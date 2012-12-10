@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,8 +128,8 @@ namespace gazebo
               };
 
       /// \brief Constructor
-      /// \param[in] parent Parent of this object
-      public: explicit Base(BasePtr parent);
+      /// \param[in] _parent Parent of this object
+      public: explicit Base(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~Base();

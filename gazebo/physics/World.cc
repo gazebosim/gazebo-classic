@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,8 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Subscriber.hh"
 
+#include "gazebo/common/LogPlay.hh"
+#include "gazebo/common/LogRecord.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Diagnostics.hh"
@@ -53,6 +55,7 @@
 #include "gazebo/physics/World.hh"
 
 #include "physics/Collision.hh"
+#include "physics/ContactManager.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -78,6 +81,12 @@ World::World(const std::string &_name)
   this->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->sdf);
 
+  this->factorySDF.reset(new sdf::SDF);
+  sdf::initFile("root.sdf", this->factorySDF);
+
+  this->logPlayStateSDF.reset(new sdf::Element);
+  sdf::initFile("state.sdf", this->logPlayStateSDF);
+
   this->receiveMutex = new boost::mutex();
   this->loadModelMutex = new boost::mutex();
 
@@ -85,6 +94,8 @@ World::World(const std::string &_name)
   this->stepInc = 0;
   this->pause = false;
   this->thread = NULL;
+
+  this->stateToggle = 0;
 
   this->pluginsLoaded = false;
 
@@ -196,11 +207,10 @@ void World::Load(sdf::ElementPtr _sdf)
 
     while (childElem)
     {
-      WorldState state;
-      state.Load(childElem);
+      WorldState myState;
+      myState.Load(childElem);
       this->sdf->InsertElement(childElem);
-      this->UpdateSDFFromState(state);
-      // this->SetState(state);
+      // this->SetState(myState);
 
       childElem = childElem->GetNextElement("state");
 
@@ -231,10 +241,10 @@ void World::Save(const std::string &_filename)
   this->UpdateStateSDF();
   std::string data;
   data = "<?xml version ='1.0'?>\n";
-  data += "<gazebo version='" +
+  data += "<sdf version='" +
           boost::lexical_cast<std::string>(SDF_VERSION) + "'>\n";
   data += this->sdf->ToString("");
-  data += "</gazebo>\n";
+  data += "</sdf>\n";
 
   std::ofstream out(_filename.c_str(), std::ios::out);
   if (!out)
@@ -257,6 +267,9 @@ void World::Init()
 
   this->testRay = boost::shared_dynamic_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
+
+  common::LogRecord::Instance()->Add(this->GetName(), "state.log",
+      boost::bind(&World::OnLog, this, _1));
 
   this->initialized = true;
 }
@@ -281,7 +294,6 @@ void World::Stop()
   }
 }
 
-
 //////////////////////////////////////////////////
 void World::RunLoop()
 {
@@ -295,50 +307,91 @@ void World::RunLoop()
 
   this->prevStepWallTime = common::Time::GetWallTime();
 
-  while (!this->stop)
-    this->Step();
+  // Get the first state
+  this->prevStates[0] = WorldState(shared_from_this());
+  this->stateToggle = 0;
+
+  if (!common::LogPlay::Instance()->IsOpen())
+  {
+    while (!this->stop)
+      this->Step();
+  }
+  else
+  {
+    this->enablePhysicsEngine = false;
+    while (!this->stop)
+      this->LogStep();
+  }
+}
+
+//////////////////////////////////////////////////
+void World::LogStep()
+{
+  if (!this->IsPaused() || this->stepInc > 0)
+  {
+    std::string data;
+    if (!common::LogPlay::Instance()->Step(data))
+    {
+      this->SetPaused(true);
+    }
+    else
+    {
+      this->logPlayStateSDF->ClearElements();
+      sdf::readString(data, this->logPlayStateSDF);
+
+      this->logPlayState.Load(this->logPlayStateSDF);
+
+      WorldState state = WorldState(shared_from_this()) + this->logPlayState;
+      this->SetState(state);
+
+      this->Update();
+    }
+
+    if (this->stepInc > 0)
+      this->stepInc--;
+  }
+
+  this->PublishWorldStats();
+
+  this->ProcessMessages();
 }
 
 //////////////////////////////////////////////////
 void World::Step()
 {
-  this->worldUpdateMutex->lock();
-
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
-    msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
-    msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
-    msgs::Set(this->worldStatsMsg.mutable_pause_time(), this->GetPauseTime());
-    this->worldStatsMsg.set_paused(this->IsPaused());
-
-    this->statPub->Publish(this->worldStatsMsg);
-    this->prevStatTime = common::Time::GetWallTime();
+    this->PublishWorldStats();
   }
 
-  if (this->IsPaused() && !this->stepInc > 0)
-    this->pauseTime += this->physicsEngine->GetStepTime();
-  else
-  {
-    // sleep here to get the correct update rate
-    common::Time sleepTime = this->prevStepWallTime +
-      common::Time(this->physicsEngine->GetUpdatePeriod()) -
-      common::Time::GetWallTime() - this->sleepOffset;
+  // sleep here to get the correct update rate
+  common::Time tmpTime = common::Time::GetWallTime();
+  common::Time sleepTime = this->prevStepWallTime +
+    common::Time(this->physicsEngine->GetUpdatePeriod()) -
+    tmpTime - this->sleepOffset;
 
-    common::Time actualSleep = common::Time::GetWallTime();
+  if (sleepTime > 0)
     common::Time::NSleep(sleepTime);
-    common::Time tmpTime = common::Time::GetWallTime();
-    actualSleep = tmpTime - actualSleep;
+  else
+    sleepTime = 0;
 
-    // throttling update rate
-    if (tmpTime - this->prevStepWallTime
-           >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+  common::Time actualSleep = common::Time::GetWallTime() - tmpTime;
+
+  // exponentially avg out
+  this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
+                      this->sleepOffset * 0.99;
+  // throttling update rate, with sleepOffset as tolerance
+  // the tolerance is needed as the sleep time is not exact
+  if (common::Time::GetWallTime() - this->prevStepWallTime + this->sleepOffset
+         >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+  {
+    this->worldUpdateMutex->lock();
+
+    this->prevStepWallTime = common::Time::GetWallTime();
+
+    if (!this->IsPaused() || this->stepInc > 0)
     {
-      this->sleepOffset = tmpTime - this->prevStepWallTime
-        - common::Time(this->physicsEngine->GetUpdatePeriod())
-        + actualSleep - sleepTime;
-
-      this->prevStepWallTime = tmpTime;
       // query timestep to allow dynamic time step size updates
       this->simTime += this->physicsEngine->GetStepTime();
       this->Update();
@@ -346,19 +399,13 @@ void World::Step()
       if (this->IsPaused() && this->stepInc > 0)
         this->stepInc--;
     }
+    else
+      this->pauseTime += this->physicsEngine->GetStepTime();
+
+    this->worldUpdateMutex->unlock();
   }
 
-  if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
-      this->processMsgsPeriod)
-  {
-    this->ProcessEntityMsgs();
-    this->ProcessRequestMsgs();
-    this->ProcessFactoryMsgs();
-    this->ProcessModelMsgs();
-    this->prevProcessMsgsTime = common::Time::GetWallTime();
-  }
-
-  this->worldUpdateMutex->unlock();
+  this->ProcessMessages();
 }
 
 //////////////////////////////////////////////////
@@ -405,14 +452,13 @@ void World::Update()
   // Update all the models
   (*this.*modelUpdateFunc)();
 
-  // TODO: put back in
-  // Logger::Instance()->Update();
+  // This must be called before PhysicsEngine::UpdatePhysics.
+  this->physicsEngine->UpdateCollision();
 
   // Update the physics engine
   if (this->enablePhysicsEngine && this->physicsEngine)
   {
-    this->physicsEngine->UpdateCollision();
-
+    // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
 
     /// need this because ODE does not call dxReallocateWorldProcessContext()
@@ -436,6 +482,22 @@ void World::Update()
     }
 
     this->dirtyPoses.clear();
+  }
+
+  // Output the contact information
+  this->physicsEngine->GetContactManager()->PublishContacts();
+
+  int currState = (this->stateToggle + 1) % 2;
+  this->prevStates[currState] = WorldState(shared_from_this());
+  WorldState diffState = this->prevStates[currState] -
+                         this->prevStates[this->stateToggle];
+
+  if (!diffState.IsZero())
+  {
+    this->stateToggle = currState;
+    this->states.push_back(diffState);
+    if (this->states.size() > 1000)
+      this->states.pop_front();
   }
 
   event::Events::worldUpdateEnd();
@@ -522,6 +584,8 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     msgs::Model msg;
     model->FillMsg(msg);
     this->modelPub->Publish(msg);
+
+    this->EnableAllModels();
   }
   else
   {
@@ -635,13 +699,11 @@ ModelPtr World::GetModel(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-std::list<ModelPtr> World::GetModels() const
+Model_V World::GetModels() const
 {
-  std::list<ModelPtr> models;
+  Model_V models;
   for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-  {
     models.push_back(this->GetModel(i));
-  }
 
   return models;
 }
@@ -652,6 +714,7 @@ void World::ResetTime()
   this->simTime = common::Time(0);
   this->pauseTime = common::Time(0);
   this->startTime = common::Time::GetWallTime();
+  this->realTimeOffset = common::Time(0);
 }
 
 //////////////////////////////////////////////////
@@ -1105,10 +1168,11 @@ void World::ProcessRequestMsgs()
       msgs::GzString msg;
       this->UpdateStateSDF();
       std::string data;
-      data = "<?xml version ='1.0'?>\n";
-      data += "<gazebo version ='1.0'>\n";
+      data = "<?xml version='1.0'?>\n";
+      data += "<sdf version='" +
+        boost::lexical_cast<std::string>(SDF_VERSION) + "'>\n";
       data += this->sdf->ToString("");
-      data += "</gazebo>\n";
+      data += "</sdf>\n";
       msg.set_data(data);
 
       std::string *serializedData = response.mutable_serialized_data();
@@ -1179,15 +1243,14 @@ void World::ProcessFactoryMsgs()
   for (iter = this->factoryMsgs.begin();
        iter != this->factoryMsgs.end(); ++iter)
   {
-    sdf::SDFPtr factorySDF(new sdf::SDF);
-    sdf::initFile("gazebo.sdf", factorySDF);
+    this->factorySDF->root->ClearElements();
 
     if ((*iter).has_sdf() && !(*iter).sdf().empty())
     {
       // SDF Parsing happens here
       if (!sdf::readString((*iter).sdf(), factorySDF))
       {
-        gzerr << "Unable to read sdf string\n";
+        gzerr << "Unable to read sdf string[" << (*iter).sdf() << "]\n";
         continue;
       }
     }
@@ -1238,7 +1301,7 @@ void World::ProcessFactoryMsgs()
       if (base)
       {
         sdf::ElementPtr elem;
-        if (factorySDF->root->GetName() == "gazebo")
+        if (factorySDF->root->GetName() == "sdf")
           elem = factorySDF->root->GetFirstElement();
         else
           elem = factorySDF->root;
@@ -1301,24 +1364,31 @@ void World::ProcessFactoryMsgs()
         ModelPtr model = this->LoadModel(elem, this->rootElement);
         model->Init();
 
-        int iterations = 0;
-
-        // Wait for the sensors to be initialized before loading
-        // plugins.
-        while (!sensors::SensorManager::Instance()->SensorsInitialized() &&
-               iterations < 50)
+        // Check to see if we need to load any model plugins
+        if (model->GetPluginCount() > 0)
         {
-          common::Time::MSleep(100);
-          iterations++;
-        }
+          int iterations = 0;
 
-        if (iterations < 50)
-          model->LoadPlugins();
-        else
-        {
-          gzerr << "Sensors failed to initialize when loading model["
-                << model->GetName() << "] via the factory mechanism."
-                << "Plugins for the model will not be loaded.\n";
+          // Wait for the sensors to be initialized before loading
+          // plugins, if there are any sensors
+          while (model->GetSensorCount() > 0 &&
+              !sensors::SensorManager::Instance()->SensorsInitialized() &&
+              iterations < 50)
+          {
+            common::Time::MSleep(100);
+            iterations++;
+          }
+
+          // Load the plugins if the sensors have been loaded, or if there
+          // are no sensors attached to the model.
+          if (iterations < 50)
+            model->LoadPlugins();
+          else
+          {
+            gzerr << "Sensors failed to initialize when loading model["
+              << model->GetName() << "] via the factory mechanism."
+              << "Plugins for the model will not be loaded.\n";
+          }
         }
       }
       else if (isLight)
@@ -1366,42 +1436,14 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
 }
 
 //////////////////////////////////////////////////
-WorldState World::GetState()
-{
-  return WorldState(shared_from_this());
-}
-
-//////////////////////////////////////////////////
-void World::UpdateStateSDF()
-{
-  this->sdf->Update();
-  sdf::ElementPtr stateElem = this->sdf->GetElement("state");
-  stateElem->ClearElements();
-
-  stateElem->GetAttribute("world_name")->Set(this->GetName());
-  stateElem->GetElement("time")->Set(this->GetSimTime());
-
-  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-  {
-    sdf::ElementPtr elem = stateElem->AddElement("model");
-    this->GetModel(i)->GetState().FillStateSDF(elem);
-  }
-}
-
-//////////////////////////////////////////////////
 void World::SetState(const WorldState &_state)
 {
-  sdf::ElementPtr stateElem = this->sdf->GetElement("state");
-
-  stateElem->GetAttribute("world_name")->Set(_state.GetName());
-  stateElem->GetElement("time")->Set(_state.GetSimTime());
-
   this->SetSimTime(_state.GetSimTime());
+
   for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
   {
     ModelState modelState = _state.GetModelState(i);
     ModelPtr model = this->GetModel(modelState.GetName());
-    modelState.FillStateSDF(stateElem->AddElement("model"));
     if (model)
       model->SetState(modelState);
     else
@@ -1446,29 +1488,6 @@ std::string World::StripWorldName(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-void World::UpdateSDFFromState(const WorldState &_state)
-{
-  if (this->sdf->HasElement("model"))
-  {
-    sdf::ElementPtr childElem = this->sdf->GetElement("model");
-
-    while (childElem)
-    {
-      for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
-      {
-        ModelState modelState = _state.GetModelState(i);
-        if (modelState.GetName() == childElem->GetValueString("name"))
-        {
-          modelState.UpdateModelSDF(childElem);
-        }
-      }
-
-      childElem = childElem->GetNextElement("model");
-    }
-  }
-}
-
-//////////////////////////////////////////////////
 void World::EnableAllModels()
 {
   for (unsigned int i = 0; i < this->GetModelCount(); ++i)
@@ -1480,4 +1499,77 @@ void World::DisableAllModels()
 {
   for (unsigned int i = 0; i < this->GetModelCount(); ++i)
     this->GetModel(i)->SetEnabled(false);
+}
+
+//////////////////////////////////////////////////
+void World::UpdateStateSDF()
+{
+  this->sdf->Update();
+  /*sdf::ElementPtr stateElem = this->sdf->GetElement("state");
+  stateElem->ClearElements();
+
+  stateElem->GetAttribute("world_name")->Set(this->GetName());
+  stateElem->GetElement("time")->Set(this->GetSimTime());
+
+  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
+  {
+    sdf::ElementPtr elem = stateElem->AddElement("model");
+    this->GetModel(i)->GetState().FillStateSDF(elem);
+  }
+  */
+}
+
+//////////////////////////////////////////////////
+bool World::OnLog(std::ostringstream &_stream)
+{
+  static bool first = true;
+
+  // Save the entire state when its the first call to OnLog.
+  if (first)
+  {
+    this->UpdateStateSDF();
+    _stream << "<sdf version ='";
+    _stream << SDF_VERSION;
+    _stream << "'>\n";
+    _stream << this->sdf->ToString("");
+    _stream << "</sdf>\n";
+
+    first = false;
+  }
+  else if (this->states.size() > 1)
+  {
+    // Get the difference from the previous state.
+    _stream << "<sdf version='" << SDF_VERSION << "'>";
+    _stream << this->states[0];
+    _stream << "</sdf>";
+    this->states.pop_front();
+  }
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+void World::ProcessMessages()
+{
+  if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
+      this->processMsgsPeriod)
+  {
+    this->ProcessEntityMsgs();
+    this->ProcessRequestMsgs();
+    this->ProcessFactoryMsgs();
+    this->ProcessModelMsgs();
+    this->prevProcessMsgsTime = common::Time::GetWallTime();
+  }
+}
+
+//////////////////////////////////////////////////
+void World::PublishWorldStats()
+{
+  msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
+  msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
+  msgs::Set(this->worldStatsMsg.mutable_pause_time(), this->GetPauseTime());
+  this->worldStatsMsg.set_paused(this->IsPaused());
+
+  this->statPub->Publish(this->worldStatsMsg);
+  this->prevStatTime = common::Time::GetWallTime();
 }

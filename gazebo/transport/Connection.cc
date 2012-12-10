@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,6 @@ Connection::Connection()
   this->writeMutex = new boost::recursive_mutex();
   this->readMutex = new boost::recursive_mutex();
   this->acceptor = NULL;
-  this->readThread = NULL;
   this->readQuit = false;
   this->writeQueue.clear();
   this->writeCount = 0;
@@ -117,18 +116,6 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
 
   this->connectCondition.wait(lock);
 
-  // Hack to make the connections work...
-  // common::Time::MSleep(100);
-
-  // We want the ::Connection call to block until a connection is
-  // established
-  /*int count = 0;
-  while (this->remoteURI.empty() && count < 20 && !this->connectError)
-  {
-    common::Time::MSleep(50);
-    ++count;
-  }*/
-
   if (this->connectError)
   {
     return false;
@@ -191,21 +178,12 @@ void Connection::OnAccept(const boost::system::error_code &e)
 void Connection::StartRead(const ReadCallback & /*_cb*/)
 {
   gzerr << "\n\n\n\n DONT USE \n\n\n\n";
-  // this->readThread =
-  // new boost::thread(
-  // boost::bind(&Connection::ReadLoop,shared_from_this(),cb));
 }
 
 //////////////////////////////////////////////////
 void Connection::StopRead()
 {
   this->readQuit = true;
-  if (this->readThread)
-  {
-    this->readThread->join();
-    delete this->readThread;
-  }
-  this->readThread = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -260,6 +238,7 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     }
 }
 
+/////////////////////////////////////////////////
 void Connection::ProcessWriteQueue()
 {
   if (!this->IsOpen())
@@ -680,4 +659,10 @@ void Connection::OnConnect(const boost::system::error_code &_error,
     this->connectError = true;
     this->connectCondition.notify_one();
   }
+}
+
+//////////////////////////////////////////////////
+unsigned int Connection::GetId() const
+{
+  return this->id;
 }

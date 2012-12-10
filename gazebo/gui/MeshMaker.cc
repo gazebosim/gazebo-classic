@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,7 +162,7 @@ void MeshMaker::CreateTheEntity()
 
   std::ostringstream newModelStr;
 
-  newModelStr << "<gazebo version ='1.0'>\
+  newModelStr << "<sdf version ='1.3'>\
     <model name='custom_user_mesh" << counter << "_model'>\
     <pose>" << this->visualMsg->pose().position().x() << " "
               << this->visualMsg->pose().position().y() << " "
@@ -186,7 +186,7 @@ void MeshMaker::CreateTheEntity()
       </visual>\
     </link>\
   </model>\
-  </gazebo>";
+  </sdf>";
 
   msg.set_sdf(newModelStr.str());
 

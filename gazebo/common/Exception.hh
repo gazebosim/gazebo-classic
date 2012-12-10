@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,9 @@ namespace gazebo
       /// \brief Return the error string
       /// \return The error string
       public: std::string GetErrorStr() const;
+
+      /// \brief Print the exception to std out.
+      public: void Print() const;
 
       /// \brief The error function
       private: std::string file;

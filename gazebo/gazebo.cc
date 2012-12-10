@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@
 #include <vector>
 #include <boost/thread/mutex.hpp>
 
-#include "transport/transport.hh"
-#include "common/common.hh"
-#include "math/gzmath.hh"
-#include "gazebo_config.h"
-#include "gazebo.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/common/LogRecord.hh"
+#include "gazebo/math/gzmath.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/gazebo.hh"
 
 boost::mutex fini_mutex;
 std::vector<gazebo::SystemPluginPtr> g_plugins;
@@ -89,6 +90,7 @@ void gazebo::run()
 /////////////////////////////////////////////////
 void gazebo::stop()
 {
+  common::LogRecord::Instance()->Stop();
   gazebo::transport::stop();
 }
 
@@ -96,7 +98,7 @@ void gazebo::stop()
 void gazebo::fini()
 {
   boost::mutex::scoped_lock lock(fini_mutex);
+  common::LogRecord::Instance()->Stop();
   g_plugins.clear();
   gazebo::transport::fini();
 }
-

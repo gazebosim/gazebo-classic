@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace sdf
   /// \brief Convert from one version of SDF to another
   class Converter
   {
-    public: static bool Convert(TiXmlElement *_elem,
+    public: static bool Convert(TiXmlDocument *_doc,
                                 const std::string &_toVersion,
                                 bool _quiet = false);
 

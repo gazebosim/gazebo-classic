@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,12 @@ using namespace rendering;
 Ogre::ColourValue Conversions::Convert(const common::Color &_color)
 {
   return Ogre::ColourValue(_color.r, _color.g, _color.b, _color.a);
+}
+
+//////////////////////////////////////////////////
+common::Color Conversions::Convert(const Ogre::ColourValue &_clr)
+{
+  return common::Color(_clr.r, _clr.g, _clr.b, _clr.a);
 }
 
 //////////////////////////////////////////////////

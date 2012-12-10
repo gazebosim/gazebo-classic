@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 
 #include "sdf/interface/Param.hh"
 
-#define SDF_VERSION "1.2"
+#define SDF_VERSION "1.3"
 
 /// \ingroup gazebo_parser
 /// \brief namespace for Simulation Description Format parser

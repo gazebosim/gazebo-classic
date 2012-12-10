@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,6 +129,7 @@ void Sensor::Update(bool _force)
   {
     if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod)
     {
+      this->lastUpdateTime = this->world->GetSimTime();
       this->UpdateImpl(_force);
     }
   }
@@ -210,6 +211,12 @@ common::Time Sensor::GetLastUpdateTime()
 }
 
 //////////////////////////////////////////////////
+common::Time Sensor::GetLastMeasurementTime()
+{
+  return this->lastMeasurementTime;
+}
+
+//////////////////////////////////////////////////
 std::string Sensor::GetType() const
 {
   return this->sdf->GetValueString("type");
@@ -225,8 +232,9 @@ bool Sensor::GetVisualize() const
 std::string Sensor::GetTopic() const
 {
   std::string result;
-  if (this->sdf->HasElement("topic"))
-    result = this->sdf->GetElement("topic")->GetValueString();
+  if (this->sdf->HasElement("topic") &&
+      this->sdf->GetValueString("topic") != "__default__")
+    result = this->sdf->GetValueString("topic");
   return result;
 }
 

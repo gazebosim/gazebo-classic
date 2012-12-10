@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,8 +119,7 @@ int main(int argc, char** argv)
     TiXmlDocument xmlDoc;
     if (xmlDoc.LoadFile(params[1]))
     {
-      TiXmlElement *gazeboNode = xmlDoc.FirstChildElement("gazebo");
-      sdf::Converter::Convert(gazeboNode, SDF::version, true);
+      sdf::Converter::Convert(&xmlDoc, SDF::version, true);
       xmlDoc.SaveFile(params[1]);
     }
     else

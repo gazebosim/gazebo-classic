@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,12 @@ void DynamicLines::AddPoint(const math::Vector3 &pt)
 {
   this->points.push_back(pt);
   this->dirty = true;
+}
+
+/////////////////////////////////////////////////
+void DynamicLines::AddPoint(double _x, double _y, double _z)
+{
+  this->AddPoint(math::Vector3(_x, _y, _z));
 }
 
 /////////////////////////////////////////////////

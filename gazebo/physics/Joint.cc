@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -374,12 +374,6 @@ void Joint::SetAngle(int /*index*/, math::Angle _angle)
 }
 
 //////////////////////////////////////////////////
-JointState Joint::GetState()
-{
-  return JointState(boost::shared_static_cast<Joint>(shared_from_this()));
-}
-
-//////////////////////////////////////////////////
 void Joint::SetState(const JointState &_state)
 {
   this->SetMaxForce(0, 0);
@@ -398,3 +392,11 @@ double Joint::GetForce(int /*_index*/)
 {
   return 0;
 }
+
+//////////////////////////////////////////////////
+void Joint::ApplyDamping()
+{
+  double dampingForce = -this->dampingCoefficient * this->GetVelocity(0);
+  this->SetForce(0, dampingForce);
+}
+

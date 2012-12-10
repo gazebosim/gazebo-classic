@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <vector>
 #include <string>
 
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 
 namespace gazebo
@@ -40,25 +41,32 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~ImuSensor();
 
-      /// \brief Load the ImuSensor from SDF.
-      /// \param[in] _node The SDF data.
-      protected: virtual void Load(sdf::ElementPtr _node);
+      // Documentation inherited.
+      protected: void Load(const std::string &_worldName, sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      protected: virtual void Load(const std::string &_worldName);
 
       /// \brief Initialize the IMU.
       protected: virtual void Init();
 
-      /// \brief Update sensed values.
-      protected: virtual void Update();
+      // Documentation inherited
+      protected: virtual void UpdateImpl(bool _force);
 
-      /// \brief Finalize the IMU.
+      // Documentation inherited
       protected: virtual void Fini();
 
-      /// \brief Returns velocity as a math::Pose
-      /// \return velocity data stored in Pose
-      public: math::Pose GetVelocity();
+      /// \brief Returns the angular velocity.
+      /// \return Angular velocity.
+      public: math::Vector3 GetAngularVelocity() const;
 
-      private: Pose prevPose;
-      private: Pose imuVel;
+      /// \brief Returns the linear acceleration.
+      /// \return Linear acceleration.
+      public: math::Vector3 GetLinearAcceleration() const;
+
+      private: transport::PublisherPtr pub;
+      private: physics::LinkPtr parentEntity;
+      private: msgs::IMU imuMsg;
     };
     /// \}
   }

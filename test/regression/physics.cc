@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ class PhysicsTest : public ServerFixture
 
 TEST_F(PhysicsTest, State)
 {
+  /// \TODO: Redo state test
+  /*
   Load("worlds/empty.world");
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
@@ -82,82 +84,65 @@ TEST_F(PhysicsTest, State)
   pose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
   EXPECT_TRUE(pose == modelState2.GetPose());
   Unload();
+  */
 }
 
-TEST_F(PhysicsTest, CollisionTest)
+TEST_F(PhysicsTest, JointDampingTest)
 {
-  // check conservation of mementum for linear inelastic collision
-  Load("worlds/collision_test.world", true);
+  Load("worlds/damp_test.world", true);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
+  int i = 0;
+  while (!this->HasEntity("model_4_mass_1_ixx_1_damping_10") && i < 20)
   {
-    // todo: get parameters from drop_test.world
-    double test_duration = 1.1;
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get model_4_mass_1_ixx_1_damping_10");
+
+  physics::ModelPtr model = world->GetModel("model_4_mass_1_ixx_1_damping_10");
+  EXPECT_TRUE(model != NULL);
+
+  {
+    // compare against recorded data only
+    double test_duration = 1.5;
     double dt = world->GetPhysicsEngine()->GetStepTime();
-
-    double f = 1000.0;
-    double v = 0;
-    double x = 0;
-
     int steps = test_duration/dt;
 
     for (int i = 0; i < steps; i++)
     {
-      double t = world->GetSimTime().Double();
-
       world->StepWorld(1);  // theoretical contact, but
-      {
-        physics::ModelPtr box_model = world->GetModel("box");
-        if (box_model)
-        {
-          math::Vector3 vel = box_model->GetWorldLinearVel();
-          math::Pose pose = box_model->GetWorldPose();
-          // gzdbg << "box time [" << t
-          //      << "] sim x [" << pose.pos.x
-          //      << "] ideal x [" << x
-          //      << "] sim vx [" << vel.x
-          //      << "] ideal vx [" << v
-          //      << "]\n";
-
-          if (i == 0)
-            box_model->GetLink("link")->SetForce(math::Vector3(1000, 0, 0));
-          EXPECT_LT(fabs(pose.pos.x - x), 0.00001);
-          EXPECT_LT(fabs(vel.x - v), 0.00001);
-        }
-
-        physics::ModelPtr sphere_model = world->GetModel("sphere");
-        if (sphere_model)
-        {
-          math::Vector3 vel = sphere_model->GetWorldLinearVel();
-          math::Pose pose = sphere_model->GetWorldPose();
-          // gzdbg << "sphere time [" << world->GetSimTime().Double()
-          //      << "] sim x [" << pose.pos.x
-          //      << "] ideal x [" << x
-          //      << "] sim vx [" << vel.x
-          //      << "] ideal vx [" << v
-          //      << "]\n";
-          if (t < 1.001)
-          {
-            EXPECT_EQ(pose.pos.x, 2);
-            EXPECT_EQ(vel.x, 0);
-          }
-          else
-          {
-            EXPECT_LT(fabs(pose.pos.x - x - 1.0), 0.00001);
-            EXPECT_LT(fabs(vel.x - v), 0.00001);
-          }
-        }
-      }
-
-      // integrate here to see when the collision should happen
-      double impulse = dt*f;
-      if (i == 0) v = v + impulse;
-      else if (t >= 1.0) v = dt*f/ 2.0;  // inelastic col. w/ eqal mass.
-      x = x + dt * v;
+      // gzdbg << "box time [" << world->GetSimTime().Double()
+      //       << "] vel [" << model->GetWorldLinearVel()
+      //       << "] pose [" << model->GetWorldPose()
+      //       << "]\n";
     }
+
+    EXPECT_EQ(world->GetSimTime().Double(), 1.5);
+
+    math::Vector3 vel = model->GetWorldLinearVel();
+    math::Pose pose = model->GetWorldPose();
+
+    EXPECT_EQ(vel.x, 0.0);
+
+    EXPECT_LT(vel.y, -10.2006);
+    EXPECT_GT(vel.y, -10.2008);
+    EXPECT_LT(vel.z, -6.51766);
+    EXPECT_GT(vel.z, -6.51768);
+
+    EXPECT_EQ(pose.pos.x, 3.0);
+    EXPECT_LT(pose.pos.y, 5.0e-6);
+    EXPECT_GT(pose.pos.y, 0.0);
+    EXPECT_GT(pose.pos.z, 10.099);
+    EXPECT_LT(pose.pos.z, 10.101);
+    EXPECT_GT(pose.rot.GetAsEuler().x, 0.567336);
+    EXPECT_LT(pose.rot.GetAsEuler().x, 0.567338);
+    EXPECT_EQ(pose.rot.GetAsEuler().y, 0.0);
+    EXPECT_EQ(pose.rot.GetAsEuler().z, 0.0);
   }
-  Unload();
 }
 
 TEST_F(PhysicsTest, DropStuff)
@@ -166,6 +151,15 @@ TEST_F(PhysicsTest, DropStuff)
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
+  int i = 0;
+  while (!this->HasEntity("cylinder") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get cylinder");
 
   {
     // todo: get parameters from drop_test.world
@@ -258,14 +252,110 @@ TEST_F(PhysicsTest, DropStuff)
       if (z < 0.5) post_contact_correction = true;
     }
   }
-  Unload();
 }
+
+
+TEST_F(PhysicsTest, CollisionTest)
+{
+  // check conservation of mementum for linear inelastic collision
+  Load("worlds/collision_test.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  int i = 0;
+  while (!this->HasEntity("sphere") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get sphere");
+
+  {
+    // todo: get parameters from drop_test.world
+    double test_duration = 1.1;
+    double dt = world->GetPhysicsEngine()->GetStepTime();
+
+    double f = 1000.0;
+    double v = 0;
+    double x = 0;
+
+    int steps = test_duration/dt;
+
+    for (int i = 0; i < steps; i++)
+    {
+      double t = world->GetSimTime().Double();
+
+      world->StepWorld(1);  // theoretical contact, but
+      {
+        physics::ModelPtr box_model = world->GetModel("box");
+        if (box_model)
+        {
+          math::Vector3 vel = box_model->GetWorldLinearVel();
+          math::Pose pose = box_model->GetWorldPose();
+          // gzdbg << "box time [" << t
+          //      << "] sim x [" << pose.pos.x
+          //      << "] ideal x [" << x
+          //      << "] sim vx [" << vel.x
+          //      << "] ideal vx [" << v
+          //      << "]\n";
+
+          if (i == 0)
+            box_model->GetLink("link")->SetForce(math::Vector3(1000, 0, 0));
+          EXPECT_LT(fabs(pose.pos.x - x), 0.00001);
+          EXPECT_LT(fabs(vel.x - v), 0.00001);
+        }
+
+        physics::ModelPtr sphere_model = world->GetModel("sphere");
+        if (sphere_model)
+        {
+          math::Vector3 vel = sphere_model->GetWorldLinearVel();
+          math::Pose pose = sphere_model->GetWorldPose();
+          // gzdbg << "sphere time [" << world->GetSimTime().Double()
+          //      << "] sim x [" << pose.pos.x
+          //      << "] ideal x [" << x
+          //      << "] sim vx [" << vel.x
+          //      << "] ideal vx [" << v
+          //      << "]\n";
+          if (t < 1.001)
+          {
+            EXPECT_EQ(pose.pos.x, 2);
+            EXPECT_EQ(vel.x, 0);
+          }
+          else
+          {
+            EXPECT_LT(fabs(pose.pos.x - x - 1.0), 0.00001);
+            EXPECT_LT(fabs(vel.x - v), 0.00001);
+          }
+        }
+      }
+
+      // integrate here to see when the collision should happen
+      double impulse = dt*f;
+      if (i == 0) v = v + impulse;
+      else if (t >= 1.0) v = dt*f/ 2.0;  // inelastic col. w/ eqal mass.
+      x = x + dt * v;
+    }
+  }
+}
+
 
 TEST_F(PhysicsTest, SimplePendulumTest)
 {
   Load("worlds/simple_pendulums.world", true);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
+
+  int i = 0;
+  while (!this->HasEntity("model_1") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get model_1");
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
   EXPECT_TRUE(physicsEngine);
@@ -298,10 +388,9 @@ TEST_F(PhysicsTest, SimplePendulumTest)
   physicsEngine->SetSORPGSIters(1000);
 
   {
-    /* test with global contact_max_correcting_vel at 0 as set by world file
-       here we expect significant energy loss as the velocity correction
-       is set to 0
-    */
+    // test with global contact_max_correcting_vel at 0 as set by world file
+    //   here we expect significant energy loss as the velocity correction
+    //   is set to 0
     int steps = 10;  // @todo: make this more general
     for (int i = 0; i < steps; i ++)
     {
@@ -347,9 +436,8 @@ TEST_F(PhysicsTest, SimplePendulumTest)
 
 
   {
-    /* test with global contact_max_correcting_vel at 100
-       here we expect much lower energy loss
-    */
+    // test with global contact_max_correcting_vel at 100
+    // here we expect much lower energy loss
     world->Reset();
     physicsEngine->SetContactMaxCorrectingVel(100);
 
@@ -394,7 +482,6 @@ TEST_F(PhysicsTest, SimplePendulumTest)
       }
     }
   }
-  Unload();
 }
 
 int main(int argc, char **argv)

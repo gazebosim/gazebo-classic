@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,7 +186,7 @@ std::string CylinderMaker::GetSDFString()
   std::ostringstream newModelStr;
 
   newModelStr
-    << "<gazebo version ='1.2'>"
+    << "<sdf version ='1.3'>"
     << "  <model name ='unit_cylinder_" << counter << "'>"
     << "    <pose>0 0 0.5 0 0 0</pose>"
     << "    <link name='link'>"
@@ -215,7 +215,7 @@ std::string CylinderMaker::GetSDFString()
     << "      </visual>"
     << "    </link>"
     << "  </model>"
-    << "</gazebo>";
+    << "</sdf>";
 
   return newModelStr.str();
 }

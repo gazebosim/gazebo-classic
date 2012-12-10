@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 #include <boost/archive/iterators/insert_linebreaks.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 #include <boost/archive/iterators/ostream_iterator.hpp>
+#include <boost/filesystem.hpp>
 
 #include "common/Event.hh"
 #include "common/SingletonT.hh"
@@ -40,7 +41,7 @@ namespace gazebo
 {
   namespace common
   {
-    //addtogroup gazebo_common
+    /// addtogroup gazebo_common
     /// \{
 
     /// \class LogRecord LogRecord.hh common/common.hh

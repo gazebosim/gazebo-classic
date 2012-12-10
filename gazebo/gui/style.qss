@@ -128,10 +128,10 @@ QTreeView::branch:!selected
   color: #d0d0d0;
 }
 
-QTreeView::item:selected
+QTreeView::item:selected,
+QTreeView::item:hover
 {
   color: #f58113;
-  background: #737373;
 }
 
 QTreeView QHeaderView:section

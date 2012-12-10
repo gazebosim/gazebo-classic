@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ namespace gazebo
       public: void SetCoG(const math::Vector3 &_center);
 
       /// \brief Get the center of gravity.
-      /// \return The cneter of gravity.
+      /// \return The center of gravity.
       public: inline const math::Vector3 &GetCoG() const
               {return this->cog;}
 
@@ -155,7 +155,7 @@ namespace gazebo
 
       /// \brief Rotate this mass.
       /// \param[in] _rot Rotation amount.
-      public: void Rotate(const math::Quaternion &rot);
+      public: void Rotate(const math::Quaternion &_rot);
 
       /// \brief Equal operator.
       /// \param[in] _inertial Inertial to copy.
@@ -207,6 +207,10 @@ namespace gazebo
 
       /// \brief Our SDF values.
       private: sdf::ElementPtr sdf;
+
+      /// \brief An SDF pointer that allows us to only read the inertial.sdf
+      /// file once, which in turns limits disk reads.
+      private: static sdf::ElementPtr sdfInertial;
     };
     /// \}
   }

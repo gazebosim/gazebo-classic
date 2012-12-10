@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ TEST_F(PhysicsTest, State)
       math::Pose pose(0, 0, 3, 0, 0, 0);
       math::Vector3 size(1.0, 0.1, 0.1);
       newModelStr
-        << "<gazebo version ='1.2'>\n"
+        << "<gazebo version='" << SDF_VERSION << "'>\n"
         << "  <model name='model_1'>\n"
         << "    <pose>" << pose << "</pose>\n"
         << "    <link name='link_1'>\n"

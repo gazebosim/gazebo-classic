@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
  * Author: Nate Koenig
  */
 
-#include "common/Exception.hh"
-#include "transport/TopicManager.hh"
-#include "transport/Publisher.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/transport/TopicManager.hh"
+#include "gazebo/transport/Publisher.hh"
 
 using namespace gazebo;
 using namespace transport;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@
 using namespace gazebo;
 using namespace physics;
 
+sdf::ElementPtr Inertial::sdfInertial;
+
 //////////////////////////////////////////////////
 Inertial::Inertial()
 {
@@ -27,8 +29,14 @@ Inertial::Inertial()
   this->principals.Set(1, 1, 1);
   this->products.Set(0, 0, 0);
 
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("inertial.sdf", this->sdf);
+  if (!this->sdfInertial)
+  {
+    this->sdfInertial.reset(new sdf::Element);
+    sdf::initFile("inertial.sdf", this->sdfInertial);
+  }
+
+  // This is the only time this->sdfInertial should be used.
+  this->sdf = this->sdfInertial->Clone();
 }
 
 //////////////////////////////////////////////////

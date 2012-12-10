@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/ode/ODELink.hh"
 #include "physics/ode/ODEJoint.hh"
+#include "physics/ScrewJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -91,6 +92,26 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       this->SetParam(dParamVel,
           elem->GetElement("velocity")->GetValueDouble());
   }
+
+  if (this->sdf->HasElement("axis"))
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    if (axisElem->HasElement("dynamics"))
+    {
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+
+      if (dynamicsElem->HasElement("damping"))
+      {
+        this->SetDamping(0, dynamicsElem->GetValueDouble("damping"));
+      }
+      if (dynamicsElem->HasElement("friction"))
+      {
+        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+        gzwarn << "joint friction not implemented\n";
+      }
+    }
+  }
+
 
   // TODO: reimplement
   /*if (**this->provideFeedbackP)
@@ -367,6 +388,162 @@ void ODEJoint::SetAttribute(Attribute _attr, int /*_index*/, double _value)
   };
 }
 
+//////////////////////////////////////////////////
+void ODEJoint::SetAttribute(const std::string &_key, int /*_index*/,
+                            const boost::any &_value)
+{
+  if (_key == "fudge_factor")
+  {
+    try
+    {
+      this->SetParam(dParamFudgeFactor, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "suspension_erp")
+  {
+    try
+    {
+      this->SetParam(dParamSuspensionERP, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "suspension_cfm")
+  {
+    try
+    {
+      this->SetParam(dParamSuspensionCFM, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "stop_erp")
+  {
+    try
+    {
+      this->SetParam(dParamStopERP, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "stop_cfm")
+  {
+    try
+    {
+      this->SetParam(dParamStopCFM, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "erp")
+  {
+    try
+    {
+      this->SetParam(dParamERP, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "cfm")
+  {
+    try
+    {
+      this->SetParam(dParamCFM, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "fmax")
+  {
+    try
+    {
+      this->SetParam(dParamFMax, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "vel")
+  {
+    try
+    {
+      this->SetParam(dParamVel, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "hi_stop")
+  {
+    try
+    {
+      this->SetParam(dParamHiStop, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "lo_stop")
+  {
+    try
+    {
+      this->SetParam(dParamLoStop, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "thread_pitch")
+  {
+    ScrewJoint<ODEJoint>* screwJoint =
+      dynamic_cast<ScrewJoint<ODEJoint>* >(this);
+    if (screwJoint != NULL)
+    {
+      try
+      {
+        screwJoint->SetThreadPitch(0, boost::any_cast<double>(_value));
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+      }
+    }
+  }
+  else
+  {
+    try
+    {
+      gzerr << "Unable to handle joint attribute["
+            << boost::any_cast<std::string>(_value) << "]\n";
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 void ODEJoint::Reset()
 {
   dJointReset(this->jointId);

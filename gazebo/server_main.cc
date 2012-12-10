@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,30 @@
  * limitations under the License.
  *
 */
-#include "Server.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/LogRecord.hh"
+#include "gazebo/Server.hh"
 
 //////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  gazebo::Server *server = new gazebo::Server();
-  if (!server->ParseArgs(argc, argv))
-    return -1;
+  try
+  {
+    gazebo::common::LogRecord::Instance()->Init("server");
 
-  server->Run();
-  server->Fini();
+    gazebo::Server *server = new gazebo::Server();
+    if (!server->ParseArgs(argc, argv))
+      return -1;
 
-  delete server;
+    server->Run();
+    server->Fini();
+
+    delete server;
+  }
+  catch(gazebo::common::Exception &_e)
+  {
+    _e.Print();
+  }
+
   return 0;
 }

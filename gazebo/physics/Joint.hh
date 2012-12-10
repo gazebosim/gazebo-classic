@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,10 @@
 
 #include <string>
 
+#include <boost/any.hpp>
+
 #include "gazebo/common/Event.hh"
+#include "gazebo/common/Events.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/MessageTypes.hh"
@@ -112,10 +115,6 @@ namespace gazebo
       /// \brief Reset the joint.
       public: virtual void Reset();
 
-      /// \brief Get the joint state.
-      /// \return The current joint state.
-      public: JointState GetState();
-
       /// \brief Set the joint state.
       /// \param[in] _state Joint state
       public: void SetState(const JointState &_state);
@@ -154,6 +153,9 @@ namespace gazebo
       /// \param[in] _index Index of the axis to set.
       /// \param[in] _damping Damping value for the axis.
       public: virtual void SetDamping(int _index, double _damping) = 0;
+
+      /// \brief Callback to apply damping force to joint.
+      public: virtual void ApplyDamping();
 
       /// \brief Connect a boost::slot the the joint update signal.
       /// \param[in] _subscriber Callback for the connection.
@@ -266,6 +268,10 @@ namespace gazebo
       /// \return Angle of the axis.
       public: math::Angle GetAngle(int _index) const;
 
+      /// \brief Get the angle count.
+      /// \return The number of DOF for the joint.
+      public: virtual unsigned int GetAngleCount() const = 0;
+
       /// \brief If the Joint is static, Gazebo stores the state of
       /// this Joint as a scalar inside the Joint class, so
       /// this call will NOT move the joint dynamically for a static Model.
@@ -305,7 +311,15 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
       public: virtual void SetAttribute(Attribute _attr, int _index,
-                                        double _value) = 0;
+                                        double _value) GAZEBO_DEPRECATED = 0;
+
+      /// \brief Set a non-generic parameter for the joint.
+      /// replaces SetAttribute(Attribute, int, double)
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _value Value of the attribute.
+      public: virtual void SetAttribute(const std::string &_key, int _index,
+                                        const boost::any &_value) = 0;
 
       /// \brief Get the child link
       /// \return Pointer to the child link.
@@ -316,6 +330,7 @@ namespace gazebo
       public: LinkPtr GetParent() const;
 
       /// \brief DEPRECATED
+      /// \param[out] _msg Message to fill with joint's properties
       /// \sa Joint::FillMsg
       public: void FillJointMsg(msgs::Joint &_msg) GAZEBO_DEPRECATED;
 
@@ -350,11 +365,14 @@ namespace gazebo
       /// \brief Joint update event.
       private: event::EventT<void ()> jointUpdate;
 
-      /// \brief joint damping_coefficient
-      protected: double damping_coefficient;
+      /// \brief joint dampingCoefficient
+      protected: double dampingCoefficient;
 
       /// \brief Angle used when the joint is paret of a static model.
       private: math::Angle staticAngle;
+
+      /// \brief apply damping for adding viscous damping forces on updates
+      protected: gazebo::event::ConnectionPtr applyDamping;
     };
     /// \}
   }

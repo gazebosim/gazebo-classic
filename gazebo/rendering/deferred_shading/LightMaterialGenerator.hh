@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,7 +147,7 @@ namespace gazebo
         ptrProgram->setParameter("compile_arguments",
             this->GetPPDefines(_permutation));
         this->SetUpBaseParameters(ptrProgram->getDefaultParameters());
-        
+
         return Ogre::GpuProgramPtr(ptrProgram);
       }*/
       ///////////////////////////////////////////////
@@ -198,8 +198,12 @@ namespace gazebo
 
         // TODO: This requires a test for Deferred Shading. Deferred
         // Lighting does not use this
-        // ptrProgram->getDefaultParameters()->setNamedConstant(
-        //    "tex1", static_cast<int>(1));
+        if (ptrProgram->getDefaultParameters()->_findNamedConstantDefinition(
+            "tex1"))
+        {
+          ptrProgram->getDefaultParameters()->setNamedConstant(
+              "tex1", static_cast<int>(1));
+        }
 
         if (_permutation &
             LightMaterialGenerator<techniquePolicy>::MI_SHADOW_CASTER)
@@ -271,7 +275,7 @@ namespace gazebo
       if(this->UseMaterialProperties()){
         strPPD += "-DUSE_MAT_PROPERTIES ";
       }
-      
+
       return strPPD;
     }*/
       ///////////////////////////////////////////////

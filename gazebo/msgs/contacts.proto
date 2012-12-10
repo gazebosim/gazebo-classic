@@ -6,9 +6,11 @@ package gazebo.msgs;
 
 
 import "contact.proto";
+import "time.proto";
 
 message Contacts
 {
   repeated Contact contact   = 1;
+  required Time time         = 2;
 }
 

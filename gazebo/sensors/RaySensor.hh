@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 23 february 2004
 */
 
-#ifndef RAYSENSOR_HH
-#define RAYSENSOR_HH
+#ifndef _RAYSENSOR_HH_
+#define _RAYSENSOR_HH_
 
 #include <vector>
 #include <string>
@@ -40,9 +40,10 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
-    /// \class RaySensor RaySensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
+
+    /// \class RaySensor RaySensor.hh sensors/sensors.hh
     /// \brief Sensor with one or more rays.
     ///
     /// This sensor cast rays into the world, tests for intersections, and
@@ -56,38 +57,30 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~RaySensor();
 
-      /// \brief Load the sensor with SDF parameters
-      /// \param[in] _sdf SDF Sensor parameters
-      /// \param[in] _worldName Name of world to load from
-      public: virtual void Load(const std::string &_worldName,
-                                sdf::ElementPtr _sdf);
-
-      /// \brief Load the sensor with default parameters
-      /// \param[in] _worldName Name of world to load from
+      // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
 
-      /// \brief Initialize the ray
+      // Documentation inherited
       public: virtual void Init();
 
-      /// \brief Update the sensor information
+      // Documentation inherited
       protected: virtual void UpdateImpl(bool _force);
 
-      /// \brief Finalize the ray
+      // Documentation inherited
       protected: virtual void Fini();
 
-      /// \brief Gets the topic name of the sensor
-      /// \return Topic name
+      // Documentation inherited
       public: virtual std::string GetTopic() const;
 
       /// \brief Get the minimum angle
-      /// \return The minimum angle
+      /// \return The minimum angle object
       public: math::Angle GetAngleMin() const;
 
       /// \brief Get the maximum angle
-      /// \return the maximum angle
+      /// \return the maximum angle object
       public: math::Angle GetAngleMax() const;
 
-      /// \brief Get radians between each range
+      /// \brief Get the angle in radians between each range
       /// \return Resolution of the angle
       public: double GetAngleResolution() const;
 

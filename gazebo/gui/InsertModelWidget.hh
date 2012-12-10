@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 
 #include <string>
 #include <map>
+#include <boost/thread/mutex.hpp>
+
 #include "gui/qt.h"
 
 class QTreeWidget;
@@ -48,10 +50,35 @@ namespace gazebo
       /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
 
+      /// \brief An update function that lets this widget add in the results
+      /// from ModelDatabase::GetModels.
+      private slots: void Update();
+
+      /// \brief QT callback when a path is changed.
+      /// \param[in] _path The path that was changed.
+      private slots: void OnDirectoryChanged(const QString &_path);
+
+      /// \brief Update the list of models on the local system.
+      private: void UpdateAllLocalPaths();
+
+      /// \brief Update a specific path.
+      /// \param[in] _path The path to update.
+      private: void UpdateLocalPath(const std::string &_path);
+
+      /// \brief Widget that display all the models that can be inserted.
       private: QTreeWidget *fileTreeWidget;
 
       /// \brief Tree item that is populated with models from the ModelDatabase.
       private: QTreeWidgetItem *modelDatabaseItem;
+
+      /// \brief Mutex to protect the modelBuffer.
+      private: boost::mutex mutex;
+
+      /// \brief Buffer to hold the results from ModelDatabase::GetModels.
+      private: std::map<std::string, std::string> modelBuffer;
+
+      /// \brief A file/directory watcher.
+      private: QFileSystemWatcher *watcher;
     };
   }
 }

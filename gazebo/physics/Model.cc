@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -189,6 +189,10 @@ void Model::Init()
 void Model::Update()
 {
   this->updateMutex->lock();
+
+  for (Joint_V::iterator jiter = this->joints.begin();
+       jiter != this->joints.end(); ++jiter)
+    (*jiter)->Update();
 
   if (this->jointController)
     this->jointController->Update();
@@ -520,6 +524,12 @@ unsigned int Model::GetJointCount() const
 }
 
 //////////////////////////////////////////////////
+const Joint_V &Model::GetJoints() const
+{
+  return this->joints;
+}
+
+//////////////////////////////////////////////////
 JointPtr Model::GetJoint(unsigned int _index) const
 {
   if (_index >= this->joints.size())
@@ -563,6 +573,12 @@ LinkPtr Model::GetLinkById(unsigned int _id) const
 
 //////////////////////////////////////////////////
 Link_V Model::GetAllLinks() const
+{
+  return this->GetLinks();
+}
+
+//////////////////////////////////////////////////
+Link_V Model::GetLinks() const
 {
   Link_V links;
   for (unsigned int i = 0; i < this->GetChildCount(); ++i)
@@ -672,6 +688,40 @@ void Model::LoadPlugins()
       pluginElem = pluginElem->GetNextElement("plugin");
     }
   }
+}
+
+//////////////////////////////////////////////////
+unsigned int Model::GetPluginCount() const
+{
+  unsigned int result = 0;
+
+  // Count all the plugins specified in SDF
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      result++;
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+unsigned int Model::GetSensorCount() const
+{
+  unsigned int result = 0;
+
+  // Count all the sensors on all the links
+  Link_V links = this->GetLinks();
+  for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
+  {
+    result += (*iter)->GetSensorCount();
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -865,17 +915,11 @@ void Model::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-ModelState Model::GetState()
-{
-  return ModelState(boost::shared_static_cast<Model>(shared_from_this()));
-}
-
-//////////////////////////////////////////////////
 void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);
 
-  for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
+  /*for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
   {
     LinkState linkState = _state.GetLinkState(i);
     LinkPtr link = this->GetLink(linkState.GetName());
@@ -883,16 +927,20 @@ void Model::SetState(const ModelState &_state)
       link->SetState(linkState);
     else
       gzerr << "Unable to find link[" << linkState.GetName() << "]\n";
-  }
+  }*/
 
   for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
   {
     JointState jointState = _state.GetJointState(i);
-    JointPtr joint = this->GetJoint(jointState.GetName());
+    this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
+                           jointState.GetAngle(0).Radian());
+
+    /*JointPtr joint = this->GetJoint(jointState.GetName());
     if (joint)
       joint->SetState(jointState);
     else
       gzerr << "Unable to find joint[" << jointState.GetName() << "]\n";
+      */
   }
 }
 
@@ -937,5 +985,11 @@ void Model::SetAutoDisable(bool _auto)
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     if (*iter && (*iter)->HasType(LINK))
       boost::static_pointer_cast<Link>(*iter)->SetAutoDisable(_auto);
+}
+
+/////////////////////////////////////////////////
+bool Model::GetAutoDisable() const
+{
+  return this->sdf->GetValueBool("allow_auto_disable");
 }
 

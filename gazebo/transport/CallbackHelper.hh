@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef CALLBACKHELPER_HH
-#define CALLBACKHELPER_HH
+#ifndef _CALLBACKHELPER_HH_
+#define _CALLBACKHELPER_HH_
 
 #include <google/protobuf/message.h>
 #include <boost/function.hpp>

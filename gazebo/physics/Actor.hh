@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,8 @@ namespace gazebo
     class Actor : public Model
     {
       /// \brief Constructor
-      /// \param[in] parent Parent object
-      public: explicit Actor(BasePtr parent);
+      /// \param[in] _parent Parent object
+      public: explicit Actor(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~Actor();
