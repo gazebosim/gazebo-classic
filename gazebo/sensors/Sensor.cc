@@ -125,9 +125,10 @@ std::string Sensor::GetParentName() const
 //////////////////////////////////////////////////
 void Sensor::Update(bool _force)
 {
-  if (this->IsActive())
+  if (this->IsActive() || _force)
   {
-    if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod)
+    if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod
+        || _force)
     {
       this->lastUpdateTime = this->world->GetSimTime();
       this->UpdateImpl(_force);

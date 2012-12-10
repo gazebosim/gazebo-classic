@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include <boost/lexical_cast.hpp>
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -23,6 +22,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+#include <boost/lexical_cast.hpp>
 
 #include "common/Console.hh"
 #include "msgs/msgs.hh"
@@ -49,7 +50,7 @@ static bool addressIsUnspecified(const boost::asio::ip::address_v4 &_addr)
 // is stolen from adress::is_loopback function in boost v1.52.
 static bool addressIsLoopback(const boost::asio::ip::address_v4 &_addr)
 {
- return (_addr.to_ulong() & 0xFF000000) == 0x7F000000;
+  return (_addr.to_ulong() & 0xFF000000) == 0x7F000000;
 }
 
 //////////////////////////////////////////////////
