@@ -109,7 +109,13 @@ namespace gazebo
       /// \param[in] _publish True to publish the pose.
       public: void SetRelativePose(const math::Pose &_pose,
                                    bool _notify = true,
-                                   bool _publish = true);
+                                   bool _publish) GAZEBO_DEPRECATED;
+
+      /// \brief Set the pose of the entity relative to its parent.
+      /// \param[in] _pose The new pose.
+      /// \param[in] _notify True = tell children of the pose change.
+      public: void SetRelativePose(const math::Pose &_pose,
+                                   bool _notify = true);
 
       /// \brief Set the world pose of the entity.
       /// \param[in] _pose The new world pose.
@@ -117,7 +123,13 @@ namespace gazebo
       /// \param[in] _publish True to publish the pose.
       public: void SetWorldPose(const math::Pose &_pose,
                                 bool _notify = true,
-                                bool _publish = true);
+                                bool _publish) GAZEBO_DEPRECATED;
+
+      /// \brief Set the world pose of the entity.
+      /// \param[in] _pose The new world pose.
+      /// \param[in] _notify True = tell children of the pose change.
+      public: void SetWorldPose(const math::Pose &_pose,
+                                bool _notify = true);
 
       /// \brief Get the linear velocity of the entity.
       /// \return A math::Vector3 for the linear velocity.

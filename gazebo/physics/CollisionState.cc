@@ -107,3 +107,10 @@ CollisionState CollisionState::operator+(const CollisionState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+void CollisionState::FillMsg(msgs::CollisionState &_msg) const
+{
+  _msg.set_name(this->name);
+  msgs::Set(_msg.mutable_pose(), this->pose);
+}

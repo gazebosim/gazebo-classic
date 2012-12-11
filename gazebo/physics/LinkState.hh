@@ -24,6 +24,7 @@
 #include <vector>
 #include <string>
 
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/sdf/sdf.hh"
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/CollisionState.hh"
@@ -134,6 +135,10 @@ namespace gazebo
       /// \param[in] _pt A state to add.
       /// \return The resulting state.
       public: LinkState operator+(const LinkState &_state) const;
+
+      /// \brief Fill a link state message.
+      /// \param[in] _msg Message that will contain the state of the link.
+      public: void FillMsg(msgs::LinkState &_msg) const;
 
       /// \brief Stream insertion operator
       /// \param[in] _out output stream

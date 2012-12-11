@@ -257,3 +257,22 @@ LinkState LinkState::operator+(const LinkState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+void LinkState::FillMsg(msgs::LinkState &_msg) const
+{
+  _msg.set_name(this->name);
+  msgs::Set(_msg.mutable_pose(), this->pose);
+  msgs::Set(_msg.mutable_velocity(), this->velocity);
+  msgs::Set(_msg.mutable_acceleration(), this->acceleration);
+  msgs::Set(_msg.mutable_wrench(), this->wrench);
+
+  // Fill the state message with all the collision states
+  for (std::vector<CollisionState>::const_iterator iter =
+       this->collisionStates.begin();
+       iter != this->collisionStates.end(); ++iter)
+  {
+    msgs::CollisionState *collisionState = _msg.add_collision_state();
+    (*iter).FillMsg(*collisionState);
+  }
+}

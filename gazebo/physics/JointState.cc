@@ -172,3 +172,13 @@ JointState JointState::operator+(const JointState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+void JointState::FillMsg(msgs::JointState &_msg) const
+{
+  _msg.set_name(this->name);
+  _msg.set_angle(this->angles[0].Radian());
+
+  if (this->angles.size() > 1)
+    _msg.set_angle2(this->angles[1].Radian());
+}

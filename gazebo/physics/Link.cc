@@ -226,8 +226,6 @@ void Link::Init()
     }
   }*/
 
-  this->enabled = true;
-
   // DO THIS LAST!
   this->SetRelativePose(this->sdf->GetValuePose("pose"));
   this->SetInitialRelativePose(this->sdf->GetValuePose("pose"));
@@ -410,13 +408,6 @@ void Link::Update()
 
   // Apply our angular accel
   // this->SetTorque(this->angularAccel);
-
-  // FIXME: race condition on factory-based model loading!!!!!
-   /*if (this->GetEnabled() != this->enabled)
-   {
-     this->enabled = this->GetEnabled();
-     this->enabledSignal(this->enabled);
-   }*/
 }
 
 /////////////////////////////////////////////////

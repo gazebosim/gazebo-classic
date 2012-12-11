@@ -483,9 +483,13 @@ namespace gazebo
       /// \param[in] _msg The message data.
       private: void OnModelMsg(ConstModelPtr &_msg);
 
+      /// \brief World state message callback.
+      /// \param[in] _msg The message data.
+      private: void OnStateMsg(ConstWorldStatePtr &_msg);
+
       /// \brief Pose message callback.
       /// \param[in] _msg The message data.
-      private: void OnPoseMsg(ConstPosePtr &_msg);
+      private: void OnPoseMsg(ConstPosePtr &_msg) GAZEBO_DEPRECATED;
 
       /// \brief Skeleton animation callback.
       /// \param[in] _msg The message data.
@@ -552,6 +556,8 @@ namespace gazebo
 
       /// \brief List of pose message to process.
       private: PoseMsgs_L poseMsgs;
+
+      private: std::list<msgs::Pose> poseDeltas;
 
       /// \def SceneMsgs_L
       /// \brief List of scene messages.
@@ -640,6 +646,9 @@ namespace gazebo
 
       /// \brief Subscribe to pose updates
       private: transport::SubscriberPtr poseSub;
+
+      /// \brief Subscribe to state updates
+      private: transport::SubscriberPtr stateSub;
 
       /// \brief Subscribe to joint updates.
       private: transport::SubscriberPtr jointSub;

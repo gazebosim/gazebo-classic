@@ -1195,13 +1195,6 @@ bool Visual::GetVisible() const
 //////////////////////////////////////////////////
 void Visual::SetPosition(const math::Vector3 &_pos)
 {
-  /*if (this->IsStatic() && this->staticGeom)
-  {
-    this->staticGeom->reset();
-    delete this->staticGeom;
-    this->staticGeom = NULL;
-    // this->staticGeom->setOrigin(Ogre::Vector3(pos.x, pos.y, pos.z));
-  }*/
   this->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
 }
 

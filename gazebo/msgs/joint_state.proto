@@ -1,0 +1,12 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Joint State
+/// \brief A message containing the state of a joint
+
+message JointState
+{
+  required string name   = 1;
+  required double angle   = 2;
+  optional double angle2 = 3;
+}

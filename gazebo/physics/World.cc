@@ -165,6 +165,8 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
+  this->statePub = this->node->Advertise<msgs::WorldState>("~/state", 1, true);
+
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 1, true);
   if (this->sdf->HasElement("gui"))
     this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
@@ -490,6 +492,13 @@ void World::Update()
 
   if (!diffState.IsZero())
   {
+    std::cout << "DiffState[" << diffState << "]\n";
+
+    // Create and output a world state message.
+    msgs::WorldState msg;
+    diffState.FillMsg(msg);
+    this->statePub->Publish(msg);
+
     this->stateToggle = currState;
     this->states.push_back(diffState);
     if (this->states.size() > 1000)

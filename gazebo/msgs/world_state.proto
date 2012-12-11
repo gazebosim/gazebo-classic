@@ -1,0 +1,19 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface World State
+/// \brief A message containing the state of a world
+
+import "pose.proto";
+import "time.proto";
+import "model_state.proto";
+
+message WorldState
+{
+  required string name            = 1;
+  required Time sim_time          = 2;
+  required Time real_time         = 3;
+  required Time wall_time         = 4;
+
+  repeated ModelState model_state = 5;
+}

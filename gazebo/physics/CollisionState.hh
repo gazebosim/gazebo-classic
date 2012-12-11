@@ -21,6 +21,7 @@
 #ifndef _COLLISIONSTATE_HH_
 #define _COLLISIONSTATE_HH_
 
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/State.hh"
 #include "gazebo/math/Pose.hh"
 
@@ -87,6 +88,11 @@ namespace gazebo
       /// \param[in] _pt A state to add.
       /// \return The resulting state.
       public: CollisionState operator+(const CollisionState &_state) const;
+
+      /// \brief Fill a collision state message.
+      /// \param[in] _msg Message that will contain the state of the
+      /// collision.
+      public: void FillMsg(msgs::CollisionState &_msg) const;
 
       /// \brief Stream insertion operator
       /// \param[in] _out output stream

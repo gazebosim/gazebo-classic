@@ -24,6 +24,8 @@
 #include <vector>
 #include <string>
 
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/math/Pose.hh"
 
 #include "gazebo/physics/State.hh"
@@ -150,6 +152,10 @@ namespace gazebo
       /// \param[in] _pt A state to substract.
       /// \return The resulting state.
       public: ModelState operator+(const ModelState &_state) const;
+
+      /// \brief Fill a model state message.
+      /// \param[in] _msg Message that will contain the state of the model.
+      public: void FillMsg(msgs::ModelState &_msg) const;
 
       /// \brief Stream insertion operator.
       /// \param[in] _out output stream.

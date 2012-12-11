@@ -5,6 +5,7 @@ set (msgs
   boxgeom.proto
   camerasensor.proto
   collision.proto
+  collision_state.proto
   color.proto
   contact.proto
   contacts.proto
@@ -31,13 +32,16 @@ set (msgs
   joint_animation.proto
   joint_cmd.proto
   joint_wrench.proto
+  joint_state.proto
   laserscan.proto
   light.proto
   link.proto
+  link_state.proto
   material.proto
   meshgeom.proto
   model.proto
   model_configuration.proto
+  model_state.proto
   model_v.proto
   packet.proto
   physics.proto
@@ -73,9 +77,10 @@ set (msgs
   vector3d.proto
   visual.proto
   world_control.proto
-  world_reset.proto 
-  world_stats.proto 
   world_modify.proto 
+  world_reset.proto 
+  world_state.proto
+  world_stats.proto 
 )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

@@ -473,6 +473,9 @@ namespace gazebo
       /// \brief Transportation node.
       private: transport::NodePtr node;
 
+      /// \brief Publisher for world state messages.
+      private: transport::PublisherPtr statePub;
+
       /// \brief Publisher for selection messages.
       private: transport::PublisherPtr selectionPub;
 

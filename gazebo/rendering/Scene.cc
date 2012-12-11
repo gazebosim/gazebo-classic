@@ -108,6 +108,8 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
 
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
+  this->stateSub = this->node->Subscribe("~/state", &Scene::OnStateMsg, this);
+
   this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
   this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
           &Scene::OnSkeletonPoseMsg, this);
@@ -1386,6 +1388,7 @@ void Scene::PreRender()
   static JointMsgs_L::iterator jIter;
   static SensorMsgs_L::iterator sensorIter;
   static LinkMsgs_L::iterator linkIter;
+  static std::list<msgs::Pose>::iterator poseIter;
 
   // Process the scene messages. DO THIS FIRST
   for (sIter = this->sceneMsgs.begin();
@@ -1430,6 +1433,27 @@ void Scene::PreRender()
       this->visualMsgs.erase(vIter++);
     else
       ++vIter;
+  }
+
+  poseIter = this->poseDeltas.begin();
+  while (poseIter != this->poseDeltas.end())
+  {
+    Visual_M::iterator iter = this->visuals.find((*poseIter).name());
+    if (iter != this->visuals.end() && iter->second)
+    {
+      // If an object is selected, don't let the physics engine move it.
+      if (!this->selectedVis || this->selectionMode != "move" ||
+          iter->first.find(this->selectedVis->GetName()) == std::string::npos)
+      {
+        math::Pose pose = msgs::Convert(*poseIter);
+        iter->second->SetPose(iter->second->GetPose() + pose);
+        this->poseDeltas.erase(poseIter++);
+      }
+      else
+        ++poseIter;
+    }
+    else
+      ++poseIter;
   }
 
   // Process all the model messages last. Remove pose message from the list
@@ -1873,9 +1897,42 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void Scene::OnStateMsg(ConstWorldStatePtr &_msg)
+{
+  std::cout << "Got state\n";
+  for (int i = 0; i < _msg->model_state_size(); ++i)
+  {
+    msgs::ModelState modelState = _msg->model_state(i);
+    this->poseDeltas.push_back(modelState.pose());
+    this->poseDeltas.back().set_name(modelState.name());
+    std::cout << "Adding Model Delta[" << this->poseDeltas.back().DebugString() << "]\n";
+
+    for (int j = 0; j < modelState.link_state_size(); ++j)
+    {
+      msgs::LinkState linkState = modelState.link_state(j);
+      this->poseDeltas.push_back(linkState.pose());
+      this->poseDeltas.back().set_name(linkState.name());
+      std::cout << "Adding Link Delta[" << this->poseDeltas.back().DebugString() << "]\n";
+
+      for (int k = 0; k < linkState.collision_state_size(); ++k)
+      {
+        msgs::CollisionState collisionState = linkState.collision_state(j);
+        this->poseDeltas.push_back(collisionState.pose());
+        this->poseDeltas.back().set_name(collisionState.name());
+
+        std::cout << "Adding Coll Delta[" << this->poseDeltas.back().DebugString() << "]\n";
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void Scene::OnPoseMsg(ConstPosePtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
+
+  gzerr << "The ~/pose/info topic is deprecated.\n";
+
   PoseMsgs_L::iterator iter;
 
   // Find an old model message, and remove them

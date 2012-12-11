@@ -302,18 +302,6 @@ namespace gazebo
       /// bounds.
       public: std::string GetSensorName(unsigned int _index) const;
 
-      /// \brief Connect to the add entity signal
-      /// \param[in] _subscriber Subsciber callback function.
-      /// \return Pointer to the connection, which must be kept in scope.
-      public: template<typename T>
-              event::ConnectionPtr ConnectEnabled(T _subscriber)
-              {return enabledSignal.Connect(_subscriber);}
-
-      /// \brief Disconnect to the add entity signal.
-      /// \param[in] _conn Connection pointer to disconnect.
-      public: void DisconnectEnabled(event::ConnectionPtr &_conn)
-              {enabledSignal.Disconnect(_conn);}
-
       /// \brief DEPRECATED
       public: void FillLinkMsg(msgs::Link &_msg) GAZEBO_DEPRECATED;
 
@@ -408,9 +396,6 @@ namespace gazebo
 
       /// \brief Event used when the link is enabled or disabled.
       private: event::EventT<void (bool)> enabledSignal;
-
-      /// \brief This flag is used to trigger the enabled
-      private: bool enabled;
 
       /// \brief Names of all the sensors attached to the link.
       private: std::vector<std::string> sensors;

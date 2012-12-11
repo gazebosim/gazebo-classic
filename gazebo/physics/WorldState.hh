@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 
+#include "gazebo/msgs/msgs.hh"
 #include "sdf/sdf.hh"
 #include "physics/State.hh"
 #include "physics/ModelState.hh"
@@ -118,6 +119,10 @@ namespace gazebo
       /// \param[in] _pt A state to add.
       /// \return The resulting state.
       public: WorldState operator+(const WorldState &_state) const;
+
+      /// \brief Fill a world state message.
+      /// \param[in] _msg Message that will contain the state of the world.
+      public: void FillMsg(msgs::WorldState &_msg) const;
 
       /// \brief Stream insertion operator
       /// \param[in] _out output stream

@@ -1,0 +1,13 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Collision State
+/// \brief A message containing the state of a collision
+
+import "pose.proto";
+
+message CollisionState
+{
+  required string name = 1;
+  required Pose pose   = 2;
+}

@@ -24,6 +24,7 @@
 #include <vector>
 #include <string>
 
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/State.hh"
 #include "gazebo/math/Pose.hh"
 
@@ -90,6 +91,10 @@ namespace gazebo
       /// \param[in] _pt A state to add.
       /// \return The resulting state.
       public: JointState operator+(const JointState &_state) const;
+
+      /// \brief Fill a joint state message.
+      /// \param[in] _msg Message that will contain the state of the joint.
+      public: void FillMsg(msgs::JointState &_msg) const;
 
       /// \brief Stream insertion operator.
       /// \param[in] _out output stream.

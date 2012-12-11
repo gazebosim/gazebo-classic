@@ -1,0 +1,20 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Link State
+/// \brief A message containing the state of a link
+
+import "pose.proto";
+import "collision_state.proto";
+
+message LinkState
+{
+  required string name       = 1;
+  required Pose pose         = 2;
+  required Pose velocity     = 3;
+  required Pose acceleration = 4;
+  required Pose wrench       = 5;
+  required bool enabled      = 6;
+
+  repeated CollisionState collision_state = 7;
+}

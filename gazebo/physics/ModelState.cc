@@ -308,3 +308,27 @@ ModelState ModelState::operator+(const ModelState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+void ModelState::FillMsg(msgs::ModelState &_msg) const
+{
+  _msg.set_name(this->name);
+  msgs::Set(_msg.mutable_pose(), this->pose);
+
+  // Insert the link states.
+  for (std::vector<LinkState>::const_iterator iter =
+       this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
+  {
+    msgs::LinkState *linkState = _msg.add_link_state();
+    (*iter).FillMsg(*linkState);
+  }
+
+  // Insert the joint states.
+  for (std::vector<JointState>::const_iterator iter =
+       this->jointStates.begin(); iter != this->jointStates.end(); ++iter)
+  {
+    msgs::JointState *jointState = _msg.add_joint_state();
+    (*iter).FillMsg(*jointState);
+  }
+
+}

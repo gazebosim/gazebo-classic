@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Model State
+/// \brief A message containing the state of a model
+
+import "pose.proto";
+import "joint_state.proto";
+import "link_state.proto";
+
+message ModelState
+{
+  required string name            = 1;
+  required Pose pose              = 2;
+  repeated JointState joint_state = 3;
+  repeated LinkState link_state   = 4;
+}

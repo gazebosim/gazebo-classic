@@ -214,3 +214,20 @@ WorldState WorldState::operator+(const WorldState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+void WorldState::FillMsg(msgs::WorldState &_msg) const
+{
+  _msg.set_name(this->name);
+  msgs::Set(_msg.mutable_sim_time(), this->simTime);
+  msgs::Set(_msg.mutable_real_time(), this->realTime);
+  msgs::Set(_msg.mutable_wall_time(), this->wallTime);
+
+  // Fill the state message with all the model states
+  for (std::vector<ModelState>::const_iterator iter =
+       this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
+  {
+    msgs::ModelState *modelState = _msg.add_model_state();
+    (*iter).FillMsg(*modelState);
+  }
+}

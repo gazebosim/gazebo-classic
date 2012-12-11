@@ -77,7 +77,6 @@ Entity::~Entity()
   delete this->poseMsg;
   this->poseMsg = NULL;
 
-  this->posePub.reset();
   this->visPub.reset();
   this->requestPub.reset();
   this->poseSub.reset();
@@ -89,7 +88,6 @@ void Entity::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
   this->node->Init(this->GetWorld()->GetName());
-  this->posePub = this->node->Advertise<msgs::Pose>("~/pose/info", 10);
 
   this->poseSub = this->node->Subscribe("~/pose/modify",
       &Entity::OnPoseMsg, this);
@@ -210,20 +208,6 @@ void Entity::StopAnimation()
 }
 
 //////////////////////////////////////////////////
-void Entity::PublishPose()
-{
-  if (this->posePub && this->posePub->HasConnections())
-  {
-    math::Pose relativePose = this->GetRelativePose();
-    if (relativePose != msgs::Convert(*this->poseMsg))
-    {
-      msgs::Set(this->poseMsg, relativePose);
-      this->posePub->Publish(*this->poseMsg);
-    }
-  }
-}
-
-//////////////////////////////////////////////////
 math::Pose Entity::GetRelativePose() const
 {
   if (this->IsCanonicalLink())
@@ -244,11 +228,16 @@ math::Pose Entity::GetRelativePose() const
 void Entity::SetRelativePose(const math::Pose &_pose, bool _notify,
         bool _publish)
 {
+  this->SetRelativePose(_pose, _notify);
+}
+
+//////////////////////////////////////////////////
+void Entity::SetRelativePose(const math::Pose &_pose, bool _notify)
+{
   if (this->parent && this->parentEntity)
-    this->SetWorldPose(_pose + this->parentEntity->GetWorldPose(), _notify,
-                              _publish);
+    this->SetWorldPose(_pose + this->parentEntity->GetWorldPose(), _notify;
   else
-    this->SetWorldPose(_pose, _notify, _publish);
+    this->SetWorldPose(_pose, _notify);
 }
 
 //////////////////////////////////////////////////
@@ -283,6 +272,12 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
 void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
         bool _publish)
 {
+  this->SetWorldPoseModel(_pose, _notify);
+}
+
+//////////////////////////////////////////////////
+void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
+{
   math::Pose oldModelWorldPose = this->worldPose;
 
   // initialization: (no children?) set own worldPose
@@ -313,8 +308,6 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
       else
       {
         entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
-        if (_publish)
-          entity->PublishPose();
       }
 
       if (_notify)
@@ -346,9 +339,6 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
 
     if (_notify)
       this->parentEntity->UpdatePhysicsPose(false);
-
-    if (_publish)
-      this->parentEntity->PublishPose();
   }
   else
     gzerr << "SWP for CB[" << this->GetName() << "] but parent["
@@ -404,9 +394,6 @@ void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
   (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
 
   this->GetWorld()->GetSetWorldPoseMutex()->unlock();
-
-  if (_publish)
-    this->PublishPose();
 }
 
 //////////////////////////////////////////////////
