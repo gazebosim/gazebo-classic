@@ -37,8 +37,6 @@ namespace gazebo
 
       public: void PopEndPoint();
 
-//      public: void RemovePoint(unsigned int _index);
-
       public: unsigned int GetCount();
 
       public: void SetVertexPosition(unsigned int _index, QPointF _pos);

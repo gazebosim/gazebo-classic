@@ -10,6 +10,7 @@ set (sources
   WallInspectorDialog.cc
   GridLines.cc
   CornerGrabber.cc
+  RotateHandle.cc
   EditorView.cc
   RectItem.cc
   WindowItem.cc
@@ -28,6 +29,7 @@ set (qt_headers
   WallInspectorDialog.hh
   GridLines.hh
   CornerGrabber.hh
+  RotateHandle.hh
   EditorView.hh
   RectItem.hh
   WindowItem.hh

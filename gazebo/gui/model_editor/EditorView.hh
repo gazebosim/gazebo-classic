@@ -75,7 +75,9 @@ namespace gazebo
 
       private: std::vector<event::ConnectionPtr> connections;
 
-      private: QGraphicsItem* currentMouseItem;
+      private: QGraphicsItem *currentMouseItem;
+
+      private: QGraphicsItem *currentSelectedItem;
     };
   }
 }

@@ -26,10 +26,10 @@ CornerGrabber::CornerGrabber(QGraphicsItem *_parent, int _index) :
   index(_index),
   mouseDownX(0),
   mouseDownY(0),
-  outterBorderColor(Qt::black),
+  borderColor(Qt::black),
   width(6),
   height(6),
-  mouseButtonState(kMouseReleased),
+  mouseButtonState(QEvent::GraphicsSceneMouseRelease),
   weldedCorner(0)
 {
   this->setParentItem(_parent);
@@ -58,7 +58,6 @@ int CornerGrabber::GetMouseState()
 /////////////////////////////////////////////////
 QPointF CornerGrabber::GetCenterPoint()
 {
-//  qDebug () << "center pt " <<pos();
   return QPointF(pos().x() + this->width/2, pos().y() + this->height/2);
 }
 
@@ -146,14 +145,14 @@ void CornerGrabber::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void CornerGrabber::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
-  this->outterBorderColor = Qt::black;
+  this->borderColor = Qt::black;
   this->update(0, 0, this->width, this->height);
 }
 
 /////////////////////////////////////////////////
 void CornerGrabber::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
-  this->outterBorderColor = Qt::red;
+  this->borderColor = Qt::red;
   this->update(0, 0, this->width, this->height);
 }
 
@@ -164,16 +163,16 @@ QRectF CornerGrabber::boundingRect() const
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
+void CornerGrabber::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
   QWidget *)
 {
-  QPen outterBorderPen;
-  outterBorderPen.setWidth(2);
-  outterBorderPen.setColor(this->outterBorderColor);
+  QPen borderPen;
+  borderPen.setWidth(1);
+  borderPen.setColor(this->borderColor);
 
-  outterBorderPen.setCapStyle(Qt::SquareCap);
-  outterBorderPen.setStyle(Qt::SolidLine);
-  _painter->setPen(outterBorderPen);
+  borderPen.setCapStyle(Qt::SquareCap);
+  borderPen.setStyle(Qt::SolidLine);
+  _painter->setPen(borderPen);
 
   QPointF topLeft (0, 0);
   QPointF bottomRight (this->width, this->height);
@@ -181,6 +180,6 @@ void CornerGrabber::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
   QRectF rect (topLeft, bottomRight);
 
   QBrush brush (Qt::SolidPattern);
-  brush.setColor (this->outterBorderColor);
+  brush.setColor (this->borderColor);
   _painter->fillRect(rect,brush);
 }

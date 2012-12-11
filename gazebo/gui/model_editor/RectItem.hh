@@ -26,6 +26,8 @@ namespace gazebo
   {
     class CornerGrabber;
 
+    class RotateHandle;
+
     class RectItem : public QGraphicsItem
     {
         public: RectItem();
@@ -44,11 +46,21 @@ namespace gazebo
 
         public: int GetHeight();
 
+        public: void showCorners(bool _show);
+
         protected: void UpdateCornerPositions();
 
         private: void AdjustSize(int _x, int _y);
 
-        private: virtual QRectF boundingRect() const;
+        protected: void showBoundingBox(QPainter *_painter);
+
+        protected: virtual QRectF boundingRect() const;
+
+        private: virtual bool rotateEventFilter(RotateHandle *_rotateHandle,
+            QGraphicsSceneMouseEvent *_event);
+
+        private: virtual bool cornerEventFilter(CornerGrabber *_corner,
+            QGraphicsSceneMouseEvent *_event);
 
         private: virtual void paint (QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
@@ -88,7 +100,7 @@ namespace gazebo
 
         protected: int drawingOriginY;
 
-        protected: QColor outterBorderColor;
+        protected: QColor borderColor;
 
         private: QPointF location;
 
@@ -104,8 +116,13 @@ namespace gazebo
 
         private: int yCornerGrabBuffer;
 
-        /// \brief Four corners, going clockwise with 0 being top left
-        CornerGrabber*  corners[4];
+        /// \brief Four corners and four edges, going clockwise with
+        /// 0 being top left
+        private: CornerGrabber *corners[8];
+
+        private: RotateHandle *rotateHandle;
+
+        private: double rotation;
     };
   }
 }

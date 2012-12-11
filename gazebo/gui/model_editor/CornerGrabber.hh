@@ -81,7 +81,7 @@ namespace gazebo
       private: double mouseDownY;
 
       /// \brief the hover event handlers will toggle this between red and black
-      private: QColor outterBorderColor;
+      private: QColor borderColor;
 
       private: double width;
 

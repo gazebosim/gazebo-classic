@@ -35,6 +35,10 @@ DoorItem::~DoorItem()
 void DoorItem::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
     QWidget *)
 {
+  if (this->isSelected())
+    this->showBoundingBox(_painter);
+  this->showCorners(this->isSelected());
+
   QPointF topLeft(this->drawingOriginX, this->drawingOriginY);
   QPointF topRight(this->drawingWidth, this->drawingOriginY);
   QPointF bottomLeft(this->drawingOriginX, this->drawingHeight);
@@ -42,7 +46,7 @@ void DoorItem::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
 
   QPen pen;
   pen.setStyle(Qt::SolidLine);
-  pen.setColor(outterBorderColor);
+  pen.setColor(this->borderColor);
   _painter->setPen(pen);
 
   _painter->drawLine(topLeft, topRight);

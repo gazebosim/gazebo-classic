@@ -67,8 +67,6 @@ void PolylineItem::AddPoint(QPointF _point)
   this->cornerWidth = corner->boundingRect().width();
   this->cornerHeight = corner->boundingRect().height();
 
-//  this->SetVertexPosition(corners.size()-1, _point);
-
   corner->setPos(lineEnd.x() - this->cornerWidth/2.0,
       lineEnd.y() - this->cornerHeight/2.0);
 
@@ -160,6 +158,7 @@ bool PolylineItem::sceneEventFilter(QGraphicsItem *_watched,
   return false;
 }
 
+/////////////////////////////////////////////////
 bool PolylineItem::segmentEventFilter(LineSegmentItem *_segment,
     QGraphicsSceneMouseEvent *_event)
 {
@@ -205,6 +204,7 @@ bool PolylineItem::segmentEventFilter(LineSegmentItem *_segment,
   return true;
 }
 
+/////////////////////////////////////////////////
 bool PolylineItem::cornerEventFilter(CornerGrabber* _corner,
     QGraphicsSceneMouseEvent *_event)
 {

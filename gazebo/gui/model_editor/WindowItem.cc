@@ -29,6 +29,7 @@ WindowItem::WindowItem(): RectItem()
   this->height = 10;
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
+
   this->UpdateCornerPositions();
 }
 
@@ -45,17 +46,31 @@ void WindowItem::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
   QPointF bottomLeft(this->drawingOriginX, this->drawingHeight);
   QPointF bottomRight(this->drawingWidth, this->drawingHeight);
 
-  QPointF middleLeft(this->drawingOriginX, this->drawingHeight/2.0);
-  QPointF middleRight(this->drawingWidth, this->drawingHeight/2.0);
+  QPointF midLeft(this->drawingOriginX, this->drawingHeight/2.0);
+  QPointF midRight(this->drawingWidth, this->drawingHeight/2.0);
+
+
+
+  if (this->isSelected())
+  {
+    this->showBoundingBox(_painter);
+  }
+  this->showCorners(this->isSelected());
+
+
 
   QPen pen;
   pen.setStyle(Qt::SolidLine);
-  pen.setColor(outterBorderColor);
+  pen.setColor(borderColor);
   _painter->setPen(pen);
 
   _painter->drawLine(topLeft, bottomLeft);
   _painter->drawLine(topRight, bottomRight);
-  _painter->drawLine(middleLeft, middleRight);
+  _painter->drawLine(midLeft, midRight);
+
+
+
+
 }
 
 /////////////////////////////////////////////////
