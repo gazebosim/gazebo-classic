@@ -872,7 +872,10 @@ void World::OnControl(ConstWorldControlPtr &_data)
     this->OnStep();
 
   if (_data->has_seed())
+  {
     math::Rand::SetSeed(_data->seed());
+    this->physicsEngine->SetSeed(_data->seed());
+  }
 
   if (_data->has_reset())
   {
