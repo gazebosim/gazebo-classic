@@ -781,7 +781,8 @@ TEST_F(MathTest, Pose)
     EXPECT_TRUE(math::equal( (math::Pose() - A).pos.z,               0.0 ));
     EXPECT_TRUE(math::equal( (math::Pose() - A).rot.GetAsEuler().x,  0.0 ));
     EXPECT_TRUE(math::equal( (math::Pose() - A).rot.GetAsEuler().y,  0.0 ));
-    EXPECT_TRUE(math::equal( (math::Pose() - A).rot.GetAsEuler().z, -M_PI/4.0 ));
+    EXPECT_TRUE(math::equal( (math::Pose() - A).rot.GetAsEuler().z, -M_PI/4.0));
+
     // test negation operator
     EXPECT_TRUE(math::equal( ( -A).pos.x,      -1.0/sqrt(2) ));
     EXPECT_TRUE(math::equal( ( -A).pos.y,       1.0/sqrt(2) ));

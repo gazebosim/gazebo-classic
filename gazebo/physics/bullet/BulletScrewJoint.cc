@@ -68,7 +68,8 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
 
   math::Vector3 pivotA, pivotB;
 
-  pivotA = this->anchorPos + this->childLink->GetWorldPose().pos - this->parentLink->GetWorldPose().pos;
+  pivotA = this->anchorPos + this->childLink->GetWorldPose().pos
+                           - this->parentLink->GetWorldPose().pos;
   pivotB = this->anchorPos;
 
   pivotA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(pivotA);
