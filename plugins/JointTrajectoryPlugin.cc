@@ -83,7 +83,7 @@ void JointTrajectoryPlugin::UnfixLink()
 void JointTrajectoryPlugin::UpdateStates()
 {
   common::Time cur_time = this->world->GetSimTime();
-  
+
   // for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();
   //                       j != this->model->GetJoints().end(); ++j)
   //   gzerr << cur_time << " " << (*j)->GetScopedName() << "\n";
