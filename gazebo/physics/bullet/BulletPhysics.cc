@@ -281,11 +281,11 @@ void BulletPhysics::UpdatePhysics()
   // need to lock, otherwise might conflict with world resetting
   this->physicsUpdateMutex->lock();
 
-  //common::Time currTime =  this->world->GetRealTime();
+  // common::Time currTime =  this->world->GetRealTime();
 
   this->dynamicsWorld->stepSimulation(
       this->stepTimeDouble, 1, this->stepTimeDouble);
-  //this->lastUpdateTime = currTime;
+  // this->lastUpdateTime = currTime;
 
   this->physicsUpdateMutex->unlock();
 }

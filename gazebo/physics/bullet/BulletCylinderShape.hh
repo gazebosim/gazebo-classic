@@ -36,23 +36,58 @@ namespace gazebo
     /// \brief Cylinder collision
     class BulletCylinderShape : public CylinderShape
     {
-      /// \brief Constructor
+      /// \brief Constructor, empty because the shape is created by SetSize.
       public: BulletCylinderShape(CollisionPtr _parent)
               : CylinderShape(_parent) {}
 
       /// \brief Destructor
-      public: virtual ~BulletCylinderShape() {}
-
-      /// \brief Set the size of the cylinder
-      public: void SetSize(double _radius, double _length)
+      public: virtual ~BulletCylinderShape()
               {
-                CylinderShape::SetSize(_radius, _length);
                 BulletCollisionPtr bParent;
                 bParent = boost::shared_dynamic_cast<BulletCollision>(
                     this->collisionParent);
+                if (bParent && bParent->GetCollisionShape())
+                {
+                  delete bParent->GetCollisionShape();
+                  bParent->SetCollisionShape(NULL);
+                }
+              }
 
-                bParent->SetCollisionShape(new btCylinderShapeZ(
-                    btVector3(_radius, _radius, _length * 0.5)));
+      /// \brief Set the size of the shape. This is also where the shape is
+      ///        created when SetSize is run for the first time.
+      /// \param[in] _radius New radius.
+      /// \param[in] _length New length.
+      public: void SetSize(double _radius, double _length)
+              {
+                BulletCollisionPtr bParent;
+                bParent = boost::shared_dynamic_cast<BulletCollision>(
+                    this->collisionParent);
+                btCollisionShape *bShape = bParent->GetCollisionShape();
+
+                if (!bShape)
+                {
+                  // Create the shape if it doesn't yet exist.
+                  // Bullet requires the half-extents of the shape.
+                  bParent->SetCollisionShape(new btCylinderShapeZ(
+                      btVector3(btScalar(_radius), btScalar(_radius),
+                        btScalar(_length * 0.5))));
+                }
+                else
+                {
+                  // Re-scale the existing btCylinderShape
+                  math::Vector3 scaling;
+                  scaling.x = _radius / this->GetRadius();
+                  scaling.y = scaling.x;
+                  scaling.z = _length / this->GetLength();
+                  btVector3 old_scaling = bShape->getLocalScaling();
+                  bShape->setLocalScaling(btVector3(
+                    btScalar(scaling.x) * old_scaling.getX(),
+                    btScalar(scaling.y) * old_scaling.getY(),
+                    btScalar(scaling.z) * old_scaling.getZ()));
+                }
+
+                // Do this last so the old size is available above, if necessary
+                CylinderShape::SetSize(_radius, _length);
               }
     };
     /// \}
