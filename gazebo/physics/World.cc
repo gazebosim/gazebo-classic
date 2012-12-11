@@ -28,6 +28,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/math/Rand.hh"
 
 #include "gazebo/sdf/sdf.hh"
 #include "gazebo/transport/Node.hh"
