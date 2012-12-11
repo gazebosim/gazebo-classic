@@ -936,7 +936,16 @@ TEST_F(MathTest, Random)
   EXPECT_GE(i, 1);
 
   i = math::Rand::GetIntNormal(2, 3);
+
+  // Test setting the random number seed
+  {
+    math::Rand::SetSeed(1001);
+
+    d = math::Rand::GetDblNormal(2, 3);
+    EXPECT_TRUE(math::equal(d, 0.985827));
+  }
 }
+
 
 int main(int argc, char **argv)
 {
