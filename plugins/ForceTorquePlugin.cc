@@ -15,9 +15,8 @@
  *
 */
 /*
- * Desc: 3D position interface for ground truth.
- * Author: Sachin Chitta and John Hsu
- * Date: 1 June 2008
+ * Desc: a test for getting force and torques at joints
+ * Author: John Hsu
  */
 
 #include <plugins/ForceTorquePlugin.hh>
