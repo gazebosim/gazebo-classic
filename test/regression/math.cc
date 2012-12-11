@@ -946,7 +946,6 @@ TEST_F(MathTest, Random)
   }
 }
 
-
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
