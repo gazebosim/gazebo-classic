@@ -298,15 +298,13 @@ void PolylineItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 void PolylineItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
   this->origin = this->pos();
-  this->dragStart = _event->pos();
   _event->setAccepted(true);
 }
 
 /////////////////////////////////////////////////
 void PolylineItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 {
-  QPointF newPos = _event->pos() ;
-  this->origin += (newPos - this->dragStart);
+  this->origin += _event->scenePos() - _event->lastScenePos();
   this->setPos(this->origin);
 }
 

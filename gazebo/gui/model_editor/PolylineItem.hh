@@ -74,7 +74,7 @@ namespace gazebo
 
       private: QPointF location;
 
-      private: QPointF dragStart;
+      //private: QPointF dragStart;
 
       private: int gridSpace;
 

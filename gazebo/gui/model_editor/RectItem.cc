@@ -26,10 +26,7 @@ using namespace gui;
 RectItem::RectItem():
     borderColor(Qt::black),
     location(0,0),
-    dragStart(0,0),
-    rotateStart(0,0),
     gridSpace(10),
-    cornerDragStart(0,0),
     xCornerGrabBuffer(10),
     yCornerGrabBuffer(10)
 {
@@ -51,8 +48,6 @@ RectItem::RectItem():
 
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable);
   this->setAcceptHoverEvents(true);
-
-  this->rotation = 0;
 }
 
  /////////////////////////////////////////////////
@@ -101,8 +96,6 @@ bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
     return this->cornerEventFilter(corner, event);
 
   return false;
-
-
 }
 
 /////////////////////////////////////////////////
@@ -116,7 +109,6 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
       _rotate->SetMouseState(QEvent::GraphicsSceneMousePress);
       _rotate->SetMouseDownX(_event->pos().x());
       _rotate->SetMouseDownY(_event->pos().y());
-      this->rotateStart = this->mapToScene(_event->pos());
       break;
     }
     case QEvent::GraphicsSceneMouseRelease:
@@ -141,16 +133,12 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
         this->drawingOriginY + (this->drawingOriginY + this->drawingHeight)/2);
     QPointF center = this->mapToScene(localCenter);
 
-//    qDebug() << center << this->rotateStart;
-
-    QPointF newPoint = this->mapToScene(_event->pos());
+    QPointF newPoint = _event->scenePos();
     QLineF prevLine(center.x(), center.y(),
-        this->rotateStart.x(), this->rotateStart.y());
+        _event->lastScenePos().x(), _event->lastScenePos().y());
     QLineF line(center.x(), center.y(), newPoint.x(), newPoint.y());
     this->setTransformOriginPoint(localCenter);
-    this->rotation = -prevLine.angleTo(line);
-
-    this->setRotation(this->rotation);
+    this->setRotation(this->rotation() - prevLine.angleTo(line));
   }
   return true;
 }
@@ -256,10 +244,10 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
     double xMoved = _corner->GetMouseDownX() - xPos;
     double yMoved = _corner->GetMouseDownY() - yPos;
 
-    double angle = this->rotation / 360 * (2 * M_PI);
-    qDebug() << " w h " << cos(angle) * xMoved << sin(angle) * yMoved;
+//    double angle = this->orientation / 360 * (2 * M_PI);
+//    qDebug() << " w h " << cos(angle) * xMoved << sin(angle) * yMoved;
 
-    qDebug() << " this pos " << this->pos();
+//    qDebug() << " this pos " << this->pos();
 
     double newWidth = this->width + (xAxisSign * xMoved);
     if (newWidth < 20)
@@ -272,8 +260,6 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
     double deltaWidth = newWidth - this->width;
     double deltaHeight = newHeight - this->height;
 
-//    cos(this->rotation )
-
     this->AdjustSize(deltaWidth, deltaHeight);
 
     deltaWidth *= (-1);
@@ -285,6 +271,10 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
       {
         int newXpos = this->pos().x() + deltaWidth;
         int newYpos = this->pos().y() + deltaHeight;
+//        QPointF newPos = mapToScene(deltaWidth, deltaHeight);
+//        qDebug() << "mouse down x vs xMoved " << _corner->GetMouseDownX() << xPos;
+//        qDebug() << "new pos " << newPos << deltaWidth << deltaHeight;
+//        this->setPos(newPos.x(), newPos.y());
         this->setPos(newXpos, newYpos);
         break;
       }
@@ -343,12 +333,7 @@ void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 
   this->setSelected(true);
   this->location = this->pos();
-  this->dragStart = _event->pos();
-
   _event->setAccepted(true);
-
-
-
 }
 
 /////////////////////////////////////////////////
@@ -359,22 +344,9 @@ void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 
   if (this->isSelected())
   {
-    QPointF newPos = _event->pos();
-    this->location += (newPos - this->dragStart);
+    this->location += (_event->scenePos() - _event->lastScenePos());
     this->setPos(this->location);
-    qDebug() << newPos << dragStart << location;
   }
-/*
-  // dragging
-  QPoint center(drawingOriginX + (drawingOriginX + drawingWidth)/2,
-      drawingOriginY + (drawingOriginY + drawingHeight)/2);
-
-  QPointF newPoint = this->mapToScene(newPos) - this->pos();
-  QLineF prevLine(center.x(), center.y(),
-      this->rotateStart.x(), this->rotateStart.y());
-  QLineF line(center.x(), center.y(), newPoint.x(), newPoint.y());
-  this->setTransformOriginPoint(center);
-  this->setRotation(-prevLine.angleTo(line));*/
 }
 
 /////////////////////////////////////////////////
@@ -519,7 +491,6 @@ void RectItem::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
   _painter->drawLine(bottomRight, bottomLeft);
   _painter->drawLine(bottomLeft, topLeft);
   _painter->restore();
-
 }
 
 /////////////////////////////////////////////////

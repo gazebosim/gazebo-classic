@@ -104,13 +104,7 @@ namespace gazebo
 
         private: QPointF location;
 
-        private: QPointF dragStart;
-
-        private: QPointF rotateStart;
-
         private: int gridSpace;
-
-        private: QPointF cornerDragStart;
 
         private: int xCornerGrabBuffer;
 
@@ -121,8 +115,6 @@ namespace gazebo
         private: CornerGrabber *corners[8];
 
         private: RotateHandle *rotateHandle;
-
-        private: double rotation;
     };
   }
 }
