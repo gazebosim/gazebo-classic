@@ -870,6 +870,9 @@ void World::OnControl(ConstWorldControlPtr &_data)
   if (_data->has_step())
     this->OnStep();
 
+  if (_data->has_seed())
+    math::Rand::SetSeed(_data->seed());
+
   if (_data->has_reset())
   {
     this->needsReset = true;
