@@ -366,7 +366,6 @@ void World::Step()
   if (!this->pluginsLoaded &&
       sensors::SensorManager::Instance()->SensorsInitialized())
   {
-    gzerr << "Load Plugins\n";
     this->LoadPlugins();
     this->pluginsLoaded = true;
   }

@@ -26,24 +26,24 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
-#include "common/KeyFrame.hh"
-#include "common/Animation.hh"
-#include "common/Plugin.hh"
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/common/KeyFrame.hh"
+#include "gazebo/common/Animation.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/CommonTypes.hh"
 
-#include "physics/Gripper.hh"
-#include "physics/Joint.hh"
-#include "physics/JointController.hh"
-#include "physics/Link.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Model.hh"
-#include "physics/Contact.hh"
+#include "gazebo/physics/Gripper.hh"
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/JointController.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Contact.hh"
 
-#include "sensors/SensorManager.hh"
+#include "gazebo/sensors/SensorManager.hh"
 
 #include "transport/Node.hh"
 
