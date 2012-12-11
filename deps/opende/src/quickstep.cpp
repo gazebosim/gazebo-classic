@@ -1876,6 +1876,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       dReal error = 0;
       for (int i=0; i<m; i++) error += dFabs(tmp[i]);
       printf ("velocity error = %10.6e\n",error);
+    }
   }
 
 #endif

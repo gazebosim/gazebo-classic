@@ -36,7 +36,8 @@ ODEBallJoint::ODEBallJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEBallJoint::~ODEBallJoint()
 {
-  physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  if (this->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
 //////////////////////////////////////////////////

@@ -109,10 +109,10 @@ void Collision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Collision::Init()
 {
+  this->shape->Init();
+
   this->SetRelativePose(
     this->sdf->GetValuePose("pose"));
-
-  this->shape->Init();
 }
 
 //////////////////////////////////////////////////
