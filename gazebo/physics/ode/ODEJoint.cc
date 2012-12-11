@@ -22,13 +22,13 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 
-#include "physics/World.hh"
-#include "physics/Link.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/ode/ODELink.hh"
-#include "physics/ode/ODEJoint.hh"
-#include "physics/ScrewJoint.hh"
-#include "physics/JointWrench.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/ode/ODELink.hh"
+#include "gazebo/physics/ode/ODEJoint.hh"
+#include "gazebo/physics/ScrewJoint.hh"
+#include "gazebo/physics/JointWrench.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -562,10 +562,10 @@ JointWrench ODEJoint::GetForceTorque(int /*_index*/)
   // f2, t2 are the force torque measured on parent body's cg
   // f1, t1 are the force torque measured on child body's cg
   dJointFeedback* fb = this->GetFeedback();
-  wrench.body1Force = math::Vector3(fb->f1[0], fb->f1[1], fb->f1[2]);
-  wrench.body1Torque = math::Vector3(fb->t1[0], fb->t1[1], fb->t1[2]);
-  wrench.body2Force = math::Vector3(fb->f2[0], fb->f2[1], fb->f2[2]);
-  wrench.body2Torque = math::Vector3(fb->t2[0], fb->t2[1], fb->t2[2]);
+  wrench.body1Force.Set(fb->f1[0], fb->f1[1], fb->f1[2]);
+  wrench.body1Torque.Set(fb->t1[0], fb->t1[1], fb->t1[2]);
+  wrench.body2Force.Set(fb->f2[0], fb->f2[1], fb->f2[2]);
+  wrench.body2Torque.Set(fb->t2[0], fb->t2[1], fb->t2[2]);
 
   {
     // convert torque from about child CG to joint anchor location
@@ -586,7 +586,6 @@ JointWrench ODEJoint::GetForceTorque(int /*_index*/)
 
     wrench.body1Torque += wrench.body1Force.Cross(childMomentArm);
   }
-
 
   // convert torque from about parent CG to joint anchor location
   if (this->parentLink)
@@ -613,8 +612,6 @@ JointWrench ODEJoint::GetForceTorque(int /*_index*/)
     wrench.body2Force = -wrench.body1Force;
     wrench.body2Torque = -wrench.body1Torque;
   }
-
-
 
   return wrench;
 }

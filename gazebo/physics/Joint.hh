@@ -34,7 +34,7 @@
 
 #include "gazebo/physics/JointState.hh"
 #include "gazebo/physics/Base.hh"
-#include "physics/JointWrench.hh"
+#include "gazebo/physics/JointWrench.hh"
 
 namespace gazebo
 {
@@ -99,7 +99,8 @@ namespace gazebo
       public: void Load(LinkPtr _parent, LinkPtr _child,
                         const math::Pose &_pose) GAZEBO_DEPRECATED;
 
-      /// \brief Set pose, parent and child links of a physics::Joint
+      /// \brief Set parent and child links of a physics::Joint and its
+      /// anchor offset position.
       /// \param[in] _parent Parent link.
       /// \param[in] _child Child link.
       /// \param[in] _pos Joint Anchor offset from child link.
@@ -252,6 +253,9 @@ namespace gazebo
       public: virtual double GetForce(int _index);
 
       /// \brief get force torque values at a joint
+      /// \param[in] _index Force and torque on child link if _index = 0
+      /// and on parent link of _index = 1
+      /// \return The force and torque at the joint
       public: virtual JointWrench GetForceTorque(int _index) = 0;
 
       /// \brief Set the max allowed force of an axis(index).

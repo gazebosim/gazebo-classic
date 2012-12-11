@@ -24,6 +24,8 @@
 
 namespace gazebo
 {
+GZ_REGISTER_MODEL_PLUGIN(ForceTorquePlugin)
+
 /////////////////////////////////////////////////
 ForceTorquePlugin::ForceTorquePlugin()
 {
@@ -80,6 +82,4 @@ void ForceTorquePlugin::UpdateStates()
           << "]\n";
   }
 }
-
-GZ_REGISTER_MODEL_PLUGIN(ForceTorquePlugin)
 }

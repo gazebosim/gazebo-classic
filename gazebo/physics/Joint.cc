@@ -404,7 +404,7 @@ void Joint::SetForce(int _index, double _force)
   if (_index < 2)
     this->forceApplied[_index] = _force;
   else
-    gzerr << "trying to apply force on index [" << _index << "]\n";
+    gzerr << "Invalid joint index [" << _index << "] when trying to apply force\n";
 }
 
 //////////////////////////////////////////////////
@@ -415,7 +415,7 @@ double Joint::GetForce(int _index)
     return this->forceApplied[_index];
   else
   {
-    gzerr << "trying to get force with index [" << _index << "]\n";
+    gzerr << "Invalid joint index [" << _index << "] when trying to apply force\n";
     return 0;
   }
 }

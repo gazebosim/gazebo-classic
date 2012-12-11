@@ -102,7 +102,7 @@ void BulletJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-JointWrench BulletJoint::GetForceTorque(int _index)
+JointWrench BulletJoint::GetForceTorque(int /*_index*/)
 {
   JointWrench wrench;
   return wrench;
