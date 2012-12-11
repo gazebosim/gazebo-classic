@@ -1,6 +1,14 @@
 <element name="camera" required="0">
   <description>These elements are specific to camera sensors.</description>
 
+  <attribute name="name" type="string" default="__default__" required="0">
+    <description>An optional name for the camera.</description>
+  </attribute>
+
+  <element name="pose" type="pose" default="0 0 0 0 0 0" required="0">
+    <description>A position and orientation in the parent coordinate frame for the camera.</description>
+  </element>
+
   <element name="horizontal_fov" type="double" default="1.047" min="0.1" max="1.5708" required="1">
     <description>Horizontal field of view</description>
   </element> <!-- End Horizontal_FOV -->
