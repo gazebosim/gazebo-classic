@@ -94,6 +94,7 @@ World::World(const std::string &_name)
   this->stepInc = 0;
   this->pause = false;
   this->thread = NULL;
+  this->stop = false;
 
   this->stateToggle = 0;
 

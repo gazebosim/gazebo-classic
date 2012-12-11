@@ -330,7 +330,7 @@ void Master::RunThread()
 //////////////////////////////////////////////////
 void Master::RunOnce()
 {
-  Connection_M::iterator iter;
+  Connection_M::iterator iter, iter2;
 
   // Process the incoming message queue
   {
@@ -356,8 +356,10 @@ void Master::RunOnce()
       }
       else
       {
+        iter2 = iter;
+        ++iter2;
         this->RemoveConnection(iter->first);
-        ++iter;
+        iter = iter2;
       }
     }
   }
