@@ -26,17 +26,63 @@ class BulletTest : public ServerFixture
 
 TEST_F(BulletTest, EmptyWorldTest)
 {
-  // check conservation of mementum for linear inelastic collision
+  // load an empty world with bullet physics engine
   Load("worlds/empty_bullet.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  ASSERT_TRUE(world != NULL);
 
-  // simulate a couple seconds
-  world->StepWorld(2000);
+  // simulate several steps
+  int steps = 20;
+  world->StepWorld(steps);
   double t = world->GetSimTime().Double();
-  EXPECT_GT(t, 0);
+  double dt = world->GetPhysicsEngine()->GetStepTime();
+  EXPECT_GT(t, 0.99*dt*(double)(steps));
+}
 
-  Unload();
+TEST_F(BulletTest, SpawnDropTest)
+{
+  // load an empty world with bullet physics engine
+  Load("worlds/empty_bullet.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // spawn some simple shapes and check to see that they start falling
+  double z0 = 3;
+  SpawnBox("test_box", math::Vector3(1, 1, 1), math::Vector3(0, 0, z0),
+    math::Vector3::Zero);
+  SpawnSphere("test_sphere", math::Vector3(4, 0, z0), math::Vector3::Zero);
+  SpawnCylinder("test_cylinder", math::Vector3(8, 0, z0), math::Vector3::Zero);
+
+  std::list<std::string> model_names;
+  model_names.push_back("test_box");
+  model_names.push_back("test_sphere");
+  model_names.push_back("test_cylinder");
+  
+  int steps = 20;
+  physics::ModelPtr model;
+  math::Pose pose1, pose2;
+  //math::Vector3 vel1, vel2;
+
+  for (std::list<std::string>::iterator iter = model_names.begin();
+    iter != model_names.end(); ++iter)
+  {
+    // Make sure the model is loaded
+    model = world->GetModel(*iter);
+    ASSERT_TRUE(model);
+
+    // Step forward and check downward velocity and decreasing position
+    world->StepWorld(steps);
+    //vel1 = model->GetWorldLinearVel();
+    pose1 = model->GetWorldPose();
+    //EXPECT_LT(vel1.z, 0);
+    EXPECT_LT(pose1.pos.z, z0);
+
+    world->StepWorld(steps);
+    //vel2 = model->GetWorldLinearVel();
+    pose2 = model->GetWorldPose();
+    //EXPECT_LT(vel2.z, vel1.z);
+    EXPECT_LT(pose2.pos.z, pose1.pos.z);
+  }
 }
 
 int main(int argc, char **argv)
