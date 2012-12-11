@@ -109,7 +109,7 @@ namespace gazebo
       /// \param[in] _publish True to publish the pose.
       public: void SetRelativePose(const math::Pose &_pose,
                                    bool _notify = true,
-                                   bool _publish) GAZEBO_DEPRECATED;
+                                   bool _publish = true) GAZEBO_DEPRECATED;
 
       /// \brief Set the pose of the entity relative to its parent.
       /// \param[in] _pose The new pose.
@@ -123,7 +123,7 @@ namespace gazebo
       /// \param[in] _publish True to publish the pose.
       public: void SetWorldPose(const math::Pose &_pose,
                                 bool _notify = true,
-                                bool _publish) GAZEBO_DEPRECATED;
+                                bool _publish = true) GAZEBO_DEPRECATED;
 
       /// \brief Set the world pose of the entity.
       /// \param[in] _pose The new world pose.
