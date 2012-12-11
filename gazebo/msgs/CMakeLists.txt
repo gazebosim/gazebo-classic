@@ -12,7 +12,6 @@ set (msgs
   cylindergeom.proto
   factory.proto
   fog.proto
-  force_torque.proto
   friction.proto
   geometry.proto
   gui_overlay_config.proto
@@ -33,6 +32,7 @@ set (msgs
   joint_animation.proto
   joint_cmd.proto
   joint_wrench.proto
+  joint_wrench_stamped.proto
   laserscan.proto
   light.proto
   link.proto
