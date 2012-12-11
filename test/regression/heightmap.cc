@@ -53,14 +53,14 @@ TEST_F(HeightmapTest, Heights)
   // Wait for the heightmap to get loaded by the scene.
   {
     int i = 0;
-    while (i < 10 && scene->GetHeightmap() == NULL)
+    while (i < 20 && scene->GetHeightmap() == NULL)
     {
-      common::Time::MSleep(100);
+      common::Time::MSleep(1000);
       i++;
     }
 
     common::Time::MSleep(100);
-    if (i >= 10)
+    if (i >= 20)
       gzthrow("Unable to get heightmap");
   }
 
