@@ -75,6 +75,8 @@ void ForceTorquePlugin::UpdateStates()
           << "] b2t [" << jw.body2Torque
           << "] link1f [" << this->joints[i]->GetLinkForce(0)
           << "] link1t [" << this->joints[i]->GetLinkTorque(0)
+          << "] link2f [" << this->joints[i]->GetLinkForce(1)
+          << "] link2t [" << this->joints[i]->GetLinkTorque(1)
           << "]\n";
   }
 }
