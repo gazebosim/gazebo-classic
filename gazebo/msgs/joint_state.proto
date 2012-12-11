@@ -7,6 +7,6 @@ package gazebo.msgs;
 message JointState
 {
   required string name   = 1;
-  required double angle   = 2;
+  required double angle  = 2;
   optional double angle2 = 3;
 }

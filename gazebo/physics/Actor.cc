@@ -575,7 +575,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
     link_pose->mutable_position()->CopyFrom(msgs::Convert(linkPose.pos));
     link_pose->mutable_orientation()->CopyFrom(msgs::Convert(linkPose.rot));
 
-    currentLink->SetWorldPose(transform.GetAsPose(), true, false);
+    currentLink->SetWorldPose(transform.GetAsPose(), true);
   }
 
   msgs::Time *stamp = msg.add_time();
@@ -588,7 +588,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
 
   if (this->bonePosePub && this->bonePosePub->HasConnections())
     this->bonePosePub->Publish(msg);
-  this->SetWorldPose(mainLinkPose, true, false);
+  this->SetWorldPose(mainLinkPose, true);
 }
 
 //////////////////////////////////////////////////

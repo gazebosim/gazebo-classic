@@ -266,6 +266,7 @@ void LinkState::FillMsg(msgs::LinkState &_msg) const
   msgs::Set(_msg.mutable_velocity(), this->velocity);
   msgs::Set(_msg.mutable_acceleration(), this->acceleration);
   msgs::Set(_msg.mutable_wrench(), this->wrench);
+  _msg.set_enabled(true);
 
   // Fill the state message with all the collision states
   for (std::vector<CollisionState>::const_iterator iter =

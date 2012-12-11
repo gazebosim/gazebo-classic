@@ -108,8 +108,8 @@ namespace gazebo
       /// \param[in] _notify True = tell children of the pose change.
       /// \param[in] _publish True to publish the pose.
       public: void SetRelativePose(const math::Pose &_pose,
-                                   bool _notify = true,
-                                   bool _publish = true) GAZEBO_DEPRECATED;
+                                   bool _notify,
+                                   bool _publish) GAZEBO_DEPRECATED;
 
       /// \brief Set the pose of the entity relative to its parent.
       /// \param[in] _pose The new pose.
@@ -122,8 +122,8 @@ namespace gazebo
       /// \param[in] _notify True = tell children of the pose change.
       /// \param[in] _publish True to publish the pose.
       public: void SetWorldPose(const math::Pose &_pose,
-                                bool _notify = true,
-                                bool _publish = true) GAZEBO_DEPRECATED;
+                                bool _notify,
+                                bool _publish) GAZEBO_DEPRECATED;
 
       /// \brief Set the world pose of the entity.
       /// \param[in] _pose The new world pose.
@@ -256,21 +256,39 @@ namespace gazebo
       /// \param[in] _publish True to publish the pose.
       private: void SetWorldPoseModel(const math::Pose &_pose,
                                       bool _notify,
-                                      bool _publish);
+                                      bool _publish) GAZEBO_DEPRECATED;
+
+      /// \brief Set the world pose for a model.
+      /// \param[in] _pose New pose for the entity.
+      /// \param[in] _notify True to notify children of the pose update.
+      private: void SetWorldPoseModel(const math::Pose &_pose,
+                                      bool _notify);
+
 
       /// \brief Set the world pose for a canonical Link.
       /// \param[in] _pose New pose for the entity.
       /// \param[in] _notify True to notify children of the pose update.
       /// \param[in] _publish True to publish the pose.
       private: void SetWorldPoseCanonicalLink(const math::Pose &_pose,
-                                              bool _notify, bool _publish);
+                   bool _notify, bool _publish) GAZEBO_DEPRECATED;
+
+      /// \brief Set the world pose for a canonical Link.
+      /// \param[in] _pose New pose for the entity.
+      /// \param[in] _notify True to notify children of the pose update.
+      private: void SetWorldPoseCanonicalLink(const math::Pose &_pose,
+                                              bool _notify);
 
       /// \brief Set the world pose for a common entity.
       /// \param[in] _pose New pose for the entity.
       /// \param[in] _notify True to notify children of the pose update.
       /// \param[in] _publish True to publish the pose.
       private: void SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
-                                        bool _publish);
+                   bool _publish) GAZEBO_DEPRECATED;
+
+      /// \brief Set the world pose for a common entity.
+      /// \param[in] _pose New pose for the entity.
+      /// \param[in] _notify True to notify children of the pose update.
+      private: void SetWorldPoseDefault(const math::Pose &_pose, bool _notify);
 
       /// \brief Called when a new pose message arrives.
       /// \param[in] _msg The message to set the pose from.
@@ -348,7 +366,7 @@ namespace gazebo
       private: boost::function<void()> onAnimationComplete;
 
       /// \brief The function used to to set the world pose.
-      private: void (Entity::*setWorldPoseFunc)(const math::Pose &, bool, bool);
+      private: void (Entity::*setWorldPoseFunc)(const math::Pose &, bool);
     };
 
     /// \}

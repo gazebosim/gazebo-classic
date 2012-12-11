@@ -1446,7 +1446,8 @@ void Scene::PreRender()
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
         math::Pose pose = msgs::Convert(*poseIter);
-        iter->second->SetPose(iter->second->GetPose() + pose);
+        iter->second->SetPosition(pose.pos + iter->second->GetPosition());
+        iter->second->SetRotation(pose.rot.GetInverse() * iter->second->GetRotation());
         this->poseDeltas.erase(poseIter++);
       }
       else
@@ -1899,28 +1900,23 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnStateMsg(ConstWorldStatePtr &_msg)
 {
-  std::cout << "Got state\n";
   for (int i = 0; i < _msg->model_state_size(); ++i)
   {
     msgs::ModelState modelState = _msg->model_state(i);
     this->poseDeltas.push_back(modelState.pose());
     this->poseDeltas.back().set_name(modelState.name());
-    std::cout << "Adding Model Delta[" << this->poseDeltas.back().DebugString() << "]\n";
 
     for (int j = 0; j < modelState.link_state_size(); ++j)
     {
       msgs::LinkState linkState = modelState.link_state(j);
       this->poseDeltas.push_back(linkState.pose());
       this->poseDeltas.back().set_name(linkState.name());
-      std::cout << "Adding Link Delta[" << this->poseDeltas.back().DebugString() << "]\n";
 
       for (int k = 0; k < linkState.collision_state_size(); ++k)
       {
-        msgs::CollisionState collisionState = linkState.collision_state(j);
+        msgs::CollisionState collisionState = linkState.collision_state(k);
         this->poseDeltas.push_back(collisionState.pose());
         this->poseDeltas.back().set_name(collisionState.name());
-
-        std::cout << "Adding Coll Delta[" << this->poseDeltas.back().DebugString() << "]\n";
       }
     }
   }

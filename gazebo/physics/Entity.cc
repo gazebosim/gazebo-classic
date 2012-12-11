@@ -226,7 +226,7 @@ math::Pose Entity::GetRelativePose() const
 
 //////////////////////////////////////////////////
 void Entity::SetRelativePose(const math::Pose &_pose, bool _notify,
-        bool _publish)
+        bool /*_publish*/)
 {
   this->SetRelativePose(_pose, _notify);
 }
@@ -235,7 +235,7 @@ void Entity::SetRelativePose(const math::Pose &_pose, bool _notify,
 void Entity::SetRelativePose(const math::Pose &_pose, bool _notify)
 {
   if (this->parent && this->parentEntity)
-    this->SetWorldPose(_pose + this->parentEntity->GetWorldPose(), _notify;
+    this->SetWorldPose(_pose + this->parentEntity->GetWorldPose(), _notify);
   else
     this->SetWorldPose(_pose, _notify);
 }
@@ -270,7 +270,7 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
 
 //////////////////////////////////////////////////
 void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
-        bool _publish)
+        bool /*_publish*/)
 {
   this->SetWorldPoseModel(_pose, _notify);
 }
@@ -318,7 +318,13 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
 
 //////////////////////////////////////////////////
 void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
-        bool _publish)
+        bool /*_publish*/)
+{
+  this->SetWorldPoseCanonicalLink(_pose, _notify);
+}
+
+//////////////////////////////////////////////////
+void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify)
 {
   this->worldPose = _pose;
   this->worldPose.Correct();
@@ -349,6 +355,12 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
 void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
         bool /*_publish*/)
 {
+  this->SetWorldPoseDefault(_pose, _notify);
+}
+
+//////////////////////////////////////////////////
+void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify)
+{
   this->worldPose = _pose;
   this->worldPose.Correct();
 
@@ -356,6 +368,12 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
     this->UpdatePhysicsPose(true);
 }
 
+//////////////////////////////////////////////////
+void Entity::SetWorldPose(const math::Pose &_pose, bool _notify,
+    bool /*_publish*/)
+{
+  this->SetWorldPose(_pose, _notify);
+}
 
 //////////////////////////////////////////////////
 //   The entity stores an initialRelativePose and dynamic worldPose
@@ -387,11 +405,11 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
 //    MWP  - Model World Pose
 //    CBRP - Canonical Body Relative (to Model) Pose
 //
-void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
+void Entity::SetWorldPose(const math::Pose &_pose, bool _notify)
 {
   this->GetWorld()->GetSetWorldPoseMutex()->lock();
 
-  (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
+  (*this.*setWorldPoseFunc)(_pose, _notify);
 
   this->GetWorld()->GetSetWorldPoseMutex()->unlock();
 }

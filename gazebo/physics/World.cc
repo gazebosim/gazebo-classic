@@ -492,7 +492,7 @@ void World::Update()
 
   if (!diffState.IsZero())
   {
-    std::cout << "DiffState[" << diffState << "]\n";
+    std::cout << "Diffstate[" << diffState << "]\n";
 
     // Create and output a world state message.
     msgs::WorldState msg;

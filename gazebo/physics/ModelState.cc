@@ -330,5 +330,4 @@ void ModelState::FillMsg(msgs::ModelState &_msg) const
     msgs::JointState *jointState = _msg.add_joint_state();
     (*iter).FillMsg(*jointState);
   }
-
 }
