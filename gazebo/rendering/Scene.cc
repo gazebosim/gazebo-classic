@@ -15,14 +15,15 @@
  *
 */
 #include <boost/lexical_cast.hpp>
+
 #include "gazebo/rendering/skyx/include/SkyX.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "rendering/ogre_gazebo.h"
-#include "msgs/msgs.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/sdf/sdf.hh"
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
@@ -79,6 +80,11 @@ struct VisualMessageLess {
 //////////////////////////////////////////////////
 Scene::Scene(const std::string &_name, bool _enableVisualizations)
 {
+  this->showCOMs = false;
+  this->showCollisions = false;
+  this->showJoints = false;
+  this->transparent = false;
+
   this->requestMsg = NULL;
   this->enableVisualizations = _enableVisualizations;
   this->node = transport::NodePtr(new transport::Node());
@@ -95,9 +101,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->connections.push_back(
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
-
-  this->connections.push_back(
-      Events::ConnectViewContacts(boost::bind(&Scene::ViewContacts, this, _1)));
 
   this->sensorSub = this->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this);
@@ -725,7 +728,6 @@ double Scene::GetHeightBelowPoint(const math::Vector3 &_pt)
   if (this->terrain)
   {
     double terrainHeight = this->terrain->GetHeight(_pt.x, _pt.y, _pt.z);
-    std::cout << "Terrain Heihgt[" << terrainHeight << "]\n";
     if (terrainHeight <= _pt.z)
       height = std::max(height, terrainHeight);
   }
@@ -1656,7 +1658,7 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
   JointVisualPtr jointVis(new JointVisual(
           _msg->name() + "_JOINT_VISUAL__", childVis));
   jointVis->Load(_msg);
-  jointVis->SetVisible(false);
+  jointVis->SetVisible(this->showJoints);
 
   this->visuals[jointVis->GetName()] = jointVis;
   return true;
@@ -1734,53 +1736,107 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
         this->RemoveVisual(iter->second);
     }
   }
+  else if (_msg->request() == "show_contact")
+  {
+    this->ShowContacts(true);
+  }
+  else if (_msg->request() == "hide_contact")
+  {
+    this->ShowContacts(false);
+  }
   else if (_msg->request() == "show_collision")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->ShowCollision(true);
+    if (_msg->data() == "all")
+      this->ShowCollisions(true);
     else
-      gzerr << "Unable to find visual[" << _msg->data() << "]\n";
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowCollision(true);
+      else
+        gzerr << "Unable to find visual[" << _msg->data() << "]\n";
+    }
   }
   else if (_msg->request() == "hide_collision")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->ShowCollision(false);
+    if (_msg->data() == "all")
+      this->ShowCollisions(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowCollision(false);
+    }
   }
   else if (_msg->request() == "show_joints")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->ShowJoints(true);
+    if (_msg->data() == "all")
+      this->ShowJoints(true);
     else
-      gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowJoints(true);
+      else
+        gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+    }
   }
   else if (_msg->request() == "hide_joints")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->ShowJoints(false);
+    if (_msg->data() == "all")
+      this->ShowJoints(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowJoints(false);
+    }
   }
   else if (_msg->request() == "show_com")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->ShowCOM(true);
+    if (_msg->data() == "all")
+      this->ShowCOMs(true);
     else
-      gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowCOM(true);
+      else
+        gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+    }
   }
   else if (_msg->request() == "hide_com")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->ShowCOM(false);
+    if (_msg->data() == "all")
+      this->ShowCOMs(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowCOM(false);
+    }
   }
-  else if (_msg->request() == "set_transparency")
+  else if (_msg->request() == "set_transparent")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->SetTransparency(_msg->dbl_data());
+    if (_msg->data() == "all")
+      this->SetTransparent(true);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->SetTransparency(0.5);
+    }
+  }
+  else if (_msg->request() == "set_opaque")
+  {
+    if (_msg->data() == "all")
+      this->SetTransparent(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->SetTransparency(0.0);
+    }
   }
   else if (_msg->request() == "show_skeleton")
   {
@@ -1866,6 +1922,11 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       {
         visual->SetVisible(false);
       }
+
+      visual->ShowCOM(this->showCOMs);
+      visual->ShowCollision(this->showCollisions);
+      visual->ShowJoints(this->showJoints);
+      visual->SetTransparency(this->transparent ? 0.5 : 0.0);
     }
   }
 
@@ -2263,21 +2324,65 @@ VisualPtr Scene::CloneVisual(const std::string &_visualName,
 }
 
 /////////////////////////////////////////////////
-void Scene::ViewContacts(bool _view)
+void Scene::SetTransparent(bool _show)
+{
+  this->transparent = _show;
+  for (Visual_M::iterator iter = this->visuals.begin();
+       iter != this->visuals.end(); ++iter)
+  {
+    iter->second->SetTransparency(_show ? 0.5 : 0.0);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowCOMs(bool _show)
+{
+  this->showCOMs = _show;
+  for (Visual_M::iterator iter = this->visuals.begin();
+       iter != this->visuals.end(); ++iter)
+  {
+    iter->second->ShowCOM(_show);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowCollisions(bool _show)
+{
+  this->showCollisions = _show;
+  for (Visual_M::iterator iter = this->visuals.begin();
+       iter != this->visuals.end(); ++iter)
+  {
+    iter->second->ShowCollision(_show);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowJoints(bool _show)
+{
+  this->showJoints = _show;
+  for (Visual_M::iterator iter = this->visuals.begin();
+       iter != this->visuals.end(); ++iter)
+  {
+    iter->second->ShowJoints(_show);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowContacts(bool _show)
 {
   ContactVisualPtr vis = boost::shared_dynamic_cast<ContactVisual>(
       this->visuals["__GUIONLY_CONTACT_VISUAL__"]);
 
-  if (!vis && _view)
+  if (!vis && _show)
   {
     vis.reset(new ContactVisual("__GUIONLY_CONTACT_VISUAL__",
               this->worldVisual, "~/physics/contacts"));
-    vis->SetEnabled(_view);
+    vis->SetEnabled(_show);
     this->visuals[vis->GetName()] = vis;
   }
 
   if (vis)
-    vis->SetEnabled(_view);
+    vis->SetEnabled(_show);
   else
     gzerr << "Unable to get contact visualization. This should never happen.\n";
 }
