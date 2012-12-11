@@ -51,7 +51,6 @@ namespace gazebo
     ///  \li sensors::GpuRaySensor
     ///  \li sensors::RaySensor
     ///  \li sensors::ContactSensor
-    ///  \li sensors::ForceTorqueSensor
     ///  \li sensors::RFIDSensor
     ///  \li sensors::RFIDTag
     public: static void RegisterAll();

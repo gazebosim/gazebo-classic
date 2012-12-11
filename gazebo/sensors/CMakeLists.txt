@@ -4,7 +4,6 @@ set (sources
   CameraSensor.cc
   ContactSensor.cc
   DepthCameraSensor.cc
-  ForceTorqueSensor.cc
   ImuSensor.cc
   MultiCameraSensor.cc
   RaySensor.cc
@@ -20,7 +19,6 @@ set (headers
   CameraSensor.hh
   ContactSensor.hh
   DepthCameraSensor.hh
-  ForceTorqueSensor.hh
   ImuSensor.hh
   MultiCameraSensor.hh
   RaySensor.hh

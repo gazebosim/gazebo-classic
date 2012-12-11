@@ -63,10 +63,8 @@ void ForceTorquePlugin::UpdateStates()
   gzdbg << "-----------------------------------------------------\n";
   for (unsigned int i = 0; i < this->joints.size(); ++i)
   {
-    
     if (i < 2)
       this->joints[i]->SetForce(0, 1.0);
-
 
     physics::JointWrench jw = this->joints[i]->GetForceTorque(0);
     gzdbg << "model [" << this->model->GetName()
@@ -75,6 +73,8 @@ void ForceTorquePlugin::UpdateStates()
           << "] b1t [" << jw.body1Torque
           << "] b2f [" << jw.body2Force
           << "] b2t [" << jw.body2Torque
+          << "] link1f [" << this->joints[i]->GetLinkForce(0)
+          << "] link1t [" << this->joints[i]->GetLinkTorque(0)
           << "]\n";
   }
 }
