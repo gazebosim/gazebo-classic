@@ -46,6 +46,17 @@
 #include <OGRE/OgreTexture.h>
 #include <OGRE/OgreRenderObjectListener.h>
 
+#include <OGRE/Terrain/OgreTerrainMaterialGeneratorA.h>
+#include <OGRE/Terrain/OgreTerrain.h>
+#include <OGRE/Terrain/OgreTerrainGroup.h>
+#include <OGRE/OgreTechnique.h>
+#include <OGRE/OgrePass.h>
+#include <OGRE/OgreTextureUnitState.h>
+#include <OGRE/OgreGpuProgramManager.h>
+#include <OGRE/OgreHighLevelGpuProgramManager.h>
+#include <OGRE/OgreHardwarePixelBuffer.h>
+#include <OGRE/OgreShadowCameraSetupPSSM.h>
+
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
 #include <RTShaderSystem/OgreRTShaderSystem.h>
 #endif
