@@ -141,12 +141,14 @@ class ServerFixture : public testing::Test
                ASSERT_NO_THROW(this->server = new Server());
                ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
-               this->SetPause(_paused);
 
                rendering::create_scene(
                    gazebo::physics::get_world()->GetName(), false);
 
+               this->SetPause(_paused);
+
                this->server->Run();
+
                rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
                ASSERT_NO_THROW(this->server->Fini());
