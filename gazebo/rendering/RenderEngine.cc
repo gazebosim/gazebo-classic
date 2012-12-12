@@ -695,23 +695,23 @@ void RenderEngine::CheckSystemCapabilities()
     std::find(profiles.begin(), profiles.end(), "glsl") != profiles.end();
 
   if (!hasFragmentPrograms || !hasVertexPrograms)
-    gwarn << "Vertex and fragment shaders are missing. "
-          << "Fixed function rendering will be used.\n";
+    gzwarn << "Vertex and fragment shaders are missing. "
+           << "Fixed function rendering will be used.\n";
 
   if (!hasGLSL)
-    gwarn << "GLSL is missing."
-          << "Fixed function rendering will be used.\n";
+    gzwarn << "GLSL is missing."
+           << "Fixed function rendering will be used.\n";
 
   if (!hasFBO)
     gzwarn << "Frame Buffer Objects (FBO) is missing. "
            << "Rendering will be disabled.\n";
 
+  this->renderPathType = RenderEngine::NONE;
+
   if (hasFBO && hasGLSL && hasVertexPrograms && hasFragmentPrograms)
     this->renderPathType = RenderEngine::FORWARD;
   else if (hasFBO)
     this->renderPathType = RenderEngine::VERTEX;
-  else
-    this->renderPathType = RenderEngine::NONE;
 
   // Disable deferred rendering for now. Needs more work.
   // if (hasRenderToVertexBuffer && multiRenderTargetCount >= 8)
