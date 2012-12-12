@@ -326,6 +326,7 @@ void PolylineItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
     this->scene()->clearSelection();
 
   this->setSelected(true);
+  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));  
 
   this->origin = this->pos();
   _event->setAccepted(true);
@@ -348,6 +349,8 @@ void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
   if (!this->isSelected())
     return;
 
+  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+
   for (unsigned int i = 0; i < corners.size(); ++i)
   {
     this->corners[i]->removeSceneEventFilter(this);
@@ -365,6 +368,8 @@ void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
   if (!this->isSelected())
     return;
 //  this->borderColor = Qt::red;
+
+  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
 
   for (unsigned int i = 0; i < corners.size(); ++i)
   {

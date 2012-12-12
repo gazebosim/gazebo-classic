@@ -57,10 +57,10 @@ namespace gazebo
         protected: virtual QRectF boundingRect() const;
 
         private: virtual bool rotateEventFilter(RotateHandle *_rotateHandle,
-            QGraphicsSceneMouseEvent *_event);
+            QEvent *_event);
 
         private: virtual bool cornerEventFilter(CornerGrabber *_corner,
-            QGraphicsSceneMouseEvent *_event);
+            QEvent *_event);
 
         private: virtual void paint (QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
@@ -119,6 +119,8 @@ namespace gazebo
         private: RotateHandle *rotateHandle;
 
         private: double rotationAngle;
+
+        private: std::vector<Qt::CursorShape> cursors;
     };
   }
 }

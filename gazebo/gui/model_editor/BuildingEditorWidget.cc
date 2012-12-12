@@ -48,8 +48,7 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   canvasLayout->addWidget(view);
 
   GridLines *gridLines = new GridLines (boundingWidth, boundingHeight);
-  gridLines->setFlag(QGraphicsItem::ItemIsSelectable, false);
-//  scene->addItem(gridLines);
+  scene->addItem(gridLines);
 
   view->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   view->setScene(scene);

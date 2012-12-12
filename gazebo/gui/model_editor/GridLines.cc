@@ -21,6 +21,7 @@
 GridLines::GridLines( int _w, int _h ) : QGraphicsItem(), width(_w), height(_h),
   space(10)
 {
+  this->setFlag(QGraphicsItem::ItemIsSelectable, false);
 }
 
 /////////////////////////////////////////////////
@@ -48,10 +49,7 @@ void GridLines::paint (QPainter *_painter,
 /////////////////////////////////////////////////
 QRectF GridLines::boundingRect() const
 {
-  return QRectF ( static_cast<qreal>(-this->width/2.0),
-                  static_cast<qreal>(-this->height/2.0),
-                  static_cast<qreal>(this->width),
-                  static_cast<qreal>(this->height));
+  return QRectF (0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////

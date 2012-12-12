@@ -52,6 +52,17 @@ RectItem::RectItem():
   QPen transparentPen(QColor(0, 0, 0, 0));
   this->setPen(transparentPen);
 
+  cursors.push_back(Qt::SizeFDiagCursor);
+  cursors.push_back(Qt::SizeBDiagCursor);
+  cursors.push_back(Qt::SizeFDiagCursor);
+  cursors.push_back(Qt::SizeBDiagCursor);
+  cursors.push_back(Qt::SizeHorCursor);
+  cursors.push_back(Qt::SizeVerCursor);
+  cursors.push_back(Qt::SizeHorCursor);
+  cursors.push_back(Qt::SizeVerCursor);
+
+  this->setCursor(Qt::SizeAllCursor);
+
   this->rotationAngle = 0;
 }
 
@@ -87,33 +98,31 @@ void RectItem::AdjustSize(double _x, double _y)
 /////////////////////////////////////////////////
 bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
 {
-  QGraphicsSceneMouseEvent *event =
-      dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
-  if (event == NULL)
-    return false;
-
   RotateHandle *rotateH = dynamic_cast<RotateHandle *>(_watched);
   if (rotateH != NULL)
-    return this->rotateEventFilter(rotateH, event);
+    return this->rotateEventFilter(rotateH, _event);
 
   CornerGrabber *corner = dynamic_cast<CornerGrabber *>(_watched);
   if (corner != NULL)
-    return this->cornerEventFilter(corner, event);
+    return this->cornerEventFilter(corner, _event);
 
   return false;
 }
 
 /////////////////////////////////////////////////
 bool RectItem::rotateEventFilter(RotateHandle *_rotate,
-    QGraphicsSceneMouseEvent *_event)
+    QEvent *_event)
 {
+  QGraphicsSceneMouseEvent *mouseEvent =
+    dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
+
   switch (_event->type())
   {
     case QEvent::GraphicsSceneMousePress:
     {
       _rotate->SetMouseState(QEvent::GraphicsSceneMousePress);
-      _rotate->SetMouseDownX(_event->pos().x());
-      _rotate->SetMouseDownY(_event->pos().y());
+      _rotate->SetMouseDownX(mouseEvent->pos().x());
+      _rotate->SetMouseDownY(mouseEvent->pos().y());
 
       break;
     }
@@ -132,6 +141,9 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
       break;
   }
 
+  if (mouseEvent == NULL)
+    return false;
+
   if (_rotate->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
     QPoint localCenter(this->drawingOriginX +
@@ -139,9 +151,9 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
       this->drawingOriginY + (this->drawingOriginY + this->drawingHeight)/2);
     QPointF center = this->mapToScene(localCenter);
 
-    QPointF newPoint = _event->scenePos();
+    QPointF newPoint = mouseEvent->scenePos();
     QLineF prevLine(center.x(), center.y(),
-        _event->lastScenePos().x(), _event->lastScenePos().y());
+        mouseEvent->lastScenePos().x(), mouseEvent->lastScenePos().y());
     QLineF line(center.x(), center.y(), newPoint.x(), newPoint.y());
 
     double angle = -prevLine.angleTo(line);
@@ -158,17 +170,18 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
 
 /////////////////////////////////////////////////
 bool RectItem::cornerEventFilter(CornerGrabber *_corner,
-    QGraphicsSceneMouseEvent *_event)
+    QEvent *_event)
 {
-//  this->setTransformOriginPoint(QPointF(0,0));
+  QGraphicsSceneMouseEvent *mouseEvent =
+    dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
 
   switch (_event->type())
   {
     case QEvent::GraphicsSceneMousePress:
     {
       _corner->SetMouseState(QEvent::GraphicsSceneMousePress);
-      _corner->SetMouseDownX(_event->pos().x());
-      _corner->SetMouseDownY(_event->pos().y());
+      _corner->SetMouseDownX(mouseEvent->pos().x());
+      _corner->SetMouseDownY(mouseEvent->pos().y());
       break;
     }
     case QEvent::GraphicsSceneMouseRelease:
@@ -181,15 +194,60 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
       _corner->SetMouseState(QEvent::GraphicsSceneMouseMove);
       break;
     }
+    case QEvent::GraphicsSceneHoverEnter:
+    {
+
+
+      double angle = this->rotationAngle
+          - static_cast<int>(rotationAngle/360) * 360;
+      double range = 22.5;
+      if (angle < 0)
+        angle += 360;
+
+      qDebug() << "angle " << angle;
+
+      if ((angle > (360 - range)) || (angle < range))
+      {
+        QApplication::setOverrideCursor(QCursor(cursors[_corner->GetIndex()]));
+      }
+      /*else if ((angle <= (360 - range)) && (angle > (180 + range)))
+      {
+        QApplication::setOverrideCursor(
+            QCursor(cursors[_corner->GetIndex() + 4 % 8]));
+      }
+      else if ((angle <= (180 + range)) && (angle > (180 - range)))
+      {
+        QApplication::setOverrideCursor(
+            QCursor(cursors[_corner->GetIndex()]));
+      }
+      else
+      {
+        QApplication::setOverrideCursor(
+            QCursor(cursors[_corner->GetIndex() + 4 % 8]));
+      }*/
+
+      return true;
+      break;
+    }
+    case QEvent::GraphicsSceneHoverLeave:
+    {
+      QApplication::restoreOverrideCursor();
+      return true;
+      break;
+    }
     default:
       return false;
       break;
   }
 
+  if (mouseEvent == NULL)
+    return false;
+
+
   if (_corner->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
-    double xPos = _event->pos().x();
-    double yPos = _event->pos().y();
+    double xPos = mouseEvent->pos().x();
+    double yPos = mouseEvent->pos().y();
 
     // depending on which corner has been grabbed, we want to move the position
     // of the item as it grows/shrinks accordingly. so we need to either add
@@ -283,7 +341,7 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
       case 0:
       {
         this->setPos(this->pos() +
-            (_event->scenePos() - _event->lastScenePos()));
+            (mouseEvent->scenePos() - mouseEvent->lastScenePos()));
         break;
       }
       case 1:
@@ -346,6 +404,7 @@ void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 //  QGraphicsItem::mousePressEvent(_event);
 //  return;
   this->setSelected(true);
+  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
   this->location = this->pos();
   _event->setAccepted(true);
 }
@@ -376,7 +435,8 @@ void RectItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
   if (!this->isSelected())
     return;
 
-//    this->borderColor = Qt::black;
+  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+
   for (int i = 0; i < 8; ++i)
     this->corners[i]->removeSceneEventFilter(this);
   this->rotateHandle->removeSceneEventFilter(this);
@@ -389,11 +449,12 @@ void RectItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
   if (!this->isSelected())
     return;
 
+  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
+
 //    this->borderColor = Qt::red;
   for (int i = 0; i < 8; ++i)
     this->corners[i]->installSceneEventFilter(this);
   this->rotateHandle->installSceneEventFilter(this);
-  this->UpdateCornerPositions();
 }
 
 /////////////////////////////////////////////////

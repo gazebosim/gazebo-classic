@@ -156,13 +156,16 @@ void CornerGrabber::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
   this->borderColor = Qt::black;
   this->update(0, 0, this->width, this->height);
+
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::hoverEnterEvent(QGraphicsSceneHoverEvent *)
+void CornerGrabber::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 {
   this->borderColor = Qt::red;
   this->update(0, 0, this->width, this->height);
+  QGraphicsItem::hoverEnterEvent(_event);
+//  _event->setAccepted(false);
 }
 
 /////////////////////////////////////////////////
