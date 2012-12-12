@@ -627,6 +627,7 @@ namespace gazebo
       /// objects are inserted via the factory.
       private: sdf::SDFPtr factorySDF;
 
+      /// \brief The list of pose messages to output.
       private: msgs::Pose_V poseMsgs;
     };
     /// \}
