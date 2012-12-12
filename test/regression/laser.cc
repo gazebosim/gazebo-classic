@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 */
 
 #include "ServerFixture.hh"
-#include "physics/physics.h"
-#include "sensors/sensors.h"
-#include "common/common.h"
+#include "physics/physics.hh"
+#include "sensors/sensors.hh"
+#include "common/common.hh"
 #include "scans_cmp.h"
 
 using namespace gazebo;
@@ -30,36 +30,49 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
 {
   Load("worlds/empty.world");
   std::ostringstream laserModel;
-    laserModel << "<gazebo version='1.0'>\
-     <model name='box' static='true'>\
-       <link name='link'>\
-         <origin pose='0 0 0.5 0 0 0'/>\
-         <inertial mass='1.0'>\
-           <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>\
-         </inertial>\
-         <sensor name='laser' type='ray' always_on='1'\
-                 update_rate='10' visualize='true'>\
-           <origin pose='0 0 0 0 0 0'/>\
-           <topic>~/laser_scan</topic>\
-           <ray>\
-             <scan>\
-               <horizontal samples='640' resolution='1'\
-                           min_angle='-2.27' max_angle='2.27'/>\
-             </scan>\
-             <range min='0.0' max='10' resolution='0.01'/>\
-           </ray>\
-         </sensor>\
-       </link>\
-     </model>\
-     </gazebo>";
+    laserModel << "<sdf version='" << SDF_VERSION << "'>"
+      "<model name='box'>"
+        "<static>true</static>"
+        "<link name='link'>"
+        "<pose>0 0 0.5 0 0 0</pose>"
+        "<sensor name='laser' type='ray'>"
+          "<always_on>true</always_on>"
+          "<update_rate>10</update_rate>"
+          "<visualize>true</visualize>"
+          "<topic>~/laser_scan</topic>"
+          "<ray>"
+            "<scan>"
+              "<horizontal>"
+                "<samples>640</samples>"
+                "<resolution>1</resolution>"
+                "<min_angle>-2.27</min_angle>"
+                "<max_angle>2.27</max_angle>"
+              "</horizontal>"
+            "</scan>"
+            "<range>"
+              "<min>0.0</min>"
+              "<max>10</max>"
+              "<resolution>0.01</resolution>"
+            "</range>"
+          "</ray>"
+        "</sensor>"
+      "</link>"
+    "</model>"
+  "</sdf>";
+
   SpawnSDF(laserModel.str());
   while (!HasEntity("box"))
     common::Time::MSleep(10);
 
   sensors::RaySensorPtr laser =
     boost::shared_static_cast<sensors::RaySensor>(
-        sensors::SensorManager::Instance()->GetSensor("laser"));
+        sensors::SensorManager::Instance()->GetSensor(
+          "default::box::link::laser"));
   EXPECT_TRUE(laser);
+  laser->Update(true);
+  while (laser->GetRange(0) == 0)
+    common::Time::MSleep(100);
+
 
   EXPECT_EQ(640, laser->GetRayCount());
   EXPECT_EQ(640, laser->GetRangeCount());
@@ -81,7 +94,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
     std::vector<double> scan;
     laser->GetRanges(scan);
 
-    ScanCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
+    DoubleCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
     EXPECT_LT(diffMax, 1e-6);
     EXPECT_LT(diffSum, 1e-5);
     EXPECT_LT(diffAvg, 1e-6);
@@ -116,14 +129,14 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
       laser->Update(true);
       laser->GetRanges(scan2);
 
-      ScanCompare(&scan[0], &scan2[0], 640, diffMax, diffSum, diffAvg);
+      DoubleCompare(&scan[0], &scan2[0], 640, diffMax, diffSum, diffAvg);
       EXPECT_LT(diffMax, 1e-6);
       EXPECT_LT(diffSum, 1e-6);
       EXPECT_LT(diffAvg, 1e-6);
     }
     laser->Update(true);
 
-    ScanCompare(plane_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
+    DoubleCompare(plane_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
     EXPECT_LT(diffMax, 1e-6);
     EXPECT_LT(diffSum, 1e-6);
     EXPECT_LT(diffAvg, 1e-6);

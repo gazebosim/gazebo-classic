@@ -1,0 +1,24 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Contact
+/// \brief Contact message for passing info between two entities
+
+
+import "vector3d.proto";
+import "time.proto";
+import "joint_wrench.proto";
+
+message Contact
+{
+  required string collision1 = 1;
+  required string collision2 = 2;
+
+  repeated Vector3d position  = 3;
+  repeated Vector3d normal    = 4;
+  repeated double depth       = 5;
+  repeated JointWrench wrench = 6;
+
+  required Time time         = 7;
+}
+

@@ -1,7 +1,6 @@
 syntax: glob
 
 build
+build_*
 Ogre.log
-.*.swp
-*.orig
-*~
+.DS_Store

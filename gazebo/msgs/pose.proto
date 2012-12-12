@@ -1,0 +1,18 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Pose 
+/// \brief Message for a pose
+
+
+import "vector3d.proto";
+import "quaternion.proto";
+
+message Pose
+{
+  optional string name            = 1;
+  required Vector3d position      = 2;
+  required Quaternion orientation = 3;
+}
+
+

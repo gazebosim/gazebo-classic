@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
-#define __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
+#ifndef _GAZEBO_DEPTH_CAMERA_PLUGIN_HH_
+#define _GAZEBO_DEPTH_CAMERA_PLUGIN_HH_
 
 #include <string>
 
@@ -24,13 +24,17 @@
 #include "sensors/DepthCameraSensor.hh"
 #include "sensors/CameraSensor.hh"
 #include "rendering/DepthCamera.hh"
-#include "gazebo.h"
+#include "gazebo.hh"
 
 namespace gazebo
 {
   class DepthCameraPlugin : public SensorPlugin
   {
+    /// \brief Constructor
     public: DepthCameraPlugin();
+
+    /// \brief Destructor
+    public: virtual ~DepthCameraPlugin();
 
     public: void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 

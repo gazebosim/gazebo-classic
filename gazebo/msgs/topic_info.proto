@@ -1,0 +1,18 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface TopicInfo
+/// \brief A message for topic information
+
+
+import "publish.proto";
+import "subscribe.proto";
+
+message TopicInfo
+{
+  required string msg_type       = 1;
+  repeated Publish publisher    = 2;
+  repeated Subscribe subscriber = 3;
+}
+
+

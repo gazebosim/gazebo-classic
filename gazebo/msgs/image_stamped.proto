@@ -1,0 +1,15 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface ImageStamped
+/// \brief Message for an image with a time
+
+
+import "time.proto";
+import "image.proto";
+
+message ImageStamped
+{
+  required Time time          = 1; // Time when the data was captured
+  required Image image        = 2;
+}

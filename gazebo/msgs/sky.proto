@@ -1,0 +1,22 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Sky 
+/// \brief Information about the sky
+
+
+import "color.proto";
+
+message Sky
+{
+  optional double time           = 1;
+  optional double sunrise        = 2;
+  optional double sunset         = 3;
+
+  optional double wind_speed     = 4;
+  optional double wind_direction = 5;
+  optional Color cloud_ambient   = 6;
+  optional double humidity       = 7;
+  optional double mean_cloud_size = 8;
+}
+

@@ -1,0 +1,7 @@
+#ifndef GAZEBO_COMMON_HH_
+#define GAZEBO_COMMON_HH_
+
+// Automatically generated
+${common_headers}
+
+#endif

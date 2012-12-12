@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PoseStamped
+/// \brief Message for a pose with a time
+
+
+import "time.proto";
+import "pose.proto";
+
+message PoseStamped
+{
+  required Time time          = 1; // Time when the data was captured
+  required Pose pose          = 2;
+}
+
+

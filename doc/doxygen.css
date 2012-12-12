@@ -70,8 +70,15 @@ div.qindex, div.navtab{
 	padding: 2px;
 }
 
-div.qindex, div.navpath {
-	width: 100%;
+div.qindex
+{
+  width: 100%;
+	line-height: 140%;
+}
+
+div.navpath
+{
+  margin-left: 20em;
 	line-height: 140%;
 }
 
@@ -184,7 +191,7 @@ body {
 
 div.contents {
 	margin-top: 10px;
-	margin-left: 10px;
+	margin-left: 20em;
 	margin-right: 10px;
 }
 
@@ -551,7 +558,7 @@ proper pixel height of your image.
 /* @end */
 
 div.dynheader {
-        margin-top: 8px;
+  margin-top: 8px;
 }
 
 address {
@@ -642,10 +649,11 @@ div.summary a
 
 div.header
 {
-        background-image:url('nav_h.png');
-        background-repeat:repeat-x;
+  background-image:url('nav_h.png');
+  background-repeat:repeat-x;
 	background-color: #F9FAFC;
 	margin:  0px;
+  margin-left: 20em;
 	border-bottom: 1px solid #C4CFE5;
 }
 
@@ -655,7 +663,7 @@ div.headertitle
 }
 
 #content { 
-  position: absolute; 
+  /*position: absolute; */
   left:12em; 
   top:0em; 
   padding-left:3em; 
@@ -678,23 +686,54 @@ div.headertitle
 }
 
 
-div.leftbar{
-  position:absolute;
+#MSearchBox
+{
+  border: 1px solid black;
+  position: static;
+  margin: 10px;
+  display: block;
+  height: 20px;
+}
+
+#MSearchField
+{
+  background:none;
+}
+
+/*iframe#MSearchResults
+{
+  height: 500px;
+  text-wrap: unrestricted;
+  border: none;
+}
+*/
+/*
+#MSearchResultsWindow
+{
+  display: block;
+  position: fixed;
+}*/
+
+div.leftbar
+{
   text-align:left;
   float: left;
-  width: 12em;
+  border-right: 1px solid #dddddd;
+  width: 18em;
   margin: 5 5 5 5;
   padding: 4 4 4 4;
-  background-color: #DDD;
+  background-color: #ffffff;
+  position: fixed;
   height: 100%;
 }
 
 div.menu {
   #display:block;
-  background:#EEE;
+  background:#ffffff;
   font-size: 90%;
-  border-top: 2px solid #000000;
+  /*border-top: 2px solid #000000;
   border-bottom: 2px solid #000000;
+*/
   margin: 0 0 10px 0;
 }
 

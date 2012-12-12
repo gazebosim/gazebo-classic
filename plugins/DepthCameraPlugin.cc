@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,13 @@ GZ_REGISTER_SENSOR_PLUGIN(DepthCameraPlugin)
 /////////////////////////////////////////////////
 DepthCameraPlugin::DepthCameraPlugin() : SensorPlugin()
 {
+}
+
+/////////////////////////////////////////////////
+DepthCameraPlugin::~DepthCameraPlugin()
+{
+  this->parentSensor.reset();
+  this->depthCamera.reset();
 }
 
 /////////////////////////////////////////////////
@@ -83,13 +90,12 @@ void DepthCameraPlugin::OnNewDepthFrame(const float *_image,
     "/tmp/depthCamera/me.jpg");
     */
 }
-    
-/////////////////////////////////////////////////
-void DepthCameraPlugin::OnNewRGBPointCloud(const float *_pcd,
-                unsigned int _width, unsigned int _height,
-                unsigned int _depth, const std::string &_format)
-{
 
+/////////////////////////////////////////////////
+void DepthCameraPlugin::OnNewRGBPointCloud(const float * /*_pcd*/,
+                unsigned int /*_width*/, unsigned int /*_height*/,
+                unsigned int /*_depth*/, const std::string &/*_format*/)
+{
 }
 
 /////////////////////////////////////////////////

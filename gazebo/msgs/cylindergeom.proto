@@ -1,0 +1,13 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface CylinderGeom 
+/// \brief Information about a cylinder geometry
+
+
+message CylinderGeom
+{
+  required double radius  = 1;
+  required double length  = 2;
+}
+

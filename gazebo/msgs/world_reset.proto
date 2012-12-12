@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface WorldReset 
+/// \brief A message that controls how the world is reset
+
+
+import "header.proto";
+
+message WorldReset
+{
+  optional bool all          = 1[default = true];
+  optional bool time_only    = 2[default = false];
+  optional bool model_only   = 3[default = false];
+}
+
+

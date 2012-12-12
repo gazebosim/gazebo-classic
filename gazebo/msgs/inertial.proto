@@ -1,0 +1,21 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Inertial 
+/// \brief Information about inertia
+
+
+import "pose.proto";
+
+message Inertial
+{
+  optional double mass             = 1;
+  optional Pose pose               = 2;
+  optional double ixx              = 3;
+  optional double ixy              = 4;
+  optional double ixz              = 5;
+  optional double iyy              = 6;
+  optional double iyz              = 7;
+  optional double izz              = 8;
+}
+

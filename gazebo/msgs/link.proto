@@ -1,0 +1,31 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Link 
+/// \brief Information about a link
+
+
+import "header.proto";
+import "inertial.proto";
+import "collision.proto";
+import "visual.proto";
+import "sensor.proto";
+import "projector.proto";
+import "pose.proto";
+
+message Link
+{
+  required uint32 id            = 1;
+  required string name          = 2;
+  optional bool self_collide    = 3;
+  optional bool gravity         = 4;
+  optional bool kinematic       = 5;
+  optional bool enabled         = 6;
+  optional Inertial inertial    = 7;
+  optional Pose pose            = 8;
+  repeated Visual visual        = 9;
+  repeated Collision collision  = 10;
+  repeated Sensor sensor        = 11;
+  repeated Projector projector  = 12;
+}
+

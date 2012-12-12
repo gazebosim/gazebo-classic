@@ -1,0 +1,88 @@
+<!-- State Info -->
+<element name="state" required="*">
+  <!-- Name of the world this state applies to -->
+  <attribute name="world_name" type="string" default="__default__" required="1">
+    <description>Name of the world this state applies to</description>
+  </attribute>
+
+  <element name="sim_time" type="time" default="0 0" required="0">
+    <description>Simulation time stamp of the state [seconds nanoseconds]</description>
+  </element>
+
+  <element name="wall_time" type="time" default="0 0" required="0">
+    <description>Wall time stamp of the state [seconds nanoseconds]</description>
+  </element>
+
+  <element name="real_time" type="time" default="0 0" required="0">
+    <description>Real time stamp of the state [seconds nanoseconds]</description>
+  </element>
+
+  <!-- State information for a model -->
+  <element name="model" required="+">
+    <description>Model state</description>
+
+    <attribute name="name" type="string" default="__default__" required="1">
+      <description>Name of the model</description>
+    </attribute>
+
+    <element name="pose" type="pose" default="0 0 0 0 0 0" required="1">
+      <description>Pose of the model</description>
+    </element>
+
+    <element name="joint" required="*">
+      <description>Joint angle</description>
+
+      <attribute name="name" type="string" default="__default__" required="1">
+        <description>Name of the joint</description>
+      </attribute>
+
+      <element name="angle" type="double" default="0" required="+">
+        <attribute name="axis" type="unsigned int" default="0" required="1">
+          <description>Index of the axis.</description>
+        </attribute>
+
+        <description>Angle of an axis</description>
+      </element>
+    </element>
+
+    <!-- State information for a link -->
+    <element name="link" required="*">
+      <description>Link state</description>
+
+      <attribute name="name" type="string" default="__default__" required="1">
+        <description>Name of the link</description>
+      </attribute>
+
+      <element name="pose" type="pose" default="0 0 0 0 0 0" required="1">
+        <description>Pose of the link relative to the model</description>
+      </element>
+
+      <element name="velocity" type="pose" default="0 0 0 0 0 0" required="0">
+        <description>Velocity of the link</description>
+      </element>
+
+      <element name="acceleration" type="pose"
+              default="0 0 0 0 0 0" required="0">
+        <description>Acceleration of the link</description>
+      </element>
+
+      <element name="wrench" type="pose" default="0 0 0 0 0 0" required="0">
+        <description>Force applied to the link</description>
+      </element>
+
+      <element name="collision" required="*">
+        <description>Collision state</description>
+
+        <attribute name="name" type="string" default="__default__" required="1">
+          <description>Name of the collision</description>
+        </attribute>
+
+        <element name="pose" type="pose" default="0 0 0 0 0 0" required="1">
+          <description>Pose of the link relative to the model</description>
+        </element>
+      </element>
+
+
+    </element> <!-- End Link -->
+  </element> <!-- End Model -->
+</element> <!-- End State -->

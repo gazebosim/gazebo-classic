@@ -1,0 +1,23 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Shadows
+/// \brief A message for shadow data
+
+
+import "color.proto";
+
+message Shadows
+{
+  enum ShadowType
+  {
+    STENCIL_ADDITIVE   = 1;
+    STENCIL_MODULATIVE = 2;
+    TEXTURE_ADDITIVE   = 3;
+    TEXTURE_MODULATIVE = 4;
+  }
+  optional ShadowType type = 5;
+  optional Color color = 6;
+}
+
+

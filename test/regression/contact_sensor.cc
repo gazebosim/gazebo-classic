@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 */
 
 #include "ServerFixture.hh"
-#include "physics/physics.h"
-#include "sensors/sensors.h"
-#include "common/common.h"
+#include "physics/physics.hh"
+#include "sensors/sensors.hh"
+#include "common/common.hh"
 #include "scans_cmp.h"
 
 using namespace gazebo;

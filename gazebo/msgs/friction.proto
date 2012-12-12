@@ -1,0 +1,18 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Frction 
+/// \brief Information about friction
+
+
+import "vector3d.proto";
+
+message Friction
+{
+  optional double   mu     = 1;
+  optional double   mu2    = 2;
+  optional Vector3d fdir1  = 3;
+  optional double   slip1  = 4;
+  optional double   slip2  = 5;
+}
+

@@ -1,0 +1,197 @@
+<?xml version="1.0" ?>
+<gazebo version="1.2">
+    <model name="default_pioneer_model">
+        <pose>0 0 0 0 0 0</pose>
+        <link name="chassis">
+            <pose>0.0 0.0 0.16 0 0 0</pose>
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="geom">
+                <geometry>
+                    <box>
+                        <size>0.445 0.277 0.17</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>1</mu>
+                        </ode>
+                    </friction>
+                </surface>
+            </collision>
+            <visual name="visual1">
+                <pose>0 0 0.04 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <filename>pioneer2dx/chassis.dae</filename>
+                    </mesh>
+                </geometry>
+            </visual>
+            <sensor name="base_laser" type="ray">
+                <pose>0.5 0 0.5 0 0 0</pose>
+                <topic>~/laser_scan</topic>
+                <ray>
+                    <scan>
+                        <horizontal>
+                            <samples>640</samples>
+                            <resolution>1</resolution>
+                            <min_angle>-1</min_angle>
+                            <max_angle>1</max_angle>
+                        </horizontal>
+                    </scan>
+                    <range>
+                        <min>0.080000000000000002</min>
+                        <max>4</max>
+                        <resolution>0.01</resolution>
+                    </range>
+                </ray>
+                <!--<plugin name='laser' filename='libRayPlugin.so'/>-->
+                <always_on>1</always_on>
+                <update_rate>20</update_rate>
+                <visualize>true</visualize>
+            </sensor>
+        </link>
+        <link name="right_wheel">
+            <pose>0.1 -.17 0.11 0 1.5707 1.5707</pose>
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>0.1</mass>
+            </inertial>
+            <collision name="geom">
+                <geometry>
+                    <cylinder>
+                        <radius>0.11</radius>
+                        <length>0.05</length>
+                    </cylinder>
+                </geometry>
+            </collision>
+            <visual name="visual">
+                <geometry>
+                    <cylinder>
+                        <radius>0.11</radius>
+                        <length>0.05</length>
+                    </cylinder>
+                </geometry>
+                <material>
+                    <script>Gazebo/FlatBlack</script>
+                </material>
+            </visual>
+        </link>
+        <link name="left_wheel">
+            <pose>0.1 .17 0.11 0 1.5707 1.5707</pose>
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>0.1</mass>
+            </inertial>
+            <collision name="geom">
+                <geometry>
+                    <cylinder>
+                        <radius>0.11</radius>
+                        <length>0.05</length>
+                    </cylinder>
+                </geometry>
+            </collision>
+            <visual name="visual">
+                <geometry>
+                    <cylinder>
+                        <radius>0.11</radius>
+                        <length>0.05</length>
+                    </cylinder>
+                </geometry>
+                <material>
+                    <script>Gazebo/FlatBlack</script>
+                </material>
+            </visual>
+        </link>
+        <link name="castor">
+            <pose>-0.200 0 0.04 0 0 0</pose>
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>0.1</mass>
+            </inertial>
+            <collision name="geom">
+                <geometry>
+                    <sphere>
+                        <radius>0.04</radius>
+                    </sphere>
+                </geometry>
+            </collision>
+            <visual name="visual">
+                <geometry>
+                    <sphere>
+                        <radius>0.04</radius>
+                    </sphere>
+                </geometry>
+                <material>
+                    <script>Gazebo/FlatBlack</script>
+                </material>
+            </visual>
+            <!--<sensor name='base_contact_sensor' type='contact' always_on='1' update_rate='100' visualize="true">
+        <topic>~/contact</topic>
+        <origin pose='0 0 0 0 -0 0'/>
+        <contact>
+          <collision name='geom'/>
+        </contact>
+        <plugin name='gazebo_contact' filename='libHlaContactPlugin.so'/>
+      </sensor>-->
+            <sensor name="rfidtag" type="rfidtag">
+                <topic>~/rfidtag</topic>
+                <always_on>1</always_on>
+                <visualize>true</visualize>
+            </sensor>
+        </link>
+        <joint type="revolute" name="left_wheel_hinge">
+            <pose>0 0 0.04 0 0 0</pose>
+            <child>left_wheel</child>
+            <parent>chassis</parent>
+            <axis>
+                <xyz>0 1 0</xyz>
+            </axis>
+        </joint>
+        <joint type="revolute" name="right_wheel_hinge">
+            <pose>0 0 -0.04 0 0 0</pose>
+            <child>right_wheel</child>
+            <parent>chassis</parent>
+            <axis>
+                <xyz>0 1 0</xyz>
+            </axis>
+        </joint>
+        <joint type="ball" name="ball_joint">
+            <child>castor</child>
+            <parent>chassis</parent>
+        </joint>
+        <!--<plugin filename="libHlaModelPlugin.so" name="plugin"/>
+    <plugin filename="libHlaRFIDTagPlugin.so" name="rfid1"/>-->
+    </model>
+</gazebo>

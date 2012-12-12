@@ -2199,6 +2199,12 @@ void dWorldSetQuickStepPreconIterations (dWorldID w, int num)
 }
 
 
+int dWorldGetQuickStepPreconIterations (dWorldID w)
+{
+	dAASSERT(w);
+	return w->qs.precon_iterations;
+}
+
 int dWorldGetQuickStepNumIterations (dWorldID w)
 {
 	dAASSERT(w);

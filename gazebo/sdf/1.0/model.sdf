@@ -1,0 +1,15 @@
+<!-- Model -->
+<element name="model" required="*">
+  <attribute name="name" type="string" default="__default__" required="1"/>
+  <attribute name="static" type="bool" default="false" required="0"/>
+
+  <element name="origin" required="0">
+    <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+  </element> <!-- End Origin -->
+
+  <include filename="link.sdf" required="+"/>
+  <include filename="joint.sdf" required="*"/>
+  <include filename="plugin.sdf" required="*"/>
+  <include filename="gripper.sdf" required="*"/>
+
+</element> <!-- End Model -->

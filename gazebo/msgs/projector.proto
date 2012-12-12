@@ -1,0 +1,20 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Projector 
+/// \brief Information about a projector
+
+
+import "pose.proto";
+
+message Projector
+{
+  required string name          = 1;
+  optional string texture       = 2;
+  optional Pose pose            = 3;
+  optional double fov           = 4[default=0.785];
+  optional double near_clip     = 5[default=0.1];
+  optional double far_clip      = 6[default=10.0];
+  optional bool enabled         = 7[default=true];
+}
+

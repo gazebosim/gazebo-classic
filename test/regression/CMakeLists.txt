@@ -1,33 +1,60 @@
 include_directories (
-  ${PROJECT_SOURCE_DIR}/src 
-  ${PROJECT_BINARY_DIR}/src 
+  ${PROJECT_SOURCE_DIR}/gazebo 
+  ${PROJECT_BINARY_DIR}/gazebo
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
-  ${BOOST_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
 )
 
 link_directories(  
-  ${OGRE_LIBRARY_PATH}
-  ${BOOST_LIBRARY_DIRS} 
+  ${ogre_library_dirs}
+  ${Boost_LIBRARY_DIRS} 
   ${ODE_LIBRARY_DIRS}
 )
 
-if (INCLUDE_PLAYER)
-  add_subdirectory(player)
+# Disable the player test for now, until we figure out a better way to test them
+#if (INCLUDE_PLAYER)
+#  add_subdirectory(player)
+#endif()
+
+if(HAVE_BULLET)
+  add_subdirectory(bullet)
 endif()
 
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
+include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 
-set (gtest_sources transport.cc speed.cc factory.cc physics.cc msgs.cc math.cc pr2.cc common.cc laser.cc file_handling.cc)
+set (gtest_sources
+  factory.cc
+  file_handling.cc
+  heightmap.cc
+  laser.cc
+  math.cc
+  msgs.cc
+  physics.cc
+  pioneer2dx.cc
+  pr2.cc
+  projector.cc
+  speed.cc
+  transport.cc)
 
+set (plugins)
+
+# Build plugins
+foreach (src ${plugins})
+  add_library(${src} SHARED ${src}.cc)
+  target_link_libraries(${src} libgazebo gazebo_sensors)
+endforeach (src ${plugins})
+
+# Build tests
 foreach(GTEST_SOURCE_file ${gtest_sources})
   string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
-  add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${PROJECT_SOURCE_DIR}/src/Server.cc ${PROJECT_SOURCE_DIR}/src/Master.cc)
+  add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${PROJECT_SOURCE_DIR}/gazebo/Server.cc ${PROJECT_SOURCE_DIR}/gazebo/Master.cc ${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc)
 
-  target_link_libraries( ${BINARY_NAME} ${GTEST_BOTH_LIBRARIES} 
+target_link_libraries(${BINARY_NAME}
+  ${GTEST_LIBRARY} 
+  ${GTEST_MAIN_LIBRARY} 
     gazebo_common
     gazebo_sdf_interface
     gazebo_transport
@@ -38,15 +65,9 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
     pthread
     ${tinyxml_libraries}
     )
-  add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
-
-  #file(STRINGS ${GTEST_SOURCE_file} GTEST_NAMES REGEX ^TEST)
-    #foreach(GTEST_NAME ${GTEST_NAMES})
-      #  string(REGEX REPLACE ["\) \(,"] ";" GTEST_NAME ${GTEST_NAME})
-      #  list(GET GTEST_NAME 1 GTEST_GROUP_NAME)
-      #  list(GET GTEST_NAME 3 GTEST_NAME)
-      #  add_test(${GTEST_GROUP_NAME}.${GTEST_NAME}
-      #           ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
-      #           --gtest_filter=${GTEST_GROUP_NAME}.${GTEST_NAME})
-  #endforeach()
+  add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+  set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
+  # Check that the test produced a result and create a failure if it didn't.
+  # Guards against crashed and timed out tests.
+  add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
 endforeach()

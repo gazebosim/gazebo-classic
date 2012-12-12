@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 */
 
 #include "ServerFixture.hh"
-#include "common/common.h"
+#include "common/common.hh"
 
 using namespace gazebo;
 class FileHandling : public ServerFixture
@@ -52,7 +52,7 @@ TEST_F(FileHandling, Save)
 
   // Wait until the file exists
   i = 0;
-  while ((file = fopen(filename.str().c_str(), "r")) == NULL && i < 10)
+  while (i < 10 && (file = fopen(filename.str().c_str(), "r")) == NULL)
   {
     i++;
     common::Time::MSleep(100);

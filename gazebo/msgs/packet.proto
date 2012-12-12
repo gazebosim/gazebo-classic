@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Packet 
+/// \brief Message that encapsulates another message with a type description
+
+
+import "time.proto";
+
+message Packet
+{
+  required Time stamp            = 1;
+  required string type           = 2;
+  required bytes serialized_data = 3;
+}
+
+

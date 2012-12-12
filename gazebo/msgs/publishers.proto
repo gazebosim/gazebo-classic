@@ -1,0 +1,15 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Publishers
+/// \brief A list of publishers 
+
+
+import "publish.proto";
+
+message Publishers
+{
+  repeated Publish publisher = 1;
+}
+
+

@@ -1,0 +1,18 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs Messages
+/// \interface Axis
+/// \brief msgs::Joint axis message
+
+import "vector3d.proto";
+
+message Axis
+{
+  required Vector3d xyz          = 1;
+  required double limit_lower    = 2;
+  required double limit_upper    = 3;
+  required double limit_effort   = 4;
+  required double limit_velocity = 5;
+  required double damping        = 6;
+  required double friction       = 7;
+}

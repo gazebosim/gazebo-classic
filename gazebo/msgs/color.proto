@@ -1,0 +1,16 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Color 
+/// \brief Color message
+
+
+message Color
+{
+  required float r = 2;
+  required float g = 3;
+  required float b = 4;
+  optional float a = 5 [default = 1.0];
+}
+
+

@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface ImageGeom 
+/// \brief Message for a image geometry
+
+
+message ImageGeom
+{
+  required string uri         = 1;
+  optional double scale       = 2;
+  optional int32 threshold    = 3 [default = 255];
+  optional double height      = 4;
+  optional int32 granularity  = 5;
+}
+
+

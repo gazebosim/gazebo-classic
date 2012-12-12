@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ void GpuRayPlugin::Load(sensors::SensorPtr _sensor,
 {
   this->parentSensor =
     boost::shared_dynamic_cast<sensors::GpuRaySensor>(_sensor);
-  
+
   if (!this->parentSensor)
   {
     gzerr << "GpuRayPlugin not attached to a GpuLaser sensor\n";
@@ -45,26 +45,12 @@ void GpuRayPlugin::Load(sensors::SensorPtr _sensor,
       boost::bind(&GpuRayPlugin::OnNewLaserFrame,
         this, _1, _2, _3, _4, _5));
 
-//  this->newImageFrameConnection = this->parentSensor->ConnectNewImage2Frame(
-//      boost::bind(&GpuRayPlugin::OnNewImageFrame,
-//        this, _1, _2, _3, _4, _5));
-
   this->parentSensor->SetActive(true);
 }
 
 /////////////////////////////////////////////////
-void GpuRayPlugin::OnNewLaserFrame(const float *_image,
-    unsigned int _width, unsigned int _height,
+void GpuRayPlugin::OnNewLaserFrame(const float * /*_image*/,
+    unsigned int /*_width*/, unsigned int /*_height*/,
     unsigned int /*_depth*/, const std::string &/*_format*/)
 {
 }
-    
-///////////////////////////////////////////////////
-//void GpuRayPlugin::OnNewImageFrame(const unsigned char * /*_image*/,
-//                              unsigned int /*_width*/,
-//                              unsigned int /*_height*/,
-//                              unsigned int /*_depth*/,
-//                              unsigned int/*_format*/)
-//{
-//}
-

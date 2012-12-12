@@ -1,0 +1,29 @@
+<!-- Scene -->
+<element name="scene" required="1">
+  <element name="ambient" required="0">
+    <attribute name="rgba" type="color" default="0.0 0.0 0.0 1.0" required="1"/>
+  </element>
+  <element name="background" required="0">
+    <attribute name="rgba" type="color" default=".7 .7 .7 1" required="1"/>
+    <element name="sky" required="0">
+      <attribute name="material" type="string" default="Gazebo/CloudySky" required="1"/>
+    </element>
+  </element>
+
+  <element name="shadows" required="0">
+    <attribute name="enabled" type="bool" default="true" required="1"/>
+  </element>
+
+  <element name="fog" required="0">
+    <attribute name="rgba" type="color" default="1 1 1 1" required="0"/>
+    <attribute name="type" type="string" default="linear" required="0"/>
+    <attribute name="start" type="double" default="1.0" required="0"/>
+    <attribute name="end" type="double" default="100.0" required="0"/>
+    <attribute name="density" type="double" default="1.0" required="0"/>
+  </element>
+  <element name="grid" required="0">
+    <attribute name="enabled" type="bool" default="true" required="1"/>
+  </element>
+</element> <!-- End Scene -->
+
+

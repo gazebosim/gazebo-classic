@@ -1,0 +1,17 @@
+<!-- Inertial -->
+<element name="inertial" required="0">
+  <attribute name="mass" type="double" default="1.0" required="0"/>
+  <attribute name="density" type="double" default="1.0" required="0"/>
+
+  <element name="origin" required="0">
+    <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+  </element> <!-- End Origin -->
+  <element name="inertia" required="0">
+    <attribute name="ixx" type="double" default="0.0" required="1"/>
+    <attribute name="ixy" type="double" default="0.0" required="1"/>
+    <attribute name="ixz" type="double" default="0.0" required="1"/>
+    <attribute name="iyy" type="double" default="0.0" required="1"/>
+    <attribute name="iyz" type="double" default="0.0" required="1"/>
+    <attribute name="izz" type="double" default="0.0" required="1"/>
+  </element> <!-- End Inertia -->
+</element> <!-- End Inertial -->

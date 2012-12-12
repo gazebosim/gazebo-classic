@@ -46,9 +46,11 @@
 #undef TIMING
 #undef REPORT_MONITOR
 #undef SHOW_CONVERGENCE
-//#define LOCAL_STEPPING  // not yet implemented
 #undef RECOMPUTE_RMS
 #undef USE_1NORM
+//#define LOCAL_STEPPING  // not yet implemented
+//#define PENETRATION_JVERROR_CORRECTION
+//#define POST_UPDATE_CONSTRAINT_VIOLATION_CORRECTION
 
 
 
@@ -120,6 +122,7 @@ struct dxSORLCPParameters {
     dRealMutablePtr J_precon ;
     dRealMutablePtr J_orig ;
     dRealMutablePtr cforce ;
+    dRealMutablePtr vnew ;
 #ifdef REORDER_CONSTRAINTS
     dRealMutablePtr last_lambda ;
     dRealMutablePtr last_lambda_erp ;
@@ -200,8 +203,8 @@ static void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
 }
 
 // compute out = inv(M)*J'*in.
-#ifdef WARM_STARTING
-static void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
+//#ifdef WARM_STARTING
+/*static void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
   dRealPtr in, dRealMutablePtr out)
 {
   dSetZero (out,6*nb);
@@ -219,8 +222,8 @@ static void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
     }
     iMJ_ptr += 6;
   }
-}
-#endif
+}*/
+//#endif
 
 // compute out = J*in.
 
@@ -321,12 +324,12 @@ static void CG_LCP (dxWorldProcessContext *context,
   for (int k=0; k<m; k++) r[k] = rhs[k] - r[k];
 #else
   dSetZero (lambda,m);
-  memcpy (r,rhs,m*sizeof(dReal));		// residual r = rhs - A*lambda
+  memcpy (r,rhs,m*sizeof(dReal));    // residual r = rhs - A*lambda
 #endif
 
   for (int iteration=0; iteration < num_iterations; iteration++) {
-    for (int i=0; i<m; i++) z[i] = r[i]*Ad[i];	// z = inv(M)*r
-    dReal rho = dot (m,r,z);		// rho = r'*z
+    for (int i=0; i<m; i++) z[i] = r[i]*Ad[i];  // z = inv(M)*r
+    dReal rho = dot (m,r,z);    // rho = r'*z
 
     // @@@
     // we must check for convergence, otherwise rho will go to 0 if
@@ -337,18 +340,18 @@ static void CG_LCP (dxWorldProcessContext *context,
     }
 
     if (iteration==0) {
-      memcpy (p,z,m*sizeof(dReal));	// p = z
+      memcpy (p,z,m*sizeof(dReal));  // p = z
     }
     else {
-      add (m,p,z,p,rho/last_rho);	// p = z + (rho/last_rho)*p
+      add (m,p,z,p,rho/last_rho);  // p = z + (rho/last_rho)*p
     }
 
     // compute q = (J*inv(M)*J')*p
     multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,p,q);
 
-    dReal alpha = rho/dot (m,p,q);		// alpha = rho/(p'*q)
-    add (m,lambda,lambda,p,alpha);		// lambda = lambda + alpha*p
-    add (m,r,r,q,-alpha);			// r = r - alpha*q
+    dReal alpha = rho/dot (m,p,q);    // alpha = rho/(p'*q)
+    add (m,lambda,lambda,p,alpha);    // lambda = lambda + alpha*p
+    add (m,r,r,q,-alpha);      // r = r - alpha*q
     last_rho = rho;
   }
 
@@ -369,10 +372,10 @@ static void CG_LCP (dxWorldProcessContext *context,
 
 struct IndexError {
 #ifdef REORDER_CONSTRAINTS
-  dReal error;		// error to sort on
+  dReal error;    // error to sort on
   int findex;
 #endif
-  int index;		// row index
+  int index;    // row index
 };
 
 
@@ -393,7 +396,7 @@ static int compare_index_error (const void *a, const void *b)
 
 void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
                       dRealPtr I, dxBody * const *body,
-                      const dReal stepsize1, dRealMutablePtr c, dRealMutablePtr J,
+                      const dReal /*stepsize1*/, dRealMutablePtr /*c*/, dRealMutablePtr J,
                       int *jb, dRealMutablePtr rhs_precon)
 {
     /************************************************************************************/
@@ -406,7 +409,7 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
     // mimic computation of rhs, but do it with J*M*inv(J) prefixed for preconditioned case.
     BEGIN_STATE_SAVE(context, tmp2state) {
       IFTIMING (dTimerNow ("compute rhs_precon"));
-      
+
       // compute the "preconditioned" right hand side `rhs_precon'
       dReal *tmp1 = context->AllocateArray<dReal> (nb*6);
       // this is slightly different than non precon, where M is left multiplied by the pre J terms
@@ -418,10 +421,11 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
       dxBody *const *const bodyend = body + nb;
       for (dxBody *const *bodycurr = body; bodycurr != bodyend; tmp1curr+=6, Irow+=12, bodycurr++) {
         dxBody *b_ptr = *bodycurr;
-        dReal body_mass = b_ptr->mass.mass;
-        for (int j=0; j<3; j++) tmp1curr[j] = b_ptr->facc[j] +  0* body_mass * b_ptr->lvel[j] * stepsize1;
+        // dReal body_mass = b_ptr->mass.mass;
+        for (int j=0; j<3; j++)
+          tmp1curr[j] = b_ptr->facc[j]; // +  body_mass * b_ptr->lvel[j] * stepsize1;
         dReal tmpa[3];
-        for (int j=0; j<3; j++) tmpa[j] = 0* b_ptr->avel[j] * stepsize1;
+        for (int j=0; j<3; j++) tmpa[j] = 0; //b_ptr->avel[j] * stepsize1;
         dMultiply0_331 (tmp1curr + 3,Irow,tmpa);
         for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->tacc[k];
       }
@@ -498,7 +502,14 @@ static void ComputeRows(
   dxQuickStepParameters *qs    = params.qs;
   int startRow                 = params.nStart;   // 0
   int nRows                    = params.nChunkSize; // m
+#ifdef USE_1NORM
   int m                        = params.m; // m used for rms error computation
+#endif
+  // int nb                       = params.nb;
+#ifdef PENETRATION_JVERROR_CORRECTION
+  dReal stepsize               = params.stepsize;
+  dRealMutablePtr vnew         = params.vnew;
+#endif
   int* jb                      = params.jb;
   const int* findex            = params.findex;
   dRealPtr        hi           = params.hi;
@@ -531,12 +542,12 @@ static void ComputeRows(
 
 
 
-/*  DEBUG PRINTOUTS
+  /*  DEBUG PRINTOUTS
   // print J_orig
   printf("J_orig\n");
-  for (int i=0; i < m ; i++) {
+  for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
-      printf("	%12.6f",J_orig[i*12+j]);
+      printf("  %12.6f",J_orig[i*12+j]);
     }
     printf("\n");
   }
@@ -544,32 +555,33 @@ static void ComputeRows(
 
   // print J, J_precon (already premultiplied by inverse of diagonal of LHS) and rhs_precon and rhs
   printf("J_precon\n");
-  for (int i=0; i < m ; i++) {
+  for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
-      printf("	%12.6f",J_precon[i*12+j]);
+      printf("  %12.6f",J_precon[i*12+j]);
     }
     printf("\n");
   }
   printf("\n");
 
   printf("J\n");
-  for (int i=0; i < m ; i++) {
+  for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
-      printf("	%12.6f",J[i*12+j]);
+      printf("  %12.6f",J[i*12+j]);
     }
     printf("\n");
   }
   printf("\n");
 
   printf("rhs_precon\n");
-  for (int i=0; i < m ; i++) printf("	%12.6f",rhs_precon[i]);
+  for (int i=startRow; i<startRow+nRows; i++)
+    printf("  %12.6f",rhs_precon[i]);
   printf("\n");
 
   printf("rhs\n");
-  for (int i=0; i < m ; i++) printf("	%12.6f",rhs[i]);
+  for (int i=startRow; i<startRow+nRows; i++)
+    printf("  %12.6f",rhs[i]);
   printf("\n");
-*/
-
+  */
 
   double rms_error = 0;
   int num_iterations = qs->num_iterations;
@@ -580,6 +592,10 @@ static void ComputeRows(
   // FIME: preconditioning can be defined insdie iterations loop now, becareful to match last iteration with
   //       velocity update
   bool preconditioning;
+
+#ifdef PENETRATION_JVERROR_CORRECTION
+  dReal Jvnew_final = 0;
+#endif
   for (int iteration=0; iteration < num_iterations + precon_iterations; iteration++) {
 
     rms_error = 0;
@@ -662,6 +678,13 @@ static void ComputeRows(
     dRealMutablePtr caccel_ptr2;
     dRealMutablePtr caccel_erp_ptr1;
     dRealMutablePtr caccel_erp_ptr2;
+
+#ifdef PENETRATION_JVERROR_CORRECTION
+    dRealMutablePtr vnew_ptr1;
+    dRealMutablePtr vnew_ptr2;
+    const dReal stepsize1 = dRecip(stepsize);
+    dReal Jvnew = 0;
+#endif
     dRealMutablePtr cforce_ptr1;
     dRealMutablePtr cforce_ptr2;
     for (int i=startRow; i<startRow+nRows; i++) {
@@ -675,6 +698,7 @@ static void ComputeRows(
       int index = order[i].index;
 
       dReal delta,delta_erp;
+      dReal delta_precon;
 
       {
         int b1 = jb[index*2];
@@ -683,12 +707,16 @@ static void ComputeRows(
         caccel_ptr2 = (b2 >= 0) ? caccel + 6*b2 : NULL;
         caccel_erp_ptr1 = caccel_erp + 6*b1;
         caccel_erp_ptr2 = (b2 >= 0) ? caccel_erp + 6*b2 : NULL;
+#ifdef PENETRATION_JVERROR_CORRECTION
+        vnew_ptr1 = vnew + 6*b1;
+        vnew_ptr2 = (b2 >= 0) ? vnew + 6*b2 : NULL;
+#endif
         cforce_ptr1 = cforce + 6*b1;
         cforce_ptr2 = (b2 >= 0) ? cforce + 6*b2 : NULL;
       }
 
-      dReal old_lambda     = lambda[index];
-      dReal old_lambda_erp = lambda_erp[index];
+      dReal old_lambda        = lambda[index];
+      dReal old_lambda_erp    = lambda_erp[index];
 
       //
       // caccel is the constraint accel in the non-precon case
@@ -700,34 +728,18 @@ static void ComputeRows(
       // caccel_erp is from the non-precon case with erp turned on
       //
       if (preconditioning) {
-        // update delta
-        delta = rhs_precon[index] - old_lambda*Adcfm_precon[index];
+        // update delta_precon
+        delta_precon = rhs_precon[index] - old_lambda*Adcfm_precon[index];
 
         dRealPtr J_ptr = J_precon + index*12;
 
         // for preconditioned case, update delta using cforce, not caccel
 
-        delta -= dot6(cforce_ptr1, J_ptr);
+        delta_precon -= dot6(cforce_ptr1, J_ptr);
         if (cforce_ptr2)
-          delta -= dot6(cforce_ptr2, J_ptr + 6);
-      } else {
-        // erp = 0
-        delta = rhs[index] - old_lambda*Adcfm[index];
-        dRealPtr J_ptr = J + index*12;
-        delta -= dot6(caccel_ptr1, J_ptr);
-        if (caccel_ptr2)
-          delta -= dot6(caccel_ptr2, J_ptr + 6);
+          delta_precon -= dot6(cforce_ptr2, J_ptr + 6);
 
-        // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
-        delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
-        J_ptr = J + index*12;
-        delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
-        if (caccel_erp_ptr2)
-          delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
-      }
-
-      {
-        // set the limits for this constraint. 
+        // set the limits for this constraint.
         // this is the place where the QuickStep method differs from the
         // direct LCP solving method, since that method only performs this
         // limit adjustment once per time step, whereas this method performs
@@ -746,113 +758,227 @@ static void ComputeRows(
         // compute lambda and clamp it to [lo,hi].
         // @@@ SSE not a win here
 #if 1
-        dReal new_lambda = old_lambda + delta;
+        dReal new_lambda = old_lambda+ delta_precon;
         if (new_lambda < lo_act) {
-          delta = lo_act-old_lambda;
+          delta_precon = lo_act-old_lambda;
           lambda[index] = lo_act;
         }
         else if (new_lambda > hi_act) {
-          delta = hi_act-old_lambda;
+          delta_precon = hi_act-old_lambda;
           lambda[index] = hi_act;
         }
         else {
           lambda[index] = new_lambda;
         }
 #else
-        dReal nl = old_lambda + delta;
+        dReal nl = old_lambda+ delta_precon;
         _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
         lambda[index] = nl;
-        delta = nl - old_lambda;
+        delta_precon = nl - old_lambda;
 #endif
-      }
 
-      if (!preconditioning)
-      {
-        // for the _erp version
-        // set the limits for this constraint. 
-        // this is the place where the QuickStep method differs from the
-        // direct LCP solving method, since that method only performs this
-        // limit adjustment once per time step, whereas this method performs
-        // once per iteration per constraint row.
-        // the constraints are ordered so that all lambda_erp[] values needed have
-        // already been computed.
-        dReal hi_act, lo_act;
-        if (findex[index] >= 0) {
-          hi_act = dFabs (hi[index] * lambda_erp[findex[index]]);
-          lo_act = -hi_act;
-        } else {
-          hi_act = hi[index];
-          lo_act = lo[index];
+        // update cforce (this is strictly for the precon case)
+        {
+          // for preconditioning case, compute cforce
+          J_ptr = J_orig + index*12; // FIXME: need un-altered unscaled J, not J_precon!!
+
+          // update cforce.
+          sum6(cforce_ptr1, delta_precon, J_ptr);
+          if (cforce_ptr2)
+            sum6(cforce_ptr2, delta_precon, J_ptr + 6);
         }
 
-        // compute lambda and clamp it to [lo,hi].
-        // @@@ SSE not a win here
-#if 1
-        dReal new_lambda_erp = old_lambda_erp + delta_erp;
-        if (new_lambda_erp < lo_act) {
-          delta_erp = lo_act-old_lambda_erp;
-          lambda_erp[index] = lo_act;
-        }
-        else if (new_lambda_erp > hi_act) {
-          delta_erp = hi_act-old_lambda_erp;
-          lambda_erp[index] = hi_act;
-        }
-        else {
-          lambda_erp[index] = new_lambda_erp;
-        }
-#else
-        dReal nl = old_lambda_erp + delta_erp;
-        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
-        lambda_erp[index] = nl;
-        delta_erp = nl - old_lambda_erp;
-#endif
-      }
-
-      // record error (for the non-erp version)
-      rms_error += delta*delta;
+        // record error (for the non-erp version)
+        rms_error += delta_precon*delta_precon;
 #ifdef RECOMPUTE_RMS
-      delta_error[index] = dFabs(delta);
+        delta_error[index] = dFabs(delta_precon);
 #endif
+        old_lambda_erp = old_lambda;
+        lambda_erp[index] = lambda[index];
+      }
+      else {
+        {
+          // FOR erp = 0
+
+          // NOTE:
+          // for this update, we need not throw away J*v(n+1)/h term from rhs
+          //   ...so adding it back, but remember rhs has already been
+          //      scaled by Ad_i, so we need to do the same to J*v(n+1)/h
+          //      but given that J is already scaled by Ad_i, we don't have
+          //      to do it explicitly here
+
+          delta =
+#ifdef PENETRATION_JVERROR_CORRECTION
+                 Jvnew_final +
+#endif
+                rhs[index] - old_lambda*Adcfm[index];
+
+          dRealPtr J_ptr = J + index*12;
+          delta -= dot6(caccel_ptr1, J_ptr);
+          if (caccel_ptr2)
+            delta -= dot6(caccel_ptr2, J_ptr + 6);
+
+          // set the limits for this constraint.
+          // this is the place where the QuickStep method differs from the
+          // direct LCP solving method, since that method only performs this
+          // limit adjustment once per time step, whereas this method performs
+          // once per iteration per constraint row.
+          // the constraints are ordered so that all lambda[] values needed have
+          // already been computed.
+          dReal hi_act, lo_act;
+          if (findex[index] >= 0) {
+            hi_act = dFabs (hi[index] * lambda[findex[index]]);
+            lo_act = -hi_act;
+          } else {
+            hi_act = hi[index];
+            lo_act = lo[index];
+          }
+
+          // compute lambda and clamp it to [lo,hi].
+          // @@@ SSE not a win here
+  #if 1
+          dReal new_lambda = old_lambda + delta;
+          if (new_lambda < lo_act) {
+            delta = lo_act-old_lambda;
+            lambda[index] = lo_act;
+          }
+          else if (new_lambda > hi_act) {
+            delta = hi_act-old_lambda;
+            lambda[index] = hi_act;
+          }
+          else {
+            lambda[index] = new_lambda;
+          }
+  #else
+          dReal nl = old_lambda + delta;
+          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+          lambda[index] = nl;
+          delta = nl - old_lambda;
+  #endif
+
+          // update caccel
+          {
+            // for non-precon case, update caccel
+            dRealPtr iMJ_ptr = iMJ + index*12;
+
+            // update caccel.
+            sum6(caccel_ptr1, delta, iMJ_ptr);
+            if (caccel_ptr2)
+              sum6(caccel_ptr2, delta, iMJ_ptr + 6);
+
+
+#ifdef PENETRATION_JVERROR_CORRECTION
+            // update vnew incrementally
+            //   add stepsize * delta_caccel to the body velocity
+            //   vnew = vnew + dt * delta_caccel
+            sum6(vnew_ptr1, stepsize*delta, iMJ_ptr);;
+            if (caccel_ptr2)
+              sum6(vnew_ptr2, stepsize*delta, iMJ_ptr + 6);
+
+            // COMPUTE Jvnew = J*vnew/h*Ad
+            //   but J is already scaled by Ad, and we multiply by h later
+            //   so it's just Jvnew = J*vnew here
+            if (iteration >= num_iterations-7) {
+              // check for non-contact bilateral constraints only
+              // I've set findex to -2 for contact normal constraint
+              if (findex[index] == -1) {
+                dRealPtr J_ptr = J + index*12;
+                Jvnew = dot6(vnew_ptr1,J_ptr);
+                if (caccel_ptr2)
+                  Jvnew += dot6(vnew_ptr2,J_ptr+6);
+                //printf("iter [%d] findex [%d] Jvnew [%f] lo [%f] hi [%f]\n",
+                //       iteration, findex[index], Jvnew, lo[index], hi[index]);
+              }
+            }
+            //printf("iter [%d] vnew [%f,%f,%f,%f,%f,%f] Jvnew [%f]\n",
+            //       iteration,
+            //       vnew_ptr1[0], vnew_ptr1[1], vnew_ptr1[2],
+            //       vnew_ptr1[3], vnew_ptr1[4], vnew_ptr1[5],Jvnew);
+#endif
+
+          }
+        }
+        // record error (for the non-erp version)
+        rms_error += delta*delta;
+#ifdef RECOMPUTE_RMS
+        delta_error[index] = dFabs(delta);
+#endif
+        {
+          // FOR erp != 0
+          // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
+          delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
+          dRealPtr J_ptr = J + index*12;
+          delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
+          if (caccel_erp_ptr2)
+            delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
+
+          // for the _erp version
+          // set the limits for this constraint.
+          // this is the place where the QuickStep method differs from the
+          // direct LCP solving method, since that method only performs this
+          // limit adjustment once per time step, whereas this method performs
+          // once per iteration per constraint row.
+          // the constraints are ordered so that all lambda_erp[] values needed have
+          // already been computed.
+          dReal hi_act, lo_act;
+          if (findex[index] >= 0) {
+            hi_act = dFabs (hi[index] * lambda_erp[findex[index]]);
+            lo_act = -hi_act;
+          } else {
+            hi_act = hi[index];
+            lo_act = lo[index];
+          }
+
+          // compute lambda and clamp it to [lo,hi].
+          // @@@ SSE not a win here
+  #if 1
+          dReal new_lambda_erp = old_lambda_erp + delta_erp;
+          if (new_lambda_erp < lo_act) {
+            delta_erp = lo_act-old_lambda_erp;
+            lambda_erp[index] = lo_act;
+          }
+          else if (new_lambda_erp > hi_act) {
+            delta_erp = hi_act-old_lambda_erp;
+            lambda_erp[index] = hi_act;
+          }
+          else {
+            lambda_erp[index] = new_lambda_erp;
+          }
+  #else
+          dReal nl = old_lambda_erp + delta_erp;
+          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+          lambda_erp[index] = nl;
+          delta_erp = nl - old_lambda_erp;
+  #endif
+          // update caccel_erp
+          if (!preconditioning)
+          {
+            // for non-precon case, update caccel_erp
+            dRealPtr iMJ_ptr = iMJ + index*12;
+
+            // update caccel_erp.
+            sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
+            if (caccel_erp_ptr2)
+              sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
+
+          }
+        }
+      }
+
+
 
       //@@@ a trick that may or may not help
       //dReal ramp = (1-((dReal)(iteration+1)/(dReal)iterations));
       //delta *= ramp;
-      
-      // update cforce (this is strictly for the precon case)
-      {
-        // for preconditioning case, compute cforce
-        dRealPtr J_ptr = J_orig + index*12; // FIXME: need un-altered unscaled J, not J_precon!!
 
-        // update cforce.
-        sum6(cforce_ptr1, delta, J_ptr);
-        if (cforce_ptr2)
-          sum6(cforce_ptr2, delta, J_ptr + 6);
-      }
-      // update caccel
-      {
-        // for non-precon case, update caccel
-        dRealPtr iMJ_ptr = iMJ + index*12;
-
-        // update caccel.
-        sum6(caccel_ptr1, delta, iMJ_ptr);
-        if (caccel_ptr2)
-          sum6(caccel_ptr2, delta, iMJ_ptr + 6);
-      }
-      // update caccel_erp
-      if (!preconditioning)
-      {
-        // for non-precon case, update caccel_erp
-        dRealPtr iMJ_ptr = iMJ + index*12;
-
-        // update caccel_erp.
-        sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
-        if (caccel_erp_ptr2)
-          sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
-      }
     } // end of for loop on m
+#ifdef PENETRATION_JVERROR_CORRECTION
+    Jvnew_final = Jvnew*stepsize1;
+    Jvnew_final = Jvnew_final > 1.0 ? 1.0 : ( Jvnew_final < -1.0 ? -1.0 : Jvnew_final );
+#endif
 
-// do we need to compute norm across entire solution space (0,m)?
-// since local convergence might produce errors in other nodes?
+    // DO WE NEED TO COMPUTE NORM ACROSS ENTIRE SOLUTION SPACE (0,m)?
+    // since local convergence might produce errors in other nodes?
 #ifdef RECOMPUTE_RMS
     // recompute rms_error to be sure swap is not corrupting arrays
     rms_error = 0;
@@ -913,6 +1039,12 @@ static void ComputeRows(
 
   } // end of for loop on iterations
 
+  //printf("vnew: ");
+  //for (int i=0; i<6*nb; i++) printf(" %f ",vnew[i]);
+  //printf("\n");
+
+
+
   qs->rms_error          = rms_error;
 
   #ifdef REPORT_THREAD_TIMING
@@ -937,7 +1069,7 @@ static void ComputeRows(
 // rhs, lo and hi are modified on exit
 //
 static void SOR_LCP (dxWorldProcessContext *context,
-  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, int *jb, dxBody * const *body,
+  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
   dRealPtr invI, dRealPtr I, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
@@ -980,7 +1112,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
   dReal *Ad = context->AllocateArray<dReal> (m);
 
   {
-    const dReal sor_w = qs->w;		// SOR over-relaxation parameter
+    const dReal sor_w = qs->w;    // SOR over-relaxation parameter
     // precompute 1 / diagonals of A
     dRealPtr iMJ_ptr = iMJ;
     dRealPtr J_ptr = J;
@@ -1000,7 +1132,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
   dReal *Ad_precon = context->AllocateArray<dReal> (m);
 
   {
-    const dReal sor_w = qs->w;		// SOR over-relaxation parameter
+    const dReal sor_w = qs->w;    // SOR over-relaxation parameter
     // precompute 1 / diagonals of A
     // preconditioned version uses J instead of iMJ
     dRealPtr J_ptr = J;
@@ -1026,7 +1158,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
 
 
   {
-    // NOTE: This may seem unnecessary but it's indeed an optimization 
+    // NOTE: This may seem unnecessary but it's indeed an optimization
     // to move multiplication by Ad[i] and cfm[i] out of iteration loop.
 
     // scale J_precon and rhs_precon by Ad
@@ -1050,7 +1182,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
 
 
   {
-    // NOTE: This may seem unnecessary but it's indeed an optimization 
+    // NOTE: This may seem unnecessary but it's indeed an optimization
     // to move multiplication by Ad[i] and cfm[i] out of iteration loop.
 
     // scale J and rhs by Ad
@@ -1161,6 +1293,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].J_precon  = J_precon ;
     params[thread_id].J_orig  = J_orig ;
     params[thread_id].cforce  = cforce ;
+    params[thread_id].vnew  = vnew ;
 #ifdef REORDER_CONSTRAINTS
     params[thread_id].last_lambda  = last_lambda ;
     params[thread_id].last_lambda_erp  = last_lambda_erp ;
@@ -1210,7 +1343,7 @@ struct dJointWithInfo1
   dxJoint::Info1 info;
 };
 
-void dxQuickStepper (dxWorldProcessContext *context, 
+void dxQuickStepper (dxWorldProcessContext *context,
   dxWorld *world, dxBody * const *body, int nb,
   dxJoint * const *_joint, int _nj, dReal stepsize)
 {
@@ -1306,11 +1439,11 @@ void dxQuickStepper (dxWorldProcessContext *context,
   // entirely, so that the code that follows does not consider them.
   dJointWithInfo1 *const jointiinfos = context->AllocateArray<dJointWithInfo1> (_nj);
   int nj;
-  
+
   {
     dJointWithInfo1 *jicurr = jointiinfos;
     dxJoint *const *const _jend = _joint + _nj;
-    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {	// jicurr=dest, _jcurr=src
+    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {  // jicurr=dest, _jcurr=src
       dxJoint *j = *_jcurr;
       j->getInfo1 (&jicurr->info);
       dIASSERT (jicurr->info.m >= 0 && jicurr->info.m <= 6 && jicurr->info.nub >= 0 && jicurr->info.nub <= jicurr->info.m);
@@ -1348,9 +1481,38 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *J_orig = NULL;
   int *jb = NULL;
 
+  dReal *vnew = NULL;
+#ifdef PENETRATION_JVERROR_CORRECTION
+  // allocate and populate vnew with v(n+1) due to non-constraint forces as the starting value
+  vnew = context->AllocateArray<dReal> (nb*6);
+  {
+    dRealMutablePtr vnewcurr = vnew;
+    dxBody* const* bodyend = body + nb;
+    const dReal *invIrow = invI;
+    dReal tmp_tacc[3];
+    for (dxBody* const* bodycurr = body; bodycurr != bodyend;
+         invIrow += 12, vnewcurr += 6, bodycurr++) {
+      dxBody *b_ptr = *bodycurr;
+
+      // add stepsize * invM * fe to the body velocity
+      dReal body_invMass_mul_stepsize = stepsize * b_ptr->invMass;
+      for (int j=0; j<3; j++) {
+        vnewcurr[j]   = b_ptr->lvel[j] + body_invMass_mul_stepsize * b_ptr->facc[j];
+        vnewcurr[j+3] = b_ptr->avel[j];
+        tmp_tacc[j]   = b_ptr->tacc[j]*stepsize;
+      }
+      dMultiplyAdd0_331 (vnewcurr+3, invIrow, tmp_tacc);
+
+    }
+  }
+#endif
+
   dReal *cforce = context->AllocateArray<dReal> (nb*6);
   dReal *caccel = context->AllocateArray<dReal> (nb*6);
   dReal *caccel_erp = context->AllocateArray<dReal> (nb*6);
+#ifdef POST_UPDATE_CONSTRAINT_VIOLATION_CORRECTION
+  dReal *caccel_corr = context->AllocateArray<dReal> (nb*6);
+#endif
 
   if (m > 0) {
     dReal *cfm, *lo, *hi, *rhs, *rhs_erp, *rhs_precon, *Jcopy;
@@ -1455,7 +1617,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
           int *findex_ofsi = findex + ofsi;
           for (int j=0; j<infom; j++) {
             int fival = findex_ofsi[j];
-            if (fival >= 0) 
+            if (fival >= 0)
               findex_ofsi[j] = fival + ofsi;
           }
 
@@ -1514,15 +1676,13 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
       // complete rhs
       for (int i=0; i<m; i++) {
-        rhs_erp[i] = c[i]*stepsize1 - rhs[i];
+        rhs_erp[i] =      c[i]*stepsize1 - rhs[i];
         if (dFabs(c[i]) > c_v_max[i])
-        {
-          rhs[i]   = c_v_max[i]*stepsize1 - rhs[i];
-        }
+          rhs[i]   =  c_v_max[i]*stepsize1 - rhs[i];
+        //if (dFabs(c[i]) > world->contactp.max_vel)
+        //  rhs[i]   =  world->contactp.max_vel*stepsize1 - rhs[i];
         else
-        {
           rhs[i]   = c[i]*stepsize1 - rhs[i];
-        }
       }
 
 
@@ -1570,7 +1730,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
     BEGIN_STATE_SAVE(context, lcpstate) {
       IFTIMING (dTimerNow ("solving LCP problem"));
       // solve the LCP problem and get lambda and invM*constraint_force
-      SOR_LCP (context,m,nb,J,J_precon,J_orig,jb,body,
+      SOR_LCP (context,m,nb,J,J_precon,J_orig,vnew,jb,body,
                invI,I,lambda,lambda_erp,
                caccel,caccel_erp,cforce,
                rhs,rhs_erp,rhs_precon,
@@ -1616,6 +1776,12 @@ void dxQuickStepper (dxWorldProcessContext *context,
           b_ptr->lvel[j] += stepsize * caccelcurr[j];
           b_ptr->avel[j] += stepsize * caccelcurr[3+j];
         }
+        // printf("caccel [%f %f %f] [%f %f %f]\n"
+        //   ,caccelcurr[0] ,caccelcurr[1] ,caccelcurr[2]
+        //   ,caccelcurr[3] ,caccelcurr[4] ,caccelcurr[5]);
+        // printf("  vel [%f %f %f] [%f %f %f]\n"
+        //   ,b_ptr->lvel[0] ,b_ptr->lvel[1] ,b_ptr->lvel[2]
+        //   ,b_ptr->avel[0] ,b_ptr->avel[1] ,b_ptr->avel[2]);
       }
     }
 
@@ -1653,10 +1819,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
             fb->t2[1] = data[4];
             fb->t2[2] = data[5];
           }
-          
+
           Jcopyrow += infom * 12;
         }
-      
+
         lambdacurr += infom;
       }
     }
@@ -1676,6 +1842,14 @@ void dxQuickStepper (dxWorldProcessContext *context,
         b_ptr->tacc[j] *= stepsize;
       }
       dMultiplyAdd0_331 (b_ptr->avel, invIrow, b_ptr->tacc);
+      // printf("fe [%f %f %f] [%f %f %f]\n"
+      //   ,b_ptr->facc[0] ,b_ptr->facc[1] ,b_ptr->facc[2]
+      //   ,b_ptr->tacc[0] ,b_ptr->tacc[1] ,b_ptr->tacc[2]);
+      /* DEBUG PRINTOUTS
+      printf("uncorrect vel [%f %f %f] [%f %f %f]\n"
+        ,b_ptr->lvel[0] ,b_ptr->lvel[1] ,b_ptr->lvel[2]
+        ,b_ptr->avel[0] ,b_ptr->avel[1] ,b_ptr->avel[2]);
+      */
     }
   }
 
@@ -1684,24 +1858,30 @@ void dxQuickStepper (dxWorldProcessContext *context,
     BEGIN_STATE_SAVE(context, velstate) {
       dReal *vel = context->AllocateArray<dReal>(nb*6);
 
-      // check that the updated velocity obeys the constraint (this check needs unmodified J)
-      dReal *velcurr = vel;
-      dxBody *bodycurr = body, *const bodyend = body + nb;
-      for (; bodycurr != bodyend; velcurr += 6, bodycurr++) {
+      // CHECK THAT THE UPDATED VELOCITY OBEYS THE CONSTRAINT
+      //  (this check needs unmodified J)
+      //  put residual into tmp
+      dRealMutablePtr velcurr = vel;
+      //dxBody* const* bodyend = body + nb;
+      for (dxBody* const* bodycurr = body; bodycurr != bodyend; velcurr += 6, bodycurr++) {
+        dxBody *b_ptr = *bodycurr;
         for (int j=0; j<3; j++) {
-          velcurr[j] = bodycurr->lvel[j];
-          velcurr[3+j] = bodycurr->avel[j];
+          velcurr[j]   = b_ptr->lvel[j];
+          velcurr[3+j] = b_ptr->avel[j];
         }
       }
       dReal *tmp = context->AllocateArray<dReal> (m);
       multiply_J (m,J,jb,vel,tmp);
+
       dReal error = 0;
       for (int i=0; i<m; i++) error += dFabs(tmp[i]);
       printf ("velocity error = %10.6e\n",error);
-    
-    } END_STATE_SAVE(context, velstate)
+    }
   }
+
 #endif
+
+
 
   {
     // update the position and orientation from the new linear/angular velocity
@@ -1719,33 +1899,100 @@ void dxQuickStepper (dxWorldProcessContext *context,
     dReal erp_removal = 1.00;
     IFTIMING (dTimerNow ("velocity update due to constraint forces"));
     // remove caccel_erp
-    const dReal *caccelcurr = caccel_erp;
+    const dReal *caccel_erp_curr = caccel_erp;
+    const dReal *caccel_curr = caccel;
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccelcurr+=6, bodycurr++) {
+    int debug_count = 0;
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
+         caccel_curr+=6, caccel_erp_curr+=6, bodycurr++, debug_count++) {
       dxBody *b_ptr = *bodycurr;
       for (int j=0; j<3; j++) {
-        b_ptr->lvel[j] -= erp_removal * stepsize * caccelcurr[j];
-        b_ptr->avel[j] -= erp_removal * stepsize * caccelcurr[3+j];
+        // dReal v0 = b_ptr->lvel[j];
+        // dReal a0 = b_ptr->avel[j];
+        dReal dv = erp_removal * stepsize * (caccel_curr[j]   - caccel_erp_curr[j]);
+        dReal da = erp_removal * stepsize * (caccel_curr[3+j] - caccel_erp_curr[3+j]);
+
+        /* default v removal
+        */
+        b_ptr->lvel[j] += dv;
+        b_ptr->avel[j] += da;
+        /* think about minimize J*v somehow without SORLCP...
+        */
+        /* minimize final velocity test 1,
+        if (v0 * dv < 0) {
+          if (fabs(v0) < fabs(dv))
+            b_ptr->lvel[j] = 0.0;
+          else
+            b_ptr->lvel[j] += dv;
+        }
+        if (a0 * da < 0) {
+          if (fabs(a0) < fabs(da))
+            b_ptr->avel[j] = 0.0;
+          else
+            b_ptr->avel[j] += da;
+        }
+        */
+
+        /*  DEBUG PRINTOUTS, total forces/accel on a body
+        printf("nb[%d] m[%d] b[%d] i[%d] v[%f] dv[%f] vf[%f] a[%f] da[%f] af[%f] debug[%f - %f][%f - %f]\n"
+               ,nb, m, debug_count, j, v0, dv, b_ptr->lvel[j]
+                 , a0, da, b_ptr->avel[j]
+               ,caccel_curr[j], caccel_erp_curr[j]
+               ,caccel_curr[3+j], caccel_erp_curr[3+j]);
+        */
       }
+      /*  DEBUG PRINTOUTS
+      printf("corrected vel [%f %f %f] [%f %f %f]\n",
+        b_ptr->lvel[0], b_ptr->lvel[1], b_ptr->lvel[2],
+        b_ptr->avel[0], b_ptr->avel[1], b_ptr->avel[2]);
+      */
     }
-    // use caccel without erp
+
+#ifdef POST_UPDATE_CONSTRAINT_VIOLATION_CORRECTION
+    // ADD CACCEL CORRECTION FROM VELOCITY CONSTRAINT VIOLATION
+    BEGIN_STATE_SAVE(context, velstate) {
+      dReal *vel = context->AllocateArray<dReal>(nb*6);
+
+      // CHECK THAT THE UPDATED VELOCITY OBEYS THE CONSTRAINT
+      //  (this check needs unmodified J)
+      //  put residual into tmp
+      dRealMutablePtr velcurr = vel;
+      //dxBody* const* bodyend = body + nb;
+      for (dxBody* const* bodycurr = body; bodycurr != bodyend; velcurr += 6, bodycurr++) {
+        dxBody *b_ptr = *bodycurr;
+        for (int j=0; j<3; j++) {
+          velcurr[j]   = b_ptr->lvel[j];
+          velcurr[3+j] = b_ptr->avel[j];
+        }
+      }
+      dReal *tmp = context->AllocateArray<dReal> (m);
+      multiply_J (m,J,jb,vel,tmp);
+
+      // DIRECTLY ADD THE CONSTRAINT VIOLATION TERM (TMP) TO VELOCITY UPDATE
+      // add correction term dlambda = J*v(n+1)/dt
+      // and caccel += dt*invM*JT*dlambda (dt's cancel out)
+      dReal *iMJ = context->AllocateArray<dReal> (m*12);
+      compute_invM_JT (m,J,iMJ,jb,body,invI);
+      // compute caccel_corr=(inv(M)*J')*dlambda, correction term
+      // as we change lambda.
+      multiply_invM_JT (m,nb,iMJ,jb,tmp,caccel_corr);
+
+    } END_STATE_SAVE(context, velstate);
+
+    // ADD CACCEL CORRECTION FROM VELOCITY CONSTRAINT VIOLATION
     caccelcurr = caccel;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccelcurr+=6, bodycurr++) {
+    const dReal* caccel_corrcurr = caccel_corr;
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccel_corrcurr+=6, bodycurr++) {
       dxBody *b_ptr = *bodycurr;
       for (int j=0; j<3; j++) {
-        b_ptr->lvel[j] += erp_removal * stepsize * caccelcurr[j];
-        b_ptr->avel[j] += erp_removal * stepsize * caccelcurr[3+j];
+        b_ptr->lvel[j] += erp_removal * stepsize * caccel_corrcurr[j];
+        b_ptr->avel[j] += erp_removal * stepsize * caccel_corrcurr[3+j];
       }
     }
+#endif
+
+
   }
-
-  // potentially, recompute J*v(n+1)
-  // then, re-update v(n+1) -= inv(M)*J'*J*v(n+1)
-
-
-
-
-
 
   {
     IFTIMING (dTimerNow ("tidy up"));
@@ -1771,7 +2018,7 @@ static size_t EstimateGR_LCPMemoryRequirements(int m)
 }
 #endif
 
-static size_t EstimateSOR_LCPMemoryRequirements(int m,int nb)
+static size_t EstimateSOR_LCPMemoryRequirements(int m,int /*nb*/)
 {
   size_t res = dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for iMJ
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Ad
@@ -1796,10 +2043,10 @@ size_t dxEstimateQuickStepMemoryRequirements (
     int njcurr = 0, mcurr = 0, mfbcurr = 0;
     dxJoint::SureMaxInfo info;
     dxJoint *const *const _jend = _joint + _nj;
-    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {	
+    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {
       dxJoint *j = *_jcurr;
       j->getSureMaxInfo (&info);
-      
+
       int jm = info.max_m;
       if (jm > 0) {
         njcurr++;
@@ -1826,6 +2073,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J_precon
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J_orig
+      sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for vnew
       sub1_res2 += 3 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for cfm, lo, hi
       sub1_res2 += 2 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for rhs, rhs_erp
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for rhs_precon
@@ -1837,7 +2085,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
         size_t sub2_res1 = dEFFICIENT_SIZE(sizeof(dReal) * m); // for c
         {
           size_t sub3_res1 = dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for tmp1
-    
+
           size_t sub3_res2 = 0;
 
           sub2_res1 += (sub3_res1 >= sub3_res2) ? sub3_res1 : sub3_res2;
@@ -1848,6 +2096,12 @@ size_t dxEstimateQuickStepMemoryRequirements (
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for cforce
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for caccel
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for caccel_erp
+#ifdef POST_UPDATE_CONSTRAINT_VIOLATION_CORRECTION
+        sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for caccel_corr
+        sub2_res2 = dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for vel
+        sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for tmp
+        sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for iMJ
+#endif
         {
           size_t sub3_res1 = EstimateSOR_LCPMemoryRequirements(m,nb); // for SOR_LCP
 
@@ -1856,6 +2110,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
           {
             size_t sub4_res1 = dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for vel
             sub4_res1 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for tmp
+            sub4_res1 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for iMJ
 
             size_t sub4_res2 = 0;
 
@@ -1868,7 +2123,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
         sub1_res2 += (sub2_res1 >= sub2_res2) ? sub2_res1 : sub2_res2;
       }
     }
-    
+
     res += (sub1_res1 >= sub1_res2) ? sub1_res1 : sub1_res2;
   }
 

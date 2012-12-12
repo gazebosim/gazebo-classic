@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PoseTrajectory
+/// \brief Message for a pose trajectory
+
+
+import "pose_stamped.proto";
+
+message PoseTrajectory
+{
+  optional string name              = 1;
+  optional uint32 id                = 2;
+  repeated PoseStamped pose_stamped = 3;
+}
+
+

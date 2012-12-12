@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include "common/Plugin.hh"
 #include "sensors/CameraSensor.hh"
 #include "rendering/RenderTypes.hh"
-#include "gazebo.h"
+#include "gazebo.hh"
 
 namespace gazebo
 {
@@ -37,17 +37,11 @@ namespace gazebo
                 unsigned int _width, unsigned int _height,
                 unsigned int _depth, const std::string &_format);
 
-    //public: virtual void OnNewImageFrame(const unsigned char *_image,
-    //                          unsigned int _width, unsigned int _height,
-    //                          unsigned int _depth, unsigned int cam);
-
     protected: unsigned int width, height/*, depth*/;
-//    protected: std::string format;
 
     protected: sensors::GpuRaySensorPtr parentSensor;
 
     private: event::ConnectionPtr newLaserFrameConnection;
-    //private: event::ConnectionPtr newImageFrameConnection;
   };
 }
 #endif

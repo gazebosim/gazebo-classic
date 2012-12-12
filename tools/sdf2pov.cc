@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 #include "math/Pose.hh"
 #include "common/Console.hh"
 #include "common/MeshManager.hh"
@@ -142,13 +142,12 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
       else
       {
         printf("    pigment { color rgb <%f, %f, %f> }\n",
-            mat->GetDiffuse().R(), mat->GetDiffuse().G(),
-            mat->GetDiffuse().B());
+            mat->GetDiffuse().r, mat->GetDiffuse().g, mat->GetDiffuse().b);
       }
 
       printf("    finish {\n");
       printf("      ambient color rgb <%f, %f, %f>\n",
-          mat->GetAmbient().R(), mat->GetAmbient().G(), mat->GetAmbient().B());
+          mat->GetAmbient().r, mat->GetAmbient().g, mat->GetAmbient().b);
       printf("      specular %f\n", 1.0);
       printf("    }\n");
 
@@ -206,8 +205,8 @@ void ProcessLight(sdf::ElementPtr _elem)
   gazebo::common::Color diffuse, specular;
 
   pose = _elem->GetOrCreateElement("origin")->GetValuePose("pose");
-  diffuse = _elem->GetElement("diffuse")->GetValueColor("rgba");
-  specular = _elem->GetElement("specular")->GetValueColor("rgba");
+  diffuse = _elem->GetValueColor("diffuse");
+  specular = _elem->GetValueColor("specular");
   // double fadeDist =
   // _elem->GetElement("attenuation")->GetValueDouble("range");
   // double constant =
@@ -219,7 +218,7 @@ void ProcessLight(sdf::ElementPtr _elem)
   printf("light_source {\n");
   printf("  <%f, %f, %f>, rgb <%f, %f, %f>\n",
       pose.pos.x, pose.pos.y, pose.pos.z,
-      diffuse.R(), diffuse.G(), diffuse.B());
+      diffuse.r, diffuse.g, diffuse.b);
 
   std::string type = _elem->GetValueString("type");
   if (type == "point")
@@ -265,14 +264,13 @@ void ProcessScene(sdf::ElementPtr _elem)
   gazebo::common::Color color;
   if (_elem->HasElement("background"))
   {
-    color = _elem->GetElement("background")->GetValueColor("rgba");
-    printf("background { rgb <%f, %f, %f> }\n",
-        color.R(), color.G(), color.B());
+    color = _elem->GetValueColor("background");
+    printf("background { rgb <%f, %f, %f> }\n", color.r, color.g, color.b);
   }
 
   if (_elem->HasElement("ambient"))
   {
-    color = _elem->GetElement("ambient")->GetValueColor("rgba");
+    color = _elem->GetValueColor("ambient");
     // printf("global_settings { ambient_light rgb <%f, %f, %f> }\n",
         // color.R(), color.G(), color.B());
   }
@@ -396,7 +394,7 @@ int main(int argc, char **argv)
       while (lightElem)
       {
         ProcessLight(lightElem);
-        lightElem = lightElem->GetNextElement();
+        lightElem = lightElem->GetNextElement("light");
       }
     }
 
@@ -424,13 +422,13 @@ int main(int argc, char **argv)
             sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
             ProcessGeometry(geomElem, visualPose);
 
-            visualElem = visualElem->GetNextElement();
+            visualElem = visualElem->GetNextElement("visual");
           }
         }
-        linkElem = linkElem->GetNextElement();
+        linkElem = linkElem->GetNextElement("link");
       }
-      modelElem = modelElem->GetNextElement();
+      modelElem = modelElem->GetNextElement("model");
     }
-    worldElem = worldElem->GetNextElement();
+    worldElem = worldElem->GetNextElement("world");
   }
 }

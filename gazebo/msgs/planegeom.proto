@@ -1,0 +1,18 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PlaneGeom
+/// \brief Message for a plane geometry
+
+
+import "vector3d.proto";
+import "vector2d.proto";
+
+message PlaneGeom
+{
+  required Vector3d normal  = 1;
+  required Vector2d size    = 2;
+  optional double d         = 3 [default = 0];
+}
+
+

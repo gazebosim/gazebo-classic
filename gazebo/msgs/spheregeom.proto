@@ -1,0 +1,12 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface SphereGeom 
+/// \brief Information about a sphere geometry
+
+
+message SphereGeom
+{
+  required double radius  = 1;
+}
+

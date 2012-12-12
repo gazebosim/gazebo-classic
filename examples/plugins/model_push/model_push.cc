@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,12 @@
  *
 */
 #include <boost/bind.hpp>
-#include "physics/physics.h"
-#include "gazebo.h"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/gazebo.hh"
 
+/// \example examples/plugins/model_push.cc
+/// This example creates a ModelPlugin, and applies a force to a box to move
+/// it alone the ground plane.
 namespace gazebo
 {
   class ModelPush : public ModelPlugin
@@ -30,7 +33,7 @@ namespace gazebo
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateStart(
-          boost::bind(&BoxPush::OnUpdate, this));
+          boost::bind(&ModelPush::OnUpdate, this));
     }
 
     // Called by the world update start event

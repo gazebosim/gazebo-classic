@@ -1,0 +1,16 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Request
+/// \brief A message containing a string request
+
+
+message Request
+{
+  required int32 id         = 1;
+  required string request   = 2;
+  optional string data      = 3;
+  optional double dbl_data  = 4;
+}
+
+

@@ -1,0 +1,740 @@
+<?xml version="1.0" ?>
+<gazebo version="1.2">
+    <model name="apartment">
+        <!--<origin pose="0 0 0 0 0 0"/>-->
+        <link name="wooden-floor">
+            <visual name="visual2">
+                <pose>0 0 0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>24.5 20 0.03</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Kitchen/WoodFloor</script>
+                </material>
+            </visual>
+        </link>
+        <link name="wall1east">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="surface_1">
+                <pose>0 -10.0 2.0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>24.5 0.5 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual2">
+                <pose>0 -10.0 2.0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>24.5 0.5 4.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <link name="wall2west">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="wall2surface">
+                <pose>0 10.0 2.0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>24.5 0.5 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="wall2visual">
+                <pose>0 10.0 2.0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>24.5 0.5 4.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <link name="wall3north-right">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="wall2surface">
+                <pose>12 -7.5 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>5.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="wall2visual">
+                <pose>12 -7.5 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>5.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <link name="wall3north-left">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="wall2surface">
+                <pose>12 4.0 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>12.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="wall2visual">
+                <pose>12 4.0 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>12.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <link name="wall4southleft">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="wall4side1surface">
+                <pose>-12 8.5 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>3.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="wall4side1visual">
+                <pose>-12 8.5 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>3.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <link name="wall4southwindowwallleft">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="wall4side1surface">
+                <pose>-12 4.5 1.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>5.0 0.5 2.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="wall4side1visual">
+                <pose>-12 4.5 1.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>5.0 0.5 2.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <link name="wall4southwindowwindowleft">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="wall4side1surface">
+                <pose>-12 4.5 3.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>5.0 0.5 2.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="wall4side1visual">
+                <pose>-12 4.5 3.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>5.0 0.5 2.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/BlueTransparent</script>
+                </material>
+            </visual>
+        </link>
+        <link name="wall4southright">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="wall4side1surface">
+                <pose>-12 0.5 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>3.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="wall4side1visual">
+                <pose>-12 0.5 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>3.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <link name="wall4southrightwindowwall">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="wall4side1surface">
+                <pose>-12 -2.5 1.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>3.0 0.5 2.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="wall4side1visual">
+                <pose>-12 -2.5 1.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>3.0 0.5 2.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <link name="wall4southrightwindowwindow">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="wall4side1surface">
+                <pose>-12 -2.5 3.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>3.0 0.5 2.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="wall4side1visual">
+                <pose>-12 -2.5 3.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>3.0 0.5 2.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/BlueTransparent</script>
+                </material>
+            </visual>
+        </link>
+        <link name="wall4southrightright">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="wall4side1surface">
+                <pose>-12 -7.0 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>6.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="wall4side1visual">
+                <pose>-12 -7.0 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>6.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <!--BATHROOM-->
+        <!-- WALLS -->
+        <link name="bathroom-south">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="wall2surface">
+                <pose>5 -7.5 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>5.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="wall2visual">
+                <pose>5 -7.5 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>5.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <link name="bathroom-west">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="wall2surface">
+                <pose>10 -5.0 2.0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>4.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="wall2visual">
+                <pose>10 -5.0 2.0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>4.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <!-- //BATHROOM -->
+        <!-- BEDROOM -->
+        <!-- WALLS -->
+        <link name="bedroom-north">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="wall2surface">
+                <pose>2 -7.0 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>6.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="wall2visual">
+                <pose>2 -7.0 2.0 0 0 1.5707</pose>
+                <geometry>
+                    <box>
+                        <size>6.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <link name="bedroom-west">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="surface_1">
+                <pose>5 -1.0 2.0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>14.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual2">
+                <pose>-5 -1.0 2.0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>14.0 0.5 4.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <!-- //BEDROOM -->
+        <!-- KITCHEN -->
+        <!-- KITCHEN/HALLWAY STORAGE -->
+        <link name="kitchen-hallway-storage">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="surface_1">
+                <pose>10 0 2.0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>4.0 4.0 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual2">
+                <pose>10 0 2.0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>4.0 4.0 4.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <!-- HALLWAY COAT CLOSET -->
+        <link name="hallway-coat-closet">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="surface_1">
+                <pose>6.5 -0.5 2.0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>3.0 3.0 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual2">
+                <pose>6.5 -0.5 2.0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>3.0 3.0 4.0</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+        </link>
+        <!-- KITCHEN BANKS -->
+        <link name="kitchen bank1">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="surface_1">
+                <pose>9 6 0.75 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>2 8 1.5</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual2">
+                <pose>11 6 0.75 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>2 8 1.5</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Kitchen/Cabinet</script>
+                </material>
+            </visual>
+        </link>
+        <link name="kitchen bank1top">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="surface_1">
+                <pose>9 6 1.55 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>2.0 8 0.5</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual2">
+                <pose>11 6 1.55 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>2.0 8 0.5</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Kitchen/CounterTop</script>
+                </material>
+            </visual>
+        </link>
+        <link name="kitchen bank2">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="surface_1">
+                <pose>7.5 9 0.75 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>5 2 1.5</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual2">
+                <pose>7.5 9 0.75 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>5 2 1.5</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Kitchen/Cabinet</script>
+                </material>
+            </visual>
+        </link>
+        <link name="kitchen bank2top">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="surface_1">
+                <pose>7.5 9 1.55 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>5 2 0.5</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual2">
+                <pose>7.5 9 1.55 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>5 2 0.5</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Kitchen/CounterTop_H</script>
+                </material>
+            </visual>
+        </link>
+        <!-- FRIDGE -->
+        <link name="fridge">
+            <pose>6.5 1.5 2.0 0 0 0</pose>
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="surface_1">
+                <geometry>
+                    <box>
+                        <size>3.0 3.0 4.0</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual2">
+                <geometry>
+                    <box>
+                        <size>2.0 2.0 3.5</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/White</script>
+                </material>
+            </visual>
+            <sensor name="bank_sensor" type="rfid">
+                <topic>~/rfid</topic>
+                <always_on>1</always_on>
+                <update_rate>100</update_rate>
+                <visualize>true</visualize>
+            </sensor>
+        </link>
+        <static>true</static>
+    </model>
+</gazebo>

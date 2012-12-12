@@ -158,15 +158,20 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
     info->c[0] = pushout;
 
     // note: this cap should not limit bounce velocity
-    dReal maxvel;
+    // if contactp is not specified per body, use the global max_vel specified in world
+    // otherwise, use the body max_vel, but truncated by world max_vel.
+    dReal maxvel = world->contactp.max_vel;
     if (node[0].body->contactp != NULL && (node[1].body && node[1].body->contactp != NULL))
       maxvel = std::min(node[0].body->contactp->max_vel,node[1].body->contactp->max_vel);
-    else if (node[0].body->contactp != NULL)
+    else if (node[0].body && node[0].body->contactp != NULL)
       maxvel = node[0].body->contactp->max_vel;
     else if (node[1].body && node[1].body->contactp != NULL)
       maxvel = node[1].body->contactp->max_vel;
-    else
+
+    // truncate everything by world max_vel
+    if (maxvel > world->contactp.max_vel)
       maxvel = world->contactp.max_vel;
+
     info->c_v_max[0] = maxvel;
 
     // deal with bounce
@@ -194,6 +199,7 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
     // set LCP limits for normal
     info->lo[0] = 0;
     info->hi[0] = dInfinity;
+    info->findex[0] = -2;
 
     // now do jacobian for tangential forces
     dVector3 t1, t2; // two vectors tangential to normal

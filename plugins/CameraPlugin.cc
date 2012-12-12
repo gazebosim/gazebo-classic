@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,13 @@ GZ_REGISTER_SENSOR_PLUGIN(CameraPlugin)
 /////////////////////////////////////////////////
 CameraPlugin::CameraPlugin() : SensorPlugin()
 {
+}
+
+/////////////////////////////////////////////////
+CameraPlugin::~CameraPlugin()
+{
+  this->parentSensor.reset();
+  this->camera.reset();
 }
 
 /////////////////////////////////////////////////

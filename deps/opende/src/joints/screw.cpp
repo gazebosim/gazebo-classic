@@ -27,7 +27,7 @@
 
 //****************************************************************************
 // helper function: shortest_angular_distance implementation
-    
+
   /*!
    * \brief normalize_angle_positive
    *
@@ -46,7 +46,7 @@
    * Normalizes the angle to be -M_PI circle to +M_PI circle
    * It takes and returns radians.
    *
-   */    
+   */
   static inline double normalize_angle(double angle)
   {
     double a = normalize_angle_positive(angle);
@@ -55,7 +55,7 @@
     return a;
   }
 
-    
+
   /*!
    * \function
    * \brief shortest_angular_distance
@@ -67,16 +67,16 @@
    * would always be -pi <= result <= pi.  Adding the result
    * to "from" will always get you an equivelent angle to "to".
    */
-    
+
   static inline double shortest_angular_distance(double from, double to)
   {
     double result = normalize_angle_positive(normalize_angle_positive(to) - normalize_angle_positive(from));
-	
+
     if (result > M_PI)
       // If the result > 180,
       // It's shorter the other way.
       result = -(2.0*M_PI - result);
-	
+
     return normalize_angle(result);
   }
 
@@ -101,7 +101,7 @@ dxJointScrew::dxJointScrew( dxWorld *w ) :
 }
 
 
-void 
+void
 dxJointScrew::getSureMaxInfo( SureMaxInfo* info )
 {
     info->max_m = 6;
@@ -115,8 +115,8 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
 
     info->m = 5;
 
-/* comment out joint limits for now, add back later after verifying continuous is working
     // if proper joint limits are specified
+
     // see if we're at a joint limit for the rotational hinge
     if ( limot.lostop <= limot.histop )
     {
@@ -126,10 +126,13 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
         // from angle, update cumulative_angle, which does not wrap
         cumulative_angle = cumulative_angle + shortest_angular_distance(cumulative_angle,angle);
 
+        // printf("angle: %f lo[%f] hi[%f]\n", cumulative_angle, limot.lostop, limot.histop);
+
         if ( limot.testRotationalLimit( cumulative_angle ) )
             info->m = 6;
     }
 
+    /* uncommnet to enforce slider joint limit
     // see if we're at a joint limit for the slider
     limot.limit = 0;
     if ( ( limot.lostop > -dInfinity || limot.histop < dInfinity ) &&
@@ -137,6 +140,9 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
     {
         // measure joint position
         dReal pos = dJointGetScrewPosition ( this );
+
+        // printf("pos: %f lo[%f] hi[%f]\n", pos, limot.lostop, limot.histop);
+
         if ( pos <= limot.lostop )
         {
             limot.limit = 1;
@@ -150,15 +156,14 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
             info->m = 6;
         }
     }
-*/
-
+    */
 }
 
 
 void
 dxJointScrew::getInfo2( dxJoint::Info2 *info )
 {
-    // set the constraint on the two sliding axis
+    // constrain the slider like DOFs
     {
       // pull out pos and R for both bodies. also get the `connection'
       // vector pos2-pos1.
@@ -293,8 +298,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
               for ( i = 0; i < 3; ++i ) ax1[i] = -ax1[i];
       }
 
-      // if the slider is powered, or has joint limits, add in the extra row
-      // limot.addLimot ( this, info, 5, ax1, 0 ); // comment out as this will be the screw constraint
+      // uncommnet to enforce slider joint limit
+      // limot.addLimot ( this, info, 5, ax1, 0 );
 
       /* comment out linear damping, use only rotation damping
       // linear joint damping
@@ -382,8 +387,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       info->c[3] = k * dCalcVectorDot3( b, p );
       info->c[4] = k * dCalcVectorDot3( b, q );
 
-      // if the screw is powered, or has joint limits, add in the stuff
-      //limot.addLimot( this, info, 5, ax1, 1 ); // comment out as this will be the screw constraint
+      // enforcing rotation joint limit
+      limot.addLimot( this, info, 5, ax1, 1 );
 
       // rotational joint damping
       if (this->use_damping)
@@ -588,6 +593,9 @@ dReal dJointGetScrewPosition ( dJointID j )
 
     // get axis1 in global coordinates
     dVector3 ax1, q;
+    if (!joint->node[0].body)
+      return 0;
+
     dMultiply0_331 ( ax1, joint->node[0].body->posr.R, joint->axis1 );
 
     if ( joint->node[1].body )

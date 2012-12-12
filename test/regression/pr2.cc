@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 #include "ServerFixture.hh"
-#include "physics/physics.h"
+#include "physics/physics.hh"
 
 using namespace gazebo;
 class PR2Test : public ServerFixture
@@ -25,12 +25,17 @@ class PR2Test : public ServerFixture
 TEST_F(PR2Test, Load)
 {
   Load("worlds/empty.world");
-  SpawnModel("models/pr2.model");
+  SpawnModel("model://pr2");
 
   int i;
-  for (i = 0; i < 40 && !this->HasEntity("pr2"); ++i)
-    common::Time::MSleep(100);
-  EXPECT_LT(i, 40);
+  for (i = 0; i < 200 && !this->HasEntity("pr2"); ++i)
+    common::Time::MSleep(200);
+  EXPECT_LT(i, 200);
+
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+    return;
+
 
   sensors::SensorPtr sensor =
     sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");

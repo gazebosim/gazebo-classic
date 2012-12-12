@@ -2,9 +2,7 @@ Gazebo - A dynamic multi-robot simulator
 ---------------------------------------- 
 
 This is the Gazebo simulator.  Gazebo simulates multiple robots in a
-3D environment, with extensive dynamic interaction between objects.
-Gazebo was developed at the USC Robotics Research Lab as part of the
-Player/Stage project, and is partially support by Willow Garage (www.willowgarage.com). 
+3D environment, with extensive dynamic interaction between objects. 
 
   http://gazebosim.org
 
@@ -27,3 +25,4 @@ Read the installation instructions (http://gazebosim.org/documentation.html) in 
 
 
 - Nate Koenig
+

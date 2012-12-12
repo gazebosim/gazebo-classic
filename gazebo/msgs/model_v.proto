@@ -1,0 +1,14 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Entities 
+/// \brief Information about all entities in a world
+
+
+import "model.proto";
+
+message Model_V
+{
+  repeated Model models  = 2;
+}
+

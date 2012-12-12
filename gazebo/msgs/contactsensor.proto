@@ -1,0 +1,12 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface ContactSensor 
+/// \brief Information about a contact sensor element
+
+
+message ContactSensor
+{
+  optional string collision_name = 1;
+}
+

@@ -1,0 +1,12 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface BoxGeom 
+/// \brief Information about a box geometry
+
+import "vector3d.proto";
+
+message BoxGeom
+{
+  required Vector3d size  = 1;
+}

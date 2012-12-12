@@ -1,0 +1,34 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Material 
+/// \brief Information about a material
+
+
+import "color.proto";
+
+message Material
+{
+  enum ShaderType 
+  {
+    VERTEX                  = 1; 
+    PIXEL                   = 2; 
+    NORMAL_MAP_OBJECT_SPACE = 3; 
+    NORMAL_MAP_TANGENT_SPACE = 4;
+  }
+
+  message Script
+  {
+    required string uri = 1;
+    required string name = 2;
+  }
+
+  optional Script script          = 1;
+  optional ShaderType shader_type = 2;
+  optional string normal_map      = 3;
+  optional Color ambient          = 4;
+  optional Color diffuse          = 5;
+  optional Color specular         = 6;
+  optional Color emissive         = 7;
+}
+

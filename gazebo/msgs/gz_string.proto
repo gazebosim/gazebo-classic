@@ -1,0 +1,13 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface GzString
+/// \brief A message for string data
+
+
+message GzString
+{
+  required string data = 1;
+}
+
+

@@ -1,0 +1,16 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Quaternion
+/// \brief A message for a quaternion
+
+
+message Quaternion
+{
+  required double x = 2;
+  required double y = 3;
+  required double z = 4;
+  required double w = 5;
+}
+
+

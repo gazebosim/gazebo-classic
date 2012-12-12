@@ -4,24 +4,86 @@ if(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0003 NEW)
   CMAKE_POLICY(SET CMP0004 NEW)
 endif(COMMAND CMAKE_POLICY)
-enable_testing()
 
 project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
-set (GAZEBO_VERSION_NAME "hydrogen")
+set (GAZEBO_VERSION_NAME "lithium")
 set (GAZEBO_MAJOR_VERSION 1)
-set (GAZEBO_MINOR_VERSION 0)
+set (GAZEBO_MINOR_VERSION 3)
 set (GAZEBO_PATCH_VERSION 0)
 
-set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION}-RC3)
+set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
+set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
 
-message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
+message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION_FULL}")
+
+set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
+
+########################################
+# Package Creation: 
+include (${gazebo_cmake_dir}/gazebo_cpack.cmake)
+set (CPACK_PACKAGE_VERSION "${GAZEBO_VERSION_FULL}")
+set (CPACK_PACKAGE_VERSION_MAJOR "${GAZEBO_MAJOR_VERSION}")
+set (CPACK_PACKAGE_VERSION_MINOR "${GAZEBO_MINOR_VERSION}")
+set (CPACK_PACKAGE_VERSION_PATCH "${GAZEBO_PATCH_VERSION}")
+
+if (CPACK_GENERATOR)
+  message(STATUS "Found CPack generators: ${CPACK_GENERATOR}")
+
+  configure_file("${gazebo_cmake_dir}/cpack_options.cmake.in" ${GAZEBO_CPACK_CFG_FILE} @ONLY)
+  set(CPACK_PROJECT_CONFIG_FILE ${GAZEBO_CPACK_CFG_FILE})
+  include (CPack)
+endif()
+
+# If we're configuring only to package source, stop here
+if (PACKAGE_SOURCE_ONLY)
+  message(WARNING "Configuration was done in PACKAGE_SOURCE_ONLY mode.  You can build a tarball (make package_source), but nothing else.")
+  return()
+endif()
+
+# Documentation
+add_subdirectory(doc)
+
+# If we're configuring only to build docs, stop here
+if (DOC_ONLY)
+  message(WARNING "Configuration was done in DOC_ONLY mode.  You can build documentation (make doc), but nothing else.")
+  return()
+endif()
+
+enable_testing()
+
+# with -fPIC
+if(UNIX AND NOT WIN32)
+  set (CMAKE_INSTALL_PREFIX "/usr" CACHE STRING "Install Prefix")
+ find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
+ if(CMAKE_UNAME)
+   exec_program(uname ARGS -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR)
+   set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} CACHE INTERNAL
+     "processor type (i386 and x86_64)")
+   if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+     ADD_DEFINITIONS(-fPIC)
+   endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+ endif(CMAKE_UNAME)
+endif()
+
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
-#if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-#  set (CMAKE_INSTALL_PREFIX "/usr/" CACHE PATH "Gazebo install prefix" FORCE)
-#endif()
+
+# developer's option to cache PKG_CONFIG_PATH and
+# LD_LIBRARY_PATH for local installs
+if(PKG_CONFIG_PATH)
+  set (ENV{PKG_CONFIG_PATH} ${PKG_CONFIG_PATH}:$ENV{PKG_CONFIG_PATH})
+endif()
+if(LD_LIBRARY_PATH)
+  set (ENV{LD_LIBRARY_PATH} ${LD_LIBRARY_PATH}:$ENV{LD_LIBRARY_PATH})
+endif()
+
+
+set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo") 
+set (LIB_INSTALL_DIR "lib" CACHE STRING "Installation directory for libraries (relative to CMAKE_INSTALL_PREFIX)") 
+set (BIN_INSTALL_DIR "bin" CACHE STRING "Installation directory for binaries (relative to CMAKE_INSTALL_PREFIX)") 
+
 
 set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
 
@@ -33,39 +95,22 @@ if (USE_FULL_RPATH)
   # (but later on when installing)
   set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
   
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
   
   # add the automatically determined parts of the RPATH
   # which point to directories outside the build tree to the install RPATH
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
   
   # the RPATH to be used when installing, but only if its not a system directory
-  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}" isSystemDir)
   if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
   endif("${isSystemDir}" STREQUAL "-1")
 endif()
 
 set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
-
-set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo")
-set (LIB_INSTALL_DIR "lib")
-set (BIN_INSTALL_DIR "bin")
-
-# with -fPIC
-if(UNIX AND NOT WIN32)
- find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
- if(CMAKE_UNAME)
-   exec_program(uname ARGS -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR)
-   set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} CACHE INTERNAL
-     "processor type (i386 and x86_64)")
-   if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-     ADD_DEFINITIONS(-fPIC)
-   endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
- endif(CMAKE_UNAME)
-endif(UNIX AND NOT WIN32)
 
 
 set (MIN_OGRE_VERSION 1.7.1 CACHE INTERNAL "Ogre version requirement" FORCE)
@@ -74,8 +119,6 @@ set (MIN_BOOST_VERSION 1.40.0 CACHE INTERNAL "Boost min version requirement" FOR
 set (FREEIMAGE_MAJOR_VERSION 3 CACHE INTERNAL "FreeImage major version requirement" FORCE)
 set (FREEIMAGE_MINOR_VERSION 9 CACHE INTERNAL "FreeImage minor version requirement" FORCE)
 set (MIN_FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
-
-set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
 
 include (${gazebo_cmake_dir}/DissectVersion.cmake)
 
@@ -104,11 +147,17 @@ endif()
 if (SSSE3_FOUND)
   set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -mssse3")
 endif()
-if (SSE4_1_FOUND)
-  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse4.1")
-endif()
-if (SSE4_2_FOUND)
-  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse4.2")
+
+if (ENABLE_SSE4)
+  message(STATUS "\nSSE4 will be enabled if system supports it.\n")
+  if (SSE4_1_FOUND)
+    set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse4.1")
+  endif()
+  if (SSE4_2_FOUND)
+    set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse4.2")
+  endif()
+else()
+  message(STATUS "\nSSE4 disabled.\n")
 endif()
 
 set (CMAKE_C_FLAGS_RELEASE " -s -O2 -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release" FORCE)
@@ -145,7 +194,7 @@ else()
   set (BUILD_TYPE_PROFILE FALSE)
 endif()
 
-if ( "${CMAKE_BUILD_TYPE}" STREQUAL "RELEASE")
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "RELEASE")
   set (BUILD_TYPE_RELEASE TRUE)
 else()
   set (BUILD_TYPE_RELEASE FALSE)
@@ -162,6 +211,16 @@ add_subdirectory(deps)
 message (STATUS "----------------------------------------\n")
 
 #################################################
+# OS Specific initialization
+if (UNIX)
+  gz_setup_unix()
+else (WIN32)
+  gz_setup_windows()
+else (APPLE)
+  gz_setup_apple()
+endif()
+
+#################################################
 # Print warnings and errors
 if ( build_warnings )
   message(STATUS "BUILD WARNINGS")
@@ -171,19 +230,27 @@ if ( build_warnings )
   message(STATUS "END BUILD WARNINGS\n")
 endif (build_warnings)
 
+########### Add uninstall target ###############
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake"
+  IMMEDIATE @ONLY)
+add_custom_target(uninstall
+  "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake")
+
 if (build_errors)
   message(STATUS "BUILD ERRORS: These must be resolved before compiling.")
   foreach (msg ${build_errors})
     message(STATUS ${msg})
   endforeach ()
   message(STATUS "END BUILD ERRORS\n")
-  message (FATAL_ERROR "Errors encountered in build.")
+  message (FATAL_ERROR "Errors encountered in build. Please see the BUILD ERRORS above.")
 else (build_errors)
 
   ########################################
   # Write the config.h file
-  configure_file (${gazebo_cmake_dir}/gazebo_config.h.in ${PROJECT_BINARY_DIR}/gazebo_config.h)
-  INSTALL_INCLUDES("" ${PROJECT_BINARY_DIR}/gazebo_config.h)
+  configure_file (${gazebo_cmake_dir}/gazebo_config.h.in ${PROJECT_BINARY_DIR}/gazebo/gazebo_config.h)
+  gz_install_includes("" ${PROJECT_BINARY_DIR}/gazebo/gazebo_config.h)
 
   configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.sh.in ${PROJECT_BINARY_DIR}/setup.sh @ONLY)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/)
@@ -194,44 +261,34 @@ else (build_errors)
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
  
-  add_subdirectory(doc)
 
   if (BUILD_GAZEBO)
-    add_subdirectory(src)
+    add_subdirectory(gazebo)
     add_subdirectory(sdf)
-    add_subdirectory(Media)
+    add_subdirectory(media)
     add_subdirectory(test)
     add_subdirectory(tools)
     add_subdirectory(plugins)
-   
-    if (INCLUDE_PLAYER)
-      add_subdirectory(player)
-    endif (INCLUDE_PLAYER)
+    add_subdirectory(interfaces)
   endif (BUILD_GAZEBO)
 
   ########################################
   # Make the package config files
-  set (pkgconfig_files gazebo_transport gazebo)
+  set (pkgconfig_files gazebo_ode gazebo_transport gazebo)
 
   foreach (pkgconfig ${pkgconfig_files})
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION lib/pkgconfig COMPONENT pkgconfig)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
   endforeach()
 
   ########################################
-  # Package Creation: 
-  include (${gazebo_cmake_dir}/gazebo_cpack.cmake)
-  set (CPACK_PACKAGE_VERSION "${GAZEBO_VERSION}")
-  set (CPACK_PACKAGE_VERSION_MAJOR "${GAZEBO_MAJOR_VERSION}")
-  set (CPACK_PACKAGE_VERSION_MINOR "${GAZEBO_MINOR_VERSION}")
-  set (CPACK_PACKAGE_VERSION_PATCH "${GAZEBO_PATCH_VERSION}")
-
-  if (CPACK_GENERATOR)
-    message(STATUS "Found CPack generators: ${CPACK_GENERATOR}")
-
-    configure_file("${gazebo_cmake_dir}/cpack_options.cmake.in" ${GAZEBO_CPACK_CFG_FILE} @ONLY)
-    set(CPACK_PROJECT_CONFIG_FILE ${GAZEBO_CPACK_CFG_FILE})
-    include (CPack)
+  # If present, load platform-specific build hooks.  This system is used,
+  # for example, by the Ubuntu overlay (in the gazebo-release repo), to
+  # arrange for installation of Ubuntu-specific application-launching
+  # configuration.
+  if (EXISTS ${PROJECT_SOURCE_DIR}/cmake/packager-hooks/CMakeLists.txt)
+    message(STATUS "Loading packager build hooks from cmake/packager-hooks")
+    add_subdirectory(cmake/packager-hooks)
   endif()
 
   message(STATUS "Configuration successful. Type make to compile gazebo")

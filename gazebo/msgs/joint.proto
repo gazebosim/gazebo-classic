@@ -1,0 +1,42 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Joint 
+/// \brief Message for creating joint in rendering::Scene
+
+
+import "vector3d.proto";
+import "axis.proto";
+import "pose.proto";
+
+message Joint
+{
+  enum Type
+  {
+    REVOLUTE  = 1;
+    REVOLUTE2 = 2;
+    PRISMATIC = 3;
+    UNIVERSAL = 4;
+    BALL      = 5;
+    SCREW     = 6;
+  }
+
+  required string name           = 1;
+  repeated double angle          = 2;
+  optional Type type             = 3;
+  optional string parent         = 4;
+  optional string child          = 5;
+  optional Pose pose             = 6;
+  optional Axis axis1            = 7;
+  optional Axis axis2            = 8;
+
+  optional double cfm            = 9;
+  optional double bounce         = 10;
+  optional double velocity       = 11;
+  optional double fudge_factor   = 12;
+  optional double limit_cfm      = 13;
+  optional double limit_erp      = 14;
+  optional double suspension_cfm = 15;
+  optional double suspension_erp = 16;
+}
+

@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<gazebo version="1.2">
+    <model name="quadrotor" static="false">
+        <link name="link">
+            <inertial mass="1.316">
+                <inertia ixx="0.0128" ixy="0" ixz="0" iyy="0.0128" iyz="0" izz="0.0218" />
+            </inertial>
+            <collision name="collision">
+                <geometry>
+                    <mesh filename="quadrotor/quadrotor_base.dae" />
+                </geometry>
+            </collision>
+            <visual name="visual">
+                <geometry>
+                    <mesh filename="quadrotor/quadrotor_base.dae" />
+                </geometry>
+            </visual>
+        </link>
+    </model>
+</gazebo>

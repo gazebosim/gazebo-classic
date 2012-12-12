@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Subscribe
+/// \brief A message for subscription data
+
+
+message Subscribe
+{
+  required string topic    = 1;
+  required string host     = 2;
+  required uint32 port     = 3;
+  required string msg_type = 4;
+  optional bool latching   = 5 [default=false];
+}
+
+

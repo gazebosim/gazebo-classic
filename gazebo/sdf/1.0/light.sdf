@@ -1,0 +1,37 @@
+<!-- Light -->
+<element name="light" required="*">
+  <attribute name="name" type="string" default="__default__" required="0"/>
+  <attribute name="type" type="string" default="point" required="1"/>
+  <attribute name="cast_shadows" type="bool" default="false" required="0"/>
+  <element name="origin" required="0">
+    <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+  </element> <!-- End Origin -->
+
+  <element name="diffuse" required="1">
+    <attribute name="rgba" type="color" default="1 1 1 1" required="1"/>
+  </element> <!-- End Diffuse -->
+
+  <element name="specular" required="1">
+    <attribute name="rgba" type="color" default=".1 .1 .1 1" required="1"/>
+  </element> <!-- End Specular -->
+
+  <element name="attenuation" required="0">
+    <attribute name="range" type="double" default="10" required="1"/>
+    <attribute name="linear" type="double" default="1" required="0"/>
+    <attribute name="constant" type="double" default="1" required="0"/>
+    <attribute name="quadratic" type="double" default="0" required="0"/>
+  </element> <!-- End Attenuation -->
+
+  <element name="direction" required="1">
+    <attribute name="xyz" type="vector3" default="0 0 -1" required="1"/>
+  </element><!-- End Directional -->
+
+  <element name="spot" required="0">
+    <attribute name="inner_angle" type="double" default="0" required="1"/>
+    <attribute name="outer_angle" type="double" default="0" required="1"/>
+    <attribute name="falloff" type="double" default="0" required="1"/>
+  </element> <!-- End Spot -->
+
+</element> <!-- End Light -->
+
+

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,24 @@
  * limitations under the License.
  *
 */
-#include "gazebo.h"
+#include "gazebo.hh"
 #include "plugins/CameraPlugin.hh"
 
 namespace gazebo
-{   
+{
   class CameraDump : public CameraPlugin
   {
-    public: CameraDump() : CameraPlugin(),saveCount(0) {}
-                                    
+    public: CameraDump() : CameraPlugin(), saveCount(0) {}
+
     public: void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     {
       // Don't forget to load the camera plugin
-      CameraPlugin::Load(_parent,_sdf);
-    } 
-          
+      CameraPlugin::Load(_parent, _sdf);
+    }
+
     // Update the controller
-    public: void OnNewFrame(const unsigned char *_image, 
-        unsigned int _width, unsigned int _height, unsigned int _depth, 
+    public: void OnNewFrame(const unsigned char *_image,
+        unsigned int _width, unsigned int _height, unsigned int _depth,
         const std::string &_format)
     {
       char tmp[1024];
@@ -50,7 +50,7 @@ namespace gazebo
 
     private: int saveCount;
   };
-    
+
   // Register this plugin with the simulator
   GZ_REGISTER_SENSOR_PLUGIN(CameraDump)
 }
