@@ -47,7 +47,8 @@ namespace gazebo
                     this->collisionParent);
                 if (bParent && bParent->GetCollisionShape())
                 {
-                  delete bParent->GetCollisionShape();
+                  delete static_cast<btSphereShape*>(
+                    bParent->GetCollisionShape());
                   bParent->SetCollisionShape(NULL);
                 }
               }
