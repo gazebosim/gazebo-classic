@@ -1448,8 +1448,10 @@ void Scene::PreRender()
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
         math::Pose pose = msgs::Convert(*poseIter);
+        //iter->second->SetPose(pose);
+
         iter->second->SetPosition(pose.pos + iter->second->GetPosition());
-        iter->second->SetRotation(pose.rot.GetInverse() * iter->second->GetRotation());
+        // iter->second->SetRotation(pose.rot * iter->second->GetRotation());
         this->poseDeltas.erase(poseIter++);
       }
       else

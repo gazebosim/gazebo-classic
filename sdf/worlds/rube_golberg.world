@@ -1,0 +1,75 @@
+<?xml version='1.0'>
+<sdf version='1.3'>
+  <world name='default'>
+  <!--
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+  -->
+
+    <model name="ramp_1">
+      <static>true</static>
+      <pose>0 0 0.5 0.2 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.4 2.0 0.05</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.4 2.0 0.05</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sphere">
+      <pose>0 0.8 1.0 0 0 0</pose>
+
+      <link name="link">
+
+        <velocity_decay>
+          <linear>0.0001</linear>
+          <angular>0.0001</angular>
+        </velocity_decay>
+
+        <inertial>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.04</ixx>
+            <iyy>0.04</iyy>
+            <izz>0.04</izz>
+
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>

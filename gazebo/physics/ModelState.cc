@@ -129,7 +129,8 @@ bool ModelState::IsZero() const
     result = result && (*iter).IsZero();
   }
 
-  return result && this->pose == math::Pose::Zero;
+  // return result && this->pose == math::Pose::Zero;
+  return false;//this->pose == math::Pose::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -241,7 +242,7 @@ ModelState ModelState::operator-(const ModelState &_state) const
 
   result.name = this->name;
   result.pose.pos = this->pose.pos - _state.pose.pos;
-  result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
+  //result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
 
   /// \TODO: put back in.
   // Insert the link state diffs.
@@ -254,7 +255,7 @@ ModelState ModelState::operator-(const ModelState &_state) const
   // }
 
   // Insert the joint state diffs.
-  for (std::vector<JointState>::const_iterator iter =
+  /*for (std::vector<JointState>::const_iterator iter =
        this->jointStates.begin(); iter != this->jointStates.end(); ++iter)
   {
     try
@@ -268,7 +269,7 @@ ModelState ModelState::operator-(const ModelState &_state) const
       // Ignore exception, which is just the fact that a joint state may not
       // have been recorded.
     }
-  }
+  }*/
 
   return result;
 }

@@ -490,14 +490,19 @@ void World::Update()
   this->physicsEngine->GetContactManager()->PublishContacts();
 
   int currState = (this->stateToggle + 1) % 2;
+
+  std::cout << "Pose[" << this->GetEntity("sphere")->GetWorldPose() << "\n";
   this->prevStates[currState] = WorldState(shared_from_this());
   WorldState diffState = this->prevStates[currState] -
                          this->prevStates[this->stateToggle];
 
+  /*msgs::WorldState msg;
+  this->prevStates[currState].FillMsg(msg);
+  this->statePub->Publish(msg);
+  */
+
   if (!diffState.IsZero())
   {
-    std::cout << "Diffstate[" << diffState << "]\n";
-
     // Create and output a world state message.
     msgs::WorldState msg;
     diffState.FillMsg(msg);

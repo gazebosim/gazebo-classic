@@ -146,7 +146,7 @@ bool WorldState::IsZero() const
     result = result && (*iter).IsZero();
   }
 
-  return result;
+  return false;//result;
 }
 
 /////////////////////////////////////////////////
@@ -191,6 +191,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
       result.modelStates.push_back(*iter);
   }
 
+  std::cout << result << "\n";
   return result;
 }
 
