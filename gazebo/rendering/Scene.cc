@@ -1183,9 +1183,11 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
   for (int i = 0; i < _msg->model_size(); i++)
   {
-    boost::shared_ptr<msgs::Pose> pm(new msgs::Pose(_msg->model(i).pose()));
-    pm->set_name(_msg->model(i).name());
-    this->poseMsgs.push_front(pm);
+    //boost::shared_ptr<msgs::Pose> pm(new msgs::Pose(_msg->model(i).pose()));
+    //pm->set_name(_msg->model(i).name());
+    //this->poseMsgs.push_front(pm);
+    this->poseMsgs.push_front(_msg->model(i).pose());
+    this->poseMsgs.back().set_name(_msg->model(i).name());
 
     this->ProcessModelMsg(_msg->model(i));
   }
@@ -1277,10 +1279,11 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   for (int j = 0; j < _msg.link_size(); j++)
   {
     linkName = modelName + _msg.link(j).name();
-    boost::shared_ptr<msgs::Pose> pm2(
-        new msgs::Pose(_msg.link(j).pose()));
-    pm2->set_name(linkName);
-    this->poseMsgs.push_front(pm2);
+    //boost::shared_ptr<msgs::Pose> pm2(
+    //    new msgs::Pose(_msg.link(j).pose()));
+    //pm2->set_name(linkName);
+    this->poseMsgs.push_front(_msg.link(j).pose());
+    this->poseMsgs.front().set_name(linkName);
 
     if (_msg.link(j).has_inertial())
     {
@@ -1440,14 +1443,14 @@ void Scene::PreRender()
   pIter = this->poseMsgs.begin();
   while (pIter != this->poseMsgs.end())
   {
-    Visual_M::iterator iter = this->visuals.find((*pIter)->name());
+    Visual_M::iterator iter = this->visuals.find((*pIter).name());
     if (iter != this->visuals.end() && iter->second)
     {
       // If an object is selected, don't let the physics engine move it.
       if (!this->selectedVis || this->selectionMode != "move" ||
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
-        math::Pose pose = msgs::Convert(*(*pIter));
+        math::Pose pose = msgs::Convert(*pIter);
         iter->second->SetPose(pose);
         PoseMsgs_L::iterator prev = pIter++;
         this->poseMsgs.erase(prev);
@@ -1934,22 +1937,25 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::OnPoseMsg(ConstPosePtr &_msg)
+void Scene::OnPoseMsg(ConstPose_VPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   PoseMsgs_L::iterator iter;
 
-  // Find an old model message, and remove them
-  for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); ++iter)
+  for (int i = 0; i < _msg->pose_size(); ++i)
   {
-    if ((*iter)->name() == _msg->name())
+    // Find an old model message, and remove them
+    for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); ++iter)
     {
-      this->poseMsgs.erase(iter);
-      break;
+      if ((*iter).name() == _msg->pose(i).name())
+      {
+        this->poseMsgs.erase(iter);
+        break;
+      }
     }
-  }
 
-  this->poseMsgs.push_back(_msg);
+    this->poseMsgs.push_back(_msg->pose(i));
+  }
 }
 
 /////////////////////////////////////////////////

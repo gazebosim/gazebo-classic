@@ -34,6 +34,9 @@ using namespace gazebo;
 std::vector<std::string> params;
 
 common::Time hz_prev_time;
+common::Time bandwidth_prev_time;
+
+int bandwidth_bytes = 0;
 
 /////////////////////////////////////////////////
 void help()
@@ -156,6 +159,22 @@ void echo_cb(ConstGzStringPtr &_data)
 }
 
 /////////////////////////////////////////////////
+void bandwidth_cb(ConstGzStringPtr &_data)
+{
+  common::Time cur_time = common::Time::GetWallTime();
+
+  bandwidth_bytes += _data->ByteSize();
+
+  if (cur_time - bandwidth_prev_time > common::Time(1, 0))
+  {
+    printf("kB/s: %6.2f\n", (bandwidth_bytes / 1024.0) /
+        (cur_time - bandwidth_prev_time).Double());
+    bandwidth_bytes = 0;
+    bandwidth_prev_time = cur_time;
+  }
+}
+
+/////////////////////////////////////////////////
 void hz_cb(ConstGzStringPtr &/*_data*/)
 {
   common::Time cur_time = common::Time::GetWallTime();
@@ -245,6 +264,34 @@ void echo()
 }
 
 /////////////////////////////////////////////////
+void bandwidth()
+{
+  if (params[1].empty())
+  {
+    std::cerr << "Error: No topic specified.\n";
+    return;
+  }
+
+  transport::init();
+
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  std::string topic = params[1];
+  topic +=  "/__dbg";
+
+  transport::SubscriberPtr sub = node->Subscribe(topic, bandwidth_cb);
+
+  // Run the transport loop: starts a new thread
+  transport::run();
+
+  while (true)
+    common::Time::MSleep(10);
+
+  transport::fini();
+}
+
+/////////////////////////////////////////////////
 void hz()
 {
   if (params[1].empty())
@@ -286,4 +333,6 @@ int main(int argc, char **argv)
     echo();
   else if (params[0] == "hz")
     hz();
+  else if (params[0] == "bandwidth")
+    bandwidth();
 }

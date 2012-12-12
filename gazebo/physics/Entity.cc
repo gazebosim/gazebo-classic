@@ -77,7 +77,6 @@ Entity::~Entity()
   delete this->poseMsg;
   this->poseMsg = NULL;
 
-  this->posePub.reset();
   this->visPub.reset();
   this->requestPub.reset();
   this->poseSub.reset();
@@ -89,7 +88,6 @@ void Entity::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
   this->node->Init(this->GetWorld()->GetName());
-  this->posePub = this->node->Advertise<msgs::Pose>("~/pose/info", 10);
 
   this->poseSub = this->node->Subscribe("~/pose/modify",
       &Entity::OnPoseMsg, this);
@@ -212,23 +210,11 @@ void Entity::StopAnimation()
 //////////////////////////////////////////////////
 void Entity::PublishPose()
 {
-  if (this->posePub && this->posePub->HasConnections())
+  math::Pose relativePose = this->GetRelativePose();
+  if (relativePose != msgs::Convert(*this->poseMsg))
   {
-    math::Pose relativePose = this->GetRelativePose();
-    if (relativePose != msgs::Convert(*this->poseMsg))
-    {
-      msgs::Set(this->poseMsg, relativePose);
-      this->poseMsgs.push_back(this->poseMsg);
-      //this->posePub->Publish(*this->poseMsg);
-    }
-  }
-}
-
-//////////////////////////////////////////////////
-void Entity::SendPoseMsgs()
-{
-  for (std::list<msgs::Pose*>::iterator iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)
-  {
+    msgs::Set(this->poseMsg, relativePose);
+    this->world->EnqueueMsg(this->poseMsg);
   }
 }
 
