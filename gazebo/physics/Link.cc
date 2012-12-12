@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,18 +157,8 @@ void Link::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Link::Init()
 {
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-  {
-    if ((*iter)->HasType(Base::COLLISION))
-      boost::shared_static_cast<Collision>(*iter)->Init();
-  }
-
   this->SetKinematic(this->sdf->GetValueBool("kinematic"));
-
-  // If no collisions are attached, then don't let gravity affect the body.
-  if (this->children.size()== 0 || !this->sdf->GetValueBool("gravity"))
-    this->SetGravityMode(false);
+  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
 
   this->SetLinearDamping(this->GetLinearDamping());
   this->SetAngularDamping(this->GetAngularDamping());
@@ -232,9 +222,17 @@ void Link::Init()
 
   this->enabled = true;
 
-  // DO THIS LAST!
+  // Set Link pose before setting pose of child collisions
   this->SetRelativePose(this->sdf->GetValuePose("pose"));
   this->SetInitialRelativePose(this->sdf->GetValuePose("pose"));
+
+  // Call Init for child collisions, which whill set their pose
+  Base_V::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    if ((*iter)->HasType(Base::COLLISION))
+      boost::shared_static_cast<Collision>(*iter)->Init();
+  }
 }
 
 //////////////////////////////////////////////////

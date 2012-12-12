@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,7 +111,7 @@ namespace gazebo
 
       /// \brief Returns true if sensor generation is active.
       /// \return True if active, false if not.
-      public: bool IsActive();
+      public: virtual bool IsActive();
 
       /// \brief Get sensor type.
       /// \return Type of sensor.

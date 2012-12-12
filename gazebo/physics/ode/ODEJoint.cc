@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,26 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       this->SetParam(dParamVel,
           elem->GetElement("velocity")->GetValueDouble());
   }
+
+  if (this->sdf->HasElement("axis"))
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    if (axisElem->HasElement("dynamics"))
+    {
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+
+      if (dynamicsElem->HasElement("damping"))
+      {
+        this->SetDamping(0, dynamicsElem->GetValueDouble("damping"));
+      }
+      if (dynamicsElem->HasElement("friction"))
+      {
+        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+        gzwarn << "joint friction not implemented\n";
+      }
+    }
+  }
+
 
   // TODO: reimplement
   /*if (**this->provideFeedbackP)

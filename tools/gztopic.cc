@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,11 +130,20 @@ void list()
   packet.ParseFromString(data);
   pubs.ParseFromString(packet.serialized_data());
 
+  // This list is used to filter topic output.
+  std::list<std::string> listed;
+
   for (int i = 0; i < pubs.publisher_size(); i++)
   {
     const msgs::Publish &p = pubs.publisher(i);
-    if (p.topic().find("__dbg") == std::string::npos)
+    if (p.topic().find("__dbg") == std::string::npos &&
+        std::find(listed.begin(), listed.end(), p.topic()) == listed.end())
+    {
       std::cout << p.topic() << std::endl;
+
+      // Record the topics that have been listed to prevent duplicates.
+      listed.push_back(p.topic());
+    }
   }
 
   connection.reset();

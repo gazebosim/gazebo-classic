@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -615,9 +615,6 @@ void GLWidget::OnMouseReleaseTranslate()
       this->SetMouseMoveVisual(rendering::VisualPtr());
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     }
-  }
-  else
-  {
     this->SetSelectedVisual(rendering::VisualPtr());
     event::Events::setSelectedEntity("", "normal");
   }
@@ -664,7 +661,8 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
 
-  this->userCamera->SetWorldPose(math::Pose(-5, 0, 1, 0, GZ_DTOR(11.31), 0.0));
+  this->userCamera->SetWorldPose(math::Pose(5, -5, 2, 0,
+                                            GZ_DTOR(11.31), GZ_DTOR(135)));
 
   if (this->windowId >= 0)
   {

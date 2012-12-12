@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -610,6 +610,10 @@ namespace gazebo
 
       private: sdf::ElementPtr logPlayStateSDF;
       private: WorldState logPlayState;
+
+      /// \brief Store a factory SDF object to improve speed at which
+      /// objects are inserted via the factory.
+      private: sdf::SDFPtr factorySDF;
     };
     /// \}
   }

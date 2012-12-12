@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ using namespace rendering;
 unsigned int Light::lightCounter = 0;
 
 //////////////////////////////////////////////////
-Light::Light(Scene *_scene)
+Light::Light(ScenePtr _scene)
 {
   this->line = NULL;
   this->scene = _scene;
@@ -66,6 +66,8 @@ Light::~Light()
 
   this->sdf->Reset();
   this->sdf.reset();
+
+  this->scene.reset();
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
  * Author: Nate Koenig, Jordi Polo
  * Date: 3 May 2008
  */
-#define BOOST_FILESYSTEM_VERSION 2
 
 #include <assert.h>
 #include <dirent.h>
@@ -265,8 +264,7 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
     for (std::list<std::string>::iterator iter = this->modelPaths.begin();
          iter != this->modelPaths.end(); ++iter)
     {
-      path = boost::filesystem::path(*iter);
-      path = boost::filesystem::operator/(path, suffix);
+      path = boost::filesystem::path(*iter) / suffix;
       if (boost::filesystem::exists(path))
         break;
     }

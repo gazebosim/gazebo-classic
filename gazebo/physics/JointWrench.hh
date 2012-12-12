@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,21 +31,22 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class JointFeedback JointFeedback.hh physics/physics.hh
-    /// \brief Feedback information from a joint.  These are
-    /// forces and torques on parent and child Link's
-    class JointFeedback
+    /// \class JointWrench JointWrench.hh physics/physics.hh
+    /// \brief Wrench information from a joint.  These are
+    /// forces and torques on parent and child Links, relative to the Link's
+    /// center of mass.
+    class JointWrench
     {
       /// \brief Operator =
-      /// \param[in] _feedback Joint feedback to set from.
+      /// \param[in] _wrench Joint wrench to set from.
       /// \return *this
-      public: JointFeedback &operator =(const JointFeedback &_feedback)
+      public: JointWrench &operator =(const JointWrench &_wrench)
               {
-                this->body1Force = _feedback.body1Force;
-                this->body2Force = _feedback.body2Force;
+                this->body1Force = _wrench.body1Force;
+                this->body2Force = _wrench.body2Force;
 
-                this->body1Torque = _feedback.body1Torque;
-                this->body2Torque = _feedback.body2Torque;
+                this->body1Torque = _wrench.body1Torque;
+                this->body2Torque = _wrench.body2Torque;
                 return *this;
               }
 

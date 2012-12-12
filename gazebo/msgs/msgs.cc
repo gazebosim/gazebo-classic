@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -299,7 +299,7 @@ namespace gazebo
 
         if (camSDF->HasElement("pose"))
         {
-          msgs::Set(guiCam->mutable_origin(), camSDF->GetValuePose("pose"));
+          msgs::Set(guiCam->mutable_pose(), camSDF->GetValuePose("pose"));
         }
 
         if (camSDF->HasElement("view_controller"))
@@ -403,9 +403,15 @@ namespace gazebo
       msgs::Visual result;
 
       result.set_name(_sdf->GetValueString("name"));
-      result.set_cast_shadows(_sdf->GetValueBool("cast_shadows"));
-      result.set_transparency(_sdf->GetValueDouble("transparency"));
-      result.set_laser_retro(_sdf->GetValueDouble("laser_retro"));
+
+      if (_sdf->HasElement("cast_shadows"))
+        result.set_cast_shadows(_sdf->GetValueBool("cast_shadows"));
+
+      if (_sdf->HasElement("transparency"))
+        result.set_transparency(_sdf->GetValueDouble("transparency"));
+
+      if (_sdf->HasElement("laser_retro"))
+        result.set_laser_retro(_sdf->GetValueDouble("laser_retro"));
 
       // Load the geometry
       if (_sdf->HasElement("geometry"))

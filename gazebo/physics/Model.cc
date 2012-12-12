@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -189,6 +189,10 @@ void Model::Init()
 void Model::Update()
 {
   this->updateMutex->lock();
+
+  for (Joint_V::iterator jiter = this->joints.begin();
+       jiter != this->joints.end(); ++jiter)
+    (*jiter)->Update();
 
   if (this->jointController)
     this->jointController->Update();
@@ -981,5 +985,11 @@ void Model::SetAutoDisable(bool _auto)
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     if (*iter && (*iter)->HasType(LINK))
       boost::static_pointer_cast<Link>(*iter)->SetAutoDisable(_auto);
+}
+
+/////////////////////////////////////////////////
+bool Model::GetAutoDisable() const
+{
+  return this->sdf->GetValueBool("allow_auto_disable");
 }
 

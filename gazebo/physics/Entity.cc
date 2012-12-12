@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -226,7 +226,11 @@ void Entity::PublishPose()
 //////////////////////////////////////////////////
 math::Pose Entity::GetRelativePose() const
 {
-  if (this->IsCanonicalLink())
+  // We return the initialRelativePose for COLLISION objects because they
+  // cannot move relative to their parent link.
+  // \todo Look into storing relative poses for all objects instead of world
+  // poses. It may simplify pose updating.
+  if (this->IsCanonicalLink() || this->HasType(COLLISION))
   {
     return this->initialRelativePose;
   }
@@ -299,17 +303,16 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 
   // force an update of all children
   // update all children pose, moving them with the model.
+  // The outer loop updates all the links.
   for (Base_V::iterator iter = this->children.begin();
-       iter != this->childrenEnd; ++iter)
+      iter != this->childrenEnd; ++iter)
   {
     if ((*iter)->HasType(ENTITY))
     {
       EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
 
       if (entity->IsCanonicalLink())
-      {
         entity->worldPose = (entity->initialRelativePose + _pose);
-      }
       else
       {
         entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
@@ -399,11 +402,10 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
 //
 void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
 {
-  this->GetWorld()->GetSetWorldPoseMutex()->lock();
+  boost::mutex::scoped_lock lock(*this->GetWorld()->GetSetWorldPoseMutex());
 
+  math::Pose oldPose = this->worldPose;
   (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
-
-  this->GetWorld()->GetSetWorldPoseMutex()->unlock();
 
   if (_publish)
     this->PublishPose();

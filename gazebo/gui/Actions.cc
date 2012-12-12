@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,10 +44,16 @@ QAction *gazebo::gui::g_pointLghtCreateAct = 0;
 QAction *gazebo::gui::g_spotLghtCreateAct = 0;
 QAction *gazebo::gui::g_dirLghtCreateAct = 0;
 
-QAction *gazebo::gui::g_viewGridAct = 0;
-QAction *gazebo::gui::g_viewResetAct = 0;
-QAction *gazebo::gui::g_viewFullScreenAct = 0;
-QAction *gazebo::gui::g_viewFPSAct = 0;
-QAction *gazebo::gui::g_viewOrbitAct = 0;
+QAction *gazebo::gui::g_showCollisionsAct = 0;
+QAction *gazebo::gui::g_showGridAct = 0;
+QAction *gazebo::gui::g_showContactsAct = 0;
+QAction *gazebo::gui::g_showJointsAct = 0;
+QAction *gazebo::gui::g_showCOMAct = 0;
+QAction *gazebo::gui::g_transparentAct = 0;
+
+QAction *gazebo::gui::g_resetAct = 0;
+QAction *gazebo::gui::g_fullScreenAct = 0;
+QAction *gazebo::gui::g_fpsAct = 0;
+QAction *gazebo::gui::g_orbitAct = 0;
 
 gazebo::gui::DeleteAction *gazebo::gui::g_deleteAct = 0;

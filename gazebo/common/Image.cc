@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,14 +54,6 @@ Image::Image(const std::string &_filename)
       this->Load(filename);
     else
       gzerr << "Unable to find image[" << _filename << "]\n";
-  }
-  else
-  {
-      /// @todo: fixme: this error shows for any
-      /// regular constructor without a filename
-      /// a parameter, since it defaults to empty.
-      /// is this error really needed?
-      gzerr << "Image filename is empty.\n";
   }
 }
 
@@ -399,7 +391,7 @@ std::string Image::GetFilename() const
 //////////////////////////////////////////////////
 Image::PixelFormat Image::GetPixelFormat() const
 {
-  Image::PixelFormat fmt = UNKNOWN;
+  Image::PixelFormat fmt = UNKNOWN_PIXEL_FORMAT;
   FREE_IMAGE_TYPE type = FreeImage_GetImageType(this->bitmap);
 
   unsigned int redMask = FreeImage_GetRedMask(this->bitmap);
@@ -425,3 +417,14 @@ Image::PixelFormat Image::GetPixelFormat() const
 
   return fmt;
 }
+
+/////////////////////////////////////////////////
+Image::PixelFormat Image::ConvertPixelFormat(const std::string &_format)
+{
+  for (unsigned int i = 0; i < PIXEL_FORMAT_COUNT; ++i)
+    if (PixelFormatNames[i] == _format)
+      return static_cast<PixelFormat>(i);
+
+  return UNKNOWN_PIXEL_FORMAT;
+}
+

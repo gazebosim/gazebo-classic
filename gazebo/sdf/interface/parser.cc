@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#define BOOST_FILESYSTEM_VERSION 2
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -575,8 +574,23 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
               gzerr << "No <model> element in manifest[" << manifest << "]\n";
             else
             {
-              filename = modelPath + "/" +
-                         modelXML->FirstChildElement("sdf")->GetText();
+              TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");
+              TiXmlElement *sdfSearch = sdfXML;
+
+              // Find the SDF element that matches our current SDF version.
+              while (sdfSearch)
+              {
+                if (sdfSearch->Attribute("version") &&
+                    std::string(sdfSearch->Attribute("version")) == SDF_VERSION)
+                {
+                  sdfXML = sdfSearch;
+                  break;
+                }
+
+                sdfSearch = sdfSearch->NextSiblingElement("sdf");
+              }
+
+              filename = modelPath + "/" + sdfXML->GetText();
             }
           }
         }
