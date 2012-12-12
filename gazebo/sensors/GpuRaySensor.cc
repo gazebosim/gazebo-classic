@@ -269,7 +269,19 @@ double GpuRaySensor::GetHAngle() const
 }
 
 //////////////////////////////////////////////////
+double GpuRaySensor::GetHorzHalfAngle() const
+{
+  return this->horzHalfAngle;
+}
+
+//////////////////////////////////////////////////
 double GpuRaySensor::GetVAngle() const
+{
+  return this->vertHalfAngle;
+}
+
+//////////////////////////////////////////////////
+double GpuRaySensor::GetVertHalfAngle() const
 {
   return this->vertHalfAngle;
 }
