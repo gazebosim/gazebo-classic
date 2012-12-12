@@ -1585,5 +1585,19 @@ void World::PublishWorldStats()
 void World::EnqueueMsg(msgs::Pose *_msg)
 {
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
-  this->poseMsgs.add_pose()->CopyFrom(*_msg);
+  int i = 0;
+
+  // Replace old pose messages with the new one.
+  for (; i < this->poseMsgs.pose_size(); ++i)
+  {
+    if (this->poseMsgs.pose(i).name() == _msg->name())
+    {
+      this->poseMsgs.mutable_pose(i)->CopyFrom(*_msg);
+      break;
+    }
+  }
+
+  // Add the pose message if no old pose messages were found.
+  if (i >= this->poseMsgs.pose_size())
+      this->poseMsgs.add_pose()->CopyFrom(*_msg);
 }
