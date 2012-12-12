@@ -1447,11 +1447,7 @@ void Scene::PreRender()
       if (!this->selectedVis || this->selectionMode != "move" ||
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
-        math::Pose pose = msgs::Convert(*poseIter);
-        //iter->second->SetPose(pose);
-
-        iter->second->SetPosition(pose.pos + iter->second->GetPosition());
-        // iter->second->SetRotation(pose.rot * iter->second->GetRotation());
+        iter->second->SetPose(msgs::Convert(*poseIter));
         this->poseDeltas.erase(poseIter++);
       }
       else
@@ -1963,13 +1959,17 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnStateMsg(ConstWorldStatePtr &_msg)
 {
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+
+  this->poseDeltas.clear();
+
   for (int i = 0; i < _msg->model_state_size(); ++i)
   {
     msgs::ModelState modelState = _msg->model_state(i);
     this->poseDeltas.push_back(modelState.pose());
     this->poseDeltas.back().set_name(modelState.name());
 
-    for (int j = 0; j < modelState.link_state_size(); ++j)
+    /*for (int j = 0; j < modelState.link_state_size(); ++j)
     {
       msgs::LinkState linkState = modelState.link_state(j);
       this->poseDeltas.push_back(linkState.pose());
@@ -1981,7 +1981,7 @@ void Scene::OnStateMsg(ConstWorldStatePtr &_msg)
         this->poseDeltas.push_back(collisionState.pose());
         this->poseDeltas.back().set_name(collisionState.name());
       }
-    }
+    }*/
   }
 }
 

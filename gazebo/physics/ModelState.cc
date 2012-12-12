@@ -130,7 +130,7 @@ bool ModelState::IsZero() const
   }
 
   // return result && this->pose == math::Pose::Zero;
-  return false;//this->pose == math::Pose::Zero;
+  return this->pose == math::Pose::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -240,7 +240,15 @@ ModelState ModelState::operator-(const ModelState &_state) const
 {
   ModelState result;
 
+  if (this->name != _state.name)
+    gzerr << "Subtracting two model states with different names: "
+          << "[" << this->name << "] - [" << _state.name << "]\n";
+
   result.name = this->name;
+
+  if (this->name == "sphere")
+    std::cout << "Subtract[" << this->pose.pos << "] - [" << _state.pose.pos << "]\n";
+
   result.pose.pos = this->pose.pos - _state.pose.pos;
   //result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
 

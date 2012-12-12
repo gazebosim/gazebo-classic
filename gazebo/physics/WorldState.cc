@@ -146,7 +146,7 @@ bool WorldState::IsZero() const
     result = result && (*iter).IsZero();
   }
 
-  return false;//result;
+  return result;
 }
 
 /////////////////////////////////////////////////
