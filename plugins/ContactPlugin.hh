@@ -28,7 +28,8 @@
 
 namespace gazebo
 {
-  /// \brief An example plugin for a contact sensor.
+  /// \brief A plugin for a contact sensor. Inherit from this class to make
+  /// your own contact plugin.
   class ContactPlugin : public SensorPlugin
   {
     /// \brief Constructor.
@@ -43,6 +44,8 @@ namespace gazebo
     public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 
     /// \brief Callback that recieves the contact sensor's update signal.
+    /// Override this this function to get callbacks when the contact sensor
+    /// is updated with new data.
     private: virtual void OnUpdate();
 
     /// \brief Pointer to the contact sensor
