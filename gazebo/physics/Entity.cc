@@ -218,8 +218,17 @@ void Entity::PublishPose()
     if (relativePose != msgs::Convert(*this->poseMsg))
     {
       msgs::Set(this->poseMsg, relativePose);
-      this->posePub->Publish(*this->poseMsg);
+      this->poseMsgs.push_back(this->poseMsg);
+      //this->posePub->Publish(*this->poseMsg);
     }
+  }
+}
+
+//////////////////////////////////////////////////
+void Entity::SendPoseMsgs()
+{
+  for (std::list<msgs::Pose*>::iterator iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)
+  {
   }
 }
 
