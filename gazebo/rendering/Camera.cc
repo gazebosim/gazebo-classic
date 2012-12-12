@@ -489,6 +489,16 @@ void Camera::SetClipDist(float _near, float _far)
 void Camera::SetHFOV(math::Angle _angle)
 {
   this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
+
+  if (this->camera)
+  {
+    double ratio = static_cast<double>(this->imageWidth) /
+                   static_cast<double>(this->imageHeight);
+    double hfov = this->GetHFOV().Radian();
+    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+    this->camera->setAspectRatio(ratio);
+    this->camera->setFOVy(Ogre::Radian(vfov));
+  }
 }
 
 //////////////////////////////////////////////////
