@@ -96,8 +96,8 @@ void GpuLaser::Fini()
 //////////////////////////////////////////////////
 void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 {
-  this->camera->yaw(Ogre::Radian(this->parent_sensor->GetHAngle()));
-  this->camera->pitch(Ogre::Radian(this->parent_sensor->GetVAngle()));
+  this->camera->yaw(Ogre::Radian(this->parent_sensor->GetHorzHalfAngle()));
+  this->camera->pitch(Ogre::Radian(this->parent_sensor->GetVertHalfAngle()));
 
   this->CreateOrthoCam();
 
@@ -493,8 +493,8 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *target, unsigned int index)
   }
   if (index == 0)
   {
-    this->camera->setAspectRatio(this->parent_sensor->Get1stRatio());
-    this->camera->setFOVy(Ogre::Radian(this->parent_sensor->GetVFOV()));
+    this->camera->setAspectRatio(this->parent_sensor->GetRayCountRatio());
+    this->camera->setFOVy(Ogre::Radian(this->parent_sensor->GetVertFOV()));
   }
 }
 
@@ -529,7 +529,7 @@ void GpuLaser::SetRangeCount(unsigned int _w, unsigned int _h)
 }
 
 /////////////////////////////////////////////////
-void GpuLaser::SetParentSensor(sensors::GpuRaySensorPtr parent)
+void GpuLaser::SetParentSensor(sensors::GpuRaySensor* parent)
 {
   this->parent_sensor = parent;
 }
@@ -559,7 +559,7 @@ void GpuLaser::CreateMesh()
   double start_x = dx;
   double start_y = view_height;
 
-  double phi = this->parent_sensor->GetVFOV() / 2;
+  double phi = this->parent_sensor->GetVertFOV() / 2;
 
   double v_ang_min = -phi;
 

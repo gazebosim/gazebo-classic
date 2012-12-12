@@ -120,7 +120,7 @@ namespace gazebo
 
       /// \brief Set the parent sensor
       /// \param[in] _parent Pointer to a sensors::GpuRaySensor
-      public: void SetParentSensor(sensors::GpuRaySensorPtr _parent);
+      public: void SetParentSensor(sensors::GpuRaySensor* _parent);
 
       /// \internal
       /// \brief Implementation of Ogre::RenderObjectListener
@@ -206,7 +206,7 @@ namespace gazebo
       private: unsigned int w2nd;
       private: unsigned int h2nd;
 
-      private: sensors::GpuRaySensorPtr parent_sensor;
+      private: sensors::GpuRaySensor* parent_sensor;
       private: double lastRenderDuration;
 
       private: std::vector<int> texIdx;
