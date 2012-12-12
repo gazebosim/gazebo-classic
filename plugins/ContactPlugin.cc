@@ -61,12 +61,12 @@ void ContactPlugin::OnUpdate()
   // Get all the contacts.
   msgs::Contacts contacts;
   contacts = this->parentSensor->GetContacts();
-  for (unsigned int i = 0; i < contacts.contact_size(); ++i)
+  for (int i = 0; i < contacts.contact_size(); ++i)
   {
     std::cout << "Collision between[" << contacts.contact(i).collision1()
               << "] and [" << contacts.contact(i).collision2() << "]\n";
 
-    for (unsigned int j = 0; j < contacts.contact(i).position_size(); ++j)
+    for (int j = 0; j < contacts.contact(i).position_size(); ++j)
     {
       std::cout << j << "  Position:"
                 << contacts.contact(i).position(j).x() << " "
