@@ -28,6 +28,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/math/Rand.hh"
 
 #include "gazebo/sdf/sdf.hh"
 #include "gazebo/transport/Node.hh"
@@ -871,6 +872,12 @@ void World::OnControl(ConstWorldControlPtr &_data)
 
   if (_data->has_step())
     this->OnStep();
+
+  if (_data->has_seed())
+  {
+    math::Rand::SetSeed(_data->seed());
+    this->physicsEngine->SetSeed(_data->seed());
+  }
 
   if (_data->has_reset())
   {

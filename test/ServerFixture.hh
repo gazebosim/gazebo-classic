@@ -47,7 +47,6 @@ class ServerFixture : public testing::Test
 {
   protected: ServerFixture()
              {
-               this->receiveMutex = new boost::mutex();
                this->server = NULL;
                this->serverRunning = false;
                this->paused = false;
@@ -80,7 +79,6 @@ class ServerFixture : public testing::Test
   protected: virtual void TearDown()
              {
                this->Unload();
-               delete this->receiveMutex;
              }
 
   protected: virtual void Unload()
@@ -187,31 +185,29 @@ class ServerFixture : public testing::Test
 
   protected: void OnPose(ConstPose_VPtr &_msg)
              {
-               this->receiveMutex->lock();
+               boost::mutex::scoped_lock lock(this->receiveMutex);
                for (int i = 0; i < _msg->pose_size(); ++i)
                {
                  this->poses[_msg->pose(i).name()] =
                    msgs::Convert(_msg->pose(i));
                }
-               this->receiveMutex->unlock();
              }
 
   protected: math::Pose GetEntityPose(const std::string &_name)
              {
+               boost::mutex::scoped_lock lock(this->receiveMutex);
+
                std::map<std::string, math::Pose>::iterator iter;
-               this->receiveMutex->lock();
                iter = this->poses.find(_name);
                EXPECT_TRUE(iter != this->poses.end());
-               this->receiveMutex->unlock();
                return iter->second;
              }
 
   protected: bool HasEntity(const std::string &_name)
              {
+               boost::mutex::scoped_lock lock(this->receiveMutex);
                std::map<std::string, math::Pose>::iterator iter;
-               this->receiveMutex->lock();
                iter = this->poses.find(_name);
-               this->receiveMutex->unlock();
                return iter != this->poses.end();
              }
 
@@ -576,7 +572,7 @@ class ServerFixture : public testing::Test
   protected: transport::PublisherPtr factoryPub;
 
   protected: std::map<std::string, math::Pose> poses;
-  protected: boost::mutex *receiveMutex;
+  protected: boost::mutex receiveMutex;
 
   private: unsigned char **imgData;
   private: int gotImage;
