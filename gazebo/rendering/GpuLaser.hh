@@ -27,6 +27,7 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
+#include "rendering/RenderTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 
 #include "gazebo/common/Event.hh"
@@ -71,7 +72,7 @@ namespace gazebo
       /// \param[in] _scene Scene that will contain the camera
       /// \param[in] _autoRender Almost everyone should leave this as true.
       public: GpuLaser(const std::string &_namePrefix,
-                          Scene *_scene, bool _autoRender = true);
+                          ScenePtr _scene, bool _autoRender = true);
 
       /// \brief Destructor
       public: virtual ~GpuLaser();
@@ -119,7 +120,7 @@ namespace gazebo
 
       /// \brief Set the parent sensor
       /// \param[in] _parent Pointer to a sensors::GpuRaySensor
-      public: void SetParentSensor(sensors::GpuRaySensor *_parent);
+      public: void SetParentSensor(sensors::GpuRaySensorPtr _parent);
 
       /// \internal
       /// \brief Implementation of Ogre::RenderObjectListener
@@ -205,7 +206,7 @@ namespace gazebo
       private: unsigned int w2nd;
       private: unsigned int h2nd;
 
-      private: sensors::GpuRaySensor *parent_sensor;
+      private: sensors::GpuRaySensorPtr parent_sensor;
       private: double lastRenderDuration;
 
       private: std::vector<int> texIdx;
