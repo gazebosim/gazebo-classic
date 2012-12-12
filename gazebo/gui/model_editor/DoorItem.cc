@@ -77,7 +77,7 @@ void DoorItem::paint (QPainter *_painter,
   this->doorWidth = this->drawingWidth;
   this->doorPos = this->pos();
 
-  QGraphicsPolygonItem::paint(_painter, _option, _widget);
+//  QGraphicsPolygonItem::paint(_painter, _option, _widget);
 }
 
 /////////////////////////////////////////////////

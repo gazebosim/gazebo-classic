@@ -57,11 +57,12 @@ PolylineItem::~PolylineItem()
 void PolylineItem::SetThickness(double _thickness)
 {
   this->lineThickness = _thickness;
-  for (unsigned int i = 0; i < segments.size(); ++i)
+  QPen segmentPen = this->pen();
+  segmentPen.setWidth(_thickness);
+  this->setPen(segmentPen);
+  for (unsigned int i = 0; i < this->segments.size(); ++i)
   {
-    QPen segmentPen = this->pen();
-    segmentPen.setWidth(_thickness);
-    this->setPen(segmentPen);
+    this->segments[i]->setPen(segmentPen);
   }
 }
 
@@ -326,7 +327,7 @@ void PolylineItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
     this->scene()->clearSelection();
 
   this->setSelected(true);
-  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));  
+  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
 
   this->origin = this->pos();
   _event->setAccepted(true);
@@ -394,8 +395,10 @@ void PolylineItem::drawBoundingBox(QPainter *_painter)
 {
   _painter->save();
   QPen boundingBoxPen;
-  boundingBoxPen.setStyle(Qt::SolidLine);
+  boundingBoxPen.setStyle(Qt::DashDotLine);
   boundingBoxPen.setColor(Qt::darkGray);
+  boundingBoxPen.setCapStyle(Qt::RoundCap);
+  boundingBoxPen.setJoinStyle(Qt::RoundJoin);
   _painter->setPen(boundingBoxPen);
   _painter->setOpacity(0.8);
   _painter->drawRect(this->boundingRect());
@@ -408,8 +411,8 @@ void PolylineItem::paint(QPainter *_painter,
 {
   _painter->save();
 
-//  if (this->isSelected())
-//    this->drawBoundingBox(_painter);
+  if (this->isSelected())
+    this->drawBoundingBox(_painter);
   this->showCorners(this->isSelected());
 
   QPen wallBorderPen;
@@ -420,6 +423,5 @@ void PolylineItem::paint(QPainter *_painter,
   _painter->drawPath(this->path());
   _painter->restore();
 
-  QGraphicsPathItem::paint(_painter, _option, _widget);
-
+//  QGraphicsPathItem::paint(_painter, _option, _widget);
 }

@@ -28,7 +28,7 @@ namespace gazebo
 
     class RotateHandle;
 
-    class RectItem : public QGraphicsPolygonItem
+    class RectItem : public QGraphicsItem
     {
         public: RectItem();
 
@@ -66,6 +66,8 @@ namespace gazebo
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
         private: virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
+
+        private: virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *_event);
 
         private: virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *_event);
 

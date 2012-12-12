@@ -49,17 +49,10 @@ RectItem::RectItem():
   this->UpdateCornerPositions();
   this->setAcceptHoverEvents(true);
 
-  QPen transparentPen(QColor(0, 0, 0, 0));
-  this->setPen(transparentPen);
-
   cursors.push_back(Qt::SizeFDiagCursor);
-  cursors.push_back(Qt::SizeBDiagCursor);
-  cursors.push_back(Qt::SizeFDiagCursor);
+  cursors.push_back(Qt::SizeVerCursor);
   cursors.push_back(Qt::SizeBDiagCursor);
   cursors.push_back(Qt::SizeHorCursor);
-  cursors.push_back(Qt::SizeVerCursor);
-  cursors.push_back(Qt::SizeHorCursor);
-  cursors.push_back(Qt::SizeVerCursor);
 
   this->setCursor(Qt::SizeAllCursor);
 
@@ -136,6 +129,17 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
       _rotate->SetMouseState(QEvent::GraphicsSceneMouseMove);
       break;
     }
+    case QEvent::GraphicsSceneHoverEnter:
+    case QEvent::GraphicsSceneHoverMove:
+    {
+      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+      return true;
+    }
+    case QEvent::GraphicsSceneHoverLeave:
+    {
+      QApplication::restoreOverrideCursor();
+      return true;
+    }
     default:
       return false;
       break;
@@ -195,49 +199,46 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
       break;
     }
     case QEvent::GraphicsSceneHoverEnter:
+    case QEvent::GraphicsSceneHoverMove:
     {
-
-
       double angle = this->rotationAngle
           - static_cast<int>(rotationAngle/360) * 360;
       double range = 22.5;
       if (angle < 0)
         angle += 360;
 
-      qDebug() << "angle " << angle;
-
-      if ((angle > (360 - range)) || (angle < range))
-      {
-        QApplication::setOverrideCursor(QCursor(cursors[_corner->GetIndex()]));
-      }
-      /*else if ((angle <= (360 - range)) && (angle > (180 + range)))
+      if ((angle > (360 - range)) || (angle < range)
+          || ((angle <= (180 + range)) && (angle > (180 - range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(cursors[_corner->GetIndex() + 4 % 8]));
+            QCursor(cursors[_corner->GetIndex() % 4]));
       }
-      else if ((angle <= (180 + range)) && (angle > (180 - range)))
+      else if (((angle <= (360 - range)) && (angle > (270 + range)))
+          || ((angle <= (180 - range)) && (angle > (90 + range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(cursors[_corner->GetIndex()]));
+            QCursor(cursors[(_corner->GetIndex() + 3) % 4]));
+      }
+      else if (((angle <= (270 + range)) && (angle > (270 - range)))
+          || ((angle <= (90 + range)) && (angle > (90 - range))))
+      {
+        QApplication::setOverrideCursor(
+            QCursor(cursors[(_corner->GetIndex() + 2) % 4]));
       }
       else
       {
         QApplication::setOverrideCursor(
-            QCursor(cursors[_corner->GetIndex() + 4 % 8]));
-      }*/
-
+            QCursor(cursors[(_corner->GetIndex() + 1) % 4]));
+      }
       return true;
-      break;
     }
     case QEvent::GraphicsSceneHoverLeave:
     {
       QApplication::restoreOverrideCursor();
       return true;
-      break;
     }
     default:
       return false;
-      break;
   }
 
   if (mouseEvent == NULL)
@@ -264,47 +265,47 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
         yAxisSign = 1;
         break;
       }
-      case 1:
+      case 2:
       {
         xAxisSign = -1;
         yAxisSign = 1;
         break;
       }
-      case 2:
+      case 4:
       {
         xAxisSign = -1;
         yAxisSign = -1;
         break;
       }
-      case 3:
+      case 6:
       {
         xAxisSign = +1;
         yAxisSign = -1;
         break;
       }
       //edges
-      case 4:
+      case 1:
       {
-        xAxisSign = 1;
+        xAxisSign = 0;
+        yAxisSign = 1;
+        break;
+      }
+      case 3:
+      {
+        xAxisSign = -1;
         yAxisSign = 0;
         break;
       }
       case 5:
       {
         xAxisSign = 0;
-        yAxisSign = 1;
-        break;
-      }
-      case 6:
-      {
-        xAxisSign = -1;
-        yAxisSign = 0;
+        yAxisSign = -1;
         break;
       }
       case 7:
       {
-        xAxisSign = 0;
-        yAxisSign = -1;
+        xAxisSign = 1;
+        yAxisSign = 0;
         break;
       }
       default:
@@ -338,20 +339,21 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
     double dy = 0;
     switch(_corner->GetIndex())
     {
+      // corners
       case 0:
       {
         this->setPos(this->pos() +
             (mouseEvent->scenePos() - mouseEvent->lastScenePos()));
         break;
       }
-      case 1:
+      case 2:
       {
         dx = sin(-angle) * deltaHeight;
         dy = cos(-angle) * deltaHeight;
         this->setPos(this->pos() + QPointF(dx, dy));
         break;
       }
-      case 3:
+      case 6:
       {
         dx = cos(angle) * deltaWidth;
         dy = sin(angle) * deltaWidth;
@@ -359,17 +361,18 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
 
         break;
       }
-      case 4:
-      {
-        dx = cos(angle) * deltaWidth;
-        dy = sin(angle) * deltaWidth;
-        this->setPos(this->pos() + QPointF(dx, dy));
-        break;
-      }
-      case 5:
+      // edges
+      case 1:
       {
         dx = sin(-angle) * deltaHeight;
         dy = cos(-angle) * deltaHeight;
+        this->setPos(this->pos() + QPointF(dx, dy));
+        break;
+      }
+      case 7:
+      {
+        dx = cos(angle) * deltaWidth;
+        dy = sin(angle) * deltaWidth;
         this->setPos(this->pos() + QPointF(dx, dy));
         break;
       }
@@ -401,6 +404,7 @@ void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
   if (!this->isSelected())
     this->scene()->clearSelection();
+
 //  QGraphicsItem::mousePressEvent(_event);
 //  return;
   this->setSelected(true);
@@ -458,6 +462,20 @@ void RectItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 }
 
 /////////////////////////////////////////////////
+void RectItem::hoverMoveEvent(QGraphicsSceneHoverEvent *)
+{
+  if (!this->isSelected())
+    return;
+
+  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
+
+//    this->borderColor = Qt::red;
+  for (int i = 0; i < 8; ++i)
+    this->corners[i]->installSceneEventFilter(this);
+  this->rotateHandle->installSceneEventFilter(this);
+}
+
+/////////////////////////////////////////////////
 void RectItem::UpdateCornerPositions()
 {
   int cornerWidth = (this->corners[0]->boundingRect().width())/2;
@@ -465,26 +483,26 @@ void RectItem::UpdateCornerPositions()
 
   this->corners[0]->setPos(this->drawingOriginX - cornerWidth,
       this->drawingOriginY - cornerHeight);
-  this->corners[1]->setPos(this->drawingWidth - cornerWidth,
-      this->drawingOriginY - cornerHeight);
   this->corners[2]->setPos(this->drawingWidth - cornerWidth,
+      this->drawingOriginY - cornerHeight);
+  this->corners[4]->setPos(this->drawingWidth - cornerWidth,
       this->drawingHeight - cornerHeight);
-  this->corners[3]->setPos(this->drawingOriginX - cornerWidth,
+  this->corners[6]->setPos(this->drawingOriginX - cornerWidth,
       this->drawingHeight - cornerHeight);
 
-  this->corners[4]->setPos(this->drawingOriginX - cornerWidth,
+  this->corners[1]->setPos(this->drawingWidth/2 - cornerWidth,
+      this->drawingOriginY - cornerHeight);
+  this->corners[3]->setPos(this->drawingWidth - cornerWidth,
       this->drawingHeight/2 - cornerHeight);
   this->corners[5]->setPos(this->drawingWidth/2 - cornerWidth,
-      this->drawingOriginY - cornerHeight);
-  this->corners[6]->setPos(this->drawingWidth - cornerWidth,
-      this->drawingHeight/2 - cornerHeight);
-  this->corners[7]->setPos(this->drawingWidth/2 - cornerWidth,
       this->drawingHeight - cornerHeight);
+  this->corners[7]->setPos(this->drawingOriginX - cornerWidth,
+      this->drawingHeight/2 - cornerHeight);
 
   this->rotateHandle->setPos(this->drawingWidth/2,
       this->drawingOriginY);
 
-  this->setPolygon(QPolygonF(this->boundingRect()));
+//  this->setPolygon(QPolygonF(this->boundingRect()));
 }
 
 /////////////////////////////////////////////////
@@ -540,13 +558,14 @@ void RectItem::drawBoundingBox(QPainter *_painter)
 {
   _painter->save();
   QPen boundingBoxPen;
-  boundingBoxPen.setStyle(Qt::SolidLine);
+  boundingBoxPen.setStyle(Qt::DashDotLine);
   boundingBoxPen.setColor(Qt::darkGray);
+  boundingBoxPen.setCapStyle(Qt::RoundCap);
+  boundingBoxPen.setJoinStyle(Qt::RoundJoin);
   _painter->setPen(boundingBoxPen);
   _painter->setOpacity(0.8);
   _painter->drawRect(this->boundingRect());
   _painter->restore();
-
 }
 
 /////////////////////////////////////////////////

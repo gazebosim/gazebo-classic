@@ -58,8 +58,8 @@ void WindowItem::paint(QPainter *_painter,
   QPointF midLeft(this->drawingOriginX, this->drawingHeight/2.0);
   QPointF midRight(this->drawingWidth, this->drawingHeight/2.0);
 
-  //if (this->isSelected())
-  //  this->drawBoundingBox(_painter);
+  if (this->isSelected())
+    this->drawBoundingBox(_painter);
   this->showCorners(this->isSelected());
 
   QPen windowPen;
@@ -78,7 +78,7 @@ void WindowItem::paint(QPainter *_painter,
   this->windowWidth = this->drawingWidth;
   this->windowPos = this->pos();
 
-  QGraphicsPolygonItem::paint(_painter, _option, _widget);
+//  QGraphicsPolygonItem::paint(_painter, _option, _widget);
 }
 
 /////////////////////////////////////////////////

@@ -27,8 +27,8 @@ CornerGrabber::CornerGrabber(QGraphicsItem *_parent, int _index) :
   mouseDownX(0),
   mouseDownY(0),
   borderColor(Qt::black),
-  width(6),
-  height(6),
+  width(8),
+  height(8),
   mouseButtonState(QEvent::GraphicsSceneMouseRelease)
 {
   this->setParentItem(_parent);
@@ -152,11 +152,11 @@ void CornerGrabber::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
+void CornerGrabber::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
 {
   this->borderColor = Qt::black;
   this->update(0, 0, this->width, this->height);
-
+  QGraphicsItem::hoverLeaveEvent(_event);
 }
 
 /////////////////////////////////////////////////
