@@ -40,7 +40,8 @@ ODEHingeJoint::ODEHingeJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEHingeJoint::~ODEHingeJoint()
 {
-  physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  if (this->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
 //////////////////////////////////////////////////
