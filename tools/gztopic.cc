@@ -51,6 +51,7 @@ void help()
             << "    info <topic> : Get information about a topic\n"
             << "    echo <topic> : Output topic data to screen\n"
             << "    hz <topic>   : Get publish frequency\n"
+            << "    bw <topic>   : Get topic bandwidth\n"
             << "    help         : This help text\n";
 }
 
