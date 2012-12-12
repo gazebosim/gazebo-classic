@@ -353,7 +353,7 @@ void Server::Run()
   while (!this->stop)
   {
     this->ProcessControlMsgs();
-    sensors::run_once(true);
+    sensors::run_once();
     common::Time::MSleep(1);
   }
 
