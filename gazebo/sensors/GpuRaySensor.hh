@@ -46,8 +46,7 @@ namespace gazebo
     /// This sensor cast rays into the world, tests for intersections, and
     /// reports the range to the nearest object.  It is used by ranging
     /// sensor models (e.g., sonars and scanning laser range finders).
-    class GpuRaySensor: public Sensor,
-                        boost::enable_shared_from_this<GpuRaySensor>
+    class GpuRaySensor: public Sensor
     {
       /// \brief Constructor
       public: GpuRaySensor();
