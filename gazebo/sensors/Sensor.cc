@@ -132,6 +132,7 @@ void Sensor::Update(bool _force)
     {
       this->lastUpdateTime = this->world->GetSimTime();
       this->UpdateImpl(_force);
+      this->updated();
     }
   }
 }
