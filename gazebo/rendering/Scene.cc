@@ -1183,9 +1183,6 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
   for (int i = 0; i < _msg->model_size(); i++)
   {
-    //boost::shared_ptr<msgs::Pose> pm(new msgs::Pose(_msg->model(i).pose()));
-    //pm->set_name(_msg->model(i).name());
-    //this->poseMsgs.push_front(pm);
     this->poseMsgs.push_front(_msg->model(i).pose());
     this->poseMsgs.back().set_name(_msg->model(i).name());
 
@@ -1279,16 +1276,12 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   for (int j = 0; j < _msg.link_size(); j++)
   {
     linkName = modelName + _msg.link(j).name();
-    //boost::shared_ptr<msgs::Pose> pm2(
-    //    new msgs::Pose(_msg.link(j).pose()));
-    //pm2->set_name(linkName);
     this->poseMsgs.push_front(_msg.link(j).pose());
     this->poseMsgs.front().set_name(linkName);
 
     if (_msg.link(j).has_inertial())
     {
-      boost::shared_ptr<msgs::Link> lm(
-          new msgs::Link(_msg.link(j)));
+      boost::shared_ptr<msgs::Link> lm(new msgs::Link(_msg.link(j)));
       this->linkMsgs.push_back(lm);
     }
 

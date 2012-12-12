@@ -17,17 +17,17 @@
 
 #include <google/protobuf/message.h>
 
+#include <gazebo/common/Time.hh>
+#include <gazebo/transport/Transport.hh>
+#include <gazebo/transport/TransportTypes.hh>
+#include <gazebo/transport/Node.hh>
+
+#include <gazebo/gazebo_config.h>
+
+
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/mutex.hpp>
-
-#include "common/Time.hh"
-
-#include "transport/Transport.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/Node.hh"
-
-#include "gazebo_config.h"
 
 using namespace gazebo;
 
@@ -37,8 +37,8 @@ std::vector<std::string> params;
 common::Time hz_prev_time;
 common::Time bw_prev_time;
 
-std::vector<int> bw_bytes;
-std::vector<common::Time> bw_time;
+std::vector<int> bwBytes;
+std::vector<common::Time> bwTime;
 
 boost::mutex mutex;
 
@@ -163,12 +163,12 @@ void echo_cb(ConstGzStringPtr &_data)
 }
 
 /////////////////////////////////////////////////
-void bw_cb(const std::string &_data)
+void bwCB(const std::string &_data)
 {
   boost::mutex::scoped_lock lock(mutex);
 
-  bw_bytes.push_back(_data.size());
-  bw_time.push_back(common::Time::GetWallTime());
+  bwBytes.push_back(_data.size());
+  bwTime.push_back(common::Time::GetWallTime());
 }
 
 /////////////////////////////////////////////////
@@ -275,9 +275,8 @@ void bw()
   node->Init();
 
   std::string topic = params[1];
-  topic +=  "/__dbg";
 
-  transport::SubscriberPtr sub = node->Subscribe(topic, bw_cb);
+  transport::SubscriberPtr sub = node->Subscribe(topic, bwCB);
 
   // Run the transport loop: starts a new thread
   transport::run();
@@ -287,29 +286,60 @@ void bw()
     common::Time::MSleep(100);
     {
       boost::mutex::scoped_lock lock(mutex);
-      if (bw_bytes.size() >= 100)
+      if (bwBytes.size() >= 100)
       {
-        std::sort(bw_bytes.begin(), bw_bytes.end());
+        std::sort(bwBytes.begin(), bwBytes.end());
 
         float sumSize = 0;
-        unsigned int count = bw_bytes.size();
-        common::Time dt = bw_time[count - 1] - bw_time[0];
+        unsigned int count = bwBytes.size();
+        common::Time dt = bwTime[count - 1] - bwTime[0];
 
         for (unsigned int i = 0; i < count; ++i)
         {
-          sumSize += bw_bytes[i];
+          sumSize += bwBytes[i];
         }
 
-        sumSize /= 1024.0f;
+        float meanBytes = sumSize / count;
+        float totalBps = sumSize / dt.Double();
 
-        float meanSize = sumSize / count;
-        float totalBw = sumSize / dt.Double();
+        // Create the output streams
+        std::ostringstream bandwidth, mean, min, max;
+        bandwidth << std::fixed << std::setprecision(2);
+        mean << std::fixed << std::setprecision(2);
+        min << std::fixed << std::setprecision(2);
+        max << std::fixed << std::setprecision(2);
 
-        printf("Total[%6.2f kB/s] Mean[%6.2f kB] Messages[%d] Time[%4.2f s]\n",
-               totalBw, meanSize, count, dt.Double());
+        // Format the output
+        if (totalBps < 1000)
+        {
+          bandwidth << totalBps << " B";
+          mean << meanBytes << " B";
+          min << bwBytes[0] << " B";
+          max << bwBytes[count-1] << " B";
+        }
+        else if (totalBps < 1000000)
+        {
+          bandwidth << totalBps / 1024.0f << " KB";
+          mean << meanBytes / 1024.0f << " KB";
+          min << bwBytes[0] / 1024.0f << " KB";
+          max << bwBytes[count-1] / 1024.0f << " KB";
+        }
+        else
+        {
+          bandwidth << totalBps/1.049e6 << " MB";
+          mean << meanBytes / 1.049e6 << " MB";
+          min << bwBytes[0] / 1.049e6 << " MB";
+          max << bwBytes[count-1] / 1.049e6 << " MB";
+        }
 
-        bw_bytes.clear();
-        bw_time.clear();
+        std::cout << "Total[" << bandwidth.str() << "] "
+                  << "Mean[" << mean.str() << "] "
+                  << "Min[" << min.str() << "] "
+                  << "Max[" << max.str() << "] "
+                  << "Messages[" << count << "]\n";
+
+        bwBytes.clear();
+        bwTime.clear();
       }
     }
   }

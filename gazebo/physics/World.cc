@@ -1553,8 +1553,7 @@ void World::ProcessMessages()
   if (this->posePub && this->posePub->HasConnections() &&
       this->poseMsgs.pose_size() > 0)
   {
-    if (this->poseMsgs.pose_size() > 0)
-      this->posePub->Publish(this->poseMsgs);
+    this->posePub->Publish(this->poseMsgs);
   }
   this->poseMsgs.clear_pose();
 
@@ -1584,6 +1583,9 @@ void World::PublishWorldStats()
 //////////////////////////////////////////////////
 void World::EnqueueMsg(msgs::Pose *_msg)
 {
+  if (!_msg)
+    return;
+
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   int i = 0;
 
