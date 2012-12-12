@@ -40,15 +40,16 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   QBrush brush (c, Qt::SolidPattern);
   scene->setBackgroundBrush(brush);
 
-  int boundingWidth = 600;
-  int boundingHeight = 300;
+  int boundingWidth = 800;
+  int boundingHeight = 600;
   scene->setSceneRect(-boundingWidth/2, -boundingHeight/2,
                       boundingWidth, boundingHeight);
   QHBoxLayout *canvasLayout = new QHBoxLayout(this);
   canvasLayout->addWidget(view);
 
   GridLines *gridLines = new GridLines (boundingWidth, boundingHeight);
-  scene->addItem(gridLines);
+  gridLines->setFlag(QGraphicsItem::ItemIsSelectable, false);
+//  scene->addItem(gridLines);
 
   view->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   view->setScene(scene);

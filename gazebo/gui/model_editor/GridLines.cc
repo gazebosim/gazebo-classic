@@ -48,8 +48,8 @@ void GridLines::paint (QPainter *_painter,
 /////////////////////////////////////////////////
 QRectF GridLines::boundingRect() const
 {
-  return QRectF ( static_cast<qreal>(0),
-                  static_cast<qreal>(0),
+  return QRectF ( static_cast<qreal>(-this->width/2.0),
+                  static_cast<qreal>(-this->height/2.0),
                   static_cast<qreal>(this->width),
                   static_cast<qreal>(this->height));
 }

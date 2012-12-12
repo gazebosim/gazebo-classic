@@ -46,7 +46,7 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   nameLayout->addWidget(modelNameLabel);
 
   QLabel *widthLabel = new QLabel(tr("Width: "));
-  QLabel *lengthLabel = new QLabel(tr("Length: "));
+  QLabel *depthLabel = new QLabel(tr("Depth: "));
   QLabel *heightLabel = new QLabel(tr("Height: "));
 
   this->widthSpinBox = new QDoubleSpinBox;
@@ -55,11 +55,11 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   this->widthSpinBox->setDecimals(3);
   this->widthSpinBox->setValue(0.000);
 
-  this->lengthSpinBox = new QDoubleSpinBox;
-  this->lengthSpinBox->setRange(-1000, 1000);
-  this->lengthSpinBox->setSingleStep(0.001);
-  this->lengthSpinBox->setDecimals(3);
-  this->lengthSpinBox->setValue(0.000);
+  this->depthSpinBox = new QDoubleSpinBox;
+  this->depthSpinBox->setRange(-1000, 1000);
+  this->depthSpinBox->setSingleStep(0.001);
+  this->depthSpinBox->setDecimals(3);
+  this->depthSpinBox->setValue(0.000);
 
   this->heightSpinBox = new QDoubleSpinBox;
   this->heightSpinBox->setRange(-1000, 1000);
@@ -70,8 +70,8 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   QGridLayout *sizeLayout = new QGridLayout;
   sizeLayout->addWidget(widthLabel, 0, 0);
   sizeLayout->addWidget(widthSpinBox, 0, 1);
-  sizeLayout->addWidget(lengthLabel, 1, 0);
-  sizeLayout->addWidget(lengthSpinBox, 1, 1);
+  sizeLayout->addWidget(depthLabel, 1, 0);
+  sizeLayout->addWidget(depthSpinBox, 1, 1);
   sizeLayout->addWidget(heightLabel, 2, 0);
   sizeLayout->addWidget(heightSpinBox, 2, 1);
 
@@ -141,9 +141,9 @@ double WindowDoorInspectorDialog::GetWidth()
 }
 
 /////////////////////////////////////////////////
-double WindowDoorInspectorDialog::GetLength()
+double WindowDoorInspectorDialog::GetDepth()
 {
-  return this->lengthSpinBox->value();
+  return this->depthSpinBox->value();
 }
 
 /////////////////////////////////////////////////
@@ -153,9 +153,11 @@ double WindowDoorInspectorDialog::GetHeight()
 }
 
 /////////////////////////////////////////////////
-math::Vector2d WindowDoorInspectorDialog::GetPosition()
+QPointF WindowDoorInspectorDialog::GetPosition()
 {
-  return math::Vector2d(this->positionXSpinBox->value(),
+//  return math::Vector2d(this->positionXSpinBox->value(),
+//      this->positionYSpinBox->value());
+  return QPointF(this->positionXSpinBox->value(),
       this->positionYSpinBox->value());
 }
 
@@ -178,16 +180,16 @@ void WindowDoorInspectorDialog::SetHeight(double _height)
 }
 
 /////////////////////////////////////////////////
-void WindowDoorInspectorDialog::SetLength(double _length)
+void WindowDoorInspectorDialog::SetDepth(double _depth)
 {
-  this->lengthSpinBox->setValue(_length);
+  this->depthSpinBox->setValue(_depth);
 }
 
 /////////////////////////////////////////////////
-void WindowDoorInspectorDialog::SetPosition(math::Vector2d _pos)
+void WindowDoorInspectorDialog::SetPosition(QPointF _pos)
 {
-  this->positionXSpinBox->setValue(_pos.x);
-  this->positionYSpinBox->setValue(_pos.y);
+  this->positionXSpinBox->setValue(_pos.x());
+  this->positionYSpinBox->setValue(_pos.y());
 }
 
 /////////////////////////////////////////////////

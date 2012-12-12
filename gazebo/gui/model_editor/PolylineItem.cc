@@ -37,7 +37,15 @@ PolylineItem::PolylineItem(QPointF _start, QPointF _end) :
   this->AddPoint(_start);
   this->AddPoint(_end);
 
+  this->setSelected(false);
+  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable);
+
   this->setAcceptHoverEvents(true);
+
+  this->lineThickness = 1;
+  this->borderColor = Qt::black;
+
+  this->setZValue(1);
 }
 
 /////////////////////////////////////////////////
@@ -46,17 +54,34 @@ PolylineItem::~PolylineItem()
 }
 
 /////////////////////////////////////////////////
+void PolylineItem::SetThickness(double _thickness)
+{
+  this->lineThickness = _thickness;
+  for (unsigned int i = 0; i < segments.size(); ++i)
+  {
+    QPen segmentPen = this->pen();
+    segmentPen.setWidth(_thickness);
+    this->setPen(segmentPen);
+  }
+}
+
+/////////////////////////////////////////////////
 void PolylineItem::AddPoint(QPointF _point)
 {
   QPointF lineEnd = _point - this->origin;
   if (!corners.empty())
   {
-
     QPointF lineStart = this->mapToScene(corners.back()->pos())
         + QPointF(this->cornerWidth/2.0, this->cornerHeight/2.0)
         - this->origin;
     LineSegmentItem *segment = new LineSegmentItem(this, this->segments.size());
     segment->SetLine(lineStart, lineEnd);
+    QPen segmentPen = this->pen();
+    segmentPen.setWidth(this->lineThickness);
+    QColor segmentPenColor = segmentPen.color();
+//    segmentPenColor.setAlpha(0);
+//    segmentPen.setColor(segmentPenColor);
+    segment->setPen(segmentPen);
     this->segments.push_back(segment);
   }
 
@@ -297,6 +322,11 @@ void PolylineItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void PolylineItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
+  if (!this->isSelected())
+    this->scene()->clearSelection();
+
+  this->setSelected(true);
+
   this->origin = this->pos();
   _event->setAccepted(true);
 }
@@ -304,6 +334,9 @@ void PolylineItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void PolylineItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 {
+  if (!this->isSelected())
+    return;
+
   this->origin += _event->scenePos() - _event->lastScenePos();
   this->setPos(this->origin);
 }
@@ -311,10 +344,9 @@ void PolylineItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
-  QColor lineColor = Qt::black;
-  QPen linePen = this->pen();
-  linePen.setColor(lineColor);
-  this->setPen(linePen);
+//  this->borderColor = Qt::black;
+  if (!this->isSelected())
+    return;
 
   for (unsigned int i = 0; i < corners.size(); ++i)
   {
@@ -330,10 +362,9 @@ void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 /////////////////////////////////////////////////
 void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
-  QColor lineColor = Qt::red;
-  QPen linePen = this->pen();
-  linePen.setColor(lineColor);
-  this->setPen(linePen);
+  if (!this->isSelected())
+    return;
+//  this->borderColor = Qt::red;
 
   for (unsigned int i = 0; i < corners.size(); ++i)
   {
@@ -344,4 +375,46 @@ void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
   {
     this->segments[i]->installSceneEventFilter(this);
   }
+}
+
+/////////////////////////////////////////////////
+void PolylineItem::showCorners(bool _show)
+{
+  for (unsigned int i = 0; i < this->corners.size(); ++i)
+    this->corners[i]->setVisible(_show);
+}
+
+/////////////////////////////////////////////////
+void PolylineItem::drawBoundingBox(QPainter *_painter)
+{
+  _painter->save();
+  QPen boundingBoxPen;
+  boundingBoxPen.setStyle(Qt::SolidLine);
+  boundingBoxPen.setColor(Qt::darkGray);
+  _painter->setPen(boundingBoxPen);
+  _painter->setOpacity(0.8);
+  _painter->drawRect(this->boundingRect());
+  _painter->restore();
+}
+
+/////////////////////////////////////////////////
+void PolylineItem::paint(QPainter *_painter,
+    const QStyleOptionGraphicsItem *_option, QWidget *_widget)
+{
+  _painter->save();
+
+//  if (this->isSelected())
+//    this->drawBoundingBox(_painter);
+  this->showCorners(this->isSelected());
+
+  QPen wallBorderPen;
+  wallBorderPen.setWidth(this->pen().width() + 2);
+  wallBorderPen.setStyle(Qt::SolidLine);
+  wallBorderPen.setColor(this->borderColor);
+  _painter->setPen(wallBorderPen);
+  _painter->drawPath(this->path());
+  _painter->restore();
+
+  QGraphicsPathItem::paint(_painter, _option, _widget);
+
 }

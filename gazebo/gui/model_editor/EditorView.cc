@@ -56,21 +56,6 @@ void EditorView::mousePressEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mouseReleaseEvent(QMouseEvent *_event)
 {
-  /// TODO for testing, delete me later
-/*  if (_event->button() == Qt::RightButton)
-  {
-    if (this->drawMode == Wall)
-    {
-      qDebug() << "set draw mode to none";
-      this->drawMode = None;
-    }
-    else {
-      qDebug() << "set draw mode to wall";
-      this->drawMode = Wall;
-    }
-    return;
-  }*/
-
   switch (drawMode)
   {
     case None:
@@ -100,9 +85,11 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
     default:
       break;
   }
-
   if (!drawInProgress)
+  {
     QGraphicsView::mouseReleaseEvent(_event);
+  }
+
 }
 
 /////////////////////////////////////////////////
@@ -231,6 +218,4 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
     this->currentMouseItem = NULL;
     this->drawInProgress = false;
   }
-
-  qDebug() << " on create editor item" << _type.c_str();
 }

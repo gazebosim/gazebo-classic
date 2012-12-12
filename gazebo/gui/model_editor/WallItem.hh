@@ -35,6 +35,8 @@ namespace gazebo
 
         private: bool segmentEventFilter(LineSegmentItem *_segment,
             QGraphicsSceneMouseEvent *_event);
+
+        private: double wallThickness;
     };
   }
 }

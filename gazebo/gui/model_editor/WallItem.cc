@@ -27,6 +27,9 @@ using namespace gui;
 WallItem::WallItem(QPointF _start, QPointF _end)
     : PolylineItem(_start, _end)
 {
+  this->wallThickness = 10;
+
+  this->SetThickness(this->wallThickness);
 }
 
 /////////////////////////////////////////////////
@@ -61,9 +64,40 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
     }
     case QEvent::GraphicsSceneMouseDoubleClick:
     {
+      QLineF line = _segment->line();
+      double segmentLength = line.length();
+      QPointF segmentStartPoint = this->mapToScene(line.p1());
+      QPointF segmentEndPoint = this->mapToScene(line.p2());
+
       WallInspectorDialog dialog;
+      dialog.SetThickness(this->wallThickness);
+      dialog.SetLength(segmentLength);
+      dialog.SetStartPosition(segmentStartPoint);
+      dialog.SetEndPosition(segmentEndPoint);
       if (dialog.exec() == QDialog::Accepted)
       {
+        this->wallThickness = dialog.GetThickness();
+        QPen wallPen = this->pen();
+        wallPen.setColor(Qt::white);
+        wallPen.setWidth(this->wallThickness);
+        this->setPen(wallPen);
+
+        double newLength = dialog.GetLength();
+        if (qFuzzyCompare(newLength + 1, segmentLength + 1))
+        {
+          line.setLength(newLength);
+          this->SetVertexPosition(_segment->GetIndex() + 1,
+              this->mapToScene(line.p2()));
+        }
+        else
+        {
+          QPointF newStartPoint = dialog.GetStartPosition();
+          QPointF newEndPoint = dialog.GetEndPosition();
+          this->SetVertexPosition(_segment->GetIndex(),
+            newStartPoint);
+          this->SetVertexPosition(_segment->GetIndex() + 1,
+            newEndPoint);
+        }
       }
       _segment->SetMouseState(QEvent::GraphicsSceneMouseDoubleClick);
       break;

@@ -43,6 +43,10 @@ namespace gazebo
 
       public: void TranslateVertex(unsigned int _index, QPointF _trans);
 
+      public: void showCorners(bool _show);
+
+      public: void SetThickness(double _thickness);
+
       private: void UpdatePath();
 
       private: void UpdatePathAtIndex(unsigned int _index, QPointF _pos);
@@ -70,15 +74,18 @@ namespace gazebo
 
       private: void mousePressEvent(QGraphicsSceneMouseEvent *_event);
 
+      private: void drawBoundingBox(QPainter *_painter);
+
+      private: void paint(QPainter *_painter,
+          const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+
       private: QPointF origin;
 
       private: QPointF location;
 
-      //private: QPointF dragStart;
-
       private: int gridSpace;
 
-      private: std::vector<CornerGrabber*> corners;
+      protected: std::vector<CornerGrabber*> corners;
 
       private: std::vector<LineSegmentItem*> segments;
 
@@ -87,6 +94,10 @@ namespace gazebo
       private: int cornerHeight;
 
       protected: QPointF segmentMouseMove;
+
+      private: QColor borderColor;
+
+      private: double lineThickness;
     };
   }
 }

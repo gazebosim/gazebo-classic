@@ -36,6 +36,16 @@ namespace gazebo
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
         private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+
+        private: double windowDepth;
+
+        private: double windowHeight;
+
+        private: double windowWidth;
+
+        private: double windowSideBar;
+
+        private: QPointF windowPos;
     };
   }
 }

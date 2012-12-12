@@ -18,7 +18,6 @@
 #ifndef _WALL_INSPECTOR_DIALOG_HH_
 #define _WALL_INSPECTOR_DIALOG_HH_
 
-#include "math/Vector2d.hh"
 #include "gui/qt.h"
 
 namespace gazebo
@@ -35,9 +34,9 @@ namespace gazebo
 
       public: double GetLength();
 
-      public: math::Vector2d GetStartPosition();
+      public: QPointF GetStartPosition();
 
-      public: math::Vector2d GetEndPosition();
+      public: QPointF GetEndPosition();
 
       public: double GetHeight();
 
@@ -47,9 +46,9 @@ namespace gazebo
 
       public: void SetLength(double _length);
 
-      public: void SetStartPosition(math::Vector2d _pos);
+      public: void SetStartPosition(QPointF _pos);
 
-      public: void SetEndPosition(math::Vector2d _pos);
+      public: void SetEndPosition(QPointF _pos);
 
       public: void SetHeight(double _height);
 

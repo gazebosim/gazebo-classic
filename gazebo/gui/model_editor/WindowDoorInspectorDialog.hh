@@ -18,7 +18,7 @@
 #ifndef _WINDOW_DOOR_INSPECTOR_DIALOG_HH_
 #define _WINDOW_DOOR_INSPECTOR_DIALOG_HH_
 
-#include "math/Vector2d.hh"
+//#include "math/Vector2d.hh"
 #include "gui/qt.h"
 
 namespace gazebo
@@ -40,9 +40,9 @@ namespace gazebo
 
       public: double GetHeight();
 
-      public: double GetLength();
+      public: double GetDepth();
 
-      public: math::Vector2d GetPosition();
+      public: QPointF GetPosition();
 
       public: std::string GetType();
 
@@ -50,9 +50,9 @@ namespace gazebo
 
       public: void SetHeight(double _height);
 
-      public: void SetLength(double _length);
+      public: void SetDepth(double _depth);
 
-      public: void SetPosition(math::Vector2d _pos);
+      public: void SetPosition(QPointF _pos);
 
       public: void SetType(std::string _type);
 
@@ -68,7 +68,7 @@ namespace gazebo
 
       private: QDoubleSpinBox *widthSpinBox;
 
-      private: QDoubleSpinBox *lengthSpinBox;
+      private: QDoubleSpinBox *depthSpinBox;
 
       private: QDoubleSpinBox *heightSpinBox;
 

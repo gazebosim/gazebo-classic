@@ -175,16 +175,16 @@ double WallInspectorDialog::GetLength()
 }
 
 /////////////////////////////////////////////////
-math::Vector2d WallInspectorDialog::GetStartPosition()
+QPointF WallInspectorDialog::GetStartPosition()
 {
-  return math::Vector2d(this->startXSpinBox->value(),
+  return QPointF(this->startXSpinBox->value(),
       this->startYSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-math::Vector2d WallInspectorDialog::GetEndPosition()
+QPointF WallInspectorDialog::GetEndPosition()
 {
-  return math::Vector2d(this->endXSpinBox->value(),
+  return QPointF(this->endXSpinBox->value(),
       this->endYSpinBox->value());
 }
 
@@ -213,17 +213,17 @@ void WallInspectorDialog::SetLength(double _length)
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetStartPosition(math::Vector2d _pos)
+void WallInspectorDialog::SetStartPosition(QPointF _pos)
 {
-  this->startXSpinBox->setValue(_pos.x);
-  this->startYSpinBox->setValue(_pos.y);
+  this->startXSpinBox->setValue(_pos.x());
+  this->startYSpinBox->setValue(_pos.y());
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetEndPosition(math::Vector2d _pos)
+void WallInspectorDialog::SetEndPosition(QPointF _pos)
 {
-  this->endXSpinBox->setValue(_pos.x);
-  this->endYSpinBox->setValue(_pos.y);
+  this->endXSpinBox->setValue(_pos.x());
+  this->endYSpinBox->setValue(_pos.y());
 }
 
 /////////////////////////////////////////////////

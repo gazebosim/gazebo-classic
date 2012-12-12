@@ -28,7 +28,7 @@ namespace gazebo
 
     class RotateHandle;
 
-    class RectItem : public QGraphicsItem
+    class RectItem : public QGraphicsPolygonItem
     {
         public: RectItem();
 
@@ -50,9 +50,9 @@ namespace gazebo
 
         protected: void UpdateCornerPositions();
 
-        private: void AdjustSize(int _x, int _y);
+        private: void AdjustSize(double _x, double _y);
 
-        protected: void showBoundingBox(QPainter *_painter);
+        protected: void drawBoundingBox(QPainter *_painter);
 
         protected: virtual QRectF boundingRect() const;
 
@@ -88,21 +88,23 @@ namespace gazebo
         private: virtual bool sceneEventFilter(QGraphicsItem *_watched,
             QEvent *_event);
 
-        protected: int width;
+        protected: double width;
 
-        protected: int height;
+        protected: double height;
 
-        protected: int drawingWidth;
+        protected: double drawingWidth;
 
-        protected: int drawingHeight;
+        protected: double drawingHeight;
 
-        protected: int drawingOriginX;
+        protected: double drawingOriginX;
 
-        protected: int drawingOriginY;
+        protected: double drawingOriginY;
 
         protected: QColor borderColor;
 
         private: QPointF location;
+
+        protected: QPointF pivot;
 
         private: int gridSpace;
 
@@ -115,6 +117,8 @@ namespace gazebo
         private: CornerGrabber *corners[8];
 
         private: RotateHandle *rotateHandle;
+
+        private: double rotationAngle;
     };
   }
 }

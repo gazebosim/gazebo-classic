@@ -29,11 +29,11 @@ CornerGrabber::CornerGrabber(QGraphicsItem *_parent, int _index) :
   borderColor(Qt::black),
   width(6),
   height(6),
-  mouseButtonState(QEvent::GraphicsSceneMouseRelease),
-  weldedCorner(0)
+  mouseButtonState(QEvent::GraphicsSceneMouseRelease)
 {
   this->setParentItem(_parent);
 
+  this->setZValue(_parent->zValue() + 1);
   this->setAcceptHoverEvents(true);
 }
 
@@ -62,6 +62,42 @@ QPointF CornerGrabber::GetCenterPoint()
 }
 
 /////////////////////////////////////////////////
+void CornerGrabber::SetWidth(double _width)
+{
+  this->width = _width;
+}
+
+/////////////////////////////////////////////////
+void CornerGrabber::SetHeight(double _height)
+{
+  this->height = _height;
+}
+
+/////////////////////////////////////////////////
+double CornerGrabber::GetWidth()
+{
+  return this->width;
+}
+
+/////////////////////////////////////////////////
+double CornerGrabber::GetHeight()
+{
+  return this->height;
+}
+
+/////////////////////////////////////////////////
+void CornerGrabber::SetColor(QColor color)
+{
+  this->borderColor = color;
+}
+
+/////////////////////////////////////////////////
+QColor CornerGrabber::GetColor()
+{
+  return this->borderColor;
+}
+
+/////////////////////////////////////////////////
 void CornerGrabber::SetMouseDownX(double _x)
 {
   this->mouseDownX = _x;
@@ -83,33 +119,6 @@ qreal CornerGrabber::GetMouseDownX()
 qreal CornerGrabber::GetMouseDownY()
 {
   return this->mouseDownY;
-}
-
-/////////////////////////////////////////////////
-void CornerGrabber::WeldCorner(CornerGrabber *_corner)
-{
-  if (!weldedCorner)
-  {
-    weldedCorner = _corner;
-    weldedCorner->WeldCorner(this);
-  }
-}
-
-/////////////////////////////////////////////////
-CornerGrabber *CornerGrabber::GetWeldedCorner()
-{
-  return weldedCorner;
-}
-
-/////////////////////////////////////////////////
-void CornerGrabber::UnweldCorner()
-{
-  CornerGrabber *tmpCorner = this->weldedCorner;
-  this->weldedCorner = NULL;
-  if (tmpCorner)
-  {
-    tmpCorner->UnweldCorner();
-  }
 }
 
 /////////////////////////////////////////////////
@@ -166,6 +175,7 @@ QRectF CornerGrabber::boundingRect() const
 void CornerGrabber::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
   QWidget *)
 {
+  _painter->save();
   QPen borderPen;
   borderPen.setWidth(1);
   borderPen.setColor(this->borderColor);
@@ -181,5 +191,6 @@ void CornerGrabber::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
 
   QBrush brush (Qt::SolidPattern);
   brush.setColor (this->borderColor);
-  _painter->fillRect(rect,brush);
+  _painter->fillRect(rect, brush);
+  _painter->restore();
 }

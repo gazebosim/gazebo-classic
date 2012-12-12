@@ -46,11 +46,17 @@ namespace gazebo
 
       public: double GetMouseDownY();
 
-      public: void WeldCorner(CornerGrabber *_corner);
+      public: void SetWidth(double _width);
 
-      public: CornerGrabber *GetWeldedCorner();
+      public: void SetHeight(double _height);
 
-      public: void UnweldCorner();
+      public: double GetWidth();
+
+      public: double GetHeight();
+
+      public: void SetColor(QColor color);
+
+      public: QColor GetColor();
 
       /// \brief Mouse states
       public: enum mouseStates {kMouseReleased=0, kMouseDown, kMouseMoving};
@@ -89,7 +95,7 @@ namespace gazebo
 
       private: int mouseButtonState;
 
-      private: CornerGrabber* weldedCorner;
+      private: double size;
     };
   }
 }

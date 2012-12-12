@@ -25,18 +25,32 @@ using namespace gui;
 /////////////////////////////////////////////////
 DoorItem::DoorItem(): RectItem()
 {
+  this->doorDepth = 10;
+  this->doorHeight = 0;
+  this->doorWidth = 50;
+
+  this->width = this->doorWidth;
+  this->height = this->doorDepth + this->doorWidth;
+  this->drawingWidth = this->width;
+  this->drawingHeight = this->height;
+
+  this->UpdateCornerPositions();
+
+  this->doorPos = this->pos();
+  this->setZValue(3);
 }
 
+/////////////////////////////////////////////////
 DoorItem::~DoorItem()
 {
 }
 
 /////////////////////////////////////////////////
-void DoorItem::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
-    QWidget *)
+void DoorItem::paint (QPainter *_painter,
+    const QStyleOptionGraphicsItem *_option, QWidget *_widget)
 {
   if (this->isSelected())
-    this->showBoundingBox(_painter);
+    this->drawBoundingBox(_painter);
   this->showCorners(this->isSelected());
 
   QPointF topLeft(this->drawingOriginX, this->drawingOriginY);
@@ -44,28 +58,45 @@ void DoorItem::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
   QPointF bottomLeft(this->drawingOriginX, this->drawingHeight);
   QPointF bottomRight(this->drawingWidth, this->drawingHeight);
 
-  QPen pen;
-  pen.setStyle(Qt::SolidLine);
-  pen.setColor(this->borderColor);
-  _painter->setPen(pen);
+  QPen doorPen;
+  doorPen.setStyle(Qt::SolidLine);
+  doorPen.setColor(this->borderColor);
+  _painter->setPen(doorPen);
 
-  _painter->drawLine(topLeft, topRight);
   _painter->drawLine(topLeft, bottomLeft);
   QRect arcRect(this->drawingOriginX - this->drawingWidth,
       this->drawingOriginY - this->drawingHeight,
       this->drawingWidth*2, this->drawingHeight*2);
   _painter->drawArc(arcRect, 0, -90 * 16);
+
+  doorPen.setWidth(this->doorDepth);
+  _painter->setPen(doorPen);
+  _painter->drawLine(topLeft + QPointF(this->doorDepth/2.0, 0),
+      topRight - QPointF(this->doorDepth/2.0, 0));
+
+  this->doorWidth = this->drawingWidth;
+  this->doorPos = this->pos();
+
+  QGraphicsPolygonItem::paint(_painter, _option, _widget);
 }
 
 /////////////////////////////////////////////////
 void DoorItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
   WindowDoorInspectorDialog dialog(1);
-  dialog.SetWidth(this->GetWidth());
-  dialog.SetHeight(this->GetHeight());
+  dialog.SetWidth(this->doorWidth);
+  dialog.SetDepth(this->doorDepth);
+  dialog.SetHeight(this->doorHeight);
+  dialog.SetPosition(this->pos());
   if (dialog.exec() == QDialog::Accepted)
   {
-    this->SetSize(QSize(dialog.GetWidth(), dialog.GetHeight()));
+    this->SetSize(QSize(dialog.GetWidth(),
+        dialog.GetDepth() + this->doorWidth));
+    this->setPos(dialog.GetPosition());
+    this->doorWidth = dialog.GetWidth();
+    this->doorHeight = dialog.GetHeight();
+    this->doorDepth = dialog.GetDepth();
+    this->doorPos = dialog.GetPosition();
   }
   _event->setAccepted(true);
 }

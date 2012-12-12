@@ -25,21 +25,30 @@ using namespace gui;
 /////////////////////////////////////////////////
 WindowItem::WindowItem(): RectItem()
 {
-  this->width = 100;
-  this->height = 10;
+  this->windowDepth = 10;
+  this->windowHeight = 0;
+  this->windowWidth = 50;
+  this->windowSideBar = 10;
+  this->windowPos = this->pos();
+
+  this->width = this->windowWidth;
+  this->height = this->windowDepth + this->windowSideBar;
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
 
   this->UpdateCornerPositions();
+
+  this->setZValue(3);
 }
 
+/////////////////////////////////////////////////
 WindowItem::~WindowItem()
 {
 }
 
 /////////////////////////////////////////////////
-void WindowItem::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
-    QWidget *)
+void WindowItem::paint(QPainter *_painter,
+    const QStyleOptionGraphicsItem *_option, QWidget *_widget)
 {
   QPointF topLeft(this->drawingOriginX, this->drawingOriginY);
   QPointF topRight(this->drawingWidth, this->drawingOriginY);
@@ -49,39 +58,46 @@ void WindowItem::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
   QPointF midLeft(this->drawingOriginX, this->drawingHeight/2.0);
   QPointF midRight(this->drawingWidth, this->drawingHeight/2.0);
 
-
-
-  if (this->isSelected())
-  {
-    this->showBoundingBox(_painter);
-  }
+  //if (this->isSelected())
+  //  this->drawBoundingBox(_painter);
   this->showCorners(this->isSelected());
 
-
-
-  QPen pen;
-  pen.setStyle(Qt::SolidLine);
-  pen.setColor(borderColor);
-  _painter->setPen(pen);
+  QPen windowPen;
+  windowPen.setStyle(Qt::SolidLine);
+  windowPen.setColor(borderColor);
+  _painter->setPen(windowPen);
 
   _painter->drawLine(topLeft, bottomLeft);
   _painter->drawLine(topRight, bottomRight);
-  _painter->drawLine(midLeft, midRight);
 
+  windowPen.setWidth(this->windowDepth);
+  _painter->setPen(windowPen);
+  _painter->drawLine(midLeft + QPointF(this->windowDepth/2, 0),
+      midRight - QPointF(this->windowDepth/2, 0));
 
+  this->windowWidth = this->drawingWidth;
+  this->windowPos = this->pos();
 
-
+  QGraphicsPolygonItem::paint(_painter, _option, _widget);
 }
 
 /////////////////////////////////////////////////
 void WindowItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
   WindowDoorInspectorDialog dialog(0);
-  dialog.SetWidth(this->GetWidth());
-  dialog.SetHeight(this->GetHeight());
+  dialog.SetWidth(this->windowWidth);
+  dialog.SetHeight(this->windowHeight);
+  dialog.SetDepth(this->windowDepth);
+  dialog.SetPosition(this->windowPos);
   if (dialog.exec() == QDialog::Accepted)
   {
-    this->SetSize(QSize(dialog.GetWidth(), dialog.GetHeight()));
+    this->SetSize(QSize(dialog.GetWidth(),
+        dialog.GetDepth() + this->windowSideBar));
+    this->setPos(dialog.GetPosition());
+    this->windowWidth = dialog.GetWidth();
+    this->windowHeight = dialog.GetHeight();
+    this->windowDepth = dialog.GetDepth();
+    this->windowPos = dialog.GetPosition();
   }
   _event->setAccepted(true);
 }

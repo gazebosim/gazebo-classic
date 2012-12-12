@@ -28,6 +28,7 @@ LineSegmentItem::LineSegmentItem(QGraphicsItem *_parent, int _index)
   if (_parent)
     this->setParentItem(_parent);
   this->setAcceptHoverEvents(true);
+  this->setZValue(0);
 }
 
 /////////////////////////////////////////////////
@@ -120,17 +121,17 @@ void LineSegmentItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void LineSegmentItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
-  QColor lineColor = Qt::black;
+/*  QColor lineColor = Qt::black;
   QPen linePen = this->pen();
   linePen.setColor(lineColor);
-  this->setPen(linePen);
+  this->setPen(linePen);*/
 }
 
 /////////////////////////////////////////////////
 void LineSegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
-  QColor lineColor = Qt::red;
+/*  QColor lineColor = Qt::red;
   QPen linePen = this->pen();
   linePen.setColor(lineColor);
-  this->setPen(linePen);
+  this->setPen(linePen);*/
 }
