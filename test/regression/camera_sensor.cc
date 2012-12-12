@@ -42,6 +42,14 @@ void OnNewCameraFrame(const unsigned char *_image,
 
 TEST_F(CameraSensor, CheckThrottle)
 {
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
   // spawn sensors of various sizes to test speed
   {
     Load("worlds/empty_test.world");
@@ -86,6 +94,14 @@ TEST_F(CameraSensor, CheckThrottle)
 
 TEST_F(CameraSensor, UnlimitedTest)
 {
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
   // spawn sensors of various sizes to test speed
   {
     Load("worlds/empty_test.world");
@@ -133,6 +149,14 @@ TEST_F(CameraSensor, MultiSenseHigh)
   // This test is disabled because it does not work on machines with
   // limited rendering capabilities.
   return;
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
 
   // spawn sensors of various sizes to test speed
   {
@@ -183,6 +207,13 @@ TEST_F(CameraSensor, MultiSenseLow)
   // limited rendering capabilities.
   return;
 
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
 
   // spawn sensors of various sizes to test speed
   {
