@@ -47,7 +47,7 @@ using namespace rendering;
 int GpuLaser::texCount = 0;
 
 //////////////////////////////////////////////////
-GpuLaser::GpuLaser(const std::string &_namePrefix, Scene *_scene,
+GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
                          bool _autoRender)
 : Camera(_namePrefix, _scene, _autoRender)
 {
@@ -96,8 +96,8 @@ void GpuLaser::Fini()
 //////////////////////////////////////////////////
 void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 {
-  this->camera->yaw(Ogre::Radian(this->parent_sensor->GetHAngle()));
-  this->camera->pitch(Ogre::Radian(this->parent_sensor->GetVAngle()));
+  this->camera->yaw(Ogre::Radian(this->parent_sensor->GetHorzHalfAngle()));
+  this->camera->pitch(Ogre::Radian(this->parent_sensor->GetVertHalfAngle()));
 
   this->CreateOrthoCam();
 
@@ -105,17 +105,17 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 
   if (this->_textureCount == 2)
   {
-    cameraYaws[0] = -this->parent_sensor->GetHFOV()/2;
-    cameraYaws[1] = +this->parent_sensor->GetHFOV();
+    cameraYaws[0] = -this->parent_sensor->GetHorzFOV()/2;
+    cameraYaws[1] = +this->parent_sensor->GetHorzFOV();
     cameraYaws[2] = 0;
-    cameraYaws[3] = -this->parent_sensor->GetHFOV()/2;
+    cameraYaws[3] = -this->parent_sensor->GetHorzFOV()/2;
   }
   else
   {
-    cameraYaws[0] = -this->parent_sensor->GetHFOV();
-    cameraYaws[1] = +this->parent_sensor->GetHFOV();
-    cameraYaws[2] = +this->parent_sensor->GetHFOV();
-    cameraYaws[3] = -this->parent_sensor->GetHFOV();
+    cameraYaws[0] = -this->parent_sensor->GetHorzFOV();
+    cameraYaws[1] = +this->parent_sensor->GetHorzFOV();
+    cameraYaws[2] = +this->parent_sensor->GetHorzFOV();
+    cameraYaws[3] = -this->parent_sensor->GetHorzFOV();
   }
 
   for (unsigned int i = 0; i < this->_textureCount; i++)
@@ -493,8 +493,8 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *target, unsigned int index)
   }
   if (index == 0)
   {
-    this->camera->setAspectRatio(this->parent_sensor->Get1stRatio());
-    this->camera->setFOVy(Ogre::Radian(this->parent_sensor->GetVFOV()));
+    this->camera->setAspectRatio(this->parent_sensor->GetRayCountRatio());
+    this->camera->setFOVy(Ogre::Radian(this->parent_sensor->GetVertFOV()));
   }
 }
 
@@ -529,7 +529,7 @@ void GpuLaser::SetRangeCount(unsigned int _w, unsigned int _h)
 }
 
 /////////////////////////////////////////////////
-void GpuLaser::SetParentSensor(sensors::GpuRaySensor *parent)
+void GpuLaser::SetParentSensor(sensors::GpuRaySensor* parent)
 {
   this->parent_sensor = parent;
 }
@@ -559,7 +559,7 @@ void GpuLaser::CreateMesh()
   double start_x = dx;
   double start_y = view_height;
 
-  double phi = this->parent_sensor->GetVFOV() / 2;
+  double phi = this->parent_sensor->GetVertFOV() / 2;
 
   double v_ang_min = -phi;
 
@@ -575,8 +575,8 @@ void GpuLaser::CreateMesh()
       gamma = ((2 * phi / (this->h2nd - 1)) * j) + v_ang_min;
     for (unsigned int i = 0; i < this->w2nd; i++)
     {
-      double hfov = this->_textureCount * this->parent_sensor->GetHFOV();
-      double theta = this->parent_sensor->GetHFOV() / 2;
+      double hfov = this->_textureCount * this->parent_sensor->GetHorzFOV();
+      double theta = this->parent_sensor->GetHorzFOV() / 2;
       double delta = ((hfov / (this->w2nd - 1)) * i);
 
       unsigned int texture = delta / (theta*2);
