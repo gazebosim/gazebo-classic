@@ -19,6 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "common/Time.hh"
 
@@ -34,9 +35,12 @@ using namespace gazebo;
 std::vector<std::string> params;
 
 common::Time hz_prev_time;
-common::Time bandwidth_prev_time;
+common::Time bw_prev_time;
 
-int bandwidth_bytes = 0;
+std::vector<int> bw_bytes;
+std::vector<common::Time> bw_time;
+
+boost::mutex mutex;
 
 /////////////////////////////////////////////////
 void help()
@@ -159,19 +163,12 @@ void echo_cb(ConstGzStringPtr &_data)
 }
 
 /////////////////////////////////////////////////
-void bandwidth_cb(ConstGzStringPtr &_data)
+void bw_cb(const std::string &_data)
 {
-  common::Time cur_time = common::Time::GetWallTime();
+  boost::mutex::scoped_lock lock(mutex);
 
-  bandwidth_bytes += _data->ByteSize();
-
-  if (cur_time - bandwidth_prev_time > common::Time(1, 0))
-  {
-    printf("kB/s: %6.2f\n", (bandwidth_bytes / 1024.0) /
-        (cur_time - bandwidth_prev_time).Double());
-    bandwidth_bytes = 0;
-    bandwidth_prev_time = cur_time;
-  }
+  bw_bytes.push_back(_data.size());
+  bw_time.push_back(common::Time::GetWallTime());
 }
 
 /////////////////////////////////////////////////
@@ -264,7 +261,7 @@ void echo()
 }
 
 /////////////////////////////////////////////////
-void bandwidth()
+void bw()
 {
   if (params[1].empty())
   {
@@ -280,13 +277,42 @@ void bandwidth()
   std::string topic = params[1];
   topic +=  "/__dbg";
 
-  transport::SubscriberPtr sub = node->Subscribe(topic, bandwidth_cb);
+  transport::SubscriberPtr sub = node->Subscribe(topic, bw_cb);
 
   // Run the transport loop: starts a new thread
   transport::run();
 
   while (true)
-    common::Time::MSleep(10);
+  {
+    common::Time::MSleep(100);
+    {
+      boost::mutex::scoped_lock lock(mutex);
+      if (bw_bytes.size() >= 100)
+      {
+        std::sort(bw_bytes.begin(), bw_bytes.end());
+
+        float sumSize = 0;
+        unsigned int count = bw_bytes.size();
+        common::Time dt = bw_time[count - 1] - bw_time[0];
+
+        for (unsigned int i = 0; i < count; ++i)
+        {
+          sumSize += bw_bytes[i];
+        }
+
+        sumSize /= 1024.0f;
+
+        float meanSize = sumSize / count;
+        float totalBw = sumSize / dt.Double();
+
+        printf("Total[%6.2f kB/s] Mean[%6.2f kB] Messages[%d] Time[%4.2f s]\n",
+               totalBw, meanSize, count, dt.Double());
+
+        bw_bytes.clear();
+        bw_time.clear();
+      }
+    }
+  }
 
   transport::fini();
 }
@@ -333,6 +359,6 @@ int main(int argc, char **argv)
     echo();
   else if (params[0] == "hz")
     hz();
-  else if (params[0] == "bandwidth")
-    bandwidth();
+  else if (params[0] == "bw")
+    bw();
 }

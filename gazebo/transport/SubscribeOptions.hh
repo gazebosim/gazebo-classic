@@ -60,6 +60,21 @@ namespace gazebo
                 this->latching = _latching;
               }
 
+      /// \brief Initialize the options. This version of init is only used
+      /// when creating subscribers of raw data.
+      /// \param[in] _topic Topic we're subscribing to
+      /// \param[in,out] _node The associated node
+      /// \param[in] _latching If true, latch the latest message; if false,
+      /// don't latch
+      public: void Init(const std::string &_topic, NodePtr _node,
+                        bool _latching)
+              {
+                this->node = _node;
+                this->topic = _topic;
+                this->msgType = "raw";
+                this->latching = _latching;
+              }
+
       /// \brief Get the node we're subscribed to
       /// \return The associated node
       public: NodePtr GetNode() const

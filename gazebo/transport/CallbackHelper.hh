@@ -121,14 +121,16 @@ namespace gazebo
                callback;
     };
 
-    /// \class DebugCallbackHelper CallbackHelper.hh transport/transport.hh
-    /// \brief CallbackHelper subclass with debug facilities
-    class DebugCallbackHelper : public CallbackHelper
+    /// \class RawCallbackHelper RawCallbackHelper.hh transport/transport.hh
+    /// \brief Used to connect publishers to subscribers, where the
+    /// subscriber wants the raw data from the publisher. Raw means that the
+    /// data has not been converted into a protobuf message.
+    class RawCallbackHelper : public CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
-      public: DebugCallbackHelper(
-                  const boost::function<void (ConstGzStringPtr &)> &_cb)
+      public: RawCallbackHelper(
+                  const boost::function<void (const std::string &)> &_cb)
               : callback(_cb)
               {
               }
@@ -136,19 +138,13 @@ namespace gazebo
       // documentation inherited
       public: std::string GetMsgType() const
               {
-                msgs::GzString m;
-                return m.GetTypeName();
+                return "raw";
               }
 
       // documentation inherited
       public: virtual bool HandleData(const std::string &_newdata)
               {
-                msgs::Packet packet;
-                packet.ParseFromString(_newdata);
-
-                boost::shared_ptr<msgs::GzString> m(new msgs::GzString);
-                m->ParseFromString(_newdata);
-                this->callback(m);
+                this->callback(_newdata);
                 return true;
               }
 
@@ -158,8 +154,7 @@ namespace gazebo
                 return true;
               }
 
-      private: boost::function<void (boost::shared_ptr<msgs::GzString> &)>
-               callback;
+      private: boost::function<void (const std::string &)> callback;
     };
     /// \}
   }
