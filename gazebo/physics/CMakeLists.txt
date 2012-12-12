@@ -5,6 +5,8 @@ if (HAVE_BULLET)
   add_subdirectory(bullet)
 endif()
 
+add_subdirectory(rtql8)
+
 set (sources
   Actor.cc
   Base.cc
