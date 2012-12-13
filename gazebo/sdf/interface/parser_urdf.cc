@@ -688,6 +688,7 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
           addKeyValue(limit, "erp", values2str(1, &(*ge)->stop_erp));
         }
 
+        /* not supported in sdf 1.2+
         if ((*ge)->is_stop_kp)
         {
           addKeyValue(limit, "kp", values2str(1, &(*ge)->stop_kp));
@@ -696,6 +697,7 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
         {
           addKeyValue(limit, "kd", values2str(1, &(*ge)->stop_kd));
         }
+        */
 
         /* FIXME: provideFeedback flag is gone, need to recover
         if ((*ge)->is_initial_joint_position)
