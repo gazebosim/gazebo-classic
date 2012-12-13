@@ -347,7 +347,7 @@ namespace gazebo
       private: boost::recursive_mutex *updateMutex;
 
       /// \brief Controller for the joints.
-      private: JointController *jointController;
+      private: JointControllerPtr jointController;
 
       private: bool pluginsLoaded;
     };
