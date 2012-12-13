@@ -237,6 +237,12 @@ physics::Contact ContactSensor::GetCollisionContact(
 }
 
 //////////////////////////////////////////////////
+msgs::Contacts ContactSensor::GetContacts() const
+{
+  return this->contactsMsg;
+}
+
+//////////////////////////////////////////////////
 std::map<std::string, gazebo::physics::Contact> ContactSensor::GetContacts(
     const std::string &_collisionName)
 {

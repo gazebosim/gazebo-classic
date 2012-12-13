@@ -93,6 +93,11 @@ namespace gazebo
                   const std::string &_collisionName, unsigned int _index) const
               GAZEBO_DEPRECATED;
 
+
+      /// \brief Get all the contacts
+      /// \return Message that contains all the contact information
+      public: msgs::Contacts GetContacts() const;
+
       /// \brief Gets contacts of a collision
       /// \param[in] _collisionName Name of collision
       /// \return Container of contacts
