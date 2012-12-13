@@ -1184,7 +1184,7 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
   for (int i = 0; i < _msg->model_size(); i++)
   {
     this->poseMsgs.push_front(_msg->model(i).pose());
-    this->poseMsgs.back().set_name(_msg->model(i).name());
+    this->poseMsgs.front().set_name(_msg->model(i).name());
 
     this->ProcessModelMsg(_msg->model(i));
   }
