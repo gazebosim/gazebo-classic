@@ -47,6 +47,11 @@ QMenu::item:selected
   color: #f58113;
 }
 
+QMenu::item:disabled
+{
+  color: #5f5f5f;
+}
+
 QToolBar
 {
   padding: 0px;

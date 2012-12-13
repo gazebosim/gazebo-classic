@@ -236,27 +236,49 @@ void MainWindow::Import()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::Save()
-{
-  msgs::ServerControl msg;
-  msg.set_save_world_name(get_world());
-  this->serverControlPub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
 void MainWindow::SaveAs()
 {
   std::string filename = QFileDialog::getSaveFileName(this,
       tr("Save World"), QString(),
       tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
 
-  if (!filename.empty())
+  if (boost::filesystem::exists(boost::filesystem::path(filename)))
   {
-    msgs::ServerControl msg;
-    msg.set_save_world_name(get_world());
-    msg.set_save_filename(filename);
-    this->serverControlPub->Publish(msg);
+    g_saveAct->setEnabled(true);
+    this->saveFilename = filename;
+    this->Save();
   }
+  else
+    gzerr << "Invalid file[" << filename << "]\n";
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Save()
+{
+  // Get the latest world in SDF.
+  boost::shared_ptr<msgs::Response> response =
+    transport::request(get_world(), "world_sdf");
+
+  msgs::GzString msg;
+
+  // Make sure the response is correct
+  if (response->response() != "error" && response->type() == msg.GetTypeName())
+  {
+    // Parse the response
+    msg.ParseFromString(response->serialized_data());
+
+    // Open the file
+    std::ofstream out(this->saveFilename.c_str(), std::ios::out);
+
+    if (!out)
+      gzerr << "Unable to open file[" << this->saveFilename << "]\n";
+    else
+      out << msg.data();
+
+    out.close();
+  }
+  else
+    gzerr << "Error getting SDF description from server\n";
 }
 
 /////////////////////////////////////////////////
@@ -535,12 +557,11 @@ void MainWindow::CreateActions()
   connect(g_importAct, SIGNAL(triggered()), this, SLOT(Import()));
   */
 
-  /*
   g_saveAct = new QAction(tr("&Save World"), this);
   g_saveAct->setShortcut(tr("Ctrl+S"));
   g_saveAct->setStatusTip(tr("Save world"));
+  g_saveAct->setEnabled(false);
   connect(g_saveAct, SIGNAL(triggered()), this, SLOT(Save()));
-  */
 
   g_saveAsAct = new QAction(tr("Save World &As"), this);
   g_saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
@@ -741,7 +762,7 @@ void MainWindow::CreateMenus()
   // this->fileMenu->addAction(g_openAct);
   // this->fileMenu->addAction(g_importAct);
   // this->fileMenu->addAction(g_newAct);
-  // this->fileMenu->addAction(g_saveAct);
+  this->fileMenu->addAction(g_saveAct);
   this->fileMenu->addAction(g_saveAsAct);
   this->fileMenu->addSeparator();
   this->fileMenu->addAction(g_quitAct);

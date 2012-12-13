@@ -137,6 +137,8 @@ namespace gazebo
       // private: QTreeWidget *treeWidget;
       private: QTabWidget *tabWidget;
       private: QMenuBar *menuBar;
+
+      private: std::string saveFilename;
     };
 
     class TreeViewDelegate: public QItemDelegate
