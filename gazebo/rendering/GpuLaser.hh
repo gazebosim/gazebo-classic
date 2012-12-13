@@ -27,7 +27,7 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 
 #include "gazebo/common/Event.hh"
