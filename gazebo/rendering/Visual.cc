@@ -63,7 +63,16 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
   if (_parent)
     pnode = _parent->GetSceneNode();
   else
+  {
     gzerr << "Create a visual, invalid parent!!!\n";
+    return;
+  }
+
+  if (!pnode)
+  {
+    gzerr << "Unable to get parent scene node\n";
+    return;
+  }
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -1396,13 +1405,13 @@ DynamicLines *Visual::CreateDynamicLine(RenderOpType type)
 }
 
 //////////////////////////////////////////////////
-void Visual::DeleteDynamicLine(DynamicLines *line)
+void Visual::DeleteDynamicLine(DynamicLines *_line)
 {
   // delete instance from lines vector
   for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
        iter!= this->lines.end(); ++iter)
   {
-    if (*iter == line)
+    if (*iter == _line)
     {
       this->lines.erase(iter);
       break;

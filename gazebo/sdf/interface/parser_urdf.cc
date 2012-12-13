@@ -398,6 +398,18 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
           gazebo->laser_retro = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
+      else if (child_elem->ValueStr() == "stopCfm")
+      {
+          gazebo->is_stop_cfm = true;
+          gazebo->stop_cfm = boost::lexical_cast<double>(
+            getKeyValueAsString(child_elem).c_str());
+      }
+      else if (child_elem->ValueStr() == "stopErp")
+      {
+          gazebo->is_stop_erp = true;
+          gazebo->stop_erp = boost::lexical_cast<double>(
+            getKeyValueAsString(child_elem).c_str());
+      }
       else if (child_elem->ValueStr() == "stopKp")
       {
           gazebo->is_stop_kp = true;
@@ -568,7 +580,8 @@ void URDF2Gazebo::insertGazeboExtensionCollision(TiXmlElement *elem,
           addKeyValue(contact_ode, "max_vel", values2str(1, &(*ge)->maxVel));
         // contact interpenetration margin tolerance
         if ((*ge)->is_minDepth)
-          addKeyValue(contact_ode, "min_depth", values2str(1, &(*ge)->minDepth));
+          addKeyValue(contact_ode, "min_depth",
+                      values2str(1, &(*ge)->minDepth));
         if ((*ge)->is_laser_retro)
           addKeyValue(elem, "laser_retro", values2str(1, &(*ge)->laser_retro));
 
@@ -665,18 +678,24 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
         TiXmlElement *physics_ode     = new TiXmlElement("ode");
         TiXmlElement *limit     = new TiXmlElement("limit");
 
-        /* stop_kp and stop_kd have become stop_cfm and stop_erp
-           but this requires time step size to translate.
-           FIXME: will skip for now.
+        // insert stop_cfm, stop_erp, fudge_factor
+        if ((*ge)->is_stop_cfm)
+        {
+          addKeyValue(limit, "cfm", values2str(1, &(*ge)->stop_cfm));
+        }
+        if ((*ge)->is_stop_erp)
+        {
+          addKeyValue(limit, "erp", values2str(1, &(*ge)->stop_erp));
+        }
+
         if ((*ge)->is_stop_kp)
         {
-          addKeyValue(limit, "stop_kp", values2str(1, &(*ge)->stop_kp));
+          addKeyValue(limit, "kp", values2str(1, &(*ge)->stop_kp));
         }
         if ((*ge)->is_stop_kd)
         {
-          addKeyValue(limit, "stop_kd", values2str(1, &(*ge)->stop_kd));
+          addKeyValue(limit, "kd", values2str(1, &(*ge)->stop_kd));
         }
-        */
 
         /* FIXME: provideFeedback flag is gone, need to recover
         if ((*ge)->is_initial_joint_position)
@@ -1705,7 +1724,7 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
 
     // add robot to gazebo_xml_out
     TiXmlElement *gazebo_sdf = new TiXmlElement("sdf");
-    gazebo_sdf->SetAttribute("version", "1.3");
+    gazebo_sdf->SetAttribute("version", SDF_VERSION);
     gazebo_sdf->LinkEndChild(robot);
     gazebo_xml_out.LinkEndChild(gazebo_sdf);
 

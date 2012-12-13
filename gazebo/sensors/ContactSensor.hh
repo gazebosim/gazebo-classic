@@ -93,6 +93,11 @@ namespace gazebo
                   const std::string &_collisionName, unsigned int _index) const
               GAZEBO_DEPRECATED;
 
+
+      /// \brief Get all the contacts
+      /// \return Message that contains all the contact information
+      public: msgs::Contacts GetContacts() const;
+
       /// \brief Gets contacts of a collision
       /// \param[in] _collisionName Name of collision
       /// \return Container of contacts
@@ -116,6 +121,12 @@ namespace gazebo
 
       /// \brief Mutex to protect reads and writes.
       private: boost::mutex mutex;
+
+      /// \brief returns a pointer to the mutex for locking while reading
+      ///        internally kept map of map of collision names and contacts
+      /// \return The mutex for the sensor
+      public: boost::mutex* GetUpdateMutex()
+              {return &(this->mutex);}
 
       /// \brief Contacts message used to output sensor data.
       private: msgs::Contacts contactsMsg;

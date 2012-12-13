@@ -67,7 +67,7 @@ namespace gazebo
       /// \param[in] _y Y location
       /// \param[in] _z Z location
       /// \return The height at the specified location
-      public: double GetHeight(double _x, double _y, double _z=1000);
+      public: double GetHeight(double _x, double _y, double _z = 1000);
 
       /// \brief Initialize all the blend material maps.
       /// \param[in] _terrain The terrain to initialize the blend maps.

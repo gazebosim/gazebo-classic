@@ -80,8 +80,8 @@ void ContactVisual::Update()
   double magScale = 100;
   double vMax = 0.5;
   double vMin = 0.1;
-  double vRange = vMax - vMin; // 0.4
-  double offset = vRange - vMin; // 0.3
+  double vRange = vMax - vMin;
+  double offset = vRange - vMin;
 
   unsigned int c = 0;
   for (int i = 0; i < this->contactsMsg->contact_size(); i++)

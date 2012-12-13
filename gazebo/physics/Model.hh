@@ -280,6 +280,10 @@ namespace gazebo
       /// \param[in] _disable If true, the model is allowed to auto disable.
       public: void SetAutoDisable(bool _disable);
 
+      /// \brief Return the value of the SDF <allow_auto_disable> element.
+      /// \return True if auto disable is allowed for this model.
+      public: bool GetAutoDisable() const;
+
       /// \brief Load all plugins
       ///
       /// Load all plugins specified in the SDF for the model.

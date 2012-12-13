@@ -30,6 +30,7 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
+#include "gazebo/sdf/sdf.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
@@ -459,6 +460,21 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
     if (modelXML)
     {
       TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");
+      TiXmlElement *sdfSearch = sdfXML;
+
+      // Find the SDF element that matches our current SDF version.
+      while (sdfSearch)
+      {
+        if (sdfSearch->Attribute("version") &&
+            std::string(sdfSearch->Attribute("version")) == SDF_VERSION)
+        {
+          sdfXML = sdfSearch;
+          break;
+        }
+
+        sdfSearch = sdfSearch->NextSiblingElement("sdf");
+      }
+
       if (sdfXML)
       {
         result = path + "/" + sdfXML->GetText();

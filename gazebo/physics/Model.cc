@@ -983,3 +983,9 @@ void Model::SetAutoDisable(bool _auto)
       boost::static_pointer_cast<Link>(*iter)->SetAutoDisable(_auto);
 }
 
+/////////////////////////////////////////////////
+bool Model::GetAutoDisable() const
+{
+  return this->sdf->GetValueBool("allow_auto_disable");
+}
+
