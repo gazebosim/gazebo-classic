@@ -96,8 +96,8 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   this->lastRenderWallTime = common::Time::GetWallTime();
 
-  // Set default render rate to 30Hz
-  this->SetRenderRate(30.0);
+  // Set default render rate to unlimited
+  this->SetRenderRate(0.0);
 }
 
 //////////////////////////////////////////////////
@@ -1429,7 +1429,10 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
 //////////////////////////////////////////////////
 void Camera::SetRenderRate(double _hz)
 {
-  this->renderPeriod = 1.0 / _hz;
+  if (_hz > 0.0)
+    this->renderPeriod = 1.0 / _hz;
+  else
+    this->renderPeriod = 0.0;
 }
 
 //////////////////////////////////////////////////

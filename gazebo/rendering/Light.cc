@@ -263,6 +263,13 @@ void Light::CreateVisual()
   {
     this->line = this->visual->CreateDynamicLine(RENDERING_LINE_LIST);
 
+    this->line->setMaterial("Gazebo/LightOn");
+
+    this->line->setVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE |
+                                   GZ_VISIBILITY_GUI);
+
+    this->visual->SetVisible(true);
+
     // Create a scene node to hold the light selection object.
     Ogre::SceneNode *visSceneNode;
     visSceneNode = this->visual->GetSceneNode()->createChildSceneNode(
@@ -393,13 +400,6 @@ void Light::CreateVisual()
       this->line->AddPoint(math::Vector3(angles[i], angles[i], -range));
     }
   }
-
-  this->line->setMaterial("Gazebo/LightOn");
-
-  this->line->setVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE |
-                                 GZ_VISIBILITY_GUI);
-
-  this->visual->SetVisible(true);
 }
 
 //////////////////////////////////////////////////
