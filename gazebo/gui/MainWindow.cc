@@ -286,7 +286,7 @@ void MainWindow::Save()
   {
     QMessageBox msgBox;
     msgBox.setText("Unable to save world.\n"
-                   "Unable to SDF world description from server.");
+                   "Unable to retrieve SDF world description from server.");
     msgBox.exec();
   }
 }
