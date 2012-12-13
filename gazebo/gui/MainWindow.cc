@@ -242,14 +242,13 @@ void MainWindow::SaveAs()
       tr("Save World"), QString(),
       tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
 
-  if (boost::filesystem::exists(boost::filesystem::path(filename)))
-  {
-    g_saveAct->setEnabled(true);
-    this->saveFilename = filename;
-    this->Save();
-  }
-  else
-    gzerr << "Invalid file[" << filename << "]\n";
+  // Return if the user has canceled.
+  if (filename.empty())
+    return;
+
+  g_saveAct->setEnabled(true);
+  this->saveFilename = filename;
+  this->Save();
 }
 
 /////////////////////////////////////////////////
@@ -271,14 +270,25 @@ void MainWindow::Save()
     std::ofstream out(this->saveFilename.c_str(), std::ios::out);
 
     if (!out)
-      gzerr << "Unable to open file[" << this->saveFilename << "]\n";
+    {
+      QMessageBox msgBox;
+      std::string str = "Unable to open file: " + this->saveFilename + "\n";
+      str += "Check file permissions.";
+      msgBox.setText(str.c_str());
+      msgBox.exec();
+    }
     else
       out << msg.data();
 
     out.close();
   }
   else
-    gzerr << "Error getting SDF description from server\n";
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Unable to save world.\n"
+                   "Unable to SDF world description from server.");
+    msgBox.exec();
+  }
 }
 
 /////////////////////////////////////////////////
