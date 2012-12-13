@@ -34,7 +34,7 @@ WorldState::WorldState()
 
 /////////////////////////////////////////////////
 WorldState::WorldState(const WorldPtr _world)
-  : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
+  : State(_world->GetName(), _world->GetRealTime(), _world->GetSimTime())
 {
   // Add a state for all the models
   Model_V models = _world->GetModels();
