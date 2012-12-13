@@ -871,6 +871,9 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
   if (signTest < 0 )
     angle *= -1;
 
+  if (this->mouseEvent.shift)
+    angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
+
   rpy += rpyAmt * angle;
 
   _vis->SetRotation(math::Quaternion(rpy));
