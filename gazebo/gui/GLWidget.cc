@@ -825,31 +825,53 @@ void GLWidget::OnOrbit()
 /////////////////////////////////////////////////
 void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
 {
-  math::Vector3 planeNorm, planeNorm2;
-  math::Vector3 p1, p2;
-  math::Vector3 a, b;
-  math::Vector3 ray(0, 0, 0);
-
-  math::Pose pose = _vis->GetPose();
-
-  math::Vector2i diff = this->mouseEvent.pos - this->mouseEvent.pressPos;
   math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
 
+  math::Vector3 axisA;
+  math::Vector3 axisB;
   math::Vector3 rpyAmt;
 
   if (this->keyText == "x" || this->keyText == "X")
+  {
+    axisA = mouseMoveVisStartPose.rot.GetYAxis();
+    axisB = mouseMoveVisStartPose.rot.GetZAxis();
     rpyAmt.x = 1.0;
+  }
   else if (this->keyText == "y" || this->keyText == "Y")
+  {
+    axisA = mouseMoveVisStartPose.rot.GetZAxis();
+    axisB = mouseMoveVisStartPose.rot.GetXAxis();
     rpyAmt.y = 1.0;
+  }
   else
+  {
+    axisA = this->mouseMoveVisStartPose.rot.GetXAxis();
+    axisB = this->mouseMoveVisStartPose.rot.GetYAxis();
     rpyAmt.z = 1.0;
+  }
 
-  double amt = diff.y * 0.04;
+  math::Vector3 normal = (axisA.Cross(axisB)).Normalize();
+  double offset = normal.Dot(this->mouseMoveVisStartPose.pos);
 
-  if (this->mouseEvent.shift)
-    amt = rint(amt / (M_PI * 0.25)) * (M_PI * 0.25);
+  math::Vector3 pressPoint;
+  this->userCamera->GetWorldPointOnPlane(this->mouseEvent.pressPos.x,
+      this->mouseEvent.pressPos.y, math::Plane(normal, offset), pressPoint);
 
-  rpy += rpyAmt * amt;
+  math::Vector3 newPoint;
+  this->userCamera->GetWorldPointOnPlane(this->mouseEvent.pos.x,
+      this->mouseEvent.pos.y, math::Plane(normal, offset), newPoint);
+
+  math::Vector3 v1 = pressPoint - this->mouseMoveVisStartPose.pos;
+  math::Vector3 v2 = newPoint - this->mouseMoveVisStartPose.pos;
+  v1 = v1.Normalize();
+  v2 = v2.Normalize();
+  double signTest = v1.Cross(v2).Dot(normal);
+  double angle = atan2((v1.Cross(v2)).GetLength(), v1.Dot(v2));
+
+  if (signTest < 0 )
+    angle *= -1;
+
+  rpy += rpyAmt * angle;
 
   _vis->SetRotation(math::Quaternion(rpy));
 }
