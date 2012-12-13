@@ -1,16 +1,16 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
-link_directories(  
-  ${CCD_LIBRARY_DIRS} 
-)
+INCLUDE_DIRECTORIES(/usr/local/include)
+INCLUDE_DIRECTORIES(/usr/local/include/dart)
+INCLUDE_DIRECTORIES(/usr/local/include/eigen-3.0.5)
 
+LINK_DIRECTORIES(/usr/local/lib)
+SET(RTQL8_LIBRARIES collision dynamics geometry integration kinematics lcpsolver optimizer renderer utils yui)
 
 set (sources
-             Test.cc
-#             ODEPhysics.cc
+             RTQL8Physics.cc
 #             ODECollision.cc
-#             ODELink.cc
+             RTQL8Link.cc
 #             ODEJoint.cc
 #             ODESliderJoint.cc
 #             ODEHingeJoint.cc
@@ -25,10 +25,9 @@ set (sources
 )
 
 SET (headers
-             Test.hh
-#             ODEPhysics.hh
+             RTQL8Physics.hh
 #             ODECollision.hh
-#             ODELink.hh
+             RTQL8Link.hh
 #             ODEJoint.hh
 #             ODESliderJoint.hh
 #             ODEHingeJoint.hh
@@ -43,11 +42,12 @@ SET (headers
 #             ODEBoxShape.hh
 #             ODEPlaneShape.hh
 #             ODECylinderShape.hh
-#             ODETypes.hh
+             RTQL8ypes.hh
 #             ODEScrewJoint.hh
 )
 
 gz_add_library(gazebo_physics_rtql8 ${sources})
-target_link_libraries(gazebo_physics_rtql8 gazebo_ode gazebo_opcode ${TBB_LIBRARIES})
+
+target_link_libraries(gazebo_physics_rtql8 ${RTQL8_LIBRARIES})
 
 gz_install_library(gazebo_physics_rtql8)

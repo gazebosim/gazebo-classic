@@ -5,7 +5,9 @@ if (HAVE_BULLET)
   add_subdirectory(bullet)
 endif()
 
-add_subdirectory(rtql8)
+#if (HAVE_RTQL8)
+  add_subdirectory(rtql8)
+#endif()
 
 set (sources
   Actor.cc
@@ -108,6 +110,10 @@ target_link_libraries(gazebo_physics
 
 if (HAVE_BULLET)
   target_link_libraries(gazebo_physics gazebo_physics_bullet)
+endif()
+
+if (HAVE_RTQL8)
+  target_link_libraries(gazebo_physics gazebo_physics_rtql8)
 endif()
 
 gz_add_executable(gzphysics server.cc)
