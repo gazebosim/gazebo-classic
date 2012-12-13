@@ -38,54 +38,54 @@
       <count>20</count>
     </plugin>
 
-    <model name="right_wall">
+    <model name="post1_right">
       <static>true</static>
       <pose>0 -2.1 0.5 0 0 0</pose>
       <link name="link">
         <collision name="collision">
           <geometry>
             <box>
-              <size>6 0.2 1.0</size>
+              <size>0.2 0.2 1.0</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>6 0.2 1.0</size>
+              <size>0.2 0.2 1.0</size>
             </box>
           </geometry>
           <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Wood</name>
+              <name>Gazebo/Red</name>
             </script>
           </material>
         </visual>
       </link>
     </model>
 
-    <model name="left_wall">
+    <model name="post1_left">
       <static>true</static>
       <pose>0 2.1 0.5 0 0 0</pose>
       <link name="link">
         <collision name="collision">
           <geometry>
             <box>
-              <size>6 0.2 1.0</size>
+              <size>0.2 0.2 1.0</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>6 0.2 1.0</size>
+              <size>0.2 0.2 1.0</size>
             </box>
           </geometry>
           <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Wood</name>
+              <name>Gazebo/Blue</name>
             </script>
           </material>
         </visual>
@@ -107,33 +107,6 @@
           <geometry>
             <box>
               <size>0.2 6 1.0</size>
-            </box>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Wood</name>
-            </script>
-          </material>
-        </visual>
-      </link>
-    </model>
-
-    <model name="back_left_connector_wall">
-      <static>true</static>
-      <pose>3.0 -2.7 0.5 0 0 0</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>0.2 1.0 1.0</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>0.2 1.0 1.0</size>
             </box>
           </geometry>
           <material>
@@ -173,32 +146,6 @@
       </link>
     </model>
 
-    <model name="back_right_connector_wall">
-      <static>true</static>
-      <pose>3.0 2.7 0.5 0 0 0</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>0.2 1.0 1.0</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>0.2 1.0 1.0</size>
-            </box>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Wood</name>
-            </script>
-          </material>
-        </visual>
-      </link>
-    </model>
 
     <model name="back_right_wall">
       <static>true</static>
