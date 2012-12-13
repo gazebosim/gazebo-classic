@@ -76,7 +76,6 @@ Model::Model(BasePtr _parent)
 Model::~Model()
 {
   delete this->updateMutex;
-  delete this->jointController;
 }
 
 //////////////////////////////////////////////////
