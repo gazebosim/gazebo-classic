@@ -22,6 +22,7 @@
 
 #include "sdf/sdf.hh"
 #include "common/Events.hh"
+#include "gui/EntityMaker.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
   namespace gui
   {
     class BoxMaker;
-    class ModelMaker;
+    class EntityMaker;
 
     class BuildingMaker : public EntityMaker
     {
@@ -60,6 +61,14 @@ namespace gazebo
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
       public: virtual void OnMouseMove(const common::MouseEvent &_event);*/
+
+      /// \brief
+      public: virtual void Start(const rendering::UserCameraPtr _camera);
+      /// \brief
+      public: virtual void Stop();
+
+      /// \brief Checks if entity is active
+      public: virtual bool IsActive() const;
 
       /// \brief Internal init function.
       private: bool Init();

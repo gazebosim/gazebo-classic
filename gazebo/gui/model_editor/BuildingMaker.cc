@@ -177,6 +177,20 @@ void BuildingMaker::SetSize(std::string _visualName, math::Vector3 _size)
 {
 }
 
+/////////////////////////////////////////////////
+void BuildingMaker::Start(const rendering::UserCameraPtr _camera)
+{
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::Stop()
+{
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::IsActive() const
+{
+}
 
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
