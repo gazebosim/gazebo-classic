@@ -156,6 +156,10 @@ namespace gazebo
     /// \brief Vector of JointPtr
     typedef std::vector<JointPtr> Joint_V;
 
+    /// \def JointController_V
+    /// \brief Vector of JointControllerPtr
+    typedef std::vector<JointControllerPtr> JointController_V;
+
     /// \def Link_V
     /// \brief Vector of LinkPtr
     typedef std::vector<LinkPtr>  Link_V;

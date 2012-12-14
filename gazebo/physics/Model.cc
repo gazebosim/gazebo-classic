@@ -660,7 +660,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   this->joints.push_back(joint);
 
   if (!this->jointController)
-    this->jointController = JointControllerPtr(new JointController(
+    this->jointController.reset(new JointController(
         boost::shared_dynamic_cast<Model>(shared_from_this())));
   this->jointController->AddJoint(joint);
 }
