@@ -37,11 +37,15 @@ namespace gazebo
 
       public: void PopEndPoint();
 
-      public: unsigned int GetCount();
+      public: unsigned int GetVertexCount();
+
+      public: unsigned int GetSegmentCount();
 
       public: void SetVertexPosition(unsigned int _index, QPointF _pos);
 
       public: void TranslateVertex(unsigned int _index, QPointF _trans);
+
+      public: LineSegmentItem *GetSegment(unsigned int _index);
 
       public: void showCorners(bool _show);
 

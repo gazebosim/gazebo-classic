@@ -20,6 +20,7 @@
 #include "RectItem.hh"
 #include "WindowItem.hh"
 #include "DoorItem.hh"
+#include "LineSegmentItem.hh"
 #include "PolylineItem.hh"
 #include "WallItem.hh"
 #include "BuildingMaker.hh"
@@ -96,7 +97,6 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mouseMoveEvent(QMouseEvent *_event)
 {
-  QPointF trans = _event->pos() - lastMousePos;
   switch (drawMode)
   {
     case None:
@@ -107,7 +107,32 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
       if (this->drawInProgress && wallItem)
       {
         if (wallItem)
-          wallItem->TranslateVertex(wallItem->GetCount()-1,trans);
+        {
+          LineSegmentItem *segment = wallItem->GetSegment(
+              wallItem->GetSegmentCount()-1);
+          QPointF p1 = segment->mapToScene(segment->line().p1());
+          QPointF p2 = this->mapToScene(_event->pos());
+          QLineF line(p1, p2);
+          double angle = line.angle();
+          double range = 10;
+          if ((angle < range) || (angle > (360 - range)) ||
+              ((angle > (180 - range)) && (angle < (180 + range))))
+          {
+            wallItem->SetVertexPosition(wallItem->GetVertexCount()-1,
+                QPointF(p2.x(), p1.y()));
+//            trans.setY(0);
+          }
+          else if (((angle > (90 - range)) && (angle < (90 + range))) ||
+              ((angle > (270 - range)) && (angle < (270 + range))))
+          {
+            wallItem->SetVertexPosition(wallItem->GetVertexCount()-1,
+                QPointF(p1.x(), p2.y()));
+          }
+          else
+          {
+            wallItem->SetVertexPosition(wallItem->GetVertexCount()-1, p2);
+          }
+        }
       }
       break;
     }
@@ -120,8 +145,6 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
     default:
       break;
   }
-
-  lastMousePos = _event->pos();
   QGraphicsView::mouseMoveEvent(_event);
 }
 
@@ -153,7 +176,6 @@ void EditorView::DrawLine(QPoint _pos)
     this->drawInProgress = true;
 
     lastLineCornerPos = _pos;
-    lastMousePos = _pos;
 
     BuildingMaker buildingMaker;
     gui::Events::createBuildingPart("wall");
@@ -162,7 +184,12 @@ void EditorView::DrawLine(QPoint _pos)
   {
     WallItem* wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
     if (wallItem)
-      wallItem->AddPoint(this->mapToScene(_pos));
+    {
+      LineSegmentItem *segment = wallItem->GetSegment(
+          wallItem->GetSegmentCount()-1);
+
+      wallItem->AddPoint(segment->mapToScene(segment->line().p2())); //this->mapToScene(_pos)
+    }
   }
 }
 

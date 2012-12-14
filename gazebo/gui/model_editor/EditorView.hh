@@ -71,8 +71,6 @@ namespace gazebo
 
       private: QPoint lastLineCornerPos;
 
-      private: QPoint lastMousePos;
-
       private: std::vector<event::ConnectionPtr> connections;
 
       private: QGraphicsItem *currentMouseItem;

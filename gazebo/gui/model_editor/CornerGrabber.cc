@@ -38,6 +38,7 @@ CornerGrabber::CornerGrabber(QGraphicsItem *_parent, int _index) :
   this->setZValue(_parent->zValue() + 1);
 //  this->setZValue(5);
   this->setAcceptHoverEvents(true);
+  this->borderColor = Qt::black;
 }
 
 /////////////////////////////////////////////////
@@ -158,16 +159,16 @@ void CornerGrabber::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void CornerGrabber::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
 {
-  this->borderColor = Qt::black;
-  this->update(0, 0, this->width, this->height);
+//  this->borderColor = Qt::black;
+//  this->update(0, 0, this->width, this->height);
   QGraphicsItem::hoverLeaveEvent(_event);
 }
 
 /////////////////////////////////////////////////
 void CornerGrabber::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 {
-  this->borderColor = Qt::red;
-  this->update(0, 0, this->width, this->height);
+//  this->borderColor = Qt::red;
+//  this->update(0, 0, this->width, this->height);
   QGraphicsItem::hoverEnterEvent(_event);
 //  _event->setAccepted(false);
 }
@@ -175,7 +176,6 @@ void CornerGrabber::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 /////////////////////////////////////////////////
 QRectF CornerGrabber::boundingRect() const
 {
-//  return QRectF(-totalWidth/2, -totalHeight/2, totalWidth, totalHeight);
   return QRectF(0, 0, this->width + this->widthGrabBuffer,
       this->height + this->heightGrabBuffer);
 }

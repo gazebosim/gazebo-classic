@@ -117,9 +117,23 @@ void PolylineItem::PopEndPoint()
 }
 
 /////////////////////////////////////////////////
-unsigned int PolylineItem::GetCount()
+unsigned int PolylineItem::GetVertexCount()
 {
   return this->corners.size();
+}
+
+/////////////////////////////////////////////////
+unsigned int PolylineItem::GetSegmentCount()
+{
+  return this->segments.size();
+}
+
+/////////////////////////////////////////////////
+LineSegmentItem *PolylineItem::GetSegment(unsigned int _index)
+{
+  if (_index >= segments.size())
+    return NULL;
+  return this->segments[_index];
 }
 
 /////////////////////////////////////////////////
@@ -139,6 +153,7 @@ void PolylineItem::SetVertexPosition(unsigned int _index, QPointF _pos)
     this->segments[_index]->SetStartPoint(lineEnd);
 
   this->UpdatePathAt(_index, _pos);
+  this->update();
 }
 
 /////////////////////////////////////////////////
@@ -309,6 +324,8 @@ void PolylineItem::UpdatePathAt(unsigned int _index, QPointF _pos)
   QPainterPath p = this->path();
   QPointF newPos = _pos - this->origin;
   p.setElementPositionAt(_index, newPos.x(), newPos.y());
+
+//  qDebug () << " path pt " << _pos;
   this->setPath(p);
 }
 
@@ -351,7 +368,10 @@ void PolylineItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 void PolylineItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 {
   if (!this->isSelected())
+  {
+    _event->ignore();
     return;
+  }
 
   this->origin += _event->scenePos() - _event->lastScenePos();
   this->setPos(this->origin);
