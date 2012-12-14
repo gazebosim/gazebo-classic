@@ -310,24 +310,29 @@ void bw()
         min << std::fixed << std::setprecision(2);
         max << std::fixed << std::setprecision(2);
 
-        // Format the output
+        // Format the bandwidth output
         if (totalBps < 1000)
+          bandwidth << totalBps << " B/s";
+        else if (totalBps < 1000000)
+          bandwidth << totalBps / 1024.0f << " KB/s";
+        else
+          bandwidth << totalBps/1.049e6 << " MB/s";
+
+        // Format message size  output
+        if (meanBps < 1000)
         {
-          bandwidth << totalBps << " B";
           mean << meanBytes << " B";
           min << bwBytes[0] << " B";
           max << bwBytes[count-1] << " B";
         }
-        else if (totalBps < 1000000)
+        else if (meanBps < 1000000)
         {
-          bandwidth << totalBps / 1024.0f << " KB";
           mean << meanBytes / 1024.0f << " KB";
           min << bwBytes[0] / 1024.0f << " KB";
           max << bwBytes[count-1] / 1024.0f << " KB";
         }
         else
         {
-          bandwidth << totalBps/1.049e6 << " MB";
           mean << meanBytes / 1.049e6 << " MB";
           min << bwBytes[0] / 1.049e6 << " MB";
           max << bwBytes[count-1] / 1.049e6 << " MB";
