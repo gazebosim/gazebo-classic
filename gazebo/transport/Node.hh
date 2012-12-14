@@ -88,18 +88,15 @@ namespace gazebo
       /// \param[in] _topic The topic to advertise
       /// \param[in] _queueLimit The maximum number of outgoing messages to
       /// queue for delivery
-      /// \param[in] _latch If true, latch the last message; otherwise,
-      /// don't latch
       /// \return Pointer to new publisher object
-      template<typename M>
+      public: template<typename M>
       transport::PublisherPtr Advertise(const std::string &_topic,
-                                        unsigned int _queueLimit = 1000,
-                                        bool _latch = false)
+                                        unsigned int _queueLimit = 1000)
       {
         std::string decodedTopic = this->DecodeTopicName(_topic);
         PublisherPtr publisher =
           transport::TopicManager::Instance()->Advertise<M>(
-              decodedTopic, _queueLimit, _latch);
+              decodedTopic, _queueLimit);
 
         boost::recursive_mutex::scoped_lock lock(this->publisherMutex);
         this->publishers.push_back(publisher);
@@ -115,7 +112,7 @@ namespace gazebo
       /// \param[in] _latching If true, latch latest incoming message;
       /// otherwise don't latch
       /// \return Pointer to new Subscriber object
-      template<typename M, typename T>
+      public: template<typename M, typename T>
       SubscriberPtr Subscribe(const std::string &_topic,
           void(T::*_fp)(const boost::shared_ptr<M const> &), T *_obj,
           bool _latching = false)
@@ -137,7 +134,7 @@ namespace gazebo
       /// \param[in] _latching If true, latch latest incoming message;
       /// otherwise don't latch
       /// \return Pointer to new Subscriber object
-      template<typename M>
+      public: template<typename M>
       SubscriberPtr Subscribe(const std::string &_topic,
           void(*_fp)(const boost::shared_ptr<M const> &),
                      bool _latching = false)

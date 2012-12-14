@@ -25,11 +25,18 @@
 using namespace gazebo;
 using namespace transport;
 
+//////////////////////////////////////////////////
+Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
+                     unsigned int _limit, bool /*_latch*/)
+  : topic(_topic), msgType(_msgType), queueLimit(_limit)
+{
+  this->prevMsg = NULL;
+}
 
 //////////////////////////////////////////////////
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
-                     unsigned int _limit, bool _latch)
-  : topic(_topic), msgType(_msgType), queueLimit(_limit), latch(_latch)
+                     unsigned int _limit)
+  : topic(_topic), msgType(_msgType), queueLimit(_limit)
 {
   this->prevMsg = NULL;
 }
@@ -153,7 +160,7 @@ void Publisher::SetPublication(PublicationPtr &_publication, int _i)
 //////////////////////////////////////////////////
 bool Publisher::GetLatching() const
 {
-  return this->latch;
+  return false;
 }
 
 //////////////////////////////////////////////////
