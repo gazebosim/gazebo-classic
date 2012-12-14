@@ -69,6 +69,8 @@ namespace gazebo
       public: bool GetLatching() const
               {return this->latching;}
 
+      /// \brief True means that the callback helper will get the last
+      /// published message on the topic.
       protected: bool latching;
     };
 
