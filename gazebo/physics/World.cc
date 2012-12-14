@@ -698,13 +698,16 @@ ModelPtr World::GetModel(unsigned int _index) const
     for (unsigned int i = 0, count = 0;
          i < this->rootElement->GetChildCount(); i++)
     {
-      if (count == _index)
+      if (this->rootElement->GetChild(i)->HasType(Base::MODEL))
       {
-        model = boost::shared_static_cast<Model>(
-            this->rootElement->GetChild(count));
-        break;
+        if (count == _index)
+        {
+          model = boost::shared_static_cast<Model>(
+              this->rootElement->GetChild(count));
+          break;
+        }
+        count++;
       }
-      count += this->rootElement->GetChild(i)->HasType(Base::MODEL) ? 1 : 0;
     }
 
     if (!model)
