@@ -312,22 +312,27 @@ void bw()
 
         // Format the output
         if (totalBps < 1000)
+          bandwidth << totalBps << " Bps";
+        else if (totalBps < 1000000)
+          bandwidth << totalBps / 1024.0f << " KBps";
+        else
+          bandwidth << totalBps/1.049e6 << " MBps";
+
+        // Use separate scaling for bandwidth and message sizes
+        if (meanBytes < 1000)
         {
-          bandwidth << totalBps << " B";
           mean << meanBytes << " B";
           min << bwBytes[0] << " B";
           max << bwBytes[count-1] << " B";
         }
-        else if (totalBps < 1000000)
+        else if (meanBytes < 1000000)
         {
-          bandwidth << totalBps / 1024.0f << " KB";
           mean << meanBytes / 1024.0f << " KB";
           min << bwBytes[0] / 1024.0f << " KB";
           max << bwBytes[count-1] / 1024.0f << " KB";
         }
         else
         {
-          bandwidth << totalBps/1.049e6 << " MB";
           mean << meanBytes / 1.049e6 << " MB";
           min << bwBytes[0] / 1.049e6 << " MB";
           max << bwBytes[count-1] / 1.049e6 << " MB";
