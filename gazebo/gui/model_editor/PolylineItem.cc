@@ -78,10 +78,6 @@ void PolylineItem::AddPoint(QPointF _point)
     LineSegmentItem *segment = new LineSegmentItem(this, this->segments.size());
     segment->SetLine(lineStart, lineEnd);
     QPen segmentPen = this->pen();
-    segmentPen.setWidth(this->lineThickness);
-    QColor segmentPenColor = segmentPen.color();
-//    segmentPenColor.setAlpha(0);
-//    segmentPen.setColor(segmentPenColor);
     segment->setPen(segmentPen);
     this->segments.push_back(segment);
   }
@@ -168,28 +164,28 @@ void PolylineItem::TranslateVertex(unsigned int _index, QPointF _trans)
 bool PolylineItem::sceneEventFilter(QGraphicsItem *_watched,
     QEvent *_event)
 {
-  QGraphicsSceneMouseEvent * event =
-    dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
-  if (event == NULL)
-    return false;
+  CornerGrabber *corner = dynamic_cast<CornerGrabber *>(_watched);
+  if (corner != NULL)
+    return this->cornerEventFilter(corner, _event);
 
   LineSegmentItem *segment = dynamic_cast<LineSegmentItem *>(_watched);
   if (segment != NULL)
-    return this->segmentEventFilter(segment, event);
-
-  CornerGrabber *corner = dynamic_cast<CornerGrabber *>(_watched);
-  if (corner != NULL)
-    return this->cornerEventFilter(corner, event);
+    return this->segmentEventFilter(segment, _event);
 
   return false;
 }
 
 /////////////////////////////////////////////////
 bool PolylineItem::segmentEventFilter(LineSegmentItem *_segment,
-    QGraphicsSceneMouseEvent *_event)
+    QEvent *_event)
 {
+  QGraphicsSceneMouseEvent *mouseEvent =
+    dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
 
-  QPointF scenePosition =  _segment->mapToScene(_event->pos());
+  if (!mouseEvent)
+    return false;
+
+  QPointF scenePosition =  _segment->mapToScene(mouseEvent->pos());
   switch (_event->type())
   {
     case QEvent::GraphicsSceneMousePress:
@@ -232,14 +228,17 @@ bool PolylineItem::segmentEventFilter(LineSegmentItem *_segment,
 
 /////////////////////////////////////////////////
 bool PolylineItem::cornerEventFilter(CornerGrabber* _corner,
-    QGraphicsSceneMouseEvent *_event)
+    QEvent *_event)
 {
+  QGraphicsSceneMouseEvent *mouseEvent =
+    dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
+
   switch (_event->type())
   {
     case QEvent::GraphicsSceneMousePress:
     {
       _corner->SetMouseState(QEvent::GraphicsSceneMousePress);
-      QPointF scenePosition =  _corner->mapToScene(_event->pos());
+      QPointF scenePosition =  _corner->mapToScene(mouseEvent->pos());
 
       _corner->SetMouseDownX(scenePosition.x());
       _corner->SetMouseDownY(scenePosition.y());
@@ -255,15 +254,30 @@ bool PolylineItem::cornerEventFilter(CornerGrabber* _corner,
       _corner->SetMouseState(QEvent::GraphicsSceneMouseMove);
       break;
     }
+    case QEvent::GraphicsSceneHoverEnter:
+    case QEvent::GraphicsSceneHoverMove:
+    {
+      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+      return true;
+    }
+    case QEvent::GraphicsSceneHoverLeave:
+    {
+      QApplication::restoreOverrideCursor();
+      return true;
+    }
+
     default:
     {
       break;
     }
   }
 
+  if (!mouseEvent)
+    return false;
+
   if (_corner->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
-    QPointF scenePosition = _corner->mapToScene(_event->pos());
+    QPointF scenePosition = _corner->mapToScene(mouseEvent->pos());
 
     this->SetVertexPosition(_corner->GetIndex(), scenePosition);
 
@@ -344,43 +358,74 @@ void PolylineItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
-{
-//  this->borderColor = Qt::black;
-  if (!this->isSelected())
-    return;
-
-  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
-
-  for (unsigned int i = 0; i < corners.size(); ++i)
-  {
-    this->corners[i]->removeSceneEventFilter(this);
-  }
-
-  for (unsigned int i = 0; i < segments.size(); ++i)
-  {
-    this->segments[i]->removeSceneEventFilter(this);
-  }
-}
-
-/////////////////////////////////////////////////
-void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
+void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 {
   if (!this->isSelected())
+  {
+    _event->ignore();
     return;
-//  this->borderColor = Qt::red;
+  }
 
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
-
-  for (unsigned int i = 0; i < corners.size(); ++i)
-  {
-    this->corners[i]->installSceneEventFilter(this);
-  }
 
   for (unsigned int i = 0; i < segments.size(); ++i)
   {
     this->segments[i]->installSceneEventFilter(this);
+    this->corners[i]->installSceneEventFilter(this);
   }
+    this->corners[corners.size()-1]->installSceneEventFilter(this);
+}
+
+/////////////////////////////////////////////////
+void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
+{
+  if (!this->isSelected())
+  {
+    _event->ignore();
+    return;
+  }
+
+  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+
+  for (unsigned int i = 0; i < segments.size(); ++i)
+  {
+    this->corners[i]->removeSceneEventFilter(this);
+    this->segments[i]->removeSceneEventFilter(this);
+  }
+    this->corners[corners.size()-1]->removeSceneEventFilter(this);
+}
+
+/////////////////////////////////////////////////
+QVariant PolylineItem::itemChange(GraphicsItemChange _change,
+  const QVariant &_value)
+{
+  if (_change == QGraphicsItem::ItemSelectedChange && this->scene()) {
+
+    if (_value.toBool())
+    {
+      QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
+
+      for (unsigned int i = 0; i < segments.size(); ++i)
+      {
+        this->segments[i]->installSceneEventFilter(this);
+        this->corners[i]->installSceneEventFilter(this);
+      }
+        this->corners[corners.size()-1]->installSceneEventFilter(this);
+    }
+    else
+    {
+      QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+
+      for (unsigned int i = 0; i < segments.size(); ++i)
+      {
+        this->corners[i]->removeSceneEventFilter(this);
+        this->segments[i]->removeSceneEventFilter(this);
+      }
+        this->corners[corners.size()-1]->removeSceneEventFilter(this);
+    }
+
+  }
+  return QGraphicsItem::itemChange(_change, _value);
 }
 
 /////////////////////////////////////////////////
@@ -415,11 +460,11 @@ void PolylineItem::paint(QPainter *_painter,
     this->drawBoundingBox(_painter);
   this->showCorners(this->isSelected());
 
-  QPen wallBorderPen;
-  wallBorderPen.setWidth(this->pen().width() + 2);
-  wallBorderPen.setStyle(Qt::SolidLine);
-  wallBorderPen.setColor(this->borderColor);
-  _painter->setPen(wallBorderPen);
+/*  QPen lineBorderPen;
+  lineBorderPen.setWidth(this->pen().width() + 2);
+  lineBorderPen.setStyle(Qt::SolidLine);
+  lineBorderPen.setColor(this->borderColor);
+  _painter->setPen(lineBorderPen);*/
   _painter->drawPath(this->path());
   _painter->restore();
 

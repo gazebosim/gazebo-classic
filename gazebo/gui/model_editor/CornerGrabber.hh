@@ -93,6 +93,10 @@ namespace gazebo
 
       private: double height;
 
+      private: double widthGrabBuffer;
+
+      private: double heightGrabBuffer;
+
       private: int mouseButtonState;
 
       private: double size;

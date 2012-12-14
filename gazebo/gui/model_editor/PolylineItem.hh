@@ -59,10 +59,10 @@ namespace gazebo
         QEvent *_event);
 
       private: virtual bool cornerEventFilter(CornerGrabber *_corner,
-          QGraphicsSceneMouseEvent *_event);
+          QEvent *_event);
 
       private: virtual bool segmentEventFilter(LineSegmentItem *_item,
-          QGraphicsSceneMouseEvent *_event);
+          QEvent *_event);
 
       private: void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
 
@@ -73,6 +73,9 @@ namespace gazebo
       private: void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
 
       private: void mousePressEvent(QGraphicsSceneMouseEvent *_event);
+
+      private: QVariant itemChange(GraphicsItemChange _change,
+        const QVariant &_value);
 
       private: void drawBoundingBox(QPainter *_painter);
 

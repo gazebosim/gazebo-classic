@@ -29,11 +29,14 @@ CornerGrabber::CornerGrabber(QGraphicsItem *_parent, int _index) :
   borderColor(Qt::black),
   width(8),
   height(8),
+  widthGrabBuffer(10),
+  heightGrabBuffer(10),
   mouseButtonState(QEvent::GraphicsSceneMouseRelease)
 {
   this->setParentItem(_parent);
 
   this->setZValue(_parent->zValue() + 1);
+//  this->setZValue(5);
   this->setAcceptHoverEvents(true);
 }
 
@@ -58,7 +61,8 @@ int CornerGrabber::GetMouseState()
 /////////////////////////////////////////////////
 QPointF CornerGrabber::GetCenterPoint()
 {
-  return QPointF(pos().x() + this->width/2, pos().y() + this->height/2);
+  return QPointF(pos().x() + (this->width + this->widthGrabBuffer/2),
+      pos().y() + (this->height + this->heightGrabBuffer)/2);
 }
 
 /////////////////////////////////////////////////
@@ -171,7 +175,9 @@ void CornerGrabber::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 /////////////////////////////////////////////////
 QRectF CornerGrabber::boundingRect() const
 {
-  return QRectF(0, 0, this->width, this->height);
+//  return QRectF(-totalWidth/2, -totalHeight/2, totalWidth, totalHeight);
+  return QRectF(0, 0, this->width + this->widthGrabBuffer,
+      this->height + this->heightGrabBuffer);
 }
 
 /////////////////////////////////////////////////
@@ -179,6 +185,10 @@ void CornerGrabber::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
   QWidget *)
 {
   _painter->save();
+
+  double totalWidth = this->width + this->widthGrabBuffer;
+  double totalHeight = this->height + this->heightGrabBuffer;
+
   QPen borderPen;
   borderPen.setWidth(1);
   borderPen.setColor(this->borderColor);
@@ -187,8 +197,10 @@ void CornerGrabber::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
   borderPen.setStyle(Qt::SolidLine);
   _painter->setPen(borderPen);
 
-  QPointF topLeft (0, 0);
-  QPointF bottomRight (this->width, this->height);
+  QPointF topLeft (totalWidth/2.0 - this->width/2.0,
+      totalHeight/2.0 - this->height/2.0);
+  QPointF bottomRight (totalWidth/2.0 + this->width/2.0,
+      totalHeight/2.0 + this->height/2.0);
 
   QRectF rect (topLeft, bottomRight);
 

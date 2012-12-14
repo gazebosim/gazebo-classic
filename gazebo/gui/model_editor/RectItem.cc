@@ -26,9 +26,7 @@ using namespace gui;
 RectItem::RectItem():
     borderColor(Qt::black),
     location(0,0),
-    gridSpace(10),
-    xCornerGrabBuffer(10),
-    yCornerGrabBuffer(10)
+    gridSpace(10)
 {
   this->width = 100;
   this->height = 100;
@@ -49,14 +47,17 @@ RectItem::RectItem():
   this->UpdateCornerPositions();
   this->setAcceptHoverEvents(true);
 
-  cursors.push_back(Qt::SizeFDiagCursor);
-  cursors.push_back(Qt::SizeVerCursor);
-  cursors.push_back(Qt::SizeBDiagCursor);
-  cursors.push_back(Qt::SizeHorCursor);
+  this->cursors.push_back(Qt::SizeFDiagCursor);
+  this->cursors.push_back(Qt::SizeVerCursor);
+  this->cursors.push_back(Qt::SizeBDiagCursor);
+  this->cursors.push_back(Qt::SizeHorCursor);
 
   this->setCursor(Qt::SizeAllCursor);
 
   this->rotationAngle = 0;
+
+  this->zValueIdle = 1;
+  this->zValueSelected = 5;
 }
 
  /////////////////////////////////////////////////
@@ -86,6 +87,30 @@ void RectItem::AdjustSize(double _x, double _y)
   this->height += _y;
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
+}
+
+/////////////////////////////////////////////////
+QVariant RectItem::itemChange(GraphicsItemChange _change,
+  const QVariant &_value)
+{
+  if (_change == QGraphicsItem::ItemSelectedChange && this->scene()) {
+
+    if (_value.toBool())
+    {
+      this->setZValue(zValueSelected);
+      for (int i = 0; i < 8; ++i)
+        this->corners[i]->installSceneEventFilter(this);
+      this->rotateHandle->installSceneEventFilter(this);
+    }
+    else
+    {
+      this->setZValue(zValueIdle);
+      for (int i = 0; i < 8; ++i)
+        this->corners[i]->removeSceneEventFilter(this);
+      this->rotateHandle->removeSceneEventFilter(this);
+    }
+  }
+  return QGraphicsItem::itemChange(_change, _value);
 }
 
 /////////////////////////////////////////////////
@@ -211,24 +236,24 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
           || ((angle <= (180 + range)) && (angle > (180 - range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(cursors[_corner->GetIndex() % 4]));
+            QCursor(this->cursors[_corner->GetIndex() % 4]));
       }
       else if (((angle <= (360 - range)) && (angle > (270 + range)))
           || ((angle <= (180 - range)) && (angle > (90 + range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(cursors[(_corner->GetIndex() + 3) % 4]));
+            QCursor(this->cursors[(_corner->GetIndex() + 3) % 4]));
       }
       else if (((angle <= (270 + range)) && (angle > (270 - range)))
           || ((angle <= (90 + range)) && (angle > (90 - range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(cursors[(_corner->GetIndex() + 2) % 4]));
+            QCursor(this->cursors[(_corner->GetIndex() + 2) % 4]));
       }
       else
       {
         QApplication::setOverrideCursor(
-            QCursor(cursors[(_corner->GetIndex() + 1) % 4]));
+            QCursor(this->cursors[(_corner->GetIndex() + 1) % 4]));
       }
       return true;
     }
@@ -241,7 +266,7 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
       return false;
   }
 
-  if (mouseEvent == NULL)
+  if (!mouseEvent)
     return false;
 
 
@@ -405,8 +430,6 @@ void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
   if (!this->isSelected())
     this->scene()->clearSelection();
 
-//  QGraphicsItem::mousePressEvent(_event);
-//  return;
   this->setSelected(true);
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
   this->location = this->pos();
@@ -416,15 +439,11 @@ void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 {
-//  QGraphicsItem::mouseMoveEvent(_event);
-//  return;
-
   if (!this->isSelected())
     return;
 
   this->location += (_event->scenePos() - _event->lastScenePos());
   this->setPos(this->location);
-
 }
 
 /////////////////////////////////////////////////
@@ -434,10 +453,13 @@ void RectItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void RectItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
+void RectItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
 {
   if (!this->isSelected())
+  {
+    _event->ignore();
     return;
+  }
 
   QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
 
@@ -448,24 +470,13 @@ void RectItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 }
 
 /////////////////////////////////////////////////
-void RectItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
+void RectItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 {
   if (!this->isSelected())
+  {
+    _event->ignore();
     return;
-
-  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
-
-//    this->borderColor = Qt::red;
-  for (int i = 0; i < 8; ++i)
-    this->corners[i]->installSceneEventFilter(this);
-  this->rotateHandle->installSceneEventFilter(this);
-}
-
-/////////////////////////////////////////////////
-void RectItem::hoverMoveEvent(QGraphicsSceneHoverEvent *)
-{
-  if (!this->isSelected())
-    return;
+  }
 
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
 

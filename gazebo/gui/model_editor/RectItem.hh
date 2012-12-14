@@ -67,8 +67,6 @@ namespace gazebo
 
         private: virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
 
-        private: virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *_event);
-
         private: virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *_event);
 
         private: virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
@@ -90,6 +88,9 @@ namespace gazebo
         private: virtual bool sceneEventFilter(QGraphicsItem *_watched,
             QEvent *_event);
 
+        private: QVariant itemChange(GraphicsItemChange _change,
+          const QVariant &_value);
+
         protected: double width;
 
         protected: double height;
@@ -110,10 +111,6 @@ namespace gazebo
 
         private: int gridSpace;
 
-        private: int xCornerGrabBuffer;
-
-        private: int yCornerGrabBuffer;
-
         /// \brief Four corners and four edges, going clockwise with
         /// 0 being top left
         private: CornerGrabber *corners[8];
@@ -123,6 +120,10 @@ namespace gazebo
         private: double rotationAngle;
 
         private: std::vector<Qt::CursorShape> cursors;
+
+        private: int zValueSelected;
+
+        protected: int zValueIdle;
     };
   }
 }

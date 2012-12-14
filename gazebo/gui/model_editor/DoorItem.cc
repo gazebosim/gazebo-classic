@@ -37,7 +37,9 @@ DoorItem::DoorItem(): RectItem()
   this->UpdateCornerPositions();
 
   this->doorPos = this->pos();
-  this->setZValue(3);
+
+  this->zValueIdle = 3;
+  this->setZValue(this->zValueIdle);
 }
 
 /////////////////////////////////////////////////

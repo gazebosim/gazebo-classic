@@ -38,7 +38,8 @@ WindowItem::WindowItem(): RectItem()
 
   this->UpdateCornerPositions();
 
-  this->setZValue(3);
+  this->zValueIdle = 3;
+  this->setZValue(this->zValueIdle);
 }
 
 /////////////////////////////////////////////////
