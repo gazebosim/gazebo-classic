@@ -319,13 +319,13 @@ void bw()
           bandwidth << totalBps/1.049e6 << " MB/s";
 
         // Format message size  output
-        if (meanBps < 1000)
+        if (meanBytes < 1000)
         {
           mean << meanBytes << " B";
           min << bwBytes[0] << " B";
           max << bwBytes[count-1] << " B";
         }
-        else if (meanBps < 1000000)
+        else if (meanBytes < 1000000)
         {
           mean << meanBytes / 1024.0f << " KB";
           min << bwBytes[0] / 1024.0f << " KB";
