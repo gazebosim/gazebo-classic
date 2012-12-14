@@ -18,7 +18,7 @@
 #include "BuildingEditorPalette.hh"
 #include "FinishModelDialog.hh"
 
-#include "gui/GuiEvents.hh"
+#include "gui/model_editor/EditorEvents.hh"
 
 //#include "WindowDoorInspectorDialog.hh"
 //#include "WallInspectorDialog.hh"

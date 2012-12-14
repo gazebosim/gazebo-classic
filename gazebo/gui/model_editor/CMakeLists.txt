@@ -18,6 +18,8 @@ set (sources
   PolylineItem.cc
   WallItem.cc
   LineSegmentItem.cc
+  BuildingMaker.cc
+  EditorEvents.cc
 )
 
 set (qt_headers
@@ -39,10 +41,15 @@ set (qt_headers
   LineSegmentItem.hh
 )
 
+set (headers
+  BuildingMaker.hh
+  EditorEvents.hh
+)
+
 set (resources ../resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-add_library(gazebo_model_editor STATIC ${sources} ${headers_MOC} ${resources_RCC})
+add_library(gazebo_model_editor STATIC ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

@@ -22,7 +22,8 @@
 #include "DoorItem.hh"
 #include "PolylineItem.hh"
 #include "WallItem.hh"
-#include "gui/GuiEvents.hh"
+#include "BuildingMaker.hh"
+#include "gui/model_editor/EditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -153,6 +154,9 @@ void EditorView::DrawLine(QPoint _pos)
 
     lastLineCornerPos = _pos;
     lastMousePos = _pos;
+
+    BuildingMaker buildingMaker;
+    gui::Events::createBuildingPart("wall");
   }
   else
   {

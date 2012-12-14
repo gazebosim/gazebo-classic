@@ -15,18 +15,12 @@
  *
 */
 
-#include "gui/GuiEvents.hh"
+#include "gui/model_editor/EditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
 
-event::EventT<void (std::string, std::string)> Events::createEntity;
-event::EventT<void (bool)> Events::moveMode;
-event::EventT<void (std::string)> Events::manipMode;
-event::EventT<void (bool)> Events::fullScreen;
-event::EventT<void ()> Events::fps;
-event::EventT<void ()> Events::orbit;
-event::EventT<void (std::string)> Events::keyPress;
-event::EventT<void (const msgs::Model &)> Events::modelUpdate;
-event::EventT<void (const common::MouseEvent &)> Events::mousePress;
-event::EventT<void (const common::MouseEvent &)> Events::mouseRelease;
+event::EventT<void (std::string)> Events::createEditorItem;
+event::EventT<void (std::string)> Events::createBuildingPart;
+event::EventT<void (std::string, math::Pose)> Events::setBuildingPartPose;
+event::EventT<void (std::string, math::Vector3)> Events::setBuildingPartSize;
