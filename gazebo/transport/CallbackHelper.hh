@@ -40,6 +40,8 @@ namespace gazebo
     class CallbackHelper
     {
       /// \brief Constructor
+      /// \param[in] _latching Set to true to make the callback helper
+      /// latching.
       public: CallbackHelper(bool _latching = false) : latching(_latching) {}
 
       /// \brief Destructor
@@ -81,6 +83,8 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
+      /// \param[in] _latching Set to true to make the callback helper
+      /// latching.
       public: CallbackHelperT(const boost::function<
                 void (const boost::shared_ptr<M const> &)> &_cb,
                 bool _latching = false)
@@ -131,6 +135,8 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
+      /// \param[in] _latching Set to true to make the callback helper
+      /// latching.
       public: DebugCallbackHelper(
                   const boost::function<void (ConstGzStringPtr &)> &_cb,
                   bool _latching = false)
