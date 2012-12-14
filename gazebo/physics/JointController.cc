@@ -50,9 +50,11 @@ void JointController::AddJoint(JointPtr _joint)
 /////////////////////////////////////////////////
 void JointController::Reset()
 {
+  // Reset setpoints and feed-forward.
   this->positions.clear();
   this->velocities.clear();
   this->forces.clear();
+  // Should the PID's be reset as well?
 }
 
 /////////////////////////////////////////////////
@@ -62,6 +64,12 @@ void JointController::Update()
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
 
+  // Skip the update step if SimTime appears to have gone backward.
+  // Negative update time wreaks havok on the integrators.
+  // This happens when World::ResetTime is called.
+  // TODO: fix this when World::ResetTime is improved
+  if (stepTime > 0)
+  {
   if (this->forces.size() > 0)
   {
     std::map<std::string, double>::iterator iter;
@@ -96,6 +104,7 @@ void JointController::Update()
           stepTime);
       this->joints[iter->first]->SetForce(0, cmd);
     }
+  }
   }
 
   // Disabled for now. Collisions don't update properly
