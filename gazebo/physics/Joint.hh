@@ -306,13 +306,6 @@ namespace gazebo
       public: virtual math::Vector3 GetLinkTorque(
                   unsigned int _index) const = 0;
 
-      /// \brief Set a parameter for the joint.
-      /// \param[in] _attr Attribute to set.
-      /// \param[in] _index Index of the axis.
-      /// \param[in] _value Value of the attribute.
-      public: virtual void SetAttribute(Attribute _attr, int _index,
-                                        double _value) GAZEBO_DEPRECATED = 0;
-
       /// \brief Set a non-generic parameter for the joint.
       /// replaces SetAttribute(Attribute, int, double)
       /// \param[in] _key String key.
@@ -328,11 +321,6 @@ namespace gazebo
       /// \brief Get the parent link.
       /// \return Pointer to the parent link.
       public: LinkPtr GetParent() const;
-
-      /// \brief DEPRECATED
-      /// \param[out] _msg Message to fill with joint's properties
-      /// \sa Joint::FillMsg
-      public: void FillJointMsg(msgs::Joint &_msg) GAZEBO_DEPRECATED;
 
       /// \brief Fill a joint message.
       /// \param[out] _msg Message to fill with this joint's properties.

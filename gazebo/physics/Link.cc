@@ -669,12 +669,6 @@ void Link::RemoveChildJoint(JointPtr _joint)
 }
 
 //////////////////////////////////////////////////
-void Link::FillLinkMsg(msgs::Link &_msg)
-{
-  this->FillMsg(_msg);
-}
-
-//////////////////////////////////////////////////
 void Link::FillMsg(msgs::Link &_msg)
 {
   _msg.set_id(this->GetId());

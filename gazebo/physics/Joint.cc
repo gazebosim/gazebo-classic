@@ -283,12 +283,6 @@ LinkPtr Joint::GetParent() const
 }
 
 //////////////////////////////////////////////////
-void Joint::FillJointMsg(msgs::Joint &_msg)
-{
-  this->FillMsg(_msg);
-}
-
-//////////////////////////////////////////////////
 void Joint::FillMsg(msgs::Joint &_msg)
 {
   _msg.set_name(this->GetScopedName());

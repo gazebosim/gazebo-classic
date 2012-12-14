@@ -48,9 +48,6 @@ namespace gazebo
       /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Deprecated.
-      public: void FillSurfaceMsg(msgs::Surface &_msg) GAZEBO_DEPRECATED;
-
       /// \brief Fill in a surface message.
       /// \param[in] _msg Message to fill with this object's values.
       public: void FillMsg(msgs::Surface &_msg);
