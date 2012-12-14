@@ -112,7 +112,7 @@ namespace gazebo
       private: std::string msgType;
       private: unsigned int queueLimit;
       private: std::list<google::protobuf::Message *> messages;
-      private: boost::recursive_mutex *mutex;
+      private: mutable boost::recursive_mutex mutex;
       private: PublicationPtr publications[2];
 
       private: bool latch;

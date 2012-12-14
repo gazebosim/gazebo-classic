@@ -79,6 +79,11 @@ namespace gazebo
       /// \brief Process incoming messages.
       public: void ProcessIncoming();
 
+      /// \brief Return true if a subscriber on a specific topic is latched.
+      /// \param[in] _topic Name of the topic to check.
+      /// \return True if a latched subscriber exists.
+      public: bool HasLatchedSubscriber(const std::string &_topic) const;
+
       /// \brief Adverise a topic
       /// \param[in] _topic The topic to advertise
       /// \param[in] _queueLimit The maximum number of outgoing messages to
@@ -121,7 +126,7 @@ namespace gazebo
 
         boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
         this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
-              new CallbackHelperT<M>(boost::bind(_fp, _obj, _1))));
+              new CallbackHelperT<M>(boost::bind(_fp, _obj, _1), _latching)));
 
         return transport::TopicManager::Instance()->Subscribe(ops);
       }
@@ -143,7 +148,7 @@ namespace gazebo
 
         boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
         this->callbacks[decodedTopic].push_back(
-            CallbackHelperPtr(new CallbackHelperT<M>(_fp)));
+            CallbackHelperPtr(new CallbackHelperT<M>(_fp, _latching)));
 
         return transport::TopicManager::Instance()->Subscribe(ops);
       }

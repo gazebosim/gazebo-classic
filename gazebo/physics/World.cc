@@ -168,7 +168,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
-  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 1, true);
+  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
   if (this->sdf->HasElement("gui"))
     this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
 

@@ -40,7 +40,8 @@ namespace gazebo
     class CallbackHelper
     {
       /// \brief Constructor
-      public: CallbackHelper() : latching(false) {}
+      public: CallbackHelper(bool _latching = false) : latching(_latching) {}
+
       /// \brief Destructor
       public: virtual ~CallbackHelper() {}
 
@@ -65,6 +66,7 @@ namespace gazebo
       /// \return true if the callback is latching, false otherwise
       public: bool GetLatching() const
               {return this->latching;}
+
       protected: bool latching;
     };
 
@@ -80,7 +82,9 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
       public: CallbackHelperT(const boost::function<
-                void (const boost::shared_ptr<M const> &)> &_cb) : callback(_cb)
+                void (const boost::shared_ptr<M const> &)> &_cb,
+                bool _latching = false)
+              : CallbackHelper(_latching), callback(_cb)
               {
                 // Just some code to make sure we have a google protobuf.
                 /*M test;
@@ -128,8 +132,9 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
       public: DebugCallbackHelper(
-                  const boost::function<void (ConstGzStringPtr &)> &_cb)
-              : callback(_cb)
+                  const boost::function<void (ConstGzStringPtr &)> &_cb,
+                  bool _latching = false)
+              : CallbackHelper(_latching), callback(_cb)
               {
               }
 
