@@ -30,9 +30,7 @@ if (HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
     gazebo_ode
     ${urdfdom_headers_LIBRARIES}
     ${urdfdom_LIBRARIES}
-    ${console_bridge_LIBRARIES}
-    ${urdfdom_LDFLAGS}
-    ${console_bridge_LDFLAGS})
+    ${console_bridge_LIBRARIES})
 else(HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
   target_link_libraries(gazebo_sdf_interface
     gazebo_common ${tinyxml_libraries} ${Boost_LIBRARIES})
