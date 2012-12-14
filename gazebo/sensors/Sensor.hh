@@ -142,6 +142,21 @@ namespace gazebo
       /// \return Name of the world.
       public: std::string GetWorldName() const;
 
+      /// \brief Connect a signal that is triggered when the sensor is
+      /// updated.
+      /// \param[in] _subscriber Callback that receives the signal.
+      /// \return A pointer to the connection. This must be kept in scope.
+      /// \sa Sensor::DisconnectUpdated
+      public: template<typename T>
+              event::ConnectionPtr ConnectUpdated(T _subscriber)
+              {return this->updated.Connect(_subscriber);}
+
+      /// \brief Disconnect from a the updated signal.
+      /// \param[in] _c The connection to disconnect
+      /// \sa Sensor::ConnectUpdated
+      public: void DisconnectUpdated(event::ConnectionPtr &_c)
+              {this->updated.Disconnect(_c);}
+
       /// \brief Load a plugin for this sensor.
       /// \param[in] _sdf SDF parameters.
       private: void LoadPlugin(sdf::ElementPtr _sdf);
@@ -167,6 +182,9 @@ namespace gazebo
 
       /// \brief Subscribe to pose updates.
       protected: transport::SubscriberPtr poseSub;
+
+      /// \brief Event triggered when a sensor is updated.
+      private: event::EventT<void()> updated;
 
       /// \brief Subscribe to control message.
       private: transport::SubscriberPtr controlSub;
