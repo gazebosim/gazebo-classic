@@ -9,13 +9,8 @@ if (HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
                              ${console_bridge_INCLUDE_DIRS}
                              ${CMAKE_SOURCE_DIR}/deps/opende/include)
 
-  link_directories(${urdfdom_LIBRARY_DIRS}
-                   ${urdfdom_headers_LIBRARY_DIRS}
-                   ${console_bridge_LIBRARY_DIRS})
-
   set (sources ${sources} parser_urdf.cc)
   set (headers ${headers} parser_urdf.hh)
-
   # add_definitions(${urdfdom_LDFLAGS}
   # ${urdfdom_headers_LDFLAGS} ${console_bridge_LDFLAGS})
 endif(HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
