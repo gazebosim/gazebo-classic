@@ -281,7 +281,6 @@ void Scene::Init()
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
 
-
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);
 }
