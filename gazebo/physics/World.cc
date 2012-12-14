@@ -703,7 +703,7 @@ ModelPtr World::GetModel(unsigned int _index) const
         if (count == _index)
         {
           model = boost::shared_static_cast<Model>(
-              this->rootElement->GetChild(count));
+              this->rootElement->GetChild(i));
           break;
         }
         count++;
