@@ -45,6 +45,7 @@ namespace urdf2gazebo
   typedef boost::shared_ptr<urdf::Collision> CollisionPtr;
   typedef boost::shared_ptr<urdf::Visual> VisualPtr;
   typedef boost::shared_ptr<urdf::Link> LinkPtr;
+  typedef boost::shared_ptr<const urdf::Link> ConstLinkPtr;
 
   class GazeboExtension
   {
@@ -332,41 +333,41 @@ namespace urdf2gazebo
 
       /// create SDF from URDF link
       void createSDF(TiXmlElement *root,
-        boost::shared_ptr<const urdf::Link> link,
+        ConstLinkPtr link,
         const gazebo::math::Pose &transform);
 
       /// create SDF Link block based on URDF
       void createLink(TiXmlElement *root,
-        boost::shared_ptr<const urdf::Link> link,
+        ConstLinkPtr link,
         gazebo::math::Pose &currentTransform);
 
       /// create collision blocks from urdf collisions
       void createCollisions(TiXmlElement* elem,
-        boost::shared_ptr<const urdf::Link> link);
+        ConstLinkPtr link);
 
       /// create visual blocks from urdf visuals
       void createVisuals(TiXmlElement* elem,
-        boost::shared_ptr<const urdf::Link> link);
+        ConstLinkPtr link);
 
       /// create SDF Inertial block based on URDF
       void createInertial(TiXmlElement *elem,
-        boost::shared_ptr<const urdf::Link> link);
+        ConstLinkPtr link);
 
       /// create SDF Collision block based on URDF
       void createCollision(TiXmlElement* elem,
-        boost::shared_ptr<const urdf::Link> link,
+        ConstLinkPtr link,
         CollisionPtr collision,
         std::string old_link_name = std::string(""));
 
       /// create SDF Visual block based on URDF
       void createVisual(TiXmlElement *elem,
-        boost::shared_ptr<const urdf::Link> link,
+        ConstLinkPtr link,
         VisualPtr visual,
         std::string old_link_name = std::string(""));
 
       /// create SDF Joint block based on URDF
       void createJoint(TiXmlElement *root,
-        boost::shared_ptr<const urdf::Link> link,
+        ConstLinkPtr link,
         gazebo::math::Pose &currentTransform);
 
       /// create SDF geometry block based on URDF

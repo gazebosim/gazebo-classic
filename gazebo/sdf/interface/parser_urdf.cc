@@ -1080,7 +1080,7 @@ void URDF2Gazebo::listGazeboExtensions(std::string reference)
 }
 
 void URDF2Gazebo::createSDF(TiXmlElement *root,
-  boost::shared_ptr<const urdf::Link> link,
+  ConstLinkPtr link,
   const gazebo::math::Pose &transform)
 {
     gazebo::math::Pose currentTransform = transform;
@@ -1150,7 +1150,7 @@ urdf::Pose  URDF2Gazebo::copyPose(gazebo::math::Pose pose)
 }
 
 void URDF2Gazebo::createLink(TiXmlElement *root,
-  boost::shared_ptr<const urdf::Link> link,
+  ConstLinkPtr link,
   gazebo::math::Pose &currentTransform)
 {
   /* create new body */
@@ -1195,7 +1195,7 @@ void URDF2Gazebo::createLink(TiXmlElement *root,
 }
 
 void URDF2Gazebo::createCollisions(TiXmlElement* elem,
-  boost::shared_ptr<const urdf::Link> link)
+  ConstLinkPtr link)
 {
   // loop through all collisions. make additional geoms using the lumped stuff
   for (std::map<std::string,
@@ -1227,7 +1227,7 @@ void URDF2Gazebo::createCollisions(TiXmlElement* elem,
 }
 
 void URDF2Gazebo::createVisuals(TiXmlElement* elem,
-  boost::shared_ptr<const urdf::Link> link)
+  ConstLinkPtr link)
 {
   // loop through all visuals. make additional collisions using the
   //   lumped stuff
@@ -1254,7 +1254,7 @@ void URDF2Gazebo::createVisuals(TiXmlElement* elem,
 
 
 void URDF2Gazebo::createInertial(TiXmlElement *elem,
-  boost::shared_ptr<const urdf::Link> link)
+  ConstLinkPtr link)
 {
   TiXmlElement *inertial = new TiXmlElement("inertial");
 
@@ -1289,7 +1289,7 @@ void URDF2Gazebo::createInertial(TiXmlElement *elem,
 
 
 void URDF2Gazebo::createJoint(TiXmlElement *root,
-  boost::shared_ptr<const urdf::Link> link,
+  ConstLinkPtr link,
   gazebo::math::Pose &currentTransform)
 {
     /* compute the joint tag */
@@ -1405,7 +1405,7 @@ void URDF2Gazebo::createJoint(TiXmlElement *root,
 
 
 void URDF2Gazebo::createCollision(TiXmlElement* elem,
-  boost::shared_ptr<const urdf::Link> link,
+  ConstLinkPtr link,
   CollisionPtr collision,
   std::string old_link_name)
 {
@@ -1448,7 +1448,7 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem,
 }
 
 void URDF2Gazebo::createVisual(TiXmlElement *elem,
-  boost::shared_ptr<const urdf::Link> link,
+  ConstLinkPtr link,
   VisualPtr visual, std::string old_link_name)
 {
     /* begin create gazebo visual node */
@@ -1524,7 +1524,7 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
     urdf_xml.Parse(urdf_str.c_str());
     parseGazeboExtension(urdf_xml);
 
-    boost::shared_ptr<const urdf::Link> root_link = robot_model->getRoot();
+    ConstLinkPtr root_link = robot_model->getRoot();
 
     /* Fixed Joint Reduction */
     /* if link connects to parent via fixed joint, lump down and remove link */
