@@ -108,20 +108,20 @@ void URDF2Gazebo::reduceVisualToParent(boost::shared_ptr<urdf::Link> link,
 }
 
 void URDF2Gazebo::reduceCollisionToParent(boost::shared_ptr<urdf::Link> link,
-      std::string group_name, boost::shared_ptr<urdf::Collision> collision)
+      std::string group_name, CollisionPtr collision)
 {
-  boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision > > >
+  boost::shared_ptr<std::vector<CollisionPtr> >
     cols = link->getCollisions(group_name);
   if (!cols)
   {
     // group does not exist, create one and add to map
-    cols.reset(new std::vector<boost::shared_ptr<urdf::Collision > >);
+    cols.reset(new std::vector<CollisionPtr>);
     // new group name, create add vector to map and add Collision to the vector
     link->collision_groups.insert(make_pair(group_name, cols));
   }
 
   // group exists, add Collision to the vector in the map
-  std::vector<boost::shared_ptr<urdf::Collision > >::iterator col_it =
+  std::vector<CollisionPtr>::iterator col_it =
     find(cols->begin(), cols->end(), collision);
   if (col_it != cols->end())
     gzwarn << "attempted to add collision to link ["
@@ -1205,8 +1205,7 @@ void URDF2Gazebo::createCollisions(TiXmlElement* elem,
     collisions_it = link->collision_groups.begin();
     collisions_it != link->collision_groups.end(); ++collisions_it)
   {
-    boost::shared_ptr<urdf::Collision> collision =
-      *(collisions_it->second->begin());
+    CollisionPtr collision = *(collisions_it->second->begin());
 
     if (collisions_it->first == "default")
     {
@@ -1409,7 +1408,7 @@ void URDF2Gazebo::createJoint(TiXmlElement *root,
 
 void URDF2Gazebo::createCollision(TiXmlElement* elem,
   boost::shared_ptr<const urdf::Link> link,
-  boost::shared_ptr<urdf::Collision> collision,
+  CollisionPtr collision,
   std::string old_link_name)
 {
     /* begin create geometry node, skip if no collision specified */
@@ -1724,7 +1723,7 @@ void URDF2Gazebo::reduceCollisionsToParent(boost::shared_ptr<urdf::Link> link)
         //       << "] for link [" << link->name
         //       << "] to parent [" << link->getParent()->name
         //       << "] with group name [" << lump_group_name << "]\n";
-        for (std::vector<boost::shared_ptr<urdf::Collision> >::iterator
+        for (std::vector<CollisionPtr>::iterator
           collision_it = collisions_it->second->begin();
           collision_it != collisions_it->second->end(); ++collision_it)
         {
@@ -1747,7 +1746,7 @@ void URDF2Gazebo::reduceCollisionsToParent(boost::shared_ptr<urdf::Link> link)
         //       << "] for link [" << link->name
         //       << "] to parent [" << link->getParent()->name
         //       << "] with group name [" << lump_group_name << "]\n";
-        for (std::vector<boost::shared_ptr<urdf::Collision> >::iterator
+        for (std::vector<CollisionPtr>::iterator
           collision_it = collisions_it->second->begin();
           collision_it != collisions_it->second->end(); ++collision_it)
         {
