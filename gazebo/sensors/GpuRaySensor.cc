@@ -125,7 +125,7 @@ void GpuRaySensor::Init()
     this->laserCam->SetHorzHalfAngle(
       (this->GetAngleMax() + this->GetAngleMin()).Radian() / 2.0);
 
-    this->laserCam->SetVertHalfAngle( (this->GetVerticalAngleMax()
+    this->laserCam->SetVertHalfAngle((this->GetVerticalAngleMax()
             + this->GetVerticalAngleMin()).Radian() / 2.0);
 
     if (this->GetHorzFOV() > 2 * M_PI)

@@ -325,7 +325,6 @@ namespace gazebo
 
       /// \brief Number of cameras.
       protected: unsigned int cameraCount;
-
     };
     /// \}
   }
