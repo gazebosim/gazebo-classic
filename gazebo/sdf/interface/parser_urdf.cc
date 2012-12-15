@@ -79,7 +79,7 @@ urdf::Vector3 URDF2Gazebo::parseVector3(TiXmlNode* key, double scale)
     return urdf::Vector3(0, 0, 0);
 }
 
-void URDF2Gazebo::reduceVisualToParent(boost::shared_ptr<urdf::Link> link,
+void URDF2Gazebo::reduceVisualToParent(LinkPtr link,
        std::string group_name, VisualPtr visual)
 {
   boost::shared_ptr<std::vector<VisualPtr> > viss
@@ -107,7 +107,7 @@ void URDF2Gazebo::reduceVisualToParent(boost::shared_ptr<urdf::Link> link,
     viss->push_back(visual);
 }
 
-void URDF2Gazebo::reduceCollisionToParent(boost::shared_ptr<urdf::Link> link,
+void URDF2Gazebo::reduceCollisionToParent(LinkPtr link,
       std::string group_name, CollisionPtr collision)
 {
   boost::shared_ptr<std::vector<CollisionPtr> >
@@ -772,7 +772,7 @@ void URDF2Gazebo::printMass(std::string link_name, dMass mass)
         << mass.I[10] << "]\n";
 }
 
-void URDF2Gazebo::printMass(boost::shared_ptr<urdf::Link> link)
+void URDF2Gazebo::printMass(LinkPtr link)
 {
   gzdbg << "LINK NAME: [" << link->name << "] from dMass\n";
   gzdbg << "     MASS: [" << link->inertial->mass << "]\n";
@@ -790,8 +790,7 @@ void URDF2Gazebo::printMass(boost::shared_ptr<urdf::Link> link)
                           << link->inertial->izz << "]\n";
 }
 
-void URDF2Gazebo::reduceFixedJoints(TiXmlElement *root,
-  boost::shared_ptr<urdf::Link> link)
+void URDF2Gazebo::reduceFixedJoints(TiXmlElement *root, LinkPtr link)
 {
   // if child is attached to self by fixed link first go up the tree,
   //   check it's children recursively
@@ -823,7 +822,7 @@ void URDF2Gazebo::reduceFixedJoints(TiXmlElement *root,
       reduceFixedJoints(root, link->child_links[i]);
 }
 
-void URDF2Gazebo::printCollisionGroups(boost::shared_ptr<urdf::Link> link)
+void URDF2Gazebo::printCollisionGroups(LinkPtr link)
 {
   gzdbg << "COLLISION LUMPING: link: [" << link->name << "] contains ["
         << static_cast<int>(link->collision_groups.size())
@@ -902,8 +901,7 @@ gazebo::math::Pose  URDF2Gazebo::inverseTransformToParentFrame(
 /// the additional transform to parent.  Also, look through all
 /// referenced link names with plugins and update references to current
 /// link to the parent link. (reduceGazeboExtensionFrameReplace())
-void URDF2Gazebo::reduceGazeboExtensionToParent(
-  boost::shared_ptr<urdf::Link> link)
+void URDF2Gazebo::reduceGazeboExtensionToParent(LinkPtr link)
 {
   /// @todo: this is a very complicated module that updates the plugins
   /// based on fixed joint reduction really wish this could be a lot cleaner
@@ -969,7 +967,7 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(
 }
 
 void URDF2Gazebo::reduceGazeboExtensionFrameReplace(GazeboExtension* ge,
-  boost::shared_ptr<urdf::Link> link)
+                                                    LinkPtr link)
 {
   // std::string link_name = link->name;
   // std::string new_link_name = link->getParent()->name;
@@ -1540,7 +1538,7 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
     if (root_link->name == "world")
     {
       /* convert all children link */
-      for (std::vector<boost::shared_ptr<urdf::Link> >::const_iterator
+      for (std::vector<LinkPtr>::const_iterator
         child = root_link->child_links.begin();
         child != root_link->child_links.end(); ++child)
           createSDF(robot, (*child), transform);
@@ -1587,7 +1585,7 @@ TiXmlDocument URDF2Gazebo::initModelFile(std::string filename)
     return xmlDoc;
 }
 
-void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
+void URDF2Gazebo::reduceInertialToParent(LinkPtr link)
 {
     // gzdbg << "TREE:   mass lumping from [" << link->name
     //      << "] to [" << link->getParent()->name << "]\n.";
@@ -1649,7 +1647,7 @@ void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
     }
 }
 
-void URDF2Gazebo::reduceVisualsToParent(boost::shared_ptr<urdf::Link> link)
+void URDF2Gazebo::reduceVisualsToParent(LinkPtr link)
 {
   // lump visual to parent
   // lump all visual to parent, assign group name
@@ -1703,7 +1701,7 @@ void URDF2Gazebo::reduceVisualsToParent(boost::shared_ptr<urdf::Link> link)
   }
 }
 
-void URDF2Gazebo::reduceCollisionsToParent(boost::shared_ptr<urdf::Link> link)
+void URDF2Gazebo::reduceCollisionsToParent(LinkPtr link)
 {
     // lump collision parent
     // lump all collision to parent, assign group name
@@ -1764,7 +1762,7 @@ void URDF2Gazebo::reduceCollisionsToParent(boost::shared_ptr<urdf::Link> link)
     // printCollisionGroups(link->getParent());
 }
 
-void URDF2Gazebo::reduceJointsToParent(boost::shared_ptr<urdf::Link> link)
+void URDF2Gazebo::reduceJointsToParent(LinkPtr link)
 {
     // set child link's parent_joint's parent link to
     // a parent link up stream that does not have a fixed parent_joint
@@ -1775,7 +1773,7 @@ void URDF2Gazebo::reduceJointsToParent(boost::shared_ptr<urdf::Link> link)
       if (parent_joint->type != urdf::Joint::FIXED)
       {
         // go down the tree until we hit a parent joint that is not fixed
-        boost::shared_ptr<urdf::Link> new_parent_link = link;
+        LinkPtr new_parent_link = link;
         gazebo::math::Pose joint_anchor_transform;
         while (new_parent_link->parent_joint &&
               new_parent_link->getParent()->name != "world" &&
@@ -1904,8 +1902,7 @@ void URDF2Gazebo::reduceGazeboExtensionProjectorTransformReduction(
 }
 
 void URDF2Gazebo::reduceGazeboExtensionContactSensorFrameReplace(
-  std::vector<TiXmlElement*>::iterator blob_it,
-  boost::shared_ptr<urdf::Link> link)
+  std::vector<TiXmlElement*>::iterator blob_it, LinkPtr link)
 {
   std::string link_name = link->name;
   std::string new_link_name = link->getParent()->name;
@@ -1940,8 +1937,7 @@ void URDF2Gazebo::reduceGazeboExtensionContactSensorFrameReplace(
 }
 
 void URDF2Gazebo::reduceGazeboExtensionPluginFrameReplace(
-  std::vector<TiXmlElement*>::iterator blob_it,
-  boost::shared_ptr<urdf::Link> link,
+  std::vector<TiXmlElement*>::iterator blob_it, LinkPtr link,
   std::string plugin_name, std::string element_name,
   gazebo::math::Pose reduction_transform)
 {
@@ -2022,8 +2018,7 @@ void URDF2Gazebo::reduceGazeboExtensionPluginFrameReplace(
 }
 
 void URDF2Gazebo::reduceGazeboExtensionProjectorFrameReplace(
-  std::vector<TiXmlElement*>::iterator blob_it,
-  boost::shared_ptr<urdf::Link> link)
+  std::vector<TiXmlElement*>::iterator blob_it, LinkPtr link)
 {
   std::string link_name = link->name;
   std::string new_link_name = link->getParent()->name;
@@ -2064,8 +2059,7 @@ void URDF2Gazebo::reduceGazeboExtensionProjectorFrameReplace(
 }
 
 void URDF2Gazebo::reduceGazeboExtensionGripperFrameReplace(
-  std::vector<TiXmlElement*>::iterator blob_it,
-  boost::shared_ptr<urdf::Link> link)
+  std::vector<TiXmlElement*>::iterator blob_it, LinkPtr link)
 {
   std::string link_name = link->name;
   std::string new_link_name = link->getParent()->name;
@@ -2104,8 +2098,7 @@ void URDF2Gazebo::reduceGazeboExtensionGripperFrameReplace(
 }
 
 void URDF2Gazebo::reduceGazeboExtensionJointFrameReplace(
-  std::vector<TiXmlElement*>::iterator blob_it,
-  boost::shared_ptr<urdf::Link> link)
+  std::vector<TiXmlElement*>::iterator blob_it, LinkPtr link)
 {
   std::string link_name = link->name;
   std::string new_link_name = link->getParent()->name;
