@@ -472,7 +472,7 @@ void PolylineItem::drawBoundingBox(QPainter *_painter)
 
 /////////////////////////////////////////////////
 void PolylineItem::paint(QPainter *_painter,
-    const QStyleOptionGraphicsItem *_option, QWidget *_widget)
+    const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
   _painter->save();
 

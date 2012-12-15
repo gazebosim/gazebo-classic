@@ -42,6 +42,8 @@ EditorView::EditorView(QWidget *_parent)
   this->connections.push_back(
   gui::Events::ConnectCreateEditorItem(
     boost::bind(&EditorView::OnCreateEditorItem, this, _1)));
+
+  buildingMaker = new BuildingMaker();
 }
 
 /////////////////////////////////////////////////
@@ -177,7 +179,8 @@ void EditorView::DrawLine(QPoint _pos)
 
     lastLineCornerPos = _pos;
 
-    BuildingMaker buildingMaker;
+//    buildingMaker->ConnectItem(lineItem);
+
     gui::Events::createBuildingPart("wall");
   }
   else

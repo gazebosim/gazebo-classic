@@ -23,6 +23,7 @@
 #include "sdf/sdf.hh"
 #include "common/Events.hh"
 #include "gui/EntityMaker.hh"
+#include "gui/qt.h"
 
 namespace gazebo
 {
@@ -35,6 +36,13 @@ namespace gazebo
   {
     class BoxMaker;
     class EntityMaker;
+
+    class WallManip : public QObject
+    {
+      Q_OBJECT
+      public: WallManip();
+
+    };
 
     class BuildingMaker : public EntityMaker
     {
@@ -74,7 +82,6 @@ namespace gazebo
       private: bool Init();
 
       private: virtual void CreateTheEntity();
-
 
       private: void OnCreateBuildingPart(std::string _partType);
 

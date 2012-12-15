@@ -28,6 +28,7 @@ namespace gazebo
     class WindowItem;
     class DoorItem;
     class WallItem;
+    class BuildingMaker;
 
     class EditorView : public QGraphicsView
     {
@@ -76,6 +77,8 @@ namespace gazebo
       private: QGraphicsItem *currentMouseItem;
 
       private: QGraphicsItem *currentSelectedItem;
+
+      private: BuildingMaker *buildingMaker;
     };
   }
 }
