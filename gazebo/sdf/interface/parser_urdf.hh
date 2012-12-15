@@ -32,8 +32,8 @@
 #include "ode/mass.h"
 #include "ode/rotation.h"
 
-#include "math/Pose.hh"
-#include "common/Console.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/common/Console.hh"
 
 /// \ingroup gazebo_parser
 /// \brief namespace for URDF to SDF parser

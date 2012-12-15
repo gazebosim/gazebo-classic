@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <string>
 
-#include "common/SystemPaths.hh"
+#include "gazebo/common/SystemPaths.hh"
 
 namespace urdf2gazebo
 {
