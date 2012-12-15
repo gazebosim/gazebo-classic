@@ -237,7 +237,7 @@ namespace urdf2gazebo
       /// reduce fixed joints:  lump visuals when reducing fixed joints
       void reduceVisualToParent(boost::shared_ptr<urdf::Link> link,
                                 std::string group_name,
-                                boost::shared_ptr<urdf::Visual> visual);
+                                VisualPtr visual);
 
       /// reduce fixed joints:  lump collision when reducing fixed joints
       void reduceCollisionToParent(boost::shared_ptr<urdf::Link> link,
@@ -361,7 +361,7 @@ namespace urdf2gazebo
       /// create SDF Visual block based on URDF
       void createVisual(TiXmlElement *elem,
         boost::shared_ptr<const urdf::Link> link,
-        boost::shared_ptr<urdf::Visual> visual,
+        VisualPtr visual,
         std::string old_link_name = std::string(""));
 
       /// create SDF Joint block based on URDF

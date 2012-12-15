@@ -80,14 +80,14 @@ urdf::Vector3 URDF2Gazebo::parseVector3(TiXmlNode* key, double scale)
 }
 
 void URDF2Gazebo::reduceVisualToParent(boost::shared_ptr<urdf::Link> link,
-       std::string group_name, boost::shared_ptr<urdf::Visual> visual)
+       std::string group_name, VisualPtr visual)
 {
-  boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Visual > > > viss
+  boost::shared_ptr<std::vector<VisualPtr> > viss
     = link->getVisuals(group_name);
   if (!viss)
   {
     // group does not exist, create one and add to map
-    viss.reset(new std::vector<boost::shared_ptr<urdf::Visual > >);
+    viss.reset(new std::vector<VisualPtr>);
     // new group name, create vector, add vector to map and
     //   add Visual to the vector
     link->visual_groups.insert(make_pair(group_name, viss));
@@ -96,7 +96,7 @@ void URDF2Gazebo::reduceVisualToParent(boost::shared_ptr<urdf::Link> link,
   }
 
   // group exists, add Visual to the vector in the map if it's not there
-  std::vector<boost::shared_ptr<urdf::Visual > >::iterator vis_it
+  std::vector<VisualPtr>::iterator vis_it
     = find(viss->begin(), viss->end(), visual);
   if (vis_it != viss->end())
     gzwarn << "attempted to add visual to link ["
@@ -1238,7 +1238,7 @@ void URDF2Gazebo::createVisuals(TiXmlElement* elem,
     visuals_it = link->visual_groups.begin();
     visuals_it != link->visual_groups.end(); ++visuals_it)
   {
-    boost::shared_ptr<urdf::Visual> visual = *(visuals_it->second->begin());
+    VisualPtr visual = *(visuals_it->second->begin());
 
     if (visuals_it->first == "default")
     {
@@ -1451,7 +1451,7 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem,
 
 void URDF2Gazebo::createVisual(TiXmlElement *elem,
   boost::shared_ptr<const urdf::Link> link,
-  boost::shared_ptr<urdf::Visual> visual, std::string old_link_name)
+  VisualPtr visual, std::string old_link_name)
 {
     /* begin create gazebo visual node */
     TiXmlElement *gazebo_visual = new TiXmlElement("visual");
@@ -1668,7 +1668,7 @@ void URDF2Gazebo::reduceVisualsToParent(boost::shared_ptr<urdf::Link> link)
       std::string lump_group_name = std::string("lump::")+link->name;
       // gzdbg << "adding modified lump group name [" << lump_group_name
       //       << "] to link [" << link->getParent()->name << "]\n.";
-      for (std::vector<boost::shared_ptr<urdf::Visual> >::iterator
+      for (std::vector<VisualPtr>::iterator
         visual_it = visuals_it->second->begin();
         visual_it != visuals_it->second->end(); ++visual_it)
       {
@@ -1687,7 +1687,7 @@ void URDF2Gazebo::reduceVisualsToParent(boost::shared_ptr<urdf::Link> link)
       std::string lump_group_name = visuals_it->first;
       // gzdbg << "re-lumping group name [" << lump_group_name
       //       << "] to link [" << link->getParent()->name << "]\n";
-      for (std::vector<boost::shared_ptr<urdf::Visual> >::iterator
+      for (std::vector<VisualPtr>::iterator
            visual_it = visuals_it->second->begin();
            visual_it != visuals_it->second->end(); ++visual_it)
       {
