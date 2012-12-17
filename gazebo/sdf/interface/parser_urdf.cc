@@ -1203,25 +1203,74 @@ void URDF2Gazebo::createCollisions(TiXmlElement* elem,
     collisions_it = link->collision_groups.begin();
     collisions_it != link->collision_groups.end(); ++collisions_it)
   {
-    CollisionPtr collision = *(collisions_it->second->begin());
-
-    if (collisions_it->first == "default")
+    unsigned int defaultMeshCount = 0;
+    unsigned int groupMeshCount = 0;
+    unsigned int lumpMeshCount = 0;
+    for (std::vector<CollisionPtr>::iterator
+         collision = collisions_it->second->begin();
+         collision != collisions_it->second->end();
+         ++collision)
     {
-      // gzdbg << "creating default collision for link [" << link->name
-      //       << "]";
+      if (collisions_it->first == "default")
+      {
+        // gzdbg << "creating default collision for link [" << link->name
+        //       << "]";
 
-      /* make a <collision> block */
-      createCollision(elem, link, collision, link->name);
-    }
-    else if (collisions_it->first.find(std::string("lump::")) == 0)
-    {
-      // if collision name starts with "lump::", pass through
-      //   original parent link name
-      // gzdbg << "creating lump collision [" << collisions_it->first
-      //       << "] for link [" << link->name << "].\n";
-      /// old_link_name is the original name before lumping
-      std::string old_link_name = collisions_it->first.substr(6);
-      createCollision(elem, link, collision, old_link_name);
+        std::string collisionPrefix = link->name;
+
+        if (defaultMeshCount > 0)
+        {
+          // append _[meshCount] to link name for additional collisions
+          std::ostringstream collision_name_stream;
+          collision_name_stream << collisionPrefix << "_" << defaultMeshCount;
+          collisionPrefix = collision_name_stream.str();
+        }
+
+        /* make a <collision> block */
+        createCollision(elem, link, *collision, collisionPrefix);
+
+        // only 1 default mesh
+        ++defaultMeshCount;
+      }
+      else if (collisions_it->first.find(std::string("lump::")) == 0)
+      {
+        // if collision name starts with "lump::", pass through
+        //   original parent link name
+        // gzdbg << "creating lump collision [" << collisions_it->first
+        //       << "] for link [" << link->name << "].\n";
+        /// collisionPrefix is the original name before lumping
+        std::string collisionPrefix = collisions_it->first.substr(6);
+
+        if (lumpMeshCount > 0)
+        {
+          // append _[meshCount] to link name for additional collisions
+          std::ostringstream collision_name_stream;
+          collision_name_stream << collisionPrefix << "_" << lumpMeshCount;
+          collisionPrefix = collision_name_stream.str();
+        }
+
+        createCollision(elem, link, *collision, collisionPrefix);
+        ++lumpMeshCount;
+      }
+      else
+      {
+        // gzdbg << "adding collisions from collision group ["
+        //      << collisions_it->first << "]\n";
+
+        std::string collisionPrefix = link->name + std::string("_") +
+                                      collisions_it->first;
+
+        if (groupMeshCount > 0)
+        {
+          // append _[meshCount] to link name for additional collisions
+          std::ostringstream collision_name_stream;
+          collision_name_stream << collisionPrefix << "_" << groupMeshCount;
+          collisionPrefix = collision_name_stream.str();
+        }
+
+        createCollision(elem, link, *collision, collisionPrefix);
+        ++groupMeshCount;
+      }
     }
   }
 }
