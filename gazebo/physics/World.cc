@@ -88,7 +88,7 @@ World::World(const std::string &_name)
   this->logPlayStateSDF.reset(new sdf::Element);
   sdf::initFile("state.sdf", this->logPlayStateSDF);
 
-  this->receiveMutex = new boost::mutex();
+  this->receiveMutex = new boost::recursive_mutex();
   this->loadModelMutex = new boost::mutex();
 
   this->initialized = false;
@@ -170,7 +170,9 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
-  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 1, true);
+  this->posePub = this->node->Advertise<msgs::Pose_V>("~/pose/info", 10);
+
+  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
   if (this->sdf->HasElement("gui"))
     this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
 
@@ -688,7 +690,12 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 //////////////////////////////////////////////////
 unsigned int World::GetModelCount() const
 {
-  return this->rootElement->GetChildCount();
+  // Not all children of the root element are models. We have to iterate
+  // through the children and count only the models.
+  unsigned int result = 0;
+  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+    result += this->rootElement->GetChild(i)->HasType(Base::MODEL) ? 1 : 0;
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -696,15 +703,32 @@ ModelPtr World::GetModel(unsigned int _index) const
 {
   ModelPtr model;
 
-  if (_index < this->rootElement->GetChildCount() &&
-      this->rootElement->GetChild(_index)->HasType(Base::MODEL))
+  if (_index < this->rootElement->GetChildCount())
   {
-    model =
-      boost::shared_static_cast<Model>(this->rootElement->GetChild(_index));
+    // Not all children of the root element are models. We have to iterate
+    // through the children and count only the models.
+    for (unsigned int i = 0, count = 0;
+         i < this->rootElement->GetChildCount(); i++)
+    {
+      if (this->rootElement->GetChild(i)->HasType(Base::MODEL))
+      {
+        if (count == _index)
+        {
+          model = boost::shared_static_cast<Model>(
+              this->rootElement->GetChild(i));
+          break;
+        }
+        count++;
+      }
+    }
+
+    if (!model)
+      gzerr << "Unable to get model with index[" << _index << "]\n";
   }
   else
   {
-    gzerr << "Invalid model index\n";
+    gzerr << "Given model index[" << _index << "] is out of range[0.."
+          << this->rootElement->GetChildCount() << "]\n";
   }
 
   return model;
@@ -872,7 +896,7 @@ void World::SetPaused(bool _p)
 //////////////////////////////////////////////////
 void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   this->factoryMsgs.push_back(*_msg);
 }
 
@@ -915,14 +939,14 @@ void World::OnControl(ConstWorldControlPtr &_data)
 //////////////////////////////////////////////////
 void World::OnRequest(ConstRequestPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   this->requestMsgs.push_back(*_msg);
 }
 
 //////////////////////////////////////////////////
 void World::JointLog(ConstJointPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   int i = 0;
   for (; i < this->sceneMsg.joint_size(); i++)
   {
@@ -943,7 +967,7 @@ void World::JointLog(ConstJointPtr &_msg)
 //////////////////////////////////////////////////
 void World::OnModelMsg(ConstModelPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   this->modelMsgs.push_back(*_msg);
 }
 
@@ -1064,8 +1088,6 @@ void World::LoadPlugin(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void World::ProcessEntityMsgs()
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-
   std::list<std::string>::iterator iter;
   for (iter = this->deleteEntity.begin();
        iter != this->deleteEntity.end(); ++iter)
@@ -1096,7 +1118,6 @@ void World::ProcessEntityMsgs()
 //////////////////////////////////////////////////
 void World::ProcessRequestMsgs()
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
   msgs::Response response;
 
   std::list<msgs::Request>::iterator iter;
@@ -1225,7 +1246,6 @@ void World::ProcessRequestMsgs()
 void World::ProcessModelMsgs()
 {
   std::list<msgs::Model>::iterator iter;
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
   for (iter = this->modelMsgs.begin();
        iter != this->modelMsgs.end(); ++iter)
   {
@@ -1259,7 +1279,6 @@ void World::ProcessModelMsgs()
 void World::ProcessFactoryMsgs()
 {
   std::list<msgs::Factory>::iterator iter;
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
 
   for (iter = this->factoryMsgs.begin();
        iter != this->factoryMsgs.end(); ++iter)
@@ -1475,7 +1494,7 @@ void World::SetState(const WorldState &_state)
 //////////////////////////////////////////////////
 void World::InsertModelFile(const std::string &_sdfFilename)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   msgs::Factory msg;
   msg.set_sdf_filename(_sdfFilename);
   this->factoryMsgs.push_back(msg);
@@ -1484,7 +1503,7 @@ void World::InsertModelFile(const std::string &_sdfFilename)
 //////////////////////////////////////////////////
 void World::InsertModelSDF(const sdf::SDF &_sdf)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   msgs::Factory msg;
   msg.set_sdf(_sdf.ToString());
   this->factoryMsgs.push_back(msg);
@@ -1493,7 +1512,7 @@ void World::InsertModelSDF(const sdf::SDF &_sdf)
 //////////////////////////////////////////////////
 void World::InsertModelString(const std::string &_sdfString)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   msgs::Factory msg;
   msg.set_sdf(_sdfString);
   this->factoryMsgs.push_back(msg);
@@ -1564,6 +1583,15 @@ bool World::OnLog(std::ostringstream &_stream)
 //////////////////////////////////////////////////
 void World::ProcessMessages()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+
+  if (this->posePub && this->posePub->HasConnections() &&
+      this->poseMsgs.pose_size() > 0)
+  {
+    this->posePub->Publish(this->poseMsgs);
+  }
+  this->poseMsgs.clear_pose();
+
   if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
       this->processMsgsPeriod)
   {
@@ -1591,4 +1619,28 @@ void World::PublishWorldStats()
 bool World::IsLoaded() const
 {
   return this->loaded;
+}
+
+//////////////////////////////////////////////////
+void World::EnqueueMsg(msgs::Pose *_msg)
+{
+  if (!_msg)
+    return;
+
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  int i = 0;
+
+  // Replace old pose messages with the new one.
+  for (; i < this->poseMsgs.pose_size(); ++i)
+  {
+    if (this->poseMsgs.pose(i).name() == _msg->name())
+    {
+      this->poseMsgs.mutable_pose(i)->CopyFrom(*_msg);
+      break;
+    }
+  }
+
+  // Add the pose message if no old pose messages were found.
+  if (i >= this->poseMsgs.pose_size())
+      this->poseMsgs.add_pose()->CopyFrom(*_msg);
 }
