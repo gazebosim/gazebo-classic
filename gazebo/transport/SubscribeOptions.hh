@@ -20,7 +20,7 @@
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>
-#include "transport/CallbackHelper.hh"
+#include "gazebo/transport/CallbackHelper.hh"
 
 namespace gazebo
 {
@@ -44,8 +44,7 @@ namespace gazebo
       /// \param[in] _latching If true, latch the latest message; if false,
       /// don't latch
       public: template<class M>
-              void Init(const std::string &_topic,
-                        NodePtr _node,
+              void Init(const std::string &_topic, NodePtr _node,
                         bool _latching)
               {
                 google::protobuf::Message *msg = NULL;

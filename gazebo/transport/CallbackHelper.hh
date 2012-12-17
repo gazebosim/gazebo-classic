@@ -40,7 +40,10 @@ namespace gazebo
     class CallbackHelper
     {
       /// \brief Constructor
-      public: CallbackHelper() : latching(false) {}
+      /// \param[in] _latching Set to true to make the callback helper
+      /// latching.
+      public: CallbackHelper(bool _latching = false) : latching(_latching) {}
+
       /// \brief Destructor
       public: virtual ~CallbackHelper() {}
 
@@ -65,6 +68,9 @@ namespace gazebo
       /// \return true if the callback is latching, false otherwise
       public: bool GetLatching() const
               {return this->latching;}
+
+      /// \brief True means that the callback helper will get the last
+      /// published message on the topic.
       protected: bool latching;
     };
 
@@ -79,8 +85,12 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
+      /// \param[in] _latching Set to true to make the callback helper
+      /// latching.
       public: CallbackHelperT(const boost::function<
-                void (const boost::shared_ptr<M const> &)> &_cb) : callback(_cb)
+                void (const boost::shared_ptr<M const> &)> &_cb,
+                bool _latching = false)
+              : CallbackHelper(_latching), callback(_cb)
               {
                 // Just some code to make sure we have a google protobuf.
                 /*M test;
@@ -129,9 +139,12 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
+      /// \param[in] _latching Set to true to make the callback helper
+      /// latching.
       public: RawCallbackHelper(
-                  const boost::function<void (const std::string &)> &_cb)
-              : callback(_cb)
+                  const boost::function<void (const std::string &)> &_cb,
+                  bool _latching = false)
+              : CallbackHelper(_latching), callback(_cb)
               {
               }
 

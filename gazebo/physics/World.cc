@@ -170,7 +170,7 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->posePub = this->node->Advertise<msgs::Pose_V>("~/pose/info", 10);
 
-  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 1, true);
+  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
   if (this->sdf->HasElement("gui"))
     this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
 
@@ -680,7 +680,12 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 //////////////////////////////////////////////////
 unsigned int World::GetModelCount() const
 {
-  return this->rootElement->GetChildCount();
+  // Not all children of the root element are models. We have to iterate
+  // through the children and count only the models.
+  unsigned int result = 0;
+  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+    result += this->rootElement->GetChild(i)->HasType(Base::MODEL) ? 1 : 0;
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -688,15 +693,32 @@ ModelPtr World::GetModel(unsigned int _index) const
 {
   ModelPtr model;
 
-  if (_index < this->rootElement->GetChildCount() &&
-      this->rootElement->GetChild(_index)->HasType(Base::MODEL))
+  if (_index < this->rootElement->GetChildCount())
   {
-    model =
-      boost::shared_static_cast<Model>(this->rootElement->GetChild(_index));
+    // Not all children of the root element are models. We have to iterate
+    // through the children and count only the models.
+    for (unsigned int i = 0, count = 0;
+         i < this->rootElement->GetChildCount(); i++)
+    {
+      if (this->rootElement->GetChild(i)->HasType(Base::MODEL))
+      {
+        if (count == _index)
+        {
+          model = boost::shared_static_cast<Model>(
+              this->rootElement->GetChild(i));
+          break;
+        }
+        count++;
+      }
+    }
+
+    if (!model)
+      gzerr << "Unable to get model with index[" << _index << "]\n";
   }
   else
   {
-    gzerr << "Invalid model index\n";
+    gzerr << "Given model index[" << _index << "] is out of range[0.."
+          << this->rootElement->GetChildCount() << "]\n";
   }
 
   return model;

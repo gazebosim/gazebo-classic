@@ -18,36 +18,72 @@
  * Desc: Contact plugin
  * Author: Nate Koenig mod by John Hsu
  */
-
-#include "physics/physics.hh"
 #include "ContactPlugin.hh"
 
 using namespace gazebo;
-
-// Register this plugin with the simulator
 GZ_REGISTER_SENSOR_PLUGIN(ContactPlugin)
 
 /////////////////////////////////////////////////
-ContactPlugin::ContactPlugin()
+ContactPlugin::ContactPlugin() : SensorPlugin()
 {
 }
 
 /////////////////////////////////////////////////
 ContactPlugin::~ContactPlugin()
 {
-  this->parentSensor.reset();
-  this->world.reset();
 }
 
 /////////////////////////////////////////////////
-void ContactPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
+void ContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 {
-  // Get then name of the parent sensor
+  // Get the parent sensor.
   this->parentSensor =
-    boost::shared_dynamic_cast<sensors::ContactSensor>(_parent);
+    boost::shared_dynamic_cast<sensors::ContactSensor>(_sensor);
 
+  // Make sure the parent sensor is valid.
   if (!this->parentSensor)
-    gzthrow("ContactPlugin requires a Contact Sensor as its parent");
+  {
+    gzerr << "ContactPlugin requires a ContactSensor.\n";
+    return;
+  }
 
-  this->world = physics::get_world(this->parentSensor->GetWorldName());
+  // Connect to the sensor update event.
+  this->updateConnection = this->parentSensor->ConnectUpdated(
+      boost::bind(&ContactPlugin::OnUpdate, this));
+
+  // Make sure the parent sensor is active.
+  this->parentSensor->SetActive(true);
+}
+
+/////////////////////////////////////////////////
+void ContactPlugin::OnUpdate()
+{
+  // Get all the contacts.
+  msgs::Contacts contacts;
+  contacts = this->parentSensor->GetContacts();
+  for (int i = 0; i < contacts.contact_size(); ++i)
+  {
+    std::cout << "Collision between[" << contacts.contact(i).collision1()
+              << "] and [" << contacts.contact(i).collision2() << "]\n";
+
+    for (int j = 0; j < contacts.contact(i).position_size(); ++j)
+    {
+      std::cout << j << "  Position:"
+                << contacts.contact(i).position(j).x() << " "
+                << contacts.contact(i).position(j).y() << " "
+                << contacts.contact(i).position(j).z() << "\n";
+      std::cout << "   Normal:"
+                << contacts.contact(i).normal(j).x() << " "
+                << contacts.contact(i).normal(j).y() << " "
+                << contacts.contact(i).normal(j).z() << "\n";
+      std::cout << "   Depth:" << contacts.contact(i).depth(j) << "\n";
+      std::cout << "   Normal force 1: "
+                << contacts.contact(i).normal(j).x() *
+                   contacts.contact(i).wrench(j).body_1_force().x() +
+                   contacts.contact(i).normal(j).y() *
+                   contacts.contact(i).wrench(j).body_1_force().y() +
+                   contacts.contact(i).normal(j).z() *
+                   contacts.contact(i).wrench(j).body_1_force().z() << "\n";
+    }
+  }
 }
