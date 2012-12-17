@@ -62,6 +62,10 @@ namespace gazebo
       /// \param[in] _sdf SDF parameters to load from.
       public: void Load(sdf::ElementPtr _sdf);
 
+      public: void LoadJoints();
+
+      private: void LoadLinks();
+
       /// \brief Initialize the model.
       public: virtual void Init();
 

@@ -307,6 +307,10 @@ namespace gazebo
       /// \brief Update the state SDF value from the current state.
       public: void UpdateStateSDF();
 
+      /// \brief Return true if the world has been loaded.
+      /// \return True if World::Load has completed.
+      public: bool IsLoaded() const;
+
       /// \brief Get a model by id.
       ///
       /// Each Entity has a unique ID, this function finds a Model with
@@ -584,6 +588,8 @@ namespace gazebo
 
       /// \brief True if the world has been initialized.
       private: bool initialized;
+
+      private: bool loaded;
 
       /// \brief True to enable the physics engine.
       private: bool enablePhysicsEngine;
