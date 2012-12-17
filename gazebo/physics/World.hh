@@ -601,6 +601,7 @@ namespace gazebo
       /// \brief True if the world has been initialized.
       private: bool initialized;
 
+      /// \brief True if the world has been loaded.
       private: bool loaded;
 
       /// \brief True to enable the physics engine.

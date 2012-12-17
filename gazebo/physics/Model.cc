@@ -93,6 +93,9 @@ void Model::Load(sdf::ElementPtr _sdf)
   this->SetAutoDisable(this->sdf->GetValueBool("allow_auto_disable"));
   this->LoadLinks();
 
+  // Load the joints if the world is already loaded. Otherwise, the World
+  // has some special logic to load models that takes into account state
+  // information.
   if (this->world->IsLoaded())
     this->LoadJoints();
 }

@@ -80,7 +80,6 @@ namespace gazebo
       /// \param[out] _sdf SDF element to populate.
       public: void FillSDF(sdf::ElementPtr _sdf);
 
-
       /// \brief Assignment operator
       /// \param[in] _state State value
       /// \return this
