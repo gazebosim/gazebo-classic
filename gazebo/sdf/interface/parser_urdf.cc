@@ -1278,25 +1278,81 @@ void URDF2Gazebo::createCollisions(TiXmlElement* elem,
 void URDF2Gazebo::createVisuals(TiXmlElement* elem,
   ConstLinkPtr link)
 {
-  // loop through all visuals. make additional collisions using the
+  // loop through all visuals. make additional visuals using the
   //   lumped stuff
   for (std::map<std::string,
     boost::shared_ptr<std::vector<VisualPtr> > >::const_iterator
     visuals_it = link->visual_groups.begin();
     visuals_it != link->visual_groups.end(); ++visuals_it)
   {
-    VisualPtr visual = *(visuals_it->second->begin());
+    unsigned int defaultMeshCount = 0;
+    unsigned int groupMeshCount = 0;
+    unsigned int lumpMeshCount = 0;
+    for (std::vector<VisualPtr>::iterator
+         visual = visuals_it->second->begin();
+         visual != visuals_it->second->end();
+         ++visual)
+    {
+      if (visuals_it->first == "default")
+      {
+        // gzdbg << "creating default visual for link [" << link->name
+        //       << "]";
 
-    if (visuals_it->first == "default")
-    {
-      /* make a visual block */
-      createVisual(elem, link, visual, link->name);
-    }
-    else if (visuals_it->first.find(std::string("lump::")) == 0)
-    {
-      std::string old_link_name = visuals_it->first.substr(6);
-      /* make a visual block */
-      createVisual(elem, link, visual, old_link_name);
+        std::string visualPrefix = link->name;
+
+        if (defaultMeshCount > 0)
+        {
+          // append _[meshCount] to link name for additional visuals
+          std::ostringstream visual_name_stream;
+          visual_name_stream << visualPrefix << "_" << defaultMeshCount;
+          visualPrefix = visual_name_stream.str();
+        }
+
+        /* make a <visual> block */
+        createVisual(elem, link, *visual, visualPrefix);
+
+        // only 1 default mesh
+        ++defaultMeshCount;
+      }
+      else if (visuals_it->first.find(std::string("lump::")) == 0)
+      {
+        // if visual name starts with "lump::", pass through
+        //   original parent link name
+        // gzdbg << "creating lump visual [" << visuals_it->first
+        //       << "] for link [" << link->name << "].\n";
+        /// visualPrefix is the original name before lumping
+        std::string visualPrefix = visuals_it->first.substr(6);
+
+        if (lumpMeshCount > 0)
+        {
+          // append _[meshCount] to link name for additional visuals
+          std::ostringstream visual_name_stream;
+          visual_name_stream << visualPrefix << "_" << lumpMeshCount;
+          visualPrefix = visual_name_stream.str();
+        }
+
+        createVisual(elem, link, *visual, visualPrefix);
+        ++lumpMeshCount;
+      }
+      else
+      {
+        // gzdbg << "adding visuals from visual group ["
+        //      << visuals_it->first << "]\n";
+
+        std::string visualPrefix = link->name + std::string("_") +
+                                      visuals_it->first;
+
+        if (groupMeshCount > 0)
+        {
+          // append _[meshCount] to link name for additional visuals
+          std::ostringstream visual_name_stream;
+          visual_name_stream << visualPrefix << "_" << groupMeshCount;
+          visualPrefix = visual_name_stream.str();
+        }
+
+        createVisual(elem, link, *visual, visualPrefix);
+        ++groupMeshCount;
+      }
     }
   }
 }
