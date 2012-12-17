@@ -139,7 +139,7 @@ MainWindow::~MainWindow()
 /////////////////////////////////////////////////
 void MainWindow::Load()
 {
-  this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this);
+  this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
 }
 
 /////////////////////////////////////////////////
