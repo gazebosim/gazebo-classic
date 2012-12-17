@@ -392,3 +392,11 @@ double Joint::GetForce(int /*_index*/)
 {
   return 0;
 }
+
+//////////////////////////////////////////////////
+void Joint::ApplyDamping()
+{
+  double dampingForce = -this->dampingCoefficient * this->GetVelocity(0);
+  this->SetForce(0, dampingForce);
+}
+

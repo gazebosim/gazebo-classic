@@ -55,14 +55,15 @@ PublicationTransport::~PublicationTransport()
 }
 
 /////////////////////////////////////////////////
-void PublicationTransport::Init(const ConnectionPtr &conn_)
+void PublicationTransport::Init(const ConnectionPtr &_conn, bool _latched)
 {
-  this->connection = conn_;
+  this->connection = _conn;
   msgs::Subscribe sub;
   sub.set_topic(this->topic);
   sub.set_msg_type(this->msgType);
   sub.set_host(this->connection->GetLocalAddress());
   sub.set_port(this->connection->GetLocalPort());
+  sub.set_latching(_latched);
 
   this->connection->EnqueueMsg(msgs::Package("sub", sub));
 

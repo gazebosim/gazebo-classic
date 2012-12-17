@@ -78,14 +78,18 @@ namespace gazebo
       private slots: void CreateSpotLight();
       private slots: void CreateDirectionalLight();
       private slots: void InsertModel();
-      private slots: void ViewGrid();
-      private slots: void ViewContacts();
-      private slots: void ViewReset();
-      private slots: void ViewFullScreen();
-      private slots: void ViewFPS();
-      private slots: void ViewOrbit();
+      private slots: void ShowGrid();
+      private slots: void ShowCollisions();
+      private slots: void ShowJoints();
+      private slots: void ShowContacts();
+      private slots: void ShowCOM();
+      private slots: void Reset();
+      private slots: void FullScreen();
+      private slots: void FPS();
+      private slots: void Orbit();
       private slots: void OnResetModelOnly();
       private slots: void OnResetWorld();
+      private slots: void SetTransparent();
 
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);

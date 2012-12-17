@@ -13,5 +13,3 @@ message ImageStamped
   required Time time          = 1; // Time when the data was captured
   required Image image        = 2;
 }
-
-

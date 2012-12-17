@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-#define BOOST_FILESYSTEM_VERSION 2
 
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
@@ -60,71 +59,19 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);
 
-
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  std::list<std::string> gazeboPaths =
-    common::SystemPaths::Instance()->GetModelPaths();
+  // Create a system path watcher
+  this->watcher = new QFileSystemWatcher();
 
-  // Iterate over all the gazebo paths
-  for (std::list<std::string>::iterator iter = gazeboPaths.begin();
-      iter != gazeboPaths.end(); ++iter)
-  {
-    // This is the full model path
-    std::string path = (*iter);
+  // Connect a callback that is triggered whenever a directory is changed.
+  connect(this->watcher, SIGNAL(directoryChanged(const QString &)),
+          this, SLOT(OnDirectoryChanged(const QString &)));
 
-    // Create a top-level tree item for the path
-    QTreeWidgetItem *topItem =
-      new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-          QStringList(QString("%1").arg(QString::fromStdString(path))));
-    this->fileTreeWidget->addTopLevelItem(topItem);
-
-    boost::filesystem::path dir(path);
-    std::list<boost::filesystem::path> resultSet;
-
-    if (boost::filesystem::exists(dir) &&
-        boost::filesystem::is_directory(dir))
-    {
-      std::vector<boost::filesystem::path> paths;
-      std::copy(boost::filesystem::directory_iterator(dir),
-                boost::filesystem::directory_iterator(),
-                std::back_inserter(paths));
-      std::sort(paths.begin(), paths.end());
-
-      // Iterate over all the models in the current gazebo path
-      for (std::vector<boost::filesystem::path>::iterator dIter = paths.begin();
-           dIter != paths.end(); ++dIter)
-      {
-        // This is for boost::filesystem version 3+
-        std::string modelName;
-        std::string fullPath = path + "/" + dIter->filename();
-        std::string manifest = fullPath + "/manifest.xml";
-
-        TiXmlDocument xmlDoc;
-        if (xmlDoc.LoadFile(manifest))
-        {
-          TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
-          if (!modelXML || !modelXML->FirstChildElement("name"))
-            gzerr << "No model name in manifest[" << manifest << "]\n";
-          else
-            modelName = modelXML->FirstChildElement("name")->GetText();
-
-          // Add a child item for the model
-          QTreeWidgetItem *childItem = new QTreeWidgetItem(topItem,
-              QStringList(QString("%1").arg(
-                  QString::fromStdString(modelName))));
-          childItem->setData(0, Qt::UserRole,
-              QVariant((std::string("file://") + fullPath).c_str()));
-          this->fileTreeWidget->addTopLevelItem(childItem);
-        }
-      }
-    }
-
-    // Make all top-level items expanded. Trying to reduce mouse clicks.
-    this->fileTreeWidget->expandItem(topItem);
-  }
+  // Update the list of models on the local system.
+  this->UpdateAllLocalPaths();
 
   // Create a top-level tree item for the path
   this->modelDatabaseItem =
@@ -139,6 +86,12 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   // Start a timer to check for the results from the ModelDatabase. We need
   // to do this so that the QT elements get added in the main thread.
   QTimer::singleShot(1000, this, SLOT(Update()));
+}
+
+/////////////////////////////////////////////////
+InsertModelWidget::~InsertModelWidget()
+{
+  delete this->watcher;
 }
 
 /////////////////////////////////////////////////
@@ -175,10 +128,7 @@ void InsertModelWidget::Update()
     QTimer::singleShot(1000, this, SLOT(Update()));
 }
 
-/////////////////////////////////////////////////
-InsertModelWidget::~InsertModelWidget()
-{
-}
+
 
 /////////////////////////////////////////////////
 void InsertModelWidget::OnModels(
@@ -211,4 +161,100 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
       QApplication::setOverrideCursor(Qt::ArrowCursor);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void InsertModelWidget::UpdateLocalPath(const std::string &_path)
+{
+  if (_path.empty())
+    return;
+
+  QString qpath = QString::fromStdString(_path);
+  QTreeWidgetItem *topItem = NULL;
+
+  QList<QTreeWidgetItem *> matchList = this->fileTreeWidget->findItems(qpath,
+      Qt::MatchExactly);
+
+  // Create a top-level tree item for the path
+  if (matchList.size() == 0)
+  {
+    topItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem*>(0), QStringList(qpath));
+    this->fileTreeWidget->addTopLevelItem(topItem);
+
+    // Add the new path to the directory watcher
+    this->watcher->addPath(qpath);
+  }
+  else
+    topItem = matchList.first();
+
+  // Remove current items.
+  topItem->takeChildren();
+
+  boost::filesystem::path dir(_path);
+  std::list<boost::filesystem::path> resultSet;
+
+  if (boost::filesystem::exists(dir) &&
+      boost::filesystem::is_directory(dir))
+  {
+    std::vector<boost::filesystem::path> paths;
+
+    // Get all the paths in alphabetical order
+    std::copy(boost::filesystem::directory_iterator(dir),
+        boost::filesystem::directory_iterator(),
+        std::back_inserter(paths));
+    std::sort(paths.begin(), paths.end());
+
+    // Iterate over all the models in the current gazebo path
+    for (std::vector<boost::filesystem::path>::iterator dIter = paths.begin();
+        dIter != paths.end(); ++dIter)
+    {
+      std::string modelName;
+      boost::filesystem::path fullPath = _path / dIter->filename();
+      boost::filesystem::path manifest = fullPath / "manifest.xml";
+
+      TiXmlDocument xmlDoc;
+      if (xmlDoc.LoadFile(manifest.string()))
+      {
+        TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
+        if (!modelXML || !modelXML->FirstChildElement("name"))
+          gzerr << "No model name in manifest[" << manifest << "]\n";
+        else
+          modelName = modelXML->FirstChildElement("name")->GetText();
+
+        // Add a child item for the model
+        QTreeWidgetItem *childItem = new QTreeWidgetItem(topItem,
+            QStringList(QString::fromStdString(modelName)));
+
+        childItem->setData(0, Qt::UserRole,
+            QVariant((std::string("file://") + fullPath.string()).c_str()));
+
+        this->fileTreeWidget->addTopLevelItem(childItem);
+      }
+    }
+  }
+
+  // Make all top-level items expanded. Trying to reduce mouse clicks.
+  this->fileTreeWidget->expandItem(topItem);
+}
+
+/////////////////////////////////////////////////
+void InsertModelWidget::UpdateAllLocalPaths()
+{
+  std::list<std::string> gazeboPaths =
+    common::SystemPaths::Instance()->GetModelPaths();
+
+  // Iterate over all the gazebo paths
+  for (std::list<std::string>::iterator iter = gazeboPaths.begin();
+      iter != gazeboPaths.end(); ++iter)
+  {
+    // This is the full model path
+    this->UpdateLocalPath((*iter));
+  }
+}
+
+/////////////////////////////////////////////////
+void InsertModelWidget::OnDirectoryChanged(const QString &_path)
+{
+  this->UpdateLocalPath(_path.toStdString());
 }

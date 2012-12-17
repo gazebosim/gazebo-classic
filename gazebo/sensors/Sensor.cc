@@ -125,12 +125,14 @@ std::string Sensor::GetParentName() const
 //////////////////////////////////////////////////
 void Sensor::Update(bool _force)
 {
-  if (this->IsActive())
+  if (this->IsActive() || _force)
   {
-    if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod)
+    if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod
+        || _force)
     {
       this->lastUpdateTime = this->world->GetSimTime();
       this->UpdateImpl(_force);
+      this->updated();
     }
   }
 }
@@ -232,8 +234,9 @@ bool Sensor::GetVisualize() const
 std::string Sensor::GetTopic() const
 {
   std::string result;
-  if (this->sdf->HasElement("topic"))
-    result = this->sdf->GetElement("topic")->GetValueString();
+  if (this->sdf->HasElement("topic") &&
+      this->sdf->GetValueString("topic") != "__default__")
+    result = this->sdf->GetValueString("topic");
   return result;
 }
 

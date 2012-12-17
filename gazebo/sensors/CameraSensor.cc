@@ -21,6 +21,7 @@
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/Image.hh"
 
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -163,7 +164,9 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
       msgs::Set(msg.mutable_time(), this->world->GetSimTime());
       msg.mutable_image()->set_width(this->camera->GetImageWidth());
       msg.mutable_image()->set_height(this->camera->GetImageHeight());
-      // msg.mutable_image()->set_pixel_format(this->camera->GetImageFormat());
+      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+            this->camera->GetImageFormat()));
+
       msg.mutable_image()->set_step(this->camera->GetImageWidth() * 3);
       msg.mutable_image()->set_data(this->camera->GetImageData(),
           msg.image().width() * 3 * msg.image().height());

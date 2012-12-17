@@ -82,6 +82,7 @@ void RaySensor::Load(const std::string &_worldName)
       this->parentName);
   this->laserCollision->SetName("ray_sensor_collision");
   this->laserCollision->SetRelativePose(this->pose);
+  this->laserCollision->SetInitialRelativePose(this->pose);
 
   this->laserShape = boost::dynamic_pointer_cast<physics::MultiRayShape>(
                      this->laserCollision->GetShape());
