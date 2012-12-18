@@ -57,6 +57,20 @@ namespace gazebo
       private slots: void OnPoseChanged(double _x, double _y, double _z,
           double _roll, double _pitch, double _yaw);
 
+      private slots: void OnWidthChanged(double _width);
+
+      private slots: void OnHeightChanged(double _height);
+
+      private slots: void OnLengthChanged(double _length);
+
+      private slots: void OnPosXChanged(double _posX);
+
+      private slots: void OnPosYChanged(double _posY);
+
+      private slots: void OnPosZChanged(double _posZ);
+
+      private slots: void OnYawChanged(double _yaw);
+
       private: rendering::VisualPtr visual;
 
       private: math::Vector3 size;
@@ -94,6 +108,10 @@ namespace gazebo
 
       public: static math::Pose ConvertPose(double _x, double _y, double _z,
           double _roll, double _pitch, double _yaw);
+
+      public: static double Convert(double _value);
+
+      public: static double ConvertAngle(double _angle);
 
 /*      public: virtual void OnMousePush(const common::MouseEvent &_event);
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);

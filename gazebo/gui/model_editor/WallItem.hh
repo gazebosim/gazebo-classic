@@ -36,7 +36,7 @@ namespace gazebo
 //        public: math::Pose GetPose();
 
 //        public: math::Vector3 GetSize();
-//        public: void SetHeight(double _height);
+        public: void SetHeight(double _height);
 
         private: bool segmentEventFilter(LineSegmentItem *_segment,
             QEvent *_event);
@@ -44,6 +44,8 @@ namespace gazebo
         private: double wallThickness;
 
         private: double wallHeight;
+
+        private: QVector3D position;
 
         private: void WallChanged();
 

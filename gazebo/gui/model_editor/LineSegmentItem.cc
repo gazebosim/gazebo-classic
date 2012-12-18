@@ -147,7 +147,8 @@ void LineSegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 /////////////////////////////////////////////////
 QVector3D LineSegmentItem::GetSize()
 {
-  return QVector3D(this->pen().width(), this->line().length(), 0);
+  return QVector3D(this->pen().width(), this->line().length(),
+      this->pseudoHeight);
 }
 
 /////////////////////////////////////////////////
@@ -166,7 +167,8 @@ double LineSegmentItem::GetSceneRotation()
 /////////////////////////////////////////////////
 void LineSegmentItem::LineChanged()
 {
-  emit sizeChanged(this->pen().width(), this->line().length(), 0);
+  emit sizeChanged(this->pen().width(), this->line().length(),
+      this->pseudoHeight);
   QPointF sceneStartPos = this->mapToScene(this->start);
   emit poseChanged(sceneStartPos.x(), sceneStartPos.y(), 0,
       0, 0, this->line().angle());

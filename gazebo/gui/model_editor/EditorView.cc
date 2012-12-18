@@ -203,6 +203,7 @@ void EditorView::DrawLine(QPoint _pos)
         BuildingMaker::ConvertPose(segment->GetScenePosition(),
             QVector3D(0, 0, segment->GetSceneRotation())));
     this->buildingMaker->ConnectItem(wallSegmentName, segment);
+    this->buildingMaker->ConnectItem(wallSegmentName, wallItem);
   }
 }
 

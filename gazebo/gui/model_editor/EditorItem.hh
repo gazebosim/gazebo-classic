@@ -15,6 +15,8 @@ namespace gazebo
 
         public: ~EditorItem();
 
+        void SetPseudoHeight(double _height);
+
         public: virtual QVector3D GetSize();
 
         public: virtual QVector3D GetScenePosition();
@@ -26,6 +28,22 @@ namespace gazebo
 
         signals: void poseChanged(double _x, double _y, double _z,
             double _roll, double _pitch, double _yaw);
+
+        signals: void widthChanged(double _width);
+
+        signals: void lengthChanged(double _length);
+
+        signals: void heightChanged(double _height);
+
+        signals: void posXChanged(double _posX);
+
+        signals: void posYChanged(double _posY);
+
+        signals: void posZChanged(double _posX);
+
+        signals: void yawChanged(double _yaw);
+
+        protected: double pseudoHeight;
     };
   }
 }

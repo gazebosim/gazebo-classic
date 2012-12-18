@@ -30,12 +30,25 @@ WallItem::WallItem(QPointF _start, QPointF _end)
   this->wallThickness = 10;
   this->wallHeight = 0;
 
+  this->position.setX(0);
+  this->position.setY(0);
+  this->position.setZ(0);
+
   this->SetThickness(this->wallThickness);
 }
 
 /////////////////////////////////////////////////
 WallItem::~WallItem()
 {
+}
+
+/////////////////////////////////////////////////
+void WallItem::SetHeight(double _height)
+{
+  for (unsigned int i = 0; i < this->segments.size(); ++i)
+  {
+    this->segments[i]->SetPseudoHeight(_height);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -92,6 +105,7 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
         this->setPen(wallPen);*/
         this->SetThickness(this->wallThickness);
         this->wallHeight = dialog.GetHeight();
+        this->SetHeight(this->wallHeight);
 //        this->SetHeight(this->wallHeight);
         this->WallChanged();
 
@@ -138,5 +152,8 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
 /////////////////////////////////////////////////
 void WallItem::WallChanged()
 {
-  emit sizeChanged(this->wallThickness, -1, this->wallHeight);
+  emit widthChanged(this->wallThickness);
+  emit heightChanged(this->wallHeight);
+//  emit poseChanged(this->position.x(), this->position.y(), this->position.z(),
+//      0, 0, 0);
 }
