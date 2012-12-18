@@ -18,6 +18,7 @@
 #include "BuildingEditorWidget.hh"
 #include "GridLines.hh"
 #include "EditorView.hh"
+#include "EditorItem.hh"
 #include "RectItem.hh"
 #include "WindowItem.hh"
 #include "DoorItem.hh"

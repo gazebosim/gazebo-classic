@@ -17,13 +17,15 @@
 
 #include "LineSegmentItem.hh"
 #include "WallInspectorDialog.hh"
+#include "EditorItem.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
 LineSegmentItem::LineSegmentItem(QGraphicsItem *_parent, int _index)
-    : QGraphicsLineItem(_parent), index(_index), start(0, 0), end(0, 0)
+    : EditorItem(), QGraphicsLineItem(_parent), index(_index), start(0, 0),
+      end(0, 0)
 {
   if (_parent)
     this->setParentItem(_parent);
@@ -42,6 +44,8 @@ void LineSegmentItem::SetLine(QPointF _start, QPointF _end)
   this->start = _start;
   this->end = _end;
   this->setLine(this->start.x(), this->start.y(), this->end.x(), this->end.y());
+
+  LineChanged();
 }
 
 /////////////////////////////////////////////////
@@ -49,6 +53,8 @@ void LineSegmentItem::SetStartPoint(QPointF _start)
 {
   this->start = _start;
   this->setLine(this->start.x(), this->start.y(), this->end.x(), this->end.y());
+
+  LineChanged();
 }
 
 /////////////////////////////////////////////////
@@ -56,6 +62,8 @@ void LineSegmentItem::SetEndPoint(QPointF _end)
 {
   this->end = _end;
   this->setLine(this->start.x(), this->start.y(), this->end.x(), this->end.y());
+
+  LineChanged();
 }
 
 /////////////////////////////////////////////////
@@ -135,3 +143,42 @@ void LineSegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
   linePen.setColor(lineColor);
   this->setPen(linePen);*/
 }
+
+/////////////////////////////////////////////////
+QVector3D LineSegmentItem::GetSize()
+{
+  return QVector3D(this->pen().width(), this->line().length(), 0);
+}
+
+/////////////////////////////////////////////////
+QVector3D LineSegmentItem::GetScenePosition()
+{
+  QPointF sceneStartPos = this->mapToScene(this->start);
+  return QVector3D(sceneStartPos.x(), sceneStartPos.y(), 0);
+}
+
+/////////////////////////////////////////////////
+double LineSegmentItem::GetSceneRotation()
+{
+  return this->line().angle();
+}
+
+/////////////////////////////////////////////////
+void LineSegmentItem::LineChanged()
+{
+  emit sizeChanged(this->pen().width(), this->line().length(), 0);
+  QPointF sceneStartPos = this->mapToScene(this->start);
+  emit poseChanged(sceneStartPos.x(), sceneStartPos.y(), 0,
+      0, 0, this->line().angle());
+
+//  qDebug() << "asdF" << this->mapToScene(this->pos()) << this->pos() << this->mapToScene(this->start);
+}
+/*
+/////////////////////////////////////////////////
+QVariant LineSegmentItem::itemChange(GraphicsItemChange _change,
+  const QVariant &_value)
+{
+  qDebug() << " item change " << _change;
+
+  return QGraphicsItem::itemChange(_change, _value);
+}*/

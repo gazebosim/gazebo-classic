@@ -62,7 +62,7 @@ void WindowItem::paint(QPainter *_painter,
   _painter->save();
 
   if (this->isSelected())
-    this->drawBoundingBox(_painter);
+    this->DrawBoundingBox(_painter);
   this->showCorners(this->isSelected());
 
   QPen windowPen;

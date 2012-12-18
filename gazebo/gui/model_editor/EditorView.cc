@@ -17,6 +17,7 @@
 
 #include "EditorView.hh"
 #include "GridLines.hh"
+#include "EditorItem.hh"
 #include "RectItem.hh"
 #include "WindowItem.hh"
 #include "DoorItem.hh"
@@ -49,6 +50,8 @@ EditorView::EditorView(QWidget *_parent)
 /////////////////////////////////////////////////
 EditorView::~EditorView()
 {
+  if (buildingMaker)
+    delete buildingMaker;
 }
 
 /////////////////////////////////////////////////
@@ -122,7 +125,6 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
           {
             wallItem->SetVertexPosition(wallItem->GetVertexCount()-1,
                 QPointF(p2.x(), p1.y()));
-//            trans.setY(0);
           }
           else if (((angle > (90 - range)) && (angle < (90 + range))) ||
               ((angle > (270 - range)) && (angle < (270 + range))))
@@ -167,32 +169,40 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::DrawLine(QPoint _pos)
 {
+  WallItem *wallItem = NULL;
   if (!drawInProgress)
   {
     QPointF pointStart = mapToScene(_pos);
     QPointF pointEnd = pointStart;
 
-    WallItem* lineItem = new WallItem(pointStart, pointEnd);
-    this->scene()->addItem(lineItem);
-    this->currentMouseItem = lineItem;
+    wallItem = new WallItem(pointStart, pointEnd);
+    this->scene()->addItem(wallItem);
+    this->currentMouseItem = wallItem;
     this->drawInProgress = true;
 
     lastLineCornerPos = _pos;
-
-//    buildingMaker->ConnectItem(lineItem);
-
-    gui::Events::createBuildingPart("wall");
   }
   else
   {
-    WallItem* wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
+    wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
     if (wallItem)
     {
       LineSegmentItem *segment = wallItem->GetSegment(
           wallItem->GetSegmentCount()-1);
 
-      wallItem->AddPoint(segment->mapToScene(segment->line().p2())); //this->mapToScene(_pos)
+      wallItem->AddPoint(segment->mapToScene(segment->line().p2()));
     }
+  }
+
+  if (wallItem)
+  {
+    LineSegmentItem *segment = wallItem->GetSegment(
+        wallItem->GetSegmentCount()-1);
+    std::string wallSegmentName = this->buildingMaker->AddWall(
+        BuildingMaker::ConvertSize(segment->GetSize()),
+        BuildingMaker::ConvertPose(segment->GetScenePosition(),
+            QVector3D(0, 0, segment->GetSceneRotation())));
+    this->buildingMaker->ConnectItem(wallSegmentName, segment);
   }
 }
 
@@ -229,7 +239,7 @@ void EditorView::DrawDoor(QPoint _pos)
   doorItem = dynamic_cast<DoorItem*>(currentMouseItem);
   if (doorItem)
   {
-    QPointF scenePos = mapToScene(_pos);
+    QPointF scenePos = this->mapToScene(_pos);
     doorItem->setPos(scenePos.x(), scenePos.y());
   }
 }

@@ -19,12 +19,16 @@
 #define _LINE_SEGMENT_ITEM_HH_
 
 #include <gui/qt.h>
+#include <gui/model_editor/EditorItem.hh>
 
 namespace gazebo
 {
   namespace gui
   {
-    class LineSegmentItem : public QGraphicsLineItem
+
+    class EditorItem;
+
+    class LineSegmentItem : public EditorItem, public QGraphicsLineItem
     {
       public: LineSegmentItem(QGraphicsItem *_parent = 0, int _index = 0);
 
@@ -37,6 +41,12 @@ namespace gazebo
       public: void SetEndPoint(QPointF _end);
 
       public: int GetIndex();
+
+      public: QVector3D GetSize();
+
+      public: QVector3D GetScenePosition();
+
+      public: double GetSceneRotation();
 
       /// \brief Set the current mouse state
       public: void SetMouseState(int _state);
@@ -61,6 +71,10 @@ namespace gazebo
       private: void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
 
       private: void mousePressEvent(QGraphicsSceneMouseEvent *_event);
+
+//      private: QVariant itemChange(GraphicsItemChange _change,
+//        const QVariant &_value);
+      private: void LineChanged();
 
       private: int index;
 

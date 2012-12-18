@@ -33,10 +33,16 @@ namespace gazebo
 
         public: ~WallItem();
 
+//        public: math::Pose GetPose();
+
+//        public: math::Vector3 GetSize();
+
         private: bool segmentEventFilter(LineSegmentItem *_segment,
             QGraphicsSceneMouseEvent *_event);
 
         private: double wallThickness;
+
+//        private: double scale;
     };
   }
 }

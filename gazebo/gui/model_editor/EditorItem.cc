@@ -15,12 +15,35 @@
  *
 */
 
-#include "gui/model_editor/EditorEvents.hh"
+#include "EditorItem.hh"
 
 using namespace gazebo;
 using namespace gui;
 
-event::EventT<void (std::string)> Events::createEditorItem;
-/*event::EventT<void (std::string)> Events::createBuildingPart;
-event::EventT<void (std::string, math::Pose)> Events::setBuildingPartPose;
-event::EventT<void (std::string, math::Vector3)> Events::setBuildingPartSize;*/
+/////////////////////////////////////////////////
+EditorItem::EditorItem()
+{
+}
+
+/////////////////////////////////////////////////
+EditorItem::~EditorItem()
+{
+}
+
+/////////////////////////////////////////////////
+QVector3D EditorItem::GetSize()
+{
+  return QVector3D(0, 0, 0);
+}
+
+/////////////////////////////////////////////////
+QVector3D EditorItem::GetScenePosition()
+{
+  return QVector3D(0, 0, 0);
+}
+
+/////////////////////////////////////////////////
+double EditorItem::GetSceneRotation()
+{
+  return 0;
+}

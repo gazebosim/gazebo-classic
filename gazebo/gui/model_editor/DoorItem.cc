@@ -52,7 +52,7 @@ void DoorItem::paint (QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
   if (this->isSelected())
-    this->drawBoundingBox(_painter);
+    this->DrawBoundingBox(_painter);
   this->showCorners(this->isSelected());
 
   QPointF topLeft(this->drawingOriginX, this->drawingOriginY);

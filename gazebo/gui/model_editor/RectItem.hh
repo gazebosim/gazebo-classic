@@ -19,6 +19,7 @@
 #define _RECT_ITEM_HH_
 
 #include "gui/qt.h"
+#include "EditorItem.hh"
 
 namespace gazebo
 {
@@ -28,7 +29,9 @@ namespace gazebo
 
     class RotateHandle;
 
-    class RectItem : public QGraphicsItem
+    class EditorItem;
+
+    class RectItem : public EditorItem, public QGraphicsItem
     {
         public: RectItem();
 
@@ -50,9 +53,13 @@ namespace gazebo
 
         protected: void UpdateCornerPositions();
 
-        private: void AdjustSize(double _x, double _y);
+        protected: void DrawBoundingBox(QPainter *_painter);
 
-        protected: void drawBoundingBox(QPainter *_painter);
+        public: virtual QVector3D GetSize();
+
+        public: virtual QVector3D GetScenePosition();
+
+        public: virtual double GetSceneRotation();
 
         protected: virtual QRectF boundingRect() const;
 
@@ -91,6 +98,8 @@ namespace gazebo
         private: QVariant itemChange(GraphicsItemChange _change,
           const QVariant &_value);
 
+        private: void AdjustSize(double _x, double _y);
+
         protected: double width;
 
         protected: double height;
@@ -124,6 +133,7 @@ namespace gazebo
         private: int zValueSelected;
 
         protected: int zValueIdle;
+
     };
   }
 }

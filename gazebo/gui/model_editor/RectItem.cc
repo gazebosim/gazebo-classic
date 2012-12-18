@@ -18,6 +18,7 @@
 #include "RectItem.hh"
 #include "CornerGrabber.hh"
 #include "RotateHandle.hh"
+#include "EditorItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -565,7 +566,7 @@ QRectF RectItem::boundingRect() const
 }
 
 /////////////////////////////////////////////////
-void RectItem::drawBoundingBox(QPainter *_painter)
+void RectItem::DrawBoundingBox(QPainter *_painter)
 {
   _painter->save();
   QPen boundingBoxPen;
@@ -577,6 +578,24 @@ void RectItem::drawBoundingBox(QPainter *_painter)
   _painter->setOpacity(0.8);
   _painter->drawRect(this->boundingRect());
   _painter->restore();
+}
+
+/////////////////////////////////////////////////
+QVector3D RectItem::GetSize()
+{
+  return QVector3D(this->width, this->height, 0);
+}
+
+/////////////////////////////////////////////////
+QVector3D RectItem::GetScenePosition()
+{
+  return QVector3D(this->scenePos().x(), this->scenePos().y(), 0);
+}
+
+/////////////////////////////////////////////////
+double RectItem::GetSceneRotation()
+{
+  return this->rotationAngle;
 }
 
 /////////////////////////////////////////////////

@@ -19,9 +19,9 @@
 
 #include <string>
 #include "common/Event.hh"
-#include "msgs/msgs.hh"
+/*#include "msgs/msgs.hh"
 #include "math/Vector3.hh"
-#include "math/Pose.hh"
+#include "math/Pose.hh"*/
 
 namespace gazebo
 {
@@ -42,7 +42,10 @@ namespace gazebo
                   event::ConnectionPtr _subscriber)
               { createEditorItem.Disconnect(_subscriber); }
 
-      public: template<typename T>
+      /// \brief An editor item has been created
+      public: static event::EventT<void (std::string)> createEditorItem;
+
+/*      public: template<typename T>
               static event::ConnectionPtr ConnectCreateBuildingPart(T _subscriber)
               { return createBuildingPart.Connect(_subscriber); }
       /// \brief Disconnect a boost::slot to the create editor item signal
@@ -69,8 +72,6 @@ namespace gazebo
                   event::ConnectionPtr _subscriber)
               { setBuildingPartSize.Disconnect(_subscriber); }
 
-      /// \brief An editor item has been created
-      public: static event::EventT<void (std::string)> createEditorItem;
 
       /// \brief A building part has been created
       public: static event::EventT<void (std::string)> createBuildingPart;
@@ -81,7 +82,7 @@ namespace gazebo
 
       /// \brief A building part size has been modified
       public: static event::EventT<void (std::string, math::Vector3)>
-          setBuildingPartSize;
+          setBuildingPartSize;*/
     };
   }
 }

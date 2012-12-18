@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODELMAKER_HH_
-#define _MODELMAKER_HH_
+#ifndef _MODEL_MAKER_HH_
+#define _MODEL_MAKER_HH_
 
 #include <list>
 #include <string>

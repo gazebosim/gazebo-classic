@@ -449,14 +449,14 @@ QVariant PolylineItem::itemChange(GraphicsItemChange _change,
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::showCorners(bool _show)
+void PolylineItem::ShowCorners(bool _show)
 {
   for (unsigned int i = 0; i < this->corners.size(); ++i)
     this->corners[i]->setVisible(_show);
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::drawBoundingBox(QPainter *_painter)
+void PolylineItem::DrawBoundingBox(QPainter *_painter)
 {
   _painter->save();
   QPen boundingBoxPen;
@@ -477,8 +477,8 @@ void PolylineItem::paint(QPainter *_painter,
   _painter->save();
 
   if (this->isSelected())
-    this->drawBoundingBox(_painter);
-  this->showCorners(this->isSelected());
+    this->DrawBoundingBox(_painter);
+  this->ShowCorners(this->isSelected());
 
 /*  QPen lineBorderPen;
   lineBorderPen.setWidth(this->pen().width() + 2);

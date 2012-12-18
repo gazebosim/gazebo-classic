@@ -47,7 +47,7 @@ namespace gazebo
 
       public: LineSegmentItem *GetSegment(unsigned int _index);
 
-      public: void showCorners(bool _show);
+      public: void ShowCorners(bool _show);
 
       public: void SetThickness(double _thickness);
 
@@ -81,7 +81,7 @@ namespace gazebo
       private: QVariant itemChange(GraphicsItemChange _change,
         const QVariant &_value);
 
-      private: void drawBoundingBox(QPainter *_painter);
+      private: void DrawBoundingBox(QPainter *_painter);
 
       private: void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);

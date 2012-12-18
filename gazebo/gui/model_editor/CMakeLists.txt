@@ -20,6 +20,7 @@ set (sources
   LineSegmentItem.cc
   BuildingMaker.cc
   EditorEvents.cc
+  EditorItem.cc
 )
 
 set (qt_headers
@@ -39,10 +40,11 @@ set (qt_headers
   PolylineItem.hh
   WallItem.hh
   LineSegmentItem.hh
+  BuildingMaker.hh
+  EditorItem.hh
 )
 
 set (headers
-  BuildingMaker.hh
   EditorEvents.hh
 )
 

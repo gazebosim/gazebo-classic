@@ -35,13 +35,35 @@ namespace gazebo
   namespace gui
   {
     class BoxMaker;
+
     class EntityMaker;
+
+    class EditorItem;
 
     class WallManip : public QObject
     {
       Q_OBJECT
       public: WallManip();
 
+      public: ~WallManip();
+
+      public: void SetVisual(rendering::VisualPtr _visual);
+
+      public: math::Vector3 Convert(math::Vector3 _vector);
+
+      private slots: void OnSizeChanged(double _width, double _length,
+          double _height);
+
+      private slots: void OnPoseChanged(double _x, double _y, double _z,
+          double _roll, double _pitch, double _yaw);
+
+      private: rendering::VisualPtr visual;
+
+      private: math::Vector3 size;
+
+      private: math::Pose pose;
+
+      private: math::Pose transform;
     };
 
     class BuildingMaker : public EntityMaker
@@ -61,9 +83,17 @@ namespace gazebo
 
       public: std::string AddDoor(math::Vector3 _size, math::Pose _pose);
 
-      public: void SetPose(std::string _visualName, math::Pose _pose);
+      public: void ConnectItem(std::string _partName, EditorItem *_item);
 
-      public: void SetSize(std::string _visualName, math::Vector3 _size);
+      public: static math::Vector3 ConvertSize(QVector3D _size);
+
+      public: static math::Vector3 ConvertSize(double _width, double _length,
+          double _height);
+
+      public: static math::Pose ConvertPose(QVector3D _pos, QVector3D _rot);
+
+      public: static math::Pose ConvertPose(double _x, double _y, double _z,
+          double _roll, double _pitch, double _yaw);
 
 /*      public: virtual void OnMousePush(const common::MouseEvent &_event);
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
@@ -83,17 +113,17 @@ namespace gazebo
 
       private: virtual void CreateTheEntity();
 
-      private: void OnCreateBuildingPart(std::string _partType);
+      private: std::map<std::string, WallManip *> walls;
 
-      private: void OnSetBuildingPartPose(std::string partName,
-          math::Pose _pose);
-
-      private: void OnSetBuildingPartSize(std::string partName,
-          math::Vector3 _size);
-
-      private: std::list<rendering::VisualPtr> wallVisuals;
       private: std::list<rendering::VisualPtr> windowVisuals;
+
       private: std::list<rendering::VisualPtr> doorVisuals;
+
+      private: std::list<WallManip *> wallManips;
+//      private: std::list<rendering::VisualPtr> windowManips;
+//      private: std::list<rendering::VisualPtr> doorManips;
+
+
       private: sdf::SDFPtr modelSDF;
 
       private: std::string modelName;
@@ -103,7 +133,9 @@ namespace gazebo
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;
 
-      private: std::vector<event::ConnectionPtr> connections;
+//      private: std::vector<event::ConnectionPtr> connections;
+
+      public: static double conversionScale;
     };
   }
 }
