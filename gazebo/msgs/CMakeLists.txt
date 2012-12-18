@@ -32,6 +32,7 @@ set (msgs
   joint_animation.proto
   joint_cmd.proto
   joint_wrench.proto
+  joint_wrench_stamped.proto
   laserscan.proto
   light.proto
   link.proto
