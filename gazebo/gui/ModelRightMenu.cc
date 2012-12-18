@@ -39,6 +39,11 @@ ModelRightMenu::ModelRightMenu()
   this->moveToAct->setStatusTip(tr("Move camera to the selection"));
   connect(this->moveToAct, SIGNAL(triggered()), this, SLOT(OnMoveTo()));
 
+  this->followAct = new QAction(tr("Follow"), this);
+  this->followAct->setStatusTip(tr("Follow the selection"));
+  connect(this->followAct, SIGNAL(triggered()), this, SLOT(OnFollow()));
+
+
   // \todo Reimplement
   // this->snapBelowAct = new QAction(tr("Snap"), this);
   // this->snapBelowAct->setStatusTip(tr("Snap to object below"));
@@ -82,10 +87,6 @@ ModelRightMenu::ModelRightMenu()
   this->viewStates.push_back(state);
 
   // \todo Reimplement
-  // this->followAction = new QAction(tr("Follow"), this);
-  // this->followAction->setStatusTip(tr("Follow the selection"));
-  // connect(this->followAction, SIGNAL(triggered()), this, SLOT(OnFollow()));
-
   // this->skeletonAction = new QAction(tr("Skeleton"), this);
   // this->skeletonAction->setStatusTip(tr("Show model skeleton"));
   // this->skeletonAction->setCheckable(true);
@@ -106,6 +107,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
 
   QMenu menu;
   menu.addAction(this->moveToAct);
+  menu.addAction(this->followAct);
   // menu.addAction(this->snapBelowAct);
 
   // Create the view menu
@@ -128,7 +130,6 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   menu.addAction(g_deleteAct);
 
   // \todo Reimplement these features.
-  // menu.addAction(this->followAction);
   // menu.addAction(this->skeletonAction);
 
   menu.exec(_pt);
@@ -139,6 +140,13 @@ void ModelRightMenu::OnMoveTo()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->MoveToVisual(this->modelName);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnFollow()
+{
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->TrackVisual(this->modelName);
 }
 
 /////////////////////////////////////////////////
@@ -257,11 +265,4 @@ void ViewState::Callback()
 //   }
 //
 //   this->requestPub->Publish(*this->requestMsg);
-// }
-
-/////////////////////////////////////////////////
-// void ModelRightMenu::OnFollow()
-// {
-//   rendering::UserCameraPtr cam = gui::get_active_camera();
-//   cam->TrackVisual(this->modelName);
 // }

@@ -52,6 +52,10 @@ namespace gazebo
       /// \brief QT callback when move to has been selected.
       private slots: void OnMoveTo();
 
+      /// \brief QT callback when follow has been selected.
+      private slots: void OnFollow();
+
+
       /// \brief QT callback when delete has been selected.
       /// \param[in] _name Name of the model to delete.
       private slots: void OnDelete(const std::string &_name="");
@@ -59,7 +63,6 @@ namespace gazebo
       /// \brief QT callback when snap below has been selected.
       // private slots: void OnSnapBelow();
 
-      // private slots: void OnFollow();
       // private slots: void OnSkeleton();
 
       /// \brief Request callback.
@@ -78,10 +81,12 @@ namespace gazebo
       /// \brief Action for moving the camera to an object.
       private: QAction *moveToAct;
 
+      /// \brief Action for attaching the camera to a model.
+      private: QAction *followAct;
+
       /// \brief Action for snapping an object to another object below the
       /// first.
       // private: QAction *snapBelowAct;
-      // private: QAction *followAct;
       // private: QAction *skeletonAct;
 
       /// \brief The various view states

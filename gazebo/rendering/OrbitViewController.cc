@@ -375,10 +375,10 @@ void OrbitViewController::UpdatePose()
 
   pos += this->focalPoint;
 
-  this->camera->SetWorldPosition(pos);
+  // this->camera->SetWorldPosition(pos);
 
   math::Quaternion rot;
   math::Vector3 rpy(0, this->pitch, this->yaw);
   rot.SetFromEuler(rpy);
-  this->camera->SetWorldRotation(rot);
+  // this->camera->SetWorldRotation(rot);
 }

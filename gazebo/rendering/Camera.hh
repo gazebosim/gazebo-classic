@@ -30,6 +30,7 @@
 #include <deque>
 
 #include "common/Event.hh"
+#include "common/PID.hh"
 #include "common/Time.hh"
 
 #include "math/Angle.hh"
@@ -651,6 +652,9 @@ namespace gazebo
 
       /// \brief Render period.
       private: common::Time renderPeriod;
+
+      /// \brief PID used to track a visual smoothly.
+      private: common::PID trackVisualPID;
     };
     /// \}
   }
