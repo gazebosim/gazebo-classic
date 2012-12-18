@@ -44,10 +44,19 @@ CameraSensorWidget::CameraSensorWidget(QWidget *_parent)
 
   QLabel *topicLabel = new QLabel(tr("Topic: "));
   this->topicCombo = new QComboBox(this);
-  this->topicCombo->addItem("Hello");
-  this->topicCombo->addItem("Hello2");
-  this->topicCombo->addItem("Hello3");
-  this->topicCombo->addItem("Hello4");
+  this->topicCombo->setObjectName("comboList");
+
+  msgs::ImageStamped msg;
+  std::list<std::string> topics;
+  topics = transport::TopicManager::Instance()->GetUniqueAdvertisedTopics(
+      msg.GetTypeName());
+
+  for (std::list<std::string>::iterator iter = topics.begin();
+       iter != topics.end(); ++iter)
+  {
+    std::cout << "Topic[" << *iter << "]\n";
+    this->topicCombo->addItem(QString::fromStdString(*iter));
+  }
 
   topicLayout->addSpacing(10);
   topicLayout->addWidget(topicLabel, 1);
@@ -60,12 +69,11 @@ CameraSensorWidget::CameraSensorWidget(QWidget *_parent)
   this->imageLabel = new QLabel();
   this->imageLabel->setPixmap(image);
 
-  frameLayout->addLayout(topicLayout);
   frameLayout->addWidget(this->imageLabel);
-
-  frameLayout->setContentsMargins(4, 4, 4, 4);
+  frameLayout->setObjectName("blackBorderFrame");
   frame->setLayout(frameLayout);
 
+  mainLayout->addLayout(topicLayout);
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(4, 4, 4, 4);

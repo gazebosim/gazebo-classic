@@ -1,3 +1,9 @@
+QLabel,
+QWidget#cameraSensor > QLabel
+{
+  color: #d0d0d0;
+}
+
 QMainWindow#mainWindow
 {
   margin: 0px;
@@ -471,12 +477,29 @@ QComboBox
   border-radius: 4px;
 }
 
+QListView
+{
+  border: 1px solid #000000;
+  border-radius: 4px;
+}
+
+QListView::item
+{
+  color: #ffffff;
+  border-radius: 4px;
+}
+
+QComboBox QListView::item
+{
+  color: #f58113;
+  background: #ffffff;
+}
+
 QComboBox:on
 {
   /* shift the text when the popup opens */
   padding-top: -10px;
   padding-left: 4px;
-  background-color: #ffffff;
 }
 
 /* This modifies the drop-down arrow container */
@@ -493,8 +516,8 @@ QComboBox::drop-down
    border-bottom-right-radius: 3px;
 }
 
-QLabel,
-QWidget#cameraSensor > QLabel
+QFrame#blackBorderFrame
 {
-  color: #d0d0d0;
+  border: 1px solid #000000;
+  margin: 0px;
 }
