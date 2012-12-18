@@ -501,7 +501,7 @@ namespace gazebo
 
       /// \brief Pose message callback.
       /// \param[in] _msg The message data.
-      private: void OnPoseMsg(ConstPosePtr &_msg);
+      private: void OnPoseMsg(ConstPose_VPtr &_msg);
 
       /// \brief Skeleton animation callback.
       /// \param[in] _msg The message data.
@@ -564,7 +564,7 @@ namespace gazebo
 
       /// \def PoseMsgs_L.
       /// \brief List of messages.
-      typedef std::list<boost::shared_ptr<msgs::Pose const> > PoseMsgs_L;
+      typedef std::list<msgs::Pose> PoseMsgs_L;
 
       /// \brief List of pose message to process.
       private: PoseMsgs_L poseMsgs;

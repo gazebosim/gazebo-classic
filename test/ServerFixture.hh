@@ -185,10 +185,14 @@ class ServerFixture : public testing::Test
                return this->percentRealTime;
              }
 
-  protected: void OnPose(ConstPosePtr &_msg)
+  protected: void OnPose(ConstPose_VPtr &_msg)
              {
                boost::mutex::scoped_lock lock(this->receiveMutex);
-               this->poses[_msg->name()] = msgs::Convert(*_msg);
+               for (int i = 0; i < _msg->pose_size(); ++i)
+               {
+                 this->poses[_msg->pose(i).name()] =
+                   msgs::Convert(_msg->pose(i));
+               }
              }
 
   protected: math::Pose GetEntityPose(const std::string &_name)

@@ -17,16 +17,17 @@
 
 #include <google/protobuf/message.h>
 
+#include <gazebo/common/Time.hh>
+#include <gazebo/transport/Transport.hh>
+#include <gazebo/transport/TransportTypes.hh>
+#include <gazebo/transport/Node.hh>
+
+#include <gazebo/gazebo_config.h>
+
+
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
-
-#include "common/Time.hh"
-
-#include "transport/Transport.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/Node.hh"
-
-#include "gazebo_config.h"
+#include <boost/thread/mutex.hpp>
 
 using namespace gazebo;
 
@@ -34,6 +35,12 @@ using namespace gazebo;
 std::vector<std::string> params;
 
 common::Time hz_prev_time;
+common::Time bw_prev_time;
+
+std::vector<int> bwBytes;
+std::vector<common::Time> bwTime;
+
+boost::mutex mutex;
 
 /////////////////////////////////////////////////
 void help()
@@ -44,6 +51,7 @@ void help()
             << "    info <topic> : Get information about a topic\n"
             << "    echo <topic> : Output topic data to screen\n"
             << "    hz <topic>   : Get publish frequency\n"
+            << "    bw <topic>   : Get topic bandwidth\n"
             << "    help         : This help text\n";
 }
 
@@ -156,6 +164,15 @@ void echo_cb(ConstGzStringPtr &_data)
 }
 
 /////////////////////////////////////////////////
+void bwCB(const std::string &_data)
+{
+  boost::mutex::scoped_lock lock(mutex);
+
+  bwBytes.push_back(_data.size());
+  bwTime.push_back(common::Time::GetWallTime());
+}
+
+/////////////////////////////////////////////////
 void hz_cb(ConstGzStringPtr &/*_data*/)
 {
   common::Time cur_time = common::Time::GetWallTime();
@@ -245,6 +262,98 @@ void echo()
 }
 
 /////////////////////////////////////////////////
+void bw()
+{
+  if (params[1].empty())
+  {
+    std::cerr << "Error: No topic specified.\n";
+    return;
+  }
+
+  transport::init();
+
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  std::string topic = params[1];
+
+  transport::SubscriberPtr sub = node->Subscribe(topic, bwCB);
+
+  // Run the transport loop: starts a new thread
+  transport::run();
+
+  while (true)
+  {
+    common::Time::MSleep(100);
+    {
+      boost::mutex::scoped_lock lock(mutex);
+      if (bwBytes.size() >= 100)
+      {
+        std::sort(bwBytes.begin(), bwBytes.end());
+
+        float sumSize = 0;
+        unsigned int count = bwBytes.size();
+        common::Time dt = bwTime[count - 1] - bwTime[0];
+
+        for (unsigned int i = 0; i < count; ++i)
+        {
+          sumSize += bwBytes[i];
+        }
+
+        float meanBytes = sumSize / count;
+        float totalBps = sumSize / dt.Double();
+
+        // Create the output streams
+        std::ostringstream bandwidth, mean, min, max;
+        bandwidth << std::fixed << std::setprecision(2);
+        mean << std::fixed << std::setprecision(2);
+        min << std::fixed << std::setprecision(2);
+        max << std::fixed << std::setprecision(2);
+
+        // Format the bandwidth output
+        if (totalBps < 1000)
+          bandwidth << totalBps << " B/s";
+        else if (totalBps < 1000000)
+          bandwidth << totalBps / 1024.0f << " KB/s";
+        else
+          bandwidth << totalBps/1.049e6 << " MB/s";
+
+        // Format message size  output
+        if (meanBytes < 1000)
+        {
+          mean << meanBytes << " B";
+          min << bwBytes[0] << " B";
+          max << bwBytes[count-1] << " B";
+        }
+        else if (meanBytes < 1000000)
+        {
+          mean << meanBytes / 1024.0f << " KB";
+          min << bwBytes[0] / 1024.0f << " KB";
+          max << bwBytes[count-1] / 1024.0f << " KB";
+        }
+        else
+        {
+          mean << meanBytes / 1.049e6 << " MB";
+          min << bwBytes[0] / 1.049e6 << " MB";
+          max << bwBytes[count-1] / 1.049e6 << " MB";
+        }
+
+        std::cout << "Total[" << bandwidth.str() << "] "
+                  << "Mean[" << mean.str() << "] "
+                  << "Min[" << min.str() << "] "
+                  << "Max[" << max.str() << "] "
+                  << "Messages[" << count << "]\n";
+
+        bwBytes.clear();
+        bwTime.clear();
+      }
+    }
+  }
+
+  transport::fini();
+}
+
+/////////////////////////////////////////////////
 void hz()
 {
   if (params[1].empty())
@@ -286,4 +395,6 @@ int main(int argc, char **argv)
     echo();
   else if (params[0] == "hz")
     hz();
+  else if (params[0] == "bw")
+    bw();
 }
