@@ -38,7 +38,7 @@ namespace gazebo
 //        public: math::Vector3 GetSize();
 
         private: bool segmentEventFilter(LineSegmentItem *_segment,
-            QGraphicsSceneMouseEvent *_event);
+            QEvent *_event);
 
         private: double wallThickness;
 

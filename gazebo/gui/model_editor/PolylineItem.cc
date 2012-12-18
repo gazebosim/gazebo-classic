@@ -180,11 +180,11 @@ bool PolylineItem::sceneEventFilter(QGraphicsItem *_watched,
     QEvent *_event)
 {
   CornerGrabber *corner = dynamic_cast<CornerGrabber *>(_watched);
-  if (corner != NULL)
+  if (corner)
     return this->cornerEventFilter(corner, _event);
 
   LineSegmentItem *segment = dynamic_cast<LineSegmentItem *>(_watched);
-  if (segment != NULL)
+  if (segment)
     return this->segmentEventFilter(segment, _event);
 
   return false;
@@ -200,7 +200,7 @@ bool PolylineItem::segmentEventFilter(LineSegmentItem *_segment,
   if (!mouseEvent)
     return false;
 
-  QPointF scenePosition =  _segment->mapToScene(mouseEvent->pos());
+  QPointF scenePosition =  mouseEvent->scenePos();
   switch (_event->type())
   {
     case QEvent::GraphicsSceneMousePress:

@@ -39,9 +39,16 @@ WallItem::~WallItem()
 
 /////////////////////////////////////////////////
 bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
-    QGraphicsSceneMouseEvent *_event)
+    QEvent *_event)
 {
-  QPointF scenePosition =  _segment->mapToScene(_event->pos());
+
+  QGraphicsSceneMouseEvent *mouseEvent =
+    dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
+
+  if (!mouseEvent)
+    return false;
+
+  QPointF scenePosition =  mouseEvent->scenePos();
   switch (_event->type())
   {
     case QEvent::GraphicsSceneMousePress:
@@ -83,7 +90,7 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
         this->setPen(wallPen);
 
         double newLength = dialog.GetLength();
-        if (qFuzzyCompare(newLength + 1, segmentLength + 1))
+        if (!qFuzzyCompare(newLength + 1, segmentLength + 1))
         {
           line.setLength(newLength);
           this->SetVertexPosition(_segment->GetIndex() + 1,
