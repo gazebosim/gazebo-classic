@@ -86,6 +86,10 @@ namespace gazebo
       /// \param[in] _force True if update is forced, false if not
       protected: virtual void UpdateImpl(bool /*_force*/) {}
 
+      /// \brief Get the update rate of the sensor.
+      /// \return _hz update rate of sensor.  Returns 0 if unthrottled.
+      public: double GetUpdateRate();
+
       /// \brief Set the update rate of the sensor.
       /// \param[in] _hz update rate of sensor.
       public: void SetUpdateRate(double _hz);
