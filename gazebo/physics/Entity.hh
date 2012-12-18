@@ -311,7 +311,7 @@ namespace gazebo
       /// \brief Visual message container.
       protected: msgs::Visual *visualMsg;
 
-      /// \brief Pose message containr.
+      /// \brief Pose message container.
       protected: msgs::Pose *poseMsg;
 
       /// \brief Current pose animation
@@ -338,7 +338,6 @@ namespace gazebo
       /// \brief The function used to to set the world pose.
       private: void (Entity::*setWorldPoseFunc)(const math::Pose &, bool, bool);
     };
-
     /// \}
   }
 }

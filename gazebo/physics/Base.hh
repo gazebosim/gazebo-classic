@@ -313,6 +313,8 @@ namespace gazebo
 
       /// \brief True if selected.
       private: bool selected;
+
+      protected: friend class Entity;
     };
     /// \}
   }

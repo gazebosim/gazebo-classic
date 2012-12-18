@@ -28,11 +28,12 @@
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Node.hh"
 
+#include "gazebo/math/Rand.hh"
+
 #include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
-
 
 using namespace gazebo;
 using namespace physics;
@@ -62,6 +63,8 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   // Create and initialized the contact manager.
   this->contactManager = new ContactManager();
   this->contactManager->Init(this->world);
+
+  this->SetSeed(math::Rand::GetSeed());
 }
 
 //////////////////////////////////////////////////
@@ -196,4 +199,9 @@ void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 ContactManager *PhysicsEngine::GetContactManager() const
 {
   return this->contactManager;
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetSeed(uint32_t /*_seed*/)
+{
 }

@@ -127,6 +127,12 @@ namespace gazebo
 
       /// \brief Feedback data for this joint
       private: dJointFeedback *feedback;
+
+      /// \brief Provide Feedback data for contact forces
+      private: bool provideFeedback;
+
+      // Documentation inherited.
+      public: virtual JointWrench GetForceTorque(int _index);
     };
   }
 }

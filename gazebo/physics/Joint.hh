@@ -34,6 +34,7 @@
 
 #include "gazebo/physics/JointState.hh"
 #include "gazebo/physics/Base.hh"
+#include "gazebo/physics/JointWrench.hh"
 
 namespace gazebo
 {
@@ -94,9 +95,17 @@ namespace gazebo
       /// \brief Set pose, parent and child links of a physics::Joint
       /// \param[in] _parent Parent link.
       /// \param[in] _child Child link.
-      /// \param[in] _pose Pose of the link.
+      /// \param[in] _pose Pose containing Joint Anchor offset from child link.
       public: void Load(LinkPtr _parent, LinkPtr _child,
-                        const math::Pose &_pose);
+                        const math::Pose &_pose) GAZEBO_DEPRECATED;
+
+      /// \brief Set parent and child links of a physics::Joint and its
+      /// anchor offset position.
+      /// \param[in] _parent Parent link.
+      /// \param[in] _child Child link.
+      /// \param[in] _pos Joint Anchor offset from child link.
+      public: void Load(LinkPtr _parent, LinkPtr _child,
+                        const math::Vector3 &_pos);
 
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.
@@ -243,6 +252,12 @@ namespace gazebo
       /// \return The force applied to an axis.
       public: virtual double GetForce(int _index);
 
+      /// \brief get force torque values at a joint
+      /// \param[in] _index Force and torque on child link if _index = 0
+      /// and on parent link of _index = 1
+      /// \return The force and torque at the joint
+      public: virtual JointWrench GetForceTorque(int _index) = 0;
+
       /// \brief Set the max allowed force of an axis(index).
       /// Note that the unit of force should be consistent with the rest
       /// of the simulation scales.  E.g.  if you are using
@@ -345,7 +360,7 @@ namespace gazebo
 
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.
-      private: void LoadImpl(const math::Pose &_pose);
+      private: void LoadImpl(const math::Pose &_pose) GAZEBO_DEPRECATED;
 
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;
@@ -373,6 +388,12 @@ namespace gazebo
 
       /// \brief apply damping for adding viscous damping forces on updates
       protected: gazebo::event::ConnectionPtr applyDamping;
+
+      /// \brief Save force applied by user
+      /// This plus the joint feedback (joint contstraint forces) is the
+      /// equivalent of simulated force torque sensor reading
+      /// Allocate a 2 vector in case hinge2 joint is used.
+      protected: double forceApplied[2];
     };
     /// \}
   }
