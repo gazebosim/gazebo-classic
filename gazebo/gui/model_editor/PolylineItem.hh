@@ -19,15 +19,17 @@
 #define _POLYLINE_ITEM_HH_
 
 #include <gui/qt.h>
+#include <gui/model_editor/EditorItem.hh>
 
 namespace gazebo
 {
   namespace gui
   {
     class CornerGrabber;
+
     class LineSegmentItem;
 
-    class PolylineItem : public QGraphicsPathItem
+    class PolylineItem : public EditorItem, public QGraphicsPathItem
     {
       public: PolylineItem(QPointF _start, QPointF _end);
 
@@ -94,7 +96,7 @@ namespace gazebo
 
       protected: std::vector<CornerGrabber*> corners;
 
-      private: std::vector<LineSegmentItem*> segments;
+      protected: std::vector<LineSegmentItem*> segments;
 
       private: int cornerWidth;
 

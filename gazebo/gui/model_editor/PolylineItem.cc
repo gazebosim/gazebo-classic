@@ -24,7 +24,7 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 PolylineItem::PolylineItem(QPointF _start, QPointF _end) :
-    QGraphicsPathItem(), gridSpace(10)
+    EditorItem(), QGraphicsPathItem(), gridSpace(10)
 {
   this->origin = _start;
   this->setPos(_start);

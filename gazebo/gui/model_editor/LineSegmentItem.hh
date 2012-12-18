@@ -72,8 +72,6 @@ namespace gazebo
 
       private: void mousePressEvent(QGraphicsSceneMouseEvent *_event);
 
-//      private: QVariant itemChange(GraphicsItemChange _change,
-//        const QVariant &_value);
       private: void LineChanged();
 
       private: int index;
