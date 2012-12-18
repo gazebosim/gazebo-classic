@@ -21,5 +21,6 @@
   <file>images/rulers.png</file>
   <file>images/snap_to_grid.png</file>
   <file>images/undo.png</file>
+  <file>images/no_image.png</file>
 </qresource>
 </RCC>

@@ -17,6 +17,8 @@
 #ifndef _CAMERASENSORWIDGET_HH_
 #define _CAMERASENSORWIDGET_HH_
 
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -34,9 +36,16 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~CameraSensorWidget();
 
+      private slots: void Update();
+      private: void OnImage(ConstImageStampedPtr &_msg);
+
+      private: QComboBox *topicCombo;
+
+      private: QLabel *imageLabel;
+      private: QPixmap pixmap;
       private: transport::NodePtr node;
       private: transport::PublisherPtr pub;
-      private: transport::SubscriberPtr sub;
+      private: transport::SubscriberPtr cameraSub;
     };
   }
 }

@@ -31,25 +31,73 @@ using namespace gui;
 CameraSensorWidget::CameraSensorWidget(QWidget *_parent)
 : QWidget(_parent)
 {
-  this->setObjectName("camera_sensor");
+  this->setWindowIcon(QIcon(":/images/gazebo.svg"));
+  this->setWindowTitle(tr("Gazebo: Camera Sensor"));
+  this->setObjectName("cameraSensor");
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  frameLayout->setContentsMargins(0, 0, 0, 0);
+  QHBoxLayout *topicLayout = new QHBoxLayout;
+
+  QLabel *topicLabel = new QLabel(tr("Topic: "));
+  this->topicCombo = new QComboBox(this);
+  this->topicCombo->addItem("Hello");
+  this->topicCombo->addItem("Hello2");
+  this->topicCombo->addItem("Hello3");
+  this->topicCombo->addItem("Hello4");
+
+  topicLayout->addSpacing(10);
+  topicLayout->addWidget(topicLabel, 1);
+  topicLayout->addWidget(this->topicCombo, 4);
+  topicLayout->addSpacing(10);
+
+  this->pixmap = QPixmap(":/images/no_image.png");
+  QPixmap image = (this->pixmap.scaled(320, 240, Qt::KeepAspectRatio,
+                                 Qt::SmoothTransformation));
+  this->imageLabel = new QLabel();
+  this->imageLabel->setPixmap(image);
+
+  frameLayout->addLayout(topicLayout);
+  frameLayout->addWidget(this->imageLabel);
+
+  frameLayout->setContentsMargins(4, 4, 4, 4);
   frame->setLayout(frameLayout);
 
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
-  this->layout()->setContentsMargins(0, 0, 0, 0);
+  this->layout()->setContentsMargins(4, 4, 4, 4);
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
+  this->cameraSub = this->node->Subscribe("~/camera/link/camera/image",
+      &CameraSensorWidget::OnImage, this);
+
+  QTimer::singleShot(500, this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
 CameraSensorWidget::~CameraSensorWidget()
 {
+}
+
+/////////////////////////////////////////////////
+void CameraSensorWidget::Update()
+{
+  this->imageLabel->setPixmap(this->pixmap);
+
+  QTimer::singleShot(500, this, SLOT(Update()));
+}
+
+/////////////////////////////////////////////////
+void CameraSensorWidget::OnImage(ConstImageStampedPtr &_msg)
+{
+  QImage image(_msg->image().width(), _msg->image().height(),
+               QImage::Format_RGB888);
+  memcpy(image.bits(), _msg->image().data().c_str(),
+         _msg->image().data().size());
+
+  this->pixmap = QPixmap::fromImage(image);
 }

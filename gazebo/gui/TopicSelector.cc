@@ -77,11 +77,11 @@ void TopicSelector::GetTopicList()
   for (std::map<std::string, std::list<std::string> >::iterator
        iter = topics.begin(); iter != topics.end(); ++iter)
   {
-    if (inserted.find(*iter) == inserted.end() &&
-        (*iter).find("__dbg") == std::string::npos)
+    if (inserted.find(iter->first) == inserted.end() &&
+        iter->first.find("__dbg") == std::string::npos)
     {
-      std::cout << *iter << "\n";
-      inserted[*iter] = true;
+      std::cout << iter->first << "\n";
+      inserted[iter->first] = true;
     }
   }
 }

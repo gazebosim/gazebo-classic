@@ -15,28 +15,29 @@
  *
  */
 
-#include "gui/TopicSelector.hh"
+#include "gazebo/gui/TopicSelector.hh"
+#include "gazebo/gui/sensor_widgets/CameraSensorWidget.hh"
 
-#include "gazebo.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "common/Events.hh"
+#include "gazebo/gazebo.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Events.hh"
 
-#include "transport/Node.hh"
-#include "transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Transport.hh"
 
-#include "rendering/UserCamera.hh"
-#include "rendering/RenderEvents.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/RenderEvents.hh"
 
-#include "gui/Actions.hh"
-#include "gui/Gui.hh"
-#include "gui/InsertModelWidget.hh"
-#include "gui/ModelListWidget.hh"
-#include "gui/RenderWidget.hh"
-#include "gui/ToolsWidget.hh"
-#include "gui/GLWidget.hh"
-#include "gui/MainWindow.hh"
-#include "gui/GuiEvents.hh"
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/InsertModelWidget.hh"
+#include "gazebo/gui/ModelListWidget.hh"
+#include "gazebo/gui/RenderWidget.hh"
+#include "gazebo/gui/ToolsWidget.hh"
+#include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/GuiEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -206,8 +207,11 @@ void MainWindow::New()
 /////////////////////////////////////////////////
 void MainWindow::Select()
 {
-  TopicSelector *selector = new TopicSelector(this);
-  selector->show();
+  // TopicSelector *selector = new TopicSelector(this);
+  // selector->show();
+
+  CameraSensorWidget *camWidget = new CameraSensorWidget();
+  camWidget->show();
 }
 
 /////////////////////////////////////////////////

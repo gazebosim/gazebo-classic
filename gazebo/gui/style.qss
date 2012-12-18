@@ -85,11 +85,6 @@ QToolButton:checked
   background-color: #454545;
 }
 
-QLabel
-{
-  color: #353535;
-}
-
 QListView
 {
   color: #d0d0d0;
@@ -393,9 +388,11 @@ QTabWidget::tab-bar
 
 QWidget#modelList,
 QWidget#jointControl,
-QWidget#toolsWidget
+QWidget#toolsWidget,
+QWidget#cameraSensor
 {
   background: #808080;
+  color: #d0d0d0;
 }
 
 
@@ -475,7 +472,29 @@ QComboBox
 }
 
 QComboBox:on
-{ /* shift the text when the popup opens */
+{
+  /* shift the text when the popup opens */
   padding-top: -10px;
   padding-left: 4px;
+  background-color: #ffffff;
+}
+
+/* This modifies the drop-down arrow container */
+QComboBox::drop-down
+{
+   subcontrol-origin: padding;
+   subcontrol-position: top right;
+   width: 15px;
+
+   border-left-width: 1px;
+   border-left-color: #000000;
+   border-left-style: solid; /* just a single line */
+   border-top-right-radius: 3px; /* same radius as the QComboBox */
+   border-bottom-right-radius: 3px;
+}
+
+QLabel,
+QWidget#cameraSensor > QLabel
+{
+  color: #d0d0d0;
 }
