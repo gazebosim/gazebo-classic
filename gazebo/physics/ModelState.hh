@@ -136,6 +136,11 @@ namespace gazebo
       /// \return A vector of joint states.
       public: const std::vector<JointState> &GetJointStates() const;
 
+      /// \brief Equality operator.
+      /// \param[in] _state State to compare against.
+      /// \return True if this state equals the given state.
+      public: bool operator==(const ModelState &_state) const;
+
       /// \brief Assignment operator
       /// \param[in] _state State value
       /// \return this

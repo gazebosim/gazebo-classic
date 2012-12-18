@@ -257,3 +257,23 @@ LinkState LinkState::operator+(const LinkState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+bool LinkState::operator==(const LinkState &_state) const
+{
+  bool equal = this->name == _state.name && this->pose == _state.pose &&
+               this->velocity == _state.velocity &&
+               this->acceleration == _state.acceleration &&
+               this->wrench == _state.wrench &&
+               this->collisionStates.size() == _state.collisionStates.size();
+
+  // Check all the collision states.
+  for (std::vector<CollisionState>::const_iterator iter =
+       this->collisionStates.begin(); iter != this->collisionStates.end() &&
+       equal; ++iter)
+  {
+    equal = (*iter) == _state.GetCollisionState((*iter).GetName());
+  }
+
+  return equal;
+}

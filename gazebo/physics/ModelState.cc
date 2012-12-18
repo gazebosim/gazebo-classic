@@ -206,6 +206,30 @@ const std::vector<JointState> &ModelState::GetJointStates() const
 }
 
 /////////////////////////////////////////////////
+bool ModelState::operator==(const ModelState &_state) const
+{
+  bool equal = this->name == _state.name && this->pose == _state.pose &&
+               this->linkStates.size() == _state.linkStates.size() &&
+               this->jointStates.size() == _state.jointStates.size();
+
+  // Check for equality between the links
+  for (std::vector<LinkState>::const_iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end() && equal; ++iter)
+  {
+    equal = (*iter) == _state.GetLinkState((*iter).GetName());
+  }
+
+  // Check for equality between the joints
+  for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end() && equal; ++iter)
+  {
+    equal = (*iter) == _state.GetJointState((*iter).GetName());
+  }
+
+  return equal;
+}
+
+/////////////////////////////////////////////////
 ModelState &ModelState::operator=(const ModelState &_state)
 {
   State::operator=(_state);

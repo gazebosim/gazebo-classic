@@ -172,3 +172,11 @@ JointState JointState::operator+(const JointState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+bool JointState::operator==(const JointState &_state) const
+{
+  return this->name == _state.name &&
+    this->angles.size() == _state.angles.size() &&
+    std::equal(this->angles.begin(), this->angles.end(), _state.angles.begin());
+}

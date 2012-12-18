@@ -73,6 +73,11 @@ namespace gazebo
       /// \return True if the values in the state are zero.
       public: bool IsZero() const;
 
+      /// \brief Equality operator.
+      /// \param[in] _state State to compare against.
+      /// \return True if this state equals the given state.
+      public: bool operator==(const CollisionState &_state) const;
+
       /// \brief Assignment operator
       /// \param[in] _state State value
       /// \return Reference to this

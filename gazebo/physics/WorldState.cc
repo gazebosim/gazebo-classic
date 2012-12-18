@@ -184,6 +184,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
     if (this->HasModelState((*iter).GetName()))
     {
       ModelState state = this->GetModelState((*iter).GetName()) - *iter;
+      std::cout << "STATE[" << state << "]\n";
       if (!state.IsZero())
         result.modelStates.push_back(state);
     }
@@ -213,4 +214,22 @@ WorldState WorldState::operator+(const WorldState &_state) const
   }
 
   return result;
+}
+
+/////////////////////////////////////////////////
+bool WorldState::operator==(const WorldState &_state) const
+{
+  bool equal = this->name == _state.name &&
+               this->simTime == _state.simTime &&
+               this->realTime == _state.realTime &&
+               this->wallTime == _state.wallTime &&
+               this->modelStates.size() == _state.modelStates.size();
+
+  for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
+       iter != this->modelStates.end() && equal; ++iter)
+  {
+    equal = (*iter) == _state.GetModelState((*iter).GetName());
+  }
+
+  return equal;
 }

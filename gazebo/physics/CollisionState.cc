@@ -107,3 +107,9 @@ CollisionState CollisionState::operator+(const CollisionState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+bool CollisionState::operator==(const CollisionState &_state) const
+{
+  return this->name == _state.name && this->pose == _state.pose;
+}

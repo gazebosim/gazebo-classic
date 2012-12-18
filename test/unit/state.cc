@@ -59,12 +59,52 @@ TEST_F(StateTest, WorldStateNoWorld)
 
 TEST_F(StateTest, WorldStateEmptyWorld)
 {
+  std::vector<physics::ModelState> modelStates;
+
   Load("worlds/empty.world");
   physics::WorldState state(physics::get_world("default"));
-  EPPECT_TRUE(state.GetSimTime(), commont::Time());
+  EXPECT_EQ(state.GetSimTime(), common::Time());
 
-  std::vector<physics::ModelState> modelStates = state.GetModelStates();
-  EXPECT_EQ(modelStates.size(), 1);
+  // Test WorldState::GetModelStates and WorldState::GetModelStateCount
+  {
+    modelStates = state.GetModelStates();
+    EXPECT_EQ(static_cast<int>(modelStates.size()), 1);
+    EXPECT_EQ(static_cast<int>(state.GetModelStateCount()), 1);
+  }
+
+  // Test WorldState::GetModelState
+  {
+    EXPECT_EQ(state.GetModelState(0), modelStates[0]);
+    EXPECT_EQ(state.GetModelState("ground_plane"), modelStates[0]);
+
+    EXPECT_THROW(state.GetModelState("bad_model_name"), common::Exception);
+    EXPECT_EQ(state.GetModelState(2), physics::ModelState());
+  }
+
+  // Test WorldState::HasModelState
+  {
+    EXPECT_TRUE(state.HasModelState("ground_plane"));
+    EXPECT_FALSE(state.HasModelState("bad_name"));
+  }
+
+  // Test WorldState::IsZero
+  {
+    EXPECT_TRUE(state.IsZero());
+  }
+
+  // Test WorldState::operator= adn WorldState::operator-
+  {
+    physics::WorldState newState = state;
+    EXPECT_EQ(newState, state);
+
+    newState = newState - state;
+    EXPECT_EQ(newState.GetSimTime(), common::Time());
+    EXPECT_EQ(newState.GetRealTime(), common::Time());
+    EXPECT_EQ(newState.GetWallTime(), common::Time());
+
+    EXPECT_EQ(static_cast<int>(state.GetModelStateCount()), 0);
+  }
+
 }
 
 TEST_F(StateTest, State)
