@@ -285,9 +285,10 @@ void Camera::Update()
     double yaw = atan2(direction.y, direction.x);
     double pitch = atan2(-direction.z,
                          sqrt(pow(direction.x, 2) + pow(direction.y, 2)));
+    pitch = math::clamp(pitch, 0.0, 0.25*M_PI);
     this->SetWorldRotation(math::Quaternion(0, pitch, yaw));
 
-    double origDistance = 5.0;
+    double origDistance = 8.0;
     double distance = direction.GetLength();
     double error = origDistance - distance;
 
@@ -296,9 +297,12 @@ void Camera::Update()
     math::Vector3 displacement = direction;
     displacement.Normalize();
     displacement *= scaling;
-    displacement.z = 0.0;
+    // displacement.z = 0.0;
 
-    this->SetWorldPosition(this->GetWorldPosition() + displacement);
+    math::Vector3 pos = this->GetWorldPosition() + displacement;
+    pos.z = math::clamp(pos.z, 3.0, pos.z);
+
+    this->SetWorldPosition(pos);
   }
 }
 
