@@ -15,7 +15,7 @@
  *
 */
 /*
- * Desc: a test for setting joint angles
+ * Desc: a test for getting force and torques at joints
  * Author: John Hsu
  */
 #ifndef GAZEBO_JOINT_TRAJECTORY_PLUGIN_HH
@@ -32,13 +32,13 @@
 
 namespace gazebo
 {
-  class JointTrajectoryPlugin : public ModelPlugin
+  class ForceTorquePlugin : public ModelPlugin
   {
     /// \brief Constructor
-    public: JointTrajectoryPlugin();
+    public: ForceTorquePlugin();
 
     /// \brief Destructor
-    public: virtual ~JointTrajectoryPlugin();
+    public: virtual ~ForceTorquePlugin();
 
     /// \brief Load the controller
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
@@ -46,12 +46,9 @@ namespace gazebo
     /// \brief Update the controller
     private: void UpdateStates();
 
-    private: void FixLink(physics::LinkPtr link);
-    private: void UnfixLink();
-
     private: physics::WorldPtr world;
     private: physics::ModelPtr model;
-    private: physics::JointPtr joint;
+    private: physics::Joint_V joints;
 
     private: boost::mutex update_mutex;
 
