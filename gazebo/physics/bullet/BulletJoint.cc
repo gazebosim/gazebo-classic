@@ -100,3 +100,10 @@ void BulletJoint::Detach()
 
   delete this->constraint;
 }
+
+//////////////////////////////////////////////////
+JointWrench BulletJoint::GetForceTorque(int /*_index*/)
+{
+  JointWrench wrench;
+  return wrench;
+}

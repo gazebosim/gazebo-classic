@@ -101,6 +101,9 @@ namespace gazebo
 
       protected: btTypedConstraint *constraint;
       protected: btDynamicsWorld *world;
+
+      // Documentation inherited.
+      public: virtual JointWrench GetForceTorque(int _index);
     };
     /// \}
   }
