@@ -187,11 +187,12 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
     QLineF line(center.x(), center.y(), newPoint.x(), newPoint.y());
 
     double angle = -prevLine.angleTo(line);
-    this->translate(localCenter.x(), 0);
-    this->rotate(angle);
-    this->translate(-localCenter.x(), 0);
 
-    rotationAngle += angle;
+/*    this->translate(localCenter.x(), 0);
+    this->rotate(angle);
+    this->translate(-localCenter.x(), 0);*/
+
+    this->SetRotation(this->GetRotation() + angle);
 //    this->setTransformOriginPoint(localCenter);
 //    this->setRotation(this->rotation() -prevLine.angleTo(line));
   }
@@ -646,4 +647,24 @@ void RectItem::SetPosition(double _x, double _y)
   this->setPos(_x, _y);
   emit posXChanged(_x);
   emit posYChanged(_y);
+}
+
+/////////////////////////////////////////////////
+void RectItem::SetRotation(double angle)
+{
+  double halfX = this->drawingOriginX +
+      (this->drawingOriginX + this->drawingWidth)/2;
+
+  this->translate(halfX, 0);
+  this->rotate(angle - this->rotationAngle);
+  this->translate(-halfX, 0);
+
+  this->rotationAngle = angle;
+  emit yawChanged(this->rotationAngle);
+}
+
+/////////////////////////////////////////////////
+double RectItem::GetRotation()
+{
+  return this->rotationAngle;
 }

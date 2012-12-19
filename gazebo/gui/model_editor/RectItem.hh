@@ -59,6 +59,10 @@ namespace gazebo
 
         public: void SetPosition(double _x, double _y);
 
+        public: void SetRotation(double _angle);
+
+        public: double GetRotation();
+
         public: virtual QVector3D GetSize();
 
         public: virtual QVector3D GetScenePosition();

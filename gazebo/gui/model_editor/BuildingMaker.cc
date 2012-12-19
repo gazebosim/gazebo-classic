@@ -120,8 +120,6 @@ void ModelManip::OnWidthChanged(double _width)
 /////////////////////////////////////////////////
 void ModelManip::OnHeightChanged(double _height)
 {
-//  qDebug() << "on height changed " << _height;
-
   double scaledHeight = BuildingMaker::Convert(_height);
   this->size = this->visual->GetScale();
   this->size.z = scaledHeight;
@@ -152,53 +150,45 @@ void ModelManip::OnLengthChanged(double _length)
 /////////////////////////////////////////////////
 void ModelManip::OnPosXChanged(double _posX)
 {
-  double scaledPosX = BuildingMaker::Convert(_posX);
-  math::Pose newPose = this->visual->GetParent()->GetWorldPose();
-  newPose.pos.x = scaledPosX;
-
-  this->visual->GetParent()->SetWorldPose(newPose);
+  math::Pose visualPose = this->visual->GetParent()->GetWorldPose();
+  double scaledX = BuildingMaker::Convert(_posX);
+  visualPose.pos.x = scaledX;
+  this->visual->GetParent()->SetWorldPosition(visualPose.pos);
 }
 
 /////////////////////////////////////////////////
 void ModelManip::OnPosYChanged(double _posY)
 {
-  double scaledPosY = BuildingMaker::Convert(-_posY);
-  math::Pose newPose = this->visual->GetParent()->GetWorldPose();
-  newPose.pos.y = scaledPosY;
-
-  this->visual->GetParent()->SetWorldPose(newPose);
+  math::Pose visualPose = this->visual->GetParent()->GetWorldPose();
+  double scaledY = BuildingMaker::Convert(_posY);
+  visualPose.pos.y = -scaledY;
+  this->visual->GetParent()->SetWorldPosition(visualPose.pos);
 }
 
 /////////////////////////////////////////////////
 void ModelManip::OnPosZChanged(double _posZ)
 {
-  double scaledPosZ = BuildingMaker::Convert(_posZ);
-  math::Pose newPose = this->visual->GetParent()->GetWorldPose();
-  newPose.pos.z = scaledPosZ;
-
-  this->visual->GetParent()->SetWorldPose(newPose);
+  math::Pose visualPose = this->visual->GetParent()->GetWorldPose();
+  double scaledZ = BuildingMaker::Convert(_posZ);
+  visualPose.pos.z = scaledZ;
+  this->visual->GetParent()->SetWorldPosition(visualPose.pos);
 }
 
 /////////////////////////////////////////////////
 void ModelManip::OnYawChanged(double _yaw)
 {
   double newYaw = BuildingMaker::ConvertAngle(_yaw);
-  math::Pose newPose = this->visual->GetParent()->GetWorldPose();
-  math::Vector3 angles = newPose.rot.GetAsEuler();
-  angles.z = newYaw;
-  newPose.rot.SetFromEuler(angles);
-
-  this->visual->GetParent()->SetWorldPose(newPose);
+  math::Vector3 angles = this->visual->GetRotation().GetAsEuler();
+  angles.z = -newYaw;
+  this->visual->SetRotation(angles);
 }
 
 /////////////////////////////////////////////////
 void ModelManip::SetPose(double _x, double _y, double _z,
     double _roll, double _pitch, double _yaw)
 {
-  math::Pose newPose = BuildingMaker::ConvertPose(_x, -_y, _z, _roll, _pitch,
-      _yaw);
-
-  this->visual->GetParent()->SetWorldPose(newPose);
+  this->SetPosition(_x, _y, _z);
+  this->SetRotation(_roll, _pitch, _yaw);
 }
 
 /////////////////////////////////////////////////
@@ -218,8 +208,7 @@ void ModelManip::SetRotation(double _roll, double _pitch, double _yaw)
   double pitchRad = BuildingMaker::ConvertAngle(_pitch);
   double yawRad = BuildingMaker::ConvertAngle(_yaw);
 
-  this->visual->GetParent()->SetWorldRotation(math::Quaternion(rollRad,
-      pitchRad, yawRad));
+  this->visual->SetRotation(math::Quaternion(rollRad, pitchRad, -yawRad));
 }
 
 /////////////////////////////////////////////////
@@ -234,7 +223,6 @@ void ModelManip::SetSize(double _width, double _length, double _height)
   math::Vector3 newPos = this->visual->GetPosition()
       - math::Vector3(dScale.x/2.0 + dScale.y/2.0, 0, dScale.z/2.0);
 
-  qDebug() << " set size " << newPos.x << newPos.y << newPos.z;
   this->visual->SetPosition(newPos);
 }
 
