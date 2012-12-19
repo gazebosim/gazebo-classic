@@ -40,22 +40,36 @@ namespace gazebo
 
     class EditorItem;
 
-    class WallManip : public QObject
+    class ModelManip : public QObject
     {
       Q_OBJECT
-      public: WallManip();
+      public: ModelManip();
 
-      public: ~WallManip();
+      public: ~ModelManip();
 
       public: void SetVisual(rendering::VisualPtr _visual);
 
+      public: rendering::VisualPtr GetVisual();
+
       public: math::Vector3 Convert(math::Vector3 _vector);
+
+      public: void SetPose(double _x, double _y, double _z,
+          double _roll, double _pitch, double _yaw);
+
+      public: void SetPosition(double _x, double _y, double _z);
+
+      public: void SetRotation(double _roll, double _pitch, double _yaw);
+
+      public: void SetSize(double _width, double _length, double _height);
 
       private slots: void OnSizeChanged(double _width, double _length,
           double _height);
 
       private slots: void OnPoseChanged(double _x, double _y, double _z,
           double _roll, double _pitch, double _yaw);
+
+      private slots: void OnPoseOriginTransformed(double _x, double _y,
+          double _z, double _roll, double _pitch, double _yaw);
 
       private slots: void OnWidthChanged(double _width);
 
@@ -77,7 +91,7 @@ namespace gazebo
 
       private: math::Pose pose;
 
-      private: math::Pose transform;
+      private: math::Pose originTransform;
     };
 
     class BuildingMaker : public EntityMaker
@@ -91,11 +105,16 @@ namespace gazebo
       public: void AddPart(std::string _type, math::Vector3 _size,
           math::Pose _pose);
 
-      public: std::string AddWall(math::Vector3 _size, math::Pose _pose);
+      public: std::string AddWall(QVector3D _size, QVector3D _pos,
+          double _angle);
 
-      public: std::string AddWindow(math::Vector3 _size, math::Pose _pose);
+      public: void RemoveWall(std::string wallName);
 
-      public: std::string AddDoor(math::Vector3 _size, math::Pose _pose);
+      public: std::string AddWindow(QVector3D _size, QVector3D _pos,
+          double _angle);
+
+      public: std::string AddDoor(QVector3D _size, QVector3D _pos,
+          double _angle);
 
       public: void ConnectItem(std::string _partName, EditorItem *_item);
 
@@ -131,13 +150,19 @@ namespace gazebo
 
       private: virtual void CreateTheEntity();
 
-      private: std::map<std::string, WallManip *> walls;
+      private: std::map<std::string, ModelManip *> allItems;
+
+      private: std::map<std::string, ModelManip *> walls;
+
+      private: std::map<std::string, ModelManip *> windows;
 
       private: std::list<rendering::VisualPtr> windowVisuals;
 
       private: std::list<rendering::VisualPtr> doorVisuals;
 
-      private: std::list<WallManip *> wallManips;
+      private: std::list<ModelManip *> windowManips;
+
+      private: std::list<ModelManip *> wallManips;
 //      private: std::list<rendering::VisualPtr> windowManips;
 //      private: std::list<rendering::VisualPtr> doorManips;
 

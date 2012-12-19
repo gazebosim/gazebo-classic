@@ -79,6 +79,8 @@ namespace gazebo
       private: QGraphicsItem *currentSelectedItem;
 
       private: BuildingMaker *buildingMaker;
+
+      private: std::string lastWallSegmentName;
     };
   }
 }

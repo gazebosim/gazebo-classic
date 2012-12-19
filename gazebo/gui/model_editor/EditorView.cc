@@ -96,7 +96,6 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
   {
     QGraphicsView::mouseReleaseEvent(_event);
   }
-
 }
 
 /////////////////////////////////////////////////
@@ -160,6 +159,8 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
     WallItem* wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
     wallItem->PopEndPoint();
     wallList.push_back(wallItem);
+    this->buildingMaker->RemoveWall(this->lastWallSegmentName);
+    this->lastWallSegmentName = "";
     this->drawMode = None;
     this->drawInProgress = false;
   }
@@ -199,9 +200,9 @@ void EditorView::DrawLine(QPoint _pos)
     LineSegmentItem *segment = wallItem->GetSegment(
         wallItem->GetSegmentCount()-1);
     std::string wallSegmentName = this->buildingMaker->AddWall(
-        BuildingMaker::ConvertSize(segment->GetSize()),
-        BuildingMaker::ConvertPose(segment->GetScenePosition(),
-            QVector3D(0, 0, segment->GetSceneRotation())));
+        segment->GetSize(), segment->GetScenePosition(),
+        segment->GetSceneRotation());
+    this->lastWallSegmentName = wallSegmentName;
     this->buildingMaker->ConnectItem(wallSegmentName, segment);
     this->buildingMaker->ConnectItem(wallSegmentName, wallItem);
   }
@@ -216,13 +217,20 @@ void EditorView::DrawWindow(QPoint _pos)
     windowItem = new WindowItem();
     this->scene()->addItem(windowItem);
     this->currentMouseItem = windowItem;
+
+    std::string windowName = this->buildingMaker->AddWindow(
+        windowItem->GetSize(), windowItem->GetScenePosition(),
+        windowItem->GetSceneRotation());
+
+    this->buildingMaker->ConnectItem(windowName, windowItem);
+
     this->drawInProgress = true;
   }
   windowItem = dynamic_cast<WindowItem*>(this->currentMouseItem);
   if (windowItem)
   {
     QPointF scenePos = this->mapToScene(_pos);
-    windowItem->setPos(scenePos.x(), scenePos.y());
+    windowItem->SetPosition(scenePos.x(), scenePos.y());
   }
 }
 
@@ -241,7 +249,7 @@ void EditorView::DrawDoor(QPoint _pos)
   if (doorItem)
   {
     QPointF scenePos = this->mapToScene(_pos);
-    doorItem->setPos(scenePos.x(), scenePos.y());
+    doorItem->SetPosition(scenePos.x(), scenePos.y());
   }
 }
 

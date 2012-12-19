@@ -45,8 +45,6 @@ namespace gazebo
 
         private: double wallHeight;
 
-        private: QVector3D position;
-
         private: void WallChanged();
 
 //        private: double scale;

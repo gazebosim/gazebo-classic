@@ -29,6 +29,9 @@ namespace gazebo
         signals: void poseChanged(double _x, double _y, double _z,
             double _roll, double _pitch, double _yaw);
 
+        signals: void poseOriginTransformed(double _x, double _y, double _z,
+            double _roll, double _pitch, double _yaw);
+
         signals: void widthChanged(double _width);
 
         signals: void lengthChanged(double _length);

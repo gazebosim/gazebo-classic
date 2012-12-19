@@ -55,6 +55,10 @@ namespace gazebo
 
         protected: void DrawBoundingBox(QPainter *_painter);
 
+        public: void SetPosition(QPointF _pos);
+
+        public: void SetPosition(double _x, double _y);
+
         public: virtual QVector3D GetSize();
 
         public: virtual QVector3D GetScenePosition();
@@ -126,7 +130,7 @@ namespace gazebo
 
         private: RotateHandle *rotateHandle;
 
-        private: double rotationAngle;
+        protected: double rotationAngle;
 
         private: std::vector<Qt::CursorShape> cursors;
 

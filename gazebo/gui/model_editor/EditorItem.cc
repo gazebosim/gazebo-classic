@@ -16,7 +16,7 @@
 */
 
 #include "EditorItem.hh"
-
+#include "gui/qt.h"
 using namespace gazebo;
 using namespace gui;
 

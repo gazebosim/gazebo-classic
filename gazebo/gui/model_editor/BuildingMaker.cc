@@ -47,23 +47,30 @@ using namespace gui;
 double BuildingMaker::conversionScale;
 
 /////////////////////////////////////////////////
-WallManip::WallManip()
+ModelManip::ModelManip()
+{
+//  this->transformOrigin = math::Pose(0, 0, 0, 0, 0, 0);
+}
+
+/////////////////////////////////////////////////
+ModelManip::~ModelManip()
 {
 }
 
 /////////////////////////////////////////////////
-WallManip::~WallManip()
-{
-}
-
-/////////////////////////////////////////////////
-void WallManip::SetVisual(rendering::VisualPtr _visual)
+void ModelManip::SetVisual(rendering::VisualPtr _visual)
 {
   this->visual = _visual;
 }
 
 /////////////////////////////////////////////////
-void WallManip::OnSizeChanged(double _width, double _length, double _height)
+rendering::VisualPtr ModelManip::GetVisual()
+{
+  return this->visual;
+}
+
+/////////////////////////////////////////////////
+void ModelManip::OnSizeChanged(double _width, double _length, double _height)
 {
   this->size = BuildingMaker::ConvertSize(_length, _width, _height);
   math::Vector3 dScale = this->visual->GetScale() - this->size;
@@ -77,16 +84,26 @@ void WallManip::OnSizeChanged(double _width, double _length, double _height)
 }
 
 /////////////////////////////////////////////////
-void WallManip::OnPoseChanged(double _x, double _y, double _z,
+void ModelManip::OnPoseChanged(double _x, double _y, double _z,
     double _roll, double _pitch, double _yaw)
 {
-  math::Pose newPose = BuildingMaker::ConvertPose(_x, _y, _z, _roll, _pitch,
-      _yaw);
-  this->visual->GetParent()->SetWorldPose(newPose);
+  this->SetPose(_x, _y, _z, _roll, _pitch, _yaw);
 }
 
 /////////////////////////////////////////////////
-void WallManip::OnWidthChanged(double _width)
+void ModelManip::OnPoseOriginTransformed(double _x, double _y, double _z,
+    double _roll, double _pitch, double _yaw)
+{
+  math::Pose trans = BuildingMaker::ConvertPose(_x, -_y, _z, _roll, _pitch,
+      _yaw);
+
+  math::Pose oldPose = this->visual->GetParent()->GetWorldPose();
+
+  this->visual->GetParent()->SetWorldPose(oldPose + trans);
+}
+
+/////////////////////////////////////////////////
+void ModelManip::OnWidthChanged(double _width)
 {
   double scaledWidth = BuildingMaker::Convert(_width);
   this->size = this->visual->GetScale();
@@ -101,8 +118,10 @@ void WallManip::OnWidthChanged(double _width)
 }
 
 /////////////////////////////////////////////////
-void WallManip::OnHeightChanged(double _height)
+void ModelManip::OnHeightChanged(double _height)
 {
+//  qDebug() << "on height changed " << _height;
+
   double scaledHeight = BuildingMaker::Convert(_height);
   this->size = this->visual->GetScale();
   this->size.z = scaledHeight;
@@ -116,7 +135,7 @@ void WallManip::OnHeightChanged(double _height)
 }
 
 /////////////////////////////////////////////////
-void WallManip::OnLengthChanged(double _length)
+void ModelManip::OnLengthChanged(double _length)
 {
   double scaledLength = BuildingMaker::Convert(_length);
   this->size = this->visual->GetScale();
@@ -131,7 +150,7 @@ void WallManip::OnLengthChanged(double _length)
 }
 
 /////////////////////////////////////////////////
-void WallManip::OnPosXChanged(double _posX)
+void ModelManip::OnPosXChanged(double _posX)
 {
   double scaledPosX = BuildingMaker::Convert(_posX);
   math::Pose newPose = this->visual->GetParent()->GetWorldPose();
@@ -141,9 +160,9 @@ void WallManip::OnPosXChanged(double _posX)
 }
 
 /////////////////////////////////////////////////
-void WallManip::OnPosYChanged(double _posY)
+void ModelManip::OnPosYChanged(double _posY)
 {
-  double scaledPosY = BuildingMaker::Convert(_posY);
+  double scaledPosY = BuildingMaker::Convert(-_posY);
   math::Pose newPose = this->visual->GetParent()->GetWorldPose();
   newPose.pos.y = scaledPosY;
 
@@ -151,7 +170,7 @@ void WallManip::OnPosYChanged(double _posY)
 }
 
 /////////////////////////////////////////////////
-void WallManip::OnPosZChanged(double _posZ)
+void ModelManip::OnPosZChanged(double _posZ)
 {
   double scaledPosZ = BuildingMaker::Convert(_posZ);
   math::Pose newPose = this->visual->GetParent()->GetWorldPose();
@@ -161,7 +180,7 @@ void WallManip::OnPosZChanged(double _posZ)
 }
 
 /////////////////////////////////////////////////
-void WallManip::OnYawChanged(double _yaw)
+void ModelManip::OnYawChanged(double _yaw)
 {
   double newYaw = BuildingMaker::ConvertAngle(_yaw);
   math::Pose newPose = this->visual->GetParent()->GetWorldPose();
@@ -170,6 +189,53 @@ void WallManip::OnYawChanged(double _yaw)
   newPose.rot.SetFromEuler(angles);
 
   this->visual->GetParent()->SetWorldPose(newPose);
+}
+
+/////////////////////////////////////////////////
+void ModelManip::SetPose(double _x, double _y, double _z,
+    double _roll, double _pitch, double _yaw)
+{
+  math::Pose newPose = BuildingMaker::ConvertPose(_x, -_y, _z, _roll, _pitch,
+      _yaw);
+
+  this->visual->GetParent()->SetWorldPose(newPose);
+}
+
+/////////////////////////////////////////////////
+void ModelManip::SetPosition(double _x, double _y, double _z)
+{
+  double scaledX = BuildingMaker::Convert(_x);
+  double scaledY = BuildingMaker::Convert(-_y);
+  double scaledZ = BuildingMaker::Convert(_z);
+  this->visual->GetParent()->SetWorldPosition(math::Vector3(scaledX, scaledY,
+      scaledZ));
+}
+
+/////////////////////////////////////////////////
+void ModelManip::SetRotation(double _roll, double _pitch, double _yaw)
+{
+  double rollRad = BuildingMaker::ConvertAngle(_roll);
+  double pitchRad = BuildingMaker::ConvertAngle(_pitch);
+  double yawRad = BuildingMaker::ConvertAngle(_yaw);
+
+  this->visual->GetParent()->SetWorldRotation(math::Quaternion(rollRad,
+      pitchRad, yawRad));
+}
+
+/////////////////////////////////////////////////
+void ModelManip::SetSize(double _width, double _length, double _height)
+{
+  this->size = BuildingMaker::ConvertSize(_length, _width, _height);
+
+  math::Vector3 dScale = this->visual->GetScale() - this->size;
+  this->visual->SetScale(this->size);
+
+  // adjust position due to difference in pivot points
+  math::Vector3 newPos = this->visual->GetPosition()
+      - math::Vector3(dScale.x/2.0 + dScale.y/2.0, 0, dScale.z/2.0);
+
+  qDebug() << " set size " << newPos.x << newPos.y << newPos.z;
+  this->visual->SetPosition(newPos);
 }
 
 /////////////////////////////////////////////////
@@ -205,13 +271,16 @@ BuildingMaker::~BuildingMaker()
 /////////////////////////////////////////////////
 void BuildingMaker::ConnectItem(std::string _partName, EditorItem *_item)
 {
-  WallManip *manip = this->walls[_partName];
+  ModelManip *manip = this->allItems[_partName];
 
   QObject::connect(_item, SIGNAL(sizeChanged(double, double, double)),
       manip, SLOT(OnSizeChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(poseChanged(double, double, double,
       double, double, double)), manip, SLOT(OnPoseChanged(double, double,
       double, double, double, double)));
+  QObject::connect(_item, SIGNAL(poseOriginTransformed(double, double, double,
+      double, double, double)), manip, SLOT(OnPoseOriginTransformed(double,
+      double, double, double, double, double)));
 
   QObject::connect(_item, SIGNAL(widthChanged(double)),
       manip, SLOT(OnWidthChanged(double)));
@@ -229,16 +298,6 @@ void BuildingMaker::ConnectItem(std::string _partName, EditorItem *_item)
       manip, SLOT(OnYawChanged(double)));
 
 }
-/*
-/////////////////////////////////////////////////
-void BuildingMaker::ConnectGroupItems(std::string _partType, EditorItem *_item)
-{
-  QObject::connect(_item, SIGNAL(sizeChanged(double, double, double)),
-      this, SLOT(OnSizeChanged(double, double, double)));
-  QObject::connect(_item, SIGNAL(poseChanged(double, double, double,
-      double, double, double)), manip, SLOT(OnPoseChanged(double, double,
-      double, double, double, double)));
-}*/
 
 /////////////////////////////////////////////////
 std::string BuildingMaker::MakeModel(math::Pose _pose)
@@ -269,27 +328,28 @@ std::string BuildingMaker::MakeModel(math::Pose _pose)
 void BuildingMaker::AddPart(std::string _type, math::Vector3 _size,
     math::Pose _pose)
 {
-  if (_type == "wall")
+/*  if (_type == "wall")
     this->AddWall(_size, _pose);
   else if (_type == "window")
     this->AddWindow(_size, _pose);
   else if (_type == "door")
-    this->AddDoor(_size, _pose);
+    this->AddDoor(_size, _pose);*/
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::AddWall(math::Vector3 _size, math::Pose _pose)
+std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
+    double _angle)
 {
   std::string linkName = "Wall";
 
   math::Pose linkPose, visualPose;
 
-  linkPose = _pose;
+//  linkPose = _pose;
 
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
         linkName, this->modelVisual));
   linkVisual->Load();
-  linkVisual->SetPose(linkPose);
+//  linkVisual->SetPose(linkPose);
   this->visuals.push_back(linkVisual);
 
   std::ostringstream visualName;
@@ -313,17 +373,16 @@ std::string BuildingMaker::AddWall(math::Vector3 _size, math::Pose _pose)
       {
         visualElem = linkElem->GetElement("visual");
         visVisual->Load(visualElem);
-        visVisual->GetParent()->SetPose(_pose);
-        /*qDebug() << "size " << _size.x << _size.y << _size.z;
-        qDebug() << "pos " << _pose.pos.x << _pose.pos.y << _pose.pos.z;
-        math::Vector3 rotate = _pose.rot.GetAsEuler();
-        qDebug() << "rot " << rotate.x << rotate.y << rotate.z;*/
-
-        visVisual->SetScale(_size);
         this->visuals.push_back(visVisual);
-        WallManip *wallManip = new WallManip();
+        ModelManip *wallManip = new ModelManip();
         wallManip->SetVisual(visVisual);
-        this->wallManips.push_back(wallManip);
+        math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+        visVisual->SetScale(scaledSize);
+        visVisual->SetPosition(math::Vector3(scaledSize.x/2, scaledSize.y/2, 0));
+        wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+//        visVisual->GetParent()->SetPose(_pose);
+//        visVisual->SetScale(_size);
+        this->allItems[visualName.str()] = wallManip;
         this->walls[visualName.str()] = wallManip;
       }
     }
@@ -333,14 +392,74 @@ std::string BuildingMaker::AddWall(math::Vector3 _size, math::Pose _pose)
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::AddWindow(math::Vector3 /*_size*/, math::Pose /*_pose*/)
+std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
+    double _angle)
 {
-  std::string windowVisualName = "";
-  return windowVisualName;
+  std::string linkName = "Window";
+
+  math::Pose linkPose, visualPose;
+
+//  linkPose = _pose;
+
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
+        linkName, this->modelVisual));
+  linkVisual->Load();
+//  linkVisual->SetPose(linkPose);
+  this->visuals.push_back(linkVisual);
+
+  std::ostringstream visualName;
+  visualName << modelName << "::" << linkName << "::Visual_"
+    << this->windows.size();
+  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+        linkVisual));
+
+  /// TODO for the moment, just draw a box to represent a window
+  std::string boxString = this->boxMaker->GetSDFString();
+
+  sdf::ElementPtr visualElem;
+  sdf::SDF sdf;
+  sdf.SetFromString(boxString);
+  if (sdf.root->HasElement("model"))
+  {
+    sdf::ElementPtr modelElem = sdf.root->GetElement("model");
+    if (modelElem->HasElement("link"))
+    {
+      sdf::ElementPtr linkElem = modelElem->GetElement("link");
+      if (linkElem->HasElement("visual"))
+      {
+        visualElem = linkElem->GetElement("visual");
+        visVisual->Load(visualElem);
+        this->visuals.push_back(visVisual);
+
+        ModelManip *windowManip = new ModelManip();
+        windowManip->SetVisual(visVisual);
+        math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+        visVisual->SetScale(scaledSize);
+        visVisual->SetPosition(math::Vector3(scaledSize.x/2, scaledSize.y/2, 0));
+        windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+        this->allItems[visualName.str()] = windowManip;
+        this->windows[visualName.str()] = windowManip;
+      }
+    }
+  }
+
+  return visualName.str();
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::AddDoor(math::Vector3 /*_size*/, math::Pose /*_pose*/)
+void BuildingMaker::RemoveWall(std::string wallName)
+{
+  ModelManip *manip = this->walls[wallName];
+  rendering::VisualPtr vis = manip->GetVisual();
+  vis->GetScene()->RemoveVisual(vis);
+  this->walls.erase(wallName);
+  this->allItems.erase(wallName);
+  delete manip;
+}
+
+/////////////////////////////////////////////////
+std::string BuildingMaker::AddDoor(QVector3D _size, QVector3D _pos,
+    double _angle)
 {
   std::string doorVisualName = "";
   return doorVisualName;
@@ -429,7 +548,7 @@ math::Vector3 BuildingMaker::ConvertSize(double _width, double _length,
 math::Pose BuildingMaker::ConvertPose(double _x, double _y, double _z,
     double _roll, double _pitch, double _yaw)
 {
-  return math::Pose(conversionScale*_x, -conversionScale*_y, conversionScale*_z,
+  return math::Pose(conversionScale*_x, conversionScale*_y, conversionScale*_z,
       GZ_DTOR(_roll), GZ_DTOR(_pitch), GZ_DTOR(_yaw));
 }
 
@@ -444,7 +563,7 @@ math::Vector3 BuildingMaker::ConvertSize(QVector3D _size)
 math::Pose BuildingMaker::ConvertPose(QVector3D _pos, QVector3D _rot)
 {
   QVector3D scaledPos = conversionScale*_pos;
-  return math::Pose(scaledPos.x(), -scaledPos.y(), scaledPos.z(),
+  return math::Pose(scaledPos.x(), scaledPos.y(), scaledPos.z(),
       GZ_DTOR(_rot.x()), GZ_DTOR(_rot.y()), GZ_DTOR(_rot.z()));
 }
 

@@ -325,7 +325,6 @@ void PolylineItem::UpdatePathAt(unsigned int _index, QPointF _pos)
   QPointF newPos = _pos - this->origin;
   p.setElementPositionAt(_index, newPos.x(), newPos.y());
 
-//  qDebug () << " path pt " << _pos;
   this->setPath(p);
 }
 
@@ -373,8 +372,11 @@ void PolylineItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
     return;
   }
 
-  this->origin += _event->scenePos() - _event->lastScenePos();
+  QPointF delta = _event->scenePos() - _event->lastScenePos();
+  this->origin += delta;
   this->setPos(this->origin);
+
+  emit poseOriginTransformed(delta.x(), delta.y(), 0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
@@ -419,8 +421,8 @@ void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
 QVariant PolylineItem::itemChange(GraphicsItemChange _change,
   const QVariant &_value)
 {
-  if (_change == QGraphicsItem::ItemSelectedChange && this->scene()) {
-
+  if (_change == QGraphicsItem::ItemSelectedChange && this->scene())
+  {
     if (_value.toBool())
     {
       QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
@@ -443,7 +445,6 @@ QVariant PolylineItem::itemChange(GraphicsItemChange _change,
       }
         this->corners[corners.size()-1]->removeSceneEventFilter(this);
     }
-
   }
   return QGraphicsItem::itemChange(_change, _value);
 }

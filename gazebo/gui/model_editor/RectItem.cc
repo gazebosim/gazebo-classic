@@ -368,7 +368,7 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
       // corners
       case 0:
       {
-        this->setPos(this->pos() +
+        this->SetPosition(this->pos() +
             (mouseEvent->scenePos() - mouseEvent->lastScenePos()));
         break;
       }
@@ -376,14 +376,14 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
       {
         dx = sin(-angle) * deltaHeight;
         dy = cos(-angle) * deltaHeight;
-        this->setPos(this->pos() + QPointF(dx, dy));
+        this->SetPosition(this->pos() + QPointF(dx, dy));
         break;
       }
       case 6:
       {
         dx = cos(angle) * deltaWidth;
         dy = sin(angle) * deltaWidth;
-        this->setPos(this->pos() + QPointF(dx, dy));
+        this->SetPosition(this->pos() + QPointF(dx, dy));
 
         break;
       }
@@ -392,14 +392,14 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
       {
         dx = sin(-angle) * deltaHeight;
         dy = cos(-angle) * deltaHeight;
-        this->setPos(this->pos() + QPointF(dx, dy));
+        this->SetPosition(this->pos() + QPointF(dx, dy));
         break;
       }
       case 7:
       {
         dx = cos(angle) * deltaWidth;
         dy = sin(angle) * deltaWidth;
-        this->setPos(this->pos() + QPointF(dx, dy));
+        this->SetPosition(this->pos() + QPointF(dx, dy));
         break;
       }
       default:
@@ -422,7 +422,7 @@ void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
   this->location.setY( (static_cast<int>(this->location.y())
       / this->gridSpace) * this->gridSpace);*/
 
-  this->setPos(this->location);
+  this->SetPosition(this->location);
 }
 
 /////////////////////////////////////////////////
@@ -443,8 +443,10 @@ void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
   if (!this->isSelected())
     return;
 
-  this->location += (_event->scenePos() - _event->lastScenePos());
-  this->setPos(this->location);
+  QPointF delta = _event->scenePos() - _event->lastScenePos();
+  this->location += delta;
+  this->SetPosition(this->location);
+//  emit poseOriginTransformed(delta.x(), delta.y(), 0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
@@ -631,4 +633,18 @@ void RectItem::mouseMoveEvent(QGraphicsSceneDragDropEvent *_event)
 void RectItem::mousePressEvent(QGraphicsSceneDragDropEvent *_event)
 {
   _event->setAccepted(false);
+}
+
+/////////////////////////////////////////////////
+void RectItem::SetPosition(QPointF _pos)
+{
+  this->SetPosition(_pos.x(), _pos.y());
+}
+
+/////////////////////////////////////////////////
+void RectItem::SetPosition(double _x, double _y)
+{
+  this->setPos(_x, _y);
+  emit posXChanged(_x);
+  emit posYChanged(_y);
 }

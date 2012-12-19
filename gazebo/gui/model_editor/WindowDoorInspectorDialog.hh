@@ -44,6 +44,8 @@ namespace gazebo
 
       public: QPointF GetPosition();
 
+      public: double GetElevation();
+
       public: std::string GetType();
 
       public: void SetWidth(double _width);
@@ -53,6 +55,8 @@ namespace gazebo
       public: void SetDepth(double _depth);
 
       public: void SetPosition(QPointF _pos);
+
+      public: void SetElevation(double _elevation);
 
       public: void SetType(std::string _type);
 
@@ -75,6 +79,8 @@ namespace gazebo
       private: QDoubleSpinBox *positionXSpinBox;
 
       private: QDoubleSpinBox *positionYSpinBox;
+
+      private: QDoubleSpinBox *elevationSpinBox;
 
       private: QComboBox *typeComboBox;
    };

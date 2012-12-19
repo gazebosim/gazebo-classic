@@ -32,10 +32,18 @@ namespace gazebo
 
         public: ~WindowItem();
 
+        public: virtual QVector3D GetSize();
+
+        public: virtual QVector3D GetScenePosition();
+
+        public: virtual double GetSceneRotation();
+
         private: virtual void paint (QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
         private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+
+        private: void WindowChanged();
 
         private: double windowDepth;
 
@@ -46,6 +54,8 @@ namespace gazebo
         private: double windowSideBar;
 
         private: QPointF windowPos;
+
+        private: double windowElevation;
     };
   }
 }

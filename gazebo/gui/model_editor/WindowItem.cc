@@ -29,7 +29,8 @@ WindowItem::WindowItem(): RectItem()
   this->windowHeight = 0;
   this->windowWidth = 50;
   this->windowSideBar = 10;
-  this->windowPos = this->pos();
+  this->windowPos = this->scenePos();
+  this->windowElevation = 0;
 
   this->width = this->windowWidth;
   this->height = this->windowDepth + this->windowSideBar;
@@ -45,6 +46,25 @@ WindowItem::WindowItem(): RectItem()
 /////////////////////////////////////////////////
 WindowItem::~WindowItem()
 {
+}
+
+/////////////////////////////////////////////////
+QVector3D WindowItem::GetSize()
+{
+  return QVector3D(this->windowWidth, this->windowDepth, this->windowHeight);
+}
+
+/////////////////////////////////////////////////
+QVector3D WindowItem::GetScenePosition()
+{
+  return QVector3D(this->scenePos().x(), this->scenePos().y(),
+      this->windowElevation);
+}
+
+/////////////////////////////////////////////////
+double WindowItem::GetSceneRotation()
+{
+  return this->rotationAngle;
 }
 
 /////////////////////////////////////////////////
@@ -98,6 +118,7 @@ void WindowItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
   WindowDoorInspectorDialog dialog(0);
   dialog.SetWidth(this->windowWidth);
   dialog.SetHeight(this->windowHeight);
+  dialog.SetElevation(this->windowElevation);
   dialog.SetDepth(this->windowDepth);
   dialog.SetPosition(this->windowPos);
   if (dialog.exec() == QDialog::Accepted)
@@ -109,6 +130,18 @@ void WindowItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
     this->windowHeight = dialog.GetHeight();
     this->windowDepth = dialog.GetDepth();
     this->windowPos = dialog.GetPosition();
+    this->windowElevation = dialog.GetElevation();
+    this->WindowChanged();
   }
   _event->setAccepted(true);
+}
+
+/////////////////////////////////////////////////
+void WindowItem::WindowChanged()
+{
+  emit widthChanged(this->windowDepth);
+  emit lengthChanged(this->windowWidth);
+  emit heightChanged(this->windowHeight);
+  emit poseChanged(this->windowPos.x(), this->windowPos.y(),
+      this->windowElevation, 0, 0, this->rotationAngle);
 }

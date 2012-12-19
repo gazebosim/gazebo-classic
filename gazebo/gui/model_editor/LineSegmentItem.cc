@@ -167,20 +167,12 @@ double LineSegmentItem::GetSceneRotation()
 /////////////////////////////////////////////////
 void LineSegmentItem::LineChanged()
 {
-  emit sizeChanged(this->pen().width(), this->line().length(),
-      this->pseudoHeight);
+//  emit sizeChanged(this->pen().width(), this->line().length(),
+//      this->pseudoHeight);
+  emit widthChanged(this->pen().width());
+  emit lengthChanged(this->line().length());
+
   QPointF sceneStartPos = this->mapToScene(this->start);
   emit poseChanged(sceneStartPos.x(), sceneStartPos.y(), 0,
       0, 0, this->line().angle());
-
-//  qDebug() << "asdF" << this->mapToScene(this->pos()) << this->pos() << this->mapToScene(this->start);
 }
-/*
-/////////////////////////////////////////////////
-QVariant LineSegmentItem::itemChange(GraphicsItemChange _change,
-  const QVariant &_value)
-{
-  qDebug() << " item change " << _change;
-
-  return QGraphicsItem::itemChange(_change, _value);
-}*/

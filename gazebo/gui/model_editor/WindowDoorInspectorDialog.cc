@@ -80,6 +80,7 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
 
   QLabel *positionXLabel = new QLabel(tr("x: "));
   QLabel *positionYLabel = new QLabel(tr("y: "));
+  QLabel *elevationLabel = new QLabel(tr("Elevation: "));
 
   this->positionXSpinBox = new QDoubleSpinBox;
   this->positionXSpinBox->setRange(-1000, 1000);
@@ -93,11 +94,19 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   this->positionYSpinBox->setDecimals(3);
   this->positionYSpinBox->setValue(0.000);
 
+  this->elevationSpinBox = new QDoubleSpinBox;
+  this->elevationSpinBox->setRange(-1000, 1000);
+  this->elevationSpinBox->setSingleStep(0.001);
+  this->elevationSpinBox->setDecimals(3);
+  this->elevationSpinBox->setValue(0.000);
+
   QHBoxLayout *positionLayout = new QHBoxLayout;
   positionLayout->addWidget(positionXLabel);
   positionLayout->addWidget(positionXSpinBox);
   positionLayout->addWidget(positionYLabel);
   positionLayout->addWidget(positionYSpinBox);
+  positionLayout->addWidget(elevationLabel);
+  positionLayout->addWidget(elevationSpinBox);
 
   QGroupBox *positionGroupBox = new QGroupBox(tr("Position"));
   positionGroupBox->setLayout(positionLayout);
@@ -162,6 +171,12 @@ QPointF WindowDoorInspectorDialog::GetPosition()
 }
 
 /////////////////////////////////////////////////
+double WindowDoorInspectorDialog::GetElevation()
+{
+  return this->elevationSpinBox->value();
+}
+
+/////////////////////////////////////////////////
 std::string WindowDoorInspectorDialog::GetType()
 {
   return this->typeComboBox->currentText().toStdString();
@@ -190,6 +205,12 @@ void WindowDoorInspectorDialog::SetPosition(QPointF _pos)
 {
   this->positionXSpinBox->setValue(_pos.x());
   this->positionYSpinBox->setValue(_pos.y());
+}
+
+/////////////////////////////////////////////////
+void WindowDoorInspectorDialog::SetElevation(double _elevation)
+{
+  this->elevationSpinBox->setValue(_elevation);
 }
 
 /////////////////////////////////////////////////
