@@ -39,6 +39,7 @@ TopicSelector::TopicSelector(QWidget *_parent)
   this->treeWidget = new QTreeWidget();
   this->treeWidget->setColumnCount(1);
   this->treeWidget->header()->hide();
+  this->treeWidget->setMinimumSize(400, 400);
   this->treeWidget->setFocusPolicy(Qt::NoFocus);
   this->treeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
   this->treeWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -94,6 +95,17 @@ void TopicSelector::GetTopicList()
           QStringList(QString::fromStdString(iter->first)));
       this->treeWidget->addTopLevelItem(topItem);
 
+      // Add all the topic names
+      for (std::list<std::string>::iterator topicIter = iter->second.begin();
+           topicIter != iter->second.end(); ++topicIter)
+      {
+        QTreeWidgetItem *topicItem = new QTreeWidgetItem(topItem,
+          QStringList(QString::fromStdString(*topicIter)));
+        this->treeWidget->addTopLevelItem(topicItem);
+      }
+
+      // Automatically expand the list of topics.
+      topItem->setExpanded(true);
     }
   }
 }
