@@ -187,9 +187,9 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
     QLineF line(center.x(), center.y(), newPoint.x(), newPoint.y());
 
     double angle = -prevLine.angleTo(line);
-    this->translate(localCenter.x(), localCenter.y());
+    this->translate(localCenter.x(), 0);
     this->rotate(angle);
-    this->translate(-localCenter.x(), -localCenter.y());
+    this->translate(-localCenter.x(), 0);
 
     rotationAngle += angle;
 //    this->setTransformOriginPoint(localCenter);
@@ -446,7 +446,6 @@ void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
   QPointF delta = _event->scenePos() - _event->lastScenePos();
   this->location += delta;
   this->SetPosition(this->location);
-//  emit poseOriginTransformed(delta.x(), delta.y(), 0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
