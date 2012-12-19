@@ -198,6 +198,15 @@ math::Pose Sensor::GetPose() const
 }
 
 //////////////////////////////////////////////////
+double Sensor::GetUpdateRate()
+{
+  if (this->updatePeriod.Double() > 0.0)
+    return 1.0/this->updatePeriod.Double();
+  else
+    return 0.0;
+}
+
+//////////////////////////////////////////////////
 void Sensor::SetUpdateRate(double _hz)
 {
   if (_hz > 0.0)
