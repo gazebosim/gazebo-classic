@@ -59,6 +59,10 @@ namespace gazebo
       private: transport::SubscriberPtr cameraSub;
 
       private: common::Time prevTime;
+
+      private: QLineEdit *hzValue;
+      private: QLineEdit *bandwidthValue;
+      private: double hz;
     };
   }
 }

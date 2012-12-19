@@ -64,11 +64,20 @@ CameraSensorWidget::CameraSensorWidget(QWidget *_parent)
   // {
   QHBoxLayout *infoLayout = new QHBoxLayout;
   QLabel *hzLabel = new QLabel("Hz: ");
+  this->hzValue = new QLineEdit;
+  this->hzValue->setReadOnly(true);
+  this->hzValue->setFixedWidth(80);
+
   QLabel *bandwidthLabel = new QLabel("Bandwidth: ");
+  this->bandwidthValue = new QLineEdit;
+  this->bandwidthValue->setReadOnly(true);
+  this->bandwidthValue->setFixedWidth(110);
 
   infoLayout->addSpacing(10);
   infoLayout->addWidget(hzLabel);
+  infoLayout->addWidget(this->hzValue);
   infoLayout->addWidget(bandwidthLabel);
+  infoLayout->addWidget(this->bandwidthValue);
   infoLayout->addStretch(4);
   // }
 
@@ -111,6 +120,10 @@ void CameraSensorWidget::Update()
 {
   this->imageLabel->setPixmap(this->pixmap);
 
+  std::ostringstream stream;
+  stream << std::fixed << std::precision(2) << this->hz;
+  this->hzValue->setText(tr(stream.str().c_str()));
+
   QTimer::singleShot(500, this, SLOT(Update()));
 }
 
@@ -119,15 +132,17 @@ void CameraSensorWidget::OnImage(ConstImageStampedPtr &_msg)
 {
   QImage image(_msg->image().width(), _msg->image().height(),
                QImage::Format_RGB888);
+
   memcpy(image.bits(), _msg->image().data().c_str(),
          _msg->image().data().size());
 
-  common::Time currTime = common::Time::GetWallTime();
+  // Get the time the message was generated
+  common::Time currTime = msgs::Convert(_msg->time());
 
-  //if (this->prevTime != common::Time(0, 0))
-  //  printf("Hz: %6.2f\n", 1.0 / (currTime - this->prevTime).Double());
-  printf("Hz: %6.2f\n", currTime.Double());
+  // Calculate the Hz value
+  this->hz = 1.0 / (currTime - this->prevTime).Double();
 
+  // Store the previous time for future Hz calculations
   this->prevTime = currTime;
 
   this->pixmap = QPixmap::fromImage(image);
