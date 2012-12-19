@@ -46,6 +46,9 @@ namespace gazebo
 
         signals: void yawChanged(double _yaw);
 
+        signals: void originChanged(double _xRatio, double _yRatio,
+            double _zRatio);
+
         protected: double pseudoHeight;
     };
   }

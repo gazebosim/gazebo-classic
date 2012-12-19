@@ -180,6 +180,7 @@ void ModelManip::OnYawChanged(double _yaw)
   double newYaw = BuildingMaker::ConvertAngle(_yaw);
   math::Vector3 angles = this->visual->GetRotation().GetAsEuler();
   angles.z = -newYaw;
+  // TODO change this to be consistent with SetRotation
   this->visual->SetRotation(angles);
 }
 
@@ -208,7 +209,8 @@ void ModelManip::SetRotation(double _roll, double _pitch, double _yaw)
   double pitchRad = BuildingMaker::ConvertAngle(_pitch);
   double yawRad = BuildingMaker::ConvertAngle(_yaw);
 
-  this->visual->SetRotation(math::Quaternion(rollRad, pitchRad, -yawRad));
+  this->visual->GetParent()->SetRotation(
+      math::Quaternion(rollRad, pitchRad, yawRad));
 }
 
 /////////////////////////////////////////////////
@@ -313,15 +315,18 @@ std::string BuildingMaker::MakeModel(math::Pose _pose)
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::AddPart(std::string _type, math::Vector3 _size,
-    math::Pose _pose)
+std::string BuildingMaker::AddPart(std::string _type, QVector3D _size,
+    QVector3D _pos, double _angle)
 {
-/*  if (_type == "wall")
-    this->AddWall(_size, _pose);
+  if (_type == "wall")
+    return this->AddWall(_size, _pos, _angle);
   else if (_type == "window")
-    this->AddWindow(_size, _pose);
+    return this->AddWindow(_size, _pos, _angle);
   else if (_type == "door")
-    this->AddDoor(_size, _pose);*/
+    return this->AddDoor(_size, _pos, _angle);
+  else if (_type == "stairs")
+    return this->AddStairs(_size, _pos, _angle);
+  return "";
 }
 
 /////////////////////////////////////////////////
@@ -329,10 +334,6 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
     double _angle)
 {
   std::string linkName = "Wall";
-
-  math::Pose linkPose, visualPose;
-
-//  linkPose = _pose;
 
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
         linkName, this->modelVisual));
@@ -385,14 +386,9 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
 {
   std::string linkName = "Window";
 
-  math::Pose linkPose, visualPose;
-
-//  linkPose = _pose;
-
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
         linkName, this->modelVisual));
   linkVisual->Load();
-//  linkVisual->SetPose(linkPose);
   this->visuals.push_back(linkVisual);
 
   std::ostringstream visualName;
@@ -430,7 +426,56 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
       }
     }
   }
+  return visualName.str();
+}
 
+
+
+/////////////////////////////////////////////////
+std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
+    double _angle)
+{
+  std::string linkName = "Stairs";
+
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
+        linkName, this->modelVisual));
+  linkVisual->Load();
+  this->visuals.push_back(linkVisual);
+
+  std::ostringstream visualName;
+  visualName << modelName << "::" << linkName << "::Visual_"
+    << this->stairs.size();
+  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+        linkVisual));
+
+  std::string boxString = this->boxMaker->GetSDFString();
+
+  sdf::ElementPtr visualElem;
+  sdf::SDF sdf;
+  sdf.SetFromString(boxString);
+  if (sdf.root->HasElement("model"))
+  {
+    sdf::ElementPtr modelElem = sdf.root->GetElement("model");
+    if (modelElem->HasElement("link"))
+    {
+      sdf::ElementPtr linkElem = modelElem->GetElement("link");
+      if (linkElem->HasElement("visual"))
+      {
+        visualElem = linkElem->GetElement("visual");
+        visVisual->Load(visualElem);
+        this->visuals.push_back(visVisual);
+
+        ModelManip *stairsManip = new ModelManip();
+        stairsManip->SetVisual(visVisual);
+        math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+        visVisual->SetScale(scaledSize);
+        visVisual->SetPosition(math::Vector3(scaledSize.x/2, scaledSize.y/2, 0));
+        stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+        this->allItems[visualName.str()] = stairsManip;
+        this->stairs[visualName.str()] = stairsManip;
+      }
+    }
+  }
   return visualName.str();
 }
 
@@ -446,8 +491,8 @@ void BuildingMaker::RemoveWall(std::string wallName)
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::AddDoor(QVector3D _size, QVector3D _pos,
-    double _angle)
+std::string BuildingMaker::AddDoor(QVector3D /*_size*/, QVector3D /*_pos*/,
+    double /*_angle*/)
 {
   std::string doorVisualName = "";
   return doorVisualName;

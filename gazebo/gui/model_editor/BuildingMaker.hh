@@ -102,19 +102,22 @@ namespace gazebo
 
       public: std::string MakeModel(math::Pose _pose);
 
-      public: void AddPart(std::string _type, math::Vector3 _size,
-          math::Pose _pose);
+      public: std::string AddPart(std::string _type, QVector3D _size,
+          QVector3D _pos, double _angle);
 
       public: std::string AddWall(QVector3D _size, QVector3D _pos,
           double _angle);
-
-      public: void RemoveWall(std::string wallName);
 
       public: std::string AddWindow(QVector3D _size, QVector3D _pos,
           double _angle);
 
       public: std::string AddDoor(QVector3D _size, QVector3D _pos,
           double _angle);
+
+      public: std::string AddStairs(QVector3D _size, QVector3D _pos,
+          double _angle);
+
+      public: void RemoveWall(std::string wallName);
 
       public: void ConnectItem(std::string _partName, EditorItem *_item);
 
@@ -156,16 +159,15 @@ namespace gazebo
 
       private: std::map<std::string, ModelManip *> windows;
 
-      private: std::list<rendering::VisualPtr> windowVisuals;
+      private: std::map<std::string, ModelManip *> stairs;
 
-      private: std::list<rendering::VisualPtr> doorVisuals;
+//      private: std::list<rendering::VisualPtr> windowVisuals;
 
-      private: std::list<ModelManip *> windowManips;
+//      private: std::list<rendering::VisualPtr> doorVisuals;
 
-      private: std::list<ModelManip *> wallManips;
-//      private: std::list<rendering::VisualPtr> windowManips;
-//      private: std::list<rendering::VisualPtr> doorManips;
+//      private: std::list<ModelManip *> windowManips;
 
+//      private: std::list<ModelManip *> wallManips;
 
       private: sdf::SDFPtr modelSDF;
 
@@ -174,6 +176,7 @@ namespace gazebo
       private: BoxMaker* boxMaker;
 
       private: rendering::VisualPtr modelVisual;
+
       private: std::list<rendering::VisualPtr> visuals;
 
 //      private: std::vector<event::ConnectionPtr> connections;

@@ -650,16 +650,16 @@ void RectItem::SetPosition(double _x, double _y)
 }
 
 /////////////////////////////////////////////////
-void RectItem::SetRotation(double angle)
+void RectItem::SetRotation(double _angle)
 {
   double halfX = this->drawingOriginX +
       (this->drawingOriginX + this->drawingWidth)/2;
 
   this->translate(halfX, 0);
-  this->rotate(angle - this->rotationAngle);
+  this->rotate(_angle - this->rotationAngle);
   this->translate(-halfX, 0);
 
-  this->rotationAngle = angle;
+  this->rotationAngle = _angle;
   emit yawChanged(this->rotationAngle);
 }
 
