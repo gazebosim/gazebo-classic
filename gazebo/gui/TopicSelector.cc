@@ -150,6 +150,15 @@ std::string TopicSelector::GetTopic() const
 /////////////////////////////////////////////////
 void TopicSelector::OnSelection(QTreeWidgetItem *_item, int /*_column*/)
 {
-  this->topicName = _item->text(0).toStdString();
-  this->okayButton->setEnabled(true);
+  if (_item->parent())
+  {
+    this->topicName = _item->text(0).toStdString();
+    this->okayButton->setEnabled(true);
+  }
+  else
+  {
+    _item->setExpanded(!_item->isExpanded());
+    this->topicName.clear();
+    this->okayButton->setEnabled(false);
+  }
 }

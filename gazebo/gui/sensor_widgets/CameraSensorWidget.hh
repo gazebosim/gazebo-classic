@@ -17,6 +17,7 @@
 #ifndef _CAMERASENSORWIDGET_HH_
 #define _CAMERASENSORWIDGET_HH_
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/gui/qt.h"
@@ -40,6 +41,9 @@ namespace gazebo
       /// \param[in] _topicName Name of the topic to use.
       public: void SetTopic(const std::string &_topicName);
 
+      /// \brief Update the list of available topics in the combo box.
+      private: void UpdateTopicList();
+
       /// \brief Update the camera sensor widget.
       private slots: void Update();
 
@@ -53,6 +57,8 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::PublisherPtr pub;
       private: transport::SubscriberPtr cameraSub;
+
+      private: common::Time prevTime;
     };
   }
 }

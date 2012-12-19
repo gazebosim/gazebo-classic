@@ -212,9 +212,12 @@ void MainWindow::SelectTopic()
   std::string topic = selector->GetTopic();
   delete selector;
 
-  CameraSensorWidget *camWidget = new CameraSensorWidget();
-  camWidget->SetTopic(topic);
-  camWidget->show();
+  if (!topic.empty())
+  {
+    CameraSensorWidget *camWidget = new CameraSensorWidget();
+    camWidget->SetTopic(topic);
+    camWidget->show();
+  }
 }
 
 /////////////////////////////////////////////////

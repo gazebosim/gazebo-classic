@@ -41,37 +41,41 @@ CameraSensorWidget::CameraSensorWidget(QWidget *_parent)
   this->setWindowTitle(tr("Gazebo: Camera Sensor"));
   this->setObjectName("cameraSensor");
 
-  QVBoxLayout *mainLayout = new QVBoxLayout;
-
-  QFrame *frame = new QFrame;
-  QVBoxLayout *frameLayout = new QVBoxLayout;
-
+  // Create the topic label and combo box
+  // {
   QHBoxLayout *topicLayout = new QHBoxLayout;
-
   QLabel *topicLabel = new QLabel(tr("Topic: "));
   this->topicCombo = new QComboBox(this);
   this->topicCombo->setObjectName("comboList");
   this->topicCombo->setMinimumSize(300, 25);
-
   connect(this->topicCombo, SIGNAL(currentIndexChanged(int)),
           this, SLOT(OnTopicChanged(int)));
 
-  msgs::ImageStamped msg;
-  std::list<std::string> topics;
-  topics = transport::getAdvertisedTopics(msg.GetTypeName());
-
-  for (std::list<std::string>::iterator iter = topics.begin();
-       iter != topics.end(); ++iter)
-  {
-    std::string topicName = this->node->EncodeTopicName(*iter);
-    this->topicCombo->addItem(QString::fromStdString(topicName));
-  }
+  this->UpdateTopicList();
 
   topicLayout->addSpacing(10);
   topicLayout->addWidget(topicLabel);
   topicLayout->addWidget(this->topicCombo);
   topicLayout->addSpacing(10);
   topicLayout->addStretch(4);
+  // }
+
+  // Create the Hz and bandwidth labels
+  // {
+  QHBoxLayout *infoLayout = new QHBoxLayout;
+  QLabel *hzLabel = new QLabel("Hz: ");
+  QLabel *bandwidthLabel = new QLabel("Bandwidth: ");
+
+  infoLayout->addSpacing(10);
+  infoLayout->addWidget(hzLabel);
+  infoLayout->addWidget(bandwidthLabel);
+  infoLayout->addStretch(4);
+  // }
+
+  // Create the image displa
+  // {
+  QFrame *frame = new QFrame;
+  QVBoxLayout *frameLayout = new QVBoxLayout;
 
   this->pixmap = QPixmap(":/images/no_image.png");
   QPixmap image = (this->pixmap.scaled(320, 240, Qt::KeepAspectRatio,
@@ -85,8 +89,11 @@ CameraSensorWidget::CameraSensorWidget(QWidget *_parent)
   frameLayout->addWidget(this->imageLabel);
   frame->setObjectName("blackBorderFrame");
   frame->setLayout(frameLayout);
+  // }
 
+  QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(topicLayout);
+  mainLayout->addLayout(infoLayout);
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(4, 4, 4, 4);
@@ -115,6 +122,14 @@ void CameraSensorWidget::OnImage(ConstImageStampedPtr &_msg)
   memcpy(image.bits(), _msg->image().data().c_str(),
          _msg->image().data().size());
 
+  common::Time currTime = common::Time::GetWallTime();
+
+  //if (this->prevTime != common::Time(0, 0))
+  //  printf("Hz: %6.2f\n", 1.0 / (currTime - this->prevTime).Double());
+  printf("Hz: %6.2f\n", currTime.Double());
+
+  this->prevTime = currTime;
+
   this->pixmap = QPixmap::fromImage(image);
 }
 
@@ -130,4 +145,19 @@ void CameraSensorWidget::SetTopic(const std::string &_topicName)
   this->cameraSub.reset();
   this->cameraSub = this->node->Subscribe(_topicName,
                                           &CameraSensorWidget::OnImage, this);
+}
+
+/////////////////////////////////////////////////
+void CameraSensorWidget::UpdateTopicList()
+{
+  msgs::ImageStamped msg;
+  std::list<std::string> topics;
+  topics = transport::getAdvertisedTopics(msg.GetTypeName());
+
+  for (std::list<std::string>::iterator iter = topics.begin();
+       iter != topics.end(); ++iter)
+  {
+    std::string topicName = this->node->EncodeTopicName(*iter);
+    this->topicCombo->addItem(QString::fromStdString(topicName));
+  }
 }
