@@ -21,6 +21,7 @@
 #include "RectItem.hh"
 #include "WindowItem.hh"
 #include "DoorItem.hh"
+#include "StairsItem.hh"
 #include "LineSegmentItem.hh"
 #include "PolylineItem.hh"
 #include "WallItem.hh"
@@ -89,6 +90,14 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
         this->drawInProgress = false;
       }
       break;
+    case Stairs:
+      if (drawInProgress)
+      {
+        this->stairsList.push_back(dynamic_cast<StairsItem*>(
+            this->currentMouseItem));
+        this->drawMode = None;
+        this->drawInProgress = false;
+      }
     default:
       break;
   }
@@ -144,6 +153,9 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
       break;
     case Door:
       this->DrawDoor(_event->pos());
+      break;
+    case Stairs:
+      this->DrawStairs(_event->pos());
       break;
     default:
       break;
@@ -252,6 +264,33 @@ void EditorView::DrawDoor(QPoint _pos)
     doorItem->SetPosition(scenePos.x(), scenePos.y());
   }
 }
+
+/////////////////////////////////////////////////
+void EditorView::DrawStairs(QPoint _pos)
+{
+  StairsItem *stairsItem = NULL;
+  if (!drawInProgress)
+  {
+    stairsItem = new StairsItem();
+    this->scene()->addItem(stairsItem);
+    this->currentMouseItem = stairsItem;
+
+/*    std::string stairsName = this->buildingMaker->AddStairs(
+        stairsItem->GetSize(), stairsItem->GetScenePosition(),
+        stairsItem->GetSceneRotation());
+
+    this->buildingMaker->ConnectItem(stairsName, stairsItem);*/
+
+    this->drawInProgress = true;
+  }
+  stairsItem = dynamic_cast<StairsItem*>(this->currentMouseItem);
+  if (stairsItem)
+  {
+    QPointF scenePos = this->mapToScene(_pos);
+    stairsItem->SetPosition(scenePos.x(), scenePos.y());
+  }
+}
+
 
 /////////////////////////////////////////////////
 void EditorView::OnCreateEditorItem(const std::string &_type)

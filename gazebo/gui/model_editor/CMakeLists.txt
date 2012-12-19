@@ -8,6 +8,7 @@ set (sources
   FinishModelDialog.cc
   WindowDoorInspectorDialog.cc
   WallInspectorDialog.cc
+  StairsInspectorDialog.cc
   GridLines.cc
   CornerGrabber.cc
   RotateHandle.cc
@@ -21,6 +22,7 @@ set (sources
   BuildingMaker.cc
   EditorEvents.cc
   EditorItem.cc
+  StairsItem.cc
 )
 
 set (qt_headers
@@ -30,6 +32,7 @@ set (qt_headers
   FinishModelDialog.hh
   WindowDoorInspectorDialog.hh
   WallInspectorDialog.hh
+  StairsInspectorDialog.hh
   GridLines.hh
   CornerGrabber.hh
   RotateHandle.hh
@@ -42,6 +45,7 @@ set (qt_headers
   LineSegmentItem.hh
   BuildingMaker.hh
   EditorItem.hh
+  StairsItem.hh
 )
 
 set (headers

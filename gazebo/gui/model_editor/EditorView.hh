@@ -26,6 +26,7 @@ namespace gazebo
   namespace gui
   {
     class WindowItem;
+    class StairsItem;
     class DoorItem;
     class WallItem;
     class BuildingMaker;
@@ -56,6 +57,8 @@ namespace gazebo
 
       private: void DrawDoor(QPoint _pos);
 
+      private: void DrawStairs(QPoint _pos);
+
       private: void OnCreateEditorItem(const std::string &_type);
 
       private: int drawMode;
@@ -69,6 +72,8 @@ namespace gazebo
       private: std::vector<WindowItem*> windowList;
 
       private: std::vector<DoorItem*> doorList;
+
+      private: std::vector<StairsItem*> stairsList;
 
       private: QPoint lastLineCornerPos;
 
