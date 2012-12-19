@@ -208,10 +208,13 @@ void MainWindow::New()
 void MainWindow::SelectTopic()
 {
   TopicSelector *selector = new TopicSelector();
-  selector->show();
+  selector->exec();
+  std::string topic = selector->GetTopic();
+  delete selector;
 
-  // CameraSensorWidget *camWidget = new CameraSensorWidget();
-  // camWidget->show();
+  CameraSensorWidget *camWidget = new CameraSensorWidget();
+  camWidget->SetTopic(topic);
+  camWidget->show();
 }
 
 /////////////////////////////////////////////////

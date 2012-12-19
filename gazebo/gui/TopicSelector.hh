@@ -28,7 +28,7 @@ namespace gazebo
 
     /// \class TopicSelector TopicSelector.hh gui/TopicSelector.hh
     /// \brief A widget that provides a list of topics to select from.
-    class TopicSelector : public QWidget
+    class TopicSelector : public QDialog
     {
       Q_OBJECT
 
@@ -39,9 +39,21 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~TopicSelector();
 
+      /// \brief Get the topic that was selected.
+      /// \return The selected topic, which can be an empty string if no
+      /// topic was selected.
+      public: std::string GetTopic() const;
+
       private: void GetTopicList();
 
+      private slots: void OnOkay();
+      private slots: void OnCancel();
+      private slots: void OnSelection(QTreeWidgetItem *_item, int _column);
+
       private: QTreeWidget *treeWidget;
+      private: QPushButton *okayButton;
+
+      private: std::string topicName;
     };
     /// \}
   }

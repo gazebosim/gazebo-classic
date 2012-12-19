@@ -4,6 +4,11 @@ QWidget#cameraSensor > QLabel
   color: #d0d0d0;
 }
 
+QWidget#topicSelector
+{
+  background-color: #303030;
+}
+
 QMainWindow#mainWindow
 {
   margin: 0px;

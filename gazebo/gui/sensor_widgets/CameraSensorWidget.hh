@@ -36,7 +36,13 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~CameraSensorWidget();
 
+      /// \brief Set the name of the topic to get data from.
+      /// \param[in] _topicName Name of the topic to use.
+      public: void SetTopic(const std::string &_topicName);
+
+      /// \brief Update the camera sensor widget.
       private slots: void Update();
+
       private slots: void OnTopicChanged(int _index);
       private: void OnImage(ConstImageStampedPtr &_msg);
 

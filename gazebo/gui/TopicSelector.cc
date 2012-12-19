@@ -26,7 +26,7 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 TopicSelector::TopicSelector(QWidget *_parent)
-  : QWidget(_parent)
+  : QDialog(_parent)
 {
   // This name is used in the qt style sheet
   this->setObjectName("topicSelector");
@@ -44,21 +44,40 @@ TopicSelector::TopicSelector(QWidget *_parent)
   this->treeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
   this->treeWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
   this->treeWidget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-  // connect(this->treeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-  //        this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
+  connect(this->treeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+          this, SLOT(OnSelection(QTreeWidgetItem *, int)));
 
   this->GetTopicList();
 
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
+
+  QLabel *topicLabel = new QLabel("Topics:");
+
+  frameLayout->addWidget(topicLabel);
   frameLayout->addWidget(this->treeWidget);
-  frameLayout->setContentsMargins(0, 0, 0, 0);
+  frameLayout->setContentsMargins(4, 4, 4, 4);
   frame->setLayout(frameLayout);
 
+  QHBoxLayout *buttonLayout = new QHBoxLayout;
+  QPushButton *cancelButton = new QPushButton("Cancel");
+  connect(cancelButton, SIGNAL(clicked()),
+          this, SLOT(OnCancel()));
+
+  this->okayButton = new QPushButton("Okay");
+  this->okayButton->setEnabled(false);
+  connect(this->okayButton, SIGNAL(clicked()),
+          this, SLOT(OnOkay()));
+
+  buttonLayout->addWidget(cancelButton);
+  buttonLayout->addStretch(2);
+  buttonLayout->addWidget(this->okayButton);
+
   mainLayout->addWidget(frame);
+  mainLayout->addLayout(buttonLayout);
 
   // Let the stylesheet handle the margin sizes
-  mainLayout->setContentsMargins(0, 0, 0, 0);
+  mainLayout->setContentsMargins(4, 4, 4, 4);
 
   // Assign the mainlayout to this widget
   this->setLayout(mainLayout);
@@ -108,4 +127,29 @@ void TopicSelector::GetTopicList()
       topItem->setExpanded(true);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void TopicSelector::OnOkay()
+{
+  this->done(QDialog::Accepted);
+}
+
+/////////////////////////////////////////////////
+void TopicSelector::OnCancel()
+{
+  this->done(QDialog::Rejected);
+}
+
+/////////////////////////////////////////////////
+std::string TopicSelector::GetTopic() const
+{
+  return this->topicName;
+}
+
+/////////////////////////////////////////////////
+void TopicSelector::OnSelection(QTreeWidgetItem *_item, int /*_column*/)
+{
+  this->topicName = _item->text(0).toStdString();
+  this->okayButton->setEnabled(true);
 }

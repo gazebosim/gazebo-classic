@@ -121,9 +121,13 @@ void CameraSensorWidget::OnImage(ConstImageStampedPtr &_msg)
 /////////////////////////////////////////////////
 void CameraSensorWidget::OnTopicChanged(int _index)
 {
-  this->cameraSub.reset();
+  this->SetTopic(this->topicCombo->itemText(_index).toStdString());
+}
 
-  std::string topicName = this->topicCombo->itemText(_index).toStdString();
-  this->cameraSub = this->node->Subscribe(topicName,
+/////////////////////////////////////////////////
+void CameraSensorWidget::SetTopic(const std::string &_topicName)
+{
+  this->cameraSub.reset();
+  this->cameraSub = this->node->Subscribe(_topicName,
                                           &CameraSensorWidget::OnImage, this);
 }
