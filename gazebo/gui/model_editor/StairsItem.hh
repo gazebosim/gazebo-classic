@@ -38,6 +38,8 @@ namespace gazebo
 
         public: virtual double GetSceneRotation();
 
+        public: int GetSteps();
+
         private: virtual void paint (QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 

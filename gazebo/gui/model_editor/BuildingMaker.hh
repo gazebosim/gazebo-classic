@@ -115,7 +115,7 @@ namespace gazebo
           double _angle);
 
       public: std::string AddStairs(QVector3D _size, QVector3D _pos,
-          double _angle);
+          double _angle, int _steps);
 
       public: void RemoveWall(std::string wallName);
 

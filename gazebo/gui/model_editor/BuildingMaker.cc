@@ -109,10 +109,12 @@ void ModelManip::OnWidthChanged(double _width)
   this->size = this->visual->GetScale();
   this->size.y = scaledWidth;
   math::Vector3 dScale = this->visual->GetScale() - this->size;
+  math::Vector3 originalPos = this->visual->GetPosition();
+  this->visual->SetPosition(math::Vector3(0, 0, 0));
   this->visual->SetScale(this->size);
 
-  math::Vector3 newPos = this->visual->GetPosition()
-      - math::Vector3(dScale.x/2.0 + dScale.y/2.0, 0, dScale.z/2.0);
+  math::Vector3 newPos = originalPos
+      + math::Vector3(0, dScale.y/2.0, 0);
 
   this->visual->SetPosition(newPos);
 }
@@ -124,10 +126,12 @@ void ModelManip::OnHeightChanged(double _height)
   this->size = this->visual->GetScale();
   this->size.z = scaledHeight;
   math::Vector3 dScale = this->visual->GetScale() - this->size;
+  math::Vector3 originalPos = this->visual->GetPosition();
+  this->visual->SetPosition(math::Vector3(0, 0, 0));
   this->visual->SetScale(this->size);
 
-  math::Vector3 newPos = this->visual->GetPosition()
-      - math::Vector3(dScale.x/2.0 + dScale.y/2.0, 0, dScale.z/2.0);
+  math::Vector3 newPos = originalPos
+      - math::Vector3(0, 0, dScale.z/2.0);
 
   this->visual->SetPosition(newPos);
 }
@@ -139,10 +143,12 @@ void ModelManip::OnLengthChanged(double _length)
   this->size = this->visual->GetScale();
   this->size.x = scaledLength;
   math::Vector3 dScale = this->visual->GetScale() - this->size;
+  math::Vector3 originalPos = this->visual->GetPosition();
+  this->visual->SetPosition(math::Vector3(0, 0, 0));
   this->visual->SetScale(this->size);
 
-  math::Vector3 newPos = this->visual->GetPosition()
-      - math::Vector3(dScale.x/2.0 + dScale.y/2.0, 0, dScale.z/2.0);
+  math::Vector3 newPos = originalPos
+      - math::Vector3(dScale.x/2.0 , 0, 0);
 
   this->visual->SetPosition(newPos);
 }
@@ -219,11 +225,14 @@ void ModelManip::SetSize(double _width, double _length, double _height)
   this->size = BuildingMaker::ConvertSize(_length, _width, _height);
 
   math::Vector3 dScale = this->visual->GetScale() - this->size;
+
+  math::Vector3 originalPos = this->visual->GetPosition();
+  this->visual->SetPosition(math::Vector3(0, 0, 0));
   this->visual->SetScale(this->size);
 
   // adjust position due to difference in pivot points
-  math::Vector3 newPos = this->visual->GetPosition()
-      - math::Vector3(dScale.x/2.0 + dScale.y/2.0, 0, dScale.z/2.0);
+  math::Vector3 newPos = originalPos
+      - math::Vector3(dScale.x/2.0, dScale.y/2.0, dScale.z/2.0);
 
   this->visual->SetPosition(newPos);
 }
@@ -324,8 +333,8 @@ std::string BuildingMaker::AddPart(std::string _type, QVector3D _size,
     return this->AddWindow(_size, _pos, _angle);
   else if (_type == "door")
     return this->AddDoor(_size, _pos, _angle);
-  else if (_type == "stairs")
-    return this->AddStairs(_size, _pos, _angle);
+//  else if (_type == "stairs")
+//    return this->AddStairs(_size, _pos, _angle);
   return "";
 }
 
@@ -338,7 +347,6 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
         linkName, this->modelVisual));
   linkVisual->Load();
-//  linkVisual->SetPose(linkPose);
   this->visuals.push_back(linkVisual);
 
   std::ostringstream visualName;
@@ -364,13 +372,11 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
         visVisual->Load(visualElem);
         this->visuals.push_back(visVisual);
         ModelManip *wallManip = new ModelManip();
-        wallManip->SetVisual(visVisual);
         math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+        wallManip->SetVisual(visVisual);
         visVisual->SetScale(scaledSize);
-        visVisual->SetPosition(math::Vector3(scaledSize.x/2, scaledSize.y/2, 0));
+        visVisual->SetPosition(math::Vector3(scaledSize.x/2.0, 0, 0));
         wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
-//        visVisual->GetParent()->SetPose(_pose);
-//        visVisual->SetScale(_size);
         this->allItems[visualName.str()] = wallManip;
         this->walls[visualName.str()] = wallManip;
       }
@@ -433,7 +439,7 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
 
 /////////////////////////////////////////////////
 std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
-    double _angle)
+    double _angle, int _steps)
 {
   std::string linkName = "Stairs";
 
@@ -462,17 +468,48 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
       if (linkElem->HasElement("visual"))
       {
         visualElem = linkElem->GetElement("visual");
-        visVisual->Load(visualElem);
+        //visVisual->Load(visualElem);
         this->visuals.push_back(visVisual);
+
+
 
         ModelManip *stairsManip = new ModelManip();
         stairsManip->SetVisual(visVisual);
         math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
         visVisual->SetScale(scaledSize);
-        visVisual->SetPosition(math::Vector3(scaledSize.x/2, scaledSize.y/2, 0));
+//        visVisual->SetPosition(math::Vector3(scaledSize.x/2, scaledSize.y/2, 0));
         stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
         this->allItems[visualName.str()] = stairsManip;
         this->stairs[visualName.str()] = stairsManip;
+
+        std::stringstream visualStepName;
+        visualStepName << visualName.str() << "step" << 0;
+        rendering::VisualPtr baseStepVisual(new rendering::Visual(
+            visualStepName.str(), visVisual));
+        baseStepVisual->Load(visualElem);
+
+        double dSteps = static_cast<double>(_steps);
+        double rise = scaledSize.z / (dSteps*scaledSize.z);
+        double run = scaledSize.y / (dSteps*scaledSize.y);
+        math::Vector3 stepSize = scaledSize;
+        stepSize.x = scaledSize.x / scaledSize.x;
+        stepSize.y = scaledSize.y / (dSteps*scaledSize.y);
+        stepSize.z = scaledSize.z / (dSteps*scaledSize.z);
+        baseStepVisual->SetScale(stepSize);
+
+        math::Vector3 offset = stepSize/2.0;
+        baseStepVisual->SetPosition(offset);
+
+        for ( int i = 1; i < _steps; ++i)
+        {
+          visualStepName.str("");
+          visualStepName << visualName.str() << "step" << i;
+          rendering::VisualPtr stepVisual = baseStepVisual->Clone(
+              visualStepName.str(), visVisual);
+          stepVisual->SetPosition(math::Vector3(offset.x, run*i + offset.y,
+              rise*i + offset.z));
+        }
+
       }
     }
   }

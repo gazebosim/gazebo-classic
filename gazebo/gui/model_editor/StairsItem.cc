@@ -74,6 +74,12 @@ double StairsItem::GetSceneRotation()
 }
 
 /////////////////////////////////////////////////
+int StairsItem::GetSteps()
+{
+  return this->stairsSteps;
+}
+
+/////////////////////////////////////////////////
 void StairsItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {

@@ -275,11 +275,11 @@ void EditorView::DrawStairs(QPoint _pos)
     this->scene()->addItem(stairsItem);
     this->currentMouseItem = stairsItem;
 
-/*    std::string stairsName = this->buildingMaker->AddStairs(
+    std::string stairsName = this->buildingMaker->AddStairs(
         stairsItem->GetSize(), stairsItem->GetScenePosition(),
-        stairsItem->GetSceneRotation());
+        stairsItem->GetSceneRotation(), stairsItem->GetSteps());
 
-    this->buildingMaker->ConnectItem(stairsName, stairsItem);*/
+    this->buildingMaker->ConnectItem(stairsName, stairsItem);
 
     this->drawInProgress = true;
   }
