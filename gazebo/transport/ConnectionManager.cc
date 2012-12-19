@@ -192,10 +192,11 @@ void ConnectionManager::RunUpdate()
 {
   std::list<ConnectionPtr>::iterator iter;
   std::list<ConnectionPtr>::iterator endIter;
+  unsigned int msize = 0;
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->masterMessagesMutex);
-    unsigned int msize = this->masterMessages.size();
+    msize = this->masterMessages.size();
   }
 
   while (msize > 0)
@@ -282,8 +283,6 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     msgs::Publish result;
     result.ParseFromString(packet.serialized_data());
     this->publishers.push_back(result);
-
-    std::cout << "Adding publisher[" << result.topic() << "]\n";
   }
   else if (packet.type() == "publisher_del")
   {

@@ -19,6 +19,7 @@
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
+#include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -31,6 +32,11 @@ using namespace gui;
 CameraSensorWidget::CameraSensorWidget(QWidget *_parent)
 : QWidget(_parent)
 {
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->cameraSub = this->node->Subscribe("~/camera/link/camera/image",
+      &CameraSensorWidget::OnImage, this);
+
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Camera Sensor"));
   this->setObjectName("cameraSensor");
@@ -45,43 +51,45 @@ CameraSensorWidget::CameraSensorWidget(QWidget *_parent)
   QLabel *topicLabel = new QLabel(tr("Topic: "));
   this->topicCombo = new QComboBox(this);
   this->topicCombo->setObjectName("comboList");
+  this->topicCombo->setMinimumSize(300, 25);
+
+  connect(this->topicCombo, SIGNAL(currentIndexChanged(int)),
+          this, SLOT(OnTopicChanged(int)));
 
   msgs::ImageStamped msg;
   std::list<std::string> topics;
-  topics = transport::TopicManager::Instance()->GetUniqueAdvertisedTopics(
-      msg.GetTypeName());
+  topics = transport::getAdvertisedTopics(msg.GetTypeName());
 
   for (std::list<std::string>::iterator iter = topics.begin();
        iter != topics.end(); ++iter)
   {
-    std::cout << "Topic[" << *iter << "]\n";
-    this->topicCombo->addItem(QString::fromStdString(*iter));
+    std::string topicName = this->node->EncodeTopicName(*iter);
+    this->topicCombo->addItem(QString::fromStdString(topicName));
   }
 
   topicLayout->addSpacing(10);
-  topicLayout->addWidget(topicLabel, 1);
-  topicLayout->addWidget(this->topicCombo, 4);
+  topicLayout->addWidget(topicLabel);
+  topicLayout->addWidget(this->topicCombo);
   topicLayout->addSpacing(10);
+  topicLayout->addStretch(4);
 
   this->pixmap = QPixmap(":/images/no_image.png");
   QPixmap image = (this->pixmap.scaled(320, 240, Qt::KeepAspectRatio,
                                  Qt::SmoothTransformation));
   this->imageLabel = new QLabel();
   this->imageLabel->setPixmap(image);
+  this->imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+  this->imageLabel->setMinimumSize(320, 240);
+  this->imageLabel->setScaledContents(true);
 
   frameLayout->addWidget(this->imageLabel);
-  frameLayout->setObjectName("blackBorderFrame");
+  frame->setObjectName("blackBorderFrame");
   frame->setLayout(frameLayout);
 
   mainLayout->addLayout(topicLayout);
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(4, 4, 4, 4);
-
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-  this->cameraSub = this->node->Subscribe("~/camera/link/camera/image",
-      &CameraSensorWidget::OnImage, this);
 
   QTimer::singleShot(500, this, SLOT(Update()));
 }
@@ -108,4 +116,14 @@ void CameraSensorWidget::OnImage(ConstImageStampedPtr &_msg)
          _msg->image().data().size());
 
   this->pixmap = QPixmap::fromImage(image);
+}
+
+/////////////////////////////////////////////////
+void CameraSensorWidget::OnTopicChanged(int _index)
+{
+  this->cameraSub.reset();
+
+  std::string topicName = this->topicCombo->itemText(_index).toStdString();
+  this->cameraSub = this->node->Subscribe(topicName,
+                                          &CameraSensorWidget::OnImage, this);
 }

@@ -388,29 +388,6 @@ TopicManager::GetAdvertisedTopics() const
 }
 
 //////////////////////////////////////////////////
-std::list<std::string> TopicManager::GetUniqueAdvertisedTopics(
-    const std::string _msgType) const
-{
-  std::list<std::string> result;
-  std::list<msgs::Publish> publishers;
-
-  ConnectionManager::Instance()->GetAllPublishers(publishers);
-
-  for(std::list<msgs::Publish>::iterator iter = publishers.begin();
-      iter != publishers.end(); ++iter)
-  {
-    if (std::find(result.begin(), result.end(), (*iter).topic()) !=
-        result.end())
-      continue;
-
-    if (_msgType.empty() || _msgType == (*iter).msg_type())
-      result.push_back((*iter).topic());
-  }
-
-  return result;
-}
-
-//////////////////////////////////////////////////
 void TopicManager::ClearBuffers()
 {
   PublicationPtr_M::iterator iter;

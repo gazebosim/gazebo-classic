@@ -205,13 +205,13 @@ void MainWindow::New()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::Select()
+void MainWindow::SelectTopic()
 {
-  // TopicSelector *selector = new TopicSelector(this);
-  // selector->show();
+  TopicSelector *selector = new TopicSelector();
+  selector->show();
 
-  CameraSensorWidget *camWidget = new CameraSensorWidget();
-  camWidget->show();
+  // CameraSensorWidget *camWidget = new CameraSensorWidget();
+  // camWidget->show();
 }
 
 /////////////////////////////////////////////////
@@ -550,11 +550,10 @@ void MainWindow::CreateActions()
   connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
   */
 
-  this->testAction = new QAction(tr("Select topic"), this);
-  this->testAction->setShortcut(tr("Ctrl+T"));
-  this->testAction->setStatusTip(tr("Select a topic"));
-  connect(this->testAction, SIGNAL(triggered()), this, SLOT(Select()));
-
+  g_topicVisAct = new QAction(tr("Topic Visualization"), this);
+  g_topicVisAct->setShortcut(tr("Ctrl+T"));
+  g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
+  connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
 
   g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
@@ -767,41 +766,43 @@ void MainWindow::CreateMenus()
 
   this->setMenuWidget(frame);
 
-  this->fileMenu = this->menuBar->addMenu(tr("&File"));
-  this->fileMenu->addAction(this->testAction);
-  this->fileMenu->addAction(g_openAct);
-  // this->fileMenu->addAction(g_importAct);
-  // this->fileMenu->addAction(g_newAct);
-  this->fileMenu->addAction(g_saveAct);
-  this->fileMenu->addAction(g_saveAsAct);
-  this->fileMenu->addSeparator();
-  this->fileMenu->addAction(g_quitAct);
+  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  fileMenu->addAction(g_openAct);
+  // fileMenu->addAction(g_importAct);
+  // fileMenu->addAction(g_newAct);
+  fileMenu->addAction(g_saveAct);
+  fileMenu->addAction(g_saveAsAct);
+  fileMenu->addSeparator();
+  fileMenu->addAction(g_quitAct);
 
-  this->editMenu = this->menuBar->addMenu(tr("&Edit"));
-  this->editMenu->addAction(g_resetModelsAct);
-  this->editMenu->addAction(g_resetWorldAct);
+  QMenu *editMenu = this->menuBar->addMenu(tr("&Edit"));
+  editMenu->addAction(g_resetModelsAct);
+  editMenu->addAction(g_resetWorldAct);
 
-  this->viewMenu = this->menuBar->addMenu(tr("&View"));
-  this->viewMenu->addAction(g_showGridAct);
-  this->viewMenu->addSeparator();
+  QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
+  viewMenu->addAction(g_showGridAct);
+  viewMenu->addSeparator();
 
-  this->viewMenu->addAction(g_transparentAct);
-  this->viewMenu->addAction(g_showCollisionsAct);
-  this->viewMenu->addAction(g_showJointsAct);
-  this->viewMenu->addAction(g_showCOMAct);
-  this->viewMenu->addAction(g_showContactsAct);
-  this->viewMenu->addSeparator();
+  viewMenu->addAction(g_transparentAct);
+  viewMenu->addAction(g_showCollisionsAct);
+  viewMenu->addAction(g_showJointsAct);
+  viewMenu->addAction(g_showCOMAct);
+  viewMenu->addAction(g_showContactsAct);
+  viewMenu->addSeparator();
 
-  this->viewMenu->addAction(g_resetAct);
-  this->viewMenu->addAction(g_fullScreenAct);
-  this->viewMenu->addSeparator();
-  // this->viewMenu->addAction(g_fpsAct);
-  this->viewMenu->addAction(g_orbitAct);
+  viewMenu->addAction(g_resetAct);
+  viewMenu->addAction(g_fullScreenAct);
+  viewMenu->addSeparator();
+  // viewMenu->addAction(g_fpsAct);
+  viewMenu->addAction(g_orbitAct);
+
+  QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
+  windowMenu->addAction(g_topicVisAct);
 
   this->menuBar->addSeparator();
 
-  this->helpMenu = this->menuBar->addMenu(tr("&Help"));
-  this->helpMenu->addAction(g_aboutAct);
+  QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
+  helpMenu->addAction(g_aboutAct);
 }
 
 /////////////////////////////////////////////////

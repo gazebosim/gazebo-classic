@@ -30,6 +30,8 @@ TopicSelector::TopicSelector(QWidget *_parent)
 {
   // This name is used in the qt style sheet
   this->setObjectName("topicSelector");
+  this->setWindowIcon(QIcon(":/images/gazebo.svg"));
+  this->setWindowTitle(tr("Gazebo: Topic Selector"));
 
   // Create the main layout for this widget
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -44,6 +46,7 @@ TopicSelector::TopicSelector(QWidget *_parent)
   // connect(this->treeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
   //        this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
 
+  this->GetTopicList();
 
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
@@ -59,7 +62,6 @@ TopicSelector::TopicSelector(QWidget *_parent)
   // Assign the mainlayout to this widget
   this->setLayout(mainLayout);
 
-  this->GetTopicList();
 }
 
 /////////////////////////////////////////////////
@@ -71,17 +73,27 @@ TopicSelector::~TopicSelector()
 void TopicSelector::GetTopicList()
 {
   std::map<std::string, std::list<std::string> > topics;
-  topics = transport::TopicManager::Instance()->GetAdvertisedTopics();
+  topics = transport::getAdvertisedTopics();
 
-  std::map<std::string, bool> inserted;
+  std::list<std::string> validMsgTypes;
+  validMsgTypes.push_back(
+      msgs::ImageStamped::default_instance().GetTypeName());
+
+  validMsgTypes.push_back(
+      msgs::LaserScan::default_instance().GetTypeName());
+
   for (std::map<std::string, std::list<std::string> >::iterator
        iter = topics.begin(); iter != topics.end(); ++iter)
   {
-    if (inserted.find(iter->first) == inserted.end() &&
-        iter->first.find("__dbg") == std::string::npos)
+    if (iter->first.find("__dbg") == std::string::npos &&
+        std::find(validMsgTypes.begin(), validMsgTypes.end(), iter->first) !=
+        validMsgTypes.end())
     {
-      std::cout << iter->first << "\n";
-      inserted[iter->first] = true;
+      QTreeWidgetItem *topItem = new QTreeWidgetItem(
+          static_cast<QTreeWidgetItem*>(0),
+          QStringList(QString::fromStdString(iter->first)));
+      this->treeWidget->addTopLevelItem(topItem);
+
     }
   }
 }

@@ -37,6 +37,7 @@ namespace gazebo
       public: virtual ~CameraSensorWidget();
 
       private slots: void Update();
+      private slots: void OnTopicChanged(int _index);
       private: void OnImage(ConstImageStampedPtr &_msg);
 
       private: QComboBox *topicCombo;
