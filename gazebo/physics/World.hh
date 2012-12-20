@@ -300,6 +300,10 @@ namespace gazebo
       /// \brief Update the state SDF value from the current state.
       public: void UpdateStateSDF();
 
+      /// \brief Return true if the world has been loaded.
+      /// \return True if World::Load has completed.
+      public: bool IsLoaded() const;
+
       /// \brief Enqueue a pose message for publication.
       /// These messages will be transmitted at the end of every iteration.
       /// \param[in] _msg The message to enqueue.
@@ -589,6 +593,9 @@ namespace gazebo
 
       /// \brief True if the world has been initialized.
       private: bool initialized;
+
+      /// \brief True if the world has been loaded.
+      private: bool loaded;
 
       /// \brief True to enable the physics engine.
       private: bool enablePhysicsEngine;

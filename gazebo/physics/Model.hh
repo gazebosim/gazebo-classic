@@ -62,6 +62,9 @@ namespace gazebo
       /// \param[in] _sdf SDF parameters to load from.
       public: void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Load all the joints.
+      public: void LoadJoints();
+
       /// \brief Initialize the model.
       public: virtual void Init();
 
@@ -286,6 +289,9 @@ namespace gazebo
 
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
+
+      /// \brief Load all the links.
+      private: void LoadLinks();
 
       /// \brief Load a joint helper function.
       /// \param[in] _sdf SDF parameter.

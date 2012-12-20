@@ -172,3 +172,20 @@ JointState JointState::operator+(const JointState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+void JointState::FillSDF(sdf::ElementPtr _sdf)
+{
+  _sdf->ClearElements();
+
+  _sdf->GetAttribute("name")->Set(this->name);
+
+  int i = 0;
+  for (std::vector<math::Angle>::const_iterator iter = this->angles.begin();
+       iter != this->angles.end(); ++iter, ++i)
+  {
+    sdf::ElementPtr elem = _sdf->AddElement("angle");
+    elem->GetAttribute("axis")->Set(i);
+    elem->Set((*iter).Radian());
+  }
+}
