@@ -15,10 +15,11 @@
  *
 */
 
-#include "PolylineItem.hh"
-#include "WallItem.hh"
-#include "LineSegmentItem.hh"
-#include "WallInspectorDialog.hh"
+#include "gui/model_editor/PolylineItem.hh"
+#include "gui/model_editor/WallItem.hh"
+#include "gui/model_editor/LineSegmentItem.hh"
+#include "gui/model_editor/WallInspectorDialog.hh"
+#include "gui/model_editor/BuildingMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -27,6 +28,8 @@ using namespace gui;
 WallItem::WallItem(QPointF _start, QPointF _end)
     : PolylineItem(_start, _end)
 {
+  this->scale = BuildingMaker::conversionScale;
+
   this->wallThickness = 10;
   this->wallHeight = 0;
 
@@ -87,26 +90,26 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
       QPointF segmentEndPoint = this->mapToScene(line.p2());
 
       WallInspectorDialog dialog;
-      dialog.SetThickness(this->wallThickness);
-      dialog.SetHeight(this->wallHeight);
-      dialog.SetLength(segmentLength);
-      dialog.SetStartPosition(segmentStartPoint);
-      dialog.SetEndPosition(segmentEndPoint);
+      dialog.SetThickness(this->wallThickness * this->scale);
+      dialog.SetHeight(this->wallHeight * this->scale);
+      dialog.SetLength(segmentLength * this->scale);
+      QPointF startPos = segmentStartPoint * this->scale;
+      startPos.setY(-startPos.y());
+      dialog.SetStartPosition(startPos);
+      QPointF endPos = segmentEndPoint * this->scale;
+      endPos.setY(-endPos.y());
+      dialog.SetEndPosition(endPos);
       if (dialog.exec() == QDialog::Accepted)
       {
-        this->wallThickness = dialog.GetThickness();
-/*        QPen wallPen = this->pen();
-        wallPen.setColor(Qt::white);
-        wallPen.setWidth(this->wallThickness);
-        this->setPen(wallPen);*/
+        this->wallThickness = dialog.GetThickness() / this->scale;
         this->SetThickness(this->wallThickness);
-        this->wallHeight = dialog.GetHeight();
-//        this->SetHeight(this->wallHeight);
-//        this->SetHeight(this->wallHeight);
+        this->wallHeight = dialog.GetHeight() / this->scale;
         this->WallChanged();
 
-        double newLength = dialog.GetLength();
-        if (!qFuzzyCompare(newLength+1, segmentLength+1))
+        double newLength = dialog.GetLength() / this->scale;
+        // User can either change length of start/end pos.
+        // fuzzy comparison between doubles up to 1 decimal place
+        if (fabs(newLength - (segmentLength * this->scale)) < 0.1)
         {
           line.setLength(newLength);
           this->SetVertexPosition(_segment->GetIndex()+1,
@@ -114,8 +117,11 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
         }
         else
         {
-          QPointF newStartPoint = dialog.GetStartPosition();
-          QPointF newEndPoint = dialog.GetEndPosition();
+          QPointF newStartPoint = dialog.GetStartPosition() / this->scale;
+          newStartPoint.setY(-newStartPoint.y());
+          QPointF newEndPoint = dialog.GetEndPosition() / this->scale;
+          newEndPoint.setY(-newEndPoint.y());
+
           this->SetVertexPosition(_segment->GetIndex(),
             newStartPoint);
           this->SetVertexPosition(_segment->GetIndex() + 1,

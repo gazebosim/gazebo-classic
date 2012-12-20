@@ -17,6 +17,7 @@
 
 #include "gui/model_editor/RectItem.hh"
 #include "gui/model_editor/StairsItem.hh"
+#include "gui/model_editor/BuildingMaker.hh"
 #include "gui/model_editor/StairsInspectorDialog.hh"
 
 using namespace gazebo;
@@ -25,6 +26,10 @@ using namespace gui;
 /////////////////////////////////////////////////
 StairsItem::StairsItem(): RectItem()
 {
+
+
+  this->scale = BuildingMaker::conversionScale;
+
   this->stairsSteps = 10;
   this->stairsDepth = 150;
   this->stairsWidth = 100;
@@ -126,21 +131,24 @@ void StairsItem::paint(QPainter *_painter,
 void StairsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
   StairsInspectorDialog dialog(0);
-  dialog.SetWidth(this->stairsWidth);
-  dialog.SetDepth(this->stairsDepth);
-  dialog.SetHeight(this->stairsHeight);
+  dialog.SetWidth(this->stairsWidth * this->scale);
+  dialog.SetDepth(this->stairsDepth * this->scale);
+  dialog.SetHeight(this->stairsHeight * this->scale);
   dialog.SetSteps(this->stairsSteps);
 //  dialog.SetElevation(this->stairsElevation);
-  dialog.SetStartPosition(this->stairsPos);
+  QPointF startPos = this->stairsPos * this->scale;
+  startPos.setY(-startPos.y());
+  dialog.SetStartPosition(startPos);
   if (dialog.exec() == QDialog::Accepted)
   {
-    this->SetSize(QSize(dialog.GetWidth(),
-        dialog.GetDepth() + this->stairsSideBar));
-    this->setPos(dialog.GetStartPosition());
-    this->stairsWidth = dialog.GetWidth();
-    this->stairsHeight = dialog.GetHeight();
-    this->stairsDepth = dialog.GetDepth();
-    this->stairsPos = dialog.GetStartPosition();
+    this->SetSize(QSize(dialog.GetWidth() / this->scale,
+        dialog.GetDepth() / this->scale));
+    this->stairsWidth = dialog.GetWidth() / this->scale;
+    this->stairsHeight = dialog.GetHeight() / this->scale;
+    this->stairsDepth = dialog.GetDepth() / this->scale;
+    this->stairsPos = dialog.GetStartPosition()  / this->scale;
+    this->stairsPos.setY(-this->stairsPos.y());
+    this->setPos(stairsPos);
 //    this->stairsElevation = dialog.GetElevation();
     this->StairsChanged();
   }

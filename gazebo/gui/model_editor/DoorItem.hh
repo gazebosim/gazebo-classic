@@ -44,6 +44,8 @@ namespace gazebo
         private: double doorWidth;
 
         private: QPointF doorPos;
+
+        private: double scale;
     };
   }
 }

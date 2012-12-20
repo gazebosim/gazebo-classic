@@ -61,6 +61,8 @@ namespace gazebo
 
         private: int stairsSteps;
 
+        private: double scale;
+
 //        private: double stairsUnitRise;
 
 //        private: double stairsUnitRun;

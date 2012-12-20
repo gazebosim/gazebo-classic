@@ -56,6 +56,8 @@ namespace gazebo
         private: QPointF windowPos;
 
         private: double windowElevation;
+
+        private: double scale;
     };
   }
 }

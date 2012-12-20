@@ -25,6 +25,7 @@ namespace gazebo
   namespace gui
   {
     class PolylineItem;
+
     class LineSegmentItem;
 
     class WallItem : public PolylineItem
@@ -46,6 +47,8 @@ namespace gazebo
         private: double wallHeight;
 
         private: void WallChanged();
+
+        private: double scale;
 
 //        private: double scale;
     };

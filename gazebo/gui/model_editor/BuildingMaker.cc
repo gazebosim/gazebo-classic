@@ -105,9 +105,9 @@ void ModelManip::OnPoseOriginTransformed(double _x, double _y, double _z,
 /////////////////////////////////////////////////
 void ModelManip::OnDepthChanged(double _depth)
 {
-  double scaledWidth = BuildingMaker::Convert(_depth);
+  double scaledDepth = BuildingMaker::Convert(_depth);
   this->size = this->visual->GetScale();
-  this->size.y = scaledWidth;
+  this->size.y = scaledDepth;
   math::Vector3 dScale = this->visual->GetScale() - this->size;
   math::Vector3 originalPos = this->visual->GetPosition();
   this->visual->SetPosition(math::Vector3(0, 0, 0));
@@ -139,9 +139,10 @@ void ModelManip::OnHeightChanged(double _height)
 /////////////////////////////////////////////////
 void ModelManip::OnWidthChanged(double _width)
 {
-  double scaledLength = BuildingMaker::Convert(_width);
+  double scaledWidth = BuildingMaker::Convert(_width);
   this->size = this->visual->GetScale();
-  this->size.x = scaledLength;
+  this->size.x = scaledWidth;
+
   math::Vector3 dScale = this->visual->GetScale() - this->size;
   math::Vector3 originalPos = this->visual->GetPosition();
   this->visual->SetPosition(math::Vector3(0, 0, 0));
@@ -149,7 +150,6 @@ void ModelManip::OnWidthChanged(double _width)
 
   math::Vector3 newPos = originalPos
       - math::Vector3(dScale.x/2.0 , 0, 0);
-
   this->visual->SetPosition(newPos);
 }
 
@@ -468,7 +468,8 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
       if (linkElem->HasElement("visual"))
       {
         visualElem = linkElem->GetElement("visual");
-        //visVisual->Load(visualElem);
+        visVisual->Load(visualElem);
+        visVisual->DetachObjects();
         this->visuals.push_back(visVisual);
 
 
@@ -477,6 +478,11 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
         stairsManip->SetVisual(visVisual);
         math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
         visVisual->SetScale(scaledSize);
+        double dSteps = static_cast<double>(_steps);
+        math::Vector3 offset = scaledSize/2.0;
+        offset.y = -offset.y;
+        visVisual->SetPosition(offset);
+//        qDebug() << " scale " << visVisual->GetScale().x << visVisual->GetScale().y << visVisual->GetScale().z;
 //        visVisual->SetPosition(math::Vector3(scaledSize.x/2, scaledSize.y/2, 0));
         stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
         this->allItems[visualName.str()] = stairsManip;
@@ -488,20 +494,13 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
             visualStepName.str(), visVisual));
         baseStepVisual->Load(visualElem);
 
-        double dSteps = static_cast<double>(_steps);
-        double rise = scaledSize.z / (dSteps*scaledSize.z);
-        double run = scaledSize.y / (dSteps*scaledSize.y);
-        math::Vector3 stepSize = scaledSize;
-        stepSize.x = scaledSize.x / scaledSize.x;
-        stepSize.y = scaledSize.y / (dSteps*scaledSize.y);
-        stepSize.z = scaledSize.z / (dSteps*scaledSize.z);
-        baseStepVisual->SetScale(stepSize);
+        double rise = 1.0 / dSteps;
+        double run = 1.0 / dSteps;
+        baseStepVisual->SetScale(math::Vector3(1, run, rise));
 
-        math::Vector3 offset = stepSize/2.0;
-        offset.y = -offset.y;
-        baseStepVisual->SetPosition(offset);
-
-        qDebug() << " rise " << rise;
+        math::Vector3 baseOffset(0, 0.5 - run/2.0,
+            -0.5 + rise/2.0);
+        baseStepVisual->SetPosition(baseOffset);
 
         for ( int i = 1; i < _steps; ++i)
         {
@@ -509,8 +508,8 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
           visualStepName << visualName.str() << "step" << i;
           rendering::VisualPtr stepVisual = baseStepVisual->Clone(
               visualStepName.str(), visVisual);
-          stepVisual->SetPosition(math::Vector3(offset.x, -(run*i - offset.y),
-              rise*i + offset.z));
+          stepVisual->SetPosition(math::Vector3(0, baseOffset.y-(run*i),
+              baseOffset.z + rise*i));
         }
 
       }

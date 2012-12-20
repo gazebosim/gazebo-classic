@@ -177,7 +177,8 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
   if (_rotate->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
     QPoint localCenter(this->drawingOriginX +
-      (this->drawingOriginX + this->drawingWidth)/2, this->drawingOriginY);
+      (this->drawingOriginX + this->drawingWidth)/2,
+      this->drawingOriginY + (this->drawingOriginY + this->drawingHeight)/2);
     QPointF center = this->mapToScene(localCenter);
 
     QPointF newPoint = mouseEvent->scenePos();
@@ -407,6 +408,14 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
     }
     this->UpdateCornerPositions();
     this->update();
+
+    if (_corner->GetIndex() == 1 || _corner->GetIndex() == 5 ||
+        (_corner->GetIndex() % 2 == 0))
+      emit depthChanged(this->drawingHeight);
+
+    if (_corner->GetIndex() == 3 || _corner->GetIndex() == 7 ||
+        (_corner->GetIndex() % 2 == 0))
+      emit widthChanged(this->drawingWidth);
   }
   return true;
 }
@@ -515,6 +524,7 @@ void RectItem::UpdateCornerPositions()
   this->rotateHandle->setPos(this->drawingWidth/2,
       this->drawingOriginY);
 
+//  emit depthChanged(this->drawingHeight);
 //  this->setPolygon(QPolygonF(this->boundingRect()));
 }
 
@@ -525,6 +535,8 @@ void RectItem::SetWidth(int _width)
   this->drawingWidth = this->width;
   this->UpdateCornerPositions();
   this->update();
+
+  emit widthChanged(this->drawingWidth);
 }
 
 /////////////////////////////////////////////////
@@ -534,6 +546,8 @@ void RectItem::SetHeight(int _height)
   this->drawingHeight = this->height;
   this->UpdateCornerPositions();
   this->update();
+
+  emit depthChanged(this->drawingHeight);
 }
 
 
@@ -546,6 +560,9 @@ void RectItem::SetSize(QSize _size)
   this->drawingHeight = this->height;
   this->UpdateCornerPositions();
   this->update();
+
+  emit widthChanged(this->drawingWidth);
+  emit depthChanged(this->drawingHeight);
 }
 
 /////////////////////////////////////////////////
@@ -653,10 +670,12 @@ void RectItem::SetRotation(double _angle)
 {
   double halfX = this->drawingOriginX +
       (this->drawingOriginX + this->drawingWidth)/2;
+  double halfY = this->drawingOriginY +
+      (this->drawingOriginY + this->drawingHeight)/2;
 
-  this->translate(halfX, 0);
+  this->translate(halfX, halfY);
   this->rotate(_angle - this->rotationAngle);
-  this->translate(-halfX, 0);
+  this->translate(-halfX, -halfY);
 
   this->rotationAngle = _angle;
   emit yawChanged(this->rotationAngle);

@@ -15,9 +15,10 @@
  *
 */
 
-#include "RectItem.hh"
-#include "WindowItem.hh"
-#include "WindowDoorInspectorDialog.hh"
+#include "gui/model_editor/RectItem.hh"
+#include "gui/model_editor/WindowItem.hh"
+#include "gui/model_editor/WindowDoorInspectorDialog.hh"
+#include "gui/model_editor/BuildingMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -25,7 +26,9 @@ using namespace gui;
 /////////////////////////////////////////////////
 WindowItem::WindowItem(): RectItem()
 {
-  this->windowDepth = 10;
+  this->scale = BuildingMaker::conversionScale;
+
+  this->windowDepth = 20;
   this->windowHeight = 0;
   this->windowWidth = 50;
   this->windowSideBar = 10;
@@ -33,7 +36,7 @@ WindowItem::WindowItem(): RectItem()
   this->windowElevation = 0;
 
   this->width = this->windowWidth;
-  this->height = this->windowDepth + this->windowSideBar;
+  this->height = this->windowDepth;
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
 
@@ -93,20 +96,21 @@ void WindowItem::paint(QPainter *_painter,
   _painter->drawLine(topLeft, bottomLeft);
   _painter->drawLine(topRight, bottomRight);
 
-  windowPen.setWidth(this->windowDepth);
+  windowPen.setWidth(this->windowDepth/2.0);
   _painter->setPen(windowPen);
-  _painter->drawLine(midLeft + QPointF(this->windowDepth/2, 0),
-      midRight - QPointF(this->windowDepth/2, 0));
+  _painter->drawLine(midLeft + QPointF(this->windowDepth/4, 0),
+      midRight - QPointF(this->windowDepth/4, 0));
 
   double borderSize = 1.0;
   windowPen.setColor(Qt::white);
-  windowPen.setWidth(this->windowDepth - borderSize*2);
+  windowPen.setWidth(this->windowDepth/2.0 - borderSize*2);
   _painter->setPen(windowPen);
-  _painter->drawLine(midLeft + QPointF(this->windowDepth/2.0, 0),
-      midRight - QPointF(this->windowDepth/2.0 - 0.5, 0) );
+  _painter->drawLine(midLeft + QPointF(this->windowDepth/4.0, 0),
+      midRight - QPointF(this->windowDepth/4.0 - 0.5, 0) );
 
   this->windowWidth = this->drawingWidth;
-  this->windowPos = this->pos();
+  this->windowDepth = this->drawingHeight;
+  this->windowPos = this->scenePos();
   _painter->restore();
 
 //  QGraphicsPolygonItem::paint(_painter, _option, _widget);
@@ -116,21 +120,25 @@ void WindowItem::paint(QPainter *_painter,
 void WindowItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
   WindowDoorInspectorDialog dialog(0);
-  dialog.SetWidth(this->windowWidth);
-  dialog.SetHeight(this->windowHeight);
-  dialog.SetElevation(this->windowElevation);
-  dialog.SetDepth(this->windowDepth);
-  dialog.SetPosition(this->windowPos);
+  dialog.SetWidth(this->windowWidth * this->scale);
+  dialog.SetHeight(this->windowHeight * this->scale);
+  dialog.SetElevation(this->windowElevation * this->scale);
+  dialog.SetDepth(this->windowDepth * this->scale);
+  QPointF itemPos = this->windowPos * this->scale;
+  itemPos.setY(-itemPos.y());
+  dialog.SetPosition(itemPos);
   if (dialog.exec() == QDialog::Accepted)
   {
-    this->SetSize(QSize(dialog.GetWidth(),
-        dialog.GetDepth() + this->windowSideBar));
-    this->setPos(dialog.GetPosition());
-    this->windowWidth = dialog.GetWidth();
-    this->windowHeight = dialog.GetHeight();
-    this->windowDepth = dialog.GetDepth();
-    this->windowPos = dialog.GetPosition();
-    this->windowElevation = dialog.GetElevation();
+    this->SetSize(QSize(dialog.GetWidth() / this->scale,
+        dialog.GetDepth() / this->scale));
+    this->windowWidth = dialog.GetWidth() / this->scale;
+    this->windowHeight = dialog.GetHeight() / this->scale;
+    this->windowDepth = dialog.GetDepth() / this->scale;
+    this->windowElevation = dialog.GetElevation() / this->scale;
+    itemPos = dialog.GetPosition() / this->scale;
+    itemPos.setY(-itemPos.y());
+    this->windowPos = itemPos;
+    this->setPos(this->windowPos);
     this->WindowChanged();
   }
   _event->setAccepted(true);

@@ -15,9 +15,10 @@
  *
 */
 
-#include "RectItem.hh"
-#include "DoorItem.hh"
-#include "WindowDoorInspectorDialog.hh"
+#include "gui/model_editor/RectItem.hh"
+#include "gui/model_editor/DoorItem.hh"
+#include "gui/model_editor/WindowDoorInspectorDialog.hh"
+#include "gui/model_editor/BuildingMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -25,6 +26,8 @@ using namespace gui;
 /////////////////////////////////////////////////
 DoorItem::DoorItem(): RectItem()
 {
+  this->scale = BuildingMaker::conversionScale;
+
   this->doorDepth = 10;
   this->doorHeight = 0;
   this->doorWidth = 50;
@@ -36,7 +39,7 @@ DoorItem::DoorItem(): RectItem()
 
   this->UpdateCornerPositions();
 
-  this->doorPos = this->pos();
+  this->doorPos = this->scenePos();
 
   this->zValueIdle = 3;
   this->setZValue(this->zValueIdle);
@@ -73,18 +76,21 @@ void DoorItem::paint (QPainter *_painter,
 
   doorPen.setWidth(this->doorDepth);
   _painter->setPen(doorPen);
-  _painter->drawLine(topLeft + QPointF(this->doorDepth/2.0, 0),
-      topRight - QPointF(this->doorDepth/2.0, 0));
+  _painter->drawLine(topLeft + QPointF(this->doorDepth/2.0,
+      this->doorDepth/2.0), topRight - QPointF(this->doorDepth/2.0,
+      -this->doorDepth/2.0));
 
   double borderSize = 1.0;
   doorPen.setColor(Qt::white);
   doorPen.setWidth(this->doorDepth - borderSize*2);
   _painter->setPen(doorPen);
-  _painter->drawLine(topLeft + QPointF(this->doorDepth/2.0, 0),
-      topRight - QPointF(this->doorDepth/2.0, 0));
+  _painter->drawLine(topLeft + QPointF(this->doorDepth/2.0,
+      this->doorDepth/2.0), topRight - QPointF(this->doorDepth/2.0,
+      -this->doorDepth/2.0));
 
   this->doorWidth = this->drawingWidth;
-  this->doorPos = this->pos();
+//  this->doorDepth = this->drawingHeight;
+  this->doorPos = this->scenePos();
 
 //  QGraphicsPolygonItem::paint(_painter, _option, _widget);
 }
@@ -93,19 +99,23 @@ void DoorItem::paint (QPainter *_painter,
 void DoorItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
   WindowDoorInspectorDialog dialog(1);
-  dialog.SetWidth(this->doorWidth);
-  dialog.SetDepth(this->doorDepth);
-  dialog.SetHeight(this->doorHeight);
-  dialog.SetPosition(this->pos());
+  dialog.SetWidth(this->doorWidth * this->scale);
+  dialog.SetDepth(this->doorDepth * this->scale);
+  dialog.SetHeight(this->doorHeight * this->scale);
+  QPointF itemPos = this->doorPos * this->scale;
+  itemPos.setY(-itemPos.y());
+  dialog.SetPosition(itemPos);
   if (dialog.exec() == QDialog::Accepted)
   {
-    this->SetSize(QSize(dialog.GetWidth(),
-        dialog.GetDepth() + this->doorWidth));
-    this->setPos(dialog.GetPosition());
-    this->doorWidth = dialog.GetWidth();
-    this->doorHeight = dialog.GetHeight();
-    this->doorDepth = dialog.GetDepth();
-    this->doorPos = dialog.GetPosition();
+    this->SetSize(QSize(dialog.GetWidth() / this->scale,
+        (dialog.GetDepth() / this->scale) + this->doorWidth));
+    this->doorWidth = dialog.GetWidth() / this->scale;
+    this->doorHeight = dialog.GetHeight() / this->scale;
+    this->doorDepth = dialog.GetDepth() / this->scale;
+    itemPos = dialog.GetPosition() / this->scale;
+    itemPos.setY(-itemPos.y());
+    this->doorPos = itemPos;
+    this->setPos(this->doorPos);
   }
   _event->setAccepted(true);
 }
