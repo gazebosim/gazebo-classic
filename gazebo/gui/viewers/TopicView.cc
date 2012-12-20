@@ -14,8 +14,6 @@
  * limitations under the License.
  *
  */
-#include "gazebo/common/SystemPaths.hh"
-
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
@@ -23,22 +21,21 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
-#include "gazebo/gui/sensor_widgets/CameraSensorWidget.hh"
+#include "gazebo/gui/viewers/TopicView.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-CameraSensorWidget::CameraSensorWidget(QWidget *_parent)
-: QWidget(_parent)
+TopicView::TopicView(const std::string &_msgTypeName,
+                                       QWidget *_parent)
+: QWidget(_parent), msgTypeName(_msgTypeName)
 {
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->cameraSub = this->node->Subscribe("~/camera/link/camera/image",
-      &CameraSensorWidget::OnImage, this);
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
-  this->setWindowTitle(tr("Gazebo: Camera Sensor"));
+  this->setWindowTitle(tr("Gazebo: Topic View"));
   this->setObjectName("cameraSensor");
 
   // Create the topic label and combo box
@@ -48,10 +45,10 @@ CameraSensorWidget::CameraSensorWidget(QWidget *_parent)
   this->topicCombo = new QComboBox(this);
   this->topicCombo->setObjectName("comboList");
   this->topicCombo->setMinimumSize(300, 25);
+  this->UpdateTopicList();
   connect(this->topicCombo, SIGNAL(currentIndexChanged(int)),
           this, SLOT(OnTopicChanged(int)));
 
-  this->UpdateTopicList();
 
   topicLayout->addSpacing(10);
   topicLayout->addWidget(topicLabel);
@@ -64,41 +61,27 @@ CameraSensorWidget::CameraSensorWidget(QWidget *_parent)
   // {
   QHBoxLayout *infoLayout = new QHBoxLayout;
   QLabel *hzLabel = new QLabel("Hz: ");
-  this->hzValue = new QLineEdit;
-  this->hzValue->setReadOnly(true);
-  this->hzValue->setFixedWidth(80);
+  this->hzEdit = new QLineEdit;
+  this->hzEdit->setReadOnly(true);
+  this->hzEdit->setFixedWidth(80);
 
   QLabel *bandwidthLabel = new QLabel("Bandwidth: ");
-  this->bandwidthValue = new QLineEdit;
-  this->bandwidthValue->setReadOnly(true);
-  this->bandwidthValue->setFixedWidth(110);
+  this->bandwidthEdit = new QLineEdit;
+  this->bandwidthEdit->setReadOnly(true);
+  this->bandwidthEdit->setFixedWidth(110);
 
   infoLayout->addSpacing(10);
   infoLayout->addWidget(hzLabel);
-  infoLayout->addWidget(this->hzValue);
+  infoLayout->addWidget(this->hzEdit);
+  infoLayout->addSpacing(4);
+  infoLayout->addStretch(1);
   infoLayout->addWidget(bandwidthLabel);
-  infoLayout->addWidget(this->bandwidthValue);
+  infoLayout->addWidget(this->bandwidthEdit);
   infoLayout->addStretch(4);
   // }
 
-  // Create the image displa
-  // {
-  QFrame *frame = new QFrame;
-  QVBoxLayout *frameLayout = new QVBoxLayout;
-
-  this->pixmap = QPixmap(":/images/no_image.png");
-  QPixmap image = (this->pixmap.scaled(320, 240, Qt::KeepAspectRatio,
-                                 Qt::SmoothTransformation));
-  this->imageLabel = new QLabel();
-  this->imageLabel->setPixmap(image);
-  this->imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-  this->imageLabel->setMinimumSize(320, 240);
-  this->imageLabel->setScaledContents(true);
-
-  frameLayout->addWidget(this->imageLabel);
-  frame->setObjectName("blackBorderFrame");
-  frame->setLayout(frameLayout);
-  // }
+  // Create the frame used to display information
+  this->frame = new QFrame;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(topicLayout);
@@ -111,68 +94,105 @@ CameraSensorWidget::CameraSensorWidget(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-CameraSensorWidget::~CameraSensorWidget()
+TopicView::~TopicView()
 {
 }
 
 /////////////////////////////////////////////////
-void CameraSensorWidget::Update()
+void TopicView::Update()
 {
-  this->imageLabel->setPixmap(this->pixmap);
+  // Update the child class.
+  this->UpdateImpl();
 
-  std::ostringstream stream;
-  stream << std::fixed << std::precision(2) << this->hz;
-  this->hzValue->setText(tr(stream.str().c_str()));
+  // Update the Hz output
+  {
+    std::ostringstream stream;
+    stream << std::fixed << std::setprecision(2) << this->hz;
+    this->hzEdit->setText(tr(stream.str().c_str()));
+  }
 
+  // Update the Bandwidth output
+  {
+    std::ostringstream stream;
+
+    // Sum up the byte information
+    int sumBytes = 0;
+    for (std::list<int>::iterator iter = this->msgSizes.begin();
+        iter != this->msgSizes.end(); ++iter)
+    {
+      sumBytes += *iter;
+    }
+
+    // Compute the bandwidth
+    common::Time dt = this->times.back() - this->times.front();
+    double bandwidth = sumBytes / dt.Double();
+
+    // Format the bandwidth output
+    stream << std::fixed << std::setprecision(2);
+
+    if (bandwidth < 1000)
+      stream << bandwidth << " B/s";
+    else if (bandwidth < 1000000)
+      stream << bandwidth / 1024.0f << " KB/s";
+    else
+      stream << bandwidth/1.049e6 << " MB/s";
+
+    this->bandwidthEdit->setText(tr(stream.str().c_str()));
+  }
+
+  // Set the timer to update again.
   QTimer::singleShot(500, this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
-void CameraSensorWidget::OnImage(ConstImageStampedPtr &_msg)
+void TopicView::OnMsg(const common::Time &_dataTime, int _size)
 {
-  QImage image(_msg->image().width(), _msg->image().height(),
-               QImage::Format_RGB888);
+  // Calculate the Hz value.
+  if (_dataTime != this->prevTime)
+    this->hz = 1.0 / (_dataTime - this->prevTime).Double();
 
-  memcpy(image.bits(), _msg->image().data().c_str(),
-         _msg->image().data().size());
+  // Store the previous time for future Hz calculations.
+  this->prevTime = _dataTime;
 
-  // Get the time the message was generated
-  common::Time currTime = msgs::Convert(_msg->time());
+  // Store the message size and clock time that it was received.
+  this->msgSizes.push_back(_size);
+  this->times.push_back(common::Time::GetWallTime());
 
-  // Calculate the Hz value
-  this->hz = 1.0 / (currTime - this->prevTime).Double();
-
-  // Store the previous time for future Hz calculations
-  this->prevTime = currTime;
-
-  this->pixmap = QPixmap::fromImage(image);
+  // Maintain a buffer of only 100 data points.
+  if (this->msgSizes.size() > 100)
+  {
+    this->msgSizes.pop_front();
+    this->times.pop_front();
+  }
 }
 
 /////////////////////////////////////////////////
-void CameraSensorWidget::OnTopicChanged(int _index)
+void TopicView::OnTopicChanged(int _index)
 {
+  // Set the current topic based on the index of the item selected in the
+  // combobox
   this->SetTopic(this->topicCombo->itemText(_index).toStdString());
 }
 
 /////////////////////////////////////////////////
-void CameraSensorWidget::SetTopic(const std::string &_topicName)
+void TopicView::UpdateTopicList()
 {
-  this->cameraSub.reset();
-  this->cameraSub = this->node->Subscribe(_topicName,
-                                          &CameraSensorWidget::OnImage, this);
-}
-
-/////////////////////////////////////////////////
-void CameraSensorWidget::UpdateTopicList()
-{
-  msgs::ImageStamped msg;
   std::list<std::string> topics;
-  topics = transport::getAdvertisedTopics(msg.GetTypeName());
 
+  // First clear out the combo box.
+  this->topicCombo->clear();
+
+  // Get the list of all topics filtered by our message type.
+  topics = transport::getAdvertisedTopics(this->msgTypeName);
+
+  // Add each topic to the combo box.
   for (std::list<std::string>::iterator iter = topics.begin();
        iter != topics.end(); ++iter)
   {
+    // Get the shorthand notation for the topic.
     std::string topicName = this->node->EncodeTopicName(*iter);
+
+    std::cout << "Adding topic[" << topicName << "]\n";
     this->topicCombo->addItem(QString::fromStdString(topicName));
   }
 }

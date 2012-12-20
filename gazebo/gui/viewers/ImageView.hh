@@ -14,55 +14,47 @@
  * limitations under the License.
  *
 */
-#ifndef _CAMERASENSORWIDGET_HH_
-#define _CAMERASENSORWIDGET_HH_
+#ifndef _IMAGEVIEW_HH_
+#define _IMAGEVIEW_HH_
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/gui/qt.h"
 #include "gazebo/transport/TransportTypes.hh"
+
+#include "gazebo/gui/qt.h"
+#include "gazebo/gui/viewers/TopicView.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class CameraSensorWidget : public QWidget
+    class ImageView : public TopicView
     {
       Q_OBJECT
 
       /// \brief Constructor
-      public: CameraSensorWidget(QWidget *_parent = 0);
+      /// \param[in] _parent Pointer to the parent widget.
+      public: ImageView(QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: virtual ~CameraSensorWidget();
+      public: virtual ~ImageView();
 
-      /// \brief Set the name of the topic to get data from.
-      /// \param[in] _topicName Name of the topic to use.
-      public: void SetTopic(const std::string &_topicName);
+      // Documentation inherited
+      public: virtual void SetTopic(const std::string &_topicName);
 
-      /// \brief Update the list of available topics in the combo box.
-      private: void UpdateTopicList();
+      // Documentation inherited
+      private: virtual void UpdateImpl();
 
-      /// \brief Update the camera sensor widget.
-      private slots: void Update();
-
-      private slots: void OnTopicChanged(int _index);
+      /// \brief Receives incoming image messages.
+      /// \param[in] _msg New image message.
       private: void OnImage(ConstImageStampedPtr &_msg);
 
-      private: QComboBox *topicCombo;
-
+      /// \brief A label is used to display the image data.
       private: QLabel *imageLabel;
+
+      /// \brief Storage mechansim for image data.
       private: QPixmap pixmap;
-      private: transport::NodePtr node;
-      private: transport::PublisherPtr pub;
-      private: transport::SubscriberPtr cameraSub;
-
-      private: common::Time prevTime;
-
-      private: QLineEdit *hzValue;
-      private: QLineEdit *bandwidthValue;
-      private: double hz;
     };
   }
 }

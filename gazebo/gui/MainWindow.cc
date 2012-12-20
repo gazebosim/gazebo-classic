@@ -16,7 +16,7 @@
  */
 
 #include "gazebo/gui/TopicSelector.hh"
-#include "gazebo/gui/sensor_widgets/CameraSensorWidget.hh"
+#include "gazebo/gui/viewers/ImageView.hh"
 
 #include "gazebo/gazebo.hh"
 #include "gazebo/common/Console.hh"
@@ -214,9 +214,9 @@ void MainWindow::SelectTopic()
 
   if (!topic.empty())
   {
-    CameraSensorWidget *camWidget = new CameraSensorWidget();
-    camWidget->SetTopic(topic);
-    camWidget->show();
+    ImageView *imgView = new ImageView();
+    imgView->SetTopic(topic);
+    imgView->show();
   }
 }
 

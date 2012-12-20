@@ -33,7 +33,8 @@ set (sources
   JointControlWidget.cc
   ToolsWidget.cc
   TopicSelector.cc
-  sensor_widgets/CameraSensorWidget.cc
+  viewers/ImageView.cc
+  viewers/TopicView.cc
 )
 
 set (qt_headers
@@ -49,7 +50,8 @@ set (qt_headers
   JointControlWidget.hh
   ToolsWidget.hh
   TopicSelector.hh
-  sensor_widgets/CameraSensorWidget.hh
+  viewers/ImageView.hh
+  viewers/TopicView.hh
 )
 
 set (headers
