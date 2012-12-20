@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,10 @@ namespace gazebo
 
       /// \brief Update the physics engine collision.
       public: virtual void UpdateCollision() = 0;
+
+      /// \brief Set the random number seed for the physics engine.
+      /// \param[in] _seed The random number seed.
+      public: virtual void SetSeed(uint32_t _seed);
 
       /// \brief Set the simulation update rate.
       /// \param[in] _value Value of the update rate.

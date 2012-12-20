@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,9 +76,6 @@ namespace gazebo
       /// \brief Update this shape from a message.
       /// \param[in] _msg Message that contains triangle mesh info.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
-
-      /// \brief Deprecated
-      public: virtual double GetMass(double _density) const GAZEBO_DEPRECATED;
 
       /// \brief Pointer to the mesh data.
       protected: const common::Mesh *mesh;

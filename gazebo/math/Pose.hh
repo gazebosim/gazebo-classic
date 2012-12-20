@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,6 +104,13 @@ namespace gazebo
       /// \param[in] _pose Pose to add to this pose
       /// \return The resulting pose
       public: const Pose &operator+=(const Pose &_pose);
+
+      /// \brief Negation operator
+      /// \return The resulting pose
+      public: inline Pose operator-() const
+              {
+                return Pose() - *this;
+              }
 
       /// \brief Subtraction operator
       /// \param[in] _pose Pose to subtract from this one

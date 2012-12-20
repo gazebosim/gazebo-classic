@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wshadow"
-#define BOOST_FILESYSTEM_VERSION 2
 
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
@@ -186,10 +185,14 @@ class ServerFixture : public testing::Test
                return this->percentRealTime;
              }
 
-  protected: void OnPose(ConstPosePtr &_msg)
+  protected: void OnPose(ConstPose_VPtr &_msg)
              {
                boost::mutex::scoped_lock lock(this->receiveMutex);
-               this->poses[_msg->name()] = msgs::Convert(*_msg);
+               for (int i = 0; i < _msg->pose_size(); ++i)
+               {
+                 this->poses[_msg->pose(i).name()] =
+                   msgs::Convert(_msg->pose(i));
+               }
              }
 
   protected: math::Pose GetEntityPose(const std::string &_name)

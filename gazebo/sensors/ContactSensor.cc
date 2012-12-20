@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -227,13 +227,6 @@ unsigned int ContactSensor::GetCollisionContactCount(
   }
 
   return result;
-}
-
-//////////////////////////////////////////////////
-physics::Contact ContactSensor::GetCollisionContact(
-    const std::string & /*_collisionName*/, unsigned int /*_index*/) const
-{
-  return physics::Contact();
 }
 
 //////////////////////////////////////////////////

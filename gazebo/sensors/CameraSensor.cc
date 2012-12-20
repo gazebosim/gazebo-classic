@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -164,7 +164,9 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
       msgs::Set(msg.mutable_time(), this->world->GetSimTime());
       msg.mutable_image()->set_width(this->camera->GetImageWidth());
       msg.mutable_image()->set_height(this->camera->GetImageHeight());
-      msg.mutable_image()->set_pixel_format(common::Image::RGB_INT32);
+      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+            this->camera->GetImageFormat()));
+
       msg.mutable_image()->set_step(this->camera->GetImageWidth() * 3);
       msg.mutable_image()->set_data(this->camera->GetImageData(),
           msg.image().width() * 3 * msg.image().height());

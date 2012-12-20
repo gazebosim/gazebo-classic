@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -356,21 +356,18 @@ void Master::RunOnce()
       }
       else
       {
-        this->RemoveConnection(iter->first);
-        ++iter;
+        this->RemoveConnection(iter++);
       }
     }
   }
 }
 
 /////////////////////////////////////////////////
-void Master::RemoveConnection(unsigned int _index)
+void Master::RemoveConnection(Connection_M::iterator _connIter)
 {
   std::list< std::pair<unsigned int, std::string> >::iterator msgIter;
-  Connection_M::iterator connIter;
-  connIter = this->connections.find(_index);
 
-  if (connIter == this->connections.end() || !connIter->second)
+  if (_connIter == this->connections.end() || !_connIter->second)
     return;
 
   // Remove all messages for this connection
@@ -379,7 +376,7 @@ void Master::RemoveConnection(unsigned int _index)
     msgIter = this->msgs.begin();
     while (msgIter != this->msgs.end())
     {
-      if ((*msgIter).first == _index)
+      if ((*msgIter).first == _connIter->first)
         this->msgs.erase(msgIter++);
       else
         ++msgIter;
@@ -394,7 +391,7 @@ void Master::RemoveConnection(unsigned int _index)
     PubList::iterator pubIter = this->publishers.begin();
     while (pubIter != this->publishers.end())
     {
-      if ((*pubIter).second->GetId() == connIter->second->GetId())
+      if ((*pubIter).second->GetId() == _connIter->second->GetId())
       {
         this->RemovePublisher((*pubIter).first);
         done = false;
@@ -415,7 +412,7 @@ void Master::RemoveConnection(unsigned int _index)
     SubList::iterator subIter = this->subscribers.begin();
     while (subIter != this->subscribers.end())
     {
-      if ((*subIter).second->GetId() == connIter->second->GetId())
+      if ((*subIter).second->GetId() == _connIter->second->GetId())
       {
         this->RemoveSubscriber((*subIter).first);
         done = false;
@@ -426,7 +423,7 @@ void Master::RemoveConnection(unsigned int _index)
     }
   }
 
-  this->connections.erase(connIter);
+  this->connections.erase(_connIter);
 }
 
 /////////////////////////////////////////////////

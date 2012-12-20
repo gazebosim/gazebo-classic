@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,9 +53,6 @@ namespace gazebo
       /// \return The size of each side of the box.
       public: math::Vector3 GetSize() const;
 
-      /// \brief Deprecated.
-      public: void FillShapeMsg(msgs::Geometry &_msg) GAZEBO_DEPRECATED;
-
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.
       public: void FillMsg(msgs::Geometry &_msg);
@@ -63,13 +60,6 @@ namespace gazebo
       /// \brief Process a geometry message.
       /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
-
-      /// \brief Deprecated
-      public: virtual double GetMass(double _density) const GAZEBO_DEPRECATED;
-
-      /// \brief Deprecated
-      public: virtual void GetInertial(double _mass, InertialPtr _inertial)
-              const GAZEBO_DEPRECATED;
     };
     /// \}
   }

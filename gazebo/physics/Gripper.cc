@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,8 +84,7 @@ void Gripper::Load(sdf::ElementPtr _sdf)
       if (collIter != this->collisions.end())
         continue;
       collision->SetContactsEnabled(true);
-      this->connections.push_back(collision->ConnectContact(
-            boost::bind(&Gripper::OnContact, this, _1, _2)));
+
       this->collisions[collision->GetScopedName()] = collision;
     }
     gripperLinkElem = gripperLinkElem->GetNextElement("gripper_link");
@@ -188,7 +187,7 @@ void Gripper::HandleAttach()
           this->attached = true;
 
           this->fixedJoint->Load(this->palmLink,
-              cc[iter->first]->GetLink(), math::Pose(0, 0, 0, 0, 0, 0));
+              cc[iter->first]->GetLink(), math::Vector3(0, 0, 0));
           this->fixedJoint->Init();
           this->fixedJoint->SetHighStop(0, 0);
           this->fixedJoint->SetLowStop(0, 0);

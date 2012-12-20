@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,9 +59,6 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~Contact();
-
-      /// \brief Deprecated
-      public: Contact Clone() const GAZEBO_DEPRECATED;
 
       /// \brief Operator =.
       /// \param[in] _contact Contact to copy.

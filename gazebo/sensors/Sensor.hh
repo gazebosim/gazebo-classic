@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,6 +85,10 @@ namespace gazebo
       ///        SensorManager::Update
       /// \param[in] _force True if update is forced, false if not
       protected: virtual void UpdateImpl(bool /*_force*/) {}
+
+      /// \brief Get the update rate of the sensor.
+      /// \return _hz update rate of sensor.  Returns 0 if unthrottled.
+      public: double GetUpdateRate();
 
       /// \brief Set the update rate of the sensor.
       /// \param[in] _hz update rate of sensor.

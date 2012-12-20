@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1931,20 +1931,9 @@ std::string Visual::GetMeshName() const
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
 
-      if (tmpElem->GetValueString("filename") != "__default__")
-      {
-        filename = tmpElem->GetValueString("filename");
-
-        gzerr << "<mesh><filename>" << filename << "</filename></mesh>"
-          << " is deprecated.\n";
-        gzerr << "Use <mesh><uri>file://" << filename << "</uri></mesh>\n";
-      }
-      else
-      {
-        filename = common::find_file(tmpElem->GetValueString("uri"));
-        if (filename == "__default__" || filename.empty())
-          gzerr << "No mesh specified\n";
-      }
+      filename = common::find_file(tmpElem->GetValueString("uri"));
+      if (filename == "__default__" || filename.empty())
+        gzerr << "No mesh specified\n";
 
       return filename;
     }

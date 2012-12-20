@@ -19,6 +19,10 @@ link_directories(
 #  add_subdirectory(player)
 #endif()
 
+if(HAVE_BULLET)
+  add_subdirectory(bullet)
+endif()
+
 include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 
 set (gtest_sources

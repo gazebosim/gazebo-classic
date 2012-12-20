@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,13 +39,16 @@ namespace gazebo
     /// \brief A publisher of messages on a topic
     class Publisher
     {
+      /// Deprecated
+      public: Publisher(const std::string &_topic, const std::string &_msgType,
+                        unsigned int _limit, bool _latch) GAZEBO_DEPRECATED;
+
       /// \brief Constructor
       /// \param[in] _topic Name of topic to be published
       /// \param[in] _msgType Type of the message to be published
       /// \param[in] _limit Maximum number of outgoing messages to queue
-      /// \param[in] _latch If true, latch last message; if false, don't latch
       public: Publisher(const std::string &_topic, const std::string &_msgType,
-                        unsigned int _limit, bool _latch);
+                        unsigned int _limit);
 
       /// \brief Destructor
       public: virtual ~Publisher();
@@ -97,9 +100,8 @@ namespace gazebo
       /// \brief Send latest message over the wire. For internal use only
       public: void SendMessage();
 
-      /// \brief Are we latching the latest message?
-      /// \return true if we latching the latest message, false otherwise
-      public: bool GetLatching() const;
+      /// Deprecated
+      public: bool GetLatching() const GAZEBO_DEPRECATED;
 
       /// \brief Get the previously published message
       /// \return The previously published message, if any
@@ -112,10 +114,9 @@ namespace gazebo
       private: std::string msgType;
       private: unsigned int queueLimit;
       private: std::list<google::protobuf::Message *> messages;
-      private: boost::recursive_mutex *mutex;
+      private: mutable boost::recursive_mutex mutex;
       private: PublicationPtr publications[2];
 
-      private: bool latch;
       private: google::protobuf::Message *prevMsg;
     };
     /// \}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,8 +68,9 @@ void BulletSliderJoint::Attach(LinkPtr _one, LinkPtr _two)
 
   math::Vector3 pivotA, pivotB;
 
-  pivotA = this->anchorPos - this->parentLink->GetWorldPose().pos;
-  pivotB = this->anchorPos - this->childLink->GetWorldPose().pos;
+  pivotA = this->anchorPos + this->childLink->GetWorldPose().pos
+                           - this->parentLink->GetWorldPose().pos;
+  pivotB = this->anchorPos;
 
   pivotA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(pivotA);
   pivotB = this->childLink->GetWorldPose().rot.RotateVectorReverse(pivotB);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,11 +87,6 @@ namespace gazebo
       /// \return The collision contact count.
       public: unsigned int GetCollisionContactCount(
                   const std::string &_collisionName) const;
-
-      /// Deprecated. Use ContactSensor::GetContacts
-      public: physics::Contact GetCollisionContact(
-                  const std::string &_collisionName, unsigned int _index) const
-              GAZEBO_DEPRECATED;
 
 
       /// \brief Get all the contacts

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,9 +177,6 @@ namespace gazebo
       /// Deprecated.
       public: void DisconnectContact(event::ConnectionPtr &_conn)
               {contact.Disconnect(_conn);}
-
-      /// \brief DEPRECATED.
-      public: void FillCollisionMsg(msgs::Collision &_msg) GAZEBO_DEPRECATED;
 
       /// \brief Fill a collision message.
       /// \param[out] _msg The message to fill with this collision's data.

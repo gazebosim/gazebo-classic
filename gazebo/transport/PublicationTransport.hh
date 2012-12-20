@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,8 +47,10 @@ namespace gazebo
       public: virtual ~PublicationTransport();
 
       /// \brief Initialize the transport
-      /// \param[in] _conn The underlying connection
-      public: void Init(const ConnectionPtr &_conn);
+      /// \param[in] _conn The underlying connection.
+      /// \param[in] _latched True to grab the last message sent on the
+      /// topic.
+      public: void Init(const ConnectionPtr &_conn, bool _latched);
 
       /// \brief Finalize the transport
       public: void Fini();

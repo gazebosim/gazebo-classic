@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,7 +160,11 @@ namespace gazebo
       // Documentation inherited
       public: virtual int GetMaxContacts();
 
+      // Documentation inherited
       public: virtual void DebugPrint() const;
+
+      // Documentation inherited
+      public: virtual void SetSeed(uint32_t _seed);
 
       /// \brief Return the world space id.
       /// \return The space id for the world.

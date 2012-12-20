@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,9 +87,11 @@ bool Server::ParseArgs(int argc, char **argv)
   po::options_description v_desc("Allowed options");
   v_desc.add_options()
     ("help,h", "Produce this help message.")
-    ("record,r", "Record state data to disk.")
-    ("play,p", po::value<std::string>(), "Play a log file.")
     ("pause,u", "Start the server in a paused state.")
+    ("play,p", po::value<std::string>(), "Play a log file.")
+    ("record,r", "Record state data to disk.")
+    ("seed",  po::value<double>(),
+     "Start with a given random number seed.")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
@@ -120,6 +122,19 @@ bool Server::ParseArgs(int argc, char **argv)
     // NOTE: boost::diagnostic_information(_e) breaks lucid
     // std::cerr << boost::diagnostic_information(_e) << "\n";
     return false;
+  }
+
+  // Set the random number seed if present on the command line.
+  if (this->vm.count("seed"))
+  {
+    try
+    {
+      math::Rand::SetSeed(this->vm["seed"].as<double>());
+    }
+    catch(boost::bad_any_cast &_e)
+    {
+      gzerr << "Unable to set random number seed. Must supply a number.\n";
+    }
   }
 
   if (this->vm.count("help"))

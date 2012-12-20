@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,6 @@ void OrbitViewController::Init(const math::Vector3 &_focalPoint)
 
   this->focalPoint = _focalPoint;
   this->distance = this->camera->GetWorldPosition().Distance(this->focalPoint);
-  if (this->distance <= 1.0)
-    std::cout << "Distance[" << this->distance << "]\n";
 }
 
 //////////////////////////////////////////////////

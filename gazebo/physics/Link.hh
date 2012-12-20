@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -313,9 +313,6 @@ namespace gazebo
       /// \param[in] _conn Connection pointer to disconnect.
       public: void DisconnectEnabled(event::ConnectionPtr &_conn)
               {enabledSignal.Disconnect(_conn);}
-
-      /// \brief DEPRECATED
-      public: void FillLinkMsg(msgs::Link &_msg) GAZEBO_DEPRECATED;
 
       /// \brief Fill a link message
       /// \param[out] _msg Message to fill
