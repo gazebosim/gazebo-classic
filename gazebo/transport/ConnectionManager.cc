@@ -154,6 +154,9 @@ bool ConnectionManager::Init(const std::string &_masterHost,
 
   this->initialized = true;
 
+  gzmsg << "Publicized address: "
+        << this->masterConn->GetLocalHostname() << "\n";
+
   return true;
 }
 

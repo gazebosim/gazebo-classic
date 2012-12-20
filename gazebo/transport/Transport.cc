@@ -85,8 +85,6 @@ void transport::run()
 
   std::list<std::string> namespaces;
 
-  printf("GetTopic namespaces\n");
-
   // This chunk of code just waits until we get a list of topic namespaces.
   unsigned int trys = 0;
   unsigned int limit = 50;
