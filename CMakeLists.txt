@@ -179,8 +179,8 @@ set (CMAKE_CXX_FLAGS_CHECK "${CMAKE_C_FLAGS_CHECK} -fno-elide-constructors -fno-
 #####################################
 # Set the default build type
 if (NOT CMAKE_BUILD_TYPE)
-  set (CMAKE_BUILD_TYPE "RELEASE" CACHE STRING 
-    "Choose the type of build, options are: debug release profile check" FORCE)
+  set (CMAKE_BUILD_TYPE "RELWITHDEBINFO" CACHE STRING 
+    "Choose the type of build, options are: debug release relwithdebinfo profile check" FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
 
