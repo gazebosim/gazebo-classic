@@ -15,7 +15,7 @@ namespace gazebo
 
         public: ~EditorItem();
 
-        void SetPseudoHeight(double _height);
+//        void SetPseudoHeight(double _height);
 
         public: virtual QVector3D GetSize();
 
@@ -23,7 +23,7 @@ namespace gazebo
 
         public: virtual double GetSceneRotation();
 
-        signals: void sizeChanged(double _width, double _length,
+        signals: void sizeChanged(double _width, double _depth,
             double _height);
 
         signals: void poseChanged(double _x, double _y, double _z,
@@ -34,7 +34,7 @@ namespace gazebo
 
         signals: void widthChanged(double _width);
 
-        signals: void lengthChanged(double _length);
+        signals: void depthChanged(double _depth);
 
         signals: void heightChanged(double _height);
 
@@ -49,7 +49,7 @@ namespace gazebo
         signals: void originChanged(double _xRatio, double _yRatio,
             double _zRatio);
 
-        protected: double pseudoHeight;
+//        protected: double pseudoHeight;
     };
   }
 }

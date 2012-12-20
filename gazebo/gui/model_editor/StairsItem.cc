@@ -25,9 +25,9 @@ using namespace gui;
 /////////////////////////////////////////////////
 StairsItem::StairsItem(): RectItem()
 {
-  this->stairsSteps = 5;
-  this->stairsDepth = 50;
-  this->stairsWidth = 50;
+  this->stairsSteps = 10;
+  this->stairsDepth = 150;
+  this->stairsWidth = 100;
   this->stairsHeight = 300;
 
 //  this->stairsUnitRise = 10;
@@ -150,8 +150,8 @@ void StairsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void StairsItem::StairsChanged()
 {
-  emit widthChanged(this->stairsDepth);
-  emit lengthChanged(this->stairsWidth);
+  emit widthChanged(this->stairsWidth);
+  emit depthChanged(this->stairsDepth);
   emit heightChanged(this->stairsHeight);
   emit poseChanged(this->stairsPos.x(), this->stairsPos.y(),
       this->stairsElevation, 0, 0, this->rotationAngle);

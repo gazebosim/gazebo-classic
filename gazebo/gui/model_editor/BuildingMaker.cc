@@ -70,9 +70,9 @@ rendering::VisualPtr ModelManip::GetVisual()
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnSizeChanged(double _width, double _length, double _height)
+void ModelManip::OnSizeChanged(double _width, double _depth, double _height)
 {
-  this->size = BuildingMaker::ConvertSize(_length, _width, _height);
+  this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
   math::Vector3 dScale = this->visual->GetScale() - this->size;
   this->visual->SetScale(this->size);
 
@@ -103,9 +103,9 @@ void ModelManip::OnPoseOriginTransformed(double _x, double _y, double _z,
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnWidthChanged(double _width)
+void ModelManip::OnDepthChanged(double _depth)
 {
-  double scaledWidth = BuildingMaker::Convert(_width);
+  double scaledWidth = BuildingMaker::Convert(_depth);
   this->size = this->visual->GetScale();
   this->size.y = scaledWidth;
   math::Vector3 dScale = this->visual->GetScale() - this->size;
@@ -137,9 +137,9 @@ void ModelManip::OnHeightChanged(double _height)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnLengthChanged(double _length)
+void ModelManip::OnWidthChanged(double _width)
 {
-  double scaledLength = BuildingMaker::Convert(_length);
+  double scaledLength = BuildingMaker::Convert(_width);
   this->size = this->visual->GetScale();
   this->size.x = scaledLength;
   math::Vector3 dScale = this->visual->GetScale() - this->size;
@@ -220,9 +220,9 @@ void ModelManip::SetRotation(double _roll, double _pitch, double _yaw)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::SetSize(double _width, double _length, double _height)
+void ModelManip::SetSize(double _width, double _depth, double _height)
 {
-  this->size = BuildingMaker::ConvertSize(_length, _width, _height);
+  this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
 
   math::Vector3 dScale = this->visual->GetScale() - this->size;
 
@@ -285,8 +285,8 @@ void BuildingMaker::ConnectItem(std::string _partName, EditorItem *_item)
       manip, SLOT(OnWidthChanged(double)));
   QObject::connect(_item, SIGNAL(heightChanged(double)),
       manip, SLOT(OnHeightChanged(double)));
-  QObject::connect(_item, SIGNAL(lengthChanged(double)),
-      manip, SLOT(OnLengthChanged(double)));
+  QObject::connect(_item, SIGNAL(depthChanged(double)),
+      manip, SLOT(OnDepthChanged(double)));
   QObject::connect(_item, SIGNAL(posXChanged(double)),
       manip, SLOT(OnPosXChanged(double)));
   QObject::connect(_item, SIGNAL(posYChanged(double)),
@@ -498,7 +498,10 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
         baseStepVisual->SetScale(stepSize);
 
         math::Vector3 offset = stepSize/2.0;
+        offset.y = -offset.y;
         baseStepVisual->SetPosition(offset);
+
+        qDebug() << " rise " << rise;
 
         for ( int i = 1; i < _steps; ++i)
         {
@@ -506,7 +509,7 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
           visualStepName << visualName.str() << "step" << i;
           rendering::VisualPtr stepVisual = baseStepVisual->Clone(
               visualStepName.str(), visVisual);
-          stepVisual->SetPosition(math::Vector3(offset.x, run*i + offset.y,
+          stepVisual->SetPosition(math::Vector3(offset.x, -(run*i - offset.y),
               rise*i + offset.z));
         }
 

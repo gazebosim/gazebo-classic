@@ -177,8 +177,7 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
   if (_rotate->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
     QPoint localCenter(this->drawingOriginX +
-      (this->drawingOriginX + this->drawingWidth)/2,
-      this->drawingOriginY + (this->drawingOriginY + this->drawingHeight)/2);
+      (this->drawingOriginX + this->drawingWidth)/2, this->drawingOriginY);
     QPointF center = this->mapToScene(localCenter);
 
     QPointF newPoint = mouseEvent->scenePos();

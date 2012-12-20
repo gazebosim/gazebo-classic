@@ -60,9 +60,9 @@ namespace gazebo
 
       public: void SetRotation(double _roll, double _pitch, double _yaw);
 
-      public: void SetSize(double _width, double _length, double _height);
+      public: void SetSize(double _width, double _depth, double _height);
 
-      private slots: void OnSizeChanged(double _width, double _length,
+      private slots: void OnSizeChanged(double _width, double _depth,
           double _height);
 
       private slots: void OnPoseChanged(double _x, double _y, double _z,
@@ -75,7 +75,7 @@ namespace gazebo
 
       private slots: void OnHeightChanged(double _height);
 
-      private slots: void OnLengthChanged(double _length);
+      private slots: void OnDepthChanged(double _depth);
 
       private slots: void OnPosXChanged(double _posX);
 
@@ -123,7 +123,7 @@ namespace gazebo
 
       public: static math::Vector3 ConvertSize(QVector3D _size);
 
-      public: static math::Vector3 ConvertSize(double _width, double _length,
+      public: static math::Vector3 ConvertSize(double _width, double _depth,
           double _height);
 
       public: static math::Pose ConvertPose(QVector3D _pos, QVector3D _rot);

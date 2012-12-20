@@ -37,7 +37,7 @@ WallItem::WallItem(QPointF _start, QPointF _end)
 WallItem::~WallItem()
 {
 }
-
+/*
 /////////////////////////////////////////////////
 void WallItem::SetHeight(double _height)
 {
@@ -45,7 +45,7 @@ void WallItem::SetHeight(double _height)
   {
     this->segments[i]->SetPseudoHeight(_height);
   }
-}
+}*/
 
 /////////////////////////////////////////////////
 bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
@@ -148,6 +148,6 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
 /////////////////////////////////////////////////
 void WallItem::WallChanged()
 {
-  emit widthChanged(this->wallThickness);
+  emit depthChanged(this->wallThickness);
   emit heightChanged(this->wallHeight);
 }
