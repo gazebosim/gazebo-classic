@@ -308,3 +308,26 @@ ModelState ModelState::operator+(const ModelState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+void ModelState::FillSDF(sdf::ElementPtr _sdf)
+{
+  _sdf->ClearElements();
+
+  _sdf->GetAttribute("name")->Set(this->name);
+  _sdf->GetElement("pose")->Set(this->pose);
+
+  for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end(); ++iter)
+  {
+    sdf::ElementPtr elem = _sdf->AddElement("link");
+    (*iter).FillSDF(elem);
+  }
+
+  for (std::vector<JointState>::iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end(); ++iter)
+  {
+    sdf::ElementPtr elem = _sdf->AddElement("joint");
+    (*iter).FillSDF(elem);
+  }
+}

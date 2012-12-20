@@ -223,7 +223,7 @@ TEST_F(TransportTest, Bandwidth)
                totalBw, meanSize, count, dt.Double());
 
         EXPECT_GT(totalBw, 5000.0);
-        EXPECT_LT(totalBw, 20000.0);
+        EXPECT_LT(totalBw, 30000.0);
         g_bwBytes.clear();
         g_bwTime.clear();
 

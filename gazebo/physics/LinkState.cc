@@ -257,3 +257,23 @@ LinkState LinkState::operator+(const LinkState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+void LinkState::FillSDF(sdf::ElementPtr _sdf)
+{
+  _sdf->ClearElements();
+
+  _sdf->GetAttribute("name")->Set(this->name);
+  _sdf->GetElement("pose")->Set(this->pose);
+  _sdf->GetElement("velocity")->Set(this->velocity);
+  _sdf->GetElement("acceleration")->Set(this->acceleration);
+  _sdf->GetElement("wrench")->Set(this->wrench);
+
+  for (std::vector<CollisionState>::iterator iter =
+       this->collisionStates.begin();
+       iter != this->collisionStates.end(); ++iter)
+  {
+    sdf::ElementPtr elem = _sdf->AddElement("collision");
+    (*iter).FillSDF(elem);
+  }
+}

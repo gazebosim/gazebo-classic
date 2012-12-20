@@ -214,3 +214,21 @@ WorldState WorldState::operator+(const WorldState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+void WorldState::FillSDF(sdf::ElementPtr _sdf)
+{
+  _sdf->ClearElements();
+
+  _sdf->GetAttribute("world_name")->Set(this->name);
+  _sdf->GetElement("sim_time")->Set(this->simTime);
+  _sdf->GetElement("real_time")->Set(this->realTime);
+  _sdf->GetElement("wall_time")->Set(this->wallTime);
+
+  for (std::vector<ModelState>::iterator iter =
+       this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
+  {
+    sdf::ElementPtr elem = _sdf->AddElement("model");
+    (*iter).FillSDF(elem);
+  }
+}
