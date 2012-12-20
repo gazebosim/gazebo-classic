@@ -173,6 +173,9 @@ namespace urdf2gazebo
       /// parser xml for vector 3
       urdf::Vector3 parseVector3(TiXmlNode* key, double scale = 1.0);
 
+      /// parser string for vector 3
+      urdf::Vector3 parseVector3(std::string str, double scale = 1.0);
+
       /// convert values to string
       std::string values2str(unsigned int count, const double *values);
 
@@ -199,6 +202,12 @@ namespace urdf2gazebo
       /// things that do not belong in urdf but should be mapped into sdf
       /// @todo: do this using sdf definitions, not hard coded stuff
       void parseGazeboExtension(TiXmlDocument &urdf_xml);
+
+      /// parse if <robot> contains an <origin> tag
+      void parseRobotOrigin(TiXmlDocument &urdf_xml);
+
+      /// insert <robot>'s <origin> tag
+      void insertRobotOrigin(TiXmlElement *elem);
 
       /// insert extensions into collision geoms
       void insertGazeboExtensionCollision(TiXmlElement *elem,
@@ -388,6 +397,7 @@ namespace urdf2gazebo
 
       std::map<std::string, std::vector<GazeboExtension*> > gazebo_extensions_;
 
+      private: urdf::Pose initial_robot_pose_;
       private: bool enforce_limits;
       private: bool reduce_fixed_joints;
       private: std::string collision_ext;

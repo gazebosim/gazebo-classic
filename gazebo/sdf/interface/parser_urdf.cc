@@ -87,33 +87,37 @@ urdf::Vector3 URDF2Gazebo::parseVector3(TiXmlNode* key, double scale)
 {
   if (key != NULL)
   {
-    std::string str = key->Value();
-    std::vector<std::string> pieces;
-    std::vector<double> vals;
-
-    boost::split(pieces, str, boost::is_any_of(" "));
-    for (unsigned int i = 0; i < pieces.size(); ++i)
-    {
-      if (pieces[i] != "")
-      {
-        try
-        {
-          vals.push_back(scale
-                         * boost::lexical_cast<double>(pieces[i].c_str()));
-        }
-        catch(boost::bad_lexical_cast &e)
-        {
-          gzerr << "xml key [" << str
-                << "][" << i << "] value [" << pieces[i]
-                << "] is not a valid double from a 3-tuple\n";
-          return urdf::Vector3(0, 0, 0);
-        }
-      }
-    }
-    return urdf::Vector3(vals[0], vals[1], vals[3]);
+    return this->parseVector3(key->Value(), scale);
   }
   else
     return urdf::Vector3(0, 0, 0);
+}
+
+urdf::Vector3 URDF2Gazebo::parseVector3(std::string str, double scale)
+{
+  std::vector<std::string> pieces;
+  std::vector<double> vals;
+
+  boost::split(pieces, str, boost::is_any_of(" "));
+  for (unsigned int i = 0; i < pieces.size(); ++i)
+  {
+    if (pieces[i] != "")
+    {
+      try
+      {
+        vals.push_back(scale
+                       * boost::lexical_cast<double>(pieces[i].c_str()));
+      }
+      catch(boost::bad_lexical_cast &e)
+      {
+        gzerr << "xml key [" << str
+              << "][" << i << "] value [" << pieces[i]
+              << "] is not a valid double from a 3-tuple\n";
+        return urdf::Vector3(0, 0, 0);
+      }
+    }
+  }
+  return urdf::Vector3(vals[0], vals[1], vals[3]);
 }
 
 void URDF2Gazebo::reduceVisualToParent(boost::shared_ptr<urdf::Link> link,
@@ -243,6 +247,30 @@ std::string URDF2Gazebo::getKeyValueAsString(TiXmlElement* elem)
     value_str = elem->FirstChild()->ValueStr();
   }
   return value_str;
+}
+
+void URDF2Gazebo::parseRobotOrigin(TiXmlDocument &urdf_xml)
+{
+  TiXmlElement* robot_xml = urdf_xml.FirstChildElement("robot");
+  TiXmlElement* origin_xml = robot_xml->FirstChildElement("origin");
+  if (origin_xml)
+  {
+    this->initial_robot_pose_.position = this->parseVector3(
+      origin_xml->Attribute("xyz"));
+    urdf::Vector3 rpy = this->parseVector3(origin_xml->Attribute("rpy"));
+    this->initial_robot_pose_.rotation.setFromRPY( rpy.x, rpy.y, rpy.z);
+  }
+}
+
+void URDF2Gazebo::insertRobotOrigin(TiXmlElement *elem)
+{
+  /* set transform */
+  double pose[6];
+  pose[0] = this->initial_robot_pose_.position.x;
+  pose[1] = this->initial_robot_pose_.position.y;
+  pose[2] = this->initial_robot_pose_.position.z;
+  this->initial_robot_pose_.rotation.getRPY(pose[3], pose[4], pose[5]);
+  addKeyValue(elem, "pose", values2str(6, pose));
 }
 
 void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
@@ -1678,6 +1706,9 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
     urdf_xml.Parse(urdf_str.c_str());
     parseGazeboExtension(urdf_xml);
 
+    /* parse robot pose */
+    parseRobotOrigin(urdf_xml);
+
     boost::shared_ptr<const urdf::Link> root_link = robot_model->getRoot();
 
     /* Fixed Joint Reduction */
@@ -1705,6 +1736,9 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
 
     /* insert the extensions without reference into <robot> root level */
     insertGazeboExtensionRobot(robot);
+
+    /* insert robot pose */
+    insertRobotOrigin(robot);
 
     // add robot to gazebo_xml_out
     TiXmlElement *gazebo_sdf = new TiXmlElement("sdf");
