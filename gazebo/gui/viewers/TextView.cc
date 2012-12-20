@@ -18,14 +18,15 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/msgs/MsgFactory.hh"
 #include "gazebo/gui/viewers/TextView.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-TextView::TextView(QWidget *_parent)
-: TopicView("gazebo.msgs.GzString", _parent)
+TextView::TextView(const std::string &_msgType)
+  : TopicView(_msgType)
 {
   this->setWindowTitle(tr("Gazebo: Text View"));
 
@@ -55,16 +56,27 @@ void TextView::UpdateImpl()
 /////////////////////////////////////////////////
 void TextView::SetTopic(const std::string &_topicName)
 {
+  TopicView::SetTopic(_topicName);
+
   // Subscribe to the new topic.
   this->sub.reset();
   this->sub = this->node->Subscribe(_topicName, &TextView::OnText, this);
 }
 
 /////////////////////////////////////////////////
-void TextView::OnText(ConstGzStringPtr &_msg)
+void TextView::OnText(const std::string &_msg)
 {
   // Update the Hz and Bandwidth info
-  this->OnMsg(common::Time::GetWallTime(), _msg->image().data().size());
+  this->OnMsg(common::Time::GetWallTime(), _msg.size());
+
+  google::protobuf::Message *msg = msgs::MsgFactory::NewMsg(this->msgTypeName);
+  if (msg)
+  {
+    msg->ParseFromString(_msg);
+    std::cout << msg->DebugString() << "\n";
+  }
+  else
+    gzerr << "Unable to parse message of type[" << this->msgTypeName << "]\n";
 
   // Add the new text to the output view.
 }

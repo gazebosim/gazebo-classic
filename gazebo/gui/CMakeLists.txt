@@ -35,6 +35,8 @@ set (sources
   TopicSelector.cc
   viewers/ImageView.cc
   viewers/TopicView.cc
+  viewers/TextView.cc
+  viewers/ViewFactory.cc
 )
 
 set (qt_headers
@@ -51,6 +53,7 @@ set (qt_headers
   ToolsWidget.hh
   TopicSelector.hh
   viewers/ImageView.hh
+  viewers/TextView.hh
   viewers/TopicView.hh
 )
 
@@ -65,6 +68,7 @@ set (headers
   GuiEvents.hh
   LightMaker.hh
   qt.h
+  viewers/ViewFactory.hh
   )
 
 set (resources resources.qrc)

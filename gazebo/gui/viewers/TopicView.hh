@@ -34,14 +34,14 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _msgType Type of message that the viewer can display.
       /// \param[in] _parent Pointer to the parent widget.
-      public: TopicView(const std::string &_msgType, QWidget *_parent = 0);
+      public: TopicView(const std::string &_msgType);
 
       /// \brief Destructor
       public: virtual ~TopicView();
 
       /// \brief Set the name of the topic to get data from.
       /// \param[in] _topicName Name of the topic to use.
-      public: virtual void SetTopic(const std::string &_topicName) = 0;
+      public: virtual void SetTopic(const std::string &_topicName);
 
       /// \brief Used by child class to indicate when a message has been
       /// received.
@@ -58,7 +58,7 @@ namespace gazebo
 
       /// \brief Update implementation. Each viewer must implement this to
       /// display the appropriate information.
-      private: virtual void UpdateImpl() = 0;
+      private: virtual void UpdateImpl();
 
       /// \brief QT callback triggered when the user has selected
       /// a different topic.
@@ -73,6 +73,9 @@ namespace gazebo
 
       /// \brief Pointer to the node for communication.
       protected: transport::NodePtr node;
+
+      /// \brief Typename of the messages that can be displayed.
+      protected: std::string msgTypeName;
 
       /// \brief Combo box that displays all the relevant topics.
       private: QComboBox *topicCombo;
@@ -94,9 +97,6 @@ namespace gazebo
 
       /// \brief A list of clock times that messages have been received.
       private: std::list<common::Time> times;
-
-      /// \brief Typename of the messages that can be displayed.
-      private: std::string msgTypeName;
     };
   }
 }

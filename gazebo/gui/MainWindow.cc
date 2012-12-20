@@ -16,6 +16,8 @@
  */
 
 #include "gazebo/gui/TopicSelector.hh"
+#include "gazebo/gui/viewers/ViewFactory.hh"
+#include "gazebo/gui/viewers/TopicView.hh"
 #include "gazebo/gui/viewers/ImageView.hh"
 
 #include "gazebo/gazebo.hh"
@@ -131,6 +133,8 @@ MainWindow::MainWindow()
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&MainWindow::OnSetSelectedEntity, this, _1, _2)));
+
+  gui::ViewFactory::RegisterAll();
 }
 
 /////////////////////////////////////////////////
@@ -210,13 +214,17 @@ void MainWindow::SelectTopic()
   TopicSelector *selector = new TopicSelector();
   selector->exec();
   std::string topic = selector->GetTopic();
+  std::string msgType = selector->GetMsgType();
   delete selector;
+
 
   if (!topic.empty())
   {
-    ImageView *imgView = new ImageView();
-    imgView->SetTopic(topic);
-    imgView->show();
+    TopicView *view = ViewFactory::NewView(msgType, topic);
+    if (view)
+      view->show();
+    else
+      gzerr << "Unable to create viewer for message type[" << msgType << "]\n";
   }
 }
 

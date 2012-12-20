@@ -95,37 +95,28 @@ void TopicSelector::GetTopicList()
   std::map<std::string, std::list<std::string> > topics;
   topics = transport::getAdvertisedTopics();
 
-  std::list<std::string> validMsgTypes;
-  validMsgTypes.push_back(
-      msgs::ImageStamped::default_instance().GetTypeName());
-
-  validMsgTypes.push_back(
-      msgs::LaserScan::default_instance().GetTypeName());
-
   for (std::map<std::string, std::list<std::string> >::iterator
        iter = topics.begin(); iter != topics.end(); ++iter)
   {
-    if (iter->first.find("__dbg") == std::string::npos &&
-        std::find(validMsgTypes.begin(), validMsgTypes.end(), iter->first) !=
-        validMsgTypes.end())
-    {
-      QTreeWidgetItem *topItem = new QTreeWidgetItem(
-          static_cast<QTreeWidgetItem*>(0),
-          QStringList(QString::fromStdString(iter->first)));
-      this->treeWidget->addTopLevelItem(topItem);
+    QTreeWidgetItem *topItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString::fromStdString(iter->first)));
+    this->treeWidget->addTopLevelItem(topItem);
 
-      // Add all the topic names
-      for (std::list<std::string>::iterator topicIter = iter->second.begin();
-           topicIter != iter->second.end(); ++topicIter)
+    // Add all the topic names
+    for (std::list<std::string>::iterator topicIter = iter->second.begin();
+        topicIter != iter->second.end(); ++topicIter)
+    {
+      if ((*topicIter).find("__dbg") == std::string::npos)
       {
         QTreeWidgetItem *topicItem = new QTreeWidgetItem(topItem,
-          QStringList(QString::fromStdString(*topicIter)));
+            QStringList(QString::fromStdString(*topicIter)));
         this->treeWidget->addTopLevelItem(topicItem);
       }
-
-      // Automatically expand the list of topics.
-      topItem->setExpanded(true);
     }
+
+    // Automatically expand the list of topics.
+    topItem->setExpanded(true);
   }
 }
 
@@ -148,17 +139,25 @@ std::string TopicSelector::GetTopic() const
 }
 
 /////////////////////////////////////////////////
+std::string TopicSelector::GetMsgType() const
+{
+  return this->msgType;
+}
+
+/////////////////////////////////////////////////
 void TopicSelector::OnSelection(QTreeWidgetItem *_item, int /*_column*/)
 {
   if (_item->parent())
   {
     this->topicName = _item->text(0).toStdString();
+    this->msgType = _item->parent()->text(0).toStdString();
     this->okayButton->setEnabled(true);
   }
   else
   {
     _item->setExpanded(!_item->isExpanded());
     this->topicName.clear();
+    this->msgType.clear();
     this->okayButton->setEnabled(false);
   }
 }

@@ -18,15 +18,20 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/viewers/ImageView.hh"
 
 using namespace gazebo;
 using namespace gui;
 
+GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.ImageStamped", ImageView);
+
 /////////////////////////////////////////////////
-ImageView::ImageView(QWidget *_parent)
-: TopicView("gazebo.msgs.ImageStamped", _parent)
+ImageView::ImageView()
+: TopicView("gazebo.msgs.ImageStamped")
 {
+  std::cout << "ImageView::Constructor\n";
+
   this->setWindowTitle(tr("Gazebo: Image View"));
 
   // Create the image display
@@ -63,6 +68,8 @@ void ImageView::UpdateImpl()
 /////////////////////////////////////////////////
 void ImageView::SetTopic(const std::string &_topicName)
 {
+  TopicView::SetTopic(_topicName);
+
   // Subscribe to the new topic.
   this->sub.reset();
   this->sub = this->node->Subscribe(_topicName, &ImageView::OnImage, this);

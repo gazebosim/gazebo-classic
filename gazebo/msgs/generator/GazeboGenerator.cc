@@ -71,7 +71,8 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
         _generator_context->OpenForInsert(headerFilename, "includes"));
     io::Printer printer(output.get(), '$');
 
-    printer.Print("#include <boost/shared_ptr.hpp>", "name", "includes");
+    printer.Print("#include <boost/shared_ptr.hpp>\n", "name", "includes");
+    printer.Print("#include \"gazebo/msgs/MsgFactory.hh\"\n", "name", "includes");
   }
 
   // Add boost shared typedef
@@ -88,6 +89,22 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
       + _file->message_type(0)->name() + "Ptr;";
 
     printer.Print(constType.c_str(), "name", "global_scope");
+  }
+
+  // Add Message Factory register
+  {
+    scoped_ptr<io::ZeroCopyOutputStream> output(
+        _generator_context->OpenForInsert(sourceFilename, "global_scope"));
+    io::Printer printer(output.get(), '$');
+
+    std::string package = _file->package();
+    boost::replace_all(package, ".", "::");
+
+    std::string name = _file->message_type(0)->name();
+
+    std::string constType = "GZ_REGISTER_STATIC_MSG(\"" + _file->package() +
+      "." + name + "\", " + name + ")\n";
+    printer.Print(constType.c_str(), "name", "namespace_scope");
   }
 
   return true;

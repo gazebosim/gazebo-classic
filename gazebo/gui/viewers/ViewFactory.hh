@@ -1,0 +1,95 @@
+/*
+ * Copyright 2012 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
+#ifndef _VIEWERFACTORY_HH_
+#define _VIEWERFACTORY_HH_
+
+#include <string>
+#include <map>
+#include <vector>
+
+#include "gazebo/gui/GuiTypes.hh"
+
+namespace gazebo
+{
+  /// \ingroup gazebo_views
+  /// \brief Sensors namespace
+  namespace gui
+  {
+    /// \def Sensor
+    /// \brief Prototype for view factory functions
+    typedef TopicView* (*ViewFactoryFn) ();
+
+    /// \addtogroup gazebo_views
+    /// \{
+    /// \class SensorFactor SensorFactory.hh views/views.hh
+    /// \brief The view factory; the class is just for namespacing purposes.
+    class ViewFactory
+    {
+      /// \brief Register all known views
+      ///  \li views::CameraSensor
+      ///  \li views::DepthCameraSensor
+      ///  \li views::GpuRaySensor
+      ///  \li views::RaySensor
+      ///  \li views::ContactSensor
+      ///  \li views::RFIDSensor
+      ///  \li views::RFIDTag
+      public: static void RegisterAll();
+
+      /// \brief Register a view class
+      /// (called by view registration function).
+      /// \param[in] _className Name of class of view to register.
+      /// \param[in] _factoryfn Function handle for registration.
+      public: static void RegisterView(const std::string &_className,
+                                        ViewFactoryFn _factoryfn);
+
+      /// \brief Create a new instance of a view.  Used by the world when
+      /// reading the world file.
+      /// \param[in] _className Name of view class
+      /// \return Pointer to Sensor
+      public: static TopicView *NewView(const std::string &_msgType,
+                                        const std::string &_topicName);
+
+      /// \brief Get all the view types
+      /// \param _types Vector of strings of the view types,
+      /// populated by function
+      public: static void GetViewTypes(std::vector<std::string> &_types);
+
+      /// \brief A list of registered view classes
+      private: static std::map<std::string, ViewFactoryFn> viewMap;
+    };
+
+
+    /// \brief Static view registration macro
+    ///
+    /// Use this macro to register views with the server.
+    /// @param name Sensor type name, as it appears in the world file.
+    /// @param classname C++ class name for the view.
+    #define GZ_REGISTER_STATIC_VIEWER(msgtype, classname) \
+    TopicView *New##classname() \
+    { \
+      return new gazebo::gui::classname(); \
+    } \
+    void Register##classname() \
+    {\
+      ViewFactory::RegisterView(msgtype, New##classname);\
+    }
+    /// \}
+  }
+}
+
+#endif

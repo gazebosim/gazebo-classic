@@ -17,6 +17,8 @@
 #ifndef _TEXTVIEW_HH_
 #define _TEXTVIEW_HH_
 
+#include <string>
+
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
 
@@ -34,8 +36,8 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
-      /// \param[in] _parent Pointer to the parent widget.
-      public: TextView(QWidget *_parent = 0);
+      /// \param[in] _msgType Type of message to view.
+      public: TextView(const std::string &_msgType);
 
       /// \brief Destructor
       public: virtual ~TextView();
@@ -48,7 +50,7 @@ namespace gazebo
 
       /// \brief Receives incoming text messages.
       /// \param[in] _msg New text message.
-      private: void OnText(ConstGzStringPtr &_msg);
+      private: void OnText(const std::string &_msg);
 
       /// \brief A scolling list of text data.
       private: QListView *textView;

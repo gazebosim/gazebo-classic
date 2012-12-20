@@ -44,16 +44,27 @@ namespace gazebo
       /// topic was selected.
       public: std::string GetTopic() const;
 
+      /// \brief Get the message type that was selected.
+      /// \return The selected topic's published message type.
+      public: std::string GetMsgType() const;
+
       private: void GetTopicList();
 
       private slots: void OnOkay();
       private slots: void OnCancel();
       private slots: void OnSelection(QTreeWidgetItem *_item, int _column);
 
+      /// \brief
       private: QTreeWidget *treeWidget;
+
+      /// \brief
       private: QPushButton *okayButton;
 
+      /// \brief The name of the selected topic.
       private: std::string topicName;
+
+      /// \brief The message type of the selected topic.
+      private: std::string msgType;
     };
     /// \}
   }

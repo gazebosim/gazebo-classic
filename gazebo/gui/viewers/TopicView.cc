@@ -27,9 +27,8 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-TopicView::TopicView(const std::string &_msgTypeName,
-                                       QWidget *_parent)
-: QWidget(_parent), msgTypeName(_msgTypeName)
+TopicView::TopicView(const std::string &_msgTypeName)
+: QWidget(), msgTypeName(_msgTypeName)
 {
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -125,7 +124,10 @@ void TopicView::Update()
 
     // Compute the bandwidth
     common::Time dt = this->times.back() - this->times.front();
-    double bandwidth = sumBytes / dt.Double();
+    double bandwidth = 0;
+
+    if (dt != common::Time(0, 0))
+      bandwidth = sumBytes / dt.Double();
 
     // Format the bandwidth output
     stream << std::fixed << std::setprecision(2);
@@ -189,10 +191,25 @@ void TopicView::UpdateTopicList()
   for (std::list<std::string>::iterator iter = topics.begin();
        iter != topics.end(); ++iter)
   {
+    if ((*iter).find("__dbg") != std::string::npos)
+      continue;
+
     // Get the shorthand notation for the topic.
     std::string topicName = this->node->EncodeTopicName(*iter);
 
-    std::cout << "Adding topic[" << topicName << "]\n";
     this->topicCombo->addItem(QString::fromStdString(topicName));
   }
+}
+
+/////////////////////////////////////////////////
+void TopicView::SetTopic(const std::string &/*_topicName*/)
+{
+  this->hz = 0.0;
+  this->msgSizes.clear();
+  this->times.clear();
+}
+
+/////////////////////////////////////////////////
+void TopicView::UpdateImpl()
+{
 }
