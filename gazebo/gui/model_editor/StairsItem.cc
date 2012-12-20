@@ -26,9 +26,9 @@ using namespace gui;
 /////////////////////////////////////////////////
 StairsItem::StairsItem(): RectItem()
 {
-
-
   this->scale = BuildingMaker::conversionScale;
+
+  this->level = 0;
 
   this->stairsSteps = 10;
   this->stairsDepth = 150;
@@ -57,6 +57,18 @@ StairsItem::StairsItem(): RectItem()
 /////////////////////////////////////////////////
 StairsItem::~StairsItem()
 {
+}
+
+/////////////////////////////////////////////////
+int StairsItem::GetLevel()
+{
+  return this->level;
+}
+
+/////////////////////////////////////////////////
+void StairsItem::SetLevel(int _level)
+{
+  this->level = _level;
 }
 
 /////////////////////////////////////////////////

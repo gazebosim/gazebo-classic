@@ -15,17 +15,17 @@
  *
 */
 
-#include "EditorView.hh"
-#include "GridLines.hh"
-#include "EditorItem.hh"
-#include "RectItem.hh"
-#include "WindowItem.hh"
-#include "DoorItem.hh"
-#include "StairsItem.hh"
-#include "LineSegmentItem.hh"
-#include "PolylineItem.hh"
-#include "WallItem.hh"
-#include "BuildingMaker.hh"
+#include "gui/model_editor/EditorView.hh"
+#include "gui/model_editor/GridLines.hh"
+#include "gui/model_editor/EditorItem.hh"
+#include "gui/model_editor/RectItem.hh"
+#include "gui/model_editor/WindowItem.hh"
+#include "gui/model_editor/DoorItem.hh"
+#include "gui/model_editor/StairsItem.hh"
+#include "gui/model_editor/LineSegmentItem.hh"
+#include "gui/model_editor/PolylineItem.hh"
+#include "gui/model_editor/WallItem.hh"
+#include "gui/model_editor/BuildingMaker.hh"
 #include "gui/model_editor/EditorEvents.hh"
 
 using namespace gazebo;
@@ -309,5 +309,71 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
     this->scene()->removeItem(this->currentMouseItem);
     this->currentMouseItem = NULL;
     this->drawInProgress = false;
+  }
+}
+
+/////////////////////////////////////////////////
+void EditorView::OnAddLevel()
+{
+  if (wallList.size() == 0)
+    return;
+
+  int wallLevel = this->wallList[0]->GetLevel();
+  double maxHeight = this->wallList[0]->GetHeight();
+
+  for (unsigned int i = 1; i < this->wallList.size(); ++i)
+  {
+    if (this->wallList[i]->GetHeight() > maxHeight)
+    {
+      maxHeight = this->wallList[i]->GetHeight();
+      wallLevel = this->wallList[i]->GetLevel();
+    }
+  }
+
+  for (unsigned int i = 0; i < this->wallList.size(); ++i)
+  {
+    WallItem *wallItem = this->wallList[i]->Clone();
+    this->wallList.push_back(wallItem);
+    wallItem->SetLevel(wallLevel+1);
+    for (unsigned int j = 0; j < wallItem->GetSegmentCount(); ++j)
+    {
+      LineSegmentItem *segment = wallItem->GetSegment(j);
+      std::string wallSegmentName = this->buildingMaker->AddWall(
+          segment->GetSize(), segment->GetScenePosition(),
+          segment->GetSceneRotation());
+
+      this->buildingMaker->ConnectItem(wallSegmentName, segment);
+      this->buildingMaker->ConnectItem(wallSegmentName, wallItem);
+    }
+  }
+  this->OnLevelChanged(wallLevel + 1);
+}
+
+/////////////////////////////////////////////////
+void EditorView::OnLevelChanged(int _level)
+{
+  for (unsigned int i = 0; i < this->wallList.size(); ++i)
+  {
+    if (this->wallList[i]->GetLevel() != _level)
+      wallList[i]->setVisible(false);
+    else wallList[i]->setVisible(true);
+  }
+  for (unsigned int i = 0; i < this->windowList.size(); ++i)
+  {
+    if (this->windowList[i]->GetLevel() != _level)
+      windowList[i]->setVisible(false);
+    else windowList[i]->setVisible(true);
+  }
+  for (unsigned int i = 0; i < this->doorList.size(); ++i)
+  {
+    if (this->doorList[i]->GetLevel() != _level)
+      doorList[i]->setVisible(false);
+    else doorList[i]->setVisible(true);
+  }
+  for (unsigned int i = 0; i < this->stairsList.size(); ++i)
+  {
+    if (this->stairsList[i]->GetLevel() != _level)
+      stairsList[i]->setVisible(false);
+    else stairsList[i]->setVisible(true);
   }
 }

@@ -28,6 +28,8 @@ DoorItem::DoorItem(): RectItem()
 {
   this->scale = BuildingMaker::conversionScale;
 
+  this->level = 0;
+
   this->doorDepth = 10;
   this->doorHeight = 0;
   this->doorWidth = 50;
@@ -48,6 +50,18 @@ DoorItem::DoorItem(): RectItem()
 /////////////////////////////////////////////////
 DoorItem::~DoorItem()
 {
+}
+
+/////////////////////////////////////////////////
+int DoorItem::GetLevel()
+{
+  return this->level;
+}
+
+/////////////////////////////////////////////////
+void DoorItem::SetLevel(int _level)
+{
+  this->level = _level;
 }
 
 /////////////////////////////////////////////////

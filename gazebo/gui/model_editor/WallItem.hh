@@ -34,21 +34,28 @@ namespace gazebo
 
         public: ~WallItem();
 
-//        public: math::Pose GetPose();
+        public: int GetLevel();
 
-//        public: math::Vector3 GetSize();
+        public: void SetLevel(int _level);
+
+        public: double GetHeight();
+
         public: void SetHeight(double _height);
+
+        public: WallItem *Clone();
 
         private: bool segmentEventFilter(LineSegmentItem *_segment,
             QEvent *_event);
+
+        private: void WallChanged();
 
         private: double wallThickness;
 
         private: double wallHeight;
 
-        private: void WallChanged();
-
         private: double scale;
+
+        private: int level;
 
 //        private: double scale;
     };

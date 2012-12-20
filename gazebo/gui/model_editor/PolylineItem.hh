@@ -53,6 +53,8 @@ namespace gazebo
 
       public: void SetThickness(double _thickness);
 
+      public: void SetPosition(QPointF _pos);
+
       private: void UpdatePath();
 
       private: void UpdatePathAtIndex(unsigned int _index, QPointF _pos);

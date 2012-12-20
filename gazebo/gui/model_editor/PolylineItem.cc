@@ -67,6 +67,12 @@ void PolylineItem::SetThickness(double _thickness)
 }
 
 /////////////////////////////////////////////////
+void PolylineItem::SetPosition(QPointF _pos)
+{
+  this->setPos(_pos);
+}
+
+/////////////////////////////////////////////////
 void PolylineItem::AddPoint(QPointF _point)
 {
   QPointF lineEnd = _point - this->origin;

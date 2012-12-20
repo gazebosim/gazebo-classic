@@ -61,6 +61,10 @@ namespace gazebo
 
       private: void OnCreateEditorItem(const std::string &_type);
 
+      private: void OnAddLevel();
+
+      private: void OnLevelChanged(int _level);
+
       private: int drawMode;
 
       private: int mouseMode;

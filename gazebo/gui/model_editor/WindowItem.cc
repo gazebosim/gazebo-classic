@@ -28,6 +28,8 @@ WindowItem::WindowItem(): RectItem()
 {
   this->scale = BuildingMaker::conversionScale;
 
+  this->level = 0;
+
   this->windowDepth = 20;
   this->windowHeight = 0;
   this->windowWidth = 50;
@@ -49,6 +51,18 @@ WindowItem::WindowItem(): RectItem()
 /////////////////////////////////////////////////
 WindowItem::~WindowItem()
 {
+}
+
+/////////////////////////////////////////////////
+int WindowItem::GetLevel()
+{
+  return this->level;
+}
+
+/////////////////////////////////////////////////
+void WindowItem::SetLevel(int _level)
+{
+  this->level = _level;
 }
 
 /////////////////////////////////////////////////

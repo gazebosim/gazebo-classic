@@ -15,10 +15,10 @@
  *
 */
 
-#include "RectItem.hh"
-#include "CornerGrabber.hh"
-#include "RotateHandle.hh"
-#include "EditorItem.hh"
+#include "gui/model_editor/RectItem.hh"
+#include "gui/model_editor/CornerGrabber.hh"
+#include "gui/model_editor/RotateHandle.hh"
+#include "gui/model_editor/EditorItem.hh"
 
 using namespace gazebo;
 using namespace gui;

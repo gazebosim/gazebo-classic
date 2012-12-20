@@ -32,6 +32,10 @@ namespace gazebo
 
         public: ~WindowItem();
 
+        public: int GetLevel();
+
+        public: void SetLevel(int _level);
+
         public: virtual QVector3D GetSize();
 
         public: virtual QVector3D GetScenePosition();
@@ -58,6 +62,8 @@ namespace gazebo
         private: double windowElevation;
 
         private: double scale;
+
+        private: int level;
     };
   }
 }

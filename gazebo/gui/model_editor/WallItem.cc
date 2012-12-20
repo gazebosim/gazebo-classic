@@ -30,6 +30,8 @@ WallItem::WallItem(QPointF _start, QPointF _end)
 {
   this->scale = BuildingMaker::conversionScale;
 
+  this->level = 0;
+
   this->wallThickness = 10;
   this->wallHeight = 0;
 
@@ -40,15 +42,53 @@ WallItem::WallItem(QPointF _start, QPointF _end)
 WallItem::~WallItem()
 {
 }
-/*
+
+/////////////////////////////////////////////////
+int WallItem::GetLevel()
+{
+  return this->level;
+}
+
+/////////////////////////////////////////////////
+void WallItem::SetLevel(int _level)
+{
+  this->level = _level;
+}
+
+/////////////////////////////////////////////////
+double WallItem::GetHeight()
+{
+  return this->wallHeight;
+}
+
 /////////////////////////////////////////////////
 void WallItem::SetHeight(double _height)
 {
-  for (unsigned int i = 0; i < this->segments.size(); ++i)
+  this->wallHeight = _height;
+}
+
+
+/////////////////////////////////////////////////
+WallItem *WallItem::Clone()
+{
+  WallItem *wallItem = new WallItem(QPointF(0,0), QPointF(0,0));
+  wallItem->SetLevel(this->level);
+  wallItem->SetHeight(this->wallHeight);
+  wallItem->SetPosition(this->scenePos());
+  wallItem->SetThickness(this->wallThickness);
+
+  LineSegmentItem *segment = this->segments[0];
+  wallItem->SetVertexPosition(0, segment->mapToScene(segment->line().p1()));
+  wallItem->SetVertexPosition(1, segment->mapToScene(segment->line().p2()));
+
+  for (unsigned int i = 1; i < this->segments.size(); ++i)
   {
-    this->segments[i]->SetPseudoHeight(_height);
+    segment = this->segments[i];
+    wallItem->AddPoint(segment->mapToScene(segment->line().p2()));
   }
-}*/
+
+  return wallItem;
+}
 
 /////////////////////////////////////////////////
 bool WallItem::segmentEventFilter(LineSegmentItem *_segment,

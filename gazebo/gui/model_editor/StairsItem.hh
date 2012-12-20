@@ -32,6 +32,10 @@ namespace gazebo
 
         public: ~StairsItem();
 
+        public: int GetLevel();
+
+        public: void SetLevel(int _level);
+
         public: virtual QVector3D GetSize();
 
         public: virtual QVector3D GetScenePosition();
@@ -62,6 +66,8 @@ namespace gazebo
         private: int stairsSteps;
 
         private: double scale;
+
+        private: int level;
 
 //        private: double stairsUnitRise;
 
