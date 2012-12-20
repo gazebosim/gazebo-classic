@@ -77,9 +77,6 @@ namespace gazebo
       /// \param[in] _msg Message that contains triangle mesh info.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
-      /// \brief Deprecated
-      public: virtual double GetMass(double _density) const GAZEBO_DEPRECATED;
-
       /// \brief Pointer to the mesh data.
       protected: const common::Mesh *mesh;
     };

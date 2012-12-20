@@ -28,9 +28,6 @@
 
   <element name="mesh" required="0">
     <description>Mesh shape</description>
-    <element name="filename" type="string" default="__default__" required="0">
-      <description>Mesh filename. DEPRECATED</description>
-    </element>
     <element name="uri" type="string" default="__default__" required="1">
       <description>Mesh uri</description>
     </element>
