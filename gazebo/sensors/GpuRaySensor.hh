@@ -26,11 +26,11 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "transport/TransportTypes.hh"
-#include "sensors/Sensor.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {
@@ -256,33 +256,6 @@ namespace gazebo
       /// \brief Camera SDF element.
       protected: sdf::ElementPtr cameraElem;
 
-      /// \brief Number of cameras.
-      protected: unsigned int cameraCount;
-
-      /// \brief Horizontal field-of-view.
-      protected: double hfov;
-
-      /// \brief Vertical field-of-view.
-      protected: double vfov;
-
-      /// \brief Cos horizontal field-of-view.
-      protected: double chfov;
-
-      /// \brief Cos vertical field-of-view.
-      protected: double cvfov;
-
-      /// \brief Horizontal half angle.
-      protected: double horzHalfAngle;
-
-      /// \brief Vertical half angle.
-      protected: double vertHalfAngle;
-
-      /// \brief Near clip plane.
-      protected: double near;
-
-      /// \brief Far clip plane.
-      protected: double far;
-
       /// \brief Horizontal ray count.
       protected: unsigned int horzRayCount;
 
@@ -295,14 +268,8 @@ namespace gazebo
       /// \brief Vertical range count.
       protected: unsigned int vertRangeCount;
 
-      /// \brief Ray count ratio.
-      protected: double rayCountRatio;
-
       /// \brief Range count ratio.
       protected: double rangeCountRatio;
-
-      /// \brief True if the sensor is horizontal only.
-      protected: bool isHorizontal;
 
       /// \brief GPU laser rendering.
       private: rendering::GpuLaserPtr laserCam;
