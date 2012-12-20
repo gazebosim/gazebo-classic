@@ -154,6 +154,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
 
   this->initialized = true;
 
+  // Tell the user what address will be publicized to other nodes.
   gzmsg << "Publicized address: "
         << this->masterConn->GetLocalHostname() << "\n";
 

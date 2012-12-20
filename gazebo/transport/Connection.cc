@@ -140,6 +140,8 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
       boost::bind(&Connection::OnConnect, this,
         boost::asio::placeholders::error, endpoint_iter));
 
+  // Wait for at most 2 seconds for a connection to be established.
+  // The connectionCondition notification occurs in ::OnConnect.
   if (!this->connectCondition.timed_wait(lock,
         boost::posix_time::milliseconds(2000)) || this->connectError)
   {
@@ -734,24 +736,30 @@ boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
 //////////////////////////////////////////////////
 std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint _ep)
 {
+  std::string result;
+
+  // Use the IP address if it's valid. This saves time, and is better than
+  // trying to find a hostname (particularly in cases where /etc/hosts has
+  // bad information).
   if (!addressIsUnspecified(_ep.address().to_v4()))
-    return _ep.address().to_string();
+  {
+    result = _ep.address().to_string();
+  }
+  // Otherwise perform a lookup
   else
   {
     boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
     boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(_ep);
     boost::asio::ip::tcp::resolver::iterator end;
 
-    std::string name;
-
     while (iter != end)
     {
-      name = (*iter).host_name();
+      result = (*iter).host_name();
       ++iter;
     }
-
-    return name;
   }
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -770,6 +778,9 @@ std::string Connection::GetLocalHostname() const
 void Connection::OnConnect(const boost::system::error_code &_error,
     boost::asio::ip::tcp::resolver::iterator /*_endPointIter*/)
 {
+  // This function is called when a connection is successfully (or
+  // unsuccessfully) established.
+
   boost::mutex::scoped_lock lock(*this->connectMutex);
   if (_error == 0)
   {
@@ -787,6 +798,7 @@ void Connection::OnConnect(const boost::system::error_code &_error,
       gzerr << "Invalid socket connection\n";
     }
 
+    // Notify the condition that it may proceed.
     this->connectCondition.notify_one();
   }
   else
