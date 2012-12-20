@@ -93,11 +93,14 @@ bool parse(int argc, char **argv)
 }
 
 /////////////////////////////////////////////////
-transport::ConnectionPtr connect_to_master(const std::string &host,
-                                           unsigned short port)
+transport::ConnectionPtr connect_to_master()
 {
   std::string data, namespacesData, publishersData;
   msgs::Packet packet;
+
+  std::string host;
+  unsigned int port;
+  transport::get_master_uri(host, port);
 
   // Connect to the master
   transport::ConnectionPtr connection(new transport::Connection());
@@ -128,7 +131,7 @@ void list()
   msgs::Request request;
   msgs::Publishers pubs;
 
-  transport::ConnectionPtr connection = connect_to_master("localhost", 11345);
+  transport::ConnectionPtr connection = connect_to_master();
 
   request.set_id(0);
   request.set_request("get_publishers");
@@ -191,7 +194,7 @@ msgs::TopicInfo get_topic_info(const std::string &_topic)
   msgs::Request *request = msgs::CreateRequest("topic_info", _topic);
   msgs::Packet packet;
 
-  transport::ConnectionPtr connection = connect_to_master("localhost", 11345);
+  transport::ConnectionPtr connection = connect_to_master();
 
   connection->EnqueueMsg(msgs::Package("request", *request), true);
 
