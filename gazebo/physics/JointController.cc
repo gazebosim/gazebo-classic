@@ -82,7 +82,8 @@ void JointController::Update()
       double cmd;
       std::map<std::string, double>::iterator iter;
 
-      for (iter = this->positions.begin(); iter != this->positions.end(); ++iter)
+      for (iter = this->positions.begin(); iter != this->positions.end();
+           ++iter)
       {
         cmd = this->posPids[iter->first].Update(
             this->joints[iter->first]->GetAngle(0).Radian() - iter->second,
