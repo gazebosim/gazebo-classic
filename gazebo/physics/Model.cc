@@ -530,15 +530,6 @@ const Joint_V &Model::GetJoints() const
 }
 
 //////////////////////////////////////////////////
-JointPtr Model::GetJoint(unsigned int _index) const
-{
-  if (_index >= this->joints.size())
-    gzthrow("Invalid joint _index[" << _index << "]\n");
-
-  return this->joints[_index];
-}
-
-//////////////////////////////////////////////////
 JointPtr Model::GetJoint(const std::string &_name)
 {
   JointPtr result;
@@ -569,12 +560,6 @@ JointPtr Model::GetJoint(const std::string &_name)
 LinkPtr Model::GetLinkById(unsigned int _id) const
 {
   return boost::shared_dynamic_cast<Link>(this->GetById(_id));
-}
-
-//////////////////////////////////////////////////
-Link_V Model::GetAllLinks() const
-{
-  return this->GetLinks();
 }
 
 //////////////////////////////////////////////////
@@ -620,18 +605,6 @@ LinkPtr Model::GetLink(const std::string &_name) const
   }
 
   return result;
-}
-
-//////////////////////////////////////////////////
-LinkPtr Model::GetLink(unsigned int _index) const
-{
-  LinkPtr link;
-  if (_index <= this->GetChildCount())
-    link = boost::shared_static_cast<Link>(this->GetChild(_index));
-  else
-    gzerr << "Index is out of range\n";
-
-  return link;
 }
 
 //////////////////////////////////////////////////
@@ -787,12 +760,6 @@ void Model::SetLaserRetro(const float _retro)
        boost::shared_static_cast<Link>(*iter)->SetLaserRetro(_retro);
     }
   }
-}
-
-//////////////////////////////////////////////////
-void Model::FillModelMsg(msgs::Model &_msg)
-{
-  this->FillMsg(_msg);
 }
 
 //////////////////////////////////////////////////

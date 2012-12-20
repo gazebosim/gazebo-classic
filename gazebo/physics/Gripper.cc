@@ -85,8 +85,7 @@ void Gripper::Load(sdf::ElementPtr _sdf)
       if (collIter != this->collisions.end())
         continue;
       collision->SetContactsEnabled(true);
-      this->connections.push_back(collision->ConnectContact(
-            boost::bind(&Gripper::OnContact, this, _1, _2)));
+
       this->collisions[collision->GetScopedName()] = collision;
     }
     gripperLinkElem = gripperLinkElem->GetNextElement("gripper_link");

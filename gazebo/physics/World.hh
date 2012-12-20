@@ -196,9 +196,6 @@ namespace gazebo
       /// \return A pointer to the entity, or NULL if no entity was found.
       public: BasePtr GetByName(const std::string &_name);
 
-      /// \brief Deprecated
-      public: ModelPtr GetModelByName(const std::string &name)GAZEBO_DEPRECATED;
-
       /// \brief Get a model by name.
       ///
       /// This function is the same as GetByName, but limits the search to
@@ -206,10 +203,6 @@ namespace gazebo
       /// \param[in] _name The name of the Model to find.
       /// \return A pointer to the Model, or NULL if no model was found.
       public: ModelPtr GetModel(const std::string &_name);
-
-      /// \brief Deprecated
-      public: EntityPtr GetEntityByName(
-                  const std::string &_name) GAZEBO_DEPRECATED;
 
       /// \brief Get a pointer to an Entity based on a name.
       ///
