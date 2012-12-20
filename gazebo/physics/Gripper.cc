@@ -188,7 +188,7 @@ void Gripper::HandleAttach()
           this->attached = true;
 
           this->fixedJoint->Load(this->palmLink,
-              cc[iter->first]->GetLink(), math::Pose(0, 0, 0, 0, 0, 0));
+              cc[iter->first]->GetLink(), math::Vector3(0, 0, 0));
           this->fixedJoint->Init();
           this->fixedJoint->SetHighStop(0, 0);
           this->fixedJoint->SetLowStop(0, 0);
