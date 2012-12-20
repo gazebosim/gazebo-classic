@@ -24,7 +24,7 @@
 using namespace gazebo;
 using namespace gui;
 
-GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.ImageStamped", ImageView);
+GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.ImageStamped", ImageView)
 
 /////////////////////////////////////////////////
 ImageView::ImageView()

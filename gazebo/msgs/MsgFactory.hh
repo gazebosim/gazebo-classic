@@ -23,8 +23,6 @@
 #include <vector>
 #include <google/protobuf/message.h>
 
-#include "gazebo/gui/GuiTypes.hh"
-
 namespace gazebo
 {
   /// \ingroup gazebo_views
@@ -70,8 +68,8 @@ namespace gazebo
       /// populated by function
       public: static void GetMsgTypes(std::vector<std::string> &_types);
 
-      /// \brief A list of registered view classes
-      private: static std::map<std::string, MsgFactoryFn> msgMap;
+      /// \brief A list of registered message types
+      private: static std::map<std::string, MsgFactoryFn> *msgMap;
     };
 
 
@@ -83,7 +81,7 @@ namespace gazebo
     #define GZ_REGISTER_STATIC_MSG(msgtype, classname) \
     google::protobuf::Message *New##classname() \
     { \
-      return new gazebo::msgs::classname(); \
+      return new gazebo::msgs::classname; \
     } \
     class Msg##classname \
     { \

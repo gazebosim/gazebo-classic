@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-
+#include <iostream>
 #include "gazebo/msgs/MsgFactory.hh"
 
 using namespace gazebo;
 using namespace msgs;
 
-std::map<std::string, MsgFactoryFn> MsgFactory::msgMap;
+std::map<std::string, MsgFactoryFn> *MsgFactory::msgMap = NULL;
 
 /////////////////////////////////////////////////
 void MsgFactory::RegisterAll()
@@ -31,7 +31,11 @@ void MsgFactory::RegisterAll()
 void MsgFactory::RegisterMsg(const std::string &_msgType,
                              MsgFactoryFn _factoryfn)
 {
-  msgMap[_msgType] = _factoryfn;
+  std::cout << "RegisterMsg[" << _msgType << "]\n";
+  if (!msgMap)
+    msgMap = new std::map<std::string, MsgFactoryFn>;
+
+  (*msgMap)[_msgType] = _factoryfn;
 }
 
 /////////////////////////////////////////////////
@@ -39,8 +43,8 @@ google::protobuf::Message *MsgFactory::NewMsg(const std::string &_msgType)
 {
   google::protobuf::Message *msg = NULL;
 
-  if (msgMap[_msgType])
-    msg = (msgMap[_msgType]) ();
+  if ((*msgMap)[_msgType])
+    msg = ((*msgMap)[_msgType]) ();
 
   return msg;
 }
@@ -51,7 +55,7 @@ void MsgFactory::GetMsgTypes(std::vector<std::string> &_types)
   _types.clear();
 
   std::map<std::string, MsgFactoryFn>::const_iterator iter;
-  for (iter = msgMap.begin(); iter != msgMap.end(); ++iter)
+  for (iter = msgMap->begin(); iter != msgMap->end(); ++iter)
   {
     _types.push_back(iter->first);
   }
