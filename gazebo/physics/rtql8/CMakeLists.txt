@@ -1,8 +1,8 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 INCLUDE_DIRECTORIES(/usr/local/include)
-INCLUDE_DIRECTORIES(/usr/local/include/dart)
-INCLUDE_DIRECTORIES(/usr/local/include/eigen-3.0.5)
+INCLUDE_DIRECTORIES(/usr/local/include/rtql8)
+INCLUDE_DIRECTORIES(/usr/local/include/eigen-3.1.2)
 
 LINK_DIRECTORIES(/usr/local/lib)
 SET(RTQL8_LIBRARIES collision dynamics geometry integration kinematics lcpsolver optimizer renderer utils yui)
@@ -11,7 +11,7 @@ set (sources
              RTQL8Physics.cc
 #             ODECollision.cc
              RTQL8Link.cc
-#             ODEJoint.cc
+             RTQL8Joint.cc
 #             ODESliderJoint.cc
 #             ODEHingeJoint.cc
 #             ODEHinge2Joint.cc
@@ -28,7 +28,7 @@ SET (headers
              RTQL8Physics.hh
 #             ODECollision.hh
              RTQL8Link.hh
-#             ODEJoint.hh
+             RTQL8Joint.hh
 #             ODESliderJoint.hh
 #             ODEHingeJoint.hh
 #             ODEHinge2Joint.hh
