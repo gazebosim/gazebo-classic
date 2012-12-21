@@ -27,7 +27,7 @@ class PhysicsTest : public ServerFixture
 TEST_F(PhysicsTest, State)
 {
   srand(time(NULL));
-  int seed = time(NULL);
+  unsigned int seed = time(NULL);
   {
     // intentionally break the joint using Link::SetWorldPose
     // let it conflict with Physics pose updates and make sure
@@ -38,11 +38,6 @@ TEST_F(PhysicsTest, State)
     world->SetPaused(true);
     EXPECT_TRUE(world != NULL);
 
-    physics::WorldState worldState = world->GetState();
-    physics::ModelState modelState = worldState.GetModelState(0);
-    physics::LinkState linkState = modelState.GetLinkState(0);
-
-
     {
       msgs::Factory msg;
 
@@ -51,7 +46,7 @@ TEST_F(PhysicsTest, State)
       math::Pose pose(0, 0, 3, 0, 0, 0);
       math::Vector3 size(1.0, 0.1, 0.1);
       newModelStr
-        << "<gazebo version='" << SDF_VERSION << "'>\n"
+        << "<sdf version='" << SDF_VERSION << "'>\n"
         << "  <model name='model_1'>\n"
         << "    <pose>" << pose << "</pose>\n"
         << "    <link name='link_1'>\n"
@@ -291,7 +286,7 @@ TEST_F(PhysicsTest, State)
         << "      </axis>\n"
         << "    </joint>\n"
         << "  </model>\n"
-        << "</gazebo>\n";
+        << "</sdf>\n";
 
       msg.set_sdf(newModelStr.str());
 
@@ -376,17 +371,17 @@ TEST_F(PhysicsTest, State)
       {
         last_update_time = world->GetRealTime().Double();
         joint_01->SetAngle(0,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         joint_12->SetAngle(0,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         joint_23->SetAngle(0,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         joint_34->SetAngle(0,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         joint_45->SetAngle(0,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         joint_52->SetAngle(0,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         sleep(1);
       }
     test_duration = world->GetSimTime().Double() - start_time;
@@ -492,100 +487,100 @@ TEST_F(PhysicsTest, State)
       last_update_time = world->GetSimTime().Double();
       math::Pose p;
       p = math::Pose(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 3.0,
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 3.0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_1->SetWorldPose(p);
       p = math::Pose(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 1.0,
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 3.0,
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 1.0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 3.0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_2->SetWorldPose(p);
       p = math::Pose(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 2.0,
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 2.0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/
           static_cast<double>(RAND_MAX) + 3.0,
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/
           static_cast<double>(RAND_MAX) + 0.5*M_PI,
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_3->SetWorldPose(p);
       p = math::Pose(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 2.0,
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 1.0,
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 3.0,
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 2.0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 1.0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 3.0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/
           static_cast<double>(RAND_MAX) + M_PI,
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_4->SetWorldPose(p);
       p = math::Pose(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 1.0,
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 1.0,
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 3.0,
-          static_cast<double>(rand_r(seed))/
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 1.0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 1.0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 3.0,
+          static_cast<double>(rand_r(&seed))/
           static_cast<double>(RAND_MAX) + 1.5*M_PI,
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_5->SetWorldPose(p);
 
       math::Vector3 v;
       v = math::Vector3(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_1->SetAngularVel(v);
       v = math::Vector3(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_1->SetLinearVel(v);
       v = math::Vector3(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_2->SetAngularVel(v);
       v = math::Vector3(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_2->SetLinearVel(v);
       v = math::Vector3(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_3->SetAngularVel(v);
       v = math::Vector3(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_3->SetLinearVel(v);
       v = math::Vector3(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_4->SetAngularVel(v);
       v = math::Vector3(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_4->SetLinearVel(v);
       v = math::Vector3(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_5->SetAngularVel(v);
       v = math::Vector3(
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       link_5->SetLinearVel(v);
     }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
@@ -611,106 +606,106 @@ TEST_F(PhysicsTest, State)
         last_update_time = world->GetSimTime().Double();
         math::Pose p;
         p = math::Pose(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/
             static_cast<double>(RAND_MAX) + 3.0,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/
             static_cast<double>(RAND_MAX) + 1.57079,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_1->SetWorldPose(p);
         p = math::Pose(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/
             static_cast<double>(RAND_MAX) + 2.0,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/
             static_cast<double>(RAND_MAX) + 1.57079,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_2->SetWorldPose(p);
         p = math::Pose(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/
             static_cast<double>(RAND_MAX) + 1.0,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/
             static_cast<double>(RAND_MAX) + 1.57079,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_3->SetWorldPose(p);
         p = math::Pose(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/
             static_cast<double>(RAND_MAX) + 1.0,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/
             static_cast<double>(RAND_MAX) + 1.57079,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_4->SetWorldPose(p);
         p = math::Pose(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/
             static_cast<double>(RAND_MAX) + 1.0,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/
             static_cast<double>(RAND_MAX) + 1.57079,
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_5->SetWorldPose(p);
 
         math::Vector3 v;
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_1->SetAngularVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_1->SetLinearVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_2->SetAngularVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_2->SetLinearVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_3->SetAngularVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_3->SetLinearVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_4->SetAngularVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_4->SetLinearVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_5->SetAngularVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_5->SetLinearVel(v);
       }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
@@ -736,54 +731,54 @@ TEST_F(PhysicsTest, State)
         // gzdbg << "setting link poses with violation\n";
         math::Vector3 v;
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_1->SetAngularVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_1->SetLinearVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_2->SetAngularVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_2->SetLinearVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_3->SetAngularVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_3->SetLinearVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_4->SetAngularVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_4->SetLinearVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_5->SetAngularVel(v);
         v = math::Vector3(
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
-            static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
         link_5->SetLinearVel(v);
       }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;

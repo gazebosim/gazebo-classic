@@ -394,7 +394,7 @@ void JointController::AddConnectedLinks(Link_V &_linksOut,
                                           parentLink != parentLinks.end();
                                           ++parentLink)
       {
-        if ((*parentLink)->GetName() != _link->GetName() &&
+        if ((*parentLink)->GetScopedName() != _link->GetScopedName() &&
             !this->ContainsLink(_linksOut, (*parentLink)))
         {
           _linksOut.push_back(*parentLink);

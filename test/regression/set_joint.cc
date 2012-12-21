@@ -38,11 +38,6 @@ TEST_F(PhysicsTest, State)
 
     world->GetPhysicsEngine()->SetGravity(math::Vector3(0, 0, 0));
 
-    physics::WorldState worldState = world->GetState();
-    physics::ModelState modelState = worldState.GetModelState(0);
-    physics::LinkState linkState = modelState.GetLinkState(0);
-
-
     {
       msgs::Factory msg;
 
@@ -51,7 +46,7 @@ TEST_F(PhysicsTest, State)
       math::Pose pose(0, 0, 3, 0, 0, 0);
       math::Vector3 size(1.0, 0.1, 0.1);
       newModelStr
-        << "<gazebo version='" << SDF_VERSION << "'>\n"
+        << "<sdf version='" << SDF_VERSION << "'>\n"
         << "  <model name='model_1'>\n"
         << "    <pose>" << pose << "</pose>\n"
         << "    <link name='link_1'>\n"
@@ -534,7 +529,7 @@ TEST_F(PhysicsTest, State)
         << "      </axis>\n"
         << "    </joint>\n"
         << "  </model>\n"
-        << "</gazebo>\n";
+        << "</sdf>\n";
 
       msg.set_sdf(newModelStr.str());
 
@@ -590,16 +585,7 @@ TEST_F(PhysicsTest, State)
     double last_update_time;
     double elapsed_wall_time;
 
-    srand_r(seed)(time(NULL));
-    int seed = time(NULL);
-
-
-
-
-
-
-
-
+    unsigned int seed = time(NULL);
 
 
 
@@ -619,10 +605,10 @@ TEST_F(PhysicsTest, State)
       {
         last_update_time = world->GetRealTime().Double();
 
-        int n = model->GetJointCount();
-        for (int i = 0; i < n; ++i)
-          model->GetJoint(i)->SetAngle(0,
-              0.1*static_cast<double>(rand_r(seed)())/
+        physics::Joint_V joints = model->GetJoints();
+        for (unsigned int i = 0; i < joints.size(); ++i)
+          joints[i]->SetAngle(0,
+              0.1*static_cast<double>(rand_r(&seed))/
               static_cast<double>(RAND_MAX));
       }
     test_duration = world->GetSimTime().Double() - start_time;
@@ -665,7 +651,7 @@ TEST_F(PhysicsTest, State)
       {
         last_update_time = world->GetSimTime().Double();
         double a = 0.50*(2.0*
-            static_cast<double>(rand_r(seed)())/
+            static_cast<double>(rand_r(&seed))/
             static_cast<double>(RAND_MAX) - 1.0);
         joint_01->SetAngle(0, a);
         // joint_12->SetAngle(0, a);
