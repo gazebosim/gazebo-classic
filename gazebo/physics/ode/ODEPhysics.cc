@@ -236,6 +236,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_solver_type(this->stepType);
     physicsMsg.set_dt(this->stepTimeDouble);
     physicsMsg.set_iters(this->GetSORPGSIters());
+    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(this->GetSORPGSW());
     physicsMsg.set_cfm(this->GetWorldCFM());
     physicsMsg.set_erp(this->GetWorldERP());
@@ -289,6 +290,9 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_erp())
     this->SetWorldERP(_msg->erp());
 
+  if (_msg->has_enable_physics())
+    this->world->EnablePhysicsEngine(_msg->enable_physics());
+
   if (_msg->has_contact_max_correcting_vel())
     this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
 
@@ -318,6 +322,11 @@ void ODEPhysics::InitForThread()
 //////////////////////////////////////////////////
 void ODEPhysics::UpdateCollision()
 {
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
+    dJointGroupEmpty(this->contactGroup);
+  }
+
   unsigned int i = 0;
   this->collidersCount = 0;
   this->trimeshCollidersCount = 0;
@@ -351,7 +360,7 @@ void ODEPhysics::UpdatePhysics()
 {
   // need to lock, otherwise might conflict with world resetting
   {
-    this->physicsUpdateMutex->lock();
+    boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
     // Update the dynamical model
     (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
@@ -382,13 +391,7 @@ void ODEPhysics::UpdatePhysics()
             this->jointFeedbacks[i]->feedbacks[j].t2[2]);
       }
     }
-
-    dJointGroupEmpty(this->contactGroup);
-    this->physicsUpdateMutex->unlock();
   }
-
-  // Output the contact information
-  this->contactManager->PublishContacts();
 }
 
 //////////////////////////////////////////////////
@@ -400,10 +403,9 @@ void ODEPhysics::Fini()
 //////////////////////////////////////////////////
 void ODEPhysics::Reset()
 {
-  this->physicsUpdateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
   // Very important to clear out the contact group
   dJointGroupEmpty(this->contactGroup);
-  this->physicsUpdateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -1003,4 +1005,10 @@ void ODEPhysics::DebugPrint() const
       g = dBodyGetNextGeom(g);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void ODEPhysics::SetSeed(uint32_t _seed)
+{
+  dRandSetSeed(_seed);
 }

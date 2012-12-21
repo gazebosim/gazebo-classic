@@ -100,6 +100,9 @@ namespace gazebo
               {gzerr << "Not implement in Simbody\n";}
 
       protected: SimTK::MultibodySystem *world;
+
+      // Documentation inherited.
+      public: virtual JointWrench GetForceTorque(int _index);
     };
     /// \}
   }

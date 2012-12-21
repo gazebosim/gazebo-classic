@@ -391,7 +391,7 @@ std::string Image::GetFilename() const
 //////////////////////////////////////////////////
 Image::PixelFormat Image::GetPixelFormat() const
 {
-  Image::PixelFormat fmt = UNKNOWN;
+  Image::PixelFormat fmt = UNKNOWN_PIXEL_FORMAT;
   FREE_IMAGE_TYPE type = FreeImage_GetImageType(this->bitmap);
 
   unsigned int redMask = FreeImage_GetRedMask(this->bitmap);
@@ -417,3 +417,14 @@ Image::PixelFormat Image::GetPixelFormat() const
 
   return fmt;
 }
+
+/////////////////////////////////////////////////
+Image::PixelFormat Image::ConvertPixelFormat(const std::string &_format)
+{
+  for (unsigned int i = 0; i < PIXEL_FORMAT_COUNT; ++i)
+    if (PixelFormatNames[i] == _format)
+      return static_cast<PixelFormat>(i);
+
+  return UNKNOWN_PIXEL_FORMAT;
+}
+

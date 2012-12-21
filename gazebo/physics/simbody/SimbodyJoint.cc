@@ -86,3 +86,10 @@ void SimbodyJoint::Detach()
   this->childLink.reset();
   this->parentLink.reset();
 }
+
+//////////////////////////////////////////////////
+JointWrench SimbodyJoint::GetForceTorque(int /*_index*/)
+{
+  JointWrench wrench;
+  return wrench;
+}

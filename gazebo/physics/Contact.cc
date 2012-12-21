@@ -43,12 +43,6 @@ Contact::~Contact()
 }
 
 //////////////////////////////////////////////////
-Contact Contact::Clone() const
-{
-  return Contact(*this);
-}
-
-//////////////////////////////////////////////////
 Contact &Contact::operator =(const Contact &_contact)
 {
   this->collision1 = _contact.collision1;

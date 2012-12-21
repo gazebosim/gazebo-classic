@@ -40,7 +40,10 @@ namespace gazebo
     class CallbackHelper
     {
       /// \brief Constructor
-      public: CallbackHelper() : latching(false) {}
+      /// \param[in] _latching Set to true to make the callback helper
+      /// latching.
+      public: CallbackHelper(bool _latching = false) : latching(_latching) {}
+
       /// \brief Destructor
       public: virtual ~CallbackHelper() {}
 
@@ -65,6 +68,9 @@ namespace gazebo
       /// \return true if the callback is latching, false otherwise
       public: bool GetLatching() const
               {return this->latching;}
+
+      /// \brief True means that the callback helper will get the last
+      /// published message on the topic.
       protected: bool latching;
     };
 
@@ -79,8 +85,12 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
+      /// \param[in] _latching Set to true to make the callback helper
+      /// latching.
       public: CallbackHelperT(const boost::function<
-                void (const boost::shared_ptr<M const> &)> &_cb) : callback(_cb)
+                void (const boost::shared_ptr<M const> &)> &_cb,
+                bool _latching = false)
+              : CallbackHelper(_latching), callback(_cb)
               {
                 // Just some code to make sure we have a google protobuf.
                 /*M test;
@@ -121,34 +131,33 @@ namespace gazebo
                callback;
     };
 
-    /// \class DebugCallbackHelper CallbackHelper.hh transport/transport.hh
-    /// \brief CallbackHelper subclass with debug facilities
-    class DebugCallbackHelper : public CallbackHelper
+    /// \class RawCallbackHelper RawCallbackHelper.hh transport/transport.hh
+    /// \brief Used to connect publishers to subscribers, where the
+    /// subscriber wants the raw data from the publisher. Raw means that the
+    /// data has not been converted into a protobuf message.
+    class RawCallbackHelper : public CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
-      public: DebugCallbackHelper(
-                  const boost::function<void (ConstGzStringPtr &)> &_cb)
-              : callback(_cb)
+      /// \param[in] _latching Set to true to make the callback helper
+      /// latching.
+      public: RawCallbackHelper(
+                  const boost::function<void (const std::string &)> &_cb,
+                  bool _latching = false)
+              : CallbackHelper(_latching), callback(_cb)
               {
               }
 
       // documentation inherited
       public: std::string GetMsgType() const
               {
-                msgs::GzString m;
-                return m.GetTypeName();
+                return "raw";
               }
 
       // documentation inherited
       public: virtual bool HandleData(const std::string &_newdata)
               {
-                msgs::Packet packet;
-                packet.ParseFromString(_newdata);
-
-                boost::shared_ptr<msgs::GzString> m(new msgs::GzString);
-                m->ParseFromString(_newdata);
-                this->callback(m);
+                this->callback(_newdata);
                 return true;
               }
 
@@ -158,8 +167,7 @@ namespace gazebo
                 return true;
               }
 
-      private: boost::function<void (boost::shared_ptr<msgs::GzString> &)>
-               callback;
+      private: boost::function<void (const std::string &)> callback;
     };
     /// \}
   }

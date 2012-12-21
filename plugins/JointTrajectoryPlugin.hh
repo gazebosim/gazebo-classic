@@ -15,9 +15,8 @@
  *
 */
 /*
- * Desc: 3D position interface.
- * Author: Sachin Chitta and John Hsu
- * Date: 10 June 2008
+ * Desc: a test for setting joint angles
+ * Author: John Hsu
  */
 #ifndef GAZEBO_JOINT_TRAJECTORY_PLUGIN_HH
 #define GAZEBO_JOINT_TRAJECTORY_PLUGIN_HH
