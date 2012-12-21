@@ -40,6 +40,8 @@ namespace gazebo
 
       private slots: void OnFinish();
 
+      private: QLineEdit* modelNameLineEdit;
+
       private: QLineEdit* modelLocationLineEdit;
    };
  }

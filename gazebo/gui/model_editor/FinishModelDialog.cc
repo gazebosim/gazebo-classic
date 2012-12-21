@@ -34,11 +34,11 @@ FinishModelDialog::FinishModelDialog(QWidget *_parent)
 
   QLabel *modelLabel = new QLabel;
   modelLabel->setText(tr("Name"));
-  QLineEdit* modelNameLineEdit = new QLineEdit;
-  modelNameLineEdit->setPlaceholderText(tr("MyNamedModel.sdf"));
+  this->modelNameLineEdit = new QLineEdit;
+  this->modelNameLineEdit->setPlaceholderText(tr("MyNamedModel.sdf"));
   QLabel *modelLocation = new QLabel;
   modelLocation->setText(tr("Location"));
-  modelLocationLineEdit = new QLineEdit;
+  this->modelLocationLineEdit = new QLineEdit;
   this->modelLocationLineEdit->setPlaceholderText(tr(""));
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
@@ -82,7 +82,7 @@ FinishModelDialog::~FinishModelDialog()
 /////////////////////////////////////////////////
 std::string FinishModelDialog::GetModelName()
 {
-  return modelLocationLineEdit->text().toStdString();
+  return this->modelNameLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////

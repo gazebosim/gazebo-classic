@@ -315,7 +315,7 @@ std::string BuildingMaker::CreateModel(math::Pose _pose)
   this->modelPose = _pose;
   this->modelName = this->node->GetTopicNamespace() + "::" + "building";
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  this->modelVisual.reset(new rendering::Visual(modelName,
+  this->modelVisual.reset(new rendering::Visual(this->modelName,
                           scene->GetWorldVisual()));
   this->modelVisual->Load();
   this->modelVisual->SetPose(modelPose);
@@ -354,7 +354,7 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
   this->visuals.push_back(linkVisual);
 
   std::ostringstream visualName;
-  visualName << modelName << "::" << linkName << "::Visual_"
+  visualName << this->modelName << "::" << linkName << "::Visual_"
     << this->walls.size();
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
@@ -405,7 +405,7 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
   this->visuals.push_back(linkVisual);
 
   std::ostringstream visualName;
-  visualName << modelName << "::" << linkName << "::Visual_"
+  visualName << this->modelName << "::" << linkName << "::Visual_"
     << this->windows.size();
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
@@ -457,7 +457,7 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
   this->visuals.push_back(linkVisual);
 
   std::ostringstream visualName;
-  visualName << modelName << "::" << linkName << "::Visual_"
+  visualName << this->modelName << "::" << linkName << "::Visual_"
     << this->stairs.size();
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
@@ -551,7 +551,6 @@ void BuildingMaker::Start(const rendering::UserCameraPtr _camera)
 /////////////////////////////////////////////////
 void BuildingMaker::Stop()
 {
-
 //  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 //  scene->RemoveVisual(this->modelVisual);
 //  this->modelVisual.reset();
