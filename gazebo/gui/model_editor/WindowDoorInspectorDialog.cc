@@ -15,8 +15,7 @@
  *
 */
 
-#include "math/Vector2d.hh"
-#include "WindowDoorInspectorDialog.hh"
+#include "gui/model_editor/WindowDoorInspectorDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -164,8 +163,6 @@ double WindowDoorInspectorDialog::GetHeight()
 /////////////////////////////////////////////////
 QPointF WindowDoorInspectorDialog::GetPosition()
 {
-//  return math::Vector2d(this->positionXSpinBox->value(),
-//      this->positionYSpinBox->value());
   return QPointF(this->positionXSpinBox->value(),
       this->positionYSpinBox->value());
 }

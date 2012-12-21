@@ -18,7 +18,6 @@
 #ifndef _WINDOW_DOOR_INSPECTOR_DIALOG_HH_
 #define _WINDOW_DOOR_INSPECTOR_DIALOG_HH_
 
-//#include "math/Vector2d.hh"
 #include "gui/qt.h"
 
 namespace gazebo

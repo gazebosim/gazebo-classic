@@ -15,15 +15,16 @@
  *
 */
 
-#include "BuildingEditorWidget.hh"
-#include "GridLines.hh"
-#include "EditorView.hh"
-#include "EditorItem.hh"
-#include "RectItem.hh"
-#include "WindowItem.hh"
-#include "DoorItem.hh"
-#include "PolylineItem.hh"
-#include "WallItem.hh"
+#include "gui/model_editor/BuildingEditorWidget.hh"
+#include "gui/model_editor/GridLines.hh"
+#include "gui/model_editor/EditorView.hh"
+#include "gui/model_editor/EditorItem.hh"
+#include "gui/model_editor/RectItem.hh"
+#include "gui/model_editor/WindowItem.hh"
+#include "gui/model_editor/DoorItem.hh"
+#include "gui/model_editor/PolylineItem.hh"
+#include "gui/model_editor/WallItem.hh"
+#include "gui/model_editor/LevelWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -56,7 +57,7 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   view->centerOn(QPointF(0, 0));
   view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
-  WallItem *lineItem = new WallItem(QPointF(0, 0), QPointF(-100, 100));
+/*  WallItem *lineItem = new WallItem(QPointF(0, 0), QPointF(-100, 100));
   scene->addItem(lineItem);
 
   WindowItem *windowItem = new WindowItem();
@@ -65,11 +66,16 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
 
   DoorItem *doorItem = new DoorItem();
   doorItem->setPos(0,0);
-  scene->addItem(doorItem);
+  scene->addItem(doorItem);*/
+
+  LevelWidget *levelWidget = new LevelWidget(this);
+  levelWidget->resize(140,50);
+//  QGraphicsProxyWidget* proxyWidget = scene->addWidget(levelWidget);
+//  proxyWidget->setFlag(QGraphicsItem::ItemIgnoresTransformations);
+//  proxyWidget->setPos(QPointF(-levelWidget->width() / 2, 0));
 
   canvasLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(canvasLayout);
-
 }
 
 /////////////////////////////////////////////////
