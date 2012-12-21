@@ -39,7 +39,8 @@ google::protobuf::Message *MsgFactory::NewMsg(const std::string &_msgType)
 
   // Create a new message if a MsgFactoryFn has been assigned to the message
   // type
-  if ((*msgMap)[_msgType])
+
+  if (msgMap->find(_msgType) != msgMap->end())
     msg = ((*msgMap)[_msgType]) ();
 
   return msg;

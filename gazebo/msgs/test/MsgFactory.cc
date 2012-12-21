@@ -46,7 +46,7 @@ std::string custom_exec(const std::string &_cmd)
 
 /////////////////////////////////////////////////
 /// Check for null when asked for a bad message type
-TEST(msgs_MsgFactory, BadMsgType)
+TEST(MsgFactory, BadMsgType)
 {
   google::protobuf::Message *msg = gazebo::msgs::MsgFactory::NewMsg("bad");
   EXPECT_EQ(NULL, msg);
@@ -54,7 +54,7 @@ TEST(msgs_MsgFactory, BadMsgType)
 
 /////////////////////////////////////////////////
 /// Check to make sure that NewMsg works properly
-TEST(msgs_MsgFactory, NewMsg)
+TEST(MsgFactory, NewMsg)
 {
   gazebo::msgs::Vector3d goodMsg;
   goodMsg.set_x(1.1);
@@ -75,7 +75,7 @@ TEST(msgs_MsgFactory, NewMsg)
 
 /////////////////////////////////////////////////
 /// Check to make sure that all the proto files have been registered
-TEST(msgs_MsgFactory, AllTypes)
+TEST(MsgFactory, AllTypes)
 {
   std::vector<std::string> types;
   gazebo::msgs::MsgFactory::GetMsgTypes(types);
