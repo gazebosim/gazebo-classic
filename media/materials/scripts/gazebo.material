@@ -738,6 +738,26 @@ material Gazebo/CloudySky
 	}
 }
 
+material Gazebo/WarningWall
+{
+	technique
+	{
+		pass
+		{
+			ambient 1.0 1.0 1.0 1.0
+			diffuse 1.0 1.0 1.0 1.0
+			specular 0.1 0.1 0.1 1.0 0.5
+
+			texture_unit
+			{
+				texture warning_wall.png
+				filtering trilinear
+			}
+		}
+	}
+}
+
+
 material Gazebo/WoodPallet
 {
 	technique

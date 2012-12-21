@@ -27,6 +27,7 @@ set (files
   willowMap.png
   wood.jpg
   WoodPallet.png
+  warning_wall.png
 )
 
 
