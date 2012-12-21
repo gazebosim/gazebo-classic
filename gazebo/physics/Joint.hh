@@ -99,6 +99,16 @@ namespace gazebo
       public: void Load(LinkPtr _parent, LinkPtr _child,
                         const math::Pose &_pose);
 
+      /// \brief Set parent and child links of a physics::Joint and its
+      /// anchor offset position.
+      /// This funciton is deprecated, use
+      /// Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
+      /// \param[in] _parent Parent link.
+      /// \param[in] _child Child link.
+      /// \param[in] _pos Joint Anchor offset from child link.
+      public: void Load(LinkPtr _parent, LinkPtr _child,
+                        const math::Vector3 &_pos); GAZEBO_DEPRECATED;
+
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf);
@@ -341,6 +351,11 @@ namespace gazebo
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.
       private: void LoadImpl(const math::Pose &_pose);
+
+      /// \brief Helper function to load a joint.
+      /// This function is deprecated, use LoadImpl(math::Pose &)
+      /// \param[in] _pos Position of the anchor.
+      private: void LoadImpl(const math::Vector3 &_pos) GAZEBO_DEPRECATED;
 
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;

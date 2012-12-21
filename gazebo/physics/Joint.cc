@@ -50,6 +50,11 @@ Joint::~Joint()
 }
 
 //////////////////////////////////////////////////
+void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos)
+{
+  this->Load(_parent, _child, math::Pose(_pos, math::Quaternion()));
+}
+
 //////////////////////////////////////////////////
 void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 {
@@ -100,6 +105,12 @@ void Joint::Load(sdf::ElementPtr _sdf)
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
   this->LoadImpl(_sdf->GetValuePose("pose"));
+}
+
+/////////////////////////////////////////////////
+void Joint::LoadImpl(const math::Vector3 &_pos)
+{
+  this->LoadImpl(math::Pose(_pos, math::Quaternion()));
 }
 
 /////////////////////////////////////////////////
