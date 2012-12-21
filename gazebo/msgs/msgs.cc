@@ -501,19 +501,8 @@ namespace gazebo
           msgs::Set(geomMsg->mutable_mesh()->mutable_scale(),
               geomElem->GetValueVector3("scale"));
 
-          // The if clause is used to detect instances of "filename" with
-          // the sdf. Eventually this code will be deprecated as people
-          // switch to using uris.
-          if (geomElem->GetValueString("filename") != "__default__")
-          {
-            geomMsg->mutable_mesh()->set_filename(
-                common::find_file(geomElem->GetValueString("filename")));
-          }
-          else
-          {
-            geomMsg->mutable_mesh()->set_filename(
-                geomElem->GetValueString("uri"));
-          }
+          geomMsg->mutable_mesh()->set_filename(
+              geomElem->GetValueString("uri"));
         }
         else if (geomElem->GetName() == "empty")
         {
