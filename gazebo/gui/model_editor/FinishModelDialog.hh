@@ -32,6 +32,8 @@ namespace gazebo
 
       public: ~FinishModelDialog();
 
+      public: std::string GetModelName();
+
       private slots: void OnBrowse();
 
       private slots: void OnCancel();

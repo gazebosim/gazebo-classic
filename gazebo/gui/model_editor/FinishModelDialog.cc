@@ -80,6 +80,12 @@ FinishModelDialog::~FinishModelDialog()
 }
 
 /////////////////////////////////////////////////
+std::string FinishModelDialog::GetModelName()
+{
+  return modelLocationLineEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
 void FinishModelDialog::OnBrowse()
 {
   QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
@@ -96,6 +102,5 @@ void FinishModelDialog::OnCancel()
 /////////////////////////////////////////////////
 void FinishModelDialog::OnFinish()
 {
-  /// TODO:
   this->accept();
 }

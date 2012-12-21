@@ -49,7 +49,6 @@ double BuildingMaker::conversionScale;
 /////////////////////////////////////////////////
 ModelManip::ModelManip()
 {
-//  this->transformOrigin = math::Pose(0, 0, 0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
@@ -58,9 +57,21 @@ ModelManip::~ModelManip()
 }
 
 /////////////////////////////////////////////////
+void ModelManip::SetName(std::string _name)
+{
+  this->name = _name;
+}
+
+/////////////////////////////////////////////////
 void ModelManip::SetVisual(rendering::VisualPtr _visual)
 {
   this->visual = _visual;
+}
+
+/////////////////////////////////////////////////
+std::string ModelManip::GetName()
+{
+  return this->name;
 }
 
 /////////////////////////////////////////////////
@@ -252,6 +263,8 @@ void ModelManip::SetSize(double _width, double _depth, double _height)
   gui::Events::ConnectSetBuildingPartSize(
     boost::bind(&BuildingMaker::OnSetBuildingPartSize, this, _1, _2)));*/
 
+  this->modelName = "Building Model";
+
   this->boxMaker = new BoxMaker;
 
   this->conversionScale = 0.01;
@@ -342,7 +355,9 @@ std::string BuildingMaker::AddPart(std::string _type, QVector3D _size,
 std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
     double _angle)
 {
-  std::string linkName = "Wall";
+  std::ostringstream linkNameStream;
+  linkNameStream << "Wall_" << this->walls.size();
+  std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
         linkName, this->modelVisual));
@@ -373,6 +388,7 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
         this->visuals.push_back(visVisual);
         ModelManip *wallManip = new ModelManip();
         math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+        wallManip->SetName(linkName);
         wallManip->SetVisual(visVisual);
         visVisual->SetScale(scaledSize);
         visVisual->SetPosition(math::Vector3(scaledSize.x/2.0, 0, 0));
@@ -390,7 +406,9 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
 std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
     double _angle)
 {
-  std::string linkName = "Window";
+  std::ostringstream linkNameStream;
+  linkNameStream << "Window_" << this->windows.size();
+  std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
         linkName, this->modelVisual));
@@ -422,6 +440,7 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
         this->visuals.push_back(visVisual);
 
         ModelManip *windowManip = new ModelManip();
+        windowManip->SetName(linkName);
         windowManip->SetVisual(visVisual);
         math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
         visVisual->SetScale(scaledSize);
@@ -435,13 +454,13 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
   return visualName.str();
 }
 
-
-
 /////////////////////////////////////////////////
 std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
     double _angle, int _steps)
 {
-  std::string linkName = "Stairs";
+  std::ostringstream linkNameStream;
+  linkNameStream << "Stairs_" << this->walls.size();
+  std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
         linkName, this->modelVisual));
@@ -472,9 +491,8 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
         visVisual->DetachObjects();
         this->visuals.push_back(visVisual);
 
-
-
         ModelManip *stairsManip = new ModelManip();
+        stairsManip->SetName(linkName);
         stairsManip->SetVisual(visVisual);
         math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
         visVisual->SetScale(scaledSize);
@@ -482,8 +500,6 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
         math::Vector3 offset = scaledSize/2.0;
         offset.y = -offset.y;
         visVisual->SetPosition(offset);
-//        qDebug() << " scale " << visVisual->GetScale().x << visVisual->GetScale().y << visVisual->GetScale().z;
-//        visVisual->SetPosition(math::Vector3(scaledSize.x/2, scaledSize.y/2, 0));
         stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
         this->allItems[visualName.str()] = stairsManip;
         this->stairs[visualName.str()] = stairsManip;
@@ -515,6 +531,7 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
       }
     }
   }
+  GenerateSDF();
   return visualName.str();
 }
 
@@ -546,6 +563,12 @@ void BuildingMaker::Start(const rendering::UserCameraPtr _camera)
 /////////////////////////////////////////////////
 void BuildingMaker::Stop()
 {
+
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  scene->RemoveVisual(this->modelVisual);
+  this->modelVisual.reset();
+  this->visuals.clear();
+  this->modelSDF.reset();
 }
 
 /////////////////////////////////////////////////
@@ -555,8 +578,167 @@ bool BuildingMaker::IsActive() const
 }
 
 /////////////////////////////////////////////////
+void BuildingMaker::SetModelName(std::string _modelName)
+{
+  this->modelName = _modelName;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::FinishModel()
+{
+  this->CreateTheEntity();
+  this->Stop();
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::GenerateSDF()
+{
+  std::string boxString = this->boxMaker->GetSDFString();
+
+  qDebug() << "Generate SDF ";
+
+
+
+  sdf::ElementPtr modelElem;
+  sdf::ElementPtr linkElem;
+  sdf::ElementPtr visualElem;
+  sdf::ElementPtr collisionElem;
+
+  //sdf::SDF sdf;
+  this->modelSDF.reset(new sdf::SDF);
+  sdf::initFile("root.sdf", this->modelSDF);
+  sdf::readString(boxString, this->modelSDF);
+
+qDebug() <<  this->modelSDF->ToString().c_str();
+//  qDebug() << "New SDF ";
+
+  if (this->modelSDF->root->HasElement("model"))
+  {
+    modelElem = this->modelSDF->root->GetElement("model");
+    if (modelElem->HasElement("link"))
+    {
+      linkElem = modelElem->GetElement("link");
+      if (linkElem->HasElement("visual"))
+      {
+        visualElem = linkElem->GetElement("visual");
+//        visVisual->Load(visualElem);
+      }
+      if (linkElem->HasElement("collision"))
+      {
+        collisionElem = linkElem->GetElement("collision");
+//        visVisual->Load(visualElem);
+      }
+    }
+  }
+
+  sdf::ElementPtr templateLinkElem = linkElem->Clone();
+  sdf::ElementPtr templateVisualElem = templateLinkElem->GetElement(
+      "visual")->Clone();
+  sdf::ElementPtr templateCollisionElem = templateLinkElem->GetElement(
+      "collision")->Clone();
+  modelElem->ClearElements();
+  std::stringstream visualNameStream;
+  std::stringstream collisionNameStream;
+
+  modelElem->GetAttribute("name")->Set(this->modelName);
+
+  std::map<std::string, ModelManip *>::iterator itemsIt;
+  for(itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
+      itemsIt++) {
+
+    visualNameStream.str("");
+    collisionNameStream.str("");
+
+    ModelManip *modelManip = itemsIt->second;
+    rendering::VisualPtr visual = modelManip->GetVisual();
+
+    sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
+    visualElem = newLinkElem->GetElement("visual");
+    collisionElem = newLinkElem->GetElement("collision");
+
+    newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
+
+    if (!newLinkElem->HasElement("pose"))
+      newLinkElem->AddElement("pose");
+    newLinkElem->GetElement("pose")->Set(
+        visual->GetParent()->GetWorldPose());
+
+    if (visual->GetChildCount() > 0)
+    {
+      newLinkElem->ClearElements();
+      for (unsigned int i = 0; i< visual->GetChildCount(); ++i)
+      {
+        visualNameStream.str("");
+        collisionNameStream.str("");
+        visualElem = templateVisualElem->Clone();
+        collisionElem = templateCollisionElem->Clone();
+        visualNameStream << modelManip->GetName() << "_Visual_" << i;
+        visualElem->GetAttribute("name")->Set(visualNameStream.str());
+        collisionNameStream << modelManip->GetName() << "_Collision_" << i;
+        collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
+
+        rendering::VisualPtr childVisual = visual->GetChild(i);
+        if (!visualElem->HasElement("pose"))
+          visualElem->AddElement("pose");
+        math::Pose newPose(visual->GetPosition()
+            + childVisual->GetPosition()/(childVisual->GetScale()*visual->GetScale()),
+            visual->GetRotation()*childVisual->GetRotation());
+        visualElem->GetElement("pose")->Set(newPose);
+
+        if (!collisionElem->HasElement("pose"))
+          collisionElem->AddElement("pose");
+        collisionElem->GetElement("pose")->Set(newPose);
+
+        visualElem->GetElement("geometry")->GetElement("box")->
+          GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
+        collisionElem->GetElement("geometry")->GetElement("box")->
+          GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
+
+        newLinkElem->InsertElement(visualElem);
+        newLinkElem->InsertElement(collisionElem);
+      }
+    }
+    else
+      {
+      visualElem->GetAttribute("name")->Set(modelManip->GetName() + "_Visual");
+      collisionElem->GetAttribute("name")->Set(modelManip->GetName()
+          + "_Collision");
+
+      if (!visualElem->HasElement("pose"))
+        visualElem->AddElement("pose");
+      visualElem->GetElement("pose")->Set(visual->GetPose());
+
+      if (!collisionElem->HasElement("pose"))
+        collisionElem->AddElement("pose");
+      collisionElem->GetElement("pose")->Set(visual->GetPose());
+
+      visualElem->GetElement("geometry")->GetElement("box")->
+          GetElement("size")->Set(visual->GetScale());
+
+      collisionElem->GetElement("geometry")->GetElement("box")->
+          GetElement("size")->Set(visual->GetScale());
+    }
+    modelElem->InsertElement(newLinkElem);
+  }
+
+
+
+//  this->modelSDF->Update();
+  qDebug() << " new model ";
+  qDebug() << this->modelSDF->ToString().c_str();
+}
+
+/////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
+
+  this->GenerateSDF();
+
+  msgs::Factory msg;
+  msg.set_sdf(this->modelSDF->ToString());
+
+  this->makerPub->Publish(msg);
+
   /*msgs::Factory msg;
   if (!this->clone)
   {

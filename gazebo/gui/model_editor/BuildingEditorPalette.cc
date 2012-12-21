@@ -232,5 +232,8 @@ void BuildingEditorPalette::OnSave()
 void BuildingEditorPalette::OnFinish()
 {
   FinishModelDialog dialog(this);
-  dialog.exec();
+  if (dialog.exec() == QDialog::Accepted)
+  {
+    gui::Events::finishModel(dialog.GetModelName());
+  }
 }

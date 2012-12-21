@@ -61,6 +61,8 @@ namespace gazebo
 
       private: void OnCreateEditorItem(const std::string &_type);
 
+      private: void OnFinishModel(const std::string &_modelName);
+
       private: void OnAddLevel();
 
       private: void OnLevelChanged(int _level);

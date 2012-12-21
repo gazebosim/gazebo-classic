@@ -45,6 +45,10 @@ EditorView::EditorView(QWidget *_parent)
   gui::Events::ConnectCreateEditorItem(
     boost::bind(&EditorView::OnCreateEditorItem, this, _1)));
 
+  this->connections.push_back(
+  gui::Events::ConnectFinishModel(
+    boost::bind(&EditorView::OnFinishModel, this, _1)));
+
   buildingMaker = new BuildingMaker();
 }
 
@@ -309,6 +313,16 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
     this->scene()->removeItem(this->currentMouseItem);
     this->currentMouseItem = NULL;
     this->drawInProgress = false;
+  }
+}
+
+/////////////////////////////////////////////////
+void EditorView::OnFinishModel(const std::string &_modelName)
+{
+  if (this->buildingMaker)
+  {
+    this->buildingMaker->SetModelName(_modelName);
+    this->buildingMaker->FinishModel();
   }
 }
 

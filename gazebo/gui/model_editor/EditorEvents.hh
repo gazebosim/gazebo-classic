@@ -42,8 +42,20 @@ namespace gazebo
                   event::ConnectionPtr _subscriber)
               { createEditorItem.Disconnect(_subscriber); }
 
+      public: template<typename T>
+              static event::ConnectionPtr ConnectFinishModel(T _subscriber)
+              { return finishModel.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot to the create editor item signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectFinishModel(
+                  event::ConnectionPtr _subscriber)
+              { finishModel.Disconnect(_subscriber); }
+
       /// \brief An editor item has been created
       public: static event::EventT<void (std::string)> createEditorItem;
+
+      /// \brief A model is to be created
+      public: static event::EventT<void (std::string)> finishModel;
 
 /*      public: template<typename T>
               static event::ConnectionPtr ConnectCreateBuildingPart(T _subscriber)

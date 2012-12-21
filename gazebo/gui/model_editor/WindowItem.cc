@@ -86,7 +86,7 @@ double WindowItem::GetSceneRotation()
 
 /////////////////////////////////////////////////
 void WindowItem::paint(QPainter *_painter,
-    const QStyleOptionGraphicsItem *_option, QWidget *_widget)
+    const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
   QPointF topLeft(this->drawingOriginX, this->drawingOriginY);
   QPointF topRight(this->drawingWidth, this->drawingOriginY);

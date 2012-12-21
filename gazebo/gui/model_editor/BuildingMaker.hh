@@ -47,7 +47,11 @@ namespace gazebo
 
       public: ~ModelManip();
 
+      public: void SetName(std::string _name);
+
       public: void SetVisual(rendering::VisualPtr _visual);
+
+      public: std::string GetName();
 
       public: rendering::VisualPtr GetVisual();
 
@@ -85,6 +89,8 @@ namespace gazebo
 
       private slots: void OnYawChanged(double _yaw);
 
+      private: std::string name;
+
       private: rendering::VisualPtr visual;
 
       private: math::Vector3 size;
@@ -101,6 +107,10 @@ namespace gazebo
       public: virtual ~BuildingMaker();
 
       public: std::string MakeModel(math::Pose _pose);
+
+      public: void SetModelName(std::string _modelName);
+
+      public: void FinishModel();
 
       public: std::string AddPart(std::string _type, QVector3D _size,
           QVector3D _pos, double _angle);
@@ -150,6 +160,8 @@ namespace gazebo
 
       /// \brief Internal init function.
       private: bool Init();
+
+      private: void GenerateSDF();
 
       private: virtual void CreateTheEntity();
 
