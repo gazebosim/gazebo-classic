@@ -18,6 +18,7 @@
 #define _TEXTVIEW_HH_
 
 #include <string>
+#include <boost/thread/mutex.hpp>
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -52,8 +53,26 @@ namespace gazebo
       /// \param[in] _msg New text message.
       private: void OnText(const std::string &_msg);
 
+      /// \brief QT callback when the buffer spin box has been changed.
+      /// \param[in] _value New value of the spin box.
+      private slots: void OnBuffer(int _value);
+
+      /// \brief QT callback when the pause check box has been changed.
+      /// \param[in] _value New value of the check box.
+      private slots: void OnPause(bool _value);
+
       /// \brief A scolling list of text data.
-      private: QListView *textView;
+      private: QListWidget *msgList;
+
+      /// \brief Size of the text buffer. The size is the number of
+      /// messages.
+      private: int bufferSize;
+
+      /// \brief The protobuf message used to decode incoming message data.
+      private: google::protobuf::Message *msg;
+      private: boost::mutex mutex;
+
+      private: bool paused;
     };
   }
 }

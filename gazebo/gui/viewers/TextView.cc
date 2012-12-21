@@ -30,13 +30,35 @@ TextView::TextView(const std::string &_msgType)
 {
   this->setWindowTitle(tr("Gazebo: Text View"));
 
+  this->bufferSize = 10;
+  this->paused = false;
+
   // Create the text list
   // {
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  this->textView = new QListView();
+  this->msgList = new QListWidget();
 
-  frameLayout->addWidget(this->textView);
+  QHBoxLayout *controlLayout = new QHBoxLayout;
+
+  QSpinBox *bufferSpin = new QSpinBox();
+  bufferSpin->setMinimum(1);
+  bufferSpin->setValue(this->bufferSize);
+  connect(bufferSpin, SIGNAL(valueChanged(int)), this, SLOT(OnBuffer(int)));
+
+  controlLayout->addWidget(new QLabel(tr("Buffer: ")));
+  controlLayout->addWidget(bufferSpin);
+
+  QCheckBox *pauseCheck = new QCheckBox();
+  pauseCheck->setChecked(this->paused);
+  connect(pauseCheck, SIGNAL(clicked(bool)), this, SLOT(OnPause(bool)));
+
+  controlLayout->addWidget(new QLabel(tr("Pause: ")));
+  controlLayout->addWidget(pauseCheck);
+
+  frameLayout->addWidget(this->msgList);
+  frameLayout->addLayout(controlLayout);
+
   this->frame->setObjectName("blackBorderFrame");
   this->frame->setLayout(frameLayout);
   // }
@@ -58,25 +80,67 @@ void TextView::SetTopic(const std::string &_topicName)
 {
   TopicView::SetTopic(_topicName);
 
-  // Subscribe to the new topic.
-  this->sub.reset();
-  this->sub = this->node->Subscribe(_topicName, &TextView::OnText, this);
+  this->msg = msgs::MsgFactory::NewMsg(this->msgTypeName);
+
+  this->msgList->clear();
+
+  // Subscribe to the new topic if we have generated an appropriate message
+  if (this->msg)
+  {
+    this->sub.reset();
+    this->sub = this->node->Subscribe(_topicName, &TextView::OnText, this);
+  }
+  else
+  {
+    this->msgList->addItem(new QListWidgetItem(QString::fromStdString(
+          std::string("Unable to parse message of type[") +
+          this->msgTypeName + "]")));
+  }
 }
 
 /////////////////////////////////////////////////
 void TextView::OnText(const std::string &_msg)
 {
-  // Update the Hz and Bandwidth info
+  if (this->paused)
+    return;
+
+  // Update the Hz and Bandwidth info.
   this->OnMsg(common::Time::GetWallTime(), _msg.size());
 
-  google::protobuf::Message *msg = msgs::MsgFactory::NewMsg(this->msgTypeName);
-  if (msg)
-  {
-    msg->ParseFromString(_msg);
-    std::cout << msg->DebugString() << "\n";
-  }
-  else
-    gzerr << "Unable to parse message of type[" << this->msgTypeName << "]\n";
+  // Convert the raw data to a message.
+  msg->ParseFromString(_msg);
 
-  // Add the new text to the output view.
+  {
+    boost::mutex::scoped_lock lock(this->mutex);
+
+    // Create a new list item.
+    QListWidgetItem *item = new QListWidgetItem(
+        QString::fromStdString(msg->DebugString()));
+
+    // Add the new text to the output view.
+    this->msgList->addItem(item);
+
+    // Remove items if the list is too long.
+    while (this->msgList->count() > this->bufferSize)
+      delete this->msgList->takeItem(0);
+  }
+}
+
+/////////////////////////////////////////////////
+void TextView::OnPause(bool _value)
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+  this->paused = _value;
+}
+
+/////////////////////////////////////////////////
+void TextView::OnBuffer(int _value)
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+
+  this->bufferSize = _value;
+
+  // Remove and item if the list is too long.
+  while (this->msgList->count() > this->bufferSize)
+    delete this->msgList->takeItem(0);
 }
