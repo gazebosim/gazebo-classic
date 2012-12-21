@@ -397,11 +397,10 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
 //
 void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
 {
-  boost::mutex::scoped_lock lock(*this->GetWorld()->GetSetWorldPoseMutex());
-
-  math::Pose oldPose = this->worldPose;
-  (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
-
+  {
+    boost::mutex::scoped_lock lock(*this->GetWorld()->GetSetWorldPoseMutex());
+    (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
+  }
   if (_publish)
     this->PublishPose();
 }

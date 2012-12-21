@@ -67,7 +67,7 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos)
 
   this->parentLink = _parent;
   this->childLink = _child;
-  this->anchorPos = _pos;
+  this->LoadImpl(_pos);
 }
 
 //////////////////////////////////////////////////
@@ -104,19 +104,11 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  /// \todo: FIXME either element pose need to be converted to xyz because
-  /// that's all we use here, or we need to use the rotational part
-  /// of pose.  But rotational part of the pose is redundanct with
-  /// specification of <axis> for joints, it just adds complexity,
-  /// so we should make <pose> a <position>.
-  if (_sdf->HasElement("pose"))
-    this->anchorPos = _sdf->GetValuePose("pose").pos;
-
-  // this->LoadImpl( _sdf->GetValuePose("pose"));
+  this->LoadImpl(_sdf->GetValuePose("pose").pos);
 }
 
 /////////////////////////////////////////////////
-void Joint::LoadImpl(const math::Pose &_pose)
+void Joint::LoadImpl(const math::Vector3 &_pos)
 {
   BasePtr myBase = shared_from_this();
 
@@ -124,14 +116,17 @@ void Joint::LoadImpl(const math::Pose &_pose)
     this->parentLink->AddChildJoint(boost::shared_static_cast<Joint>(myBase));
   this->childLink->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
 
-  /// \todo: FIXME either convert _pose to Vector3 because
-  /// that's all we use here, or we need to use the rotational part
-  /// of _pose.
   // setting anchor relative to gazebo link frame pose
   if (this->childLink)
-    this->anchorPos = (_pose + this->childLink->GetWorldPose()).pos;
+    this->anchorPos = _pos;
   else
     this->anchorPos = math::Vector3(0, 0, 0);
+}
+
+/////////////////////////////////////////////////
+void Joint::LoadImpl(const math::Pose &_pose)
+{
+  this->LoadImpl(_pose.pos);
 }
 
 //////////////////////////////////////////////////
