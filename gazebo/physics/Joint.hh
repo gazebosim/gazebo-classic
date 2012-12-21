@@ -347,8 +347,13 @@ namespace gazebo
       protected: virtual math::Angle GetAngleImpl(int _index) const = 0;
 
       /// \brief Helper function to load a joint.
+      /// Deprecated, use LoadImpl(math::Vector3)
       /// \param[in] _pose Pose of the anchor.
       private: void LoadImpl(const math::Pose &_pose) GAZEBO_DEPRECATED;
+
+      /// \brief Helper function to load a joint.
+      /// \param[in] _pose Pose of the anchor.
+      private: void LoadImpl(const math::Vector3 &_pos);
 
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;
