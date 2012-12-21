@@ -75,6 +75,8 @@ namespace gazebo
       private slots: void OnPoseOriginTransformed(double _x, double _y,
           double _z, double _roll, double _pitch, double _yaw);
 
+      private slots: void OnPositionChanged(double _x, double _y, double _z);
+
       private slots: void OnWidthChanged(double _width);
 
       private slots: void OnHeightChanged(double _height);
@@ -105,8 +107,6 @@ namespace gazebo
       public: BuildingMaker();
 
       public: virtual ~BuildingMaker();
-
-      public: std::string MakeModel(math::Pose _pose);
 
       public: void SetModelName(std::string _modelName);
 
@@ -161,6 +161,8 @@ namespace gazebo
       /// \brief Internal init function.
       private: bool Init();
 
+      private: std::string CreateModel(math::Pose _pose);
+
       private: void GenerateSDF();
 
       private: virtual void CreateTheEntity();
@@ -190,6 +192,8 @@ namespace gazebo
       private: rendering::VisualPtr modelVisual;
 
       private: std::list<rendering::VisualPtr> visuals;
+
+      private: math::Pose modelPose;
 
 //      private: std::vector<event::ConnectionPtr> connections;
 

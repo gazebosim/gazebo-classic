@@ -173,6 +173,6 @@ void StairsItem::StairsChanged()
   emit widthChanged(this->stairsWidth);
   emit depthChanged(this->stairsDepth);
   emit heightChanged(this->stairsHeight);
-  emit poseChanged(this->stairsPos.x(), this->stairsPos.y(),
-      this->stairsElevation, 0, 0, this->rotationAngle);
+  emit positionChanged(this->stairsPos.x(), this->stairsPos.y(),
+        this->stairsElevation);
 }

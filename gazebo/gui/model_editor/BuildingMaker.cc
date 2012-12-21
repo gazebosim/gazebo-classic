@@ -114,6 +114,17 @@ void ModelManip::OnPoseOriginTransformed(double _x, double _y, double _z,
 }
 
 /////////////////////////////////////////////////
+void ModelManip::OnPositionChanged(double _x, double _y, double _z)
+{
+  double scaledX = BuildingMaker::Convert(_x);
+  double scaledY = BuildingMaker::Convert(-_y);
+  double scaledZ = BuildingMaker::Convert(_z);
+
+  this->visual->GetParent()->SetWorldPosition(math::Vector3(
+      scaledX, scaledY, scaledZ));
+}
+
+/////////////////////////////////////////////////
 void ModelManip::OnDepthChanged(double _depth)
 {
   double scaledDepth = BuildingMaker::Convert(_depth);
@@ -251,27 +262,13 @@ void ModelManip::SetSize(double _width, double _depth, double _height)
 /////////////////////////////////////////////////
   BuildingMaker::BuildingMaker() : EntityMaker()
 {
-/*  this->connections.push_back(
-  gui::Events::ConnectCreateBuildingPart(
-    boost::bind(&BuildingMaker::OnCreateBuildingPart, this, _1)));
-
-  this->connections.push_back(
-  gui::Events::ConnectSetBuildingPartPose(
-    boost::bind(&BuildingMaker::OnSetBuildingPartPose, this, _1, _2)));
-
-  this->connections.push_back(
-  gui::Events::ConnectSetBuildingPartSize(
-    boost::bind(&BuildingMaker::OnSetBuildingPartSize, this, _1, _2)));*/
-
-  this->modelName = "Building Model";
+  this->modelName = "";
 
   this->boxMaker = new BoxMaker;
 
   this->conversionScale = 0.01;
 
-  math::Pose modelPose;
-  modelPose.Set(0, 0, 0, 0, 0, 0);
-  this->MakeModel(modelPose);
+  this->CreateModel(math::Pose(0, 0, 0, 0, 0, 0));
 }
 
 /////////////////////////////////////////////////
@@ -293,6 +290,8 @@ void BuildingMaker::ConnectItem(std::string _partName, EditorItem *_item)
   QObject::connect(_item, SIGNAL(poseOriginTransformed(double, double, double,
       double, double, double)), manip, SLOT(OnPoseOriginTransformed(double,
       double, double, double, double, double)));
+  QObject::connect(_item, SIGNAL(positionChanged(double, double, double)),
+      manip, SLOT(OnPositionChanged(double, double, double)));
 
   QObject::connect(_item, SIGNAL(widthChanged(double)),
       manip, SLOT(OnWidthChanged(double)));
@@ -308,31 +307,21 @@ void BuildingMaker::ConnectItem(std::string _partName, EditorItem *_item)
       manip, SLOT(OnPosZChanged(double)));
   QObject::connect(_item, SIGNAL(yawChanged(double)),
       manip, SLOT(OnYawChanged(double)));
-
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::MakeModel(math::Pose _pose)
+std::string BuildingMaker::CreateModel(math::Pose _pose)
 {
-  this->modelName = "";
-
-  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-
-  math::Pose modelPose;
-
-  modelPose = _pose;
-
+  this->modelPose = _pose;
   this->modelName = this->node->GetTopicNamespace() + "::" + "building";
-
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
   this->modelVisual.reset(new rendering::Visual(modelName,
                           scene->GetWorldVisual()));
   this->modelVisual->Load();
   this->modelVisual->SetPose(modelPose);
-
   this->modelName = this->modelVisual->GetName();
 
   scene->AddVisual(this->modelVisual);
-
   return modelName;
 }
 
@@ -527,7 +516,6 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
           stepVisual->SetPosition(math::Vector3(0, baseOffset.y-(run*i),
               baseOffset.z + rise*i));
         }
-
       }
     }
   }
@@ -564,10 +552,10 @@ void BuildingMaker::Start(const rendering::UserCameraPtr _camera)
 void BuildingMaker::Stop()
 {
 
-  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  scene->RemoveVisual(this->modelVisual);
-  this->modelVisual.reset();
-  this->visuals.clear();
+//  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+//  scene->RemoveVisual(this->modelVisual);
+//  this->modelVisual.reset();
+//  this->visuals.clear();
   this->modelSDF.reset();
 }
 
@@ -595,41 +583,19 @@ void BuildingMaker::GenerateSDF()
 {
   std::string boxString = this->boxMaker->GetSDFString();
 
-  qDebug() << "Generate SDF ";
-
-
-
   sdf::ElementPtr modelElem;
   sdf::ElementPtr linkElem;
   sdf::ElementPtr visualElem;
   sdf::ElementPtr collisionElem;
 
-  //sdf::SDF sdf;
   this->modelSDF.reset(new sdf::SDF);
   sdf::initFile("root.sdf", this->modelSDF);
   sdf::readString(boxString, this->modelSDF);
 
-qDebug() <<  this->modelSDF->ToString().c_str();
-//  qDebug() << "New SDF ";
+  //qDebug() <<  this->modelSDF->ToString().c_str();
 
-  if (this->modelSDF->root->HasElement("model"))
-  {
-    modelElem = this->modelSDF->root->GetElement("model");
-    if (modelElem->HasElement("link"))
-    {
-      linkElem = modelElem->GetElement("link");
-      if (linkElem->HasElement("visual"))
-      {
-        visualElem = linkElem->GetElement("visual");
-//        visVisual->Load(visualElem);
-      }
-      if (linkElem->HasElement("collision"))
-      {
-        collisionElem = linkElem->GetElement("collision");
-//        visVisual->Load(visualElem);
-      }
-    }
-  }
+  modelElem = this->modelSDF->root->GetElement("model");
+  linkElem = modelElem->GetElement("link");
 
   sdf::ElementPtr templateLinkElem = linkElem->Clone();
   sdf::ElementPtr templateVisualElem = templateLinkElem->GetElement(
@@ -644,8 +610,8 @@ qDebug() <<  this->modelSDF->ToString().c_str();
 
   std::map<std::string, ModelManip *>::iterator itemsIt;
   for(itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
-      itemsIt++) {
-
+      itemsIt++)
+  {
     visualNameStream.str("");
     collisionNameStream.str("");
 
@@ -663,43 +629,8 @@ qDebug() <<  this->modelSDF->ToString().c_str();
     newLinkElem->GetElement("pose")->Set(
         visual->GetParent()->GetWorldPose());
 
-    if (visual->GetChildCount() > 0)
+    if (visual->GetChildCount() == 0)
     {
-      newLinkElem->ClearElements();
-      for (unsigned int i = 0; i< visual->GetChildCount(); ++i)
-      {
-        visualNameStream.str("");
-        collisionNameStream.str("");
-        visualElem = templateVisualElem->Clone();
-        collisionElem = templateCollisionElem->Clone();
-        visualNameStream << modelManip->GetName() << "_Visual_" << i;
-        visualElem->GetAttribute("name")->Set(visualNameStream.str());
-        collisionNameStream << modelManip->GetName() << "_Collision_" << i;
-        collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
-
-        rendering::VisualPtr childVisual = visual->GetChild(i);
-        if (!visualElem->HasElement("pose"))
-          visualElem->AddElement("pose");
-        math::Pose newPose(visual->GetPosition()
-            + childVisual->GetPosition()/(childVisual->GetScale()*visual->GetScale()),
-            visual->GetRotation()*childVisual->GetRotation());
-        visualElem->GetElement("pose")->Set(newPose);
-
-        if (!collisionElem->HasElement("pose"))
-          collisionElem->AddElement("pose");
-        collisionElem->GetElement("pose")->Set(newPose);
-
-        visualElem->GetElement("geometry")->GetElement("box")->
-          GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
-        collisionElem->GetElement("geometry")->GetElement("box")->
-          GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
-
-        newLinkElem->InsertElement(visualElem);
-        newLinkElem->InsertElement(collisionElem);
-      }
-    }
-    else
-      {
       visualElem->GetAttribute("name")->Set(modelManip->GetName() + "_Visual");
       collisionElem->GetAttribute("name")->Set(modelManip->GetName()
           + "_Collision");
@@ -717,77 +648,61 @@ qDebug() <<  this->modelSDF->ToString().c_str();
 
       collisionElem->GetElement("geometry")->GetElement("box")->
           GetElement("size")->Set(visual->GetScale());
+
+    }
+    else
+    {
+      // TODO: This handles the special case for stairs where
+      // there are nested visuals which SDF doesn't support.
+      // Should somehow generalize/combine the code above and below
+      newLinkElem->ClearElements();
+      for (unsigned int i = 0; i< visual->GetChildCount(); ++i)
+      {
+        visualNameStream.str("");
+        collisionNameStream.str("");
+        visualElem = templateVisualElem->Clone();
+        collisionElem = templateCollisionElem->Clone();
+        visualNameStream << modelManip->GetName() << "_Visual_" << i;
+        visualElem->GetAttribute("name")->Set(visualNameStream.str());
+        collisionNameStream << modelManip->GetName() << "_Collision_" << i;
+        collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
+
+        rendering::VisualPtr childVisual = visual->GetChild(i);
+        if (!visualElem->HasElement("pose"))
+          visualElem->AddElement("pose");
+
+        math::Pose newPose(childVisual->GetWorldPose().pos,
+            visual->GetRotation());
+
+        if (!visualElem->HasElement("pose"))
+          visualElem->AddElement("pose");
+        visualElem->GetElement("pose")->Set(newPose);
+
+        if (!collisionElem->HasElement("pose"))
+          collisionElem->AddElement("pose");
+        collisionElem->GetElement("pose")->Set(newPose);
+
+        visualElem->GetElement("geometry")->GetElement("box")->
+          GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
+        collisionElem->GetElement("geometry")->GetElement("box")->
+          GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
+
+        newLinkElem->InsertElement(visualElem);
+        newLinkElem->InsertElement(collisionElem);
+      }
     }
     modelElem->InsertElement(newLinkElem);
   }
-
-
-
-//  this->modelSDF->Update();
-  qDebug() << " new model ";
-  qDebug() << this->modelSDF->ToString().c_str();
+  //qDebug() << this->modelSDF->ToString().c_str();
 }
 
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
-
   this->GenerateSDF();
-
   msgs::Factory msg;
   msg.set_sdf(this->modelSDF->ToString());
-
   this->makerPub->Publish(msg);
-
-  /*msgs::Factory msg;
-  if (!this->clone)
-  {
-    rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-    sdf::ElementPtr modelElem;
-    bool isModel = false;
-    bool isLight = false;
-    if (this->modelSDF->root->HasElement("model"))
-    {
-      modelElem = this->modelSDF->root->GetElement("model");
-      isModel = true;
-    }
-    else if (this->modelSDF->root->HasElement("light"))
-    {
-      modelElem = this->modelSDF->root->GetElement("light");
-      isLight = true;
-    }
-
-    std::string modelNameStr = modelElem->GetValueString("name");
-
-    // Automatically create a new name if the model exists
-    int i = 0;
-    while ((isModel && has_entity_name(modelNameStr)) ||
-        (isLight && scene->GetLight(modelNameStr)))
-    {
-      modelNameStr = modelElem->GetValueString("name") + "_" +
-        boost::lexical_cast<std::string>(i++);
-    }
-
-    // Remove the topic namespace from the model name. This will get re-inserted
-    // by the World automatically
-    modelNameStr.erase(0, this->node->GetTopicNamespace().size()+2);
-
-    // The the SDF model's name
-    modelElem->GetAttribute("name")->Set(modelNameStr);
-    modelElem->GetElement("pose")->Set(
-        this->modelVisual->GetWorldPose());
-
-    // Spawn the model in the physics server
-    msg.set_sdf(this->modelSDF->ToString());
-  }
-  else
-  {
-    msgs::Set(msg.mutable_pose(), this->modelVisual->GetWorldPose());
-    msg.set_clone_model_name(this->modelVisual->GetName().substr(0,
-          this->modelVisual->GetName().find("_clone_tmp")));
-  }
-
-  this->makerPub->Publish(msg);*/
 }
 
 /////////////////////////////////////////////////

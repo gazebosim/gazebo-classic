@@ -164,6 +164,6 @@ void WindowItem::WindowChanged()
   emit widthChanged(this->windowWidth);
   emit depthChanged(this->windowDepth);
   emit heightChanged(this->windowHeight);
-  emit poseChanged(this->windowPos.x(), this->windowPos.y(),
-      this->windowElevation, 0, 0, this->rotationAngle);
+  emit positionChanged(this->windowPos.x(), this->windowPos.y(),
+      this->windowElevation);
 }
