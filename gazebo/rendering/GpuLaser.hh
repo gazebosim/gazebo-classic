@@ -182,7 +182,7 @@ namespace gazebo
       /// \param[in] vertical half angle
       public: void SetVertHalfAngle(double _angle);
 
-      /// \brief Gets if sensor is horizontal
+      /// \brief Sets sensor horizontal or vertical
       /// \return True if horizontal, false if not
       public: void SetIsHorizontal(bool _horizontal);
 

@@ -76,8 +76,9 @@ void BulletBallJoint::Attach(LinkPtr _one, LinkPtr _two)
   math::Vector3 pivotA, pivotB;
 
   // Compute the pivot point, based on the anchorPos
-  pivotA = this->anchorPos - this->parentLink->GetWorldPose().pos;
-  pivotB = this->anchorPos - this->childLink->GetWorldPose().pos;
+  pivotA = this->anchorPos + this->childLink->GetWorldPose().pos
+                           - this->parentLink->GetWorldPose().pos;
+  pivotB = this->anchorPos;
 
   this->btBall = new btPoint2PointConstraint(
       *bulletParentLink->GetBulletLink(),

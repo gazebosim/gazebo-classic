@@ -26,6 +26,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "gazebo/math/Helpers.hh"
 #include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
@@ -174,6 +175,13 @@ namespace gazebo
       /// \param[in] _v vector to add
       public: const Vector3 &operator+=(const Vector3 &_v);
 
+      /// \brief Negation operator
+      /// \return negative of this vector
+      public: inline Vector3 operator-() const
+              {
+                return Vector3(-this->x, -this->y, -this->z);
+              }
+
       /// \brief Subtraction operators
       /// \param[in] _pt a vector to substract
       /// \return a vector
@@ -286,7 +294,8 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                               const gazebo::math::Vector3 &_pt)
       {
-        _out << _pt.x << " " << _pt.y << " " << _pt.z;
+        _out << precision(_pt.x, 6) << " " << precision(_pt.y, 6) << " "
+             << precision(_pt.z, 6);
         return _out;
       }
 

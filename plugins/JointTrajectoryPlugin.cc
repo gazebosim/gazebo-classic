@@ -15,9 +15,8 @@
  *
 */
 /*
- * Desc: 3D position interface for ground truth.
- * Author: Sachin Chitta and John Hsu
- * Date: 1 June 2008
+ * Desc: a test for setting joint angles
+ * Author: John Hsu
  */
 
 #include <plugins/JointTrajectoryPlugin.hh>
@@ -53,15 +52,15 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 }
 
 /////////////////////////////////////////////////
-void JointTrajectoryPlugin::FixLink(physics::LinkPtr link)
+void JointTrajectoryPlugin::FixLink(physics::LinkPtr _link)
 {
   this->joint = this->world->GetPhysicsEngine()->CreateJoint("revolute",
       this->model);
 
   this->joint->SetModel(this->model);
-  math::Pose pose = link->GetWorldPose();
+  math::Pose pose = _link->GetWorldPose();
   // math::Pose  pose(math::Vector3(0, 0, 0.2), math::Quaternion(1, 0, 0, 0));
-  this->joint->Load(physics::LinkPtr(), link, pose);
+  this->joint->Load(physics::LinkPtr(), _link, pose.pos);
   this->joint->SetAxis(0, math::Vector3(0, 0, 0));
   this->joint->SetHighStop(0, 0);
   this->joint->SetLowStop(0, 0);

@@ -62,6 +62,9 @@ namespace gazebo
       /// \param[in] _sdf SDF parameters to load from.
       public: void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Load all the joints.
+      public: void LoadJoints();
+
       /// \brief Initialize the model.
       public: virtual void Init();
 
@@ -144,18 +147,10 @@ namespace gazebo
       /// \return Get the number of joints.
       public: unsigned int GetJointCount() const;
 
-      /// Deprecated
-      public: Link_V GetAllLinks() const GAZEBO_DEPRECATED;
-
       /// \brief Construct and return a vector of Link's in this model
       /// Note this constructs the vector of Link's on the fly, could be costly
       /// \return a vector of Link's in this model
       public: Link_V GetLinks() const;
-
-      /// \brief Get a joint by index
-      /// \param index Index of the joint
-      /// \return A pointer to the joint
-      public: JointPtr GetJoint(unsigned int index) const GAZEBO_DEPRECATED;
 
       /// \brief Get the joints.
       /// \return Vector of joints.
@@ -175,9 +170,6 @@ namespace gazebo
       /// \return Pointer to the link, NULL if the name is invalid.
       public: LinkPtr GetLink(const std::string &_name ="canonical") const;
 
-      /// \brief This function is dangerous. Do not use.
-      public: LinkPtr GetLink(unsigned int _index) const GAZEBO_DEPRECATED;
-
       /// \brief Set the gravity mode of the model.
       /// \param[in] _value False to turn gravity on for the model.
       public: void SetGravityMode(const bool &_value);
@@ -191,9 +183,6 @@ namespace gazebo
       /// \brief Set the laser retro reflectiveness of the model.
       /// \param[in] _retro Retro reflectance value.
       public: void SetLaserRetro(const float _retro);
-
-      /// \brief DEPRECATED
-      public: void FillModelMsg(msgs::Model &_msg) GAZEBO_DEPRECATED;
 
       /// \brief Fill a model message.
       /// \param[in] _msg Message to fill using this model's data.
@@ -300,6 +289,9 @@ namespace gazebo
 
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
+
+      /// \brief Load all the links.
+      private: void LoadLinks();
 
       /// \brief Load a joint helper function.
       /// \param[in] _sdf SDF parameter.

@@ -276,21 +276,9 @@ bool GpuRaySensor::IsHorizontal() const
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetHAngle() const
-{
-  return this->laserCam->GetHorzHalfAngle();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::GetHorzHalfAngle() const
 {
   return this->laserCam->GetHorzHalfAngle();
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::GetVAngle() const
-{
-  return this->laserCam->GetVertHalfAngle();
 }
 
 //////////////////////////////////////////////////
@@ -300,21 +288,9 @@ double GpuRaySensor::GetVertHalfAngle() const
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetHFOV() const
-{
-  return this->laserCam->GetHorzFOV();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::GetHorzFOV() const
 {
   return this->laserCam->GetHorzFOV();
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::GetCHFOV() const
-{
-  return this->GetCosHorzFOV();
 }
 
 //////////////////////////////////////////////////
@@ -324,21 +300,9 @@ double GpuRaySensor::GetCosHorzFOV() const
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetVFOV() const
-{
-  return this->GetVertFOV();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::GetVertFOV() const
 {
   return this->laserCam->GetVertFOV();
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::GetCVFOV() const
-{
-  return this->GetCosVertFOV();
 }
 
 //////////////////////////////////////////////////
@@ -348,21 +312,9 @@ double GpuRaySensor::GetCosVertFOV() const
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::Get1stRatio() const
-{
-  return this->GetRayCountRatio();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::GetRayCountRatio() const
 {
   return this->laserCam->GetRayCountRatio();
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::Get2ndRatio() const
-{
-  return this->GetRangeCountRatio();
 }
 
 //////////////////////////////////////////////////

@@ -2320,7 +2320,7 @@ def _ClassifyInclude(fileinfo, include, is_system):
   # This is a list of all standard c++ header files, except
   # those already checked for above.
   is_stl_h = include in _STL_HEADERS
-  is_cpp_h = is_stl_h or include in _CPP_HEADERS or include.find(".hpp") > 0
+  is_cpp_h = is_stl_h or include in _CPP_HEADERS or include.find(".hpp") or include.find(".hh") > 0
 
   if is_system:
     if is_cpp_h:

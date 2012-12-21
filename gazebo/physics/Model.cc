@@ -91,14 +91,25 @@ void Model::Load(sdf::ElementPtr _sdf)
       boost::bind(&Entity::IsStatic, this));
 
   this->SetAutoDisable(this->sdf->GetValueBool("allow_auto_disable"));
+  this->LoadLinks();
 
+  // Load the joints if the world is already loaded. Otherwise, the World
+  // has some special logic to load models that takes into account state
+  // information.
+  if (this->world->IsLoaded())
+    this->LoadJoints();
+}
+
+//////////////////////////////////////////////////
+void Model::LoadLinks()
+{
   /// \TODO: check for duplicate model, and raise an error
   /// BasePtr dup = Base::GetByName(this->GetScopedName());
 
   // Load the bodies
-  if (_sdf->HasElement("link"))
+  if (this->sdf->HasElement("link"))
   {
-    sdf::ElementPtr linkElem = _sdf->GetElement("link");
+    sdf::ElementPtr linkElem = this->sdf->GetElement("link");
     bool canonicalLinkInitialized = false;
     while (linkElem)
     {
@@ -122,11 +133,15 @@ void Model::Load(sdf::ElementPtr _sdf)
       linkElem = linkElem->GetNextElement("link");
     }
   }
+}
 
+//////////////////////////////////////////////////
+void Model::LoadJoints()
+{
   // Load the joints
-  if (_sdf->HasElement("joint"))
+  if (this->sdf->HasElement("joint"))
   {
-    sdf::ElementPtr jointElem = _sdf->GetElement("joint");
+    sdf::ElementPtr jointElem = this->sdf->GetElement("joint");
     while (jointElem)
     {
       try
@@ -141,9 +156,9 @@ void Model::Load(sdf::ElementPtr _sdf)
     }
   }
 
-  if (_sdf->HasElement("gripper"))
+  if (this->sdf->HasElement("gripper"))
   {
-    sdf::ElementPtr gripperElem = _sdf->GetElement("gripper");
+    sdf::ElementPtr gripperElem = this->sdf->GetElement("gripper");
     while (gripperElem)
     {
       this->LoadGripper(gripperElem);
@@ -530,15 +545,6 @@ const Joint_V &Model::GetJoints() const
 }
 
 //////////////////////////////////////////////////
-JointPtr Model::GetJoint(unsigned int _index) const
-{
-  if (_index >= this->joints.size())
-    gzthrow("Invalid joint _index[" << _index << "]\n");
-
-  return this->joints[_index];
-}
-
-//////////////////////////////////////////////////
 JointPtr Model::GetJoint(const std::string &_name)
 {
   JointPtr result;
@@ -569,12 +575,6 @@ JointPtr Model::GetJoint(const std::string &_name)
 LinkPtr Model::GetLinkById(unsigned int _id) const
 {
   return boost::shared_dynamic_cast<Link>(this->GetById(_id));
-}
-
-//////////////////////////////////////////////////
-Link_V Model::GetAllLinks() const
-{
-  return this->GetLinks();
 }
 
 //////////////////////////////////////////////////
@@ -620,18 +620,6 @@ LinkPtr Model::GetLink(const std::string &_name) const
   }
 
   return result;
-}
-
-//////////////////////////////////////////////////
-LinkPtr Model::GetLink(unsigned int _index) const
-{
-  LinkPtr link;
-  if (_index <= this->GetChildCount())
-    link = boost::shared_static_cast<Link>(this->GetChild(_index));
-  else
-    gzerr << "Index is out of range\n";
-
-  return link;
 }
 
 //////////////////////////////////////////////////
@@ -790,12 +778,6 @@ void Model::SetLaserRetro(const float _retro)
 }
 
 //////////////////////////////////////////////////
-void Model::FillModelMsg(msgs::Model &_msg)
-{
-  this->FillMsg(_msg);
-}
-
-//////////////////////////////////////////////////
 void Model::FillMsg(msgs::Model &_msg)
 {
   _msg.set_name(this->GetScopedName());
@@ -934,13 +916,6 @@ void Model::SetState(const ModelState &_state)
     JointState jointState = _state.GetJointState(i);
     this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
                            jointState.GetAngle(0).Radian());
-
-    /*JointPtr joint = this->GetJoint(jointState.GetName());
-    if (joint)
-      joint->SetState(jointState);
-    else
-      gzerr << "Unable to find joint[" << jointState.GetName() << "]\n";
-      */
   }
 }
 

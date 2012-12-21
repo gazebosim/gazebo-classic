@@ -18,6 +18,7 @@
 #define _GAZEBO_MATH_FUNCTIONS_HH_
 
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/math/special_functions/round.hpp>
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -46,7 +47,7 @@ namespace gazebo
     /// \brief Returns the representation of a quiet not a number (NAN)
     static const int NAN_I = std::numeric_limits<int>::quiet_NaN();
 
-    /// \brief simple clamping function
+    /// \brief Simple clamping function
     /// \param[in] _v value
     /// \param[in] _min minimum
     /// \param[in] _max maximum
@@ -142,7 +143,7 @@ namespace gazebo
     template<typename T>
     inline T precision(const T &_a, const unsigned int &_precision)
     {
-      return round(_a * pow(10, _precision)) / pow(10, _precision);
+      return boost::math::round(_a * pow(10, _precision)) / pow(10, _precision);
     }
 
     /// \brief is this a power of 2?
