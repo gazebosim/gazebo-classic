@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef PUBLICATIONTRANSPORT_HH
-#define PUBLICATIONTRANSPORT_HH
+#ifndef _PUBLICATIONTRANSPORT_HH_
+#define _PUBLICATIONTRANSPORT_HH_
 
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -47,8 +47,10 @@ namespace gazebo
       public: virtual ~PublicationTransport();
 
       /// \brief Initialize the transport
-      /// \param[in] _conn The underlying connection
-      public: void Init(const ConnectionPtr &_conn);
+      /// \param[in] _conn The underlying connection.
+      /// \param[in] _latched True to grab the last message sent on the
+      /// topic.
+      public: void Init(const ConnectionPtr &_conn, bool _latched);
 
       /// \brief Finalize the transport
       public: void Fini();
@@ -70,23 +72,35 @@ namespace gazebo
       /// \return The topic type
       public: std::string GetMsgType() const;
 
+      /// \brief Called when connection is shutdown.
       private: void OnConnectionShutdown();
 
-      private: void OnPublish(const std::string &data);
+      /// \brief Called when data is published.
+      /// \param[in] _data Data to be published.
+      private: void OnPublish(const std::string &_data);
 
+      /// \brief The topic for this publication transport.
       private: std::string topic;
+
+      /// \brief The type of messages that can be processed.
       private: std::string msgType;
+
+      /// \brief The connection for the publication transport
       private: ConnectionPtr connection;
+
+      /// \brief Callback used when OnPublish is called.
       private: boost::function<void (const std::string &)> callback;
+
+      /// \brief Event listener for the connection's shutdown signal.
       private: event::ConnectionPtr shutdownConnectionPtr;
 
+      /// \brief Counter to give the publication transport a unique id.
       private: static int counter;
+
+      /// \brief The unique id for the publication transport.
       private: int id;
     };
     /// \}
   }
 }
-
 #endif
-
-

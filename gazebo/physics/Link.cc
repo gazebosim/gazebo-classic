@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,18 +157,8 @@ void Link::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Link::Init()
 {
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-  {
-    if ((*iter)->HasType(Base::COLLISION))
-      boost::shared_static_cast<Collision>(*iter)->Init();
-  }
-
   this->SetKinematic(this->sdf->GetValueBool("kinematic"));
-
-  // If no collisions are attached, then don't let gravity affect the body.
-  if (this->children.size()== 0 || !this->sdf->GetValueBool("gravity"))
-    this->SetGravityMode(false);
+  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
 
   this->SetLinearDamping(this->GetLinearDamping());
   this->SetAngularDamping(this->GetAngularDamping());
@@ -232,9 +222,17 @@ void Link::Init()
 
   this->enabled = true;
 
-  // DO THIS LAST!
+  // Set Link pose before setting pose of child collisions
   this->SetRelativePose(this->sdf->GetValuePose("pose"));
   this->SetInitialRelativePose(this->sdf->GetValuePose("pose"));
+
+  // Call Init for child collisions, which whill set their pose
+  Base_V::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    if ((*iter)->HasType(Base::COLLISION))
+      boost::shared_static_cast<Collision>(*iter)->Init();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -494,6 +492,22 @@ CollisionPtr Link::GetCollision(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+Collision_V Link::GetCollisions() const
+{
+  Collision_V result;
+  Base_V::const_iterator biter;
+  for (biter = this->children.begin(); biter != this->children.end(); ++biter)
+  {
+    if ((*biter)->HasType(Base::COLLISION))
+    {
+      result.push_back(boost::shared_static_cast<Collision>(*biter));
+    }
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 CollisionPtr Link::GetCollision(unsigned int _index) const
 {
   CollisionPtr collision;
@@ -530,7 +544,7 @@ math::Vector3 Link::GetRelativeLinearVel() const
 math::Vector3 Link::GetRelativeAngularVel() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(
-      this->GetWorldAngularVel());
+         this->GetWorldAngularVel());
 }
 
 //////////////////////////////////////////////////
@@ -652,12 +666,6 @@ void Link::RemoveChildJoint(JointPtr _joint)
       break;
     }
   }
-}
-
-//////////////////////////////////////////////////
-void Link::FillLinkMsg(msgs::Link &_msg)
-{
-  this->FillMsg(_msg);
 }
 
 //////////////////////////////////////////////////
@@ -839,16 +847,11 @@ void Link::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-LinkState Link::GetState()
+void Link::SetState(const LinkState & /*_state*/)
 {
-  return LinkState(boost::shared_static_cast<Link>(shared_from_this()));
-}
+  // this->SetRelativePose(_state.GetPose());
 
-//////////////////////////////////////////////////
-void Link::SetState(const LinkState &_state)
-{
-  this->SetRelativePose(_state.GetPose());
-
+  /*
   for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)
   {
     CollisionState collisionState = _state.GetCollisionState(i);
@@ -857,7 +860,7 @@ void Link::SetState(const LinkState &_state)
       collision->SetState(collisionState);
     else
       gzerr << "Unable to find collision[" << collisionState.GetName() << "]\n";
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////

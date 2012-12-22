@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +33,12 @@ TEST_F(SpeedTest, BallTest)
   // Load 500 spheres into the world
   std::string name = "sphere";
   math::Vector3 pos(0, 0, 5);
+
   for (int i = 0; i < 500; ++i)
   {
     pos.z += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, math::Vector3(0, 0, 0));
+        pos, math::Vector3(0, 0, 0), i == 499);
   }
 
   common::Time::MSleep(2000);
@@ -71,7 +72,7 @@ TEST_F(SpeedTest, ShapesWorld)
   {
     pos.z += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, math::Vector3(0, 0, 0));
+        pos, math::Vector3(0, 0, 0), i == 499);
   }
   common::Time::MSleep(2000);
 

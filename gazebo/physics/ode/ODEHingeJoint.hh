@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,9 +60,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetDamping(int _index, double _damping);
-
-      /// \brief callback to apply damping force to joint.
-      public: void ApplyDamping();
 
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(int _index) const;

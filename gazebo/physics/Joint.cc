@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ Joint::Joint(BasePtr _parent)
   : Base(_parent)
 {
   this->AddType(Base::JOINT);
+  this->forceApplied[0] = 0;
+  this->forceApplied[1] = 0;
 }
 
 //////////////////////////////////////////////////
@@ -48,7 +50,7 @@ Joint::~Joint()
 }
 
 //////////////////////////////////////////////////
-void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
+void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos)
 {
   if (_parent)
   {
@@ -65,7 +67,13 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 
   this->parentLink = _parent;
   this->childLink = _child;
-  this->LoadImpl(_pose);
+  this->LoadImpl(_pos);
+}
+
+//////////////////////////////////////////////////
+void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
+{
+  this->Load(_parent, _child, _pose.pos);
 }
 
 //////////////////////////////////////////////////
@@ -75,10 +83,6 @@ void Joint::Load(sdf::ElementPtr _sdf)
 
   std::string parentName = _sdf->GetValueString("parent");
   std::string childName = _sdf->GetValueString("child");
-
-  math::Pose pose;
-  if (_sdf->HasElement("pose"))
-    pose = _sdf->GetValuePose("pose");
 
   if (this->model)
   {
@@ -100,11 +104,11 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  this->LoadImpl(pose);
+  this->LoadImpl(_sdf->GetValuePose("pose").pos);
 }
 
 /////////////////////////////////////////////////
-void Joint::LoadImpl(const math::Pose &_pose)
+void Joint::LoadImpl(const math::Vector3 &_pos)
 {
   BasePtr myBase = shared_from_this();
 
@@ -114,9 +118,15 @@ void Joint::LoadImpl(const math::Pose &_pose)
 
   // setting anchor relative to gazebo link frame pose
   if (this->childLink)
-    this->anchorPos = (_pose + this->childLink->GetWorldPose()).pos;
+    this->anchorPos = _pos;
   else
     this->anchorPos = math::Vector3(0, 0, 0);
+}
+
+/////////////////////////////////////////////////
+void Joint::LoadImpl(const math::Pose &_pose)
+{
+  this->LoadImpl(_pose.pos);
 }
 
 //////////////////////////////////////////////////
@@ -125,7 +135,7 @@ void Joint::Init()
   this->Attach(this->parentLink, this->childLink);
 
   // Set the anchor vector
-  this->SetAnchor(0, this->anchorPos);
+  this->SetAnchor(0, this->anchorPos + this->childLink->GetWorldPose().pos);
 
   if (this->sdf->HasElement("axis"))
   {
@@ -283,12 +293,6 @@ LinkPtr Joint::GetParent() const
 }
 
 //////////////////////////////////////////////////
-void Joint::FillJointMsg(msgs::Joint &_msg)
-{
-  this->FillMsg(_msg);
-}
-
-//////////////////////////////////////////////////
 void Joint::FillMsg(msgs::Joint &_msg)
 {
   _msg.set_name(this->GetScopedName());
@@ -374,12 +378,6 @@ void Joint::SetAngle(int /*index*/, math::Angle _angle)
 }
 
 //////////////////////////////////////////////////
-JointState Joint::GetState()
-{
-  return JointState(boost::shared_static_cast<Joint>(shared_from_this()));
-}
-
-//////////////////////////////////////////////////
 void Joint::SetState(const JointState &_state)
 {
   this->SetMaxForce(0, 0);
@@ -389,12 +387,34 @@ void Joint::SetState(const JointState &_state)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetForce(int /*_index*/, double /*_force*/)
+void Joint::SetForce(int _index, double _force)
 {
+  /// \todo: should check to see if this type of joint has _index
+  if (_index < 2)
+    this->forceApplied[_index] = _force;
+  else
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to apply force\n";
 }
 
 //////////////////////////////////////////////////
-double Joint::GetForce(int /*_index*/)
+double Joint::GetForce(int _index)
 {
-  return 0;
+  /// \todo: should check to see if this type of joint has _index
+  if (_index < 2)
+    return this->forceApplied[_index];
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to apply force\n";
+    return 0;
+  }
 }
+
+//////////////////////////////////////////////////
+void Joint::ApplyDamping()
+{
+  double dampingForce = -this->dampingCoefficient * this->GetVelocity(0);
+  this->SetForce(0, dampingForce);
+}
+

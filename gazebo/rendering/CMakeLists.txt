@@ -122,4 +122,4 @@ if (${OGRE_VERSION} GREATER 1.7.4)
 endif()
 
 gz_install_library(gazebo_rendering)
-gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh rendering.h)
+gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)

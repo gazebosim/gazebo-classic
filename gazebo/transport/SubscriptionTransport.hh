@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef SUBSCRIPTIONTRANSPORT_HH
-#define SUBSCRIPTIONTRANSPORT_HH
+#ifndef _SUBSCRIPTIONTRANSPORT_HH_
+#define _SUBSCRIPTIONTRANSPORT_HH_
 
 #include <boost/shared_ptr.hpp>
 #include <string>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wshadow"
-#define BOOST_FILESYSTEM_VERSION 2
 
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
@@ -48,7 +47,6 @@ class ServerFixture : public testing::Test
 {
   protected: ServerFixture()
              {
-               this->receiveMutex = new boost::mutex();
                this->server = NULL;
                this->serverRunning = false;
                this->paused = false;
@@ -81,7 +79,6 @@ class ServerFixture : public testing::Test
   protected: virtual void TearDown()
              {
                this->Unload();
-               delete this->receiveMutex;
              }
 
   protected: virtual void Unload()
@@ -142,10 +139,18 @@ class ServerFixture : public testing::Test
   protected: void RunServer(const std::string &_worldFilename, bool _paused)
              {
                ASSERT_NO_THROW(this->server = new Server());
-               ASSERT_NO_THROW(this->server->Load(_worldFilename));
+               ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
+
+               rendering::create_scene(
+                   gazebo::physics::get_world()->GetName(), false);
+
                this->SetPause(_paused);
+
                this->server->Run();
+
+               rendering::remove_scene(gazebo::physics::get_world()->GetName());
+
                ASSERT_NO_THROW(this->server->Fini());
                delete this->server;
                this->server = NULL;
@@ -180,29 +185,31 @@ class ServerFixture : public testing::Test
                return this->percentRealTime;
              }
 
-  protected: void OnPose(ConstPosePtr &_msg)
+  protected: void OnPose(ConstPose_VPtr &_msg)
              {
-               this->receiveMutex->lock();
-               this->poses[_msg->name()] = msgs::Convert(*_msg);
-               this->receiveMutex->unlock();
+               boost::mutex::scoped_lock lock(this->receiveMutex);
+               for (int i = 0; i < _msg->pose_size(); ++i)
+               {
+                 this->poses[_msg->pose(i).name()] =
+                   msgs::Convert(_msg->pose(i));
+               }
              }
 
   protected: math::Pose GetEntityPose(const std::string &_name)
              {
+               boost::mutex::scoped_lock lock(this->receiveMutex);
+
                std::map<std::string, math::Pose>::iterator iter;
-               this->receiveMutex->lock();
                iter = this->poses.find(_name);
                EXPECT_TRUE(iter != this->poses.end());
-               this->receiveMutex->unlock();
                return iter->second;
              }
 
   protected: bool HasEntity(const std::string &_name)
              {
+               boost::mutex::scoped_lock lock(this->receiveMutex);
                std::map<std::string, math::Pose>::iterator iter;
-               this->receiveMutex->lock();
                iter = this->poses.find(_name);
-               this->receiveMutex->unlock();
                return iter != this->poses.end();
              }
 
@@ -446,7 +453,8 @@ class ServerFixture : public testing::Test
 
 
   protected: void SpawnSphere(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _wait = true)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
@@ -478,7 +486,7 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name))
+               while (_wait && !this->HasEntity(_name))
                  common::Time::MSleep(10);
              }
 
@@ -566,7 +574,7 @@ class ServerFixture : public testing::Test
   protected: transport::PublisherPtr factoryPub;
 
   protected: std::map<std::string, math::Pose> poses;
-  protected: boost::mutex *receiveMutex;
+  protected: boost::mutex receiveMutex;
 
   private: unsigned char **imgData;
   private: int gotImage;

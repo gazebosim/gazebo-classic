@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  * Author: Nate Koenig
  * Date: 18 Dec 2009
  */
-#include "rendering/RenderEngine.hh"
 #include "sensors/Sensor.hh"
 #include "sensors/SensorFactory.hh"
 #include "sensors/SensorManager.hh"
@@ -68,7 +67,7 @@ void SensorManager::RunLoop()
 }
 
 //////////////////////////////////////////////////
-void SensorManager::Update(bool force)
+void SensorManager::Update(bool _force)
 {
   Sensor_V::iterator iter;
   Sensor_V::iterator end;
@@ -98,7 +97,7 @@ void SensorManager::Update(bool force)
     end = this->sensors.end();
     for (iter = this->sensors.begin(); iter != end; ++iter)
     {
-      (*iter)->Update(force);
+      (*iter)->Update(_force);
     }
   }
 }

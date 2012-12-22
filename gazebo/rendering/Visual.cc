@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,16 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
   if (_parent)
     pnode = _parent->GetSceneNode();
   else
+  {
     gzerr << "Create a visual, invalid parent!!!\n";
+    return;
+  }
+
+  if (!pnode)
+  {
+    gzerr << "Unable to get parent scene node\n";
+    return;
+  }
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -754,7 +763,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 
       if (dynamic_cast<Ogre::Entity*>(obj))
         ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
-      else
+      else if (dynamic_cast<Ogre::SimpleRenderable*>(obj))
         ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
     }
 
@@ -1396,13 +1405,13 @@ DynamicLines *Visual::CreateDynamicLine(RenderOpType type)
 }
 
 //////////////////////////////////////////////////
-void Visual::DeleteDynamicLine(DynamicLines *line)
+void Visual::DeleteDynamicLine(DynamicLines *_line)
 {
   // delete instance from lines vector
   for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
        iter!= this->lines.end(); ++iter)
   {
-    if (*iter == line)
+    if (*iter == _line)
     {
       this->lines.erase(iter);
       break;
@@ -1466,19 +1475,20 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       posDiff = Conversions::Convert(node->_getDerivedPosition()) -
                 this->GetWorldPose().pos;
 
-      min = rotDiff * Conversions::Convert(bb.getMinimum() * node->getScale())
-            + posDiff;
-      max = rotDiff * Conversions::Convert(bb.getMaximum() * node->getScale())
-            + posDiff;
-
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
       {
-        min = Conversions::Convert(node->getPosition());
-        max = Conversions::Convert(node->getPosition());
-        min -= math::Vector3(0.5, 0.5, 0.5);
-        max += math::Vector3(0.5, 0.5, 0.5);
+        min = math::Vector3(-0.5, -0.5, -0.5);
+        max = math::Vector3(0.5, 0.5, 0.5);
       }
+      else
+      {
+        min = rotDiff *
+          Conversions::Convert(bb.getMinimum() * node->getScale()) + posDiff;
+        max = rotDiff *
+          Conversions::Convert(bb.getMaximum() * node->getScale()) + posDiff;
+      }
+
 
       box.Merge(math::Box(min, max));
     }
@@ -1921,20 +1931,9 @@ std::string Visual::GetMeshName() const
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
 
-      if (tmpElem->GetValueString("filename") != "__default__")
-      {
-        filename = tmpElem->GetValueString("filename");
-
-        gzerr << "<mesh><filename>" << filename << "</filename></mesh>"
-          << " is deprecated.\n";
-        gzerr << "Use <mesh><uri>file://" << filename << "</uri></mesh>\n";
-      }
-      else
-      {
-        filename = common::find_file(tmpElem->GetValueString("uri"));
-        if (filename == "__default__" || filename.empty())
-          gzerr << "No mesh specified\n";
-      }
+      filename = common::find_file(tmpElem->GetValueString("uri"));
+      if (filename == "__default__" || filename.empty())
+        gzerr << "No mesh specified\n";
 
       return filename;
     }

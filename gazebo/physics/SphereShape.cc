@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,23 +64,4 @@ void SphereShape::FillMsg(msgs::Geometry &_msg)
 void SphereShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetRadius(_msg.sphere().radius());
-}
-
-//////////////////////////////////////////////////
-double SphereShape::GetMass(double _density) const
-{
-  double r = this->GetRadius();
-  return (4.0/3.0) * M_PI * r * r * r * _density;
-}
-
-//////////////////////////////////////////////////
-void SphereShape::GetInertial(double _mass, InertialPtr _inertial) const
-{
-  double r = this->GetRadius();
-  double ii = 0.4 * _mass * r * r;
-
-  _inertial->SetMass(_mass);
-  _inertial->SetIXX(ii);
-  _inertial->SetIYY(ii);
-  _inertial->SetIZZ(ii);
 }

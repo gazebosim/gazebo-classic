@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,12 +52,6 @@ math::Vector3 BoxShape::GetSize() const
 }
 
 //////////////////////////////////////////////////
-void BoxShape::FillShapeMsg(msgs::Geometry &_msg)
-{
-  this->FillMsg(_msg);
-}
-
-//////////////////////////////////////////////////
 void BoxShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::BOX);
@@ -68,22 +62,4 @@ void BoxShape::FillMsg(msgs::Geometry &_msg)
 void BoxShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetSize(msgs::Convert(_msg.box().size()));
-}
-
-//////////////////////////////////////////////////
-double BoxShape::GetMass(double _density) const
-{
-  math::Vector3 size = this->GetSize();
-  return size.x * size.y * size.z * _density;
-}
-
-//////////////////////////////////////////////////
-void BoxShape::GetInertial(double _mass, InertialPtr _inertial) const
-{
-  math::Vector3 size = this->GetSize();
-
-  _inertial->SetMass(_mass);
-  _inertial->SetIXX(_mass / 12.0 * (size.y * size.y + size.z * size.z));
-  _inertial->SetIYY(_mass / 12.0 * (size.x * size.x + size.z * size.z));
-  _inertial->SetIZZ(_mass / 12.0 * (size.x * size.x + size.y * size.y));
 }

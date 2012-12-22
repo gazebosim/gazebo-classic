@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,11 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~Hinge2Joint()
-              {}
+              { }
+
+      /// \interal
+      public: virtual unsigned int GetAngleCount() const
+              {return 2;}
 
       /// \brief Load the joint.
       /// \param[in] _sdf SDF values to load from.

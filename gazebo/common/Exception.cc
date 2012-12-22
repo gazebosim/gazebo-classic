@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,12 +34,15 @@ Exception::Exception(const char *_file, int _line, std::string _msg)
   this->file = _file;
   this->line = _line;
   this->str = _msg;
-  gazebo::common::Console::Instance()->ColorErr("Exception",
-      this->file, this->line, 31) << *this << "\n";
 }
 
 //////////////////////////////////////////////////
 Exception::~Exception()
+{
+}
+
+//////////////////////////////////////////////////
+void Exception::Print() const
 {
   gazebo::common::Console::Instance()->ColorErr("Exception",
       this->file, this->line, 31) << *this << "\n";

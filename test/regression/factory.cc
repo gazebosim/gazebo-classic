@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,6 @@ TEST_F(FactoryTest, Sphere)
   }
 }
 
-
 TEST_F(FactoryTest, Cylinder)
 {
   math::Pose setPose, testPose;
@@ -90,7 +89,6 @@ TEST_F(FactoryTest, Cylinder)
     EXPECT_TRUE(math::equal(testPose.pos.z, setPose.pos.z, 0.1));
   }
 }
-
 
 TEST_F(FactoryTest, Camera)
 {

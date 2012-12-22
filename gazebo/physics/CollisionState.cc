@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  *
  */
 
-#include "physics/Collision.hh"
-#include "physics/World.hh"
-#include "physics/CollisionState.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/CollisionState.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -33,7 +33,15 @@ CollisionState::CollisionState(const CollisionPtr _collision)
 : State(_collision->GetName(), _collision->GetWorld()->GetRealTime(),
         _collision->GetWorld()->GetSimTime())
 {
-  this->pose = _collision->GetWorldPose();
+  this->pose = _collision->GetRelativePose();
+}
+
+/////////////////////////////////////////////////
+CollisionState::CollisionState(const sdf::ElementPtr _sdf)
+  : State()
+{
+  // Load the state from SDF
+  this->Load(_sdf);
 }
 
 /////////////////////////////////////////////////
@@ -42,12 +50,70 @@ CollisionState::~CollisionState()
 }
 
 /////////////////////////////////////////////////
-void CollisionState::Load(sdf::ElementPtr /*_elem*/)
+void CollisionState::Load(const sdf::ElementPtr _elem)
 {
+  // Set the name
+  this->name = _elem->GetValueString("name");
+
+  // Set the pose
+  if (_elem->HasElement("pose"))
+    this->pose = _elem->GetValuePose("pose");
+  else
+    this->pose.Set(0, 0, 0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
-math::Pose CollisionState::GetPose() const
+const math::Pose &CollisionState::GetPose() const
 {
   return this->pose;
 }
+
+/////////////////////////////////////////////////
+bool CollisionState::IsZero() const
+{
+  return this->pose == math::Pose::Zero;
+}
+
+/////////////////////////////////////////////////
+CollisionState &CollisionState::operator=(const CollisionState &_state)
+{
+  State::operator=(_state);
+  this->pose = _state.pose;
+  return *this;
+}
+
+/////////////////////////////////////////////////
+CollisionState CollisionState::operator-(const CollisionState &_state) const
+{
+  CollisionState result;
+  result.name = this->name;
+
+  // Subtract the pose
+  result.pose.pos = this->pose.pos - _state.pose.pos;
+  result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+CollisionState CollisionState::operator+(const CollisionState &_state) const
+{
+  CollisionState result;
+  result.name = this->name;
+
+  // Add the pose
+  result.pose.pos = this->pose.pos + _state.pose.pos;
+  result.pose.rot = _state.pose.rot * this->pose.rot;
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+void CollisionState::FillSDF(sdf::ElementPtr _sdf)
+{
+  _sdf->ClearElements();
+
+  _sdf->GetAttribute("name")->Set(this->name);
+  _sdf->GetElement("pose")->Set(this->pose);
+}
+

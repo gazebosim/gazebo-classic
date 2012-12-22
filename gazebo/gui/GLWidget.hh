@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -154,6 +154,7 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
+      private: transport::PublisherPtr lightPub;
       private: transport::SubscriberPtr selectionSub, requestSub;
 
       private: std::string keyText;

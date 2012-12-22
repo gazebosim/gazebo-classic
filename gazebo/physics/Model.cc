@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,22 +26,24 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
-#include "common/KeyFrame.hh"
-#include "common/Animation.hh"
-#include "common/Plugin.hh"
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/common/KeyFrame.hh"
+#include "gazebo/common/Animation.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/CommonTypes.hh"
 
-#include "physics/Gripper.hh"
-#include "physics/Joint.hh"
-#include "physics/JointController.hh"
-#include "physics/Link.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Model.hh"
-#include "physics/Contact.hh"
+#include "gazebo/physics/Gripper.hh"
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/JointController.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Contact.hh"
+
+#include "gazebo/sensors/SensorManager.hh"
 
 #include "transport/Node.hh"
 
@@ -91,14 +93,25 @@ void Model::Load(sdf::ElementPtr _sdf)
       boost::bind(&Entity::IsStatic, this));
 
   this->SetAutoDisable(this->sdf->GetValueBool("allow_auto_disable"));
+  this->LoadLinks();
 
+  // Load the joints if the world is already loaded. Otherwise, the World
+  // has some special logic to load models that takes into account state
+  // information.
+  if (this->world->IsLoaded())
+    this->LoadJoints();
+}
+
+//////////////////////////////////////////////////
+void Model::LoadLinks()
+{
   /// \TODO: check for duplicate model, and raise an error
   /// BasePtr dup = Base::GetByName(this->GetScopedName());
 
   // Load the bodies
-  if (_sdf->HasElement("link"))
+  if (this->sdf->HasElement("link"))
   {
-    sdf::ElementPtr linkElem = _sdf->GetElement("link");
+    sdf::ElementPtr linkElem = this->sdf->GetElement("link");
     bool canonicalLinkInitialized = false;
     while (linkElem)
     {
@@ -122,11 +135,15 @@ void Model::Load(sdf::ElementPtr _sdf)
       linkElem = linkElem->GetNextElement("link");
     }
   }
+}
 
+//////////////////////////////////////////////////
+void Model::LoadJoints()
+{
   // Load the joints
-  if (_sdf->HasElement("joint"))
+  if (this->sdf->HasElement("joint"))
   {
-    sdf::ElementPtr jointElem = _sdf->GetElement("joint");
+    sdf::ElementPtr jointElem = this->sdf->GetElement("joint");
     while (jointElem)
     {
       try
@@ -141,9 +158,9 @@ void Model::Load(sdf::ElementPtr _sdf)
     }
   }
 
-  if (_sdf->HasElement("gripper"))
+  if (this->sdf->HasElement("gripper"))
   {
-    sdf::ElementPtr gripperElem = _sdf->GetElement("gripper");
+    sdf::ElementPtr gripperElem = this->sdf->GetElement("gripper");
     while (gripperElem)
     {
       this->LoadGripper(gripperElem);
@@ -189,6 +206,10 @@ void Model::Init()
 void Model::Update()
 {
   this->updateMutex->lock();
+
+  for (Joint_V::iterator jiter = this->joints.begin();
+       jiter != this->joints.end(); ++jiter)
+    (*jiter)->Update();
 
   if (this->jointController)
     this->jointController->Update();
@@ -520,12 +541,9 @@ unsigned int Model::GetJointCount() const
 }
 
 //////////////////////////////////////////////////
-JointPtr Model::GetJoint(unsigned int _index) const
+const Joint_V &Model::GetJoints() const
 {
-  if (_index >= this->joints.size())
-    gzthrow("Invalid joint _index[" << _index << "]\n");
-
-  return this->joints[_index];
+  return this->joints;
 }
 
 //////////////////////////////////////////////////
@@ -562,7 +580,7 @@ LinkPtr Model::GetLinkById(unsigned int _id) const
 }
 
 //////////////////////////////////////////////////
-Link_V Model::GetAllLinks() const
+Link_V Model::GetLinks() const
 {
   Link_V links;
   for (unsigned int i = 0; i < this->GetChildCount(); ++i)
@@ -604,18 +622,6 @@ LinkPtr Model::GetLink(const std::string &_name) const
   }
 
   return result;
-}
-
-//////////////////////////////////////////////////
-LinkPtr Model::GetLink(unsigned int _index) const
-{
-  LinkPtr link;
-  if (_index <= this->GetChildCount())
-    link = boost::shared_static_cast<Link>(this->GetChild(_index));
-  else
-    gzerr << "Index is out of range\n";
-
-  return link;
 }
 
 //////////////////////////////////////////////////
@@ -662,16 +668,74 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Model::LoadPlugins()
 {
-  // Load the plugins
+  // Check to see if we need to load any model plugins
+  if (this->GetPluginCount() > 0)
+  {
+    int iterations = 0;
+
+    // Wait for the sensors to be initialized before loading
+    // plugins, if there are any sensors
+    while (this->GetSensorCount() > 0 &&
+        !sensors::SensorManager::Instance()->SensorsInitialized() &&
+        iterations < 50)
+    {
+      common::Time::MSleep(100);
+      iterations++;
+    }
+
+    // Load the plugins if the sensors have been loaded, or if there
+    // are no sensors attached to the model.
+    if (iterations < 50)
+    {
+      // Load the plugins
+      sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+      while (pluginElem)
+      {
+        this->LoadPlugin(pluginElem);
+        pluginElem = pluginElem->GetNextElement("plugin");
+      }
+    }
+    else
+    {
+      gzerr << "Sensors failed to initialize when loading model["
+        << this->GetName() << "] via the factory mechanism."
+        << "Plugins for the model will not be loaded.\n";
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+unsigned int Model::GetPluginCount() const
+{
+  unsigned int result = 0;
+
+  // Count all the plugins specified in SDF
   if (this->sdf->HasElement("plugin"))
   {
     sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
     while (pluginElem)
     {
-      this->LoadPlugin(pluginElem);
+      result++;
       pluginElem = pluginElem->GetNextElement("plugin");
     }
   }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+unsigned int Model::GetSensorCount() const
+{
+  unsigned int result = 0;
+
+  // Count all the sensors on all the links
+  Link_V links = this->GetLinks();
+  for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
+  {
+    result += (*iter)->GetSensorCount();
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -737,12 +801,6 @@ void Model::SetLaserRetro(const float _retro)
        boost::shared_static_cast<Link>(*iter)->SetLaserRetro(_retro);
     }
   }
-}
-
-//////////////////////////////////////////////////
-void Model::FillModelMsg(msgs::Model &_msg)
-{
-  this->FillMsg(_msg);
 }
 
 //////////////////////////////////////////////////
@@ -865,17 +923,11 @@ void Model::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-ModelState Model::GetState()
-{
-  return ModelState(boost::shared_static_cast<Model>(shared_from_this()));
-}
-
-//////////////////////////////////////////////////
 void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);
 
-  for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
+  /*for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
   {
     LinkState linkState = _state.GetLinkState(i);
     LinkPtr link = this->GetLink(linkState.GetName());
@@ -883,16 +935,13 @@ void Model::SetState(const ModelState &_state)
       link->SetState(linkState);
     else
       gzerr << "Unable to find link[" << linkState.GetName() << "]\n";
-  }
+  }*/
 
   for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
   {
     JointState jointState = _state.GetJointState(i);
-    JointPtr joint = this->GetJoint(jointState.GetName());
-    if (joint)
-      joint->SetState(jointState);
-    else
-      gzerr << "Unable to find joint[" << jointState.GetName() << "]\n";
+    this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
+                           jointState.GetAngle(0).Radian());
   }
 }
 
@@ -937,5 +986,11 @@ void Model::SetAutoDisable(bool _auto)
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     if (*iter && (*iter)->HasType(LINK))
       boost::static_pointer_cast<Link>(*iter)->SetAutoDisable(_auto);
+}
+
+/////////////////////////////////////////////////
+bool Model::GetAutoDisable() const
+{
+  return this->sdf->GetValueBool("allow_auto_disable");
 }
 

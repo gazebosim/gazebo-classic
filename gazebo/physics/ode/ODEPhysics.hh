@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,16 +43,18 @@ namespace gazebo
   namespace physics
   {
     /// \brief Data structure for contact feedbacks
-    class ContactFeedback
+    class ODEJointFeedback
     {
+      public: ODEJointFeedback() : contact(NULL), count(0) {}
+
       /// \brief Contact information.
-      public: Contact contact;
+      public: Contact *contact;
+
+      /// \brief Number of elements in feedbacks array.
+      public: int count;
 
       /// \brief Contact joint feedback information.
       public: dJointFeedback feedbacks[MAX_CONTACT_JOINTS];
-
-      /// \brief Number of elements in feedbacks array.
-      public: int feedbackCount;
     };
 
     /// \brief ODE physics engine.
@@ -158,7 +160,11 @@ namespace gazebo
       // Documentation inherited
       public: virtual int GetMaxContacts();
 
+      // Documentation inherited
       public: virtual void DebugPrint() const;
+
+      // Documentation inherited
+      public: virtual void SetSeed(uint32_t _seed);
 
       /// \brief Return the world space id.
       /// \return The space id for the world.
@@ -195,11 +201,9 @@ namespace gazebo
       public: void Collide(ODECollision *_collision1, ODECollision *_collision2,
                            dContactGeom *_contactCollisions);
 
-      /// \brief process contact feedbacks into physics::ContactFeedback
-      /// \param[in,out] _feedback Contact feedback information.
-      /// \param[out] _msg Message to add contact information to.
-      public: void ProcessContactFeedback(ContactFeedback *_feedback,
-                                          msgs::Contact *_msg);
+      /// \brief process joint feedbacks.
+      /// \param[in] _feedback ODE Joint Contact feedback information.
+      public: void ProcessJointFeedback(ODEJointFeedback *_feedback);
 
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
 
@@ -241,10 +245,10 @@ namespace gazebo
       private: std::string stepType;
 
       /// \brief Buffer of contact feedback information.
-      private: std::vector<ContactFeedback*> contactFeedbacks;
+      private: std::vector<ODEJointFeedback*> jointFeedbacks;
 
       /// \brief Current index into the contactFeedbacks buffer
-      private: unsigned int contactFeedbackIndex;
+      private: unsigned int jointFeedbackIndex;
 
       /// \brief All the collsiion spaces.
       private: std::map<std::string, dSpaceID> spaces;

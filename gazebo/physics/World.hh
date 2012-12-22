@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <list>
+#include <deque>
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
@@ -132,7 +133,7 @@ namespace gazebo
 
       /// \brief Get a list of all the models.
       /// \return A list of all the Models in the world.
-      public: std::list<ModelPtr> GetModels() const;
+      public: Model_V GetModels() const;
 
       /// \brief Reset with options.
       ///
@@ -159,8 +160,8 @@ namespace gazebo
       public: void PrintEntityTree();
 
       /// \brief Get the world simulation time, note if you want the PC
-      /// wall clock call World::GetRealTime.
-      /// \return The current simulation time.
+      /// wall clock call common::Time::GetWallTime.
+      /// \return The current simulation time
       public: common::Time GetSimTime() const;
 
       /// \brief Set the sim time.
@@ -195,9 +196,6 @@ namespace gazebo
       /// \return A pointer to the entity, or NULL if no entity was found.
       public: BasePtr GetByName(const std::string &_name);
 
-      /// \brief Deprecated
-      public: ModelPtr GetModelByName(const std::string &name)GAZEBO_DEPRECATED;
-
       /// \brief Get a model by name.
       ///
       /// This function is the same as GetByName, but limits the search to
@@ -205,10 +203,6 @@ namespace gazebo
       /// \param[in] _name The name of the Model to find.
       /// \return A pointer to the Model, or NULL if no model was found.
       public: ModelPtr GetModel(const std::string &_name);
-
-      /// \brief Deprecated
-      public: EntityPtr GetEntityByName(
-                  const std::string &_name) GAZEBO_DEPRECATED;
 
       /// \brief Get a pointer to an Entity based on a name.
       ///
@@ -232,10 +226,6 @@ namespace gazebo
       /// \param[in] _pt The 3D point to search below
       /// \return A pointer to nearest Entity, NULL if none is found.
       public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
-
-      /// \brief Get the current world state.
-      /// \return A object that contains the entire state of the World.
-      public: WorldState GetState();
 
       /// \brief Set the current world state.
       /// \param _state The state to set the World to.
@@ -307,6 +297,18 @@ namespace gazebo
       public: void EnablePhysicsEngine(bool _enable)
               {this->enablePhysicsEngine = _enable;}
 
+      /// \brief Update the state SDF value from the current state.
+      public: void UpdateStateSDF();
+
+      /// \brief Return true if the world has been loaded.
+      /// \return True if World::Load has completed.
+      public: bool IsLoaded() const;
+
+      /// \brief Enqueue a pose message for publication.
+      /// These messages will be transmitted at the end of every iteration.
+      /// \param[in] _msg The message to enqueue.
+      public: void EnqueueMsg(msgs::Pose *_msg);
+
       /// \brief Get a model by id.
       ///
       /// Each Entity has a unique ID, this function finds a Model with
@@ -348,6 +350,9 @@ namespace gazebo
 
       /// \brief Step the world once.
       private: void Step();
+
+      /// \brief Step the world once by reading from a log file.
+      private: void LogStep();
 
       /// \brief Update the world.
       private: void Update();
@@ -405,23 +410,29 @@ namespace gazebo
       private: void FillModelMsg(msgs::Model &_msg, ModelPtr _model);
 
       /// \brief Process all recieved entity messages.
+      /// Must only be called from the World::ProcessMessages function.
       private: void ProcessEntityMsgs();
 
       /// \brief Process all recieved request messages.
+      /// Must only be called from the World::ProcessMessages function.
       private: void ProcessRequestMsgs();
 
       /// \brief Process all recieved factory messages.
+      /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
 
       /// \brief Process all recieved model messages.
+      /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
 
-      /// \brief Update the state SDF values from the current state.
-      private: void UpdateStateSDF();
+      /// \brief Log callback. This is where we write out state info.
+      private: bool OnLog(std::ostringstream &_stream);
 
-      /// \brief Update the state SDF from a given state.
-      /// \param[in] _state State to update from.
-      private: void UpdateSDFFromState(const WorldState &_state);
+      /// \brief Process all incoming messages.
+      private: void ProcessMessages();
+
+      /// \brief Publish the world stats message.
+      private: void PublishWorldStats();
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
@@ -486,6 +497,9 @@ namespace gazebo
       /// \brief Publisher for light messages.
       private: transport::PublisherPtr lightPub;
 
+      /// \brief Publisher for pose messages.
+      private: transport::PublisherPtr posePub;
+
       /// \brief Subscriber to world control messages.
       private: transport::SubscriberPtr controlSub;
 
@@ -523,7 +537,7 @@ namespace gazebo
       private: common::Time realTimeOffset;
 
       /// \brief Mutext to protect incoming message buffers.
-      private: boost::mutex *receiveMutex;
+      private: boost::recursive_mutex *receiveMutex;
 
       /// \brief Mutex to protext loading of models.
       private: boost::mutex *loadModelMutex;
@@ -580,6 +594,9 @@ namespace gazebo
       /// \brief True if the world has been initialized.
       private: bool initialized;
 
+      /// \brief True if the world has been loaded.
+      private: bool loaded;
+
       /// \brief True to enable the physics engine.
       private: bool enablePhysicsEngine;
 
@@ -597,6 +614,21 @@ namespace gazebo
 
       /// \brief Period over which messages should be processed.
       private: common::Time processMsgsPeriod;
+
+      /// \brief Buffer of states.
+      private: std::deque<WorldState> states;
+      private: WorldState prevStates[2];
+      private: int stateToggle;
+
+      private: sdf::ElementPtr logPlayStateSDF;
+      private: WorldState logPlayState;
+
+      /// \brief Store a factory SDF object to improve speed at which
+      /// objects are inserted via the factory.
+      private: sdf::SDFPtr factorySDF;
+
+      /// \brief The list of pose messages to output.
+      private: msgs::Pose_V poseMsgs;
     };
     /// \}
   }

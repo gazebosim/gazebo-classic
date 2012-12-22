@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,6 +78,10 @@ namespace gazebo
       /// \brief Get the low stop of an axis(index).
       public: virtual math::Angle GetLowStop(int /*_index*/)
               {return math::Angle();}
+
+      /// \internal
+      public: virtual unsigned int GetAngleCount() const
+              {return 0;}
     };
     /// \}
   }

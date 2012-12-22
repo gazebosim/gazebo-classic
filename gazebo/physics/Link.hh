@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -246,6 +246,10 @@ namespace gazebo
       /// \return Pointer to the collision, NULL if the name was not found.
       public: CollisionPtr GetCollision(unsigned int _index) const;
 
+      /// \brief Get all the child collisions.
+      /// \return A std::vector of all the child collisions.
+      public: Collision_V GetCollisions() const;
+
       /// \brief Get the bounding box for the link and all the child
       /// elements.
       /// \return The link's bounding box.
@@ -310,9 +314,6 @@ namespace gazebo
       public: void DisconnectEnabled(event::ConnectionPtr &_conn)
               {enabledSignal.Disconnect(_conn);}
 
-      /// \brief DEPRECATED
-      public: void FillLinkMsg(msgs::Link &_msg) GAZEBO_DEPRECATED;
-
       /// \brief Fill a link message
       /// \param[out] _msg Message to fill
       public: void FillMsg(msgs::Link &_msg);
@@ -353,10 +354,6 @@ namespace gazebo
       /// \internal
       /// \brief Called when the pose is changed. Do not call this directly.
       public: virtual void OnPoseChange();
-
-      /// \brief Get the link state.
-      /// \return The state of this link.
-      public: LinkState GetState();
 
       /// \brief Set the current link state.
       /// \param[in] _state The state to set the link to.
