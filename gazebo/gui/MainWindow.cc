@@ -262,40 +262,58 @@ void MainWindow::Import()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::Save()
-{
-  /*boost::shared_ptr<msgs::Response> response;
-  response = transport::request(this->node, "world_sdf");
-
-  msgs::GzString strMsg;
-  if (response.response() != "error" &&
-      response.type() == strMsg.GetTypeName())
-  {
-    strMsg.ParseFromString(response.serialized_data());
-
-    std::ofstream out(this->filename.c_str(), "w");
-    out << this->filename;
-    out.close();
-  }
-  else
-  {
-    gzerr << "Unable to get SDF from server.\n";
-  }*/
-}
-
-/////////////////////////////////////////////////
 void MainWindow::SaveAs()
 {
   std::string filename = QFileDialog::getSaveFileName(this,
       tr("Save World"), QString(),
       tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
 
-  if (!filename.empty())
+  // Return if the user has canceled.
+  if (filename.empty())
+    return;
+
+  g_saveAct->setEnabled(true);
+  this->saveFilename = filename;
+  this->Save();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Save()
+{
+  // Get the latest world in SDF.
+  boost::shared_ptr<msgs::Response> response =
+    transport::request(get_world(), "world_sdf");
+
+  msgs::GzString msg;
+
+  // Make sure the response is correct
+  if (response->response() != "error" && response->type() == msg.GetTypeName())
   {
-    msgs::ServerControl msg;
-    msg.set_save_world_name(get_world());
-    msg.set_save_filename(filename);
-    this->serverControlPub->Publish(msg);
+    // Parse the response
+    msg.ParseFromString(response->serialized_data());
+
+    // Open the file
+    std::ofstream out(this->saveFilename.c_str(), std::ios::out);
+
+    if (!out)
+    {
+      QMessageBox msgBox;
+      std::string str = "Unable to open file: " + this->saveFilename + "\n";
+      str += "Check file permissions.";
+      msgBox.setText(str.c_str());
+      msgBox.exec();
+    }
+    else
+      out << msg.data();
+
+    out.close();
+  }
+  else
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Unable to save world.\n"
+                   "Unable to retrieve SDF world description from server.");
+    msgBox.exec();
   }
 }
 
@@ -583,6 +601,7 @@ void MainWindow::CreateActions()
   g_saveAct = new QAction(tr("&Save World"), this);
   g_saveAct->setShortcut(tr("Ctrl+S"));
   g_saveAct->setStatusTip(tr("Save world"));
+  g_saveAct->setEnabled(false);
   connect(g_saveAct, SIGNAL(triggered()), this, SLOT(Save()));
 
   g_saveAsAct = new QAction(tr("Save World &As"), this);
@@ -780,14 +799,14 @@ void MainWindow::CreateMenus()
 
   this->setMenuWidget(frame);
 
-  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
-  fileMenu->addAction(g_openAct);
-  // fileMenu->addAction(g_importAct);
-  // fileMenu->addAction(g_newAct);
-  fileMenu->addAction(g_saveAct);
-  fileMenu->addAction(g_saveAsAct);
-  fileMenu->addSeparator();
-  fileMenu->addAction(g_quitAct);
+  this->fileMenu = this->menuBar->addMenu(tr("&File"));
+  // this->fileMenu->addAction(g_openAct);
+  // this->fileMenu->addAction(g_importAct);
+  // this->fileMenu->addAction(g_newAct);
+  this->fileMenu->addAction(g_saveAct);
+  this->fileMenu->addAction(g_saveAsAct);
+  this->fileMenu->addSeparator();
+  this->fileMenu->addAction(g_quitAct);
 
   QMenu *editMenu = this->menuBar->addMenu(tr("&Edit"));
   editMenu->addAction(g_resetModelsAct);

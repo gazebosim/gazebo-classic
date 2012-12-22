@@ -26,11 +26,11 @@
 #include <iostream>
 #include <cmath>
 
-#include "math/Helpers.hh"
-#include "math/Angle.hh"
-#include "math/Vector3.hh"
-#include "math/Matrix3.hh"
-#include "math/Matrix4.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Matrix3.hh"
+#include "gazebo/math/Matrix4.hh"
 
 namespace gazebo
 {
@@ -359,7 +359,8 @@ namespace gazebo
                 const gazebo::math::Quaternion &_q)
     {
       Vector3 v(_q.GetAsEuler());
-      _out << v.x << " " << v.y << " " << v.z;
+      _out << precision(v.x, 6) << " " << precision(v.y, 6) << " "
+           << precision(v.z, 6);
       return _out;
     }
 

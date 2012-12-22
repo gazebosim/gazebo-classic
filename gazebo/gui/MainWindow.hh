@@ -136,6 +136,10 @@ namespace gazebo
       // private: QTreeWidget *treeWidget;
       private: QTabWidget *tabWidget;
       private: QMenuBar *menuBar;
+
+      /// \brief The filename set via "Save As". This filename is used by
+      /// the "Save" feature.
+      private: std::string saveFilename;
     };
 
     class TreeViewDelegate: public QItemDelegate

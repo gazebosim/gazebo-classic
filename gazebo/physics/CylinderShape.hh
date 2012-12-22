@@ -73,13 +73,6 @@ namespace gazebo
       /// \brief Update values based on a message.
       /// \param[in] _msg Message to update from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
-
-      /// \brief Deprecated.
-      public: virtual double GetMass(double _density) const GAZEBO_DEPRECATED;
-
-      /// \brief Deprecated.
-      public: virtual void GetInertial(double _mass, InertialPtr _inertial)
-              const GAZEBO_DEPRECATED;
     };
     /// \}
   }
