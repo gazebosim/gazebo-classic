@@ -223,7 +223,7 @@ namespace gazebo
       /// \return Depth of the image
       public: unsigned int GetImageDepth() const;
 
-      /// \brief Get the height of the image
+      /// \brief Get the string representation of the image format.
       /// \return String representation of the image format.
       public: std::string GetImageFormat() const;
 

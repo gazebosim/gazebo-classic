@@ -39,7 +39,8 @@ ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEUniversalJoint::~ODEUniversalJoint()
 {
-  physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  if (this->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
 //////////////////////////////////////////////////
@@ -136,6 +137,7 @@ void ODEUniversalJoint::SetVelocity(int _index, double _angle)
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetForce(int _index, double _torque)
 {
+  ODEJoint::SetForce(_index, _torque);
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
   if (_index == 0)
