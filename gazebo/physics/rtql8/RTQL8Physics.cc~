@@ -298,9 +298,7 @@ JointPtr RTQL8Physics::CreateJoint(const std::string &_type, ModelPtr _parent)
 void RTQL8Physics::SetGravity(const gazebo::math::Vector3& _gravity)
 {
   this->sdf->GetElement("gravity")->GetAttribute("xyz")->Set(_gravity);
-  this->gravity(0) = _gravity.x;
-  this->gravity(1) = _gravity.y;
-  this->gravity(2) = _gravity.z;
+  this->gravity << _gravity.x << _gravity.y << _gravity.z;
 }
 
 //////////////////////////////////////////////////

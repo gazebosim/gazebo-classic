@@ -9,7 +9,7 @@ SET(RTQL8_LIBRARIES collision dynamics geometry integration kinematics lcpsolver
 
 set (sources
              RTQL8Physics.cc
-#             ODECollision.cc
+             RTQL8Collision.cc
              RTQL8Link.cc
              RTQL8Joint.cc
 #             ODESliderJoint.cc
@@ -26,7 +26,7 @@ set (sources
 
 SET (headers
              RTQL8Physics.hh
-#             ODECollision.hh
+             RTQL8Collision.hh
              RTQL8Link.hh
              RTQL8Joint.hh
 #             ODESliderJoint.hh
