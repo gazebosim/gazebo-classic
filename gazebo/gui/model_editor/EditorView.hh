@@ -65,7 +65,7 @@ namespace gazebo
 
       private: void OnAddLevel();
 
-      private: void OnLevelChanged(int _level);
+      private: void OnChangeLevel(int _level);
 
       private: int drawMode;
 

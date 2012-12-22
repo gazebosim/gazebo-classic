@@ -55,6 +55,8 @@ namespace gazebo
 
       public: void SetPosition(QPointF _pos);
 
+      public: void Update();
+
       private: void UpdatePath();
 
       private: void UpdatePathAtIndex(unsigned int _index, QPointF _pos);

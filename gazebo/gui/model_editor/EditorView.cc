@@ -49,6 +49,14 @@ EditorView::EditorView(QWidget *_parent)
   gui::Events::ConnectFinishModel(
     boost::bind(&EditorView::OnFinishModel, this, _1)));
 
+  this->connections.push_back(
+  gui::Events::ConnectAddLevel(
+    boost::bind(&EditorView::OnAddLevel, this)));
+
+  this->connections.push_back(
+  gui::Events::ConnectChangeLevel(
+    boost::bind(&EditorView::OnChangeLevel, this, _1)));
+
   buildingMaker = new BuildingMaker();
 }
 
@@ -272,6 +280,7 @@ void EditorView::DrawDoor(QPoint _pos)
 /////////////////////////////////////////////////
 void EditorView::DrawStairs(QPoint _pos)
 {
+//qDebug() << " draw stairs";
   StairsItem *stairsItem = NULL;
   if (!drawInProgress)
   {
@@ -299,6 +308,9 @@ void EditorView::DrawStairs(QPoint _pos)
 /////////////////////////////////////////////////
 void EditorView::OnCreateEditorItem(const std::string &_type)
 {
+
+//qDebug() << " create editor itme " << _type.c_str();
+
   if (_type == "Wall")
     this->drawMode = Wall;
   else if (_type == "Window")
@@ -344,11 +356,14 @@ void EditorView::OnAddLevel()
     }
   }
 
+  qDebug() << " set level " << wallLevel;
+  std::vector<WallItem *> newWalls;
   for (unsigned int i = 0; i < this->wallList.size(); ++i)
   {
     WallItem *wallItem = this->wallList[i]->Clone();
-    this->wallList.push_back(wallItem);
     wallItem->SetLevel(wallLevel+1);
+    this->scene()->addItem(wallItem);
+    newWalls.push_back(wallItem);
     for (unsigned int j = 0; j < wallItem->GetSegmentCount(); ++j)
     {
       LineSegmentItem *segment = wallItem->GetSegment(j);
@@ -359,13 +374,31 @@ void EditorView::OnAddLevel()
       this->buildingMaker->ConnectItem(wallSegmentName, segment);
       this->buildingMaker->ConnectItem(wallSegmentName, wallItem);
     }
+    wallItem->Update();
   }
-  this->OnLevelChanged(wallLevel + 1);
+
+
+
+/*    WallItem *wallItem = this->wallList[0];
+    WallItem *newWallItem = newWalls[0];
+
+  for (unsigned int i = 0; i < this->wallList[0]->GetSegmentCount(); ++i)
+  {
+    qDebug() << wallItem->GetSegment(i)->line().p1() << " " <<
+        wallItem->GetSegment(i)->line().p2() << " vs " <<
+        newWallItem->GetSegment(i)->line().p1() << " " <<
+        newWallItem->GetSegment(i)->line().p2();
+
+  }*/
+
+  this->wallList.insert(this->wallList.end(), newWalls.begin(),
+      newWalls.end());
 }
 
 /////////////////////////////////////////////////
-void EditorView::OnLevelChanged(int _level)
+void EditorView::OnChangeLevel(int _level)
 {
+  qDebug() << " level " << _level;
   for (unsigned int i = 0; i < this->wallList.size(); ++i)
   {
     if (this->wallList[i]->GetLevel() != _level)

@@ -62,6 +62,8 @@ namespace gazebo
 
       public: double GetMouseDownY();
 
+      public: void Update();
+
       private: void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
 
       private: void hoverLeaveEvent(QGraphicsSceneHoverEvent *_event);

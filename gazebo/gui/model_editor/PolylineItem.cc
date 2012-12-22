@@ -29,6 +29,8 @@ PolylineItem::PolylineItem(QPointF _start, QPointF _end) :
   this->origin = _start;
   this->setPos(_start);
 
+  qDebug() << "origin " << this->origin;
+
   this->location = _start;
 
   QPainterPath p;
@@ -75,12 +77,17 @@ void PolylineItem::SetPosition(QPointF _pos)
 /////////////////////////////////////////////////
 void PolylineItem::AddPoint(QPointF _point)
 {
+//  qDebug() << " Add point  " << _point;
+
   QPointF lineEnd = _point - this->origin;
   if (!corners.empty())
   {
     QPointF lineStart = this->mapToScene(corners.back()->pos())
         + QPointF(this->cornerWidth/2.0, this->cornerHeight/2.0)
         - this->origin;
+
+      qDebug() << " Add point  " << lineStart << lineEnd;
+
     LineSegmentItem *segment = new LineSegmentItem(this, this->segments.size());
     segment->SetLine(lineStart, lineEnd);
     QPen segmentPen = this->pen();
@@ -107,7 +114,8 @@ void PolylineItem::PopEndPoint()
   CornerGrabber *corner = this->corners.back();
   if (corner)
   {
-    this->scene()->removeItem(corner);
+    if (this->scene())
+      this->scene()->removeItem(corner);
     this->corners.pop_back();
     delete corner;
   }
@@ -115,7 +123,8 @@ void PolylineItem::PopEndPoint()
   LineSegmentItem *segment =  this->segments.back();
   if (segment)
   {
-    this->scene()->removeItem(segment);
+    if (this->scene())
+      this->scene()->removeItem(segment);
     this->segments.pop_back();
     delete segment;
   }
@@ -496,4 +505,13 @@ void PolylineItem::paint(QPainter *_painter,
   _painter->restore();
 
 //  QGraphicsPathItem::paint(_painter, _option, _widget);
+}
+
+/////////////////////////////////////////////////
+void PolylineItem::Update()
+{
+  for (unsigned int i = 0; i < this->segments.size(); ++i)
+  {
+    this->segments[i]->Update();
+  }
 }

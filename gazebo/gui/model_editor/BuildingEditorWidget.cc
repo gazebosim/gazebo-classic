@@ -57,10 +57,10 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   view->centerOn(QPointF(0, 0));
   view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
-/*  WallItem *lineItem = new WallItem(QPointF(0, 0), QPointF(-100, 100));
+  WallItem *lineItem = new WallItem(QPointF(0, 0), QPointF(0, 0));
   scene->addItem(lineItem);
 
-  WindowItem *windowItem = new WindowItem();
+/*  WindowItem *windowItem = new WindowItem();
   windowItem->setPos(-100,100);
   scene->addItem(windowItem);
 

@@ -44,6 +44,8 @@ namespace gazebo
 
         public: WallItem *Clone();
 
+        public: void Update();
+
         private: bool segmentEventFilter(LineSegmentItem *_segment,
             QEvent *_event);
 

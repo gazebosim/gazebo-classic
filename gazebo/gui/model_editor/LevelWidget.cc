@@ -17,6 +17,7 @@
 
 #include <sstream>
 #include "gui/model_editor/LevelWidget.hh"
+#include "gui/model_editor/EditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -56,7 +57,7 @@ LevelWidget::~LevelWidget()
 //////////////////////////////////////////////////
 void LevelWidget::OnCurrentLevelChanged(int _level)
 {
-  emit LevelChanged(_level);
+  gui::Events::changeLevel(_level);
 }
 
 //////////////////////////////////////////////////
@@ -66,5 +67,6 @@ void LevelWidget::OnAddLevel()
   int count = this->levelComboBox->count();
   levelText << "Level " << (count + 1);
   this->levelComboBox->addItem(QString(levelText.str().c_str()));
+  gui::Events::addLevel();
   this->levelComboBox->setCurrentIndex(count);
 }

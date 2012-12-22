@@ -71,21 +71,27 @@ void WallItem::SetHeight(double _height)
 /////////////////////////////////////////////////
 WallItem *WallItem::Clone()
 {
-  WallItem *wallItem = new WallItem(QPointF(0,0), QPointF(0,0));
-  wallItem->SetLevel(this->level);
-  wallItem->SetHeight(this->wallHeight);
-  wallItem->SetPosition(this->scenePos());
-  wallItem->SetThickness(this->wallThickness);
+  WallItem *wallItem = new WallItem(this->scenePos(), this->scenePos());
 
   LineSegmentItem *segment = this->segments[0];
-  wallItem->SetVertexPosition(0, segment->mapToScene(segment->line().p1()));
-  wallItem->SetVertexPosition(1, segment->mapToScene(segment->line().p2()));
+  wallItem->SetVertexPosition(1, this->mapToScene(segment->line().p2()));
 
+
+  // TODO: Code below just simiulates the way wall are created through user
+  // interactions. There should be a better way of doing this
   for (unsigned int i = 1; i < this->segments.size(); ++i)
   {
     segment = this->segments[i];
-    wallItem->AddPoint(segment->mapToScene(segment->line().p2()));
-  }
+    wallItem->AddPoint(this->mapToScene(segment->line().p1()));
+    wallItem->SetVertexPosition(wallItem->GetVertexCount()-1,
+        this->mapToScene(segment->line().p2()));  }
+  wallItem->AddPoint(this->mapToScene(
+      this->segments[wallItem->GetSegmentCount()-1]->line().p2()));
+  wallItem->PopEndPoint();
+
+  wallItem->SetLevel(this->level);
+  wallItem->SetHeight(this->wallHeight);
+  wallItem->SetThickness(this->wallThickness);
 
   return wallItem;
 }
@@ -196,4 +202,11 @@ void WallItem::WallChanged()
 {
   emit depthChanged(this->wallThickness);
   emit heightChanged(this->wallHeight);
+}
+
+/////////////////////////////////////////////////
+void WallItem::Update()
+{
+  this->WallChanged();
+  PolylineItem::Update();
 }

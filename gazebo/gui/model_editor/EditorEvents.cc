@@ -22,6 +22,8 @@ using namespace gui;
 
 event::EventT<void (std::string)> Events::createEditorItem;
 event::EventT<void (std::string)> Events::finishModel;
+event::EventT<void (int)> Events::changeLevel;
+event::EventT<void ()> Events::addLevel;
 /*event::EventT<void (std::string)> Events::createBuildingPart;
 event::EventT<void (std::string, math::Pose)> Events::setBuildingPartPose;
 event::EventT<void (std::string, math::Vector3)> Events::setBuildingPartSize;*/
