@@ -28,15 +28,13 @@ namespace gazebo
 
     class LineSegmentItem;
 
-    class WallItem : public PolylineItem
+    class BuildingItem;
+
+    class WallItem : public PolylineItem, public BuildingItem
     {
         public: WallItem(QPointF _start, QPointF _end);
 
         public: ~WallItem();
-
-        public: int GetLevel();
-
-        public: void SetLevel(int _level);
 
         public: double GetHeight();
 
@@ -56,10 +54,6 @@ namespace gazebo
         private: double wallHeight;
 
         private: double scale;
-
-        private: int level;
-
-//        private: double scale;
     };
   }
 }

@@ -15,6 +15,7 @@
  *
 */
 
+#include "gui/model_editor/BuildingItem.hh"
 #include "gui/model_editor/RectItem.hh"
 #include "gui/model_editor/DoorItem.hh"
 #include "gui/model_editor/WindowDoorInspectorDialog.hh"
@@ -24,11 +25,12 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-DoorItem::DoorItem(): RectItem()
+DoorItem::DoorItem(): RectItem(), BuildingItem()
 {
   this->scale = BuildingMaker::conversionScale;
 
   this->level = 0;
+  this->levelBaseHeight = 0;
 
   this->doorDepth = 10;
   this->doorHeight = 0;
@@ -50,18 +52,6 @@ DoorItem::DoorItem(): RectItem()
 /////////////////////////////////////////////////
 DoorItem::~DoorItem()
 {
-}
-
-/////////////////////////////////////////////////
-int DoorItem::GetLevel()
-{
-  return this->level;
-}
-
-/////////////////////////////////////////////////
-void DoorItem::SetLevel(int _level)
-{
-  this->level = _level;
 }
 
 /////////////////////////////////////////////////

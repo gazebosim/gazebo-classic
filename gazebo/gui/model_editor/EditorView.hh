@@ -92,6 +92,10 @@ namespace gazebo
       private: BuildingMaker *buildingMaker;
 
       private: std::string lastWallSegmentName;
+
+      private: int currentLevel;
+
+      private: std::map<int, double> levelHeights;
     };
   }
 }

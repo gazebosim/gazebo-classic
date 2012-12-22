@@ -15,6 +15,7 @@
  *
 */
 
+#include "gui/model_editor/BuildingItem.hh"
 #include "gui/model_editor/RectItem.hh"
 #include "gui/model_editor/StairsItem.hh"
 #include "gui/model_editor/BuildingMaker.hh"
@@ -24,7 +25,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-StairsItem::StairsItem(): RectItem()
+StairsItem::StairsItem(): RectItem(), BuildingItem()
 {
   this->scale = BuildingMaker::conversionScale;
 
@@ -57,18 +58,6 @@ StairsItem::StairsItem(): RectItem()
 /////////////////////////////////////////////////
 StairsItem::~StairsItem()
 {
-}
-
-/////////////////////////////////////////////////
-int StairsItem::GetLevel()
-{
-  return this->level;
-}
-
-/////////////////////////////////////////////////
-void StairsItem::SetLevel(int _level)
-{
-  this->level = _level;
 }
 
 /////////////////////////////////////////////////
@@ -174,5 +163,5 @@ void StairsItem::StairsChanged()
   emit depthChanged(this->stairsDepth);
   emit heightChanged(this->stairsHeight);
   emit positionChanged(this->stairsPos.x(), this->stairsPos.y(),
-        this->stairsElevation);
+      this->levelBaseHeight + this->stairsElevation);
 }

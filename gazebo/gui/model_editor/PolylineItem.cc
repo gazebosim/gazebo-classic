@@ -29,8 +29,6 @@ PolylineItem::PolylineItem(QPointF _start, QPointF _end) :
   this->origin = _start;
   this->setPos(_start);
 
-  qDebug() << "origin " << this->origin;
-
   this->location = _start;
 
   QPainterPath p;
@@ -77,16 +75,12 @@ void PolylineItem::SetPosition(QPointF _pos)
 /////////////////////////////////////////////////
 void PolylineItem::AddPoint(QPointF _point)
 {
-//  qDebug() << " Add point  " << _point;
-
   QPointF lineEnd = _point - this->origin;
   if (!corners.empty())
   {
     QPointF lineStart = this->mapToScene(corners.back()->pos())
         + QPointF(this->cornerWidth/2.0, this->cornerHeight/2.0)
         - this->origin;
-
-      qDebug() << " Add point  " << lineStart << lineEnd;
 
     LineSegmentItem *segment = new LineSegmentItem(this, this->segments.size());
     segment->SetLine(lineStart, lineEnd);

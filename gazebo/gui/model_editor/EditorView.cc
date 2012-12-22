@@ -15,7 +15,7 @@
  *
 */
 
-#include "gui/model_editor/EditorView.hh"
+#include "gui/model_editor/BuildingItem.hh"
 #include "gui/model_editor/GridLines.hh"
 #include "gui/model_editor/EditorItem.hh"
 #include "gui/model_editor/RectItem.hh"
@@ -27,6 +27,7 @@
 #include "gui/model_editor/WallItem.hh"
 #include "gui/model_editor/BuildingMaker.hh"
 #include "gui/model_editor/EditorEvents.hh"
+#include "gui/model_editor/EditorView.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -58,6 +59,7 @@ EditorView::EditorView(QWidget *_parent)
     boost::bind(&EditorView::OnChangeLevel, this, _1)));
 
   buildingMaker = new BuildingMaker();
+  this->currentLevel = 0;
 }
 
 /////////////////////////////////////////////////
@@ -201,6 +203,8 @@ void EditorView::DrawLine(QPoint _pos)
     QPointF pointEnd = pointStart;
 
     wallItem = new WallItem(pointStart, pointEnd);
+    wallItem->SetLevel(this->currentLevel);
+    wallItem->SetLevelBaseHeight(this->levelHeights[this->currentLevel]);
     this->scene()->addItem(wallItem);
     this->currentMouseItem = wallItem;
     this->drawInProgress = true;
@@ -223,9 +227,11 @@ void EditorView::DrawLine(QPoint _pos)
   {
     LineSegmentItem *segment = wallItem->GetSegment(
         wallItem->GetSegmentCount()-1);
+
+    QVector3D segmentPosition = segment->GetScenePosition();
+    segmentPosition.setZ(wallItem->GetLevelBaseHeight() + segmentPosition.z());
     std::string wallSegmentName = this->buildingMaker->AddWall(
-        segment->GetSize(), segment->GetScenePosition(),
-        segment->GetSceneRotation());
+        segment->GetSize(), segmentPosition, segment->GetSceneRotation());
     this->lastWallSegmentName = wallSegmentName;
     this->buildingMaker->ConnectItem(wallSegmentName, segment);
     this->buildingMaker->ConnectItem(wallSegmentName, wallItem);
@@ -239,12 +245,15 @@ void EditorView::DrawWindow(QPoint _pos)
   if (!drawInProgress)
   {
     windowItem = new WindowItem();
+    windowItem->SetLevel(this->currentLevel);
+    windowItem->SetLevelBaseHeight(this->levelHeights[this->currentLevel]);
     this->scene()->addItem(windowItem);
     this->currentMouseItem = windowItem;
 
+    QVector3D windowPosition = windowItem->GetScenePosition();
+    windowPosition.setZ(windowItem->GetLevelBaseHeight() + windowPosition.z());
     std::string windowName = this->buildingMaker->AddWindow(
-        windowItem->GetSize(), windowItem->GetScenePosition(),
-        windowItem->GetSceneRotation());
+        windowItem->GetSize(), windowPosition, windowItem->GetSceneRotation());
 
     this->buildingMaker->ConnectItem(windowName, windowItem);
 
@@ -265,6 +274,8 @@ void EditorView::DrawDoor(QPoint _pos)
   if (!drawInProgress)
   {
     doorItem = new DoorItem();
+    doorItem->SetLevel(this->currentLevel);
+    doorItem->SetLevelBaseHeight(this->levelHeights[this->currentLevel]);
     this->scene()->addItem(doorItem);
     this->currentMouseItem = doorItem;
     this->drawInProgress = true;
@@ -280,17 +291,20 @@ void EditorView::DrawDoor(QPoint _pos)
 /////////////////////////////////////////////////
 void EditorView::DrawStairs(QPoint _pos)
 {
-//qDebug() << " draw stairs";
   StairsItem *stairsItem = NULL;
   if (!drawInProgress)
   {
     stairsItem = new StairsItem();
+    stairsItem->SetLevel(this->currentLevel);
+    stairsItem->SetLevelBaseHeight(this->levelHeights[this->currentLevel]);
     this->scene()->addItem(stairsItem);
     this->currentMouseItem = stairsItem;
 
+    QVector3D stairsPosition = stairsItem->GetScenePosition();
+    stairsPosition.setZ(stairsItem->GetLevelBaseHeight() + stairsPosition.z());
     std::string stairsName = this->buildingMaker->AddStairs(
-        stairsItem->GetSize(), stairsItem->GetScenePosition(),
-        stairsItem->GetSceneRotation(), stairsItem->GetSteps());
+        stairsItem->GetSize(), stairsPosition, stairsItem->GetSceneRotation(),
+        stairsItem->GetSteps());
 
     this->buildingMaker->ConnectItem(stairsName, stairsItem);
 
@@ -356,25 +370,30 @@ void EditorView::OnAddLevel()
     }
   }
 
-  qDebug() << " set level " << wallLevel;
+  this->currentLevel = wallLevel+1;
+  this->levelHeights[this->currentLevel] = maxHeight;
+
   std::vector<WallItem *> newWalls;
   for (unsigned int i = 0; i < this->wallList.size(); ++i)
   {
     WallItem *wallItem = this->wallList[i]->Clone();
-    wallItem->SetLevel(wallLevel+1);
+    wallItem->SetLevel(this->currentLevel);
+    wallItem->SetLevelBaseHeight(this->levelHeights[this->currentLevel]);
     this->scene()->addItem(wallItem);
     newWalls.push_back(wallItem);
     for (unsigned int j = 0; j < wallItem->GetSegmentCount(); ++j)
     {
       LineSegmentItem *segment = wallItem->GetSegment(j);
+      QVector3D segmentSize = segment->GetSize();
+      segmentSize.setZ(wallItem->GetHeight());
+      QVector3D segmentPosition = segment->GetScenePosition();
+      segmentPosition.setZ(wallItem->GetLevelBaseHeight() + segmentPosition.z());
       std::string wallSegmentName = this->buildingMaker->AddWall(
-          segment->GetSize(), segment->GetScenePosition(),
-          segment->GetSceneRotation());
+          segmentSize, segmentPosition, segment->GetSceneRotation());
 
       this->buildingMaker->ConnectItem(wallSegmentName, segment);
       this->buildingMaker->ConnectItem(wallSegmentName, wallItem);
     }
-    wallItem->Update();
   }
 
 
@@ -398,7 +417,7 @@ void EditorView::OnAddLevel()
 /////////////////////////////////////////////////
 void EditorView::OnChangeLevel(int _level)
 {
-  qDebug() << " level " << _level;
+  this->currentLevel = _level;
   for (unsigned int i = 0; i < this->wallList.size(); ++i)
   {
     if (this->wallList[i]->GetLevel() != _level)

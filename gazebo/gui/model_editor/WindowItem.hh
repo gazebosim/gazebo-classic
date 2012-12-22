@@ -26,15 +26,13 @@ namespace gazebo
   {
     class RectItem;
 
-    class WindowItem : public RectItem
+    class BuildingItem;
+
+    class WindowItem : public RectItem, public BuildingItem
     {
         public: WindowItem();
 
         public: ~WindowItem();
-
-        public: int GetLevel();
-
-        public: void SetLevel(int _level);
 
         public: virtual QVector3D GetSize();
 
@@ -62,8 +60,6 @@ namespace gazebo
         private: double windowElevation;
 
         private: double scale;
-
-        private: int level;
     };
   }
 }

@@ -15,6 +15,7 @@ set (sources
   RotateHandle.cc
   EditorView.cc
   RectItem.cc
+  BuildingItem.cc
   WindowItem.cc
   DoorItem.cc
   PolylineItem.cc
@@ -41,6 +42,7 @@ set (qt_headers
   RotateHandle.hh
   EditorView.hh
   RectItem.hh
+  BuildingItem.hh
   WindowItem.hh
   DoorItem.hh
   PolylineItem.hh

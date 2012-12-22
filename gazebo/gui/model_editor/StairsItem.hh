@@ -26,15 +26,11 @@ namespace gazebo
   {
     class RectItem;
 
-    class StairsItem : public RectItem
+    class StairsItem : public RectItem, public BuildingItem
     {
         public: StairsItem();
 
         public: ~StairsItem();
-
-        public: int GetLevel();
-
-        public: void SetLevel(int _level);
 
         public: virtual QVector3D GetSize();
 
@@ -66,8 +62,6 @@ namespace gazebo
         private: int stairsSteps;
 
         private: double scale;
-
-        private: int level;
 
 //        private: double stairsUnitRise;
 

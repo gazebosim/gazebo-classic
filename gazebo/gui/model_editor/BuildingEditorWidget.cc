@@ -15,7 +15,7 @@
  *
 */
 
-#include "gui/model_editor/BuildingEditorWidget.hh"
+#include "gui/model_editor/BuildingItem.hh"
 #include "gui/model_editor/GridLines.hh"
 #include "gui/model_editor/EditorView.hh"
 #include "gui/model_editor/EditorItem.hh"
@@ -25,6 +25,7 @@
 #include "gui/model_editor/PolylineItem.hh"
 #include "gui/model_editor/WallItem.hh"
 #include "gui/model_editor/LevelWidget.hh"
+#include "gui/model_editor/BuildingEditorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -57,16 +58,10 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   view->centerOn(QPointF(0, 0));
   view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
-  WallItem *lineItem = new WallItem(QPointF(0, 0), QPointF(0, 0));
-  scene->addItem(lineItem);
-
-/*  WindowItem *windowItem = new WindowItem();
-  windowItem->setPos(-100,100);
-  scene->addItem(windowItem);
-
-  DoorItem *doorItem = new DoorItem();
-  doorItem->setPos(0,0);
-  scene->addItem(doorItem);*/
+  // TODO remove this wall and make sure scene updates without any items in it
+  WallItem *wallItem = new WallItem(QPointF(0, 0), QPointF(0, 0));
+  wallItem->SetThickness(0);
+  scene->addItem(wallItem);
 
   LevelWidget *levelWidget = new LevelWidget(this);
   levelWidget->resize(140,50);

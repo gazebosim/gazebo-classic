@@ -26,15 +26,13 @@ namespace gazebo
   {
     class RectItem;
 
-    class DoorItem : public RectItem
+    class BuildingItem;
+
+    class DoorItem : public RectItem, public BuildingItem
     {
         public: DoorItem();
 
         public: ~DoorItem();
-
-        public: int GetLevel();
-
-        public: void SetLevel(int _level);
 
         private: virtual void paint (QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
@@ -50,8 +48,6 @@ namespace gazebo
         private: QPointF doorPos;
 
         private: double scale;
-
-        private: int level;
     };
   }
 }

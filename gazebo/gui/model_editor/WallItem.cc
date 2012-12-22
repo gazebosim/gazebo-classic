@@ -15,6 +15,7 @@
  *
 */
 
+#include "gui/model_editor/BuildingItem.hh"
 #include "gui/model_editor/PolylineItem.hh"
 #include "gui/model_editor/WallItem.hh"
 #include "gui/model_editor/LineSegmentItem.hh"
@@ -26,7 +27,7 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 WallItem::WallItem(QPointF _start, QPointF _end)
-    : PolylineItem(_start, _end)
+    : PolylineItem(_start, _end), BuildingItem()
 {
   this->scale = BuildingMaker::conversionScale;
 
@@ -41,18 +42,6 @@ WallItem::WallItem(QPointF _start, QPointF _end)
 /////////////////////////////////////////////////
 WallItem::~WallItem()
 {
-}
-
-/////////////////////////////////////////////////
-int WallItem::GetLevel()
-{
-  return this->level;
-}
-
-/////////////////////////////////////////////////
-void WallItem::SetLevel(int _level)
-{
-  this->level = _level;
 }
 
 /////////////////////////////////////////////////
@@ -153,8 +142,9 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
         this->WallChanged();
 
         double newLength = dialog.GetLength() / this->scale;
-        // User can either change length of start/end pos.
-        // fuzzy comparison between doubles up to 1 decimal place
+        // The if statement below limits the change to either the length of
+        // the wall segment or its start/end pos.
+        // Comparison between doubles up to 1 decimal place
         if (fabs(newLength - (segmentLength * this->scale)) < 0.1)
         {
           line.setLength(newLength);

@@ -380,7 +380,8 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
         wallManip->SetName(linkName);
         wallManip->SetVisual(visVisual);
         visVisual->SetScale(scaledSize);
-        visVisual->SetPosition(math::Vector3(scaledSize.x/2.0, 0, 0));
+        visVisual->SetPosition(math::Vector3(scaledSize.x/2.0,
+          scaledSize.y/2.0, scaledSize.z/2.0));
         wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
         this->allItems[visualName.str()] = wallManip;
         this->walls[visualName.str()] = wallManip;

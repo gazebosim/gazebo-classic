@@ -15,6 +15,7 @@
  *
 */
 
+#include "gui/model_editor/BuildingItem.hh"
 #include "gui/model_editor/RectItem.hh"
 #include "gui/model_editor/WindowItem.hh"
 #include "gui/model_editor/WindowDoorInspectorDialog.hh"
@@ -24,11 +25,12 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-WindowItem::WindowItem(): RectItem()
+WindowItem::WindowItem(): RectItem(), BuildingItem()
 {
   this->scale = BuildingMaker::conversionScale;
 
   this->level = 0;
+  this->levelBaseHeight = 0;
 
   this->windowDepth = 20;
   this->windowHeight = 0;
@@ -51,18 +53,6 @@ WindowItem::WindowItem(): RectItem()
 /////////////////////////////////////////////////
 WindowItem::~WindowItem()
 {
-}
-
-/////////////////////////////////////////////////
-int WindowItem::GetLevel()
-{
-  return this->level;
-}
-
-/////////////////////////////////////////////////
-void WindowItem::SetLevel(int _level)
-{
-  this->level = _level;
 }
 
 /////////////////////////////////////////////////
@@ -165,5 +155,5 @@ void WindowItem::WindowChanged()
   emit depthChanged(this->windowDepth);
   emit heightChanged(this->windowHeight);
   emit positionChanged(this->windowPos.x(), this->windowPos.y(),
-      this->windowElevation);
+      this->levelBaseHeight + this->windowElevation);
 }
