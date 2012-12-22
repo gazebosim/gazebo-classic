@@ -52,6 +52,12 @@ Joint::~Joint()
 //////////////////////////////////////////////////
 void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos)
 {
+  this->Load(_parent, _child, math::Pose(_pos, math::Quaternion()));
+}
+
+//////////////////////////////////////////////////
+void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
+{
   if (_parent)
   {
     this->world = _parent->GetWorld();
@@ -67,13 +73,7 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos)
 
   this->parentLink = _parent;
   this->childLink = _child;
-  this->LoadImpl(_pos);
-}
-
-//////////////////////////////////////////////////
-void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
-{
-  this->Load(_parent, _child, _pose.pos);
+  this->LoadImpl(_pose);
 }
 
 //////////////////////////////////////////////////
@@ -104,11 +104,17 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  this->LoadImpl(_sdf->GetValuePose("pose").pos);
+  this->LoadImpl(_sdf->GetValuePose("pose"));
 }
 
 /////////////////////////////////////////////////
 void Joint::LoadImpl(const math::Vector3 &_pos)
+{
+  this->LoadImpl(math::Pose(_pos, math::Quaternion()));
+}
+
+/////////////////////////////////////////////////
+void Joint::LoadImpl(const math::Pose &_pose)
 {
   BasePtr myBase = shared_from_this();
 
@@ -118,15 +124,9 @@ void Joint::LoadImpl(const math::Vector3 &_pos)
 
   // setting anchor relative to gazebo link frame pose
   if (this->childLink)
-    this->anchorPos = _pos;
+    this->anchorPos = (_pose + this->childLink->GetWorldPose()).pos;
   else
     this->anchorPos = math::Vector3(0, 0, 0);
-}
-
-/////////////////////////////////////////////////
-void Joint::LoadImpl(const math::Pose &_pose)
-{
-  this->LoadImpl(_pose.pos);
 }
 
 //////////////////////////////////////////////////
@@ -135,7 +135,7 @@ void Joint::Init()
   this->Attach(this->parentLink, this->childLink);
 
   // Set the anchor vector
-  this->SetAnchor(0, this->anchorPos + this->childLink->GetWorldPose().pos);
+  this->SetAnchor(0, this->anchorPos);
 
   if (this->sdf->HasElement("axis"))
   {
