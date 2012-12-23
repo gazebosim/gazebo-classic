@@ -520,6 +520,25 @@ QListView::item
   border-radius: 4px;
 }
 
+/*
+QListWidget#topicTextList::item
+{
+  border-bottom: 1px solid black;
+  border-radius: 4px;
+  background-color: #404040;
+  margin: 4px;
+}
+*/
+
+QListWidget#topicTextList::item
+{
+  border-bottom: 1px solid black;
+  border-radius: 4px;
+  color: #101010;
+  background-color: #b0b0b0;
+  margin: 4px;
+}
+
 QComboBox QListView::item
 {
   color: #f58113;
@@ -553,3 +572,5 @@ QFrame#blackBorderFrame
   padding: 0px;
   margin: 0px;
 }
+
+

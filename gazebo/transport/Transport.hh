@@ -119,6 +119,11 @@ namespace gazebo
     /// of the type specified by _msgType.
     std::list<std::string> getAdvertisedTopics(const std::string &_msgType);
 
+    /// \brief Get the message typename that is published on the given topic.
+    /// \param[in] _topicName Name of the topic to query.
+    /// \return The message type, or empty string if the topic is not valid.
+    std::string getTopicMsgType(const std::string &_topicName);
+
     /// \}
   }
 }

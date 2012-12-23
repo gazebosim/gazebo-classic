@@ -298,3 +298,21 @@ std::list<std::string> transport::getAdvertisedTopics(
 
   return result;
 }
+
+/////////////////////////////////////////////////
+std::string transport::getTopicMsgType(const std::string &_topicName)
+{
+  std::string result;
+  std::list<msgs::Publish> publishers;
+
+  ConnectionManager::Instance()->GetAllPublishers(publishers);
+
+  for(std::list<msgs::Publish>::iterator iter = publishers.begin();
+      iter != publishers.end() && result.empty(); ++iter)
+  {
+    if (_topicName == (*iter).topic())
+      result = (*iter).msg_type();
+  }
+
+  return result;
+}

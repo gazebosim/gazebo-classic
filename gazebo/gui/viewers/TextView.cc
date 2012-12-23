@@ -38,6 +38,13 @@ TextView::TextView(const std::string &_msgType)
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
   this->msgList = new QListWidget();
+  this->msgList->setVerticalScrollMode(
+      QAbstractItemView::ScrollPerPixel);
+  this->msgList->setObjectName("topicTextList");
+
+  /*this->msgList->setStyleSheet(
+      "QListWidget::item{ border-bottom: 1px solid black;}");
+      */
 
   QHBoxLayout *controlLayout = new QHBoxLayout;
 
@@ -55,6 +62,7 @@ TextView::TextView(const std::string &_msgType)
 
   controlLayout->addWidget(new QLabel(tr("Pause: ")));
   controlLayout->addWidget(pauseCheck);
+  controlLayout->addStretch(1);
 
   frameLayout->addWidget(this->msgList);
   frameLayout->addLayout(controlLayout);
