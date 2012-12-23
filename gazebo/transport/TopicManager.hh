@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,13 +94,10 @@ namespace gazebo
       /// \param[in] _topic The name of the topic
       /// \param[in] _queueLimit The maximum number of outgoing messages
       /// to queue
-      /// \param[in] _latch If true, latch the latest message; if false,
-      /// don't latch
       /// \return Pointer to the newly created Publisher
       public: template<typename M>
               PublisherPtr Advertise(const std::string &_topic,
-                                     unsigned int _queueLimit,
-                                     bool _latch)
+                                     unsigned int _queueLimit)
               {
                 google::protobuf::Message *msg = NULL;
                 M msgtype;
@@ -111,7 +108,7 @@ namespace gazebo
                 this->UpdatePublications(_topic, msg->GetTypeName());
 
                 PublisherPtr pub = PublisherPtr(new Publisher(_topic,
-                      msg->GetTypeName(), _queueLimit, _latch));
+                      msg->GetTypeName(), _queueLimit));
 
                 std::string msgTypename;
                 PublicationPtr publication;
@@ -245,6 +242,7 @@ namespace gazebo
       // Singleton implementation
       private: friend class SingletonT<TopicManager>;
     };
+
     /// \}
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,6 +207,10 @@ namespace gazebo
 
       /// \brief Our SDF values.
       private: sdf::ElementPtr sdf;
+
+      /// \brief An SDF pointer that allows us to only read the inertial.sdf
+      /// file once, which in turns limits disk reads.
+      private: static sdf::ElementPtr sdfInertial;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,11 +40,22 @@ OrbitViewController::OrbitViewController(UserCameraPtr _camera)
   this->minDist = MIN_DISTANCE;
   this->maxDist = 0;
   this->typeString = TYPE_STRING;
+
+  this->refVisual.reset(new Visual("OrbitViewController",
+                        this->camera->GetScene()));
+
+  this->refVisual->Init();
+  this->refVisual->AttachMesh("unit_sphere");
+  this->refVisual->SetScale(math::Vector3(0.2, 0.2, 0.1));
+  this->refVisual->SetCastShadows(false);
+  this->refVisual->SetMaterial("Gazebo/YellowTransparent");
+  this->refVisual->SetVisible(false);
 }
 
 //////////////////////////////////////////////////
 OrbitViewController::~OrbitViewController()
 {
+  this->refVisual.reset();
 }
 
 //////////////////////////////////////////////////
@@ -56,8 +67,6 @@ void OrbitViewController::Init(const math::Vector3 &_focalPoint)
 
   this->focalPoint = _focalPoint;
   this->distance = this->camera->GetWorldPosition().Distance(this->focalPoint);
-  if (this->distance <= 1.0)
-    std::cout << "Distance[" << this->distance << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -158,6 +167,8 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   if (_event.buttons & common::MouseEvent::MIDDLE)
   {
+    this->refVisual->SetVisible(true);
+
     if (_event.pressPos == _event.pos)
     {
       this->focalPoint = this->camera->GetScene()->GetFirstContact(this->camera,
@@ -165,7 +176,6 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
       this->distance = this->camera->GetWorldPose().pos.Distance(
           this->focalPoint);
     }
-
 
     /// Lock rotation to an axis if the "y" or "z" key is pressed.
     if (!this->key.empty() && (this->key == "y" || this->key == "z"))
@@ -194,6 +204,8 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   }
   else if (_event.buttons & common::MouseEvent::LEFT)
   {
+    this->refVisual->SetVisible(true);
+
     this->distance =
       this->camera->GetWorldPose().pos.Distance(this->focalPoint);
 
@@ -266,7 +278,10 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     this->Zoom(-(_event.scroll.y * factor) * _event.moveScale *
                (this->distance / 10.0));
   }
+  else
+    this->refVisual->SetVisible(false);
 
+  this->refVisual->SetPosition(this->focalPoint);
   this->UpdatePose();
 }
 
@@ -292,6 +307,7 @@ void OrbitViewController::SetDistance(float _d)
 void OrbitViewController::SetFocalPoint(const math::Vector3 &_fp)
 {
   this->focalPoint = _fp;
+  this->refVisual->SetPosition(this->focalPoint);
 }
 
 //////////////////////////////////////////////////
@@ -311,7 +327,6 @@ void OrbitViewController::SetPitch(double _pitch)
 {
   this->pitch = _pitch;
 }
-
 
 //////////////////////////////////////////////////
 void OrbitViewController::NormalizeYaw(float &v)

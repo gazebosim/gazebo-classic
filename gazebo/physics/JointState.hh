@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,10 @@ namespace gazebo
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
       public: bool IsZero() const;
+
+      /// \brief Populate a state SDF element with data from the object.
+      /// \param[out] _sdf SDF element to populate.
+      public: void FillSDF(sdf::ElementPtr _sdf);
 
       /// \brief Assignment operator
       /// \param[in] _state State value

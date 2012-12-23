@@ -47,6 +47,11 @@ QMenu::item:selected
   color: #f58113;
 }
 
+QMenu::item:disabled
+{
+  color: #5f5f5f;
+}
+
 QToolBar
 {
   padding: 0px;
@@ -128,10 +133,10 @@ QTreeView::branch:!selected
   color: #d0d0d0;
 }
 
-QTreeView::item:selected
+QTreeView::item:selected,
+QTreeView::item:hover
 {
   color: #f58113;
-  background: #737373;
 }
 
 QTreeView QHeaderView:section

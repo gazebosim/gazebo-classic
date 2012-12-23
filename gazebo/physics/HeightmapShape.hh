@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,6 +96,10 @@ namespace gazebo
       /// \brief Get the minimum height.
       /// \return The minimum height.
       public: float GetMinHeight() const;
+
+      /// \brief Get the amount of subsampling.
+      /// \return Amount of subsampling.
+      public: int GetSubSampling() const;
 
       /// \brief Create a lookup table of the terrain's height.
       private: void FillHeightMap();

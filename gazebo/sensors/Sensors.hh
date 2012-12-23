@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ namespace gazebo
     /// \brief Run the sensor generation one step.
     /// \param _force: If true, all sensors are forced to update. Otherwise
     ///        a sensor will update based on it's Hz rate.
-    void run_once(bool _force = true);
+    void run_once(bool _force = false);
 
     /// \brief Run sensor generation continuously. This is a blocking call
     void run();

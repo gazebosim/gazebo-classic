@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ using namespace rendering;
 unsigned int Light::lightCounter = 0;
 
 //////////////////////////////////////////////////
-Light::Light(Scene *_scene)
+Light::Light(ScenePtr _scene)
 {
   this->line = NULL;
   this->scene = _scene;
@@ -66,6 +66,8 @@ Light::~Light()
 
   this->sdf->Reset();
   this->sdf.reset();
+
+  this->scene.reset();
 }
 
 //////////////////////////////////////////////////
@@ -261,6 +263,13 @@ void Light::CreateVisual()
   {
     this->line = this->visual->CreateDynamicLine(RENDERING_LINE_LIST);
 
+    this->line->setMaterial("Gazebo/LightOn");
+
+    this->line->setVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE |
+                                   GZ_VISIBILITY_GUI);
+
+    this->visual->SetVisible(true);
+
     // Create a scene node to hold the light selection object.
     Ogre::SceneNode *visSceneNode;
     visSceneNode = this->visual->GetSceneNode()->createChildSceneNode(
@@ -391,13 +400,6 @@ void Light::CreateVisual()
       this->line->AddPoint(math::Vector3(angles[i], angles[i], -range));
     }
   }
-
-  this->line->setMaterial("Gazebo/LightOn");
-
-  this->line->setVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE |
-                                 GZ_VISIBILITY_GUI);
-
-  this->visual->SetVisible(true);
 }
 
 //////////////////////////////////////////////////

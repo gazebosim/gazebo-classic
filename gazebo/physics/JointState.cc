@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -171,4 +171,21 @@ JointState JointState::operator+(const JointState &_state) const
   }
 
   return result;
+}
+
+/////////////////////////////////////////////////
+void JointState::FillSDF(sdf::ElementPtr _sdf)
+{
+  _sdf->ClearElements();
+
+  _sdf->GetAttribute("name")->Set(this->name);
+
+  int i = 0;
+  for (std::vector<math::Angle>::const_iterator iter = this->angles.begin();
+       iter != this->angles.end(); ++iter, ++i)
+  {
+    sdf::ElementPtr elem = _sdf->AddElement("angle");
+    elem->GetAttribute("axis")->Set(i);
+    elem->Set((*iter).Radian());
+  }
 }

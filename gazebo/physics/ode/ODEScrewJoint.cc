@@ -1,21 +1,17 @@
 /*
- *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003
- *     Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 /* Desc: A screw or primastic joint
@@ -44,6 +40,8 @@ ODEScrewJoint::ODEScrewJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEScrewJoint::~ODEScrewJoint()
 {
+  if (this->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
 //////////////////////////////////////////////////
@@ -98,8 +96,10 @@ void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 //////////////////////////////////////////////////
 void ODEScrewJoint::SetDamping(int /*index*/, double _damping)
 {
-  this->damping_coefficient = _damping;
-  dJointSetDamping(this->jointId, this->damping_coefficient);
+  this->dampingCoefficient = _damping;
+  // dJointSetDamping(this->jointId, this->dampingCoefficient);
+  this->applyDamping = physics::Joint::ConnectJointUpdate(
+    boost::bind(&Joint::ApplyDamping, this));
 }
 
 //////////////////////////////////////////////////
@@ -109,15 +109,9 @@ void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::ApplyDamping()
+void ODEScrewJoint::SetForce(int _index, double _force)
 {
-  double damping_force = this->damping_coefficient * this->GetVelocity(0);
-  this->SetForce(0, damping_force);
-}
-
-//////////////////////////////////////////////////
-void ODEScrewJoint::SetForce(int /*index*/, double _force)
-{
+  ODEJoint::SetForce(_index, _force);
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
   // dJointAddScrewForce(this->jointId, _force);

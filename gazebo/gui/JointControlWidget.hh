@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,9 +136,6 @@ namespace gazebo
 
       /// \brief Publisher for joint messages.
       private: transport::PublisherPtr jointPub;
-
-      /// \brief Holds out request for model information.
-      private: msgs::Request *requestMsg;
 
       /// \brief Sliders for force control
       private: std::map<std::string, JointForceControl*> sliders;

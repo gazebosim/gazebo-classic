@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#define BOOST_FILESYSTEM_VERSION 2
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -359,7 +358,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
   {
     if (strcmp(gazeboNode->Attribute("version"), SDF::version.c_str()) != 0)
     {
-      gzwarn << "Converting a deprecatd SDF source[" << _source << "].\n";
+      gzwarn << "Converting a deprecated SDF source[" << _source << "].\n";
       Converter::Convert(_xmlDoc, SDF::version);
     }
 
@@ -411,7 +410,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
     if (strcmp(gazeboNode->Attribute("version"),
                SDF::version.c_str()) != 0)
     {
-      gzwarn << "Converting a deprecatd SDF source[" << _source << "].\n";
+      gzwarn << "Converting a deprecated SDF source[" << _source << "].\n";
       Converter::Convert(_xmlDoc, SDF::version);
     }
 
@@ -575,8 +574,23 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
               gzerr << "No <model> element in manifest[" << manifest << "]\n";
             else
             {
-              filename = modelPath + "/" +
-                         modelXML->FirstChildElement("sdf")->GetText();
+              TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");
+              TiXmlElement *sdfSearch = sdfXML;
+
+              // Find the SDF element that matches our current SDF version.
+              while (sdfSearch)
+              {
+                if (sdfSearch->Attribute("version") &&
+                    std::string(sdfSearch->Attribute("version")) == SDF_VERSION)
+                {
+                  sdfXML = sdfSearch;
+                  break;
+                }
+
+                sdfSearch = sdfSearch->NextSiblingElement("sdf");
+              }
+
+              filename = modelPath + "/" + sdfXML->GetText();
             }
           }
         }

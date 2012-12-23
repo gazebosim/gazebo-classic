@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,6 +86,10 @@ namespace gazebo
       /// \param[in] _force True if update is forced, false if not
       protected: virtual void UpdateImpl(bool /*_force*/) {}
 
+      /// \brief Get the update rate of the sensor.
+      /// \return _hz update rate of sensor.  Returns 0 if unthrottled.
+      public: double GetUpdateRate();
+
       /// \brief Set the update rate of the sensor.
       /// \param[in] _hz update rate of sensor.
       public: void SetUpdateRate(double _hz);
@@ -111,7 +115,7 @@ namespace gazebo
 
       /// \brief Returns true if sensor generation is active.
       /// \return True if active, false if not.
-      public: bool IsActive();
+      public: virtual bool IsActive();
 
       /// \brief Get sensor type.
       /// \return Type of sensor.
@@ -142,6 +146,21 @@ namespace gazebo
       /// \return Name of the world.
       public: std::string GetWorldName() const;
 
+      /// \brief Connect a signal that is triggered when the sensor is
+      /// updated.
+      /// \param[in] _subscriber Callback that receives the signal.
+      /// \return A pointer to the connection. This must be kept in scope.
+      /// \sa Sensor::DisconnectUpdated
+      public: template<typename T>
+              event::ConnectionPtr ConnectUpdated(T _subscriber)
+              {return this->updated.Connect(_subscriber);}
+
+      /// \brief Disconnect from a the updated signal.
+      /// \param[in] _c The connection to disconnect
+      /// \sa Sensor::ConnectUpdated
+      public: void DisconnectUpdated(event::ConnectionPtr &_c)
+              {this->updated.Disconnect(_c);}
+
       /// \brief Load a plugin for this sensor.
       /// \param[in] _sdf SDF parameters.
       private: void LoadPlugin(sdf::ElementPtr _sdf);
@@ -167,6 +186,9 @@ namespace gazebo
 
       /// \brief Subscribe to pose updates.
       protected: transport::SubscriberPtr poseSub;
+
+      /// \brief Event triggered when a sensor is updated.
+      private: event::EventT<void()> updated;
 
       /// \brief Subscribe to control message.
       private: transport::SubscriberPtr controlSub;

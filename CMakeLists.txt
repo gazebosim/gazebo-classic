@@ -8,7 +8,7 @@ endif(COMMAND CMAKE_POLICY)
 project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
-set (GAZEBO_VERSION_NAME "helium")
+set (GAZEBO_VERSION_NAME "lithium")
 set (GAZEBO_MAJOR_VERSION 1)
 set (GAZEBO_MINOR_VERSION 3)
 set (GAZEBO_PATCH_VERSION 0)
@@ -254,6 +254,8 @@ else (build_errors)
 
   configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.sh.in ${PROJECT_BINARY_DIR}/setup.sh @ONLY)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/)
+  configure_file(${CMAKE_SOURCE_DIR}/cmake/setup-unversioned.sh.in ${PROJECT_BINARY_DIR}/unversioned/setup.sh @ONLY)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/unversioned/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/)
  
   include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
   

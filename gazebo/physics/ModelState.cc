@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -307,4 +307,27 @@ ModelState ModelState::operator+(const ModelState &_state) const
   }
 
   return result;
+}
+
+/////////////////////////////////////////////////
+void ModelState::FillSDF(sdf::ElementPtr _sdf)
+{
+  _sdf->ClearElements();
+
+  _sdf->GetAttribute("name")->Set(this->name);
+  _sdf->GetElement("pose")->Set(this->pose);
+
+  for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end(); ++iter)
+  {
+    sdf::ElementPtr elem = _sdf->AddElement("link");
+    (*iter).FillSDF(elem);
+  }
+
+  for (std::vector<JointState>::iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end(); ++iter)
+  {
+    sdf::ElementPtr elem = _sdf->AddElement("joint");
+    (*iter).FillSDF(elem);
+  }
 }

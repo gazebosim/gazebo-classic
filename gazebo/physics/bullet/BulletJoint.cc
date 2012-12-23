@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,4 +99,11 @@ void BulletJoint::Detach()
   this->parentLink.reset();
 
   delete this->constraint;
+}
+
+//////////////////////////////////////////////////
+JointWrench BulletJoint::GetForceTorque(int /*_index*/)
+{
+  JointWrench wrench;
+  return wrench;
 }

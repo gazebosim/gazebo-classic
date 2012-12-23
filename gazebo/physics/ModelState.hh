@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,6 +135,10 @@ namespace gazebo
       /// \brief Get the joint states.
       /// \return A vector of joint states.
       public: const std::vector<JointState> &GetJointStates() const;
+
+      /// \brief Populate a state SDF element with data from the object.
+      /// \param[out] _sdf SDF element to populate.
+      public: void FillSDF(sdf::ElementPtr _sdf);
 
       /// \brief Assignment operator
       /// \param[in] _state State value
