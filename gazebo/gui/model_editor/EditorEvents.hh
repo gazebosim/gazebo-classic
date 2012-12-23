@@ -73,7 +73,8 @@ namespace gazebo
       public: static event::EventT<void (std::string)> createEditorItem;
 
       /// \brief A model is to be created
-      public: static event::EventT<void (std::string)> finishModel;
+      public: static event::EventT<void (std::string, std::string)>
+          finishModel;
 
       /// \brief The current level has been changed
       public: static event::EventT<void (int)> changeLevel;

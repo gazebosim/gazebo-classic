@@ -34,6 +34,8 @@ namespace gazebo
 
       public: std::string GetModelName();
 
+      public: std::string GetSaveLocation();
+
       private slots: void OnBrowse();
 
       private slots: void OnCancel();

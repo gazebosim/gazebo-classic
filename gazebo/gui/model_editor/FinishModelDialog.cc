@@ -35,11 +35,11 @@ FinishModelDialog::FinishModelDialog(QWidget *_parent)
   QLabel *modelLabel = new QLabel;
   modelLabel->setText(tr("Name"));
   this->modelNameLineEdit = new QLineEdit;
-  this->modelNameLineEdit->setPlaceholderText(tr("MyNamedModel.sdf"));
+  this->modelNameLineEdit->setText(tr("MyNamedModel"));
   QLabel *modelLocation = new QLabel;
   modelLocation->setText(tr("Location"));
   this->modelLocationLineEdit = new QLineEdit;
-  this->modelLocationLineEdit->setPlaceholderText(tr(""));
+  this->modelLocationLineEdit->setText(QDir::homePath());
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
 
@@ -86,10 +86,16 @@ std::string FinishModelDialog::GetModelName()
 }
 
 /////////////////////////////////////////////////
+std::string FinishModelDialog::GetSaveLocation()
+{
+  return this->modelLocationLineEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
 void FinishModelDialog::OnBrowse()
 {
   QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-    "/home", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    QDir::homePath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
   this->modelLocationLineEdit->setText(dir);
 }
 

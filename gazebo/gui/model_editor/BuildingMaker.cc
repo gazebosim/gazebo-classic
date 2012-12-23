@@ -572,10 +572,21 @@ void BuildingMaker::SetModelName(std::string _modelName)
 }
 
 /////////////////////////////////////////////////
+void BuildingMaker::SaveToSDF(std::string _savePath)
+{
+  this->savePath = _savePath;
+  std::ofstream savefile;
+  std::string saveFilePath = this->savePath + "/" + this->modelName + ".sdf";
+  savefile.open(saveFilePath.c_str());
+  savefile << this->modelSDF->ToString();
+  savefile.close();
+}
+
+/////////////////////////////////////////////////
 void BuildingMaker::FinishModel()
 {
   this->CreateTheEntity();
-  this->Stop();
+//  this->Stop();
 }
 
 /////////////////////////////////////////////////

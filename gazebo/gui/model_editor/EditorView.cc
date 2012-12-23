@@ -48,7 +48,7 @@ EditorView::EditorView(QWidget *_parent)
 
   this->connections.push_back(
   gui::Events::ConnectFinishModel(
-    boost::bind(&EditorView::OnFinishModel, this, _1)));
+    boost::bind(&EditorView::OnFinishModel, this, _1, _2)));
 
   this->connections.push_back(
   gui::Events::ConnectAddLevel(
@@ -343,12 +343,14 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
-void EditorView::OnFinishModel(const std::string &_modelName)
+void EditorView::OnFinishModel(const std::string &_modelName,
+    const std::string &_savePath)
 {
   if (this->buildingMaker)
   {
     this->buildingMaker->SetModelName(_modelName);
     this->buildingMaker->FinishModel();
+    this->buildingMaker->SaveToSDF(_savePath);
   }
 }
 

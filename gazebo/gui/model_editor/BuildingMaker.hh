@@ -152,11 +152,14 @@ namespace gazebo
 
       /// \brief
       public: virtual void Start(const rendering::UserCameraPtr _camera);
+
       /// \brief
       public: virtual void Stop();
 
       /// \brief Checks if entity is active
       public: virtual bool IsActive() const;
+
+      public: void SaveToSDF(std::string _savePath);
 
       /// \brief Internal init function.
       private: bool Init();
@@ -186,6 +189,8 @@ namespace gazebo
       private: sdf::SDFPtr modelSDF;
 
       private: std::string modelName;
+
+      private: std::string savePath;
 
       private: BoxMaker* boxMaker;
 
