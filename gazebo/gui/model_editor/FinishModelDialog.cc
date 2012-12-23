@@ -95,8 +95,10 @@ std::string FinishModelDialog::GetSaveLocation()
 void FinishModelDialog::OnBrowse()
 {
   QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-    QDir::homePath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-  this->modelLocationLineEdit->setText(dir);
+    QDir::homePath(), QFileDialog::ShowDirsOnly
+    | QFileDialog::DontResolveSymlinks);
+  if (!dir.isEmpty())
+    this->modelLocationLineEdit->setText(dir);
 }
 
 /////////////////////////////////////////////////
