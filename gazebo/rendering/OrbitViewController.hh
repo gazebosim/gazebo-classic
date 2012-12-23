@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include "rendering/DynamicLines.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/ViewController.hh"
 #include "gazebo/math/Vector3.hh"
@@ -125,6 +126,7 @@ namespace gazebo
       private: float dy, dp;
 
       private: std::string key;
+      private: DynamicLines *line;
     };
     /// \}
   }

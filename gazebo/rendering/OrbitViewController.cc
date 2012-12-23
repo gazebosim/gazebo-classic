@@ -51,6 +51,10 @@ OrbitViewController::OrbitViewController(UserCameraPtr _camera)
   this->refVisual->SetCastShadows(false);
   this->refVisual->SetMaterial("Gazebo/YellowTransparent");
   this->refVisual->SetVisible(false);
+
+  this->line = this->refVisual->CreateDynamicLine();
+  this->line->AddPoint(math::Vector3());
+  this->line->AddPoint(math::Vector3());
 }
 
 //////////////////////////////////////////////////
@@ -174,7 +178,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   {
     this->refVisual->SetVisible(true);
 
-    std::cout << "PressPos[" << _event.pressPos << "] Pos[" << _event.pos << "]\n";
+    // std::cout << "PressPos[" << _event.pressPos << "] Pos[" << _event.pos << "]\n";
     if (_event.pressPos == _event.pos)
     {
       math::Vector3 rpy = this->camera->GetWorldPose().rot.GetAsEuler();
@@ -221,7 +225,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     else
     {
       this->dy = drag.x * _event.moveScale * -0.4;
-      //this->dp = drag.y * _event.moveScale * 0.4;
+      this->dp = drag.y * _event.moveScale * 0.4;
       this->NormalizeYaw(this->dy);
       this->NormalizePitch(this->dp);
 
@@ -231,7 +235,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
       // this->NormalizePitch(this->pitch);
     }
 
-    std::cout << "FocalPoint[" << this->focalPoint << "]\n";
+    // std::cout << "FocalPoint[" << this->focalPoint << "]\n";
     this->refVisual->SetPosition(this->focalPoint);
     this->UpdatePose();
   }
@@ -434,20 +438,39 @@ void OrbitViewController::UpdatePose()
 
   math::Vector3 delta = this->camera->GetWorldPosition() - this->focalPoint;
   double y = atan2(delta.y, delta.x);
-  double p = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+  double p1 = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
 
+  /*math::Vector3 deltaNorm = delta;
+  deltaNorm.Normalize();
+  math::Vector3 right = math::Vector3(0, 0, 1).Cross(deltaNorm);
+  right *= this->distance;
   Ogre::Quaternion q = this->camera->GetSceneNode()->getOrientation();
   Ogre::Vector3 vRight = Ogre::Vector3::UNIT_Y;
   vRight = q * vRight;
-  std::cout << "Right[" << vRight << "]\n";
+  this->line->SetPoint(1, math::Vector3(vRight.x, vRight.y, vRight.z));
+  */
+
+  /*this->dy = 0;
+  pos.x = this->distance * cos(y + this->dy) * cos(p);
+  pos.y = this->distance * sin(y + this->dy) * cos(p);
+  pos.z = this->distance * sin(p);
+  */
+
+  std::cout << "Yaw[" << y << "] Pitch[" << p1 << "]\n";
+  pos.x = -cos(p1 + this->dp);
+  pos.y = 0;//sin(3.1415) * cos(p + this->dp);
+  pos.z = sin(p1 + this->dp);
+
+  pos *= this->distance;
+  pos += this->focalPoint;
 
 
-  pos.x = this->distance * cos(y + this->dy) * cos(p + this->dp);
-  pos.y = this->distance * sin(y + this->dy) * cos(p + this->dp);
-  pos.z = this->distance * sin(p + this->dp);
-
-  //std::cout << "Y[" << GZ_RTOD(y) << "] P[" << GZ_RTOD(p) << "]\n";
-  //std::cout << "Pos[" << pos << "] FP[" << this->focalPoint << "]\n";
+  delta = this->camera->GetWorldPosition()- this->focalPoint;
+  y = atan2(delta.y, delta.x);
+  double p = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+  pos.x = this->distance * cos(y + this->dy) * cos(0);
+  pos.y = this->distance * sin(y + this->dy) * cos(0);
+  pos.z = this->distance * sin(p+this->dp);
 
   pos += this->focalPoint;
 
