@@ -10,6 +10,7 @@ set (plugins
   GpuRayPlugin
   ContactPlugin
   CartTestPlugin
+  ForceTorquePlugin
   ModelTrajectoryTestPlugin
   RayPlugin
   RubblePlugin

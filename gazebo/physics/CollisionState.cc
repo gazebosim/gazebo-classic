@@ -107,3 +107,13 @@ CollisionState CollisionState::operator+(const CollisionState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+void CollisionState::FillSDF(sdf::ElementPtr _sdf)
+{
+  _sdf->ClearElements();
+
+  _sdf->GetAttribute("name")->Set(this->name);
+  _sdf->GetElement("pose")->Set(this->pose);
+}
+

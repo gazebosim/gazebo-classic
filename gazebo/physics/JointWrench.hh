@@ -19,8 +19,8 @@
  * Date: 10 Nov 2009
  */
 
-#ifndef _JOINTFEEDBACK_HH_
-#define _JOINTFEEDBACK_HH_
+#ifndef _JOINT_WRENCH_HH_
+#define _JOINT_WRENCH_HH_
 
 #include "math/Vector3.hh"
 

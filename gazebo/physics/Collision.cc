@@ -285,12 +285,6 @@ void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Collision::FillCollisionMsg(msgs::Collision &_msg)
-{
-  this->FillMsg(_msg);
-}
-
-//////////////////////////////////////////////////
 void Collision::FillMsg(msgs::Collision &_msg)
 {
   msgs::Set(_msg.mutable_pose(), this->GetRelativePose());

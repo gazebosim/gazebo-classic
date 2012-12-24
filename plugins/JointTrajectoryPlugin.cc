@@ -15,9 +15,8 @@
  *
 */
 /*
- * Desc: 3D position interface for ground truth.
- * Author: Sachin Chitta and John Hsu
- * Date: 1 June 2008
+ * Desc: a test for setting joint angles
+ * Author: John Hsu
  */
 
 #include <plugins/JointTrajectoryPlugin.hh>
@@ -40,10 +39,14 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
                                  sdf::ElementPtr /*_sdf*/)
 {
   // Get the world name.
-  this->world = _parent->GetWorld();
   this->model = _parent;
+  this->world = this->model->GetWorld();
 
   // this->world->GetPhysicsEngine()->SetGravity(math::Vector3(0,0,0));
+
+  for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();
+                        j != this->model->GetJoints().end(); ++j)
+    (*j)->SetAngle(0, 0);
 
   // New Mechanism for Updating every World Cycle
   // Listen to the update event. This event is broadcast every
@@ -53,15 +56,15 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 }
 
 /////////////////////////////////////////////////
-void JointTrajectoryPlugin::FixLink(physics::LinkPtr link)
+void JointTrajectoryPlugin::FixLink(physics::LinkPtr _link)
 {
   this->joint = this->world->GetPhysicsEngine()->CreateJoint("revolute",
       this->model);
 
   this->joint->SetModel(this->model);
-  math::Pose pose = link->GetWorldPose();
+  math::Pose pose = _link->GetWorldPose();
   // math::Pose  pose(math::Vector3(0, 0, 0.2), math::Quaternion(1, 0, 0, 0));
-  this->joint->Load(physics::LinkPtr(), link, pose);
+  this->joint->Load(physics::LinkPtr(), _link, pose);
   this->joint->SetAxis(0, math::Vector3(0, 0, 0));
   this->joint->SetHighStop(0, 0);
   this->joint->SetLowStop(0, 0);
@@ -80,15 +83,22 @@ void JointTrajectoryPlugin::UpdateStates()
 {
   common::Time cur_time = this->world->GetSimTime();
 
+  // for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();
+  //                       j != this->model->GetJoints().end(); ++j)
+  //   gzerr << cur_time << " " << (*j)->GetScopedName() << "\n";
+
   bool is_paused = this->world->IsPaused();
   if (!is_paused) this->world->SetPaused(true);
 
   std::map<std::string, double> joint_position_map;
-  joint_position_map["arm_shoulder_pan_joint"] = cos(cur_time.Double());
-  joint_position_map["arm_elbow_pan_joint"] = -cos(cur_time.Double());
-  joint_position_map["arm_wrist_lift_joint"] = -0.35
-    + 0.45*cos(0.5*cur_time.Double());
-  joint_position_map["arm_wrist_roll_joint"] = -2.9*cos(3.0*cur_time.Double());
+  joint_position_map["simple_arm_gripper::simple_arm::arm_shoulder_pan_joint"]
+    = cos(cur_time.Double());
+  joint_position_map["simple_arm_gripper::simple_arm::arm_elbow_pan_joint"]
+    = -cos(cur_time.Double());
+  joint_position_map["simple_arm_gripper::simple_arm::arm_wrist_lift_joint"]
+    = -0.35 + 0.45*cos(0.5*cur_time.Double());
+  joint_position_map["simple_arm_gripper::simple_arm::arm_wrist_roll_joint"]
+    = -2.9*cos(3.0*cur_time.Double());
 
   this->model->SetJointPositions(joint_position_map);
 
