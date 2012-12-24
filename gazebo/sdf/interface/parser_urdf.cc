@@ -280,33 +280,33 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
         else
           gazebo->gravity = true;
       }
-      else if (child_elem->ValueStr() == "damping_factor")
+      else if (child_elem->ValueStr() == "dampingFactor")
       {
-          gazebo->is_damping_factor = true;
-          gazebo->damping_factor = boost::lexical_cast<double>(
+          gazebo->isDampingFactor = true;
+          gazebo->dampingFactor = boost::lexical_cast<double>(
               getKeyValueAsString(child_elem).c_str());
       }
       else if (child_elem->ValueStr() == "maxVel")
       {
-          gazebo->is_maxVel = true;
+          gazebo->isMaxVel = true;
           gazebo->maxVel = boost::lexical_cast<double>(
               getKeyValueAsString(child_elem).c_str());
       }
       else if (child_elem->ValueStr() == "minDepth")
       {
-          gazebo->is_minDepth = true;
+          gazebo->isMinDepth = true;
           gazebo->minDepth = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
       else if (child_elem->ValueStr() == "mu1")
       {
-          gazebo->is_mu1 = true;
+          gazebo->isMu1 = true;
           gazebo->mu1 = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
       else if (child_elem->ValueStr() == "mu2")
       {
-          gazebo->is_mu2 = true;
+          gazebo->isMu2 = true;
           gazebo->mu2 = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
@@ -316,54 +316,54 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
       }
       else if (child_elem->ValueStr() == "kp")
       {
-          gazebo->is_kp = true;
+          gazebo->isKp = true;
           gazebo->kp = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
       else if (child_elem->ValueStr() == "kd")
       {
-          gazebo->is_kd = true;
+          gazebo->isKd = true;
           gazebo->kd = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
-      else if (child_elem->ValueStr() == "self_collide")
+      else if (child_elem->ValueStr() == "selfCollide")
       {
         std::string value_str = getKeyValueAsString(child_elem);
 
-        // default of self_collide is false
+        // default of selfCollide is false
         if (lowerStr(value_str) == "true" || lowerStr(value_str) == "yes" ||
             value_str == "1")
-          gazebo->self_collide = true;
+          gazebo->selfCollide = true;
         else
-          gazebo->self_collide = false;
+          gazebo->selfCollide = false;
       }
-      else if (child_elem->ValueStr() == "laser_retro")
+      else if (child_elem->ValueStr() == "laserRetro")
       {
-          gazebo->is_laser_retro = true;
-          gazebo->laser_retro = boost::lexical_cast<double>(
+          gazebo->isLaserRetro = true;
+          gazebo->laserRetro = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
-      else if (child_elem->ValueStr() == "stop_cfm")
+      else if (child_elem->ValueStr() == "stopCfm")
       {
-          gazebo->is_stop_cfm = true;
-          gazebo->stop_cfm = boost::lexical_cast<double>(
+          gazebo->isStopCfm = true;
+          gazebo->stopCfm = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
-      else if (child_elem->ValueStr() == "stop_erp")
+      else if (child_elem->ValueStr() == "stopErp")
       {
-          gazebo->is_stop_erp = true;
-          gazebo->stop_erp = boost::lexical_cast<double>(
+          gazebo->isStopErp = true;
+          gazebo->stopErp = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
-      else if (child_elem->ValueStr() == "initial_joint_position")
+      else if (child_elem->ValueStr() == "initialJointPosition")
       {
-          gazebo->is_initial_joint_position = true;
-          gazebo->initial_joint_position = boost::lexical_cast<double>(
+          gazebo->isInitialJointPosition = true;
+          gazebo->initialJointPosition = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
       else if (child_elem->ValueStr() == "fudge_factor")
       {
-          gazebo->is_fudge_factor = true;
+          gazebo->isFudge_factor = true;
           gazebo->fudge_factor = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
@@ -411,25 +411,25 @@ void URDF2Gazebo::insertGazeboExtensionCollision(TiXmlElement *elem,
         TiXmlElement *contact_ode = new TiXmlElement("ode");
 
         // insert mu1, mu2, kp, kd for collision
-        if ((*ge)->is_mu1)
+        if ((*ge)->isMu1)
           addKeyValue(friction_ode, "mu", values2str(1, &(*ge)->mu1));
-        if ((*ge)->is_mu2)
+        if ((*ge)->isMu2)
           addKeyValue(friction_ode, "mu2", values2str(1, &(*ge)->mu2));
         if (!(*ge)->fdir1.empty())
           addKeyValue(friction_ode, "fdir1", (*ge)->fdir1);
-        if ((*ge)->is_kp)
+        if ((*ge)->isKp)
           addKeyValue(contact_ode, "kp", values2str(1, &(*ge)->kp));
-        if ((*ge)->is_kd)
+        if ((*ge)->isKd)
           addKeyValue(contact_ode, "kd", values2str(1, &(*ge)->kd));
         // max contact interpenetration correction velocity
-        if ((*ge)->is_maxVel)
+        if ((*ge)->isMaxVel)
           addKeyValue(contact_ode, "max_vel", values2str(1, &(*ge)->maxVel));
         // contact interpenetration margin tolerance
-        if ((*ge)->is_minDepth)
+        if ((*ge)->isMinDepth)
           addKeyValue(contact_ode, "min_depth",
                       values2str(1, &(*ge)->minDepth));
-        if ((*ge)->is_laser_retro)
-          addKeyValue(elem, "laser_retro", values2str(1, &(*ge)->laser_retro));
+        if ((*ge)->isLaserRetro)
+          addKeyValue(elem, "laser_retro", values2str(1, &(*ge)->laserRetro));
 
         contact->LinkEndChild(contact_ode);
         surface->LinkEndChild(contact);
@@ -483,15 +483,15 @@ void URDF2Gazebo::insertGazeboExtensionLink(TiXmlElement *elem,
 
           // damping factor
           TiXmlElement *velocity_decay = new TiXmlElement("velocity_decay");
-          if ((*ge)->is_damping_factor)
+          if ((*ge)->isDampingFactor)
           {
             /// @todo separate linear and angular velocity decay
-            addKeyValue(elem, "linear", values2str(1, &(*ge)->damping_factor));
-            addKeyValue(elem, "angular", values2str(1, &(*ge)->damping_factor));
+            addKeyValue(elem, "linear", values2str(1, &(*ge)->dampingFactor));
+            addKeyValue(elem, "angular", values2str(1, &(*ge)->dampingFactor));
           }
           elem->LinkEndChild(velocity_decay);
-          // self_collide tag
-          if ((*ge)->self_collide)
+          // selfCollide tag
+          if ((*ge)->selfCollide)
               addKeyValue(elem, "self_collide", "true");
           else
               addKeyValue(elem, "self_collide", "false");
@@ -523,19 +523,19 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
         TiXmlElement *physics     = new TiXmlElement("physics");
         TiXmlElement *physicsOde = new TiXmlElement("ode");
         TiXmlElement *limit       = new TiXmlElement("limit");
-        // insert stop_cfm, stop_erp, fudge_factor
-        if ((*ge)->is_stop_cfm)
+        // insert stopCfm, stopErp, fudge_factor
+        if ((*ge)->isStopCfm)
         {
-          addKeyValue(limit, "erp", values2str(1, &(*ge)->stop_cfm));
+          addKeyValue(limit, "erp", values2str(1, &(*ge)->stopCfm));
         }
-        if ((*ge)->is_stop_erp)
+        if ((*ge)->isStopErp)
         {
-          addKeyValue(limit, "cfm", values2str(1, &(*ge)->stop_erp));
+          addKeyValue(limit, "cfm", values2str(1, &(*ge)->stopErp));
         }
         /* gone
-        if ((*ge)->is_initial_joint_position)
-            addKeyValue(elem, "initial_joint_position",
-              values2str(1, &(*ge)->initial_joint_position));
+        if ((*ge)->isInitialJointPosition)
+            addKeyValue(elem, "initialJointPosition",
+              values2str(1, &(*ge)->initialJointPosition));
         */
 
         // insert provideFeedback
@@ -545,7 +545,7 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
             addKeyValue(physicsOde, "provide_feedback", "false");
 
         // insert fudge_factor
-        if ((*ge)->is_fudge_factor)
+        if ((*ge)->isFudge_factor)
           addKeyValue(physicsOde, "fudge_factor",
                       values2str(1, &(*ge)->fudge_factor));
 
