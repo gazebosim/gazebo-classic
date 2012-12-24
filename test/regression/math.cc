@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
+#include <gtest/gtest.h>
 #include <string.h>
 #include "common/Console.hh"
 #include "math/gzmath.hh"
 #include "msgs/msgs.hh"
-#include "ServerFixture.hh"
 
 using namespace gazebo;
-class MathTest : public ServerFixture
+class MathTest : public testing::Test
 {
 };
 
