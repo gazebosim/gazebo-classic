@@ -51,8 +51,8 @@ namespace urdf2gazebo
   {
     public:
       // for reducing fixed joints and removing links
-      std::string old_link_name;
-      gazebo::math::Pose reduction_transform;
+      std::string oldLinkName;
+      gazebo::math::Pose reductionTransform;
 
       // visual
       std::string material;
@@ -139,8 +139,8 @@ namespace urdf2gazebo
         is_initial_joint_position = ge.is_initial_joint_position;
         is_fudge_factor = ge.is_fudge_factor;
         provideFeedback = ge.provideFeedback;
-        old_link_name = ge.old_link_name;
-        reduction_transform = ge.reduction_transform;
+        oldLinkName = ge.oldLinkName;
+        reductionTransform = ge.reductionTransform;
         blobs = ge.blobs;
 
         damping_factor = ge.damping_factor;
@@ -259,7 +259,7 @@ namespace urdf2gazebo
       void reduceGazeboExtensionPluginFrameReplace(
         std::vector<TiXmlElement*>::iterator blob_it,
         LinkPtr link, std::string plugin_name,
-        std::string element_name, gazebo::math::Pose reduction_transform);
+        std::string element_name, gazebo::math::Pose _reductionTransform);
 
       /// reduced fixed joints:  apply appropriate frame updates in projector
       ///  inside urdf extensions when doing fixed joint reduction
@@ -293,13 +293,13 @@ namespace urdf2gazebo
       ///   in extensions when doing fixed joint reduction
       void reduceGazeboExtensionSensorTransformReduction(
         std::vector<TiXmlElement*>::iterator blob_it,
-        gazebo::math::Pose reduction_transform);
+        gazebo::math::Pose _reductionTransform);
 
       /// reduced fixed joints:  apply transform reduction for projectors in
       ///   extensions when doing fixed joint reduction
       void reduceGazeboExtensionProjectorTransformReduction(
         std::vector<TiXmlElement*>::iterator blob_it,
-        gazebo::math::Pose reduction_transform);
+        gazebo::math::Pose _reductionTransform);
 
       /// reduced fixed joints: transform to parent frame
       urdf::Pose  transformToParentFrame(
@@ -357,13 +357,13 @@ namespace urdf2gazebo
       void createCollision(TiXmlElement* elem,
         ConstLinkPtr link,
         CollisionPtr collision,
-        std::string old_link_name = std::string(""));
+        std::string _oldLinkName = std::string(""));
 
       /// create SDF Visual block based on URDF
       void createVisual(TiXmlElement *elem,
         ConstLinkPtr link,
         VisualPtr visual,
-        std::string old_link_name = std::string(""));
+        std::string _oldLinkName = std::string(""));
 
       /// create SDF Joint block based on URDF
       void createJoint(TiXmlElement *root,
