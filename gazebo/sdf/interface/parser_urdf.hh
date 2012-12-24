@@ -76,8 +76,8 @@ namespace urdf2gazebo
       double laserRetro;
 
       // joint, joint limit dynamics
-      bool isStopCfm, isStopErp, isInitialJointPosition, isFudge_factor;
-      double stopCfm, stopErp, initialJointPosition, fudge_factor;
+      bool isStopCfm, isStopErp, isInitialJointPosition, isFudgeFactor;
+      double stopCfm, stopErp, initialJointPosition, fudgeFactor;
       bool provideFeedback;
 
       // blobs into body or robot
@@ -101,7 +101,7 @@ namespace urdf2gazebo
         isStopCfm = false;
         isStopErp = false;
         isInitialJointPosition = false;
-        isFudge_factor = false;
+        isFudgeFactor = false;
         provideFeedback = false;
         blobs.clear();
 
@@ -116,7 +116,7 @@ namespace urdf2gazebo
         stopCfm = 0;
         stopErp = 0.1;
         initialJointPosition = 0;
-        fudge_factor = 1;
+        fudgeFactor = 1;
       };
 
       GazeboExtension(const GazeboExtension &ge)
@@ -137,7 +137,7 @@ namespace urdf2gazebo
         isStopCfm = ge.isStopCfm;
         isStopErp = ge.isStopErp;
         isInitialJointPosition = ge.isInitialJointPosition;
-        isFudge_factor = ge.isFudge_factor;
+        isFudgeFactor = ge.isFudgeFactor;
         provideFeedback = ge.provideFeedback;
         oldLinkName = ge.oldLinkName;
         reductionTransform = ge.reductionTransform;
@@ -154,7 +154,7 @@ namespace urdf2gazebo
         stopCfm = ge.stopCfm;
         stopErp = ge.stopErp;
         initialJointPosition = ge.initialJointPosition;
-        fudge_factor = ge.fudge_factor;
+        fudgeFactor = ge.fudgeFactor;
       };
   };
 

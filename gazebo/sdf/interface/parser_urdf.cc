@@ -361,10 +361,10 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
           gazebo->initialJointPosition = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
-      else if (child_elem->ValueStr() == "fudge_factor")
+      else if (child_elem->ValueStr() == "fudgeFactor")
       {
-          gazebo->isFudge_factor = true;
-          gazebo->fudge_factor = boost::lexical_cast<double>(
+          gazebo->isFudgeFactor = true;
+          gazebo->fudgeFactor = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
       else if (child_elem->ValueStr() == "provideFeedback")
@@ -523,7 +523,7 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
         TiXmlElement *physics     = new TiXmlElement("physics");
         TiXmlElement *physicsOde = new TiXmlElement("ode");
         TiXmlElement *limit       = new TiXmlElement("limit");
-        // insert stopCfm, stopErp, fudge_factor
+        // insert stopCfm, stopErp, fudgeFactor
         if ((*ge)->isStopCfm)
         {
           addKeyValue(limit, "erp", values2str(1, &(*ge)->stopCfm));
@@ -544,10 +544,10 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
         else
             addKeyValue(physicsOde, "provide_feedback", "false");
 
-        // insert fudge_factor
-        if ((*ge)->isFudge_factor)
+        // insert fudgeFactor
+        if ((*ge)->isFudgeFactor)
           addKeyValue(physicsOde, "fudge_factor",
-                      values2str(1, &(*ge)->fudge_factor));
+                      values2str(1, &(*ge)->fudgeFactor));
 
         physics->LinkEndChild(physicsOde);
         physicsOde->LinkEndChild(limit);
