@@ -246,7 +246,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
     for (TiXmlElement *child_elem = gazebo_xml->FirstChildElement();
          child_elem; child_elem = child_elem->NextSiblingElement())
     {
-      gazebo->old_link_name = ref_str;
+      gazebo->oldLinkName = ref_str;
 
       // go through all elements of the extension,
       //   extract what we know, and save the rest in blobs
@@ -402,7 +402,7 @@ void URDF2Gazebo::insertGazeboExtensionCollision(TiXmlElement *elem,
     for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin();
          ge != gazebo_it->second.end(); ++ge)
     {
-      if ((*ge)->old_link_name == link_name)
+      if ((*ge)->oldLinkName == link_name)
       {
         TiXmlElement *surface = new TiXmlElement("surface");
         TiXmlElement *friction = new TiXmlElement("friction");
@@ -451,7 +451,7 @@ void URDF2Gazebo::insertGazeboExtensionVisual(TiXmlElement *elem,
     for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin();
          ge != gazebo_it->second.end(); ++ge)
     {
-      if ((*ge)->old_link_name == link_name)
+      if ((*ge)->oldLinkName == link_name)
       {
         // insert material block
         if (!(*ge)->material.empty())
@@ -922,8 +922,8 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(LinkPtr link)
     for (std::vector<GazeboExtension*>::iterator ge = ext->second.begin();
          ge != ext->second.end(); ++ge)
     {
-      (*ge)->reduction_transform = transformToParentFrame(
-        (*ge)->reduction_transform,
+      (*ge)->reductionTransform = transformToParentFrame(
+        (*ge)->reductionTransform,
         link->parent_joint->parent_to_joint_origin_transform);
       // for sensor and projector blocks only
       reduceGazeboExtensionsTransformReduction((*ge));
@@ -971,8 +971,6 @@ void URDF2Gazebo::reduceGazeboExtensionFrameReplace(GazeboExtension* ge,
 {
   // std::string link_name = link->name;
   // std::string new_link_name = link->getParent()->name;
-  std::vector<TiXmlElement*> blobs = ge->blobs;
-  gazebo::math::Pose reduction_transform = ge->reduction_transform;
 
   // HACK: need to do this more generally, but we also need to replace
   //       all instances of link name with new link name
@@ -982,8 +980,8 @@ void URDF2Gazebo::reduceGazeboExtensionFrameReplace(GazeboExtension* ge,
   //         <collision>base_footprint_collision</collision>
   // gzdbg << "  STRING REPLACE: instances of link name ["
   //       << link_name << "] with [" << new_link_name << "]\n";
-  for (std::vector<TiXmlElement*>::iterator blob_it = blobs.begin();
-       blob_it != blobs.end(); ++blob_it)
+  for (std::vector<TiXmlElement*>::iterator blob_it = ge->blobs.begin();
+       blob_it != ge->blobs.end(); ++blob_it)
   {
     std::ostringstream debug_stream_in;
     debug_stream_in << *(*blob_it);
@@ -994,9 +992,9 @@ void URDF2Gazebo::reduceGazeboExtensionFrameReplace(GazeboExtension* ge,
 
     this->reduceGazeboExtensionContactSensorFrameReplace(blob_it, link);
     this->reduceGazeboExtensionPluginFrameReplace(blob_it, link,
-      "plugin", "bodyName", reduction_transform);
+      "plugin", "bodyName", ge->reductionTransform);
     this->reduceGazeboExtensionPluginFrameReplace(blob_it, link,
-      "plugin", "frameName", reduction_transform);
+      "plugin", "frameName", ge->reductionTransform);
     this->reduceGazeboExtensionProjectorFrameReplace(blob_it, link);
     this->reduceGazeboExtensionGripperFrameReplace(blob_it, link);
     this->reduceGazeboExtensionJointFrameReplace(blob_it, link);
@@ -1008,15 +1006,14 @@ void URDF2Gazebo::reduceGazeboExtensionFrameReplace(GazeboExtension* ge,
 
 void URDF2Gazebo::reduceGazeboExtensionsTransformReduction(GazeboExtension* ge)
 {
-  gazebo::math::Pose reduction_transform = ge->reduction_transform;
   for (std::vector<TiXmlElement*>::iterator blob_it = ge->blobs.begin();
        blob_it != ge->blobs.end(); ++blob_it)
   {
     /// @todo make sure we are not missing any additional transform reductions
     this->reduceGazeboExtensionSensorTransformReduction(blob_it,
-      reduction_transform);
+      ge->reductionTransform);
     this->reduceGazeboExtensionProjectorTransformReduction(blob_it,
-      reduction_transform);
+      ge->reductionTransform);
   }
 }
 
@@ -1512,18 +1509,18 @@ void URDF2Gazebo::createJoint(TiXmlElement *root,
 void URDF2Gazebo::createCollision(TiXmlElement* elem,
   ConstLinkPtr link,
   CollisionPtr collision,
-  std::string old_link_name)
+  std::string _old_link_name)
 {
     /* begin create geometry node, skip if no collision specified */
     TiXmlElement *gazebo_collision = new TiXmlElement("collision");
 
     /* set its name, if lumped, add original link name */
-    if (old_link_name == link->name)
+    if (_old_link_name == link->name)
       gazebo_collision->SetAttribute("name",
         link->name + std::string("_collision"));
     else
       gazebo_collision->SetAttribute("name",
-        link->name + std::string("_collision_")+old_link_name);
+        link->name + std::string("_collision_") + _old_link_name);
 
     /* set transform */
     double pose[6];
@@ -1546,7 +1543,7 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem,
     }
 
     /* set additional data from extensions */
-    insertGazeboExtensionCollision(gazebo_collision, old_link_name);
+    insertGazeboExtensionCollision(gazebo_collision, _old_link_name);
 
     /* add geometry to body */
     elem->LinkEndChild(gazebo_collision);
@@ -1554,19 +1551,19 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem,
 
 void URDF2Gazebo::createVisual(TiXmlElement *elem,
   ConstLinkPtr link,
-  VisualPtr visual, std::string old_link_name)
+  VisualPtr visual, std::string _old_link_name)
 {
     /* begin create gazebo visual node */
     TiXmlElement *gazebo_visual = new TiXmlElement("visual");
 
     /* set its name */
-    // gzdbg << "original link name [" << old_link_name
+    // gzdbg << "original link name [" << _old_link_name
     //       << "] new link name [" << link->name << "]\n";
-    if (old_link_name == link->name)
+    if (_old_link_name == link->name)
       gazebo_visual->SetAttribute("name", link->name + std::string("_vis"));
     else
       gazebo_visual->SetAttribute("name", link->name + std::string("_vis_")
-        + old_link_name);
+        + _old_link_name);
 
     /* add the visualisation transfrom */
     double pose[6];
@@ -1586,7 +1583,7 @@ void URDF2Gazebo::createVisual(TiXmlElement *elem,
       createGeometry(gazebo_visual, visual->geometry);
 
     /* set additional data from extensions */
-    insertGazeboExtensionVisual(gazebo_visual, old_link_name);
+    insertGazeboExtensionVisual(gazebo_visual, _old_link_name);
 
     /* end create visual node */
     elem->LinkEndChild(gazebo_visual);
@@ -1904,7 +1901,7 @@ void URDF2Gazebo::reduceJointsToParent(LinkPtr link)
 
 void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(
   std::vector<TiXmlElement*>::iterator blob_it,
-  gazebo::math::Pose reduction_transform)
+  gazebo::math::Pose _reductionTransform)
 {
     // overwrite <xyz> and <rpy> if they exist
     if ((*blob_it)->ValueStr() == "sensor")
@@ -1924,18 +1921,19 @@ void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(
       {
         TiXmlNode* old_pose_key = (*blob_it)->FirstChild("pose");
         /// @todo: FIXME:  we should read xyz, rpy and aggregate it to
-        /// reduction_transform instead of just throwing the info away.
+        /// reductionTransform instead of just throwing the info away.
         if (old_pose_key)
           (*blob_it)->RemoveChild(old_pose_key);
       }
 
-      // convert reduction_transform to values
-      urdf::Vector3 reduction_xyz(reduction_transform.pos.x,
-        reduction_transform.pos.y,
-        reduction_transform.pos.z);
-      urdf::Rotation reduction_q(reduction_transform.rot.x,
-        reduction_transform.rot.y,
-        reduction_transform.rot.z, reduction_transform.rot.w);
+      // convert reductionTransform to values
+      urdf::Vector3 reduction_xyz(_reductionTransform.pos.x,
+                                  _reductionTransform.pos.y,
+                                  _reductionTransform.pos.z);
+      urdf::Rotation reduction_q(_reductionTransform.rot.x,
+                                 _reductionTransform.rot.y,
+                                 _reductionTransform.rot.z,
+                                 _reductionTransform.rot.w);
 
       urdf::Vector3 reduction_rpy;
       reduction_q.getRPY(reduction_rpy.x, reduction_rpy.y, reduction_rpy.z);
@@ -1956,7 +1954,7 @@ void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(
 
 void URDF2Gazebo::reduceGazeboExtensionProjectorTransformReduction(
   std::vector<TiXmlElement*>::iterator blob_it,
-  gazebo::math::Pose reduction_transform)
+  gazebo::math::Pose _reductionTransform)
 {
     // overwrite <pose> (xyz/rpy) if it exists
     if ((*blob_it)->ValueStr() == "projector")
@@ -1973,21 +1971,21 @@ void URDF2Gazebo::reduceGazeboExtensionProjectorTransformReduction(
       }
       */
 
-      /* should read <pose>...</pose> and agregate reduction_transform */
+      /* should read <pose>...</pose> and agregate reductionTransform */
       TiXmlNode* pose_key = (*blob_it)->FirstChild("pose");
       // read pose and save it
 
       // remove the tag for now
       if (pose_key) (*blob_it)->RemoveChild(pose_key);
 
-      // convert reduction_transform to values
-      urdf::Vector3 reduction_xyz(reduction_transform.pos.x,
-        reduction_transform.pos.y,
-        reduction_transform.pos.z);
-      urdf::Rotation reduction_q(reduction_transform.rot.x,
-        reduction_transform.rot.y,
-        reduction_transform.rot.z,
-        reduction_transform.rot.w);
+      // convert reductionTransform to values
+      urdf::Vector3 reduction_xyz(_reductionTransform.pos.x,
+                                  _reductionTransform.pos.y,
+                                  _reductionTransform.pos.z);
+      urdf::Rotation reduction_q(_reductionTransform.rot.x,
+                                 _reductionTransform.rot.y,
+                                 _reductionTransform.rot.z,
+                                 _reductionTransform.rot.w);
 
       urdf::Vector3 reduction_rpy;
       reduction_q.getRPY(reduction_rpy.x, reduction_rpy.y, reduction_rpy.z);
@@ -2044,7 +2042,7 @@ void URDF2Gazebo::reduceGazeboExtensionContactSensorFrameReplace(
 void URDF2Gazebo::reduceGazeboExtensionPluginFrameReplace(
   std::vector<TiXmlElement*>::iterator blob_it, LinkPtr link,
   std::string plugin_name, std::string element_name,
-  gazebo::math::Pose reduction_transform)
+  gazebo::math::Pose _reductionTransform)
 {
   std::string link_name = link->name;
   std::string new_link_name = link->getParent()->name;
@@ -2071,7 +2069,7 @@ void URDF2Gazebo::reduceGazeboExtensionPluginFrameReplace(
         if (xyz_key)
         {
           urdf::Vector3 v1 = parseVector3(xyz_key);
-          reduction_transform.pos = gazebo::math::Vector3(v1.x, v1.y, v1.z);
+          _reductionTransform.pos = gazebo::math::Vector3(v1.x, v1.y, v1.z);
           // remove xyzOffset and rpyOffset
           (*blob_it)->RemoveChild(xyz_key);
         }
@@ -2079,14 +2077,14 @@ void URDF2Gazebo::reduceGazeboExtensionPluginFrameReplace(
         if (rpy_key)
         {
           urdf::Vector3 rpy = parseVector3(rpy_key, M_PI/180.0);
-          reduction_transform.rot =
+          _reductionTransform.rot =
             gazebo::math::Quaternion::EulerToQuaternion(rpy.x, rpy.y, rpy.z);
           // remove xyzOffset and rpyOffset
           (*blob_it)->RemoveChild(rpy_key);
         }
 
         // pass through the parent transform from fixed joint reduction
-        reduction_transform = inverseTransformToParentFrame(reduction_transform,
+        _reductionTransform = inverseTransformToParentFrame(_reductionTransform,
           link->parent_joint->parent_to_joint_origin_transform);
 
         // create new offset xml blocks
@@ -2094,12 +2092,12 @@ void URDF2Gazebo::reduceGazeboExtensionPluginFrameReplace(
         rpy_key = new TiXmlElement("rpyOffset");
 
         // create new offset xml blocks
-        urdf::Vector3 reduction_xyz(reduction_transform.pos.x,
-          reduction_transform.pos.y,
-          reduction_transform.pos.z);
-        urdf::Rotation reduction_q(reduction_transform.rot.x,
-          reduction_transform.rot.y, reduction_transform.rot.z,
-          reduction_transform.rot.w);
+        urdf::Vector3 reduction_xyz(_reductionTransform.pos.x,
+          _reductionTransform.pos.y,
+          _reductionTransform.pos.z);
+        urdf::Rotation reduction_q(_reductionTransform.rot.x,
+          _reductionTransform.rot.y, _reductionTransform.rot.z,
+          _reductionTransform.rot.w);
 
         std::ostringstream xyz_stream, rpy_stream;
         xyz_stream << reduction_xyz.x << " " << reduction_xyz.y << " "
