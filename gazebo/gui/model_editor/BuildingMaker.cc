@@ -83,13 +83,21 @@ rendering::VisualPtr ModelManip::GetVisual()
 /////////////////////////////////////////////////
 void ModelManip::OnSizeChanged(double _width, double _depth, double _height)
 {
+  // TODO verify the result of this function
   this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
   math::Vector3 dScale = this->visual->GetScale() - this->size;
+  math::Vector3 originalPos = this->visual->GetPosition();
   this->visual->SetScale(this->size);
 
+  double angle = this->visual->GetRotation().GetAsEuler().z;
+  double xdx = cos(angle)*dScale.x/2.0;
+  double xdy = sin(angle)*dScale.x/2.0;
+  double ydx = sin(angle)*dScale.y/2.0;
+  double ydy = -cos(angle)*dScale.y/2.0;
+
   // adjust position due to difference in pivot points
-  math::Vector3 newPos = this->visual->GetPosition()
-      - math::Vector3(dScale.x/2.0 + dScale.y/2.0, 0, dScale.z/2.0);
+  math::Vector3 newPos = originalPos -
+      - math::Vector3(xdx + ydx, xdy + ydy, 0);
 
   this->visual->SetPosition(newPos);
 }
@@ -105,6 +113,7 @@ void ModelManip::OnPoseChanged(double _x, double _y, double _z,
 void ModelManip::OnPoseOriginTransformed(double _x, double _y, double _z,
     double _roll, double _pitch, double _yaw)
 {
+  // Handle translations, currently used by polylines
   math::Pose trans = BuildingMaker::ConvertPose(_x, -_y, _z, _roll, _pitch,
       _yaw);
 
@@ -132,11 +141,14 @@ void ModelManip::OnDepthChanged(double _depth)
   this->size.y = scaledDepth;
   math::Vector3 dScale = this->visual->GetScale() - this->size;
   math::Vector3 originalPos = this->visual->GetPosition();
-  this->visual->SetPosition(math::Vector3(0, 0, 0));
   this->visual->SetScale(this->size);
 
+  double angle = this->visual->GetRotation().GetAsEuler().z;
+  double dx = sin(angle)*dScale.y/2.0;
+  double dy = -cos(angle)*dScale.y/2.0;
+
   math::Vector3 newPos = originalPos
-      + math::Vector3(0, dScale.y/2.0, 0);
+      - math::Vector3(dx, dy, 0);
 
   this->visual->SetPosition(newPos);
 }
@@ -149,7 +161,6 @@ void ModelManip::OnHeightChanged(double _height)
   this->size.z = scaledHeight;
   math::Vector3 dScale = this->visual->GetScale() - this->size;
   math::Vector3 originalPos = this->visual->GetPosition();
-  this->visual->SetPosition(math::Vector3(0, 0, 0));
   this->visual->SetScale(this->size);
 
   math::Vector3 newPos = originalPos
@@ -167,11 +178,15 @@ void ModelManip::OnWidthChanged(double _width)
 
   math::Vector3 dScale = this->visual->GetScale() - this->size;
   math::Vector3 originalPos = this->visual->GetPosition();
-  this->visual->SetPosition(math::Vector3(0, 0, 0));
   this->visual->SetScale(this->size);
 
+  double angle = this->visual->GetRotation().GetAsEuler().z;
+  double dx = cos(angle)*dScale.x/2.0;
+  double dy = sin(angle)*dScale.x/2.0;
+
   math::Vector3 newPos = originalPos
-      - math::Vector3(dScale.x/2.0 , 0, 0);
+      - math::Vector3(dx , dy, 0);
+
   this->visual->SetPosition(newPos);
 }
 
@@ -205,10 +220,13 @@ void ModelManip::OnPosZChanged(double _posZ)
 /////////////////////////////////////////////////
 void ModelManip::OnYawChanged(double _yaw)
 {
+  // Rotation around the object's local center;
+  // TODO this is different from ModelManip::SetRotation which rotates the
+  // object around the parent's center (mainly needed by polylines due to the
+  // way user draws walls). Need to change this for consistency
   double newYaw = BuildingMaker::ConvertAngle(_yaw);
   math::Vector3 angles = this->visual->GetRotation().GetAsEuler();
   angles.z = -newYaw;
-  // TODO change this to be consistent with SetRotation
   this->visual->SetRotation(angles);
 }
 
@@ -381,7 +399,7 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
         wallManip->SetVisual(visVisual);
         visVisual->SetScale(scaledSize);
         visVisual->SetPosition(math::Vector3(scaledSize.x/2.0,
-          scaledSize.y/2.0, scaledSize.z/2.0));
+          -scaledSize.y/2.0, scaledSize.z/2.0));
         wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
         this->allItems[visualName.str()] = wallManip;
         this->walls[visualName.str()] = wallManip;
@@ -434,7 +452,7 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
         windowManip->SetVisual(visVisual);
         math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
         visVisual->SetScale(scaledSize);
-        visVisual->SetPosition(math::Vector3(scaledSize.x/2, scaledSize.y/2, 0));
+        visVisual->SetPosition(math::Vector3(scaledSize.x/2, -scaledSize.y/2, 0));
         windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
         this->allItems[visualName.str()] = windowManip;
         this->windows[visualName.str()] = windowManip;
