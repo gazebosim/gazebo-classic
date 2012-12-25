@@ -69,6 +69,17 @@ set (headers
   Video.hh
   )
 
+if (HAVE_GTS)
+set (sources
+  ${sources}
+  MeshCSG.cc
+)
+set (headers
+  ${headers}
+  MeshCSG.hh
+)
+endif()
+
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(common_headers
