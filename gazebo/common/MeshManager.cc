@@ -30,9 +30,12 @@
 
 #include "gazebo/common/MeshManager.hh"
 
+#ifdef HAVE_GTS
+  #include "gts.h"
+#endif
+
 using namespace gazebo;
 using namespace common;
-
 
 //////////////////////////////////////////////////
 MeshManager::MeshManager()
@@ -60,6 +63,11 @@ MeshManager::MeshManager()
   this->CreateCone("axis_head", 0.02, 0.08, 1, 16);
 
   this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
+
+/*  this->CreateBox("box2", math::Vector3(0.5, 0.5, 1.5),
+      math::Vector2d(1, 1));
+  this->CreateBoolean("sphere_box", this->GetMesh("unit_box"),
+    this->GetMesh("box2"), UNION);*/
 
   this->fileExtensions.push_back("stl");
   this->fileExtensions.push_back("dae");
@@ -960,5 +968,402 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
   }
 }
 
+#ifdef HAVE_GTS
+
+static void vertices_merge (GPtrArray * _vertices, double epsilon)
+{
+  GPtrArray * array;
+  GNode * kdtree;
+  guint i;
+  GtsVertex **verticesData = reinterpret_cast<GtsVertex **>(_vertices->pdata);
+  array = g_ptr_array_new ();
+  for (i = 0; i < _vertices->len; i++)
+    g_ptr_array_add (array, verticesData[i]);
+  kdtree = gts_kdtree_new (array, NULL);
+  g_ptr_array_free (array, TRUE);
+
+  for (i = 0; i < _vertices->len; i++) {
+    GtsVertex * v = reinterpret_cast<GtsVertex *>(verticesData[i]);
+
+    if (!GTS_OBJECT (v)->reserved) { /* Do something only if v is active */
+      GtsBBox * bbox;
+      GSList * selected, * j;
+
+      /* build bounding box */
+      bbox = gts_bbox_new (gts_bbox_class (),
+			   v,
+			   GTS_POINT (v)->x - epsilon,
+			   GTS_POINT (v)->y - epsilon,
+			   GTS_POINT (v)->z - epsilon,
+			   GTS_POINT (v)->x + epsilon,
+			   GTS_POINT (v)->y + epsilon,
+			   GTS_POINT (v)->z + epsilon);
+
+      /* select vertices which are inside bbox using kdtree */
+      j = selected = gts_kdtree_range (kdtree, bbox, NULL);
+      while (j) {
+	GtsVertex * sv = reinterpret_cast<GtsVertex *>(j->data);
+
+	if (sv != v && !GTS_OBJECT (sv)->reserved)
+	  GTS_OBJECT (sv)->reserved = v; /* mark sv as inactive */
+	j = j->next;
+      }
+      g_slist_free (selected);
+      gts_object_destroy (GTS_OBJECT (bbox));
+    }
+  }
+
+  gts_kdtree_destroy (kdtree);
+
+  /* destroy inactive vertices */
+
+  /* we want to control vertex destruction */
+  gts_allow_floating_vertices = TRUE;
+
+  for (i = 0; i < _vertices->len; i++) {
+    GtsVertex * v = reinterpret_cast<GtsVertex *>(verticesData[i]);
+
+    if (GTS_OBJECT (v)->reserved) { /* v is inactive */
+      verticesData[i] = reinterpret_cast<GtsVertex *>(GTS_OBJECT (v)->reserved);
+      gts_object_destroy (GTS_OBJECT (v));
+    }
+  }
+
+  gts_allow_floating_vertices = FALSE;
+}
 
 
+
+//////////////////////////////////////////////////
+/*static void write_face (GtsTriangle *_t, SubMesh* _subMesh)
+{
+  GtsVertex *v1, *v2, *v3;
+  GtsVector n;
+
+  gts_triangle_vertices(_t, &v1, &v2, &v3);
+  gts_triangle_normal(_t, &n[0], &n[1], &n[2]);
+  gts_vector_normalize(n);
+  _subMesh->AddVertex(GTS_POINT (v1)->x, GTS_POINT (v1)->y, GTS_POINT (v1)->z);
+  _subMesh->AddVertex(GTS_POINT (v2)->x, GTS_POINT (v2)->y, GTS_POINT (v2)->z);
+  _subMesh->AddVertex(GTS_POINT (v3)->x, GTS_POINT (v3)->y, GTS_POINT (v3)->z);
+//  _subMesh->AddNormal(n[0], n[2], n[2]);
+
+}*/
+
+
+static void write_vertex (GtsPoint * p, gpointer * data)
+{
+  /*(*GTS_OBJECT (p)->klass->write) (GTS_OBJECT (p), (FILE *) data[0]);
+  if (!GTS_POINT_CLASS (GTS_OBJECT (p)->klass)->binary)
+    fputc ('\n', (FILE *) data[0]);*/
+
+  SubMesh *subMesh = reinterpret_cast<SubMesh *>(data[0]);
+  GHashTable* vIndex = reinterpret_cast<GHashTable *>(data[2]);
+  subMesh->AddVertex(GTS_POINT (p)->x, GTS_POINT (p)->y, GTS_POINT (p)->z);
+  g_hash_table_insert (vIndex, p, GUINT_TO_POINTER (++(*((guint *) data[1]))));
+}
+
+static void write_edge (GtsSegment * s, gpointer * data)
+{
+/*  fprintf ((FILE *) data[0], "%u %u",
+	   GPOINTER_TO_UINT (g_hash_table_lookup (data[2], s->v1)),
+	   GPOINTER_TO_UINT (g_hash_table_lookup (data[2], s->v2)));
+  if (GTS_OBJECT (s)->klass->write)
+    (*GTS_OBJECT (s)->klass->write) (GTS_OBJECT (s), (FILE *) data[0]);
+  fputc ('\n', (FILE *) data[0]);*/
+  GHashTable* eIndex = reinterpret_cast<GHashTable *>(data[3]);
+  g_hash_table_insert (eIndex, s, GUINT_TO_POINTER (++(*((guint *) data[1]))));
+}
+
+static void write_face (GtsTriangle * t, gpointer * data)
+{
+/*  fprintf (data[0], "%u %u %u",
+	   GPOINTER_TO_UINT (g_hash_table_lookup (data[3], t->e1)),
+	   GPOINTER_TO_UINT (g_hash_table_lookup (data[3], t->e2)),
+	   GPOINTER_TO_UINT (g_hash_table_lookup (data[3], t->e3)));
+  if (GTS_OBJECT (t)->klass->write)
+    (*GTS_OBJECT (t)->klass->write) (GTS_OBJECT (t), data[0]);
+  fputc ('\n', data[0]);*/
+  SubMesh *subMesh = reinterpret_cast<SubMesh *>(data[0]);
+  GHashTable* eIndex = reinterpret_cast<GHashTable *>(data[3]);
+  subMesh->AddIndex(GPOINTER_TO_UINT (g_hash_table_lookup (eIndex, t->e1)));
+  subMesh->AddIndex(GPOINTER_TO_UINT (g_hash_table_lookup (eIndex, t->e2)));
+  subMesh->AddIndex(GPOINTER_TO_UINT (g_hash_table_lookup (eIndex, t->e3)));
+}
+
+
+
+//////////////////////////////////////////////////
+void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
+    const Mesh *_m2, int _operation)
+{
+  if (this->HasMesh(_name))
+  {
+    return;
+  }
+
+  GtsSurface *s1, *s2, *s3;
+  GtsSurfaceInter *si;
+  GNode *tree1, *tree2;
+
+  bool closed = true;
+  bool is_open1 = false;
+  bool is_open2 = false;
+
+  s1 = gts_surface_new(gts_surface_class(), gts_face_class(), gts_edge_class(),
+      gts_vertex_class());
+  s2 = gts_surface_new(gts_surface_class(), gts_face_class(), gts_edge_class(),
+      gts_vertex_class());
+  s3 = gts_surface_new(gts_surface_class(), gts_face_class(), gts_edge_class(),
+      gts_vertex_class());
+
+  this->ConvertToGTS(_m1, s1);
+  this->ConvertToGTS(_m2, s2);
+
+
+  // build bounding box tree for first surface
+  tree1 = gts_bb_tree_surface (s1);
+  is_open1 = gts_surface_volume (s1) < 0. ? true : false;
+
+  // build bounding box tree for second surface
+  tree2 = gts_bb_tree_surface (s2);
+  is_open2 = gts_surface_volume (s2) < 0. ? true : false;
+
+  si = gts_surface_inter_new (gts_surface_inter_class (), s1, s2, tree1, tree2,
+      is_open1, is_open2);
+  assert(gts_surface_inter_check (si, &closed));
+  if (!closed) {
+    gzerr << "the intersection of " << _m1->GetName() << " and "
+        << _m2->GetName() << " is not a closed curve\n";
+    return;
+  }
+
+  FILE *output1 = fopen("output3.gts", "w");
+  gts_surface_write(s1, output1);
+  fclose(output1);
+
+  FILE *output2 = fopen("output4.gts", "w");
+  gts_surface_write(s2, output2);
+  fclose(output2);
+
+  if (_operation == MeshManager::UNION)
+  {
+    gts_surface_inter_boolean (si, s3, GTS_1_OUT_2);
+    gts_surface_inter_boolean (si, s3, GTS_2_OUT_1);
+  }
+  else if (_operation == MeshManager::INTERSECTION)
+  {
+    gts_surface_inter_boolean (si, s3, GTS_1_IN_2);
+    gts_surface_inter_boolean (si, s3, GTS_2_IN_1);
+  }
+  else if (_operation == MeshManager::DIFFERENCE)
+  {
+    gts_surface_inter_boolean (si, s3, GTS_1_OUT_2);
+//    gts_surface_inter_boolean (si, s3, GTS_2_IN_1);
+//    gts_surface_foreach_face (si->s2, (GtsFunc) gts_triangle_revert, NULL);
+//    gts_surface_foreach_face (s2, (GtsFunc) gts_triangle_revert, NULL);
+  }
+
+
+
+
+  FILE *output = fopen("output.gts", "w");
+  gts_surface_write(s3, output);
+  fclose(output);
+
+  // create the boolean mesh in gazebo
+  Mesh *mesh = new Mesh();
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
+
+  SubMesh *subMesh = new SubMesh();
+  mesh->AddSubMesh(subMesh);
+
+  // fill the submesh with data generated by GTS
+  guint n;
+  gpointer data[4];
+  GHashTable * vindex, * eindex;
+
+  data[0] = subMesh;
+  data[1] = &n;
+  data[2] = vindex = g_hash_table_new (NULL, NULL);
+  data[3] = eindex = g_hash_table_new (NULL, NULL);
+
+  n = 0;
+  gts_surface_foreach_vertex (s3, (GtsFunc) write_vertex, data);
+  n = 0;
+  gts_surface_foreach_edge (s3, (GtsFunc) write_edge, data);
+  gts_surface_foreach_face (s3, (GtsFunc) write_face, data);
+  g_hash_table_destroy (vindex);
+  g_hash_table_destroy (eindex);
+
+  mesh->RecalculateNormals();
+
+/*  GtsVertex * v1, * v2, * v3;
+  GtsVector n;
+
+  gts_triangle_vertices (t, &v1, &v2, &v3);
+  gts_triangle_normal (t, &n[0], &n[1], &n[2]);
+  gts_vector_normalize (n);
+  printf ("facet normal %g %g %g\nouter loop\n", n[0], n[1], n[2]);
+  printf ("vertex %g %g %g\n",
+	  GTS_POINT (v1)->x, GTS_POINT (v1)->y, GTS_POINT (v1)->z);
+  printf ("vertex %g %g %g\n",
+	  GTS_POINT (v2)->x, GTS_POINT (v2)->y, GTS_POINT (v2)->z);
+  printf ("vertex %g %g %g\n",
+	  GTS_POINT (v3)->x, GTS_POINT (v3)->y, GTS_POINT (v3)->z);
+  puts ("endloop\nendfacet");*/
+
+    // Compute the vertices
+/*  for (i = 0; i < 8; i++)
+  {
+    v[i][0] *= sides.x * 0.5;
+    v[i][1] *= sides.y * 0.5;
+    v[i][2] *= sides.z * 0.5;
+  }
+
+  // For each face
+  for (i = 0; i < 6; i++)
+  {
+    // For each vertex in the face
+    for (k = 0; k < 4; k++)
+    {
+      subMesh->AddVertex(v[faces[i][k]][0], v[faces[i][k]][1],
+          v[faces[i][k]][2]);
+      subMesh->AddNormal(n[faces[i][k]][0], n[faces[i][k]][1],
+          n[faces[i][k]][2]);
+      subMesh->AddTexCoord(t[k][0], t[k][1]);
+    }
+  }
+
+  // Set the indices
+  for (i = 0; i < 36; i++)
+    subMesh->AddIndex(ind[i]);
+
+  subMesh->RecalculateNormals();*/
+
+  // destroy surfaces
+  gts_object_destroy (GTS_OBJECT (s1));
+  gts_object_destroy (GTS_OBJECT (s2));
+  gts_object_destroy (GTS_OBJECT (s3));
+  gts_object_destroy (GTS_OBJECT (si));
+
+  // destroy bounding box trees (including bounding boxes)
+  gts_bb_tree_destroy (tree1, true);
+  gts_bb_tree_destroy (tree2, true);
+
+}
+
+static void add_stl(GtsSurface * s, GPtrArray * _vertices)
+{
+  guint i;
+
+  GtsVertex **verticesData = reinterpret_cast<GtsVertex **>(_vertices->pdata);
+  for (i = 0; i < _vertices->len/3; i++) {
+    GtsEdge * e1 = GTS_EDGE (gts_vertices_are_connected (verticesData[3*i],
+							 verticesData[3*i + 1]));
+    GtsEdge * e2 = GTS_EDGE (gts_vertices_are_connected (verticesData[3*i + 1],
+							 verticesData[3*i + 2]));
+    GtsEdge * e3 = GTS_EDGE (gts_vertices_are_connected (verticesData[3*i + 2],
+							 verticesData[3*i]));
+
+    if (e1 == NULL && verticesData[3*i] != verticesData[3*i + 1])
+      e1 = gts_edge_new (s->edge_class,
+			 verticesData[3*i], verticesData[3*i + 1]);
+    if (e2 == NULL && verticesData[3*i + 1] != verticesData[3*i + 2])
+      e2 = gts_edge_new (s->edge_class,
+			 verticesData[3*i + 1], verticesData[3*i + 2]);
+    if (e3 == NULL && verticesData[3*i + 2] != verticesData[3*i])
+      e3 = gts_edge_new (s->edge_class,
+			 verticesData[3*i + 2], verticesData[3*i]);
+    if (e1 != NULL && e2 != NULL && e3 != NULL)
+      gts_surface_add_face (s, gts_face_new (s->face_class, e1, e2, e3));
+    else gzwarn << "Ignoring degenerate facet!";
+  }
+}
+
+
+//////////////////////////////////////////////////
+void MeshManager::ConvertToGTS(const Mesh *_mesh, GtsSurface *_surface)
+{
+  if (!_surface)
+  {
+    gzerr << "Surface is NULL ";
+//    _surface = gts_surface_new(gts_surface_class(), gts_face_class(),
+//        gts_edge_class(), gts_vertex_class());
+    return;
+  }
+
+  GPtrArray *vertices = g_ptr_array_new();
+
+  for (unsigned int i = 0; i < _mesh->GetSubMeshCount(); ++i)
+  {
+    const SubMesh *subMesh = _mesh->GetSubMesh(i);
+    unsigned int indexCount = subMesh->GetIndexCount();
+    if (subMesh->GetVertexCount() <= 2)
+      continue;
+
+
+    gzerr << "submesh vertex count " << subMesh->GetVertexCount() << "\n";
+    for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
+    {
+      math::Vector3 vertex = subMesh->GetVertex(j);
+      g_ptr_array_add (vertices, gts_vertex_new(gts_vertex_class(), vertex.x,
+          vertex.y, vertex.z));
+    }
+
+    vertices_merge(vertices, 0.01);
+    gzerr << "merged vertex count " << vertices->len<< "\n";
+    add_stl(_surface, vertices);
+
+    /*GtsVertex **verticesData = reinterpret_cast<GtsVertex **>(vertices->pdata);
+    for (unsigned int j = 0; j < indexCount/3; ++j)
+    {
+        GtsEdge *e1 = GTS_EDGE(gts_vertices_are_connected(
+            verticesData[subMesh->GetIndex(3*j)],
+            verticesData[subMesh->GetIndex(3*j+1)]));
+        GtsEdge *e2 = GTS_EDGE(gts_vertices_are_connected(
+            verticesData[subMesh->GetIndex(3*j+1)],
+            verticesData[subMesh->GetIndex(3*j+2)]));
+        GtsEdge *e3 = GTS_EDGE(gts_vertices_are_connected(
+            verticesData[subMesh->GetIndex(3*j+2)],
+            verticesData[subMesh->GetIndex(3*j)]));
+        if (e1 == NULL && verticesData[subMesh->GetIndex(3*j)]
+            != verticesData[subMesh->GetIndex(3*j+1)])
+        {
+          e1 = gts_edge_new(_surface->edge_class,
+              verticesData[subMesh->GetIndex(3*j)],
+              verticesData[subMesh->GetIndex(3*j+1)]);
+        }
+        if (e2 == NULL && verticesData[subMesh->GetIndex(3*j+1)]
+            != verticesData[subMesh->GetIndex(3*j+2)])
+        {
+          e2 = gts_edge_new(_surface->edge_class,
+              verticesData[subMesh->GetIndex(3*j+1)],
+              verticesData[subMesh->GetIndex(3*j+2)]);
+        }
+        if (e3 == NULL && verticesData[subMesh->GetIndex(3*j+2)]
+            != verticesData[subMesh->GetIndex(3*j)])
+        {
+          e3 = gts_edge_new(_surface->edge_class,
+              verticesData[subMesh->GetIndex(3*j+2)],
+              verticesData[subMesh->GetIndex(3*j)]);
+        }
+        if (e1 != NULL && e2 != NULL && e3 != NULL)
+        {
+          gts_surface_add_face(_surface, gts_face_new(_surface->face_class, e1,
+              e2, e3));
+        }
+        else
+        {
+          gzwarn << _mesh->GetName() << ": Ignoring degenerate facet!";
+        }
+    }*/
+  }
+
+
+
+//  gts_object_destroy (GTS_OBJECT (vertices));
+
+}
+#endif

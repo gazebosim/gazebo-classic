@@ -26,6 +26,12 @@
 #include "math/Vector2d.hh"
 #include "math/Plane.hh"
 #include "common/SingletonT.hh"
+#include "gazebo_config.h"
+
+#ifdef HAVE_GTS
+struct _GtsSurface;
+typedef _GtsSurface GtsSurface;
+#endif
 
 namespace gazebo
 {
@@ -44,6 +50,12 @@ namespace gazebo
     /// \brief Maintains and manages all meshes
     class MeshManager : public SingletonT<MeshManager>
     {
+
+#ifdef HAVE_GTS
+      /// \brief An enumeration of the boolean operations
+      public: enum BooleanOperation {UNION, INTERSECTION, DIFFERENCE};
+#endif
+
       /// \brief Constructor
       private: MeshManager();
 
@@ -190,6 +202,20 @@ namespace gazebo
       /// \param[in] _scale scaling factor for the camera
       public: void CreateCamera(const std::string &_name, float _scale);
 
+
+#ifdef HAVE_GTS
+      /// \brief Create a boolean mesh from two meshes
+      /// \param[in] _name the name of the new mesh
+      /// \param[in] _m1 the parent mesh in the boolean operation
+      /// \param[in] _m2 the child mesh in the boolean operation
+      /// \param[in] _operation the boolean operation applied to the two meshes
+      public: void CreateBoolean(const std::string &_name, const Mesh *_m1,
+          const Mesh *_m2, const int _operation);
+
+      private: void ConvertToGTS(const Mesh *mesh, GtsSurface *surface);
+
+#endif
+
       /// \brief 3D mesh loader for COLLADA files
       private: ColladaLoader *colladaLoader;
 
@@ -211,5 +237,3 @@ namespace gazebo
   }
 }
 #endif
-
-
