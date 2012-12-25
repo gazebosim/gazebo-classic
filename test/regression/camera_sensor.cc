@@ -83,7 +83,7 @@ TEST_F(CameraSensor, CheckThrottle)
   double rate = static_cast<double>(total_images)/dt.Double();
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
   EXPECT_GT(rate, 7.0);
-  EXPECT_LT(rate, 10.0);
+  EXPECT_LT(rate, 11.0);
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
   delete img;
 }
