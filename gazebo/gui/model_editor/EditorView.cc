@@ -178,6 +178,20 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
+void EditorView::keyPressEvent(QKeyEvent *_event)
+{
+  if (_event->key() == Qt::Key_Delete)
+    {
+    QList<QGraphicsItem *> selectedItems = this->scene()->selectedItems();
+
+    for (int i = 0; i < selectedItems.size(); ++i)
+    {
+      delete selectedItems[i];
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
 {
   if (this->drawMode == Wall)

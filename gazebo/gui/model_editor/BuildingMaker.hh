@@ -145,11 +145,6 @@ namespace gazebo
 
       public: static double ConvertAngle(double _angle);
 
-/*      public: virtual void OnMousePush(const common::MouseEvent &_event);
-      public: virtual void OnMouseRelease(const common::MouseEvent &_event);
-      public: virtual void OnMouseDrag(const common::MouseEvent &_event);
-      public: virtual void OnMouseMove(const common::MouseEvent &_event);*/
-
       /// \brief
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 
@@ -169,6 +164,8 @@ namespace gazebo
       private: void GenerateSDF();
 
       private: virtual void CreateTheEntity();
+
+//      private slots: void OnItemDeleteted();
 
       private: std::map<std::string, ModelManip *> allItems;
 

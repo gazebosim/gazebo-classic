@@ -325,6 +325,9 @@ void BuildingMaker::ConnectItem(std::string _partName, EditorItem *_item)
       manip, SLOT(OnPosZChanged(double)));
   QObject::connect(_item, SIGNAL(yawChanged(double)),
       manip, SLOT(OnYawChanged(double)));
+
+//  QObject::connect(_item, SIGNAL(itemDeleted()), this, SLOT(OnItemDeleted());
+
 }
 
 /////////////////////////////////////////////////
@@ -732,7 +735,18 @@ void BuildingMaker::CreateTheEntity()
   msgs::Factory msg;
   msg.set_sdf(this->modelSDF->ToString());
   this->makerPub->Publish(msg);
+
 }
+/////////////////////////////////////////////////
+/*void BuildingMaker::OnItemDeleteted()
+{
+  ModelManip *manip = this->walls[wallName];
+  rendering::VisualPtr vis = manip->GetVisual();
+  vis->GetScene()->RemoveVisual(vis);
+  this->walls.erase(wallName);
+  this->allItems.erase(wallName);
+  delete manip;
+}*/
 
 /////////////////////////////////////////////////
 math::Vector3 BuildingMaker::ConvertSize(double _width, double _length,

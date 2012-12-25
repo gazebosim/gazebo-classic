@@ -49,6 +49,8 @@ namespace gazebo
         signals: void originChanged(double _xRatio, double _yRatio,
             double _zRatio);
 
+        signals: void itemDeleted();
+
         private: double baseHeight;
     };
   }

@@ -43,13 +43,15 @@ namespace gazebo
 
       public: enum mouseActions{Select, Translate, Rotate};
 
-      protected: void mousePressEvent(QMouseEvent *_event);
+      private: void mousePressEvent(QMouseEvent *_event);
 
-      protected: void mouseReleaseEvent(QMouseEvent *_event);
+      private: void mouseReleaseEvent(QMouseEvent *_event);
 
-      protected: void mouseMoveEvent(QMouseEvent *_event);
+      private: void mouseMoveEvent(QMouseEvent *_event);
 
-      protected: void mouseDoubleClickEvent(QMouseEvent *_event);
+      private: void mouseDoubleClickEvent(QMouseEvent *_event);
+
+      private: void keyPressEvent(QKeyEvent *_event);
 
       private: void DrawLine(QPoint _pos);
 
