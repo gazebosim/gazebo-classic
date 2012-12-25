@@ -24,8 +24,8 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <string>
 
+#include "gazebo/sdf/sdf.hh"
 #include "gazebo/transport/TransportTypes.hh"
-
 #include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo

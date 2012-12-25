@@ -113,7 +113,7 @@ if (HAVE_BULLET)
 endif()
 
 #if (HAVE_RTQL8)
-target_link_libraries(gazebo_physics gazebo_physics_rtql8)
+  target_link_libraries(gazebo_physics gazebo_physics_rtql8)
 #endif()
 
 gz_add_executable(gzphysics server.cc)

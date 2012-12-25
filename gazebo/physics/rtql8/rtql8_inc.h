@@ -3,7 +3,7 @@
 
 #include <rtql8/integration/EulerIntegrator.h>
 #include <rtql8/integration/RK4Integrator.h>
-#include <rtql8/integration/Integrator.h>
+//#include <rtql8/integration/Integrator.h>
 
 #include <rtql8/kinematics/BodyNode.h>
 

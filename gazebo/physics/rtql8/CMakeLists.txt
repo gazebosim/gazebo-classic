@@ -42,7 +42,7 @@ SET (headers
 #             ODEBoxShape.hh
 #             ODEPlaneShape.hh
 #             ODECylinderShape.hh
-             RTQL8ypes.hh
+             RTQL8Types.hh
 #             ODEScrewJoint.hh
 )
 
