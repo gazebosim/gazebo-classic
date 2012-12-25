@@ -81,6 +81,12 @@ rendering::VisualPtr ModelManip::GetVisual()
 }
 
 /////////////////////////////////////////////////
+void ModelManip::SetMaker(BuildingMaker *_maker)
+{
+  this->maker = _maker;
+}
+
+/////////////////////////////////////////////////
 void ModelManip::OnSizeChanged(double _width, double _depth, double _height)
 {
   // TODO verify the result of this function
@@ -231,6 +237,12 @@ void ModelManip::OnYawChanged(double _yaw)
 }
 
 /////////////////////////////////////////////////
+void ModelManip::OnItemDeleted()
+{
+  this->maker->RemovePart(this->visual->GetName());
+}
+
+/////////////////////////////////////////////////
 void ModelManip::SetPose(double _x, double _y, double _z,
     double _roll, double _pitch, double _yaw)
 {
@@ -287,6 +299,11 @@ void ModelManip::SetSize(double _width, double _depth, double _height)
   this->conversionScale = 0.01;
 
   this->CreateModel(math::Pose(0, 0, 0, 0, 0, 0));
+
+  this->wallCounter = 0;
+  this->windowCounter = 0;
+  this->doorCounter = 0;
+  this->stairsCounter = 0;
 }
 
 /////////////////////////////////////////////////
@@ -326,7 +343,7 @@ void BuildingMaker::ConnectItem(std::string _partName, EditorItem *_item)
   QObject::connect(_item, SIGNAL(yawChanged(double)),
       manip, SLOT(OnYawChanged(double)));
 
-//  QObject::connect(_item, SIGNAL(itemDeleted()), this, SLOT(OnItemDeleted());
+  QObject::connect(_item, SIGNAL(itemDeleted()), manip, SLOT(OnItemDeleted()));
 
 }
 
@@ -366,17 +383,16 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
     double _angle)
 {
   std::ostringstream linkNameStream;
-  linkNameStream << "Wall_" << this->walls.size();
+  linkNameStream << "Wall_" << wallCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
         linkName, this->modelVisual));
   linkVisual->Load();
-  this->visuals.push_back(linkVisual);
+//  this->visuals.push_back(linkVisual);
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual_"
-    << this->walls.size();
+  visualName << this->modelName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
@@ -395,9 +411,10 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
       {
         visualElem = linkElem->GetElement("visual");
         visVisual->Load(visualElem);
-        this->visuals.push_back(visVisual);
-        ModelManip *wallManip = new ModelManip();
+//        this->visuals.push_back(visVisual);
         math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+        ModelManip *wallManip = new ModelManip();
+        wallManip->SetMaker(this);
         wallManip->SetName(linkName);
         wallManip->SetVisual(visVisual);
         visVisual->SetScale(scaledSize);
@@ -405,7 +422,7 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
           -scaledSize.y/2.0, scaledSize.z/2.0));
         wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
         this->allItems[visualName.str()] = wallManip;
-        this->walls[visualName.str()] = wallManip;
+//        this->walls[visualName.str()] = wallManip;
       }
     }
   }
@@ -418,17 +435,16 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
     double _angle)
 {
   std::ostringstream linkNameStream;
-  linkNameStream << "Window_" << this->windows.size();
+  linkNameStream << "Window_" << this->windowCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
         linkName, this->modelVisual));
   linkVisual->Load();
-  this->visuals.push_back(linkVisual);
+//  this->visuals.push_back(linkVisual);
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual_"
-    << this->windows.size();
+  visualName << this->modelName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
@@ -448,9 +464,10 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
       {
         visualElem = linkElem->GetElement("visual");
         visVisual->Load(visualElem);
-        this->visuals.push_back(visVisual);
+//        this->visuals.push_back(visVisual);
 
         ModelManip *windowManip = new ModelManip();
+        windowManip->SetMaker(this);
         windowManip->SetName(linkName);
         windowManip->SetVisual(visVisual);
         math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
@@ -458,7 +475,7 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
         visVisual->SetPosition(math::Vector3(scaledSize.x/2, -scaledSize.y/2, 0));
         windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
         this->allItems[visualName.str()] = windowManip;
-        this->windows[visualName.str()] = windowManip;
+//        this->windows[visualName.str()] = windowManip;
       }
     }
   }
@@ -470,17 +487,16 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
     double _angle, int _steps)
 {
   std::ostringstream linkNameStream;
-  linkNameStream << "Stairs_" << this->walls.size();
+  linkNameStream << "Stairs_" << this->stairsCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
         linkName, this->modelVisual));
   linkVisual->Load();
-  this->visuals.push_back(linkVisual);
+//  this->visuals.push_back(linkVisual);
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual_"
-    << this->stairs.size();
+  visualName << this->modelName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
@@ -500,9 +516,10 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
         visualElem = linkElem->GetElement("visual");
         visVisual->Load(visualElem);
         visVisual->DetachObjects();
-        this->visuals.push_back(visVisual);
+//        this->visuals.push_back(visVisual);
 
         ModelManip *stairsManip = new ModelManip();
+        stairsManip->SetMaker(this);
         stairsManip->SetName(linkName);
         stairsManip->SetVisual(visVisual);
         math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
@@ -513,7 +530,7 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
         visVisual->SetPosition(offset);
         stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
         this->allItems[visualName.str()] = stairsManip;
-        this->stairs[visualName.str()] = stairsManip;
+//        this->stairs[visualName.str()] = stairsManip;
 
         std::stringstream visualStepName;
         visualStepName << visualName.str() << "step" << 0;
@@ -546,14 +563,29 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::RemoveWall(std::string wallName)
+void BuildingMaker::RemovePart(std::string _partName)
 {
-  ModelManip *manip = this->walls[wallName];
+  ModelManip *manip = this->allItems[_partName];
+  if (!manip)
+  {
+    gzerr << _partName << " does not exist\n";
+    return;
+  }
   rendering::VisualPtr vis = manip->GetVisual();
-  vis->GetScene()->RemoveVisual(vis);
-  this->walls.erase(wallName);
-  this->allItems.erase(wallName);
+  rendering::VisualPtr visParent = vis->GetParent();
+  rendering::ScenePtr scene = vis->GetScene();
+  scene->RemoveVisual(vis);
+  if (visParent)
+    scene->RemoveVisual(visParent);
+  this->allItems.erase(_partName);
   delete manip;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::RemoveWall(std::string _wallName)
+{
+  qDebug() << " remove " << _wallName.c_str() << " \n";
+  this->RemovePart(_wallName);
 }
 
 /////////////////////////////////////////////////
@@ -737,16 +769,6 @@ void BuildingMaker::CreateTheEntity()
   this->makerPub->Publish(msg);
 
 }
-/////////////////////////////////////////////////
-/*void BuildingMaker::OnItemDeleteted()
-{
-  ModelManip *manip = this->walls[wallName];
-  rendering::VisualPtr vis = manip->GetVisual();
-  vis->GetScene()->RemoveVisual(vis);
-  this->walls.erase(wallName);
-  this->allItems.erase(wallName);
-  delete manip;
-}*/
 
 /////////////////////////////////////////////////
 math::Vector3 BuildingMaker::ConvertSize(double _width, double _length,

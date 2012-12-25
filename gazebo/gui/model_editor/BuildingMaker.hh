@@ -38,6 +38,8 @@ namespace gazebo
 
     class EntityMaker;
 
+    class BuildingMaker;
+
     class EditorItem;
 
     class ModelManip : public QObject
@@ -54,6 +56,8 @@ namespace gazebo
       public: std::string GetName();
 
       public: rendering::VisualPtr GetVisual();
+
+      public: void SetMaker(BuildingMaker *_maker);
 
       public: math::Vector3 Convert(math::Vector3 _vector);
 
@@ -91,6 +95,8 @@ namespace gazebo
 
       private slots: void OnYawChanged(double _yaw);
 
+      private slots: void OnItemDeleted();
+
       private: std::string name;
 
       private: rendering::VisualPtr visual;
@@ -100,6 +106,8 @@ namespace gazebo
       private: math::Pose pose;
 
       private: math::Pose originTransform;
+
+      private: BuildingMaker *maker;
     };
 
     class BuildingMaker : public EntityMaker
@@ -127,7 +135,9 @@ namespace gazebo
       public: std::string AddStairs(QVector3D _size, QVector3D _pos,
           double _angle, int _steps);
 
-      public: void RemoveWall(std::string wallName);
+      public: void RemovePart(std::string _partName);
+
+      public: void RemoveWall(std::string _wallName);
 
       public: void ConnectItem(std::string _partName, EditorItem *_item);
 
@@ -165,23 +175,13 @@ namespace gazebo
 
       private: virtual void CreateTheEntity();
 
-//      private slots: void OnItemDeleteted();
-
       private: std::map<std::string, ModelManip *> allItems;
 
-      private: std::map<std::string, ModelManip *> walls;
+//      private: std::map<std::string, ModelManip *> walls;
 
-      private: std::map<std::string, ModelManip *> windows;
+//      private: std::map<std::string, ModelManip *> windows;
 
-      private: std::map<std::string, ModelManip *> stairs;
-
-//      private: std::list<rendering::VisualPtr> windowVisuals;
-
-//      private: std::list<rendering::VisualPtr> doorVisuals;
-
-//      private: std::list<ModelManip *> windowManips;
-
-//      private: std::list<ModelManip *> wallManips;
+//      private: std::map<std::string, ModelManip *> stairs;
 
       private: sdf::SDFPtr modelSDF;
 
@@ -193,13 +193,19 @@ namespace gazebo
 
       private: rendering::VisualPtr modelVisual;
 
-      private: std::list<rendering::VisualPtr> visuals;
+//      private: std::list<rendering::VisualPtr> visuals;
 
       private: math::Pose modelPose;
 
-//      private: std::vector<event::ConnectionPtr> connections;
-
       public: static double conversionScale;
+
+      private: int wallCounter;
+
+      private: int windowCounter;
+
+      private: int doorCounter;
+
+      private: int stairsCounter;
     };
   }
 }

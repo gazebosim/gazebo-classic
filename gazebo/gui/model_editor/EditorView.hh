@@ -39,7 +39,7 @@ namespace gazebo
 
       public: ~EditorView();
 
-      public: enum modelTypes{None, Wall, Window, Door, Stairs};
+      public: enum modelTypes{NONE, WALL, WINDOW, DOOR, STAIRS};
 
       public: enum mouseActions{Select, Translate, Rotate};
 
@@ -76,13 +76,13 @@ namespace gazebo
 
       private: bool drawInProgress;
 
-      private: std::vector<WallItem*> wallList;
+      private: std::list<WallItem*> wallList;
 
-      private: std::vector<WindowItem*> windowList;
+      private: std::list<WindowItem*> windowList;
 
-      private: std::vector<DoorItem*> doorList;
+      private: std::list<DoorItem*> doorList;
 
-      private: std::vector<StairsItem*> stairsList;
+      private: std::list<StairsItem*> stairsList;
 
       private: QPoint lastLineCornerPos;
 

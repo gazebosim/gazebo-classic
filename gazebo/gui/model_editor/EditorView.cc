@@ -38,7 +38,7 @@ EditorView::EditorView(QWidget *_parent)
 {
   this->setObjectName("editorView");
 
-  this->drawMode = None;
+  this->drawMode = NONE;
   this->drawInProgress = false;
   this->mouseMode = Select;
 
@@ -80,36 +80,36 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
 {
   switch (drawMode)
   {
-    case None:
+    case NONE:
       break;
-    case Wall:
+    case WALL:
       this->DrawLine(_event->pos());
       break;
-    case Window:
+    case WINDOW:
       if (drawInProgress)
       {
         this->windowList.push_back(dynamic_cast<WindowItem*>(
             this->currentMouseItem));
-        this->drawMode = None;
+        this->drawMode = NONE;
         this->drawInProgress = false;
       }
 
       break;
-    case Door:
+    case DOOR:
       if (drawInProgress)
       {
         this->doorList.push_back(dynamic_cast<DoorItem*>(
             this->currentMouseItem));
-        this->drawMode = None;
+        this->drawMode = NONE;
         this->drawInProgress = false;
       }
       break;
-    case Stairs:
+    case STAIRS:
       if (drawInProgress)
       {
         this->stairsList.push_back(dynamic_cast<StairsItem*>(
             this->currentMouseItem));
-        this->drawMode = None;
+        this->drawMode = NONE;
         this->drawInProgress = false;
       }
     default:
@@ -126,9 +126,9 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 {
   switch (drawMode)
   {
-    case None:
+    case NONE:
       break;
-    case Wall:
+    case WALL:
     {
       WallItem *wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
       if (this->drawInProgress && wallItem)
@@ -162,13 +162,13 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
       }
       break;
     }
-    case Window:
+    case WINDOW:
       this->DrawWindow(_event->pos());
       break;
-    case Door:
+    case DOOR:
       this->DrawDoor(_event->pos());
       break;
-    case Stairs:
+    case STAIRS:
       this->DrawStairs(_event->pos());
       break;
     default:
@@ -186,22 +186,34 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
 
     for (int i = 0; i < selectedItems.size(); ++i)
     {
+      QGraphicsItem *item = selectedItems[i];
+      if (dynamic_cast<WallItem *>(item))
+        wallList.remove(dynamic_cast<WallItem *>(item));
+      else if (dynamic_cast<WindowItem *>(item))
+          windowList.remove(dynamic_cast<WindowItem *>(item));
+      else if (dynamic_cast<DoorItem *>(item))
+        doorList.remove(dynamic_cast<DoorItem *>(item));
+      else if (dynamic_cast<StairsItem *>(item))
+        stairsList.remove(dynamic_cast<StairsItem *>(item));
       delete selectedItems[i];
     }
+    drawMode = NONE;
+    this->drawInProgress = false;
+    this->currentMouseItem = NULL;
   }
 }
 
 /////////////////////////////////////////////////
 void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
 {
-  if (this->drawMode == Wall)
+  if (this->drawMode == WALL)
   {
     WallItem* wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
     wallItem->PopEndPoint();
     wallList.push_back(wallItem);
-    this->buildingMaker->RemoveWall(this->lastWallSegmentName);
+//    this->buildingMaker->RemoveWall(this->lastWallSegmentName);
     this->lastWallSegmentName = "";
-    this->drawMode = None;
+    this->drawMode = NONE;
     this->drawInProgress = false;
   }
   QGraphicsView::mouseDoubleClickEvent(_event);
@@ -340,13 +352,13 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
 //qDebug() << " create editor itme " << _type.c_str();
 
   if (_type == "Wall")
-    this->drawMode = Wall;
+    this->drawMode = WALL;
   else if (_type == "Window")
-    this->drawMode = Window;
+    this->drawMode = WINDOW;
   else if (_type == "Door")
-    this->drawMode = Door;
+    this->drawMode = DOOR;
   else if (_type == "Stairs")
-    this->drawMode = Stairs;
+    this->drawMode = STAIRS;
 
   if (this->drawInProgress && this->currentMouseItem)
   {
@@ -374,15 +386,17 @@ void EditorView::OnAddLevel()
   if (wallList.size() == 0)
     return;
 
-  int wallLevel = this->wallList[0]->GetLevel();
-  double maxHeight = this->wallList[0]->GetHeight();
+  std::list<WallItem *>::iterator wallIt = this->wallList.begin();
+  int wallLevel = (*wallIt)->GetLevel();
+  double maxHeight = (*wallIt)->GetHeight();
 
-  for (unsigned int i = 1; i < this->wallList.size(); ++i)
+  wallIt++;
+  for (wallIt; wallIt != this->wallList.end(); ++wallIt)
   {
-    if (this->wallList[i]->GetHeight() > maxHeight)
+    if ((*wallIt)->GetHeight() > maxHeight)
     {
-      maxHeight = this->wallList[i]->GetHeight();
-      wallLevel = this->wallList[i]->GetLevel();
+      maxHeight = (*wallIt)->GetHeight();
+      wallLevel = (*wallIt)->GetLevel();
     }
   }
 
@@ -390,9 +404,10 @@ void EditorView::OnAddLevel()
   this->levelHeights[this->currentLevel] = maxHeight;
 
   std::vector<WallItem *> newWalls;
-  for (unsigned int i = 0; i < this->wallList.size(); ++i)
+  for (std::list<WallItem *>::iterator it = wallList.begin();
+      it  != this->wallList.end(); ++it)
   {
-    WallItem *wallItem = this->wallList[i]->Clone();
+    WallItem *wallItem = (*it)->Clone();
     wallItem->SetLevel(this->currentLevel);
     wallItem->SetLevelBaseHeight(this->levelHeights[this->currentLevel]);
     this->scene()->addItem(wallItem);
@@ -411,21 +426,6 @@ void EditorView::OnAddLevel()
       this->buildingMaker->ConnectItem(wallSegmentName, wallItem);
     }
   }
-
-
-
-/*    WallItem *wallItem = this->wallList[0];
-    WallItem *newWallItem = newWalls[0];
-
-  for (unsigned int i = 0; i < this->wallList[0]->GetSegmentCount(); ++i)
-  {
-    qDebug() << wallItem->GetSegment(i)->line().p1() << " " <<
-        wallItem->GetSegment(i)->line().p2() << " vs " <<
-        newWallItem->GetSegment(i)->line().p1() << " " <<
-        newWallItem->GetSegment(i)->line().p2();
-
-  }*/
-
   this->wallList.insert(this->wallList.end(), newWalls.begin(),
       newWalls.end());
 }
@@ -434,28 +434,32 @@ void EditorView::OnAddLevel()
 void EditorView::OnChangeLevel(int _level)
 {
   this->currentLevel = _level;
-  for (unsigned int i = 0; i < this->wallList.size(); ++i)
+  for (std::list<WallItem *>::iterator it = this->wallList.begin();
+      it != this->wallList.end(); ++it)
   {
-    if (this->wallList[i]->GetLevel() != _level)
-      wallList[i]->setVisible(false);
-    else wallList[i]->setVisible(true);
+    if ((*it)->GetLevel() != _level)
+      (*it)->setVisible(false);
+    else (*it)->setVisible(true);
   }
-  for (unsigned int i = 0; i < this->windowList.size(); ++i)
+  for (std::list<WindowItem *>::iterator it = this->windowList.begin();
+      it != this->windowList.end(); ++it)
   {
-    if (this->windowList[i]->GetLevel() != _level)
-      windowList[i]->setVisible(false);
-    else windowList[i]->setVisible(true);
+    if ((*it)->GetLevel() != _level)
+      (*it)->setVisible(false);
+    else (*it)->setVisible(true);
   }
-  for (unsigned int i = 0; i < this->doorList.size(); ++i)
+  for (std::list<DoorItem *>::iterator it = this->doorList.begin();
+      it != this->doorList.end(); ++it)
   {
-    if (this->doorList[i]->GetLevel() != _level)
-      doorList[i]->setVisible(false);
-    else doorList[i]->setVisible(true);
+    if ((*it)->GetLevel() != _level)
+      (*it)->setVisible(false);
+    else (*it)->setVisible(true);
   }
-  for (unsigned int i = 0; i < this->stairsList.size(); ++i)
+  for (std::list<StairsItem *>::iterator it = this->stairsList.begin();
+      it != this->stairsList.end(); ++it)
   {
-    if (this->stairsList[i]->GetLevel() != _level)
-      stairsList[i]->setVisible(false);
-    else stairsList[i]->setVisible(true);
+    if ((*it)->GetLevel() != _level)
+      (*it)->setVisible(false);
+    else (*it)->setVisible(true);
   }
 }
