@@ -31,6 +31,10 @@
 #ifdef HAVE_GTS
 struct _GtsSurface;
 typedef _GtsSurface GtsSurface;
+struct _GPtrArray;
+typedef _GPtrArray GPtrArray;
+struct _GtsPoint;
+typedef _GtsPoint GtsPoint;
 #endif
 
 namespace gazebo
@@ -212,8 +216,8 @@ namespace gazebo
       public: void CreateBoolean(const std::string &_name, const Mesh *_m1,
           const Mesh *_m2, const int _operation);
 
-      private: void ConvertToGTS(const Mesh *mesh, GtsSurface *surface);
-
+      /// \brief Helper method for converting Mesh to GTS Surface
+      private: void ConvertMeshToGTS(const Mesh *mesh, GtsSurface *surface);
 #endif
 
       /// \brief 3D mesh loader for COLLADA files

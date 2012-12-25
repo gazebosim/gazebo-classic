@@ -64,10 +64,10 @@ MeshManager::MeshManager()
 
   this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
 
-/*  this->CreateBox("box2", math::Vector3(0.5, 0.5, 1.5),
+  this->CreateBox("box2", math::Vector3(0.5, 0.5, 1.5),
       math::Vector2d(1, 1));
   this->CreateBoolean("sphere_box", this->GetMesh("unit_box"),
-    this->GetMesh("box2"), UNION);*/
+    this->GetMesh("box2"), DIFFERENCE);
 
   this->fileExtensions.push_back("stl");
   this->fileExtensions.push_back("dae");
@@ -969,101 +969,89 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
 }
 
 #ifdef HAVE_GTS
-
-static void vertices_merge (GPtrArray * _vertices, double epsilon)
+//////////////////////////////////////////////////
+static void MergeVertices(GPtrArray * _vertices, double _epsilon)
 {
-  GPtrArray * array;
-  GNode * kdtree;
-  guint i;
+  GPtrArray *array;
+  GNode *kdtree;
   GtsVertex **verticesData = reinterpret_cast<GtsVertex **>(_vertices->pdata);
-  array = g_ptr_array_new ();
-  for (i = 0; i < _vertices->len; i++)
+  array = g_ptr_array_new();
+  for (unsigned int i = 0; i < _vertices->len; ++i)
     g_ptr_array_add (array, verticesData[i]);
-  kdtree = gts_kdtree_new (array, NULL);
-  g_ptr_array_free (array, TRUE);
+  kdtree = gts_kdtree_new(array, NULL);
+  g_ptr_array_free (array, true);
 
-  for (i = 0; i < _vertices->len; i++) {
-    GtsVertex * v = reinterpret_cast<GtsVertex *>(verticesData[i]);
+  for (unsigned int i = 0; i < _vertices->len; i++)
+  {
+    GtsVertex *v = reinterpret_cast<GtsVertex *>(verticesData[i]);
 
-    if (!GTS_OBJECT (v)->reserved) { /* Do something only if v is active */
-      GtsBBox * bbox;
-      GSList * selected, * j;
+    if (!GTS_OBJECT (v)->reserved)
+    {
+      // Do something only if v is active
+      GtsBBox *bbox;
+      GSList *selected, *j;
 
-      /* build bounding box */
-      bbox = gts_bbox_new (gts_bbox_class (),
+      // build bounding box
+      bbox = gts_bbox_new (gts_bbox_class(),
 			   v,
-			   GTS_POINT (v)->x - epsilon,
-			   GTS_POINT (v)->y - epsilon,
-			   GTS_POINT (v)->z - epsilon,
-			   GTS_POINT (v)->x + epsilon,
-			   GTS_POINT (v)->y + epsilon,
-			   GTS_POINT (v)->z + epsilon);
+			   GTS_POINT(v)->x - _epsilon,
+			   GTS_POINT(v)->y - _epsilon,
+			   GTS_POINT(v)->z - _epsilon,
+			   GTS_POINT(v)->x + _epsilon,
+			   GTS_POINT(v)->y + _epsilon,
+			   GTS_POINT(v)->z + _epsilon);
 
       /* select vertices which are inside bbox using kdtree */
       j = selected = gts_kdtree_range (kdtree, bbox, NULL);
-      while (j) {
-	GtsVertex * sv = reinterpret_cast<GtsVertex *>(j->data);
-
-	if (sv != v && !GTS_OBJECT (sv)->reserved)
-	  GTS_OBJECT (sv)->reserved = v; /* mark sv as inactive */
-	j = j->next;
+      while (j)
+      {
+	      GtsVertex *sv = reinterpret_cast<GtsVertex *>(j->data);
+        // mark sv as inactive
+	      if (sv != v && !GTS_OBJECT(sv)->reserved)
+	        GTS_OBJECT(sv)->reserved = v;
+	      j = j->next;
       }
-      g_slist_free (selected);
-      gts_object_destroy (GTS_OBJECT (bbox));
+      g_slist_free(selected);
+      gts_object_destroy(GTS_OBJECT(bbox));
     }
   }
 
-  gts_kdtree_destroy (kdtree);
+  gts_kdtree_destroy(kdtree);
 
-  /* destroy inactive vertices */
+  // destroy inactive vertices
 
-  /* we want to control vertex destruction */
-  gts_allow_floating_vertices = TRUE;
+  // we want to control vertex destruction
+  gts_allow_floating_vertices = true;
 
-  for (i = 0; i < _vertices->len; i++) {
+  for (unsigned int i = 0; i < _vertices->len; ++i)
+  {
     GtsVertex * v = reinterpret_cast<GtsVertex *>(verticesData[i]);
-
-    if (GTS_OBJECT (v)->reserved) { /* v is inactive */
-      verticesData[i] = reinterpret_cast<GtsVertex *>(GTS_OBJECT (v)->reserved);
-      gts_object_destroy (GTS_OBJECT (v));
+    // v is inactive
+    if (GTS_OBJECT(v)->reserved)
+    {
+      verticesData[i] =
+          reinterpret_cast<GtsVertex *>(GTS_OBJECT(v)->reserved);
+      gts_object_destroy(GTS_OBJECT(v));
     }
   }
-
-  gts_allow_floating_vertices = FALSE;
+  gts_allow_floating_vertices = false;
 }
 
-
-
 //////////////////////////////////////////////////
-/*static void write_face (GtsTriangle *_t, SubMesh* _subMesh)
-{
-  GtsVertex *v1, *v2, *v3;
-  GtsVector n;
-
-  gts_triangle_vertices(_t, &v1, &v2, &v3);
-  gts_triangle_normal(_t, &n[0], &n[1], &n[2]);
-  gts_vector_normalize(n);
-  _subMesh->AddVertex(GTS_POINT (v1)->x, GTS_POINT (v1)->y, GTS_POINT (v1)->z);
-  _subMesh->AddVertex(GTS_POINT (v2)->x, GTS_POINT (v2)->y, GTS_POINT (v2)->z);
-  _subMesh->AddVertex(GTS_POINT (v3)->x, GTS_POINT (v3)->y, GTS_POINT (v3)->z);
-//  _subMesh->AddNormal(n[0], n[2], n[2]);
-
-}*/
-
-
-static void write_vertex (GtsPoint * p, gpointer * data)
+static void FillVertex(GtsPoint *_p, gpointer *_data)
 {
   /*(*GTS_OBJECT (p)->klass->write) (GTS_OBJECT (p), (FILE *) data[0]);
   if (!GTS_POINT_CLASS (GTS_OBJECT (p)->klass)->binary)
     fputc ('\n', (FILE *) data[0]);*/
 
-  SubMesh *subMesh = reinterpret_cast<SubMesh *>(data[0]);
-  GHashTable* vIndex = reinterpret_cast<GHashTable *>(data[2]);
-  subMesh->AddVertex(GTS_POINT (p)->x, GTS_POINT (p)->y, GTS_POINT (p)->z);
-  g_hash_table_insert (vIndex, p, GUINT_TO_POINTER (++(*((guint *) data[1]))));
+  SubMesh *subMesh = reinterpret_cast<SubMesh *>(_data[0]);
+  GHashTable* vIndex = reinterpret_cast<GHashTable *>(_data[2]);
+  subMesh->AddVertex(GTS_POINT(_p)->x, GTS_POINT(_p)->y, GTS_POINT (_p)->z);
+  g_hash_table_insert(vIndex, _p, GUINT_TO_POINTER (++(*((guint *)_data[1]))));
 }
 
-static void write_edge (GtsSegment * s, gpointer * data)
+//////////////////////////////////////////////////
+static void FillEdge(GtsSegment *_s, gpointer *_data)
 {
 /*  fprintf ((FILE *) data[0], "%u %u",
 	   GPOINTER_TO_UINT (g_hash_table_lookup (data[2], s->v1)),
@@ -1071,11 +1059,12 @@ static void write_edge (GtsSegment * s, gpointer * data)
   if (GTS_OBJECT (s)->klass->write)
     (*GTS_OBJECT (s)->klass->write) (GTS_OBJECT (s), (FILE *) data[0]);
   fputc ('\n', (FILE *) data[0]);*/
-  GHashTable* eIndex = reinterpret_cast<GHashTable *>(data[3]);
-  g_hash_table_insert (eIndex, s, GUINT_TO_POINTER (++(*((guint *) data[1]))));
+  GHashTable* eIndex = reinterpret_cast<GHashTable *>(_data[3]);
+  g_hash_table_insert (eIndex, _s, GUINT_TO_POINTER (++(*((guint *)_data[1]))));
 }
 
-static void write_face (GtsTriangle * t, gpointer * data)
+//////////////////////////////////////////////////
+static void FillFace(GtsTriangle *_t, gpointer *_data)
 {
 /*  fprintf (data[0], "%u %u %u",
 	   GPOINTER_TO_UINT (g_hash_table_lookup (data[3], t->e1)),
@@ -1084,23 +1073,19 @@ static void write_face (GtsTriangle * t, gpointer * data)
   if (GTS_OBJECT (t)->klass->write)
     (*GTS_OBJECT (t)->klass->write) (GTS_OBJECT (t), data[0]);
   fputc ('\n', data[0]);*/
-  SubMesh *subMesh = reinterpret_cast<SubMesh *>(data[0]);
-  GHashTable* eIndex = reinterpret_cast<GHashTable *>(data[3]);
-  subMesh->AddIndex(GPOINTER_TO_UINT (g_hash_table_lookup (eIndex, t->e1)));
-  subMesh->AddIndex(GPOINTER_TO_UINT (g_hash_table_lookup (eIndex, t->e2)));
-  subMesh->AddIndex(GPOINTER_TO_UINT (g_hash_table_lookup (eIndex, t->e3)));
+  SubMesh *subMesh = reinterpret_cast<SubMesh *>(_data[0]);
+  GHashTable* eIndex = reinterpret_cast<GHashTable *>(_data[3]);
+  subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup (eIndex, _t->e1)));
+  subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup (eIndex, _t->e2)));
+  subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup (eIndex, _t->e3)));
 }
-
-
 
 //////////////////////////////////////////////////
 void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
     const Mesh *_m2, int _operation)
 {
   if (this->HasMesh(_name))
-  {
     return;
-  }
 
   GtsSurface *s1, *s2, *s3;
   GtsSurfaceInter *si;
@@ -1117,9 +1102,8 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   s3 = gts_surface_new(gts_surface_class(), gts_face_class(), gts_edge_class(),
       gts_vertex_class());
 
-  this->ConvertToGTS(_m1, s1);
-  this->ConvertToGTS(_m2, s2);
-
+  this->ConvertMeshToGTS(_m1, s1);
+  this->ConvertMeshToGTS(_m2, s2);
 
   // build bounding box tree for first surface
   tree1 = gts_bb_tree_surface (s1);
@@ -1132,19 +1116,20 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   si = gts_surface_inter_new (gts_surface_inter_class (), s1, s2, tree1, tree2,
       is_open1, is_open2);
   assert(gts_surface_inter_check (si, &closed));
-  if (!closed) {
+  if (!closed)
+  {
     gzerr << "the intersection of " << _m1->GetName() << " and "
         << _m2->GetName() << " is not a closed curve\n";
     return;
   }
 
-  FILE *output1 = fopen("output3.gts", "w");
+  /*FILE *output1 = fopen("output3.gts", "w");
   gts_surface_write(s1, output1);
   fclose(output1);
 
   FILE *output2 = fopen("output4.gts", "w");
   gts_surface_write(s2, output2);
-  fclose(output2);
+  fclose(output2);*/
 
   if (_operation == MeshManager::UNION)
   {
@@ -1159,17 +1144,14 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   else if (_operation == MeshManager::DIFFERENCE)
   {
     gts_surface_inter_boolean (si, s3, GTS_1_OUT_2);
-//    gts_surface_inter_boolean (si, s3, GTS_2_IN_1);
-//    gts_surface_foreach_face (si->s2, (GtsFunc) gts_triangle_revert, NULL);
-//    gts_surface_foreach_face (s2, (GtsFunc) gts_triangle_revert, NULL);
+    gts_surface_inter_boolean (si, s3, GTS_2_IN_1);
+    gts_surface_foreach_face (si->s2, (GtsFunc) gts_triangle_revert, NULL);
+    gts_surface_foreach_face (s2, (GtsFunc) gts_triangle_revert, NULL);
   }
 
-
-
-
-  FILE *output = fopen("output.gts", "w");
+  /*FILE *output = fopen("output.gts", "w");
   gts_surface_write(s3, output);
-  fclose(output);
+  fclose(output);*/
 
   // create the boolean mesh in gazebo
   Mesh *mesh = new Mesh();
@@ -1180,111 +1162,40 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   mesh->AddSubMesh(subMesh);
 
   // fill the submesh with data generated by GTS
-  guint n;
+  unsigned int n;
   gpointer data[4];
-  GHashTable * vindex, * eindex;
+  GHashTable *vIndex = g_hash_table_new(NULL, NULL);
+  GHashTable *eIndex = g_hash_table_new(NULL, NULL);
 
   data[0] = subMesh;
   data[1] = &n;
-  data[2] = vindex = g_hash_table_new (NULL, NULL);
-  data[3] = eindex = g_hash_table_new (NULL, NULL);
+  data[2] = vIndex;
+  data[3] = eIndex;
 
   n = 0;
-  gts_surface_foreach_vertex (s3, (GtsFunc) write_vertex, data);
+  gts_surface_foreach_vertex(s3, (GtsFunc)FillVertex, data);
   n = 0;
-  gts_surface_foreach_edge (s3, (GtsFunc) write_edge, data);
-  gts_surface_foreach_face (s3, (GtsFunc) write_face, data);
-  g_hash_table_destroy (vindex);
-  g_hash_table_destroy (eindex);
+  gts_surface_foreach_edge(s3, (GtsFunc)FillEdge, data);
+  gts_surface_foreach_face(s3, (GtsFunc)FillFace, data);
+  g_hash_table_destroy(vIndex);
+  g_hash_table_destroy(eIndex);
 
   mesh->RecalculateNormals();
 
-/*  GtsVertex * v1, * v2, * v3;
-  GtsVector n;
-
-  gts_triangle_vertices (t, &v1, &v2, &v3);
-  gts_triangle_normal (t, &n[0], &n[1], &n[2]);
-  gts_vector_normalize (n);
-  printf ("facet normal %g %g %g\nouter loop\n", n[0], n[1], n[2]);
-  printf ("vertex %g %g %g\n",
-	  GTS_POINT (v1)->x, GTS_POINT (v1)->y, GTS_POINT (v1)->z);
-  printf ("vertex %g %g %g\n",
-	  GTS_POINT (v2)->x, GTS_POINT (v2)->y, GTS_POINT (v2)->z);
-  printf ("vertex %g %g %g\n",
-	  GTS_POINT (v3)->x, GTS_POINT (v3)->y, GTS_POINT (v3)->z);
-  puts ("endloop\nendfacet");*/
-
-    // Compute the vertices
-/*  for (i = 0; i < 8; i++)
-  {
-    v[i][0] *= sides.x * 0.5;
-    v[i][1] *= sides.y * 0.5;
-    v[i][2] *= sides.z * 0.5;
-  }
-
-  // For each face
-  for (i = 0; i < 6; i++)
-  {
-    // For each vertex in the face
-    for (k = 0; k < 4; k++)
-    {
-      subMesh->AddVertex(v[faces[i][k]][0], v[faces[i][k]][1],
-          v[faces[i][k]][2]);
-      subMesh->AddNormal(n[faces[i][k]][0], n[faces[i][k]][1],
-          n[faces[i][k]][2]);
-      subMesh->AddTexCoord(t[k][0], t[k][1]);
-    }
-  }
-
-  // Set the indices
-  for (i = 0; i < 36; i++)
-    subMesh->AddIndex(ind[i]);
-
-  subMesh->RecalculateNormals();*/
-
   // destroy surfaces
-  gts_object_destroy (GTS_OBJECT (s1));
-  gts_object_destroy (GTS_OBJECT (s2));
-  gts_object_destroy (GTS_OBJECT (s3));
-  gts_object_destroy (GTS_OBJECT (si));
+  gts_object_destroy(GTS_OBJECT(s1));
+  gts_object_destroy(GTS_OBJECT(s2));
+  gts_object_destroy(GTS_OBJECT(s3));
+  gts_object_destroy(GTS_OBJECT(si));
 
   // destroy bounding box trees (including bounding boxes)
-  gts_bb_tree_destroy (tree1, true);
-  gts_bb_tree_destroy (tree2, true);
+  gts_bb_tree_destroy(tree1, true);
+  gts_bb_tree_destroy(tree2, true);
 
 }
-
-static void add_stl(GtsSurface * s, GPtrArray * _vertices)
-{
-  guint i;
-
-  GtsVertex **verticesData = reinterpret_cast<GtsVertex **>(_vertices->pdata);
-  for (i = 0; i < _vertices->len/3; i++) {
-    GtsEdge * e1 = GTS_EDGE (gts_vertices_are_connected (verticesData[3*i],
-							 verticesData[3*i + 1]));
-    GtsEdge * e2 = GTS_EDGE (gts_vertices_are_connected (verticesData[3*i + 1],
-							 verticesData[3*i + 2]));
-    GtsEdge * e3 = GTS_EDGE (gts_vertices_are_connected (verticesData[3*i + 2],
-							 verticesData[3*i]));
-
-    if (e1 == NULL && verticesData[3*i] != verticesData[3*i + 1])
-      e1 = gts_edge_new (s->edge_class,
-			 verticesData[3*i], verticesData[3*i + 1]);
-    if (e2 == NULL && verticesData[3*i + 1] != verticesData[3*i + 2])
-      e2 = gts_edge_new (s->edge_class,
-			 verticesData[3*i + 1], verticesData[3*i + 2]);
-    if (e3 == NULL && verticesData[3*i + 2] != verticesData[3*i])
-      e3 = gts_edge_new (s->edge_class,
-			 verticesData[3*i + 2], verticesData[3*i]);
-    if (e1 != NULL && e2 != NULL && e3 != NULL)
-      gts_surface_add_face (s, gts_face_new (s->face_class, e1, e2, e3));
-    else gzwarn << "Ignoring degenerate facet!";
-  }
-}
-
 
 //////////////////////////////////////////////////
-void MeshManager::ConvertToGTS(const Mesh *_mesh, GtsSurface *_surface)
+void MeshManager::ConvertMeshToGTS(const Mesh *_mesh, GtsSurface *_surface)
 {
   if (!_surface)
   {
@@ -1303,8 +1214,6 @@ void MeshManager::ConvertToGTS(const Mesh *_mesh, GtsSurface *_surface)
     if (subMesh->GetVertexCount() <= 2)
       continue;
 
-
-    gzerr << "submesh vertex count " << subMesh->GetVertexCount() << "\n";
     for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
     {
       math::Vector3 vertex = subMesh->GetVertex(j);
@@ -1312,58 +1221,55 @@ void MeshManager::ConvertToGTS(const Mesh *_mesh, GtsSurface *_surface)
           vertex.y, vertex.z));
     }
 
-    vertices_merge(vertices, 0.01);
-    gzerr << "merged vertex count " << vertices->len<< "\n";
-    add_stl(_surface, vertices);
+    // merge duplicate or close-by vertices
+    // duplicate vertices will produce undesirable results
+    MergeVertices(vertices, 0.01);
 
-    /*GtsVertex **verticesData = reinterpret_cast<GtsVertex **>(vertices->pdata);
+    GtsVertex **verticesData =
+        reinterpret_cast<GtsVertex **>(vertices->pdata);
     for (unsigned int j = 0; j < indexCount/3; ++j)
     {
-        GtsEdge *e1 = GTS_EDGE(gts_vertices_are_connected(
+      GtsEdge *e1 = GTS_EDGE(gts_vertices_are_connected(
+          verticesData[subMesh->GetIndex(3*j)],
+          verticesData[subMesh->GetIndex(3*j+1)]));
+      GtsEdge *e2 = GTS_EDGE(gts_vertices_are_connected(
+          verticesData[subMesh->GetIndex(3*j+1)],
+          verticesData[subMesh->GetIndex(3*j+2)]));
+      GtsEdge *e3 = GTS_EDGE(gts_vertices_are_connected(
+          verticesData[subMesh->GetIndex(3*j+2)],
+          verticesData[subMesh->GetIndex(3*j)]));
+      if (e1 == NULL && verticesData[subMesh->GetIndex(3*j)]
+          != verticesData[subMesh->GetIndex(3*j+1)])
+      {
+        e1 = gts_edge_new(_surface->edge_class,
             verticesData[subMesh->GetIndex(3*j)],
-            verticesData[subMesh->GetIndex(3*j+1)]));
-        GtsEdge *e2 = GTS_EDGE(gts_vertices_are_connected(
+            verticesData[subMesh->GetIndex(3*j+1)]);
+      }
+      if (e2 == NULL && verticesData[subMesh->GetIndex(3*j+1)]
+          != verticesData[subMesh->GetIndex(3*j+2)])
+      {
+        e2 = gts_edge_new(_surface->edge_class,
             verticesData[subMesh->GetIndex(3*j+1)],
-            verticesData[subMesh->GetIndex(3*j+2)]));
-        GtsEdge *e3 = GTS_EDGE(gts_vertices_are_connected(
+            verticesData[subMesh->GetIndex(3*j+2)]);
+      }
+      if (e3 == NULL && verticesData[subMesh->GetIndex(3*j+2)]
+          != verticesData[subMesh->GetIndex(3*j)])
+      {
+        e3 = gts_edge_new(_surface->edge_class,
             verticesData[subMesh->GetIndex(3*j+2)],
-            verticesData[subMesh->GetIndex(3*j)]));
-        if (e1 == NULL && verticesData[subMesh->GetIndex(3*j)]
-            != verticesData[subMesh->GetIndex(3*j+1)])
-        {
-          e1 = gts_edge_new(_surface->edge_class,
-              verticesData[subMesh->GetIndex(3*j)],
-              verticesData[subMesh->GetIndex(3*j+1)]);
-        }
-        if (e2 == NULL && verticesData[subMesh->GetIndex(3*j+1)]
-            != verticesData[subMesh->GetIndex(3*j+2)])
-        {
-          e2 = gts_edge_new(_surface->edge_class,
-              verticesData[subMesh->GetIndex(3*j+1)],
-              verticesData[subMesh->GetIndex(3*j+2)]);
-        }
-        if (e3 == NULL && verticesData[subMesh->GetIndex(3*j+2)]
-            != verticesData[subMesh->GetIndex(3*j)])
-        {
-          e3 = gts_edge_new(_surface->edge_class,
-              verticesData[subMesh->GetIndex(3*j+2)],
-              verticesData[subMesh->GetIndex(3*j)]);
-        }
-        if (e1 != NULL && e2 != NULL && e3 != NULL)
-        {
-          gts_surface_add_face(_surface, gts_face_new(_surface->face_class, e1,
-              e2, e3));
-        }
-        else
-        {
-          gzwarn << _mesh->GetName() << ": Ignoring degenerate facet!";
-        }
-    }*/
+            verticesData[subMesh->GetIndex(3*j)]);
+      }
+      if (e1 != NULL && e2 != NULL && e3 != NULL)
+      {
+        gts_surface_add_face(_surface, gts_face_new(_surface->face_class, e1,
+            e2, e3));
+      }
+      else
+      {
+        gzwarn << _mesh->GetName() << ": Ignoring degenerate facet!";
+      }
+    }
   }
-
-
-
-//  gts_object_destroy (GTS_OBJECT (vertices));
-
+  //gts_object_destroy (GTS_OBJECT(vertices));
 }
 #endif
