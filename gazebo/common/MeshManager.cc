@@ -27,12 +27,16 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/ColladaLoader.hh"
 #include "gazebo/common/STLLoader.hh"
+#include "gazebo_config.h"
+
+#ifdef HAVE_GTS
+  #include "gazebo/common/MeshCSG.hh"
+#endif
 
 #include "gazebo/common/MeshManager.hh"
 
 using namespace gazebo;
 using namespace common;
-
 
 //////////////////////////////////////////////////
 MeshManager::MeshManager()
@@ -60,6 +64,14 @@ MeshManager::MeshManager()
   this->CreateCone("axis_head", 0.02, 0.08, 1, 16);
 
   this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
+
+#ifdef HAVE_GTS
+  // Test CSG
+  this->CreateBox("small_box", math::Vector3(0.5, 0.5, 1.5),
+      math::Vector2d(1, 1));
+  this->CreateBoolean("box_hole", this->GetMesh("unit_box"),
+    this->GetMesh("small_box"), MeshCSG::DIFFERENCE);
+#endif
 
   this->fileExtensions.push_back("stl");
   this->fileExtensions.push_back("dae");
@@ -960,5 +972,17 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
   }
 }
 
+#ifdef HAVE_GTS
+//////////////////////////////////////////////////
+void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
+    const Mesh *_m2, int _operation)
+{
+  if (this->HasMesh(_name))
+    return;
 
-
+  MeshCSG csg;
+  Mesh *mesh = csg.CreateBoolean(_m1, _m2, _operation);
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
+}
+#endif
