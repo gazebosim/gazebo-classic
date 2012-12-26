@@ -24,6 +24,7 @@
 
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
+#include "math/Pose.hh"
 #include "math/Plane.hh"
 #include "common/SingletonT.hh"
 
@@ -196,8 +197,10 @@ namespace gazebo
       /// \param[in] _m1 the parent mesh in the boolean operation
       /// \param[in] _m2 the child mesh in the boolean operation
       /// \param[in] _operation the boolean operation applied to the two meshes
+      /// \param[in] _offset _m2's pose offset from _m1
       public: void CreateBoolean(const std::string &_name, const Mesh *_m1,
-          const Mesh *_m2, const int _operation);
+          const Mesh *_m2, const int _operation,
+          math::Pose _offset = math::Pose::Zero);
 #endif
 
       /// \brief 3D mesh loader for COLLADA files

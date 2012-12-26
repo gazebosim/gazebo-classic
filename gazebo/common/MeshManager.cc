@@ -70,7 +70,8 @@ MeshManager::MeshManager()
   this->CreateBox("small_box", math::Vector3(0.5, 0.5, 1.5),
       math::Vector2d(1, 1));
   this->CreateBoolean("box_hole", this->GetMesh("unit_box"),
-    this->GetMesh("small_box"), MeshCSG::DIFFERENCE);
+    this->GetMesh("small_box"), MeshCSG::DIFFERENCE,
+    math::Pose(0.1, 0.2, 0, 0, 0, 0));
 #endif
 
   this->fileExtensions.push_back("stl");
@@ -975,13 +976,13 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
 #ifdef HAVE_GTS
 //////////////////////////////////////////////////
 void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
-    const Mesh *_m2, int _operation)
+    const Mesh *_m2, int _operation, math::Pose _offset)
 {
   if (this->HasMesh(_name))
     return;
 
   MeshCSG csg;
-  Mesh *mesh = csg.CreateBoolean(_m1, _m2, _operation);
+  Mesh *mesh = csg.CreateBoolean(_m1, _m2, _operation, _offset);
   mesh->SetName(_name);
   this->meshes.insert(std::make_pair(_name, mesh));
 }
