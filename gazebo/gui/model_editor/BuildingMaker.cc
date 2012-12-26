@@ -33,7 +33,6 @@
 
 #include "gui/Gui.hh"
 #include "gui/EntityMaker.hh"
-#include "gui/BoxMaker.hh"
 
 #ifdef HAVE_GTS
   #include "gazebo/common/Mesh.hh"
@@ -353,8 +352,6 @@ void ModelManip::SetSize(double _width, double _depth, double _height)
 {
   this->modelName = "";
 
-  this->boxMaker = new BoxMaker;
-
   this->conversionScale = 0.01;
 
   this->CreateModel(math::Pose(0, 0, 0, 0, 0, 0));
@@ -455,36 +452,29 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  std::string boxString = this->boxMaker->GetSDFString();
+  std::string templateString = this->GetTemplateSDFString();
 
   sdf::ElementPtr visualElem;
   sdf::SDF sdf;
-  sdf.SetFromString(boxString);
-  if (sdf.root->HasElement("model"))
-  {
-    sdf::ElementPtr modelElem = sdf.root->GetElement("model");
-    if (modelElem->HasElement("link"))
-    {
-      sdf::ElementPtr linkElem = modelElem->GetElement("link");
-      if (linkElem->HasElement("visual"))
-      {
-        visualElem = linkElem->GetElement("visual");
-        visVisual->Load(visualElem);
-//        this->visuals.push_back(visVisual);
-        math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
-        ModelManip *wallManip = new ModelManip();
-        wallManip->SetMaker(this);
-        wallManip->SetName(linkName);
-        wallManip->SetVisual(visVisual);
-        visVisual->SetScale(scaledSize);
-        visVisual->SetPosition(math::Vector3(scaledSize.x/2.0,
-          -scaledSize.y/2.0, scaledSize.z/2.0));
-        wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
-        this->allItems[visualName.str()] = wallManip;
-//        this->walls[visualName.str()] = wallManip;
-      }
-    }
-  }
+  sdf.SetFromString(templateString);
+
+  sdf::ElementPtr modelElem = sdf.root->GetElement("model");
+  sdf::ElementPtr linkElem = modelElem->GetElement("link");
+  visualElem = linkElem->GetElement("visual");
+  visVisual->Load(visualElem);
+  //this->visuals.push_back(visVisual);
+  math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+  ModelManip *wallManip = new ModelManip();
+  wallManip->SetMaker(this);
+  wallManip->SetName(linkName);
+  wallManip->SetVisual(visVisual);
+  visVisual->SetScale(scaledSize);
+  visVisual->SetPosition(math::Vector3(scaledSize.x/2.0,
+  -scaledSize.y/2.0, scaledSize.z/2.0));
+  wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+  this->allItems[visualName.str()] = wallManip;
+  //this->walls[visualName.str()] = wallManip;
+
 
   return visualName.str();
 }
@@ -508,34 +498,29 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
         linkVisual));
 
   /// TODO for the moment, just draw a box to represent a window
-  std::string boxString = this->boxMaker->GetSDFString();
+  std::string templateString = this->GetTemplateSDFString();
 
   sdf::ElementPtr visualElem;
   sdf::SDF sdf;
-  sdf.SetFromString(boxString);
-  if (sdf.root->HasElement("model"))
-  {
-    sdf::ElementPtr modelElem = sdf.root->GetElement("model");
-    if (modelElem->HasElement("link"))
-    {
-      sdf::ElementPtr linkElem = modelElem->GetElement("link");
-      if (linkElem->HasElement("visual"))
-      {
-        visualElem = linkElem->GetElement("visual");
-        visVisual->Load(visualElem);
+  sdf.SetFromString(templateString);
+  sdf::ElementPtr modelElem = sdf.root->GetElement("model");
+  sdf::ElementPtr linkElem = modelElem->GetElement("link");
+  visualElem = linkElem->GetElement("visual");
+  visualElem->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set("Gazebo/BlueTransparent");
+  visVisual->Load(visualElem);
 
-        ModelManip *windowManip = new ModelManip();
-        windowManip->SetMaker(this);
-        windowManip->SetName(linkName);
-        windowManip->SetVisual(visVisual);
-        math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
-        visVisual->SetScale(scaledSize);
-        visVisual->SetPosition(math::Vector3(scaledSize.x/2, -scaledSize.y/2, 0));
-        windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
-        this->allItems[visualName.str()] = windowManip;
-      }
-    }
-  }
+
+  ModelManip *windowManip = new ModelManip();
+  windowManip->SetMaker(this);
+  windowManip->SetName(linkName);
+  windowManip->SetVisual(visVisual);
+  math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+  visVisual->SetScale(scaledSize);
+  visVisual->SetPosition(math::Vector3(scaledSize.x/2, -scaledSize.y/2, 0));
+  windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+  this->allItems[visualName.str()] = windowManip;
+
   return visualName.str();
 }
 
@@ -557,65 +542,57 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  std::string boxString = this->boxMaker->GetSDFString();
+  std::string templateString = this->GetTemplateSDFString();
 
   sdf::ElementPtr visualElem;
   sdf::SDF sdf;
-  sdf.SetFromString(boxString);
-  if (sdf.root->HasElement("model"))
+  sdf.SetFromString(templateString);
+  sdf::ElementPtr modelElem = sdf.root->GetElement("model");
+  sdf::ElementPtr linkElem = modelElem->GetElement("link");
+  visualElem = linkElem->GetElement("visual");
+  visVisual->Load(visualElem);
+  visVisual->DetachObjects();
+  // this->visuals.push_back(visVisual);
+
+  ModelManip *stairsManip = new ModelManip();
+  stairsManip->SetMaker(this);
+  stairsManip->SetName(linkName);
+  stairsManip->SetVisual(visVisual);
+  math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+  visVisual->SetScale(scaledSize);
+  double dSteps = static_cast<double>(_steps);
+  math::Vector3 offset = scaledSize/2.0;
+  offset.y = -offset.y;
+  visVisual->SetPosition(offset);
+  stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+  this->allItems[visualName.str()] = stairsManip;
+  // this->stairs[visualName.str()] = stairsManip;
+
+  std::stringstream visualStepName;
+  visualStepName << visualName.str() << "step" << 0;
+  rendering::VisualPtr baseStepVisual(new rendering::Visual(
+      visualStepName.str(), visVisual));
+  visualElem->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set("Gazebo/Red");
+  baseStepVisual->Load(visualElem);
+
+  double rise = 1.0 / dSteps;
+  double run = 1.0 / dSteps;
+  baseStepVisual->SetScale(math::Vector3(1, run, rise));
+
+  math::Vector3 baseOffset(0, 0.5 - run/2.0,
+      -0.5 + rise/2.0);
+  baseStepVisual->SetPosition(baseOffset);
+
+  for ( int i = 1; i < _steps; ++i)
   {
-    sdf::ElementPtr modelElem = sdf.root->GetElement("model");
-    if (modelElem->HasElement("link"))
-    {
-      sdf::ElementPtr linkElem = modelElem->GetElement("link");
-      if (linkElem->HasElement("visual"))
-      {
-        visualElem = linkElem->GetElement("visual");
-        visVisual->Load(visualElem);
-        visVisual->DetachObjects();
-//        this->visuals.push_back(visVisual);
-
-        ModelManip *stairsManip = new ModelManip();
-        stairsManip->SetMaker(this);
-        stairsManip->SetName(linkName);
-        stairsManip->SetVisual(visVisual);
-        math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
-        visVisual->SetScale(scaledSize);
-        double dSteps = static_cast<double>(_steps);
-        math::Vector3 offset = scaledSize/2.0;
-        offset.y = -offset.y;
-        visVisual->SetPosition(offset);
-        stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
-        this->allItems[visualName.str()] = stairsManip;
-//        this->stairs[visualName.str()] = stairsManip;
-
-        std::stringstream visualStepName;
-        visualStepName << visualName.str() << "step" << 0;
-        rendering::VisualPtr baseStepVisual(new rendering::Visual(
-            visualStepName.str(), visVisual));
-        baseStepVisual->Load(visualElem);
-
-        double rise = 1.0 / dSteps;
-        double run = 1.0 / dSteps;
-        baseStepVisual->SetScale(math::Vector3(1, run, rise));
-
-        math::Vector3 baseOffset(0, 0.5 - run/2.0,
-            -0.5 + rise/2.0);
-        baseStepVisual->SetPosition(baseOffset);
-
-        for ( int i = 1; i < _steps; ++i)
-        {
-          visualStepName.str("");
-          visualStepName << visualName.str() << "step" << i;
-          rendering::VisualPtr stepVisual = baseStepVisual->Clone(
-              visualStepName.str(), visVisual);
-          stepVisual->SetPosition(math::Vector3(0, baseOffset.y-(run*i),
-              baseOffset.z + rise*i));
-        }
-      }
-    }
+    visualStepName.str("");
+    visualStepName << visualName.str() << "step" << i;
+    rendering::VisualPtr stepVisual = baseStepVisual->Clone(
+        visualStepName.str(), visVisual);
+    stepVisual->SetPosition(math::Vector3(0, baseOffset.y-(run*i),
+        baseOffset.z + rise*i));
   }
-  GenerateSDF();
   return visualName.str();
 }
 
@@ -662,35 +639,29 @@ std::string BuildingMaker::AddDoor(QVector3D _size, QVector3D _pos,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  std::string boxString = this->boxMaker->GetSDFString();
+  std::string templateString = this->GetTemplateSDFString();
 
   sdf::ElementPtr visualElem;
   sdf::SDF sdf;
-  sdf.SetFromString(boxString);
-  if (sdf.root->HasElement("model"))
-  {
-    sdf::ElementPtr modelElem = sdf.root->GetElement("model");
-    if (modelElem->HasElement("link"))
-    {
-      sdf::ElementPtr linkElem = modelElem->GetElement("link");
-      if (linkElem->HasElement("visual"))
-      {
-        visualElem = linkElem->GetElement("visual");
-        visVisual->Load(visualElem);
+  sdf.SetFromString(templateString);
 
-        ModelManip *doorManip = new ModelManip();
-        doorManip->SetMaker(this);
-        doorManip->SetName(linkName);
-        doorManip->SetVisual(visVisual);
-        math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
-        visVisual->SetScale(scaledSize);
-        visVisual->SetPosition(
-            math::Vector3(scaledSize.x/2, -scaledSize.y/2, 0));
-        doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
-        this->allItems[visualName.str()] = doorManip;
-      }
-    }
-  }
+  sdf::ElementPtr modelElem = sdf.root->GetElement("model");
+  sdf::ElementPtr linkElem = modelElem->GetElement("link");
+  visualElem = linkElem->GetElement("visual");
+  visualElem->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set("Gazebo/Wood");
+  visVisual->Load(visualElem);
+
+  ModelManip *doorManip = new ModelManip();
+  doorManip->SetMaker(this);
+  doorManip->SetName(linkName);
+  doorManip->SetVisual(visVisual);
+  math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+  visVisual->SetScale(scaledSize);
+  visVisual->SetPosition(math::Vector3(scaledSize.x/2, -scaledSize.y/2, 0));
+  doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+  this->allItems[visualName.str()] = doorManip;
+
   return visualName.str();
 }
 
@@ -707,7 +678,8 @@ void BuildingMaker::Stop()
 //  scene->RemoveVisual(this->modelVisual);
 //  this->modelVisual.reset();
 //  this->visuals.clear();
-  this->modelSDF.reset();
+//  this->modelSDF.reset();
+  this->modelVisual->SetVisible(false);
 }
 
 /////////////////////////////////////////////////
@@ -737,13 +709,13 @@ void BuildingMaker::SaveToSDF(std::string _savePath)
 void BuildingMaker::FinishModel()
 {
   this->CreateTheEntity();
-//  this->Stop();
+  this->Stop();
 }
 
 /////////////////////////////////////////////////
 void BuildingMaker::GenerateSDF()
 {
-  std::string boxString = this->boxMaker->GetSDFString();
+  std::string templateString = this->GetTemplateSDFString();
 
   sdf::ElementPtr modelElem;
   sdf::ElementPtr linkElem;
@@ -752,7 +724,7 @@ void BuildingMaker::GenerateSDF()
 
   this->modelSDF.reset(new sdf::SDF);
   sdf::initFile("root.sdf", this->modelSDF);
-  sdf::readString(boxString, this->modelSDF);
+  sdf::readString(templateString, this->modelSDF);
 
   //qDebug() <<  this->modelSDF->ToString().c_str();
 
@@ -813,9 +785,6 @@ void BuildingMaker::GenerateSDF()
     collisionElem = newLinkElem->GetElement("collision");
 
     newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
-
-    if (!newLinkElem->HasElement("pose"))
-      newLinkElem->AddElement("pose");
     newLinkElem->GetElement("pose")->Set(
         visual->GetParent()->GetWorldPose());
 
@@ -824,21 +793,12 @@ void BuildingMaker::GenerateSDF()
       visualElem->GetAttribute("name")->Set(modelManip->GetName() + "_Visual");
       collisionElem->GetAttribute("name")->Set(modelManip->GetName()
           + "_Collision");
-
-      if (!visualElem->HasElement("pose"))
-        visualElem->AddElement("pose");
       visualElem->GetElement("pose")->Set(visual->GetPose());
-
-      if (!collisionElem->HasElement("pose"))
-        collisionElem->AddElement("pose");
       collisionElem->GetElement("pose")->Set(visual->GetPose());
-
       visualElem->GetElement("geometry")->GetElement("box")->
           GetElement("size")->Set(visual->GetScale());
-
       collisionElem->GetElement("geometry")->GetElement("box")->
           GetElement("size")->Set(visual->GetScale());
-
     }
     else
     {
@@ -856,26 +816,15 @@ void BuildingMaker::GenerateSDF()
         visualElem->GetAttribute("name")->Set(visualNameStream.str());
         collisionNameStream << modelManip->GetName() << "_Collision_" << i;
         collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
-
         rendering::VisualPtr childVisual = visual->GetChild(i);
-        if (!visualElem->HasElement("pose"))
-          visualElem->AddElement("pose");
-
         math::Pose newPose(childVisual->GetWorldPose().pos,
             visual->GetRotation());
-
-        if (!visualElem->HasElement("pose"))
-          visualElem->AddElement("pose");
         visualElem->GetElement("pose")->Set(newPose);
-
-        if (!collisionElem->HasElement("pose"))
-          collisionElem->AddElement("pose");
         collisionElem->GetElement("pose")->Set(newPose);
-
         visualElem->GetElement("geometry")->GetElement("box")->
-          GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
+            GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
         collisionElem->GetElement("geometry")->GetElement("box")->
-          GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
+            GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
 
         newLinkElem->InsertElement(visualElem);
         newLinkElem->InsertElement(collisionElem);
@@ -937,4 +886,42 @@ double BuildingMaker::Convert(double _value)
 double BuildingMaker::ConvertAngle(double _angle)
 {
   return GZ_DTOR(_angle);
+}
+
+/////////////////////////////////////////////////
+std::string BuildingMaker::GetTemplateSDFString()
+{
+  std::ostringstream newModelStr;
+  newModelStr << "<sdf version ='1.3'>"
+    << "<model name='building_template_model'>"
+    << "<pose>0 0 0.0 0 0 0</pose>"
+    << "<link name ='link'>"
+    <<   "<pose>0 0 0.0 0 0 0</pose>"
+    <<   "<collision name ='collision'>"
+    <<     "<pose>0 0 0.0 0 0 0</pose>"
+    <<     "<geometry>"
+    <<       "<box>"
+    <<         "<size>1.0 1.0 1.0</size>"
+    <<       "</box>"
+    <<     "</geometry>"
+    <<   "</collision>"
+    <<   "<visual name ='visual'>"
+    <<     "<pose>0 0 0.0 0 0 0</pose>"
+    <<     "<geometry>"
+    <<       "<box>"
+    <<         "<size>1.0 1.0 1.0</size>"
+    <<       "</box>"
+    <<     "</geometry>"
+    <<     "<material>"
+    <<       "<script>"
+    <<         "<uri>file://media/materials/scripts/gazebo.material</uri>"
+    <<         "<name>Gazebo/Grey</name>"
+    <<       "</script>"
+    <<     "</material>"
+    <<   "</visual>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  return newModelStr.str();
 }

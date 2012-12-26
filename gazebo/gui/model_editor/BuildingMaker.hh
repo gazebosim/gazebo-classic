@@ -34,8 +34,6 @@ namespace gazebo
 
   namespace gui
   {
-    class BoxMaker;
-
     class EntityMaker;
 
     class BuildingMaker;
@@ -191,6 +189,8 @@ namespace gazebo
 
       private: virtual void CreateTheEntity();
 
+      private: std::string GetTemplateSDFString();
+
       private: std::map<std::string, ModelManip *> allItems;
 
 //      private: std::map<std::string, ModelManip *> walls;
@@ -204,8 +204,6 @@ namespace gazebo
       private: std::string modelName;
 
       private: std::string savePath;
-
-      private: BoxMaker* boxMaker;
 
       private: rendering::VisualPtr modelVisual;
 
