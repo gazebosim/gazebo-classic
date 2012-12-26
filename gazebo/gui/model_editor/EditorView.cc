@@ -26,6 +26,7 @@
 #include "gui/model_editor/PolylineItem.hh"
 #include "gui/model_editor/WallItem.hh"
 #include "gui/model_editor/BuildingMaker.hh"
+#include "gui/model_editor/LevelInspectorDialog.hh"
 #include "gui/model_editor/EditorEvents.hh"
 #include "gui/model_editor/EditorView.hh"
 
@@ -52,7 +53,7 @@ EditorView::EditorView(QWidget *_parent)
 
   this->connections.push_back(
   gui::Events::ConnectAddLevel(
-    boost::bind(&EditorView::OnAddLevel, this)));
+    boost::bind(&EditorView::OnAddLevel, this, _1, _2)));
 
   this->connections.push_back(
   gui::Events::ConnectChangeLevel(
@@ -60,6 +61,13 @@ EditorView::EditorView(QWidget *_parent)
 
   buildingMaker = new BuildingMaker();
   this->currentLevel = 0;
+
+  this->levelNames[0] = "Level 1";
+
+  this->openLevelInspectorAct = new QAction(tr("&Open Level Inspector"), this);
+  this->openLevelInspectorAct->setStatusTip(tr("Open Level Inspector"));
+  connect(this->openLevelInspectorAct, SIGNAL(triggered()),
+    this, SLOT(OnOpenLevelInspector()));
 }
 
 /////////////////////////////////////////////////
@@ -68,6 +76,15 @@ EditorView::~EditorView()
   if (buildingMaker)
     delete buildingMaker;
 }
+
+/////////////////////////////////////////////////
+void EditorView::contextMenuEvent(QContextMenuEvent *_event)
+{
+  QMenu menu(this);
+  menu.addAction(this->openLevelInspectorAct);
+  menu.exec(_event->globalPos());
+}
+
 
 /////////////////////////////////////////////////
 void EditorView::mousePressEvent(QMouseEvent *_event)
@@ -387,10 +404,16 @@ void EditorView::OnFinishModel(const std::string &_modelName,
 }
 
 /////////////////////////////////////////////////
-void EditorView::OnAddLevel()
+void EditorView::OnAddLevel(int _newLevel, std::string _levelName)
 {
+  this->currentLevel = _newLevel;
+  this->levelNames[_newLevel] = _levelName;
+
   if (wallList.size() == 0)
+  {
+    this->levelHeights[_newLevel] = 0;
     return;
+  }
 
   std::list<WallItem *>::iterator wallIt = this->wallList.begin();
   int wallLevel = (*wallIt)->GetLevel();
@@ -467,5 +490,18 @@ void EditorView::OnChangeLevel(int _level)
     if ((*it)->GetLevel() != _level)
       (*it)->setVisible(false);
     else (*it)->setVisible(true);
+  }
+}
+
+/////////////////////////////////////////////////
+void EditorView::OnOpenLevelInspector()
+{
+  LevelInspectorDialog dialog;
+  dialog.SetLevelName(this->levelNames[this->currentLevel]);
+  if (dialog.exec() == QDialog::Accepted)
+  {
+    std::string newLevelName = dialog.GetLevelName();
+    this->levelNames[this->currentLevel] = newLevelName;
+    emit gui::Events::changeLevelName(this->currentLevel, newLevelName);
   }
 }

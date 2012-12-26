@@ -19,6 +19,7 @@
 #define _LEVEL_WIDGET_HH_
 
 #include "gui/qt.h"
+#include "common/Event.hh"
 
 namespace gazebo
 {
@@ -40,8 +41,11 @@ namespace gazebo
 
       public slots: void OnAddLevel();
 
+      private: void OnChangeLevelName(int _level, std::string _newName);
+
       private: QComboBox *levelComboBox;
 
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

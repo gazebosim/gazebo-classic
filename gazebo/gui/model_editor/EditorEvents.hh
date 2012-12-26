@@ -69,6 +69,15 @@ namespace gazebo
                   event::ConnectionPtr _subscriber)
               { addLevel.Disconnect(_subscriber); }
 
+      public: template<typename T>
+              static event::ConnectionPtr ConnectChangeLevelName(T _subscriber)
+              { return changeLevelName.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot to the change level name signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectChangeLevelName(
+                  event::ConnectionPtr _subscriber)
+              { changeLevelName.Disconnect(_subscriber); }
+
       /// \brief An editor item is to be created
       public: static event::EventT<void (std::string)> createEditorItem;
 
@@ -80,7 +89,10 @@ namespace gazebo
       public: static event::EventT<void (int)> changeLevel;
 
       /// \brief A new level is to be added
-      public: static event::EventT<void ()> addLevel;
+      public: static event::EventT<void (int, std::string)> addLevel;
+
+      /// \brief The current level name has been changed
+      public: static event::EventT<void (int, std::string)> changeLevelName;
 
 /*      public: template<typename T>
               static event::ConnectionPtr ConnectCreateBuildingPart(T _subscriber)

@@ -43,6 +43,8 @@ namespace gazebo
 
       public: enum mouseActions{Select, Translate, Rotate};
 
+      private: void contextMenuEvent(QContextMenuEvent *event);
+
       private: void mousePressEvent(QMouseEvent *_event);
 
       private: void mouseReleaseEvent(QMouseEvent *_event);
@@ -66,9 +68,11 @@ namespace gazebo
       private: void OnFinishModel(const std::string &_modelName,
           const std::string &_savePath);
 
-      private: void OnAddLevel();
+      private: void OnAddLevel(int _newLevel, std::string _levelName);
 
       private: void OnChangeLevel(int _level);
+
+      private slots: void OnOpenLevelInspector();
 
       private: int drawMode;
 
@@ -99,6 +103,12 @@ namespace gazebo
       private: int currentLevel;
 
       private: std::map<int, double> levelHeights;
+
+      private: std::map<int, std::string> levelNames;
+
+      private: QAction *openLevelInspectorAct;
+
+
     };
   }
 }
