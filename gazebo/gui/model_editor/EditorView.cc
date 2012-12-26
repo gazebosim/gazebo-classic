@@ -281,7 +281,6 @@ void EditorView::DrawWindow(QPoint _pos)
     windowPosition.setZ(windowItem->GetLevelBaseHeight() + windowPosition.z());
     std::string windowName = this->buildingMaker->AddWindow(
         windowItem->GetSize(), windowPosition, windowItem->GetSceneRotation());
-
     this->buildingMaker->ConnectItem(windowName, windowItem);
 
     this->drawInProgress = true;
@@ -305,6 +304,12 @@ void EditorView::DrawDoor(QPoint _pos)
     doorItem->SetLevelBaseHeight(this->levelHeights[this->currentLevel]);
     this->scene()->addItem(doorItem);
     this->currentMouseItem = doorItem;
+    QVector3D doorPosition = doorItem->GetScenePosition();
+    doorPosition.setZ(doorItem->GetLevelBaseHeight() + doorPosition.z());
+    std::string doorName = this->buildingMaker->AddDoor(
+        doorItem->GetSize(), doorPosition, doorItem->GetSceneRotation());
+    this->buildingMaker->ConnectItem(doorName, doorItem);
+
     this->drawInProgress = true;
   }
   doorItem = dynamic_cast<DoorItem*>(currentMouseItem);

@@ -33,7 +33,7 @@ WallItem::WallItem(QPointF _start, QPointF _end)
 
   this->level = 0;
 
-  this->wallThickness = 10;
+  this->wallThickness = 20;
   this->wallHeight = 0;
 
   this->SetThickness(this->wallThickness);
@@ -55,7 +55,6 @@ void WallItem::SetHeight(double _height)
 {
   this->wallHeight = _height;
 }
-
 
 /////////////////////////////////////////////////
 WallItem *WallItem::Clone()

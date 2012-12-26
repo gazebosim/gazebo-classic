@@ -55,11 +55,11 @@ namespace gazebo
 
         protected: void DrawBoundingBox(QPainter *_painter);
 
-        public: void SetPosition(QPointF _pos);
+        public: virtual void SetPosition(QPointF _pos);
 
-        public: void SetPosition(double _x, double _y);
+        public: virtual void SetPosition(double _x, double _y);
 
-        public: void SetRotation(double _angle);
+        public: virtual void SetRotation(double _angle);
 
         public: double GetRotation();
 
@@ -105,6 +105,8 @@ namespace gazebo
 
         private: QVariant itemChange(GraphicsItemChange _change,
           const QVariant &_value);
+
+        private: virtual void SizeChanged();
 
         private: void AdjustSize(double _x, double _y);
 

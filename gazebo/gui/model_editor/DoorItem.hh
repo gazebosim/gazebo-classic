@@ -34,10 +34,20 @@ namespace gazebo
 
         public: ~DoorItem();
 
+        public: virtual QVector3D GetSize();
+
+        public: virtual QVector3D GetScenePosition();
+
+        public: virtual double GetSceneRotation();
+
         private: virtual void paint (QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
         private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+
+        private: void DoorChanged();
+
+        private: void SizeChanged();
 
         private: double doorDepth;
 

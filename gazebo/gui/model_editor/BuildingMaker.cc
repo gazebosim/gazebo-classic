@@ -523,7 +523,6 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
       {
         visualElem = linkElem->GetElement("visual");
         visVisual->Load(visualElem);
-//        this->visuals.push_back(visVisual);
 
         ModelManip *windowManip = new ModelManip();
         windowManip->SetMaker(this);
@@ -534,7 +533,6 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
         visVisual->SetPosition(math::Vector3(scaledSize.x/2, -scaledSize.y/2, 0));
         windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
         this->allItems[visualName.str()] = windowManip;
-//        this->windows[visualName.str()] = windowManip;
       }
     }
   }
@@ -647,11 +645,53 @@ void BuildingMaker::RemoveWall(std::string _wallName)
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::AddDoor(QVector3D /*_size*/, QVector3D /*_pos*/,
-    double /*_angle*/)
+std::string BuildingMaker::AddDoor(QVector3D _size, QVector3D _pos,
+    double _angle)
 {
-  std::string doorVisualName = "";
-  return doorVisualName;
+  /// TODO a copy of AddWindow function. FIXME later
+  std::ostringstream linkNameStream;
+  linkNameStream << "Door_" << this->doorCounter++;
+  std::string linkName = linkNameStream.str();
+
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
+        linkName, this->modelVisual));
+  linkVisual->Load();
+
+  std::ostringstream visualName;
+  visualName << this->modelName << "::" << linkName << "::Visual";
+  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+        linkVisual));
+
+  std::string boxString = this->boxMaker->GetSDFString();
+
+  sdf::ElementPtr visualElem;
+  sdf::SDF sdf;
+  sdf.SetFromString(boxString);
+  if (sdf.root->HasElement("model"))
+  {
+    sdf::ElementPtr modelElem = sdf.root->GetElement("model");
+    if (modelElem->HasElement("link"))
+    {
+      sdf::ElementPtr linkElem = modelElem->GetElement("link");
+      if (linkElem->HasElement("visual"))
+      {
+        visualElem = linkElem->GetElement("visual");
+        visVisual->Load(visualElem);
+
+        ModelManip *doorManip = new ModelManip();
+        doorManip->SetMaker(this);
+        doorManip->SetName(linkName);
+        doorManip->SetVisual(visVisual);
+        math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+        visVisual->SetScale(scaledSize);
+        visVisual->SetPosition(
+            math::Vector3(scaledSize.x/2, -scaledSize.y/2, 0));
+        doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+        this->allItems[visualName.str()] = doorManip;
+      }
+    }
+  }
+  return visualName.str();
 }
 
 /////////////////////////////////////////////////

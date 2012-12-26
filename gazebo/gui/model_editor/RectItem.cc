@@ -409,13 +409,13 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
     this->UpdateCornerPositions();
     this->update();
 
-    if (_corner->GetIndex() == 1 || _corner->GetIndex() == 5 ||
+    /*if (_corner->GetIndex() == 1 || _corner->GetIndex() == 5 ||
         (_corner->GetIndex() % 2 == 0))
       emit depthChanged(this->drawingHeight);
 
     if (_corner->GetIndex() == 3 || _corner->GetIndex() == 7 ||
         (_corner->GetIndex() % 2 == 0))
-      emit widthChanged(this->drawingWidth);
+      emit widthChanged(this->drawingWidth);*/
   }
   return true;
 }
@@ -524,7 +524,8 @@ void RectItem::UpdateCornerPositions()
   this->rotateHandle->setPos(this->drawingWidth/2,
       this->drawingOriginY);
 
-//  emit depthChanged(this->drawingHeight);
+  this->SizeChanged();
+
 //  this->setPolygon(QPolygonF(this->boundingRect()));
 }
 
@@ -685,4 +686,11 @@ void RectItem::SetRotation(double _angle)
 double RectItem::GetRotation()
 {
   return this->rotationAngle;
+}
+
+/////////////////////////////////////////////////
+void RectItem::SizeChanged()
+{
+  emit depthChanged(this->drawingHeight);
+  emit widthChanged(this->drawingWidth);
 }

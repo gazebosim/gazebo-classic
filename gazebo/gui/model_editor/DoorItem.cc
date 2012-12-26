@@ -32,12 +32,13 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
   this->level = 0;
   this->levelBaseHeight = 0;
 
-  this->doorDepth = 10;
+  this->doorDepth = 20;
   this->doorHeight = 0;
-  this->doorWidth = 50;
+  this->doorWidth = 100;
 
   this->width = this->doorWidth;
-  this->height = this->doorDepth + this->doorWidth;
+//  this->height = this->doorDepth + this->doorWidth;
+  this->height = this->doorDepth;
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
 
@@ -52,6 +53,24 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
 /////////////////////////////////////////////////
 DoorItem::~DoorItem()
 {
+}
+
+/////////////////////////////////////////////////
+QVector3D DoorItem::GetSize()
+{
+  return QVector3D(this->doorWidth, this->doorDepth, this->doorHeight);
+}
+
+/////////////////////////////////////////////////
+QVector3D DoorItem::GetScenePosition()
+{
+  return QVector3D(this->scenePos().x(), this->scenePos().y(), 0);
+}
+
+/////////////////////////////////////////////////
+double DoorItem::GetSceneRotation()
+{
+  return this->rotationAngle;
 }
 
 /////////////////////////////////////////////////
@@ -72,10 +91,10 @@ void DoorItem::paint (QPainter *_painter,
   doorPen.setColor(this->borderColor);
   _painter->setPen(doorPen);
 
-  _painter->drawLine(topLeft, bottomLeft);
+  _painter->drawLine(topLeft, bottomLeft + QPointF(0, this->drawingWidth));
   QRect arcRect(this->drawingOriginX - this->drawingWidth,
-      this->drawingOriginY - this->drawingHeight,
-      this->drawingWidth*2, this->drawingHeight*2);
+      this->drawingOriginY + this->drawingHeight - this->drawingWidth,
+      this->drawingWidth*2, this->drawingWidth*2);
   _painter->drawArc(arcRect, 0, -90 * 16);
 
   doorPen.setWidth(this->doorDepth);
@@ -93,7 +112,7 @@ void DoorItem::paint (QPainter *_painter,
       -this->doorDepth/2.0));
 
   this->doorWidth = this->drawingWidth;
-//  this->doorDepth = this->drawingHeight;
+  this->doorDepth = this->drawingHeight;
   this->doorPos = this->pos();
 
 //  QGraphicsPolygonItem::paint(_painter, _option, _widget);
@@ -102,7 +121,7 @@ void DoorItem::paint (QPainter *_painter,
 /////////////////////////////////////////////////
 void DoorItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
-  WindowDoorInspectorDialog dialog(1);
+  WindowDoorInspectorDialog dialog(WindowDoorInspectorDialog::DOOR);
   dialog.SetWidth(this->doorWidth * this->scale);
   dialog.SetDepth(this->doorDepth * this->scale);
   dialog.SetHeight(this->doorHeight * this->scale);
@@ -112,7 +131,7 @@ void DoorItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
   if (dialog.exec() == QDialog::Accepted)
   {
     this->SetSize(QSize(dialog.GetWidth() / this->scale,
-        (dialog.GetDepth() / this->scale) + this->doorWidth));
+        (dialog.GetDepth() / this->scale)));
     this->doorWidth = dialog.GetWidth() / this->scale;
     this->doorHeight = dialog.GetHeight() / this->scale;
     this->doorDepth = dialog.GetDepth() / this->scale;
@@ -120,6 +139,24 @@ void DoorItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
     itemPos.setY(-itemPos.y());
     this->doorPos = itemPos;
     this->setPos(this->doorPos);
+    this->DoorChanged();
   }
   _event->setAccepted(true);
+}
+
+/////////////////////////////////////////////////
+void DoorItem::DoorChanged()
+{
+  emit widthChanged(this->doorWidth);
+  emit depthChanged(this->doorDepth);
+  emit heightChanged(this->doorHeight);
+  emit positionChanged(this->doorPos.x(), this->doorPos.y(),
+      this->levelBaseHeight/* + this->doorElevation*/);
+}
+
+/////////////////////////////////////////////////
+void DoorItem::SizeChanged()
+{
+  emit widthChanged(this->doorWidth);
+  emit depthChanged(this->doorDepth);
 }

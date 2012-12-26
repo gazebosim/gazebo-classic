@@ -34,7 +34,7 @@ WindowItem::WindowItem(): RectItem(), BuildingItem()
 
   this->windowDepth = 20;
   this->windowHeight = 0;
-  this->windowWidth = 50;
+  this->windowWidth = 100;
   this->windowSideBar = 10;
   this->windowPos = this->pos();
   this->windowElevation = 0;
@@ -123,7 +123,7 @@ void WindowItem::paint(QPainter *_painter,
 /////////////////////////////////////////////////
 void WindowItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
-  WindowDoorInspectorDialog dialog(0);
+  WindowDoorInspectorDialog dialog(WindowDoorInspectorDialog::WINDOW);
   dialog.SetWidth(this->windowWidth * this->scale);
   dialog.SetHeight(this->windowHeight * this->scale);
   dialog.SetElevation(this->windowElevation * this->scale);
