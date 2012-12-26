@@ -36,7 +36,7 @@ WindowItem::WindowItem(): RectItem(), BuildingItem()
   this->windowHeight = 0;
   this->windowWidth = 50;
   this->windowSideBar = 10;
-  this->windowPos = this->scenePos();
+  this->windowPos = this->pos();
   this->windowElevation = 0;
 
   this->width = this->windowWidth;
@@ -114,7 +114,7 @@ void WindowItem::paint(QPainter *_painter,
 
   this->windowWidth = this->drawingWidth;
   this->windowDepth = this->drawingHeight;
-  this->windowPos = this->scenePos();
+  this->windowPos = this->pos();
   _painter->restore();
 
 //  QGraphicsPolygonItem::paint(_painter, _option, _widget);
@@ -128,6 +128,7 @@ void WindowItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
   dialog.SetHeight(this->windowHeight * this->scale);
   dialog.SetElevation(this->windowElevation * this->scale);
   dialog.SetDepth(this->windowDepth * this->scale);
+
   QPointF itemPos = this->windowPos * this->scale;
   itemPos.setY(-itemPos.y());
   dialog.SetPosition(itemPos);
