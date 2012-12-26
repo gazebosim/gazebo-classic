@@ -295,6 +295,13 @@ void ModelManip::OnYawChanged(double _yaw)
 }
 
 /////////////////////////////////////////////////
+void ModelManip::OnRotationChanged(double _roll, double _pitch, double _yaw)
+{
+  this->SetRotation(_roll, _pitch, _yaw);
+}
+
+
+/////////////////////////////////////////////////
 void ModelManip::OnItemDeleted()
 {
   this->maker->RemovePart(this->visual->GetName());
@@ -383,6 +390,8 @@ void BuildingMaker::ConnectItem(std::string _partName, EditorItem *_item)
       double, double, double, double, double)));
   QObject::connect(_item, SIGNAL(positionChanged(double, double, double)),
       manip, SLOT(OnPositionChanged(double, double, double)));
+  QObject::connect(_item, SIGNAL(rotationChanged(double, double, double)),
+      manip, SLOT(OnRotationChanged(double, double, double)));
 
   QObject::connect(_item, SIGNAL(widthChanged(double)),
       manip, SLOT(OnWidthChanged(double)));
@@ -398,7 +407,6 @@ void BuildingMaker::ConnectItem(std::string _partName, EditorItem *_item)
       manip, SLOT(OnPosZChanged(double)));
   QObject::connect(_item, SIGNAL(yawChanged(double)),
       manip, SLOT(OnYawChanged(double)));
-
   QObject::connect(_item, SIGNAL(itemDeleted()), manip, SLOT(OnItemDeleted()));
 
 }

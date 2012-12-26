@@ -172,8 +172,9 @@ void LineSegmentItem::LineChanged()
   emit depthChanged(this->pen().width());
 
   QPointF sceneStartPos = this->mapToScene(this->start);
-  emit poseChanged(sceneStartPos.x(), sceneStartPos.y(), 0,
-      0, 0, this->line().angle());
+  emit posXChanged(sceneStartPos.x());
+  emit posYChanged(sceneStartPos.y());
+  emit rotationChanged(0, 0, this->line().angle());
 }
 
 /////////////////////////////////////////////////

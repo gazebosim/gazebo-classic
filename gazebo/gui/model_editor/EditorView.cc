@@ -430,28 +430,33 @@ void EditorView::OnAddLevel(int _newLevel, std::string _levelName)
   }
 
   std::list<WallItem *>::iterator wallIt = this->wallList.begin();
-  int wallLevel = (*wallIt)->GetLevel();
   double maxHeight = (*wallIt)->GetHeight();
+  double wallHeight = (*wallIt)->GetHeight() + (*wallIt)->GetLevelBaseHeight();
+  int wallLevel = 0;
+
 
   wallIt++;
   for (wallIt; wallIt != this->wallList.end(); ++wallIt)
   {
-    if ((*wallIt)->GetHeight() > maxHeight)
+    wallHeight = (*wallIt)->GetHeight() + (*wallIt)->GetLevelBaseHeight();
+    if ( wallHeight > maxHeight)
     {
-      maxHeight = (*wallIt)->GetHeight();
+      maxHeight = wallHeight;
       wallLevel = (*wallIt)->GetLevel();
     }
   }
 
-  this->currentLevel = wallLevel+1;
-  this->levelHeights[this->currentLevel] = maxHeight;
+  this->levelHeights[_newLevel] = maxHeight;
 
   std::vector<WallItem *> newWalls;
   for (std::list<WallItem *>::iterator it = wallList.begin();
       it  != this->wallList.end(); ++it)
   {
+    if ((*it)->GetLevel() != wallLevel)
+      continue;
+
     WallItem *wallItem = (*it)->Clone();
-    wallItem->SetLevel(this->currentLevel);
+    wallItem->SetLevel(_newLevel);
     wallItem->SetLevelBaseHeight(this->levelHeights[this->currentLevel]);
     this->scene()->addItem(wallItem);
     newWalls.push_back(wallItem);

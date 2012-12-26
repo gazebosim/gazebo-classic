@@ -91,6 +91,9 @@ namespace gazebo
 
       private slots: void OnPositionChanged(double _x, double _y, double _z);
 
+      private slots: void OnRotationChanged(double _roll, double _pitch,
+          double _yaw);
+
       private slots: void OnWidthChanged(double _width);
 
       private slots: void OnHeightChanged(double _height);
