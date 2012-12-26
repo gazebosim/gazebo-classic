@@ -200,6 +200,7 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
     drawMode = NONE;
     this->drawInProgress = false;
     this->currentMouseItem = NULL;
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
   }
 }
 

@@ -59,6 +59,18 @@ namespace gazebo
 
       public: void SetMaker(BuildingMaker *_maker);
 
+      public: void AttachObject(ModelManip *_object);
+
+      public: void DetachObject(ModelManip *_object);
+
+      public: void SetAttachedTo(ModelManip *_parent);
+
+      public: ModelManip *GetAttachedObject(unsigned int _index);
+
+      public: unsigned int GetAttachedObjectCount();
+
+      public: bool IsAttached();
+
       public: math::Vector3 Convert(math::Vector3 _vector);
 
       public: void SetPose(double _x, double _y, double _z,
@@ -108,6 +120,10 @@ namespace gazebo
       private: math::Pose originTransform;
 
       private: BuildingMaker *maker;
+
+      private: std::vector<ModelManip *> attachedObjects;
+
+      private: ModelManip * parent;
     };
 
     class BuildingMaker : public EntityMaker

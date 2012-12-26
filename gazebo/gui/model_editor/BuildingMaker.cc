@@ -35,10 +35,18 @@
 #include "gui/EntityMaker.hh"
 #include "gui/BoxMaker.hh"
 
+#ifdef HAVE_GTS
+  #include "gazebo/common/Mesh.hh"
+  #include "gazebo/common/MeshManager.hh"
+  #include "gazebo/common/MeshCSG.hh"
+#endif
+
 #include "gui/model_editor/EditorEvents.hh"
 #include "gui/model_editor/BuildingMaker.hh"
 
 #include "gui/model_editor/EditorItem.hh"
+#include "gazebo_config.h"
+
 
 
 using namespace gazebo;
@@ -49,6 +57,7 @@ double BuildingMaker::conversionScale;
 /////////////////////////////////////////////////
 ModelManip::ModelManip()
 {
+  this->parent = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -106,6 +115,56 @@ void ModelManip::OnSizeChanged(double _width, double _depth, double _height)
       - math::Vector3(xdx + ydx, xdy + ydy, 0);
 
   this->visual->SetPosition(newPos);
+}
+
+/////////////////////////////////////////////////
+void ModelManip::AttachObject(ModelManip *_object)
+{
+  if (!_object->IsAttached())
+  {
+    _object->SetAttachedTo(this);
+    this->attachedObjects.push_back(_object);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelManip::DetachObject(ModelManip *_object)
+{
+
+  std::remove(this->attachedObjects.begin(), this->attachedObjects.end(),
+      _object);
+}
+
+/////////////////////////////////////////////////
+void ModelManip::SetAttachedTo(ModelManip *_parent)
+{
+  if (this->IsAttached())
+  {
+    gzerr << this->name << " is already attached to a parent \n";
+    return;
+  }
+  this->parent = _parent;
+}
+
+/////////////////////////////////////////////////
+ModelManip *ModelManip::GetAttachedObject(unsigned int _index)
+{
+  if (_index >= this->attachedObjects.size())
+    gzthrow("Index too large");
+
+  return this->attachedObjects[_index];
+}
+
+/////////////////////////////////////////////////
+unsigned int ModelManip::GetAttachedObjectCount()
+{
+  return this->attachedObjects.size();
+}
+
+/////////////////////////////////////////////////
+bool ModelManip::IsAttached()
+{
+  return (this->parent != NULL);
 }
 
 /////////////////////////////////////////////////
@@ -584,7 +643,6 @@ void BuildingMaker::RemovePart(std::string _partName)
 /////////////////////////////////////////////////
 void BuildingMaker::RemoveWall(std::string _wallName)
 {
-  qDebug() << " remove " << _wallName.c_str() << " \n";
   this->RemovePart(_wallName);
 }
 
@@ -676,10 +734,38 @@ void BuildingMaker::GenerateSDF()
   for(itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
       itemsIt++)
   {
+    std::string name = itemsIt->first;
+    ModelManip *modelManip = itemsIt->second;
+
+#ifdef HAVE_GTS
+    // create a hole to represent a window/door in the wall
+    if (name.find("Window") != std::string::npos
+        || name.find("Door") != std::string::npos)
+    {
+      if (modelManip->IsAttached())
+        continue;
+    }
+    else if (name.find("Wall") != std::string::npos
+        && modelManip->GetAttachedObjectCount() != 0)
+    {
+      for (unsigned int i = 0; i < modelManip->GetAttachedObjectCount(); ++i)
+      {
+        ModelManip *attachedObj = modelManip->GetAttachedObject(i);
+        std::string objName = attachedObj->GetName();
+        if (objName.find("Window") != std::string::npos
+            || objName.find("Door") != std::string::npos)
+        {
+          common::Mesh *wallMesh, *objectMesh;
+/*          MeshManager::Instance()->CreateBoolean(
+              modelManip->GetName() + "_Boolean", wallMesh, objectMesh,
+              MeshCSG::DIFFERENCE);*/
+        }
+      }
+    }
+#endif
     visualNameStream.str("");
     collisionNameStream.str("");
 
-    ModelManip *modelManip = itemsIt->second;
     rendering::VisualPtr visual = modelManip->GetVisual();
 
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
