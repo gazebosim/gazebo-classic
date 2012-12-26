@@ -26,42 +26,44 @@ namespace gazebo
   {
     class RectItem;
 
-    class StairsItem : public RectItem, public BuildingItem
+    class StairsItem :  public RectItem, public BuildingItem
     {
-        public: StairsItem();
+      public: StairsItem();
 
-        public: ~StairsItem();
+      public: ~StairsItem();
 
-        public: virtual QVector3D GetSize();
+      public: virtual QVector3D GetSize();
 
-        public: virtual QVector3D GetScenePosition();
+      public: virtual QVector3D GetScenePosition();
 
-        public: virtual double GetSceneRotation();
+      public: virtual double GetSceneRotation();
 
-        public: int GetSteps();
+      public: int GetSteps();
 
-        private: virtual void paint (QPainter *_painter,
-            const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+      private: virtual void paint (QPainter *_painter,
+          const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-        private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+      private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
 
-        private: void StairsChanged();
+      private: void StairsChanged();
 
-        private: double stairsDepth;
+      private: void StepsChanged();
 
-        private: double stairsHeight;
+      private: double stairsDepth;
 
-        private: double stairsWidth;
+      private: double stairsHeight;
 
-        private: double stairsSideBar;
+      private: double stairsWidth;
 
-        private: QPointF stairsPos;
+      private: double stairsSideBar;
 
-        private: double stairsElevation;
+      private: QPointF stairsPos;
 
-        private: int stairsSteps;
+      private: double stairsElevation;
 
-        private: double scale;
+      private: int stairsSteps;
+
+      private: double scale;
 
 //        private: double stairsUnitRise;
 

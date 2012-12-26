@@ -23,7 +23,7 @@ using namespace gui;
 /////////////////////////////////////////////////
 EditorItem::EditorItem()
 {
-  //this->pseudoHeight = 0;
+  this->editorType = "base";
 }
 
 /////////////////////////////////////////////////
@@ -31,12 +31,6 @@ EditorItem::~EditorItem()
 {
   emit itemDeleted();
 }
-
-/*/////////////////////////////////////////////////
-void EditorItem::SetPseudoHeight(double _height)
-{
-  this->pseudoHeight = _height;
-}*/
 
 /////////////////////////////////////////////////
 QVector3D EditorItem::GetSize()
@@ -54,4 +48,10 @@ QVector3D EditorItem::GetScenePosition()
 double EditorItem::GetSceneRotation()
 {
   return 0;
+}
+
+/////////////////////////////////////////////////
+std::string EditorItem::GetType()
+{
+  return this->editorType;
 }

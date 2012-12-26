@@ -29,6 +29,8 @@ RectItem::RectItem():
     location(0,0),
     gridSpace(10)
 {
+  this->editorType = "Rect";
+
   this->width = 100;
   this->height = 100;
 

@@ -21,6 +21,8 @@ namespace gazebo
 
         public: virtual double GetSceneRotation();
 
+        public: virtual std::string GetType();
+
         signals: void sizeChanged(double _width, double _depth,
             double _height);
 
@@ -51,7 +53,7 @@ namespace gazebo
 
         signals: void itemDeleted();
 
-        private: double baseHeight;
+        protected: std::string editorType;
     };
   }
 }

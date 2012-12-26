@@ -29,6 +29,7 @@ using namespace gui;
 WallItem::WallItem(QPointF _start, QPointF _end)
     : PolylineItem(_start, _end), BuildingItem()
 {
+  this->editorType = "Wall";
   this->scale = BuildingMaker::conversionScale;
 
   this->level = 0;

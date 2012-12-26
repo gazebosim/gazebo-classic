@@ -25,6 +25,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class EditorItem;
     class WindowItem;
     class StairsItem;
     class DoorItem;
@@ -42,6 +43,8 @@ namespace gazebo
       public: enum modelTypes{NONE, WALL, WINDOW, DOOR, STAIRS};
 
       public: enum mouseActions{Select, Translate, Rotate};
+
+      public: void CloneItem3D(EditorItem *item);
 
       private: void contextMenuEvent(QContextMenuEvent *event);
 

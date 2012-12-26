@@ -26,6 +26,7 @@ using namespace gui;
 PolylineItem::PolylineItem(QPointF _start, QPointF _end) :
     EditorItem(), QGraphicsPathItem(), gridSpace(10)
 {
+  this->editorType = "Polyline";
   this->origin = _start;
   this->setPos(_start);
 

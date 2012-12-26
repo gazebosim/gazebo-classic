@@ -27,6 +27,7 @@ using namespace gui;
 /////////////////////////////////////////////////
 DoorItem::DoorItem(): RectItem(), BuildingItem()
 {
+  this->editorType = "Door";
   this->scale = BuildingMaker::conversionScale;
 
   this->level = 0;

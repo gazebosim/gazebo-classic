@@ -17,9 +17,10 @@
 
 #include "gui/model_editor/BuildingItem.hh"
 #include "gui/model_editor/RectItem.hh"
-#include "gui/model_editor/StairsItem.hh"
 #include "gui/model_editor/BuildingMaker.hh"
 #include "gui/model_editor/StairsInspectorDialog.hh"
+#include "gui/model_editor/EditorView.hh"
+#include "gui/model_editor/StairsItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -27,6 +28,7 @@ using namespace gui;
 /////////////////////////////////////////////////
 StairsItem::StairsItem(): RectItem(), BuildingItem()
 {
+  this->editorType = "Stairs";
   this->scale = BuildingMaker::conversionScale;
 
   this->level = 0;
@@ -116,7 +118,7 @@ void StairsItem::paint(QPainter *_painter,
   double stairsUnitRun = this->stairsDepth /
       static_cast<double>(this->stairsSteps);
 
-  for (int i = 0; i <= stairsSteps; ++i)
+  for (int i = 0; i <= this->stairsSteps; ++i)
   {
     double stepIncr = topLeft.y() + i*stairsUnitRun;
     drawStepLeft.setY(stepIncr);
@@ -150,6 +152,11 @@ void StairsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
     this->stairsPos = dialog.GetStartPosition()  / this->scale;
     this->stairsPos.setY(-this->stairsPos.y());
     this->setPos(stairsPos);
+    if (this->stairsSteps != dialog.GetSteps())
+    {
+      this->stairsSteps = dialog.GetSteps();
+      this->StepsChanged();
+    }
 //    this->stairsElevation = dialog.GetElevation();
     this->StairsChanged();
   }
@@ -164,4 +171,14 @@ void StairsItem::StairsChanged()
   emit heightChanged(this->stairsHeight);
   emit positionChanged(this->stairsPos.x(), this->stairsPos.y(),
       this->levelBaseHeight + this->stairsElevation);
+}
+
+/////////////////////////////////////////////////
+void StairsItem::StepsChanged()
+{
+    // emit a signal to delete 3d and make a new one
+    // TODO there should be a more efficient way to do this.
+    emit itemDeleted();
+    dynamic_cast<EditorView *>((this->scene()->views())[0])->CloneItem3D(this);
+    this->StairsChanged();
 }

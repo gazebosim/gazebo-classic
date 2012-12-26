@@ -367,6 +367,20 @@ void EditorView::DrawStairs(QPoint _pos)
   }
 }
 
+/////////////////////////////////////////////////
+void EditorView::CloneItem3D(EditorItem* _item)
+{
+  if (_item->GetType() == "Stairs")
+  {
+    StairsItem *stairsItem = dynamic_cast<StairsItem *>(_item);
+    QVector3D stairsPosition = stairsItem->GetScenePosition();
+    stairsPosition.setZ(stairsItem->GetLevelBaseHeight() + stairsPosition.z());
+    std::string stairsName = this->buildingMaker->AddStairs(
+        stairsItem->GetSize(), stairsPosition, stairsItem->GetSceneRotation(),
+        stairsItem->GetSteps());
+    this->buildingMaker->ConnectItem(stairsName, stairsItem);
+  }
+}
 
 /////////////////////////////////////////////////
 void EditorView::OnCreateEditorItem(const std::string &_type)
