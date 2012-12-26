@@ -131,8 +131,8 @@ static void FillFace(GtsTriangle *_t, gpointer *_data)
 }
 
 //////////////////////////////////////////////////
-Mesh *MeshCSG::CreateBoolean(const Mesh *_m1,
-    const Mesh *_m2, int _operation)
+Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
+    math::Pose _offset)
 {
   GtsSurface *s1, *s2, *s3;
   GtsSurfaceInter *si;
@@ -150,7 +150,34 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1,
       gts_vertex_class());
 
   this->ConvertMeshToGTS(_m1, s1);
-  this->ConvertMeshToGTS(_m2, s2);
+
+  if (_offset != math::Pose::Zero)
+  {
+    Mesh *m2 = new Mesh();
+    for (unsigned int i = 0; i < _m2->GetSubMeshCount(); ++i)
+    {
+      SubMesh *m2SubMesh = new SubMesh();
+      m2->AddSubMesh(m2SubMesh);
+
+      const SubMesh *subMesh = _m2->GetSubMesh(i);
+      if (subMesh->GetVertexCount() <= 2)
+        continue;
+      for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
+      {
+        m2SubMesh->AddVertex(_offset.pos + _offset.rot*subMesh->GetVertex(j));
+      }
+      for (unsigned int j = 0; j < subMesh->GetIndexCount(); ++j)
+      {
+        m2SubMesh->AddIndex(subMesh->GetIndex(j));
+      }
+    }
+    this->ConvertMeshToGTS(m2, s2);
+    delete m2;
+  }
+  else
+  {
+    this->ConvertMeshToGTS(_m2, s2);
+  }
 
   // build bounding box tree for first surface
   tree1 = gts_bb_tree_surface (s1);
