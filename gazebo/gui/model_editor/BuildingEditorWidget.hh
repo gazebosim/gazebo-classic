@@ -26,8 +26,6 @@ namespace gazebo
   {
     class BuildingEditorWidget : public QWidget
     {
-      Q_OBJECT
-
       public: BuildingEditorWidget(QWidget *_parent = 0);
 
       public: ~BuildingEditorWidget();

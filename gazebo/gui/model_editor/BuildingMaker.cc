@@ -465,6 +465,8 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
 
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set("Gazebo/Grey");
   visVisual->Load(visualElem);
   //this->visuals.push_back(visVisual);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);

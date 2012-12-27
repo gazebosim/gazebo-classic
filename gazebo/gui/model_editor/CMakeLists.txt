@@ -29,32 +29,32 @@ set (sources
 )
 
 set (qt_headers
-  EditorWidget.hh
-  BuildingEditorWidget.hh
   BuildingEditorPalette.hh
   FinishModelDialog.hh
   WindowDoorInspectorDialog.hh
   WallInspectorDialog.hh
   StairsInspectorDialog.hh
   LevelInspectorDialog.hh
-  GridLines.hh
-  CornerGrabber.hh
-  RotateHandle.hh
-  EditorView.hh
-  RectItem.hh
-  BuildingItem.hh
-  WindowItem.hh
-  DoorItem.hh
-  PolylineItem.hh
-  WallItem.hh
-  LineSegmentItem.hh
   BuildingMaker.hh
   EditorItem.hh
-  StairsItem.hh
   LevelWidget.hh
+  EditorView.hh
 )
 
 set (headers
+  BuildingEditorWidget.hh
+  EditorWidget.hh
+  CornerGrabber.hh
+  RotateHandle.hh
+  BuildingItem.hh
+  WindowItem.hh
+  DoorItem.hh
+  RectItem.hh
+  LineSegmentItem.hh
+  GridLines.hh
+  PolylineItem.hh
+  WallItem.hh
+  StairsItem.hh
   EditorEvents.hh
 )
 

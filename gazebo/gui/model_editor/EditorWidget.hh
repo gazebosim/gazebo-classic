@@ -26,8 +26,6 @@ namespace gazebo
   {
     class EditorWidget : public QWidget
     {
-      Q_OBJECT
-
       public: EditorWidget(QWidget *_parent = 0);
 
       public: virtual ~EditorWidget();
