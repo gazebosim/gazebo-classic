@@ -67,6 +67,8 @@ RTQL8Physics::RTQL8Physics(WorldPtr _world)
 //   // Instantiate the world
 //   this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher,
 //       this->broadPhase, this->solver, this->collisionConfig);
+
+  this->world = new simulation::World;
 }
 
 //////////////////////////////////////////////////
@@ -85,6 +87,10 @@ RTQL8Physics::~RTQL8Physics()
 //   this->dispatcher = NULL;
 //   this->solver = NULL;
 //   this->dynamicsWorld = NULL;
+
+  delete this->world;
+  
+  this->world = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -94,12 +100,10 @@ void RTQL8Physics::Load(sdf::ElementPtr _sdf)
 
   // Gravity
   math::Vector3 g = this->sdf->GetValueVector3("gravity");
-  this->gravity(0) = g.x;
-  this->gravity(1) = g.y;
-  this->gravity(2) = g.z;
+  this->world->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
   
   // Time step
-  this->timeStep = this->sdf->GetValueDouble("time_step");
+  this->world->setTimeStep(this->sdf->GetValueDouble("time_step"));
   
   // TODO: Elements for rtql8 settings
   sdf::ElementPtr rtql8Elem = this->sdf->GetElement("rtql8");
@@ -110,17 +114,7 @@ void RTQL8Physics::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void RTQL8Physics::Init()
 {
-  PhysicsEngine::Init();
-  
-  std::vector<dynamics::SkeletonDynamics*>::iterator itrSkels = skels.begin();
-  
-  for (std::vector<dynamics::SkeletonDynamics*>::iterator itrSkels = skels.begin();
-       itrSkels != skels.end(); itrSkels++)
-  {
-    (*itrSkels)->initDynamics();
-    //(*itrSkels)->setPose(mDofs, false, false); // set flags to skip transformation and first-derivatives updates
-  }
-        
+  this->world->init();
 }
 
 //////////////////////////////////////////////////
@@ -146,31 +140,31 @@ void RTQL8Physics::UpdateCollision()
 //////////////////////////////////////////////////
 void RTQL8Physics::UpdatePhysics()
 {
-//   // need to lock, otherwise might conflict with world resetting
-//   this->physicsUpdateMutex->lock();
-// 
-//   common::Time currTime =  this->world->GetRealTime();
-// 
-//   this->dynamicsWorld->stepSimulation(
-//       (currTime - this->lastUpdateTime).Float(), 7, this->stepTimeDouble);
-//   this->lastUpdateTime = currTime;
-// 
-//   this->physicsUpdateMutex->unlock();
+  // need to lock, otherwise might conflict with world resetting
+  this->physicsUpdateMutex->lock();
+
+  //common::Time currTime =  this->world->GetRealTime();
+  this->world->updatePhysics();
+  //this->lastUpdateTime = currTime;
+
+  this->physicsUpdateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
 void RTQL8Physics::SetStepTime(double _value)
 {
+   // TODO: 
 //   this->sdf->GetElement("ode")->GetElement(
 //       "solver")->GetAttribute("dt")->Set(_value);
-// 
-//   this->stepTimeDouble = _value;
+   this->stepTimeDouble = _value;
+   this->world->setTimeStep(_value);
 }
 
 //////////////////////////////////////////////////
 double RTQL8Physics::GetStepTime()
 {
   return this->stepTimeDouble;
+  //return this->world->getTimeStep();
 }
 
 //////////////////////////////////////////////////
@@ -303,9 +297,7 @@ JointPtr RTQL8Physics::CreateJoint(const std::string &_type, ModelPtr _parent)
 void RTQL8Physics::SetGravity(const gazebo::math::Vector3& _gravity)
 {
   this->sdf->GetElement("gravity")->GetAttribute("xyz")->Set(_gravity);
-  this->gravity(0) = _gravity.x;
-  this->gravity(1) = _gravity.y;
-  this->gravity(2) = _gravity.z;
+  this->world->setGravity(Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
 }
 
 //////////////////////////////////////////////////

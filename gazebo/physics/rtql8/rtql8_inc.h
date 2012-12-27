@@ -9,4 +9,6 @@
 
 #include <rtql8/dynamics/SkeletonDynamics.h>
 
+#include <rtql8/simulation/World.h>
+
 #endif

@@ -107,29 +107,32 @@ namespace gazebo
       /// \brief Store the value of the stepTime parameter to improve efficiency
       private: double stepTimeDouble;
       
-      /// \brief Array of skeletons
-      private: std::vector<dynamics::SkeletonDynamics*> skels;
-      
       /// \brief 
-      private: std::vector<Eigen::VectorXd> dofVels;
+      private: simulation::World* world;
       
-      /// \brief 
-      private: std::vector<Eigen::VectorXd> dofs;
-      
-      /// \brief Integrator
-      private: integration::EulerIntegrator integrator;
-      
-      /// \brief 
-      private: Eigen::Vector3d gravity;
-      
-	  /// \brief 
-	  private: double timeStep;
-	  
-      /// \brief 
-      private: bool running;
-      
-      /// \brief 
-      private: int frame;
+//       /// \brief Array of skeletons
+//       private: std::vector<dynamics::SkeletonDynamics*> skels;
+//       
+//       /// \brief 
+//       private: std::vector<Eigen::VectorXd> dofVels;
+//       
+//       /// \brief 
+//       private: std::vector<Eigen::VectorXd> dofs;
+//       
+//       /// \brief Integrator
+//       private: integration::EulerIntegrator integrator;
+//       
+//       /// \brief 
+//       private: Eigen::Vector3d gravity;
+//       
+// 	  /// \brief 
+// 	  private: double timeStep;
+// 	  
+//       /// \brief 
+//       private: bool running;
+//       
+//       /// \brief 
+//       private: int frame;
     };
 
   /// \}

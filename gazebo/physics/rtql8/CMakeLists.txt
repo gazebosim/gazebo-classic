@@ -5,7 +5,7 @@ INCLUDE_DIRECTORIES(/usr/local/include/rtql8)
 INCLUDE_DIRECTORIES(/usr/local/include/eigen-3.1.2)
 
 LINK_DIRECTORIES(/usr/local/lib)
-SET(RTQL8_LIBRARIES collision dynamics geometry integration kinematics lcpsolver optimizer renderer utils yui)
+SET(RTQL8_LIBRARIES collision dynamics geometry integration kinematics lcpsolver optimizer renderer utils yui simulation)
 
 set (sources
              RTQL8Physics.cc
