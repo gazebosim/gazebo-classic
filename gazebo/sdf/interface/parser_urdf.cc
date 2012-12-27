@@ -590,7 +590,7 @@ void URDF2Gazebo::InsertGazeboExtensionRobot(TiXmlElement *_elem)
 }
 
 void URDF2Gazebo::CreateGeometry(TiXmlElement* _elem,
-  boost::shared_ptr<urdf::Geometry> _geometry)
+  boost::shared_ptr<urdf::Geometry> _geom)
 {
   int sizeCount;
   double sizeVals[3];
@@ -600,14 +600,14 @@ void URDF2Gazebo::CreateGeometry(TiXmlElement* _elem,
   std::string type;
   TiXmlElement *geometryType = NULL;
 
-  switch (_geometry->type)
+  switch (_geom->type)
   {
   case urdf::Geometry::BOX:
     type = "box";
     sizeCount = 3;
     {
       boost::shared_ptr<const urdf::Box> box;
-      box = boost::dynamic_pointer_cast< const urdf::Box >(_geometry);
+      box = boost::dynamic_pointer_cast< const urdf::Box >(_geom);
       sizeVals[0] = box->dim.x;
       sizeVals[1] = box->dim.y;
       sizeVals[2] = box->dim.z;
@@ -620,7 +620,7 @@ void URDF2Gazebo::CreateGeometry(TiXmlElement* _elem,
     sizeCount = 2;
     {
       boost::shared_ptr<const urdf::Cylinder> cylinder;
-      cylinder = boost::dynamic_pointer_cast<const urdf::Cylinder >(_geometry);
+      cylinder = boost::dynamic_pointer_cast<const urdf::Cylinder >(_geom);
       geometryType = new TiXmlElement(type);
       AddKeyValue(geometryType, "length", Values2str(1, &cylinder->length));
       AddKeyValue(geometryType, "radius", Values2str(1, &cylinder->radius));
@@ -631,7 +631,7 @@ void URDF2Gazebo::CreateGeometry(TiXmlElement* _elem,
     sizeCount = 1;
     {
       boost::shared_ptr<const urdf::Sphere> sphere;
-      sphere = boost::dynamic_pointer_cast<const urdf::Sphere >(_geometry);
+      sphere = boost::dynamic_pointer_cast<const urdf::Sphere >(_geom);
       geometryType = new TiXmlElement(type);
       AddKeyValue(geometryType, "radius", Values2str(1, &sphere->radius));
     }
@@ -641,7 +641,7 @@ void URDF2Gazebo::CreateGeometry(TiXmlElement* _elem,
     sizeCount = 3;
     {
       boost::shared_ptr<const urdf::Mesh> mesh;
-      mesh = boost::dynamic_pointer_cast<const urdf::Mesh >(_geometry);
+      mesh = boost::dynamic_pointer_cast<const urdf::Mesh >(_geom);
       sizeVals[0] = mesh->scale.x;
       sizeVals[1] = mesh->scale.y;
       sizeVals[2] = mesh->scale.z;
@@ -693,7 +693,7 @@ void URDF2Gazebo::CreateGeometry(TiXmlElement* _elem,
     break;
   default:
     sizeCount = 0;
-    gzwarn << "Unknown body type: [" << _geometry->type
+    gzwarn << "Unknown body type: [" << _geom->type
            << "] skipped in geometry\n";
     break;
   }
@@ -707,17 +707,17 @@ void URDF2Gazebo::CreateGeometry(TiXmlElement* _elem,
 
 
 std::string URDF2Gazebo::GetGeometryBoundingBox(
-  boost::shared_ptr<urdf::Geometry> _geometry, double *_sizeVals)
+  boost::shared_ptr<urdf::Geometry> _geom, double *_sizeVals)
 {
   std::string type;
 
-  switch (_geometry->type)
+  switch (_geom->type)
   {
   case urdf::Geometry::BOX:
       type = "box";
       {
         boost::shared_ptr<const urdf::Box> box;
-        box = boost::dynamic_pointer_cast<const urdf::Box >(_geometry);
+        box = boost::dynamic_pointer_cast<const urdf::Box >(_geom);
         _sizeVals[0] = box->dim.x;
         _sizeVals[1] = box->dim.y;
         _sizeVals[2] = box->dim.z;
@@ -727,7 +727,7 @@ std::string URDF2Gazebo::GetGeometryBoundingBox(
       type = "cylinder";
       {
         boost::shared_ptr<const urdf::Cylinder> cylinder;
-        cylinder = boost::dynamic_pointer_cast<const urdf::Cylinder >(_geometry);
+        cylinder = boost::dynamic_pointer_cast<const urdf::Cylinder >(_geom);
         _sizeVals[0] = cylinder->radius * 2;
         _sizeVals[1] = cylinder->radius * 2;
         _sizeVals[2] = cylinder->length;
@@ -737,7 +737,7 @@ std::string URDF2Gazebo::GetGeometryBoundingBox(
       type = "sphere";
       {
         boost::shared_ptr<const urdf::Sphere> sphere;
-        sphere = boost::dynamic_pointer_cast<const urdf::Sphere >(_geometry);
+        sphere = boost::dynamic_pointer_cast<const urdf::Sphere >(_geom);
         _sizeVals[0] = _sizeVals[1] = _sizeVals[2] = sphere->radius * 2;
       }
       break;
@@ -745,7 +745,7 @@ std::string URDF2Gazebo::GetGeometryBoundingBox(
       type = "trimesh";
       {
         boost::shared_ptr<const urdf::Mesh> mesh;
-        mesh = boost::dynamic_pointer_cast<const urdf::Mesh >(_geometry);
+        mesh = boost::dynamic_pointer_cast<const urdf::Mesh >(_geom);
         _sizeVals[0] = mesh->scale.x;
         _sizeVals[1] = mesh->scale.y;
         _sizeVals[2] = mesh->scale.z;
@@ -753,7 +753,7 @@ std::string URDF2Gazebo::GetGeometryBoundingBox(
       break;
   default:
       _sizeVals[0] = _sizeVals[1] = _sizeVals[2] = 0;
-      gzwarn << "Unknown body type: [" << _geometry->type
+      gzwarn << "Unknown body type: [" << _geom->type
              << "] skipped in geometry\n";
       break;
   }
