@@ -1199,7 +1199,8 @@ void URDF2Gazebo::CreateLink(TiXmlElement *_root,
 void URDF2Gazebo::CreateCollisions(TiXmlElement* _elem,
   ConstLinkPtr _link)
 {
-  // loop through all collisions. make additional geoms using the lumped stuff
+  // loop through all collision groups. as well as additional collision from
+  //   lumped meshes (fixed joint reduction)
   for (std::map<std::string,
     boost::shared_ptr<std::vector<CollisionPtr> > >::const_iterator
     collisionsIt = _link->collision_groups.begin();
@@ -1208,6 +1209,7 @@ void URDF2Gazebo::CreateCollisions(TiXmlElement* _elem,
     unsigned int defaultMeshCount = 0;
     unsigned int groupMeshCount = 0;
     unsigned int lumpMeshCount = 0;
+    // loop through collisions in each group
     for (std::vector<CollisionPtr>::iterator
          collision = collisionsIt->second->begin();
          collision != collisionsIt->second->end();
@@ -1280,8 +1282,8 @@ void URDF2Gazebo::CreateCollisions(TiXmlElement* _elem,
 void URDF2Gazebo::CreateVisuals(TiXmlElement* _elem,
   ConstLinkPtr _link)
 {
-  // loop through all visuals. make additional visuals using the
-  //   lumped stuff
+  // loop through all visual groups. as well as additional visuals from
+  //   lumped meshes (fixed joint reduction)
   for (std::map<std::string,
     boost::shared_ptr<std::vector<VisualPtr> > >::const_iterator
     visualsIt = _link->visual_groups.begin();
@@ -1290,6 +1292,7 @@ void URDF2Gazebo::CreateVisuals(TiXmlElement* _elem,
     unsigned int defaultMeshCount = 0;
     unsigned int groupMeshCount = 0;
     unsigned int lumpMeshCount = 0;
+    // loop through all visuals in this group
     for (std::vector<VisualPtr>::iterator
          visual = visualsIt->second->begin();
          visual != visualsIt->second->end();
@@ -1310,7 +1313,7 @@ void URDF2Gazebo::CreateVisuals(TiXmlElement* _elem,
           visualPrefix = visualNameStream.str();
         }
 
-        /* make a <visual> block */
+        // create a <visual> block
         CreateVisual(_elem, _link, *visual, visualPrefix);
 
         // only 1 default mesh
@@ -1910,17 +1913,17 @@ void URDF2Gazebo::ReduceGazeboExtensionSensorTransformReduction(
     // overwrite <xyz> and <rpy> if they exist
     if ((*_blobIt)->ValueStr() == "sensor")
     {
-      /*
       // parse it and add/replace the reduction transform
       // find first instance of xyz and rpy, replace with reduction transform
-      for (TiXmlNode* elIt = (*_blobIt)->FirstChild();
-           elIt; elIt = elIt->NextSibling())
-      {
-        std::ostringstream streamIn;
-        streamIn << *elIt;
-        gzdbg << "    " << streamIn << "\n";
-      }
-      */
+
+      // debug print
+      // for (TiXmlNode* elIt = (*_blobIt)->FirstChild();
+      //      elIt; elIt = elIt->NextSibling())
+      // {
+      //   std::ostringstream streamIn;
+      //   streamIn << *elIt;
+      //   gzdbg << "    " << streamIn << "\n";
+      // }
 
       {
         TiXmlNode* oldPoseKey = (*_blobIt)->FirstChild("pose");

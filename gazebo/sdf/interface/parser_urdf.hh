@@ -42,10 +42,10 @@ namespace urdf2gazebo
   /// \addtogroup gazebo_parser
   /// \{
 
-  typedef boost::shared_ptr<urdf::Collision> CollisionPtr;
-  typedef boost::shared_ptr<urdf::Visual> VisualPtr;
-  typedef boost::shared_ptr<urdf::Link> LinkPtr;
-  typedef boost::shared_ptr<const urdf::Link> ConstLinkPtr;
+  typedef boost::shared_ptr<urdf::Collision> UrdfCollisionPtr;
+  typedef boost::shared_ptr<urdf::Visual> UrdfVisualPtr;
+  typedef boost::shared_ptr<urdf::Link> UrdfLinkPtr;
+  typedef boost::shared_ptr<const urdf::Link> ConstUrdfLinkPtr;
 
   class GazeboExtension
   {
@@ -209,7 +209,7 @@ namespace urdf2gazebo
                       const::gazebo::math::Pose& _transform);
 
     /// print mass for link for debugging
-    private: void PrintMass(LinkPtr _link);
+    private: void PrintMass(UrdfLinkPtr _link);
 
     /// print mass for link for debugging
     private: void PrintMass(std::string _linkName, dMass _mass);
@@ -248,69 +248,69 @@ namespace urdf2gazebo
 
     /// reduce fixed joints by lumping inertial, visual and
     // collision elements of the child link into the parent link
-    private: void ReduceFixedJoints(TiXmlElement *_root, LinkPtr _link);
+    private: void ReduceFixedJoints(TiXmlElement *_root, UrdfLinkPtr _link);
 
     /// reduce fixed joints:  lump inertial to parent link
-    private: void ReduceInertialToParent(LinkPtr _link);
+    private: void ReduceInertialToParent(UrdfLinkPtr _link);
 
     /// reduce fixed joints:  lump visuals to parent link
-    private: void ReduceVisualsToParent(LinkPtr _link);
+    private: void ReduceVisualsToParent(UrdfLinkPtr _link);
 
     /// reduce fixed joints:  lump collisions to parent link
-    private: void ReduceCollisionsToParent(LinkPtr _link);
+    private: void ReduceCollisionsToParent(UrdfLinkPtr _link);
 
     /// reduce fixed joints:  lump joints to parent link
-    private: void ReduceJointsToParent(LinkPtr _link);
+    private: void ReduceJointsToParent(UrdfLinkPtr _link);
 
     /// reduce fixed joints:  lump visuals when reducing fixed joints
-    private: void ReduceVisualToParent(LinkPtr _link,
+    private: void ReduceVisualToParent(UrdfLinkPtr _link,
                               std::string _groupName,
-                              VisualPtr _visual);
+                              UrdfVisualPtr _visual);
 
     /// reduce fixed joints:  lump collision when reducing fixed joints
-    private: void ReduceCollisionToParent(LinkPtr _link,
+    private: void ReduceCollisionToParent(UrdfLinkPtr _link,
                          std::string _groupName,
-                         CollisionPtr _collision);
+                         UrdfCollisionPtr _collision);
 
     /// reduced fixed joints:  apply appropriate updates to urdf
     ///   extensions when doing fixed joint reduction
-    private: void ReduceGazeboExtensionToParent(LinkPtr _link);
+    private: void ReduceGazeboExtensionToParent(UrdfLinkPtr _link);
 
     /// reduced fixed joints:  apply appropriate frame updates
     ///   in urdf extensions when doing fixed joint reduction
     private: void ReduceGazeboExtensionFrameReplace(GazeboExtension* _ge,
-                                           LinkPtr _link);
+                                           UrdfLinkPtr _link);
 
     /// reduced fixed joints:  apply appropriate frame updates in plugins
     ///   inside urdf extensions when doing fixed joint reduction
     private: void ReduceGazeboExtensionPluginFrameReplace(
       std::vector<TiXmlElement*>::iterator _blobIt,
-      LinkPtr _link, std::string _pluginName,
+      UrdfLinkPtr _link, std::string _pluginName,
       std::string _elementName, gazebo::math::Pose _reductionTransform);
 
     /// reduced fixed joints:  apply appropriate frame updates in projector
     ///  inside urdf extensions when doing fixed joint reduction
     private: void ReduceGazeboExtensionProjectorFrameReplace(
       std::vector<TiXmlElement*>::iterator _blobIt,
-      LinkPtr _link);
+      UrdfLinkPtr _link);
 
     /// reduced fixed joints:  apply appropriate frame updates in gripper
     ///   inside urdf extensions when doing fixed joint reduction
     private: void ReduceGazeboExtensionGripperFrameReplace(
       std::vector<TiXmlElement*>::iterator _blobIt,
-       LinkPtr _link);
+       UrdfLinkPtr _link);
 
     /// reduced fixed joints:  apply appropriate frame updates in joint
     ///   inside urdf extensions when doing fixed joint reduction
     private: void ReduceGazeboExtensionJointFrameReplace(
       std::vector<TiXmlElement*>::iterator _blobIt,
-       LinkPtr _link);
+       UrdfLinkPtr _link);
 
     /// reduced fixed joints:  apply appropriate frame updates in urdf
     ///   extensions when doing fixed joint reduction
     private: void ReduceGazeboExtensionContactSensorFrameReplace(
       std::vector<TiXmlElement*>::iterator _blobIt,
-       LinkPtr _link);
+       UrdfLinkPtr _link);
 
     /// reduced fixed joints:  apply transform reduction to extensions
     ///   when doing fixed joint reduction
@@ -356,45 +356,45 @@ namespace urdf2gazebo
 
 
     /// print collision groups for debugging purposes
-    private: void PrintCollisionGroups(LinkPtr _link);
+    private: void PrintCollisionGroups(UrdfLinkPtr _link);
 
     /// create SDF from URDF link
     private: void CreateSDF(TiXmlElement *_root,
-      ConstLinkPtr _link,
+      ConstUrdfLinkPtr _link,
       const gazebo::math::Pose &_transform);
 
     /// create SDF Link block based on URDF
     private: void CreateLink(TiXmlElement *_root,
-      ConstLinkPtr _link,
+      ConstUrdfLinkPtr _link,
       gazebo::math::Pose &_currentTransform);
 
     /// create collision blocks from urdf collisions
     private: void CreateCollisions(TiXmlElement* _elem,
-      ConstLinkPtr _link);
+      ConstUrdfLinkPtr _link);
 
     /// create visual blocks from urdf visuals
     private: void CreateVisuals(TiXmlElement* _elem,
-      ConstLinkPtr _link);
+      ConstUrdfLinkPtr _link);
 
     /// create SDF Inertial block based on URDF
     private: void CreateInertial(TiXmlElement *_elem,
-      ConstLinkPtr _link);
+      ConstUrdfLinkPtr _link);
 
     /// create SDF Collision block based on URDF
     private: void CreateCollision(TiXmlElement* _elem,
-      ConstLinkPtr _link,
-      CollisionPtr _collision,
+      ConstUrdfLinkPtr _link,
+      UrdfCollisionPtr _collision,
       std::string _oldLinkName = std::string(""));
 
     /// create SDF Visual block based on URDF
     private: void CreateVisual(TiXmlElement *_elem,
-      ConstLinkPtr _link,
-      VisualPtr _visual,
+      ConstUrdfLinkPtr _link,
+      UrdfVisualPtr _visual,
       std::string _oldLinkName = std::string(""));
 
     /// create SDF Joint block based on URDF
     private: void CreateJoint(TiXmlElement *_root,
-      ConstLinkPtr _link,
+      ConstUrdfLinkPtr _link,
       gazebo::math::Pose &_currentTransform);
 
     /// create SDF geometry block based on URDF
