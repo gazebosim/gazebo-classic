@@ -148,6 +148,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
   QPushButton *OKButton = new QPushButton(tr("&OK"));
+  OKButton->setDefault(true);
   connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(OKButton);

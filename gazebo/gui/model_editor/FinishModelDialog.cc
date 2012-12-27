@@ -53,6 +53,7 @@ FinishModelDialog::FinishModelDialog(QWidget *_parent)
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
   QPushButton *finishButton = new QPushButton(tr("&Finish"));
+  finishButton->setDefault(true);
   connect(finishButton, SIGNAL(clicked()), this, SLOT(OnFinish()));
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(finishButton);
