@@ -166,19 +166,23 @@ namespace urdf2gazebo
     /// \brief destructor
     public: ~URDF2Gazebo();
 
-    /// \brief convert urdf string string to sdf xml document
-    public: TiXmlDocument InitModelString(std::string _urdfStr);
-
     /// \brief convert urdf xml document string to sdf xml document
+    /// \param[in] _xmlDoc a tinyxml document containing the urdf model
+    /// \return a tinyxml document containing sdf of the model
     public: TiXmlDocument InitModelDoc(TiXmlDocument* _xmlDoc);
 
     /// \brief convert urdf file to sdf xml document
+    /// \param[in] _urdfStr a string containing filename of the urdf model
+    /// \return a tinyxml document containing sdf of the model
     public: TiXmlDocument InitModelFile(std::string _filename);
 
     /// \brief convert urdf string to sdf xml document, with option to enforce
     /// limits.
+    /// \param[in] _urdfStr a string containing model urdf
+    /// \param[in] _enforceLimits option to enforce joint limits
+    /// \return a tinyxml document containing sdf of the model
     public: TiXmlDocument InitModelString(std::string _urdfStr,
-                                          bool _enforceLimits);
+                                          bool _enforceLimits = true);
 
     /// \brief parser xml string into urdf::Vector3
     /// \param[in] _key XML key where vector3 value might be
