@@ -47,115 +47,117 @@ namespace urdf2gazebo
   typedef boost::shared_ptr<urdf::Link> UrdfLinkPtr;
   typedef boost::shared_ptr<const urdf::Link> ConstUrdfLinkPtr;
 
+  /// \class A class for holding gazebo extension elements in urdf
   class GazeboExtension
   {
-    public:
-      // for reducing fixed joints and removing links
-      std::string oldLinkName;
-      gazebo::math::Pose reductionTransform;
+    private: GazeboExtension()
+    {
+      material.clear();
+      setStaticFlag = false;
+      gravity = true;
+      isDampingFactor = false;
+      isMaxVel = false;
+      isMinDepth = false;
+      fdir1.clear();
+      isMu1 = false;
+      isMu2 = false;
+      isKp = false;
+      isKd = false;
+      selfCollide = false;
+      isLaserRetro = false;
+      isStopCfm = false;
+      isStopErp = false;
+      isInitialJointPosition = false;
+      isFudgeFactor = false;
+      provideFeedback = false;
+      blobs.clear();
 
-      // visual
-      std::string material;
+      dampingFactor = 0;
+      maxVel = 0;
+      minDepth = 0;
+      mu1 = 0;
+      mu2 = 0;
+      kp = 100000000;
+      kd = 1;
+      laserRetro = 101;
+      stopCfm = 0;
+      stopErp = 0.1;
+      initialJointPosition = 0;
+      fudgeFactor = 1;
+    };
 
-      // body, default off
-      bool setStaticFlag;
-      bool gravity;
-      bool isDampingFactor;
-      double dampingFactor;
-      bool isMaxVel;
-      double maxVel;
-      bool isMinDepth;
-      double minDepth;
-      bool selfCollide;
+    private: GazeboExtension(const GazeboExtension &ge)
+    {
+      material = ge.material;
+      setStaticFlag = ge.setStaticFlag;
+      gravity = ge.gravity;
+      isDampingFactor = ge.isDampingFactor;
+      isMaxVel = ge.isMaxVel;
+      isMinDepth = ge.isMinDepth;
+      fdir1 = ge.fdir1;
+      isMu1 = ge.isMu1;
+      isMu2 = ge.isMu2;
+      isKp = ge.isKp;
+      isKd = ge.isKd;
+      selfCollide = ge.selfCollide;
+      isLaserRetro = ge.isLaserRetro;
+      isStopCfm = ge.isStopCfm;
+      isStopErp = ge.isStopErp;
+      isInitialJointPosition = ge.isInitialJointPosition;
+      isFudgeFactor = ge.isFudgeFactor;
+      provideFeedback = ge.provideFeedback;
+      oldLinkName = ge.oldLinkName;
+      reductionTransform = ge.reductionTransform;
+      blobs = ge.blobs;
 
-      // geom, contact dynamics
-      bool isMu1, isMu2, isKp, isKd;
-      double mu1, mu2, kp, kd;
-      std::string fdir1;
-      bool isLaserRetro;
-      double laserRetro;
+      dampingFactor = ge.dampingFactor;
+      maxVel = ge.maxVel;
+      minDepth = ge.minDepth;
+      mu1 = ge.mu1;
+      mu2 = ge.mu2;
+      kp = ge.kp;
+      kd = ge.kd;
+      laserRetro = ge.laserRetro;
+      stopCfm = ge.stopCfm;
+      stopErp = ge.stopErp;
+      initialJointPosition = ge.initialJointPosition;
+      fudgeFactor = ge.fudgeFactor;
+    };
 
-      // joint, joint limit dynamics
-      bool isStopCfm, isStopErp, isInitialJointPosition, isFudgeFactor;
-      double stopCfm, stopErp, initialJointPosition, fudgeFactor;
-      bool provideFeedback;
+    // for reducing fixed joints and removing links
+    private: std::string oldLinkName;
+    private: gazebo::math::Pose reductionTransform;
 
-      // blobs into body or robot
-      std::vector<TiXmlElement*> blobs;
+    // visual
+    private: std::string material;
 
-      GazeboExtension()
-      {
-        material.clear();
-        setStaticFlag = false;
-        gravity = true;
-        isDampingFactor = false;
-        isMaxVel = false;
-        isMinDepth = false;
-        fdir1.clear();
-        isMu1 = false;
-        isMu2 = false;
-        isKp = false;
-        isKd = false;
-        selfCollide = false;
-        isLaserRetro = false;
-        isStopCfm = false;
-        isStopErp = false;
-        isInitialJointPosition = false;
-        isFudgeFactor = false;
-        provideFeedback = false;
-        blobs.clear();
+    // body, default off
+    private: bool setStaticFlag;
+    private: bool gravity;
+    private: bool isDampingFactor;
+    private: double dampingFactor;
+    private: bool isMaxVel;
+    private: double maxVel;
+    private: bool isMinDepth;
+    private: double minDepth;
+    private: bool selfCollide;
 
-        dampingFactor = 0;
-        maxVel = 0;
-        minDepth = 0;
-        mu1 = 0;
-        mu2 = 0;
-        kp = 100000000;
-        kd = 1;
-        laserRetro = 101;
-        stopCfm = 0;
-        stopErp = 0.1;
-        initialJointPosition = 0;
-        fudgeFactor = 1;
-      };
+    // geom, contact dynamics
+    private: bool isMu1, isMu2, isKp, isKd;
+    private: double mu1, mu2, kp, kd;
+    private: std::string fdir1;
+    private: bool isLaserRetro;
+    private: double laserRetro;
 
-      GazeboExtension(const GazeboExtension &ge)
-      {
-        material = ge.material;
-        setStaticFlag = ge.setStaticFlag;
-        gravity = ge.gravity;
-        isDampingFactor = ge.isDampingFactor;
-        isMaxVel = ge.isMaxVel;
-        isMinDepth = ge.isMinDepth;
-        fdir1 = ge.fdir1;
-        isMu1 = ge.isMu1;
-        isMu2 = ge.isMu2;
-        isKp = ge.isKp;
-        isKd = ge.isKd;
-        selfCollide = ge.selfCollide;
-        isLaserRetro = ge.isLaserRetro;
-        isStopCfm = ge.isStopCfm;
-        isStopErp = ge.isStopErp;
-        isInitialJointPosition = ge.isInitialJointPosition;
-        isFudgeFactor = ge.isFudgeFactor;
-        provideFeedback = ge.provideFeedback;
-        oldLinkName = ge.oldLinkName;
-        reductionTransform = ge.reductionTransform;
-        blobs = ge.blobs;
+    // joint, joint limit dynamics
+    private: bool isStopCfm, isStopErp, isInitialJointPosition, isFudgeFactor;
+    private: double stopCfm, stopErp, initialJointPosition, fudgeFactor;
+    private: bool provideFeedback;
 
-        dampingFactor = ge.dampingFactor;
-        maxVel = ge.maxVel;
-        minDepth = ge.minDepth;
-        mu1 = ge.mu1;
-        mu2 = ge.mu2;
-        kp = ge.kp;
-        kd = ge.kd;
-        laserRetro = ge.laserRetro;
-        stopCfm = ge.stopCfm;
-        stopErp = ge.stopErp;
-        initialJointPosition = ge.initialJointPosition;
-        fudgeFactor = ge.fudgeFactor;
-      };
+    // blobs into body or robot
+    private: std::vector<TiXmlElement*> blobs;
+
+    friend class URDF2Gazebo;
   };
 
   class URDF2Gazebo
