@@ -300,7 +300,6 @@ void ModelManip::OnRotationChanged(double _roll, double _pitch, double _yaw)
   this->SetRotation(_roll, _pitch, _yaw);
 }
 
-
 /////////////////////////////////////////////////
 void ModelManip::OnItemDeleted()
 {
@@ -367,6 +366,10 @@ void ModelManip::SetSize(double _width, double _depth, double _height)
   this->windowCounter = 0;
   this->doorCounter = 0;
   this->stairsCounter = 0;
+
+  this->modelTemplateSDF.reset(new sdf::SDF);
+  this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
+
 }
 
 /////////////////////////////////////////////////
@@ -437,8 +440,8 @@ std::string BuildingMaker::AddPart(std::string _type, QVector3D _size,
     return this->AddWindow(_size, _pos, _angle);
   else if (_type == "door")
     return this->AddDoor(_size, _pos, _angle);
-//  else if (_type == "stairs")
-//    return this->AddStairs(_size, _pos, _angle);
+  else if (_type == "stairs")
+    return this->AddStairs(_size, _pos, _angle, 10);
   return "";
 }
 
@@ -460,15 +463,8 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  std::string templateString = this->GetTemplateSDFString();
-
-  sdf::ElementPtr visualElem;
-  sdf::SDF sdf;
-  sdf.SetFromString(templateString);
-
-  sdf::ElementPtr modelElem = sdf.root->GetElement("model");
-  sdf::ElementPtr linkElem = modelElem->GetElement("link");
-  visualElem = linkElem->GetElement("visual");
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
   visVisual->Load(visualElem);
   //this->visuals.push_back(visVisual);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
@@ -482,7 +478,6 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[visualName.str()] = wallManip;
   //this->walls[visualName.str()] = wallManip;
-
 
   return visualName.str();
 }
@@ -506,18 +501,11 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
         linkVisual));
 
   /// TODO for the moment, just draw a box to represent a window
-  std::string templateString = this->GetTemplateSDFString();
-
-  sdf::ElementPtr visualElem;
-  sdf::SDF sdf;
-  sdf.SetFromString(templateString);
-  sdf::ElementPtr modelElem = sdf.root->GetElement("model");
-  sdf::ElementPtr linkElem = modelElem->GetElement("link");
-  visualElem = linkElem->GetElement("visual");
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
       ->GetElement("name")->Set("Gazebo/BlueTransparent");
   visVisual->Load(visualElem);
-
 
   ModelManip *windowManip = new ModelManip();
   windowManip->SetMaker(this);
@@ -528,6 +516,10 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
   visVisual->SetPosition(math::Vector3(scaledSize.x/2, -scaledSize.y/2, 0));
   windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[visualName.str()] = windowManip;
+
+  // TODO remove me after testing
+//  std::map<std::string, ModelManip *>::iterator it = this->allItems.begin();
+//  (*it).second->AttachObject(windowManip);
 
   return visualName.str();
 }
@@ -550,14 +542,8 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  std::string templateString = this->GetTemplateSDFString();
-
-  sdf::ElementPtr visualElem;
-  sdf::SDF sdf;
-  sdf.SetFromString(templateString);
-  sdf::ElementPtr modelElem = sdf.root->GetElement("model");
-  sdf::ElementPtr linkElem = modelElem->GetElement("link");
-  visualElem = linkElem->GetElement("visual");
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
   visVisual->Load(visualElem);
   visVisual->DetachObjects();
   // this->visuals.push_back(visVisual);
@@ -647,15 +633,8 @@ std::string BuildingMaker::AddDoor(QVector3D _size, QVector3D _pos,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  std::string templateString = this->GetTemplateSDFString();
-
-  sdf::ElementPtr visualElem;
-  sdf::SDF sdf;
-  sdf.SetFromString(templateString);
-
-  sdf::ElementPtr modelElem = sdf.root->GetElement("model");
-  sdf::ElementPtr linkElem = modelElem->GetElement("link");
-  visualElem = linkElem->GetElement("visual");
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
       ->GetElement("name")->Set("Gazebo/Wood");
   visVisual->Load(visualElem);
@@ -687,6 +666,7 @@ void BuildingMaker::Stop()
 //  this->modelVisual.reset();
 //  this->visuals.clear();
 //  this->modelSDF.reset();
+
   this->modelVisual->SetVisible(false);
 }
 
@@ -723,18 +703,13 @@ void BuildingMaker::FinishModel()
 /////////////////////////////////////////////////
 void BuildingMaker::GenerateSDF()
 {
-  std::string templateString = this->GetTemplateSDFString();
-
   sdf::ElementPtr modelElem;
   sdf::ElementPtr linkElem;
   sdf::ElementPtr visualElem;
   sdf::ElementPtr collisionElem;
 
   this->modelSDF.reset(new sdf::SDF);
-  sdf::initFile("root.sdf", this->modelSDF);
-  sdf::readString(templateString, this->modelSDF);
-
-  //qDebug() <<  this->modelSDF->ToString().c_str();
+  this->modelSDF->SetFromString(this->GetTemplateSDFString());
 
   modelElem = this->modelSDF->root->GetElement("model");
   linkElem = modelElem->GetElement("link");
@@ -754,10 +729,20 @@ void BuildingMaker::GenerateSDF()
   for(itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
       itemsIt++)
   {
+    visualNameStream.str("");
+    collisionNameStream.str("");
+
     std::string name = itemsIt->first;
     ModelManip *modelManip = itemsIt->second;
+    rendering::VisualPtr visual = modelManip->GetVisual();
+    sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
+    visualElem = newLinkElem->GetElement("visual");
+    collisionElem = newLinkElem->GetElement("collision");
+    newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
+    newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
 
-#ifdef HAVE_GTS
+//#ifdef HAVE_GTS
+#if 0
     // create a hole to represent a window/door in the wall
     if (name.find("Window") != std::string::npos
         || name.find("Door") != std::string::npos)
@@ -768,34 +753,94 @@ void BuildingMaker::GenerateSDF()
     else if (name.find("Wall") != std::string::npos
         && modelManip->GetAttachedObjectCount() != 0)
     {
+      rendering::VisualPtr wallVis = visual;
+      math::Pose wallPose = wallVis->GetWorldPose();
+      const common::Mesh *wallMesh = common::MeshManager::Instance()
+          ->GetMesh(wallVis->GetMeshName());
+      // clone wall mesh to to be used in boolean operation
+      common::Mesh *m1 = new common::Mesh();
+      for (unsigned int k = 0; k < wallMesh->GetSubMeshCount(); ++k)
+      {
+        common::SubMesh *m1SubMesh = new common::SubMesh();
+        m1->AddSubMesh(m1SubMesh);
+        const common::SubMesh *subMesh = wallMesh->GetSubMesh(k);
+        if (subMesh->GetVertexCount() <= 2)
+          continue;
+        for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
+        {
+          m1SubMesh->AddVertex(subMesh->GetVertex(j));
+        }
+        for (unsigned int j = 0; j < subMesh->GetIndexCount(); ++j)
+        {
+          m1SubMesh->AddIndex(subMesh->GetIndex(j));
+        }
+      }
+      m1->SetScale(math::Vector3(wallVis->GetScale()));
+
+      std::string booleanMeshName = modelManip->GetName() + "_Boolean";
+      common::Mesh *booleanMesh = NULL;
       for (unsigned int i = 0; i < modelManip->GetAttachedObjectCount(); ++i)
       {
+        if (booleanMesh)
+        {
+          delete m1;
+          m1 = booleanMesh;
+        }
+
         ModelManip *attachedObj = modelManip->GetAttachedObject(i);
         std::string objName = attachedObj->GetName();
         if (objName.find("Window") != std::string::npos
             || objName.find("Door") != std::string::npos)
         {
-          common::Mesh *wallMesh, *objectMesh;
-/*          MeshManager::Instance()->CreateBoolean(
-              modelManip->GetName() + "_Boolean", wallMesh, objectMesh,
-              MeshCSG::DIFFERENCE);*/
+          rendering::VisualPtr attachedVis = attachedObj->GetVisual();
+          math::Pose offset = attachedVis->GetWorldPose() - wallPose;
+          const common::Mesh *attachedMesh = common::MeshManager::Instance()->
+              GetMesh(attachedVis->GetMeshName());
+          // clone attached object mesh
+          common::Mesh *m2 = new common::Mesh();
+          for (unsigned int k = 0; k < attachedMesh->GetSubMeshCount(); ++k)
+          {
+            common::SubMesh *m2SubMesh = new common::SubMesh();
+            m2->AddSubMesh(m2SubMesh);
+            const common::SubMesh *subMesh = attachedMesh->GetSubMesh(k);
+            if (subMesh->GetVertexCount() <= 2)
+              continue;
+            for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
+            {
+              m2SubMesh->AddVertex(subMesh->GetVertex(j));
+            }
+            for (unsigned int j = 0; j < subMesh->GetIndexCount(); ++j)
+            {
+              m2SubMesh->AddIndex(subMesh->GetIndex(j));
+            }
+          }
+          m2->SetScale(math::Vector3(attachedVis->GetScale()));
+          // create csg but don't add to mesh manager just yet
+          common::MeshCSG csg;
+          booleanMesh = csg.CreateBoolean(m1, m2, common::MeshCSG::DIFFERENCE,
+              offset);
         }
       }
+      // add to mesh manager after all boolean operations are done
+      booleanMesh->SetName(booleanMeshName);
+      common::MeshManager::Instance()->AddMesh(booleanMesh);
+
+      // finally create the sdf elements
+      visualElem->GetAttribute("name")->Set(modelManip->GetName() + "_Visual");
+      collisionElem->GetAttribute("name")->Set(modelManip->GetName()
+          + "_Collision");
+      sdf::ElementPtr visGeomElem = visualElem->GetElement("geometry");
+      visGeomElem->ClearElements();
+      sdf::ElementPtr meshElem = visGeomElem->AddElement("mesh");
+      std::string uri = "model://" + this->modelName + "/meshes/"
+          + booleanMeshName;
+      meshElem->GetElement("uri")->Set(uri);
+      visualElem->GetElement("pose")->Set(visual->GetPose());
+      collisionElem->GetElement("geometry")->GetElement("box")->
+          GetElement("size")->Set(visual->GetScale());
+      collisionElem->GetElement("pose")->Set(visual->GetPose());
     }
-#endif
-    visualNameStream.str("");
-    collisionNameStream.str("");
-
-    rendering::VisualPtr visual = modelManip->GetVisual();
-
-    sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
-    visualElem = newLinkElem->GetElement("visual");
-    collisionElem = newLinkElem->GetElement("collision");
-
-    newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
-    newLinkElem->GetElement("pose")->Set(
-        visual->GetParent()->GetWorldPose());
-
+#else
     if (visual->GetChildCount() == 0)
     {
       visualElem->GetAttribute("name")->Set(modelManip->GetName() + "_Visual");
@@ -838,9 +883,10 @@ void BuildingMaker::GenerateSDF()
         newLinkElem->InsertElement(collisionElem);
       }
     }
+#endif
     modelElem->InsertElement(newLinkElem);
   }
-  //qDebug() << this->modelSDF->ToString().c_str();
+//  qDebug() << this->modelSDF->ToString().c_str();
 }
 
 /////////////////////////////////////////////////

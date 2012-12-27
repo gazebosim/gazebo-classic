@@ -204,6 +204,8 @@ namespace gazebo
 
       private: sdf::SDFPtr modelSDF;
 
+      private: sdf::SDFPtr modelTemplateSDF;
+
       private: std::string modelName;
 
       private: std::string savePath;

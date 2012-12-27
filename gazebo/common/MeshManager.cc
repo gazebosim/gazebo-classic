@@ -67,11 +67,11 @@ MeshManager::MeshManager()
 
 #ifdef HAVE_GTS
   // Test CSG
-  this->CreateBox("small_box", math::Vector3(0.5, 0.5, 1.5),
-      math::Vector2d(1, 1));
-  this->CreateBoolean("box_hole", this->GetMesh("unit_box"),
-    this->GetMesh("small_box"), MeshCSG::DIFFERENCE,
-    math::Pose(0.1, 0.2, 0, 0, 0, 0));
+  //this->CreateBox("small_box", math::Vector3(0.5, 0.5, 1.5),
+  //    math::Vector2d(1, 1));
+  //this->CreateBoolean("box_hole", this->GetMesh("unit_box"),
+  //  this->GetMesh("small_box"), MeshCSG::DIFFERENCE,
+  //  math::Pose(0.1, 0.2, 0, 0, 0, 0));
 #endif
 
   this->fileExtensions.push_back("stl");

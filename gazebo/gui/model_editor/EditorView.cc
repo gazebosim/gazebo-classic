@@ -430,10 +430,9 @@ void EditorView::OnAddLevel(int _newLevel, std::string _levelName)
   }
 
   std::list<WallItem *>::iterator wallIt = this->wallList.begin();
-  double maxHeight = (*wallIt)->GetHeight();
   double wallHeight = (*wallIt)->GetHeight() + (*wallIt)->GetLevelBaseHeight();
+  double maxHeight = wallHeight;
   int wallLevel = 0;
-
 
   wallIt++;
   for (wallIt; wallIt != this->wallList.end(); ++wallIt)
