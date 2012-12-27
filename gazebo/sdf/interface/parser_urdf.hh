@@ -160,240 +160,251 @@ namespace urdf2gazebo
 
   class URDF2Gazebo
   {
-    public:
-      URDF2Gazebo();
-      ~URDF2Gazebo();
+    /// \brief constructor
+    public: URDF2Gazebo();
 
-      /// \brief parser xml string into urdf::Vector3
-      /// \param[in] _key XML key where vector3 value might be
-      /// \param[in] _scale scalar scale for the vector3
-      /// \return a urdf::Vector3
-      urdf::Vector3 ParseVector3(TiXmlNode* _key, double _scale = 1.0);
+    /// \brief destructor
+    public: ~URDF2Gazebo();
 
-      /// \brief convert values to string
-      /// \param[in] _count number of values in _values array
-      /// \param[in] _values array of double values
-      /// \return a string
-      std::string Values2str(unsigned int _count, const double *_values);
+    /// \brief convert urdf string string to sdf xml document
+    public: TiXmlDocument InitModelString(std::string _urdfStr);
 
-      /// \brief convert Vector3 to string
-      /// \param[in] _vector a urdf::Vector3
-      /// \return a string
-      std::string Vector32Str(const urdf::Vector3 _vector);
+    /// \brief convert urdf xml document string to sdf xml document
+    public: TiXmlDocument InitModelDoc(TiXmlDocument* _xmlDoc);
 
-      /// \brief append key value pair to the end of the xml element
-      /// \param[in] _elem pointer to xml element
-      /// \param[in] _key string containing key to add to xml element
-      /// \param[in] _value string containing value for the key added
-      void AddKeyValue(TiXmlElement *_elem, const std::string& _key,
-                       const std::string &_value);
+    /// \brief convert urdf file to sdf xml document
+    public: TiXmlDocument InitModelFile(std::string _filename);
 
-      /// append transform (pose) to the end of the xml element
-      void AddTransform(TiXmlElement *_elem,
-                        const::gazebo::math::Pose& _transform);
+    /// \brief convert urdf string to sdf xml document, with option to enforce
+    /// limits.
+    public: TiXmlDocument InitModelString(std::string _urdfStr,
+                                          bool _enforceLimits);
 
-      /// print mass for link for debugging
-      void PrintMass(LinkPtr _link);
+    /// \brief parser xml string into urdf::Vector3
+    /// \param[in] _key XML key where vector3 value might be
+    /// \param[in] _scale scalar scale for the vector3
+    /// \return a urdf::Vector3
+    private: urdf::Vector3 ParseVector3(TiXmlNode* _key, double _scale = 1.0);
 
-      /// print mass for link for debugging
-      void PrintMass(std::string _linkName, dMass _mass);
+    /// \brief convert values to string
+    /// \param[in] _count number of values in _values array
+    /// \param[in] _values array of double values
+    /// \return a string
+    private: std::string Values2str(unsigned int _count, const double *_values);
 
-      /// get value from <key value="..."/> pair and return it as string
-      std::string GetKeyValueAsString(TiXmlElement* _elem);
+    /// \brief convert Vector3 to string
+    /// \param[in] _vector a urdf::Vector3
+    /// \return a string
+    private: std::string Vector32Str(const urdf::Vector3 _vector);
 
-      /// things that do not belong in urdf but should be mapped into sdf
-      /// @todo: do this using sdf definitions, not hard coded stuff
-      void ParseGazeboExtension(TiXmlDocument &_urdfXml);
+    /// \brief append key value pair to the end of the xml element
+    /// \param[in] _elem pointer to xml element
+    /// \param[in] _key string containing key to add to xml element
+    /// \param[in] _value string containing value for the key added
+    private: void AddKeyValue(TiXmlElement *_elem, const std::string& _key,
+                     const std::string &_value);
 
-      /// insert extensions into collision geoms
-      void InsertGazeboExtensionCollision(TiXmlElement *_elem,
-                                          std::string _linkName);
+    /// append transform (pose) to the end of the xml element
+    private: void AddTransform(TiXmlElement *_elem,
+                      const::gazebo::math::Pose& _transform);
 
-      /// insert extensions into visuals
-      void InsertGazeboExtensionVisual(TiXmlElement *_elem,
-                                       std::string _linkName);
+    /// print mass for link for debugging
+    private: void PrintMass(LinkPtr _link);
 
-      /// insert extensions into links
-      void InsertGazeboExtensionLink(TiXmlElement *_elem,
+    /// print mass for link for debugging
+    private: void PrintMass(std::string _linkName, dMass _mass);
+
+    /// get value from <key value="..."/> pair and return it as string
+    private: std::string GetKeyValueAsString(TiXmlElement* _elem);
+
+    /// things that do not belong in urdf but should be mapped into sdf
+    /// @todo: do this using sdf definitions, not hard coded stuff
+    private: void ParseGazeboExtension(TiXmlDocument &_urdfXml);
+
+    /// insert extensions into collision geoms
+    private: void InsertGazeboExtensionCollision(TiXmlElement *_elem,
+                                        std::string _linkName);
+
+    /// insert extensions into visuals
+    private: void InsertGazeboExtensionVisual(TiXmlElement *_elem,
                                      std::string _linkName);
 
-      /// insert extensions into joints
-      void InsertGazeboExtensionJoint(TiXmlElement *_elem,
-                                      std::string _jointName);
+    /// insert extensions into links
+    private: void InsertGazeboExtensionLink(TiXmlElement *_elem,
+                                   std::string _linkName);
 
-      /// insert extensions into model
-      void InsertGazeboExtensionRobot(TiXmlElement *_elem);
+    /// insert extensions into joints
+    private: void InsertGazeboExtensionJoint(TiXmlElement *_elem,
+                                    std::string _jointName);
 
-      /// list extensions for debugging
-      void ListGazeboExtensions();
+    /// insert extensions into model
+    private: void InsertGazeboExtensionRobot(TiXmlElement *_elem);
 
-      /// list extensions for debugging
-      void ListGazeboExtensions(std::string _reference);
+    /// list extensions for debugging
+    private: void ListGazeboExtensions();
 
-      /// reduce fixed joints by lumping inertial, visual and
-      // collision elements of the child link into the parent link
-      void ReduceFixedJoints(TiXmlElement *_root, LinkPtr _link);
+    /// list extensions for debugging
+    private: void ListGazeboExtensions(std::string _reference);
 
-      /// reduce fixed joints:  lump inertial to parent link
-      void ReduceInertialToParent(LinkPtr _link);
+    /// reduce fixed joints by lumping inertial, visual and
+    // collision elements of the child link into the parent link
+    private: void ReduceFixedJoints(TiXmlElement *_root, LinkPtr _link);
 
-      /// reduce fixed joints:  lump visuals to parent link
-      void ReduceVisualsToParent(LinkPtr _link);
+    /// reduce fixed joints:  lump inertial to parent link
+    private: void ReduceInertialToParent(LinkPtr _link);
 
-      /// reduce fixed joints:  lump collisions to parent link
-      void ReduceCollisionsToParent(LinkPtr _link);
+    /// reduce fixed joints:  lump visuals to parent link
+    private: void ReduceVisualsToParent(LinkPtr _link);
 
-      /// reduce fixed joints:  lump joints to parent link
-      void ReduceJointsToParent(LinkPtr _link);
+    /// reduce fixed joints:  lump collisions to parent link
+    private: void ReduceCollisionsToParent(LinkPtr _link);
 
-      /// reduce fixed joints:  lump visuals when reducing fixed joints
-      void ReduceVisualToParent(LinkPtr _link,
-                                std::string _groupName,
-                                VisualPtr _visual);
+    /// reduce fixed joints:  lump joints to parent link
+    private: void ReduceJointsToParent(LinkPtr _link);
 
-      /// reduce fixed joints:  lump collision when reducing fixed joints
-      void ReduceCollisionToParent(LinkPtr _link,
-                           std::string _groupName,
-                           CollisionPtr _collision);
+    /// reduce fixed joints:  lump visuals when reducing fixed joints
+    private: void ReduceVisualToParent(LinkPtr _link,
+                              std::string _groupName,
+                              VisualPtr _visual);
 
-      /// reduced fixed joints:  apply appropriate updates to urdf
-      ///   extensions when doing fixed joint reduction
-      void ReduceGazeboExtensionToParent(LinkPtr _link);
+    /// reduce fixed joints:  lump collision when reducing fixed joints
+    private: void ReduceCollisionToParent(LinkPtr _link,
+                         std::string _groupName,
+                         CollisionPtr _collision);
 
-      /// reduced fixed joints:  apply appropriate frame updates
-      ///   in urdf extensions when doing fixed joint reduction
-      void ReduceGazeboExtensionFrameReplace(GazeboExtension* _ge,
-                                             LinkPtr _link);
+    /// reduced fixed joints:  apply appropriate updates to urdf
+    ///   extensions when doing fixed joint reduction
+    private: void ReduceGazeboExtensionToParent(LinkPtr _link);
 
-      /// reduced fixed joints:  apply appropriate frame updates in plugins
-      ///   inside urdf extensions when doing fixed joint reduction
-      void ReduceGazeboExtensionPluginFrameReplace(
-        std::vector<TiXmlElement*>::iterator _blobIt,
-        LinkPtr _link, std::string _pluginName,
-        std::string _elementName, gazebo::math::Pose _reductionTransform);
+    /// reduced fixed joints:  apply appropriate frame updates
+    ///   in urdf extensions when doing fixed joint reduction
+    private: void ReduceGazeboExtensionFrameReplace(GazeboExtension* _ge,
+                                           LinkPtr _link);
 
-      /// reduced fixed joints:  apply appropriate frame updates in projector
-      ///  inside urdf extensions when doing fixed joint reduction
-      void ReduceGazeboExtensionProjectorFrameReplace(
-        std::vector<TiXmlElement*>::iterator _blobIt,
-        LinkPtr _link);
+    /// reduced fixed joints:  apply appropriate frame updates in plugins
+    ///   inside urdf extensions when doing fixed joint reduction
+    private: void ReduceGazeboExtensionPluginFrameReplace(
+      std::vector<TiXmlElement*>::iterator _blobIt,
+      LinkPtr _link, std::string _pluginName,
+      std::string _elementName, gazebo::math::Pose _reductionTransform);
 
-      /// reduced fixed joints:  apply appropriate frame updates in gripper
-      ///   inside urdf extensions when doing fixed joint reduction
-      void ReduceGazeboExtensionGripperFrameReplace(
-        std::vector<TiXmlElement*>::iterator _blobIt,
-         LinkPtr _link);
+    /// reduced fixed joints:  apply appropriate frame updates in projector
+    ///  inside urdf extensions when doing fixed joint reduction
+    private: void ReduceGazeboExtensionProjectorFrameReplace(
+      std::vector<TiXmlElement*>::iterator _blobIt,
+      LinkPtr _link);
 
-      /// reduced fixed joints:  apply appropriate frame updates in joint
-      ///   inside urdf extensions when doing fixed joint reduction
-      void ReduceGazeboExtensionJointFrameReplace(
-        std::vector<TiXmlElement*>::iterator _blobIt,
-         LinkPtr _link);
+    /// reduced fixed joints:  apply appropriate frame updates in gripper
+    ///   inside urdf extensions when doing fixed joint reduction
+    private: void ReduceGazeboExtensionGripperFrameReplace(
+      std::vector<TiXmlElement*>::iterator _blobIt,
+       LinkPtr _link);
 
-      /// reduced fixed joints:  apply appropriate frame updates in urdf
-      ///   extensions when doing fixed joint reduction
-      void ReduceGazeboExtensionContactSensorFrameReplace(
-        std::vector<TiXmlElement*>::iterator _blobIt,
-         LinkPtr _link);
+    /// reduced fixed joints:  apply appropriate frame updates in joint
+    ///   inside urdf extensions when doing fixed joint reduction
+    private: void ReduceGazeboExtensionJointFrameReplace(
+      std::vector<TiXmlElement*>::iterator _blobIt,
+       LinkPtr _link);
 
-      /// reduced fixed joints:  apply transform reduction to extensions
-      ///   when doing fixed joint reduction
-      void ReduceGazeboExtensionsTransformReduction(GazeboExtension* _ge);
+    /// reduced fixed joints:  apply appropriate frame updates in urdf
+    ///   extensions when doing fixed joint reduction
+    private: void ReduceGazeboExtensionContactSensorFrameReplace(
+      std::vector<TiXmlElement*>::iterator _blobIt,
+       LinkPtr _link);
 
-      /// reduced fixed joints:  apply transform reduction for ray sensors
-      ///   in extensions when doing fixed joint reduction
-      void ReduceGazeboExtensionSensorTransformReduction(
-        std::vector<TiXmlElement*>::iterator _blobIt,
-        gazebo::math::Pose _reductionTransform);
+    /// reduced fixed joints:  apply transform reduction to extensions
+    ///   when doing fixed joint reduction
+    private: void ReduceGazeboExtensionsTransform(GazeboExtension* _ge);
 
-      /// reduced fixed joints:  apply transform reduction for projectors in
-      ///   extensions when doing fixed joint reduction
-      void ReduceGazeboExtensionProjectorTransformReduction(
-        std::vector<TiXmlElement*>::iterator _blobIt,
-        gazebo::math::Pose _reductionTransform);
+    /// reduced fixed joints:  apply transform reduction for ray sensors
+    ///   in extensions when doing fixed joint reduction
+    private: void ReduceGazeboExtensionSensorTransformReduction(
+      std::vector<TiXmlElement*>::iterator _blobIt,
+      gazebo::math::Pose _reductionTransform);
 
-      /// reduced fixed joints: transform to parent frame
-      urdf::Pose  TransformToParentFrame(
-        urdf::Pose _transformInLinkFrame,
-        urdf::Pose _parentToLinkTransform);
-      /// reduced fixed joints: transform to parent frame
-      gazebo::math::Pose  TransformToParentFrame(
-        gazebo::math::Pose _transformInLinkFrame,
-        urdf::Pose _parentToLinkTransform);
-      /// reduced fixed joints: transform to parent frame
-      gazebo::math::Pose  TransformToParentFrame(
-        gazebo::math::Pose _transformInLinkFrame,
-        gazebo::math::Pose _parentToLinkTransform);
-      /// reduced fixed joints: transform to parent frame
-      gazebo::math::Pose  inverseTransformToParentFrame(
-        gazebo::math::Pose _transformInLinkFrame,
-        urdf::Pose _parentToLinkTransform);
-      /// reduced fixed joints: utility to copy between urdf::Pose and
-      ///   math::Pose
-      gazebo::math::Pose  CopyPose(urdf::Pose _pose);
-      /// reduced fixed joints: utility to copy between urdf::Pose and
-      ///   math::Pose
-      urdf::Pose  CopyPose(gazebo::math::Pose _pose);
+    /// reduced fixed joints:  apply transform reduction for projectors in
+    ///   extensions when doing fixed joint reduction
+    private: void ReduceGazeboExtensionProjectorTransformReduction(
+      std::vector<TiXmlElement*>::iterator _blobIt,
+      gazebo::math::Pose _reductionTransform);
 
-      std::string GetGeometryBoundingBox(
-        boost::shared_ptr<urdf::Geometry> _geometry, double *_sizeVals);
+    /// reduced fixed joints: transform to parent frame
+    private: urdf::Pose  TransformToParentFrame(
+      urdf::Pose _transformInLinkFrame,
+      urdf::Pose _parentToLinkTransform);
+    /// reduced fixed joints: transform to parent frame
+    private: gazebo::math::Pose  TransformToParentFrame(
+      gazebo::math::Pose _transformInLinkFrame,
+      urdf::Pose _parentToLinkTransform);
+    /// reduced fixed joints: transform to parent frame
+    private: gazebo::math::Pose  TransformToParentFrame(
+      gazebo::math::Pose _transformInLinkFrame,
+      gazebo::math::Pose _parentToLinkTransform);
+    /// reduced fixed joints: transform to parent frame
+    private: gazebo::math::Pose  inverseTransformToParentFrame(
+      gazebo::math::Pose _transformInLinkFrame,
+      urdf::Pose _parentToLinkTransform);
+    /// reduced fixed joints: utility to copy between urdf::Pose and
+    ///   math::Pose
+    private: gazebo::math::Pose  CopyPose(urdf::Pose _pose);
+    /// reduced fixed joints: utility to copy between urdf::Pose and
+    ///   math::Pose
+    private: urdf::Pose  CopyPose(gazebo::math::Pose _pose);
+
+    private: std::string GetGeometryBoundingBox(
+      boost::shared_ptr<urdf::Geometry> _geometry, double *_sizeVals);
 
 
-      /// print collision groups for debugging purposes
-      void PrintCollisionGroups(LinkPtr _link);
+    /// print collision groups for debugging purposes
+    private: void PrintCollisionGroups(LinkPtr _link);
 
-      /// create SDF from URDF link
-      void CreateSDF(TiXmlElement *_root,
-        ConstLinkPtr _link,
-        const gazebo::math::Pose &_transform);
+    /// create SDF from URDF link
+    private: void CreateSDF(TiXmlElement *_root,
+      ConstLinkPtr _link,
+      const gazebo::math::Pose &_transform);
 
-      /// create SDF Link block based on URDF
-      void CreateLink(TiXmlElement *_root,
-        ConstLinkPtr _link,
-        gazebo::math::Pose &_currentTransform);
+    /// create SDF Link block based on URDF
+    private: void CreateLink(TiXmlElement *_root,
+      ConstLinkPtr _link,
+      gazebo::math::Pose &_currentTransform);
 
-      /// create collision blocks from urdf collisions
-      void CreateCollisions(TiXmlElement* _elem,
-        ConstLinkPtr _link);
+    /// create collision blocks from urdf collisions
+    private: void CreateCollisions(TiXmlElement* _elem,
+      ConstLinkPtr _link);
 
-      /// create visual blocks from urdf visuals
-      void CreateVisuals(TiXmlElement* _elem,
-        ConstLinkPtr _link);
+    /// create visual blocks from urdf visuals
+    private: void CreateVisuals(TiXmlElement* _elem,
+      ConstLinkPtr _link);
 
-      /// create SDF Inertial block based on URDF
-      void CreateInertial(TiXmlElement *_elem,
-        ConstLinkPtr _link);
+    /// create SDF Inertial block based on URDF
+    private: void CreateInertial(TiXmlElement *_elem,
+      ConstLinkPtr _link);
 
-      /// create SDF Collision block based on URDF
-      void CreateCollision(TiXmlElement* _elem,
-        ConstLinkPtr _link,
-        CollisionPtr _collision,
-        std::string _oldLinkName = std::string(""));
+    /// create SDF Collision block based on URDF
+    private: void CreateCollision(TiXmlElement* _elem,
+      ConstLinkPtr _link,
+      CollisionPtr _collision,
+      std::string _oldLinkName = std::string(""));
 
-      /// create SDF Visual block based on URDF
-      void CreateVisual(TiXmlElement *_elem,
-        ConstLinkPtr _link,
-        VisualPtr _visual,
-        std::string _oldLinkName = std::string(""));
+    /// create SDF Visual block based on URDF
+    private: void CreateVisual(TiXmlElement *_elem,
+      ConstLinkPtr _link,
+      VisualPtr _visual,
+      std::string _oldLinkName = std::string(""));
 
-      /// create SDF Joint block based on URDF
-      void CreateJoint(TiXmlElement *_root,
-        ConstLinkPtr _link,
-        gazebo::math::Pose &_currentTransform);
+    /// create SDF Joint block based on URDF
+    private: void CreateJoint(TiXmlElement *_root,
+      ConstLinkPtr _link,
+      gazebo::math::Pose &_currentTransform);
 
-      /// create SDF geometry block based on URDF
-      void CreateGeometry(TiXmlElement* _elem,
-        boost::shared_ptr<urdf::Geometry> _geometry);
+    /// create SDF geometry block based on URDF
+    private: void CreateGeometry(TiXmlElement* _elem,
+      boost::shared_ptr<urdf::Geometry> _geometry);
 
-      TiXmlDocument InitModelString(std::string _urdfStr);
-      TiXmlDocument InitModelDoc(TiXmlDocument* _xmlDoc);
-      TiXmlDocument InitModelFile(std::string _filename);
-      TiXmlDocument InitModelString(std::string _urdfStr, bool _enforceLimits);
+    private: std::map<std::string, std::vector<GazeboExtension*> > extensions;
 
-      std::map<std::string, std::vector<GazeboExtension*> > gazeboEntensions;
-
-      private: bool enforceLimits;
-      private: bool reduceFixedJoints;
+    private: bool enforceLimits;
+    private: bool reduceFixedJoints;
   };
   /// \}
 }

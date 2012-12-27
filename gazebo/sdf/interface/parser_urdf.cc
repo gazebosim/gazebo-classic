@@ -213,7 +213,7 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
   TiXmlElement* robot_xml = _urdfXml.FirstChildElement("robot");
 
   // Get all Gazebo extension elements, put everything in
-  //   this->gazeboEntensions map, containing a key string
+  //   this->extensions map, containing a key string
   //   (link/joint name) and values
   for (TiXmlElement* gazebo_xml = robot_xml->FirstChildElement("gazebo");
        gazebo_xml; gazebo_xml = gazebo_xml->NextSiblingElement("gazebo"))
@@ -231,12 +231,12 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
       ref_str = std::string(ref);
     }
 
-    if (this->gazeboEntensions.find(ref_str) ==
-        this->gazeboEntensions.end())
+    if (this->extensions.find(ref_str) ==
+        this->extensions.end())
     {
         // create extension map for reference
-        std::vector<GazeboExtension*> extensions;
-        this->gazeboEntensions.insert(std::make_pair(ref_str, extensions));
+        std::vector<GazeboExtension*> ge;
+        this->extensions.insert(std::make_pair(ref_str, ge));
     }
 
     // create and insert a new GazeboExtension into the map
@@ -388,7 +388,7 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
     }
 
     // insert into my map
-    (this->gazeboEntensions.find(ref_str))->second.push_back(gazebo);
+    (this->extensions.find(ref_str))->second.push_back(gazebo);
   }
 }
 
@@ -396,8 +396,8 @@ void URDF2Gazebo::InsertGazeboExtensionCollision(TiXmlElement *_elem,
   std::string _linkName)
 {
   for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
-       gazebo_it = this->gazeboEntensions.begin();
-       gazebo_it != this->gazeboEntensions.end(); ++gazebo_it)
+       gazebo_it = this->extensions.begin();
+       gazebo_it != this->extensions.end(); ++gazebo_it)
   {
     for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin();
          ge != gazebo_it->second.end(); ++ge)
@@ -445,8 +445,8 @@ void URDF2Gazebo::InsertGazeboExtensionVisual(TiXmlElement *_elem,
   std::string _linkName)
 {
   for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
-       gazebo_it = this->gazeboEntensions.begin();
-       gazebo_it != this->gazeboEntensions.end(); ++gazebo_it)
+       gazebo_it = this->extensions.begin();
+       gazebo_it != this->extensions.end(); ++gazebo_it)
   {
     for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin();
          ge != gazebo_it->second.end(); ++ge)
@@ -465,8 +465,8 @@ void URDF2Gazebo::InsertGazeboExtensionLink(TiXmlElement *_elem,
   std::string _linkName)
 {
     for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
-         gazebo_it = this->gazeboEntensions.begin();
-         gazebo_it != this->gazeboEntensions.end(); ++gazebo_it)
+         gazebo_it = this->extensions.begin();
+         gazebo_it != this->extensions.end(); ++gazebo_it)
     {
       if (gazebo_it->first == _linkName)
       {
@@ -511,8 +511,8 @@ void URDF2Gazebo::InsertGazeboExtensionJoint(TiXmlElement *_elem,
   std::string _jointName)
 {
   for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
-       gazebo_it = this->gazeboEntensions.begin();
-       gazebo_it != this->gazeboEntensions.end(); ++gazebo_it)
+       gazebo_it = this->extensions.begin();
+       gazebo_it != this->extensions.end(); ++gazebo_it)
   {
     if (gazebo_it->first == _jointName)
     {
@@ -560,8 +560,8 @@ void URDF2Gazebo::InsertGazeboExtensionJoint(TiXmlElement *_elem,
 void URDF2Gazebo::InsertGazeboExtensionRobot(TiXmlElement *_elem)
 {
   for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
-       gazebo_it = this->gazeboEntensions.begin();
-       gazebo_it != this->gazeboEntensions.end(); ++gazebo_it)
+       gazebo_it = this->extensions.begin();
+       gazebo_it != this->extensions.end(); ++gazebo_it)
   {
     if (gazebo_it->first.empty())
     {
@@ -914,8 +914,8 @@ void URDF2Gazebo::ReduceGazeboExtensionToParent(LinkPtr _link)
   // update extension map with references to linkName
   // this->ListGazeboExtensions();
   std::map<std::string, std::vector<GazeboExtension*> >::iterator ext =
-    this->gazeboEntensions.find(linkName);
-  if (ext != this->gazeboEntensions.end())
+    this->extensions.find(linkName);
+  if (ext != this->extensions.end())
   {
     // gzdbg << "  REDUCE EXTENSION: moving reference from ["
     //       << linkName << "] to [" << _link->getParent()->name << "]\n";
@@ -929,21 +929,21 @@ void URDF2Gazebo::ReduceGazeboExtensionToParent(LinkPtr _link)
         (*ge)->reductionTransform,
         _link->parent_joint->parent_to_joint_origin_transform);
       // for sensor and projector blocks only
-      ReduceGazeboExtensionsTransformReduction((*ge));
+      ReduceGazeboExtensionsTransform((*ge));
     }
 
     // find pointer to the existing extension with the new _link reference
     std::string newLinkName = _link->getParent()->name;
     std::map<std::string, std::vector<GazeboExtension*> >::iterator
-      new_ext = this->gazeboEntensions.find(newLinkName);
+      new_ext = this->extensions.find(newLinkName);
 
     // if none exist, create new_extension with newLinkName
-    if (new_ext == this->gazeboEntensions.end())
+    if (new_ext == this->extensions.end())
     {
-      std::vector<GazeboExtension*> extensions;
-      this->gazeboEntensions.insert(std::make_pair(
-        newLinkName, extensions));
-      new_ext = this->gazeboEntensions.find(newLinkName);
+      std::vector<GazeboExtension*> ge;
+      this->extensions.insert(std::make_pair(
+        newLinkName, ge));
+      new_ext = this->extensions.find(newLinkName);
     }
 
     // move gazebo extensions from _link into the parent _link's extensions
@@ -957,8 +957,8 @@ void URDF2Gazebo::ReduceGazeboExtensionToParent(LinkPtr _link)
   // _link name patterns within the plugin with new _link name
   // and assign the proper reduction transform for the _link name pattern
   for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
-       gazebo_it = this->gazeboEntensions.begin();
-       gazebo_it != this->gazeboEntensions.end(); ++gazebo_it)
+       gazebo_it = this->extensions.begin();
+       gazebo_it != this->extensions.end(); ++gazebo_it)
     {
       // update reduction transform (for contacts, rays, cameras for now).
       for (std::vector<GazeboExtension*>::iterator
@@ -1007,7 +1007,7 @@ void URDF2Gazebo::ReduceGazeboExtensionFrameReplace(GazeboExtension* _ge,
   }
 }
 
-void URDF2Gazebo::ReduceGazeboExtensionsTransformReduction(GazeboExtension* _ge)
+void URDF2Gazebo::ReduceGazeboExtensionsTransform(GazeboExtension* _ge)
 {
   for (std::vector<TiXmlElement*>::iterator blobIt = _ge->blobs.begin();
        blobIt != _ge->blobs.end(); ++blobIt)
@@ -1025,8 +1025,8 @@ void URDF2Gazebo::ListGazeboExtensions()
 {
   gzdbg << "================================================================\n";
   for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
-       gazebo_it = this->gazeboEntensions.begin();
-       gazebo_it != this->gazeboEntensions.end(); ++gazebo_it)
+       gazebo_it = this->extensions.begin();
+       gazebo_it != this->extensions.end(); ++gazebo_it)
   {
     int ext_count = 0;
     for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin();
@@ -1055,8 +1055,8 @@ void URDF2Gazebo::ListGazeboExtensions(std::string _reference)
 {
   gzdbg << "================================================================\n";
   for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
-       gazebo_it = this->gazeboEntensions.begin();
-       gazebo_it != this->gazeboEntensions.end(); ++gazebo_it)
+       gazebo_it = this->extensions.begin();
+       gazebo_it != this->extensions.end(); ++gazebo_it)
   {
     if (gazebo_it->first == _reference)
     {
