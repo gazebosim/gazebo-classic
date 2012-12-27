@@ -16,6 +16,7 @@
 */
 #include <urdf_parser/urdf_parser.h>
 #include <sdf/interface/parser_urdf.hh>
+#include <sdf/sdf.hh>
 #include <sdf/interface/parser_deprecated.hh>
 
 #include <fstream>
@@ -685,8 +686,8 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
            ge != gazebo_it->second.end(); ++ge)
       {
         TiXmlElement *physics     = new TiXmlElement("physics");
-        TiXmlElement *physics_ode     = new TiXmlElement("ode");
-        TiXmlElement *limit     = new TiXmlElement("limit");
+        TiXmlElement *physicsOde = new TiXmlElement("ode");
+        TiXmlElement *limit       = new TiXmlElement("limit");
 
         // insert stop_cfm, stop_erp, fudge_factor
         if ((*ge)->is_stop_cfm)
@@ -709,24 +710,25 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
         }
         */
 
-        /* FIXME: provideFeedback flag is gone, need to recover
+        /* FIXME: to be implemented
         if ((*ge)->is_initial_joint_position)
             addKeyValue(elem, "initial_joint_position",
               values2str(1, &(*ge)->initial_joint_position));
+        */
+
         // insert provideFeedback
         if ((*ge)->provideFeedback)
-            addKeyValue(elem, "provideFeedback", "true");
+            addKeyValue(physicsOde, "provide_feedback", "true");
         else
-            addKeyValue(elem, "provideFeedback", "false");
-        */
+            addKeyValue(physicsOde, "provide_feedback", "false");
 
         // insert fudge_factor
         if ((*ge)->is_fudge_factor)
-          addKeyValue(physics_ode, "fudge_factor",
+          addKeyValue(physicsOde, "fudge_factor",
                       values2str(1, &(*ge)->fudge_factor));
 
-        physics->LinkEndChild(physics_ode);
-        physics_ode->LinkEndChild(limit);
+        physics->LinkEndChild(physicsOde);
+        physicsOde->LinkEndChild(limit);
         elem->LinkEndChild(physics);
       }
     }
