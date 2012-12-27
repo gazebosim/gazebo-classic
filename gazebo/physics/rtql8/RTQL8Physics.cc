@@ -92,30 +92,34 @@ void RTQL8Physics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
-//   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
-// 
-//   this->stepTimeDouble = bulletElem->GetElement("dt")->GetValueDouble();
-// 
-//   math::Vector3 g = this->sdf->GetValueVector3("gravity");
-//   this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
-// 
-//   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
-// 
-//   // Split impulse feature. This can leads to improper stacking of objects
-//   info.m_splitImpulse = 1;
-//   info.m_splitImpulsePenetrationThreshold = -0.02;
-// 
-//   if (bulletElem->HasElement("constraints"))
-//   {
-//     info.m_globalCfm =
-//       bulletElem->GetElement("constraints")->GetValueDouble("cfm");
-//     info.m_erp = bulletElem->GetElement("constraints")->GetValueDouble("erp");
-//   }
+  // Gravity
+  math::Vector3 g = this->sdf->GetValueVector3("gravity");
+  this->gravity(0) = g.x;
+  this->gravity(1) = g.y;
+  this->gravity(2) = g.z;
+  
+  // Time step
+  this->timeStep = this->sdf->GetValueDouble("time_step");
+  
+  // TODO: Elements for rtql8 settings
+  sdf::ElementPtr rtql8Elem = this->sdf->GetElement("rtql8");
+  //this->stepTimeDouble = rtql8Elem->GetElement("dt")->GetValueDouble();
+  
 }
  
 //////////////////////////////////////////////////
 void RTQL8Physics::Init()
 {
+ 
+  std::vector<dynamics::SkeletonDynamics*>::iterator itrSkels = skels.begin();
+  
+  for (std::vector<dynamics::SkeletonDynamics*>::iterator itrSkels = skels.begin();
+       itrSkels != skels.end(); itrSkels++)
+  {
+    (*itrSkels)->initDynamics();
+    //(*itrSkels)->setPose(mDofs, false, false); // set flags to skip transformation and first-derivatives updates
+  }
+        
 }
 
 //////////////////////////////////////////////////

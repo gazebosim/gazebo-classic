@@ -77,6 +77,9 @@ namespace gazebo
       /// \brief Get the simulation step time
       public: virtual double GetStepTime();
 
+      /// \brief Create a new model (js: in test)
+      //public: virtual ModelPtr CreateModel(ModelPtr _parent);
+      
       /// \brief Create a new body
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
@@ -119,6 +122,9 @@ namespace gazebo
       /// \brief 
       private: Eigen::Vector3d gravity;
       
+	  /// \brief 
+	  private: double timeStep;
+	  
       /// \brief 
       private: bool running;
       
