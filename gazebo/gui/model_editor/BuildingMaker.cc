@@ -97,23 +97,8 @@ void ModelManip::SetMaker(BuildingMaker *_maker)
 /////////////////////////////////////////////////
 void ModelManip::OnSizeChanged(double _width, double _depth, double _height)
 {
-  // TODO verify the result of this function
   this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
-  math::Vector3 dScale = this->visual->GetScale() - this->size;
-  math::Vector3 originalPos = this->visual->GetPosition();
   this->visual->SetScale(this->size);
-
-  double angle = this->visual->GetRotation().GetAsEuler().z;
-  double xdx = cos(angle)*dScale.x/2.0;
-  double xdy = sin(angle)*dScale.x/2.0;
-  double ydx = sin(angle)*dScale.y/2.0;
-  double ydy = -cos(angle)*dScale.y/2.0;
-
-  // adjust position due to difference in pivot points
-  math::Vector3 newPos = originalPos -
-      - math::Vector3(xdx + ydx, xdy + ydy, 0);
-
-  this->visual->SetPosition(newPos);
 }
 
 /////////////////////////////////////////////////
@@ -198,23 +183,21 @@ void ModelManip::OnPositionChanged(double _x, double _y, double _z)
 }
 
 /////////////////////////////////////////////////
+void ModelManip::OnWidthChanged(double _width)
+{
+  double scaledWidth = BuildingMaker::Convert(_width);
+  this->size = this->visual->GetScale();
+  this->size.x = scaledWidth;
+  this->visual->SetScale(this->size);
+}
+
+/////////////////////////////////////////////////
 void ModelManip::OnDepthChanged(double _depth)
 {
   double scaledDepth = BuildingMaker::Convert(_depth);
   this->size = this->visual->GetScale();
   this->size.y = scaledDepth;
-  math::Vector3 dScale = this->visual->GetScale() - this->size;
-  math::Vector3 originalPos = this->visual->GetPosition();
   this->visual->SetScale(this->size);
-
-  double angle = this->visual->GetRotation().GetAsEuler().z;
-  double dx = sin(angle)*dScale.y/2.0;
-  double dy = -cos(angle)*dScale.y/2.0;
-
-  math::Vector3 newPos = originalPos
-      - math::Vector3(dx, dy, 0);
-
-  this->visual->SetPosition(newPos);
 }
 
 /////////////////////////////////////////////////
@@ -229,27 +212,6 @@ void ModelManip::OnHeightChanged(double _height)
 
   math::Vector3 newPos = originalPos
       - math::Vector3(0, 0, dScale.z/2.0);
-
-  this->visual->SetPosition(newPos);
-}
-
-/////////////////////////////////////////////////
-void ModelManip::OnWidthChanged(double _width)
-{
-  double scaledWidth = BuildingMaker::Convert(_width);
-  this->size = this->visual->GetScale();
-  this->size.x = scaledWidth;
-
-  math::Vector3 dScale = this->visual->GetScale() - this->size;
-  math::Vector3 originalPos = this->visual->GetPosition();
-  this->visual->SetScale(this->size);
-
-  double angle = this->visual->GetRotation().GetAsEuler().z;
-  double dx = cos(angle)*dScale.x/2.0;
-  double dy = sin(angle)*dScale.x/2.0;
-
-  math::Vector3 newPos = originalPos
-      - math::Vector3(dx , dy, 0);
 
   this->visual->SetPosition(newPos);
 }
@@ -475,8 +437,7 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
   wallManip->SetName(linkName);
   wallManip->SetVisual(visVisual);
   visVisual->SetScale(scaledSize);
-  visVisual->SetPosition(math::Vector3(scaledSize.x/2.0,
-  -scaledSize.y/2.0, scaledSize.z/2.0));
+  visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[visualName.str()] = wallManip;
   //this->walls[visualName.str()] = wallManip;
@@ -515,13 +476,50 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
   windowManip->SetVisual(visVisual);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
-  visVisual->SetPosition(math::Vector3(scaledSize.x/2, -scaledSize.y/2, 0));
+  visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[visualName.str()] = windowManip;
 
   // TODO remove me after testing
 //  std::map<std::string, ModelManip *>::iterator it = this->allItems.begin();
 //  (*it).second->AttachObject(windowManip);
+
+  return visualName.str();
+}
+
+/////////////////////////////////////////////////
+std::string BuildingMaker::AddDoor(QVector3D _size, QVector3D _pos,
+    double _angle)
+{
+  /// TODO a copy of AddWindow function. FIXME later
+  std::ostringstream linkNameStream;
+  linkNameStream << "Door_" << this->doorCounter++;
+  std::string linkName = linkNameStream.str();
+
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
+        linkName, this->modelVisual));
+  linkVisual->Load();
+
+  std::ostringstream visualName;
+  visualName << this->modelName << "::" << linkName << "::Visual";
+  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+        linkVisual));
+
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set("Gazebo/Wood");
+  visVisual->Load(visualElem);
+
+  ModelManip *doorManip = new ModelManip();
+  doorManip->SetMaker(this);
+  doorManip->SetName(linkName);
+  doorManip->SetVisual(visVisual);
+  math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+  visVisual->SetScale(scaledSize);
+  visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
+  doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+  this->allItems[visualName.str()] = doorManip;
 
   return visualName.str();
 }
@@ -557,9 +555,9 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
   double dSteps = static_cast<double>(_steps);
-  math::Vector3 offset = scaledSize/2.0;
-  offset.y = -offset.y;
-  visVisual->SetPosition(offset);
+//  math::Vector3 offset = scaledSize/2.0;
+//  offset.y = -offset.y;
+  visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[visualName.str()] = stairsManip;
   // this->stairs[visualName.str()] = stairsManip;
@@ -617,42 +615,6 @@ void BuildingMaker::RemoveWall(std::string _wallName)
   this->RemovePart(_wallName);
 }
 
-/////////////////////////////////////////////////
-std::string BuildingMaker::AddDoor(QVector3D _size, QVector3D _pos,
-    double _angle)
-{
-  /// TODO a copy of AddWindow function. FIXME later
-  std::ostringstream linkNameStream;
-  linkNameStream << "Door_" << this->doorCounter++;
-  std::string linkName = linkNameStream.str();
-
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
-  linkVisual->Load();
-
-  std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
-  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-        linkVisual));
-
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
-      ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/Wood");
-  visVisual->Load(visualElem);
-
-  ModelManip *doorManip = new ModelManip();
-  doorManip->SetMaker(this);
-  doorManip->SetName(linkName);
-  doorManip->SetVisual(visVisual);
-  math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
-  visVisual->SetScale(scaledSize);
-  visVisual->SetPosition(math::Vector3(scaledSize.x/2, -scaledSize.y/2, 0));
-  doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
-  this->allItems[visualName.str()] = doorManip;
-
-  return visualName.str();
-}
 
 /////////////////////////////////////////////////
 void BuildingMaker::Start(const rendering::UserCameraPtr _camera)

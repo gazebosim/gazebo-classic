@@ -274,8 +274,10 @@ void EditorView::DrawLine(QPoint _pos)
 
     QVector3D segmentPosition = segment->GetScenePosition();
     segmentPosition.setZ(wallItem->GetLevelBaseHeight() + segmentPosition.z());
+    QVector3D segmentSize = segment->GetSize();
+    segmentSize.setZ(wallItem->GetHeight());
     std::string wallSegmentName = this->buildingMaker->AddWall(
-        segment->GetSize(), segmentPosition, segment->GetSceneRotation());
+        segmentSize, segmentPosition, segment->GetSceneRotation());
     this->lastWallSegmentName = wallSegmentName;
     this->buildingMaker->ConnectItem(wallSegmentName, segment);
     this->buildingMaker->ConnectItem(wallSegmentName, wallItem);

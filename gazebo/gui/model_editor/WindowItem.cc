@@ -34,11 +34,11 @@ WindowItem::WindowItem(): RectItem(), BuildingItem()
   this->levelBaseHeight = 0;
 
   this->windowDepth = 20;
-  this->windowHeight = 0;
-  this->windowWidth = 100;
+  this->windowHeight = 80;
+  this->windowWidth = 80;
   this->windowSideBar = 10;
   this->windowPos = this->pos();
-  this->windowElevation = 0;
+  this->windowElevation = 50;
 
   this->width = this->windowWidth;
   this->height = this->windowDepth;
@@ -79,13 +79,19 @@ double WindowItem::GetSceneRotation()
 void WindowItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
-  QPointF topLeft(this->drawingOriginX, this->drawingOriginY);
-  QPointF topRight(this->drawingWidth, this->drawingOriginY);
-  QPointF bottomLeft(this->drawingOriginX, this->drawingHeight);
-  QPointF bottomRight(this->drawingWidth, this->drawingHeight);
+  QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
+      this->drawingOriginY - this->drawingHeight/2);
+  QPointF topRight(this->drawingOriginX + this->drawingWidth/2,
+      this->drawingOriginY - this->drawingHeight/2);
+  QPointF bottomLeft(this->drawingOriginX - this->drawingWidth/2,
+      this->drawingOriginY + this->drawingHeight/2);
+  QPointF bottomRight(this->drawingOriginX  + this->drawingWidth/2,
+      this->drawingOriginY + this->drawingHeight/2);
 
-  QPointF midLeft(this->drawingOriginX, this->drawingHeight/2.0);
-  QPointF midRight(this->drawingWidth, this->drawingHeight/2.0);
+  QPointF midLeft(this->drawingOriginX - this->drawingWidth/2,
+      this->drawingOriginY);
+  QPointF midRight(this->drawingOriginX + this->drawingWidth/2,
+      this->drawingOriginY);
 
   _painter->save();
 

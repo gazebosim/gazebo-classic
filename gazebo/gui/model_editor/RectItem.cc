@@ -178,9 +178,11 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
 
   if (_rotate->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
-    QPoint localCenter(this->drawingOriginX +
+/*    QPoint localCenter(this->drawingOriginX +
       (this->drawingOriginX + this->drawingWidth)/2,
       this->drawingOriginY + (this->drawingOriginY + this->drawingHeight)/2);
+    QPointF center = this->mapToScene(localCenter);*/
+    QPoint localCenter(this->drawingOriginX, this->drawingOriginY);
     QPointF center = this->mapToScene(localCenter);
 
     QPointF newPoint = mouseEvent->scenePos();
@@ -366,42 +368,73 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
     double angle = rotationAngle / 360.0 * (2 * M_PI);
     double dx = 0;
     double dy = 0;
+    double deltaLength = sqrt((deltaHeight * deltaHeight)
+        + (deltaWidth * deltaWidth));
     switch(_corner->GetIndex())
     {
       // corners
       case 0:
       {
-        this->SetPosition(this->pos() +
-            (mouseEvent->scenePos() - mouseEvent->lastScenePos()));
+        dx = sin(-angle) * deltaHeight/2;
+        dy = cos(-angle) * deltaHeight/2;
+        dx += cos(angle) * deltaWidth/2;
+        dy += sin(angle) * deltaWidth/2;
+        this->SetPosition(this->pos() + QPointF(dx, dy));
         break;
       }
       case 2:
       {
-        dx = sin(-angle) * deltaHeight;
-        dy = cos(-angle) * deltaHeight;
+        dx = sin(-angle) * deltaHeight/2;
+        dy = cos(-angle) * deltaHeight/2;
+        dx += -cos(angle) * deltaWidth/2;
+        dy += -sin(angle) * deltaWidth/2;
+        this->SetPosition(this->pos() + QPointF(dx, dy));
+        break;
+      }
+      case 4:
+      {
+        dx = -sin(-angle) * deltaHeight/2;
+        dy = -cos(-angle) * deltaHeight/2;
+        dx += -cos(angle) * deltaWidth/2;
+        dy += -sin(angle) * deltaWidth/2;
         this->SetPosition(this->pos() + QPointF(dx, dy));
         break;
       }
       case 6:
       {
-        dx = cos(angle) * deltaWidth;
-        dy = sin(angle) * deltaWidth;
+        dx = -sin(-angle) * deltaHeight/2;
+        dy = -cos(-angle) * deltaHeight/2;
+        dx += cos(angle) * deltaWidth/2;
+        dy += sin(angle) * deltaWidth/2;
         this->SetPosition(this->pos() + QPointF(dx, dy));
-
         break;
       }
       // edges
       case 1:
       {
-        dx = sin(-angle) * deltaHeight;
-        dy = cos(-angle) * deltaHeight;
+        dx = sin(-angle) * deltaHeight/2;
+        dy = cos(-angle) * deltaHeight/2;
         this->SetPosition(this->pos() + QPointF(dx, dy));
+        break;
+      }
+      case 3:
+      {
+        dx = cos(-angle) * deltaWidth/2;
+        dy = -sin(-angle) * deltaWidth/2;
+        this->SetPosition(this->pos() - QPointF(dx, dy));
+        break;
+      }
+      case 5:
+      {
+        dx = sin(-angle) * deltaHeight/2;
+        dy = cos(-angle) * deltaHeight/2;
+        this->SetPosition(this->pos() - QPointF(dx, dy));
         break;
       }
       case 7:
       {
-        dx = cos(angle) * deltaWidth;
-        dy = sin(angle) * deltaWidth;
+        dx = cos(angle) * deltaWidth/2;
+        dy = sin(angle) * deltaWidth/2;
         this->SetPosition(this->pos() + QPointF(dx, dy));
         break;
       }
@@ -505,26 +538,32 @@ void RectItem::UpdateCornerPositions()
   int cornerWidth = (this->corners[0]->boundingRect().width())/2;
   int cornerHeight = (this->corners[0]->boundingRect().height())/2;
 
-  this->corners[0]->setPos(this->drawingOriginX - cornerWidth,
-      this->drawingOriginY - cornerHeight);
-  this->corners[2]->setPos(this->drawingWidth - cornerWidth,
-      this->drawingOriginY - cornerHeight);
-  this->corners[4]->setPos(this->drawingWidth - cornerWidth,
-      this->drawingHeight - cornerHeight);
-  this->corners[6]->setPos(this->drawingOriginX - cornerWidth,
-      this->drawingHeight - cornerHeight);
+  this->corners[0]->setPos(
+      this->drawingOriginX - this->drawingWidth/2 - cornerWidth,
+      this->drawingOriginY - this->drawingHeight/2 - cornerHeight);
+  this->corners[2]->setPos(
+      this->drawingOriginX + this->drawingWidth/2 - cornerWidth,
+      this->drawingOriginY - this->drawingHeight/2 - cornerHeight);
+  this->corners[4]->setPos(
+      this->drawingOriginX + this->drawingWidth/2 - cornerWidth,
+      this->drawingOriginY + this->drawingHeight/2 - cornerHeight);
+  this->corners[6]->setPos(
+      this->drawingOriginX - this->drawingWidth/2 - cornerWidth,
+      this->drawingOriginY + this->drawingHeight/2 - cornerHeight);
 
-  this->corners[1]->setPos(this->drawingWidth/2 - cornerWidth,
+  this->corners[1]->setPos(this->drawingOriginX - cornerWidth,
+      this->drawingOriginY - this->drawingHeight/2 - cornerHeight);
+  this->corners[3]->setPos(
+      this->drawingOriginX + this->drawingWidth/2 - cornerWidth,
       this->drawingOriginY - cornerHeight);
-  this->corners[3]->setPos(this->drawingWidth - cornerWidth,
-      this->drawingHeight/2 - cornerHeight);
-  this->corners[5]->setPos(this->drawingWidth/2 - cornerWidth,
-      this->drawingHeight - cornerHeight);
-  this->corners[7]->setPos(this->drawingOriginX - cornerWidth,
-      this->drawingHeight/2 - cornerHeight);
+  this->corners[5]->setPos(this->drawingOriginX - cornerWidth,
+      this->drawingOriginY + this->drawingHeight/2 - cornerHeight);
+  this->corners[7]->setPos(
+      this->drawingOriginX - this->drawingWidth/2 - cornerWidth,
+      this->drawingOriginY - cornerHeight);
 
-  this->rotateHandle->setPos(this->drawingWidth/2,
-      this->drawingOriginY);
+  this->rotateHandle->setPos(this->drawingOriginX,
+      this->drawingOriginY - this->drawingHeight/2);
 
   this->SizeChanged();
 
@@ -552,7 +591,6 @@ void RectItem::SetHeight(int _height)
 
   emit depthChanged(this->drawingHeight);
 }
-
 
 /////////////////////////////////////////////////
 void RectItem::SetSize(QSize _size)
@@ -583,7 +621,7 @@ int RectItem::GetHeight()
 /////////////////////////////////////////////////
 QRectF RectItem::boundingRect() const
 {
-  return QRectF(0, 0, this->width, this->height);
+  return QRectF(-this->width/2, -this->height/2, this->width, this->height);
 }
 
 /////////////////////////////////////////////////
@@ -625,10 +663,14 @@ void RectItem::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
 {
   _painter->save();
 
-  QPointF topLeft(this->drawingOriginX, this->drawingOriginY);
-  QPointF topRight(this->drawingWidth, this->drawingOriginY);
-  QPointF bottomLeft(this->drawingOriginX, this->drawingHeight);
-  QPointF bottomRight(this->drawingWidth, this->drawingHeight);
+  QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
+      this->drawingOriginY - this->drawingHeight/2);
+  QPointF topRight(this->drawingOriginX + this->drawingWidth/2,
+      this->drawingOriginY - this->drawingHeight/2);
+  QPointF bottomLeft(this->drawingOriginX - this->drawingWidth/2,
+      this->drawingOriginY + this->drawingHeight/2);
+  QPointF bottomRight(this->drawingOriginX  + this->drawingWidth/2,
+      this->drawingOriginY + this->drawingHeight/2);
 
   QPen rectPen;
   rectPen.setStyle(Qt::SolidLine);
@@ -671,14 +713,14 @@ void RectItem::SetPosition(double _x, double _y)
 /////////////////////////////////////////////////
 void RectItem::SetRotation(double _angle)
 {
-  double halfX = this->drawingOriginX +
-      (this->drawingOriginX + this->drawingWidth)/2;
-  double halfY = this->drawingOriginY +
-      (this->drawingOriginY + this->drawingHeight)/2;
+//  double halfX = this->drawingOriginX +
+//      (this->drawingOriginX + this->drawingWidth)/2;
+//  double halfY = this->drawingOriginY +
+//      (this->drawingOriginY + this->drawingHeight)/2;
 
-  this->translate(halfX, halfY);
+//  this->translate(halfX, halfY);
   this->rotate(_angle - this->rotationAngle);
-  this->translate(-halfX, -halfY);
+//  this->translate(-halfX, -halfY);
 
   this->rotationAngle = _angle;
   emit yawChanged(this->rotationAngle);

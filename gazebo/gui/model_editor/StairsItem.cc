@@ -36,7 +36,7 @@ StairsItem::StairsItem(): RectItem(), BuildingItem()
   this->stairsSteps = 10;
   this->stairsDepth = 150;
   this->stairsWidth = 100;
-  this->stairsHeight = 300;
+  this->stairsHeight = 280;
 
 //  this->stairsUnitRise = 10;
 //  this->stairsUnitRun = 10;
@@ -92,10 +92,14 @@ void StairsItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
    // ignore resize for now
-  QPointF topLeft(this->drawingOriginX, this->drawingOriginY);
-  QPointF topRight(this->drawingWidth, this->drawingOriginY);
-  QPointF bottomLeft(this->drawingOriginX, this->drawingHeight);
-  QPointF bottomRight(this->drawingWidth, this->drawingHeight);
+  QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
+      this->drawingOriginY - this->drawingHeight/2);
+  QPointF topRight(this->drawingOriginX + this->drawingWidth/2,
+      this->drawingOriginY - this->drawingHeight/2);
+  QPointF bottomLeft(this->drawingOriginX - this->drawingWidth/2,
+      this->drawingOriginY + this->drawingHeight/2);
+  QPointF bottomRight(this->drawingOriginX  + this->drawingWidth/2,
+      this->drawingOriginY + this->drawingHeight/2);
 
   this->stairsPos = this->pos();
   this->stairsWidth = this->drawingWidth;

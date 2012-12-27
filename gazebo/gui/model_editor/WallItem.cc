@@ -35,7 +35,7 @@ WallItem::WallItem(QPointF _start, QPointF _end)
   this->level = 0;
 
   this->wallThickness = 20;
-  this->wallHeight = 0;
+  this->wallHeight = 250;
 
   this->SetThickness(this->wallThickness);
 }
@@ -120,7 +120,7 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
     case QEvent::GraphicsSceneMouseDoubleClick:
     {
       QLineF line = _segment->line();
-      double segmentLength = line.length();
+      double segmentLength = line.length() + this->wallThickness;
       QPointF segmentStartPoint = this->mapToScene(line.p1());
       QPointF segmentEndPoint = this->mapToScene(line.p2());
 
@@ -147,7 +147,7 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
         // Comparison between doubles up to 1 decimal place
         if (fabs(newLength - (segmentLength * this->scale)) < 0.1)
         {
-          line.setLength(newLength);
+          line.setLength(newLength - this->wallThickness);
           this->SetVertexPosition(_segment->GetIndex()+1,
               this->mapToScene(line.p2()));
         }

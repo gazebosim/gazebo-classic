@@ -153,8 +153,9 @@ QVector3D LineSegmentItem::GetSize()
 /////////////////////////////////////////////////
 QVector3D LineSegmentItem::GetScenePosition()
 {
-  QPointF sceneStartPos = this->mapToScene(this->start);
-  return QVector3D(sceneStartPos.x(), sceneStartPos.y(), 0);
+  QPointF centerPos = this->mapToScene(this->start
+      + (this->end - this->start)/2.0);
+  return QVector3D(centerPos.x(), centerPos.y(), 0);
 }
 
 /////////////////////////////////////////////////
@@ -168,12 +169,13 @@ void LineSegmentItem::LineChanged()
 {
 //  emit sizeChanged(this->pen().width(), this->line().length(),
 //      this->pseudoHeight);
-  emit widthChanged(this->line().length());
+  emit widthChanged(this->line().length() + this->pen().width());
   emit depthChanged(this->pen().width());
 
-  QPointF sceneStartPos = this->mapToScene(this->start);
-  emit posXChanged(sceneStartPos.x());
-  emit posYChanged(sceneStartPos.y());
+  QPointF centerPos = this->mapToScene(this->start
+      + (this->end - this->start)/2.0);
+  emit posXChanged(centerPos.x());
+  emit posYChanged(centerPos.y());
   emit rotationChanged(0, 0, this->line().angle());
 }
 

@@ -34,7 +34,7 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
   this->levelBaseHeight = 0;
 
   this->doorDepth = 20;
-  this->doorHeight = 0;
+  this->doorHeight = 200;
   this->doorWidth = 100;
 
   this->width = this->doorWidth;
@@ -82,10 +82,14 @@ void DoorItem::paint (QPainter *_painter,
     this->DrawBoundingBox(_painter);
   this->showCorners(this->isSelected());
 
-  QPointF topLeft(this->drawingOriginX, this->drawingOriginY);
-  QPointF topRight(this->drawingWidth, this->drawingOriginY);
-  QPointF bottomLeft(this->drawingOriginX, this->drawingHeight);
-  QPointF bottomRight(this->drawingWidth, this->drawingHeight);
+  QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
+      this->drawingOriginY - this->drawingHeight/2);
+  QPointF topRight(this->drawingOriginX + this->drawingWidth/2,
+      this->drawingOriginY - this->drawingHeight/2);
+  QPointF bottomLeft(this->drawingOriginX - this->drawingWidth/2,
+      this->drawingOriginY + this->drawingHeight/2);
+  QPointF bottomRight(this->drawingOriginX  + this->drawingWidth/2,
+      this->drawingOriginY + this->drawingHeight/2);
 
   QPen doorPen;
   doorPen.setStyle(Qt::SolidLine);
@@ -93,8 +97,8 @@ void DoorItem::paint (QPainter *_painter,
   _painter->setPen(doorPen);
 
   _painter->drawLine(topLeft, bottomLeft + QPointF(0, this->drawingWidth));
-  QRect arcRect(this->drawingOriginX - this->drawingWidth,
-      this->drawingOriginY + this->drawingHeight - this->drawingWidth,
+  QRect arcRect(topLeft.x() - this->drawingWidth,
+      topLeft.y() + this->drawingHeight - this->drawingWidth,
       this->drawingWidth*2, this->drawingWidth*2);
   _painter->drawArc(arcRect, 0, -90 * 16);
 
