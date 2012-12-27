@@ -164,16 +164,27 @@ namespace urdf2gazebo
       URDF2Gazebo();
       ~URDF2Gazebo();
 
-      /// parser xml for vector 3
+      /// \brief parser xml string into urdf::Vector3
+      /// \param[in] _key XML key where vector3 value might be
+      /// \param[in] _scale scalar scale for the vector3
+      /// \return a urdf::Vector3
       urdf::Vector3 ParseVector3(TiXmlNode* _key, double _scale = 1.0);
 
-      /// convert values to string
+      /// \brief convert values to string
+      /// \param[in] _count number of values in _values array
+      /// \param[in] _values array of double values
+      /// \return a string
       std::string Values2str(unsigned int _count, const double *_values);
 
-      /// convert Vector3 to string
+      /// \brief convert Vector3 to string
+      /// \param[in] _vector a urdf::Vector3
+      /// \return a string
       std::string Vector32Str(const urdf::Vector3 _vector);
 
-      /// append key value pair to the end of the xml element
+      /// \brief append key value pair to the end of the xml element
+      /// \param[in] _elem pointer to xml element
+      /// \param[in] _key string containing key to add to xml element
+      /// \param[in] _value string containing value for the key added
       void AddKeyValue(TiXmlElement *_elem, const std::string& _key,
                        const std::string &_value);
 
