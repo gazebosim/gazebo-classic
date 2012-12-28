@@ -718,9 +718,9 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
 
         // insert provideFeedback
         if ((*ge)->provideFeedback)
-            addKeyValue(physicsOde, "provideFeedback", "true");
+            addKeyValue(physicsOde, "provide_feedback", "true");
         else
-            addKeyValue(physicsOde, "provideFeedback", "false");
+            addKeyValue(physicsOde, "provide_feedback", "false");
 
         // insert fudge_factor
         if ((*ge)->is_fudge_factor)

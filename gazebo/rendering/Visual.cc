@@ -1259,6 +1259,7 @@ void Visual::SetWorldPose(const math::Pose _pose)
 //////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
+  gzerr << _pos << "\n";
   this->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
 }
 
