@@ -37,6 +37,8 @@
 #include "gui/MainWindow.hh"
 #include "gui/GuiEvents.hh"
 
+#include "sdf/sdf.hh"
+
 using namespace gazebo;
 using namespace gui;
 
@@ -263,8 +265,42 @@ void MainWindow::Save()
   // Make sure the response is correct
   if (response->response() != "error" && response->type() == msg.GetTypeName())
   {
-    // Parse the response
+    // Parse the response message
     msg.ParseFromString(response->serialized_data());
+
+    // Parse the string into sdf, so that we can insert user camera settings.
+    sdf::SDFPtr sdf_parsed;
+    sdf_parsed.reset(new sdf::SDF);
+    sdf_parsed->SetFromString(msg.data());
+    if (sdf_parsed->root->HasElement("world"))
+    {
+      sdf::ElementPtr world = sdf_parsed->root->GetElement("world");
+      sdf::ElementPtr guiElem, cameraElem;
+      rendering::UserCameraPtr cam = gui::get_active_camera();
+      if (!world->HasElement("gui"))
+      {
+        // Usually the gui element is not created by the get_world request.
+        guiElem = world->AddElement("gui");
+        if (guiElem->HasAttribute("fullscreen"))
+        {
+          guiElem->GetAttribute("fullscreen")->Set(g_fullscreen);
+        }
+        cameraElem = guiElem->AddElement("camera");
+        cameraElem->AddElement("pose")->Set(cam->GetWorldPose());
+        cameraElem->AddElement("view_controller")->Set("orbit");
+        // TODO: export track_visual properties as well.
+        //msg.ParseFromString(sdf_parsed->ToString());
+        gzerr << '\n' << sdf_parsed->root->ToString("") << '\n';
+      }
+      else
+      {
+        gzerr << "get_world request included unexpected gui element.\n";
+      }
+    }
+    else
+    {
+      gzerr << "Unable to parse world file to add user camera settings.\n";
+    }
 
     // Open the file
     std::ofstream out(this->saveFilename.c_str(), std::ios::out);
