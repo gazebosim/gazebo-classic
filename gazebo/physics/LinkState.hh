@@ -120,6 +120,10 @@ namespace gazebo
       /// \return True if the values in the state are zero.
       public: bool IsZero() const;
 
+      /// \brief Populate a state SDF element with data from the object.
+      /// \param[out] _sdf SDF element to populate.
+      public: void FillSDF(sdf::ElementPtr _sdf);
+
       /// \brief Assignment operator
       /// \param[in] _state State value
       /// \return this

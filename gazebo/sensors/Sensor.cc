@@ -125,12 +125,14 @@ std::string Sensor::GetParentName() const
 //////////////////////////////////////////////////
 void Sensor::Update(bool _force)
 {
-  if (this->IsActive())
+  if (this->IsActive() || _force)
   {
-    if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod)
+    if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod
+        || _force)
     {
       this->lastUpdateTime = this->world->GetSimTime();
       this->UpdateImpl(_force);
+      this->updated();
     }
   }
 }
@@ -193,6 +195,15 @@ bool Sensor::IsActive()
 math::Pose Sensor::GetPose() const
 {
   return this->pose;
+}
+
+//////////////////////////////////////////////////
+double Sensor::GetUpdateRate()
+{
+  if (this->updatePeriod.Double() > 0.0)
+    return 1.0/this->updatePeriod.Double();
+  else
+    return 0.0;
 }
 
 //////////////////////////////////////////////////

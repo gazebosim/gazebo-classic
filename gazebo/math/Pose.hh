@@ -105,6 +105,13 @@ namespace gazebo
       /// \return The resulting pose
       public: const Pose &operator+=(const Pose &_pose);
 
+      /// \brief Negation operator
+      /// \return The resulting pose
+      public: inline Pose operator-() const
+              {
+                return Pose() - *this;
+              }
+
       /// \brief Subtraction operator
       /// \param[in] _pose Pose to subtract from this one
       /// \return The resulting pose

@@ -137,9 +137,6 @@ namespace gazebo
       /// \brief Publisher for joint messages.
       private: transport::PublisherPtr jointPub;
 
-      /// \brief Holds out request for model information.
-      private: msgs::Request *requestMsg;
-
       /// \brief Sliders for force control
       private: std::map<std::string, JointForceControl*> sliders;
 
