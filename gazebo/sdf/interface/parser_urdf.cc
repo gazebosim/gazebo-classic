@@ -710,16 +710,17 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
         }
         */
 
-        /* FIXME: provideFeedback flag is gone, need to recover
+        /* FIXME: to be implemented
         if ((*ge)->is_initial_joint_position)
             addKeyValue(elem, "initial_joint_position",
               values2str(1, &(*ge)->initial_joint_position));
+        */
+
         // insert provideFeedback
         if ((*ge)->provideFeedback)
             addKeyValue(physicsOde, "provideFeedback", "true");
         else
             addKeyValue(physicsOde, "provideFeedback", "false");
-        */
 
         // insert fudge_factor
         if ((*ge)->is_fudge_factor)
