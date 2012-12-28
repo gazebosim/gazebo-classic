@@ -12,16 +12,17 @@ set (sources
              RTQL8Collision.cc
              RTQL8Link.cc
              RTQL8Joint.cc
-#             ODESliderJoint.cc
-#             ODEHingeJoint.cc
-#             ODEHinge2Joint.cc
-#             ODEUniversalJoint.cc
-#             ODEBallJoint.cc
+             RTQL8SliderJoint.cc
+             RTQL8HingeJoint.cc
+             RTQL8Hinge2Joint.cc
+             RTQL8UniversalJoint.cc
+             RTQL8BallJoint.cc
 #             ODETrimeshShape.cc
 #             ODERayShape.cc
 #             ODEMultiRayShape.cc
 #             ODEHeightmapShape.cc
-#             ODEScrewJoint.cc
+             RTQL8ScrewJoint.cc
+             RTQL8Model.cc
 )
 
 SET (headers
@@ -29,11 +30,11 @@ SET (headers
              RTQL8Collision.hh
              RTQL8Link.hh
              RTQL8Joint.hh
-#             ODESliderJoint.hh
-#             ODEHingeJoint.hh
-#             ODEHinge2Joint.hh
-#             ODEUniversalJoint.hh
-#             ODEBallJoint.hh
+             RTQL8SliderJoint.hh
+             RTQL8HingeJoint.hh
+             RTQL8Hinge2Joint.hh
+             RTQL8UniversalJoint.hh
+             RTQL8BallJoint.hh
 #             ODETrimeshShape.hh
 #             ODERayShape.hh
 #             ODEMultiRayShape.hh
@@ -43,7 +44,8 @@ SET (headers
 #             ODEPlaneShape.hh
 #             ODECylinderShape.hh
              RTQL8Types.hh
-#             ODEScrewJoint.hh
+             RTQL8ScrewJoint.hh
+             RTQL8Model.hh
 )
 
 gz_add_library(gazebo_physics_rtql8 ${sources})

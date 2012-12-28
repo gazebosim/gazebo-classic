@@ -153,7 +153,7 @@ void RTQL8Physics::UpdatePhysics()
 //////////////////////////////////////////////////
 void RTQL8Physics::SetStepTime(double _value)
 {
-   // TODO: 
+   // TODO: element of dt
 //   this->sdf->GetElement("ode")->GetElement(
 //       "solver")->GetAttribute("dt")->Set(_value);
    this->stepTimeDouble = _value;

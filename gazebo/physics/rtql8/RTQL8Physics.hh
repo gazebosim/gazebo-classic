@@ -108,31 +108,8 @@ namespace gazebo
       private: double stepTimeDouble;
       
       /// \brief 
-      private: simulation::World* world;
+      private: simulation::World* rtql8World;
       
-//       /// \brief Array of skeletons
-//       private: std::vector<dynamics::SkeletonDynamics*> skels;
-//       
-//       /// \brief 
-//       private: std::vector<Eigen::VectorXd> dofVels;
-//       
-//       /// \brief 
-//       private: std::vector<Eigen::VectorXd> dofs;
-//       
-//       /// \brief Integrator
-//       private: integration::EulerIntegrator integrator;
-//       
-//       /// \brief 
-//       private: Eigen::Vector3d gravity;
-//       
-// 	  /// \brief 
-// 	  private: double timeStep;
-// 	  
-//       /// \brief 
-//       private: bool running;
-//       
-//       /// \brief 
-//       private: int frame;
     };
 
   /// \}

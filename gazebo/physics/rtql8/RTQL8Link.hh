@@ -14,7 +14,7 @@ namespace gazebo
     //class BulletMotionState;
 
     /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_bullet RTQL8 Physics
+    /// \addtogroup gazebo_physics_rtql8 RTQL8 Physics
     /// \brief rtql8 physics engine wrapper
     /// \{
 

@@ -1,23 +1,3 @@
-// #include "physics/bullet/BulletTypes.hh"
-// #include "physics/bullet/BulletLink.hh"
-// #include "physics/bullet/BulletCollision.hh"
-// 
-// #include "physics/bullet/BulletPlaneShape.hh"
-// #include "physics/bullet/BulletSphereShape.hh"
-// #include "physics/bullet/BulletHeightmapShape.hh"
-// #include "physics/bullet/BulletMultiRayShape.hh"
-// #include "physics/bullet/BulletBoxShape.hh"
-// #include "physics/bullet/BulletCylinderShape.hh"
-// #include "physics/bullet/BulletTrimeshShape.hh"
-// #include "physics/bullet/BulletRayShape.hh"
-// 
-// #include "physics/bullet/BulletHingeJoint.hh"
-// #include "physics/bullet/BulletUniversalJoint.hh"
-// #include "physics/bullet/BulletBallJoint.hh"
-// #include "physics/bullet/BulletSliderJoint.hh"
-// #include "physics/bullet/BulletHinge2Joint.hh"
-// #include "physics/bullet/BulletScrewJoint.hh"
-
 #include "physics/PhysicsTypes.hh"
 #include "physics/PhysicsFactory.hh"
 #include "physics/World.hh"
@@ -68,7 +48,7 @@ RTQL8Physics::RTQL8Physics(WorldPtr _world)
 //   this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher,
 //       this->broadPhase, this->solver, this->collisionConfig);
 
-  this->world = new simulation::World;
+  this->rtql8World = new simulation::World;
 }
 
 //////////////////////////////////////////////////
@@ -88,9 +68,9 @@ RTQL8Physics::~RTQL8Physics()
 //   this->solver = NULL;
 //   this->dynamicsWorld = NULL;
 
-  delete this->world;
+  delete this->rtql8World;
   
-  this->world = NULL;
+  this->rtql8World = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -100,10 +80,10 @@ void RTQL8Physics::Load(sdf::ElementPtr _sdf)
 
   // Gravity
   math::Vector3 g = this->sdf->GetValueVector3("gravity");
-  this->world->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
+  this->rtql8World->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
   
   // Time step
-  this->world->setTimeStep(this->sdf->GetValueDouble("time_step"));
+  this->rtql8World->setTimeStep(this->sdf->GetValueDouble("time_step"));
   
   // TODO: Elements for rtql8 settings
   sdf::ElementPtr rtql8Elem = this->sdf->GetElement("rtql8");
@@ -114,7 +94,7 @@ void RTQL8Physics::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void RTQL8Physics::Init()
 {
-  this->world->init();
+  this->rtql8World->init();
 }
 
 //////////////////////////////////////////////////
@@ -144,7 +124,7 @@ void RTQL8Physics::UpdatePhysics()
   this->physicsUpdateMutex->lock();
 
   //common::Time currTime =  this->world->GetRealTime();
-  this->world->updatePhysics();
+  this->rtql8World->updatePhysics();
   //this->lastUpdateTime = currTime;
 
   this->physicsUpdateMutex->unlock();
@@ -157,7 +137,7 @@ void RTQL8Physics::SetStepTime(double _value)
 //   this->sdf->GetElement("ode")->GetElement(
 //       "solver")->GetAttribute("dt")->Set(_value);
    this->stepTimeDouble = _value;
-   this->world->setTimeStep(_value);
+   this->rtql8World->setTimeStep(_value);
 }
 
 //////////////////////////////////////////////////
@@ -297,7 +277,7 @@ JointPtr RTQL8Physics::CreateJoint(const std::string &_type, ModelPtr _parent)
 void RTQL8Physics::SetGravity(const gazebo::math::Vector3& _gravity)
 {
   this->sdf->GetElement("gravity")->GetAttribute("xyz")->Set(_gravity);
-  this->world->setGravity(Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
+  this->rtql8World->setGravity(Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
 }
 
 //////////////////////////////////////////////////
