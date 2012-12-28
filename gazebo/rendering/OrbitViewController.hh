@@ -50,11 +50,6 @@ namespace gazebo
       /// \param[in] _focalPoint Point to look at.
       public: virtual void Init(const math::Vector3 &_focalPoint);
 
-      /// \brief Set the min and max distance from the focal point.
-      /// \param[in] _minDist Min distance to the focal point.
-      /// \param[in] _maxDist Max distance from the focal point.
-      public: void SetDistanceRange(double _minDist, double _maxDist);
-
       /// \brief Update.
       public: virtual void Update();
 
@@ -78,14 +73,6 @@ namespace gazebo
       /// \return The focal point
       public: math::Vector3 GetFocalPoint() const;
 
-      /// \brief Set the yaw angle of the camera.
-      /// \param[in] _yaw angle in radians
-      public: void SetYaw(double _yaw);
-
-      /// \brief Set the pitch angle of the camera.
-      /// \param[in] _pitch Pitch angle in radians.
-      public: void SetPitch(double _pitch);
-
       // Documentation inherited from parent
       public: void HandleKeyReleaseEvent(const std::string &_key);
 
@@ -94,11 +81,11 @@ namespace gazebo
 
       /// \brief Translate the focal point in the local coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      private: void TranslateLocal(math::Vector3 _vec);
+      private: void TranslateLocal(const math::Vector3 &_vec);
 
       /// \brief Translate the focal point in the global coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      private: void TranslateGlobal(math::Vector3 _vec);
+      private: void TranslateGlobal(const math::Vector3 &_vec);
 
       /// \brief Zoom the camera.
       /// \paramp[in] _amount Zoom quatity.
@@ -112,21 +99,21 @@ namespace gazebo
       /// \paramp[in] _v Normalize a pitch value.
       private: void NormalizePitch(float &_v);
 
-      /// \brief Update the camera's pose.
-      private: void UpdatePose();
+      /// \brief Update the reference visual.
+      private: void UpdateRefVisual();
+
+      /// \brief Update the camera's pose based on a rotation update.
+      private: void Orbit();
 
       private: float yaw, pitch;
       private: float distance;
-      private: float minDist, maxDist;
       private: math::Vector3 focalPoint;
 
       private: VisualPtr refVisual;
-      private: math::Vector2i posCache;
 
       private: float dy, dp;
 
       private: std::string key;
-      private: DynamicLines *line;
     };
     /// \}
   }
