@@ -99,6 +99,10 @@ namespace gazebo
       public: void SetViewController(const std::string &_type,
                                      const math::Vector3 &_pos);
 
+      /// \brief Get current view controller type.
+      /// \return Type of the current view controller: "orbit", "fps"
+      public: std::string GetViewControllerTypeString();
+
       /// \brief Resize the camera.
       /// \param[in] _w Width of the camera image.
       /// \param[in] _h Height of the camera image.

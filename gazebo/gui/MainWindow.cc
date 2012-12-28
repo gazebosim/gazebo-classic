@@ -261,6 +261,7 @@ void MainWindow::Save()
     transport::request(get_world(), "world_sdf");
 
   msgs::GzString msg;
+  std::string msgData;
 
   // Make sure the response is correct
   if (response->response() != "error" && response->type() == msg.GetTypeName())
@@ -269,36 +270,29 @@ void MainWindow::Save()
     msg.ParseFromString(response->serialized_data());
 
     // Parse the string into sdf, so that we can insert user camera settings.
-    sdf::SDFPtr sdf_parsed;
-    sdf_parsed.reset(new sdf::SDF);
-    sdf_parsed->SetFromString(msg.data());
-    if (sdf_parsed->root->HasElement("world"))
+    sdf::SDF sdf_parsed;
+    sdf_parsed.SetFromString(msg.data());
+    // Check that sdf contains world, but not gui
+    if (sdf_parsed.root->HasElement("world") &&
+        !sdf_parsed.root->GetElement("world")->HasElement("gui") )
     {
-      sdf::ElementPtr world = sdf_parsed->root->GetElement("world");
-      sdf::ElementPtr guiElem, cameraElem;
+      sdf::ElementPtr world = sdf_parsed.root->GetElement("world");
+      sdf::ElementPtr guiElem = world->AddElement("gui");
+      if (guiElem->HasAttribute("fullscreen"))
+      {
+        guiElem->GetAttribute("fullscreen")->Set(g_fullscreen);
+      }
+      sdf::ElementPtr cameraElem = guiElem->AddElement("camera");
       rendering::UserCameraPtr cam = gui::get_active_camera();
-      if (!world->HasElement("gui"))
-      {
-        // Usually the gui element is not created by the get_world request.
-        guiElem = world->AddElement("gui");
-        if (guiElem->HasAttribute("fullscreen"))
-        {
-          guiElem->GetAttribute("fullscreen")->Set(g_fullscreen);
-        }
-        cameraElem = guiElem->AddElement("camera");
-        cameraElem->AddElement("pose")->Set(cam->GetWorldPose());
-        cameraElem->AddElement("view_controller")->Set("orbit");
-        // TODO: export track_visual properties as well.
-        //msg.ParseFromString(sdf_parsed->ToString());
-        gzerr << '\n' << sdf_parsed->root->ToString("") << '\n';
-      }
-      else
-      {
-        gzerr << "get_world request included unexpected gui element.\n";
-      }
+      cameraElem->AddElement("pose")->Set(cam->GetWorldPose());
+      cameraElem->AddElement("view_controller")->Set(
+                              cam->GetViewControllerTypeString());
+      // TODO: export track_visual properties as well.
+      msgData = sdf_parsed.root->ToString("");
     }
     else
     {
+      msgData = msg.data();
       gzerr << "Unable to parse world file to add user camera settings.\n";
     }
 
@@ -314,7 +308,7 @@ void MainWindow::Save()
       msgBox.exec();
     }
     else
-      out << msg.data();
+      out << msgData;
 
     out.close();
   }
