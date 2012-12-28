@@ -1180,6 +1180,7 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
 /////////////////////////////////////////////////
 void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
   for (int i = 0; i < _msg->model_size(); i++)
   {
     this->poseMsgs.push_front(_msg->model(i).pose());

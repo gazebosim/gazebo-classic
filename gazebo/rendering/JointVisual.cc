@@ -48,6 +48,10 @@ void JointVisual::Load(ConstJointPtr &_msg)
       new AxisVisual(this->GetName() + "_AXIS", shared_from_this()));
   this->axisVisual->Load();
 
+  gzerr << _msg->pose().position().x()
+        << " " << _msg->pose().position().y()
+        << " " << _msg->pose().position().z()
+        << "\n";
   this->SetWorldPosition(msgs::Convert(_msg->pose().position()));
   this->SetWorldRotation(msgs::Convert(_msg->pose().orientation()));
 
