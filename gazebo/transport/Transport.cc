@@ -267,7 +267,7 @@ std::map<std::string, std::list<std::string> > transport::getAdvertisedTopics()
 
   ConnectionManager::Instance()->GetAllPublishers(publishers);
 
-  for(std::list<msgs::Publish>::iterator iter = publishers.begin();
+  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
       iter != publishers.end(); ++iter)
   {
     result[(*iter).msg_type()].push_back((*iter).topic());
@@ -285,7 +285,7 @@ std::list<std::string> transport::getAdvertisedTopics(
 
   ConnectionManager::Instance()->GetAllPublishers(publishers);
 
-  for(std::list<msgs::Publish>::iterator iter = publishers.begin();
+  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
       iter != publishers.end(); ++iter)
   {
     if (std::find(result.begin(), result.end(), (*iter).topic()) !=
@@ -307,7 +307,7 @@ std::string transport::getTopicMsgType(const std::string &_topicName)
 
   ConnectionManager::Instance()->GetAllPublishers(publishers);
 
-  for(std::list<msgs::Publish>::iterator iter = publishers.begin();
+  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
       iter != publishers.end() && result.empty(); ++iter)
   {
     if (_topicName == (*iter).topic())

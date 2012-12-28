@@ -17,6 +17,9 @@
 #ifndef _TOPICVIEW_HH_
 #define _TOPICVIEW_HH_
 
+#include <string>
+#include <list>
+
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
 

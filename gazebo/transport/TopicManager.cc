@@ -378,7 +378,7 @@ TopicManager::GetAdvertisedTopics() const
 
   ConnectionManager::Instance()->GetAllPublishers(publishers);
 
-  for(std::list<msgs::Publish>::iterator iter = publishers.begin();
+  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
       iter != publishers.end(); ++iter)
   {
     result[(*iter).msg_type()].push_back((*iter).topic());

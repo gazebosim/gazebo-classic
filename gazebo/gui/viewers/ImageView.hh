@@ -17,6 +17,8 @@
 #ifndef _IMAGEVIEW_HH_
 #define _IMAGEVIEW_HH_
 
+#include <string>
+
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
 

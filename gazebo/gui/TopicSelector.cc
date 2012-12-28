@@ -81,7 +81,6 @@ TopicSelector::TopicSelector(QWidget *_parent)
 
   // Assign the mainlayout to this widget
   this->setLayout(mainLayout);
-
 }
 
 /////////////////////////////////////////////////

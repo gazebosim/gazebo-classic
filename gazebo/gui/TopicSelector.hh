@@ -17,6 +17,8 @@
 #ifndef _TOPICSELECTOR_HH_
 #define _TOPICSELECTOR_HH_
 
+#include <string>
+
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
