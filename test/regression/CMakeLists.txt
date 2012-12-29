@@ -30,6 +30,7 @@ set (gtest_sources
   factory.cc
   file_handling.cc
   heightmap.cc
+  issue_236.cc
   laser.cc
   math.cc
   msgs.cc
