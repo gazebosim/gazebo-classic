@@ -47,6 +47,8 @@ using namespace physics;
 Entity::Entity(BasePtr _parent)
   : Base(_parent)
 {
+  this->worldPose = math::Pose(math::Vector3(0, 0, 0),
+                               math::Quaternion(0, 0, 0));
   this->isCanonicalLink = false;
   this->node = transport::NodePtr(new transport::Node());
   this->AddType(ENTITY);
