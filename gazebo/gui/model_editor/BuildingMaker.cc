@@ -15,6 +15,7 @@
  *
  */
 #include <sstream>
+#include <set>
 
 #include "msgs/msgs.hh"
 
@@ -98,7 +99,12 @@ void ModelManip::SetMaker(BuildingMaker *_maker)
 void ModelManip::OnSizeChanged(double _width, double _depth, double _height)
 {
   this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
+  double dScaleZ = this->visual->GetScale().z - this->size.z;
   this->visual->SetScale(this->size);
+  math::Vector3 originalPos = this->visual->GetPosition();
+  math::Vector3 newPos = originalPos
+      - math::Vector3(0, 0, dScaleZ/2.0);
+  this->visual->SetPosition(newPos);
 }
 
 /////////////////////////////////////////////////
@@ -660,6 +666,22 @@ void BuildingMaker::SaveToSDF(std::string _savePath)
 /////////////////////////////////////////////////
 void BuildingMaker::FinishModel()
 {
+  QRect host(0, 0, 10, 10);
+
+  QRect hole1(2,3,2,2);;
+
+  QRect hole2(5,2,2,2);
+
+  QRect hole3(4,6,3,4);
+
+  std::vector<QRect> holes;
+  holes.push_back(hole1);
+  holes.push_back(hole2);
+  holes.push_back(hole3);
+  std::vector<QRect> subs;
+
+  this->SubdivideRectSurface(host, holes, subs);
+
   this->CreateTheEntity();
   this->Stop();
 }
@@ -705,8 +727,95 @@ void BuildingMaker::GenerateSDF()
     newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
     newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
 
-//#ifdef HAVE_GTS
-#if 0
+    if (visual->GetChildCount() == 0)
+    {
+      visualElem->GetAttribute("name")->Set(modelManip->GetName() + "_Visual");
+      collisionElem->GetAttribute("name")->Set(modelManip->GetName()
+          + "_Collision");
+      visualElem->GetElement("pose")->Set(visual->GetPose());
+      collisionElem->GetElement("pose")->Set(visual->GetPose());
+      visualElem->GetElement("geometry")->GetElement("box")->
+          GetElement("size")->Set(visual->GetScale());
+      collisionElem->GetElement("geometry")->GetElement("box")->
+          GetElement("size")->Set(visual->GetScale());
+    }
+    else
+    {
+      // TODO: This handles the special case for stairs where
+      // there are nested visuals which SDF doesn't support.
+      // Should somehow generalize/combine the code above and below
+      newLinkElem->ClearElements();
+      for (unsigned int i = 0; i< visual->GetChildCount(); ++i)
+      {
+        visualNameStream.str("");
+        collisionNameStream.str("");
+        visualElem = templateVisualElem->Clone();
+        collisionElem = templateCollisionElem->Clone();
+        visualNameStream << modelManip->GetName() << "_Visual_" << i;
+        visualElem->GetAttribute("name")->Set(visualNameStream.str());
+        collisionNameStream << modelManip->GetName() << "_Collision_" << i;
+        collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
+        rendering::VisualPtr childVisual = visual->GetChild(i);
+        math::Pose newPose(childVisual->GetWorldPose().pos,
+            visual->GetRotation());
+        visualElem->GetElement("pose")->Set(newPose);
+        collisionElem->GetElement("pose")->Set(newPose);
+        visualElem->GetElement("geometry")->GetElement("box")->
+            GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
+        collisionElem->GetElement("geometry")->GetElement("box")->
+            GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
+
+        newLinkElem->InsertElement(visualElem);
+        newLinkElem->InsertElement(collisionElem);
+      }
+    }
+    modelElem->InsertElement(newLinkElem);
+  }
+//  qDebug() << this->modelSDF->ToString().c_str();
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::GenerateSDFWithCSG()
+{
+#ifdef HAVE_GTS
+  sdf::ElementPtr modelElem;
+  sdf::ElementPtr linkElem;
+  sdf::ElementPtr visualElem;
+  sdf::ElementPtr collisionElem;
+
+  this->modelSDF.reset(new sdf::SDF);
+  this->modelSDF->SetFromString(this->GetTemplateSDFString());
+
+  modelElem = this->modelSDF->root->GetElement("model");
+  linkElem = modelElem->GetElement("link");
+
+  sdf::ElementPtr templateLinkElem = linkElem->Clone();
+  sdf::ElementPtr templateVisualElem = templateLinkElem->GetElement(
+      "visual")->Clone();
+  sdf::ElementPtr templateCollisionElem = templateLinkElem->GetElement(
+      "collision")->Clone();
+  modelElem->ClearElements();
+  std::stringstream visualNameStream;
+  std::stringstream collisionNameStream;
+
+  modelElem->GetAttribute("name")->Set(this->modelName);
+
+  std::map<std::string, ModelManip *>::iterator itemsIt;
+  for(itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
+      itemsIt++)
+  {
+    visualNameStream.str("");
+    collisionNameStream.str("");
+
+    std::string name = itemsIt->first;
+    ModelManip *modelManip = itemsIt->second;
+    rendering::VisualPtr visual = modelManip->GetVisual();
+    sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
+    visualElem = newLinkElem->GetElement("visual");
+    collisionElem = newLinkElem->GetElement("collision");
+    newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
+    newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
+
     // create a hole to represent a window/door in the wall
     if (name.find("Window") != std::string::npos
         || name.find("Door") != std::string::npos)
@@ -796,6 +905,7 @@ void BuildingMaker::GenerateSDF()
       sdf::ElementPtr visGeomElem = visualElem->GetElement("geometry");
       visGeomElem->ClearElements();
       sdf::ElementPtr meshElem = visGeomElem->AddElement("mesh");
+      // TODO create the folder
       std::string uri = "model://" + this->modelName + "/meshes/"
           + booleanMeshName;
       meshElem->GetElement("uri")->Set(uri);
@@ -804,24 +914,9 @@ void BuildingMaker::GenerateSDF()
           GetElement("size")->Set(visual->GetScale());
       collisionElem->GetElement("pose")->Set(visual->GetPose());
     }
-#else
-    if (visual->GetChildCount() == 0)
+    else if (name.find("Stairs") != std::string::npos
+        && visual->GetChildCount() > 0)
     {
-      visualElem->GetAttribute("name")->Set(modelManip->GetName() + "_Visual");
-      collisionElem->GetAttribute("name")->Set(modelManip->GetName()
-          + "_Collision");
-      visualElem->GetElement("pose")->Set(visual->GetPose());
-      collisionElem->GetElement("pose")->Set(visual->GetPose());
-      visualElem->GetElement("geometry")->GetElement("box")->
-          GetElement("size")->Set(visual->GetScale());
-      collisionElem->GetElement("geometry")->GetElement("box")->
-          GetElement("size")->Set(visual->GetScale());
-    }
-    else
-    {
-      // TODO: This handles the special case for stairs where
-      // there are nested visuals which SDF doesn't support.
-      // Should somehow generalize/combine the code above and below
       newLinkElem->ClearElements();
       for (unsigned int i = 0; i< visual->GetChildCount(); ++i)
       {
@@ -847,10 +942,9 @@ void BuildingMaker::GenerateSDF()
         newLinkElem->InsertElement(collisionElem);
       }
     }
-#endif
     modelElem->InsertElement(newLinkElem);
   }
-//  qDebug() << this->modelSDF->ToString().c_str();
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -942,4 +1036,202 @@ std::string BuildingMaker::GetTemplateSDFString()
     << "</sdf>";
 
   return newModelStr.str();
+}
+
+
+/////////////////////////////////////////////////
+struct PointCompareY
+{
+  bool operator()(QPoint a, QPoint b) const
+  {
+    return a.y() < b.y();
+  }
+};
+
+struct RectCompareX
+{
+  bool operator()(QRect a, QRect b) const
+  {
+    return a.x() < b.x();
+  }
+};
+
+struct RectCompareY
+{
+  bool operator()(QRect a, QRect b) const
+  {
+    return a.y() < b.y();
+  }
+};
+
+
+/////////////////////////////////////////////////
+void BuildingMaker::SubdivideRectSurface(const QRect _surface,
+    const std::vector<QRect> _holes, std::vector<QRect> &_subdivisions)
+{
+  // use multiset for ordered elements
+  std::multiset<QRect, RectCompareX> filledX;
+  std::multiset<QRect, RectCompareY> filledY;
+  for (unsigned int i = 0; i < _holes.size(); ++i)
+  {
+    filledX.insert(_holes[i]);
+    filledY.insert(_holes[i]);
+  }
+
+  std::multiset<QPoint, PointCompareY> startings;
+
+  QPoint start(_surface.x(), _surface.y());
+  startings.insert(start);
+
+  std::multiset<QPoint>::iterator startIt;
+  std::multiset<QRect>::iterator filledIt;
+
+  // Surface subdivision algorithm:
+  // subdivisions are called blocks here
+  // 1. Start from top left corner
+  // 2. Walk along y from starting point and stop on first obstacle with
+  //    same x, this gives block height
+  // 3. Find the next obstacle in x dir, this gives block width
+  // 4. Remove starting point from the list
+  // 5. Find next starting points by walking along the block's
+  //    bottom and right edges
+  // 6. Insert new starting points and the new block
+  // 7. Repeat 2~6 until there are no more starting points.
+
+  while (!startings.empty())
+  {
+    startIt = startings.begin();
+    //  std::cout << " start xy " << (*startIt).x()
+    //      << " " << (*startIt).y() << std::endl;
+
+    // walk along y
+    int maxY = _surface.y() + _surface.height();
+    std::multiset<QRect>::iterator it = filledY.begin();
+    for (it; it!=filledY.end(); ++it)
+    {
+      if (((*startIt).x() >= (*it).x())
+          && ((*startIt).x() < ((*it).x() + (*it).width())))
+      {
+        if (((*it).y() < maxY) && ((*it).y() > (*startIt).y()))
+        {
+          maxY = (*it).y();
+        }
+      }
+    }
+
+    // find next obstacle in x dir
+    int maxX = _surface.x() + _surface.width();
+    it = filledX.begin();
+    for (it; it!=filledX.end(); ++it)
+    {
+      if ((maxY > (*it).y()) )
+      {
+        if (((*it).x() < maxX) && ((*it).x() > (*startIt).x()))
+        {
+          maxX = (*it).x();
+        }
+      }
+    }
+//    std::cout << " next xy " << maxX << " " << maxY << std::endl;
+
+    QRect block((*startIt).x(), (*startIt).y(),
+        maxX - (*startIt).x(), maxY - (*startIt).y());
+
+    // remove current starting point
+    startings.erase(startIt);
+
+    // find new starting points
+    // walk along bottom and right edges
+    // first start with bottom edge
+    QPoint tmpStart(block.x(), block.y() + block.height());
+    bool walkedEdge = false;
+    std::multiset<QRect>::iterator edgeIt = filledX.begin();
+
+    if (tmpStart.y() >= _surface.y() + _surface.height())
+      edgeIt = filledX.end();
+    for (edgeIt; edgeIt!=filledX.end(); ++edgeIt)
+    {
+      if ((*edgeIt).y() != (block.y() + block.height()))
+        continue;
+
+      if ((*edgeIt).x() == tmpStart.x())
+        walkedEdge = false;
+
+      if ((*edgeIt).x() > tmpStart.x())
+      {
+         startings.insert(tmpStart);
+      }
+      if (((*edgeIt).x() + (*edgeIt).width()) < (block.x() + block.width()))
+      {
+        if (((*edgeIt).x() + (*edgeIt).width()) > block.x())
+        {
+          tmpStart.setX((*edgeIt).x() + (*edgeIt).width());
+          walkedEdge = true;
+        }
+      }
+      else break;
+    }
+    if (walkedEdge && (tmpStart.x() < (block.x() + block.width())))
+    {
+      if ((tmpStart.x() < (_surface.x() + _surface.width()))
+          && (tmpStart.y() < (_surface.y() + _surface.height())))
+      {
+        startings.insert(tmpStart);
+      }
+    }
+
+    // then look at the right edge
+    tmpStart.setX(block.x() + block.width());
+    tmpStart.setY(block.y());
+    edgeIt = filledY.begin();
+    walkedEdge = false;
+
+    if (tmpStart.x() >= (_surface.x() + _surface.width()))
+      edgeIt = filledY.end();
+
+    for (edgeIt; edgeIt!=filledY.end(); ++edgeIt)
+    {
+      if ((*edgeIt).x() != (block.x() + block.width()))
+        continue;
+
+      if ((*edgeIt).y() == tmpStart.y())
+        walkedEdge = false;
+
+      if ((*edgeIt).y() > tmpStart.y())
+      {
+        startings.insert(tmpStart);
+        walkedEdge = false;
+      }
+      if ( ((*edgeIt).y() + (*edgeIt).height()) < (block.y() + block.height()))
+      {
+        if (((*edgeIt).y() + (*edgeIt).height()) > block.y())
+        {
+          tmpStart.setY((*edgeIt).y() + (*edgeIt).height());
+          walkedEdge = true;
+        }
+      }
+      else break;
+    }
+    if (walkedEdge && (tmpStart.y() <= (block.y() + block.height())) )
+    {
+      if ((tmpStart.x() < (_surface.x() + _surface.width()))
+          && (tmpStart.y() < (_surface.y() + _surface.height())))
+      {
+        startings.insert(tmpStart);
+      }
+     }
+
+    filledX.insert(block);
+    filledY.insert(block);
+    _subdivisions.push_back(block);
+
+//    std::cout << "================================================="<<std::endl;
+//    for (unsigned int i = 0; i < _subdivisions.size(); ++i)
+//    {
+//      std::cout << "subs " << i << " " << _subdivisions[i].x() << " "
+//          << _subdivisions[i].y() << " " << _subdivisions[i].width() << " "
+//          << _subdivisions[i].height() << std::endl;
+//    }
+  }
+
 }

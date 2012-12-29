@@ -190,9 +190,14 @@ namespace gazebo
 
       private: void GenerateSDF();
 
+      private: void GenerateSDFWithCSG();
+
       private: virtual void CreateTheEntity();
 
       private: std::string GetTemplateSDFString();
+
+      private: void SubdivideRectSurface(const QRect _surface,
+        const std::vector<QRect> _holes, std::vector<QRect> &_subdivisions);
 
       private: std::map<std::string, ModelManip *> allItems;
 
