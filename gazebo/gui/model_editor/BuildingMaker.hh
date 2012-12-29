@@ -196,8 +196,8 @@ namespace gazebo
 
       private: std::string GetTemplateSDFString();
 
-      private: void SubdivideRectSurface(const QRect _surface,
-        const std::vector<QRect> _holes, std::vector<QRect> &_subdivisions);
+      private: void SubdivideRectSurface(const QRectF _surface,
+        const std::vector<QRectF> _holes, std::vector<QRectF> &_subdivisions);
 
       private: std::map<std::string, ModelManip *> allItems;
 

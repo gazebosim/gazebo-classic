@@ -487,8 +487,8 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
   this->allItems[visualName.str()] = windowManip;
 
   // TODO remove me after testing
-//  std::map<std::string, ModelManip *>::iterator it = this->allItems.begin();
-//  (*it).second->AttachObject(windowManip);
+  std::map<std::string, ModelManip *>::iterator it = this->allItems.begin();
+  (*it).second->AttachObject(windowManip);
 
   return visualName.str();
 }
@@ -666,22 +666,6 @@ void BuildingMaker::SaveToSDF(std::string _savePath)
 /////////////////////////////////////////////////
 void BuildingMaker::FinishModel()
 {
-  QRect host(0, 0, 10, 10);
-
-  QRect hole1(2,3,2,2);;
-
-  QRect hole2(5,2,2,2);
-
-  QRect hole3(4,6,3,4);
-
-  std::vector<QRect> holes;
-  holes.push_back(hole1);
-  holes.push_back(hole2);
-  holes.push_back(hole3);
-  std::vector<QRect> subs;
-
-  this->SubdivideRectSurface(host, holes, subs);
-
   this->CreateTheEntity();
   this->Stop();
 }
@@ -729,6 +713,85 @@ void BuildingMaker::GenerateSDF()
 
     if (visual->GetChildCount() == 0)
     {
+
+#if 0
+      // subdivide wall surface to create holes for representing
+      // window/doors
+      if (name.find("Window") != std::string::npos
+          || name.find("Door") != std::string::npos)
+      {
+        if (modelManip->IsAttached())
+          continue;
+      }
+      else if (name.find("Wall") != std::string::npos
+          && modelManip->GetAttachedObjectCount() != 0)
+      {
+        std::vector<QRectF> holes;
+        rendering::VisualPtr wallVis = visual;
+        math::Pose wallPose = wallVis->GetWorldPose();
+        for (unsigned int i = 0; i < modelManip->GetAttachedObjectCount(); ++i)
+        {
+          ModelManip *attachedObj = modelManip->GetAttachedObject(i);
+          std::string objName = attachedObj->GetName();
+          if (objName.find("Window") != std::string::npos
+              || objName.find("Door") != std::string::npos)
+          {
+            rendering::VisualPtr attachedVis = attachedObj->GetVisual();
+            math::Pose offset = attachedVis->GetWorldPose() - wallPose;
+            math::Vector3 size = attachedVis->GetScale();
+            math::Vector3 newOffset = offset.pos - (-wallVis->GetScale()/2.0)
+                - size/2.0;
+            QRectF hole(newOffset.x, newOffset.z, size.x, size.z);
+            holes.push_back(hole);
+          }
+        }
+        std::vector<QRectF> subdivisions;
+        QRectF surface(0, 0, wallVis->GetScale().x, wallVis->GetScale().z);
+
+        //QRectF host(0, 0, 1.0, 1.0);
+        //QRectF hole1(0.2,0.3,0.2,0.2);;
+        //QRectF hole2(0.5,0.2,0.2,0.2);
+        //QRectF hole3(0.4,0.6,0.3,0.4);
+        //std::vector<QRectF> holess;
+        //holess.push_back(hole1);
+        //holess.push_back(hole2);
+        //holess.push_back(hole3);
+        //std::vector<QRectF> subs;
+        //this->SubdivideRectSurface(host, holess, subs);
+
+        this->SubdivideRectSurface(surface, holes, subdivisions);
+
+        newLinkElem->ClearElements();
+        for (unsigned int i = 0; i< subdivisions.size(); ++i)
+        {
+          visualNameStream.str("");
+          collisionNameStream.str("");
+          visualElem = templateVisualElem->Clone();
+          collisionElem = templateCollisionElem->Clone();
+          visualNameStream << modelManip->GetName() << "_Visual_" << i;
+          visualElem->GetAttribute("name")->Set(visualNameStream.str());
+          collisionNameStream << modelManip->GetName() << "_Collision_" << i;
+          collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
+
+
+          math::Vector3 newSubPos = wallPose.pos + (-wallVis->GetScale()/2.0)
+              + math::Vector3(subdivisions[i].x(), 0, subdivisions[i].y())
+              + math::Vector3(subdivisions[i].width()/2, 0,
+                  subdivisions[i].height()/2);
+          math::Pose newPose(newSubPos, wallPose.rot);
+        visualElem->GetElement("pose")->Set(newPose);
+        collisionElem->GetElement("pose")->Set(newPose);
+          math::Vector3 blockSize(subdivisions[i].width(),
+              wallVis->GetScale().y, subdivisions[i].height());
+          visualElem->GetElement("geometry")->GetElement("box")->
+            GetElement("size")->Set(blockSize);
+          collisionElem->GetElement("geometry")->GetElement("box")->
+            GetElement("size")->Set(blockSize);
+          newLinkElem->InsertElement(visualElem);
+          newLinkElem->InsertElement(collisionElem);
+        }
+      }
+#endif
       visualElem->GetAttribute("name")->Set(modelManip->GetName() + "_Visual");
       collisionElem->GetAttribute("name")->Set(modelManip->GetName()
           + "_Collision");
@@ -1042,7 +1105,7 @@ std::string BuildingMaker::GetTemplateSDFString()
 /////////////////////////////////////////////////
 struct PointCompareY
 {
-  bool operator()(QPoint a, QPoint b) const
+  bool operator()(QPointF a, QPointF b) const
   {
     return a.y() < b.y();
   }
@@ -1050,7 +1113,7 @@ struct PointCompareY
 
 struct RectCompareX
 {
-  bool operator()(QRect a, QRect b) const
+  bool operator()(QRectF a, QRectF b) const
   {
     return a.x() < b.x();
   }
@@ -1058,7 +1121,7 @@ struct RectCompareX
 
 struct RectCompareY
 {
-  bool operator()(QRect a, QRect b) const
+  bool operator()(QRectF a, QRectF b) const
   {
     return a.y() < b.y();
   }
@@ -1066,25 +1129,25 @@ struct RectCompareY
 
 
 /////////////////////////////////////////////////
-void BuildingMaker::SubdivideRectSurface(const QRect _surface,
-    const std::vector<QRect> _holes, std::vector<QRect> &_subdivisions)
+void BuildingMaker::SubdivideRectSurface(const QRectF _surface,
+    const std::vector<QRectF> _holes, std::vector<QRectF> &_subdivisions)
 {
   // use multiset for ordered elements
-  std::multiset<QRect, RectCompareX> filledX;
-  std::multiset<QRect, RectCompareY> filledY;
+  std::multiset<QRectF, RectCompareX> filledX;
+  std::multiset<QRectF, RectCompareY> filledY;
   for (unsigned int i = 0; i < _holes.size(); ++i)
   {
     filledX.insert(_holes[i]);
     filledY.insert(_holes[i]);
   }
 
-  std::multiset<QPoint, PointCompareY> startings;
+  std::multiset<QPointF, PointCompareY> startings;
 
-  QPoint start(_surface.x(), _surface.y());
+  QPointF start(_surface.x(), _surface.y());
   startings.insert(start);
 
-  std::multiset<QPoint>::iterator startIt;
-  std::multiset<QRect>::iterator filledIt;
+  std::multiset<QPointF>::iterator startIt;
+  std::multiset<QRectF>::iterator filledIt;
 
   // Surface subdivision algorithm:
   // subdivisions are called blocks here
@@ -1098,15 +1161,16 @@ void BuildingMaker::SubdivideRectSurface(const QRect _surface,
   // 6. Insert new starting points and the new block
   // 7. Repeat 2~6 until there are no more starting points.
 
+  double eps = 0.001;
   while (!startings.empty())
   {
     startIt = startings.begin();
-    //  std::cout << " start xy " << (*startIt).x()
-    //      << " " << (*startIt).y() << std::endl;
+      std::cout << " start xy " << (*startIt).x()
+          << " " << (*startIt).y() << std::endl;
 
     // walk along y
-    int maxY = _surface.y() + _surface.height();
-    std::multiset<QRect>::iterator it = filledY.begin();
+    double maxY = _surface.y() + _surface.height();
+    std::multiset<QRectF>::iterator it = filledY.begin();
     for (it; it!=filledY.end(); ++it)
     {
       if (((*startIt).x() >= (*it).x())
@@ -1120,7 +1184,7 @@ void BuildingMaker::SubdivideRectSurface(const QRect _surface,
     }
 
     // find next obstacle in x dir
-    int maxX = _surface.x() + _surface.width();
+    double maxX = _surface.x() + _surface.width();
     it = filledX.begin();
     for (it; it!=filledX.end(); ++it)
     {
@@ -1134,7 +1198,7 @@ void BuildingMaker::SubdivideRectSurface(const QRect _surface,
     }
 //    std::cout << " next xy " << maxX << " " << maxY << std::endl;
 
-    QRect block((*startIt).x(), (*startIt).y(),
+    QRectF block((*startIt).x(), (*startIt).y(),
         maxX - (*startIt).x(), maxY - (*startIt).y());
 
     // remove current starting point
@@ -1143,18 +1207,18 @@ void BuildingMaker::SubdivideRectSurface(const QRect _surface,
     // find new starting points
     // walk along bottom and right edges
     // first start with bottom edge
-    QPoint tmpStart(block.x(), block.y() + block.height());
+    QPointF tmpStart(block.x(), block.y() + block.height());
     bool walkedEdge = false;
-    std::multiset<QRect>::iterator edgeIt = filledX.begin();
+    std::multiset<QRectF>::iterator edgeIt = filledX.begin();
 
     if (tmpStart.y() >= _surface.y() + _surface.height())
       edgeIt = filledX.end();
     for (edgeIt; edgeIt!=filledX.end(); ++edgeIt)
     {
-      if ((*edgeIt).y() != (block.y() + block.height()))
+      if (fabs((*edgeIt).y() - (block.y() + block.height())) > eps)
         continue;
 
-      if ((*edgeIt).x() == tmpStart.x())
+      if (fabs((*edgeIt).x() - tmpStart.x()) < eps)
         walkedEdge = false;
 
       if ((*edgeIt).x() > tmpStart.x())
@@ -1191,10 +1255,10 @@ void BuildingMaker::SubdivideRectSurface(const QRect _surface,
 
     for (edgeIt; edgeIt!=filledY.end(); ++edgeIt)
     {
-      if ((*edgeIt).x() != (block.x() + block.width()))
+      if (fabs((*edgeIt).x() - (block.x() + block.width())) > eps)
         continue;
 
-      if ((*edgeIt).y() == tmpStart.y())
+      if (fabs((*edgeIt).y() - tmpStart.y()) < eps)
         walkedEdge = false;
 
       if ((*edgeIt).y() > tmpStart.y())
@@ -1225,13 +1289,12 @@ void BuildingMaker::SubdivideRectSurface(const QRect _surface,
     filledY.insert(block);
     _subdivisions.push_back(block);
 
-//    std::cout << "================================================="<<std::endl;
-//    for (unsigned int i = 0; i < _subdivisions.size(); ++i)
-//    {
-//      std::cout << "subs " << i << " " << _subdivisions[i].x() << " "
-//          << _subdivisions[i].y() << " " << _subdivisions[i].width() << " "
-//          << _subdivisions[i].height() << std::endl;
-//    }
+/*    std::cout << "================================================="<<std::endl;
+    for (unsigned int i = 0; i < _subdivisions.size(); ++i)
+    {
+      std::cout << "subs " << i << " " << _subdivisions[i].x() << " "
+          << _subdivisions[i].y() << " " << _subdivisions[i].width() << " "
+          << _subdivisions[i].height() << std::endl;
+    }*/
   }
-
 }
