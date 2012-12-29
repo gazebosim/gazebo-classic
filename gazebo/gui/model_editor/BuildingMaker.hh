@@ -36,96 +36,9 @@ namespace gazebo
   {
     class EntityMaker;
 
-    class BuildingMaker;
-
     class EditorItem;
 
-    class ModelManip : public QObject
-    {
-      Q_OBJECT
-      public: ModelManip();
-
-      public: ~ModelManip();
-
-      public: void SetName(std::string _name);
-
-      public: void SetVisual(rendering::VisualPtr _visual);
-
-      public: std::string GetName();
-
-      public: rendering::VisualPtr GetVisual();
-
-      public: void SetMaker(BuildingMaker *_maker);
-
-      public: void AttachObject(ModelManip *_object);
-
-      public: void DetachObject(ModelManip *_object);
-
-      public: void SetAttachedTo(ModelManip *_parent);
-
-      public: ModelManip *GetAttachedObject(unsigned int _index);
-
-      public: unsigned int GetAttachedObjectCount();
-
-      public: bool IsAttached();
-
-      public: math::Vector3 Convert(math::Vector3 _vector);
-
-      public: void SetPose(double _x, double _y, double _z,
-          double _roll, double _pitch, double _yaw);
-
-      public: void SetPosition(double _x, double _y, double _z);
-
-      public: void SetRotation(double _roll, double _pitch, double _yaw);
-
-      public: void SetSize(double _width, double _depth, double _height);
-
-      private slots: void OnSizeChanged(double _width, double _depth,
-          double _height);
-
-      private slots: void OnPoseChanged(double _x, double _y, double _z,
-          double _roll, double _pitch, double _yaw);
-
-      private slots: void OnPoseOriginTransformed(double _x, double _y,
-          double _z, double _roll, double _pitch, double _yaw);
-
-      private slots: void OnPositionChanged(double _x, double _y, double _z);
-
-      private slots: void OnRotationChanged(double _roll, double _pitch,
-          double _yaw);
-
-      private slots: void OnWidthChanged(double _width);
-
-      private slots: void OnHeightChanged(double _height);
-
-      private slots: void OnDepthChanged(double _depth);
-
-      private slots: void OnPosXChanged(double _posX);
-
-      private slots: void OnPosYChanged(double _posY);
-
-      private slots: void OnPosZChanged(double _posZ);
-
-      private slots: void OnYawChanged(double _yaw);
-
-      private slots: void OnItemDeleted();
-
-      private: std::string name;
-
-      private: rendering::VisualPtr visual;
-
-      private: math::Vector3 size;
-
-      private: math::Pose pose;
-
-      private: math::Pose originTransform;
-
-      private: BuildingMaker *maker;
-
-      private: std::vector<ModelManip *> attachedObjects;
-
-      private: ModelManip * parent;
-    };
+    class ModelManip;
 
     class BuildingMaker : public EntityMaker
     {
@@ -195,6 +108,12 @@ namespace gazebo
       private: virtual void CreateTheEntity();
 
       private: std::string GetTemplateSDFString();
+
+      private: static bool PointCompareY(const QPointF &_a, const QPointF &_b);
+
+      private: static bool RectCompareX(const QRectF &_a, const QRectF &_b);
+
+      private: static bool RectCompareY(const QRectF &_a, const QRectF &_b);
 
       private: void SubdivideRectSurface(const QRectF _surface,
         const std::vector<QRectF> _holes, std::vector<QRectF> &_subdivisions);

@@ -26,6 +26,7 @@ set (sources
   EditorItem.cc
   StairsItem.cc
   LevelWidget.cc
+  ModelManip.cc
 )
 
 set (qt_headers
@@ -35,13 +36,14 @@ set (qt_headers
   WallInspectorDialog.hh
   StairsInspectorDialog.hh
   LevelInspectorDialog.hh
-  BuildingMaker.hh
+  ModelManip.hh
   EditorItem.hh
   LevelWidget.hh
   EditorView.hh
 )
 
 set (headers
+  BuildingMaker.hh
   BuildingEditorWidget.hh
   EditorWidget.hh
   CornerGrabber.hh
