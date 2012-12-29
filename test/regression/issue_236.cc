@@ -28,7 +28,11 @@ class Issue236 : public ServerFixture
 
 TEST_F(Issue236, Hokuyo)
 {
-  Load("worlds/empty.world");
+  Load("worlds/empty.world", true);
+  SpawnModel("model://hokuyo");
+  SpawnBox("test_box", math::Vector3(1,1,1),
+                       math::Vector3(5,0,0.5),
+                       math::Vector3::Zero);
 }
 
 int main(int argc, char **argv)
