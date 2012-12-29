@@ -61,7 +61,7 @@ TEST_F(BulletTest, SpawnDropTest)
   int steps = 20;
   physics::ModelPtr model;
   math::Pose pose1, pose2;
-  // math::Vector3 vel1, vel2;
+  math::Vector3 vel1, vel2;
 
   for (std::list<std::string>::iterator iter = model_names.begin();
     iter != model_names.end(); ++iter)
@@ -72,15 +72,15 @@ TEST_F(BulletTest, SpawnDropTest)
 
     // Step forward and check downward velocity and decreasing position
     world->StepWorld(steps);
-    // vel1 = model->GetWorldLinearVel();
+    vel1 = model->GetWorldLinearVel();
     pose1 = model->GetWorldPose();
-    // EXPECT_LT(vel1.z, 0);
+    EXPECT_LT(vel1.z, 0);
     EXPECT_LT(pose1.pos.z, z0);
 
     world->StepWorld(steps);
-    // vel2 = model->GetWorldLinearVel();
+    vel2 = model->GetWorldLinearVel();
     pose2 = model->GetWorldPose();
-    // EXPECT_LT(vel2.z, vel1.z);
+    EXPECT_LT(vel2.z, vel1.z);
     EXPECT_LT(pose2.pos.z, pose1.pos.z);
   }
 }

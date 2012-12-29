@@ -68,7 +68,7 @@ void BulletLink::Init()
   btScalar btMass = this->inertial->GetMass();
   // the bullet dynamics solver checks for zero mass to identify static and
   // kinematic bodies
-  if (this->IsStatic() || this->IsKinematic())
+  if (this->IsStatic() || this->GetKinematic())
     btMass = 0;
   btVector3 fallInertia(0, 0, 0);
   math::Vector3 cogVec = this->inertial->GetCoG();
@@ -256,15 +256,12 @@ void BulletLink::SetLinearVel(const math::Vector3 & /*_vel*/)
 //////////////////////////////////////////////////
 math::Vector3 BulletLink::GetWorldLinearVel() const
 {
-  /*
   if (!this->rigidLink)
     return math::Vector3(0, 0, 0);
 
-  btmath::Vector3 btVec = this->rigidLink->getLinearVelocity();
+  btVector3 btVec = this->rigidLink->getLinearVelocity();
 
-  return math::Vector3(btVec.x(), btVec.y(), btVec.z());
-  */
-  return math::Vector3();
+  return math::Vector3(btVec.getX(), btVec.getY(), btVec.getZ());
 }
 
 //////////////////////////////////////////////////

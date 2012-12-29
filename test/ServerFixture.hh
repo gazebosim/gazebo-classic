@@ -129,6 +129,12 @@ class ServerFixture : public testing::Test
 
                this->factoryPub =
                  this->node->Advertise<msgs::Factory>("~/factory");
+
+               // Wait for the world to reach the correct pause state.
+               // This might not work properly with multiple worlds.
+               while (!physics::get_world() ||
+                       physics::get_world()->IsPaused() != _paused)
+                 common::Time::MSleep(10);
              }
 
   protected: void RunServer(const std::string &_worldFilename)
