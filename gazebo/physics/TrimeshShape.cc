@@ -52,23 +52,13 @@ void TrimeshShape::Init()
 
   this->mesh = NULL;
   common::MeshManager *meshManager = common::MeshManager::Instance();
-  if (this->sdf->GetValueString("filename") != "__default__")
-  {
-    filename = common::find_file(this->sdf->GetValueString("filename"));
 
-    gzerr << "<mesh><filename>" << filename << "</filename></mesh>"
-          << " is deprecated.\n";
-    gzerr << "Use <mesh><uri>file://" << filename << "</uri></mesh>\n";
-    this->sdf->GetElement("uri")->Set(std::string("file://") + filename);
-  }
-  else
+  filename = common::find_file(this->sdf->GetValueString("uri"));
+
+  if (filename == "__default__" || filename.empty())
   {
-    filename = common::find_file(this->sdf->GetValueString("uri"));
-    if (filename == "__default__" || filename.empty())
-    {
-      gzerr << "No mesh specified\n";
-      return;
-    }
+    gzerr << "No mesh specified\n";
+    return;
   }
 
   if ((this->mesh = meshManager->Load(filename)) == NULL)
@@ -120,11 +110,4 @@ void TrimeshShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetScale(msgs::Convert(_msg.mesh().scale()));
   this->SetFilename(_msg.mesh().filename());
-}
-
-//////////////////////////////////////////////////
-double TrimeshShape::GetMass(double _density) const
-{
-  gzerr << "Not implemented\n";
-  return _density;
 }

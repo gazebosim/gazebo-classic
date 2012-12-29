@@ -88,11 +88,6 @@ namespace gazebo
       public: unsigned int GetCollisionContactCount(
                   const std::string &_collisionName) const;
 
-      /// Deprecated. Use ContactSensor::GetContacts
-      public: physics::Contact GetCollisionContact(
-                  const std::string &_collisionName, unsigned int _index) const
-              GAZEBO_DEPRECATED;
-
 
       /// \brief Get all the contacts
       /// \return Message that contains all the contact information

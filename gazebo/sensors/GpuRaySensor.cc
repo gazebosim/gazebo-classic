@@ -263,33 +263,9 @@ bool GpuRaySensor::IsHorizontal() const
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetHAngle() const
-{
-  return this->horzHalfAngle;
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::GetVAngle() const
-{
-  return this->vertHalfAngle;
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::GetHFOV() const
-{
-  return this->hfov;
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::GetHorzFOV() const
 {
   return this->hfov;
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::GetCHFOV() const
-{
-  return this->GetCosHorzFOV();
 }
 
 //////////////////////////////////////////////////
@@ -299,21 +275,9 @@ double GpuRaySensor::GetCosHorzFOV() const
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetVFOV() const
-{
-  return this->GetVertFOV();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::GetVertFOV() const
 {
   return this->vfov;
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::GetCVFOV() const
-{
-  return this->GetCosVertFOV();
 }
 
 //////////////////////////////////////////////////
@@ -323,21 +287,9 @@ double GpuRaySensor::GetCosVertFOV() const
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::Get1stRatio() const
-{
-  return this->GetRayCountRatio();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::GetRayCountRatio() const
 {
   return this->rayCountRatio;
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::Get2ndRatio() const
-{
-  return this->GetRangeCountRatio();
 }
 
 //////////////////////////////////////////////////

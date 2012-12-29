@@ -36,6 +36,7 @@ namespace gazebo
     class Link;
     class Collision;
     class Joint;
+    class JointController;
     class Contact;
     class PhysicsEngine;
     class Mass;
@@ -86,6 +87,10 @@ namespace gazebo
     /// \def JointPtr
     /// \brief Boost shared pointer to a Joint object
     typedef boost::shared_ptr<Joint> JointPtr;
+
+    /// \def JointControllerPtr
+    /// \brief Boost shared pointer to a JointController object
+    typedef boost::shared_ptr<JointController> JointControllerPtr;
 
     /// \def  PhysicsEnginePtr
     /// \brief Boost shared pointer to a PhysicsEngine object
@@ -150,6 +155,10 @@ namespace gazebo
     /// \def Joint_V
     /// \brief Vector of JointPtr
     typedef std::vector<JointPtr> Joint_V;
+
+    /// \def JointController_V
+    /// \brief Vector of JointControllerPtr
+    typedef std::vector<JointControllerPtr> JointController_V;
 
     /// \def Link_V
     /// \brief Vector of LinkPtr
