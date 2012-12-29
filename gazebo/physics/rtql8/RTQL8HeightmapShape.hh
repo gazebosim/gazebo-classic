@@ -19,28 +19,28 @@
  * Date: 12 Nov 2009
  */
 
-#ifndef _ODEHEIGHTMAPSHAPE_HH_
-#define _ODEHEIGHTMAPSHAPE_HH_
+#ifndef _RTQL8HEIGHTMAPSHAPE_HH_
+#define _RTQL8HEIGHTMAPSHAPE_HH_
 
 #include <vector>
 
 #include "gazebo/physics/HeightmapShape.hh"
-#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/rtql8/RTQL8Physics.hh"
 #include "gazebo/physics/Collision.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \brief ODE Height map collision.
-    class ODEHeightmapShape : public HeightmapShape
+    /// \brief RTQL8 Height map collision.
+    class RTQL8HeightmapShape : public HeightmapShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Collision parent.
-      public: ODEHeightmapShape(CollisionPtr _parent);
+      public: RTQL8HeightmapShape(CollisionPtr _parent);
 
       /// \brief Destructor
-      public: virtual ~ODEHeightmapShape();
+      public: virtual ~RTQL8HeightmapShape();
 
       // Documentation inerited.
       public: virtual void Init();
@@ -49,10 +49,10 @@ namespace gazebo
       /// \param[in] _data Pointer to the heightmap data.
       /// \param[in] _x X location.
       /// \param[in] _y Y location.
-      private: static dReal GetHeightCallback(void *_data, int _x, int _y);
+      //private: static dReal GetHeightCallback(void *_data, int _x, int _y);
 
       /// \brief The heightmap data.
-      private: dHeightfieldDataID odeData;
+      //private: dHeightfieldDataID odeData;
     };
   }
 }

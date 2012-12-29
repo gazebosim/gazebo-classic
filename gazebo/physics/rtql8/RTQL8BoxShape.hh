@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _ODEBOXSHAPE_HH_
-#define _ODEBOXSHAPE_HH_
+#ifndef _RTQL8BOXSHAPE_HH_
+#define _RTQL8BOXSHAPE_HH_
 
 #include "math/Vector3.hh"
 
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODETypes.hh"
-#include "physics/ode/ODECollision.hh"
+#include "physics/rtql8/RTQL8Physics.hh"
+#include "physics/rtql8/RTQL8Types.hh"
+#include "physics/rtql8/RTQL8Collision.hh"
 
 #include "physics/PhysicsTypes.hh"
 #include "physics/BoxShape.hh"
@@ -30,31 +30,31 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \brief ODE Box shape
-    class ODEBoxShape : public BoxShape
+    /// \brief RTQL8 Box shape
+    class RTQL8BoxShape : public BoxShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit ODEBoxShape(ODECollisionPtr _parent)
+      public: explicit RTQL8BoxShape(RTQL8CollisionPtr _parent)
               : BoxShape(_parent) {}
 
       /// \brief Destructor.
-      public: virtual ~ODEBoxShape() {}
+      public: virtual ~RTQL8BoxShape() {}
 
       // Documentation inherited.
       public: virtual void SetSize(const math::Vector3 &_size)
       {
-        BoxShape::SetSize(_size);
-
-        ODECollisionPtr oParent;
-        oParent = boost::shared_dynamic_cast<ODECollision>(
-            this->collisionParent);
-
-        if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreateBox(0, _size.x, _size.y, _size.z), true);
-        else
-          dGeomBoxSetLengths(oParent->GetCollisionId(),
-                             _size.x, _size.y, _size.z);
+//         BoxShape::SetSize(_size);
+// 
+//         RTQL8CollisionPtr oParent;
+//         oParent = boost::shared_dynamic_cast<RTQL8Collision>(
+//             this->collisionParent);
+// 
+//         if (oParent->GetCollisionId() == NULL)
+//           oParent->SetCollision(dCreateBox(0, _size.x, _size.y, _size.z), true);
+//         else
+//           dGeomBoxSetLengths(oParent->GetCollisionId(),
+//                              _size.x, _size.y, _size.z);
       }
     };
   }
