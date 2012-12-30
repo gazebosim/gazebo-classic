@@ -19,8 +19,8 @@
  * Date: 16 Oct 2009
  */
 
-#ifndef _ODETRIMESHSHAPE_HH_
-#define _ODETRIMESHSHAPE_HH_
+#ifndef _RTQL8TRIMESHSHAPE_HH_
+#define _RTQL8TRIMESHSHAPE_HH_
 
 #include "gazebo/physics/TrimeshShape.hh"
 
@@ -29,14 +29,14 @@ namespace gazebo
   namespace physics
   {
     /// \brief Triangle mesh collision.
-    class ODETrimeshShape : public TrimeshShape
+    class RTQL8TrimeshShape : public TrimeshShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.
-      public: explicit ODETrimeshShape(CollisionPtr _parent);
+      public: explicit RTQL8TrimeshShape(CollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~ODETrimeshShape();
+      public: virtual ~RTQL8TrimeshShape();
 
       // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
@@ -48,7 +48,7 @@ namespace gazebo
       public: virtual void Update();
 
       /// \brief Transform matrix.
-      private: dReal transform[16*2];
+      //private: dReal transform[16*2];
 
       /// \brief Transform matrix index.
       private: int transformIndex;
@@ -59,8 +59,8 @@ namespace gazebo
       /// \brief Array of index values.
       private: int *indices;
 
-      /// \brief ODE trimesh data.
-      private: dTriMeshDataID odeData;
+      /// \brief RTQL8 trimesh data.
+      //private: dTriMeshDataID odeData;
     };
   }
 }

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ODEMULTIRAYSHAPE_HH_
-#define _ODEMULTIRAYSHAPE_HH_
+#ifndef _RTQL8MULTIRAYSHAPE_HH_
+#define _RTQL8MULTIRAYSHAPE_HH_
 
 #include "gazebo/physics/MultiRayShape.hh"
 
@@ -23,15 +23,15 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \brief ODE specific version of MultiRayShape
-    class ODEMultiRayShape : public MultiRayShape
+    /// \brief RTQL8 specific version of MultiRayShape
+    class RTQL8MultiRayShape : public MultiRayShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit ODEMultiRayShape(CollisionPtr _parent);
+      public: explicit RTQL8MultiRayShape(CollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~ODEMultiRayShape();
+      public: virtual ~RTQL8MultiRayShape();
 
       // Documentation inherited.
       public: virtual void UpdateRays();
@@ -40,20 +40,20 @@ namespace gazebo
       /// \param[in] _data Pointer to user data.
       /// \param[in] _o1 First geom to check for collisions.
       /// \param[in] _o2 Second geom to check for collisions.
-      private: static void UpdateCallback(void *_data, dGeomID _o1,
-                                          dGeomID _o2);
+//       private: static void UpdateCallback(void *_data, dGeomID _o1,
+//                                           dGeomID _o2);
 
       /// \brief Add a ray to the collision.
       /// \param[in] _start Start of a ray.
       /// \param[in] _end End of a ray.
-      protected: void AddRay(const math::Vector3 &_start,
-                             const math::Vector3 &_end);
+//       protected: void AddRay(const math::Vector3 &_start,
+//                              const math::Vector3 &_end);
 
       /// \brief Space to contain the ray space, for efficiency.
-      private: dSpaceID superSpaceId;
+      //private: dSpaceID superSpaceId;
 
       /// \brief Ray space for collision detector.
-      private: dSpaceID raySpaceId;
+      //private: dSpaceID raySpaceId;
     };
   }
 }

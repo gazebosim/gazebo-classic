@@ -14,39 +14,39 @@
  * limitations under the License.
  *
 */
-#ifndef _ODECYLINDERSHAPE_HH_
-#define _ODECYLINDERSHAPE_HH_
+#ifndef _RTQL8CYLINDERSHAPE_HH_
+#define _RTQL8CYLINDERSHAPE_HH_
 
 #include "gazebo/physics/CylinderShape.hh"
-#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/rtql8/RTQL8Physics.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \brief ODE cylinder shape
-    class ODECylinderShape : public CylinderShape
+    /// \brief RTQL8 cylinder shape
+    class RTQL8CylinderShape : public CylinderShape
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent.
-      public: explicit ODECylinderShape(CollisionPtr _parent)
+      public: explicit RTQL8CylinderShape(CollisionPtr _parent)
               : CylinderShape(_parent) {}
 
       /// \brief Destructor.
-      public: virtual ~ODECylinderShape() {}
+      public: virtual ~RTQL8CylinderShape() {}
 
       // Documentation inerited.
       public: void SetSize(double _radius, double _length)
       {
-        CylinderShape::SetSize(_radius, _length);
-        ODECollisionPtr oParent;
-        oParent =
-          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
-
-        if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreateCylinder(0, _radius, _length), true);
-        else
-          dGeomCylinderSetParams(oParent->GetCollisionId(), _radius, _length);
+//         CylinderShape::SetSize(_radius, _length);
+//         RTQL8CollisionPtr oParent;
+//         oParent =
+//           boost::shared_dynamic_cast<RTQL8Collision>(this->collisionParent);
+// 
+//         if (oParent->GetCollisionId() == NULL)
+//           oParent->SetCollision(dCreateCylinder(0, _radius, _length), true);
+//         else
+//           dGeomCylinderSetParams(oParent->GetCollisionId(), _radius, _length);
       }
     };
   }

@@ -17,10 +17,10 @@ set (sources
              RTQL8Hinge2Joint.cc
              RTQL8UniversalJoint.cc
              RTQL8BallJoint.cc
-#             ODETrimeshShape.cc
-#             ODERayShape.cc
-#             ODEMultiRayShape.cc
-#             ODEHeightmapShape.cc
+             RTQL8TrimeshShape.cc
+             RTQL8RayShape.cc
+             RTQL8MultiRayShape.cc
+             RTQL8HeightmapShape.cc
              RTQL8ScrewJoint.cc
              RTQL8Model.cc
 )
@@ -35,14 +35,14 @@ SET (headers
              RTQL8Hinge2Joint.hh
              RTQL8UniversalJoint.hh
              RTQL8BallJoint.hh
-#             ODETrimeshShape.hh
-#             ODERayShape.hh
-#             ODEMultiRayShape.hh
-#             ODEHeightmapShape.hh
-#             ODESphereShape.hh
-#             ODEBoxShape.hh
-#             ODEPlaneShape.hh
-#             ODECylinderShape.hh
+             RTQL8TrimeshShape.hh
+             RTQL8RayShape.hh
+             RTQL8MultiRayShape.hh
+             RTQL8HeightmapShape.hh
+             RTQL8SphereShape.hh
+             RTQL8BoxShape.hh
+             RTQL8PlaneShape.hh
+             RTQL8CylinderShape.hh
              RTQL8Types.hh
              RTQL8ScrewJoint.hh
              RTQL8Model.hh

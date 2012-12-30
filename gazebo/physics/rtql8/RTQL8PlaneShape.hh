@@ -14,63 +14,63 @@
  * limitations under the License.
  *
 */
-#ifndef _ODEPLANESHAPE_HH_
-#define _ODEPLANESHAPE_HH_
+#ifndef _RTQL8PLANESHAPE_HH_
+#define _RTQL8PLANESHAPE_HH_
 
 #include "gazebo/physics/PlaneShape.hh"
-#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/rtql8/RTQL8Physics.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \brief An ODE Plane shape.
-    class ODEPlaneShape : public PlaneShape
+    /// \brief An RTQL8 Plane shape.
+    class RTQL8PlaneShape : public PlaneShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit ODEPlaneShape(CollisionPtr _parent)
+      public: explicit RTQL8PlaneShape(CollisionPtr _parent)
               : PlaneShape(_parent) {}
 
       /// \brief Destructor.
-      public: virtual ~ODEPlaneShape() {}
+      public: virtual ~RTQL8PlaneShape() {}
 
       // Documentation inherited
       public: virtual void CreatePlane()
       {
-        PlaneShape::CreatePlane();
-        ODECollisionPtr oParent;
-        oParent =
-          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
-
-        double altitude = 0;
-
-        math::Vector3 n = this->GetNormal();
-        if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),
-                n.x, n.y, n.z, altitude), false);
-        else
-          dGeomPlaneSetParams(oParent->GetCollisionId(),
-                              n.x, n.y, n.z, altitude);
+//         PlaneShape::CreatePlane();
+//         RTQL8CollisionPtr oParent;
+//         oParent =
+//           boost::shared_dynamic_cast<RTQL8Collision>(this->collisionParent);
+// 
+//         double altitude = 0;
+// 
+//         math::Vector3 n = this->GetNormal();
+//         if (oParent->GetCollisionId() == NULL)
+//           oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),
+//                 n.x, n.y, n.z, altitude), false);
+//         else
+//           dGeomPlaneSetParams(oParent->GetCollisionId(),
+//                               n.x, n.y, n.z, altitude);
       }
 
       // Documentation inherited
       public: virtual void SetAltitude(const math::Vector3 &_pos)
       {
-        PlaneShape::SetAltitude(_pos);
-        ODECollisionPtr odeParent;
-        odeParent =
-          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
-
-        dVector4 vec4;
-
-        dGeomPlaneGetParams(odeParent->GetCollisionId(), vec4);
-
-        // Compute "altitude": scalar product of position and normal
-        vec4[3] = vec4[0] * _pos.x + vec4[1] * _pos.y + vec4[2] * _pos.z;
-
-        dGeomPlaneSetParams(odeParent->GetCollisionId(), vec4[0], vec4[1],
-                            vec4[2], vec4[3]);
+//         PlaneShape::SetAltitude(_pos);
+//         RTQL8CollisionPtr odeParent;
+//         odeParent =
+//           boost::shared_dynamic_cast<RTQL8Collision>(this->collisionParent);
+// 
+//         dVector4 vec4;
+// 
+//         dGeomPlaneGetParams(odeParent->GetCollisionId(), vec4);
+// 
+//         // Compute "altitude": scalar product of position and normal
+//         vec4[3] = vec4[0] * _pos.x + vec4[1] * _pos.y + vec4[2] * _pos.z;
+// 
+//         dGeomPlaneSetParams(odeParent->GetCollisionId(), vec4[0], vec4[1],
+//                             vec4[2], vec4[3]);
       }
     };
   }
