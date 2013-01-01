@@ -86,6 +86,9 @@ namespace gazebo
       public: virtual void SetAttribute(const std::string &_key, int _index,
                                         const boost::any &_value);
 
+      /// \brief
+      protected: kinematics::Joint* rtql8Joint;
+
     };
   }
 }

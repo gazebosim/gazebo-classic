@@ -23,19 +23,18 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "physics/rtql8/rtql8_inc.h"
-
 #include "physics/PhysicsEngine.hh"
 #include "physics/Collision.hh"
 #include "physics/Shape.hh"
+
+#include "physics/rtql8/rtql8_inc.h"
+#include "physics/rtql8/RTQL8Types.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    class Entity;
-    class XMLConfigNode;
-    class Mass;
+    //class Entity;
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_rtql8 RTQL8 Physics
@@ -101,9 +100,6 @@ namespace gazebo
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const;
 
-      ///// \brief 
-      //private: common::Time lastUpdateTime;
- 
       /// \brief Store the value of the stepTime parameter to improve efficiency
       private: double stepTimeDouble;
       

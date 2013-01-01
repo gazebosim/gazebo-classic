@@ -27,6 +27,8 @@
 #include "gazebo/physics/RayShape.hh"
 #include "gazebo/physics/Shape.hh"
 
+#include "gazebo/physics/rtql8/RTQL8Types.hh"
+
 namespace gazebo
 {
   namespace physics

@@ -15,18 +15,16 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 RTQL8Link::RTQL8Link(EntityPtr _parent)
-    : Link(_parent)
+  : Link(_parent), rtql8BodyNode(NULL)
 {
-  //TODO:
-  //this->rigidLink = NULL;
-  //this->compoundShape = new btCompoundShape();
-  //this->motionState = new BulletMotionState(this);
+
 }
 
 //////////////////////////////////////////////////
 RTQL8Link::~RTQL8Link()
 {
-  //TODO:
+  if (rtql8BodyNode)
+    delete rtql8BodyNode;
 }
 
 void RTQL8Link::Load(sdf::ElementPtr _sdf)
@@ -38,21 +36,23 @@ void RTQL8Link::Load(sdf::ElementPtr _sdf)
     gzthrow("Not using the rtql8 physics engine");
 
   Link::Load(_sdf);
+
+  // TODO:
+  this->rtql8BodyNode = new kinematics::BodyNode();
 }
 
 //////////////////////////////////////////////////
 void RTQL8Link::Init()
 {
   Link::Init();
-  
-  this->rtql8BodyNode = new kinematics::BodyNode();
+
+  // TODO:
 }
 
 //////////////////////////////////////////////////
 void RTQL8Link::Fini()
 {
-  delete rtql8BodyNode;
-  
+
   Link::Fini();
 }
 
@@ -62,287 +62,366 @@ void RTQL8Link::Update()
   Link::Update();
 }
 
-// //////////////////////////////////////////////////
-// void BulletLink::SetGravityMode(bool _mode)
-// {
-//   if (!this->rigidLink)
+//////////////////////////////////////////////////
+void RTQL8Link::OnPoseChange()
+{
+  Link::OnPoseChange();
+
+//   if (!this->linkId)
 //     return;
 // 
-//   if (_mode == false)
-//     this->rigidLink->setGravity(btVector3(0, 0, 0));
-//     // this->rigidLink->setMassProps(btScalar(0), btmath::Vector3(0, 0, 0));
-//   else
-//   {
-//     math::Vector3 g = this->bulletPhysics->GetGravity();
-//     this->rigidLink->setGravity(btVector3(g.x, g.y, g.z));
-//     /*btScalar btMass = this->mass.GetAsDouble();
-//     btmath::Vector3 fallInertia(0, 0, 0);
+//   this->SetEnabled(true);
 // 
-//     this->compoundShape->calculateLocalInertia(btMass, fallInertia);
-//     this->rigidLink->setMassProps(btMass, fallInertia);
-//     */
-//   }
-// }
+//   const math::Pose myPose = this->GetWorldPose();
 // 
-// //////////////////////////////////////////////////
-// bool BulletLink::GetGravityMode()
-// {
-//   bool result = false;
-//   if (this->rigidLink)
-//   {
-//     btVector3 g = this->rigidLink->getGravity();
-//     result = !math::equal(static_cast<double>(g.length()), 0.0);
-//   }
+//   math::Vector3 cog = myPose.rot.RotateVector(this->inertial->GetCoG());
 // 
-//   return result;
-// }
+//   // adding cog location for ode pose
+//   dBodySetPosition(this->linkId,
+//       myPose.pos.x + cog.x,
+//       myPose.pos.y + cog.y,
+//       myPose.pos.z + cog.z);
 // 
-// //////////////////////////////////////////////////
-// void BulletLink::SetSelfCollide(bool /*_collide*/)
-// {
-// }
+//   dQuaternion q;
+//   q[0] = myPose.rot.w;
+//   q[1] = myPose.rot.x;
+//   q[2] = myPose.rot.y;
+//   q[3] = myPose.rot.z;
 // 
-// //////////////////////////////////////////////////
-// /*void BulletLink::AttachCollision(Collision *_collision)
-// {
-//   Link::AttachCollision(_collision);
-// 
-//   BulletCollision *bcollision = dynamic_cast<BulletCollision*>(_collision);
-// 
-//   if (_collision == NULL)
-//     gzthrow("requires BulletCollision");
-// 
-//   btTransform trans;
-//   math::Pose relativePose = _collision->GetRelativePose();
-//   trans = BulletPhysics::ConvertPose(relativePose);
-// 
-//   bcollision->SetCompoundShapeIndex(this->compoundShape->getNumChildShapes());
-//   this->compoundShape->addChildShape(trans, bcollision->GetCollisionShape());
-// }
-//   */
-// 
-// //////////////////////////////////////////////////
-// /// changed
-// void BulletLink::OnPoseChange()
-// {
-//   /*
-//   math::Pose pose = this->GetWorldPose();
-// 
-//   this->motionState->SetWorldPose(pose);
-//   if (this->rigidLink)
-//     this->rigidLink->setMotionState(this->motionState);
-//     */
-// }
-// 
-// //////////////////////////////////////////////////
-// void BulletLink::SetEnabled(bool /*_enable*/) const
-// {
-//   /*
-//   if (!this->rigidLink)
+//   // Set the rotation of the ODE link
+//   dBodySetQuaternion(this->linkId, q);
+}
+
+//////////////////////////////////////////////////
+void RTQL8Link::SetEnabled(bool _enable) const
+{
+//   if (!this->linkId)
 //     return;
-// 
+
 //   if (_enable)
-//     this->rigidLink->activate(true);
+//     dBodyEnable(this->linkId);
 //   else
-//     this->rigidLink->setActivationState(WANTS_DEACTIVATION);
-//     */
-// }
-// 
-// /////////////////////////////////////////////////////////////////////
-// /*
-//   What's going on here?  In ODE the CoM of a body corresponds to the
-//   origin of the body-fixed coordinate system.  In Gazebo, however, we
-//   want to have arbitrary body coordinate systems (i.e., CoM may be
-//   displaced from the body-fixed cs).  To get around this limitation in
-//   Bullet, we have an extra fudge-factor (comPose), describing the pose of
-//   the CoM relative to Gazebo's body-fixed cs.  When using low-level
-//   Bullet functions, one must use apply this factor appropriately.
-// 
-//   The UpdateCoM() function is used to compute this offset, based on
-//   the mass distribution of attached collisions.  This function also shifts
-//   the Bullet-pose of the collisions, to keep everything in the same place in
-//   the Gazebo cs.  Simple, neh?
-// */
-// void BulletLink::UpdateCoM()
-// {
-//   // Link::UpdateCoM();
-// }
-// 
-// //////////////////////////////////////////////////
-// void BulletLink::SetLinearVel(const math::Vector3 & /*_vel*/)
-// {
-//   /*
-//   if (!this->rigidLink)
+//     dBodyDisable(this->linkId);
+}
+
+/////////////////////////////////////////////////////////////////////
+bool RTQL8Link::GetEnabled() const
+{
+  bool result = true;
+
+//   if (this->linkId)
+//     result = dBodyIsEnabled(this->linkId);
+
+  return result;
+}
+
+/////////////////////////////////////////////////////////////////////
+void RTQL8Link::UpdateMass()
+{
+//   if (!this->linkId)
 //     return;
 // 
-//   this->rigidLink->setLinearVelocity(btmath::Vector3(_vel.x, _vel.y, _vel.z));
-//   */
-// }
+//   dMass odeMass;
+//   dMassSetZero(&odeMass);
 // 
-// //////////////////////////////////////////////////
-// math::Vector3 BulletLink::GetWorldLinearVel() const
-// {
-//   /*
-//   if (!this->rigidLink)
-//     return math::Vector3(0, 0, 0);
+//   // The CoG must always be (0, 0, 0)
+//   math::Vector3 cog(0, 0, 0);
 // 
-//   btmath::Vector3 btVec = this->rigidLink->getLinearVelocity();
+//   math::Vector3 principals = this->inertial->GetPrincipalMoments();
+//   math::Vector3 products = this->inertial->GetProductsofInertia();
 // 
-//   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
-//   */
-//   return math::Vector3();
-// }
+//   dMassSetParameters(&odeMass, this->inertial->GetMass(),
+//       cog.x, cog.y, cog.z,
+//       principals.x, principals.y, principals.z,
+//       products.x, products.y, products.z);
 // 
-// //////////////////////////////////////////////////
-// void BulletLink::SetAngularVel(const math::Vector3 &_vel)
-// {
-//   if (!this->rigidLink)
-//     return;
-// 
-//   this->rigidLink->setAngularVelocity(btVector3(_vel.x, _vel.y, _vel.z));
-// }
-// 
-// //////////////////////////////////////////////////
-// math::Vector3 BulletLink::GetWorldAngularVel() const
-// {
-//   if (!this->rigidLink)
-//     return math::Vector3(0, 0, 0);
-// 
-//   btVector3 btVec = this->rigidLink->getAngularVelocity();
-// 
-//   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
-// }
-// 
-// //////////////////////////////////////////////////
-// void BulletLink::SetForce(const math::Vector3 &/*_force*/)
-// {
-//   /*
-//   if (!this->rigidLink)
-//     return;
-// 
-//   this->rigidLink->applyCentralForce(
-//       btmath::Vector3(_force.x, _force.y, _force.z));
-//       */
-// }
-// 
-// //////////////////////////////////////////////////
-// math::Vector3 BulletLink::GetWorldForce() const
-// {
-//   /*
-//   if (!this->rigidLink)
-//     return math::Vector3(0, 0, 0);
-// 
-//   btmath::Vector3 btVec;
-// 
-//   btVec = this->rigidLink->getTotalForce();
-// 
-//   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
-//   */
-//   return math::Vector3();
-// }
-// 
-// //////////////////////////////////////////////////
-// void BulletLink::SetTorque(const math::Vector3 &_torque)
-// {
-//   if (!this->rigidLink)
-//     return;
-// 
-//   this->rigidLink->applyTorque(btVector3(_torque.x, _torque.y, _torque.z));
-// }
-// 
-// //////////////////////////////////////////////////
-// math::Vector3 BulletLink::GetWorldTorque() const
-// {
-//   /*
-//   if (!this->rigidLink)
-//     return math::Vector3(0, 0, 0);
-// 
-//   btmath::Vector3 btVec;
-// 
-//   btVec = this->rigidLink->getTotalTorque();
-// 
-//   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
-//   */
-//   return math::Vector3();
-// }
-// 
-// //////////////////////////////////////////////////
-// btRigidBody *BulletLink::GetBulletLink() const
-// {
-//   return this->rigidLink;
-// }
-// 
-// //////////////////////////////////////////////////
-// void BulletLink::SetLinearDamping(double _damping)
-// {
-//   if (this->rigidLink)
-//     this->rigidLink->setDamping((btScalar)_damping,
-//         (btScalar)this->rigidLink->getAngularDamping());
-// }
-// 
-// //////////////////////////////////////////////////
-// void BulletLink::SetAngularDamping(double _damping)
-// {
-//   if (this->rigidLink)
-//     this->rigidLink->setDamping(
-//         (btScalar)this->rigidLink->getLinearDamping(), (btScalar)_damping);
-// }
-// 
-// //////////////////////////////////////////////////
-// /*void BulletLink::SetCollisionRelativePose(BulletCollision *_collision,
-//     const math::Pose &_newPose)
-// {
-//   std::map<std::string, Collision*>::iterator iter;
-//   unsigned int i;
-// 
-//   for (iter = this->collisions.begin(), i = 0; iter != this->collisions.end();
-//        ++iter, ++i)
+//   if (this->inertial->GetMass() > 0)
+//     dBodySetMass(this->linkId, &odeMass);
+//   else
+//     gzthrow("Setting custom link " + this->GetName() + "mass to zero!");
+}
+
+/////////////////////////////////////////////////////////////////////
+void RTQL8Link::UpdateSurface()
+{
+//   Base_V::iterator iter;
+//   Base_V::iterator iter_end = this->children.end();
+//   for (iter = this->children.begin(); iter != iter_end; ++iter)
 //   {
-//     if (iter->second == _collision)
-//       break;
+//     if ((*iter)->HasType(Base::COLLISION))
+//     {
+//       ODECollisionPtr g = boost::shared_static_cast<ODECollision>(*iter);
+//       if (g->IsPlaceable() && g->GetCollisionId())
+//       {
+//         // Set surface properties max_vel and min_depth
+//         dBodySetMaxVel(this->linkId, g->GetSurface()->maxVel);
+//         dBodySetMinDepth(this->linkId, g->GetSurface()->minDepth);
+//       }
+//     }
 //   }
-// 
-//   if (i < this->collisions.size())
+}
+
+//////////////////////////////////////////////////
+void RTQL8Link::SetLinearVel(const math::Vector3 &_vel)
+{
+//   if (this->linkId)
 //   {
-//     // Set the pose of the _collision in Bullet
-//     this->compoundShape->updateChildTransform(i,
-//         BulletPhysics::ConvertPose(_newPose));
+//     dBodySetLinearVel(this->linkId, _vel.x, _vel.y, _vel.z);
 //   }
-// }*/
+}
+
+//////////////////////////////////////////////////
+void RTQL8Link::SetAngularVel(const math::Vector3 &_vel)
+{
+//   if (this->linkId)
+//   {
+//     dBodySetAngularVel(this->linkId, _vel.x, _vel.y, _vel.z);
+//   }
+}
+
+//////////////////////////////////////////////////
+void RTQL8Link::SetForce(const math::Vector3 &_force)
+{
+//   if (this->linkId)
+//   {
+//     this->SetEnabled(true);
+//     dBodySetForce(this->linkId, _force.x, _force.y, _force.z);
+//   }
+}
+
+//////////////////////////////////////////////////
+void RTQL8Link::SetTorque(const math::Vector3 &_torque)
+{
+//   if (this->linkId)
+//   {
+//     this->SetEnabled(true);
+//     dBodySetTorque(this->linkId, _torque.x, _torque.y, _torque.z);
+//   }
+}
+
+//////////////////////////////////////////////////
+void RTQL8Link::AddForce(const math::Vector3 &_force)
+{
+//   if (this->linkId)
+//   {
+//     this->SetEnabled(true);
+//     dBodyAddForce(this->linkId, _force.x, _force.y, _force.z);
+//   }
+}
+
+/////////////////////////////////////////////////
+void RTQL8Link::AddRelativeForce(const math::Vector3 &_force)
+{
+//   if (this->linkId)
+//   {
+//     this->SetEnabled(true);
+//     dBodyAddRelForce(this->linkId, _force.x, _force.y, _force.z);
+//   }
+}
+
+/////////////////////////////////////////////////
+void RTQL8Link::AddForceAtWorldPosition(const math::Vector3 &_force,
+                                      const math::Vector3 &_pos)
+{
+//   if (this->linkId)
+//   {
+//     this->SetEnabled(true);
+//     dBodyAddForceAtPos(this->linkId, _force.x, _force.y, _force.z,
+//                           _pos.x, _pos.y, _pos.z);
+//   }
+}
+/////////////////////////////////////////////////
+void RTQL8Link::AddForceAtRelativePosition(const math::Vector3 &_force,
+                               const math::Vector3 &_relpos)
+{
+//   if (this->linkId)
+//   {
+//     this->SetEnabled(true);
+//     dBodyAddForceAtRelPos(this->linkId, _force.x, _force.y, _force.z,
+//                           _relpos.x, _relpos.y, _relpos.z);
+//   }
+}
+
+/////////////////////////////////////////////////
+void RTQL8Link::AddTorque(const math::Vector3 &_torque)
+{
+//   if (this->linkId)
+//   {
+//     this->SetEnabled(true);
+//     dBodyAddTorque(this->linkId, _torque.x, _torque.y, _torque.z);
+//   }
+}
+
+/////////////////////////////////////////////////
+void RTQL8Link::AddRelativeTorque(const math::Vector3 &_torque)
+{
+//   if (this->linkId)
+//   {
+//     this->SetEnabled(true);
+//     dBodyAddRelTorque(this->linkId, _torque.x, _torque.y, _torque.z);
+//   }
+}
+
+//////////////////////////////////////////////////
+math::Vector3 RTQL8Link::GetWorldLinearVel() const
+{
+  math::Vector3 vel;
+
+//   if (this->linkId)
+//   {
+//     const dReal *dvel;
+//     dvel = dBodyGetLinearVel(this->linkId);
+//     vel.Set(dvel[0], dvel[1], dvel[2]);
+//   }
+
+  return vel;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 RTQL8Link::GetWorldAngularVel() const
+{
+  math::Vector3 vel;
+
+//   if (this->linkId)
+//   {
+//     const dReal *dvel;
 // 
-// /////////////////////////////////////////////////
-// void BulletLink::AddForce(const math::Vector3 &/*_force*/)
-// {
-// }
+//     dvel = dBodyGetAngularVel(this->linkId);
 // 
-// /////////////////////////////////////////////////
-// void BulletLink::AddRelativeForce(const math::Vector3 &/*_force*/)
-// {
-// }
+//     vel.Set(dvel[0], dvel[1], dvel[2]);
+//   }
+
+  return vel;
+}
+
+/////////////////////////////////////////////////
+math::Vector3 RTQL8Link::GetWorldForce() const
+{
+  math::Vector3 force;
+
+//   if (this->linkId)
+//   {
+//     const dReal *dforce;
 // 
-// /////////////////////////////////////////////////
-// void BulletLink::AddForceAtWorldPosition(const math::Vector3 &/*_force*/,
-//                                          const math::Vector3 &/*_pos*/)
-// {
-// }
+//     dforce = dBodyGetForce(this->linkId);
 // 
-// /////////////////////////////////////////////////
-// void BulletLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
-//                   const math::Vector3 &/*_relpos*/)
-// {
-// }
+//     force.x = dforce[0];
+//     force.y = dforce[1];
+//     force.z = dforce[2];
+//   }
+
+  return force;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 RTQL8Link::GetWorldTorque() const
+{
+  math::Vector3 torque;
+
+//   if (this->linkId)
+//   {
+//     const dReal *dtorque;
 // 
-// /////////////////////////////////////////////////
-// void BulletLink::AddTorque(const math::Vector3 &/*_torque*/)
-// {
-// }
+//     dtorque = dBodyGetTorque(this->linkId);
 // 
-// /////////////////////////////////////////////////
-// void BulletLink::AddRelativeTorque(const math::Vector3 &/*_torque*/)
-// {
-// }
-// 
-// /////////////////////////////////////////////////
-// void BulletLink::SetAutoDisable(bool /*_disable*/)
-// {
-// }
+//     torque.x = dtorque[0];
+//     torque.y = dtorque[1];
+//     torque.z = dtorque[2];
+//   }
+
+  return torque;
+}
+
+//////////////////////////////////////////////////
+void RTQL8Link::SetGravityMode(bool _mode)
+{
+  this->sdf->GetElement("gravity")->Set(_mode);
+//   if (this->linkId)
+//   {
+//     dBodySetGravityMode(this->linkId, _mode ? 1: 0);
+//   }
+}
+
+//////////////////////////////////////////////////
+bool RTQL8Link::GetGravityMode()
+{
+  int mode = 0;
+//   if (this->linkId)
+//   {
+//     mode = dBodyGetGravityMode(this->linkId);
+//   }
+
+  return mode;
+}
+
+//////////////////////////////////////////////////
+void RTQL8Link::SetSelfCollide(bool _collide)
+{
+//   this->sdf->GetElement("self_collide")->Set(_collide);
+//   if (_collide)
+//     this->spaceId = dSimpleSpaceCreate(this->odePhysics->GetSpaceId());
+}
+
+//////////////////////////////////////////////////
+void RTQL8Link::SetLinearDamping(double _damping)
+{
+//   if (this->GetODEId())
+//     dBodySetLinearDamping(this->GetODEId(), _damping);
+}
+
+//////////////////////////////////////////////////
+void RTQL8Link::SetAngularDamping(double _damping)
+{
+//   if (this->GetODEId())
+//     dBodySetAngularDamping(this->GetODEId(), _damping);
+}
+
+//////////////////////////////////////////////////
+void RTQL8Link::SetKinematic(const bool &_state)
+{
+  this->sdf->GetElement("kinematic")->Set(_state);
+//   if (this->linkId)
+//   {
+//     if (_state)
+//       dBodySetKinematic(this->linkId);
+//     else
+//       dBodySetDynamic(this->linkId);
+//   }
+}
+
+//////////////////////////////////////////////////
+bool RTQL8Link::GetKinematic() const
+{
+  bool result = false;
+
+//   if (this->linkId)
+//     result = dBodyIsKinematic(this->linkId);
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+void RTQL8Link::SetAutoDisable(bool _disable)
+{
+//   if (this->GetModel()->GetJointCount() == 0 && this->linkId)
+//   {
+//     dBodySetAutoDisableFlag(this->linkId, _disable);
+//   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

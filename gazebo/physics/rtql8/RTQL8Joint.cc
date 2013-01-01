@@ -29,83 +29,53 @@
 #include "physics/rtql8/RTQL8Joint.hh"
 //#include "physics/ScrewJoint.hh"
 
+#include "rtql8/kinematics/Joint.h"
+
 using namespace gazebo;
 using namespace physics;
 
 
 //////////////////////////////////////////////////
 RTQL8Joint::RTQL8Joint(BasePtr _parent)
-  : Joint(_parent)
+  : Joint(_parent), rtql8Joint(NULL)
 {
-  //this->jointId = NULL;
 }
 
 //////////////////////////////////////////////////
 RTQL8Joint::~RTQL8Joint()
 {
   this->Detach();
-  //dJointDestroy(this->jointId);
+
+  if (rtql8Joint)
+    delete rtql8Joint;
 }
 
 //////////////////////////////////////////////////
 void RTQL8Joint::Load(sdf::ElementPtr _sdf)
 {
-//   Joint::Load(_sdf);
-// 
-//   if (this->sdf->HasElement("physics") &&
-//       this->sdf->GetElement("physics")->HasElement("ode"))
-//   {
-//     sdf::ElementPtr elem = this->sdf->GetElement("physics")->GetElement("ode");
-// 
-//     if (elem->HasElement("limit"))
-//     {
-//       this->SetParam(dParamStopERP,
-//           elem->GetElement("limit")->GetValueDouble("erp"));
-//       this->SetParam(dParamStopCFM,
-//           elem->GetElement("limit")->GetValueDouble("cfm"));
-//     }
-// 
-//     if (elem->HasElement("suspension"))
-//     {
-//       this->SetParam(dParamSuspensionERP,
-//           elem->GetElement("suspension")->GetValueDouble("erp"));
-//       this->SetParam(dParamSuspensionCFM,
-//           elem->GetElement("suspension")->GetValueDouble("cfm"));
-//     }
-// 
-//     if (elem->HasElement("fudge_factor"))
-//       this->SetParam(dParamFudgeFactor,
-//           elem->GetElement("fudge_factor")->GetValueDouble());
-// 
-//     if (elem->HasElement("cfm"))
-//         this->SetParam(dParamCFM, elem->GetElement("cfm")->GetValueDouble());
-// 
-//     if (elem->HasElement("bounce"))
-//         this->SetParam(dParamBounce,
-//           elem->GetElement("bounce")->GetValueDouble());
-// 
-//     if (elem->HasElement("max_force"))
-//       this->SetParam(dParamFMax,
-//           elem->GetElement("max_force")->GetValueDouble());
-// 
-//     if (elem->HasElement("velocity"))
-//       this->SetParam(dParamVel,
-//           elem->GetElement("velocity")->GetValueDouble());
-//   }
-// 
-//   // TODO: reimplement
-//   /*if (**this->provideFeedbackP)
-//   {
-//     this->feedback = new dJointFeedback;
-//     dJointSetFeedback(this->jointId, this->feedback);
-//   }
-//   */
+   Joint::Load(_sdf);
+
+   // In case this joint is already loaded, we delete rtql8 joint if it is
+   // created.
+   if (rtql8Joint)
+     delete rtql8Joint;
+
+   // In Joint::Load(sdf::ElementPtr), this joint stored the parent joint and
+   // child joint.
+   kinematics::BodyNode* parentBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
+         this->parentLink)->GetBodyNode();
+   kinematics::BodyNode* childBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
+         this->childLink)->GetBodyNode();
+
+   // In order to create rtql8 joint, we need to know this joint's parent
+   // and child link so we create rtql8 joint after the joint is loaded with sdf
+   // .
+   rtql8Joint = new kinematics::Joint(parentBodyNode, childBodyNode);
 }
 
 //////////////////////////////////////////////////
 void RTQL8Joint::Reset()
 {
-//   dJointReset(this->jointId);
   Joint::Reset();
 }
 

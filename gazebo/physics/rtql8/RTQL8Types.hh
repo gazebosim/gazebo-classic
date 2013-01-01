@@ -28,15 +28,27 @@ namespace gazebo
 {
   namespace physics
   {
-    //class BulletCollision;
+	class RTQL8Collision;
     class RTQL8Link;
+    class RTQL8RayShape;
     class RTQL8Physics;
-    //class BulletRayShape;
 
-    typedef boost::shared_ptr<RTQL8Physics> RTQL8PhysicsPtr;
-    //typedef boost::shared_ptr<BulletCollision> BulletCollisionPtr;
+	/// \def RTQL8CollisionPtr
+    /// \brief Boost shared point to RTQL8Collision
+    typedef boost::shared_ptr<RTQL8Collision> RTQL8CollisionPtr;
+
+    /// \def RTQL8LinkPtr
+    /// \brief Boost shared point to RTQL8Link
     typedef boost::shared_ptr<RTQL8Link> RTQL8LinkPtr;
-    //typedef boost::shared_ptr<BulletRayShape> BulletRayShapePtr;
+
+    /// \def RTQL8RayShapePtr
+    /// \brief Boost shared point to RTQL8RayShape
+    typedef boost::shared_ptr<RTQL8RayShape> RTQL8RayShapePtr;
+
+    /// \def RTQL8PhysicsPtr
+    /// \brief Boost shared pointer for RTQL8Physics.
+    typedef boost::shared_ptr<RTQL8Physics> RTQL8PhysicsPtr;
+	
   }
 }
 
