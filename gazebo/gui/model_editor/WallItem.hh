@@ -26,6 +26,8 @@ namespace gazebo
   {
     class PolylineItem;
 
+    class CornerGrabber;
+
     class LineSegmentItem;
 
     class BuildingItem;
@@ -43,6 +45,9 @@ namespace gazebo
         public: WallItem *Clone();
 
         public: void Update();
+
+        private: bool cornerEventFilter(CornerGrabber *_corner,
+            QEvent *_event);
 
         private: bool segmentEventFilter(LineSegmentItem *_segment,
             QEvent *_event);

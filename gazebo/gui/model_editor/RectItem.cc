@@ -46,6 +46,7 @@ RectItem::RectItem():
 
   this->setSelected(false);
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable);
+  this->setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
 
   this->UpdateCornerPositions();
   this->setAcceptHoverEvents(true);
@@ -96,7 +97,8 @@ void RectItem::AdjustSize(double _x, double _y)
 QVariant RectItem::itemChange(GraphicsItemChange _change,
   const QVariant &_value)
 {
-  if (_change == QGraphicsItem::ItemSelectedChange && this->scene()) {
+  if (_change == QGraphicsItem::ItemSelectedChange && this->scene())
+  {
 
     if (_value.toBool())
     {
@@ -112,6 +114,16 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
         this->corners[i]->removeSceneEventFilter(this);
       this->rotateHandle->removeSceneEventFilter(this);
     }
+  }
+  else if (_change == QGraphicsItem::ItemScenePositionHasChanged
+      && this->scene())
+  {
+    emit posXChanged(this->scenePos().x());
+    emit posYChanged(this->scenePos().y());
+  }
+  if (_change == QGraphicsItem::ItemParentChange && this->scene())
+  {
+
   }
   return QGraphicsItem::itemChange(_change, _value);
 }
@@ -197,6 +209,7 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
     this->translate(-localCenter.x(), 0);*/
 
     this->SetRotation(this->GetRotation() + angle);
+
 //    this->setTransformOriginPoint(localCenter);
 //    this->setRotation(this->rotation() -prevLine.angleTo(line));
   }
@@ -368,8 +381,6 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
     double angle = rotationAngle / 360.0 * (2 * M_PI);
     double dx = 0;
     double dy = 0;
-    double deltaLength = sqrt((deltaHeight * deltaHeight)
-        + (deltaWidth * deltaWidth));
     switch(_corner->GetIndex())
     {
       // corners
@@ -466,7 +477,7 @@ void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
   this->location.setY( (static_cast<int>(this->location.y())
       / this->gridSpace) * this->gridSpace);*/
 
-  this->SetPosition(this->location);
+//  this->SetPosition(this->location);
 }
 
 /////////////////////////////////////////////////
@@ -477,7 +488,7 @@ void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 
   this->setSelected(true);
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
-  this->location = this->pos();
+//  this->location = this->pos();
   _event->setAccepted(true);
 }
 
@@ -488,8 +499,9 @@ void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
     return;
 
   QPointF delta = _event->scenePos() - _event->lastScenePos();
-  this->location += delta;
-  this->SetPosition(this->location);
+  this->SetPosition(this->scenePos() + delta);
+//  this->location += delta;
+//  this->SetPosition(this->location);
 }
 
 /////////////////////////////////////////////////
@@ -706,8 +718,8 @@ void RectItem::SetPosition(QPointF _pos)
 void RectItem::SetPosition(double _x, double _y)
 {
   this->setPos(_x, _y);
-  emit posXChanged(_x);
-  emit posYChanged(_y);
+//  emit posXChanged(_x);
+//  emit posYChanged(_y);
 }
 
 /////////////////////////////////////////////////

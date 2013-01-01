@@ -153,9 +153,14 @@ void StairsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
     this->stairsWidth = dialog.GetWidth() / this->scale;
     this->stairsHeight = dialog.GetHeight() / this->scale;
     this->stairsDepth = dialog.GetDepth() / this->scale;
-    this->stairsPos = dialog.GetStartPosition()  / this->scale;
-    this->stairsPos.setY(-this->stairsPos.y());
-    this->setPos(stairsPos);
+    if ((fabs(dialog.GetStartPosition().x() - startPos.x()) >= 0.01)
+        || (fabs(dialog.GetStartPosition().y() - startPos.y()) >= 0.01))
+    {
+      this->stairsPos = dialog.GetStartPosition() / this->scale;
+      this->stairsPos.setY(-this->stairsPos.y());
+      this->setPos(stairsPos);
+      this->setParentItem(NULL);
+    }
     if (this->stairsSteps != dialog.GetSteps())
     {
       this->stairsSteps = dialog.GetSteps();
@@ -183,6 +188,6 @@ void StairsItem::StepsChanged()
     // emit a signal to delete 3d and make a new one
     // TODO there should be a more efficient way to do this.
     emit itemDeleted();
-    dynamic_cast<EditorView *>((this->scene()->views())[0])->CloneItem3D(this);
+    dynamic_cast<EditorView *>((this->scene()->views())[0])->CreateItem3D(this);
     this->StairsChanged();
 }

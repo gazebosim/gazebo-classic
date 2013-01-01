@@ -71,6 +71,10 @@ namespace gazebo
 
       public: void ConnectItem(std::string _partName, EditorItem *_item);
 
+      public: void AttachObject(std::string _child, std::string _parent);
+
+      public: void DetachObject(std::string _child, std::string _parent);
+
       public: static math::Vector3 ConvertSize(QVector3D _size);
 
       public: static math::Vector3 ConvertSize(double _width, double _depth,

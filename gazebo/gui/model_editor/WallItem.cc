@@ -15,12 +15,14 @@
  *
 */
 
+#include "gui/model_editor/RectItem.hh"
 #include "gui/model_editor/BuildingItem.hh"
 #include "gui/model_editor/PolylineItem.hh"
-#include "gui/model_editor/WallItem.hh"
 #include "gui/model_editor/LineSegmentItem.hh"
 #include "gui/model_editor/WallInspectorDialog.hh"
 #include "gui/model_editor/BuildingMaker.hh"
+#include "gui/model_editor/CornerGrabber.hh"
+#include "gui/model_editor/WallItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -83,6 +85,91 @@ WallItem *WallItem::Clone()
   wallItem->SetThickness(this->wallThickness);
 
   return wallItem;
+}
+
+
+/////////////////////////////////////////////////
+bool WallItem::cornerEventFilter(CornerGrabber* _corner,
+    QEvent *_event)
+{
+  QGraphicsSceneMouseEvent *mouseEvent =
+    dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
+
+  switch (_event->type())
+  {
+    case QEvent::GraphicsSceneMousePress:
+    {
+      _corner->SetMouseState(QEvent::GraphicsSceneMousePress);
+      QPointF scenePosition =  _corner->mapToScene(mouseEvent->pos());
+
+      _corner->SetMouseDownX(scenePosition.x());
+      _corner->SetMouseDownY(scenePosition.y());
+      break;
+    }
+    case QEvent::GraphicsSceneMouseRelease:
+    {
+      _corner->SetMouseState(QEvent::GraphicsSceneMouseRelease);
+      break;
+    }
+    case QEvent::GraphicsSceneMouseMove:
+    {
+      _corner->SetMouseState(QEvent::GraphicsSceneMouseMove);
+      break;
+    }
+    case QEvent::GraphicsSceneHoverEnter:
+    case QEvent::GraphicsSceneHoverMove:
+    {
+      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+      return true;
+    }
+    case QEvent::GraphicsSceneHoverLeave:
+    {
+      QApplication::restoreOverrideCursor();
+      return true;
+    }
+
+    default:
+    {
+      break;
+    }
+  }
+
+  if (!mouseEvent)
+    return false;
+
+  if (_corner->GetMouseState() == QEvent::GraphicsSceneMouseMove)
+  {
+    QPointF scenePosition = _corner->mapToScene(mouseEvent->pos());
+
+    this->SetVertexPosition(_corner->GetIndex(), scenePosition);
+
+    this->update();
+
+    for (int i = _corner->GetIndex(); i > _corner->GetIndex() - 2; --i)
+    {
+      if ((i - this->GetSegmentCount()) != 0 && i >= 0)
+      {
+        LineSegmentItem *segment = this->GetSegment(i);
+        QList<QGraphicsItem *> children = segment->childItems();
+        for (int j = 0; j < children.size(); ++j)
+        {
+          // TODO find a more generic way than casting child as rect item
+          RectItem *rectItem = dynamic_cast<RectItem *>(children[j]);
+          if (rectItem)
+          {
+            rectItem->SetRotation(-segment->line().angle());
+            QPointF delta = rectItem->pos() - segment->line().p1();
+            QPointF deltaLine = segment->line().p2() - segment->line().p1();
+            double deltaRatio = sqrt(delta.x()*delta.x() + delta.y()*delta.y())
+                / segment->line().length();
+            rectItem->setPos(segment->line().p1() + deltaRatio*deltaLine);
+
+          }
+        }
+      }
+    }
+  }
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -183,6 +270,10 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
     this->segmentMouseMove = scenePosition;
 
     this->update();
+
+    QList<QGraphicsItem *> children = _segment->childItems();
+    for ( int i = 0; i < children.size(); ++i)
+      children[i]->moveBy(trans.x(), trans.y());
   }
   return true;
 }

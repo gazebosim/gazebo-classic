@@ -43,8 +43,8 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   QBrush brush (c, Qt::SolidPattern);
   scene->setBackgroundBrush(brush);
 
-  int boundingWidth = 800;
-  int boundingHeight = 600;
+  int boundingWidth = 1024;
+  int boundingHeight = 800;
   scene->setSceneRect(-boundingWidth/2, -boundingHeight/2,
                       boundingWidth, boundingHeight);
   QHBoxLayout *canvasLayout = new QHBoxLayout(this);
@@ -57,6 +57,7 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   view->setScene(scene);
   view->centerOn(QPointF(0, 0));
   view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+  view->setDragMode(QGraphicsView::ScrollHandDrag);
 
   // TODO remove this wall and make sure scene updates without any items in it
   WallItem *wallItem = new WallItem(QPointF(0, 0), QPointF(0, 0));

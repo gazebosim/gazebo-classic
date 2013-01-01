@@ -110,8 +110,24 @@ void BuildingMaker::ConnectItem(std::string _partName, EditorItem *_item)
   QObject::connect(_item, SIGNAL(yawChanged(double)),
       manip, SLOT(OnYawChanged(double)));
   QObject::connect(_item, SIGNAL(itemDeleted()), manip, SLOT(OnItemDeleted()));
-
 }
+
+/////////////////////////////////////////////////
+void BuildingMaker::AttachObject(std::string _child, std::string _parent)
+{
+  ModelManip *child = this->allItems[_child];
+  ModelManip *parent = this->allItems[_parent];
+  parent->AttachObject(child);
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::DetachObject(std::string _child, std::string _parent)
+{
+  ModelManip *child = this->allItems[_child];
+  ModelManip *parent = this->allItems[_parent];
+  parent->DetachObject(child);
+}
+
 
 /////////////////////////////////////////////////
 std::string BuildingMaker::CreateModel(math::Pose _pose)
@@ -442,98 +458,113 @@ void BuildingMaker::GenerateSDF()
     newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
     newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
 
+//    qDebug() << " visual rotation " << visual->GetRotation().GetAsEuler().x
+//        << visual->GetRotation().GetAsEuler().y
+//        << visual->GetRotation().GetAsEuler().z;
+//    qDebug() << " visual world rot "
+//        << visual->GetWorldPose().rot.GetAsEuler().x
+//        << visual->GetWorldPose().rot.y
+//        << visual->GetWorldPose().rot.z;
+
     if (visual->GetChildCount() == 0)
     {
-
-#if 0
       // subdivide wall surface to create holes for representing
       // window/doors
-      if (name.find("Window") != std::string::npos
+/*      if (name.find("Window") != std::string::npos
           || name.find("Door") != std::string::npos)
       {
         if (modelManip->IsAttached())
           continue;
       }
-      else if (name.find("Wall") != std::string::npos
-          && modelManip->GetAttachedObjectCount() != 0)
+      else if (name.find("Wall") != std::string::npos)
       {
-        std::vector<QRectF> holes;
-        rendering::VisualPtr wallVis = visual;
-        math::Pose wallPose = wallVis->GetWorldPose();
-        for (unsigned int i = 0; i < modelManip->GetAttachedObjectCount(); ++i)
+        if (modelManip->GetAttachedObjectCount() != 0 )
         {
-          ModelManip *attachedObj = modelManip->GetAttachedObject(i);
-          std::string objName = attachedObj->GetName();
-          if (objName.find("Window") != std::string::npos
-              || objName.find("Door") != std::string::npos)
+          std::vector<QRectF> holes;
+          rendering::VisualPtr wallVis = visual;
+          math::Pose wallPose = wallVis->GetWorldPose();
+          for (unsigned int i = 0; i < modelManip->GetAttachedObjectCount(); ++i)
           {
-            rendering::VisualPtr attachedVis = attachedObj->GetVisual();
-            math::Pose offset = attachedVis->GetWorldPose() - wallPose;
-            math::Vector3 size = attachedVis->GetScale();
-            math::Vector3 newOffset = offset.pos - (-wallVis->GetScale()/2.0)
-                - size/2.0;
-            QRectF hole(newOffset.x, newOffset.z, size.x, size.z);
-            holes.push_back(hole);
+            ModelManip *attachedObj = modelManip->GetAttachedObject(i);
+            std::string objName = attachedObj->GetName();
+            if (objName.find("Window") != std::string::npos
+                || objName.find("Door") != std::string::npos)
+            {
+              rendering::VisualPtr attachedVis = attachedObj->GetVisual();
+              math::Pose offset = attachedVis->GetWorldPose() - wallPose;
+              math::Vector3 size = attachedVis->GetScale();
+              math::Vector3 newOffset = offset.pos - (-wallVis->GetScale()/2.0)
+                  - size/2.0;
+              QRectF hole(newOffset.x, newOffset.z, size.x, size.z);
+              holes.push_back(hole);
+            }
+          }
+          std::vector<QRectF> subdivisions;
+          QRectF surface(0, 0, wallVis->GetScale().x, wallVis->GetScale().z);
+
+          //QRectF host(0, 0, 1.0, 1.0);
+          //QRectF hole1(0.2,0.3,0.2,0.2);;
+          //QRectF hole2(0.5,0.2,0.2,0.2);
+          //QRectF hole3(0.4,0.6,0.3,0.4);
+          //std::vector<QRectF> holess;
+          //holess.push_back(hole1);
+          //holess.push_back(hole2);
+          //holess.push_back(hole3);
+          //std::vector<QRectF> subs;
+          //this->SubdivideRectSurface(host, holess, subs);
+
+          this->SubdivideRectSurface(surface, holes, subdivisions);
+
+          newLinkElem->ClearElements();
+          newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
+          newLinkElem->GetElement("pose")->Set(
+              visual->GetParent()->GetWorldPose());
+          for (unsigned int i = 0; i< subdivisions.size(); ++i)
+          {
+            visualNameStream.str("");
+            collisionNameStream.str("");
+            visualElem = templateVisualElem->Clone();
+            collisionElem = templateCollisionElem->Clone();
+            visualNameStream << modelManip->GetName() << "_Visual_" << i;
+            visualElem->GetAttribute("name")->Set(visualNameStream.str());
+            collisionNameStream << modelManip->GetName() << "_Collision_" << i;
+            collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
+
+            math::Vector3 newSubPos = (-wallVis->GetScale()/2.0)
+                + math::Vector3(subdivisions[i].x(), 0, subdivisions[i].y())
+                + math::Vector3(subdivisions[i].width()/2, 0,
+                    subdivisions[i].height()/2);
+            newSubPos.z += wallPose.pos.z;
+            math::Pose newPose(newSubPos,
+                 visual->GetRotation());
+            visualElem->GetElement("pose")->Set(newPose);
+            collisionElem->GetElement("pose")->Set(newPose);
+            math::Vector3 blockSize(subdivisions[i].width(),
+                wallVis->GetScale().y, subdivisions[i].height());
+            visualElem->GetElement("geometry")->GetElement("box")->
+              GetElement("size")->Set(blockSize);
+            collisionElem->GetElement("geometry")->GetElement("box")->
+              GetElement("size")->Set(blockSize);
+            newLinkElem->InsertElement(visualElem);
+            newLinkElem->InsertElement(collisionElem);
           }
         }
-        std::vector<QRectF> subdivisions;
-        QRectF surface(0, 0, wallVis->GetScale().x, wallVis->GetScale().z);
-
-        //QRectF host(0, 0, 1.0, 1.0);
-        //QRectF hole1(0.2,0.3,0.2,0.2);;
-        //QRectF hole2(0.5,0.2,0.2,0.2);
-        //QRectF hole3(0.4,0.6,0.3,0.4);
-        //std::vector<QRectF> holess;
-        //holess.push_back(hole1);
-        //holess.push_back(hole2);
-        //holess.push_back(hole3);
-        //std::vector<QRectF> subs;
-        //this->SubdivideRectSurface(host, holess, subs);
-
-        this->SubdivideRectSurface(surface, holes, subdivisions);
-
-        newLinkElem->ClearElements();
-        for (unsigned int i = 0; i< subdivisions.size(); ++i)
+        else
         {
-          visualNameStream.str("");
-          collisionNameStream.str("");
-          visualElem = templateVisualElem->Clone();
-          collisionElem = templateCollisionElem->Clone();
-          visualNameStream << modelManip->GetName() << "_Visual_" << i;
-          visualElem->GetAttribute("name")->Set(visualNameStream.str());
-          collisionNameStream << modelManip->GetName() << "_Collision_" << i;
-          collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
-
-
-          math::Vector3 newSubPos = wallPose.pos + (-wallVis->GetScale()/2.0)
-              + math::Vector3(subdivisions[i].x(), 0, subdivisions[i].y())
-              + math::Vector3(subdivisions[i].width()/2, 0,
-                  subdivisions[i].height()/2);
-          math::Pose newPose(newSubPos, wallPose.rot);
-        visualElem->GetElement("pose")->Set(newPose);
-        collisionElem->GetElement("pose")->Set(newPose);
-          math::Vector3 blockSize(subdivisions[i].width(),
-              wallVis->GetScale().y, subdivisions[i].height());
+          visualElem->GetAttribute("name")->Set(modelManip->GetName() + "_Visual");
+          collisionElem->GetAttribute("name")->Set(modelManip->GetName()
+              + "_Collision");
+          visualElem->GetElement("pose")->Set(visual->GetPose());
+          collisionElem->GetElement("pose")->Set(visual->GetPose());
           visualElem->GetElement("geometry")->GetElement("box")->
-            GetElement("size")->Set(blockSize);
+              GetElement("size")->Set(visual->GetScale());
           collisionElem->GetElement("geometry")->GetElement("box")->
-            GetElement("size")->Set(blockSize);
-          newLinkElem->InsertElement(visualElem);
-          newLinkElem->InsertElement(collisionElem);
+              GetElement("size")->Set(visual->GetScale());
         }
       }
-#endif
-      visualElem->GetAttribute("name")->Set(modelManip->GetName() + "_Visual");
-      collisionElem->GetAttribute("name")->Set(modelManip->GetName()
-          + "_Collision");
-      visualElem->GetElement("pose")->Set(visual->GetPose());
-      collisionElem->GetElement("pose")->Set(visual->GetPose());
-      visualElem->GetElement("geometry")->GetElement("box")->
-          GetElement("size")->Set(visual->GetScale());
-      collisionElem->GetElement("geometry")->GetElement("box")->
-          GetElement("size")->Set(visual->GetScale());
+
     }
-    else
+    else*/
     {
       // TODO: This handles the special case for stairs where
       // there are nested visuals which SDF doesn't support.

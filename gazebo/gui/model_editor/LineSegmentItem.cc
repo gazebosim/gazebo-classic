@@ -27,6 +27,8 @@ LineSegmentItem::LineSegmentItem(QGraphicsItem *_parent, int _index)
     : EditorItem(), QGraphicsLineItem(_parent), index(_index), start(0, 0),
       end(0, 0)
 {
+  this->editorType = "Line";
+
   if (_parent)
     this->setParentItem(_parent);
   this->setAcceptHoverEvents(true);

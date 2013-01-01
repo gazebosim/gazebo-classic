@@ -140,10 +140,15 @@ void DoorItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
     this->doorWidth = dialog.GetWidth() / this->scale;
     this->doorHeight = dialog.GetHeight() / this->scale;
     this->doorDepth = dialog.GetDepth() / this->scale;
-    itemPos = dialog.GetPosition() / this->scale;
-    itemPos.setY(-itemPos.y());
-    this->doorPos = itemPos;
-    this->setPos(this->doorPos);
+    if ((fabs(dialog.GetPosition().x() - itemPos.x()) >= 0.01)
+        || (fabs(dialog.GetPosition().y() - itemPos.y()) >= 0.01))
+    {
+      itemPos = dialog.GetPosition() / this->scale;
+      itemPos.setY(-itemPos.y());
+      this->doorPos = itemPos;
+      this->setPos(this->doorPos);
+      this->setParentItem(NULL);
+    }
     this->DoorChanged();
   }
   _event->setAccepted(true);

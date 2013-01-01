@@ -44,7 +44,7 @@ namespace gazebo
 
       public: enum mouseActions{Select, Translate, Rotate};
 
-      public: void CloneItem3D(EditorItem *item);
+      public: void CreateItem3D(EditorItem *item);
 
       private: void contextMenuEvent(QContextMenuEvent *event);
 
@@ -58,7 +58,7 @@ namespace gazebo
 
       private: void keyPressEvent(QKeyEvent *_event);
 
-      private: void DrawLine(QPoint _pos);
+      private: void DrawWall(QPoint _pos);
 
       private: void DrawWindow(QPoint _pos);
 
@@ -91,6 +91,8 @@ namespace gazebo
 
       private: std::list<StairsItem*> stairsList;
 
+      private: std::map<EditorItem *, std::string> itemToModelMap;
+
       private: QPoint lastLineCornerPos;
 
       private: std::vector<event::ConnectionPtr> connections;
@@ -110,6 +112,8 @@ namespace gazebo
       private: std::map<int, std::string> levelNames;
 
       private: QAction *openLevelInspectorAct;
+
+      private: double grabberDragRotation;
 
 
     };
