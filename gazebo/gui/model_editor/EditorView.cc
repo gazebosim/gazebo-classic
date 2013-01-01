@@ -516,6 +516,10 @@ void EditorView::OnDiscardModel()
   GridLines *gridLines = new GridLines (this->scene()->sceneRect().width(),
       this->scene()->sceneRect().height());
   this->scene()->addItem(gridLines);
+
+  this->currentMouseItem = NULL;
+  this->drawInProgress = false;
+  this->drawMode = NONE;
 }
 
 

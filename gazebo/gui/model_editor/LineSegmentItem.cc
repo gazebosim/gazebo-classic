@@ -149,7 +149,8 @@ void LineSegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 /////////////////////////////////////////////////
 QVector3D LineSegmentItem::GetSize()
 {
-  return QVector3D(this->line().length(), this->pen().width(), 0);
+  return QVector3D(this->line().length() + this->pen().width(),
+      this->pen().width(), 0);
 }
 
 /////////////////////////////////////////////////

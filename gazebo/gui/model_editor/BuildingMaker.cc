@@ -492,6 +492,7 @@ void BuildingMaker::GenerateSDF()
           std::vector<QRectF> holes;
           rendering::VisualPtr wallVis = visual;
           math::Pose wallPose = wallVis->GetWorldPose();
+          math::Vector3 wallSize = wallVis->GetScale();
           for (unsigned int i = 0; i < modelManip->GetAttachedObjectCount(); ++i)
           {
             ModelManip *attachedObj = modelManip->GetAttachedObject(i);
@@ -502,7 +503,7 @@ void BuildingMaker::GenerateSDF()
               rendering::VisualPtr attachedVis = attachedObj->GetVisual();
               math::Pose offset = attachedVis->GetWorldPose() - wallPose;
               math::Vector3 size = attachedVis->GetScale();
-              math::Vector3 newOffset = offset.pos - (-wallVis->GetScale()/2.0)
+              math::Vector3 newOffset = offset.pos - (-wallSize/2.0)
                   - size/2.0;
               QRectF hole(newOffset.x, newOffset.z, size.x, size.z);
               holes.push_back(hole);
@@ -539,11 +540,12 @@ void BuildingMaker::GenerateSDF()
             collisionNameStream << modelManip->GetName() << "_Collision_" << i;
             collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
 
-            math::Vector3 newSubPos = (-wallVis->GetScale()/2.0)
+            math::Vector3 newSubPos =
+                math::Vector3(-wallSize.x/2.0, 0, -wallSize.z/2.0)
                 + math::Vector3(subdivisions[i].x(), 0, subdivisions[i].y())
                 + math::Vector3(subdivisions[i].width()/2, 0,
                     subdivisions[i].height()/2);
-            newSubPos.z += wallPose.pos.z;
+            newSubPos.z += wallVis->GetPosition().z;
             math::Pose newPose(newSubPos,
                  visual->GetRotation());
             visualElem->GetElement("pose")->Set(newPose);
