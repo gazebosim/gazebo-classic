@@ -71,6 +71,8 @@ namespace gazebo
       private: void OnFinishModel(const std::string &_modelName,
           const std::string &_savePath);
 
+      private: void OnDiscardModel();
+
       private: void OnAddLevel(int _newLevel, std::string _levelName);
 
       private: void OnChangeLevel(int _level);

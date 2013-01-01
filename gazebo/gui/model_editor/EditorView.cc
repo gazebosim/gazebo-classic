@@ -52,6 +52,10 @@ EditorView::EditorView(QWidget *_parent)
     boost::bind(&EditorView::OnFinishModel, this, _1, _2)));
 
   this->connections.push_back(
+  gui::Events::ConnectDiscardModel(
+    boost::bind(&EditorView::OnDiscardModel, this)));
+
+  this->connections.push_back(
   gui::Events::ConnectAddLevel(
     boost::bind(&EditorView::OnAddLevel, this, _1, _2)));
 
@@ -196,7 +200,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 
   if (!drawInProgress)
   {
-    // auto attach objects
+    // auto attach windows and doors to walls
     QGraphicsItem *grabber = this->scene()->mouseGrabberItem();
     RectItem *editorItem = dynamic_cast<RectItem *>(grabber);
     if (grabber && editorItem && (editorItem->GetType() == "Window"
@@ -265,7 +269,6 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         }
       }
     }
-
     QGraphicsView::mouseMoveEvent(_event);
   }
 }
@@ -279,20 +282,11 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
 
     for (int i = 0; i < selectedItems.size(); ++i)
     {
-//      QGraphicsItem *item = selectedItems[i];
       EditorItem *item = dynamic_cast<EditorItem *>(selectedItems[i]);
-/*      if (dynamic_cast<WallItem *>(item))
-        wallList.remove(dynamic_cast<WallItem *>(item));
-      else if (dynamic_cast<WindowItem *>(item))
-          windowList.remove(dynamic_cast<WindowItem *>(item));
-      else if (dynamic_cast<DoorItem *>(item))
-        doorList.remove(dynamic_cast<DoorItem *>(item));
-      else if (dynamic_cast<StairsItem *>(item))
-        stairsList.remove(dynamic_cast<StairsItem *>(item));*/
       if (item->GetType() == "Wall")
         wallList.remove(dynamic_cast<WallItem *>(item));
       else if (item->GetType() == "Window")
-          windowList.remove(dynamic_cast<WindowItem *>(item));
+        windowList.remove(dynamic_cast<WindowItem *>(item));
       else if (item->GetType() == "Door")
         doorList.remove(dynamic_cast<DoorItem *>(item));
       else if (item->GetType() == "Stairs")
@@ -502,13 +496,28 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
 void EditorView::OnFinishModel(const std::string &_modelName,
     const std::string &_savePath)
 {
-  if (this->buildingMaker)
-  {
-    this->buildingMaker->SetModelName(_modelName);
-    this->buildingMaker->FinishModel();
-    this->buildingMaker->SaveToSDF(_savePath);
-  }
+  this->buildingMaker->SetModelName(_modelName);
+  this->buildingMaker->FinishModel();
+  this->buildingMaker->SaveToSDF(_savePath);
 }
+
+/////////////////////////////////////////////////
+void EditorView::OnDiscardModel()
+{
+  this->wallList.clear();
+  this->windowList.clear();
+  this->doorList.clear();
+  this->stairsList.clear();
+  this->itemToModelMap.clear();
+  this->buildingMaker->Reset();
+
+  // clear the scene but add the grid back in
+  this->scene()->clear();
+  GridLines *gridLines = new GridLines (this->scene()->sceneRect().width(),
+      this->scene()->sceneRect().height());
+  this->scene()->addItem(gridLines);
+}
+
 
 /////////////////////////////////////////////////
 void EditorView::OnAddLevel(int _newLevel, std::string _levelName)

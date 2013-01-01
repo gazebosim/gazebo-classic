@@ -59,8 +59,6 @@ double BuildingMaker::conversionScale;
 
   this->conversionScale = 0.01;
 
-  this->CreateModel(math::Pose(0, 0, 0, 0, 0, 0));
-
   this->wallCounter = 0;
   this->windowCounter = 0;
   this->doorCounter = 0;
@@ -69,6 +67,7 @@ double BuildingMaker::conversionScale;
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
 
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -130,19 +129,10 @@ void BuildingMaker::DetachObject(std::string _child, std::string _parent)
 
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::CreateModel(math::Pose _pose)
+std::string BuildingMaker::CreateModel()
 {
-  this->modelPose = _pose;
-  this->modelName = this->node->GetTopicNamespace() + "::" + "building";
-  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  this->modelVisual.reset(new rendering::Visual(this->modelName,
-                          scene->GetWorldVisual()));
-  this->modelVisual->Load();
-  this->modelVisual->SetPose(modelPose);
-  this->modelName = this->modelVisual->GetName();
-
-  scene->AddVisual(this->modelVisual);
-  return modelName;
+  this->Reset();
+  return this->modelName;
 }
 
 /////////////////////////////////////////////////
@@ -383,8 +373,27 @@ void BuildingMaker::Stop()
 //  this->modelVisual.reset();
 //  this->visuals.clear();
 //  this->modelSDF.reset();
-
   this->modelVisual->SetVisible(false);
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::Reset()
+{
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  if (this->modelVisual)
+    scene->RemoveVisual(this->modelVisual);
+  this->modelName = this->node->GetTopicNamespace() + "::" + "building";
+  this->modelVisual.reset(new rendering::Visual(this->modelName,
+      scene->GetWorldVisual()));
+  this->modelVisual->Load();
+  this->modelPose = math::Pose::Zero;
+  this->modelVisual->SetPose(this->modelPose);
+  scene->AddVisual(this->modelVisual);
+
+  std::map<std::string, ModelManip *>::iterator it;
+  for (it = this->allItems.begin(); it != this->allItems.end(); ++it)
+    delete (*it).second;
+  this->allItems.clear();
 }
 
 /////////////////////////////////////////////////

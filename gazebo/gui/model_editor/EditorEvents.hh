@@ -52,6 +52,15 @@ namespace gazebo
               { finishModel.Disconnect(_subscriber); }
 
       public: template<typename T>
+              static event::ConnectionPtr ConnectDiscardModel(T _subscriber)
+              { return discardModel.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot to the discard model signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectDiscardModel(
+                  event::ConnectionPtr _subscriber)
+              { discardModel.Disconnect(_subscriber); }
+
+      public: template<typename T>
               static event::ConnectionPtr ConnectChangeLevel(T _subscriber)
               { return changeLevel.Connect(_subscriber); }
       /// \brief Disconnect a boost::slot to the change level signal
@@ -84,6 +93,9 @@ namespace gazebo
       /// \brief A model is to be created
       public: static event::EventT<void (std::string, std::string)>
           finishModel;
+
+      /// \brief A model is to be created
+      public: static event::EventT<void ()> discardModel;
 
       /// \brief The current level has been changed
       public: static event::EventT<void (int)> changeLevel;

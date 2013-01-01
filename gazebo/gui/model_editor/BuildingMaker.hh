@@ -90,6 +90,9 @@ namespace gazebo
       public: static double ConvertAngle(double _angle);
 
       /// \brief
+      public: void Reset();
+
+      /// \brief
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 
       /// \brief
@@ -103,7 +106,7 @@ namespace gazebo
       /// \brief Internal init function.
       private: bool Init();
 
-      private: std::string CreateModel(math::Pose _pose);
+      private: std::string CreateModel();
 
       private: void GenerateSDF();
 

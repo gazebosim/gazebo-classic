@@ -22,6 +22,7 @@ using namespace gui;
 
 event::EventT<void (std::string)> Events::createEditorItem;
 event::EventT<void (std::string, std::string)> Events::finishModel;
+event::EventT<void ()> Events::discardModel;
 event::EventT<void (int)> Events::changeLevel;
 event::EventT<void (int, std::string)> Events::addLevel;
 event::EventT<void (int, std::string)> Events::changeLevelName;

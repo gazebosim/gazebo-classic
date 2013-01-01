@@ -204,10 +204,10 @@ void BuildingEditorPalette::OnDiscard()
   switch (ret)
   {
     case QMessageBox::Discard:
-    /// TODO
-    break;
+      gui::Events::discardModel();
+      break;
     case QMessageBox::Cancel:
-    /// TODO
+    // Do nothing
     break;
     default:
     break;
