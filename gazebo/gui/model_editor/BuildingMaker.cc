@@ -470,7 +470,7 @@ void BuildingMaker::GenerateSDF()
     {
       // subdivide wall surface to create holes for representing
       // window/doors
-/*      if (name.find("Window") != std::string::npos
+      if (name.find("Window") != std::string::npos
           || name.find("Door") != std::string::npos)
       {
         if (modelManip->IsAttached())
@@ -549,7 +549,7 @@ void BuildingMaker::GenerateSDF()
             newLinkElem->InsertElement(collisionElem);
           }
         }
-        else*/
+        else
         {
           visualElem->GetAttribute("name")->Set(modelManip->GetName() + "_Visual");
           collisionElem->GetAttribute("name")->Set(modelManip->GetName()
@@ -561,7 +561,7 @@ void BuildingMaker::GenerateSDF()
           collisionElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->GetScale());
         }
-      //}
+      }
 
     }
     else
@@ -907,8 +907,8 @@ void BuildingMaker::SubdivideRectSurface(const QRectF _surface,
 
   // Surface subdivision algorithm:
   // subdivisions are called blocks here
-  // 1. Start from top left corner
-  // 2. Walk along y from starting point and stop on first obstacle with
+  // 1. Insert a few starting points found by walking along top and left borders
+  // 2. Walk along y from a starting point and stop on first obstacle with
   //    same x, this gives block height
   // 3. Find the next obstacle in x dir, this gives block width
   // 4. Remove starting point from the list
@@ -918,6 +918,28 @@ void BuildingMaker::SubdivideRectSurface(const QRectF _surface,
   // 7. Repeat 2~6 until there are no more starting points.
 
   double eps = 0.001;
+  QPointF borderStart;
+  std::multiset<QRectF>::iterator borderIt = filledX.begin();
+  for (borderIt; borderIt!=filledX.end(); ++borderIt)
+  {
+    if (fabs((*borderIt).y() - _surface.y()) < eps
+        && ((*borderIt).x() + (*borderIt).width())
+        < (_surface.x() + _surface.width()))
+    {
+      borderStart.setX((*borderIt).x() + (*borderIt).width());
+      borderStart.setY(0);
+      startings.insert(borderStart);
+    }
+    if (fabs((*borderIt).x() - _surface.x()) < eps
+        && ((*borderIt).y() + (*borderIt).height())
+        < (_surface.y() + _surface.height()))
+    {
+      borderStart.setX(0);
+      borderStart.setY((*borderIt).y() + (*borderIt).height());
+      startings.insert(borderStart);
+    }
+  }
+
   while (!startings.empty())
   {
     startIt = startings.begin();
