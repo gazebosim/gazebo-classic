@@ -15,10 +15,6 @@ namespace gazebo
 
         public: ~EditorItem();
 
- /*       public: virtual void AttachItem(EditorItem *_item);
-
-        public: virtual void DetachItem(EditorItem *_item);*/
-
         public: virtual QVector3D GetSize();
 
         public: virtual QVector3D GetScenePosition();

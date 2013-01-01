@@ -31,61 +31,7 @@ EditorItem::~EditorItem()
 {
   emit itemDeleted();
 }
-/*
-/////////////////////////////////////////////////
-void EditorItem::AttachItem(EditorItem *_item)
-{
-  if (!_item->IsAttached())
-  {
-    _item->SetAttachedTo(this);
-    this->attachedItems.push_back(_item);
-  }
-}
 
-/////////////////////////////////////////////////
-void EditorItem::DetachItem(EditorItem *_item)
-{
-  std::remove(this->attachedItems.begin(), this->attachedItems.end(),
-      _item);
-}
-
-/////////////////////////////////////////////////
-bool EditorItem::IsAttached()
-{
-}
-
-/////////////////////////////////////////////////
-void EditorItem::SetAttached(EditorItem *_parent)
-{
-  if (this->IsAttached())
-  {
-    gzerr << this->editorType << " is already attached to a parent \n";
-    return;
-  }
-  this->parent = _parent;
-}
-
-/////////////////////////////////////////////////
-EditorItem *ModelManip::GetAttachedItem(unsigned int _index)
-{
-  if (_index >= this->attachedObjects.size())
-    gzthrow("Index too large");
-
-  return this->attachedObjects[_index];
-}
-
-/////////////////////////////////////////////////
-unsigned int EditorItem::GetAttachedItemCount()
-{
-  return this->attachedItems.size();
-}
-
-/////////////////////////////////////////////////
-bool EditorItem::IsAttached()
-{
-  return (this->parent != NULL);
-}
-*/
 
 /////////////////////////////////////////////////
 QVector3D EditorItem::GetSize()

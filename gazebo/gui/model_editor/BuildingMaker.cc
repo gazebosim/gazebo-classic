@@ -549,7 +549,7 @@ void BuildingMaker::GenerateSDF()
             newLinkElem->InsertElement(collisionElem);
           }
         }
-        else
+        else*/
         {
           visualElem->GetAttribute("name")->Set(modelManip->GetName() + "_Visual");
           collisionElem->GetAttribute("name")->Set(modelManip->GetName()
@@ -561,10 +561,10 @@ void BuildingMaker::GenerateSDF()
           collisionElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->GetScale());
         }
-      }
+      //}
 
     }
-    else*/
+    else
     {
       // TODO: This handles the special case for stairs where
       // there are nested visuals which SDF doesn't support.

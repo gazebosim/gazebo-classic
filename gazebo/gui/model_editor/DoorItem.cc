@@ -45,7 +45,7 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
 
   this->UpdateCornerPositions();
 
-  this->doorPos = this->pos();
+  this->doorPos = this->scenePos();
 
   this->zValueIdle = 3;
   this->setZValue(this->zValueIdle);
@@ -118,7 +118,7 @@ void DoorItem::paint (QPainter *_painter,
 
   this->doorWidth = this->drawingWidth;
   this->doorDepth = this->drawingHeight;
-  this->doorPos = this->pos();
+  this->doorPos = this->scenePos();
 
 //  QGraphicsPolygonItem::paint(_painter, _option, _widget);
 }

@@ -43,7 +43,7 @@ StairsItem::StairsItem(): RectItem(), BuildingItem()
 //  this->stairsDepth = this->stairsSteps * this->stairsUnitRun;
 //  this->stairsHeight = this->stairsSteps * this->stairsUnitRise;
 
-  this->stairsPos = this->pos();
+  this->stairsPos = this->scenePos();
   this->stairsElevation = 0;
 
   this->width = this->stairsWidth;
@@ -101,7 +101,7 @@ void StairsItem::paint(QPainter *_painter,
   QPointF bottomRight(this->drawingOriginX  + this->drawingWidth/2,
       this->drawingOriginY + this->drawingHeight/2);
 
-  this->stairsPos = this->pos();
+  this->stairsPos = this->scenePos();
   this->stairsWidth = this->drawingWidth;
   this->stairsDepth = this->drawingHeight;
 
