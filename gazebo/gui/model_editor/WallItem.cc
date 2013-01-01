@@ -65,6 +65,7 @@ WallItem *WallItem::Clone()
   WallItem *wallItem = new WallItem(this->scenePos(), this->scenePos());
 
   LineSegmentItem *segment = this->segments[0];
+  wallItem->SetVertexPosition(0, this->mapToScene(segment->line().p1()));
   wallItem->SetVertexPosition(1, this->mapToScene(segment->line().p2()));
 
 
