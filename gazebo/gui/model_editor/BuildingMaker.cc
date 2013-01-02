@@ -634,9 +634,16 @@ void BuildingMaker::GenerateSDF()
               rendering::VisualPtr attachedVis = attachedObj->GetVisual();
               math::Pose offset = attachedVis->GetWorldPose() - floorPose;
               math::Vector3 size = attachedVis->GetScale();
+
+              QRectF rect(0, 0, size.x, size.y);
+              QPolygonF polygon(rect);
+              QTransform transform;
+              transform.rotate(GZ_RTOD(offset.rot.GetAsEuler().z));
+              QRectF bound = transform.map(polygon).boundingRect();
               math::Vector3 newOffset = offset.pos - (-floorSize/2.0)
-                  - size/2.0;
-              QRectF hole(newOffset.x, newOffset.y, size.x, size.y);
+                  - math::Vector3(bound.width(), bound.height(), size.z)/2.0;
+              QRectF hole(newOffset.x, newOffset.y, bound.width(),
+                  bound.height());
               holes.push_back(hole);
             }
           }
