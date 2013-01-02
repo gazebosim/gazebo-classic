@@ -138,7 +138,7 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
   GtsSurfaceInter *si;
   GNode *tree1, *tree2;
 
-  bool closed = true;
+  gboolean closed = true;
   bool is_open1 = false;
   bool is_open2 = false;
 

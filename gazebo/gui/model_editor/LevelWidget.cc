@@ -49,6 +49,10 @@ LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
     gui::Events::ConnectChangeLevelName(
     boost::bind(&LevelWidget::OnChangeLevelName, this, _1, _2)));
 
+  this->connections.push_back(
+    gui::Events::ConnectDiscardModel(
+    boost::bind(&LevelWidget::OnDiscard, this)));
+
   this->setLayout(levelLayout);
 }
 
@@ -78,4 +82,11 @@ void LevelWidget::OnAddLevel()
 void LevelWidget::OnChangeLevelName(int _level, std::string _newName)
 {
   this->levelComboBox->setItemText(_level, tr(_newName.c_str()));
+}
+
+//////////////////////////////////////////////////
+void LevelWidget::OnDiscard()
+{
+  this->levelComboBox->clear();
+  this->levelComboBox->addItem(QString("Level 1"));
 }

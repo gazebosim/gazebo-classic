@@ -43,6 +43,8 @@ namespace gazebo
 
       private: void OnChangeLevelName(int _level, std::string _newName);
 
+      private: void OnDiscard();
+
       private: QComboBox *levelComboBox;
 
       private: std::vector<event::ConnectionPtr> connections;

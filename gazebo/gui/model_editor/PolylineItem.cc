@@ -334,7 +334,6 @@ void PolylineItem::UpdatePathAt(unsigned int _index, QPointF _pos)
   QPainterPath p = this->path();
   QPointF newPos = _pos - this->origin;
   p.setElementPositionAt(_index, newPos.x(), newPos.y());
-
   this->setPath(p);
 }
 

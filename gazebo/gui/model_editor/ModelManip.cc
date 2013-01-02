@@ -33,6 +33,7 @@ ModelManip::ModelManip()
 /////////////////////////////////////////////////
 ModelManip::~ModelManip()
 {
+  this->DetachFromParent();
 }
 
 /////////////////////////////////////////////////
@@ -66,6 +67,12 @@ void ModelManip::SetMaker(BuildingMaker *_maker)
 }
 
 /////////////////////////////////////////////////
+ModelManip *ModelManip::GetParent()
+{
+  return this->parent;
+}
+
+/////////////////////////////////////////////////
 void ModelManip::OnSizeChanged(double _width, double _depth, double _height)
 {
   this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
@@ -90,9 +97,27 @@ void ModelManip::AttachObject(ModelManip *_object)
 /////////////////////////////////////////////////
 void ModelManip::DetachObject(ModelManip *_object)
 {
+  if (_object)
+  {
+    std::vector<ModelManip *> ::iterator it = std::remove(
+        this->attachedObjects.begin(), this->attachedObjects.end(), _object);
+    if (it != this->attachedObjects.end())
+    {
+      _object->DetachFromParent();
+      this->attachedObjects.erase(it, this->attachedObjects.end());
+    }
+  }
+}
 
-  std::remove(this->attachedObjects.begin(), this->attachedObjects.end(),
-      _object);
+/////////////////////////////////////////////////
+void ModelManip::DetachFromParent()
+{
+  if (this->parent)
+  {
+    ModelManip *tmp = this->parent;
+    this->parent = NULL;
+    tmp->DetachObject(this);
+  }
 }
 
 /////////////////////////////////////////////////

@@ -30,6 +30,7 @@ namespace gazebo
     class StairsItem;
     class DoorItem;
     class WallItem;
+    class FloorItem;
     class BuildingMaker;
 
     class EditorView : public QGraphicsView
@@ -85,13 +86,15 @@ namespace gazebo
 
       private: bool drawInProgress;
 
-      private: std::list<WallItem*> wallList;
+      private: std::vector<WallItem*> wallList;
 
-      private: std::list<WindowItem*> windowList;
+      private: std::vector<WindowItem*> windowList;
 
-      private: std::list<DoorItem*> doorList;
+      private: std::vector<DoorItem*> doorList;
 
-      private: std::list<StairsItem*> stairsList;
+      private: std::vector<StairsItem*> stairsList;
+
+      private: std::vector<FloorItem*> floorList;
 
       private: std::map<EditorItem *, std::string> itemToModelMap;
 

@@ -65,6 +65,9 @@ namespace gazebo
       public: std::string AddStairs(QVector3D _size, QVector3D _pos,
           double _angle, int _steps);
 
+      public: std::string AddFloor(QVector3D _size, QVector3D _pos,
+          double _angle);
+
       public: void RemovePart(std::string _partName);
 
       public: void RemoveWall(std::string _wallName);
@@ -156,6 +159,8 @@ namespace gazebo
       private: int doorCounter;
 
       private: int stairsCounter;
+
+      private: int floorCounter;
     };
   }
 }

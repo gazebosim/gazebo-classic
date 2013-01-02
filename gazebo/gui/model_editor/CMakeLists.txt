@@ -15,6 +15,7 @@ set (sources
   RotateHandle.cc
   EditorView.cc
   RectItem.cc
+  FloorItem.cc
   BuildingItem.cc
   WindowItem.cc
   DoorItem.cc
@@ -52,6 +53,7 @@ set (headers
   WindowItem.hh
   DoorItem.hh
   RectItem.hh
+  FloorItem.hh
   LineSegmentItem.hh
   GridLines.hh
   PolylineItem.hh

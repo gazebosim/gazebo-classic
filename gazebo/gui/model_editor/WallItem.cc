@@ -62,7 +62,8 @@ void WallItem::SetHeight(double _height)
 /////////////////////////////////////////////////
 WallItem *WallItem::Clone()
 {
-  WallItem *wallItem = new WallItem(this->scenePos(), this->scenePos());
+  WallItem *wallItem = new WallItem(this->scenePos(),
+      this->scenePos() + QPointF(1, 0));
 
   LineSegmentItem *segment = this->segments[0];
   wallItem->SetVertexPosition(0, this->mapToScene(segment->line().p1()));
@@ -74,11 +75,13 @@ WallItem *WallItem::Clone()
   for (unsigned int i = 1; i < this->segments.size(); ++i)
   {
     segment = this->segments[i];
-    wallItem->AddPoint(this->mapToScene(segment->line().p1()));
+    wallItem->AddPoint(this->mapToScene(segment->line().p1()) + QPointF(1, 0));
     wallItem->SetVertexPosition(wallItem->GetVertexCount()-1,
-        this->mapToScene(segment->line().p2()));  }
+        this->mapToScene(segment->line().p2()));
+  }
   wallItem->AddPoint(this->mapToScene(
-      this->segments[wallItem->GetSegmentCount()-1]->line().p2()));
+      this->segments[wallItem->GetSegmentCount()-1]->line().p2())
+      + QPointF(1, 0));
   wallItem->PopEndPoint();
 
   wallItem->SetLevel(this->level);
@@ -87,7 +90,6 @@ WallItem *WallItem::Clone()
 
   return wallItem;
 }
-
 
 /////////////////////////////////////////////////
 bool WallItem::cornerEventFilter(CornerGrabber* _corner,

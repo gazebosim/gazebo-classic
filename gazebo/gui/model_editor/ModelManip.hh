@@ -44,11 +44,15 @@ namespace gazebo
 
       public: void SetMaker(BuildingMaker *_maker);
 
+      public: ModelManip *GetParent();
+
       public: void AttachObject(ModelManip *_object);
 
       public: void DetachObject(ModelManip *_object);
 
       public: void SetAttachedTo(ModelManip *_parent);
+
+      public: void DetachFromParent();
 
       public: ModelManip *GetAttachedObject(unsigned int _index);
 
