@@ -117,6 +117,7 @@ class ServerFixture : public testing::Test
                               _paused));
 
                // Wait for the server to come up
+               // Should this loop have a timout?
                while (!this->server || !this->server->GetInitialized())
                  common::Time::MSleep(10);
 
