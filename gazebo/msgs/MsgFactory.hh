@@ -22,6 +22,7 @@
 #include <map>
 #include <vector>
 #include <google/protobuf/message.h>
+#include <boost/shared_ptr.hpp>
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
   {
     /// \def MsgFactoryFn
     /// \brief Prototype for message factory generation
-    typedef google::protobuf::Message* (*MsgFactoryFn) ();
+    typedef boost::shared_ptr<google::protobuf::Message> (*MsgFactoryFn) ();
 
     /// \addtogroup gazebo_msgs Messages
     /// \{
@@ -48,7 +49,7 @@ namespace gazebo
       /// \param[in] _msgType Type of message to create.
       /// \return Pointer to a google protobuf message. Null if the message
       /// type could not be handled.
-      public: static google::protobuf::Message *NewMsg(
+      public: static boost::shared_ptr<google::protobuf::Message> NewMsg(
                   const std::string &_msgType);
 
       /// \brief Get all the message types
@@ -66,9 +67,10 @@ namespace gazebo
     /// \param[in] _msgtype Message type name.
     /// \param[in] _classname Class name for message.
     #define GZ_REGISTER_STATIC_MSG(_msgtype, _classname) \
-    google::protobuf::Message *New##_classname() \
+    boost::shared_ptr<google::protobuf::Message> New##_classname() \
     { \
-      return new gazebo::msgs::_classname; \
+      return boost::shared_ptr<gazebo::msgs::_classname>(\
+          new gazebo::msgs::_classname); \
     } \
     class Msg##_classname \
     { \

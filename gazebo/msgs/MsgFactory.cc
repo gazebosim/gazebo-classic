@@ -33,9 +33,10 @@ void MsgFactory::RegisterMsg(const std::string &_msgType,
 }
 
 /////////////////////////////////////////////////
-google::protobuf::Message *MsgFactory::NewMsg(const std::string &_msgType)
+boost::shared_ptr<google::protobuf::Message> MsgFactory::NewMsg(
+    const std::string &_msgType)
 {
-  google::protobuf::Message *msg = NULL;
+  boost::shared_ptr<google::protobuf::Message> msg;
 
   // Create a new message if a MsgFactoryFn has been assigned to the message
   // type

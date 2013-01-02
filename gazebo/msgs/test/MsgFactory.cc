@@ -48,8 +48,9 @@ std::string custom_exec(const std::string &_cmd)
 /// Check for null when asked for a bad message type
 TEST(MsgFactory, BadMsgType)
 {
-  google::protobuf::Message *msg = gazebo::msgs::MsgFactory::NewMsg("bad");
-  EXPECT_EQ(NULL, msg);
+  boost::shared_ptr<google::protobuf::Message> msg =
+    gazebo::msgs::MsgFactory::NewMsg("bad");
+  EXPECT_EQ(NULL, msg.get());
 }
 
 /////////////////////////////////////////////////
@@ -64,13 +65,14 @@ TEST(MsgFactory, NewMsg)
   std::string serializedData;
   goodMsg.SerializeToString(&serializedData);
 
-  google::protobuf::Message *msg = gazebo::msgs::MsgFactory::NewMsg(
-      "gazebo.msgs.Vector3d");
+  gazebo::msgs::Vector3dPtr msg =
+    boost::shared_dynamic_cast<gazebo::msgs::Vector3d>(
+        gazebo::msgs::MsgFactory::NewMsg("gazebo.msgs.Vector3d"));
 
   msg->ParseFromString(serializedData);
-  EXPECT_EQ(static_cast<gazebo::msgs::Vector3d*>(msg)->x(), 1.1);
-  EXPECT_EQ(static_cast<gazebo::msgs::Vector3d*>(msg)->y(), 2.2);
-  EXPECT_EQ(static_cast<gazebo::msgs::Vector3d*>(msg)->z(), 3.3);
+  EXPECT_EQ(msg->x(), 1.1);
+  EXPECT_EQ(msg->y(), 2.2);
+  EXPECT_EQ(msg->z(), 3.3);
 }
 
 /////////////////////////////////////////////////
