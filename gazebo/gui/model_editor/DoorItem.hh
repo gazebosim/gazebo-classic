@@ -55,6 +55,8 @@ namespace gazebo
 
         private: double doorWidth;
 
+        private: double doorElevation;
+
         private: QPointF doorPos;
 
         private: double scale;

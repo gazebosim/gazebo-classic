@@ -235,7 +235,7 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
         // The if statement below limits the change to either the length of
         // the wall segment or its start/end pos.
         // Comparison between doubles up to 1 decimal place
-        if (fabs(newLength - (segmentLength * this->scale)) < 0.1)
+        if (fabs(newLength - segmentLength) > 0.1)
         {
           line.setLength(newLength - this->wallThickness);
           this->SetVertexPosition(_segment->GetIndex()+1,

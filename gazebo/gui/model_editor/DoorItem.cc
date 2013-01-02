@@ -36,6 +36,7 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
   this->doorDepth = 20;
   this->doorHeight = 200;
   this->doorWidth = 100;
+  this->doorElevation = 0;
 
   this->width = this->doorWidth;
 //  this->height = this->doorDepth + this->doorWidth;
@@ -65,7 +66,8 @@ QVector3D DoorItem::GetSize()
 /////////////////////////////////////////////////
 QVector3D DoorItem::GetScenePosition()
 {
-  return QVector3D(this->scenePos().x(), this->scenePos().y(), 0);
+  return QVector3D(this->scenePos().x(), this->scenePos().y(),
+      this->doorElevation);
 }
 
 /////////////////////////////////////////////////
@@ -130,6 +132,7 @@ void DoorItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
   dialog.SetWidth(this->doorWidth * this->scale);
   dialog.SetDepth(this->doorDepth * this->scale);
   dialog.SetHeight(this->doorHeight * this->scale);
+  dialog.SetElevation(this->doorElevation * this->scale);
   QPointF itemPos = this->doorPos * this->scale;
   itemPos.setY(-itemPos.y());
   dialog.SetPosition(itemPos);
@@ -140,6 +143,7 @@ void DoorItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
     this->doorWidth = dialog.GetWidth() / this->scale;
     this->doorHeight = dialog.GetHeight() / this->scale;
     this->doorDepth = dialog.GetDepth() / this->scale;
+    this->doorElevation = dialog.GetElevation() / this->scale;
     if ((fabs(dialog.GetPosition().x() - itemPos.x()) >= 0.01)
         || (fabs(dialog.GetPosition().y() - itemPos.y()) >= 0.01))
     {
@@ -161,7 +165,7 @@ void DoorItem::DoorChanged()
   emit depthChanged(this->doorDepth);
   emit heightChanged(this->doorHeight);
   emit positionChanged(this->doorPos.x(), this->doorPos.y(),
-      this->levelBaseHeight/* + this->doorElevation*/);
+      this->levelBaseHeight + this->doorElevation);
 }
 
 /////////////////////////////////////////////////
