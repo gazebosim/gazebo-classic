@@ -18,7 +18,7 @@
 #ifndef _LEVEL_INSPECTOR_DIALOG_HH_
 #define _LEVEL_INSPECTOR_DIALOG_HH_
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {

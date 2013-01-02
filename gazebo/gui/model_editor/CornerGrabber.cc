@@ -15,7 +15,7 @@
  *
 */
 
-#include "CornerGrabber.hh"
+#include "gazebo/gui/model_editor/CornerGrabber.hh"
 
 using namespace gazebo;
 using namespace gui;

@@ -16,8 +16,8 @@
 */
 
 #include <sstream>
-#include "gui/model_editor/LevelWidget.hh"
-#include "gui/model_editor/EditorEvents.hh"
+#include "gazebo/gui/model_editor/LevelWidget.hh"
+#include "gazebo/gui/model_editor/EditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;

@@ -18,7 +18,7 @@
 #define _EDITOR_EVENTS_HH_
 
 #include <string>
-#include "common/Event.hh"
+#include "gazebo/common/Event.hh"
 /*#include "msgs/msgs.hh"
 #include "math/Vector3.hh"
 #include "math/Pose.hh"*/
@@ -105,45 +105,6 @@ namespace gazebo
 
       /// \brief The current level name has been changed
       public: static event::EventT<void (int, std::string)> changeLevelName;
-
-/*      public: template<typename T>
-              static event::ConnectionPtr ConnectCreateBuildingPart(T _subscriber)
-              { return createBuildingPart.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot to the create editor item signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectCreateBuildingPart(
-                  event::ConnectionPtr _subscriber)
-              { createBuildingPart.Disconnect(_subscriber); }
-
-      public: template<typename T>
-              static event::ConnectionPtr ConnectSetBuildingPartPose(T _subscriber)
-              { return setBuildingPartPose.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot to the set building part pose signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectSetBuildingPartPose(
-                  event::ConnectionPtr _subscriber)
-              { setBuildingPartPose.Disconnect(_subscriber); }
-
-      public: template<typename T>
-              static event::ConnectionPtr ConnectSetBuildingPartSize(T _subscriber)
-              { return setBuildingPartSize.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot to the set building part pose signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectSetBuildingPartSize(
-                  event::ConnectionPtr _subscriber)
-              { setBuildingPartSize.Disconnect(_subscriber); }
-
-
-      /// \brief A building part has been created
-      public: static event::EventT<void (std::string)> createBuildingPart;
-
-      /// \brief A building part pose has been modified
-      public: static event::EventT<void (std::string, math::Pose)>
-          setBuildingPartPose;
-
-      /// \brief A building part size has been modified
-      public: static event::EventT<void (std::string, math::Vector3)>
-          setBuildingPartSize;*/
     };
   }
 }

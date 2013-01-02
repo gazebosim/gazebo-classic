@@ -18,7 +18,7 @@
 #ifndef _GRID_LINES_H
 #define _GRID_LINES_H
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 class GridLines : public  QGraphicsItem
 {

@@ -18,7 +18,7 @@
 #ifndef _BUILDING_EDITOR_PALETTE_HH_
 #define _BUILDING_EDITOR_PALETTE_HH_
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
@@ -59,8 +59,6 @@ namespace gazebo
 
       /// \brief On finish callback.
       private slots: void OnFinish();
-
-
     };
   }
 }

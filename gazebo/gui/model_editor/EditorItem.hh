@@ -1,7 +1,7 @@
 #ifndef _EDITOR_ITEM_HH_
 #define _EDITOR_ITEM_HH_
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
@@ -56,8 +56,6 @@ namespace gazebo
         signals: void itemDeleted();
 
         protected: std::string editorType;
-
-//        protected: std::vector<EditorItem *> attachedItems;
     };
   }
 }

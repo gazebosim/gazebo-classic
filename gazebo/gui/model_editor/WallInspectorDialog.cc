@@ -15,7 +15,7 @@
  *
 */
 
-#include "WallInspectorDialog.hh"
+#include "gazebo/gui/model_editor/WallInspectorDialog.hh"
 
 using namespace gazebo;
 using namespace gui;

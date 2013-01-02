@@ -15,17 +15,17 @@
  *
 */
 
-#include "gui/model_editor/BuildingItem.hh"
-#include "gui/model_editor/GridLines.hh"
-#include "gui/model_editor/EditorView.hh"
-#include "gui/model_editor/EditorItem.hh"
-#include "gui/model_editor/RectItem.hh"
-#include "gui/model_editor/WindowItem.hh"
-#include "gui/model_editor/DoorItem.hh"
-#include "gui/model_editor/PolylineItem.hh"
-#include "gui/model_editor/WallItem.hh"
-#include "gui/model_editor/LevelWidget.hh"
-#include "gui/model_editor/BuildingEditorWidget.hh"
+#include "gazebo/gui/model_editor/BuildingItem.hh"
+#include "gazebo/gui/model_editor/GridLines.hh"
+#include "gazebo/gui/model_editor/EditorView.hh"
+#include "gazebo/gui/model_editor/EditorItem.hh"
+#include "gazebo/gui/model_editor/RectItem.hh"
+#include "gazebo/gui/model_editor/WindowItem.hh"
+#include "gazebo/gui/model_editor/DoorItem.hh"
+#include "gazebo/gui/model_editor/PolylineItem.hh"
+#include "gazebo/gui/model_editor/WallItem.hh"
+#include "gazebo/gui/model_editor/LevelWidget.hh"
+#include "gazebo/gui/model_editor/BuildingEditorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;

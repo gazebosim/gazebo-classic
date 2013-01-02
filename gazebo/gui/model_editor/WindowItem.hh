@@ -18,7 +18,7 @@
 #ifndef _WINDOW_ITEM_HH_
 #define _WINDOW_ITEM_HH_
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {

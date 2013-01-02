@@ -15,8 +15,8 @@
  *
 */
 
-#include "BuildingItem.hh"
-#include "gui/qt.h"
+#include "gazebo/gui/model_editor/BuildingItem.hh"
+#include "gazebo/gui/qt.h"
 
 using namespace gazebo;
 using namespace gui;

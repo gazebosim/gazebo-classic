@@ -18,7 +18,7 @@
 #ifndef _EDITOR_WIDGET_HH_
 #define _EDITOR_WIDGET_HH_
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {

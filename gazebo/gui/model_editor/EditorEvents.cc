@@ -15,7 +15,7 @@
  *
 */
 
-#include "gui/model_editor/EditorEvents.hh"
+#include "gazebo/gui/model_editor/EditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -26,6 +26,3 @@ event::EventT<void ()> Events::discardModel;
 event::EventT<void (int)> Events::changeLevel;
 event::EventT<void (int, std::string)> Events::addLevel;
 event::EventT<void (int, std::string)> Events::changeLevelName;
-/*event::EventT<void (std::string)> Events::createBuildingPart;
-event::EventT<void (std::string, math::Pose)> Events::setBuildingPartPose;
-event::EventT<void (std::string, math::Vector3)> Events::setBuildingPartSize;*/

@@ -18,7 +18,7 @@
 #ifndef _BUILDING_EDITOR_WIDGET_HH_
 #define _BUILDING_EDITOR_WIDGET_HH_
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
@@ -26,11 +26,11 @@ namespace gazebo
   {
     class BuildingEditorWidget : public QWidget
     {
+      public: enum modelTypes {None, Wall, Window, Door, Stairs};
+
       public: BuildingEditorWidget(QWidget *_parent = 0);
 
       public: ~BuildingEditorWidget();
-
-      public: enum modelTypes {None, Wall, Window, Door, Stairs};
     };
   }
 }

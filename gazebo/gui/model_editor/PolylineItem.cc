@@ -15,9 +15,9 @@
  *
 */
 
-#include "PolylineItem.hh"
-#include "CornerGrabber.hh"
-#include "LineSegmentItem.hh"
+#include "gazebo/gui/model_editor/PolylineItem.hh"
+#include "gazebo/gui/model_editor/CornerGrabber.hh"
+#include "gazebo/gui/model_editor/LineSegmentItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -44,7 +44,6 @@ PolylineItem::PolylineItem(QPointF _start, QPointF _end) :
   this->setAcceptHoverEvents(true);
 
   this->lineThickness = 1;
-  this->borderColor = Qt::black;
 
   this->setZValue(1);
 }
@@ -490,15 +489,8 @@ void PolylineItem::paint(QPainter *_painter,
     this->DrawBoundingBox(_painter);
   this->ShowCorners(this->isSelected());
 
-/*  QPen lineBorderPen;
-  lineBorderPen.setWidth(this->pen().width() + 2);
-  lineBorderPen.setStyle(Qt::SolidLine);
-  lineBorderPen.setColor(this->borderColor);
-  _painter->setPen(lineBorderPen);*/
   _painter->drawPath(this->path());
   _painter->restore();
-
-//  QGraphicsPathItem::paint(_painter, _option, _widget);
 }
 
 /////////////////////////////////////////////////

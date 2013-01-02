@@ -15,10 +15,10 @@
  *
 */
 
-#include "gui/model_editor/RectItem.hh"
-#include "gui/model_editor/BuildingItem.hh"
-#include "gui/model_editor/FloorItem.hh"
-#include "gui/model_editor/BuildingMaker.hh"
+#include "gazebo/gui/model_editor/RectItem.hh"
+#include "gazebo/gui/model_editor/BuildingItem.hh"
+#include "gazebo/gui/model_editor/FloorItem.hh"
+#include "gazebo/gui/model_editor/BuildingMaker.hh"
 
 using namespace gazebo;
 using namespace gui;

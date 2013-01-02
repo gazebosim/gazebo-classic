@@ -15,11 +15,11 @@
  *
 */
 
-#include "common/Exception.hh"
-#include "math/Quaternion.hh"
-#include "rendering/Visual.hh"
-#include "gui/model_editor/BuildingMaker.hh"
-#include "gui/model_editor/ModelManip.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/gui/model_editor/BuildingMaker.hh"
+#include "gazebo/gui/model_editor/ModelManip.hh"
 
 using namespace gazebo;
 using namespace gui;

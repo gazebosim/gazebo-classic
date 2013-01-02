@@ -18,7 +18,7 @@
 #ifndef _CORNER_GRABBER_HH_
 #define _CORNER_GRABBER_HH_
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {

@@ -15,7 +15,7 @@
  *
 */
 
-#include "GridLines.hh"
+#include "gazebo/gui/model_editor/GridLines.hh"
 
 /////////////////////////////////////////////////
 GridLines::GridLines( int _w, int _h ) : QGraphicsItem(), width(_w), height(_h),

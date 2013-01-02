@@ -18,8 +18,8 @@
 #define _MODEL_MANIP_HH_
 
 #include <string>
-#include "gui/qt.h"
-#include "rendering/Visual.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {

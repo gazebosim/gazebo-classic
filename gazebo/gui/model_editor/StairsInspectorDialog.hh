@@ -18,7 +18,7 @@
 #ifndef _STAIRS_INSPECTOR_DIALOG_HH_
 #define _STAIRS_INSPECTOR_DIALOG_HH_
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {

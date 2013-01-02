@@ -15,11 +15,11 @@
  *
 */
 
-#include "gui/model_editor/BuildingItem.hh"
-#include "gui/model_editor/RectItem.hh"
-#include "gui/model_editor/DoorItem.hh"
-#include "gui/model_editor/WindowDoorInspectorDialog.hh"
-#include "gui/model_editor/BuildingMaker.hh"
+#include "gazebo/gui/model_editor/BuildingItem.hh"
+#include "gazebo/gui/model_editor/RectItem.hh"
+#include "gazebo/gui/model_editor/DoorItem.hh"
+#include "gazebo/gui/model_editor/WindowDoorInspectorDialog.hh"
+#include "gazebo/gui/model_editor/BuildingMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -39,7 +39,6 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
   this->doorElevation = 0;
 
   this->width = this->doorWidth;
-//  this->height = this->doorDepth + this->doorWidth;
   this->height = this->doorDepth;
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
@@ -121,8 +120,6 @@ void DoorItem::paint (QPainter *_painter,
   this->doorWidth = this->drawingWidth;
   this->doorDepth = this->drawingHeight;
   this->doorPos = this->scenePos();
-
-//  QGraphicsPolygonItem::paint(_painter, _option, _widget);
 }
 
 /////////////////////////////////////////////////

@@ -18,8 +18,8 @@
 #ifndef _LEVEL_WIDGET_HH_
 #define _LEVEL_WIDGET_HH_
 
-#include "gui/qt.h"
-#include "common/Event.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/common/Event.hh"
 
 namespace gazebo
 {

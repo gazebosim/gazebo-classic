@@ -15,14 +15,14 @@
  *
 */
 
-#include "gui/model_editor/RectItem.hh"
-#include "gui/model_editor/BuildingItem.hh"
-#include "gui/model_editor/PolylineItem.hh"
-#include "gui/model_editor/LineSegmentItem.hh"
-#include "gui/model_editor/WallInspectorDialog.hh"
-#include "gui/model_editor/BuildingMaker.hh"
-#include "gui/model_editor/CornerGrabber.hh"
-#include "gui/model_editor/WallItem.hh"
+#include "gazebo/gui/model_editor/RectItem.hh"
+#include "gazebo/gui/model_editor/BuildingItem.hh"
+#include "gazebo/gui/model_editor/PolylineItem.hh"
+#include "gazebo/gui/model_editor/LineSegmentItem.hh"
+#include "gazebo/gui/model_editor/WallInspectorDialog.hh"
+#include "gazebo/gui/model_editor/BuildingMaker.hh"
+#include "gazebo/gui/model_editor/CornerGrabber.hh"
+#include "gazebo/gui/model_editor/WallItem.hh"
 
 using namespace gazebo;
 using namespace gui;

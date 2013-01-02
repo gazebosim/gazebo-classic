@@ -15,7 +15,7 @@
  *
 */
 
-#include "RotateHandle.hh"
+#include "gazebo/gui/model_editor/RotateHandle.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -117,7 +117,6 @@ void RotateHandle::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
   QWidget *)
 {
   QPen borderPen;
-//  borderPen.setWidth(2);
   borderPen.setColor(this->borderColor);
 
   borderPen.setStyle(Qt::SolidLine);
@@ -127,7 +126,4 @@ void RotateHandle::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
       handleOffset.y() - handleSize, handleSize, handleSize);
   _painter->drawLine(origin, handleOffset);
   _painter->drawArc(rotateRect, 0, 16*360);
-
-//  _painter->drawRect(this->boundingRect());
-
 }

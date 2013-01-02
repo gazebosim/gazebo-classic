@@ -18,8 +18,8 @@
 #ifndef _RECT_ITEM_HH_
 #define _RECT_ITEM_HH_
 
-#include "gui/qt.h"
-#include "EditorItem.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/gui/model_editor/EditorItem.hh"
 
 namespace gazebo
 {

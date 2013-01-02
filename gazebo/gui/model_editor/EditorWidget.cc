@@ -15,8 +15,8 @@
  *
 */
 
-#include "EditorWidget.hh"
-#include "BuildingEditorWidget.hh"
+#include "gazebo/gui/model_editor/EditorWidget.hh"
+#include "gazebo/gui/model_editor/BuildingEditorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;

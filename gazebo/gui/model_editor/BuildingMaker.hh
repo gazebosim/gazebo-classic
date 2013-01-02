@@ -20,10 +20,10 @@
 #include <list>
 #include <string>
 
-#include "sdf/sdf.hh"
-#include "common/Events.hh"
-#include "gui/EntityMaker.hh"
-#include "gui/qt.h"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/gui/EntityMaker.hh"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
@@ -92,6 +92,8 @@ namespace gazebo
 
       public: static double ConvertAngle(double _angle);
 
+      public: void SaveToSDF(std::string _savePath);
+
       /// \brief
       public: void Reset();
 
@@ -104,7 +106,7 @@ namespace gazebo
       /// \brief Checks if entity is active
       public: virtual bool IsActive() const;
 
-      public: void SaveToSDF(std::string _savePath);
+      private: virtual void CreateTheEntity();
 
       /// \brief Internal init function.
       private: bool Init();
@@ -114,8 +116,6 @@ namespace gazebo
       private: void GenerateSDF();
 
       private: void GenerateSDFWithCSG();
-
-      private: virtual void CreateTheEntity();
 
       private: std::string GetTemplateSDFString();
 
@@ -128,13 +128,9 @@ namespace gazebo
       private: void SubdivideRectSurface(const QRectF _surface,
         const std::vector<QRectF> _holes, std::vector<QRectF> &_subdivisions);
 
+      public: static double conversionScale;
+
       private: std::map<std::string, ModelManip *> allItems;
-
-//      private: std::map<std::string, ModelManip *> walls;
-
-//      private: std::map<std::string, ModelManip *> windows;
-
-//      private: std::map<std::string, ModelManip *> stairs;
 
       private: sdf::SDFPtr modelSDF;
 
@@ -146,11 +142,7 @@ namespace gazebo
 
       private: rendering::VisualPtr modelVisual;
 
-//      private: std::list<rendering::VisualPtr> visuals;
-
       private: math::Pose modelPose;
-
-      public: static double conversionScale;
 
       private: int wallCounter;
 

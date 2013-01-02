@@ -15,7 +15,7 @@
  *
 */
 
-#include "StairsInspectorDialog.hh"
+#include "gazebo/gui/model_editor/StairsInspectorDialog.hh"
 
 using namespace gazebo;
 using namespace gui;

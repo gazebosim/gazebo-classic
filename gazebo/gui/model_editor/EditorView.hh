@@ -18,8 +18,8 @@
 #ifndef _EDITOR_VIEW_HH_
 #define _EDITOR_VIEW_HH_
 
-#include "gui/qt.h"
-#include "common/Event.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/common/Event.hh"
 
 namespace gazebo
 {

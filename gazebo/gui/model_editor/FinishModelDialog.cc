@@ -15,7 +15,7 @@
  *
 */
 
-#include "FinishModelDialog.hh"
+#include "gazebo/gui/model_editor/FinishModelDialog.hh"
 
 using namespace gazebo;
 using namespace gui;

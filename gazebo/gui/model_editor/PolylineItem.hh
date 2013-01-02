@@ -18,8 +18,8 @@
 #ifndef _POLYLINE_ITEM_HH_
 #define _POLYLINE_ITEM_HH_
 
-#include <gui/qt.h>
-#include <gui/model_editor/EditorItem.hh>
+#include "gazebo/gui/qt.h"
+#include "gazebo/gui/model_editor/EditorItem.hh"
 
 namespace gazebo
 {
@@ -92,23 +92,21 @@ namespace gazebo
       private: void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
+      protected: std::vector<CornerGrabber*> corners;
+
+      protected: std::vector<LineSegmentItem*> segments;
+
+      protected: QPointF segmentMouseMove;
+
       private: QPointF origin;
 
       private: QPointF location;
 
       private: int gridSpace;
 
-      protected: std::vector<CornerGrabber*> corners;
-
-      protected: std::vector<LineSegmentItem*> segments;
-
       private: int cornerWidth;
 
       private: int cornerHeight;
-
-      protected: QPointF segmentMouseMove;
-
-      private: QColor borderColor;
 
       private: double lineThickness;
     };

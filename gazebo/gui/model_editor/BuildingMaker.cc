@@ -14,26 +14,27 @@
  * limitations under the License.
  *
  */
+
 #include <sstream>
 #include <set>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "common/Console.hh"
-#include "common/MouseEvent.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "rendering/UserCamera.hh"
-#include "rendering/Visual.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Scene.hh"
 
-#include "math/Quaternion.hh"
+#include "gazebo/math/Quaternion.hh"
 
-#include "transport/Publisher.hh"
-#include "transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "gui/Gui.hh"
-#include "gui/EntityMaker.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/EntityMaker.hh"
 
 #ifdef HAVE_GTS
   #include "gazebo/common/Mesh.hh"
@@ -41,11 +42,11 @@
   #include "gazebo/common/MeshCSG.hh"
 #endif
 
-#include "gui/model_editor/EditorEvents.hh"
-#include "gui/model_editor/BuildingMaker.hh"
-#include "gui/model_editor/ModelManip.hh"
-#include "gui/model_editor/EditorItem.hh"
-#include "gazebo_config.h"
+#include "gazebo/gui/model_editor/EditorEvents.hh"
+#include "gazebo/gui/model_editor/BuildingMaker.hh"
+#include "gazebo/gui/model_editor/ModelManip.hh"
+#include "gazebo/gui/model_editor/EditorItem.hh"
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 using namespace gui;
@@ -131,7 +132,6 @@ void BuildingMaker::DetachObject(std::string _child, std::string _parent)
   parent->DetachObject(child);
 }
 
-
 /////////////////////////////////////////////////
 std::string BuildingMaker::CreateModel()
 {
@@ -165,7 +165,6 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
         linkName, this->modelVisual));
   linkVisual->Load();
-//  this->visuals.push_back(linkVisual);
 
   std::ostringstream visualName;
   visualName << this->modelName << "::" << linkName << "::Visual";
@@ -177,7 +176,6 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
   visualElem->GetElement("material")->GetElement("script")
       ->GetElement("name")->Set("Gazebo/OrangeTransparent");
   visVisual->Load(visualElem);
-  //this->visuals.push_back(visVisual);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   ModelManip *wallManip = new ModelManip();
   wallManip->SetMaker(this);
@@ -187,7 +185,6 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[visualName.str()] = wallManip;
-  //this->walls[visualName.str()] = wallManip;
 
   return visualName.str();
 }
@@ -203,14 +200,12 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
         linkName, this->modelVisual));
   linkVisual->Load();
-//  this->visuals.push_back(linkVisual);
 
   std::ostringstream visualName;
   visualName << this->modelName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  /// TODO for the moment, just draw a box to represent a window
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
@@ -226,10 +221,6 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[visualName.str()] = windowManip;
-
-  // TODO remove me after testing
-//  std::map<std::string, ModelManip *>::iterator it = this->allItems.begin();
-//  (*it).second->AttachObject(windowManip);
 
   return visualName.str();
 }
@@ -282,7 +273,6 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
         linkName, this->modelVisual));
   linkVisual->Load();
-//  this->visuals.push_back(linkVisual);
 
   std::ostringstream visualName;
   visualName << this->modelName << "::" << linkName << "::Visual";
@@ -293,7 +283,6 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visVisual->Load(visualElem);
   visVisual->DetachObjects();
-  // this->visuals.push_back(visVisual);
 
   ModelManip *stairsManip = new ModelManip();
   stairsManip->SetMaker(this);
@@ -302,12 +291,9 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
   double dSteps = static_cast<double>(_steps);
-//  math::Vector3 offset = scaledSize/2.0;
-//  offset.y = -offset.y;
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[visualName.str()] = stairsManip;
-  // this->stairs[visualName.str()] = stairsManip;
 
   std::stringstream visualStepName;
   visualStepName << visualName.str() << "step" << 0;
@@ -508,14 +494,6 @@ void BuildingMaker::GenerateSDF()
     newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
     newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
 
-//    qDebug() << " visual rotation " << visual->GetRotation().GetAsEuler().x
-//        << visual->GetRotation().GetAsEuler().y
-//        << visual->GetRotation().GetAsEuler().z;
-//    qDebug() << " visual world rot "
-//        << visual->GetWorldPose().rot.GetAsEuler().x
-//        << visual->GetWorldPose().rot.y
-//        << visual->GetWorldPose().rot.z;
-
     if (visual->GetChildCount() == 0)
     {
       // subdivide wall surface to create holes for representing
@@ -553,17 +531,6 @@ void BuildingMaker::GenerateSDF()
           }
           std::vector<QRectF> subdivisions;
           QRectF surface(0, 0, wallVis->GetScale().x, wallVis->GetScale().z);
-
-          //QRectF host(0, 0, 1.0, 1.0);
-          //QRectF hole1(0.2,0.3,0.2,0.2);;
-          //QRectF hole2(0.5,0.2,0.2,0.2);
-          //QRectF hole3(0.4,0.6,0.3,0.4);
-          //std::vector<QRectF> holess;
-          //holess.push_back(hole1);
-          //holess.push_back(hole2);
-          //holess.push_back(hole3);
-          //std::vector<QRectF> subs;
-          //this->SubdivideRectSurface(host, holess, subs);
 
           this->SubdivideRectSurface(surface, holes, subdivisions);
 
@@ -700,7 +667,6 @@ void BuildingMaker::GenerateSDF()
               GetElement("size")->Set(visual->GetScale());
         }
       }
-
     }
     else
     {
@@ -1081,8 +1047,6 @@ void BuildingMaker::SubdivideRectSurface(const QRectF _surface,
   while (!startings.empty())
   {
     startIt = startings.begin();
-//      std::cout << " start xy " << (*startIt).x()
-//          << " " << (*startIt).y() << std::endl;
 
     // walk along y
     double maxY = _surface.y() + _surface.height();
@@ -1204,13 +1168,5 @@ void BuildingMaker::SubdivideRectSurface(const QRectF _surface,
     filledX.insert(block);
     filledY.insert(block);
     _subdivisions.push_back(block);
-
-/*    std::cout << "================================================="<<std::endl;
-    for (unsigned int i = 0; i < _subdivisions.size(); ++i)
-    {
-      std::cout << "subs " << i << " " << _subdivisions[i].x() << " "
-          << _subdivisions[i].y() << " " << _subdivisions[i].width() << " "
-          << _subdivisions[i].height() << std::endl;
-    }*/
   }
 }

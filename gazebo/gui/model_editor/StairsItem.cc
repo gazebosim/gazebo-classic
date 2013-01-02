@@ -15,12 +15,12 @@
  *
 */
 
-#include "gui/model_editor/BuildingItem.hh"
-#include "gui/model_editor/RectItem.hh"
-#include "gui/model_editor/BuildingMaker.hh"
-#include "gui/model_editor/StairsInspectorDialog.hh"
-#include "gui/model_editor/EditorView.hh"
-#include "gui/model_editor/StairsItem.hh"
+#include "gazebo/gui/model_editor/BuildingItem.hh"
+#include "gazebo/gui/model_editor/RectItem.hh"
+#include "gazebo/gui/model_editor/BuildingMaker.hh"
+#include "gazebo/gui/model_editor/StairsInspectorDialog.hh"
+#include "gazebo/gui/model_editor/EditorView.hh"
+#include "gazebo/gui/model_editor/StairsItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -91,7 +91,6 @@ int StairsItem::GetSteps()
 void StairsItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
-   // ignore resize for now
   QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
       this->drawingOriginY - this->drawingHeight/2);
   QPointF topRight(this->drawingOriginX + this->drawingWidth/2,

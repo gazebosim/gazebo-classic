@@ -15,21 +15,21 @@
  *
 */
 
-#include "gui/model_editor/BuildingItem.hh"
-#include "gui/model_editor/GridLines.hh"
-#include "gui/model_editor/EditorItem.hh"
-#include "gui/model_editor/RectItem.hh"
-#include "gui/model_editor/WindowItem.hh"
-#include "gui/model_editor/DoorItem.hh"
-#include "gui/model_editor/StairsItem.hh"
-#include "gui/model_editor/FloorItem.hh"
-#include "gui/model_editor/LineSegmentItem.hh"
-#include "gui/model_editor/PolylineItem.hh"
-#include "gui/model_editor/WallItem.hh"
-#include "gui/model_editor/BuildingMaker.hh"
-#include "gui/model_editor/LevelInspectorDialog.hh"
-#include "gui/model_editor/EditorEvents.hh"
-#include "gui/model_editor/EditorView.hh"
+#include "gazebo/gui/model_editor/BuildingItem.hh"
+#include "gazebo/gui/model_editor/GridLines.hh"
+#include "gazebo/gui/model_editor/EditorItem.hh"
+#include "gazebo/gui/model_editor/RectItem.hh"
+#include "gazebo/gui/model_editor/WindowItem.hh"
+#include "gazebo/gui/model_editor/DoorItem.hh"
+#include "gazebo/gui/model_editor/StairsItem.hh"
+#include "gazebo/gui/model_editor/FloorItem.hh"
+#include "gazebo/gui/model_editor/LineSegmentItem.hh"
+#include "gazebo/gui/model_editor/PolylineItem.hh"
+#include "gazebo/gui/model_editor/WallItem.hh"
+#include "gazebo/gui/model_editor/BuildingMaker.hh"
+#include "gazebo/gui/model_editor/LevelInspectorDialog.hh"
+#include "gazebo/gui/model_editor/EditorEvents.hh"
+#include "gazebo/gui/model_editor/EditorView.hh"
 
 using namespace gazebo;
 using namespace gui;

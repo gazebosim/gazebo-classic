@@ -15,9 +15,9 @@
  *
 */
 
-#include "LineSegmentItem.hh"
-#include "WallInspectorDialog.hh"
-#include "EditorItem.hh"
+#include "gazebo/gui/model_editor/LineSegmentItem.hh"
+#include "gazebo/gui/model_editor/WallInspectorDialog.hh"
+#include "gazebo/gui/model_editor/EditorItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -131,19 +131,19 @@ void LineSegmentItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void LineSegmentItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
-/*  QColor lineColor = Qt::black;
-  QPen linePen = this->pen();
-  linePen.setColor(lineColor);
-  this->setPen(linePen);*/
+//  QColor lineColor = Qt::black;
+//  QPen linePen = this->pen();
+//  linePen.setColor(lineColor);
+//  this->setPen(linePen);
 }
 
 /////////////////////////////////////////////////
 void LineSegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
-/*  QColor lineColor = Qt::red;
-  QPen linePen = this->pen();
-  linePen.setColor(lineColor);
-  this->setPen(linePen);*/
+//  QColor lineColor = Qt::red;
+//  QPen linePen = this->pen();
+//  linePen.setColor(lineColor);
+//  this->setPen(linePen);
 }
 
 /////////////////////////////////////////////////
@@ -170,8 +170,6 @@ double LineSegmentItem::GetSceneRotation()
 /////////////////////////////////////////////////
 void LineSegmentItem::LineChanged()
 {
-//  emit sizeChanged(this->pen().width(), this->line().length(),
-//      this->pseudoHeight);
   emit widthChanged(this->line().length() + this->pen().width());
   emit depthChanged(this->pen().width());
 

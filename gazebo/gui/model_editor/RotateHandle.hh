@@ -18,7 +18,7 @@
 #ifndef _ROTATE_HANDLE_HH_
 #define _ROTATE_HANDLE_HH_
 
-#include <gui/qt.h>
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {

@@ -15,7 +15,7 @@
  *
 */
 
-#include "gui/model_editor/LevelInspectorDialog.hh"
+#include "gazebo/gui/model_editor/LevelInspectorDialog.hh"
 
 using namespace gazebo;
 using namespace gui;

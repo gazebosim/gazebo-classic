@@ -15,9 +15,9 @@
  *
 */
 
-#include "gui/model_editor/BuildingEditorPalette.hh"
-#include "gui/model_editor/FinishModelDialog.hh"
-#include "gui/model_editor/EditorEvents.hh"
+#include "gazebo/gui/model_editor/BuildingEditorPalette.hh"
+#include "gazebo/gui/model_editor/FinishModelDialog.hh"
+#include "gazebo/gui/model_editor/EditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
