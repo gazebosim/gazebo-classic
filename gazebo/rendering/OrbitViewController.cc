@@ -173,7 +173,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   this->refVisual->SetVisible(true);
 
   // Middle mouse button is used to Orbit.
-  if (_event.buttons & common::MouseEvent::MIDDLE)
+  if (_event.buttons & common::MouseEvent::MIDDLE && _event.dragging)
   {
     // Compute the delta yaw and pitch.
     double dy = this->NormalizeYaw(drag.x * _event.moveScale * -0.4);
@@ -189,7 +189,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     this->Orbit(dy, dp);
   }
   // The left mouse button is used to translate the camera.
-  else if (_event.buttons & common::MouseEvent::LEFT)
+  else if (_event.buttons & common::MouseEvent::LEFT && _event.dragging)
   {
     this->distance =
       this->camera->GetWorldPose().pos.Distance(this->focalPoint);
