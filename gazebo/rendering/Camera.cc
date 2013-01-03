@@ -179,7 +179,6 @@ void Camera::Init()
 
   this->CreateCamera();
 
-
   // Create a scene node to control pitch motion
   this->pitchNode =
     this->sceneNode->createChildSceneNode(this->name + "PitchNode");
@@ -1296,13 +1295,6 @@ bool Camera::IsVisible(const std::string &_visualName)
 bool Camera::GetInitialized() const
 {
   return this->initialized;
-}
-
-/////////////////////////////////////////////////
-bool Camera::RotateToOrientation(const math::Quaternion & /*_quat*/,
-                                 double /*_time*/)
-{
-  return true;
 }
 
 /////////////////////////////////////////////////

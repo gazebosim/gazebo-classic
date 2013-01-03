@@ -393,7 +393,6 @@ void UserCamera::ShowVisual(bool /*_s*/)
 //////////////////////////////////////////////////
 bool UserCamera::MoveToPosition(const math::Pose &_pose, double _time)
 {
-  // this->orbitViewController->SetFocalPoint(_pose.pos);
   return Camera::MoveToPosition(_pose, _time);
 }
 

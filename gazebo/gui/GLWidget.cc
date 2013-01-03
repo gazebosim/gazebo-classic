@@ -661,7 +661,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
 
-  math::Vector3 camPos(-10, 0, 2);
+  math::Vector3 camPos(5, -5, 2);
   math::Vector3 lookAt(0, 0, 0);
   math::Vector3 delta = lookAt - camPos;
 
