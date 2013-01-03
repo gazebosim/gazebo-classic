@@ -41,6 +41,8 @@ namespace gazebo
         private: virtual void paint (QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
+        private: virtual void mousePressEvent(QGraphicsSceneMouseEvent *_event);
+
         private: void FloorChanged();
 
         private: void SizeChanged();

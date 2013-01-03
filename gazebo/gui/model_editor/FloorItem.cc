@@ -74,6 +74,15 @@ double FloorItem::GetSceneRotation()
 }
 
 /////////////////////////////////////////////////
+void FloorItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
+{
+  if (!this->isSelected())
+    this->scene()->clearSelection();
+
+  _event->setAccepted(false);
+}
+
+/////////////////////////////////////////////////
 void FloorItem::paint (QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
