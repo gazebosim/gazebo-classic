@@ -21,6 +21,7 @@
 #include "gazebo/gui/model_editor/StairsInspectorDialog.hh"
 #include "gazebo/gui/model_editor/EditorView.hh"
 #include "gazebo/gui/model_editor/StairsItem.hh"
+#include "gazebo/gui/model_editor/RotateHandle.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -90,6 +91,84 @@ double StairsItem::GetSceneRotation()
 int StairsItem::GetSteps()
 {
   return this->stairsSteps;
+}
+
+
+/////////////////////////////////////////////////
+bool StairsItem::rotateEventFilter(RotateHandle *_rotate,
+    QEvent *_event)
+{
+  QGraphicsSceneMouseEvent *mouseEvent =
+    dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
+
+  switch (_event->type())
+  {
+    case QEvent::GraphicsSceneMousePress:
+    {
+      _rotate->SetMouseState(QEvent::GraphicsSceneMousePress);
+      _rotate->SetMouseDownX(mouseEvent->pos().x());
+      _rotate->SetMouseDownY(mouseEvent->pos().y());
+
+      break;
+    }
+    case QEvent::GraphicsSceneMouseRelease:
+    {
+      _rotate->SetMouseState(QEvent::GraphicsSceneMouseRelease);
+      break;
+    }
+    case QEvent::GraphicsSceneMouseMove:
+    {
+      _rotate->SetMouseState(QEvent::GraphicsSceneMouseMove);
+      break;
+    }
+    case QEvent::GraphicsSceneHoverEnter:
+    case QEvent::GraphicsSceneHoverMove:
+    {
+      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+      return true;
+    }
+    case QEvent::GraphicsSceneHoverLeave:
+    {
+      QApplication::restoreOverrideCursor();
+      return true;
+    }
+    default:
+      return false;
+      break;
+  }
+
+  if (mouseEvent == NULL)
+    return false;
+
+  if (_rotate->GetMouseState() == QEvent::GraphicsSceneMouseMove)
+  {
+    QPoint localCenter(this->drawingOriginX, this->drawingOriginY);
+    QPointF center = this->mapToScene(localCenter);
+
+    QPointF newPoint = mouseEvent->scenePos();
+    QLineF line(center.x(), center.y(), newPoint.x(), newPoint.y());
+
+    // limit stairs to right angles until there is proper csg support
+    double angle = line.angle();
+    double range = 25;
+    if (angle > (90 - range) && (angle < 90 + range))
+    {
+      this->SetRotation(0);
+    }
+    else if (angle > (180 - range) && (angle < 180 + range))
+    {
+      this->SetRotation(-90);
+    }
+    else if (angle > (270 - range) && (angle < 270 + range))
+    {
+      this->SetRotation(180);
+    }
+    else if (angle > (360 - range) || (angle < 0 + range))
+    {
+      this->SetRotation(90);
+    }
+  }
+  return true;
 }
 
 /////////////////////////////////////////////////

@@ -51,6 +51,9 @@ namespace gazebo
       private: virtual void paint (QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
+      private: virtual bool rotateEventFilter(RotateHandle *_rotateHandle,
+          QEvent *_event);
+
       private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
 
       private slots: void OnApply();
