@@ -41,6 +41,10 @@ set (qt_headers
   EditorItem.hh
   LevelWidget.hh
   EditorView.hh
+  StairsItem.hh
+  WallItem.hh
+  DoorItem.hh
+  WindowItem.hh
 )
 
 set (headers
@@ -50,15 +54,11 @@ set (headers
   CornerGrabber.hh
   RotateHandle.hh
   BuildingItem.hh
-  WindowItem.hh
-  DoorItem.hh
   RectItem.hh
   FloorItem.hh
   LineSegmentItem.hh
   GridLines.hh
   PolylineItem.hh
-  WallItem.hh
-  StairsItem.hh
   EditorEvents.hh
 )
 

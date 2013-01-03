@@ -59,7 +59,11 @@ namespace gazebo
 
       public: void SetType(std::string _type);
 
+      Q_SIGNALS: void Applied();
+
       private slots: void OnCancel();
+
+      private slots: void OnApply();
 
       private slots: void OnOK();
 

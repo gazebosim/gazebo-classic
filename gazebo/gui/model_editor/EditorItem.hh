@@ -23,37 +23,37 @@ namespace gazebo
 
         public: virtual std::string GetType();
 
-        signals: void sizeChanged(double _width, double _depth,
+        Q_SIGNALS: void sizeChanged(double _width, double _depth,
             double _height);
 
-        signals: void poseChanged(double _x, double _y, double _z,
+        Q_SIGNALS: void poseChanged(double _x, double _y, double _z,
             double _roll, double _pitch, double _yaw);
 
-        signals: void poseOriginTransformed(double _x, double _y, double _z,
+        Q_SIGNALS: void poseOriginTransformed(double _x, double _y, double _z,
             double _roll, double _pitch, double _yaw);
 
-        signals: void positionChanged(double _x, double _y, double _z);
+        Q_SIGNALS: void positionChanged(double _x, double _y, double _z);
 
-        signals: void rotationChanged(double _roll, double _pitch, double _yaw);
+        Q_SIGNALS: void rotationChanged(double _roll, double _pitch, double _yaw);
 
-        signals: void widthChanged(double _width);
+        Q_SIGNALS: void widthChanged(double _width);
 
-        signals: void depthChanged(double _depth);
+        Q_SIGNALS: void depthChanged(double _depth);
 
-        signals: void heightChanged(double _height);
+        Q_SIGNALS: void heightChanged(double _height);
 
-        signals: void posXChanged(double _posX);
+        Q_SIGNALS: void posXChanged(double _posX);
 
-        signals: void posYChanged(double _posY);
+        Q_SIGNALS: void posYChanged(double _posY);
 
-        signals: void posZChanged(double _posX);
+        Q_SIGNALS: void posZChanged(double _posX);
 
-        signals: void yawChanged(double _yaw);
+        Q_SIGNALS: void yawChanged(double _yaw);
 
-        signals: void originChanged(double _xRatio, double _yRatio,
+        Q_SIGNALS: void originChanged(double _xRatio, double _yRatio,
             double _zRatio);
 
-        signals: void itemDeleted();
+        Q_SIGNALS: void itemDeleted();
 
         protected: std::string editorType;
     };

@@ -19,6 +19,8 @@
 #define _WALL_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/model_editor/PolylineItem.hh"
+#include "gazebo/gui/model_editor/BuildingItem.hh"
 
 namespace gazebo
 {
@@ -32,8 +34,12 @@ namespace gazebo
 
     class BuildingItem;
 
+    class WallInspectorDialog;
+
     class WallItem : public PolylineItem, public BuildingItem
     {
+        Q_OBJECT
+
         public: WallItem(QPointF _start, QPointF _end);
 
         public: ~WallItem();
@@ -52,6 +58,8 @@ namespace gazebo
         private: bool segmentEventFilter(LineSegmentItem *_segment,
             QEvent *_event);
 
+        private slots: void OnApply();
+
         private: void WallChanged();
 
         private: double wallThickness;
@@ -59,6 +67,10 @@ namespace gazebo
         private: double wallHeight;
 
         private: double scale;
+
+        private: LineSegmentItem* selectedSegment;
+
+        private: WallInspectorDialog *inspector;
     };
   }
 }

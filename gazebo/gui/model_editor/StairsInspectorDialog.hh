@@ -52,7 +52,11 @@ namespace gazebo
 
       public: void SetSteps(int _steps);
 
+      Q_SIGNALS: void Applied();
+
       private slots: void OnCancel();
+
+      private slots: void OnApply();
 
       private slots: void OnOK();
 

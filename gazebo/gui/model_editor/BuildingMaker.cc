@@ -503,6 +503,16 @@ void BuildingMaker::GenerateSDF()
       {
         if (modelManip->IsAttached())
           continue;
+        visualElem->GetAttribute("name")->Set(modelManip->GetName()
+            + "_Visual");
+        collisionElem->GetAttribute("name")->Set(modelManip->GetName()
+            + "_Collision");
+        visualElem->GetElement("pose")->Set(visual->GetPose());
+        collisionElem->GetElement("pose")->Set(visual->GetPose());
+        visualElem->GetElement("geometry")->GetElement("box")->
+            GetElement("size")->Set(visual->GetScale());
+        collisionElem->GetElement("geometry")->GetElement("box")->
+            GetElement("size")->Set(visual->GetScale());
       }
       else if (name.find("Wall") != std::string::npos)
       {

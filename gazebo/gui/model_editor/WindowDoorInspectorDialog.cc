@@ -121,10 +121,13 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
+  QPushButton *applyButton = new QPushButton(tr("&Apply"));
+  connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
   QPushButton *OKButton = new QPushButton(tr("&OK"));
   OKButton->setDefault(true);
   connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
   buttonsLayout->addWidget(cancelButton);
+  buttonsLayout->addWidget(applyButton);
   buttonsLayout->addWidget(OKButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
@@ -226,8 +229,14 @@ void WindowDoorInspectorDialog::OnCancel()
 }
 
 /////////////////////////////////////////////////
+void WindowDoorInspectorDialog::OnApply()
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
 void WindowDoorInspectorDialog::OnOK()
 {
-  /// TODO:
+  emit Applied();
   this->accept();
 }

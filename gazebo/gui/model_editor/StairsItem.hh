@@ -19,6 +19,8 @@
 #define _STAIRS_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/model_editor/RectItem.hh"
+#include "gazebo/gui/model_editor/BuildingItem.hh"
 
 namespace gazebo
 {
@@ -26,8 +28,14 @@ namespace gazebo
   {
     class RectItem;
 
+    class BuildingItem;
+
+    class StairsInspectorDialog;
+
     class StairsItem :  public RectItem, public BuildingItem
     {
+      Q_OBJECT
+
       public: StairsItem();
 
       public: ~StairsItem();
@@ -44,6 +52,8 @@ namespace gazebo
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
       private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+
+      private slots: void OnApply();
 
       private: void StairsChanged();
 
@@ -64,6 +74,8 @@ namespace gazebo
       private: int stairsSteps;
 
       private: double scale;
+
+      private: StairsInspectorDialog* inspector;
 
 //        private: double stairsUnitRise;
 

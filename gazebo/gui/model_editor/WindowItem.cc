@@ -49,11 +49,17 @@ WindowItem::WindowItem(): RectItem(), BuildingItem()
 
   this->zValueIdle = 3;
   this->setZValue(this->zValueIdle);
+
+  this->inspector = new WindowDoorInspectorDialog(
+      WindowDoorInspectorDialog::WINDOW);
+  this->inspector->setModal(false);
+  connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
 }
 
 /////////////////////////////////////////////////
 WindowItem::~WindowItem()
 {
+  delete this->inspector;
 }
 
 /////////////////////////////////////////////////
@@ -130,35 +136,43 @@ void WindowItem::paint(QPainter *_painter,
 /////////////////////////////////////////////////
 void WindowItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
-  WindowDoorInspectorDialog dialog(WindowDoorInspectorDialog::WINDOW);
-  dialog.SetWidth(this->windowWidth * this->scale);
-  dialog.SetHeight(this->windowHeight * this->scale);
-  dialog.SetElevation(this->windowElevation * this->scale);
-  dialog.SetDepth(this->windowDepth * this->scale);
+  this->inspector->SetWidth(this->windowWidth * this->scale);
+  this->inspector->SetHeight(this->windowHeight * this->scale);
+  this->inspector->SetElevation(this->windowElevation * this->scale);
+  this->inspector->SetDepth(this->windowDepth * this->scale);
 
   QPointF itemPos = this->windowPos * this->scale;
   itemPos.setY(-itemPos.y());
-  dialog.SetPosition(itemPos);
-  if (dialog.exec() == QDialog::Accepted)
-  {
-    this->SetSize(QSize(dialog.GetWidth() / this->scale,
-        dialog.GetDepth() / this->scale));
-    this->windowWidth = dialog.GetWidth() / this->scale;
-    this->windowHeight = dialog.GetHeight() / this->scale;
-    this->windowDepth = dialog.GetDepth() / this->scale;
-    this->windowElevation = dialog.GetElevation() / this->scale;
-    if ((fabs(dialog.GetPosition().x() - itemPos.x()) >= 0.01)
-        || (fabs(dialog.GetPosition().y() - itemPos.y()) >= 0.01))
-    {
-      itemPos = dialog.GetPosition() / this->scale;
-      itemPos.setY(-itemPos.y());
-      this->windowPos = itemPos;
-      this->setPos(this->windowPos);
-      this->setParentItem(NULL);
-    }
-    this->WindowChanged();
-  }
+  this->inspector->SetPosition(itemPos);
+  this->inspector->show();
+
   _event->setAccepted(true);
+}
+
+/////////////////////////////////////////////////
+void WindowItem::OnApply()
+{
+  WindowDoorInspectorDialog *dialog =
+     qobject_cast<WindowDoorInspectorDialog *>(QObject::sender());
+
+  QPointF itemPos = this->windowPos * this->scale;
+  itemPos.setY(-itemPos.y());
+  this->SetSize(QSize(dialog->GetWidth() / this->scale,
+      dialog->GetDepth() / this->scale));
+  this->windowWidth = dialog->GetWidth() / this->scale;
+  this->windowHeight = dialog->GetHeight() / this->scale;
+  this->windowDepth = dialog->GetDepth() / this->scale;
+  this->windowElevation = dialog->GetElevation() / this->scale;
+  if ((fabs(dialog->GetPosition().x() - itemPos.x()) >= 0.01)
+      || (fabs(dialog->GetPosition().y() - itemPos.y()) >= 0.01))
+  {
+    itemPos = dialog->GetPosition() / this->scale;
+    itemPos.setY(-itemPos.y());
+    this->windowPos = itemPos;
+    this->setPos(this->windowPos);
+    this->setParentItem(NULL);
+  }
+  this->WindowChanged();
 }
 
 /////////////////////////////////////////////////

@@ -40,11 +40,18 @@ WallItem::WallItem(QPointF _start, QPointF _end)
   this->wallHeight = 250;
 
   this->SetThickness(this->wallThickness);
+
+  this->selectedSegment = NULL;
+
+  this->inspector = new WallInspectorDialog();
+  this->inspector->setModal(false);
+  connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
 }
 
 /////////////////////////////////////////////////
 WallItem::~WallItem()
 {
+  delete this->inspector;
 }
 
 /////////////////////////////////////////////////
@@ -209,51 +216,22 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
     }
     case QEvent::GraphicsSceneMouseDoubleClick:
     {
+      this->selectedSegment = _segment;
       QLineF line = _segment->line();
       double segmentLength = line.length() + this->wallThickness;
       QPointF segmentStartPoint = this->mapToScene(line.p1());
       QPointF segmentEndPoint = this->mapToScene(line.p2());
 
-      WallInspectorDialog dialog;
-      dialog.SetThickness(this->wallThickness * this->scale);
-      dialog.SetHeight(this->wallHeight * this->scale);
-      dialog.SetLength(segmentLength * this->scale);
+      this->inspector->SetThickness(this->wallThickness * this->scale);
+      this->inspector->SetHeight(this->wallHeight * this->scale);
+      this->inspector->SetLength(segmentLength * this->scale);
       QPointF startPos = segmentStartPoint * this->scale;
       startPos.setY(-startPos.y());
-      dialog.SetStartPosition(startPos);
+      this->inspector->SetStartPosition(startPos);
       QPointF endPos = segmentEndPoint * this->scale;
       endPos.setY(-endPos.y());
-      dialog.SetEndPosition(endPos);
-      if (dialog.exec() == QDialog::Accepted)
-      {
-        this->wallThickness = dialog.GetThickness() / this->scale;
-        this->SetThickness(this->wallThickness);
-        this->wallHeight = dialog.GetHeight() / this->scale;
-        this->WallChanged();
-
-        double newLength = dialog.GetLength() / this->scale;
-        // The if statement below limits the change to either the length of
-        // the wall segment or its start/end pos.
-        // Comparison between doubles up to 1 decimal place
-        if (fabs(newLength - segmentLength) > 0.1)
-        {
-          line.setLength(newLength - this->wallThickness);
-          this->SetVertexPosition(_segment->GetIndex()+1,
-              this->mapToScene(line.p2()));
-        }
-        else
-        {
-          QPointF newStartPoint = dialog.GetStartPosition() / this->scale;
-          newStartPoint.setY(-newStartPoint.y());
-          QPointF newEndPoint = dialog.GetEndPosition() / this->scale;
-          newEndPoint.setY(-newEndPoint.y());
-
-          this->SetVertexPosition(_segment->GetIndex(),
-            newStartPoint);
-          this->SetVertexPosition(_segment->GetIndex() + 1,
-            newEndPoint);
-        }
-      }
+      this->inspector->SetEndPosition(endPos);
+      this->inspector->show();
       _segment->SetMouseState(QEvent::GraphicsSceneMouseDoubleClick);
       break;
     }
@@ -279,6 +257,43 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
       children[i]->moveBy(trans.x(), trans.y());
   }
   return true;
+}
+
+/////////////////////////////////////////////////
+void WallItem::OnApply()
+{
+  WallInspectorDialog *dialog =
+     qobject_cast<WallInspectorDialog *>(QObject::sender());
+
+  QLineF line = this->selectedSegment->line();
+  double segmentLength = line.length() + this->wallThickness;
+  this->wallThickness = dialog->GetThickness() / this->scale;
+  this->SetThickness(this->wallThickness);
+  this->wallHeight = dialog->GetHeight() / this->scale;
+  this->WallChanged();
+
+  double newLength = dialog->GetLength() / this->scale;
+  // The if statement below limits the change to either the length of
+  // the wall segment or its start/end pos.
+  // Comparison between doubles up to 1 decimal place
+  if (fabs(newLength - segmentLength) > 0.1)
+  {
+    line.setLength(newLength - this->wallThickness);
+    this->SetVertexPosition(this->selectedSegment->GetIndex()+1,
+        this->mapToScene(line.p2()));
+  }
+  else
+  {
+    QPointF newStartPoint = dialog->GetStartPosition() / this->scale;
+    newStartPoint.setY(-newStartPoint.y());
+    QPointF newEndPoint = dialog->GetEndPosition() / this->scale;
+    newEndPoint.setY(-newEndPoint.y());
+
+    this->SetVertexPosition(this->selectedSegment->GetIndex(),
+      newStartPoint);
+    this->SetVertexPosition(this->selectedSegment->GetIndex() + 1,
+      newEndPoint);
+  }
 }
 
 /////////////////////////////////////////////////

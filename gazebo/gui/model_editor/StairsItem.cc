@@ -55,11 +55,16 @@ StairsItem::StairsItem(): RectItem(), BuildingItem()
 
   this->zValueIdle = 3;
   this->setZValue(this->zValueIdle);
+
+  this->inspector = new StairsInspectorDialog();
+  this->inspector->setModal(false);
+  connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
 }
 
 /////////////////////////////////////////////////
 StairsItem::~StairsItem()
 {
+  delete this->inspector;
 }
 
 /////////////////////////////////////////////////
@@ -136,39 +141,47 @@ void StairsItem::paint(QPainter *_painter,
 /////////////////////////////////////////////////
 void StairsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
-  StairsInspectorDialog dialog(0);
-  dialog.SetWidth(this->stairsWidth * this->scale);
-  dialog.SetDepth(this->stairsDepth * this->scale);
-  dialog.SetHeight(this->stairsHeight * this->scale);
-  dialog.SetSteps(this->stairsSteps);
+  this->inspector->SetWidth(this->stairsWidth * this->scale);
+  this->inspector->SetDepth(this->stairsDepth * this->scale);
+  this->inspector->SetHeight(this->stairsHeight * this->scale);
+  this->inspector->SetSteps(this->stairsSteps);
 //  dialog.SetElevation(this->stairsElevation);
   QPointF startPos = this->stairsPos * this->scale;
   startPos.setY(-startPos.y());
-  dialog.SetStartPosition(startPos);
-  if (dialog.exec() == QDialog::Accepted)
-  {
-    this->SetSize(QSize(dialog.GetWidth() / this->scale,
-        dialog.GetDepth() / this->scale));
-    this->stairsWidth = dialog.GetWidth() / this->scale;
-    this->stairsHeight = dialog.GetHeight() / this->scale;
-    this->stairsDepth = dialog.GetDepth() / this->scale;
-    if ((fabs(dialog.GetStartPosition().x() - startPos.x()) >= 0.01)
-        || (fabs(dialog.GetStartPosition().y() - startPos.y()) >= 0.01))
-    {
-      this->stairsPos = dialog.GetStartPosition() / this->scale;
-      this->stairsPos.setY(-this->stairsPos.y());
-      this->setPos(stairsPos);
-      this->setParentItem(NULL);
-    }
-    if (this->stairsSteps != dialog.GetSteps())
-    {
-      this->stairsSteps = dialog.GetSteps();
-      this->StepsChanged();
-    }
-//    this->stairsElevation = dialog.GetElevation();
-    this->StairsChanged();
-  }
+  this->inspector->SetStartPosition(startPos);
+  this->inspector->show();
+
   _event->setAccepted(true);
+}
+
+/////////////////////////////////////////////////
+void StairsItem::OnApply()
+{
+  StairsInspectorDialog *dialog =
+      qobject_cast<StairsInspectorDialog *>(QObject::sender());
+
+  QPointF startPos = this->stairsPos * this->scale;
+  startPos.setY(-startPos.y());
+ this->SetSize(QSize(dialog->GetWidth() / this->scale,
+      dialog->GetDepth() / this->scale));
+  this->stairsWidth = dialog->GetWidth() / this->scale;
+  this->stairsHeight = dialog->GetHeight() / this->scale;
+  this->stairsDepth = dialog->GetDepth() / this->scale;
+  if ((fabs(dialog->GetStartPosition().x() - startPos.x()) >= 0.01)
+      || (fabs(dialog->GetStartPosition().y() - startPos.y()) >= 0.01))
+  {
+    this->stairsPos = dialog->GetStartPosition() / this->scale;
+    this->stairsPos.setY(-this->stairsPos.y());
+    this->setPos(stairsPos);
+    this->setParentItem(NULL);
+  }
+  if (this->stairsSteps != dialog->GetSteps())
+  {
+    this->stairsSteps = dialog->GetSteps();
+    this->StepsChanged();
+  }
+//    this->stairsElevation = dialog->GetElevation();
+  this->StairsChanged();
 }
 
 /////////////////////////////////////////////////

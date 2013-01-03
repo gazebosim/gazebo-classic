@@ -97,9 +97,9 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
 
   QLabel *stepsLabel = new QLabel(tr("# Steps: "));
   this->stepsSpinBox = new QSpinBox;
-  this->stepsSpinBox->setRange(0, 1000);
+  this->stepsSpinBox->setRange(1, 1000);
   this->stepsSpinBox->setSingleStep(1);
-  this->stepsSpinBox->setValue(0);
+  this->stepsSpinBox->setValue(1);
 
   QGridLayout *stepsLayout = new QGridLayout;
   stepsLayout->addWidget(stepsLabel, 0, 0);
@@ -108,10 +108,13 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
+  QPushButton *applyButton = new QPushButton(tr("&Apply"));
+  connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
   QPushButton *OKButton = new QPushButton(tr("&OK"));
   OKButton->setDefault(true);
   connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
   buttonsLayout->addWidget(cancelButton);
+  buttonsLayout->addWidget(applyButton);
   buttonsLayout->addWidget(OKButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
@@ -200,8 +203,14 @@ void StairsInspectorDialog::OnCancel()
 }
 
 /////////////////////////////////////////////////
+void StairsInspectorDialog::OnApply()
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
 void StairsInspectorDialog::OnOK()
 {
-  /// TODO:
+  emit Applied();
   this->accept();
 }

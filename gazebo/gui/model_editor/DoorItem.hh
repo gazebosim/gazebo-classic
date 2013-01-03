@@ -19,6 +19,8 @@
 #define _DOOR_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/model_editor/RectItem.hh"
+#include "gazebo/gui/model_editor/BuildingItem.hh"
 
 namespace gazebo
 {
@@ -28,8 +30,12 @@ namespace gazebo
 
     class BuildingItem;
 
+    class WindowDoorInspectorDialog;
+
     class DoorItem : public RectItem, public BuildingItem
     {
+        Q_OBJECT
+
         public: DoorItem();
 
         public: ~DoorItem();
@@ -44,6 +50,8 @@ namespace gazebo
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
         private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+
+        private slots: void OnApply();
 
         private: void DoorChanged();
 
@@ -60,6 +68,8 @@ namespace gazebo
         private: QPointF doorPos;
 
         private: double scale;
+
+        private: WindowDoorInspectorDialog *inspector;
     };
   }
 }

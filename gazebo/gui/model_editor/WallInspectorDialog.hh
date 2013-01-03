@@ -56,7 +56,11 @@ namespace gazebo
 
       public: void SetMaterial(std::string _material);
 
+      Q_SIGNALS: void Applied();
+
       private slots: void OnCancel();
+
+      private slots: void OnApply();
 
       private slots: void OnOK();
 
