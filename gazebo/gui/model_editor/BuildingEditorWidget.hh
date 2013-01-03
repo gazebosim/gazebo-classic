@@ -24,6 +24,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class LevelWidget;
+
     class BuildingEditorWidget : public QWidget
     {
       public: enum modelTypes {None, Wall, Window, Door, Stairs};
@@ -31,6 +33,10 @@ namespace gazebo
       public: BuildingEditorWidget(QWidget *_parent = 0);
 
       public: ~BuildingEditorWidget();
+
+      private: void resizeEvent(QResizeEvent *_event);
+
+      private: LevelWidget *levelWidget;
     };
   }
 }

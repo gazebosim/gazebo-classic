@@ -37,6 +37,8 @@ LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
   this->levelComboBox->setMinimumHeight(comboBoxHeight);
 
   QPushButton *addLevelButton = new QPushButton("+");
+//  addLevelButton->resize(10, comboBoxHeight);
+  this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
   levelLayout->addWidget(this->levelComboBox);
   levelLayout->addWidget(addLevelButton);
