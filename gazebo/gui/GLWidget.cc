@@ -668,7 +668,6 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   double yaw = atan2(delta.y, delta.x);
 
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  std::cout << "Yaw[" << GZ_RTOD(yaw) << "] Pitch[" << GZ_RTOD(pitch) << "]\n";
   this->userCamera->SetWorldPose(math::Pose(camPos,
         math::Vector3(0, pitch, yaw)));
 

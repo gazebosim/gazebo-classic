@@ -320,6 +320,10 @@ namespace gazebo
       /// \return The scene node the camera is attached to
       public: Ogre::SceneNode *GetSceneNode() const;
 
+      /// \brief Get the camera's pitch scene node
+      /// \return The pitch node the camera is attached to
+      public: Ogre::SceneNode *GetPitchNode() const;
+
       /// \brief Get a pointer to the image data
       ///
       /// Get the raw image data from a camera's buffer.

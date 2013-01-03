@@ -36,6 +36,7 @@ OrbitViewController::OrbitViewController(UserCameraPtr _camera)
   : ViewController(_camera), distance(5.0f)
 {
   this->typeString = TYPE_STRING;
+  this->init = false;
 
   // Create a visual that is used a reference point.
   this->refVisual.reset(new Visual("OrbitViewController",
@@ -59,11 +60,13 @@ OrbitViewController::~OrbitViewController()
 //////////////////////////////////////////////////
 void OrbitViewController::Init(const math::Vector3 &_focalPoint)
 {
-  this->yaw = 0.0;
-  this->pitch = 0.0;
+  this->yaw = 0;
+  this->pitch = 0;
 
   this->focalPoint = _focalPoint;
   this->distance = this->camera->GetWorldPosition().Distance(this->focalPoint);
+
+  this->init = true;
 }
 
 //////////////////////////////////////////////////
@@ -161,6 +164,9 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
     this->distance = this->camera->GetWorldPose().pos.Distance(
         this->focalPoint);
+
+    this->yaw = this->camera->GetWorldRotation().GetAsEuler().z;
+    this->pitch = this->camera->GetWorldRotation().GetAsEuler().y;
   }
 
   // Turn on the reference visual.
@@ -344,6 +350,7 @@ void OrbitViewController::UpdateRefVisual()
 void OrbitViewController::Orbit(double _dy, double _dp)
 {
   Ogre::SceneNode *cameraNode = this->camera->GetSceneNode();
+  Ogre::SceneNode *pitchNode = this->camera->GetPitchNode();
   Ogre::Node *parentNode = cameraNode->getParent();
   Ogre::Vector3 pos = cameraNode->_getDerivedPosition();
 
@@ -361,17 +368,20 @@ void OrbitViewController::Orbit(double _dy, double _dp)
   // reference visual, which in turns rotates the camera.
   cameraNode->_setDerivedPosition(pos);
   cameraNode->setOrientation(Ogre::Quaternion());
+  pitchNode->setOrientation(Ogre::Quaternion());
 
   // Rotate and update the reference visual.
   this->yaw += _dy;
   this->pitch += _dp;
   this->refVisual->SetRotation(math::Quaternion(0, this->pitch, this->yaw));
 
-  // Get the final position of the camera
-  pos = cameraNode->_getDerivedPosition();
+  // Get the final position of the camera. Special case when the orbit view
+  // camera has just been initialized.
+  if (!this->init)
+    pos = cameraNode->_getDerivedPosition();
 
   // Store the new location of the camera
-  Ogre::Quaternion rot = cameraNode->_getDerivedOrientation();
+  Ogre::Quaternion rot = pitchNode->_getDerivedOrientation();
 
   // Detach the camera from the reference visual.
   this->refVisual->GetSceneNode()->removeChild(cameraNode);
@@ -381,8 +391,9 @@ void OrbitViewController::Orbit(double _dy, double _dp)
   {
     parentNode->addChild(cameraNode);
     cameraNode->_setDerivedPosition(pos);
-    cameraNode->_setDerivedOrientation(rot);
+    this->camera->SetWorldRotation(Conversions::Convert(rot));
   }
 
+  this->init = false;
   this->UpdateRefVisual();
 }

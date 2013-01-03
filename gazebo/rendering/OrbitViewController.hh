@@ -108,10 +108,10 @@ namespace gazebo
       private: void Orbit(double _dy, double _dp);
 
       /// \brief Yaw value.
-      private: float yaw;
+      private: float yaw, initYaw;
 
       /// \brief Pitch value.
-      private: float pitch;
+      private: float pitch, initPitch;
 
       /// \brief Distance to the focal point.
       private: float distance;
@@ -124,6 +124,10 @@ namespace gazebo
 
       /// \brief Key that is currently pressed.
       private: std::string key;
+
+      /// \brief A flag used to inidicate that the view controller has just
+      /// been initialized.
+      private: bool init;
     };
     /// \}
   }

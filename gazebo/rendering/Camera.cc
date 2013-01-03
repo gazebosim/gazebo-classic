@@ -179,6 +179,7 @@ void Camera::Init()
 
   this->CreateCamera();
 
+
   // Create a scene node to control pitch motion
   this->pitchNode =
     this->sceneNode->createChildSceneNode(this->name + "PitchNode");
@@ -186,6 +187,9 @@ void Camera::Init()
 
   this->pitchNode->attachObject(this->camera);
   this->camera->setAutoAspectRatio(true);
+
+  this->sceneNode->setInheritScale(false);
+  this->pitchNode->setInheritScale(false);
 
   this->saveCount = 0;
 
@@ -405,7 +409,6 @@ math::Quaternion Camera::GetWorldRotation() const
 //////////////////////////////////////////////////
 void Camera::SetWorldPose(const math::Pose &_pose)
 {
-  std::cout << "Camera::SetWorldPose[" << _pose << "]\n";
   this->SetWorldPosition(_pose.pos);
   this->SetWorldRotation(_pose.rot);
 }
@@ -751,6 +754,12 @@ void Camera::SetSceneNode(Ogre::SceneNode *node)
 Ogre::SceneNode *Camera::GetSceneNode() const
 {
   return this->sceneNode;
+}
+
+//////////////////////////////////////////////////
+Ogre::SceneNode *Camera::GetPitchNode() const
+{
+  return this->pitchNode;
 }
 
 //////////////////////////////////////////////////
@@ -1310,7 +1319,6 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
     this->moveToPositionQueue.push_back(std::make_pair(_pose, _time));
     return false;
   }
-
 
   Ogre::TransformKeyFrame *key;
   math::Vector3 rpy = _pose.rot.GetAsEuler();
