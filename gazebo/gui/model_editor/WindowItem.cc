@@ -54,6 +54,8 @@ WindowItem::WindowItem(): RectItem(), BuildingItem()
       WindowDoorInspectorDialog::WINDOW);
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
+
+  this->SetResizeFlag(ITEM_WIDTH);
 }
 
 /////////////////////////////////////////////////

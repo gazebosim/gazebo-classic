@@ -131,6 +131,7 @@ void LineSegmentItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void LineSegmentItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
+  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
 //  QColor lineColor = Qt::black;
 //  QPen linePen = this->pen();
 //  linePen.setColor(lineColor);
@@ -138,12 +139,15 @@ void LineSegmentItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 }
 
 /////////////////////////////////////////////////
+void LineSegmentItem::hoverMoveEvent(QGraphicsSceneHoverEvent *)
+{
+  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
+}
+
+/////////////////////////////////////////////////
 void LineSegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
-//  QColor lineColor = Qt::red;
-//  QPen linePen = this->pen();
-//  linePen.setColor(lineColor);
-//  this->setPen(linePen);
+  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
 }
 
 /////////////////////////////////////////////////

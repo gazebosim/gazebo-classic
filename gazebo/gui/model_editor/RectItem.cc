@@ -41,7 +41,10 @@ RectItem::RectItem():
   this->drawingHeight = this->height;
 
   for (int i = 0; i < 8; ++i)
-    this->corners[i] = new CornerGrabber(this, i);
+  {
+    CornerGrabber *corner = new CornerGrabber(this, i);
+    this->corners.push_back(corner);
+  }
   this->rotateHandle = new RotateHandle(this);
 
   this->setSelected(false);
@@ -62,6 +65,8 @@ RectItem::RectItem():
 
   this->zValueIdle = 1;
   this->zValueSelected = 5;
+
+  this->SetResizeFlag(ITEM_WIDTH | ITEM_HEIGHT);
 }
 
  /////////////////////////////////////////////////
@@ -104,14 +109,20 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
     {
       this->setZValue(zValueSelected);
       for (int i = 0; i < 8; ++i)
-        this->corners[i]->installSceneEventFilter(this);
+      {
+        if (this->corners[i]->isEnabled())
+          this->corners[i]->installSceneEventFilter(this);
+      }
       this->rotateHandle->installSceneEventFilter(this);
     }
     else
     {
       this->setZValue(zValueIdle);
       for (int i = 0; i < 8; ++i)
-        this->corners[i]->removeSceneEventFilter(this);
+      {
+        if (this->corners[i]->isEnabled())
+          this->corners[i]->removeSceneEventFilter(this);
+      }
       this->rotateHandle->removeSceneEventFilter(this);
     }
   }
@@ -136,7 +147,7 @@ bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
     return this->rotateEventFilter(rotateH, _event);
 
   CornerGrabber *corner = dynamic_cast<CornerGrabber *>(_watched);
-  if (corner != NULL)
+  if (corner != NULL && corner->isEnabled())
     return this->cornerEventFilter(corner, _event);
 
   return false;
@@ -190,10 +201,6 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
 
   if (_rotate->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
-/*    QPoint localCenter(this->drawingOriginX +
-      (this->drawingOriginX + this->drawingWidth)/2,
-      this->drawingOriginY + (this->drawingOriginY + this->drawingHeight)/2);
-    QPointF center = this->mapToScene(localCenter);*/
     QPoint localCenter(this->drawingOriginX, this->drawingOriginY);
     QPointF center = this->mapToScene(localCenter);
 
@@ -203,10 +210,6 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
     QLineF line(center.x(), center.y(), newPoint.x(), newPoint.y());
 
     double angle = -prevLine.angleTo(line);
-
-/*    this->translate(localCenter.x(), 0);
-    this->rotate(angle);
-    this->translate(-localCenter.x(), 0);*/
 
     this->SetRotation(this->GetRotation() + angle);
 
@@ -522,9 +525,23 @@ void RectItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
   QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
 
   for (int i = 0; i < 8; ++i)
-    this->corners[i]->removeSceneEventFilter(this);
+  {
+    if (this->corners[i]->isEnabled())
+      this->corners[i]->removeSceneEventFilter(this);
+  }
   this->rotateHandle->removeSceneEventFilter(this);
+}
 
+/////////////////////////////////////////////////
+void RectItem::hoverMoveEvent(QGraphicsSceneHoverEvent *_event)
+{
+  if (!this->isSelected())
+  {
+    _event->ignore();
+    return;
+  }
+
+  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
 }
 
 /////////////////////////////////////////////////
@@ -540,7 +557,10 @@ void RectItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 
 //    this->borderColor = Qt::red;
   for (int i = 0; i < 8; ++i)
-    this->corners[i]->installSceneEventFilter(this);
+  {
+    if (this->corners[i]->isEnabled())
+      this->corners[i]->installSceneEventFilter(this);
+  }
   this->rotateHandle->installSceneEventFilter(this);
 }
 
@@ -749,4 +769,34 @@ void RectItem::SizeChanged()
 {
   emit depthChanged(this->drawingHeight);
   emit widthChanged(this->drawingWidth);
+}
+
+/////////////////////////////////////////////////
+void RectItem::SetResizeFlag(unsigned int _flag)
+{
+  if (this->resizeFlag == _flag)
+    return;
+
+  this->resizeFlag = _flag;
+  for (int i = 0; i < 8; ++i)
+    this->corners[i]->setEnabled(false);
+
+
+  if (resizeFlag & ITEM_WIDTH)
+  {
+    this->corners[3]->setEnabled(true);
+    this->corners[7]->setEnabled(true);
+  }
+  if (resizeFlag & ITEM_HEIGHT)
+  {
+    this->corners[1]->setEnabled(true);
+    this->corners[5]->setEnabled(true);
+  }
+  if ((resizeFlag & ITEM_WIDTH) && (resizeFlag & ITEM_HEIGHT))
+  {
+    this->corners[1]->setEnabled(true);
+    this->corners[2]->setEnabled(true);
+    this->corners[3]->setEnabled(true);
+    this->corners[6]->setEnabled(true);
+  }
 }

@@ -43,6 +43,8 @@ WallItem::WallItem(QPointF _start, QPointF _end)
 
   this->selectedSegment = NULL;
 
+  this->setAcceptHoverEvents(true);
+
   this->inspector = new WallInspectorDialog();
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
@@ -137,7 +139,6 @@ bool WallItem::cornerEventFilter(CornerGrabber* _corner,
       QApplication::restoreOverrideCursor();
       return true;
     }
-
     default:
     {
       break;
@@ -234,6 +235,17 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
       this->inspector->show();
       _segment->SetMouseState(QEvent::GraphicsSceneMouseDoubleClick);
       break;
+    }
+    case QEvent::GraphicsSceneHoverEnter:
+    case QEvent::GraphicsSceneHoverMove:
+    {
+      QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
+      return true;
+    }
+    case QEvent::GraphicsSceneHoverLeave:
+    {
+      QApplication::restoreOverrideCursor();
+      return true;
     }
     default:
     {

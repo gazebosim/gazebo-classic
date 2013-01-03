@@ -33,6 +33,9 @@ namespace gazebo
 
     class RectItem : public EditorItem, public QGraphicsItem
     {
+        public: enum ResizeFlags {NONE = 0x00,
+            ITEM_WIDTH = 0x01, ITEM_HEIGHT = 0x02};
+
         public: RectItem();
 
         public: virtual ~RectItem();
@@ -61,6 +64,8 @@ namespace gazebo
 
         public: virtual void SetRotation(double _angle);
 
+        public: virtual void SetResizeFlag(unsigned int _flag);
+
         public: double GetRotation();
 
         public: virtual QVector3D GetSize();
@@ -81,6 +86,8 @@ namespace gazebo
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
         private: virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
+
+        private: virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *_event);
 
         private: virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *_event);
 
@@ -124,25 +131,29 @@ namespace gazebo
 
         protected: QColor borderColor;
 
-        private: QPointF location;
+        protected: double rotationAngle;
+
+        protected: int zValueIdle;
 
         protected: QPointF pivot;
+
+        private: QPointF location;
 
         private: int gridSpace;
 
         /// \brief Four corners and four edges, going clockwise with
         /// 0 being top left
-        private: CornerGrabber *corners[8];
+        protected: std::vector<CornerGrabber *> corners;
 
         private: RotateHandle *rotateHandle;
-
-        protected: double rotationAngle;
 
         private: std::vector<Qt::CursorShape> cursors;
 
         private: int zValueSelected;
 
-        protected: int zValueIdle;
+        private: unsigned int resizeFlag;
+
+
 
     };
   }
