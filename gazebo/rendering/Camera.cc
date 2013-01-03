@@ -405,6 +405,7 @@ math::Quaternion Camera::GetWorldRotation() const
 //////////////////////////////////////////////////
 void Camera::SetWorldPose(const math::Pose &_pose)
 {
+  std::cout << "Camera::SetWorldPose[" << _pose << "]\n";
   this->SetWorldPosition(_pose.pos);
   this->SetWorldRotation(_pose.rot);
 }
@@ -412,8 +413,8 @@ void Camera::SetWorldPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
-  if (this->animState)
-    return;
+  //if (this->animState)
+  //  return;
 
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
 }
