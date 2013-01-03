@@ -205,14 +205,33 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
     QPointF center = this->mapToScene(localCenter);
 
     QPointF newPoint = mouseEvent->scenePos();
-    QLineF prevLine(center.x(), center.y(),
-        mouseEvent->lastScenePos().x(), mouseEvent->lastScenePos().y());
     QLineF line(center.x(), center.y(), newPoint.x(), newPoint.y());
 
-    double angle = -prevLine.angleTo(line);
+    double angle = 0;
 
-    this->SetRotation(this->GetRotation() + angle);
+    if (this->parentItem())
+    {
+      QPointF localCenterTop(this->drawingOriginX, this->drawingOriginY
+          + this->drawingHeight);
+      QPointF centerTop = this->mapToScene(localCenterTop);
+      QLineF lineCenter(center.x(), center.y(), centerTop.x(), centerTop.y());
+      angle = -lineCenter.angleTo(line);
 
+      if (angle < 0)
+        angle += 360;
+      if (angle < 90 || angle > 270)
+      {
+        angle = 180;
+        this->SetRotation(this->GetRotation() + angle);
+      }
+    }
+    else 
+    {
+      QLineF prevLine(center.x(), center.y(),
+          mouseEvent->lastScenePos().x(), mouseEvent->lastScenePos().y());
+      angle = -prevLine.angleTo(line);
+      this->SetRotation(this->GetRotation() + angle);
+    }
 //    this->setTransformOriginPoint(localCenter);
 //    this->setRotation(this->rotation() -prevLine.angleTo(line));
   }
