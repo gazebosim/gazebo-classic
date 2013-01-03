@@ -162,33 +162,33 @@ BuildingEditorPalette::~BuildingEditorPalette()
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnDrawWall()
 {
-  gui::Events::createEditorItem("Wall");
+  gui::editor::Events::createEditorItem("Wall");
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnImportImage()
 {
-//  gui::Events::createEditorItem("Image");
+//  gui::editor::Events::createEditorItem("Image");
 }
 
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddWindow()
 {
-  gui::Events::createEditorItem("Window");
+  gui::editor::Events::createEditorItem("Window");
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddDoor()
 {
-  gui::Events::createEditorItem("Door");
+  gui::editor::Events::createEditorItem("Door");
 }
 
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddStairs()
 {
-  gui::Events::createEditorItem("Stairs");
+  gui::editor::Events::createEditorItem("Stairs");
 }
 
 /////////////////////////////////////////////////
@@ -204,7 +204,7 @@ void BuildingEditorPalette::OnDiscard()
   switch (ret)
   {
     case QMessageBox::Discard:
-      gui::Events::discardModel();
+      gui::editor::Events::discardModel();
       break;
     case QMessageBox::Cancel:
     // Do nothing
@@ -234,6 +234,6 @@ void BuildingEditorPalette::OnFinish()
   FinishModelDialog dialog(this);
   if (dialog.exec() == QDialog::Accepted)
   {
-    gui::Events::finishModel(dialog.GetModelName(), dialog.GetSaveLocation());
+    gui::editor::Events::finishModel(dialog.GetModelName(), dialog.GetSaveLocation());
   }
 }

@@ -48,11 +48,11 @@ LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
   connect(addLevelButton, SIGNAL(clicked()), this, SLOT(OnAddLevel()));
 
   this->connections.push_back(
-    gui::Events::ConnectChangeLevelName(
+    gui::editor::Events::ConnectChangeLevelName(
     boost::bind(&LevelWidget::OnChangeLevelName, this, _1, _2)));
 
   this->connections.push_back(
-    gui::Events::ConnectDiscardModel(
+    gui::editor::Events::ConnectDiscardModel(
     boost::bind(&LevelWidget::OnDiscard, this)));
 
   this->setLayout(levelLayout);
@@ -66,7 +66,7 @@ LevelWidget::~LevelWidget()
 //////////////////////////////////////////////////
 void LevelWidget::OnCurrentLevelChanged(int _level)
 {
-  gui::Events::changeLevel(_level);
+  gui::editor::Events::changeLevel(_level);
 }
 
 //////////////////////////////////////////////////
@@ -76,7 +76,7 @@ void LevelWidget::OnAddLevel()
   int count = this->levelComboBox->count();
   levelText << "Level " << (count + 1);
   this->levelComboBox->addItem(QString(levelText.str().c_str()));
-  gui::Events::addLevel(count, levelText.str());
+  gui::editor::Events::addLevel(count, levelText.str());
   this->levelComboBox->setCurrentIndex(count);
 }
 

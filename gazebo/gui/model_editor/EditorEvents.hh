@@ -27,85 +27,88 @@ namespace gazebo
 {
   namespace gui
   {
-    class Events
+    namespace editor
     {
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the create editor item signal
-      /// \param[in] _subscriber the subscriber to this event
-      /// \return a connection
-      public: template<typename T>
-              static event::ConnectionPtr ConnectCreateEditorItem(T _subscriber)
-              { return createEditorItem.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot to the create editor item signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectCreateEditorItem(
-                  event::ConnectionPtr _subscriber)
-              { createEditorItem.Disconnect(_subscriber); }
+      class Events
+      {
+        //////////////////////////////////////////////////////////////////////////
+        /// \brief Connect a boost::slot the the create editor item signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+                static event::ConnectionPtr ConnectCreateEditorItem(T _subscriber)
+                { return createEditorItem.Connect(_subscriber); }
+        /// \brief Disconnect a boost::slot to the create editor item signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectCreateEditorItem(
+                    event::ConnectionPtr _subscriber)
+                { createEditorItem.Disconnect(_subscriber); }
 
-      public: template<typename T>
-              static event::ConnectionPtr ConnectFinishModel(T _subscriber)
-              { return finishModel.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot to the finish model signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectFinishModel(
-                  event::ConnectionPtr _subscriber)
-              { finishModel.Disconnect(_subscriber); }
+        public: template<typename T>
+                static event::ConnectionPtr ConnectFinishModel(T _subscriber)
+                { return finishModel.Connect(_subscriber); }
+        /// \brief Disconnect a boost::slot to the finish model signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectFinishModel(
+                    event::ConnectionPtr _subscriber)
+                { finishModel.Disconnect(_subscriber); }
 
-      public: template<typename T>
-              static event::ConnectionPtr ConnectDiscardModel(T _subscriber)
-              { return discardModel.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot to the discard model signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectDiscardModel(
-                  event::ConnectionPtr _subscriber)
-              { discardModel.Disconnect(_subscriber); }
+        public: template<typename T>
+                static event::ConnectionPtr ConnectDiscardModel(T _subscriber)
+                { return discardModel.Connect(_subscriber); }
+        /// \brief Disconnect a boost::slot to the discard model signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectDiscardModel(
+                    event::ConnectionPtr _subscriber)
+                { discardModel.Disconnect(_subscriber); }
 
-      public: template<typename T>
-              static event::ConnectionPtr ConnectChangeLevel(T _subscriber)
-              { return changeLevel.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot to the change level signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectChangeLevel(
-                  event::ConnectionPtr _subscriber)
-              { changeLevel.Disconnect(_subscriber); }
+        public: template<typename T>
+                static event::ConnectionPtr ConnectChangeLevel(T _subscriber)
+                { return changeLevel.Connect(_subscriber); }
+        /// \brief Disconnect a boost::slot to the change level signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectChangeLevel(
+                    event::ConnectionPtr _subscriber)
+                { changeLevel.Disconnect(_subscriber); }
 
-      public: template<typename T>
-              static event::ConnectionPtr ConnectAddLevel(T _subscriber)
-              { return addLevel.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot to the add level signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectAddLevel(
-                  event::ConnectionPtr _subscriber)
-              { addLevel.Disconnect(_subscriber); }
+        public: template<typename T>
+                static event::ConnectionPtr ConnectAddLevel(T _subscriber)
+                { return addLevel.Connect(_subscriber); }
+        /// \brief Disconnect a boost::slot to the add level signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectAddLevel(
+                    event::ConnectionPtr _subscriber)
+                { addLevel.Disconnect(_subscriber); }
 
-      public: template<typename T>
-              static event::ConnectionPtr ConnectChangeLevelName(T _subscriber)
-              { return changeLevelName.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot to the change level name signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectChangeLevelName(
-                  event::ConnectionPtr _subscriber)
-              { changeLevelName.Disconnect(_subscriber); }
+        public: template<typename T>
+                static event::ConnectionPtr ConnectChangeLevelName(T _subscriber)
+                { return changeLevelName.Connect(_subscriber); }
+        /// \brief Disconnect a boost::slot to the change level name signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectChangeLevelName(
+                    event::ConnectionPtr _subscriber)
+                { changeLevelName.Disconnect(_subscriber); }
 
-      /// \brief An editor item is to be created
-      public: static event::EventT<void (std::string)> createEditorItem;
+        /// \brief An editor item is to be created
+        public: static event::EventT<void (std::string)> createEditorItem;
 
-      /// \brief A model is to be created
-      public: static event::EventT<void (std::string, std::string)>
-          finishModel;
+        /// \brief A model is to be created
+        public: static event::EventT<void (std::string, std::string)>
+            finishModel;
 
-      /// \brief A model is to be created
-      public: static event::EventT<void ()> discardModel;
+        /// \brief A model is to be created
+        public: static event::EventT<void ()> discardModel;
 
-      /// \brief The current level has been changed
-      public: static event::EventT<void (int)> changeLevel;
+        /// \brief The current level has been changed
+        public: static event::EventT<void (int)> changeLevel;
 
-      /// \brief A new level is to be added
-      public: static event::EventT<void (int, std::string)> addLevel;
+        /// \brief A new level is to be added
+        public: static event::EventT<void (int, std::string)> addLevel;
 
-      /// \brief The current level name has been changed
-      public: static event::EventT<void (int, std::string)> changeLevelName;
-    };
+        /// \brief The current level name has been changed
+        public: static event::EventT<void (int, std::string)> changeLevelName;
+      };
+    }
   }
 }
 #endif

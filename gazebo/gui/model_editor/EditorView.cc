@@ -45,23 +45,23 @@ EditorView::EditorView(QWidget *_parent)
   this->mouseMode = Select;
 
   this->connections.push_back(
-  gui::Events::ConnectCreateEditorItem(
+  gui::editor::Events::ConnectCreateEditorItem(
     boost::bind(&EditorView::OnCreateEditorItem, this, _1)));
 
   this->connections.push_back(
-  gui::Events::ConnectFinishModel(
+  gui::editor::Events::ConnectFinishModel(
     boost::bind(&EditorView::OnFinishModel, this, _1, _2)));
 
   this->connections.push_back(
-  gui::Events::ConnectDiscardModel(
+  gui::editor::Events::ConnectDiscardModel(
     boost::bind(&EditorView::OnDiscardModel, this)));
 
   this->connections.push_back(
-  gui::Events::ConnectAddLevel(
+  gui::editor::Events::ConnectAddLevel(
     boost::bind(&EditorView::OnAddLevel, this, _1, _2)));
 
   this->connections.push_back(
-  gui::Events::ConnectChangeLevel(
+  gui::editor::Events::ConnectChangeLevel(
     boost::bind(&EditorView::OnChangeLevel, this, _1)));
 
   this->grabberDragRotation = 0;
@@ -723,6 +723,6 @@ void EditorView::OnOpenLevelInspector()
   {
     std::string newLevelName = dialog.GetLevelName();
     this->levelNames[this->currentLevel] = newLevelName;
-    emit gui::Events::changeLevelName(this->currentLevel, newLevelName);
+    emit gui::editor::Events::changeLevelName(this->currentLevel, newLevelName);
   }
 }

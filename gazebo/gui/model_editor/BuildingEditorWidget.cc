@@ -65,8 +65,8 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   wallItem->SetThickness(0);
   scene->addItem(wallItem);
 
-  levelWidget = new LevelWidget(this);
-  levelWidget->resize(150,50);
+  this->levelWidget = new LevelWidget(this);
+  this->levelWidget->resize(150,50);
 //  QGraphicsProxyWidget* proxyWidget = scene->addWidget(levelWidget);
 //  proxyWidget->setFlag(QGraphicsItem::ItemIgnoresTransformations);
 //  proxyWidget->setPos(QPointF(-levelWidget->width() / 2, 0));
@@ -83,6 +83,6 @@ BuildingEditorWidget::~BuildingEditorWidget()
 /////////////////////////////////////////////////
 void BuildingEditorWidget::resizeEvent(QResizeEvent *_event)
 {
-  levelWidget->move(_event->size().width()/2
+  this->levelWidget->move(_event->size().width()/2
       - levelWidget->size().width()/2, 0);
 }

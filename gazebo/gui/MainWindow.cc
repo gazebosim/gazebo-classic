@@ -36,6 +36,7 @@
 #include "gui/MainWindow.hh"
 #include "gui/GuiEvents.hh"
 #include "gui/model_editor/BuildingEditorPalette.hh"
+#include "gui/model_editor/EditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -143,6 +144,10 @@ MainWindow::MainWindow()
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&MainWindow::OnSetSelectedEntity, this, _1, _2)));
+
+  this->connections.push_back(
+      gui::editor::Events::ConnectFinishModel(
+      boost::bind(&MainWindow::OnFinishModel, this, _1, _2)));
 }
 
 /////////////////////////////////////////////////
@@ -1058,6 +1063,13 @@ void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
     g_playAct->setChecked(true);
     g_pauseAct->setChecked(false);
   }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnFinishModel(std::string /*_name*/, std::string /*_location*/)
+{
+  g_editBuildingAct->setChecked(!g_editBuildingAct->isChecked());
+  this->OnEditBuilding();
 }
 
 /////////////////////////////////////////////////
