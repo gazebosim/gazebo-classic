@@ -164,11 +164,9 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   if (_event.pressPos == _event.pos)
   {
     math::Vector3 rpy = this->camera->GetWorldPose().rot.GetAsEuler();
-    // this->yaw = rpy.z;
-    // this->pitch = rpy.y;
 
-    this->focalPoint = this->camera->GetScene()->GetFirstContact(this->camera,
-        _event.pressPos);
+    this->focalPoint = this->camera->GetScene()->GetFirstContact(
+        this->camera, _event.pressPos);
 
     this->distance = this->camera->GetWorldPose().pos.Distance(
         this->focalPoint);
@@ -369,71 +367,6 @@ void OrbitViewController::UpdateRefVisual()
 /////////////////////////////////////////////////
 void OrbitViewController::Orbit()
 {
-  /*
-  math::Vector3 pos;
-  math::Vector3 delta;
-
-  // The vector between the current camera position and the focal point.
-  delta = this->camera->GetWorldPosition() - this->focalPoint;
-
-  // Compute the yaw and pitch between the camera position and the focal
-  // point.
-  double currYaw = atan2(delta.y, delta.x);
-  double currPitch1 = atan2(delta.z,
-                           sqrt(delta.x * delta.x + delta.y * delta.y));
-
-  // Calculate the new pose, only taking into account the change in pitch.
-  pos.x = this->distance * cos(M_PI) * cos(currPitch1 + this->dp);
-  pos.y = this->distance * sin(M_PI) * cos(currPitch1 + this->dp);
-  pos.z = this->distance * sin(currPitch1 + this->dp);
-
-  std::cout << "DY[" << this->dy << "] DP[" << this->dp << "]\n";
-  std::cout << "CPitch1[" << GZ_RTOD(currPitch1) << "] XYZ[" << pos << "]\n";
-
-
-  // Add the focal point offset.
-  pos += this->focalPoint;
-
-  pos = pos + (this->camera->GetWorldPosition() - pos);
-
-  // Use the new pose to re-compute the yaw and pitch angles.
-  delta = pos - this->focalPoint;
-  // currYaw = atan2(delta.y, delta.x);
-  double currPitch = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-
-  // Calculate the final pose by only taking into account the change in yaw.
-  //pos.x = this->distance * cos(currYaw + this->dy);// * cos(currPitch);
-  //pos.y = this->distance * sin(currYaw + this->dy);// * cos(currPitch);
-  //pos.z = this->distance * sin(currPitch1 + this->dp);
-
-  // Add the focal point offset.
-  //pos += this->focalPoint;
-
-  // Set the new camera position
-  //this->camera->SetWorldPosition(pos);
-
-
-  // Compute the final yaw and pitch.
-  delta = pos - this->focalPoint;
-  double finalYaw = atan2(delta.y, delta.x);
-  double finalPitch = atan2(delta.z,
-                            sqrt(delta.x * delta.x + delta.y * delta.y));
-
-  // Store the yaw and pitch values.
-  this->yaw = this->yaw + (finalYaw - currYaw);
-  this->pitch = this->pitch + (finalPitch - currPitch1);
-  this->camera->SetWorldRotation(
-  math::Quaternion(0, this->pitch, this->yaw));
-
-  // Compute the final pitch and yaw values.
-  //math::Quaternion rot = this->camera->GetWorldRotation().GetAsEuler();
-  // rot.y += finalPitch - currPitch;
-  //rot.z += finalYaw - currYaw;
-
-  // Set the orientation of the camera.
-  //this->camera->SetWorldRotation(rot);
-  */
-
   Ogre::SceneNode *cameraNode = this->camera->GetSceneNode();
   Ogre::Node *parentNode = cameraNode->getParent();
   Ogre::Vector3 pos = cameraNode->_getDerivedPosition();
@@ -451,16 +384,18 @@ void OrbitViewController::Orbit()
   // Move the camera to it's starting location. Now we can rotate the
   // reference visual, which in turns rotates the camera.
   cameraNode->_setDerivedPosition(pos);
+  cameraNode->setOrientation(Ogre::Quaternion());
 
   // Rotate and update the reference visual.
   this->yaw += this->dy;
   this->pitch += this->dp;
   this->refVisual->SetRotation(math::Quaternion(0, this->pitch, this->yaw));
 
+  // Get the final position of the camera
   pos = cameraNode->_getDerivedPosition();
 
   // Store the new location of the camera
-  Ogre::Quaternion rot = cameraNode->getOrientation();
+  Ogre::Quaternion rot = cameraNode->_getDerivedOrientation();
 
   // Detach the camera from the reference visual.
   this->refVisual->GetSceneNode()->removeChild(cameraNode);
@@ -470,9 +405,7 @@ void OrbitViewController::Orbit()
   {
     parentNode->addChild(cameraNode);
     cameraNode->_setDerivedPosition(pos);
-    math::Quaternion grot = Conversions::Convert(rot);
-    this->camera->SetWorldRotation(grot);
-    // cameraNode->_setDerivedOrientation(rot);
+    cameraNode->_setDerivedOrientation(rot);
   }
 
   this->UpdateRefVisual();

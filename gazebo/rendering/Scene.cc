@@ -916,9 +916,26 @@ math::Vector3 Scene::GetFirstContact(CameraPtr _camera,
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
-  for (; iter != result.end() && math::equal(iter->distance, 0.0f); ++iter);
+  for (; iter != result.end(); ++iter)
+  {
+    if (iter->distance == 0)
+      continue;
 
-  Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
+    if (iter->movable &&
+        iter->movable->getMovableType().compare("Entity") == 0 &&
+        iter->movable->getName().find("OrbitViewController")
+        == std::string::npos)
+    {
+      std::cout << "Dist[" << iter->distance << "]\n";
+      break;
+    }
+  }
+
+  Ogre::Vector3 pt;
+  if (iter != result.end())
+    pt = mouseRay.getPoint(iter->distance);
+  else
+    pt = mouseRay.getPoint(1);
 
   return math::Vector3(pt.x, pt.y, pt.z);
 }
