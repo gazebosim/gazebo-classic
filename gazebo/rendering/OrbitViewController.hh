@@ -19,11 +19,9 @@
 
 #include <string>
 
-#include "rendering/DynamicLines.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/ViewController.hh"
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2i.hh"
 
 namespace gazebo
 {
@@ -93,26 +91,38 @@ namespace gazebo
 
       /// \brief Normalize yaw value.
       /// \paramp[in] _v Normalize a yaw value.
-      private: void NormalizeYaw(float &_v);
+      /// \return The normalized value.
+      private: double NormalizeYaw(double _v);
 
       /// \brief Normalize pitch value.
       /// \paramp[in] _v Normalize a pitch value.
-      private: void NormalizePitch(float &_v);
+      /// \return The normalized value.
+      private: double NormalizePitch(double _v);
 
       /// \brief Update the reference visual.
       private: void UpdateRefVisual();
 
       /// \brief Update the camera's pose based on a rotation update.
-      private: void Orbit();
+      /// \param[in] _dy Delta yaw movement.
+      /// \param[in] _dp Delta pitch movement.
+      private: void Orbit(double _dy, double _dp);
 
-      private: float yaw, pitch;
+      /// \brief Yaw value.
+      private: float yaw;
+
+      /// \brief Pitch value.
+      private: float pitch;
+
+      /// \brief Distance to the focal point.
       private: float distance;
+
+      /// \brief The focal point.
       private: math::Vector3 focalPoint;
 
+      /// \brief A reference visual.
       private: VisualPtr refVisual;
 
-      private: float dy, dp;
-
+      /// \brief Key that is currently pressed.
       private: std::string key;
     };
     /// \}

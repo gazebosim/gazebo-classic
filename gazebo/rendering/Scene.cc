@@ -900,6 +900,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
 math::Vector3 Scene::GetFirstContact(CameraPtr _camera,
                                      const math::Vector2i &_mousePos)
 {
+  math::Vector3 position;
   Ogre::Camera *ogreCam = _camera->GetOgreCamera();
 
   // Ogre::Real closest_distance = -1.0f;
@@ -916,28 +917,45 @@ math::Vector3 Scene::GetFirstContact(CameraPtr _camera,
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
-  for (; iter != result.end(); ++iter)
+  double distance = 0.0;
+
+  // Iterate over all the results.
+  for (; iter != result.end() && distance <= 0.0; ++iter)
   {
-    if (iter->distance == 0)
+    // Skip results where the distance is zero or less
+    if (iter->distance <= 0.0)
       continue;
 
+    // Only accept a hit if there is a movable object, and it's and Entity.
     if (iter->movable &&
         iter->movable->getMovableType().compare("Entity") == 0 &&
         iter->movable->getName().find("OrbitViewController")
         == std::string::npos)
     {
-      std::cout << "Dist[" << iter->distance << "]\n";
-      break;
+      distance = iter->distance;
     }
   }
 
-  Ogre::Vector3 pt;
-  if (iter != result.end())
-    pt = mouseRay.getPoint(iter->distance);
-  else
-    pt = mouseRay.getPoint(1);
+  // If nothing was hit, then check the terrain.
+  if (distance <= 0.0 && this->terrain)
+  {
+    // The terrain uses a special ray intersection test.
+    Ogre::TerrainGroup::RayResult terrainResult =
+      this->terrain->GetOgreTerrain()->rayIntersects(mouseRay);
 
-  return math::Vector3(pt.x, pt.y, pt.z);
+    if (terrainResult.hit)
+      position = Conversions::Convert(terrainResult.position);
+  }
+
+  // Compute the interesection point using the mouse ray and a distance
+  // value.
+  if (position == math::Vector3::Zero)
+  {
+    position = Conversions::Convert(
+        mouseRay.getPoint(distance <= 0.0 ? 1.0 : distance));
+  }
+
+  return position;
 }
 
 //////////////////////////////////////////////////
