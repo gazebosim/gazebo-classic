@@ -80,8 +80,8 @@ EditorView::EditorView(QWidget *_parent)
 /////////////////////////////////////////////////
 EditorView::~EditorView()
 {
-  if (buildingMaker)
-    delete buildingMaker;
+  if (this->buildingMaker)
+    delete this->buildingMaker;
 }
 
 /////////////////////////////////////////////////
@@ -147,7 +147,7 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
     default:
       break;
   }
-  if (!drawInProgress)
+//  if (!drawInProgress)
     QGraphicsView::mouseReleaseEvent(_event);
 }
 
@@ -320,10 +320,36 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
       this->itemToModelMap.erase(item);
       delete selectedItems[i];
     }
-    drawMode = NONE;
+    this->drawMode = NONE;
     this->drawInProgress = false;
     this->currentMouseItem = NULL;
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+  }
+  else if (_event->key() == Qt::Key_Escape)
+  {
+    if (this->drawInProgress)
+    {
+      if (this->currentMouseItem)
+      {
+        EditorItem *item = dynamic_cast<EditorItem *>(currentMouseItem);
+        this->itemToModelMap.erase(item);
+        if (drawMode == WALL)
+        {
+          WallItem* wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
+          wallItem->PopEndPoint();
+          wallList.push_back(wallItem);
+          //this->buildingMaker->RemoveWall(this->lastWallSegmentName);
+          this->lastWallSegmentName = "";
+        }
+        else
+        {
+          delete this->currentMouseItem;
+        }
+      }
+      this->drawMode = NONE;
+      this->drawInProgress = false;
+      this->currentMouseItem = NULL;
+    }
   }
 }
 
@@ -337,10 +363,13 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
     wallList.push_back(wallItem);
 //    this->buildingMaker->RemoveWall(this->lastWallSegmentName);
     this->lastWallSegmentName = "";
+    this->currentMouseItem = NULL;
     this->drawMode = NONE;
     this->drawInProgress = false;
   }
-  QGraphicsView::mouseDoubleClickEvent(_event);
+
+  if (!drawInProgress)
+    QGraphicsView::mouseDoubleClickEvent(_event);
 }
 
 /////////////////////////////////////////////////
