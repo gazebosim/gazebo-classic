@@ -40,6 +40,9 @@ namespace gazebo
       public: TopicCombo(QWidget *_w, const std::string &_msgTypeName,
                   const std::string &_viewType, transport::NodePtr _node);
 
+      /// \brief Destructor
+      public: virtual ~TopicCombo();
+
       /// \brief Inherited function from QComboBox. Called when the item
       /// list is displayed.
       public: virtual void showPopup();

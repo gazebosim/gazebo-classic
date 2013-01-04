@@ -46,8 +46,6 @@ TopicView::TopicView(const std::string &_msgTypeName,
       _viewType, this->node);
   this->topicCombo->setObjectName("comboList");
   this->topicCombo->setMinimumSize(300, 25);
-  connect(this->topicCombo, SIGNAL(currentIndexChanged(int)),
-          this, SLOT(OnTopicChanged(int)));
 
   topicLayout->addSpacing(10);
   topicLayout->addWidget(topicLabel);
@@ -95,7 +93,7 @@ TopicView::TopicView(const std::string &_msgTypeName,
 /////////////////////////////////////////////////
 TopicView::~TopicView()
 {
-  this->topicCombo->node.reset();
+  delete this->topicCombo;
 }
 
 /////////////////////////////////////////////////
@@ -178,11 +176,25 @@ void TopicView::OnTopicChanged(int _index)
 }
 
 /////////////////////////////////////////////////
-void TopicView::SetTopic(const std::string &/*_topicName*/)
+void TopicView::SetTopic(const std::string &_topicName)
 {
+  if (_topicName.empty())
+    return;
+
   this->hz = 0.0;
   this->msgSizes.clear();
   this->times.clear();
+  std::string topicName = this->node->EncodeTopicName(_topicName);
+
+  disconnect(this->topicCombo, SIGNAL(currentIndexChanged(int)),
+             this, SLOT(OnTopicChanged(int)));
+
+  int index = this->topicCombo->findText(QString::fromStdString(topicName));
+  if (index >= 0)
+    this->topicCombo->setCurrentIndex(index);
+
+  connect(this->topicCombo, SIGNAL(currentIndexChanged(int)),
+          this, SLOT(OnTopicChanged(int)));
 }
 
 /////////////////////////////////////////////////
@@ -201,6 +213,12 @@ TopicCombo::TopicCombo(QWidget *_w,
 }
 
 /////////////////////////////////////////////////
+TopicCombo::~TopicCombo()
+{
+  this->node.reset();
+}
+
+/////////////////////////////////////////////////
 void TopicCombo::showPopup()
 {
   this->UpdateList();
@@ -212,6 +230,10 @@ void TopicCombo::showPopup()
 /////////////////////////////////////////////////
 void TopicCombo::UpdateList()
 {
+  QString myText = this->currentText();
+
+  this->blockSignals(true);
+
   // First clear out the combo box.
   this->clear();
 
@@ -258,4 +280,10 @@ void TopicCombo::UpdateList()
 
     this->addItem(QString::fromStdString(topicName));
   }
+
+  int index = this->findText(myText);
+  if (index >= 0)
+    this->setCurrentIndex(index);
+
+  this->blockSignals(false);
 }

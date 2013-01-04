@@ -167,8 +167,8 @@ namespace gazebo
       private: physics::EntityPtr parentEntity;
 
       private: transport::PublisherPtr scanPub;
-      private: boost::mutex *mutex;
-      private: msgs::LaserScan laserMsg;
+      private: boost::mutex mutex;
+      private: msgs::LaserScanStamped laserMsg;
     };
     /// \}
   }

@@ -55,7 +55,7 @@ namespace gazebo
       public: virtual void SetEmissive(const common::Color &_color);
 
       /// \brief Callback when laser data is received.
-      private: void OnScan(ConstLaserScanPtr &_msg);
+      private: void OnScan(ConstLaserScanStampedPtr &_msg);
 
       /// \brief Pointer to a node that handles communication.
       private: transport::NodePtr node;

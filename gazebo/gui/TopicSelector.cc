@@ -102,15 +102,19 @@ void TopicSelector::GetTopicList()
         QStringList(QString::fromStdString(iter->first)));
     this->treeWidget->addTopLevelItem(topItem);
 
+    std::list<std::string> added;
+
     // Add all the topic names
     for (std::list<std::string>::iterator topicIter = iter->second.begin();
         topicIter != iter->second.end(); ++topicIter)
     {
-      if ((*topicIter).find("__dbg") == std::string::npos)
+      if ((*topicIter).find("__dbg") == std::string::npos &&
+          std::find(added.begin(), added.end(), *topicIter) == added.end())
       {
         QTreeWidgetItem *topicItem = new QTreeWidgetItem(topItem,
             QStringList(QString::fromStdString(*topicIter)));
         this->treeWidget->addTopLevelItem(topicItem);
+        added.push_back(*topicIter);
       }
     }
 

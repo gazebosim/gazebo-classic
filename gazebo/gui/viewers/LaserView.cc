@@ -19,20 +19,18 @@
 #include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/gui/viewers/ViewFactory.hh"
-#include "gazebo/gui/viewers/ImageView.hh"
+#include "gazebo/gui/viewers/LaserView.hh"
 
 using namespace gazebo;
 using namespace gui;
 
-GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.ImageStamped", ImageView)
+GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.ImageStamped", LaserView)
 
 /////////////////////////////////////////////////
-ImageView::ImageView()
-: TopicView("gazebo.msgs.ImageStamped")
+LaserView::LaserView()
+: TopicView("gazebo.msgs.ImageStamped", "laser")
 {
-  std::cout << "ImageView::Constructor\n";
-
-  this->setWindowTitle(tr("Gazebo: Image View"));
+  this->setWindowTitle(tr("Gazebo: Laser View"));
 
   // Create the image display
   // {
@@ -54,42 +52,28 @@ ImageView::ImageView()
 }
 
 /////////////////////////////////////////////////
-ImageView::~ImageView()
+LaserView::~LaserView()
 {
 }
 
 /////////////////////////////////////////////////
-void ImageView::UpdateImpl()
+void LaserView::UpdateImpl()
 {
-  // Update the image output
-  this->imageLabel->setPixmap(this->pixmap);
 }
 
 /////////////////////////////////////////////////
-void ImageView::SetTopic(const std::string &_topicName)
+void LaserView::SetTopic(const std::string &_topicName)
 {
   TopicView::SetTopic(_topicName);
 
   // Subscribe to the new topic.
   this->sub.reset();
-  this->sub = this->node->Subscribe(_topicName, &ImageView::OnImage, this);
+  this->sub = this->node->Subscribe(_topicName, &LaserView::OnScan, this);
 }
 
 /////////////////////////////////////////////////
-void ImageView::OnImage(ConstImageStampedPtr &_msg)
+void LaserView::OnScan(ConstLaserScanPtr &_msg)
 {
   // Update the Hz and Bandwidth info
-  this->OnMsg(msgs::Convert(_msg->time()),
-      _msg->image().data().size());
-
-  // Get the image data in a QT friendly format
-  QImage image(_msg->image().width(), _msg->image().height(),
-               QImage::Format_RGB888);
-
-  // Store the image data
-  memcpy(image.bits(), _msg->image().data().c_str(),
-         _msg->image().data().size());
-
-  // Set the pixmap used by the image label.
-  this->pixmap = QPixmap::fromImage(image);
+  this->OnMsg(msgs::Convert(_msg->time()), _msg->ByteSize());
 }

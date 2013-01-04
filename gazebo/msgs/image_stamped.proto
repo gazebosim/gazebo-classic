@@ -10,6 +10,7 @@ import "image.proto";
 
 message ImageStamped
 {
-  required Time time          = 1; // Time when the data was captured
+  // Time when the data was captured
+  required Time time          = 1;
   required Image image        = 2;
 }

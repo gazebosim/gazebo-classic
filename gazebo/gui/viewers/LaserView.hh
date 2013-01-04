@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _IMAGEVIEW_HH_
-#define _IMAGEVIEW_HH_
+#ifndef _LASERVIEW_HH_
+#define _LASERVIEW_HH_
 
 #include <string>
 
@@ -31,16 +31,16 @@ namespace gazebo
 {
   namespace gui
   {
-    class ImageView : public TopicView
+    class LaserView : public TopicView
     {
       Q_OBJECT
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent widget.
-      public: ImageView();
+      public: LaserView();
 
       /// \brief Destructor
-      public: virtual ~ImageView();
+      public: virtual ~LaserView();
 
       // Documentation inherited
       public: virtual void SetTopic(const std::string &_topicName);
@@ -48,15 +48,9 @@ namespace gazebo
       // Documentation inherited
       private: virtual void UpdateImpl();
 
-      /// \brief Receives incoming image messages.
-      /// \param[in] _msg New image message.
-      private: void OnImage(ConstImageStampedPtr &_msg);
-
-      /// \brief A label is used to display the image data.
-      private: QLabel *imageLabel;
-
-      /// \brief Storage mechansim for image data.
-      private: QPixmap pixmap;
+      /// \brief Receives incoming laser scan messages.
+      /// \param[in] _msg New laser scan message.
+      private: void OnScan(ConstLaserScantampedPtr &_msg);
     };
   }
 }
