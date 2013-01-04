@@ -52,6 +52,7 @@ namespace gazebo
 
       private: void OnGUI(ConstGUIPtr &_msg);
 
+
       private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
       private slots: void Open();
@@ -90,6 +91,9 @@ namespace gazebo
       private slots: void SetTransparent();
       private slots: void OnEditBuilding();
 
+      /// \brief Callback when topic selection action.
+      private slots: void SelectTopic();
+
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);
 
@@ -106,10 +110,6 @@ namespace gazebo
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
       private: void OnFinishModel();
 
-      private: QMenu *fileMenu;
-      private: QMenu *editMenu;
-      private: QMenu *viewMenu;
-      private: QMenu *helpMenu;
       private: QToolBar *playToolbar;
 
       private: RenderWidget *renderWidget;
