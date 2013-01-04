@@ -117,9 +117,12 @@ class ServerFixture : public testing::Test
                               _paused));
 
                // Wait for the server to come up
-               // Should this loop have a timout?
-               while (!this->server || !this->server->GetInitialized())
+               // Use a 30 second timeout.
+               int waitCount = 0, maxWaitCount = 3000;
+               while ((!this->server || !this->server->GetInitialized()) &&
+                      ++waitCount < maxWaitCount)
                  common::Time::MSleep(10);
+               ASSERT_LT(waitCount, maxWaitCount);
 
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
@@ -133,13 +136,13 @@ class ServerFixture : public testing::Test
 
                // Wait for the world to reach the correct pause state.
                // This might not work properly with multiple worlds.
-               int waitCount = 0, maxWaitCount = 3000;
+               // Use a 30 second timeout.
+               waitCount = 0;
+               maxWaitCount = 3000;
                while ((!physics::get_world() ||
                         physics::get_world()->IsPaused() != _paused) &&
                       ++waitCount < maxWaitCount)
                  common::Time::MSleep(10);
-               gzdbg << "Checking Load(world, paused) pause state.\n";
-               gzdbg << "Waited " << 0.01*waitCount << " s for pause state.\n";
                ASSERT_LT(waitCount, maxWaitCount);
              }
 
