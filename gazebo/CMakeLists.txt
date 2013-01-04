@@ -6,14 +6,25 @@ include_directories(SYSTEM
 )
 
 include_directories(
-  ${PROJECT_SOURCE_DIR}/gazebo 
-  ${PROJECT_BINARY_DIR}/gazebo 
+  ${PROJECT_SOURCE_DIR}/gazebo
+  ${PROJECT_BINARY_DIR}/gazebo
 )
 
-link_directories(  
+link_directories(
   ${ogre_library_dirs}
-  ${Boost_LIBRARY_DIRS} 
+  ${Boost_LIBRARY_DIRS}
 )
+
+if(HAVE_URDFDOM_HEADERS)
+  link_directories(
+    ${urdfdom_LIBRARY_DIRS}
+    ${urdfdom_headers_LIBRARY_DIRS})
+endif(HAVE_URDFDOM_HEADERS)
+
+if(HAVE_CONSOLE_BRIDGE)
+  link_directories(
+    ${console_bridge_LIBRARY_DIRS})
+endif(HAVE_CONSOLE_BRIDGE)
 
 add_subdirectory(msgs)
 add_subdirectory(math)

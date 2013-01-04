@@ -500,7 +500,14 @@ void MainWindow::OnFullScreen(bool _value)
 void MainWindow::Reset()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->SetWorldPose(math::Pose(5, -5, 2, 0, GZ_DTOR(11.31), GZ_DTOR(135)));
+
+  math::Vector3 camPos(5, -5, 2);
+  math::Vector3 lookAt(0, 0, 0);
+  math::Vector3 delta = camPos - lookAt;
+
+  double yaw = atan2(delta.x, delta.y);
+  double pitch = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+  cam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
 }
 
 /////////////////////////////////////////////////

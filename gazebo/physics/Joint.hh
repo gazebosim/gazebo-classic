@@ -107,7 +107,7 @@ namespace gazebo
       /// \param[in] _child Child link.
       /// \param[in] _pos Joint Anchor offset from child link.
       public: void Load(LinkPtr _parent, LinkPtr _child,
-                        const math::Vector3 &_pos); GAZEBO_DEPRECATED;
+                        const math::Vector3 &_pos) GAZEBO_DEPRECATED;
 
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.

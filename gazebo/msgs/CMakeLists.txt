@@ -1,5 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+add_subdirectory(test)
+
 set (msgs
   axis.proto
   boxgeom.proto
@@ -86,8 +88,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 gz_add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
 target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRARY} pthread)
 
-set (sources msgs.cc)
-set (headers msgs.hh)
+set (sources msgs.cc MsgFactory.cc)
+set (headers msgs.hh MsgFactory.hh)
 
 set(PROTO_SRCS)
 set(PROTO_HDRS)
