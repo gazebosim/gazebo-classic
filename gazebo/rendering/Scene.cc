@@ -935,7 +935,6 @@ bool Scene::GetFirstContact(CameraPtr _camera,
         iter->movable->getName().find("OrbitViewController")
         == std::string::npos)
     {
-
       Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
 
       // mesh data to retrieve
