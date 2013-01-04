@@ -58,6 +58,8 @@ namespace gazebo
       /// \brief On finish callback.
       private slots: void OnFinish();
 
+      private: QLabel *modelNameLabel;
+
       private: QPushButton *saveButton;
 
       private: std::string modelName;

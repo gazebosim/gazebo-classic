@@ -36,7 +36,9 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 
   QHBoxLayout *modelNameLayout = new QHBoxLayout;
   QLabel *modelLabel = new QLabel(tr("Model: "));
+  this->modelNameLabel = new QLabel(tr(this->modelName.c_str()));
   modelNameLayout->addWidget(modelLabel);
+  modelNameLayout->addWidget(modelNameLabel);
 
   modelNameLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                       QSizePolicy::Minimum));
@@ -231,6 +233,7 @@ void BuildingEditorPalette::OnDiscard()
       this->saveButton->setText("&Save As");
       this->modelName = "MyNamedModel";
       this->saveLocation = QDir::homePath().toStdString();
+      this->modelNameLabel->setText(tr(this->modelName.c_str()));
       this->saved = false;
       break;
     case QMessageBox::Cancel:
@@ -260,6 +263,7 @@ void BuildingEditorPalette::OnSave()
       this->saveLocation = dialog.GetSaveLocation();
       gui::editor::Events::saveModel(this->modelName, this->saveLocation);
       this->saveButton->setText("Save");
+      this->modelNameLabel->setText(tr(this->modelName.c_str()));
       this->saved = true;
     }
   }
@@ -275,6 +279,7 @@ void BuildingEditorPalette::OnFinish()
   {
     this->modelName = dialog.GetModelName();
     this->saveLocation = dialog.GetSaveLocation();
+    this->modelNameLabel->setText(tr(this->modelName.c_str()));
     gui::editor::Events::saveModel(this->modelName, this->saveLocation);
     gui::editor::Events::finishModel();
   }
