@@ -151,12 +151,40 @@ bool WallItem::cornerEventFilter(CornerGrabber* _corner,
   if (_corner->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
     QPointF scenePosition = _corner->mapToScene(mouseEvent->pos());
-
-    this->SetVertexPosition(_corner->GetIndex(), scenePosition);
-
+    int cornerIndex = _corner->GetIndex();
+    
+    // Snap wall rotations to fixed size increments
+    QPointF newScenePos = scenePosition;
+    if ((cornerIndex <= static_cast<int>(this->GetSegmentCount())))
+    {
+      int segmentIndex = std::max(cornerIndex-1, 0);
+      LineSegmentItem *segment = this->GetSegment(segmentIndex);
+      QPointF lineOrigin = segment->line().p1();
+      if (cornerIndex == 0)
+        lineOrigin = segment->line().p2();
+      QLineF lineToPoint(lineOrigin,
+          segment->mapFromScene(scenePosition)); 
+      QPointF startScenePoint = segment->mapToScene(lineOrigin);
+      double angle = QLineF(startScenePoint,
+          scenePosition).angle();
+      double range = 15;
+      int increment = angle / range;
+      if ((angle - range*increment) > range/2)
+        increment++;
+      angle = -range*increment;
+      double lineLength = lineToPoint.length();
+      
+      newScenePos.setX(startScenePoint.x() 
+          + cos(GZ_DTOR(angle))*lineLength);
+      newScenePos.setY(startScenePoint.y() 
+          + sin(GZ_DTOR(angle))*lineLength);
+    }
+    
+    this->SetVertexPosition(cornerIndex, newScenePos);
     this->update();
 
-    for (int i = _corner->GetIndex(); i > _corner->GetIndex() - 2; --i)
+    // re-align child items when a vertex is moved
+    for (int i = cornerIndex; i > cornerIndex - 2; --i)
     {
       if ((i - this->GetSegmentCount()) != 0 && i >= 0)
       {
