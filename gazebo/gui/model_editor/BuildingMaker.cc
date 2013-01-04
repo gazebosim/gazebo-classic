@@ -166,11 +166,11 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
         linkName, this->modelVisual));
   linkVisual->Load();
 
+
   std::ostringstream visualName;
   visualName << this->modelName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
-
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
@@ -186,6 +186,7 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[visualName.str()] = wallManip;
 
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
   return visualName.str();
 }
 
@@ -222,6 +223,7 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
   windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[visualName.str()] = windowManip;
 
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
   return visualName.str();
 }
 
@@ -259,6 +261,7 @@ std::string BuildingMaker::AddDoor(QVector3D _size, QVector3D _pos,
   doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[visualName.str()] = doorManip;
 
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
   return visualName.str();
 }
 
@@ -320,6 +323,8 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
     stepVisual->SetPosition(math::Vector3(0, baseOffset.y-(run*i),
         baseOffset.z + rise*i));
   }
+
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
   return visualName.str();
 }
 
@@ -357,6 +362,7 @@ std::string BuildingMaker::AddFloor(QVector3D _size, QVector3D _pos,
   floorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[visualName.str()] = floorManip;
 
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
   return visualName.str();
 }
 
@@ -415,6 +421,7 @@ void BuildingMaker::Reset()
   this->modelVisual->Load();
   this->modelPose = math::Pose::Zero;
   this->modelVisual->SetPose(this->modelPose);
+  this->modelVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
   scene->AddVisual(this->modelVisual);
 
   std::map<std::string, ModelManip *>::iterator it;
