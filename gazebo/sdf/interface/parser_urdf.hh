@@ -287,7 +287,7 @@ namespace urdf2gazebo
     /// referenced link names with plugins and update references to current
     /// link to the parent link. (ReduceGazeboExtensionFrameReplace())
     ///
-    /// \param[in] _link pointer to the urdf link whose extension will be reduced
+    /// \param[in] _link pointer to urdf link, its extensions will be reduced
     private: void ReduceGazeboExtensionToParent(UrdfLinkPtr _link);
 
     /// reduced fixed joints:  apply appropriate frame updates
