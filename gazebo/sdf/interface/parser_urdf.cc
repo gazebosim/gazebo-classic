@@ -118,7 +118,7 @@ urdf::Vector3 URDF2Gazebo::parseVector3(std::string str, double scale)
       }
     }
   }
-  return urdf::Vector3(vals[0], vals[1], vals[3]);
+  return urdf::Vector3(vals[0], vals[1], vals[2]);
 }
 
 void URDF2Gazebo::reduceVisualToParent(boost::shared_ptr<urdf::Link> link,
