@@ -61,8 +61,8 @@ void Gripper::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr grasp_check = _sdf->GetElement("grasp_check");
   this->min_contact_count = grasp_check->GetValueUInt("min_contact_count");
-  this->attachSteps = grasp_check->GetValueInt("attachSteps");
-  this->detachSteps = grasp_check->GetValueInt("detachSteps");
+  this->attachSteps = grasp_check->GetValueInt("attach_steps");
+  this->detachSteps = grasp_check->GetValueInt("detach_steps");
 
   sdf::ElementPtr palmLinkElem = _sdf->GetElement("palm_link");
   this->palmLink = this->model->GetLink(palmLinkElem->GetValueString());
@@ -188,7 +188,7 @@ void Gripper::HandleAttach()
           this->attached = true;
 
           this->fixedJoint->Load(this->palmLink,
-              cc[iter->first]->GetLink(), math::Vector3(0, 0, 0));
+              cc[iter->first]->GetLink(), math::Pose());
           this->fixedJoint->Init();
           this->fixedJoint->SetHighStop(0, 0);
           this->fixedJoint->SetLowStop(0, 0);

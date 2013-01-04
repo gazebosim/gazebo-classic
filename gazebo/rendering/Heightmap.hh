@@ -71,6 +71,10 @@ namespace gazebo
       /// \return The height at the specified location
       public: double GetHeight(double _x, double _y, double _z = 1000);
 
+      /// \brief Get a pointer to the OGRE terrain group object.
+      /// \return Pointer to the OGRE terrain.
+      public: Ogre::TerrainGroup *GetOgreTerrain() const;
+
       /// \brief Initialize all the blend material maps.
       /// \param[in] _terrain The terrain to initialize the blend maps.
       private: bool InitBlendMaps(Ogre::Terrain *_terrain);

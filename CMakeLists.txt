@@ -10,8 +10,8 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 set (GAZEBO_VERSION_NAME "lithium")
 set (GAZEBO_MAJOR_VERSION 1)
-set (GAZEBO_MINOR_VERSION 3)
-set (GAZEBO_PATCH_VERSION 1)
+set (GAZEBO_MINOR_VERSION 4)
+set (GAZEBO_PATCH_VERSION 0)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -130,6 +130,7 @@ set (CMAKE_C_FLAGS_ALL " -Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unu
 #####################################
 # Build type link flags
 set (CMAKE_LINK_FLAGS_RELEASE " " CACHE INTERNAL "Link flags fro release" FORCE)
+set (CMAKE_LINK_FLAGS_RELWITHDEBINFO " " CACHE INTERNAL "Link flags for release with debug support" FORCE)
 set (CMAKE_LINK_FLAGS_DEBUG " " CACHE INTERNAL "Link flags for debug" FORCE)
 set (CMAKE_LINK_FLAGS_PROFILE " -pg" CACHE INTERNAL "Link flags for profile" FORCE)
 set (CMAKE_LINK_FLAGS_CHECK " --coverage" CACHE INTERNAL "Link flags for static code checking" FORCE)
@@ -160,8 +161,11 @@ else()
   message(STATUS "\nSSE4 disabled.\n")
 endif()
 
-set (CMAKE_C_FLAGS_RELEASE " -s -O2 -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release" FORCE)
+set (CMAKE_C_FLAGS_RELEASE " -s -O3 -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release" FORCE)
 set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
+
+set (CMAKE_C_FLAGS_RELWITHDEBINFO " -g -O2 ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release with debug support" FORCE)
+set (CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_C_FLAGS_RELWITHDEBINFO})
 
 set (CMAKE_C_FLAGS_DEBUG " -ggdb3 ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for debug" FORCE)
 set (CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
@@ -175,8 +179,8 @@ set (CMAKE_CXX_FLAGS_CHECK "${CMAKE_C_FLAGS_CHECK} -fno-elide-constructors -fno-
 #####################################
 # Set the default build type
 if (NOT CMAKE_BUILD_TYPE)
-  set (CMAKE_BUILD_TYPE "RELEASE" CACHE STRING 
-    "Choose the type of build, options are: debug release profile check" FORCE)
+  set (CMAKE_BUILD_TYPE "RELWITHDEBINFO" CACHE STRING 
+    "Choose the type of build, options are: debug release relwithdebinfo profile check" FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
 
@@ -198,6 +202,12 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "RELEASE")
   set (BUILD_TYPE_RELEASE TRUE)
 else()
   set (BUILD_TYPE_RELEASE FALSE)
+endif()
+
+if ( "${CMAKE_BUILD_TYPE}" STREQUAL "RELWITHDEBINFO")
+  set (BUILD_TYPE_RELWITHDEBINFO TRUE)
+else()
+  set (BUILD_TYPE_RELWITHDEBINFO FALSE)
 endif()
 
 if ( "${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
