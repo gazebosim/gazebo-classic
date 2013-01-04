@@ -251,15 +251,12 @@ void BulletLink::SetLinearVel(const math::Vector3 & /*_vel*/)
 //////////////////////////////////////////////////
 math::Vector3 BulletLink::GetWorldLinearVel() const
 {
-  /*
   if (!this->rigidLink)
     return math::Vector3(0, 0, 0);
 
-  btmath::Vector3 btVec = this->rigidLink->getLinearVelocity();
+  btVector3 btVec = this->rigidLink->getLinearVelocity();
 
-  return math::Vector3(btVec.x(), btVec.y(), btVec.z());
-  */
-  return math::Vector3();
+  return math::Vector3(btVec.getX(), btVec.getY(), btVec.getZ());
 }
 
 //////////////////////////////////////////////////
