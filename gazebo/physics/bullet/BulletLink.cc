@@ -65,6 +65,10 @@ void BulletLink::Init()
   Link::Init();
 
   btScalar btMass = this->inertial->GetMass();
+  // The bullet dynamics solver checks for zero mass to identify static and
+  // kinematic bodies.
+  if (this->IsStatic() || this->GetKinematic())
+    btMass = 0;
   btVector3 fallInertia(0, 0, 0);
   math::Vector3 cogVec = this->inertial->GetCoG();
 
