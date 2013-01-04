@@ -162,8 +162,11 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
     default:
       break;
   }
-//  if (!drawInProgress)
-    QGraphicsView::mouseReleaseEvent(_event);
+
+  if (!this->drawInProgress)
+    this->currentMouseItem = NULL;
+
+  QGraphicsView::mouseReleaseEvent(_event);
 }
 
 /////////////////////////////////////////////////

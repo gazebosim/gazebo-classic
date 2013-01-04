@@ -499,8 +499,6 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
 /////////////////////////////////////////////////
 void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 {
-  _event->setAccepted(true);
-
   /// TODO: uncomment to enable snap to grid
 /*  this->location.setX( (static_cast<int>(this->location.x())
       / this->gridSpace) * this->gridSpace);
@@ -509,6 +507,7 @@ void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 
 //  this->SetPosition(this->location);
   this->mousePressPos = QPointF(0, 0);
+  _event->setAccepted(true);
 }
 
 /////////////////////////////////////////////////
