@@ -50,16 +50,30 @@ namespace gazebo
       /// \return The selected topic's published message type.
       public: std::string GetMsgType() const;
 
+      /// \brief Utility function to get the list of topic names.
       private: void GetTopicList();
 
+      /// \brief Callback when okay button is selected.
       private slots: void OnOkay();
+
+      /// \brief Callback when cancel button is selected.
       private slots: void OnCancel();
+
+      /// \brief Callback when an item is selected with a single mouse click.
+      /// \param[in] _item Pointer to the item selected.
+      /// \param[in] _column Column selected.
       private slots: void OnSelection(QTreeWidgetItem *_item, int _column);
 
-      /// \brief
+      /// \brief Callback when an item is selected with a double mouse click.
+      /// \param[in] _item Pointer to the item selected.
+      /// \param[in] _column Column selected.
+      private slots: void OnDoubleClickSelection(QTreeWidgetItem *_item,
+                                                 int _column);
+
+      /// \brief The tree widget which holds all the topics.
       private: QTreeWidget *treeWidget;
 
-      /// \brief
+      /// \brief Button used to finalize topic selection
       private: QPushButton *okayButton;
 
       /// \brief The name of the selected topic.

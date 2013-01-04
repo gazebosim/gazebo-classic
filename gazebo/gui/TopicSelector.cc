@@ -47,6 +47,9 @@ TopicSelector::TopicSelector(QWidget *_parent)
   connect(this->treeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
           this, SLOT(OnSelection(QTreeWidgetItem *, int)));
 
+  connect(this->treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
+          this, SLOT(OnDoubleClickSelection(QTreeWidgetItem *, int)));
+
   this->GetTopicList();
 
   QFrame *frame = new QFrame;
@@ -155,6 +158,25 @@ void TopicSelector::OnSelection(QTreeWidgetItem *_item, int /*_column*/)
     this->topicName = _item->text(0).toStdString();
     this->msgType = _item->parent()->text(0).toStdString();
     this->okayButton->setEnabled(true);
+  }
+  else
+  {
+    _item->setExpanded(!_item->isExpanded());
+    this->topicName.clear();
+    this->msgType.clear();
+    this->okayButton->setEnabled(false);
+  }
+}
+
+/////////////////////////////////////////////////
+void TopicSelector::OnDoubleClickSelection(QTreeWidgetItem *_item,
+                                           int /*_column*/)
+{
+  if (_item->parent())
+  {
+    this->topicName = _item->text(0).toStdString();
+    this->msgType = _item->parent()->text(0).toStdString();
+    this->OnOkay();
   }
   else
   {

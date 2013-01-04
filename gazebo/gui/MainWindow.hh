@@ -90,6 +90,7 @@ namespace gazebo
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
 
+      /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
 
       private: void OnFullScreen(bool _value);
