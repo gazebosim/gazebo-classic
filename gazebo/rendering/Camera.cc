@@ -549,11 +549,11 @@ unsigned int Camera::GetImageDepth() const
   sdf::ElementPtr imgElem = this->sdf->GetElement("image");
   std::string imgFmt = imgElem->GetValueString("format");
 
-  if (imgFmt == "L8")
+  if (imgFmt == "L8" || imgFmt == "L_INT8")
     return 1;
-  else if (imgFmt == "R8G8B8")
+  else if (imgFmt == "R8G8B8" || imgFmt == "RGB_INT8")
     return 3;
-  else if (imgFmt == "B8G8R8")
+  else if (imgFmt == "B8G8R8" || imgFmt == "BGR_INT8")
     return 3;
   else if ((imgFmt == "BAYER_RGGB8") || (imgFmt == "BAYER_BGGR8") ||
             (imgFmt == "BAYER_GBRG8") || (imgFmt == "BAYER_GRBG8"))
@@ -609,11 +609,11 @@ int Camera::GetOgrePixelFormat(const std::string &_format)
 {
   int result;
 
-  if (_format == "L8")
+  if (_format == "L8" || _format == "L_INT8")
     result = static_cast<int>(Ogre::PF_L8);
-  else if (_format == "R8G8B8")
+  else if (_format == "R8G8B8" || _format == "RGB_INT8")
     result = static_cast<int>(Ogre::PF_BYTE_RGB);
-  else if (_format == "B8G8R8")
+  else if (_format == "B8G8R8" || _format == "BGR_INT8")
     result = static_cast<int>(Ogre::PF_BYTE_BGR);
   else if (_format == "FLOAT32")
     result = static_cast<int>(Ogre::PF_FLOAT32_R);

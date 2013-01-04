@@ -219,6 +219,13 @@ namespace gazebo
       /// \param[out] _namespaces The list of namespaces will be written here
       public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
 
+      /// \brief Get a list of all the topics.
+      /// \return A map where keys are message types, and values are a list
+      /// of topic names.
+      /// \sa transport::GetAdvertisedTopics
+      public: std::map<std::string, std::list<std::string> >
+              GetAdvertisedTopics() const GAZEBO_DEPRECATED;
+
       /// \brief Clear all buffers
       public: void ClearBuffers();
 
@@ -247,4 +254,3 @@ namespace gazebo
   }
 }
 #endif
-

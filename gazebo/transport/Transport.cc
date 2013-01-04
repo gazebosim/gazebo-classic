@@ -258,3 +258,61 @@ void transport::requestNoReply(NodePtr _node, const std::string &_request,
   // Clean up the publisher.
   requestPub.reset();
 }
+
+/////////////////////////////////////////////////
+std::map<std::string, std::list<std::string> > transport::getAdvertisedTopics()
+{
+  std::map<std::string, std::list<std::string> > result;
+  std::list<msgs::Publish> publishers;
+
+  ConnectionManager::Instance()->GetAllPublishers(publishers);
+
+  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
+      iter != publishers.end(); ++iter)
+  {
+    result[(*iter).msg_type()].push_back((*iter).topic());
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+std::list<std::string> transport::getAdvertisedTopics(
+    const std::string &_msgType)
+{
+  std::list<std::string> result;
+  std::list<msgs::Publish> publishers;
+
+  ConnectionManager::Instance()->GetAllPublishers(publishers);
+
+  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
+      iter != publishers.end(); ++iter)
+  {
+    if (std::find(result.begin(), result.end(), (*iter).topic()) !=
+        result.end())
+      continue;
+
+    if (_msgType.empty() || _msgType == (*iter).msg_type())
+      result.push_back((*iter).topic());
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+std::string transport::getTopicMsgType(const std::string &_topicName)
+{
+  std::string result;
+  std::list<msgs::Publish> publishers;
+
+  ConnectionManager::Instance()->GetAllPublishers(publishers);
+
+  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
+      iter != publishers.end() && result.empty(); ++iter)
+  {
+    if (_topicName == (*iter).topic())
+      result = (*iter).msg_type();
+  }
+
+  return result;
+}
