@@ -36,16 +36,16 @@ std::list<msgs::Request *> g_requests;
 std::list<boost::shared_ptr<msgs::Response> > g_responses;
 
 /////////////////////////////////////////////////
-bool transport::get_master_uri(std::string &master_host,
-                               unsigned int &master_port)
+bool transport::get_master_uri(std::string &_masterHost,
+                               unsigned int &_masterPort)
 {
   char *char_uri = getenv("GAZEBO_MASTER_URI");
 
   // Set to default host and port
   if (!char_uri || strlen(char_uri) == 0)
   {
-    master_host = "localhost";
-    master_port = 11345;
+    _masterHost = "localhost";
+    _masterPort = 11345;
     return false;
   }
 
@@ -53,18 +53,18 @@ bool transport::get_master_uri(std::string &master_host,
 
   boost::replace_first(master_uri, "http://", "");
   int last_colon = master_uri.find_last_of(":");
-  master_host = master_uri.substr(0, last_colon);
-  master_port = boost::lexical_cast<unsigned int>(
+  _masterHost = master_uri.substr(0, last_colon);
+  _masterPort = boost::lexical_cast<unsigned int>(
       master_uri.substr(last_colon+1, master_uri.size() - (last_colon+1)));
 
   return true;
 }
 
 /////////////////////////////////////////////////
-bool transport::init(const std::string &master_host, unsigned int master_port)
+bool transport::init(const std::string &_masterHost, unsigned int _masterPort)
 {
-  std::string host = master_host;
-  unsigned int port = master_port;
+  std::string host = _masterHost;
+  unsigned int port = _masterPort;
 
   if (host.empty())
     get_master_uri(host, port);
@@ -92,8 +92,11 @@ void transport::run()
   {
     TopicManager::Instance()->GetTopicNamespaces(namespaces);
 
-    // 25 seconds max wait time
-    common::Time::MSleep(500);
+    if (namespaces.empty())
+    {
+      // 25 seconds max wait time
+      common::Time::MSleep(500);
+    }
 
     trys++;
   }

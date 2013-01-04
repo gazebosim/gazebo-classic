@@ -140,10 +140,15 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
       boost::bind(&Connection::OnConnect, this,
         boost::asio::placeholders::error, endpoint_iter));
 
-  this->connectCondition.wait(lock);
-
-  if (this->connectError)
+  // Wait for at most 2 seconds for a connection to be established.
+  // The connectionCondition notification occurs in ::OnConnect.
+  if (!this->connectCondition.timed_wait(lock,
+        boost::posix_time::milliseconds(60000)) || this->connectError)
   {
+    // \todo Log this output to a gazebo log file.
+    // gzlog << "Failed to create connection to remote host["
+    //       << host << ":" << _port << "]\n";
+    this->socket->close();
     return false;
   }
 
@@ -725,26 +730,36 @@ boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
   boost::asio::ip::tcp::endpoint ep;
   if (this->socket)
     ep = this->socket->remote_endpoint();
-
   return ep;
 }
 
 //////////////////////////////////////////////////
-std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint ep)
+std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint _ep)
 {
-  boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
-  boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(ep);
-  boost::asio::ip::tcp::resolver::iterator end;
+  std::string result;
 
-  std::string name;
-
-  while (iter != end)
+  // Use the IP address if it's valid. This saves time, and is better than
+  // trying to find a hostname (particularly in cases where /etc/hosts has
+  // bad information).
+  if (!addressIsUnspecified(_ep.address().to_v4()))
   {
-    name = (*iter).host_name();
-    ++iter;
+    result = _ep.address().to_string();
+  }
+  // Otherwise perform a lookup
+  else
+  {
+    boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
+    boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(_ep);
+    boost::asio::ip::tcp::resolver::iterator end;
+
+    while (iter != end)
+    {
+      result = (*iter).host_name();
+      ++iter;
+    }
   }
 
-  return name;
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -761,10 +776,12 @@ std::string Connection::GetLocalHostname() const
 
 //////////////////////////////////////////////////
 void Connection::OnConnect(const boost::system::error_code &_error,
-    boost::asio::ip::tcp::resolver::iterator _endPointIter)
+    boost::asio::ip::tcp::resolver::iterator /*_endPointIter*/)
 {
-  boost::mutex::scoped_lock(*this->connectMutex);
+  // This function is called when a connection is successfully (or
+  // unsuccessfully) established.
 
+  boost::mutex::scoped_lock lock(*this->connectMutex);
   if (_error == 0)
   {
     this->remoteURI = std::string("http://") + this->GetRemoteHostname()
@@ -781,17 +798,8 @@ void Connection::OnConnect(const boost::system::error_code &_error,
       gzerr << "Invalid socket connection\n";
     }
 
+    // Notify the condition that it may proceed.
     this->connectCondition.notify_one();
-  }
-  else if (_endPointIter != boost::asio::ip::tcp::resolver::iterator() &&
-           this->socket)
-  {
-    this->socket->close();
-    boost::asio::ip::tcp::endpoint endPoint = *_endPointIter;
-
-    this->socket->async_connect(endPoint,
-        boost::bind(&Connection::OnConnect, this,
-          boost::asio::placeholders::error, ++_endPointIter));
   }
   else
   {

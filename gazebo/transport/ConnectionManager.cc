@@ -62,7 +62,7 @@ ConnectionManager::~ConnectionManager()
 }
 
 //////////////////////////////////////////////////
-bool ConnectionManager::Init(const std::string &master_host,
+bool ConnectionManager::Init(const std::string &_masterHost,
                              unsigned int master_port)
 {
   this->stop = false;
@@ -75,7 +75,7 @@ bool ConnectionManager::Init(const std::string &master_host,
       boost::bind(&ConnectionManager::OnAccept, this, _1));
 
   gzmsg << "Waiting for master";
-  while (!this->masterConn->Connect(master_host, master_port) &&
+  while (!this->masterConn->Connect(_masterHost, master_port) &&
          this->IsRunning())
   {
     printf(".");
@@ -152,6 +152,10 @@ bool ConnectionManager::Init(const std::string &master_host,
       boost::bind(&ConnectionManager::OnMasterRead, this, _1));
 
   this->initialized = true;
+
+  // Tell the user what address will be publicized to other nodes.
+  gzmsg << "Publicized address: "
+        << this->masterConn->GetLocalHostname() << "\n";
 
   return true;
 }
@@ -454,11 +458,13 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &_publishers)
 void ConnectionManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 {
   _namespaces.clear();
-  std::list<std::string>::iterator iter;
 
   boost::recursive_mutex::scoped_lock lock(*this->listMutex);
-  for (iter = this->namespaces.begin(); iter != this->namespaces.end(); ++iter)
+  for (std::list<std::string>::iterator iter = this->namespaces.begin();
+       iter != this->namespaces.end(); ++iter)
+  {
     _namespaces.push_back(*iter);
+  }
 }
 
 //////////////////////////////////////////////////
