@@ -469,12 +469,13 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
                  <<     "  xmlns:sensor='http://gazebosim.org/'>"
                  << *child_elem << "</blob>";
 
-          // *********************************************
+          // *************************************************
+          // convert to sdf 1.2 if it is the deprecated format
           // check if blob is any of the deprecated format
           // this is not needed if we don't support
           // deprecated xml format any more, will be out
           // from groovy
-          // *********************************************
+          // *************************************************
           xmlDocPtr xmlDoc =
             xmlParseDoc(reinterpret_cast<const xmlChar*>(stream.str().c_str()));
           xmlNodePtr node = xmlDocGetRootElement(xmlDoc)->xmlChildrenNode;
@@ -488,6 +489,9 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
           initSDF(includeSDF);
           sdf::ElementPtr sdf;
 
+          // a place to store converted doc
+          TiXmlDocument xmlNewDoc;
+
           if (node->ns && (const char*)node->ns->prefix
                 == std::string("controller"))
           {
@@ -495,6 +499,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
                                   ->GetElement("plugin");
             deprecated_sdf::initPlugin(node, sdf);
             // gzdbg << "controller:\n" << sdf->ToString("") << "\n";
+            xmlNewDoc.Parse(sdf->ToString("").c_str());
           }
           else if (node->ns && (const char*)node->ns->prefix
                    == std::string("sensor"))
@@ -504,6 +509,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
                   ->GetElement("sensor");
             deprecated_sdf::initSensor(node, sdf);
             // gzdbg << "sensor:\n" << sdf->ToString("") << "\n";
+            xmlNewDoc.Parse(sdf->ToString("").c_str());
           }
           else if (node->ns && (const char*)node->ns->prefix
                 == std::string("body"))
@@ -512,6 +518,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
                   ->GetElement("link");
             deprecated_sdf::initLink(node, sdf);
             // gzdbg << "body:\n" << sdf->ToString("") << "\n";
+            xmlNewDoc.Parse(sdf->ToString("").c_str());
           }
           else if (node->ns && (const char*)node->ns->prefix
                 == std::string("joint"))
@@ -520,6 +527,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
                   ->GetElement("joint");
             deprecated_sdf::initJoint(node, sdf);
             // gzdbg << "joint:\n" << sdf->ToString("") << "\n";
+            xmlNewDoc.Parse(sdf->ToString("").c_str());
           }
           else if (std::string((const char*)node->name) == "gripper")
           {
@@ -527,6 +535,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
                   ->GetElement("gripper");
             deprecated_sdf::initGripper(node, sdf);
             // gzdbg << "gripper:\n" << sdf->ToString("") << "\n";
+            xmlNewDoc.Parse(sdf->ToString("").c_str());
           }
           else if (std::string((const char*)node->name)
                    == "projector")
@@ -536,15 +545,15 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
                   ->GetElement("projector");
             deprecated_sdf::initProjector(node, sdf);
             // gzdbg << "projector:\n" << sdf->ToString("") << "\n";
+            xmlNewDoc.Parse(sdf->ToString("").c_str());
           }
           else
           {
-            gzerr << "extension [" << stream.str() << "] not converted.\n";
+            std::ostringstream origStream;
+            origStream << *child_elem;
+            gzdbg << "extension [" << origStream.str() << "] not converted.\n";
+            xmlNewDoc.Parse(origStream.str().c_str());
           }
-
-          /// \TODO: convert to sdf 1.2 if it is the deprecated format
-          TiXmlDocument xmlNewDoc;
-          xmlNewDoc.Parse(sdf->ToString("").c_str());
 
           // save all unknown stuff in a vector of blobs
           TiXmlElement *blob = new TiXmlElement(*xmlNewDoc.FirstChildElement());
