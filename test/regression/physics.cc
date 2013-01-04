@@ -30,15 +30,21 @@ void PhysicsTest::EmptyWorld(std::string _worldFile)
   // Load an empty world
   Load(_worldFile, true);
   physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  ASSERT_TRUE(world != NULL);
 
-  // simulate a couple seconds
-  world->StepWorld(2000);
+  // simulate 1 step
+  world->StepWorld(1);
   double t = world->GetSimTime().Double();
   // verify that time moves forward
   EXPECT_GT(t, 0);
 
-  Unload();
+  // simulate a few steps
+  int steps = 20;
+  world->StepWorld(steps);
+  double dt = world->GetPhysicsEngine()->GetStepTime();
+  EXPECT_GT(dt, 0);
+  t = world->GetSimTime().Double();
+  EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 
 TEST_F(PhysicsTest, EmptyWorldODE)
