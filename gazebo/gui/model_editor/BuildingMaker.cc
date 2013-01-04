@@ -465,8 +465,8 @@ void BuildingMaker::GenerateSDF()
   this->modelSDF->SetFromString(this->GetTemplateSDFString());
 
   modelElem = this->modelSDF->root->GetElement("model");
-  linkElem = modelElem->GetElement("link");
 
+  linkElem = modelElem->GetElement("link");
   sdf::ElementPtr templateLinkElem = linkElem->Clone();
   sdf::ElementPtr templateVisualElem = templateLinkElem->GetElement(
       "visual")->Clone();
@@ -710,7 +710,8 @@ void BuildingMaker::GenerateSDF()
     }
     modelElem->InsertElement(newLinkElem);
   }
-//  qDebug() << this->modelSDF->ToString().c_str();
+  (modelElem->AddElement("static"))->Set("true");
+  qDebug() << this->modelSDF->ToString().c_str();
 }
 
 /////////////////////////////////////////////////
@@ -883,6 +884,7 @@ void BuildingMaker::GenerateSDFWithCSG()
     }
     modelElem->InsertElement(newLinkElem);
   }
+  (modelElem->AddElement("static"))->Set("true");
 #endif
 }
 
@@ -971,6 +973,7 @@ std::string BuildingMaker::GetTemplateSDFString()
     <<     "</material>"
     <<   "</visual>"
     << "</link>"
+    << "<static>true</static>"
     << "</model>"
     << "</sdf>";
 
