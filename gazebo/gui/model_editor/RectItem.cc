@@ -508,6 +508,7 @@ void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
       / this->gridSpace) * this->gridSpace);*/
 
 //  this->SetPosition(this->location);
+  this->mousePressPos = QPointF(0, 0);
 }
 
 /////////////////////////////////////////////////
@@ -519,6 +520,7 @@ void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
   this->setSelected(true);
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
 //  this->location = this->pos();
+  this->mousePressPos = this->mapFromScene(_event->scenePos());
   _event->setAccepted(true);
 }
 
@@ -528,10 +530,12 @@ void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
   if (!this->isSelected())
     return;
 
-  QPointF delta = _event->scenePos() - _event->lastScenePos();
-  this->SetPosition(this->scenePos() + delta);
+//  QPointF delta = _event->scenePos() - _event->lastScenePos();
+//  this->SetPosition(this->scenePos() + delta);
 //  this->location += delta;
 //  this->SetPosition(this->location);
+  this->SetPosition(this->pos()
+    + this->mapFromScene(_event->scenePos()) - mousePressPos);
 }
 
 /////////////////////////////////////////////////

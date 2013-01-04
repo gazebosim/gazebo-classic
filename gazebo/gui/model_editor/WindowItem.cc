@@ -168,7 +168,7 @@ void WindowItem::OnApply()
     itemPos.setY(-itemPos.y());
     this->windowPos = itemPos;
     this->setPos(this->windowPos);
-    this->setParentItem(NULL);
+//    this->setParentItem(NULL);
   }
   this->WindowChanged();
 }

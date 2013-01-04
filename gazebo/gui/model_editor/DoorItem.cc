@@ -163,7 +163,7 @@ void DoorItem::OnApply()
     itemPos.setY(-itemPos.y());
     this->doorPos = itemPos;
     this->setPos(this->doorPos);
-    this->setParentItem(NULL);
+//    this->setParentItem(NULL);
   }
   this->DoorChanged();
 }

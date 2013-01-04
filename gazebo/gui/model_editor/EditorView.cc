@@ -221,78 +221,82 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
       break;
   }
 
-  if (!drawInProgress)
+
+  // auto attach windows and doors to walls
+  QGraphicsItem *grabber = this->scene()->mouseGrabberItem();
+  if (!grabber)
+    grabber = this->currentMouseItem;
+  RectItem *editorItem = dynamic_cast<RectItem *>(grabber);
+  if (grabber && editorItem && (editorItem->GetType() == "Window"
+      || editorItem->GetType() == "Door") )
   {
-    // auto attach windows and doors to walls
-    QGraphicsItem *grabber = this->scene()->mouseGrabberItem();
-    RectItem *editorItem = dynamic_cast<RectItem *>(grabber);
-    if (grabber && editorItem && (editorItem->GetType() == "Window"
-        || editorItem->GetType() == "Door") )
+    if (grabber->parentItem())
     {
-      if (grabber->parentItem())
+      LineSegmentItem *wallSegment =
+            dynamic_cast<LineSegmentItem *>(grabber->parentItem());
+      if (wallSegment)
+      {
+        QLineF segmentLine(wallSegment->line());
+        segmentLine.setP1(wallSegment->mapToScene(segmentLine.p1()));
+        segmentLine.setP2(wallSegment->mapToScene(segmentLine.p2()));
+        QPointF mousePoint = this->mapToScene(_event->pos());
+        QPointF deltaLine = segmentLine.p2() - segmentLine.p1();
+        QPointF deltaMouse = mousePoint - segmentLine.p1();
+        double deltaLineMouse2 = deltaLine.x()*(-deltaMouse.y())
+            - (-deltaMouse.x())*deltaLine.y();
+        double deltaLine2 = (deltaLine.x()*deltaLine.x())
+            + deltaLine.y()*deltaLine.y();
+        double mouseDotLine = deltaMouse.x()*deltaLine.x()
+              + deltaMouse.y()*deltaLine.y();
+        double t = mouseDotLine / deltaLine2;
+        double distance = fabs(deltaLineMouse2) / sqrt(deltaLine2);
+        if (distance > 30 || t > 1.0 || t < 0.0)
+        {
+          editorItem->setParentItem(NULL);
+          this->buildingMaker->DetachObject(this->itemToModelMap[editorItem],
+                this->itemToModelMap[wallSegment]);
+          editorItem->SetRotation(editorItem->GetRotation()
+            - this->grabberDragRotation);
+          editorItem->SetPosition(mousePoint);
+        }
+        else
+        {
+          QPointF closest(segmentLine.p1() + t*deltaLine);
+          grabber->setPos(wallSegment->mapFromScene(closest));
+          grabber->setRotation(wallSegment->rotation());
+        }
+        return;
+      }
+    }
+    else
+    {
+      QList<QGraphicsItem *> overlaps = this->scene()->collidingItems(
+          grabber, Qt::IntersectsItemBoundingRect);
+      for (int i = 0; i < overlaps.size(); ++i)
       {
         LineSegmentItem *wallSegment =
-              dynamic_cast<LineSegmentItem *>(grabber->parentItem());
+            dynamic_cast<LineSegmentItem *>(overlaps[i]);
         if (wallSegment)
         {
-          QLineF segmentLine(wallSegment->line());
-          segmentLine.setP1(wallSegment->mapToScene(segmentLine.p1()));
-          segmentLine.setP2(wallSegment->mapToScene(segmentLine.p2()));
-          QPointF mousePoint = this->mapToScene(_event->pos());
-          QPointF deltaLine = segmentLine.p2() - segmentLine.p1();
-          QPointF deltaMouse = mousePoint - segmentLine.p1();
-          double deltaLineMouse2 = deltaLine.x()*(-deltaMouse.y())
-              - (-deltaMouse.x())*deltaLine.y();
-          double deltaLine2 = (deltaLine.x()*deltaLine.x())
-              + deltaLine.y()*deltaLine.y();
-          double mouseDotLine = deltaMouse.x()*deltaLine.x()
-                + deltaMouse.y()*deltaLine.y();
-          double t = mouseDotLine / deltaLine2;
-          double distance = fabs(deltaLineMouse2) / sqrt(deltaLine2);
-          if (distance > 30 || t > 1.0 || t < 0.0)
+          QPointF scenePos =  grabber->scenePos();
+          if (wallSegment->contains(wallSegment->mapFromScene(scenePos)))
           {
-            editorItem->setParentItem(NULL);
-            this->buildingMaker->DetachObject(this->itemToModelMap[editorItem],
-                  this->itemToModelMap[wallSegment]);
-            editorItem->SetRotation(editorItem->GetRotation()
-              - this->grabberDragRotation);
-            editorItem->SetPosition(mousePoint);
-          }
-          else
-          {
-            QPointF closest(segmentLine.p1() + t*deltaLine);
-            grabber->setPos(wallSegment->mapFromScene(closest));
-            grabber->setRotation(wallSegment->rotation());
-          }
-          return;
-        }
-      }
-      else
-      {
-        QList<QGraphicsItem *> overlaps = this->scene()->collidingItems(
-            grabber, Qt::IntersectsItemBoundingRect);
-        for (int i = 0; i < overlaps.size(); ++i)
-        {
-          LineSegmentItem *wallSegment =
-              dynamic_cast<LineSegmentItem *>(overlaps[i]);
-          if (wallSegment)
-          {
-            QPointF scenePos =  grabber->scenePos();
-            if (wallSegment->contains(wallSegment->mapFromScene(scenePos)))
-            {
-              editorItem->setParentItem(wallSegment);
-              this->buildingMaker->AttachObject(
-                  this->itemToModelMap[editorItem],
-                  this->itemToModelMap[wallSegment]);
-              editorItem->SetPosition(wallSegment->mapFromScene(scenePos));
-              this->grabberDragRotation = -wallSegment->line().angle();
-              editorItem->SetRotation(this->grabberDragRotation);
-              return;
-            }
+            editorItem->setParentItem(wallSegment);
+            this->buildingMaker->AttachObject(
+                this->itemToModelMap[editorItem],
+                this->itemToModelMap[wallSegment]);
+            editorItem->SetPosition(wallSegment->mapFromScene(scenePos));
+            this->grabberDragRotation = -wallSegment->line().angle();
+            editorItem->SetRotation(this->grabberDragRotation);
+            return;
           }
         }
       }
     }
+  }
+
+  if (!drawInProgress)
+  {
     QGraphicsView::mouseMoveEvent(_event);
   }
 }

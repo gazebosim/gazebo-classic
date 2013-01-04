@@ -148,6 +148,8 @@ namespace gazebo
 
         private: QPointF location;
 
+        private: QPointF mousePressPos;
+
         private: int gridSpace;
 
         /// \brief Four corners and four edges, going clockwise with
