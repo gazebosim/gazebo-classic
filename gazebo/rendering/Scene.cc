@@ -920,7 +920,7 @@ bool Scene::GetFirstContact(CameraPtr _camera,
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
-  double distance = 0.0;
+  double distance = -1.0;
 
   // Iterate over all the results.
   for (; iter != result.end() && distance <= 0.0; ++iter)
@@ -935,7 +935,45 @@ bool Scene::GetFirstContact(CameraPtr _camera,
         iter->movable->getName().find("OrbitViewController")
         == std::string::npos)
     {
-      distance = iter->distance;
+
+      Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
+
+      // mesh data to retrieve
+      size_t vertexCount;
+      size_t indexCount;
+      Ogre::Vector3 *vertices;
+      uint64_t *indices;
+
+      // Get the mesh information
+      this->GetMeshInformation(pentity->getMesh().get(), vertexCount,
+          vertices, indexCount, indices,
+          pentity->getParentNode()->_getDerivedPosition(),
+          pentity->getParentNode()->_getDerivedOrientation(),
+          pentity->getParentNode()->_getDerivedScale());
+
+      for (int i = 0; i < static_cast<int>(indexCount); i += 3)
+      {
+        // when indices size is not divisible by 3
+        if (i+2 >= static_cast<int>(indexCount))
+          break;
+
+        // check for a hit against this triangle
+        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay,
+            vertices[indices[i]],
+            vertices[indices[i+1]],
+            vertices[indices[i+2]],
+            true, false);
+
+        // if it was a hit check if its the closest
+        if (hit.first)
+        {
+          if ((distance < 0.0f) || (hit.second < distance))
+          {
+            // this is the closest so far, save it off
+            distance = hit.second;
+          }
+        }
+      }
     }
   }
 
