@@ -91,7 +91,10 @@ RectItem::~RectItem()
 void RectItem::showCorners(bool _show)
 {
   for (int i = 0; i < 8; ++i)
-    this->corners[i]->setVisible(_show);
+  {
+    this->corners[i]->setVisible(_show && this->corners[i]->isEnabled());
+
+  }
   this->rotateHandle->setVisible(_show);
 }
 
@@ -832,9 +835,9 @@ void RectItem::SetResizeFlag(unsigned int _flag)
   }
   if ((resizeFlag & ITEM_WIDTH) && (resizeFlag & ITEM_HEIGHT))
   {
-    this->corners[1]->setEnabled(true);
+    this->corners[0]->setEnabled(true);
     this->corners[2]->setEnabled(true);
-    this->corners[3]->setEnabled(true);
+    this->corners[4]->setEnabled(true);
     this->corners[6]->setEnabled(true);
   }
 }
