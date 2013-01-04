@@ -15,8 +15,6 @@
     <!-- A ground plane -->
     <include><uri>model://ground_plane</uri></include>
 
-    <include filename="hokuyo.model" />
-
     <!-- A global light source -->
     <include><uri>model://sun</uri></include>
 

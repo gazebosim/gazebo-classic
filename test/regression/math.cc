@@ -757,6 +757,55 @@ TEST_F(MathTest, Quaternion)
 TEST_F(MathTest, Pose)
 {
   {
+    // test hypothesis that if
+    // A is the transform from O to P specified in frame O
+    // B is the transform from P to Q specified in frame P
+    // then, B + A is the transform from O to Q specified in frame O
+    math::Pose A(math::Vector3(1, 0, 0), math::Quaternion(0, 0, M_PI/4.0));
+    math::Pose B(math::Vector3(1, 0, 0), math::Quaternion(0, 0, M_PI/2.0));
+    EXPECT_TRUE(math::equal((B + A).pos.x, 1.0 + 1.0/sqrt(2)));
+    EXPECT_TRUE(math::equal((B + A).pos.y,       1.0/sqrt(2)));
+    EXPECT_TRUE(math::equal((B + A).pos.z,               0.0));
+    EXPECT_TRUE(math::equal((B + A).rot.GetAsEuler().x,  0.0));
+    EXPECT_TRUE(math::equal((B + A).rot.GetAsEuler().y,  0.0));
+    EXPECT_TRUE(math::equal((B + A).rot.GetAsEuler().z, 3.0*M_PI/4.0));
+  }
+  {
+    // If:
+    // A is the transform from O to P in frame O
+    // B is the transform from O to Q in frame O
+    // then -A is transform from P to O specified in frame P
+    math::Pose A(math::Vector3(1, 0, 0), math::Quaternion(0, 0, M_PI/4.0));
+    EXPECT_TRUE(math::equal((math::Pose() - A).pos.x,      -1.0/sqrt(2)));
+    EXPECT_TRUE(math::equal((math::Pose() - A).pos.y,       1.0/sqrt(2)));
+    EXPECT_TRUE(math::equal((math::Pose() - A).pos.z,               0.0));
+    EXPECT_TRUE(math::equal((math::Pose() - A).rot.GetAsEuler().x,  0.0));
+    EXPECT_TRUE(math::equal((math::Pose() - A).rot.GetAsEuler().y,  0.0));
+    EXPECT_TRUE(math::equal((math::Pose() - A).rot.GetAsEuler().z, -M_PI/4.0));
+
+    // test negation operator
+    EXPECT_TRUE(math::equal((-A).pos.x,      -1.0/sqrt(2)));
+    EXPECT_TRUE(math::equal((-A).pos.y,       1.0/sqrt(2)));
+    EXPECT_TRUE(math::equal((-A).pos.z,               0.0));
+    EXPECT_TRUE(math::equal((-A).rot.GetAsEuler().x,  0.0));
+    EXPECT_TRUE(math::equal((-A).rot.GetAsEuler().y,  0.0));
+    EXPECT_TRUE(math::equal((-A).rot.GetAsEuler().z, -M_PI/4.0));
+  }
+  {
+    // If:
+    // A is the transform from O to P in frame O
+    // B is the transform from O to Q in frame O
+    // B - A is the transform from P to Q in frame P
+    math::Pose A(math::Vector3(1, 0, 0), math::Quaternion(0, 0, M_PI/4.0));
+    math::Pose B(math::Vector3(1, 1, 0), math::Quaternion(0, 0, M_PI/2.0));
+    EXPECT_TRUE(math::equal((B - A).pos.x,       1.0/sqrt(2)));
+    EXPECT_TRUE(math::equal((B - A).pos.y,       1.0/sqrt(2)));
+    EXPECT_TRUE(math::equal((B - A).pos.z,               0.0));
+    EXPECT_TRUE(math::equal((B - A).rot.GetAsEuler().x,  0.0));
+    EXPECT_TRUE(math::equal((B - A).rot.GetAsEuler().y,  0.0));
+    EXPECT_TRUE(math::equal((B - A).rot.GetAsEuler().z, M_PI/4.0));
+  }
+  {
     math::Pose pose;
     EXPECT_TRUE(pose.pos == math::Vector3(0, 0, 0));
     EXPECT_TRUE(pose.rot == math::Quaternion(0, 0, 0));
@@ -936,6 +985,14 @@ TEST_F(MathTest, Random)
   EXPECT_GE(i, 1);
 
   i = math::Rand::GetIntNormal(2, 3);
+
+  // Test setting the random number seed
+  {
+    math::Rand::SetSeed(1001);
+
+    d = math::Rand::GetDblNormal(2, 3);
+    EXPECT_TRUE(math::equal(d, 0.985827));
+  }
 }
 
 int main(int argc, char **argv)
