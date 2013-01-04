@@ -173,7 +173,6 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
       _rotate->SetMouseState(QEvent::GraphicsSceneMousePress);
       _rotate->SetMouseDownX(mouseEvent->pos().x());
       _rotate->SetMouseDownY(mouseEvent->pos().y());
-
       break;
     }
     case QEvent::GraphicsSceneMouseRelease:
@@ -202,7 +201,7 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
       break;
   }
 
-  if (mouseEvent == NULL)
+  if (!mouseEvent)
     return false;
 
   if (_rotate->GetMouseState() == QEvent::GraphicsSceneMouseMove)
