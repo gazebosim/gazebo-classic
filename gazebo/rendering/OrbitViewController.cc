@@ -159,8 +159,14 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   // the focal point and distance.
   if (_event.pressPos == _event.pos)
   {
-    this->focalPoint = this->camera->GetScene()->GetFirstContact(
-        this->camera, _event.pressPos);
+    if (!this->camera->GetScene()->GetFirstContact(
+         this->camera, _event.pressPos, this->focalPoint))
+    {
+      math::Vector3 origin, dir;
+      this->camera->GetCameraToViewportRay(
+          _event.pressPos.x, _event.pressPos.y, origin, dir);
+      this->focalPoint = origin + dir * 10.0;
+    }
 
     this->distance = this->camera->GetWorldPose().pos.Distance(
         this->focalPoint);
@@ -194,11 +200,18 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     this->distance =
       this->camera->GetWorldPose().pos.Distance(this->focalPoint);
 
+
     double fovY = this->camera->GetVFOV().Radian();
     double fovX = 2.0f * atan(tan(fovY / 2.0f) *
         this->camera->GetAspectRatio());
 
     math::Vector3 translation;
+
+    double factor = 2.0;
+
+    // The control key increases zoom speed by a factor of two.
+    if (_event.control)
+      factor *= 2.0;
 
     // If the "x", "y", or "z" key is pressed, then lock translation to the
     // indicated axis.
@@ -206,13 +219,13 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     {
       if (this->key == "x")
         translation.Set((drag.y / static_cast<float>(height)) *
-                        this->distance * tan(fovY / 2.0) * 2.0, 0.0, 0.0);
+                        this->distance * tan(fovY / 2.0) * factor, 0.0, 0.0);
       else if (this->key == "y")
         translation.Set(0.0, (drag.x / static_cast<float>(width)) *
-                        this->distance * tan(fovX / 2.0) * 2.0, 0.0);
+                        this->distance * tan(fovX / 2.0) * factor, 0.0);
       else if (this->key == "z")
         translation.Set(0.0, 0.0, (drag.y / static_cast<float>(height)) *
-                        this->distance * tan(fovY / 2.0) * 2.0);
+                        this->distance * tan(fovY / 2.0) * factor);
       else
         gzerr << "Unable to handle key [" << this->key << "] in orbit view "
               << "controller.\n";
@@ -225,9 +238,9 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
       // Translate in the "y" "z" plane.
       translation.Set(0.0,
           (drag.x / static_cast<float>(width)) *
-          this->distance * tan(fovX / 2.0) * 2.0,
+          this->distance * tan(fovX / 2.0) * factor,
           (drag.y / static_cast<float>(height)) *
-          this->distance * tan(fovY / 2.0) * 2.0);
+          this->distance * tan(fovY / 2.0) * factor);
 
       // Translate in the local coordinate frame
       this->TranslateLocal(translation);
@@ -243,8 +256,14 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   // The scroll wheel controls zoom.
   else if (_event.type == common::MouseEvent::SCROLL)
   {
-    this->focalPoint = this->camera->GetScene()->GetFirstContact(this->camera,
-        _event.pos);
+    if (!this->camera->GetScene()->GetFirstContact(
+         this->camera, _event.pos, this->focalPoint))
+    {
+      math::Vector3 origin, dir;
+      this->camera->GetCameraToViewportRay(
+          _event.pos.x, _event.pos.y, origin, dir);
+      this->focalPoint = origin + dir * 10.0;
+    }
 
     this->distance = this->camera->GetWorldPose().pos.Distance(
         this->focalPoint);
@@ -378,8 +397,8 @@ void OrbitViewController::Orbit(double _dy, double _dp)
   pitchNode->setOrientation(Ogre::Quaternion());
 
   // Rotate and update the reference visual.
-  this->yaw += _dy;
-  this->pitch += _dp;
+  this->yaw = this->NormalizeYaw(this->yaw + _dy);
+  this->pitch = this->NormalizePitch(this->pitch + _dp);
   this->refVisual->SetRotation(math::Quaternion(0, this->pitch, this->yaw));
 
   // Get the final position of the camera. Special case when the orbit view

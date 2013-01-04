@@ -897,11 +897,14 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Scene::GetFirstContact(CameraPtr _camera,
-                                     const math::Vector2i &_mousePos)
+bool Scene::GetFirstContact(CameraPtr _camera,
+                            const math::Vector2i &_mousePos,
+                            math::Vector3 &_position)
 {
-  math::Vector3 position;
+  bool valid = false;
   Ogre::Camera *ogreCam = _camera->GetOgreCamera();
+
+  _position = math::Vector3::Zero;
 
   // Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
@@ -944,18 +947,21 @@ math::Vector3 Scene::GetFirstContact(CameraPtr _camera,
       this->terrain->GetOgreTerrain()->rayIntersects(mouseRay);
 
     if (terrainResult.hit)
-      position = Conversions::Convert(terrainResult.position);
+    {
+      _position = Conversions::Convert(terrainResult.position);
+      valid = true;
+    }
   }
 
   // Compute the interesection point using the mouse ray and a distance
   // value.
-  if (position == math::Vector3::Zero)
+  if (_position == math::Vector3::Zero && distance > 0.0)
   {
-    position = Conversions::Convert(
-        mouseRay.getPoint(distance <= 0.0 ? 1.0 : distance));
+    _position = Conversions::Convert(mouseRay.getPoint(distance));
+    valid = true;
   }
 
-  return position;
+  return valid;
 }
 
 //////////////////////////////////////////////////

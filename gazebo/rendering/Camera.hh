@@ -350,7 +350,7 @@ namespace gazebo
       /// through the viewport
       /// \param[in] _screenx X coordinate in the camera's viewport, in pixels.
       /// \param[in] _screeny Y coordinate in the camera's viewport, in pixels.
-      /// \param[out] _origin Origing in the world coordinate frame of the
+      /// \param[out] _origin Origin in the world coordinate frame of the
       /// resulting ray
       /// \param[out] _dir Direction of the resulting ray
       public: void GetCameraToViewportRay(int _screenx, int _screeny,

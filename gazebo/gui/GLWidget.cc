@@ -294,15 +294,17 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent * /*_event*/)
     {
       math::Pose pose, camPose;
       camPose = this->userCamera->GetWorldPose();
-      pose.pos = this->scene->GetFirstContact(this->userCamera,
-                                              this->mouseEvent.pos);
-      this->userCamera->SetFocalPoint(pose.pos);
+      if (this->scene->GetFirstContact(this->userCamera,
+                                   this->mouseEvent.pos, pose.pos))
+      {
+        this->userCamera->SetFocalPoint(pose.pos);
 
-      math::Vector3 dir = pose.pos - camPose.pos;
-      pose.pos = camPose.pos + (dir * 0.8);
+        math::Vector3 dir = pose.pos - camPose.pos;
+        pose.pos = camPose.pos + (dir * 0.8);
 
-      pose.rot = this->userCamera->GetWorldRotation();
-      this->userCamera->MoveToPosition(pose, 0.5);
+        pose.rot = this->userCamera->GetWorldRotation();
+        this->userCamera->MoveToPosition(pose, 0.5);
+      }
     }
     else
     {
@@ -365,6 +367,8 @@ void GLWidget::OnMousePressTranslate()
     event::Events::setSelectedEntity(this->mouseMoveVis->GetName(), "move");
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
   }
+  else
+    this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
 /////////////////////////////////////////////////
@@ -537,6 +541,7 @@ void GLWidget::OnMouseMoveTranslate()
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     else
       QApplication::setOverrideCursor(Qt::ArrowCursor);
+    this->userCamera->HandleMouseEvent(this->mouseEvent);
   }
 }
 
@@ -618,6 +623,8 @@ void GLWidget::OnMouseReleaseTranslate()
     this->SetSelectedVisual(rendering::VisualPtr());
     event::Events::setSelectedEntity("", "normal");
   }
+
+  this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
 //////////////////////////////////////////////////
