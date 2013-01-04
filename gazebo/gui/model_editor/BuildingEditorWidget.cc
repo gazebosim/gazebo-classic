@@ -66,7 +66,7 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   scene->addItem(wallItem);
 
   this->levelWidget = new LevelWidget(this);
-  this->levelWidget->resize(150,50);
+  this->levelWidget->resize(250,50);
 //  QGraphicsProxyWidget* proxyWidget = scene->addWidget(levelWidget);
 //  proxyWidget->setFlag(QGraphicsItem::ItemIgnoresTransformations);
 //  proxyWidget->setPos(QPointF(-levelWidget->width() / 2, 0));
