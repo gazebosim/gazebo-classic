@@ -511,7 +511,7 @@ void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
 void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
 {
   this->sdf->GetElement("ode")->GetElement("solver")->
-    GetElement("percon_iters")->Set(_iters);
+    GetElement("precon_iters")->Set(_iters);
 
   dWorldSetQuickStepPreconIterations(this->worldId, _iters);
 }
