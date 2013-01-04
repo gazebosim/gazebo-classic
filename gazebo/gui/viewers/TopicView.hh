@@ -30,6 +30,33 @@ namespace gazebo
 {
   namespace gui
   {
+    class TopicCombo : public QComboBox
+    {
+      /// \brief Constructor
+      /// \param[in] _w Parent widget.
+      /// \param[in] _msgTypeName Name of the message type to display.
+      /// \param[in] _viewType Type of viewer, used to prune list of topics.
+      /// \param[in] _node Node used to get the list of topics.
+      public: TopicCombo(QWidget *_w, const std::string &_msgTypeName,
+                  const std::string &_viewType, transport::NodePtr _node);
+
+      /// \brief Inherited function from QComboBox. Called when the item
+      /// list is displayed.
+      public: virtual void showPopup();
+
+      /// \brief Update the list of items.
+      private: void UpdateList();
+
+      /// \brief Name of the message types to display.
+      private: std::string msgTypeName;
+
+      /// \brief Type of viewer.
+      private: std::string viewType;
+
+      /// \brief Tranport node pointer.
+      private: transport::NodePtr node;
+    };
+
     class TopicView : public QWidget
     {
       Q_OBJECT
@@ -37,7 +64,9 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _msgType Type of message that the viewer can display.
       /// \param[in] _parent Pointer to the parent widget.
-      public: TopicView(const std::string &_msgType);
+      /// \param[in] _viewType The type of the viewer.
+      public: TopicView(const std::string &_msgType,
+                        const std::string &_viewType);
 
       /// \brief Destructor
       public: virtual ~TopicView();
@@ -52,9 +81,6 @@ namespace gazebo
       /// be the timestamp when data was generated on the server.
       /// \param[in] _size Size of the message in bytes.
       protected: void OnMsg(const common::Time &_dataTime, int _size);
-
-      /// \brief Update the list of available topics in the combo box.
-      private: void UpdateTopicList();
 
       /// \brief Update the camera sensor widget.
       private slots: void Update();
@@ -81,7 +107,7 @@ namespace gazebo
       protected: std::string msgTypeName;
 
       /// \brief Combo box that displays all the relevant topics.
-      private: QComboBox *topicCombo;
+      private: TopicCombo *topicCombo;
 
       /// \brief Previous time a message was received.
       private: common::Time prevTime;

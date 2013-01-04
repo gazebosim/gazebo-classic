@@ -28,10 +28,8 @@ GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.ImageStamped", ImageView)
 
 /////////////////////////////////////////////////
 ImageView::ImageView()
-: TopicView("gazebo.msgs.ImageStamped")
+: TopicView("gazebo.msgs.ImageStamped", "image")
 {
-  std::cout << "ImageView::Constructor\n";
-
   this->setWindowTitle(tr("Gazebo: Image View"));
 
   // Create the image display

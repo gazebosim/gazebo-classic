@@ -26,7 +26,7 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 TextView::TextView(const std::string &_msgType)
-  : TopicView(_msgType)
+  : TopicView(_msgType, "text")
 {
   this->setWindowTitle(tr("Gazebo: Text View"));
 
@@ -104,6 +104,7 @@ void TextView::SetTopic(const std::string &_topicName)
           std::string("Unable to parse message of type[") +
           this->msgTypeName + "]")));
   }
+  //this->msg.reset();
 }
 
 /////////////////////////////////////////////////
@@ -116,7 +117,7 @@ void TextView::OnText(const std::string &_msg)
   this->OnMsg(common::Time::GetWallTime(), _msg.size());
 
   // Convert the raw data to a message.
-  msg->ParseFromString(_msg);
+  this->msg->ParseFromString(_msg);
 
   {
     boost::mutex::scoped_lock lock(this->mutex);

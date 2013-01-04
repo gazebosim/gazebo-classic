@@ -54,7 +54,6 @@ TopicView *ViewFactory::NewView(const std::string &_msgType,
 
   view->SetTopic(_topicName);
 
-
   return view;
 }
 

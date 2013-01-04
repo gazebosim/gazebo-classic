@@ -27,7 +27,8 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-TopicView::TopicView(const std::string &_msgTypeName)
+TopicView::TopicView(const std::string &_msgTypeName,
+                     const std::string &_viewType)
 : QWidget(), msgTypeName(_msgTypeName)
 {
   this->node = transport::NodePtr(new transport::Node());
@@ -41,13 +42,12 @@ TopicView::TopicView(const std::string &_msgTypeName)
   // {
   QHBoxLayout *topicLayout = new QHBoxLayout;
   QLabel *topicLabel = new QLabel(tr("Topic: "));
-  this->topicCombo = new QComboBox(this);
+  this->topicCombo = new TopicCombo(this, this->msgTypeName,
+      _viewType, this->node);
   this->topicCombo->setObjectName("comboList");
   this->topicCombo->setMinimumSize(300, 25);
-  this->UpdateTopicList();
   connect(this->topicCombo, SIGNAL(currentIndexChanged(int)),
           this, SLOT(OnTopicChanged(int)));
-
 
   topicLayout->addSpacing(10);
   topicLayout->addWidget(topicLabel);
@@ -95,6 +95,7 @@ TopicView::TopicView(const std::string &_msgTypeName)
 /////////////////////////////////////////////////
 TopicView::~TopicView()
 {
+  this->topicCombo->node.reset();
 }
 
 /////////////////////////////////////////////////
@@ -177,31 +178,6 @@ void TopicView::OnTopicChanged(int _index)
 }
 
 /////////////////////////////////////////////////
-void TopicView::UpdateTopicList()
-{
-  std::list<std::string> topics;
-
-  // First clear out the combo box.
-  this->topicCombo->clear();
-
-  // Get the list of all topics filtered by our message type.
-  topics = transport::getAdvertisedTopics(this->msgTypeName);
-
-  // Add each topic to the combo box.
-  for (std::list<std::string>::iterator iter = topics.begin();
-       iter != topics.end(); ++iter)
-  {
-    if ((*iter).find("__dbg") != std::string::npos)
-      continue;
-
-    // Get the shorthand notation for the topic.
-    std::string topicName = this->node->EncodeTopicName(*iter);
-
-    this->topicCombo->addItem(QString::fromStdString(topicName));
-  }
-}
-
-/////////////////////////////////////////////////
 void TopicView::SetTopic(const std::string &/*_topicName*/)
 {
   this->hz = 0.0;
@@ -212,4 +188,74 @@ void TopicView::SetTopic(const std::string &/*_topicName*/)
 /////////////////////////////////////////////////
 void TopicView::UpdateImpl()
 {
+}
+
+/////////////////////////////////////////////////
+TopicCombo::TopicCombo(QWidget *_w,
+    const std::string &_msgTypeName,
+    const std::string &_viewType,
+    transport::NodePtr _node)
+: QComboBox(_w), msgTypeName(_msgTypeName), viewType(_viewType), node(_node)
+{
+  this->UpdateList();
+}
+
+/////////////////////////////////////////////////
+void TopicCombo::showPopup()
+{
+  this->UpdateList();
+
+  // show the list
+  QComboBox::showPopup();
+}
+
+/////////////////////////////////////////////////
+void TopicCombo::UpdateList()
+{
+  // First clear out the combo box.
+  this->clear();
+
+  std::list<std::string> topics;
+
+  // Get only the topics that match the message type, if the current viewer
+  // is not a text viewer.
+  if (this->viewType != "text")
+  {
+    // Get the list of all topics filtered by our message type.
+    topics = transport::getAdvertisedTopics(this->msgTypeName);
+  }
+  // Otherwise select all the topics to show in the combo box.
+  else
+  {
+    std::map<std::string, std::list<std::string> > allTopics;
+    allTopics = transport::getAdvertisedTopics();
+
+    for (std::map<std::string, std::list<std::string> >::iterator
+         iter = allTopics.begin(); iter != allTopics.end(); ++iter)
+    {
+      // Add all the topic names
+      for (std::list<std::string>::iterator topicIter = iter->second.begin();
+           topicIter != iter->second.end(); ++topicIter)
+      {
+        if ((*topicIter).find("__dbg") == std::string::npos &&
+            std::find(topics.begin(), topics.end(), *topicIter) == topics.end())
+        {
+          topics.push_back(*topicIter);
+        }
+      }
+    }
+  }
+
+  // Add each topic to the combo box.
+  for (std::list<std::string>::iterator iter = topics.begin();
+      iter != topics.end(); ++iter)
+  {
+    if ((*iter).find("__dbg") != std::string::npos)
+      continue;
+
+    // Get the shorthand notation for the topic.
+    std::string topicName = this->node->EncodeTopicName(*iter);
+
+    this->addItem(QString::fromStdString(topicName));
+  }
 }

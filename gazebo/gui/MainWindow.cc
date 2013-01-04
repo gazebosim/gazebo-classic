@@ -799,14 +799,14 @@ void MainWindow::CreateMenus()
 
   this->setMenuWidget(frame);
 
-  this->fileMenu = this->menuBar->addMenu(tr("&File"));
-  // this->fileMenu->addAction(g_openAct);
-  // this->fileMenu->addAction(g_importAct);
-  // this->fileMenu->addAction(g_newAct);
-  this->fileMenu->addAction(g_saveAct);
-  this->fileMenu->addAction(g_saveAsAct);
-  this->fileMenu->addSeparator();
-  this->fileMenu->addAction(g_quitAct);
+  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  // fileMenu->addAction(g_openAct);
+  // fileMenu->addAction(g_importAct);
+  // fileMenu->addAction(g_newAct);
+  fileMenu->addAction(g_saveAct);
+  fileMenu->addAction(g_saveAsAct);
+  fileMenu->addSeparator();
+  fileMenu->addAction(g_quitAct);
 
   QMenu *editMenu = this->menuBar->addMenu(tr("&Edit"));
   editMenu->addAction(g_resetModelsAct);

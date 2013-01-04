@@ -69,7 +69,7 @@ namespace gazebo
       private: int bufferSize;
 
       /// \brief The protobuf message used to decode incoming message data.
-      private: google::protobuf::Message *msg;
+      private: boost::shared_ptr<google::protobuf::Message> msg;
       private: boost::mutex mutex;
 
       private: bool paused;

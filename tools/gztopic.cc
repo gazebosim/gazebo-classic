@@ -55,6 +55,7 @@ void help()
             << "    list         : List all topics\n"
             << "    info <topic> : Get information about a topic\n"
             << "    echo <topic> : Output topic data to screen\n"
+            << "    view <topic> : View topic data using a QT widget\n"
             << "    hz <topic>   : Get publish frequency\n"
             << "    bw <topic>   : Get topic bandwidth\n"
             << "    help         : This help text\n";
@@ -425,6 +426,7 @@ void view(int _argc, char **_argv)
 
   if (!topic.empty() && !msgType.empty())
   {
+    gui::ViewFactory::RegisterAll();
     gui::TopicView *view = gui::ViewFactory::NewView(msgType, topic);
     if (view)
       view->show();
