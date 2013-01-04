@@ -55,6 +55,11 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
 
+  this->openInspectorAct = new QAction(tr("&Open Dooor Inspector"), this);
+  this->openInspectorAct->setStatusTip(tr("Open Door Inspector"));
+  connect(this->openInspectorAct, SIGNAL(triggered()),
+    this, SLOT(OnOpenInspector()));
+
   this->SetResizeFlag(ITEM_WIDTH);
 }
 
@@ -133,15 +138,7 @@ void DoorItem::paint (QPainter *_painter,
 /////////////////////////////////////////////////
 void DoorItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
-  this->inspector->SetWidth(this->doorWidth * this->scale);
-  this->inspector->SetDepth(this->doorDepth * this->scale);
-  this->inspector->SetHeight(this->doorHeight * this->scale);
-  this->inspector->SetElevation(this->doorElevation * this->scale);
-  QPointF itemPos = this->doorPos * this->scale;
-  itemPos.setY(-itemPos.y());
-  this->inspector->SetPosition(itemPos);
-  this->inspector->show();
-
+  this->OnOpenInspector();
   _event->setAccepted(true);
 }
 
@@ -169,6 +166,19 @@ void DoorItem::OnApply()
     this->setParentItem(NULL);
   }
   this->DoorChanged();
+}
+
+/////////////////////////////////////////////////
+void DoorItem::OnOpenInspector()
+{
+  this->inspector->SetWidth(this->doorWidth * this->scale);
+  this->inspector->SetDepth(this->doorDepth * this->scale);
+  this->inspector->SetHeight(this->doorHeight * this->scale);
+  this->inspector->SetElevation(this->doorElevation * this->scale);
+  QPointF itemPos = this->doorPos * this->scale;
+  itemPos.setY(-itemPos.y());
+  this->inspector->SetPosition(itemPos);
+  this->inspector->show();
 }
 
 /////////////////////////////////////////////////

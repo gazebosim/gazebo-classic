@@ -60,6 +60,11 @@ StairsItem::StairsItem(): RectItem(), BuildingItem()
   this->inspector = new StairsInspectorDialog();
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
+
+  this->openInspectorAct = new QAction(tr("&Open Stairs Inspector"), this);
+  this->openInspectorAct->setStatusTip(tr("Open Stairs Inspector"));
+  connect(this->openInspectorAct, SIGNAL(triggered()),
+    this, SLOT(OnOpenInspector()));
 }
 
 /////////////////////////////////////////////////
@@ -220,16 +225,7 @@ void StairsItem::paint(QPainter *_painter,
 /////////////////////////////////////////////////
 void StairsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
-  this->inspector->SetWidth(this->stairsWidth * this->scale);
-  this->inspector->SetDepth(this->stairsDepth * this->scale);
-  this->inspector->SetHeight(this->stairsHeight * this->scale);
-  this->inspector->SetSteps(this->stairsSteps);
-//  dialog.SetElevation(this->stairsElevation);
-  QPointF startPos = this->stairsPos * this->scale;
-  startPos.setY(-startPos.y());
-  this->inspector->SetStartPosition(startPos);
-  this->inspector->show();
-
+  this->OnOpenInspector();
   _event->setAccepted(true);
 }
 
@@ -261,6 +257,20 @@ void StairsItem::OnApply()
   }
 //    this->stairsElevation = dialog->GetElevation();
   this->StairsChanged();
+}
+
+/////////////////////////////////////////////////
+void StairsItem::OnOpenInspector()
+{
+  this->inspector->SetWidth(this->stairsWidth * this->scale);
+  this->inspector->SetDepth(this->stairsDepth * this->scale);
+  this->inspector->SetHeight(this->stairsHeight * this->scale);
+  this->inspector->SetSteps(this->stairsSteps);
+//  dialog.SetElevation(this->stairsElevation);
+  QPointF startPos = this->stairsPos * this->scale;
+  startPos.setY(-startPos.y());
+  this->inspector->SetStartPosition(startPos);
+  this->inspector->show();
 }
 
 /////////////////////////////////////////////////

@@ -48,6 +48,11 @@ WallItem::WallItem(QPointF _start, QPointF _end)
   this->inspector = new WallInspectorDialog();
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
+
+  this->openInspectorAct = new QAction(tr("&Open Wall Inspector"), this);
+  this->openInspectorAct->setStatusTip(tr("Open Wall Inspector"));
+  connect(this->openInspectorAct, SIGNAL(triggered()),
+    this, SLOT(OnOpenInspector()));
 }
 
 /////////////////////////////////////////////////
@@ -152,7 +157,7 @@ bool WallItem::cornerEventFilter(CornerGrabber* _corner,
   {
     QPointF scenePosition = _corner->mapToScene(mouseEvent->pos());
     int cornerIndex = _corner->GetIndex();
-    
+
     // Snap wall rotations to fixed size increments
     QPointF newScenePos = scenePosition;
     if ((cornerIndex <= static_cast<int>(this->GetSegmentCount())))
@@ -163,7 +168,7 @@ bool WallItem::cornerEventFilter(CornerGrabber* _corner,
       if (cornerIndex == 0)
         lineOrigin = segment->line().p2();
       QLineF lineToPoint(lineOrigin,
-          segment->mapFromScene(scenePosition)); 
+          segment->mapFromScene(scenePosition));
       QPointF startScenePoint = segment->mapToScene(lineOrigin);
       double angle = QLineF(startScenePoint,
           scenePosition).angle();
@@ -173,13 +178,13 @@ bool WallItem::cornerEventFilter(CornerGrabber* _corner,
         increment++;
       angle = -range*increment;
       double lineLength = lineToPoint.length();
-      
-      newScenePos.setX(startScenePoint.x() 
+
+      newScenePos.setX(startScenePoint.x()
           + cos(GZ_DTOR(angle))*lineLength);
-      newScenePos.setY(startScenePoint.y() 
+      newScenePos.setY(startScenePoint.y()
           + sin(GZ_DTOR(angle))*lineLength);
     }
-    
+
     this->SetVertexPosition(cornerIndex, newScenePos);
     this->update();
 
@@ -215,14 +220,13 @@ bool WallItem::cornerEventFilter(CornerGrabber* _corner,
 bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
     QEvent *_event)
 {
-
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
 
-  if (!mouseEvent)
-    return false;
+  QPointF scenePosition;
+  if (mouseEvent)
+    scenePosition =  mouseEvent->scenePos();
 
-  QPointF scenePosition =  mouseEvent->scenePos();
   switch (_event->type())
   {
     case QEvent::GraphicsSceneMousePress:
@@ -243,24 +247,19 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
       _segment->SetMouseState(QEvent::GraphicsSceneMouseMove);
       break;
     }
+    case QEvent::GraphicsSceneContextMenu:
+    {
+      this->selectedSegment = _segment;
+      QMenu menu;
+      menu.addAction(this->openInspectorAct);
+      menu.exec(dynamic_cast<QGraphicsSceneContextMenuEvent*>(
+          _event)->screenPos());
+      return true;
+    }
     case QEvent::GraphicsSceneMouseDoubleClick:
     {
       this->selectedSegment = _segment;
-      QLineF line = _segment->line();
-      double segmentLength = line.length() + this->wallThickness;
-      QPointF segmentStartPoint = this->mapToScene(line.p1());
-      QPointF segmentEndPoint = this->mapToScene(line.p2());
-
-      this->inspector->SetThickness(this->wallThickness * this->scale);
-      this->inspector->SetHeight(this->wallHeight * this->scale);
-      this->inspector->SetLength(segmentLength * this->scale);
-      QPointF startPos = segmentStartPoint * this->scale;
-      startPos.setY(-startPos.y());
-      this->inspector->SetStartPosition(startPos);
-      QPointF endPos = segmentEndPoint * this->scale;
-      endPos.setY(-endPos.y());
-      this->inspector->SetEndPosition(endPos);
-      this->inspector->show();
+      this->OnOpenInspector();
       _segment->SetMouseState(QEvent::GraphicsSceneMouseDoubleClick);
       break;
     }
@@ -281,6 +280,9 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
     }
   }
 
+  if (!mouseEvent)
+    return false;
+
   if (_segment->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
     QPointF trans = scenePosition - segmentMouseMove;
@@ -297,6 +299,37 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
       children[i]->moveBy(trans.x(), trans.y());
   }
   return true;
+}
+
+/////////////////////////////////////////////////
+void WallItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
+{
+  QMenu menu;
+  menu.addAction(this->openInspectorAct);
+  menu.exec(_event->screenPos());
+  _event->accept();
+}
+
+/////////////////////////////////////////////////
+void WallItem::OnOpenInspector()
+{
+  if (!this->selectedSegment)
+    return;
+  QLineF line = this->selectedSegment->line();
+  double segmentLength = line.length() + this->wallThickness;
+  QPointF segmentStartPoint = this->mapToScene(line.p1());
+  QPointF segmentEndPoint = this->mapToScene(line.p2());
+
+  this->inspector->SetThickness(this->wallThickness * this->scale);
+  this->inspector->SetHeight(this->wallHeight * this->scale);
+  this->inspector->SetLength(segmentLength * this->scale);
+  QPointF startPos = segmentStartPoint * this->scale;
+  startPos.setY(-startPos.y());
+  this->inspector->SetStartPosition(startPos);
+  QPointF endPos = segmentEndPoint * this->scale;
+  endPos.setY(-endPos.y());
+  this->inspector->SetEndPosition(endPos);
+  this->inspector->show();
 }
 
 /////////////////////////////////////////////////

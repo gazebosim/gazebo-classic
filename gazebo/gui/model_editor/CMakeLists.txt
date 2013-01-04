@@ -41,6 +41,7 @@ set (qt_headers
   EditorItem.hh
   LevelWidget.hh
   EditorView.hh
+  RectItem.hh
   StairsItem.hh
   WallItem.hh
   DoorItem.hh
@@ -54,7 +55,6 @@ set (headers
   CornerGrabber.hh
   RotateHandle.hh
   BuildingItem.hh
-  RectItem.hh
   FloorItem.hh
   LineSegmentItem.hh
   GridLines.hh

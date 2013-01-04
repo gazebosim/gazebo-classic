@@ -58,7 +58,14 @@ namespace gazebo
         private: bool segmentEventFilter(LineSegmentItem *_segment,
             QEvent *_event);
 
+        private: void contextMenuEvent(
+            QGraphicsSceneContextMenuEvent *_event);
+
         private slots: void OnApply();
+
+        private slots: void OnOpenInspector();
+
+        private: QAction *openInspectorAct;
 
         private: void WallChanged();
 

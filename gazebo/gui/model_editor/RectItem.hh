@@ -33,6 +33,8 @@ namespace gazebo
 
     class RectItem : public EditorItem, public QGraphicsItem
     {
+        Q_OBJECT
+
         public: enum ResizeFlags {NONE = 0x00,
             ITEM_WIDTH = 0x01, ITEM_HEIGHT = 0x02};
 
@@ -113,6 +115,11 @@ namespace gazebo
         private: QVariant itemChange(GraphicsItemChange _change,
           const QVariant &_value);
 
+        private: virtual void contextMenuEvent(
+            QGraphicsSceneContextMenuEvent *_event);
+
+        private slots: virtual void OnOpenInspector();
+
         private: virtual void SizeChanged();
 
         private: void AdjustSize(double _x, double _y);
@@ -137,13 +144,15 @@ namespace gazebo
 
         protected: QPointF pivot;
 
+        protected: QAction *openInspectorAct;
+
         private: QPointF location;
 
         private: int gridSpace;
 
         /// \brief Four corners and four edges, going clockwise with
         /// 0 being top left
-        protected: std::vector<CornerGrabber *> corners;
+        private: std::vector<CornerGrabber *> corners;
 
         private: RotateHandle *rotateHandle;
 
@@ -152,8 +161,6 @@ namespace gazebo
         private: int zValueSelected;
 
         private: unsigned int resizeFlag;
-
-
 
     };
   }

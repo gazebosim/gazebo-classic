@@ -55,6 +55,11 @@ WindowItem::WindowItem(): RectItem(), BuildingItem()
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
 
+  this->openInspectorAct = new QAction(tr("&Open Window Inspector"), this);
+  this->openInspectorAct->setStatusTip(tr("Open Window Inspector"));
+  connect(this->openInspectorAct, SIGNAL(triggered()),
+    this, SLOT(OnOpenInspector()));
+
   this->SetResizeFlag(ITEM_WIDTH);
 }
 
@@ -138,16 +143,7 @@ void WindowItem::paint(QPainter *_painter,
 /////////////////////////////////////////////////
 void WindowItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
-  this->inspector->SetWidth(this->windowWidth * this->scale);
-  this->inspector->SetHeight(this->windowHeight * this->scale);
-  this->inspector->SetElevation(this->windowElevation * this->scale);
-  this->inspector->SetDepth(this->windowDepth * this->scale);
-
-  QPointF itemPos = this->windowPos * this->scale;
-  itemPos.setY(-itemPos.y());
-  this->inspector->SetPosition(itemPos);
-  this->inspector->show();
-
+  this->OnOpenInspector();
   _event->setAccepted(true);
 }
 
@@ -185,4 +181,27 @@ void WindowItem::WindowChanged()
   emit heightChanged(this->windowHeight);
   emit positionChanged(this->windowPos.x(), this->windowPos.y(),
       this->levelBaseHeight + this->windowElevation);
+}
+/*
+/////////////////////////////////////////////////
+void WindowItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
+{
+  QMenu menu;
+  menu.addAction(this->openInspectorAct);
+  menu.exec(_event->screenPos());
+  _event->accept();
+}
+*/
+/////////////////////////////////////////////////
+void WindowItem::OnOpenInspector()
+{
+  this->inspector->SetWidth(this->windowWidth * this->scale);
+  this->inspector->SetHeight(this->windowHeight * this->scale);
+  this->inspector->SetElevation(this->windowElevation * this->scale);
+  this->inspector->SetDepth(this->windowDepth * this->scale);
+
+  QPointF itemPos = this->windowPos * this->scale;
+  itemPos.setY(-itemPos.y());
+  this->inspector->SetPosition(itemPos);
+  this->inspector->show();
 }

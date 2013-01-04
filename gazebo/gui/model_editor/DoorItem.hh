@@ -53,6 +53,8 @@ namespace gazebo
 
         private slots: void OnApply();
 
+        private slots: void OnOpenInspector();
+
         private: void DoorChanged();
 
         private: void SizeChanged();

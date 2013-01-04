@@ -87,11 +87,19 @@ EditorView::~EditorView()
 /////////////////////////////////////////////////
 void EditorView::contextMenuEvent(QContextMenuEvent *_event)
 {
+  QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
+  if (item)
+  {
+    _event->ignore();
+    QGraphicsView::contextMenuEvent(_event);
+    return;
+  }
+
   QMenu menu(this);
   menu.addAction(this->openLevelInspectorAct);
   menu.exec(_event->globalPos());
+  _event->accept();
 }
-
 
 /////////////////////////////////////////////////
 void EditorView::mousePressEvent(QMouseEvent *_event)

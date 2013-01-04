@@ -67,6 +67,12 @@ RectItem::RectItem():
   this->zValueSelected = 5;
 
   this->SetResizeFlag(ITEM_WIDTH | ITEM_HEIGHT);
+
+  this->openInspectorAct = new QAction(tr("&Open Inspector"), this);
+  this->openInspectorAct->setStatusTip(tr("Open Inspector"));
+  connect(this->openInspectorAct, SIGNAL(triggered()),
+    this, SLOT(OnOpenInspector()));
+
 }
 
  /////////////////////////////////////////////////
@@ -225,7 +231,7 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
         this->SetRotation(this->GetRotation() + angle);
       }
     }
-    else 
+    else
     {
       QLineF prevLine(center.x(), center.y(),
           mouseEvent->lastScenePos().x(), mouseEvent->lastScenePos().y());
@@ -745,6 +751,20 @@ void RectItem::mouseMoveEvent(QGraphicsSceneDragDropEvent *_event)
 void RectItem::mousePressEvent(QGraphicsSceneDragDropEvent *_event)
 {
   _event->setAccepted(false);
+}
+
+/////////////////////////////////////////////////
+void RectItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
+{
+  QMenu menu;
+  menu.addAction(this->openInspectorAct);
+  menu.exec(_event->screenPos());
+  _event->accept();
+}
+
+/////////////////////////////////////////////////
+void RectItem::OnOpenInspector()
+{
 }
 
 /////////////////////////////////////////////////
