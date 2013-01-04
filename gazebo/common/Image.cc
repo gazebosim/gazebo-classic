@@ -421,6 +421,12 @@ Image::PixelFormat Image::GetPixelFormat() const
 /////////////////////////////////////////////////
 Image::PixelFormat Image::ConvertPixelFormat(const std::string &_format)
 {
+  // Handle old format strings
+  if (_format == "L8" || _format == "L_INT8")
+    return L_INT8;
+  else if (_format == "R8G8B8" || _format == "RGB_INT8")
+    return RGB_INT8;
+
   for (unsigned int i = 0; i < PIXEL_FORMAT_COUNT; ++i)
     if (PixelFormatNames[i] == _format)
       return static_cast<PixelFormat>(i);

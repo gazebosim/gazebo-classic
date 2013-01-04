@@ -167,9 +167,11 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
       msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
             this->camera->GetImageFormat()));
 
-      msg.mutable_image()->set_step(this->camera->GetImageWidth() * 3);
+      msg.mutable_image()->set_step(this->camera->GetImageWidth() *
+          this->camera->GetImageDepth());
       msg.mutable_image()->set_data(this->camera->GetImageData(),
-          msg.image().width() * 3 * msg.image().height());
+          msg.image().width() * this->camera->GetImageDepth() *
+          msg.image().height());
       this->imagePub->Publish(msg);
     }
   }
@@ -202,4 +204,10 @@ bool CameraSensor::SaveFrame(const std::string &_filename)
 {
   this->SetActive(true);
   return this->camera->SaveFrame(_filename);
+}
+
+//////////////////////////////////////////////////
+bool CameraSensor::IsActive()
+{
+  return Sensor::IsActive() || this->imagePub->HasConnections();
 }

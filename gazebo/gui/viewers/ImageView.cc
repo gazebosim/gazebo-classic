@@ -18,6 +18,8 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/common/Image.hh"
+
 #include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/viewers/ImageView.hh"
 
@@ -80,13 +82,27 @@ void ImageView::OnImage(ConstImageStampedPtr &_msg)
   this->OnMsg(msgs::Convert(_msg->time()),
       _msg->image().data().size());
 
+  QImage::Format fmt = QImage::Format_RGB888;
+
+  common::Image img;
+  img.SetFromData(
+      (unsigned char *)(_msg->image().data().c_str()),
+      _msg->image().width(),
+      _msg->image().height(),
+      (common::Image::PixelFormat)(_msg->image().pixel_format()));
+
+  unsigned char *rgbData = NULL;
+  unsigned int rgbDataSize = 0;
+  img.GetRGBData(&rgbData, rgbDataSize);
+
   // Get the image data in a QT friendly format
-  QImage image(_msg->image().width(), _msg->image().height(),
-               QImage::Format_RGB888);
+  QImage image(_msg->image().width(), _msg->image().height(), fmt);
 
   // Store the image data
-  memcpy(image.bits(), _msg->image().data().c_str(),
+  /*memcpy(image.bits(), _msg->image().data().c_str(),
          _msg->image().data().size());
+         */
+  memcpy(image.bits(), rgbData, rgbDataSize);
 
   // Set the pixmap used by the image label.
   this->pixmap = QPixmap::fromImage(image);

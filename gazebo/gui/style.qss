@@ -559,11 +559,16 @@ QComboBox::drop-down
    subcontrol-position: top right;
    width: 15px;
 
-   border-left-width: 1px;
+   border-left-width: 0px;
    border-left-color: #000000;
    border-left-style: solid; /* just a single line */
    border-top-right-radius: 3px; /* same radius as the QComboBox */
    border-bottom-right-radius: 3px;
+}
+
+QComboBox::down-arrow
+{
+  image: url(:/images/down_arrow.png);
 }
 
 QFrame#blackBorderFrame
@@ -572,5 +577,3 @@ QFrame#blackBorderFrame
   padding: 0px;
   margin: 0px;
 }
-
-

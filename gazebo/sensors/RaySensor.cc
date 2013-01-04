@@ -72,7 +72,8 @@ std::string RaySensor::GetTopic() const
 void RaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->scanPub = this->node->Advertise<msgs::LaserScan>(this->GetTopic());
+  this->scanPub = this->node->Advertise<msgs::LaserScanStamped>(
+      this->GetTopic());
 
   physics::PhysicsEnginePtr physicsEngine = this->world->GetPhysicsEngine();
   this->laserCollision = physicsEngine->CreateCollision("multiray",

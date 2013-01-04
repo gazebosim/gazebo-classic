@@ -19,8 +19,8 @@
  * Date: 15 July 2003
  */
 
-#ifndef CAMERASENSOR_HH
-#define CAMERASENSOR_HH
+#ifndef _CAMERASENSOR_HH_
+#define _CAMERASENSOR_HH_
 
 #include <string>
 
@@ -98,6 +98,9 @@ namespace gazebo
       /// \param[in] _filename The name of the file to be saved.
       /// \return True if successful, false if unsuccessful.
       public: bool SaveFrame(const std::string &_filename);
+
+      // Documentation inherited
+      public: virtual bool IsActive();
 
       private: rendering::CameraPtr camera;
       private: rendering::ScenePtr scene;

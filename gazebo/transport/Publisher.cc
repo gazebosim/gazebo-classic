@@ -59,7 +59,7 @@ bool Publisher::HasConnections() const
             this->publications[0]->GetNodeCount() > 0)) ||
           (this->publications[1] &&
            (this->publications[1]->GetCallbackCount() > 0 ||
-            this->publications[0]->GetNodeCount() > 0)));
+            this->publications[1]->GetNodeCount() > 0)));
 }
 
 //////////////////////////////////////////////////

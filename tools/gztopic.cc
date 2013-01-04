@@ -409,13 +409,15 @@ void view(int _argc, char **_argv)
   std::string topic;
   std::string msgType;
 
-  if (params[1].empty())
+  if (params.size() == 1 || params[1].empty())
   {
+    std::cout << "New topic selector\n";
     gui::TopicSelector *selector = new gui::TopicSelector();
     selector->exec();
 
     topic = selector->GetTopic();
     msgType = selector->GetMsgType();
+    std::cout << "Topic[" << topic << "] MsgType[" << msgType << "]\n";
     delete selector;
   }
   else
