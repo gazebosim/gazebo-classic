@@ -189,7 +189,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     this->Orbit(dy, dp);
   }
   // The left mouse button is used to translate the camera.
-  else if (_event.buttons & common::MouseEvent::LEFT && _event.dragging)
+  else if ((_event.buttons & common::MouseEvent::LEFT) && _event.dragging)
   {
     this->distance =
       this->camera->GetWorldPose().pos.Distance(this->focalPoint);
@@ -232,6 +232,13 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
       // Translate in the local coordinate frame
       this->TranslateLocal(translation);
     }
+  }
+  // The right mouse button is used to zoom the camera.
+  else if ((_event.buttons & common::MouseEvent::RIGHT) && _event.dragging)
+  {
+    double fovY = this->camera->GetVFOV().Radian();
+    this->Zoom((-drag.y / static_cast<float>(height)) *
+               this->distance * tan(fovY / 2.0) * 6.0);
   }
   // The scroll wheel controls zoom.
   else if (_event.type == common::MouseEvent::SCROLL)
