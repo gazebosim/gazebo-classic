@@ -25,6 +25,7 @@ class PhysicsTest : public ServerFixture
 {
   public: void EmptyWorld(std::string _worldFile);
   public: void SpawnDrop(std::string _worldFile);
+  public: void SimplePendulum(std::string _worldFile);
 };
 
 void PhysicsTest::EmptyWorld(std::string _worldFile)
@@ -511,9 +512,21 @@ TEST_F(PhysicsTest, CollisionTest)
 }
 
 
-TEST_F(PhysicsTest, SimplePendulumTest)
+TEST_F(PhysicsTest, SimplePendulumODE)
 {
-  Load("worlds/simple_pendulums.world", true);
+  SimplePendulum("worlds/simple_pendulums.world");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, SimplePendulumBullet)
+{
+  SimplePendulum("worlds/simple_pendulums_bullet.world");
+}
+#endif // HAVE_BULLET
+
+void PhysicsTest::SimplePendulum(std::string _worldFile)
+{
+  Load(_worldFile, true);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
