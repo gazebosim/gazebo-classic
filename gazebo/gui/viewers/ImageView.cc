@@ -82,8 +82,7 @@ void ImageView::OnImage(ConstImageStampedPtr &_msg)
   this->OnMsg(msgs::Convert(_msg->time()),
       _msg->image().data().size());
 
-  QImage::Format fmt = QImage::Format_RGB888;
-
+  // Convert the image data to RGB
   common::Image img;
   img.SetFromData(
       (unsigned char *)(_msg->image().data().c_str()),
@@ -96,12 +95,10 @@ void ImageView::OnImage(ConstImageStampedPtr &_msg)
   img.GetRGBData(&rgbData, rgbDataSize);
 
   // Get the image data in a QT friendly format
-  QImage image(_msg->image().width(), _msg->image().height(), fmt);
+  QImage image(_msg->image().width(), _msg->image().height(),
+               QImage::Format_RGB888);
 
   // Store the image data
-  /*memcpy(image.bits(), _msg->image().data().c_str(),
-         _msg->image().data().size());
-         */
   memcpy(image.bits(), rgbData, rgbDataSize);
 
   // Set the pixmap used by the image label.

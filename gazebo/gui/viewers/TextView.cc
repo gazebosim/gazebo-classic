@@ -42,10 +42,6 @@ TextView::TextView(QWidget *_parent, const std::string &_msgType)
       QAbstractItemView::ScrollPerPixel);
   this->msgList->setObjectName("topicTextList");
 
-  /*this->msgList->setStyleSheet(
-      "QListWidget::item{ border-bottom: 1px solid black;}");
-      */
-
   QHBoxLayout *controlLayout = new QHBoxLayout;
 
   QSpinBox *bufferSpin = new QSpinBox();
@@ -80,7 +76,6 @@ TextView::~TextView()
 /////////////////////////////////////////////////
 void TextView::UpdateImpl()
 {
-  // Anything?
 }
 
 /////////////////////////////////////////////////

@@ -28,28 +28,20 @@ class QWidget;
 
 namespace gazebo
 {
-  /// \ingroup gazebo_views
-  /// \brief Sensors namespace
   namespace gui
   {
-    /// \def Sensor
+    /// \def ViewFactoryFn
     /// \brief Prototype for view factory functions
     typedef TopicView* (*ViewFactoryFn) (QWidget *_parent);
 
     /// \addtogroup gazebo_views
     /// \{
-    /// \class SensorFactor SensorFactory.hh views/views.hh
-    /// \brief The view factory; the class is just for namespacing purposes.
+    /// \class ViewFactory ViewFactory.hh gui/viewers/ViewFactory.hh
+    /// \brief The view factory creates GUI widgets to visualize data on
+    /// a topic.
     class ViewFactory
     {
       /// \brief Register all known views
-      ///  \li views::CameraSensor
-      ///  \li views::DepthCameraSensor
-      ///  \li views::GpuRaySensor
-      ///  \li views::RaySensor
-      ///  \li views::ContactSensor
-      ///  \li views::RFIDSensor
-      ///  \li views::RFIDTag
       public: static void RegisterAll();
 
       /// \brief Register a view class
@@ -59,17 +51,17 @@ namespace gazebo
       public: static void RegisterView(const std::string &_className,
                                        ViewFactoryFn _factoryfn);
 
-      /// \brief Create a new instance of a view.  Used by the world when
-      /// reading the world file.
-      /// \param[in] _className Name of view class
-      /// \return Pointer to Sensor
+      /// \brief Create a new instance of a view.
+      /// \param[in] _msgType Type of message to view.
+      /// \param[in] _topicName Name of the topic to get data from.
+      /// \param[in] _parent Parent QWidget.
+      /// \return Pointer to the new topic viewer.
       public: static TopicView *NewView(const std::string &_msgType,
                                         const std::string &_topicName,
                                         QWidget *_parent = NULL);
 
       /// \brief Get all the view types
-      /// \param _types Vector of strings of the view types,
-      /// populated by function
+      /// \param _types Vector of strings of the view types.
       public: static void GetViewTypes(std::vector<std::string> &_types);
 
       /// \brief A list of registered view classes
@@ -79,9 +71,9 @@ namespace gazebo
 
     /// \brief Static view registration macro
     ///
-    /// Use this macro to register views with the server.
-    /// @param name Sensor type name, as it appears in the world file.
-    /// @param classname C++ class name for the view.
+    /// Use this macro to register views.
+    /// \param[in] msgtype Type of message to visualize.
+    /// \param[in] classname C++ class name for the view.
     #define GZ_REGISTER_STATIC_VIEWER(msgtype, classname) \
     TopicView *New##classname(QWidget *_parent) \
     { \

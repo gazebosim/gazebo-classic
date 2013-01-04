@@ -411,13 +411,11 @@ void view(int _argc, char **_argv)
 
   if (params.size() == 1 || params[1].empty())
   {
-    std::cout << "New topic selector\n";
     gui::TopicSelector *selector = new gui::TopicSelector();
     selector->exec();
 
     topic = selector->GetTopic();
     msgType = selector->GetMsgType();
-    std::cout << "Topic[" << topic << "] MsgType[" << msgType << "]\n";
     delete selector;
   }
   else
@@ -438,7 +436,7 @@ void view(int _argc, char **_argv)
 
   if (!gazebo::init())
   {
-    printf("error\n");
+    gzerr << "Unable to initialize Gazebo\n";
     return;
   }
 

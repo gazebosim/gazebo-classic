@@ -70,8 +70,11 @@ namespace gazebo
 
       /// \brief The protobuf message used to decode incoming message data.
       private: boost::shared_ptr<google::protobuf::Message> msg;
+
+      /// \brief Mutex to protec message buffer.
       private: boost::mutex mutex;
 
+      /// \brief Flag used to pause message parsing.
       private: bool paused;
     };
   }
