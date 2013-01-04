@@ -98,7 +98,7 @@ void PhysicsTest::SpawnDrop(std::string _worldFile)
   math::Pose pose1, pose2;
   math::Vector3 vel1, vel2;
 
-  double t;
+  double t, x0=0;
   for (std::list<std::string>::iterator iter = model_names.begin();
     iter != model_names.end(); ++iter)
   {
@@ -106,17 +106,26 @@ void PhysicsTest::SpawnDrop(std::string _worldFile)
     model = world->GetModel(*iter);
     if (model != NULL)
     {
+      gzdbg << "Check freefall of model " << *iter << '\n';
       // Step once and check downward z velocity
       world->StepWorld(1);
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
-      EXPECT_LT(vel1.z, g.z*t*(1-PHYSICS_TOL));
-      EXPECT_GT(vel1.z, g.z*t*(1+PHYSICS_TOL));
+      EXPECT_EQ(vel1.x, 0);
+      EXPECT_EQ(vel1.y, 0);
+      EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->StepWorld(steps - 1);
       pose1 = model->GetWorldPose();
-      EXPECT_LT(pose1.pos.z, (z0-g.z/2*t*t)*(1-PHYSICS_TOL));
-      EXPECT_GT(pose1.pos.z, (z0-g.z/2*t*t)*(1+PHYSICS_TOL));
+      if (*iter == "test_box")
+        x0 = 0;
+      else if (*iter == "test_sphere")
+        x0 = 4;
+      else if (*iter == "test_cylinder")
+        x0 = 8;
+      EXPECT_EQ(pose1.pos.x, x0);
+      EXPECT_EQ(pose1.pos.y, 0);
+      EXPECT_NEAR(pose1.pos.z, z0 - g.z/2*t*t, (z0-g.z/2*t*t)*PHYSICS_TOL);
 
       // Check once more and just make sure they keep falling
       world->StepWorld(steps);
@@ -131,17 +140,58 @@ void PhysicsTest::SpawnDrop(std::string _worldFile)
       EXPECT_TRUE(model != NULL);
     }
   }
+
+  // Wait until they've all hit the ground plane
+  double tHit = sqrt(2*(z0-0.5) / (-g.z));
+  // Time to advance, allow 0.5 s settling time.
+  double dtHit = tHit+0.5 - world->GetSimTime().Double();
+  steps = ceil(dtHit / dt);
+  EXPECT_GT(steps, 0);
+  world->StepWorld(steps);
+
+  for (std::list<std::string>::iterator iter = model_names.begin();
+    iter != model_names.end(); ++iter)
+  {
+    // Make sure the model is loaded
+    model = world->GetModel(*iter);
+    if (model != NULL)
+    {
+      gzdbg << "Check ground contact of model " << *iter << '\n';
+      // Check that velocity is small
+      vel1 = model->GetWorldLinearVel();
+      EXPECT_NEAR(vel1.x, 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel1.y, 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
+
+      // Check that model is resting on ground
+      pose1 = model->GetWorldPose();
+      if (*iter == "test_box")
+        x0 = 0;
+      else if (*iter == "test_sphere")
+        x0 = 4;
+      else if (*iter == "test_cylinder")
+        x0 = 8;
+      EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
+      EXPECT_NEAR(pose1.pos.y, 0, PHYSICS_TOL);
+      EXPECT_NEAR(pose1.pos.z, 0.5, PHYSICS_TOL);
+    }
+    else
+    {
+      gzerr << "Error loading model " << *iter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
 }
 
 TEST_F(PhysicsTest, SpawnDropODE)
 {
-  EmptyWorld("worlds/empty.world");
+  SpawnDrop("worlds/empty.world");
 }
 
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, SpawnDropBullet)
 {
-  EmptyWorld("worlds/empty_bullet.world");
+  SpawnDrop("worlds/empty_bullet.world");
 }
 #endif // HAVE_BULLET
 
