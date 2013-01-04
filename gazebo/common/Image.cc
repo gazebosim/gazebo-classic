@@ -183,6 +183,7 @@ void Image::GetRGBData(unsigned char **_data, unsigned int &_count) const
 {
   FIBITMAP *tmp = FreeImage_ConvertTo24Bits(this->bitmap);
   this->GetDataImpl(_data, _count, tmp);
+  FreeImage_Unload(tmp);
 }
 
 //////////////////////////////////////////////////

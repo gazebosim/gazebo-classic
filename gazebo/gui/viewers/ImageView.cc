@@ -56,6 +56,7 @@ ImageView::ImageView(QWidget *_parent)
 /////////////////////////////////////////////////
 ImageView::~ImageView()
 {
+  this->sub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -82,6 +83,9 @@ void ImageView::OnImage(ConstImageStampedPtr &_msg)
   this->OnMsg(msgs::Convert(_msg->time()),
       _msg->image().data().size());
 
+  unsigned char *rgbData = NULL;
+  unsigned int rgbDataSize = 0;
+
   // Convert the image data to RGB
   common::Image img;
   img.SetFromData(
@@ -90,17 +94,16 @@ void ImageView::OnImage(ConstImageStampedPtr &_msg)
       _msg->image().height(),
       (common::Image::PixelFormat)(_msg->image().pixel_format()));
 
-  unsigned char *rgbData = NULL;
-  unsigned int rgbDataSize = 0;
   img.GetRGBData(&rgbData, rgbDataSize);
 
   // Get the image data in a QT friendly format
   QImage image(_msg->image().width(), _msg->image().height(),
                QImage::Format_RGB888);
-
   // Store the image data
   memcpy(image.bits(), rgbData, rgbDataSize);
 
   // Set the pixmap used by the image label.
   this->pixmap = QPixmap::fromImage(image);
+
+  delete [] rgbData;
 }
