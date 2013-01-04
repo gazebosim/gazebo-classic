@@ -41,8 +41,9 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 
   QFont underLineFont;
   underLineFont.setUnderline(true);
+  underLineFont.setPointSize(14);
 
-  QGridLayout *floorPlanLayout = new QGridLayout;
+  QGridLayout *floorPlanGridLayout = new QGridLayout;
 
   QLabel *floorPlanLabel = new QLabel(tr("Floor Plan"));
   floorPlanLabel->setFont(underLineFont);
@@ -58,10 +59,10 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QVBoxLayout *drawWallLayout = new QVBoxLayout;
   drawWallLayout->addWidget(addDrawWallButton);
   drawWallLayout->addWidget(drawWallsLabel);
-  floorPlanLayout->addLayout(drawWallLayout, 0, 0);
-  floorPlanLayout->setAlignment(Qt::AlignLeft);
+  floorPlanGridLayout->addLayout(drawWallLayout, 0, 0);
+  floorPlanGridLayout->setAlignment(Qt::AlignLeft);
 
-  QLabel *importImageLabel = new QLabel;
+/*  QLabel *importImageLabel = new QLabel;
   importImageLabel->setText("Import Image");
   QPushButton *importImageButton = new QPushButton;
   importImageButton->setIcon(QIcon(":/images/box.png"));
@@ -73,9 +74,13 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   importImageLayout->addWidget(importImageButton);
   importImageLayout->addWidget(importImageLabel);
   importImageLayout->setAlignment(Qt::AlignLeft);
-  floorPlanLayout->addLayout(importImageLayout, 0, 1);
+  floorPlanGridLayout->addLayout(importImageLayout, 0, 1);*/
 
-  QGridLayout *windowDoorLayout = new QGridLayout;
+  QVBoxLayout *floorPlanLayout = new QVBoxLayout;
+  floorPlanLayout->addWidget(floorPlanLabel);
+  floorPlanLayout->addLayout(floorPlanGridLayout);
+
+  QGridLayout *windowDoorGridLayout = new QGridLayout;
   QLabel *windowDoorLabel = new QLabel(tr("Windows & Doors"));
   windowDoorLabel->setFont(underLineFont);
 
@@ -91,7 +96,10 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   addWindowLayout->addWidget(addWindowButton);
   addWindowLayout->addWidget(addWindowLabel);
   addWindowLayout->setAlignment(Qt::AlignLeft);
-  windowDoorLayout->addLayout(addWindowLayout, 0, 0);
+  windowDoorGridLayout->addLayout(addWindowLayout, 0, 0);
+
+  windowDoorGridLayout->addItem(new QSpacerItem(20, 10, QSizePolicy::Minimum,
+      QSizePolicy::Minimum), 0, 1);
 
   QLabel *addDoorLabel = new QLabel;
   addDoorLabel->setText("Add Door");
@@ -105,13 +113,17 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   addDoorLayout->addWidget(addDoorButton);
   addDoorLayout->addWidget(addDoorLabel);
   addDoorLayout->setAlignment(Qt::AlignLeft);
-  windowDoorLayout->addLayout(addDoorLayout, 0, 1);
-  windowDoorLayout->setAlignment(Qt::AlignLeft);
+  windowDoorGridLayout->addLayout(addDoorLayout, 0, 2);
+  windowDoorGridLayout->setAlignment(Qt::AlignLeft);
+
+  QVBoxLayout *windowDoorLayout = new QVBoxLayout;
+  windowDoorLayout->addWidget(windowDoorLabel);
+  windowDoorLayout->addLayout(windowDoorGridLayout);
 
   QLabel *otherLabel = new QLabel(tr("Other"));
   otherLabel->setFont(underLineFont);
 
-  QGridLayout *otherLayout = new QGridLayout;
+  QGridLayout *otherGridLayout = new QGridLayout;
 
   QLabel *addStairsLabel = new QLabel;
   addStairsLabel->setText("Add Stairs");
@@ -124,8 +136,12 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QVBoxLayout *addStairsLayout = new QVBoxLayout;
   addStairsLayout->addWidget(addStairsButton);
   addStairsLayout->addWidget(addStairsLabel);
-  otherLayout->addLayout(addStairsLayout, 0, 0);
-  otherLayout->setAlignment(Qt::AlignLeft);
+  otherGridLayout->addLayout(addStairsLayout, 0, 0);
+  otherGridLayout->setAlignment(Qt::AlignLeft);
+
+  QVBoxLayout *otherLayout = new QVBoxLayout;
+  otherLayout->addWidget(otherLabel);
+  otherLayout->addLayout(otherGridLayout);
 
   QPushButton *discardButton = new QPushButton(tr("Discard"));
   connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
@@ -141,17 +157,22 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   buttonsLayout->setAlignment(Qt::AlignCenter);
 
   mainLayout->addLayout(modelNameLayout);
-  mainLayout->addWidget(floorPlanLabel);
+  mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                      QSizePolicy::Minimum));
   mainLayout->addLayout(floorPlanLayout);
-  mainLayout->addWidget(windowDoorLabel);
+  mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                      QSizePolicy::Minimum));
   mainLayout->addLayout(windowDoorLayout);
-  mainLayout->addWidget(otherLabel);
+  mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                      QSizePolicy::Minimum));
   mainLayout->addLayout(otherLayout);
+  mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                      QSizePolicy::Minimum));
   mainLayout->addLayout(buttonsLayout);
-  mainLayout->setAlignment(Qt::AlignTop);
+  mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
   this->setLayout(mainLayout);
-  this->layout()->setContentsMargins(0, 0, 0, 0);
+//  this->layout()->setContentsMargins(0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
