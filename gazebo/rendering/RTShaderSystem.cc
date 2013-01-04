@@ -60,6 +60,8 @@ void RTShaderSystem::Init()
 
   if (Ogre::RTShader::ShaderGenerator::initialize())
   {
+    this->initialized = true;
+
     std::string coreLibsPath, cachePath;
     this->GetPaths(coreLibsPath, cachePath);
 
@@ -74,8 +76,6 @@ void RTShaderSystem::Init()
     this->shaderGenerator->setShaderCachePath(cachePath);
 
     this->shaderGenerator->setTargetLanguage("glsl");
-
-    this->initialized = true;
   }
   else
     gzerr << "RT Shader system failed to initialize\n";
@@ -454,9 +454,9 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
   sceneMgr->setShadowTextureCount(3);
-  sceneMgr->setShadowTextureConfig(0, 1024, 1024, Ogre::PF_FLOAT32_RGB);
-  sceneMgr->setShadowTextureConfig(1, 512, 512, Ogre::PF_FLOAT32_RGB);
-  sceneMgr->setShadowTextureConfig(2, 512, 512, Ogre::PF_FLOAT32_RGB);
+  sceneMgr->setShadowTextureConfig(0, 1024, 1024, Ogre::PF_FLOAT32_R);
+  sceneMgr->setShadowTextureConfig(1, 512, 512, Ogre::PF_FLOAT32_R);
+  sceneMgr->setShadowTextureConfig(2, 512, 512, Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureSelfShadow(true);
 
   // TODO: We have two different shadow caster materials, both taken from
@@ -468,30 +468,35 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   sceneMgr->setShadowCasterRenderBackFaces(true);
 
   // Disable fog on the caster pass.
-  /* Ogre::MaterialPtr passCaterMaterial =
-    Ogre::MaterialManager::getSingleton().getByName("PSSM/shadow_caster");
-  Ogre::Pass* pssmCasterPass = passCaterMaterial->getTechnique(0)->getPass(0);
-  pssmCasterPass->setFog(true); */
+  //  Ogre::MaterialPtr passCaterMaterial =
+  //   Ogre::MaterialManager::getSingleton().getByName("PSSM/shadow_caster");
+  // Ogre::Pass* pssmCasterPass =
+  // passCaterMaterial->getTechnique(0)->getPass(0);
+  // pssmCasterPass->setFog(true);
 
   // shadow camera setup
   this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
   sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(this->pssmSetup));
 
-  double shadowFarDistance = 100;
-  double cameraNearClip = 0.3;
+  double shadowFarDistance = 1000;
+  double cameraNearClip = 0.01;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
   this->pssmSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
-  this->pssmSetup->setSplitPadding(cameraNearClip);
-  this->pssmSetup->setOptimalAdjustFactor(0, 4);
-  this->pssmSetup->setOptimalAdjustFactor(1, 1);
-  this->pssmSetup->setOptimalAdjustFactor(2, 0.5);
+  this->pssmSetup->setSplitPadding(0);
+
+  // These values do not seem to help at all. Leaving here until I have time
+  // to properly fix shadow z-fighting.
+  // this->pssmSetup->setOptimalAdjustFactor(0, 4);
+  // this->pssmSetup->setOptimalAdjustFactor(1, 1);
+  // this->pssmSetup->setOptimalAdjustFactor(2, 0.5);
 
   this->shadowRenderState = this->shaderGenerator->createSubRenderState(
       Ogre::RTShader::IntegratedPSSM3::Type);
-  Ogre::RTShader::IntegratedPSSM3* pssm3SubRenderState =
+  Ogre::RTShader::IntegratedPSSM3 *pssm3SubRenderState =
     static_cast<Ogre::RTShader::IntegratedPSSM3*>(this->shadowRenderState);
-  const Ogre::PSSMShadowCameraSetup::SplitPointList& srcSplitPoints =
+
+  const Ogre::PSSMShadowCameraSetup::SplitPointList &srcSplitPoints =
     this->pssmSetup->getSplitPoints();
   Ogre::RTShader::IntegratedPSSM3::SplitPointList dstSplitPoints;
 
