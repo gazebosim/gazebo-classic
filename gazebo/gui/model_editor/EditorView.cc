@@ -58,7 +58,7 @@ EditorView::EditorView(QWidget *_parent)
 
   this->connections.push_back(
   gui::editor::Events::ConnectAddLevel(
-    boost::bind(&EditorView::OnAddLevel, this, _1, _2)));
+    boost::bind(&EditorView::OnAddLevel, this)));
 
   this->connections.push_back(
   gui::editor::Events::ConnectChangeLevel(
@@ -69,12 +69,18 @@ EditorView::EditorView(QWidget *_parent)
   buildingMaker = new BuildingMaker();
   this->currentLevel = 0;
 
+  this->levelHeights[0] = 0;
   this->levelNames[0] = "Level 1";
 
   this->openLevelInspectorAct = new QAction(tr("&Open Level Inspector"), this);
   this->openLevelInspectorAct->setStatusTip(tr("Open Level Inspector"));
   connect(this->openLevelInspectorAct, SIGNAL(triggered()),
     this, SLOT(OnOpenLevelInspector()));
+
+  this->addLevelAct = new QAction(tr("&Add Level"), this);
+  this->addLevelAct->setStatusTip(tr("Add Level"));
+  connect(this->addLevelAct, SIGNAL(triggered()),
+    this, SLOT(OnAddLevel()));
 }
 
 /////////////////////////////////////////////////
@@ -96,6 +102,7 @@ void EditorView::contextMenuEvent(QContextMenuEvent *_event)
   }
 
   QMenu menu(this);
+  menu.addAction(this->addLevelAct);
   menu.addAction(this->openLevelInspectorAct);
   menu.exec(_event->globalPos());
   _event->accept();
@@ -579,6 +586,11 @@ void EditorView::OnDiscardModel()
   this->floorList.clear();
   this->itemToModelMap.clear();
   this->buildingMaker->Reset();
+  this->levelNames.clear();
+  this->levelHeights.clear();
+
+  this->levelHeights[0] = 0;
+  this->levelNames[0] = "Level 1";
 
   // clear the scene but add the grid back in
   this->scene()->clear();
@@ -591,16 +603,19 @@ void EditorView::OnDiscardModel()
   this->drawMode = NONE;
 }
 
-
 /////////////////////////////////////////////////
-void EditorView::OnAddLevel(int _newLevel, std::string _levelName)
+void EditorView::OnAddLevel()
 {
-  this->currentLevel = _newLevel;
-  this->levelNames[_newLevel] = _levelName;
-
+  int newLevel = this->levelHeights.size();
+  std::stringstream levelNameStr;
+  levelNameStr << "Level " << newLevel + 1;
+  std::string levelName = levelNameStr.str();
+  this->currentLevel = newLevel;
+  this->levelNames[newLevel] = levelName;
+  emit gui::editor::Events::changeLevelName(this->currentLevel, levelName);
   if (wallList.size() == 0)
   {
-    this->levelHeights[_newLevel] = 0;
+    this->levelHeights[newLevel] = 0;
     return;
   }
 
@@ -619,7 +634,7 @@ void EditorView::OnAddLevel(int _newLevel, std::string _levelName)
       wallLevel = (*wallIt)->GetLevel();
     }
   }
-  this->levelHeights[_newLevel] = maxHeight;
+  this->levelHeights[newLevel] = maxHeight;
 
   QPolygonF wallBound;
   std::vector<WallItem *> newWalls;
@@ -630,7 +645,7 @@ void EditorView::OnAddLevel(int _newLevel, std::string _levelName)
       continue;
 
     WallItem *wallItem = (*it)->Clone();
-    wallItem->SetLevel(_newLevel);
+    wallItem->SetLevel(newLevel);
     wallItem->SetLevelBaseHeight(this->levelHeights[this->currentLevel]);
     this->scene()->addItem(wallItem);
     newWalls.push_back(wallItem);
@@ -660,7 +675,7 @@ void EditorView::OnAddLevel(int _newLevel, std::string _levelName)
   QRectF allWallBound = wallBound.boundingRect();
   QVector3D floorSize(allWallBound.width(), allWallBound.height(), 10);
   QVector3D floorPosition(allWallBound.x() + allWallBound.width()/2,
-      allWallBound.y()+allWallBound.height()/2, this->levelHeights[_newLevel]);
+      allWallBound.y()+allWallBound.height()/2, this->levelHeights[newLevel]);
 
   FloorItem *floorItem = new FloorItem();
   floorItem->SetLevel(this->currentLevel);
@@ -672,7 +687,7 @@ void EditorView::OnAddLevel(int _newLevel, std::string _levelName)
   for (std::vector<StairsItem *>::iterator it = this->stairsList.begin();
       it != this->stairsList.end(); ++it)
   {
-    if ((*it)->GetLevel() == (_newLevel - 1))
+    if ((*it)->GetLevel() == (newLevel - 1))
       buildingMaker->AttachObject(this->itemToModelMap[(*it)], floorName);
   }
   this->buildingMaker->ConnectItem(floorName, floorItem);

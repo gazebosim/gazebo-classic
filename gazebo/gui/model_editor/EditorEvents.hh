@@ -103,7 +103,7 @@ namespace gazebo
         public: static event::EventT<void (int)> changeLevel;
 
         /// \brief A new level is to be added
-        public: static event::EventT<void (int, std::string)> addLevel;
+        public: static event::EventT<void ()> addLevel;
 
         /// \brief The current level name has been changed
         public: static event::EventT<void (int, std::string)> changeLevelName;

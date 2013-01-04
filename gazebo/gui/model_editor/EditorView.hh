@@ -74,7 +74,7 @@ namespace gazebo
 
       private: void OnDiscardModel();
 
-      private: void OnAddLevel(int _newLevel, std::string _levelName);
+      private slots: void OnAddLevel();
 
       private: void OnChangeLevel(int _level);
 
@@ -117,6 +117,8 @@ namespace gazebo
       private: std::map<int, std::string> levelNames;
 
       private: QAction *openLevelInspectorAct;
+
+      private: QAction *addLevelAct;
 
       private: double grabberDragRotation;
 

@@ -30,7 +30,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   this->levelNameLineEdit = new QLineEdit;
   this->levelNameLineEdit->setPlaceholderText(tr("Level X"));
 
-  QLabel *floorThicknessLabel = new QLabel(tr("Floor Thickness: "));
+/*  QLabel *floorThicknessLabel = new QLabel(tr("Floor Thickness: "));
   this->floorThicknessSpinBox = new QDoubleSpinBox;
   this->floorThicknessSpinBox->setRange(-1000, 1000);
   this->floorThicknessSpinBox->setSingleStep(0.001);
@@ -46,17 +46,17 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
 
   QLabel *materialLabel = new QLabel(tr("Floor Material: "));
   this->materialComboBox = new QComboBox;
-  this->materialComboBox->addItem(QString("Hardwood"));
+  this->materialComboBox->addItem(QString("Hardwood"));*/
 
   QGridLayout *levelLayout = new QGridLayout;
   levelLayout->addWidget(levelLabel, 0, 0);
   levelLayout->addWidget(this->levelNameLineEdit, 0, 1);
-  levelLayout->addWidget(floorThicknessLabel, 1, 0);
+/*  levelLayout->addWidget(floorThicknessLabel, 1, 0);
   levelLayout->addWidget(this->floorThicknessSpinBox, 1, 1);
   levelLayout->addWidget(heightLabel, 2, 0);
   levelLayout->addWidget(this->heightSpinBox, 2, 1);
   levelLayout->addWidget(materialLabel, 3, 0);
-  levelLayout->addWidget(this->materialComboBox, 3, 1);
+  levelLayout->addWidget(this->materialComboBox, 3, 1);*/
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));

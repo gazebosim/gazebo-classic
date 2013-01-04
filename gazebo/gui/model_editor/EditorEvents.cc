@@ -24,5 +24,5 @@ event::EventT<void (std::string)> editor::Events::createEditorItem;
 event::EventT<void (std::string, std::string)> editor::Events::finishModel;
 event::EventT<void ()> editor::Events::discardModel;
 event::EventT<void (int)> editor::Events::changeLevel;
-event::EventT<void (int, std::string)> editor::Events::addLevel;
+event::EventT<void ()> editor::Events::addLevel;
 event::EventT<void (int, std::string)> editor::Events::changeLevelName;

@@ -76,14 +76,24 @@ void LevelWidget::OnAddLevel()
   int count = this->levelComboBox->count();
   levelText << "Level " << (count + 1);
   this->levelComboBox->addItem(QString(levelText.str().c_str()));
-  gui::editor::Events::addLevel(count, levelText.str());
   this->levelComboBox->setCurrentIndex(count);
+  gui::editor::Events::addLevel();
 }
 
 //////////////////////////////////////////////////
 void LevelWidget::OnChangeLevelName(int _level, std::string _newName)
 {
-  this->levelComboBox->setItemText(_level, tr(_newName.c_str()));
+  if (_level == this->levelComboBox->count())
+  {
+    // Used for responding to addLevel events from context menus
+    // TODO Use a level manager later for managing all events
+    this->levelComboBox->addItem(tr(_newName.c_str()));
+    this->levelComboBox->setCurrentIndex(_level);
+  }
+  else
+  {
+    this->levelComboBox->setItemText(_level, tr(_newName.c_str()));
+  }
 }
 
 //////////////////////////////////////////////////
