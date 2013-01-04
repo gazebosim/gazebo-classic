@@ -31,6 +31,8 @@ LineSegmentItem::LineSegmentItem(QGraphicsItem *_parent, int _index)
 
   if (_parent)
     this->setParentItem(_parent);
+
+  this->setFlag(QGraphicsItem::ItemIsSelectable, true);
   this->setAcceptHoverEvents(true);
   this->setZValue(0);
 }
@@ -148,6 +150,30 @@ void LineSegmentItem::hoverMoveEvent(QGraphicsSceneHoverEvent *)
 void LineSegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
+}
+
+/////////////////////////////////////////////////
+QVariant LineSegmentItem::itemChange(GraphicsItemChange _change,
+  const QVariant &_value)
+{
+  if (_change == QGraphicsItem::ItemSelectedChange && this->scene())
+  {
+    if (_value.toBool())
+    {
+      QColor lineColor = Qt::red;
+      QPen linePen = this->pen();
+      linePen.setColor(lineColor);
+      this->setPen(linePen);
+    }
+    else
+    {
+      QColor lineColor = Qt::black;
+      QPen linePen = this->pen();
+      linePen.setColor(lineColor);
+      this->setPen(linePen);
+    }
+  }
+  return QGraphicsItem::itemChange(_change, _value);
 }
 
 /////////////////////////////////////////////////

@@ -69,6 +69,8 @@ namespace gazebo
 
         private: void WallChanged();
 
+        private: void SetSegmentSelected(unsigned int _index, bool _selected);
+
         private: double wallThickness;
 
         private: double wallHeight;

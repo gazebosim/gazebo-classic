@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/Exception.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/BuildingItem.hh"
 #include "gazebo/gui/model_editor/PolylineItem.hh"
@@ -162,17 +163,16 @@ bool WallItem::cornerEventFilter(CornerGrabber* _corner,
     QPointF newScenePos = scenePosition;
     if ((cornerIndex <= static_cast<int>(this->GetSegmentCount())))
     {
-      int segmentIndex = std::max(cornerIndex-1, 0);
-      LineSegmentItem *segment = this->GetSegment(segmentIndex);
+      LineSegmentItem *segment = this->selectedSegment;
       QPointF lineOrigin = segment->line().p1();
-      if (cornerIndex == 0)
+      if (segment->GetIndex() == cornerIndex)
         lineOrigin = segment->line().p2();
       QLineF lineToPoint(lineOrigin,
           segment->mapFromScene(scenePosition));
       QPointF startScenePoint = segment->mapToScene(lineOrigin);
       double angle = QLineF(startScenePoint,
           scenePosition).angle();
-      double range = 15;
+      double range = 7.5;
       int increment = angle / range;
       if ((angle - range*increment) > range/2)
         increment++;
@@ -234,6 +234,10 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
       _segment->SetMouseState(QEvent::GraphicsSceneMousePress);
       _segment->SetMouseDownX(scenePosition.x());
       _segment->SetMouseDownY(scenePosition.y());
+
+//      this->selectedSegment = _segment;
+      this->setSelected(true);
+      this->SetSegmentSelected(_segment->GetIndex(), true);
       this->segmentMouseMove = scenePosition;
       break;
     }
@@ -249,7 +253,8 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
     }
     case QEvent::GraphicsSceneContextMenu:
     {
-      this->selectedSegment = _segment;
+//      this->selectedSegment = _segment;
+      this->SetSegmentSelected(_segment->GetIndex(), true);
       QMenu menu;
       menu.addAction(this->openInspectorAct);
       menu.exec(dynamic_cast<QGraphicsSceneContextMenuEvent*>(
@@ -258,7 +263,8 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
     }
     case QEvent::GraphicsSceneMouseDoubleClick:
     {
-      this->selectedSegment = _segment;
+//      this->selectedSegment = _segment;
+      this->SetSegmentSelected(_segment->GetIndex(), true);
       this->OnOpenInspector();
       _segment->SetMouseState(QEvent::GraphicsSceneMouseDoubleClick);
       break;
@@ -367,6 +373,25 @@ void WallItem::OnApply()
     this->SetVertexPosition(this->selectedSegment->GetIndex() + 1,
       newEndPoint);
   }
+}
+
+/////////////////////////////////////////////////
+void WallItem::SetSegmentSelected(unsigned int _index, bool _selected)
+{
+  if (_index >= this->segments.size())
+    gzthrow("Index too large")
+
+  if (_selected && this->selectedSegment)
+  {
+    unsigned int oldIndex = this->selectedSegment->GetIndex();
+    this->selectedSegment->setSelected(false);
+    this->corners[oldIndex]->setVisible(false);
+    this->corners[oldIndex+1]->setVisible(false);
+  }
+  this->selectedSegment = this->segments[_index];
+  this->corners[_index]->setVisible(_selected);
+  this->corners[_index+1]->setVisible(_selected);
+  this->selectedSegment->setSelected(_selected);
 }
 
 /////////////////////////////////////////////////

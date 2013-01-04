@@ -39,6 +39,7 @@ PolylineItem::PolylineItem(QPointF _start, QPointF _end) :
   this->AddPoint(_end);
 
   this->setSelected(false);
+  this->ShowCorners(false);
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable);
 
   this->setAcceptHoverEvents(true);
@@ -91,6 +92,7 @@ void PolylineItem::AddPoint(QPointF _point)
 
   CornerGrabber *corner = new CornerGrabber(this,
       static_cast<int>(corners.size()));
+  corner->setVisible(false);
   this->corners.push_back(corner);
 
   this->cornerWidth = corner->boundingRect().width();
@@ -354,8 +356,10 @@ void PolylineItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
                       / this->gridSpace) * this->gridSpace);
   this->origin.setY((static_cast<int>(this->origin.y())
                       / this->gridSpace) * this->gridSpace);*/
-  this->setPos(this->origin);
-  _event->setAccepted(true);
+
+//  this->setPos(this->origin);
+//  _event->setAccepted(true);
+  _event->setAccepted(false);
 }
 
 /////////////////////////////////////////////////
@@ -364,11 +368,12 @@ void PolylineItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
   if (!this->isSelected())
     this->scene()->clearSelection();
 
-  this->setSelected(true);
-  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
+//  this->setSelected(true);
+//  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
 
-  this->origin = this->pos();
-  _event->setAccepted(true);
+//  this->origin = this->pos();
+//  _event->setAccepted(true);
+  _event->setAccepted(false);
 }
 
 /////////////////////////////////////////////////
@@ -380,23 +385,23 @@ void PolylineItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
     return;
   }
 
-  QPointF delta = _event->scenePos() - _event->lastScenePos();
+/*  QPointF delta = _event->scenePos() - _event->lastScenePos();
   this->origin += delta;
   this->setPos(this->origin);
 
-  emit poseOriginTransformed(delta.x(), delta.y(), 0, 0, 0, 0);
+  emit poseOriginTransformed(delta.x(), delta.y(), 0, 0, 0, 0);*/
 }
 
 /////////////////////////////////////////////////
 void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 {
-  if (!this->isSelected())
+/*  if (!this->isSelected())
   {
     _event->ignore();
     return;
   }
 
-  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
+  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));*/
 
   for (unsigned int i = 0; i < segments.size(); ++i)
   {
@@ -407,15 +412,35 @@ void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
+void PolylineItem::hoverMoveEvent(QGraphicsSceneHoverEvent *_event)
 {
-  if (!this->isSelected())
+/*  if (!this->isSelected())
   {
     _event->ignore();
     return;
   }
 
-  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));*/
+
+  for (unsigned int i = 0; i < segments.size(); ++i)
+  {
+    this->segments[i]->installSceneEventFilter(this);
+    this->corners[i]->installSceneEventFilter(this);
+  }
+    this->corners[corners.size()-1]->installSceneEventFilter(this);
+}
+
+
+/////////////////////////////////////////////////
+void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
+{
+/*  if (!this->isSelected())
+  {
+    _event->ignore();
+    return;
+  }
+
+  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));*/
 
   for (unsigned int i = 0; i < segments.size(); ++i)
   {
@@ -453,6 +478,8 @@ QVariant PolylineItem::itemChange(GraphicsItemChange _change,
       }
         this->corners[corners.size()-1]->removeSceneEventFilter(this);
     }
+    if (!_value.toBool())
+        this->ShowCorners(_value.toBool());
   }
   return QGraphicsItem::itemChange(_change, _value);
 }
@@ -485,9 +512,10 @@ void PolylineItem::paint(QPainter *_painter,
 {
   _painter->save();
 
-  if (this->isSelected())
-    this->DrawBoundingBox(_painter);
-  this->ShowCorners(this->isSelected());
+//  if (this->isSelected())
+//    this->DrawBoundingBox(_painter);
+
+//  this->ShowCorners(this->isSelected());
 
   _painter->drawPath(this->path());
   _painter->restore();
