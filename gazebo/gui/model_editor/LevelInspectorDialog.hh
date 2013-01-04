@@ -42,7 +42,11 @@ namespace gazebo
 
       public: void SetHeight(double _height);
 
+      Q_SIGNALS: void Applied();
+
       private slots: void OnCancel();
+
+      private slots: void OnApply();
 
       private slots: void OnOK();
 

@@ -76,6 +76,10 @@ EditorView::EditorView(QWidget *_parent)
   this->levelHeights[0] = 0;
   this->levelNames[0] = "Level 1";
 
+  this->levelInspector = new LevelInspectorDialog();
+  this->levelInspector->setModal(false);
+  connect(this->levelInspector, SIGNAL(Applied()), this, SLOT(OnLevelApply()));
+
   this->openLevelInspectorAct = new QAction(tr("&Open Level Inspector"), this);
   this->openLevelInspectorAct->setStatusTip(tr("Open Level Inspector"));
   connect(this->openLevelInspectorAct, SIGNAL(triggered()),
@@ -92,6 +96,8 @@ EditorView::~EditorView()
 {
   if (this->buildingMaker)
     delete this->buildingMaker;
+
+  delete this->levelInspector;
 }
 
 /////////////////////////////////////////////////
@@ -757,12 +763,17 @@ void EditorView::OnChangeLevel(int _level)
 /////////////////////////////////////////////////
 void EditorView::OnOpenLevelInspector()
 {
-  LevelInspectorDialog dialog;
-  dialog.SetLevelName(this->levelNames[this->currentLevel]);
-  if (dialog.exec() == QDialog::Accepted)
-  {
-    std::string newLevelName = dialog.GetLevelName();
+  this->levelInspector->SetLevelName(this->levelNames[this->currentLevel]);
+  this->levelInspector->show();
+}
+
+/////////////////////////////////////////////////
+void EditorView::OnLevelApply()
+{
+  LevelInspectorDialog *dialog =
+     qobject_cast<LevelInspectorDialog *>(QObject::sender());
+
+  std::string newLevelName = dialog->GetLevelName();
     this->levelNames[this->currentLevel] = newLevelName;
     emit gui::editor::Events::changeLevelName(this->currentLevel, newLevelName);
-  }
 }

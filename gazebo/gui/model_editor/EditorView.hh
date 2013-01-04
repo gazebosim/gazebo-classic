@@ -32,6 +32,7 @@ namespace gazebo
     class WallItem;
     class FloorItem;
     class BuildingMaker;
+    class LevelInspectorDialog;
 
     class EditorView : public QGraphicsView
     {
@@ -77,6 +78,8 @@ namespace gazebo
       private: void OnDiscardModel();
 
       private slots: void OnAddLevel();
+
+      private slots: void OnLevelApply();
 
       private: void OnChangeLevel(int _level);
 
@@ -124,7 +127,7 @@ namespace gazebo
 
       private: double grabberDragRotation;
 
-
+      private: LevelInspectorDialog *levelInspector;
     };
   }
 }
