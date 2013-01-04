@@ -17,7 +17,6 @@ if (HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
 
   set (sources ${sources} parser_urdf.cc)
   set (headers ${headers} parser_urdf.hh)
-
   # add_definitions(${urdfdom_LDFLAGS}
   # ${urdfdom_headers_LDFLAGS} ${console_bridge_LDFLAGS})
 else(HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
