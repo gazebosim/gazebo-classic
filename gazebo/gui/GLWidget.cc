@@ -294,15 +294,17 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent * /*_event*/)
     {
       math::Pose pose, camPose;
       camPose = this->userCamera->GetWorldPose();
-      pose.pos = this->scene->GetFirstContact(this->userCamera,
-                                              this->mouseEvent.pos);
-      this->userCamera->SetFocalPoint(pose.pos);
+      if (this->scene->GetFirstContact(this->userCamera,
+                                   this->mouseEvent.pos, pose.pos))
+      {
+        this->userCamera->SetFocalPoint(pose.pos);
 
-      math::Vector3 dir = pose.pos - camPose.pos;
-      pose.pos = camPose.pos + (dir * 0.8);
+        math::Vector3 dir = pose.pos - camPose.pos;
+        pose.pos = camPose.pos + (dir * 0.8);
 
-      pose.rot = this->userCamera->GetWorldRotation();
-      this->userCamera->MoveToPosition(pose, 0.5);
+        pose.rot = this->userCamera->GetWorldRotation();
+        this->userCamera->MoveToPosition(pose, 0.5);
+      }
     }
     else
     {
@@ -365,6 +367,8 @@ void GLWidget::OnMousePressTranslate()
     event::Events::setSelectedEntity(this->mouseMoveVis->GetName(), "move");
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
   }
+  else
+    this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
 /////////////////////////////////////////////////
@@ -537,6 +541,7 @@ void GLWidget::OnMouseMoveTranslate()
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     else
       QApplication::setOverrideCursor(Qt::ArrowCursor);
+    this->userCamera->HandleMouseEvent(this->mouseEvent);
   }
 }
 
@@ -618,6 +623,8 @@ void GLWidget::OnMouseReleaseTranslate()
     this->SetSelectedVisual(rendering::VisualPtr());
     event::Events::setSelectedEntity("", "normal");
   }
+
+  this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
 //////////////////////////////////////////////////
@@ -661,8 +668,15 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
 
-  this->userCamera->SetWorldPose(math::Pose(5, -5, 2, 0,
-                                            GZ_DTOR(11.31), GZ_DTOR(135)));
+  math::Vector3 camPos(5, -5, 2);
+  math::Vector3 lookAt(0, 0, 0);
+  math::Vector3 delta = lookAt - camPos;
+
+  double yaw = atan2(delta.y, delta.x);
+
+  double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+  this->userCamera->SetWorldPose(math::Pose(camPos,
+        math::Vector3(0, pitch, yaw)));
 
   if (this->windowId >= 0)
   {

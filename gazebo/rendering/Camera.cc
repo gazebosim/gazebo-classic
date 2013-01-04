@@ -187,6 +187,9 @@ void Camera::Init()
   this->pitchNode->attachObject(this->camera);
   this->camera->setAutoAspectRatio(true);
 
+  this->sceneNode->setInheritScale(false);
+  this->pitchNode->setInheritScale(false);
+
   this->saveCount = 0;
 
   this->SetClipDist();
@@ -414,6 +417,7 @@ void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
   if (this->animState)
     return;
+
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
 }
 
@@ -747,6 +751,12 @@ void Camera::SetSceneNode(Ogre::SceneNode *node)
 
 //////////////////////////////////////////////////
 Ogre::SceneNode *Camera::GetSceneNode() const
+{
+  return this->sceneNode;
+}
+
+//////////////////////////////////////////////////
+Ogre::SceneNode *Camera::GetPitchNode() const
 {
   return this->pitchNode;
 }
@@ -1288,6 +1298,12 @@ bool Camera::GetInitialized() const
 }
 
 /////////////////////////////////////////////////
+bool Camera::IsAnimating() const
+{
+  return this->animState != NULL;
+}
+
+/////////////////////////////////////////////////
 bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
 {
   if (this->animState)
@@ -1295,7 +1311,6 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
     this->moveToPositionQueue.push_back(std::make_pair(_pose, _time));
     return false;
   }
-
 
   Ogre::TransformKeyFrame *key;
   math::Vector3 rpy = _pose.rot.GetAsEuler();
