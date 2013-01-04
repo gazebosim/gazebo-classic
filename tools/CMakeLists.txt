@@ -1,5 +1,8 @@
 link_directories(${urdfdom_LIBRARY_DIRS} ${urdfdom_headers_LIBRARY_DIRS} ${console_bridge_LIBRARY_DIRS})
 
+include ( ${QT_USE_FILE} )
+add_definitions(${QT_DEFINITIONS})
+
 include_directories( 
   ${PROJECT_BINARY_DIR}/gazebo 
   ${PROJECT_SOURCE_DIR}/gazebo 
@@ -12,7 +15,7 @@ target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_sdf_interface)
 gz_install_executable(gzsdf)
 
 add_executable(gztopic gztopic.cc)
-target_link_libraries(gztopic gazebo_msgs gazebo_common gazebo_transport pthread)
+target_link_libraries(gztopic gazebo_msgs gazebo_common gazebo_transport pthread gazebo_gui ${QT_LIBRARIES})
 gz_install_executable(gztopic)
 
 add_executable(gzstats gzstats.cc)

@@ -52,6 +52,7 @@ namespace gazebo
 
       private: void OnGUI(ConstGUIPtr &_msg);
 
+
       private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
       private slots: void Open();
@@ -89,6 +90,9 @@ namespace gazebo
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
 
+      /// \brief Callback when topic selection action.
+      private slots: void SelectTopic();
+
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);
 
@@ -104,10 +108,6 @@ namespace gazebo
                                         const std::string &_mode);
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
-      private: QMenu *fileMenu;
-      private: QMenu *editMenu;
-      private: QMenu *viewMenu;
-      private: QMenu *helpMenu;
       private: QToolBar *playToolbar;
 
       private: RenderWidget *renderWidget;
@@ -137,6 +137,10 @@ namespace gazebo
       // private: QTreeWidget *treeWidget;
       private: QTabWidget *tabWidget;
       private: QMenuBar *menuBar;
+
+      /// \brief The filename set via "Save As". This filename is used by
+      /// the "Save" feature.
+      private: std::string saveFilename;
     };
 
     class TreeViewDelegate: public QItemDelegate

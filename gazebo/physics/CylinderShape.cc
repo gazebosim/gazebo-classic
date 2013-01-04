@@ -83,31 +83,8 @@ void CylinderShape::FillMsg(msgs::Geometry &_msg)
   _msg.mutable_cylinder()->set_length(this->GetLength());
 }
 
+/////////////////////////////////////////////////
 void CylinderShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetSize(_msg.cylinder().radius(), _msg.cylinder().length());
-}
-
-//////////////////////////////////////////////////
-double CylinderShape::GetMass(double _density) const
-{
-  double r = this->GetRadius();
-  double l = this->GetLength();
-  return M_PI * r * r * l * _density;
-}
-
-//////////////////////////////////////////////////
-void CylinderShape::GetInertial(double _mass, InertialPtr _inertial) const
-{
-  double r = this->GetRadius();
-  double l = this->GetLength();
-
-  double r2 = r * r;
-  double i = _mass * (0.25 * r2 + (1.0/12.0) * l * l);
-
-  _inertial->SetMass(_mass);
-  _inertial->SetIXX(i);
-  _inertial->SetIYY(i);
-  // cylinders are oriented along the z axis
-  _inertial->SetIZZ(_mass * 0.5 * r2);
 }

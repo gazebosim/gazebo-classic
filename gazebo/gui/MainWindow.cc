@@ -15,27 +15,31 @@
  *
  */
 
-#include "gazebo.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "common/Events.hh"
+#include "gazebo/gui/TopicSelector.hh"
+#include "gazebo/gui/viewers/ViewFactory.hh"
+#include "gazebo/gui/viewers/TopicView.hh"
+#include "gazebo/gui/viewers/ImageView.hh"
 
-#include "transport/Node.hh"
-#include "transport/Transport.hh"
+#include "gazebo/gazebo.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Events.hh"
 
-#include "rendering/UserCamera.hh"
-#include "rendering/RenderEvents.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Transport.hh"
 
-#include "gui/Actions.hh"
-#include "gui/Gui.hh"
-#include "gui/InsertModelWidget.hh"
-#include "gui/SkyWidget.hh"
-#include "gui/ModelListWidget.hh"
-#include "gui/RenderWidget.hh"
-#include "gui/ToolsWidget.hh"
-#include "gui/GLWidget.hh"
-#include "gui/MainWindow.hh"
-#include "gui/GuiEvents.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/InsertModelWidget.hh"
+#include "gazebo/gui/ModelListWidget.hh"
+#include "gazebo/gui/RenderWidget.hh"
+#include "gazebo/gui/ToolsWidget.hh"
+#include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/GuiEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -129,6 +133,8 @@ MainWindow::MainWindow()
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&MainWindow::OnSetSelectedEntity, this, _1, _2)));
+
+  gui::ViewFactory::RegisterAll();
 }
 
 /////////////////////////////////////////////////
@@ -203,6 +209,25 @@ void MainWindow::New()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::SelectTopic()
+{
+  TopicSelector *selector = new TopicSelector();
+  selector->exec();
+  std::string topic = selector->GetTopic();
+  std::string msgType = selector->GetMsgType();
+  delete selector;
+
+  if (!topic.empty())
+  {
+    TopicView *view = ViewFactory::NewView(msgType, topic, this);
+    if (view)
+      view->show();
+    else
+      gzerr << "Unable to create viewer for message type[" << msgType << "]\n";
+  }
+}
+
+/////////////////////////////////////////////////
 void MainWindow::Open()
 {
   std::string filename = QFileDialog::getOpenFileName(this,
@@ -236,26 +261,58 @@ void MainWindow::Import()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::Save()
-{
-  msgs::ServerControl msg;
-  msg.set_save_world_name(get_world());
-  this->serverControlPub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
 void MainWindow::SaveAs()
 {
   std::string filename = QFileDialog::getSaveFileName(this,
       tr("Save World"), QString(),
       tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
 
-  if (!filename.empty())
+  // Return if the user has canceled.
+  if (filename.empty())
+    return;
+
+  g_saveAct->setEnabled(true);
+  this->saveFilename = filename;
+  this->Save();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Save()
+{
+  // Get the latest world in SDF.
+  boost::shared_ptr<msgs::Response> response =
+    transport::request(get_world(), "world_sdf");
+
+  msgs::GzString msg;
+
+  // Make sure the response is correct
+  if (response->response() != "error" && response->type() == msg.GetTypeName())
   {
-    msgs::ServerControl msg;
-    msg.set_save_world_name(get_world());
-    msg.set_save_filename(filename);
-    this->serverControlPub->Publish(msg);
+    // Parse the response
+    msg.ParseFromString(response->serialized_data());
+
+    // Open the file
+    std::ofstream out(this->saveFilename.c_str(), std::ios::out);
+
+    if (!out)
+    {
+      QMessageBox msgBox;
+      std::string str = "Unable to open file: " + this->saveFilename + "\n";
+      str += "Check file permissions.";
+      msgBox.setText(str.c_str());
+      msgBox.exec();
+    }
+    else
+      out << msg.data();
+
+    out.close();
+  }
+  else
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Unable to save world.\n"
+                   "Unable to retrieve SDF world description from server.");
+    msgBox.exec();
   }
 }
 
@@ -429,7 +486,14 @@ void MainWindow::OnFullScreen(bool _value)
 void MainWindow::Reset()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->SetWorldPose(math::Pose(5, -5, 2, 0, GZ_DTOR(11.31), GZ_DTOR(135)));
+
+  math::Vector3 camPos(5, -5, 2);
+  math::Vector3 lookAt(0, 0, 0);
+  math::Vector3 delta = camPos - lookAt;
+
+  double yaw = atan2(delta.x, delta.y);
+  double pitch = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+  cam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
 }
 
 /////////////////////////////////////////////////
@@ -524,6 +588,11 @@ void MainWindow::CreateActions()
   connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
   */
 
+  g_topicVisAct = new QAction(tr("Topic Visualization"), this);
+  g_topicVisAct->setShortcut(tr("Ctrl+T"));
+  g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
+  connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
+
   g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
   g_openAct->setStatusTip(tr("Open an world file"));
@@ -535,12 +604,11 @@ void MainWindow::CreateActions()
   connect(g_importAct, SIGNAL(triggered()), this, SLOT(Import()));
   */
 
-  /*
   g_saveAct = new QAction(tr("&Save World"), this);
   g_saveAct->setShortcut(tr("Ctrl+S"));
   g_saveAct->setStatusTip(tr("Save world"));
+  g_saveAct->setEnabled(false);
   connect(g_saveAct, SIGNAL(triggered()), this, SLOT(Save()));
-  */
 
   g_saveAsAct = new QAction(tr("Save World &As"), this);
   g_saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
@@ -737,40 +805,43 @@ void MainWindow::CreateMenus()
 
   this->setMenuWidget(frame);
 
-  this->fileMenu = this->menuBar->addMenu(tr("&File"));
-  // this->fileMenu->addAction(g_openAct);
-  // this->fileMenu->addAction(g_importAct);
-  // this->fileMenu->addAction(g_newAct);
-  // this->fileMenu->addAction(g_saveAct);
-  this->fileMenu->addAction(g_saveAsAct);
-  this->fileMenu->addSeparator();
-  this->fileMenu->addAction(g_quitAct);
+  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  // fileMenu->addAction(g_openAct);
+  // fileMenu->addAction(g_importAct);
+  // fileMenu->addAction(g_newAct);
+  fileMenu->addAction(g_saveAct);
+  fileMenu->addAction(g_saveAsAct);
+  fileMenu->addSeparator();
+  fileMenu->addAction(g_quitAct);
 
-  this->editMenu = this->menuBar->addMenu(tr("&Edit"));
-  this->editMenu->addAction(g_resetModelsAct);
-  this->editMenu->addAction(g_resetWorldAct);
+  QMenu *editMenu = this->menuBar->addMenu(tr("&Edit"));
+  editMenu->addAction(g_resetModelsAct);
+  editMenu->addAction(g_resetWorldAct);
 
-  this->viewMenu = this->menuBar->addMenu(tr("&View"));
-  this->viewMenu->addAction(g_showGridAct);
-  this->viewMenu->addSeparator();
+  QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
+  viewMenu->addAction(g_showGridAct);
+  viewMenu->addSeparator();
 
-  this->viewMenu->addAction(g_transparentAct);
-  this->viewMenu->addAction(g_showCollisionsAct);
-  this->viewMenu->addAction(g_showJointsAct);
-  this->viewMenu->addAction(g_showCOMAct);
-  this->viewMenu->addAction(g_showContactsAct);
-  this->viewMenu->addSeparator();
+  viewMenu->addAction(g_transparentAct);
+  viewMenu->addAction(g_showCollisionsAct);
+  viewMenu->addAction(g_showJointsAct);
+  viewMenu->addAction(g_showCOMAct);
+  viewMenu->addAction(g_showContactsAct);
+  viewMenu->addSeparator();
 
-  this->viewMenu->addAction(g_resetAct);
-  this->viewMenu->addAction(g_fullScreenAct);
-  this->viewMenu->addSeparator();
-  // this->viewMenu->addAction(g_fpsAct);
-  this->viewMenu->addAction(g_orbitAct);
+  viewMenu->addAction(g_resetAct);
+  viewMenu->addAction(g_fullScreenAct);
+  viewMenu->addSeparator();
+  // viewMenu->addAction(g_fpsAct);
+  viewMenu->addAction(g_orbitAct);
+
+  QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
+  windowMenu->addAction(g_topicVisAct);
 
   this->menuBar->addSeparator();
 
-  this->helpMenu = this->menuBar->addMenu(tr("&Help"));
-  this->helpMenu->addAction(g_aboutAct);
+  QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
+  helpMenu->addAction(g_aboutAct);
 }
 
 /////////////////////////////////////////////////

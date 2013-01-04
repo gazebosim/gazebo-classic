@@ -92,6 +92,7 @@ World::World(const std::string &_name)
   this->loadModelMutex = new boost::mutex();
 
   this->initialized = false;
+  this->loaded = false;
   this->stepInc = 0;
   this->pause = false;
   this->thread = NULL;
@@ -148,6 +149,7 @@ World::~World()
 //////////////////////////////////////////////////
 void World::Load(sdf::ElementPtr _sdf)
 {
+  this->loaded = false;
   this->sdf = _sdf;
 
   if (this->sdf->GetValueString("name").empty())
@@ -205,27 +207,35 @@ void World::Load(sdf::ElementPtr _sdf)
   this->rootElement->SetName(this->GetName());
   this->rootElement->SetWorld(shared_from_this());
 
-  if (this->sdf->HasElement("state"))
+  // A special order is necessary when loading a world that contains state
+  // information. The joints must be created last, otherwise they get
+  // initialized improperly.
   {
-    sdf::ElementPtr childElem = this->sdf->GetElement("state");
+    // Create all the entities
+    this->LoadEntities(this->sdf, this->rootElement);
 
-    while (childElem)
+    // Set the state of the entities
+    if (this->sdf->HasElement("state"))
     {
-      WorldState myState;
-      myState.Load(childElem);
-      this->sdf->InsertElement(childElem);
-      // this->SetState(myState);
+      sdf::ElementPtr childElem = this->sdf->GetElement("state");
 
-      childElem = childElem->GetNextElement("state");
+      while (childElem)
+      {
+        WorldState myState;
+        myState.Load(childElem);
+        this->SetState(myState);
 
-      // TODO: We currently load just the first state data. Need to
-      // implement a better mechanism for handling multiple states
-      break;
+        childElem = childElem->GetNextElement("state");
+
+        // TODO: We currently load just the first state data. Need to
+        // implement a better mechanism for handling multiple states
+        break;
+      }
     }
-  }
 
-  // Create all the entities
-  this->LoadEntities(this->sdf, this->rootElement);
+    for (unsigned int i = 0; i < this->GetModelCount(); ++i)
+      this->GetModel(i)->LoadJoints();
+  }
 
   // TODO: Performance test to see if TBB model updating is necessary
   // Choose threaded or unthreaded model updating depending on the number of
@@ -236,8 +246,9 @@ void World::Load(sdf::ElementPtr _sdf)
   // this->modelUpdateFunc = &World::ModelUpdateTBB;
 
   event::Events::worldCreated(this->GetName());
-}
 
+  this->loaded = true;
+}
 
 //////////////////////////////////////////////////
 void World::Save(const std::string &_filename)
@@ -363,6 +374,17 @@ void World::LogStep()
 //////////////////////////////////////////////////
 void World::Step()
 {
+  /// need this because ODE does not call dxReallocateWorldProcessContext()
+  /// until dWorld.*Step
+  /// Plugins that manipulate joints (and probably other properties) require
+  /// one iteration of the physics engine. Do not remove this.
+  if (!this->pluginsLoaded &&
+      sensors::SensorManager::Instance()->SensorsInitialized())
+  {
+    this->LoadPlugins();
+    this->pluginsLoaded = true;
+  }
+
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
@@ -385,12 +407,13 @@ void World::Step()
   // exponentially avg out
   this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
                       this->sleepOffset * 0.99;
+
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
   if (common::Time::GetWallTime() - this->prevStepWallTime + this->sleepOffset
          >= common::Time(this->physicsEngine->GetUpdatePeriod()))
   {
-    this->worldUpdateMutex->lock();
+    boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
 
     this->prevStepWallTime = common::Time::GetWallTime();
 
@@ -405,8 +428,6 @@ void World::Step()
     }
     else
       this->pauseTime += this->physicsEngine->GetStepTime();
-
-    this->worldUpdateMutex->unlock();
   }
 
   this->ProcessMessages();
@@ -421,19 +442,19 @@ void World::StepWorld(int _steps)
     this->SetPaused(true);
   }
 
-  this->worldUpdateMutex->lock();
-  this->stepInc = _steps;
-  this->worldUpdateMutex->unlock();
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
+    this->stepInc = _steps;
+  }
 
   // block on completion
   bool wait = true;
   while (wait)
   {
     common::Time::MSleep(1);
-    this->worldUpdateMutex->lock();
+    boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
     if (this->stepInc == 0 || this->stop)
       wait = false;
-    this->worldUpdateMutex->unlock();
   }
 }
 
@@ -464,17 +485,6 @@ void World::Update()
   {
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
-
-    /// need this because ODE does not call dxReallocateWorldProcessContext()
-    /// until dWorld.*Step
-    /// Plugins that manipulate joints (and probably other properties) require
-    /// one iteration of the physics engine. Do not remove this.
-    if (!this->pluginsLoaded &&
-        sensors::SensorManager::Instance()->SensorsInitialized())
-    {
-      this->LoadPlugins();
-      this->pluginsLoaded = true;
-    }
 
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
@@ -754,16 +764,18 @@ void World::Reset()
 {
   bool currently_paused = this->IsPaused();
   this->SetPaused(true);
-  this->worldUpdateMutex->lock();
 
-  this->ResetTime();
-  this->ResetEntities(Base::BASE);
-  for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
-    (*iter)->Reset();
-  this->physicsEngine->Reset();
+  {
+    boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
 
-  this->worldUpdateMutex->unlock();
+    this->ResetTime();
+    this->ResetEntities(Base::BASE);
+    for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
+        iter != this->plugins.end(); ++iter)
+      (*iter)->Reset();
+    this->physicsEngine->Reset();
+  }
+
   this->SetPaused(currently_paused);
 }
 
@@ -868,9 +880,10 @@ void World::SetPaused(bool _p)
   if (this->pause == _p)
     return;
 
-  this->worldUpdateMutex->lock();
-  this->pause = _p;
-  this->worldUpdateMutex->unlock();
+  {
+    boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
+    this->pause = _p;
+  }
 
   if (_p)
     this->pauseStartTime = common::Time::GetWallTime();
@@ -1196,13 +1209,13 @@ void World::ProcessRequestMsgs()
     {
       msgs::GzString msg;
       this->UpdateStateSDF();
-      std::string data;
-      data = "<?xml version='1.0'?>\n";
-      data += "<sdf version='" +
-        boost::lexical_cast<std::string>(SDF_VERSION) + "'>\n";
-      data += this->sdf->ToString("");
-      data += "</sdf>\n";
-      msg.set_data(data);
+      std::ostringstream stream;
+      stream << "<?xml version='1.0'?>\n"
+             << "<sdf version='" << SDF_VERSION << "'>\n"
+             << this->sdf->ToString("")
+             << "</sdf>";
+
+      msg.set_data(stream.str());
 
       std::string *serializedData = response.mutable_serialized_data();
       msg.SerializeToString(serializedData);
@@ -1391,32 +1404,7 @@ void World::ProcessFactoryMsgs()
         ModelPtr model = this->LoadModel(elem, this->rootElement);
         model->Init();
 
-        // Check to see if we need to load any model plugins
-        if (model->GetPluginCount() > 0)
-        {
-          int iterations = 0;
-
-          // Wait for the sensors to be initialized before loading
-          // plugins, if there are any sensors
-          while (model->GetSensorCount() > 0 &&
-              !sensors::SensorManager::Instance()->SensorsInitialized() &&
-              iterations < 50)
-          {
-            common::Time::MSleep(100);
-            iterations++;
-          }
-
-          // Load the plugins if the sensors have been loaded, or if there
-          // are no sensors attached to the model.
-          if (iterations < 50)
-            model->LoadPlugins();
-          else
-          {
-            gzerr << "Sensors failed to initialize when loading model["
-              << model->GetName() << "] via the factory mechanism."
-              << "Plugins for the model will not be loaded.\n";
-          }
-        }
+        model->LoadPlugins();
       }
       else if (isLight)
       {
@@ -1532,18 +1520,10 @@ void World::DisableAllModels()
 void World::UpdateStateSDF()
 {
   this->sdf->Update();
-  /*sdf::ElementPtr stateElem = this->sdf->GetElement("state");
+  sdf::ElementPtr stateElem = this->sdf->GetElement("state");
   stateElem->ClearElements();
 
-  stateElem->GetAttribute("world_name")->Set(this->GetName());
-  stateElem->GetElement("time")->Set(this->GetSimTime());
-
-  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-  {
-    sdf::ElementPtr elem = stateElem->AddElement("model");
-    this->GetModel(i)->GetState().FillStateSDF(elem);
-  }
-  */
+  this->prevStates[(this->stateToggle + 1) % 2].FillSDF(stateElem);
 }
 
 //////////////////////////////////////////////////
@@ -1608,6 +1588,12 @@ void World::PublishWorldStats()
 
   this->statPub->Publish(this->worldStatsMsg);
   this->prevStatTime = common::Time::GetWallTime();
+}
+
+//////////////////////////////////////////////////
+bool World::IsLoaded() const
+{
+  return this->loaded;
 }
 
 //////////////////////////////////////////////////

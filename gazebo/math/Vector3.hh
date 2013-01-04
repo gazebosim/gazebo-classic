@@ -26,6 +26,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "gazebo/math/Helpers.hh"
 #include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
@@ -231,6 +232,13 @@ namespace gazebo
       /// \brief Multiplication operators
       /// \param[in] _v the scaling factor
       /// \return a scaled vector
+      public: friend inline Vector3 operator*(double _s,
+                                              const Vector3 &_v)
+      { return Vector3(_v.x * _s, _v.y * _s, _v.z * _s); }
+
+      /// \brief Multiplication operators
+      /// \param[in] _v the scaling factor
+      /// \return a scaled vector
       public: Vector3 operator*(double _v) const;
 
       /// \brief Multiplication operator
@@ -293,7 +301,8 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                               const gazebo::math::Vector3 &_pt)
       {
-        _out << _pt.x << " " << _pt.y << " " << _pt.z;
+        _out << precision(_pt.x, 6) << " " << precision(_pt.y, 6) << " "
+             << precision(_pt.z, 6);
         return _out;
       }
 

@@ -17,13 +17,18 @@
 
 #include <google/protobuf/message.h>
 
+#include <gazebo/gui/qt.h>
+#include <gazebo/gui/TopicSelector.hh>
+#include <gazebo/gui/viewers/TopicView.hh>
+#include <gazebo/gui/viewers/ViewFactory.hh>
+#include <gazebo/gazebo.hh>
+
 #include <gazebo/common/Time.hh>
 #include <gazebo/transport/Transport.hh>
 #include <gazebo/transport/TransportTypes.hh>
 #include <gazebo/transport/Node.hh>
 
 #include <gazebo/gazebo_config.h>
-
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -50,6 +55,7 @@ void help()
             << "    list         : List all topics\n"
             << "    info <topic> : Get information about a topic\n"
             << "    echo <topic> : Output topic data to screen\n"
+            << "    view <topic> : View topic data using a QT widget\n"
             << "    hz <topic>   : Get publish frequency\n"
             << "    bw <topic>   : Get topic bandwidth\n"
             << "    help         : This help text\n";
@@ -385,6 +391,64 @@ void hz()
 }
 
 /////////////////////////////////////////////////
+void view(int _argc, char **_argv)
+{
+  if (!gazebo::load())
+  {
+    printf("load error\n");
+    return;
+  }
+
+  gazebo::run();
+
+  QApplication *app = new QApplication(_argc, _argv);
+
+  QFile file(":/style.qss");
+  file.open(QFile::ReadOnly);
+  QString styleSheet = QLatin1String(file.readAll());
+
+  app->setStyleSheet(styleSheet);
+
+  std::string topic;
+  std::string msgType;
+
+  if (params.size() == 1 || params[1].empty())
+  {
+    gui::TopicSelector *selector = new gui::TopicSelector();
+    selector->exec();
+
+    topic = selector->GetTopic();
+    msgType = selector->GetMsgType();
+    delete selector;
+  }
+  else
+  {
+    topic = params[1];
+    msgType = transport::getTopicMsgType(topic);
+  }
+
+  if (!topic.empty() && !msgType.empty())
+  {
+    gui::ViewFactory::RegisterAll();
+    gui::TopicView *view = gui::ViewFactory::NewView(msgType, topic);
+    if (view)
+      view->show();
+    else
+      gzerr << "Unable to create viewer for message type[" << msgType << "]\n";
+  }
+
+  if (!gazebo::init())
+  {
+    gzerr << "Unable to initialize Gazebo\n";
+    return;
+  }
+
+  app->exec();
+
+  gazebo::fini();
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   if (!parse(argc, argv))
@@ -400,4 +464,6 @@ int main(int argc, char **argv)
     hz();
   else if (params[0] == "bw")
     bw();
+  else if (params[0] == "view")
+    view(argc, argv);
 }

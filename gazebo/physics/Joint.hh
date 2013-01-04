@@ -97,15 +97,17 @@ namespace gazebo
       /// \param[in] _child Child link.
       /// \param[in] _pose Pose containing Joint Anchor offset from child link.
       public: void Load(LinkPtr _parent, LinkPtr _child,
-                        const math::Pose &_pose) GAZEBO_DEPRECATED;
+                        const math::Pose &_pose);
 
       /// \brief Set parent and child links of a physics::Joint and its
       /// anchor offset position.
+      /// This funciton is deprecated, use
+      /// Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
       /// \param[in] _parent Parent link.
       /// \param[in] _child Child link.
       /// \param[in] _pos Joint Anchor offset from child link.
       public: void Load(LinkPtr _parent, LinkPtr _child,
-                        const math::Vector3 &_pos);
+                        const math::Vector3 &_pos) GAZEBO_DEPRECATED;
 
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.
@@ -321,13 +323,6 @@ namespace gazebo
       public: virtual math::Vector3 GetLinkTorque(
                   unsigned int _index) const = 0;
 
-      /// \brief Set a parameter for the joint.
-      /// \param[in] _attr Attribute to set.
-      /// \param[in] _index Index of the axis.
-      /// \param[in] _value Value of the attribute.
-      public: virtual void SetAttribute(Attribute _attr, int _index,
-                                        double _value) GAZEBO_DEPRECATED = 0;
-
       /// \brief Set a non-generic parameter for the joint.
       /// replaces SetAttribute(Attribute, int, double)
       /// \param[in] _key String key.
@@ -344,11 +339,6 @@ namespace gazebo
       /// \return Pointer to the parent link.
       public: LinkPtr GetParent() const;
 
-      /// \brief DEPRECATED
-      /// \param[out] _msg Message to fill with joint's properties
-      /// \sa Joint::FillMsg
-      public: void FillJointMsg(msgs::Joint &_msg) GAZEBO_DEPRECATED;
-
       /// \brief Fill a joint message.
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);
@@ -360,7 +350,12 @@ namespace gazebo
 
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.
-      private: void LoadImpl(const math::Pose &_pose) GAZEBO_DEPRECATED;
+      private: void LoadImpl(const math::Pose &_pose);
+
+      /// \brief Helper function to load a joint.
+      /// This function is deprecated, use LoadImpl(math::Pose &)
+      /// \param[in] _pos Position of the anchor.
+      private: void LoadImpl(const math::Vector3 &_pos) GAZEBO_DEPRECATED;
 
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;

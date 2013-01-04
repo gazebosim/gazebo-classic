@@ -178,9 +178,6 @@ namespace gazebo
       public: void DisconnectContact(event::ConnectionPtr &_conn)
               {contact.Disconnect(_conn);}
 
-      /// \brief DEPRECATED.
-      public: void FillCollisionMsg(msgs::Collision &_msg) GAZEBO_DEPRECATED;
-
       /// \brief Fill a collision message.
       /// \param[out] _msg The message to fill with this collision's data.
       public: void FillMsg(msgs::Collision &_msg);
