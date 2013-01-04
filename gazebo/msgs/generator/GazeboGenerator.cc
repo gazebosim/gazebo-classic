@@ -72,11 +72,27 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
     io::Printer printer(output.get(), '$');
 
     printer.Print("#include <boost/shared_ptr.hpp>\n", "name", "includes");
-    printer.Print("#include \"gazebo/msgs/MsgFactory.hh\"\n", "name",
-                  "includes");
+    printer.Print("#include \"gazebo/msgs/MsgFactory.hh\"\n",
+        "name", "includes");
   }
 
   // Add boost shared typedef
+  {
+    scoped_ptr<io::ZeroCopyOutputStream> output(
+        _generator_context->OpenForInsert(headerFilename, "namespace_scope"));
+    io::Printer printer(output.get(), '$');
+
+    std::string package = _file->package();
+    boost::replace_all(package, ".", "::");
+
+    std::string ptrType = "typedef boost::shared_ptr<" + package
+      + "::" + _file->message_type(0)->name() + "> "
+      + _file->message_type(0)->name() + "Ptr;\n";
+
+    printer.Print(ptrType.c_str(), "name", "namespace_scope");
+  }
+
+  // Add const boost shared typedef
   {
     scoped_ptr<io::ZeroCopyOutputStream> output(
         _generator_context->OpenForInsert(headerFilename, "global_scope"));

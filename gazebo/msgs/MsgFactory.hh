@@ -22,50 +22,38 @@
 #include <map>
 #include <vector>
 #include <google/protobuf/message.h>
+#include <boost/shared_ptr.hpp>
 
 namespace gazebo
 {
-  /// \ingroup gazebo_views
-  /// \brief Sensors namespace
   namespace msgs
   {
-    /// \def Sensor
-    /// \brief Prototype for view factory functions
-    typedef google::protobuf::Message* (*MsgFactoryFn) ();
+    /// \def MsgFactoryFn
+    /// \brief Prototype for message factory generation
+    typedef boost::shared_ptr<google::protobuf::Message> (*MsgFactoryFn) ();
 
-    /// \addtogroup gazebo_views
+    /// \addtogroup gazebo_msgs Messages
     /// \{
-    /// \class SensorFactor SensorFactory.hh views/views.hh
-    /// \brief The view factory; the class is just for namespacing purposes.
+    /// \class MsgFactory MsgFactory.hh msgs/msgs.hh
+    /// \brief A factory that generates protobuf message based on a string
+    /// type.
     class MsgFactory
     {
-      /// \brief Register all known views
-      ///  \li views::CameraSensor
-      ///  \li views::DepthCameraSensor
-      ///  \li views::GpuRaySensor
-      ///  \li views::RaySensor
-      ///  \li views::ContactSensor
-      ///  \li views::RFIDSensor
-      ///  \li views::RFIDTag
-      public: static void RegisterAll();
-
-      /// \brief Register a view class
-      /// (called by view registration function).
-      /// \param[in] _className Name of class of view to register.
-      /// \param[in] _factoryfn Function handle for registration.
-      public: static void RegisterMsg(const std::string &_className,
+      /// \brief Register a message.
+      /// \param[in] _msgType Type of message to register.
+      /// \param[in] _factoryfn Function that generates the message.
+      public: static void RegisterMsg(const std::string &_msgType,
                                       MsgFactoryFn _factoryfn);
 
-      /// \brief Create a new instance of a view.  Used by the world when
-      /// reading the world file.
-      /// \param[in] _className Name of view class
-      /// \return Pointer to Sensor
-      public: static google::protobuf::Message *NewMsg(
+      /// \brief Create a new instance of a message.
+      /// \param[in] _msgType Type of message to create.
+      /// \return Pointer to a google protobuf message. Null if the message
+      /// type could not be handled.
+      public: static boost::shared_ptr<google::protobuf::Message> NewMsg(
                   const std::string &_msgType);
 
-      /// \brief Get all the view types
-      /// \param _types Vector of strings of the view types,
-      /// populated by function
+      /// \brief Get all the message types
+      /// \param[out] _types Vector of strings of the message types.
       public: static void GetMsgTypes(std::vector<std::string> &_types);
 
       /// \brief A list of registered message types
@@ -73,24 +61,25 @@ namespace gazebo
     };
 
 
-    /// \brief Static view registration macro
+    /// \brief Static message registration macro
     ///
-    /// Use this macro to register views with the server.
-    /// @param name Sensor type name, as it appears in the world file.
-    /// @param classname C++ class name for the view.
-    #define GZ_REGISTER_STATIC_MSG(msgtype, classname) \
-    google::protobuf::Message *New##classname() \
+    /// Use this macro to register messages.
+    /// \param[in] _msgtype Message type name.
+    /// \param[in] _classname Class name for message.
+    #define GZ_REGISTER_STATIC_MSG(_msgtype, _classname) \
+    boost::shared_ptr<google::protobuf::Message> New##_classname() \
     { \
-      return new gazebo::msgs::classname; \
+      return boost::shared_ptr<gazebo::msgs::_classname>(\
+          new gazebo::msgs::_classname); \
     } \
-    class Msg##classname \
+    class Msg##_classname \
     { \
-      public: Msg##classname() \
+      public: Msg##_classname() \
       { \
-        gazebo::msgs::MsgFactory::RegisterMsg(msgtype, New##classname);\
+        gazebo::msgs::MsgFactory::RegisterMsg(_msgtype, New##_classname);\
       } \
     }; \
-    static Msg##classname gz_initializer;
+    static Msg##_classname GzMsgInitializer;
 
     /// \}
   }

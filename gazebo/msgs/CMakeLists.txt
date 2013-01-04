@@ -1,5 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+add_subdirectory(test)
+
 set (msgs
   axis.proto
   boxgeom.proto
