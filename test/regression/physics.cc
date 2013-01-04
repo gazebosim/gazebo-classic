@@ -19,10 +19,12 @@
 #include "physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
 
+#define PHYSICS_TOL 1e-2
 using namespace gazebo;
 class PhysicsTest : public ServerFixture
 {
   public: void EmptyWorld(std::string _worldFile);
+  public: void SpawnDrop(std::string _worldFile);
 };
 
 void PhysicsTest::EmptyWorld(std::string _worldFile)
@@ -54,6 +56,90 @@ TEST_F(PhysicsTest, EmptyWorldODE)
 
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, EmptyWorldBullet)
+{
+  EmptyWorld("worlds/empty_bullet.world");
+}
+#endif // HAVE_BULLET
+
+void PhysicsTest::SpawnDrop(std::string _worldFile)
+{
+  // load an empty world
+  Load(_worldFile, true);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  math::Vector3 g = physics->GetGravity();
+  // Assume gravity vector points down z axis only.
+  EXPECT_EQ(g.x, 0);
+  EXPECT_EQ(g.y, 0);
+  EXPECT_LT(g.z, 0);
+
+  // get physics time step
+  double dt = physics->GetStepTime();
+  EXPECT_GT(dt, 0);
+
+  // spawn some simple shapes and check to see that they start falling
+  double z0 = 3;
+  SpawnBox("test_box", math::Vector3(1, 1, 1), math::Vector3(0, 0, z0),
+    math::Vector3::Zero);
+  SpawnSphere("test_sphere", math::Vector3(4, 0, z0), math::Vector3::Zero);
+  SpawnCylinder("test_cylinder", math::Vector3(8, 0, z0), math::Vector3::Zero);
+
+  std::list<std::string> model_names;
+  model_names.push_back("test_box");
+  model_names.push_back("test_sphere");
+  model_names.push_back("test_cylinder");
+ 
+  int steps = 2;
+  physics::ModelPtr model;
+  math::Pose pose1, pose2;
+  math::Vector3 vel1, vel2;
+
+  double t;
+  for (std::list<std::string>::iterator iter = model_names.begin();
+    iter != model_names.end(); ++iter)
+  {
+    // Make sure the model is loaded
+    model = world->GetModel(*iter);
+    if (model != NULL)
+    {
+      // Step once and check downward z velocity
+      world->StepWorld(1);
+      vel1 = model->GetWorldLinearVel();
+      t = world->GetSimTime().Double();
+      EXPECT_LT(vel1.z, g.z*t*(1-PHYSICS_TOL));
+      EXPECT_GT(vel1.z, g.z*t*(1+PHYSICS_TOL));
+      // Need to step at least twice to check decreasing z position
+      world->StepWorld(steps - 1);
+      pose1 = model->GetWorldPose();
+      EXPECT_LT(pose1.pos.z, (z0-g.z/2*t*t)*(1-PHYSICS_TOL));
+      EXPECT_GT(pose1.pos.z, (z0-g.z/2*t*t)*(1+PHYSICS_TOL));
+
+      // Check once more and just make sure they keep falling
+      world->StepWorld(steps);
+      vel2 = model->GetWorldLinearVel();
+      pose2 = model->GetWorldPose();
+      EXPECT_LT(vel2.z, vel1.z);
+      EXPECT_LT(pose2.pos.z, pose1.pos.z);
+    }
+    else
+    {
+      gzerr << "Error loading model " << *iter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+}
+
+TEST_F(PhysicsTest, SpawnDropODE)
+{
+  EmptyWorld("worlds/empty.world");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, SpawnDropBullet)
 {
   EmptyWorld("worlds/empty_bullet.world");
 }
