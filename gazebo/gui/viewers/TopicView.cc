@@ -27,9 +27,9 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-TopicView::TopicView(const std::string &_msgTypeName,
+TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
                      const std::string &_viewType)
-: QWidget(), msgTypeName(_msgTypeName)
+: QDialog(_parent), msgTypeName(_msgTypeName)
 {
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -85,8 +85,9 @@ TopicView::TopicView(const std::string &_msgTypeName,
   mainLayout->addLayout(infoLayout);
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
-  this->layout()->setContentsMargins(4, 4, 4, 4);
+  this->layout()->setContentsMargins(8, 8, 8, 10);
 
+  this->setSizeGripEnabled(true);
   QTimer::singleShot(500, this, SLOT(Update()));
 }
 
@@ -181,6 +182,11 @@ void TopicView::SetTopic(const std::string &_topicName)
   if (_topicName.empty())
     return;
 
+  this->msgTypeName = transport::getTopicMsgType(
+      this->node->DecodeTopicName(_topicName));
+
+  this->topicCombo->SetMsgTypeName(this->msgTypeName);
+
   this->hz = 0.0;
   this->msgSizes.clear();
   this->times.clear();
@@ -216,6 +222,12 @@ TopicCombo::TopicCombo(QWidget *_w,
 TopicCombo::~TopicCombo()
 {
   this->node.reset();
+}
+
+/////////////////////////////////////////////////
+void TopicCombo::SetMsgTypeName(const std::string &_type)
+{
+  this->msgTypeName = _type;
 }
 
 /////////////////////////////////////////////////

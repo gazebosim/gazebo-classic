@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/qt.h"
 #include "gazebo/gui/GuiTypes.hh"
 #include "gazebo/gui/viewers/ViewFactory.hh"
 
@@ -43,14 +44,15 @@ void ViewFactory::RegisterView(const std::string &_msgType,
 
 /////////////////////////////////////////////////
 TopicView *ViewFactory::NewView(const std::string &_msgType,
-                                const std::string &_topicName)
+                                const std::string &_topicName,
+                                QWidget *_parent)
 {
   TopicView *view = NULL;
 
   if (viewMap[_msgType])
-    view = (viewMap[_msgType]) ();
+    view = (viewMap[_msgType]) (_parent);
   else
-    view = new TextView(_msgType);
+    view = new TextView(_parent, _msgType);
 
   view->SetTopic(_topicName);
 

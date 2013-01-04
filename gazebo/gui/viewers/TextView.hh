@@ -38,7 +38,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _msgType Type of message to view.
-      public: TextView(const std::string &_msgType);
+      public: TextView(QWidget *_parent, const std::string &_msgType);
 
       /// \brief Destructor
       public: virtual ~TextView();

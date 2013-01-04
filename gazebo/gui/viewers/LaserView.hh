@@ -37,7 +37,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent widget.
-      public: LaserView();
+      public: LaserView(QWidget *_parent);
 
       /// \brief Destructor
       public: virtual ~LaserView();

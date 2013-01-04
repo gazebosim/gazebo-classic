@@ -43,6 +43,10 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~TopicCombo();
 
+      /// \brief Set the message type name.
+      /// \param[in] _type Name of the message type.
+      public: void SetMsgTypeName(const std::string &_type);
+
       /// \brief Inherited function from QComboBox. Called when the item
       /// list is displayed.
       public: virtual void showPopup();
@@ -60,15 +64,16 @@ namespace gazebo
       private: transport::NodePtr node;
     };
 
-    class TopicView : public QWidget
+    class TopicView : public QDialog
     {
       Q_OBJECT
 
       /// \brief Constructor
+      /// \param[in] _parent Parent QWidget.
       /// \param[in] _msgType Type of message that the viewer can display.
       /// \param[in] _parent Pointer to the parent widget.
       /// \param[in] _viewType The type of the viewer.
-      public: TopicView(const std::string &_msgType,
+      public: TopicView(QWidget *_parent, const std::string &_msgType,
                         const std::string &_viewType);
 
       /// \brief Destructor

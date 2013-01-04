@@ -27,8 +27,8 @@ using namespace gui;
 GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.ImageStamped", LaserView)
 
 /////////////////////////////////////////////////
-LaserView::LaserView()
-: TopicView("gazebo.msgs.ImageStamped", "laser")
+LaserView::LaserView(QWidget *_parent)
+: TopicView(_parent, "gazebo.msgs.ImageStamped", "laser")
 {
   this->setWindowTitle(tr("Gazebo: Laser View"));
 

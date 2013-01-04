@@ -24,6 +24,8 @@
 
 #include "gazebo/gui/GuiTypes.hh"
 
+class QWidget;
+
 namespace gazebo
 {
   /// \ingroup gazebo_views
@@ -32,7 +34,7 @@ namespace gazebo
   {
     /// \def Sensor
     /// \brief Prototype for view factory functions
-    typedef TopicView* (*ViewFactoryFn) ();
+    typedef TopicView* (*ViewFactoryFn) (QWidget *_parent);
 
     /// \addtogroup gazebo_views
     /// \{
@@ -55,14 +57,15 @@ namespace gazebo
       /// \param[in] _className Name of class of view to register.
       /// \param[in] _factoryfn Function handle for registration.
       public: static void RegisterView(const std::string &_className,
-                                        ViewFactoryFn _factoryfn);
+                                       ViewFactoryFn _factoryfn);
 
       /// \brief Create a new instance of a view.  Used by the world when
       /// reading the world file.
       /// \param[in] _className Name of view class
       /// \return Pointer to Sensor
       public: static TopicView *NewView(const std::string &_msgType,
-                                        const std::string &_topicName);
+                                        const std::string &_topicName,
+                                        QWidget *_parent = NULL);
 
       /// \brief Get all the view types
       /// \param _types Vector of strings of the view types,
@@ -80,9 +83,9 @@ namespace gazebo
     /// @param name Sensor type name, as it appears in the world file.
     /// @param classname C++ class name for the view.
     #define GZ_REGISTER_STATIC_VIEWER(msgtype, classname) \
-    TopicView *New##classname() \
+    TopicView *New##classname(QWidget *_parent) \
     { \
-      return new gazebo::gui::classname(); \
+      return new gazebo::gui::classname(_parent); \
     } \
     void Register##classname() \
     {\

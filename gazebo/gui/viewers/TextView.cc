@@ -25,8 +25,8 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-TextView::TextView(const std::string &_msgType)
-  : TopicView(_msgType, "text")
+TextView::TextView(QWidget *_parent, const std::string &_msgType)
+  : TopicView(_parent, _msgType, "text")
 {
   this->setWindowTitle(tr("Gazebo: Text View"));
 
@@ -104,7 +104,6 @@ void TextView::SetTopic(const std::string &_topicName)
           std::string("Unable to parse message of type[") +
           this->msgTypeName + "]")));
   }
-  //this->msg.reset();
 }
 
 /////////////////////////////////////////////////

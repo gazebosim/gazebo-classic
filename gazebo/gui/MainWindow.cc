@@ -217,10 +217,9 @@ void MainWindow::SelectTopic()
   std::string msgType = selector->GetMsgType();
   delete selector;
 
-
   if (!topic.empty())
   {
-    TopicView *view = ViewFactory::NewView(msgType, topic);
+    TopicView *view = ViewFactory::NewView(msgType, topic, this);
     if (view)
       view->show();
     else

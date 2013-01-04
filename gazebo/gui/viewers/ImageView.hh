@@ -37,7 +37,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent widget.
-      public: ImageView();
+      public: ImageView(QWidget *_parent=NULL);
 
       /// \brief Destructor
       public: virtual ~ImageView();
