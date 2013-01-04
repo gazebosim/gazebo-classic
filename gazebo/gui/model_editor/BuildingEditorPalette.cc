@@ -28,7 +28,9 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 {
   this->setObjectName("buildingEditorPalette");
 
-  this->modelName = "building";
+  this->modelName = "MyNamedModel";
+  this->saveLocation = QDir::homePath().toStdString();
+  this->saved = false;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
@@ -145,7 +147,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 
   QPushButton *discardButton = new QPushButton(tr("Discard"));
   connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
-  QPushButton *saveButton = new QPushButton(tr("Save"));
+  saveButton = new QPushButton(tr("Save As"));
   connect(saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
   QPushButton *finishButton = new QPushButton(tr("Finish"));
   connect(finishButton, SIGNAL(clicked()), this, SLOT(OnFinish()));
@@ -226,6 +228,10 @@ void BuildingEditorPalette::OnDiscard()
   {
     case QMessageBox::Discard:
       gui::editor::Events::discardModel();
+      this->saveButton->setText("&Save As");
+      this->modelName = "MyNamedModel";
+      this->saveLocation = QDir::homePath().toStdString();
+      this->saved = false;
       break;
     case QMessageBox::Cancel:
     // Do nothing
@@ -239,22 +245,37 @@ void BuildingEditorPalette::OnDiscard()
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnSave()
 {
-  bool ok;
-  QString text = QInputDialog::getText(this, tr("Save"),
-      tr("Please give your model a name:"), QLineEdit::Normal,
-      QString(this->modelName.c_str()), &ok);
-  if (ok && !text.isEmpty())
+  if (this->saved)
   {
-    /// TODO
+    gui::editor::Events::saveModel(this->modelName, this->saveLocation);
+  }
+  else
+  {
+    FinishModelDialog dialog(FinishModelDialog::MODEL_SAVE, this);
+    dialog.SetModelName(this->modelName);
+    dialog.SetSaveLocation(this->saveLocation);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+      this->modelName = dialog.GetModelName();
+      this->saveLocation = dialog.GetSaveLocation();
+      gui::editor::Events::saveModel(this->modelName, this->saveLocation);
+      this->saveButton->setText("Save");
+      this->saved = true;
+    }
   }
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnFinish()
 {
-  FinishModelDialog dialog(this);
+  FinishModelDialog dialog(FinishModelDialog::MODEL_FINISH, this);
+  dialog.SetModelName(this->modelName);
+  dialog.SetSaveLocation(this->saveLocation);
   if (dialog.exec() == QDialog::Accepted)
   {
-    gui::editor::Events::finishModel(dialog.GetModelName(), dialog.GetSaveLocation());
+    this->modelName = dialog.GetModelName();
+    this->saveLocation = dialog.GetSaveLocation();
+    gui::editor::Events::saveModel(this->modelName, this->saveLocation);
+    gui::editor::Events::finishModel();
   }
 }

@@ -104,7 +104,7 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
-      private: void OnFinishModel(std::string _name, std::string _location);
+      private: void OnFinishModel();
 
       private: QMenu *fileMenu;
       private: QMenu *editMenu;

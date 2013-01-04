@@ -45,6 +45,15 @@ namespace gazebo
                 { createEditorItem.Disconnect(_subscriber); }
 
         public: template<typename T>
+                static event::ConnectionPtr ConnectSaveModel(T _subscriber)
+                { return saveModel.Connect(_subscriber); }
+        /// \brief Disconnect a boost::slot to the save model signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectSaveModel(
+                    event::ConnectionPtr _subscriber)
+                { saveModel.Disconnect(_subscriber); }
+
+        public: template<typename T>
                 static event::ConnectionPtr ConnectFinishModel(T _subscriber)
                 { return finishModel.Connect(_subscriber); }
         /// \brief Disconnect a boost::slot to the finish model signal
@@ -92,9 +101,12 @@ namespace gazebo
         /// \brief An editor item is to be created
         public: static event::EventT<void (std::string)> createEditorItem;
 
-        /// \brief A model is to be created
+        /// \brief A model is to be saved
         public: static event::EventT<void (std::string, std::string)>
-            finishModel;
+            saveModel;
+
+        /// \brief A model is to be created
+        public: static event::EventT<void ()> finishModel;
 
         /// \brief A model is to be created
         public: static event::EventT<void ()> discardModel;

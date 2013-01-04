@@ -28,13 +28,19 @@ namespace gazebo
     {
       Q_OBJECT
 
-      public: FinishModelDialog(QWidget *_parent = 0);
+      public: enum FinishMode {MODEL_FINISH, MODEL_SAVE};
+
+      public: FinishModelDialog(int _mode = 0, QWidget *_parent = 0);
 
       public: ~FinishModelDialog();
 
-      public: std::string GetModelName();
+      public: std::string GetModelName() const;
 
-      public: std::string GetSaveLocation();
+      public: std::string GetSaveLocation() const;
+
+      public: void SetModelName(const std::string &_name);
+
+      public: void SetSaveLocation(const std::string &_location);
 
       private slots: void OnBrowse();
 

@@ -21,16 +21,28 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-FinishModelDialog::FinishModelDialog(QWidget *_parent)
+FinishModelDialog::FinishModelDialog(int _mode, QWidget *_parent)
   : QDialog(_parent)
 {
   this->setObjectName("finishModelDialog");
-  this->setWindowTitle(tr("Finish Model"));
+
+  if (_mode == MODEL_FINISH)
+    this->setWindowTitle(tr("Finish Model"));
+  else if (_mode == MODEL_FINISH)
+    this->setWindowTitle(tr("Save Model"));
 
   QLabel *messageLabel = new QLabel;
-  messageLabel->setText(
-      tr("Before we finalize your model, please make sure that\n"
-      "the following information is correct:\n"));
+  if (_mode == MODEL_FINISH)
+  {
+    messageLabel->setText(
+        tr("Before we finalize your model, please make sure that\n"
+        "the following information is correct:\n"));
+  }
+  else if (_mode == MODEL_SAVE)
+  {
+    messageLabel->setText(
+        tr("Please give your model a name:\n"));
+  }
 
   QLabel *modelLabel = new QLabel;
   modelLabel->setText(tr("Name"));
@@ -52,7 +64,12 @@ FinishModelDialog::FinishModelDialog(QWidget *_parent)
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
-  QPushButton *finishButton = new QPushButton(tr("&Finish"));
+
+  std::string finishButtonText = "&Finish";
+  if (_mode == MODEL_SAVE)
+      finishButtonText = "&Save";
+
+  QPushButton *finishButton = new QPushButton(tr(finishButtonText.c_str()));
   finishButton->setDefault(true);
   connect(finishButton, SIGNAL(clicked()), this, SLOT(OnFinish()));
   buttonsLayout->addWidget(cancelButton);
@@ -69,7 +86,8 @@ FinishModelDialog::FinishModelDialog(QWidget *_parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(messageLabel);
   mainLayout->addLayout(gridLayout);
-  mainLayout->addWidget(contributeCheckBox);
+  if (_mode == MODEL_FINISH)
+    mainLayout->addWidget(contributeCheckBox);
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
@@ -81,15 +99,27 @@ FinishModelDialog::~FinishModelDialog()
 }
 
 /////////////////////////////////////////////////
-std::string FinishModelDialog::GetModelName()
+std::string FinishModelDialog::GetModelName() const
 {
   return this->modelNameLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-std::string FinishModelDialog::GetSaveLocation()
+std::string FinishModelDialog::GetSaveLocation() const
 {
   return this->modelLocationLineEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+void FinishModelDialog::SetModelName(const std::string &_name)
+{
+  this->modelNameLineEdit->setText(tr(_name.c_str()));
+}
+
+/////////////////////////////////////////////////
+void FinishModelDialog::SetSaveLocation(const std::string &_location)
+{
+  this->modelLocationLineEdit->setText(tr(_location.c_str()));
 }
 
 /////////////////////////////////////////////////

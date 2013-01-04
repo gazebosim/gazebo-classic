@@ -147,7 +147,7 @@ MainWindow::MainWindow()
 
   this->connections.push_back(
       gui::editor::Events::ConnectFinishModel(
-      boost::bind(&MainWindow::OnFinishModel, this, _1, _2)));
+      boost::bind(&MainWindow::OnFinishModel, this)));
 }
 
 /////////////////////////////////////////////////
@@ -1066,7 +1066,7 @@ void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void MainWindow::OnFinishModel(std::string /*_name*/, std::string /*_location*/)
+void MainWindow::OnFinishModel()
 {
   g_editBuildingAct->setChecked(!g_editBuildingAct->isChecked());
   this->OnEditBuilding();

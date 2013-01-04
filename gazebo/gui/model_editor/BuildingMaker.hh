@@ -103,6 +103,8 @@ namespace gazebo
       /// \brief
       public: virtual void Stop();
 
+      public: void GenerateSDF();
+
       /// \brief Checks if entity is active
       public: virtual bool IsActive() const;
 
@@ -112,8 +114,6 @@ namespace gazebo
       private: bool Init();
 
       private: std::string CreateModel();
-
-      private: void GenerateSDF();
 
       private: void GenerateSDFWithCSG();
 

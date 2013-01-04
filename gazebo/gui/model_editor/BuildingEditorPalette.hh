@@ -34,8 +34,6 @@ namespace gazebo
 
 //      public: void SetEditorWidget(BuildingEditorWidget* _widget);
 
-      private: std::string modelName;
-
       /// \brief On draw wall callback.
       private slots: void OnDrawWall();
 
@@ -59,6 +57,14 @@ namespace gazebo
 
       /// \brief On finish callback.
       private slots: void OnFinish();
+
+      private: QPushButton *saveButton;
+
+      private: std::string modelName;
+
+      private: std::string saveLocation;
+
+      private: bool saved;
     };
   }
 }

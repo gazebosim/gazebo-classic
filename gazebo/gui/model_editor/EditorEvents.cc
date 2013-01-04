@@ -21,7 +21,8 @@ using namespace gazebo;
 using namespace gui;
 
 event::EventT<void (std::string)> editor::Events::createEditorItem;
-event::EventT<void (std::string, std::string)> editor::Events::finishModel;
+event::EventT<void (std::string, std::string)> editor::Events::saveModel;
+event::EventT<void ()> editor::Events::finishModel;
 event::EventT<void ()> editor::Events::discardModel;
 event::EventT<void (int)> editor::Events::changeLevel;
 event::EventT<void ()> editor::Events::addLevel;

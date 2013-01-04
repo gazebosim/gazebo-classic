@@ -718,7 +718,7 @@ void BuildingMaker::GenerateSDF()
     modelElem->InsertElement(newLinkElem);
   }
   (modelElem->AddElement("static"))->Set("true");
-  qDebug() << this->modelSDF->ToString().c_str();
+  //qDebug() << this->modelSDF->ToString().c_str();
 }
 
 /////////////////////////////////////////////////
