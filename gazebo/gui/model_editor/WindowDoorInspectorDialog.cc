@@ -45,7 +45,7 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   nameLayout->addWidget(modelNameLabel);
 
   QLabel *widthLabel = new QLabel(tr("Width: "));
-  QLabel *depthLabel = new QLabel(tr("Depth: "));
+//  QLabel *depthLabel = new QLabel(tr("Depth: "));
   QLabel *heightLabel = new QLabel(tr("Height: "));
 
   this->widthSpinBox = new QDoubleSpinBox;
@@ -69,8 +69,8 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   QGridLayout *sizeLayout = new QGridLayout;
   sizeLayout->addWidget(widthLabel, 0, 0);
   sizeLayout->addWidget(widthSpinBox, 0, 1);
-  sizeLayout->addWidget(depthLabel, 1, 0);
-  sizeLayout->addWidget(depthSpinBox, 1, 1);
+//  sizeLayout->addWidget(depthLabel, 1, 0);
+//  sizeLayout->addWidget(depthSpinBox, 1, 1);
   sizeLayout->addWidget(heightLabel, 2, 0);
   sizeLayout->addWidget(heightSpinBox, 2, 1);
 
