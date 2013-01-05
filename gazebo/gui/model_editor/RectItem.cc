@@ -519,7 +519,6 @@ void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
   this->setSelected(true);
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
   this->mousePressPos = this->mapFromScene(_event->scenePos());
-  qDebug() <<   this->mousePressPos;
   _event->setAccepted(true);
 }
 
@@ -810,6 +809,7 @@ void RectItem::SetRotation(double _angle)
 
   this->rotationAngle = _angle;
   emit yawChanged(this->rotationAngle);
+//  emit rotationChanged(0, 0, this->rotationAngle);
 }
 
 /////////////////////////////////////////////////

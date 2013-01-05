@@ -314,6 +314,7 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
       -0.5 + rise/2.0);
   baseStepVisual->SetPosition(baseOffset);
 
+
   for ( int i = 1; i < _steps; ++i)
   {
     visualStepName.str("");
@@ -322,6 +323,7 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
         visualStepName.str(), visVisual);
     stepVisual->SetPosition(math::Vector3(0, baseOffset.y-(run*i),
         baseOffset.z + rise*i));
+    stepVisual->SetRotation(baseStepVisual->GetRotation());
   }
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
@@ -527,7 +529,7 @@ void BuildingMaker::GenerateSDF()
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr wallVis = visual;
-          math::Pose wallPose = wallVis->GetWorldPose();
+          math::Pose wallPose = wallVis->GetParent()->GetWorldPose();
           math::Vector3 wallSize = wallVis->GetScale();
           for (unsigned int i = 0; i < modelManip->GetAttachedObjectCount();
               ++i)
@@ -538,8 +540,13 @@ void BuildingMaker::GenerateSDF()
                 || objName.find("Door") != std::string::npos)
             {
               rendering::VisualPtr attachedVis = attachedObj->GetVisual();
-              math::Pose offset = attachedVis->GetWorldPose() - wallPose;
+              math::Pose offset = attachedVis->GetParent()->GetWorldPose()
+                  - wallPose;
               math::Vector3 size = attachedVis->GetScale();
+
+              offset.pos.z += attachedVis->GetPosition().z
+                  - wallVis->GetPosition().z;
+
               math::Vector3 newOffset = offset.pos - (-wallSize/2.0)
                   - size/2.0;
               QRectF hole(newOffset.x, newOffset.z, size.x, size.z);
@@ -555,6 +562,7 @@ void BuildingMaker::GenerateSDF()
           newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
           newLinkElem->GetElement("pose")->Set(
               visual->GetParent()->GetWorldPose());
+          qDebug() << "newlink " << visual->GetParent()->GetWorldPose().rot.z;
           for (unsigned int i = 0; i< subdivisions.size(); ++i)
           {
             visualNameStream.str("");
@@ -571,9 +579,8 @@ void BuildingMaker::GenerateSDF()
                 + math::Vector3(subdivisions[i].x(), 0, subdivisions[i].y())
                 + math::Vector3(subdivisions[i].width()/2, 0,
                     subdivisions[i].height()/2);
-            newSubPos.z += wallVis->GetPosition().z;
-            math::Pose newPose(newSubPos,
-                 visual->GetRotation());
+            newSubPos.z += wallSize.z/2;
+            math::Pose newPose(newSubPos, math::Quaternion(0, 0, 0));
             visualElem->GetElement("pose")->Set(newPose);
             collisionElem->GetElement("pose")->Set(newPose);
             math::Vector3 blockSize(subdivisions[i].width(),
@@ -616,7 +623,8 @@ void BuildingMaker::GenerateSDF()
             if (objName.find("Stairs") != std::string::npos)
             {
               rendering::VisualPtr attachedVis = attachedObj->GetVisual();
-              math::Pose offset = attachedVis->GetWorldPose() - floorPose;
+              math::Pose offset = attachedVis->GetParent()->GetWorldPose()
+                  - floorPose;
               math::Vector3 size = attachedVis->GetScale();
 
               QRectF rect(0, 0, size.x, size.y);
@@ -657,7 +665,7 @@ void BuildingMaker::GenerateSDF()
                 + math::Vector3(subdivisions[i].width()/2,
                 subdivisions[i].height()/2, 0);
             newSubPos.z += floorVis->GetPosition().z;
-            math::Pose newPose(newSubPos, visual->GetRotation());
+            math::Pose newPose(newSubPos, visual->GetParent()->GetRotation());
             visualElem->GetElement("pose")->Set(newPose);
             collisionElem->GetElement("pose")->Set(newPose);
             math::Vector3 blockSize(subdivisions[i].width(),
@@ -703,7 +711,7 @@ void BuildingMaker::GenerateSDF()
         collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
         rendering::VisualPtr childVisual = visual->GetChild(i);
         math::Pose newPose(childVisual->GetWorldPose().pos,
-            visual->GetRotation());
+            visual->GetParent()->GetRotation());
         visualElem->GetElement("pose")->Set(newPose);
         collisionElem->GetElement("pose")->Set(newPose);
         visualElem->GetElement("geometry")->GetElement("box")->

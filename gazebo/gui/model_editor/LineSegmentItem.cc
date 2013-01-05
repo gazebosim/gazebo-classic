@@ -194,7 +194,7 @@ QVector3D LineSegmentItem::GetScenePosition()
 /////////////////////////////////////////////////
 double LineSegmentItem::GetSceneRotation()
 {
-  return this->line().angle();
+  return -this->line().angle();
 }
 
 /////////////////////////////////////////////////
@@ -207,7 +207,7 @@ void LineSegmentItem::LineChanged()
       + (this->end - this->start)/2.0);
   emit posXChanged(centerPos.x());
   emit posYChanged(centerPos.y());
-  emit rotationChanged(0, 0, this->line().angle());
+  emit rotationChanged(0, 0, -this->line().angle());
 }
 
 /////////////////////////////////////////////////
