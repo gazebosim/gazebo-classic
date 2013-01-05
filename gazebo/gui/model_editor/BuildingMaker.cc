@@ -562,7 +562,6 @@ void BuildingMaker::GenerateSDF()
           newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
           newLinkElem->GetElement("pose")->Set(
               visual->GetParent()->GetWorldPose());
-          qDebug() << "newlink " << visual->GetParent()->GetWorldPose().rot.z;
           for (unsigned int i = 0; i< subdivisions.size(); ++i)
           {
             visualNameStream.str("");
