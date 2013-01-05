@@ -40,7 +40,8 @@ ODESliderJoint::ODESliderJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODESliderJoint::~ODESliderJoint()
 {
-  physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  if (this->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
 //////////////////////////////////////////////////
@@ -100,8 +101,9 @@ void ODESliderJoint::SetDamping(int /*index*/, double _damping)
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetForce(int /*index*/, double _force)
+void ODESliderJoint::SetForce(int _index, double _force)
 {
+  ODEJoint::SetForce(_index, _force);
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)

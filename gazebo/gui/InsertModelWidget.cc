@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-#define BOOST_FILESYSTEM_VERSION 2
 
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
@@ -210,13 +209,12 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
     for (std::vector<boost::filesystem::path>::iterator dIter = paths.begin();
         dIter != paths.end(); ++dIter)
     {
-      // This is for boost::filesystem version 3+
       std::string modelName;
-      std::string fullPath = _path + "/" + dIter->filename();
-      std::string manifest = fullPath + "/manifest.xml";
+      boost::filesystem::path fullPath = _path / dIter->filename();
+      boost::filesystem::path manifest = fullPath / "manifest.xml";
 
       TiXmlDocument xmlDoc;
-      if (xmlDoc.LoadFile(manifest))
+      if (xmlDoc.LoadFile(manifest.string()))
       {
         TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
         if (!modelXML || !modelXML->FirstChildElement("name"))
@@ -229,7 +227,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
             QStringList(QString::fromStdString(modelName)));
 
         childItem->setData(0, Qt::UserRole,
-            QVariant((std::string("file://") + fullPath).c_str()));
+            QVariant((std::string("file://") + fullPath.string()).c_str()));
 
         this->fileTreeWidget->addTopLevelItem(childItem);
       }

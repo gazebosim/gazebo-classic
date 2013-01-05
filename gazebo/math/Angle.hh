@@ -78,15 +78,7 @@ namespace gazebo
 
     /// \brief Get the angle in radians
     /// \return double containing the angle's radian value
-    public: double GetAsRadian() const __attribute__((deprecated));
-
-    /// \brief Get the angle in radians
-    /// \return double containing the angle's radian value
     public: double Radian() const;
-
-    /// \brief Get the angle in degrees
-    /// \return double containing the angle's degree value
-    public: double GetAsDegree() const __attribute__((deprecated));
 
     /// \brief Get the angle in degrees
     /// \return double containing the angle's degree value

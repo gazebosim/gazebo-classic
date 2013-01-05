@@ -15,27 +15,31 @@
  *
  */
 
-#include "gazebo.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "common/Events.hh"
+#include "gazebo/gui/TopicSelector.hh"
+#include "gazebo/gui/viewers/ViewFactory.hh"
+#include "gazebo/gui/viewers/TopicView.hh"
+#include "gazebo/gui/viewers/ImageView.hh"
 
-#include "transport/Node.hh"
-#include "transport/Transport.hh"
+#include "gazebo/gazebo.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Events.hh"
 
-#include "rendering/UserCamera.hh"
-#include "rendering/RenderEvents.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Transport.hh"
 
-#include "gui/Actions.hh"
-#include "gui/Gui.hh"
-#include "gui/InsertModelWidget.hh"
-#include "gui/SkyWidget.hh"
-#include "gui/ModelListWidget.hh"
-#include "gui/RenderWidget.hh"
-#include "gui/ToolsWidget.hh"
-#include "gui/GLWidget.hh"
-#include "gui/MainWindow.hh"
-#include "gui/GuiEvents.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/InsertModelWidget.hh"
+#include "gazebo/gui/ModelListWidget.hh"
+#include "gazebo/gui/RenderWidget.hh"
+#include "gazebo/gui/ToolsWidget.hh"
+#include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/GuiEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -129,6 +133,8 @@ MainWindow::MainWindow()
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&MainWindow::OnSetSelectedEntity, this, _1, _2)));
+
+  gui::ViewFactory::RegisterAll();
 }
 
 /////////////////////////////////////////////////
@@ -139,7 +145,7 @@ MainWindow::~MainWindow()
 /////////////////////////////////////////////////
 void MainWindow::Load()
 {
-  this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this);
+  this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
 }
 
 /////////////////////////////////////////////////
@@ -203,6 +209,25 @@ void MainWindow::New()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::SelectTopic()
+{
+  TopicSelector *selector = new TopicSelector();
+  selector->exec();
+  std::string topic = selector->GetTopic();
+  std::string msgType = selector->GetMsgType();
+  delete selector;
+
+  if (!topic.empty())
+  {
+    TopicView *view = ViewFactory::NewView(msgType, topic, this);
+    if (view)
+      view->show();
+    else
+      gzerr << "Unable to create viewer for message type[" << msgType << "]\n";
+  }
+}
+
+/////////////////////////////////////////////////
 void MainWindow::Open()
 {
   std::string filename = QFileDialog::getOpenFileName(this,
@@ -236,26 +261,58 @@ void MainWindow::Import()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::Save()
-{
-  msgs::ServerControl msg;
-  msg.set_save_world_name(get_world());
-  this->serverControlPub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
 void MainWindow::SaveAs()
 {
   std::string filename = QFileDialog::getSaveFileName(this,
       tr("Save World"), QString(),
       tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
 
-  if (!filename.empty())
+  // Return if the user has canceled.
+  if (filename.empty())
+    return;
+
+  g_saveAct->setEnabled(true);
+  this->saveFilename = filename;
+  this->Save();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Save()
+{
+  // Get the latest world in SDF.
+  boost::shared_ptr<msgs::Response> response =
+    transport::request(get_world(), "world_sdf");
+
+  msgs::GzString msg;
+
+  // Make sure the response is correct
+  if (response->response() != "error" && response->type() == msg.GetTypeName())
   {
-    msgs::ServerControl msg;
-    msg.set_save_world_name(get_world());
-    msg.set_save_filename(filename);
-    this->serverControlPub->Publish(msg);
+    // Parse the response
+    msg.ParseFromString(response->serialized_data());
+
+    // Open the file
+    std::ofstream out(this->saveFilename.c_str(), std::ios::out);
+
+    if (!out)
+    {
+      QMessageBox msgBox;
+      std::string str = "Unable to open file: " + this->saveFilename + "\n";
+      str += "Check file permissions.";
+      msgBox.setText(str.c_str());
+      msgBox.exec();
+    }
+    else
+      out << msg.data();
+
+    out.close();
+  }
+  else
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Unable to save world.\n"
+                   "Unable to retrieve SDF world description from server.");
+    msgBox.exec();
   }
 }
 
@@ -426,42 +483,98 @@ void MainWindow::OnFullScreen(bool _value)
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ViewReset()
+void MainWindow::Reset()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->SetWorldPose(math::Pose(5, -5, 2, 0, GZ_DTOR(11.31), GZ_DTOR(135)));
+
+  math::Vector3 camPos(5, -5, 2);
+  math::Vector3 lookAt(0, 0, 0);
+  math::Vector3 delta = camPos - lookAt;
+
+  double yaw = atan2(delta.x, delta.y);
+  double pitch = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+  cam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ViewGrid()
+void MainWindow::ShowCollisions()
+{
+  if (g_showCollisionsAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_collision", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_collision", "all");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowGrid()
 {
   msgs::Scene msg;
   msg.set_name("default");
-  msg.set_grid(g_viewGridAct->isChecked());
+  msg.set_grid(g_showGridAct->isChecked());
   this->scenePub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ViewContacts()
+void MainWindow::ShowJoints()
 {
-  gazebo::rendering::Events::viewContacts(g_viewContactsAct->isChecked());
+  if (g_showJointsAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_joints", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_joints", "all");
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ViewFullScreen()
+void MainWindow::SetTransparent()
+{
+  if (g_transparentAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "set_transparent", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "set_opaque", "all");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowCOM()
+{
+  if (g_showCOMAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_com", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_com", "all");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowContacts()
+{
+  if (g_showContactsAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_contact", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_contact", "all");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::FullScreen()
 {
   g_fullscreen = !g_fullscreen;
   gui::Events::fullScreen(g_fullscreen);
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ViewFPS()
+void MainWindow::FPS()
 {
   gui::Events::fps();
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ViewOrbit()
+void MainWindow::Orbit()
 {
   gui::Events::orbit();
 }
@@ -475,6 +588,11 @@ void MainWindow::CreateActions()
   connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
   */
 
+  g_topicVisAct = new QAction(tr("Topic Visualization"), this);
+  g_topicVisAct->setShortcut(tr("Ctrl+T"));
+  g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
+  connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
+
   g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
   g_openAct->setStatusTip(tr("Open an world file"));
@@ -486,12 +604,11 @@ void MainWindow::CreateActions()
   connect(g_importAct, SIGNAL(triggered()), this, SLOT(Import()));
   */
 
-  /*
   g_saveAct = new QAction(tr("&Save World"), this);
   g_saveAct->setShortcut(tr("Ctrl+S"));
   g_saveAct->setStatusTip(tr("Save world"));
+  g_saveAct->setEnabled(false);
   connect(g_saveAct, SIGNAL(triggered()), this, SLOT(Save()));
-  */
 
   g_saveAsAct = new QAction(tr("Save World &As"), this);
   g_saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
@@ -608,37 +725,66 @@ void MainWindow::CreateActions()
   connect(g_dirLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateDirectionalLight()));
 
-  g_viewResetAct = new QAction(tr("Reset View"), this);
-  g_viewResetAct->setStatusTip(tr("Move camera to pose"));
-  connect(g_viewResetAct, SIGNAL(triggered()), this,
-      SLOT(ViewReset()));
+  g_resetAct = new QAction(tr("Reset Camera"), this);
+  g_resetAct->setStatusTip(tr("Move camera to pose"));
+  connect(g_resetAct, SIGNAL(triggered()), this,
+      SLOT(Reset()));
 
-  g_viewGridAct = new QAction(tr("Grid"), this);
-  g_viewGridAct->setStatusTip(tr("View Grid"));
-  g_viewGridAct->setCheckable(true);
-  g_viewGridAct->setChecked(true);
-  connect(g_viewGridAct, SIGNAL(triggered()), this,
-          SLOT(ViewGrid()));
+  g_showCollisionsAct = new QAction(tr("Collisions"), this);
+  g_showCollisionsAct->setStatusTip(tr("Show Collisions"));
+  g_showCollisionsAct->setCheckable(true);
+  g_showCollisionsAct->setChecked(false);
+  connect(g_showCollisionsAct, SIGNAL(triggered()), this,
+          SLOT(ShowCollisions()));
 
-  g_viewContactsAct = new QAction(tr("Contacts"), this);
-  g_viewContactsAct->setStatusTip(tr("View Contacts"));
-  g_viewContactsAct->setCheckable(true);
-  g_viewContactsAct->setChecked(false);
-  connect(g_viewContactsAct, SIGNAL(triggered()), this,
-          SLOT(ViewContacts()));
+  g_showGridAct = new QAction(tr("Grid"), this);
+  g_showGridAct->setStatusTip(tr("Show Grid"));
+  g_showGridAct->setCheckable(true);
+  g_showGridAct->setChecked(true);
+  connect(g_showGridAct, SIGNAL(triggered()), this,
+          SLOT(ShowGrid()));
 
-  g_viewFullScreenAct = new QAction(tr("Full Screen"), this);
-  g_viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
-  connect(g_viewFullScreenAct, SIGNAL(triggered()), this,
-      SLOT(ViewFullScreen()));
+  g_transparentAct = new QAction(tr("Transparent"), this);
+  g_transparentAct->setStatusTip(tr("Transparent"));
+  g_transparentAct->setCheckable(true);
+  g_transparentAct->setChecked(false);
+  connect(g_transparentAct, SIGNAL(triggered()), this,
+          SLOT(SetTransparent()));
 
-  // g_viewFPSAct = new QAction(tr("FPS View Control"), this);
-  // g_viewFPSAct->setStatusTip(tr("First Person Shooter View Style"));
-  // connect(g_viewFPSAct, SIGNAL(triggered()), this, SLOT(ViewFPS()));
+  g_showCOMAct = new QAction(tr("Center of Mass"), this);
+  g_showCOMAct->setStatusTip(tr("Show COM"));
+  g_showCOMAct->setCheckable(true);
+  g_showCOMAct->setChecked(false);
+  connect(g_showCOMAct, SIGNAL(triggered()), this,
+          SLOT(ShowCOM()));
 
-  g_viewOrbitAct = new QAction(tr("Orbit View Control"), this);
-  g_viewOrbitAct->setStatusTip(tr("Orbit View Style"));
-  connect(g_viewOrbitAct, SIGNAL(triggered()), this, SLOT(ViewOrbit()));
+  g_showContactsAct = new QAction(tr("Contacts"), this);
+  g_showContactsAct->setStatusTip(tr("Show Contacts"));
+  g_showContactsAct->setCheckable(true);
+  g_showContactsAct->setChecked(false);
+  connect(g_showContactsAct, SIGNAL(triggered()), this,
+          SLOT(ShowContacts()));
+
+  g_showJointsAct = new QAction(tr("Joints"), this);
+  g_showJointsAct->setStatusTip(tr("Show Joints"));
+  g_showJointsAct->setCheckable(true);
+  g_showJointsAct->setChecked(false);
+  connect(g_showJointsAct, SIGNAL(triggered()), this,
+          SLOT(ShowJoints()));
+
+
+  g_fullScreenAct = new QAction(tr("Full Screen"), this);
+  g_fullScreenAct->setStatusTip(tr("Full Screen(F-11 to exit)"));
+  connect(g_fullScreenAct, SIGNAL(triggered()), this,
+      SLOT(FullScreen()));
+
+  // g_fpsAct = new QAction(tr("FPS View Control"), this);
+  // g_fpsAct->setStatusTip(tr("First Person Shooter View Style"));
+  // connect(g_fpsAct, SIGNAL(triggered()), this, SLOT(FPS()));
+
+  g_orbitAct = new QAction(tr("Orbit View Control"), this);
+  g_orbitAct->setStatusTip(tr("Orbit View Style"));
+  connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 }
 
 /////////////////////////////////////////////////
@@ -659,33 +805,43 @@ void MainWindow::CreateMenus()
 
   this->setMenuWidget(frame);
 
-  this->fileMenu = this->menuBar->addMenu(tr("&File"));
-  // this->fileMenu->addAction(g_openAct);
-  // this->fileMenu->addAction(g_importAct);
-  // this->fileMenu->addAction(g_newAct);
-  // this->fileMenu->addAction(g_saveAct);
-  this->fileMenu->addAction(g_saveAsAct);
-  this->fileMenu->addSeparator();
-  this->fileMenu->addAction(g_quitAct);
+  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  // fileMenu->addAction(g_openAct);
+  // fileMenu->addAction(g_importAct);
+  // fileMenu->addAction(g_newAct);
+  fileMenu->addAction(g_saveAct);
+  fileMenu->addAction(g_saveAsAct);
+  fileMenu->addSeparator();
+  fileMenu->addAction(g_quitAct);
 
-  this->editMenu = this->menuBar->addMenu(tr("&Edit"));
-  this->editMenu->addAction(g_resetModelsAct);
-  this->editMenu->addAction(g_resetWorldAct);
+  QMenu *editMenu = this->menuBar->addMenu(tr("&Edit"));
+  editMenu->addAction(g_resetModelsAct);
+  editMenu->addAction(g_resetWorldAct);
 
-  this->viewMenu = this->menuBar->addMenu(tr("&View"));
-  this->viewMenu->addAction(g_viewGridAct);
-  this->viewMenu->addAction(g_viewContactsAct);
-  this->viewMenu->addSeparator();
-  this->viewMenu->addAction(g_viewResetAct);
-  this->viewMenu->addAction(g_viewFullScreenAct);
-  this->viewMenu->addSeparator();
-  // this->viewMenu->addAction(g_viewFPSAct);
-  this->viewMenu->addAction(g_viewOrbitAct);
+  QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
+  viewMenu->addAction(g_showGridAct);
+  viewMenu->addSeparator();
+
+  viewMenu->addAction(g_transparentAct);
+  viewMenu->addAction(g_showCollisionsAct);
+  viewMenu->addAction(g_showJointsAct);
+  viewMenu->addAction(g_showCOMAct);
+  viewMenu->addAction(g_showContactsAct);
+  viewMenu->addSeparator();
+
+  viewMenu->addAction(g_resetAct);
+  viewMenu->addAction(g_fullScreenAct);
+  viewMenu->addSeparator();
+  // viewMenu->addAction(g_fpsAct);
+  viewMenu->addAction(g_orbitAct);
+
+  QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
+  windowMenu->addAction(g_topicVisAct);
 
   this->menuBar->addSeparator();
 
-  this->helpMenu = this->menuBar->addMenu(tr("&Help"));
-  this->helpMenu->addAction(g_aboutAct);
+  QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
+  helpMenu->addAction(g_aboutAct);
 }
 
 /////////////////////////////////////////////////
@@ -717,7 +873,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 {
   if (_msg->has_fullscreen() && _msg->fullscreen())
   {
-    ViewFullScreen();
+    this->FullScreen();
   }
 
   if (_msg->has_camera())

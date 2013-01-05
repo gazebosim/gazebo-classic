@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#define BOOST_FILESYSTEM_VERSION 2
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -359,7 +358,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
   {
     if (strcmp(gazeboNode->Attribute("version"), SDF::version.c_str()) != 0)
     {
-      gzwarn << "Converting a deprecatd SDF source[" << _source << "].\n";
+      gzwarn << "Converting a deprecated SDF source[" << _source << "].\n";
       Converter::Convert(_xmlDoc, SDF::version);
     }
 
@@ -411,7 +410,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
     if (strcmp(gazeboNode->Attribute("version"),
                SDF::version.c_str()) != 0)
     {
-      gzwarn << "Converting a deprecatd SDF source[" << _source << "].\n";
+      gzwarn << "Converting a deprecated SDF source[" << _source << "].\n";
       Converter::Convert(_xmlDoc, SDF::version);
     }
 

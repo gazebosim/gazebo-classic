@@ -52,6 +52,7 @@ namespace gazebo
 
       private: void OnGUI(ConstGUIPtr &_msg);
 
+
       private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
       private slots: void Open();
@@ -76,14 +77,21 @@ namespace gazebo
       private slots: void CreateSpotLight();
       private slots: void CreateDirectionalLight();
       private slots: void InsertModel();
-      private slots: void ViewGrid();
-      private slots: void ViewContacts();
-      private slots: void ViewReset();
-      private slots: void ViewFullScreen();
-      private slots: void ViewFPS();
-      private slots: void ViewOrbit();
+      private slots: void ShowGrid();
+      private slots: void ShowCollisions();
+      private slots: void ShowJoints();
+      private slots: void ShowContacts();
+      private slots: void ShowCOM();
+      private slots: void Reset();
+      private slots: void FullScreen();
+      private slots: void FPS();
+      private slots: void Orbit();
       private slots: void OnResetModelOnly();
       private slots: void OnResetWorld();
+      private slots: void SetTransparent();
+
+      /// \brief Callback when topic selection action.
+      private slots: void SelectTopic();
 
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);
@@ -100,10 +108,6 @@ namespace gazebo
                                         const std::string &_mode);
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
-      private: QMenu *fileMenu;
-      private: QMenu *editMenu;
-      private: QMenu *viewMenu;
-      private: QMenu *helpMenu;
       private: QToolBar *playToolbar;
 
       private: RenderWidget *renderWidget;
@@ -133,6 +137,10 @@ namespace gazebo
       // private: QTreeWidget *treeWidget;
       private: QTabWidget *tabWidget;
       private: QMenuBar *menuBar;
+
+      /// \brief The filename set via "Save As". This filename is used by
+      /// the "Save" feature.
+      private: std::string saveFilename;
     };
 
     class TreeViewDelegate: public QItemDelegate

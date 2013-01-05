@@ -183,6 +183,7 @@ void Image::GetRGBData(unsigned char **_data, unsigned int &_count) const
 {
   FIBITMAP *tmp = FreeImage_ConvertTo24Bits(this->bitmap);
   this->GetDataImpl(_data, _count, tmp);
+  FreeImage_Unload(tmp);
 }
 
 //////////////////////////////////////////////////
@@ -391,7 +392,7 @@ std::string Image::GetFilename() const
 //////////////////////////////////////////////////
 Image::PixelFormat Image::GetPixelFormat() const
 {
-  Image::PixelFormat fmt = UNKNOWN;
+  Image::PixelFormat fmt = UNKNOWN_PIXEL_FORMAT;
   FREE_IMAGE_TYPE type = FreeImage_GetImageType(this->bitmap);
 
   unsigned int redMask = FreeImage_GetRedMask(this->bitmap);
@@ -417,3 +418,20 @@ Image::PixelFormat Image::GetPixelFormat() const
 
   return fmt;
 }
+
+/////////////////////////////////////////////////
+Image::PixelFormat Image::ConvertPixelFormat(const std::string &_format)
+{
+  // Handle old format strings
+  if (_format == "L8" || _format == "L_INT8")
+    return L_INT8;
+  else if (_format == "R8G8B8" || _format == "RGB_INT8")
+    return RGB_INT8;
+
+  for (unsigned int i = 0; i < PIXEL_FORMAT_COUNT; ++i)
+    if (PixelFormatNames[i] == _format)
+      return static_cast<PixelFormat>(i);
+
+  return UNKNOWN_PIXEL_FORMAT;
+}
+

@@ -21,6 +21,7 @@
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/Image.hh"
 
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -163,10 +164,14 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
       msgs::Set(msg.mutable_time(), this->world->GetSimTime());
       msg.mutable_image()->set_width(this->camera->GetImageWidth());
       msg.mutable_image()->set_height(this->camera->GetImageHeight());
-      // msg.mutable_image()->set_pixel_format(this->camera->GetImageFormat());
-      msg.mutable_image()->set_step(this->camera->GetImageWidth() * 3);
+      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+            this->camera->GetImageFormat()));
+
+      msg.mutable_image()->set_step(this->camera->GetImageWidth() *
+          this->camera->GetImageDepth());
       msg.mutable_image()->set_data(this->camera->GetImageData(),
-          msg.image().width() * 3 * msg.image().height());
+          msg.image().width() * this->camera->GetImageDepth() *
+          msg.image().height());
       this->imagePub->Publish(msg);
     }
   }
@@ -199,4 +204,10 @@ bool CameraSensor::SaveFrame(const std::string &_filename)
 {
   this->SetActive(true);
   return this->camera->SaveFrame(_filename);
+}
+
+//////////////////////////////////////////////////
+bool CameraSensor::IsActive()
+{
+  return Sensor::IsActive() || this->imagePub->HasConnections();
 }

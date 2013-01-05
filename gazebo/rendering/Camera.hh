@@ -223,7 +223,7 @@ namespace gazebo
       /// \return Depth of the image
       public: unsigned int GetImageDepth() const;
 
-      /// \brief Get the height of the image
+      /// \brief Get the string representation of the image format.
       /// \return String representation of the image format.
       public: std::string GetImageFormat() const;
 
@@ -320,6 +320,10 @@ namespace gazebo
       /// \return The scene node the camera is attached to
       public: Ogre::SceneNode *GetSceneNode() const;
 
+      /// \brief Get the camera's pitch scene node
+      /// \return The pitch node the camera is attached to
+      public: Ogre::SceneNode *GetPitchNode() const;
+
       /// \brief Get a pointer to the image data
       ///
       /// Get the raw image data from a camera's buffer.
@@ -346,7 +350,7 @@ namespace gazebo
       /// through the viewport
       /// \param[in] _screenx X coordinate in the camera's viewport, in pixels.
       /// \param[in] _screeny Y coordinate in the camera's viewport, in pixels.
-      /// \param[out] _origin Origing in the world coordinate frame of the
+      /// \param[out] _origin Origin in the world coordinate frame of the
       /// resulting ray
       /// \param[out] _dir Direction of the resulting ray
       public: void GetCameraToViewportRay(int _screenx, int _screeny,
@@ -448,6 +452,9 @@ namespace gazebo
       /// \brief Returns true if initialized
       /// \return Ture if the camera is initialized
       public: bool GetInitialized() const;
+
+      /// \brief Return true if the camera is moving due to an animation.
+      public: bool IsAnimating() const;
 
       /// \brief Move the camera to a position (this is an animated motion).
       /// \sa Camera::MoveToPositions

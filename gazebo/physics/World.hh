@@ -196,9 +196,6 @@ namespace gazebo
       /// \return A pointer to the entity, or NULL if no entity was found.
       public: BasePtr GetByName(const std::string &_name);
 
-      /// \brief Deprecated
-      public: ModelPtr GetModelByName(const std::string &name)GAZEBO_DEPRECATED;
-
       /// \brief Get a model by name.
       ///
       /// This function is the same as GetByName, but limits the search to
@@ -206,10 +203,6 @@ namespace gazebo
       /// \param[in] _name The name of the Model to find.
       /// \return A pointer to the Model, or NULL if no model was found.
       public: ModelPtr GetModel(const std::string &_name);
-
-      /// \brief Deprecated
-      public: EntityPtr GetEntityByName(
-                  const std::string &_name) GAZEBO_DEPRECATED;
 
       /// \brief Get a pointer to an Entity based on a name.
       ///
@@ -306,6 +299,15 @@ namespace gazebo
 
       /// \brief Update the state SDF value from the current state.
       public: void UpdateStateSDF();
+
+      /// \brief Return true if the world has been loaded.
+      /// \return True if World::Load has completed.
+      public: bool IsLoaded() const;
+
+      /// \brief Enqueue a pose message for publication.
+      /// These messages will be transmitted at the end of every iteration.
+      /// \param[in] _msg The message to enqueue.
+      public: void EnqueueMsg(msgs::Pose *_msg);
 
       /// \brief Get a model by id.
       ///
@@ -408,15 +410,19 @@ namespace gazebo
       private: void FillModelMsg(msgs::Model &_msg, ModelPtr _model);
 
       /// \brief Process all recieved entity messages.
+      /// Must only be called from the World::ProcessMessages function.
       private: void ProcessEntityMsgs();
 
       /// \brief Process all recieved request messages.
+      /// Must only be called from the World::ProcessMessages function.
       private: void ProcessRequestMsgs();
 
       /// \brief Process all recieved factory messages.
+      /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
 
       /// \brief Process all recieved model messages.
+      /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
 
       /// \brief Log callback. This is where we write out state info.
@@ -491,6 +497,9 @@ namespace gazebo
       /// \brief Publisher for light messages.
       private: transport::PublisherPtr lightPub;
 
+      /// \brief Publisher for pose messages.
+      private: transport::PublisherPtr posePub;
+
       /// \brief Subscriber to world control messages.
       private: transport::SubscriberPtr controlSub;
 
@@ -528,7 +537,7 @@ namespace gazebo
       private: common::Time realTimeOffset;
 
       /// \brief Mutext to protect incoming message buffers.
-      private: boost::mutex *receiveMutex;
+      private: boost::recursive_mutex *receiveMutex;
 
       /// \brief Mutex to protext loading of models.
       private: boost::mutex *loadModelMutex;
@@ -585,6 +594,9 @@ namespace gazebo
       /// \brief True if the world has been initialized.
       private: bool initialized;
 
+      /// \brief True if the world has been loaded.
+      private: bool loaded;
+
       /// \brief True to enable the physics engine.
       private: bool enablePhysicsEngine;
 
@@ -614,6 +626,9 @@ namespace gazebo
       /// \brief Store a factory SDF object to improve speed at which
       /// objects are inserted via the factory.
       private: sdf::SDFPtr factorySDF;
+
+      /// \brief The list of pose messages to output.
+      private: msgs::Pose_V poseMsgs;
     };
     /// \}
   }

@@ -18,7 +18,6 @@
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
-#define BOOST_FILESYSTEM_VERSION 2
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -354,11 +353,6 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/Plugin_BSPSceneManager");
     plugins.push_back(path+"/Plugin_OctreeSceneManager");
 
-    // This is needed by the Ogre::Terrain System.
-    // We should spend some tim fixing Ogre::Terrain so that GLSL is
-    // supported.
-    plugins.push_back(path+"/Plugin_CgProgramManager");
-
     for (piter = plugins.begin(); piter!= plugins.end(); ++piter)
     {
       try
@@ -380,13 +374,6 @@ void RenderEngine::LoadPlugins()
             gzerr << "Unable to load Ogre Plugin[" << *piter
                   << "]. Rendering will not be possible."
                   << "Make sure you have installed OGRE and Gazebo properly.\n";
-          }
-          else if ((*piter).find("CgProgramManager") != std::string::npos)
-          {
-            gzwarn << "Unable to load Ogre Plugin[" << *piter
-                   << "]Heightmaps(Terrain) will not display properly."
-                   << "You'll need to install Ogre3d from source."
-                   << "Please visit www.ogre3d.org.\n";
           }
         }
       }
@@ -436,13 +423,13 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
         for (std::vector<boost::filesystem::path>::iterator dIter =
             paths.begin(); dIter != paths.end(); ++dIter)
         {
-          if (dIter->filename().find(".material") != std::string::npos)
+          if (dIter->filename().extension() == ".material")
           {
-            std::string fullPath = path + "/" + dIter->filename();
+            boost::filesystem::path fullPath = path / dIter->filename();
 
             Ogre::DataStreamPtr stream =
               Ogre::ResourceGroupManager::getSingleton().openResource(
-                  fullPath, "General");
+                  fullPath.string(), "General");
 
             // There is a material file under there somewhere, read the thing in
             try
@@ -450,7 +437,8 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
               Ogre::MaterialManager::getSingleton().parseScript(
                   stream, "General");
               Ogre::MaterialPtr matPtr =
-                Ogre::MaterialManager::getSingleton().getByName(fullPath);
+                Ogre::MaterialManager::getSingleton().getByName(
+                    fullPath.string());
 
               if (!matPtr.isNull())
               {
@@ -694,18 +682,23 @@ void RenderEngine::CheckSystemCapabilities()
   bool hasGLSL =
     std::find(profiles.begin(), profiles.end(), "glsl") != profiles.end();
 
-  if (!hasGLSL || !hasFBO)
-  {
-    gzerr << "Your machine does not meet the minimal rendering requirements.\n";
-    if (!hasGLSL)
-      gzerr << "   GLSL is missing.\n";
-    if (!hasFBO)
-      gzerr << "   Frame Buffer Objects (FBO) is missing.\n";
-  }
+  if (!hasFragmentPrograms || !hasVertexPrograms)
+    gzwarn << "Vertex and fragment shaders are missing. "
+           << "Fixed function rendering will be used.\n";
 
-  if (hasVertexPrograms && hasFragmentPrograms)
+  if (!hasGLSL)
+    gzwarn << "GLSL is missing."
+           << "Fixed function rendering will be used.\n";
+
+  if (!hasFBO)
+    gzwarn << "Frame Buffer Objects (FBO) is missing. "
+           << "Rendering will be disabled.\n";
+
+  this->renderPathType = RenderEngine::NONE;
+
+  if (hasFBO && hasGLSL && hasVertexPrograms && hasFragmentPrograms)
     this->renderPathType = RenderEngine::FORWARD;
-  else
+  else if (hasFBO)
     this->renderPathType = RenderEngine::VERTEX;
 
   // Disable deferred rendering for now. Needs more work.

@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "gazebo/rendering/ogre_gazebo.h"
+
 #include "common/Image.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
@@ -69,6 +71,10 @@ namespace gazebo
       /// \return The height at the specified location
       public: double GetHeight(double _x, double _y, double _z = 1000);
 
+      /// \brief Get a pointer to the OGRE terrain group object.
+      /// \return Pointer to the OGRE terrain.
+      public: Ogre::TerrainGroup *GetOgreTerrain() const;
+
       /// \brief Initialize all the blend material maps.
       /// \param[in] _terrain The terrain to initialize the blend maps.
       private: bool InitBlendMaps(Ogre::Terrain *_terrain);
@@ -80,6 +86,10 @@ namespace gazebo
       /// \param[in] _x X coordinate of the terrain.
       /// \param[in] _y Y coordinate of the terrain.
       private: void DefineTerrain(int _x, int _y);
+
+      /// \brief Internal function used to setup shadows for the terrain.
+      /// \param[in] _enabled True to enable shadows.
+      private: void SetupShadows(bool _enabled);
 
       /// \brief The scene.
       private: ScenePtr scene;
@@ -124,6 +134,171 @@ namespace gazebo
       private: std::vector<double> blendFade;
     };
     /// \}
+
+    /// \internal
+    /// \brief Custom terrain material generator for GLSL terrains.
+    class GzTerrainMatGen : public Ogre::TerrainMaterialGeneratorA
+    {
+      /// \brief Constructor
+      public: GzTerrainMatGen();
+
+      /// \brief Destructor
+      public: virtual ~GzTerrainMatGen();
+
+      /// \brief Shader model 2 profile target.
+      public: class SM2Profile :
+              public Ogre::TerrainMaterialGeneratorA::SM2Profile
+      {
+        /// \brief Constructor
+        public: SM2Profile(Ogre::TerrainMaterialGenerator *_parent,
+                    const Ogre::String &_name, const Ogre::String &_desc);
+
+        /// \brief Destructor
+        public: virtual ~SM2Profile();
+
+        public: Ogre::MaterialPtr generate(const Ogre::Terrain *_terrain);
+
+        public: Ogre::MaterialPtr generateForCompositeMap(
+                    const Ogre::Terrain *_terrain);
+
+        public: void UpdateParams(const Ogre::MaterialPtr &_mat,
+                                  const Ogre::Terrain *_terrain);
+
+        public: void UpdateParamsForCompositeMap(const Ogre::MaterialPtr &_mat,
+                                                 const Ogre::Terrain *_terrain);
+
+        protected: virtual void addTechnique(const Ogre::MaterialPtr &_mat,
+                       const Ogre::Terrain *_terrain, TechniqueType _tt);
+
+        /// \brief Utility class to help with generating shaders for GLSL.
+        protected: class ShaderHelperGLSL :
+            public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL
+        {
+          public: virtual Ogre::HighLevelGpuProgramPtr generateVertexProgram(
+                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                      TechniqueType _tt);
+
+          public: virtual Ogre::HighLevelGpuProgramPtr generateFragmentProgram(
+                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                      TechniqueType _tt);
+
+          public: virtual void updateParams(const SM2Profile *_prof,
+                      const Ogre::MaterialPtr &_mat,
+                      const Ogre::Terrain *_terrain, bool _compositeMap);
+
+          protected: virtual void generateVpHeader(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateVpFooter(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateVertexProgramSource(
+                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                         TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void defaultVpParams(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         const Ogre::HighLevelGpuProgramPtr &_prog);
+
+          protected: virtual unsigned int generateVpDynamicShadowsParams(
+                         unsigned int _texCoordStart, const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateVpDynamicShadows(
+                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                         TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFpHeader(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain,
+                         TechniqueType tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFpLayer(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType tt,
+                         Ogre::uint _layer,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFpFooter(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain,
+                         TechniqueType tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFpDynamicShadowsParams(
+                         Ogre::uint *_texCoord, Ogre::uint *_sampler,
+                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                         TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFpDynamicShadowsHelpers(
+                         const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain,
+                         TechniqueType tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: void generateFpDynamicShadows(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFragmentProgramSource(
+                         const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain,
+                         TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void updateVpParams(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         const Ogre::GpuProgramParametersSharedPtr &_params);
+
+          private: Ogre::String GetChannel(Ogre::uint _idx);
+        };
+
+        /// Keeping the CG shader for reference.
+        /// Utility class to help with generating shaders for Cg / HLSL.
+        protected: class ShaderHelperCg :
+            public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg
+        {
+          public: virtual Ogre::HighLevelGpuProgramPtr generateFragmentProgram(
+                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                      TechniqueType _tt);
+
+          public: virtual Ogre::HighLevelGpuProgramPtr generateVertexProgram(
+                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                      TechniqueType _tt);
+
+          protected: virtual void generateVpHeader(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateVpFooter(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateVertexProgramSource(
+                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                         TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void defaultVpParams(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         const Ogre::HighLevelGpuProgramPtr &_prog);
+
+          protected: virtual unsigned int generateVpDynamicShadowsParams(
+                         unsigned int _texCoordStart, const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateVpDynamicShadows(
+                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                         TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+        };
+      };
+    };
   }
 }
 #endif

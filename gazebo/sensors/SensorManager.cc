@@ -67,7 +67,7 @@ void SensorManager::RunLoop()
 }
 
 //////////////////////////////////////////////////
-void SensorManager::Update(bool force)
+void SensorManager::Update(bool _force)
 {
   Sensor_V::iterator iter;
   Sensor_V::iterator end;
@@ -97,7 +97,7 @@ void SensorManager::Update(bool force)
     end = this->sensors.end();
     for (iter = this->sensors.begin(); iter != end; ++iter)
     {
-      (*iter)->Update(force);
+      (*iter)->Update(_force);
     }
   }
 }

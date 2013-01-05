@@ -18,6 +18,15 @@
 #ifndef TEST_SCANS_CMP_H_
 #define TEST_SCANS_CMP_H_
 
+#ifdef __GNUC__
+    #define MAYBE_UNUSED __attribute__((used))
+#elif defined _MSC_VER
+    #pragma warning(disable: Cxxxxx)
+    #define MAYBE_UNUSED
+#else
+    #define MAYBE_UNUSED
+#endif
+
 static double __box_scan[] = {
 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000,
 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000,
@@ -147,7 +156,7 @@ static double __box_scan[] = {
 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000,
 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000,
 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000};
-static double *box_scan = __box_scan;
+static double *box_scan MAYBE_UNUSED = __box_scan;
 
 static double __plane_scan[] = {
 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000,
@@ -278,6 +287,6 @@ static double __plane_scan[] = {
 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000,
 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000,
 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000, 10.0000000000};
-static double *plane_scan = __plane_scan;
+static double *plane_scan MAYBE_UNUSED = __plane_scan;
 
 #endif

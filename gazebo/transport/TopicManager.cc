@@ -280,7 +280,23 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
       // send data to a Publication.
       PublicationTransportPtr publink(new PublicationTransport(_pub.topic(),
             _pub.msg_type()));
-      publink->Init(conn);
+
+      bool latched = false;
+      SubNodeMap::iterator nodeIter = this->subscribedNodes.find(_pub.topic());
+
+      // Find if any local node has a latched subscriber for the new topic
+      // publication transport.
+      if (nodeIter != this->subscribedNodes.end())
+      {
+        std::list<NodePtr>::iterator cbIter;
+        for (cbIter = nodeIter->second.begin();
+             cbIter != nodeIter->second.end() && !latched; ++cbIter)
+        {
+          latched = (*cbIter)->HasLatchedSubscriber(_pub.topic());
+        }
+      }
+
+      publink->Init(conn, latched);
 
       publication->AddTransport(publink);
     }
@@ -351,6 +367,24 @@ void TopicManager::RegisterTopicNamespace(const std::string &_name)
 void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 {
   ConnectionManager::Instance()->GetTopicNamespaces(_namespaces);
+}
+
+//////////////////////////////////////////////////
+std::map<std::string, std::list<std::string> >
+TopicManager::GetAdvertisedTopics() const
+{
+  std::map<std::string, std::list<std::string> > result;
+  std::list<msgs::Publish> publishers;
+
+  ConnectionManager::Instance()->GetAllPublishers(publishers);
+
+  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
+      iter != publishers.end(); ++iter)
+  {
+    result[(*iter).msg_type()].push_back((*iter).topic());
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////

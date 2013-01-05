@@ -230,10 +230,9 @@ unsigned int ContactSensor::GetCollisionContactCount(
 }
 
 //////////////////////////////////////////////////
-physics::Contact ContactSensor::GetCollisionContact(
-    const std::string & /*_collisionName*/, unsigned int /*_index*/) const
+msgs::Contacts ContactSensor::GetContacts() const
 {
-  return physics::Contact();
+  return this->contactsMsg;
 }
 
 //////////////////////////////////////////////////

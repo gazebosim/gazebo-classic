@@ -47,8 +47,10 @@ namespace gazebo
       public: virtual ~PublicationTransport();
 
       /// \brief Initialize the transport
-      /// \param[in] _conn The underlying connection
-      public: void Init(const ConnectionPtr &_conn);
+      /// \param[in] _conn The underlying connection.
+      /// \param[in] _latched True to grab the last message sent on the
+      /// topic.
+      public: void Init(const ConnectionPtr &_conn, bool _latched);
 
       /// \brief Finalize the transport
       public: void Fini();

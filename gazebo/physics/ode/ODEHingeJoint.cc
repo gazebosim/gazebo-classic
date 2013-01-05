@@ -40,7 +40,8 @@ ODEHingeJoint::ODEHingeJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEHingeJoint::~ODEHingeJoint()
 {
-  physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  if (this->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
 //////////////////////////////////////////////////
@@ -139,8 +140,9 @@ double ODEHingeJoint::GetMaxForce(int /*index*/)
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetForce(int /*index*/, double _torque)
+void ODEHingeJoint::SetForce(int _index, double _torque)
 {
+  ODEJoint::SetForce(_index, _torque);
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
