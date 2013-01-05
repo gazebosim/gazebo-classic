@@ -291,7 +291,7 @@ if (PKG_CONFIG_FOUND)
     set (HAVE_GTS TRUE)
   else ()
     set (HAVE_GTS FALSE)
-    BUILD_WARNING ("GNU Triangulation Surface library not found - model editor will not be built.")
+    BUILD_WARNING ("GNU Triangulation Surface library not found - Gazebo will not have CSG support.")
   endif ()
 
   #################################################
