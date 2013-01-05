@@ -56,9 +56,6 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   BulletLinkPtr bulletParentLink =
     boost::shared_static_cast<BulletLink>(this->parentLink);
 
-  if (!bulletChildLink || !bulletParentLink)
-    gzthrow("Requires bullet bodies");
-
   sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
   math::Vector3 axis = axisElem->GetValueVector3("xyz");
 
@@ -78,13 +75,30 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   axisB = this->childLink->GetWorldPose().rot.RotateVectorReverse(axis);
   axisB = axisB.Round();
 
-  this->btHinge = new btHingeConstraint(
-      *bulletParentLink->GetBulletLink(),
-      *bulletChildLink->GetBulletLink(),
-      btVector3(pivotA.x, pivotA.y, pivotA.z),
-      btVector3(pivotB.x, pivotB.y, pivotB.z),
-      btVector3(axisA.x, axisA.y, axisA.z),
-      btVector3(axisB.x, axisB.y, axisB.z));
+  
+  if (bulletChildLink && bulletParentLink)
+    this->btHinge = new btHingeConstraint(
+        *bulletParentLink->GetBulletLink(),
+        *bulletChildLink->GetBulletLink(),
+        btVector3(pivotA.x, pivotA.y, pivotA.z),
+        btVector3(pivotB.x, pivotB.y, pivotB.z),
+        btVector3(axisA.x, axisA.y, axisA.z),
+        btVector3(axisB.x, axisB.y, axisB.z));
+  else if (bulletChildLink)
+    this->btHinge = new btHingeConstraint(
+        *bulletChildLink->GetBulletLink(),
+        btVector3(pivotB.x, pivotB.y, pivotB.z),
+        btVector3(axisB.x, axisB.y, axisB.z));
+  else if (bulletParentLink)
+    this->btHinge = new btHingeConstraint(
+        *bulletParentLink->GetBulletLink(),
+        btVector3(pivotA.x, pivotA.y, pivotA.z),
+        btVector3(axisA.x, axisA.y, axisA.z));
+  else
+  {
+    gzerr << "joint without links\n";
+    gzthrow("joint without links\n");
+  }
 
   this->constraint = this->btHinge;
 
