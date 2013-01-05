@@ -64,6 +64,9 @@ namespace gazebo
 
       public: void Update();
 
+      private: QVariant itemChange(GraphicsItemChange _change,
+          const QVariant &_value);
+
       private: void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
 
       private: void hoverMoveEvent(QGraphicsSceneHoverEvent *_event);

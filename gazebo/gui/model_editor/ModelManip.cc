@@ -247,14 +247,10 @@ void ModelManip::OnPosZChanged(double _posZ)
 /////////////////////////////////////////////////
 void ModelManip::OnYawChanged(double _yaw)
 {
-  // Rotation around the object's local center;
-  // TODO this is different from ModelManip::SetRotation which rotates the
-  // object around the parent's center (mainly needed by polylines due to the
-  // way user draws walls). Need to change this for consistency
   double newYaw = BuildingMaker::ConvertAngle(_yaw);
   math::Vector3 angles = this->visual->GetRotation().GetAsEuler();
   angles.z = -newYaw;
-  this->visual->SetRotation(angles);
+  this->visual->GetParent()->SetRotation(angles);
 }
 
 /////////////////////////////////////////////////
@@ -295,7 +291,7 @@ void ModelManip::SetRotation(double _roll, double _pitch, double _yaw)
   double yawRad = BuildingMaker::ConvertAngle(_yaw);
 
   this->visual->GetParent()->SetRotation(
-      math::Quaternion(rollRad, pitchRad, yawRad));
+      math::Quaternion(rollRad, pitchRad, -yawRad));
 }
 
 /////////////////////////////////////////////////

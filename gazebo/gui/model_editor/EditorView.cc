@@ -324,33 +324,48 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
     for (int i = 0; i < selectedItems.size(); ++i)
     {
       EditorItem *item = dynamic_cast<EditorItem *>(selectedItems[i]);
-      if (item->GetType() == "Wall")
+      if (item)
       {
-        wallList.erase(std::remove(wallList.begin(), wallList.end(),
-            dynamic_cast<WallItem *>(item)), wallList.end());
+        if (item->GetType() == "Wall")
+        {
+          wallList.erase(std::remove(wallList.begin(), wallList.end(),
+              dynamic_cast<WallItem *>(item)), wallList.end());
+        }
+        else if (item->GetType() == "Window")
+        {
+          windowList.erase(std::remove(windowList.begin(), windowList.end(),
+              dynamic_cast<WindowItem *>(item)), windowList.end());
+        }
+        else if (item->GetType() == "Door")
+        {
+          doorList.erase(std::remove(doorList.begin(), doorList.end(),
+              dynamic_cast<DoorItem *>(item)), doorList.end());
+        }
+        else if (item->GetType() == "Stairs")
+        {
+          stairsList.erase(std::remove(stairsList.begin(), stairsList.end(),
+              dynamic_cast<StairsItem *>(item)), stairsList.end());
+        }
+        else if (item->GetType() == "Floor")
+        {
+          floorList.erase(std::remove(floorList.begin(), floorList.end(),
+              dynamic_cast<FloorItem *>(item)), floorList.end());
+        }
+
+        if (item->GetType() == "Line")
+        {
+          EditorItem *itemParent = dynamic_cast<EditorItem *>(
+              selectedItems[i]->parentItem());
+          wallList.erase(std::remove(wallList.begin(), wallList.end(),
+              dynamic_cast<WallItem *>(itemParent)), wallList.end());
+          this->itemToModelMap.erase(item);
+          delete itemParent;
+        }
+        else {
+          this->itemToModelMap.erase(item);
+          delete selectedItems[i];
+        }
       }
-      else if (item->GetType() == "Window")
-      {
-        windowList.erase(std::remove(windowList.begin(), windowList.end(),
-            dynamic_cast<WindowItem *>(item)), windowList.end());
-      }
-      else if (item->GetType() == "Door")
-      {
-        doorList.erase(std::remove(doorList.begin(), doorList.end(),
-            dynamic_cast<DoorItem *>(item)), doorList.end());
-      }
-      else if (item->GetType() == "Stairs")
-      {
-        stairsList.erase(std::remove(stairsList.begin(), stairsList.end(),
-            dynamic_cast<StairsItem *>(item)), stairsList.end());
-      }
-      else if (item->GetType() == "Floor")
-      {
-        floorList.erase(std::remove(floorList.begin(), floorList.end(),
-            dynamic_cast<FloorItem *>(item)), floorList.end());
-      }
-      this->itemToModelMap.erase(item);
-      delete selectedItems[i];
     }
     this->drawMode = NONE;
     this->drawInProgress = false;

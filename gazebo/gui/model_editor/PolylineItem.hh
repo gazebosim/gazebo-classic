@@ -76,6 +76,8 @@ namespace gazebo
 
       private: void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
 
+      private: void hoverMoveEvent(QGraphicsSceneHoverEvent *_event);
+
       private: void hoverLeaveEvent(QGraphicsSceneHoverEvent *_event);
 
       private: void mouseReleaseEvent(QGraphicsSceneMouseEvent *_event);

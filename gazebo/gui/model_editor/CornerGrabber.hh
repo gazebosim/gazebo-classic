@@ -28,38 +28,37 @@ namespace gazebo
     {
       public: explicit CornerGrabber(QGraphicsItem *_parent = 0, int index = 0);
 
-      public: int GetIndex();
+      public: int GetIndex() const;
 
       /// \brief Set the current mouse state
-      public: void SetMouseState(int _state);
+      public: void SetMouseState(const int &_state);
 
       /// \brief Retrieve the current mouse state
-      public: int  GetMouseState();
+      public: int  GetMouseState() const;
 
-      public: QPointF GetCenterPoint();
+      public: QPointF GetCenterPoint() const;
 
-      public: void SetMouseDownX(double _x);
+      public: void SetMouseDownX(const double &_x);
 
-      public: void SetMouseDownY(double _y);
+      public: void SetMouseDownY(const double &_y);
 
-      public: double GetMouseDownX();
+      public: double GetMouseDownX() const;
 
-      public: double GetMouseDownY();
+      public: double GetMouseDownY() const;
 
-      public: void SetWidth(double _width);
+      public: void SetWidth(const double &_width);
 
-      public: void SetHeight(double _height);
+      public: void SetHeight(const double &_height);
 
-      public: double GetWidth();
+      public: double GetWidth() const;
 
-      public: double GetHeight();
+      public: double GetHeight() const;
 
-      public: void SetColor(QColor color);
+      public: void SetColor(const QColor &color);
 
-      public: QColor GetColor();
+      public: QColor GetColor() const;
 
-      /// \brief Mouse states
-      public: enum mouseStates {kMouseReleased=0, kMouseDown, kMouseMoving};
+      public: void SetBorderColor(const QColor &_borderColor);
 
       public: virtual QRectF boundingRect() const;
 
@@ -86,7 +85,8 @@ namespace gazebo
 
       private: double mouseDownY;
 
-      /// \brief the hover event handlers will toggle this between red and black
+      private: QColor handleColor;
+
       private: QColor borderColor;
 
       private: double width;

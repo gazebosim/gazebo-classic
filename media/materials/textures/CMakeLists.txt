@@ -1,4 +1,4 @@
-set (files 
+set (files
   beigeWall.jpg
   ceiling_tiled.jpg
   clouds.jpg

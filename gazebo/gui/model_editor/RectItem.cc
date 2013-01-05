@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/math/Angle.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/CornerGrabber.hh"
 #include "gazebo/gui/model_editor/RotateHandle.hh"
@@ -505,7 +506,6 @@ void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
   this->location.setY( (static_cast<int>(this->location.y())
       / this->gridSpace) * this->gridSpace);*/
 
-//  this->SetPosition(this->location);
   this->mousePressPos = QPointF(0, 0);
   _event->setAccepted(true);
 }
@@ -518,7 +518,6 @@ void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 
   this->setSelected(true);
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
-//  this->location = this->pos();
   this->mousePressPos = this->mapFromScene(_event->scenePos());
   _event->setAccepted(true);
 }
@@ -533,8 +532,18 @@ void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 //  this->SetPosition(this->scenePos() + delta);
 //  this->location += delta;
 //  this->SetPosition(this->location);
-  this->SetPosition(this->pos()
-    + this->mapFromScene(_event->scenePos()) - mousePressPos);
+
+  // keep track of mouse press pos for more accurate mouse movements than
+  // purely relying on mouse translations because we expect items to rotate
+  // arbitrary (snap to parent items) when dragged
+  QPointF trans = this->mapFromScene(_event->scenePos()) - this->mousePressPos;
+  QPointF rotatedTrans;
+  rotatedTrans.setX(cos(GZ_DTOR(this->rotationAngle))*-trans.x()
+    - sin(GZ_DTOR(this->rotationAngle))*-trans.y());
+  rotatedTrans.setY(sin(GZ_DTOR(this->rotationAngle))*-trans.x()
+    + cos(GZ_DTOR(this->rotationAngle))*-trans.y());
+
+  this->SetPosition(this->pos() - rotatedTrans);
 }
 
 /////////////////////////////////////////////////
@@ -800,6 +809,7 @@ void RectItem::SetRotation(double _angle)
 
   this->rotationAngle = _angle;
   emit yawChanged(this->rotationAngle);
+//  emit rotationChanged(0, 0, this->rotationAngle);
 }
 
 /////////////////////////////////////////////////

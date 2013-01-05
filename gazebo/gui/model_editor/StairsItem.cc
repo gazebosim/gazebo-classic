@@ -156,22 +156,18 @@ bool StairsItem::rotateEventFilter(RotateHandle *_rotate,
     // limit stairs to right angles until there is proper csg support
     double angle = line.angle();
     double range = 25;
+    double angleToRotate = this->rotationAngle;
     if (angle > (90 - range) && (angle < 90 + range))
-    {
-      this->SetRotation(0);
-    }
+      angleToRotate = 0;
     else if (angle > (180 - range) && (angle < 180 + range))
-    {
-      this->SetRotation(-90);
-    }
+      angleToRotate = -90;
     else if (angle > (270 - range) && (angle < 270 + range))
-    {
-      this->SetRotation(180);
-    }
+      angleToRotate = 180;
     else if (angle > (360 - range) || (angle < 0 + range))
-    {
-      this->SetRotation(90);
-    }
+      angleToRotate = 90;
+
+    if (fabs(angleToRotate - this->rotationAngle) > 0)
+      this->SetRotation(angleToRotate);
   }
   return true;
 }
@@ -237,7 +233,7 @@ void StairsItem::OnApply()
 
   QPointF startPos = this->stairsPos * this->scale;
   startPos.setY(-startPos.y());
- this->SetSize(QSize(dialog->GetWidth() / this->scale,
+  this->SetSize(QSize(dialog->GetWidth() / this->scale,
       dialog->GetDepth() / this->scale));
   this->stairsWidth = dialog->GetWidth() / this->scale;
   this->stairsHeight = dialog->GetHeight() / this->scale;
@@ -286,9 +282,9 @@ void StairsItem::StairsChanged()
 /////////////////////////////////////////////////
 void StairsItem::StepsChanged()
 {
-    // emit a signal to delete 3d and make a new one
-    // TODO there should be a more efficient way to do this.
-    emit itemDeleted();
-    dynamic_cast<EditorView *>((this->scene()->views())[0])->CreateItem3D(this);
-    this->StairsChanged();
+  // emit a signal to delete 3d and make a new one
+  // TODO there should be a more efficient way to do this.
+  emit itemDeleted();
+  dynamic_cast<EditorView *>((this->scene()->views())[0])->CreateItem3D(this);
+  this->StairsChanged();
 }

@@ -38,90 +38,91 @@ CornerGrabber::CornerGrabber(QGraphicsItem *_parent, int _index) :
   this->setZValue(_parent->zValue() + 1);
 //  this->setZValue(5);
   this->setAcceptHoverEvents(true);
-  this->borderColor = Qt::black;
+  this->handleColor = Qt::black;
+  this->borderColor = QColor(247, 142, 30);
 }
 
 /////////////////////////////////////////////////
-int CornerGrabber::GetIndex()
+int CornerGrabber::GetIndex() const
 {
   return this->index;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetMouseState(int _state)
+void CornerGrabber::SetMouseState(const int &_state)
 {
   this->mouseButtonState = _state;
 }
 
 /////////////////////////////////////////////////
-int CornerGrabber::GetMouseState()
+int CornerGrabber::GetMouseState() const
 {
   return this->mouseButtonState;
 }
 
 /////////////////////////////////////////////////
-QPointF CornerGrabber::GetCenterPoint()
+QPointF CornerGrabber::GetCenterPoint() const
 {
   return QPointF(pos().x() + (this->width + this->widthGrabBuffer/2),
       pos().y() + (this->height + this->heightGrabBuffer)/2);
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetWidth(double _width)
+void CornerGrabber::SetWidth(const double &_width)
 {
   this->width = _width;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetHeight(double _height)
+void CornerGrabber::SetHeight(const double &_height)
 {
   this->height = _height;
 }
 
 /////////////////////////////////////////////////
-double CornerGrabber::GetWidth()
+double CornerGrabber::GetWidth() const
 {
   return this->width;
 }
 
 /////////////////////////////////////////////////
-double CornerGrabber::GetHeight()
+double CornerGrabber::GetHeight() const
 {
   return this->height;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetColor(QColor color)
+void CornerGrabber::SetColor(const QColor &color)
 {
-  this->borderColor = color;
+  this->handleColor = color;
 }
 
 /////////////////////////////////////////////////
-QColor CornerGrabber::GetColor()
+QColor CornerGrabber::GetColor() const
 {
-  return this->borderColor;
+  return this->handleColor;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetMouseDownX(double _x)
+void CornerGrabber::SetMouseDownX(const double &_x)
 {
   this->mouseDownX = _x;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetMouseDownY(double _y)
+void CornerGrabber::SetMouseDownY(const double &_y)
 {
   this->mouseDownY = _y;
 }
 
 /////////////////////////////////////////////////
-qreal CornerGrabber::GetMouseDownX()
+double CornerGrabber::GetMouseDownX() const
 {
   return this->mouseDownX;
 }
 
 /////////////////////////////////////////////////
-qreal CornerGrabber::GetMouseDownY()
+double CornerGrabber::GetMouseDownY() const
 {
   return this->mouseDownY;
 }
@@ -181,6 +182,12 @@ QRectF CornerGrabber::boundingRect() const
 }
 
 /////////////////////////////////////////////////
+void CornerGrabber::SetBorderColor(const QColor &_borderColor)
+{
+  this->borderColor = _borderColor;
+}
+
+/////////////////////////////////////////////////
 void CornerGrabber::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
   QWidget *)
 {
@@ -191,7 +198,7 @@ void CornerGrabber::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
 
   QPen borderPen;
   borderPen.setWidth(1);
-  borderPen.setColor(this->borderColor);
+  borderPen.setColor(this->handleColor);
 
   borderPen.setCapStyle(Qt::SquareCap);
   borderPen.setStyle(Qt::SolidLine);
@@ -202,10 +209,14 @@ void CornerGrabber::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
   QPointF bottomRight (totalWidth/2.0 + this->width/2.0,
       totalHeight/2.0 + this->height/2.0);
 
+  QRectF borderRect (topLeft - QPointF(1, 1), bottomRight + QPointF(1, 1));
   QRectF rect (topLeft, bottomRight);
 
   QBrush brush (Qt::SolidPattern);
   brush.setColor (this->borderColor);
+  _painter->fillRect(borderRect, brush);
+  brush.setColor (this->handleColor);
   _painter->fillRect(rect, brush);
+
   _painter->restore();
 }
