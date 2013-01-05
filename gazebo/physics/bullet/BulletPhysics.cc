@@ -307,8 +307,11 @@ void BulletPhysics::Reset()
 //////////////////////////////////////////////////
 void BulletPhysics::SetStepTime(double _value)
 {
-  this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetAttribute("dt")->Set(_value);
+  if (this->sdf->HasElement("bullet") &&
+      this->sdf->GetElement("bullet")->HasElement("dt"))
+    this->sdf->GetElement("bullet")->GetElement("dt")->Set(_value);
+  else
+    gzerr << "Unable to set bullet step time\n";
 
   this->stepTimeDouble = _value;
 }
