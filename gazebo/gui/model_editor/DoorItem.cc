@@ -55,7 +55,7 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
 
-  this->openInspectorAct = new QAction(tr("&Open Dooor Inspector"), this);
+  this->openInspectorAct = new QAction(tr("&Open Door Inspector"), this);
   this->openInspectorAct->setStatusTip(tr("Open Door Inspector"));
   connect(this->openInspectorAct, SIGNAL(triggered()),
     this, SLOT(OnOpenInspector()));
