@@ -18,6 +18,7 @@
 #define _LASERVIEW_HH_
 
 #include <string>
+#include <boost/thread/mutex.hpp>
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -50,7 +51,37 @@ namespace gazebo
 
       /// \brief Receives incoming laser scan messages.
       /// \param[in] _msg New laser scan message.
-      private: void OnScan(ConstLaserScantampedPtr &_msg);
+      private: void OnScan(ConstLaserScanStampedPtr &_msg);
+
+      private: class LaserItem : public QGraphicsItem
+               {
+                 public: LaserItem();
+
+                 public: void ClearPoints();
+
+                 public: unsigned int GetPointCount();
+
+                 public: void AddPoint(const math::Vector2d &_pt);
+
+                 public: void SetPoint(unsigned int _index,
+                                       const math::Vector2d &_pt);
+
+                 public: QRectF GetBoundingRect() const;
+
+                 private: virtual QRectF boundingRect() const;
+
+                 private: virtual void paint (QPainter *_painter,
+                              const QStyleOptionGraphicsItem *_option,
+                              QWidget *_widget);
+
+                 private: std::vector<math::Vector2d> points;
+
+                 /// \brief Mutex to protect the laser data.
+                 private: boost::mutex mutex;
+               };
+
+      private: LaserItem *laserItem;
+      private: QGraphicsView *view;
     };
   }
 }
