@@ -28,6 +28,13 @@ class PhysicsTest : public ServerFixture
   public: void SimplePendulum(std::string _worldFile);
 };
 
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, FirstTest)
+{
+  SimplePendulum("worlds/simple_pendulums_bullet.world");
+}
+#endif // HAVE_BULLET
+
 void PhysicsTest::EmptyWorld(std::string _worldFile)
 {
   // Load an empty world

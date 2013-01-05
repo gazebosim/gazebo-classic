@@ -62,17 +62,22 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   math::Vector3 pivotA, pivotB, axisA, axisB;
 
   // Compute the pivot point, based on the anchorPos
-  pivotA = this->anchorPos + this->childLink->GetWorldPose().pos
-                           - this->parentLink->GetWorldPose().pos;
+  pivotA = this->anchorPos;
   pivotB = this->anchorPos;
+  if (this->parentLink)
+  {
+    pivotA -= this->parentLink->GetWorldPose().pos;
+    pivotA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(pivotA);
+    axisA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(axis);
+  }
+  if (this->childLink)
+  {
+    pivotA += this->childLink->GetWorldPose().pos;
+    pivotB = this->childLink->GetWorldPose().rot.RotateVectorReverse(pivotB);
+    axisB = this->childLink->GetWorldPose().rot.RotateVectorReverse(axis);
+  }
 
-  pivotA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(pivotA);
-  pivotB = this->childLink->GetWorldPose().rot.RotateVectorReverse(pivotB);
-
-  axisA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(axis);
   axisA = axisA.Round();
-
-  axisB = this->childLink->GetWorldPose().rot.RotateVectorReverse(axis);
   axisB = axisB.Round();
 
   
@@ -145,12 +150,14 @@ void BulletHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetAngle(int /*_index*/) const
+math::Angle BulletHingeJoint::GetAngleImpl(int /*_index*/) const
 {
+  math::Angle result;
   if (this->btHinge)
-    return this->btHinge->getHingeAngle();
+    result = this->btHinge->getHingeAngle();
   else
-    gzthrow("Joint has not been created");
+    gzerr << "btHinge does not yet exist, returning default angle\n";
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -267,13 +274,17 @@ math::Angle BulletHingeJoint::GetLowStop(int /*_index*/)
 //////////////////////////////////////////////////
 math::Vector3 BulletHingeJoint::GetGlobalAxis(int /*_index*/) const
 {
-  gzerr << "BulletHingeJoint::GetGlobalAxis not implemented\n";
-  return math::Vector3();
-}
-
-//////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetAngleImpl(int /*_index*/) const
-{
-  gzerr << "BulletHingeJoint::GetAngleImpl not implemented\n";
-  return math::Angle();
+  math::Vector3 result;
+  if (this->btHinge)
+  {
+    btVector3 vec =
+      btHinge->getRigidBodyA().getCenterOfMassTransform().getBasis() *
+      btHinge->getFrameOffsetA().getBasis().getColumn(2);
+    result.x = vec.getX();
+    result.y = vec.getY();
+    result.z = vec.getZ();
+  }
+  else
+    gzerr << "btHinge does not exist, returning fake axis\n";
+  return result;
 }
