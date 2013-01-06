@@ -40,13 +40,13 @@ namespace gazebo
 
       public: ~StairsItem();
 
-      public: virtual QVector3D GetSize();
+      public: virtual QVector3D GetSize() const;
 
-      public: virtual QVector3D GetScenePosition();
+      public: virtual QVector3D GetScenePosition() const;
 
-      public: virtual double GetSceneRotation();
+      public: virtual double GetSceneRotation() const;
 
-      public: int GetSteps();
+      public: int GetSteps() const;
 
       private: virtual void paint (QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);

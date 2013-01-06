@@ -16,10 +16,11 @@
 */
 
 #include "gazebo/gui/model_editor/BuildingItem.hh"
+#include "gazebo/gui/model_editor/EditorItem.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
-#include "gazebo/gui/model_editor/DoorItem.hh"
 #include "gazebo/gui/model_editor/WindowDoorInspectorDialog.hh"
 #include "gazebo/gui/model_editor/BuildingMaker.hh"
+#include "gazebo/gui/model_editor/DoorItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -70,20 +71,20 @@ DoorItem::~DoorItem()
 }
 
 /////////////////////////////////////////////////
-QVector3D DoorItem::GetSize()
+QVector3D DoorItem::GetSize() const
 {
   return QVector3D(this->doorWidth, this->doorDepth, this->doorHeight);
 }
 
 /////////////////////////////////////////////////
-QVector3D DoorItem::GetScenePosition()
+QVector3D DoorItem::GetScenePosition() const
 {
   return QVector3D(this->scenePos().x(), this->scenePos().y(),
       this->doorElevation);
 }
 
 /////////////////////////////////////////////////
-double DoorItem::GetSceneRotation()
+double DoorItem::GetSceneRotation() const
 {
   return this->rotationAngle;
 }
@@ -94,7 +95,7 @@ void DoorItem::paint (QPainter *_painter,
 {
   if (this->isSelected())
     this->DrawBoundingBox(_painter);
-  this->showCorners(this->isSelected());
+  this->ShowCorners(this->isSelected());
 
   QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
       this->drawingOriginY - this->drawingHeight/2);

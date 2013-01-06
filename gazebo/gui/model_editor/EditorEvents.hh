@@ -19,9 +19,6 @@
 
 #include <string>
 #include "gazebo/common/Event.hh"
-/*#include "msgs/msgs.hh"
-#include "math/Vector3.hh"
-#include "math/Pose.hh"*/
 
 namespace gazebo
 {

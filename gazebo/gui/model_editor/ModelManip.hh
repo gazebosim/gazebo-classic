@@ -32,19 +32,19 @@ namespace gazebo
       Q_OBJECT
       public: ModelManip();
 
-      public: ~ModelManip();
+      public: virtual ~ModelManip();
 
-      public: void SetName(std::string _name);
+      public: void SetName(const std::string &_name);
 
-      public: void SetVisual(rendering::VisualPtr _visual);
+      public: void SetVisual(const rendering::VisualPtr &_visual);
 
-      public: std::string GetName();
+      public: std::string GetName() const;
 
-      public: rendering::VisualPtr GetVisual();
+      public: rendering::VisualPtr GetVisual() const;
 
       public: void SetMaker(BuildingMaker *_maker);
 
-      public: ModelManip *GetParent();
+      public: ModelManip *GetParent() const;
 
       public: void AttachObject(ModelManip *_object);
 
@@ -54,13 +54,13 @@ namespace gazebo
 
       public: void DetachFromParent();
 
-      public: ModelManip *GetAttachedObject(unsigned int _index);
+      public: ModelManip *GetAttachedObject(unsigned int _index) const;
 
-      public: unsigned int GetAttachedObjectCount();
+      public: unsigned int GetAttachedObjectCount() const;
 
-      public: bool IsAttached();
+      public: bool IsAttached() const;
 
-      public: math::Vector3 Convert(math::Vector3 _vector);
+      public: math::Vector3 Convert(const math::Vector3 &_vector);
 
       public: void SetPose(double _x, double _y, double _z,
           double _roll, double _pitch, double _yaw);

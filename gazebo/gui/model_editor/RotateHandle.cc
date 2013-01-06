@@ -43,7 +43,7 @@ void RotateHandle::SetMouseState(int _state)
 }
 
 /////////////////////////////////////////////////
-int RotateHandle::GetMouseState()
+int RotateHandle::GetMouseState() const
 {
   return this->mouseButtonState;
 }
@@ -61,13 +61,13 @@ void RotateHandle::SetMouseDownY(double _y)
 }
 
 /////////////////////////////////////////////////
-qreal RotateHandle::GetMouseDownX()
+double RotateHandle::GetMouseDownX() const
 {
   return this->mouseDownX;
 }
 
 /////////////////////////////////////////////////
-qreal RotateHandle::GetMouseDownY()
+double RotateHandle::GetMouseDownY() const
 {
   return this->mouseDownY;
 }

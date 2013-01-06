@@ -19,7 +19,6 @@
 #define _LINE_SEGMENT_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/model_editor/EditorItem.hh"
 
 namespace gazebo
 {
@@ -34,33 +33,33 @@ namespace gazebo
 
       public: ~LineSegmentItem();
 
-      public: void SetLine(QPointF _start, QPointF _end);
+      public: void SetLine(const QPointF &_start, const QPointF &_end);
 
-      public: void SetStartPoint(QPointF _start);
+      public: void SetStartPoint(const QPointF &_start);
 
-      public: void SetEndPoint(QPointF _end);
+      public: void SetEndPoint(const QPointF &_end);
 
-      public: int GetIndex();
+      public: int GetIndex() const;
 
-      public: QVector3D GetSize();
+      public: QVector3D GetSize() const;
 
-      public: QVector3D GetScenePosition();
+      public: QVector3D GetScenePosition() const;
 
-      public: double GetSceneRotation();
+      public: double GetSceneRotation() const;
 
       /// \brief Set the current mouse state
       public: void SetMouseState(int _state);
 
       /// \brief Retrieve the current mouse state
-      public: int  GetMouseState();
+      public: int  GetMouseState() const;
 
       public: void SetMouseDownX(double _x);
 
       public: void SetMouseDownY(double _y);
 
-      public: double GetMouseDownX();
+      public: double GetMouseDownX() const;
 
-      public: double GetMouseDownY();
+      public: double GetMouseDownY() const;
 
       public: void Update();
 

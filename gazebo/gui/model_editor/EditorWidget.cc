@@ -47,7 +47,7 @@ EditorWidget::~EditorWidget()
 }
 
 /////////////////////////////////////////////////
-QWidget *EditorWidget::GetBuildingEditor()
+QWidget *EditorWidget::GetBuildingEditor() const
 {
   return this->buildingEditorWidget;
 }

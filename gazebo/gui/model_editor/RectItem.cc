@@ -16,10 +16,10 @@
 */
 
 #include "gazebo/math/Angle.hh"
-#include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/CornerGrabber.hh"
 #include "gazebo/gui/model_editor/RotateHandle.hh"
 #include "gazebo/gui/model_editor/EditorItem.hh"
+#include "gazebo/gui/model_editor/RectItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -89,7 +89,7 @@ RectItem::~RectItem()
 }
 
 /////////////////////////////////////////////////
-void RectItem::showCorners(bool _show)
+void RectItem::ShowCorners(bool _show)
 {
   for (int i = 0; i < 8; ++i)
   {
@@ -164,8 +164,7 @@ bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
 }
 
 /////////////////////////////////////////////////
-bool RectItem::rotateEventFilter(RotateHandle *_rotate,
-    QEvent *_event)
+bool RectItem::rotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -174,19 +173,21 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
   {
     case QEvent::GraphicsSceneMousePress:
     {
-      _rotate->SetMouseState(QEvent::GraphicsSceneMousePress);
+      _rotate->SetMouseState(
+          static_cast<int>(QEvent::GraphicsSceneMousePress));
       _rotate->SetMouseDownX(mouseEvent->pos().x());
       _rotate->SetMouseDownY(mouseEvent->pos().y());
       break;
     }
     case QEvent::GraphicsSceneMouseRelease:
     {
-      _rotate->SetMouseState(QEvent::GraphicsSceneMouseRelease);
+      _rotate->SetMouseState(
+          static_cast<int>(QEvent::GraphicsSceneMouseRelease));
       break;
     }
     case QEvent::GraphicsSceneMouseMove:
     {
-      _rotate->SetMouseState(QEvent::GraphicsSceneMouseMove);
+      _rotate->SetMouseState(static_cast<int>(QEvent::GraphicsSceneMouseMove));
       break;
     }
     case QEvent::GraphicsSceneHoverEnter:
@@ -208,7 +209,8 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
   if (!mouseEvent)
     return false;
 
-  if (_rotate->GetMouseState() == QEvent::GraphicsSceneMouseMove)
+  if (_rotate->GetMouseState()
+      == static_cast<int>(QEvent::GraphicsSceneMouseMove))
   {
     QPoint localCenter(this->drawingOriginX, this->drawingOriginY);
     QPointF center = this->mapToScene(localCenter);
@@ -248,8 +250,7 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate,
 }
 
 /////////////////////////////////////////////////
-bool RectItem::cornerEventFilter(CornerGrabber *_corner,
-    QEvent *_event)
+bool RectItem::cornerEventFilter(CornerGrabber *_corner, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -258,19 +259,20 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
   {
     case QEvent::GraphicsSceneMousePress:
     {
-      _corner->SetMouseState(QEvent::GraphicsSceneMousePress);
+      _corner->SetMouseState(static_cast<int>(QEvent::GraphicsSceneMousePress));
       _corner->SetMouseDownX(mouseEvent->pos().x());
       _corner->SetMouseDownY(mouseEvent->pos().y());
       break;
     }
     case QEvent::GraphicsSceneMouseRelease:
     {
-      _corner->SetMouseState(QEvent::GraphicsSceneMouseRelease);
+      _corner->SetMouseState(
+          static_cast<int>(QEvent::GraphicsSceneMouseRelease));
       break;
     }
     case QEvent::GraphicsSceneMouseMove:
     {
-      _corner->SetMouseState(QEvent::GraphicsSceneMouseMove);
+      _corner->SetMouseState(static_cast<int>(QEvent::GraphicsSceneMouseMove));
       break;
     }
     case QEvent::GraphicsSceneHoverEnter:
@@ -320,7 +322,8 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner,
     return false;
 
 
-  if (_corner->GetMouseState() == QEvent::GraphicsSceneMouseMove)
+  if (_corner->GetMouseState()
+      == static_cast<int>(QEvent::GraphicsSceneMouseMove))
   {
     double xPos = mouseEvent->pos().x();
     double yPos = mouseEvent->pos().y();
@@ -637,6 +640,7 @@ void RectItem::UpdateCornerPositions()
       this->drawingOriginY - this->drawingHeight/2);
 
   this->SizeChanged();
+  this->setRect(this->boundingRect());
 
 //  this->setPolygon(QPolygonF(this->boundingRect()));
 }
@@ -678,13 +682,13 @@ void RectItem::SetSize(QSize _size)
 }
 
 /////////////////////////////////////////////////
-int RectItem::GetWidth()
+double RectItem::GetWidth() const
 {
   return this->drawingWidth;
 }
 
 /////////////////////////////////////////////////
-int RectItem::GetHeight()
+double RectItem::GetHeight() const
 {
   return this->drawingHeight;
 }
@@ -711,19 +715,19 @@ void RectItem::DrawBoundingBox(QPainter *_painter)
 }
 
 /////////////////////////////////////////////////
-QVector3D RectItem::GetSize()
+QVector3D RectItem::GetSize() const
 {
   return QVector3D(this->width, this->height, 0);
 }
 
 /////////////////////////////////////////////////
-QVector3D RectItem::GetScenePosition()
+QVector3D RectItem::GetScenePosition() const
 {
   return QVector3D(this->scenePos().x(), this->scenePos().y(), 0);
 }
 
 /////////////////////////////////////////////////
-double RectItem::GetSceneRotation()
+double RectItem::GetSceneRotation() const
 {
   return this->rotationAngle;
 }
@@ -782,7 +786,7 @@ void RectItem::OnOpenInspector()
 }
 
 /////////////////////////////////////////////////
-void RectItem::SetPosition(QPointF _pos)
+void RectItem::SetPosition(const QPointF &_pos)
 {
   this->SetPosition(_pos.x(), _pos.y());
 }
@@ -813,7 +817,7 @@ void RectItem::SetRotation(double _angle)
 }
 
 /////////////////////////////////////////////////
-double RectItem::GetRotation()
+double RectItem::GetRotation() const
 {
   return this->rotationAngle;
 }

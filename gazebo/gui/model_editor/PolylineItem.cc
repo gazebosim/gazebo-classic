@@ -15,15 +15,16 @@
  *
 */
 
-#include "gazebo/gui/model_editor/PolylineItem.hh"
 #include "gazebo/gui/model_editor/CornerGrabber.hh"
+#include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/LineSegmentItem.hh"
+#include "gazebo/gui/model_editor/PolylineItem.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-PolylineItem::PolylineItem(QPointF _start, QPointF _end) :
+PolylineItem::PolylineItem(const QPointF &_start, const QPointF &_end) :
     EditorItem(), QGraphicsPathItem(), gridSpace(10)
 {
   this->editorType = "Polyline";
@@ -68,13 +69,13 @@ void PolylineItem::SetThickness(double _thickness)
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::SetPosition(QPointF _pos)
+void PolylineItem::SetPosition(const QPointF &_pos)
 {
   this->setPos(_pos);
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::AddPoint(QPointF _point)
+void PolylineItem::AddPoint(const QPointF &_point)
 {
   QPointF lineEnd = _point - this->origin;
   if (!corners.empty())
@@ -128,19 +129,19 @@ void PolylineItem::PopEndPoint()
 }
 
 /////////////////////////////////////////////////
-unsigned int PolylineItem::GetVertexCount()
+unsigned int PolylineItem::GetVertexCount() const
 {
   return this->corners.size();
 }
 
 /////////////////////////////////////////////////
-unsigned int PolylineItem::GetSegmentCount()
+unsigned int PolylineItem::GetSegmentCount() const
 {
   return this->segments.size();
 }
 
 /////////////////////////////////////////////////
-LineSegmentItem *PolylineItem::GetSegment(unsigned int _index)
+LineSegmentItem *PolylineItem::GetSegment(unsigned int _index) const
 {
   if (_index >= segments.size())
     return NULL;
@@ -148,7 +149,7 @@ LineSegmentItem *PolylineItem::GetSegment(unsigned int _index)
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::SetVertexPosition(unsigned int _index, QPointF _pos)
+void PolylineItem::SetVertexPosition(unsigned int _index, const QPointF &_pos)
 {
   if (_index >= this->corners.size())
     return;
@@ -168,7 +169,7 @@ void PolylineItem::SetVertexPosition(unsigned int _index, QPointF _pos)
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::TranslateVertex(unsigned int _index, QPointF _trans)
+void PolylineItem::TranslateVertex(unsigned int _index, const QPointF &_trans)
 {
   if (_index >= this->corners.size())
     return;
@@ -202,8 +203,7 @@ bool PolylineItem::sceneEventFilter(QGraphicsItem *_watched,
 }
 
 /////////////////////////////////////////////////
-bool PolylineItem::segmentEventFilter(LineSegmentItem *_segment,
-    QEvent *_event)
+bool PolylineItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -253,8 +253,7 @@ bool PolylineItem::segmentEventFilter(LineSegmentItem *_segment,
 }
 
 /////////////////////////////////////////////////
-bool PolylineItem::cornerEventFilter(CornerGrabber* _corner,
-    QEvent *_event)
+bool PolylineItem::cornerEventFilter(CornerGrabber* _corner, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -330,7 +329,7 @@ void PolylineItem::UpdatePath()
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::UpdatePathAt(unsigned int _index, QPointF _pos)
+void PolylineItem::UpdatePathAt(unsigned int _index, const QPointF &_pos)
 {
   QPainterPath p = this->path();
   QPointF newPos = _pos - this->origin;
@@ -339,7 +338,7 @@ void PolylineItem::UpdatePathAt(unsigned int _index, QPointF _pos)
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::AppendToPath(QPointF _point)
+void PolylineItem::AppendToPath(const QPointF &_point)
 {
   QPainterPath p = this->path();
   if (p.elementCount() == 0)

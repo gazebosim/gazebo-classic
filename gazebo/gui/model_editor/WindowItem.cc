@@ -16,10 +16,11 @@
 */
 
 #include "gazebo/gui/model_editor/BuildingItem.hh"
+#include "gazebo/gui/model_editor/EditorItem.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
-#include "gazebo/gui/model_editor/WindowItem.hh"
 #include "gazebo/gui/model_editor/WindowDoorInspectorDialog.hh"
 #include "gazebo/gui/model_editor/BuildingMaker.hh"
+#include "gazebo/gui/model_editor/WindowItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -70,20 +71,20 @@ WindowItem::~WindowItem()
 }
 
 /////////////////////////////////////////////////
-QVector3D WindowItem::GetSize()
+QVector3D WindowItem::GetSize() const
 {
   return QVector3D(this->windowWidth, this->windowDepth, this->windowHeight);
 }
 
 /////////////////////////////////////////////////
-QVector3D WindowItem::GetScenePosition()
+QVector3D WindowItem::GetScenePosition() const
 {
   return QVector3D(this->scenePos().x(), this->scenePos().y(),
       this->windowElevation);
 }
 
 /////////////////////////////////////////////////
-double WindowItem::GetSceneRotation()
+double WindowItem::GetSceneRotation() const
 {
   return this->rotationAngle;
 }
@@ -110,7 +111,7 @@ void WindowItem::paint(QPainter *_painter,
 
   if (this->isSelected())
     this->DrawBoundingBox(_painter);
-  this->showCorners(this->isSelected());
+  this->ShowCorners(this->isSelected());
 
   QPen windowPen;
   windowPen.setStyle(Qt::SolidLine);

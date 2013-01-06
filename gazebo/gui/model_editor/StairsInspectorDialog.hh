@@ -32,17 +32,17 @@ namespace gazebo
 
       public: ~StairsInspectorDialog();
 
-      public: QPointF GetStartPosition();
+      public: QPointF GetStartPosition() const;
 
-      public: double GetWidth();
+      public: double GetWidth() const;
 
-      public: double GetDepth();
+      public: double GetDepth() const;
 
-      public: double GetHeight();
+      public: double GetHeight() const;
 
-      public: int GetSteps();
+      public: int GetSteps() const;
 
-      public: void SetStartPosition(QPointF _pos);
+      public: void SetStartPosition(const QPointF &_pos);
 
       public: void SetWidth(double _width);
 

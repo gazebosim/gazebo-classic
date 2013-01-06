@@ -27,43 +27,45 @@ namespace gazebo
   {
     class CornerGrabber;
 
+    class EditorItem;
+
     class LineSegmentItem;
 
     class PolylineItem : public EditorItem, public QGraphicsPathItem
     {
-      public: PolylineItem(QPointF _start, QPointF _end);
+      public: PolylineItem(const QPointF &_start, const QPointF &_end);
 
       public: ~PolylineItem();
 
-      public: void AddPoint(QPointF _point);
+      public: void AddPoint(const QPointF &_point);
 
       public: void PopEndPoint();
 
-      public: unsigned int GetVertexCount();
+      public: unsigned int GetVertexCount() const;
 
-      public: unsigned int GetSegmentCount();
+      public: unsigned int GetSegmentCount() const;
 
-      public: void SetVertexPosition(unsigned int _index, QPointF _pos);
+      public: void SetVertexPosition(unsigned int _index, const QPointF &_pos);
 
-      public: void TranslateVertex(unsigned int _index, QPointF _trans);
+      public: void TranslateVertex(unsigned int _index, const QPointF &_trans);
 
-      public: LineSegmentItem *GetSegment(unsigned int _index);
+      public: LineSegmentItem *GetSegment(unsigned int _index) const;
 
       public: void ShowCorners(bool _show);
 
       public: void SetThickness(double _thickness);
 
-      public: void SetPosition(QPointF _pos);
+      public: void SetPosition(const QPointF &_pos);
 
       public: void Update();
 
       private: void UpdatePath();
 
-      private: void UpdatePathAtIndex(unsigned int _index, QPointF _pos);
+      private: void UpdatePathAtIndex(unsigned int _index, const QPointF &_pos);
 
-      private: void UpdatePathAt(unsigned int _index, QPointF _pos);
+      private: void UpdatePathAt(unsigned int _index, const QPointF &_pos);
 
-      private: void AppendToPath(QPointF _point);
+      private: void AppendToPath(const QPointF &_point);
 
       private: bool sceneEventFilter(QGraphicsItem * watched,
         QEvent *_event);

@@ -34,11 +34,11 @@ namespace gazebo
 
       public: ~LevelInspectorDialog();
 
-      public: std::string GetLevelName();
+      public: std::string GetLevelName() const;
 
-      public: double GetHeight();
+      public: double GetHeight() const;
 
-      public: void SetLevelName(std::string _levelName);
+      public: void SetLevelName(const std::string &_levelName);
 
       public: void SetHeight(double _height);
 

@@ -31,24 +31,24 @@ namespace gazebo
       public: int GetIndex() const;
 
       /// \brief Set the current mouse state
-      public: void SetMouseState(const int &_state);
+      public: void SetMouseState(int _state);
 
       /// \brief Retrieve the current mouse state
       public: int  GetMouseState() const;
 
       public: QPointF GetCenterPoint() const;
 
-      public: void SetMouseDownX(const double &_x);
+      public: void SetMouseDownX(double _x);
 
-      public: void SetMouseDownY(const double &_y);
+      public: void SetMouseDownY(double _y);
 
       public: double GetMouseDownX() const;
 
       public: double GetMouseDownY() const;
 
-      public: void SetWidth(const double &_width);
+      public: void SetWidth(double _width);
 
-      public: void SetHeight(const double &_height);
+      public: void SetHeight(double _height);
 
       public: double GetWidth() const;
 

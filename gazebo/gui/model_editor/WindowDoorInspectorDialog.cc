@@ -147,38 +147,38 @@ WindowDoorInspectorDialog::~WindowDoorInspectorDialog()
 }
 
 /////////////////////////////////////////////////
-double WindowDoorInspectorDialog::GetWidth()
+double WindowDoorInspectorDialog::GetWidth() const
 {
   return this->widthSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double WindowDoorInspectorDialog::GetDepth()
+double WindowDoorInspectorDialog::GetDepth() const
 {
   return this->depthSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double WindowDoorInspectorDialog::GetHeight()
+double WindowDoorInspectorDialog::GetHeight() const
 {
   return this->heightSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-QPointF WindowDoorInspectorDialog::GetPosition()
+QPointF WindowDoorInspectorDialog::GetPosition() const
 {
   return QPointF(this->positionXSpinBox->value(),
       this->positionYSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-double WindowDoorInspectorDialog::GetElevation()
+double WindowDoorInspectorDialog::GetElevation() const
 {
   return this->elevationSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-std::string WindowDoorInspectorDialog::GetType()
+std::string WindowDoorInspectorDialog::GetType() const
 {
   return this->typeComboBox->currentText().toStdString();
 }
@@ -202,7 +202,7 @@ void WindowDoorInspectorDialog::SetDepth(double _depth)
 }
 
 /////////////////////////////////////////////////
-void WindowDoorInspectorDialog::SetPosition(QPointF _pos)
+void WindowDoorInspectorDialog::SetPosition(const QPointF &_pos)
 {
   this->positionXSpinBox->setValue(_pos.x());
   this->positionYSpinBox->setValue(_pos.y());
@@ -215,7 +215,7 @@ void WindowDoorInspectorDialog::SetElevation(double _elevation)
 }
 
 /////////////////////////////////////////////////
-void WindowDoorInspectorDialog::SetType(std::string _type)
+void WindowDoorInspectorDialog::SetType(const std::string &_type)
 {
   int index = this->typeComboBox->findText(
     QString::fromStdString(_type));

@@ -35,17 +35,17 @@ namespace gazebo
 
       public: ~WindowDoorInspectorDialog();
 
-      public: double GetWidth();
+      public: double GetWidth() const;
 
-      public: double GetHeight();
+      public: double GetHeight() const;
 
-      public: double GetDepth();
+      public: double GetDepth() const;
 
-      public: QPointF GetPosition();
+      public: QPointF GetPosition() const;
 
-      public: double GetElevation();
+      public: double GetElevation() const;
 
-      public: std::string GetType();
+      public: std::string GetType() const;
 
       public: void SetWidth(double _width);
 
@@ -53,11 +53,11 @@ namespace gazebo
 
       public: void SetDepth(double _depth);
 
-      public: void SetPosition(QPointF _pos);
+      public: void SetPosition(const QPointF &_pos);
 
       public: void SetElevation(double _elevation);
 
-      public: void SetType(std::string _type);
+      public: void SetType(const std::string &_type);
 
       Q_SIGNALS: void Applied();
 

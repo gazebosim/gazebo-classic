@@ -15,10 +15,11 @@
  *
 */
 
+#include "gazebo/gui/model_editor/EditorItem.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/BuildingItem.hh"
-#include "gazebo/gui/model_editor/FloorItem.hh"
 #include "gazebo/gui/model_editor/BuildingMaker.hh"
+#include "gazebo/gui/model_editor/FloorItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -56,19 +57,19 @@ FloorItem::~FloorItem()
 }*/
 
 /////////////////////////////////////////////////
-QVector3D FloorItem::GetSize()
+QVector3D FloorItem::GetSize() const
 {
   return QVector3D(this->floorWidth, this->floorDepth, this->floorHeight);
 }
 
 /////////////////////////////////////////////////
-QVector3D FloorItem::GetScenePosition()
+QVector3D FloorItem::GetScenePosition() const
 {
   return QVector3D(this->floorPos.x(), this->floorPos.y(), 0);
 }
 
 /////////////////////////////////////////////////
-double FloorItem::GetSceneRotation()
+double FloorItem::GetSceneRotation() const
 {
   return 0;
 }
@@ -88,7 +89,7 @@ void FloorItem::paint (QPainter *_painter,
 {
   if (this->isSelected())
     this->DrawBoundingBox(_painter);
-  this->showCorners(this->isSelected());
+  this->ShowCorners(this->isSelected());
 
   QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
       this->drawingOriginY - this->drawingHeight/2);

@@ -13,21 +13,21 @@ set (sources
   GridLines.cc
   CornerGrabber.cc
   RotateHandle.cc
-  EditorView.cc
+  EditorItem.cc
+  BuildingItem.cc
   RectItem.cc
   FloorItem.cc
-  BuildingItem.cc
   WindowItem.cc
   DoorItem.cc
+  LineSegmentItem.cc
   PolylineItem.cc
   WallItem.cc
-  LineSegmentItem.cc
   BuildingMaker.cc
   EditorEvents.cc
-  EditorItem.cc
   StairsItem.cc
   LevelWidget.cc
   ModelManip.cc
+  EditorView.cc
 )
 
 set (qt_headers
@@ -40,12 +40,12 @@ set (qt_headers
   ModelManip.hh
   EditorItem.hh
   LevelWidget.hh
-  EditorView.hh
   RectItem.hh
   StairsItem.hh
   WallItem.hh
   DoorItem.hh
   WindowItem.hh
+  EditorView.hh
 )
 
 set (headers

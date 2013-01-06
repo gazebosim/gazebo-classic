@@ -84,19 +84,19 @@ LevelInspectorDialog::~LevelInspectorDialog()
 }
 
 /////////////////////////////////////////////////
-std::string LevelInspectorDialog::GetLevelName()
+std::string LevelInspectorDialog::GetLevelName() const
 {
   return this->levelNameLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-double LevelInspectorDialog::GetHeight()
+double LevelInspectorDialog::GetHeight() const
 {
   return this->heightSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-void LevelInspectorDialog::SetLevelName(std::string _levelName)
+void LevelInspectorDialog::SetLevelName(const std::string &_levelName)
 {
   this->levelNameLineEdit->setText(QString(_levelName.c_str()));
 }

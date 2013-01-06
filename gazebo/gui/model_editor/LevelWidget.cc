@@ -80,7 +80,7 @@ void LevelWidget::OnAddLevel()
 }
 
 //////////////////////////////////////////////////
-void LevelWidget::OnChangeLevelName(int _level, std::string _newName)
+void LevelWidget::OnChangeLevelName(int _level, const std::string &_newName)
 {
   if (_level == this->levelComboBox->count())
   {

@@ -159,7 +159,7 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
       {
         this->stairsList.push_back(dynamic_cast<StairsItem*>(
             this->currentMouseItem));
-        if ((this->currentLevel) < floorList.size())
+        if ((this->currentLevel) < static_cast<int>(floorList.size()))
         {
           EditorItem *item = dynamic_cast<EditorItem*>(this->currentMouseItem);
           this->buildingMaker->AttachObject(this->itemToModelMap[item],
@@ -420,7 +420,7 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void EditorView::DrawWall(QPoint _pos)
+void EditorView::DrawWall(const QPoint &_pos)
 {
   WallItem *wallItem = NULL;
   if (!drawInProgress)
@@ -470,7 +470,7 @@ void EditorView::DrawWall(QPoint _pos)
 }
 
 /////////////////////////////////////////////////
-void EditorView::DrawWindow(QPoint _pos)
+void EditorView::DrawWindow(const QPoint &_pos)
 {
   WindowItem *windowItem = NULL;
   if (!drawInProgress)
@@ -499,7 +499,7 @@ void EditorView::DrawWindow(QPoint _pos)
 }
 
 /////////////////////////////////////////////////
-void EditorView::DrawDoor(QPoint _pos)
+void EditorView::DrawDoor(const QPoint &_pos)
 {
   DoorItem *doorItem = NULL;
   if (!drawInProgress)
@@ -527,7 +527,7 @@ void EditorView::DrawDoor(QPoint _pos)
 }
 
 /////////////////////////////////////////////////
-void EditorView::DrawStairs(QPoint _pos)
+void EditorView::DrawStairs(const QPoint &_pos)
 {
   StairsItem *stairsItem = NULL;
   if (!drawInProgress)

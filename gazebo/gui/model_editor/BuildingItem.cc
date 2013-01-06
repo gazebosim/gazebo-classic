@@ -16,7 +16,6 @@
 */
 
 #include "gazebo/gui/model_editor/BuildingItem.hh"
-#include "gazebo/gui/qt.h"
 
 using namespace gazebo;
 using namespace gui;
@@ -34,7 +33,7 @@ BuildingItem::~BuildingItem()
 }
 
 /////////////////////////////////////////////////
-int BuildingItem::GetLevel()
+int BuildingItem::GetLevel() const
 {
   return this->level;
 }
@@ -46,7 +45,7 @@ void BuildingItem::SetLevel(int _level)
 }
 
 /////////////////////////////////////////////////
-double BuildingItem::GetLevelBaseHeight()
+double BuildingItem::GetLevelBaseHeight() const
 {
   return this->levelBaseHeight;
 }

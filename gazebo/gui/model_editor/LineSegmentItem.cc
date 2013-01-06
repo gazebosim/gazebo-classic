@@ -15,9 +15,9 @@
  *
 */
 
-#include "gazebo/gui/model_editor/LineSegmentItem.hh"
 #include "gazebo/gui/model_editor/WallInspectorDialog.hh"
 #include "gazebo/gui/model_editor/EditorItem.hh"
+#include "gazebo/gui/model_editor/LineSegmentItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -43,7 +43,7 @@ LineSegmentItem::~LineSegmentItem()
 }
 
 /////////////////////////////////////////////////
-void LineSegmentItem::SetLine(QPointF _start, QPointF _end)
+void LineSegmentItem::SetLine(const QPointF &_start, const QPointF &_end)
 {
   this->start = _start;
   this->end = _end;
@@ -53,7 +53,7 @@ void LineSegmentItem::SetLine(QPointF _start, QPointF _end)
 }
 
 /////////////////////////////////////////////////
-void LineSegmentItem::SetStartPoint(QPointF _start)
+void LineSegmentItem::SetStartPoint(const QPointF &_start)
 {
   this->start = _start;
   this->setLine(this->start.x(), this->start.y(), this->end.x(), this->end.y());
@@ -62,7 +62,7 @@ void LineSegmentItem::SetStartPoint(QPointF _start)
 }
 
 /////////////////////////////////////////////////
-void LineSegmentItem::SetEndPoint(QPointF _end)
+void LineSegmentItem::SetEndPoint(const QPointF &_end)
 {
   this->end = _end;
   this->setLine(this->start.x(), this->start.y(), this->end.x(), this->end.y());
@@ -71,7 +71,7 @@ void LineSegmentItem::SetEndPoint(QPointF _end)
 }
 
 /////////////////////////////////////////////////
-int LineSegmentItem::GetIndex()
+int LineSegmentItem::GetIndex() const
 {
   return index;
 }
@@ -83,7 +83,7 @@ void LineSegmentItem::SetMouseState(int _state)
 }
 
 /////////////////////////////////////////////////
-int LineSegmentItem::GetMouseState()
+int LineSegmentItem::GetMouseState() const
 {
   return this->mouseButtonState;
 }
@@ -101,13 +101,13 @@ void LineSegmentItem::SetMouseDownY(double _y)
 }
 
 /////////////////////////////////////////////////
-qreal LineSegmentItem::GetMouseDownX()
+double LineSegmentItem::GetMouseDownX() const
 {
   return this->mouseDownX;
 }
 
 /////////////////////////////////////////////////
-qreal LineSegmentItem::GetMouseDownY()
+double LineSegmentItem::GetMouseDownY() const
 {
   return this->mouseDownY;
 }
@@ -173,14 +173,14 @@ QVariant LineSegmentItem::itemChange(GraphicsItemChange _change,
 }
 
 /////////////////////////////////////////////////
-QVector3D LineSegmentItem::GetSize()
+QVector3D LineSegmentItem::GetSize() const
 {
   return QVector3D(this->line().length() + this->pen().width(),
       this->pen().width(), 0);
 }
 
 /////////////////////////////////////////////////
-QVector3D LineSegmentItem::GetScenePosition()
+QVector3D LineSegmentItem::GetScenePosition() const
 {
   QPointF centerPos = this->mapToScene(this->start
       + (this->end - this->start)/2.0);
@@ -188,7 +188,7 @@ QVector3D LineSegmentItem::GetScenePosition()
 }
 
 /////////////////////////////////////////////////
-double LineSegmentItem::GetSceneRotation()
+double LineSegmentItem::GetSceneRotation() const
 {
   return -this->line().angle();
 }

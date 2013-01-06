@@ -49,7 +49,7 @@ int CornerGrabber::GetIndex() const
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetMouseState(const int &_state)
+void CornerGrabber::SetMouseState(int _state)
 {
   this->mouseButtonState = _state;
 }
@@ -68,13 +68,13 @@ QPointF CornerGrabber::GetCenterPoint() const
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetWidth(const double &_width)
+void CornerGrabber::SetWidth(double _width)
 {
   this->width = _width;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetHeight(const double &_height)
+void CornerGrabber::SetHeight(double _height)
 {
   this->height = _height;
 }
@@ -104,13 +104,13 @@ QColor CornerGrabber::GetColor() const
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetMouseDownX(const double &_x)
+void CornerGrabber::SetMouseDownX(double _x)
 {
   this->mouseDownX = _x;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetMouseDownY(const double &_y)
+void CornerGrabber::SetMouseDownY(double _y)
 {
   this->mouseDownY = _y;
 }

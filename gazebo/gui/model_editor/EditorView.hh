@@ -60,13 +60,13 @@ namespace gazebo
 
       private: void keyPressEvent(QKeyEvent *_event);
 
-      private: void DrawWall(QPoint _pos);
+      private: void DrawWall(const QPoint &_pos);
 
-      private: void DrawWindow(QPoint _pos);
+      private: void DrawWindow(const QPoint &_pos);
 
-      private: void DrawDoor(QPoint _pos);
+      private: void DrawDoor(const QPoint &_pos);
 
-      private: void DrawStairs(QPoint _pos);
+      private: void DrawStairs(const QPoint &_pos);
 
       private: void OnCreateEditorItem(const std::string &_type);
 

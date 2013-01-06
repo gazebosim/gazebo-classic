@@ -40,15 +40,15 @@ namespace gazebo
     {
         Q_OBJECT
 
-        public: WallItem(QPointF _start, QPointF _end);
+        public: WallItem(const QPointF &_start, const QPointF &_end);
 
         public: ~WallItem();
 
-        public: double GetHeight();
+        public: double GetHeight() const;
 
         public: void SetHeight(double _height);
 
-        public: WallItem *Clone();
+        public: WallItem *Clone() const;
 
         public: void Update();
 
@@ -58,14 +58,11 @@ namespace gazebo
         private: bool segmentEventFilter(LineSegmentItem *_segment,
             QEvent *_event);
 
-        private: void contextMenuEvent(
-            QGraphicsSceneContextMenuEvent *_event);
+        private: void contextMenuEvent(QGraphicsSceneContextMenuEvent *_event);
 
         private slots: void OnApply();
 
         private slots: void OnOpenInspector();
-
-        private: QAction *openInspectorAct;
 
         private: void WallChanged();
 
@@ -78,6 +75,8 @@ namespace gazebo
         private: double scale;
 
         private: LineSegmentItem* selectedSegment;
+
+        private: QAction *openInspectorAct;
 
         private: WallInspectorDialog *inspector;
     };

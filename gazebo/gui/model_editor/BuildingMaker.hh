@@ -46,44 +46,48 @@ namespace gazebo
 
       public: virtual ~BuildingMaker();
 
-      public: void SetModelName(std::string _modelName);
+      public: void SetModelName(const std::string &_modelName);
 
       public: void FinishModel();
 
-      public: std::string AddPart(std::string _type, QVector3D _size,
-          QVector3D _pos, double _angle);
+      public: std::string AddPart(const std::string &_type,
+          const QVector3D &_size, const QVector3D &_pos, double _angle);
 
-      public: std::string AddWall(QVector3D _size, QVector3D _pos,
+      public: std::string AddWall(const QVector3D &_size, const QVector3D &_pos,
           double _angle);
 
-      public: std::string AddWindow(QVector3D _size, QVector3D _pos,
+      public: std::string AddWindow(const QVector3D &_size,
+          const QVector3D &_pos, double _angle);
+
+      public: std::string AddDoor(const QVector3D &_size, const QVector3D &_pos,
           double _angle);
 
-      public: std::string AddDoor(QVector3D _size, QVector3D _pos,
-          double _angle);
+      public: std::string AddStairs(const QVector3D &_size,
+          const QVector3D &_pos, double _angle, int _steps);
 
-      public: std::string AddStairs(QVector3D _size, QVector3D _pos,
-          double _angle, int _steps);
+      public: std::string AddFloor(const QVector3D &_size,
+          const QVector3D &_pos, double _angle);
 
-      public: std::string AddFloor(QVector3D _size, QVector3D _pos,
-          double _angle);
+      public: void RemovePart(const std::string &_partName);
 
-      public: void RemovePart(std::string _partName);
+      public: void RemoveWall(const std::string &_wallName);
 
-      public: void RemoveWall(std::string _wallName);
+      public: void ConnectItem(const std::string &_partName,
+          const EditorItem *_item);
 
-      public: void ConnectItem(std::string _partName, EditorItem *_item);
+      public: void AttachObject(const std::string &_child,
+          const std::string &_parent);
 
-      public: void AttachObject(std::string _child, std::string _parent);
+      public: void DetachObject(const std::string &_child,
+          const std::string &_parent);
 
-      public: void DetachObject(std::string _child, std::string _parent);
-
-      public: static math::Vector3 ConvertSize(QVector3D _size);
+      public: static math::Vector3 ConvertSize(const QVector3D &_size);
 
       public: static math::Vector3 ConvertSize(double _width, double _depth,
           double _height);
 
-      public: static math::Pose ConvertPose(QVector3D _pos, QVector3D _rot);
+      public: static math::Pose ConvertPose(const QVector3D &_pos,
+          const QVector3D &_rot);
 
       public: static math::Pose ConvertPose(double _x, double _y, double _z,
           double _roll, double _pitch, double _yaw);
@@ -92,7 +96,7 @@ namespace gazebo
 
       public: static double ConvertAngle(double _angle);
 
-      public: void SaveToSDF(std::string _savePath);
+      public: void SaveToSDF(const std::string &_savePath);
 
       /// \brief
       public: void Reset();
@@ -125,8 +129,8 @@ namespace gazebo
 
       private: static bool RectCompareY(const QRectF &_a, const QRectF &_b);
 
-      private: void SubdivideRectSurface(const QRectF _surface,
-        const std::vector<QRectF> _holes, std::vector<QRectF> &_subdivisions);
+      private: void SubdivideRectSurface(const QRectF &_surface,
+        const std::vector<QRectF> &_holes, std::vector<QRectF> &_subdivisions);
 
       public: static double conversionScale;
 

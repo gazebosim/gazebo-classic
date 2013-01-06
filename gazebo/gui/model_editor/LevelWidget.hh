@@ -41,7 +41,7 @@ namespace gazebo
 
       public slots: void OnAddLevel();
 
-      private: void OnChangeLevelName(int _level, std::string _newName);
+      private: void OnChangeLevelName(int _level, const std::string &_newName);
 
       private: void OnDiscard();
 

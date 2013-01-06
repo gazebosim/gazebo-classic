@@ -32,29 +32,29 @@ namespace gazebo
 
       public: ~WallInspectorDialog();
 
-      public: double GetLength();
+      public: double GetLength() const;
 
-      public: QPointF GetStartPosition();
+      public: QPointF GetStartPosition() const;
 
-      public: QPointF GetEndPosition();
+      public: QPointF GetEndPosition() const;
 
-      public: double GetHeight();
+      public: double GetHeight() const;
 
-      public: double GetThickness();
+      public: double GetThickness() const;
 
-      public: std::string GetMaterial();
+      public: std::string GetMaterial() const;
 
       public: void SetLength(double _length);
 
-      public: void SetStartPosition(QPointF _pos);
+      public: void SetStartPosition(const QPointF &_pos);
 
-      public: void SetEndPosition(QPointF _pos);
+      public: void SetEndPosition(const QPointF &_pos);
 
       public: void SetHeight(double _height);
 
       public: void SetThickness(double _thickness);
 
-      public: void SetMaterial(std::string _material);
+      public: void SetMaterial(const std::string &_material);
 
       Q_SIGNALS: void Applied();
 

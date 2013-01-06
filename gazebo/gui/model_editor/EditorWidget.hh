@@ -32,7 +32,7 @@ namespace gazebo
 
       public: void SetMode(int mode);
 
-      public: QWidget *GetBuildingEditor();
+      public: QWidget *GetBuildingEditor() const;
 
       private: QWidget *buildingEditorWidget;
 

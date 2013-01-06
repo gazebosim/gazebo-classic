@@ -16,20 +16,21 @@
 */
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/gui/model_editor/CornerGrabber.hh"
+#include "gazebo/gui/model_editor/EditorItem.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/BuildingItem.hh"
-#include "gazebo/gui/model_editor/PolylineItem.hh"
 #include "gazebo/gui/model_editor/LineSegmentItem.hh"
+#include "gazebo/gui/model_editor/PolylineItem.hh"
 #include "gazebo/gui/model_editor/WallInspectorDialog.hh"
 #include "gazebo/gui/model_editor/BuildingMaker.hh"
-#include "gazebo/gui/model_editor/CornerGrabber.hh"
 #include "gazebo/gui/model_editor/WallItem.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-WallItem::WallItem(QPointF _start, QPointF _end)
+WallItem::WallItem(const QPointF &_start, const QPointF &_end)
     : PolylineItem(_start, _end), BuildingItem()
 {
   this->editorType = "Wall";
@@ -63,7 +64,7 @@ WallItem::~WallItem()
 }
 
 /////////////////////////////////////////////////
-double WallItem::GetHeight()
+double WallItem::GetHeight() const
 {
   return this->wallHeight;
 }
@@ -75,7 +76,7 @@ void WallItem::SetHeight(double _height)
 }
 
 /////////////////////////////////////////////////
-WallItem *WallItem::Clone()
+WallItem *WallItem::Clone() const
 {
   WallItem *wallItem = new WallItem(this->scenePos(),
       this->scenePos() + QPointF(1, 0));
@@ -107,8 +108,7 @@ WallItem *WallItem::Clone()
 }
 
 /////////////////////////////////////////////////
-bool WallItem::cornerEventFilter(CornerGrabber* _corner,
-    QEvent *_event)
+bool WallItem::cornerEventFilter(CornerGrabber* _corner, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -142,7 +142,7 @@ bool WallItem::cornerEventFilter(CornerGrabber* _corner,
     }
     case QEvent::GraphicsSceneHoverLeave:
     {
-      QApplication::restoreOverrideCursor();
+      QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
       return true;
     }
     default:
@@ -217,8 +217,7 @@ bool WallItem::cornerEventFilter(CornerGrabber* _corner,
 }
 
 /////////////////////////////////////////////////
-bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
-    QEvent *_event)
+bool WallItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -277,7 +276,7 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
     }
     case QEvent::GraphicsSceneHoverLeave:
     {
-      QApplication::restoreOverrideCursor();
+      QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
       return true;
     }
     default:

@@ -134,38 +134,38 @@ StairsInspectorDialog::~StairsInspectorDialog()
 }
 
 /////////////////////////////////////////////////
-QPointF StairsInspectorDialog::GetStartPosition()
+QPointF StairsInspectorDialog::GetStartPosition() const
 {
   return QPointF(this->startXSpinBox->value(),
       this->startYSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-double StairsInspectorDialog::GetWidth()
+double StairsInspectorDialog::GetWidth() const
 {
   return this->widthSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double StairsInspectorDialog::GetDepth()
+double StairsInspectorDialog::GetDepth() const
 {
   return this->depthSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double StairsInspectorDialog::GetHeight()
+double StairsInspectorDialog::GetHeight() const
 {
   return this->heightSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-int StairsInspectorDialog::GetSteps()
+int StairsInspectorDialog::GetSteps() const
 {
   return this->stepsSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-void StairsInspectorDialog::SetStartPosition(QPointF _pos)
+void StairsInspectorDialog::SetStartPosition(const QPointF &_pos)
 {
   this->startXSpinBox->setValue(_pos.x());
   this->startYSpinBox->setValue(_pos.y());

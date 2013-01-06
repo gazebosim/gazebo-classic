@@ -16,7 +16,6 @@
 */
 
 #include "gazebo/gui/model_editor/EditorItem.hh"
-#include "gazebo/gui/qt.h"
 
 using namespace gazebo;
 using namespace gui;
@@ -33,27 +32,26 @@ EditorItem::~EditorItem()
   emit itemDeleted();
 }
 
-
 /////////////////////////////////////////////////
-QVector3D EditorItem::GetSize()
+QVector3D EditorItem::GetSize() const
 {
   return QVector3D(0, 0, 0);
 }
 
 /////////////////////////////////////////////////
-QVector3D EditorItem::GetScenePosition()
+QVector3D EditorItem::GetScenePosition() const
 {
   return QVector3D(0, 0, 0);
 }
 
 /////////////////////////////////////////////////
-double EditorItem::GetSceneRotation()
+double EditorItem::GetSceneRotation() const
 {
   return 0;
 }
 
 /////////////////////////////////////////////////
-std::string EditorItem::GetType()
+std::string EditorItem::GetType() const
 {
   return this->editorType;
 }

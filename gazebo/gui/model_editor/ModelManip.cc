@@ -37,25 +37,25 @@ ModelManip::~ModelManip()
 }
 
 /////////////////////////////////////////////////
-void ModelManip::SetName(std::string _name)
+void ModelManip::SetName(const std::string &_name)
 {
   this->name = _name;
 }
 
 /////////////////////////////////////////////////
-void ModelManip::SetVisual(rendering::VisualPtr _visual)
+void ModelManip::SetVisual(const rendering::VisualPtr &_visual)
 {
   this->visual = _visual;
 }
 
 /////////////////////////////////////////////////
-std::string ModelManip::GetName()
+std::string ModelManip::GetName() const
 {
   return this->name;
 }
 
 /////////////////////////////////////////////////
-rendering::VisualPtr ModelManip::GetVisual()
+rendering::VisualPtr ModelManip::GetVisual() const
 {
   return this->visual;
 }
@@ -67,7 +67,7 @@ void ModelManip::SetMaker(BuildingMaker *_maker)
 }
 
 /////////////////////////////////////////////////
-ModelManip *ModelManip::GetParent()
+ModelManip *ModelManip::GetParent() const
 {
   return this->parent;
 }
@@ -132,7 +132,7 @@ void ModelManip::SetAttachedTo(ModelManip *_parent)
 }
 
 /////////////////////////////////////////////////
-ModelManip *ModelManip::GetAttachedObject(unsigned int _index)
+ModelManip *ModelManip::GetAttachedObject(unsigned int _index) const
 {
   if (_index >= this->attachedObjects.size())
     gzthrow("Index too large");
@@ -141,13 +141,13 @@ ModelManip *ModelManip::GetAttachedObject(unsigned int _index)
 }
 
 /////////////////////////////////////////////////
-unsigned int ModelManip::GetAttachedObjectCount()
+unsigned int ModelManip::GetAttachedObjectCount() const
 {
   return this->attachedObjects.size();
 }
 
 /////////////////////////////////////////////////
-bool ModelManip::IsAttached()
+bool ModelManip::IsAttached() const
 {
   return (this->parent != NULL);
 }

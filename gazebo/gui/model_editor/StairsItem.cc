@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/gui/model_editor/BuildingItem.hh"
+#include "gazebo/gui/model_editor/EditorItem.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/BuildingMaker.hh"
 #include "gazebo/gui/model_editor/StairsInspectorDialog.hh"
@@ -74,26 +75,26 @@ StairsItem::~StairsItem()
 }
 
 /////////////////////////////////////////////////
-QVector3D StairsItem::GetSize()
+QVector3D StairsItem::GetSize() const
 {
   return QVector3D(this->stairsWidth, this->stairsDepth, this->stairsHeight);
 }
 
 /////////////////////////////////////////////////
-QVector3D StairsItem::GetScenePosition()
+QVector3D StairsItem::GetScenePosition() const
 {
   return QVector3D(this->scenePos().x(), this->scenePos().y(),
       this->stairsElevation);
 }
 
 /////////////////////////////////////////////////
-double StairsItem::GetSceneRotation()
+double StairsItem::GetSceneRotation() const
 {
   return this->rotationAngle;
 }
 
 /////////////////////////////////////////////////
-int StairsItem::GetSteps()
+int StairsItem::GetSteps() const
 {
   return this->stairsSteps;
 }
@@ -193,7 +194,7 @@ void StairsItem::paint(QPainter *_painter,
 
   if (this->isSelected())
     this->DrawBoundingBox(_painter);
-  this->showCorners(this->isSelected());
+  this->ShowCorners(this->isSelected());
 
   QPen stairsPen;
   stairsPen.setStyle(Qt::SolidLine);

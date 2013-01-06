@@ -34,15 +34,15 @@ namespace gazebo
       public: void SetMouseState(int _state);
 
       /// \brief Retrieve the current mouse state
-      public: int  GetMouseState();
+      public: int  GetMouseState() const;
 
       public: void SetMouseDownX(double _x);
 
       public: void SetMouseDownY(double _y);
 
-      public: double GetMouseDownX();
+      public: double GetMouseDownX() const;
 
-      public: double GetMouseDownY();
+      public: double GetMouseDownY() const;
 
       private: void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
 

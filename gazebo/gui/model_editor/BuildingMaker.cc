@@ -82,7 +82,8 @@ BuildingMaker::~BuildingMaker()
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::ConnectItem(std::string _partName, EditorItem *_item)
+void BuildingMaker::ConnectItem(const std::string &_partName,
+    const EditorItem *_item)
 {
   ModelManip *manip = this->allItems[_partName];
 
@@ -117,7 +118,8 @@ void BuildingMaker::ConnectItem(std::string _partName, EditorItem *_item)
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::AttachObject(std::string _child, std::string _parent)
+void BuildingMaker::AttachObject(const std::string &_child,
+    const std::string &_parent)
 {
   ModelManip *child = this->allItems[_child];
   ModelManip *parent = this->allItems[_parent];
@@ -125,7 +127,8 @@ void BuildingMaker::AttachObject(std::string _child, std::string _parent)
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::DetachObject(std::string _child, std::string _parent)
+void BuildingMaker::DetachObject(const std::string &_child,
+    const std::string &_parent)
 {
   ModelManip *child = this->allItems[_child];
   ModelManip *parent = this->allItems[_parent];
@@ -140,8 +143,8 @@ std::string BuildingMaker::CreateModel()
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::AddPart(std::string _type, QVector3D _size,
-    QVector3D _pos, double _angle)
+std::string BuildingMaker::AddPart(const std::string &_type,
+    const QVector3D &_size, const QVector3D &_pos, double _angle)
 {
   if (_type == "wall")
     return this->AddWall(_size, _pos, _angle);
@@ -155,8 +158,8 @@ std::string BuildingMaker::AddPart(std::string _type, QVector3D _size,
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
-    double _angle)
+std::string BuildingMaker::AddWall(const QVector3D &_size,
+    const QVector3D &_pos, double _angle)
 {
   std::ostringstream linkNameStream;
   linkNameStream << "Wall_" << wallCounter++;
@@ -191,8 +194,8 @@ std::string BuildingMaker::AddWall(QVector3D _size, QVector3D _pos,
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
-    double _angle)
+std::string BuildingMaker::AddWindow(const QVector3D &_size,
+    const QVector3D &_pos, double _angle)
 {
   std::ostringstream linkNameStream;
   linkNameStream << "Window_" << this->windowCounter++;
@@ -228,8 +231,8 @@ std::string BuildingMaker::AddWindow(QVector3D _size, QVector3D _pos,
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::AddDoor(QVector3D _size, QVector3D _pos,
-    double _angle)
+std::string BuildingMaker::AddDoor(const QVector3D &_size,
+    const QVector3D &_pos, double _angle)
 {
   /// TODO a copy of AddWindow function. FIXME later
   std::ostringstream linkNameStream;
@@ -266,8 +269,8 @@ std::string BuildingMaker::AddDoor(QVector3D _size, QVector3D _pos,
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
-    double _angle, int _steps)
+std::string BuildingMaker::AddStairs(const QVector3D &_size,
+    const QVector3D &_pos, double _angle, int _steps)
 {
   std::ostringstream linkNameStream;
   linkNameStream << "Stairs_" << this->stairsCounter++;
@@ -331,8 +334,8 @@ std::string BuildingMaker::AddStairs(QVector3D _size, QVector3D _pos,
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::AddFloor(QVector3D _size, QVector3D _pos,
-    double _angle)
+std::string BuildingMaker::AddFloor(const QVector3D &_size,
+    const QVector3D &_pos, double _angle)
 {
   /// TODO a copy of AddWindow function. FIXME later
   std::ostringstream linkNameStream;
@@ -369,7 +372,7 @@ std::string BuildingMaker::AddFloor(QVector3D _size, QVector3D _pos,
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::RemovePart(std::string _partName)
+void BuildingMaker::RemovePart(const std::string &_partName)
 {
   ModelManip *manip = this->allItems[_partName];
   if (!manip)
@@ -388,7 +391,7 @@ void BuildingMaker::RemovePart(std::string _partName)
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::RemoveWall(std::string _wallName)
+void BuildingMaker::RemoveWall(const std::string &_wallName)
 {
   this->RemovePart(_wallName);
 }
@@ -439,13 +442,13 @@ bool BuildingMaker::IsActive() const
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::SetModelName(std::string _modelName)
+void BuildingMaker::SetModelName(const std::string &_modelName)
 {
   this->modelName = _modelName;
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::SaveToSDF(std::string _savePath)
+void BuildingMaker::SaveToSDF(const std::string &_savePath)
 {
   this->savePath = _savePath;
   std::ofstream savefile;
@@ -929,14 +932,15 @@ math::Pose BuildingMaker::ConvertPose(double _x, double _y, double _z,
 }
 
 /////////////////////////////////////////////////
-math::Vector3 BuildingMaker::ConvertSize(QVector3D _size)
+math::Vector3 BuildingMaker::ConvertSize(const QVector3D &_size)
 {
   QVector3D scaledSize = conversionScale*_size;
   return math::Vector3(scaledSize.x(), scaledSize.y(), scaledSize.z());
 }
 
 /////////////////////////////////////////////////
-math::Pose BuildingMaker::ConvertPose(QVector3D _pos, QVector3D _rot)
+math::Pose BuildingMaker::ConvertPose(const QVector3D &_pos,
+    const QVector3D &_rot)
 {
   QVector3D scaledPos = conversionScale*_pos;
   return math::Pose(scaledPos.x(), scaledPos.y(), scaledPos.z(),
@@ -1013,8 +1017,8 @@ bool BuildingMaker::RectCompareY(const QRectF &_a, const QRectF &_b)
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::SubdivideRectSurface(const QRectF _surface,
-    const std::vector<QRectF> _holes, std::vector<QRectF> &_subdivisions)
+void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
+    const std::vector<QRectF> &_holes, std::vector<QRectF> &_subdivisions)
 {
   // use multiset for ordered elements
   std::multiset<QRectF, bool(*)(const QRectF &, const QRectF &)> filledX(

@@ -15,13 +15,13 @@ namespace gazebo
 
         public: ~EditorItem();
 
-        public: virtual QVector3D GetSize();
+        public: virtual QVector3D GetSize() const;
 
-        public: virtual QVector3D GetScenePosition();
+        public: virtual QVector3D GetScenePosition() const;
 
-        public: virtual double GetSceneRotation();
+        public: virtual double GetSceneRotation() const;
 
-        public: virtual std::string GetType();
+        public: virtual std::string GetType() const;
 
         Q_SIGNALS: void sizeChanged(double _width, double _depth,
             double _height);

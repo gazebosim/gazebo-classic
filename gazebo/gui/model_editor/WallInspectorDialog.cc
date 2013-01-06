@@ -173,39 +173,39 @@ WallInspectorDialog::~WallInspectorDialog()
 }
 
 /////////////////////////////////////////////////
-double WallInspectorDialog::GetLength()
+double WallInspectorDialog::GetLength() const
 {
   return this->lengthSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-QPointF WallInspectorDialog::GetStartPosition()
+QPointF WallInspectorDialog::GetStartPosition() const
 {
   return QPointF(this->startXSpinBox->value(),
       this->startYSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-QPointF WallInspectorDialog::GetEndPosition()
+QPointF WallInspectorDialog::GetEndPosition() const
 {
   return QPointF(this->endXSpinBox->value(),
       this->endYSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-double WallInspectorDialog::GetHeight()
+double WallInspectorDialog::GetHeight() const
 {
   return this->heightSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double WallInspectorDialog::GetThickness()
+double WallInspectorDialog::GetThickness() const
 {
   return this->thicknessSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-std::string WallInspectorDialog::GetMaterial()
+std::string WallInspectorDialog::GetMaterial() const
 {
   return this->materialComboBox->currentText().toStdString();
 }
@@ -217,14 +217,14 @@ void WallInspectorDialog::SetLength(double _length)
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetStartPosition(QPointF _pos)
+void WallInspectorDialog::SetStartPosition(const QPointF &_pos)
 {
   this->startXSpinBox->setValue(_pos.x());
   this->startYSpinBox->setValue(_pos.y());
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetEndPosition(QPointF _pos)
+void WallInspectorDialog::SetEndPosition(const QPointF &_pos)
 {
   this->endXSpinBox->setValue(_pos.x());
   this->endYSpinBox->setValue(_pos.y());
@@ -243,7 +243,7 @@ void WallInspectorDialog::SetThickness(double _thickness)
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetMaterial(std::string _material)
+void WallInspectorDialog::SetMaterial(const std::string &_material)
 {
   int index = this->materialComboBox->findText(
       QString::fromStdString(_material));

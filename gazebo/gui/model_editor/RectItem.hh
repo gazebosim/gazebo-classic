@@ -31,7 +31,7 @@ namespace gazebo
 
     class EditorItem;
 
-    class RectItem : public EditorItem, public QGraphicsItem
+    class RectItem : public EditorItem, public QGraphicsRectItem
     {
         Q_OBJECT
 
@@ -50,17 +50,17 @@ namespace gazebo
 
         public: void SetSize(QSize _size);
 
-        public: int GetWidth();
+        public: double GetWidth() const;
 
-        public: int GetHeight();
+        public: double GetHeight() const;
 
-        public: void showCorners(bool _show);
+        public: void ShowCorners(bool _show);
 
         protected: void UpdateCornerPositions();
 
         protected: void DrawBoundingBox(QPainter *_painter);
 
-        public: virtual void SetPosition(QPointF _pos);
+        public: virtual void SetPosition(const QPointF &_pos);
 
         public: virtual void SetPosition(double _x, double _y);
 
@@ -68,13 +68,13 @@ namespace gazebo
 
         public: virtual void SetResizeFlag(unsigned int _flag);
 
-        public: double GetRotation();
+        public: double GetRotation() const;
 
-        public: virtual QVector3D GetSize();
+        public: virtual QVector3D GetSize() const;
 
-        public: virtual QVector3D GetScenePosition();
+        public: virtual QVector3D GetScenePosition() const;
 
-        public: virtual double GetSceneRotation();
+        public: virtual double GetSceneRotation() const;
 
         protected: virtual QRectF boundingRect() const;
 
