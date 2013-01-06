@@ -59,11 +59,14 @@ PolylineItem::~PolylineItem()
 void PolylineItem::SetThickness(double _thickness)
 {
   this->lineThickness = _thickness;
-  QPen segmentPen = this->pen();
-  segmentPen.setWidth(_thickness);
-  this->setPen(segmentPen);
+
+  QPen polylinePen = this->pen();
+  polylinePen.setWidth(_thickness);
+  this->setPen(polylinePen);
   for (unsigned int i = 0; i < this->segments.size(); ++i)
   {
+    QPen segmentPen = this->segments[i]->pen();
+    segmentPen.setWidth(_thickness);  
     this->segments[i]->setPen(segmentPen);
   }
 }

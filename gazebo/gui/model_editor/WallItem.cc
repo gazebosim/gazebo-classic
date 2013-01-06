@@ -356,7 +356,8 @@ void WallItem::OnApply()
   // Comparison between doubles up to 1 decimal place
   if (fabs(newLength - segmentLength) > 0.1)
   {
-    line.setLength(newLength - this->wallThickness);
+    newLength = std::max(newLength - this->wallThickness, 1.0);
+    line.setLength(newLength);
     this->SetVertexPosition(this->selectedSegment->GetIndex()+1,
         this->mapToScene(line.p2()));
   }
