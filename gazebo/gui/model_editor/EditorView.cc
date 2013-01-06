@@ -121,7 +121,8 @@ void EditorView::contextMenuEvent(QContextMenuEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mousePressEvent(QMouseEvent *_event)
 {
-  if (!drawInProgress && (_event->button() != Qt::RightButton))
+  if (!this->drawInProgress && this->drawMode != WALL
+      && (_event->button() != Qt::RightButton))
     QGraphicsView::mousePressEvent(_event);
 }
 
