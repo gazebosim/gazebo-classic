@@ -80,7 +80,7 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   axisA = axisA.Round();
   axisB = axisB.Round();
 
-  
+
   if (bulletChildLink && bulletParentLink)
     this->btHinge = new btHingeConstraint(
         *bulletParentLink->GetBulletLink(),

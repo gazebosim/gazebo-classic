@@ -100,13 +100,13 @@ void PhysicsTest::SpawnDrop(std::string _worldFile)
   model_names.push_back("test_box");
   model_names.push_back("test_sphere");
   model_names.push_back("test_cylinder");
- 
+
   int steps = 2;
   physics::ModelPtr model;
   math::Pose pose1, pose2;
   math::Vector3 vel1, vel2;
 
-  double t, x0=0;
+  double t, x0 = 0;
   for (std::list<std::string>::iterator iter = model_names.begin();
     iter != model_names.end(); ++iter)
   {
