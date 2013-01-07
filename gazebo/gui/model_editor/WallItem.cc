@@ -285,13 +285,17 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
     this->update();
 
     // re-align child items when a segment is moved
-    for (int i = _segment->GetIndex() - 1; i <= _segment->GetIndex() + 1; ++i)
+    QList<QGraphicsItem *> children = _segment->childItems();
+    for ( int i = 0; i < children.size(); ++i)
+      children[i]->moveBy(trans.x(), trans.y());
+    for (int i = _segment->GetIndex() - 1; i <= _segment->GetIndex() + 1; i+=2)
     {
       if ((i - this->GetSegmentCount()) != 0 && i >= 0)
       {
         this->UpdateSegmentChildren(this->GetSegment(i));
       }
     }
+
   }
   return true;
 }
@@ -391,7 +395,7 @@ void WallItem::UpdateSegmentChildren(LineSegmentItem *_segment)
   for (int j = 0; j < children.size(); ++j)
   {
     // TODO find a more generic way than casting child as rect item,
-    // Need to keep children at same pos ratio on line
+    // and need to keep wall-children pos ratio fixed
     RectItem *rectItem = dynamic_cast<RectItem *>(children[j]);
     if (rectItem)
     {
@@ -401,6 +405,7 @@ void WallItem::UpdateSegmentChildren(LineSegmentItem *_segment)
       double deltaRatio = sqrt(delta.x()*delta.x() + delta.y()*delta.y())
           / _segment->line().length();
       rectItem->setPos(_segment->line().p1() + deltaRatio*deltaLine);
+
     }
   }
 }
