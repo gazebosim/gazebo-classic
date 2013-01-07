@@ -60,6 +60,8 @@ namespace gazebo
 
         private: void contextMenuEvent(QGraphicsSceneContextMenuEvent *_event);
 
+        private: void UpdateSegmentChildren(LineSegmentItem *_segment);
+
         private slots: void OnApply();
 
         private slots: void OnOpenInspector();

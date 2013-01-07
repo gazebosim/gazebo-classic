@@ -45,6 +45,7 @@ WallItem::WallItem(const QPointF &_start, const QPointF &_end)
 
   this->selectedSegment = NULL;
 
+  this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
   this->setAcceptHoverEvents(true);
 
   this->inspector = new WallInspectorDialog();
@@ -193,23 +194,7 @@ bool WallItem::grabberEventFilter(GrabberHandle* _grabber, QEvent *_event)
     {
       if ((i - this->GetSegmentCount()) != 0 && i >= 0)
       {
-        LineSegmentItem *segment = this->GetSegment(i);
-        QList<QGraphicsItem *> children = segment->childItems();
-        for (int j = 0; j < children.size(); ++j)
-        {
-          // TODO find a more generic way than casting child as rect item
-          RectItem *rectItem = dynamic_cast<RectItem *>(children[j]);
-          if (rectItem)
-          {
-            rectItem->SetRotation(-segment->line().angle());
-            QPointF delta = rectItem->pos() - segment->line().p1();
-            QPointF deltaLine = segment->line().p2() - segment->line().p1();
-            double deltaRatio = sqrt(delta.x()*delta.x() + delta.y()*delta.y())
-                / segment->line().length();
-            rectItem->setPos(segment->line().p1() + deltaRatio*deltaLine);
-
-          }
-        }
+        this->UpdateSegmentChildren(this->GetSegment(i));
       }
     }
   }
@@ -299,9 +284,14 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
 
     this->update();
 
-    QList<QGraphicsItem *> children = _segment->childItems();
-    for ( int i = 0; i < children.size(); ++i)
-      children[i]->moveBy(trans.x(), trans.y());
+    // re-align child items when a segment is moved
+    for (int i = _segment->GetIndex() - 1; i <= _segment->GetIndex() + 1; ++i)
+    {
+      if ((i - this->GetSegmentCount()) != 0 && i >= 0)
+      {
+        this->UpdateSegmentChildren(this->GetSegment(i));
+      }
+    }
   }
   return true;
 }
@@ -392,6 +382,27 @@ void WallItem::SetSegmentSelected(unsigned int _index, bool _selected)
   this->grabbers[_index]->setVisible(_selected);
   this->grabbers[_index+1]->setVisible(_selected);
   this->selectedSegment->setSelected(_selected);
+}
+
+/////////////////////////////////////////////////
+void WallItem::UpdateSegmentChildren(LineSegmentItem *_segment)
+{
+  QList<QGraphicsItem *> children = _segment->childItems();
+  for (int j = 0; j < children.size(); ++j)
+  {
+    // TODO find a more generic way than casting child as rect item,
+    // Need to keep children at same pos ratio on line
+    RectItem *rectItem = dynamic_cast<RectItem *>(children[j]);
+    if (rectItem)
+    {
+      rectItem->SetRotation(-_segment->line().angle());
+      QPointF delta = rectItem->pos() - _segment->line().p1();
+      QPointF deltaLine = _segment->line().p2() - _segment->line().p1();
+      double deltaRatio = sqrt(delta.x()*delta.x() + delta.y()*delta.y())
+          / _segment->line().length();
+      rectItem->setPos(_segment->line().p1() + deltaRatio*deltaLine);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
