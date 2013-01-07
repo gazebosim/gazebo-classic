@@ -194,6 +194,16 @@ double LineSegmentItem::GetSceneRotation() const
 }
 
 /////////////////////////////////////////////////
+void LineSegmentItem::paint(QPainter *_painter,
+    const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
+{
+  _painter->save();
+  _painter->setPen(this->pen());
+  _painter->drawLine(this->line());
+  _painter->restore();
+}
+
+/////////////////////////////////////////////////
 void LineSegmentItem::LineChanged()
 {
   emit widthChanged(this->line().length() + this->pen().width());

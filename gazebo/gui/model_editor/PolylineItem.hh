@@ -91,10 +91,10 @@ namespace gazebo
       private: QVariant itemChange(GraphicsItemChange _change,
         const QVariant &_value);
 
-      private: void DrawBoundingBox(QPainter *_painter);
-
       private: void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+
+      private: void DrawBoundingBox(QPainter *_painter);
 
       protected: std::vector<GrabberHandle*> grabbers;
 
