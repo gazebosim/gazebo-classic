@@ -103,6 +103,13 @@ EditorView::~EditorView()
 /////////////////////////////////////////////////
 void EditorView::contextMenuEvent(QContextMenuEvent *_event)
 {
+  if (this->drawInProgress)
+  {
+    this->CancelDrawMode();
+    _event->accept();
+    return;
+  }
+
   QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
   if (item)
   {
@@ -375,29 +382,7 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
   }
   else if (_event->key() == Qt::Key_Escape)
   {
-    if (this->drawInProgress)
-    {
-      if (this->currentMouseItem)
-      {
-        EditorItem *item = dynamic_cast<EditorItem *>(currentMouseItem);
-        this->itemToModelMap.erase(item);
-        if (drawMode == WALL)
-        {
-          WallItem* wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
-          wallItem->PopEndPoint();
-          wallList.push_back(wallItem);
-          //this->buildingMaker->RemoveWall(this->lastWallSegmentName);
-          this->lastWallSegmentName = "";
-        }
-        else
-        {
-          delete this->currentMouseItem;
-        }
-      }
-      this->drawMode = NONE;
-      this->drawInProgress = false;
-      this->currentMouseItem = NULL;
-    }
+    this->CancelDrawMode();
   }
 }
 
@@ -792,4 +777,30 @@ void EditorView::OnLevelApply()
   std::string newLevelName = dialog->GetLevelName();
     this->levelNames[this->currentLevel] = newLevelName;
     emit gui::editor::Events::changeLevelName(this->currentLevel, newLevelName);
+}
+
+/////////////////////////////////////////////////
+void EditorView::CancelDrawMode()
+{
+  if (this->drawInProgress && this->currentMouseItem)
+  {
+    EditorItem *item = dynamic_cast<EditorItem *>(this->currentMouseItem);
+    this->itemToModelMap.erase(item);
+    if (drawMode == WALL)
+    {
+      WallItem* wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
+      wallItem->PopEndPoint();
+      wallList.push_back(wallItem);
+      //this->buildingMaker->RemoveWall(this->lastWallSegmentName);
+      this->lastWallSegmentName = "";
+    }
+    else
+    {
+      delete this->currentMouseItem;
+    }
+
+    this->drawMode = NONE;
+    this->drawInProgress = false;
+    this->currentMouseItem = NULL;
+  }
 }

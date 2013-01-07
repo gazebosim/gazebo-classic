@@ -85,6 +85,8 @@ namespace gazebo
 
       private slots: void OnOpenLevelInspector();
 
+      private: void CancelDrawMode();
+
       private: int drawMode;
 
       private: int mouseMode;
