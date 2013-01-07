@@ -305,7 +305,7 @@ void MainWindow::Save()
 
       if (guiElem->HasAttribute("fullscreen"))
         guiElem->GetAttribute("fullscreen")->Set(g_fullscreen);
-      
+
       sdf::ElementPtr cameraElem = guiElem->GetElement("camera");
       rendering::UserCameraPtr cam = gui::get_active_camera();
 
