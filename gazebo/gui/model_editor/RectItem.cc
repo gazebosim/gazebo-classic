@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/math/Angle.hh"
-#include "gazebo/gui/model_editor/CornerGrabber.hh"
+#include "gazebo/gui/model_editor/GrabberHandle.hh"
 #include "gazebo/gui/model_editor/RotateHandle.hh"
 #include "gazebo/gui/model_editor/EditorItem.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
@@ -43,8 +43,8 @@ RectItem::RectItem():
 
   for (int i = 0; i < 8; ++i)
   {
-    CornerGrabber *corner = new CornerGrabber(this, i);
-    this->corners.push_back(corner);
+    GrabberHandle *grabber = new GrabberHandle(this, i);
+    this->grabbers.push_back(grabber);
   }
   this->rotateHandle = new RotateHandle(this);
 
@@ -81,8 +81,8 @@ RectItem::~RectItem()
 {
   for (int i = 0; i < 8; ++i)
   {
-    this->corners[i]->setParentItem(NULL);
-    delete this->corners[i];
+    this->grabbers[i]->setParentItem(NULL);
+    delete this->grabbers[i];
   }
   this->rotateHandle->setParentItem(NULL);
   delete this->rotateHandle;
@@ -93,7 +93,7 @@ void RectItem::ShowCorners(bool _show)
 {
   for (int i = 0; i < 8; ++i)
   {
-    this->corners[i]->setVisible(_show && this->corners[i]->isEnabled());
+    this->grabbers[i]->setVisible(_show && this->grabbers[i]->isEnabled());
 
   }
   this->rotateHandle->setVisible(_show);
@@ -120,8 +120,8 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
       this->setZValue(zValueSelected);
       for (int i = 0; i < 8; ++i)
       {
-        if (this->corners[i]->isEnabled())
-          this->corners[i]->installSceneEventFilter(this);
+        if (this->grabbers[i]->isEnabled())
+          this->grabbers[i]->installSceneEventFilter(this);
       }
       this->rotateHandle->installSceneEventFilter(this);
     }
@@ -130,8 +130,8 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
       this->setZValue(zValueIdle);
       for (int i = 0; i < 8; ++i)
       {
-        if (this->corners[i]->isEnabled())
-          this->corners[i]->removeSceneEventFilter(this);
+        if (this->grabbers[i]->isEnabled())
+          this->grabbers[i]->removeSceneEventFilter(this);
       }
       this->rotateHandle->removeSceneEventFilter(this);
     }
@@ -156,9 +156,9 @@ bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
   if (rotateH != NULL)
     return this->rotateEventFilter(rotateH, _event);
 
-  CornerGrabber *corner = dynamic_cast<CornerGrabber *>(_watched);
-  if (corner != NULL && corner->isEnabled())
-    return this->cornerEventFilter(corner, _event);
+  GrabberHandle *grabber = dynamic_cast<GrabberHandle *>(_watched);
+  if (grabber != NULL && grabber->isEnabled())
+    return this->grabberEventFilter(grabber, _event);
 
   return false;
 }
@@ -250,7 +250,7 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 }
 
 /////////////////////////////////////////////////
-bool RectItem::cornerEventFilter(CornerGrabber *_corner, QEvent *_event)
+bool RectItem::grabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -259,20 +259,20 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner, QEvent *_event)
   {
     case QEvent::GraphicsSceneMousePress:
     {
-      _corner->SetMouseState(static_cast<int>(QEvent::GraphicsSceneMousePress));
-      _corner->SetMouseDownX(mouseEvent->pos().x());
-      _corner->SetMouseDownY(mouseEvent->pos().y());
+      _grabber->SetMouseState(static_cast<int>(QEvent::GraphicsSceneMousePress));
+      _grabber->SetMouseDownX(mouseEvent->pos().x());
+      _grabber->SetMouseDownY(mouseEvent->pos().y());
       break;
     }
     case QEvent::GraphicsSceneMouseRelease:
     {
-      _corner->SetMouseState(
+      _grabber->SetMouseState(
           static_cast<int>(QEvent::GraphicsSceneMouseRelease));
       break;
     }
     case QEvent::GraphicsSceneMouseMove:
     {
-      _corner->SetMouseState(static_cast<int>(QEvent::GraphicsSceneMouseMove));
+      _grabber->SetMouseState(static_cast<int>(QEvent::GraphicsSceneMouseMove));
       break;
     }
     case QEvent::GraphicsSceneHoverEnter:
@@ -288,24 +288,24 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner, QEvent *_event)
           || ((angle <= (180 + range)) && (angle > (180 - range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[_corner->GetIndex() % 4]));
+            QCursor(this->cursors[_grabber->GetIndex() % 4]));
       }
       else if (((angle <= (360 - range)) && (angle > (270 + range)))
           || ((angle <= (180 - range)) && (angle > (90 + range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[(_corner->GetIndex() + 3) % 4]));
+            QCursor(this->cursors[(_grabber->GetIndex() + 3) % 4]));
       }
       else if (((angle <= (270 + range)) && (angle > (270 - range)))
           || ((angle <= (90 + range)) && (angle > (90 - range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[(_corner->GetIndex() + 2) % 4]));
+            QCursor(this->cursors[(_grabber->GetIndex() + 2) % 4]));
       }
       else
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[(_corner->GetIndex() + 1) % 4]));
+            QCursor(this->cursors[(_grabber->GetIndex() + 1) % 4]));
       }
       return true;
     }
@@ -322,19 +322,19 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner, QEvent *_event)
     return false;
 
 
-  if (_corner->GetMouseState()
+  if (_grabber->GetMouseState()
       == static_cast<int>(QEvent::GraphicsSceneMouseMove))
   {
     double xPos = mouseEvent->pos().x();
     double yPos = mouseEvent->pos().y();
 
-    // depending on which corner has been grabbed, we want to move the position
+    // depending on which grabber has been grabbed, we want to move the position
     // of the item as it grows/shrinks accordingly. so we need to either add
-    // or subtract the offsets based on which corner this is.
+    // or subtract the offsets based on which grabber this is.
 
     int xAxisSign = 0;
     int yAxisSign = 0;
-    switch(_corner->GetIndex())
+    switch(_grabber->GetIndex())
     {
       // corners
       case 0:
@@ -393,8 +393,8 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner, QEvent *_event)
     // if the mouse is being dragged, calculate a new size and also position
     // for resizing the box
 
-    double xMoved = _corner->GetMouseDownX() - xPos;
-    double yMoved = _corner->GetMouseDownY() - yPos;
+    double xMoved = _grabber->GetMouseDownX() - xPos;
+    double yMoved = _grabber->GetMouseDownY() - yPos;
 
     double newWidth = this->width + (xAxisSign * xMoved);
     if (newWidth < 20)
@@ -415,9 +415,9 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner, QEvent *_event)
     double angle = rotationAngle / 360.0 * (2 * M_PI);
     double dx = 0;
     double dy = 0;
-    switch(_corner->GetIndex())
+    switch(_grabber->GetIndex())
     {
-      // corners
+      // grabbers
       case 0:
       {
         dx = sin(-angle) * deltaHeight/2;
@@ -489,12 +489,12 @@ bool RectItem::cornerEventFilter(CornerGrabber *_corner, QEvent *_event)
     this->UpdateCornerPositions();
     this->update();
 
-    /*if (_corner->GetIndex() == 1 || _corner->GetIndex() == 5 ||
-        (_corner->GetIndex() % 2 == 0))
+    /*if (_grabber->GetIndex() == 1 || _grabber->GetIndex() == 5 ||
+        (_grabber->GetIndex() % 2 == 0))
       emit depthChanged(this->drawingHeight);
 
-    if (_corner->GetIndex() == 3 || _corner->GetIndex() == 7 ||
-        (_corner->GetIndex() % 2 == 0))
+    if (_grabber->GetIndex() == 3 || _grabber->GetIndex() == 7 ||
+        (_grabber->GetIndex() % 2 == 0))
       emit widthChanged(this->drawingWidth);*/
   }
   return true;
@@ -568,8 +568,8 @@ void RectItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
 
   for (int i = 0; i < 8; ++i)
   {
-    if (this->corners[i]->isEnabled())
-      this->corners[i]->removeSceneEventFilter(this);
+    if (this->grabbers[i]->isEnabled())
+      this->grabbers[i]->removeSceneEventFilter(this);
   }
   this->rotateHandle->removeSceneEventFilter(this);
 }
@@ -600,8 +600,8 @@ void RectItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 //    this->borderColor = Qt::red;
   for (int i = 0; i < 8; ++i)
   {
-    if (this->corners[i]->isEnabled())
-      this->corners[i]->installSceneEventFilter(this);
+    if (this->grabbers[i]->isEnabled())
+      this->grabbers[i]->installSceneEventFilter(this);
   }
   this->rotateHandle->installSceneEventFilter(this);
 }
@@ -609,32 +609,32 @@ void RectItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 /////////////////////////////////////////////////
 void RectItem::UpdateCornerPositions()
 {
-  int cornerWidth = (this->corners[0]->boundingRect().width())/2;
-  int cornerHeight = (this->corners[0]->boundingRect().height())/2;
+  int grabberWidth = (this->grabbers[0]->boundingRect().width())/2;
+  int grabberHeight = (this->grabbers[0]->boundingRect().height())/2;
 
-  this->corners[0]->setPos(
-      this->drawingOriginX - this->drawingWidth/2 - cornerWidth,
-      this->drawingOriginY - this->drawingHeight/2 - cornerHeight);
-  this->corners[2]->setPos(
-      this->drawingOriginX + this->drawingWidth/2 - cornerWidth,
-      this->drawingOriginY - this->drawingHeight/2 - cornerHeight);
-  this->corners[4]->setPos(
-      this->drawingOriginX + this->drawingWidth/2 - cornerWidth,
-      this->drawingOriginY + this->drawingHeight/2 - cornerHeight);
-  this->corners[6]->setPos(
-      this->drawingOriginX - this->drawingWidth/2 - cornerWidth,
-      this->drawingOriginY + this->drawingHeight/2 - cornerHeight);
+  this->grabbers[0]->setPos(
+      this->drawingOriginX - this->drawingWidth/2 - grabberWidth,
+      this->drawingOriginY - this->drawingHeight/2 - grabberHeight);
+  this->grabbers[2]->setPos(
+      this->drawingOriginX + this->drawingWidth/2 - grabberWidth,
+      this->drawingOriginY - this->drawingHeight/2 - grabberHeight);
+  this->grabbers[4]->setPos(
+      this->drawingOriginX + this->drawingWidth/2 - grabberWidth,
+      this->drawingOriginY + this->drawingHeight/2 - grabberHeight);
+  this->grabbers[6]->setPos(
+      this->drawingOriginX - this->drawingWidth/2 - grabberWidth,
+      this->drawingOriginY + this->drawingHeight/2 - grabberHeight);
 
-  this->corners[1]->setPos(this->drawingOriginX - cornerWidth,
-      this->drawingOriginY - this->drawingHeight/2 - cornerHeight);
-  this->corners[3]->setPos(
-      this->drawingOriginX + this->drawingWidth/2 - cornerWidth,
-      this->drawingOriginY - cornerHeight);
-  this->corners[5]->setPos(this->drawingOriginX - cornerWidth,
-      this->drawingOriginY + this->drawingHeight/2 - cornerHeight);
-  this->corners[7]->setPos(
-      this->drawingOriginX - this->drawingWidth/2 - cornerWidth,
-      this->drawingOriginY - cornerHeight);
+  this->grabbers[1]->setPos(this->drawingOriginX - grabberWidth,
+      this->drawingOriginY - this->drawingHeight/2 - grabberHeight);
+  this->grabbers[3]->setPos(
+      this->drawingOriginX + this->drawingWidth/2 - grabberWidth,
+      this->drawingOriginY - grabberHeight);
+  this->grabbers[5]->setPos(this->drawingOriginX - grabberWidth,
+      this->drawingOriginY + this->drawingHeight/2 - grabberHeight);
+  this->grabbers[7]->setPos(
+      this->drawingOriginX - this->drawingWidth/2 - grabberWidth,
+      this->drawingOriginY - grabberHeight);
 
   this->rotateHandle->setPos(this->drawingOriginX,
       this->drawingOriginY - this->drawingHeight/2);
@@ -837,24 +837,24 @@ void RectItem::SetResizeFlag(unsigned int _flag)
 
   this->resizeFlag = _flag;
   for (int i = 0; i < 8; ++i)
-    this->corners[i]->setEnabled(false);
+    this->grabbers[i]->setEnabled(false);
 
 
   if (resizeFlag & ITEM_WIDTH)
   {
-    this->corners[3]->setEnabled(true);
-    this->corners[7]->setEnabled(true);
+    this->grabbers[3]->setEnabled(true);
+    this->grabbers[7]->setEnabled(true);
   }
   if (resizeFlag & ITEM_HEIGHT)
   {
-    this->corners[1]->setEnabled(true);
-    this->corners[5]->setEnabled(true);
+    this->grabbers[1]->setEnabled(true);
+    this->grabbers[5]->setEnabled(true);
   }
   if ((resizeFlag & ITEM_WIDTH) && (resizeFlag & ITEM_HEIGHT))
   {
-    this->corners[0]->setEnabled(true);
-    this->corners[2]->setEnabled(true);
-    this->corners[4]->setEnabled(true);
-    this->corners[6]->setEnabled(true);
+    this->grabbers[0]->setEnabled(true);
+    this->grabbers[2]->setEnabled(true);
+    this->grabbers[4]->setEnabled(true);
+    this->grabbers[6]->setEnabled(true);
   }
 }

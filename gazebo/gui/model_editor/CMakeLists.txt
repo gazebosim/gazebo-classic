@@ -11,7 +11,7 @@ set (sources
   StairsInspectorDialog.cc
   LevelInspectorDialog.cc
   GridLines.cc
-  CornerGrabber.cc
+  GrabberHandle.cc
   RotateHandle.cc
   EditorItem.cc
   BuildingItem.cc
@@ -52,7 +52,7 @@ set (headers
   BuildingMaker.hh
   BuildingEditorWidget.hh
   EditorWidget.hh
-  CornerGrabber.hh
+  GrabberHandle.hh
   RotateHandle.hh
   BuildingItem.hh
   FloorItem.hh

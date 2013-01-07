@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/gui/model_editor/CornerGrabber.hh"
+#include "gazebo/gui/model_editor/GrabberHandle.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/LineSegmentItem.hh"
 #include "gazebo/gui/model_editor/PolylineItem.hh"
@@ -81,10 +81,10 @@ void PolylineItem::SetPosition(const QPointF &_pos)
 void PolylineItem::AddPoint(const QPointF &_point)
 {
   QPointF lineEnd = _point - this->origin;
-  if (!corners.empty())
+  if (!grabbers.empty())
   {
-    QPointF lineStart = this->mapToScene(corners.back()->pos())
-        + QPointF(this->cornerWidth/2.0, this->cornerHeight/2.0)
+    QPointF lineStart = this->mapToScene(grabbers.back()->pos())
+        + QPointF(this->grabberWidth/2.0, this->grabberHeight/2.0)
         - this->origin;
 
     LineSegmentItem *segment = new LineSegmentItem(this, this->segments.size());
@@ -94,16 +94,16 @@ void PolylineItem::AddPoint(const QPointF &_point)
     this->segments.push_back(segment);
   }
 
-  CornerGrabber *corner = new CornerGrabber(this,
-      static_cast<int>(corners.size()));
-  corner->setVisible(false);
-  this->corners.push_back(corner);
+  GrabberHandle *grabber = new GrabberHandle(this,
+      static_cast<int>(grabbers.size()));
+  grabber->setVisible(false);
+  this->grabbers.push_back(grabber);
 
-  this->cornerWidth = corner->boundingRect().width();
-  this->cornerHeight = corner->boundingRect().height();
+  this->grabberWidth = grabber->boundingRect().width();
+  this->grabberHeight = grabber->boundingRect().height();
 
-  corner->setPos(lineEnd.x() - this->cornerWidth/2.0,
-      lineEnd.y() - this->cornerHeight/2.0);
+  grabber->setPos(lineEnd.x() - this->grabberWidth/2.0,
+      lineEnd.y() - this->grabberHeight/2.0);
 
   this->AppendToPath(_point);
 }
@@ -111,13 +111,13 @@ void PolylineItem::AddPoint(const QPointF &_point)
 /////////////////////////////////////////////////
 void PolylineItem::PopEndPoint()
 {
-  CornerGrabber *corner = this->corners.back();
-  if (corner)
+  GrabberHandle *grabber = this->grabbers.back();
+  if (grabber)
   {
     if (this->scene())
-      this->scene()->removeItem(corner);
-    this->corners.pop_back();
-    delete corner;
+      this->scene()->removeItem(grabber);
+    this->grabbers.pop_back();
+    delete grabber;
   }
 
   LineSegmentItem *segment =  this->segments.back();
@@ -134,7 +134,7 @@ void PolylineItem::PopEndPoint()
 /////////////////////////////////////////////////
 unsigned int PolylineItem::GetVertexCount() const
 {
-  return this->corners.size();
+  return this->grabbers.size();
 }
 
 /////////////////////////////////////////////////
@@ -154,13 +154,13 @@ LineSegmentItem *PolylineItem::GetSegment(unsigned int _index) const
 /////////////////////////////////////////////////
 void PolylineItem::SetVertexPosition(unsigned int _index, const QPointF &_pos)
 {
-  if (_index >= this->corners.size())
+  if (_index >= this->grabbers.size())
     return;
 
   QPointF lineEnd = _pos - this->origin;
 
-  this->corners[_index]->setPos(lineEnd.x() - this->cornerWidth/2.0,
-      lineEnd.y() - this->cornerHeight/2.0);
+  this->grabbers[_index]->setPos(lineEnd.x() - this->grabberWidth/2.0,
+      lineEnd.y() - this->grabberHeight/2.0);
 
   if (_index != 0)
     this->segments[_index-1]->SetEndPoint(lineEnd);
@@ -174,14 +174,14 @@ void PolylineItem::SetVertexPosition(unsigned int _index, const QPointF &_pos)
 /////////////////////////////////////////////////
 void PolylineItem::TranslateVertex(unsigned int _index, const QPointF &_trans)
 {
-  if (_index >= this->corners.size())
+  if (_index >= this->grabbers.size())
     return;
 
-  QPointF newCornerPos = this->corners[_index]->pos() + _trans;
+  QPointF newCornerPos = this->grabbers[_index]->pos() + _trans;
 
-  this->corners[_index]->setPos(newCornerPos);
+  this->grabbers[_index]->setPos(newCornerPos);
 
-  QPointF offset(this->cornerWidth/2.0, this->cornerHeight/2.0);
+  QPointF offset(this->grabberWidth/2.0, this->grabberHeight/2.0);
   if (_index != 0)
     this->segments[_index-1]->SetEndPoint(newCornerPos + offset);
   if (_index < this->segments.size())
@@ -194,9 +194,9 @@ void PolylineItem::TranslateVertex(unsigned int _index, const QPointF &_trans)
 bool PolylineItem::sceneEventFilter(QGraphicsItem *_watched,
     QEvent *_event)
 {
-  CornerGrabber *corner = dynamic_cast<CornerGrabber *>(_watched);
-  if (corner)
-    return this->cornerEventFilter(corner, _event);
+  GrabberHandle *grabber = dynamic_cast<GrabberHandle *>(_watched);
+  if (grabber)
+    return this->grabberEventFilter(grabber, _event);
 
   LineSegmentItem *segment = dynamic_cast<LineSegmentItem *>(_watched);
   if (segment)
@@ -256,7 +256,7 @@ bool PolylineItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
 }
 
 /////////////////////////////////////////////////
-bool PolylineItem::cornerEventFilter(CornerGrabber* _corner, QEvent *_event)
+bool PolylineItem::grabberEventFilter(GrabberHandle* _grabber, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -265,21 +265,21 @@ bool PolylineItem::cornerEventFilter(CornerGrabber* _corner, QEvent *_event)
   {
     case QEvent::GraphicsSceneMousePress:
     {
-      _corner->SetMouseState(QEvent::GraphicsSceneMousePress);
-      QPointF scenePosition =  _corner->mapToScene(mouseEvent->pos());
+      _grabber->SetMouseState(QEvent::GraphicsSceneMousePress);
+      QPointF scenePosition =  _grabber->mapToScene(mouseEvent->pos());
 
-      _corner->SetMouseDownX(scenePosition.x());
-      _corner->SetMouseDownY(scenePosition.y());
+      _grabber->SetMouseDownX(scenePosition.x());
+      _grabber->SetMouseDownY(scenePosition.y());
       break;
     }
     case QEvent::GraphicsSceneMouseRelease:
     {
-      _corner->SetMouseState(QEvent::GraphicsSceneMouseRelease);
+      _grabber->SetMouseState(QEvent::GraphicsSceneMouseRelease);
       break;
     }
     case QEvent::GraphicsSceneMouseMove:
     {
-      _corner->SetMouseState(QEvent::GraphicsSceneMouseMove);
+      _grabber->SetMouseState(QEvent::GraphicsSceneMouseMove);
       break;
     }
     case QEvent::GraphicsSceneHoverEnter:
@@ -303,11 +303,11 @@ bool PolylineItem::cornerEventFilter(CornerGrabber* _corner, QEvent *_event)
   if (!mouseEvent)
     return false;
 
-  if (_corner->GetMouseState() == QEvent::GraphicsSceneMouseMove)
+  if (_grabber->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
-    QPointF scenePosition = _corner->mapToScene(mouseEvent->pos());
+    QPointF scenePosition = _grabber->mapToScene(mouseEvent->pos());
 
-    this->SetVertexPosition(_corner->GetIndex(), scenePosition);
+    this->SetVertexPosition(_grabber->GetIndex(), scenePosition);
 
     this->update();
   }
@@ -319,13 +319,13 @@ void PolylineItem::UpdatePath()
 {
   QPainterPath newPath;
 
-  QPointF point = this->corners[0]->pos() +
-      QPointF(this->cornerWidth/2.0, this->cornerHeight/2.0);
+  QPointF point = this->grabbers[0]->pos() +
+      QPointF(this->grabberWidth/2.0, this->grabberHeight/2.0);
   newPath.moveTo(point);
-  for (unsigned int i = 1; i < corners.size(); ++i)
+  for (unsigned int i = 1; i < grabbers.size(); ++i)
   {
-    point = this->corners[i]->pos() +
-        QPointF(this->cornerWidth/2.0, this->cornerHeight/2.0);
+    point = this->grabbers[i]->pos() +
+        QPointF(this->grabberWidth/2.0, this->grabberHeight/2.0);
     newPath.lineTo(point);
   }
   this->setPath(newPath);
@@ -408,9 +408,9 @@ void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent */*_event*/)
   for (unsigned int i = 0; i < segments.size(); ++i)
   {
     this->segments[i]->installSceneEventFilter(this);
-    this->corners[i]->installSceneEventFilter(this);
+    this->grabbers[i]->installSceneEventFilter(this);
   }
-    this->corners[corners.size()-1]->installSceneEventFilter(this);
+    this->grabbers[grabbers.size()-1]->installSceneEventFilter(this);
 }
 
 /////////////////////////////////////////////////
@@ -427,9 +427,9 @@ void PolylineItem::hoverMoveEvent(QGraphicsSceneHoverEvent */*_event*/)
   for (unsigned int i = 0; i < segments.size(); ++i)
   {
     this->segments[i]->installSceneEventFilter(this);
-    this->corners[i]->installSceneEventFilter(this);
+    this->grabbers[i]->installSceneEventFilter(this);
   }
-    this->corners[corners.size()-1]->installSceneEventFilter(this);
+    this->grabbers[grabbers.size()-1]->installSceneEventFilter(this);
 }
 
 
@@ -446,10 +446,10 @@ void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent */*_event*/)
 
   for (unsigned int i = 0; i < segments.size(); ++i)
   {
-    this->corners[i]->removeSceneEventFilter(this);
+    this->grabbers[i]->removeSceneEventFilter(this);
     this->segments[i]->removeSceneEventFilter(this);
   }
-    this->corners[corners.size()-1]->removeSceneEventFilter(this);
+    this->grabbers[grabbers.size()-1]->removeSceneEventFilter(this);
 }
 
 /////////////////////////////////////////////////
@@ -465,9 +465,9 @@ QVariant PolylineItem::itemChange(GraphicsItemChange _change,
       for (unsigned int i = 0; i < segments.size(); ++i)
       {
         this->segments[i]->installSceneEventFilter(this);
-        this->corners[i]->installSceneEventFilter(this);
+        this->grabbers[i]->installSceneEventFilter(this);
       }
-        this->corners[corners.size()-1]->installSceneEventFilter(this);
+        this->grabbers[grabbers.size()-1]->installSceneEventFilter(this);
     }
     else
     {
@@ -475,10 +475,10 @@ QVariant PolylineItem::itemChange(GraphicsItemChange _change,
 
       for (unsigned int i = 0; i < segments.size(); ++i)
       {
-        this->corners[i]->removeSceneEventFilter(this);
+        this->grabbers[i]->removeSceneEventFilter(this);
         this->segments[i]->removeSceneEventFilter(this);
       }
-        this->corners[corners.size()-1]->removeSceneEventFilter(this);
+        this->grabbers[grabbers.size()-1]->removeSceneEventFilter(this);
     }
     if (!_value.toBool())
         this->ShowCorners(_value.toBool());
@@ -489,8 +489,8 @@ QVariant PolylineItem::itemChange(GraphicsItemChange _change,
 /////////////////////////////////////////////////
 void PolylineItem::ShowCorners(bool _show)
 {
-  for (unsigned int i = 0; i < this->corners.size(); ++i)
-    this->corners[i]->setVisible(_show);
+  for (unsigned int i = 0; i < this->grabbers.size(); ++i)
+    this->grabbers[i]->setVisible(_show);
 }
 
 /////////////////////////////////////////////////

@@ -25,7 +25,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class CornerGrabber;
+    class GrabberHandle;
 
     class EditorItem;
 
@@ -70,7 +70,7 @@ namespace gazebo
       private: bool sceneEventFilter(QGraphicsItem * watched,
         QEvent *_event);
 
-      private: virtual bool cornerEventFilter(CornerGrabber *_corner,
+      private: virtual bool grabberEventFilter(GrabberHandle *_grabber,
           QEvent *_event);
 
       private: virtual bool segmentEventFilter(LineSegmentItem *_item,
@@ -96,7 +96,7 @@ namespace gazebo
       private: void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-      protected: std::vector<CornerGrabber*> corners;
+      protected: std::vector<GrabberHandle*> grabbers;
 
       protected: std::vector<LineSegmentItem*> segments;
 
@@ -108,9 +108,9 @@ namespace gazebo
 
       private: int gridSpace;
 
-      private: int cornerWidth;
+      private: int grabberWidth;
 
-      private: int cornerHeight;
+      private: int grabberHeight;
 
       private: double lineThickness;
     };

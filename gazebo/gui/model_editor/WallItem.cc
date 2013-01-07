@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/common/Exception.hh"
-#include "gazebo/gui/model_editor/CornerGrabber.hh"
+#include "gazebo/gui/model_editor/GrabberHandle.hh"
 #include "gazebo/gui/model_editor/EditorItem.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/BuildingItem.hh"
@@ -108,7 +108,7 @@ WallItem *WallItem::Clone() const
 }
 
 /////////////////////////////////////////////////
-bool WallItem::cornerEventFilter(CornerGrabber* _corner, QEvent *_event)
+bool WallItem::grabberEventFilter(GrabberHandle* _grabber, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -117,21 +117,21 @@ bool WallItem::cornerEventFilter(CornerGrabber* _corner, QEvent *_event)
   {
     case QEvent::GraphicsSceneMousePress:
     {
-      _corner->SetMouseState(QEvent::GraphicsSceneMousePress);
-      QPointF scenePosition =  _corner->mapToScene(mouseEvent->pos());
+      _grabber->SetMouseState(QEvent::GraphicsSceneMousePress);
+      QPointF scenePosition =  _grabber->mapToScene(mouseEvent->pos());
 
-      _corner->SetMouseDownX(scenePosition.x());
-      _corner->SetMouseDownY(scenePosition.y());
+      _grabber->SetMouseDownX(scenePosition.x());
+      _grabber->SetMouseDownY(scenePosition.y());
       break;
     }
     case QEvent::GraphicsSceneMouseRelease:
     {
-      _corner->SetMouseState(QEvent::GraphicsSceneMouseRelease);
+      _grabber->SetMouseState(QEvent::GraphicsSceneMouseRelease);
       break;
     }
     case QEvent::GraphicsSceneMouseMove:
     {
-      _corner->SetMouseState(QEvent::GraphicsSceneMouseMove);
+      _grabber->SetMouseState(QEvent::GraphicsSceneMouseMove);
       break;
     }
     case QEvent::GraphicsSceneHoverEnter:
@@ -154,18 +154,18 @@ bool WallItem::cornerEventFilter(CornerGrabber* _corner, QEvent *_event)
   if (!mouseEvent)
     return false;
 
-  if (_corner->GetMouseState() == QEvent::GraphicsSceneMouseMove)
+  if (_grabber->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
-    QPointF scenePosition = _corner->mapToScene(mouseEvent->pos());
-    int cornerIndex = _corner->GetIndex();
+    QPointF scenePosition = _grabber->mapToScene(mouseEvent->pos());
+    int grabberIndex = _grabber->GetIndex();
 
     // Snap wall rotations to fixed size increments
     QPointF newScenePos = scenePosition;
-    if ((cornerIndex <= static_cast<int>(this->GetSegmentCount())))
+    if ((grabberIndex <= static_cast<int>(this->GetSegmentCount())))
     {
       LineSegmentItem *segment = this->selectedSegment;
       QPointF lineOrigin = segment->line().p1();
-      if (segment->GetIndex() == cornerIndex)
+      if (segment->GetIndex() == grabberIndex)
         lineOrigin = segment->line().p2();
       QLineF lineToPoint(lineOrigin,
           segment->mapFromScene(scenePosition));
@@ -185,11 +185,11 @@ bool WallItem::cornerEventFilter(CornerGrabber* _corner, QEvent *_event)
           + sin(GZ_DTOR(angle))*lineLength);
     }
 
-    this->SetVertexPosition(cornerIndex, newScenePos);
+    this->SetVertexPosition(grabberIndex, newScenePos);
     this->update();
 
     // re-align child items when a vertex is moved
-    for (int i = cornerIndex; i > cornerIndex - 2; --i)
+    for (int i = grabberIndex; i > grabberIndex - 2; --i)
     {
       if ((i - this->GetSegmentCount()) != 0 && i >= 0)
       {
@@ -385,12 +385,12 @@ void WallItem::SetSegmentSelected(unsigned int _index, bool _selected)
   {
     unsigned int oldIndex = this->selectedSegment->GetIndex();
     this->selectedSegment->setSelected(false);
-    this->corners[oldIndex]->setVisible(false);
-    this->corners[oldIndex+1]->setVisible(false);
+    this->grabbers[oldIndex]->setVisible(false);
+    this->grabbers[oldIndex+1]->setVisible(false);
   }
   this->selectedSegment = this->segments[_index];
-  this->corners[_index]->setVisible(_selected);
-  this->corners[_index+1]->setVisible(_selected);
+  this->grabbers[_index]->setVisible(_selected);
+  this->grabbers[_index+1]->setVisible(_selected);
   this->selectedSegment->setSelected(_selected);
 }
 

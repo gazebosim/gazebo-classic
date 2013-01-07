@@ -28,7 +28,7 @@ namespace gazebo
   {
     class PolylineItem;
 
-    class CornerGrabber;
+    class GrabberHandle;
 
     class LineSegmentItem;
 
@@ -52,7 +52,7 @@ namespace gazebo
 
         public: void Update();
 
-        private: bool cornerEventFilter(CornerGrabber *_corner,
+        private: bool grabberEventFilter(GrabberHandle *_grabber,
             QEvent *_event);
 
         private: bool segmentEventFilter(LineSegmentItem *_segment,

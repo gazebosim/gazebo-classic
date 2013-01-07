@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _CORNER_GRABBER_HH_
-#define _CORNER_GRABBER_HH_
+#ifndef _GRABBER_HANDLE_HH_
+#define _GRABBER_HANDLE_HH_
 
 #include "gazebo/gui/qt.h"
 
@@ -24,9 +24,9 @@ namespace gazebo
 {
   namespace gui
   {
-    class CornerGrabber : public QGraphicsItem
+    class GrabberHandle : public QGraphicsItem
     {
-      public: explicit CornerGrabber(QGraphicsItem *_parent = 0, int index = 0);
+      public: explicit GrabberHandle(QGraphicsItem *_parent = 0, int index = 0);
 
       public: int GetIndex() const;
 
@@ -104,4 +104,4 @@ namespace gazebo
   }
 }
 
-#endif // CORNERGRABBER_H
+#endif

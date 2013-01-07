@@ -25,7 +25,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class CornerGrabber;
+    class GrabberHandle;
 
     class RotateHandle;
 
@@ -81,7 +81,7 @@ namespace gazebo
         private: virtual bool rotateEventFilter(RotateHandle *_rotateHandle,
             QEvent *_event);
 
-        private: virtual bool cornerEventFilter(CornerGrabber *_corner,
+        private: virtual bool grabberEventFilter(GrabberHandle *_grabber,
             QEvent *_event);
 
         private: virtual void paint (QPainter *_painter,
@@ -152,9 +152,9 @@ namespace gazebo
 
         private: int gridSpace;
 
-        /// \brief Four corners and four edges, going clockwise with
+        /// \brief Four grabbers and four edges, going clockwise with
         /// 0 being top left
-        private: std::vector<CornerGrabber *> corners;
+        private: std::vector<GrabberHandle *> grabbers;
 
         private: RotateHandle *rotateHandle;
 

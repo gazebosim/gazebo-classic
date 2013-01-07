@@ -15,13 +15,13 @@
  *
 */
 
-#include "gazebo/gui/model_editor/CornerGrabber.hh"
+#include "gazebo/gui/model_editor/GrabberHandle.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-CornerGrabber::CornerGrabber(QGraphicsItem *_parent, int _index) :
+GrabberHandle::GrabberHandle(QGraphicsItem *_parent, int _index) :
   QGraphicsItem(_parent),
   index(_index),
   mouseDownX(0),
@@ -43,122 +43,122 @@ CornerGrabber::CornerGrabber(QGraphicsItem *_parent, int _index) :
 }
 
 /////////////////////////////////////////////////
-int CornerGrabber::GetIndex() const
+int GrabberHandle::GetIndex() const
 {
   return this->index;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetMouseState(int _state)
+void GrabberHandle::SetMouseState(int _state)
 {
   this->mouseButtonState = _state;
 }
 
 /////////////////////////////////////////////////
-int CornerGrabber::GetMouseState() const
+int GrabberHandle::GetMouseState() const
 {
   return this->mouseButtonState;
 }
 
 /////////////////////////////////////////////////
-QPointF CornerGrabber::GetCenterPoint() const
+QPointF GrabberHandle::GetCenterPoint() const
 {
   return QPointF(pos().x() + (this->width + this->widthGrabBuffer/2),
       pos().y() + (this->height + this->heightGrabBuffer)/2);
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetWidth(double _width)
+void GrabberHandle::SetWidth(double _width)
 {
   this->width = _width;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetHeight(double _height)
+void GrabberHandle::SetHeight(double _height)
 {
   this->height = _height;
 }
 
 /////////////////////////////////////////////////
-double CornerGrabber::GetWidth() const
+double GrabberHandle::GetWidth() const
 {
   return this->width;
 }
 
 /////////////////////////////////////////////////
-double CornerGrabber::GetHeight() const
+double GrabberHandle::GetHeight() const
 {
   return this->height;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetColor(const QColor &color)
+void GrabberHandle::SetColor(const QColor &color)
 {
   this->handleColor = color;
 }
 
 /////////////////////////////////////////////////
-QColor CornerGrabber::GetColor() const
+QColor GrabberHandle::GetColor() const
 {
   return this->handleColor;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetMouseDownX(double _x)
+void GrabberHandle::SetMouseDownX(double _x)
 {
   this->mouseDownX = _x;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetMouseDownY(double _y)
+void GrabberHandle::SetMouseDownY(double _y)
 {
   this->mouseDownY = _y;
 }
 
 /////////////////////////////////////////////////
-double CornerGrabber::GetMouseDownX() const
+double GrabberHandle::GetMouseDownX() const
 {
   return this->mouseDownX;
 }
 
 /////////////////////////////////////////////////
-double CornerGrabber::GetMouseDownY() const
+double GrabberHandle::GetMouseDownY() const
 {
   return this->mouseDownY;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::mouseMoveEvent(QGraphicsSceneDragDropEvent *_event)
+void GrabberHandle::mouseMoveEvent(QGraphicsSceneDragDropEvent *_event)
 {
   _event->setAccepted(false);
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::mousePressEvent(QGraphicsSceneDragDropEvent *_event)
+void GrabberHandle::mousePressEvent(QGraphicsSceneDragDropEvent *_event)
 {
   _event->setAccepted(false);
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
+void GrabberHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 {
   _event->setAccepted(true);
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::mousePressEvent(QGraphicsSceneMouseEvent *_event)
+void GrabberHandle::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
   _event->setAccepted(false);
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
+void GrabberHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 {
   _event->setAccepted(false);
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
+void GrabberHandle::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
 {
 //  this->borderColor = Qt::black;
 //  this->update(0, 0, this->width, this->height);
@@ -166,7 +166,7 @@ void CornerGrabber::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
+void GrabberHandle::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 {
 //  this->borderColor = Qt::red;
 //  this->update(0, 0, this->width, this->height);
@@ -175,20 +175,20 @@ void CornerGrabber::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 }
 
 /////////////////////////////////////////////////
-QRectF CornerGrabber::boundingRect() const
+QRectF GrabberHandle::boundingRect() const
 {
   return QRectF(0, 0, this->width + this->widthGrabBuffer,
       this->height + this->heightGrabBuffer);
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetBorderColor(const QColor &_borderColor)
+void GrabberHandle::SetBorderColor(const QColor &_borderColor)
 {
   this->borderColor = _borderColor;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
+void GrabberHandle::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
   QWidget *)
 {
   _painter->save();
