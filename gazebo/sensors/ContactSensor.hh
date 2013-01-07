@@ -86,12 +86,23 @@ namespace gazebo
       /// \param[in] _collisionName The name of the observed collision.
       /// \return The collision contact count.
       public: unsigned int GetCollisionContactCount(
-                  const std::string &_collisionName) const;
+                  const std::string &_collisionName);
 
+      /// \brief Return the number of contacts for an observed collision.
+      /// Deprecated by the non-const version with mutex lock.
+      /// \param[in] _collisionName The name of the observed collision.
+      /// \return The collision contact count.
+      public: unsigned int GetCollisionContactCount(
+                  const std::string &_collisionName) const GAZEBO_DEPRECATED;
 
       /// \brief Get all the contacts
       /// \return Message that contains all the contact information
-      public: msgs::Contacts GetContacts() const;
+      public: msgs::Contacts GetContacts();
+
+      /// \brief Get all the contacts
+      /// Deprecated by the non-const version with mutex lock.
+      /// \return Message that contains all the contact information
+      public: msgs::Contacts GetContacts() const GAZEBO_DEPRECATED;
 
       /// \brief Gets contacts of a collision
       /// \param[in] _collisionName Name of collision
