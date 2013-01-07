@@ -33,7 +33,7 @@ TEST_F(PhysicsTest, FirstTest)
 {
   SimplePendulum("worlds/simple_pendulums_bullet.world");
 }
-#endif // HAVE_BULLET
+#endif  // HAVE_BULLET
 
 void PhysicsTest::EmptyWorld(std::string _worldFile)
 {
@@ -67,7 +67,7 @@ TEST_F(PhysicsTest, EmptyWorldBullet)
 {
   EmptyWorld("worlds/empty_bullet.world");
 }
-#endif // HAVE_BULLET
+#endif  // HAVE_BULLET
 
 void PhysicsTest::SpawnDrop(std::string _worldFile)
 {
@@ -201,7 +201,7 @@ TEST_F(PhysicsTest, SpawnDropBullet)
 {
   SpawnDrop("worlds/empty_bullet.world");
 }
-#endif // HAVE_BULLET
+#endif  // HAVE_BULLET
 
 TEST_F(PhysicsTest, State)
 {
@@ -529,7 +529,7 @@ TEST_F(PhysicsTest, SimplePendulumBullet)
 {
   SimplePendulum("worlds/simple_pendulums_bullet.world");
 }
-#endif // HAVE_BULLET
+#endif  // HAVE_BULLET
 
 void PhysicsTest::SimplePendulum(std::string _worldFile)
 {
