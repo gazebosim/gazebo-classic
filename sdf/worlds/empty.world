@@ -10,5 +10,47 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
+
+  <model name="box">
+    <static>true</static>
+    <link name="chassis">
+      <collision name="geom">
+        <geometry>
+          <box>
+            <size>0.445 0.277 0.17</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual1">
+        <geometry>
+          <box>
+            <size>0.445 0.277 0.17</size>
+          </box>
+        </geometry>
+      </visual>
+      <sensor name="base_laser" type="ray">
+        <pose>0.5 0 0.5 0 0 0</pose>
+        <topic>~/laser_scan</topic>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>640</samples>
+              <resolution>1</resolution>
+              <min_angle>-1</min_angle>
+              <max_angle>1</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.0</min>
+            <max>4</max>
+            <resolution>0.01</resolution>
+          </range>
+        </ray>
+        <always_on>1</always_on>
+        <update_rate>20</update_rate>
+        <visualize>true</visualize>
+      </sensor>
+    </link>
+  </model>
   </world>
 </sdf>

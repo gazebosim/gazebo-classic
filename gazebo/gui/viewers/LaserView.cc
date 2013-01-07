@@ -49,16 +49,18 @@ LaserView::LaserView(QWidget *_parent)
 
   this->view->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   this->view->setScene(scene);
-  this->view->centerOn(QPointF(0, 0));
   this->view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   this->view->setDragMode(QGraphicsView::ScrollHandDrag);
+  this->view->centerOn(QPointF(0, 100));
 
   this->laserItem = new LaserView::LaserItem();
+  this->laserItem->setRotation(-90);
   scene->addItem(this->laserItem);
 
   frameLayout->addWidget(this->view);
   frameLayout->setAlignment(Qt::AlignHCenter);
 
+  this->frame->setFixedSize(320, 240);
   this->frame->setObjectName("blackborderframe");
   this->frame->setLayout(frameLayout);
   // }
@@ -113,7 +115,14 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
 
   this->laserItem->AddPoint(math::Vector2d(0, 0));
 
-  this->view->fitInView(this->laserItem->GetBoundingRect());
+  QRectF bound = this->laserItem->GetBoundingRect();
+  float yp = bound.x() + bound.width() * 0.5;
+
+  //this->view->fitInView(bound, Qt::KeepAspectRatio);
+  //this->laserItem->setPos(QPointF(0, 100));
+  //this->view->centerOn(QPointF(0, 100));
+  std::cout << "Yp[" << yp << "]\n";
+  std::cout << "Scene[" << this->laserItem->scenePos().x() << ":" << this->laserItem->scenePos().y() << "]\n";
 }
 
 /////////////////////////////////////////////////
