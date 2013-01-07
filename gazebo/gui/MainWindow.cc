@@ -297,21 +297,21 @@ void MainWindow::Save()
     // Parse the string into sdf, so that we can insert user camera settings.
     sdf::SDF sdf_parsed;
     sdf_parsed.SetFromString(msg.data());
-    // Check that sdf contains world, but not gui
-    if (sdf_parsed.root->HasElement("world") &&
-        !sdf_parsed.root->GetElement("world")->HasElement("gui") )
+    // Check that sdf contains world
+    if (sdf_parsed.root->HasElement("world"))
     {
       sdf::ElementPtr world = sdf_parsed.root->GetElement("world");
-      sdf::ElementPtr guiElem = world->AddElement("gui");
+      sdf::ElementPtr guiElem = world->GetElement("gui");
+
       if (guiElem->HasAttribute("fullscreen"))
-      {
         guiElem->GetAttribute("fullscreen")->Set(g_fullscreen);
-      }
-      sdf::ElementPtr cameraElem = guiElem->AddElement("camera");
+      
+      sdf::ElementPtr cameraElem = guiElem->GetElement("camera");
       rendering::UserCameraPtr cam = gui::get_active_camera();
-      cameraElem->AddElement("pose")->Set(cam->GetWorldPose());
-      cameraElem->AddElement("view_controller")->Set(
-                              cam->GetViewControllerTypeString());
+
+      cameraElem->GetElement("pose")->Set(cam->GetWorldPose());
+      cameraElem->GetElement("view_controller")->Set(
+        cam->GetViewControllerTypeString());
       // TODO: export track_visual properties as well.
       msgData = sdf_parsed.root->ToString("");
     }
