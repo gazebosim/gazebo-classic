@@ -51,16 +51,15 @@ LaserView::LaserView(QWidget *_parent)
   this->view->setScene(scene);
   this->view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   this->view->setDragMode(QGraphicsView::ScrollHandDrag);
-  this->view->centerOn(QPointF(0, 100));
+  this->view->centerOn(QPointF(0, 0));
 
   this->laserItem = new LaserView::LaserItem();
-  this->laserItem->setRotation(-90);
-  scene->addItem(this->laserItem);
+  // scene->addItem(this->laserItem);
 
   frameLayout->addWidget(this->view);
   frameLayout->setAlignment(Qt::AlignHCenter);
 
-  this->frame->setFixedSize(320, 240);
+  this->frame->setMinimumHeight(240);
   this->frame->setObjectName("blackborderframe");
   this->frame->setLayout(frameLayout);
   // }
@@ -69,6 +68,15 @@ LaserView::LaserView(QWidget *_parent)
 /////////////////////////////////////////////////
 LaserView::~LaserView()
 {
+}
+
+/////////////////////////////////////////////////
+void LaserView::wheelEvent(QWheelEvent *_event)
+{
+  if (_event->delta() > 0)
+    this->view->scale(1.15, 1.15);
+  else
+    this->view->scale(1.0 / 1.15, 1.0 / 1.15);
 }
 
 /////////////////////////////////////////////////
@@ -89,6 +97,8 @@ void LaserView::SetTopic(const std::string &_topicName)
 /////////////////////////////////////////////////
 void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
 {
+  static bool first = true;
+
   // Update the Hz and Bandwidth info
   this->OnMsg(msgs::Convert(_msg->time()), _msg->ByteSize());
 
@@ -102,33 +112,46 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
        i < static_cast<unsigned int>(_msg->scan().ranges_size()); i++)
   {
     r = _msg->scan().ranges(i) + _msg->scan().range_min();
-    pt.x = 0 + r * cos(angle);
-    pt.y = 0 + r * sin(angle);
+    pt.x = r * cos(angle);
+    pt.y = -r * sin(angle);
 
     if (i+1 >= this->laserItem->GetPointCount())
-      this->laserItem->AddPoint(pt);
+    {
+      this->laserItem->AddRange(r);
+    }
     else
-      this->laserItem->SetPoint(i+1, pt);
+    {
+      this->laserItem->SetRange(i+1, r);
+    }
 
     angle += _msg->scan().angle_step();
   }
 
-  this->laserItem->AddPoint(math::Vector2d(0, 0));
+  this->laserItem->angleMin = _msg->scan().angle_min();
+  this->laserItem->angleMax = _msg->scan().angle_max();
+  this->laserItem->angleStep = _msg->scan().angle_step();
+  this->laserItem->rangeMax = _msg->scan().range_max();
 
   QRectF bound = this->laserItem->GetBoundingRect();
-  float yp = bound.x() + bound.width() * 0.5;
 
-  //this->view->fitInView(bound, Qt::KeepAspectRatio);
-  //this->laserItem->setPos(QPointF(0, 100));
-  //this->view->centerOn(QPointF(0, 100));
-  std::cout << "Yp[" << yp << "]\n";
-  std::cout << "Scene[" << this->laserItem->scenePos().x() << ":" << this->laserItem->scenePos().y() << "]\n";
+  if (first)
+  {
+    this->view->scene()->addItem(this->laserItem);
+    this->view->fitInView(bound, Qt::KeepAspectRatio);
+    first = false;
+  }
+
+  this->laserItem->Update();
 }
 
 /////////////////////////////////////////////////
 LaserView::LaserItem::LaserItem()
 {
   this->setFlag(QGraphicsItem::ItemIsSelectable, false);
+  this->setAcceptHoverEvents(true);
+  this->indexAngle = -999;
+  this->scale = 100.0;
+  this->rangeMax = 8.0;
 }
 
 /////////////////////////////////////////////////
@@ -137,54 +160,119 @@ void LaserView::LaserItem::paint (QPainter *_painter,
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
-  QColor c(200,200,255,125);
+  QColor c(100,100,100,255);
 
-  _painter->setPen(c);
+  QPen pen(c);
+  pen.setWidthF(0.0);
+  _painter->setPen(pen);
+  _painter->setBrush(QColor(100,100,100,50));
 
-  math::Vector2d prevPoint;
-  for (unsigned int i = 0; i < this->points.size(); ++i)
+  this->points.clear();
+  double angle = this->angleMin;
+  for (unsigned int i = 0; i < this->ranges.size(); ++i)
   {
-    _painter->drawLine(prevPoint.x, prevPoint.y,
-                       this->points[i].x, this->points[i].y);
-    prevPoint = this->points[i];
+    QPointF pt(this->ranges[i] * this->scale * cos(angle),
+              -this->ranges[i] * this->scale * sin(angle));
+    this->points.push_back(pt);
+    angle += this->angleStep;
+
+  }
+  _painter->drawPolygon(&this->points[0], this->points.size());
+
+  pen.setColor(QColor(255, 100, 100, 255));
+  _painter->setPen(pen);
+  _painter->setBrush(QColor(0,0,0,0));
+  _painter->drawRect(-10, -10, 20, 20);
+  _painter->drawLine(0, 0, 20, 0);
+  _painter->drawLine(25, 0, 20, -5);
+  _painter->drawLine(20, -5, 20, 5);
+  _painter->drawLine(20, 5, 25, 0);
+
+
+  int index = static_cast<int>(
+      rint((this->indexAngle - this->angleMin) / this->angleStep));
+  if (index >= 0 && index < this->ranges.size())
+  {
+    double x, y;
+    double x2, y2;
+
+    double buffer = 1.2;
+
+    x = this->ranges[index] * this->scale * cos(this->indexAngle);
+    y = -this->ranges[index] * this->scale * sin(this->indexAngle);
+
+    _painter->drawLine(0, 0, x, y);
+
+    x = (this->rangeMax * this->scale * buffer) * cos(this->indexAngle);
+    y = (-this->rangeMax * this->scale * buffer) * sin(this->indexAngle);
+
+    x2 = (this->rangeMax * this->scale * (buffer + 0.05)) *
+      cos(this->indexAngle);
+    y2 = (-this->rangeMax * this->scale * (buffer + 0.05)) *
+      sin(this->indexAngle);
+
+    _painter->drawLine(x, y, x2, y2);
+
+    x = (this->rangeMax * this->scale * buffer);
+    y = 0;
+    x2 = (this->rangeMax * this->scale * (buffer + 0.05));
+    y2 = 0;
+
+    _painter->drawLine(x, y, x2, y2);
+
+    std::ostringstream stream;
+    stream << std::fixed << std::setprecision(4)
+           << this->ranges[index] << " m";
+
+    float textFactor = this->GetBoundingRect().width() / _painter->fontMetrics().width(stream.str().c_str());
+
+    std::cout << "text Factor[" << textFactor << "]\n";
+
+    x = (this->ranges[index] * this->scale * 1.05) * cos(this->indexAngle);
+    y = -(this->ranges[index] * this->scale * 1.05) * sin(this->indexAngle);
+
+    QFont f = _painter->font();
+    f.setPointSizeF(f.pointSizeF() * textFactor);
+    _painter->setFont(f);
+    _painter->drawText(x, y, stream.str().c_str());
+
+    stream.str(std::string());
+    stream << std::fixed << std::setprecision(4)
+           << this->indexAngle << " radians";
+
+    x = (this->rangeMax * this->scale * (buffer+0.05)) *
+      cos(this->indexAngle*0.5);
+    y = -(this->rangeMax * this->scale * (buffer+0.05)) *
+      sin(this->indexAngle * 0.5);
+
+    _painter->drawText(x, y, stream.str().c_str());
+
+    QRectF rect(-(this->rangeMax * this->scale * buffer),
+                -(this->rangeMax * this->scale * buffer),
+                this->rangeMax * this->scale * buffer * 2.0,
+                this->rangeMax * this->scale * buffer * 2.0);
+
+    _painter->drawArc(rect, 0, GZ_RTOD(this->indexAngle) * 16);
   }
 }
 
 /////////////////////////////////////////////////
 QRectF LaserView::LaserItem::GetBoundingRect() const
 {
-  float minX, maxX;
-  float minY, maxY;
+  if (this->ranges.size() == 0)
+    return QRectF(0, 0, 0, 0);
 
-  minX = minY = GZ_FLT_MAX;
-  maxX = maxY = GZ_FLT_MIN;
+  double buffer = 1.5;
 
-  for (unsigned int i = 0; i < this->points.size(); ++i)
-  {
-    if (this->points[i].x < minX)
-      minX = this->points[i].x;
+  double max = this->rangeMax * this->scale * buffer;
 
-    if (this->points[i].x > maxX)
-      maxX = this->points[i].x;
-
-    if (this->points[i].y < minY)
-      minY = this->points[i].y;
-
-    if (this->points[i].y > maxY)
-      maxY = this->points[i].y;
-  }
-
-  std::cout << "Min[" << minX << ":" << minY << "] Max[" << maxX << ":" << maxY << "]\n";
-
-  return QRectF (minX, minY, fabs(maxX-minX), fabs(maxY-minY));
+  return QRectF (-max, -max, max*2.0, max*2.0);
 }
 
 /////////////////////////////////////////////////
 QRectF LaserView::LaserItem::boundingRect() const
 {
-  return QRectF (0, 0, 0, 0);
-
-  //return this->GetBoundingRect();
+  return this->GetBoundingRect();
 }
 
 /////////////////////////////////////////////////
@@ -192,22 +280,28 @@ void LaserView::LaserItem::ClearPoints()
 {
   boost::mutex::scoped_lock lock(this->mutex);
   this->points.clear();
+  this->ranges.clear();
 }
 
 /////////////////////////////////////////////////
-void LaserView::LaserItem::AddPoint(const math::Vector2d &_pt)
+void LaserView::LaserItem::AddRange(double _range)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  this->points.push_back(_pt * 100.0);
+  this->ranges.push_back(_range);
 }
 
 /////////////////////////////////////////////////
-void LaserView::LaserItem::SetPoint(unsigned int _index,
-                                    const math::Vector2d &_pt)
+void LaserView::LaserItem::SetRange(unsigned int _index, double _range)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  if (_index < this->points.size())
-    this->points[_index] = _pt*100.0;
+  if (_index < this->ranges.size())
+    this->ranges[_index] = _range;
+}
+
+/////////////////////////////////////////////////
+void LaserView::LaserItem::Update()
+{
+  this->prepareGeometryChange();
 }
 
 /////////////////////////////////////////////////
@@ -215,4 +309,23 @@ unsigned int LaserView::LaserItem::GetPointCount()
 {
   boost::mutex::scoped_lock lock(this->mutex);
   return this->points.size();
+}
+
+/////////////////////////////////////////////////
+void LaserView::LaserItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
+{
+  this->indexAngle = atan2(-_event->pos().y(), _event->pos().x());
+}
+
+//////////////////////////////////////////////////
+void LaserView::LaserItem::hoverLeaveEvent(
+    QGraphicsSceneHoverEvent * /*_event*/)
+{
+  this->indexAngle = -999;
+}
+
+/////////////////////////////////////////////////
+void LaserView::LaserItem::hoverMoveEvent(QGraphicsSceneHoverEvent *_event)
+{
+  this->indexAngle = atan2(-_event->pos().y(), _event->pos().x());
 }

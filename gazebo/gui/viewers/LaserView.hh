@@ -53,6 +53,8 @@ namespace gazebo
       /// \param[in] _msg New laser scan message.
       private: void OnScan(ConstLaserScanStampedPtr &_msg);
 
+      private: void wheelEvent(QWheelEvent *_event);
+
       private: class LaserItem : public QGraphicsItem
                {
                  public: LaserItem();
@@ -61,12 +63,13 @@ namespace gazebo
 
                  public: unsigned int GetPointCount();
 
-                 public: void AddPoint(const math::Vector2d &_pt);
+                 public: void AddRange(double _range);
 
-                 public: void SetPoint(unsigned int _index,
-                                       const math::Vector2d &_pt);
+                 public: void SetRange(unsigned int _index, double _range);
 
                  public: QRectF GetBoundingRect() const;
+
+                 public: void Update();
 
                  private: virtual QRectF boundingRect() const;
 
@@ -74,7 +77,26 @@ namespace gazebo
                               const QStyleOptionGraphicsItem *_option,
                               QWidget *_widget);
 
-                 private: std::vector<math::Vector2d> points;
+                 private: virtual void hoverEnterEvent(
+                              QGraphicsSceneHoverEvent *_event);
+
+                 private: virtual void hoverLeaveEvent(
+                              QGraphicsSceneHoverEvent *_event);
+
+                 private: void hoverMoveEvent(QGraphicsSceneHoverEvent *_event);
+
+                 private: std::vector<QPointF> points;
+                 private: std::vector<double> ranges;
+
+                 public: double angleMin;
+                 public: double angleMax;
+                 public: double angleStep;
+
+                 public: double rangeMax;
+
+                 private: double indexAngle;
+
+                 private: double scale;
 
                  /// \brief Mutex to protect the laser data.
                  private: boost::mutex mutex;
