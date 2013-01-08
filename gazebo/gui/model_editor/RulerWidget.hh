@@ -15,35 +15,27 @@
  *
 */
 
-#ifndef _BUILDING_EDITOR_WIDGET_HH_
-#define _BUILDING_EDITOR_WIDGET_HH_
+#ifndef _RULER_WIDGET_HH_
+#define _RULER_WIDGET_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/common/Event.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class LevelWidget;
-
-    class RulerWidget;
-
-    class BuildingEditorWidget : public QWidget
+    class RulerWidget : public QWidget
     {
-      public: enum modelTypes {None, Wall, Window, Door, Stairs};
+      Q_OBJECT
 
-      public: BuildingEditorWidget(QWidget *_parent = 0);
+      public: RulerWidget(QWidget *_parent = 0);
 
-      public: ~BuildingEditorWidget();
+      public: ~RulerWidget();
 
-      public: static QCursor rotateCursor;
+      public: void paintEvent(QPaintEvent *_event);
 
-      private: void resizeEvent(QResizeEvent *_event);
-
-      private: LevelWidget *levelWidget;
-
-      private: RulerWidget *rulerWidget;
-
+      private: std::string rulerText;
     };
   }
 }
