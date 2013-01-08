@@ -413,8 +413,13 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
     this->drawMode = NONE;
     this->drawInProgress = false;
   }
+  else
+  {
+    if (!this->scene()->itemAt(this->mapToScene(_event->pos())))
+      this->OnOpenLevelInspector();
+  }
 
-  if (!drawInProgress)
+  if (!this->drawInProgress)
     QGraphicsView::mouseDoubleClickEvent(_event);
 }
 

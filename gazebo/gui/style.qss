@@ -3,6 +3,11 @@ QLabel
   color: #d0d0d0;
 }
 
+QDialog
+{
+  background-color: #303030;
+}
+
 QWidget#topicSelector,
 QWidget#cameraSensor
 {
@@ -163,6 +168,44 @@ QTreeView QHeaderView:section
   font-weight: bold;
   background: #404040;
   border: 0px;
+}
+
+QSpinBox
+{
+  color: #353535;
+  background: #737373;
+  border-radius: 4;
+  margin-right: 20px;  
+}
+
+QSpinBox::up-button
+{
+  subcontrol-origin: margin;
+  subcontrol-position: top right;
+
+  border: 1px outset #727272;
+  border-radius: 1px;
+  background: #737373;
+}
+
+QSpinBox::up-button:pressed
+{
+  border: 2px inset #727272;
+}
+
+QSpinBox::down-button
+{
+  subcontrol-origin: margin;
+  subcontrol-position: bottom right;
+
+  border: 1px outset #727272;
+  border-radius: 1px;
+  background: #737373;
+}
+
+QSpinBox::down-button:pressed
+{
+  border: 2px inset #727272;
 }
 
 QDoubleSpinBox,
