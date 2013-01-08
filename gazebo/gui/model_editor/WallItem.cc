@@ -253,12 +253,14 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
     case QEvent::GraphicsSceneHoverEnter:
     case QEvent::GraphicsSceneHoverMove:
     {
-      QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
+      if (_segment->isSelected())
+        QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
       return true;
     }
     case QEvent::GraphicsSceneHoverLeave:
     {
-      QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+      if (_segment->isSelected())
+        QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
       return true;
     }
     default:

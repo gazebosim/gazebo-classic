@@ -603,6 +603,8 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
     this->drawInProgress = false;
   }
 
+  this->scene()->clearSelection();
+
   if (this->drawMode == WALL)
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 }
