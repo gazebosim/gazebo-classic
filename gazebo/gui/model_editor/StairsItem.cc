@@ -158,7 +158,7 @@ bool StairsItem::rotateEventFilter(RotateHandle *_rotate,
 
     // limit stairs to right angles until there is proper csg support
     double angle = line.angle();
-    double range = 25;
+    double range = 45;
     double angleToRotate = this->rotationAngle;
     if (angle > (90 - range) && (angle < 90 + range))
       angleToRotate = 0;
