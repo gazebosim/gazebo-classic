@@ -77,6 +77,12 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 }
 
 //////////////////////////////////////////////////
+Ogre::TerrainGroup *Heightmap::GetOgreTerrain() const
+{
+  return this->terrainGroup;
+}
+
+//////////////////////////////////////////////////
 void Heightmap::Load()
 {
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
