@@ -95,6 +95,15 @@ namespace gazebo
                     event::ConnectionPtr _subscriber)
                 { changeLevelName.Disconnect(_subscriber); }
 
+        public: template<typename T>
+                static event::ConnectionPtr ConnectChangeZoom(T _subscriber)
+                { return changeZoom.Connect(_subscriber); }
+        /// \brief Disconnect a boost::slot to the change zoom level signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectChangeZoom(
+                    event::ConnectionPtr _subscriber)
+                { changeZoom.Disconnect(_subscriber); }
+
         /// \brief An editor item is to be created
         public: static event::EventT<void (std::string)> createEditorItem;
 
@@ -116,6 +125,9 @@ namespace gazebo
 
         /// \brief The current level name has been changed
         public: static event::EventT<void (int, std::string)> changeLevelName;
+
+        /// \brief The current zoom level has been changed
+        public: static event::EventT<void (double)> changeZoom;
       };
     }
   }

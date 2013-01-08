@@ -162,7 +162,7 @@ bool WallItem::grabberEventFilter(GrabberHandle* _grabber, QEvent *_event)
 
     // Snap wall rotations to fixed size increments
     QPointF newScenePos = scenePosition;
-    if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
+    if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
     {
       LineSegmentItem *segment = this->selectedSegment;
       QPointF lineOrigin = segment->line().p1();

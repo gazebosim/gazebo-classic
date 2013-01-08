@@ -15,35 +15,42 @@
  *
 */
 
-#ifndef _GRID_LINES_H
-#define _GRID_LINES_H
+#ifndef _GRID_LINES_HH_
+#define _GRID_LINES_HH_
 
 #include "gazebo/gui/qt.h"
 
-class GridLines : public  QGraphicsItem
+namespace gazebo
 {
-  public : GridLines(int _width, int _height);
+  namespace gui
+  {
+    class GridLines : public  QGraphicsItem
+    {
+      public : GridLines(int _width, int _height);
 
-  public : void HandleWindowSizeChanged(int _w, int _h);
+      public : ~GridLines();
 
-  private: virtual QRectF boundingRect() const;
+      public : void HandleWindowSizeChanged(int _w, int _h);
 
-  private: virtual void paint (QPainter *_painter,
-    const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+      private: virtual QRectF boundingRect() const;
 
-  private: virtual void mouseMoveEvent (QGraphicsSceneMouseEvent *_event);
+      private: virtual void paint (QPainter *_painter,
+        const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-  private: virtual void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
+      private: virtual void mouseMoveEvent (QGraphicsSceneMouseEvent *_event);
 
-  private: virtual void mousePressEvent (QGraphicsSceneMouseEvent *_event);
+      private: virtual void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
 
-  private: virtual void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
+      private: virtual void mousePressEvent (QGraphicsSceneMouseEvent *_event);
 
-  private: int width;
+      private: virtual void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
 
-  private: int height;
+      private: int width;
 
-  private: int space;
-};
+      private: int height;
 
-#endif // GRIDLINES_H
+      private: int space;
+    };
+  }
+}
+#endif

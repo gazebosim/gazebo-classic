@@ -17,11 +17,19 @@
 
 #include "gazebo/gui/model_editor/GridLines.hh"
 
+using namespace gazebo;
+using namespace gui;
+
 /////////////////////////////////////////////////
 GridLines::GridLines( int _w, int _h ) : QGraphicsItem(), width(_w), height(_h),
   space(10)
 {
   this->setFlag(QGraphicsItem::ItemIsSelectable, false);
+  this->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+}
+
+GridLines::~GridLines()
+{
 }
 
 /////////////////////////////////////////////////
@@ -70,11 +78,13 @@ void GridLines::mousePressEvent(QGraphicsSceneDragDropEvent *)
 }
 
 /////////////////////////////////////////////////
-void GridLines::mousePressEvent ( QGraphicsSceneMouseEvent */*_event*/)
+void GridLines::mousePressEvent ( QGraphicsSceneMouseEvent *_event)
 {
+  _event->ignore();
 }
 
 /////////////////////////////////////////////////
-void GridLines::mouseMoveEvent ( QGraphicsSceneMouseEvent */*_event*/)
+void GridLines::mouseMoveEvent ( QGraphicsSceneMouseEvent *_event)
 {
+  _event->ignore();
 }

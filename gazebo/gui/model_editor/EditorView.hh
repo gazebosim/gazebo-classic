@@ -26,13 +26,22 @@ namespace gazebo
   namespace gui
   {
     class EditorItem;
+
     class WindowItem;
+
     class StairsItem;
+
     class DoorItem;
+
     class WallItem;
+
     class FloorItem;
+
     class BuildingMaker;
+
     class LevelInspectorDialog;
+
+    class GridLines;
 
     class EditorView : public QGraphicsView
     {
@@ -48,7 +57,13 @@ namespace gazebo
 
       public: void CreateItem3D(EditorItem *item);
 
+      private: void resizeEvent(QResizeEvent *_event);
+
+      private: void scrollContentsBy (int _dx, int _dy);
+
       private: void contextMenuEvent(QContextMenuEvent *event);
+
+      private: void wheelEvent(QWheelEvent *_event);
 
       private: void mousePressEvent(QMouseEvent *_event);
 
@@ -130,6 +145,10 @@ namespace gazebo
       private: double grabberDragRotation;
 
       private: LevelInspectorDialog *levelInspector;
+
+      private: GridLines *gridLines;
+
+      private: double viewScale;
     };
   }
 }

@@ -15,6 +15,8 @@
  *
 */
 
+#include <sstream>
+#include "gazebo/gui/model_editor/EditorEvents.hh"
 #include "gazebo/gui/model_editor/ScaleWidget.hh"
 
 using namespace gazebo;
@@ -24,7 +26,11 @@ using namespace gui;
 ScaleWidget::ScaleWidget(QWidget *_parent) : QWidget(_parent)
 {
   this->setObjectName("scaleWidget");
-  this->scaleText = "1.0 m";
+  this->scaleText = "1.00 m";
+
+  this->connections.push_back(
+    gui::editor::Events::ConnectChangeZoom(
+    boost::bind(&ScaleWidget::OnChangeZoom, this, _1)));
 }
 
 //////////////////////////////////////////////////
@@ -54,4 +60,13 @@ void ScaleWidget::paintEvent(QPaintEvent *)
    QRect rulerRect(textTopLeft, textBottomRight);
    painter.drawText (rulerRect, Qt::AlignHCenter,
       QString(this->scaleText.c_str()));
+}
+
+//////////////////////////////////////////////////
+void ScaleWidget::OnChangeZoom(double _zoomFactor)
+{
+  std::stringstream str;
+  double places = pow(10.0, 2);
+  str << round(_zoomFactor * places) / places << " m";
+  this->scaleText = str.str();
 }

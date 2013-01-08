@@ -89,6 +89,13 @@ EditorView::EditorView(QWidget *_parent)
   this->addLevelAct->setStatusTip(tr("Add Level"));
   connect(this->addLevelAct, SIGNAL(triggered()),
     this, SLOT(OnAddLevel()));
+
+  this->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+  this->setRenderHint(QPainter::SmoothPixmapTransform);
+//  this->setRenderHint(QPainter::Antialiasing);
+  this->gridLines = NULL;
+  this->viewScale = 1.0;
+
 }
 
 /////////////////////////////////////////////////
@@ -98,6 +105,30 @@ EditorView::~EditorView()
     delete this->buildingMaker;
 
   delete this->levelInspector;
+}
+
+/////////////////////////////////////////////////
+void EditorView::scrollContentsBy (int _dx, int _dy)
+{
+  if (this->gridLines && this->scene())
+  {
+    this->gridLines->moveBy(-_dx, -_dy);
+  }
+  QGraphicsView::scrollContentsBy(_dx, _dy);
+}
+
+/////////////////////////////////////////////////
+void EditorView::resizeEvent(QResizeEvent *_event)
+{
+  if (!this->gridLines && this->scene())
+  {
+    this->gridLines = new GridLines (this->scene()->sceneRect().width(),
+    this->scene()->sceneRect().height());
+    this->scene()->addItem(this->gridLines);
+//    qDebug() << this->scene()->sceneRect().width() <<
+//    this->scene()->sceneRect().height();
+  }
+
 }
 
 /////////////////////////////////////////////////
@@ -123,6 +154,44 @@ void EditorView::contextMenuEvent(QContextMenuEvent *_event)
   menu.addAction(this->openLevelInspectorAct);
   menu.exec(_event->globalPos());
   _event->accept();
+}
+
+/////////////////////////////////////////////////
+void EditorView::wheelEvent(QWheelEvent *_event)
+{
+  int numSteps = (_event->delta()/8) / 15;
+
+  QMatrix mat = matrix();
+  QPointF mousePosition = _event->pos();
+
+  mat.translate((width()/2) - mousePosition.x(), (height() / 2) -
+    mousePosition.y());
+
+  double scaleFactor = 1.15;
+
+  if (numSteps > 0)
+  {
+    mat.scale(numSteps*scaleFactor, numSteps*scaleFactor);
+    this->viewScale *= numSteps*scaleFactor;
+  }
+  else
+  {
+    mat.scale(-1/(numSteps*scaleFactor), -1/(numSteps*scaleFactor));
+    this->viewScale *= -1/(numSteps*scaleFactor);
+  }
+  mat.translate(mousePosition.x() - (this->width()/2),
+      mousePosition.y() -(this->height()/2));
+  this->setMatrix(mat);
+
+  if(gridLines)
+  {
+    this->gridLines->setPos(this->mapToScene(
+        QPoint(this->width()/2, this->height()/2)));
+  }
+
+  gui::editor::Events::changeZoom(this->viewScale);
+  _event->accept();
+
 }
 
 /////////////////////////////////////////////////
@@ -640,11 +709,13 @@ void EditorView::OnDiscardModel()
   this->levelHeights[0] = 0;
   this->levelNames[0] = "Level 1";
 
-  // clear the scene but add the grid back in
+
   this->scene()->clear();
-  GridLines *gridLines = new GridLines (this->scene()->sceneRect().width(),
+
+  // clear the scene but add the grid back in
+  this->gridLines = new GridLines (this->scene()->sceneRect().width(),
       this->scene()->sceneRect().height());
-  this->scene()->addItem(gridLines);
+  this->scene()->addItem(this->gridLines);
 
   this->currentMouseItem = NULL;
   this->drawInProgress = false;

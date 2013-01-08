@@ -33,9 +33,13 @@ namespace gazebo
 
       public: ~ScaleWidget();
 
-      public: void paintEvent(QPaintEvent *_event);
+      private: void paintEvent(QPaintEvent *_event);
+
+      private: void OnChangeZoom(double _zoomFactor);
 
       private: std::string scaleText;
+
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

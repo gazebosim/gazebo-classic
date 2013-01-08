@@ -51,14 +51,11 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
 
   int boundingWidth = 1240;
   int boundingHeight = 1024;
-  scene->setSceneRect(-boundingWidth/2, -boundingHeight/2,
-                      boundingWidth, boundingHeight);
+  scene->setSceneRect(-boundingWidth, -boundingHeight,
+                      boundingWidth*2, boundingHeight*2);
   QHBoxLayout *canvasLayout = new QHBoxLayout(this);
   canvasLayout->addWidget(view);
   canvasLayout->setAlignment(Qt::AlignHCenter);
-
-  GridLines *gridLines = new GridLines (boundingWidth, boundingHeight);
-  scene->addItem(gridLines);
 
   view->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   view->setScene(scene);
