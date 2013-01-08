@@ -930,17 +930,10 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       cam->SetWorldPose(cam_pose);
     }
 
-    // These 4 lines are repeated below.
     if (_msg->camera().has_view_controller())
     {
       cam->SetViewController(_msg->camera().view_controller());
     }
-
-    // Comment out the second set.
-    // if (_msg->camera().has_view_controller())
-    // {
-    //   cam->SetViewController(_msg->camera().view_controller());
-    // }
 
     if (_msg->camera().has_track())
     {
