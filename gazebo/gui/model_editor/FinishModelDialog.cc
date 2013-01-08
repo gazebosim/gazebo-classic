@@ -55,11 +55,11 @@ FinishModelDialog::FinishModelDialog(int _mode, QWidget *_parent)
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
 
-  QString contributeText(
+/*  QString contributeText(
       tr("Contribute this model to the Model Database so that\n"
          "the entire Gazebo community can benefit!\n"
          "[This will open up a new tab in your browser]\n"));
-  QCheckBox *contributeCheckBox = new QCheckBox(contributeText);
+  QCheckBox *contributeCheckBox = new QCheckBox(contributeText);*/
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
@@ -86,8 +86,8 @@ FinishModelDialog::FinishModelDialog(int _mode, QWidget *_parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(messageLabel);
   mainLayout->addLayout(gridLayout);
-  if (_mode == MODEL_FINISH)
-    mainLayout->addWidget(contributeCheckBox);
+//  if (_mode == MODEL_FINISH)
+//    mainLayout->addWidget(contributeCheckBox);
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
