@@ -117,6 +117,14 @@ namespace gazebo
       /// \brief Convert a gazebo pose to a bullet transform
       public: static btTransform ConvertPose(const math::Pose &_pose);
 
+      /// \brief Convert a bullet btVector3 to a gazebo Vector3
+      public: static math::Vector3 ConvertVector3(const btVector3 &_bt)
+              { return math::Vector3(_bt.getX(), _bt.getY(), _bt.getZ()); }
+
+      /// \brief Convert a gazebo Vector3 to a bullet btVector3
+      public: static btVector3 ConvertVector3(const math::Vector3 &_vec)
+              { return btVector3(_vec.x, _vec.y, _vec.z); }
+
       // Documentation inherited
       public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
 
