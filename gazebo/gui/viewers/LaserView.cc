@@ -131,6 +131,7 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
   this->laserItem->angleMax = _msg->scan().angle_max();
   this->laserItem->angleStep = _msg->scan().angle_step();
   this->laserItem->rangeMax = _msg->scan().range_max();
+  this->laserItem->rangeMin = _msg->scan().range_min();
 
   QRectF bound = this->laserItem->GetBoundingRect();
 
@@ -152,6 +153,7 @@ LaserView::LaserItem::LaserItem()
   this->indexAngle = -999;
   this->scale = 100.0;
   this->rangeMax = 8.0;
+  this->rangeMin = 0.0;
 }
 
 /////////////////////////////////////////////////
@@ -167,18 +169,10 @@ void LaserView::LaserItem::paint (QPainter *_painter,
   _painter->setPen(pen);
   _painter->setBrush(QColor(100,100,100,50));
 
-  this->points.clear();
-  double angle = this->angleMin;
-  for (unsigned int i = 0; i < this->ranges.size(); ++i)
-  {
-    QPointF pt(this->ranges[i] * this->scale * cos(angle),
-              -this->ranges[i] * this->scale * sin(angle));
-    this->points.push_back(pt);
-    angle += this->angleStep;
-
-  }
+  // Draw the filled polygon that represents the current laser data.
   _painter->drawPolygon(&this->points[0], this->points.size());
 
+  // Draw a box with an arrow around the (0, 0) location
   pen.setColor(QColor(255, 100, 100, 255));
   _painter->setPen(pen);
   _painter->setBrush(QColor(0,0,0,0));
@@ -189,70 +183,112 @@ void LaserView::LaserItem::paint (QPainter *_painter,
   _painter->drawLine(20, 5, 25, 0);
 
 
+  // Compute the index of the ray that the mouse is hovering over.
   int index = static_cast<int>(
       rint((this->indexAngle - this->angleMin) / this->angleStep));
-  if (index >= 0 && index < this->ranges.size())
+
+  // Draw the ray and associated data if the index is valid.
+  if (index >= 0 && index < static_cast<int>(this->ranges.size()))
   {
-    double x, y;
+    double x1, y1;
     double x2, y2;
 
     double buffer = 1.2;
 
-    x = this->ranges[index] * this->scale * cos(this->indexAngle);
-    y = -this->ranges[index] * this->scale * sin(this->indexAngle);
+    // Draw the ray
+    x1 = this->ranges[index] * this->scale * cos(this->indexAngle);
+    y1 = -this->ranges[index] * this->scale * sin(this->indexAngle);
+    _painter->drawLine(0, 0, x1, y1);
 
-    _painter->drawLine(0, 0, x, y);
-
-    x = (this->rangeMax * this->scale * buffer) * cos(this->indexAngle);
-    y = (-this->rangeMax * this->scale * buffer) * sin(this->indexAngle);
-
-    x2 = (this->rangeMax * this->scale * (buffer + 0.05)) *
-      cos(this->indexAngle);
-    y2 = (-this->rangeMax * this->scale * (buffer + 0.05)) *
-      sin(this->indexAngle);
-
-    _painter->drawLine(x, y, x2, y2);
-
-    x = (this->rangeMax * this->scale * buffer);
-    y = 0;
-    x2 = (this->rangeMax * this->scale * (buffer + 0.05));
-    y2 = 0;
-
-    _painter->drawLine(x, y, x2, y2);
-
+    // Set the text for the range measurement
     std::ostringstream stream;
     stream << std::fixed << std::setprecision(4)
            << this->ranges[index] << " m";
 
-    float textFactor = this->GetBoundingRect().width() / _painter->fontMetrics().width(stream.str().c_str());
+    // Compute the size of the box we want to use for the range measurement.
+    // This will help us scale the text properly.
+    float textBoxWidth = (this->rangeMax * this->scale * buffer) -
+                         (this->rangeMax * this->scale);
 
-    std::cout << "text Factor[" << textFactor << "]\n";
+    // Compute the text scaling factor.
+    float textFactor = textBoxWidth /
+      _painter->fontMetrics().width(stream.str().c_str());
 
-    x = (this->ranges[index] * this->scale * 1.05) * cos(this->indexAngle);
-    y = -(this->ranges[index] * this->scale * 1.05) * sin(this->indexAngle);
-
+    // Set the font according to the scaling factor.
     QFont f = _painter->font();
     f.setPointSizeF(f.pointSizeF() * textFactor);
     _painter->setFont(f);
-    _painter->drawText(x, y, stream.str().c_str());
 
-    stream.str(std::string());
-    stream << std::fixed << std::setprecision(4)
-           << this->indexAngle << " radians";
+    // The final text width and height
+    float textWidth = _painter->fontMetrics().width(stream.str().c_str());
+    float textHeight = _painter->fontMetrics().height();
 
-    x = (this->rangeMax * this->scale * (buffer+0.05)) *
-      cos(this->indexAngle*0.5);
-    y = -(this->rangeMax * this->scale * (buffer+0.05)) *
-      sin(this->indexAngle * 0.5);
+    // Compute the additional offset to apply to the range text. This will
+    // prevent the text from overlapping the range polygon.
+    double rAngle = M_PI - this->indexAngle;
+    double xOff = cos(rAngle) < 0 ? 0 : cos(rAngle) * textWidth;
+    double yOff = sin(rAngle) * textHeight;
 
-    _painter->drawText(x, y, stream.str().c_str());
+    // The location to draw the range text
+    x1 = (this->ranges[index] * this->scale * 1.05) * cos(this->indexAngle);
+    y1 = -(this->ranges[index] * this->scale * 1.05) * sin(this->indexAngle);
 
-    QRectF rect(-(this->rangeMax * this->scale * buffer),
-                -(this->rangeMax * this->scale * buffer),
-                this->rangeMax * this->scale * buffer * 2.0,
-                this->rangeMax * this->scale * buffer * 2.0);
+    x1 -= xOff;
+    y1 -= yOff;
 
-    _painter->drawArc(rect, 0, GZ_RTOD(this->indexAngle) * 16);
+    // Draw the range text
+    _painter->drawText(x1, y1, stream.str().c_str());
+
+
+    // This section draws the arc and the angle of the ray
+    {
+      // Give the arc some padding.
+      textWidth *= 1.4;
+
+      // Compute the position for the angle text.
+      x1 = (this->rangeMax * this->scale * 1.15 + textWidth) *
+        cos(this->indexAngle * 0.5);
+      y1 = -(this->rangeMax * this->scale * 1.15 + textWidth) *
+        sin(this->indexAngle * 0.5);
+
+      // Draw the text for the angle of the ray
+      stream.str(std::string());
+      if (this->radians)
+        stream << std::fixed << std::setprecision(4)
+          << this->indexAngle << " radians";
+      else
+        stream << std::fixed << std::setprecision(4)
+          << GZ_RTOD(this->indexAngle) << " degrees";
+
+      _painter->drawText(x1, y1, stream.str().c_str());
+
+      // Draw an arc that depicts the angle of the ray
+      QRectF rect(-(this->rangeMax * this->scale * 1.1 + textWidth),
+          -(this->rangeMax * this->scale * 1.1 + textWidth),
+          this->rangeMax * this->scale * 1.1 * 2.0 + textWidth*2.0,
+          this->rangeMax * this->scale * 1.1 * 2.0 + textWidth*2.0);
+      _painter->drawArc(rect, 0, GZ_RTOD(this->indexAngle) * 16);
+
+
+      // Draw the line that marks the start of the arc
+      x1 = (this->rangeMax * this->scale * 1.1 + textWidth);
+      x2 = (this->rangeMax * this->scale * 1.15 + textWidth);
+
+      _painter->drawLine(x1, 0, x2, 0);
+
+      // Draw the line that marks the end of the arc
+      x1 = (this->rangeMax * this->scale * 1.1 + textWidth) *
+        cos(this->indexAngle);
+      y1 = -(this->rangeMax * this->scale * 1.1 + textWidth) *
+        sin(this->indexAngle);
+
+      x2 = (this->rangeMax * this->scale * 1.15 + textWidth) *
+        cos(this->indexAngle);
+      y2 = -(this->rangeMax * this->scale * 1.15 + textWidth) *
+        sin(this->indexAngle);
+
+      _painter->drawLine(x1, y1, x2, y2);
+    }
   }
 }
 
@@ -262,11 +298,13 @@ QRectF LaserView::LaserItem::GetBoundingRect() const
   if (this->ranges.size() == 0)
     return QRectF(0, 0, 0, 0);
 
-  double buffer = 1.5;
+  // Compute the maximum size of bound box by scaling up the maximum
+  // possible range. The multiplication of 2.0 increases the bounding box
+  // size to make the mouse hover behavior easier to use.
+  double max = this->rangeMax * this->scale * 2.0;
 
-  double max = this->rangeMax * this->scale * buffer;
-
-  return QRectF (-max, -max, max*2.0, max*2.0);
+  // Return the top-left position and the width and height.
+  return QRectF(-max, -max, max * 2.0, max * 2.0);
 }
 
 /////////////////////////////////////////////////
@@ -279,8 +317,8 @@ QRectF LaserView::LaserItem::boundingRect() const
 void LaserView::LaserItem::ClearPoints()
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  this->points.clear();
   this->ranges.clear();
+  this->points.clear();
 }
 
 /////////////////////////////////////////////////
@@ -301,6 +339,52 @@ void LaserView::LaserItem::SetRange(unsigned int _index, double _range)
 /////////////////////////////////////////////////
 void LaserView::LaserItem::Update()
 {
+  // Resize the point array if the number of ranges has changed.
+  if (this->rangeMin > 0.0 &&
+      this->ranges.size() * 2 != this->points.size())
+  {
+    // A min range > 0 means we have to draw an inner circle, so we twice as
+    // many points
+    this->points.resize(this->ranges.size() * 2);
+  }
+  else if (math::equal(this->rangeMin, 0.0) &&
+      this->ranges.size() + 1 != this->points.size())
+  {
+    // A min range == 0 mean we just need a closing point at the (0, 0)
+    // location
+    this->points.resize(this->ranges.size() + 1);
+  }
+
+  double angle = this->angleMin;
+
+  // Add a point for each laser reading
+  for (unsigned int i = 0; i < this->ranges.size(); ++i)
+  {
+    QPointF pt(this->ranges[i] * this->scale * cos(angle),
+        -this->ranges[i] * this->scale * sin(angle));
+    this->points[i] = pt;
+    angle += this->angleStep;
+  }
+
+  // If a min range is set, then draw an inner circle
+  if (this->rangeMin > 0.0)
+  {
+    // Create the inner circle that denotes the min range
+    for (int i = this->ranges.size()-1; i >=0 ; --i)
+    {
+      QPointF pt(this->rangeMin * this->scale * cos(angle),
+          -this->rangeMin * this->scale * sin(angle));
+      this->points[i + this->ranges.size()] = pt;
+      angle -= this->angleStep;
+    }
+  }
+  else
+  {
+    // Connect the last point to the (0,0)
+    this->points[this->ranges.size()] = QPointF(0, 0);
+  }
+
+  // Tell QT we have changed.
   this->prepareGeometryChange();
 }
 
@@ -308,7 +392,7 @@ void LaserView::LaserItem::Update()
 unsigned int LaserView::LaserItem::GetPointCount()
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  return this->points.size();
+  return this->ranges.size();
 }
 
 /////////////////////////////////////////////////

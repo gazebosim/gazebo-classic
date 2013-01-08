@@ -93,10 +93,14 @@ namespace gazebo
                  public: double angleStep;
 
                  public: double rangeMax;
+                 public: double rangeMin;
 
                  private: double indexAngle;
 
                  private: double scale;
+
+                 /// \brief True to draw the hover angles in radians
+                 private: bool radians;
 
                  /// \brief Mutex to protect the laser data.
                  private: boost::mutex mutex;
