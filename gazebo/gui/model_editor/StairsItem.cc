@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/model_editor/BuildingEditorWidget.hh"
 #include "gazebo/gui/model_editor/BuildingItem.hh"
 #include "gazebo/gui/model_editor/EditorItem.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
@@ -130,7 +131,8 @@ bool StairsItem::rotateEventFilter(RotateHandle *_rotate,
     case QEvent::GraphicsSceneHoverEnter:
     case QEvent::GraphicsSceneHoverMove:
     {
-      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+//      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+      QApplication::setOverrideCursor(BuildingEditorWidget::rotateCursor);
       return true;
     }
     case QEvent::GraphicsSceneHoverLeave:

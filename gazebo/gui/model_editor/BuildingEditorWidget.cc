@@ -28,11 +28,18 @@
 using namespace gazebo;
 using namespace gui;
 
+QCursor BuildingEditorWidget::rotateCursor;
+
 /////////////////////////////////////////////////
 BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   : QWidget(_parent)
 {
   this->setObjectName("buildingEditorWidget");
+
+  QPixmap rotatePixmap(":/images/rotate_object.png");
+  rotatePixmap = rotatePixmap.scaledToHeight(25);
+  rotatePixmap = rotatePixmap.scaledToWidth(25);
+  rotateCursor = QCursor(rotatePixmap);
 
   EditorView *view = new EditorView();
   QGraphicsScene *scene = new QGraphicsScene();

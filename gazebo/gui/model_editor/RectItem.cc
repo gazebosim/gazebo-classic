@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/math/Angle.hh"
+#include "gazebo/gui/model_editor/BuildingEditorWidget.hh"
 #include "gazebo/gui/model_editor/GrabberHandle.hh"
 #include "gazebo/gui/model_editor/RotateHandle.hh"
 #include "gazebo/gui/model_editor/EditorItem.hh"
@@ -193,7 +194,9 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate, QEvent *_event)
     case QEvent::GraphicsSceneHoverEnter:
     case QEvent::GraphicsSceneHoverMove:
     {
-      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+//      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+
+      QApplication::setOverrideCursor(BuildingEditorWidget::rotateCursor);
       return true;
     }
     case QEvent::GraphicsSceneHoverLeave:

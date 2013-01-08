@@ -20,6 +20,8 @@
 using namespace gazebo;
 using namespace gui;
 
+
+
 /////////////////////////////////////////////////
 EditorItem::EditorItem()
 {

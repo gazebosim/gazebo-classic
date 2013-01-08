@@ -34,9 +34,12 @@ namespace gazebo
 
       public: ~BuildingEditorWidget();
 
+      public: static QCursor rotateCursor;
+
       private: void resizeEvent(QResizeEvent *_event);
 
       private: LevelWidget *levelWidget;
+
     };
   }
 }
