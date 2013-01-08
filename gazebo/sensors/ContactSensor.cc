@@ -215,27 +215,7 @@ std::string ContactSensor::GetCollisionName(unsigned int _index) const
 unsigned int ContactSensor::GetCollisionContactCount(
     const std::string &_collisionName) const
 {
-  gzwarn << "not thread safe, use the non-const version of this function\n";
-  unsigned int result = 0;
-
-  for (int i = 0; i < this->contactsMsg.contact_size(); ++i)
-  {
-    if (this->contactsMsg.contact(i).collision1() == _collisionName ||
-        this->contactsMsg.contact(i).collision2() == _collisionName)
-    {
-      result += this->contactsMsg.contact(i).position_size();
-    }
-  }
-
-  return result;
-}
-
-//////////////////////////////////////////////////
-unsigned int ContactSensor::GetCollisionContactCount(
-    const std::string &_collisionName)
-{
   boost::mutex::scoped_lock lock(this->mutex);
-
   unsigned int result = 0;
 
   for (int i = 0; i < this->contactsMsg.contact_size(); ++i)
@@ -253,15 +233,7 @@ unsigned int ContactSensor::GetCollisionContactCount(
 //////////////////////////////////////////////////
 msgs::Contacts ContactSensor::GetContacts() const
 {
-  gzwarn << "not thread safe, use the non-const version of this function\n";
-  return this->contactsMsg;
-}
-
-//////////////////////////////////////////////////
-msgs::Contacts ContactSensor::GetContacts()
-{
   boost::mutex::scoped_lock lock(this->mutex);
-
   return this->contactsMsg;
 }
 
