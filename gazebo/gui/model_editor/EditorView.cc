@@ -338,7 +338,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::keyPressEvent(QKeyEvent *_event)
 {
-  if (_event->key() == Qt::Key_Delete)
+  if (_event->key() == Qt::Key_Delete || _event->key() == Qt::Key_Backspace)
     {
     QList<QGraphicsItem *> selectedItems = this->scene()->selectedItems();
 

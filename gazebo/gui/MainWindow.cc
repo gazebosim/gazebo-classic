@@ -679,7 +679,7 @@ void MainWindow::CreateActions()
   g_resetWorldAct->setStatusTip(tr("Reset the world"));
   connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
 
-  g_editBuildingAct = new QAction(tr("Edit &Building"), this);
+  g_editBuildingAct = new QAction(tr("&Building Editor"), this);
   g_editBuildingAct->setShortcut(tr("Ctrl+B"));
   g_editBuildingAct->setStatusTip(tr("Enter Building Editor Mode"));
   g_editBuildingAct->setCheckable(true);
