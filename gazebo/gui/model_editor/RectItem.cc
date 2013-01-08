@@ -516,10 +516,10 @@ void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
-  if (!this->isSelected())
-    this->scene()->clearSelection();
+//  if (!this->isSelected())
+//    this->scene()->clearSelection();
 
-  this->setSelected(true);
+//  this->setSelected(true);
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
   this->mousePressPos = this->mapFromScene(_event->scenePos());
   _event->setAccepted(true);

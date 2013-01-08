@@ -130,7 +130,20 @@ void EditorView::mousePressEvent(QMouseEvent *_event)
 {
   if (!this->drawInProgress && this->drawMode != WALL
       && (_event->button() != Qt::RightButton))
+  {
+    QGraphicsItem *mouseItem =
+        this->scene()->itemAt(this->mapToScene(_event->pos()));
+    if (mouseItem && !mouseItem->isSelected())
+    {
+      EditorItem *editorItem = dynamic_cast<EditorItem*>(mouseItem);
+      if (editorItem)
+      {
+        this->scene()->clearSelection();
+        mouseItem->setSelected(true);
+      }
+    }
     QGraphicsView::mousePressEvent(_event);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -782,7 +795,7 @@ void EditorView::OnLevelApply()
 /////////////////////////////////////////////////
 void EditorView::CancelDrawMode()
 {
-  if (this->drawInProgress && this->currentMouseItem)
+  if (this->drawMode != NONE && this->currentMouseItem)
   {
     EditorItem *item = dynamic_cast<EditorItem *>(this->currentMouseItem);
     this->itemToModelMap.erase(item);

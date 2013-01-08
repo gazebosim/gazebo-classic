@@ -41,7 +41,7 @@ PolylineItem::PolylineItem(const QPointF &_start, const QPointF &_end) :
 
   this->setSelected(false);
   this->ShowCorners(false);
-  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable);
+  this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   this->setAcceptHoverEvents(true);
 
@@ -66,7 +66,7 @@ void PolylineItem::SetThickness(double _thickness)
   for (unsigned int i = 0; i < this->segments.size(); ++i)
   {
     QPen segmentPen = this->segments[i]->pen();
-    segmentPen.setWidth(_thickness);  
+    segmentPen.setWidth(_thickness);
     this->segments[i]->setPen(segmentPen);
   }
 }
@@ -367,8 +367,8 @@ void PolylineItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void PolylineItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
-  if (!this->isSelected())
-    this->scene()->clearSelection();
+//  if (!this->isSelected())
+//    this->scene()->clearSelection();
 
 //  this->setSelected(true);
 //  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
@@ -410,7 +410,7 @@ void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent */*_event*/)
     this->segments[i]->installSceneEventFilter(this);
     this->grabbers[i]->installSceneEventFilter(this);
   }
-    this->grabbers[grabbers.size()-1]->installSceneEventFilter(this);
+  this->grabbers[grabbers.size()-1]->installSceneEventFilter(this);
 }
 
 /////////////////////////////////////////////////
@@ -429,7 +429,7 @@ void PolylineItem::hoverMoveEvent(QGraphicsSceneHoverEvent */*_event*/)
     this->segments[i]->installSceneEventFilter(this);
     this->grabbers[i]->installSceneEventFilter(this);
   }
-    this->grabbers[grabbers.size()-1]->installSceneEventFilter(this);
+  this->grabbers[grabbers.size()-1]->installSceneEventFilter(this);
 }
 
 
@@ -449,7 +449,7 @@ void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent */*_event*/)
     this->grabbers[i]->removeSceneEventFilter(this);
     this->segments[i]->removeSceneEventFilter(this);
   }
-    this->grabbers[grabbers.size()-1]->removeSceneEventFilter(this);
+  this->grabbers[grabbers.size()-1]->removeSceneEventFilter(this);
 }
 
 /////////////////////////////////////////////////
@@ -458,7 +458,7 @@ QVariant PolylineItem::itemChange(GraphicsItemChange _change,
 {
   if (_change == QGraphicsItem::ItemSelectedChange && this->scene())
   {
-    if (_value.toBool())
+   /* if (_value.toBool())
     {
       QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
 
@@ -479,7 +479,7 @@ QVariant PolylineItem::itemChange(GraphicsItemChange _change,
         this->segments[i]->removeSceneEventFilter(this);
       }
         this->grabbers[grabbers.size()-1]->removeSceneEventFilter(this);
-    }
+    }*/
     if (!_value.toBool())
         this->ShowCorners(_value.toBool());
   }

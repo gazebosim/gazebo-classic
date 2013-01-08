@@ -38,6 +38,8 @@ FloorItem::FloorItem(): RectItem(), BuildingItem()
   this->floorHeight = 10;
 
   this->floorPos = this->scenePos();
+
+  this->setFlag(QGraphicsItem::ItemIsSelectable, false);
 //  this->setVisible(false);
 }
 
@@ -77,8 +79,8 @@ double FloorItem::GetSceneRotation() const
 /////////////////////////////////////////////////
 void FloorItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
-  if (!this->isSelected())
-    this->scene()->clearSelection();
+//  if (!this->isSelected())
+//    this->scene()->clearSelection();
 
   _event->setAccepted(false);
 }
@@ -115,6 +117,12 @@ void FloorItem::paint (QPainter *_painter,
   this->floorPos = this->scenePos();
 
 //  QGraphicsPolygonItem::paint(_painter, _option, _widget);
+}
+
+/////////////////////////////////////////////////
+void FloorItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
+{
+  _event->ignore();
 }
 
 /////////////////////////////////////////////////

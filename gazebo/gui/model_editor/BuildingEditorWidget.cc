@@ -41,8 +41,8 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   QBrush brush (c, Qt::SolidPattern);
   scene->setBackgroundBrush(brush);
 
-  int boundingWidth = 1024;
-  int boundingHeight = 800;
+  int boundingWidth = 1240;
+  int boundingHeight = 1024;
   scene->setSceneRect(-boundingWidth/2, -boundingHeight/2,
                       boundingWidth, boundingHeight);
   QHBoxLayout *canvasLayout = new QHBoxLayout(this);

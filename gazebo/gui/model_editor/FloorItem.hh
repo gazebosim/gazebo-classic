@@ -43,6 +43,9 @@ namespace gazebo
 
         private: virtual void mousePressEvent(QGraphicsSceneMouseEvent *_event);
 
+        private: virtual void contextMenuEvent(
+            QGraphicsSceneContextMenuEvent *_event);
+
         private: void FloorChanged();
 
         private: void SizeChanged();

@@ -219,7 +219,6 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
       _segment->SetMouseDownX(scenePosition.x());
       _segment->SetMouseDownY(scenePosition.y());
 
-//      this->selectedSegment = _segment;
       this->setSelected(true);
       this->SetSegmentSelected(_segment->GetIndex(), true);
       this->segmentMouseMove = scenePosition;
@@ -237,7 +236,6 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
     }
     case QEvent::GraphicsSceneContextMenu:
     {
-//      this->selectedSegment = _segment;
       this->SetSegmentSelected(_segment->GetIndex(), true);
       QMenu menu;
       menu.addAction(this->openInspectorAct);
@@ -247,7 +245,6 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
     }
     case QEvent::GraphicsSceneMouseDoubleClick:
     {
-//      this->selectedSegment = _segment;
       this->SetSegmentSelected(_segment->GetIndex(), true);
       this->OnOpenInspector();
       _segment->SetMouseState(QEvent::GraphicsSceneMouseDoubleClick);
