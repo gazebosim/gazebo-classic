@@ -412,6 +412,7 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
     this->currentMouseItem = NULL;
     this->drawMode = NONE;
     this->drawInProgress = false;
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
   }
   else
   {
@@ -601,6 +602,9 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
     this->currentMouseItem = NULL;
     this->drawInProgress = false;
   }
+
+  if (this->drawMode == WALL)
+    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 }
 
 /////////////////////////////////////////////////
@@ -820,5 +824,6 @@ void EditorView::CancelDrawMode()
     this->drawMode = NONE;
     this->drawInProgress = false;
     this->currentMouseItem = NULL;
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
   }
 }
