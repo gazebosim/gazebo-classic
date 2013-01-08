@@ -23,7 +23,7 @@
 #include "gazebo/gui/model_editor/PolylineItem.hh"
 #include "gazebo/gui/model_editor/WallItem.hh"
 #include "gazebo/gui/model_editor/LevelWidget.hh"
-#include "gazebo/gui/model_editor/RulerWidget.hh"
+#include "gazebo/gui/model_editor/ScaleWidget.hh"
 #include "gazebo/gui/model_editor/BuildingEditorWidget.hh"
 
 using namespace gazebo;
@@ -77,8 +77,8 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
 //  proxyWidget->setFlag(QGraphicsItem::ItemIgnoresTransformations);
 //  proxyWidget->setPos(QPointF(-levelWidget->width() / 2, 0));
 
-  this->rulerWidget = new RulerWidget(this);
-  this->rulerWidget->resize(250,50);
+  this->scaleWidget = new ScaleWidget(this);
+  this->scaleWidget->resize(250,50);
 
   canvasLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(canvasLayout);
@@ -95,6 +95,6 @@ void BuildingEditorWidget::resizeEvent(QResizeEvent *_event)
   this->levelWidget->move(_event->size().width()/2
       - levelWidget->size().width()/2, 0);
 
-  this->rulerWidget->move(20, _event->size().height()
-      - rulerWidget->size().height() - 20);
+  this->scaleWidget->move(20, _event->size().height()
+      - scaleWidget->size().height() - 20);
 }

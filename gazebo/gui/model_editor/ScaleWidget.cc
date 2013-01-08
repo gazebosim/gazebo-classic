@@ -15,29 +15,29 @@
  *
 */
 
-#include "gazebo/gui/model_editor/RulerWidget.hh"
+#include "gazebo/gui/model_editor/ScaleWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 //////////////////////////////////////////////////
-RulerWidget::RulerWidget(QWidget *_parent) : QWidget(_parent)
+ScaleWidget::ScaleWidget(QWidget *_parent) : QWidget(_parent)
 {
-  this->setObjectName("rulerWidget");
+  this->setObjectName("scaleWidget");
+  this->scaleText = "1.0 m";
 }
 
 //////////////////////////////////////////////////
-RulerWidget::~RulerWidget()
+ScaleWidget::~ScaleWidget()
 {
 }
 
 //////////////////////////////////////////////////
-void RulerWidget::paintEvent(QPaintEvent *)
+void ScaleWidget::paintEvent(QPaintEvent *)
 {
    QPoint topLeft(0, 20);
    QPoint bottomRight(100, 40);
    QPointF midPoint = (topLeft + bottomRight)/2;
-   this->rulerText = "0.1 m";
 
    QPainter painter(this);
    QPen rulerPen;
@@ -53,5 +53,5 @@ void RulerWidget::paintEvent(QPaintEvent *)
       (bottomRight.y() - topLeft.y()));
    QRect rulerRect(textTopLeft, textBottomRight);
    painter.drawText (rulerRect, Qt::AlignHCenter,
-      QString(this->rulerText.c_str()));
+      QString(this->scaleText.c_str()));
 }

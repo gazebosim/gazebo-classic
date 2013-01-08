@@ -25,17 +25,17 @@ namespace gazebo
 {
   namespace gui
   {
-    class RulerWidget : public QWidget
+    class ScaleWidget : public QWidget
     {
       Q_OBJECT
 
-      public: RulerWidget(QWidget *_parent = 0);
+      public: ScaleWidget(QWidget *_parent = 0);
 
-      public: ~RulerWidget();
+      public: ~ScaleWidget();
 
       public: void paintEvent(QPaintEvent *_event);
 
-      private: std::string rulerText;
+      private: std::string scaleText;
     };
   }
 }

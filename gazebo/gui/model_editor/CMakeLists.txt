@@ -26,7 +26,7 @@ set (sources
   EditorEvents.cc
   StairsItem.cc
   LevelWidget.cc
-  RulerWidget.cc
+  ScaleWidget.cc
   ModelManip.cc
   EditorView.cc
 )
@@ -41,7 +41,7 @@ set (qt_headers
   ModelManip.hh
   EditorItem.hh
   LevelWidget.hh
-  RulerWidget.hh
+  ScaleWidget.hh
   RectItem.hh
   StairsItem.hh
   WallItem.hh

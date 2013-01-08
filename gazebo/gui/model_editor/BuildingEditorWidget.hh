@@ -26,7 +26,7 @@ namespace gazebo
   {
     class LevelWidget;
 
-    class RulerWidget;
+    class ScaleWidget;
 
     class BuildingEditorWidget : public QWidget
     {
@@ -42,7 +42,7 @@ namespace gazebo
 
       private: LevelWidget *levelWidget;
 
-      private: RulerWidget *rulerWidget;
+      private: ScaleWidget *scaleWidget;
 
     };
   }
