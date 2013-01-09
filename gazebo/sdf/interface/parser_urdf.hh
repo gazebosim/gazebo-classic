@@ -105,8 +105,8 @@ namespace urdf2gazebo
       isKd = ge.isKd;
       selfCollide = ge.selfCollide;
       isLaserRetro = ge.isLaserRetro;
-      is_stop_kp = ge.isStopKp;
-      is_stop_kd = ge.isStopKd;
+      isStopKp = ge.isStopKp;
+      isStopKd = ge.isStopKd;
       isStopCfm = ge.isStopCfm;
       isStopErp = ge.isStopErp;
       isInitialJointPosition = ge.isInitialJointPosition;
@@ -194,13 +194,6 @@ namespace urdf2gazebo
     public: TiXmlDocument InitModelString(const std::string &_urdfStr,
                                           bool _enforceLimits = true);
 
-    /// \brief convert urdf string to sdf xml document, with option to enforce
-    /// limits.
-    /// \param[in] _urdfStr a string containing model urdf
-    /// \param[in] _enforceLimits option to enforce joint limits
-    /// \return a tinyxml document containing sdf of the model
-    public: TiXmlDocument InitModelString(const std::string &_urdfStr);
-
     /// \brief parser xml string into urdf::Vector3
     /// \param[in] _key XML key where vector3 value might be
     /// \param[in] _scale scalar scale for the vector3
@@ -249,10 +242,10 @@ namespace urdf2gazebo
     private: void ParseGazeboExtension(TiXmlDocument &_urdfXml);
 
     /// parse if <robot> contains an <origin> tag
-    private: void parseRobotOrigin(TiXmlDocument &_urdfXml);
+    private: void ParseRobotOrigin(TiXmlDocument &_urdfXml);
 
     /// insert <robot>'s <origin> tag
-    private: void insertRobotOrigin(TiXmlElement *_elem);
+    private: void InsertRobotOrigin(TiXmlElement *_elem);
 
     /// insert extensions into collision geoms
     private: void InsertGazeboExtensionCollision(TiXmlElement *_elem,

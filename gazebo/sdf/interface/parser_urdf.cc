@@ -38,27 +38,27 @@ std::string lowerStr(std::string str)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string findFile(const std::string &_filename)
+std::string find_file(const std::string &_filename)
 {
   std::string result = _filename;
 
   if (_filename[0] == '/')
-    result = gazebo::common::findFile(_filename, false);
+    result = gazebo::common::find_file(_filename, false);
   else
   {
     std::string tmp = std::string("sdf/") + sdf::SDF::version + "/" + _filename;
-    result = gazebo::common::findFile(tmp, false);
+    result = gazebo::common::find_file(tmp, false);
   }
 
   return result;
 }
 
-bool initSDF(sdf::SDFPtr _sdf)
+bool init_sdf(sdf::SDFPtr _sdf)
 {
   bool result = false;
 
   std::string filename;
-  filename = findFile("root.sdf");
+  filename = find_file("root.sdf");
 
   FILE *ftest = fopen(filename.c_str(), "r");
   if (ftest && initFile(filename, _sdf))
@@ -93,13 +93,13 @@ urdf::Vector3 URDF2Gazebo::ParseVector3(TiXmlNode* _key, double _scale)
 {
   if (_key != NULL)
   {
-    return this->ParseVector3(key->Value(), scale);
+    return this->ParseVector3(_key->Value(), _scale);
   }
   else
     return urdf::Vector3(0, 0, 0);
 }
 
-urdf::Vector3 URDF2Gazebo::ParseVector3(std::string _str, double _scale)
+urdf::Vector3 URDF2Gazebo::ParseVector3(const std::string &_str, double _scale)
 {
   std::vector<std::string> pieces;
   std::vector<double> vals;
@@ -272,7 +272,7 @@ void URDF2Gazebo::ParseRobotOrigin(TiXmlDocument &_urdfXml)
   TiXmlElement* originXml = robotXml->FirstChildElement("origin");
   if (originXml)
   {
-    this->initial_robot_pose_.position = this->ParseVector3(
+    this->initialRobotPose.position = this->ParseVector3(
       originXml->Attribute("xyz"));
     urdf::Vector3 rpy = this->ParseVector3(originXml->Attribute("rpy"));
     this->initialRobotPose.rotation.setFromRPY( rpy.x, rpy.y, rpy.z);
@@ -287,7 +287,7 @@ void URDF2Gazebo::InsertRobotOrigin(TiXmlElement *_elem)
   pose[1] = this->initialRobotPose.position.y;
   pose[2] = this->initialRobotPose.position.z;
   this->initialRobotPose.rotation.getRPY(pose[3], pose[4], pose[5]);
-  addKeyValue(_elem, "pose", values2str(6, pose));
+  this->AddKeyValue(_elem, "pose", this->Values2str(6, pose));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -503,7 +503,7 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
           // gzerr << "node: " << deprecated_sdf::ToString(node) << "\n";
 
           sdf::SDFPtr includeSDF(new sdf::SDF);
-          initSDF(includeSDF);
+          init_sdf(includeSDF);
           sdf::ElementPtr sdf;
 
           // a place to store converted doc
@@ -1848,11 +1848,7 @@ TiXmlDocument URDF2Gazebo::InitModelString(const std::string &_urdfStr,
   bool _enforceLimits)
 {
     this->enforceLimits = _enforceLimits;
-    return this->initModelString(_urdfStr);
-}
 
-TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
-{
     /* Create a RobotModel from string */
     boost::shared_ptr<urdf::ModelInterface> robotModel =
       urdf::parseURDF(_urdfStr.c_str());
@@ -1882,7 +1878,7 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
     this->ParseGazeboExtension(urdfXml);
 
     /* parse robot pose */
-    this->ParseRobotOrigin(urdf_xml);
+    this->ParseRobotOrigin(urdfXml);
 
     ConstUrdfLinkPtr rootLink = robotModel->getRoot();
 
