@@ -4,6 +4,8 @@ include_directories(${BULLET_INCLUDE_DIRS})
 
 link_directories(${BULLET_LIBRARY_DIRS})
 
+add_subdirectory(test)
+
 add_definitions(${BULLET_CFLAGS})
 
 set (sources
