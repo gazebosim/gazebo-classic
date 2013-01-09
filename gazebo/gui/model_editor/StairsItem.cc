@@ -37,8 +37,8 @@ StairsItem::StairsItem(): RectItem(), BuildingItem()
 
   this->level = 0;
 
-  this->stairsSteps = 10;
-  this->stairsDepth = 150;
+  this->stairsSteps = 15;
+  this->stairsDepth = 350;
   this->stairsWidth = 100;
   this->stairsHeight = 250;
 
