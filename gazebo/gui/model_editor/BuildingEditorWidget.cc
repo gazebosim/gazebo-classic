@@ -38,8 +38,8 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   this->setObjectName("buildingEditorWidget");
 
   QPixmap rotatePixmap(":/images/rotate_object.png");
-  rotatePixmap = rotatePixmap.scaledToHeight(25);
-  rotatePixmap = rotatePixmap.scaledToWidth(25);
+//  rotatePixmap = rotatePixmap.scaledToHeight(25);
+//  rotatePixmap = rotatePixmap.scaledToWidth(25);
   rotateCursor = QCursor(rotatePixmap);
 
   EditorView *view = new EditorView();
@@ -75,7 +75,7 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
 //  proxyWidget->setPos(QPointF(-levelWidget->width() / 2, 0));
 
   this->scaleWidget = new ScaleWidget(this);
-  this->scaleWidget->resize(250,50);
+  this->scaleWidget->resize(150,50);
 
   canvasLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(canvasLayout);

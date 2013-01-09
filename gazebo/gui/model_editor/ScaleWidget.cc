@@ -28,6 +28,7 @@ ScaleWidget::ScaleWidget(QWidget *_parent) : QWidget(_parent)
   this->setObjectName("scaleWidget");
   this->scaleText = "1.00 m";
 
+  this->setAttribute(Qt::WA_TransparentForMouseEvents);
   this->connections.push_back(
     gui::editor::Events::ConnectChangeZoom(
     boost::bind(&ScaleWidget::OnChangeZoom, this, _1)));
@@ -47,6 +48,7 @@ void ScaleWidget::paintEvent(QPaintEvent *)
 
    QPainter painter(this);
    QPen rulerPen;
+   rulerPen.setColor(Qt::gray);
    rulerPen.setWidth(3);
    painter.setPen(rulerPen);
    painter.drawLine(topLeft.x(), midPoint.y(), bottomRight.x(), midPoint.y());

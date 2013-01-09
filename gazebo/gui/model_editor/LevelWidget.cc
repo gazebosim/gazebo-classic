@@ -60,6 +60,8 @@ LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
     boost::bind(&LevelWidget::OnDiscard, this)));
 
   this->setLayout(levelLayout);
+
+  this->setAttribute(Qt::WA_TransparentForMouseEvents);
 }
 
 //////////////////////////////////////////////////
