@@ -41,6 +41,8 @@ namespace gazebo
 
       public slots: void OnAddLevel();
 
+      public: void OnDeleteLevel(int _level);
+
       private: void OnChangeLevelName(int _level, const std::string &_newName);
 
       private: void OnDiscard();
@@ -48,6 +50,8 @@ namespace gazebo
       private: QComboBox *levelComboBox;
 
       private: std::vector<event::ConnectionPtr> connections;
+
+      private: int levelCounter;
     };
   }
 }

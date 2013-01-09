@@ -28,6 +28,7 @@ LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
   this->setObjectName("levelWidget");
 
   QHBoxLayout *levelLayout = new QHBoxLayout;
+  this->levelCounter = 0;
 
   this->levelComboBox = new QComboBox;
   this->levelComboBox->addItem(QString("Level 1"));
@@ -45,6 +46,10 @@ LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
   connect(this->levelComboBox, SIGNAL(currentIndexChanged(int)),
       this, SLOT(OnCurrentLevelChanged(int)));
   connect(addLevelButton, SIGNAL(clicked()), this, SLOT(OnAddLevel()));
+
+  this->connections.push_back(
+    gui::editor::Events::ConnectDeleteLevel(
+    boost::bind(&LevelWidget::OnDeleteLevel, this, _1)));
 
   this->connections.push_back(
     gui::editor::Events::ConnectChangeLevelName(
@@ -72,10 +77,10 @@ void LevelWidget::OnCurrentLevelChanged(int _level)
 void LevelWidget::OnAddLevel()
 {
   std::stringstream levelText;
-  int count = this->levelComboBox->count();
-  levelText << "Level " << (count + 1);
+//  int count = this->levelComboBox->count();
+  levelText << "Level " << (++this->levelCounter + 1);
   this->levelComboBox->addItem(QString(levelText.str().c_str()));
-  this->levelComboBox->setCurrentIndex(count);
+  this->levelComboBox->setCurrentIndex(this->levelComboBox->count()-1);
   gui::editor::Events::addLevel();
 }
 
@@ -88,6 +93,7 @@ void LevelWidget::OnChangeLevelName(int _level, const std::string &_newName)
     // TODO Use a level manager later for managing all events
     this->levelComboBox->addItem(tr(_newName.c_str()));
     this->levelComboBox->setCurrentIndex(_level);
+    this->levelCounter++;
   }
   else
   {
@@ -96,8 +102,17 @@ void LevelWidget::OnChangeLevelName(int _level, const std::string &_newName)
 }
 
 //////////////////////////////////////////////////
+void LevelWidget::OnDeleteLevel(int _level)
+{
+  this->levelComboBox->removeItem(_level);
+  if (_level-1 >= 0)
+    this->levelComboBox->setCurrentIndex(_level-1);
+}
+
+//////////////////////////////////////////////////
 void LevelWidget::OnDiscard()
 {
   this->levelComboBox->clear();
   this->levelComboBox->addItem(QString("Level 1"));
+  this->levelCounter = 0;
 }

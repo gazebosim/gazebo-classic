@@ -43,6 +43,15 @@ namespace gazebo
 
     class GridLines;
 
+    class Level
+    {
+      public: int level;
+
+      public: std::string name;
+
+      public: double height;
+    };
+
     class EditorView : public QGraphicsView
     {
       Q_OBJECT
@@ -96,7 +105,11 @@ namespace gazebo
 
       private slots: void OnAddLevel();
 
+      private slots: void OnDeleteLevel();
+
       private slots: void OnLevelApply();
+
+      private: void DeleteLevel(int _level);
 
       private: void OnChangeLevel(int _level);
 
@@ -136,13 +149,15 @@ namespace gazebo
 
       private: int currentLevel;
 
-      private: std::map<int, double> levelHeights;
+      private: std::vector<Level *> levels;
 
-      private: std::map<int, std::string> levelNames;
+      private: int levelCounter;
 
       private: QAction *openLevelInspectorAct;
 
       private: QAction *addLevelAct;
+
+      private: QAction *deleteLevelAct;
 
       private: double grabberDragRotation;
 

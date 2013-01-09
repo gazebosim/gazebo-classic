@@ -87,6 +87,15 @@ namespace gazebo
                 { addLevel.Disconnect(_subscriber); }
 
         public: template<typename T>
+                static event::ConnectionPtr ConnectDeleteLevel(T _subscriber)
+                { return deleteLevel.Connect(_subscriber); }
+        /// \brief Disconnect a boost::slot to the delete level signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectDeleteLevel(
+                    event::ConnectionPtr _subscriber)
+                { deleteLevel.Disconnect(_subscriber); }
+
+        public: template<typename T>
                 static event::ConnectionPtr ConnectChangeLevelName(T _subscriber)
                 { return changeLevelName.Connect(_subscriber); }
         /// \brief Disconnect a boost::slot to the change level name signal
@@ -120,8 +129,11 @@ namespace gazebo
         /// \brief The current level has been changed
         public: static event::EventT<void (int)> changeLevel;
 
-        /// \brief A new level is to be added
+        /// \brief A new level has been added
         public: static event::EventT<void ()> addLevel;
+
+        /// \brief A new level has been deleted
+        public: static event::EventT<void (int)> deleteLevel;
 
         /// \brief The current level name has been changed
         public: static event::EventT<void (int, std::string)> changeLevelName;
