@@ -278,9 +278,11 @@ namespace gazebo
       /// \brief Get the world pos of a the first contact at a pixel location.
       /// \param[in] _camera Pointer to the camera.
       /// \param[in] _mousePos 2D position of the mouse in pixels.
-      /// \return 3D position of the first contact point.
-      public: math::Vector3 GetFirstContact(CameraPtr _camera,
-                                            const math::Vector2i &_mousePos);
+      /// \param[out] _position 3D position of the first contact point.
+      /// \return True if a valid object was hit by the raycast.
+      public: bool GetFirstContact(CameraPtr _camera,
+                                   const math::Vector2i &_mousePos,
+                                   math::Vector3 &_position);
 
       /// \brief Print the scene graph to std_out.
       public: void PrintSceneGraph();

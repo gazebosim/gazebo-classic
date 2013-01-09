@@ -56,4 +56,6 @@ QAction *gazebo::gui::g_fullScreenAct = 0;
 QAction *gazebo::gui::g_fpsAct = 0;
 QAction *gazebo::gui::g_orbitAct = 0;
 
+QAction *gazebo::gui::g_topicVisAct = 0;
+
 gazebo::gui::DeleteAction *gazebo::gui::g_deleteAct = 0;
