@@ -3,12 +3,15 @@ link_directories(${urdfdom_LIBRARY_DIRS} ${urdfdom_headers_LIBRARY_DIRS} ${conso
 include ( ${QT_USE_FILE} )
 add_definitions(${QT_DEFINITIONS})
 
+
 include_directories( 
   ${PROJECT_BINARY_DIR}/gazebo 
   ${PROJECT_SOURCE_DIR}/gazebo 
   ${tinyxml_include_dirs}
   ${PROTOBUF_INCLUDE_DIR}
 )
+
+add_subdirectory(test)
 
 add_executable(gzsdf gzsdf.cc)
 target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_sdf_interface)
