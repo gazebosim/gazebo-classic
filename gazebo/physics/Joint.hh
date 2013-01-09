@@ -124,7 +124,7 @@ namespace gazebo
 
       /// \brief Get the link to which the joint is attached according
       /// the _index.
-      /// \param[in] _index Index of the link to retreive.
+      /// \param[in] _index Index of the link to retrieve.
       /// \return Pointer to the request link. NULL if the index was
       /// invalid.
       public: virtual LinkPtr GetJointLink(int _index) const = 0;

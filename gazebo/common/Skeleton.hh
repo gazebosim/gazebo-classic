@@ -264,7 +264,7 @@ namespace gazebo
       /// \return the child skeleton. NO BOUNDS CHECKING
       public: SkeletonNode* GetChild(unsigned int _index);
 
-      /// \brief Get child by name
+      /// \brief Get child by name, so it should affect everyt
       /// \param[in] _name the name of the child skeleton
       /// \return the skeleton, or NULL if not found
       public: SkeletonNode* GetChildByName(std::string _name);
