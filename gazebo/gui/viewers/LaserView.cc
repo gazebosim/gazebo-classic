@@ -31,7 +31,7 @@ GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.LaserScanStamped", LaserView)
 
 /////////////////////////////////////////////////
 LaserView::LaserView(QWidget *_parent)
-: TopicView(_parent, "gazebo.msgs.LaserScanStamped", "image")
+: TopicView(_parent, "gazebo.msgs.LaserScanStamped", "laser")
 {
   this->setWindowTitle(tr("Gazebo: Laser View"));
 
@@ -122,14 +122,11 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
 
   double angle = _msg->scan().angle_min();
 
-  math::Vector2d pt;
   double r;
   for (unsigned int i = 0;
        i < static_cast<unsigned int>(_msg->scan().ranges_size()); i++)
   {
     r = _msg->scan().ranges(i) + _msg->scan().range_min();
-    pt.x = r * cos(angle);
-    pt.y = -r * sin(angle);
 
     if (i+1 >= this->laserItem->GetRangeCount())
       this->laserItem->AddRange(r);
@@ -182,7 +179,7 @@ LaserView::LaserItem::LaserItem()
 }
 
 /////////////////////////////////////////////////
-void LaserView::LaserItem::paint (QPainter *_painter,
+void LaserView::LaserItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem * /*_option*/, QWidget * /*_widget*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
@@ -199,7 +196,7 @@ void LaserView::LaserItem::paint (QPainter *_painter,
 
   // Draw a box with an arrow around the (0, 0) location
   _painter->setPen(QPen(orange));
-  _painter->setBrush(QColor(0,0,0,0));
+  _painter->setBrush(QColor(0, 0, 0, 0));
   _painter->drawRect(-10, -10, 20, 20);
   _painter->drawLine(0, 0, 20, 0);
   _painter->drawLine(25, 0, 20, -5);

@@ -18,6 +18,7 @@
 #define _LASERVIEW_HH_
 
 #include <string>
+#include <vector>
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/common/Time.hh"
@@ -109,7 +110,7 @@ namespace gazebo
                  /// \param[in] _option An unsued graphics options.
                  /// \param[in] _widget Option param, the widget to paint
                  /// on.
-                 private: virtual void paint (QPainter *_painter,
+                 private: virtual void paint(QPainter *_painter,
                               const QStyleOptionGraphicsItem *_option,
                               QWidget *_widget);
 
@@ -165,12 +166,17 @@ namespace gazebo
                  private: mutable boost::mutex mutex;
                };
 
+      /// \brief This class exists so that we can properly capture the
+      /// QT wheelEvent.
       private: class CustomView : public QGraphicsView
                {
+                 /// \brief Constructor
+                 /// \param[in] _parent Pointer to the parent widget.
                  public: CustomView(QWidget *_parent)
                          : QGraphicsView(_parent), viewZoomed(false) {}
 
-                 // \brief QT callback. Used when a wheel event occurs.
+                 /// \brief QT callback. Used when a wheel event occurs.
+                 /// \param[in] _event QT wheel event info.
                  private: void wheelEvent(QWheelEvent *_event)
                  {
                    this->viewZoomed = true;

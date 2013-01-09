@@ -51,7 +51,7 @@ TEST_F(PhysicsTest, EmptyWorldBullet)
 {
   EmptyWorld("worlds/empty_bullet.world");
 }
-#endif // HAVE_BULLET
+#endif  // HAVE_BULLET
 
 TEST_F(PhysicsTest, State)
 {
