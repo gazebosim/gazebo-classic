@@ -57,6 +57,8 @@ namespace gazebo
 
       public: void CreateItem3D(EditorItem *item);
 
+      public: void DeleteItem(EditorItem *_item);
+
       private: void resizeEvent(QResizeEvent *_event);
 
       private: void scrollContentsBy (int _dx, int _dy);

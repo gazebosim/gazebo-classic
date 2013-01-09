@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/model_editor/EditorView.hh"
 #include "gazebo/gui/model_editor/BuildingItem.hh"
 #include "gazebo/gui/model_editor/EditorItem.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
@@ -60,6 +61,10 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
   this->openInspectorAct->setStatusTip(tr("Open Door Inspector"));
   connect(this->openInspectorAct, SIGNAL(triggered()),
     this, SLOT(OnOpenInspector()));
+  this->deleteItemAct = new QAction(tr("&Delete"), this);
+  this->deleteItemAct->setStatusTip(tr("Delete"));
+  connect(this->deleteItemAct, SIGNAL(triggered()),
+    this, SLOT(OnDeleteItem()));
 
   this->SetResizeFlag(ITEM_WIDTH);
 }
@@ -197,4 +202,10 @@ void DoorItem::SizeChanged()
 {
   emit widthChanged(this->doorWidth);
   emit depthChanged(this->doorDepth);
+}
+
+/////////////////////////////////////////////////
+void DoorItem::OnDeleteItem()
+{
+  dynamic_cast<EditorView *>(this->scene()->views()[0])->DeleteItem(this);
 }

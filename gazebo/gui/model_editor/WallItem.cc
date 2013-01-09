@@ -17,6 +17,7 @@
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/gui/model_editor/GrabberHandle.hh"
+#include "gazebo/gui/model_editor/EditorView.hh"
 #include "gazebo/gui/model_editor/EditorItem.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/BuildingItem.hh"
@@ -56,6 +57,10 @@ WallItem::WallItem(const QPointF &_start, const QPointF &_end)
   this->openInspectorAct->setStatusTip(tr("Open Wall Inspector"));
   connect(this->openInspectorAct, SIGNAL(triggered()),
     this, SLOT(OnOpenInspector()));
+  this->deleteItemAct = new QAction(tr("&Delete"), this);
+  this->deleteItemAct->setStatusTip(tr("Delete"));
+  connect(this->deleteItemAct, SIGNAL(triggered()),
+    this, SLOT(OnDeleteItem()));
 }
 
 /////////////////////////////////////////////////
@@ -239,6 +244,7 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
       this->SetSegmentSelected(_segment->GetIndex(), true);
       QMenu menu;
       menu.addAction(this->openInspectorAct);
+      menu.addAction(this->deleteItemAct);
       menu.exec(dynamic_cast<QGraphicsSceneContextMenuEvent*>(
           _event)->screenPos());
       return true;
@@ -325,6 +331,16 @@ void WallItem::OnOpenInspector()
   endPos.setY(-endPos.y());
   this->inspector->SetEndPosition(endPos);
   this->inspector->show();
+}
+
+/////////////////////////////////////////////////
+void WallItem::OnDeleteItem()
+{
+  if (!this->selectedSegment)
+    return;
+
+  dynamic_cast<EditorView *>(this->scene()->views()[0])->DeleteItem(
+      this->selectedSegment);
 }
 
 /////////////////////////////////////////////////

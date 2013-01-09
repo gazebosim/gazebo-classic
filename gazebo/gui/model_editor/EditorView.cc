@@ -403,7 +403,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 void EditorView::keyPressEvent(QKeyEvent *_event)
 {
   if (_event->key() == Qt::Key_Delete || _event->key() == Qt::Key_Backspace)
-    {
+  {
     QList<QGraphicsItem *> selectedItems = this->scene()->selectedItems();
 
     for (int i = 0; i < selectedItems.size(); ++i)
@@ -411,45 +411,7 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
       EditorItem *item = dynamic_cast<EditorItem *>(selectedItems[i]);
       if (item)
       {
-        if (item->GetType() == "Wall")
-        {
-          wallList.erase(std::remove(wallList.begin(), wallList.end(),
-              dynamic_cast<WallItem *>(item)), wallList.end());
-        }
-        else if (item->GetType() == "Window")
-        {
-          windowList.erase(std::remove(windowList.begin(), windowList.end(),
-              dynamic_cast<WindowItem *>(item)), windowList.end());
-        }
-        else if (item->GetType() == "Door")
-        {
-          doorList.erase(std::remove(doorList.begin(), doorList.end(),
-              dynamic_cast<DoorItem *>(item)), doorList.end());
-        }
-        else if (item->GetType() == "Stairs")
-        {
-          stairsList.erase(std::remove(stairsList.begin(), stairsList.end(),
-              dynamic_cast<StairsItem *>(item)), stairsList.end());
-        }
-        else if (item->GetType() == "Floor")
-        {
-          floorList.erase(std::remove(floorList.begin(), floorList.end(),
-              dynamic_cast<FloorItem *>(item)), floorList.end());
-        }
-
-        if (item->GetType() == "Line")
-        {
-          EditorItem *itemParent = dynamic_cast<EditorItem *>(
-              selectedItems[i]->parentItem());
-          wallList.erase(std::remove(wallList.begin(), wallList.end(),
-              dynamic_cast<WallItem *>(itemParent)), wallList.end());
-          this->itemToModelMap.erase(item);
-          delete itemParent;
-        }
-        else {
-          this->itemToModelMap.erase(item);
-          delete selectedItems[i];
-        }
+        this->DeleteItem(item);
       }
     }
     this->drawMode = NONE;
@@ -489,6 +451,54 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
 
   if (!this->drawInProgress)
     QGraphicsView::mouseDoubleClickEvent(_event);
+}
+
+/////////////////////////////////////////////////
+void EditorView::DeleteItem(EditorItem *_item)
+{
+  if (!_item)
+    return;
+
+  QGraphicsItem *qItem = dynamic_cast<QGraphicsItem *>(_item);
+
+  if (_item->GetType() == "Wall")
+  {
+    wallList.erase(std::remove(wallList.begin(), wallList.end(),
+        dynamic_cast<WallItem *>(_item)), wallList.end());
+  }
+  else if (_item->GetType() == "Window")
+  {
+    windowList.erase(std::remove(windowList.begin(), windowList.end(),
+        dynamic_cast<WindowItem *>(_item)), windowList.end());
+  }
+  else if (_item->GetType() == "Door")
+  {
+    doorList.erase(std::remove(doorList.begin(), doorList.end(),
+        dynamic_cast<DoorItem *>(_item)), doorList.end());
+  }
+  else if (_item->GetType() == "Stairs")
+  {
+    stairsList.erase(std::remove(stairsList.begin(), stairsList.end(),
+        dynamic_cast<StairsItem *>(_item)), stairsList.end());
+  }
+  else if (_item->GetType() == "Floor")
+  {
+    floorList.erase(std::remove(floorList.begin(), floorList.end(),
+        dynamic_cast<FloorItem *>(_item)), floorList.end());
+  }
+
+  if (_item->GetType() == "Line")
+  {
+    QGraphicsItem *itemParent = qItem->parentItem();
+    wallList.erase(std::remove(wallList.begin(), wallList.end(),
+        dynamic_cast<WallItem *>(itemParent)), wallList.end());
+    this->itemToModelMap.erase(_item);
+    delete itemParent;
+  }
+  else {
+    this->itemToModelMap.erase(_item);
+    delete qItem;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -691,6 +701,7 @@ void EditorView::OnSaveModel(const std::string &_modelName,
 void EditorView::OnFinishModel()
 {
   this->buildingMaker->FinishModel();
+  this->OnDiscardModel();
 }
 
 /////////////////////////////////////////////////
@@ -708,7 +719,6 @@ void EditorView::OnDiscardModel()
 
   this->levelHeights[0] = 0;
   this->levelNames[0] = "Level 1";
-
 
   this->scene()->clear();
 

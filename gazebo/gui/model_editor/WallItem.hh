@@ -66,6 +66,8 @@ namespace gazebo
 
         private slots: void OnOpenInspector();
 
+        private slots: void OnDeleteItem();
+
         private: void WallChanged();
 
         private: void SetSegmentSelected(unsigned int _index, bool _selected);
@@ -79,6 +81,8 @@ namespace gazebo
         private: LineSegmentItem* selectedSegment;
 
         private: QAction *openInspectorAct;
+
+        private: QAction *deleteItemAct;
 
         private: WallInspectorDialog *inspector;
     };

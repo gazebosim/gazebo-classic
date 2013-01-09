@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/model_editor/EditorView.hh"
 #include "gazebo/gui/model_editor/BuildingEditorWidget.hh"
 #include "gazebo/gui/model_editor/BuildingItem.hh"
 #include "gazebo/gui/model_editor/EditorItem.hh"
@@ -67,6 +68,10 @@ StairsItem::StairsItem(): RectItem(), BuildingItem()
   this->openInspectorAct->setStatusTip(tr("Open Stairs Inspector"));
   connect(this->openInspectorAct, SIGNAL(triggered()),
     this, SLOT(OnOpenInspector()));
+  this->deleteItemAct = new QAction(tr("&Delete"), this);
+  this->deleteItemAct->setStatusTip(tr("Delete"));
+  connect(this->deleteItemAct, SIGNAL(triggered()),
+    this, SLOT(OnDeleteItem()));
 }
 
 /////////////////////////////////////////////////
@@ -270,6 +275,12 @@ void StairsItem::OnOpenInspector()
   startPos.setY(-startPos.y());
   this->inspector->SetStartPosition(startPos);
   this->inspector->show();
+}
+
+/////////////////////////////////////////////////
+void StairsItem::OnDeleteItem()
+{
+  dynamic_cast<EditorView *>(this->scene()->views()[0])->DeleteItem(this);
 }
 
 /////////////////////////////////////////////////

@@ -60,6 +60,8 @@ namespace gazebo
 
       private slots: void OnOpenInspector();
 
+      private slots: void OnDeleteItem();
+
       private: void StairsChanged();
 
       private: void StepsChanged();

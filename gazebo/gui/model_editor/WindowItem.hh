@@ -55,6 +55,8 @@ namespace gazebo
 
         private slots: void OnOpenInspector();
 
+        private slots: void OnDeleteItem();
+
         private: void WindowChanged();
 
         private: double windowDepth;

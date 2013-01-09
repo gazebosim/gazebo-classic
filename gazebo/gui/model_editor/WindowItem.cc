@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/model_editor/EditorView.hh"
 #include "gazebo/gui/model_editor/BuildingItem.hh"
 #include "gazebo/gui/model_editor/EditorItem.hh"
 #include "gazebo/gui/model_editor/RectItem.hh"
@@ -60,6 +61,10 @@ WindowItem::WindowItem(): RectItem(), BuildingItem()
   this->openInspectorAct->setStatusTip(tr("Open Window Inspector"));
   connect(this->openInspectorAct, SIGNAL(triggered()),
     this, SLOT(OnOpenInspector()));
+  this->deleteItemAct = new QAction(tr("&Delete"), this);
+  this->deleteItemAct->setStatusTip(tr("Delete"));
+  connect(this->deleteItemAct, SIGNAL(triggered()),
+    this, SLOT(OnDeleteItem()));
 
   this->SetResizeFlag(ITEM_WIDTH);
 }
@@ -205,4 +210,10 @@ void WindowItem::OnOpenInspector()
   itemPos.setY(-itemPos.y());
   this->inspector->SetPosition(itemPos);
   this->inspector->show();
+}
+
+/////////////////////////////////////////////////
+void WindowItem::OnDeleteItem()
+{
+  dynamic_cast<EditorView *>(this->scene()->views()[0])->DeleteItem(this);
 }

@@ -419,12 +419,16 @@ void MainWindow::OnEditBuilding()
     this->renderWidget->ShowEditor(true);
     this->tabWidget->hide();
     this->buildingEditorTabWidget->show();
+    g_resetModelsAct->setEnabled(false);
+    g_resetWorldAct->setEnabled(false);
   }
   else
   {
     this->renderWidget->ShowEditor(false);
     this->tabWidget->show();
     this->buildingEditorTabWidget->hide();
+    g_resetModelsAct->setEnabled(true);
+    g_resetWorldAct->setEnabled(true);
     this->Play();
   }
 }

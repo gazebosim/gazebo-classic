@@ -118,11 +118,13 @@ namespace gazebo
         private: virtual void contextMenuEvent(
             QGraphicsSceneContextMenuEvent *_event);
 
-        private slots: virtual void OnOpenInspector();
-
         private: virtual void SizeChanged();
 
         private: void AdjustSize(double _x, double _y);
+
+        private slots: virtual void OnOpenInspector();
+
+        private slots: virtual void OnDeleteItem();
 
         protected: double width;
 
@@ -145,6 +147,8 @@ namespace gazebo
         protected: QPointF pivot;
 
         protected: QAction *openInspectorAct;
+
+        protected: QAction *deleteItemAct;
 
         private: QPointF location;
 

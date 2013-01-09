@@ -75,6 +75,10 @@ RectItem::RectItem():
   connect(this->openInspectorAct, SIGNAL(triggered()),
     this, SLOT(OnOpenInspector()));
 
+  this->deleteItemAct = new QAction(tr("&Delete"), this);
+  this->deleteItemAct->setStatusTip(tr("Delete"));
+  connect(this->deleteItemAct, SIGNAL(triggered()),
+    this, SLOT(OnDeleteItem()));
 }
 
  /////////////////////////////////////////////////
@@ -246,8 +250,6 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate, QEvent *_event)
       angle = -prevLine.angleTo(line);
       this->SetRotation(this->GetRotation() + angle);
     }
-//    this->setTransformOriginPoint(localCenter);
-//    this->setRotation(this->rotation() -prevLine.angleTo(line));
   }
   return true;
 }
@@ -491,14 +493,6 @@ bool RectItem::grabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     }
     this->UpdateCornerPositions();
     this->update();
-
-    /*if (_grabber->GetIndex() == 1 || _grabber->GetIndex() == 5 ||
-        (_grabber->GetIndex() % 2 == 0))
-      emit depthChanged(this->drawingHeight);
-
-    if (_grabber->GetIndex() == 3 || _grabber->GetIndex() == 7 ||
-        (_grabber->GetIndex() % 2 == 0))
-      emit widthChanged(this->drawingWidth);*/
   }
   return true;
 }
@@ -600,8 +594,7 @@ void RectItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
 
-//    this->borderColor = Qt::red;
-  for (int i = 0; i < 8; ++i)
+  for (unsigned int i = 0; i < this->grabbers.size(); ++i)
   {
     if (this->grabbers[i]->isEnabled())
       this->grabbers[i]->installSceneEventFilter(this);
@@ -779,12 +772,18 @@ void RectItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
 {
   QMenu menu;
   menu.addAction(this->openInspectorAct);
+  menu.addAction(this->deleteItemAct);
   menu.exec(_event->screenPos());
   _event->accept();
 }
 
 /////////////////////////////////////////////////
 void RectItem::OnOpenInspector()
+{
+}
+
+/////////////////////////////////////////////////
+void RectItem::OnDeleteItem()
 {
 }
 
@@ -805,18 +804,9 @@ void RectItem::SetPosition(double _x, double _y)
 /////////////////////////////////////////////////
 void RectItem::SetRotation(double _angle)
 {
-//  double halfX = this->drawingOriginX +
-//      (this->drawingOriginX + this->drawingWidth)/2;
-//  double halfY = this->drawingOriginY +
-//      (this->drawingOriginY + this->drawingHeight)/2;
-
-//  this->translate(halfX, halfY);
   this->rotate(_angle - this->rotationAngle);
-//  this->translate(-halfX, -halfY);
-
   this->rotationAngle = _angle;
   emit yawChanged(this->rotationAngle);
-//  emit rotationChanged(0, 0, this->rotationAngle);
 }
 
 /////////////////////////////////////////////////
