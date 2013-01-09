@@ -79,6 +79,47 @@ TEST(BulletTypes, ConvertVector4)
 }
 
 /////////////////////////////////////////////////
+/// Check Pose conversions
+TEST(BulletTypes, ConvertPose)
+{
+  {
+    math::Pose pose, pose2;
+    btTransform bt = physics::BulletTypes::ConvertPose(pose);
+    EXPECT_NEAR(bt.getOrigin().getX(), 0, NEAR_TOL);
+    EXPECT_NEAR(bt.getOrigin().getY(), 0, NEAR_TOL);
+    EXPECT_NEAR(bt.getOrigin().getZ(), 0, NEAR_TOL);
+    EXPECT_NEAR(bt.getRotation().getX(), 0, NEAR_TOL);
+    EXPECT_NEAR(bt.getRotation().getY(), 0, NEAR_TOL);
+    EXPECT_NEAR(bt.getRotation().getZ(), 0, NEAR_TOL);
+    EXPECT_NEAR(bt.getRotation().getW(), 1, NEAR_TOL);
+    pose2 = physics::BulletTypes::ConvertPose(bt);
+    EXPECT_LT((pose.pos-pose2.pos).GetSquaredLength(), NEAR_TOL*NEAR_TOL);
+    EXPECT_LT((pose.rot-pose2.rot).x, NEAR_TOL);
+    EXPECT_LT((pose.rot-pose2.rot).y, NEAR_TOL);
+    EXPECT_LT((pose.rot-pose2.rot).z, NEAR_TOL);
+    EXPECT_LT((pose.rot-pose2.rot).w, NEAR_TOL);
+  }
+
+  {
+    math::Pose pose(105.4, 3.1, -0.34, 3.14/8, 3.14/16, -3.14/2), pose2;
+    btTransform bt = physics::BulletTypes::ConvertPose(pose);
+    EXPECT_NEAR(bt.getOrigin().getX(), pose.pos.x, NEAR_TOL);
+    EXPECT_NEAR(bt.getOrigin().getY(), pose.pos.y, NEAR_TOL);
+    EXPECT_NEAR(bt.getOrigin().getZ(), pose.pos.z, NEAR_TOL);
+    EXPECT_NEAR(bt.getRotation().getX(), pose.rot.x, NEAR_TOL);
+    EXPECT_NEAR(bt.getRotation().getY(), pose.rot.y, NEAR_TOL);
+    EXPECT_NEAR(bt.getRotation().getZ(), pose.rot.z, NEAR_TOL);
+    EXPECT_NEAR(bt.getRotation().getW(), pose.rot.w, NEAR_TOL);
+    pose2 = physics::BulletTypes::ConvertPose(bt);
+    EXPECT_LT((pose.pos-pose2.pos).GetSquaredLength(), NEAR_TOL*NEAR_TOL);
+    EXPECT_LT((pose.rot-pose2.rot).x, NEAR_TOL);
+    EXPECT_LT((pose.rot-pose2.rot).y, NEAR_TOL);
+    EXPECT_LT((pose.rot-pose2.rot).z, NEAR_TOL);
+    EXPECT_LT((pose.rot-pose2.rot).w, NEAR_TOL);
+  }
+}
+
+/////////////////////////////////////////////////
 /// Main
 int main(int argc, char **argv)
 {

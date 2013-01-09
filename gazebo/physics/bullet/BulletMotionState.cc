@@ -22,6 +22,7 @@
 #include "physics/Link.hh"
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/bullet/BulletMotionState.hh"
+#include "physics/bullet/BulletTypes.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -74,13 +75,13 @@ void BulletMotionState::SetCoG(const math::Vector3 &_cog)
 void BulletMotionState::getWorldTransform(btTransform &_worldTrans) const
 {
   math::Pose result = this->worldPose;
-  _worldTrans = BulletPhysics::ConvertPose(result);
+  _worldTrans = BulletTypes::ConvertPose(result);
 }
 
 //////////////////////////////////////////////////
 void BulletMotionState::setWorldTransform(const btTransform &_worldTrans)
 {
-  this->worldPose = BulletPhysics::ConvertPose(_worldTrans);
+  this->worldPose = BulletTypes::ConvertPose(_worldTrans);
 
   math::Vector3 cg = this->worldPose.rot.RotateVector(this->cog);
   this->worldPose.pos -= cg;

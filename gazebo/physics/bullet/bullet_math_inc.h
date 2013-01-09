@@ -21,5 +21,6 @@
 // This disables warning messages for ODE
 #pragma GCC system_header
 #include <LinearMath/btVector3.h>
+#include <LinearMath/btTransform.h>
 
 #endif

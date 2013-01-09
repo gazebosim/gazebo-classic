@@ -418,33 +418,6 @@ void BulletPhysics::ConvertMass(void * /*_engineMass*/,
 }
 
 //////////////////////////////////////////////////
-math::Pose BulletPhysics::ConvertPose(const btTransform &_bt)
-{
-  math::Pose pose;
-  pose.pos.x = _bt.getOrigin().getX();
-  pose.pos.y = _bt.getOrigin().getY();
-  pose.pos.z = _bt.getOrigin().getZ();
-
-  pose.rot.w = _bt.getRotation().getW();
-  pose.rot.x = _bt.getRotation().getX();
-  pose.rot.y = _bt.getRotation().getY();
-  pose.rot.z = _bt.getRotation().getZ();
-
-  return pose;
-}
-
-//////////////////////////////////////////////////
-btTransform BulletPhysics::ConvertPose(const math::Pose &_pose)
-{
-  btTransform trans;
-
-  trans.setOrigin(btVector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
-  trans.setRotation(btQuaternion(_pose.rot.x, _pose.rot.y,
-                                 _pose.rot.z, _pose.rot.w));
-  return trans;
-}
-
-//////////////////////////////////////////////////
 double BulletPhysics::GetWorldCFM()
 {
   sdf::ElementPtr elem = this->sdf->GetElement("bullet");

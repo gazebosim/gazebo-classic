@@ -22,6 +22,7 @@
 #include "gazebo/physics/bullet/bullet_math_inc.h"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector4.hh"
+#include "gazebo/math/Pose.hh"
 
 /// \file
 /// \ingroup gazebo_physics
@@ -66,6 +67,30 @@ namespace gazebo
               {
                 return btVector4(_vec.x, _vec.y, _vec.z, _vec.w);
               }
+
+      /// \brief Convert a bullet transform to a gazebo pose
+      public: static math::Pose ConvertPose(const btTransform &_bt)
+              {
+                math::Pose pose;
+                pose.pos = ConvertVector3(_bt.getOrigin());
+                pose.rot.w = _bt.getRotation().getW();
+                pose.rot.x = _bt.getRotation().getX();
+                pose.rot.y = _bt.getRotation().getY();
+                pose.rot.z = _bt.getRotation().getZ();
+                return pose;
+              }
+
+      /// \brief Convert a gazebo pose to a bullet transform
+      public: static btTransform ConvertPose(const math::Pose &_pose)
+              {
+                btTransform trans;
+
+                trans.setOrigin(ConvertVector3(_pose.pos));
+                trans.setRotation(btQuaternion(_pose.rot.x, _pose.rot.y,
+                                               _pose.rot.z, _pose.rot.w));
+                return trans;
+              }
+
     };
   }
 }

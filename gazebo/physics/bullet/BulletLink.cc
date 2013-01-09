@@ -89,7 +89,7 @@ void BulletLink::Init()
       relativePose.pos -= cogVec;
 
       this->compoundShape->addChildShape(
-          BulletPhysics::ConvertPose(relativePose), shape);
+          BulletTypes::ConvertPose(relativePose), shape);
     }
   }
 
@@ -187,7 +187,7 @@ void BulletLink::SetSelfCollide(bool /*_collide*/)
 
   btTransform trans;
   math::Pose relativePose = _collision->GetRelativePose();
-  trans = BulletPhysics::ConvertPose(relativePose);
+  trans = BulletTypes::ConvertPose(relativePose);
 
   bcollision->SetCompoundShapeIndex(this->compoundShape->getNumChildShapes());
   this->compoundShape->addChildShape(trans, bcollision->GetCollisionShape());
@@ -376,7 +376,7 @@ void BulletLink::SetAngularDamping(double _damping)
   {
     // Set the pose of the _collision in Bullet
     this->compoundShape->updateChildTransform(i,
-        BulletPhysics::ConvertPose(_newPose));
+        BulletTypes::ConvertPose(_newPose));
   }
 }*/
 
