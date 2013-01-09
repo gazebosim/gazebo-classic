@@ -125,7 +125,7 @@ urdf::Vector3 URDF2Gazebo::ParseVector3(const std::string &_str, double _scale)
   }
 
   if (vals.size() == 3)
-    return urdf::Vector3(vals[0], vals[1], vals[3]);
+    return urdf::Vector3(vals[0], vals[1], vals[2]);
   else
     return urdf::Vector3(0, 0, 0);
 }
