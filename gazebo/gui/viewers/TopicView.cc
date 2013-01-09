@@ -86,8 +86,8 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(8, 8, 8, 10);
-
   this->setSizeGripEnabled(true);
+
   QTimer::singleShot(500, this, SLOT(Update()));
 }
 
@@ -298,4 +298,11 @@ void TopicCombo::UpdateList()
     this->setCurrentIndex(index);
 
   this->blockSignals(false);
+}
+
+//////////////////////////////////////////////////
+void TopicView::closeEvent(QCloseEvent * /*_event*/)
+{
+  this->sub.reset();
+  this->node.reset();
 }

@@ -31,36 +31,47 @@ GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.LaserScanStamped", LaserView)
 
 /////////////////////////////////////////////////
 LaserView::LaserView(QWidget *_parent)
-: TopicView(_parent, "gazebo.msgs.LaserScanStamped", "laser")
+: TopicView(_parent, "gazebo.msgs.LaserScanStamped", "image")
 {
   this->setWindowTitle(tr("Gazebo: Laser View"));
 
-  // Create the image display
+  this->firstMsg = true;
+
+  // Create the laser display
   // {
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
   QGraphicsScene *scene = new QGraphicsScene();
 
-  QColor c (250,250,250);
-  QBrush brush (c, Qt::SolidPattern);
+  QBrush brush(QColor(250, 250, 250), Qt::SolidPattern);
   scene->setBackgroundBrush(brush);
 
-  this->view = new QGraphicsView();
-
-  this->view->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+  this->view = new CustomView(this);
   this->view->setScene(scene);
-  this->view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   this->view->setDragMode(QGraphicsView::ScrollHandDrag);
   this->view->centerOn(QPointF(0, 0));
+  this->view->setMinimumHeight(240);
 
   this->laserItem = new LaserView::LaserItem();
-  // scene->addItem(this->laserItem);
+  scene->addItem(this->laserItem);
+
+  QHBoxLayout *controlLayout = new QHBoxLayout;
+
+  QPushButton *fitButton = new QPushButton("Fit in View");
+  connect(fitButton, SIGNAL(clicked()), this, SLOT(OnFitInView()));
+
+  QRadioButton *degreeToggle = new QRadioButton();
+  degreeToggle->setText("Degrees");
+  connect(degreeToggle, SIGNAL(toggled(bool)), this, SLOT(OnDegree(bool)));
+
+  controlLayout->addWidget(degreeToggle);
+  controlLayout->addWidget(fitButton);
+  controlLayout->addStretch(1);
 
   frameLayout->addWidget(this->view);
-  frameLayout->setAlignment(Qt::AlignHCenter);
+  frameLayout->addLayout(controlLayout);
 
-  this->frame->setMinimumHeight(240);
-  this->frame->setObjectName("blackborderframe");
+  this->frame->setObjectName("blackBorderFrame");
   this->frame->setLayout(frameLayout);
   // }
 }
@@ -71,15 +82,6 @@ LaserView::~LaserView()
 }
 
 /////////////////////////////////////////////////
-void LaserView::wheelEvent(QWheelEvent *_event)
-{
-  if (_event->delta() > 0)
-    this->view->scale(1.15, 1.15);
-  else
-    this->view->scale(1.0 / 1.15, 1.0 / 1.15);
-}
-
-/////////////////////////////////////////////////
 void LaserView::UpdateImpl()
 {
 }
@@ -87,6 +89,8 @@ void LaserView::UpdateImpl()
 /////////////////////////////////////////////////
 void LaserView::SetTopic(const std::string &_topicName)
 {
+  this->firstMsg = true;
+
   TopicView::SetTopic(_topicName);
 
   // Subscribe to the new topic.
@@ -95,14 +99,26 @@ void LaserView::SetTopic(const std::string &_topicName)
 }
 
 /////////////////////////////////////////////////
+void LaserView::resizeEvent(QResizeEvent *_event)
+{
+  // Automatically fit the laser item to the view if the user has not zoomed
+  // in/out
+  if (!this->view->viewZoomed && this->laserItem)
+  {
+    QRectF bound = this->laserItem->GetBoundingRect();
+    this->view->fitInView(bound, Qt::KeepAspectRatio);
+  }
+
+  QDialog::resizeEvent(_event);
+}
+
+/////////////////////////////////////////////////
 void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
 {
-  static bool first = true;
-
   // Update the Hz and Bandwidth info
   this->OnMsg(msgs::Convert(_msg->time()), _msg->ByteSize());
 
-  this->laserItem->ClearPoints();
+  this->laserItem->Clear();
 
   double angle = _msg->scan().angle_min();
 
@@ -115,34 +131,42 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
     pt.x = r * cos(angle);
     pt.y = -r * sin(angle);
 
-    if (i+1 >= this->laserItem->GetPointCount())
-    {
+    if (i+1 >= this->laserItem->GetRangeCount())
       this->laserItem->AddRange(r);
-    }
     else
-    {
       this->laserItem->SetRange(i+1, r);
-    }
 
     angle += _msg->scan().angle_step();
   }
 
-  this->laserItem->angleMin = _msg->scan().angle_min();
-  this->laserItem->angleMax = _msg->scan().angle_max();
-  this->laserItem->angleStep = _msg->scan().angle_step();
-  this->laserItem->rangeMax = _msg->scan().range_max();
-  this->laserItem->rangeMin = _msg->scan().range_min();
+  // Recalculate the points to draw.
+  this->laserItem->Update(
+      _msg->scan().angle_min(),
+      _msg->scan().angle_max(),
+      _msg->scan().angle_step(),
+      _msg->scan().range_max(),
+      _msg->scan().range_min());
 
-  QRectF bound = this->laserItem->GetBoundingRect();
-
-  if (first)
+  if (this->firstMsg)
   {
-    this->view->scene()->addItem(this->laserItem);
+    QRectF bound = this->laserItem->GetBoundingRect();
     this->view->fitInView(bound, Qt::KeepAspectRatio);
-    first = false;
+    this->firstMsg = false;
   }
+}
 
-  this->laserItem->Update();
+/////////////////////////////////////////////////
+void LaserView::OnFitInView()
+{
+  QRectF bound = this->laserItem->GetBoundingRect();
+  this->view->fitInView(bound, Qt::KeepAspectRatio);
+  this->view->viewZoomed = false;
+}
+
+/////////////////////////////////////////////////
+void LaserView::OnDegree(bool _toggled)
+{
+  this->laserItem->radians = !_toggled;
 }
 
 /////////////////////////////////////////////////
@@ -154,6 +178,7 @@ LaserView::LaserItem::LaserItem()
   this->scale = 100.0;
   this->rangeMax = 8.0;
   this->rangeMin = 0.0;
+  this->radians = true;
 }
 
 /////////////////////////////////////////////////
@@ -162,19 +187,18 @@ void LaserView::LaserItem::paint (QPainter *_painter,
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
-  QColor c(100,100,100,255);
+  QColor orange(245, 129, 19, 255);
+  QColor darkGrey(100, 100, 100, 255);
+  QColor lightGrey(100, 100, 100, 50);
 
-  QPen pen(c);
-  pen.setWidthF(0.0);
-  _painter->setPen(pen);
-  _painter->setBrush(QColor(100,100,100,50));
+  _painter->setPen(QPen(darkGrey));
+  _painter->setBrush(lightGrey);
 
   // Draw the filled polygon that represents the current laser data.
   _painter->drawPolygon(&this->points[0], this->points.size());
 
   // Draw a box with an arrow around the (0, 0) location
-  pen.setColor(QColor(255, 100, 100, 255));
-  _painter->setPen(pen);
+  _painter->setPen(QPen(orange));
   _painter->setBrush(QColor(0,0,0,0));
   _painter->drawRect(-10, -10, 20, 20);
   _painter->drawLine(0, 0, 20, 0);
@@ -193,11 +217,13 @@ void LaserView::LaserItem::paint (QPainter *_painter,
     double x1, y1;
     double x2, y2;
 
-    double buffer = 1.2;
+    double rangeScaled = this->ranges[index] * this->scale;
+    double rangeMaxScaled = this->rangeMax * this->scale;
 
     // Draw the ray
-    x1 = this->ranges[index] * this->scale * cos(this->indexAngle);
-    y1 = -this->ranges[index] * this->scale * sin(this->indexAngle);
+    x1 = rangeScaled * cos(this->indexAngle);
+    y1 = -rangeScaled * sin(this->indexAngle);
+    _painter->setPen(QPen(orange));
     _painter->drawLine(0, 0, x1, y1);
 
     // Set the text for the range measurement
@@ -207,8 +233,7 @@ void LaserView::LaserItem::paint (QPainter *_painter,
 
     // Compute the size of the box we want to use for the range measurement.
     // This will help us scale the text properly.
-    float textBoxWidth = (this->rangeMax * this->scale * buffer) -
-                         (this->rangeMax * this->scale);
+    float textBoxWidth = (rangeMaxScaled * 1.2) -rangeMaxScaled;
 
     // Compute the text scaling factor.
     float textFactor = textBoxWidth /
@@ -230,15 +255,15 @@ void LaserView::LaserItem::paint (QPainter *_painter,
     double yOff = sin(rAngle) * textHeight;
 
     // The location to draw the range text
-    x1 = (this->ranges[index] * this->scale * 1.05) * cos(this->indexAngle);
-    y1 = -(this->ranges[index] * this->scale * 1.05) * sin(this->indexAngle);
+    x1 = (rangeScaled * 1.05) * cos(this->indexAngle);
+    y1 = -(rangeScaled * 1.05) * sin(this->indexAngle);
 
     x1 -= xOff;
     y1 -= yOff;
 
     // Draw the range text
+    _painter->setPen(QPen(orange));
     _painter->drawText(x1, y1, stream.str().c_str());
-
 
     // This section draws the arc and the angle of the ray
     {
@@ -246,10 +271,8 @@ void LaserView::LaserItem::paint (QPainter *_painter,
       textWidth *= 1.4;
 
       // Compute the position for the angle text.
-      x1 = (this->rangeMax * this->scale * 1.15 + textWidth) *
-        cos(this->indexAngle * 0.5);
-      y1 = -(this->rangeMax * this->scale * 1.15 + textWidth) *
-        sin(this->indexAngle * 0.5);
+      x1 = (rangeMaxScaled * 1.15 + textWidth) * cos(this->indexAngle * 0.5);
+      y1 = -(rangeMaxScaled * 1.15 + textWidth) * sin(this->indexAngle * 0.5);
 
       // Draw the text for the angle of the ray
       stream.str(std::string());
@@ -260,33 +283,34 @@ void LaserView::LaserItem::paint (QPainter *_painter,
         stream << std::fixed << std::setprecision(4)
           << GZ_RTOD(this->indexAngle) << " degrees";
 
+      _painter->setPen(QPen(orange));
       _painter->drawText(x1, y1, stream.str().c_str());
 
       // Draw an arc that depicts the angle of the ray
-      QRectF rect(-(this->rangeMax * this->scale * 1.1 + textWidth),
-          -(this->rangeMax * this->scale * 1.1 + textWidth),
-          this->rangeMax * this->scale * 1.1 * 2.0 + textWidth*2.0,
-          this->rangeMax * this->scale * 1.1 * 2.0 + textWidth*2.0);
+      QRectF rect(-(rangeMaxScaled * 1.1 + textWidth),
+                  -(rangeMaxScaled * 1.1 + textWidth),
+                  rangeMaxScaled * 1.1 * 2.0 + textWidth * 2.0,
+                  rangeMaxScaled * 1.1 * 2.0 + textWidth * 2.0);
+
+      _painter->setPen(QPen(orange));
       _painter->drawArc(rect, 0, GZ_RTOD(this->indexAngle) * 16);
 
 
       // Draw the line that marks the start of the arc
-      x1 = (this->rangeMax * this->scale * 1.1 + textWidth);
-      x2 = (this->rangeMax * this->scale * 1.15 + textWidth);
+      x1 = (rangeMaxScaled * 1.1 + textWidth);
+      x2 = (rangeMaxScaled * 1.15 + textWidth);
 
+      _painter->setPen(QPen(orange));
       _painter->drawLine(x1, 0, x2, 0);
 
       // Draw the line that marks the end of the arc
-      x1 = (this->rangeMax * this->scale * 1.1 + textWidth) *
-        cos(this->indexAngle);
-      y1 = -(this->rangeMax * this->scale * 1.1 + textWidth) *
-        sin(this->indexAngle);
+      x1 = (rangeMaxScaled * 1.1 + textWidth) * cos(this->indexAngle);
+      y1 = -(rangeMaxScaled * 1.1 + textWidth) * sin(this->indexAngle);
 
-      x2 = (this->rangeMax * this->scale * 1.15 + textWidth) *
-        cos(this->indexAngle);
-      y2 = -(this->rangeMax * this->scale * 1.15 + textWidth) *
-        sin(this->indexAngle);
+      x2 = (rangeMaxScaled * 1.15 + textWidth) * cos(this->indexAngle);
+      y2 = -(rangeMaxScaled * 1.15 + textWidth) * sin(this->indexAngle);
 
+      _painter->setPen(QPen(orange));
       _painter->drawLine(x1, y1, x2, y2);
     }
   }
@@ -299,9 +323,9 @@ QRectF LaserView::LaserItem::GetBoundingRect() const
     return QRectF(0, 0, 0, 0);
 
   // Compute the maximum size of bound box by scaling up the maximum
-  // possible range. The multiplication of 2.0 increases the bounding box
+  // possible range. The multiplication of 1.8 increases the bounding box
   // size to make the mouse hover behavior easier to use.
-  double max = this->rangeMax * this->scale * 2.0;
+  double max = this->rangeMax * this->scale * 1.8;
 
   // Return the top-left position and the width and height.
   return QRectF(-max, -max, max * 2.0, max * 2.0);
@@ -314,7 +338,7 @@ QRectF LaserView::LaserItem::boundingRect() const
 }
 
 /////////////////////////////////////////////////
-void LaserView::LaserItem::ClearPoints()
+void LaserView::LaserItem::Clear()
 {
   boost::mutex::scoped_lock lock(this->mutex);
   this->ranges.clear();
@@ -337,8 +361,17 @@ void LaserView::LaserItem::SetRange(unsigned int _index, double _range)
 }
 
 /////////////////////////////////////////////////
-void LaserView::LaserItem::Update()
+void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
+    double _angleStep, double _rangeMax, double _rangeMin)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+
+  this->angleMin = _angleMin;
+  this->angleMax = _angleMax;
+  this->angleStep = _angleStep;
+  this->rangeMax = _rangeMax;
+  this->rangeMin = _rangeMin;
+
   // Resize the point array if the number of ranges has changed.
   if (this->rangeMin > 0.0 &&
       this->ranges.size() * 2 != this->points.size())
@@ -389,7 +422,7 @@ void LaserView::LaserItem::Update()
 }
 
 /////////////////////////////////////////////////
-unsigned int LaserView::LaserItem::GetPointCount()
+unsigned int LaserView::LaserItem::GetRangeCount()
 {
   boost::mutex::scoped_lock lock(this->mutex);
   return this->ranges.size();
@@ -399,6 +432,8 @@ unsigned int LaserView::LaserItem::GetPointCount()
 void LaserView::LaserItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 {
   this->indexAngle = atan2(-_event->pos().y(), _event->pos().x());
+
+  QApplication::setOverrideCursor(Qt::CrossCursor);
 }
 
 //////////////////////////////////////////////////
@@ -406,6 +441,7 @@ void LaserView::LaserItem::hoverLeaveEvent(
     QGraphicsSceneHoverEvent * /*_event*/)
 {
   this->indexAngle = -999;
+  QApplication::setOverrideCursor(Qt::OpenHandCursor);
 }
 
 /////////////////////////////////////////////////

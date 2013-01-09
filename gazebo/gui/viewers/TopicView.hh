@@ -90,6 +90,10 @@ namespace gazebo
       /// \param[in] _size Size of the message in bytes.
       protected: void OnMsg(const common::Time &_dataTime, int _size);
 
+      /// \brief Qt close event callback.
+      /// \param[in] _event The close event info.
+      protected: virtual void closeEvent(QCloseEvent *_event);
+
       /// \brief Update the camera sensor widget.
       private slots: void Update();
 

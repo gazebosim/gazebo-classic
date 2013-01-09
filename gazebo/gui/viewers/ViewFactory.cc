@@ -34,8 +34,8 @@ std::map<std::string, ViewFactoryFn> ViewFactory::viewMap;
 /////////////////////////////////////////////////
 void ViewFactory::RegisterAll()
 {
-  RegisterImageView();
   RegisterLaserView();
+  RegisterImageView();
 }
 
 /////////////////////////////////////////////////

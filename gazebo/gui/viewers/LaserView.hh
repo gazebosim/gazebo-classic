@@ -38,7 +38,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent widget.
-      public: LaserView(QWidget *_parent);
+      public: LaserView(QWidget *_parent = NULL);
 
       /// \brief Destructor
       public: virtual ~LaserView();
@@ -49,65 +49,148 @@ namespace gazebo
       // Documentation inherited
       private: virtual void UpdateImpl();
 
+      /// \brief QT event, called when view is resized.
+      /// \param[in] _event Pointer to the resize event info.
+      protected: virtual void resizeEvent(QResizeEvent *_event);
+
       /// \brief Receives incoming laser scan messages.
       /// \param[in] _msg New laser scan message.
       private: void OnScan(ConstLaserScanStampedPtr &_msg);
 
-      private: void wheelEvent(QWheelEvent *_event);
+      /// \brief QT callback. Used when the "fit in view" button is pressed.
+      private slots: void OnFitInView();
 
+      /// \brief QT callback. Used when the "degrees" button is pressed.
+      private slots: void OnDegree(bool _toggled);
+
+      /// \brief Class that draws the laser ranges.
       private: class LaserItem : public QGraphicsItem
                {
+                 /// \brief Constructor
                  public: LaserItem();
 
-                 public: void ClearPoints();
+                 /// \brief Clear all the stored ranges.
+                 public: void Clear();
 
-                 public: unsigned int GetPointCount();
+                 /// \brief Get the number of range values.
+                 /// \return The size of the ranges vector.
+                 public: unsigned int GetRangeCount();
 
+                 /// \brief Add a new range value.
+                 /// \param[in] _range The new range value.
                  public: void AddRange(double _range);
 
+                 /// \brief Set a specific range value.
+                 /// \param[in] _index Index of the range to set.
+                 /// \param[in] _range The value of the range.
                  public: void SetRange(unsigned int _index, double _range);
 
+                 /// \brief Return the bounding rectangle for this item.
                  public: QRectF GetBoundingRect() const;
 
-                 public: void Update();
+                 /// \brief Update the list of points to draw.
+                 /// \param[in] _angleMin Minimum angle, in radians.
+                 /// \param[in] _angleMax Maximum angle, in radians.
+                 /// \param[in] _angleStep Angle step size, in radians.
+                 /// \param[in] _rangeMax Maximum range in meters.
+                 /// \param[in] _rangeMin Minimum range in meters.
+                 public: void Update(double _angleMin, double _angleMax,
+                             double _angleStep, double _rangeMax,
+                             double _rangeMin);
 
+                 /// \brief A QT pure virtual function that must be defined.
+                 /// This calls GetBoundingRect.
                  private: virtual QRectF boundingRect() const;
 
+                 /// \brief A QT function that is called when the item
+                 /// should be redrawn.
+                 /// \param[in] _painter Pointer to the QPainter, which
+                 /// draws shapes in the scene.
+                 /// \param[in] _option An unsued graphics options.
+                 /// \param[in] _widget Option param, the widget to paint
+                 /// on.
                  private: virtual void paint (QPainter *_painter,
                               const QStyleOptionGraphicsItem *_option,
                               QWidget *_widget);
 
+                 /// \brief QT event that is called when the mouse starts to
+                 /// hover over this item.
+                 /// \param[in] _event The hover event info.
                  private: virtual void hoverEnterEvent(
                               QGraphicsSceneHoverEvent *_event);
 
+                 /// \brief QT event that is called when the mouse leaves
+                 /// this item.
+                 /// \param[in] _event The hover event info.
                  private: virtual void hoverLeaveEvent(
                               QGraphicsSceneHoverEvent *_event);
 
+                 /// \brief QT event that is called when the mouse moves
+                 /// over this item.
+                 /// \param[in] _event The hover event info.
                  private: void hoverMoveEvent(QGraphicsSceneHoverEvent *_event);
 
+                 /// \brief The vector of points to draw.
                  private: std::vector<QPointF> points;
+
+                 /// \brief The vector of range values, as returned by the
+                 /// laser sensor.
                  private: std::vector<double> ranges;
 
-                 public: double angleMin;
-                 public: double angleMax;
-                 public: double angleStep;
+                 /// \brief The minimum angle of the laser.
+                 private: double angleMin;
 
-                 public: double rangeMax;
-                 public: double rangeMin;
+                 /// \brief The maximum angle of the laser.
+                 private: double angleMax;
 
+                 /// \brief The size of the step between rays, in radians.
+                 private: double angleStep;
+
+                 /// \brief The maximum range value.
+                 private: double rangeMax;
+
+                 /// \brief The minimum range value.
+                 private: double rangeMin;
+
+                 /// \brief Angle that is highlighted by the mouse position.
                  private: double indexAngle;
 
+                 /// \brief Scaling factor that is applied to range data.
                  private: double scale;
 
                  /// \brief True to draw the hover angles in radians
-                 private: bool radians;
+                 public: bool radians;
 
                  /// \brief Mutex to protect the laser data.
-                 private: boost::mutex mutex;
+                 private: mutable boost::mutex mutex;
                };
 
+      private: class CustomView : public QGraphicsView
+               {
+                 public: CustomView(QWidget *_parent)
+                         : QGraphicsView(_parent), viewZoomed(false) {}
+
+                 // \brief QT callback. Used when a wheel event occurs.
+                 private: void wheelEvent(QWheelEvent *_event)
+                 {
+                   this->viewZoomed = true;
+                   _event->delta() > 0 ? this->scale(1.15, 1.15) :
+                                         this->scale(1.0 / 1.15, 1.0 / 1.15);
+                   _event->accept();
+                 }
+
+                 /// \brief True if the view has been zoomed in/out by the user.
+                 public: bool viewZoomed;
+               };
+
+      /// \brief The item that draws the laser data.
       private: LaserItem *laserItem;
-      private: QGraphicsView *view;
+
+      /// \brief The view that displays the laser item.
+      private: CustomView *view;
+
+      /// \brief Flag used to determine if a recieved message is the first.
+      private: bool firstMsg;
     };
   }
 }
