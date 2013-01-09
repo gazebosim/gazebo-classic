@@ -516,7 +516,8 @@ void MainWindow::OnFullScreen(bool _value)
   {
     this->showNormal();
     this->renderWidget->showNormal();
-    this->tabWidget->show();
+    if (!g_editBuildingAct->isChecked())
+      this->tabWidget->show();
     this->toolsWidget->show();
     this->menuBar->show();
   }

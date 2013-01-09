@@ -118,9 +118,17 @@ RenderWidget::RenderWidget(QWidget *_parent)
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
   bottomFrame->setLayout(bottomPanelLayout);
 
+
+  QWidget *render3DWidget = new QWidget(this);
+  QVBoxLayout *render3DLayout = new QVBoxLayout;
+  render3DLayout->addWidget(toolFrame);
+  render3DLayout->addWidget(this->glWidget);
+  render3DLayout->setContentsMargins(0, 0, 0, 0);
+  render3DWidget->setLayout(render3DLayout);
+
   QSplitter *splitter = new QSplitter(this);
   splitter->addWidget(this->editorWidget);
-  splitter->addWidget(this->glWidget);
+  splitter->addWidget(render3DWidget);
   QList<int> sizes;
   sizes.push_back(300);
   sizes.push_back(300);
@@ -129,7 +137,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   splitter->setStretchFactor(1, 1);
   splitter->setOrientation(Qt::Vertical);
 
-  frameLayout->addWidget(toolFrame);
   frameLayout->addWidget(splitter);
   frameLayout->addWidget(bottomFrame);
   frameLayout->setContentsMargins(0, 0, 0, 0);
