@@ -151,13 +151,13 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
   saveButton = new QPushButton(tr("Save As"));
   connect(saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
-  QPushButton *finishButton = new QPushButton(tr("Finish"));
-  connect(finishButton, SIGNAL(clicked()), this, SLOT(OnFinish()));
+  QPushButton *doneButton = new QPushButton(tr("Done"));
+  connect(doneButton, SIGNAL(clicked()), this, SLOT(OnDone()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(discardButton);
   buttonsLayout->addWidget(saveButton);
-  buttonsLayout->addWidget(finishButton);
+  buttonsLayout->addWidget(doneButton);
   buttonsLayout->setAlignment(Qt::AlignCenter);
 
   mainLayout->addLayout(modelNameLayout);
@@ -224,7 +224,7 @@ void BuildingEditorPalette::OnDiscard()
       "your model? All of your work will\n"
       "be lost."),
       QMessageBox::Discard | QMessageBox::Cancel,
-      QMessageBox::Discard);
+      QMessageBox::Cancel);
 
   switch (ret)
   {
@@ -270,7 +270,7 @@ void BuildingEditorPalette::OnSave()
 }
 
 /////////////////////////////////////////////////
-void BuildingEditorPalette::OnFinish()
+void BuildingEditorPalette::OnDone()
 {
   FinishModelDialog dialog(FinishModelDialog::MODEL_FINISH, this);
   dialog.SetModelName(this->modelName);

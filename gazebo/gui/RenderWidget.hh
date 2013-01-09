@@ -45,7 +45,7 @@ namespace gazebo
       public: void RemoveScene(const std::string &_name);
       public: void CreateScene(const std::string &_name);
 
-      public: void ShowEditor(int mode);
+      public: void ShowEditor(bool _mode);
 
       private slots: virtual void update();
 
@@ -55,6 +55,7 @@ namespace gazebo
       private: GLWidget *glWidget;
       private: EditorWidget *editorWidget;
       private: QFrame *mainFrame;
+      private: QFrame *bottomFrame;
       private: QLabel *xyzLabel;
       private: QLineEdit *xPosEdit;
       private: QLineEdit *yPosEdit;

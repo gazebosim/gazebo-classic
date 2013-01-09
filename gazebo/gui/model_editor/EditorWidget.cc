@@ -51,22 +51,3 @@ QWidget *EditorWidget::GetBuildingEditor() const
 {
   return this->buildingEditorWidget;
 }
-
-/////////////////////////////////////////////////
-void EditorWidget::SetMode(int mode)
-{
-  /// TODO: 2 modes, building and model,
-  ///       create enums for these
-  switch (mode)
-  {
-    case 0:
-      this->buildingEditorWidget->hide();
-      break;
-    case 1:
-      this->buildingEditorWidget->show();
-      break;
-    default:
-      break;
-  }
-
-}

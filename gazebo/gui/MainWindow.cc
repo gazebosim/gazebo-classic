@@ -416,13 +416,13 @@ void MainWindow::OnEditBuilding()
   if (isChecked)
   {
     this->Pause();
-    this->renderWidget->ShowEditor(1);
+    this->renderWidget->ShowEditor(true);
     this->tabWidget->hide();
     this->buildingEditorTabWidget->show();
   }
   else
   {
-    this->renderWidget->ShowEditor(0);
+    this->renderWidget->ShowEditor(false);
     this->tabWidget->show();
     this->buildingEditorTabWidget->hide();
     this->Play();

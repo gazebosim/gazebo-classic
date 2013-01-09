@@ -65,7 +65,7 @@ FinishModelDialog::FinishModelDialog(int _mode, QWidget *_parent)
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
-  std::string finishButtonText = "&Finish";
+  std::string finishButtonText = "&Done";
   if (_mode == MODEL_SAVE)
       finishButtonText = "&Save";
 

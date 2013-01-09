@@ -92,9 +92,9 @@ RenderWidget::RenderWidget(QWidget *_parent)
   QHBoxLayout *playControlLayout = new QHBoxLayout;
   playControlLayout->setContentsMargins(0, 0, 0, 0);
 
-  QFrame *bottomFrame = new QFrame;
-  bottomFrame->setObjectName("renderBottomFrame");
-  bottomFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+  this->bottomFrame = new QFrame;
+  this->bottomFrame->setObjectName("renderBottomFrame");
+  this->bottomFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
   QFrame *playFrame = new QFrame;
   QToolBar *playToolbar = new QToolBar;
@@ -116,7 +116,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
                              QSizePolicy::Minimum));
   bottomPanelLayout->setSpacing(0);
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
-  bottomFrame->setLayout(bottomPanelLayout);
+  this->bottomFrame->setLayout(bottomPanelLayout);
 
 
   QWidget *render3DWidget = new QWidget(this);
@@ -138,7 +138,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   splitter->setOrientation(Qt::Vertical);
 
   frameLayout->addWidget(splitter);
-  frameLayout->addWidget(bottomFrame);
+  frameLayout->addWidget(this->bottomFrame);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frameLayout->setSpacing(0);
 
@@ -229,24 +229,30 @@ void RenderWidget::update()
   this->glWidget->update();
 }
 
-void RenderWidget::ShowEditor(int mode)
+/////////////////////////////////////////////////
+void RenderWidget::ShowEditor(bool _show)
 {
-  if (mode > 0)
+  if (_show)
   {
     this->editorWidget->show();
-    this->editorWidget->SetMode(mode);
+    this->bottomFrame->hide();
   }
   else
+  {
     this->editorWidget->hide();
+    this->bottomFrame->show();
+  }
 
 }
 
+/////////////////////////////////////////////////
 void RenderWidget::RemoveScene(const std::string &_name)
 {
   this->clear = true;
   this->clearName = _name;
 }
 
+/////////////////////////////////////////////////
 void RenderWidget::CreateScene(const std::string &_name)
 {
   this->create = true;

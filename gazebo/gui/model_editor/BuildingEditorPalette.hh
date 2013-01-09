@@ -55,8 +55,8 @@ namespace gazebo
       /// \brief On save callback.
       private slots: void OnSave();
 
-      /// \brief On finish callback.
-      private slots: void OnFinish();
+      /// \brief On done callback.
+      private slots: void OnDone();
 
       private: QLabel *modelNameLabel;
 
