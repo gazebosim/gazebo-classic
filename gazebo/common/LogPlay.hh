@@ -118,8 +118,14 @@ namespace gazebo
       /// \brief Name of the log file.
       private: std::string filename;
 
+      /// \brief The version of the Gazebo logger used to create the open
+      /// log file.
       private: std::string logVersion;
+
+      /// \brief The version of Gazebo used to create the open log file.
       private: std::string gazeboVersion;
+
+      /// \brief The random number seed recorded in the open log file.
       private: uint32_t randSeed;
 
       /// \brief The encoding for the current chunk in the log file.
