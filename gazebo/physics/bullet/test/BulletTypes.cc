@@ -22,7 +22,7 @@
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "test_config.h"
 
-#define NEAR_TOL 1e-6
+#define NEAR_TOL 2e-5
 
 using namespace gazebo;
 
@@ -31,35 +31,50 @@ using namespace gazebo;
 TEST(BulletTypes, ConvertVector3)
 {
   {
-    math::Vector3 vec;
+    math::Vector3 vec, vec2;
     btVector3 bt = physics::BulletTypes::ConvertVector3(vec);
     EXPECT_NEAR(bt.getX(), 0, NEAR_TOL);
     EXPECT_NEAR(bt.getY(), 0, NEAR_TOL);
     EXPECT_NEAR(bt.getZ(), 0, NEAR_TOL);
+    vec2 = physics::BulletTypes::ConvertVector3(bt);
+    EXPECT_LT((vec-vec2).GetSquaredLength(), NEAR_TOL*NEAR_TOL);
   }
 
   {
-    btVector3 bt;
-    math::Vector3 vec = physics::BulletTypes::ConvertVector3(bt);
-    EXPECT_NEAR(vec.x, 0, NEAR_TOL);
-    EXPECT_NEAR(vec.y, 0, NEAR_TOL);
-    EXPECT_NEAR(vec.z, 0, NEAR_TOL);
-  }
-
-  {
-    math::Vector3 vec(100.5, -2.314, 42);
+    math::Vector3 vec(100.5, -2.314, 42), vec2;
     btVector3 bt = physics::BulletTypes::ConvertVector3(vec);
-    EXPECT_NEAR(bt.getX(), 100.5, NEAR_TOL);
-    EXPECT_NEAR(bt.getY(), -2.314, NEAR_TOL);
-    EXPECT_NEAR(bt.getZ(), 42, NEAR_TOL);
+    EXPECT_NEAR(bt.getX(), vec.x, NEAR_TOL);
+    EXPECT_NEAR(bt.getY(), vec.y, NEAR_TOL);
+    EXPECT_NEAR(bt.getZ(), vec.z, NEAR_TOL);
+    vec2 = physics::BulletTypes::ConvertVector3(bt);
+    EXPECT_LT((vec-vec2).GetSquaredLength(), NEAR_TOL*NEAR_TOL);
+  }
+}
+
+/////////////////////////////////////////////////
+/// Check Vector4 conversions
+TEST(BulletTypes, ConvertVector4)
+{
+  {
+    math::Vector4 vec, vec2;
+    btVector4 bt = physics::BulletTypes::ConvertVector4(vec);
+    EXPECT_NEAR(bt.getX(), 0, NEAR_TOL);
+    EXPECT_NEAR(bt.getY(), 0, NEAR_TOL);
+    EXPECT_NEAR(bt.getZ(), 0, NEAR_TOL);
+    EXPECT_NEAR(bt.getW(), 0, NEAR_TOL);
+    vec2 = physics::BulletTypes::ConvertVector4(bt);
+    EXPECT_LT((vec-vec2).GetSquaredLength(), NEAR_TOL*NEAR_TOL);
   }
 
   {
-    btVector3 bt(100.5, -2.314, 42);
-    math::Vector3 vec = physics::BulletTypes::ConvertVector3(bt);
-    EXPECT_NEAR(vec.x, 100.5, NEAR_TOL);
-    EXPECT_NEAR(vec.y, -2.314, NEAR_TOL);
-    EXPECT_NEAR(vec.z, 42, NEAR_TOL);
+    math::Vector4 vec(100.5, -2.314, 42, 848.8), vec2;
+    btVector4 bt = physics::BulletTypes::ConvertVector4(vec);
+    EXPECT_NEAR(bt.getX(), vec.x, NEAR_TOL);
+    EXPECT_NEAR(bt.getY(), vec.y, NEAR_TOL);
+    EXPECT_NEAR(bt.getZ(), vec.z, NEAR_TOL);
+    EXPECT_NEAR(bt.getW(), vec.w, NEAR_TOL);
+    vec2 = physics::BulletTypes::ConvertVector4(bt);
+    EXPECT_LT((vec-vec2).GetSquaredLength(), NEAR_TOL*NEAR_TOL);
   }
 }
 

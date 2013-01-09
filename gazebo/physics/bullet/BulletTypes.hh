@@ -21,6 +21,7 @@
 #include <boost/shared_ptr.hpp>
 #include "gazebo/physics/bullet/bullet_math_inc.h"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector4.hh"
 
 /// \file
 /// \ingroup gazebo_physics
@@ -51,6 +52,19 @@ namespace gazebo
       public: static btVector3 ConvertVector3(const math::Vector3 &_vec)
               {
                 return btVector3(_vec.x, _vec.y, _vec.z);
+              }
+
+      /// \brief Convert a bullet btVector4 to a gazebo Vector4
+      public: static math::Vector4 ConvertVector4(const btVector4 &_bt)
+              {
+                return math::Vector4(_bt.getX(), _bt.getY(),
+                                     _bt.getZ(), _bt.getW());
+              }
+
+      /// \brief Convert a gazebo Vector4 to a bullet btVector4
+      public: static btVector4 ConvertVector4(const math::Vector4 &_vec)
+              {
+                return btVector4(_vec.x, _vec.y, _vec.z, _vec.w);
               }
     };
   }
