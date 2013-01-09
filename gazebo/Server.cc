@@ -87,9 +87,11 @@ bool Server::ParseArgs(int argc, char **argv)
   po::options_description v_desc("Allowed options");
   v_desc.add_options()
     ("help,h", "Produce this help message.")
-    ("record,r", "Record state data to disk.")
-    ("play,p", po::value<std::string>(), "Play a log file.")
     ("pause,u", "Start the server in a paused state.")
+    ("play,p", po::value<std::string>(), "Play a log file.")
+    ("record,r", "Record state data to disk.")
+    ("seed",  po::value<double>(),
+     "Start with a given random number seed.")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
@@ -120,6 +122,19 @@ bool Server::ParseArgs(int argc, char **argv)
     // NOTE: boost::diagnostic_information(_e) breaks lucid
     // std::cerr << boost::diagnostic_information(_e) << "\n";
     return false;
+  }
+
+  // Set the random number seed if present on the command line.
+  if (this->vm.count("seed"))
+  {
+    try
+    {
+      math::Rand::SetSeed(this->vm["seed"].as<double>());
+    }
+    catch(boost::bad_any_cast &_e)
+    {
+      gzerr << "Unable to set random number seed. Must supply a number.\n";
+    }
   }
 
   if (this->vm.count("help"))
@@ -174,8 +189,7 @@ bool Server::ParseArgs(int argc, char **argv)
   {
     // Get the world file name from the command line, or use "empty.world"
     // if no world file is specified.
-    //std::string configFilename = "worlds/empty.world";
-    std::string configFilename = "worlds/test_world_rtql8.world";
+    std::string configFilename = "worlds/empty.world";
     if (this->vm.count("world_file"))
       configFilename = this->vm["world_file"].as<std::string>();
 
@@ -354,7 +368,7 @@ void Server::Run()
   while (!this->stop)
   {
     this->ProcessControlMsgs();
-    sensors::run_once(true);
+    sensors::run_once();
     common::Time::MSleep(1);
   }
 

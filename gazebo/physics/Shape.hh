@@ -48,18 +48,6 @@ namespace gazebo
       /// \brief Initialize the shape.
       public: virtual void Init() = 0;
 
-      /// \brief Deprecated.
-      public: virtual double GetMass(double _density) const GAZEBO_DEPRECATED
-              {return _density;}
-
-      /// \brief Deprecated
-      public: virtual void GetInertial(double _mass, InertialPtr _inertial)
-              const GAZEBO_DEPRECATED;
-
-      /// \brief Deprecated
-      public: virtual void FillShapeMsg(msgs::Geometry &_msg)
-              GAZEBO_DEPRECATED;
-
       /// \brief Fill in the values for a geometry message.
       /// \param[out] _msg The geometry message to fill.
       public: virtual void FillMsg(msgs::Geometry &_msg) = 0;

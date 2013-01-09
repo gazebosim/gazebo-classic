@@ -127,6 +127,10 @@ namespace gazebo
       /// \param[in] _scene The scene to remove shadows from.
       public: void RemoveShadows(ScenePtr _scene);
 
+      /// \brief Get the Ogre PSSM Shadows camera setup.
+      /// \return The Ogre PSSM Shadows camera setup.
+      public: Ogre::PSSMShadowCameraSetup *GetPSSMShadowCameraSetup() const;
+
       /// \brief Get paths for the shader system
       /// \param[out] _coreLibsPath Path to the core libraries.
       /// \param[out] _cachePath Path to where the generated shaders are
@@ -156,6 +160,8 @@ namespace gazebo
 
       /// \brief Mutex used to protext the entities list.
       private: boost::mutex *entityMutex;
+
+      private: Ogre::PSSMShadowCameraSetup *pssmSetup;
 
       /// \brief Make the RTShader system a singleton.
       private: friend class SingletonT<RTShaderSystem>;

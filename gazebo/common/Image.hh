@@ -38,13 +38,39 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
+    /// \brief String names for the pixel formats.
+    /// \sa Image::PixelFormat.
+    static std::string PixelFormatNames[] =
+    {
+      "UNKNOWN_PIXEL_FORMAT",
+      "L_INT8",
+      "L_INT16",
+      "RGB_INT8",
+      "RGBA_INT8",
+      "BGRA_INT8",
+      "RGB_INT16",
+      "RGB_INT32",
+      "BGR_INT8",
+      "BGR_INT16",
+      "BGR_INT32",
+      "R_FLOAT16",
+      "RGB_FLOAT16",
+      "R_FLOAT32",
+      "RGB_FLOAT32",
+      "BAYER_RGGB8",
+      "BAYER_RGGR8",
+      "BAYER_GBRG8",
+      "BAYER_GRBG8"
+    };
+
     /// \class Image Image.hh common/common.hh
     /// \brief Encapsulates an image
     class Image
     {
       /// \brief Pixel formats enumeration
-      public: enum PixelFormat {
-                UNKNOWN,
+      public: enum PixelFormat
+              {
+                UNKNOWN_PIXEL_FORMAT,
                 L_INT8,
                 L_INT16,
                 RGB_INT8,
@@ -62,8 +88,16 @@ namespace gazebo
                 BAYER_RGGB8,
                 BAYER_RGGR8,
                 BAYER_GBRG8,
-                BAYER_GRBG8
+                BAYER_GRBG8,
+                PIXEL_FORMAT_COUNT
               };
+
+
+      /// \brief Convert a string to a Image::PixelFormat.
+      /// \param[in] _format Pixel format string. \sa Image::PixelFormatNames
+      /// \return Image::PixelFormat
+      public: static Image::PixelFormat ConvertPixelFormat(
+                  const std::string &_format);
 
       /// \brief Constructor
       /// \param[in] _filename the path to the image

@@ -199,3 +199,13 @@ std::string Node::GetMsgType(const std::string &_topic) const
 
   return std::string();
 }
+
+/////////////////////////////////////////////////
+bool Node::HasLatchedSubscriber(const std::string &_topic) const
+{
+  Callback_M::const_iterator iter = this->callbacks.find(_topic);
+  if (iter != this->callbacks.end())
+    return iter->second.front()->GetLatching();
+
+  return false;
+}

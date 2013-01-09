@@ -18,54 +18,114 @@
 #define _MODELRIGHTMENU_HH_
 
 #include <map>
+#include <vector>
 #include <string>
-#include "gui/qt.h"
-#include "msgs/msgs.hh"
-#include "transport/TransportTypes.hh"
+
+#include "gazebo/gui/qt.h"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class ViewState;
+
+    /// \class ModelRightMenu ModelRightMenu.hh gui/gui.hh
+    /// \brief Displays a menu when the right mouse button has been pressed.
     class ModelRightMenu : public QObject
     {
       Q_OBJECT
+
+      /// \brief Constructor
       public: ModelRightMenu();
+
+      /// \brief Destructor
       public: virtual ~ModelRightMenu();
 
+      /// \brief Show the right menu.
+      /// \param[in] _modelName Name of the model that is active.
+      /// \param[in] _pt Point on the GUI that has received the right-click
+      /// request.
       public: void Run(const std::string &_modelName, const QPoint &_pt);
 
-      private slots: void OnSnapBelow();
+      /// \brief QT callback when move to has been selected.
       private slots: void OnMoveTo();
-      private slots: void OnDelete(const std::string &_name="");
-      private slots: void OnFollow();
-      private slots: void OnShowCollision();
-      private slots: void OnShowJoints();
-      private slots: void OnShowCOM();
-      private slots: void OnTransparent();
-      private slots: void OnSkeleton();
 
+      /// \brief QT callback when delete has been selected.
+      /// \param[in] _name Name of the model to delete.
+      private slots: void OnDelete(const std::string &_name="");
+
+      /// \brief QT callback when snap below has been selected.
+      // private slots: void OnSnapBelow();
+
+      // private slots: void OnFollow();
+      // private slots: void OnSkeleton();
+
+      /// \brief Request callback.
+      /// \param[in] _msg Request message to process.
+      private: void OnRequest(ConstRequestPtr &_msg);
+
+      /// \brief Node for communication.
+      private: transport::NodePtr node;
+
+      /// \brief Subscriber to request messages.
+      private: transport::SubscriberPtr requestSub;
+
+      /// \brief Name of the active model.
       private: std::string modelName;
 
-      private: QAction *moveToAction;
-      private: QAction *transparentAct;
+      /// \brief Action for moving the camera to an object.
+      private: QAction *moveToAct;
 
-      private: QAction *snapBelowAction;
-      private: QAction *followAction;
-      private: QAction *showCollisionAction;
-      private: QAction *skeletonAction;
-      private: QAction *showJointsAction;
-      private: QAction *showCOMAction;
+      /// \brief Action for snapping an object to another object below the
+      /// first.
+      // private: QAction *snapBelowAct;
+      // private: QAction *followAct;
+      // private: QAction *skeletonAct;
 
-      private: transport::NodePtr node;
-      private: transport::PublisherPtr requestPub;
-      private: msgs::Request *requestMsg;
+      /// \brief The various view states
+      private: std::vector<ViewState*> viewStates;
 
-      private: std::map<std::string, bool> showCollisionsActionState;
-      private: std::map<std::string, bool> showJointsActionState;
-      private: std::map<std::string, bool> showCOMActionState;
-      private: std::map<std::string, bool> transparentActionState;
-      private: std::map<std::string, bool> skeletonActionState;
+      // The view state class is a friend for convenience
+      private: friend class ViewState;
+    };
+
+    /// \class ViewState ViewState.hh gui/gui.hh
+    /// \brief A class for managing view visualization states.
+    /// Used by ModelRightMenu.
+    class ViewState : public QObject
+    {
+      Q_OBJECT
+
+      /// \brief Constructor
+      /// \param[in] _parent Pointer to the MOdelRightMenu
+      /// \param[in] _checkRequest Name of the request to send when checked.
+      /// \param[in] _uncheckRequest Name of the request to send when unchecked.
+      public: ViewState(ModelRightMenu *_parent,
+                  const std::string &_checkRequest,
+                  const std::string &_uncheckRequest);
+
+      /// \brief State of all the models for this view.
+      public: std::map<std::string, bool> modelStates;
+
+      /// \brief Action for this view.
+      public: QAction *action;
+
+      /// \brief True if the view visualization is enabled globally.
+      public: bool globalEnable;
+
+      /// \brief Pointer to the ModelRightMenu.
+      public: ModelRightMenu *parent;
+
+      /// \brief Name of the request to send when checked.
+      public: std::string checkRequest;
+
+      /// \brief Name of the request to send when unchecked.
+      public: std::string uncheckRequest;
+
+      /// \brief QT callback for the QAction.
+      public slots: void Callback();
     };
   }
 }

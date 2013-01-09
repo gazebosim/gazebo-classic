@@ -22,8 +22,36 @@
 using namespace gazebo;
 class PhysicsTest : public ServerFixture
 {
+  public: void EmptyWorld(std::string _worldFile);
 };
 
+void PhysicsTest::EmptyWorld(std::string _worldFile)
+{
+  // Load an empty world
+  Load(_worldFile, true);
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  // simulate a couple seconds
+  world->StepWorld(2000);
+  double t = world->GetSimTime().Double();
+  // verify that time moves forward
+  EXPECT_GT(t, 0);
+
+  Unload();
+}
+
+TEST_F(PhysicsTest, EmptyWorldODE)
+{
+  EmptyWorld("worlds/empty.world");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, EmptyWorldBullet)
+{
+  EmptyWorld("worlds/empty_bullet.world");
+}
+#endif  // HAVE_BULLET
 
 TEST_F(PhysicsTest, State)
 {
@@ -85,6 +113,64 @@ TEST_F(PhysicsTest, State)
   EXPECT_TRUE(pose == modelState2.GetPose());
   Unload();
   */
+}
+
+TEST_F(PhysicsTest, JointDampingTest)
+{
+  Load("worlds/damp_test.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  int i = 0;
+  while (!this->HasEntity("model_4_mass_1_ixx_1_damping_10") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get model_4_mass_1_ixx_1_damping_10");
+
+  physics::ModelPtr model = world->GetModel("model_4_mass_1_ixx_1_damping_10");
+  EXPECT_TRUE(model != NULL);
+
+  {
+    // compare against recorded data only
+    double test_duration = 1.5;
+    double dt = world->GetPhysicsEngine()->GetStepTime();
+    int steps = test_duration/dt;
+
+    for (int i = 0; i < steps; i++)
+    {
+      world->StepWorld(1);  // theoretical contact, but
+      // gzdbg << "box time [" << world->GetSimTime().Double()
+      //       << "] vel [" << model->GetWorldLinearVel()
+      //       << "] pose [" << model->GetWorldPose()
+      //       << "]\n";
+    }
+
+    EXPECT_EQ(world->GetSimTime().Double(), 1.5);
+
+    math::Vector3 vel = model->GetWorldLinearVel();
+    math::Pose pose = model->GetWorldPose();
+
+    EXPECT_EQ(vel.x, 0.0);
+
+    EXPECT_LT(vel.y, -10.2006);
+    EXPECT_GT(vel.y, -10.2008);
+    EXPECT_LT(vel.z, -6.51766);
+    EXPECT_GT(vel.z, -6.51768);
+
+    EXPECT_EQ(pose.pos.x, 3.0);
+    EXPECT_LT(pose.pos.y, 5.0e-6);
+    EXPECT_GT(pose.pos.y, 0.0);
+    EXPECT_GT(pose.pos.z, 10.099);
+    EXPECT_LT(pose.pos.z, 10.101);
+    EXPECT_GT(pose.rot.GetAsEuler().x, 0.567336);
+    EXPECT_LT(pose.rot.GetAsEuler().x, 0.567338);
+    EXPECT_EQ(pose.rot.GetAsEuler().y, 0.0);
+    EXPECT_EQ(pose.rot.GetAsEuler().z, 0.0);
+  }
 }
 
 TEST_F(PhysicsTest, DropStuff)

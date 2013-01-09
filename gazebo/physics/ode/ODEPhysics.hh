@@ -160,7 +160,11 @@ namespace gazebo
       // Documentation inherited
       public: virtual int GetMaxContacts();
 
+      // Documentation inherited
       public: virtual void DebugPrint() const;
+
+      // Documentation inherited
+      public: virtual void SetSeed(uint32_t _seed);
 
       /// \brief Return the world space id.
       /// \return The space id for the world.

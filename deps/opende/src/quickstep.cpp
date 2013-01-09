@@ -1876,11 +1876,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
       dReal error = 0;
       for (int i=0; i<m; i++) error += dFabs(tmp[i]);
       printf ("velocity error = %10.6e\n",error);
+    }
   }
-
 #endif
-
-
 
   {
     // update the position and orientation from the new linear/angular velocity

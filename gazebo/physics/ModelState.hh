@@ -136,6 +136,10 @@ namespace gazebo
       /// \return A vector of joint states.
       public: const std::vector<JointState> &GetJointStates() const;
 
+      /// \brief Populate a state SDF element with data from the object.
+      /// \param[out] _sdf SDF element to populate.
+      public: void FillSDF(sdf::ElementPtr _sdf);
+
       /// \brief Assignment operator
       /// \param[in] _state State value
       /// \return this

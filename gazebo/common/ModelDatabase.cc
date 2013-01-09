@@ -15,8 +15,6 @@
  *
 */
 
-#define BOOST_FILESYSTEM_VERSION 2
-
 #include <tinyxml.h>
 #include <libtar.h>
 #include <curl/curl.h>
