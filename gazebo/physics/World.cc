@@ -571,7 +571,8 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 
   if (_sdf->GetName() == "model")
   {
-    model.reset(new Model(_parent));
+    //model.reset(new Model(_parent));
+    model = this->GetPhysicsEngine()->CreateModel(_parent);
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
 

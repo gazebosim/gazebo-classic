@@ -90,6 +90,10 @@ namespace gazebo
       /// \brief Update the physics engine.
       public: virtual void UpdatePhysics() {}
 
+      /// \brief Create a new model.
+      /// \param[in] _parent Parent object.
+      public: virtual ModelPtr CreateModel(BasePtr _parent);
+
       /// \brief Create a new body.
       /// \param[in] _parent Parent model for the link.
       public: virtual LinkPtr CreateLink(ModelPtr _parent) = 0;

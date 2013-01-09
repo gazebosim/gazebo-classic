@@ -30,7 +30,7 @@ using namespace physics;
 RTQL8HingeJoint::RTQL8HingeJoint(BasePtr _parent)
     : HingeJoint<RTQL8Joint>(_parent)
 {
-//   this->jointId = dJointCreateHinge(_worldId, NULL);
+
 }
 
 //////////////////////////////////////////////////
@@ -41,7 +41,7 @@ RTQL8HingeJoint::~RTQL8HingeJoint()
 //////////////////////////////////////////////////
 void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
 {
-//   HingeJoint<ODEJoint>::Load(_sdf);
+  HingeJoint<RTQL8Joint>::Load(_sdf);
 // 
 //   this->SetParam(dParamFMax, 0);
 //   this->SetForce(0, 0);
@@ -107,11 +107,11 @@ void RTQL8HingeJoint::ApplyDamping()
 //////////////////////////////////////////////////
 math::Angle RTQL8HingeJoint::GetAngleImpl(int /*index*/) const
 {
-//   math::Angle result;
+   math::Angle result;
 //   if (this->jointId)
 //     result = dJointGetHingeAngle(this->jointId);
-//   return result;
-  return 0;
+   return result;
+  //return 0;
 }
 
 //////////////////////////////////////////////////

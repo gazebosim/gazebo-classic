@@ -54,8 +54,8 @@ namespace gazebo
       /// \brief Finalize the model.
       public: virtual void Fini();
 
-	  /// \brief
-	  protected: dynamics::SkeletonDynamics* rtql8SkeletonDynamics;
+      /// \brief
+      protected: dynamics::SkeletonDynamics* rtql8SkeletonDynamics;
     };
     /// \}
   }

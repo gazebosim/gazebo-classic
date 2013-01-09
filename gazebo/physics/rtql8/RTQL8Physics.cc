@@ -1,15 +1,15 @@
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "math/Vector3.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/math/Vector3.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/PhysicsFactory.hh"
-#include "physics/World.hh"
-#include "physics/Entity.hh"
-#include "physics/Model.hh"
-#include "physics/SurfaceParams.hh"
-#include "physics/Collision.hh"
-#include "physics/MapShape.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Entity.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/MapShape.hh"
 
 #include "gazebo/physics/rtql8/RTQL8ScrewJoint.hh"
 #include "gazebo/physics/rtql8/RTQL8HingeJoint.hh"
@@ -18,16 +18,17 @@
 #include "gazebo/physics/rtql8/RTQL8BallJoint.hh"
 #include "gazebo/physics/rtql8/RTQL8UniversalJoint.hh"
 
-#include "physics/rtql8/RTQL8RayShape.hh"
-#include "physics/rtql8/RTQL8BoxShape.hh"
-#include "physics/rtql8/RTQL8SphereShape.hh"
-#include "physics/rtql8/RTQL8CylinderShape.hh"
-#include "physics/rtql8/RTQL8PlaneShape.hh"
-#include "physics/rtql8/RTQL8TrimeshShape.hh"
-#include "physics/rtql8/RTQL8MultiRayShape.hh"
-#include "physics/rtql8/RTQL8HeightmapShape.hh"
+#include "gazebo/physics/rtql8/RTQL8RayShape.hh"
+#include "gazebo/physics/rtql8/RTQL8BoxShape.hh"
+#include "gazebo/physics/rtql8/RTQL8SphereShape.hh"
+#include "gazebo/physics/rtql8/RTQL8CylinderShape.hh"
+#include "gazebo/physics/rtql8/RTQL8PlaneShape.hh"
+#include "gazebo/physics/rtql8/RTQL8TrimeshShape.hh"
+#include "gazebo/physics/rtql8/RTQL8MultiRayShape.hh"
+#include "gazebo/physics/rtql8/RTQL8HeightmapShape.hh"
 
-#include "physics/rtql8/RTQL8Link.hh"
+#include "gazebo/physics/rtql8/RTQL8Model.hh"
+#include "gazebo/physics/rtql8/RTQL8Link.hh"
 
 
 #include "RTQL8Physics.hh"
@@ -60,36 +61,14 @@ GZ_REGISTER_PHYSICS_ENGINE("rtql8", RTQL8Physics)
 RTQL8Physics::RTQL8Physics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
-//   // Create the dynamics solver
-//   this->solver = new btSequentialImpulseConstraintSolver;
-// 
-//   // Instantiate the world
-//   this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher,
-//       this->broadPhase, this->solver, this->collisionConfig);
-
   this->rtql8World = new simulation::World;
 }
 
 //////////////////////////////////////////////////
 RTQL8Physics::~RTQL8Physics()
 {
-//   delete this->broadPhase;
-//   delete this->collisionConfig;
-//   delete this->dispatcher;
-//   delete this->solver;
-// 
-//   // TODO: Fix this line
-//   // delete this->dynamicsWorld;
-// 
-//   this->broadPhase = NULL;
-//   this->collisionConfig = NULL;
-//   this->dispatcher = NULL;
-//   this->solver = NULL;
-//   this->dynamicsWorld = NULL;
-
   delete this->rtql8World;
-  
-  this->rtql8World = NULL;
+  //this->rtql8World = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -102,12 +81,12 @@ void RTQL8Physics::Load(sdf::ElementPtr _sdf)
   this->rtql8World->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
   
   // Time step
-  this->rtql8World->setTimeStep(this->sdf->GetValueDouble("time_step"));
+  double timeStep = this->sdf->GetValueDouble("time_step");
+  this->rtql8World->setTimeStep(timeStep);
   
   // TODO: Elements for rtql8 settings
-  sdf::ElementPtr rtql8Elem = this->sdf->GetElement("rtql8");
+  //sdf::ElementPtr rtql8Elem = this->sdf->GetElement("rtql8");
   //this->stepTimeDouble = rtql8Elem->GetElement("dt")->GetValueDouble();
-  
 }
  
 //////////////////////////////////////////////////
@@ -119,11 +98,18 @@ void RTQL8Physics::Init()
 //////////////////////////////////////////////////
 void RTQL8Physics::Fini()
 {
+  PhysicsEngine::Fini();
 }
 
 //////////////////////////////////////////////////
 void RTQL8Physics::Reset()
 {
+  {
+    this->physicsUpdateMutex->lock();
+    // Very important to clear out the contact group
+    //dJointGroupEmpty(this->contactGroup);
+    this->physicsUpdateMutex->unlock();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -139,31 +125,42 @@ void RTQL8Physics::UpdateCollision()
 //////////////////////////////////////////////////
 void RTQL8Physics::UpdatePhysics()
 {
-  // need to lock, otherwise might conflict with world resetting
-  this->physicsUpdateMutex->lock();
+  {
+    // need to lock, otherwise might conflict with world resetting
+    this->physicsUpdateMutex->lock();
 
-  //common::Time currTime =  this->world->GetRealTime();
-  this->rtql8World->updatePhysics();
-  //this->lastUpdateTime = currTime;
+    //common::Time currTime =  this->world->GetRealTime();
+    //this->rtql8World->updatePhysics();
+    //this->lastUpdateTime = currTime;
 
-  this->physicsUpdateMutex->unlock();
+    this->physicsUpdateMutex->unlock();
+  }
 }
 
 //////////////////////////////////////////////////
 void RTQL8Physics::SetStepTime(double _value)
 {
-   // TODO: element of dt
-//   this->sdf->GetElement("ode")->GetElement(
-//       "solver")->GetAttribute("dt")->Set(_value);
-   this->stepTimeDouble = _value;
+   this->sdf->GetElement("rtql8")->GetElement(
+       "solver")->GetAttribute("dt")->Set(_value);
+
    this->rtql8World->setTimeStep(_value);
 }
 
 //////////////////////////////////////////////////
 double RTQL8Physics::GetStepTime()
 {
-  return this->stepTimeDouble;
-  //return this->world->getTimeStep();
+  return this->rtql8World->getTimeStep();
+}
+
+//////////////////////////////////////////////////
+ModelPtr RTQL8Physics::CreateModel(BasePtr _parent)
+{
+//  if (_parent == NULL)
+//	gzthrow("Model must have a parent\n");
+
+  RTQL8ModelPtr model(new RTQL8Model(_parent));
+
+  return model;
 }
 
 //////////////////////////////////////////////////

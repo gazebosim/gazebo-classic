@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _RTQL8PHYSICS_HH
-#define _RTQL8PHYSICS_HH
+#ifndef _RTQL8PHYSICS_HH_
+#define _RTQL8PHYSICS_HH_
 
 #include <string>
 
@@ -77,22 +77,22 @@ namespace gazebo
       public: virtual double GetStepTime();
 
       /// \brief Create a new model (js: in test)
-      //public: virtual ModelPtr CreateModel(ModelPtr _parent);
+      public: virtual ModelPtr CreateModel(BasePtr _parent);
       
       /// \brief Create a new body
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
       /// \brief Create a new collision
       public: virtual CollisionPtr CreateCollision(const std::string& _type,
-						    LinkPtr _body);
+                                                   LinkPtr _body);
 
       /// \brief Create a new joint
       public: virtual JointPtr CreateJoint(const std::string& _type,
-					    ModelPtr _parent);
+                                           ModelPtr _parent);
       
       /// \brief Create a new shape
       public: virtual ShapePtr CreateShape(const std::string& _shapeType,
-					    CollisionPtr _collision);
+                                           CollisionPtr _collision);
 
       /// \brief Set the gavity vector
       public: virtual void SetGravity(const gazebo::math::Vector3& gravity);
@@ -101,7 +101,7 @@ namespace gazebo
       public: virtual void DebugPrint() const;
 
       /// \brief Store the value of the stepTime parameter to improve efficiency
-      private: double stepTimeDouble;
+      //private: double stepTimeDouble;
       
       /// \brief 
       private: simulation::World* rtql8World;
