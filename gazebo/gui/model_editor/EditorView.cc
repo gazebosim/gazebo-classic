@@ -469,7 +469,7 @@ void EditorView::DeleteItem(EditorItem *_item)
   if (!_item)
     return;
 
-  QGraphicsItem *qItem = dynamic_cast<QGraphicsItem *>(_item);
+  QGraphicsItem *qItem = qobject_cast<QGraphicsItem *>(_item);
 
   if (_item->GetType() == "Wall")
   {
@@ -507,7 +507,7 @@ void EditorView::DeleteItem(EditorItem *_item)
   }
   else {
     this->itemToModelMap.erase(_item);
-    delete qItem;
+    delete _item;
   }
 }
 
@@ -695,7 +695,7 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
   if (this->drawMode == WALL)
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 
-  this->grabKeyboard();
+//  this->grabKeyboard();
 }
 
 /////////////////////////////////////////////////
@@ -711,7 +711,7 @@ void EditorView::OnSaveModel(const std::string &_modelName,
 void EditorView::OnFinishModel()
 {
   this->buildingMaker->FinishModel();
-  this->OnDiscardModel();
+  gui::editor::Events::discardModel();
 }
 
 /////////////////////////////////////////////////
@@ -734,6 +734,7 @@ void EditorView::OnDiscardModel()
   newLevel->level = 0;
   newLevel->name = "Level 1";
   this->levels.push_back(newLevel);
+  this->levelCounter = 0;
 //  this->levelHeights[0] = 0;
 //  this->levelNames[0] = "Level 1";
 
@@ -863,19 +864,10 @@ void EditorView::DeleteLevel(int _level)
 
   this->OnChangeLevel(newLevelIndex);
   std::vector<EditorItem *> toBeDeleted;
-  for (std::vector<WallItem *>::iterator it = this->wallList.begin();
-      it != this->wallList.end(); ++it)
-  {
-    if ((*it)->GetLevel() == _level)
-      toBeDeleted.push_back(*it);
-    else if ((*it)->GetLevel() > _level)
-      (*it)->SetLevel((*it)->GetLevel()-1);
-
-  }
   for (std::vector<WindowItem *>::iterator it = this->windowList.begin();
       it != this->windowList.end(); ++it)
   {
-    if ((*it)->GetLevel() != _level)
+    if ((*it)->GetLevel() == _level)
       toBeDeleted.push_back(*it);
     else if ((*it)->GetLevel() > _level)
       (*it)->SetLevel((*it)->GetLevel()-1);
@@ -904,9 +896,19 @@ void EditorView::DeleteLevel(int _level)
     else if ((*it)->GetLevel() > _level)
       (*it)->SetLevel((*it)->GetLevel()-1);
   }
+  for (std::vector<WallItem *>::iterator it = this->wallList.begin();
+      it != this->wallList.end(); ++it)
+  {
+    if ((*it)->GetLevel() == _level)
+      toBeDeleted.push_back(*it);
+    else if ((*it)->GetLevel() > _level)
+      (*it)->SetLevel((*it)->GetLevel()-1);
+  }
 
   for (unsigned int i = 0; i < toBeDeleted.size(); ++i)
+  {
     this->DeleteItem(toBeDeleted[i]);
+  }
 
   int levelNum = 0;
   for (unsigned int i = 0; i < this->levels.size(); ++i)
