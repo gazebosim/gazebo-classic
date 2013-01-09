@@ -12,7 +12,7 @@ link_directories(
 )
 
 set (gtest_sources 
-  BulletPhysics.cc 
+  BulletTypes.cc 
 )
 
 # Build tests

@@ -15,12 +15,11 @@
  *
 */
 
+
 #include <gtest/gtest.h>
 
-#include <LinearMath/btVector3.h>
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
 #include "test_config.h"
 
 #define NEAR_TOL 1e-6
@@ -29,38 +28,38 @@ using namespace gazebo;
 
 /////////////////////////////////////////////////
 /// Check Vector3 conversions
-TEST(BulletPhysics, ConvertVector3)
+TEST(BulletTypes, ConvertVector3)
 {
   {
     math::Vector3 vec;
-    btVector3 bt = physics::BulletPhysics::ConvertVector3(vec);
-    EXPECT_EQ(bt.getX(), 0);
-    EXPECT_EQ(bt.getY(), 0);
-    EXPECT_EQ(bt.getZ(), 0);
+    btVector3 bt = physics::BulletTypes::ConvertVector3(vec);
+    EXPECT_NEAR(bt.getX(), 0, NEAR_TOL);
+    EXPECT_NEAR(bt.getY(), 0, NEAR_TOL);
+    EXPECT_NEAR(bt.getZ(), 0, NEAR_TOL);
   }
 
   {
     btVector3 bt;
-    math::Vector3 vec = physics::BulletPhysics::ConvertVector3(bt);
-    EXPECT_EQ(vec.x, 0);
-    EXPECT_EQ(vec.y, 0);
-    EXPECT_EQ(vec.z, 0);
+    math::Vector3 vec = physics::BulletTypes::ConvertVector3(bt);
+    EXPECT_NEAR(vec.x, 0, NEAR_TOL);
+    EXPECT_NEAR(vec.y, 0, NEAR_TOL);
+    EXPECT_NEAR(vec.z, 0, NEAR_TOL);
   }
 
   {
-    math::Vector3 vec(1, 2, 3);
-    btVector3 bt = physics::BulletPhysics::ConvertVector3(vec);
-    EXPECT_NEAR(bt.getX(), 1.0, NEAR_TOL);
-    EXPECT_NEAR(bt.getY(), 2.0, NEAR_TOL);
-    EXPECT_NEAR(bt.getZ(), 3.0, NEAR_TOL);
+    math::Vector3 vec(100.5, -2.314, 42);
+    btVector3 bt = physics::BulletTypes::ConvertVector3(vec);
+    EXPECT_NEAR(bt.getX(), 100.5, NEAR_TOL);
+    EXPECT_NEAR(bt.getY(), -2.314, NEAR_TOL);
+    EXPECT_NEAR(bt.getZ(), 42, NEAR_TOL);
   }
 
   {
-    btVector3 bt(1, 2, 3);
-    math::Vector3 vec = physics::BulletPhysics::ConvertVector3(bt);
-    EXPECT_NEAR(vec.x, 1.0, NEAR_TOL);
-    EXPECT_NEAR(vec.y, 2.0, NEAR_TOL);
-    EXPECT_NEAR(vec.z, 3.0, NEAR_TOL);
+    btVector3 bt(100.5, -2.314, 42);
+    math::Vector3 vec = physics::BulletTypes::ConvertVector3(bt);
+    EXPECT_NEAR(vec.x, 100.5, NEAR_TOL);
+    EXPECT_NEAR(vec.y, -2.314, NEAR_TOL);
+    EXPECT_NEAR(vec.z, 42, NEAR_TOL);
   }
 }
 
