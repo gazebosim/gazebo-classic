@@ -146,23 +146,21 @@ namespace gazebo
       /// \param[in] _torque Torque value.
       public: virtual void SetTorque(const math::Vector3 &_torque) = 0;
 
-      /// \brief Add a force to the body.
+      /// \brief Add a force to the Link's origin.
       /// \param[in] _force Force to add.
       public: virtual void AddForce(const math::Vector3 &_force) = 0;
 
-      /// \brief Add a force to the body, components are relative to the
-      /// body's own frame of reference.
+      /// \brief Add a force to the Link's origin.
       /// \param[in] _force Force to add.
       public: virtual void AddRelativeForce(const math::Vector3 &_force) = 0;
 
-      /// \brief Add a force to the body using a global position.
+      /// \brief Add a force to the Link's origin.
       /// \param[in] _force Force to add.
-      /// \param[in] _pos Position in global coord frame to add the force.
+      /// \param[in] _pos Position of force specified in inertial coord frame.
       public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
                   const math::Vector3 &_pos) = 0;
 
-      /// \brief Add a force to the body at position expressed to the body's
-      /// own frame of reference.
+      /// \brief Add a force to the Link's origin.
       /// \param[in] _force Force to add.
       /// \param[in] _relPos Position on the link to add the force.
       public: virtual void AddForceAtRelativePosition(
