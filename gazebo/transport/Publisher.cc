@@ -100,6 +100,8 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
 
     if (this->messages.size() > this->queueLimit)
     {
+      gzwarn << "Queue limit reached, deleting message of type "
+        << this->messages.front()->GetTypeName() << '\n';
       delete this->messages.front();
       this->messages.pop_front();
     }
