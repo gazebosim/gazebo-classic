@@ -352,7 +352,7 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
         else
           gazebo->setStaticFlag = false;
       }
-      else if (childElem->ValueStr() == "gravity")
+      else if (childElem->ValueStr() == "turnGravityOff")
       {
         std::string valueStr = this->GetKeyValueAsString(childElem);
 
