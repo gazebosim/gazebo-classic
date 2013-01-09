@@ -302,10 +302,7 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
 /////////////////////////////////////////////////
 void WallItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
 {
-  QMenu menu;
-  menu.addAction(this->openInspectorAct);
-  menu.exec(_event->screenPos());
-  _event->accept();
+  _event->ignore();
 }
 
 /////////////////////////////////////////////////
