@@ -266,6 +266,7 @@ void StairsItem::OnApply()
 /////////////////////////////////////////////////
 void StairsItem::OnOpenInspector()
 {
+  this->inspector->SetName(this->GetName());
   this->inspector->SetWidth(this->stairsWidth * this->scale);
   this->inspector->SetDepth(this->stairsDepth * this->scale);
   this->inspector->SetHeight(this->stairsHeight * this->scale);

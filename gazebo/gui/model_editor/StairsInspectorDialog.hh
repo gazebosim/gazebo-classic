@@ -42,6 +42,8 @@ namespace gazebo
 
       public: int GetSteps() const;
 
+      public: void SetName(const std::string &_name);
+
       public: void SetStartPosition(const QPointF &_pos);
 
       public: void SetWidth(double _width);

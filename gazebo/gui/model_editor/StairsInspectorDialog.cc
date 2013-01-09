@@ -65,6 +65,9 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   xyLayout->addWidget(startPointLabel);
   xyLayout->addLayout(startXYLayout);
 
+  QGroupBox *positionGroupBox = new QGroupBox(tr("Position"));
+  positionGroupBox->setLayout(xyLayout);
+
   QLabel *widthLabel = new QLabel(tr("Width: "));
   QLabel *depthLabel = new QLabel(tr("Depth: "));
   QLabel *heightLabel = new QLabel(tr("Height: "));
@@ -105,6 +108,13 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   stepsLayout->addWidget(stepsLabel, 0, 0);
   stepsLayout->addWidget(stepsSpinBox, 0, 1);
 
+  QVBoxLayout *sizeStepsLayout = new QVBoxLayout;
+  sizeStepsLayout->addLayout(sizeLayout);
+  sizeStepsLayout->addLayout(stepsLayout);
+
+  QGroupBox *sizeGroupBox = new QGroupBox(tr("Size"));
+  sizeGroupBox->setLayout(sizeStepsLayout);
+
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
@@ -120,9 +130,8 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(nameLayout);
-  mainLayout->addLayout(xyLayout);
-  mainLayout->addLayout(sizeLayout);
-  mainLayout->addLayout(stepsLayout);
+  mainLayout->addWidget(positionGroupBox);
+  mainLayout->addWidget(sizeGroupBox);
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
@@ -162,6 +171,12 @@ double StairsInspectorDialog::GetHeight() const
 int StairsInspectorDialog::GetSteps() const
 {
   return this->stepsSpinBox->value();
+}
+
+/////////////////////////////////////////////////
+void StairsInspectorDialog::SetName(const std::string &_name)
+{
+  this->stairsNameLabel->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////

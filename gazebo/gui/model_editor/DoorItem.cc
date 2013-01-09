@@ -177,6 +177,7 @@ void DoorItem::OnApply()
 /////////////////////////////////////////////////
 void DoorItem::OnOpenInspector()
 {
+  this->inspector->SetName(this->GetName());
   this->inspector->SetWidth(this->doorWidth * this->scale);
   this->inspector->SetDepth(this->doorDepth * this->scale);
   this->inspector->SetHeight(this->doorHeight * this->scale);

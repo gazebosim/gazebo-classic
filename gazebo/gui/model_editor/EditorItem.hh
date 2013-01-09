@@ -23,6 +23,10 @@ namespace gazebo
 
       public: virtual std::string GetType() const;
 
+      public: virtual std::string GetName() const;
+
+      public: virtual void SetName(const std::string &_name);
+
       Q_SIGNALS: void sizeChanged(double _width, double _depth,
           double _height);
 
@@ -56,6 +60,8 @@ namespace gazebo
       Q_SIGNALS: void itemDeleted();
 
       protected: std::string editorType;
+
+      protected: std::string name;
     };
   }
 }

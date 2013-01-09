@@ -187,10 +187,10 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   visVisual->SetScale(scaledSize);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
-  this->allItems[visualName.str()] = wallManip;
+  this->allItems[linkName] = wallManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
-  return visualName.str();
+  return linkName;
 }
 
 /////////////////////////////////////////////////
@@ -224,10 +224,10 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   visVisual->SetScale(scaledSize);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
-  this->allItems[visualName.str()] = windowManip;
+  this->allItems[linkName] = windowManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
-  return visualName.str();
+  return linkName;
 }
 
 /////////////////////////////////////////////////
@@ -262,10 +262,10 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   visVisual->SetScale(scaledSize);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
-  this->allItems[visualName.str()] = doorManip;
+  this->allItems[linkName] = doorManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
-  return visualName.str();
+  return linkName;
 }
 
 /////////////////////////////////////////////////
@@ -299,7 +299,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   double dSteps = static_cast<double>(_steps);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
-  this->allItems[visualName.str()] = stairsManip;
+  this->allItems[linkName] = stairsManip;
 
   std::stringstream visualStepName;
   visualStepName << visualName.str() << "step" << 0;
@@ -330,7 +330,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   }
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
-  return visualName.str();
+  return linkName;
 }
 
 /////////////////////////////////////////////////
@@ -365,10 +365,10 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   visVisual->SetScale(scaledSize);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   floorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
-  this->allItems[visualName.str()] = floorManip;
+  this->allItems[linkName] = floorManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
-  return visualName.str();
+  return linkName;
 }
 
 /////////////////////////////////////////////////

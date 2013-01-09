@@ -20,12 +20,11 @@
 using namespace gazebo;
 using namespace gui;
 
-
-
 /////////////////////////////////////////////////
 EditorItem::EditorItem()
 {
   this->editorType = "base";
+  this->name = "";
 }
 
 /////////////////////////////////////////////////
@@ -56,4 +55,16 @@ double EditorItem::GetSceneRotation() const
 std::string EditorItem::GetType() const
 {
   return this->editorType;
+}
+
+/////////////////////////////////////////////////
+std::string EditorItem::GetName() const
+{
+  return this->name;
+}
+
+/////////////////////////////////////////////////
+void EditorItem::SetName(const std::string &_name)
+{
+  this->name = _name;
 }

@@ -536,7 +536,6 @@ void EditorView::DrawWall(const QPoint &_pos)
     {
       LineSegmentItem *segment = wallItem->GetSegment(
           wallItem->GetSegmentCount()-1);
-
       wallItem->AddPoint(segment->mapToScene(segment->line().p2())
           + QPointF(1, 0));
     }
@@ -557,6 +556,8 @@ void EditorView::DrawWall(const QPoint &_pos)
     this->buildingMaker->ConnectItem(wallSegmentName, segment);
     this->buildingMaker->ConnectItem(wallSegmentName, wallItem);
     this->itemToModelMap[segment] = wallSegmentName;
+    if (segment->GetIndex() == 0)
+      wallItem->SetName(wallSegmentName);
 //    this->itemToModelMap[wallItem] = wallSegmentName;
   }
 }
@@ -579,7 +580,7 @@ void EditorView::DrawWindow(const QPoint &_pos)
         windowItem->GetSize(), windowPosition, windowItem->GetSceneRotation());
     this->buildingMaker->ConnectItem(windowName, windowItem);
     this->itemToModelMap[windowItem] = windowName;
-
+    windowItem->SetName(windowName);
     this->drawInProgress = true;
   }
   windowItem = dynamic_cast<WindowItem*>(this->currentMouseItem);
@@ -607,7 +608,7 @@ void EditorView::DrawDoor(const QPoint &_pos)
         doorItem->GetSize(), doorPosition, doorItem->GetSceneRotation());
     this->buildingMaker->ConnectItem(doorName, doorItem);
     this->itemToModelMap[doorItem] = doorName;
-
+    doorItem->SetName(doorName);
     this->drawInProgress = true;
   }
   doorItem = dynamic_cast<DoorItem*>(currentMouseItem);
@@ -638,7 +639,7 @@ void EditorView::DrawStairs(const QPoint &_pos)
 
     this->buildingMaker->ConnectItem(stairsName, stairsItem);
     this->itemToModelMap[stairsItem] = stairsName;
-
+    stairsItem->SetName(stairsName);
     this->drawInProgress = true;
   }
   stairsItem = dynamic_cast<StairsItem*>(this->currentMouseItem);
@@ -662,6 +663,7 @@ void EditorView::CreateItem3D(EditorItem* _item)
         stairsItem->GetSteps());
     this->buildingMaker->ConnectItem(stairsName, stairsItem);
     this->itemToModelMap[stairsItem] = stairsName;
+    stairsItem->SetName(stairsName);
     if (stairsItem->GetLevel() < static_cast<int>(floorList.size()))
     {
       this->buildingMaker->AttachObject(stairsName,

@@ -107,11 +107,16 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   xyLayout->addLayout(startXYLayout);
   xyLayout->addLayout(endXYLayout);
 
-  QVBoxLayout * lengthGroupLayout = new QVBoxLayout;
+  QVBoxLayout *lengthGroupLayout = new QVBoxLayout;
   lengthGroupLayout->addLayout(lengthLayout);
   lengthGroupLayout->addWidget(lengthCaptionLabel);
-  lengthGroupLayout->addLayout(startEndLayout);
-  lengthGroupLayout->addLayout(xyLayout);
+
+  QVBoxLayout *positionGroupLayout = new QVBoxLayout;
+  positionGroupLayout->addLayout(startEndLayout);
+  positionGroupLayout->addLayout(xyLayout);
+
+  QGroupBox *positionGroupBox = new QGroupBox(tr("Position"));
+  positionGroupBox->setLayout(positionGroupLayout);
 
   QGroupBox *lengthGroupBox = new QGroupBox(tr("Length"));
   lengthGroupBox->setLayout(lengthGroupLayout);
@@ -159,6 +164,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(nameLayout);
+  mainLayout->addWidget(positionGroupBox);
   mainLayout->addWidget(lengthGroupBox);
   mainLayout->addLayout(heightThicknessLayout);
   //mainLayout->addLayout(materialLayout);
@@ -208,6 +214,12 @@ double WallInspectorDialog::GetThickness() const
 std::string WallInspectorDialog::GetMaterial() const
 {
   return this->materialComboBox->currentText().toStdString();
+}
+
+/////////////////////////////////////////////////
+void WallInspectorDialog::SetName(const std::string &_name)
+{
+  this->wallNameLabel->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////

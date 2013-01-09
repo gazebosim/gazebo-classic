@@ -201,6 +201,7 @@ void WindowItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
 /////////////////////////////////////////////////
 void WindowItem::OnOpenInspector()
 {
+  this->inspector->SetName(this->GetName());
   this->inspector->SetWidth(this->windowWidth * this->scale);
   this->inspector->SetHeight(this->windowHeight * this->scale);
   this->inspector->SetElevation(this->windowElevation * this->scale);

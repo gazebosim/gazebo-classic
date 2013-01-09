@@ -262,7 +262,7 @@ void ModelManip::OnRotationChanged(double _roll, double _pitch, double _yaw)
 /////////////////////////////////////////////////
 void ModelManip::OnItemDeleted()
 {
-  this->maker->RemovePart(this->visual->GetName());
+  this->maker->RemovePart(this->name);
 }
 
 /////////////////////////////////////////////////

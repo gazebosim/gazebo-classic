@@ -44,6 +44,8 @@ namespace gazebo
 
       public: std::string GetMaterial() const;
 
+      public: void SetName(const std::string &_name);
+
       public: void SetLength(double _length);
 
       public: void SetStartPosition(const QPointF &_pos);

@@ -47,6 +47,8 @@ namespace gazebo
 
       public: std::string GetType() const;
 
+      public: void SetName(const std::string &_name);
+
       public: void SetWidth(double _width);
 
       public: void SetHeight(double _height);

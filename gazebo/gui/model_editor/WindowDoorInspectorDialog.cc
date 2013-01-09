@@ -99,13 +99,13 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   this->elevationSpinBox->setDecimals(3);
   this->elevationSpinBox->setValue(0.000);
 
-  QHBoxLayout *positionLayout = new QHBoxLayout;
-  positionLayout->addWidget(positionXLabel);
-  positionLayout->addWidget(positionXSpinBox);
-  positionLayout->addWidget(positionYLabel);
-  positionLayout->addWidget(positionYSpinBox);
-  positionLayout->addWidget(elevationLabel);
-  positionLayout->addWidget(elevationSpinBox);
+  QGridLayout *positionLayout = new QGridLayout;
+  positionLayout->addWidget(positionXLabel, 0, 0);
+  positionLayout->addWidget(positionXSpinBox, 0, 1);
+  positionLayout->addWidget(positionYLabel), 1, 0;
+  positionLayout->addWidget(positionYSpinBox, 1, 1);
+  positionLayout->addWidget(elevationLabel, 0, 2);
+  positionLayout->addWidget(elevationSpinBox, 0, 3);
 
   QGroupBox *positionGroupBox = new QGroupBox(tr("Position"));
   positionGroupBox->setLayout(positionLayout);
@@ -133,8 +133,8 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(nameLayout);
-  mainLayout->addWidget(sizeGroupBox);
   mainLayout->addWidget(positionGroupBox);
+  mainLayout->addWidget(sizeGroupBox);
   //mainLayout->addLayout(typeLayout);
   mainLayout->addLayout(buttonsLayout);
 
@@ -181,6 +181,12 @@ double WindowDoorInspectorDialog::GetElevation() const
 std::string WindowDoorInspectorDialog::GetType() const
 {
   return this->typeComboBox->currentText().toStdString();
+}
+
+/////////////////////////////////////////////////
+void WindowDoorInspectorDialog::SetName(const std::string &_name)
+{
+  this->modelNameLabel->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////

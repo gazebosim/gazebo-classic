@@ -321,6 +321,7 @@ void WallItem::OnOpenInspector()
   QPointF segmentStartPoint = this->mapToScene(line.p1());
   QPointF segmentEndPoint = this->mapToScene(line.p2());
 
+  this->inspector->SetName(this->GetName());
   this->inspector->SetThickness(this->wallThickness * this->scale);
   this->inspector->SetHeight(this->wallHeight * this->scale);
   this->inspector->SetLength(segmentLength * this->scale);
