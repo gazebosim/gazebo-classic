@@ -85,6 +85,14 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->editorWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   this->editorWidget->hide();
 
+  this->viewOnlyLabel = new QLabel("Building is View Only", this->glWidget);
+  this->viewOnlyLabel->resize(
+      viewOnlyLabel->fontMetrics().width(this->viewOnlyLabel->text()),
+      viewOnlyLabel->fontMetrics().height());
+  this->viewOnlyLabel->setStyleSheet(
+      "QLabel { background-color : white; color : gray; }");
+  this->viewOnlyLabel->setVisible(false);
+
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
   TimePanel *timePanel = new TimePanel(this);
@@ -235,11 +243,13 @@ void RenderWidget::ShowEditor(bool _show)
   if (_show)
   {
     this->editorWidget->show();
+    this->viewOnlyLabel->setVisible(true);
     this->bottomFrame->hide();
   }
   else
   {
     this->editorWidget->hide();
+    this->viewOnlyLabel->setVisible(false);
     this->bottomFrame->show();
   }
 

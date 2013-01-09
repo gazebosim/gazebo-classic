@@ -71,6 +71,8 @@ namespace gazebo
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 
+      private: QLabel *viewOnlyLabel;
+
       private: std::vector<event::ConnectionPtr> connections;
 
       private: bool clear;
