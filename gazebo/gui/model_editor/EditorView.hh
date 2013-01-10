@@ -96,8 +96,8 @@ namespace gazebo
 
       private: void OnCreateEditorItem(const std::string &_type);
 
-      private: void OnSaveModel(const std::string &_modelName,
-          const std::string &_savePath);
+//      private: void OnSaveModel(const std::string &_modelName,
+//          const std::string &_savePath);
 
       private: void OnFinishModel();
 

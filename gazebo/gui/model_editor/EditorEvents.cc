@@ -29,3 +29,8 @@ event::EventT<void ()> editor::Events::addLevel;
 event::EventT<void (int)> editor::Events::deleteLevel;
 event::EventT<void (int, std::string)> editor::Events::changeLevelName;
 event::EventT<void (double)> editor::Events::changeZoom;
+
+event::EventT<void ()> editor::Events::save;
+event::EventT<void ()> editor::Events::discard;
+event::EventT<void ()> editor::Events::done;
+event::EventT<void ()> editor::Events::exit;

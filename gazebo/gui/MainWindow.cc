@@ -419,16 +419,20 @@ void MainWindow::OnEditBuilding()
     this->renderWidget->ShowEditor(true);
     this->tabWidget->hide();
     this->buildingEditorTabWidget->show();
-    g_resetModelsAct->setEnabled(false);
-    g_resetWorldAct->setEnabled(false);
+    this->menuBar->hide();
+    this->editorMenuBar->show();
+//    this->menuLayout->insertWidget(0, this->editorMenuBar);
   }
   else
   {
     this->renderWidget->ShowEditor(false);
     this->tabWidget->show();
     this->buildingEditorTabWidget->hide();
-    g_resetModelsAct->setEnabled(true);
-    g_resetWorldAct->setEnabled(true);
+//    this->menuLayout->removeWidget(this->editorMenuBar);
+    this->editorMenuBar->hide();
+    this->menuBar->show();
+//    this->menuLayout->insertWidget(0, this->menuBar);
+//    this->menuBar->setEnabled(true);
     this->Play();
   }
 }
@@ -622,6 +626,30 @@ void MainWindow::FPS()
 void MainWindow::Orbit()
 {
   gui::Events::orbit();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::EditorSave()
+{
+  gui::editor::Events::save();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::EditorDiscard()
+{
+  gui::editor::Events::discard();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::EditorDone()
+{
+  gui::editor::Events::done();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::EditorExit()
+{
+  gui::editor::Events::exit();
 }
 
 /////////////////////////////////////////////////
@@ -837,22 +865,50 @@ void MainWindow::CreateActions()
   g_orbitAct = new QAction(tr("Orbit View Control"), this);
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
+
+  g_editorSaveAct = new QAction(tr("&Save (As)"), this);
+  g_editorSaveAct->setStatusTip(tr("Save (As)"));
+  g_editorSaveAct->setShortcut(tr("Ctrl+S"));
+  g_editorSaveAct->setCheckable(false);
+  connect(g_editorSaveAct, SIGNAL(triggered()), this,
+          SLOT(EditorSave()));
+
+  g_editorDiscardAct = new QAction(tr("&Discard"), this);
+  g_editorDiscardAct->setStatusTip(tr("Discard"));
+  g_editorDiscardAct->setShortcut(tr("Ctrl+D"));
+  g_editorDiscardAct->setCheckable(false);
+  connect(g_editorDiscardAct, SIGNAL(triggered()), this,
+          SLOT(EditorDiscard()));
+
+  g_editorDoneAct = new QAction(tr("Don&e"), this);
+  g_editorDoneAct->setShortcut(tr("Ctrl+E"));
+  g_editorDoneAct->setStatusTip(tr("Done"));
+  g_editorDoneAct->setCheckable(false);
+  connect(g_editorDoneAct, SIGNAL(triggered()), this,
+          SLOT(EditorDone()));
+
+  g_editorExitAct = new QAction(tr("E&xit Building Editor"), this);
+  g_editorExitAct->setStatusTip(tr("Exit Building Editor"));
+  g_editorExitAct->setShortcut(tr("Ctrl+X"));
+  g_editorExitAct->setCheckable(false);
+  connect(g_editorExitAct, SIGNAL(triggered()), this,
+          SLOT(EditorExit()));
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateMenus()
 {
-  QHBoxLayout *menuLayout = new QHBoxLayout;
+  this->menuLayout = new QHBoxLayout;
 
   QFrame *frame = new QFrame;
   this->menuBar =  new QMenuBar;
   this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-  menuLayout->addWidget(this->menuBar);
-  menuLayout->addStretch(5);
-  menuLayout->setContentsMargins(0, 0, 0, 0);
+  this->menuLayout->addWidget(this->menuBar);
+  this->menuLayout->addStretch(5);
+  this->menuLayout->setContentsMargins(0, 0, 0, 0);
 
-  frame->setLayout(menuLayout);
+  frame->setLayout(this->menuLayout);
   frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
   this->setMenuWidget(frame);
@@ -895,6 +951,18 @@ void MainWindow::CreateMenus()
 
   QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
   helpMenu->addAction(g_aboutAct);
+
+  this->editorMenuBar = new QMenuBar;
+  this->editorMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->menuLayout->insertWidget(0, this->editorMenuBar);
+  this->editorMenuBar->hide();
+
+  QMenu *editorFileMenu = this->editorMenuBar->addMenu(tr("&File"));
+  editorFileMenu->addAction(g_editorSaveAct);
+  editorFileMenu->addAction(g_editorDiscardAct);
+  editorFileMenu->addAction(g_editorDoneAct);
+  editorFileMenu->addAction(g_editorExitAct);
+
 }
 
 /////////////////////////////////////////////////
@@ -1115,6 +1183,7 @@ void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
 void MainWindow::OnFinishModel()
 {
   g_editBuildingAct->setChecked(!g_editBuildingAct->isChecked());
+//  g_editBuildingAct->toggle();
   this->OnEditBuilding();
 }
 

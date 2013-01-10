@@ -132,6 +132,14 @@ namespace gazebo
       private: void SubdivideRectSurface(const QRectF &_surface,
         const std::vector<QRectF> &_holes, std::vector<QRectF> &_subdivisions);
 
+      private: void OnSave();
+
+      private: void OnDiscard();
+
+      private: void OnDone();
+
+      private: void OnExit();
+
       public: static double conversionScale;
 
       private: std::map<std::string, ModelManip *> allItems;
@@ -157,6 +165,12 @@ namespace gazebo
       private: int stairsCounter;
 
       private: int floorCounter;
+
+      private: bool saved;
+
+      private: std::string saveLocation;
+
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

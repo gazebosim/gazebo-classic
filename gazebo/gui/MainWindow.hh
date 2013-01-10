@@ -91,6 +91,11 @@ namespace gazebo
       private slots: void SetTransparent();
       private slots: void OnEditBuilding();
 
+      private slots: void EditorSave();
+      private slots: void EditorDiscard();
+      private slots: void EditorDone();
+      private slots: void EditorExit();
+
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
 
@@ -142,6 +147,8 @@ namespace gazebo
       private: QTabWidget *tabWidget;
       private: QTabWidget *buildingEditorTabWidget;
       private: QMenuBar *menuBar;
+      private: QMenuBar *editorMenuBar;
+      private: QHBoxLayout *menuLayout;
 
       /// \brief The filename set via "Save As". This filename is used by
       /// the "Save" feature.

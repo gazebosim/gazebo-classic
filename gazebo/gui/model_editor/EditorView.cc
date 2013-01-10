@@ -48,13 +48,13 @@ EditorView::EditorView(QWidget *_parent)
   gui::editor::Events::ConnectCreateEditorItem(
     boost::bind(&EditorView::OnCreateEditorItem, this, _1)));
 
-  this->connections.push_back(
+/*  this->connections.push_back(
   gui::editor::Events::ConnectSaveModel(
-    boost::bind(&EditorView::OnSaveModel, this, _1, _2)));
+    boost::bind(&EditorView::OnSaveModel, this, _1, _2)));*/
 
-  this->connections.push_back(
-  gui::editor::Events::ConnectFinishModel(
-    boost::bind(&EditorView::OnFinishModel, this)));
+/*  this->connections.push_back(
+  gui::editor::Events::ConnectDone(
+    boost::bind(&EditorView::OnDone, this)));*/
 
   this->connections.push_back(
   gui::editor::Events::ConnectDiscardModel(
@@ -719,9 +719,9 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
   if (this->drawMode == WALL)
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 
-  this->grabKeyboard();
+//  this->grabKeyboard();
 }
-
+/*
 /////////////////////////////////////////////////
 void EditorView::OnSaveModel(const std::string &_modelName,
     const std::string &_savePath)
@@ -729,14 +729,15 @@ void EditorView::OnSaveModel(const std::string &_modelName,
   this->buildingMaker->SetModelName(_modelName);
   this->buildingMaker->GenerateSDF();
   this->buildingMaker->SaveToSDF(_savePath);
-}
+}*/
 
-/////////////////////////////////////////////////
-void EditorView::OnFinishModel()
+/*/////////////////////////////////////////////////
+void EditorView::OnDone()
 {
-  this->buildingMaker->FinishModel();
-  gui::editor::Events::discardModel();
-}
+//  this->buildingMaker->FinishModel();
+  this->OnDiscardModel();
+//  gui::editor::Events::discardModel();
+}*/
 
 /////////////////////////////////////////////////
 void EditorView::OnDiscardModel()

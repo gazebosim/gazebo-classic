@@ -19,6 +19,7 @@
 #define _BUILDING_EDITOR_PALETTE_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/common/Events.hh"
 
 namespace gazebo
 {
@@ -58,6 +59,13 @@ namespace gazebo
       /// \brief On done callback.
       private slots: void OnDone();
 
+      /// \brief On save model event.
+      private: void OnSaveModel(std::string _saveName,
+          std::string _saveLocation);
+
+      /// \brief On discard model event.
+      private: void OnDiscardModel();
+
       private: QLabel *modelNameLabel;
 
       private: QPushButton *saveButton;
@@ -66,7 +74,7 @@ namespace gazebo
 
       private: std::string saveLocation;
 
-      private: bool saved;
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

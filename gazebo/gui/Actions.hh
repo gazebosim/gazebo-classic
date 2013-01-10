@@ -69,6 +69,11 @@ namespace gazebo
 
     extern QAction *g_topicVisAct;
 
+    extern QAction *g_editorSaveAct;
+    extern QAction *g_editorDiscardAct;
+    extern QAction *g_editorDoneAct;
+    extern QAction *g_editorExitAct;
+
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
     class DeleteAction : public QAction

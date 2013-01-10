@@ -16,7 +16,6 @@
 */
 
 #include "gazebo/gui/model_editor/BuildingEditorPalette.hh"
-#include "gazebo/gui/model_editor/FinishModelDialog.hh"
 #include "gazebo/gui/model_editor/EditorEvents.hh"
 
 using namespace gazebo;
@@ -29,8 +28,6 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->setObjectName("buildingEditorPalette");
 
   this->modelName = "MyNamedModel";
-  this->saveLocation = QDir::homePath().toStdString();
-  this->saved = false;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
@@ -186,7 +183,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
       << "<br>Double-click to stop drawing.</br></p>"
       << "<p>Add Window/Doorway: Click/release in Palette, "
       << "click/release again in 2D View to place the object.<p>"
-      << "<p>Double-click an object to open an Inspector with configuration"
+      << "<p>Double-click an object to open an Inspector with configuration "
       << "options.</p>"
       << "<p>Note: Currently, windows & doors are simple holes in the wall.</p>"
       << "<p>Note: Because Gazebo only supports simple primitive shapes, "
@@ -200,6 +197,16 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   mainLayout->addWidget(tipsLabel);
 
   this->setLayout(mainLayout);
+
+
+  this->connections.push_back(
+      gui::editor::Events::ConnectSaveModel(
+      boost::bind(&BuildingEditorPalette::OnSaveModel, this, _1, _2)));
+
+  this->connections.push_back(
+      gui::editor::Events::ConnectSaveModel(
+      boost::bind(&BuildingEditorPalette::OnDiscardModel, this)));
+
 //  this->layout()->setContentsMargins(0, 0, 0, 0);
 }
 
@@ -243,68 +250,32 @@ void BuildingEditorPalette::OnAddStairs()
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnDiscard()
 {
-  int ret = QMessageBox::warning(this, tr("Discard"),
-      tr("Are you sure you want to discard\n"
-      "your model? All of your work will\n"
-      "be lost."),
-      QMessageBox::Discard | QMessageBox::Cancel,
-      QMessageBox::Cancel);
-
-  switch (ret)
-  {
-    case QMessageBox::Discard:
-      gui::editor::Events::discardModel();
-      this->saveButton->setText("&Save As");
-      this->modelName = "MyNamedModel";
-      this->saveLocation = QDir::homePath().toStdString();
-      this->modelNameLabel->setText(tr(this->modelName.c_str()));
-      this->saved = false;
-      break;
-    case QMessageBox::Cancel:
-    // Do nothing
-    break;
-    default:
-    break;
-  }
-
+  gui::editor::Events::discard();
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnSave()
 {
-  if (this->saved)
-  {
-    gui::editor::Events::saveModel(this->modelName, this->saveLocation);
-  }
-  else
-  {
-    FinishModelDialog dialog(FinishModelDialog::MODEL_SAVE, this);
-    dialog.SetModelName(this->modelName);
-    dialog.SetSaveLocation(this->saveLocation);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-      this->modelName = dialog.GetModelName();
-      this->saveLocation = dialog.GetSaveLocation();
-      gui::editor::Events::saveModel(this->modelName, this->saveLocation);
-      this->saveButton->setText("Save");
-      this->modelNameLabel->setText(tr(this->modelName.c_str()));
-      this->saved = true;
-    }
-  }
+  gui::editor::Events::save();
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnDone()
 {
-  FinishModelDialog dialog(FinishModelDialog::MODEL_FINISH, this);
-  dialog.SetModelName(this->modelName);
-  dialog.SetSaveLocation(this->saveLocation);
-  if (dialog.exec() == QDialog::Accepted)
-  {
-    this->modelName = dialog.GetModelName();
-    this->saveLocation = dialog.GetSaveLocation();
-    this->modelNameLabel->setText(tr(this->modelName.c_str()));
-    gui::editor::Events::saveModel(this->modelName, this->saveLocation);
-    gui::editor::Events::finishModel();
-  }
+  gui::editor::Events::done();
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnDiscardModel()
+{
+  this->saveButton->setText("&Save As");
+  this->modelNameLabel->setText("MyNamedModel");
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnSaveModel(std::string _saveName,
+    std::string /*_saveLocation*/)
+{
+  this->saveButton->setText("Save");
+  this->modelNameLabel->setText(tr(_saveName.c_str()));
 }

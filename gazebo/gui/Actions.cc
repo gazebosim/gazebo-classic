@@ -33,6 +33,11 @@ QAction *gazebo::gui::g_resetModelsAct = 0;
 QAction *gazebo::gui::g_resetWorldAct = 0;
 QAction *gazebo::gui::g_editBuildingAct = 0;
 
+QAction *gazebo::gui::g_editorSaveAct = 0;
+QAction *gazebo::gui::g_editorDiscardAct = 0;
+QAction *gazebo::gui::g_editorDoneAct = 0;
+QAction *gazebo::gui::g_editorExitAct = 0;
+
 QAction *gazebo::gui::g_playAct = 0;
 QAction *gazebo::gui::g_pauseAct = 0;
 QAction *gazebo::gui::g_stepAct = 0;

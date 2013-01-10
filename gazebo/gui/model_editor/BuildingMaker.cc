@@ -42,6 +42,7 @@
   #include "gazebo/common/MeshCSG.hh"
 #endif
 
+#include "gazebo/gui/model_editor/FinishModelDialog.hh"
 #include "gazebo/gui/model_editor/EditorEvents.hh"
 #include "gazebo/gui/model_editor/BuildingMaker.hh"
 #include "gazebo/gui/model_editor/ModelManip.hh"
@@ -71,6 +72,19 @@ double BuildingMaker::conversionScale;
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
+
+  this->connections.push_back(
+  gui::editor::Events::ConnectSave(
+    boost::bind(&BuildingMaker::OnSave, this)));
+  this->connections.push_back(
+  gui::editor::Events::ConnectDiscard(
+    boost::bind(&BuildingMaker::OnDiscard, this)));
+  this->connections.push_back(
+  gui::editor::Events::ConnectDone(
+    boost::bind(&BuildingMaker::OnDone, this)));
+  this->connections.push_back(
+  gui::editor::Events::ConnectExit(
+    boost::bind(&BuildingMaker::OnExit, this)));
 
   this->Reset();
 }
@@ -420,7 +434,9 @@ void BuildingMaker::Reset()
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
   if (this->modelVisual)
     scene->RemoveVisual(this->modelVisual);
-  this->modelName = this->node->GetTopicNamespace() + "::" + "building";
+  this->saved = false;
+  this->saveLocation = QDir::homePath().toStdString();
+  this->modelName = "MyNamedModel";
   this->modelVisual.reset(new rendering::Visual(this->modelName,
       scene->GetWorldVisual()));
   this->modelVisual->Load();
@@ -1200,4 +1216,112 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
     filledY.insert(block);
     _subdivisions.push_back(block);
   }
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnDiscard()
+{
+  int ret = QMessageBox::warning(0, QString("Discard"),
+      QString("Are you sure you want to discard\n"
+      "your model? All of your work will\n"
+      "be lost."),
+      QMessageBox::Discard | QMessageBox::Cancel,
+      QMessageBox::Cancel);
+
+  switch (ret)
+  {
+    case QMessageBox::Discard:
+      gui::editor::Events::discardModel();
+//      this->saveButton->setText("&Save As");
+      this->modelName = "MyNamedModel";
+      this->saveLocation = QDir::homePath().toStdString();
+//      this->modelNameLabel->setText(tr(this->modelName.c_str()));
+      this->saved = false;
+      break;
+    case QMessageBox::Cancel:
+    // Do nothing
+    break;
+    default:
+    break;
+  }
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnSave()
+{
+  if (this->saved)
+  {
+    this->SetModelName(this->modelName);
+    this->GenerateSDF();
+    this->SaveToSDF(this->saveLocation);
+  }
+  else
+  {
+    FinishModelDialog dialog(FinishModelDialog::MODEL_SAVE, 0);
+    dialog.SetModelName(this->modelName);
+    dialog.SetSaveLocation(this->saveLocation);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+      this->modelName = dialog.GetModelName();
+      this->saveLocation = dialog.GetSaveLocation();
+      this->SetModelName(this->modelName);
+      this->GenerateSDF();
+      this->SaveToSDF(this->saveLocation);
+      this->saved = true;
+    }
+  }
+  gui::editor::Events::saveModel(this->modelName, this->saveLocation);
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnDone()
+{
+  FinishModelDialog dialog(FinishModelDialog::MODEL_FINISH, 0);
+  dialog.SetModelName(this->modelName);
+  dialog.SetSaveLocation(this->saveLocation);
+  if (dialog.exec() == QDialog::Accepted)
+  {
+    this->modelName = dialog.GetModelName();
+    this->saveLocation = dialog.GetSaveLocation();
+    this->SetModelName(this->modelName);
+    this->GenerateSDF();
+    this->SaveToSDF(this->saveLocation);
+    this->FinishModel();
+    gui::editor::Events::discardModel();
+    gui::editor::Events::finishModel();
+  }
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnExit()
+{
+  int ret = QMessageBox::warning(0, QString("Exit"),
+      QString("Save Changes before exiting? If you do not\n"
+      "save, all of your work will be lost!\n\n"
+      "Note: Building Editor state is not maintained\n"
+      "between Gazebo sessions. Once you quit\n"
+      "Gazebo, your building will no longer be editable.\n\n"),
+//      "If you are done editing your model, select Done\n"),
+      QMessageBox::Discard | QMessageBox::Cancel | QMessageBox::Save,
+      QMessageBox::Save);
+
+  switch (ret)
+  {
+    case QMessageBox::Discard:
+      gui::editor::Events::discardModel();
+      this->modelName = "MyNamedModel";
+      this->saveLocation = QDir::homePath().toStdString();
+      this->saved = false;
+      gui::editor::Events::finishModel();
+      break;
+    case QMessageBox::Cancel:
+      break;
+    case QMessageBox::Save:
+      this->OnSave();
+      gui::editor::Events::finishModel();
+      break;
+    default:
+      break;
+  }
+
 }
