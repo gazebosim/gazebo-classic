@@ -33,6 +33,7 @@ BulletUniversalJoint::BulletUniversalJoint(btDynamicsWorld *_world,
   BasePtr _parent) : UniversalJoint<BulletJoint>(_parent)
 {
   this->world = _world;
+  this->btUniversal = NULL;
 }
 
 //////////////////////////////////////////////////

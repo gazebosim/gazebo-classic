@@ -35,6 +35,7 @@ BulletSliderJoint::BulletSliderJoint(btDynamicsWorld *_world, BasePtr _parent)
     : SliderJoint<BulletJoint>(_parent)
 {
   this->world = _world;
+  this->btSlider = NULL;
 }
 
 //////////////////////////////////////////////////

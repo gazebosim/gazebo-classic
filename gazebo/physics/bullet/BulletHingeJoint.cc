@@ -33,6 +33,7 @@ BulletHingeJoint::BulletHingeJoint(btDynamicsWorld *_world, BasePtr _parent)
     : HingeJoint<BulletJoint>(_parent)
 {
   this->world = _world;
+  this->btHinge = NULL;
 }
 
 //////////////////////////////////////////////////

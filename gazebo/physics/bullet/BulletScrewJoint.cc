@@ -35,6 +35,7 @@ BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world, BasePtr _parent)
     : ScrewJoint<BulletJoint>(_parent)
 {
   this->world = _world;
+  this->btScrew = NULL;
 }
 
 //////////////////////////////////////////////////

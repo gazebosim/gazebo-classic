@@ -34,6 +34,7 @@ BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent)
     : BallJoint<BulletJoint>(_parent)
 {
   this->world = _world;
+  this->btBall = NULL;
 }
 
 //////////////////////////////////////////////////
