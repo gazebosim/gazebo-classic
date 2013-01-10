@@ -19,6 +19,8 @@
 #include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/BuildingItem.hh"
 #include "gazebo/gui/model_editor/BuildingMaker.hh"
+#include "gazebo/gui/model_editor/WallItem.hh"
+#include "gazebo/gui/model_editor/LineSegmentItem.hh"
 #include "gazebo/gui/model_editor/FloorItem.hh"
 
 using namespace gazebo;
@@ -40,23 +42,21 @@ FloorItem::FloorItem(): RectItem(), BuildingItem()
   this->floorPos = this->scenePos();
 
   this->setFlag(QGraphicsItem::ItemIsSelectable, false);
-//  this->setVisible(false);
+  this->wallGroup = new QGraphicsItemGroup();
+  this->dirty = false;
+
+  QTimer *timer = new QTimer(this);
+  connect(timer, SIGNAL(timeout()), this, SLOT(RecalculateBoundingBox()));
+  timer->start(300);
 }
 
 /////////////////////////////////////////////////
 FloorItem::~FloorItem()
 {
+  if (this->wallGroup)
+    delete this->wallGroup;
 }
 
-/////////////////////////////////////////////////
-/*void FloorItem::SetSize(QVector3D _size)
-{
-  this->floorWidth = _size.x();
-  this->floorDepth = _size.y();
-  this->floorHeight = _size.z();
-  this->SetSize(QSize(this->floorWidth, this->floorDepth));
-  this->FloorChanged();
-}*/
 
 /////////////////////////////////////////////////
 QVector3D FloorItem::GetSize() const
@@ -67,7 +67,8 @@ QVector3D FloorItem::GetSize() const
 /////////////////////////////////////////////////
 QVector3D FloorItem::GetScenePosition() const
 {
-  return QVector3D(this->floorPos.x(), this->floorPos.y(), 0);
+  return QVector3D(this->floorPos.x(), this->floorPos.y(),
+      this->levelBaseHeight);
 }
 
 /////////////////////////////////////////////////
@@ -75,6 +76,86 @@ double FloorItem::GetSceneRotation() const
 {
   return 0;
 }
+
+/////////////////////////////////////////////////
+void FloorItem::AttachWall(WallItem *_wallItem)
+{
+  if (this->floorBoundingRect.isEmpty())
+    this->floorBoundingRect = _wallItem->mapToScene(_wallItem->boundingRect());
+  else this->floorBoundingRect = this->floorBoundingRect.united(
+      _wallItem->mapToScene(_wallItem->boundingRect()));
+  this->walls.push_back(_wallItem);
+
+  for (unsigned int i = 0; i < _wallItem->GetSegmentCount(); ++i)
+  {
+    LineSegmentItem *segment = _wallItem->GetSegment(i);
+    connect(segment, SIGNAL(widthChanged(double)), this,
+        SLOT(NotifyChange()));
+    connect(segment, SIGNAL(depthChanged(double)), this,
+        SLOT(NotifyChange()));
+    connect(segment, SIGNAL(posXChanged(double)), this,
+        SLOT(NotifyChange()));
+    connect(segment, SIGNAL(posYChanged(double)), this,
+        SLOT(NotifyChange()));
+  }
+  connect(_wallItem, SIGNAL(itemDeleted()), this,
+      SLOT(WallDeleted()));
+  this->Update();
+}
+
+/////////////////////////////////////////////////
+void FloorItem:: WallDeleted()
+{
+  EditorItem *wallItem = dynamic_cast<EditorItem *>(QObject::sender());
+  if (wallItem)
+  {
+    this->walls.erase(std::remove(this->walls.begin(), this->walls.end(),
+      wallItem), this->walls.end());
+  }
+  this->dirty = true;
+}
+
+/////////////////////////////////////////////////
+void FloorItem:: NotifyChange()
+{
+  this->dirty = true;
+}
+
+/////////////////////////////////////////////////
+void FloorItem::RecalculateBoundingBox()
+{
+  if ((this->walls.size() == 0) || !this->dirty)
+    return;
+
+  WallItem *wallItem = this->walls[0];
+  this->floorBoundingRect = wallItem->mapToScene(
+      wallItem->boundingRect());
+  for (unsigned int i = 1; i < this->walls.size(); ++i)
+  {
+    this->floorBoundingRect = this->floorBoundingRect.united(
+        this->walls[i]->mapToScene(this->walls[i]->boundingRect()));
+  }
+  this->Update();
+  this->dirty = false;
+}
+
+/////////////////////////////////////////////////
+void FloorItem::Update()
+{
+  QRectF allWallBound = this->floorBoundingRect.boundingRect();
+  this->floorWidth = allWallBound.width();
+  this->floorDepth = allWallBound.height();
+
+  this->floorPos = QPointF(allWallBound.x()  + allWallBound.width()/2,
+      allWallBound.y()+allWallBound.height()/2);
+
+  this->drawingWidth = this->floorWidth;
+  this->drawingHeight = this->floorDepth;
+  this->setPos(this->floorPos);
+
+  this->FloorChanged();
+}
+
 
 /////////////////////////////////////////////////
 void FloorItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)

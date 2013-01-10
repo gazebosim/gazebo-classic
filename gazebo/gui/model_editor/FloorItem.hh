@@ -19,6 +19,9 @@
 #define _FLOOR_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/model_editor/RectItem.hh"
+#include "gazebo/gui/model_editor/BuildingItem.hh"
+
 
 namespace gazebo
 {
@@ -26,8 +29,12 @@ namespace gazebo
   {
     class BuildingItem;
 
+    class WallItem;
+
     class FloorItem : public RectItem, public BuildingItem
     {
+        Q_OBJECT
+
         public: FloorItem();
 
         public: ~FloorItem();
@@ -38,6 +45,8 @@ namespace gazebo
 
         public: virtual double GetSceneRotation() const;
 
+        public: void AttachWall(WallItem *_wallItem);
+
         private: virtual void paint (QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
@@ -45,6 +54,14 @@ namespace gazebo
 
         private: virtual void contextMenuEvent(
             QGraphicsSceneContextMenuEvent *_event);
+
+        private slots: void NotifyChange();
+
+        private slots: void RecalculateBoundingBox();
+
+        private slots: void WallDeleted();
+
+        private: void Update();
 
         private: void FloorChanged();
 
@@ -58,7 +75,15 @@ namespace gazebo
 
         private: QPointF floorPos;
 
+        private: bool dirty;
+
         private: double scale;
+
+        private: std::vector<WallItem *> walls;
+
+        private: QGraphicsItemGroup *wallGroup;
+
+        private: QPolygonF floorBoundingRect;
     };
   }
 }

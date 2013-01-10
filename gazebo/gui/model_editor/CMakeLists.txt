@@ -47,6 +47,7 @@ set (qt_headers
   WallItem.hh
   DoorItem.hh
   WindowItem.hh
+  FloorItem.hh
   EditorView.hh
 )
 
@@ -57,7 +58,6 @@ set (headers
   GrabberHandle.hh
   RotateHandle.hh
   BuildingItem.hh
-  FloorItem.hh
   LineSegmentItem.hh
   GridLines.hh
   PolylineItem.hh

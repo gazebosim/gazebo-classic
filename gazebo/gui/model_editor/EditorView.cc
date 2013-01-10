@@ -77,8 +77,6 @@ EditorView::EditorView(QWidget *_parent)
   newLevel->level = 0;
   newLevel->name = "Level 1";
   this->levels.push_back(newLevel);
-//  this->levelHeights[0] = 0;
-//  this->levelNames[0] = "Level 1";
 
   this->levelInspector = new LevelInspectorDialog();
   this->levelInspector->setModal(false);
@@ -447,6 +445,9 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
     wallList.push_back(wallItem);
 //    this->buildingMaker->RemoveWall(this->lastWallSegmentName);
     this->lastWallSegmentName = "";
+    if (wallItem->GetLevel() > 0)
+      floorList[wallItem->GetLevel()-1]->AttachWall(wallItem);
+
     this->currentMouseItem = NULL;
     this->drawMode = NONE;
     this->drawInProgress = false;
@@ -468,8 +469,6 @@ void EditorView::DeleteItem(EditorItem *_item)
 {
   if (!_item)
     return;
-
-  QGraphicsItem *qItem = qobject_cast<QGraphicsItem *>(_item);
 
   if (_item->GetType() == "Wall")
   {
@@ -499,13 +498,15 @@ void EditorView::DeleteItem(EditorItem *_item)
 
   if (_item->GetType() == "Line")
   {
+    QGraphicsItem *qItem = dynamic_cast<QGraphicsItem *>(_item);
     QGraphicsItem *itemParent = qItem->parentItem();
     wallList.erase(std::remove(wallList.begin(), wallList.end(),
         dynamic_cast<WallItem *>(itemParent)), wallList.end());
     this->itemToModelMap.erase(_item);
-    delete itemParent;
+    delete dynamic_cast<WallItem *>(itemParent);
   }
-  else {
+  else
+  {
     this->itemToModelMap.erase(_item);
     delete _item;
   }
@@ -526,8 +527,6 @@ void EditorView::DrawWall(const QPoint &_pos)
     this->scene()->addItem(wallItem);
     this->currentMouseItem = wallItem;
     this->drawInProgress = true;
-
-    lastLineCornerPos = _pos;
   }
   else
   {
@@ -697,7 +696,7 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
   if (this->drawMode == WALL)
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 
-//  this->grabKeyboard();
+  this->grabKeyboard();
 }
 
 /////////////////////////////////////////////////
@@ -787,7 +786,7 @@ void EditorView::OnAddLevel()
   }
   newlevel->height = maxHeight;
 
-  QPolygonF wallBound;
+  FloorItem *floorItem = new FloorItem();
   std::vector<WallItem *> newWalls;
   for (std::vector<WallItem *>::iterator it = wallList.begin();
       it  != this->wallList.end(); ++it)
@@ -806,35 +805,23 @@ void EditorView::OnAddLevel()
       QVector3D segmentSize = segment->GetSize();
       segmentSize.setZ(wallItem->GetHeight());
       QVector3D segmentPosition = segment->GetScenePosition();
-      segmentPosition.setZ(wallItem->GetLevelBaseHeight() + segmentPosition.z());
+      segmentPosition.setZ(wallItem->GetLevelBaseHeight()
+          + segmentPosition.z());
       std::string wallSegmentName = this->buildingMaker->AddWall(
           segmentSize, segmentPosition, segment->GetSceneRotation());
-
       this->buildingMaker->ConnectItem(wallSegmentName, segment);
       this->buildingMaker->ConnectItem(wallSegmentName, wallItem);
       this->itemToModelMap[segment] = wallSegmentName;
     }
-    if (wallBound.isEmpty())
-      wallBound = wallItem->mapToScene(wallItem->boundingRect());
-    else wallBound.united(wallItem->mapToScene(wallItem->boundingRect()));
+    floorItem->AttachWall(wallItem);
   }
   this->wallList.insert(this->wallList.end(), newWalls.begin(),
       newWalls.end());
 
-  // FIXME: hack to at least get some floors going
-  QRectF allWallBound = wallBound.boundingRect();
-  QVector3D floorSize(allWallBound.width(), allWallBound.height(), 10);
-  QVector3D floorPosition(allWallBound.x() + allWallBound.width()/2,
-      allWallBound.y()+allWallBound.height()/2,
-      this->levels[this->currentLevel]->height);
-
-  FloorItem *floorItem = new FloorItem();
   floorItem->SetLevel(this->currentLevel);
   floorItem->SetLevelBaseHeight(this->levels[this->currentLevel]->height);
-  floorItem->setPos(floorPosition.x(), floorPosition.y());
-  floorItem->SetSize(QSize(floorSize.x(), floorSize.y()));
   std::string floorName = this->buildingMaker->AddFloor(
-      floorSize, floorPosition, 0);
+      floorItem->GetSize(), floorItem->GetScenePosition(), 0);
   for (std::vector<StairsItem *>::iterator it = this->stairsList.begin();
       it != this->stairsList.end(); ++it)
   {
@@ -1004,12 +991,23 @@ void EditorView::CancelDrawMode()
       {
         WallItem* wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
         wallItem->PopEndPoint();
-        wallList.push_back(wallItem);
-        //this->buildingMaker->RemoveWall(this->lastWallSegmentName);
-        this->lastWallSegmentName = "";
+        if (wallItem->GetVertexCount() >= 2)
+        {
+          wallList.push_back(wallItem);
+          //this->buildingMaker->RemoveWall(this->lastWallSegmentName);
+          this->lastWallSegmentName = "";
+          if (wallItem->GetLevel() > 0)
+            floorList[wallItem->GetLevel()-1]->AttachWall(wallItem);
+        }
+        else
+        {
+          this->scene()->removeItem(this->currentMouseItem);
+          delete wallItem;
+        }
       }
       else
       {
+        this->scene()->removeItem(this->currentMouseItem);
         delete this->currentMouseItem;
       }
     }

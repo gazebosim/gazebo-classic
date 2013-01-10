@@ -135,8 +135,6 @@ namespace gazebo
 
       private: std::map<EditorItem *, std::string> itemToModelMap;
 
-      private: QPoint lastLineCornerPos;
-
       private: std::vector<event::ConnectionPtr> connections;
 
       private: QGraphicsItem *currentMouseItem;

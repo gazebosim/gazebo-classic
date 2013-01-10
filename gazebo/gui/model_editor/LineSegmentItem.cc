@@ -115,36 +115,52 @@ double LineSegmentItem::GetMouseDownY() const
 /////////////////////////////////////////////////
 void LineSegmentItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 {
-  _event->setAccepted(false);
+  _event->setAccepted(true);
 }
 
 /////////////////////////////////////////////////
 void LineSegmentItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
-  _event->setAccepted(false);
+
+  _event->setAccepted(true);
 }
 
 /////////////////////////////////////////////////
 void LineSegmentItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 {
-  _event->setAccepted(false);
+  _event->setAccepted(true);
 }
 
 /////////////////////////////////////////////////
-void LineSegmentItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
+void LineSegmentItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
 {
+  if (!this->isSelected())
+  {
+    _event->ignore();
+    return;
+  }
   QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
 }
 
 /////////////////////////////////////////////////
-void LineSegmentItem::hoverMoveEvent(QGraphicsSceneHoverEvent *)
+void LineSegmentItem::hoverMoveEvent(QGraphicsSceneHoverEvent *_event)
 {
+  if (!this->isSelected())
+  {
+    _event->ignore();
+    return;
+  }
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
 }
 
 /////////////////////////////////////////////////
-void LineSegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
+void LineSegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 {
+  if (!this->isSelected())
+  {
+    _event->ignore();
+    return;
+  }
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
 }
 
