@@ -39,7 +39,6 @@ BulletLink::BulletLink(EntityPtr _parent)
 {
   this->rigidLink = NULL;
   this->compoundShape = new btCompoundShape();
-  this->motionState = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -73,8 +72,8 @@ void BulletLink::Init()
   math::Vector3 cogVec = this->inertial->GetCoG();
 
   // Set the initial pose of the body
-  this->motionState = new BulletMotionState(
-    boost::shared_dynamic_cast<Link>(shared_from_this()));
+  this->motionState.reset(new BulletMotionState(
+    boost::shared_dynamic_cast<Link>(shared_from_this())));
   this->motionState->SetWorldPose(this->GetWorldPose());
   this->motionState->SetCoG(cogVec);
 
@@ -99,7 +98,8 @@ void BulletLink::Init()
 
   // Create a construction info object
   btRigidBody::btRigidBodyConstructionInfo
-    rigidLinkCI(btMass, this->motionState, this->compoundShape, fallInertia);
+    rigidLinkCI(btMass, this->motionState.get(), this->compoundShape,
+    fallInertia);
 
   rigidLinkCI.m_linearDamping = this->GetLinearDamping();
   rigidLinkCI.m_angularDamping = this->GetAngularDamping();

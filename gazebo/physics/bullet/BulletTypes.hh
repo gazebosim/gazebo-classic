@@ -36,11 +36,13 @@ namespace gazebo
     class BulletLink;
     class BulletPhysics;
     class BulletRayShape;
+    class BulletMotionState;
 
     typedef boost::shared_ptr<BulletPhysics> BulletPhysicsPtr;
     typedef boost::shared_ptr<BulletCollision> BulletCollisionPtr;
     typedef boost::shared_ptr<BulletLink> BulletLinkPtr;
     typedef boost::shared_ptr<BulletRayShape> BulletRayShapePtr;
+    typedef boost::shared_ptr<BulletMotionState> BulletMotionStatePtr;
 
     class BulletTypes {
       /// \brief Convert a bullet btVector3 to a gazebo Vector3

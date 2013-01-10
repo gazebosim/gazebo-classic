@@ -148,7 +148,7 @@ namespace gazebo
       public: virtual void SetAutoDisable(bool _disable);
 
       private: btCompoundShape *compoundShape;
-      private: BulletMotionState *motionState;
+      private: BulletMotionStatePtr motionState;
       private: btRigidBody *rigidLink;
       private: BulletPhysicsPtr bulletPhysics;
       protected: math::Pose pose;
