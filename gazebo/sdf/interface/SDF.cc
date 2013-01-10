@@ -745,7 +745,10 @@ bool Element::GetValueBool(const std::string &_key)
   bool result = false;
 
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+      this->value->Get(result);
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -758,6 +761,7 @@ bool Element::GetValueBool(const std::string &_key)
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
+
   return result;
 }
 
@@ -765,8 +769,12 @@ bool Element::GetValueBool(const std::string &_key)
 int Element::GetValueInt(const std::string &_key)
 {
   int result = 0;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+      this->value->Get(result);
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -786,8 +794,12 @@ int Element::GetValueInt(const std::string &_key)
 float Element::GetValueFloat(const std::string &_key)
 {
   float result = 0.0;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+      this->value->Get(result);
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -807,12 +819,16 @@ float Element::GetValueFloat(const std::string &_key)
 double Element::GetValueDouble(const std::string &_key)
 {
   double result = 0.0;
+
   if (_key.empty())
   {
-    if (this->value->IsStr())
-      result = boost::lexical_cast<double>(this->value->GetAsString());
-    else
-      this->value->Get(result);
+    if (this->value)
+    {
+      if (this->value->IsStr())
+        result = boost::lexical_cast<double>(this->value->GetAsString());
+      else
+        this->value->Get(result);
+    }
   }
   else
   {
@@ -835,10 +851,13 @@ unsigned int Element::GetValueUInt(const std::string &_key)
   unsigned int result = 0;
   if (_key.empty())
   {
-    if (this->value->IsStr())
-      result = boost::lexical_cast<unsigned int>(this->value->GetAsString());
-    else
-      this->value->Get(result);
+    if (this->value)
+    {
+      if (this->value->IsStr())
+        result = boost::lexical_cast<unsigned int>(this->value->GetAsString());
+      else
+        this->value->Get(result);
+    }
   }
   else
   {
@@ -859,12 +878,16 @@ unsigned int Element::GetValueUInt(const std::string &_key)
 char Element::GetValueChar(const std::string &_key)
 {
   char result = '\0';
+
   if (_key.empty())
   {
-    if (this->value->IsStr())
-      result = boost::lexical_cast<char>(this->value->GetAsString());
-    else
-      this->value->Get(result);
+    if (this->value)
+    {
+      if (this->value->IsStr())
+        result = boost::lexical_cast<char>(this->value->GetAsString());
+      else
+        this->value->Get(result);
+    }
   }
   else
   {
@@ -885,8 +908,12 @@ char Element::GetValueChar(const std::string &_key)
 std::string Element::GetValueString(const std::string &_key)
 {
   std::string result = "";
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+      this->value->Get(result);
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -906,8 +933,12 @@ std::string Element::GetValueString(const std::string &_key)
 gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
 {
   gazebo::math::Vector3 result;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+      this->value->Get(result);
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -927,8 +958,12 @@ gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
 gazebo::math::Vector2d Element::GetValueVector2d(const std::string &_key)
 {
   gazebo::math::Vector2d result;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+      this->value->Get(result);
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -948,8 +983,12 @@ gazebo::math::Vector2d Element::GetValueVector2d(const std::string &_key)
 gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
 {
   gazebo::math::Quaternion result;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+      this->value->Get(result);
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -969,8 +1008,12 @@ gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
 gazebo::math::Pose Element::GetValuePose(const std::string &_key)
 {
   gazebo::math::Pose result;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+      this->value->Get(result);
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -990,8 +1033,12 @@ gazebo::math::Pose Element::GetValuePose(const std::string &_key)
 gazebo::common::Color Element::GetValueColor(const std::string &_key)
 {
   gazebo::common::Color result;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+      this->value->Get(result);
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -1011,8 +1058,12 @@ gazebo::common::Color Element::GetValueColor(const std::string &_key)
 gazebo::common::Time Element::GetValueTime(const std::string &_key)
 {
   gazebo::common::Time result;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+      this->value->Get(result);
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
