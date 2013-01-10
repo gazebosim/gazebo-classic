@@ -22,8 +22,36 @@
 using namespace gazebo;
 class PhysicsTest : public ServerFixture
 {
+  public: void EmptyWorld(std::string _worldFile);
 };
 
+void PhysicsTest::EmptyWorld(std::string _worldFile)
+{
+  // Load an empty world
+  Load(_worldFile, true);
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  // simulate a couple seconds
+  world->StepWorld(2000);
+  double t = world->GetSimTime().Double();
+  // verify that time moves forward
+  EXPECT_GT(t, 0);
+
+  Unload();
+}
+
+TEST_F(PhysicsTest, EmptyWorldODE)
+{
+  EmptyWorld("worlds/empty.world");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, EmptyWorldBullet)
+{
+  EmptyWorld("worlds/empty_bullet.world");
+}
+#endif  // HAVE_BULLET
 
 TEST_F(PhysicsTest, State)
 {

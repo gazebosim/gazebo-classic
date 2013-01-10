@@ -20,6 +20,7 @@
 #include <boost/bind.hpp>
 #include <string>
 #include <list>
+#include <map>
 
 #include "transport/TransportTypes.hh"
 #include "transport/SubscribeOptions.hh"
@@ -105,6 +106,24 @@ namespace gazebo
     /// \param[in] _data Optional data string.
     void requestNoReply(NodePtr _node, const std::string &_request,
                         const std::string &_data = "");
+
+    /// \brief Get a list of all the topics and their message types.
+    /// \return A map where keys are message types, and values are a list
+    /// of topic names.
+    std::map<std::string, std::list<std::string> > getAdvertisedTopics();
+
+    /// \brief Get a list of all the unique advertised topic names.
+    /// \param[in] _msgType Type of message to filter the result on. If
+    /// empty, then a list of all the topics is returned.
+    /// \return A list of the advertised topics that publish messages
+    /// of the type specified by _msgType.
+    std::list<std::string> getAdvertisedTopics(const std::string &_msgType);
+
+    /// \brief Get the message typename that is published on the given topic.
+    /// \param[in] _topicName Name of the topic to query.
+    /// \return The message type, or empty string if the topic is not valid.
+    std::string getTopicMsgType(const std::string &_topicName);
+
     /// \}
   }
 }

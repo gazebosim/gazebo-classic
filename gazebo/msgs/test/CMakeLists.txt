@@ -16,6 +16,7 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
   string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
   add_executable(${BINARY_NAME} ${GTEST_SOURCE_file})
   add_dependencies(${BINARY_NAME} gtest)
+  add_dependencies(${BINARY_NAME} gtest_main)
 
   target_link_libraries(${BINARY_NAME}
     libgtest.a
