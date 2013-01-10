@@ -26,32 +26,56 @@ namespace gazebo
   {
     class GridLines : public  QGraphicsItem
     {
+      /// \brief Constructor
+      /// \param[in] _width Width of grid lines in pixels.
+      /// \param[in] _height Height of grid lines in pixels.
       public : GridLines(int _width, int _height);
 
+      /// \brief Destructor
       public : ~GridLines();
 
-      public : void HandleWindowSizeChanged(int _w, int _h);
+      /// \return Set the size of grid lines in pixels.
+      /// \param[in] _width Width of grid lines in pixels.
+      /// \param[in] _height Height of grid lines in pixels.
+      public : void SetSize(int _width, int _height);
 
+      /// \brief Get the bounding box of the grid lines
+      /// \return The bounding box of the grid lines
       private: virtual QRectF boundingRect() const;
 
+      /// \brief Qt paint function for drawing the grid lines.
+      /// \param[in] _painter Qt painter object.
+      /// \param[in] _painter Qt style options for the item.
+      /// \param[in] _painter Qt widget being painted on.
       private: virtual void paint(QPainter *_painter,
         const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
+      /// \brief Qt mouse move event
+      /// \param[in] _event Qt mouse event
       private: virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
 
-      private: virtual void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
-
+      /// \brief Qt mouse press event
+      /// \param[in] _event Qt mouse event
       private: virtual void mousePressEvent(QGraphicsSceneMouseEvent *_event);
 
+      /// \brief Qt mouse move event during drag and drop
+      /// \param[in] _event Qt mouse event
+      private: virtual void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
+
+      /// \brief Qt mouse press event
+      /// \param[in] _event Qt mouse event
       private: virtual void mousePressEvent(
           QGraphicsSceneDragDropEvent *_event);
 
+      /// \brief Width of grid lines in pixels.
       private: int width;
 
+      /// \brief height of grid lines in pixels.
       private: int height;
 
+      /// \brief Space between the lines in pixels.
       private: int space;
-          };
+    };
   }
 }
 #endif

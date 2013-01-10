@@ -21,28 +21,29 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
+WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
   QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("windowDoorInspectorDialog");
 
-  this->modelType = _type;
+  int dialogMode = _mode;
 
-  if (this->modelType == WINDOW)
-    this->modelTypeStr = "Window";
-  else if (this->modelType == DOOR)
-    this->modelTypeStr = "Door";
+  std::string dialogModeStr = "";
+  if (dialogMode == WINDOW)
+    dialogModeStr = "Window";
+  else if (dialogMode == DOOR)
+    dialogModeStr = "Door";
 
-  std::string titleStr = modelTypeStr + " Inspector";
+  std::string titleStr = dialogModeStr + " Inspector";
   this->setWindowTitle(tr(titleStr.c_str()));
 
-  std::string modelLabelStr = modelTypeStr + " Name:";
-  QLabel *modelLabel = new QLabel(tr(modelLabelStr.c_str()));
-  this->modelNameLabel = new QLabel(tr(""));
+  std::string itemLabelStr = dialogModeStr + " Name:";
+  QLabel *itemlLabel = new QLabel(tr(itemLabelStr.c_str()));
+  this->itemNameLabel = new QLabel(tr(""));
 
   QHBoxLayout *nameLayout = new QHBoxLayout;
-  nameLayout->addWidget(modelLabel);
-  nameLayout->addWidget(modelNameLabel);
+  nameLayout->addWidget(itemlLabel);
+  nameLayout->addWidget(itemNameLabel);
 
   QLabel *widthLabel = new QLabel(tr("Width: "));
 //  QLabel *depthLabel = new QLabel(tr("Depth: "));
@@ -186,7 +187,7 @@ std::string WindowDoorInspectorDialog::GetType() const
 /////////////////////////////////////////////////
 void WindowDoorInspectorDialog::SetName(const std::string &_name)
 {
-  this->modelNameLabel->setText(tr(_name.c_str()));
+  this->itemNameLabel->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////

@@ -29,8 +29,11 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Constructor
+      /// \param[in] _parent Parent QWidget.
       public: WallInspectorDialog(QWidget *_parent = 0);
 
+      /// \brief Destructor
       public: ~WallInspectorDialog();
 
       public: double GetLength() const;
@@ -59,12 +62,16 @@ namespace gazebo
 
       public: void SetMaterial(const std::string &_material);
 
+      /// \brief Qt signal emitted to indicate that changes should be applied
       Q_SIGNALS: void Applied();
 
+      /// \brief Qt callback when the Cancel button is pressed
       private slots: void OnCancel();
 
+      /// \brief Qt callback when the Apply button is pressed
       private slots: void OnApply();
 
+      /// \brief Qt callback when the Ok button is pressed
       private slots: void OnOK();
 
       private: QDoubleSpinBox *startXSpinBox;

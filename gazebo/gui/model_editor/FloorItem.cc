@@ -30,7 +30,6 @@ using namespace gui;
 FloorItem::FloorItem(): RectItem(), BuildingItem()
 {
   this->editorType = "Floor";
-  this->scale = BuildingMaker::conversionScale;
 
   this->level = 0;
   this->levelBaseHeight = 0;
@@ -42,7 +41,6 @@ FloorItem::FloorItem(): RectItem(), BuildingItem()
   this->floorPos = this->scenePos();
 
   this->setFlag(QGraphicsItem::ItemIsSelectable, false);
-  this->wallGroup = new QGraphicsItemGroup();
   this->dirty = false;
 
   QTimer *timer = new QTimer(this);
@@ -53,8 +51,6 @@ FloorItem::FloorItem(): RectItem(), BuildingItem()
 /////////////////////////////////////////////////
 FloorItem::~FloorItem()
 {
-  if (this->wallGroup)
-    delete this->wallGroup;
 }
 
 

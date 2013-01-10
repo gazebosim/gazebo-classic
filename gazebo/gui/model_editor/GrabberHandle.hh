@@ -26,80 +26,139 @@ namespace gazebo
   {
     class GrabberHandle : public QGraphicsItem
     {
+      /// \brief Constructor
+      /// \param[in] _parent Parent graphics Item
+      /// \param[in] _index Index of grabber handle
       public: GrabberHandle(QGraphicsItem *_parent = 0, int index = 0);
 
+      /// \brief Get the index of the grabber handle.
+      /// \return Index of the grabber handle.
       public: int GetIndex() const;
 
-      /// \brief Set the current mouse state
-      public: void SetMouseState(int _state);
-
-      /// \brief Retrieve the current mouse state
+      /// \brief Get the current mouse state.
+      /// \return The current mouse state.
       public: int  GetMouseState() const;
 
+      /// \brief Get the center point of the grabber handle in pixels.
+      /// \return Center point in pixels.
       public: QPointF GetCenterPoint() const;
 
-      public: void SetMouseDownX(double _x);
-
-      public: void SetMouseDownY(double _y);
-
+      /// \brief Get the X position of the mouse press in pixels.
+      /// \return Mouse press X position in pixels.
       public: double GetMouseDownX() const;
 
+      /// \brief Get the Y position of the mouse press in pixels.
+      /// \return Mouse press Y position in pixels.
       public: double GetMouseDownY() const;
 
-      public: void SetWidth(double _width);
-
-      public: void SetHeight(double _height);
-
+      /// \brief Get the width of the grabber handle.
+      /// \return The width of the grabber handle in pixels.
       public: double GetWidth() const;
 
+      /// \brief Get the Height of the grabber handle.
+      /// \return The height of the grabber handle in pixels.
       public: double GetHeight() const;
 
-      public: void SetColor(const QColor &color);
-
+      /// \brief Get the fill color of the grabber handle.
+      /// \return _color Fill color.
       public: QColor GetColor() const;
 
+      /// \brief Set the current mouse state.
+      /// \param[in] _state Current mouse state.
+      public: void SetMouseState(int _state);
+
+      /// \brief Set the X position of the mouse press in pixels.
+      /// \param[in] _x Mouse press X position in pixels.
+      public: void SetMouseDownX(double _x);
+
+      /// \brief Set the Y position of the mouse press in pixels.
+      /// \param[in] _y Mouse press Y position in pixels.
+      public: void SetMouseDownY(double _y);
+
+      /// \brief Set the width of the grabber handle in pixels.
+      /// \param[in] _width Width in pixels.
+      public: void SetWidth(double _width);
+
+      /// \brief Set the height of the grabber handle in pixels.
+      /// \param[in] _height Height in pixels.
+      public: void SetHeight(double _height);
+
+      /// \brief Set the fill color of the grabber handle.
+      /// \param[in] _color Fill Color.
+      public: void SetColor(const QColor &color);
+
+      /// \brief Set the border color of the grabber handle.
+      /// \param[in] _borderColor Border Color.
       public: void SetBorderColor(const QColor &_borderColor);
 
+      /// \brief Get the bounding box of the grabber handle.
+      /// \return The grabber handle bounding box.
       public: virtual QRectF boundingRect() const;
 
+      /// \brief Qt paint function for drawing the grabber handle.
+      /// \param[in] _painter Qt painter object.
+      /// \param[in] _painter Qt style options for the item.
+      /// \param[in] _painter Qt widget being painted on.
       private: virtual void paint(QPainter *_painter,
         const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
+      /// \brief Qt mouse hover enter event
+      /// \param[in] _event Qt mouse hover event
       protected: void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
 
+      /// \brief Qt mouse hover leave event
+      /// \param[in] _event Qt mouse hover event
       protected: void hoverLeaveEvent(QGraphicsSceneHoverEvent *_event);
 
+      /// \brief Qt mouse move event
+      /// \param[in] _event Qt mouse event
       protected: void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
 
-      protected: void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
-
+      /// \brief Qt mouse press event
+      /// \param[in] _event Qt mouse event
       protected: void mousePressEvent(QGraphicsSceneMouseEvent *_event);
 
-      protected: void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
-
+      /// \brief Qt mouse release event
+      /// \param[in] _event Qt mouse event
       protected: void mouseReleaseEvent(QGraphicsSceneMouseEvent *_event);
 
+      /// \brief Qt mouse press event during drag and drop
+      /// \param[in] _event Qt mouse drag and drop event
+      protected: void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
+
+      /// \brief Qt mouse move event during drag and drop
+      /// \param[in] _event Qt mouse drag and drop event
+      protected: void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
+
+      /// \brief Index of this corner grabber
       private: int index;
 
+      /// \brief Mouse press X position in pixels.
       private: double mouseDownX;
 
+      /// \brief Mouse press Y position in pixels.
       private: double mouseDownY;
 
+      /// \brief Fill color of the grabber handle.
       private: QColor handleColor;
 
+      /// \brief Border color of the grabber handle.
       private: QColor borderColor;
 
+      /// \brief Width of the grabber handle in pixels.
       private: double width;
 
+      /// \brief Height of the grabber handle in pixels.
       private: double height;
 
+      /// \brief Extra width for the mouse grab hotspot for easy grabbing.
       private: double widthGrabBuffer;
 
+      /// \brief Extra height for the mouse grab hotspot for easy grabbing.
       private: double heightGrabBuffer;
 
+      /// \brief Current mouse state.
       private: int mouseButtonState;
-
-      private: double size;
     };
   }
 }

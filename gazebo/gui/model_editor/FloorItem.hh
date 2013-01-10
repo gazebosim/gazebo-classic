@@ -23,7 +23,6 @@
 #include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/BuildingItem.hh"
 
-
 namespace gazebo
 {
   namespace gui
@@ -36,54 +35,75 @@ namespace gazebo
     {
         Q_OBJECT
 
+        /// \brief Constructor
         public: FloorItem();
 
+        /// \brief Destructor
         public: ~FloorItem();
 
+        // Documentation inherited.
         public: virtual QVector3D GetSize() const;
 
+        // Documentation inherited.
         public: virtual QVector3D GetScenePosition() const;
 
+        // Documentation inherited.
         public: virtual double GetSceneRotation() const;
 
+        /// \brief Attach walls so the floor can auto expand to hold the wall.
+        /// \param[in] _wallItem Wall item to attach to the floor.
         public: void AttachWall(WallItem *_wallItem);
 
+        // Documentation inherited.
         private: virtual void paint(QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
+        // Documentation inherited.
         private: virtual void mousePressEvent(QGraphicsSceneMouseEvent *_event);
 
+        // Documentation inherited.
         private: virtual void contextMenuEvent(
             QGraphicsSceneContextMenuEvent *_event);
 
+        /// \brief Notify that the bounding box of all the walls
+        /// needs to be changed.
         private slots: void NotifyChange();
 
+        /// \brief Qt callback to recalculate the bounding box of all wall
+        /// items.
         private slots: void RecalculateBoundingBox();
 
+        /// \brief Qt callback when a wall
         private slots: void WallDeleted();
 
+        /// \brief Update the floor properties and emit Qt signals
         private: void Update();
 
+        /// \brief Emit floor changed Qt signals.
         private: void FloorChanged();
 
+        /// \brief Emit size changed Qt signals.
         private: void SizeChanged();
 
+        /// \brief Depth of floor
         private: double floorDepth;
 
+        /// \brief Height of floor
         private: double floorHeight;
 
+        /// \brief Width of floor
         private: double floorWidth;
 
+        /// \brief Scene position of floor
         private: QPointF floorPos;
 
+        /// \brief A flag to indicate that there have been changes to the walls
         private: bool dirty;
 
-        private: double scale;
-
+        /// \brief A list of walls that the floor holds
         private: std::vector<WallItem *> walls;
 
-        private: QGraphicsItemGroup *wallGroup;
-
+        /// \brief Bounding box of the floor item
         private: QPolygonF floorBoundingRect;
     };
   }

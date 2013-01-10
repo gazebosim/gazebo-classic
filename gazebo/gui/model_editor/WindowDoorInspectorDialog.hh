@@ -29,65 +29,104 @@ namespace gazebo
     {
       Q_OBJECT
 
-      public: enum type {WINDOW, DOOR};
+      /// \brief Dialog mode
+      public: enum mode {WINDOW, DOOR};
 
-      public: WindowDoorInspectorDialog(int _type = WINDOW,
+      /// \brief Constructor
+      /// \param[in] _mode Dialog mode
+      /// \param[in] _parent Parent QWidget.
+      public: WindowDoorInspectorDialog(int _mode = WINDOW,
           QWidget *_parent = 0);
 
+      /// \brief Destructor
       public: ~WindowDoorInspectorDialog();
 
+      /// \brief Get the item width
+      /// \return Width in pixels.
       public: double GetWidth() const;
 
+      /// \brief Get the item height
+      /// \return Height in pixels.
       public: double GetHeight() const;
 
+      /// \brief Get the item depth
+      /// \return Depth in pixels.
       public: double GetDepth() const;
 
+      /// \brief Get the item position
+      /// \return Item position in pixels.
       public: QPointF GetPosition() const;
 
+      /// \brief Get the item elevation
+      /// \return Item elevation
       public: double GetElevation() const;
 
+      /// \brief Get the item type
+      /// \return Item type
       public: std::string GetType() const;
 
+      /// \brief Set the item name
+      /// \param[in] _depth Name to set to.
       public: void SetName(const std::string &_name);
 
+      /// \brief Set the item width in pixels.
+      /// \param[in] _depth Width in pixels.
       public: void SetWidth(double _width);
 
+      /// \brief Set the item height in pixels.
+      /// \param[in] _depth Height in pixels.
       public: void SetHeight(double _height);
 
+      /// \brief Set the item depth in pixels.
+      /// \param[in] _depth Depth in pixels.
       public: void SetDepth(double _depth);
 
+      /// \brief Set the item position in pixels.
+      /// \param[in] _pos Position in pixels.
       public: void SetPosition(const QPointF &_pos);
 
+      /// \brief Set the item elevation.
+      /// \param[in] _elevation Item elevation.
       public: void SetElevation(double _elevation);
 
+      /// \brief Set the item type.
+      /// \param[in] _type Item type.
       public: void SetType(const std::string &_type);
 
+      /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
 
+      /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
+      /// \brief Qt callback when the Apply button is pressed.
       private slots: void OnApply();
 
+      /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
-      private: QLabel* modelNameLabel;
+      /// \brief Label that displays the name of the item.
+      private: QLabel* itemNameLabel;
 
-      private: int modelType;
-
-      private: std::string modelTypeStr;
-
+      /// \brief Spin box for configuring the width of the item.
       private: QDoubleSpinBox *widthSpinBox;
 
+      /// \brief Spin box for configuring the depth of the item.
       private: QDoubleSpinBox *depthSpinBox;
 
+      /// \brief Spin box for configuring the height of the item.
       private: QDoubleSpinBox *heightSpinBox;
 
+      /// \brief Spin box for configuring the X position of the item.
       private: QDoubleSpinBox *positionXSpinBox;
 
+      /// \brief Spin box for configuring the Y position of the item.
       private: QDoubleSpinBox *positionYSpinBox;
 
+      /// \brief Spin box for configuring the elevation of the item.
       private: QDoubleSpinBox *elevationSpinBox;
 
+      /// \brief Combo box for selecting the type of the item.
       private: QComboBox *typeComboBox;
     };
   }

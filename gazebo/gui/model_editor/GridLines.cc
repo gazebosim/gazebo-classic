@@ -61,10 +61,10 @@ QRectF GridLines::boundingRect() const
 }
 
 /////////////////////////////////////////////////
-void GridLines::HandleWindowSizeChanged(int _w, int _h)
+void GridLines::SetSize(int _width, int _height)
 {
-  this->width = _w;
-  this->height = _h;
+  this->width = _width;
+  this->height = _height;
 }
 
 /////////////////////////////////////////////////

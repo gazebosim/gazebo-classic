@@ -26,12 +26,18 @@ namespace gazebo
   {
     class EditorWidget : public QWidget
     {
+      /// \brief Constructor
+      /// \param[in] _parent Parent QWidget.
       public: EditorWidget(QWidget *_parent = 0);
 
+      /// \brief Destructor
       public: virtual ~EditorWidget();
 
+      /// \brief Get the building editor widget
+      /// \return Building editor widget
       public: QWidget *GetBuildingEditor() const;
 
+      /// \brief A building editor widget attached to this widget
       private: QWidget *buildingEditorWidget;
     };
   }

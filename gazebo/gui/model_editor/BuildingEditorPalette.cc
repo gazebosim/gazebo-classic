@@ -222,10 +222,10 @@ void BuildingEditorPalette::OnDrawWall()
 }
 
 /////////////////////////////////////////////////
-void BuildingEditorPalette::OnImportImage()
+/*void BuildingEditorPalette::OnImportImage()
 {
 //  gui::editor::Events::createEditorItem("Image");
-}
+}*/
 
 
 /////////////////////////////////////////////////

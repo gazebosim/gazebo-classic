@@ -29,28 +29,46 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Modes of the dialog
       public: enum FinishMode {MODEL_FINISH, MODEL_SAVE};
 
+      /// \brief Constructor
+      /// \param[in] _mode Mode of the dialog
+      /// \param[in] _parent Parent QWidget.
       public: FinishModelDialog(int _mode = 0, QWidget *_parent = 0);
 
+      /// \brief Destructor
       public: ~FinishModelDialog();
 
+      /// \brief Get the model name
+      /// \return The model name
       public: std::string GetModelName() const;
 
+      /// \brief Get the save location
+      /// \return Path of the save location
       public: std::string GetSaveLocation() const;
 
+      /// \brief Set the model name
+      /// \param[in] _name Name to set the model to.
       public: void SetModelName(const std::string &_name);
 
+      /// \brief Set the save location
+      /// \param[in] _location Location to save to.
       public: void SetSaveLocation(const std::string &_location);
 
+      /// \brief Qt callback when the file directory browse button is pressed
       private slots: void OnBrowse();
 
+      /// \brief Qt callback when the cancel button is pressed
       private slots: void OnCancel();
 
+      /// \brief Qt callback when the Done button is pressed
       private slots: void OnFinish();
 
+      /// \brief Editable line for the model name
       private: QLineEdit* modelNameLineEdit;
 
+      /// \brief Editable line for the model location
       private: QLineEdit* modelLocationLineEdit;
     };
   }
