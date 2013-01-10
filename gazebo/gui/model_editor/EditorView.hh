@@ -164,6 +164,8 @@ namespace gazebo
       private: GridLines *gridLines;
 
       private: double viewScale;
+
+      private: bool snapToCloseWall;
     };
   }
 }

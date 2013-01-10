@@ -287,29 +287,46 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
       WallItem *wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
       if (this->drawInProgress && wallItem)
       {
-        // snap walls to 0/90/180 degrees
-        LineSegmentItem *segment = wallItem->GetSegment(
-            wallItem->GetSegmentCount()-1);
-        QPointF p1 = segment->mapToScene(segment->line().p1());
-        QPointF p2 = this->mapToScene(_event->pos());
-        QLineF line(p1, p2);
-        double angle = line.angle();
-        double range = 10;
-        if ((angle < range) || (angle > (360 - range)) ||
-            ((angle > (180 - range)) && (angle < (180 + range))))
+        this->snapToCloseWall =false;
+        if (wallItem->GetVertexCount() >= 3)
         {
-          wallItem->SetVertexPosition(wallItem->GetVertexCount()-1,
-              QPointF(p2.x(), p1.y()));
+          LineSegmentItem *segment = wallItem->GetSegment(0);
+          QPointF firstPoint = segment->mapToScene(segment->line().p1());
+          QPointF currentPoint = this->mapToScene(_event->pos());
+          double distanceToClose = 30;
+          if (QVector2D(currentPoint - firstPoint).length() <= distanceToClose)
+          {
+            wallItem->SetVertexPosition(wallItem->GetVertexCount()-1,
+                firstPoint);
+            this->snapToCloseWall = true;
+          }
         }
-        else if (((angle > (90 - range)) && (angle < (90 + range))) ||
-            ((angle > (270 - range)) && (angle < (270 + range))))
+        if (!snapToCloseWall)
         {
-          wallItem->SetVertexPosition(wallItem->GetVertexCount()-1,
-              QPointF(p1.x(), p2.y()));
-        }
-        else
-        {
-          wallItem->SetVertexPosition(wallItem->GetVertexCount()-1, p2);
+          // snap walls to 0/90/180 degrees
+          LineSegmentItem *segment = wallItem->GetSegment(
+              wallItem->GetSegmentCount()-1);
+          QPointF p1 = segment->mapToScene(segment->line().p1());
+          QPointF p2 = this->mapToScene(_event->pos());
+          QLineF line(p1, p2);
+          double angle = line.angle();
+          double range = 10;
+          if ((angle < range) || (angle > (360 - range)) ||
+              ((angle > (180 - range)) && (angle < (180 + range))))
+          {
+            wallItem->SetVertexPosition(wallItem->GetVertexCount()-1,
+                QPointF(p2.x(), p1.y()));
+          }
+          else if (((angle > (90 - range)) && (angle < (90 + range))) ||
+              ((angle > (270 - range)) && (angle < (270 + range))))
+          {
+            wallItem->SetVertexPosition(wallItem->GetVertexCount()-1,
+                QPointF(p1.x(), p2.y()));
+          }
+          else
+          {
+            wallItem->SetVertexPosition(wallItem->GetVertexCount()-1, p2);
+          }
         }
       }
       QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
@@ -442,6 +459,12 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
   {
     WallItem* wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
     wallItem->PopEndPoint();
+    if (this->snapToCloseWall)
+    {
+      wallItem->ClosePath();
+      this->snapToCloseWall = false;
+    }
+
     wallList.push_back(wallItem);
 //    this->buildingMaker->RemoveWall(this->lastWallSegmentName);
     this->lastWallSegmentName = "";
@@ -1011,6 +1034,7 @@ void EditorView::CancelDrawMode()
         delete this->currentMouseItem;
       }
     }
+    this->snapToCloseWall = false;
     this->drawMode = NONE;
     this->drawInProgress = false;
     this->currentMouseItem = NULL;

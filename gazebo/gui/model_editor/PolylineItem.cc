@@ -46,8 +46,8 @@ PolylineItem::PolylineItem(const QPointF &_start, const QPointF &_end) :
   this->setAcceptHoverEvents(true);
 
   this->lineThickness = 1;
-
   this->setZValue(1);
+  this->closed = false;
 }
 
 /////////////////////////////////////////////////
@@ -167,6 +167,24 @@ void PolylineItem::SetVertexPosition(unsigned int _index, const QPointF &_pos)
   if (_index < this->segments.size())
     this->segments[_index]->SetStartPoint(lineEnd);
 
+  if (this->closed)
+  {
+    if (_index == 0)
+    {
+      this->segments[this->segments.size()-1]->SetEndPoint(lineEnd);
+      this->grabbers[this->segments.size()]->setPos(lineEnd.x()
+          - this->grabberWidth/2.0, lineEnd.y() - this->grabberHeight/2.0);
+      this->UpdatePathAt(this->segments.size(), _pos);
+    }
+    else if (_index == this->segments.size())
+    {
+      this->segments[0]->SetStartPoint(lineEnd);
+      this->grabbers[0]->setPos(lineEnd.x() - this->grabberWidth/2.0,
+          lineEnd.y() - this->grabberHeight/2.0);
+      this->UpdatePathAt(0, _pos);
+    }
+  }
+
   this->UpdatePathAt(_index, _pos);
   this->update();
 }
@@ -181,13 +199,45 @@ void PolylineItem::TranslateVertex(unsigned int _index, const QPointF &_trans)
 
   this->grabbers[_index]->setPos(newCornerPos);
 
-  QPointF offset(this->grabberWidth/2.0, this->grabberHeight/2.0);
+  QPointF Offset(this->grabberWidth/2.0, this->grabberHeight/2.0);
   if (_index != 0)
-    this->segments[_index-1]->SetEndPoint(newCornerPos + offset);
+    this->segments[_index-1]->SetEndPoint(newCornerPos + Offset);
   if (_index < this->segments.size())
-    this->segments[_index]->SetStartPoint(newCornerPos + offset);
+    this->segments[_index]->SetStartPoint(newCornerPos + Offset);
 
-  this->UpdatePathAt(_index, newCornerPos + offset + this->origin);
+  if (this->closed)
+  {
+    if (_index == 0)
+    {
+      this->segments[this->segments.size()-1]->SetEndPoint(newCornerPos
+          + Offset);
+      this->grabbers[this->segments.size()]->setPos(newCornerPos + Offset);
+      this->UpdatePathAt(this->segments.size(), newCornerPos + Offset
+          + this->origin);
+    }
+    else if (_index == this->segments.size())
+    {
+      this->segments[0]->SetStartPoint(newCornerPos + Offset);
+      this->grabbers[0]->setPos(newCornerPos + Offset);
+      this->UpdatePathAt(0, newCornerPos + Offset + this->origin);
+    }
+  }
+  this->UpdatePathAt(_index, newCornerPos + Offset + this->origin);
+}
+
+/////////////////////////////////////////////////
+void PolylineItem::ClosePath()
+{
+  if (!this->closed && this->GetVertexCount() >= 3)
+  {
+    this->closed = true;
+  }
+}
+
+/////////////////////////////////////////////////
+bool PolylineItem::IsClosed() const
+{
+  return this->closed;
 }
 
 /////////////////////////////////////////////////

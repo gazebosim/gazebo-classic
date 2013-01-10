@@ -57,6 +57,10 @@ namespace gazebo
 
       public: void SetPosition(const QPointF &_pos);
 
+      public: void ClosePath();
+
+      public: bool IsClosed() const;
+
       public: void Update();
 
       private: void UpdatePath();
@@ -101,6 +105,8 @@ namespace gazebo
       protected: std::vector<LineSegmentItem*> segments;
 
       protected: QPointF segmentMouseMove;
+
+      protected: bool closed;
 
       private: QPointF origin;
 
