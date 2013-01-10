@@ -49,31 +49,38 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletMotionState();
 
-      /// \brief Get the pose
-      public: math::Pose GetWorldPose() const;
+      // \brief Get the pose
+      // public: math::Pose GetWorldPose() const;
 
-      /// \brief Set the position of the body
-      /// \param pos math::Vector position
-      public: virtual void SetWorldPosition(const math::Vector3 &_pos);
+      /// \brief Get the pose of the body at the center of gravity
+      ///        in the world frame.
+      /// \return Returns the pose of the body at the center of gravity.
+      public: math::Pose GetCoGWorldPose() const;
 
-      /// \brief Set the rotation of the body
-      /// \param rot Quaternion rotation
-      public: virtual void SetWorldRotation(const math::Quaternion &_rot);
+      // \brief Set the position of the body
+      // \param pos math::Vector position
+      // public: virtual void SetWorldPosition(const math::Vector3 &_pos);
 
-      /// \brief Set the pose
-      public: void SetWorldPose(const math::Pose &_pose);
+      // \brief Set the rotation of the body
+      // \param rot Quaternion rotation
+      // public: virtual void SetWorldRotation(const math::Quaternion &_rot);
 
-      /// \brief Set the center of mass offset
-      public: void SetCoG(const math::Vector3 &_cog);
+      // \brief Set the pose
+      // public: void SetWorldPose(const math::Pose &_pose);
 
-      /// \brief Get the world transform
-      public: virtual void getWorldTransform(btTransform &_worldTrans) const;
+      // \brief Set the center of mass offset
+      // public: void SetCoG(const math::Vector3 &_cog);
 
-      /// \brief Set the world transform
-      public: virtual void setWorldTransform(const btTransform &_worldTrans);
+      /// \brief Get the world transform of the body at the center of gravity.
+      /// \param[out] _cogWorldTrans Pose of body center of gravity.
+      public: virtual void getWorldTransform(btTransform &_cogWorldTrans) const;
 
-      private: math::Pose worldPose;
-      private: math::Vector3 cog;
+      /// \brief Set the world transform of the body at the center of gravity.
+      /// \param[in] _cogWorldTrans Pose of body center of gravity.
+      public: virtual void setWorldTransform(const btTransform &_cogWorldTrans);
+
+      // private: math::Pose worldPose;
+      // private: math::Vector3 cog;
       private: LinkPtr link;
     };
     /// \}
