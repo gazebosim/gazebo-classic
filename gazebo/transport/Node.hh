@@ -125,7 +125,12 @@ namespace gazebo
         this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
               new CallbackHelperT<M>(boost::bind(_fp, _obj, _1), _latching)));
 
-        return transport::TopicManager::Instance()->Subscribe(ops);
+        SubscriberPtr result =
+          transport::TopicManager::Instance()->Subscribe(ops);
+
+        result->SetCallbackId(this->callbacks[decodedTopic].back()->GetId());
+
+        return result;
       }
 
       /// \brief Subscribe to a topic using a bare function as the callback
@@ -147,7 +152,12 @@ namespace gazebo
         this->callbacks[decodedTopic].push_back(
             CallbackHelperPtr(new CallbackHelperT<M>(_fp, _latching)));
 
-        return transport::TopicManager::Instance()->Subscribe(ops);
+        SubscriberPtr result =
+          transport::TopicManager::Instance()->Subscribe(ops);
+
+        result->SetCallbackId(this->callbacks[decodedTopic].back()->GetId());
+
+        return result;
       }
 
       /// \brief Subscribe to a topic using a class method as the callback
@@ -170,7 +180,12 @@ namespace gazebo
         this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
               new RawCallbackHelper(boost::bind(_fp, _obj, _1))));
 
-        return transport::TopicManager::Instance()->Subscribe(ops);
+        SubscriberPtr result =
+          transport::TopicManager::Instance()->Subscribe(ops);
+
+        result->SetCallbackId(this->callbacks[decodedTopic].back()->GetId());
+
+        return result;
       }
 
 
@@ -191,7 +206,12 @@ namespace gazebo
         this->callbacks[decodedTopic].push_back(
             CallbackHelperPtr(new RawCallbackHelper(_fp)));
 
-        return transport::TopicManager::Instance()->Subscribe(ops);
+        SubscriberPtr result =
+          transport::TopicManager::Instance()->Subscribe(ops);
+
+        result->SetCallbackId(this->callbacks[decodedTopic].back()->GetId());
+
+        return result;
       }
 
       /// \brief Handle incoming data.
@@ -210,11 +230,17 @@ namespace gazebo
       public: void InsertLatchedMsg(const std::string &_topic,
                                     const std::string &_msg);
 
-
       /// \brief Get the message type for a topic
       /// \param[in] _topic The topic
       /// \return The message type
       public: std::string GetMsgType(const std::string &_topic) const;
+
+      /// \internal
+      /// \brief Remove a callback. This should only be called by
+      /// Subscriber.cc
+      /// \param[in] _topic Name of the topic.
+      /// \param[in] _id Id of the callback.
+      public: void RemoveCallback(const std::string &_topic, unsigned int _id);
 
       private: std::string topicNamespace;
       private: std::vector<PublisherPtr> publishers;
