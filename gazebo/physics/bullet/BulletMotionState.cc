@@ -28,7 +28,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletMotionState::BulletMotionState(Link *_link)
+BulletMotionState::BulletMotionState(LinkPtr _link)
   : btMotionState()
 {
   this->link = _link;

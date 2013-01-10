@@ -41,7 +41,7 @@ namespace gazebo
     class BulletMotionState : public btMotionState
     {
       /// \brief Constructor
-      public: BulletMotionState(Link *_link);
+      public: BulletMotionState(LinkPtr _link);
 
       /// \brief Constructor
       // public: BulletMotionState(const math::Pose &initPose);
@@ -74,7 +74,7 @@ namespace gazebo
 
       private: math::Pose worldPose;
       private: math::Vector3 cog;
-      private: Link *link;
+      private: LinkPtr link;
     };
     /// \}
   }
