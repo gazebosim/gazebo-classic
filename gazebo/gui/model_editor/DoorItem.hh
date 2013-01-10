@@ -34,46 +34,65 @@ namespace gazebo
 
     class DoorItem : public RectItem, public BuildingItem
     {
-        Q_OBJECT
+      Q_OBJECT
 
-        public: DoorItem();
+      /// \brief Constructor
+      public: DoorItem();
 
-        public: ~DoorItem();
+      /// \brief Destructor
+      public: ~DoorItem();
 
-        public: virtual QVector3D GetSize() const;
+      // Documentation inherited
+      public: virtual QVector3D GetSize() const;
 
-        public: virtual QVector3D GetScenePosition() const;
+      // Documentation inherited
+      public: virtual QVector3D GetScenePosition() const;
 
-        public: virtual double GetSceneRotation() const;
+      // Documentation inherited
+      public: virtual double GetSceneRotation() const;
 
-        private: virtual void paint(QPainter *_painter,
-            const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+      // Documentation inherited
+      private: virtual void paint(QPainter *_painter,
+          const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-        private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+      // Documentation inherited
+      private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
 
-        private slots: void OnApply();
+      /// \brief Qt callback when the changes are to be applied
+      private slots: void OnApply();
 
-        private slots: void OnOpenInspector();
+      /// \brief Qt callback to open the door inspector
+      private slots: void OnOpenInspector();
 
-        private slots: void OnDeleteItem();
+      /// \brief Qt callback to delete this door item
+      private slots: void OnDeleteItem();
 
-        private: void DoorChanged();
+      /// \brief Emit door changed signals
+      private: void DoorChanged();
 
-        private: void SizeChanged();
+      /// \brief Emit size changed signals
+      private: void SizeChanged();
 
-        private: double doorDepth;
+      /// \brief Door depth in pixels
+      private: double doorDepth;
 
-        private: double doorHeight;
+      /// \brief Door height in pixels
+      private: double doorHeight;
 
-        private: double doorWidth;
+      /// \brief Door width in pixels
+      private: double doorWidth;
 
-        private: double doorElevation;
+      /// \brief Door elevation in pixels
+      private: double doorElevation;
 
-        private: QPointF doorPos;
+      /// \brief Door scene position in pixels
+      private: QPointF doorPos;
 
-        private: double scale;
+      /// \brief Scale for converting to metric units
+      private: double scale;
 
-        private: WindowDoorInspectorDialog *inspector;
+      /// \brief Door inspector
+      private: WindowDoorInspectorDialog *inspector;
     };
   }
 }

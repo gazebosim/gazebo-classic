@@ -32,50 +32,58 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
+      /// \param[in] _parent Parent QWidget.
       public: BuildingEditorPalette(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~BuildingEditorPalette();
 
-      /// \brief On draw wall callback.
+      /// \brief Qt callback when the draw wall mode is chosen.
       private slots: void OnDrawWall();
 
-      /// \brief On import image callback.
-      private slots: void OnImportImage();
+      //private slots: void OnImportImage();
 
-      /// \brief On add window callback.
+      /// \brief Qt callback when the draw window button is pressed.
       private slots: void OnAddWindow();
 
-      /// \brief On add door callback.
+      /// \brief Qt callback when the draw door butotn is pressed.
       private slots: void OnAddDoor();
 
-      /// \brief On add stairs callback.
+      /// \brief Qt callback when the draw stairs button is pressed.
       private slots: void OnAddStairs();
 
-      /// \brief On discard callback.
+      /// \brief Qt callback when the discard button pressed.
       private slots: void OnDiscard();
 
-      /// \brief On save callback.
+      /// \brief Qt callback when the save button is pressed.
       private slots: void OnSave();
 
-      /// \brief On done callback.
+      /// \brief Qt callback when the done button is pressed.
       private slots: void OnDone();
 
-      /// \brief On save model event.
+      /// \brief Callback when user has provided information on where
+      /// to save the model to.
+      /// \param[in] _saveName Name of model.
+      /// \param[in] _saveLocation Location to save the model to.
       private: void OnSaveModel(std::string _saveName,
           std::string _saveLocation);
 
-      /// \brief On discard model event.
+      /// \brief Callback when user confirms to discard model.
       private: void OnDiscardModel();
 
+      /// \brief A label that displays the name of the model.
       private: QLabel *modelNameLabel;
 
+      /// \brief Save button.
       private: QPushButton *saveButton;
 
+      /// \brief Name of model.
       private: std::string modelName;
 
+      /// \brief Save location.
       private: std::string saveLocation;
 
+      /// \brief A list of gui editor events.
       private: std::vector<event::ConnectionPtr> connections;
     };
   }

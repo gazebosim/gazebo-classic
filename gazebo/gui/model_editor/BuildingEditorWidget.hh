@@ -30,18 +30,27 @@ namespace gazebo
 
     class BuildingEditorWidget : public QWidget
     {
+      /// \brief Types of models supported in building editor
       public: enum modelTypes {None, Wall, Window, Door, Stairs};
 
+      /// \brief Constructor
+      /// \param[in] _parent Parent QWidget.
       public: BuildingEditorWidget(QWidget *_parent = 0);
 
+      /// \brief Destructor
       public: ~BuildingEditorWidget();
 
-      public: static QCursor rotateCursor;
-
+      /// \brief Qt event received when the widget is being resized
+      /// \param[in] _event Resize event.
       private: void resizeEvent(QResizeEvent *_event);
 
+      /// \brief Custom rotation cursor
+      public: static QCursor rotateCursor;
+
+      /// \brief A widget to display and change building levels.
       private: LevelWidget *levelWidget;
 
+      /// \brief A widget to display the scale of the 2D editor view.
       private: ScaleWidget *scaleWidget;
     };
   }

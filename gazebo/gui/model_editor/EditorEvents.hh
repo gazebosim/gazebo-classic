@@ -28,7 +28,6 @@ namespace gazebo
     {
       class Events
       {
-        //////////////////////////////////////////////////////////////////////
         /// \brief Connect a boost::slot the the create editor item signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -153,14 +152,14 @@ namespace gazebo
         /// \brief An editor item is to be created
         public: static event::EventT<void (std::string)> createEditorItem;
 
-        /// \brief A model is to be saved with a name and location
+        /// \brief A model has been saved with a name and a location
         public: static event::EventT<void (std::string, std::string)>
             saveModel;
 
-        /// \brief A model is to be created
+        /// \brief A model has been created
         public: static event::EventT<void ()> finishModel;
 
-        /// \brief A model is to be created
+        /// \brief A model has been discarded
         public: static event::EventT<void ()> discardModel;
 
         /// \brief The current level has been changed

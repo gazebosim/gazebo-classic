@@ -24,20 +24,30 @@ namespace gazebo
   {
     class BuildingItem
     {
+        /// \brief Constructor
         public: BuildingItem();
 
+        /// \brief Destructor
         public: ~BuildingItem();
 
+        /// \brief Get the level in which this building item is located
         public: int GetLevel() const;
 
+        /// \brief Set the level of this building item
+        /// \param[in] _level level number
         public: void SetLevel(int _level);
 
+        /// \brief Get the base height of this level relative to ground plane
         public: double GetLevelBaseHeight() const;
 
+        /// \brief Set the base height of this level relative to gound plan
+        /// \param[in] _height base height
         public: void SetLevelBaseHeight(double _height);
 
+        /// \brief Level of this building item
         protected: int level;
 
+        /// \brief Base height of the level
         protected: double levelBaseHeight;
     };
   }
