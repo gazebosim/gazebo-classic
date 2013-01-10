@@ -81,9 +81,14 @@ double FloorItem::GetSceneRotation() const
 void FloorItem::AttachWall(WallItem *_wallItem)
 {
   if (this->floorBoundingRect.isEmpty())
+  {
     this->floorBoundingRect = _wallItem->mapToScene(_wallItem->boundingRect());
-  else this->floorBoundingRect = this->floorBoundingRect.united(
+  }
+  else
+  {
+    this->floorBoundingRect = this->floorBoundingRect.united(
       _wallItem->mapToScene(_wallItem->boundingRect()));
+  }
   this->walls.push_back(_wallItem);
 
   for (unsigned int i = 0; i < _wallItem->GetSegmentCount(); ++i)
@@ -167,7 +172,7 @@ void FloorItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void FloorItem::paint (QPainter *_painter,
+void FloorItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
   if (this->isSelected())

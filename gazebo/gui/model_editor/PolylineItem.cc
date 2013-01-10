@@ -24,9 +24,10 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-PolylineItem::PolylineItem(const QPointF &_start, const QPointF &_end) :
-    EditorItem(), QGraphicsPathItem(), gridSpace(10)
+PolylineItem::PolylineItem(const QPointF &_start, const QPointF &_end)
+  : EditorItem(), QGraphicsPathItem()
 {
+  this->gridSpace = 10;
   this->editorType = "Polyline";
   this->origin = _start;
   this->setPos(_start);
@@ -396,7 +397,10 @@ void PolylineItem::AppendToPath(const QPointF &_point)
   QPainterPath p = this->path();
   if (p.elementCount() == 0)
     p.moveTo(_point - this->origin);
-  else p.lineTo(_point - this->origin);
+  else
+  {
+    p.lineTo(_point - this->origin);
+  }
   this->setPath(p);
 }
 

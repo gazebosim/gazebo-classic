@@ -48,7 +48,7 @@ namespace gazebo
 
       public: int GetSteps() const;
 
-      private: virtual void paint (QPainter *_painter,
+      private: virtual void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
       private: virtual bool rotateEventFilter(RotateHandle *_rotateHandle,

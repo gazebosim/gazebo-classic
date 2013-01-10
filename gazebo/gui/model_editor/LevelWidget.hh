@@ -18,6 +18,8 @@
 #ifndef _LEVEL_WIDGET_HH_
 #define _LEVEL_WIDGET_HH_
 
+#include <string>
+#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 

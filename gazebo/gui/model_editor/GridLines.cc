@@ -21,25 +21,25 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-GridLines::GridLines( int _w, int _h ) : QGraphicsItem(), width(_w), height(_h),
+GridLines::GridLines(int _w, int _h) : QGraphicsItem(), width(_w), height(_h),
   space(10)
 {
   this->setFlag(QGraphicsItem::ItemIsSelectable, false);
   this->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 }
 
+/////////////////////////////////////////////////
 GridLines::~GridLines()
 {
 }
 
 /////////////////////////////////////////////////
-void GridLines::paint (QPainter *_painter,
-                       const QStyleOptionGraphicsItem */*_option*/,
-                       QWidget */*_widget*/)
+void GridLines::paint(QPainter *_painter,
+    const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
   // re-draw the grid lines from 0,0 to this->width, this->height
   // do horizontal first
-  QColor c(200,200,255,125);
+  QColor c(200, 200, 255, 125);
 
   _painter->setPen(c);
 
@@ -78,13 +78,13 @@ void GridLines::mousePressEvent(QGraphicsSceneDragDropEvent *)
 }
 
 /////////////////////////////////////////////////
-void GridLines::mousePressEvent ( QGraphicsSceneMouseEvent *_event)
+void GridLines::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
   _event->ignore();
 }
 
 /////////////////////////////////////////////////
-void GridLines::mouseMoveEvent ( QGraphicsSceneMouseEvent *_event)
+void GridLines::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 {
   _event->ignore();
 }

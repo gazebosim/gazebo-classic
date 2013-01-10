@@ -15,6 +15,7 @@
  *
 */
 
+#include <string>
 #ifndef _STAIRS_INSPECTOR_DIALOG_HH_
 #define _STAIRS_INSPECTOR_DIALOG_HH_
 
@@ -75,8 +76,8 @@ namespace gazebo
       private: QSpinBox *stepsSpinBox;
 
       private: QLabel* stairsNameLabel;
-   };
- }
+    };
+  }
 }
 
 #endif

@@ -18,6 +18,9 @@
 #ifndef _EDITOR_VIEW_HH_
 #define _EDITOR_VIEW_HH_
 
+#include <map>
+#include <string>
+#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 
@@ -60,9 +63,9 @@ namespace gazebo
 
       public: ~EditorView();
 
-      public: enum modelTypes{NONE, WALL, WINDOW, DOOR, STAIRS};
+      public: enum modelTypes {NONE, WALL, WINDOW, DOOR, STAIRS};
 
-      public: enum mouseActions{Select, Translate, Rotate};
+      public: enum mouseActions {Select, Translate, Rotate};
 
       public: void CreateItem3D(EditorItem *item);
 
@@ -70,7 +73,7 @@ namespace gazebo
 
       private: void resizeEvent(QResizeEvent *_event);
 
-      private: void scrollContentsBy (int _dx, int _dy);
+      private: void scrollContentsBy(int _dx, int _dy);
 
       private: void contextMenuEvent(QContextMenuEvent *event);
 

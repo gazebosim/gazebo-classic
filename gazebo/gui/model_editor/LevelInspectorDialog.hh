@@ -18,6 +18,7 @@
 #ifndef _LEVEL_INSPECTOR_DIALOG_HH_
 #define _LEVEL_INSPECTOR_DIALOG_HH_
 
+#include <string>
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -57,8 +58,8 @@ namespace gazebo
       private: QDoubleSpinBox *floorThicknessSpinBox;
 
       private: QComboBox *materialComboBox;
-   };
- }
+    };
+  }
 }
 
 #endif

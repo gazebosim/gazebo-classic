@@ -18,6 +18,7 @@
 #ifndef _WINDOW_DOOR_INSPECTOR_DIALOG_HH_
 #define _WINDOW_DOOR_INSPECTOR_DIALOG_HH_
 
+#include <string>
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -88,8 +89,8 @@ namespace gazebo
       private: QDoubleSpinBox *elevationSpinBox;
 
       private: QComboBox *typeComboBox;
-   };
- }
+    };
+  }
 }
 
 #endif

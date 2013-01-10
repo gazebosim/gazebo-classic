@@ -82,7 +82,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
   this->editorWidget = new EditorWidget(this);
-  this->editorWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  this->editorWidget->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Expanding);
   this->editorWidget->hide();
 
   this->viewOnlyLabel = new QLabel("Building is View Only", this->glWidget);
@@ -102,7 +103,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   this->bottomFrame = new QFrame;
   this->bottomFrame->setObjectName("renderBottomFrame");
-  this->bottomFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+  this->bottomFrame->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Minimum);
 
   QFrame *playFrame = new QFrame;
   QToolBar *playToolbar = new QToolBar;
@@ -252,7 +254,6 @@ void RenderWidget::ShowEditor(bool _show)
     this->viewOnlyLabel->setVisible(false);
     this->bottomFrame->show();
   }
-
 }
 
 /////////////////////////////////////////////////

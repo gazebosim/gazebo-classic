@@ -21,22 +21,22 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-GrabberHandle::GrabberHandle(QGraphicsItem *_parent, int _index) :
-  QGraphicsItem(_parent),
-  index(_index),
-  mouseDownX(0),
-  mouseDownY(0),
-  borderColor(Qt::black),
-  width(8),
-  height(8),
-  widthGrabBuffer(10),
-  heightGrabBuffer(10),
-  mouseButtonState(QEvent::GraphicsSceneMouseRelease)
+GrabberHandle::GrabberHandle(QGraphicsItem *_parent, int _index)
+  : QGraphicsItem(_parent)
 {
+  this->index = _index;
+  this-> mouseDownX = 0;
+  this-> mouseDownY = 0;
+  this->borderColor = Qt::black;
+  this->width = 8;
+  this->height = 8;
+  this->widthGrabBuffer = 10;
+  this->heightGrabBuffer = 10;
+  this-> mouseButtonState = QEvent::GraphicsSceneMouseRelease;
   this->setParentItem(_parent);
 
   this->setZValue(_parent->zValue() + 1);
-//  this->setZValue(5);
+  // this->setZValue(5);
   this->setAcceptHoverEvents(true);
   this->handleColor = Qt::black;
   this->borderColor = QColor(247, 142, 30);
@@ -204,18 +204,18 @@ void GrabberHandle::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
   borderPen.setStyle(Qt::SolidLine);
   _painter->setPen(borderPen);
 
-  QPointF topLeft (totalWidth/2.0 - this->width/2.0,
+  QPointF topLeft(totalWidth/2.0 - this->width/2.0,
       totalHeight/2.0 - this->height/2.0);
-  QPointF bottomRight (totalWidth/2.0 + this->width/2.0,
+  QPointF bottomRight(totalWidth/2.0 + this->width/2.0,
       totalHeight/2.0 + this->height/2.0);
 
-  QRectF borderRect (topLeft - QPointF(1, 1), bottomRight + QPointF(1, 1));
-  QRectF rect (topLeft, bottomRight);
+  QRectF borderRect(topLeft - QPointF(1, 1), bottomRight + QPointF(1, 1));
+  QRectF rect(topLeft, bottomRight);
 
-  QBrush brush (Qt::SolidPattern);
-  brush.setColor (this->borderColor);
+  QBrush brush(Qt::SolidPattern);
+  brush.setColor(this->borderColor);
   _painter->fillRect(borderRect, brush);
-  brush.setColor (this->handleColor);
+  brush.setColor(this->handleColor);
   _painter->fillRect(rect, brush);
 
   _painter->restore();

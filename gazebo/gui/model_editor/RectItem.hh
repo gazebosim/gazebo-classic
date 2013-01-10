@@ -18,6 +18,7 @@
 #ifndef _RECT_ITEM_HH_
 #define _RECT_ITEM_HH_
 
+#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model_editor/EditorItem.hh"
 
@@ -84,7 +85,7 @@ namespace gazebo
         private: virtual bool grabberEventFilter(GrabberHandle *_grabber,
             QEvent *_event);
 
-        private: virtual void paint (QPainter *_painter,
+        private: virtual void paint(QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
         private: virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
@@ -167,7 +168,6 @@ namespace gazebo
         private: int zValueSelected;
 
         private: unsigned int resizeFlag;
-
     };
   }
 }

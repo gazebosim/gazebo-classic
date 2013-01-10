@@ -45,8 +45,8 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   EditorView *view = new EditorView();
   QGraphicsScene *scene = new QGraphicsScene();
 
-  QColor c (250,250,250);
-  QBrush brush (c, Qt::SolidPattern);
+  QColor c(250, 250, 250);
+  QBrush brush(c, Qt::SolidPattern);
   scene->setBackgroundBrush(brush);
 
   int boundingWidth = 1240;
@@ -57,7 +57,7 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   canvasLayout->addWidget(view);
   canvasLayout->setAlignment(Qt::AlignHCenter);
 
-  view->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+  view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   view->setScene(scene);
   view->centerOn(QPointF(0, 0));
   view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
@@ -69,13 +69,13 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   scene->addItem(wallItem);
 
   this->levelWidget = new LevelWidget(this);
-  this->levelWidget->resize(250,50);
+  this->levelWidget->resize(250, 50);
 //  QGraphicsProxyWidget* proxyWidget = scene->addWidget(levelWidget);
 //  proxyWidget->setFlag(QGraphicsItem::ItemIgnoresTransformations);
 //  proxyWidget->setPos(QPointF(-levelWidget->width() / 2, 0));
 
   this->scaleWidget = new ScaleWidget(this);
-  this->scaleWidget->resize(150,50);
+  this->scaleWidget->resize(150, 50);
 
   canvasLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(canvasLayout);

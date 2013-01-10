@@ -33,7 +33,6 @@ namespace gazebo
       public: QWidget *GetBuildingEditor() const;
 
       private: QWidget *buildingEditorWidget;
-
     };
   }
 }

@@ -42,26 +42,26 @@ ScaleWidget::~ScaleWidget()
 //////////////////////////////////////////////////
 void ScaleWidget::paintEvent(QPaintEvent *)
 {
-   QPoint topLeft(0, 20);
-   QPoint bottomRight(100, 40);
-   QPointF midPoint = (topLeft + bottomRight)/2;
+  QPoint topLeft(0, 20);
+  QPoint bottomRight(100, 40);
+  QPointF midPoint = (topLeft + bottomRight)/2;
 
-   QPainter painter(this);
-   QPen rulerPen;
-   rulerPen.setColor(Qt::gray);
-   rulerPen.setWidth(3);
-   painter.setPen(rulerPen);
-   painter.drawLine(topLeft.x(), midPoint.y(), bottomRight.x(), midPoint.y());
-   painter.drawLine(topLeft.x(), topLeft.y(), topLeft.x(), bottomRight.y());
-   painter.drawLine(bottomRight.x(), topLeft.y(), bottomRight.x(),
-      bottomRight.y());
+  QPainter painter(this);
+  QPen rulerPen;
+  rulerPen.setColor(Qt::gray);
+  rulerPen.setWidth(3);
+  painter.setPen(rulerPen);
+  painter.drawLine(topLeft.x(), midPoint.y(), bottomRight.x(), midPoint.y());
+  painter.drawLine(topLeft.x(), topLeft.y(), topLeft.x(), bottomRight.y());
+  painter.drawLine(bottomRight.x(), topLeft.y(), bottomRight.x(),
+    bottomRight.y());
 
-   QPoint textTopLeft(topLeft.x(), 2*topLeft.y() - bottomRight.y());
-   QPoint textBottomRight(bottomRight.x(), textTopLeft.y() +
-      (bottomRight.y() - topLeft.y()));
-   QRect rulerRect(textTopLeft, textBottomRight);
-   painter.drawText (rulerRect, Qt::AlignHCenter,
-      QString(this->scaleText.c_str()));
+  QPoint textTopLeft(topLeft.x(), 2*topLeft.y() - bottomRight.y());
+  QPoint textBottomRight(bottomRight.x(), textTopLeft.y() +
+    (bottomRight.y() - topLeft.y()));
+  QRect rulerRect(textTopLeft, textBottomRight);
+  painter.drawText(rulerRect, Qt::AlignHCenter,
+    QString(this->scaleText.c_str()));
 }
 
 //////////////////////////////////////////////////

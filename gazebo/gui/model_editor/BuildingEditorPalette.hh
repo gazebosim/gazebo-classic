@@ -18,6 +18,8 @@
 #ifndef _BUILDING_EDITOR_PALETTE_HH_
 #define _BUILDING_EDITOR_PALETTE_HH_
 
+#include <string>
+#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Events.hh"
 
@@ -29,11 +31,11 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Constructor
       public: BuildingEditorPalette(QWidget *_parent = 0);
 
+      /// \brief Destructor
       public: ~BuildingEditorPalette();
-
-//      public: void SetEditorWidget(BuildingEditorWidget* _widget);
 
       /// \brief On draw wall callback.
       private slots: void OnDrawWall();

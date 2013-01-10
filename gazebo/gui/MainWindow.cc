@@ -962,7 +962,6 @@ void MainWindow::CreateMenus()
   editorFileMenu->addAction(g_editorDiscardAct);
   editorFileMenu->addAction(g_editorDoneAct);
   editorFileMenu->addAction(g_editorExitAct);
-
 }
 
 /////////////////////////////////////////////////

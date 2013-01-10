@@ -18,6 +18,7 @@
 #ifndef _WALL_INSPECTOR_DIALOG_HH_
 #define _WALL_INSPECTOR_DIALOG_HH_
 
+#include <string>
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -83,8 +84,8 @@ namespace gazebo
       private: QDoubleSpinBox *lengthSpinBox;
 
       private: QComboBox *materialComboBox;
-   };
- }
+    };
+  }
 }
 
 #endif

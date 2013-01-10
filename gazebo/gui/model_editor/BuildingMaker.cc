@@ -507,7 +507,7 @@ void BuildingMaker::GenerateSDF()
   modelElem->GetAttribute("name")->Set(this->modelName);
 
   std::map<std::string, ModelManip *>::iterator itemsIt;
-  for(itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
+  for (itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
       itemsIt++)
   {
     visualNameStream.str("");
@@ -744,7 +744,7 @@ void BuildingMaker::GenerateSDF()
     modelElem->InsertElement(newLinkElem);
   }
   (modelElem->AddElement("static"))->Set("true");
-  //qDebug() << this->modelSDF->ToString().c_str();
+  // qDebug() << this->modelSDF->ToString().c_str();
 }
 
 /////////////////////////////////////////////////
@@ -774,7 +774,7 @@ void BuildingMaker::GenerateSDFWithCSG()
   modelElem->GetAttribute("name")->Set(this->modelName);
 
   std::map<std::string, ModelManip *>::iterator itemsIt;
-  for(itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
+  for (itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
       itemsIt++)
   {
     visualNameStream.str("");
@@ -928,7 +928,6 @@ void BuildingMaker::CreateTheEntity()
   msgs::Factory msg;
   msg.set_sdf(this->modelSDF->ToString());
   this->makerPub->Publish(msg);
-
 }
 
 /////////////////////////////////////////////////
@@ -1037,10 +1036,10 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
     const std::vector<QRectF> &_holes, std::vector<QRectF> &_subdivisions)
 {
   // use multiset for ordered elements
-  std::multiset<QRectF, bool(*)(const QRectF &, const QRectF &)> filledX(
-      BuildingMaker::RectCompareX);
-  std::multiset<QRectF, bool(*)(const QRectF &, const QRectF &)> filledY(
-      BuildingMaker::RectCompareY);
+  std::multiset<QRectF, bool(*)(const QRectF &, const QRectF &)>
+      filledX(BuildingMaker::RectCompareX);
+  std::multiset<QRectF, bool(*)(const QRectF &, const QRectF &)>
+      filledY(BuildingMaker::RectCompareY);
   for (unsigned int i = 0; i < _holes.size(); ++i)
   {
     filledX.insert(_holes[i]);
@@ -1071,7 +1070,7 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
   double eps = 0.001;
   QPointF borderStart;
   std::multiset<QRectF>::iterator borderIt = filledX.begin();
-  for (borderIt; borderIt!=filledX.end(); ++borderIt)
+  for (borderIt; borderIt != filledX.end(); ++borderIt)
   {
     if (fabs((*borderIt).y() - _surface.y()) < eps
         && ((*borderIt).x() + (*borderIt).width())
@@ -1098,7 +1097,7 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
     // walk along y
     double maxY = _surface.y() + _surface.height();
     std::multiset<QRectF>::iterator it = filledY.begin();
-    for (it; it!=filledY.end(); ++it)
+    for (it; it != filledY.end(); ++it)
     {
       if (((*startIt).x() >= (*it).x())
           && ((*startIt).x() < ((*it).x() + (*it).width())))
@@ -1113,7 +1112,7 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
     // find next obstacle in x dir
     double maxX = _surface.x() + _surface.width();
     it = filledX.begin();
-    for (it; it!=filledX.end(); ++it)
+    for (it; it != filledX.end(); ++it)
     {
       if ((maxY > (*it).y()) )
       {
@@ -1140,7 +1139,7 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
 
     if (tmpStart.y() >= _surface.y() + _surface.height())
       edgeIt = filledX.end();
-    for (edgeIt; edgeIt!=filledX.end(); ++edgeIt)
+    for (edgeIt; edgeIt != filledX.end(); ++edgeIt)
     {
       if (fabs((*edgeIt).y() - (block.y() + block.height())) > eps)
         continue;
@@ -1160,7 +1159,10 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
           walkedEdge = true;
         }
       }
-      else break;
+      else
+      {
+        break;
+      }
     }
     if (walkedEdge && (tmpStart.x() < (block.x() + block.width())))
     {
@@ -1180,7 +1182,7 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
     if (tmpStart.x() >= (_surface.x() + _surface.width()))
       edgeIt = filledY.end();
 
-    for (edgeIt; edgeIt!=filledY.end(); ++edgeIt)
+    for (edgeIt; edgeIt != filledY.end(); ++edgeIt)
     {
       if (fabs((*edgeIt).x() - (block.x() + block.width())) > eps)
         continue;
@@ -1201,7 +1203,10 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
           walkedEdge = true;
         }
       }
-      else break;
+      else
+      {
+        break;
+      }
     }
     if (walkedEdge && (tmpStart.y() <= (block.y() + block.height())) )
     {
@@ -1323,5 +1328,4 @@ void BuildingMaker::OnExit()
     default:
       break;
   }
-
 }

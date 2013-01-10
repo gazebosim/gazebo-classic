@@ -167,7 +167,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   mainLayout->addWidget(positionGroupBox);
   mainLayout->addWidget(lengthGroupBox);
   mainLayout->addLayout(heightThicknessLayout);
-  //mainLayout->addLayout(materialLayout);
+  // mainLayout->addLayout(materialLayout);
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);

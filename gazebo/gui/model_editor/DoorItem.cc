@@ -95,7 +95,7 @@ double DoorItem::GetSceneRotation() const
 }
 
 /////////////////////////////////////////////////
-void DoorItem::paint (QPainter *_painter,
+void DoorItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
   if (this->isSelected())

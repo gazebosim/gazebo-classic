@@ -16,7 +16,7 @@
  */
 
 #include <string>
-#include "gts.h"
+#include <gts.h>
 
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Exception.hh"
@@ -46,9 +46,9 @@ static void MergeVertices(GPtrArray * _vertices, double _epsilon)
   GtsVertex **verticesData = reinterpret_cast<GtsVertex **>(_vertices->pdata);
   array = g_ptr_array_new();
   for (unsigned int i = 0; i < _vertices->len; ++i)
-    g_ptr_array_add (array, verticesData[i]);
+    g_ptr_array_add(array, verticesData[i]);
   kdtree = gts_kdtree_new(array, NULL);
-  g_ptr_array_free (array, true);
+  g_ptr_array_free(array, true);
 
   for (unsigned int i = 0; i < _vertices->len; i++)
   {
@@ -61,24 +61,24 @@ static void MergeVertices(GPtrArray * _vertices, double _epsilon)
       GSList *selected, *j;
 
       // build bounding box
-      bbox = gts_bbox_new (gts_bbox_class(),
-			   v,
-			   GTS_POINT(v)->x - _epsilon,
-			   GTS_POINT(v)->y - _epsilon,
-			   GTS_POINT(v)->z - _epsilon,
-			   GTS_POINT(v)->x + _epsilon,
-			   GTS_POINT(v)->y + _epsilon,
-			   GTS_POINT(v)->z + _epsilon);
+      bbox = gts_bbox_new(gts_bbox_class(),
+          v,
+          GTS_POINT(v)->x - _epsilon,
+          GTS_POINT(v)->y - _epsilon,
+          GTS_POINT(v)->z - _epsilon,
+          GTS_POINT(v)->x + _epsilon,
+          GTS_POINT(v)->y + _epsilon,
+          GTS_POINT(v)->z + _epsilon);
 
       // select vertices which are inside bbox using kdtree
-      j = selected = gts_kdtree_range (kdtree, bbox, NULL);
+      j = selected = gts_kdtree_range(kdtree, bbox, NULL);
       while (j)
       {
-	      GtsVertex *sv = reinterpret_cast<GtsVertex *>(j->data);
+        GtsVertex *sv = reinterpret_cast<GtsVertex *>(j->data);
         // mark sv as inactive
-	      if (sv != v && !GTS_OBJECT(sv)->reserved)
-	        GTS_OBJECT(sv)->reserved = v;
-	      j = j->next;
+        if (sv != v && !GTS_OBJECT(sv)->reserved)
+          GTS_OBJECT(sv)->reserved = v;
+        j = j->next;
       }
       g_slist_free(selected);
       gts_object_destroy(GTS_OBJECT(bbox));
@@ -111,8 +111,9 @@ static void FillVertex(GtsPoint *_p, gpointer *_data)
 {
   SubMesh *subMesh = reinterpret_cast<SubMesh *>(_data[0]);
   GHashTable* vIndex = reinterpret_cast<GHashTable *>(_data[2]);
-  subMesh->AddVertex(GTS_POINT(_p)->x, GTS_POINT(_p)->y, GTS_POINT (_p)->z);
-  g_hash_table_insert(vIndex, _p, GUINT_TO_POINTER((*((guint *)_data[1]))++));
+  subMesh->AddVertex(GTS_POINT(_p)->x, GTS_POINT(_p)->y, GTS_POINT(_p)->z);
+  g_hash_table_insert(vIndex, _p,
+      GUINT_TO_POINTER((*(reinterpret_cast<guint *>(_data[1])))++));
 }
 
 //////////////////////////////////////////////////
@@ -123,7 +124,7 @@ static void FillFace(GtsTriangle *_t, gpointer *_data)
 
   GtsVertex * v1, * v2, * v3;
 //  GtsVector n;
-  gts_triangle_vertices (_t, &v1, &v2, &v3);
+  gts_triangle_vertices(_t, &v1, &v2, &v3);
 
   subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v1)));
   subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v2)));
@@ -180,16 +181,16 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
   }
 
   // build bounding box tree for first surface
-  tree1 = gts_bb_tree_surface (s1);
-  is_open1 = gts_surface_volume (s1) < 0. ? true : false;
+  tree1 = gts_bb_tree_surface(s1);
+  is_open1 = gts_surface_volume(s1) < 0. ? true : false;
 
   // build bounding box tree for second surface
-  tree2 = gts_bb_tree_surface (s2);
-  is_open2 = gts_surface_volume (s2) < 0. ? true : false;
+  tree2 = gts_bb_tree_surface(s2);
+  is_open2 = gts_surface_volume(s2) < 0. ? true : false;
 
-  si = gts_surface_inter_new (gts_surface_inter_class (), s1, s2, tree1, tree2,
+  si = gts_surface_inter_new(gts_surface_inter_class(), s1, s2, tree1, tree2,
       is_open1, is_open2);
-  assert(gts_surface_inter_check (si, &closed));
+  assert(gts_surface_inter_check(si, &closed));
   if (!closed)
   {
     gzerr << "the intersection of " << _m1->GetName() << " and "
@@ -207,20 +208,20 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
 
   if (_operation == MeshCSG::UNION)
   {
-    gts_surface_inter_boolean (si, s3, GTS_1_OUT_2);
-    gts_surface_inter_boolean (si, s3, GTS_2_OUT_1);
+    gts_surface_inter_boolean(si, s3, GTS_1_OUT_2);
+    gts_surface_inter_boolean(si, s3, GTS_2_OUT_1);
   }
   else if (_operation == MeshCSG::INTERSECTION)
   {
-    gts_surface_inter_boolean (si, s3, GTS_1_IN_2);
-    gts_surface_inter_boolean (si, s3, GTS_2_IN_1);
+    gts_surface_inter_boolean(si, s3, GTS_1_IN_2);
+    gts_surface_inter_boolean(si, s3, GTS_2_IN_1);
   }
   else if (_operation == MeshCSG::DIFFERENCE)
   {
-    gts_surface_inter_boolean (si, s3, GTS_1_OUT_2);
-    gts_surface_inter_boolean (si, s3, GTS_2_IN_1);
-    gts_surface_foreach_face (si->s2, (GtsFunc) gts_triangle_revert, NULL);
-    gts_surface_foreach_face (s2, (GtsFunc) gts_triangle_revert, NULL);
+    gts_surface_inter_boolean(si, s3, GTS_1_OUT_2);
+    gts_surface_inter_boolean(si, s3, GTS_2_IN_1);
+    gts_surface_foreach_face(si->s2, (GtsFunc) gts_triangle_revert, NULL);
+    gts_surface_foreach_face(s2, (GtsFunc) gts_triangle_revert, NULL);
   }
 
 //  FILE *output = fopen("output.gts", "w");
@@ -283,7 +284,7 @@ void MeshCSG::ConvertMeshToGTS(const Mesh *_mesh, GtsSurface *_surface)
     for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
     {
       math::Vector3 vertex = subMesh->GetVertex(j);
-      g_ptr_array_add (vertices, gts_vertex_new(gts_vertex_class(), vertex.x,
+      g_ptr_array_add(vertices, gts_vertex_new(gts_vertex_class(), vertex.x,
           vertex.y, vertex.z));
     }
 

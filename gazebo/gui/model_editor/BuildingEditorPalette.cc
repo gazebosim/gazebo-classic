@@ -53,7 +53,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   drawWallsLabel->setText("Draw Walls");
   QPushButton *addDrawWallButton = new QPushButton;
   addDrawWallButton->setIcon(QIcon(":/images/Wall.png"));
-  addDrawWallButton->setIconSize(QSize(30,60));
+  addDrawWallButton->setIconSize(QSize(30, 60));
   addDrawWallButton->setFlat(true);
   connect(addDrawWallButton, SIGNAL(clicked()), this, SLOT(OnDrawWall()));
 
@@ -89,7 +89,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   addWindowLabel->setText("Add Window");
   QPushButton *addWindowButton = new QPushButton;
   addWindowButton->setIcon(QIcon(":/images/Window.png"));
-  addWindowButton->setIconSize(QSize(30,60));
+  addWindowButton->setIconSize(QSize(30, 60));
   addWindowButton->setFlat(true);
   connect(addWindowButton, SIGNAL(clicked()), this, SLOT(OnAddWindow()));
 
@@ -106,7 +106,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   addDoorLabel->setText("Add Doorway");
   QPushButton *addDoorButton = new QPushButton;
   addDoorButton->setIcon(QIcon(":/images/Door.png"));
-  addDoorButton->setIconSize(QSize(30,60));
+  addDoorButton->setIconSize(QSize(30, 60));
   addDoorButton->setFlat(true);
   connect(addDoorButton, SIGNAL(clicked()), this, SLOT(OnAddDoor()));
 
@@ -130,7 +130,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   addStairsLabel->setText("Add Stairs");
   QPushButton *addStairsButton = new QPushButton;
   addStairsButton->setIcon(QIcon(":/images/Stairs.png"));
-  addStairsButton->setIconSize(QSize(30,60));
+  addStairsButton->setIconSize(QSize(30, 60));
   addStairsButton->setFlat(true);
   connect(addStairsButton, SIGNAL(clicked()), this, SLOT(OnAddStairs()));
 

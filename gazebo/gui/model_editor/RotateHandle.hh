@@ -56,7 +56,7 @@ namespace gazebo
 
       public: virtual QRectF boundingRect() const;
 
-      private: void paint (QPainter *_painter,
+      private: void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
       private: int mouseButtonState;
@@ -74,8 +74,6 @@ namespace gazebo
       private: QPointF origin;
 
       private: QPointF handleOffset;
-
-
     };
   }
 }

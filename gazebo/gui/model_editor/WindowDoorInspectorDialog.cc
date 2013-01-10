@@ -135,7 +135,7 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   mainLayout->addLayout(nameLayout);
   mainLayout->addWidget(positionGroupBox);
   mainLayout->addWidget(sizeGroupBox);
-  //mainLayout->addLayout(typeLayout);
+  // mainLayout->addLayout(typeLayout);
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);

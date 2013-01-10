@@ -18,6 +18,7 @@
 #define _MODEL_MANIP_HH_
 
 #include <string>
+#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/rendering/Visual.hh"
 

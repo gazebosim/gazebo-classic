@@ -24,7 +24,6 @@ namespace gazebo
 {
   namespace gui
   {
-
     class EditorItem;
 
     class LineSegmentItem : public EditorItem, public QGraphicsLineItem

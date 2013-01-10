@@ -43,7 +43,6 @@ namespace gazebo
       private: LevelWidget *levelWidget;
 
       private: ScaleWidget *scaleWidget;
-
     };
   }
 }

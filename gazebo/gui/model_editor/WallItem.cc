@@ -300,7 +300,6 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
         this->UpdateSegmentChildren(this->GetSegment(i));
       }
     }
-
   }
   return true;
 }
@@ -418,7 +417,6 @@ void WallItem::UpdateSegmentChildren(LineSegmentItem *_segment)
       double deltaRatio = sqrt(delta.x()*delta.x() + delta.y()*delta.y())
           / _segment->line().length();
       rectItem->setPos(_segment->line().p1() + deltaRatio*deltaLine);
-
     }
   }
 }

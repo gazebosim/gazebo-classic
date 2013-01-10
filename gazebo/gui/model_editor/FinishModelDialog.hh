@@ -18,6 +18,7 @@
 #ifndef _FINISH_MODEL_DIALOG_HH_
 #define _FINISH_MODEL_DIALOG_HH_
 
+#include <string>
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -51,8 +52,8 @@ namespace gazebo
       private: QLineEdit* modelNameLineEdit;
 
       private: QLineEdit* modelLocationLineEdit;
-   };
- }
+    };
+  }
 }
 
 #endif

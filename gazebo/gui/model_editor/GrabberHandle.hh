@@ -26,7 +26,7 @@ namespace gazebo
   {
     class GrabberHandle : public QGraphicsItem
     {
-      public: explicit GrabberHandle(QGraphicsItem *_parent = 0, int index = 0);
+      public: GrabberHandle(QGraphicsItem *_parent = 0, int index = 0);
 
       public: int GetIndex() const;
 
@@ -62,22 +62,22 @@ namespace gazebo
 
       public: virtual QRectF boundingRect() const;
 
-      private: virtual void paint (QPainter *_painter,
+      private: virtual void paint(QPainter *_painter,
         const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-      protected: void hoverEnterEvent (QGraphicsSceneHoverEvent *_event);
+      protected: void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
 
-      protected: void hoverLeaveEvent (QGraphicsSceneHoverEvent *_event);
+      protected: void hoverLeaveEvent(QGraphicsSceneHoverEvent *_event);
 
-      protected: void mouseMoveEvent (QGraphicsSceneMouseEvent *_event);
+      protected: void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
 
       protected: void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
 
-      protected: void mousePressEvent (QGraphicsSceneMouseEvent *_event);
+      protected: void mousePressEvent(QGraphicsSceneMouseEvent *_event);
 
       protected: void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
 
-      protected: void mouseReleaseEvent (QGraphicsSceneMouseEvent *_event);
+      protected: void mouseReleaseEvent(QGraphicsSceneMouseEvent *_event);
 
       private: int index;
 

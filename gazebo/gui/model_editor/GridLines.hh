@@ -34,23 +34,24 @@ namespace gazebo
 
       private: virtual QRectF boundingRect() const;
 
-      private: virtual void paint (QPainter *_painter,
+      private: virtual void paint(QPainter *_painter,
         const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-      private: virtual void mouseMoveEvent (QGraphicsSceneMouseEvent *_event);
+      private: virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
 
       private: virtual void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
 
-      private: virtual void mousePressEvent (QGraphicsSceneMouseEvent *_event);
+      private: virtual void mousePressEvent(QGraphicsSceneMouseEvent *_event);
 
-      private: virtual void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
+      private: virtual void mousePressEvent(
+          QGraphicsSceneDragDropEvent *_event);
 
       private: int width;
 
       private: int height;
 
       private: int space;
-    };
+          };
   }
 }
 #endif

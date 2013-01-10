@@ -115,7 +115,7 @@ EditorView::~EditorView()
 }
 
 /////////////////////////////////////////////////
-void EditorView::scrollContentsBy (int _dx, int _dy)
+void EditorView::scrollContentsBy(int _dx, int _dy)
 {
   if (this->gridLines && this->scene())
   {
@@ -129,11 +129,10 @@ void EditorView::resizeEvent(QResizeEvent *_event)
 {
   if (!this->gridLines && this->scene())
   {
-    this->gridLines = new GridLines (this->scene()->sceneRect().width(),
+    this->gridLines = new GridLines(this->scene()->sceneRect().width(),
     this->scene()->sceneRect().height());
     this->scene()->addItem(this->gridLines);
   }
-
 }
 
 /////////////////////////////////////////////////
@@ -189,7 +188,7 @@ void EditorView::wheelEvent(QWheelEvent *_event)
       mousePosition.y() -(this->height()/2));
   this->setMatrix(mat);
 
-  if(gridLines)
+  if (gridLines)
   {
     this->gridLines->setPos(this->mapToScene(
         QPoint(this->width()/2, this->height()/2)));
@@ -197,7 +196,6 @@ void EditorView::wheelEvent(QWheelEvent *_event)
 
   gui::editor::Events::changeZoom(this->viewScale);
   _event->accept();
-
 }
 
 /////////////////////////////////////////////////
@@ -239,7 +237,6 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
         this->drawMode = NONE;
         this->drawInProgress = false;
       }
-
       break;
     case DOOR:
       if (drawInProgress)
@@ -263,7 +260,6 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
         }
         this->drawMode = NONE;
         this->drawInProgress = false;
-
       }
     default:
       break;
@@ -692,7 +688,7 @@ void EditorView::CreateItem3D(EditorItem* _item)
           this->itemToModelMap[floorList[stairsItem->GetLevel()]]);
     }
   }
-  //TODO add implementation for other times
+  // TODO add implementation for other times
 }
 
 /////////////////////////////////////////////////
@@ -719,8 +715,9 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
   if (this->drawMode == WALL)
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 
-//  this->grabKeyboard();
+  // this->grabKeyboard();
 }
+
 /*
 /////////////////////////////////////////////////
 void EditorView::OnSaveModel(const std::string &_modelName,
@@ -766,7 +763,7 @@ void EditorView::OnDiscardModel()
   this->scene()->clear();
 
   // clear the scene but add the grid back in
-  this->gridLines = new GridLines (this->scene()->sceneRect().width(),
+  this->gridLines = new GridLines(this->scene()->sceneRect().width(),
       this->scene()->sceneRect().height());
   this->scene()->addItem(this->gridLines);
 
@@ -952,35 +949,40 @@ void EditorView::OnChangeLevel(int _level)
   {
     if ((*it)->GetLevel() != _level)
       (*it)->setVisible(false);
-    else (*it)->setVisible(true);
+    else
+      (*it)->setVisible(true);
   }
   for (std::vector<WindowItem *>::iterator it = this->windowList.begin();
       it != this->windowList.end(); ++it)
   {
     if ((*it)->GetLevel() != _level)
       (*it)->setVisible(false);
-    else (*it)->setVisible(true);
+    else
+      (*it)->setVisible(true);
   }
   for (std::vector<DoorItem *>::iterator it = this->doorList.begin();
       it != this->doorList.end(); ++it)
   {
     if ((*it)->GetLevel() != _level)
       (*it)->setVisible(false);
-    else (*it)->setVisible(true);
+    else
+      (*it)->setVisible(true);
   }
   for (std::vector<StairsItem *>::iterator it = this->stairsList.begin();
       it != this->stairsList.end(); ++it)
   {
     if ((*it)->GetLevel() != _level && (*it)->GetLevel() != (_level - 1))
       (*it)->setVisible(false);
-    else (*it)->setVisible(true);
+    else
+      (*it)->setVisible(true);
   }
   for (std::vector<FloorItem *>::iterator it = this->floorList.begin();
       it != this->floorList.end(); ++it)
   {
     if ((*it)->GetLevel() != _level)
       (*it)->setVisible(false);
-    else (*it)->setVisible(true);
+    else
+      (*it)->setVisible(true);
   }
 }
 
@@ -1018,7 +1020,7 @@ void EditorView::CancelDrawMode()
         if (wallItem->GetVertexCount() >= 2)
         {
           wallList.push_back(wallItem);
-          //this->buildingMaker->RemoveWall(this->lastWallSegmentName);
+          // this->buildingMaker->RemoveWall(this->lastWallSegmentName);
           this->lastWallSegmentName = "";
           if (wallItem->GetLevel() > 0)
             floorList[wallItem->GetLevel()-1]->AttachWall(wallItem);

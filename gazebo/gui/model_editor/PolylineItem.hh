@@ -18,6 +18,7 @@
 #ifndef _POLYLINE_ITEM_HH_
 #define _POLYLINE_ITEM_HH_
 
+#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model_editor/EditorItem.hh"
 

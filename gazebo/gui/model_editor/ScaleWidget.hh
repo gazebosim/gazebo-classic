@@ -18,6 +18,8 @@
 #ifndef _RULER_WIDGET_HH_
 #define _RULER_WIDGET_HH_
 
+#include <string>
+#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 

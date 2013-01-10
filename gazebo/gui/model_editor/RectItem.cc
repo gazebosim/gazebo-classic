@@ -26,10 +26,8 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-RectItem::RectItem():
-    borderColor(Qt::black),
-    location(0,0),
-    gridSpace(10)
+RectItem::RectItem()
+    : borderColor(Qt::black), location(0, 0), gridSpace(10)
 {
   this->editorType = "Rect";
 
@@ -81,7 +79,7 @@ RectItem::RectItem():
     this, SLOT(OnDeleteItem()));
 }
 
- /////////////////////////////////////////////////
+/////////////////////////////////////////////////
 RectItem::~RectItem()
 {
   for (int i = 0; i < 8; ++i)
@@ -99,7 +97,6 @@ void RectItem::ShowCorners(bool _show)
   for (int i = 0; i < 8; ++i)
   {
     this->grabbers[i]->setVisible(_show && this->grabbers[i]->isEnabled());
-
   }
   this->rotateHandle->setVisible(_show);
 }
@@ -119,7 +116,6 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
 {
   if (_change == QGraphicsItem::ItemSelectedChange && this->scene())
   {
-
     if (_value.toBool())
     {
       this->setZValue(zValueSelected);
@@ -146,10 +142,6 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
   {
     emit posXChanged(this->scenePos().x());
     emit posYChanged(this->scenePos().y());
-  }
-  if (_change == QGraphicsItem::ItemParentChange && this->scene())
-  {
-
   }
   return QGraphicsItem::itemChange(_change, _value);
 }
@@ -264,7 +256,8 @@ bool RectItem::grabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
   {
     case QEvent::GraphicsSceneMousePress:
     {
-      _grabber->SetMouseState(static_cast<int>(QEvent::GraphicsSceneMousePress));
+      _grabber->SetMouseState(
+          static_cast<int>(QEvent::GraphicsSceneMousePress));
       _grabber->SetMouseDownX(mouseEvent->pos().x());
       _grabber->SetMouseDownY(mouseEvent->pos().y());
       break;
@@ -339,7 +332,7 @@ bool RectItem::grabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
 
     int xAxisSign = 0;
     int yAxisSign = 0;
-    switch(_grabber->GetIndex())
+    switch (_grabber->GetIndex())
     {
       // corners
       case 0:
@@ -366,7 +359,7 @@ bool RectItem::grabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
         yAxisSign = -1;
         break;
       }
-      //edges
+      // edges
       case 1:
       {
         xAxisSign = 0;
@@ -420,7 +413,7 @@ bool RectItem::grabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     double angle = rotationAngle / 360.0 * (2 * M_PI);
     double dx = 0;
     double dy = 0;
-    switch(_grabber->GetIndex())
+    switch (_grabber->GetIndex())
     {
       // grabbers
       case 0:

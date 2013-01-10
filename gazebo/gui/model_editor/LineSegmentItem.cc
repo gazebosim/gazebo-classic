@@ -121,7 +121,6 @@ void LineSegmentItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void LineSegmentItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
-
   _event->setAccepted(true);
 }
 

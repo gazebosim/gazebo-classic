@@ -18,6 +18,7 @@
 #ifndef _FLOOR_ITEM_HH_
 #define _FLOOR_ITEM_HH_
 
+#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/BuildingItem.hh"
@@ -47,7 +48,7 @@ namespace gazebo
 
         public: void AttachWall(WallItem *_wallItem);
 
-        private: virtual void paint (QPainter *_painter,
+        private: virtual void paint(QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
         private: virtual void mousePressEvent(QGraphicsSceneMouseEvent *_event);

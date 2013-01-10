@@ -46,7 +46,7 @@ namespace gazebo
 
         public: virtual double GetSceneRotation() const;
 
-        private: virtual void paint (QPainter *_painter,
+        private: virtual void paint(QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
         private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);

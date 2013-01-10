@@ -22,7 +22,6 @@
 #include "gazebo/gui/model_editor/RectItem.hh"
 #include "gazebo/gui/model_editor/BuildingMaker.hh"
 #include "gazebo/gui/model_editor/StairsInspectorDialog.hh"
-#include "gazebo/gui/model_editor/EditorView.hh"
 #include "gazebo/gui/model_editor/StairsItem.hh"
 #include "gazebo/gui/model_editor/RotateHandle.hh"
 
