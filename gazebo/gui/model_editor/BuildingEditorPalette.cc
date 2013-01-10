@@ -103,7 +103,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
       QSizePolicy::Minimum), 0, 1);
 
   QLabel *addDoorLabel = new QLabel;
-  addDoorLabel->setText("Add Door");
+  addDoorLabel->setText("Add Doorway");
   QPushButton *addDoorButton = new QPushButton;
   addDoorButton->setIcon(QIcon(":/images/Door.png"));
   addDoorButton->setIconSize(QSize(30,60));
