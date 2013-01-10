@@ -19,6 +19,7 @@
 
 #include <string>
 #include <list>
+#include <boost/thread/mutex.hpp>
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -138,6 +139,9 @@ namespace gazebo
 
       /// \brief A list of clock times that messages have been received.
       private: std::list<common::Time> times;
+
+      /// \brief A mutex to protect the update cycle.
+      private: boost::mutex updateMutex;
     };
   }
 }

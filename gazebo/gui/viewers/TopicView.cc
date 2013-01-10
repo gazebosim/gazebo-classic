@@ -89,6 +89,8 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   this->setSizeGripEnabled(true);
 
   QTimer::singleShot(500, this, SLOT(Update()));
+
+  this->setWindowFlags(Qt::Window);
 }
 
 /////////////////////////////////////////////////
@@ -100,6 +102,8 @@ TopicView::~TopicView()
 /////////////////////////////////////////////////
 void TopicView::Update()
 {
+  boost::mutex::scoped_lock lock(this->updateMutex);
+
   // Update the child class.
   this->UpdateImpl();
 
@@ -171,6 +175,8 @@ void TopicView::OnMsg(const common::Time &_dataTime, int _size)
 /////////////////////////////////////////////////
 void TopicView::OnTopicChanged(int _index)
 {
+  boost::mutex::scoped_lock lock(this->updateMutex);
+
   // Set the current topic based on the index of the item selected in the
   // combobox
   this->SetTopic(this->topicCombo->itemText(_index).toStdString());
