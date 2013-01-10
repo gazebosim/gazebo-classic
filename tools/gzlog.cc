@@ -17,6 +17,9 @@
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/regex.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
@@ -29,6 +32,8 @@
 #include <gazebo/gazebo_config.h>
 
 using namespace gazebo;
+
+sdf::ElementPtr g_stateSdf;
 
 std::vector<std::string> params;
 
@@ -174,10 +179,6 @@ void info()
   sdf::initFile("root.sdf", sdf);
   sdf::readString(sdfString, sdf);
 
-  // Create a state sdf element.
-  sdf::ElementPtr stateSdf(new sdf::Element);
-  sdf::initFile("state.sdf", stateSdf);
-
   gazebo::physics::WorldState state;
 
   unsigned int modelCount = 0;
@@ -225,16 +226,16 @@ void info()
     for (unsigned int i = 0; i < play->GetChunkCount(); ++i)
     {
       stateString.clear();
-      stateSdf->ClearElements();
+      g_stateSdf->ClearElements();
 
       play->Step(stateString);
 
       if (stateString.empty())
         continue;
 
-      sdf::readString(stateString, stateSdf);
+      sdf::readString(stateString, g_stateSdf);
 
-      state.Load(stateSdf);
+      state.Load(g_stateSdf);
       endTime += state.GetWallTime();
     }
   }
@@ -271,11 +272,69 @@ void info()
 }
 
 /////////////////////////////////////////////////
+/// \brief Filter a state string.
+std::string filter_state(const std::string &_stateString,
+                         std::string _filterName)
+{
+  std::string result;
+  gazebo::physics::WorldState state;
+  std::vector<std::string> names;
+
+  g_stateSdf->ClearElements();
+  sdf::readString(_stateString, g_stateSdf);
+  state.Load(g_stateSdf);
+
+  // Split the filter name on "::"
+  boost::split_regex(names, _filterName, boost::regex("::"));
+  std::vector<std::string>::iterator iter = names.begin();
+
+  if (names.size() > 0)
+  {
+    gazebo::physics::ModelState modelState = state.GetModelState(*iter);
+    iter++;
+
+    if (names.size() > 1)
+    {
+      if (modelState.HasLinkState(*iter))
+        std::cout << modelState.GetLinkState(*iter);
+      else if (modelState.HasJointState(*iter))
+      {
+        gazebo::physics::JointState jointState;
+        jointState = modelState.GetJointState(*(iter++));
+
+        if (iter != names.end())
+        {
+          try
+          {
+            int index = boost::lexical_cast<int>(*iter);
+            result =
+              boost::lexical_cast<std::string>(jointState.GetAngle(index));
+          }
+          catch(boost::bad_lexical_cast &_e)
+          {
+            gzerr << "Invalid joint angle index[" << *iter << "]\n";
+            result.clear();
+          }
+        }
+        else
+          result = jointState.GetName();
+      }
+    }
+    else
+      std::cout << modelState;
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
 /// \brief Dump the contents of a log file to screen
 void echo()
 {
   if (!load_log_from_param(1))
     return;
+
+  std::string filter = "pr2::bl_caster_l_wheel_joint::0";
 
   std::string stateString;
   for (unsigned int i = 0;
@@ -283,7 +342,14 @@ void echo()
   {
     // Get and output the state string
     gazebo::common::LogPlay::Instance()->Step(stateString);
-    std::cout << stateString << "\n";
+
+    if (!filter.empty() && i > 0)
+      stateString = filter_state(stateString, filter);
+    else if (!filter.empty())
+      stateString.clear();
+
+    if (!stateString.empty())
+      std::cout << stateString << "\n";
   }
 }
 
@@ -320,6 +386,10 @@ int main(int argc, char **argv)
 {
   if (!parse(argc, argv))
     return 0;
+
+  // Create a state sdf element.
+  g_stateSdf.reset(new sdf::Element);
+  sdf::initFile("state.sdf", g_stateSdf);
 
   if (params[0] == "info")
     info();

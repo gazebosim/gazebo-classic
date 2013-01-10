@@ -104,6 +104,11 @@ namespace gazebo
       /// \throws common::Exception When _linkName is invalid.
       public: LinkState GetLinkState(const std::string &_linkName) const;
 
+      /// \brief Return true if there is a link with the specified name.
+      /// \param[in] _linkName Name of the LinkState.
+      /// \return True if the link exists in the model.
+      public: bool HasLinkState(const std::string &_linkName) const;
+
       /// \brief Get the link states.
       /// \return A vector of link states.
       public: const std::vector<LinkState> &GetLinkStates() const;
@@ -135,6 +140,11 @@ namespace gazebo
       /// \brief Get the joint states.
       /// \return A vector of joint states.
       public: const std::vector<JointState> &GetJointStates() const;
+
+      /// \brief Return true if there is a joint with the specified name.
+      /// \param[in] _jointName Name of the Jointtate.
+      /// \return True if the joint exists in the model.
+      public: bool HasJointState(const std::string &_jointName) const;
 
       /// \brief Populate a state SDF element with data from the object.
       /// \param[out] _sdf SDF element to populate.

@@ -164,6 +164,20 @@ LinkState ModelState::GetLinkState(const std::string &_linkName) const
 }
 
 /////////////////////////////////////////////////
+bool ModelState::HasLinkState(const std::string &_linkName) const
+{
+  // Search for the link name
+  for (std::vector<LinkState>::const_iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end(); ++iter)
+  {
+    if ((*iter).GetName() == _linkName)
+      return true;
+  }
+
+  return false;
+}
+
+/////////////////////////////////////////////////
 const std::vector<LinkState> &ModelState::GetLinkStates() const
 {
   return this->linkStates;
@@ -197,6 +211,19 @@ JointState ModelState::GetJointState(const std::string &_jointName) const
 
   gzthrow("Invalid joint name[" + _jointName + "]");
   return JointState();
+}
+
+/////////////////////////////////////////////////
+bool ModelState::HasJointState(const std::string &_jointName) const
+{
+  for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end(); ++iter)
+  {
+    if ((*iter).GetName() == _jointName)
+      return true;
+  }
+
+  return false;
 }
 
 /////////////////////////////////////////////////
