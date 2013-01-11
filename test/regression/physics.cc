@@ -222,21 +222,22 @@ void PhysicsTest::SpawnDropCoGOffset(std::string _worldFile)
   double z0 = 3;
   double r1 = 0.5, r2 = 1.5;
   math::Vector3 v30 = math::Vector3::Zero;
+  math::Vector3 cog;
 
   // sphere1 and sphere2 have c.g. at center of sphere, different sizes
   SpawnSphere("sphere1", math::Vector3(0, 0, z0+r1), v30, v30, r1);
   SpawnSphere("sphere2", math::Vector3(4, 0, z0+r2), v30, v30, r2);
 
   // sphere3 has c.g. below the center
-  math::Vector3 cog(0, 0, -r1);
+  cog.Set(0, 0, -r1);
   SpawnSphere("sphere3", math::Vector3(8, 0, z0+r2), v30, cog, r2);
 
   // sphere4 has c.g. above the center
-  math::Vector3 cog(0, 0, r1);
+  cog.Set(0, 0, r1);
   SpawnSphere("sphere4", math::Vector3(-4, 0, z0+r2), v30, cog, r2);
 
   // sphere5 has c.g. to the side; it will roll
-  math::Vector3 cog(0, r1, 0);
+  cog.Set(0, r1, 0);
   SpawnSphere("sphere5", math::Vector3(-8, 0, z0+r2), v30, cog, r2);
 
   std::list<std::string> model_names;
@@ -251,7 +252,7 @@ void PhysicsTest::SpawnDropCoGOffset(std::string _worldFile)
   math::Pose pose1, pose2;
   math::Vector3 vel1, vel2;
 
-  double t, x0 = 0;
+  double t, x0 = 0, radius;
   for (std::list<std::string>::iterator iter = model_names.begin();
     iter != model_names.end(); ++iter)
   {
@@ -264,6 +265,7 @@ void PhysicsTest::SpawnDropCoGOffset(std::string _worldFile)
       world->StepWorld(1);
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
+      radius = r2;
       EXPECT_EQ(vel1.x, 0);
       EXPECT_EQ(vel1.y, 0);
       EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
@@ -271,7 +273,10 @@ void PhysicsTest::SpawnDropCoGOffset(std::string _worldFile)
       world->StepWorld(steps - 1);
       pose1 = model->GetWorldPose();
       if (*iter == "sphere1")
+      {
         x0 = 0;
+        radius = r1;
+      }
       else if (*iter == "sphere2")
         x0 = 4;
       else if (*iter == "sphere3")
@@ -282,7 +287,8 @@ void PhysicsTest::SpawnDropCoGOffset(std::string _worldFile)
         x0 = -8;
       EXPECT_EQ(pose1.pos.x, x0);
       EXPECT_EQ(pose1.pos.y, 0);
-      EXPECT_NEAR(pose1.pos.z, z0 - g.z/2*t*t, (z0-g.z/2*t*t)*PHYSICS_TOL);
+      EXPECT_NEAR(pose1.pos.z, z0+radius - g.z/2*t*t,
+                  (z0+radius-g.z/2*t*t)*PHYSICS_TOL);
 
       // Check once more and just make sure they keep falling
       world->StepWorld(steps);
@@ -316,20 +322,36 @@ void PhysicsTest::SpawnDropCoGOffset(std::string _worldFile)
       gzdbg << "Check ground contact of model " << *iter << '\n';
       // Check that velocity is small
       vel1 = model->GetWorldLinearVel();
+      vel2 = model->GetWorldAngularVel();
       if (*iter != "sphere5")
       {
         EXPECT_NEAR(vel1.x, 0, PHYSICS_TOL);
         EXPECT_NEAR(vel1.y, 0, PHYSICS_TOL);
         EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel2.x, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel2.y, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel2.z, 0, PHYSICS_TOL);
       }
       else
       {
+        // Should roll in Y direction
+        EXPECT_GT(vel1.y,  0.1);
+        EXPECT_LT(vel2.x, -0.1);
+        // following should still be near zero
+        EXPECT_NEAR(vel1.x, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel2.y, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel2.z, 0, PHYSICS_TOL);
       }
 
       // Check that model is resting on ground
       pose1 = model->GetWorldPose();
+      radius = r2;
       if (*iter == "sphere1")
+      {
         x0 = 0;
+        radius = r1;
+      }
       else if (*iter == "sphere2")
         x0 = 4;
       else if (*iter == "sphere3")
@@ -339,8 +361,11 @@ void PhysicsTest::SpawnDropCoGOffset(std::string _worldFile)
       else if (*iter == "sphere5")
         x0 = -8;
       EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.y, 0, PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.z, 0.5, PHYSICS_TOL);
+      EXPECT_NEAR(pose1.pos.z, radius, PHYSICS_TOL);
+      if (*iter != "sphere5")
+        EXPECT_NEAR(pose1.pos.y, 0, PHYSICS_TOL);
+      else
+        EXPECT_GT(pose1.pos.y,  0.5);
     }
     else
     {

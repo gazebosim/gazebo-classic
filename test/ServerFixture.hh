@@ -538,7 +538,6 @@ class ServerFixture : public testing::Test
                  << "</link>"
                  << "</model>"
                  << "</gazebo>";
-               gzerr << newModelStr << '\n';
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
