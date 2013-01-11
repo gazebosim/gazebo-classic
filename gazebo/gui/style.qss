@@ -120,10 +120,17 @@ QListView
   alternate-background-color: #606060;
 
   selection-color: #f58113;
-  selection-background-color: transparent;
+  selection-background-color: #808080;
+  show-decoration-selected: 0;
 
-  border: 0px solid #737373;
+  border: 1px solid #737373;
   border-radius: 4;
+}
+
+QListView::item
+{
+  color: #ffffff;
+  border-radius: 4px;
 }
 
 QTreeView
@@ -500,36 +507,6 @@ QFrame#pidControl
   padding: 2px;
 }
 
-QComboBox
-{
-  border: 1px solid #101010;
-  background-color: #808080;
-  color: #d0d0d0;
-  border-radius: 4px;
-}
-
-QListView
-{
-  border: 1px solid #000000;
-  border-radius: 4px;
-}
-
-QListView::item
-{
-  color: #ffffff;
-  border-radius: 4px;
-}
-
-/*
-QListWidget#topicTextList::item
-{
-  border-bottom: 1px solid black;
-  border-radius: 4px;
-  background-color: #404040;
-  margin: 4px;
-}
-*/
-
 QListWidget#topicTextList::item
 {
   border-bottom: 1px solid black;
@@ -539,20 +516,24 @@ QListWidget#topicTextList::item
   margin: 4px;
 }
 
-QComboBox QListView::item
+QComboBox
 {
-  color: #f58113;
-  background: #ffffff;
+  border: 1px solid #101010;
+  background-color: #808080;
+  color: #d0d0d0;
+  border-radius: 4px;
+
+  selection-color: #f58113;
+  selection-background-color: #808080;
+  show-decoration-selected: 0;
 }
 
 QComboBox:on
 {
-  /* shift the text when the popup opens */
   padding-top: -10px;
   padding-left: 4px;
 }
 
-/* This modifies the drop-down arrow container */
 QComboBox::drop-down
 {
    subcontrol-origin: padding;
@@ -561,8 +542,8 @@ QComboBox::drop-down
 
    border-left-width: 0px;
    border-left-color: #000000;
-   border-left-style: solid; /* just a single line */
-   border-top-right-radius: 3px; /* same radius as the QComboBox */
+   border-left-style: solid;
+   border-top-right-radius: 3px;
    border-bottom-right-radius: 3px;
 }
 

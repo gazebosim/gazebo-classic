@@ -30,6 +30,7 @@ namespace gazebo
     class TopicView;
     class ImageView;
     class TextView;
+    class LaserView;
 
     /// \def TopicViewPtr
     /// \brief Boost shared pointer to a TopicView object
@@ -38,6 +39,10 @@ namespace gazebo
     /// \def ImageViewPtr
     /// \brief Boost shared pointer to a ImageView object
     typedef boost::shared_ptr<ImageView> ImageViewPtr;
+
+    /// \def LaserViewPtr
+    /// \brief Boost shared pointer to a LaserView object
+    typedef boost::shared_ptr<LaserView> LaserViewPtr;
 
     /// \def TextViewPtr
     /// \brief Boost shared pointer to a TextView object
