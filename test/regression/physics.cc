@@ -22,51 +22,73 @@
 using namespace gazebo;
 class PhysicsTest : public ServerFixture
 {
+  public: void SetupWorld(std::string _worldFile);
   public: void EmptyWorld(std::string _worldFile);
-  public: void JointTest(std::string _worldFile);
+
+  private: physics::WorldPtr world;
+  physics::PhysicsEnginePtr physics;
+  private: math::Vector3 g;
+  private: double dt;
+
+  class JointAxisPendulum : public PhysicsTest
+  {
+    public: void Test(std::string _worldFile);
+
+    math::Pose modelPose, linkPose, jointPose;
+    math::Vector3 pendSize, axis, cogPos;
+    math::Angle initial;
+    std::string modelName;
+    physics::ModelPtr model;
+    physics::LinkPtr link;
+    
+  };
 };
 
-void PhysicsTest::JointTest(std::string _worldFile)
+void PhysicsTest::SetupWorld(std::string _worldFile)
 {
   // Load an empty world
   Load(_worldFile, true);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  this->world = physics::get_world("default");
+  ASSERT_TRUE(this->world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  math::Vector3 g = physics->GetGravity();
+  this->physics = this->world->GetPhysicsEngine();
+  ASSERT_TRUE(this->physics != NULL);
+  this->g = this->physics->GetGravity();
   // Assume gravity vector points down z axis only,
   // with minimum magnitude of 1 m/s^2.
-  EXPECT_EQ(g.x, 0);
-  EXPECT_EQ(g.y, 0);
-  EXPECT_LT(g.z, 1);
+  EXPECT_EQ(this->g.x, 0);
+  EXPECT_EQ(this->g.y, 0);
+  EXPECT_LT(this->g.z, 1);
 
   // get physics time step, expect greater than 100 ns
-  double dt = physics->GetStepTime();
-  EXPECT_GT(dt, 1e-7);
+  this->dt = this->physics->GetStepTime();
+  EXPECT_GT(this->dt, 1e-7);
+}
 
-  math::Pose modelPose, linkPose, jointPose;
-  math::Vector3 pendSize, axis, cogPos;
-  math::Angle initial;
-  physics::ModelPtr model;
-  physics::LinkPtr link;
-  std::string modelName;
+void PhysicsTest::JointAxisPendulum::Test(std::string _worldFile)
+{
+  this->SetupWorld(_worldFile);
+  
+}
+
+void PhysicsTest::JointTest(std::string _worldFile)
+{
+  this->SetupWorld(_worldFile);
+
   double t=0;
 
   // Spawn a pendulum
-  modelName = "pend_x";
-  initial.SetFromDegree(90);
-  pendSize.Set(0.2, 0.2, 4);
-  cogPos.Set(0, 0, -2);
-  modelPose.pos.Set(0, 0, 6);
-  modelPose.rot.SetToIdentity();
-  linkPose.Reset();
-  linkPose.rot.SetFromEuler(initial.Radian(), 0, 90);
-  axis.Set(1, 0, 0);
-  jointPose.Reset();
-  //jointPose.rot.SetFromEuler(0, 0, 90);
+  this->modelName = "pend_x";
+  this->initial.SetFromDegree(90);
+  this->pendSize.Set(0.2, 0.2, 4);
+  this->cogPos.Set(0, 0, -2);
+  this->modelPose.pos.Set(0, 0, 6);
+  this->modelPose.rot.SetToIdentity();
+  this->linkPose.Reset();
+  this->linkPose.rot.SetFromEuler(initial.Radian(), 0, 90);
+  this->axis.Set(1, 0, 0);
+  this->jointPose.Reset();
   SpawnPendulum(modelName, pendSize, cogPos, axis,
                 modelPose, linkPose, jointPose);
 
