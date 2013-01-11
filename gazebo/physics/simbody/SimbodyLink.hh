@@ -66,9 +66,6 @@ namespace gazebo
       /// \brief Get whether this body is enabled in the physics engine
       public: virtual bool GetEnabled() const {return true;}
 
-      /// \brief Update the center of mass
-      public: virtual void UpdateCoM();
-
       /// \brief Set the linear velocity of the body
       public: virtual void SetLinearVel(const math::Vector3 &vel);
 

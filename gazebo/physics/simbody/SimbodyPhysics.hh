@@ -120,6 +120,11 @@ namespace gazebo
       private: common::Time lastUpdateTime;
 
       private: double stepTimeDouble;
+
+      public: SimTK::MultibodySystem system;
+      public: SimTK::SimbodyMatterSubsystem matter;
+      public: SimTK::GeneralForceSubsystem forces;
+      public: SimTK:: Integrator *integ;
     };
 
   /// \}

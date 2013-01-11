@@ -54,8 +54,12 @@
 
 #include "SimbodyPhysics.hh"
 
+// include simbody
+#include "Simbody.h"
+
 using namespace gazebo;
 using namespace physics;
+using namespace SimTK;
 
 GZ_REGISTER_PHYSICS_ENGINE("simbody", SimbodyPhysics)
 
@@ -73,13 +77,14 @@ bool ContactProcessed()
 
 //////////////////////////////////////////////////
 SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
-    : PhysicsEngine(_world)
+    : PhysicsEngine(_world), system(), matter(system), forces(system), integ(NULL)
 {
   // Create the dynamics solver
 
   // Instantiate the world
 
   // TODO: Enable this to do custom contact setting
+
 }
 
 //////////////////////////////////////////////////
@@ -98,11 +103,32 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 
   math::Vector3 g = this->sdf->GetValueVector3("gravity");
 
+
+  // set gravity
+  SimTK::Force::UniformGravity(this->forces, this->matter, SimTK::Vec3(g.x, g.y, g.z));
+
+
 }
 
 //////////////////////////////////////////////////
 void SimbodyPhysics::Init()
 {
+  // add pendulum body
+  // default pin joint has axis in the +z direction,
+  // rotate to get pin in x direction
+  const SimTK::Rotation ZtoY( -SimTK::Pi/2, SimTK::XAxis);
+  SimTK::Body::Rigid pendulumBody(MassProperties(1.0, Vec3(-1, 0, 0), UnitInertia::pointMassAt(Vec3(-1,0,0))));
+  SimTK::MobilizedBody::Pin pendulum(matter.Ground(), Transform(ZtoY, Vec3(0, 0, 0)), 
+                                pendulumBody,    Transform(ZtoY, Vec3(1, 0, 0)));
+
+  //this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
+  this->integ = new SimTK::ExplicitEulerIntegrator(system);
+
+  SimTK::State state = this->system.realizeTopology();
+
+  // pendulum.setAngle(state, Pi/4);
+
+  this->integ->initialize(state);
 }
 
 //////////////////////////////////////////////////
@@ -122,6 +148,24 @@ void SimbodyPhysics::UpdatePhysics()
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
   common::Time currTime =  this->world->GetRealTime();
+
+
+  while (integ->getTime() < this->world->GetSimTime().Double())
+    this->integ->stepTo(this->world->GetSimTime().Double(),
+                       this->world->GetSimTime().Double());
+
+  const SimTK::State &s = integ->getState();
+  gzerr << "\n\ntime [" << s.getTime()
+        << "] q [" << s.getQ()
+        << "] u [" << s.getU()
+        << "] dt [" << this->stepTimeDouble
+        << "] t [" << this->world->GetSimTime().Double()
+        << "]\n";
+
+  ModelPtr model = this->world->GetModel("model1");
+  LinkPtr link = model->GetLink("link1");
+  JointPtr joint = model->GetJoint("model1::joint1");
+  joint->SetAngle(0, s.getQ()[0]);
 
   this->lastUpdateTime = currTime;
 }
@@ -207,25 +251,24 @@ ShapePtr SimbodyPhysics::CreateShape(const std::string &_type,
 }
 
 //////////////////////////////////////////////////
-JointPtr SimbodyPhysics::CreateJoint(const std::string &/*_type*/,
-                                     ModelPtr /*_parent*/)
+JointPtr SimbodyPhysics::CreateJoint(const std::string &_type,
+                                     ModelPtr _parent)
 {
   JointPtr joint;
-
-  // if (_type == "revolute")
-  //   joint.reset(new SimbodyHingeJoint(this->dynamicsWorld, _parent));
-  // else if (_type == "universal")
-  //   joint.reset(new SimbodyUniversalJoint(this->dynamicsWorld, _parent));
-  // else if (_type == "ball")
-  //   joint.reset(new SimbodyBallJoint(this->dynamicsWorld, _parent));
-  // else if (_type == "prismatic")
-  //   joint.reset(new SimbodySliderJoint(this->dynamicsWorld, _parent));
-  // else if (_type == "revolute2")
-  //   joint.reset(new SimbodyHinge2Joint(this->dynamicsWorld, _parent));
-  // else if (_type == "screw")
-  //   joint.reset(new SimbodyScrewJoint(this->dynamicsWorld, _parent));
-  // else
-  //   gzthrow("Unable to create joint of type[" << _type << "]");
+  if (_type == "revolute")
+    joint.reset(new SimbodyHingeJoint(this->dynamicsWorld, _parent));
+  else if (_type == "universal")
+    joint.reset(new SimbodyUniversalJoint(this->dynamicsWorld, _parent));
+  else if (_type == "ball")
+    joint.reset(new SimbodyBallJoint(this->dynamicsWorld, _parent));
+  else if (_type == "prismatic")
+    joint.reset(new SimbodySliderJoint(this->dynamicsWorld, _parent));
+  else if (_type == "revolute2")
+    joint.reset(new SimbodyHinge2Joint(this->dynamicsWorld, _parent));
+  else if (_type == "screw")
+    joint.reset(new SimbodyScrewJoint(this->dynamicsWorld, _parent));
+  else
+    gzthrow("Unable to create joint of type[" << _type << "]");
 
   return joint;
 }

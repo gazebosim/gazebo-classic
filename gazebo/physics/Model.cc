@@ -632,7 +632,10 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
      boost::shared_static_cast<Model>(shared_from_this()));
   if (!joint)
+  {
+    gzerr << "Unable to create joint of type[" << stype << "]\n";
     gzthrow("Unable to create joint of type[" + stype + "]\n");
+  }
 
   joint->SetModel(boost::shared_static_cast<Model>(shared_from_this()));
 
@@ -640,7 +643,10 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   joint->Load(_sdf);
 
   if (this->GetJoint(joint->GetScopedName()) != NULL)
+  {
+    gzerr << "can't have two joint with the same name\n";
     gzthrow("can't have two joint with the same name");
+  }
 
   msgs::Joint msg;
   joint->FillMsg(msg);
