@@ -556,11 +556,9 @@ class ServerFixture : public testing::Test
 
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
-                 << "<pose>" << _modelPose.pos
-                             << _modelPose.rot.GetAsEuler() << "</pose>"
+                 << "<pose>" << _modelPose << "</pose>"
                  << "<link name ='body'>"
-                 << "  <pose>" << _linkPose.pos
-                               << _linkPose.rot.GetAsEuler() << "</pose>"
+                 << "  <pose>" << _linkPose << "</pose>"
                  << "  <inertial><pose>" << _cogPos << " 0 0 0</pose></inertial>"
                  << "  <collision name ='collision'>"
                  << "    <pose>" << _cogPos << " 0 0 0</pose>"
@@ -575,11 +573,10 @@ class ServerFixture : public testing::Test
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"
-                 << "<joint name ='upper_pin'>"
+                 << "<joint name ='upper_pin' type='revolute'>"
                  << "  <parent>world</parent>"
                  << "  <child>body</child>"
-                 << "  <pose>" << _jointPose.pos
-                               << _jointPose.rot.GetAsEuler() << "</pose>"
+                 << "  <pose>" << _jointPose << "</pose>"
                  << "  <axis><xyz>" << _jointAxis << "</xyz></axis>"
                  << "</joint>" 
                  << "</model>"

@@ -63,24 +63,30 @@ void PhysicsTest::JointTest(std::string _worldFile)
   modelPose.pos.Set(0, 0, 6);
   modelPose.rot.SetToIdentity();
   linkPose.Reset();
-  linkPose.rot.SetFromEuler(initial.Radian(), 0, 0);
+  linkPose.rot.SetFromEuler(initial.Radian(), 0, 90);
   axis.Set(1, 0, 0);
   jointPose.Reset();
+  //jointPose.rot.SetFromEuler(0, 0, 90);
   SpawnPendulum(modelName, pendSize, cogPos, axis,
                 modelPose, linkPose, jointPose);
 
   model = world->GetModel(modelName);
   if (model != NULL)
   {
-    t = physics->GetSimTime().Double();
-    double w = sqrt(g.z / cosPos.z);
-    double period = 6.28/w;
-    int steps = ceil(period/2 / dt);
-    world->StepWorld(steps);
-
     link = model->GetLink("body");
     if (link != NULL)
     {
+      physics::InertialPtr inertial = link->GetInertial();
+      double m = inertial->GetMass();
+      double L = fabs(cogPos.z);
+      math::Vector3 diagI = inertial->GetPrincipalMoments();
+      double massFactor = 1 + diagI.x / m / (L*L);
+      double w = sqrt(fabs(g.z / L / massFactor));
+      double period = 6.28/w;
+      int steps = ceil(period/4 / dt);
+      world->StepWorld(steps);
+      t = world->GetSimTime().Double();
+
       math::Pose pose = link->GetWorldPose();
       gzdbg << modelName << " angles at t=" << t << " s, "
             << pose.rot.GetAsEuler() << '\n';
