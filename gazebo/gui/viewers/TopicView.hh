@@ -63,6 +63,8 @@ namespace gazebo
 
       /// \brief Tranport node pointer.
       private: transport::NodePtr node;
+
+      private: boost::mutex mutex;
     };
 
     class TopicView : public QDialog

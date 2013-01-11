@@ -44,7 +44,6 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   QLabel *topicLabel = new QLabel(tr("Topic: "));
   this->topicCombo = new TopicCombo(this, this->msgTypeName,
       _viewType, this->node);
-  this->topicCombo->setObjectName("comboList");
   this->topicCombo->setMinimumSize(300, 25);
 
   topicLayout->addSpacing(10);
@@ -188,6 +187,7 @@ void TopicView::SetTopic(const std::string &_topicName)
   if (_topicName.empty())
     return;
 
+  this->sub.reset();
   this->msgTypeName = transport::getTopicMsgType(
       this->node->DecodeTopicName(_topicName));
 
@@ -248,6 +248,8 @@ void TopicCombo::showPopup()
 /////////////////////////////////////////////////
 void TopicCombo::UpdateList()
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+
   QString myText = this->currentText();
 
   this->blockSignals(true);
