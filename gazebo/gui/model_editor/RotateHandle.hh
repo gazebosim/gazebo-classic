@@ -33,46 +33,78 @@ namespace gazebo
       /// \brief Set the current mouse state
       public: void SetMouseState(int _state);
 
-      /// \brief Retrieve the current mouse state
+      /// \brief Get the current mouse state
       public: int  GetMouseState() const;
 
-      public: void SetMouseDownX(double _x);
-
-      public: void SetMouseDownY(double _y);
-
+      /// \brief Get the X position of the mouse press in pixels.
+      /// \return Mouse press X position in pixels.
       public: double GetMouseDownX() const;
 
+      /// \brief Get the Y position of the mouse press in pixels.
+      /// \return Mouse press Y position in pixels.
       public: double GetMouseDownY() const;
 
-      private: void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
+      /// \brief Set the X position of the mouse press in pixels.
+      /// \param[in] _x Mouse press X position in pixels.
+      public: void SetMouseDownX(double _x);
 
-      private: void hoverLeaveEvent(QGraphicsSceneHoverEvent *_event);
+      /// \brief Set the Y position of the mouse press in pixels.
+      /// \param[in] _y Mouse press Y position in pixels.
+      public: void SetMouseDownY(double _y);
 
-      private: void mouseReleaseEvent(QGraphicsSceneMouseEvent *_event);
+      /// \brief Qt mouse hover enter event
+      /// \param[in] _event Qt mouse hover event
+      protected: void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
 
-      private: void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
+      /// \brief Qt mouse hover leave event
+      /// \param[in] _event Qt mouse hover event
+      protected: void hoverLeaveEvent(QGraphicsSceneHoverEvent *_event);
 
-      private: void mousePressEvent(QGraphicsSceneMouseEvent *_event);
+      /// \brief Qt mouse move event
+      /// \param[in] _event Qt mouse event
+      protected: void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
 
+      /// \brief Qt mouse press event
+      /// \param[in] _event Qt mouse event
+      protected: void mousePressEvent(QGraphicsSceneMouseEvent *_event);
+
+      /// \brief Qt mouse release event
+      /// \param[in] _event Qt mouse event
+      protected: void mouseReleaseEvent(QGraphicsSceneMouseEvent *_event);
+
+      /// \brief Get the bounding box of the rotate handle.
+      /// \return The grabber handle bounding box.
       public: virtual QRectF boundingRect() const;
 
+      /// \brief Qt paint function for drawing the grabber handle.
+      /// \param[in] _painter Qt painter object.
+      /// \param[in] _painter Qt style options for the item.
+      /// \param[in] _painter Qt widget being painted on.
       private: void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
+      /// \brief Current mouse state.
       private: int mouseButtonState;
 
+      /// \brief Mouse press X position in pixels.
       private: double mouseDownX;
 
+      /// \brief Mouse press Y position in pixels.
       private: double mouseDownY;
 
+      /// \brief Border color of the rotate handle.
       private: QColor borderColor;
 
+      /// \brief Size of the rotate handle in pixels.
       private: double handleSize;
 
+      /// \brief Offset height from the item to the rotate handle in pixels.
       private: double handleOffsetHeight;
 
+      /// \brief Origin of the rotate handle
       private: QPointF origin;
 
+      /// \brief Offset position from the item to the rotate handle in pixels.
       private: QPointF handleOffset;
     };
   }
