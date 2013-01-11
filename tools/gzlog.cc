@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
@@ -32,58 +33,26 @@
 #include <gazebo/common/Time.hh>
 #include <gazebo/gazebo_config.h>
 
-using namespace gazebo;
 namespace po = boost::program_options;
 
 sdf::ElementPtr g_stateSdf;
-
-std::vector<std::string> params;
 
 /////////////////////////////////////////////////
 /// \brief Print general help
 void help()
 {
+  std::cerr << "Help:\n";
   std::cerr << "This tool introspects Gazebo log files.\n\n";
   std::cerr << "Usage: gzlog [command] <options> [log file]\n\n";
+
+  std::cerr << "Commands:\n"
+            << "  help\t Output this help message.\n"
+            << "  info\t Display statistical information about a log file.\n"
+            << "  echo\t Output the contents of a log file to screen.\n"
+            << "  step\t Step through the contents of a log file.\n";
+
+  std::cerr << "\n";
 }
-
-/////////////////////////////////////////////////
-/// \brief Parse command line arguments
-/*bool parse(int argc, char **argv)
-{
-  if (argc == 1 || std::string(argv[1]) == "help")
-  {
-    help();
-    return false;
-  }
-
-  // Get parameters from command line
-  for (int i = 1; i < argc; i++)
-  {
-    std::string p = argv[i];
-    boost::trim(p);
-    params.push_back(p);
-  }
-
-  // Get parameters from stdin
-  if (!isatty(fileno(stdin)))
-  {
-    char str[1024];
-    while (!feof(stdin))
-    {
-      if (fgets(str, 1024, stdin)== NULL)
-        break;
-
-      if (feof(stdin))
-        break;
-      std::string p = str;
-      boost::trim(p);
-      params.push_back(p);
-    }
-  }
-
-  return true;
-}*/
 
 /////////////////////////////////////////////////
 /// \brief Get a character from the terminal. This bypasses the need to wait
@@ -127,30 +96,6 @@ bool load_log_from_file(const std::string &_filename)
 }
 
 /////////////////////////////////////////////////
-/// \brief Load a log file from a command line parameter.
-/// \param[in] _paramIndex Index of the parameter that is the log file.
-bool load_log_from_param(unsigned int _paramIndex)
-{
-  if (params.size() <= _paramIndex)
-  {
-    gzerr << "Please specify a log file\n";
-    return false;
-  }
-
-  try
-  {
-    gazebo::common::LogPlay::Instance()->Open(params[_paramIndex]);
-  }
-  catch(gazebo::common::Exception &_e)
-  {
-    gzerr << "Unable to open log file[" << params[_paramIndex] << "]\n";
-    return false;
-  }
-
-  return true;
-}
-
-/////////////////////////////////////////////////
 /// \brief Get the size of file.
 /// \param[in] _filename Name of the file to get the size of.
 /// \return The size of the file in human readable format.
@@ -186,44 +131,8 @@ std::string get_file_size_str(const std::string &_filename)
 
 /////////////////////////////////////////////////
 /// \bried Output information about a log file.
-void info(int _argc, char **_argv)//const std::string &_filename)
+void info(const std::string &_filename)
 {
-  po::options_description infoOptions("info options");
-  infoOptions.add_options()
-    ("info", "Info")
-    ("file", po::value<std::string>(), "Log file");
-
-  po::positional_options_description positionalOptions;
-  positionalOptions.add("info", 1).add("file", -1);
-
-  po::variables_map vm;
-  try
-  {
-    po::store(
-        po::command_line_parser(_argc, _argv).options(infoOptions).positional(
-          positionalOptions).allow_unregistered().run(), vm);
-
-    po::notify(vm);
-  }
-  catch(boost::exception &_e)
-  {
-    std::cerr << "Error. Invalid arguments\n";
-    // NOTE: boost::diagnostic_information(_e) breaks lucid
-    // std::cerr << boost::diagnostic_information(_e) << "\n";
-    return;
-  }
-
-  std::string filename;
-  if (vm.count("file"))
-    filename = vm["file"].as<std::string>();
-  else
-    gzerr << "No filename specified\n";
-
-  std::cout << "Filename[" << filename << "]\n";
-
-  if (!load_log_from_file(filename))
-    return;
-
   gazebo::common::LogPlay *play = gazebo::common::LogPlay::Instance();
 
   // Get the SDF world description from the log file
@@ -239,8 +148,8 @@ void info(int _argc, char **_argv)//const std::string &_filename)
 
   unsigned int modelCount = 0;
 
-  common::Time endTime(0, 0);
-  common::Time startTime(0, 0);
+  gazebo::common::Time endTime(0, 0);
+  gazebo::common::Time startTime(0, 0);
 
   if (sdf)
   {
@@ -302,7 +211,7 @@ void info(int _argc, char **_argv)//const std::string &_filename)
   std::cout.imbue(std::locale(std::locale::classic(), facet));
 
   // Compute the duration
-  common::Time deltaTime = endTime - startTime;
+  gazebo::common::Time deltaTime = endTime - startTime;
   int hours = deltaTime.sec / 3600;
   int minutes = (deltaTime.sec - hours * 3600) / 60;
   int seconds = (deltaTime.sec - hours * 3600 - minutes * 60);
@@ -321,7 +230,7 @@ void info(int _argc, char **_argv)//const std::string &_filename)
                           << std::setfill('0') << std::setw(2) << seconds << "."
                           << deltaTime.nsec << "\n"
     << "Steps:          " << play->GetChunkCount() << "\n"
-    << "Size:           " << get_file_size_str(filename) << "\n"
+    << "Size:           " << get_file_size_str(_filename) << "\n"
     << "Encoding:       " << play->GetEncoding() << "\n"
     << "Model Count:    " << modelCount << "\n"
     << "\n";
@@ -329,6 +238,8 @@ void info(int _argc, char **_argv)//const std::string &_filename)
 
 /////////////////////////////////////////////////
 /// \brief Filter a state string.
+/// \param[in] _stateString State string data.
+/// \param[in] _filter Filter argument.
 std::string filter_state(const std::string &_stateString,
                          std::string _filter)
 {
@@ -433,49 +344,10 @@ std::string filter_state(const std::string &_stateString,
 
 /////////////////////////////////////////////////
 /// \brief Dump the contents of a log file to screen
-void echo(int _argc, char **_argv)
+/// \param[in] _filter Filter string
+void echo(const std::string _filter)
 {
-  po::options_description infoOptions("echo options");
-  infoOptions.add_options()
-    ("echo", "Echo")
-    ("file", po::value<std::string>(), "Log file");
-
-  po::positional_options_description positionalOptions;
-  positionalOptions.add("echo", 1).add("file", -1);
-
-  po::variables_map vm;
-  try
-  {
-    po::store(
-        po::command_line_parser(_argc, _argv).options(infoOptions).positional(
-          positionalOptions).allow_unregistered().run(), vm);
-
-    po::notify(vm);
-  }
-  catch(boost::exception &_e)
-  {
-    std::cerr << "Error. Invalid arguments\n";
-    // NOTE: boost::diagnostic_information(_e) breaks lucid
-    // std::cerr << boost::diagnostic_information(_e) << "\n";
-    return;
-  }
-
-  std::string filename;
-  if (vm.count("file"))
-    filename = vm["file"].as<std::string>();
-  else
-    gzerr << "No filename specified\n";
-
-  if (!load_log_from_file(filename))
-    return;
-
-
-  std::string filter;
   std::string stateString;
-
-  // Get the filter value
-  if (params.size() >= 3)
-    filter = params[2];
 
   for (unsigned int i = 0;
        i < gazebo::common::LogPlay::Instance()->GetChunkCount(); ++i)
@@ -483,9 +355,9 @@ void echo(int _argc, char **_argv)
     // Get and output the state string
     gazebo::common::LogPlay::Instance()->Step(stateString);
 
-    if (!filter.empty() && i > 0)
-      stateString = filter_state(stateString, filter);
-    else if (!filter.empty())
+    if (!_filter.empty() && i > 0)
+      stateString = filter_state(stateString, _filter);
+    else if (!_filter.empty())
       stateString.clear();
 
     if (!stateString.empty())
@@ -495,20 +367,24 @@ void echo(int _argc, char **_argv)
 
 /////////////////////////////////////////////////
 /// \brief Step through a log file.
-void step()
+/// \param[in] _filter Filter string
+void step(const std::string &_filter)
 {
-  if (!load_log_from_param(1))
-    return;
-
+  std::string stateString;
   gazebo::common::LogPlay *play = gazebo::common::LogPlay::Instance();
 
-  std::string stateString;
   char c = '\0';
 
   for (unsigned int i = 0; i < play->GetChunkCount() && c != 'q'; ++i)
   {
     // Get and output the state string
     play->Step(stateString);
+
+    if (!_filter.empty() && i > 0)
+      stateString = filter_state(stateString, _filter);
+    else if (!_filter.empty())
+      stateString.clear();
+
     std::cout << stateString << "\n";
 
     std::cout << "\n--- Press space to continue, 'q' to quit ---\n";
@@ -524,75 +400,84 @@ void step()
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  if (argc <= 1)
-  {
-    help();
-    return 0;
-  }
+  // Hidden options
+  po::options_description hiddenOptions("hidden options");
+  hiddenOptions.add_options()
+    ("command", po::value<std::string>(), "Command");
 
-  std::string command = argv[1];
-  boost::trim(command);
+  // Options that are visible to the user through help.
+  po::options_description visibleOptions("Options");
+  visibleOptions.add_options()
+    ("help,h", "Output this help message.")
+    ("file,f", po::value<std::string>(), "Path to a log file.")
+    ("filter", po::value<std::string>(),
+     "Filter output. Valid only for the echo and step commands");
 
-  std::cout << "Cmd[" << command << "]\n";
+  // Both the hidden and visible options
+  po::options_description allOptions("all options");
+  allOptions.add(hiddenOptions).add(visibleOptions);
 
-  if (command == "info")
-    info(argc, argv);
-  else if (command == "echo")
-    echo(argc, argv);
-  //else if (command == "step")
-  //  step(argc, argv);
-  else
-    help();
-}
-
-/*
-
-  // Create a state sdf element.
-  g_stateSdf.reset(new sdf::Element);
-  sdf::initFile("state.sdf", g_stateSdf);
+  // The command and file options are positional
+  po::positional_options_description positional;
+  positional.add("command", 1).add("file", -1);
 
   po::variables_map vm;
-
-
-  po::options_description generalOptions("Allowed options");
-  generalOptions.add_options()
-    ("help,h", "Produce this help message.")
-    ("info", "Display statistics about a log file.")
-    ("echo", "Print out a complete log file.")
-    ("step", "Step through a log file.");
-    // ("file", po::value<std::string>(), "Log file");
-
-  po::options_description allOptions("Allowed options");
-  allOptions.add(generalOptions);//.add(infoOptions);
-
-  po::positional_options_description positionalOptions;
-  positionalOptions.add("info", 1).add("echo", 1).add("step", 1);
 
   try
   {
     po::store(
         po::command_line_parser(argc, argv).options(allOptions).positional(
-          positionalOptions).allow_unregistered().run(), vm);
+          positional).run(), vm);
 
     po::notify(vm);
   }
   catch(boost::exception &_e)
   {
-    std::cerr << "Error. Invalid arguments\n";
-    // NOTE: boost::diagnostic_information(_e) breaks lucid
-    // std::cerr << boost::diagnostic_information(_e) << "\n";
-    return false;
+    std::cerr << "Invalid arguments\n\n";
+    return -1;
   }
 
-  if (vm.count("info"))
-    info(argc, argv);
-  else if (vm.count("echo"))
-    echo(argc, argv);
-  else if (vm.count("help"))
+  std::string command, filename, filter;
+
+  // Create a state sdf element.
+  g_stateSdf.reset(new sdf::Element);
+  sdf::initFile("state.sdf", g_stateSdf);
+
+  // Get the command name
+  command = vm.count("command") ? vm["command"].as<std::string>() : "";
+
+  // Get the filter
+  filter = vm.count("filter") ? vm["filter"].as<std::string>() : "";
+
+  // Output help when appropriate
+  if (command.empty() || command == "help" || vm.count("help"))
   {
-    std::cerr << "This tool introspects Gazebo log files.\n\n";
-    std::cerr << "Usage: gzlog [options] [world_file]\n\n";
-    std::cerr << generalOptions << "\n";
+    help();
+    std::cerr << visibleOptions << "\n";
+
+    return 0;
   }
+
+  // Load the log file
+  if (vm.count("file"))
+    filename = vm["file"].as<std::string>();
+  else
+  {
+    gzerr << "No log file specified\n";
+    return -1;
+  }
+
+  // Load log file from string
+  if (!load_log_from_file(filename))
+    return -1;
+
+  // Process the command
+  if (command == "info")
+    info(filename);
+  else if (command == "echo")
+    echo(filter);
+  else if (command == "step")
+    step(filter);
+
+  return 0;
 }
-*/
