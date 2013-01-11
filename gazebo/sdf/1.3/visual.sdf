@@ -28,7 +28,7 @@
     <element name="script" required="0">
       <description>Name of material from an installed script file. This will override the color element if the script exists.</description>
 
-      <element name="uri" type="string" default="__default__" required="0">
+      <element name="uri" type="string" default="__default__" required="+">
         <description>URI of the material script file</description>
       </element>
 
