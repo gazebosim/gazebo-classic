@@ -29,7 +29,7 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \brief Modes of the dialog
+      /// \brief Dialog mode.
       public: enum FinishMode {MODEL_FINISH, MODEL_SAVE};
 
       /// \brief Constructor
@@ -56,19 +56,19 @@ namespace gazebo
       /// \param[in] _location Location to save to.
       public: void SetSaveLocation(const std::string &_location);
 
-      /// \brief Qt callback when the file directory browse button is pressed
+      /// \brief Qt callback when the file directory browse button is pressed.
       private slots: void OnBrowse();
 
-      /// \brief Qt callback when the cancel button is pressed
+      /// \brief Qt callback when the cancel button is pressed.
       private slots: void OnCancel();
 
-      /// \brief Qt callback when the Done button is pressed
+      /// \brief Qt callback when the Done button is pressed.
       private slots: void OnFinish();
 
-      /// \brief Editable line for the model name
+      /// \brief Editable line that holds the model's name.
       private: QLineEdit* modelNameLineEdit;
 
-      /// \brief Editable line for the model location
+      /// \brief Editable line that holds the model's save location.
       private: QLineEdit* modelLocationLineEdit;
     };
   }

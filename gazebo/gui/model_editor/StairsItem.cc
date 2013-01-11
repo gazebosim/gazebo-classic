@@ -200,7 +200,7 @@ void StairsItem::paint(QPainter *_painter,
 
   if (this->isSelected())
     this->DrawBoundingBox(_painter);
-  this->ShowCorners(this->isSelected());
+  this->ShowHandles(this->isSelected());
 
   QPen stairsPen;
   stairsPen.setStyle(Qt::SolidLine);

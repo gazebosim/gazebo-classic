@@ -58,13 +58,13 @@ namespace gazebo
       // Documentation inherited
       private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
 
-      /// \brief Qt callback when the changes are to be applied
+      // Documentation inherited
       private slots: void OnApply();
 
-      /// \brief Qt callback to open the door inspector
+      // Documentation inherited
       private slots: void OnOpenInspector();
 
-      /// \brief Qt callback to delete this door item
+      // Documentation inherited
       private slots: void OnDeleteItem();
 
       /// \brief Emit door changed signals
@@ -88,10 +88,10 @@ namespace gazebo
       /// \brief Door scene position in pixels
       private: QPointF doorPos;
 
-      /// \brief Scale for converting to metric units
+      /// \brief Scale for converting to from pixel to metric units
       private: double scale;
 
-      /// \brief Door inspector
+      /// \brief Inspector for configuring the window item.
       private: WindowDoorInspectorDialog *inspector;
     };
   }

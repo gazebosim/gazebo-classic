@@ -85,16 +85,16 @@ namespace gazebo
         /// \brief Emit size changed Qt signals.
         private: void SizeChanged();
 
-        /// \brief Depth of floor
+        /// \brief Depth of floor in pixels.
         private: double floorDepth;
 
-        /// \brief Height of floor
+        /// \brief Height of floor in pixels.
         private: double floorHeight;
 
-        /// \brief Width of floor
+        /// \brief Width of floor in pixels.
         private: double floorWidth;
 
-        /// \brief Scene position of floor
+        /// \brief Scene position of floor in pixel coordinates.
         private: QPointF floorPos;
 
         /// \brief A flag to indicate that there have been changes to the walls
@@ -103,7 +103,7 @@ namespace gazebo
         /// \brief A list of walls that the floor holds
         private: std::vector<WallItem *> walls;
 
-        /// \brief Bounding box of the floor item
+        /// \brief Bounding box of the floor item.
         private: QPolygonF floorBoundingRect;
     };
   }

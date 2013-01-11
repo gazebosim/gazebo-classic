@@ -173,7 +173,7 @@ void FloorItem::paint(QPainter *_painter,
 {
   if (this->isSelected())
     this->DrawBoundingBox(_painter);
-  this->ShowCorners(this->isSelected());
+  this->ShowHandles(this->isSelected());
 
   QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
       this->drawingOriginY - this->drawingHeight/2);

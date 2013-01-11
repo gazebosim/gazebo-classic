@@ -43,40 +43,40 @@ namespace gazebo
       /// \return The level name
       public: std::string GetLevelName() const;
 
-      /// \brief Get the height of the level in pixels
-      /// \return The level height in pixels
+      /// \brief Get the height of the level.
+      /// \return The level height in pixels.
       public: double GetHeight() const;
 
       /// \brief Set the name of the level
       /// \param[in] _levelName New level name.
       public: void SetLevelName(const std::string &_levelName);
 
-      /// \brief Set the height of the level
+      /// \brief Set the height of the level.
       /// \param[in] _height Level height in pixels.
       public: void SetHeight(double _height);
 
-      /// \brief Qt signal emitted to indicate that changes should be applied
+      /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
 
-      /// \brief Qt callback when the Cancel button is pressed
+      /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
-      /// \brief Qt callback when the Apply button is pressed
+      /// \brief Qt callback when the Apply button is pressed.
       private slots: void OnApply();
 
-      /// \brief Qt callback when the Ok button is pressed
+      /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
-      /// \brief Editable line that holds the the level name
+      /// \brief Editable line that holds the the level name.
       private: QLineEdit* levelNameLineEdit;
 
-      /// \brief Spin box for configuring the level height
+      /// \brief Spin box for configuring the level height.
       private: QDoubleSpinBox *heightSpinBox;
 
-      /// \brief Spin box for configuring the floor thickness
+      /// \brief Spin box for configuring the floor thickness.
       private: QDoubleSpinBox *floorThicknessSpinBox;
 
-      /// \brief Combo box for configuring the floor material
+      /// \brief Combo box for configuring the floor material.
       private: QComboBox *materialComboBox;
     };
   }

@@ -27,8 +27,9 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 RectItem::RectItem()
-    : borderColor(Qt::black), location(0, 0), gridSpace(10)
 {
+//  this->location = Qt(0, 0);
+// this->gridSpace = 10;
   this->editorType = "Rect";
 
   this->width = 100;
@@ -39,6 +40,8 @@ RectItem::RectItem()
 
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
+
+  this->borderColor = Qt::black;
 
   for (int i = 0; i < 8; ++i)
   {
@@ -92,7 +95,7 @@ RectItem::~RectItem()
 }
 
 /////////////////////////////////////////////////
-void RectItem::ShowCorners(bool _show)
+void RectItem::ShowHandles(bool _show)
 {
   for (int i = 0; i < 8; ++i)
   {

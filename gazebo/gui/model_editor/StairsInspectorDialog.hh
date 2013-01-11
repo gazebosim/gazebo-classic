@@ -15,10 +15,10 @@
  *
 */
 
-#include <string>
 #ifndef _STAIRS_INSPECTOR_DIALOG_HH_
 #define _STAIRS_INSPECTOR_DIALOG_HH_
 
+#include <string>
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -36,18 +36,19 @@ namespace gazebo
       /// \brief Destructor
       public: ~StairsInspectorDialog();
 
-      /// \brief Get starting position (bottom-end) of the staircase in pixels.
+      /// \brief Get start position (bottom-end) of the staircase.
+      /// \return The start position of the staircase in pixels.
       public: QPointF GetStartPosition() const;
 
-      /// \brief Get the width the staircase in pixels.
+      /// \brief Get the width the staircase.
       /// \return Staircase width in pixels.
       public: double GetWidth() const;
 
-      /// \brief Get the depth the staircase in pixels
+      /// \brief Get the depth the staircase.
       /// \return Staircase depth in pixels.
       public: double GetDepth() const;
 
-      /// \brief Get the height the staircase in pixels
+      /// \brief Get the height the staircase.
       /// \return Staircase height in pixels.
       public: double GetHeight() const;
 
@@ -59,24 +60,24 @@ namespace gazebo
       /// \param[in] _name Name to set to.
       public: void SetName(const std::string &_name);
 
-      /// \brief Set the starting position of the staircase.
-      /// \param[in] _pos Starting position in pixels.
+      /// \brief Set the start position of the staircase.
+      /// \param[in] _pos Start position in pixels.
       public: void SetStartPosition(const QPointF &_pos);
 
       /// \brief Set the width of the staircase.
-      /// \param[in] _pos Width in pixels.
+      /// \param[in] _width Width in pixels.
       public: void SetWidth(double _width);
 
       /// \brief Set the depth of the staircase.
-      /// \param[in] _pos depth in pixels.
+      /// \param[in] _depth Depth in pixels.
       public: void SetDepth(double _depth);
 
       /// \brief Set the height of the staircase.
-      /// \param[in] _pos height in pixels.
+      /// \param[in] _height Height in pixels.
       public: void SetHeight(double _height);
 
       /// \brief Set the number of steps in the staircase.
-      /// \param[in] _pos Number of steps.
+      /// \param[in] _steps Number of steps.
       public: void SetSteps(int _steps);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
@@ -91,11 +92,11 @@ namespace gazebo
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
-      /// \brief Spin box for configuring the X starting position of the
+      /// \brief Spin box for configuring the X start position of the
       /// staircase.
       private: QDoubleSpinBox *startXSpinBox;
 
-      /// \brief Spin box for configuring the Y starting position of the
+      /// \brief Spin box for configuring the Y start position of the
       /// staircase.
       private: QDoubleSpinBox *startYSpinBox;
 
@@ -111,7 +112,7 @@ namespace gazebo
       /// \brief Spin box for configuring the number of steps in the staircase.
       private: QSpinBox *stepsSpinBox;
 
-      /// \brief Label that displays the name of the staircase
+      /// \brief Label that holds the name of the staircase.
       private: QLabel* stairsNameLabel;
     };
   }

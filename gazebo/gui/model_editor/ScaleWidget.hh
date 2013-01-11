@@ -31,16 +31,25 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Constructor
+      /// \param[in] _parent Parent QWidget.
       public: ScaleWidget(QWidget *_parent = 0);
 
+      /// \brief Destructor
       public: ~ScaleWidget();
 
+      /// \brief Qt paint event for drawing the scale widget.
+      /// \param[in] _event Qt paint event.
       private: void paintEvent(QPaintEvent *_event);
 
+      /// \brief Event received when the zoom level has changed.
+      /// \param[in] _zoomFactor New zoom factor.
       private: void OnChangeZoom(double _zoomFactor);
 
+      /// \brief Text displaying the scale
       private: std::string scaleText;
 
+      /// \brief A list of gui editor events connected to this widget.
       private: std::vector<event::ConnectionPtr> connections;
     };
   }

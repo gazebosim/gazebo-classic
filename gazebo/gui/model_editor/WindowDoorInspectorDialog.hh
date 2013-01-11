@@ -41,52 +41,52 @@ namespace gazebo
       /// \brief Destructor
       public: ~WindowDoorInspectorDialog();
 
-      /// \brief Get the item width
+      /// \brief Get the item width.
       /// \return Width in pixels.
       public: double GetWidth() const;
 
-      /// \brief Get the item height
+      /// \brief Get the item height.
       /// \return Height in pixels.
       public: double GetHeight() const;
 
-      /// \brief Get the item depth
+      /// \brief Get the item depth.
       /// \return Depth in pixels.
       public: double GetDepth() const;
 
-      /// \brief Get the item position
+      /// \brief Get the item position.
       /// \return Item position in pixels.
       public: QPointF GetPosition() const;
 
-      /// \brief Get the item elevation
-      /// \return Item elevation
+      /// \brief Get the item elevation.
+      /// \return Item elevation in pixels.
       public: double GetElevation() const;
 
-      /// \brief Get the item type
-      /// \return Item type
+      /// \brief Get the item type.
+      /// \return Item type.
       public: std::string GetType() const;
 
-      /// \brief Set the item name
-      /// \param[in] _depth Name to set to.
+      /// \brief Set the item name.
+      /// \param[in] _name Name to set to.
       public: void SetName(const std::string &_name);
 
-      /// \brief Set the item width in pixels.
-      /// \param[in] _depth Width in pixels.
+      /// \brief Set the item width.
+      /// \param[in] _width Width in pixels.
       public: void SetWidth(double _width);
 
-      /// \brief Set the item height in pixels.
-      /// \param[in] _depth Height in pixels.
+      /// \brief Set the item height.
+      /// \param[in] _height Height in pixels.
       public: void SetHeight(double _height);
 
-      /// \brief Set the item depth in pixels.
+      /// \brief Set the item depth.
       /// \param[in] _depth Depth in pixels.
       public: void SetDepth(double _depth);
 
-      /// \brief Set the item position in pixels.
+      /// \brief Set the item scene position.
       /// \param[in] _pos Position in pixels.
       public: void SetPosition(const QPointF &_pos);
 
       /// \brief Set the item elevation.
-      /// \param[in] _elevation Item elevation.
+      /// \param[in] _elevation Item elevation in pixels.
       public: void SetElevation(double _elevation);
 
       /// \brief Set the item type.
@@ -126,7 +126,7 @@ namespace gazebo
       /// \brief Spin box for configuring the elevation of the item.
       private: QDoubleSpinBox *elevationSpinBox;
 
-      /// \brief Combo box for selecting the type of the item.
+      /// \brief Combo box for selecting the type of the item to use.
       private: QComboBox *typeComboBox;
     };
   }

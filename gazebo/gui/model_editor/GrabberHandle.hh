@@ -39,20 +39,20 @@ namespace gazebo
       /// \return The current mouse state.
       public: int  GetMouseState() const;
 
-      /// \brief Get the center point of the grabber handle in pixels.
-      /// \return Center point in pixels.
+      /// \brief Get the center point of the grabber handle.
+      /// \return Center point in pixel coordinates.
       public: QPointF GetCenterPoint() const;
 
-      /// \brief Get the X position of the mouse press in pixels.
-      /// \return Mouse press X position in pixels.
+      /// \brief Get the X position of the mouse press.
+      /// \return Mouse press X position in pixel coordinates.
       public: double GetMouseDownX() const;
 
-      /// \brief Get the Y position of the mouse press in pixels.
-      /// \return Mouse press Y position in pixels.
+      /// \brief Get the Y position of the mouse press.
+      /// \return Mouse press Y position in pixel coordinates.
       public: double GetMouseDownY() const;
 
       /// \brief Get the width of the grabber handle.
-      /// \return The width of the grabber handle in pixels.
+      /// \return The width of the grabber handle in pixel coordinates.
       public: double GetWidth() const;
 
       /// \brief Get the Height of the grabber handle.
@@ -67,19 +67,19 @@ namespace gazebo
       /// \param[in] _state Current mouse state.
       public: void SetMouseState(int _state);
 
-      /// \brief Set the X position of the mouse press in pixels.
+      /// \brief Set the X position of the mouse press.
       /// \param[in] _x Mouse press X position in pixels.
       public: void SetMouseDownX(double _x);
 
-      /// \brief Set the Y position of the mouse press in pixels.
+      /// \brief Set the Y position of the mouse press.
       /// \param[in] _y Mouse press Y position in pixels.
       public: void SetMouseDownY(double _y);
 
-      /// \brief Set the width of the grabber handle in pixels.
+      /// \brief Set the width of the grabber handle.
       /// \param[in] _width Width in pixels.
       public: void SetWidth(double _width);
 
-      /// \brief Set the height of the grabber handle in pixels.
+      /// \brief Set the height of the grabber handle.
       /// \param[in] _height Height in pixels.
       public: void SetHeight(double _height);
 
@@ -133,10 +133,10 @@ namespace gazebo
       /// \brief Index of this corner grabber
       private: int index;
 
-      /// \brief Mouse press X position in pixels.
+      /// \brief Mouse press X position in pixel coordinates.
       private: double mouseDownX;
 
-      /// \brief Mouse press Y position in pixels.
+      /// \brief Mouse press Y position in pixel coordinates.
       private: double mouseDownY;
 
       /// \brief Fill color of the grabber handle.

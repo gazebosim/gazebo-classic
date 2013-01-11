@@ -38,53 +38,86 @@ namespace gazebo
 
     class WallItem : public PolylineItem, public BuildingItem
     {
-        Q_OBJECT
+      Q_OBJECT
 
-        public: WallItem(const QPointF &_start, const QPointF &_end);
+      /// \brief Constructor
+      /// param[in] _start Start position of the wall item in pixel coordinates.
+      /// param[in] _start End position of the wall item in pixel coordinates.
+      public: WallItem(const QPointF &_start, const QPointF &_end);
 
-        public: ~WallItem();
+      /// \brief Destructor
+      public: ~WallItem();
 
-        public: double GetHeight() const;
+      /// \brief Get the height of the wall item.
+      /// \return Height of the wall item in pixels.
+      public: double GetHeight() const;
 
-        public: void SetHeight(double _height);
+      /// \brief Set the height of the wall item.
+      /// param[in] _height Height of the wall item in pixels.
+      public: void SetHeight(double _height);
 
-        public: WallItem *Clone() const;
+      /// \brief Clone the wall item.
+      /// \return A pointer to a copy of the wall item.
+      public: WallItem *Clone() const;
 
-        public: void Update();
+      /// \brief Update by emitting wall changed Qt signals.
+      public: void Update();
 
-        private: bool grabberEventFilter(GrabberHandle *_grabber,
-            QEvent *_event);
+      // Documentation inherited
+      private: bool grabberEventFilter(GrabberHandle *_grabber,
+          QEvent *_event);
 
-        private: bool segmentEventFilter(LineSegmentItem *_segment,
-            QEvent *_event);
+      // Documentation inherited
+      private: bool segmentEventFilter(LineSegmentItem *_segment,
+          QEvent *_event);
 
-        private: void contextMenuEvent(QGraphicsSceneContextMenuEvent *_event);
+      /// \brief Qt context menu event received on a mouse right click.
+      /// \param[in] Qt context menu event.
+      private: void contextMenuEvent(QGraphicsSceneContextMenuEvent *_event);
 
-        private: void UpdateSegmentChildren(LineSegmentItem *_segment);
+      /// \brief Helper function for updating the pose of children attached to
+      /// a wall segment.
+      /// \param[in] _segment Parent segment
+      private: void UpdateSegmentChildren(LineSegmentItem *_segment);
 
-        private slots: void OnApply();
+      // Documentation inherited
+      private slots: void OnApply();
 
-        private slots: void OnOpenInspector();
+      // Documentation inherited
+      private slots: void OnOpenInspector();
 
-        private slots: void OnDeleteItem();
+      // Documentation inherited
+      private slots: void OnDeleteItem();
 
-        private: void WallChanged();
+      /// \brief Emit wall changed Qt signals.
+      private: void WallChanged();
 
-        private: void SetSegmentSelected(unsigned int _index, bool _selected);
+      /// \brief Set a particular segment of the wall to be selected or not.
+      /// \param[in] _index Index of the wall segment.
+      /// \param[in] _selected True to be in a selected state, false to
+      /// disable interaction with the wall segment.
+      private: void SetSegmentSelected(unsigned int _index, bool _selected);
 
-        private: double wallThickness;
+      /// \brief Thickness of the wall in pixels.
+      private: double wallThickness;
 
-        private: double wallHeight;
+      /// \brief Height of the wall in pixels.
+      private: double wallHeight;
 
-        private: double scale;
+      /// \brief Scale for converting pixels to metric units.
+      private: double scale;
 
-        private: LineSegmentItem* selectedSegment;
+      /// \brief The current selected segment of the wall.
+      private: LineSegmentItem* selectedSegment;
 
-        private: QAction *openInspectorAct;
+      /// \brief Qt action for opening the inspector.
+      private: QAction *openInspectorAct;
 
-        private: QAction *deleteItemAct;
+      /// \brief Qt action for deleting the wall item.
+      private: QAction *deleteItemAct;
 
-        private: WallInspectorDialog *inspector;
+      /// \brief Inspector for configuring the wall item.
+      private: WallInspectorDialog *inspector;
     };
   }
 }

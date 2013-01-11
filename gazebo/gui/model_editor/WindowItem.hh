@@ -36,43 +36,62 @@ namespace gazebo
     {
         Q_OBJECT
 
+        /// \brief Constructor
         public: WindowItem();
 
+        /// \brief Destructor
         public: ~WindowItem();
 
+        // Documentation inherited
         public: virtual QVector3D GetSize() const;
 
+        // Documentation inherited
         public: virtual QVector3D GetScenePosition() const;
 
+        // Documentation inherited
         public: virtual double GetSceneRotation() const;
 
+        // Documentation inherited
         private: virtual void paint(QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
+        // Documentation inherited
         private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
 
+        // Documentation inherited
         private slots: void OnApply();
 
+        // Documentation inherited
         private slots: void OnOpenInspector();
 
+        // Documentation inherited
         private slots: void OnDeleteItem();
 
+        /// \brief Emit window changed Qt signals.
         private: void WindowChanged();
 
+        /// \brief Depth of the window item in pixels.
         private: double windowDepth;
 
+        /// \brief Height of the window item in pixels.
         private: double windowHeight;
 
+        /// \brief Width of the window item in pixels.
         private: double windowWidth;
 
+        /// \brief Side bar of the window item in pixels.
         private: double windowSideBar;
 
+        /// \brief Scene position of the window item in pixels.
         private: QPointF windowPos;
 
+        /// \brief Elevation of the window item in pixels.
         private: double windowElevation;
 
+        /// \brief Scale for converting pixels to metric units.
         private: double scale;
 
+        /// \brief Inspector for configuring the window item.
         private: WindowDoorInspectorDialog *inspector;
     };
   }

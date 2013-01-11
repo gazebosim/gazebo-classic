@@ -36,52 +36,73 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Constructor
       public: StairsItem();
 
+      /// \brief Destructor
       public: ~StairsItem();
 
+      // Documentation inherited
       public: virtual QVector3D GetSize() const;
 
+      // Documentation inherited
       public: virtual QVector3D GetScenePosition() const;
 
+      // Documentation inherited
       public: virtual double GetSceneRotation() const;
 
+      /// \brief Get the number of steps in the staircase
+      /// \return The number of steps in the staircase
       public: int GetSteps() const;
 
+      // Documentation inherited
       private: virtual void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
+      // Documentation inherited
       private: virtual bool rotateEventFilter(RotateHandle *_rotateHandle,
           QEvent *_event);
 
+      // Documentation inherited
       private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
 
+      // Documentation inherited
       private slots: void OnApply();
 
+      // Documentation inherited
       private slots: void OnOpenInspector();
 
+      // Documentation inherited
       private slots: void OnDeleteItem();
 
+      /// \brief Emit stairs changed Qt signals.
       private: void StairsChanged();
 
+      /// \brief Emit steps changed Qt signals.
       private: void StepsChanged();
 
+      /// \brief Depth of staircase item in pixels.
       private: double stairsDepth;
 
+      /// \brief Height of staircase item in pixels.
       private: double stairsHeight;
 
+      /// \brief Width of staircase item in pixels.
       private: double stairsWidth;
 
-      private: double stairsSideBar;
-
+      /// \brief Scene position of staircase item in pixel coordinates.
       private: QPointF stairsPos;
 
+      /// \brief Elevation of staircase item in pixels.
       private: double stairsElevation;
 
+      /// \brief Number of steps in the staircase item.
       private: int stairsSteps;
 
+      /// \brief Scale for converting pixels to metric units.
       private: double scale;
 
+      /// \brief Inspector for configuring the staircase item.
       private: StairsInspectorDialog* inspector;
 
 //        private: double stairsUnitRise;

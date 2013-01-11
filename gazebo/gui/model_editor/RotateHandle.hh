@@ -26,8 +26,11 @@ namespace gazebo
   {
     class RotateHandle : public QGraphicsItem
     {
+      /// \brief Constructor
+      /// param[in] _parent Parent graphics item.
       public: RotateHandle(QGraphicsItem *_parent = 0);
 
+      /// \brief Destructor
       public: ~RotateHandle();
 
       /// \brief Set the current mouse state
@@ -36,20 +39,20 @@ namespace gazebo
       /// \brief Get the current mouse state
       public: int  GetMouseState() const;
 
-      /// \brief Get the X position of the mouse press in pixels.
-      /// \return Mouse press X position in pixels.
+      /// \brief Get the X position of the mouse press.
+      /// \return Mouse press X position in pixel coordinates.
       public: double GetMouseDownX() const;
 
-      /// \brief Get the Y position of the mouse press in pixels.
-      /// \return Mouse press Y position in pixels.
+      /// \brief Get the Y position of the mouse press.
+      /// \return Mouse press Y position in pixel coordinates.
       public: double GetMouseDownY() const;
 
-      /// \brief Set the X position of the mouse press in pixels.
-      /// \param[in] _x Mouse press X position in pixels.
+      /// \brief Set the X position of the mouse press.
+      /// \param[in] _x Mouse press X position in pixel coordinates.
       public: void SetMouseDownX(double _x);
 
-      /// \brief Set the Y position of the mouse press in pixels.
-      /// \param[in] _y Mouse press Y position in pixels.
+      /// \brief Set the Y position of the mouse press.
+      /// \param[in] _y Mouse press Y position in pixel coordinates.
       public: void SetMouseDownY(double _y);
 
       /// \brief Qt mouse hover enter event
@@ -78,8 +81,8 @@ namespace gazebo
 
       /// \brief Qt paint function for drawing the grabber handle.
       /// \param[in] _painter Qt painter object.
-      /// \param[in] _painter Qt style options for the item.
-      /// \param[in] _painter Qt widget being painted on.
+      /// \param[in] _option Qt style options for the item.
+      /// \param[in] _widget Qt widget being painted on.
       private: void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
@@ -98,13 +101,13 @@ namespace gazebo
       /// \brief Size of the rotate handle in pixels.
       private: double handleSize;
 
-      /// \brief Offset height from the item to the rotate handle in pixels.
+      /// \brief Offset height of the rotate handle (from the item) in pixels.
       private: double handleOffsetHeight;
 
       /// \brief Origin of the rotate handle
       private: QPointF origin;
 
-      /// \brief Offset position from the item to the rotate handle in pixels.
+      /// \brief Offset position of the rotate handle pixel coordinates.
       private: QPointF handleOffset;
     };
   }

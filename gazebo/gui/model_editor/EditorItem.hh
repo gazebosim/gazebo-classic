@@ -39,11 +39,11 @@ namespace gazebo
       /// \return The item size in pixels.
       public: virtual QVector3D GetSize() const;
 
-      /// \brief Get the scene position of item in pixels.
-      /// \return The scene position in pixels.
+      /// \brief Get the scene position of item.
+      /// \return The scene position in pixel coordinates.
       public: virtual QVector3D GetScenePosition() const;
 
-      /// \brief Get the scene rotation of item in degrees.
+      /// \brief Get the scene rotation of item.
       /// \return The scene rotation in degrees.
       public: virtual double GetSceneRotation() const;
 

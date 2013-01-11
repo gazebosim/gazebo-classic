@@ -31,28 +31,36 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Constructor
+      /// \param[in] _parent Parent QWidget.
       public: LevelWidget(QWidget *_parent = 0);
 
+      /// \brief Destructor
       public: ~LevelWidget();
 
-      signals: void LevelChanged(int _level);
-
-      signals: void LevelAdded();
-
+      /// \brief Qt callback when the selection of the level combo box has been
+      ///  changed.
       public slots: void OnCurrentLevelChanged(int _level);
 
+      /// \brief Qt callback when the add level button has been pressed.
       public slots: void OnAddLevel();
 
+      /// \brief Event received when the level has been deleted.
       public: void OnDeleteLevel(int _level);
 
+      /// \brief Event received when the level name has been changed externally.
       private: void OnChangeLevelName(int _level, const std::string &_newName);
 
+      /// \brief Event received when the level has been changed externally.
       private: void OnDiscard();
 
+      /// \brief Combo box for selecting the current level.
       private: QComboBox *levelComboBox;
 
+      /// \brief A list of gui editor events connected to this widget
       private: std::vector<event::ConnectionPtr> connections;
 
+      /// \brief Counter for the total number of levels.
       private: int levelCounter;
     };
   }

@@ -36,61 +36,101 @@ namespace gazebo
       /// \brief Destructor
       public: ~WallInspectorDialog();
 
+      /// \brief Get the length the wall segment.
+      /// \return Wall segment length in pixels.
       public: double GetLength() const;
 
+      /// \brief Get the start position of the wall segment.
+      /// \return Wall segment start position in pixel coordinates.
       public: QPointF GetStartPosition() const;
 
+      /// \brief Get the end position of the wall segment.
+      /// \return Wall segment end position in pixel coordinates.
       public: QPointF GetEndPosition() const;
 
+      /// \brief Get the height of the wall.
+      /// \return Wall height in pixels.
       public: double GetHeight() const;
 
+      /// \brief Get the thickness of the wall.
+      /// \return Wall thickness in pixels.
       public: double GetThickness() const;
 
+      /// \brief Get the material of the wall.
+      /// \return Wall material.
       public: std::string GetMaterial() const;
 
+      /// \brief Set the name of the wall.
+      /// \param[in] _name Name to set the wall to.
       public: void SetName(const std::string &_name);
 
+      /// \brief Set the length of the wall segment.
+      /// \param[in] _length Length of the wall segment in pixels.
       public: void SetLength(double _length);
 
+      /// \brief Set the start position of the wall segment.
+      /// \param[in] _pos Start position of the wall segment in pixel
+      /// coordinates.
       public: void SetStartPosition(const QPointF &_pos);
 
+      /// \brief Set the end position of the wall segment.
+      /// \param[in] _pos end position of the wall segment in pixel coordinates.
       public: void SetEndPosition(const QPointF &_pos);
 
+      /// \brief Set the height of the wall.
+      /// \param[in] _height Height of wall in pixels.
       public: void SetHeight(double _height);
 
+      /// \brief Set the thickness of the wall.
+      /// \param[in] _thickness Thickness of wall in pixels.
       public: void SetThickness(double _thickness);
 
+      /// \brief Set the material of the wall.
+      /// \param[in] _material New wall material to use.
       public: void SetMaterial(const std::string &_material);
 
-      /// \brief Qt signal emitted to indicate that changes should be applied
+      /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
 
-      /// \brief Qt callback when the Cancel button is pressed
+      /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
-      /// \brief Qt callback when the Apply button is pressed
+      /// \brief Qt callback when the Apply button is pressed.
       private slots: void OnApply();
 
-      /// \brief Qt callback when the Ok button is pressed
+      /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
+      /// \brief Spin box for configuring the X start position of the wall
+      /// segment.
       private: QDoubleSpinBox *startXSpinBox;
 
+      /// \brief Spin box for configuring the Y start position of the wall
+      /// segment.
       private: QDoubleSpinBox *startYSpinBox;
 
+      /// \brief Spin box for configuring the X end position of the wall
+      /// segment.
       private: QDoubleSpinBox *endXSpinBox;
 
+      /// \brief Spin box for configuring the Y end position of the wall
+      /// segment.
       private: QDoubleSpinBox *endYSpinBox;
 
+      /// \brief Spin box for configuring the height of the wall.
       private: QDoubleSpinBox *heightSpinBox;
 
+      /// \brief Spin box for configuring the thickness of the wall.
       private: QDoubleSpinBox *thicknessSpinBox;
 
-      private: QLabel* wallNameLabel;
-
+      /// \brief Spin box for configuring the length of the wall segment.
       private: QDoubleSpinBox *lengthSpinBox;
 
+      /// \brief Combo box for selecting the material of the wall to use.
       private: QComboBox *materialComboBox;
+
+      /// \brief Label that holds the name of the wall.
+      private: QLabel* wallNameLabel;
     };
   }
 }
