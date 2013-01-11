@@ -415,7 +415,7 @@ class ServerFixture : public testing::Test
                  << "  </sensor>"
                  << "</link>"
                  << "</model>"
-                 << "</gazebo>";
+                 << "</sdf>";
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
@@ -456,7 +456,7 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</gazebo>";
+                 << "</sdf>";
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
@@ -495,7 +495,7 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</gazebo>";
+                 << "</sdf>";
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
@@ -533,7 +533,7 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</gazebo>";
+                 << "</sdf>";
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
@@ -541,6 +541,58 @@ class ServerFixture : public testing::Test
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
                  common::Time::MSleep(10);
+             }
+
+  protected: void SpawnPendulum(const std::string &_name,
+                 const math::Vector3 &_pendSize,
+                 const math::Vector3 &_cogPos,
+                 const math::Vector3 &_jointAxis,
+                 const math::Pose &_modelPose,
+                 const math::Pose &_linkPose,
+                 const math::Pose &_jointPose)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<pose>" << _modelPose.pos
+                             << _modelPose.rot.GetAsEuler() << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <pose>" << _linkPose.pos
+                               << _linkPose.rot.GetAsEuler() << "</pose>"
+                 << "  <inertial><pose>" << _cogPos << " 0 0 0</pose></inertial>"
+                 << "  <collision name ='collision'>"
+                 << "    <pose>" << _cogPos << " 0 0 0</pose>"
+                 << "    <geometry>"
+                 << "      <box><size>" << _pendSize << "</size></box>"
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <pose>" << _cogPos << " 0 0 0</pose>"
+                 << "    <geometry>"
+                 << "      <box><size>" << _pendSize << "</size></box>"
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "</link>"
+                 << "<joint name ='upper_pin'>"
+                 << "  <parent>world</parent>"
+                 << "  <child>body</child>"
+                 << "  <pose>" << _jointPose.pos
+                               << _jointPose.rot.GetAsEuler() << "</pose>"
+                 << "  <axis><xyz>" << _jointAxis << "</xyz></axis>"
+                 << "</joint>" 
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               // Wait for the entity to spawn
+               int waitCount = 0, maxWaitCount = 3000;
+               while (!this->HasEntity(_name) && ++waitCount < maxWaitCount)
+                 common::Time::MSleep(10);
+               ASSERT_LT(waitCount, maxWaitCount);
              }
 
   protected: void SpawnModel(const std::string &_filename)

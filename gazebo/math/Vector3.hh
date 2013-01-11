@@ -78,7 +78,7 @@ namespace gazebo
       public: double Distance(double _x, double _y, double _z) const;
 
       /// \brief Returns the length (magnitude) of the vector
-      /// \ return the length
+      /// \return the length
       public: double GetLength() const;
 
       /// \brief Return the square of the length (magnitude) of the vector

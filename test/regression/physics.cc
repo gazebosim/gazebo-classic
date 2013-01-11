@@ -23,7 +23,97 @@ using namespace gazebo;
 class PhysicsTest : public ServerFixture
 {
   public: void EmptyWorld(std::string _worldFile);
+  public: void JointTest(std::string _worldFile);
 };
+
+void PhysicsTest::JointTest(std::string _worldFile)
+{
+  // Load an empty world
+  Load(_worldFile, true);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  math::Vector3 g = physics->GetGravity();
+  // Assume gravity vector points down z axis only,
+  // with minimum magnitude of 1 m/s^2.
+  EXPECT_EQ(g.x, 0);
+  EXPECT_EQ(g.y, 0);
+  EXPECT_LT(g.z, 1);
+
+  // get physics time step, expect greater than 100 ns
+  double dt = physics->GetStepTime();
+  EXPECT_GT(dt, 1e-7);
+
+  math::Pose modelPose, linkPose, jointPose;
+  math::Vector3 pendSize, axis, cogPos;
+  math::Angle initial;
+  physics::ModelPtr model;
+  physics::LinkPtr link;
+  std::string modelName;
+  double t=0;
+
+  // Spawn a pendulum
+  modelName = "pend_x";
+  initial.SetFromDegree(90);
+  pendSize.Set(0.2, 0.2, 4);
+  cogPos.Set(0, 0, -2);
+  modelPose.pos.Set(0, 0, 6);
+  modelPose.rot.SetToIdentity();
+  linkPose.Reset();
+  linkPose.rot.SetFromEuler(initial.Radian(), 0, 0);
+  axis.Set(1, 0, 0);
+  jointPose.Reset();
+  SpawnPendulum(modelName, pendSize, cogPos, axis,
+                modelPose, linkPose, jointPose);
+
+  model = world->GetModel(modelName);
+  if (model != NULL)
+  {
+    t = physics->GetSimTime().Double();
+    double w = sqrt(g.z / cosPos.z);
+    double period = 6.28/w;
+    int steps = ceil(period/2 / dt);
+    world->StepWorld(steps);
+
+    link = model->GetLink("body");
+    if (link != NULL)
+    {
+      math::Pose pose = link->GetWorldPose();
+      gzdbg << modelName << " angles at t=" << t << " s, "
+            << pose.rot.GetAsEuler() << '\n';
+      math::Vector3 angVel = link->GetWorldAngularVel();
+      double mag = angVel.GetLength();
+      math::Vector3 unitVec = angVel.Normalize();
+      gzdbg << "mag: " << mag << '\n';
+      gzdbg << "unitVec: " << unitVec << '\n';
+    }
+    else
+    {
+      gzerr << "Unable to load link: body\n";
+      EXPECT_TRUE(link != NULL);
+    }
+  }
+  else
+  {
+    gzerr << "Unable to load model: " << modelName << '\n';
+    EXPECT_TRUE(model != NULL);
+  }
+}
+
+TEST_F(PhysicsTest, JointTestODE)
+{
+  JointTest("worlds/empty.world");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, JointTestBullet)
+{
+  JointTest("worlds/empty_bullet.world");
+}
+#endif  // HAVE_BULLET
 
 void PhysicsTest::EmptyWorld(std::string _worldFile)
 {
