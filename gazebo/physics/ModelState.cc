@@ -115,13 +115,11 @@ bool ModelState::IsZero() const
 {
   bool result = true;
 
-  /// \TODO: put back in.
-  // for (std::vector<LinkState>::const_iterator iter =
-  //      this->linkStates.begin();
-  //      iter != this->linkStates.end() && result; ++iter)
-  // {
-  //   result = result && (*iter).IsZero();
-  // }
+  for (std::vector<LinkState>::const_iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end() && result; ++iter)
+  {
+    result = result && (*iter).IsZero();
+  }
 
   for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
        iter != this->jointStates.end() && result; ++iter)
@@ -270,15 +268,22 @@ ModelState ModelState::operator-(const ModelState &_state) const
   result.pose.pos = this->pose.pos - _state.pose.pos;
   result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
 
-  /// \TODO: put back in.
   // Insert the link state diffs.
-  // for (std::vector<LinkState>::const_iterator iter =
-  //      this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
-  // {
-  //   LinkState state = (*iter) - _state.GetLinkState((*iter).GetName());
-  //   if (!state.IsZero())
-  //     result.linkStates.push_back(state);
-  // }
+  for (std::vector<LinkState>::const_iterator iter =
+       this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
+  {
+    try
+    {
+      LinkState state = (*iter) - _state.GetLinkState((*iter).GetName());
+      if (!state.IsZero())
+        result.linkStates.push_back(state);
+    }
+    catch(common::Exception &)
+    {
+      // Ignore exception, which is just the fact that a link state may not
+      // have been recorded.
+    }
+  }
 
   // Insert the joint state diffs.
   for (std::vector<JointState>::const_iterator iter =
@@ -310,12 +315,20 @@ ModelState ModelState::operator+(const ModelState &_state) const
   result.pose.rot = _state.pose.rot * this->pose.rot;
 
   // Insert the link state diffs.
-  // for (std::vector<LinkState>::const_iterator iter =
-  //      this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
-  // {
-  //   LinkState state = (*iter) + _state.GetLinkState((*iter).GetName());
-  //   result.linkStates.push_back(state);
-  // }
+  for (std::vector<LinkState>::const_iterator iter =
+       this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
+  {
+    try
+    {
+      LinkState state = (*iter) + _state.GetLinkState((*iter).GetName());
+      result.linkStates.push_back(state);
+    }
+    catch(common::Exception &)
+    {
+      // Ignore exception, which is just the fact that a link state may not
+      // have been recorded.
+    }
+  }
 
   // Insert the joint state diffs.
   for (std::vector<JointState>::const_iterator iter =

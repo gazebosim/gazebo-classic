@@ -925,6 +925,8 @@ void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);
 
+  // For now we don't use the link state values to set the state of
+  // simulation.
   /*for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
   {
     LinkState linkState = _state.GetLinkState(i);
