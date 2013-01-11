@@ -99,6 +99,7 @@ MainWindow::MainWindow()
   splitter->setStretchFactor(1, 2);
   splitter->setStretchFactor(2, 0);
   splitter->setCollapsible(1, false);
+  splitter->setHandleWidth(10);
 
   centerLayout->addWidget(splitter);
   centerLayout->setContentsMargins(0, 0, 0, 0);
