@@ -286,6 +286,9 @@ void World::Init()
   common::LogRecord::Instance()->Add(this->GetName(), "state.log",
       boost::bind(&World::OnLog, this, _1));
 
+  this->prevStates[0].SetName(this->GetName());
+  this->prevStates[1].SetName(this->GetName());
+
   this->initialized = true;
 }
 
@@ -374,6 +377,17 @@ void World::LogStep()
 //////////////////////////////////////////////////
 void World::Step()
 {
+  /// need this because ODE does not call dxReallocateWorldProcessContext()
+  /// until dWorld.*Step
+  /// Plugins that manipulate joints (and probably other properties) require
+  /// one iteration of the physics engine. Do not remove this.
+  if (!this->pluginsLoaded &&
+      sensors::SensorManager::Instance()->SensorsInitialized())
+  {
+    this->LoadPlugins();
+    this->pluginsLoaded = true;
+  }
+
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
@@ -474,17 +488,6 @@ void World::Update()
   {
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
-
-    /// need this because ODE does not call dxReallocateWorldProcessContext()
-    /// until dWorld.*Step
-    /// Plugins that manipulate joints (and probably other properties) require
-    /// one iteration of the physics engine. Do not remove this.
-    if (!this->pluginsLoaded &&
-        sensors::SensorManager::Instance()->SensorsInitialized())
-    {
-      this->LoadPlugins();
-      this->pluginsLoaded = true;
-    }
 
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
@@ -1404,32 +1407,7 @@ void World::ProcessFactoryMsgs()
         ModelPtr model = this->LoadModel(elem, this->rootElement);
         model->Init();
 
-        // Check to see if we need to load any model plugins
-        if (model->GetPluginCount() > 0)
-        {
-          int iterations = 0;
-
-          // Wait for the sensors to be initialized before loading
-          // plugins, if there are any sensors
-          while (model->GetSensorCount() > 0 &&
-              !sensors::SensorManager::Instance()->SensorsInitialized() &&
-              iterations < 50)
-          {
-            common::Time::MSleep(100);
-            iterations++;
-          }
-
-          // Load the plugins if the sensors have been loaded, or if there
-          // are no sensors attached to the model.
-          if (iterations < 50)
-            model->LoadPlugins();
-          else
-          {
-            gzerr << "Sensors failed to initialize when loading model["
-              << model->GetName() << "] via the factory mechanism."
-              << "Plugins for the model will not be loaded.\n";
-          }
-        }
+        model->LoadPlugins();
       }
       else if (isLight)
       {

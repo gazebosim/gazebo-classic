@@ -15,27 +15,31 @@
  *
  */
 
-#include "gazebo.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "common/Events.hh"
+#include "gazebo/gui/TopicSelector.hh"
+#include "gazebo/gui/viewers/ViewFactory.hh"
+#include "gazebo/gui/viewers/TopicView.hh"
+#include "gazebo/gui/viewers/ImageView.hh"
 
-#include "transport/Node.hh"
-#include "transport/Transport.hh"
+#include "gazebo/gazebo.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Events.hh"
 
-#include "rendering/UserCamera.hh"
-#include "rendering/RenderEvents.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Transport.hh"
 
-#include "gui/Actions.hh"
-#include "gui/Gui.hh"
-#include "gui/InsertModelWidget.hh"
-#include "gui/SkyWidget.hh"
-#include "gui/ModelListWidget.hh"
-#include "gui/RenderWidget.hh"
-#include "gui/ToolsWidget.hh"
-#include "gui/GLWidget.hh"
-#include "gui/MainWindow.hh"
-#include "gui/GuiEvents.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/InsertModelWidget.hh"
+#include "gazebo/gui/ModelListWidget.hh"
+#include "gazebo/gui/RenderWidget.hh"
+#include "gazebo/gui/ToolsWidget.hh"
+#include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/GuiEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -87,14 +91,15 @@ MainWindow::MainWindow()
   splitter->addWidget(this->toolsWidget);
 
   QList<int> sizes;
-  sizes.push_back(300);
-  sizes.push_back(700);
-  sizes.push_back(300);
+  sizes.push_back(250);
+  sizes.push_back(this->width() - 250);
+  sizes.push_back(0);
   splitter->setSizes(sizes);
-  splitter->setStretchFactor(0, 1);
+  splitter->setStretchFactor(0, 0);
   splitter->setStretchFactor(1, 2);
-  splitter->setStretchFactor(2, 1);
+  splitter->setStretchFactor(2, 0);
   splitter->setCollapsible(1, false);
+  splitter->setHandleWidth(10);
 
   centerLayout->addWidget(splitter);
   centerLayout->setContentsMargins(0, 0, 0, 0);
@@ -129,6 +134,8 @@ MainWindow::MainWindow()
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&MainWindow::OnSetSelectedEntity, this, _1, _2)));
+
+  gui::ViewFactory::RegisterAll();
 }
 
 /////////////////////////////////////////////////
@@ -200,6 +207,25 @@ void MainWindow::New()
   msgs::ServerControl msg;
   msg.set_new_world(true);
   this->serverControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::SelectTopic()
+{
+  TopicSelector *selector = new TopicSelector();
+  selector->exec();
+  std::string topic = selector->GetTopic();
+  std::string msgType = selector->GetMsgType();
+  delete selector;
+
+  if (!topic.empty())
+  {
+    TopicView *view = ViewFactory::NewView(msgType, topic, this);
+    if (view)
+      view->show();
+    else
+      gzerr << "Unable to create viewer for message type[" << msgType << "]\n";
+  }
 }
 
 /////////////////////////////////////////////////
@@ -461,7 +487,14 @@ void MainWindow::OnFullScreen(bool _value)
 void MainWindow::Reset()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->SetWorldPose(math::Pose(5, -5, 2, 0, GZ_DTOR(11.31), GZ_DTOR(135)));
+
+  math::Vector3 camPos(5, -5, 2);
+  math::Vector3 lookAt(0, 0, 0);
+  math::Vector3 delta = camPos - lookAt;
+
+  double yaw = atan2(delta.x, delta.y);
+  double pitch = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+  cam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
 }
 
 /////////////////////////////////////////////////
@@ -555,6 +588,11 @@ void MainWindow::CreateActions()
   g_newAct->setStatusTip(tr("Create a new world"));
   connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
   */
+
+  g_topicVisAct = new QAction(tr("Topic Visualization"), this);
+  g_topicVisAct->setShortcut(tr("Ctrl+T"));
+  g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
+  connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
 
   g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
@@ -768,40 +806,43 @@ void MainWindow::CreateMenus()
 
   this->setMenuWidget(frame);
 
-  this->fileMenu = this->menuBar->addMenu(tr("&File"));
-  // this->fileMenu->addAction(g_openAct);
-  // this->fileMenu->addAction(g_importAct);
-  // this->fileMenu->addAction(g_newAct);
-  this->fileMenu->addAction(g_saveAct);
-  this->fileMenu->addAction(g_saveAsAct);
-  this->fileMenu->addSeparator();
-  this->fileMenu->addAction(g_quitAct);
+  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  // fileMenu->addAction(g_openAct);
+  // fileMenu->addAction(g_importAct);
+  // fileMenu->addAction(g_newAct);
+  fileMenu->addAction(g_saveAct);
+  fileMenu->addAction(g_saveAsAct);
+  fileMenu->addSeparator();
+  fileMenu->addAction(g_quitAct);
 
-  this->editMenu = this->menuBar->addMenu(tr("&Edit"));
-  this->editMenu->addAction(g_resetModelsAct);
-  this->editMenu->addAction(g_resetWorldAct);
+  QMenu *editMenu = this->menuBar->addMenu(tr("&Edit"));
+  editMenu->addAction(g_resetModelsAct);
+  editMenu->addAction(g_resetWorldAct);
 
-  this->viewMenu = this->menuBar->addMenu(tr("&View"));
-  this->viewMenu->addAction(g_showGridAct);
-  this->viewMenu->addSeparator();
+  QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
+  viewMenu->addAction(g_showGridAct);
+  viewMenu->addSeparator();
 
-  this->viewMenu->addAction(g_transparentAct);
-  this->viewMenu->addAction(g_showCollisionsAct);
-  this->viewMenu->addAction(g_showJointsAct);
-  this->viewMenu->addAction(g_showCOMAct);
-  this->viewMenu->addAction(g_showContactsAct);
-  this->viewMenu->addSeparator();
+  viewMenu->addAction(g_transparentAct);
+  viewMenu->addAction(g_showCollisionsAct);
+  viewMenu->addAction(g_showJointsAct);
+  viewMenu->addAction(g_showCOMAct);
+  viewMenu->addAction(g_showContactsAct);
+  viewMenu->addSeparator();
 
-  this->viewMenu->addAction(g_resetAct);
-  this->viewMenu->addAction(g_fullScreenAct);
-  this->viewMenu->addSeparator();
-  // this->viewMenu->addAction(g_fpsAct);
-  this->viewMenu->addAction(g_orbitAct);
+  viewMenu->addAction(g_resetAct);
+  viewMenu->addAction(g_fullScreenAct);
+  viewMenu->addSeparator();
+  // viewMenu->addAction(g_fpsAct);
+  viewMenu->addAction(g_orbitAct);
+
+  QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
+  windowMenu->addAction(g_topicVisAct);
 
   this->menuBar->addSeparator();
 
-  this->helpMenu = this->menuBar->addMenu(tr("&Help"));
-  this->helpMenu->addAction(g_aboutAct);
+  QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
+  helpMenu->addAction(g_aboutAct);
 }
 
 /////////////////////////////////////////////////

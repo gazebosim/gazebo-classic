@@ -232,6 +232,13 @@ namespace gazebo
       /// \brief Multiplication operators
       /// \param[in] _v the scaling factor
       /// \return a scaled vector
+      public: friend inline Vector3 operator*(double _s,
+                                              const Vector3 &_v)
+      { return Vector3(_v.x * _s, _v.y * _s, _v.z * _s); }
+
+      /// \brief Multiplication operators
+      /// \param[in] _v the scaling factor
+      /// \return a scaled vector
       public: Vector3 operator*(double _v) const;
 
       /// \brief Multiplication operator

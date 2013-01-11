@@ -26,22 +26,24 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
-#include "common/KeyFrame.hh"
-#include "common/Animation.hh"
-#include "common/Plugin.hh"
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/common/KeyFrame.hh"
+#include "gazebo/common/Animation.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/CommonTypes.hh"
 
-#include "physics/Gripper.hh"
-#include "physics/Joint.hh"
-#include "physics/JointController.hh"
-#include "physics/Link.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Model.hh"
-#include "physics/Contact.hh"
+#include "gazebo/physics/Gripper.hh"
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/JointController.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Contact.hh"
+
+#include "gazebo/sensors/SensorManager.hh"
 
 #include "transport/Node.hh"
 
@@ -69,14 +71,12 @@ Model::Model(BasePtr _parent)
 {
   this->AddType(MODEL);
   this->updateMutex = new boost::recursive_mutex();
-  this->jointController = NULL;
 }
 
 //////////////////////////////////////////////////
 Model::~Model()
 {
   delete this->updateMutex;
-  delete this->jointController;
 }
 
 //////////////////////////////////////////////////
@@ -649,8 +649,8 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   this->joints.push_back(joint);
 
   if (!this->jointController)
-    this->jointController = new JointController(
-        boost::shared_dynamic_cast<Model>(shared_from_this()));
+    this->jointController.reset(new JointController(
+        boost::shared_dynamic_cast<Model>(shared_from_this())));
   this->jointController->AddJoint(joint);
 }
 
@@ -666,14 +666,38 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Model::LoadPlugins()
 {
-  // Load the plugins
-  if (this->sdf->HasElement("plugin"))
+  // Check to see if we need to load any model plugins
+  if (this->GetPluginCount() > 0)
   {
-    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
-    while (pluginElem)
+    int iterations = 0;
+
+    // Wait for the sensors to be initialized before loading
+    // plugins, if there are any sensors
+    while (this->GetSensorCount() > 0 &&
+        !sensors::SensorManager::Instance()->SensorsInitialized() &&
+        iterations < 50)
     {
-      this->LoadPlugin(pluginElem);
-      pluginElem = pluginElem->GetNextElement("plugin");
+      common::Time::MSleep(100);
+      iterations++;
+    }
+
+    // Load the plugins if the sensors have been loaded, or if there
+    // are no sensors attached to the model.
+    if (iterations < 50)
+    {
+      // Load the plugins
+      sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+      while (pluginElem)
+      {
+        this->LoadPlugin(pluginElem);
+        pluginElem = pluginElem->GetNextElement("plugin");
+      }
+    }
+    else
+    {
+      gzerr << "Sensors failed to initialize when loading model["
+        << this->GetName() << "] via the factory mechanism."
+        << "Plugins for the model will not be loaded.\n";
     }
   }
 }
@@ -901,6 +925,8 @@ void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);
 
+  // For now we don't use the link state values to set the state of
+  // simulation.
   /*for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
   {
     LinkState linkState = _state.GetLinkState(i);

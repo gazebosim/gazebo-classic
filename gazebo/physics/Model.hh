@@ -41,7 +41,6 @@ namespace gazebo
 {
   namespace physics
   {
-    class JointController;
     class Gripper;
 
     /// \addtogroup gazebo_physics
@@ -305,6 +304,11 @@ namespace gazebo
       /// \param[in] _sdf SDF parameter.
       private: void LoadGripper(sdf::ElementPtr _sdf);
 
+      /// \brief Get a handle to the Controller for the joints in this model.
+      /// \return A handle to the Controller for the joints in this model.
+      public: JointControllerPtr GetJointController()
+        { return this->jointController; }
+
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
 
@@ -339,7 +343,7 @@ namespace gazebo
       private: boost::recursive_mutex *updateMutex;
 
       /// \brief Controller for the joints.
-      private: JointController *jointController;
+      private: JointControllerPtr jointController;
 
       private: bool pluginsLoaded;
     };
