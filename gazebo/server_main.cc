@@ -21,11 +21,13 @@
 //////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
+  gazebo::Server *server = NULL;
+
   try
   {
     gazebo::common::LogRecord::Instance()->Init("server");
 
-    gazebo::Server *server = new gazebo::Server();
+    server = new gazebo::Server();
     if (!server->ParseArgs(argc, argv))
       return -1;
 
@@ -37,6 +39,9 @@ int main(int argc, char **argv)
   catch(gazebo::common::Exception &_e)
   {
     _e.Print();
+
+    server->Fini();
+    delete server;
   }
 
   return 0;
