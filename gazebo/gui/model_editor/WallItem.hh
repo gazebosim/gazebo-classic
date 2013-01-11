@@ -42,7 +42,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// param[in] _start Start position of the wall item in pixel coordinates.
-      /// param[in] _start End position of the wall item in pixel coordinates.
+      /// param[in] _end End position of the wall item in pixel coordinates.
       public: WallItem(const QPointF &_start, const QPointF &_end);
 
       /// \brief Destructor

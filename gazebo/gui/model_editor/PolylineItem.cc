@@ -27,12 +27,12 @@ using namespace gui;
 PolylineItem::PolylineItem(const QPointF &_start, const QPointF &_end)
   : EditorItem(), QGraphicsPathItem()
 {
-//  this->gridSpace = 10;
   this->editorType = "Polyline";
   this->origin = _start;
   this->setPos(_start);
 
-  //this->location = _start;
+  // this->location = _start;
+  // this->gridSpace = 10;
 
   QPainterPath p;
   this->setPath(p);
@@ -41,7 +41,7 @@ PolylineItem::PolylineItem(const QPointF &_start, const QPointF &_end)
   this->AddPoint(_end);
 
   this->setSelected(false);
-  this->ShowCorners(false);
+  this->ShowHandles(false);
   this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   this->setAcceptHoverEvents(true);
@@ -535,13 +535,13 @@ QVariant PolylineItem::itemChange(GraphicsItemChange _change,
         this->grabbers[grabbers.size()-1]->removeSceneEventFilter(this);
     }*/
     if (!_value.toBool())
-        this->ShowCorners(_value.toBool());
+        this->ShowHandles(_value.toBool());
   }
   return QGraphicsItem::itemChange(_change, _value);
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::ShowCorners(bool _show)
+void PolylineItem::ShowHandles(bool _show)
 {
   for (unsigned int i = 0; i < this->grabbers.size(); ++i)
     this->grabbers[i]->setVisible(_show);

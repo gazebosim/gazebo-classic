@@ -65,12 +65,11 @@ namespace gazebo
         private: virtual void contextMenuEvent(
             QGraphicsSceneContextMenuEvent *_event);
 
-        /// \brief Notify that the bounding box of all the walls
-        /// needs to be changed.
+        /// \brief Notify that the bounding box of the wall items needs to be
+        /// changed.
         private slots: void NotifyChange();
 
-        /// \brief Qt callback to recalculate the bounding box of all wall
-        /// items.
+        /// \brief Qt callback to recalculate the bounding box of wall items.
         private slots: void RecalculateBoundingBox();
 
         /// \brief Qt callback when a wall
@@ -85,22 +84,23 @@ namespace gazebo
         /// \brief Emit size changed Qt signals.
         private: void SizeChanged();
 
-        /// \brief Depth of floor in pixels.
+        /// \brief Depth of floor item in pixels.
         private: double floorDepth;
 
-        /// \brief Height of floor in pixels.
+        /// \brief Height of floor item in pixels.
         private: double floorHeight;
 
-        /// \brief Width of floor in pixels.
+        /// \brief Width of floor item in pixels.
         private: double floorWidth;
 
-        /// \brief Scene position of floor in pixel coordinates.
+        /// \brief Scene position of floor item in pixel coordinates.
         private: QPointF floorPos;
 
-        /// \brief A flag to indicate that there have been changes to the walls
+        /// \brief A flag to indicate that there have been changes to the wall
+        /// items.
         private: bool dirty;
 
-        /// \brief A list of walls that the floor holds
+        /// \brief A list of wall items that the floor item holds.
         private: std::vector<WallItem *> walls;
 
         /// \brief Bounding box of the floor item.

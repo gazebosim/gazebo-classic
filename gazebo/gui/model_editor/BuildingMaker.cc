@@ -128,25 +128,25 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
       manip, SLOT(OnPosZChanged(double)));
   QObject::connect(_item, SIGNAL(yawChanged(double)),
       manip, SLOT(OnYawChanged(double)));
-  QObject::connect(_item, SIGNAL(itemDeleted()), manip, SLOT(OnItemDeleted()));
+  QObject::connect(_item, SIGNAL(itemDeleted()), manip, SLOT(OnDeleted()));
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::AttachObject(const std::string &_child,
+void BuildingMaker::AttachManip(const std::string &_child,
     const std::string &_parent)
 {
   ModelManip *child = this->allItems[_child];
   ModelManip *parent = this->allItems[_parent];
-  parent->AttachObject(child);
+  parent->AttachManip(child);
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::DetachObject(const std::string &_child,
+void BuildingMaker::DetachManip(const std::string &_child,
     const std::string &_parent)
 {
   ModelManip *child = this->allItems[_child];
   ModelManip *parent = this->allItems[_parent];
-  parent->DetachObject(child);
+  parent->DetachManip(child);
 }
 
 /////////////////////////////////////////////////
@@ -545,16 +545,16 @@ void BuildingMaker::GenerateSDF()
       }
       else if (name.find("Wall") != std::string::npos)
       {
-        if (modelManip->GetAttachedObjectCount() != 0 )
+        if (modelManip->GetAttachedManipCount() != 0 )
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr wallVis = visual;
           math::Pose wallPose = wallVis->GetParent()->GetWorldPose();
           math::Vector3 wallSize = wallVis->GetScale();
-          for (unsigned int i = 0; i < modelManip->GetAttachedObjectCount();
+          for (unsigned int i = 0; i < modelManip->GetAttachedManipCount();
               ++i)
           {
-            ModelManip *attachedObj = modelManip->GetAttachedObject(i);
+            ModelManip *attachedObj = modelManip->GetAttachedManip(i);
             std::string objName = attachedObj->GetName();
             if (objName.find("Window") != std::string::npos
                 || objName.find("Door") != std::string::npos)
@@ -628,16 +628,16 @@ void BuildingMaker::GenerateSDF()
       }
       else if (name.find("Floor") != std::string::npos)
       {
-        if (modelManip->GetAttachedObjectCount() != 0 )
+        if (modelManip->GetAttachedManipCount() != 0 )
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr floorVis = visual;
           math::Pose floorPose = floorVis->GetWorldPose();
           math::Vector3 floorSize = floorVis->GetScale();
-          for (unsigned int i = 0; i < modelManip->GetAttachedObjectCount();
+          for (unsigned int i = 0; i < modelManip->GetAttachedManipCount();
               ++i)
           {
-            ModelManip *attachedObj = modelManip->GetAttachedObject(i);
+            ModelManip *attachedObj = modelManip->GetAttachedManip(i);
             std::string objName = attachedObj->GetName();
             if (objName.find("Stairs") != std::string::npos)
             {
@@ -798,7 +798,7 @@ void BuildingMaker::GenerateSDFWithCSG()
         continue;
     }
     else if (name.find("Wall") != std::string::npos
-        && modelManip->GetAttachedObjectCount() != 0)
+        && modelManip->GetAttachedManipCount() != 0)
     {
       rendering::VisualPtr wallVis = visual;
       math::Pose wallPose = wallVis->GetWorldPose();
@@ -826,7 +826,7 @@ void BuildingMaker::GenerateSDFWithCSG()
 
       std::string booleanMeshName = modelManip->GetName() + "_Boolean";
       common::Mesh *booleanMesh = NULL;
-      for (unsigned int i = 0; i < modelManip->GetAttachedObjectCount(); ++i)
+      for (unsigned int i = 0; i < modelManip->GetAttachedManipCount(); ++i)
       {
         if (booleanMesh)
         {
@@ -834,7 +834,7 @@ void BuildingMaker::GenerateSDFWithCSG()
           m1 = booleanMesh;
         }
 
-        ModelManip *attachedObj = modelManip->GetAttachedObject(i);
+        ModelManip *attachedObj = modelManip->GetAttachedManip(i);
         std::string objName = attachedObj->GetName();
         if (objName.find("Window") != std::string::npos
             || objName.find("Door") != std::string::npos)

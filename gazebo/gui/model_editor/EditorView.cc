@@ -42,7 +42,6 @@ EditorView::EditorView(QWidget *_parent)
 
   this->drawMode = NONE;
   this->drawInProgress = false;
-  this->mouseMode = Select;
 
   this->connections.push_back(
   gui::editor::Events::ConnectCreateEditorItem(
@@ -68,7 +67,7 @@ EditorView::EditorView(QWidget *_parent)
   gui::editor::Events::ConnectChangeLevel(
     boost::bind(&EditorView::OnChangeLevel, this, _1)));
 
-  this->grabberDragRotation = 0;
+  this->mousePressRotation = 0;
 
   this->buildingMaker = new BuildingMaker();
   this->currentLevel = 0;
@@ -255,8 +254,8 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
         if ((this->currentLevel) < static_cast<int>(floorList.size()))
         {
           EditorItem *item = dynamic_cast<EditorItem*>(this->currentMouseItem);
-          this->buildingMaker->AttachObject(this->itemToModelMap[item],
-              this->itemToModelMap[floorList[this->currentLevel]]);
+          this->buildingMaker->AttachManip(this->itemToVisualMap[item],
+              this->itemToVisualMap[floorList[this->currentLevel]]);
         }
         this->drawMode = NONE;
         this->drawInProgress = false;
@@ -372,10 +371,10 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         if (distance > 30 || t > 1.0 || t < 0.0)
         {
           editorItem->setParentItem(NULL);
-          this->buildingMaker->DetachObject(this->itemToModelMap[editorItem],
-                this->itemToModelMap[wallSegment]);
+          this->buildingMaker->DetachManip(this->itemToVisualMap[editorItem],
+                this->itemToVisualMap[wallSegment]);
           editorItem->SetRotation(editorItem->GetRotation()
-            - this->grabberDragRotation);
+            - this->mousePressRotation);
           editorItem->SetPosition(mousePoint);
         }
         else
@@ -401,12 +400,12 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
           if (wallSegment->contains(wallSegment->mapFromScene(scenePos)))
           {
             editorItem->setParentItem(wallSegment);
-            this->buildingMaker->AttachObject(
-                this->itemToModelMap[editorItem],
-                this->itemToModelMap[wallSegment]);
+            this->buildingMaker->AttachManip(
+                this->itemToVisualMap[editorItem],
+                this->itemToVisualMap[wallSegment]);
             editorItem->SetPosition(wallSegment->mapFromScene(scenePos));
-            this->grabberDragRotation = -wallSegment->line().angle();
-            editorItem->SetRotation(this->grabberDragRotation);
+            this->mousePressRotation = -wallSegment->line().angle();
+            editorItem->SetRotation(this->mousePressRotation);
             return;
           }
         }
@@ -462,8 +461,8 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
     }
 
     wallList.push_back(wallItem);
-//    this->buildingMaker->RemoveWall(this->lastWallSegmentName);
-    this->lastWallSegmentName = "";
+    // this->buildingMaker->RemoveWall(this->lastWallSegmentName);
+    // this->lastWallSegmentName = "";
     if (wallItem->GetLevel() > 0)
       floorList[wallItem->GetLevel()-1]->AttachWall(wallItem);
 
@@ -521,12 +520,12 @@ void EditorView::DeleteItem(EditorItem *_item)
     QGraphicsItem *itemParent = qItem->parentItem();
     wallList.erase(std::remove(wallList.begin(), wallList.end(),
         dynamic_cast<WallItem *>(itemParent)), wallList.end());
-    this->itemToModelMap.erase(_item);
+    this->itemToVisualMap.erase(_item);
     delete dynamic_cast<WallItem *>(itemParent);
   }
   else
   {
-    this->itemToModelMap.erase(_item);
+    this->itemToVisualMap.erase(_item);
     delete _item;
   }
 }
@@ -570,13 +569,13 @@ void EditorView::DrawWall(const QPoint &_pos)
     segmentSize.setZ(wallItem->GetHeight());
     std::string wallSegmentName = this->buildingMaker->AddWall(
         segmentSize, segmentPosition, segment->GetSceneRotation());
-    this->lastWallSegmentName = wallSegmentName;
+    // this->lastWallSegmentName = wallSegmentName;
     this->buildingMaker->ConnectItem(wallSegmentName, segment);
     this->buildingMaker->ConnectItem(wallSegmentName, wallItem);
-    this->itemToModelMap[segment] = wallSegmentName;
+    this->itemToVisualMap[segment] = wallSegmentName;
     if (segment->GetIndex() == 0)
       wallItem->SetName(wallSegmentName);
-//    this->itemToModelMap[wallItem] = wallSegmentName;
+//    this->itemToVisualMap[wallItem] = wallSegmentName;
   }
 }
 
@@ -597,7 +596,7 @@ void EditorView::DrawWindow(const QPoint &_pos)
     std::string windowName = this->buildingMaker->AddWindow(
         windowItem->GetSize(), windowPosition, windowItem->GetSceneRotation());
     this->buildingMaker->ConnectItem(windowName, windowItem);
-    this->itemToModelMap[windowItem] = windowName;
+    this->itemToVisualMap[windowItem] = windowName;
     windowItem->SetName(windowName);
     this->drawInProgress = true;
   }
@@ -625,7 +624,7 @@ void EditorView::DrawDoor(const QPoint &_pos)
     std::string doorName = this->buildingMaker->AddDoor(
         doorItem->GetSize(), doorPosition, doorItem->GetSceneRotation());
     this->buildingMaker->ConnectItem(doorName, doorItem);
-    this->itemToModelMap[doorItem] = doorName;
+    this->itemToVisualMap[doorItem] = doorName;
     doorItem->SetName(doorName);
     this->drawInProgress = true;
   }
@@ -656,7 +655,7 @@ void EditorView::DrawStairs(const QPoint &_pos)
         stairsItem->GetSteps());
 
     this->buildingMaker->ConnectItem(stairsName, stairsItem);
-    this->itemToModelMap[stairsItem] = stairsName;
+    this->itemToVisualMap[stairsItem] = stairsName;
     stairsItem->SetName(stairsName);
     this->drawInProgress = true;
   }
@@ -669,7 +668,7 @@ void EditorView::DrawStairs(const QPoint &_pos)
 }
 
 /////////////////////////////////////////////////
-void EditorView::CreateItem3D(EditorItem* _item)
+void EditorView::Create3DVisual(EditorItem* _item)
 {
   if (_item->GetType() == "Stairs")
   {
@@ -680,12 +679,12 @@ void EditorView::CreateItem3D(EditorItem* _item)
         stairsItem->GetSize(), stairsPosition, stairsItem->GetSceneRotation(),
         stairsItem->GetSteps());
     this->buildingMaker->ConnectItem(stairsName, stairsItem);
-    this->itemToModelMap[stairsItem] = stairsName;
+    this->itemToVisualMap[stairsItem] = stairsName;
     stairsItem->SetName(stairsName);
     if (stairsItem->GetLevel() < static_cast<int>(floorList.size()))
     {
-      this->buildingMaker->AttachObject(stairsName,
-          this->itemToModelMap[floorList[stairsItem->GetLevel()]]);
+      this->buildingMaker->AttachManip(stairsName,
+          this->itemToVisualMap[floorList[stairsItem->GetLevel()]]);
     }
   }
   // TODO add implementation for other times
@@ -744,7 +743,7 @@ void EditorView::OnDiscardModel()
   this->doorList.clear();
   this->stairsList.clear();
   this->floorList.clear();
-  this->itemToModelMap.clear();
+  this->itemToVisualMap.clear();
   this->buildingMaker->Reset();
 //  this->levelNames.clear();
 //  this->levelHeights.clear();
@@ -832,7 +831,7 @@ void EditorView::OnAddLevel()
           segmentSize, segmentPosition, segment->GetSceneRotation());
       this->buildingMaker->ConnectItem(wallSegmentName, segment);
       this->buildingMaker->ConnectItem(wallSegmentName, wallItem);
-      this->itemToModelMap[segment] = wallSegmentName;
+      this->itemToVisualMap[segment] = wallSegmentName;
     }
     floorItem->AttachWall(wallItem);
   }
@@ -847,10 +846,10 @@ void EditorView::OnAddLevel()
       it != this->stairsList.end(); ++it)
   {
     if ((*it)->GetLevel() == (newLevelNum - 1))
-      buildingMaker->AttachObject(this->itemToModelMap[(*it)], floorName);
+      buildingMaker->AttachManip(this->itemToVisualMap[(*it)], floorName);
   }
   this->buildingMaker->ConnectItem(floorName, floorItem);
-  this->itemToModelMap[floorItem] = floorName;
+  this->itemToVisualMap[floorItem] = floorName;
   this->scene()->addItem(floorItem);
   this->floorList.push_back(floorItem);
 }
@@ -1012,7 +1011,7 @@ void EditorView::CancelDrawMode()
     if (this->currentMouseItem)
       {
       EditorItem *item = dynamic_cast<EditorItem *>(this->currentMouseItem);
-      this->itemToModelMap.erase(item);
+      this->itemToVisualMap.erase(item);
       if (drawMode == WALL)
       {
         WallItem* wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
@@ -1021,7 +1020,7 @@ void EditorView::CancelDrawMode()
         {
           wallList.push_back(wallItem);
           // this->buildingMaker->RemoveWall(this->lastWallSegmentName);
-          this->lastWallSegmentName = "";
+          // this->lastWallSegmentName = "";
           if (wallItem->GetLevel() > 0)
             floorList[wallItem->GetLevel()-1]->AttachWall(wallItem);
         }

@@ -123,13 +123,13 @@ namespace gazebo
       /// making holes in walls and floors.
       /// \param[in] _child Child Item to be attached.
       /// \param[in] _child Parent item to attach to.
-      public: void AttachObject(const std::string &_child,
+      public: void AttachManip(const std::string &_child,
           const std::string &_parent);
 
       /// \brief Detach a building part from another.
       /// \param[in] _child Child Item to be detached.
       /// \param[in] _child Parent item to detach from.
-      public: void DetachObject(const std::string &_child,
+      public: void DetachManip(const std::string &_child,
           const std::string &_parent);
 
       /// \brief Helper method to convert size from 2D editor coordinate system

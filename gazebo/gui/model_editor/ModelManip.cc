@@ -85,26 +85,26 @@ void ModelManip::OnSizeChanged(double _width, double _depth, double _height)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::AttachObject(ModelManip *_object)
+void ModelManip::AttachManip(ModelManip *_manip)
 {
-  if (!_object->IsAttached())
+  if (!_manip->IsAttached())
   {
-    _object->SetAttachedTo(this);
-    this->attachedObjects.push_back(_object);
+    _manip->SetAttachedTo(this);
+    this->attachedManips.push_back(_manip);
   }
 }
 
 /////////////////////////////////////////////////
-void ModelManip::DetachObject(ModelManip *_object)
+void ModelManip::DetachManip(ModelManip *_manip)
 {
-  if (_object)
+  if (_manip)
   {
     std::vector<ModelManip *> ::iterator it = std::remove(
-        this->attachedObjects.begin(), this->attachedObjects.end(), _object);
-    if (it != this->attachedObjects.end())
+        this->attachedManips.begin(), this->attachedManips.end(), _manip);
+    if (it != this->attachedManips.end())
     {
-      _object->DetachFromParent();
-      this->attachedObjects.erase(it, this->attachedObjects.end());
+      _manip->DetachFromParent();
+      this->attachedManips.erase(it, this->attachedManips.end());
     }
   }
 }
@@ -116,7 +116,7 @@ void ModelManip::DetachFromParent()
   {
     ModelManip *tmp = this->parent;
     this->parent = NULL;
-    tmp->DetachObject(this);
+    tmp->DetachManip(this);
   }
 }
 
@@ -132,18 +132,18 @@ void ModelManip::SetAttachedTo(ModelManip *_parent)
 }
 
 /////////////////////////////////////////////////
-ModelManip *ModelManip::GetAttachedObject(unsigned int _index) const
+ModelManip *ModelManip::GetAttachedManip(unsigned int _index) const
 {
-  if (_index >= this->attachedObjects.size())
+  if (_index >= this->attachedManips.size())
     gzthrow("Index too large");
 
-  return this->attachedObjects[_index];
+  return this->attachedManips[_index];
 }
 
 /////////////////////////////////////////////////
-unsigned int ModelManip::GetAttachedObjectCount() const
+unsigned int ModelManip::GetAttachedManipCount() const
 {
-  return this->attachedObjects.size();
+  return this->attachedManips.size();
 }
 
 /////////////////////////////////////////////////
@@ -260,7 +260,7 @@ void ModelManip::OnRotationChanged(double _roll, double _pitch, double _yaw)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnItemDeleted()
+void ModelManip::OnDeleted()
 {
   this->maker->RemovePart(this->name);
 }

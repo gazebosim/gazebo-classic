@@ -148,7 +148,6 @@ namespace gazebo
                     event::ConnectionPtr _subscriber)
                 { exit.Disconnect(_subscriber); }
 
-
         /// \brief An editor item is to be created
         public: static event::EventT<void (std::string)> createEditorItem;
 

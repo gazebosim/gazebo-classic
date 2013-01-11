@@ -34,7 +34,6 @@ namespace gazebo
 
     class PolylineItem : public EditorItem, public QGraphicsPathItem
     {
-
       /// \brief Constructor
       /// param[in] _start Start position of the polyline item in pixel
       /// coordinates.
@@ -45,46 +44,89 @@ namespace gazebo
       /// \brief Destructor
       public: ~PolylineItem();
 
+      /// \brief Add a point to the polyline item.
+      /// \param[in] _point Point to add
       public: void AddPoint(const QPointF &_point);
 
+      /// \brief Pop the end point off the polyline item.
       public: void PopEndPoint();
 
+      /// \brief Get the number of vertices the polyline item has.
+      /// \return Number of vertices
       public: unsigned int GetVertexCount() const;
 
+      /// \brief Get the number of line segments the polyline item has.
+      /// \return Number of line segments
       public: unsigned int GetSegmentCount() const;
 
+      /// \brief Set the position of a vertex of the polyline item.
+      /// \param[in] _index Index of the vertex.
+      /// \param[in] _pos Position in pixel coordinates.
       public: void SetVertexPosition(unsigned int _index, const QPointF &_pos);
 
+      /// \brief Translate a vertex of the polyline item.
+      /// \param[in] _index Index of the vertex.
+      /// \param[in] _pos Translation vector in pixels.
       public: void TranslateVertex(unsigned int _index, const QPointF &_trans);
 
+      /// \brief Get a line segment of the polyline item.
+      /// \param[in] _index Index of the line segment.
       public: LineSegmentItem *GetSegment(unsigned int _index) const;
 
-      public: void ShowCorners(bool _show);
+      /// \brief Show the grabber handles of the polyline item.
+      /// \param[in] _show True to show them, false to disable interaction with
+      /// with the handles.
+      public: void ShowHandles(bool _show);
 
+      /// \brief Set the thickness of the polyline item.
+      /// \param[in] _thickness Thickness in pixels.
       public: void SetThickness(double _thickness);
 
+      /// \brief Set the position of the polyline item.
+      /// \param[in] _pos Position in pixel coordinates.
       public: void SetPosition(const QPointF &_pos);
 
+      /// \brief Call the function to indicate that the start and end vertices
+      /// are connected
       public: void ClosePath();
 
+      /// \brief Get whether of not the polyline item is closed.
+      /// \return True if the polyline item is closed, false otherwise
       public: bool IsClosed() const;
 
+      /// \brief Update by calling all line segments' Update function which
+      /// emits Qt signals
       public: void Update();
 
+      /// \brief Helper function for updating the underlying Qt painter path
       private: void UpdatePath();
 
-      private: void UpdatePathAtIndex(unsigned int _index, const QPointF &_pos);
-
+      /// \brief Helper function for updating a point on the underlying Qt
+      /// painter path.
+      /// \param[in] _index Index of the point on the painter path.
+      /// \param[in] _pos New position in pixel coordinates.
       private: void UpdatePathAt(unsigned int _index, const QPointF &_pos);
 
+      /// \brief Helper function for appending a point on the underlying Qt
+      /// painter path.
+      /// \param[in] _point A point to append to the painter path.
       private: void AppendToPath(const QPointF &_point);
 
+      /// \brief Filter Qt events and redirect them to another item.
+      /// \param[in] _watched Item that handle that will handle the event.
+      /// \param[in] _event Qt event.
       private: bool sceneEventFilter(QGraphicsItem * watched,
         QEvent *_event);
 
+      /// \brief Filter Qt events and redirect them to the grabber handle.
+      /// \param[in] _rotateHandle Grabber handle that will handle the event.
+      /// \param[in] _event Qt event
       private: virtual bool grabberEventFilter(GrabberHandle *_grabber,
           QEvent *_event);
 
+      /// \brief Filter Qt events and redirect them to the line segment item.
+      /// \param[in] _item Line segment item that will handle the event.
+      /// \param[in] _event Qt event
       private: virtual bool segmentEventFilter(LineSegmentItem *_item,
           QEvent *_event);
 
@@ -147,18 +189,20 @@ namespace gazebo
       /// \brief Keep track of mouse press position for translating segments
       protected: QPointF segmentMouseMove;
 
-      /// \brief True to indicate that the polyline is closed, where the first
+      /// \brief True to indicate that the polyline is closed, and the first
       /// and last vertices are connected
       protected: bool closed;
 
       /// \brief Polyline item origin (start vertex).
       private: QPointF origin;
 
-//      private: int gridSpace;
+      // private: int gridSpace;
 
-      private: int grabberWidth;
+      /// \brief Width of grabber in pixels
+      private: double grabberWidth;
 
-      private: int grabberHeight;
+      /// \brief Height of grabber in pixels
+      private: double grabberHeight;
 
       /// \brief Thickness of the polyline in pixels
       private: double lineThickness;

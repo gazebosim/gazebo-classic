@@ -299,6 +299,6 @@ void StairsItem::StepsChanged()
   // emit a signal to delete 3d and make a new one
   // TODO there should be a more efficient way to do this.
   emit itemDeleted();
-  dynamic_cast<EditorView *>((this->scene()->views())[0])->CreateItem3D(this);
+  dynamic_cast<EditorView *>((this->scene()->views())[0])->Create3DVisual(this);
   this->StairsChanged();
 }
