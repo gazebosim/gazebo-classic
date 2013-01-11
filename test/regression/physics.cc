@@ -339,6 +339,9 @@ void PhysicsTest::SpawnDropCoGOffset(std::string _worldFile)
         EXPECT_LT(vel2.x, -0.1);
         // following should still be near zero
         EXPECT_NEAR(vel1.x, 0, PHYSICS_TOL);
+        gzwarn << "The following test currently fails because I'm expecting "
+               << "velocity measurement in the link frame.\n"
+               << "See Issue #376\n";
         EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
         EXPECT_NEAR(vel2.y, 0, PHYSICS_TOL);
         EXPECT_NEAR(vel2.z, 0, PHYSICS_TOL);
