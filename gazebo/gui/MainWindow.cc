@@ -91,14 +91,15 @@ MainWindow::MainWindow()
   splitter->addWidget(this->toolsWidget);
 
   QList<int> sizes;
-  sizes.push_back(300);
-  sizes.push_back(700);
-  sizes.push_back(300);
+  sizes.push_back(250);
+  sizes.push_back(this->width() - 250);
+  sizes.push_back(0);
   splitter->setSizes(sizes);
-  splitter->setStretchFactor(0, 1);
+  splitter->setStretchFactor(0, 0);
   splitter->setStretchFactor(1, 2);
-  splitter->setStretchFactor(2, 1);
+  splitter->setStretchFactor(2, 0);
   splitter->setCollapsible(1, false);
+  splitter->setHandleWidth(10);
 
   centerLayout->addWidget(splitter);
   centerLayout->setContentsMargins(0, 0, 0, 0);
