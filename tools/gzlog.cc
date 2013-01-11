@@ -280,7 +280,7 @@ std::string filter_state(const std::string &_stateString,
         {
           // Each data value in a link starts with a unique character, so we
           // allow the user to use just the first character in the filter.
-          switch((*iter)[0])
+          switch ((*iter)[0])
           {
             default:
             case 'p':
