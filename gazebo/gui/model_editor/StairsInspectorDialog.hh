@@ -42,7 +42,7 @@ namespace gazebo
       public: ~StairsInspectorDialog();
 
       /// \brief Get start position (bottom-end) of the staircase.
-      /// \return The start position of the staircase in pixels.
+      /// \return The start position of the staircase in pixel coordinates.
       public: QPointF GetStartPosition() const;
 
       /// \brief Get the width the staircase.
@@ -66,7 +66,7 @@ namespace gazebo
       public: void SetName(const std::string &_name);
 
       /// \brief Set the start position of the staircase.
-      /// \param[in] _pos Start position in pixels.
+      /// \param[in] _pos Start position in pixel coordinates.
       public: void SetStartPosition(const QPointF &_pos);
 
       /// \brief Set the width of the staircase.

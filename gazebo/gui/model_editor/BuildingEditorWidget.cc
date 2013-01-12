@@ -16,7 +16,6 @@
 */
 
 #include "gazebo/gui/model_editor/BuildingItem.hh"
-#include "gazebo/gui/model_editor/GridLines.hh"
 #include "gazebo/gui/model_editor/EditorView.hh"
 #include "gazebo/gui/model_editor/EditorItem.hh"
 #include "gazebo/gui/model_editor/LineSegmentItem.hh"

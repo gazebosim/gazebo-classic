@@ -29,7 +29,7 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \brief Dialog mode
+      /// \brief Dialog modes
       public: enum mode {WINDOW, DOOR};
 
       /// \brief Constructor
@@ -54,7 +54,7 @@ namespace gazebo
       public: double GetDepth() const;
 
       /// \brief Get the item position.
-      /// \return Item position in pixels.
+      /// \return Item position in pixel coordinates.
       public: QPointF GetPosition() const;
 
       /// \brief Get the item elevation.
@@ -82,7 +82,7 @@ namespace gazebo
       public: void SetDepth(double _depth);
 
       /// \brief Set the item scene position.
-      /// \param[in] _pos Position in pixels.
+      /// \param[in] _pos Position in pixel coordinates.
       public: void SetPosition(const QPointF &_pos);
 
       /// \brief Set the item elevation.

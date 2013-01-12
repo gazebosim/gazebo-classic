@@ -34,7 +34,7 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \brief Dialog mode.
+      /// \brief Dialog modes.
       public: enum mode {WINDOW, DOOR};
 
       /// \brief Constructor
@@ -44,15 +44,15 @@ namespace gazebo
       /// \brief Destructor
       public: ~LevelInspectorDialog();
 
-      /// \brief Get the name of the level
-      /// \return The level name
+      /// \brief Get the name of the level.
+      /// \return The level name.
       public: std::string GetLevelName() const;
 
       /// \brief Get the height of the level.
       /// \return The level height in pixels.
       public: double GetHeight() const;
 
-      /// \brief Set the name of the level
+      /// \brief Set the name of the level.
       /// \param[in] _levelName New level name.
       public: void SetLevelName(const std::string &_levelName);
 

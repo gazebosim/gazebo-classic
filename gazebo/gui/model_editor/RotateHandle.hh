@@ -94,10 +94,10 @@ namespace gazebo
       /// \brief Current mouse state.
       private: int mouseButtonState;
 
-      /// \brief Mouse press X position in pixels.
+      /// \brief Mouse press X position in pixel coordinates.
       private: double mouseDownX;
 
-      /// \brief Mouse press Y position in pixels.
+      /// \brief Mouse press Y position in pixel coordinates.
       private: double mouseDownY;
 
       /// \brief Border color of the rotate handle.
@@ -109,10 +109,10 @@ namespace gazebo
       /// \brief Offset height of the rotate handle (from the item) in pixels.
       private: double handleOffsetHeight;
 
-      /// \brief Origin of the rotate handle
+      /// \brief Origin of the rotate handle.
       private: QPointF origin;
 
-      /// \brief Offset position of the rotate handle pixel coordinates.
+      /// \brief Offset position of the rotate handle in pixel coordinates.
       private: QPointF handleOffset;
     };
     /// \}

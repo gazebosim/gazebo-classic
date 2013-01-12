@@ -47,11 +47,11 @@ namespace gazebo
       /// \param[in] _event Qt paint event.
       private: void paintEvent(QPaintEvent *_event);
 
-      /// \brief Event received when the zoom level has changed.
+      /// \brief Callback received when the zoom level has changed.
       /// \param[in] _zoomFactor New zoom factor.
       private: void OnChangeZoom(double _zoomFactor);
 
-      /// \brief Text displaying the scale
+      /// \brief Text displaying the scale.
       private: std::string scaleText;
 
       /// \brief A list of gui editor events connected to this widget.

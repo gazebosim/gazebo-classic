@@ -67,20 +67,21 @@ namespace gazebo
       /// \brief Set the position of a vertex of the polyline item.
       /// \param[in] _index Index of the vertex.
       /// \param[in] _pos Position in pixel coordinates.
-      public: void SetVertexPosition(unsigned int _index, const QPointF &_pos);
+      public: void SetVertexPosition(unsigned int _index,
+          const QPointF &_pos);
 
       /// \brief Translate a vertex of the polyline item.
       /// \param[in] _index Index of the vertex.
       /// \param[in] _pos Translation vector in pixels.
-      public: void TranslateVertex(unsigned int _index, const QPointF &_trans);
+      public: void TranslateVertex(unsigned int _index,
+          const QPointF &_trans);
 
       /// \brief Get a line segment of the polyline item.
       /// \param[in] _index Index of the line segment.
       public: LineSegmentItem *GetSegment(unsigned int _index) const;
 
       /// \brief Show the grabber handles of the polyline item.
-      /// \param[in] _show True to show them, false to disable interaction with
-      /// with the handles.
+      /// \param[in] _show True to show the grabber handles, false to hide them.
       public: void ShowHandles(bool _show);
 
       /// \brief Set the thickness of the polyline item.
@@ -96,14 +97,14 @@ namespace gazebo
       public: void ClosePath();
 
       /// \brief Get whether of not the polyline item is closed.
-      /// \return True if the polyline item is closed, false otherwise
+      /// \return True if the polyline item is closed, false otherwise.
       public: bool IsClosed() const;
 
       /// \brief Update by calling all line segments' Update function which
       /// emits Qt signals
       public: void Update();
 
-      /// \brief Helper function for updating the underlying Qt painter path
+      /// \brief Helper function for updating the underlying Qt painter path.
       private: void UpdatePath();
 
       /// \brief Helper function for updating a point on the underlying Qt
@@ -117,8 +118,8 @@ namespace gazebo
       /// \param[in] _point A point to append to the painter path.
       private: void AppendToPath(const QPointF &_point);
 
-      /// \brief Filter Qt events and redirect them to another item.
-      /// \param[in] _watched Item that handle that will handle the event.
+      /// \brief Filter Qt events and redirect them to the another item.
+      /// \param[in] _watched Item that watches and will handle the event.
       /// \param[in] _event Qt event.
       private: bool sceneEventFilter(QGraphicsItem * watched,
         QEvent *_event);
@@ -176,8 +177,8 @@ namespace gazebo
 
       /// \brief Qt paint function for drawing the polyline.
       /// \param[in] _painter Qt painter object.
-      /// \param[in] _painter Qt style options for the item.
-      /// \param[in] _painter Qt widget being painted on.
+      /// \param[in] _option Qt style options for the item.
+      /// \param[in] _widget Qt widget being painted on.
       private: void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
@@ -194,11 +195,10 @@ namespace gazebo
       /// \brief Keep track of mouse press position for translating segments
       protected: QPointF segmentMouseMove;
 
-      /// \brief True to indicate that the polyline is closed, and the first
-      /// and last vertices are connected
+      /// \brief True to indicate that the polyline is closed
       protected: bool closed;
 
-      /// \brief Polyline item origin (start vertex).
+      /// \brief Polyline item origin (position of the first vertex).
       private: QPointF origin;
 
       // private: int gridSpace;

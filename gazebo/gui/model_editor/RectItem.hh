@@ -72,11 +72,10 @@ namespace gazebo
       public: double GetHeight() const;
 
       /// \brief Show the grabber and rotate handles of the rect item.
-      /// \param[in] _show True to draw the handles, and false to disable
-      /// them.
+      /// \param[in] _show True to draw the handles, and false to hide them.
       public: void ShowHandles(bool _show);
 
-      /// \brief Helper method for Updating the corner positions of the rectItem
+      /// \brief Helper method for Updating the corner positions of the rect
       /// item.
       protected: void UpdateCornerPositions();
 
@@ -187,7 +186,7 @@ namespace gazebo
       /// \brief React to item changes notified by Qt.
       /// \param[in] _change Qt change type, e.g. selected change, position
       /// change.
-      /// \param[in] _value Value to be changed to.
+      /// \param[in] _value Value to changed to.
       private: QVariant itemChange(GraphicsItemChange _change,
         const QVariant &_value);
 

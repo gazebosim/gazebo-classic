@@ -59,12 +59,12 @@ namespace gazebo
     /// \{
 
     /// \class EditorView EditorView.hh
-    /// \brief Controls the editor view and manage contents in the editor scene.
+    /// \brief Control the editor view and manage contents in the editor scene.
     class EditorView : public QGraphicsView
     {
       Q_OBJECT
 
-      /// \brief Different drawing modes
+      /// \brief Drawing modes within the editor.
       public: enum drawModes {NONE, WALL, WINDOW, DOOR, STAIRS};
 
       /// \brief Constructor
@@ -84,15 +84,15 @@ namespace gazebo
       private: void resizeEvent(QResizeEvent *_event);
 
       /// \brief Qt event received when the editor view is being scrolled.
-      /// \param[in] _dx Change in x.
-      /// \param[in] _dx Change in y.
+      /// \param[in] _dx Change in X position of the scrollbar.
+      /// \param[in] _dx Change in Y position of the scrollbar.
       private: void scrollContentsBy(int _dx, int _dy);
 
-      /// \brief Qt context menu received on a right mouse click.
+      /// \brief Qt context menu received on a mouse right click.
       /// \param[in] _event Qt context menu event.
       private: void contextMenuEvent(QContextMenuEvent *event);
 
-      /// \brief Qt wheel event received on the mouse wheel is being scrolled.
+      /// \brief Qt wheel event received when the mouse wheel is being scrolled.
       /// \param[in] _event Qt wheel event.
       private: void wheelEvent(QWheelEvent *_event);
 
@@ -116,36 +116,38 @@ namespace gazebo
       /// \param[in] _event Qt key event.
       private: void keyPressEvent(QKeyEvent *_event);
 
-      /// \brief Draw a wall in the scene
+      /// \brief Draw a wall in the scene.
       /// \param[in] _pos Start position of the wall in pixel coordinates.
       private: void DrawWall(const QPoint &_pos);
 
-      /// \brief Draw a window in the scene
-      /// \param[in] _pos Scene position in pixel coordinates at which the
-      /// window is drawn.
+      /// \brief Draw a window in the scene.
+      /// \param[in] _pos Scene position in pixel coordinates to draw the
+      /// window.
       private: void DrawWindow(const QPoint &_pos);
 
       /// \brief Draw a door in the scene
-      /// \param[in] _pos Scene position in pixel coordinates at which the
-      /// door is drawn.
+      /// \param[in] _pos Scene position in pixel coordinates to draw the
+      /// door.
       private: void DrawDoor(const QPoint &_pos);
 
       /// \brief Draw a staircase in the scene
-      /// \param[in] _pos Scene position in pixel coordinates at which the
-      /// staircase is drawn.
+      /// \param[in] _pos Scene position in pixel coordinates to draw the
+      /// staircase.
       private: void DrawStairs(const QPoint &_pos);
 
-      /// \brief Event for creating an editor item and adding it to the scene
+      /// \brief Callback triggered when the user chooses to draw an editor item
+      /// in the scene
       /// \param[in] _type Type of editor item to be created.
       private: void OnCreateEditorItem(const std::string &_type);
 
       // private: void OnSaveModel(const std::string &_modelName,
       //     const std::string &_savePath);
 
-      /// \brief Event received when the model has been completed.
+      /// \brief Callback received when the model has been completed and
+      /// uploaded onto the server.
       private: void OnFinishModel();
 
-      /// \brief Event received when the model has been discarded.
+      /// \brief Callback received when the model has been discarded.
       private: void OnDiscardModel();
 
       /// \brief Qt callback when a level is to be added to the building model.
@@ -158,15 +160,15 @@ namespace gazebo
       /// \brief Qt callback when changes to a building level are to be applied.
       private slots: void OnLevelApply();
 
-      /// \brief  Qt Callback for opening the building level inspector.
+      /// \brief Qt Callback for opening the building level inspector.
       private slots: void OnOpenLevelInspector();
 
-      /// \brief Event received when a level on a building model is to
+      /// \brief Callback received when a level on a building model is to
       /// be changed.
       private: void OnChangeLevel(int _level);
 
       /// \brief Delete a level from the building model
-      /// \param[in] _level Level to delete.
+      /// \param[in] _level Level number to delete.
       private: void DeleteLevel(int _level);
 
       /// \brief Cancel the current drawing operation.
@@ -175,7 +177,7 @@ namespace gazebo
       /// \brief Current draw mode
       private: int drawMode;
 
-      /// \brief Indicate whether or not a drawing operation is taking place
+      /// \brief Indicate whether or not a drawing operation is taking place.
       private: bool drawInProgress;
 
       /// \brief A list of wall items in the scene.
@@ -193,16 +195,17 @@ namespace gazebo
       /// \brief A list of floor items in the scene.
       private: std::vector<FloorItem*> floorList;
 
-      /// \brief Mapping between 2D editor items to corresponding 3D visuals.
+      /// \brief Mapping between 2D editor items to 3D visuals.
       private: std::map<EditorItem *, std::string> itemToVisualMap;
 
       /// \brief A list of gui editor events connected to this view.
       private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Editor item currently attached to the mouse.
+      /// \brief Editor item currently attached to the mouse during a drawing
+      /// operation.
       private: QGraphicsItem *currentMouseItem;
 
-      /// \brief Currently selected editor item
+      /// \brief Currently selected editor item.
       private: QGraphicsItem *currentSelectedItem;
 
       /// \brief Building maker manages the creation of 3D visuals
@@ -216,30 +219,30 @@ namespace gazebo
       /// \brief A list of building levels in the scene.
       private: std::vector<Level *> levels;
 
-      /// \brief A counter that holds the total number of levels in building
+      /// \brief A counter that holds the total number of levels in the building
       /// model.
       private: int levelCounter;
 
       /// \brief Qt action for opening a building level inspector.
       private: QAction *openLevelInspectorAct;
 
-      /// \brief Qt action for adding a level to the building.
+      /// \brief Qt action for adding a level to the building model.
       private: QAction *addLevelAct;
 
-      /// \brief Qt action for deleting a level from the building.
+      /// \brief Qt action for deleting a level from the building model.
       private: QAction *deleteLevelAct;
 
       /// \brief Rotation in degrees when a mouse is pressed and dragged for
-      /// a rotating an item.
+      /// rotating an item.
       private: double mousePressRotation;
 
-      /// \brief Inspector for a building level
+      /// \brief Inspector for a building level.
       private: LevelInspectorDialog *levelInspector;
 
       /// \brief Grid lines drawn on the background of the editor.
       private: GridLines *gridLines;
 
-      /// \brief Scale or zoom level of the editor view.
+      /// \brief Scale (zoom level) of the editor view.
       private: double viewScale;
 
       /// \brief Indicate whether or not the wall can be closed during a draw

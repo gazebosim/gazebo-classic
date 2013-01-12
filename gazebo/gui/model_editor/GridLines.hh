@@ -50,8 +50,8 @@ namespace gazebo
 
       /// \brief Qt paint function for drawing the grid lines.
       /// \param[in] _painter Qt painter object.
-      /// \param[in] _painter Qt style options for the item.
-      /// \param[in] _painter Qt widget being painted on.
+      /// \param[in] _option Qt style options for the item.
+      /// \param[in] _widget Qt widget being painted on.
       private: virtual void paint(QPainter *_painter,
         const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
@@ -65,7 +65,8 @@ namespace gazebo
 
       /// \brief Qt mouse move event during drag and drop
       /// \param[in] _event Qt mouse event
-      private: virtual void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
+      private: virtual void mouseMoveEvent(
+          QGraphicsSceneDragDropEvent *_event);
 
       /// \brief Qt mouse press event
       /// \param[in] _event Qt mouse event

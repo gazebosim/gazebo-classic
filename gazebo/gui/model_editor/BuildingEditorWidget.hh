@@ -32,10 +32,11 @@ namespace gazebo
     /// \{
 
     /// \class BuildingEditorWidget BuildingEditorWidget.hh
-    /// \brief A widget which the building editor is attached to.
+    /// \brief The parent widget of the building editor, level widget and scale
+    /// widget.
     class BuildingEditorWidget : public QWidget
     {
-      /// \brief Types of models supported in building editor
+      /// \brief Type of models supported in building editor
       public: enum modelTypes {None, Wall, Window, Door, Stairs};
 
       /// \brief Constructor

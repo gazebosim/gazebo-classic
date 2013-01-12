@@ -42,7 +42,7 @@ namespace gazebo
       public: ~LineSegmentItem();
 
       /// \brief Set the line
-      /// \param[in] _start Start position of the line.
+      /// \param[in] _start Start position of the line in pixel coordinates.
       /// \param[in] _end End position of the line in pixel coordinates.
       public: void SetLine(const QPointF &_start, const QPointF &_end);
 

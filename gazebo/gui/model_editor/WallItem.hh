@@ -80,8 +80,8 @@ namespace gazebo
       /// \param[in] Qt context menu event.
       private: void contextMenuEvent(QGraphicsSceneContextMenuEvent *_event);
 
-      /// \brief Helper function for updating the pose of children attached to
-      /// a wall segment.
+      /// \brief Helper function for updating the pose of children items
+      /// attached to a wall segment.
       /// \param[in] _segment Parent segment
       private: void UpdateSegmentChildren(LineSegmentItem *_segment);
 

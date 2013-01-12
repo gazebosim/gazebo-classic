@@ -93,7 +93,7 @@ namespace gazebo
       /// \brief Door scene position in pixel coordinates.
       private: QPointF doorPos;
 
-      /// \brief Scale for converting to from pixel to metric units
+      /// \brief Scale for converting from pixel to metric units.
       private: double scale;
 
       /// \brief Inspector for configuring the door item.

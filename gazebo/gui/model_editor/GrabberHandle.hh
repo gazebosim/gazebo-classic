@@ -27,8 +27,8 @@ namespace gazebo
     class GrabberHandle : public QGraphicsItem
     {
       /// \brief Constructor
-      /// \param[in] _parent Parent graphics Item
-      /// \param[in] _index Index of grabber handle
+      /// \param[in] _parent Parent graphics item
+      /// \param[in] _index Index of the grabber handle
       public: GrabberHandle(QGraphicsItem *_parent = 0, int index = 0);
 
       /// \brief Get the index of the grabber handle.
@@ -55,7 +55,7 @@ namespace gazebo
       /// \return The width of the grabber handle in pixel coordinates.
       public: double GetWidth() const;
 
-      /// \brief Get the Height of the grabber handle.
+      /// \brief Get the height of the grabber handle.
       /// \return The height of the grabber handle in pixels.
       public: double GetHeight() const;
 
@@ -68,11 +68,11 @@ namespace gazebo
       public: void SetMouseState(int _state);
 
       /// \brief Set the X position of the mouse press.
-      /// \param[in] _x Mouse press X position in pixels.
+      /// \param[in] _x Mouse press X position in pixel coordinates.
       public: void SetMouseDownX(double _x);
 
       /// \brief Set the Y position of the mouse press.
-      /// \param[in] _y Mouse press Y position in pixels.
+      /// \param[in] _y Mouse press Y position in pixel coordinates.
       public: void SetMouseDownY(double _y);
 
       /// \brief Set the width of the grabber handle.
@@ -97,40 +97,40 @@ namespace gazebo
 
       /// \brief Qt paint function for drawing the grabber handle.
       /// \param[in] _painter Qt painter object.
-      /// \param[in] _painter Qt style options for the item.
-      /// \param[in] _painter Qt widget being painted on.
+      /// \param[in] _option Qt style options for the item.
+      /// \param[in] _widget Qt widget being painted on.
       private: virtual void paint(QPainter *_painter,
         const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-      /// \brief Qt mouse hover enter event
-      /// \param[in] _event Qt mouse hover event
+      /// \brief Qt mouse hover enter event.
+      /// \param[in] _event Qt mouse hover event.
       protected: void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
 
-      /// \brief Qt mouse hover leave event
-      /// \param[in] _event Qt mouse hover event
+      /// \brief Qt mouse hover leave event.
+      /// \param[in] _event Qt mouse hover event.
       protected: void hoverLeaveEvent(QGraphicsSceneHoverEvent *_event);
 
-      /// \brief Qt mouse move event
-      /// \param[in] _event Qt mouse event
+      /// \brief Qt mouse move event.
+      /// \param[in] _event Qt mouse event.
       protected: void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
 
-      /// \brief Qt mouse press event
-      /// \param[in] _event Qt mouse event
+      /// \brief Qt mouse press event.
+      /// \param[in] _event Qt mouse event.
       protected: void mousePressEvent(QGraphicsSceneMouseEvent *_event);
 
-      /// \brief Qt mouse release event
-      /// \param[in] _event Qt mouse event
+      /// \brief Qt mouse release event.
+      /// \param[in] _event Qt mouse event.
       protected: void mouseReleaseEvent(QGraphicsSceneMouseEvent *_event);
 
-      /// \brief Qt mouse press event during drag and drop
-      /// \param[in] _event Qt mouse drag and drop event
+      /// \brief Qt mouse press event during drag and drop.
+      /// \param[in] _event Qt mouse drag and drop event.
       protected: void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
 
-      /// \brief Qt mouse move event during drag and drop
-      /// \param[in] _event Qt mouse drag and drop event
+      /// \brief Qt mouse move event during drag and drop.
+      /// \param[in] _event Qt mouse drag and drop event.
       protected: void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
 
-      /// \brief Index of this corner grabber
+      /// \brief Index of this corner grabber.
       private: int index;
 
       /// \brief Mouse press X position in pixel coordinates.
@@ -151,10 +151,10 @@ namespace gazebo
       /// \brief Height of the grabber handle in pixels.
       private: double height;
 
-      /// \brief Extra width for the mouse grab hotspot for easy grabbing.
+      /// \brief Extra width around the grabber handle for mouse grabbing.
       private: double widthGrabBuffer;
 
-      /// \brief Extra height for the mouse grab hotspot for easy grabbing.
+      /// \brief Extra height around the grabber handle for mouse grabbing.
       private: double heightGrabBuffer;
 
       /// \brief Current mouse state.

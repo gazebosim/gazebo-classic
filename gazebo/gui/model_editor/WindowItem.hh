@@ -87,7 +87,7 @@ namespace gazebo
         /// \brief Side bar of the window item in pixels.
         private: double windowSideBar;
 
-        /// \brief Scene position of the window item in pixels.
+        /// \brief Scene position of the window item in pixel coordinates.
         private: QPointF windowPos;
 
         /// \brief Elevation of the window item in pixels.

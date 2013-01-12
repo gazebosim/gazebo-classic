@@ -70,14 +70,14 @@ namespace gazebo
       private: virtual void contextMenuEvent(
           QGraphicsSceneContextMenuEvent *_event);
 
-      /// \brief Notify that the bounding box of the wall items needs to be
-      /// changed.
+      /// \brief Qt callback tonNotify that the bounding box of the wall items
+      /// needs to be changed.
       private slots: void NotifyChange();
 
       /// \brief Qt callback to recalculate the bounding box of wall items.
       private slots: void RecalculateBoundingBox();
 
-      /// \brief Qt callback when a wall
+      /// \brief Qt callback when a wall is being deleted.
       private slots: void WallDeleted();
 
       /// \brief Update the floor properties and emit Qt signals
@@ -101,8 +101,8 @@ namespace gazebo
       /// \brief Scene position of floor item in pixel coordinates.
       private: QPointF floorPos;
 
-      /// \brief A flag to indicate that there have been changes to the wall
-      /// items.
+      /// \brief A flag to indicate whether or not there have been changes to
+      /// the wall items.
       private: bool dirty;
 
       /// \brief A list of wall items that the floor item holds.

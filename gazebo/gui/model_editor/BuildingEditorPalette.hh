@@ -31,7 +31,7 @@ namespace gazebo
     /// \{
 
     /// \class BuildingEditorPalette BuildingEditorPalette.hh
-    /// \brief A palette that displays different drawing operations.
+    /// \brief A palette of building items which can be added to the editor.
     class BuildingEditorPalette : public QWidget
     {
       Q_OBJECT
@@ -43,21 +43,21 @@ namespace gazebo
       /// \brief Destructor
       public: ~BuildingEditorPalette();
 
-      /// \brief Qt callback when the draw wall mode is chosen.
+      /// \brief Qt callback when the draw wall button is pressed.
       private slots: void OnDrawWall();
 
-      //private slots: void OnImportImage();
+      // private slots: void OnImportImage();
 
       /// \brief Qt callback when the draw window button is pressed.
       private slots: void OnAddWindow();
 
-      /// \brief Qt callback when the draw door butotn is pressed.
+      /// \brief Qt callback when the draw door button is pressed.
       private slots: void OnAddDoor();
 
       /// \brief Qt callback when the draw stairs button is pressed.
       private slots: void OnAddStairs();
 
-      /// \brief Qt callback when the discard button pressed.
+      /// \brief Qt callback when the discard button is pressed.
       private slots: void OnDiscard();
 
       /// \brief Qt callback when the save button is pressed.
@@ -66,17 +66,17 @@ namespace gazebo
       /// \brief Qt callback when the done button is pressed.
       private slots: void OnDone();
 
-      /// \brief Callback when user has provided information on where
-      /// to save the model to.
-      /// \param[in] _saveName Name of model.
+      /// \brief Callback when user has provided information on where to save
+      /// the model to.
+      /// \param[in] _saveName Name of model being saved.
       /// \param[in] _saveLocation Location to save the model to.
       private: void OnSaveModel(std::string _saveName,
           std::string _saveLocation);
 
-      /// \brief Callback when user confirms to discard model.
+      /// \brief Event received when a building model has been discarded.
       private: void OnDiscardModel();
 
-      /// \brief A label that displays the name of the model.
+      /// \brief A label that displays the name of the building model.
       private: QLabel *modelNameLabel;
 
       /// \brief Save button.
@@ -88,7 +88,7 @@ namespace gazebo
       /// \brief Save location.
       private: std::string saveLocation;
 
-      /// \brief A list of gui editor events.
+      /// \brief A list of gui editor events connected to this palette.
       private: std::vector<event::ConnectionPtr> connections;
     };
     /// \}

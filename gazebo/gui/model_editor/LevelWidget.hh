@@ -50,13 +50,15 @@ namespace gazebo
       /// \brief Qt callback when the add level button has been pressed.
       public slots: void OnAddLevel();
 
-      /// \brief Event received when the level has been deleted.
+      /// \brief Callback received when the level has been deleted.
       public: void OnDeleteLevel(int _level);
 
-      /// \brief Event received when the level name has been changed externally.
-      private: void OnChangeLevelName(int _level, const std::string &_newName);
+      /// \brief Callback received when the level name has been changed
+      /// externally.
+      private: void OnChangeLevelName(int _level,
+          const std::string &_newName);
 
-      /// \brief Event received when the level has been changed externally.
+      /// \brief Callback received when the level has been changed externally.
       private: void OnDiscard();
 
       /// \brief Combo box for selecting the current level.
