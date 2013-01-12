@@ -74,6 +74,7 @@ EditorView::EditorView(QWidget *_parent)
 
   Level *newLevel = new Level;
   newLevel->level = 0;
+  newLevel->height = 0;
   newLevel->name = "Level 1";
   this->levels.push_back(newLevel);
 

@@ -1037,9 +1037,9 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
     const std::vector<QRectF> &_holes, std::vector<QRectF> &_subdivisions)
 {
   // use multiset for ordered elements
-  std::multiset<QRectF, bool(*)(const QRectF &, const QRectF &)>
+  std::multiset<QRectF, bool (*)(const QRectF &, const QRectF &)>
       filledX(BuildingMaker::RectCompareX);
-  std::multiset<QRectF, bool(*)(const QRectF &, const QRectF &)>
+  std::multiset<QRectF, bool (*)(const QRectF &, const QRectF &)>
       filledY(BuildingMaker::RectCompareY);
   for (unsigned int i = 0; i < _holes.size(); ++i)
   {
@@ -1047,8 +1047,8 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
     filledY.insert(_holes[i]);
   }
 
-  std::multiset<QPointF, bool(*)(const QPointF &, const QPointF &)> startings(
-      BuildingMaker::PointCompareY);
+  std::multiset<QPointF, bool (*)(const QPointF &, const QPointF &)>
+      startings(BuildingMaker::PointCompareY);
 
   QPointF start(_surface.x(), _surface.y());
   startings.insert(start);
