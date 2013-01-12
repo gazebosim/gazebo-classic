@@ -88,7 +88,6 @@ namespace gazebo
       public: unsigned int GetCollisionContactCount(
                   const std::string &_collisionName) const;
 
-
       /// \brief Get all the contacts
       /// \return Message that contains all the contact information
       public: msgs::Contacts GetContacts() const;
@@ -115,7 +114,7 @@ namespace gazebo
       private: transport::SubscriberPtr contactSub;
 
       /// \brief Mutex to protect reads and writes.
-      private: boost::mutex mutex;
+      private: mutable boost::mutex mutex;
 
       /// \brief returns a pointer to the mutex for locking while reading
       ///        internally kept map of map of collision names and contacts

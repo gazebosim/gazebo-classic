@@ -45,6 +45,18 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Subscriber();
 
+      /// \internal
+      /// \brief Set the ID of the callback which is associated with this
+      /// subscriber. This function should only be used by Node.hh
+      /// \param[in] _id ID of the callback
+      public: void SetCallbackId(unsigned int _id);
+
+      /// \internal
+      /// \brief Get the ID of the callback which is associated with this
+      /// subscriber. This function should only be used by Node.hh
+      /// \return ID of the callback
+      public: unsigned int GetCallbackId() const;
+
       /// \brief Get the topic name
       /// \return The topic name
       public: std::string GetTopic() const;
@@ -52,8 +64,14 @@ namespace gazebo
       /// \brief Unsubscribe from the topic
       public: void Unsubscribe() const;
 
+      /// \brief Topic this object is subscribe to.
       private: std::string topic;
+
+      /// \brief Node which handles communication.
       private: NodePtr node;
+
+      /// \brief Id of the callback associated with this object.
+      private: unsigned int callbackId;
     };
     /// \}
   }

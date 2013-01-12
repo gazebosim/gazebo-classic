@@ -103,7 +103,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
   this->sensorSub = this->node->Subscribe("~/sensor",
-                                          &Scene::OnSensorMsg, this);
+                                          &Scene::OnSensorMsg, this, true);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
 
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
