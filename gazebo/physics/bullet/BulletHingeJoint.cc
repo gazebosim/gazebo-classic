@@ -61,6 +61,7 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   math::Vector3 axis = axisElem->GetValueVector3("xyz");
 
   math::Vector3 pivotA, pivotB, axisA, axisB;
+  math::Pose pose;
 
   // Compute the pivot point, based on the anchorPos
   pivotA = this->anchorPos;
@@ -73,7 +74,10 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   }
   if (this->childLink)
   {
-    pivotA += this->childLink->GetWorldPose().pos;
+    // link CoG pose
+    pose = this->childLink->GetWorldPose();
+    pose.pos += pose.rot.RotateVector(this->childLink->GetInertial()->GetCoG());
+    pivotB -= pose.pos;
     pivotB = this->childLink->GetWorldPose().rot.RotateVectorReverse(pivotB);
     axisB = this->childLink->GetWorldPose().rot.RotateVectorReverse(axis);
   }
@@ -108,8 +112,8 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
 
   this->constraint = this->btHinge;
 
-  double angle = this->btHinge->getHingeAngle();
-  this->btHinge->setLimit(angle - .4, angle + .4);
+  // double angle = this->btHinge->getHingeAngle();
+  // this->btHinge->setLimit(angle - .4, angle + .4);
   // Add the joint to the world
   this->world->addConstraint(this->btHinge, true);
 

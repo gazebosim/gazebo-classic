@@ -93,5 +93,8 @@ void BulletMotionState::setWorldTransform(const btTransform &_cogWorldTrans)
   math::Vector3 cg = pose.rot.RotateVector(this->link->GetInertial()->GetCoG());
   pose.pos -= cg;
 
+  // The second argument is set to false to prevent Entity.cc from propagating
+  // the pose change all the way back to bullet.
+  // \TODO: consider using the dirtyPose mechanism employed by ODE.
   this->link->SetWorldPose(pose, false);
 }
