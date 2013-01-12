@@ -64,9 +64,21 @@ LaserView::LaserView(QWidget *_parent)
   degreeToggle->setText("Degrees");
   connect(degreeToggle, SIGNAL(toggled(bool)), this, SLOT(OnDegree(bool)));
 
+  this->rangeEdit = new QLineEdit;
+  this->rangeEdit->setReadOnly(true);
+  this->rangeEdit->setFixedWidth(80);
+
+  this->angleEdit = new QLineEdit;
+  this->angleEdit->setReadOnly(true);
+  this->angleEdit->setFixedWidth(80);
+
   controlLayout->addWidget(degreeToggle);
   controlLayout->addWidget(fitButton);
   controlLayout->addStretch(1);
+  controlLayout->addWidget(new QLabel("Range"));
+  controlLayout->addWidget(this->rangeEdit);
+  controlLayout->addWidget(new QLabel("Angle"));
+  controlLayout->addWidget(this->angleEdit);
 
   frameLayout->addWidget(this->view);
   frameLayout->addLayout(controlLayout);
@@ -84,6 +96,15 @@ LaserView::~LaserView()
 /////////////////////////////////////////////////
 void LaserView::UpdateImpl()
 {
+  std::ostringstream value;
+  value << this->laserItem->GetHoverRange();
+  this->rangeEdit->setText(tr(value.str().c_str()));
+
+  value.str(std::string());
+  double angle = this->laserItem->GetHoverAngle();
+  angle = angle <= -999 ? 0.0 : angle;
+  value << angle;
+  this->angleEdit->setText(tr(value.str().c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -325,6 +346,25 @@ QRectF LaserView::LaserItem::GetBoundingRect() const
 
   // Return the top-left position and the width and height.
   return QRectF(-max, -max, max * 2.0, max * 2.0);
+}
+
+/////////////////////////////////////////////////
+double LaserView::LaserItem::GetHoverRange() const
+{
+  // Compute the index of the ray that the mouse is hovering over.
+  int index = static_cast<int>(
+      rint((this->indexAngle - this->angleMin) / this->angleStep));
+
+  if (index >= 0 && index < static_cast<int>(this->ranges.size()))
+    return this->ranges[index];
+
+  return 0.0;
+}
+
+/////////////////////////////////////////////////
+double LaserView::LaserItem::GetHoverAngle() const
+{
+  return this->radians ? this->indexAngle : GZ_RTOD(this->indexAngle);
 }
 
 /////////////////////////////////////////////////
