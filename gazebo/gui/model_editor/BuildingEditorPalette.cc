@@ -188,8 +188,8 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
       << "<p>Note: Currently, windows & doors are simple holes in the wall.</p>"
       << "<p>Note: Because Gazebo only supports simple primitive shapes, "
       << "all floors will be rectangular.</p>";
-  tipsLabel->setMinimumSize(200, 400);
-  tipsLabel->setMaximumSize(300, 400);
+  tipsLabel->setMinimumSize(300, 500);
+  tipsLabel->setMaximumSize(400, 800);
 
   tipsLabel->setText(tr(tipsText.str().c_str()));
   mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,

@@ -750,9 +750,11 @@ void EditorView::OnDiscardModel()
   for (unsigned int i = 0; i < this->levels.size(); ++i)
     delete this->levels[i];
   this->levels.clear();
+  this->currentLevel = 0;
 
   Level *newLevel = new Level;
   newLevel->level = 0;
+  newLevel->height = 0;
   newLevel->name = "Level 1";
   this->levels.push_back(newLevel);
   this->levelCounter = 0;
