@@ -25,6 +25,11 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class WallInspectorDialog WallInspectorDialog.hh
+    /// \brief Dialog for configuring a wall item.
     class WallInspectorDialog : public QDialog
     {
       Q_OBJECT
@@ -132,6 +137,7 @@ namespace gazebo
       /// \brief Label that holds the name of the wall.
       private: QLabel* wallNameLabel;
     };
+    /// \}
   }
 }
 

@@ -24,6 +24,11 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class EditorWidget EditorWidget.hh
+    /// \brief Root widget of an editor.
     class EditorWidget : public QWidget
     {
       /// \brief Constructor
@@ -40,6 +45,7 @@ namespace gazebo
       /// \brief A building editor widget attached to this widget
       private: QWidget *buildingEditorWidget;
     };
+    /// \}
   }
 }
 

@@ -24,6 +24,11 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class GridLines GridLines.hh
+    /// \brief 2D grid lines.
     class GridLines : public  QGraphicsItem
     {
       /// \brief Constructor
@@ -76,6 +81,7 @@ namespace gazebo
       /// \brief Space between the lines in pixels.
       private: int space;
     };
+    /// \}
   }
 }
 #endif

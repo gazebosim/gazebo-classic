@@ -25,6 +25,11 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class FinishModelDialog FinishModelDialog.hh
+    /// \brief Dialog for saving the building model.
     class FinishModelDialog : public QDialog
     {
       Q_OBJECT
@@ -71,6 +76,7 @@ namespace gazebo
       /// \brief Editable line that holds the model's save location.
       private: QLineEdit* modelLocationLineEdit;
     };
+    /// \}
   }
 }
 

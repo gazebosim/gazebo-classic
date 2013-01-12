@@ -36,6 +36,11 @@ namespace gazebo
 
     class WallInspectorDialog;
 
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class WallItem WallItem.hh
+    /// \brief 2D representation of a wall.
     class WallItem : public PolylineItem, public BuildingItem
     {
       Q_OBJECT
@@ -119,6 +124,7 @@ namespace gazebo
       /// \brief Inspector for configuring the wall item.
       private: WallInspectorDialog *inspector;
     };
+    /// \}
   }
 }
 

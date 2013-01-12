@@ -25,6 +25,11 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class EditorItem EditorItem.hh
+    /// \brief A base class representing an item on the editor.
     class EditorItem : public QObject
     {
       Q_OBJECT
@@ -136,6 +141,7 @@ namespace gazebo
       /// \brief Name of editor item
       protected: std::string name;
     };
+    /// \}
   }
 }
 

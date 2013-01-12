@@ -41,6 +41,11 @@ namespace gazebo
 
     class ModelManip;
 
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class BuildingMaker BuildingMaker.hh
+    /// \brief Create and manage 3D visuals of a building.
     class BuildingMaker : public EntityMaker
     {
       /// \brief Constructor
@@ -286,6 +291,7 @@ namespace gazebo
       /// \brief A list of gui editor events.
       private: std::vector<event::ConnectionPtr> connections;
     };
+    /// \}
   }
 }
 #endif

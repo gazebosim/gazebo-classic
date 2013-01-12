@@ -32,6 +32,11 @@ namespace gazebo
 
     class WindowDoorInspectorDialog;
 
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class DoorItem DoorItem.hh
+    /// \brief 2D representation of a door
     class DoorItem : public RectItem, public BuildingItem
     {
       Q_OBJECT
@@ -85,15 +90,16 @@ namespace gazebo
       /// \brief Door elevation in pixels
       private: double doorElevation;
 
-      /// \brief Door scene position in pixels
+      /// \brief Door scene position in pixel coordinates.
       private: QPointF doorPos;
 
       /// \brief Scale for converting to from pixel to metric units
       private: double scale;
 
-      /// \brief Inspector for configuring the window item.
+      /// \brief Inspector for configuring the door item.
       private: WindowDoorInspectorDialog *inspector;
     };
+    /// \}
   }
 }
 

@@ -24,6 +24,11 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class RotateHandle RotateHandle.hh
+    /// \brief Handle for rotating an editor item
     class RotateHandle : public QGraphicsItem
     {
       /// \brief Constructor
@@ -110,6 +115,7 @@ namespace gazebo
       /// \brief Offset position of the rotate handle pixel coordinates.
       private: QPointF handleOffset;
     };
+    /// \}
   }
 }
 

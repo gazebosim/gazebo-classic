@@ -22,6 +22,11 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class BuildingItem BuildingItem.hh
+    /// \brief A base class that holds properties of a building level
     class BuildingItem
     {
         /// \brief Constructor
@@ -50,6 +55,7 @@ namespace gazebo
         /// \brief Base height of the level
         protected: double levelBaseHeight;
     };
+    /// \}
   }
 }
 

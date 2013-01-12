@@ -28,6 +28,11 @@ namespace gazebo
 
     class ScaleWidget;
 
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class BuildingEditorWidget BuildingEditorWidget.hh
+    /// \brief A widget which the building editor is attached to.
     class BuildingEditorWidget : public QWidget
     {
       /// \brief Types of models supported in building editor
@@ -53,6 +58,7 @@ namespace gazebo
       /// \brief A widget to display the scale of the 2D editor view.
       private: ScaleWidget *scaleWidget;
     };
+    /// \}
   }
 }
 

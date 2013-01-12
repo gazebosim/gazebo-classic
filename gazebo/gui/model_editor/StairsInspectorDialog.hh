@@ -25,6 +25,11 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class StairsInspectorDialog StairsInspectorDialog.hh
+    /// \brief Dialog for configuring a staircase item.
     class StairsInspectorDialog : public QDialog
     {
       Q_OBJECT
@@ -115,6 +120,7 @@ namespace gazebo
       /// \brief Label that holds the name of the staircase.
       private: QLabel* stairsNameLabel;
     };
+    /// \}
   }
 }
 

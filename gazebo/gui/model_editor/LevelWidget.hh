@@ -27,6 +27,11 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class GridLines GridLines.hh
+    /// \brief A widget for adding and changing building levels.
     class LevelWidget : public QWidget
     {
       Q_OBJECT
@@ -63,6 +68,7 @@ namespace gazebo
       /// \brief Counter for the total number of levels.
       private: int levelCounter;
     };
+    /// \}
   }
 }
 

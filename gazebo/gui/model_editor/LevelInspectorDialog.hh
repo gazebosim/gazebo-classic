@@ -25,6 +25,11 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class LevelInspectorDialog LevelInspectorDialog.hh
+    /// \brief Dialog for configuring a building level
     class LevelInspectorDialog : public QDialog
     {
       Q_OBJECT
@@ -79,6 +84,7 @@ namespace gazebo
       /// \brief Combo box for configuring the floor material.
       private: QComboBox *materialComboBox;
     };
+    /// \}
   }
 }
 

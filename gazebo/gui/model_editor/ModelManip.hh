@@ -28,6 +28,11 @@ namespace gazebo
   {
     class BuildingMaker;
 
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class ModelManip ModelManip.hh
+    /// \brief Manipulate a 3D visual generated from a 2D editor item
     class ModelManip : public QObject
     {
       Q_OBJECT
@@ -217,6 +222,7 @@ namespace gazebo
       /// \brief Parent manipulator.
       private: ModelManip * parent;
     };
+    /// \}
   }
 }
 #endif

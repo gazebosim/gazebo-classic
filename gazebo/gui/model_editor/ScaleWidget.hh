@@ -27,6 +27,11 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class ScaleWidget ScaleWidget.hh
+    /// \brief Widget that displays the scale (zoom level) of the editor
     class ScaleWidget : public QWidget
     {
       Q_OBJECT
@@ -52,6 +57,7 @@ namespace gazebo
       /// \brief A list of gui editor events connected to this widget.
       private: std::vector<event::ConnectionPtr> connections;
     };
+    /// \}
   }
 }
 

@@ -32,6 +32,11 @@ namespace gazebo
 
     class EditorItem;
 
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class RectItem RectItem.hh
+    /// \brief 2D rectangle.
     class RectItem : public EditorItem, public QGraphicsRectItem
     {
       Q_OBJECT
@@ -261,6 +266,7 @@ namespace gazebo
       /// \brieft Resize flag that controls how the rect item can be resized.
       private: unsigned int resizeFlag;
     };
+    /// \}
   }
 }
 

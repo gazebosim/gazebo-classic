@@ -160,6 +160,7 @@ namespace gazebo
       /// \brief Current mouse state.
       private: int mouseButtonState;
     };
+    /// \}
   }
 }
 

@@ -27,6 +27,11 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class BuildingEditorPalette BuildingEditorPalette.hh
+    /// \brief A palette that displays different drawing operations.
     class BuildingEditorPalette : public QWidget
     {
       Q_OBJECT
@@ -86,6 +91,7 @@ namespace gazebo
       /// \brief A list of gui editor events.
       private: std::vector<event::ConnectionPtr> connections;
     };
+    /// \}
   }
 }
 

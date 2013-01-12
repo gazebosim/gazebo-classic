@@ -32,6 +32,11 @@ namespace gazebo
 
     class LineSegmentItem;
 
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class PolylineItem PolylineItem.hh
+    /// \brief 2D polyline.
     class PolylineItem : public EditorItem, public QGraphicsPathItem
     {
       /// \brief Constructor
@@ -207,6 +212,7 @@ namespace gazebo
       /// \brief Thickness of the polyline in pixels
       private: double lineThickness;
     };
+    /// \}
   }
 }
 

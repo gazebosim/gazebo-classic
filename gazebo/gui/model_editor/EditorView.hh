@@ -55,6 +55,11 @@ namespace gazebo
       public: double height;
     };
 
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class EditorView EditorView.hh
+    /// \brief Controls the editor view and manage contents in the editor scene.
     class EditorView : public QGraphicsView
     {
       Q_OBJECT
@@ -241,6 +246,7 @@ namespace gazebo
       /// wall operation.
       private: bool snapToCloseWall;
     };
+    /// \}
   }
 }
 

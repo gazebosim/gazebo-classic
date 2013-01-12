@@ -32,6 +32,11 @@ namespace gazebo
 
     class WindowDoorInspectorDialog;
 
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class WindowItem WindowItem.hh
+    /// \brief 2D representation of a window.
     class WindowItem : public RectItem, public BuildingItem
     {
         Q_OBJECT
@@ -94,6 +99,7 @@ namespace gazebo
         /// \brief Inspector for configuring the window item.
         private: WindowDoorInspectorDialog *inspector;
     };
+    /// \}
   }
 }
 #endif

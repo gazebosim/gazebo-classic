@@ -32,6 +32,11 @@ namespace gazebo
 
     class StairsInspectorDialog;
 
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class StairsItem StairsItem.hh
+    /// \brief 2D representation of a staircase.
     class StairsItem :  public RectItem, public BuildingItem
     {
       Q_OBJECT
@@ -109,6 +114,7 @@ namespace gazebo
 
       // private: double stairsUnitRun;
     };
+    /// \}
   }
 }
 #endif

@@ -26,6 +26,11 @@ namespace gazebo
   {
     class EditorItem;
 
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class LineSegmentItem LineSegmentItem.hh
+    /// \brief 2D line segment.
     class LineSegmentItem : public EditorItem, public QGraphicsLineItem
     {
       /// \brief Constructor
@@ -152,6 +157,7 @@ namespace gazebo
       /// \brief Mouse press Y position in pixel coordinates.
       private: double mouseDownY;
     };
+    /// \}
   }
 }
 

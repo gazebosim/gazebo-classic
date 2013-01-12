@@ -129,6 +129,7 @@ namespace gazebo
       /// \brief Combo box for selecting the type of the item to use.
       private: QComboBox *typeComboBox;
     };
+    /// \}
   }
 }
 
