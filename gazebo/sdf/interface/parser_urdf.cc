@@ -93,10 +93,15 @@ urdf::Vector3 URDF2Gazebo::ParseVector3(TiXmlNode* _key, double _scale)
 {
   if (_key != NULL)
   {
-    return this->ParseVector3(_key->Value(), _scale);
+    TiXmlElement *key = _key->ToElement();
+    if (key != NULL)
+    {
+      return this->ParseVector3(this->GetKeyValueAsString(key), _scale);
+    }
   }
-  else
-    return urdf::Vector3(0, 0, 0);
+  gzerr << "key[" << _key->Value() << "] does not contain a Vector3\n";
+
+  return urdf::Vector3(0, 0, 0);
 }
 
 urdf::Vector3 URDF2Gazebo::ParseVector3(const std::string &_str, double _scale)
