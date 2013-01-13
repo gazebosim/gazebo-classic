@@ -13,6 +13,7 @@ set (sources
   main.cc 
   ../gazebo.cc
   Actions.cc
+  DataLogger.cc
   Gui.cc 
   MainWindow.cc 
   RenderWidget.cc 
@@ -41,6 +42,7 @@ set (sources
 
 set (qt_headers
   Actions.hh
+  DataLogger.hh
   MainWindow.hh 
   RenderWidget.hh 
   GLWidget.hh 

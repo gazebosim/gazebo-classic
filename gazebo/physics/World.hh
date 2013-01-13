@@ -368,6 +368,10 @@ namespace gazebo
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
 
+      /// \brief Called when a log control message is received.
+      /// \param[in] _data The log control message.
+      private: void OnLogControl(ConstLogControlPtr &_data);
+
       /// \brief Called when a request message is received.
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
@@ -502,6 +506,9 @@ namespace gazebo
 
       /// \brief Subscriber to world control messages.
       private: transport::SubscriberPtr controlSub;
+
+      /// \brief Subscriber to log control messages.
+      private: transport::SubscriberPtr logControlSub;
 
       /// \brief Subscriber to factory messages.
       private: transport::SubscriberPtr factorySub;

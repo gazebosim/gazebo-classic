@@ -180,6 +180,8 @@ void World::Load(sdf::ElementPtr _sdf)
                                            &World::OnFactoryMsg, this);
   this->controlSub = this->node->Subscribe("~/world_control",
                                            &World::OnControl, this);
+  this->logControlSub = this->node->Subscribe("~/log/control",
+                                              &World::OnLogControl, this);
   this->requestSub = this->node->Subscribe("~/request",
                                            &World::OnRequest, this);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
@@ -901,6 +903,21 @@ void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   this->factoryMsgs.push_back(*_msg);
+}
+
+//////////////////////////////////////////////////
+void World::OnLogControl(ConstLogControlPtr &_data)
+{
+  std::cout << _data->DebugString() << "\n";
+
+  if (_data->has_start() && _data->start())
+  {
+    common::LogRecord::Instance()->Start("bz2");
+    common::LogRecord::Instance()->Add(this->GetName(), "state.log",
+        boost::bind(&World::OnLog, this, _1));
+  }
+  else if (_data->has_stop() && _data->stop())
+    common::LogRecord::Instance()->Stop();
 }
 
 //////////////////////////////////////////////////

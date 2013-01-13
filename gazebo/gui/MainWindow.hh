@@ -90,6 +90,9 @@ namespace gazebo
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
 
+      /// \brief QT slot to open the data logger utility
+      private slots: void DataLogger();
+
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
 

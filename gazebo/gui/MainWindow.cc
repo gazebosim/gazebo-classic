@@ -16,6 +16,7 @@
  */
 
 #include "gazebo/gui/TopicSelector.hh"
+#include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/viewers/TopicView.hh"
 #include "gazebo/gui/viewers/ImageView.hh"
@@ -211,7 +212,7 @@ void MainWindow::New()
 /////////////////////////////////////////////////
 void MainWindow::SelectTopic()
 {
-  TopicSelector *selector = new TopicSelector();
+  TopicSelector *selector = new TopicSelector(this);
   selector->exec();
   std::string topic = selector->GetTopic();
   std::string msgType = selector->GetMsgType();
@@ -580,6 +581,13 @@ void MainWindow::Orbit()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::DataLogger()
+{
+  gui::DataLogger *dataLogger = new gui::DataLogger(this);
+  dataLogger->show();
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
   /*g_newAct = new QAction(tr("&New World"), this);
@@ -785,6 +793,11 @@ void MainWindow::CreateActions()
   g_orbitAct = new QAction(tr("Orbit View Control"), this);
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
+
+  g_dataLoggerAct = new QAction(tr("&Log Data"), this);
+  g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
+  g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
+  connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
 }
 
 /////////////////////////////////////////////////
@@ -811,6 +824,8 @@ void MainWindow::CreateMenus()
   // fileMenu->addAction(g_newAct);
   fileMenu->addAction(g_saveAct);
   fileMenu->addAction(g_saveAsAct);
+  fileMenu->addSeparator();
+  fileMenu->addAction(g_dataLoggerAct);
   fileMenu->addSeparator();
   fileMenu->addAction(g_quitAct);
 
