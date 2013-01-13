@@ -1,0 +1,12 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface LogStatus
+/// \brief A message that contains information about data logging
+
+import "time.proto";
+
+message LogStatus
+{
+  optional Time start           = 1;
+}
