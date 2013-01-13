@@ -34,6 +34,7 @@ set (sources
   JointControlWidget.cc
   ToolsWidget.cc
   TopicSelector.cc
+  VideoRecorder.cc
   viewers/ImageView.cc
   viewers/TopicView.cc
   viewers/TextView.cc
@@ -54,6 +55,7 @@ set (qt_headers
   JointControlWidget.hh
   ToolsWidget.hh
   TopicSelector.hh
+  VideoRecorder.hh
   viewers/ImageView.hh
   viewers/TextView.hh
   viewers/TopicView.hh

@@ -196,20 +196,22 @@ void UserCamera::PostRender()
   {
     std::string path = elem->GetValueString("path");
 
+    std::string friendlyName = this->GetName();
+    boost::replace_all(friendlyName, "::", "_");
+
     char tmp[1024];
     if (!path.empty())
     {
       snprintf(tmp, sizeof(tmp), "%s/%s-%04d.jpg", path.c_str(),
-          this->name.c_str(), this->saveCount);
+          friendlyName.c_str(), this->saveCount);
     }
     else
     {
       snprintf(tmp, sizeof(tmp),
-          "%s-%04d.jpg", this->name.c_str(), this->saveCount);
+          "%s-%04d.jpg", friendlyName.c_str(), this->saveCount);
     }
 
-    // TODO: Use the window manager instead.
-    // this->window->writeContentsToFile(tmp);
+    this->viewport->getTarget()->writeContentsToFile(tmp);
 
     this->saveCount++;
   }
@@ -334,6 +336,18 @@ void UserCamera::SetViewController(const std::string &type,
     gzthrow("Invalid view controller type: " + type);
 
   this->viewController->Init(_pos);
+}
+
+//////////////////////////////////////////////////
+unsigned int UserCamera::GetImageWidth() const
+{
+  return this->viewport->getActualWidth();
+}
+
+//////////////////////////////////////////////////
+unsigned int UserCamera::GetImageHeight() const
+{
+  return this->viewport->getActualHeight();
 }
 
 //////////////////////////////////////////////////

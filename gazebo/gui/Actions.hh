@@ -35,6 +35,7 @@ namespace gazebo
     extern QAction *g_quitAct;
 
     extern QAction *g_dataLoggerAct;
+    extern QAction *g_videoRecorderAct;
 
     extern QAction *g_newModelAct;
     extern QAction *g_resetModelsAct;

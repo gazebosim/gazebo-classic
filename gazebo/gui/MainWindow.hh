@@ -93,6 +93,9 @@ namespace gazebo
       /// \brief QT slot to open the data logger utility
       private slots: void DataLogger();
 
+      /// \brief QT slot to open the video recording utility
+      private slots: void VideoRecorder();
+
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
 

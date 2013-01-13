@@ -83,7 +83,7 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   // Connect to the render signal
   this->connections.push_back(
-      event::Events::ConnectPreRender(boost::bind(&Camera::Update, this)));
+      event::Events::ConnectPostRender(boost::bind(&Camera::Update, this)));
 
   if (_autoRender)
   {
@@ -325,6 +325,7 @@ void Camera::PostRender()
 
   if (this->newData && this->captureData)
   {
+    /*
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
 
     size_t size;
@@ -377,6 +378,7 @@ void Camera::PostRender()
 
     this->newImageFrame(buffer, width, height, this->GetImageDepth(),
                     this->GetImageFormat());
+                    */
   }
 
   this->newData = false;
@@ -646,7 +648,9 @@ void Camera::EnableSaveFrame(bool enable)
   this->captureData = true;
 
   if (!this->renderTexture)
-    this->CreateRenderTexture("saveframes_render_texture");
+  {
+    // this->CreateRenderTexture("saveframes_render_texture");
+  }
 }
 
 //////////////////////////////////////////////////
@@ -659,7 +663,7 @@ void Camera::SetSaveFramePathname(const std::string &_pathname)
   if (elem->GetValueBool("enabled"))
   {
     std::string command;
-    command = "mkdir " + _pathname + " 2>>/dev/null";
+    command = "mkdir -p " + _pathname + " 2>>/dev/null";
     if (system(command.c_str()) <0)
       gzerr << "Error making directory\n";
   }
@@ -812,7 +816,6 @@ std::string Camera::GetFrameFilename()
 
   std::string friendlyName = this->GetName();
   boost::replace_all(friendlyName, "::", "_");
-
 
   char tmp[1024];
   if (!path.empty())

@@ -17,6 +17,7 @@
 
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
+#include "gazebo/gui/VideoRecorder.hh"
 #include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/viewers/TopicView.hh"
 #include "gazebo/gui/viewers/ImageView.hh"
@@ -588,6 +589,13 @@ void MainWindow::DataLogger()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::VideoRecorder()
+{
+  gui::VideoRecorder *videoRecorder = new gui::VideoRecorder(this);
+  videoRecorder->show();
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
   /*g_newAct = new QAction(tr("&New World"), this);
@@ -798,6 +806,11 @@ void MainWindow::CreateActions()
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
   connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
+
+  g_videoRecorderAct = new QAction(tr("&Record Video"), this);
+  g_videoRecorderAct->setShortcut(tr("Ctrl+V"));
+  g_videoRecorderAct->setStatusTip(tr("Video Recording Utility"));
+  connect(g_videoRecorderAct, SIGNAL(triggered()), this, SLOT(VideoRecorder()));
 }
 
 /////////////////////////////////////////////////
@@ -852,6 +865,7 @@ void MainWindow::CreateMenus()
 
   QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
+  windowMenu->addAction(g_videoRecorderAct);
 
   this->menuBar->addSeparator();
 
