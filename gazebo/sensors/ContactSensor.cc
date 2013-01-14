@@ -215,6 +215,7 @@ std::string ContactSensor::GetCollisionName(unsigned int _index) const
 unsigned int ContactSensor::GetCollisionContactCount(
     const std::string &_collisionName) const
 {
+  boost::mutex::scoped_lock lock(this->mutex);
   unsigned int result = 0;
 
   for (int i = 0; i < this->contactsMsg.contact_size(); ++i)
@@ -232,6 +233,7 @@ unsigned int ContactSensor::GetCollisionContactCount(
 //////////////////////////////////////////////////
 msgs::Contacts ContactSensor::GetContacts() const
 {
+  boost::mutex::scoped_lock lock(this->mutex);
   return this->contactsMsg;
 }
 
@@ -239,6 +241,8 @@ msgs::Contacts ContactSensor::GetContacts() const
 std::map<std::string, gazebo::physics::Contact> ContactSensor::GetContacts(
     const std::string &_collisionName)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+
   std::map<std::string, gazebo::physics::Contact> result;
 
   std::string collision2;
