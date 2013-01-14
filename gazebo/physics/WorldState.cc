@@ -36,6 +36,8 @@ WorldState::WorldState()
 WorldState::WorldState(const WorldPtr _world)
   : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
 {
+  this->world = _world;
+
   // Add a state for all the models
   Model_V models = _world->GetModels();
   for (Model_V::const_iterator iter = models.begin();
@@ -79,6 +81,12 @@ void WorldState::Load(const sdf::ElementPtr _elem)
       childElem = childElem->GetNextElement("model");
     }
   }
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetWorld(const WorldPtr _world)
+{
+  this->world = _world;
 }
 
 /////////////////////////////////////////////////
@@ -173,9 +181,9 @@ WorldState WorldState::operator-(const WorldState &_state) const
   WorldState result;
 
   result.name = this->name;
-  result.simTime = this->simTime - _state.simTime;
-  result.realTime = this->realTime - _state.realTime;
-  result.wallTime = this->wallTime - _state.wallTime;
+  result.simTime = this->simTime;
+  result.realTime = this->realTime;
+  result.wallTime = this->wallTime;
 
   // Subtract the model states.
   for (std::vector<ModelState>::const_iterator iter =
@@ -188,7 +196,25 @@ WorldState WorldState::operator-(const WorldState &_state) const
         result.modelStates.push_back(state);
     }
     else
+    {
       result.modelStates.push_back(*iter);
+    }
+  }
+
+  // Add in the new model states
+  for (std::vector<ModelState>::const_iterator iter =
+       this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
+  {
+    if (!_state->HasModelState((*iter).GetName()))
+    {
+      result.modelStates.push_back(*iter);
+
+      if (this->world)
+      {
+        ModelPtr model = this->world->GetModel((*iter).GetName());
+        result.newModels.push_back(model->GetSDF()->ToString(""));
+      }
+    }
   }
 
   return result;
@@ -200,9 +226,9 @@ WorldState WorldState::operator+(const WorldState &_state) const
   WorldState result;
 
   result.name = this->name;
-  result.simTime = this->simTime + _state.simTime;
-  result.realTime = this->realTime + _state.realTime;
-  result.wallTime = this->wallTime + _state.wallTime;
+  result.simTime = this->simTime;
+  result.realTime = this->realTime;
+  result.wallTime = this->wallTime;
 
   // Add the states.
   for (std::vector<ModelState>::const_iterator iter =

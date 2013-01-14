@@ -288,6 +288,9 @@ void World::Init()
   common::LogRecord::Instance()->Add(this->GetName(), "state.log",
       boost::bind(&World::OnLog, this, _1));
 
+  this->prevStates[0].SetWorld(shared_from_this());
+  this->prevStates[1].SetWorld(shared_from_this());
+
   this->prevStates[0].SetName(this->GetName());
   this->prevStates[1].SetName(this->GetName());
 

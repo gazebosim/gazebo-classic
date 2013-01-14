@@ -67,6 +67,10 @@ namespace gazebo
       /// \param[in] _elem Pointer to the WorldState SDF element.
       public: virtual void Load(const sdf::ElementPtr _elem);
 
+      /// \brief Set the world.
+      /// \param[in] _world Pointer to the world.
+      public: void SetWorld(const WorldPtr _world);
+
       /// \brief Get the model states.
       /// \return A vector of model states.
       public: const std::vector<ModelState> &GetModelStates() const;
@@ -130,6 +134,12 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                  const gazebo::physics::WorldState &_state)
       {
+        for (std::vector<std::string>::const_iterator iter =
+             _state.newModels.begin(); iter != _state.newModels.end(); ++iter)
+        {
+          _out << *iter << "\n";
+        }
+
         _out << "<state world_name='" << _state.name << "'>\n";
         _out << "<sim_time>" << _state.simTime << "</sim_time>\n";
         _out << "<wall_time>" << _state.wallTime << "</wall_time>\n";
@@ -148,6 +158,10 @@ namespace gazebo
 
       /// State of all the models.
       private: std::vector<ModelState> modelStates;
+
+      private: std::vector<std::string> newModels;
+
+      private: WorldPtr world;
     };
     /// \}
   }
