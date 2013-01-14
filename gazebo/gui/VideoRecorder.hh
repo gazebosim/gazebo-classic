@@ -72,6 +72,7 @@ namespace gazebo
       private: QLineEdit *rollEdit;
       private: QLineEdit *pitchEdit;
       private: QLineEdit *yawEdit;
+      private: QLineEdit *durationEdit;
 
       private: int activeRow;
     };

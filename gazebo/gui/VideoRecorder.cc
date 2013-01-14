@@ -90,8 +90,13 @@ VideoRecorder::VideoRecorder(QWidget *_parent)
   buttonLayout->addWidget(previewButton);
   buttonLayout->addWidget(recordButton);
 
+  this->durationEdit = new QLineEdit;
+  this->durationEdit->setFixedWidth(40);
+  this->durationEdit->setText("10.0");
+
   mainLayout->addWidget(this->poseList);
   mainLayout->addLayout(poseEditLayout);
+  mainLayout->addWidget(this->durationEdit);
   mainLayout->addLayout(buttonLayout);
 
   // Let the stylesheet handle the margin sizes
@@ -148,7 +153,8 @@ void VideoRecorder::OnPreview()
     pts.push_back(pose);
   }
 
-  this->camera->MoveToPositions(pts, 5);
+  double duration = boost::lexical_cast<double>(this->durationEdit->text().toStdString());
+  this->camera->MoveToPositions(pts, duration);
 }
 
 /////////////////////////////////////////////////
