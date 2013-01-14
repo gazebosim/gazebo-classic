@@ -19,6 +19,7 @@
 
 #include <string>
 #include <list>
+#include <boost/thread/mutex.hpp>
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -62,6 +63,8 @@ namespace gazebo
 
       /// \brief Tranport node pointer.
       private: transport::NodePtr node;
+
+      private: boost::mutex mutex;
     };
 
     class TopicView : public QDialog
@@ -89,6 +92,10 @@ namespace gazebo
       /// be the timestamp when data was generated on the server.
       /// \param[in] _size Size of the message in bytes.
       protected: void OnMsg(const common::Time &_dataTime, int _size);
+
+      /// \brief Qt close event callback.
+      /// \param[in] _event The close event info.
+      protected: virtual void closeEvent(QCloseEvent *_event);
 
       /// \brief Update the camera sensor widget.
       private slots: void Update();
@@ -134,6 +141,9 @@ namespace gazebo
 
       /// \brief A list of clock times that messages have been received.
       private: std::list<common::Time> times;
+
+      /// \brief A mutex to protect the update cycle.
+      private: boost::mutex updateMutex;
     };
   }
 }
