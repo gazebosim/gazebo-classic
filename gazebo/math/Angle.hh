@@ -25,6 +25,8 @@
 #include <math.h>
 #include <iostream>
 
+#include "gazebo/common/CommonTypes.hh"
+
 /// \brief Macro that converts radians to degrees
 /// \param[in] radians
 /// \return degrees
@@ -79,6 +81,11 @@ namespace gazebo
     /// \brief Get the angle in radians
     /// \return double containing the angle's radian value
     public: double Radian() const;
+
+    /// \brief Get the angle in radians, deprecated by Radian
+    /// \return double containing the angle's radian value
+    public: double GetAsRadian() const GAZEBO_DEPRECATED
+      { return this->Radian(); }
 
     /// \brief Get the angle in degrees
     /// \return double containing the angle's degree value
