@@ -147,10 +147,10 @@ bool WorldState::HasModelState(const std::string &_modelName) const
 /////////////////////////////////////////////////
 bool WorldState::IsZero() const
 {
-  bool result = true;
+  bool result = this->newModels.size() == 0;
 
   for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end(); ++iter)
+       iter != this->modelStates.end() && result; ++iter)
   {
     result = result && (*iter).IsZero();
   }
@@ -166,11 +166,20 @@ WorldState &WorldState::operator=(const WorldState &_state)
   // Clear the model states
   this->modelStates.clear();
 
+  this->newModels.clear();
+
   // Copy the model states.
   for (std::vector<ModelState>::const_iterator iter =
        _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
   {
     this->modelStates.push_back(ModelState(*iter));
+  }
+
+  // Copy the newModel states.
+  for (std::vector<std::string>::const_iterator iter =
+       _state.newModels.begin(); iter != _state.newModels.end(); ++iter)
+  {
+    this->newModels.push_back(*iter);
   }
 
   return *this;
@@ -193,12 +202,19 @@ WorldState WorldState::operator-(const WorldState &_state) const
     if (this->HasModelState((*iter).GetName()))
     {
       ModelState state = this->GetModelState((*iter).GetName()) - *iter;
+
       if (!state.IsZero())
+      {
         result.modelStates.push_back(state);
+      }
     }
     else
     {
-      result.modelStates.push_back(*iter);
+      std::cout << "[" << (*iter).GetName() << "]\n";
+      if ((*iter).GetName().empty())
+        printf("BAD\n");
+      printf("HERE\n");
+      // result.modelStates.push_back(*iter);
     }
   }
 
@@ -206,12 +222,13 @@ WorldState WorldState::operator-(const WorldState &_state) const
   for (std::vector<ModelState>::const_iterator iter =
        this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
   {
-    //if (!_state.HasModelState((*iter).GetName()))
+    if (!_state.HasModelState((*iter).GetName()))
     {
       result.modelStates.push_back(*iter);
 
       if (this->world)
       {
+        printf("First\n");
         ModelPtr model = this->world->GetModel((*iter).GetName());
         result.newModels.push_back(model->GetSDF()->ToString(""));
       }

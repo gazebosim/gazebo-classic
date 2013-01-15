@@ -511,11 +511,13 @@ void World::Update()
 
   int currState = (this->stateToggle + 1) % 2;
   this->prevStates[currState] = WorldState(shared_from_this());
+
   WorldState diffState = this->prevStates[currState] -
                          this->prevStates[this->stateToggle];
 
   if (!diffState.IsZero())
   {
+    printf("Not Zero\n");
     this->stateToggle = currState;
     this->states.push_back(diffState);
     if (this->states.size() > 1000)
@@ -1569,7 +1571,7 @@ bool World::OnLog(std::ostringstream &_stream)
 
     first = false;
   }
-  else if (this->states.size() > 1)
+  else if (this->states.size() >= 1)
   {
     // Get the difference from the previous state.
     _stream << "<sdf version='" << SDF_VERSION << "'>";
