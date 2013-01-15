@@ -544,6 +544,9 @@ void World::Fini()
     this->physicsEngine->Fini();
     this->physicsEngine.reset();
   }
+
+  this->prevStates[0].SetWorld(WorldPtr());
+  this->prevStates[1].SetWorld(WorldPtr());
 }
 
 //////////////////////////////////////////////////

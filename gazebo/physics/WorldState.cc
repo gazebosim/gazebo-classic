@@ -57,6 +57,7 @@ WorldState::WorldState(const sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 WorldState::~WorldState()
 {
+  this->world.reset();
   this->modelStates.clear();
 }
 
@@ -205,7 +206,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
   for (std::vector<ModelState>::const_iterator iter =
        this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
   {
-    if (!_state->HasModelState((*iter).GetName()))
+    //if (!_state.HasModelState((*iter).GetName()))
     {
       result.modelStates.push_back(*iter);
 
