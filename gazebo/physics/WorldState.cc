@@ -212,7 +212,6 @@ WorldState WorldState::operator-(const WorldState &_state) const
     }
     else
     {
-      printf("Deletion\n");
       result.deletions.push_back((*iter).GetName());
     }
   }
@@ -221,16 +220,10 @@ WorldState WorldState::operator-(const WorldState &_state) const
   for (std::vector<ModelState>::const_iterator iter =
        this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
   {
-    if (!_state.HasModelState((*iter).GetName()))
+    if (!_state.HasModelState((*iter).GetName()) && this->world)
     {
-      result.modelStates.push_back(*iter);
-
-      if (this->world)
-      {
-        printf("Insertion\n");
-        ModelPtr model = this->world->GetModel((*iter).GetName());
-        result.insertions.push_back(model->GetSDF()->ToString(""));
-      }
+      ModelPtr model = this->world->GetModel((*iter).GetName());
+      result.insertions.push_back(model->GetSDF()->ToString(""));
     }
   }
 

@@ -65,7 +65,7 @@ DataLogger::DataLogger(QWidget *_parent)
   buttonLayout->addWidget(this->okayButton);
   */
 
-  //mainLayout->addWidget(frame);
+  // mainLayout->addWidget(frame);
   mainLayout->addLayout(buttonLayout);
 
   // Let the stylesheet handle the margin sizes

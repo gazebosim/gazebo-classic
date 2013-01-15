@@ -364,9 +364,6 @@ void World::LogStep()
 
       this->logPlayState.Load(this->logPlayStateSDF);
 
-      WorldState state = WorldState(shared_from_this()) + this->logPlayState;
-      this->SetState(state);
-
       // Process insertions
       if (this->logPlayStateSDF->HasElement("insertions"))
       {
@@ -375,8 +372,10 @@ void World::LogStep()
 
         while (modelElem)
         {
-          std::cout << "New[" << modelElem->GetValueString("name") << "]\n";
-          this->LoadModel(modelElem, this->rootElement);
+          ModelPtr model = this->LoadModel(modelElem, this->rootElement);
+          model->Init();
+          model->LoadPlugins();
+
           modelElem = modelElem->GetNextElement("model");
         }
       }
@@ -388,12 +387,14 @@ void World::LogStep()
           this->logPlayStateSDF->GetElement("deletions")->GetElement("name");
         while (nameElem)
         {
-          std::cout << "DELETE[" << nameElem->GetValueString() << "]\n";
-          this->deleteEntity.push_back(nameElem->GetValueString());
+          transport::requestNoReply(this->GetName(), "entity_delete",
+                                    nameElem->GetValueString());
           nameElem = nameElem->GetNextElement("name");
         }
       }
 
+      WorldState state = WorldState(shared_from_this()) + this->logPlayState;
+      this->SetState(state);
       this->Update();
     }
 
@@ -544,7 +545,6 @@ void World::Update()
 
   if (!diffState.IsZero())
   {
-    printf("Not Zero\n");
     this->stateToggle = currState;
     this->states.push_back(diffState);
     if (this->states.size() > 1000)
@@ -943,8 +943,6 @@ void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 //////////////////////////////////////////////////
 void World::OnLogControl(ConstLogControlPtr &_data)
 {
-  std::cout << _data->DebugString() << "\n";
-
   if (_data->has_start() && _data->start())
   {
     common::LogRecord::Instance()->Start("bz2");

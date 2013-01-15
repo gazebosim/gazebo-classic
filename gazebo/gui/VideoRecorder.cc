@@ -153,7 +153,8 @@ void VideoRecorder::OnPreview()
     pts.push_back(pose);
   }
 
-  double duration = boost::lexical_cast<double>(this->durationEdit->text().toStdString());
+  double duration = boost::lexical_cast<double>(
+      this->durationEdit->text().toStdString());
   this->camera->MoveToPositions(pts, duration);
 }
 
