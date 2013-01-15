@@ -322,6 +322,15 @@ double BulletPhysics::GetStepTime()
   return this->stepTimeDouble;
 }
 
+// //////////////////////////////////////////////////
+// void BulletPhysics::SetSORPGSIters(unsigned int _iters)
+// {
+//   // TODO: set SDF parameter
+//   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
+//   // Line below commented out because it wasn't helping pendulum test.
+//   // info.m_numIterations = _iters;
+// }
+
 //////////////////////////////////////////////////
 LinkPtr BulletPhysics::CreateLink(ModelPtr _parent)
 {

@@ -102,6 +102,7 @@ namespace gazebo
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
       private: btHingeConstraint *btHinge;
+      private: double angleOffset;
     };
     /// \}
   }

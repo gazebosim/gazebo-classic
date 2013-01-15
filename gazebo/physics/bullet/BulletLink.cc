@@ -94,7 +94,9 @@ void BulletLink::Init()
     }
   }
 
-  this->compoundShape->calculateLocalInertia(btMass, fallInertia);
+  // this->compoundShape->calculateLocalInertia(btMass, fallInertia);
+  fallInertia = BulletTypes::ConvertVector3(
+    this->inertial->GetPrincipalMoments());
 
   // Create a construction info object
   btRigidBody::btRigidBodyConstructionInfo

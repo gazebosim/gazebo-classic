@@ -34,6 +34,7 @@ BulletHingeJoint::BulletHingeJoint(btDynamicsWorld *_world, BasePtr _parent)
 {
   this->world = _world;
   this->btHinge = NULL;
+  this->angleOffset = 0;
 }
 
 //////////////////////////////////////////////////
@@ -113,6 +114,7 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
 
   this->constraint = this->btHinge;
 
+  this->angleOffset = this->btHinge->getHingeAngle();
   // double angle = this->btHinge->getHingeAngle();
   // this->btHinge->setLimit(angle - .4, angle + .4);
   // Add the joint to the world
@@ -159,10 +161,10 @@ void BulletHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
 math::Angle BulletHingeJoint::GetAngleImpl(int /*_index*/) const
 {
   math::Angle result;
-  if (this->btHinge)
-    result = this->btHinge->getHingeAngle();
+  if (this->btHinge != NULL)
+    result = this->btHinge->getHingeAngle() - this->angleOffset;
   else
-    gzerr << "btHinge does not yet exist, returning default angle\n";
+    gzerr << "btHinge does not exist, returning default angle\n";
   return result;
 }
 
