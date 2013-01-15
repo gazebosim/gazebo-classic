@@ -41,6 +41,8 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
+#include "gazebo_config.h"
+
 using namespace gazebo;
 using namespace gui;
 
@@ -320,17 +322,20 @@ void MainWindow::Save()
 /////////////////////////////////////////////////
 void MainWindow::About()
 {
-  std::string helpTxt = "Gazebo is a 3D multi-robot simulator with dynamics. ";
-  helpTxt += "It is capable of simulating articulated robots in complex and ";
-  helpTxt += "realistic environments.\n\n";
+  std::string helpTxt = GAZEBO_VERSION_HEADER;
+  helpTxt += "\n\n";
 
-  helpTxt += "Web site:\t\thttp://gazebosim.org\n";
   helpTxt += "Tutorials:\t\thttp://gazebosim.org/wiki/tutorials\n";
   helpTxt += "User Guide:\t\thttp://gazebosim.org/user_guide\n";
   helpTxt += "API:\t\thttp://gazebosim.org/api\n";
   helpTxt += "SDF:\t\thttp://gazebosim.org/sdf\n";
   helpTxt += "Messages:\t\thttp://gazebosim.org/msgs\n";
-  QMessageBox::about(this, tr("About Gazebo"), tr(helpTxt.c_str()));
+
+  QPixmap icon(":images/gazebo_neg_60x71.png");
+  QMessageBox aboutBox(this);
+  aboutBox.setWindowTitle("About Gazebo");
+  aboutBox.setText(QString::fromStdString(helpTxt));
+  aboutBox.exec();
 }
 
 /////////////////////////////////////////////////

@@ -20,6 +20,11 @@ QWidget#cameraSensor > QLabel
   background-color: #303030;
 }
 
+QMessageBox
+{
+  color: #d0d0d0;
+  background-color: #303030;
+}
 
 QMainWindow#mainWindow
 {
