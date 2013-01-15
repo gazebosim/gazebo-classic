@@ -102,16 +102,16 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                      const gazebo::physics::JointState &_state)
       {
-        _out << "<joint name='" << _state.GetName() << "'>\n";
+        _out << "    <joint name='" << _state.GetName() << "'>\n";
 
         int i = 0;
         for (std::vector<math::Angle>::const_iterator iter =
             _state.angles.begin(); iter != _state.angles.end(); ++iter)
         {
-          _out << "<angle axis='" << i << "'>" << (*iter) << "</angle>\n";
+          _out << "      <angle axis='" << i << "'>" << (*iter) << "</angle>\n";
         }
 
-        _out << "</joint>\n";
+        _out << "    </joint>\n";
 
         return _out;
       }

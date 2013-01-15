@@ -367,6 +367,33 @@ void World::LogStep()
       WorldState state = WorldState(shared_from_this()) + this->logPlayState;
       this->SetState(state);
 
+      // Process insertions
+      if (this->logPlayStateSDF->HasElement("insertions"))
+      {
+        sdf::ElementPtr modelElem =
+          this->logPlayStateSDF->GetElement("insertions")->GetElement("model");
+
+        while (modelElem)
+        {
+          std::cout << "New[" << modelElem->GetValueString("name") << "]\n";
+          this->LoadModel(modelElem, this->rootElement);
+          modelElem = modelElem->GetNextElement("model");
+        }
+      }
+
+      // Process deletions
+      if (this->logPlayStateSDF->HasElement("deletions"))
+      {
+        sdf::ElementPtr nameElem =
+          this->logPlayStateSDF->GetElement("deletions")->GetElement("name");
+        while (nameElem)
+        {
+          std::cout << "DELETE[" << nameElem->GetValueString() << "]\n";
+          this->deleteEntity.push_back(nameElem->GetValueString());
+          nameElem = nameElem->GetNextElement("name");
+        }
+      }
+
       this->Update();
     }
 

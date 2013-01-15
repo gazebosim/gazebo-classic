@@ -147,7 +147,7 @@ bool WorldState::HasModelState(const std::string &_modelName) const
 /////////////////////////////////////////////////
 bool WorldState::IsZero() const
 {
-  bool result = this->newModels.size() == 0;
+  bool result = this->insertions.size() == 0 && this->deletions.size() == 0;
 
   for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
        iter != this->modelStates.end() && result; ++iter)
@@ -166,7 +166,8 @@ WorldState &WorldState::operator=(const WorldState &_state)
   // Clear the model states
   this->modelStates.clear();
 
-  this->newModels.clear();
+  this->insertions.clear();
+  this->deletions.clear();
 
   // Copy the model states.
   for (std::vector<ModelState>::const_iterator iter =
@@ -175,12 +176,13 @@ WorldState &WorldState::operator=(const WorldState &_state)
     this->modelStates.push_back(ModelState(*iter));
   }
 
-  // Copy the newModel states.
-  for (std::vector<std::string>::const_iterator iter =
-       _state.newModels.begin(); iter != _state.newModels.end(); ++iter)
-  {
-    this->newModels.push_back(*iter);
-  }
+  // Copy the insertions
+  std::copy(_state.insertions.begin(),
+            _state.insertions.end(), this->insertions.begin());
+
+  // Copy the deletions
+  std::copy(_state.deletions.begin(),
+            _state.deletions.end(), this->deletions.begin());
 
   return *this;
 }
@@ -210,11 +212,8 @@ WorldState WorldState::operator-(const WorldState &_state) const
     }
     else
     {
-      std::cout << "[" << (*iter).GetName() << "]\n";
-      if ((*iter).GetName().empty())
-        printf("BAD\n");
-      printf("HERE\n");
-      // result.modelStates.push_back(*iter);
+      printf("Deletion\n");
+      result.deletions.push_back((*iter).GetName());
     }
   }
 
@@ -228,9 +227,9 @@ WorldState WorldState::operator-(const WorldState &_state) const
 
       if (this->world)
       {
-        printf("First\n");
+        printf("Insertion\n");
         ModelPtr model = this->world->GetModel((*iter).GetName());
-        result.newModels.push_back(model->GetSDF()->ToString(""));
+        result.insertions.push_back(model->GetSDF()->ToString(""));
       }
     }
   }

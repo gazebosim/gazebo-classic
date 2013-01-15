@@ -134,33 +134,62 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                  const gazebo::physics::WorldState &_state)
       {
-        for (std::vector<std::string>::const_iterator iter =
-             _state.newModels.begin(); iter != _state.newModels.end(); ++iter)
+        _out << "<state world_name='" << _state.name << "'>\n";
+        _out << "  <sim_time>" << _state.simTime << "</sim_time>\n";
+        _out << "  <wall_time>" << _state.wallTime << "</wall_time>\n";
+        _out << "  <real_time>" << _state.realTime << "</real_time>\n";
+
+        // List all of the inserted models
+        if (_state.insertions.size() > 0)
         {
-          _out << *iter << "\n";
+          _out << "  <insertions>\n";
+          for (std::vector<std::string>::const_iterator iter =
+               _state.insertions.begin();
+               iter != _state.insertions.end(); ++iter)
+          {
+            _out << *iter << "\n";
+          }
+          _out << "  </insertions>\n";
         }
 
-        _out << "<state world_name='" << _state.name << "'>\n";
-        _out << "<sim_time>" << _state.simTime << "</sim_time>\n";
-        _out << "<wall_time>" << _state.wallTime << "</wall_time>\n";
-        _out << "<real_time>" << _state.realTime << "</real_time>\n";
+        // List all of the deleted models
+        if (_state.deletions.size() > 0)
+        {
+          _out << "  <deletions>\n";
+          for (std::vector<std::string>::const_iterator iter =
+               _state.deletions.begin();
+               iter != _state.deletions.end(); ++iter)
+          {
+            _out << "    <name>" << (*iter) << "</name>\n";
+          }
+          _out << "  </deletions>\n";
+        }
 
+        // List the model states
         for (std::vector<ModelState>::const_iterator iter =
             _state.modelStates.begin(); iter != _state.modelStates.end();
             ++iter)
         {
           _out << *iter;
         }
+
         _out << "</state>\n";
 
         return _out;
       }
 
-      /// State of all the models.
+      /// \brief State of all the models.
       private: std::vector<ModelState> modelStates;
 
-      private: std::vector<std::string> newModels;
+      /// \brief List of new added models. The
+      /// value is the SDF that describes the model.
+      private: std::vector<std::string> insertions;
 
+      /// \brief List of deleted models. Each string is the name of the
+      /// deleted model.
+      private: std::vector<std::string> deletions;
+
+      /// \brief Pointer to the world.
       private: WorldPtr world;
     };
     /// \}
