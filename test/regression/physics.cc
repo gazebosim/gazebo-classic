@@ -221,6 +221,19 @@ TEST_F(PhysicsTest, SpawnDropBullet)
 }
 #endif  // HAVE_BULLET
 
+////////////////////////////////////////////////////////////////////////
+// SpawnDropCoGOffset:
+// Load a world, check that gravity points along z axis, spawn several
+// spheres of varying radii and center of gravity (cg) location.
+//  sphere1: smaller radius, centered cg
+//  sphere2: larger radius, centered cg
+//  sphere3: larger radius, lowered cg
+//  sphere4: larger radius, raised cg
+//  sphere5: larger radius, laterally offset cg
+// The bottom of each sphere is at the same height, and it is verified
+// that they hit the ground at the same time. Also, sphere5 should start
+// rolling to the side when it hits the ground.
+////////////////////////////////////////////////////////////////////////
 void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
 {
   // load an empty world
@@ -276,6 +289,8 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   math::Vector3 vel1, vel2;
 
   double t, x0 = 0, radius;
+  // This loop steps the world forward and makes sure that each model falls,
+  // expecting downward z velocity and decreasing z position.
   for (std::list<std::string>::iterator iter = model_names.begin();
     iter != model_names.end(); ++iter)
   {
@@ -327,14 +342,19 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
     }
   }
 
-  // Wait until they've all hit the ground plane
-  double tHit = sqrt(2*z0 / (-g.z));
+  // Predict time of contact with ground plane.
+  double tHit = sqrt(2*(z0-0.5) / (-g.z));
   // Time to advance, allow 0.5 s settling time.
+  // This assumes inelastic collisions with the ground.
   double dtHit = tHit+0.5 - world->GetSimTime().Double();
   steps = ceil(dtHit / dt);
   EXPECT_GT(steps, 0);
   world->StepWorld(steps);
 
+  // This loop checks the velocity and pose of each model 0.5 seconds
+  // after the time of predicted ground contact. Except for sphere5,
+  // the velocity is expected to be small, and the pose is expected
+  // to be underneath the initial pose. sphere5 is expected to be rolling.
   for (std::list<std::string>::iterator iter = model_names.begin();
     iter != model_names.end(); ++iter)
   {
