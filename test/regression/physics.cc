@@ -154,9 +154,10 @@ void PhysicsTest::SpawnDrop(const std::string &_worldFile)
     }
   }
 
-  // Wait until they've all hit the ground plane
+  // Predict time of contact with ground plane.
   double tHit = sqrt(2*(z0-0.5) / (-g.z));
   // Time to advance, allow 0.5 s settling time.
+  // This assumes inelastic collisions with the ground.
   double dtHit = tHit+0.5 - world->GetSimTime().Double();
   steps = ceil(dtHit / dt);
   EXPECT_GT(steps, 0);
