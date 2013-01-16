@@ -23,11 +23,16 @@
 using namespace gazebo;
 class PhysicsTest : public ServerFixture
 {
-  public: void EmptyWorld(std::string _worldFile);
-  public: void SpawnDrop(std::string _worldFile);
+  public: void EmptyWorld(const std::string &_worldFile);
+  public: void SpawnDrop(const std::string &_worldFile);
 };
 
-void PhysicsTest::EmptyWorld(std::string _worldFile)
+////////////////////////////////////////////////////////////////////////
+// EmptyWorld:
+// Load a world, take a few steps, and verify that time is increasing.
+// This is the most basic physics engine test.
+////////////////////////////////////////////////////////////////////////
+void PhysicsTest::EmptyWorld(const std::string &_worldFile)
 {
   // Load an empty world
   Load(_worldFile, true);
@@ -61,7 +66,13 @@ TEST_F(PhysicsTest, EmptyWorldBullet)
 }
 #endif  // HAVE_BULLET
 
-void PhysicsTest::SpawnDrop(std::string _worldFile)
+////////////////////////////////////////////////////////////////////////
+// SpawnDrop:
+// Load a world, check that gravity points along z axis, spawn simple
+// shapes (box, sphere, cylinder), verify that they fall and hit the
+// ground plane. The test currently assumes inelastic collisions.
+////////////////////////////////////////////////////////////////////////
+void PhysicsTest::SpawnDrop(const std::string &_worldFile)
 {
   // load an empty world
   Load(_worldFile, true);
@@ -75,7 +86,7 @@ void PhysicsTest::SpawnDrop(std::string _worldFile)
   // Assume gravity vector points down z axis only.
   EXPECT_EQ(g.x, 0);
   EXPECT_EQ(g.y, 0);
-  EXPECT_LT(g.z, 0);
+  EXPECT_LE(g.z, -9.8);
 
   // get physics time step
   double dt = physics->GetStepTime();
@@ -99,6 +110,8 @@ void PhysicsTest::SpawnDrop(std::string _worldFile)
   math::Vector3 vel1, vel2;
 
   double t, x0 = 0;
+  // This loop steps the world forward and makes sure that each model falls,
+  // expecting downward z velocity and decreasing z position.
   for (std::list<std::string>::iterator iter = model_names.begin();
     iter != model_names.end(); ++iter)
   {
@@ -149,6 +162,9 @@ void PhysicsTest::SpawnDrop(std::string _worldFile)
   EXPECT_GT(steps, 0);
   world->StepWorld(steps);
 
+  // This loop checks the velocity and pose of each model 0.5 seconds
+  // after the time of predicted ground contact. The velocity is expected
+  // to be small, and the pose is expected to be underneath the initial pose.
   for (std::list<std::string>::iterator iter = model_names.begin();
     iter != model_names.end(); ++iter)
   {

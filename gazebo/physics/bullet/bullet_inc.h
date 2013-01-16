@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef BULLET_INC_H_
-#define BULLET_INC_H_
+#ifndef _BULLET_INC_H_
+#define _BULLET_INC_H_
 
 // This disables warning messages for ODE
 #pragma GCC system_header
