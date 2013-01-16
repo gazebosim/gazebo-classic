@@ -23,12 +23,12 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "physics/PhysicsEngine.hh"
-#include "physics/Collision.hh"
-#include "physics/Shape.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Shape.hh"
 
-#include "physics/rtql8/rtql8_inc.h"
-#include "physics/rtql8/RTQL8Types.hh"
+#include "gazebo/physics/rtql8/rtql8_inc.h"
+#include "gazebo/physics/rtql8/RTQL8Types.hh"
 
 namespace gazebo
 {
@@ -76,7 +76,7 @@ namespace gazebo
       /// \brief Get the simulation step time
       public: virtual double GetStepTime();
 
-      /// \brief Create a new model (js: in test)
+      /// \brief Create a new model
       public: virtual ModelPtr CreateModel(BasePtr _parent);
       
       /// \brief Create a new body
@@ -104,7 +104,7 @@ namespace gazebo
       //private: double stepTimeDouble;
       
       /// \brief 
-      private: simulation::World* rtql8World;
+      private: rtql8::simulation::World* rtql8World;
       
     };
 

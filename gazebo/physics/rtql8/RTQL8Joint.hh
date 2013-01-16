@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The ODE base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 12 Oct 2009
- */
 
 #ifndef _RTQL8JOINT_HH_
 #define _RTQL8JOINT_HH_
@@ -87,8 +83,10 @@ namespace gazebo
                                         const boost::any &_value);
 
       /// \brief
-      protected: kinematics::Joint* rtql8Joint;
+      protected: rtql8::kinematics::Joint* rtql8Joint;
 
+      // Documentation inherited.
+      public: virtual JointWrench GetForceTorque(int _index);
     };
   }
 }

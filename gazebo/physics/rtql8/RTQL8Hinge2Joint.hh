@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #ifndef _RTQL8HINGE2JOINT_HH_
 #define _RTQL8HINGE2JOINT_HH_

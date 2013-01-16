@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 #include <boost/bind.hpp>
 
 #include "gazebo_config.h"
@@ -49,7 +50,7 @@ void RTQL8SliderJoint::Load(sdf::ElementPtr _sdf)
   SliderJoint<RTQL8Joint>::Load(_sdf);
 
   // Slider joint has only one degree of freedom.
-  kinematics::Dof* dofs = new kinematics::Dof;
+  rtql8::kinematics::Dof* dofs = new rtql8::kinematics::Dof;
 
   // TODO: Could I know the sliding axis?; x, y, z
 
@@ -108,24 +109,24 @@ void RTQL8SliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
   {
     // When rtql8's 'Joint' is destroied, it deletes all 'Transform's.
     // When 'Transform' is destroied, it deletes all 'Dof's.
-    kinematics::Dof* dofs = new kinematics::Dof;
-    kinematics::TrfmTranslateX* trans = new kinematics::TrfmTranslateX(dofs);
+    rtql8::kinematics::Dof* dofs = new rtql8::kinematics::Dof;
+    rtql8::kinematics::TrfmTranslateX* trans = new rtql8::kinematics::TrfmTranslateX(dofs);
     this->rtql8Joint->addTransform(trans);
   }
   else if (_axis == math::Vector3(1, 0, 0))
   {
     // When rtql8's 'Joint' is destroied, it deletes all 'Transform's.
     // When 'Transform' is destroied, it deletes all 'Dof's.
-    kinematics::Dof* dofs = new kinematics::Dof;
-    kinematics::TrfmTranslateY* trans = new kinematics::TrfmTranslateY(dofs);
+    rtql8::kinematics::Dof* dofs = new rtql8::kinematics::Dof;
+    rtql8::kinematics::TrfmTranslateY* trans = new rtql8::kinematics::TrfmTranslateY(dofs);
     this->rtql8Joint->addTransform(trans);
   }
   else if (_axis == math::Vector3(1, 0, 0))
   {
     // When rtql8's 'Joint' is destroied, it deletes all 'Transform's.
     // When 'Transform' is destroied, it deletes all 'Dof's.
-    kinematics::Dof* dofs = new kinematics::Dof;
-    kinematics::TrfmTranslateZ* trans = new kinematics::TrfmTranslateZ(dofs);
+    rtql8::kinematics::Dof* dofs = new rtql8::kinematics::Dof;
+    rtql8::kinematics::TrfmTranslateZ* trans = new rtql8::kinematics::TrfmTranslateZ(dofs);
     this->rtql8Joint->addTransform(trans);
   }
   else

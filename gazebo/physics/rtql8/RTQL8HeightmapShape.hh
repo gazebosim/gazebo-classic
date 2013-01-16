@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: ODE Heightmap shape
- * Author: Nate Koenig
- * Date: 12 Nov 2009
- */
 
 #ifndef _RTQL8HEIGHTMAPSHAPE_HH_
 #define _RTQL8HEIGHTMAPSHAPE_HH_

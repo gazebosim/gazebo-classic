@@ -17,11 +17,16 @@
 
 #include <boost/bind.hpp>
 
-#include "gazebo_config.h"
-#include "common/Console.hh"
+#include "gazebo/gazebo_config.h"
 
-#include "physics/Link.hh"
-#include "physics/rtql8/RTQL8HingeJoint.hh"
+#include "gazebo/common/Console.hh"
+
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/rtql8/RTQL8Model.hh"
+#include "gazebo/physics/rtql8/RTQL8HingeJoint.hh"
+
+#include "rtql8/kinematics/Dof.h"
+#include "rtql8/kinematics/TrfmRotateEuler.h"
 
 using namespace gazebo;
 using namespace physics;
@@ -42,9 +47,69 @@ RTQL8HingeJoint::~RTQL8HingeJoint()
 void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
 {
   HingeJoint<RTQL8Joint>::Load(_sdf);
-// 
-//   this->SetParam(dParamFMax, 0);
-//   this->SetForce(0, 0);
+
+  if (this->sdf->HasElement("axis"))
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+
+    math::Vector3 xyz = axisElem->GetValueVector3("xyz");
+    Eigen::Vector3d axisHinge(xyz.x, xyz.y, xyz.z);
+
+    rtql8::kinematics::Dof* dofHinge = new rtql8::kinematics::Dof(0);
+
+    rtql8::kinematics::TrfmRotateAxis1* rotHinge
+        = new rtql8::kinematics::TrfmRotateAxis1(axisHinge, dofHinge);
+
+    this->rtql8Joint->addTransform(rotHinge);
+
+    // Get the model associated with
+    // Add the transform to the skeletone in the model.
+    // add to model because it's variable
+//    boost::shared_dynamic_cast<RTQL8Model>(this->model)->GetSkeletonDynamics()->addTransform(rotHinge);
+    RTQL8ModelPtr rtql8Model = boost::shared_dynamic_cast<RTQL8Model>(this->model);
+    rtql8Model->GetSkeletonDynamics()->addTransform(rotHinge);
+
+    if (axisElem->HasElement("limit"))
+    {
+      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
+      dofHinge->setMin(limitElem->GetValueDouble("lower"));
+      dofHinge->setMax(limitElem->GetValueDouble("upper"));
+    }
+  }
+
+  //---- Step 3. Third pose
+  math::Pose pose;// = poseElem->GetValuePose();
+
+  if (this->sdf->HasElement("pose"))
+  {
+    sdf::ElementPtr poseElem = this->sdf->GetElement("pose");
+
+    math::Pose poseL1toJoint = poseElem->GetValuePose();
+
+    pose -= poseL1toJoint;
+  }
+
+  pose -= this->childLink->GetWorldPose();
+  pose += this->parentLink->GetWorldPose();
+
+  rtql8::kinematics::Dof* tranX = new rtql8::kinematics::Dof(pose.pos.x);
+  rtql8::kinematics::Dof* tranY = new rtql8::kinematics::Dof(pose.pos.y);
+  rtql8::kinematics::Dof* tranZ = new rtql8::kinematics::Dof(pose.pos.z);
+
+  rtql8::kinematics::TrfmTranslate* tran
+      = new rtql8::kinematics::TrfmTranslate(tranX, tranY, tranZ);
+
+  this->rtql8Joint->addTransform(tran, false);
+
+  rtql8::kinematics::Dof* rotW = new rtql8::kinematics::Dof(pose.rot.w);
+  rtql8::kinematics::Dof* rotX = new rtql8::kinematics::Dof(pose.rot.x);
+  rtql8::kinematics::Dof* rotY = new rtql8::kinematics::Dof(pose.rot.y);
+  rtql8::kinematics::Dof* rotZ = new rtql8::kinematics::Dof(pose.rot.z);
+
+  rtql8::kinematics::TrfmRotateQuat* rot
+      = new rtql8::kinematics::TrfmRotateQuat(rotW, rotX, rotY, rotZ);
+
+  this->rtql8Joint->addTransform(rot, false);
 }
 
 //////////////////////////////////////////////////
@@ -55,6 +120,9 @@ math::Vector3 RTQL8HingeJoint::GetAnchor(int /*index*/) const
 //   dJointGetHingeAnchor(this->jointId, result);
 // 
 //   return math::Vector3(result[0], result[1], result[2]);
+
+  gzerr << "Not implemented...\n";
+
   return math::Vector3(0, 0, 0);
 }
 
@@ -67,6 +135,7 @@ void RTQL8HingeJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 //     this->parentLink->SetEnabled(true);
 // 
 //   dJointSetHingeAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  gzerr << "Not implemented...\n";
 }
 
 
@@ -98,20 +167,28 @@ void RTQL8HingeJoint::SetDamping(int /*index*/, double _damping)
 }
 
 //////////////////////////////////////////////////
-void RTQL8HingeJoint::ApplyDamping()
-{
+//void RTQL8HingeJoint::ApplyDamping()
+//{
 //   double damping_force = this->damping_coefficient * this->GetVelocity(0);
 //   this->SetForce(0, damping_force);
-}
+//}
 
 //////////////////////////////////////////////////
 math::Angle RTQL8HingeJoint::GetAngleImpl(int /*index*/) const
 {
    math::Angle result;
-//   if (this->jointId)
-//     result = dJointGetHingeAngle(this->jointId);
+
+   assert(this->rtql8Joint);
+   assert(this->rtql8Joint->getNumDofs() == 1);
+
+   // Hinge joint has only one dof.
+   rtql8::kinematics::Dof* dof = this->rtql8Joint->getDof(0);
+
+   assert(dof);
+
+   result.SetFromRadian(dof->getValue());
+
    return result;
-  //return 0;
 }
 
 //////////////////////////////////////////////////
@@ -152,18 +229,18 @@ void RTQL8HingeJoint::SetForce(int /*index*/, double _torque)
 }
 
 //////////////////////////////////////////////////
-double RTQL8HingeJoint::GetParam(int _parameter) const
-{
+//double RTQL8HingeJoint::GetParam(int _parameter) const
+//{
 //   double result = dJointGetHingeParam(this->jointId, _parameter);
 // 
 //   return result;
-  return 0;
-}
+//  return 0;
+//}
 
 //////////////////////////////////////////////////
-void RTQL8HingeJoint::SetParam(int _parameter, double _value)
-{
+//void RTQL8HingeJoint::SetParam(int _parameter, double _value)
+//{
 //   ODEJoint::SetParam(_parameter, _value);
 // 
 //   dJointSetHingeParam(this->jointId, _parameter, _value);
-}
+//}

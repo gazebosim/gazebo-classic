@@ -14,21 +14,18 @@
  * limitations under the License.
  *
 */
-/* Desc: The RTQL8 base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 12 Oct 2009
- */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
-#include "physics/World.hh"
-#include "physics/Link.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/rtql8/RTQL8Link.hh"
-#include "physics/rtql8/RTQL8Joint.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/rtql8/RTQL8Link.hh"
+#include "gazebo/physics/rtql8/RTQL8Joint.hh"
 //#include "physics/ScrewJoint.hh"
 
+#include "rtql8/kinematics/Dof.h"
 #include "rtql8/kinematics/Joint.h"
 
 using namespace gazebo;
@@ -58,19 +55,49 @@ void RTQL8Joint::Load(sdf::ElementPtr _sdf)
    // In case this joint is already loaded, we delete rtql8 joint if it is
    // created.
    if (rtql8Joint)
+   {
      delete rtql8Joint;
+     rtql8Joint = NULL;
+   }
 
-   // In Joint::Load(sdf::ElementPtr), this joint stored the parent joint and
-   // child joint.
-   kinematics::BodyNode* parentBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
-         this->parentLink)->GetBodyNode();
-   kinematics::BodyNode* childBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
-         this->childLink)->GetBodyNode();
+   // In Joint::Load(sdf::ElementPtr), this joint stored the information of the
+   // parent joint and child joint.
+   rtql8::kinematics::BodyNode* parentBodyNode
+       = boost::shared_dynamic_cast<RTQL8Link>(this->parentLink)->GetBodyNode();
+   rtql8::kinematics::BodyNode* childBodyNode
+       = boost::shared_dynamic_cast<RTQL8Link>(this->childLink)->GetBodyNode();
 
    // In order to create rtql8 joint, we need to know this joint's parent
    // and child link so we create rtql8 joint after the joint is loaded with sdf
    // .
-   rtql8Joint = new kinematics::Joint(parentBodyNode, childBodyNode);
+   rtql8Joint = new rtql8::kinematics::Joint(parentBodyNode, childBodyNode);
+
+   // Set Pose: offset from child link origin in child link frame.
+   if (this->sdf->HasElement("pose"))
+   {
+     sdf::ElementPtr poseElem = this->sdf->GetElement("pose");
+
+     math::Pose pose = poseElem->GetValuePose();
+
+     rtql8::kinematics::Dof* tranX = new rtql8::kinematics::Dof(pose.pos.x);
+     rtql8::kinematics::Dof* tranY = new rtql8::kinematics::Dof(pose.pos.y);
+     rtql8::kinematics::Dof* tranZ = new rtql8::kinematics::Dof(pose.pos.z);
+
+     rtql8::kinematics::TrfmTranslate* tran
+         = new rtql8::kinematics::TrfmTranslate(tranX, tranY, tranZ);
+
+     this->rtql8Joint->addTransform(tran, false);
+
+     rtql8::kinematics::Dof* rotW = new rtql8::kinematics::Dof(pose.rot.w);
+     rtql8::kinematics::Dof* rotX = new rtql8::kinematics::Dof(pose.rot.x);
+     rtql8::kinematics::Dof* rotY = new rtql8::kinematics::Dof(pose.rot.y);
+     rtql8::kinematics::Dof* rotZ = new rtql8::kinematics::Dof(pose.rot.z);
+
+     rtql8::kinematics::TrfmRotateQuat* rot
+         = new rtql8::kinematics::TrfmRotateQuat(rotW, rotX, rotY, rotZ);
+
+     this->rtql8Joint->addTransform(rot, false);
+   }
 }
 
 //////////////////////////////////////////////////
@@ -132,15 +159,18 @@ void RTQL8Joint::Attach(LinkPtr _parent, LinkPtr _child)
 
    // TODO: RTQL8's joint can't change their links connected.
    // For now, recreating the joint is the only way.
-   if (this->rtql8Joint)
-     delete this->rtql8Joint;
 
-   kinematics::BodyNode* parentBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
-         this->parentLink)->GetBodyNode();
-   kinematics::BodyNode* childBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
-         this->childLink)->GetBodyNode();
+   // TODO: We need to add the functionality, attach/detaach, into rtql8's joint
+   // class.
+//   if (this->rtql8Joint)
+//     delete this->rtql8Joint;
 
-   this->rtql8Joint = new kinematics::Joint(parentBodyNode, childBodyNode);
+//   rtql8::kinematics::BodyNode* parentBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
+//         this->parentLink)->GetBodyNode();
+//   rtql8::kinematics::BodyNode* childBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
+//         this->childLink)->GetBodyNode();
+
+//   this->rtql8Joint = new rtql8::kinematics::Joint(parentBodyNode, childBodyNode);
 }
 
 //////////////////////////////////////////////////
@@ -151,15 +181,15 @@ void RTQL8Joint::Detach()
 
   // TODO: RTQL8's joint can't change their links connected.
   // For now, recreating the joint is the only way.
-  if (this->rtql8Joint)
-    delete this->rtql8Joint;
+//  if (this->rtql8Joint)
+//    delete this->rtql8Joint;
 
 //  kinematics::BodyNode* parentBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
 //        this->parentLink)->GetBodyNode();
 //  kinematics::BodyNode* childBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
 //        this->childLink)->GetBodyNode();
 
-  this->rtql8Joint = new kinematics::Joint(NULL, NULL);
+//  this->rtql8Joint = new rtql8::kinematics::Joint(NULL, NULL);
 }
 
 //////////////////////////////////////////////////
@@ -466,4 +496,74 @@ void RTQL8Joint::SetAttribute(const std::string &_key, int /*_index*/,
 //       gzerr << "boost any_cast error:" << e.what() << "\n";
 //     }
 //   }
+}
+
+JointWrench RTQL8Joint::GetForceTorque(int _index)
+{
+  JointWrench wrench;
+//  // Note that:
+//  // f2, t2 are the force torque measured on parent body's cg
+//  // f1, t1 are the force torque measured on child body's cg
+//  dJointFeedback* fb = this->GetFeedback();
+//  if (fb)
+//  {
+//    wrench.body1Force.Set(fb->f1[0], fb->f1[1], fb->f1[2]);
+//    wrench.body1Torque.Set(fb->t1[0], fb->t1[1], fb->t1[2]);
+//    wrench.body2Force.Set(fb->f2[0], fb->f2[1], fb->f2[2]);
+//    wrench.body2Torque.Set(fb->t2[0], fb->t2[1], fb->t2[2]);
+
+//    if (this->childLink)
+//    {
+//      // convert torque from about child CG to joint anchor location
+//      // cg position specified in child link frame
+//      math::Vector3 cgPos = this->childLink->GetInertial()->GetPose().pos;
+//      // moment arm rotated into world frame (given feedback is in world frame)
+//      math::Vector3 childMomentArm =
+//        this->childLink->GetWorldPose().rot.RotateVector(
+//        this->anchorPos - cgPos);
+
+//      // gzerr << "anchor [" << anchorPos
+//      //       << "] iarm[" << this->childLink->GetInertial()->GetPose().pos
+//      //       << "] childMomentArm[" << childMomentArm
+//      //       << "] f1[" << wrench.body1Force
+//      //       << "] t1[" << wrench.body1Torque
+//      //       << "] fxp[" << wrench.body1Force.Cross(childMomentArm)
+//      //       << "]\n";
+
+//      wrench.body1Torque += wrench.body1Force.Cross(childMomentArm);
+//    }
+
+//    // convert torque from about parent CG to joint anchor location
+//    if (this->parentLink)
+//    {
+//      // parent cg specified in child link frame
+//      math::Vector3 cgPos = ((this->parentLink->GetInertial()->GetPose() +
+//                            this->parentLink->GetWorldPose()) -
+//                            this->childLink->GetWorldPose()).pos;
+
+//      // rotate moement arms into world frame
+//      math::Vector3 parentMomentArm =
+//        this->childLink->GetWorldPose().rot.RotateVector(
+//        this->anchorPos - cgPos);
+
+//      wrench.body2Torque -= wrench.body2Force.Cross(parentMomentArm);
+
+//      // A good check is that
+//      // the computed body2Torque shoud in fact be opposite of body1Torque
+//    }
+//    else
+//    {
+//      // convert torque from about child CG to joint anchor location
+//      // or simply use equal opposite force as body1 wrench
+//      wrench.body2Force = -wrench.body1Force;
+//      wrench.body2Torque = -wrench.body1Torque;
+//    }
+//  }
+//  else
+//  {
+//    // forgot to set provide_feedback?
+//    gzwarn << "GetForceTorque: forget to set <provide_feedback>?\n";
+//  }
+
+  return wrench;
 }

@@ -1,10 +1,27 @@
+/*
+ * Copyright 2012 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
 #ifndef _RTQL8LINK_HH_
 #define _RTQL8LINK_HH_
 
-#include "physics/Link.hh"
+#include "gazebo/physics/Link.hh"
 
-#include "physics/rtql8/rtql8_inc.h"
-#include "physics/rtql8/RTQL8Types.hh"
+#include "gazebo/physics/rtql8/rtql8_inc.h"
+#include "gazebo/physics/rtql8/RTQL8Types.hh"
 
 namespace gazebo
 {
@@ -24,7 +41,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~RTQL8Link();
 
-      /// \brief Load the body based on an common::XMLConfig node
+      // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _ptr);
 
       /// \brief Initialize the body
@@ -121,10 +138,10 @@ namespace gazebo
       public: virtual void SetAutoDisable(bool _disable);
 
       /// \brief
-      public: kinematics::BodyNode* GetBodyNode() const {return rtql8BodyNode;}
+      public: rtql8::kinematics::BodyNode* GetBodyNode() const {return rtql8BodyNode;}
 
       /// \brief
-      private: kinematics::BodyNode* rtql8BodyNode;
+      private: rtql8::kinematics::BodyNode* rtql8BodyNode;
 	  
       /// \brief
       private: RTQL8PhysicsPtr rtql8Physics;

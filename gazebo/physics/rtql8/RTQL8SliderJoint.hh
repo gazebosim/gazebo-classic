@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A slider or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #ifndef _RTQL8SLIDERJOINT_HH_
 #define _RTQL8SLIDERJOINT_HH_

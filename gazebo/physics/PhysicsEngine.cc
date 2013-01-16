@@ -31,6 +31,7 @@
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/physics/ContactManager.hh"
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -138,6 +139,14 @@ double PhysicsEngine::GetUpdatePeriod()
     return 1.0/this->updateRateDouble;
   else
     return 0;
+}
+
+//////////////////////////////////////////////////
+ModelPtr PhysicsEngine::CreateModel(BasePtr _parent)
+{
+  ModelPtr model(new Model(_parent));
+
+  return model;
 }
 
 //////////////////////////////////////////////////

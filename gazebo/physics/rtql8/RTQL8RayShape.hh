@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray
- * Author: Nate Koenig, Andrew Howard
- * Date: 14 Oct 2009
- */
 
 #ifndef _RTQL8RAYSHAPE_HH_
 #define _RTQL8RAYSHAPE_HH_
