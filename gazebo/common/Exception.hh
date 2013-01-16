@@ -86,6 +86,45 @@ namespace gazebo
                 return _out << _err.GetErrorStr();
               }
     };
+
+    /// \class InternalError Exception.hh common/common.hh
+    /// \brief Class for generating Internal Gazebo Errors:
+    ///        those errors which should never happend and
+    ///        represent programming bugs.
+    class InternalError : public Exception
+    {
+      /// \brief Constructor
+      public: InternalError();
+
+      /// \brief Default constructor
+      /// \param[in] _file File name
+      /// \param[in] _line Line number where the error occurred
+      /// \param[in] _msg Error message
+      public: InternalError(const char *_file,
+                            int _line,
+                            const std::string _msg);
+
+      /// \brief Destructor
+      public: virtual ~InternalError();
+    };
+
+
+    class AssertionInternalError : public InternalError
+    {
+      /// \brief Constructor for assertions
+      /// \param[in] _file File name
+      /// \param[in] _line Line number where the error occurred
+      /// \param[in] _expr Assertion expression failed resulting in an internal error
+      /// \param[in] _function Function where assertion failed
+      /// \param[in] _msg Function where assertion failed
+      public: AssertionInternalError(const char *_file,
+                                     int _line,
+                                     const std::string _expr,
+                                     const std::string _function,
+                                     const std::string _msg = "");
+      /// \brief Destructor
+      public: virtual ~AssertionInternalError();
+    };
     /// \}
   }
 }
