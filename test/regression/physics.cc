@@ -25,8 +25,8 @@ class PhysicsTest : public ServerFixture
 {
   public: void EmptyWorld(const std::string &_worldFile);
   public: void SpawnDrop(const std::string &_worldFile);
-  public: void SpawnDropCoGOffset(std::string _worldFile);
-  public: void SimplePendulum(std::string _worldFile);
+  public: void SpawnDropCoGOffset(const std::string &_worldFile);
+  public: void SimplePendulum(const std::string &_worldFile);
 };
 
 #ifdef HAVE_BULLET
@@ -221,7 +221,7 @@ TEST_F(PhysicsTest, SpawnDropBullet)
 }
 #endif  // HAVE_BULLET
 
-void PhysicsTest::SpawnDropCoGOffset(std::string _worldFile)
+void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
 {
   // load an empty world
   Load(_worldFile, true);
@@ -741,7 +741,7 @@ TEST_F(PhysicsTest, SimplePendulumBullet)
 }
 #endif  // HAVE_BULLET
 
-void PhysicsTest::SimplePendulum(std::string _worldFile)
+void PhysicsTest::SimplePendulum(const std::string &_worldFile)
 {
   Load(_worldFile, true);
   physics::WorldPtr world = physics::get_world("default");
