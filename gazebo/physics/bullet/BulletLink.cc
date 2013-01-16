@@ -63,11 +63,11 @@ void BulletLink::Init()
 {
   Link::Init();
 
-  btScalar btMass = this->inertial->GetMass();
+  btScalar mass = this->inertial->GetMass();
   // The bullet dynamics solver checks for zero mass to identify static and
   // kinematic bodies.
   if (this->IsStatic() || this->GetKinematic())
-    btMass = 0;
+    mass = 0;
   btVector3 fallInertia(0, 0, 0);
   math::Vector3 cogVec = this->inertial->GetCoG();
 
@@ -94,13 +94,13 @@ void BulletLink::Init()
     }
   }
 
-  // this->compoundShape->calculateLocalInertia(btMass, fallInertia);
+  // this->compoundShape->calculateLocalInertia(mass, fallInertia);
   fallInertia = BulletTypes::ConvertVector3(
     this->inertial->GetPrincipalMoments());
 
   // Create a construction info object
   btRigidBody::btRigidBodyConstructionInfo
-    rigidLinkCI(btMass, this->motionState.get(), this->compoundShape,
+    rigidLinkCI(mass, this->motionState.get(), this->compoundShape,
     fallInertia);
 
   rigidLinkCI.m_linearDamping = this->GetLinearDamping();
@@ -118,7 +118,7 @@ void BulletLink::Init()
   // math::Vector3 size = this->GetBoundingBox().GetSize();
   // this->rigidLink->setCcdSweptSphereRadius(size.GetMax()*0.8);
 
-  if (btMass <= 0.0)
+  if (mass <= 0.0)
     this->rigidLink->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
 
   btDynamicsWorld *wd = this->bulletPhysics->GetDynamicsWorld();
@@ -262,9 +262,9 @@ math::Vector3 BulletLink::GetWorldLinearVel() const
   if (!this->rigidLink)
     return math::Vector3(0, 0, 0);
 
-  btVector3 btVec = this->rigidLink->getLinearVelocity();
+  btVector3 vel = this->rigidLink->getLinearVelocity();
 
-  return math::Vector3(btVec.getX(), btVec.getY(), btVec.getZ());
+  return math::Vector3(vel.x(), vel.y(), vel.z());
 }
 
 //////////////////////////////////////////////////
@@ -282,9 +282,9 @@ math::Vector3 BulletLink::GetWorldAngularVel() const
   if (!this->rigidLink)
     return math::Vector3(0, 0, 0);
 
-  btVector3 btVec = this->rigidLink->getAngularVelocity();
+  btVector3 vel = this->rigidLink->getAngularVelocity();
 
-  return math::Vector3(btVec.x(), btVec.y(), btVec.z());
+  return math::Vector3(vel.x(), vel.y(), vel.z());
 }
 
 //////////////////////////////////////////////////
