@@ -31,7 +31,7 @@ ConnectionManager::ConnectionManager()
   this->tmpIndex = 0;
   this->initialized = false;
   this->stop = false;
-  this->stopped = false;
+  this->stopped = true;
 
   this->serverConn = NULL;
   this->listMutex = new boost::recursive_mutex();
