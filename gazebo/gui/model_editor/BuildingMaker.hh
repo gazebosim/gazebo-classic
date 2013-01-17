@@ -36,10 +36,9 @@ namespace gazebo
   namespace gui
   {
     class EntityMaker;
-
     class EditorItem;
-
     class ModelManip;
+    class FinishModelDialog;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -297,6 +296,16 @@ namespace gazebo
 
       /// \brief A list of gui editor events connected to the building maker.
       private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Default name of building model
+      private: std::string buildingDefaultName;
+
+      /// \brief A dialog for setting building model name and save location.
+      private: FinishModelDialog *saveDialog;
+
+      /// \brief A dialog that prompts to confirm model completion and uploading
+      /// to the server
+      private: FinishModelDialog *finishDialog;
     };
     /// \}
   }

@@ -27,7 +27,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 {
   this->setObjectName("buildingEditorPalette");
 
-  this->modelName = "MyNamedModel";
+  this->modelName = "BuildingDefaultName";
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
@@ -52,7 +52,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QLabel *drawWallsLabel = new QLabel;
   drawWallsLabel->setText("Draw Walls");
   QPushButton *addDrawWallButton = new QPushButton;
-  addDrawWallButton->setIcon(QIcon(":/images/Wall.png"));
+  addDrawWallButton->setIcon(QIcon(":/images/wall.png"));
   addDrawWallButton->setIconSize(QSize(30, 60));
   addDrawWallButton->setFlat(true);
   connect(addDrawWallButton, SIGNAL(clicked()), this, SLOT(OnDrawWall()));
@@ -88,7 +88,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QLabel *addWindowLabel = new QLabel;
   addWindowLabel->setText("Add Window");
   QPushButton *addWindowButton = new QPushButton;
-  addWindowButton->setIcon(QIcon(":/images/Window.png"));
+  addWindowButton->setIcon(QIcon(":/images/window.png"));
   addWindowButton->setIconSize(QSize(30, 60));
   addWindowButton->setFlat(true);
   connect(addWindowButton, SIGNAL(clicked()), this, SLOT(OnAddWindow()));
@@ -105,7 +105,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QLabel *addDoorLabel = new QLabel;
   addDoorLabel->setText("Add Doorway");
   QPushButton *addDoorButton = new QPushButton;
-  addDoorButton->setIcon(QIcon(":/images/Door.png"));
+  addDoorButton->setIcon(QIcon(":/images/door.png"));
   addDoorButton->setIconSize(QSize(30, 60));
   addDoorButton->setFlat(true);
   connect(addDoorButton, SIGNAL(clicked()), this, SLOT(OnAddDoor()));
@@ -129,7 +129,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QLabel *addStairsLabel = new QLabel;
   addStairsLabel->setText("Add Stairs");
   QPushButton *addStairsButton = new QPushButton;
-  addStairsButton->setIcon(QIcon(":/images/Stairs.png"));
+  addStairsButton->setIcon(QIcon(":/images/stairs.png"));
   addStairsButton->setIconSize(QSize(30, 60));
   addStairsButton->setFlat(true);
   connect(addStairsButton, SIGNAL(clicked()), this, SLOT(OnAddStairs()));
@@ -200,14 +200,12 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 
 
   this->connections.push_back(
-      gui::editor::Events::ConnectSaveModel(
+      gui::editor::Events::ConnectSaveBuildingModel(
       boost::bind(&BuildingEditorPalette::OnSaveModel, this, _1, _2)));
 
   this->connections.push_back(
-      gui::editor::Events::ConnectSaveModel(
+      gui::editor::Events::ConnectDiscardBuildingModel(
       boost::bind(&BuildingEditorPalette::OnDiscardModel, this)));
-
-//  this->layout()->setContentsMargins(0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
@@ -218,51 +216,44 @@ BuildingEditorPalette::~BuildingEditorPalette()
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnDrawWall()
 {
-  gui::editor::Events::createEditorItem("Wall");
+  gui::editor::Events::createBuildingEditorItem("wall");
 }
-
-/////////////////////////////////////////////////
-/*void BuildingEditorPalette::OnImportImage()
-{
-//  gui::editor::Events::createEditorItem("Image");
-}*/
-
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddWindow()
 {
-  gui::editor::Events::createEditorItem("Window");
+  gui::editor::Events::createBuildingEditorItem("window");
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddDoor()
 {
-  gui::editor::Events::createEditorItem("Door");
+  gui::editor::Events::createBuildingEditorItem("door");
 }
 
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddStairs()
 {
-  gui::editor::Events::createEditorItem("Stairs");
+  gui::editor::Events::createBuildingEditorItem("stairs");
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnDiscard()
 {
-  gui::editor::Events::discard();
+  gui::editor::Events::discardBuildingEditor();
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnSave()
 {
-  gui::editor::Events::save();
+  gui::editor::Events::saveBuildingEditor();
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnDone()
 {
-  gui::editor::Events::done();
+  gui::editor::Events::doneBuildingEditor();
 }
 
 /////////////////////////////////////////////////
@@ -273,8 +264,8 @@ void BuildingEditorPalette::OnDiscardModel()
 }
 
 /////////////////////////////////////////////////
-void BuildingEditorPalette::OnSaveModel(std::string _saveName,
-    std::string /*_saveLocation*/)
+void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
+    const std::string &/*_saveLocation*/)
 {
   this->saveButton->setText("Save");
   this->modelNameLabel->setText(tr(_saveName.c_str()));

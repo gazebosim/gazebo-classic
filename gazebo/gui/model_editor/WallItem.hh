@@ -27,13 +27,9 @@ namespace gazebo
   namespace gui
   {
     class PolylineItem;
-
     class GrabberHandle;
-
     class LineSegmentItem;
-
     class BuildingItem;
-
     class WallInspectorDialog;
 
     /// \addtogroup gazebo_gui

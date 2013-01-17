@@ -39,7 +39,7 @@ MeshCSG::~MeshCSG()
 }
 
 //////////////////////////////////////////////////
-static void MergeVertices(GPtrArray * _vertices, double _epsilon)
+void MeshCSG::MergeVertices(GPtrArray * _vertices, double _epsilon)
 {
   GPtrArray *array;
   GNode *kdtree;
@@ -50,13 +50,16 @@ static void MergeVertices(GPtrArray * _vertices, double _epsilon)
   kdtree = gts_kdtree_new(array, NULL);
   g_ptr_array_free(array, true);
 
+  // for each vertex, do a bbox kdtree search to find nearby vertices within
+  // _epsilon, merge vertices if they are within the bbox
   for (unsigned int i = 0; i < _vertices->len; i++)
   {
     GtsVertex *v = reinterpret_cast<GtsVertex *>(verticesData[i]);
 
+    // make sure vertex v is active (because they could be marked inactive
+    // due to previous merge operation)
     if (!GTS_OBJECT (v)->reserved)
     {
-      // Do something only if v is active
       GtsBBox *bbox;
       GSList *selected, *j;
 
@@ -75,7 +78,7 @@ static void MergeVertices(GPtrArray * _vertices, double _epsilon)
       while (j)
       {
         GtsVertex *sv = reinterpret_cast<GtsVertex *>(j->data);
-        // mark sv as inactive
+        // mark sv as inactive (merged)
         if (sv != v && !GTS_OBJECT(sv)->reserved)
           GTS_OBJECT(sv)->reserved = v;
         j = j->next;
@@ -88,10 +91,8 @@ static void MergeVertices(GPtrArray * _vertices, double _epsilon)
   gts_kdtree_destroy(kdtree);
 
   // destroy inactive vertices
-
   // we want to control vertex destruction
   gts_allow_floating_vertices = true;
-
   for (unsigned int i = 0; i < _vertices->len; ++i)
   {
     GtsVertex * v = reinterpret_cast<GtsVertex *>(verticesData[i]);
@@ -109,9 +110,12 @@ static void MergeVertices(GPtrArray * _vertices, double _epsilon)
 //////////////////////////////////////////////////
 static void FillVertex(GtsPoint *_p, gpointer *_data)
 {
+  // create a Gazebo vertex from GTS_POINT and add it to the submesh
   SubMesh *subMesh = reinterpret_cast<SubMesh *>(_data[0]);
   GHashTable* vIndex = reinterpret_cast<GHashTable *>(_data[2]);
   subMesh->AddVertex(GTS_POINT(_p)->x, GTS_POINT(_p)->y, GTS_POINT(_p)->z);
+  // fill the hash table which will later be used for adding indices to the
+  // submesh in the FillFace function.
   g_hash_table_insert(vIndex, _p,
       GUINT_TO_POINTER((*(reinterpret_cast<guint *>(_data[1])))++));
 }
@@ -123,7 +127,6 @@ static void FillFace(GtsTriangle *_t, gpointer *_data)
   GHashTable* vIndex = reinterpret_cast<GHashTable *>(_data[2]);
 
   GtsVertex * v1, * v2, * v3;
-//  GtsVector n;
   gts_triangle_vertices(_t, &v1, &v2, &v3);
 
   subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v1)));
@@ -133,15 +136,15 @@ static void FillFace(GtsTriangle *_t, gpointer *_data)
 
 //////////////////////////////////////////////////
 Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
-    math::Pose _offset)
+    const math::Pose &_offset)
 {
   GtsSurface *s1, *s2, *s3;
   GtsSurfaceInter *si;
   GNode *tree1, *tree2;
 
   gboolean closed = true;
-  bool is_open1 = false;
-  bool is_open2 = false;
+  bool isOpen1 = false;
+  bool isOpen2 = false;
 
   s1 = gts_surface_new(gts_surface_class(), gts_face_class(), gts_edge_class(),
       gts_vertex_class());
@@ -182,14 +185,14 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
 
   // build bounding box tree for first surface
   tree1 = gts_bb_tree_surface(s1);
-  is_open1 = gts_surface_volume(s1) < 0. ? true : false;
+  isOpen1 = gts_surface_volume(s1) < 0. ? true : false;
 
   // build bounding box tree for second surface
   tree2 = gts_bb_tree_surface(s2);
-  is_open2 = gts_surface_volume(s2) < 0. ? true : false;
+  isOpen2 = gts_surface_volume(s2) < 0. ? true : false;
 
   si = gts_surface_inter_new(gts_surface_inter_class(), s1, s2, tree1, tree2,
-      is_open1, is_open2);
+      isOpen1, isOpen2);
   assert(gts_surface_inter_check(si, &closed));
   if (!closed)
   {
@@ -289,7 +292,7 @@ void MeshCSG::ConvertMeshToGTS(const Mesh *_mesh, GtsSurface *_surface)
     }
 
     // merge duplicate vertices, otherwise gts produces undesirable results
-    MergeVertices(vertices, 0.01);
+    this->MergeVertices(vertices, 0.01);
 
     GtsVertex **verticesData =
         reinterpret_cast<GtsVertex **>(vertices->pdata);

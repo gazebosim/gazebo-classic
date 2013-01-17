@@ -74,17 +74,23 @@ double BuildingMaker::conversionScale;
   this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
 
   this->connections.push_back(
-  gui::editor::Events::ConnectSave(
+  gui::editor::Events::ConnectSaveBuildingEditor(
     boost::bind(&BuildingMaker::OnSave, this)));
   this->connections.push_back(
-  gui::editor::Events::ConnectDiscard(
+  gui::editor::Events::ConnectDiscardBuildingEditor(
     boost::bind(&BuildingMaker::OnDiscard, this)));
   this->connections.push_back(
-  gui::editor::Events::ConnectDone(
+  gui::editor::Events::ConnectDoneBuildingEditor(
     boost::bind(&BuildingMaker::OnDone, this)));
   this->connections.push_back(
-  gui::editor::Events::ConnectExit(
+  gui::editor::Events::ConnectExitBuildingEditor(
     boost::bind(&BuildingMaker::OnExit, this)));
+
+  this->buildingDefaultName = "BuildingDefaultName";
+
+  this->saveDialog = new FinishModelDialog(FinishModelDialog::MODEL_SAVE, 0);
+  this->finishDialog =
+      new FinishModelDialog(FinishModelDialog::MODEL_FINISH, 0);
 
   this->Reset();
 }
@@ -93,6 +99,10 @@ double BuildingMaker::conversionScale;
 BuildingMaker::~BuildingMaker()
 {
 //  this->camera.reset();
+  if (this->saveDialog)
+    delete this->saveDialog;
+  if (this->finishDialog)
+    delete this->finishDialog;
 }
 
 /////////////////////////////////////////////////
@@ -332,7 +342,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   baseStepVisual->SetPosition(baseOffset);
 
 
-  for ( int i = 1; i < _steps; ++i)
+  for (int i = 1; i < _steps; ++i)
   {
     visualStepName.str("");
     visualStepName << visualName.str() << "step" << i;
@@ -436,7 +446,7 @@ void BuildingMaker::Reset()
     scene->RemoveVisual(this->modelVisual);
   this->saved = false;
   this->saveLocation = QDir::homePath().toStdString();
-  this->modelName = "MyNamedModel";
+  this->modelName = this->buildingDefaultName;
   this->modelVisual.reset(new rendering::Visual(this->modelName,
       scene->GetWorldVisual()));
   this->modelVisual->Load();
@@ -485,6 +495,15 @@ void BuildingMaker::FinishModel()
 /////////////////////////////////////////////////
 void BuildingMaker::GenerateSDF()
 {
+  // This function generates an SDF file for the final building model (which
+  // will eventually be uploaded to the server). It loops through all the model
+  // manip objects (allItems), grabs pose and size data of each model manip, and
+  // creates a link element consisting of a visual and a collision element with
+  // the same geometry. If the model manip has attached objects, e.g. a wall
+  // with windows/doors and a floor with stairs, it creates holes in the
+  // surface of the parent by using a rectangular surface subdivision algorithm.
+  // TODO Refactor code
+
   sdf::ElementPtr modelElem;
   sdf::ElementPtr linkElem;
   sdf::ElementPtr visualElem;
@@ -508,6 +527,8 @@ void BuildingMaker::GenerateSDF()
   modelElem->GetAttribute("name")->Set(this->modelName);
 
   std::map<std::string, ModelManip *>::iterator itemsIt;
+
+  // loop through all model manips
   for (itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
       itemsIt++)
   {
@@ -543,6 +564,7 @@ void BuildingMaker::GenerateSDF()
         collisionElem->GetElement("geometry")->GetElement("box")->
             GetElement("size")->Set(visual->GetScale());
       }
+      // check if walls have attached children, i.e. windows or doors
       else if (name.find("Wall") != std::string::npos)
       {
         if (modelManip->GetAttachedManipCount() != 0 )
@@ -576,12 +598,15 @@ void BuildingMaker::GenerateSDF()
           std::vector<QRectF> subdivisions;
           QRectF surface(0, 0, wallVis->GetScale().x, wallVis->GetScale().z);
 
+          // subdivide the wall into mutiple compositing rectangles in order
+          // to create holes for the attached children
           this->SubdivideRectSurface(surface, holes, subdivisions);
 
           newLinkElem->ClearElements();
           newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
           newLinkElem->GetElement("pose")->Set(
               visual->GetParent()->GetWorldPose());
+          // create a link element of box geom for each subdivision
           for (unsigned int i = 0; i< subdivisions.size(); ++i)
           {
             visualNameStream.str("");
@@ -626,6 +651,7 @@ void BuildingMaker::GenerateSDF()
               GetElement("size")->Set(visual->GetScale());
         }
       }
+      // check if floors have attached children, i.e. stairs
       else if (name.find("Floor") != std::string::npos)
       {
         if (modelManip->GetAttachedManipCount() != 0 )
@@ -661,12 +687,15 @@ void BuildingMaker::GenerateSDF()
           std::vector<QRectF> subdivisions;
           QRectF surface(0, 0, floorVis->GetScale().x, floorVis->GetScale().y);
 
+          // subdivide the floor into mutiple compositing rectangles to make an
+          // opening for the stairs
           this->SubdivideRectSurface(surface, holes, subdivisions);
 
           newLinkElem->ClearElements();
           newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
           newLinkElem->GetElement("pose")->Set(
               visual->GetParent()->GetWorldPose());
+          // create a link element of box geom for each subdivision
           for (unsigned int i = 0; i< subdivisions.size(); ++i)
           {
             visualNameStream.str("");
@@ -752,6 +781,13 @@ void BuildingMaker::GenerateSDF()
 void BuildingMaker::GenerateSDFWithCSG()
 {
 #ifdef HAVE_GTS
+  // This function generates an SDF file for the final building model in a
+  // similar manner to the GenerateSDF function. However instead of using a
+  // surface subdivision algorithm for making openings for attached objects,
+  // it uses boolean operations to find the difference between one mesh and
+  // the other.
+  // TODO The function is not yet integrated as custom shapes are not yet
+  // supported in Gazebo.
   sdf::ElementPtr modelElem;
   sdf::ElementPtr linkElem;
   sdf::ElementPtr visualElem;
@@ -776,7 +812,7 @@ void BuildingMaker::GenerateSDFWithCSG()
 
   std::map<std::string, ModelManip *>::iterator itemsIt;
   for (itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
-      itemsIt++)
+      ++itemsIt)
   {
     visualNameStream.str("");
     collisionNameStream.str("");
@@ -979,11 +1015,10 @@ double BuildingMaker::ConvertAngle(double _angle)
 std::string BuildingMaker::GetTemplateSDFString()
 {
   std::ostringstream newModelStr;
-  newModelStr << "<sdf version ='1.3'>"
+  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
     << "<model name='building_template_model'>"
     << "<pose>0 0 0.0 0 0 0</pose>"
     << "<link name ='link'>"
-    <<   "<pose>0 0 0.0 0 0 0</pose>"
     <<   "<collision name ='collision'>"
     <<     "<pose>0 0 0.0 0 0 0</pose>"
     <<     "<geometry>"
@@ -1237,11 +1272,9 @@ void BuildingMaker::OnDiscard()
   switch (ret)
   {
     case QMessageBox::Discard:
-      gui::editor::Events::discardModel();
-//      this->saveButton->setText("&Save As");
-      this->modelName = "MyNamedModel";
+      gui::editor::Events::discardBuildingModel();
+      this->modelName = this->buildingDefaultName;
       this->saveLocation = QDir::homePath().toStdString();
-//      this->modelNameLabel->setText(tr(this->modelName.c_str()));
       this->saved = false;
       break;
     case QMessageBox::Cancel:
@@ -1263,38 +1296,37 @@ void BuildingMaker::OnSave()
   }
   else
   {
-    FinishModelDialog dialog(FinishModelDialog::MODEL_SAVE, 0);
-    dialog.SetModelName(this->modelName);
-    dialog.SetSaveLocation(this->saveLocation);
-    if (dialog.exec() == QDialog::Accepted)
+    this->saveDialog->SetModelName(this->modelName);
+    this->saveDialog->SetSaveLocation(this->saveLocation);
+    if (this->saveDialog->exec() == QDialog::Accepted)
     {
-      this->modelName = dialog.GetModelName();
-      this->saveLocation = dialog.GetSaveLocation();
+      this->modelName = this->saveDialog->GetModelName();
+      this->saveLocation = this->saveDialog->GetSaveLocation();
       this->SetModelName(this->modelName);
       this->GenerateSDF();
       this->SaveToSDF(this->saveLocation);
       this->saved = true;
     }
   }
-  gui::editor::Events::saveModel(this->modelName, this->saveLocation);
+  gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
 }
 
 /////////////////////////////////////////////////
 void BuildingMaker::OnDone()
 {
-  FinishModelDialog dialog(FinishModelDialog::MODEL_FINISH, 0);
-  dialog.SetModelName(this->modelName);
-  dialog.SetSaveLocation(this->saveLocation);
-  if (dialog.exec() == QDialog::Accepted)
+
+  this->finishDialog->SetModelName(this->modelName);
+  this->finishDialog->SetSaveLocation(this->saveLocation);
+  if (this->finishDialog->exec() == QDialog::Accepted)
   {
-    this->modelName = dialog.GetModelName();
-    this->saveLocation = dialog.GetSaveLocation();
+    this->modelName = this->finishDialog->GetModelName();
+    this->saveLocation = this->finishDialog->GetSaveLocation();
     this->SetModelName(this->modelName);
     this->GenerateSDF();
     this->SaveToSDF(this->saveLocation);
     this->FinishModel();
-    gui::editor::Events::discardModel();
-    gui::editor::Events::finishModel();
+    gui::editor::Events::discardBuildingModel();
+    gui::editor::Events::finishBuildingModel();
   }
 }
 
@@ -1314,17 +1346,17 @@ void BuildingMaker::OnExit()
   switch (ret)
   {
     case QMessageBox::Discard:
-      gui::editor::Events::discardModel();
-      this->modelName = "MyNamedModel";
+      gui::editor::Events::discardBuildingModel();
+      this->modelName = this->buildingDefaultName;
       this->saveLocation = QDir::homePath().toStdString();
       this->saved = false;
-      gui::editor::Events::finishModel();
+      gui::editor::Events::finishBuildingModel();
       break;
     case QMessageBox::Cancel:
       break;
     case QMessageBox::Save:
       this->OnSave();
-      gui::editor::Events::finishModel();
+      gui::editor::Events::finishBuildingModel();
       break;
     default:
       break;

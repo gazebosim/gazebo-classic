@@ -16,17 +16,17 @@
  */
 #include <iomanip>
 
-#include "rendering/UserCamera.hh"
-#include "rendering/Rendering.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/Scene.hh"
 
-#include "gui/Actions.hh"
-#include "gui/Gui.hh"
-#include "gui/GLWidget.hh"
-#include "gui/GuiEvents.hh"
-#include "gui/TimePanel.hh"
-#include "gui/RenderWidget.hh"
-#include "gui/model_editor/EditorWidget.hh"
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/TimePanel.hh"
+#include "gazebo/gui/RenderWidget.hh"
+#include "gazebo/gui/model_editor/EditorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -81,10 +81,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->glWidget = new GLWidget(this->mainFrame);
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
-  this->editorWidget = new EditorWidget(this);
-  this->editorWidget->setSizePolicy(QSizePolicy::Expanding,
+  this->buildingEditorWidget = new EditorWidget(this);
+  this->buildingEditorWidget->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
-  this->editorWidget->hide();
+  this->buildingEditorWidget->hide();
 
   this->viewOnlyLabel = new QLabel("Building is View Only", this->glWidget);
   this->viewOnlyLabel->resize(
@@ -137,7 +137,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   render3DWidget->setLayout(render3DLayout);
 
   QSplitter *splitter = new QSplitter(this);
-  splitter->addWidget(this->editorWidget);
+  splitter->addWidget(this->buildingEditorWidget);
   splitter->addWidget(render3DWidget);
   QList<int> sizes;
   sizes.push_back(300);
@@ -244,13 +244,13 @@ void RenderWidget::ShowEditor(bool _show)
 {
   if (_show)
   {
-    this->editorWidget->show();
+    this->buildingEditorWidget->show();
     this->viewOnlyLabel->setVisible(true);
     this->bottomFrame->hide();
   }
   else
   {
-    this->editorWidget->hide();
+    this->buildingEditorWidget->hide();
     this->viewOnlyLabel->setVisible(false);
     this->bottomFrame->show();
   }

@@ -32,210 +32,219 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectCreateEditorItem(T _subscriber)
-          { return createEditorItem.Connect(_subscriber); }
+            static event::ConnectionPtr
+                ConnectCreateBuildingEditorItem(T _subscriber)
+          { return createBuildingEditorItem.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the create editor item signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectCreateEditorItem(
+        public: static void DisconnectCreateBuildingEditorItem(
             event::ConnectionPtr _subscriber)
-          { createEditorItem.Disconnect(_subscriber); }
+          { createBuildingEditorItem.Disconnect(_subscriber); }
 
         /// \brief Connect a boost::slot to the save model signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectSaveModel(T _subscriber)
-          { return saveModel.Connect(_subscriber); }
+            static event::ConnectionPtr ConnectSaveBuildingModel(T _subscriber)
+          { return saveBuildingModel.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the save model signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectSaveModel(
+        public: static void DisconnectSaveBuildingModel(
             event::ConnectionPtr _subscriber)
-          { saveModel.Disconnect(_subscriber); }
+          { saveBuildingModel.Disconnect(_subscriber); }
 
         /// \brief Connect a boost::slot to the finish model signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectFinishModel(T _subscriber)
-          { return finishModel.Connect(_subscriber); }
+            static event::ConnectionPtr
+            ConnectFinishBuildingModel(T _subscriber)
+          { return finishBuildingModel.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the finish model signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectFinishModel(
+        public: static void DisconnectFinishBuildingModel(
             event::ConnectionPtr _subscriber)
-          { finishModel.Disconnect(_subscriber); }
+          { finishBuildingModel.Disconnect(_subscriber); }
 
         /// \brief Connect a boost::slot to the discard model signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectDiscardModel(T _subscriber)
-          { return discardModel.Connect(_subscriber); }
+            static event::ConnectionPtr ConnectDiscardBuildingModel(T _subscriber)
+          { return discardBuildingModel.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the discard model signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectDiscardModel(
+        public: static void DisconnectDiscardBuildingModel(
             event::ConnectionPtr _subscriber)
-          { discardModel.Disconnect(_subscriber); }
+          { discardBuildingModel.Disconnect(_subscriber); }
 
         /// \brief Connect a boost::slot to the change model signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectChangeLevel(T _subscriber)
-          { return changeLevel.Connect(_subscriber); }
+            static event::ConnectionPtr
+                ConnectChangeBuildingLevel(T _subscriber)
+          { return changeBuildingLevel.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the change level signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectChangeLevel(
+        public: static void DisconnectChangeBuildingLevel(
             event::ConnectionPtr _subscriber)
-          { changeLevel.Disconnect(_subscriber); }
+          { changeBuildingLevel.Disconnect(_subscriber); }
 
         /// \brief Connect a boost::slot to the add level signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectAddLevel(T _subscriber)
-          { return addLevel.Connect(_subscriber); }
+            static event::ConnectionPtr ConnectAddBuildingLevel(T _subscriber)
+          { return addBuildingLevel.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the add level signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectAddLevel(
+        public: static void DisconnectAddBuildingLevel(
             event::ConnectionPtr _subscriber)
-          { addLevel.Disconnect(_subscriber); }
+          { addBuildingLevel.Disconnect(_subscriber); }
 
         /// \brief Connect a boost::slot to the delete level signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectDeleteLevel(T _subscriber)
-          { return deleteLevel.Connect(_subscriber); }
+            static event::ConnectionPtr
+            ConnectDeleteBuildingLevel(T _subscriber)
+          { return deleteBuildingLevel.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the delete level signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectDeleteLevel(
-                    event::ConnectionPtr _subscriber)
-                { deleteLevel.Disconnect(_subscriber); }
+        public: static void DisconnectDeleteBuildingLevel(
+              event::ConnectionPtr _subscriber)
+          { deleteBuildingLevel.Disconnect(_subscriber); }
 
         /// \brief Connect a boost::slot to the change level name signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectChangeLevelName(T _subscriber)
-          { return changeLevelName.Connect(_subscriber); }
+            static event::ConnectionPtr
+                ConnectChangeBuildingLevelName(T _subscriber)
+          { return changeBuildingLevelName.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the change level name signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectChangeLevelName(
-                    event::ConnectionPtr _subscriber)
-                { changeLevelName.Disconnect(_subscriber); }
+        public: static void DisconnectChangeBuildingLevelName(
+              event::ConnectionPtr _subscriber)
+          { changeBuildingLevelName.Disconnect(_subscriber); }
 
         /// \brief Connect a boost::slot to the change zoom signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-          static event::ConnectionPtr ConnectChangeZoom(T _subscriber)
-        { return changeZoom.Connect(_subscriber); }
+          static event::ConnectionPtr
+              ConnectChangeBuildingEditorZoom(T _subscriber)
+        { return changeBuildingEditorZoom.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the change zoom level signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectChangeZoom(
+        public: static void DisconnectChangeBuildingEditorZoom(
             event::ConnectionPtr _subscriber)
-          { changeZoom.Disconnect(_subscriber); }
+          { changeBuildingEditorZoom.Disconnect(_subscriber); }
 
         /// \brief Connect a boost::slot to the save signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectSave(T _subscriber)
-          { return save.Connect(_subscriber); }
+            static event::ConnectionPtr ConnectSaveBuildingEditor(T _subscriber)
+          { return saveBuildingEditor.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the save signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectSave(
-                    event::ConnectionPtr _subscriber)
-                { save.Disconnect(_subscriber); }
+        public: static void DisconnectSaveBuildingEditor(
+            event::ConnectionPtr _subscriber)
+          { saveBuildingEditor.Disconnect(_subscriber); }
 
         /// \brief Connect a boost::slot to the done signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectDone(T _subscriber)
-          { return done.Connect(_subscriber); }
+            static event::ConnectionPtr ConnectDoneBuildingEditor(T _subscriber)
+          { return doneBuildingEditor.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the done signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectDone(
+        public: static void DisconnectDoneBuildingEditor(
                     event::ConnectionPtr _subscriber)
-                { done.Disconnect(_subscriber); }
+                { doneBuildingEditor.Disconnect(_subscriber); }
 
         /// \brief Connect a boost::slot to the discard signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectDiscard(T _subscriber)
-          { return discard.Connect(_subscriber); }
+            static event::ConnectionPtr
+            ConnectDiscardBuildingEditor(T _subscriber)
+          { return discardBuildingEditor.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the discard signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectDiscard(
-                    event::ConnectionPtr _subscriber)
-                { discard.Disconnect(_subscriber); }
+        public: static void DisconnectDiscardBuildingEditor(
+              event::ConnectionPtr _subscriber)
+          { discardBuildingEditor.Disconnect(_subscriber); }
 
         /// \brief Connect a boost::slot to the exit signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectExit(T _subscriber)
-          { return exit.Connect(_subscriber); }
+            static event::ConnectionPtr ConnectExitBuildingEditor(T _subscriber)
+          { return exitBuildingEditor.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the exit signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectExit(
+        public: static void DisconnectExitBuildingEditor(
             event::ConnectionPtr _subscriber)
-          { exit.Disconnect(_subscriber); }
+          { exitBuildingEditor.Disconnect(_subscriber); }
 
         /// \brief An editor item is to be created
-        public: static event::EventT<void (std::string)> createEditorItem;
+        public: static event::EventT<void (std::string)>
+            createBuildingEditorItem;
 
         /// \brief A model has been saved with a name and a location
         public: static event::EventT<void (std::string, std::string)>
-            saveModel;
+            saveBuildingModel;
 
         /// \brief A model has been completed and uploaded onto the server.
-        public: static event::EventT<void ()> finishModel;
+        public: static event::EventT<void ()> finishBuildingModel;
 
         /// \brief A model has been discarded
-        public: static event::EventT<void ()> discardModel;
+        public: static event::EventT<void ()> discardBuildingModel;
 
         /// \brief The current level has been changed
-        public: static event::EventT<void (int)> changeLevel;
+        public: static event::EventT<void (int)> changeBuildingLevel;
 
         /// \brief A new level has been added
-        public: static event::EventT<void ()> addLevel;
+        public: static event::EventT<void ()> addBuildingLevel;
 
         /// \brief A new level has been deleted
-        public: static event::EventT<void (int)> deleteLevel;
+        public: static event::EventT<void (int)> deleteBuildingLevel;
 
         /// \brief The current level name has been changed
-        public: static event::EventT<void (int, std::string)> changeLevelName;
+        public: static event::EventT<void (int, std::string)>
+            changeBuildingLevelName;
 
         /// \brief The current zoom level has been changed
-        public: static event::EventT<void (double)> changeZoom;
+        public: static event::EventT<void (double)> changeBuildingEditorZoom;
 
         /// \brief Save the model
-        public: static event::EventT<void ()> save;
+        public: static event::EventT<void ()> saveBuildingEditor;
 
         /// \brief Discard the model
-        public: static event::EventT<void ()> discard;
+        public: static event::EventT<void ()> discardBuildingEditor;
 
         /// \brief Finish creating the model, save, and exit
-        public: static event::EventT<void ()> done;
+        public: static event::EventT<void ()> doneBuildingEditor;
 
         /// \brief Exit the editor mode with the option to save
-        public: static event::EventT<void ()> exit;
+        public: static event::EventT<void ()> exitBuildingEditor;
       };
     }
   }

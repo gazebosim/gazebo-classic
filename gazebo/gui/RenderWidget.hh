@@ -45,7 +45,9 @@ namespace gazebo
       public: void RemoveScene(const std::string &_name);
       public: void CreateScene(const std::string &_name);
 
-      public: void ShowEditor(bool _mode);
+      /// \brief Show editor widget in the main window
+      /// param[in] _show True to show the editor widget, false to hide it.
+      public: void ShowEditor(bool _show);
 
       private slots: virtual void update();
 
@@ -53,8 +55,10 @@ namespace gazebo
 
       private: QHBoxLayout *bottomBarLayout;
       private: GLWidget *glWidget;
-      private: EditorWidget *editorWidget;
+      private: EditorWidget *buildingEditorWidget;
       private: QFrame *mainFrame;
+
+      /// \brief Bottom frame that holds the play/pause widgets
       private: QFrame *bottomFrame;
       private: QLabel *xyzLabel;
       private: QLineEdit *xPosEdit;
@@ -71,6 +75,8 @@ namespace gazebo
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 
+      /// \brief An overlay label on the 3D render widget (currently used for
+      // to show that building model is view only
       private: QLabel *viewOnlyLabel;
 
       private: std::vector<event::ConnectionPtr> connections;

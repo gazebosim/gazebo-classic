@@ -21,6 +21,8 @@
 
 struct _GtsSurface;
 typedef _GtsSurface GtsSurface;
+struct _GPtrArray;
+typedef _GPtrArray GPtrArray;
 
 namespace gazebo
 {
@@ -51,10 +53,16 @@ namespace gazebo
       /// \param[in] _offset _m2's pose offset from _m1
       /// \return a pointer to the created mesh
       public: Mesh *CreateBoolean(const Mesh *_m1, const Mesh *_m2,
-          const int _operation, math::Pose _offset = math::Pose::Zero);
+          const int _operation, const math::Pose &_offset = math::Pose::Zero);
 
       /// \brief Helper method for converting Mesh to GTS Surface
       private: void ConvertMeshToGTS(const Mesh *mesh, GtsSurface *surface);
+
+      /// \brief Helper method for merging neighborhood vertices whose positions
+      // are within epsilon
+      /// \param[in] _vertices Array of GTS vertices.
+      /// \param[in] _epsilon Epsilon
+      private: void MergeVertices(GPtrArray * _vertices, double _epsilon);
     };
     /// \}
   }

@@ -27,9 +27,7 @@ namespace gazebo
   namespace gui
   {
     class RectItem;
-
     class BuildingItem;
-
     class StairsInspectorDialog;
 
     /// \addtogroup gazebo_gui

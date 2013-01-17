@@ -20,17 +20,18 @@
 using namespace gazebo;
 using namespace gui;
 
-event::EventT<void (std::string)> editor::Events::createEditorItem;
-event::EventT<void (std::string, std::string)> editor::Events::saveModel;
-event::EventT<void ()> editor::Events::finishModel;
-event::EventT<void ()> editor::Events::discardModel;
-event::EventT<void (int)> editor::Events::changeLevel;
-event::EventT<void ()> editor::Events::addLevel;
-event::EventT<void (int)> editor::Events::deleteLevel;
-event::EventT<void (int, std::string)> editor::Events::changeLevelName;
-event::EventT<void (double)> editor::Events::changeZoom;
+event::EventT<void (std::string)> editor::Events::createBuildingEditorItem;
+event::EventT<void (std::string, std::string)>
+    editor::Events::saveBuildingModel;
+event::EventT<void ()> editor::Events::finishBuildingModel;
+event::EventT<void ()> editor::Events::discardBuildingModel;
+event::EventT<void (int)> editor::Events::changeBuildingLevel;
+event::EventT<void ()> editor::Events::addBuildingLevel;
+event::EventT<void (int)> editor::Events::deleteBuildingLevel;
+event::EventT<void (int, std::string)> editor::Events::changeBuildingLevelName;
+event::EventT<void (double)> editor::Events::changeBuildingEditorZoom;
 
-event::EventT<void ()> editor::Events::save;
-event::EventT<void ()> editor::Events::discard;
-event::EventT<void ()> editor::Events::done;
-event::EventT<void ()> editor::Events::exit;
+event::EventT<void ()> editor::Events::saveBuildingEditor;
+event::EventT<void ()> editor::Events::discardBuildingEditor;
+event::EventT<void ()> editor::Events::doneBuildingEditor;
+event::EventT<void ()> editor::Events::exitBuildingEditor;

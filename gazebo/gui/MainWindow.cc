@@ -40,8 +40,8 @@
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include "gui/model_editor/BuildingEditorPalette.hh"
-#include "gui/model_editor/EditorEvents.hh"
+#include "gazebo/gui/model_editor/BuildingEditorPalette.hh"
+#include "gazebo/gui/model_editor/EditorEvents.hh"
 
 #include "sdf/sdf.hh"
 
@@ -157,8 +157,8 @@ MainWindow::MainWindow()
        boost::bind(&MainWindow::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
-      gui::editor::Events::ConnectFinishModel(
-      boost::bind(&MainWindow::OnFinishModel, this)));
+      gui::editor::Events::ConnectFinishBuildingModel(
+      boost::bind(&MainWindow::OnFinishBuilding, this)));
 
   gui::ViewFactory::RegisterAll();
 }
@@ -454,19 +454,15 @@ void MainWindow::OnEditBuilding()
     this->tabWidget->hide();
     this->buildingEditorTabWidget->show();
     this->menuBar->hide();
-    this->editorMenuBar->show();
-//    this->menuLayout->insertWidget(0, this->editorMenuBar);
+    this->buildingEditorMenuBar->show();
   }
   else
   {
     this->renderWidget->ShowEditor(false);
     this->tabWidget->show();
     this->buildingEditorTabWidget->hide();
-//    this->menuLayout->removeWidget(this->editorMenuBar);
-    this->editorMenuBar->hide();
+    this->buildingEditorMenuBar->hide();
     this->menuBar->show();
-//    this->menuLayout->insertWidget(0, this->menuBar);
-//    this->menuBar->setEnabled(true);
     this->Play();
   }
 }
@@ -663,27 +659,27 @@ void MainWindow::Orbit()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::EditorSave()
+void MainWindow::BuildingEditorSave()
 {
-  gui::editor::Events::save();
+  gui::editor::Events::saveBuildingEditor();
 }
 
 /////////////////////////////////////////////////
-void MainWindow::EditorDiscard()
+void MainWindow::BuildingEditorDiscard()
 {
-  gui::editor::Events::discard();
+  gui::editor::Events::discardBuildingEditor();
 }
 
 /////////////////////////////////////////////////
-void MainWindow::EditorDone()
+void MainWindow::BuildingEditorDone()
 {
-  gui::editor::Events::done();
+  gui::editor::Events::doneBuildingEditor();
 }
 
 /////////////////////////////////////////////////
-void MainWindow::EditorExit()
+void MainWindow::BuildingEditorExit()
 {
-  gui::editor::Events::exit();
+  gui::editor::Events::exitBuildingEditor();
 }
 
 /////////////////////////////////////////////////
@@ -900,33 +896,33 @@ void MainWindow::CreateActions()
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 
-  g_editorSaveAct = new QAction(tr("&Save (As)"), this);
-  g_editorSaveAct->setStatusTip(tr("Save (As)"));
-  g_editorSaveAct->setShortcut(tr("Ctrl+S"));
-  g_editorSaveAct->setCheckable(false);
-  connect(g_editorSaveAct, SIGNAL(triggered()), this,
-          SLOT(EditorSave()));
+  g_buildingEditorSaveAct = new QAction(tr("&Save (As)"), this);
+  g_buildingEditorSaveAct->setStatusTip(tr("Save (As)"));
+  g_buildingEditorSaveAct->setShortcut(tr("Ctrl+S"));
+  g_buildingEditorSaveAct->setCheckable(false);
+  connect(g_buildingEditorSaveAct, SIGNAL(triggered()), this,
+          SLOT(BuildingEditorSave()));
 
-  g_editorDiscardAct = new QAction(tr("&Discard"), this);
-  g_editorDiscardAct->setStatusTip(tr("Discard"));
-  g_editorDiscardAct->setShortcut(tr("Ctrl+D"));
-  g_editorDiscardAct->setCheckable(false);
-  connect(g_editorDiscardAct, SIGNAL(triggered()), this,
-          SLOT(EditorDiscard()));
+  g_buildingEditorDiscardAct = new QAction(tr("&Discard"), this);
+  g_buildingEditorDiscardAct->setStatusTip(tr("Discard"));
+  g_buildingEditorDiscardAct->setShortcut(tr("Ctrl+D"));
+  g_buildingEditorDiscardAct->setCheckable(false);
+  connect(g_buildingEditorDiscardAct, SIGNAL(triggered()), this,
+          SLOT(BuildingEditorDiscard()));
 
-  g_editorDoneAct = new QAction(tr("Don&e"), this);
-  g_editorDoneAct->setShortcut(tr("Ctrl+E"));
-  g_editorDoneAct->setStatusTip(tr("Done"));
-  g_editorDoneAct->setCheckable(false);
-  connect(g_editorDoneAct, SIGNAL(triggered()), this,
-          SLOT(EditorDone()));
+  g_buildingEditorDoneAct = new QAction(tr("Don&e"), this);
+  g_buildingEditorDoneAct->setShortcut(tr("Ctrl+E"));
+  g_buildingEditorDoneAct->setStatusTip(tr("Done"));
+  g_buildingEditorDoneAct->setCheckable(false);
+  connect(g_buildingEditorDoneAct, SIGNAL(triggered()), this,
+          SLOT(BuildingEditorDone()));
 
-  g_editorExitAct = new QAction(tr("E&xit Building Editor"), this);
-  g_editorExitAct->setStatusTip(tr("Exit Building Editor"));
-  g_editorExitAct->setShortcut(tr("Ctrl+X"));
-  g_editorExitAct->setCheckable(false);
-  connect(g_editorExitAct, SIGNAL(triggered()), this,
-          SLOT(EditorExit()));
+  g_buildingEditorExitAct = new QAction(tr("E&xit Building Editor"), this);
+  g_buildingEditorExitAct->setStatusTip(tr("Exit Building Editor"));
+  g_buildingEditorExitAct->setShortcut(tr("Ctrl+X"));
+  g_buildingEditorExitAct->setCheckable(false);
+  connect(g_buildingEditorExitAct, SIGNAL(triggered()), this,
+          SLOT(BuildingEditorExit()));
 }
 
 /////////////////////////////////////////////////
@@ -986,16 +982,18 @@ void MainWindow::CreateMenus()
   QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
   helpMenu->addAction(g_aboutAct);
 
-  this->editorMenuBar = new QMenuBar;
-  this->editorMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  this->menuLayout->insertWidget(0, this->editorMenuBar);
-  this->editorMenuBar->hide();
+  this->buildingEditorMenuBar = new QMenuBar;
+  this->buildingEditorMenuBar->setSizePolicy(QSizePolicy::Fixed,
+      QSizePolicy::Fixed);
+  this->menuLayout->insertWidget(0, this->buildingEditorMenuBar);
+  this->buildingEditorMenuBar->hide();
 
-  QMenu *editorFileMenu = this->editorMenuBar->addMenu(tr("&File"));
-  editorFileMenu->addAction(g_editorSaveAct);
-  editorFileMenu->addAction(g_editorDiscardAct);
-  editorFileMenu->addAction(g_editorDoneAct);
-  editorFileMenu->addAction(g_editorExitAct);
+  QMenu *buildingEditorFileMenu = this->buildingEditorMenuBar->addMenu(
+      tr("&File"));
+  buildingEditorFileMenu->addAction(g_buildingEditorSaveAct);
+  buildingEditorFileMenu->addAction(g_buildingEditorDiscardAct);
+  buildingEditorFileMenu->addAction(g_buildingEditorDoneAct);
+  buildingEditorFileMenu->addAction(g_buildingEditorExitAct);
 }
 
 /////////////////////////////////////////////////
@@ -1208,10 +1206,9 @@ void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void MainWindow::OnFinishModel()
+void MainWindow::OnFinishBuilding()
 {
   g_editBuildingAct->setChecked(!g_editBuildingAct->isChecked());
-//  g_editBuildingAct->toggle();
   this->OnEditBuilding();
 }
 

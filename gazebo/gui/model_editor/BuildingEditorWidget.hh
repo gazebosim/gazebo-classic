@@ -25,7 +25,6 @@ namespace gazebo
   namespace gui
   {
     class LevelWidget;
-
     class ScaleWidget;
 
     /// \addtogroup gazebo_gui
@@ -36,9 +35,6 @@ namespace gazebo
     /// widget.
     class BuildingEditorWidget : public QWidget
     {
-      /// \brief Type of models supported in building editor
-      public: enum modelTypes {None, Wall, Window, Door, Stairs};
-
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
       public: BuildingEditorWidget(QWidget *_parent = 0);

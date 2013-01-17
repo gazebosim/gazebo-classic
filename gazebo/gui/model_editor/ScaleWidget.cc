@@ -30,7 +30,7 @@ ScaleWidget::ScaleWidget(QWidget *_parent) : QWidget(_parent)
 
   this->setAttribute(Qt::WA_TransparentForMouseEvents);
   this->connections.push_back(
-    gui::editor::Events::ConnectChangeZoom(
+    gui::editor::Events::ConnectChangeBuildingEditorZoom(
     boost::bind(&ScaleWidget::OnChangeZoom, this, _1)));
 }
 

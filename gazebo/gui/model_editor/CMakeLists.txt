@@ -2,66 +2,66 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include ( ${QT_USE_FILE} )
 
 set (sources
-  EditorWidget.cc
-  BuildingEditorWidget.cc
   BuildingEditorPalette.cc
-  FinishModelDialog.cc
-  WindowDoorInspectorDialog.cc
-  WallInspectorDialog.cc
-  StairsInspectorDialog.cc
-  LevelInspectorDialog.cc
-  GridLines.cc
-  GrabberHandle.cc
-  RotateHandle.cc
-  EditorItem.cc
+  BuildingEditorWidget.cc
   BuildingItem.cc
-  RectItem.cc
-  FloorItem.cc
-  WindowItem.cc
-  DoorItem.cc
-  LineSegmentItem.cc
-  PolylineItem.cc
-  WallItem.cc
   BuildingMaker.cc
+  DoorItem.cc
   EditorEvents.cc
-  StairsItem.cc
-  LevelWidget.cc
-  ScaleWidget.cc
-  ModelManip.cc
+  EditorItem.cc
   EditorView.cc
+  EditorWidget.cc
+  FinishModelDialog.cc
+  FloorItem.cc
+  GrabberHandle.cc
+  GridLines.cc
+  LevelInspectorDialog.cc
+  LevelWidget.cc
+  LineSegmentItem.cc
+  ModelManip.cc
+  PolylineItem.cc
+  RectItem.cc
+  RotateHandle.cc
+  ScaleWidget.cc
+  StairsInspectorDialog.cc
+  StairsItem.cc
+  WallInspectorDialog.cc
+  WallItem.cc
+  WindowDoorInspectorDialog.cc
+  WindowItem.cc
 )
 
 set (qt_headers
   BuildingEditorPalette.hh
-  FinishModelDialog.hh
-  WindowDoorInspectorDialog.hh
-  WallInspectorDialog.hh
-  StairsInspectorDialog.hh
-  LevelInspectorDialog.hh
-  ModelManip.hh
-  EditorItem.hh
-  LevelWidget.hh
-  ScaleWidget.hh
-  RectItem.hh
-  StairsItem.hh
-  WallItem.hh
   DoorItem.hh
-  WindowItem.hh
-  FloorItem.hh
+  EditorItem.hh
   EditorView.hh
+  FinishModelDialog.hh
+  FloorItem.hh
+  LevelInspectorDialog.hh
+  LevelWidget.hh
+  ModelManip.hh
+  RectItem.hh
+  ScaleWidget.hh
+  StairsInspectorDialog.hh
+  StairsItem.hh
+  WallInspectorDialog.hh
+  WallItem.hh
+  WindowDoorInspectorDialog.hh
+  WindowItem.hh
 )
 
 set (headers
-  BuildingMaker.hh
   BuildingEditorWidget.hh
+  BuildingItem.hh
+  BuildingMaker.hh
+  EditorEvents.hh
   EditorWidget.hh
   GrabberHandle.hh
-  RotateHandle.hh
-  BuildingItem.hh
-  LineSegmentItem.hh
   GridLines.hh
+  LineSegmentItem.hh
   PolylineItem.hh
-  EditorEvents.hh
+  RotateHandle.hh
 )
 
 set (resources ../resources.qrc)

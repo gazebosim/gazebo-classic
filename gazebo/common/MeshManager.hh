@@ -22,11 +22,11 @@
 #include <vector>
 #include <boost/thread/mutex.hpp>
 
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
-#include "math/Pose.hh"
-#include "math/Plane.hh"
-#include "common/SingletonT.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Plane.hh"
+#include "gazebo/common/SingletonT.hh"
 
 namespace gazebo
 {

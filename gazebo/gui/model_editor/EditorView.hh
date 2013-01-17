@@ -29,29 +29,26 @@ namespace gazebo
   namespace gui
   {
     class EditorItem;
-
     class WindowItem;
-
     class StairsItem;
-
     class DoorItem;
-
     class WallItem;
-
     class FloorItem;
-
     class BuildingMaker;
-
     class LevelInspectorDialog;
-
     class GridLines;
 
+    /// \class Level EditorView.hh
+    /// \brief A convenient structure for storing level information
     class Level
     {
+      /// \brief Level number
       public: int level;
 
+      /// \brief Level name
       public: std::string name;
 
+      /// \brief Level height from ground
       public: double height;
     };
 
@@ -64,8 +61,20 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \brief Drawing modes within the editor.
-      public: enum drawModes {NONE, WALL, WINDOW, DOOR, STAIRS};
+      /// \enum DrawModes
+      /// \brief Unique identifiers for all drawing modes within the editor.
+      public: enum DrawModes {
+                  /// \brief None mode
+                  NONE,
+                  /// \brief Wall mode
+                  WALL,
+                  /// \brief Window mode
+                  WINDOW,
+                  /// \brief Door mode
+                  DOOR,
+                  /// \brief Stairs mode
+                  STAIRS
+                };
 
       /// \brief Constructor
       /// \param[in] _parent Parent Widget.
@@ -75,12 +84,14 @@ namespace gazebo
       public: ~EditorView();
 
       /// \brief Create a 3D visual from a 2D editor item.
-      public: void Create3DVisual(EditorItem *item);
+      public: void Create3DVisual(EditorItem *_item);
 
       /// \brief Delete an editor item.
+      /// \param[in] _item Item to be deleted.
       public: void DeleteItem(EditorItem *_item);
 
       /// \brief Qt resize event received when the parent widget changes size.
+      /// \param[in] _event Qt resize event
       private: void resizeEvent(QResizeEvent *_event);
 
       /// \brief Qt event received when the editor view is being scrolled.
@@ -90,7 +101,7 @@ namespace gazebo
 
       /// \brief Qt context menu received on a mouse right click.
       /// \param[in] _event Qt context menu event.
-      private: void contextMenuEvent(QContextMenuEvent *event);
+      private: void contextMenuEvent(QContextMenuEvent *_event);
 
       /// \brief Qt wheel event received when the mouse wheel is being scrolled.
       /// \param[in] _event Qt wheel event.

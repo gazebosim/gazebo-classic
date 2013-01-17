@@ -27,9 +27,7 @@ namespace gazebo
   namespace gui
   {
     class GrabberHandle;
-
     class EditorItem;
-
     class LineSegmentItem;
 
     /// \addtogroup gazebo_gui

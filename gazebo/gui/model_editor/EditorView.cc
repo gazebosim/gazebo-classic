@@ -44,7 +44,7 @@ EditorView::EditorView(QWidget *_parent)
   this->drawInProgress = false;
 
   this->connections.push_back(
-  gui::editor::Events::ConnectCreateEditorItem(
+  gui::editor::Events::ConnectCreateBuildingEditorItem(
     boost::bind(&EditorView::OnCreateEditorItem, this, _1)));
 
 /*  this->connections.push_back(
@@ -56,15 +56,15 @@ EditorView::EditorView(QWidget *_parent)
     boost::bind(&EditorView::OnDone, this)));*/
 
   this->connections.push_back(
-  gui::editor::Events::ConnectDiscardModel(
+  gui::editor::Events::ConnectDiscardBuildingModel(
     boost::bind(&EditorView::OnDiscardModel, this)));
 
   this->connections.push_back(
-  gui::editor::Events::ConnectAddLevel(
+  gui::editor::Events::ConnectAddBuildingLevel(
     boost::bind(&EditorView::OnAddLevel, this)));
 
   this->connections.push_back(
-  gui::editor::Events::ConnectChangeLevel(
+  gui::editor::Events::ConnectChangeBuildingLevel(
     boost::bind(&EditorView::OnChangeLevel, this, _1)));
 
   this->mousePressRotation = 0;
@@ -125,7 +125,7 @@ void EditorView::scrollContentsBy(int _dx, int _dy)
 }
 
 /////////////////////////////////////////////////
-void EditorView::resizeEvent(QResizeEvent *_event)
+void EditorView::resizeEvent(QResizeEvent */*_event*/)
 {
   if (!this->gridLines && this->scene())
   {
@@ -194,7 +194,7 @@ void EditorView::wheelEvent(QWheelEvent *_event)
         QPoint(this->width()/2, this->height()/2)));
   }
 
-  gui::editor::Events::changeZoom(this->viewScale);
+  gui::editor::Events::changeBuildingEditorZoom(this->viewScale);
   _event->accept();
 }
 
@@ -491,36 +491,42 @@ void EditorView::DeleteItem(EditorItem *_item)
 
   if (_item->GetType() == "Wall")
   {
-    wallList.erase(std::remove(wallList.begin(), wallList.end(),
-        dynamic_cast<WallItem *>(_item)), wallList.end());
+    this->wallList.erase(std::remove(this->wallList.begin(),
+        this->wallList.end(), dynamic_cast<WallItem *>(_item)),
+        this->wallList.end());
   }
   else if (_item->GetType() == "Window")
   {
-    windowList.erase(std::remove(windowList.begin(), windowList.end(),
-        dynamic_cast<WindowItem *>(_item)), windowList.end());
+    this->windowList.erase(std::remove(this->windowList.begin(),
+        this->windowList.end(), dynamic_cast<WindowItem *>(_item)),
+        this->windowList.end());
   }
   else if (_item->GetType() == "Door")
   {
-    doorList.erase(std::remove(doorList.begin(), doorList.end(),
-        dynamic_cast<DoorItem *>(_item)), doorList.end());
+    this->doorList.erase(std::remove(this->doorList.begin(),
+        this->doorList.end(), dynamic_cast<DoorItem *>(_item)),
+        this->doorList.end());
   }
   else if (_item->GetType() == "Stairs")
   {
-    stairsList.erase(std::remove(stairsList.begin(), stairsList.end(),
-        dynamic_cast<StairsItem *>(_item)), stairsList.end());
+    this->stairsList.erase(std::remove(this->stairsList.begin(),
+        this->stairsList.end(), dynamic_cast<StairsItem *>(_item)),
+        this->stairsList.end());
   }
   else if (_item->GetType() == "Floor")
   {
-    floorList.erase(std::remove(floorList.begin(), floorList.end(),
-        dynamic_cast<FloorItem *>(_item)), floorList.end());
+    this->floorList.erase(std::remove(this->floorList.begin(),
+        this->floorList.end(), dynamic_cast<FloorItem *>(_item)),
+        this->floorList.end());
   }
 
   if (_item->GetType() == "Line")
   {
     QGraphicsItem *qItem = dynamic_cast<QGraphicsItem *>(_item);
     QGraphicsItem *itemParent = qItem->parentItem();
-    wallList.erase(std::remove(wallList.begin(), wallList.end(),
-        dynamic_cast<WallItem *>(itemParent)), wallList.end());
+    this->wallList.erase(std::remove(this->wallList.begin(),
+        this->wallList.end(), dynamic_cast<WallItem *>(itemParent)),
+        this->wallList.end());
     this->itemToVisualMap.erase(_item);
     delete dynamic_cast<WallItem *>(itemParent);
   }
@@ -669,7 +675,7 @@ void EditorView::DrawStairs(const QPoint &_pos)
 }
 
 /////////////////////////////////////////////////
-void EditorView::Create3DVisual(EditorItem* _item)
+void EditorView::Create3DVisual(EditorItem *_item)
 {
   if (_item->GetType() == "Stairs")
   {
@@ -694,13 +700,13 @@ void EditorView::Create3DVisual(EditorItem* _item)
 /////////////////////////////////////////////////
 void EditorView::OnCreateEditorItem(const std::string &_type)
 {
-  if (_type == "Wall")
+  if (_type == "wall")
     this->drawMode = WALL;
-  else if (_type == "Window")
+  else if (_type == "window")
     this->drawMode = WINDOW;
-  else if (_type == "Door")
+  else if (_type == "door")
     this->drawMode = DOOR;
-  else if (_type == "Stairs")
+  else if (_type == "stairs")
     this->drawMode = STAIRS;
 
   if (this->drawInProgress && this->currentMouseItem)
@@ -718,24 +724,6 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
   // this->grabKeyboard();
 }
 
-/*
-/////////////////////////////////////////////////
-void EditorView::OnSaveModel(const std::string &_modelName,
-    const std::string &_savePath)
-{
-  this->buildingMaker->SetModelName(_modelName);
-  this->buildingMaker->GenerateSDF();
-  this->buildingMaker->SaveToSDF(_savePath);
-}*/
-
-/*/////////////////////////////////////////////////
-void EditorView::OnDone()
-{
-//  this->buildingMaker->FinishModel();
-  this->OnDiscardModel();
-//  gui::editor::Events::discardModel();
-}*/
-
 /////////////////////////////////////////////////
 void EditorView::OnDiscardModel()
 {
@@ -746,8 +734,7 @@ void EditorView::OnDiscardModel()
   this->floorList.clear();
   this->itemToVisualMap.clear();
   this->buildingMaker->Reset();
-//  this->levelNames.clear();
-//  this->levelHeights.clear();
+
   for (unsigned int i = 0; i < this->levels.size(); ++i)
     delete this->levels[i];
   this->levels.clear();
@@ -759,12 +746,9 @@ void EditorView::OnDiscardModel()
   newLevel->name = "Level 1";
   this->levels.push_back(newLevel);
   this->levelCounter = 0;
-//  this->levelHeights[0] = 0;
-//  this->levelNames[0] = "Level 1";
-
-  this->scene()->clear();
 
   // clear the scene but add the grid back in
+  this->scene()->clear();
   this->gridLines = new GridLines(this->scene()->sceneRect().width(),
       this->scene()->sceneRect().height());
   this->scene()->addItem(this->gridLines);
@@ -785,7 +769,8 @@ void EditorView::OnAddLevel()
   Level *newlevel = new Level;
   newlevel->name = levelName;
   this->levels.push_back(newlevel);
-  emit gui::editor::Events::changeLevelName(this->currentLevel, levelName);
+  emit gui::editor::Events::changeBuildingLevelName(this->currentLevel,
+      levelName);
   if (wallList.size() == 0)
   {
     newlevel->height = 0;
@@ -939,7 +924,7 @@ void EditorView::DeleteLevel(int _level)
   this->levels.erase(this->levels.begin() + levelNum);
   this->currentLevel = newLevelIndex;
 
-  gui::editor::Events::deleteLevel(_level);
+  gui::editor::Events::deleteBuildingLevel(_level);
 }
 
 /////////////////////////////////////////////////
@@ -1003,7 +988,8 @@ void EditorView::OnLevelApply()
 
   std::string newLevelName = dialog->GetLevelName();
     this->levels[this->currentLevel]->name = newLevelName;
-    emit gui::editor::Events::changeLevelName(this->currentLevel, newLevelName);
+    emit gui::editor::Events::changeBuildingLevelName(this->currentLevel,
+        newLevelName);
 }
 
 /////////////////////////////////////////////////
@@ -1017,7 +1003,7 @@ void EditorView::CancelDrawMode()
       this->itemToVisualMap.erase(item);
       if (drawMode == WALL)
       {
-        WallItem* wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
+        WallItem* wallItem = dynamic_cast<WallItem *>(this->currentMouseItem);
         wallItem->PopEndPoint();
         if (wallItem->GetVertexCount() >= 2)
         {

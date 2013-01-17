@@ -26,7 +26,8 @@ namespace gazebo
     /// \{
 
     /// \class BuildingItem BuildingItem.hh
-    /// \brief Base class of a building item with building level properties.
+    /// \brief Base class of a items that have building level properties such as
+    /// the level number and level height.
     class BuildingItem
     {
         /// \brief Constructor

@@ -70,8 +70,8 @@ namespace gazebo
       /// the model to.
       /// \param[in] _saveName Name of model being saved.
       /// \param[in] _saveLocation Location to save the model to.
-      private: void OnSaveModel(std::string _saveName,
-          std::string _saveLocation);
+      private: void OnSaveModel(const std::string &_saveName,
+          const std::string &_saveLocation);
 
       /// \brief Event received when a building model has been discarded.
       private: void OnDiscardModel();
