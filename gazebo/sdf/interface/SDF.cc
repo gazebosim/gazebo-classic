@@ -1379,8 +1379,8 @@ void SDF::PrintDoc()
             << "<li><b>&lt;uri&gt;</b>: URI of SDF model file to include.</li>"
             << "<li><b>&lt;name&gt;</b>: Name of the included SDF model.</li>"
             << "<li><b>&lt;pose&gt;</b>: Pose of the included SDF model, "
-            << "specified as &lt;pose&gt;x y z roll pitch yaw&lt;/pose&gt; "
-            << "with x, y, and z representing a position in meters and roll, "
+            << "specified as &lt;pose&gt;x y z roll pitch yaw&lt;/pose&gt;, "
+            << "with x, y, and z representing a position in meters, and roll, "
             << "pitch, and yaw representing Euler angles in radians.</li>"
             << "</ul>"
             << "</li>";
