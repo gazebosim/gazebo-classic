@@ -32,9 +32,9 @@ void RegisterODEPhysics();
   void RegisterBulletPhysics();
 #endif
 
-//#ifdef HAVE_RTQL8
+#ifdef HAVE_RTQL8
   void RegisterRTQL8Physics();
-//#endif
+#endif
 
 using namespace gazebo;
 using namespace physics;
@@ -51,9 +51,9 @@ void PhysicsFactory::RegisterAll()
   RegisterBulletPhysics();
 #endif
 
-//#ifdef HAVE_RTQL8
+#ifdef HAVE_RTQL8
   RegisterRTQL8Physics();
-//#endif
+#endif
 }
 
 //////////////////////////////////////////////////
