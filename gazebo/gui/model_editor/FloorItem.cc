@@ -90,16 +90,16 @@ void FloorItem::AttachWall(WallItem *_wallItem)
   for (unsigned int i = 0; i < _wallItem->GetSegmentCount(); ++i)
   {
     LineSegmentItem *segment = _wallItem->GetSegment(i);
-    connect(segment, SIGNAL(widthChanged(double)), this,
+    connect(segment, SIGNAL(WidthChanged(double)), this,
         SLOT(NotifyChange()));
-    connect(segment, SIGNAL(depthChanged(double)), this,
+    connect(segment, SIGNAL(DepthChanged(double)), this,
         SLOT(NotifyChange()));
-    connect(segment, SIGNAL(posXChanged(double)), this,
+    connect(segment, SIGNAL(PosXChanged(double)), this,
         SLOT(NotifyChange()));
-    connect(segment, SIGNAL(posYChanged(double)), this,
+    connect(segment, SIGNAL(PosYChanged(double)), this,
         SLOT(NotifyChange()));
   }
-  connect(_wallItem, SIGNAL(itemDeleted()), this,
+  connect(_wallItem, SIGNAL(ItemDeleted()), this,
       SLOT(WallDeleted()));
   this->Update();
 }
@@ -210,16 +210,16 @@ void FloorItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
 /////////////////////////////////////////////////
 void FloorItem::FloorChanged()
 {
-  emit widthChanged(this->floorWidth);
-  emit depthChanged(this->floorDepth);
-  emit heightChanged(this->floorHeight);
-  emit positionChanged(this->floorPos.x(), this->floorPos.y(),
+  emit WidthChanged(this->floorWidth);
+  emit DepthChanged(this->floorDepth);
+  emit HeightChanged(this->floorHeight);
+  emit PositionChanged(this->floorPos.x(), this->floorPos.y(),
       this->levelBaseHeight/* + this->floorElevation*/);
 }
 
 /////////////////////////////////////////////////
 void FloorItem::SizeChanged()
 {
-  emit widthChanged(this->floorWidth);
-  emit depthChanged(this->floorDepth);
+  emit WidthChanged(this->floorWidth);
+  emit DepthChanged(this->floorDepth);
 }

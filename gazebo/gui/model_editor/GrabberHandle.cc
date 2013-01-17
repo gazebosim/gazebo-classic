@@ -92,9 +92,9 @@ double GrabberHandle::GetHeight() const
 }
 
 /////////////////////////////////////////////////
-void GrabberHandle::SetColor(const QColor &color)
+void GrabberHandle::SetColor(const QColor &_color)
 {
-  this->handleColor = color;
+  this->handleColor = _color;
 }
 
 /////////////////////////////////////////////////

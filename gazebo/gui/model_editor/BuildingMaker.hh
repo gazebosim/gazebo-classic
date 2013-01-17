@@ -37,7 +37,7 @@ namespace gazebo
   {
     class EntityMaker;
     class EditorItem;
-    class ModelManip;
+    class BuildingModelManip;
     class FinishModelDialog;
 
     /// \addtogroup gazebo_gui
@@ -256,7 +256,7 @@ namespace gazebo
 
       /// \brief A map of building part names to model manip objects which
       /// manage the visuals representing the building part.
-      private: std::map<std::string, ModelManip *> allItems;
+      private: std::map<std::string, BuildingModelManip *> allItems;
 
       /// \brief The building model in SDF format.
       private: sdf::SDFPtr modelSDF;

@@ -34,8 +34,14 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \brief Dialog modes.
-      public: enum FinishMode {MODEL_FINISH, MODEL_SAVE};
+      /// \enum FinishMode
+      /// \brief Unique identifiers for all dialog modes.
+      public: enum FinishMode {
+                /// \brief Finish mode
+                MODEL_FINISH,
+                /// \brief Save mode
+                MODEL_SAVE
+              };
 
       /// \brief Constructor
       /// \param[in] _mode Mode of the dialog

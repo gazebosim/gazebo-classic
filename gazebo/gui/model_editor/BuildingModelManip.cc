@@ -19,61 +19,61 @@
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/gui/model_editor/BuildingMaker.hh"
-#include "gazebo/gui/model_editor/ModelManip.hh"
+#include "gazebo/gui/model_editor/BuildingModelManip.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-ModelManip::ModelManip()
+BuildingModelManip::BuildingModelManip()
 {
   this->parent = NULL;
 }
 
 /////////////////////////////////////////////////
-ModelManip::~ModelManip()
+BuildingModelManip::~BuildingModelManip()
 {
   this->DetachFromParent();
 }
 
 /////////////////////////////////////////////////
-void ModelManip::SetName(const std::string &_name)
+void BuildingModelManip::SetName(const std::string &_name)
 {
   this->name = _name;
 }
 
 /////////////////////////////////////////////////
-void ModelManip::SetVisual(const rendering::VisualPtr &_visual)
+void BuildingModelManip::SetVisual(const rendering::VisualPtr &_visual)
 {
   this->visual = _visual;
 }
 
 /////////////////////////////////////////////////
-std::string ModelManip::GetName() const
+std::string BuildingModelManip::GetName() const
 {
   return this->name;
 }
 
 /////////////////////////////////////////////////
-rendering::VisualPtr ModelManip::GetVisual() const
+rendering::VisualPtr BuildingModelManip::GetVisual() const
 {
   return this->visual;
 }
 
 /////////////////////////////////////////////////
-void ModelManip::SetMaker(BuildingMaker *_maker)
+void BuildingModelManip::SetMaker(BuildingMaker *_maker)
 {
   this->maker = _maker;
 }
 
 /////////////////////////////////////////////////
-ModelManip *ModelManip::GetParent() const
+BuildingModelManip *BuildingModelManip::GetParent() const
 {
   return this->parent;
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnSizeChanged(double _width, double _depth, double _height)
+void BuildingModelManip::OnSizeChanged(double _width, double _depth, double _height)
 {
   this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
   double dScaleZ = this->visual->GetScale().z - this->size.z;
@@ -85,7 +85,7 @@ void ModelManip::OnSizeChanged(double _width, double _depth, double _height)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::AttachManip(ModelManip *_manip)
+void BuildingModelManip::AttachManip(BuildingModelManip *_manip)
 {
   if (!_manip->IsAttached())
   {
@@ -95,11 +95,11 @@ void ModelManip::AttachManip(ModelManip *_manip)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::DetachManip(ModelManip *_manip)
+void BuildingModelManip::DetachManip(BuildingModelManip *_manip)
 {
   if (_manip)
   {
-    std::vector<ModelManip *> ::iterator it = std::remove(
+    std::vector<BuildingModelManip *> ::iterator it = std::remove(
         this->attachedManips.begin(), this->attachedManips.end(), _manip);
     if (it != this->attachedManips.end())
     {
@@ -110,18 +110,18 @@ void ModelManip::DetachManip(ModelManip *_manip)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::DetachFromParent()
+void BuildingModelManip::DetachFromParent()
 {
   if (this->parent)
   {
-    ModelManip *tmp = this->parent;
+    BuildingModelManip *tmp = this->parent;
     this->parent = NULL;
     tmp->DetachManip(this);
   }
 }
 
 /////////////////////////////////////////////////
-void ModelManip::SetAttachedTo(ModelManip *_parent)
+void BuildingModelManip::SetAttachedTo(BuildingModelManip *_parent)
 {
   if (this->IsAttached())
   {
@@ -132,7 +132,7 @@ void ModelManip::SetAttachedTo(ModelManip *_parent)
 }
 
 /////////////////////////////////////////////////
-ModelManip *ModelManip::GetAttachedManip(unsigned int _index) const
+BuildingModelManip *BuildingModelManip::GetAttachedManip(unsigned int _index) const
 {
   if (_index >= this->attachedManips.size())
     gzthrow("Index too large");
@@ -141,26 +141,26 @@ ModelManip *ModelManip::GetAttachedManip(unsigned int _index) const
 }
 
 /////////////////////////////////////////////////
-unsigned int ModelManip::GetAttachedManipCount() const
+unsigned int BuildingModelManip::GetAttachedManipCount() const
 {
   return this->attachedManips.size();
 }
 
 /////////////////////////////////////////////////
-bool ModelManip::IsAttached() const
+bool BuildingModelManip::IsAttached() const
 {
   return (this->parent != NULL);
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnPoseChanged(double _x, double _y, double _z,
+void BuildingModelManip::OnPoseChanged(double _x, double _y, double _z,
     double _roll, double _pitch, double _yaw)
 {
   this->SetPose(_x, _y, _z, _roll, _pitch, _yaw);
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnPoseOriginTransformed(double _x, double _y, double _z,
+void BuildingModelManip::OnPoseOriginTransformed(double _x, double _y, double _z,
     double _roll, double _pitch, double _yaw)
 {
   // Handle translations, currently used by polylines
@@ -173,7 +173,7 @@ void ModelManip::OnPoseOriginTransformed(double _x, double _y, double _z,
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnPositionChanged(double _x, double _y, double _z)
+void BuildingModelManip::OnPositionChanged(double _x, double _y, double _z)
 {
   double scaledX = BuildingMaker::Convert(_x);
   double scaledY = BuildingMaker::Convert(-_y);
@@ -184,7 +184,7 @@ void ModelManip::OnPositionChanged(double _x, double _y, double _z)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnWidthChanged(double _width)
+void BuildingModelManip::OnWidthChanged(double _width)
 {
   double scaledWidth = BuildingMaker::Convert(_width);
   this->size = this->visual->GetScale();
@@ -193,7 +193,7 @@ void ModelManip::OnWidthChanged(double _width)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnDepthChanged(double _depth)
+void BuildingModelManip::OnDepthChanged(double _depth)
 {
   double scaledDepth = BuildingMaker::Convert(_depth);
   this->size = this->visual->GetScale();
@@ -202,7 +202,7 @@ void ModelManip::OnDepthChanged(double _depth)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnHeightChanged(double _height)
+void BuildingModelManip::OnHeightChanged(double _height)
 {
   double scaledHeight = BuildingMaker::Convert(_height);
   this->size = this->visual->GetScale();
@@ -218,7 +218,7 @@ void ModelManip::OnHeightChanged(double _height)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnPosXChanged(double _posX)
+void BuildingModelManip::OnPosXChanged(double _posX)
 {
   math::Pose visualPose = this->visual->GetParent()->GetWorldPose();
   double scaledX = BuildingMaker::Convert(_posX);
@@ -227,7 +227,7 @@ void ModelManip::OnPosXChanged(double _posX)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnPosYChanged(double _posY)
+void BuildingModelManip::OnPosYChanged(double _posY)
 {
   math::Pose visualPose = this->visual->GetParent()->GetWorldPose();
   double scaledY = BuildingMaker::Convert(_posY);
@@ -236,7 +236,7 @@ void ModelManip::OnPosYChanged(double _posY)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnPosZChanged(double _posZ)
+void BuildingModelManip::OnPosZChanged(double _posZ)
 {
   math::Pose visualPose = this->visual->GetParent()->GetWorldPose();
   double scaledZ = BuildingMaker::Convert(_posZ);
@@ -245,7 +245,7 @@ void ModelManip::OnPosZChanged(double _posZ)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnYawChanged(double _yaw)
+void BuildingModelManip::OnYawChanged(double _yaw)
 {
   double newYaw = BuildingMaker::ConvertAngle(_yaw);
   math::Vector3 angles = this->visual->GetRotation().GetAsEuler();
@@ -254,19 +254,19 @@ void ModelManip::OnYawChanged(double _yaw)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnRotationChanged(double _roll, double _pitch, double _yaw)
+void BuildingModelManip::OnRotationChanged(double _roll, double _pitch, double _yaw)
 {
   this->SetRotation(_roll, _pitch, _yaw);
 }
 
 /////////////////////////////////////////////////
-void ModelManip::OnDeleted()
+void BuildingModelManip::OnDeleted()
 {
   this->maker->RemovePart(this->name);
 }
 
 /////////////////////////////////////////////////
-void ModelManip::SetPose(double _x, double _y, double _z,
+void BuildingModelManip::SetPose(double _x, double _y, double _z,
     double _roll, double _pitch, double _yaw)
 {
   this->SetPosition(_x, _y, _z);
@@ -274,7 +274,7 @@ void ModelManip::SetPose(double _x, double _y, double _z,
 }
 
 /////////////////////////////////////////////////
-void ModelManip::SetPosition(double _x, double _y, double _z)
+void BuildingModelManip::SetPosition(double _x, double _y, double _z)
 {
   double scaledX = BuildingMaker::Convert(_x);
   double scaledY = BuildingMaker::Convert(-_y);
@@ -284,7 +284,7 @@ void ModelManip::SetPosition(double _x, double _y, double _z)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::SetRotation(double _roll, double _pitch, double _yaw)
+void BuildingModelManip::SetRotation(double _roll, double _pitch, double _yaw)
 {
   double rollRad = BuildingMaker::ConvertAngle(_roll);
   double pitchRad = BuildingMaker::ConvertAngle(_pitch);
@@ -295,7 +295,7 @@ void ModelManip::SetRotation(double _roll, double _pitch, double _yaw)
 }
 
 /////////////////////////////////////////////////
-void ModelManip::SetSize(double _width, double _depth, double _height)
+void BuildingModelManip::SetSize(double _width, double _depth, double _height)
 {
   this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
 

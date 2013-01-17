@@ -114,7 +114,7 @@ WallItem *WallItem::Clone() const
 }
 
 /////////////////////////////////////////////////
-bool WallItem::grabberEventFilter(GrabberHandle* _grabber, QEvent *_event)
+bool WallItem::GrabberEventFilter(GrabberHandle* _grabber, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -207,7 +207,7 @@ bool WallItem::grabberEventFilter(GrabberHandle* _grabber, QEvent *_event)
 }
 
 /////////////////////////////////////////////////
-bool WallItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
+bool WallItem::SegmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -424,8 +424,8 @@ void WallItem::UpdateSegmentChildren(LineSegmentItem *_segment)
 /////////////////////////////////////////////////
 void WallItem::WallChanged()
 {
-  emit depthChanged(this->wallThickness);
-  emit heightChanged(this->wallHeight);
+  emit DepthChanged(this->wallThickness);
+  emit HeightChanged(this->wallHeight);
 }
 
 /////////////////////////////////////////////////

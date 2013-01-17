@@ -200,30 +200,30 @@ void PolylineItem::TranslateVertex(unsigned int _index, const QPointF &_trans)
 
   this->grabbers[_index]->setPos(newCornerPos);
 
-  QPointF Offset(this->grabberWidth/2.0, this->grabberHeight/2.0);
+  QPointF offset(this->grabberWidth/2.0, this->grabberHeight/2.0);
   if (_index != 0)
-    this->segments[_index-1]->SetEndPoint(newCornerPos + Offset);
+    this->segments[_index-1]->SetEndPoint(newCornerPos + offset);
   if (_index < this->segments.size())
-    this->segments[_index]->SetStartPoint(newCornerPos + Offset);
+    this->segments[_index]->SetStartPoint(newCornerPos + offset);
 
   if (this->closed)
   {
     if (_index == 0)
     {
       this->segments[this->segments.size()-1]->SetEndPoint(newCornerPos
-          + Offset);
-      this->grabbers[this->segments.size()]->setPos(newCornerPos + Offset);
-      this->UpdatePathAt(this->segments.size(), newCornerPos + Offset
+          + offset);
+      this->grabbers[this->segments.size()]->setPos(newCornerPos + offset);
+      this->UpdatePathAt(this->segments.size(), newCornerPos + offset
           + this->origin);
     }
     else if (_index == this->segments.size())
     {
-      this->segments[0]->SetStartPoint(newCornerPos + Offset);
-      this->grabbers[0]->setPos(newCornerPos + Offset);
-      this->UpdatePathAt(0, newCornerPos + Offset + this->origin);
+      this->segments[0]->SetStartPoint(newCornerPos + offset);
+      this->grabbers[0]->setPos(newCornerPos + offset);
+      this->UpdatePathAt(0, newCornerPos + offset + this->origin);
     }
   }
-  this->UpdatePathAt(_index, newCornerPos + Offset + this->origin);
+  this->UpdatePathAt(_index, newCornerPos + offset + this->origin);
 }
 
 /////////////////////////////////////////////////
@@ -247,17 +247,17 @@ bool PolylineItem::sceneEventFilter(QGraphicsItem *_watched,
 {
   GrabberHandle *grabber = dynamic_cast<GrabberHandle *>(_watched);
   if (grabber)
-    return this->grabberEventFilter(grabber, _event);
+    return this->GrabberEventFilter(grabber, _event);
 
   LineSegmentItem *segment = dynamic_cast<LineSegmentItem *>(_watched);
   if (segment)
-    return this->segmentEventFilter(segment, _event);
+    return this->SegmentEventFilter(segment, _event);
 
   return false;
 }
 
 /////////////////////////////////////////////////
-bool PolylineItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
+bool PolylineItem::SegmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -307,7 +307,7 @@ bool PolylineItem::segmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
 }
 
 /////////////////////////////////////////////////
-bool PolylineItem::grabberEventFilter(GrabberHandle* _grabber, QEvent *_event)
+bool PolylineItem::GrabberEventFilter(GrabberHandle* _grabber, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -440,25 +440,11 @@ void PolylineItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
     _event->ignore();
     return;
   }
-
-/*  QPointF delta = _event->scenePos() - _event->lastScenePos();
-  this->origin += delta;
-  this->setPos(this->origin);
-
-  emit poseOriginTransformed(delta.x(), delta.y(), 0, 0, 0, 0);*/
 }
 
 /////////////////////////////////////////////////
 void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent */*_event*/)
 {
-/*  if (!this->isSelected())
-  {
-    _event->ignore();
-    return;
-  }
-
-  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));*/
-
   for (unsigned int i = 0; i < segments.size(); ++i)
   {
     this->segments[i]->installSceneEventFilter(this);
@@ -470,14 +456,6 @@ void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent */*_event*/)
 /////////////////////////////////////////////////
 void PolylineItem::hoverMoveEvent(QGraphicsSceneHoverEvent */*_event*/)
 {
-/*  if (!this->isSelected())
-  {
-    _event->ignore();
-    return;
-  }
-
-  QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));*/
-
   for (unsigned int i = 0; i < segments.size(); ++i)
   {
     this->segments[i]->installSceneEventFilter(this);
@@ -490,14 +468,6 @@ void PolylineItem::hoverMoveEvent(QGraphicsSceneHoverEvent */*_event*/)
 /////////////////////////////////////////////////
 void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent */*_event*/)
 {
-/*  if (!this->isSelected())
-  {
-    _event->ignore();
-    return;
-  }
-
-  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));*/
-
   for (unsigned int i = 0; i < segments.size(); ++i)
   {
     this->grabbers[i]->removeSceneEventFilter(this);
@@ -567,11 +537,6 @@ void PolylineItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
   _painter->save();
-
-//  if (this->isSelected())
-//    this->DrawBoundingBox(_painter);
-
-//  this->ShowCorners(this->isSelected());
 
   _painter->drawPath(this->path());
   _painter->restore();

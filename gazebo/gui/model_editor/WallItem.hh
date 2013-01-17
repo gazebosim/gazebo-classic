@@ -65,11 +65,11 @@ namespace gazebo
       public: void Update();
 
       // Documentation inherited
-      private: bool grabberEventFilter(GrabberHandle *_grabber,
+      private: bool GrabberEventFilter(GrabberHandle *_grabber,
           QEvent *_event);
 
       // Documentation inherited
-      private: bool segmentEventFilter(LineSegmentItem *_segment,
+      private: bool SegmentEventFilter(LineSegmentItem *_segment,
           QEvent *_event);
 
       /// \brief Qt context menu event received on a mouse right click.

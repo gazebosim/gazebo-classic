@@ -34,7 +34,7 @@ namespace gazebo
 
   namespace gui
   {
-    class EditorWidget;
+    class BuildingEditorWidget;
 
     class RenderWidget : public QWidget
     {
@@ -55,7 +55,10 @@ namespace gazebo
 
       private: QHBoxLayout *bottomBarLayout;
       private: GLWidget *glWidget;
-      private: EditorWidget *buildingEditorWidget;
+
+      // \brief Building editor widget for creating a building model
+      private: BuildingEditorWidget *buildingEditorWidget;
+
       private: QFrame *mainFrame;
 
       /// \brief Bottom frame that holds the play/pause widgets

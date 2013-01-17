@@ -31,71 +31,73 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class ModelManip ModelManip.hh
+    /// \class BuildingModelManip BuildingModelManip.hh
     /// \brief Manipulate a 3D visual associated to a 2D editor item.
-    class ModelManip : public QObject
+    class BuildingModelManip : public QObject
     {
       Q_OBJECT
 
       /// \brief Constructor
-      public: ModelManip();
+      public: BuildingModelManip();
 
       /// \brief Destructor
-      public: virtual ~ModelManip();
+      public: virtual ~BuildingModelManip();
 
-      /// \brief Get the name of the manipulator object.
-      /// \return Name of the manipulator object.
+      /// \brief Get the name of the manip object.
+      /// \return Name of the manip object.
       public: std::string GetName() const;
 
-      /// \brief Get the visual this manipulator manages.
+      /// \brief Get the visual this manip manages.
       /// \return A pointer to the visual object.
       public: rendering::VisualPtr GetVisual() const;
 
-      /// \brief Set the name of the manipulator object.
-      /// \param[in] _name Name to set the manipulator to.
+      /// \brief Set the name of the manip object.
+      /// \param[in] _name Name to set the manip to.
       public: void SetName(const std::string &_name);
 
-      /// \brief Set the visual this manipulator manages.
+      /// \brief Set the visual this manip manages.
       /// \param[in] _visual A pointer of the visual object.
       public: void SetVisual(const rendering::VisualPtr &_visual);
 
-      /// \brief Set the maker that the manipulator is managed by.
-      /// \param[in] _maker Maker that manages the manipulator.
+      /// \brief Set the maker that the manip is managed by.
+      /// \param[in] _maker Maker that manages the manip.
       public: void SetMaker(BuildingMaker *_maker);
 
-      /// \brief Get the parent of this manipulator.
-      /// \return Parent manipulator.
-      public: ModelManip *GetParent() const;
+      /// \brief Get the parent of this manip.
+      /// \return Parent manip.
+      public: BuildingModelManip *GetParent() const;
 
-      /// \brief Attach a manipulator as a child to this manipulator.
-      /// \param[in] _manip Manipulator to be attached.
-      public: void AttachManip(ModelManip *_manip);
+      /// \brief Attach a manip as a child to this manip.
+      /// \param[in] _manip manip to be attached.
+      public: void AttachManip(BuildingModelManip *_manip);
 
-      /// \brief Detach a child manipulator from this manipulator.
-      /// \param[in] _manip Manipulator to be detached.
-      public: void DetachManip(ModelManip *_manip);
+      /// \brief Detach a child manip from this manip.
+      /// \param[in] _manip manip to be detached.
+      public: void DetachManip(BuildingModelManip *_manip);
 
-      /// \brief Set the parent manipulator of this manipulator.
-      /// \param[in] _parent Parent manipulator
-      public: void SetAttachedTo(ModelManip *_parent);
+      /// \brief Set the parent manip of this manip.
+      /// \param[in] _parent Parent manip
+      public: void SetAttachedTo(BuildingModelManip *_parent);
 
-      /// \brief Detach this manipulator from its parent.
+      /// \brief Detach this manip from its parent.
       public: void DetachFromParent();
 
-      /// \brief Get a child manipulator by index.
-      /// \param[in] _index Index of the child manipulator.
-      public: ModelManip *GetAttachedManip(unsigned int _index) const;
+      /// \brief Get a child manip by index.
+      /// \param[in] _index Index of the child manip.
+      /// \return The attached manip at index _index.
+      public: BuildingModelManip *GetAttachedManip(unsigned int _index) const;
 
-      /// \brief Get the number of child manipulators attached to this
-      /// manipulator.
-      /// \param[in] _index Index of the child manipulator.
+      /// \brief Get the number of child manips attached to this
+      /// manip.
+      /// \param[in] _index Index of the child manip.
+      /// \return The number of attached manips.
       public: unsigned int GetAttachedManipCount() const;
 
-      /// \brief Get whether or not this manipulator is attached to another.
+      /// \brief Get whether or not this manip is attached to another.
       /// \return True if attached, false otherwise.
       public: bool IsAttached() const;
 
-      /// \brief Set the pose of the manipulator.
+      /// \brief Set the pose of the manip.
       /// \param[in] _x X position in pixel coordinates.
       /// \param[in] _y Y position in pixel coordinates.
       /// \param[in] _z Z position in pixel coordinates.
@@ -105,19 +107,19 @@ namespace gazebo
       public: void SetPose(double _x, double _y, double _z,
           double _roll, double _pitch, double _yaw);
 
-      /// \brief Set the position of the manipulator.
+      /// \brief Set the position of the manip.
       /// \param[in] _x X position in pixel coordinates.
       /// \param[in] _y Y position in pixel coordinates.
       /// \param[in] _z Z position in pixel coordinates.
       public: void SetPosition(double _x, double _y, double _z);
 
-      /// \brief Set the rotation of the manipulator.
+      /// \brief Set the rotation of the manip.
       /// \param[in] _roll Roll rotation in degrees.
       /// \param[in] _pitch Pitch rotation in degrees.
       /// \param[in] _yaw Yaw rotation in degrees.
       public: void SetRotation(double _roll, double _pitch, double _yaw);
 
-      /// \brief Set the size of the manipulator.
+      /// \brief Set the size of the manip.
       /// \param[in] _width Width in pixels.
       /// \param[in] _depth Depth in pixels.
       /// \param[in] _height Height pixels.
@@ -206,26 +208,26 @@ namespace gazebo
       /// \brief Qt callback when the associated editor item has been deleted.
       private slots: void OnDeleted();
 
-      /// \brief Name of the manipulator.
+      /// \brief Name of the manip.
       private: std::string name;
 
-      /// \brief A pointer to the visual managed by the manipulator.
+      /// \brief A pointer to the visual managed by the manip.
       private: rendering::VisualPtr visual;
 
       /// \brief Size of the manipular.
       private: math::Vector3 size;
 
-      /// \brief Pose of the manipulator.
+      /// \brief Pose of the manip.
       private: math::Pose pose;
 
-      /// \brief Maker that manages this manipulator.
+      /// \brief Maker that manages this manip.
       private: BuildingMaker *maker;
 
-      /// \brief A list of attached manipulators.
-      private: std::vector<ModelManip *> attachedManips;
+      /// \brief A list of attached manips.
+      private: std::vector<BuildingModelManip *> attachedManips;
 
-      /// \brief Parent manipulator.
-      private: ModelManip * parent;
+      /// \brief Parent manip.
+      private: BuildingModelManip * parent;
     };
     /// \}
   }

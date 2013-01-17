@@ -106,7 +106,7 @@ int StairsItem::GetSteps() const
 
 
 /////////////////////////////////////////////////
-bool StairsItem::rotateEventFilter(RotateHandle *_rotate,
+bool StairsItem::RotateEventFilter(RotateHandle *_rotate,
     QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
@@ -286,10 +286,10 @@ void StairsItem::OnDeleteItem()
 /////////////////////////////////////////////////
 void StairsItem::StairsChanged()
 {
-  emit widthChanged(this->stairsWidth);
-  emit depthChanged(this->stairsDepth);
-  emit heightChanged(this->stairsHeight);
-  emit positionChanged(this->stairsPos.x(), this->stairsPos.y(),
+  emit WidthChanged(this->stairsWidth);
+  emit DepthChanged(this->stairsDepth);
+  emit HeightChanged(this->stairsHeight);
+  emit PositionChanged(this->stairsPos.x(), this->stairsPos.y(),
       this->levelBaseHeight + this->stairsElevation);
 }
 
@@ -298,7 +298,7 @@ void StairsItem::StepsChanged()
 {
   // emit a signal to delete 3d and make a new one
   // TODO there should be a more efficient way to do this.
-  emit itemDeleted();
+  emit ItemDeleted();
   dynamic_cast<EditorView *>((this->scene()->views())[0])->Create3DVisual(this);
   this->StairsChanged();
 }

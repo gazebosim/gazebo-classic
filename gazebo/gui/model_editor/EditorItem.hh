@@ -68,7 +68,7 @@ namespace gazebo
       /// \param[in] _width Width of item in pixels.
       /// \param[in] _depth Depth of item in pixels.
       /// \param[in] _height Height of item in pixels.
-      Q_SIGNALS: void sizeChanged(double _width, double _depth,
+      Q_SIGNALS: void SizeChanged(double _width, double _depth,
           double _height);
 
       /// \brief Qt signal emitted when the editor item pose has changed.
@@ -78,7 +78,7 @@ namespace gazebo
       /// \param[in] _roll Roll rotation of item in degrees.
       /// \param[in] _pitch Pitch rotation of item in degrees.
       /// \param[in] _yaw Yaw rotation of item in degrees.
-      Q_SIGNALS: void poseChanged(double _x, double _y, double _z,
+      Q_SIGNALS: void PoseChanged(double _x, double _y, double _z,
           double _roll, double _pitch, double _yaw);
 
       /// \brief Qt signal emitted when the editor item pose origin has changed.
@@ -88,55 +88,55 @@ namespace gazebo
       /// \param[in] _roll Roll rotation of item in degrees.
       /// \param[in] _pitch Pitch rotation of item in degrees.
       /// \param[in] _yaw Yaw rotation of item in degrees.
-      Q_SIGNALS: void poseOriginTransformed(double _x, double _y, double _z,
+      Q_SIGNALS: void PoseOriginTransformed(double _x, double _y, double _z,
           double _roll, double _pitch, double _yaw);
 
       /// \brief Qt signal emitted when the editor item position has changed.
       /// \param[in] _x X position of item in pixels.
       /// \param[in] _y Y position of item in pixels.
       /// \param[in] _z Z position of item in pixels.
-      Q_SIGNALS: void positionChanged(double _x, double _y, double _z);
+      Q_SIGNALS: void PositionChanged(double _x, double _y, double _z);
 
       /// \brief Qt signal emitted when the editor item rotation has changed.
       /// \param[in] _roll Roll rotation of item in degrees.
       /// \param[in] _pitch Pitch rotation of item in degrees.
       /// \param[in] _yaw Yaw rotation of item in degrees.
-      Q_SIGNALS: void rotationChanged(double _roll, double _pitch, double _yaw);
+      Q_SIGNALS: void RotationChanged(double _roll, double _pitch, double _yaw);
 
       /// \brief Qt signal emitted when the editor item width has changed.
       /// \param[in] _width Width of item in pixels.
-      Q_SIGNALS: void widthChanged(double _width);
+      Q_SIGNALS: void WidthChanged(double _width);
 
       /// \brief Qt signal emitted when the editor item depth has changed.
       /// \param[in] _depth Depth of item in pixels.
-      Q_SIGNALS: void depthChanged(double _depth);
+      Q_SIGNALS: void DepthChanged(double _depth);
 
       /// \brief Qt signal emitted when the editor item height has changed.
       /// \param[in] _height Height of item in pixels.
-      Q_SIGNALS: void heightChanged(double _height);
+      Q_SIGNALS: void HeightChanged(double _height);
 
       /// \brief Qt signal emitted when the editor item's X position has
       /// changed.
       /// \param[in] _x X position of item in pixels.
-      Q_SIGNALS: void posXChanged(double _posX);
+      Q_SIGNALS: void PosXChanged(double _posX);
 
       /// \brief Qt signal emitted when the editor item's Y position has
       /// changed.
       /// \param[in] _y Y position of item in pixels.
-      Q_SIGNALS: void posYChanged(double _posY);
+      Q_SIGNALS: void PosYChanged(double _posY);
 
       /// \brief Qt signal emitted when the editor item's Z position has
       /// changed.
       /// \param[in] _z Z position of item in pixels.
-      Q_SIGNALS: void posZChanged(double _posZ);
+      Q_SIGNALS: void PosZChanged(double _posZ);
 
       /// \brief Qt signal emitted when the editor item yaw rotation has
       /// changed.
       /// \param[in] _yaw Yaw rotation of item in degrees.
-      Q_SIGNALS: void yawChanged(double _yaw);
+      Q_SIGNALS: void YawChanged(double _yaw);
 
       /// \brief Qt signal emitted when the editor item is being deleted.
-      Q_SIGNALS: void itemDeleted();
+      Q_SIGNALS: void ItemDeleted();
 
       /// \brief Type of editor item.
       protected: std::string editorType;

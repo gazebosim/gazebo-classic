@@ -26,7 +26,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/RenderWidget.hh"
-#include "gazebo/gui/model_editor/EditorWidget.hh"
+#include "gazebo/gui/model_editor/BuildingEditorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -81,7 +81,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->glWidget = new GLWidget(this->mainFrame);
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
-  this->buildingEditorWidget = new EditorWidget(this);
+  this->buildingEditorWidget = new BuildingEditorWidget(this);
   this->buildingEditorWidget->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
   this->buildingEditorWidget->hide();

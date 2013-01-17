@@ -191,18 +191,18 @@ void DoorItem::OnOpenInspector()
 /////////////////////////////////////////////////
 void DoorItem::DoorChanged()
 {
-  emit widthChanged(this->doorWidth);
-  emit depthChanged(this->doorDepth);
-  emit heightChanged(this->doorHeight);
-  emit positionChanged(this->doorPos.x(), this->doorPos.y(),
+  emit WidthChanged(this->doorWidth);
+  emit DepthChanged(this->doorDepth);
+  emit HeightChanged(this->doorHeight);
+  emit PositionChanged(this->doorPos.x(), this->doorPos.y(),
       this->levelBaseHeight + this->doorElevation);
 }
 
 /////////////////////////////////////////////////
 void DoorItem::SizeChanged()
 {
-  emit widthChanged(this->doorWidth);
-  emit depthChanged(this->doorDepth);
+  emit WidthChanged(this->doorWidth);
+  emit DepthChanged(this->doorDepth);
 }
 
 /////////////////////////////////////////////////

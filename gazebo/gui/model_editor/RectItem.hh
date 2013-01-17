@@ -119,13 +119,13 @@ namespace gazebo
       /// \brief Filter Qt events and redirect them to the rotate handle.
       /// \param[in] _rotateHandle Rotate handle that will handle the event.
       /// \param[in] _event Qt event
-      private: virtual bool rotateEventFilter(RotateHandle *_rotateHandle,
+      private: virtual bool RotateEventFilter(RotateHandle *_rotateHandle,
           QEvent *_event);
 
       /// \brief Filter Qt events and redirect them to the grabber handle.
       /// \param[in] _rotateHandle Grabber handle that will handle the event.
       /// \param[in] _event Qt event
-      private: virtual bool grabberEventFilter(GrabberHandle *_grabber,
+      private: virtual bool GrabberEventFilter(GrabberHandle *_grabber,
           QEvent *_event);
 
       /// \brief Qt paint function for drawing the rect item.

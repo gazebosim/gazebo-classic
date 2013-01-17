@@ -94,6 +94,8 @@ namespace gazebo
       public: void Update();
 
       /// \brief React to item changes notified by Qt.
+      /// \param[in] _change Qt change type, e.g. selected change
+      /// \param[in] _value Value to be changed to.
       private: QVariant itemChange(GraphicsItemChange _change,
           const QVariant &_value);
 

@@ -63,7 +63,7 @@ namespace gazebo
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
       // Documentation inherited
-      private: virtual bool rotateEventFilter(RotateHandle *_rotateHandle,
+      private: virtual bool RotateEventFilter(RotateHandle *_rotateHandle,
           QEvent *_event);
 
       // Documentation inherited

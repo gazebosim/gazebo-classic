@@ -182,10 +182,10 @@ void WindowItem::OnApply()
 /////////////////////////////////////////////////
 void WindowItem::WindowChanged()
 {
-  emit widthChanged(this->windowWidth);
-  emit depthChanged(this->windowDepth);
-  emit heightChanged(this->windowHeight);
-  emit positionChanged(this->windowPos.x(), this->windowPos.y(),
+  emit WidthChanged(this->windowWidth);
+  emit DepthChanged(this->windowDepth);
+  emit HeightChanged(this->windowHeight);
+  emit PositionChanged(this->windowPos.x(), this->windowPos.y(),
       this->levelBaseHeight + this->windowElevation);
 }
 /*

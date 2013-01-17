@@ -17,6 +17,7 @@
 
 #include <sstream>
 #include <set>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -42,12 +43,13 @@
   #include "gazebo/common/MeshCSG.hh"
 #endif
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/gui/model_editor/FinishModelDialog.hh"
 #include "gazebo/gui/model_editor/EditorEvents.hh"
-#include "gazebo/gui/model_editor/BuildingMaker.hh"
-#include "gazebo/gui/model_editor/ModelManip.hh"
+#include "gazebo/gui/model_editor/BuildingModelManip.hh"
 #include "gazebo/gui/model_editor/EditorItem.hh"
-#include "gazebo/gazebo_config.h"
+#include "gazebo/gui/model_editor/BuildingMaker.hh"
+
 
 using namespace gazebo;
 using namespace gui;
@@ -62,7 +64,7 @@ double BuildingMaker::conversionScale;
   this->conversionScale = 0.01;
 
   // Counters are only used for giving visuals unique names.
-  // FIXME they cannot be reset else gazebo complains about creating
+  // FIXME they cannot be reset else gazebo complains about creating,
   // deleting duplicate visuals
   this->wallCounter = 0;
   this->windowCounter = 0;
@@ -109,44 +111,44 @@ BuildingMaker::~BuildingMaker()
 void BuildingMaker::ConnectItem(const std::string &_partName,
     const EditorItem *_item)
 {
-  ModelManip *manip = this->allItems[_partName];
+  BuildingModelManip *manip = this->allItems[_partName];
 
-  QObject::connect(_item, SIGNAL(sizeChanged(double, double, double)),
+  QObject::connect(_item, SIGNAL(SizeChanged(double, double, double)),
       manip, SLOT(OnSizeChanged(double, double, double)));
-  QObject::connect(_item, SIGNAL(poseChanged(double, double, double,
+  QObject::connect(_item, SIGNAL(PoseChanged(double, double, double,
       double, double, double)), manip, SLOT(OnPoseChanged(double, double,
       double, double, double, double)));
-  QObject::connect(_item, SIGNAL(poseOriginTransformed(double, double, double,
+  QObject::connect(_item, SIGNAL(PoseOriginTransformed(double, double, double,
       double, double, double)), manip, SLOT(OnPoseOriginTransformed(double,
       double, double, double, double, double)));
-  QObject::connect(_item, SIGNAL(positionChanged(double, double, double)),
+  QObject::connect(_item, SIGNAL(PositionChanged(double, double, double)),
       manip, SLOT(OnPositionChanged(double, double, double)));
-  QObject::connect(_item, SIGNAL(rotationChanged(double, double, double)),
+  QObject::connect(_item, SIGNAL(RotationChanged(double, double, double)),
       manip, SLOT(OnRotationChanged(double, double, double)));
 
-  QObject::connect(_item, SIGNAL(widthChanged(double)),
+  QObject::connect(_item, SIGNAL(WidthChanged(double)),
       manip, SLOT(OnWidthChanged(double)));
-  QObject::connect(_item, SIGNAL(heightChanged(double)),
+  QObject::connect(_item, SIGNAL(HeightChanged(double)),
       manip, SLOT(OnHeightChanged(double)));
-  QObject::connect(_item, SIGNAL(depthChanged(double)),
+  QObject::connect(_item, SIGNAL(DepthChanged(double)),
       manip, SLOT(OnDepthChanged(double)));
-  QObject::connect(_item, SIGNAL(posXChanged(double)),
+  QObject::connect(_item, SIGNAL(PosXChanged(double)),
       manip, SLOT(OnPosXChanged(double)));
-  QObject::connect(_item, SIGNAL(posYChanged(double)),
+  QObject::connect(_item, SIGNAL(PosYChanged(double)),
       manip, SLOT(OnPosYChanged(double)));
-  QObject::connect(_item, SIGNAL(posZChanged(double)),
+  QObject::connect(_item, SIGNAL(PosZChanged(double)),
       manip, SLOT(OnPosZChanged(double)));
-  QObject::connect(_item, SIGNAL(yawChanged(double)),
+  QObject::connect(_item, SIGNAL(YawChanged(double)),
       manip, SLOT(OnYawChanged(double)));
-  QObject::connect(_item, SIGNAL(itemDeleted()), manip, SLOT(OnDeleted()));
+  QObject::connect(_item, SIGNAL(ItemDeleted()), manip, SLOT(OnDeleted()));
 }
 
 /////////////////////////////////////////////////
 void BuildingMaker::AttachManip(const std::string &_child,
     const std::string &_parent)
 {
-  ModelManip *child = this->allItems[_child];
-  ModelManip *parent = this->allItems[_parent];
+  BuildingModelManip *child = this->allItems[_child];
+  BuildingModelManip *parent = this->allItems[_parent];
   parent->AttachManip(child);
 }
 
@@ -154,8 +156,8 @@ void BuildingMaker::AttachManip(const std::string &_child,
 void BuildingMaker::DetachManip(const std::string &_child,
     const std::string &_parent)
 {
-  ModelManip *child = this->allItems[_child];
-  ModelManip *parent = this->allItems[_parent];
+  BuildingModelManip *child = this->allItems[_child];
+  BuildingModelManip *parent = this->allItems[_parent];
   parent->DetachManip(child);
 }
 
@@ -204,7 +206,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
       ->GetElement("name")->Set("Gazebo/OrangeTransparent");
   visVisual->Load(visualElem);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
-  ModelManip *wallManip = new ModelManip();
+  BuildingModelManip *wallManip = new BuildingModelManip();
   wallManip->SetMaker(this);
   wallManip->SetName(linkName);
   wallManip->SetVisual(visVisual);
@@ -240,7 +242,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
       ->GetElement("name")->Set("Gazebo/BlueTransparent");
   visVisual->Load(visualElem);
 
-  ModelManip *windowManip = new ModelManip();
+  BuildingModelManip *windowManip = new BuildingModelManip();
   windowManip->SetMaker(this);
   windowManip->SetName(linkName);
   windowManip->SetVisual(visVisual);
@@ -278,7 +280,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
       ->GetElement("name")->Set("Gazebo/YellowTransparent");
   visVisual->Load(visualElem);
 
-  ModelManip *doorManip = new ModelManip();
+  BuildingModelManip *doorManip = new BuildingModelManip();
   doorManip->SetMaker(this);
   doorManip->SetName(linkName);
   doorManip->SetVisual(visVisual);
@@ -314,7 +316,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   visVisual->Load(visualElem);
   visVisual->DetachObjects();
 
-  ModelManip *stairsManip = new ModelManip();
+  BuildingModelManip *stairsManip = new BuildingModelManip();
   stairsManip->SetMaker(this);
   stairsManip->SetName(linkName);
   stairsManip->SetVisual(visVisual);
@@ -381,7 +383,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
       ->GetElement("name")->Set("Gazebo/OrangeTransparent");
   visVisual->Load(visualElem);
 
-  ModelManip *floorManip = new ModelManip();
+  BuildingModelManip *floorManip = new BuildingModelManip();
   floorManip->SetMaker(this);
   floorManip->SetName(linkName);
   floorManip->SetVisual(visVisual);
@@ -398,7 +400,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
 /////////////////////////////////////////////////
 void BuildingMaker::RemovePart(const std::string &_partName)
 {
-  ModelManip *manip = this->allItems[_partName];
+  BuildingModelManip *manip = this->allItems[_partName];
   if (!manip)
   {
     gzerr << _partName << " does not exist\n";
@@ -435,7 +437,7 @@ void BuildingMaker::Stop()
 //  this->modelVisual.reset();
 //  this->visuals.clear();
 //  this->modelSDF.reset();
-  this->modelVisual->SetVisible(false);
+//  this->modelVisual->SetVisible(false);
 }
 
 /////////////////////////////////////////////////
@@ -455,7 +457,7 @@ void BuildingMaker::Reset()
   this->modelVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
   scene->AddVisual(this->modelVisual);
 
-  std::map<std::string, ModelManip *>::iterator it;
+  std::map<std::string, BuildingModelManip *>::iterator it;
   for (it = this->allItems.begin(); it != this->allItems.end(); ++it)
     delete (*it).second;
   this->allItems.clear();
@@ -478,9 +480,10 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
 {
   this->saveLocation = _savePath;
   std::ofstream savefile;
-  std::string saveFilePath = this->saveLocation + "/" + this->modelName
-      + ".sdf";
-  savefile.open(saveFilePath.c_str());
+  boost::filesystem::path path;
+  path = boost::filesystem::operator/(this->saveLocation,
+      this->modelName + ".sdf");
+  savefile.open(path.string().c_str());
   savefile << this->modelSDF->ToString();
   savefile.close();
 }
@@ -526,7 +529,7 @@ void BuildingMaker::GenerateSDF()
 
   modelElem->GetAttribute("name")->Set(this->modelName);
 
-  std::map<std::string, ModelManip *>::iterator itemsIt;
+  std::map<std::string, BuildingModelManip *>::iterator itemsIt;
 
   // loop through all model manips
   for (itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
@@ -536,12 +539,12 @@ void BuildingMaker::GenerateSDF()
     collisionNameStream.str("");
 
     std::string name = itemsIt->first;
-    ModelManip *modelManip = itemsIt->second;
-    rendering::VisualPtr visual = modelManip->GetVisual();
+    BuildingModelManip *buildingModelManip = itemsIt->second;
+    rendering::VisualPtr visual = buildingModelManip->GetVisual();
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
-    newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
+    newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
     newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
 
     if (visual->GetChildCount() == 0)
@@ -551,11 +554,11 @@ void BuildingMaker::GenerateSDF()
       if (name.find("Window") != std::string::npos
           || name.find("Door") != std::string::npos)
       {
-        if (modelManip->IsAttached())
+        if (buildingModelManip->IsAttached())
           continue;
-        visualElem->GetAttribute("name")->Set(modelManip->GetName()
+        visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
             + "_Visual");
-        collisionElem->GetAttribute("name")->Set(modelManip->GetName()
+        collisionElem->GetAttribute("name")->Set(buildingModelManip->GetName()
             + "_Collision");
         visualElem->GetElement("pose")->Set(visual->GetPose());
         collisionElem->GetElement("pose")->Set(visual->GetPose());
@@ -567,16 +570,16 @@ void BuildingMaker::GenerateSDF()
       // check if walls have attached children, i.e. windows or doors
       else if (name.find("Wall") != std::string::npos)
       {
-        if (modelManip->GetAttachedManipCount() != 0 )
+        if (buildingModelManip->GetAttachedManipCount() != 0 )
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr wallVis = visual;
           math::Pose wallPose = wallVis->GetParent()->GetWorldPose();
           math::Vector3 wallSize = wallVis->GetScale();
-          for (unsigned int i = 0; i < modelManip->GetAttachedManipCount();
+          for (unsigned int i = 0; i < buildingModelManip->GetAttachedManipCount();
               ++i)
           {
-            ModelManip *attachedObj = modelManip->GetAttachedManip(i);
+            BuildingModelManip *attachedObj = buildingModelManip->GetAttachedManip(i);
             std::string objName = attachedObj->GetName();
             if (objName.find("Window") != std::string::npos
                 || objName.find("Door") != std::string::npos)
@@ -603,7 +606,7 @@ void BuildingMaker::GenerateSDF()
           this->SubdivideRectSurface(surface, holes, subdivisions);
 
           newLinkElem->ClearElements();
-          newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
+          newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
           newLinkElem->GetElement("pose")->Set(
               visual->GetParent()->GetWorldPose());
           // create a link element of box geom for each subdivision
@@ -613,9 +616,9 @@ void BuildingMaker::GenerateSDF()
             collisionNameStream.str("");
             visualElem = templateVisualElem->Clone();
             collisionElem = templateCollisionElem->Clone();
-            visualNameStream << modelManip->GetName() << "_Visual_" << i;
+            visualNameStream << buildingModelManip->GetName() << "_Visual_" << i;
             visualElem->GetAttribute("name")->Set(visualNameStream.str());
-            collisionNameStream << modelManip->GetName() << "_Collision_" << i;
+            collisionNameStream << buildingModelManip->GetName() << "_Collision_" << i;
             collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
 
             math::Vector3 newSubPos =
@@ -639,9 +642,9 @@ void BuildingMaker::GenerateSDF()
         }
         else
         {
-          visualElem->GetAttribute("name")->Set(modelManip->GetName()
+          visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
               + "_Visual");
-          collisionElem->GetAttribute("name")->Set(modelManip->GetName()
+          collisionElem->GetAttribute("name")->Set(buildingModelManip->GetName()
               + "_Collision");
           visualElem->GetElement("pose")->Set(visual->GetPose());
           collisionElem->GetElement("pose")->Set(visual->GetPose());
@@ -654,16 +657,17 @@ void BuildingMaker::GenerateSDF()
       // check if floors have attached children, i.e. stairs
       else if (name.find("Floor") != std::string::npos)
       {
-        if (modelManip->GetAttachedManipCount() != 0 )
+        if (buildingModelManip->GetAttachedManipCount() != 0 )
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr floorVis = visual;
           math::Pose floorPose = floorVis->GetWorldPose();
           math::Vector3 floorSize = floorVis->GetScale();
-          for (unsigned int i = 0; i < modelManip->GetAttachedManipCount();
-              ++i)
+          for (unsigned int i = 0; i <
+              buildingModelManip->GetAttachedManipCount(); ++i)
           {
-            ModelManip *attachedObj = modelManip->GetAttachedManip(i);
+            BuildingModelManip *attachedObj =
+                buildingModelManip->GetAttachedManip(i);
             std::string objName = attachedObj->GetName();
             if (objName.find("Stairs") != std::string::npos)
             {
@@ -692,7 +696,7 @@ void BuildingMaker::GenerateSDF()
           this->SubdivideRectSurface(surface, holes, subdivisions);
 
           newLinkElem->ClearElements();
-          newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
+          newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
           newLinkElem->GetElement("pose")->Set(
               visual->GetParent()->GetWorldPose());
           // create a link element of box geom for each subdivision
@@ -702,9 +706,11 @@ void BuildingMaker::GenerateSDF()
             collisionNameStream.str("");
             visualElem = templateVisualElem->Clone();
             collisionElem = templateCollisionElem->Clone();
-            visualNameStream << modelManip->GetName() << "_Visual_" << i;
+            visualNameStream << buildingModelManip->GetName() << "_Visual_"
+                << i;
             visualElem->GetAttribute("name")->Set(visualNameStream.str());
-            collisionNameStream << modelManip->GetName() << "_Collision_" << i;
+            collisionNameStream << buildingModelManip->GetName()
+                << "_Collision_" << i;
             collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
 
             math::Vector3 newSubPos =
@@ -728,9 +734,9 @@ void BuildingMaker::GenerateSDF()
         }
         else
         {
-          visualElem->GetAttribute("name")->Set(modelManip->GetName()
+          visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
               + "_Visual");
-          collisionElem->GetAttribute("name")->Set(modelManip->GetName()
+          collisionElem->GetAttribute("name")->Set(buildingModelManip->GetName()
               + "_Collision");
           visualElem->GetElement("pose")->Set(visual->GetPose());
           collisionElem->GetElement("pose")->Set(visual->GetPose());
@@ -753,9 +759,10 @@ void BuildingMaker::GenerateSDF()
         collisionNameStream.str("");
         visualElem = templateVisualElem->Clone();
         collisionElem = templateCollisionElem->Clone();
-        visualNameStream << modelManip->GetName() << "_Visual_" << i;
+        visualNameStream << buildingModelManip->GetName() << "_Visual_" << i;
         visualElem->GetAttribute("name")->Set(visualNameStream.str());
-        collisionNameStream << modelManip->GetName() << "_Collision_" << i;
+        collisionNameStream << buildingModelManip->GetName()
+            << "_Collision_" << i;
         collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
         rendering::VisualPtr childVisual = visual->GetChild(i);
         math::Pose newPose(childVisual->GetWorldPose().pos,
@@ -810,7 +817,7 @@ void BuildingMaker::GenerateSDFWithCSG()
 
   modelElem->GetAttribute("name")->Set(this->modelName);
 
-  std::map<std::string, ModelManip *>::iterator itemsIt;
+  std::map<std::string, BuildingModelManip *>::iterator itemsIt;
   for (itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
       ++itemsIt)
   {
@@ -818,23 +825,23 @@ void BuildingMaker::GenerateSDFWithCSG()
     collisionNameStream.str("");
 
     std::string name = itemsIt->first;
-    ModelManip *modelManip = itemsIt->second;
-    rendering::VisualPtr visual = modelManip->GetVisual();
+    BuildingModelManip *buildingModelManip = itemsIt->second;
+    rendering::VisualPtr visual = buildingModelManip->GetVisual();
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
-    newLinkElem->GetAttribute("name")->Set(modelManip->GetName());
+    newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
     newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
 
     // create a hole to represent a window/door in the wall
     if (name.find("Window") != std::string::npos
         || name.find("Door") != std::string::npos)
     {
-      if (modelManip->IsAttached())
+      if (buildingModelManip->IsAttached())
         continue;
     }
     else if (name.find("Wall") != std::string::npos
-        && modelManip->GetAttachedManipCount() != 0)
+        && buildingModelManip->GetAttachedManipCount() != 0)
     {
       rendering::VisualPtr wallVis = visual;
       math::Pose wallPose = wallVis->GetWorldPose();
@@ -860,9 +867,10 @@ void BuildingMaker::GenerateSDFWithCSG()
       }
       m1->SetScale(math::Vector3(wallVis->GetScale()));
 
-      std::string booleanMeshName = modelManip->GetName() + "_Boolean";
+      std::string booleanMeshName = buildingModelManip->GetName() + "_Boolean";
       common::Mesh *booleanMesh = NULL;
-      for (unsigned int i = 0; i < modelManip->GetAttachedManipCount(); ++i)
+      for (unsigned int i = 0; i < buildingModelManip->GetAttachedManipCount();
+          ++i)
       {
         if (booleanMesh)
         {
@@ -870,7 +878,8 @@ void BuildingMaker::GenerateSDFWithCSG()
           m1 = booleanMesh;
         }
 
-        ModelManip *attachedObj = modelManip->GetAttachedManip(i);
+        BuildingModelManip *attachedObj =
+            buildingModelManip->GetAttachedManip(i);
         std::string objName = attachedObj->GetName();
         if (objName.find("Window") != std::string::npos
             || objName.find("Door") != std::string::npos)
@@ -909,8 +918,9 @@ void BuildingMaker::GenerateSDFWithCSG()
       common::MeshManager::Instance()->AddMesh(booleanMesh);
 
       // finally create the sdf elements
-      visualElem->GetAttribute("name")->Set(modelManip->GetName() + "_Visual");
-      collisionElem->GetAttribute("name")->Set(modelManip->GetName()
+      visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
+          + "_Visual");
+      collisionElem->GetAttribute("name")->Set(buildingModelManip->GetName()
           + "_Collision");
       sdf::ElementPtr visGeomElem = visualElem->GetElement("geometry");
       visGeomElem->ClearElements();
@@ -934,9 +944,10 @@ void BuildingMaker::GenerateSDFWithCSG()
         collisionNameStream.str("");
         visualElem = templateVisualElem->Clone();
         collisionElem = templateCollisionElem->Clone();
-        visualNameStream << modelManip->GetName() << "_Visual_" << i;
+        visualNameStream << buildingModelManip->GetName() << "_Visual_" << i;
         visualElem->GetAttribute("name")->Set(visualNameStream.str());
-        collisionNameStream << modelManip->GetName() << "_Collision_" << i;
+        collisionNameStream << buildingModelManip->GetName() << "_Collision_"
+            << i;
         collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
         rendering::VisualPtr childVisual = visual->GetChild(i);
         math::Pose newPose(childVisual->GetWorldPose().pos,
@@ -1020,7 +1031,6 @@ std::string BuildingMaker::GetTemplateSDFString()
     << "<pose>0 0 0.0 0 0 0</pose>"
     << "<link name ='link'>"
     <<   "<collision name ='collision'>"
-    <<     "<pose>0 0 0.0 0 0 0</pose>"
     <<     "<geometry>"
     <<       "<box>"
     <<         "<size>1.0 1.0 1.0</size>"

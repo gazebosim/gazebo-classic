@@ -34,9 +34,6 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \brief Dialog modes.
-      public: enum mode {WINDOW, DOOR};
-
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
       public: LevelInspectorDialog(QWidget *_parent = 0);
@@ -73,7 +70,7 @@ namespace gazebo
       private slots: void OnOK();
 
       /// \brief Editable line that holds the the level name.
-      private: QLineEdit* levelNameLineEdit;
+      private: QLineEdit *levelNameLineEdit;
 
       /// \brief Spin box for configuring the level height.
       private: QDoubleSpinBox *heightSpinBox;

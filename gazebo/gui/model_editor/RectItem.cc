@@ -28,8 +28,6 @@ using namespace gui;
 /////////////////////////////////////////////////
 RectItem::RectItem()
 {
-//  this->location = Qt(0, 0);
-// this->gridSpace = 10;
   this->editorType = "Rect";
 
   this->width = 100;
@@ -143,8 +141,8 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
   else if (_change == QGraphicsItem::ItemScenePositionHasChanged
       && this->scene())
   {
-    emit posXChanged(this->scenePos().x());
-    emit posYChanged(this->scenePos().y());
+    emit PosXChanged(this->scenePos().x());
+    emit PosYChanged(this->scenePos().y());
   }
   return QGraphicsItem::itemChange(_change, _value);
 }
@@ -154,17 +152,17 @@ bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
 {
   RotateHandle *rotateH = dynamic_cast<RotateHandle *>(_watched);
   if (rotateH != NULL)
-    return this->rotateEventFilter(rotateH, _event);
+    return this->RotateEventFilter(rotateH, _event);
 
   GrabberHandle *grabber = dynamic_cast<GrabberHandle *>(_watched);
   if (grabber != NULL && grabber->isEnabled())
-    return this->grabberEventFilter(grabber, _event);
+    return this->GrabberEventFilter(grabber, _event);
 
   return false;
 }
 
 /////////////////////////////////////////////////
-bool RectItem::rotateEventFilter(RotateHandle *_rotate, QEvent *_event)
+bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -250,7 +248,7 @@ bool RectItem::rotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 }
 
 /////////////////////////////////////////////////
-bool RectItem::grabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
+bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -645,7 +643,7 @@ void RectItem::SetWidth(int _width)
   this->UpdateCornerPositions();
   this->update();
 
-  emit widthChanged(this->drawingWidth);
+  emit WidthChanged(this->drawingWidth);
 }
 
 /////////////////////////////////////////////////
@@ -656,7 +654,7 @@ void RectItem::SetHeight(int _height)
   this->UpdateCornerPositions();
   this->update();
 
-  emit depthChanged(this->drawingHeight);
+  emit DepthChanged(this->drawingHeight);
 }
 
 /////////////////////////////////////////////////
@@ -669,8 +667,8 @@ void RectItem::SetSize(QSize _size)
   this->UpdateCornerPositions();
   this->update();
 
-  emit widthChanged(this->drawingWidth);
-  emit depthChanged(this->drawingHeight);
+  emit WidthChanged(this->drawingWidth);
+  emit DepthChanged(this->drawingHeight);
 }
 
 /////////////////////////////////////////////////
@@ -802,7 +800,7 @@ void RectItem::SetRotation(double _angle)
 {
   this->rotate(_angle - this->rotationAngle);
   this->rotationAngle = _angle;
-  emit yawChanged(this->rotationAngle);
+  emit YawChanged(this->rotationAngle);
 }
 
 /////////////////////////////////////////////////
@@ -814,8 +812,8 @@ double RectItem::GetRotation() const
 /////////////////////////////////////////////////
 void RectItem::SizeChanged()
 {
-  emit depthChanged(this->drawingHeight);
-  emit widthChanged(this->drawingWidth);
+  emit DepthChanged(this->drawingHeight);
+  emit WidthChanged(this->drawingWidth);
 }
 
 /////////////////////////////////////////////////

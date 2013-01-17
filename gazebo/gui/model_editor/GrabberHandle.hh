@@ -85,7 +85,7 @@ namespace gazebo
 
       /// \brief Set the fill color of the grabber handle.
       /// \param[in] _color Fill Color.
-      public: void SetColor(const QColor &color);
+      public: void SetColor(const QColor &_color);
 
       /// \brief Set the border color of the grabber handle.
       /// \param[in] _borderColor Border Color.

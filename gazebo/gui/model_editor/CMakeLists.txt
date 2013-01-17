@@ -6,11 +6,11 @@ set (sources
   BuildingEditorWidget.cc
   BuildingItem.cc
   BuildingMaker.cc
+  BuildingModelManip.cc
   DoorItem.cc
   EditorEvents.cc
   EditorItem.cc
   EditorView.cc
-  EditorWidget.cc
   FinishModelDialog.cc
   FloorItem.cc
   GrabberHandle.cc
@@ -18,7 +18,6 @@ set (sources
   LevelInspectorDialog.cc
   LevelWidget.cc
   LineSegmentItem.cc
-  ModelManip.cc
   PolylineItem.cc
   RectItem.cc
   RotateHandle.cc
@@ -33,6 +32,7 @@ set (sources
 
 set (qt_headers
   BuildingEditorPalette.hh
+  BuildingModelManip.hh
   DoorItem.hh
   EditorItem.hh
   EditorView.hh
@@ -40,7 +40,6 @@ set (qt_headers
   FloorItem.hh
   LevelInspectorDialog.hh
   LevelWidget.hh
-  ModelManip.hh
   RectItem.hh
   ScaleWidget.hh
   StairsInspectorDialog.hh
@@ -56,7 +55,6 @@ set (headers
   BuildingItem.hh
   BuildingMaker.hh
   EditorEvents.hh
-  EditorWidget.hh
   GrabberHandle.hh
   GridLines.hh
   LineSegmentItem.hh

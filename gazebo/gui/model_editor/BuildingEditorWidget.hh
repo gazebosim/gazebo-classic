@@ -54,6 +54,15 @@ namespace gazebo
 
       /// \brief A widget to display the scale of the 2D editor view.
       private: ScaleWidget *scaleWidget;
+
+      /// \brief Qt Graphics Scene where graphics items are drawn in
+      private: QGraphicsScene *scene;
+
+      /// \brief Minimum width of the Qt graphics scene
+      private: int minimumWidth;
+
+      /// \brief Minimum height of the Qt graphics scene
+      private: int minimumHeight;
     };
     /// \}
   }

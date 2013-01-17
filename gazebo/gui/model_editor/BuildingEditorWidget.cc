@@ -37,21 +37,19 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   this->setObjectName("buildingEditorWidget");
 
   QPixmap rotatePixmap(":/images/rotate_object.png");
-//  rotatePixmap = rotatePixmap.scaledToHeight(25);
-//  rotatePixmap = rotatePixmap.scaledToWidth(25);
   rotateCursor = QCursor(rotatePixmap);
 
   EditorView *view = new EditorView();
-  QGraphicsScene *scene = new QGraphicsScene();
+  this->scene = new QGraphicsScene();
 
   QColor c(250, 250, 250);
   QBrush brush(c, Qt::SolidPattern);
-  scene->setBackgroundBrush(brush);
+  this->scene->setBackgroundBrush(brush);
 
-  int boundingWidth = 1240;
-  int boundingHeight = 1024;
-  scene->setSceneRect(-boundingWidth, -boundingHeight,
-                      boundingWidth*2, boundingHeight*2);
+  this->minimumWidth = 1240;
+  this->minimumHeight = 1024;
+  this->scene->setSceneRect(-minimumWidth/2, -minimumHeight/2,
+      minimumWidth, minimumHeight);
   QHBoxLayout *canvasLayout = new QHBoxLayout(this);
   canvasLayout->addWidget(view);
   canvasLayout->setAlignment(Qt::AlignHCenter);
@@ -65,7 +63,7 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   // TODO remove this wall and make sure scene updates without any items in it
   WallItem *wallItem = new WallItem(QPointF(0, 0), QPointF(0, 0));
   wallItem->SetThickness(0);
-  scene->addItem(wallItem);
+  this->scene->addItem(wallItem);
 
   this->levelWidget = new LevelWidget(this);
   this->levelWidget->resize(250, 50);
@@ -88,6 +86,14 @@ BuildingEditorWidget::~BuildingEditorWidget()
 /////////////////////////////////////////////////
 void BuildingEditorWidget::resizeEvent(QResizeEvent *_event)
 {
+  double boundingWidth = std::max(this->minimumWidth, _event->size().width());
+  boundingWidth = std::max(boundingWidth, this->scene->sceneRect().width());
+  double boundingHeight = std::max(this->minimumHeight,
+      _event->size().height());
+  boundingHeight = std::max(boundingHeight, this->scene->sceneRect().height());
+  this->scene->setSceneRect(-boundingWidth/2, -boundingHeight/2,
+      boundingWidth, boundingHeight);
+
   this->levelWidget->move(_event->size().width()/2
       - levelWidget->size().width()/2, 0);
 

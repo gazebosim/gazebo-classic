@@ -30,6 +30,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   this->levelNameLineEdit = new QLineEdit;
   this->levelNameLineEdit->setPlaceholderText(tr("Level X"));
 
+  /// TODO add the widgets back in after the functions is implemented
 /*  QLabel *floorThicknessLabel = new QLabel(tr("Floor Thickness: "));
   this->floorThicknessSpinBox = new QDoubleSpinBox;
   this->floorThicknessSpinBox->setRange(-1000, 1000);

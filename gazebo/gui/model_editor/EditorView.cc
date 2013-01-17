@@ -101,6 +101,7 @@ EditorView::EditorView(QWidget *_parent)
 //  this->setRenderHint(QPainter::SmoothPixmapTransform);
 //  this->setRenderHint(QPainter::Antialiasing);
   this->gridLines = NULL;
+
   this->viewScale = 1.0;
   this->levelCounter = 0;
 }
@@ -117,21 +118,33 @@ EditorView::~EditorView()
 /////////////////////////////////////////////////
 void EditorView::scrollContentsBy(int _dx, int _dy)
 {
+  QGraphicsView::scrollContentsBy(_dx, _dy);
+
   if (this->gridLines && this->scene())
   {
-    this->gridLines->moveBy(-_dx, -_dy);
+    this->gridLines->setPos(this->mapToScene(QPoint(this->width()/2,
+        this->height()/2)));
   }
-  QGraphicsView::scrollContentsBy(_dx, _dy);
 }
 
 /////////////////////////////////////////////////
-void EditorView::resizeEvent(QResizeEvent */*_event*/)
+void EditorView::resizeEvent(QResizeEvent *_event)
 {
-  if (!this->gridLines && this->scene())
+  if (this->scene())
   {
-    this->gridLines = new GridLines(this->scene()->sceneRect().width(),
-    this->scene()->sceneRect().height());
-    this->scene()->addItem(this->gridLines);
+    if (!this->gridLines)
+    {
+      this->gridLines = new GridLines(_event->size().width(),
+          _event->size().height());
+      this->scene()->addItem(this->gridLines);
+    }
+    else
+    {
+      this->gridLines->SetSize(_event->size().width(),
+          _event->size().height());
+    }
+    this->gridLines->setPos(this->mapToScene(
+        QPoint(_event->size().width()/2, _event->size().height()/2)));
   }
 }
 
@@ -188,7 +201,7 @@ void EditorView::wheelEvent(QWheelEvent *_event)
       mousePosition.y() -(this->height()/2));
   this->setMatrix(mat);
 
-  if (gridLines)
+  if (this->gridLines)
   {
     this->gridLines->setPos(this->mapToScene(
         QPoint(this->width()/2, this->height()/2)));
@@ -222,7 +235,7 @@ void EditorView::mousePressEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mouseReleaseEvent(QMouseEvent *_event)
 {
-  switch (drawMode)
+  switch (this->drawMode)
   {
     case NONE:
       break;
@@ -230,31 +243,31 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
       this->DrawWall(_event->pos());
       break;
     case WINDOW:
-      if (drawInProgress)
+      if (this->drawInProgress)
       {
-        this->windowList.push_back(dynamic_cast<WindowItem*>(
+        this->windowList.push_back(dynamic_cast<WindowItem *>(
             this->currentMouseItem));
         this->drawMode = NONE;
         this->drawInProgress = false;
       }
       break;
     case DOOR:
-      if (drawInProgress)
+      if (this->drawInProgress)
       {
-        this->doorList.push_back(dynamic_cast<DoorItem*>(
+        this->doorList.push_back(dynamic_cast<DoorItem *>(
             this->currentMouseItem));
         this->drawMode = NONE;
         this->drawInProgress = false;
       }
       break;
     case STAIRS:
-      if (drawInProgress)
+      if (this->drawInProgress)
       {
-        this->stairsList.push_back(dynamic_cast<StairsItem*>(
+        this->stairsList.push_back(dynamic_cast<StairsItem *>(
             this->currentMouseItem));
         if ((this->currentLevel) < static_cast<int>(floorList.size()))
         {
-          EditorItem *item = dynamic_cast<EditorItem*>(this->currentMouseItem);
+          EditorItem *item = dynamic_cast<EditorItem *>(this->currentMouseItem);
           this->buildingMaker->AttachManip(this->itemToVisualMap[item],
               this->itemToVisualMap[floorList[this->currentLevel]]);
         }
@@ -274,18 +287,19 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mouseMoveEvent(QMouseEvent *_event)
 {
-  switch (drawMode)
+  switch (this->drawMode)
   {
     case NONE:
       break;
     case WALL:
     {
-      WallItem *wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
+      WallItem *wallItem = dynamic_cast<WallItem *>(this->currentMouseItem);
       if (this->drawInProgress && wallItem)
       {
         this->snapToCloseWall =false;
         if (wallItem->GetVertexCount() >= 3)
         {
+          // snap end point to initial start point
           LineSegmentItem *segment = wallItem->GetSegment(0);
           QPointF firstPoint = segment->mapToScene(segment->line().p1());
           QPointF currentPoint = this->mapToScene(_event->pos());
@@ -541,7 +555,7 @@ void EditorView::DeleteItem(EditorItem *_item)
 void EditorView::DrawWall(const QPoint &_pos)
 {
   WallItem *wallItem = NULL;
-  if (!drawInProgress)
+  if (!this->drawInProgress)
   {
     QPointF pointStart = mapToScene(_pos);
     QPointF pointEnd = pointStart + QPointF(1, 0);
@@ -555,7 +569,7 @@ void EditorView::DrawWall(const QPoint &_pos)
   }
   else
   {
-    wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
+    wallItem = dynamic_cast<WallItem *>(this->currentMouseItem);
     if (wallItem)
     {
       LineSegmentItem *segment = wallItem->GetSegment(
@@ -582,7 +596,6 @@ void EditorView::DrawWall(const QPoint &_pos)
     this->itemToVisualMap[segment] = wallSegmentName;
     if (segment->GetIndex() == 0)
       wallItem->SetName(wallSegmentName);
-//    this->itemToVisualMap[wallItem] = wallSegmentName;
   }
 }
 

@@ -221,14 +221,14 @@ void LineSegmentItem::paint(QPainter *_painter,
 /////////////////////////////////////////////////
 void LineSegmentItem::LineChanged()
 {
-  emit widthChanged(this->line().length() + this->pen().width());
-  emit depthChanged(this->pen().width());
+  emit WidthChanged(this->line().length() + this->pen().width());
+  emit DepthChanged(this->pen().width());
 
   QPointF centerPos = this->mapToScene(this->start
       + (this->end - this->start)/2.0);
-  emit posXChanged(centerPos.x());
-  emit posYChanged(centerPos.y());
-  emit rotationChanged(0, 0, -this->line().angle());
+  emit PosXChanged(centerPos.x());
+  emit PosYChanged(centerPos.y());
+  emit RotationChanged(0, 0, -this->line().angle());
 }
 
 /////////////////////////////////////////////////
