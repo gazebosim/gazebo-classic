@@ -79,22 +79,24 @@ namespace gazebo
       /// \brief Process incoming messages.
       public: void ProcessIncoming();
 
+      /// \brief Return true if a subscriber on a specific topic is latched.
+      /// \param[in] _topic Name of the topic to check.
+      /// \return True if a latched subscriber exists.
+      public: bool HasLatchedSubscriber(const std::string &_topic) const;
+
       /// \brief Adverise a topic
       /// \param[in] _topic The topic to advertise
       /// \param[in] _queueLimit The maximum number of outgoing messages to
       /// queue for delivery
-      /// \param[in] _latch If true, latch the last message; otherwise,
-      /// don't latch
       /// \return Pointer to new publisher object
-      template<typename M>
+      public: template<typename M>
       transport::PublisherPtr Advertise(const std::string &_topic,
-                                        unsigned int _queueLimit = 1000,
-                                        bool _latch = false)
+                                        unsigned int _queueLimit = 1000)
       {
         std::string decodedTopic = this->DecodeTopicName(_topic);
         PublisherPtr publisher =
           transport::TopicManager::Instance()->Advertise<M>(
-              decodedTopic, _queueLimit, _latch);
+              decodedTopic, _queueLimit);
 
         boost::recursive_mutex::scoped_lock lock(this->publisherMutex);
         this->publishers.push_back(publisher);
@@ -110,7 +112,7 @@ namespace gazebo
       /// \param[in] _latching If true, latch latest incoming message;
       /// otherwise don't latch
       /// \return Pointer to new Subscriber object
-      template<typename M, typename T>
+      public: template<typename M, typename T>
       SubscriberPtr Subscribe(const std::string &_topic,
           void(T::*_fp)(const boost::shared_ptr<M const> &), T *_obj,
           bool _latching = false)
@@ -121,9 +123,14 @@ namespace gazebo
 
         boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
         this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
-              new CallbackHelperT<M>(boost::bind(_fp, _obj, _1))));
+              new CallbackHelperT<M>(boost::bind(_fp, _obj, _1), _latching)));
 
-        return transport::TopicManager::Instance()->Subscribe(ops);
+        SubscriberPtr result =
+          transport::TopicManager::Instance()->Subscribe(ops);
+
+        result->SetCallbackId(this->callbacks[decodedTopic].back()->GetId());
+
+        return result;
       }
 
       /// \brief Subscribe to a topic using a bare function as the callback
@@ -132,7 +139,7 @@ namespace gazebo
       /// \param[in] _latching If true, latch latest incoming message;
       /// otherwise don't latch
       /// \return Pointer to new Subscriber object
-      template<typename M>
+      public: template<typename M>
       SubscriberPtr Subscribe(const std::string &_topic,
           void(*_fp)(const boost::shared_ptr<M const> &),
                      bool _latching = false)
@@ -143,9 +150,68 @@ namespace gazebo
 
         boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
         this->callbacks[decodedTopic].push_back(
-            CallbackHelperPtr(new CallbackHelperT<M>(_fp)));
+            CallbackHelperPtr(new CallbackHelperT<M>(_fp, _latching)));
 
-        return transport::TopicManager::Instance()->Subscribe(ops);
+        SubscriberPtr result =
+          transport::TopicManager::Instance()->Subscribe(ops);
+
+        result->SetCallbackId(this->callbacks[decodedTopic].back()->GetId());
+
+        return result;
+      }
+
+      /// \brief Subscribe to a topic using a class method as the callback
+      /// \param[in] _topic The topic to subscribe to
+      /// \param[in] _fp Class method to be called on receipt of new message
+      /// \param[in] _obj Class instance to be used on receipt of new message
+      /// \param[in] _latching If true, latch latest incoming message;
+      /// otherwise don't latch
+      /// \return Pointer to new Subscriber object
+      template<typename T>
+      SubscriberPtr Subscribe(const std::string &_topic,
+          void(T::*_fp)(const std::string &), T *_obj,
+          bool _latching = false)
+      {
+        SubscribeOptions ops;
+        std::string decodedTopic = this->DecodeTopicName(_topic);
+        ops.Init(decodedTopic, shared_from_this(), _latching);
+
+        boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+        this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
+              new RawCallbackHelper(boost::bind(_fp, _obj, _1))));
+
+        SubscriberPtr result =
+          transport::TopicManager::Instance()->Subscribe(ops);
+
+        result->SetCallbackId(this->callbacks[decodedTopic].back()->GetId());
+
+        return result;
+      }
+
+
+      /// \brief Subscribe to a topic using a bare function as the callback
+      /// \param[in] _topic The topic to subscribe to
+      /// \param[in] _fp Function to be called on receipt of new message
+      /// \param[in] _latching If true, latch latest incoming message;
+      /// otherwise don't latch
+      /// \return Pointer to new Subscriber object
+      SubscriberPtr Subscribe(const std::string &_topic,
+          void(*_fp)(const std::string &), bool _latching = false)
+      {
+        SubscribeOptions ops;
+        std::string decodedTopic = this->DecodeTopicName(_topic);
+        ops.Init(decodedTopic, shared_from_this(), _latching);
+
+        boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+        this->callbacks[decodedTopic].push_back(
+            CallbackHelperPtr(new RawCallbackHelper(_fp)));
+
+        SubscriberPtr result =
+          transport::TopicManager::Instance()->Subscribe(ops);
+
+        result->SetCallbackId(this->callbacks[decodedTopic].back()->GetId());
+
+        return result;
       }
 
       /// \brief Handle incoming data.
@@ -164,11 +230,17 @@ namespace gazebo
       public: void InsertLatchedMsg(const std::string &_topic,
                                     const std::string &_msg);
 
-
       /// \brief Get the message type for a topic
       /// \param[in] _topic The topic
       /// \return The message type
       public: std::string GetMsgType(const std::string &_topic) const;
+
+      /// \internal
+      /// \brief Remove a callback. This should only be called by
+      /// Subscriber.cc
+      /// \param[in] _topic Name of the topic.
+      /// \param[in] _id Id of the callback.
+      public: void RemoveCallback(const std::string &_topic, unsigned int _id);
 
       private: std::string topicNamespace;
       private: std::vector<PublisherPtr> publishers;

@@ -20,6 +20,7 @@
 #include <boost/bind.hpp>
 #include <string>
 #include <list>
+#include <map>
 
 #include "transport/TransportTypes.hh"
 #include "transport/SubscribeOptions.hh"
@@ -81,10 +82,48 @@ namespace gazebo
     /// until a response is received.
     /// \param[in] _worldName The name of the world to which the request
     /// should be sent
-    /// \param[in] _request The request itself
+    /// \param[in] _request The type request.
+    /// \param[in] _data Optional data string.
     /// \return The response to the request.  Can be empty.
-    msgs::Response request(const std::string &_worldName,
-                           const msgs::Request &_request);
+    boost::shared_ptr<msgs::Response> request(const std::string &_worldName,
+                                              const std::string &_request,
+                                              const std::string &_data = "");
+
+    /// \brief Send a request and don't wait for a response. This is
+    /// non-blocking.
+    /// \param[in] _worldName The name of the world to which the request
+    /// should be sent.
+    /// \param[in] _request The type request.
+    /// \param[in] _data Optional data string.
+    void requestNoReply(const std::string &_worldName,
+                        const std::string &_request,
+                        const std::string &_data = "");
+
+    /// \brief Send a request and don't wait for a response. This is
+    /// non-blocking.
+    /// \param[in] _node Pointer to a node that provides communication.
+    /// \param[in] _request The type request.
+    /// \param[in] _data Optional data string.
+    void requestNoReply(NodePtr _node, const std::string &_request,
+                        const std::string &_data = "");
+
+    /// \brief Get a list of all the topics and their message types.
+    /// \return A map where keys are message types, and values are a list
+    /// of topic names.
+    std::map<std::string, std::list<std::string> > getAdvertisedTopics();
+
+    /// \brief Get a list of all the unique advertised topic names.
+    /// \param[in] _msgType Type of message to filter the result on. If
+    /// empty, then a list of all the topics is returned.
+    /// \return A list of the advertised topics that publish messages
+    /// of the type specified by _msgType.
+    std::list<std::string> getAdvertisedTopics(const std::string &_msgType);
+
+    /// \brief Get the message typename that is published on the given topic.
+    /// \param[in] _topicName Name of the topic to query.
+    /// \return The message type, or empty string if the topic is not valid.
+    std::string getTopicMsgType(const std::string &_topicName);
+
     /// \}
   }
 }

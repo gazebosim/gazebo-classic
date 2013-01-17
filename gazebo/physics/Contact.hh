@@ -60,9 +60,6 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~Contact();
 
-      /// \brief Deprecated
-      public: Contact Clone() const GAZEBO_DEPRECATED;
-
       /// \brief Operator =.
       /// \param[in] _contact Contact to copy.
       /// \return Reference to this contact

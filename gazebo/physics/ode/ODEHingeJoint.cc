@@ -40,6 +40,8 @@ ODEHingeJoint::ODEHingeJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEHingeJoint::~ODEHingeJoint()
 {
+  if (this->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
 //////////////////////////////////////////////////
@@ -95,15 +97,11 @@ void ODEHingeJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 //////////////////////////////////////////////////
 void ODEHingeJoint::SetDamping(int /*index*/, double _damping)
 {
-  this->damping_coefficient = _damping;
-  dJointSetDamping(this->jointId, this->damping_coefficient);
-}
-
-//////////////////////////////////////////////////
-void ODEHingeJoint::ApplyDamping()
-{
-  double damping_force = this->damping_coefficient * this->GetVelocity(0);
-  this->SetForce(0, damping_force);
+  this->dampingCoefficient = _damping;
+  // use below when ode version is fixed
+  // dJointSetDamping(this->jointId, this->dampingCoefficient);
+  this->applyDamping = physics::Joint::ConnectJointUpdate(
+    boost::bind(&Joint::ApplyDamping, this));
 }
 
 //////////////////////////////////////////////////
@@ -142,8 +140,9 @@ double ODEHingeJoint::GetMaxForce(int /*index*/)
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetForce(int /*index*/, double _torque)
+void ODEHingeJoint::SetForce(int _index, double _torque)
 {
+  ODEJoint::SetForce(_index, _torque);
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)

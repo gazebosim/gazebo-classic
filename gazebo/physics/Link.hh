@@ -314,9 +314,6 @@ namespace gazebo
       public: void DisconnectEnabled(event::ConnectionPtr &_conn)
               {enabledSignal.Disconnect(_conn);}
 
-      /// \brief DEPRECATED
-      public: void FillLinkMsg(msgs::Link &_msg) GAZEBO_DEPRECATED;
-
       /// \brief Fill a link message
       /// \param[out] _msg Message to fill
       public: void FillMsg(msgs::Link &_msg);

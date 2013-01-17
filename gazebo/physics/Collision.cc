@@ -109,10 +109,10 @@ void Collision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Collision::Init()
 {
+  this->shape->Init();
+
   this->SetRelativePose(
     this->sdf->GetValuePose("pose"));
-
-  this->shape->Init();
 }
 
 //////////////////////////////////////////////////
@@ -282,12 +282,6 @@ math::Vector3 Collision::GetWorldAngularAccel() const
 void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Entity::UpdateParameters(_sdf);
-}
-
-//////////////////////////////////////////////////
-void Collision::FillCollisionMsg(msgs::Collision &_msg)
-{
-  this->FillMsg(_msg);
 }
 
 //////////////////////////////////////////////////

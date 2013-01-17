@@ -88,10 +88,9 @@ namespace gazebo
       public: unsigned int GetCollisionContactCount(
                   const std::string &_collisionName) const;
 
-      /// Deprecated. Use ContactSensor::GetContacts
-      public: physics::Contact GetCollisionContact(
-                  const std::string &_collisionName, unsigned int _index) const
-              GAZEBO_DEPRECATED;
+      /// \brief Get all the contacts
+      /// \return Message that contains all the contact information
+      public: msgs::Contacts GetContacts() const;
 
       /// \brief Gets contacts of a collision
       /// \param[in] _collisionName Name of collision
@@ -115,7 +114,7 @@ namespace gazebo
       private: transport::SubscriberPtr contactSub;
 
       /// \brief Mutex to protect reads and writes.
-      private: boost::mutex mutex;
+      private: mutable boost::mutex mutex;
 
       /// \brief Contacts message used to output sensor data.
       private: msgs::Contacts contactsMsg;

@@ -13,6 +13,7 @@ message Physics
   enum Type
   {
     ODE = 1;
+    BULLET = 2;
   }
   required Type type = 2[default=ODE];
 
@@ -26,5 +27,6 @@ message Physics
   optional double contact_surface_layer = 10;
   optional Vector3d gravity = 11;
   optional double update_rate = 12;
+  optional bool enable_physics = 13;
 }
 

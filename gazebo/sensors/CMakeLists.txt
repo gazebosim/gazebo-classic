@@ -1,30 +1,34 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-set (sources Sensors.cc
-             Sensor.cc
-             SensorFactory.cc
-             SensorManager.cc
-             CameraSensor.cc
-             ContactSensor.cc
-             DepthCameraSensor.cc
-             ImuSensor.cc
-             RaySensor.cc
-             RFIDSensor.cc
-             RFIDTag.cc
+set (sources 
+  CameraSensor.cc
+  ContactSensor.cc
+  DepthCameraSensor.cc
+  ImuSensor.cc
+  MultiCameraSensor.cc
+  RaySensor.cc
+  RFIDSensor.cc
+  RFIDTag.cc
+  Sensors.cc
+  Sensor.cc
+  SensorFactory.cc
+  SensorManager.cc
 ) 
 
-set (headers Sensors.hh
-             Sensor.hh
-             SensorTypes.hh
-             SensorFactory.hh
-             SensorManager.hh
-             CameraSensor.hh
-             ContactSensor.hh
-             DepthCameraSensor.hh
-             ImuSensor.hh
-             RaySensor.hh
-             RFIDSensor.hh
-             RFIDTag.hh
+set (headers
+  CameraSensor.hh
+  ContactSensor.hh
+  DepthCameraSensor.hh
+  ImuSensor.hh
+  MultiCameraSensor.hh
+  RaySensor.hh
+  RFIDSensor.hh
+  RFIDTag.hh
+  Sensors.hh
+  Sensor.hh
+  SensorTypes.hh
+  SensorFactory.hh
+  SensorManager.hh
 )
 
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)

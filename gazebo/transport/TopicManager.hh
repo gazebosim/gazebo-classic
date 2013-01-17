@@ -94,13 +94,10 @@ namespace gazebo
       /// \param[in] _topic The name of the topic
       /// \param[in] _queueLimit The maximum number of outgoing messages
       /// to queue
-      /// \param[in] _latch If true, latch the latest message; if false,
-      /// don't latch
       /// \return Pointer to the newly created Publisher
       public: template<typename M>
               PublisherPtr Advertise(const std::string &_topic,
-                                     unsigned int _queueLimit,
-                                     bool _latch)
+                                     unsigned int _queueLimit)
               {
                 google::protobuf::Message *msg = NULL;
                 M msgtype;
@@ -111,7 +108,7 @@ namespace gazebo
                 this->UpdatePublications(_topic, msg->GetTypeName());
 
                 PublisherPtr pub = PublisherPtr(new Publisher(_topic,
-                      msg->GetTypeName(), _queueLimit, _latch));
+                      msg->GetTypeName(), _queueLimit));
 
                 std::string msgTypename;
                 PublicationPtr publication;
@@ -222,6 +219,13 @@ namespace gazebo
       /// \param[out] _namespaces The list of namespaces will be written here
       public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
 
+      /// \brief Get a list of all the topics.
+      /// \return A map where keys are message types, and values are a list
+      /// of topic names.
+      /// \sa transport::GetAdvertisedTopics
+      public: std::map<std::string, std::list<std::string> >
+              GetAdvertisedTopics() const GAZEBO_DEPRECATED;
+
       /// \brief Clear all buffers
       public: void ClearBuffers();
 
@@ -245,8 +249,8 @@ namespace gazebo
       // Singleton implementation
       private: friend class SingletonT<TopicManager>;
     };
+
     /// \}
   }
 }
 #endif
-

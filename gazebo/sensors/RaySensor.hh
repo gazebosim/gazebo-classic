@@ -162,13 +162,16 @@ namespace gazebo
       public: physics::MultiRayShapePtr GetLaserShape() const
               {return this->laserShape;}
 
+      // Documentation inherited
+      public: virtual bool IsActive();
+
       private: physics::CollisionPtr laserCollision;
       private: physics::MultiRayShapePtr laserShape;
       private: physics::EntityPtr parentEntity;
 
       private: transport::PublisherPtr scanPub;
-      private: boost::mutex *mutex;
-      private: msgs::LaserScan laserMsg;
+      private: boost::mutex mutex;
+      private: msgs::LaserScanStamped laserMsg;
     };
     /// \}
   }

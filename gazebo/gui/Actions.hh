@@ -50,16 +50,23 @@ namespace gazebo
     extern QAction *g_spotLghtCreateAct;
     extern QAction *g_dirLghtCreateAct;
 
-    extern QAction *g_viewGridAct;
-    extern QAction *g_viewContactsAct;
-    extern QAction *g_viewResetAct;
-    extern QAction *g_viewFullScreenAct;
-    extern QAction *g_viewFPSAct;
-    extern QAction *g_viewOrbitAct;
+    extern QAction *g_showCollisionsAct;
+    extern QAction *g_showGridAct;
+    extern QAction *g_showContactsAct;
+    extern QAction *g_showJointsAct;
+    extern QAction *g_showCOMAct;
+    extern QAction *g_transparentAct;
+
+    extern QAction *g_resetAct;
+    extern QAction *g_fullScreenAct;
+    extern QAction *g_fpsAct;
+    extern QAction *g_orbitAct;
 
     extern QAction *g_arrowAct;
     extern QAction *g_translateAct;
     extern QAction *g_rotateAct;
+
+    extern QAction *g_topicVisAct;
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.

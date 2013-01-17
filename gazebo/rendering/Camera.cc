@@ -96,8 +96,8 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   this->lastRenderWallTime = common::Time::GetWallTime();
 
-  // Set default render rate to 30Hz
-  this->SetRenderRate(30.0);
+  // Set default render rate to unlimited
+  this->SetRenderRate(0.0);
 }
 
 //////////////////////////////////////////////////
@@ -186,6 +186,9 @@ void Camera::Init()
 
   this->pitchNode->attachObject(this->camera);
   this->camera->setAutoAspectRatio(true);
+
+  this->sceneNode->setInheritScale(false);
+  this->pitchNode->setInheritScale(false);
 
   this->saveCount = 0;
 
@@ -414,6 +417,7 @@ void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
   if (this->animState)
     return;
+
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
 }
 
@@ -545,11 +549,11 @@ unsigned int Camera::GetImageDepth() const
   sdf::ElementPtr imgElem = this->sdf->GetElement("image");
   std::string imgFmt = imgElem->GetValueString("format");
 
-  if (imgFmt == "L8")
+  if (imgFmt == "L8" || imgFmt == "L_INT8")
     return 1;
-  else if (imgFmt == "R8G8B8")
+  else if (imgFmt == "R8G8B8" || imgFmt == "RGB_INT8")
     return 3;
-  else if (imgFmt == "B8G8R8")
+  else if (imgFmt == "B8G8R8" || imgFmt == "BGR_INT8")
     return 3;
   else if ((imgFmt == "BAYER_RGGB8") || (imgFmt == "BAYER_BGGR8") ||
             (imgFmt == "BAYER_GBRG8") || (imgFmt == "BAYER_GRBG8"))
@@ -605,11 +609,11 @@ int Camera::GetOgrePixelFormat(const std::string &_format)
 {
   int result;
 
-  if (_format == "L8")
+  if (_format == "L8" || _format == "L_INT8")
     result = static_cast<int>(Ogre::PF_L8);
-  else if (_format == "R8G8B8")
+  else if (_format == "R8G8B8" || _format == "RGB_INT8")
     result = static_cast<int>(Ogre::PF_BYTE_RGB);
-  else if (_format == "B8G8R8")
+  else if (_format == "B8G8R8" || _format == "BGR_INT8")
     result = static_cast<int>(Ogre::PF_BYTE_BGR);
   else if (_format == "FLOAT32")
     result = static_cast<int>(Ogre::PF_FLOAT32_R);
@@ -747,6 +751,12 @@ void Camera::SetSceneNode(Ogre::SceneNode *node)
 
 //////////////////////////////////////////////////
 Ogre::SceneNode *Camera::GetSceneNode() const
+{
+  return this->sceneNode;
+}
+
+//////////////////////////////////////////////////
+Ogre::SceneNode *Camera::GetPitchNode() const
 {
   return this->pitchNode;
 }
@@ -1288,6 +1298,12 @@ bool Camera::GetInitialized() const
 }
 
 /////////////////////////////////////////////////
+bool Camera::IsAnimating() const
+{
+  return this->animState != NULL;
+}
+
+/////////////////////////////////////////////////
 bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
 {
   if (this->animState)
@@ -1295,7 +1311,6 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
     this->moveToPositionQueue.push_back(std::make_pair(_pose, _time));
     return false;
   }
-
 
   Ogre::TransformKeyFrame *key;
   math::Vector3 rpy = _pose.rot.GetAsEuler();
@@ -1429,7 +1444,10 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
 //////////////////////////////////////////////////
 void Camera::SetRenderRate(double _hz)
 {
-  this->renderPeriod = 1.0 / _hz;
+  if (_hz > 0.0)
+    this->renderPeriod = 1.0 / _hz;
+  else
+    this->renderPeriod = 0.0;
 }
 
 //////////////////////////////////////////////////

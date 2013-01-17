@@ -27,12 +27,14 @@
 #include <boost/any.hpp>
 
 #include "gazebo/common/Event.hh"
+#include "gazebo/common/Events.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 
 #include "gazebo/physics/JointState.hh"
 #include "gazebo/physics/Base.hh"
+#include "gazebo/physics/JointWrench.hh"
 
 namespace gazebo
 {
@@ -93,9 +95,19 @@ namespace gazebo
       /// \brief Set pose, parent and child links of a physics::Joint
       /// \param[in] _parent Parent link.
       /// \param[in] _child Child link.
-      /// \param[in] _pose Pose of the link.
+      /// \param[in] _pose Pose containing Joint Anchor offset from child link.
       public: void Load(LinkPtr _parent, LinkPtr _child,
                         const math::Pose &_pose);
+
+      /// \brief Set parent and child links of a physics::Joint and its
+      /// anchor offset position.
+      /// This funciton is deprecated, use
+      /// Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
+      /// \param[in] _parent Parent link.
+      /// \param[in] _child Child link.
+      /// \param[in] _pos Joint Anchor offset from child link.
+      public: void Load(LinkPtr _parent, LinkPtr _child,
+                        const math::Vector3 &_pos) GAZEBO_DEPRECATED;
 
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.
@@ -152,6 +164,9 @@ namespace gazebo
       /// \param[in] _index Index of the axis to set.
       /// \param[in] _damping Damping value for the axis.
       public: virtual void SetDamping(int _index, double _damping) = 0;
+
+      /// \brief Callback to apply damping force to joint.
+      public: virtual void ApplyDamping();
 
       /// \brief Connect a boost::slot the the joint update signal.
       /// \param[in] _subscriber Callback for the connection.
@@ -239,6 +254,12 @@ namespace gazebo
       /// \return The force applied to an axis.
       public: virtual double GetForce(int _index);
 
+      /// \brief get force torque values at a joint
+      /// \param[in] _index Force and torque on child link if _index = 0
+      /// and on parent link of _index = 1
+      /// \return The force and torque at the joint
+      public: virtual JointWrench GetForceTorque(int _index) = 0;
+
       /// \brief Set the max allowed force of an axis(index).
       /// Note that the unit of force should be consistent with the rest
       /// of the simulation scales.  E.g.  if you are using
@@ -302,13 +323,6 @@ namespace gazebo
       public: virtual math::Vector3 GetLinkTorque(
                   unsigned int _index) const = 0;
 
-      /// \brief Set a parameter for the joint.
-      /// \param[in] _attr Attribute to set.
-      /// \param[in] _index Index of the axis.
-      /// \param[in] _value Value of the attribute.
-      public: virtual void SetAttribute(Attribute _attr, int _index,
-                                        double _value) GAZEBO_DEPRECATED = 0;
-
       /// \brief Set a non-generic parameter for the joint.
       /// replaces SetAttribute(Attribute, int, double)
       /// \param[in] _key String key.
@@ -325,11 +339,6 @@ namespace gazebo
       /// \return Pointer to the parent link.
       public: LinkPtr GetParent() const;
 
-      /// \brief DEPRECATED
-      /// \param[out] _msg Message to fill with joint's properties
-      /// \sa Joint::FillMsg
-      public: void FillJointMsg(msgs::Joint &_msg) GAZEBO_DEPRECATED;
-
       /// \brief Fill a joint message.
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);
@@ -342,6 +351,11 @@ namespace gazebo
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.
       private: void LoadImpl(const math::Pose &_pose);
+
+      /// \brief Helper function to load a joint.
+      /// This function is deprecated, use LoadImpl(math::Pose &)
+      /// \param[in] _pos Position of the anchor.
+      private: void LoadImpl(const math::Vector3 &_pos) GAZEBO_DEPRECATED;
 
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;
@@ -361,11 +375,20 @@ namespace gazebo
       /// \brief Joint update event.
       private: event::EventT<void ()> jointUpdate;
 
-      /// \brief joint damping_coefficient
-      protected: double damping_coefficient;
+      /// \brief joint dampingCoefficient
+      protected: double dampingCoefficient;
 
       /// \brief Angle used when the joint is paret of a static model.
       private: math::Angle staticAngle;
+
+      /// \brief apply damping for adding viscous damping forces on updates
+      protected: gazebo::event::ConnectionPtr applyDamping;
+
+      /// \brief Save force applied by user
+      /// This plus the joint feedback (joint contstraint forces) is the
+      /// equivalent of simulated force torque sensor reading
+      /// Allocate a 2 vector in case hinge2 joint is used.
+      protected: double forceApplied[2];
     };
     /// \}
   }

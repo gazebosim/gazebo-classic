@@ -277,9 +277,11 @@ namespace gazebo
       /// \brief Get the world pos of a the first contact at a pixel location.
       /// \param[in] _camera Pointer to the camera.
       /// \param[in] _mousePos 2D position of the mouse in pixels.
-      /// \return 3D position of the first contact point.
-      public: math::Vector3 GetFirstContact(CameraPtr _camera,
-                                            const math::Vector2i &_mousePos);
+      /// \param[out] _position 3D position of the first contact point.
+      /// \return True if a valid object was hit by the raycast.
+      public: bool GetFirstContact(CameraPtr _camera,
+                                   const math::Vector2i &_mousePos,
+                                   math::Vector3 &_position);
 
       /// \brief Print the scene graph to std_out.
       public: void PrintSceneGraph();
@@ -365,9 +367,25 @@ namespace gazebo
       /// nothing is selected.
       public: VisualPtr GetSelectedVisual() const;
 
+      /// \brief Enable or disable transparency for all visuals.
+      /// \param[in] _show True to enable transparency for all visuals.
+      public: void SetTransparent(bool _show);
+
+      /// \brief Enable or disable center of mass visualization.
+      /// \param[in] _show True to enable center of mass visualization.
+      public: void ShowCOMs(bool _show);
+
+      /// \brief Enable or disable joint visualization.
+      /// \param[in] _show True to enable joint visualization.
+      public: void ShowJoints(bool _show);
+
+      /// \brief Enable or disable collision visualization.
+      /// \param[in] _show True to enable collision visualization.
+      public: void ShowCollisions(bool _show);
+
       /// \brief Enable or disable contact visualization.
-      /// \param[in] _view True to enable contact visualization.
-      public: void ViewContacts(bool _view);
+      /// \param[in] _show True to enable contact visualization.
+      public: void ShowContacts(bool _show);
 
       /// \brief Helper function to setup the sky.
       private: void SetSky();
@@ -485,7 +503,7 @@ namespace gazebo
 
       /// \brief Pose message callback.
       /// \param[in] _msg The message data.
-      private: void OnPoseMsg(ConstPosePtr &_msg);
+      private: void OnPoseMsg(ConstPose_VPtr &_msg);
 
       /// \brief Skeleton animation callback.
       /// \param[in] _msg The message data.
@@ -548,7 +566,7 @@ namespace gazebo
 
       /// \def PoseMsgs_L.
       /// \brief List of messages.
-      typedef std::list<boost::shared_ptr<msgs::Pose const> > PoseMsgs_L;
+      typedef std::list<msgs::Pose> PoseMsgs_L;
 
       /// \brief List of pose message to process.
       private: PoseMsgs_L poseMsgs;
@@ -701,6 +719,18 @@ namespace gazebo
 
       /// \brief Controls the sky.
       private: SkyX::BasicController *skyxController;
+
+      /// \brief True when all COMs should be visualized.
+      private: bool showCOMs;
+
+      /// \brief True when all collisions should be visualized.
+      private: bool showCollisions;
+
+      /// \brief True when all joints should be visualized.
+      private: bool showJoints;
+
+      /// \brief True when all objects should be transparent.
+      private: bool transparent;
     };
     /// \}
   }
