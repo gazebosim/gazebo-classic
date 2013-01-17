@@ -20,9 +20,11 @@
 #include "gazebo/gui/viewers/ViewFactory.hh"
 
 #include "gazebo/gui/viewers/ImageView.hh"
+#include "gazebo/gui/viewers/LaserView.hh"
 #include "gazebo/gui/viewers/TextView.hh"
 
 void RegisterImageView();
+void RegisterLaserView();
 
 using namespace gazebo;
 using namespace gui;
@@ -32,6 +34,7 @@ std::map<std::string, ViewFactoryFn> ViewFactory::viewMap;
 /////////////////////////////////////////////////
 void ViewFactory::RegisterAll()
 {
+  RegisterLaserView();
   RegisterImageView();
 }
 
