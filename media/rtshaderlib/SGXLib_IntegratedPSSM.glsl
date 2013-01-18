@@ -67,16 +67,16 @@ float _SGX_ShadowPCF4(sampler2D shadowMap, vec4 shadowMapPos, vec2 offset)
   float c;
 
   // top left
-	c =	(z < texture2D(shadowMap, uv.xy - o.xy).x) ? 1.0 : 0.2;
+	c =	(z < texture2D(shadowMap, uv.xy - o.xy).x) ? 1.0 : 0.4;
 
   // bottom right
-	c += (z < texture2D(shadowMap, uv.xy + o.xy).x) ? 1.0 : 0.2;
+	c += (z < texture2D(shadowMap, uv.xy + o.xy).x) ? 1.0 : 0.4;
 
   // bottom left
-	c += (z < texture2D(shadowMap, uv.xy + o.zy).x) ? 1.0 : 0.2;
+	c += (z < texture2D(shadowMap, uv.xy + o.zy).x) ? 1.0 : 0.4;
 
   // top right
-	c += (z < texture2D(shadowMap, uv.xy - o.zy).x) ? 1.0 : 0.2;
+	c += (z < texture2D(shadowMap, uv.xy - o.zy).x) ? 1.0 : 0.4;
 
 	return c / 4.0;
 }

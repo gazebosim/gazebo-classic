@@ -278,8 +278,6 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
             normalMapSubRS->setNormalMapTextureName(vis->GetNormalMap());
             renderState->addTemplateSubRenderState(normalMapSubRS);
-            std::cout << "Vis[" << vis->GetName() << "] Normal Map["
-                      << vis->GetNormalMap() << "]\n";
           }
           else if (vis->GetShaderType() == "normal_map_tangent_space")
           {
@@ -483,10 +481,10 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
   this->pssmSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
-  this->pssmSetup->setSplitPadding(0);
-  this->pssmSetup->setOptimalAdjustFactor(0, 2);
-  this->pssmSetup->setOptimalAdjustFactor(1, .5);
-  this->pssmSetup->setOptimalAdjustFactor(2, .01);
+  this->pssmSetup->setSplitPadding(4);
+  this->pssmSetup->setOptimalAdjustFactor(0, 4);
+  this->pssmSetup->setOptimalAdjustFactor(1, 1);
+  this->pssmSetup->setOptimalAdjustFactor(2, .1);
 
   sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(this->pssmSetup));
 
