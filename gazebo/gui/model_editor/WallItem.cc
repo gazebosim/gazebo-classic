@@ -114,7 +114,7 @@ WallItem *WallItem::Clone() const
 }
 
 /////////////////////////////////////////////////
-bool WallItem::GrabberEventFilter(GrabberHandle* _grabber, QEvent *_event)
+bool WallItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -171,24 +171,25 @@ bool WallItem::GrabberEventFilter(GrabberHandle* _grabber, QEvent *_event)
     {
       LineSegmentItem *segment = this->selectedSegment;
       QPointF lineOrigin = segment->line().p1();
+
       if (segment->GetIndex() == grabberIndex)
         lineOrigin = segment->line().p2();
-      QLineF lineToPoint(lineOrigin,
-          segment->mapFromScene(scenePosition));
+
+      QLineF lineToPoint(lineOrigin, segment->mapFromScene(scenePosition));
       QPointF startScenePoint = segment->mapToScene(lineOrigin);
-      double angle = QLineF(startScenePoint,
-          scenePosition).angle();
+
+      double angle = QLineF(startScenePoint, scenePosition).angle();
       double range = 7.5;
       int increment = angle / range;
+
       if ((angle - range*increment) > range/2)
         increment++;
+
       angle = -range*increment;
       double lineLength = lineToPoint.length();
 
-      newScenePos.setX(startScenePoint.x()
-          + cos(GZ_DTOR(angle))*lineLength);
-      newScenePos.setY(startScenePoint.y()
-          + sin(GZ_DTOR(angle))*lineLength);
+      newScenePos.setX(startScenePoint.x() + cos(GZ_DTOR(angle))*lineLength);
+      newScenePos.setY(startScenePoint.y() + sin(GZ_DTOR(angle))*lineLength);
     }
 
     this->SetVertexPosition(grabberIndex, newScenePos);
@@ -214,7 +215,7 @@ bool WallItem::SegmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
 
   QPointF scenePosition;
   if (mouseEvent)
-    scenePosition =  mouseEvent->scenePos();
+    scenePosition = mouseEvent->scenePos();
 
   switch (_event->type())
   {
@@ -357,6 +358,7 @@ void WallItem::OnApply()
   this->WallChanged();
 
   double newLength = dialog->GetLength() / this->scale;
+
   // The if statement below limits the change to either the length of
   // the wall segment or its start/end pos.
   // Comparison between doubles up to 1 decimal place

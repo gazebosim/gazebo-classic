@@ -96,7 +96,7 @@ double WindowItem::GetSceneRotation() const
 
 /////////////////////////////////////////////////
 void WindowItem::paint(QPainter *_painter,
-    const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
+    const QStyleOptionGraphicsItem * /*_option*/, QWidget * /*_widget*/)
 {
   QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
       this->drawingOriginY - this->drawingHeight/2);
@@ -143,7 +143,7 @@ void WindowItem::paint(QPainter *_painter,
   this->windowPos = this->scenePos();
   _painter->restore();
 
-//  QGraphicsPolygonItem::paint(_painter, _option, _widget);
+  //  QGraphicsPolygonItem::paint(_painter, _option, _widget);
 }
 
 /////////////////////////////////////////////////
@@ -174,7 +174,7 @@ void WindowItem::OnApply()
     itemPos.setY(-itemPos.y());
     this->windowPos = itemPos;
     this->setPos(this->windowPos);
-//    this->setParentItem(NULL);
+    // this->setParentItem(NULL);
   }
   this->WindowChanged();
 }
@@ -188,6 +188,7 @@ void WindowItem::WindowChanged()
   emit PositionChanged(this->windowPos.x(), this->windowPos.y(),
       this->levelBaseHeight + this->windowElevation);
 }
+
 /*
 /////////////////////////////////////////////////
 void WindowItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
@@ -198,6 +199,7 @@ void WindowItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
   _event->accept();
 }
 */
+
 /////////////////////////////////////////////////
 void WindowItem::OnOpenInspector()
 {

@@ -106,7 +106,7 @@ namespace gazebo
       private: double scale;
 
       /// \brief Inspector for configuring the staircase item.
-      private: StairsInspectorDialog* inspector;
+      private: StairsInspectorDialog *inspector;
 
       // private: double stairsUnitRise;
 

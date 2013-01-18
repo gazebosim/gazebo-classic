@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
 #include "gazebo/gui/model_editor/EditorView.hh"
 #include "gazebo/gui/model_editor/BuildingEditorWidget.hh"
@@ -41,10 +41,10 @@ StairsItem::StairsItem(): RectItem(), BuildingItem()
   this->stairsWidth = 100;
   this->stairsHeight = 250;
 
-//  this->stairsUnitRise = 10;
-//  this->stairsUnitRun = 10;
-//  this->stairsDepth = this->stairsSteps * this->stairsUnitRun;
-//  this->stairsHeight = this->stairsSteps * this->stairsUnitRise;
+  //  this->stairsUnitRise = 10;
+  //  this->stairsUnitRun = 10;
+  //  this->stairsDepth = this->stairsSteps * this->stairsUnitRun;
+  //  this->stairsHeight = this->stairsSteps * this->stairsUnitRise;
 
   this->stairsPos = this->scenePos();
   this->stairsElevation = 0;
@@ -66,11 +66,11 @@ StairsItem::StairsItem(): RectItem(), BuildingItem()
   this->openInspectorAct = new QAction(tr("&Open Stairs Inspector"), this);
   this->openInspectorAct->setStatusTip(tr("Open Stairs Inspector"));
   connect(this->openInspectorAct, SIGNAL(triggered()),
-    this, SLOT(OnOpenInspector()));
+      this, SLOT(OnOpenInspector()));
   this->deleteItemAct = new QAction(tr("&Delete"), this);
   this->deleteItemAct->setStatusTip(tr("Delete"));
   connect(this->deleteItemAct, SIGNAL(triggered()),
-    this, SLOT(OnDeleteItem()));
+      this, SLOT(OnDeleteItem()));
 }
 
 /////////////////////////////////////////////////
@@ -106,8 +106,7 @@ int StairsItem::GetSteps() const
 
 
 /////////////////////////////////////////////////
-bool StairsItem::RotateEventFilter(RotateHandle *_rotate,
-    QEvent *_event)
+bool StairsItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -115,35 +114,35 @@ bool StairsItem::RotateEventFilter(RotateHandle *_rotate,
   switch (_event->type())
   {
     case QEvent::GraphicsSceneMousePress:
-    {
-      _rotate->SetMouseState(QEvent::GraphicsSceneMousePress);
-      _rotate->SetMouseDownX(mouseEvent->pos().x());
-      _rotate->SetMouseDownY(mouseEvent->pos().y());
+      {
+        _rotate->SetMouseState(QEvent::GraphicsSceneMousePress);
+        _rotate->SetMouseDownX(mouseEvent->pos().x());
+        _rotate->SetMouseDownY(mouseEvent->pos().y());
 
-      break;
-    }
+        break;
+      }
     case QEvent::GraphicsSceneMouseRelease:
-    {
-      _rotate->SetMouseState(QEvent::GraphicsSceneMouseRelease);
-      break;
-    }
+      {
+        _rotate->SetMouseState(QEvent::GraphicsSceneMouseRelease);
+        break;
+      }
     case QEvent::GraphicsSceneMouseMove:
-    {
-      _rotate->SetMouseState(QEvent::GraphicsSceneMouseMove);
-      break;
-    }
+      {
+        _rotate->SetMouseState(QEvent::GraphicsSceneMouseMove);
+        break;
+      }
     case QEvent::GraphicsSceneHoverEnter:
     case QEvent::GraphicsSceneHoverMove:
-    {
-//      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
-      QApplication::setOverrideCursor(BuildingEditorWidget::rotateCursor);
-      return true;
-    }
+      {
+        // QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+        QApplication::setOverrideCursor(BuildingEditorWidget::rotateCursor);
+        return true;
+      }
     case QEvent::GraphicsSceneHoverLeave:
-    {
-      QApplication::restoreOverrideCursor();
-      return true;
-    }
+      {
+        QApplication::restoreOverrideCursor();
+        return true;
+      }
     default:
       return false;
       break;
@@ -181,7 +180,7 @@ bool StairsItem::RotateEventFilter(RotateHandle *_rotate,
 
 /////////////////////////////////////////////////
 void StairsItem::paint(QPainter *_painter,
-    const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
+    const QStyleOptionGraphicsItem * /*_option*/, QWidget * /*_widget*/)
 {
   QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
       this->drawingOriginY - this->drawingHeight/2);
@@ -211,7 +210,7 @@ void StairsItem::paint(QPainter *_painter,
   QPointF drawStepRight = topRight;
 
   double stairsUnitRun = this->stairsDepth /
-      static_cast<double>(this->stairsSteps);
+    static_cast<double>(this->stairsSteps);
 
   for (int i = 0; i <= this->stairsSteps; ++i)
   {
@@ -236,12 +235,12 @@ void StairsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 void StairsItem::OnApply()
 {
   StairsInspectorDialog *dialog =
-      qobject_cast<StairsInspectorDialog *>(QObject::sender());
+    qobject_cast<StairsInspectorDialog *>(QObject::sender());
 
   QPointF startPos = this->stairsPos * this->scale;
   startPos.setY(-startPos.y());
   this->SetSize(QSize(dialog->GetWidth() / this->scale,
-      dialog->GetDepth() / this->scale));
+        dialog->GetDepth() / this->scale));
   this->stairsWidth = dialog->GetWidth() / this->scale;
   this->stairsHeight = dialog->GetHeight() / this->scale;
   this->stairsDepth = dialog->GetDepth() / this->scale;
@@ -258,7 +257,7 @@ void StairsItem::OnApply()
     this->stairsSteps = dialog->GetSteps();
     this->StepsChanged();
   }
-//    this->stairsElevation = dialog->GetElevation();
+  // this->stairsElevation = dialog->GetElevation();
   this->StairsChanged();
 }
 
@@ -270,7 +269,7 @@ void StairsItem::OnOpenInspector()
   this->inspector->SetDepth(this->stairsDepth * this->scale);
   this->inspector->SetHeight(this->stairsHeight * this->scale);
   this->inspector->SetSteps(this->stairsSteps);
-//  dialog.SetElevation(this->stairsElevation);
+  //  dialog.SetElevation(this->stairsElevation);
   QPointF startPos = this->stairsPos * this->scale;
   startPos.setY(-startPos.y());
   this->inspector->SetStartPosition(startPos);
