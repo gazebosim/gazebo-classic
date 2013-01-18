@@ -31,7 +31,6 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 
-#include "gazebo/rendering/RTShaderSystem.hh"
 #include "rendering/Scene.hh"
 #include "rendering/DynamicLines.hh"
 #include "rendering/Visual.hh"
@@ -101,7 +100,6 @@ void Light::Load()
   this->scene->AddVisual(this->visual);
 
   this->CreateVisual();
-  RTShaderSystem::Instance()->UpdateShaders();
 }
 
 //////////////////////////////////////////////////

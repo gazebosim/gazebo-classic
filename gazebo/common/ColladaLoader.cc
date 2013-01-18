@@ -1339,7 +1339,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
 
   // A list of all the input values.
   std::list<std::pair<std::string, int> > inputs;
-  //std::map<std::string, int> inputs;
   while (trianglesInputXml)
   {
     std::string semantic = trianglesInputXml->Attribute("semantic");

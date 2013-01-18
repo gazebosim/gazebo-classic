@@ -6,7 +6,7 @@ void main()
   float depth = vertex_depth.z / vertex_depth.w;
 
   // Linear
-  // float depth = (vertex_depth.z - 0.10002) / 3000.0;
+  // float depth = (vertex_depth.z - depth_range.x) / depth_range.w;
 
   gl_FragColor = vec4(depth, depth, depth, 1.0);
 }

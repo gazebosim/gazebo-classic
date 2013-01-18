@@ -297,7 +297,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
             renderState->addTemplateSubRenderState(normalMapSubRS);
           }
-          /*else if (vis->GetShaderType() == "vertex")
+          else if (vis->GetShaderType() == "vertex")
           {
             Ogre::RTShader::SubRenderState *perPerVertexLightModel =
               this->shaderGenerator->createSubRenderState(
@@ -305,7 +305,6 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
             renderState->addTemplateSubRenderState(perPerVertexLightModel);
           }
-          */
           else
           {
             Ogre::RTShader::SubRenderState *perPixelLightModel =
@@ -455,7 +454,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
-  sceneMgr->setShadowTextureCount(6);
+  sceneMgr->setShadowTextureCount(3);
   sceneMgr->setShadowTextureConfig(0, 1024, 1024, Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(1, 512, 512, Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(2, 512, 512, Ogre::PF_FLOAT32_R);
@@ -479,7 +478,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   // shadow camera setup
   this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
 
-  double shadowFarDistance = 3000;
+  double shadowFarDistance = 5000;
   double cameraNearClip = .01;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
