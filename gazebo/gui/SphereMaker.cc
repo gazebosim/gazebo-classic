@@ -40,7 +40,7 @@ SphereMaker::SphereMaker()
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::SPHERE);
 
-  this->visualMsg->mutable_material()->mutable_script()->set_uri(
+  this->visualMsg->mutable_material()->mutable_script()->add_uri(
       "gazebo://media/materials/scripts/gazebo.material");
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
@@ -175,7 +175,7 @@ std::string SphereMaker::GetSDFString()
     << "      <material>"
     << "        <script>"
     << "          <uri>file://media/materials/scripts/gazebo.material</uri>"
-    << "          <name>Gazebo/Grey</name>"
+    << "          <name>Gazebo/Blue</name>"
     << "        </script>"
     << "      </material>"
     << "    </visual>"

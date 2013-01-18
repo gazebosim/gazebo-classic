@@ -110,11 +110,11 @@ void UserCamera::Init()
   else if (RenderEngine::Instance()->GetRenderPathType() ==
            RenderEngine::FORWARD)
   {
-    this->SetClipDist(0.1, 5000);
+    this->SetClipDist(.01, 3000);
   }
   else
   {
-    this->SetClipDist(0.1, 5000);
+    this->SetClipDist(.01, 5000);
   }
 
   // Removing for now because the axis doesn't not move properly when the
