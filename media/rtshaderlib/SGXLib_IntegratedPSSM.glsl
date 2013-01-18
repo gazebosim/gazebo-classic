@@ -59,7 +59,7 @@ float _SGX_ShadowPCF4(sampler2D shadowMap, vec4 shadowMapPos, vec2 offset)
 {
 	shadowMapPos = shadowMapPos / shadowMapPos.w;
 	vec2 uv = shadowMapPos.xy;
-	vec3 o = vec3(offset, -offset.x) * 0.4;
+	vec3 o = vec3(offset, -offset.x) * 0.3;
 
   float z = shadowMapPos.z;
 

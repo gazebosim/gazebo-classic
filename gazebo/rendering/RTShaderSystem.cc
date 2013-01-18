@@ -446,7 +446,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
     this->shaderGenerator->getRenderState(_scene->GetName() +
         Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
-  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
   // 3 textures per directional light
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
@@ -456,15 +456,14 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   sceneMgr->setShadowTextureConfig(0, 1024, 1024, Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(1, 512, 512, Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(2, 512, 512, Ogre::PF_FLOAT32_R);
-  sceneMgr->setShadowTextureSelfShadow(false);
+  sceneMgr->setShadowTextureSelfShadow(true);
+  sceneMgr->setShadowCasterRenderBackFaces(false);
 
   // TODO: We have two different shadow caster materials, both taken from
   // OGRE samples. They should be compared and tested.
   // Set up caster material - this is just a standard depth/shadow map caster
   // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
   sceneMgr->setShadowTextureCasterMaterial("Gazebo/shadow_caster");
-
-  sceneMgr->setShadowCasterRenderBackFaces(true);
 
   // Disable fog on the caster pass.
   //  Ogre::MaterialPtr passCaterMaterial =
@@ -476,15 +475,15 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   // shadow camera setup
   this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
 
-  double shadowFarDistance = 5000;
-  double cameraNearClip = .01;
+  double shadowFarDistance = 1000;
+  double cameraNearClip = 0.1;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
   this->pssmSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
   this->pssmSetup->setSplitPadding(4);
   this->pssmSetup->setOptimalAdjustFactor(0, 4);
   this->pssmSetup->setOptimalAdjustFactor(1, 1);
-  this->pssmSetup->setOptimalAdjustFactor(2, .1);
+  this->pssmSetup->setOptimalAdjustFactor(2, .5);
 
   sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(this->pssmSetup));
 
