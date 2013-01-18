@@ -35,37 +35,39 @@ DataLogger::DataLogger(QWidget *_parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   QHBoxLayout *buttonLayout = new QHBoxLayout;
-  QPushButton *recordButton = new QPushButton("R");
-  connect(recordButton, SIGNAL(clicked()),
-          this, SLOT(OnRecord()));
 
-  buttonLayout->addWidget(recordButton);
+  this->recordButton = new QToolButton(this);
+  this->recordButton->setIcon(QPixmap(":/images/record.png"));
+  this->recordButton->setStatusTip(tr("Record a log file"));
+  this->recordButton->setCheckable(true);
+  this->recordButton->setChecked(false);
+  this->recordButton->setIconSize(QSize(48, 48));
+  this->recordButton->setObjectName("dataLoggerRecordButton");
+  connect(this->recordButton, SIGNAL(toggled(bool)),
+          this, SLOT(OnRecord(bool)));
 
-/*
+  QVBoxLayout *stopButtonLayout = new QVBoxLayout;
+  this->stopButton = new QToolButton(this);
+  this->stopButton->setIcon(QIcon(":/images/stop.png"));
+  this->stopButton->setStatusTip(tr("Stop recording of a log file"));
+  this->stopButton->setCheckable(true);
+  this->stopButton->setChecked(true);
+  this->stopButton->setIconSize(QSize(24, 24));
+  this->stopButton->setObjectName("dataLoggerStopButton");
+  connect(this->stopButton, SIGNAL(clicked()), this, SLOT(OnStop()));
 
-  QFrame *frame = new QFrame;
-  QVBoxLayout *frameLayout = new QVBoxLayout;
+  stopButtonLayout->addStretch(1);
+  stopButtonLayout->addWidget(this->stopButton, 0);
 
+  this->timeLabel = new QLabel("hh:mm:ss");
 
-  frameLayout->setContentsMargins(4, 4, 4, 4);
-  frame->setLayout(frameLayout);
+  buttonLayout->addWidget(this->recordButton);
+  buttonLayout->addLayout(stopButtonLayout);
+  buttonLayout->addSpacing(10);
+  buttonLayout->addStretch(1);
+  buttonLayout->addWidget(this->timeLabel);
+  buttonLayout->addSpacing(5);
 
-  QHBoxLayout *buttonLayout = new QHBoxLayout;
-  QPushButton *cancelButton = new QPushButton("Cancel");
-  connect(cancelButton, SIGNAL(clicked()),
-          this, SLOT(OnCancel()));
-
-  this->okayButton = new QPushButton("Okay");
-  this->okayButton->setEnabled(false);
-  connect(this->okayButton, SIGNAL(clicked()),
-          this, SLOT(OnOkay()));
-
-  buttonLayout->addWidget(cancelButton);
-  buttonLayout->addStretch(2);
-  buttonLayout->addWidget(this->okayButton);
-  */
-
-  // mainLayout->addWidget(frame);
   mainLayout->addLayout(buttonLayout);
 
   // Let the stylesheet handle the margin sizes
@@ -86,10 +88,30 @@ DataLogger::~DataLogger()
 }
 
 /////////////////////////////////////////////////
-void DataLogger::OnRecord()
+void DataLogger::OnRecord(bool _toggle)
 {
-  printf("On Record\n");
+  if (_toggle)
+  {
+    this->recordButton->setIcon(QPixmap(":/images/record_pause.png"));
+
+    msgs::LogControl msg;
+    msg.set_start(true);
+    this->pub->Publish(msg);
+  }
+  else
+  {
+    this->recordButton->setIcon(QPixmap(":/images/record.png"));
+
+    msgs::LogControl msg;
+    msg.set_stop(true);
+    this->pub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnStop()
+{
   msgs::LogControl msg;
-  msg.set_start(true);
+  msg.set_stop(true);
   this->pub->Publish(msg);
 }

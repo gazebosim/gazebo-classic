@@ -44,6 +44,7 @@ typedef boost::archive::iterators::base64_from_binary<
 LogRecord::LogRecord()
 {
   this->stop = true;
+  this->paused = false;
   this->initialized = false;
 
   // Get the user's home directory
@@ -92,6 +93,7 @@ bool LogRecord::Init(const std::string &_subdir)
 
   this->logsEnd = this->logs.end();
   this->initialized = true;
+  this->paused = false;
 
   return true;
 }
@@ -119,6 +121,7 @@ void LogRecord::Start(const std::string &_encoding)
   this->logsEnd = this->logs.end();
 
   this->stop = false;
+  this->paused = false;
 
   // Listen to the world update event
   if (!this->updateConnection)
@@ -172,6 +175,18 @@ void LogRecord::Stop()
 }
 
 //////////////////////////////////////////////////
+void LogRecord::SetPaused(bool _paused)
+{
+  this->paused = _paused;
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::GetPaused() const
+{
+  return this->paused;
+}
+
+//////////////////////////////////////////////////
 void LogRecord::Add(const std::string &_name, const std::string &_filename,
                  boost::function<bool (std::ostringstream &)> _logCallback)
 {
@@ -181,11 +196,25 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
   if (this->stop)
     return;
 
-  if (this->logs.find(_name) != this->logs.end())
-    gzthrow("Log file with name[" + _name + "] already exists.\n");
-
   // Make the full path
   boost::filesystem::path path = this->logPath / _filename;
+
+  // The request log
+  if (this->logs.find(_name) != this->logs.end())
+  {
+    if (!this->logs.find(_name)->second)
+      gzerr << "Error\n";
+
+    if (this->logs.find(_name)->second->GetLogFilename() != path.string())
+    {
+      gzthrow(std::string("Attempting to add a duplicate log object named[")
+          + _name + "] with a filename of [" + _filename + "]\n");
+    }
+    else
+    {
+      return;
+    }
+  }
 
   // Make sure the file does not exist
   if (boost::filesystem::exists(path))
@@ -233,19 +262,21 @@ bool LogRecord::Remove(const std::string &_name)
 //////////////////////////////////////////////////
 void LogRecord::Update()
 {
+  if (!this->paused)
   {
-    boost::mutex::scoped_lock lock(this->writeMutex);
-
-    // Collect all the new log data. This will not write data to disk.
-    for (this->updateIter = this->logs.begin();
-         this->updateIter != this->logsEnd; ++this->updateIter)
     {
-      this->updateIter->second->Update();
-    }
-  }
+      boost::mutex::scoped_lock lock(this->writeMutex);
 
-  // Signal that new data is available.
-  this->dataAvailableCondition.notify_one();
+      // Collect all the new log data. This will not write data to disk.
+      for (this->updateIter = this->logs.begin();
+          this->updateIter != this->logsEnd; ++this->updateIter)
+      {
+        this->updateIter->second->Update();
+      }
+    }
+    // Signal that new data is available.
+    this->dataAvailableCondition.notify_one();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -350,6 +381,12 @@ void LogRecord::Log::Update()
 void LogRecord::Log::ClearBuffer()
 {
   this->buffer.clear();
+}
+
+//////////////////////////////////////////////////
+std::string LogRecord::Log::GetLogFilename() const
+{
+  return this->filename;
 }
 
 //////////////////////////////////////////////////

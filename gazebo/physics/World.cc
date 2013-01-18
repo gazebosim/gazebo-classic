@@ -945,12 +945,21 @@ void World::OnLogControl(ConstLogControlPtr &_data)
 {
   if (_data->has_start() && _data->start())
   {
-    common::LogRecord::Instance()->Start("bz2");
-    common::LogRecord::Instance()->Add(this->GetName(), "state.log",
-        boost::bind(&World::OnLog, this, _1));
+    if (common::LogRecord::Instance()->GetPaused())
+    {
+      common::LogRecord::Instance()->Start("bz2");
+    }
+    else
+    {
+      common::LogRecord::Instance()->Start("bz2");
+      common::LogRecord::Instance()->Add(this->GetName(), "state.log",
+          boost::bind(&World::OnLog, this, _1));
+    }
   }
   else if (_data->has_stop() && _data->stop())
     common::LogRecord::Instance()->Stop();
+  else if (_data->has_paused())
+    common::LogRecord::Instance()->SetPaused(_data->paused());
 }
 
 //////////////////////////////////////////////////

@@ -41,4 +41,3 @@ message Geometry
 
   repeated Vector3d points          = 9;
 }
-

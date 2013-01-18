@@ -8,5 +8,19 @@ import "time.proto";
 
 message LogStatus
 {
+  message LogFileSize
+  {
+    enum Units
+    {
+      BYTES = 1;
+      K_BYTES = 2;
+      M_BYTES = 3;
+      G_BYTES = 4;
+    }
+    optional float logsize        = 1;
+    optional Units logsize_units  = 2;
+  }
+
   optional Time start           = 1;
+  optional LogFileSize logFile  = 2;
 }

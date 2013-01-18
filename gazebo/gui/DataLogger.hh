@@ -41,13 +41,24 @@ namespace gazebo
       public: virtual ~DataLogger();
 
       /// \brief QT callback for the record button.
-      private slots: void OnRecord();
+      private slots: void OnRecord(bool _toggle);
+
+      /// \brief QT callback for the stop button.
+      private slots: void OnStop();
 
       /// \brief Node to handle communication.
       private: transport::NodePtr node;
 
       /// \brief Publisher for log control messages.
       private: transport::PublisherPtr pub;
+
+      /// \brief The button used to start and pause logging.
+      private: QToolButton *recordButton;
+
+      /// \brief The button used to stop logging.
+      private: QToolButton *stopButton;
+
+      private: QLabel *timeLabel;
     };
     /// \}
   }

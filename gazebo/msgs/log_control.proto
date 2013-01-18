@@ -8,5 +8,6 @@ message LogControl
 {
   optional bool start           = 1;
   optional bool stop            = 2;
-  optional string filename      = 3;
+  optional bool paused          = 3;
+  optional string filename      = 4;
 }

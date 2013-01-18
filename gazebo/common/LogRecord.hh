@@ -105,6 +105,17 @@ namespace gazebo
       /// \brief Stop the logger.
       public: void Stop();
 
+      /// \brief Set whether logging should pause. A paused state means the
+      /// log file is still open, but data is not written to it.
+      /// \param[in] _paused True to pause data logging.
+      /// \sa LogRecord::GetPaused
+      public: void SetPaused(bool _paused);
+
+      /// \brief Get whether logging is paused.
+      /// \return True if logging is paused.
+      /// \sa LogRecord::SetPaused
+      public: bool GetPaused() const;
+
       /// \brief Start the logger.
       /// \param[in] _encoding The type of encoding (txt, or bz2).
       public: void Start(const std::string &_encoding="bz2");
@@ -139,6 +150,8 @@ namespace gazebo
         public: void Update();
 
         public: void ClearBuffer();
+
+        public: std::string GetLogFilename() const;
 
         public: LogRecord *parent;
         public: boost::function<bool (std::ostringstream &)> logCB;
@@ -188,6 +201,9 @@ namespace gazebo
 
       /// \brief True if initialized.
       private: bool initialized;
+
+      /// \brief True to pause recording.
+      private: bool paused;
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogRecord>;
