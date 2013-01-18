@@ -15,6 +15,13 @@
  *
 */
 
+#include <vector>
+#include <list>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/thread/mutex.hpp>
+
 #include <google/protobuf/message.h>
 
 #include <gazebo/gui/qt.h>
@@ -30,18 +37,16 @@
 
 #include <gazebo/gazebo_config.h>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/thread/mutex.hpp>
-
 using namespace gazebo;
 
 // transport::ConnectionPtr connection(new transport::Connection());
 std::vector<std::string> params;
 
-common::Time hz_prev_time;
-common::Time bw_prev_time;
+common::Time hzPrevTime;
+std::list<common::Time> hzTime;
+boost::condition_variable g_condition;
 
+common::Time bw_prev_time;
 std::vector<int> bwBytes;
 std::vector<common::Time> bwTime;
 
@@ -182,14 +187,21 @@ void bwCB(const std::string &_data)
 }
 
 /////////////////////////////////////////////////
-void hz_cb(ConstGzStringPtr &/*_data*/)
+void hz_cb(const std::string &/*_data*/)
 {
-  common::Time cur_time = common::Time::GetWallTime();
+  common::Time currTime = common::Time::GetWallTime();
 
-  if (hz_prev_time != common::Time(0, 0))
-    printf("Hz: %6.2f\n", 1.0 / (cur_time - hz_prev_time).Double());
+  boost::mutex::scoped_lock lock(mutex);
 
-  hz_prev_time = cur_time;
+  if (hzPrevTime != common::Time(0, 0))
+  {
+    hzTime.push_back(currTime - hzPrevTime);
+    while(hzTime.size() > 100)
+      hzTime.pop_front();
+  }
+  std::cout << "Hz[" << 1.0 / (currTime - hzPrevTime).Double() << "]\n";
+
+  hzPrevTime = currTime;
 }
 
 /////////////////////////////////////////////////
@@ -363,6 +375,31 @@ void bw()
 }
 
 /////////////////////////////////////////////////
+void runHz()
+{
+  common::Time avg;
+  while (true)
+  {
+    boost::mutex::scoped_lock lock(mutex);
+    if (hzTime.size() >= 100)
+    {
+      avg.Set(0, 0);
+      for (std::list<common::Time>::iterator iter = hzTime.begin();
+          iter != hzTime.end(); ++iter)
+      {
+        avg += *iter;
+      }
+
+      avg /= hzTime.size();
+
+      printf("Hz: %6.2f\n", 1.0 / avg.Double());
+    }
+  }
+
+  g_condition.notify_one();
+}
+
+/////////////////////////////////////////////////
 void hz()
 {
   if (params[1].empty())
@@ -377,15 +414,18 @@ void hz()
   node->Init();
 
   std::string topic = params[1];
-  topic +=  "/__dbg";
 
   transport::SubscriberPtr sub = node->Subscribe(topic, hz_cb);
 
   // Run the transport loop: starts a new thread
   transport::run();
 
-  while (true)
-    common::Time::MSleep(10);
+  boost::mutex myMutex;
+  boost::mutex::scoped_lock lock(myMutex);
+
+  //boost::thread *thread = new boost::thread(boost::bind(&runHz));
+
+  g_condition.wait(lock);
 
   transport::fini();
 }

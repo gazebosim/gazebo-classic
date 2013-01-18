@@ -226,12 +226,15 @@ int RaySensor::GetFiducial(int index)
 //////////////////////////////////////////////////
 void RaySensor::UpdateImpl(bool /*_force*/)
 {
+  std::cout << "Ray[" << this->GetName() << "] SimHz[" << 1.0 / (this->world->GetSimTime() - this->lastMeasurementTime).Double() << "] Wallhz[" << 1.0 / (common::Time::GetWallTime() - this->lastWallTime).Double() << "]\n";
+
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
   // need to move mutex lock after this? or make the OnNewLaserScan connection
   // call somewhere else?
   this->laserShape->Update();
   this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastWallTime = common::Time::GetWallTime();
 
   // moving this behind laserShape update
   boost::mutex::scoped_lock lock(this->mutex);

@@ -172,6 +172,8 @@ namespace gazebo
       private: transport::PublisherPtr scanPub;
       private: boost::mutex mutex;
       private: msgs::LaserScanStamped laserMsg;
+
+      private: common::Time lastWallTime;
     };
     /// \}
   }
