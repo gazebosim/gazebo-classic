@@ -297,7 +297,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
             renderState->addTemplateSubRenderState(normalMapSubRS);
           }
-          else if (vis->GetShaderType() == "vertex")
+          /*else if (vis->GetShaderType() == "vertex")
           {
             Ogre::RTShader::SubRenderState *perPerVertexLightModel =
               this->shaderGenerator->createSubRenderState(
@@ -305,6 +305,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
             renderState->addTemplateSubRenderState(perPerVertexLightModel);
           }
+          */
           else
           {
             Ogre::RTShader::SubRenderState *perPixelLightModel =
@@ -452,18 +453,18 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
 
   // 3 textures per directional light
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
-  //sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
-  //sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
-  sceneMgr->setShadowTextureCount(3);
+  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
+  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
+  sceneMgr->setShadowTextureCount(6);
   sceneMgr->setShadowTextureConfig(0, 1024, 1024, Ogre::PF_FLOAT32_R);
-  sceneMgr->setShadowTextureConfig(1, 1024, 1024, Ogre::PF_FLOAT32_R);
-  sceneMgr->setShadowTextureConfig(2, 1024, 1024, Ogre::PF_FLOAT32_R);
+  sceneMgr->setShadowTextureConfig(1, 512, 512, Ogre::PF_FLOAT32_R);
+  sceneMgr->setShadowTextureConfig(2, 512, 512, Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureSelfShadow(false);
 
   // TODO: We have two different shadow caster materials, both taken from
   // OGRE samples. They should be compared and tested.
   // Set up caster material - this is just a standard depth/shadow map caster
-  //sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
+  // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
   sceneMgr->setShadowTextureCasterMaterial("Gazebo/shadow_caster");
 
   sceneMgr->setShadowCasterRenderBackFaces(true);
@@ -482,14 +483,6 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   double cameraNearClip = .01;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
-  /*Ogre::PSSMShadowCameraSetup::SplitPointList splitPoints;
-  splitPoints.push_back(0.01);
-  splitPoints.push_back(5.0);
-  splitPoints.push_back(10.0);
-  splitPoints.push_back(3000.0);
-
-  this->pssmSetup->setSplitPoints(splitPoints);
-  */
   this->pssmSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
   this->pssmSetup->setSplitPadding(0);
   this->pssmSetup->setOptimalAdjustFactor(0, 2);

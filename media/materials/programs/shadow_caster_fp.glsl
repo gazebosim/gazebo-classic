@@ -3,10 +3,10 @@ varying vec4 vertex_depth;
 
 void main()
 {
-  float depth = (vertex_depth.z) / vertex_depth.w;
+  float depth = vertex_depth.z / vertex_depth.w;
 
   // Linear
-  //depth = (vertex_depth.z - depth_range.x) * depth_range.w;
+  // float depth = (vertex_depth.z - 0.10002) / 3000.0;
 
-  gl_FragColor = vec4(depth*0.5, depth*0.5, depth*0.5, 1.0);
+  gl_FragColor = vec4(depth, depth, depth, 1.0);
 }

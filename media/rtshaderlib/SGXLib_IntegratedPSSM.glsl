@@ -61,16 +61,10 @@ float _SGX_ShadowPCF4(sampler2D shadowMap, vec4 shadowMapPos, vec2 offset)
 	vec2 uv = shadowMapPos.xy;
 	vec3 o = vec3(offset, -offset.x) * 0.4;
 
-  float z = shadowMapPos.z * 0.5;
-  float s = texture2D(shadowMap, uv.xy).r;
-
-  if (z / s > 1.000007)
-    return 0.4;
-  else
-    return 1.0;
+  float z = shadowMapPos.z;
 
 	// Note: We using 2x2 PCF. Good enough and is a lot faster.
- float c;
+  float c;
 
   // top left
 	c =	(z < texture2D(shadowMap, uv.xy - o.xy).x) ? 1.0 : 0.2;
