@@ -90,6 +90,10 @@ namespace gazebo
       /// \param[in] _pose The initial pose.
       public: void SetInitialRelativePose(const math::Pose &_pose);
 
+      /// \brief Get the initial relative pose.
+      /// \return The initial relative pose.
+      public: math::Pose GetInitialRelativePose() const;
+
       /// \brief Return the bounding box for the entity.
       /// \return The bounding box.
       public: virtual math::Box GetBoundingBox() const;
