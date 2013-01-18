@@ -456,8 +456,8 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   sceneMgr->setShadowTextureConfig(0, 1024, 1024, Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(1, 512, 512, Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(2, 512, 512, Ogre::PF_FLOAT32_R);
-  sceneMgr->setShadowTextureSelfShadow(true);
-  sceneMgr->setShadowCasterRenderBackFaces(false);
+  sceneMgr->setShadowTextureSelfShadow(false);
+  sceneMgr->setShadowCasterRenderBackFaces(true);
 
   // TODO: We have two different shadow caster materials, both taken from
   // OGRE samples. They should be compared and tested.
@@ -475,15 +475,15 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   // shadow camera setup
   this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
 
-  double shadowFarDistance = 1000;
+  double shadowFarDistance = 200;
   double cameraNearClip = 0.1;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
   this->pssmSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
-  this->pssmSetup->setSplitPadding(4);
+  this->pssmSetup->setSplitPadding(0);
   this->pssmSetup->setOptimalAdjustFactor(0, 4);
   this->pssmSetup->setOptimalAdjustFactor(1, 1);
-  this->pssmSetup->setOptimalAdjustFactor(2, .5);
+  this->pssmSetup->setOptimalAdjustFactor(2, .1);
 
   sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(this->pssmSetup));
 
