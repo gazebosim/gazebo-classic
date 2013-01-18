@@ -99,46 +99,68 @@ void Converter::ConvertImpl(TiXmlElement *_elem, TiXmlElement *_convert)
   for (TiXmlElement *renameElem = _convert->FirstChildElement("rename");
        renameElem; renameElem = renameElem->NextSiblingElement("rename"))
   {
-    TiXmlElement *fromConvertElem = renameElem->FirstChildElement("from");
-    TiXmlElement *toConvertElem = renameElem->FirstChildElement("to");
+    Rename(_elem, renameElem);
+  }
 
-    const char *fromElemName = fromConvertElem->Attribute("element");
-    const char *fromAttrName = fromConvertElem->Attribute("attribute");
-
-    const char *toElemName = toConvertElem->Attribute("element");
-    const char *toAttrName = toConvertElem->Attribute("attribute");
-
-    const char *value = GetValue(fromElemName, fromAttrName, _elem);
-    if (!value)
-      continue;
-
-    if (!toElemName)
-    {
-      gzerr << "No 'to' element name specified\n";
-      continue;
-    }
-
-    TiXmlElement *replaceTo = new TiXmlElement(toElemName);
-    if (toAttrName)
-      replaceTo->SetAttribute(toAttrName, value);
-    else
-    {
-      TiXmlText *text = new TiXmlText(value);
-      replaceTo->LinkEndChild(text);
-    }
-
-    if (fromElemName)
-    {
-      TiXmlElement *replaceFrom = _elem->FirstChildElement(fromElemName);
-      _elem->ReplaceChild(replaceFrom, *replaceTo);
-    }
-    else if (fromAttrName)
-    {
-      _elem->RemoveAttribute(fromAttrName);
-      _elem->LinkEndChild(replaceTo);
-    }
+  for (TiXmlElement *moveElem = _convert->FirstChildElement("move");
+     moveElem; moveElem = moveElem->NextSiblingElement("move"))
+  {
+    Move(_elem, moveElem);
   }
 }
+
+/////////////////////////////////////////////////
+void Converter::Rename(TiXmlElement *_elem, TiXmlElement *_renameElem)
+{
+  TiXmlElement *fromConvertElem = _renameElem->FirstChildElement("from");
+  TiXmlElement *toConvertElem = _renameElem->FirstChildElement("to");
+
+  const char *fromElemName = fromConvertElem->Attribute("element");
+  const char *fromAttrName = fromConvertElem->Attribute("attribute");
+
+  const char *toElemName = toConvertElem->Attribute("element");
+  const char *toAttrName = toConvertElem->Attribute("attribute");
+
+  const char *value = GetValue(fromElemName, fromAttrName, _elem);
+  if (!value)
+    return;
+//    continue;
+
+  if (!toElemName)
+  {
+    gzerr << "No 'to' element name specified\n";
+//    continue;
+    return;
+  }
+
+  TiXmlElement *replaceTo = new TiXmlElement(toElemName);
+  if (toAttrName)
+    replaceTo->SetAttribute(toAttrName, value);
+  else
+  {
+    TiXmlText *text = new TiXmlText(value);
+    replaceTo->LinkEndChild(text);
+  }
+
+  if (fromElemName)
+  {
+    TiXmlElement *replaceFrom = _elem->FirstChildElement(fromElemName);
+    _elem->ReplaceChild(replaceFrom, *replaceTo);
+  }
+  else if (fromAttrName)
+  {
+    _elem->RemoveAttribute(fromAttrName);
+    _elem->LinkEndChild(replaceTo);
+  }
+}
+
+/////////////////////////////////////////////////
+void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
+{
+
+}
+
+
 
 /////////////////////////////////////////////////
 const char *Converter::GetValue(const char *_valueElem, const char *_valueAttr,

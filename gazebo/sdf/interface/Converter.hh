@@ -32,6 +32,12 @@ namespace sdf
     private: static void ConvertImpl(TiXmlElement *_elem,
                                      TiXmlElement *_convert);
 
+    private: static void Rename(TiXmlElement *_elem,
+                                     TiXmlElement *_renameElem);
+
+    private: static void Move(TiXmlElement *_elem,
+                                     TiXmlElement *_moveElem);
+
     private: static const char *GetValue(const char *_valueElem,
                                          const char *_valueAttr,
                                          TiXmlElement *_elem);
