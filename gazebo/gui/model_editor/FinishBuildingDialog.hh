@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _FINISH_MODEL_DIALOG_HH_
-#define _FINISH_MODEL_DIALOG_HH_
+#ifndef _FINISH_BUILDING_DIALOG_HH_
+#define _FINISH_BUILDING_DIALOG_HH_
 
 #include <string>
 #include "gazebo/gui/qt.h"
@@ -28,9 +28,9 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class FinishModelDialog FinishModelDialog.hh
+    /// \class FinishBuildingDialog FinishBuildingDialog.hh
     /// \brief Dialog for saving the building model.
-    class FinishModelDialog : public QDialog
+    class FinishBuildingDialog : public QDialog
     {
       Q_OBJECT
 
@@ -46,12 +46,12 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _mode Mode of the dialog
       /// \param[in] _parent Parent QWidget.
-      public: FinishModelDialog(int _mode = 0, QWidget *_parent = 0);
+      public: FinishBuildingDialog(int _mode = 0, QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: ~FinishModelDialog();
+      public: ~FinishBuildingDialog();
 
-      /// \brief Get the model name.
+      /// \brief Get the building model name.
       /// \return The model name.
       public: std::string GetModelName() const;
 
@@ -59,7 +59,7 @@ namespace gazebo
       /// \return Path of the save location.
       public: std::string GetSaveLocation() const;
 
-      /// \brief Set the model name.
+      /// \brief Set the building model name.
       /// \param[in] _name Name to set the model to.
       public: void SetModelName(const std::string &_name);
 

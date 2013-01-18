@@ -73,7 +73,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectDiscardBuildingModel(T _subscriber)
+            static event::ConnectionPtr
+                ConnectDiscardBuildingModel(T _subscriber)
           { return discardBuildingModel.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the discard model signal

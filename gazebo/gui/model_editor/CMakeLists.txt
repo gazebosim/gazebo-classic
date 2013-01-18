@@ -11,7 +11,7 @@ set (sources
   EditorEvents.cc
   EditorItem.cc
   EditorView.cc
-  FinishModelDialog.cc
+  FinishBuildingDialog.cc
   FloorItem.cc
   GrabberHandle.cc
   GridLines.cc
@@ -36,7 +36,7 @@ set (qt_headers
   DoorItem.hh
   EditorItem.hh
   EditorView.hh
-  FinishModelDialog.hh
+  FinishBuildingDialog.hh
   FloorItem.hh
   LevelInspectorDialog.hh
   LevelWidget.hh

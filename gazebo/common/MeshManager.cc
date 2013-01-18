@@ -967,7 +967,7 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
 #ifdef HAVE_GTS
 //////////////////////////////////////////////////
 void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
-    const Mesh *_m2, int _operation, math::Pose _offset)
+    const Mesh *_m2, int _operation, const math::Pose &_offset)
 {
   if (this->HasMesh(_name))
     return;

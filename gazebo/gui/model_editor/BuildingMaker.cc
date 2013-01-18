@@ -44,7 +44,7 @@
 #endif
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/gui/model_editor/FinishModelDialog.hh"
+#include "gazebo/gui/model_editor/FinishBuildingDialog.hh"
 #include "gazebo/gui/model_editor/EditorEvents.hh"
 #include "gazebo/gui/model_editor/BuildingModelManip.hh"
 #include "gazebo/gui/model_editor/EditorItem.hh"
@@ -90,9 +90,10 @@ double BuildingMaker::conversionScale;
 
   this->buildingDefaultName = "BuildingDefaultName";
 
-  this->saveDialog = new FinishModelDialog(FinishModelDialog::MODEL_SAVE, 0);
+  this->saveDialog =
+      new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
   this->finishDialog =
-      new FinishModelDialog(FinishModelDialog::MODEL_FINISH, 0);
+      new FinishBuildingDialog(FinishBuildingDialog::MODEL_FINISH, 0);
 
   this->Reset();
 }
@@ -576,10 +577,11 @@ void BuildingMaker::GenerateSDF()
           rendering::VisualPtr wallVis = visual;
           math::Pose wallPose = wallVis->GetParent()->GetWorldPose();
           math::Vector3 wallSize = wallVis->GetScale();
-          for (unsigned int i = 0; i < buildingModelManip->GetAttachedManipCount();
-              ++i)
+          for (unsigned int i = 0; i <
+              buildingModelManip->GetAttachedManipCount(); ++i)
           {
-            BuildingModelManip *attachedObj = buildingModelManip->GetAttachedManip(i);
+            BuildingModelManip *attachedObj =
+                buildingModelManip->GetAttachedManip(i);
             std::string objName = attachedObj->GetName();
             if (objName.find("Window") != std::string::npos
                 || objName.find("Door") != std::string::npos)
@@ -616,9 +618,11 @@ void BuildingMaker::GenerateSDF()
             collisionNameStream.str("");
             visualElem = templateVisualElem->Clone();
             collisionElem = templateCollisionElem->Clone();
-            visualNameStream << buildingModelManip->GetName() << "_Visual_" << i;
+            visualNameStream << buildingModelManip->GetName() << "_Visual_"
+                << i;
             visualElem->GetAttribute("name")->Set(visualNameStream.str());
-            collisionNameStream << buildingModelManip->GetName() << "_Collision_" << i;
+            collisionNameStream << buildingModelManip->GetName()
+                << "_Collision_" << i;
             collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
 
             math::Vector3 newSubPos =
@@ -1324,7 +1328,6 @@ void BuildingMaker::OnSave()
 /////////////////////////////////////////////////
 void BuildingMaker::OnDone()
 {
-
   this->finishDialog->SetModelName(this->modelName);
   this->finishDialog->SetSaveLocation(this->saveLocation);
   if (this->finishDialog->exec() == QDialog::Accepted)

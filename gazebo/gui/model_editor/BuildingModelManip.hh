@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_MANIP_HH_
-#define _MODEL_MANIP_HH_
+#ifndef _BUILDING_MODEL_MANIP_HH_
+#define _BUILDING_MODEL_MANIP_HH_
 
 #include <string>
 #include <vector>

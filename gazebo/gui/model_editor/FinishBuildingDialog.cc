@@ -15,16 +15,16 @@
  *
 */
 
-#include "gazebo/gui/model_editor/FinishModelDialog.hh"
+#include "gazebo/gui/model_editor/FinishBuildingDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-FinishModelDialog::FinishModelDialog(int _mode, QWidget *_parent)
+FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   : QDialog(_parent)
 {
-  this->setObjectName("finishModelDialog");
+  this->setObjectName("finishBuildingDialog");
 
   if (_mode == MODEL_FINISH)
     this->setWindowTitle(tr("Finish Model"));
@@ -94,36 +94,36 @@ FinishModelDialog::FinishModelDialog(int _mode, QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-FinishModelDialog::~FinishModelDialog()
+FinishBuildingDialog::~FinishBuildingDialog()
 {
 }
 
 /////////////////////////////////////////////////
-std::string FinishModelDialog::GetModelName() const
+std::string FinishBuildingDialog::GetModelName() const
 {
   return this->modelNameLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-std::string FinishModelDialog::GetSaveLocation() const
+std::string FinishBuildingDialog::GetSaveLocation() const
 {
   return this->modelLocationLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-void FinishModelDialog::SetModelName(const std::string &_name)
+void FinishBuildingDialog::SetModelName(const std::string &_name)
 {
   this->modelNameLineEdit->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////
-void FinishModelDialog::SetSaveLocation(const std::string &_location)
+void FinishBuildingDialog::SetSaveLocation(const std::string &_location)
 {
   this->modelLocationLineEdit->setText(tr(_location.c_str()));
 }
 
 /////////////////////////////////////////////////
-void FinishModelDialog::OnBrowse()
+void FinishBuildingDialog::OnBrowse()
 {
   QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
     QDir::homePath(), QFileDialog::ShowDirsOnly
@@ -133,13 +133,13 @@ void FinishModelDialog::OnBrowse()
 }
 
 /////////////////////////////////////////////////
-void FinishModelDialog::OnCancel()
+void FinishBuildingDialog::OnCancel()
 {
   this->close();
 }
 
 /////////////////////////////////////////////////
-void FinishModelDialog::OnFinish()
+void FinishBuildingDialog::OnFinish()
 {
   this->accept();
 }

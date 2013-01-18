@@ -38,7 +38,7 @@ namespace gazebo
     class EntityMaker;
     class EditorItem;
     class BuildingModelManip;
-    class FinishModelDialog;
+    class FinishBuildingDialog;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -301,11 +301,11 @@ namespace gazebo
       private: std::string buildingDefaultName;
 
       /// \brief A dialog for setting building model name and save location.
-      private: FinishModelDialog *saveDialog;
+      private: FinishBuildingDialog *saveDialog;
 
       /// \brief A dialog that prompts to confirm model completion and uploading
       /// to the server
-      private: FinishModelDialog *finishDialog;
+      private: FinishBuildingDialog *finishDialog;
     };
     /// \}
   }

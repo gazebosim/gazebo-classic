@@ -73,7 +73,8 @@ BuildingModelManip *BuildingModelManip::GetParent() const
 }
 
 /////////////////////////////////////////////////
-void BuildingModelManip::OnSizeChanged(double _width, double _depth, double _height)
+void BuildingModelManip::OnSizeChanged(double _width, double _depth,
+    double _height)
 {
   this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
   double dScaleZ = this->visual->GetScale().z - this->size.z;
@@ -132,7 +133,8 @@ void BuildingModelManip::SetAttachedTo(BuildingModelManip *_parent)
 }
 
 /////////////////////////////////////////////////
-BuildingModelManip *BuildingModelManip::GetAttachedManip(unsigned int _index) const
+BuildingModelManip *BuildingModelManip::GetAttachedManip(
+    unsigned int _index) const
 {
   if (_index >= this->attachedManips.size())
     gzthrow("Index too large");
@@ -160,8 +162,8 @@ void BuildingModelManip::OnPoseChanged(double _x, double _y, double _z,
 }
 
 /////////////////////////////////////////////////
-void BuildingModelManip::OnPoseOriginTransformed(double _x, double _y, double _z,
-    double _roll, double _pitch, double _yaw)
+void BuildingModelManip::OnPoseOriginTransformed(double _x, double _y,
+    double _z, double _roll, double _pitch, double _yaw)
 {
   // Handle translations, currently used by polylines
   math::Pose trans = BuildingMaker::ConvertPose(_x, -_y, _z, _roll, _pitch,
@@ -254,7 +256,8 @@ void BuildingModelManip::OnYawChanged(double _yaw)
 }
 
 /////////////////////////////////////////////////
-void BuildingModelManip::OnRotationChanged(double _roll, double _pitch, double _yaw)
+void BuildingModelManip::OnRotationChanged(double _roll, double _pitch,
+    double _yaw)
 {
   this->SetRotation(_roll, _pitch, _yaw);
 }
