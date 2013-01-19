@@ -62,7 +62,7 @@ TEST(SdfUpdate, UpdateAttribute)
 
   std::string nameCheck;
   int i;
-  for (i=0; i < 4; i++)
+  for (i = 0; i < 4; i++)
   {
     // Update test class variables
     fixture.name[0] = 'd' + i;
@@ -116,7 +116,7 @@ TEST(SdfUpdate, UpdateElement)
   bool flagCheck;
   gazebo::math::Pose poseCheck;
   int i;
-  for (i=0; i < 4; i++)
+  for (i = 0; i < 4; i++)
   {
     // Update test class variables
     fixture.flag = !fixture.flag;
