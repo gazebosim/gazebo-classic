@@ -243,7 +243,7 @@ if (PKG_CONFIG_FOUND)
 
   ########################################
   # Find urdfdom and urdfdom_headers
-  find_package(urdfdom_headers)
+  find_package(urdfdom_headers QUIET)
   if (NOT urdfdom_headers_FOUND)
     BUILD_WARNING ("urdfdom_headers not found, urdf parser will not be built.")
   endif ()
@@ -251,7 +251,7 @@ if (PKG_CONFIG_FOUND)
     set (HAVE_URDFDOM_HEADERS TRUE)
   endif ()
 
-  find_package(urdfdom)
+  find_package(urdfdom QUIET)
   if (NOT urdfdom_FOUND)
     BUILD_WARNING ("urdfdom not found, urdf parser will not be built.")
   endif ()
@@ -259,7 +259,7 @@ if (PKG_CONFIG_FOUND)
     set (HAVE_URDFDOM TRUE)
   endif ()
 
-  find_package(console_bridge)
+  find_package(console_bridge QUIET)
   if (NOT console_bridge_FOUND)
     BUILD_WARNING ("console_bridge not found, urdf parser will not be built.")
   endif ()
