@@ -136,13 +136,14 @@ QToolButton#dataLoggerRecordButton
   padding: 0px;
   margin-left: 10px;
   margin-top: 10px;
-  margin-right: 4px;
-  margin-bottom: 10px;
-  width: 64px;
-  height: 64px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+
+  width: 37px;
+  height: 37px;
 
   background-color: #999999;
-  border-radius: 32px;
+  border-radius: 19px;
   border: 0px;
 }
 
@@ -154,12 +155,9 @@ QToolButton#dataLoggerRecordButton:hover
 QToolButton#dataLoggerStopButton
 {
   padding: 0px;
-  margin-left: 0px;
-  margin-top: 10px;
-  margin-right: 4px;
-  margin-bottom: 10px;
-  width: 32px;
-  height: 32px;
+  margin: 0px;
+  width: 21px;
+  height: 21px;
 
   background-color: #999999;
   border-radius: 4px;
@@ -634,4 +632,14 @@ QFrame#blackBorderFrame
   border: 1px solid #000000;
   padding: 0px;
   margin: 0px;
+}
+
+QLabel#dataLoggerStatusLabel
+{
+  border-top: 1px solid #202020;
+}
+
+QLabel#dataLoggerTimeLabel
+{
+  border: 1px solid #202020;
 }

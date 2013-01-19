@@ -68,6 +68,15 @@ namespace gazebo
 
       /// \brief Label to display the log time.
       private: QLabel *timeLabel;
+
+      /// \brief Label to display the log file size.
+      private: QLabel *sizeLabel;
+
+      /// \brief Label to display status information.
+      private: QLabel *statusLabel;
+
+      private: bool recording;
+      private: bool paused;
     };
     /// \}
   }

@@ -60,8 +60,8 @@ LogRecord::LogRecord()
   this->logPath /= "/.gazebo/log/";
 
   // Add the current time
-  boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-  this->logPath /= boost::posix_time::to_iso_extended_string(now);
+  //boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+  //this->logPath /= boost::posix_time::to_iso_extended_string(now);
 
   this->logsEnd = this->logs.end();
 }
@@ -71,15 +71,6 @@ LogRecord::~LogRecord()
 {
   // Stop the write thread.
   this->Stop();
-
-  // Delete all the log objects
-  for (Log_M::iterator iter = this->logs.begin();
-       iter != this->logs.end(); ++iter)
-  {
-    delete iter->second;
-  }
-
-  this->logs.clear();
 }
 
 //////////////////////////////////////////////////
@@ -89,7 +80,8 @@ bool LogRecord::Init(const std::string &_subdir)
     return false;
 
   if (!_subdir.empty())
-    this->logPath /=  _subdir;
+    this->logSubDir = _subDir;
+    //this->logPath /=  _subdir;
 
   this->logsEnd = this->logs.end();
   this->initialized = true;
@@ -108,15 +100,20 @@ void LogRecord::Start(const std::string &_encoding)
   if (!this->stop)
     return;
 
+  // Add the current time
+  boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+  this->logPath /= boost::posix_time::to_iso_extended_string(now);
+  this->logPath /= this->logSubDir;
+
+  // Create the log directory if necessary
+  if (!boost::filesystem::exists(this->logPath))
+    boost::filesystem::create_directories(this->logPath);
+
   if (_encoding != "bz2" && _encoding != "txt")
     gzthrow("Invalid log encoding[" + _encoding +
             "]. Must be one of [bz2, txt]");
 
   this->encoding = _encoding;
-
-  // Create the log directory if necessary
-  if (!boost::filesystem::exists(this->logPath))
-    boost::filesystem::create_directories(this->logPath);
 
   this->logsEnd = this->logs.end();
 
@@ -172,6 +169,15 @@ void LogRecord::Stop()
   if (this->updateConnection)
     event::Events::DisconnectWorldUpdateStart(this->updateConnection);
   this->updateConnection.reset();
+
+  // Delete all the log objects
+  for (Log_M::iterator iter = this->logs.begin();
+       iter != this->logs.end(); ++iter)
+  {
+    delete iter->second;
+  }
+
+  this->logs.clear();
 }
 
 //////////////////////////////////////////////////
@@ -193,7 +199,7 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
   boost::mutex::scoped_lock lock(this->controlMutex);
 
   // Check to see if the logger is already started.
-  if (this->stop)
+  if (!this->stop)
     return;
 
   // Make the full path

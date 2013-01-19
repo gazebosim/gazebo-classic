@@ -42,7 +42,7 @@ DataLogger::DataLogger(QWidget *_parent)
   this->recordButton->setStatusTip(tr("Record a log file"));
   this->recordButton->setCheckable(true);
   this->recordButton->setChecked(false);
-  this->recordButton->setIconSize(QSize(48, 48));
+  this->recordButton->setIconSize(QSize(30, 30));
   this->recordButton->setObjectName("dataLoggerRecordButton");
   connect(this->recordButton, SIGNAL(toggled(bool)),
           this, SLOT(OnRecord(bool)));
@@ -55,7 +55,7 @@ DataLogger::DataLogger(QWidget *_parent)
   this->stopButton->setStatusTip(tr("Stop recording of a log file"));
   this->stopButton->setCheckable(true);
   this->stopButton->setChecked(true);
-  this->stopButton->setIconSize(QSize(24, 24));
+  this->stopButton->setIconSize(QSize(16, 16));
   this->stopButton->setObjectName("dataLoggerStopButton");
   connect(this->stopButton, SIGNAL(clicked()), this, SLOT(OnStop()));
 
@@ -63,23 +63,34 @@ DataLogger::DataLogger(QWidget *_parent)
   stopButtonLayout->addStretch(1);
   stopButtonLayout->addWidget(this->stopButton, 0);
 
-  this->timeLabel = new QLabel("hh:mm:ss");
+  QVBoxLayout *infoLayout = new QVBoxLayout;
+  this->timeLabel = new QLabel("00:00:00.00");
+  this->timeLabel->setObjectName("dataLoggerTimeLabel");
+
+  this->sizeLabel = new QLabel("0 KB");
+  this->sizeLabel->setObjectName("dataLoggerSizeLabel");
+
+  infoLayout->addStretch(1);
+  infoLayout->addWidget(this->timeLabel);
+  infoLayout->addWidget(this->sizeLabel);
+  infoLayout->addStretch(1);
 
   buttonLayout->addWidget(this->recordButton);
   buttonLayout->addLayout(stopButtonLayout);
   buttonLayout->addSpacing(10);
   buttonLayout->addStretch(1);
-  buttonLayout->addWidget(this->timeLabel);
+  buttonLayout->addLayout(infoLayout);
   buttonLayout->addSpacing(5);
 
-  QFrame *statusFrame = new QFrame;
+  this->statusLabel = new QLabel;
+  this->statusLabel->setObjectName("dataLoggerStatusLabel");
+  this->statusLabel->setText("ready");
 
   mainLayout->addLayout(buttonLayout);
-  mainLayout->addWidget(statusFrame);
-
+  mainLayout->addWidget(this->statusLabel);
 
   // Let the stylesheet handle the margin sizes
-  mainLayout->setContentsMargins(4, 4, 4, 4);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
 
   // Assign the mainlayout to this widget
   this->setLayout(mainLayout);
@@ -97,6 +108,9 @@ DataLogger::DataLogger(QWidget *_parent)
   // messages.
   this->sub = this->node->Subscribe<msgs::LogStatus>("~/log/status",
       &DataLogger::OnStatus, this);
+
+  this->recording = false;
+  this->paused = false;
 }
 
 /////////////////////////////////////////////////
@@ -108,15 +122,23 @@ DataLogger::~DataLogger()
 void DataLogger::OnRecord(bool _toggle)
 {
   // If _toggle, then we should start logging data.
-  if (_toggle)
+  if (!this->recording || this->paused)
   {
     // Switch the icon
     this->recordButton->setIcon(QPixmap(":/images/record_pause.png"));
 
     // Tell the server to start data logging
     msgs::LogControl msg;
-    msg.set_start(true);
+
+    if (!this->paused)
+      msg.set_start(true);
+    else
+      msg.set_paused(false);
+
     this->pub->Publish(msg);
+    this->statusLabel->setText("recording");
+    this->recording = true;
+    this->paused = false;
   }
   // Otherwise pause data logging
   else
@@ -124,20 +146,30 @@ void DataLogger::OnRecord(bool _toggle)
     // Switch the icon
     this->recordButton->setIcon(QPixmap(":/images/record.png"));
 
-    // Tell the server to stop data logging
+    // Tell the server to pause data logging
     msgs::LogControl msg;
-    msg.set_stop(true);
+    msg.set_paused(true);
     this->pub->Publish(msg);
+
+    this->statusLabel->setText("paused");
+    this->paused = true;
   }
 }
 
 /////////////////////////////////////////////////
 void DataLogger::OnStop()
 {
+  this->recording = false;
+  this->paused = false;
+
+  // Switch the icon
+  this->recordButton->setIcon(QPixmap(":/images/record.png"));
+
   // Tell the server to stop data logging
   msgs::LogControl msg;
   msg.set_stop(true);
   this->pub->Publish(msg);
+  this->statusLabel->setText("ready");
 }
 
 /////////////////////////////////////////////////
@@ -147,12 +179,15 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
   common::Time time = msgs::Convert(_msg->start());
   std::ostringstream stream;
 
-  int hours = time.sec / 3600;
-  int min = (time.sec - hours * 3600) / 60;
-  int sec = (time.sec - hours * 3600  - min * 60);
-  ent msec = rint(time.nsec * 1e-6);
+  unsigned int hours = time.sec / 3600;
+  unsigned int min = (time.sec - hours * 3600) / 60;
+  unsigned int sec = (time.sec - hours * 3600  - min * 60);
+  unsigned int msec = rint(time.nsec * 1e-6);
 
-  stream << hours  << ":" << min << ":" << sec << "." << msec;
+  stream << std::setw(2) << std::setfill('0') << hours  << ":";
+  stream << std::setw(2) << std::setfill('0') << min << ":";
+  stream << std::setw(2) << std::setfill('0') << sec << ".";
+  stream << std::setw(2) << std::setfill('0') << msec;
 
   this->timeLabel->setText(QString::fromStdString(stream.str()));
 }
