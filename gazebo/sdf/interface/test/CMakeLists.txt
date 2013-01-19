@@ -21,6 +21,7 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
     libgtest.a
     libgtest_main.a 
     gazebo_common
+    gazebo_sdf_interface
     pthread
     )
 
