@@ -510,6 +510,9 @@ namespace gazebo
       /// \brief Subscriber to log control messages.
       private: transport::SubscriberPtr logControlSub;
 
+      /// \brief Publisher of log status messages.
+      private: transport::PublisherPtr logStatusPub;
+
       /// \brief Subscriber to factory messages.
       private: transport::SubscriberPtr factorySub;
 

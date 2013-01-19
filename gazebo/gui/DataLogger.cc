@@ -36,6 +36,7 @@ DataLogger::DataLogger(QWidget *_parent)
 
   QHBoxLayout *buttonLayout = new QHBoxLayout;
 
+  // The record button allows the user to start and pause data recording
   this->recordButton = new QToolButton(this);
   this->recordButton->setIcon(QPixmap(":/images/record.png"));
   this->recordButton->setStatusTip(tr("Record a log file"));
@@ -47,6 +48,8 @@ DataLogger::DataLogger(QWidget *_parent)
           this, SLOT(OnRecord(bool)));
 
   QVBoxLayout *stopButtonLayout = new QVBoxLayout;
+
+  // The stop button stops and closes an open log file.
   this->stopButton = new QToolButton(this);
   this->stopButton->setIcon(QIcon(":/images/stop.png"));
   this->stopButton->setStatusTip(tr("Stop recording of a log file"));
@@ -56,6 +59,7 @@ DataLogger::DataLogger(QWidget *_parent)
   this->stopButton->setObjectName("dataLoggerStopButton");
   connect(this->stopButton, SIGNAL(clicked()), this, SLOT(OnStop()));
 
+  // Position the stop button next to the record button
   stopButtonLayout->addStretch(1);
   stopButtonLayout->addWidget(this->stopButton, 0);
 
@@ -68,18 +72,31 @@ DataLogger::DataLogger(QWidget *_parent)
   buttonLayout->addWidget(this->timeLabel);
   buttonLayout->addSpacing(5);
 
+  QFrame *statusFrame = new QFrame;
+
   mainLayout->addLayout(buttonLayout);
+  mainLayout->addWidget(statusFrame);
+
 
   // Let the stylesheet handle the margin sizes
   mainLayout->setContentsMargins(4, 4, 4, 4);
 
   // Assign the mainlayout to this widget
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
+  // Create a node from communication.
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
+  // Advertise on the log control topic. The server listens to log control
+  // messages.
   this->pub = this->node->Advertise<msgs::LogControl>("~/log/control");
+
+  // Subscribe to the log status topic. The server publishes log status
+  // messages.
+  this->sub = this->node->Subscribe<msgs::LogStatus>("~/log/status",
+      &DataLogger::OnStatus, this);
 }
 
 /////////////////////////////////////////////////
@@ -90,18 +107,24 @@ DataLogger::~DataLogger()
 /////////////////////////////////////////////////
 void DataLogger::OnRecord(bool _toggle)
 {
+  // If _toggle, then we should start logging data.
   if (_toggle)
   {
+    // Switch the icon
     this->recordButton->setIcon(QPixmap(":/images/record_pause.png"));
 
+    // Tell the server to start data logging
     msgs::LogControl msg;
     msg.set_start(true);
     this->pub->Publish(msg);
   }
+  // Otherwise pause data logging
   else
   {
+    // Switch the icon
     this->recordButton->setIcon(QPixmap(":/images/record.png"));
 
+    // Tell the server to stop data logging
     msgs::LogControl msg;
     msg.set_stop(true);
     this->pub->Publish(msg);
@@ -111,7 +134,25 @@ void DataLogger::OnRecord(bool _toggle)
 /////////////////////////////////////////////////
 void DataLogger::OnStop()
 {
+  // Tell the server to stop data logging
   msgs::LogControl msg;
   msg.set_stop(true);
   this->pub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
+{
+  // A new log status message has arrived, let's display the contents.
+  common::Time time = msgs::Convert(_msg->start());
+  std::ostringstream stream;
+
+  int hours = time.sec / 3600;
+  int min = (time.sec - hours * 3600) / 60;
+  int sec = (time.sec - hours * 3600  - min * 60);
+  ent msec = rint(time.nsec * 1e-6);
+
+  stream << hours  << ":" << min << ":" << sec << "." << msec;
+
+  this->timeLabel->setText(QString::fromStdString(stream.str()));
 }

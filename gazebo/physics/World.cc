@@ -180,8 +180,11 @@ void World::Load(sdf::ElementPtr _sdf)
                                            &World::OnFactoryMsg, this);
   this->controlSub = this->node->Subscribe("~/world_control",
                                            &World::OnControl, this);
+
   this->logControlSub = this->node->Subscribe("~/log/control",
                                               &World::OnLogControl, this);
+  this->logStatusPub = this->node->Advertise<msgs::LogStatus>("~/log/status");
+
   this->requestSub = this->node->Subscribe("~/request",
                                            &World::OnRequest, this);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
@@ -549,6 +552,14 @@ void World::Update()
     this->states.push_back(diffState);
     if (this->states.size() > 1000)
       this->states.pop_front();
+
+    msgs::LogStatus msg;
+    msgs::Set(msg.mutable_start(), this->GetSimTime());
+    msg.mutable_logfile()->set_logsize(100);
+    msg.mutable_logfile()->set_logsize_units(
+        msgs::LogStatus::LogFileSize::BYTES);
+
+    this->logStatusPub->Publish(msg);
   }
 
   event::Events::worldUpdateEnd();

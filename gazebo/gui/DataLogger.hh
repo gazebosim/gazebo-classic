@@ -18,6 +18,7 @@
 #define _DATALOGGER_HH_
 
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -46,11 +47,18 @@ namespace gazebo
       /// \brief QT callback for the stop button.
       private slots: void OnStop();
 
+      /// \brief Callback for log status messages.
+      /// \param[in] _msg Log status message.
+      private: void OnStatus(ConstLogStatusPtr &_msg);
+
       /// \brief Node to handle communication.
       private: transport::NodePtr node;
 
       /// \brief Publisher for log control messages.
       private: transport::PublisherPtr pub;
+
+      /// \brief Subscriber for log status messages.
+      private: transport::SubscriberPtr sub;
 
       /// \brief The button used to start and pause logging.
       private: QToolButton *recordButton;
@@ -58,6 +66,7 @@ namespace gazebo
       /// \brief The button used to stop logging.
       private: QToolButton *stopButton;
 
+      /// \brief Label to display the log time.
       private: QLabel *timeLabel;
     };
     /// \}
