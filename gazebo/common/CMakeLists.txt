@@ -1,6 +1,12 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-set (sources 
+if (HAVE_GTS)
+  include_directories(${gts_INCLUDE_DIRS})
+  link_directories(${gts_LIBRARY_DIRS})
+  add_definitions(${gts_CFLAGS})
+endif()
+
+set (sources
   Animation.cc
   BVHLoader.cc
   ColladaLoader.cc
@@ -30,7 +36,7 @@ set (sources
   Video.cc
 )
 
-set (headers 
+set (headers
   Animation.hh
   BVHLoader.hh
   ColladaLoader.hh
@@ -42,7 +48,7 @@ set (headers
   Event.hh
   Events.hh
   Exception.hh
-  Image.hh 
+  Image.hh
   KeyFrame.hh
   LogPlay.hh
   LogRecord.hh
@@ -62,6 +68,17 @@ set (headers
   Timer.hh
   Video.hh
   )
+
+if (HAVE_GTS)
+set (sources
+  ${sources}
+  MeshCSG.cc
+)
+set (headers
+  ${headers}
+  MeshCSG.hh
+)
+endif()
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
 foreach (hdr ${headers})
@@ -83,6 +100,10 @@ target_link_libraries(gazebo_common gazebo_math
                                     ${libtar_libraries}
                                     rt
                                     )
+
+if (HAVE_GTS)
+  target_link_libraries(gazebo_common ${gts_LIBRARIES})
+endif()
 
 gz_install_library(gazebo_common)
 gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)
