@@ -13,6 +13,7 @@ include_directories(
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
+  ${PROJECT_BINARY_DIR}/test
 )
 
 if(HAVE_URDFDOM_HEADERS)

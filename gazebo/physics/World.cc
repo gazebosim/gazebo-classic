@@ -287,6 +287,9 @@ void World::Init()
       boost::bind(&World::OnLog, this, _1));
 
   this->initialized = true;
+
+  // Mark the world initialization
+  gzlog << "World::Init" << std::endl;
 }
 
 //////////////////////////////////////////////////

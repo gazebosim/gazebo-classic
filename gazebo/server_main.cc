@@ -16,6 +16,7 @@
 */
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/LogRecord.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/Server.hh"
 
 //////////////////////////////////////////////////
@@ -23,7 +24,15 @@ int main(int argc, char **argv)
 {
   try
   {
-    gazebo::common::LogRecord::Instance()->Init("server");
+    // Initialize the informational logger. This will log warnings, and
+    // errors.
+    gazebo::common::Console::Instance()->Init("gzserver.log");
+
+    // Initialize the data logger. This will log state information.
+    gazebo::common::LogRecord::Instance()->Init("gzserver");
+
+    // Output the version of Gazebo.
+    gzlog << GAZEBO_VERSION_HEADER << std::endl;
 
     gazebo::Server *server = new gazebo::Server();
     if (!server->ParseArgs(argc, argv))

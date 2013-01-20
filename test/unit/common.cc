@@ -576,12 +576,6 @@ TEST_F(CommonTest, Material)
   EXPECT_TRUE(mat.GetLighting());
 }
 
-TEST_F(CommonTest, Console)
-{
-  common::Console::Instance()->Load();
-  common::Console::Instance()->SetQuiet(true);
-}
-
 TEST_F(CommonTest, Exception)
 {
   try
