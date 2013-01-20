@@ -617,23 +617,23 @@ TEST_F(CommonTest, InternalAssertionError_AssertionConstructor_Throw)
 }
 
 #if defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-TEST_F(CommonTest, GZBASSERT_Disabled_NoThrow)
+TEST_F(CommonTest, GZASSERT_Disabled_NoThrow)
 {
   ASSERT_NO_THROW(
-     GZB_ASSERT(true == false, "Assert thrown"));
+     GZ_ASSERT(true == false, "Assert thrown"));
 }
 #elif defined(BOOST_ENABLE_ASSERT_HANDLER)
-TEST_F(CommonTest, GZBASSERT_WithHandler_ThrowException)
+TEST_F(CommonTest, GZASSERT_WithHandler_ThrowException)
 {
   ASSERT_THROW(
-    GZB_ASSERT(true == false, "Assert thrown"),
+    GZ_ASSERT(true == false, "Assert thrown"),
                common::AssertionInternalError);
 }
 #else
-TEST_F(CommonTest, GZBASSERT_Enabled_ThrowAssertion)
+TEST_F(CommonTest, GZASSERT_Enabled_ThrowAssertion)
 {
     ASSERT_DEATH(
-      GZB_ASSERT(true == false, "Assert thrown"),
+      GZ_ASSERT(true == false, "Assert thrown"),
       ".*Internal Program Error - assertion.*");
 }
 #endif

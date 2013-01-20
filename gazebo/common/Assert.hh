@@ -19,14 +19,6 @@
 
 #include <boost/assert.hpp>
 
-/*
-namespace boost
-{
-  void assertion_failed_msg(char const * expr, char const * msg,
-                           char const * function, char const * file, long line);
-}
-*/
-
-#define GZB_ASSERT(_expr, _msg) BOOST_ASSERT_MSG(_expr, _msg)
+#define GZ_ASSERT(_expr, _msg) BOOST_ASSERT_MSG(_expr, _msg)
 
 #endif
