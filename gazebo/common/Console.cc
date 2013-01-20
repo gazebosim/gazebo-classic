@@ -36,7 +36,8 @@ Console::Console()
 //////////////////////////////////////////////////
 Console::~Console()
 {
-  this->logStream->close();
+  if (this->logStream)
+    this->logStream->close();
 }
 
 //////////////////////////////////////////////////
