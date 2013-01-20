@@ -107,13 +107,18 @@ namespace gazebo
       public: virtual ~InternalError();
     };
 
+    /// \class AssertionInternalError Exception.hh common/common.hh
+    /// \brief Class for generating Exceptions which come from
+    ///        gazebo assertions. They include information about the
+    ///        assertion expression violated, function where problem
+    ///        appeared and assertion debug message.
     class AssertionInternalError : public InternalError
     {
       /// \brief Constructor for assertions
       /// \param[in] _file File name
       /// \param[in] _line Line number where the error occurred
       /// \param[in] _expr Assertion expression failed resulting in an
-      /// internal error
+      ///                  internal error
       /// \param[in] _function Function where assertion failed
       /// \param[in] _msg Function where assertion failed
       public: AssertionInternalError(const char *_file,
