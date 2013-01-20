@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,29 @@
  * limitations under the License.
  *
 */
+#include <inttypes.h>
 #include "Assert.hh"
 #include "common/Exception.hh"
 
+/*
+ * When using the flag BOOST_ENABLE_ASSERT_HANDLER, the boost functions
+ * assert_failed and assertion_failed_msg function need to be defined. Gazebo
+ * behaviour is to thrown a gazebo::common::AssertionInternalError.
+ */
 namespace boost
 {
-  void assertion_failed(char const *_expr, char const *_function,
-                        char const *_file, long _line)
+  void assertion_failed(char const * expr, char const * function,
+                        char const * file, int64_t line)
   {
-    throw gazebo::common::AssertionInternalError(_file, _line,
-                                                 _expr, _function);
+    throw gazebo::common::AssertionInternalError(file, line, expr, function);
   }
 
 
-  void assertion_failed_msg(char const *_expr, char const *_msg,
-                            char const *_function, char const *_file,
-                            long _line)
+  void assertion_failed_msg(char const * expr, char const * msg,
+                            char const * function, char const * file,
+                            int64_t line)
   {
-    throw gazebo::common::AssertionInternalError(_file, _line, _expr,
-                                                 _function, _msg);
+    throw gazebo::common::AssertionInternalError(file, line, expr,
+                                                 function, msg);
   }
 }
