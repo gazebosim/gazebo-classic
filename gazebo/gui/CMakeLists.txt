@@ -34,6 +34,7 @@ set (sources
   ToolsWidget.cc
   TopicSelector.cc
   viewers/ImageView.cc
+  viewers/LaserView.cc
   viewers/TopicView.cc
   viewers/TextView.cc
   viewers/ViewFactory.cc
@@ -53,6 +54,7 @@ set (qt_headers
   ToolsWidget.hh
   TopicSelector.hh
   viewers/ImageView.hh
+  viewers/LaserView.hh
   viewers/TextView.hh
   viewers/TopicView.hh
 )

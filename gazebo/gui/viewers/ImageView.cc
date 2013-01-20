@@ -72,7 +72,6 @@ void ImageView::SetTopic(const std::string &_topicName)
   TopicView::SetTopic(_topicName);
 
   // Subscribe to the new topic.
-  this->sub.reset();
   this->sub = this->node->Subscribe(_topicName, &ImageView::OnImage, this);
 }
 

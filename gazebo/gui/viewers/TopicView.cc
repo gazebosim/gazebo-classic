@@ -44,7 +44,6 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   QLabel *topicLabel = new QLabel(tr("Topic: "));
   this->topicCombo = new TopicCombo(this, this->msgTypeName,
       _viewType, this->node);
-  this->topicCombo->setObjectName("comboList");
   this->topicCombo->setMinimumSize(300, 25);
 
   topicLayout->addSpacing(10);
@@ -86,9 +85,11 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(8, 8, 8, 10);
-
   this->setSizeGripEnabled(true);
+
   QTimer::singleShot(500, this, SLOT(Update()));
+
+  this->setWindowFlags(Qt::Window);
 }
 
 /////////////////////////////////////////////////
@@ -100,6 +101,8 @@ TopicView::~TopicView()
 /////////////////////////////////////////////////
 void TopicView::Update()
 {
+  boost::mutex::scoped_lock lock(this->updateMutex);
+
   // Update the child class.
   this->UpdateImpl();
 
@@ -171,6 +174,8 @@ void TopicView::OnMsg(const common::Time &_dataTime, int _size)
 /////////////////////////////////////////////////
 void TopicView::OnTopicChanged(int _index)
 {
+  boost::mutex::scoped_lock lock(this->updateMutex);
+
   // Set the current topic based on the index of the item selected in the
   // combobox
   this->SetTopic(this->topicCombo->itemText(_index).toStdString());
@@ -182,6 +187,7 @@ void TopicView::SetTopic(const std::string &_topicName)
   if (_topicName.empty())
     return;
 
+  this->sub.reset();
   this->msgTypeName = transport::getTopicMsgType(
       this->node->DecodeTopicName(_topicName));
 
@@ -242,6 +248,8 @@ void TopicCombo::showPopup()
 /////////////////////////////////////////////////
 void TopicCombo::UpdateList()
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+
   QString myText = this->currentText();
 
   this->blockSignals(true);
@@ -298,4 +306,11 @@ void TopicCombo::UpdateList()
     this->setCurrentIndex(index);
 
   this->blockSignals(false);
+}
+
+//////////////////////////////////////////////////
+void TopicView::closeEvent(QCloseEvent * /*_event*/)
+{
+  this->sub.reset();
+  this->node.reset();
 }

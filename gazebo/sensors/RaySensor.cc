@@ -266,3 +266,9 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   if (this->scanPub)
     this->scanPub->Publish(this->laserMsg);
 }
+
+//////////////////////////////////////////////////
+bool RaySensor::IsActive()
+{
+  return Sensor::IsActive() || this->scanPub->HasConnections();
+}
