@@ -1,7 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-add_subdirectory(test)
-
 set (sources Param.cc SDF.cc parser.cc Converter.cc)
 set (headers SDF.hh Param.hh parser.hh Converter.hh)
 set (gtest_sources
