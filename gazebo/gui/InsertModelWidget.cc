@@ -211,7 +211,19 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
     {
       std::string modelName;
       boost::filesystem::path fullPath = _path / dIter->filename();
-      boost::filesystem::path manifest = fullPath / "manifest.xml";
+      boost::filesystem::path manifest = fullPath;
+
+      // First try to get the GZ_MODEL_MANIFEST_FILENAME. If that file doesn't
+      // exist, try to get the deprecated version.
+      if (boost::filesystem::exists(manifest / GZ_MODEL_MANIFEST_FILENAME))
+        manifest /= GZ_MODEL_MANIFEST_FILENAME;
+      else
+      {
+        gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
+          << "Please rename manifest.xml to gz_model_manifest.xml\n";
+
+        manifest /= "manifest.xml";
+      }
 
       TiXmlDocument xmlDoc;
       if (xmlDoc.LoadFile(manifest.string()))

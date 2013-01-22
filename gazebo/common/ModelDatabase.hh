@@ -24,6 +24,12 @@
 #include <boost/thread/mutex.hpp>
 #include "gazebo/common/SingletonT.hh"
 
+/// \brief The file name of model XML configuration.
+#define GZ_MODEL_MANIFEST_FILENAME "model.config"
+
+/// \brief The file name of model database XML configuration.
+#define GZ_MODEL_DB_MANIFEST_FILENAME "database.config"
+
 namespace gazebo
 {
   namespace common
@@ -70,9 +76,18 @@ namespace gazebo
       /// \return the model's name.
       public: std::string GetModelName(const std::string &_uri);
 
-      /// \brief Return the manifest.xml file as a string.
-      /// \return the manifest file from the model database.
-      public: std::string GetManifest(const std::string &_uri);
+      /// \brief Return the gz_model_manifest.xml file as a string.
+      /// \return the gz_model_manifest file from the model database.
+      public: std::string GetModelManifest(const std::string &_uri);
+
+      /// \brief Return the gz_model_db.xml file as a string.
+      /// \return the gz_model_db file from the model database.
+      public: std::string GetDBManifest(const std::string &_uri);
+
+      /// \brief Deprecated.
+      /// \sa ModelDatabase::GetModelManifest
+      public: std::string GetManifest(const std::string &_uri)
+              GAZEBO_DEPRECATED;
 
       /// \brief Get the local path to a model.
       ///
@@ -92,9 +107,9 @@ namespace gazebo
 
       /// \brief Download all dependencies for a give model path
       ///
-      /// Look's in the model's manifest file (_path/manifest.xml) for all
-      /// models listed in the <depend> block, and downloads the models if
-      /// necessary.
+      /// Look's in the model's manifest file (_path/gz_model_manifest.xml)
+      /// for all models listed in the <depend> block, and downloads the
+      /// models if necessary.
       /// \param[in] _path Path to a model.
       public: void DownloadDependencies(const std::string &_path);
 
@@ -104,6 +119,11 @@ namespace gazebo
       /// model://my_model_name).
       /// \return True if the model was found.
       public: bool HasModel(const std::string &_modelName);
+
+      /// \brief A helper function that uses CURL to get a manifest file.
+      /// \param[in] _uri URI of a manifest XML file.
+      /// \return The contents of the manifest file.
+      private: std::string GetManifestImpl(const std::string &_uri);
 
       /// \brief Used by a thread to update the model cache.
       private: void UpdateModelCache();
