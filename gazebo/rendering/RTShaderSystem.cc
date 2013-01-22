@@ -480,10 +480,10 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
   this->pssmSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
-  this->pssmSetup->setSplitPadding(0);
-  this->pssmSetup->setOptimalAdjustFactor(0, 4);
+  this->pssmSetup->setSplitPadding(4);
+  this->pssmSetup->setOptimalAdjustFactor(0, 2);
   this->pssmSetup->setOptimalAdjustFactor(1, 1);
-  this->pssmSetup->setOptimalAdjustFactor(2, .1);
+  this->pssmSetup->setOptimalAdjustFactor(2, .5);
 
   sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(this->pssmSetup));
 
