@@ -576,7 +576,8 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
           else
           {
             gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
-                   << "Please rename manifest.xml to gz_model_manifest.xml\n";
+                   << "Please rename manifest.xml to "
+                   << GZ_MODEL_MANIFEST_FILENAME << ".\n";
 
             manifestPath /= "manifest.xml";
           }

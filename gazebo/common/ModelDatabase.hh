@@ -76,16 +76,17 @@ namespace gazebo
       /// \return the model's name.
       public: std::string GetModelName(const std::string &_uri);
 
-      /// \brief Return the gz_model_manifest.xml file as a string.
-      /// \return the gz_model_manifest file from the model database.
-      public: std::string GetModelManifest(const std::string &_uri);
+      /// \brief Return the model.config file as a string.
+      /// \return The model config file from the model database.
+      public: std::string GetModelConfig(const std::string &_uri);
 
-      /// \brief Return the gz_model_db.xml file as a string.
-      /// \return the gz_model_db file from the model database.
-      public: std::string GetDBManifest(const std::string &_uri);
+      /// \brief Return the database.config file as a string.
+      /// \return The database config file from the model database.
+      public: std::string GetDBConfig(const std::string &_uri);
 
       /// \brief Deprecated.
-      /// \sa ModelDatabase::GetModelManifest
+      /// \sa ModelDatabase::GetModelConfig
+      /// \sa ModelDatabase::GetDBConfig
       public: std::string GetManifest(const std::string &_uri)
               GAZEBO_DEPRECATED;
 
@@ -107,7 +108,7 @@ namespace gazebo
 
       /// \brief Download all dependencies for a give model path
       ///
-      /// Look's in the model's manifest file (_path/gz_model_manifest.xml)
+      /// Look's in the model's manifest file (_path/model.config)
       /// for all models listed in the <depend> block, and downloads the
       /// models if necessary.
       /// \param[in] _path Path to a model.

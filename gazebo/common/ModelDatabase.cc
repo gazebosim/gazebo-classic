@@ -113,7 +113,7 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
 }
 
 /////////////////////////////////////////////////
-std::string ModelDatabase::GetDBManifest(const std::string &_uri)
+std::string ModelDatabase::GetDBConfig(const std::string &_uri)
 {
   std::string xmlString;
   std::string uri = _uri;
@@ -130,7 +130,7 @@ std::string ModelDatabase::GetDBManifest(const std::string &_uri)
 }
 
 /////////////////////////////////////////////////
-std::string ModelDatabase::GetModelManifest(const std::string &_uri)
+std::string ModelDatabase::GetModelConfig(const std::string &_uri)
 {
   std::string xmlString;
   std::string uri = _uri;
@@ -148,7 +148,7 @@ std::string ModelDatabase::GetModelManifest(const std::string &_uri)
 /////////////////////////////////////////////////
 std::string ModelDatabase::GetManifest(const std::string &_uri)
 {
-  return this->GetModelManifest(_uri);
+  return this->GetModelConfig(_uri);
 }
 
 /////////////////////////////////////////////////
@@ -179,7 +179,7 @@ std::string ModelDatabase::GetManifestImpl(const std::string &_uri)
 /////////////////////////////////////////////////
 bool ModelDatabase::UpdateModelCacheImpl()
 {
-  std::string xmlString = ModelDatabase::GetDBManifest(ModelDatabase::GetURI());
+  std::string xmlString = ModelDatabase::GetDBConfig(ModelDatabase::GetURI());
 
   if (!xmlString.empty())
   {
@@ -190,7 +190,7 @@ bool ModelDatabase::UpdateModelCacheImpl()
     if (!databaseElem)
     {
       gzerr << "No <database> tag in the model database "
-            << GZ_MODEL_MANIFEST_FILENAME << " found"
+            << GZ_MODEL_DB_MANIFEST_FILENAME << " found"
             << " here[" << ModelDatabase::GetURI() << "]\n";
       return false;
     }
@@ -199,7 +199,7 @@ bool ModelDatabase::UpdateModelCacheImpl()
     if (!modelsElem)
     {
       gzerr << "No <models> tag in the model database "
-        << GZ_MODEL_MANIFEST_FILENAME << " found"
+        << GZ_MODEL_DB_MANIFEST_FILENAME << " found"
         << " here[" << ModelDatabase::GetURI() << "]\n";
       return false;
     }
@@ -298,7 +298,7 @@ void ModelDatabase::GetModels(
 std::string ModelDatabase::GetModelName(const std::string &_uri)
 {
   std::string result;
-  std::string xmlStr = ModelDatabase::GetModelManifest(_uri);
+  std::string xmlStr = ModelDatabase::GetModelConfig(_uri);
 
   if (!xmlStr.empty())
   {
@@ -450,7 +450,7 @@ void ModelDatabase::DownloadDependencies(const std::string &_path)
   else
   {
     gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
-      << "Please rename manifest.xml to gz_model_manifest.xml\n";
+      << "Please rename manifest.xml to " << GZ_MODEL_MANIFEST_FILENAME << "\n";
 
     manifestPath /= "manifest.xml";
   }
@@ -506,7 +506,7 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
   else
   {
     gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
-      << "Please rename manifest.xml to gz_model_manifest.xml\n";
+      << "Please rename manifest.xml to " << GZ_MODEL_MANIFEST_FILENAME << "\n";
 
     manifestPath /= "manifest.xml";
   }
