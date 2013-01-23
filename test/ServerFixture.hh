@@ -26,15 +26,16 @@
 #include <map>
 #include <string>
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "common/SystemPaths.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsTypes.hh"
-#include "physics/Physics.hh"
-#include "sensors/sensors.hh"
-#include "rendering/rendering.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/Physics.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/rendering/rendering.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo_config.h"
 #include "gazebo/Server.hh"
@@ -55,6 +56,7 @@ class ServerFixture : public testing::Test
                this->imgData = NULL;
                this->serverThread = NULL;
 
+               common::Console::Instance()->Init("test.log");
                common::SystemPaths::Instance()->AddGazeboPaths(
                    TEST_REGRESSION_PATH);
 

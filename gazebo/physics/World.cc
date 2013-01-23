@@ -290,6 +290,9 @@ void World::Init()
   this->prevStates[1].SetName(this->GetName());
 
   this->initialized = true;
+
+  // Mark the world initialization
+  gzlog << "World::Init" << std::endl;
 }
 
 //////////////////////////////////////////////////
