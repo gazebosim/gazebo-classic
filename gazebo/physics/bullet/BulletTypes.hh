@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef BULLETTYPES_HH
-#define BULLETTYPES_HH
+#ifndef _BULLETTYPES_HH
+#define _BULLETTYPES_HH
 
 #include <boost/shared_ptr.hpp>
 #include "gazebo/physics/bullet/bullet_math_inc.h"
@@ -96,4 +96,4 @@ namespace gazebo
     };
   }
 }
-#endif  // #ifndef BULLETTYPES_HH
+#endif  // #ifndef _BULLETTYPES_HH
