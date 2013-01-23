@@ -29,13 +29,6 @@ class PhysicsTest : public ServerFixture
   public: void SimplePendulum(const std::string &_worldFile);
 };
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, FirstTest)
-{
-  SimplePendulum("worlds/simple_pendulums_bullet.world");
-}
-#endif  // HAVE_BULLET
-
 ////////////////////////////////////////////////////////////////////////
 // EmptyWorld:
 // Load a world, take a few steps, and verify that time is increasing.
