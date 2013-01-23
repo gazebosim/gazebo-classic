@@ -14,47 +14,42 @@
  * limitations under the License.
  *
  */
-/*
- * Desc: Gazebo Console messages
- * Author: Nathan Koenig
- * Date: 09 June 2007
- */
-
 #include <string.h>
+#include <boost/filesystem.hpp>
 #include <sstream>
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
-
-Console *Console::myself = NULL;
 
 //////////////////////////////////////////////////
 Console::Console()
 {
   this->msgStream = &std::cout;
   this->errStream = &std::cerr;
+  this->logStream = NULL;
 }
 
 //////////////////////////////////////////////////
 Console::~Console()
 {
+  if (this->logStream)
+    this->logStream->close();
 }
 
 //////////////////////////////////////////////////
-Console *Console::Instance()
+void Console::Init(const std::string &_logFilename)
 {
-  if (myself == NULL)
-    myself = new Console();
+  if (!getenv("HOME"))
+    gzthrow("Missing HOME environment variable");
 
-  return myself;
-}
+  boost::filesystem::path logPath(getenv("HOME"));
+  logPath = logPath / ".gazebo/" / _logFilename;
 
-//////////////////////////////////////////////////
-void Console::Load()
-{
+  this->logStream = new std::ofstream(logPath.string().c_str(), std::ios::out);
 }
 
 //////////////////////////////////////////////////
@@ -63,15 +58,26 @@ void Console::SetQuiet(bool)
 }
 
 //////////////////////////////////////////////////
-std::ostream &Console::ColorMsg(const std::string &lbl, int color)
+std::ostream &Console::ColorMsg(const std::string &_lbl, int _color)
 {
   // if (**this->quietP)
   // return this->nullStream;
   // else
   // {
-  *this->msgStream << "\033[1;" << color << "m" << lbl << "\033[0m ";
+  *this->msgStream << "\033[1;" << _color << "m" << _lbl << "\033[0m ";
   return *this->msgStream;
   // }
+}
+
+//////////////////////////////////////////////////
+std::ofstream &Console::Log()
+{
+  if (!this->logStream)
+    gzthrow("Console has not been initialized\n");
+
+  *this->logStream << "[" << common::Time::GetWallTime() << "] ";
+  this->logStream->flush();
+  return *this->logStream;
 }
 
 //////////////////////////////////////////////////
