@@ -202,16 +202,20 @@ void BulletLink::SetSelfCollide(bool /*_collide*/)
   */
 
 //////////////////////////////////////////////////
-/// changed
+/// I adapted this from ODELink::OnPoseChange
 void BulletLink::OnPoseChange()
 {
-  /*
-  math::Pose pose = this->GetWorldPose();
+  Link::OnPoseChange();
 
-  this->motionState->SetWorldPose(pose);
-  if (this->rigidLink)
-    this->rigidLink->setMotionState(this->motionState);
-    */
+  if (!this->rigidLink)
+    return;
+
+  // this->SetEnabled(true);
+
+  const math::Pose myPose = this->GetWorldCoGPose();
+
+  this->rigidLink->setCenterOfMassTransform(
+    BulletTypes::ConvertPose(myPose));
 }
 
 //////////////////////////////////////////////////
@@ -249,14 +253,12 @@ void BulletLink::UpdateCoM()
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetLinearVel(const math::Vector3 & /*_vel*/)
+void BulletLink::SetLinearVel(const math::Vector3 &_vel)
 {
-  /*
   if (!this->rigidLink)
     return;
 
-  this->rigidLink->setLinearVelocity(btmath::Vector3(_vel.x, _vel.y, _vel.z));
-  */
+  this->rigidLink->setLinearVelocity(BulletTypes::ConvertVector3(_vel));
 }
 
 //////////////////////////////////////////////////
@@ -276,7 +278,7 @@ void BulletLink::SetAngularVel(const math::Vector3 &_vel)
   if (!this->rigidLink)
     return;
 
-  this->rigidLink->setAngularVelocity(btVector3(_vel.x, _vel.y, _vel.z));
+  this->rigidLink->setAngularVelocity(BulletTypes::ConvertVector3(_vel));
 }
 
 //////////////////////////////////////////////////

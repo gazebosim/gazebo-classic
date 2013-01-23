@@ -178,6 +178,10 @@ namespace gazebo
       /// \param[in] _torque Torque value to add.
       public: virtual void AddRelativeTorque(const math::Vector3 &_torque) = 0;
 
+      /// \brief Get the world pose of body center of gravity.
+      /// \return World pose of body center of gravity.
+      public: math::Pose GetWorldCoGPose() const;
+
       /// \brief Get the linear velocity of the body.
       /// \return Linear velocity of the body.
       public: math::Vector3 GetRelativeLinearVel() const;

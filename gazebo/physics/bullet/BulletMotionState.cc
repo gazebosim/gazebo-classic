@@ -45,14 +45,6 @@ BulletMotionState::~BulletMotionState()
 //   return this->worldPose;
 // }
 
-//////////////////////////////////////////////////
-math::Pose BulletMotionState::GetCoGWorldPose() const
-{
-  math::Pose pose = this->link->GetWorldPose();
-  pose.pos += pose.rot.RotateVector(this->link->GetInertial()->GetCoG());
-  return pose;
-}
-
 // //////////////////////////////////////////////////
 // void BulletMotionState::SetWorldPosition(const math::Vector3 &_pos)
 // {
@@ -82,7 +74,7 @@ math::Pose BulletMotionState::GetCoGWorldPose() const
 //////////////////////////////////////////////////
 void BulletMotionState::getWorldTransform(btTransform &_cogWorldTrans) const
 {
-  _cogWorldTrans = BulletTypes::ConvertPose(this->GetCoGWorldPose());
+  _cogWorldTrans = BulletTypes::ConvertPose(this->link->GetWorldCoGPose());
 }
 
 //////////////////////////////////////////////////

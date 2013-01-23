@@ -69,16 +69,14 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   pivotB = this->anchorPos;
   if (this->parentLink)
   {
-    pose = this->parentLink->GetWorldPose();
-    pose.pos += pose.rot.RotateVector(this->parentLink->GetInertial()->GetCoG());
+    pose = this->parentLink->GetWorldCoGPose();
     pivotA -= pose.pos;
     pivotA = pose.rot.RotateVectorReverse(pivotA);
     axisA = pose.rot.RotateVectorReverse(axis);
   }
   if (this->childLink)
   {
-    pose = this->childLink->GetWorldPose();
-    pose.pos += pose.rot.RotateVector(this->childLink->GetInertial()->GetCoG());
+    pose = this->childLink->GetWorldCoGPose();
     pivotB -= pose.pos;
     pivotB = pose.rot.RotateVectorReverse(pivotB);
     axisB = pose.rot.RotateVectorReverse(axis);
