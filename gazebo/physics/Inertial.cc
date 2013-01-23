@@ -109,7 +109,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
         boost::bind(&Inertial::GetIXZ, this));
     inertiaElem->GetElement("iyz")->GetValue()->SetUpdateFunc(
         boost::bind(&Inertial::GetIYZ, this));
- }
+  }
 
   this->SetMass(this->sdf->GetValueDouble("mass"));
   this->sdf->GetElement("mass")->GetValue()->SetUpdateFunc(

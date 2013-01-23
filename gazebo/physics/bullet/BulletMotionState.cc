@@ -19,10 +19,10 @@
  * Date: 25 May 2009
  */
 
-#include "physics/Link.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletMotionState.hh"
-#include "physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletMotionState.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -38,38 +38,6 @@ BulletMotionState::BulletMotionState(LinkPtr _link)
 BulletMotionState::~BulletMotionState()
 {
 }
-
-// //////////////////////////////////////////////////
-// math::Pose BulletMotionState::GetWorldPose() const
-// {
-//   return this->worldPose;
-// }
-
-// //////////////////////////////////////////////////
-// void BulletMotionState::SetWorldPosition(const math::Vector3 &_pos)
-// {
-//   this->worldPose.pos = _pos;
-// }
-
-// //////////////////////////////////////////////////
-// void BulletMotionState::SetWorldRotation(const math::Quaternion &_rot)
-// {
-//   this->worldPose.rot = _rot;
-// }
-
-// //////////////////////////////////////////////////
-// void BulletMotionState::SetWorldPose(const math::Pose &_pose)
-// {
-//   this->worldPose = _pose;
-// }
-
-// //////////////////////////////////////////////////
-// void BulletMotionState::SetCoG(const math::Vector3 &_cog)
-// {
-//   this->cog = _cog;
-//   math::Vector3 cg = this->worldPose.rot.RotateVector(this->cog);
-//   this->worldPose.pos += cg;
-// }
 
 //////////////////////////////////////////////////
 void BulletMotionState::getWorldTransform(btTransform &_cogWorldTrans) const

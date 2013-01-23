@@ -74,8 +74,6 @@ void BulletLink::Init()
   // Set the initial pose of the body
   this->motionState.reset(new BulletMotionState(
     boost::shared_dynamic_cast<Link>(shared_from_this())));
-  // this->motionState->SetWorldPose(this->GetWorldPose());
-  // this->motionState->SetCoG(cogVec);
 
   for (Base_V::iterator iter = this->children.begin();
        iter != this->children.end(); ++iter)
@@ -202,7 +200,7 @@ void BulletLink::SetSelfCollide(bool /*_collide*/)
   */
 
 //////////////////////////////////////////////////
-/// I adapted this from ODELink::OnPoseChange
+/// Adapted from ODELink::OnPoseChange
 void BulletLink::OnPoseChange()
 {
   Link::OnPoseChange();

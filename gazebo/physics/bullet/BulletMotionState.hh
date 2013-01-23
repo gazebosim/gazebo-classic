@@ -22,10 +22,10 @@
 #ifndef _BULLETMOTIONSTATE_HH_
 #define _BULLETMOTIONSTATE_HH_
 
-#include "physics/bullet/bullet_inc.h"
-#include "math/MathTypes.hh"
-#include "physics/PhysicsTypes.hh"
-#include "math/Pose.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/math/MathTypes.hh"
+#include "gazebo/math/Pose.hh"
 
 namespace gazebo
 {
@@ -43,33 +43,8 @@ namespace gazebo
       /// \brief Constructor
       public: BulletMotionState(LinkPtr _link);
 
-      /// \brief Constructor
-      // public: BulletMotionState(const math::Pose &initPose);
-
       /// \brief Destructor
       public: virtual ~BulletMotionState();
-
-      // \brief Get the pose
-      // public: math::Pose GetWorldPose() const;
-
-      /// \brief Get the pose of the body at the center of gravity
-      ///        in the world frame.
-      /// \return Returns the pose of the body at the center of gravity.
-      public: math::Pose GetCoGWorldPose() const;
-
-      // \brief Set the position of the body
-      // \param pos math::Vector position
-      // public: virtual void SetWorldPosition(const math::Vector3 &_pos);
-
-      // \brief Set the rotation of the body
-      // \param rot Quaternion rotation
-      // public: virtual void SetWorldRotation(const math::Quaternion &_rot);
-
-      // \brief Set the pose
-      // public: void SetWorldPose(const math::Pose &_pose);
-
-      // \brief Set the center of mass offset
-      // public: void SetCoG(const math::Vector3 &_cog);
 
       /// \brief Get the world transform of the body at the center of gravity.
       /// \param[out] _cogWorldTrans Pose of body center of gravity.
