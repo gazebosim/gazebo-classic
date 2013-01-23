@@ -107,6 +107,8 @@ namespace gazebo
       /// \brief Update loop
       private: void RunLoop();
 
+      private: void RunRay();
+
       /// \brief If True the sensor manager stop processing sensors.
       private: bool stop;
 
@@ -120,11 +122,19 @@ namespace gazebo
       /// \brief Mutex used when adding and removing sensors.
       private: boost::recursive_mutex mutex;
 
-      /// \brief The list of initialized sensors.
+      /// \brief The list of initialized non-image sensors.
       private: Sensor_V sensors;
+
+      /// \brief The list of initialized image sensors.
+      private: Sensor_V imageSensors;
 
       /// \brief List of sensors that require initialization.
       private: Sensor_V initSensors;
+
+      private: std::vector<Sensor_V*> sensorLists;
+
+      /// \brief Thread for ray sensors.
+      private: boost::thread *rayThread;
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<SensorManager>;

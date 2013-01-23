@@ -30,12 +30,15 @@ using namespace sensors;
 SensorManager::SensorManager()
   : stop(true), initialized(false), runThread(NULL)
 {
+  this->sensorLists.push_back(&this->sensors);
+  this->sensorLists.push_back(&this->imageSensors);
 }
 
 //////////////////////////////////////////////////
 SensorManager::~SensorManager()
 {
   this->sensors.clear();
+  this->imageSensors.clear();
   this->initSensors.clear();
 }
 
@@ -43,8 +46,12 @@ SensorManager::~SensorManager()
 void SensorManager::Run()
 {
   this->stop = false;
-  this->runThread = new boost::thread(
-      boost::bind(&SensorManager::RunLoop, this));
+  // this->runThread = new boost::thread(
+  //    boost::bind(&SensorManager::RunLoop, this));
+
+  printf("RUN baby\n");
+  this->rayThread = new boost::thread(
+      boost::bind(&SensorManager::RunRay, this));
 }
 
 //////////////////////////////////////////////////
@@ -57,6 +64,13 @@ void SensorManager::Stop()
     delete this->runThread;
     this->runThread = NULL;
   }
+
+  if (this->rayThread)
+  {
+    this->rayThread->join();
+    delete this->rayThread;
+    this->rayThread = NULL;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -64,6 +78,25 @@ void SensorManager::RunLoop()
 {
   while (!this->stop)
     this->Update();
+}
+
+//////////////////////////////////////////////////
+void SensorManager::RunRay()
+{
+  Sensor_V::iterator iter;
+  Sensor_V::iterator end;
+
+  while (!this->stop)
+  {
+    {
+      //boost::recursive_mutex::scoped_lock lock(this->mutex);
+      end = this->sensors.end();
+      for (iter = this->sensors.begin(); iter != end; ++iter)
+      {
+        (*iter)->Update(false);
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -79,7 +112,14 @@ void SensorManager::Update(bool _force)
     for (iter = this->initSensors.begin(); iter != end; ++iter)
     {
       (*iter)->Init();
-      this->sensors.push_back((*iter));
+      if ((*iter)->GetType() != "camera" &&
+          (*iter)->GetType() != "multicamera" &&
+          (*iter)->GetType() != "depth")
+      {
+        this->sensors.push_back(*iter);
+      }
+      else
+        this->imageSensors.push_back(*iter);
     }
     this->initSensors.clear();
   }
@@ -92,10 +132,10 @@ void SensorManager::Update(bool _force)
   event::Events::postRender();
 
   {
-    boost::recursive_mutex::scoped_lock lock(this->mutex);
+    //boost::recursive_mutex::scoped_lock lock(this->mutex);
     // in case things are spawn, sensors length changes
-    end = this->sensors.end();
-    for (iter = this->sensors.begin(); iter != end; ++iter)
+    end = this->imageSensors.end();
+    for (iter = this->imageSensors.begin(); iter != end; ++iter)
     {
       (*iter)->Update(_force);
     }
@@ -115,8 +155,16 @@ void SensorManager::Init()
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
   Sensor_V::iterator iter;
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
-    (*iter)->Init();
+
+  for (std::vector<Sensor_V*>::iterator viter = this->sensorLists.begin();
+      viter != this->sensorLists.end(); ++viter)
+  {
+    for (iter = (*viter)->begin(); iter != (*viter)->end(); ++iter)
+    {
+      (*iter)->Init();
+    }
+  }
+
   this->initialized = true;
 }
 
@@ -127,9 +175,17 @@ void SensorManager::Fini()
 
   this->initialized = false;
   Sensor_V::iterator iter;
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
-    (*iter)->Fini();
-  this->sensors.clear();
+
+  for (std::vector<Sensor_V*>::iterator viter = this->sensorLists.begin();
+      viter != this->sensorLists.end(); ++viter)
+  {
+    for (iter = (*viter)->begin(); iter != (*viter)->end(); ++iter)
+    {
+      (*iter)->Fini();
+    }
+
+    (*viter)->clear();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -159,7 +215,11 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
 
   if (!this->initialized)
   {
-    this->sensors.push_back(sensor);
+    if (sensor->GetType() != "camera" && sensor->GetType() != "multicamera" &&
+        sensor->GetType() != "depth")
+      this->sensors.push_back(sensor);
+    else
+      this->imageSensors.push_back(sensor);
   }
   else
   {
@@ -177,7 +237,16 @@ SensorPtr SensorManager::GetSensor(const std::string &_name)
 
   SensorPtr result;
   Sensor_V::iterator iter;
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+
+  for (iter = this->sensors.begin();
+       iter != this->sensors.end() && !result; ++iter)
+  {
+    if ((*iter)->GetScopedName() == _name)
+      result = (*iter);
+  }
+
+  for (iter = this->imageSensors.begin();
+       iter != this->imageSensors.end() && !result; ++iter)
   {
     if ((*iter)->GetScopedName() == _name)
       result = (*iter);
@@ -189,19 +258,23 @@ SensorPtr SensorManager::GetSensor(const std::string &_name)
   // because we don't know which sensor is correct.
   if (!result)
   {
-    for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+    for (std::vector<Sensor_V*>::iterator viter = this->sensorLists.begin();
+         viter != this->sensorLists.end(); ++viter)
     {
-      if ((*iter)->GetName() != _name)
-        continue;
-
-      if (!result)
-        result = (*iter);
-      else
+      for (iter = (*viter)->begin(); iter != (*viter)->end(); ++iter)
       {
-        gzerr << "Unable to get a sensor, multiple sensors with the same "
-              << "name[" << _name << "]. Use a scoped name instead, "
-              << "world_name::model_name::link_name::sensor_name.\n";
-        result.reset();
+        if ((*iter)->GetName() != _name)
+          continue;
+
+        if (!result)
+          result = (*iter);
+        else
+        {
+          gzerr << "Unable to get a sensor, multiple sensors with the same "
+            << "name[" << _name << "]. Use a scoped name instead, "
+            << "world_name::model_name::link_name::sensor_name.\n";
+          result.reset();
+        }
       }
     }
   }
@@ -209,9 +282,18 @@ SensorPtr SensorManager::GetSensor(const std::string &_name)
   return result;
 }
 
+//////////////////////////////////////////////////
 Sensor_V SensorManager::GetSensors() const
 {
-  return this->sensors;
+  Sensor_V result;
+
+  std::copy(this->sensors.begin(), this->sensors.end(),
+            std::back_inserter(result));
+
+  std::copy(this->imageSensors.begin(), this->imageSensors.end(),
+            std::back_inserter(result));
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -228,16 +310,23 @@ void SensorManager::RemoveSensor(const std::string &_name)
     boost::recursive_mutex::scoped_lock lock(this->mutex);
 
     Sensor_V::iterator iter;
-    for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
-      if ((*iter)->GetScopedName() == sensor->GetScopedName())
-        break;
 
-    if (iter != this->sensors.end())
+    bool removed = false;
+    for (std::vector<Sensor_V*>::iterator viter = this->sensorLists.begin();
+        viter != this->sensorLists.end() && !removed; ++viter)
     {
-      (*iter)->Fini();
-      this->sensors.erase(iter);
+      for (iter = (*viter)->begin(); iter != (*viter)->end(); ++iter)
+      {
+        if ((*iter)->GetScopedName() == sensor->GetScopedName())
+        {
+          (*iter)->Fini();
+          (*viter)->erase(iter);
+          removed = true;
+        }
+      }
     }
-    else
+
+    if (!removed)
       gzerr << "RemoveSensor failed. The SensorManager's list of sensors "
         << "changed during sensor removal. This is bad, and should "
         << "never happen.\n";
@@ -252,6 +341,13 @@ void SensorManager::RemoveSensors()
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
     (*iter)->Fini();
 
+  for (iter = this->imageSensors.begin();
+       iter != this->imageSensors.end(); ++iter)
+  {
+    (*iter)->Fini();
+  }
+
   this->sensors.clear();
+  this->imageSensors.clear();
   this->initSensors.clear();
 }
