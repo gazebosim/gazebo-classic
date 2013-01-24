@@ -32,6 +32,22 @@ namespace sdf
     private: static void ConvertImpl(TiXmlElement *_elem,
                                      TiXmlElement *_convert);
 
+    /// \brief Rename an element or attribute.
+    /// \param[in] _elem The element to be renamed, or the element which
+    /// has the attribute to be renamed.
+    /// \param[in] _moveElem A 'convert' element that describes the rename
+    /// operation.
+    private: static void Rename(TiXmlElement *_elem,
+                                     TiXmlElement *_renameElem);
+
+    /// \brief Move an element or attribute within a common ancestor element.
+    /// \param[in] _elem Ancestor element of the element or attribute to
+    /// be moved.
+    /// \param[in] _moveElem A 'convert' element that describes the move
+    /// operation.
+    private: static void Move(TiXmlElement *_elem,
+                                     TiXmlElement *_moveElem);
+
     private: static const char *GetValue(const char *_valueElem,
                                          const char *_valueAttr,
                                          TiXmlElement *_elem);
