@@ -34,7 +34,7 @@ BulletRayShape::BulletRayShape(PhysicsEnginePtr _physicsEngine)
   : RayShape(_physicsEngine),
     rayCallback(btVector3(0, 0, 0), btVector3(0, 0, 0))
 {
-  this->SetName("ODE Ray Shape");
+  this->SetName("Bullet Ray Shape");
 
   this->physicsEngine =
     boost::shared_static_cast<BulletPhysics>(_physicsEngine);

@@ -96,14 +96,18 @@ void LogPlay::Open(const std::string &_logFile)
 
   // Read in the header.
   this->ReadHeader();
+
+  this->encoding.clear();
 }
 
 /////////////////////////////////////////////////
 void LogPlay::ReadHeader()
 {
-  std::string logVersion, gazeboVersion;
-  uint32_t randSeed = math::Rand::GetSeed();
+  this->randSeed = math::Rand::GetSeed();
   TiXmlElement *headerXml, *childXml;
+
+  this->logVersion.clear();
+  this->gazeboVersion.clear();
 
   // Get the header element
   headerXml = this->logStartXml->FirstChildElement("header");
@@ -115,40 +119,54 @@ void LogPlay::ReadHeader()
   if (!childXml)
     gzerr << "Log file header is missing the log version.\n";
   else
-    logVersion = childXml->GetText();
+    this->logVersion = childXml->GetText();
 
   // Get the gazebo version
   childXml = headerXml->FirstChildElement("gazebo_version");
   if (!childXml)
     gzerr << "Log file header is missing the gazebo version.\n";
   else
-    gazeboVersion = childXml->GetText();
+    this->gazeboVersion = childXml->GetText();
 
   // Get the random number seed.
   childXml = headerXml->FirstChildElement("rand_seed");
   if (!childXml)
     gzerr << "Log file header is missing the random number seed.\n";
   else
-    randSeed = boost::lexical_cast<uint32_t>(childXml->GetText());
+    this->randSeed = boost::lexical_cast<uint32_t>(childXml->GetText());
 
-  gzmsg << "\nLog playback:\n"
-        << "  Log Version[" << logVersion << "]\n"
-        << "  Gazebo Version[" << gazeboVersion << "]\n"
-        << "  Random Seed[" << randSeed << "]\n\n";
-
-  if (logVersion != GZ_LOG_VERSION)
-    gzwarn << "Log version[" << logVersion << "] in file[" << this->filename
+  if (this->logVersion != GZ_LOG_VERSION)
+    gzwarn << "Log version[" << this->logVersion << "] in file["
+           << this->filename
            << "] does not match Gazebo's log version["
            << GZ_LOG_VERSION << "]\n";
 
   /// Set the random number seed for simulation
-  math::Rand::SetSeed(randSeed);
+  math::Rand::SetSeed(this->randSeed);
 }
 
 /////////////////////////////////////////////////
 bool LogPlay::IsOpen() const
 {
   return this->logStartXml != NULL;
+}
+
+/////////////////////////////////////////////////
+std::string LogPlay::GetLogVersion() const
+{
+  return this->logVersion;
+}
+
+/////////////////////////////////////////////////
+std::string LogPlay::GetGazeboVersion() const
+{
+  return this->gazeboVersion;
+}
+
+/////////////////////////////////////////////////
+uint32_t LogPlay::GetRandSeed() const
+{
+  return this->randSeed;
 }
 
 /////////////////////////////////////////////////
@@ -159,23 +177,47 @@ bool LogPlay::Step(std::string &_data)
   else
     this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
 
+  return this->GetChunkData(this->logCurrXml, _data);
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::GetChunk(unsigned int _index, std::string &_data)
+{
+  unsigned int count = 0;
+  TiXmlElement *xml = this->logStartXml->FirstChildElement("chunk");
+
+  while (xml && count < _index)
+  {
+    count++;
+    xml = xml->NextSiblingElement("chunk");
+  }
+
+  if (xml && count == _index)
+    return this->GetChunkData(xml, _data);
+  else
+    return false;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::GetChunkData(TiXmlElement *_xml, std::string &_data)
+{
   // Make sure we have valid xml pointer
-  if (!this->logCurrXml)
+  if (!_xml)
     return false;
 
   /// Get the chunk's encoding
-  std::string encoding = this->logCurrXml->Attribute("encoding");
+  this->encoding = _xml->Attribute("encoding");
 
   // Make sure there is an encoding value.
-  if (encoding.empty())
+  if (this->encoding.empty())
     gzthrow("Enconding missing for a chunk in log file[" +
-            this->filename + "]");
+        this->filename + "]");
 
-  if (encoding == "txt")
-    _data = this->logCurrXml->GetText();
-  else if (encoding == "bz2")
+  if (this->encoding == "txt")
+    _data = _xml->GetText();
+  else if (this->encoding == "bz2")
   {
-    std::string data = this->logCurrXml->GetText();
+    std::string data = _xml->GetText();
     std::string buffer;
 
     // Decode the base64 string
@@ -193,10 +235,31 @@ bool LogPlay::Step(std::string &_data)
   }
   else
   {
-    gzerr << "Inavlid encoding[" << encoding << "] in log file["
-          << this->filename << "]\n";
-      return false;
+    gzerr << "Inavlid encoding[" << this->encoding << "] in log file["
+      << this->filename << "]\n";
+    return false;
   }
 
   return true;
+}
+
+/////////////////////////////////////////////////
+std::string LogPlay::GetEncoding() const
+{
+  return this->encoding;
+}
+
+/////////////////////////////////////////////////
+unsigned int LogPlay::GetChunkCount() const
+{
+  unsigned int count = 0;
+  TiXmlElement *xml = this->logStartXml->FirstChildElement("chunk");
+
+  while (xml)
+  {
+    count++;
+    xml = xml->NextSiblingElement("chunk");
+  }
+
+  return count;
 }

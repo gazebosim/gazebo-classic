@@ -337,6 +337,14 @@ void UserCamera::SetViewController(const std::string &type,
 }
 
 //////////////////////////////////////////////////
+std::string UserCamera::GetViewControllerTypeString()
+{
+  if (this->viewController)
+    return this->viewController->GetTypeString();
+  return "";
+}
+
+//////////////////////////////////////////////////
 void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 {
   if (this->viewport)

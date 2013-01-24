@@ -62,9 +62,46 @@ namespace gazebo
       /// \return True if a log file is open.
       public: bool IsOpen() const;
 
+      /// \brief Get the log version number of the open log file.
+      /// \return The log version of the open log file. Empty string if
+      /// a log file is not open.
+      public: std::string GetLogVersion() const;
+
+      /// \brief Get the Gazebo version number of the open log file.
+      /// \return The Gazebo version of the open log file. Empty string if
+      /// a log file is not open.
+      public: std::string GetGazeboVersion() const;
+
+      /// \brief Get the random number seed of the open log file.
+      /// \return The random number seed the open log file. The current
+      /// random number seed, as defined in math::Rand::GetSeed.
+      public: uint32_t GetRandSeed() const;
+
       /// \brief Step through the open log file.
       /// \param[out] _data Data from next entry in the log file.
       public: bool Step(std::string &_data);
+
+      /// \brief Get the number of chunks (steps) in the open log file.
+      /// \return The number of recorded states in the log file.
+      public: unsigned int GetChunkCount() const;
+
+      /// \brief Get data for a particular chunk index.
+      /// \param[in] _index Index of the chunk.
+      /// \param[out] _data Storage for the chunk's data.
+      /// \return True if the _index was valid.
+      public: bool GetChunk(unsigned int _index, std::string &_data);
+
+      /// \brief Get the type of encoding used for current chunck in the
+      /// open log file.
+      /// \return The type of encoding. An empty string will be returned if
+      /// LogPlay::Step has not been called at least once.
+      public: std::string GetEncoding() const;
+
+      /// \brief Helper function to get chunk data from XML.
+      /// \param[in] _xml Pointer to an xml block that has state data.
+      /// \param[out] _data Storage for the chunk's data.
+      /// \return True if the chunk was successfully parsed.
+      private: bool GetChunkData(TiXmlElement *_xml, std::string &_data);
 
       /// \brief Read the header from the log file.
       private: void ReadHeader();
@@ -80,6 +117,19 @@ namespace gazebo
 
       /// \brief Name of the log file.
       private: std::string filename;
+
+      /// \brief The version of the Gazebo logger used to create the open
+      /// log file.
+      private: std::string logVersion;
+
+      /// \brief The version of Gazebo used to create the open log file.
+      private: std::string gazeboVersion;
+
+      /// \brief The random number seed recorded in the open log file.
+      private: uint32_t randSeed;
+
+      /// \brief The encoding for the current chunk in the log file.
+      private: std::string encoding;
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogPlay>;
