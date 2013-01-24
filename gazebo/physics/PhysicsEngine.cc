@@ -126,13 +126,13 @@ void PhysicsEngine::SetUpdateRate(double _value)
 }
 
 //////////////////////////////////////////////////
-double PhysicsEngine::GetUpdateRate()
+double PhysicsEngine::GetUpdateRate() const
 {
   return this->updateRateDouble;
 }
 
 //////////////////////////////////////////////////
-double PhysicsEngine::GetUpdatePeriod()
+double PhysicsEngine::GetUpdatePeriod() const
 {
   if (this->updateRateDouble > 0)
     return 1.0/this->updateRateDouble;

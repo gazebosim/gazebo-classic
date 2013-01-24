@@ -92,7 +92,7 @@ namespace gazebo
       public: virtual void SetStepTime(double _value);
 
       // Documentation inherited
-      public: virtual double GetStepTime();
+      public: virtual double GetStepTime() const;
 
       // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);

@@ -418,7 +418,7 @@ void ODEPhysics::SetStepTime(double _value)
 }
 
 //////////////////////////////////////////////////
-double ODEPhysics::GetStepTime()
+double ODEPhysics::GetStepTime() const
 {
   return this->stepTimeDouble;
 }

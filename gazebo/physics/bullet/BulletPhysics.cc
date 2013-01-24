@@ -314,7 +314,7 @@ void BulletPhysics::SetStepTime(double _value)
 }
 
 //////////////////////////////////////////////////
-double BulletPhysics::GetStepTime()
+double BulletPhysics::GetStepTime() const
 {
   return this->stepTimeDouble;
 }
