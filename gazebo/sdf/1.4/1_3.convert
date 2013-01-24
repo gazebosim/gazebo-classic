@@ -1,32 +1,16 @@
 <convert name="gazebo">
   <convert name="world">
     <move>
-      <from>
-        <convert name="physics">
-          <src element="update_rate"/>
-        </convert>
-      </from>
-      <to>
-        <dst element="real_time_update_rate"/>
-      </to>
+      <from element="physics::update_rate"/>
+      <to element="real_time_update_rate"/>
     </move>
     <move>
-      <from>
-        <convert name="physics">
-          <src element="dt"/>
-        </convert>
-      </from>
-      <to>
-        <dst element="max_step_size"/>
-      </to>
+      <from element="physics::ode::dt"/>
+      <to element="max_step_size"/>
     </move>
-    <convert name="physics">
-      <convert name="ode">
-        <rename>
-          <from element="dt"/>
-          <to element="min_step_size"/>
-        </rename>
-      </convert>
-    </convert>
+    <move>
+      <from element="physics::bullet::dt"/>
+      <to element="max_step_size"/>
+    </move>
   </convert>
 </convert> <!-- End SDF -->
