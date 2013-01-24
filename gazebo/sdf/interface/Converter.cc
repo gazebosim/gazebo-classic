@@ -18,6 +18,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/regex.hpp>
 
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Console.hh"
@@ -76,6 +77,8 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
   }
 
   ConvertImpl(elem, xmlDoc.FirstChildElement("convert"));
+
+  _doc->Print();
 
   return true;
 }
@@ -156,113 +159,91 @@ void Converter::Rename(TiXmlElement *_elem, TiXmlElement *_renameElem)
 /////////////////////////////////////////////////
 void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
 {
-  /*
-  <convert name="world">
-    <move>
-      <from element="physics::child::update_rate"/>
-      <to element="real_time_update_rate"/>
-    </move>
-  </convert>
-  */
-
-
   TiXmlElement *fromConvertElem = _moveElem->FirstChildElement("from");
   TiXmlElement *toConvertElem = _moveElem->FirstChildElement("to");
 
-  const char *fromElemName = fromConvertElem->Attribute("element");
-  const char *fromAttrName = fromConvertElem->Attribute("attribute");
+  const char *fromElemStr = fromConvertElem->Attribute("element");
+  const char *fromAttrStr = fromConvertElem->Attribute("attribute");
 
-  const char *toElemName = toConvertElem->Attribute("element");
-  const char *toAttrName = toConvertElem->Attribute("attribute");
+  const char *toElemStr = toConvertElem->Attribute("element");
+  const char *toAttrStr = toConvertElem->Attribute("attribute");
 
-  const char *fromValue = GetValue(fromElemName, fromAttrName, _elem);
-  const char *toValue = GetValue(toElemName, toAttrName, _elem);
-
-
-  if (!value)
-    return;
-
-  if (!toElemName)
-  {
-    gzerr << "No 'to' element name specified\n";
-    return;
-  }
-
-  // tokenize
-  std::string fromValueStr = fromValue;
-  std::string toValueStr = toValue;
+  // tokenize 'from' and 'to' strs
+  std::string fromStr = "";
+  if (fromElemStr)
+    fromStr = fromElemStr;
+  else if (fromAttrStr)
+    fromStr = fromAttrStr;
+  std::string toStr = "";
+  if (toElemStr)
+    toStr = toElemStr;
+  else if (toAttrStr)
+    toStr = toAttrStr;
   std::vector<std::string> fromTokens;
   std::vector<std::string> toTokens;
-  boost::split(fromTokens, fromValueStr, boost::is_any_of("::"));
-  boost::split(toTokens, toValueStr, boost::is_any_of("::"));
+  boost::algorithm::split_regex(fromTokens, fromStr, boost::regex("::"));
+  boost::algorithm::split_regex(toTokens, toStr, boost::regex("::"));
 
-  if (fromTokens.size() == 0)
+  if (fromTokens.size() == 0 || toTokens.size() == 0)
   {
-    gzerr << "Incorrect 'from' element or attribute string\n";
+    gzerr << "Incorrect 'from' or 'to' string format\n";
     return;
   }
 
-  // get the second to last element in the token
-  TiXmlElement *fromElem = _elem->FirstChildElement(fromTokens[0]);
-  for (int i = 1; i < fromTokens.size()-1; ++i)
+  // get value of the 'from' element/attribute
+  TiXmlElement *fromElem = _elem;
+  for (unsigned int i = 0; i < fromTokens.size()-1; ++i)
   {
-    if (!fromElem)
-    {
-      gzerr << "No 'from' element found\n";
-      return;
-    }
     fromElem = fromElem->FirstChildElement(fromTokens[i]);
-  }
-
-  TiXmlElement *toElem = _elem->FirstChildElement(toTokens[0]);
-  for (int i = 1; i < toTokens.size()-1; ++i)
-  {
-    if (!toElem)
-    {
-      gzerr << "No 'to' element found\n";
+    if (!fromElem)
       return;
-    }
+  }
+  const char *fromName = fromTokens[fromTokens.size()-1].c_str();
+  const char *value = NULL;
+  if (fromElemStr)
+    value = GetValue(fromName, NULL, fromElem);
+  else if (fromAttrStr)
+    value = GetValue(NULL, fromName, fromElem);
+
+  if (!value)
+  {
+    gzerr << "No value found for element/attribute: " << fromName << "\n";
+    return;
+  }
+
+  // get the new element/attribute name
+  const char *toName = toTokens[toTokens.size()-1].c_str();
+  TiXmlElement *toElem = _elem;
+  for (unsigned int i = 0; i < toTokens.size()-1; ++i)
+  {
     toElem = toElem->FirstChildElement(toTokens[i]);
+    if (!toElem)
+      return;
   }
 
-  if (!fromElem)
+  // move by creating a new element/attribute and deleting the old one
+  if (toElemStr)
   {
-    gzerr << "No 'from' element found\n";
-    return;
-  }
-  if (!toElem)
-  {
-    gzerr << "No 'to' element specified\n";
-    return;
-  }
-
-/*  char *actualValue = NULL;
-  if (fromElemName)
-    actualValue = GetValue(tokens[tokens.size()-1], NULL, fromElem);
-  else if (fromAttrName)
-    actualValue = GetValue(NULL, tokens[tokens.size()-1], fromElem);
-
-  TiXmlElement *moveTo = new TiXmlElement(toElemName);
-  if (toAttrName)
-    moveTo->SetAttribute(toAttrName, actualValue);
-  else
-  {
-    TiXmlText *text = new TiXmlText(actualValue);
+    TiXmlElement *moveTo = new TiXmlElement(toName);
+    TiXmlText *text = new TiXmlText(value);
     moveTo->LinkEndChild(text);
+    toElem->LinkEndChild(moveTo);
   }
-
-  if (fromElemName)
+  else if (toAttrStr)
   {
-    TiXmlElement *moveFrom = _elem->FirstChildElement(fromElemName);
-    _elem->RemoveChild(moveFrom);
+    toElem->SetAttribute(toName, value);
   }
-  else if (fromAttrName)
+  if (fromElemStr)
   {
-    _elem->RemoveAttribute(fromAttrName);
-  }*/
+    TiXmlElement *moveFrom =
+        fromElem->FirstChildElement(fromName);
+    fromElem->RemoveChild(moveFrom);
+  }
+  else if (fromAttrStr)
+  {
+    fromElem->RemoveAttribute(fromName);
+  }
 }
-
-
 
 /////////////////////////////////////////////////
 const char *Converter::GetValue(const char *_valueElem, const char *_valueAttr,
