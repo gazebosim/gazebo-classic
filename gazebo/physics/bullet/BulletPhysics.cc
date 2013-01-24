@@ -203,7 +203,7 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_dt(this->stepTimeDouble);
     // physicsMsg.set_iters(this->GetSORPGSIters());
     // physicsMsg.set_sor(this->GetSORPGSW());
-    physicsMsg.set_cfm(this->GetWorldCFM());
+    // physicsMsg.set_cfm(this->GetWorldCFM());
     // physicsMsg.set_erp(this->GetWorldERP());
     // physicsMsg.set_contact_max_correcting_vel(
     //     this->GetContactMaxCorrectingVel());
@@ -220,12 +220,11 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
 void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   if (_msg->has_dt())
-  {
     this->SetStepTime(_msg->dt());
-  }
 
   if (_msg->has_update_rate())
     this->SetUpdateRate(_msg->update_rate());
+
   // Like OnRequest, this function was copied from ODEPhysics.
   // TODO: change this when changing OnRequest.
   // if (_msg->has_solver_type())
@@ -250,8 +249,8 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   // if (_msg->has_sor())
   //   this->SetSORPGSW(_msg->sor());
 
-  if (_msg->has_cfm())
-    this->SetWorldCFM(_msg->cfm());
+  // if (_msg->has_cfm())
+  //   this->SetWorldCFM(_msg->cfm());
 
   // if (_msg->has_erp())
   //   this->SetWorldERP(_msg->erp());
@@ -448,9 +447,9 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 //////////////////////////////////////////////////
 void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->GetAttribute("xyz")->Set(_gravity);
-  this->dynamicsWorld->setGravity(btVector3(_gravity.x,
-        _gravity.y, _gravity.z));
+  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->dynamicsWorld->setGravity(
+    BulletTypes::ConvertVector3(_gravity));
 }
 
 //////////////////////////////////////////////////
