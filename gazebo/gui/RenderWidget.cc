@@ -129,16 +129,18 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->bottomFrame->setLayout(bottomPanelLayout);
 
 
-  QWidget *render3DWidget = new QWidget(this);
+  QFrame *render3DFrame = new QFrame;
+  render3DFrame->setObjectName("render3DFrame");
   QVBoxLayout *render3DLayout = new QVBoxLayout;
   render3DLayout->addWidget(toolFrame);
   render3DLayout->addWidget(this->glWidget);
   render3DLayout->setContentsMargins(0, 0, 0, 0);
-  render3DWidget->setLayout(render3DLayout);
+  render3DLayout->setSpacing(0);
+  render3DFrame->setLayout(render3DLayout);
 
   QSplitter *splitter = new QSplitter(this);
   splitter->addWidget(this->buildingEditorWidget);
-  splitter->addWidget(render3DWidget);
+  splitter->addWidget(render3DFrame);
   QList<int> sizes;
   sizes.push_back(300);
   sizes.push_back(300);

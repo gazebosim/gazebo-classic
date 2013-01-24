@@ -75,6 +75,7 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   this->scaleWidget->resize(150, 50);
 
   canvasLayout->setContentsMargins(0, 0, 0, 0);
+  canvasLayout->setSpacing(0);
   this->setLayout(canvasLayout);
 }
 
