@@ -221,7 +221,8 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
       {
         gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
           << "Please rename manifest.xml to "
-          << GZ_MODEL_MANIFEST_FILENAME << "\n";
+          << GZ_MODEL_MANIFEST_FILENAME << " for model "
+          << (*dIter)->filename() << "\n";
 
         manifest /= "manifest.xml";
       }

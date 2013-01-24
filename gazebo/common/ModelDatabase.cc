@@ -450,7 +450,8 @@ void ModelDatabase::DownloadDependencies(const std::string &_path)
   else
   {
     gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
-      << "Please rename manifest.xml to " << GZ_MODEL_MANIFEST_FILENAME << "\n";
+      << "Please rename manifest.xml to " << GZ_MODEL_MANIFEST_FILENAME
+      << " for model " << _path << "\n";
 
     manifestPath /= "manifest.xml";
   }
@@ -506,7 +507,8 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
   else
   {
     gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
-      << "Please rename manifest.xml to " << GZ_MODEL_MANIFEST_FILENAME << "\n";
+      << "Please rename manifest.xml to " << GZ_MODEL_MANIFEST_FILENAME
+      << " for model " << manifestPath << "\n";
 
     manifestPath /= "manifest.xml";
   }
