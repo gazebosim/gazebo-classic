@@ -318,20 +318,32 @@ void MainWindow::Save()
       cameraElem->GetElement("view_controller")->Set(
         cam->GetViewControllerTypeString());
       // TODO: export track_visual properties as well.
-      msgData = sdf_parsed.root->ToString("");
+
+      // Remove lights from parsed sdf
+      sdf::ElementPtr current, next;
+      next = world->GetElement("light");
+      while (next)
+      {
+        current = next;
+        next = next->GetNextElement("light");
+        current->ClearElements();
+      }
 
       // Get lights from current scene.
       rendering::ScenePtr scene = cam->GetScene();
       uint32_t i;
-      sdf::ElementPtr lightElem;
       rendering::LightPtr light;
       for (i = 0; i < scene->GetLightCount(); i++)
       {
+        sdf::ElementPtr elem;
         light = scene->GetLight(i);
         gzwarn << light->GetName() << '\n';
-        // The Light::FillSDF function needs to be written.
-        light->FillSDF(lightElem);
+        elem = light->CloneSDF();
+        gzwarn << elem->ToString("");
+        // Insert elem into world
       }
+
+      msgData = sdf_parsed.root->ToString("");
     }
     else
     {

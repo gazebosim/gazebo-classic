@@ -172,6 +172,10 @@ namespace gazebo
       /// \param[in] _msg Light message to update from
       public: void UpdateFromMsg(ConstLightPtr &_msg);
 
+      /// \brief Clone this light's sdf element.
+      /// \return Cloned SDF element.
+      public: sdf::ElementPtr CloneSDF() const;
+
       /// \brief On pose change callback
       protected: virtual void OnPoseChange() {}
 

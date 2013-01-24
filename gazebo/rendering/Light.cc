@@ -222,6 +222,12 @@ void Light::UpdateFromMsg(ConstLightPtr &_msg)
 }
 
 //////////////////////////////////////////////////
+sdf::ElementPtr Light::CloneSDF() const
+{
+  return this->sdf->Clone();
+}
+
+//////////////////////////////////////////////////
 void Light::LoadFromMsg(ConstLightPtr &_msg)
 {
   this->UpdateSDFFromMsg(_msg);
