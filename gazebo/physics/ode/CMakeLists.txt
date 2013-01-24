@@ -47,4 +47,3 @@ gz_add_library(gazebo_physics_ode ${sources})
 target_link_libraries(gazebo_physics_ode gazebo_ode gazebo_opcode ${TBB_LIBRARIES})
 
 gz_install_library(gazebo_physics_ode)
-gz_install_includes("physics/ode" ${headers})
