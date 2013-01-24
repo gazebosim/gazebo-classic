@@ -300,12 +300,12 @@ void MainWindow::Save()
     // Parse the string into sdf, so that we can insert user camera settings.
     // Also, remove all the lights from the parsed sdf and insert lights from
     // the current Scene.
-    sdf::SDF sdf_parsed;
-    sdf_parsed.SetFromString(msg.data());
+    sdf::SDF sdfParsed;
+    sdfParsed.SetFromString(msg.data());
     // Check that sdf contains world
-    if (sdf_parsed.root->HasElement("world"))
+    if (sdfParsed.root->HasElement("world"))
     {
-      sdf::ElementPtr world = sdf_parsed.root->GetElement("world");
+      sdf::ElementPtr world = sdfParsed.root->GetElement("world");
       sdf::ElementPtr guiElem = world->GetElement("gui");
 
       if (guiElem->HasAttribute("fullscreen"))
@@ -343,7 +343,7 @@ void MainWindow::Save()
         // Insert elem into world
       }
 
-      msgData = sdf_parsed.root->ToString("");
+      msgData = sdfParsed.root->ToString("");
     }
     else
     {
