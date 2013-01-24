@@ -78,8 +78,6 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
 
   ConvertImpl(elem, xmlDoc.FirstChildElement("convert"));
 
-  _doc->Print();
-
   return true;
 }
 
