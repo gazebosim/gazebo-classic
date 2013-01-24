@@ -162,7 +162,7 @@ math::Angle BulletHingeJoint::GetAngleImpl(int /*_index*/) const
   if (this->btHinge != NULL)
     result = this->btHinge->getHingeAngle() - this->angleOffset;
   else
-    gzerr << "btHinge does not exist, returning default angle\n";
+    gzwarn << "btHinge does not exist, returning default angle\n";
   return result;
 }
 
@@ -291,6 +291,6 @@ math::Vector3 BulletHingeJoint::GetGlobalAxis(int /*_index*/) const
     result.z = vec.getZ();
   }
   else
-    gzerr << "btHinge does not exist, returning fake axis\n";
+    gzwarn << "btHinge does not exist, returning fake axis\n";
   return result;
 }
