@@ -28,6 +28,8 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Transport.hh"
 
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderEvents.hh"
 
@@ -296,6 +298,8 @@ void MainWindow::Save()
     msg.ParseFromString(response->serialized_data());
 
     // Parse the string into sdf, so that we can insert user camera settings.
+    // Also, remove all the lights from the parsed sdf and insert lights from
+    // the current Scene.
     sdf::SDF sdf_parsed;
     sdf_parsed.SetFromString(msg.data());
     // Check that sdf contains world
@@ -315,6 +319,19 @@ void MainWindow::Save()
         cam->GetViewControllerTypeString());
       // TODO: export track_visual properties as well.
       msgData = sdf_parsed.root->ToString("");
+
+      // Get lights from current scene.
+      rendering::ScenePtr scene = cam->GetScene();
+      uint32_t i;
+      sdf::ElementPtr lightElem;
+      rendering::LightPtr light;
+      for (i = 0; i < scene->GetLightCount(); i++)
+      {
+        light = scene->GetLight(i);
+        gzwarn << light->GetName() << '\n';
+        // The Light::FillSDF function needs to be written.
+        light->FillSDF(lightElem);
+      }
     }
     else
     {
