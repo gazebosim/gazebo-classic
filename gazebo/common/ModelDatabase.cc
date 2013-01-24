@@ -126,7 +126,6 @@ std::string ModelDatabase::GetDBConfig(const std::string &_uri)
   }
 
   return xmlString;
-
 }
 
 /////////////////////////////////////////////////
