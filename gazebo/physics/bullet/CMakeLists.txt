@@ -25,6 +25,7 @@ set (sources
 )
 
 set (headers
+  bullet_inc.h
   BulletBallJoint.hh
   BulletBoxShape.hh
   BulletCollision.hh
