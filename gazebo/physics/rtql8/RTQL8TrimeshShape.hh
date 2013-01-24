@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh geometry
- * Author: Nate Koenig
- * Date: 16 Oct 2009
- */
 
 #ifndef _RTQL8TRIMESHSHAPE_HH_
 #define _RTQL8TRIMESHSHAPE_HH_

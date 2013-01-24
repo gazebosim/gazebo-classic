@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 #ifndef _RTQL8MULTIRAYSHAPE_HH_
 #define _RTQL8MULTIRAYSHAPE_HH_
 

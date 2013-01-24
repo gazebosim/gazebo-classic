@@ -14,20 +14,19 @@
  * limitations under the License.
  *
 */
-/* Desc: The ODE base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 12 Oct 2009
- */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
-#include "physics/World.hh"
-#include "physics/Link.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/rtql8/RTQL8Link.hh"
-#include "physics/rtql8/RTQL8Joint.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/rtql8/RTQL8Link.hh"
+#include "gazebo/physics/rtql8/RTQL8Joint.hh"
 //#include "physics/ScrewJoint.hh"
+
+#include "rtql8/kinematics/Dof.h"
+#include "rtql8/kinematics/Joint.h"
 
 using namespace gazebo;
 using namespace physics;
@@ -35,77 +34,75 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 RTQL8Joint::RTQL8Joint(BasePtr _parent)
-  : Joint(_parent)
+  : Joint(_parent), rtql8Joint(NULL)
 {
-  //this->jointId = NULL;
 }
 
 //////////////////////////////////////////////////
 RTQL8Joint::~RTQL8Joint()
 {
   this->Detach();
-  //dJointDestroy(this->jointId);
+
+  if (rtql8Joint)
+    delete rtql8Joint;
 }
 
 //////////////////////////////////////////////////
 void RTQL8Joint::Load(sdf::ElementPtr _sdf)
 {
-//   Joint::Load(_sdf);
-// 
-//   if (this->sdf->HasElement("physics") &&
-//       this->sdf->GetElement("physics")->HasElement("ode"))
-//   {
-//     sdf::ElementPtr elem = this->sdf->GetElement("physics")->GetElement("ode");
-// 
-//     if (elem->HasElement("limit"))
-//     {
-//       this->SetParam(dParamStopERP,
-//           elem->GetElement("limit")->GetValueDouble("erp"));
-//       this->SetParam(dParamStopCFM,
-//           elem->GetElement("limit")->GetValueDouble("cfm"));
-//     }
-// 
-//     if (elem->HasElement("suspension"))
-//     {
-//       this->SetParam(dParamSuspensionERP,
-//           elem->GetElement("suspension")->GetValueDouble("erp"));
-//       this->SetParam(dParamSuspensionCFM,
-//           elem->GetElement("suspension")->GetValueDouble("cfm"));
-//     }
-// 
-//     if (elem->HasElement("fudge_factor"))
-//       this->SetParam(dParamFudgeFactor,
-//           elem->GetElement("fudge_factor")->GetValueDouble());
-// 
-//     if (elem->HasElement("cfm"))
-//         this->SetParam(dParamCFM, elem->GetElement("cfm")->GetValueDouble());
-// 
-//     if (elem->HasElement("bounce"))
-//         this->SetParam(dParamBounce,
-//           elem->GetElement("bounce")->GetValueDouble());
-// 
-//     if (elem->HasElement("max_force"))
-//       this->SetParam(dParamFMax,
-//           elem->GetElement("max_force")->GetValueDouble());
-// 
-//     if (elem->HasElement("velocity"))
-//       this->SetParam(dParamVel,
-//           elem->GetElement("velocity")->GetValueDouble());
-//   }
-// 
-//   // TODO: reimplement
-//   /*if (**this->provideFeedbackP)
-//   {
-//     this->feedback = new dJointFeedback;
-//     dJointSetFeedback(this->jointId, this->feedback);
-//   }
-//   */
+   Joint::Load(_sdf);
+
+   // In case this joint is already loaded, we delete rtql8 joint if it is
+   // created.
+   if (rtql8Joint)
+   {
+     delete rtql8Joint;
+     rtql8Joint = NULL;
+   }
+
+   // In Joint::Load(sdf::ElementPtr), this joint stored the information of the
+   // parent joint and child joint.
+   rtql8::kinematics::BodyNode* parentBodyNode
+       = boost::shared_dynamic_cast<RTQL8Link>(this->parentLink)->GetBodyNode();
+   rtql8::kinematics::BodyNode* childBodyNode
+       = boost::shared_dynamic_cast<RTQL8Link>(this->childLink)->GetBodyNode();
+
+   // In order to create rtql8 joint, we need to know this joint's parent
+   // and child link so we create rtql8 joint after the joint is loaded with sdf
+   // .
+   rtql8Joint = new rtql8::kinematics::Joint(parentBodyNode, childBodyNode);
+
+   // Set Pose: offset from child link origin in child link frame.
+   if (this->sdf->HasElement("pose"))
+   {
+     sdf::ElementPtr poseElem = this->sdf->GetElement("pose");
+
+     math::Pose pose = poseElem->GetValuePose();
+
+     rtql8::kinematics::Dof* tranX = new rtql8::kinematics::Dof(pose.pos.x);
+     rtql8::kinematics::Dof* tranY = new rtql8::kinematics::Dof(pose.pos.y);
+     rtql8::kinematics::Dof* tranZ = new rtql8::kinematics::Dof(pose.pos.z);
+
+     rtql8::kinematics::TrfmTranslate* tran
+         = new rtql8::kinematics::TrfmTranslate(tranX, tranY, tranZ);
+
+     this->rtql8Joint->addTransform(tran, false);
+
+     rtql8::kinematics::Dof* rotW = new rtql8::kinematics::Dof(pose.rot.w);
+     rtql8::kinematics::Dof* rotX = new rtql8::kinematics::Dof(pose.rot.x);
+     rtql8::kinematics::Dof* rotY = new rtql8::kinematics::Dof(pose.rot.y);
+     rtql8::kinematics::Dof* rotZ = new rtql8::kinematics::Dof(pose.rot.z);
+
+     rtql8::kinematics::TrfmRotateQuat* rot
+         = new rtql8::kinematics::TrfmRotateQuat(rotW, rotX, rotY, rotZ);
+
+     this->rtql8Joint->addTransform(rot, false);
+   }
 }
 
 //////////////////////////////////////////////////
 void RTQL8Joint::Reset()
 {
-//   dJointReset(this->jointId);
   Joint::Reset();
 }
 
@@ -114,16 +111,23 @@ LinkPtr RTQL8Joint::GetJointLink(int _index) const
 {
   LinkPtr result;
 
-//   if (_index == 0 || _index == 1)
-//   {
-//     ODELinkPtr odeLink1 = boost::shared_static_cast<ODELink>(this->childLink);
-//     ODELinkPtr odeLink2 = boost::shared_static_cast<ODELink>(this->parentLink);
-//     if (odeLink1 != NULL &&
-//         dJointGetBody(this->jointId, _index) == odeLink1->GetODEId())
-//       result = this->childLink;
-//     else if (odeLink2)
-//       result = this->parentLink;
-//   }
+  if (_index == 0)
+  {
+    RTQL8LinkPtr rtql8Link1
+        = boost::shared_static_cast<RTQL8Link>(this->parentLink);
+
+    if (rtql8Link1 != NULL)
+      return this->parentLink;
+  }
+
+  if (_index == 1)
+  {
+    RTQL8LinkPtr rtql8Link2
+        = boost::shared_static_cast<RTQL8Link>(this->childLink);
+
+    if (rtql8Link2 != NULL)
+      return this->childLink;
+  }
 
   return result;
 }
@@ -131,90 +135,100 @@ LinkPtr RTQL8Joint::GetJointLink(int _index) const
 //////////////////////////////////////////////////
 bool RTQL8Joint::AreConnected(LinkPtr _one, LinkPtr _two) const
 {
-//   ODELinkPtr odeLink1 = boost::shared_dynamic_cast<ODELink>(_one);
-//   ODELinkPtr odeLink2 = boost::shared_dynamic_cast<ODELink>(_two);
-// 
-//   if (odeLink1 == NULL || odeLink2 == NULL)
-//     gzthrow("RTQL8Joint requires ODE bodies\n");
-// 
-//   return dAreConnected(odeLink1->GetODEId(), odeLink2->GetODEId());
-  return 0;
+//  RTQL8LinkPtr rtql8Link1 = boost::shared_dynamic_cast<RTQL8Link>(_one);
+//  RTQL8LinkPtr rtql8Link2 = boost::shared_dynamic_cast<RTQL8Link>(_two);
+
+//  if (rtql8Link1 == NULL || rtql8Link2 == NULL)
+//    gzthrow("RTQL8Joint requires RTQL8 bodies\n");
+
+//  return dAreConnected(odeLink1->GetODEId(), odeLink2->GetODEId());
+  return (this->childLink.get() == _one.get() && this->parentLink.get() == _two.get())
+      || (this->childLink.get() == _two.get() && this->parentLink.get() == _one.get());
 }
 
 //////////////////////////////////////////////////
 void RTQL8Joint::Attach(LinkPtr _parent, LinkPtr _child)
 {
-//   Joint::Attach(_parent, _child);
-// 
-//   ODELinkPtr odechild = boost::shared_dynamic_cast<ODELink>(this->childLink);
-//   ODELinkPtr odeparent = boost::shared_dynamic_cast<ODELink>(this->parentLink);
-// 
-//   if (odechild == NULL && odeparent == NULL)
-//     gzthrow("RTQL8Joint requires at least one ODE link\n");
-// 
-// 
-//   if (!odechild && odeparent)
-//   {
-//     dJointAttach(this->jointId, 0, odeparent->GetODEId());
-//   }
-//   else if (odechild && !odeparent)
-//   {
-//     dJointAttach(this->jointId, odechild->GetODEId(), 0);
-//   }
-//   else if (odechild && odeparent)
-//   {
-//     if (this->HasType(Base::HINGE2_JOINT))
-//       dJointAttach(this->jointId, odeparent->GetODEId(), odechild->GetODEId());
-//     else
-//       dJointAttach(this->jointId, odechild->GetODEId(), odeparent->GetODEId());
-//   }
+   Joint::Attach(_parent, _child);
+
+   RTQL8LinkPtr rtql8child = boost::shared_dynamic_cast<RTQL8Link>(this->childLink);
+   RTQL8LinkPtr rtql8parent = boost::shared_dynamic_cast<RTQL8Link>(this->parentLink);
+
+   if (rtql8child == NULL && rtql8parent == NULL)
+     gzthrow("RTQL8Joint requires at least one RTQL8 link\n");
+
+   // TODO: RTQL8's joint can't change their links connected.
+   // For now, recreating the joint is the only way.
+
+   // TODO: We need to add the functionality, attach/detaach, into rtql8's joint
+   // class.
+//   if (this->rtql8Joint)
+//     delete this->rtql8Joint;
+
+//   rtql8::kinematics::BodyNode* parentBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
+//         this->parentLink)->GetBodyNode();
+//   rtql8::kinematics::BodyNode* childBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
+//         this->childLink)->GetBodyNode();
+
+//   this->rtql8Joint = new rtql8::kinematics::Joint(parentBodyNode, childBodyNode);
 }
 
 //////////////////////////////////////////////////
 void RTQL8Joint::Detach()
 {
-//   this->childLink.reset();
-//   this->parentLink.reset();
-//   dJointAttach(this->jointId, 0, 0);
+   this->childLink.reset();
+   this->parentLink.reset();
+
+  // TODO: RTQL8's joint can't change their links connected.
+  // For now, recreating the joint is the only way.
+//  if (this->rtql8Joint)
+//    delete this->rtql8Joint;
+
+//  kinematics::BodyNode* parentBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
+//        this->parentLink)->GetBodyNode();
+//  kinematics::BodyNode* childBodyNode = boost::shared_dynamic_cast<RTQL8Link>(
+//        this->childLink)->GetBodyNode();
+
+//  this->rtql8Joint = new rtql8::kinematics::Joint(NULL, NULL);
 }
 
 //////////////////////////////////////////////////
 void RTQL8Joint::SetHighStop(int _index, const math::Angle &_angle)
 {
-//   switch (_index)
-//   {
-//     case 0:
+   switch (_index)
+   {
+     case 0:
 //       this->SetParam(dParamHiStop, _angle.Radian());
-//       break;
-//     case 1:
+       break;
+     case 1:
 //       this->SetParam(dParamHiStop2, _angle.Radian());
-//       break;
-//     case 2:
+       break;
+     case 2:
 //       this->SetParam(dParamHiStop3, _angle.Radian());
-//       break;
-//     default:
-//       gzerr << "Invalid index[" << _index << "]\n";
-//       break;
-//   };
+       break;
+     default:
+       gzerr << "Invalid index[" << _index << "]\n";
+       break;
+   };
 }
 
 //////////////////////////////////////////////////
 void RTQL8Joint::SetLowStop(int _index, const math::Angle &_angle)
 {
-//   switch (_index)
-//   {
-//     case 0:
+   switch (_index)
+   {
+     case 0:
 //       this->SetParam(dParamLoStop, _angle.Radian());
-//       break;
-//     case 1:
+       break;
+     case 1:
 //       this->SetParam(dParamLoStop2, _angle.Radian());
-//       break;
-//     case 2:
+       break;
+     case 2:
 //       this->SetParam(dParamLoStop3, _angle.Radian());
-//       break;
-//     default:
-//       gzerr << "Invalid index[" << _index << "]\n";
-//   };
+       break;
+     default:
+       gzerr << "Invalid index[" << _index << "]\n";
+   };
 }
 
 //////////////////////////////////////////////////
@@ -482,4 +496,74 @@ void RTQL8Joint::SetAttribute(const std::string &_key, int /*_index*/,
 //       gzerr << "boost any_cast error:" << e.what() << "\n";
 //     }
 //   }
+}
+
+JointWrench RTQL8Joint::GetForceTorque(int _index)
+{
+  JointWrench wrench;
+//  // Note that:
+//  // f2, t2 are the force torque measured on parent body's cg
+//  // f1, t1 are the force torque measured on child body's cg
+//  dJointFeedback* fb = this->GetFeedback();
+//  if (fb)
+//  {
+//    wrench.body1Force.Set(fb->f1[0], fb->f1[1], fb->f1[2]);
+//    wrench.body1Torque.Set(fb->t1[0], fb->t1[1], fb->t1[2]);
+//    wrench.body2Force.Set(fb->f2[0], fb->f2[1], fb->f2[2]);
+//    wrench.body2Torque.Set(fb->t2[0], fb->t2[1], fb->t2[2]);
+
+//    if (this->childLink)
+//    {
+//      // convert torque from about child CG to joint anchor location
+//      // cg position specified in child link frame
+//      math::Vector3 cgPos = this->childLink->GetInertial()->GetPose().pos;
+//      // moment arm rotated into world frame (given feedback is in world frame)
+//      math::Vector3 childMomentArm =
+//        this->childLink->GetWorldPose().rot.RotateVector(
+//        this->anchorPos - cgPos);
+
+//      // gzerr << "anchor [" << anchorPos
+//      //       << "] iarm[" << this->childLink->GetInertial()->GetPose().pos
+//      //       << "] childMomentArm[" << childMomentArm
+//      //       << "] f1[" << wrench.body1Force
+//      //       << "] t1[" << wrench.body1Torque
+//      //       << "] fxp[" << wrench.body1Force.Cross(childMomentArm)
+//      //       << "]\n";
+
+//      wrench.body1Torque += wrench.body1Force.Cross(childMomentArm);
+//    }
+
+//    // convert torque from about parent CG to joint anchor location
+//    if (this->parentLink)
+//    {
+//      // parent cg specified in child link frame
+//      math::Vector3 cgPos = ((this->parentLink->GetInertial()->GetPose() +
+//                            this->parentLink->GetWorldPose()) -
+//                            this->childLink->GetWorldPose()).pos;
+
+//      // rotate moement arms into world frame
+//      math::Vector3 parentMomentArm =
+//        this->childLink->GetWorldPose().rot.RotateVector(
+//        this->anchorPos - cgPos);
+
+//      wrench.body2Torque -= wrench.body2Force.Cross(parentMomentArm);
+
+//      // A good check is that
+//      // the computed body2Torque shoud in fact be opposite of body1Torque
+//    }
+//    else
+//    {
+//      // convert torque from about child CG to joint anchor location
+//      // or simply use equal opposite force as body1 wrench
+//      wrench.body2Force = -wrench.body1Force;
+//      wrench.body2Torque = -wrench.body1Torque;
+//    }
+//  }
+//  else
+//  {
+//    // forgot to set provide_feedback?
+//    gzwarn << "GetForceTorque: forget to set <provide_feedback>?\n";
+//  }
+
+  return wrench;
 }

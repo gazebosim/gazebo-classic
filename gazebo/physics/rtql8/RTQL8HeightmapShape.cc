@@ -14,14 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: ODE Heightmap shape
- * Author: Nate Koenig
- * Date: 12 Nov 2009
- */
 
-#include "common/Exception.hh"
-#include "physics/rtql8/RTQL8Collision.hh"
-#include "physics/rtql8/RTQL8HeightmapShape.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/physics/rtql8/RTQL8Collision.hh"
+#include "gazebo/physics/rtql8/RTQL8HeightmapShape.hh"
 
 using namespace gazebo;
 using namespace physics;

@@ -14,17 +14,18 @@
  * limitations under the License.
  *
 */
-/* Desc: A slider or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
+
 #include <boost/bind.hpp>
 
 #include "gazebo_config.h"
-#include "common/Console.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/Link.hh"
-#include "physics/rtql8/RTQL8SliderJoint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/rtql8/RTQL8SliderJoint.hh"
+
+#include "rtql8/kinematics/Dof.h"
+#include "rtql8/kinematics/Joint.h"
 
 using namespace gazebo;
 using namespace physics;
@@ -45,7 +46,20 @@ RTQL8SliderJoint::~RTQL8SliderJoint()
 //////////////////////////////////////////////////
 void RTQL8SliderJoint::Load(sdf::ElementPtr _sdf)
 {
-//   SliderJoint<ODEJoint>::Load(_sdf);
+  //
+  SliderJoint<RTQL8Joint>::Load(_sdf);
+
+  // Slider joint has only one degree of freedom.
+  rtql8::kinematics::Dof* dofs = new rtql8::kinematics::Dof;
+
+  // TODO: Could I know the sliding axis?; x, y, z
+
+  //
+//  kinematics::TrfmTranslate* trans
+//      = new kinematics::TrfmTranslate(dofs[0], dofs[1], dofs[2]);
+
+  //
+  //this->rtql8Joint->addTransform(trans);
 }
 
 //////////////////////////////////////////////////
@@ -77,17 +91,50 @@ double RTQL8SliderJoint::GetVelocity(int /*index*/) const
 //////////////////////////////////////////////////
 void RTQL8SliderJoint::SetVelocity(int /*index*/, double _angle)
 {
-//   this->SetParam(dParamVel, _angle);
+   //this->SetParam(dParamVel, _angle);
 }
 
 //////////////////////////////////////////////////
 void RTQL8SliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 {
-//   if (this->childLink)
-//     this->childLink->SetEnabled(true);
-//   if (this->parentLink) this->parentLink->SetEnabled(true);
-// 
-//   dJointSetSliderAxis(this->jointId, _axis.x, _axis.y, _axis.z);
+  // TODO: check whether below code is needed.
+   if (this->childLink)
+     this->childLink->SetEnabled(true);
+   if (this->parentLink)
+     this->parentLink->SetEnabled(true);
+
+  // Slider joint has only one degree of freedom.
+  // _axis must have a value of (1, 0, 0), (0, 1, 0), and (0, 0, 1)
+  if (_axis == math::Vector3(1, 0, 0))
+  {
+    // When rtql8's 'Joint' is destroied, it deletes all 'Transform's.
+    // When 'Transform' is destroied, it deletes all 'Dof's.
+    rtql8::kinematics::Dof* dofs = new rtql8::kinematics::Dof;
+    rtql8::kinematics::TrfmTranslateX* trans = new rtql8::kinematics::TrfmTranslateX(dofs);
+    this->rtql8Joint->addTransform(trans);
+  }
+  else if (_axis == math::Vector3(1, 0, 0))
+  {
+    // When rtql8's 'Joint' is destroied, it deletes all 'Transform's.
+    // When 'Transform' is destroied, it deletes all 'Dof's.
+    rtql8::kinematics::Dof* dofs = new rtql8::kinematics::Dof;
+    rtql8::kinematics::TrfmTranslateY* trans = new rtql8::kinematics::TrfmTranslateY(dofs);
+    this->rtql8Joint->addTransform(trans);
+  }
+  else if (_axis == math::Vector3(1, 0, 0))
+  {
+    // When rtql8's 'Joint' is destroied, it deletes all 'Transform's.
+    // When 'Transform' is destroied, it deletes all 'Dof's.
+    rtql8::kinematics::Dof* dofs = new rtql8::kinematics::Dof;
+    rtql8::kinematics::TrfmTranslateZ* trans = new rtql8::kinematics::TrfmTranslateZ(dofs);
+    this->rtql8Joint->addTransform(trans);
+  }
+  else
+  {
+    // We assume that the axis has the value among these:
+    // (1, 0, 0), (0, 1, 0), (0, 0, 1)
+    gzthrow("Axis must be one of these: (1, 0, 0), (0, 1, 0), (0, 0, 1)\n");
+  }
 }
 
 //////////////////////////////////////////////////
@@ -113,21 +160,6 @@ void RTQL8SliderJoint::SetForce(int /*index*/, double _force)
 //     this->parentLink->SetEnabled(true);
 // 
 //   dJointAddSliderForce(this->jointId, _force);
-}
-
-//////////////////////////////////////////////////
-void RTQL8SliderJoint::SetParam(int _parameter, double _value)
-{
-//   ODEJoint::SetParam(_parameter, _value);
-//   dJointSetSliderParam(this->jointId, _parameter, _value);
-}
-
-//////////////////////////////////////////////////
-double RTQL8SliderJoint::GetParam(int _parameter) const
-{
-//   double result = dJointGetSliderParam(this->jointId, _parameter);
-//   return result;
-  return 0;
 }
 
 //////////////////////////////////////////////////

@@ -103,6 +103,15 @@ if (PKG_CONFIG_FOUND)
   else()
     set (HAVE_BULLET FALSE)
   endif()
+
+  #################################################
+  # Find rtql8
+#  pkg_check_modules(RTQL8 rtql8)
+#  if (RTQL8_FOUND)
+#    set (HAVE_RTQL8 TRUE)
+#  else()
+#    set (HAVE_RTQL8 FALSE)
+#  endif()
   
   #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config

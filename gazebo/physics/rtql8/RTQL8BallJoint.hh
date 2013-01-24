@@ -29,6 +29,7 @@ namespace gazebo
     class RTQL8BallJoint : public BallJoint<RTQL8Joint>
     {
       /// \brief Constructor
+      /// \param[in] _parent Parent of the Joint
       public: RTQL8BallJoint(BasePtr _parent);
 
       /// \brief Destructor.

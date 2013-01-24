@@ -14,20 +14,16 @@
  * limitations under the License.
  *
  */
-/* Desc: RTQL8Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
 #include <sstream>
 
-#include "common/Console.hh"
-#include "math/Box.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/math/Box.hh"
 
-//#include "physics/SurfaceParams.hh"
-//#include "physics/rtql8/RTQL8Physics.hh"
-//#include "physics/rtql8/RTQL8Link.hh"
-#include "physics/rtql8/RTQL8Collision.hh"
+//#include "gazebo/physics/SurfaceParams.hh"
+//#include "gazebo/physics/rtql8/RTQL8Physics.hh"
+//#include "gazebo/physics/rtql8/RTQL8Link.hh"
+#include "gazebo/physics/rtql8/RTQL8Collision.hh"
 
 using namespace gazebo;
 using namespace physics;
