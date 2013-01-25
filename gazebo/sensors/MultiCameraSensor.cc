@@ -38,7 +38,7 @@ GZ_REGISTER_STATIC_SENSOR("multicamera", MultiCameraSensor)
 
 //////////////////////////////////////////////////
 MultiCameraSensor::MultiCameraSensor()
-    : Sensor()
+    : Sensor(sensors::IMAGE)
 {
 }
 

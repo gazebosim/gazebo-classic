@@ -87,7 +87,7 @@ namespace gazebo
       /// \brief Get a sensor
       /// \param[in] _name The name of a sensor to find.
       /// \return A pointer to the sensor. NULL if not found.
-      public: SensorPtr GetSensor(const std::string &_name);
+      public: SensorPtr GetSensor(const std::string &_name) const;
 
       /// \brief Get all the sensors.
       /// \return Vector of all the sensors.
@@ -104,37 +104,110 @@ namespace gazebo
       /// i.e. all sensors managed by SensorManager have been initialized
       public: bool SensorsInitialized();
 
-      /// \brief Update loop
-      private: void RunLoop();
+      /// \brief Add a new sensor to a sensor container.
+      /// \param[in] _sensor Pointer to a sensor to add.
+      private: void AddSensor(SensorPtr _sensor);
 
-      private: void RunRay();
+      /// \cond
+      /// \brief A container for sensors of a specific type. This is used to
+      /// separate sensors which rely on the rendering engine from those
+      /// that do not.
+      /// This is a private embedded class because only the SensorManager
+      /// should have access to SensorContainers.
+      private: class SensorContainer
+               {
+                 /// \brief Constructor
+                 public: SensorContainer();
 
-      /// \brief If True the sensor manager stop processing sensors.
-      private: bool stop;
+                 /// \brief Destructor
+                 public: virtual ~SensorContainer();
+
+                 /// \brief Initialize all sensors in this container.
+                 public: void Init();
+
+                 /// \brief Finalize all sensors in this container.
+                 public: void Fini();
+
+                 /// \brief Run the sensor updates in a separete thread.
+                 public: void Run();
+
+                 /// \brief Stop the run thread.
+                 public: void Stop();
+
+                 /// \brief Update the sensors.
+                 /// \param[in] _force True to force the sensors to update,
+                 /// even if they are not active.
+                 public: virtual void Update(bool _force = false);
+
+                 /// \brief Add a new sensor to this container.
+                 /// \param[in] _sensor Pointer to a sensor to add.
+                 public: void AddSensor(SensorPtr _sensor);
+
+                 /// \brief Get a sensor by name.
+                 /// \param[in] _useLeafName False indicates that _name
+                 /// should be compared against the scoped name of a sensor.
+                 /// \return Pointer to the matching sensor. NULL if no
+                 /// sensor is found.
+                 public: SensorPtr GetSensor(const std::string &_name,
+                                             bool _useLeafName = false) const;
+
+                 /// \brief Remove a sensor by name.
+                 /// \param[in] _name Name of the sensor to remove, which
+                 /// must be a scoped name.
+                 public: bool RemoveSensor(const std::string &_name);
+
+                 /// \brief Remove all sensors.
+                 public: void RemoveSensors();
+
+                 /// \brief A loop to update the sensor. Used by the
+                 /// runThread.
+                 private: void RunLoop();
+
+                 /// \brief The set of sensors to maintain.
+                 public: Sensor_V sensors;
+
+                 /// \brief Flag to inidicate when to stop the runThread.
+                 private: bool stop;
+
+                 /// \brief Flag to indicate that the sensors have been
+                 /// initialized.
+                 private: bool initialized;
+
+                 /// \brief A thread to update the sensors.
+                 private: boost::thread *runThread;
+
+                 /// \brief A mutex to manage access to the sensors vector.
+                 private: mutable boost::recursive_mutex mutex;
+               };
+      /// \endcond
+
+      /// \cond
+      /// \brief Image based sensors need a special update. So we subclass
+      /// the SensorContainer.
+      private: class ImageSensorContainer : public SensorContainer
+               {
+                 /// \brief The special update for image based sensors.
+                 /// \param[in] _force True to force the sensors to update,
+                 /// even if they are not active.
+                 public: virtual void Update(bool _force = false);
+               };
+      /// \endcond
 
       /// \brief True if SensorManager::Init has been called
       ///        i.e. SensorManager::sensors are initialized.
       private: bool initialized;
 
-      /// \brief The thread to run sensor updates in.
-      private: boost::thread *runThread;
-
       /// \brief Mutex used when adding and removing sensors.
-      private: boost::recursive_mutex mutex;
-
-      /// \brief The list of initialized non-image sensors.
-      private: Sensor_V sensors;
-
-      /// \brief The list of initialized image sensors.
-      private: Sensor_V imageSensors;
+      private: mutable boost::recursive_mutex mutex;
 
       /// \brief List of sensors that require initialization.
       private: Sensor_V initSensors;
 
-      private: std::vector<Sensor_V*> sensorLists;
+      /// \brief A vector of SensorContainer pointers.
+      private: typedef std::vector<SensorContainer*> SensorContainer_V;
 
-      /// \brief Thread for ray sensors.
-      private: boost::thread *rayThread;
+      /// \brief The sensor manager's vector of sensor containers.
+      private: SensorContainer_V sensorContainers;
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<SensorManager>;
@@ -143,5 +216,3 @@ namespace gazebo
   }
 }
 #endif
-
-

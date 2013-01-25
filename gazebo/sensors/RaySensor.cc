@@ -44,7 +44,7 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor)
 
 //////////////////////////////////////////////////
 RaySensor::RaySensor()
-    : Sensor()
+    : Sensor(sensors::RAY)
 {
 }
 

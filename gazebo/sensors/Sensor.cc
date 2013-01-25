@@ -39,8 +39,10 @@ using namespace gazebo;
 using namespace sensors;
 
 //////////////////////////////////////////////////
-Sensor::Sensor()
+Sensor::Sensor(SensorCategory _cat)
 {
+  this->category = _cat;
+
   this->sdf.reset(new sdf::Element);
   sdf::initFile("sensor.sdf", this->sdf);
 
@@ -273,6 +275,12 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
 std::string Sensor::GetWorldName() const
 {
   return this->world->GetName();
+}
+
+//////////////////////////////////////////////////
+SensorCategory Sensor::GetCategory() const
+{
+  return this->category;
 }
 
 //////////////////////////////////////////////////
