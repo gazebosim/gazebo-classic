@@ -172,6 +172,7 @@ bool Server::ParseArgs(int argc, char **argv)
   // Set the parameter to playback a log file. The log file contains the
   // world description, so don't try to reead the world file from the
   // command line.
+  if (this->vm.count("play"))
   {
     // Load the log file
     common::LogPlay::Instance()->Open(this->vm["play"].as<std::string>());
@@ -196,8 +197,7 @@ bool Server::ParseArgs(int argc, char **argv)
   {
     // Get the world file name from the command line, or use "empty.world"
     // if no world file is specified.
-    //std::string configFilename = "worlds/empty.world";
-    std::string configFilename = "worlds/rtql8.world";
+    std::string configFilename = "worlds/empty.world";
     if (this->vm.count("world_file"))
       configFilename = this->vm["world_file"].as<std::string>();
 

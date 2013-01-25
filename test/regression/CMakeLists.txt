@@ -24,6 +24,11 @@ if(HAVE_BULLET)
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 
+if(HAVE_RTQL8)
+  include_directories ( ${RTQL8_INCLUDE_DIRS} )
+  link_directories ( ${RTQL8_LIBRARY_DIRS} )
+endif()
+
 include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 
 set (gtest_sources
@@ -35,6 +40,7 @@ set (gtest_sources
   math.cc
   msgs.cc
   physics.cc
+  #physics_rtql8.cc
   pioneer2dx.cc
   pr2.cc
   projector.cc

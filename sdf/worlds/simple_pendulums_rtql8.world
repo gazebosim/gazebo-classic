@@ -1,0 +1,73 @@
+<?xml version="1.0" ?>
+<sdf version="1.3">
+  <world name="default">
+    <physics type="rtql8">
+      <gravity>0 0 -10.0</gravity>
+    </physics>
+    <include><uri>model://ground_plane</uri></include>
+    <model name="test_model">
+      <pose>0 0 0.7 0 0 0</pose>
+
+      <link name='chassis'>
+        <pose>0 0 .1 0 0 0</pose>
+
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>.4 .2 .1</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>.4 .2 .1</size>
+            </box>
+          </geometry>
+        </visual>
+
+      </link>
+
+      <link name="left_wheel">
+	<pose>0.1 0.13 0.1 0 1.5707 1.5707</pose>
+	<collision name="collision">
+	  <geometry>
+            <box>
+              <size>.4 .2 .1</size>
+            </box>
+	  </geometry>
+	</collision>
+	<visual name="visual">
+	  <geometry>
+            <box>
+              <size>.4 .2 .1</size>
+            </box>
+	  </geometry>
+	</visual>
+      </link>
+      <joint type="revolute" name="left_wheel_hinge">
+        <pose>0 0 -0.03 0 0 0</pose>
+        <child>left_wheel</child>
+        <parent>chassis</parent>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+
+    </model>
+    <light type="directional" name="sun">
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>.8 .8 .8 1</diffuse>
+      <specular>.1 .1 .1 1</specular>
+      <attenuation>
+        <range>10</range>
+        <linear>0.01</linear>
+        <constant>0.8</constant>
+        <quadratic>0.0</quadratic>
+      </attenuation>
+      <direction>0 .5 -.5</direction>
+      <cast_shadows>true</cast_shadows>
+    </light>
+  </world>
+</sdf>

@@ -53,13 +53,6 @@ TEST_F(PhysicsTest, EmptyWorldBullet)
 }
 #endif  // HAVE_BULLET
 
-#ifdef HAVE_RTQL8
-TEST_F(PhysicsTest, EmptyWorldRTQL8)
-{
-  EmptyWorld("worlds/empty_rtql8.world");
-}
-#endif // HAVE_RTQL8
-
 TEST_F(PhysicsTest, State)
 {
   /// \TODO: Redo state test
