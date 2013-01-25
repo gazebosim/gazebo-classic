@@ -17,4 +17,6 @@
 
 #include <rtql8/simulation/World.h>
 
+#include <rtql8/utils/UtilsRotation.h>
+
 #endif

@@ -46,6 +46,7 @@ RTQL8Link::~RTQL8Link()
 
 void RTQL8Link::Load(sdf::ElementPtr _sdf)
 {
+  // TODO: (JS in test)
   this->rtql8Physics = boost::shared_dynamic_cast<RTQL8Physics>(
       this->GetWorld()->GetPhysicsEngine());
 
@@ -54,12 +55,26 @@ void RTQL8Link::Load(sdf::ElementPtr _sdf)
 
   Link::Load(_sdf);
 
-  // TODO:
+  // Create rtql8's body node according to gazebo's link.
   this->rtql8BodyNode = new rtql8::kinematics::BodyNode();
 
+  // Set rtql8's body node transformation from gazebo's link pose.
+  math::Pose worldPose = this->GetWorldPose();
+  Eigen::Matrix4d newTrfm;
+  newTrfm.setZero();
+  Eigen::Quaterniond quat(worldPose.rot.w, worldPose.rot.x,
+                          worldPose.rot.y, worldPose.rot.z);
+  newTrfm.topLeftCorner(3, 3) = rtql8::utils::rotation::quatToMatrix(quat);
+  newTrfm(0, 3) = worldPose.pos.x;
+  newTrfm(1, 3) = worldPose.pos.y;
+  newTrfm(2, 3) = worldPose.pos.z;
+  newTrfm(3, 3) = 1.0;
+  this->rtql8BodyNode->setWorldTransform(newTrfm);
+
+  // Add rtql8's body node to rtql8's skeleton.
   RTQL8ModelPtr rtql8Model
       = boost::shared_dynamic_cast<RTQL8Model>(this->GetModel());
-  rtql8Model->GetSkeletonDynamics()->addNode(rtql8BodyNode);
+  rtql8Model->GetSkeletonDynamics()->addNode(rtql8BodyNode, false);
 }
 
 //////////////////////////////////////////////////
@@ -434,7 +449,38 @@ void RTQL8Link::SetAutoDisable(bool _disable)
 //   }
 }
 
+void RTQL8Link::updateDirtyPoseFromRTQL8Transformation()
+{
+  //-- Step 1: get rtql8 body's transformation
+  Eigen::Matrix4d tran = this->rtql8BodyNode->getWorldTransform();
 
+  //-- Step 2: set gazebo link's pose using the transformation
+
+  // a) prepare new pose
+  math::Pose newPose;
+  //math::Pose myPose = this->GetWorldPose();
+  // b) set position
+  newPose.pos.Set(tran(0,3), tran(1,3), tran(2,3));
+
+  // c) set rotation
+  Eigen::Matrix3d mat3x3 = tran.topLeftCorner(3,3);
+  Eigen::Quaterniond quat = rtql8::utils::rotation::matrixToQuat(mat3x3);
+  newPose.rot.Set(quat.w(), quat.x(), quat.y(), quat.z());
+
+  // subtracting cog location from ode pose
+//  math::Vector3 cog = this->dirtyPose.rot.RotateVector(
+//      this->inertial->GetCoG());
+
+//  this->dirtyPose.pos -= cog;
+
+  // set the new pose to this link
+  this->dirtyPose = newPose;
+  //this->dirtyPose = myPose;
+
+  // set the new pose to the world
+  // TODO: below method can be changed in gazebo code
+  this->world->dirtyPoses.push_back(this);
+}
 
 
 

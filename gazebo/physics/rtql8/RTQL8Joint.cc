@@ -22,6 +22,7 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/rtql8/RTQL8Link.hh"
+#include "gazebo/physics/rtql8/RTQL8Model.hh"
 #include "gazebo/physics/rtql8/RTQL8Joint.hh"
 //#include "physics/ScrewJoint.hh"
 
@@ -71,6 +72,10 @@ void RTQL8Joint::Load(sdf::ElementPtr _sdf)
    // and child link so we create rtql8 joint after the joint is loaded with sdf
    // .
    rtql8Joint = new rtql8::kinematics::Joint(parentBodyNode, childBodyNode);
+
+   RTQL8ModelPtr rtql8Model
+       = boost::shared_dynamic_cast<RTQL8Model>(this->model);
+   rtql8Model->GetSkeletonDynamics()->addJoint(rtql8Joint);
 
    // Set Pose: offset from child link origin in child link frame.
    if (this->sdf->HasElement("pose"))

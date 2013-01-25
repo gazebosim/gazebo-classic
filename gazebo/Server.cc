@@ -189,7 +189,8 @@ bool Server::ParseArgs(int argc, char **argv)
   {
     // Get the world file name from the command line, or use "empty.world"
     // if no world file is specified.
-    std::string configFilename = "worlds/empty.world";
+    //std::string configFilename = "worlds/empty.world";
+    std::string configFilename = "worlds/rtql8.world";
     if (this->vm.count("world_file"))
       configFilename = this->vm["world_file"].as<std::string>();
 
