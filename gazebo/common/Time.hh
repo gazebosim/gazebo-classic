@@ -26,6 +26,8 @@
 #include <time.h>
 #include <iostream>
 
+#include "gazebo/common/CommonTypes.hh"
+
 namespace gazebo
 {
   namespace common
@@ -89,17 +91,25 @@ namespace gazebo
       /// \return Time as a float in seconds
       public: float Float() const;
 
+      /// \brief Sleep for the specified time
+      /// \param[in] _time Sleep time
+      /// \return Time actually slept
+      public: static Time Sleep(const common::Time &_time);
+
       /// \brief Millisecond sleep
       /// \param[in] _ms milliseconds
+      /// \return Time actually slept
       public: static Time MSleep(unsigned int _ms);
 
       /// \brief Nano sleep
       /// \param[in] _ns nanoseconds
+      /// \return Time actually slept
       public: static Time NSleep(unsigned int _ns);
 
       /// \brief Nano sleep
       /// \param[in] _time is a Time
-      public: static Time NSleep(Time _time);
+      /// \return Time actually slept
+      public: static Time NSleep(Time _time) GAZEBO_DEPRECATED;
 
       /// \brief Assignment operator
       /// \param[in] _tv the new time
@@ -429,7 +439,7 @@ namespace gazebo
                  this->sec += this->nsec / static_cast<int32_t>(1e9);
                  this->nsec = this->nsec % static_cast<int32_t>(1e9);
                }
-      private: static struct timespec clock_resolution;
+      private: static struct timespec clockResolution;
     };
     /// \}
   }

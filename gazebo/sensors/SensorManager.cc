@@ -366,10 +366,15 @@ void SensorManager::SensorContainer::RunLoop()
     minUpdateRate = std::min((*iter)->GetUpdateRate(), minUpdateRate);
   }
 
+  std::cout << "MinUpdateRate[" << minUpdateRate << "]\n";
+  minUpdateRate *= 2.0;
+
+  common::Time sleepTime(1.0 / (minUpdateRate * 2.0));
+
   while (!this->stop)
   {
     this->Update(false);
-    nanosleep( );
+    common::Time::Sleep(sleepTime);
   }
 }
 
