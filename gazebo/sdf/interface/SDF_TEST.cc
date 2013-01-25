@@ -42,12 +42,12 @@ TEST(SdfUpdate, UpdateAttribute)
          << "  <static>false</true>"
          << "</model>"
          << "</sdf>";
-  sdf::SDF sdf_parsed;
-  sdf_parsed.SetFromString(stream.str());
+  sdf::SDF sdfParsed;
+  sdfParsed.SetFromString(stream.str());
 
   // Verify correct parsing
-  EXPECT_TRUE(sdf_parsed.root->HasElement("model"));
-  sdf::ElementPtr modelElem = sdf_parsed.root->GetElement("model");
+  EXPECT_TRUE(sdfParsed.root->HasElement("model"));
+  sdf::ElementPtr modelElem = sdfParsed.root->GetElement("model");
 
   // Read name attribute value
   EXPECT_TRUE(modelElem->HasAttribute("name"));
@@ -68,7 +68,7 @@ TEST(SdfUpdate, UpdateAttribute)
     fixture.name[0] = 'd' + i;
 
     // Update root sdf element
-    sdf_parsed.root->Update();
+    sdfParsed.root->Update();
 
     // Expect sdf values to match test class variables
     nameParam->Get(nameCheck);
@@ -88,12 +88,12 @@ TEST(SdfUpdate, UpdateElement)
          << "  <static>false</true>"
          << "</model>"
          << "</sdf>";
-  sdf::SDF sdf_parsed;
-  sdf_parsed.SetFromString(stream.str());
+  sdf::SDF sdfParsed;
+  sdfParsed.SetFromString(stream.str());
 
   // Verify correct parsing
-  EXPECT_TRUE(sdf_parsed.root->HasElement("model"));
-  sdf::ElementPtr modelElem = sdf_parsed.root->GetElement("model");
+  EXPECT_TRUE(sdfParsed.root->HasElement("model"));
+  sdf::ElementPtr modelElem = sdfParsed.root->GetElement("model");
 
   // Read static element value
   EXPECT_TRUE(modelElem->HasElement("static"));
@@ -125,7 +125,7 @@ TEST(SdfUpdate, UpdateElement)
     fixture.pose.pos.z = -i*i*i;
 
     // Update root sdf element
-    sdf_parsed.root->Update();
+    sdfParsed.root->Update();
 
     // Expect sdf values to match test class variables
     staticParam->Get(flagCheck);
