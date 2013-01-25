@@ -14,18 +14,14 @@
  * limitations under the License.
  *
 */
-/* Desc: RTQL8 Trimesh shape
- * Author: Nate Koenig
- * Date: 16 Oct 2009
- */
 
-#include "common/Mesh.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
-#include "physics/rtql8/RTQL8Collision.hh"
-#include "physics/rtql8/RTQL8Physics.hh"
-#include "physics/rtql8/RTQL8TrimeshShape.hh"
+#include "gazebo/physics/rtql8/RTQL8Collision.hh"
+#include "gazebo/physics/rtql8/RTQL8Physics.hh"
+#include "gazebo/physics/rtql8/RTQL8TrimeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;

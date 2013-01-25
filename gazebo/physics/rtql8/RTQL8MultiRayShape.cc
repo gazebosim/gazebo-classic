@@ -14,15 +14,16 @@
  * limitations under the License.
  *
  */
-#include "common/Exception.hh"
 
-#include "physics/World.hh"
-#include "physics/rtql8/RTQL8Types.hh"
-#include "physics/rtql8/RTQL8Link.hh"
-#include "physics/rtql8/RTQL8Collision.hh"
-#include "physics/rtql8/RTQL8Physics.hh"
-#include "physics/rtql8/RTQL8RayShape.hh"
-#include "physics/rtql8/RTQL8MultiRayShape.hh"
+#include "gazebo/common/Exception.hh"
+
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/rtql8/RTQL8Types.hh"
+#include "gazebo/physics/rtql8/RTQL8Link.hh"
+#include "gazebo/physics/rtql8/RTQL8Collision.hh"
+#include "gazebo/physics/rtql8/RTQL8Physics.hh"
+#include "gazebo/physics/rtql8/RTQL8RayShape.hh"
+#include "gazebo/physics/rtql8/RTQL8MultiRayShape.hh"
 
 using namespace gazebo;
 using namespace physics;

@@ -14,17 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
 
-#include "physics/World.hh"
-#include "physics/Link.hh"
-#include "physics/rtql8/RTQL8Physics.hh"
-#include "physics/rtql8/RTQL8Types.hh"
-#include "physics/rtql8/RTQL8Collision.hh"
-#include "physics/rtql8/RTQL8RayShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/rtql8/RTQL8Physics.hh"
+#include "gazebo/physics/rtql8/RTQL8Types.hh"
+#include "gazebo/physics/rtql8/RTQL8Collision.hh"
+#include "gazebo/physics/rtql8/RTQL8RayShape.hh"
 
 using namespace gazebo;
 using namespace physics;

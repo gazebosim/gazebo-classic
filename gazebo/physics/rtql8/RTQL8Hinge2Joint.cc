@@ -14,16 +14,14 @@
  * limitations under the License.
  *
 */
-/* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
-#include "gazebo_config.h"
-#include "common/Console.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Console.hh"
 
-#include "physics/Link.hh"
-#include "physics/rtql8/RTQL8Hinge2Joint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/rtql8/RTQL8Hinge2Joint.hh"
+
+#include "rtql8/kinematics/Dof.h"
 
 using namespace gazebo;
 using namespace physics;
@@ -106,13 +104,12 @@ math::Angle RTQL8Hinge2Joint::GetAngleImpl(int _index) const
 {
   math::Angle result;
 
-//   if (this->jointId)
-//   {
-//     if (_index == 0)
-//       result = dJointGetHinge2Angle1(this->jointId);
-//   }
+  if (_index == 0)
+    result = this->rtql8Joint->getDof(0)->getValue();
+  else
+    result = this->rtql8Joint->getDof(1)->getValue();
 
-  return math::Angle(0);
+  return result;
 }
 
 //////////////////////////////////////////////////
