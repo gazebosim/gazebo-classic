@@ -13,6 +13,7 @@ include_directories(
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
+  ${PROJECT_BINARY_DIR}/test
 )
 
 if(HAVE_URDFDOM_HEADERS)
@@ -44,9 +45,12 @@ add_dependencies(gazebo_sensors gazebo_rendering)
 if(HAVE_BULLET)
   add_dependencies(gazebo_physics_bullet gazebo_msgs)
 endif()
-#if(HAVE_RTQL8)
+if(HAVE_RTQL8)
   add_dependencies(gazebo_physics_rtql8 gazebo_msgs)
-#endif()
+endif()
+if (HAVE_Simbody)
+  add_dependencies(gazebo_physics_simbody gazebo_msgs)
+endif()
 
 gz_add_executable(gzmaster master_main.cc Master.cc gazebo.cc)
 gz_add_executable(gzserver server_main.cc Server.cc Master.cc gazebo.cc)

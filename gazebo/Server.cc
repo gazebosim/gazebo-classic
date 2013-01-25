@@ -172,10 +172,17 @@ bool Server::ParseArgs(int argc, char **argv)
   // Set the parameter to playback a log file. The log file contains the
   // world description, so don't try to reead the world file from the
   // command line.
-  if (this->vm.count("play"))
   {
     // Load the log file
     common::LogPlay::Instance()->Open(this->vm["play"].as<std::string>());
+
+    gzmsg << "\nLog playback:\n"
+      << "  Log Version: "
+      << common::LogPlay::Instance()->GetLogVersion() << "\n"
+      << "  Gazebo Version: "
+      << common::LogPlay::Instance()->GetGazeboVersion() << "\n"
+      << "  Random Seed: "
+      << common::LogPlay::Instance()->GetRandSeed() << "\n";
 
     // Get the SDF world description from the log file
     std::string sdfString;

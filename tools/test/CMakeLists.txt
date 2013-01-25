@@ -1,12 +1,13 @@
-
 include_directories (
   ${PROJECT_SOURCE_DIR}/gazebo 
   ${PROJECT_BINARY_DIR}/gazebo
   ${PROTOBUF_INCLUDE_DIR}
 )
 
+link_directories(${PROJECT_BINARY_DIR}/test)
+
 set (gtest_sources 
-  MsgFactory.cc 
+  gz_log.cc 
 )
 
 # Build tests
