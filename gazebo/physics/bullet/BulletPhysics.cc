@@ -143,8 +143,6 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
 
-  this->stepTimeDouble = bulletElem->GetElement("dt")->GetValueDouble();
-
   math::Vector3 g = this->sdf->GetValueVector3("gravity");
   // ODEPhysics checks this, so we will too.
   if (g == math::Vector3(0, 0, 0))
@@ -200,7 +198,7 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     // This function was copied from ODEPhysics with portions commented out.
     // TODO: determine which of these should be implemented.
     // physicsMsg.set_solver_type(this->stepType);
-    physicsMsg.set_dt(this->stepTimeDouble);
+    physicsMsg.set_dt(this->GetStepTime());
     // physicsMsg.set_iters(this->GetSORPGSIters());
     // physicsMsg.set_sor(this->GetSORPGSW());
     physicsMsg.set_cfm(this->GetWorldCFM());
@@ -283,7 +281,7 @@ void BulletPhysics::UpdatePhysics()
   // common::Time currTime =  this->world->GetRealTime();
 
   this->dynamicsWorld->stepSimulation(
-      this->stepTimeDouble, 1, this->stepTimeDouble);
+      this->GetStepTime(), 1, this->GetStepTime());
   // this->lastUpdateTime = currTime;
 
   this->physicsUpdateMutex->unlock();
@@ -302,21 +300,6 @@ void BulletPhysics::Reset()
   // bullet/Demos/OpenGL/DemoApplication.cpp
   // this->physicsUpdateMutex->lock();
   // this->physicsUpdateMutex->unlock();
-}
-
-//////////////////////////////////////////////////
-void BulletPhysics::SetStepTime(double _value)
-{
-  this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetAttribute("dt")->Set(_value);
-
-  this->stepTimeDouble = _value;
-}
-
-//////////////////////////////////////////////////
-double BulletPhysics::GetStepTime()
-{
-  return this->stepTimeDouble;
 }
 
 //////////////////////////////////////////////////
@@ -472,5 +455,3 @@ void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 void BulletPhysics::DebugPrint() const
 {
 }
-
-

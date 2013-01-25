@@ -89,12 +89,6 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
-      public: virtual void SetStepTime(double _value);
-
-      // Documentation inherited
-      public: virtual double GetStepTime();
-
-      // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
       // Documentation inherited
@@ -239,7 +233,7 @@ namespace gazebo
       private: dJointGroupID contactGroup;
 
       /// \brief Store the value of the stepTime parameter to improve efficiency
-      private: double stepTimeDouble;
+//      private: double stepTimeDouble;
 
       /// \brief The type of the solver.
       private: std::string stepType;

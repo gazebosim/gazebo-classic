@@ -16,10 +16,10 @@
 
   <element name="simbody" required="0">
     <description>Simbody specific physics properties</description>
-    <element name="min_step_size" type="double" required="0">
+    <element name="min_step_size" type="double" default="0.0001" required="0">
       <description>TBD</description>
     </element>
-    <element name="accuracy" type="double" required="0">
+    <element name="accuracy" type="double" default="1" required="0">
       <description>TBD</description>
     </element>
   </element>
@@ -31,7 +31,7 @@
       <element name="type" type="string" default="sequential_impulse" required="1">
         <description>One of the following types: sequential_impulse only.</description>
       </element>
-      <element name="min_step_size" type="double" required="0">
+      <element name="min_step_size" type="double" default="0.0001" required="0">
         <description>The time duration which advances with each iteration of the dynamics engine, this has to be no bigger than max_step_size under physics block.  If left unspecified, min_step_size defaults to max_step_size.</description>
       </element>
       <element name="iters" type="int" default="50" required="1">
@@ -53,10 +53,10 @@
       <element name="contact_surface_layer" type="double" default="0.001" required="1">
         <description>The depth of the surface layer around all geometry objects. Contacts are allowed to sink into the surface layer up to the given depth before coming to rest. The default value is zero. Increasing this to some small value (e.g. 0.001) can help prevent jittering problems due to contacts being repeatedly made and broken.</description>
       </element>
-      <element name="split_impulse" type="bool" default="1">
+      <element name="split_impulse" type="bool" default="1" required="1">
         <description>Similar to ODE's max_vel implementation.  See http://bulletphysics.org/mediawiki-1.5.8/index.php/BtContactSolverInfo#Split_Impulse for more information.</description>
       </element>
-      <element name="split_impulse_penetration_threshold" type="double" default="-0.01">
+      <element name="split_impulse_penetration_threshold" type="double" default="-0.01" required="1">
         <description>Similar to ODE's max_vel implementation.  See http://bulletphysics.org/mediawiki-1.5.8/index.php/BtContactSolverInfo#Split_Impulse for more information.</description>
       </element>
     </element> <!-- End Constraints -->
@@ -69,7 +69,7 @@
       <element name="type" type="string" default="quick" required="1">
         <description>One of the following types: world, quick</description>
       </element>
-      <element name="min_step_size" type="double" required="0">
+      <element name="min_step_size" type="double" default="0.0001" required="0">
         <description>The time duration which advances with each iteration of the dynamics engine, this has to be no bigger than max_step_size under physics block.  If left unspecified, min_step_size defaults to max_step_size.</description>
       </element>
       <element name="iters" type="int" default="50" required="1">

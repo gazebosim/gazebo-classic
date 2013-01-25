@@ -83,10 +83,10 @@
       <element name="kd" type="double" default="1.0" required="0">
         <description>dynamically "damping"-equivalent coefficient for contact joints</description>
       </element>
-      <element name="split_impulse" type="bool" default="1">
+      <element name="split_impulse" type="bool" default="1" required="1">
         <description>Similar to ODE's max_vel implementation.  See http://bulletphysics.org/mediawiki-1.5.8/index.php/BtContactSolverInfo#Split_Impulse for more information.</description>
       </element>
-      <element name="split_impulse_penetration_threshold" type="double" default="-0.01">
+      <element name="split_impulse_penetration_threshold" type="double" default="-0.01" required="1">
         <description>Similar to ODE's max_vel implementation.  See http://bulletphysics.org/mediawiki-1.5.8/index.php/BtContactSolverInfo#Split_Impulse for more information.</description>
       </element>
     </element> <!-- End Bullet -->

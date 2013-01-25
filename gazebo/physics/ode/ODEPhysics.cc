@@ -166,7 +166,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   sdf::ElementPtr solverElem = odeElem->GetElement("solver");
 
-  this->stepTimeDouble = solverElem->GetValueDouble("dt");
+//  this->GetStepTime() = solverElem->GetValueDouble("dt");
   this->stepType = solverElem->GetValueString("type");
 
   dWorldSetDamping(this->worldId, 0.0001, 0.0001);
@@ -234,7 +234,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_type(msgs::Physics::ODE);
     physicsMsg.set_update_rate(this->GetUpdateRate());
     physicsMsg.set_solver_type(this->stepType);
-    physicsMsg.set_dt(this->stepTimeDouble);
+    physicsMsg.set_dt(this->GetStepTime());
     physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(this->GetSORPGSW());
@@ -363,7 +363,7 @@ void ODEPhysics::UpdatePhysics()
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
     // Update the dynamical model
-    (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
+    (*physicsStepFunc)(this->worldId, this->GetStepTime());
 
     // Set the joint contact feedback for each contact.
     for (unsigned int i = 0; i < this->jointFeedbackIndex; ++i)
@@ -406,21 +406,6 @@ void ODEPhysics::Reset()
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
   // Very important to clear out the contact group
   dJointGroupEmpty(this->contactGroup);
-}
-
-//////////////////////////////////////////////////
-void ODEPhysics::SetStepTime(double _value)
-{
-  this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetElement("dt")->Set(_value);
-
-  this->stepTimeDouble = _value;
-}
-
-//////////////////////////////////////////////////
-double ODEPhysics::GetStepTime()
-{
-  return this->stepTimeDouble;
 }
 
 //////////////////////////////////////////////////
@@ -822,10 +807,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     (1.0 / _collision1->GetSurface()->kp + 1.0 / _collision2->GetSurface()->kp);
   double kd = _collision1->GetSurface()->kd + _collision2->GetSurface()->kd;
 
-  contact.surface.soft_erp = (this->stepTimeDouble * kp) /
-                             (this->stepTimeDouble * kp + kd);
+  contact.surface.soft_erp = (this->GetStepTime() * kp) /
+                             (this->GetStepTime() * kp + kd);
 
-  contact.surface.soft_cfm = 1.0 / (this->stepTimeDouble * kp + kd);
+  contact.surface.soft_cfm = 1.0 / (this->GetStepTime() * kp + kd);
 
   // contact.surface.soft_erp = 0.5*(_collision1->surface->softERP +
   //                                _collision2->surface->softERP);

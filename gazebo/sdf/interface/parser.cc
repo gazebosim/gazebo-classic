@@ -162,6 +162,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr _sdf)
   const char *requiredString = _xml->Attribute("required");
   if (!requiredString)
   {
+    gzerr << nameString << "\n";
     gzerr << "Element is missing the required attributed\n";
     return false;
   }

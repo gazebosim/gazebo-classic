@@ -309,6 +309,22 @@ namespace gazebo
       /// \param[in] _msg The message to enqueue.
       public: void EnqueueMsg(msgs::Pose *_msg);
 
+      /// \brief Get real time update rate
+      /// \return Update rate
+      public: double GetRealTimeUpdateRate() const;
+
+      /// \brief Get max step size.
+      /// \return Max step size.
+      public: double GetMaxStepSize() const;
+
+      /// \brief Set real time update rate
+      /// \param[in] _rate Update rate
+      public: void SetRealTimeUpdateRate(double _rate);
+
+      /// \brief Set max step size.
+      /// \param[in] _stepSize Max step size.
+      public: void SetMaxStepSize(double _stepSize);
+
       /// \brief Get a model by id.
       ///
       /// Each Entity has a unique ID, this function finds a Model with
@@ -629,6 +645,12 @@ namespace gazebo
 
       /// \brief The list of pose messages to output.
       private: msgs::Pose_V poseMsgs;
+
+      /// \brief Real time update rate.
+      private: double realTimeUpdateRate;
+
+      /// \brief Max step size;
+      private: double maxStepSize;
     };
     /// \}
   }

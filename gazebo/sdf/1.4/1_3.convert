@@ -5,7 +5,7 @@
       <to element="real_time_update_rate"/>
     </move>
     <move>
-      <from element="physics::ode::dt"/>
+      <from element="physics::ode::solver::dt"/>
       <to element="max_step_size"/>
     </move>
     <move>

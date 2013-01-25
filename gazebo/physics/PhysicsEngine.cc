@@ -58,7 +58,7 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
 
   this->physicsUpdateMutex = new boost::recursive_mutex();
 
-  this->updateRateDouble = 0.0;
+//  this->updateRateDouble = 0.0;
 
   // Create and initialized the contact manager.
   this->contactManager = new ContactManager();
@@ -71,8 +71,8 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
 void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
-  if (this->sdf->HasElement("update_rate"))
-    this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
+//  if (this->sdf->HasElement("update_rate"))
+//    this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
 }
 
 //////////////////////////////////////////////////
@@ -121,23 +121,35 @@ CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
 //////////////////////////////////////////////////
 void PhysicsEngine::SetUpdateRate(double _value)
 {
-  this->sdf->GetElement("update_rate")->Set(_value);
-  this->updateRateDouble = _value;
+  this->world->SetRealTimeUpdateRate(_value);
 }
 
 //////////////////////////////////////////////////
 double PhysicsEngine::GetUpdateRate()
 {
-  return this->updateRateDouble;
+  return this->world->GetRealTimeUpdateRate();
 }
 
 //////////////////////////////////////////////////
 double PhysicsEngine::GetUpdatePeriod()
 {
-  if (this->updateRateDouble > 0)
-    return 1.0/this->updateRateDouble;
+  double updateRate = this->world->GetRealTimeUpdateRate();
+  if (updateRate > 0)
+    return 1.0/updateRate;
   else
     return 0;
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetStepTime(double _value)
+{
+  this->world->SetMaxStepSize(_value);
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::GetStepTime()
+{
+  return this->world->GetMaxStepSize();
 }
 
 //////////////////////////////////////////////////

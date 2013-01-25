@@ -74,12 +74,6 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
-      public: virtual void SetStepTime(double _value);
-
-      // Documentation inherited
-      public: virtual double GetStepTime();
-
-      // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
       // Documentation inherited
@@ -139,8 +133,6 @@ namespace gazebo
       private: btDiscreteDynamicsWorld *dynamicsWorld;
 
       private: common::Time lastUpdateTime;
-
-      private: double stepTimeDouble;
     };
 
   /// \}
