@@ -203,6 +203,12 @@ void MultiCameraSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
+unsigned int MultiCameraSensor::GetCameraCount() const
+{
+  return this->cameras.size();
+}
+
+//////////////////////////////////////////////////
 unsigned int MultiCameraSensor::GetImageWidth(unsigned int _index) const
 {
   return this->GetCamera(_index)->GetImageWidth();
