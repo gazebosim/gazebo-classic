@@ -8,13 +8,11 @@ MESSAGE(STATUS "Looking for a valid DRI display")
 SET (VALID_DRI_DISPLAY FALSE)
 
 # Try to run glxinfo. If not found, variable will be empty
-EXECUTE_PROCESS(
-    COMMAND glxinfo
-    OUTPUT_VARIABLE GLXINFO_EXISTS)
+FIND_PROGRAM(GLXINFO glxinfo)
 
 # If not display found, it will throw an error
 # Another grep pattern: "direct rendering:[[:space:]]*Yes[[:space:]]*"
-IF (GLXINFO_EXISTS)
+IF (GLXINFO)
   EXECUTE_PROCESS(
     COMMAND glxinfo
     COMMAND grep GL_EXT_framebuffer_object
