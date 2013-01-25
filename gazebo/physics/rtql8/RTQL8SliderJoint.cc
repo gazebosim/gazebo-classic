@@ -50,7 +50,7 @@ void RTQL8SliderJoint::Load(sdf::ElementPtr _sdf)
   SliderJoint<RTQL8Joint>::Load(_sdf);
 
   // Slider joint has only one degree of freedom.
-  rtql8::kinematics::Dof* dofs = new rtql8::kinematics::Dof;
+  // rtql8::kinematics::Dof* dofs = new rtql8::kinematics::Dof;
 
   // TODO: Could I know the sliding axis?; x, y, z
 
@@ -89,7 +89,7 @@ double RTQL8SliderJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8SliderJoint::SetVelocity(int /*index*/, double _angle)
+void RTQL8SliderJoint::SetVelocity(int /*index*/, double /*_angle*/)
 {
    //this->SetParam(dParamVel, _angle);
 }
@@ -138,7 +138,7 @@ void RTQL8SliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void RTQL8SliderJoint::SetDamping(int /*index*/, double _damping)
+void RTQL8SliderJoint::SetDamping(int /*index*/, double /*_damping*/)
 {
 //   this->damping_coefficient = _damping;
 //   dJointSetDamping(this->jointId, this->damping_coefficient);
@@ -152,7 +152,7 @@ void RTQL8SliderJoint::ApplyDamping()
 }
 
 //////////////////////////////////////////////////
-void RTQL8SliderJoint::SetForce(int /*index*/, double _force)
+void RTQL8SliderJoint::SetForce(int /*index*/, double /*_force*/)
 {
 //   if (this->childLink)
 //     this->childLink->SetEnabled(true);
@@ -163,7 +163,7 @@ void RTQL8SliderJoint::SetForce(int /*index*/, double _force)
 }
 
 //////////////////////////////////////////////////
-void RTQL8SliderJoint::SetMaxForce(int /*_index*/, double _t)
+void RTQL8SliderJoint::SetMaxForce(int /*_index*/, double /*_t*/)
 {
 //   this->SetParam(dParamFMax, _t);
 }

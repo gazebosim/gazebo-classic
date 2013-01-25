@@ -37,17 +37,17 @@ namespace gazebo
       public: virtual ~RTQL8CylinderShape() {}
 
       // Documentation inerited.
-      public: void SetSize(double _radius, double _length)
+      public: void SetSize(double /*_radius*/, double /*_length*/)
       {
-//         CylinderShape::SetSize(_radius, _length);
-//         RTQL8CollisionPtr oParent;
-//         oParent =
-//           boost::shared_dynamic_cast<RTQL8Collision>(this->collisionParent);
+//      CylinderShape::SetSize(_radius, _length);
+//      RTQL8CollisionPtr oParent;
+//      oParent =
+//        boost::shared_dynamic_cast<RTQL8Collision>(this->collisionParent);
 // 
-//         if (oParent->GetCollisionId() == NULL)
-//           oParent->SetCollision(dCreateCylinder(0, _radius, _length), true);
-//         else
-//           dGeomCylinderSetParams(oParent->GetCollisionId(), _radius, _length);
+//      if (oParent->GetCollisionId() == NULL)
+//        oParent->SetCollision(dCreateCylinder(0, _radius, _length), true);
+//      else
+//        dGeomCylinderSetParams(oParent->GetCollisionId(), _radius, _length);
       }
     };
   }

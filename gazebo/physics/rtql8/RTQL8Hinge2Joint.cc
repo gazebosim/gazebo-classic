@@ -46,7 +46,7 @@ void RTQL8Hinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 RTQL8Hinge2Joint::GetAnchor(int _index) const
+math::Vector3 RTQL8Hinge2Joint::GetAnchor(int /*_index*/) const
 {
 //   dVector3 result;
 // 
@@ -60,7 +60,7 @@ math::Vector3 RTQL8Hinge2Joint::GetAnchor(int _index) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8Hinge2Joint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
+void RTQL8Hinge2Joint::SetAnchor(int /*index*/, const math::Vector3 & /*_anchor*/)
 {
 //   if (this->childLink) this->childLink->SetEnabled(true);
 //   if (this->parentLink) this->parentLink->SetEnabled(true);
@@ -68,7 +68,7 @@ void RTQL8Hinge2Joint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 }
 
 //////////////////////////////////////////////////
-void RTQL8Hinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
+void RTQL8Hinge2Joint::SetAxis(int /*_index*/, const math::Vector3 & /*_axis*/)
 {
 //   if (this->childLink) this->childLink->SetEnabled(true);
 //   if (this->parentLink) this->parentLink->SetEnabled(true);
@@ -80,13 +80,13 @@ void RTQL8Hinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void RTQL8Hinge2Joint::SetDamping(int /*_index*/, double _damping)
+void RTQL8Hinge2Joint::SetDamping(int /*_index*/, double /*_damping*/)
 {
 //   dJointSetDamping(this->jointId, _damping);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 RTQL8Hinge2Joint::GetGlobalAxis(int _index) const
+math::Vector3 RTQL8Hinge2Joint::GetGlobalAxis(int /*_index*/) const
 {
 //   dVector3 result;
 // 
@@ -113,20 +113,20 @@ math::Angle RTQL8Hinge2Joint::GetAngleImpl(int _index) const
 }
 
 //////////////////////////////////////////////////
-double RTQL8Hinge2Joint::GetVelocity(int _index) const
+double RTQL8Hinge2Joint::GetVelocity(int /*_index*/) const
 {
-  double result;
+  // double result;
 
 //   if (_index == 0)
 //     result = dJointGetHinge2Angle1Rate(this->jointId);
 //   else
 //     result = dJointGetHinge2Angle2Rate(this->jointId);
 
-  return result;
+  return 0;
 }
 
 //////////////////////////////////////////////////
-void RTQL8Hinge2Joint::SetVelocity(int _index, double _angle)
+void RTQL8Hinge2Joint::SetVelocity(int /*_index*/, double /*_angle*/)
 {
 //   if (_index == 0)
 //     this->SetParam(dParamVel, _angle);
@@ -135,17 +135,18 @@ void RTQL8Hinge2Joint::SetVelocity(int _index, double _angle)
 }
 
 //////////////////////////////////////////////////
-double RTQL8Hinge2Joint::GetMaxForce(int _index)
+double RTQL8Hinge2Joint::GetMaxForce(int /*_index*/)
 {
 //   if (_index == 0)
 //     return this->GetParam(dParamFMax);
 //   else
 //     return this->GetParam(dParamFMax2);
+  return 0;
 }
 
 
 //////////////////////////////////////////////////
-void RTQL8Hinge2Joint::SetMaxForce(int _index, double _t)
+void RTQL8Hinge2Joint::SetMaxForce(int /*_index*/, double /*_t*/)
 {
 //   if (_index == 0)
 //     this->SetParam(dParamFMax, _t);
@@ -155,7 +156,7 @@ void RTQL8Hinge2Joint::SetMaxForce(int _index, double _t)
 
 
 //////////////////////////////////////////////////
-void RTQL8Hinge2Joint::SetForce(int _index, double _torque)
+void RTQL8Hinge2Joint::SetForce(int /*_index*/, double /*_torque*/)
 {
 //   if (this->childLink) this->childLink->SetEnabled(true);
 //   if (this->parentLink) this->parentLink->SetEnabled(true);
@@ -167,7 +168,7 @@ void RTQL8Hinge2Joint::SetForce(int _index, double _torque)
 }
 
 //////////////////////////////////////////////////
-double RTQL8Hinge2Joint::GetParam(int _parameter) const
+double RTQL8Hinge2Joint::GetParam(int /*_parameter*/) const
 {
 //   double result = dJointGetHinge2Param(this->jointId, _parameter);
 // 
@@ -176,7 +177,7 @@ double RTQL8Hinge2Joint::GetParam(int _parameter) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8Hinge2Joint::SetParam(int _parameter, double _value)
+void RTQL8Hinge2Joint::SetParam(int /*_parameter*/, double /*_value*/)
 {
 //   ODEJoint::SetParam(_parameter, _value);
 //   dJointSetHinge2Param(this->jointId, _parameter, _value);

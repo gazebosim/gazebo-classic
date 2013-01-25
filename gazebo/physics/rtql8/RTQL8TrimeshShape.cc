@@ -85,7 +85,7 @@ void RTQL8TrimeshShape::Update()
 }
 
 //////////////////////////////////////////////////
-void RTQL8TrimeshShape::Load(sdf::ElementPtr _sdf)
+void RTQL8TrimeshShape::Load(sdf::ElementPtr /*_sdf*/)
 {
 //   TrimeshShape::Load(_sdf);
 }
