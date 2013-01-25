@@ -22,9 +22,10 @@
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
-#include "math/Helpers.hh"
-#include "common/Time.hh"
-#include "common/Console.hh"
+
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -146,8 +147,8 @@ Time Time::Sleep(const common::Time &_time)
   }
   else
   {
-    /// Warn about skipping sleep because clock resolution too big
-    gzlog << "Sleep time is larger than clock resolution, skipping sleep\n";
+    /// \TODO Make this a gzlog
+    gzwarn << "Sleep time is larger than clock resolution, skipping sleep\n";
   }
 
   return result;

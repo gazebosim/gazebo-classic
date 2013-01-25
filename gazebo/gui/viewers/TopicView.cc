@@ -108,8 +108,16 @@ void TopicView::Update()
 
   // Update the Hz output
   {
+    common::Time avg;
+    for (std::list<common::Time>::iterator iter = this->dataTimes.begin();
+         iter != this->dataTimes.end(); ++iter)
+    {
+      avg += (*iter);
+    }
+    avg /= this->dataTimes.size();
+
     std::ostringstream stream;
-    stream << std::fixed << std::setprecision(2) << this->hz;
+    stream << std::fixed << std::setprecision(2) << 1.0 / avg.Double();
     this->hzEdit->setText(tr(stream.str().c_str()));
   }
 
@@ -154,7 +162,11 @@ void TopicView::OnMsg(const common::Time &_dataTime, int _size)
 {
   // Calculate the Hz value.
   if (_dataTime != this->prevTime)
-    this->hz = 1.0 / (_dataTime - this->prevTime).Double();
+  {
+    this->dataTimes.push_back(_dataTime - this->prevTime);
+    if (this->dataTimes.size() > 10)
+      this->dataTimes.pop_front();
+  }
 
   // Store the previous time for future Hz calculations.
   this->prevTime = _dataTime;
@@ -193,7 +205,6 @@ void TopicView::SetTopic(const std::string &_topicName)
 
   this->topicCombo->SetMsgTypeName(this->msgTypeName);
 
-  this->hz = 0.0;
   this->msgSizes.clear();
   this->times.clear();
   std::string topicName = this->node->EncodeTopicName(_topicName);

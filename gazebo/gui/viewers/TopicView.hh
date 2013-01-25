@@ -142,6 +142,9 @@ namespace gazebo
       /// \brief A list of clock times that messages have been received.
       private: std::list<common::Time> times;
 
+      /// \brief A list of clock times that messages have been generated.
+      private: std::list<common::Time> dataTimes;
+
       /// \brief A mutex to protect the update cycle.
       private: boost::mutex updateMutex;
     };

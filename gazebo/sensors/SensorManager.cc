@@ -100,7 +100,9 @@ void SensorManager::Update(bool _force)
     this->initSensors.clear();
   }
 
-  this->sensorContainers[sensors::IMAGE]->Update(_force);
+  // Only update if there are sensors
+  if (this->sensorContainers[sensors::IMAGE]->sensors.size() > 0)
+    this->sensorContainers[sensors::IMAGE]->Update(_force);
 }
 
 //////////////////////////////////////////////////
@@ -135,7 +137,7 @@ void SensorManager::Fini()
   for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
        iter != this->sensorContainers.end(); ++iter)
   {
-    (*iter)->Init();
+    (*iter)->Fini();
   }
 
   this->initialized = false;
@@ -248,6 +250,7 @@ Sensor_V SensorManager::GetSensors() const
 //////////////////////////////////////////////////
 void SensorManager::RemoveSensor(const std::string &_name)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
   SensorPtr sensor = this->GetSensor(_name);
 
   if (!sensor)
@@ -259,10 +262,11 @@ void SensorManager::RemoveSensor(const std::string &_name)
   {
     bool removed = false;
 
+    std::string scopedName = sensor->GetScopedName();
     for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
          iter != this->sensorContainers.end() && !removed; ++iter)
     {
-      removed = (*iter)->RemoveSensor(sensor->GetScopedName());
+      removed = (*iter)->RemoveSensor(scopedName);
     }
 
     if (!removed)
@@ -346,6 +350,7 @@ void SensorManager::SensorContainer::Run()
 void SensorManager::SensorContainer::Stop()
 {
   this->stop = true;
+  this->runCondition.notify_one();
   if (this->runThread)
   {
     this->runThread->join();
@@ -357,24 +362,47 @@ void SensorManager::SensorContainer::Stop()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::RunLoop()
 {
+  common::Time sleepTime, startTime, diffTime;
   double minUpdateRate = GZ_DBL_MAX;
 
-  // Get the minimum update rate from the sensors.
-  for (Sensor_V::iterator iter = this->sensors.begin();
-       iter != this->sensors.end(); ++iter)
+  this->stop = false;
+
   {
-    minUpdateRate = std::min((*iter)->GetUpdateRate(), minUpdateRate);
+    boost::recursive_mutex::scoped_lock lock(this->mutex);
+
+    boost::mutex tmpMutex;
+    boost::mutex::scoped_lock lock2(tmpMutex);
+
+    // Wait for a sensor to be added.
+    if (this->sensors.size() == 0)
+    {
+      this->runCondition.wait(lock2);
+      if (this->stop)
+        return;
+    }
+
+    // Get the minimum update rate from the sensors.
+    for (Sensor_V::iterator iter = this->sensors.begin();
+        iter != this->sensors.end() && !this->stop; ++iter)
+    {
+      minUpdateRate = std::min((*iter)->GetUpdateRate(), minUpdateRate);
+    }
   }
 
-  std::cout << "MinUpdateRate[" << minUpdateRate << "]\n";
-  minUpdateRate *= 2.0;
-
-  common::Time sleepTime(1.0 / (minUpdateRate * 2.0));
+  // Calculate an appropriate sleep time.
+  if (minUpdateRate < GZ_DBL_MAX)
+    sleepTime.Set(1.0 / (minUpdateRate));
+  else
+    sleepTime.Set(0, 1e6);
 
   while (!this->stop)
   {
+    startTime = common::Time::GetWallTime();
     this->Update(false);
-    common::Time::Sleep(sleepTime);
+    diffTime = common::Time::GetWallTime() - startTime;
+
+    if (diffTime < sleepTime)
+      common::Time::Sleep(sleepTime - diffTime);
   }
 }
 
@@ -383,6 +411,10 @@ void SensorManager::SensorContainer::Update(bool _force)
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
+  if (this->sensors.size() == 0)
+    printf("ERROR\n");
+
+  // Update all the sensors in this container.
   for (Sensor_V::iterator iter = this->sensors.begin();
        iter != this->sensors.end(); ++iter)
   {
@@ -419,6 +451,9 @@ void SensorManager::SensorContainer::AddSensor(SensorPtr _sensor)
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
   this->sensors.push_back(_sensor);
+
+  // Tell the run loop that we have received a sensor
+  this->runCondition.notify_one();
 }
 
 //////////////////////////////////////////////////
@@ -438,6 +473,7 @@ bool SensorManager::SensorContainer::RemoveSensor(const std::string &_name)
       (*iter)->Fini();
       this->sensors.erase(iter);
       removed = true;
+      break;
     }
   }
 

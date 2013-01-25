@@ -178,6 +178,10 @@ namespace gazebo
 
                  /// \brief A mutex to manage access to the sensors vector.
                  private: mutable boost::recursive_mutex mutex;
+
+                 /// \brief Condition used to block the RunLoop if no
+                 /// sensors are present.
+                 private: boost::condition_variable runCondition;
                };
       /// \endcond
 
