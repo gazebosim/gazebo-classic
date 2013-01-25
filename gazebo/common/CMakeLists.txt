@@ -61,7 +61,13 @@ set (headers
   Time.hh
   Timer.hh
   Video.hh
-  )
+ )
+
+set (gtest_sources
+  Console_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
 foreach (hdr ${headers})

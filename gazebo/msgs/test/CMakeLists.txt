@@ -5,8 +5,6 @@ include_directories (
   ${PROTOBUF_INCLUDE_DIR}
 )
 
-link_directories(${PROJECT_BINARY_DIR}/test)
-
 set (gtest_sources 
   MsgFactory.cc 
 )
