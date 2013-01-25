@@ -31,11 +31,6 @@ DataLogger::DataLogger(QWidget *_parent)
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Data Logger"));
 
-  // Create the main layout for this widget
-  QVBoxLayout *mainLayout = new QVBoxLayout;
-
-  QHBoxLayout *buttonLayout = new QHBoxLayout;
-
   // The record button allows the user to start and pause data recording
   this->recordButton = new QToolButton(this);
   this->recordButton->setIcon(QPixmap(":/images/record.png"));
@@ -47,50 +42,63 @@ DataLogger::DataLogger(QWidget *_parent)
   connect(this->recordButton, SIGNAL(toggled(bool)),
           this, SLOT(OnRecord(bool)));
 
-  QVBoxLayout *stopButtonLayout = new QVBoxLayout;
+  // Create the status frame, which contains the duration label, size
+  // label, and a one word text message.
+  // {
+  QFrame *statusFrame = new QFrame;
+  statusFrame->setObjectName("dataLoggerStatusFrame");
 
-  // The stop button stops and closes an open log file.
-  this->stopButton = new QToolButton(this);
-  this->stopButton->setIcon(QIcon(":/images/stop.png"));
-  this->stopButton->setStatusTip(tr("Stop recording of a log file"));
-  this->stopButton->setCheckable(true);
-  this->stopButton->setChecked(true);
-  this->stopButton->setIconSize(QSize(16, 16));
-  this->stopButton->setObjectName("dataLoggerStopButton");
-  connect(this->stopButton, SIGNAL(clicked()), this, SLOT(OnStop()));
+  this->statusLabel = new QLabel("Ready");
+  this->statusLabel->setFixedWidth(70);
+  this->timeLabel = new QLabel("00:00:00.000");
 
-  // Position the stop button next to the record button
-  stopButtonLayout->addStretch(1);
-  stopButtonLayout->addWidget(this->stopButton, 0);
+  QHBoxLayout *timeLayout = new QHBoxLayout;
+  timeLayout->addWidget(this->statusLabel);
+  timeLayout->addSpacing(5);
+  timeLayout->addWidget(this->timeLabel);
 
-  QVBoxLayout *infoLayout = new QVBoxLayout;
-  this->timeLabel = new QLabel("00:00:00.00");
-  this->timeLabel->setObjectName("dataLoggerTimeLabel");
+  QHBoxLayout *sizeLayout = new QHBoxLayout;
+  sizeLayout->addStretch(1);
+  sizeLayout->addWidget(new QLabel("(0 MB)"));
 
-  this->sizeLabel = new QLabel("0 KB");
-  this->sizeLabel->setObjectName("dataLoggerSizeLabel");
+  QVBoxLayout *statusFrameLayout = new QVBoxLayout;
+  statusFrameLayout->addLayout(timeLayout);
+  statusFrameLayout->addLayout(sizeLayout);
 
-  infoLayout->addStretch(1);
-  infoLayout->addWidget(this->timeLabel);
-  infoLayout->addWidget(this->sizeLabel);
-  infoLayout->addStretch(1);
+  statusFrame->setLayout(statusFrameLayout);
+  // }
 
+  QFrame *settingFrame = new QFrame;
+  settingFrame->setObjectName("dataLoggerSettingFrame");
+  QHBoxLayout *settingFrameLayout = new QHBoxLayout;
+  settingFrameLayout->addWidget(new QLabel("Settings"));
+  settingFrame->setLayout(settingFrameLayout);
+
+  // Layout to position the record button vertically
+  QVBoxLayout *buttonLayout = new QVBoxLayout;
   buttonLayout->addWidget(this->recordButton);
-  buttonLayout->addLayout(stopButtonLayout);
-  buttonLayout->addSpacing(10);
-  buttonLayout->addStretch(1);
-  buttonLayout->addLayout(infoLayout);
-  buttonLayout->addSpacing(5);
+  buttonLayout->addStretch(4);
 
-  this->statusLabel = new QLabel;
-  this->statusLabel->setObjectName("dataLoggerStatusLabel");
-  this->statusLabel->setText("ready");
+  // Layout to position the status information vertically
+  QVBoxLayout *statusLayout = new QVBoxLayout;
+  statusLayout->addSpacing(10);
+  statusLayout->addWidget(statusFrame);
 
-  mainLayout->addLayout(buttonLayout);
-  mainLayout->addWidget(this->statusLabel);
+  // Horizontal layout for the record button and status information
+  QHBoxLayout *topLayout = new QHBoxLayout;
+  topLayout->addLayout(buttonLayout);
+  topLayout->addSpacing(10);
+  topLayout->addStretch(4);
+  topLayout->addLayout(statusLayout);
+
+  // Mainlayout for the whole widget
+  // Create the main layout for this widget
+  QVBoxLayout *mainLayout = new QVBoxLayout;
+  mainLayout->addLayout(topLayout);
+  mainLayout->addWidget(settingFrame);
 
   // Let the stylesheet handle the margin sizes
-  mainLayout->setContentsMargins(0, 0, 0, 0);
+  mainLayout->setContentsMargins(4, 4, 4, 4);
 
   // Assign the mainlayout to this widget
   this->setLayout(mainLayout);
@@ -108,9 +116,6 @@ DataLogger::DataLogger(QWidget *_parent)
   // messages.
   this->sub = this->node->Subscribe<msgs::LogStatus>("~/log/status",
       &DataLogger::OnStatus, this);
-
-  this->recording = false;
-  this->paused = false;
 }
 
 /////////////////////////////////////////////////
@@ -122,23 +127,17 @@ DataLogger::~DataLogger()
 void DataLogger::OnRecord(bool _toggle)
 {
   // If _toggle, then we should start logging data.
-  if (!this->recording || this->paused)
+  if (_toggle)
   {
     // Switch the icon
     this->recordButton->setIcon(QPixmap(":/images/record_pause.png"));
 
+    this->statusLabel->setText("Recording");
+
     // Tell the server to start data logging
     msgs::LogControl msg;
-
-    if (!this->paused)
-      msg.set_start(true);
-    else
-      msg.set_paused(false);
-
+    msg.set_start(true);
     this->pub->Publish(msg);
-    this->statusLabel->setText("recording");
-    this->recording = true;
-    this->paused = false;
   }
   // Otherwise pause data logging
   else
@@ -146,30 +145,13 @@ void DataLogger::OnRecord(bool _toggle)
     // Switch the icon
     this->recordButton->setIcon(QPixmap(":/images/record.png"));
 
-    // Tell the server to pause data logging
+    this->statusLabel->setText("Ready");
+
+    // Tell the server to stop data logging
     msgs::LogControl msg;
-    msg.set_paused(true);
+    msg.set_stop(true);
     this->pub->Publish(msg);
-
-    this->statusLabel->setText("paused");
-    this->paused = true;
   }
-}
-
-/////////////////////////////////////////////////
-void DataLogger::OnStop()
-{
-  this->recording = false;
-  this->paused = false;
-
-  // Switch the icon
-  this->recordButton->setIcon(QPixmap(":/images/record.png"));
-
-  // Tell the server to stop data logging
-  msgs::LogControl msg;
-  msg.set_stop(true);
-  this->pub->Publish(msg);
-  this->statusLabel->setText("ready");
 }
 
 /////////////////////////////////////////////////
@@ -190,4 +172,21 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
   stream << std::setw(2) << std::setfill('0') << msec;
 
   this->timeLabel->setText(QString::fromStdString(stream.str()));
+
+  stream.string("");
+
+  if (_msg.has_log_file())
+  {
+    stream << _msg.log_file().size();
+    if (_msg.log_file().size_units() == msgs::LogStatus::BYTES)
+      stream << "B";
+    else if (_msg.log_file().size_units() == msgs::LogStatus::K_BYTES)
+      stream << "KB";
+    else if (_msg.log_file().size_units() == msgs::LogStatus::M_BYTES)
+      stream << "MB";
+    else
+      stream << "GB";
+
+    this->timeLabel->setText(QString::fromStdString(stream.str()));
+  }
 }

@@ -152,18 +152,6 @@ QToolButton#dataLoggerRecordButton:hover
   background-color: #dddddd;
 }
 
-QToolButton#dataLoggerStopButton
-{
-  padding: 0px;
-  margin: 0px;
-  width: 21px;
-  height: 21px;
-
-  background-color: #999999;
-  border-radius: 4px;
-  border: 0px;
-}
-
 QToolButton#dataLoggerStopButton:hover
 {
   background-color: #dddddd;
@@ -632,6 +620,13 @@ QFrame#blackBorderFrame
   border: 1px solid #000000;
   padding: 0px;
   margin: 0px;
+}
+
+QFrame#dataLoggerSettingFrame
+{
+  border-top: 1px solid #555555;
+  margin: 0px;
+  padding: 0px;
 }
 
 QLabel#dataLoggerStatusLabel

@@ -44,9 +44,6 @@ namespace gazebo
       /// \brief QT callback for the record button.
       private slots: void OnRecord(bool _toggle);
 
-      /// \brief QT callback for the stop button.
-      private slots: void OnStop();
-
       /// \brief Callback for log status messages.
       /// \param[in] _msg Log status message.
       private: void OnStatus(ConstLogStatusPtr &_msg);

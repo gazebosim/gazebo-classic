@@ -118,7 +118,7 @@ namespace gazebo
 
       /// \brief Start the logger.
       /// \param[in] _encoding The type of encoding (txt, or bz2).
-      public: void Start(const std::string &_encoding="bz2");
+      public: bool Start(const std::string &_encoding="bz2");
 
       /// \brief Get the encoding used.
       /// \return Either [txt, or bz2], where txt is plain txt and bz2 is
@@ -134,30 +134,61 @@ namespace gazebo
       /// \brief Run the Write loop.
       private: void Run();
 
+      /// \brief Clear and delete the log buffers.
+      private: void ClearLogs();
+
       /// \brief Write the header to file.
       // private: void WriteHeader();
 
       /// \cond
       private: class Log
       {
-        public: Log(LogRecord *_parent, const std::string &_filename,
+        /// \brief Constructor
+        /// \param[in] _parent Pointer to the LogRecord parent.
+        /// \param[in] _relativeFilename The name of the log file to
+        /// generate, sans the complete path.
+        /// \param[in] _logCB Callback function, which is used to get log
+        /// data.
+        public: Log(LogRecord *_parent, const std::string &_relativeFilename,
                     boost::function<bool (std::ostringstream &)> _logCB);
 
+        /// \brief Destructor
         public: virtual ~Log();
 
+        /// \brief Start the log.
+        /// \param[in] _path The complete path in which to put the log file.
+        public: void Start(const boost::filesystem::path &_path);
+
+        /// \brief Write data to disk.
         public: void Write();
 
+        /// \brief Update the data buffer.
         public: void Update();
 
+        /// \brief Clear the data buffer.
         public: void ClearBuffer();
 
-        public: std::string GetLogFilename() const;
+        /// \brief Get the relative filename. This is the filename passed
+        /// to the constructor.
+        /// \return The relative filename.
+        public: std::string GetRelativeFilename() const;
 
+        /// \brief Pointer to the log record parent.
         public: LogRecord *parent;
+
+        /// \brief Callback from which to get data.
         public: boost::function<bool (std::ostringstream &)> logCB;
+
+        /// \brief Data buffer.
         public: std::string buffer;
+
+        /// \brief The log file.
         public: std::ofstream logFile;
-        public: std::string filename;
+
+        /// \brief Relative log filename.
+        public: std::string relativeFilename;
+
+        private: boost::filesystem::path completePath;
       };
       /// \endcond
 
@@ -177,8 +208,8 @@ namespace gazebo
       /// \brief Event connected to the World update.
       private: event::ConnectionPtr updateConnection;
 
-      /// \brief True if logging is stopped.
-      private: bool stop;
+      /// \brief True if logging is running.
+      private: bool running;
 
       /// \brief Thread used to write data to disk.
       private: boost::thread *writeThread;
@@ -194,7 +225,14 @@ namespace gazebo
       private: boost::condition_variable dataAvailableCondition;
 
       /// \brief The base pathname for all the logs.
-      private: boost::filesystem::path logPath;
+      private: boost::filesystem::path logBasePath;
+
+      /// \brief The complete pathname for all the logs.
+      private: boost::filesystem::path logCompletePath;
+
+      /// \brief Subdirectory for log files. This is appended to
+      /// logBasePath.
+      private: std::string logSubDir;
 
       /// \brief Encoding format for each chunk.
       private: std::string encoding;
