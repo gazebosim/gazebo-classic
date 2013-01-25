@@ -113,7 +113,7 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
-        gzwarn << "joint friction not implemented\n";
+        gzlog << "joint friction not implemented\n";
       }
     }
   }
