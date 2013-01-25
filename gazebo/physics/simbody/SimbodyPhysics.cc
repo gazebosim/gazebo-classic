@@ -79,11 +79,15 @@ bool ContactProcessed()
 SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
     : PhysicsEngine(_world), system(), matter(system), forces(system), integ(NULL)
 {
-  // Create the dynamics solver
+  // Instantiate the Multibody System
+  // Instantiate the Simbody Matter Subsystem
+  // Instantiate the Simbody General Force Subsystem
 
-  // Instantiate the world
+  // Create an integrator
+  //this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
+  this->integ = new SimTK::ExplicitEulerIntegrator(system);
 
-  // TODO: Enable this to do custom contact setting
+
 
 }
 
@@ -120,9 +124,6 @@ void SimbodyPhysics::Init()
   SimTK::Body::Rigid pendulumBody(MassProperties(1.0, Vec3(-1, 0, 0), UnitInertia::pointMassAt(Vec3(-1,0,0))));
   SimTK::MobilizedBody::Pin pendulum(matter.Ground(), Transform(ZtoY, Vec3(0, 0, 0)), 
                                 pendulumBody,    Transform(ZtoY, Vec3(1, 0, 0)));
-
-  //this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
-  this->integ = new SimTK::ExplicitEulerIntegrator(system);
 
   SimTK::State state = this->system.realizeTopology();
 

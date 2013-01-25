@@ -159,6 +159,12 @@ void Entity::SetInitialRelativePose(const math::Pose &_p)
 }
 
 //////////////////////////////////////////////////
+math::Pose Entity::GetInitialRelativePose() const
+{
+  return this->initialRelativePose;
+}
+
+//////////////////////////////////////////////////
 math::Box Entity::GetBoundingBox() const
 {
   return math::Box(math::Vector3(0, 0, 0), math::Vector3(1, 1, 1));

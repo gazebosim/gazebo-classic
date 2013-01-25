@@ -42,17 +42,14 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _latching Set to true to make the callback helper
       /// latching.
-      public: CallbackHelper(bool _latching = false) : latching(_latching) {}
+      public: CallbackHelper(bool _latching = false);
 
       /// \brief Destructor
-      public: virtual ~CallbackHelper() {}
+      public: virtual ~CallbackHelper();
 
       /// \brief Get the typename of the message that is handled
       /// \return String representation of the message type
-      public: virtual std::string GetMsgType() const
-              {
-                return std::string();
-              }
+      public: virtual std::string GetMsgType() const;
 
       /// \brief Process new incoming data
       /// \param[in] _newdata Incoming data to be processed
@@ -66,12 +63,21 @@ namespace gazebo
 
       /// \brief Is the callback latching?
       /// \return true if the callback is latching, false otherwise
-      public: bool GetLatching() const
-              {return this->latching;}
+      public: bool GetLatching() const;
+
+      /// \brief Get the unique ID of this callback.
+      /// \return The unique ID of this callback.
+      public: unsigned int GetId() const;
 
       /// \brief True means that the callback helper will get the last
       /// published message on the topic.
       protected: bool latching;
+
+      /// \brief A counter to generate the unique id of this callback.
+      private: static unsigned int idCounter;
+
+      /// \brief The unique id of this callback.
+      private: unsigned int id;
     };
 
     /// \brief boost shared pointer to transport::CallbackHelper

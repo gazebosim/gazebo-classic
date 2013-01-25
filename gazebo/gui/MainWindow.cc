@@ -41,6 +41,8 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
+#include "sdf/sdf.hh"
+
 using namespace gazebo;
 using namespace gui;
 
@@ -285,12 +287,40 @@ void MainWindow::Save()
     transport::request(get_world(), "world_sdf");
 
   msgs::GzString msg;
+  std::string msgData;
 
   // Make sure the response is correct
   if (response->response() != "error" && response->type() == msg.GetTypeName())
   {
-    // Parse the response
+    // Parse the response message
     msg.ParseFromString(response->serialized_data());
+
+    // Parse the string into sdf, so that we can insert user camera settings.
+    sdf::SDF sdf_parsed;
+    sdf_parsed.SetFromString(msg.data());
+    // Check that sdf contains world
+    if (sdf_parsed.root->HasElement("world"))
+    {
+      sdf::ElementPtr world = sdf_parsed.root->GetElement("world");
+      sdf::ElementPtr guiElem = world->GetElement("gui");
+
+      if (guiElem->HasAttribute("fullscreen"))
+        guiElem->GetAttribute("fullscreen")->Set(g_fullscreen);
+
+      sdf::ElementPtr cameraElem = guiElem->GetElement("camera");
+      rendering::UserCameraPtr cam = gui::get_active_camera();
+
+      cameraElem->GetElement("pose")->Set(cam->GetWorldPose());
+      cameraElem->GetElement("view_controller")->Set(
+        cam->GetViewControllerTypeString());
+      // TODO: export track_visual properties as well.
+      msgData = sdf_parsed.root->ToString("");
+    }
+    else
+    {
+      msgData = msg.data();
+      gzerr << "Unable to parse world file to add user camera settings.\n";
+    }
 
     // Open the file
     std::ofstream out(this->saveFilename.c_str(), std::ios::out);
@@ -304,7 +334,7 @@ void MainWindow::Save()
       msgBox.exec();
     }
     else
-      out << msg.data();
+      out << msgData;
 
     out.close();
   }
@@ -899,11 +929,6 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       math::Pose cam_pose(cam_pose_pos, cam_pose_rot);
 
       cam->SetWorldPose(cam_pose);
-    }
-
-    if (_msg->camera().has_view_controller())
-    {
-      cam->SetViewController(_msg->camera().view_controller());
     }
 
     if (_msg->camera().has_view_controller())

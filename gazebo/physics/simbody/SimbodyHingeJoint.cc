@@ -57,8 +57,8 @@ void SimbodyHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   SimbodyLinkPtr simbodyParentLink =
     boost::shared_static_cast<SimbodyLink>(this->parentLink);
 
-  if (!simbodyChildLink || !simbodyParentLink)
-    gzthrow("Requires simbody bodies");
+  // if (!simbodyChildLink || !simbodyParentLink)
+  //   gzthrow("Requires simbody bodies");
 
   sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
   math::Vector3 axis = axisElem->GetValueVector3("xyz");
