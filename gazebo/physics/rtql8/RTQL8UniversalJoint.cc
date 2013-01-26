@@ -48,7 +48,7 @@ math::Vector3 RTQL8UniversalJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8UniversalJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
+void RTQL8UniversalJoint::SetAnchor(int /*index*/, const math::Vector3 &/*_anchor*/)
 {
 //   if (this->childLink) this->childLink->SetEnabled(true);
 //   if (this->parentLink) this->parentLink->SetEnabled(true);
@@ -57,7 +57,7 @@ void RTQL8UniversalJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 RTQL8UniversalJoint::GetGlobalAxis(int _index) const
+math::Vector3 RTQL8UniversalJoint::GetGlobalAxis(int /*_index*/) const
 {
 //   dVector3 result;
 // 
@@ -71,7 +71,7 @@ math::Vector3 RTQL8UniversalJoint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8UniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
+void RTQL8UniversalJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 {
 //   if (this->childLink) this->childLink->SetEnabled(true);
 //   if (this->parentLink) this->parentLink->SetEnabled(true);
@@ -83,13 +83,13 @@ void RTQL8UniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void RTQL8UniversalJoint::SetDamping(int /*_index*/, double _damping)
+void RTQL8UniversalJoint::SetDamping(int /*_index*/, double /*_damping*/)
 {
 //   dJointSetDamping(this->jointId, _damping);
 }
 
 //////////////////////////////////////////////////
-math::Angle RTQL8UniversalJoint::GetAngleImpl(int _index) const
+math::Angle RTQL8UniversalJoint::GetAngleImpl(int /*_index*/) const
 {
   math::Angle result;
 
@@ -105,20 +105,20 @@ math::Angle RTQL8UniversalJoint::GetAngleImpl(int _index) const
 }
 
 //////////////////////////////////////////////////
-double RTQL8UniversalJoint::GetVelocity(int _index) const
+double RTQL8UniversalJoint::GetVelocity(int /*_index*/) const
 {
-  double result;
+  // double result;
 
 //   if (_index == 0)
 //     result = dJointGetUniversalAngle1Rate(this->jointId);
 //   else
 //     result = dJointGetUniversalAngle2Rate(this->jointId);
 
-  return result;
+  return 0;
 }
 
 //////////////////////////////////////////////////
-void RTQL8UniversalJoint::SetVelocity(int _index, double _angle)
+void RTQL8UniversalJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 {
 //   if (_index == 0)
 //     this->SetParam(dParamVel, _angle);
@@ -127,7 +127,7 @@ void RTQL8UniversalJoint::SetVelocity(int _index, double _angle)
 }
 
 //////////////////////////////////////////////////
-void RTQL8UniversalJoint::SetForce(int _index, double _torque)
+void RTQL8UniversalJoint::SetForce(int /*_index*/, double /*_torque*/)
 {
 //   if (this->childLink) this->childLink->SetEnabled(true);
 //   if (this->parentLink) this->parentLink->SetEnabled(true);
@@ -138,7 +138,7 @@ void RTQL8UniversalJoint::SetForce(int _index, double _torque)
 }
 
 //////////////////////////////////////////////////
-void RTQL8UniversalJoint::SetMaxForce(int _index, double _t)
+void RTQL8UniversalJoint::SetMaxForce(int /*_index*/, double /*_t*/)
 {
 //   if (_index == 0)
 //     this->SetParam(dParamFMax, _t);
@@ -147,7 +147,7 @@ void RTQL8UniversalJoint::SetMaxForce(int _index, double _t)
 }
 
 //////////////////////////////////////////////////
-double RTQL8UniversalJoint::GetMaxForce(int _index)
+double RTQL8UniversalJoint::GetMaxForce(int /*_index*/)
 {
 //   if (_index == 0)
 //     return this->GetParam(dParamFMax);
@@ -157,7 +157,7 @@ double RTQL8UniversalJoint::GetMaxForce(int _index)
 }
 
 //////////////////////////////////////////////////
-void RTQL8UniversalJoint::SetParam(int _parameter, double _value)
+void RTQL8UniversalJoint::SetParam(int /*_parameter*/, double /*_value*/)
 {
 //   ODEJoint::SetParam(_parameter, _value);
 //   dJointSetUniversalParam(this->jointId, _parameter, _value);

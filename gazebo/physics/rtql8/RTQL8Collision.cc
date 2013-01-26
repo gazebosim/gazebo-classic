@@ -46,7 +46,7 @@ RTQL8Collision::~RTQL8Collision()
 }
 
 //////////////////////////////////////////////////
-void RTQL8Collision::Load(sdf::ElementPtr _sdf)
+void RTQL8Collision::Load(sdf::ElementPtr /*_sdf*/)
 {
 //   Collision::Load(_sdf);
 // 
@@ -77,7 +77,7 @@ void RTQL8Collision::Fini()
 }
 
 //////////////////////////////////////////////////
-void RTQL8Collision::SetCollision(bool _placeable)
+void RTQL8Collision::SetCollision(bool /*_placeable*/)
 {
 //   // Must go first in this function
 //   this->collisionId = _collisionId;
@@ -118,7 +118,7 @@ void RTQL8Collision::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-void RTQL8Collision::SetCategoryBits(unsigned int _bits)
+void RTQL8Collision::SetCategoryBits(unsigned int /*_bits*/)
 {
 //   if (this->collisionId)
 //     dGeomSetCategoryBits(this->collisionId, _bits);
@@ -127,7 +127,7 @@ void RTQL8Collision::SetCategoryBits(unsigned int _bits)
 }
 
 //////////////////////////////////////////////////
-void RTQL8Collision::SetCollideBits(unsigned int _bits)
+void RTQL8Collision::SetCollideBits(unsigned int /*_bits*/)
 {
 //   if (this->collisionId)
 //     dGeomSetCollideBits(this->collisionId, _bits);

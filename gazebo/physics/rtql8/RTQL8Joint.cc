@@ -193,7 +193,7 @@ void RTQL8Joint::Detach()
 }
 
 //////////////////////////////////////////////////
-void RTQL8Joint::SetHighStop(int _index, const math::Angle &_angle)
+void RTQL8Joint::SetHighStop(int _index, const math::Angle & /*_angle*/)
 {
    switch (_index)
    {
@@ -213,7 +213,7 @@ void RTQL8Joint::SetHighStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-void RTQL8Joint::SetLowStop(int _index, const math::Angle &_angle)
+void RTQL8Joint::SetLowStop(int _index, const math::Angle & /*_angle*/)
 {
    switch (_index)
    {
@@ -232,7 +232,7 @@ void RTQL8Joint::SetLowStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle RTQL8Joint::GetHighStop(int _index)
+math::Angle RTQL8Joint::GetHighStop(int /*_index*/)
 {
 //   switch (_index)
 //   {
@@ -250,7 +250,7 @@ math::Angle RTQL8Joint::GetHighStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Angle RTQL8Joint::GetLowStop(int _index)
+math::Angle RTQL8Joint::GetLowStop(int /*_index*/)
 {
 //   switch (_index)
 //   {
@@ -268,7 +268,7 @@ math::Angle RTQL8Joint::GetLowStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 RTQL8Joint::GetLinkForce(unsigned int _index) const
+math::Vector3 RTQL8Joint::GetLinkForce(unsigned int /*_index*/) const
 {
   math::Vector3 result;
 //   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
@@ -284,7 +284,7 @@ math::Vector3 RTQL8Joint::GetLinkForce(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 RTQL8Joint::GetLinkTorque(unsigned int _index) const
+math::Vector3 RTQL8Joint::GetLinkTorque(unsigned int /*_index*/) const
 {
   math::Vector3 result;
 //   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
@@ -300,7 +300,7 @@ math::Vector3 RTQL8Joint::GetLinkTorque(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8Joint::SetAttribute(Attribute _attr, int /*_index*/, double _value)
+void RTQL8Joint::SetAttribute(Attribute /*_attr*/, int /*_index*/, double /*_value*/)
 {
 //   switch (_attr)
 //   {
@@ -344,8 +344,8 @@ void RTQL8Joint::SetAttribute(Attribute _attr, int /*_index*/, double _value)
 }
 
 //////////////////////////////////////////////////
-void RTQL8Joint::SetAttribute(const std::string &_key, int /*_index*/,
-                            const boost::any &_value)
+void RTQL8Joint::SetAttribute(const std::string &/*_key*/, int /*_index*/,
+                            const boost::any &/*_value*/)
 {
 //   if (_key == "fudge_factor")
 //   {
@@ -498,7 +498,7 @@ void RTQL8Joint::SetAttribute(const std::string &_key, int /*_index*/,
 //   }
 }
 
-JointWrench RTQL8Joint::GetForceTorque(int _index)
+JointWrench RTQL8Joint::GetForceTorque(int /*_index*/)
 {
   JointWrench wrench;
 //  // Note that:
