@@ -1,7 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(${RTQL8_INCLUDE_DIRS})
-
 link_directories(${RTQL8_LIBRARY_DIRS})
 
 set (sources
@@ -20,7 +19,7 @@ set (sources
              RTQL8HeightmapShape.cc
              RTQL8ScrewJoint.cc
              RTQL8Model.cc
-             RTQL8Utils.cc
+             #RTQL8Utils.cc
 )
 
 SET (headers
@@ -44,7 +43,7 @@ SET (headers
              RTQL8Types.hh
              RTQL8ScrewJoint.hh
              RTQL8Model.hh
-             RTQL8Utils.hh
+             #RTQL8Utils.hh
 )
 
 gz_add_library(gazebo_physics_rtql8 ${sources})
