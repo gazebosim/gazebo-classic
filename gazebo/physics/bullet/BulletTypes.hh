@@ -44,6 +44,12 @@ namespace gazebo
     typedef boost::shared_ptr<BulletRayShape> BulletRayShapePtr;
     typedef boost::shared_ptr<BulletMotionState> BulletMotionStatePtr;
 
+    /// \addtogroup gazebo_physics_bullet
+    /// \{
+
+    /// \class BulletTypes BulletTypes.hh
+    /// \brief A set of functions for converting between the math types used
+    ///        by gazebo and bullet.
     class BulletTypes {
       /// \brief Convert a bullet btVector3 to a gazebo Vector3.
       /// \param[in] _bt Bullet Vector3.
@@ -104,8 +110,8 @@ namespace gazebo
                                                _pose.rot.z, _pose.rot.w));
                 return trans;
               }
-
     };
+    /// \}
   }
 }
 #endif  // #ifndef _BULLETTYPES_HH

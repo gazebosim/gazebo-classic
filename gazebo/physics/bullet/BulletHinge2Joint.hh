@@ -104,7 +104,7 @@ namespace gazebo
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      private: btHinge2Constraint *btHinge2;
+      private: btHinge2Constraint *bulletHinge2;
     };
 
   /// \}
