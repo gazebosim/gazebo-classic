@@ -77,32 +77,7 @@ void RTQL8Joint::Load(sdf::ElementPtr _sdf)
        = boost::shared_dynamic_cast<RTQL8Model>(this->model);
    rtql8Model->GetSkeletonDynamics()->addJoint(rtql8Joint);
 
-   // Set Pose: offset from child link origin in child link frame.
-   if (this->sdf->HasElement("pose"))
-   {
-     sdf::ElementPtr poseElem = this->sdf->GetElement("pose");
 
-     math::Pose pose = poseElem->GetValuePose();
-
-     rtql8::kinematics::Dof* tranX = new rtql8::kinematics::Dof(pose.pos.x);
-     rtql8::kinematics::Dof* tranY = new rtql8::kinematics::Dof(pose.pos.y);
-     rtql8::kinematics::Dof* tranZ = new rtql8::kinematics::Dof(pose.pos.z);
-
-     rtql8::kinematics::TrfmTranslate* tran
-         = new rtql8::kinematics::TrfmTranslate(tranX, tranY, tranZ);
-
-     this->rtql8Joint->addTransform(tran, false);
-
-     rtql8::kinematics::Dof* rotW = new rtql8::kinematics::Dof(pose.rot.w);
-     rtql8::kinematics::Dof* rotX = new rtql8::kinematics::Dof(pose.rot.x);
-     rtql8::kinematics::Dof* rotY = new rtql8::kinematics::Dof(pose.rot.y);
-     rtql8::kinematics::Dof* rotZ = new rtql8::kinematics::Dof(pose.rot.z);
-
-     rtql8::kinematics::TrfmRotateQuat* rot
-         = new rtql8::kinematics::TrfmRotateQuat(rotW, rotX, rotY, rotZ);
-
-     this->rtql8Joint->addTransform(rot, false);
-   }
 }
 
 //////////////////////////////////////////////////
