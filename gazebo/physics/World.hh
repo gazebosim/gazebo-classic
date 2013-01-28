@@ -630,9 +630,6 @@ namespace gazebo
 
       /// \brief The list of pose messages to output.
       private: msgs::Pose_V poseMsgs;
-
-      /// \brief For timing performance
-      private: common::Timer timer;
     };
     /// \}
   }

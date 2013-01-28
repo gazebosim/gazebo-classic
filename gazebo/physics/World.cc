@@ -380,7 +380,8 @@ void World::LogStep()
 //////////////////////////////////////////////////
 void World::Step()
 {
-  this->timer.Start();
+  common::Timer stepTimer;
+  stepTimer.Start();
   /// need this because ODE does not call dxReallocateWorldProcessContext()
   /// until dWorld.*Step
   /// Plugins that manipulate joints (and probably other properties) require
@@ -392,8 +393,8 @@ void World::Step()
     this->pluginsLoaded = true;
   }
 
-  common::Time pluginsLoadedTime = this->timer.GetElapsed();
-  gzerr << "pluginsLoaded [" << pluginsLoadedTime << "]\n";
+  gzerr << "pluginsLoaded [" << stepTimer.GetElapsed().Double()*1000.0 << "]\n";
+  stepTimer.Start();
 
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
@@ -401,8 +402,8 @@ void World::Step()
     this->PublishWorldStats();
   }
 
-  common::Time pubStatsTime = this->timer.GetElapsed();
-  gzerr << "pubStatsTime [" << pubStatsTime << "]\n";
+  gzerr << "pubStatsTime [" << stepTimer.GetElapsed().Double()*1000.0 << "]\n";
+  stepTimer.Start();
 
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
@@ -421,8 +422,8 @@ void World::Step()
   this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
                       this->sleepOffset * 0.99;
 
-  common::Time computeSleepTime = this->timer.GetElapsed();
-  gzerr << "computeSleepTime [" << computeSleepTime << "]\n";
+  gzerr << "computeSleepTime [" << stepTimer.GetElapsed().Double()*1000.0 << "]\n";
+  stepTimer.Start();
 
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
@@ -430,8 +431,8 @@ void World::Step()
          >= common::Time(this->physicsEngine->GetUpdatePeriod()))
   {
     boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
-    common::Time getMutexTime = this->timer.GetElapsed();
-    gzerr << "getMutexTime [" << getMutexTime << "]\n";
+    gzerr << "getMutexTime [" << stepTimer.GetElapsed().Double()*1000.0 << "]\n";
+    stepTimer.Start();
 
     this->prevStepWallTime = common::Time::GetWallTime();
 
@@ -440,8 +441,8 @@ void World::Step()
       // query timestep to allow dynamic time step size updates
       this->simTime += this->physicsEngine->GetStepTime();
       this->Update();
-      common::Time worldUpdateTime = this->timer.GetElapsed();
-      gzerr << "worldUpdateTime [" << worldUpdateTime << "]\n";
+      gzerr << "worldUpdateTime [" << stepTimer.GetElapsed().Double()*1000.0 << "]\n";
+    stepTimer.Start();
 
       if (this->IsPaused() && this->stepInc > 0)
         this->stepInc--;
@@ -452,8 +453,7 @@ void World::Step()
 
   this->ProcessMessages();
 
-  common::Time processMessagesTime = this->timer.GetElapsed();
-  gzerr << "processMessagesTime [" << processMessagesTime << "]\n";
+  gzerr << "processMessagesTime [" << stepTimer.GetElapsed().Double()*1000.0 << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -484,6 +484,9 @@ void World::StepWorld(int _steps)
 //////////////////////////////////////////////////
 void World::Update()
 {
+  common::Timer updateTimer;
+  updateTimer.Start();
+
   if (this->needsReset)
   {
     if (this->resetAll)
@@ -494,20 +497,35 @@ void World::Update()
       this->ResetEntities(Base::MODEL);
     this->needsReset = false;
   }
+  
+  gzerr << "  Update reset [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  updateTimer.Start();
 
   event::Events::worldUpdateStart();
+
+  gzerr << "  UpdateStart event [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  updateTimer.Start();
 
   // Update all the models
   (*this.*modelUpdateFunc)();
 
+  gzerr << "  Model::Update [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  updateTimer.Start();
+
   // This must be called before PhysicsEngine::UpdatePhysics.
   this->physicsEngine->UpdateCollision();
+
+  gzerr << "  collision [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  updateTimer.Start();
 
   // Update the physics engine
   if (this->enablePhysicsEngine && this->physicsEngine)
   {
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
+
+    gzerr << "  physics [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+    updateTimer.Start();
 
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
@@ -519,15 +537,24 @@ void World::Update()
     }
 
     this->dirtyPoses.clear();
+
+    gzerr << "  dirty poses [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+    updateTimer.Start();
   }
 
   // Output the contact information
   this->physicsEngine->GetContactManager()->PublishContacts();
 
+  gzerr << "  pub contacts [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  updateTimer.Start();
+
   int currState = (this->stateToggle + 1) % 2;
   this->prevStates[currState] = WorldState(shared_from_this());
   WorldState diffState = this->prevStates[currState] -
                          this->prevStates[this->stateToggle];
+
+  gzerr << "  diffing [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  updateTimer.Start();
 
   if (!diffState.IsZero())
   {
@@ -536,8 +563,13 @@ void World::Update()
     if (this->states.size() > 1000)
       this->states.pop_front();
   }
+  gzerr << "  push diffs [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  updateTimer.Start();
 
   event::Events::worldUpdateEnd();
+
+  gzerr << "  UpdateEnd event [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  updateTimer.Start();
 }
 
 //////////////////////////////////////////////////
