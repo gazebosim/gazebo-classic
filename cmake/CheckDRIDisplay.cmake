@@ -26,10 +26,13 @@ IF (GLXINFO)
 ELSE ()
   EXECUTE_PROCESS(
       COMMAND ${PROJECT_SOURCE_DIR}/tools/gl-test.py
-      OUTPUT_VARIABLE GL_TEST_OUT
-      ERROR_VARIABLE GL_TEST_ERROR)
+      # RESULT_VARIABLE is store in a FAIL variable since the command
+      # returns 0 if ok and 1 if error (inverse than cmake IF)
+      RESULT_VARIABLE GL_FAIL_RESULT
+      ERROR_QUIET
+      OUTPUT_QUIET)
 
-  IF (NOT GL_TEST_OUT AND NOT GL_TEST_ERROR)
+  IF (NOT GL_FAIL_RESULT)
     MESSAGE(STATUS " + found a valid dri display (pyopengl)")
     SET (VALID_DRI_DISPLAY TRUE)
   ENDIF ()
