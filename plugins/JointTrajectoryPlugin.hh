@@ -46,11 +46,16 @@ namespace gazebo
     /// \brief Update the controller
     private: void UpdateStates();
 
+    /// \brief Testing
+    private: void FixLink(physics::LinkPtr _link);
+    private: void UnfixLink();
+
     private: physics::WorldPtr world;
     private: physics::ModelPtr model;
 
     // The possible list of joint elements
     private: physics::Joint_V joints;
+    private: physics::JointPtr joint;
 
     private: boost::mutex update_mutex;
 
