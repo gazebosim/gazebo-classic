@@ -54,8 +54,7 @@ namespace gazebo
       /// \param[in] _cogWorldTrans Pose of body center of gravity.
       public: virtual void setWorldTransform(const btTransform &_cogWorldTrans);
 
-      // private: math::Pose worldPose;
-      // private: math::Vector3 cog;
+      /// \brief Pointer to parent link.
       private: LinkPtr link;
     };
     /// \}

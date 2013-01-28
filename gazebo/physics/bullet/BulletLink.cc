@@ -230,26 +230,6 @@ void BulletLink::SetEnabled(bool /*_enable*/) const
     */
 }
 
-/////////////////////////////////////////////////////////////////////
-/*
-  What's going on here?  In ODE the CoM of a body corresponds to the
-  origin of the body-fixed coordinate system.  In Gazebo, however, we
-  want to have arbitrary body coordinate systems (i.e., CoM may be
-  displaced from the body-fixed cs).  To get around this limitation in
-  Bullet, we have an extra fudge-factor (comPose), describing the pose of
-  the CoM relative to Gazebo's body-fixed cs.  When using low-level
-  Bullet functions, one must use apply this factor appropriately.
-
-  The UpdateCoM() function is used to compute this offset, based on
-  the mass distribution of attached collisions.  This function also shifts
-  the Bullet-pose of the collisions, to keep everything in the same place in
-  the Gazebo cs.  Simple, neh?
-*/
-void BulletLink::UpdateCoM()
-{
-  // Link::UpdateCoM();
-}
-
 //////////////////////////////////////////////////
 void BulletLink::SetLinearVel(const math::Vector3 &_vel)
 {
