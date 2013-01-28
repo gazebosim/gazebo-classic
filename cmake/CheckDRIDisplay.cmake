@@ -1,9 +1,6 @@
 # FindDRI support
 # Check for existance of glxinfo application
 # Check for existance of support for pyopengl
-cmake_minimum_required(VERSION 2.8)
-PROJECT(Checker)
-
 MESSAGE(STATUS "Looking for a valid DRI display")
 SET (VALID_DRI_DISPLAY FALSE)
 
