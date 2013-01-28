@@ -125,7 +125,12 @@
         <child>link_2</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
-          <limit lower="0" upper="0" effort="0" velocity="0" />
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+            <effort>0</effort>
+            <velocity>0</velocity>
+          </limit>
           <xyz>0 0 1</xyz>
         </axis>
       </joint>

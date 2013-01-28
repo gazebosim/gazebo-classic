@@ -1006,3 +1006,9 @@ void ODEPhysics::DebugPrint() const
     }
   }
 }
+
+/////////////////////////////////////////////////
+void ODEPhysics::SetSeed(uint32_t _seed)
+{
+  dRandSetSeed(_seed);
+}

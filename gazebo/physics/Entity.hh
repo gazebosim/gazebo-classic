@@ -90,6 +90,10 @@ namespace gazebo
       /// \param[in] _pose The initial pose.
       public: void SetInitialRelativePose(const math::Pose &_pose);
 
+      /// \brief Get the initial relative pose.
+      /// \return The initial relative pose.
+      public: math::Pose GetInitialRelativePose() const;
+
       /// \brief Return the bounding box for the entity.
       /// \return The bounding box.
       public: virtual math::Box GetBoundingBox() const;
@@ -311,7 +315,7 @@ namespace gazebo
       /// \brief Visual message container.
       protected: msgs::Visual *visualMsg;
 
-      /// \brief Pose message containr.
+      /// \brief Pose message container.
       protected: msgs::Pose *poseMsg;
 
       /// \brief Current pose animation
@@ -338,7 +342,6 @@ namespace gazebo
       /// \brief The function used to to set the world pose.
       private: void (Entity::*setWorldPoseFunc)(const math::Pose &, bool, bool);
     };
-
     /// \}
   }
 }

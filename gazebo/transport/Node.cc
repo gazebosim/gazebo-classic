@@ -199,3 +199,37 @@ std::string Node::GetMsgType(const std::string &_topic) const
 
   return std::string();
 }
+
+/////////////////////////////////////////////////
+bool Node::HasLatchedSubscriber(const std::string &_topic) const
+{
+  Callback_M::const_iterator iter = this->callbacks.find(_topic);
+  if (iter != this->callbacks.end())
+    return iter->second.front()->GetLatching();
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
+{
+  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+
+  // Find the topic list in the map.
+  Callback_M::iterator iter = this->callbacks.find(_topic);
+
+  if (iter != this->callbacks.end())
+  {
+    // Find the callback with the correct ID and remove it.
+    for (Callback_L::iterator liter = iter->second.begin();
+         liter != iter->second.end(); ++liter)
+    {
+      if ((*liter)->GetId() == _id)
+      {
+        iter->second.erase(liter);
+        (*liter).reset();
+        break;
+      }
+    }
+  }
+}

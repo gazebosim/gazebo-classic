@@ -67,6 +67,10 @@ namespace gazebo
       /// \brief Update the physics engine collision.
       public: virtual void UpdateCollision() = 0;
 
+      /// \brief Set the random number seed for the physics engine.
+      /// \param[in] _seed The random number seed.
+      public: virtual void SetSeed(uint32_t _seed);
+
       /// \brief Set the simulation update rate.
       /// \param[in] _value Value of the update rate.
       public: void SetUpdateRate(double _value);

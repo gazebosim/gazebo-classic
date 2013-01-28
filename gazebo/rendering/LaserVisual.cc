@@ -53,7 +53,7 @@ LaserVisual::~LaserVisual()
 }
 
 /////////////////////////////////////////////////
-void LaserVisual::OnScan(ConstLaserScanPtr &_msg)
+void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
 {
   // Skip the update if the user is moving the laser.
   if (this->GetScene()->GetSelectedVisual() &&
@@ -63,15 +63,16 @@ void LaserVisual::OnScan(ConstLaserScanPtr &_msg)
     return;
   }
 
-  double angle = _msg->angle_min();
+  double angle = _msg->scan().angle_min();
   double r;
   math::Vector3 pt;
-  math::Pose offset = msgs::Convert(_msg->world_pose()) - this->GetWorldPose();
+  math::Pose offset = msgs::Convert(_msg->scan().world_pose()) -
+                      this->GetWorldPose();
 
   this->rayFan->SetPoint(0, offset.pos);
-  for (int i = 0; i < _msg->ranges_size(); i++)
+  for (int i = 0; i < _msg->scan().ranges_size(); i++)
   {
-    r = _msg->ranges(i) + _msg->range_min();
+    r = _msg->scan().ranges(i) + _msg->scan().range_min();
     pt.x = 0 + r * cos(angle);
     pt.y = 0 + r * sin(angle);
     pt.z = 0;
@@ -82,7 +83,7 @@ void LaserVisual::OnScan(ConstLaserScanPtr &_msg)
     else
       this->rayFan->SetPoint(i+1, pt);
 
-    angle += _msg->angle_step();
+    angle += _msg->scan().angle_step();
   }
 }
 

@@ -576,12 +576,6 @@ TEST_F(CommonTest, Material)
   EXPECT_TRUE(mat.GetLighting());
 }
 
-TEST_F(CommonTest, Console)
-{
-  common::Console::Instance()->Load();
-  common::Console::Instance()->SetQuiet(true);
-}
-
 TEST_F(CommonTest, Exception)
 {
   try
@@ -594,6 +588,49 @@ TEST_F(CommonTest, Exception)
     std::cout << "Exception[" << _e.GetErrorStr() << "]\n";
   }
 }
+
+TEST_F(CommonTest, InternalError_DefaultConstructor_Throw)
+{
+  ASSERT_THROW(
+    throw common::InternalError(),
+    common::InternalError);
+}
+
+TEST_F(CommonTest, InternalError_FileLineMsgConstructor_Throw)
+{
+  ASSERT_THROW(
+      throw common::InternalError(__FILE__,__LINE__,"test"),
+      common::InternalError);
+}
+
+TEST_F(CommonTest, InternalAssertionError_AssertionConstructor_Throw)
+{
+  ASSERT_THROW(
+      throw common::AssertionInternalError(__FILE__,__LINE__,"expression","function","msg"),
+      common::AssertionInternalError);
+}
+
+#if defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
+TEST_F(CommonTest, GZASSERT_Disabled_NoThrow)
+{
+  ASSERT_NO_THROW(
+     GZ_ASSERT(true == false, "Assert thrown"));
+}
+#elif defined(BOOST_ENABLE_ASSERT_HANDLER)
+TEST_F(CommonTest, GZASSERT_WithHandler_ThrowException)
+{
+  ASSERT_THROW(
+    GZ_ASSERT(true == false, "Assert thrown"),
+               common::AssertionInternalError);
+}
+#else
+TEST_F(CommonTest, GZASSERT_Enabled_ThrowAssertion)
+{
+    ASSERT_DEATH(
+      GZ_ASSERT(true == false, "Assert thrown"),
+      ".*Internal Program Error - assertion.*");
+}
+#endif
 
 TEST_F(CommonTest, Diagnostics)
 {

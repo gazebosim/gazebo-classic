@@ -103,7 +103,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
   this->sensorSub = this->node->Subscribe("~/sensor",
-                                          &Scene::OnSensorMsg, this);
+                                          &Scene::OnSensorMsg, this, true);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
 
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
@@ -280,7 +280,6 @@ void Scene::Init()
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
-
 
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);
@@ -898,10 +897,14 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Scene::GetFirstContact(CameraPtr _camera,
-                                     const math::Vector2i &_mousePos)
+bool Scene::GetFirstContact(CameraPtr _camera,
+                            const math::Vector2i &_mousePos,
+                            math::Vector3 &_position)
 {
+  bool valid = false;
   Ogre::Camera *ogreCam = _camera->GetOgreCamera();
+
+  _position = math::Vector3::Zero;
 
   // Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
@@ -917,11 +920,85 @@ math::Vector3 Scene::GetFirstContact(CameraPtr _camera,
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
-  for (; iter != result.end() && math::equal(iter->distance, 0.0f); ++iter);
+  double distance = -1.0;
 
-  Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
+  // Iterate over all the results.
+  for (; iter != result.end() && distance <= 0.0; ++iter)
+  {
+    // Skip results where the distance is zero or less
+    if (iter->distance <= 0.0)
+      continue;
 
-  return math::Vector3(pt.x, pt.y, pt.z);
+    // Only accept a hit if there is a movable object, and it's and Entity.
+    if (iter->movable &&
+        iter->movable->getMovableType().compare("Entity") == 0 &&
+        iter->movable->getName().find("OrbitViewController")
+        == std::string::npos)
+    {
+      Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
+
+      // mesh data to retrieve
+      size_t vertexCount;
+      size_t indexCount;
+      Ogre::Vector3 *vertices;
+      uint64_t *indices;
+
+      // Get the mesh information
+      this->GetMeshInformation(pentity->getMesh().get(), vertexCount,
+          vertices, indexCount, indices,
+          pentity->getParentNode()->_getDerivedPosition(),
+          pentity->getParentNode()->_getDerivedOrientation(),
+          pentity->getParentNode()->_getDerivedScale());
+
+      for (int i = 0; i < static_cast<int>(indexCount); i += 3)
+      {
+        // when indices size is not divisible by 3
+        if (i+2 >= static_cast<int>(indexCount))
+          break;
+
+        // check for a hit against this triangle
+        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay,
+            vertices[indices[i]],
+            vertices[indices[i+1]],
+            vertices[indices[i+2]],
+            true, false);
+
+        // if it was a hit check if its the closest
+        if (hit.first)
+        {
+          if ((distance < 0.0f) || (hit.second < distance))
+          {
+            // this is the closest so far, save it off
+            distance = hit.second;
+          }
+        }
+      }
+    }
+  }
+
+  // If nothing was hit, then check the terrain.
+  if (distance <= 0.0 && this->terrain)
+  {
+    // The terrain uses a special ray intersection test.
+    Ogre::TerrainGroup::RayResult terrainResult =
+      this->terrain->GetOgreTerrain()->rayIntersects(mouseRay);
+
+    if (terrainResult.hit)
+    {
+      _position = Conversions::Convert(terrainResult.position);
+      valid = true;
+    }
+  }
+
+  // Compute the interesection point using the mouse ray and a distance
+  // value.
+  if (_position == math::Vector3::Zero && distance > 0.0)
+  {
+    _position = Conversions::Convert(mouseRay.getPoint(distance));
+    valid = true;
+  }
+
+  return valid;
 }
 
 //////////////////////////////////////////////////
@@ -1183,9 +1260,8 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
   for (int i = 0; i < _msg->model_size(); i++)
   {
-    boost::shared_ptr<msgs::Pose> pm(new msgs::Pose(_msg->model(i).pose()));
-    pm->set_name(_msg->model(i).name());
-    this->poseMsgs.push_front(pm);
+    this->poseMsgs.push_front(_msg->model(i).pose());
+    this->poseMsgs.front().set_name(_msg->model(i).name());
 
     this->ProcessModelMsg(_msg->model(i));
   }
@@ -1277,15 +1353,12 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   for (int j = 0; j < _msg.link_size(); j++)
   {
     linkName = modelName + _msg.link(j).name();
-    boost::shared_ptr<msgs::Pose> pm2(
-        new msgs::Pose(_msg.link(j).pose()));
-    pm2->set_name(linkName);
-    this->poseMsgs.push_front(pm2);
+    this->poseMsgs.push_front(_msg.link(j).pose());
+    this->poseMsgs.front().set_name(linkName);
 
     if (_msg.link(j).has_inertial())
     {
-      boost::shared_ptr<msgs::Link> lm(
-          new msgs::Link(_msg.link(j)));
+      boost::shared_ptr<msgs::Link> lm(new msgs::Link(_msg.link(j)));
       this->linkMsgs.push_back(lm);
     }
 
@@ -1440,14 +1513,14 @@ void Scene::PreRender()
   pIter = this->poseMsgs.begin();
   while (pIter != this->poseMsgs.end())
   {
-    Visual_M::iterator iter = this->visuals.find((*pIter)->name());
+    Visual_M::iterator iter = this->visuals.find((*pIter).name());
     if (iter != this->visuals.end() && iter->second)
     {
       // If an object is selected, don't let the physics engine move it.
       if (!this->selectedVis || this->selectionMode != "move" ||
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
-        math::Pose pose = msgs::Convert(*(*pIter));
+        math::Pose pose = msgs::Convert(*pIter);
         iter->second->SetPose(pose);
         PoseMsgs_L::iterator prev = pIter++;
         this->poseMsgs.erase(prev);
@@ -1934,22 +2007,25 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::OnPoseMsg(ConstPosePtr &_msg)
+void Scene::OnPoseMsg(ConstPose_VPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   PoseMsgs_L::iterator iter;
 
-  // Find an old model message, and remove them
-  for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); ++iter)
+  for (int i = 0; i < _msg->pose_size(); ++i)
   {
-    if ((*iter)->name() == _msg->name())
+    // Find an old model message, and remove them
+    for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); ++iter)
     {
-      this->poseMsgs.erase(iter);
-      break;
+      if ((*iter).name() == _msg->pose(i).name())
+      {
+        this->poseMsgs.erase(iter);
+        break;
+      }
     }
-  }
 
-  this->poseMsgs.push_back(_msg);
+    this->poseMsgs.push_back(_msg->pose(i));
+  }
 }
 
 /////////////////////////////////////////////////

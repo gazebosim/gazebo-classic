@@ -93,6 +93,9 @@
     <description>Parameters that are specific to a certain physics engine.</description>
     <element name="ode" required="0">
       <description>ODE specific parameters</description>
+      <element name="provide_feedback" type="bool" default="0" required="0">
+        <description>If provide_feedback is set to true, ODE will compute the constraint forces at this joint.</description>
+      </element>
       <element name="fudge_factor" type="double" default="0" required="0">
         <description>Scale the excess for in a joint motor at joint limits. Should be between zero and one.</description>
       </element>

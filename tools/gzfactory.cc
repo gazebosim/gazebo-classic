@@ -34,24 +34,24 @@ void help()
 }
 
 /////////////////////////////////////////////////
-void Spawn(po::variables_map &vm)
+void Spawn(po::variables_map &_vm)
 {
   std::string filename, modelName;
   std::string worldName = "default";
 
-  if (!vm.count("sdf"))
+  if (!_vm.count("sdf"))
   {
     std::cerr << "Error: Missing filename.\n";
     return;
   }
 
-  if (vm.count("world-name"))
-    worldName = vm["world-name"].as<std::string>();
+  if (_vm.count("world-name"))
+    worldName = _vm["world-name"].as<std::string>();
 
-  if (vm.count("model-name"))
-    modelName = vm["model-name"].as<std::string>();
+  if (_vm.count("model-name"))
+    modelName = _vm["model-name"].as<std::string>();
 
-  filename = vm["sdf"].as<std::string>();
+  filename = _vm["sdf"].as<std::string>();
 
   std::ifstream ifs(filename.c_str());
   if (!ifs)
@@ -75,6 +75,12 @@ void Spawn(po::variables_map &vm)
 
   sdf::ElementPtr modelElem = sdf->root->GetElement("model");
 
+  if (!modelElem)
+  {
+    gzerr << "Unable to find <model> element.\n";
+    return;
+  }
+
   // Get/Set the model name
   if (modelName.empty())
     modelName = modelElem->GetValueString("name");
@@ -83,20 +89,19 @@ void Spawn(po::variables_map &vm)
 
   math::Pose pose = modelElem->GetValuePose("pose");
   math::Vector3 rpy = pose.rot.GetAsEuler();
-  if (vm.count("pose-x"))
-    pose.pos.x = vm["pose-x"].as<double>();
-  if (vm.count("pose-y"))
-    pose.pos.y = vm["pose-y"].as<double>();
-  if (vm.count("pose-z"))
-    pose.pos.z = vm["pose-z"].as<double>();
-  if (vm.count("pose-R"))
-    rpy.x = vm["pose-R"].as<double>();
-  if (vm.count("pose-P"))
-    rpy.y = vm["pose-P"].as<double>();
-  if (vm.count("pose-Y"))
-    rpy.z = vm["pose-Y"].as<double>();
+  if (_vm.count("pose-x"))
+    pose.pos.x = _vm["pose-x"].as<double>();
+  if (_vm.count("pose-y"))
+    pose.pos.y = _vm["pose-y"].as<double>();
+  if (_vm.count("pose-z"))
+    pose.pos.z = _vm["pose-z"].as<double>();
+  if (_vm.count("pose-R"))
+    rpy.x = _vm["pose-R"].as<double>();
+  if (_vm.count("pose-P"))
+    rpy.y = _vm["pose-P"].as<double>();
+  if (_vm.count("pose-Y"))
+    rpy.z = _vm["pose-Y"].as<double>();
   pose.rot.SetFromEuler(rpy);
-  modelElem->GetElement("pose")->Set(pose);
 
   std::cout << "Spawning " << modelName << " into "
             << worldName  << " world.\n";
@@ -112,6 +117,7 @@ void Spawn(po::variables_map &vm)
 
   msgs::Factory msg;
   msg.set_sdf(sdf->ToString());
+  msgs::Set(msg.mutable_pose(), pose);
   pub->Publish(msg, true);
 
   transport::fini();
@@ -161,7 +167,7 @@ int main(int argc, char **argv)
     ("model-name,m", po::value<std::string>(), "Model name.")
     ("pose-x,x", po::value<double>(), "set model x position.")
     ("pose-y,y", po::value<double>(), "set model y position.")
-    ("pose-z,z", po::value<double>(), "set model z position.")
+    ("pose-z,z", po::value<double>(), "set model z positione.")
     ("pose-R,R", po::value<double>(), "set model roll orientation in radians.")
     ("pose-P,P", po::value<double>(), "set model pitch orientation in radians.")
     ("pose-Y,Y", po::value<double>(), "set model yaw orientation in radians.");

@@ -13,7 +13,5 @@ message WorldControl
   optional bool pause           = 1;
   optional bool step            = 2;
   optional WorldReset reset     = 3;
+  optional uint32 seed          = 4;
 }
-
-
-/// \}

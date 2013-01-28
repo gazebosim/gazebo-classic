@@ -43,7 +43,7 @@ namespace gazebo
       public: virtual ~BulletSphereShape() {}
 
       /// \brief Set the radius
-      public: void SetRadius(const double &_radius)
+      public: void SetRadius(double _radius)
               {
                 SphereShape::SetRadius(_radius);
                 BulletCollisionPtr bParent;

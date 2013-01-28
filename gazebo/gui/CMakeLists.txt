@@ -5,7 +5,7 @@ link_directories(
   ${Boost_LIBRARY_DIRS} 
 )
 
-add_definitions( ${QT_DEFINITIONS} )
+add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
 
@@ -32,6 +32,12 @@ set (sources
   ModelRightMenu.cc
   JointControlWidget.cc
   ToolsWidget.cc
+  TopicSelector.cc
+  viewers/ImageView.cc
+  viewers/LaserView.cc
+  viewers/TopicView.cc
+  viewers/TextView.cc
+  viewers/ViewFactory.cc
 )
 
 set (qt_headers
@@ -46,6 +52,11 @@ set (qt_headers
   ModelRightMenu.hh
   JointControlWidget.hh
   ToolsWidget.hh
+  TopicSelector.hh
+  viewers/ImageView.hh
+  viewers/LaserView.hh
+  viewers/TextView.hh
+  viewers/TopicView.hh
 )
 
 set (headers
@@ -59,6 +70,7 @@ set (headers
   GuiEvents.hh
   LightMaker.hh
   qt.h
+  viewers/ViewFactory.hh
   )
 
 set (resources resources.qrc)

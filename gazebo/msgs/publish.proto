@@ -12,5 +12,3 @@ message Publish
   required string host     = 3;
   required uint32 port     = 4;
 }
-
-

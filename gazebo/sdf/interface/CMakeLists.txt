@@ -2,6 +2,9 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources Param.cc SDF.cc parser.cc Converter.cc)
 set (headers SDF.hh Param.hh parser.hh Converter.hh)
+set (gtest_sources
+  SDF_TEST.cc
+)
 
 if (HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
   include_directories(SYSTEM ${urdfdom_INCLUDE_DIRS}
@@ -9,16 +12,13 @@ if (HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
                              ${console_bridge_INCLUDE_DIRS}
                              ${CMAKE_SOURCE_DIR}/deps/opende/include)
 
-  link_directories(${urdfdom_LIBRARY_DIRS}
-                   ${urdfdom_headers_LIBRARY_DIRS}
-                   ${console_bridge_LIBRARY_DIRS})
-
   set (sources ${sources} parser_urdf.cc)
   set (headers ${headers} parser_urdf.hh)
-
   # add_definitions(${urdfdom_LDFLAGS}
   # ${urdfdom_headers_LDFLAGS} ${console_bridge_LDFLAGS})
 endif(HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
+
+gz_build_tests(${gtest_sources})
 
 gz_add_library(gazebo_sdf_interface ${sources})
 
@@ -30,9 +30,7 @@ if (HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
     gazebo_ode
     ${urdfdom_headers_LIBRARIES}
     ${urdfdom_LIBRARIES}
-    ${console_bridge_LIBRARIES}
-    ${urdfdom_LDFLAGS}
-    ${console_bridge_LDFLAGS})
+    ${console_bridge_LIBRARIES})
 else(HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
   target_link_libraries(gazebo_sdf_interface
     gazebo_common ${tinyxml_libraries} ${Boost_LIBRARIES})

@@ -18,37 +18,42 @@
  * Desc: Contact Plugin
  * Author: Nate Koenig mod by John Hsu
  */
+#ifndef _GAZEBO_CONTACT_PLUGIN_HH_
+#define _GAZEBO_CONTACT_PLUGIN_HH_
 
-#ifndef GAZEBO_CONTACT_PLUGIN_HH
-#define GAZEBO_CONTACT_PLUGIN_HH
+#include <string>
 
-#include "common/Plugin.hh"
-#include "sensors/SensorTypes.hh"
-#include "sensors/ContactSensor.hh"
-#include "gazebo.hh"
+#include <gazebo/gazebo.hh>
+#include <gazebo/sensors/sensors.hh>
 
 namespace gazebo
 {
-  /// \brief A Bumper controller
+  /// \brief A plugin for a contact sensor. Inherit from this class to make
+  /// your own contact plugin.
   class ContactPlugin : public SensorPlugin
   {
-    /// \brief Constructor
+    /// \brief Constructor.
     public: ContactPlugin();
 
-    /// \brief Destructor
+    /// \brief Destructor.
     public: virtual ~ContactPlugin();
 
-    /// \brief Load the plugin
-    /// \param take in SDF root element
-    public: void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
+    /// \brief Load the sensor plugin.
+    /// \param[in] _sensor Pointer to the sensor that loaded this plugin.
+    /// \param[in] _sdf SDF element that describes the plugin.
+    public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 
-    /// \brief Pointer to parent
-    protected: physics::WorldPtr world;
+    /// \brief Callback that recieves the contact sensor's update signal.
+    /// Override this this function to get callbacks when the contact sensor
+    /// is updated with new data.
+    private: virtual void OnUpdate();
 
-    /// \brief The parent sensor
-    protected: sensors::ContactSensorPtr parentSensor;
+    /// \brief Pointer to the contact sensor
+    private: sensors::ContactSensorPtr parentSensor;
+
+    /// \brief Connection that maintains a link between the contact sensor's
+    /// updated signal and the OnUpdate callback.
+    private: event::ConnectionPtr updateConnection;
   };
 }
-
 #endif
-

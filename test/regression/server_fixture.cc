@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,36 @@
  * limitations under the License.
  *
 */
+#include <string.h>
+#include "math/Helpers.hh"
+#include "transport/TransportTypes.hh"
+#include "transport/Node.hh"
 
+#include "rendering/RenderEngine.hh"
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
+
 
 using namespace gazebo;
-class BulletTest : public ServerFixture
+class ServerFixtureTest : public ServerFixture
 {
 };
 
-
-TEST_F(BulletTest, EmptyWorldTest)
+TEST_F(ServerFixtureTest, LoadPaused)
 {
-  // check conservation of mementum for linear inelastic collision
-  Load("worlds/empty_bullet.world", true);
+  // Note the second argument of Load sets the pause state
+  Load("worlds/empty.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  ASSERT_TRUE(world != NULL);
+  gzdbg << "Check IsPaused with no delay\n";
+  EXPECT_TRUE(world->IsPaused());
 
-  // simulate a couple seconds
-  world->StepWorld(2000);
-  double t = world->GetSimTime().Double();
-  EXPECT_GT(t, 0);
+  common::Time::MSleep(100);
+  gzdbg << "Check IsPaused with 100 ms delay\n";
+  EXPECT_TRUE(world->IsPaused());
 
-  Unload();
+  common::Time::MSleep(900);
+  gzdbg << "Check IsPaused with 1000 ms delay\n";
+  EXPECT_TRUE(world->IsPaused());
 }
 
 int main(int argc, char **argv)

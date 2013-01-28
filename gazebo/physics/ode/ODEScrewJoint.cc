@@ -109,8 +109,9 @@ void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetForce(int /*index*/, double _force)
+void ODEScrewJoint::SetForce(int _index, double _force)
 {
+  ODEJoint::SetForce(_index, _force);
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
   // dJointAddScrewForce(this->jointId, _force);

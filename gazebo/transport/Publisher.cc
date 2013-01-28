@@ -25,14 +25,22 @@
 using namespace gazebo;
 using namespace transport;
 
+//////////////////////////////////////////////////
+Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
+                     unsigned int _limit, bool /*_latch*/)
+  : topic(_topic), msgType(_msgType), queueLimit(_limit)
+{
+  this->prevMsg = NULL;
+  this->queueLimitWarned = false;
+}
 
 //////////////////////////////////////////////////
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
-                     unsigned int _limit, bool _latch)
-  : topic(_topic), msgType(_msgType), queueLimit(_limit), latch(_latch)
+                     unsigned int _limit)
+  : topic(_topic), msgType(_msgType), queueLimit(_limit)
 {
-  this->mutex = new boost::recursive_mutex();
   this->prevMsg = NULL;
+  this->queueLimitWarned = false;
 }
 
 //////////////////////////////////////////////////
@@ -43,8 +51,6 @@ Publisher::~Publisher()
 
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
-
-  delete this->mutex;
 }
 
 //////////////////////////////////////////////////
@@ -55,7 +61,7 @@ bool Publisher::HasConnections() const
             this->publications[0]->GetNodeCount() > 0)) ||
           (this->publications[1] &&
            (this->publications[1]->GetCallbackCount() > 0 ||
-            this->publications[0]->GetNodeCount() > 0)));
+            this->publications[1]->GetNodeCount() > 0)));
 }
 
 //////////////////////////////////////////////////
@@ -86,25 +92,39 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   google::protobuf::Message *msg = _message.New();
   msg->CopyFrom(_message);
 
-  this->mutex->lock();
-  if (this->prevMsg == NULL)
-    this->prevMsg = _message.New();
-  this->prevMsg->CopyFrom(_message);
-
-  this->messages.push_back(msg);
-
-  if (this->messages.size() > this->queueLimit)
   {
-    delete this->messages.front();
-    this->messages.pop_front();
+    boost::recursive_mutex::scoped_lock lock(this->mutex);
+    if (this->prevMsg == NULL)
+      this->prevMsg = _message.New();
+    this->prevMsg->CopyFrom(_message);
+
+    this->messages.push_back(msg);
+
+    if (this->messages.size() > this->queueLimit)
+    {
+      if (!queueLimitWarned)
+      {
+        gzwarn << "Queue limit reached for topic "
+               << this->topic
+               << ", deleting message"
+               << " (only this warning is printed to the console, "
+               << "see the ~/.gazebo/gzserver.log and "
+               << "~/.gazebo/gzclient.log files for future warnings).\n";
+        queueLimitWarned = true;
+      }
+      gzlog << "Queue limit reached for topic "
+            << this->topic
+            << ", deleting message\n";
+      delete this->messages.front();
+      this->messages.pop_front();
+    }
   }
-  this->mutex->unlock();
 }
 
 //////////////////////////////////////////////////
 void Publisher::SendMessage()
 {
-  this->mutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   if (this->messages.size() > 0)
   {
@@ -119,16 +139,13 @@ void Publisher::SendMessage()
 
     this->messages.clear();
   }
-
-  this->mutex->unlock();
 }
 
 //////////////////////////////////////////////////
 unsigned int Publisher::GetOutgoingCount() const
 {
-  this->mutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
   unsigned int c = this->messages.size();
-  this->mutex->unlock();
   return c;
 }
 
@@ -158,13 +175,14 @@ void Publisher::SetPublication(PublicationPtr &_publication, int _i)
 //////////////////////////////////////////////////
 bool Publisher::GetLatching() const
 {
-  return this->latch;
+  return false;
 }
 
 //////////////////////////////////////////////////
 std::string Publisher::GetPrevMsg() const
 {
   std::string result;
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
   if (this->prevMsg)
     this->prevMsg->SerializeToString(&result);
   return result;
