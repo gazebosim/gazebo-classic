@@ -1,6 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources 
+  Assert.cc
   Animation.cc
   BVHLoader.cc
   ColladaLoader.cc
@@ -31,6 +32,7 @@ set (sources
 )
 
 set (headers 
+  Assert.hh
   Animation.hh
   BVHLoader.hh
   ColladaLoader.hh
