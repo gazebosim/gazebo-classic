@@ -35,7 +35,7 @@ namespace sdf
     /// \brief Rename an element or attribute.
     /// \param[in] _elem The element to be renamed, or the element which
     /// has the attribute to be renamed.
-    /// \param[in] _moveElem A 'convert' element that describes the rename
+    /// \param[in] _renameElem A 'convert' element that describes the rename
     /// operation.
     private: static void Rename(TiXmlElement *_elem,
                                      TiXmlElement *_renameElem);

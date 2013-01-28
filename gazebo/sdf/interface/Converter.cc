@@ -14,15 +14,20 @@
  * limitations under the License.
  *
 */
+
 #include <vector>
+#include <set>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
+#include <boost/filesystem.hpp>
 
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/sdf/interface/Converter.hh"
+
 
 using namespace sdf;
 
@@ -64,15 +69,69 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
 
   elem->SetAttribute("version", _toVersion);
 
+  std::string origVersionStr = origVersion;
   boost::replace_all(origVersion, ".", "_");
 
   std::string filename = gazebo::common::find_file(
       std::string("sdf/") + _toVersion + "/" + origVersion + ".convert");
 
+
+  // Use convert file in the current sdf version folder for conversion. If file
+  // does not exist, then find intermediate convert files and interatively
+  // convert the sdf elem. Ideally, users should use gzsdf convert so that the
+  // latest sdf versioned file is written and no subsequent conversions are
+  // necessary.
   TiXmlDocument xmlDoc;
   if (!xmlDoc.LoadFile(filename))
   {
-    gzerr << "Unable to load file[" << filename << "]\n";
+    // find all sdf version dirs in gazebo resource path
+    std::string sdfPath = gazebo::common::find_file(std::string("sdf/"), false);
+    boost::filesystem::directory_iterator endIter;
+    std::set<boost::filesystem::path> sdfDirs;
+    if (boost::filesystem::exists(sdfPath)
+        && boost::filesystem::is_directory(sdfPath))
+    {
+      for( boost::filesystem::directory_iterator dirIter(sdfPath);
+          dirIter != endIter ; ++dirIter)
+      {
+        if (boost::filesystem::is_directory(dirIter->status()))
+        {
+          if (boost::algorithm::ilexicographical_compare(
+              origVersionStr, (*dirIter).path().filename().string()))
+          {
+            sdfDirs.insert((*dirIter));
+          }
+        }
+      }
+    }
+
+    // loop through sdf dirs and do the intermediate conversions
+    for (std::set<boost::filesystem::path>::iterator it = sdfDirs.begin();
+        it != sdfDirs.end(); ++it)
+    {
+      boost::filesystem::path convertFile
+         = boost::filesystem::operator/((*it).string(), origVersion+".convert");
+      if (boost::filesystem::exists(convertFile))
+      {
+        if (!xmlDoc.LoadFile(convertFile.string()))
+        {
+            gzerr << "Unable to load file[" << convertFile << "]\n";
+            return false;
+        }
+        ConvertImpl(elem, xmlDoc.FirstChildElement("convert"));
+        if ((*it).filename() == _toVersion)
+          return true;
+
+        origVersion = (*it).filename().string();
+        boost::replace_all(origVersion, ".", "_");
+      }
+      else
+      {
+        continue;
+      }
+    }
+    gzerr << "Unable to convert from SDF version " << origVersionStr
+        << " to " << _toVersion << "\n";
     return false;
   }
 
