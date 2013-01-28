@@ -380,6 +380,7 @@ void World::LogStep()
 //////////////////////////////////////////////////
 void World::Step()
 {
+  this->timer.Start();
   /// need this because ODE does not call dxReallocateWorldProcessContext()
   /// until dWorld.*Step
   /// Plugins that manipulate joints (and probably other properties) require
@@ -391,11 +392,17 @@ void World::Step()
     this->pluginsLoaded = true;
   }
 
+  common::Time pluginsLoadedTime = this->timer.GetElapsed();
+  gzerr << "pluginsLoaded [" << pluginsLoadedTime << "]\n";
+
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
     this->PublishWorldStats();
   }
+
+  common::Time pubStatsTime = this->timer.GetElapsed();
+  gzerr << "pubStatsTime [" << pubStatsTime << "]\n";
 
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
@@ -414,12 +421,17 @@ void World::Step()
   this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
                       this->sleepOffset * 0.99;
 
+  common::Time computeSleepTime = this->timer.GetElapsed();
+  gzerr << "computeSleepTime [" << computeSleepTime << "]\n";
+
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
   if (common::Time::GetWallTime() - this->prevStepWallTime + this->sleepOffset
          >= common::Time(this->physicsEngine->GetUpdatePeriod()))
   {
     boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
+    common::Time getMutexTime = this->timer.GetElapsed();
+    gzerr << "getMutexTime [" << getMutexTime << "]\n";
 
     this->prevStepWallTime = common::Time::GetWallTime();
 
@@ -428,6 +440,8 @@ void World::Step()
       // query timestep to allow dynamic time step size updates
       this->simTime += this->physicsEngine->GetStepTime();
       this->Update();
+      common::Time worldUpdateTime = this->timer.GetElapsed();
+      gzerr << "worldUpdateTime [" << worldUpdateTime << "]\n";
 
       if (this->IsPaused() && this->stepInc > 0)
         this->stepInc--;
@@ -437,6 +451,9 @@ void World::Step()
   }
 
   this->ProcessMessages();
+
+  common::Time processMessagesTime = this->timer.GetElapsed();
+  gzerr << "processMessagesTime [" << processMessagesTime << "]\n";
 }
 
 //////////////////////////////////////////////////

@@ -35,6 +35,7 @@
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Event.hh"
+#include "gazebo/common/Timer.hh"
 
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -629,6 +630,9 @@ namespace gazebo
 
       /// \brief The list of pose messages to output.
       private: msgs::Pose_V poseMsgs;
+
+      /// \brief For timing performance
+      private: common::Timer timer;
     };
     /// \}
   }
