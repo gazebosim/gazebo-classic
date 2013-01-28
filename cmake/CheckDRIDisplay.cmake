@@ -25,9 +25,9 @@ IF (GLXINFO)
   ENDIF ()
 ELSE ()
   EXECUTE_PROCESS(
-      COMMAND ${PROJECT_SOURCE_DIR}/tools/gl-test.py
       # RESULT_VARIABLE is store in a FAIL variable since the command
       # returns 0 if ok and 1 if error (inverse than cmake IF)
+      COMMAND ${PROJECT_SOURCE_DIR}/tools/gl-test.py
       RESULT_VARIABLE GL_FAIL_RESULT
       ERROR_QUIET
       OUTPUT_QUIET)
