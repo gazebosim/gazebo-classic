@@ -256,9 +256,13 @@ void Scene::Init()
 
   for (uint32_t i = 0; i < this->grids.size(); i++)
     this->grids[i]->Init();
-
-  this->SetSky();
-
+  
+  // Create Sky
+  if (this->sdf->HasElement("sky")) 
+  {
+    this->SetSky();
+  }
+  
   // Create Fog
   if (this->sdf->HasElement("fog"))
   {
@@ -2093,60 +2097,63 @@ void Scene::OnModelMsg(ConstModelPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 {
-  SkyX::VClouds::VClouds *vclouds =
-    this->skyx->getVCloudsManager()->getVClouds();
-
-  if (_msg->has_time())
+  if(this->skyx != NULL)
   {
-    Ogre::Vector3 t = this->skyxController->getTime();
-    t.x = math::clamp(_msg->time(), 0.0, 24.0);
-    this->skyxController->setTime(t);
+    SkyX::VClouds::VClouds *vclouds =
+      this->skyx->getVCloudsManager()->getVClouds();
+
+    if (_msg->has_time())
+    {
+      Ogre::Vector3 t = this->skyxController->getTime();
+      t.x = math::clamp(_msg->time(), 0.0, 24.0);
+      this->skyxController->setTime(t);
+    }
+
+    if (_msg->has_sunrise())
+    {
+      Ogre::Vector3 t = this->skyxController->getTime();
+      t.y = math::clamp(_msg->sunrise(), 0.0, 24.0);
+      this->skyxController->setTime(t);
+    }
+
+    if (_msg->has_sunset())
+    {
+      Ogre::Vector3 t = this->skyxController->getTime();
+      t.z = math::clamp(_msg->sunset(), 0.0, 24.0);
+      this->skyxController->setTime(t);
+    }
+
+    if (_msg->has_wind_speed())
+      vclouds->setWindSpeed(_msg->wind_speed());
+
+    if (_msg->has_wind_direction())
+      vclouds->setWindDirection(Ogre::Radian(_msg->wind_direction()));
+
+    if (_msg->has_cloud_ambient())
+    {
+      vclouds->setAmbientFactors(Ogre::Vector4(
+            _msg->cloud_ambient().r(),
+            _msg->cloud_ambient().g(),
+            _msg->cloud_ambient().b(),
+            _msg->cloud_ambient().a()));
+    }
+
+    if (_msg->has_humidity())
+    {
+      Ogre::Vector2 wheater = vclouds->getWheater();
+      vclouds->setWheater(math::clamp(_msg->humidity(), 0.0, 1.0),
+                          wheater.y, true);
+    }
+
+    if (_msg->has_mean_cloud_size())
+    {
+      Ogre::Vector2 wheater = vclouds->getWheater();
+      vclouds->setWheater(wheater.x,
+                          math::clamp(_msg->mean_cloud_size(), 0.0, 1.0), true);
+    }
+
+    this->skyx->update(0);
   }
-
-  if (_msg->has_sunrise())
-  {
-    Ogre::Vector3 t = this->skyxController->getTime();
-    t.y = math::clamp(_msg->sunrise(), 0.0, 24.0);
-    this->skyxController->setTime(t);
-  }
-
-  if (_msg->has_sunset())
-  {
-    Ogre::Vector3 t = this->skyxController->getTime();
-    t.z = math::clamp(_msg->sunset(), 0.0, 24.0);
-    this->skyxController->setTime(t);
-  }
-
-  if (_msg->has_wind_speed())
-    vclouds->setWindSpeed(_msg->wind_speed());
-
-  if (_msg->has_wind_direction())
-    vclouds->setWindDirection(Ogre::Radian(_msg->wind_direction()));
-
-  if (_msg->has_cloud_ambient())
-  {
-    vclouds->setAmbientFactors(Ogre::Vector4(
-          _msg->cloud_ambient().r(),
-          _msg->cloud_ambient().g(),
-          _msg->cloud_ambient().b(),
-          _msg->cloud_ambient().a()));
-  }
-
-  if (_msg->has_humidity())
-  {
-    Ogre::Vector2 wheater = vclouds->getWheater();
-    vclouds->setWheater(math::clamp(_msg->humidity(), 0.0, 1.0),
-                        wheater.y, true);
-  }
-
-  if (_msg->has_mean_cloud_size())
-  {
-    Ogre::Vector2 wheater = vclouds->getWheater();
-    vclouds->setWheater(wheater.x,
-                        math::clamp(_msg->mean_cloud_size(), 0.0, 1.0), true);
-  }
-
-  this->skyx->update(0);
 }
 
 /////////////////////////////////////////////////
