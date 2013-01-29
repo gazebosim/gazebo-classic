@@ -222,8 +222,7 @@ TEST_F(TransportTest, Bandwidth)
         printf("  Total[%6.2f B/s] Mean[%6.2f B] Messages[%d] Time[%4.2fs]\n",
                totalBw, meanSize, count, dt.Double());
 
-        EXPECT_GT(totalBw, 5000.0);
-        EXPECT_LT(totalBw, 30000.0);
+        EXPECT_GT(totalBw, 1000.0);
         g_bwBytes.clear();
         g_bwTime.clear();
 
