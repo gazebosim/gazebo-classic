@@ -1,36 +1,37 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include ( ${QT_USE_FILE} )
 
-link_directories(  
-  ${Boost_LIBRARY_DIRS} 
+link_directories(
+  ${Boost_LIBRARY_DIRS}
 )
 
 add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
+add_subdirectory(model_editor)
 
 set (sources
-  main.cc 
   ../gazebo.cc
   Actions.cc
-  Gui.cc 
-  MainWindow.cc 
-  RenderWidget.cc 
-  GLWidget.cc 
-  TimePanel.cc
-  InsertModelWidget.cc
-  ModelListWidget.cc
-  EntityMaker.cc
   BoxMaker.cc
-  SphereMaker.cc
   CylinderMaker.cc
-  LightMaker.cc
+  EntityMaker.cc
+  RenderWidget.cc
+  GLWidget.cc
+  Gui.cc
   GuiEvents.cc
-  ModelEditWidget.cc
+  InsertModelWidget.cc
+  JointControlWidget.cc
+  LightMaker.cc
+  main.cc
+  MainWindow.cc
   MeshMaker.cc
+  ModelEditWidget.cc
+  ModelListWidget.cc
   ModelMaker.cc
   ModelRightMenu.cc
-  JointControlWidget.cc
+  SphereMaker.cc
+  TimePanel.cc
   ToolsWidget.cc
   TopicSelector.cc
   viewers/ImageView.cc
@@ -42,15 +43,15 @@ set (sources
 
 set (qt_headers
   Actions.hh
-  MainWindow.hh 
-  RenderWidget.hh 
-  GLWidget.hh 
-  TimePanel.hh
+  GLWidget.hh
   InsertModelWidget.hh
+  JointControlWidget.hh
+  MainWindow.hh
   ModelListWidget.hh
   ModelEditWidget.hh
   ModelRightMenu.hh
-  JointControlWidget.hh
+  RenderWidget.hh
+  TimePanel.hh
   ToolsWidget.hh
   TopicSelector.hh
   viewers/ImageView.hh
@@ -60,18 +61,18 @@ set (qt_headers
 )
 
 set (headers
-  Gui.hh
-  EntityMaker.hh
+  qt.h
   BoxMaker.hh
-  SphereMaker.hh
   CylinderMaker.hh
-  MeshMaker.hh
-  ModelMaker.hh
+  EntityMaker.hh
+  Gui.hh
   GuiEvents.hh
   LightMaker.hh
-  qt.h
+  MeshMaker.hh
+  ModelMaker.hh
+  SphereMaker.hh
   viewers/ViewFactory.hh
-  )
+)
 
 set (resources resources.qrc)
 
@@ -87,10 +88,11 @@ target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_rendering
                                  gazebo_sensors
                                  gazebo_msgs
-                                 gzqtpropertybrowser 
-                                 ${QT_LIBRARIES} 
-                                 ${ogre_libraries} 
-                                 ${Boost_LIBRARIES} 
+                                 gazebo_model_editor
+                                 gzqtpropertybrowser
+                                 ${QT_LIBRARIES}
+                                 ${ogre_libraries}
+                                 ${Boost_LIBRARIES}
                                  pthread)
 
 target_link_libraries(gzclient  gazebo_common
@@ -99,13 +101,14 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_rendering
                                 gazebo_sensors
                                 gazebo_msgs
-                                gzqtpropertybrowser 
-                                ${QT_LIBRARIES} 
-                                ${ogre_libraries} 
-                                ${Boost_LIBRARIES} 
+                                gazebo_model_editor
+                                gzqtpropertybrowser
+                                ${QT_LIBRARIES}
+                                ${ogre_libraries}
+                                ${Boost_LIBRARIES}
                                 pthread)
 
- 
+
 
 add_definitions(${QT_DEFINITIONS})
 

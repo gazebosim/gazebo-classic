@@ -24,6 +24,31 @@ set (sources
   BulletHeightmapShape.cc
 )
 
+set (headers
+  bullet_inc.h
+  BulletBallJoint.hh
+  BulletBoxShape.hh
+  BulletCollision.hh
+  BulletCylinderShape.hh
+  BulletHeightmapShape.hh
+  BulletHinge2Joint.hh
+  BulletHingeJoint.hh
+  BulletJoint.hh
+  BulletLink.hh
+  BulletMotionState.hh
+  BulletMultiRayShape.hh
+  BulletPhysics.hh
+  BulletPlaneShape.hh
+  BulletRaySensor.hh
+  BulletRayShape.hh
+  BulletScrewJoint.hh
+  BulletSliderJoint.hh
+  BulletSphereShape.hh
+  BulletTrimeshShape.hh
+  BulletTypes.hh
+  BulletUniversalJoint.hh
+)
+
 set (gtest_sources
   BulletTypes_TEST.cc
 )
