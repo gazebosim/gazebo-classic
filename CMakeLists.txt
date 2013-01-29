@@ -164,6 +164,9 @@ else()
   message(STATUS "\nSSE4 disabled.\n")
 endif()
 
+# Check for DRI capable Display
+include (${gazebo_cmake_dir}/CheckDRIDisplay.cmake)
+
 set (CMAKE_C_FLAGS_RELEASE " -s -O3 -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release" FORCE)
 set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 
