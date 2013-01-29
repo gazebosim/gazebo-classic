@@ -50,7 +50,24 @@ DataLogger::DataLogger(QWidget *_parent)
 
   this->statusLabel = new QLabel("Ready");
   this->statusLabel->setFixedWidth(70);
+
   this->timeLabel = new QLabel("00:00:00.000");
+  this->timeLabel->setFixedWidth(85);
+
+  this->sizeLabel = new QLabel("0 MB");
+
+  // Create a QueuedConnection to set time. This is used for thread safety.
+  connect(this, SIGNAL(SetTime(QString)),
+          this->timeLabel, SLOT(setText(QString)), Qt::QueuedConnection);
+
+  // Create a QueuedConnection to set size. This is used for thread safety.
+  connect(this, SIGNAL(SetSize(QString)),
+          this->sizeLabel, SLOT(setText(QString)), Qt::QueuedConnection);
+
+  // Create a QueuedConnection to set filename. This is used for thread safety.
+  connect(this, SIGNAL(SetFilename(QString)),
+          this, SLOT(OnSetFilename(QString)), Qt::QueuedConnection);
+
 
   QHBoxLayout *timeLayout = new QHBoxLayout;
   timeLayout->addWidget(this->statusLabel);
@@ -59,7 +76,7 @@ DataLogger::DataLogger(QWidget *_parent)
 
   QHBoxLayout *sizeLayout = new QHBoxLayout;
   sizeLayout->addStretch(1);
-  sizeLayout->addWidget(new QLabel("(0 MB)"));
+  sizeLayout->addWidget(this->sizeLabel);
 
   QVBoxLayout *statusFrameLayout = new QVBoxLayout;
   statusFrameLayout->addLayout(timeLayout);
@@ -68,11 +85,21 @@ DataLogger::DataLogger(QWidget *_parent)
   statusFrame->setLayout(statusFrameLayout);
   // }
 
+  // Create the settings frame, where the user can input a save-to location
+  // {
   QFrame *settingFrame = new QFrame;
   settingFrame->setObjectName("dataLoggerSettingFrame");
-  QHBoxLayout *settingFrameLayout = new QHBoxLayout;
+  QVBoxLayout *settingFrameLayout = new QVBoxLayout;
+
+  QHBoxLayout *filenameLayout = new QHBoxLayout;
+  this->filenameEdit = new QLineEdit;
+  filenameLayout->addWidget(this->filenameEdit);
+  filenameLayout->addWidget(new QPushButton("..."));
+
   settingFrameLayout->addWidget(new QLabel("Settings"));
+  settingFrameLayout->addLayout(filenameLayout);
   settingFrame->setLayout(settingFrameLayout);
+  // }
 
   // Layout to position the record button vertically
   QVBoxLayout *buttonLayout = new QVBoxLayout;
@@ -158,7 +185,7 @@ void DataLogger::OnRecord(bool _toggle)
 void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 {
   // A new log status message has arrived, let's display the contents.
-  common::Time time = msgs::Convert(_msg->start());
+  common::Time time = msgs::Convert(_msg->sim_time());
   std::ostringstream stream;
 
   unsigned int hours = time.sec / 3600;
@@ -169,24 +196,42 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
   stream << std::setw(2) << std::setfill('0') << hours  << ":";
   stream << std::setw(2) << std::setfill('0') << min << ":";
   stream << std::setw(2) << std::setfill('0') << sec << ".";
-  stream << std::setw(2) << std::setfill('0') << msec;
+  stream << std::setw(3) << std::setfill('0') << msec;
 
-  this->timeLabel->setText(QString::fromStdString(stream.str()));
+  this->SetTime(QString::fromStdString(stream.str()));
 
-  stream.string("");
 
-  if (_msg.has_log_file())
+  stream.str("");
+
+  if (_msg->has_log_file())
   {
-    stream << _msg.log_file().size();
-    if (_msg.log_file().size_units() == msgs::LogStatus::BYTES)
+    this->SetFilename(QString::fromStdString(_msg->log_file().base_path()));
+
+    stream << std::fixed << std::setprecision(2) << _msg->log_file().size();
+    if (_msg->log_file().size_units() == msgs::LogStatus::LogFile::BYTES)
       stream << "B";
-    else if (_msg.log_file().size_units() == msgs::LogStatus::K_BYTES)
+    else if (_msg->log_file().size_units() == msgs::LogStatus::LogFile::K_BYTES)
       stream << "KB";
-    else if (_msg.log_file().size_units() == msgs::LogStatus::M_BYTES)
+    else if (_msg->log_file().size_units() == msgs::LogStatus::LogFile::M_BYTES)
       stream << "MB";
     else
       stream << "GB";
 
-    this->timeLabel->setText(QString::fromStdString(stream.str()));
+    this->SetSize(QString::fromStdString(stream.str()));
   }
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnSetFilename(QString _filename)
+{
+
+  std::string filename = _filename.toStdString();
+
+  if (getenv("HOME"))
+  {
+    std::string homeDir = getenv("HOME");
+    boost::replace_first(filename, homeDir, "~");
+  }
+
+  this->filenameEdit->setText(filename.c_str());
 }

@@ -298,6 +298,8 @@ void World::Init()
   this->prevStates[1].SetName(this->GetName());
 
   this->initialized = true;
+
+  this->updateInfo.worldName = this->GetName();
 }
 
 //////////////////////////////////////////////////
@@ -512,6 +514,9 @@ void World::Update()
   }
 
   event::Events::worldUpdateStart();
+  this->updateInfo.simTime = this->GetSimTime();
+  this->updateInfo.realTime = this->GetRealTime();
+  event::Events::worldUpdateBegin(this->updateInfo);
 
   // Update all the models
   (*this.*modelUpdateFunc)();
@@ -553,13 +558,9 @@ void World::Update()
     if (this->states.size() > 1000)
       this->states.pop_front();
 
-    msgs::LogStatus msg;
-    msgs::Set(msg.mutable_start(), this->GetSimTime());
-    msg.mutable_logfile()->set_logsize(100);
-    msg.mutable_logfile()->set_logsize_units(
-        msgs::LogStatus::LogFileSize::BYTES);
-
-    this->logStatusPub->Publish(msg);
+    /// Publish a log status message if the logger is running.
+    if (common::LogRecord::Instance()->GetRunning())
+      this->PublishLogStatus();
   }
 
   event::Events::worldUpdateEnd();
@@ -966,6 +967,9 @@ void World::OnLogControl(ConstLogControlPtr &_data)
       common::LogRecord::Instance()->Add(this->GetName(), "state.log",
           boost::bind(&World::OnLog, this, _1));
     }
+
+    // Output the new log status
+    this->PublishLogStatus();
   }
   else if (_data->has_stop() && _data->stop())
     common::LogRecord::Instance()->Stop();
@@ -1691,4 +1695,46 @@ void World::EnqueueMsg(msgs::Pose *_msg)
   // Add the pose message if no old pose messages were found.
   if (i >= this->poseMsgs.pose_size())
       this->poseMsgs.add_pose()->CopyFrom(*_msg);
+}
+
+//////////////////////////////////////////////////
+void World::PublishLogStatus()
+{
+  msgs::LogStatus msg;
+  unsigned int size = 0;
+
+  // Set the time of the status message
+  msgs::Set(msg.mutable_sim_time(),
+            common::LogRecord::Instance()->GetRunTime());
+
+  // Set the log recording base path name
+  msg.mutable_log_file()->set_base_path(
+      common::LogRecord::Instance()->GetBasePath());
+
+  // Get the full name of the log file
+  msg.mutable_log_file()->set_full_path(
+    common::LogRecord::Instance()->GetFilename(this->GetName()));
+
+  // Get the size of the log file
+  size = common::LogRecord::Instance()->GetFileSize(this->GetName());
+
+  if (size < 1000)
+    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::BYTES);
+  else if (size < 1e6)
+  {
+    msg.mutable_log_file()->set_size(size / 1.0e3);
+    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::K_BYTES);
+  }
+  else if (size < 1e9)
+  {
+    msg.mutable_log_file()->set_size(size / 1.0e6);
+    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::M_BYTES);
+  }
+  else
+  {
+    msg.mutable_log_file()->set_size(size / 1.0e9);
+    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::G_BYTES);
+  }
+
+  this->logStatusPub->Publish(msg);
 }

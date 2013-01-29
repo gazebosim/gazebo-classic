@@ -135,9 +135,9 @@ void TopicView::Update()
     if (bandwidth < 1000)
       stream << bandwidth << " B/s";
     else if (bandwidth < 1000000)
-      stream << bandwidth / 1024.0f << " KB/s";
+      stream << bandwidth / 1.0e3 << " KB/s";
     else
-      stream << bandwidth/1.049e6 << " MB/s";
+      stream << bandwidth/1.0e6 << " MB/s";
 
     this->bandwidthEdit->setText(tr(stream.str().c_str()));
   }

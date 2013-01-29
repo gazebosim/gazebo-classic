@@ -34,6 +34,7 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
 
 #include "gazebo/physics/Base.hh"
@@ -438,6 +439,9 @@ namespace gazebo
       /// \brief Publish the world stats message.
       private: void PublishWorldStats();
 
+      /// \brief Publish log status message.
+      private: void PublishLogStatus();
+
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
 
@@ -639,6 +643,8 @@ namespace gazebo
 
       /// \brief The list of pose messages to output.
       private: msgs::Pose_V poseMsgs;
+
+      private: common::UpdateInfo updateInfo;
     };
     /// \}
   }

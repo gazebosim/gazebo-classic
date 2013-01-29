@@ -41,8 +41,23 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~DataLogger();
 
+      /// \brief A signal used to set the time label.
+      /// \param[in] _string String representation of time.
+      signals: void SetTime(QString _string);
+
+      /// \brief A signal used to set the size label.
+      /// \param[in] _string String representation of size.
+      signals: void SetSize(QString _string);
+
+      /// \brief A signal used to set the filename.
+      /// \param[in] _string The log filename
+      signals: void SetFilename(QString _string);
+
       /// \brief QT callback for the record button.
       private slots: void OnRecord(bool _toggle);
+
+      /// \brief QT callback for setting the filename.
+      private slots: void OnSetFilename(QString _string);
 
       /// \brief Callback for log status messages.
       /// \param[in] _msg Log status message.
@@ -71,6 +86,9 @@ namespace gazebo
 
       /// \brief Label to display status information.
       private: QLabel *statusLabel;
+
+      /// \brief Name of the log file path
+      private: QLineEdit *filenameEdit;
 
       private: bool recording;
       private: bool paused;

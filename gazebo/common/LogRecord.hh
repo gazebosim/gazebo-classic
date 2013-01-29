@@ -32,8 +32,9 @@
 #include <boost/archive/iterators/ostream_iterator.hpp>
 #include <boost/filesystem.hpp>
 
-#include "common/Event.hh"
-#include "common/SingletonT.hh"
+#include "gazebo/common/UpdateInfo.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/SingletonT.hh"
 
 #define GZ_LOG_VERSION "1.0"
 
@@ -116,6 +117,10 @@ namespace gazebo
       /// \sa LogRecord::SetPaused
       public: bool GetPaused() const;
 
+      /// \brief Get whether logging is running.
+      /// \return True if logging has been started.
+      public: bool GetRunning() const;
+
       /// \brief Start the logger.
       /// \param[in] _encoding The type of encoding (txt, or bz2).
       public: bool Start(const std::string &_encoding="bz2");
@@ -125,11 +130,29 @@ namespace gazebo
       /// bzip2 compressed data with Base64 encoding.
       public: const std::string &GetEncoding() const;
 
+      /// \brief Get the filename for a log object.
+      /// \param[in] _name Name of the log object.
+      /// \return Filename, empty string if not found.
+      public: std::string GetFilename(const std::string &_name) const;
+
+      /// \brief Get the file size for a log object.
+      /// \param[in] _name Name of the log object.
+      /// \return Size in bytes.
+      public: unsigned int GetFileSize(const std::string &_name) const;
+
+      /// \brief Get the base path for a log recording.
+      /// \return Path for log recording.
+      public: std::string GetBasePath() const;
+
+      /// \brief Get the run time in sim time.
+      /// \return Run sim time.
+      public: common::Time GetRunTime() const;
+
       /// \brief Update the log files
       ///
       /// Captures the current state of all registered entities, and outputs
       /// the data to their respective log files.
-      private: void Update();
+      private: void Update(const common::UpdateInfo &_info);
 
       /// \brief Run the Write loop.
       private: void Run();
@@ -172,6 +195,10 @@ namespace gazebo
         /// to the constructor.
         /// \return The relative filename.
         public: std::string GetRelativeFilename() const;
+
+        /// \brief Get the complete filename.
+        /// \return The complete filename.
+        public: std::string GetCompleteFilename() const;
 
         /// \brief Pointer to the log record parent.
         public: LogRecord *parent;
@@ -242,6 +269,15 @@ namespace gazebo
 
       /// \brief True to pause recording.
       private: bool paused;
+
+      /// \brief Used to indicate the first update callback.
+      private: bool firstUpdate;
+
+      /// \brief Start simulation time.
+      private: common::Time startTime;
+
+      /// \brief Current simulation time.
+      private: common::Time currTime;
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogRecord>;

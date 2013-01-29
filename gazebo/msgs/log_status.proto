@@ -17,10 +17,13 @@ message LogStatus
       M_BYTES = 3;
       G_BYTES = 4;
     }
-    optional float size        = 1;
-    optional Units size_units  = 2;
+
+    optional string base_path  = 1;
+    optional string full_path  = 2;
+    optional float size        = 3;
+    optional Units size_units  = 4;
   }
 
-  optional Time start           = 1;
+  optional Time sim_time     = 1;
   optional LogFile log_file  = 2;
 }

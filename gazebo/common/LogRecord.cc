@@ -134,8 +134,8 @@ bool LogRecord::Start(const std::string &_encoding)
   if (!this->updateConnection)
   {
     this->updateConnection =
-      event::Events::ConnectWorldUpdateStart(
-          boost::bind(&LogRecord::Update, this));
+      event::Events::ConnectWorldUpdateBegin(
+          boost::bind(&LogRecord::Update, this, _1));
   }
   else
   {
@@ -154,6 +154,7 @@ bool LogRecord::Start(const std::string &_encoding)
 
   this->running = true;
   this->paused = false;
+  this->firstUpdate = true;
 
   return true;
 }
@@ -181,7 +182,7 @@ void LogRecord::Stop()
 
   // Disconnect from the world update signale
   if (this->updateConnection)
-    event::Events::DisconnectWorldUpdateStart(this->updateConnection);
+    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
   this->updateConnection.reset();
 
   this->ClearLogs();
@@ -215,6 +216,12 @@ void LogRecord::SetPaused(bool _paused)
 bool LogRecord::GetPaused() const
 {
   return this->paused;
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::GetRunning() const
+{
+  return this->running;
 }
 
 //////////////////////////////////////////////////
@@ -283,10 +290,54 @@ bool LogRecord::Remove(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Update()
+std::string LogRecord::GetFilename(const std::string &_name) const
+{
+  std::string result;
+
+  Log_M::const_iterator iter = this->logs.find(_name);
+  if (iter != this->logs.end())
+  {
+    /// \TODO GZ_ASSERT(iter->second);
+    result = iter->second->GetCompleteFilename();
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+unsigned int LogRecord::GetFileSize(const std::string &_name) const
+{
+  unsigned int result = 0;
+
+  // Get the filename of the specified log object;
+  std::string filename = this->GetFilename(_name);
+
+  if (!filename.empty())
+  {
+    // Get the size of the file
+    if (!filename.empty() && boost::filesystem::exists(filename))
+      result = boost::filesystem::file_size(filename);
+  }
+
+  return result;
+}
+//////////////////////////////////////////////////
+std::string LogRecord::GetBasePath() const
+{
+  return this->logBasePath.string();
+}
+
+//////////////////////////////////////////////////
+void LogRecord::Update(const common::UpdateInfo &_info)
 {
   if (!this->paused)
   {
+    if (this->firstUpdate)
+    {
+      this->firstUpdate = false;
+      this->startTime = _info.simeTime;
+    }
+
     {
       boost::mutex::scoped_lock lock(this->writeMutex);
 
@@ -297,8 +348,11 @@ void LogRecord::Update()
         this->updateIter->second->Update();
       }
     }
+
     // Signal that new data is available.
     this->dataAvailableCondition.notify_one();
+
+    this->currTime = _info.simTime;
   }
 }
 
@@ -327,6 +381,12 @@ void LogRecord::Run()
     // Throttle the write loop.
     common::Time::MSleep(2000);
   }
+}
+
+//////////////////////////////////////////////////
+common::Time LogRecord::GetRunTime() const
+{
+  return common::Time();
 }
 
 //////////////////////////////////////////////////
@@ -413,6 +473,12 @@ void LogRecord::Log::ClearBuffer()
 std::string LogRecord::Log::GetRelativeFilename() const
 {
   return this->relativeFilename;
+}
+
+//////////////////////////////////////////////////
+std::string LogRecord::Log::GetCompleteFilename() const
+{
+  return this->completePath.string();
 }
 
 //////////////////////////////////////////////////
