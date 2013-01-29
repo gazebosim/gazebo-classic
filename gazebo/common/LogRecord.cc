@@ -144,6 +144,12 @@ void LogRecord::Start(const std::string &_encoding)
 }
 
 //////////////////////////////////////////////////
+bool LogRecord::GetRunning() const
+{
+  return !this->stop;
+}
+
+//////////////////////////////////////////////////
 const std::string &LogRecord::GetEncoding() const
 {
   return this->encoding;
