@@ -761,8 +761,8 @@ TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent,
     const std::string &_id)
 {
   std::string id = _id;
-  if (id.find("#") != std::string::npos)
-    id.erase(id.find("#"), 1);
+  if (id.length() > 0 && id[0] == '#')
+    id.erase(0, 1);
 
   if ((id.empty() && _parent->Value() == _name) ||
       (_parent->Attribute("id") && _parent->Attribute("id") == id) ||
@@ -1093,29 +1093,34 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
     TiXmlElement *imageXml = NULL;
     std::string textureName =
       typeElem->FirstChildElement("texture")->Attribute("texture");
-
-    TiXmlElement *textureXml = this->GetElementId("newparam", textureName);
-    if (textureXml)
+    imageXml = this->GetElementId("image", textureName);
+    if (!imageXml)
     {
-      if (std::string(textureXml->Value()) == "image")
+      TiXmlElement *textureXml = this->GetElementId("newparam", textureName);
+      if (textureXml)
       {
-        imageXml = textureXml;
-      }
-      else
-      {
-        TiXmlElement *sampler = textureXml->FirstChildElement("sampler2D");
-        if (sampler)
+        if (std::string(textureXml->Value()) == "image")
         {
-          std::string sourceName =
-            sampler->FirstChildElement("source")->GetText();
-          TiXmlElement *sourceXml = this->GetElementId("newparam", sourceName);
-          if (sourceXml)
+          imageXml = textureXml;
+        }
+        else
+        {
+          TiXmlElement *sampler = textureXml->FirstChildElement("sampler2D");
+          if (sampler)
           {
-            TiXmlElement *surfaceXml = sourceXml->FirstChildElement("surface");
-            if (surfaceXml && surfaceXml->FirstChildElement("init_from"))
+            std::string sourceName =
+              sampler->FirstChildElement("source")->GetText();
+            TiXmlElement *sourceXml =
+                this->GetElementId("newparam", sourceName);
+            if (sourceXml)
             {
-              imageXml = this->GetElementId("image",
-                  surfaceXml->FirstChildElement("init_from")->GetText());
+              TiXmlElement *surfaceXml
+                  = sourceXml->FirstChildElement("surface");
+              if (surfaceXml && surfaceXml->FirstChildElement("init_from"))
+              {
+                imageXml = this->GetElementId("image",
+                    surfaceXml->FirstChildElement("init_from")->GetText());
+              }
             }
           }
         }
