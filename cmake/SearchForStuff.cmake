@@ -293,6 +293,26 @@ if (PKG_CONFIG_FOUND)
          "Player libraries")
   endif ()
 
+  ########################################
+  # Find GNU Triangulation Surface Library
+  pkg_check_modules(gts gts)
+  if (gts_FOUND)
+    message (STATUS "Looking for GTS - found")
+    set (HAVE_GTS TRUE)
+  else ()
+    set (HAVE_GTS FALSE)
+    BUILD_WARNING ("GNU Triangulation Surface library not found - Gazebo will not have CSG support.")
+  endif ()
+
+  #################################################
+  # Find bullet
+  pkg_check_modules(BULLET bullet)
+  if (BULLET_FOUND)
+    set (HAVE_BULLET TRUE)
+  else()
+    set (HAVE_BULLET FALSE)
+  endif()
+
 else (PKG_CONFIG_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
   BUILD_ERROR ("Error: pkg-config not found")
@@ -388,12 +408,12 @@ ENDIF (NOT HAVE_CONSOLE_BRIDGE)
 # Find avformat and avcodec
 IF (HAVE_FFMPEG)
   SET (libavformat_search_path
-    /usr/include /usr/include/libavformat /usr/local/include 
+    /usr/include /usr/include/libavformat /usr/local/include
     /usr/local/include/libavformat /usr/include/ffmpeg
   )
 
   SET (libavcodec_search_path
-    /usr/include /usr/include/libavcodec /usr/local/include 
+    /usr/include /usr/include/libavcodec /usr/local/include
     /usr/local/include/libavcodec /usr/include/ffmpeg
   )
 
