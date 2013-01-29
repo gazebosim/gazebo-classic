@@ -53,31 +53,44 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
 {
   HingeJoint<BulletJoint>::Attach(_one, _two);
 
+  // Cast to BulletLink
   BulletLinkPtr bulletChildLink =
     boost::shared_static_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
     boost::shared_static_cast<BulletLink>(this->parentLink);
 
+  // Get axis from sdf.
   sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
   math::Vector3 axis = axisElem->GetValueVector3("xyz");
 
+  // Local variables used to compute pivots and axes in body-fixed frames
+  // for the parent and child links.
   math::Vector3 pivotA, pivotB, axisA, axisB;
   math::Pose pose;
 
-  // Compute the pivot point, based on the anchorPos
+  // Initialize pivot[AB] to anchorPos, which is expressed in the
+  // world coordinate frame.
   pivotA = this->anchorPos;
   pivotB = this->anchorPos;
+  // Check if parentLink exists. If not, the parent will be the world.
   if (this->parentLink)
   {
+    // Compute relative pose between joint anchor and CoG of parent link.
     pose = this->parentLink->GetWorldCoGPose();
+    // Subtract CoG position from anchor position, both in world frame.
     pivotA -= pose.pos;
+    // Rotate pivot offset and axis into body-fixed frame of parent.
     pivotA = pose.rot.RotateVectorReverse(pivotA);
     axisA = pose.rot.RotateVectorReverse(axis);
   }
+  // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
   {
+    // Compute relative pose between joint anchor and CoG of child link.
     pose = this->childLink->GetWorldCoGPose();
+    // Subtract CoG position from anchor position, both in world frame.
     pivotB -= pose.pos;
+    // Rotate pivot offset and axis into body-fixed frame of child.
     pivotB = pose.rot.RotateVectorReverse(pivotB);
     axisB = pose.rot.RotateVectorReverse(axis);
   }
@@ -85,17 +98,19 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   axisA = axisA.Round();
   axisB = axisB.Round();
 
-
+  // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
     this->bulletHinge = new btHingeConstraint(
         *(bulletParentLink->GetBulletLink()),
         *(bulletChildLink->GetBulletLink()),
-        btVector3(pivotA.x, pivotA.y, pivotA.z),
-        btVector3(pivotB.x, pivotB.y, pivotB.z),
-        btVector3(axisA.x, axisA.y, axisA.z),
-        btVector3(axisB.x, axisB.y, axisB.z));
+        BulletTypes::ConvertVector3(pivotA),
+        BulletTypes::ConvertVector3(pivotB),
+        BulletTypes::ConvertVector3(axisA),
+        BulletTypes::ConvertVector3(axisB));
   }
+  // If only the child exists, then create a joint between the child
+  // and the world.
   else if (bulletChildLink)
   {
     this->bulletHinge = new btHingeConstraint(
@@ -103,6 +118,8 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
         btVector3(pivotB.x, pivotB.y, pivotB.z),
         btVector3(axisB.x, axisB.y, axisB.z));
   }
+  // If only the parent exists, then create a joint between the parent
+  // and the world.
   else if (bulletParentLink)
   {
     this->bulletHinge = new btHingeConstraint(
@@ -110,17 +127,24 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
         btVector3(pivotA.x, pivotA.y, pivotA.z),
         btVector3(axisA.x, axisA.y, axisA.z));
   }
+  // Throw an error if no links are given.
   else
   {
+    // TODO eliminate following line when Issue #447 is resolved.
     gzerr << "joint without links\n";
     gzthrow("joint without links\n");
   }
 
+  // Give parent class BulletJoint a pointer to this constraint.
   this->constraint = this->bulletHinge;
 
+  // Set angleOffset based on hinge angle at joint creation.
+  // GetAngleImpl will report angles relative to this offset.
   this->angleOffset = this->bulletHinge->getHingeAngle();
-  // double angle = this->bulletHinge->getHingeAngle();
+
+  // TODO: apply joint limits here.
   // this->bulletHinge->setLimit(angle - .4, angle + .4);
+
   // Add the joint to the world
   this->world->addConstraint(this->bulletHinge, true);
 
@@ -289,12 +313,12 @@ math::Vector3 BulletHingeJoint::GetGlobalAxis(int /*_index*/) const
   math::Vector3 result;
   if (this->bulletHinge)
   {
+    // I have not verified the following math, though I based it on internal
+    // bullet code at line 250 of btHingeConstraint.cpp
     btVector3 vec =
       bulletHinge->getRigidBodyA().getCenterOfMassTransform().getBasis() *
       bulletHinge->getFrameOffsetA().getBasis().getColumn(2);
-    result.x = vec.getX();
-    result.y = vec.getY();
-    result.z = vec.getZ();
+    result = BulletTypes::ConvertVector3(vec);
   }
   else
     gzwarn << "bulletHinge does not exist, returning fake axis\n";
