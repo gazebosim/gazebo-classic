@@ -236,6 +236,13 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
         manifest /= "manifest.xml";
       }
 
+      if (!boost::filesystem::exists(manifest))
+      {
+        gzerr << "model.config file is missing in directory["
+              << fullPath << "]\n";
+        continue;
+      }
+
       TiXmlDocument xmlDoc;
       if (xmlDoc.LoadFile(manifest.string()))
       {
