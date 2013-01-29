@@ -39,7 +39,7 @@ TEST(SdfUpdate, UpdateAttribute)
   stream << "<sdf version='1.3'>"
          << "<model name='test_model'>"
          << "  <pose>0 1 2  0 0 0</pose>"
-         << "  <static>false</true>"
+         << "  <static>false</static>"
          << "</model>"
          << "</sdf>";
   sdf::SDF sdfParsed;
@@ -85,7 +85,7 @@ TEST(SdfUpdate, UpdateElement)
   stream << "<sdf version='1.3'>"
          << "<model name='test_model'>"
          << "  <pose>0 1 2  0 0 0</pose>"
-         << "  <static>false</true>"
+         << "  <static>false</static>"
          << "</model>"
          << "</sdf>";
   sdf::SDF sdfParsed;
@@ -144,15 +144,15 @@ TEST(SdfUpdate, ElementRemoveFromParent)
   stream << "<sdf version='1.3'>"
          << "<model name='model1'>"
          << "  <pose>0 1 2  0 0 0</pose>"
-         << "  <static>false</true>"
+         << "  <static>false</static>"
          << "</model>"
          << "<model name='model2'>"
          << "  <pose>0 1 2  0 0 0</pose>"
-         << "  <static>false</true>"
+         << "  <static>false</static>"
          << "</model>"
          << "<model name='model3'>"
          << "  <pose>0 1 2  0 0 0</pose>"
-         << "  <static>false</true>"
+         << "  <static>false</static>"
          << "</model>"
          << "</sdf>";
   sdf::SDF sdfParsed;
