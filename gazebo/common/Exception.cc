@@ -27,6 +27,10 @@ using namespace gazebo;
 using namespace common;
 using namespace std;
 
+//////////////////////////////////////////////////
+Exception::Exception()
+{
+}
 
 //////////////////////////////////////////////////
 Exception::Exception(const char *_file, int _line, std::string _msg)
@@ -60,4 +64,40 @@ std::string Exception::GetErrorFile() const
 std::string Exception::GetErrorStr() const
 {
   return this->str;
+}
+
+//////////////////////////////////////////////////
+InternalError::InternalError()
+{
+}
+
+//////////////////////////////////////////////////
+InternalError::InternalError(const char *_file, int _line,
+                             const std::string _msg) :
+  Exception(_file, _line, _msg)
+{
+}
+
+//////////////////////////////////////////////////
+InternalError::~InternalError()
+{
+}
+
+//////////////////////////////////////////////////
+AssertionInternalError::AssertionInternalError(
+    const char * _file, int _line,
+    const std::string _expr,
+    const std::string _function,
+    const std::string _msg) :
+  InternalError(_file, _line,
+      "GAZEBO ASSERTION                     \n" +
+      _msg                               + "\n" +
+      "In function       : " + _function + "\n" +
+      "Assert expression : " + _expr     + "\n")
+{
+}
+
+//////////////////////////////////////////////////
+AssertionInternalError::~AssertionInternalError()
+{
 }

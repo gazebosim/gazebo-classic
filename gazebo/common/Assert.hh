@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,13 @@
  * limitations under the License.
  *
 */
+#ifndef _ASSERT_HH_
+#define _ASSERT_HH_ 1
 
-#ifndef _BULLET_INC_H_
-#define _BULLET_INC_H_
+#include <boost/assert.hpp>
 
-// This disables warning messages for ODE
-#pragma GCC system_header
-#include <btBulletDynamicsCommon.h>
-#include <btBulletCollisionCommon.h>
-#include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
+/// \brief This macro define the standard way of launching an exception
+/// inside gazebo.
+#define GZ_ASSERT(_expr, _msg) BOOST_ASSERT_MSG(_expr, _msg)
 
 #endif

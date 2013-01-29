@@ -300,6 +300,9 @@ void World::Init()
   this->initialized = true;
 
   this->updateInfo.worldName = this->GetName();
+
+  // Mark the world initialization
+  gzlog << "World::Init" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -400,6 +403,7 @@ void World::LogStep()
 
       WorldState state = WorldState(shared_from_this()) + this->logPlayState;
       this->SetState(state);
+
       this->Update();
     }
 

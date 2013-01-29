@@ -1048,6 +1048,9 @@ void Element::Update()
   {
     (*iter)->Update();
   }
+
+  if (this->value)
+    this->value->Update();
 }
 
 /////////////////////////////////////////////////

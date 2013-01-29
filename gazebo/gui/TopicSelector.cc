@@ -132,6 +132,8 @@ void TopicSelector::OnOkay()
 /////////////////////////////////////////////////
 void TopicSelector::OnCancel()
 {
+  this->msgType.clear();
+  this->topicName.clear();
   this->done(QDialog::Rejected);
 }
 

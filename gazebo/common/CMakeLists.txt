@@ -1,6 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources 
+  Assert.cc
   Animation.cc
   BVHLoader.cc
   ColladaLoader.cc
@@ -31,6 +32,7 @@ set (sources
 )
 
 set (headers 
+  Assert.hh
   Animation.hh
   BVHLoader.hh
   ColladaLoader.hh
@@ -62,7 +64,13 @@ set (headers
   Timer.hh
   UpdateInfo.hh
   Video.hh
-  )
+ )
+
+set (gtest_sources
+  Console_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
 foreach (hdr ${headers})
