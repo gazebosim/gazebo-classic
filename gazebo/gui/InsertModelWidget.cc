@@ -237,7 +237,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
       // exist, try to get the deprecated version.
       if (boost::filesystem::exists(manifest / GZ_MODEL_MANIFEST_FILENAME))
         manifest /= GZ_MODEL_MANIFEST_FILENAME;
-      else
+      else if (boost::filesystem::exists(manifest / "manifest.xml"))
       {
         gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
           << "Please rename manifest.xml to "
@@ -247,7 +247,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
         manifest /= "manifest.xml";
       }
 
-      if (!boost::filesystem::exists(manifest))
+      if (!boost::filesystem::exists(manifest) || manifest == fullPath)
       {
         gzerr << "model.config file is missing in directory["
               << fullPath << "]\n";
