@@ -1037,7 +1037,7 @@ void Element::RemoveFromParent()
 {
   if (this->parent)
   {
-    ElementPtr_V::const_iterator iter;
+    ElementPtr_V::iterator iter;
     iter = std::find(this->parent->elements.begin(),
         this->parent->elements.end(), shared_from_this());
 
