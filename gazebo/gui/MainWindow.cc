@@ -314,7 +314,7 @@ void MainWindow::Save()
 
       cameraElem->GetElement("pose")->Set(cam->GetWorldPose());
       cameraElem->GetElement("view_controller")->Set(
-        cam->GetViewControllerTypeString());
+          cam->GetViewControllerTypeString());
       // TODO: export track_visual properties as well.
       msgData = sdf_parsed.root->ToString("");
     }

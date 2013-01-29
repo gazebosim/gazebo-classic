@@ -21,11 +21,12 @@
 
 #include <sstream>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "common/Events.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Events.hh"
 
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -617,4 +618,11 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+std::string UserCamera::GetViewControllerTypeString()
+{
+  GZ_ASSERT(this->viewController, "ViewController != NULL");
+  return this->viewController->GetTypeString();
 }

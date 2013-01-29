@@ -335,7 +335,7 @@ void LogRecord::Update(const common::UpdateInfo &_info)
     if (this->firstUpdate)
     {
       this->firstUpdate = false;
-      this->startTime = _info.simeTime;
+      this->startTime = _info.simTime;
     }
 
     {
