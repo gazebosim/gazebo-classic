@@ -191,6 +191,10 @@ namespace gazebo
         /// \brief Clear the data buffer.
         public: void ClearBuffer();
 
+        /// \brief Get the byte size of the buffer.
+        /// \return Buffer byte size.
+        public: unsigned int GetBufferSize();
+
         /// \brief Get the relative filename. This is the filename passed
         /// to the constructor.
         /// \return The relative filename.
@@ -242,7 +246,7 @@ namespace gazebo
       private: boost::thread *writeThread;
 
       /// \brief Mutext to protect writing.
-      private: boost::mutex writeMutex;
+      private: mutable boost::mutex writeMutex;
 
       /// \brief Mutex to protect logging control.
       private: boost::mutex controlMutex;

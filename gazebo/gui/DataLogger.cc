@@ -157,7 +157,7 @@ void DataLogger::OnRecord(bool _toggle)
   if (_toggle)
   {
     // Switch the icon
-    this->recordButton->setIcon(QPixmap(":/images/record_pause.png"));
+    this->recordButton->setIcon(QPixmap(":/images/record_stop.png"));
 
     this->statusLabel->setText("Recording");
 

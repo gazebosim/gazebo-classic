@@ -23,6 +23,7 @@
 
 #include "gazebo/math/Rand.hh"
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
@@ -155,6 +156,8 @@ bool LogRecord::Start(const std::string &_encoding)
   this->running = true;
   this->paused = false;
   this->firstUpdate = true;
+
+  this->startTime = this->currTime = common::Time();
 
   return true;
 }
@@ -319,6 +322,16 @@ unsigned int LogRecord::GetFileSize(const std::string &_name) const
       result = boost::filesystem::file_size(filename);
   }
 
+  {
+    boost::mutex::scoped_lock lock(this->writeMutex);
+    for (Log_M::const_iterator iter = this->logs.begin();
+         iter != this->logsEnd; ++iter)
+    {
+      GZ_ASSERT(iter->second, "Log object is NULL");
+      result += iter->second->GetBufferSize();
+    }
+  }
+
   return result;
 }
 //////////////////////////////////////////////////
@@ -386,7 +399,7 @@ void LogRecord::Run()
 //////////////////////////////////////////////////
 common::Time LogRecord::GetRunTime() const
 {
-  return common::Time();
+  return this->currTime - this->startTime;
 }
 
 //////////////////////////////////////////////////
@@ -467,6 +480,12 @@ void LogRecord::Log::Update()
 void LogRecord::Log::ClearBuffer()
 {
   this->buffer.clear();
+}
+
+//////////////////////////////////////////////////
+unsigned int LogRecord::Log::GetBufferSize()
+{
+  return this->buffer.size();
 }
 
 //////////////////////////////////////////////////
