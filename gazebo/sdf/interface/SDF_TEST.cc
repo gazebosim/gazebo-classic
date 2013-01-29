@@ -135,6 +135,59 @@ TEST(SdfUpdate, UpdateElement)
   }
 }
 
+////////////////////////////////////////////////////
+/// Ensure that SDF::Element::RemoveFromParent is working
+TEST(SdfUpdate, ElementRemoveFromParent)
+{
+  // Set up a simple sdf model file
+  std::ostringstream stream;
+  stream << "<sdf version='1.3'>"
+         << "<model name='model1'>"
+         << "  <pose>0 1 2  0 0 0</pose>"
+         << "  <static>false</true>"
+         << "</model>"
+         << "<model name='model2'>"
+         << "  <pose>0 1 2  0 0 0</pose>"
+         << "  <static>false</true>"
+         << "</model>"
+         << "<model name='model3'>"
+         << "  <pose>0 1 2  0 0 0</pose>"
+         << "  <static>false</true>"
+         << "</model>"
+         << "</sdf>";
+  sdf::SDF sdfParsed;
+  sdfParsed.SetFromString(stream.str());
+
+  // Verify correct parsing
+  EXPECT_TRUE(sdfParsed.root->HasElement("model"));
+  sdf::ElementPtr modelElem = sdfParsed.root->GetElement("model");
+
+  // Select the second model named 'model2'
+  modelElem = modelElem.GetNextElement("model");
+  EXPECT_TRUE(modelElem);
+  EXPECT_TRUE(modelElem->HasAttribute("name"));
+  EXPECT_EQ(modelElem->GetValueString("name"), "model2");
+
+  // Remove model2
+  modelElem.RemoveFromParent();
+
+  // Get first model element again
+  sdf::ElementPtr modelElem = sdfParsed.root->GetElement("model");
+  // Check name == model1
+  EXPECT_TRUE(modelElem->HasAttribute("name"));
+  EXPECT_EQ(modelElem->GetValueString("name"), "model1");
+
+  // Get next model element
+  sdf::ElementPtr modelElem = modelElem->GetNextElement("model");
+  // Check name == model3
+  EXPECT_TRUE(modelElem->HasAttribute("name"));
+  EXPECT_EQ(modelElem->GetValueString("name"), "model3");
+
+  // Try to get another model element
+  sdf::ElementPtr modelElem = modelElem->GetNextElement("model");
+  EXPECT_FALSE(modelElem);
+}
+
 /////////////////////////////////////////////////
 /// Main
 int main(int argc, char **argv)
