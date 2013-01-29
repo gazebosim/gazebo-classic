@@ -1107,12 +1107,10 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
         {
           std::string sourceName =
             sampler->FirstChildElement("source")->GetText();
-          TiXmlElement *sourceXml =
-              this->GetElementId("newparam", sourceName);
+          TiXmlElement *sourceXml = this->GetElementId("newparam", sourceName);
           if (sourceXml)
           {
-            TiXmlElement *surfaceXml
-                = sourceXml->FirstChildElement("surface");
+            TiXmlElement *surfaceXml = sourceXml->FirstChildElement("surface");
             if (surfaceXml && surfaceXml->FirstChildElement("init_from"))
             {
               imageXml = this->GetElementId("image",
