@@ -193,7 +193,7 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->statPub =
-    this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 1);
+    this->node->Advertise<msgs::WorldStatistics>("~/world_stats");
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
@@ -971,14 +971,18 @@ void World::OnLogControl(ConstLogControlPtr &_data)
       common::LogRecord::Instance()->Add(this->GetName(), "state.log",
           boost::bind(&World::OnLog, this, _1));
     }
-
-    // Output the new log status
-    this->PublishLogStatus();
   }
   else if (_data->has_stop() && _data->stop())
+  {
     common::LogRecord::Instance()->Stop();
+  }
   else if (_data->has_paused())
+  {
     common::LogRecord::Instance()->SetPaused(_data->paused());
+  }
+
+  // Output the new log status
+  this->PublishLogStatus();
 }
 
 //////////////////////////////////////////////////

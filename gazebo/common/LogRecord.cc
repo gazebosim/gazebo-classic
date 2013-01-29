@@ -47,6 +47,7 @@ LogRecord::LogRecord()
   this->running = false;
   this->paused = false;
   this->initialized = false;
+  this->stopThread = false;
 
   // Get the user's home directory
   // \todo getenv is not portable, and there is no generic cross-platform
@@ -67,7 +68,7 @@ LogRecord::LogRecord()
 LogRecord::~LogRecord()
 {
   // Stop the write thread.
-  this->Stop();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -86,6 +87,7 @@ bool LogRecord::Init(const std::string &_subdir)
   this->initialized = true;
   this->running = false;
   this->paused = false;
+  this->stopThread = false;
 
   return true;
 }
@@ -144,14 +146,9 @@ bool LogRecord::Start(const std::string &_encoding)
     return false;
   }
 
-  // Start the logging thread
+  // Start the writing thread if it has not already been started
   if (!this->writeThread)
     this->writeThread = new boost::thread(boost::bind(&LogRecord::Run, this));
-  else
-  {
-    gzerr << "LogRecord has already been initialized\n";
-    return false;
-  }
 
   this->running = true;
   this->paused = false;
@@ -169,28 +166,39 @@ const std::string &LogRecord::GetEncoding() const
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Stop()
+void LogRecord::Fini()
 {
-  boost::mutex::scoped_lock lock(this->controlMutex);
+  this->stopThread = true;
 
-
-  // Kick the write thread
-  this->dataAvailableCondition.notify_one();
+  this->Stop();
 
   // Wait for the write thread, if it exists
   if (this->writeThread)
     this->writeThread->join();
   delete this->writeThread;
   this->writeThread = NULL;
+}
+
+//////////////////////////////////////////////////
+void LogRecord::Stop()
+{
+  boost::mutex::scoped_lock lock(this->controlMutex);
 
   // Disconnect from the world update signale
   if (this->updateConnection)
     event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
   this->updateConnection.reset();
 
+  // Kick the write thread
+  this->dataAvailableCondition.notify_one();
+
+  // Remove all the logs.
   this->ClearLogs();
 
-  this->initialized = false;
+  // Reset the times
+  this->startTime = this->currTime = common::Time();
+
+  // Reset the flags
   this->running = false;
   this->paused = false;
 }
@@ -198,6 +206,8 @@ void LogRecord::Stop()
 //////////////////////////////////////////////////
 void LogRecord::ClearLogs()
 {
+  boost::mutex::scoped_lock logLock(this->writeMutex);
+
   // Delete all the log objects
   for (Log_M::iterator iter = this->logs.begin();
       iter != this->logs.end(); ++iter)
@@ -315,6 +325,7 @@ unsigned int LogRecord::GetFileSize(const std::string &_name) const
   // Get the filename of the specified log object;
   std::string filename = this->GetFilename(_name);
 
+  // Get the size of the log file on disk.
   if (!filename.empty())
   {
     // Get the size of the file
@@ -322,10 +333,13 @@ unsigned int LogRecord::GetFileSize(const std::string &_name) const
       result = boost::filesystem::file_size(filename);
   }
 
+  // Add in the contents of the write buffer. This is the data that will be
+  // written to disk soon.
   {
     boost::mutex::scoped_lock lock(this->writeMutex);
-    for (Log_M::const_iterator iter = this->logs.begin();
-         iter != this->logsEnd; ++iter)
+    Log_M::const_iterator iter = this->logs.find(_name);
+
+    if (iter != this->logs.end())
     {
       GZ_ASSERT(iter->second, "Log object is NULL");
       result += iter->second->GetBufferSize();
@@ -334,6 +348,7 @@ unsigned int LogRecord::GetFileSize(const std::string &_name) const
 
   return result;
 }
+
 //////////////////////////////////////////////////
 std::string LogRecord::GetBasePath() const
 {
@@ -351,6 +366,8 @@ void LogRecord::Update(const common::UpdateInfo &_info)
       this->startTime = _info.simTime;
     }
 
+    unsigned int size = 0;
+
     {
       boost::mutex::scoped_lock lock(this->writeMutex);
 
@@ -358,12 +375,13 @@ void LogRecord::Update(const common::UpdateInfo &_info)
       for (this->updateIter = this->logs.begin();
           this->updateIter != this->logsEnd; ++this->updateIter)
       {
-        this->updateIter->second->Update();
+        size += this->updateIter->second->Update();
       }
     }
 
     // Signal that new data is available.
-    this->dataAvailableCondition.notify_one();
+    if (size > 0)
+      this->dataAvailableCondition.notify_one();
 
     this->currTime = _info.simTime;
   }
@@ -375,8 +393,10 @@ void LogRecord::Run()
   if (!this->running)
     gzerr << "Running LogRecord before it has been started." << std::endl;
 
+  this->stopThread = false;
+
   // This loop will write data to disk.
-  while (this->running)
+  while (!this->stopThread)
   {
     {
       // Wait for new data.
@@ -392,7 +412,7 @@ void LogRecord::Run()
     }
 
     // Throttle the write loop.
-    common::Time::MSleep(2000);
+    common::Time::MSleep(1000);
   }
 }
 
@@ -432,10 +452,11 @@ LogRecord::Log::~Log()
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Log::Update()
+unsigned int LogRecord::Log::Update()
 {
   std::ostringstream stream;
 
+  // Get log data via the callback.
   if (this->logCB(stream) && !stream.str().empty())
   {
     const std::string encoding = this->parent->GetEncoding();
@@ -474,6 +495,8 @@ void LogRecord::Log::Update()
 
     this->buffer.append("</chunk>\n");
   }
+
+  return this->buffer.size();
 }
 
 //////////////////////////////////////////////////
@@ -514,6 +537,18 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
 //////////////////////////////////////////////////
 void LogRecord::Log::Write()
 {
+  // Check to see if the log file still exists on disk. This will catch the
+  // case when someone deletes a log file while recording.
+  if (!boost::filesystem::exists(this->completePath.string().c_str()))
+  {
+    gzerr << "Log file[" << this->completePath << "] no longer exists. "
+          << "Unable to write log data.\n";
+
+    // We have to clear the buffer, or else it may grow indefinitely.
+    this->buffer.clear();
+    return;
+  }
+
   // Make sure the file is open for writing
   if (!this->logFile.is_open())
   {

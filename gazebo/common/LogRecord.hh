@@ -148,6 +148,9 @@ namespace gazebo
       /// \return Run sim time.
       public: common::Time GetRunTime() const;
 
+      /// Finialize, and shutdown.
+      public: void Fini();
+
       /// \brief Update the log files
       ///
       /// Captures the current state of all registered entities, and outputs
@@ -186,7 +189,8 @@ namespace gazebo
         public: void Write();
 
         /// \brief Update the data buffer.
-        public: void Update();
+        /// \return The size of the data buffer.
+        public: unsigned int Update();
 
         /// \brief Clear the data buffer.
         public: void ClearBuffer();
@@ -276,6 +280,9 @@ namespace gazebo
 
       /// \brief Used to indicate the first update callback.
       private: bool firstUpdate;
+
+      /// \brief Flag used to stop the write thread.
+      private: bool stopThread;
 
       /// \brief Start simulation time.
       private: common::Time startTime;
