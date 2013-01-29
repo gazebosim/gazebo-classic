@@ -393,7 +393,7 @@ void World::Step()
     this->pluginsLoaded = true;
   }
 
-  gzerr << "pluginsLoaded [" << stepTimer.GetElapsed().Double()*1000.0 << "]\n";
+  printf("pluginsLoaded [%f]\n", stepTimer.GetElapsed().Double()*1000.0);
   stepTimer.Start();
 
   // Send statistics about the world simulation
@@ -402,7 +402,7 @@ void World::Step()
     this->PublishWorldStats();
   }
 
-  gzerr << "pubStatsTime [" << stepTimer.GetElapsed().Double()*1000.0 << "]\n";
+  printf("pubStatsTime [%f]\n", stepTimer.GetElapsed().Double()*1000.0);
   stepTimer.Start();
 
   // sleep here to get the correct update rate
@@ -422,7 +422,7 @@ void World::Step()
   this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
                       this->sleepOffset * 0.99;
 
-  gzerr << "computeSleepTime [" << stepTimer.GetElapsed().Double()*1000.0 << "]\n";
+  printf("computeSleepTime [%f]\n", stepTimer.GetElapsed().Double()*1000.0);
   stepTimer.Start();
 
   // throttling update rate, with sleepOffset as tolerance
@@ -431,7 +431,7 @@ void World::Step()
          >= common::Time(this->physicsEngine->GetUpdatePeriod()))
   {
     boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
-    gzerr << "getMutexTime [" << stepTimer.GetElapsed().Double()*1000.0 << "]\n";
+    printf("getMutexTime [%f]\n", stepTimer.GetElapsed().Double()*1000.0);
     stepTimer.Start();
 
     this->prevStepWallTime = common::Time::GetWallTime();
@@ -441,8 +441,8 @@ void World::Step()
       // query timestep to allow dynamic time step size updates
       this->simTime += this->physicsEngine->GetStepTime();
       this->Update();
-      gzerr << "worldUpdateTime [" << stepTimer.GetElapsed().Double()*1000.0 << "]\n";
-    stepTimer.Start();
+      printf("worldUpdateTime [%f]\n", stepTimer.GetElapsed().Double()*1000.0);
+      stepTimer.Start();
 
       if (this->IsPaused() && this->stepInc > 0)
         this->stepInc--;
@@ -453,7 +453,7 @@ void World::Step()
 
   this->ProcessMessages();
 
-  gzerr << "processMessagesTime [" << stepTimer.GetElapsed().Double()*1000.0 << "]\n";
+  printf("processMessagesTime [%f]\n", stepTimer.GetElapsed().Double()*1000.0);
 }
 
 //////////////////////////////////////////////////
@@ -498,24 +498,24 @@ void World::Update()
     this->needsReset = false;
   }
   
-  gzerr << "  Update reset [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  printf("  Update reset [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
   updateTimer.Start();
 
   event::Events::worldUpdateStart();
 
-  gzerr << "  UpdateStart event [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  printf("  UpdateStart event [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
   updateTimer.Start();
 
   // Update all the models
   (*this.*modelUpdateFunc)();
 
-  gzerr << "  Model::Update [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  printf("  Model::Update [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
   updateTimer.Start();
 
   // This must be called before PhysicsEngine::UpdatePhysics.
   this->physicsEngine->UpdateCollision();
 
-  gzerr << "  collision [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  printf("  collision [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
   updateTimer.Start();
 
   // Update the physics engine
@@ -524,7 +524,7 @@ void World::Update()
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
 
-    gzerr << "  physics [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+    printf("  physics [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
     updateTimer.Start();
 
     // do this after physics update as
@@ -538,14 +538,14 @@ void World::Update()
 
     this->dirtyPoses.clear();
 
-    gzerr << "  dirty poses [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+    printf("  dirty poses [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
     updateTimer.Start();
   }
 
   // Output the contact information
   this->physicsEngine->GetContactManager()->PublishContacts();
 
-  gzerr << "  pub contacts [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  printf("  pub contacts [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
   updateTimer.Start();
 
   int currState = (this->stateToggle + 1) % 2;
@@ -553,7 +553,7 @@ void World::Update()
   WorldState diffState = this->prevStates[currState] -
                          this->prevStates[this->stateToggle];
 
-  gzerr << "  diffing [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  printf("  diffing [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
   updateTimer.Start();
 
   if (!diffState.IsZero())
@@ -563,12 +563,12 @@ void World::Update()
     if (this->states.size() > 1000)
       this->states.pop_front();
   }
-  gzerr << "  push diffs [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  printf("  push diffs [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
   updateTimer.Start();
 
   event::Events::worldUpdateEnd();
 
-  gzerr << "  UpdateEnd event [" << updateTimer.GetElapsed().Double()*1000.0 << "]\n";
+  printf("  UpdateEnd event [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
   updateTimer.Start();
 }
 
