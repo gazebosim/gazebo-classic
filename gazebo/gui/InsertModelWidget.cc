@@ -215,10 +215,21 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
 
       if (!boost::filesystem::is_directory(fullPath))
       {
-        gzwarn << "Invalid filename or directory[" << fullPath
-               << "] in GAZEBO_MODEL_PATH. It's not a good idea to put extra "
-               << "files in a GAZEBO_MODEL_PATH because the file structure may"
-               << " be modified by Gazebo.\n";
+        if (dIter->filename() == "manifest.xml")
+        {
+          boost::filesystem::path tmpPath = boost::filesystem::path(_path) /
+            "database.config";
+          gzwarn << "manifest.xml for a model database is deprecated. "
+                 << "Please rename " << fullPath <<  " to "
+                 << tmpPath << "\n";
+        }
+        else if (dIter->filename() != "database.config")
+        {
+          gzwarn << "Invalid filename or directory[" << fullPath
+            << "] in GAZEBO_MODEL_PATH. It's not a good idea to put extra "
+            << "files in a GAZEBO_MODEL_PATH because the file structure may"
+            << " be modified by Gazebo.\n";
+        }
         continue;
       }
 
