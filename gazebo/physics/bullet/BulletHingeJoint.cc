@@ -130,8 +130,6 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   // Throw an error if no links are given.
   else
   {
-    // TODO eliminate following line when Issue #447 is resolved.
-    gzerr << "joint without links\n";
     gzthrow("joint without links\n");
   }
 
