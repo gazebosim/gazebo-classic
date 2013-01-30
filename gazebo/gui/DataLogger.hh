@@ -62,6 +62,10 @@ namespace gazebo
       /// \brief QT callback for setting the log path.
       private slots: void OnBrowse();
 
+      /// \brief QT callback for toggling the settings visibility.
+      private slots: void OnToggleSettings(bool _checked);
+
+
       /// \brief Callback for log status messages.
       /// \param[in] _msg Log status message.
       private: void OnStatus(ConstLogStatusPtr &_msg);
@@ -78,11 +82,17 @@ namespace gazebo
       /// \brief The button used to start and pause logging.
       private: QToolButton *recordButton;
 
+      /// \brief The button used to show/hide the settings frame.
+      private: QPushButton *settingExpandButton;
+
       /// \brief The button used to stop logging.
       private: QToolButton *stopButton;
 
       /// \brief Label to display the log time.
       private: QLabel *timeLabel;
+
+      /// \brief Label to display the log destination.
+      private: QLabel *destLabel;
 
       /// \brief Label to display the log file size.
       private: QLabel *sizeLabel;
@@ -92,6 +102,9 @@ namespace gazebo
 
       /// \brief Name of the log file path
       private: QLineEdit *filenameEdit;
+
+      /// \brief Frame that holds settings.
+      private: QFrame *settingsFrame;
 
       private: bool recording;
       private: bool paused;

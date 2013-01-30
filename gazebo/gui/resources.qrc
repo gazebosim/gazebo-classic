@@ -29,5 +29,8 @@
   <file>images/scale_object.png</file>
   <file>images/record.png</file>
   <file>images/record_stop.png</file>
+  <file>images/right_arrow.png</file>
+  <file>images/left_arrow.png</file>
+  <file>images/up_arrow.png</file>
 </qresource>
 </RCC>

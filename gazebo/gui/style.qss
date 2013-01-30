@@ -131,6 +131,27 @@ QWidget#dataLogger > QToolButton:hover
 }
 */
 
+QPushButton#expandButton
+{
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  background-color: transparent;
+  selection-background-color: transparent;
+  selection-color: transparent;
+  width: 70px;
+  text-align: left;
+
+  background-image: url(:/images/right_arrow.png);
+  background-repeat: no-repeat;
+  background-position: center right;
+}
+
+QPushButton#expandButton:checked
+{
+  background-image: url(:/images/down_arrow.png);
+}
+
 QToolButton#dataLoggerRecordButton
 {
   padding: 0px;

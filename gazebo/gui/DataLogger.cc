@@ -90,9 +90,10 @@ DataLogger::DataLogger(QWidget *_parent)
 
   // Create the settings frame, where the user can input a save-to location
   // {
-  QFrame *settingFrame = new QFrame;
-  settingFrame->setObjectName("dataLoggerSettingFrame");
-  QVBoxLayout *settingFrameLayout = new QVBoxLayout;
+  QFrame *settingsMasterFrame = new QFrame;
+  settingsMasterFrame->setFixedWidth(300);
+  settingsMasterFrame->setObjectName("dataLoggerSettingFrame");
+
 
   QHBoxLayout *filenameLayout = new QHBoxLayout;
   this->filenameEdit = new QLineEdit;
@@ -106,9 +107,34 @@ DataLogger::DataLogger(QWidget *_parent)
 
   filenameLayout->addWidget(browseButton);
 
-  settingFrameLayout->addWidget(new QLabel("Settings"));
-  settingFrameLayout->addLayout(filenameLayout);
-  settingFrame->setLayout(settingFrameLayout);
+  QHBoxLayout *settingExpandLayout = new QHBoxLayout;
+
+  this->settingExpandButton = new QPushButton("Settings");
+  this->settingExpandButton->setObjectName("expandButton");
+  this->settingExpandButton->setCheckable(true);
+  this->settingExpandButton->setChecked(false);
+  this->settingExpandButton->setFocusPolicy(Qt::NoFocus);
+  connect(settingExpandButton, SIGNAL(toggled(bool)),
+          this, SLOT(OnToggleSettings(bool)));
+
+  settingExpandLayout->setContentsMargins(0, 0, 0, 0);
+  settingExpandLayout->addWidget(this->settingExpandButton);
+  settingExpandLayout->addStretch(1);
+
+  /// Create the frame that can be hidden by toggling the setting's button
+  this->settingsFrame = new QFrame;
+  QVBoxLayout *settingsLayout = new QVBoxLayout;
+  settingsLayout->setContentsMargins(2, 2, 2, 2);
+  settingsLayout->addLayout(filenameLayout);
+  this->settingsFrame->setLayout(settingsLayout);
+  this->settingsFrame->hide();
+
+  QVBoxLayout *settingsMasterFrameLayout = new QVBoxLayout;
+  settingsMasterFrameLayout->setContentsMargins(2, 2, 2, 2);
+
+  settingsMasterFrameLayout->addLayout(settingExpandLayout);
+  settingsMasterFrameLayout->addWidget(this->settingsFrame);
+  settingsMasterFrame->setLayout(settingsMasterFrameLayout);
   // }
 
   // Layout to position the record button vertically
@@ -128,14 +154,23 @@ DataLogger::DataLogger(QWidget *_parent)
   topLayout->addStretch(4);
   topLayout->addLayout(statusLayout);
 
+  QHBoxLayout *destLayout = new QHBoxLayout;
+  this->destLabel = new QLabel;
+  this->destLabel->setText("2013-01-30T06:59:44.114902");
+  destLayout->addSpacing(4);
+  destLayout->addWidget(new QLabel("Destination: "));
+  destLayout->addWidget(this->destLabel);
+  destLayout->addStretch(1);
+
   // Mainlayout for the whole widget
   // Create the main layout for this widget
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(topLayout);
-  mainLayout->addWidget(settingFrame);
+  mainLayout->addLayout(destLayout);
+  mainLayout->addWidget(settingsMasterFrame);
 
   // Let the stylesheet handle the margin sizes
-  mainLayout->setContentsMargins(4, 4, 4, 4);
+  mainLayout->setContentsMargins(2, 2, 2, 2);
 
   // Assign the mainlayout to this widget
   this->setLayout(mainLayout);
@@ -244,6 +279,19 @@ void DataLogger::OnSetFilename(QString _filename)
   }
 
   this->filenameEdit->setText(filename.c_str());
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnToggleSettings(bool _checked)
+{
+  if (_checked)
+  {
+    this->settingsFrame->show();
+  }
+  else
+  {
+    this->settingsFrame->hide();
+  }
 }
 
 /////////////////////////////////////////////////
