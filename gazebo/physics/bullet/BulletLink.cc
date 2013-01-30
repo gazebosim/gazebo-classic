@@ -221,7 +221,7 @@ bool BulletLink::GetEnabled() const
 {
   // This function and its counterpart BulletLink::SetEnabled
   // don't do anything yet.
-  return true;  
+  return true;
 }
 
 //////////////////////////////////////////////////
