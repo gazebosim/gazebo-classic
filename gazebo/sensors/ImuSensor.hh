@@ -64,6 +64,15 @@ namespace gazebo
       /// \return Linear acceleration.
       public: math::Vector3 GetLinearAcceleration() const;
 
+      /// \brief Returns the imu orientation.
+      /// \return Linear acceleration.
+      public: math::Vector3 GetLinearAcceleration() const;
+      /// \brief get orientation of the IMU relative to the reference pose
+      public: math::Pose GetOrientation() const;
+
+      /// \brief Sets the current pose as the IMU reference pose
+      public: void SetReferencePose() const;
+
       private: transport::PublisherPtr pub;
       private: physics::LinkPtr parentEntity;
       private: msgs::IMU imuMsg;
