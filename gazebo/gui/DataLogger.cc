@@ -15,6 +15,9 @@
  *
  */
 
+#include <boost/filesystem.hpp>
+#include <stdio.h>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/gui/DataLogger.hh"
@@ -93,8 +96,15 @@ DataLogger::DataLogger(QWidget *_parent)
 
   QHBoxLayout *filenameLayout = new QHBoxLayout;
   this->filenameEdit = new QLineEdit;
+  this->filenameEdit->setText("~/.gazebo/log");
+  filenameLayout->addWidget(new QLabel("Save to:"));
   filenameLayout->addWidget(this->filenameEdit);
-  filenameLayout->addWidget(new QPushButton("..."));
+
+  QPushButton *browseButton = new QPushButton("Browse");
+  browseButton->setFixedHeight(23);
+  connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
+
+  filenameLayout->addWidget(browseButton);
 
   settingFrameLayout->addWidget(new QLabel("Settings"));
   settingFrameLayout->addLayout(filenameLayout);
@@ -234,4 +244,50 @@ void DataLogger::OnSetFilename(QString _filename)
   }
 
   this->filenameEdit->setText(filename.c_str());
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnBrowse()
+{
+  boost::filesystem::path path = QFileDialog::getExistingDirectory(this,
+      tr("Set log directory"), this->filenameEdit->text(),
+      QFileDialog::ShowDirsOnly |
+      QFileDialog::DontResolveSymlinks).toStdString();
+
+  // Make sure the  directory exists
+  if (!boost::filesystem::exists(path))
+  {
+    QMessageBox msgBox;
+    std::ostringstream stream;
+    stream << "Directory " << path << " does not exist.";
+    msgBox.setText(stream.str().c_str());
+    msgBox.exec();
+    return;
+  }
+
+  // Make sure we have a directory
+  if (!boost::filesystem::is_directory(path))
+  {
+    QMessageBox msgBox;
+    std::ostringstream stream;
+    stream << "Path " << path << " is not a directory. Please only specify a "
+           << "directory for data logging.";
+    msgBox.setText(stream.str().c_str());
+    msgBox.exec();
+    return;
+  }
+
+  // Make sure the path is writable.
+  // Note: This is not cross-platform compatible.
+  if (access(path.string().c_str(), W_OK) != 0)
+  {
+    QMessageBox msgBox;
+    std::ostringstream stream;
+    stream << "You do no have permission to write into " << path;
+    msgBox.setText(stream.str().c_str());
+    msgBox.exec();
+    return;
+  }
+
+  this->SetFilename(QString::fromStdString(path.string()));
 }

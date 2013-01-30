@@ -549,22 +549,25 @@ void World::Update()
   // Output the contact information
   this->physicsEngine->GetContactManager()->PublishContacts();
 
-  int currState = (this->stateToggle + 1) % 2;
-  this->prevStates[currState] = WorldState(shared_from_this());
-
-  WorldState diffState = this->prevStates[currState] -
-                         this->prevStates[this->stateToggle];
-
-  if (!diffState.IsZero())
+  // Only update state informatin if logging data.
+  if (common::LogRecord::Instance()->GetRunning())
   {
-    this->stateToggle = currState;
-    this->states.push_back(diffState);
-    if (this->states.size() > 1000)
-      this->states.pop_front();
+    int currState = (this->stateToggle + 1) % 2;
+    this->prevStates[currState] = WorldState(shared_from_this());
 
-    /// Publish a log status message if the logger is running.
-    if (common::LogRecord::Instance()->GetRunning())
+    WorldState diffState = this->prevStates[currState] -
+      this->prevStates[this->stateToggle];
+
+    if (!diffState.IsZero())
+    {
+      this->stateToggle = currState;
+      this->states.push_back(diffState);
+      if (this->states.size() > 1000)
+        this->states.pop_front();
+
+      /// Publish a log status message if the logger is running.
       this->PublishLogStatus();
+    }
   }
 
   event::Events::worldUpdateEnd();
@@ -1614,10 +1617,8 @@ void World::UpdateStateSDF()
 //////////////////////////////////////////////////
 bool World::OnLog(std::ostringstream &_stream)
 {
-  static bool first = true;
-
   // Save the entire state when its the first call to OnLog.
-  if (first)
+  if (common::LogRecord::Instance()->GetFirstUpdate())
   {
     this->UpdateStateSDF();
     _stream << "<sdf version ='";
@@ -1625,8 +1626,6 @@ bool World::OnLog(std::ostringstream &_stream)
     _stream << "'>\n";
     _stream << this->sdf->ToString("");
     _stream << "</sdf>\n";
-
-    first = false;
   }
   else if (this->states.size() >= 1)
   {

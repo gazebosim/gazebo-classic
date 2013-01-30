@@ -869,8 +869,6 @@ void MainWindow::CreateMenus()
   fileMenu->addAction(g_saveAct);
   fileMenu->addAction(g_saveAsAct);
   fileMenu->addSeparator();
-  fileMenu->addAction(g_dataLoggerAct);
-  fileMenu->addSeparator();
   fileMenu->addAction(g_quitAct);
 
   QMenu *editMenu = this->menuBar->addMenu(tr("&Edit"));
@@ -896,7 +894,9 @@ void MainWindow::CreateMenus()
 
   QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
-  windowMenu->addAction(g_videoRecorderAct);
+  // windowMenu->addAction(g_videoRecorderAct);
+  windowMenu->addSeparator();
+  windowMenu->addAction(g_dataLoggerAct);
 
   this->menuBar->addSeparator();
 

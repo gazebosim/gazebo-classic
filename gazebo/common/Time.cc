@@ -98,7 +98,8 @@ const Time &Time::GetWallTime()
 const std::string &Time::GetWallTimeAsISOString()
 {
   wallTimeISO = boost::posix_time::to_iso_extended_string(
-      boost::posix_time::second_clock::local_time());
+      boost::posix_time::microsec_clock::local_time());
+
   return wallTimeISO;
 }
 

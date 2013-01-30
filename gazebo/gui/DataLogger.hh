@@ -59,6 +59,9 @@ namespace gazebo
       /// \brief QT callback for setting the filename.
       private slots: void OnSetFilename(QString _string);
 
+      /// \brief QT callback for setting the log path.
+      private slots: void OnBrowse();
+
       /// \brief Callback for log status messages.
       /// \param[in] _msg Log status message.
       private: void OnStatus(ConstLogStatusPtr &_msg);

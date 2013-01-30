@@ -148,8 +148,12 @@ namespace gazebo
       /// \return Run sim time.
       public: common::Time GetRunTime() const;
 
-      /// Finialize, and shutdown.
+      /// \brief Finialize, and shutdown.
       public: void Fini();
+
+      /// \brief Return true if an Update has not yet been completed.
+      /// \return True if an Update has not yet been completed.
+      public: bool GetFirstUpdate() const;
 
       /// \brief Update the log files
       ///

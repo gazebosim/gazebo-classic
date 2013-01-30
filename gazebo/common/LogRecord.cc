@@ -118,7 +118,7 @@ bool LogRecord::Start(const std::string &_encoding)
   this->logCompletePath = this->logBasePath / logTimeDir / this->logSubDir;
 
   // Create the log directory if necessary
-  if (!boost::filesystem::exists(logCompletePath))
+  if (!boost::filesystem::exists(this->logCompletePath))
     boost::filesystem::create_directories(logCompletePath);
 
   if (_encoding != "bz2" && _encoding != "txt")
@@ -127,11 +127,15 @@ bool LogRecord::Start(const std::string &_encoding)
 
   this->encoding = _encoding;
 
-  this->logsEnd = this->logs.end();
+  {
+    boost::mutex::scoped_lock logLock(this->writeMutex);
+    this->logsEnd = this->logs.end();
 
-  // Start all the logs
-  for (Log_M::iterator iter = this->logs.begin(); iter != this->logsEnd; ++iter)
-    iter->second->Start(logCompletePath);
+    // Start all the logs
+    for (Log_M::iterator iter = this->logs.begin();
+         iter != this->logsEnd; ++iter)
+      iter->second->Start(logCompletePath);
+  }
 
   // Listen to the world update event
   if (!this->updateConnection)
@@ -241,7 +245,7 @@ bool LogRecord::GetRunning() const
 void LogRecord::Add(const std::string &_name, const std::string &_filename,
                     boost::function<bool (std::ostringstream &)> _logCallback)
 {
-  boost::mutex::scoped_lock lock(this->controlMutex);
+  boost::mutex::scoped_lock logLock(this->writeMutex);
 
   // Check to see if the log has already been added.
   if (this->logs.find(_name) != this->logs.end())
@@ -285,6 +289,8 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
 //////////////////////////////////////////////////
 bool LogRecord::Remove(const std::string &_name)
 {
+  boost::mutex::scoped_lock logLock(this->writeMutex);
+
   bool result = false;
 
   Log_M::iterator iter = this->logs.find(_name);
@@ -305,6 +311,8 @@ bool LogRecord::Remove(const std::string &_name)
 //////////////////////////////////////////////////
 std::string LogRecord::GetFilename(const std::string &_name) const
 {
+  boost::mutex::scoped_lock logLock(this->writeMutex);
+
   std::string result;
 
   Log_M::const_iterator iter = this->logs.find(_name);
@@ -356,16 +364,16 @@ std::string LogRecord::GetBasePath() const
 }
 
 //////////////////////////////////////////////////
+bool LogRecord::GetFirstUpdate() const
+{
+  return this->firstUpdate;
+}
+
+//////////////////////////////////////////////////
 void LogRecord::Update(const common::UpdateInfo &_info)
 {
   if (!this->paused)
   {
-    if (this->firstUpdate)
-    {
-      this->firstUpdate = false;
-      this->startTime = _info.simTime;
-    }
-
     unsigned int size = 0;
 
     {
@@ -378,6 +386,13 @@ void LogRecord::Update(const common::UpdateInfo &_info)
         size += this->updateIter->second->Update();
       }
     }
+
+    if (this->firstUpdate)
+    {
+      this->firstUpdate = false;
+      this->startTime = _info.simTime;
+    }
+
 
     // Signal that new data is available.
     if (size > 0)
@@ -537,18 +552,6 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
 //////////////////////////////////////////////////
 void LogRecord::Log::Write()
 {
-  // Check to see if the log file still exists on disk. This will catch the
-  // case when someone deletes a log file while recording.
-  if (!boost::filesystem::exists(this->completePath.string().c_str()))
-  {
-    gzerr << "Log file[" << this->completePath << "] no longer exists. "
-          << "Unable to write log data.\n";
-
-    // We have to clear the buffer, or else it may grow indefinitely.
-    this->buffer.clear();
-    return;
-  }
-
   // Make sure the file is open for writing
   if (!this->logFile.is_open())
   {
@@ -561,6 +564,19 @@ void LogRecord::Log::Write()
       gzthrow("Unable to open file for logging:" +
               this->completePath.string() + "]");
   }
+
+  // Check to see if the log file still exists on disk. This will catch the
+  // case when someone deletes a log file while recording.
+  if (!boost::filesystem::exists(this->completePath.string().c_str()))
+  {
+    gzerr << "Log file[" << this->completePath << "] no longer exists. "
+          << "Unable to write log data.\n";
+
+    // We have to clear the buffer, or else it may grow indefinitely.
+    this->buffer.clear();
+    return;
+  }
+
 
   // Write out the contents of the buffer.
   this->logFile.write(this->buffer.c_str(), this->buffer.size());
