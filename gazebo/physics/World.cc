@@ -186,7 +186,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->logStatusPub = this->node->Advertise<msgs::LogStatus>("~/log/status");
 
   this->requestSub = this->node->Subscribe("~/request",
-                                           &World::OnRequest, this);
+                                           &World::OnRequest, this, true);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
@@ -354,7 +354,6 @@ void World::RunLoop()
     this->enablePhysicsEngine = false;
     while (!this->stop)
       this->LogStep();
-
   }
 }
 
