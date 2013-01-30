@@ -110,13 +110,15 @@ void ODERayShape::GetIntersection(double &_dist, std::string &_entity)
     Intersection intersection;
     intersection.depth = 1000;
 
-    this->physicsEngine->GetPhysicsUpdateMutex()->lock();
+    {
+      boost::recursive_mutex::scoped_lock lock(
+          *this->physicsEngine->GetPhysicsUpdateMutex());
 
-    // Do collision detection
-    dSpaceCollide2(this->geomId,
-        (dGeomID)(this->physicsEngine->GetSpaceId()),
-        &intersection, &UpdateCallback);
-    this->physicsEngine->GetPhysicsUpdateMutex()->unlock();
+      // Do collision detection
+      dSpaceCollide2(this->geomId,
+          (dGeomID)(this->physicsEngine->GetSpaceId()),
+          &intersection, &UpdateCallback);
+    }
 
     _dist = intersection.depth;
     _entity = intersection.name;

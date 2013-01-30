@@ -27,9 +27,10 @@
 #include <string>
 #include <vector>
 
-#include "common/SingletonT.hh"
-#include "sensors/SensorTypes.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/common/SingletonT.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {
@@ -37,6 +38,61 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    /// \cond
+    /// \brief A simulation time event
+    class SimTimeEvent
+    {
+      /// \brief The time at which to trigger the condition.
+      public: common::Time time;
+
+      /// \brief The condition to notify.
+      public: boost::condition_variable *condition;
+    };
+
+    /// \brief Monitors simulation time, and notifies conditions when
+    /// a specified time has been reached.
+    class SimTimeEventHandler : public SingletonT<SimTimeEventHandler>
+    {
+      /// \brief Constructor
+      public: SimTimeEventHandler();
+
+      /// \brief Destructor
+      public: virtual ~SimTimeEventHandler();
+
+      /// \brief Add a new event to the handler.
+      /// \param[in] _time Time of the new event. The current sim time will
+      /// be add to this time.
+      /// \param[in] _var Condition to notify when the time has been
+      /// reached.
+      public: void AddRelativeEvent(const common::Time &_time,
+                  boost::condition_variable *_var);
+
+      /// \brief Run loop for the processing thread.
+      private: void RunLoop();
+
+      /// \brief Mutex to mantain thread safety.
+      private: boost::mutex mutex;
+
+      /// \brief Used by the thread to determine when to stop running.
+      private: bool stop;
+
+      /// \brief The list of events to handle.
+      private: std::list<SimTimeEvent*> events;
+
+      /// \brief Get sim time from the world.
+      private: physics::WorldPtr world;
+
+      /// \brief Processing thread.
+      private: boost::thread *thread;
+
+      /// \brief Condition used to tell the thread when to run.
+      private: boost::condition_variable condition;
+
+      /// \brief This is a singleton class.
+      private: friend class SingletonT<SimTimeEventHandler>;
+    };
+    /// \endcond
+
     /// \addtogroup gazebo_sensors
     /// \{
     /// \class SensorManager SensorManager.hh sensors/sensors.hh

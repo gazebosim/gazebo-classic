@@ -181,7 +181,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->controlSub = this->node->Subscribe("~/world_control",
                                            &World::OnControl, this);
   this->requestSub = this->node->Subscribe("~/request",
-                                           &World::OnRequest, this);
+                                           &World::OnRequest, this, true);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
@@ -401,7 +401,7 @@ void World::Step()
     tmpTime - this->sleepOffset;
 
   if (sleepTime > 0)
-    common::Time::NSleep(sleepTime);
+    common::Time::Sleep(sleepTime);
   else
     sleepTime = 0;
 

@@ -266,7 +266,7 @@ void Heightmap::DefineTerrain(int x, int y)
     this->terrainGroup->defineTerrain(x, y, &img);
     this->terrainsImported = true;
 
-    // delete [] data;
+    delete [] data;
   }
 }
 

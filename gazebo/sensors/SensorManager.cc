@@ -19,9 +19,11 @@
  * Author: Nate Koenig
  * Date: 18 Dec 2009
  */
-#include "sensors/Sensor.hh"
-#include "sensors/SensorFactory.hh"
-#include "sensors/SensorManager.hh"
+#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/SensorManager.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -85,14 +87,13 @@ void SensorManager::Stop()
 void SensorManager::Update(bool _force)
 {
   Sensor_V::iterator iter;
-  Sensor_V::iterator end;
 
   {
     boost::recursive_mutex::scoped_lock lock(this->mutex);
 
     // in case things are spawn, sensors length changes
-    end = this->initSensors.end();
-    for (iter = this->initSensors.begin(); iter != end; ++iter)
+    for (iter = this->initSensors.begin();
+         iter != this->initSensors.end(); ++iter)
     {
       (*iter)->Init();
       this->sensorContainers[(*iter)->GetCategory()]->AddSensor(*iter);
@@ -362,17 +363,17 @@ void SensorManager::SensorContainer::Stop()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::RunLoop()
 {
+  physics::WorldPtr world = physics::get_world();
+
   common::Time sleepTime, startTime, diffTime;
   double minUpdateRate = GZ_DBL_MAX;
 
   this->stop = false;
 
+  boost::mutex tmpMutex;
+  boost::mutex::scoped_lock lock2(tmpMutex);
+
   {
-    boost::recursive_mutex::scoped_lock lock(this->mutex);
-
-    boost::mutex tmpMutex;
-    boost::mutex::scoped_lock lock2(tmpMutex);
-
     // Wait for a sensor to be added.
     if (this->sensors.size() == 0)
     {
@@ -381,6 +382,7 @@ void SensorManager::SensorContainer::RunLoop()
         return;
     }
 
+    boost::recursive_mutex::scoped_lock lock(this->mutex);
     // Get the minimum update rate from the sensors.
     for (Sensor_V::iterator iter = this->sensors.begin();
         iter != this->sensors.end() && !this->stop; ++iter)
@@ -397,12 +399,18 @@ void SensorManager::SensorContainer::RunLoop()
 
   while (!this->stop)
   {
-    startTime = common::Time::GetWallTime();
+    // Get the start time of the update.
+    startTime = world->GetSimTime();
     this->Update(false);
-    diffTime = common::Time::GetWallTime() - startTime;
 
-    if (diffTime < sleepTime)
-      common::Time::Sleep(sleepTime - diffTime);
+    // Compute the time it took to update the sensors.
+    diffTime = world->GetSimTime() - startTime;
+
+    // Add an event to trigger when the appropriate simulation time has been
+    // reached.
+    SimTimeEventHandler::Instance()->AddRelativeEvent(sleepTime - diffTime,
+                                                      &this->runCondition);
+    this->runCondition.wait(lock2);
   }
 }
 
@@ -412,7 +420,7 @@ void SensorManager::SensorContainer::Update(bool _force)
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   if (this->sensors.size() == 0)
-    printf("ERROR\n");
+    gzerr << "Updating a sensor containing without any sensors.\n";
 
   // Update all the sensors in this container.
   for (Sensor_V::iterator iter = this->sensors.begin();
@@ -504,4 +512,94 @@ void SensorManager::ImageSensorContainer::Update(bool _force)
 
   // Update the sensors, which will produce data messages.
   SensorContainer::Update(_force);
+}
+
+
+
+
+/////////////////////////////////////////////////
+SimTimeEventHandler::SimTimeEventHandler()
+{
+  this->world = physics::get_world();
+
+  this->thread = new boost::thread(
+      boost::bind(&SimTimeEventHandler::RunLoop, this));
+}
+
+/////////////////////////////////////////////////
+SimTimeEventHandler::~SimTimeEventHandler()
+{
+  // Stop the thread.
+  this->stop = true;
+  if (this->thread)
+  {
+    this->thread->join();
+    delete this->thread;
+    this->thread = NULL;
+  }
+
+  // Cleanup the events.
+  for (std::list<SimTimeEvent*>::iterator iter = this->events.begin();
+       iter != this->events.end();)
+  {
+    delete *iter;
+  }
+  this->events.clear();
+}
+
+/////////////////////////////////////////////////
+void SimTimeEventHandler::AddRelativeEvent(const common::Time &_time,
+                                           boost::condition_variable *_var)
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+
+  // Create the new event.
+  SimTimeEvent *event = new SimTimeEvent;
+  event->time = this->world->GetSimTime() + _time;
+  event->condition = _var;
+
+  // Add the event to the list.
+  this->events.push_back(event);
+
+  // Tell the thread that an event has been added.
+  this->condition.notify_one();
+}
+
+/////////////////////////////////////////////////
+void SimTimeEventHandler::RunLoop()
+{
+  common::Time simTime;
+  this->stop = false;
+  while (!stop)
+  {
+    {
+      boost::mutex::scoped_lock lock(this->mutex);
+
+      // Get the current simulation time
+      simTime = this->world->GetSimTime();
+
+      // Iterate over all the events.
+      for (std::list<SimTimeEvent*>::iterator iter = this->events.begin();
+          iter != this->events.end();)
+      {
+        // Find events that have a time less than or equal to simulation
+        // time.
+        if ((*iter)->time <= simTime)
+        {
+          // Notify the event by triggering its condition.
+          (*iter)->condition->notify_all();
+
+          // Remove the event.
+          delete *iter;
+          this->events.erase(iter++);
+        }
+        else
+          ++iter;
+      }
+
+      // Wait if there are no events in the list.
+      if (this->events.size() == 0)
+        this->condition.wait(lock);
+    }
+  }
 }

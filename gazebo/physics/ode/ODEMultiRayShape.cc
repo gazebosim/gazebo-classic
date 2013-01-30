@@ -74,12 +74,13 @@ void ODEMultiRayShape::UpdateRays()
   // FIXME: Do we need to lock the physics engine here? YES!
   //        especially when spawning models with sensors
 
-  ode->GetPhysicsUpdateMutex()->lock();
-  // Do collision detection
-  dSpaceCollide2((dGeomID) (this->superSpaceId),
-      (dGeomID) (ode->GetSpaceId()),
-      this, &UpdateCallback);
-  ode->GetPhysicsUpdateMutex()->unlock();
+  {
+    boost::recursive_mutex::scoped_lock lock(*ode->GetPhysicsUpdateMutex());
+    // Do collision detection
+    dSpaceCollide2((dGeomID) (this->superSpaceId),
+        (dGeomID) (ode->GetSpaceId()),
+        this, &UpdateCallback);
+  }
 }
 
 //////////////////////////////////////////////////

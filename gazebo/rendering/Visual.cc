@@ -1941,12 +1941,13 @@ std::string Visual::GetMeshName() const
       return "unit_cylinder";
     else if (geomElem->HasElement("plane"))
       return "unit_plane";
-    else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
+    else if (geomElem->HasElement("mesh"))
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
 
       filename = common::find_file(tmpElem->GetValueString("uri"));
+
       if (filename == "__default__" || filename.empty())
         gzerr << "No mesh specified\n";
 
