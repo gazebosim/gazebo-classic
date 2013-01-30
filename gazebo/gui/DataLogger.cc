@@ -49,6 +49,7 @@ DataLogger::DataLogger(QWidget *_parent)
   // label, and a one word text message.
   // {
   QFrame *statusFrame = new QFrame;
+  statusFrame->setFixedWidth(290);
   statusFrame->setObjectName("dataLoggerStatusFrame");
 
   this->statusLabel = new QLabel("Ready");
@@ -77,8 +78,7 @@ DataLogger::DataLogger(QWidget *_parent)
 
   // Create the settings frame, where the user can input a save-to location
   // {
-  QFrame *settingsMasterFrame = new QFrame;
-  settingsMasterFrame->setFixedWidth(300);
+  /*QFrame *settingsMasterFrame = new QFrame;
   settingsMasterFrame->setObjectName("dataLoggerSettingFrame");
 
 
@@ -124,7 +124,7 @@ DataLogger::DataLogger(QWidget *_parent)
   settingsMasterFrameLayout->addWidget(this->settingsFrame);
   settingsMasterFrame->setLayout(settingsMasterFrameLayout);
   // }
-
+*/
   // Layout to position the record button vertically
   QVBoxLayout *buttonLayout = new QVBoxLayout;
   buttonLayout->setContentsMargins(0, 0, 0, 0);
@@ -157,7 +157,7 @@ DataLogger::DataLogger(QWidget *_parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(topLayout);
   mainLayout->addLayout(destLayout);
-  mainLayout->addWidget(settingsMasterFrame);
+  // mainLayout->addWidget(settingsMasterFrame);
 
   // Let the stylesheet handle the margin sizes
   mainLayout->setContentsMargins(2, 2, 2, 2);
@@ -175,8 +175,8 @@ DataLogger::DataLogger(QWidget *_parent)
           this->sizeLabel, SLOT(setText(QString)), Qt::QueuedConnection);
 
   // Create a QueuedConnection to set filename. This is used for thread safety.
-  connect(this, SIGNAL(SetFilename(QString)),
-          this, SLOT(OnSetFilename(QString)), Qt::QueuedConnection);
+  // connect(this, SIGNAL(SetFilename(QString)),
+  //        this, SLOT(OnSetFilename(QString)), Qt::QueuedConnection);
 
   // Create a QueuedConnection to set destination.
   // This is used for thread safety.
@@ -214,8 +214,8 @@ void DataLogger::OnRecord(bool _toggle)
     this->statusLabel->setText("Recording");
 
     // Disable filename editing while recording
-    this->filenameEdit->setEnabled(false);
-    this->browseButton->setEnabled(false);
+    // this->filenameEdit->setEnabled(false);
+    // this->browseButton->setEnabled(false);
 
     // Tell the server to start data logging
     msgs::LogControl msg;
@@ -231,8 +231,8 @@ void DataLogger::OnRecord(bool _toggle)
     this->statusLabel->setText("Ready");
 
     // Enable filename editing while not recording
-    this->filenameEdit->setEnabled(true);
-    this->browseButton->setEnabled(true);
+    // this->filenameEdit->setEnabled(true);
+    // this->browseButton->setEnabled(true);
 
     // Tell the server to stop data logging
     msgs::LogControl msg;
@@ -275,7 +275,7 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
       std::string basePath = _msg->log_file().base_path();
 
       /// Display the root log filename
-      this->SetFilename(QString::fromStdString(basePath));
+      // this->SetFilename(QString::fromStdString(basePath));
 
       // Display the leaf log filename
       if (_msg->log_file().has_full_path() && !basePath.empty())
@@ -330,7 +330,7 @@ void DataLogger::OnSetDestination(QString _filename)
 /////////////////////////////////////////////////
 void DataLogger::OnSetFilename(QString _filename)
 {
-
+  /*
   std::string filename = _filename.toStdString();
 
   if (getenv("HOME"))
@@ -340,6 +340,7 @@ void DataLogger::OnSetFilename(QString _filename)
   }
 
   this->filenameEdit->setText(filename.c_str());
+  */
 }
 
 /////////////////////////////////////////////////
