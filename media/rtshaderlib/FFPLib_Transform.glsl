@@ -5,7 +5,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -33,7 +33,7 @@ THE SOFTWARE.
 // Language: GLSL
 // Notes: Implements core functions for FFPTransform class.
 // based on transform engine. 
-// See http://msdn.microsoft.com/en-us/library/ee422511.aspx
+// See http://msdn.microsoft.com/en-us/library/bb206269.aspx
 //-----------------------------------------------------------------------------
 
 
@@ -45,3 +45,27 @@ void FFP_Transform(in mat4 m,
 	vOut = m * v;
 }
 
+//-----------------------------------------------------------------------------
+void FFP_Transform(in mat4 m, 
+				   in vec4 v, 
+				   out vec3 vOut)
+{
+	vOut = (m * v).xyz;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Transform(in mat3x4 m, 
+				   in vec3 v, 
+				   out vec3 vOut)
+{
+	vOut = mat3(m) * v;
+}
+
+
+//-----------------------------------------------------------------------------
+void FFP_Transform(in mat4 m, 
+				   in vec3 v, 
+				   out vec3 vOut)
+{
+	vOut = mat3(m) * v;
+}
