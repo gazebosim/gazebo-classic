@@ -48,23 +48,26 @@ TimePanel::TimePanel(QWidget *_parent)
   this->realTimeEdit->setReadOnly(true);
   this->realTimeEdit->setFixedWidth(110);
 
-  QLabel *percentRealTimeLabel = new QLabel(tr("Real Time Factor:"));
-  QLabel *simTimeLabel = new QLabel(tr("Sim Time:"));
-  QLabel *realTimeLabel = new QLabel(tr("Real Time:"));
+  this->iterationsEdit = new QLineEdit;
+  this->iterationsEdit->setReadOnly(true);
+  this->iterationsEdit->setFixedWidth(110);
 
   QPushButton *timeResetButton = new QPushButton("Reset");
   timeResetButton->setFocusPolicy(Qt::NoFocus);
   connect(timeResetButton, SIGNAL(clicked()),
           this, SLOT(OnTimeReset()));
 
-  frameLayout->addWidget(percentRealTimeLabel);
+  frameLayout->addWidget(new QLabel(tr("Real Time Factor:")));
   frameLayout->addWidget(this->percentRealTimeEdit);
 
-  frameLayout->addWidget(simTimeLabel);
+  frameLayout->addWidget(new QLabel(tr("Sim Time:")));
   frameLayout->addWidget(this->simTimeEdit);
 
-  frameLayout->addWidget(realTimeLabel);
+  frameLayout->addWidget(new QLabel(tr("Real Time:")));
   frameLayout->addWidget(this->realTimeEdit);
+
+  frameLayout->addWidget(new QLabel(tr("Iterations:")));
+  frameLayout->addWidget(this->iterationsEdit);
 
   frameLayout->addWidget(timeResetButton);
 
@@ -95,6 +98,21 @@ TimePanel::TimePanel(QWidget *_parent)
 
   this->simTime.Set(0);
   this->show();
+
+  // Create a QueuedConnection to set iterations.
+  // This is used for thread safety.
+  connect(this, SIGNAL(SetIterations(QString)),
+          this->iterationsEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+
+  // Create a QueuedConnection to set sim time.
+  // This is used for thread safety.
+  connect(this, SIGNAL(SetSimTime(QString)),
+          this->simTimeEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+
+  // Create a QueuedConnection to set real time.
+  // This is used for thread safety.
+  connect(this, SIGNAL(SetRealTime(QString)),
+          this->realTimeEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 }
 
 /////////////////////////////////////////////////
@@ -116,6 +134,9 @@ TimePanel::~TimePanel()
 /////////////////////////////////////////////////
 void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+  std::ostringstream stream;
+
   this->simTimes.push_back(msgs::Convert(_msg->sim_time()));
   if (this->simTimes.size() > 20)
     this->simTimes.pop_front();
@@ -124,7 +145,7 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   if (this->realTimes.size() > 20)
     this->realTimes.pop_front();
 
-  this->simTime = msgs::Convert(_msg->sim_time());
+  // this->simTime = msgs::Convert(_msg->sim_time());
   this->realTime = msgs::Convert(_msg->real_time());
 
   if (_msg->paused() && !g_pauseAct->isChecked())
@@ -137,42 +158,61 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
     g_pauseAct->setChecked(false);
     g_playAct->setChecked(true);
   }
+
+  // Set simulation time
+  {
+    stream.str("");
+
+    double simDbl = msgs::Convert(_msg->sim_time()).Double();
+    if (simDbl > 31536000)
+      stream << std::fixed << std::setprecision(2) << simDbl/31536000 << " dys";
+    else if (simDbl > 86400)
+      stream << std::fixed << std::setprecision(2) << simDbl/86400 << " dys";
+    else if (simDbl > 3600)
+      stream << std::fixed << std::setprecision(2) << simDbl/3600 << " hrs";
+    else if (simDbl > 999)
+      stream << std::fixed << std::setprecision(2) << simDbl/60 << " min";
+    else
+      stream << std::fixed << std::setprecision(2) << simDbl << " sec";
+
+    this->SetSimTime(QString::fromStdString(stream.str()));
+  }
+
+  // Set real time
+  {
+    stream.str("");
+
+    double realDbl = msgs::Convert(_msg->real_time()).Double();
+    if (realDbl > 31536000)
+      stream << std::fixed << std::setprecision(2)
+             << realDbl/31536000 << " dys";
+    else if (realDbl > 86400)
+      stream << std::fixed << std::setprecision(2) << realDbl/86400 << " dys";
+    else if (realDbl > 3600)
+      stream << std::fixed << std::setprecision(2) << realDbl/3600 << " hrs";
+    else if (realDbl > 999)
+      stream << std::fixed << std::setprecision(2) << realDbl/60 << " min";
+    else
+      stream << std::fixed << std::setprecision(2) << realDbl << " sec";
+
+    this->SetRealTime(QString::fromStdString(stream.str()));
+  }
+
+  // Set the iterations
+  this->SetIterations(QString::fromStdString(
+        boost::lexical_cast<std::string>(_msg->iterations())));
 }
 
 /////////////////////////////////////////////////
 void TimePanel::Update()
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+
   std::ostringstream percent;
-  std::ostringstream sim;
-  std::ostringstream real;
-  std::ostringstream pause;
-
-  double simDbl = this->simTime.Double();
-  if (simDbl > 31536000)
-    sim << std::fixed << std::setprecision(2) << simDbl/31536000 << " dys";
-  else if (simDbl > 86400)
-    sim << std::fixed << std::setprecision(2) << simDbl / 86400 << " dys";
-  else if (simDbl > 3600)
-    sim << std::fixed << std::setprecision(2) << simDbl/3600 << " hrs";
-  else if (simDbl > 999)
-    sim << std::fixed << std::setprecision(2) << simDbl/60 << " min";
-  else
-    sim << std::fixed << std::setprecision(2) << simDbl << " sec";
-
-  double realDbl = this->realTime.Double();
-  if (realDbl > 31536000)
-    real << std::fixed << std::setprecision(2) << realDbl/31536000 << " dys";
-  else if (realDbl > 86400)
-    real << std::fixed << std::setprecision(2) << realDbl/86400 << " dys";
-  else if (realDbl > 3600)
-    real << std::fixed << std::setprecision(2) << realDbl/3600 << " hrs";
-  else if (realDbl > 999)
-    real << std::fixed << std::setprecision(2) << realDbl/60 << " min";
-  else
-    real << std::fixed << std::setprecision(2) << realDbl << " sec";
 
   common::Time simAvg, realAvg;
   std::list<common::Time>::iterator simIter, realIter;
+
   simIter = ++(this->simTimes.begin());
   realIter = ++(this->realTimes.begin());
   while (simIter != this->simTimes.end() && realIter != this->realTimes.end())
@@ -193,9 +233,6 @@ void TimePanel::Update()
     percent << "0";
 
   this->percentRealTimeEdit->setText(tr(percent.str().c_str()));
-
-  this->simTimeEdit->setText(tr(sim.str().c_str()));
-  this->realTimeEdit->setText(tr(real.str().c_str()));
 }
 
 /////////////////////////////////////////////////

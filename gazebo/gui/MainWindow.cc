@@ -981,17 +981,17 @@ void MainWindow::CreateActions()
 /////////////////////////////////////////////////
 void MainWindow::CreateMenus()
 {
-  QHBoxLayout *menuLayout = new QHBoxLayout;
+  this->menuLayout = new QHBoxLayout;
 
   QFrame *frame = new QFrame;
   this->menuBar =  new QMenuBar;
   this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-  menuLayout->addWidget(this->menuBar);
-  menuLayout->addStretch(5);
-  menuLayout->setContentsMargins(0, 0, 0, 0);
+  this->menuLayout->addWidget(this->menuBar);
+  this->menuLayout->addStretch(5);
+  this->menuLayout->setContentsMargins(0, 0, 0, 0);
 
-  frame->setLayout(menuLayout);
+  frame->setLayout(this->menuLayout);
   frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
   this->setMenuWidget(frame);

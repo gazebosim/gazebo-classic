@@ -301,6 +301,8 @@ void World::Init()
 
   this->updateInfo.worldName = this->GetName();
 
+  this->iterations = 0;
+
   // Mark the world initialization
   gzlog << "World::Init" << std::endl;
 }
@@ -352,6 +354,7 @@ void World::RunLoop()
     this->enablePhysicsEngine = false;
     while (!this->stop)
       this->LogStep();
+
   }
 }
 
@@ -405,6 +408,7 @@ void World::LogStep()
       this->SetState(state);
 
       this->Update();
+      this->iterations++;
     }
 
     if (this->stepInc > 0)
@@ -466,6 +470,7 @@ void World::Step()
     {
       // query timestep to allow dynamic time step size updates
       this->simTime += this->physicsEngine->GetStepTime();
+      this->iterations++;
       this->Update();
 
       if (this->IsPaused() && this->stepInc > 0)
@@ -810,6 +815,7 @@ void World::ResetTime()
   this->pauseTime = common::Time(0);
   this->startTime = common::Time::GetWallTime();
   this->realTimeOffset = common::Time(0);
+  this->iterations = 0;
 }
 
 //////////////////////////////////////////////////
@@ -1191,6 +1197,15 @@ void World::ProcessEntityMsgs()
       }
       else
         ++iter2;
+    }
+
+    if (this->sdf->HasElement("model"))
+    {
+      sdf::ElementPtr childElem = this->sdf->GetElement("model");
+      while (childElem && childElem->GetValueString("name") != (*iter))
+        childElem = childElem->GetNextElement("model");
+      if (childElem)
+        this->sdf->RemoveChild(childElem);
     }
 
     this->rootElement->RemoveChild((*iter));
@@ -1668,6 +1683,7 @@ void World::PublishWorldStats()
   msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
   msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
   msgs::Set(this->worldStatsMsg.mutable_pause_time(), this->GetPauseTime());
+  this->worldStatsMsg.set_iterations(this->iterations);
   this->worldStatsMsg.set_paused(this->IsPaused());
 
   this->statPub->Publish(this->worldStatsMsg);

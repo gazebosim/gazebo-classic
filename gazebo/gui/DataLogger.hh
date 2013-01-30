@@ -53,18 +53,24 @@ namespace gazebo
       /// \param[in] _string The log filename
       signals: void SetFilename(QString _string);
 
+      /// \brief A signal used to set the destination label.
+      /// \param[in] _string The log destination directory
+      signals: void SetDestination(QString _string);
+
       /// \brief QT callback for the record button.
       private slots: void OnRecord(bool _toggle);
 
       /// \brief QT callback for setting the filename.
       private slots: void OnSetFilename(QString _string);
 
+      /// \brief QT callback for setting the destination label.
+      private slots: void OnSetDestination(QString _string);
+
       /// \brief QT callback for setting the log path.
       private slots: void OnBrowse();
 
       /// \brief QT callback for toggling the settings visibility.
       private slots: void OnToggleSettings(bool _checked);
-
 
       /// \brief Callback for log status messages.
       /// \param[in] _msg Log status message.

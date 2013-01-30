@@ -57,20 +57,7 @@ DataLogger::DataLogger(QWidget *_parent)
   this->timeLabel = new QLabel("00:00:00.000");
   this->timeLabel->setFixedWidth(85);
 
-  this->sizeLabel = new QLabel("0 MB");
-
-  // Create a QueuedConnection to set time. This is used for thread safety.
-  connect(this, SIGNAL(SetTime(QString)),
-          this->timeLabel, SLOT(setText(QString)), Qt::QueuedConnection);
-
-  // Create a QueuedConnection to set size. This is used for thread safety.
-  connect(this, SIGNAL(SetSize(QString)),
-          this->sizeLabel, SLOT(setText(QString)), Qt::QueuedConnection);
-
-  // Create a QueuedConnection to set filename. This is used for thread safety.
-  connect(this, SIGNAL(SetFilename(QString)),
-          this, SLOT(OnSetFilename(QString)), Qt::QueuedConnection);
-
+  this->sizeLabel = new QLabel("0.00 B");
 
   QHBoxLayout *timeLayout = new QHBoxLayout;
   timeLayout->addWidget(this->statusLabel);
@@ -139,26 +126,28 @@ DataLogger::DataLogger(QWidget *_parent)
 
   // Layout to position the record button vertically
   QVBoxLayout *buttonLayout = new QVBoxLayout;
+  buttonLayout->setContentsMargins(0, 0, 0, 0);
   buttonLayout->addWidget(this->recordButton);
   buttonLayout->addStretch(4);
 
   // Layout to position the status information vertically
   QVBoxLayout *statusLayout = new QVBoxLayout;
-  statusLayout->addSpacing(10);
+  statusLayout->setContentsMargins(0, 0, 0, 0);
   statusLayout->addWidget(statusFrame);
 
   // Horizontal layout for the record button and status information
   QHBoxLayout *topLayout = new QHBoxLayout;
+  topLayout->setContentsMargins(0, 0, 0, 0);
   topLayout->addLayout(buttonLayout);
-  topLayout->addSpacing(10);
   topLayout->addStretch(4);
   topLayout->addLayout(statusLayout);
 
   QHBoxLayout *destLayout = new QHBoxLayout;
   this->destLabel = new QLabel;
-  this->destLabel->setText("2013-01-30T06:59:44.114902");
+  this->destLabel->setStyleSheet("QLabel {color: #aeaeae; font-size: 11px;}");
+
+  destLayout->setContentsMargins(0, 0, 0, 0);
   destLayout->addSpacing(4);
-  destLayout->addWidget(new QLabel("Destination: "));
   destLayout->addWidget(this->destLabel);
   destLayout->addStretch(1);
 
@@ -175,6 +164,23 @@ DataLogger::DataLogger(QWidget *_parent)
   // Assign the mainlayout to this widget
   this->setLayout(mainLayout);
   this->layout()->setSizeConstraint(QLayout::SetFixedSize);
+
+  // Create a QueuedConnection to set time. This is used for thread safety.
+  connect(this, SIGNAL(SetTime(QString)),
+          this->timeLabel, SLOT(setText(QString)), Qt::QueuedConnection);
+
+  // Create a QueuedConnection to set size. This is used for thread safety.
+  connect(this, SIGNAL(SetSize(QString)),
+          this->sizeLabel, SLOT(setText(QString)), Qt::QueuedConnection);
+
+  // Create a QueuedConnection to set filename. This is used for thread safety.
+  connect(this, SIGNAL(SetFilename(QString)),
+          this, SLOT(OnSetFilename(QString)), Qt::QueuedConnection);
+
+  // Create a QueuedConnection to set destination.
+  // This is used for thread safety.
+  connect(this, SIGNAL(SetDestination(QString)),
+          this, SLOT(OnSetDestination(QString)), Qt::QueuedConnection);
 
   // Create a node from communication.
   this->node = transport::NodePtr(new transport::Node());
@@ -250,20 +256,46 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 
   if (_msg->has_log_file())
   {
-    this->SetFilename(QString::fromStdString(_msg->log_file().base_path()));
+    if (_msg->log_file().has_base_path())
+    {
+      std::string basePath = _msg->log_file().base_path();
+      this->SetFilename(QString::fromStdString(basePath));
 
-    stream << std::fixed << std::setprecision(2) << _msg->log_file().size();
-    if (_msg->log_file().size_units() == msgs::LogStatus::LogFile::BYTES)
-      stream << "B";
-    else if (_msg->log_file().size_units() == msgs::LogStatus::LogFile::K_BYTES)
-      stream << "KB";
-    else if (_msg->log_file().size_units() == msgs::LogStatus::LogFile::M_BYTES)
-      stream << "MB";
+      if (_msg->log_file().has_full_path() && !basePath.empty())
+      {
+        std::string leaf = _msg->log_file().full_path();
+        if (!leaf.empty())
+          leaf = leaf.substr(basePath.size());
+        this->SetDestination(QString::fromStdString(leaf));
+      }
+    }
+
+    if (_msg->log_file().has_size() && _msg->log_file().has_size_units())
+    {
+      stream << std::fixed << std::setprecision(2) << _msg->log_file().size();
+      if (_msg->log_file().size_units() == msgs::LogStatus::LogFile::BYTES)
+        stream << "B";
+      else if (_msg->log_file().size_units() == msgs::LogStatus::LogFile::K_BYTES)
+        stream << "KB";
+      else if (_msg->log_file().size_units() == msgs::LogStatus::LogFile::M_BYTES)
+        stream << "MB";
+      else
+        stream << "GB";
+
+      this->SetSize(QString::fromStdString(stream.str()));
+    }
     else
-      stream << "GB";
-
-    this->SetSize(QString::fromStdString(stream.str()));
+      this->SetSize("0.00 B");
   }
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnSetDestination(QString _filename)
+{
+  if (!_filename.isEmpty())
+    this->destLabel->setText("Log: " + _filename);
+  else
+    this->destLabel->setText("");
 }
 
 /////////////////////////////////////////////////
@@ -305,7 +337,7 @@ void DataLogger::OnBrowse()
   // Make sure the  directory exists
   if (!boost::filesystem::exists(path))
   {
-    QMessageBox msgBox;
+    QMessageBox msgBox(this);
     std::ostringstream stream;
     stream << "Directory " << path << " does not exist.";
     msgBox.setText(stream.str().c_str());
@@ -316,7 +348,7 @@ void DataLogger::OnBrowse()
   // Make sure we have a directory
   if (!boost::filesystem::is_directory(path))
   {
-    QMessageBox msgBox;
+    QMessageBox msgBox(this);
     std::ostringstream stream;
     stream << "Path " << path << " is not a directory. Please only specify a "
            << "directory for data logging.";
@@ -329,7 +361,7 @@ void DataLogger::OnBrowse()
   // Note: This is not cross-platform compatible.
   if (access(path.string().c_str(), W_OK) != 0)
   {
-    QMessageBox msgBox;
+    QMessageBox msgBox(this);
     std::ostringstream stream;
     stream << "You do no have permission to write into " << path;
     msgBox.setText(stream.str().c_str());

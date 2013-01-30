@@ -28,7 +28,6 @@ QAction *gazebo::gui::g_saveAsAct = 0;
 QAction *gazebo::gui::g_aboutAct = 0;
 QAction *gazebo::gui::g_quitAct = 0;
 QAction *gazebo::gui::g_dataLoggerAct = 0;
-QAction *gazebo::gui::g_videoRecorderAct = 0;
 
 QAction *gazebo::gui::g_newModelAct = 0;
 QAction *gazebo::gui::g_resetModelsAct = 0;

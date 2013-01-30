@@ -39,6 +39,18 @@ namespace gazebo
       public: TimePanel(QWidget *_parent = 0);
       public: virtual ~TimePanel();
 
+      /// \brief A signal used to set the sim time line edit.
+      /// \param[in] _string String representation of sim time.
+      signals: void SetSimTime(QString _string);
+
+      /// \brief A signal used to set the real time line edit.
+      /// \param[in] _string String representation of real time.
+      signals: void SetRealTime(QString _string);
+
+      /// \brief A signal used to set the iterations line edit.
+      /// \param[in] _string String representation of iterations.
+      signals: void SetIterations(QString _string);
+
       private slots: void Update();
 
       private: void OnFullScreen(bool &_value);
@@ -49,6 +61,7 @@ namespace gazebo
       private: QLineEdit *percentRealTimeEdit;
       private: QLineEdit *simTimeEdit;
       private: QLineEdit *realTimeEdit;
+      private: QLineEdit *iterationsEdit;
 
       private: common::Time lastUpdateTime, statusUpdatePeriod;
       private: common::Time simTime, realTime, pauseTime;
@@ -59,6 +72,7 @@ namespace gazebo
 
       private: std::vector<event::ConnectionPtr> connections;
       private: std::list<common::Time> simTimes, realTimes;
+      private: boost::mutex mutex;
     };
   }
 }

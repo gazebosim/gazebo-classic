@@ -644,7 +644,11 @@ namespace gazebo
       /// \brief The list of pose messages to output.
       private: msgs::Pose_V poseMsgs;
 
+      /// \brief Info passed through the WorldUpdateBegin event.
       private: common::UpdateInfo updateInfo;
+
+      /// \brief The number of simulation iterations.
+      private: uint64_t iterations;
     };
     /// \}
   }
