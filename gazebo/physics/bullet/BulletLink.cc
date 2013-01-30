@@ -163,7 +163,7 @@ void BulletLink::SetGravityMode(bool _mode)
 }
 
 //////////////////////////////////////////////////
-bool BulletLink::GetGravityMode()
+bool BulletLink::GetGravityMode() const
 {
   bool result = false;
   if (this->rigidLink)

@@ -95,7 +95,7 @@ namespace gazebo
 
       /// \brief Get the gravity mode.
       /// \return True if gravity is enabled.
-      public: virtual bool GetGravityMode() = 0;
+      public: virtual bool GetGravityMode() const = 0;
 
       /// \brief Set whether this body will collide with others in the
       /// model.
