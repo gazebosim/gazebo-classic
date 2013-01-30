@@ -67,7 +67,7 @@ namespace gazebo
       public: virtual void SetEnabled(bool enable) const;
 
       // Documentation inherited.
-      public: virtual bool GetEnabled() const {return true;}
+      public: virtual bool GetEnabled() const;
 
       // Documentation inherited.
       public: virtual void SetLinearVel(const math::Vector3 &vel);
