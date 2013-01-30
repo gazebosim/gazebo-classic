@@ -293,6 +293,11 @@ QLineEdit
   border-radius: 4;
 }
 
+QLineEdit:disabled
+{
+  color: #909090;
+}
+
 QDoubleSpinBox
 {
   margin-right: 20px;

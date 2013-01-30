@@ -968,6 +968,9 @@ void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 //////////////////////////////////////////////////
 void World::OnLogControl(ConstLogControlPtr &_data)
 {
+  if (_data->has_base_path() && !_data->base_path().empty())
+    common::LogRecord::Instance()->SetBasePath(_data->base_path());
+
   if (_data->has_start() && _data->start())
   {
     if (common::LogRecord::Instance()->GetPaused())

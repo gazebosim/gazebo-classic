@@ -358,6 +358,35 @@ unsigned int LogRecord::GetFileSize(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
+void LogRecord::SetBasePath(const std::string &_path)
+{
+  // Make sure the  directory exists
+  if (!boost::filesystem::exists(_path))
+  {
+    gzerr << "Log directory[" << _path << "] does not exist.\n";
+    return;
+  }
+
+  // Make sure we have a directory
+  if (!boost::filesystem::is_directory(_path))
+  {
+    gzerr << "Path " << _path << " is not a directory. Please only specify a "
+           << "directory for data logging.\n";
+    return;
+  }
+
+  // Make sure the path is writable.
+  // Note: This is not cross-platform compatible.
+  if (access(_path.c_str(), W_OK) != 0)
+  {
+    gzerr << "You do no have permission to write into " << _path << "\n";
+    return;
+  }
+
+  this->logBasePath = _path;
+}
+
+//////////////////////////////////////////////////
 std::string LogRecord::GetBasePath() const
 {
   return this->logBasePath.string();

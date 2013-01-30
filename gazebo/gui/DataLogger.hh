@@ -112,6 +112,9 @@ namespace gazebo
       /// \brief Frame that holds settings.
       private: QFrame *settingsFrame;
 
+      /// \brief Button to browse for a log recording directory
+      private: QPushButton *browseButton;
+
       private: bool recording;
       private: bool paused;
     };

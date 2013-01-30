@@ -140,6 +140,10 @@ namespace gazebo
       /// \return Size in bytes.
       public: unsigned int GetFileSize(const std::string &_name) const;
 
+      /// \brief Set the base path.
+      /// \param[in] _path Path to the new logging location.
+      public: void SetBasePath(const std::string &_path);
+
       /// \brief Get the base path for a log recording.
       /// \return Path for log recording.
       public: std::string GetBasePath() const;

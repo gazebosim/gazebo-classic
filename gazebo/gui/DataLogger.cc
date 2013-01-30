@@ -88,8 +88,9 @@ DataLogger::DataLogger(QWidget *_parent)
   filenameLayout->addWidget(new QLabel("Save to:"));
   filenameLayout->addWidget(this->filenameEdit);
 
-  QPushButton *browseButton = new QPushButton("Browse");
-  browseButton->setFixedHeight(23);
+  this->browseButton = new QPushButton("Browse");
+  this->browseButton->setFixedHeight(23);
+  this->browseButton->setFocusPolicy(Qt::NoFocus);
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
 
   filenameLayout->addWidget(browseButton);
@@ -212,6 +213,10 @@ void DataLogger::OnRecord(bool _toggle)
 
     this->statusLabel->setText("Recording");
 
+    // Disable filename editing while recording
+    this->filenameEdit->setEnabled(false);
+    this->browseButton->setEnabled(false);
+
     // Tell the server to start data logging
     msgs::LogControl msg;
     msg.set_start(true);
@@ -224,6 +229,10 @@ void DataLogger::OnRecord(bool _toggle)
     this->recordButton->setIcon(QPixmap(":/images/record.png"));
 
     this->statusLabel->setText("Ready");
+
+    // Enable filename editing while not recording
+    this->filenameEdit->setEnabled(true);
+    this->browseButton->setEnabled(true);
 
     // Tell the server to stop data logging
     msgs::LogControl msg;
@@ -239,11 +248,14 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
   common::Time time = msgs::Convert(_msg->sim_time());
   std::ostringstream stream;
 
+  // Compute the hours, minutes, seconds, and milliseconds that logging has
+  // been running.
   unsigned int hours = time.sec / 3600;
   unsigned int min = (time.sec - hours * 3600) / 60;
   unsigned int sec = (time.sec - hours * 3600  - min * 60);
   unsigned int msec = rint(time.nsec * 1e-6);
 
+  // Display the time.
   stream << std::setw(2) << std::setfill('0') << hours  << ":";
   stream << std::setw(2) << std::setfill('0') << min << ":";
   stream << std::setw(2) << std::setfill('0') << sec << ".";
@@ -251,16 +263,21 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 
   this->SetTime(QString::fromStdString(stream.str()));
 
-
+  // Reset the stream
   stream.str("");
 
+  // If there is log file information in the message...
   if (_msg->has_log_file())
   {
+    // If there is file name information...
     if (_msg->log_file().has_base_path())
     {
       std::string basePath = _msg->log_file().base_path();
+
+      /// Display the root log filename
       this->SetFilename(QString::fromStdString(basePath));
 
+      // Display the leaf log filename
       if (_msg->log_file().has_full_path() && !basePath.empty())
       {
         std::string leaf = _msg->log_file().full_path();
@@ -270,15 +287,27 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
       }
     }
 
+    // If there is log file size information...
     if (_msg->log_file().has_size() && _msg->log_file().has_size_units())
     {
+      // Get the size of the log file.
       stream << std::fixed << std::setprecision(2) << _msg->log_file().size();
+
+      // Get the size units.
       if (_msg->log_file().size_units() == msgs::LogStatus::LogFile::BYTES)
+      {
         stream << "B";
-      else if (_msg->log_file().size_units() == msgs::LogStatus::LogFile::K_BYTES)
+      }
+      else if (_msg->log_file().size_units() ==
+          msgs::LogStatus::LogFile::K_BYTES)
+      {
         stream << "KB";
-      else if (_msg->log_file().size_units() == msgs::LogStatus::LogFile::M_BYTES)
+      }
+      else if (_msg->log_file().size_units() ==
+          msgs::LogStatus::LogFile::M_BYTES)
+      {
         stream << "MB";
+      }
       else
         stream << "GB";
 
@@ -317,13 +346,9 @@ void DataLogger::OnSetFilename(QString _filename)
 void DataLogger::OnToggleSettings(bool _checked)
 {
   if (_checked)
-  {
     this->settingsFrame->show();
-  }
   else
-  {
     this->settingsFrame->hide();
-  }
 }
 
 /////////////////////////////////////////////////
@@ -368,6 +393,11 @@ void DataLogger::OnBrowse()
     msgBox.exec();
     return;
   }
+
+  // Set the new base path
+  msgs::LogControl msg;
+  msg.set_base_path(path.string());
+  this->pub->Publish(msg);
 
   this->SetFilename(QString::fromStdString(path.string()));
 }
