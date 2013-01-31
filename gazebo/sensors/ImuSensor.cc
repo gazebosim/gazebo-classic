@@ -55,7 +55,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 
-  this->sdf->PrintValues("  ");
+  // this->sdf->PrintValues("  ");
 
   if (this->sdf->HasElement("imu") &&
       this->sdf->GetElement("imu")->HasElement("topic") &&
@@ -138,7 +138,8 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
   // Set the time stamp
   msgs::Set(this->imuMsg.mutable_stamp(), this->world->GetSimTime());
 
-  math::Pose imuPose = this->pose + this->parentEntity->GetWorldPose();
+  math::Pose parentEntityPose = this->parentEntity->GetWorldPose();
+  math::Pose imuPose = this->pose + parentEntityPose;
 
   // Set the IMU orientation
   msgs::Set(this->imuMsg.mutable_orientation(),
@@ -149,12 +150,16 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
             imuPose.rot.GetInverse().RotateVector(
             this->parentEntity->GetWorldAngularVel()));
 
-  // compute linear velocity
+  // compute linear velocity in parent entity frame
+  math::Vector3 imuAngularVelParentFrame =
+    parentEntityPose.rot.GetInverse().RotateVector(
+    this->parentEntity->GetWorldAngularVel());
   math::Vector3 imuLinearVelParentFrame =
-    this->parentEntity->GetWorldLinearVel() +
-    this->pose.pos.Cross(this->parentEntity->GetWorldAngularVel());
+    parentEntityPose.rot.GetInverse().RotateVector(
+    this->parentEntity->GetWorldLinearVel()) +
+    this->pose.pos.Cross(imuAngularVelParentFrame);
   math::Vector3 imuLinearVelImuFrame =
-    imuPose.rot.GetInverse().RotateVector(imuLinearVelParentFrame);
+    this->pose.rot.GetInverse().RotateVector(imuLinearVelParentFrame);
 
   // Compute and set the IMU linear acceleration
   double dt = (this->world->GetSimTime() - this->lastSimTime).Double();
