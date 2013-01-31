@@ -159,6 +159,12 @@ void Entity::SetInitialRelativePose(const math::Pose &_p)
 }
 
 //////////////////////////////////////////////////
+math::Pose Entity::GetInitialRelativePose() const
+{
+  return this->initialRelativePose;
+}
+
+//////////////////////////////////////////////////
 math::Box Entity::GetBoundingBox() const
 {
   return math::Box(math::Vector3(0, 0, 0), math::Vector3(1, 1, 1));
@@ -397,11 +403,10 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
 //
 void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
 {
-  boost::mutex::scoped_lock lock(*this->GetWorld()->GetSetWorldPoseMutex());
-
-  math::Pose oldPose = this->worldPose;
-  (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
-
+  {
+    boost::mutex::scoped_lock lock(*this->GetWorld()->GetSetWorldPoseMutex());
+    (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
+  }
   if (_publish)
     this->PublishPose();
 }

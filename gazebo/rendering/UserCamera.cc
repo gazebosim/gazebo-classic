@@ -110,11 +110,11 @@ void UserCamera::Init()
   else if (RenderEngine::Instance()->GetRenderPathType() ==
            RenderEngine::FORWARD)
   {
-    this->SetClipDist(0.1, 5000);
+    this->SetClipDist(.1, 5000);
   }
   else
   {
-    this->SetClipDist(0.1, 5000);
+    this->SetClipDist(.1, 5000);
   }
 
   // Removing for now because the axis doesn't not move properly when the
@@ -256,7 +256,7 @@ void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
 
 /////////////////////////////////////////////////
 bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
-                                     double _minDist, double _maxDist)
+                                     double /*_minDist*/, double /*_maxDist*/)
 {
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
@@ -284,8 +284,6 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
     pos.z = bb.max.z;
 
     this->SetViewController(OrbitViewController::GetTypeString(), pos);
-    static_cast<OrbitViewController*>(this->viewController)->SetDistanceRange(
-        _minDist, _maxDist);
   }
   else
     this->SetViewController(FPSViewController::GetTypeString());
@@ -336,6 +334,14 @@ void UserCamera::SetViewController(const std::string &type,
     gzthrow("Invalid view controller type: " + type);
 
   this->viewController->Init(_pos);
+}
+
+//////////////////////////////////////////////////
+std::string UserCamera::GetViewControllerTypeString()
+{
+  if (this->viewController)
+    return this->viewController->GetTypeString();
+  return "";
 }
 
 //////////////////////////////////////////////////
@@ -395,7 +401,6 @@ void UserCamera::ShowVisual(bool /*_s*/)
 //////////////////////////////////////////////////
 bool UserCamera::MoveToPosition(const math::Pose &_pose, double _time)
 {
-  this->orbitViewController->SetFocalPoint(_pose.pos);
   return Camera::MoveToPosition(_pose, _time);
 }
 
@@ -497,7 +502,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   this->animState->setLoop(false);
   this->prevAnimTime = common::Time::GetWallTime();
 
-  this->orbitViewController->SetFocalPoint(_visual->GetWorldPose().pos);
+  // this->orbitViewController->SetFocalPoint(_visual->GetWorldPose().pos);
   this->onAnimationComplete =
     boost::bind(&UserCamera::OnMoveToVisualComplete, this);
 }
@@ -505,8 +510,6 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 /////////////////////////////////////////////////
 void UserCamera::OnMoveToVisualComplete()
 {
-  this->orbitViewController->SetYaw(this->GetWorldPose().rot.GetAsEuler().z);
-  this->orbitViewController->SetPitch(this->GetWorldPose().rot.GetAsEuler().y);
   this->orbitViewController->SetDistance(this->GetWorldPose().pos.Distance(
         this->orbitViewController->GetFocalPoint()));
 }

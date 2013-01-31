@@ -26,15 +26,16 @@
 #include <map>
 #include <string>
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "common/SystemPaths.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsTypes.hh"
-#include "physics/Physics.hh"
-#include "sensors/sensors.hh"
-#include "rendering/rendering.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/Physics.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/rendering/rendering.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo_config.h"
 #include "gazebo/Server.hh"
@@ -55,6 +56,7 @@ class ServerFixture : public testing::Test
                this->imgData = NULL;
                this->serverThread = NULL;
 
+               common::Console::Instance()->Init("test.log");
                common::SystemPaths::Instance()->AddGazeboPaths(
                    TEST_REGRESSION_PATH);
 
@@ -117,8 +119,12 @@ class ServerFixture : public testing::Test
                               _paused));
 
                // Wait for the server to come up
-               while (!this->server || !this->server->GetInitialized())
+               // Use a 30 second timeout.
+               int waitCount = 0, maxWaitCount = 3000;
+               while ((!this->server || !this->server->GetInitialized()) &&
+                      ++waitCount < maxWaitCount)
                  common::Time::MSleep(10);
+               ASSERT_LT(waitCount, maxWaitCount);
 
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
@@ -129,6 +135,17 @@ class ServerFixture : public testing::Test
 
                this->factoryPub =
                  this->node->Advertise<msgs::Factory>("~/factory");
+
+               // Wait for the world to reach the correct pause state.
+               // This might not work properly with multiple worlds.
+               // Use a 30 second timeout.
+               waitCount = 0;
+               maxWaitCount = 3000;
+               while ((!physics::get_world() ||
+                        physics::get_world()->IsPaused() != _paused) &&
+                      ++waitCount < maxWaitCount)
+                 common::Time::MSleep(10);
+               ASSERT_LT(waitCount, maxWaitCount);
              }
 
   protected: void RunServer(const std::string &_worldFilename)
