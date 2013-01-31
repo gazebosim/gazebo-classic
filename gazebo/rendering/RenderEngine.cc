@@ -405,7 +405,6 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
       Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
           "General");
 
-
       // Parse all material files in the path if any exist
       boost::filesystem::path dir(path);
       std::list<boost::filesystem::path> resultSet;
