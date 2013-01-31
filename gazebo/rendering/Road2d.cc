@@ -256,8 +256,8 @@ void Road2d::Segment::Load(msgs::Road _msg)
 
   float texCoord = 0.0;
 
-  double texMaxLen = this->width; // length for each texture tile, same road width as texture is square (if texture size should ever change there needs to be code to handle this)
-  double curLen = 0.0; // current length of a road tile
+  double texMaxLen = this->width; // length for each texture tile, same as road width as texture is square (if texture size should change or made custom in a future version there needs to be code to handle this)
+  double curLen = 0.0; // current road length
 
   // Generate the triangles for the road
   for (unsigned int i = 0; i < this->points.size(); ++i)
@@ -270,12 +270,12 @@ void Road2d::Segment::Load(msgs::Road _msg)
     }
     else
     {
-      // calculate current road length
+      // update current road length
       curLen += this->points[i].Distance(this->points[i-1]);
 
       //assign texture coordinate as percentage of texture tile size and let ogre/opengl handle the texture wrapping
       texCoord = curLen/texMaxLen; 
-    } 
+    }
 
     // Start point is a special case
     if (i == 0)
