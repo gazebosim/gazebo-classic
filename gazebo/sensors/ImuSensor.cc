@@ -42,7 +42,7 @@ ImuSensor::ImuSensor()
     : Sensor()
 {
   std::cout << "NEW IMU\n";
-  this->imuLinearAcc = math::Vector3(0, 0, 0);
+  this->linearAcc = math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
@@ -88,9 +88,8 @@ void ImuSensor::Load(const std::string &_worldName)
     gzthrow("IMU has invalid paret[" + this->parentName +
             "]. Must be a link\n");
   }
-  this->lastSimTime = this->world->GetSimTime();
-  this->imuReferencePose = this->pose + this->parentEntity->GetWorldPose();
-  this->imuLastLinearVel = this->imuReferencePose.rot.RotateVector(
+  this->referencePose = this->pose + this->parentEntity->GetWorldPose();
+  this->lastLinearVel = this->referencePose.rot.RotateVector(
     this->parentEntity->GetWorldLinearVel());
 }
 
@@ -125,12 +124,14 @@ math::Quaternion ImuSensor::GetOrientation() const
 //////////////////////////////////////////////////
 void ImuSensor::SetReferencePose()
 {
-  this->imuReferencePose = this->pose + this->parentEntity->GetWorldPose();
+  this->referencePose = this->pose + this->parentEntity->GetWorldPose();
 }
 
 //////////////////////////////////////////////////
 void ImuSensor::UpdateImpl(bool /*_force*/)
 {
+  double dt = (this->world->GetSimTime() - this->lastMeasurementTime).Double();
+
   this->lastMeasurementTime = this->world->GetSimTime();
 
   this->imuMsg.set_entity_name(this->parentName);
@@ -143,7 +144,7 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
 
   // Set the IMU orientation
   msgs::Set(this->imuMsg.mutable_orientation(),
-            imuPose.rot * this->imuReferencePose.rot.GetInverse());
+            imuPose.rot * this->referencePose.rot.GetInverse());
 
   // Set the IMU angular velocity
   msgs::Set(this->imuMsg.mutable_angular_velocity(),
@@ -162,16 +163,13 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
     this->pose.rot.GetInverse().RotateVector(imuLinearVelParentFrame);
 
   // Compute and set the IMU linear acceleration
-  double dt = (this->world->GetSimTime() - this->lastSimTime).Double();
-
   if (dt > 0.0)
   {
-    this->imuLinearAcc = (imuLinearVelImuFrame - this->imuLastLinearVel) / dt;
-    this->imuLastLinearVel = imuLinearVelImuFrame;
-    this->lastSimTime = this->world->GetSimTime();
+    this->linearAcc = (imuLinearVelImuFrame - this->lastLinearVel) / dt;
+    this->lastLinearVel = imuLinearVelImuFrame;
   }
 
-  msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->imuLinearAcc);
+  msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
 
   if (this->pub)
     this->pub->Publish(this->imuMsg);

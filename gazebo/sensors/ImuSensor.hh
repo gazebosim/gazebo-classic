@@ -65,18 +65,25 @@ namespace gazebo
       public: math::Vector3 GetLinearAcceleration() const;
 
       /// \brief get orientation of the IMU relative to the reference pose
+      /// \return returns the orientation quaternion of the IMU relative to
+      /// the imu reference pose.
       public: math::Quaternion GetOrientation() const;
 
       /// \brief Sets the current pose as the IMU reference pose
       public: void SetReferencePose();
 
-      private: math::Pose imuReferencePose;
-      private: math::Vector3 imuLastLinearVel;
-      private: math::Vector3 imuLinearAcc;
+      /// \brief Imu reference pose
+      private: math::Pose referencePose;
+
+      /// \brief Save previous imu linear velocity for computing acceleration.
+      private: math::Vector3 lastLinearVel;
+
+      /// \brief Imu linear acceleration
+      private: math::Vector3 linearAcc;
+
       private: transport::PublisherPtr pub;
       private: physics::LinkPtr parentEntity;
       private: msgs::IMU imuMsg;
-      private: common::Time lastSimTime;
     };
     /// \}
   }
