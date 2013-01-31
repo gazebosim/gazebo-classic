@@ -28,7 +28,6 @@
 
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
-#include "gazebo/physics/PhysicsEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/ImuSensor.hh"
@@ -89,7 +88,7 @@ void ImuSensor::Load(const std::string &_worldName)
     gzthrow("IMU has invalid paret[" + this->parentName +
             "]. Must be a link\n");
   }
-
+  this->lastSimTime = this->world->GetSimTime();
   this->imuReferencePose = this->pose + this->parentEntity->GetWorldPose();
   this->imuLastLinearVel = this->imuReferencePose.rot.RotateVector(
     this->parentEntity->GetWorldLinearVel());
@@ -158,12 +157,13 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
     imuPose.rot.GetInverse().RotateVector(imuLinearVelParentFrame);
 
   // Compute and set the IMU linear acceleration
-  double dt = this->world->GetPhysicsEngine()->GetStepTime();
+  double dt = (this->world->GetSimTime() - this->lastSimTime).Double();
 
   if (dt > 0.0)
   {
     this->imuLinearAcc = (imuLinearVelImuFrame - this->imuLastLinearVel) / dt;
     this->imuLastLinearVel = imuLinearVelImuFrame;
+    this->lastSimTime = this->world->GetSimTime();
   }
 
   msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->imuLinearAcc);

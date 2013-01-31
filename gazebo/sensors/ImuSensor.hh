@@ -76,6 +76,7 @@ namespace gazebo
       private: transport::PublisherPtr pub;
       private: physics::LinkPtr parentEntity;
       private: msgs::IMU imuMsg;
+      private: common::Time lastSimTime;
     };
     /// \}
   }
