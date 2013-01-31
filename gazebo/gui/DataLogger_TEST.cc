@@ -134,7 +134,9 @@ void DataLogger_TEST::StressTest()
   // due to the record button being toggled.
   unsigned int dirCount = 0;
   for (boost::filesystem::directory_iterator iter("/tmp/gazebo_test");
-       iter != boost::filesystem::directory_iterator(); ++iter, ++dirCount);
+       iter != boost::filesystem::directory_iterator(); ++iter, ++dirCount)
+  {
+  }
 
   QVERIFY(dirCount == count / 2);
 
