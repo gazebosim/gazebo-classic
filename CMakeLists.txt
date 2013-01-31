@@ -14,7 +14,7 @@ set (GAZEBO_MINOR_VERSION 4)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
-set (GAZEBO_PATCH_VERSION 5)
+set (GAZEBO_PATCH_VERSION 6)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -163,6 +163,9 @@ if (ENABLE_SSE4)
 else()
   message(STATUS "\nSSE4 disabled.\n")
 endif()
+
+# Check for DRI capable Display
+include (${gazebo_cmake_dir}/CheckDRIDisplay.cmake)
 
 set (CMAKE_C_FLAGS_RELEASE " -s -O3 -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release" FORCE)
 set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
