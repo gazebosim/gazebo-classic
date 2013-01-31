@@ -54,14 +54,17 @@ DataLogger::DataLogger(QWidget *_parent)
 
   // Textual status information
   this->statusLabel = new QLabel("Ready");
+  this->statusLabel->setObjectName("dataLoggerStatusLabel");
   this->statusLabel->setFixedWidth(70);
 
   // Duration of logging
   this->timeLabel = new QLabel("00:00:00.000");
+  this->timeLabel->setObjectName("dataLoggerTimeLabel");
   this->timeLabel->setFixedWidth(85);
 
   // Size of log file
   this->sizeLabel = new QLabel("0.00 B");
+  this->sizeLabel->setObjectName("dataLoggerSizeLabel");
 
   QHBoxLayout *timeLayout = new QHBoxLayout;
   timeLayout->addWidget(this->statusLabel);
@@ -148,6 +151,7 @@ DataLogger::DataLogger(QWidget *_parent)
 
   QHBoxLayout *destLayout = new QHBoxLayout;
   this->destLabel = new QLabel;
+  this->destLabel->setObjectName("dataLoggerDestnationLabel");
   this->destLabel->setStyleSheet("QLabel {color: #aeaeae; font-size: 11px;}");
 
   destLayout->setContentsMargins(0, 0, 0, 0);
@@ -247,7 +251,6 @@ void DataLogger::OnRecord(bool _toggle)
 /////////////////////////////////////////////////
 void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 {
-  std::cout << _msg->DebugString() << "\n\n";
   // A new log status message has arrived, let's display the contents.
   common::Time time = msgs::Convert(_msg->sim_time());
   std::ostringstream stream;
@@ -287,7 +290,6 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
         std::string leaf = _msg->log_file().full_path();
         if (!leaf.empty())
           leaf = leaf.substr(basePath.size());
-        std::cout << "Set Destination[" << leaf << "]\n";
         this->SetDestination(QString::fromStdString(leaf));
       }
     }
@@ -330,12 +332,6 @@ void DataLogger::OnSetDestination(QString _filename)
     this->destLabel->setText("Log: " + _filename);
   else
     this->destLabel->setText("");
-}
-
-/////////////////////////////////////////////////
-std::string DataLogger::GetDestination() const
-{
-  return this->destLabel->text().toStdString();
 }
 
 /////////////////////////////////////////////////

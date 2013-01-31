@@ -15,7 +15,10 @@
  *
 */
 
-#include "gazebo/gui/TestFramework.h"
+#ifndef _DATALOGGER_TEST_HH_
+#define _DATALOGGER_TEST_HH_
+
+#include "gazebo/gui/TestFramework.hh"
 
 /// \brief A test class for the DataLogger widget.
 class DataLogger_TEST : public TestFramework
@@ -24,4 +27,9 @@ class DataLogger_TEST : public TestFramework
 
   /// \brief Test the record button on the data logging gui.
   private slots: void RecordButton();
+
+  /// \brief Simulate pressing the record button many times.
+  private slots: void StressTest();
 };
+
+#endif

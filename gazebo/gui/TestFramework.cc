@@ -18,7 +18,7 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/gazebo.hh"
-#include "gazebo/gui/TestFramework.moc"
+#include "gazebo/gui/TestFramework.hh"
 
 /////////////////////////////////////////////////
 void TestFramework::initTestCase()

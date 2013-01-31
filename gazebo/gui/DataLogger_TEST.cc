@@ -15,8 +15,9 @@
  *
 */
 
+#include "gazebo/math/Rand.hh"
 #include "gazebo/gui/DataLogger.hh"
-#include "DataLogger_TEST.moc"
+#include "gazebo/gui/DataLogger_TEST.hh"
 
 /////////////////////////////////////////////////
 void DataLogger_TEST::RecordButton()
@@ -28,11 +29,30 @@ void DataLogger_TEST::RecordButton()
   QToolButton *recordButton = dataLogger->findChild<QToolButton*>(
       "dataLoggerRecordButton");
 
+  // Get the destination label
+  QLabel *destLabel = dataLogger->findChild<QLabel*>(
+      "dataLoggerDestnationLabel");
+
+  // Get the time label
+  QLabel *timeLabel = dataLogger->findChild<QLabel*>("dataLoggerTimeLabel");
+
+  // Get the status label
+  QLabel *statusLabel = dataLogger->findChild<QLabel*>("dataLoggerStatusLabel");
+
+  // Get the size label
+  QLabel *sizeLabel = dataLogger->findChild<QLabel*>("dataLoggerSizeLabel");
+
+  QVERIFY(recordButton != NULL);
+  QVERIFY(destLabel != NULL);
+  QVERIFY(sizeLabel != NULL);
+  QVERIFY(timeLabel != NULL);
+  QVERIFY(statusLabel != NULL);
+
   // Toggle the record button, which starts logging.
   recordButton->toggle();
 
   // Wait for a log status return message
-  while (dataLogger->GetDestination().empty())
+  while (destLabel->text().isEmpty())
   {
     // The following line tell QT to process its events. This is vital for
     // all tests, but it must be run in the main thread.
@@ -40,10 +60,79 @@ void DataLogger_TEST::RecordButton()
     gazebo::common::Time::MSleep(100);
   }
 
+  std::string txt;
+
   // Make sure the destination log file is correct.
-  QVERIFY(dataLogger->GetDestination().find("test/state.log") !=
-          std::string::npos);
+  txt = destLabel->text().toStdString();
+  QVERIFY(txt.find("test/state.log") != std::string::npos);
+
+  // Make sure the initial size is zero
+  txt = sizeLabel->text().toStdString();
+  QVERIFY(txt == "0.00 B");
+
+  // Make sure the initial time is zero
+  txt = timeLabel->text().toStdString();
+  QVERIFY(txt == "00:00:00.000");
+
+  // Make sure the status label says "Recording"
+  txt = statusLabel->text().toStdString();
+  QVERIFY(txt == "Recording");
+
+
+  // Toggle the record button, which stops logging.
+  recordButton->toggle();
+
+  // Make sure the initial size is zero
+  txt = sizeLabel->text().toStdString();
+  QVERIFY(txt == "0.00 B");
+
+  // Make sure the initial time is zero
+  txt = timeLabel->text().toStdString();
+  QVERIFY(txt == "00:00:00.000");
+
+
+  // Make sure the status label says "Ready"
+  txt = statusLabel->text().toStdString();
+  QVERIFY(txt == "Ready");
 }
 
-// Generate a main function.
+/////////////////////////////////////////////////
+void DataLogger_TEST::StressTest()
+{
+  gazebo::transport::NodePtr node;
+  gazebo::transport::PublisherPtr pub;
+
+  // Create a node from communication.
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  node->Init();
+  pub = node->Advertise<gazebo::msgs::LogControl>("~/log/control");
+
+  gazebo::msgs::LogControl msg;
+  msg.set_base_path("/tmp/gazebo_test");
+  pub->Publish(msg);
+
+  // Create a new data logger widget
+  gazebo::gui::DataLogger *dataLogger = new gazebo::gui::DataLogger;
+
+  // Get the record button
+  QToolButton *recordButton = dataLogger->findChild<QToolButton*>(
+      "dataLoggerRecordButton");
+
+  // Toggle the record button many times
+  for (unsigned int i = 0; i < 1000; ++i)
+  {
+    recordButton->toggle();
+  }
+
+  // Toggle the record button many times with sleeps
+  for (unsigned int i = 0; i < 50; ++i)
+  {
+    recordButton->toggle();
+
+    // Sleep for random times
+    gazebo::common::Time::MSleep(gazebo::math::Rand::GetIntUniform(0, 1000));
+  }
+}
+
+// Generate a main function for the test
 QTEST_MAIN(DataLogger_TEST)

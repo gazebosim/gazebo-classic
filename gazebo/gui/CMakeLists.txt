@@ -79,6 +79,7 @@ set (tests
   DataLogger_TEST.cc
 )
 
+# Generate executables for each of the QT unit tests
 gz_build_qt_tests(${tests})
 
 set (resources resources.qrc)

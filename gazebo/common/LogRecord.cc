@@ -356,10 +356,7 @@ void LogRecord::SetBasePath(const std::string &_path)
 {
   // Make sure the  directory exists
   if (!boost::filesystem::exists(_path))
-  {
-    gzerr << "Log directory[" << _path << "] does not exist.\n";
-    return;
-  }
+    boost::filesystem::create_directories(_path);
 
   // Make sure we have a directory
   if (!boost::filesystem::is_directory(_path))
