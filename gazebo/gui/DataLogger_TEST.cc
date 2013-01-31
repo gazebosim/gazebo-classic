@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/filesystem.hpp>
 #include "gazebo/math/Rand.hh"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/DataLogger_TEST.hh"
@@ -118,20 +119,27 @@ void DataLogger_TEST::StressTest()
   QToolButton *recordButton = dataLogger->findChild<QToolButton*>(
       "dataLoggerRecordButton");
 
-  // Toggle the record button many times
-  for (unsigned int i = 0; i < 1000; ++i)
-  {
-    recordButton->toggle();
-  }
+  unsigned int count = 100;
 
   // Toggle the record button many times with sleeps
-  for (unsigned int i = 0; i < 50; ++i)
+  for (unsigned int i = 0; i < count; ++i)
   {
     recordButton->toggle();
 
     // Sleep for random times
-    gazebo::common::Time::MSleep(gazebo::math::Rand::GetIntUniform(0, 1000));
+    gazebo::common::Time::MSleep(gazebo::math::Rand::GetIntUniform(10, 500));
   }
+
+  // There should be (count * 0.5) log directories in /tmp/gazebo_test
+  // due to the record button being toggled.
+  unsigned int dirCount = 0;
+  for (boost::filesystem::directory_iterator iter("/tmp/gazebo_test");
+       iter != boost::filesystem::directory_iterator(); ++iter, ++dirCount);
+
+  QVERIFY(dirCount == count / 2);
+
+  // Cleanup after ourselves.
+  boost::filesystem::remove_all("/tmp/gazebo_test");
 }
 
 // Generate a main function for the test
