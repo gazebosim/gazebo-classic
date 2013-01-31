@@ -28,6 +28,7 @@
 #include <list>
 #include <vector>
 
+#include "msgs/msgs.hh"
 #include "common/Event.hh"
 #include "math/Box.hh"
 #include "math/Pose.hh"
@@ -36,7 +37,6 @@
 #include "math/Vector2d.hh"
 
 #include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
 #include "rendering/RenderTypes.hh"
 #include "common/CommonTypes.hh"
 

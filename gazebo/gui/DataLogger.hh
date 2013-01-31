@@ -41,6 +41,10 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~DataLogger();
 
+      /// \brief Get the destination filename.
+      /// \return Destination filename
+      public: std::string GetDestination() const;
+
       /// \brief A signal used to set the time label.
       /// \param[in] _string String representation of time.
       signals: void SetTime(QString _string);

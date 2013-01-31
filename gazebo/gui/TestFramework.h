@@ -15,25 +15,24 @@
  *
 */
 
-#ifndef GAZEBO_QT_HEADERS_H_
-#define GAZEBO_QT_HEADERS_H_
+#include <boost/thread.hpp>
+#include "gazebo_config.h"
+#include "test_config.h"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/rendering/rendering.hh"
+#include "gazebo/Server.hh"
 
-#pragma GCC system_header
+#include "gazebo/gui/qt.h"
 
-#include <QtGui>
-#include <QX11Info>
-#include <QWidget>
-#include <QPushButton>
-#include <QPoint>
-#include <QFrame>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QGroupBox>
-#include <QApplication>
-#include <qmainwindow.h>
-#include <QAction>
-#include <QtTest/QtTest>
+class TestFramework : public QObject
+{
+  Q_OBJECT
 
-#endif
+  private slots: void initTestCase();
+  private slots: void cleanupTestCase();
+
+  private: void RunServer();
+
+  protected: gazebo::Server *server;
+  protected: boost::thread *serverThread;
+};

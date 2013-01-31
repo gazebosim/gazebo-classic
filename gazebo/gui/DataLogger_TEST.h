@@ -15,25 +15,13 @@
  *
 */
 
-#ifndef GAZEBO_QT_HEADERS_H_
-#define GAZEBO_QT_HEADERS_H_
+#include "gazebo/gui/TestFramework.h"
 
-#pragma GCC system_header
+/// \brief A test class for the DataLogger widget.
+class DataLogger_TEST : public TestFramework
+{
+  Q_OBJECT
 
-#include <QtGui>
-#include <QX11Info>
-#include <QWidget>
-#include <QPushButton>
-#include <QPoint>
-#include <QFrame>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QGroupBox>
-#include <QApplication>
-#include <qmainwindow.h>
-#include <QAction>
-#include <QtTest/QtTest>
-
-#endif
+  /// \brief Test the record button on the data logging gui.
+  private slots: void RecordButton();
+};

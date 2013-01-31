@@ -1761,5 +1761,6 @@ void World::PublishLogStatus()
     msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::G_BYTES);
   }
 
+  printf("Publish status\n");
   this->logStatusPub->Publish(msg);
 }

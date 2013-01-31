@@ -24,7 +24,6 @@ set (sources
   InsertModelWidget.cc
   JointControlWidget.cc
   LightMaker.cc
-  main.cc
   MainWindow.cc
   MeshMaker.cc
   ModelEditWidget.cc
@@ -76,13 +75,23 @@ set (headers
   viewers/ViewFactory.hh
 )
 
+set (tests
+  DataLogger_TEST.cc
+)
+
+gz_build_qt_tests(${tests})
+
 set (resources resources.qrc)
 
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-gz_add_executable(gzclient ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+gz_add_executable(gzclient ${sources} main.cc ${headers_MOC} ${headers} ${resources_RCC})
+
 gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+
+add_dependencies(gazebo_gui gazebo_msgs)
+add_dependencies(gzclient gazebo_msgs)
 
 target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_transport
@@ -109,8 +118,6 @@ target_link_libraries(gzclient  gazebo_common
                                 ${ogre_libraries}
                                 ${Boost_LIBRARIES}
                                 pthread)
-
-
 
 add_definitions(${QT_DEFINITIONS})
 

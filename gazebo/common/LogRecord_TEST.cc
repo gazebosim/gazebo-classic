@@ -33,10 +33,10 @@ TEST(LogRecord_TEST, Constructor)
   boost::filesystem::path logPath = "/tmp/gazebo";
   if (homePath)
     logPath = boost::filesystem::path(homePath);
-  logPath /= "/.gazebo/log";
+  logPath /= "/.gazebo/log/";
 
   // Make sure the log path is correct
-  EXPECT_EQ(logPath.string(), recorder->GetBasePath());
+  EXPECT_EQ(recorder->GetBasePath(), logPath.string());
 
   EXPECT_FALSE(recorder->GetPaused());
   EXPECT_FALSE(recorder->GetRunning());
@@ -59,15 +59,15 @@ TEST(LogRecord_TEST, StartErrors)
 
   // Invalid encoding
   {
+    EXPECT_TRUE(recorder->Init("test"));
     EXPECT_THROW(recorder->Start("garbage"), gazebo::common::Exception);
   }
 
   // Double start
   {
-    EXPECT_TRUE(recorder->Init("test"));
-    EXPECT_TRUE(recorder->Start("test"));
+    EXPECT_TRUE(recorder->Start("bz2"));
     EXPECT_TRUE(recorder->GetRunning());
-    EXPECT_FALSE(recorder->Start("test"));
+    EXPECT_FALSE(recorder->Start("bz2"));
   }
 }
 

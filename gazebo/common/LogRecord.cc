@@ -48,6 +48,7 @@ LogRecord::LogRecord()
   this->paused = false;
   this->initialized = false;
   this->stopThread = false;
+  this->firstUpdate = true;
 
   // Get the user's home directory
   // \todo getenv is not portable, and there is no generic cross-platform
@@ -89,6 +90,7 @@ bool LogRecord::Init(const std::string &_subdir)
   this->running = false;
   this->paused = false;
   this->stopThread = false;
+  this->firstUpdate = true;
 
   return true;
 }

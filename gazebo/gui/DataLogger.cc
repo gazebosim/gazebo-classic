@@ -247,6 +247,7 @@ void DataLogger::OnRecord(bool _toggle)
 /////////////////////////////////////////////////
 void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 {
+  std::cout << _msg->DebugString() << "\n\n";
   // A new log status message has arrived, let's display the contents.
   common::Time time = msgs::Convert(_msg->sim_time());
   std::ostringstream stream;
@@ -286,6 +287,7 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
         std::string leaf = _msg->log_file().full_path();
         if (!leaf.empty())
           leaf = leaf.substr(basePath.size());
+        std::cout << "Set Destination[" << leaf << "]\n";
         this->SetDestination(QString::fromStdString(leaf));
       }
     }
@@ -328,6 +330,12 @@ void DataLogger::OnSetDestination(QString _filename)
     this->destLabel->setText("Log: " + _filename);
   else
     this->destLabel->setText("");
+}
+
+/////////////////////////////////////////////////
+std::string DataLogger::GetDestination() const
+{
+  return this->destLabel->text().toStdString();
 }
 
 /////////////////////////////////////////////////
