@@ -28,6 +28,7 @@
 
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/ImuSensor.hh"
@@ -42,6 +43,7 @@ ImuSensor::ImuSensor()
     : Sensor()
 {
   std::cout << "NEW IMU\n";
+  this->imuLinearAcc = math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
@@ -87,6 +89,10 @@ void ImuSensor::Load(const std::string &_worldName)
     gzthrow("IMU has invalid paret[" + this->parentName +
             "]. Must be a link\n");
   }
+
+  this->imuReferencePose = this->pose + this->parentEntity->GetWorldPose();
+  this->imuLastLinearVel = this->imuReferencePose.rot.RotateVector(
+    this->parentEntity->GetWorldLinearVel());
 }
 
 //////////////////////////////////////////////////
@@ -112,6 +118,18 @@ math::Vector3 ImuSensor::GetLinearAcceleration() const
 }
 
 //////////////////////////////////////////////////
+math::Quaternion ImuSensor::GetOrientation() const
+{
+  return msgs::Convert(this->imuMsg.orientation());
+}
+
+//////////////////////////////////////////////////
+void ImuSensor::SetReferencePose()
+{
+  this->imuReferencePose = this->pose + this->parentEntity->GetWorldPose();
+}
+
+//////////////////////////////////////////////////
 void ImuSensor::UpdateImpl(bool /*_force*/)
 {
   this->lastMeasurementTime = this->world->GetSimTime();
@@ -121,17 +139,34 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
   // Set the time stamp
   msgs::Set(this->imuMsg.mutable_stamp(), this->world->GetSimTime());
 
+  math::Pose imuPose = this->pose + this->parentEntity->GetWorldPose();
+
   // Set the IMU orientation
   msgs::Set(this->imuMsg.mutable_orientation(),
-            this->parentEntity->GetWorldPose().rot);
+            imuPose.rot * this->imuReferencePose.rot.GetInverse());
 
   // Set the IMU angular velocity
   msgs::Set(this->imuMsg.mutable_angular_velocity(),
-            this->parentEntity->GetWorldAngularVel());
+            imuPose.rot.GetInverse().RotateVector(
+            this->parentEntity->GetWorldAngularVel()));
 
-  // Set the IMU linear acceleration
-  msgs::Set(this->imuMsg.mutable_linear_acceleration(),
-            this->parentEntity->GetWorldLinearAccel());
+  // compute linear velocity
+  math::Vector3 imuLinearVelParentFrame =
+    this->parentEntity->GetWorldLinearVel() +
+    this->pose.pos.Cross(this->parentEntity->GetWorldAngularVel());
+  math::Vector3 imuLinearVelImuFrame =
+    imuPose.rot.GetInverse().RotateVector(imuLinearVelParentFrame);
+
+  // Compute and set the IMU linear acceleration
+  double dt = this->world->GetPhysicsEngine()->GetStepTime();
+
+  if (dt > 0.0)
+  {
+    this->imuLinearAcc = (imuLinearVelImuFrame - this->imuLastLinearVel) / dt;
+    this->imuLastLinearVel = imuLinearVelImuFrame;
+  }
+
+  msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->imuLinearAcc);
 
   if (this->pub)
     this->pub->Publish(this->imuMsg);
