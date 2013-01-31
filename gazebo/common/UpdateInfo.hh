@@ -17,16 +17,24 @@
 #ifndef _UPDATEINFO_HH_
 #define _UPDATEINFO_HH_
 
+#include <string>
 #include "gazebo/common/Time.hh"
 
 namespace gazebo
 {
   namespace common
   {
+    /// \class UpdateInfo UpdateInfo.hh common/common.hh
+    /// \brief Information for use in an update event.
     class UpdateInfo
     {
+      /// \brief Name of the world.
       public: std::string worldName;
+
+      /// \brief Current simulation time.
       public: common::Time simTime;
+
+      /// \brief Current real time.
       public: common::Time realTime;
     };
   }

@@ -52,12 +52,15 @@ DataLogger::DataLogger(QWidget *_parent)
   statusFrame->setFixedWidth(290);
   statusFrame->setObjectName("dataLoggerStatusFrame");
 
+  // Textual status information
   this->statusLabel = new QLabel("Ready");
   this->statusLabel->setFixedWidth(70);
 
+  // Duration of logging
   this->timeLabel = new QLabel("00:00:00.000");
   this->timeLabel->setFixedWidth(85);
 
+  // Size of log file
   this->sizeLabel = new QLabel("0.00 B");
 
   QHBoxLayout *timeLayout = new QHBoxLayout;

@@ -58,18 +58,23 @@ namespace gazebo
       signals: void SetDestination(QString _string);
 
       /// \brief QT callback for the record button.
+      /// \param[in] _toggle True if the record button was toggled.
       private slots: void OnRecord(bool _toggle);
 
       /// \brief QT callback for setting the filename.
+      /// \param[in] _string Filename value.
       private slots: void OnSetFilename(QString _string);
 
       /// \brief QT callback for setting the destination label.
+      /// \param[in] _string Destination value.
       private slots: void OnSetDestination(QString _string);
 
       /// \brief QT callback for setting the log path.
       private slots: void OnBrowse();
 
       /// \brief QT callback for toggling the settings visibility.
+      /// \param[in] _checked True if the record button is in the checked
+      /// state.
       private slots: void OnToggleSettings(bool _checked);
 
       /// \brief Callback for log status messages.
@@ -114,9 +119,6 @@ namespace gazebo
 
       /// \brief Button to browse for a log recording directory
       private: QPushButton *browseButton;
-
-      private: bool recording;
-      private: bool paused;
     };
     /// \}
   }

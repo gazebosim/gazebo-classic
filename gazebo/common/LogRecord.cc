@@ -53,6 +53,7 @@ LogRecord::LogRecord()
   // \todo getenv is not portable, and there is no generic cross-platform
   // method. Must check OS and choose a method
   char *homePath = getenv("HOME");
+  GZ_ASSERT(homePath, "HOME environment variable is missing");
 
   if (!homePath)
     this->logBasePath = boost::filesystem::path("/tmp/gazebo");
@@ -138,17 +139,8 @@ bool LogRecord::Start(const std::string &_encoding)
   }
 
   // Listen to the world update event
-  if (!this->updateConnection)
-  {
-    this->updateConnection =
-      event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&LogRecord::Update, this, _1));
-  }
-  else
-  {
-    gzerr << "LogRecord has already been initialized\n";
-    return false;
-  }
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+        boost::bind(&LogRecord::Update, this, _1));
 
   // Start the writing thread if it has not already been started
   if (!this->writeThread)
