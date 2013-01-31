@@ -310,7 +310,7 @@ TEST_F(PhysicsTest, JointDampingTest)
 
     EXPECT_EQ(world->GetSimTime().Double(), 1.5);
 
-    math::Vector3 vel = model->GetWorldLinearVel();
+    math::Vector3 vel = model->GetWorldCoGLinearVel();
     math::Pose pose = model->GetWorldPose();
 
     EXPECT_EQ(vel.x, 0.0);

@@ -103,6 +103,9 @@ namespace gazebo
       public: virtual math::Vector3 GetWorldLinearVel() const;
 
       // Documentation inherited
+      public: virtual math::Vector3 GetWorldCoGLinearVel() const;
+
+      // Documentation inherited
       public: virtual math::Vector3 GetWorldAngularVel() const;
 
       // Documentation inherited

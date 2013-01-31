@@ -85,8 +85,11 @@ namespace gazebo
       /// \brief Set the torque applied to the body
       public: virtual void SetTorque(const math::Vector3 &force);
 
-      /// \brief Get the linear velocity of the body in the world frame
+      // Documentation inherited
       public: virtual math::Vector3 GetWorldLinearVel() const;
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldCoGLinearVel() const;
 
       /// \brief Get the angular velocity of the body in the world frame
       public: virtual math::Vector3 GetWorldAngularVel() const;
