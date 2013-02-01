@@ -259,7 +259,7 @@ TEST(SdfUpdate, ElementRemoveChild)
 
 ////////////////////////////////////////////////////
 /// Ensure that Converter::Move function is working
-TEST(Converter, ConverterMove)
+TEST(Converter, Move)
 {
   // Set up a simple xml file
   std::stringstream stream;

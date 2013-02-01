@@ -25,10 +25,18 @@ namespace sdf
   /// \brief Convert from one version of SDF to another
   class Converter
   {
+    /// \brief Convert SDF to the specified version.
+    /// \param[in] _doc SDF xml doc
+    /// \param[in] _toVersion Version number in string format
+    /// \param[in] _quiet False to be more verbose
     public: static bool Convert(TiXmlDocument *_doc,
                                 const std::string &_toVersion,
                                 bool _quiet = false);
 
+    /// \brief Generic convert function that converts the SDF based on the
+    /// given Convert file.
+    /// \param[in] _doc SDF xml doc
+    /// \param[in] _convertDoc Convert xml doc
     public: static void Convert(TiXmlDocument *_doc,
         TiXmlDocument *_convertDoc);
 
