@@ -22,8 +22,8 @@
 #ifndef _BULLETSPHERESHAPE_HH_
 #define _BULLETSPHERESHAPE_HH_
 
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/SphereShape.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/SphereShape.hh"
 
 namespace gazebo
 {
@@ -36,7 +36,7 @@ namespace gazebo
     /// \brief Bullet sphere collision
     class BulletSphereShape : public SphereShape
     {
-      /// \brief Constructor
+      /// \brief Constructor, nothing here. Memory is allocated by SetRadius
       public: BulletSphereShape(CollisionPtr _parent) : SphereShape(_parent) {}
 
       /// \brief Destructor
@@ -45,12 +45,30 @@ namespace gazebo
       /// \brief Set the radius
       public: void SetRadius(double _radius)
               {
-                SphereShape::SetRadius(_radius);
                 BulletCollisionPtr bParent;
                 bParent = boost::shared_dynamic_cast<BulletCollision>(
                     this->collisionParent);
+                btCollisionShapePtr shape = bParent->GetCollisionShape();
 
-                bParent->SetCollisionShape(new btSphereShape(_radius));
+                if (shape)
+                {
+                  // Collision shape already exists, so resize
+                  math::Vector3 oldScaling = BulletTypes::ConvertVector3(
+                    shape.get()->getLocalScaling());
+                  double oldRadius = this->GetRadius();
+                  shape.get()->setLocalScaling(BulletTypes::ConvertVector3(
+                    _radius / oldRadius * oldScaling));
+                  // Need to call a function here to reset Bullet contacts
+                  // http://code.google.com/p/bullet/issues/detail?id=687#c2
+                }
+                else
+                {
+                  // Collision shape doesn't exist, so create one
+                  bParent->SetCollisionShape(
+                    btCollisionShapePtr(new btSphereShape(_radius)));
+                }
+                // Do this last so the old size is still available
+                SphereShape::SetRadius(_radius);
               }
     };
     /// \}

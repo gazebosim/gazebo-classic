@@ -73,15 +73,15 @@ namespace gazebo
       public: virtual math::Box GetBoundingBox() const;
 
       /// \brief Set the collision shape
-      public: void SetCollisionShape(btCollisionShape *shape);
+      public: void SetCollisionShape(btCollisionShapePtr shape);
 
       /// \brief Get the bullet collision shape
-      public: btCollisionShape *GetCollisionShape() const;
+      public: btCollisionShapePtr GetCollisionShape() const;
 
       /// \brief Set the index of the compound shape
       public: void SetCompoundShapeIndex(int index);
 
-      protected: btCollisionShape *collisionShape;
+      protected: btCollisionShapePtr collisionShape;
     };
     /// \}
   }

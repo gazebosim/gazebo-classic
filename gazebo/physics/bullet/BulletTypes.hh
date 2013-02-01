@@ -24,6 +24,8 @@
 #include "gazebo/math/Vector4.hh"
 #include "gazebo/math/Pose.hh"
 
+class btCollisionShape;
+
 /// \file
 /// \ingroup gazebo_physics
 /// \ingroup gazebo_physics_bullet
@@ -43,6 +45,8 @@ namespace gazebo
     typedef boost::shared_ptr<BulletLink> BulletLinkPtr;
     typedef boost::shared_ptr<BulletRayShape> BulletRayShapePtr;
     typedef boost::shared_ptr<BulletMotionState> BulletMotionStatePtr;
+
+    typedef boost::shared_ptr<btCollisionShape> btCollisionShapePtr;
 
     /// \addtogroup gazebo_physics_bullet
     /// \{

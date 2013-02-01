@@ -92,7 +92,7 @@ math::Box BulletCollision::GetBoundingBox() const
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCollisionShape(btCollisionShape *_shape)
+void BulletCollision::SetCollisionShape(btCollisionShapePtr _shape)
 {
   this->collisionShape = _shape;
 
@@ -103,7 +103,7 @@ void BulletCollision::SetCollisionShape(btCollisionShape *_shape)
 }
 
 //////////////////////////////////////////////////
-btCollisionShape *BulletCollision::GetCollisionShape() const
+btCollisionShapePtr BulletCollision::GetCollisionShape() const
 {
   return this->collisionShape;
 }
