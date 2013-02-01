@@ -68,6 +68,7 @@ set (headers
   SystemPaths.hh
   Time.hh
   Timer.hh
+  UpdateInfo.hh
   Video.hh
  )
 
@@ -84,6 +85,7 @@ endif()
 
 set (gtest_sources
   Console_TEST.cc
+  LogRecord_TEST.cc
 )
 gz_build_tests(${gtest_sources})
 

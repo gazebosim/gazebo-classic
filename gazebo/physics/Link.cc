@@ -19,26 +19,26 @@
  * Date: 13 Feb 2006
  */
 
-#include <float.h>
 #include <sstream>
 
 #include "msgs/msgs.hh"
 
-#include "common/Events.hh"
-#include "math/Quaternion.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Assert.hh"
 
-#include "sensors/Sensors.hh"
-#include "sensors/Sensor.hh"
+#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/Sensor.hh"
 
-#include "physics/Model.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Collision.hh"
-#include "physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Link.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Publisher.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -389,7 +389,11 @@ void Link::SetCollideMode(const std::string &_mode)
 //////////////////////////////////////////////////
 bool Link::GetSelfCollide()
 {
-  return this->sdf->GetValueBool("self_collide");
+  GZ_ASSERT(this->sdf != NULL, "Link sdf member is NULL");
+  if (this->sdf->HasElement("self_collide"))
+    return this->sdf->GetValueBool("self_collide");
+  else
+    return false;
 }
 
 //////////////////////////////////////////////////
@@ -595,7 +599,7 @@ math::Box Link::GetBoundingBox() const
   math::Box box;
   Base_V::const_iterator iter;
 
-  box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
+  box.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
   box.max.Set(0, 0, 0);
 
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
