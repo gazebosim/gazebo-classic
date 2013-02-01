@@ -277,6 +277,20 @@ math::Vector3 BulletLink::GetWorldCoGLinearVel() const
 }
 
 //////////////////////////////////////////////////
+math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset) const
+{
+  if (!this->rigidLink)
+    return math::Vector3(0, 0, 0);
+
+  math::Pose wPose = this->GetWorldPose();
+  math::Vector3 offsetFromCoG = wPose.rot*(_offset - this->inertial->GetCoG());
+  btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
+      BulletTypes::ConvertVector3(offsetFromCoG));
+
+  return math::Vector3(vel.x(), vel.y(), vel.z());
+}
+
+//////////////////////////////////////////////////
 void BulletLink::SetAngularVel(const math::Vector3 &_vel)
 {
   if (!this->rigidLink)
