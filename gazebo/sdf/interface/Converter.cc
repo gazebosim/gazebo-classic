@@ -91,7 +91,7 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
     if (boost::filesystem::exists(sdfPath)
         && boost::filesystem::is_directory(sdfPath))
     {
-      for( boost::filesystem::directory_iterator dirIter(sdfPath);
+      for (boost::filesystem::directory_iterator dirIter(sdfPath);
           dirIter != endIter ; ++dirIter)
       {
         if (boost::filesystem::is_directory(dirIter->status()))

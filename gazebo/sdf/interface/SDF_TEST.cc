@@ -435,7 +435,7 @@ TEST(Converter, Move)
   EXPECT_EQ(convertedElem->ValueStr(), "elemC");
   EXPECT_FALSE(convertedElem->FirstChildElement("elemD"));
 
-    // Test moving from attr to attr across multiple levels
+  // Test moving from attr to attr across multiple levels
   TiXmlDocument xmlDoc6;
   xmlDoc6.Parse(stream.str().c_str());
   convertStream.str("");
