@@ -19,7 +19,7 @@
 #include "gazebo/gui/TimePanel_TEST.hh"
 
 /////////////////////////////////////////////////
-void TimePanel_TEST::RecordButton()
+void TimePanel_TEST::ValidTimes()
 {
   // Create a new data logger widget
   gazebo::gui::TimePanel *timePanel = new gazebo::gui::TimePanel;
@@ -40,44 +40,31 @@ void TimePanel_TEST::RecordButton()
   QVERIFY(simTimeEdit != NULL);
   QVERIFY(realTimeEdit != NULL);
 
-  gazebo::transport::NodePtr node;
-  gazebo::transport::PublisherPtr pub;
-
-  // Create a node from communication.
-  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
-  node->Init();
-  pub = node->Advertise<gazebo::msgs::LogControl>("~/world_stats");
-
-  gazebo::msgs::WorldStatistics msg;
-  gazebo::msgs::Set(msg.mutable_sim_time(), gazebo::common::Time(1, 2));
-  gazebo::msgs::Set(msg.mutable_pause_time(), gazebo::common::Time(0, 5));
-  gazebo::msgs::Set(msg.mutable_real_time(), gazebo::common::Time(123, 456));
-  pub->Publish(msg);
-
-  gazebo::common::Time::MSleep(100);
-  QCoreApplication::processEvents();
+  // Wait a little bit so that time increases.
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+  }
 
   std::string txt;
+  double value;
 
-  // Make sure the destination log file is correct.
+  // Make sure realt time is greater than zero
   txt = realTimeEdit->text().toStdString();
-  std::cout << "Real[" << txt << std::endl;
-  // QVERIFY(txt.find("test/state.log") != std::string::npos);
+  value = boost::lexical_cast<double>(txt.substr(0, txt.find(" ")));
+  QVERIFY(value > 0.0);
 
-  // Make sure the initial size is zero
+  // Make sure sim time is greater than zero
   txt = simTimeEdit->text().toStdString();
-  std::cout << "Sim[" << txt << std::endl;
-  //QVERIFY(txt == "0.00 B");
+  value = boost::lexical_cast<double>(txt.substr(0, txt.find(" ")));
+  QVERIFY(value > 0.0);
 
-  // Make sure the initial time is zero
+  // Make sure the percent real time is greater than zero
   txt = percentEdit->text().toStdString();
-  std::cout << "Percent[" << txt << std::endl;
-  // QVERIFY(txt == "00:00:00.000");
-
-  // Make sure the status label says "Recording"
-  // txt = statusLabel->text().toStdString();
-  //QVERIFY(txt == "Recording");
-
+  value = boost::lexical_cast<double>(txt.substr(0, txt.find(" ")));
+  QVERIFY(value > 0.0);
 }
+
 // Generate a main function for the test
 QTEST_MAIN(TimePanel_TEST)

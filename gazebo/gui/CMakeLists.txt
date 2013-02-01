@@ -75,10 +75,10 @@ set (headers
 )
 
 set (tests 
-  TimePanel_TEST.c
+  TimePanel_TEST.cc
   )
 
-qt_build_qt_tests(${tests})
+gz_build_qt_tests(${tests})
 
 set (resources resources.qrc)
 

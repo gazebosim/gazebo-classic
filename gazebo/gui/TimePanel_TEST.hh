@@ -25,11 +25,8 @@ class TimePanel_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test the record button on the data logging gui.
-  private slots: void RecordButton();
-
-  /// \brief Simulate pressing the record button many times.
-  private slots: void StressTest();
+  /// \brief Test that the TimePanel gets valid times from the server.
+  private slots: void ValidTimes();
 };
 
 #endif

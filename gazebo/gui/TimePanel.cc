@@ -130,12 +130,12 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   this->simTime = msgs::Convert(_msg->sim_time());
   this->realTime = msgs::Convert(_msg->real_time());
 
-  if (_msg->paused() && !g_pauseAct->isChecked())
+  if (_msg->paused() && (g_pauseAct && !g_pauseAct->isChecked()))
   {
     g_pauseAct->setChecked(true);
     g_playAct->setChecked(false);
   }
-  else if (!_msg->paused() && !g_playAct->isChecked())
+  else if (!_msg->paused() && (g_playAct && !g_playAct->isChecked()))
   {
     g_pauseAct->setChecked(false);
     g_playAct->setChecked(true);
