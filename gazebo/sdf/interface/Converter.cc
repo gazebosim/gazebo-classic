@@ -141,6 +141,13 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
 }
 
 /////////////////////////////////////////////////
+void Converter::Convert(TiXmlDocument *_doc, TiXmlDocument *_convertDoc)
+{
+  ConvertImpl(_doc->FirstChildElement(), _convertDoc->FirstChildElement());
+    _doc->Print();
+}
+
+/////////////////////////////////////////////////
 void Converter::ConvertImpl(TiXmlElement *_elem, TiXmlElement *_convert)
 {
   CheckDeprecation(_elem, _convert);

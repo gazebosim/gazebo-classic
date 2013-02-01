@@ -257,6 +257,213 @@ TEST(SdfUpdate, ElementRemoveChild)
   EXPECT_FALSE(elem);
 }
 
+////////////////////////////////////////////////////
+/// Ensure that Converter::Move function is working
+TEST(Converter, ConverterMove)
+{
+  // Set up a simple xml file
+  std::stringstream stream;
+  stream << "<elemA attrA='A'>"
+         << "  <elemB attrB='B'>"
+         << "    <elemC attrC='C'>"
+         << "      <elemD>D</elemD>"
+         << "    </elemC>"
+         << "  </elemB>"
+         << "</elemA>";
+
+  // Verify the xml
+  TiXmlDocument xmlDoc;
+  xmlDoc.Parse(stream.str().c_str());
+  TiXmlElement *childElem =  xmlDoc.FirstChildElement();
+  EXPECT_TRUE(childElem);
+  EXPECT_EQ(childElem->ValueStr(), "elemA");
+  childElem =  childElem->FirstChildElement();
+  EXPECT_TRUE(childElem);
+  EXPECT_EQ(childElem->ValueStr(), "elemB");
+  childElem =  childElem->FirstChildElement();
+  EXPECT_TRUE(childElem);
+  EXPECT_EQ(childElem->ValueStr(), "elemC");
+  childElem =  childElem->FirstChildElement();
+  EXPECT_TRUE(childElem);
+  EXPECT_EQ(childElem->ValueStr(), "elemD");
+
+  // Test moving from elem to elem
+  // Set up a convert file
+  std::stringstream convertStream;
+  convertStream << "<convert name='elemA'>"
+                << "  <convert name='elemB'>"
+                << "    <move>"
+                << "     <from element='elemC::elemD'/>"
+                << "     <to element='elemE'/>"
+                << "   </move>"
+                << " </convert>"
+                << "</convert>";
+  TiXmlDocument convertXmlDoc;
+  convertXmlDoc.Parse(convertStream.str().c_str());
+  sdf::Converter::Convert(&xmlDoc, &convertXmlDoc);
+
+  TiXmlElement *convertedElem =  xmlDoc.FirstChildElement();
+  EXPECT_EQ(convertedElem->ValueStr(), "elemA");
+  convertedElem =  convertedElem->FirstChildElement();
+  EXPECT_TRUE(convertedElem);
+  EXPECT_EQ(convertedElem->ValueStr(), "elemB");
+  EXPECT_TRUE(convertedElem->FirstChildElement("elemC"));
+  EXPECT_TRUE(convertedElem->FirstChildElement("elemE"));
+  std::string elemValue = convertedElem->FirstChildElement("elemE")->GetText();
+  EXPECT_EQ(elemValue, "D");
+  convertedElem =  convertedElem->FirstChildElement("elemC");
+  EXPECT_TRUE(convertedElem);
+  EXPECT_FALSE(convertedElem->FirstChildElement("elemD"));
+
+  // Test moving from elem to attr
+  TiXmlDocument xmlDoc2;
+  xmlDoc2.Parse(stream.str().c_str());
+  convertStream.str("");
+  convertStream << "<convert name='elemA'>"
+                << "  <convert name='elemB'>"
+                << "    <move>"
+                << "     <from element='elemC::elemD'/>"
+                << "     <to attribute='attrE'/>"
+                << "   </move>"
+                << " </convert>"
+                << "</convert>";
+  TiXmlDocument convertXmlDoc2;
+  convertXmlDoc2.Parse(convertStream.str().c_str());
+  sdf::Converter::Convert(&xmlDoc2, &convertXmlDoc2);
+
+  convertedElem =  xmlDoc2.FirstChildElement();
+  EXPECT_EQ(convertedElem->ValueStr(), "elemA");
+  convertedElem =  convertedElem->FirstChildElement();
+  EXPECT_TRUE(convertedElem);
+  EXPECT_EQ(convertedElem->ValueStr(), "elemB");
+  EXPECT_TRUE(convertedElem->Attribute("attrE"));
+  std::string attrValue = convertedElem->Attribute("attrE");
+  EXPECT_EQ(attrValue, "D");
+  convertedElem =  convertedElem->FirstChildElement();
+  EXPECT_TRUE(convertedElem);
+  EXPECT_EQ(convertedElem->ValueStr(), "elemC");
+  EXPECT_FALSE(convertedElem->FirstChildElement("elemD"));
+
+  // Test moving from attr to attr
+  TiXmlDocument xmlDoc3;
+  xmlDoc3.Parse(stream.str().c_str());
+  convertStream.str("");
+  convertStream << "<convert name='elemA'>"
+                << "  <convert name='elemB'>"
+                << "    <move>"
+                << "     <from attribute='elemC::attrC'/>"
+                << "     <to attribute='attrE'/>"
+                << "   </move>"
+                << " </convert>"
+                << "</convert>";
+  TiXmlDocument convertXmlDoc3;
+  convertXmlDoc3.Parse(convertStream.str().c_str());
+  sdf::Converter::Convert(&xmlDoc3, &convertXmlDoc3);
+
+  convertedElem =  xmlDoc3.FirstChildElement();
+  EXPECT_EQ(convertedElem->ValueStr(), "elemA");
+  convertedElem =  convertedElem->FirstChildElement();
+  EXPECT_TRUE(convertedElem);
+  EXPECT_EQ(convertedElem->ValueStr(), "elemB");
+  EXPECT_TRUE(convertedElem->Attribute("attrE"));
+  attrValue = convertedElem->Attribute("attrE");
+  EXPECT_EQ(attrValue, "C");
+  convertedElem =  convertedElem->FirstChildElement();
+  EXPECT_TRUE(convertedElem);
+  EXPECT_EQ(convertedElem->ValueStr(), "elemC");
+  EXPECT_FALSE(convertedElem->Attribute("attrC"));
+  convertedElem =  convertedElem->FirstChildElement();
+  EXPECT_TRUE(convertedElem);
+  EXPECT_EQ(convertedElem->ValueStr(), "elemD");
+
+  // Test moving from attr to elem
+  TiXmlDocument xmlDoc4;
+  xmlDoc4.Parse(stream.str().c_str());
+  convertStream.str("");
+  convertStream << "<convert name='elemA'>"
+                << "  <convert name='elemB'>"
+                << "    <move>"
+                << "     <from attribute='elemC::attrC'/>"
+                << "     <to element='elemE'/>"
+                << "   </move>"
+                << " </convert>"
+                << "</convert>";
+  TiXmlDocument convertXmlDoc4;
+  convertXmlDoc4.Parse(convertStream.str().c_str());
+  sdf::Converter::Convert(&xmlDoc4, &convertXmlDoc4);
+
+  convertedElem =  xmlDoc4.FirstChildElement();
+  EXPECT_EQ(convertedElem->ValueStr(), "elemA");
+  convertedElem =  convertedElem->FirstChildElement();
+  EXPECT_TRUE(convertedElem);
+  EXPECT_EQ(convertedElem->ValueStr(), "elemB");
+  EXPECT_TRUE(convertedElem->FirstChildElement("elemE"));
+  elemValue = convertedElem->FirstChildElement("elemE")->GetText();
+  EXPECT_EQ(elemValue, "C");
+  EXPECT_TRUE(convertedElem->FirstChildElement("elemC"));
+  convertedElem =  convertedElem->FirstChildElement("elemC");
+  EXPECT_TRUE(convertedElem);
+  EXPECT_FALSE(convertedElem->Attribute("attrC"));
+  convertedElem =  convertedElem->FirstChildElement();
+  EXPECT_TRUE(convertedElem);
+  EXPECT_EQ(convertedElem->ValueStr(), "elemD");
+
+  // Test moving from elem to elem across multiple levels
+  TiXmlDocument xmlDoc5;
+  xmlDoc5.Parse(stream.str().c_str());
+  convertStream.str("");
+  convertStream << "<convert name='elemA'>"
+                << "  <move>"
+                << "   <from element='elemB::elemC::elemD'/>"
+                << "   <to element='elemE'/>"
+                << "  </move>"
+                << "</convert>";
+  TiXmlDocument convertXmlDoc5;
+  convertXmlDoc5.Parse(convertStream.str().c_str());
+  sdf::Converter::Convert(&xmlDoc5, &convertXmlDoc5);
+
+  convertedElem =  xmlDoc5.FirstChildElement();
+  EXPECT_EQ(convertedElem->ValueStr(), "elemA");
+  EXPECT_TRUE(convertedElem->FirstChildElement("elemB"));
+  EXPECT_TRUE(convertedElem->FirstChildElement("elemE"));
+  elemValue = convertedElem->FirstChildElement("elemE")->GetText();
+  EXPECT_EQ(elemValue, "D");
+  convertedElem =  convertedElem->FirstChildElement("elemB");
+  EXPECT_TRUE(convertedElem);
+  convertedElem = convertedElem->FirstChildElement();
+  EXPECT_TRUE(convertedElem);
+  EXPECT_EQ(convertedElem->ValueStr(), "elemC");
+  EXPECT_FALSE(convertedElem->FirstChildElement("elemD"));
+
+    // Test moving from attr to attr across multiple levels
+  TiXmlDocument xmlDoc6;
+  xmlDoc6.Parse(stream.str().c_str());
+  convertStream.str("");
+  convertStream << "<convert name='elemA'>"
+                << "  <move>"
+                << "   <from attribute='elemB::elemC::attrC'/>"
+                << "   <to attribute='attrE'/>"
+                << "  </move>"
+                << "</convert>";
+  TiXmlDocument convertXmlDoc6;
+  convertXmlDoc6.Parse(convertStream.str().c_str());
+  sdf::Converter::Convert(&xmlDoc6, &convertXmlDoc6);
+
+  convertedElem =  xmlDoc6.FirstChildElement();
+  EXPECT_TRUE(convertedElem);
+  EXPECT_EQ(convertedElem->ValueStr(), "elemA");
+  attrValue = convertedElem->Attribute("attrE");
+  EXPECT_EQ(attrValue, "C");
+  convertedElem = convertedElem->FirstChildElement("elemB");
+  EXPECT_TRUE(convertedElem);
+  convertedElem =  convertedElem->FirstChildElement();
+  EXPECT_TRUE(convertedElem);
+  EXPECT_EQ(convertedElem->ValueStr(), "elemC");
+  EXPECT_FALSE(convertedElem->Attribute("attrC"));
+  convertedElem = convertedElem->FirstChildElement();
+  EXPECT_TRUE(convertedElem);
+  EXPECT_EQ(convertedElem->ValueStr(), "elemD");
+}
 
 /////////////////////////////////////////////////
 /// Main

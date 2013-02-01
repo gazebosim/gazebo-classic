@@ -29,6 +29,9 @@ namespace sdf
                                 const std::string &_toVersion,
                                 bool _quiet = false);
 
+    public: static void Convert(TiXmlDocument *_doc,
+        TiXmlDocument *_convertDoc);
+
     private: static void ConvertImpl(TiXmlElement *_elem,
                                      TiXmlElement *_convert);
 
