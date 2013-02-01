@@ -3,6 +3,7 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/gazebo 
   ${PROJECT_BINARY_DIR}/gazebo
   ${PROTOBUF_INCLUDE_DIR}
+  ${PROJECT_SOURCE_DIR}/test/gtest/include
 )
 
 set (gtest_sources 

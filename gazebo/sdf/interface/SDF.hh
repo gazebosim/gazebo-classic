@@ -80,7 +80,8 @@ namespace sdf
     /// This generates the SDF html documentation.
     /// \param[out] _html Accumulated HTML for output
     /// \param[in] _spacing Amount of spacing for this element.
-    public: void PrintDocRightPane(std::string &_html, int _spacing);
+    public: void PrintDocRightPane(std::string &_html,
+                                  int _spacing, int &_index);
 
     private: void ToString(const std::string &_prefix,
                            std::ostringstream &_out) const;

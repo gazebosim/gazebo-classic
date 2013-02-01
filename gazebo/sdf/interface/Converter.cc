@@ -46,7 +46,7 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
   else if (!elem)
     elem = _doc->FirstChildElement("sdf");
 
-  if (!elem->Attribute("version"))
+  if (!elem || !elem->Attribute("version"))
   {
     gzerr << "  Unable to determine original SDF version\n";
     return false;
@@ -77,7 +77,7 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
 
 
   // Use convert file in the current sdf version folder for conversion. If file
-  // does not exist, then find intermediate convert files and interatively
+  // does not exist, then find intermediate convert files and iteratively
   // convert the sdf elem. Ideally, users should use gzsdf convert so that the
   // latest sdf versioned file is written and no subsequent conversions are
   // necessary.
