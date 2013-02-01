@@ -37,14 +37,17 @@ TimePanel::TimePanel(QWidget *_parent)
   QHBoxLayout *frameLayout = new QHBoxLayout;
 
   this->percentRealTimeEdit = new QLineEdit;
+  this->percentRealTimeEdit->setObjectName("timePanelPercentRealTime");
   this->percentRealTimeEdit->setReadOnly(true);
   this->percentRealTimeEdit->setFixedWidth(90);
 
   this->simTimeEdit = new QLineEdit;
+  this->simTimeEdit->setObjectName("timePanelSimTime");
   this->simTimeEdit->setReadOnly(true);
   this->simTimeEdit->setFixedWidth(110);
 
   this->realTimeEdit = new QLineEdit;
+  this->realTimeEdit->setObjectName("timePanelRealTime");
   this->realTimeEdit->setReadOnly(true);
   this->realTimeEdit->setFixedWidth(110);
 
