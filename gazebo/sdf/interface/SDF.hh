@@ -170,6 +170,11 @@ namespace sdf
     public: ElementPtr AddElement(const std::string &_name);
     public: void InsertElement(ElementPtr _elem);
     public: void RemoveFromParent();
+
+    /// \brief Remove a child element.
+    /// \param[in] _child Pointer to the child to remove.
+    public: void RemoveChild(ElementPtr _child);
+
     public: void ClearElements();
 
     public: void Update();

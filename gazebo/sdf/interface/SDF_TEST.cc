@@ -190,6 +190,74 @@ TEST(SdfUpdate, ElementRemoveFromParent)
   EXPECT_FALSE(elem);
 }
 
+////////////////////////////////////////////////////
+/// Ensure that SDF::Element::RemoveChild is working
+TEST(SdfUpdate, ElementRemoveChild)
+{
+  // Set up a simple sdf model file
+  std::ostringstream stream;
+  stream << "<sdf version='1.3'>"
+         << "<model name='model1'>"
+         << "  <pose>0 1 2  0 0 0</pose>"
+         << "  <static>false</static>"
+         << "</model>"
+         << "<model name='model2'>"
+         << "  <pose>0 1 2  0 0 0</pose>"
+         << "  <static>false</static>"
+         << "</model>"
+         << "<model name='model3'>"
+         << "  <pose>0 1 2  0 0 0</pose>"
+         << "  <static>false</static>"
+         << "</model>"
+         << "</sdf>";
+  sdf::SDF sdfParsed;
+  sdfParsed.SetFromString(stream.str());
+
+  sdf::ElementPtr elem, elem2;
+
+  // Verify correct parsing
+  EXPECT_TRUE(sdfParsed.root->HasElement("model"));
+  elem = sdfParsed.root->GetElement("model");
+
+  // Select the static element in model1
+  elem2 = elem->GetElement("static");
+  EXPECT_TRUE(elem2);
+  EXPECT_FALSE(elem2->GetValueBool());
+  elem->RemoveChild(elem2);
+
+  // Get first model element again
+  elem = sdfParsed.root->GetElement("model");
+  // Check name == model1
+  EXPECT_TRUE(elem->HasAttribute("name"));
+  EXPECT_EQ(elem->GetValueString("name"), "model1");
+
+  // Check that we have deleted the static element in model1
+  EXPECT_FALSE(elem->HasElement("static"));
+
+  // Get model2
+  elem2 = elem->GetNextElement("model");
+
+  // Remove model2
+  sdfParsed.root->RemoveChild(elem2);
+
+  // Get first model element again
+  elem = sdfParsed.root->GetElement("model");
+  // Check name == model1
+  EXPECT_TRUE(elem->HasAttribute("name"));
+  EXPECT_EQ(elem->GetValueString("name"), "model1");
+
+  // Get next model element
+  elem = elem->GetNextElement("model");
+  // Check name == model3
+  EXPECT_TRUE(elem->HasAttribute("name"));
+  EXPECT_EQ(elem->GetValueString("name"), "model3");
+
+  // Try to get another model element
+  elem = elem->GetNextElement("model");
+  EXPECT_FALSE(elem);
+}
+
+
 /////////////////////////////////////////////////
 /// Main
 int main(int argc, char **argv)

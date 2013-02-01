@@ -1044,7 +1044,22 @@ void Element::RemoveFromParent()
     if (iter != this->parent->elements.end())
     {
       this->parent->elements.erase(iter);
+      this->parent.reset();
     }
+  }
+}
+
+/////////////////////////////////////////////////
+void Element::RemoveChild(ElementPtr _child)
+{
+  ElementPtr_V::iterator iter;
+  iter = std::find(this->elements.begin(),
+                   this->elements.end(), _child);
+
+  if (iter != this->elements.end())
+  {
+    _child->SetParent(ElementPtr());
+    this->elements.erase(iter);
   }
 }
 
