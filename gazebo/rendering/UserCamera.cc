@@ -110,11 +110,11 @@ void UserCamera::Init()
   else if (RenderEngine::Instance()->GetRenderPathType() ==
            RenderEngine::FORWARD)
   {
-    this->SetClipDist(0.1, 5000);
+    this->SetClipDist(.1, 5000);
   }
   else
   {
-    this->SetClipDist(0.1, 5000);
+    this->SetClipDist(.1, 5000);
   }
 
   // Removing for now because the axis doesn't not move properly when the
@@ -334,6 +334,14 @@ void UserCamera::SetViewController(const std::string &type,
     gzthrow("Invalid view controller type: " + type);
 
   this->viewController->Init(_pos);
+}
+
+//////////////////////////////////////////////////
+std::string UserCamera::GetViewControllerTypeString()
+{
+  if (this->viewController)
+    return this->viewController->GetTypeString();
+  return "";
 }
 
 //////////////////////////////////////////////////

@@ -258,11 +258,17 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   for (unsigned int i = 0; i < (unsigned int)this->GetRayCount(); i++)
   {
     scan->add_ranges(
-      this->laserShape->GetRange(j * this->GetRayCount() + i));
+        this->laserShape->GetRange(j * this->GetRayCount() + i));
     scan->add_intensities(
         this->laserShape->GetRetro(j * this->GetRayCount() + i));
   }
 
   if (this->scanPub)
     this->scanPub->Publish(this->laserMsg);
+}
+
+//////////////////////////////////////////////////
+bool RaySensor::IsActive()
+{
+  return Sensor::IsActive() || this->scanPub->HasConnections();
 }

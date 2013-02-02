@@ -44,7 +44,7 @@ namespace gazebo
       public: virtual ~BulletCylinderShape() {}
 
       /// \brief Set the size of the cylinder
-      public: void SetSize(const double &_radius, const double &_length)
+      public: void SetSize(double _radius, double _length)
               {
                 CylinderShape::SetSize(_radius, _length);
                 BulletCollisionPtr bParent;
