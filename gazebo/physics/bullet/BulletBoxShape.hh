@@ -45,14 +45,32 @@ namespace gazebo
       /// \brief Set the size of the box
       public: void SetSize(const math::Vector3 &_size)
               {
-                BoxShape::SetSize(_size);
                 BulletCollisionPtr bParent;
                 bParent = boost::shared_dynamic_cast<BulletCollision>(
                     this->collisionParent);
+                btCollisionShapePtr shape = bParent->GetCollisionShape();
 
-                /// Bullet requires the half-extents of the box
-                bParent->SetCollisionShape(new btBoxShape(
-                    btVector3(_size.x*0.5, _size.y*0.5, _size.z*0.5)));
+                if (shape)
+                {
+                  // Collision shape already exists, so resize
+                  math::Vector3 oldScaling = BulletTypes::ConvertVector3(
+                    shape.get()->getLocalScaling());
+                  math::Vector3 oldSize = this->GetSize();
+                  shape.get()->setLocalScaling(BulletTypes::ConvertVector3(
+                    _size / oldSize * oldScaling));
+                  // Need to call a function here to reset Bullet contacts
+                  // http://code.google.com/p/bullet/issues/detail?id=687#c2
+                }
+                else
+                {
+                  // Collision shape doesn't exist, so create one
+                  // Bullet requires the half-extents of the box
+                  bParent->SetCollisionShape(
+                    btCollisionShapePtr(new btBoxShape(
+                      BulletTypes::ConvertVector3(_size*0.5))));
+                }
+                // Do this last so the old size is still available
+                BoxShape::SetSize(_size);
               }
     };
     /// \}

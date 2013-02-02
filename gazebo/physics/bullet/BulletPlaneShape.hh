@@ -47,6 +47,11 @@ namespace gazebo
       /// \brief Set the altitude of the plane
       public: void SetAltitude(const math::Vector3 &pos)
               {
+                // This function doesn't actually alter the bullet plane shape
+                // The API needs to change so that the altitude is given to
+                // CreatePlane()
+                // Or, this child could reset the parent pointer,
+                // but it currently cannot access it
                 PlaneShape::SetAltitude(pos);
               }
 
@@ -58,10 +63,10 @@ namespace gazebo
                 bParent = boost::shared_dynamic_cast<BulletCollision>(
                     this->collisionParent);
 
-                math::Vector3 n = this->GetNormal();
-                btVector3 vec(n.x, n.y, n.z);
+                btVector3 n = BulletTypes::ConvertVector3(this->GetNormal());
 
-                bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0));
+                bParent->SetCollisionShape(btCollisionShapePtr(new
+                  btStaticPlaneShape(n, 0.0)));
               }
     };
     /// \}

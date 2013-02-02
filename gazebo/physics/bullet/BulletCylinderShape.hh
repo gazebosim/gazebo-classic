@@ -46,13 +46,35 @@ namespace gazebo
       /// \brief Set the size of the cylinder
       public: void SetSize(double _radius, double _length)
               {
-                CylinderShape::SetSize(_radius, _length);
                 BulletCollisionPtr bParent;
                 bParent = boost::shared_dynamic_cast<BulletCollision>(
                     this->collisionParent);
+                btCollisionShapePtr shape = bParent->GetCollisionShape();
 
-                bParent->SetCollisionShape(new btCylinderShapeZ(
-                    btVector3(_radius, _radius, _length * 0.5)));
+                if (shape)
+                {
+                  // Collision shape already exists, so resize
+                  math::Vector3 oldScaling = BulletTypes::ConvertVector3(
+                    shape.get()->getLocalScaling());
+                  double radiusRatio = _radius / this->GetRadius();
+                  double lengthRatio = _length / this->GetLength();
+                  math::Vector3 ratio(_radius / oldRadius, _radius / 
+                  shape.get()->setLocalScaling(BulletTypes::ConvertVector3(
+                    math::Vector3(radiusRatio, radiusRatio, lengthRatio) *
+                      oldScaling));
+                  // Need to call a function here to reset Bullet contacts
+                  // http://code.google.com/p/bullet/issues/detail?id=687#c2
+                }
+                else
+                {
+                  // Collision shape doesn't exist, so create one
+                  // Bullet requires the half-extents of the shape
+                  bParent->SetCollisionShape(
+                    btCollisionShapePtr(new btCylinderShape(
+                      btVector3(_radius, _radius, _length * 0.5)));
+                }
+                // Do this last so the old size is still available
+                CylinderShape::SetSize(_radius, _length);
               }
     };
     /// \}
