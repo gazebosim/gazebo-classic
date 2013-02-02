@@ -64,22 +64,22 @@ namespace gazebo
       public: virtual void OnPoseChange();
 
       // Documentation inherited.
-      public: virtual void SetEnabled(bool enable) const;
+      public: virtual void SetEnabled(bool _enable) const;
 
       // Documentation inherited.
       public: virtual bool GetEnabled() const;
 
       // Documentation inherited.
-      public: virtual void SetLinearVel(const math::Vector3 &vel);
+      public: virtual void SetLinearVel(const math::Vector3 &_vel);
 
       // Documentation inherited.
-      public: virtual void SetAngularVel(const math::Vector3 &vel);
+      public: virtual void SetAngularVel(const math::Vector3 &_vel);
 
       // Documentation inherited.
-      public: virtual void SetForce(const math::Vector3 &force);
+      public: virtual void SetForce(const math::Vector3 &_force);
 
       // Documentation inherited.
-      public: virtual void SetTorque(const math::Vector3 &force);
+      public: virtual void SetTorque(const math::Vector3 &_torque);
 
       // Documentation inherited.
       public: virtual math::Vector3 GetWorldLinearVel() const;
@@ -94,23 +94,23 @@ namespace gazebo
       public: virtual math::Vector3 GetWorldTorque() const;
 
       // Documentation inherited.
-      public: virtual void SetGravityMode(bool mode);
+      public: virtual void SetGravityMode(bool _mode);
 
       // Documentation inherited.
       public: virtual bool GetGravityMode() const;
 
       // Documentation inherited.
-      public: virtual void SetSelfCollide(bool collide);
+      public: virtual void SetSelfCollide(bool _collide);
 
       /// \brief Get the bullet rigid body.
       /// \return Pointer to bullet rigid body object.
       public: btRigidBody *GetBulletLink() const;
 
       // Documentation inherited.
-      public: virtual void SetLinearDamping(double damping);
+      public: virtual void SetLinearDamping(double _damping);
 
       // Documentation inherited.
-      public: virtual void SetAngularDamping(double damping);
+      public: virtual void SetAngularDamping(double _damping);
 
       /// \brief Set the relative pose of a child collision.
       /*public: void SetCollisionRelativePose(BulletCollision *collision,

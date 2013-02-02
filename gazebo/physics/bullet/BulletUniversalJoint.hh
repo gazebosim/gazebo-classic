@@ -99,6 +99,7 @@ namespace gazebo
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
+      /// \brief Pointer to bullet universal constraint
       private: btUniversalConstraint *bulletUniversal;
     };
 

@@ -18,7 +18,7 @@
 #ifndef _BULLET_MATH_INC_H_
 #define _BULLET_MATH_INC_H_
 
-// This disables warning messages for ODE
+// This disables warning messages for Bullet
 #pragma GCC system_header
 #include <LinearMath/btVector3.h>
 #include <LinearMath/btTransform.h>
