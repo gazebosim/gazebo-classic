@@ -90,6 +90,11 @@ void BulletLink::Init()
       math::Pose relativePose = collision->GetRelativePose();
       relativePose.pos -= cogVec;
 
+      // It should be noted that not all bullet shape types ae supported
+      // for use as children of compound shapes, as discussed here:
+      // http://code.google.com/p/bullet/issues/detail?id=348
+      // This includes concave meshes and the static plane shape
+      // It appears to work for now, but this be kept in mind
       this->compoundShape->addChildShape(
           BulletTypes::ConvertPose(relativePose), shape);
     }

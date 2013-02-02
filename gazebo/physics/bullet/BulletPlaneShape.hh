@@ -27,6 +27,9 @@
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/PlaneShape.hh"
 
+// Note that this shape is not officially supported for use with
+// compound shapes: http://code.google.com/p/bullet/issues/detail?id=348
+// It appears to work, but this should be kept in mind.
 namespace gazebo
 {
   namespace physics
