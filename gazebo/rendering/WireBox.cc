@@ -28,6 +28,7 @@ WireBox::WireBox(VisualPtr _parent, const math::Box &_box)
   this->lines = new DynamicLines(RENDERING_LINE_LIST);
   this->lines->setMaterial("BaseWhiteNoLighting");
   this->parent->AttachObject(this->lines);
+  this->lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->Init(_box);
 }
