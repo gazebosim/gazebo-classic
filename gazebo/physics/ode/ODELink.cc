@@ -198,7 +198,7 @@ void ODELink::SetGravityMode(bool _mode)
 }
 
 //////////////////////////////////////////////////
-bool ODELink::GetGravityMode()
+bool ODELink::GetGravityMode() const
 {
   int mode = 0;
   if (this->linkId)
