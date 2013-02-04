@@ -88,6 +88,7 @@ set (gtest_sources
   Console_TEST.cc
   Diagnostics_TEST.cc
   Exception_TEST.cc
+  LogRecord_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
   Image_TEST.cc

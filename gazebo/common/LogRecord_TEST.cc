@@ -15,6 +15,8 @@
  *
 */
 
+#include <gtest/gtest.h>
+
 #include "gazebo/common/LogRecord.hh"
 
 using namespace gazebo;
@@ -39,6 +41,7 @@ TEST(LogRecordTest, LogRecord)
   common::LogRecord::Instance()->Stop();
 }
 
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
