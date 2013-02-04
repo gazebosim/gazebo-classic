@@ -45,14 +45,15 @@ TEST(Exception, InternalError_DefaultConstructor_Throw)
 TEST(Exception, InternalError_FileLineMsgConstructor_Throw)
 {
   ASSERT_THROW(
-      throw common::InternalError(__FILE__,__LINE__,"test"),
+      throw common::InternalError(__FILE__, __LINE__, "test"),
       common::InternalError);
 }
 
 TEST(Exception, InternalAssertionError_AssertionConstructor_Throw)
 {
   ASSERT_THROW(
-      throw common::AssertionInternalError(__FILE__,__LINE__,"expression","function","msg"),
+      throw common::AssertionInternalError(__FILE__, __LINE__, "expression",
+                                          "function", "msg"),
       common::AssertionInternalError);
 }
 
