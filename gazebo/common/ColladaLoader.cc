@@ -53,6 +53,9 @@ ColladaLoader::~ColladaLoader()
 //////////////////////////////////////////////////
 Mesh *ColladaLoader::Load(const std::string &_filename)
 {
+  // reset scale
+  this->meter = 1.0;
+
   TiXmlDocument xmlDoc;
 
   this->path.clear();
@@ -761,8 +764,8 @@ TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent,
     const std::string &_id)
 {
   std::string id = _id;
-  if (id.find("#") != std::string::npos)
-    id.erase(id.find("#"), 1);
+  if (id.length() > 0 && id[0] == '#')
+    id.erase(0, 1);
 
   if ((id.empty() && _parent->Value() == _name) ||
       (_parent->Attribute("id") && _parent->Attribute("id") == id) ||
@@ -1093,7 +1096,6 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
     TiXmlElement *imageXml = NULL;
     std::string textureName =
       typeElem->FirstChildElement("texture")->Attribute("texture");
-
     TiXmlElement *textureXml = this->GetElementId("newparam", textureName);
     if (textureXml)
     {
@@ -1120,6 +1122,10 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
           }
         }
       }
+    }
+    else
+    {
+      imageXml = this->GetElementId("image", textureName);
     }
 
     if (imageXml && imageXml->FirstChildElement("init_from"))

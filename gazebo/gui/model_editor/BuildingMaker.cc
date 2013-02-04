@@ -19,10 +19,6 @@
 #include <set>
 #include <boost/filesystem.hpp>
 
-#include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
