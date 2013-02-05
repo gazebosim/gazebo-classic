@@ -428,7 +428,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
       // expect no pose change for directions with no offset
       if (cog.x == 0)
       {
-      EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
+        EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
       }
       // expect rolling in direction of cog offset
       else
