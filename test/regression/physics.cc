@@ -253,7 +253,6 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   math::Vector3 v30 = math::Vector3::Zero;
   math::Vector3 cog;
   math::Angle angle;
-  std::string modelName;
 
   std::vector<std::string> model_names;
   std::vector<double> x0s;
@@ -465,7 +464,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
       // expect rolling in direction of cog offset
       else
       {
-        EXPECT_GT( (pose1.pos.x-x0) * cog.x, cog.x * cog.x);
+        EXPECT_GT((pose1.pos.x-x0) * cog.x, cog.x * cog.x);
       }
 
       // expect no pose change for directions with no offset
@@ -476,7 +475,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
       // expect rolling in direction of cog offset
       else
       {
-        EXPECT_GT( (pose1.pos.y-y0) * cog.y, cog.y * cog.y);
+        EXPECT_GT((pose1.pos.y-y0) * cog.y, cog.y * cog.y);
       }
     }
     else
