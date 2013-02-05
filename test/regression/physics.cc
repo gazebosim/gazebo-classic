@@ -292,6 +292,13 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   radii.push_back(r2);
   cogs.push_back(math::Vector3(0, r1, 0));
 
+  // sphere6 has c.g. to the side along x axis; it will roll
+  model_names.push_back("sphere6");
+  x0s.push_back(15);
+  y0s.push_back(0);
+  radii.push_back(r2);
+  cogs.push_back(math::Vector3(r1, 0, 0));
+
   unsigned int i;
   for (i = 0; i < model_names.size(); i++)
   {
