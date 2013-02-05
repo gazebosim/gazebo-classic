@@ -19,7 +19,10 @@
  * Author: Nate Koenig
  * Date: 18 Dec 2009
  */
+#include "gazebo/common/Assert.hh"
+
 #include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorFactory.hh"
@@ -49,6 +52,7 @@ SensorManager::~SensorManager()
   for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
        iter != this->sensorContainers.end(); ++iter)
   {
+    GZ_ASSERT((*iter) != NULL, "Sensor Constainer is NULL");
     (*iter)->Stop();
     (*iter)->RemoveSensors();
     delete (*iter);
@@ -68,6 +72,7 @@ void SensorManager::Run()
   for (SensorContainer_V::iterator iter = ++this->sensorContainers.begin();
        iter != this->sensorContainers.end(); ++iter)
   {
+    GZ_ASSERT((*iter) != NULL, "Sensor Constainer is NULL");
     (*iter)->Run();
   }
 }
@@ -79,6 +84,7 @@ void SensorManager::Stop()
   for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
        iter != this->sensorContainers.end(); ++iter)
   {
+    GZ_ASSERT((*iter) != NULL, "Sensor Constainer is NULL");
     (*iter)->Stop();
   }
 }
@@ -95,6 +101,8 @@ void SensorManager::Update(bool _force)
     for (iter = this->initSensors.begin();
          iter != this->initSensors.end(); ++iter)
     {
+      GZ_ASSERT((*iter) != NULL, "Sensor pointer is NULL");
+
       (*iter)->Init();
       this->sensorContainers[(*iter)->GetCategory()]->AddSensor(*iter);
     }
@@ -123,6 +131,7 @@ void SensorManager::Init()
   for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
        iter != this->sensorContainers.end(); ++iter)
   {
+    GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
     (*iter)->Init();
   }
 
@@ -138,6 +147,7 @@ void SensorManager::Fini()
   for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
        iter != this->sensorContainers.end(); ++iter)
   {
+    GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
     (*iter)->Fini();
   }
 
@@ -200,6 +210,7 @@ SensorPtr SensorManager::GetSensor(const std::string &_name) const
   for (iter = this->sensorContainers.begin();
        iter != this->sensorContainers.end() && !result; ++iter)
   {
+    GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
     result = (*iter)->GetSensor(_name);
   }
 
@@ -212,11 +223,15 @@ SensorPtr SensorManager::GetSensor(const std::string &_name) const
     for (iter = this->sensorContainers.begin();
          iter != this->sensorContainers.end(); ++iter)
     {
+      GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
       if (!(*iter)->GetSensor(_name, true))
         continue;
 
       if (!result)
+      {
         result = (*iter)->GetSensor(_name, true);
+        GZ_ASSERT(result != NULL, "SensorContainer contains a NULL Sensor");
+      }
       else
       {
         gzerr << "Unable to get a sensor, multiple sensors with the same "
@@ -241,6 +256,7 @@ Sensor_V SensorManager::GetSensors() const
   for (SensorContainer_V::const_iterator iter = this->sensorContainers.begin();
        iter != this->sensorContainers.end(); ++iter)
   {
+    GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
     std::copy((*iter)->sensors.begin(), (*iter)->sensors.end(),
               std::back_inserter(result));
   }
@@ -267,6 +283,7 @@ void SensorManager::RemoveSensor(const std::string &_name)
     for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
          iter != this->sensorContainers.end() && !removed; ++iter)
     {
+      GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
       removed = (*iter)->RemoveSensor(scopedName);
     }
 
@@ -287,6 +304,7 @@ void SensorManager::RemoveSensors()
   for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
       iter != this->sensorContainers.end(); ++iter)
   {
+    GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
     (*iter)->RemoveSensors();
   }
   this->initSensors.clear();
@@ -315,6 +333,7 @@ void SensorManager::SensorContainer::Init()
   Sensor_V::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
   {
+    GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
     (*iter)->Init();
   }
 
@@ -331,6 +350,7 @@ void SensorManager::SensorContainer::Fini()
   // Finialize each sensor in the current sensor vector
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
   {
+    GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
     (*iter)->Fini();
   }
 
@@ -345,13 +365,15 @@ void SensorManager::SensorContainer::Run()
 {
   this->runThread = new boost::thread(
       boost::bind(&SensorManager::SensorContainer::RunLoop, this));
+
+  GZ_ASSERT(this->runThread, "Unable to create boost::thread.");
 }
 
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Stop()
 {
   this->stop = true;
-  this->runCondition.notify_one();
+  this->runCondition.notify_all();
   if (this->runThread)
   {
     this->runThread->join();
@@ -363,12 +385,18 @@ void SensorManager::SensorContainer::Stop()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::RunLoop()
 {
+  this->stop = false;
+
   physics::WorldPtr world = physics::get_world();
+  GZ_ASSERT(world != NULL, "Pointer to World is NULL");
+
+  physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
+  GZ_ASSERT(engine != NULL, "Pointer to PhysicsEngine is NULL");
+
+  engine->InitForThread();
 
   common::Time sleepTime, startTime, diffTime;
-  double minUpdateRate = GZ_DBL_MAX;
-
-  this->stop = false;
+  double maxUpdateRate = GZ_DBL_MIN;
 
   boost::mutex tmpMutex;
   boost::mutex::scoped_lock lock2(tmpMutex);
@@ -387,13 +415,14 @@ void SensorManager::SensorContainer::RunLoop()
     for (Sensor_V::iterator iter = this->sensors.begin();
         iter != this->sensors.end() && !this->stop; ++iter)
     {
-      minUpdateRate = std::min((*iter)->GetUpdateRate(), minUpdateRate);
+      GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
+      maxUpdateRate = std::max((*iter)->GetUpdateRate(), maxUpdateRate);
     }
   }
 
   // Calculate an appropriate sleep time.
-  if (minUpdateRate < GZ_DBL_MAX)
-    sleepTime.Set(1.0 / (minUpdateRate));
+  if (maxUpdateRate > 0)
+    sleepTime.Set(1.0 / (maxUpdateRate));
   else
     sleepTime.Set(0, 1e6);
 
@@ -426,6 +455,7 @@ void SensorManager::SensorContainer::Update(bool _force)
   for (Sensor_V::iterator iter = this->sensors.begin();
        iter != this->sensors.end(); ++iter)
   {
+    GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
     (*iter)->Update(_force);
   }
 }
@@ -442,6 +472,7 @@ SensorPtr SensorManager::SensorContainer::GetSensor(const std::string &_name,
   for (Sensor_V::const_iterator iter = this->sensors.begin();
        iter != this->sensors.end() && !result; ++iter)
   {
+    GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
     // We match on the scoped name (model::link::sensor) because multiple
     // sensors with the name leaf name make exists in a world.
     if ((_useLeafName && (*iter)->GetName() == _name) ||
@@ -457,6 +488,7 @@ SensorPtr SensorManager::SensorContainer::GetSensor(const std::string &_name,
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::AddSensor(SensorPtr _sensor)
 {
+  GZ_ASSERT(_sensor != NULL, "Sensor is NULL when passed to ::AddSensor");
   boost::recursive_mutex::scoped_lock lock(this->mutex);
   this->sensors.push_back(_sensor);
 
@@ -476,6 +508,8 @@ bool SensorManager::SensorContainer::RemoveSensor(const std::string &_name)
   // Find the correct sensor based on name, and remove it.
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
   {
+    GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
+
     if ((*iter)->GetScopedName() == _name)
     {
       (*iter)->Fini();
@@ -495,7 +529,10 @@ void SensorManager::SensorContainer::RemoveSensors()
 
   // Remove all the sensors
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+  {
+    GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
     (*iter)->Fini();
+  }
 
   this->sensors.clear();
 }
@@ -521,9 +558,11 @@ void SensorManager::ImageSensorContainer::Update(bool _force)
 SimTimeEventHandler::SimTimeEventHandler()
 {
   this->world = physics::get_world();
+  GZ_ASSERT(this->world != NULL, "World pointer is NULL");
 
   this->thread = new boost::thread(
       boost::bind(&SimTimeEventHandler::RunLoop, this));
+  GZ_ASSERT(this->thread != NULL, "Unable to create boost::thread");
 }
 
 /////////////////////////////////////////////////
@@ -540,8 +579,9 @@ SimTimeEventHandler::~SimTimeEventHandler()
 
   // Cleanup the events.
   for (std::list<SimTimeEvent*>::iterator iter = this->events.begin();
-       iter != this->events.end();)
+       iter != this->events.end(); ++iter)
   {
+    GZ_ASSERT(*iter != NULL, "SimTimeEvent is NULL");
     delete *iter;
   }
   this->events.clear();
@@ -568,6 +608,8 @@ void SimTimeEventHandler::AddRelativeEvent(const common::Time &_time,
 /////////////////////////////////////////////////
 void SimTimeEventHandler::RunLoop()
 {
+  GZ_ASSERT(this->world != NULL, "World pointer is NULL");
+
   common::Time simTime;
   this->stop = false;
   while (!stop)
@@ -582,6 +624,8 @@ void SimTimeEventHandler::RunLoop()
       for (std::list<SimTimeEvent*>::iterator iter = this->events.begin();
           iter != this->events.end();)
       {
+        GZ_ASSERT(*iter != NULL, "SimTimeEvent is NULL");
+
         // Find events that have a time less than or equal to simulation
         // time.
         if ((*iter)->time <= simTime)

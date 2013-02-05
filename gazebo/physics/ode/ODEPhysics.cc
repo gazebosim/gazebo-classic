@@ -345,12 +345,12 @@ void ODEPhysics::UpdateCollision()
 
   // Generate trimesh collision.
   // This must happen in this thread sequentially
-  /*for (i = 0; i < this->trimeshCollidersCount; ++i)
+  for (i = 0; i < this->trimeshCollidersCount; ++i)
   {
     ODECollision *collision1 = this->trimeshColliders[i].first;
     ODECollision *collision2 = this->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->contactCollisions);
-  }*/
+  }
 }
 
 //////////////////////////////////////////////////

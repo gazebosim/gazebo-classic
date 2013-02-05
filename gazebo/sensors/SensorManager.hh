@@ -26,6 +26,7 @@
 #include <boost/thread.hpp>
 #include <string>
 #include <vector>
+#include <list>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/SingletonT.hh"
