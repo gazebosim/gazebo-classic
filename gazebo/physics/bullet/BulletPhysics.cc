@@ -203,7 +203,7 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_dt(this->stepTimeDouble);
     // physicsMsg.set_iters(this->GetSORPGSIters());
     // physicsMsg.set_sor(this->GetSORPGSW());
-    physicsMsg.set_cfm(this->GetWorldCFM());
+    // physicsMsg.set_cfm(this->GetWorldCFM());
     // physicsMsg.set_erp(this->GetWorldERP());
     // physicsMsg.set_contact_max_correcting_vel(
     //     this->GetContactMaxCorrectingVel());
@@ -220,12 +220,11 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
 void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   if (_msg->has_dt())
-  {
     this->SetStepTime(_msg->dt());
-  }
 
   if (_msg->has_update_rate())
     this->SetUpdateRate(_msg->update_rate());
+
   // Like OnRequest, this function was copied from ODEPhysics.
   // TODO: change this when changing OnRequest.
   // if (_msg->has_solver_type())
@@ -250,8 +249,8 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   // if (_msg->has_sor())
   //   this->SetSORPGSW(_msg->sor());
 
-  if (_msg->has_cfm())
-    this->SetWorldCFM(_msg->cfm());
+  // if (_msg->has_cfm())
+  //   this->SetWorldCFM(_msg->cfm());
 
   // if (_msg->has_erp())
   //   this->SetWorldERP(_msg->erp());
@@ -307,8 +306,11 @@ void BulletPhysics::Reset()
 //////////////////////////////////////////////////
 void BulletPhysics::SetStepTime(double _value)
 {
-  this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetAttribute("dt")->Set(_value);
+  if (this->sdf->HasElement("bullet") &&
+      this->sdf->GetElement("bullet")->HasElement("dt"))
+    this->sdf->GetElement("bullet")->GetElement("dt")->Set(_value);
+  else
+    gzerr << "Unable to set bullet step time\n";
 
   this->stepTimeDouble = _value;
 }
@@ -318,6 +320,15 @@ double BulletPhysics::GetStepTime()
 {
   return this->stepTimeDouble;
 }
+
+// //////////////////////////////////////////////////
+// void BulletPhysics::SetSORPGSIters(unsigned int _iters)
+// {
+//   // TODO: set SDF parameter
+//   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
+//   // Line below commented out because it wasn't helping pendulum test.
+//   // info.m_numIterations = _iters;
+// }
 
 //////////////////////////////////////////////////
 LinkPtr BulletPhysics::CreateLink(ModelPtr _parent)
@@ -415,33 +426,6 @@ void BulletPhysics::ConvertMass(void * /*_engineMass*/,
 }
 
 //////////////////////////////////////////////////
-math::Pose BulletPhysics::ConvertPose(const btTransform &_bt)
-{
-  math::Pose pose;
-  pose.pos.x = _bt.getOrigin().getX();
-  pose.pos.y = _bt.getOrigin().getY();
-  pose.pos.z = _bt.getOrigin().getZ();
-
-  pose.rot.w = _bt.getRotation().getW();
-  pose.rot.x = _bt.getRotation().getX();
-  pose.rot.y = _bt.getRotation().getY();
-  pose.rot.z = _bt.getRotation().getZ();
-
-  return pose;
-}
-
-//////////////////////////////////////////////////
-btTransform BulletPhysics::ConvertPose(const math::Pose &_pose)
-{
-  btTransform trans;
-
-  trans.setOrigin(btVector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
-  trans.setRotation(btQuaternion(_pose.rot.x, _pose.rot.y,
-                                 _pose.rot.z, _pose.rot.w));
-  return trans;
-}
-
-//////////////////////////////////////////////////
 double BulletPhysics::GetWorldCFM()
 {
   sdf::ElementPtr elem = this->sdf->GetElement("bullet");
@@ -463,9 +447,9 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 //////////////////////////////////////////////////
 void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->GetAttribute("xyz")->Set(_gravity);
-  this->dynamicsWorld->setGravity(btVector3(_gravity.x,
-        _gravity.y, _gravity.z));
+  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->dynamicsWorld->setGravity(
+    BulletTypes::ConvertVector3(_gravity));
 }
 
 //////////////////////////////////////////////////

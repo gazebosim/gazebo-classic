@@ -115,7 +115,7 @@ namespace gazebo
       public: virtual void SetGravityMode(bool _mode);
 
       // Documentation inherited
-      public: virtual bool GetGravityMode();
+      public: virtual bool GetGravityMode() const;
 
       // Documentation inherited
       public: void SetSelfCollide(bool _collide);
