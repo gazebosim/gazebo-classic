@@ -252,6 +252,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   double r1 = 0.5, r2 = 1.5;
   math::Vector3 v30 = math::Vector3::Zero;
   math::Vector3 cog;
+  math::Angle angle;
 
   std::vector<std::string> model_names;
   std::vector<double> x0s;
@@ -292,6 +293,31 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   y0s.push_back(0);
   radii.push_back(r2);
   cogs.push_back(math::Vector3(0, r1, 0));
+
+  // sphere6 has c.g. to the side along x axis; it will roll
+  model_names.push_back("cog_x_offset_sphere");
+  x0s.push_back(15);
+  y0s.push_back(0);
+  radii.push_back(r2);
+  cogs.push_back(math::Vector3(r1, 0, 0));
+
+  // sphere7 has c.g. to the side diagonally; it will roll
+  model_names.push_back("cog_xy_45deg_offset_sphere");
+  x0s.push_back(0);
+  y0s.push_back(8);
+  radii.push_back(r2);
+  angle.SetFromDegree(45);
+  cogs.push_back(math::Vector3(r1*cos(angle.Radian()),
+                               r1*sin(angle.Radian()), 0));
+
+  // sphere8 has c.g. to the side diagonally; it will roll
+  model_names.push_back("cog_xy_-30deg_offset_sphere");
+  x0s.push_back(0);
+  y0s.push_back(-8);
+  radii.push_back(r2);
+  angle.SetFromDegree(-30);
+  cogs.push_back(math::Vector3(r1*cos(angle.Radian()),
+                               r1*sin(angle.Radian()), 0));
 
   unsigned int i;
   for (i = 0; i < model_names.size(); i++)
