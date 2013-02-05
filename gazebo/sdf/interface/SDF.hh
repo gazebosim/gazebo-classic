@@ -53,10 +53,6 @@ namespace sdf
     public: ElementPtr GetParent() const;
     public: void SetParent(const ElementPtr _parent);
 
-    /// \brief Remove a child element.
-    /// \param[in] _child Pointer to the child to remove.
-    public: void RemoveChild(ElementPtr _child);
-
     public: void SetName(const std::string &_name);
     public: const std::string &GetName() const;
 
