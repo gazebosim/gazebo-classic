@@ -365,6 +365,26 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
 }
 
 //////////////////////////////////////////////////
+math::Vector3 ODELink::GetWorldLinearVel(const math::Pose &_pose) const
+{
+  math::Vector3 vel;
+
+  if (this->linkId)
+  {
+    dVector3 dvel;
+    math::Pose wPose = this->GetWorldPose();
+    math::Vector3 offsetFromCoG =
+        wPose.rot.RotateVectorReverse(_pose.rot * _pose.pos)
+        - this->inertial->GetCoG();
+    dBodyGetRelPointVel(this->linkId, offsetFromCoG.x, offsetFromCoG.y,
+        offsetFromCoG.z, dvel);
+    vel.Set(dvel[0], dvel[1], dvel[2]);
+  }
+
+  return vel;
+}
+
+//////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldCoGLinearVel() const
 {
   math::Vector3 vel;
