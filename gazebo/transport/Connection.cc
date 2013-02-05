@@ -121,9 +121,23 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
   boost::asio::ip::tcp::resolver::query query(host, service,
       boost::asio::ip::resolver_query_base::numeric_service);
   boost::asio::ip::tcp::resolver::iterator endpoint_iter;
+
   try
   {
     endpoint_iter = resolver.resolve(query);
+
+    // Find the first valid IPv4 address
+    for (; endpoint_iter != end &&
+           !(*endpoint_iter).endpoint().address().is_v4(); ++endpoint_iter)
+    {
+    }
+
+    // Make sure we didn't run off the end of the list.
+    if (endpoint_iter == end)
+    {
+      gzerr << "Unable to resolve uri[" << _host << ":" << _port << "]\n";
+      return false;
+    }
   }
   catch(...)
   {
@@ -675,7 +689,10 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
         continue;
 
       int family = ifa->ifa_addr->sa_family;
-      if (family == AF_INET || family == AF_INET6)
+      // \todo We currently don't handle AF_INET6 addresses. So I commented
+      // out the below line, and removed AF_INET6 for the if clause.
+      // if (family == AF_INET || family == AF_INET6)
+      if (family == AF_INET)
       {
         int s = getnameinfo(ifa->ifa_addr,
             (family == AF_INET) ? sizeof(struct sockaddr_in) :
@@ -795,7 +812,6 @@ void Connection::OnConnect(const boost::system::error_code &_error,
     else
     {
       this->connectError = true;
-      gzerr << "Invalid socket connection\n";
     }
 
     // Notify the condition that it may proceed.
