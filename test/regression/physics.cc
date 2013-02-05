@@ -252,6 +252,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   double r1 = 0.5, r2 = 1.5;
   math::Vector3 v30 = math::Vector3::Zero;
   math::Vector3 cog;
+
   std::vector<std::string> model_names;
   std::vector<double> x0s;
   std::vector<double> y0s;
@@ -259,34 +260,34 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   std::vector<math::Vector3> cogs;
 
   // sphere1 and sphere2 have c.g. at center of sphere, different sizes
-  model_names.push_back("sphere1");
+  model_names.push_back("small_centered_sphere");
   x0s.push_back(0);
   y0s.push_back(0);
   radii.push_back(r1);
   cogs.push_back(v30);
 
-  model_names.push_back("sphere2");
+  model_names.push_back("large_centered_sphere");
   x0s.push_back(4);
   y0s.push_back(0);
   radii.push_back(r2);
   cogs.push_back(v30);
 
   // sphere3 has c.g. below the center
-  model_names.push_back("sphere3");
+  model_names.push_back("lowered_cog_sphere");
   x0s.push_back(8);
   y0s.push_back(0);
   radii.push_back(r2);
   cogs.push_back(math::Vector3(0, 0, -r1));
 
   // sphere4 has c.g. above the center
-  model_names.push_back("sphere4");
+  model_names.push_back("raised_cog_sphere");
   x0s.push_back(-4);
   y0s.push_back(0);
   radii.push_back(r2);
   cogs.push_back(math::Vector3(0, 0, r1));
 
   // sphere5 has c.g. to the side along y axis; it will roll
-  model_names.push_back("sphere5");
+  model_names.push_back("cog_y_offset_sphere");
   x0s.push_back(-8);
   y0s.push_back(0);
   radii.push_back(r2);
@@ -369,7 +370,8 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
     cog = cogs[i];
     if (model != NULL)
     {
-      gzdbg << "Check ground contact of model " << model_names[i] << '\n';
+      gzdbg << "Check ground contact and roll without slip of model "
+            << model_names[i] << '\n';
 
       // Check that velocity is small
       vel1 = model->GetWorldLinearVel();
