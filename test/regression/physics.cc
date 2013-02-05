@@ -292,7 +292,6 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   radii.push_back(r2);
   cogs.push_back(math::Vector3(0, r1, 0));
 
-
   unsigned int i;
   for (i = 0; i < model_names.size(); i++)
   {
@@ -404,6 +403,24 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
         EXPECT_LT(vel2.x*cog.y, -0.2*cog.y*cog.y);
       }
 
+      // Expect roll without slip
+      EXPECT_NEAR(vel1.x,  vel2.y*radius, PHYSICS_TOL);
+      EXPECT_NEAR(vel1.y, -vel2.x*radius, PHYSICS_TOL);
+
+      // Use GetWorldLinearVel with global offset to check roll without slip
+      // Expect small linear velocity at contact point
+      math::Vector3 vel3 = model->GetLink()->GetWorldLinearVel(
+          math::Pose(0, 0, -radius, 0, 0, 0));
+      EXPECT_NEAR(vel3.x, 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel3.y, 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel3.z, 0, PHYSICS_TOL);
+      // Expect speed at top of sphere to be double the speed at center
+      math::Vector3 vel4 = model->GetLink()->GetWorldLinearVel(
+          math::Pose(0, 0, radius, 0, 0, 0));
+      EXPECT_NEAR(vel4.y, 2*vel1.y, PHYSICS_TOL);
+      EXPECT_NEAR(vel4.x, 2*vel1.x, PHYSICS_TOL);
+      EXPECT_NEAR(vel4.z, 0, PHYSICS_TOL);
+
       // Check that model is resting on ground
       pose1 = model->GetWorldPose();
       EXPECT_NEAR(pose1.pos.z, radius, PHYSICS_TOL);
@@ -416,8 +433,8 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
       // expect rolling in direction of cog offset
       else
       {
-        EXPECT_GT( (pose1.pos.x-x0) * cog.x, cog.x * cog.x);
-    }
+        EXPECT_GT((pose1.pos.x-x0) * cog.x, cog.x * cog.x);
+      }
 
       // expect no pose change for directions with no offset
       if (cog.y == 0)
@@ -427,7 +444,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
       // expect rolling in direction of cog offset
       else
       {
-        EXPECT_GT( (pose1.pos.y-y0) * cog.y, cog.y * cog.y);
+        EXPECT_GT((pose1.pos.y-y0) * cog.y, cog.y * cog.y);
       }
     }
     else
