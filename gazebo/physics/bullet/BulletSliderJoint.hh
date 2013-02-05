@@ -70,9 +70,6 @@ namespace gazebo
       /// \brief Get the low stop of an axis(index).
       public: virtual math::Angle GetLowStop(int _index);
 
-      /// \brief Get the position of the joint
-      public: virtual math::Angle GetAngle(int _index) const;
-
       /// \brief Get the rate of change
       public: virtual double GetVelocity(int _index) const;
 
@@ -102,4 +99,3 @@ namespace gazebo
   }
 }
 #endif
-

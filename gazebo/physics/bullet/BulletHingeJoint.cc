@@ -51,6 +51,9 @@ void BulletHingeJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
 {
+  if (this->constraint)
+    this->Detach();
+
   HingeJoint<BulletJoint>::Attach(_one, _two);
 
   // Cast to BulletLink

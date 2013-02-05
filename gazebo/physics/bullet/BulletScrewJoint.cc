@@ -53,6 +53,9 @@ void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
 {
+  if (this->constraint)
+    this->Detach();
+
   ScrewJoint<BulletJoint>::Attach(_one, _two);
 
   BulletLinkPtr bulletChildLink =
@@ -94,12 +97,6 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
-}
-
-//////////////////////////////////////////////////
-math::Angle BulletScrewJoint::GetAngle(int /*_index*/) const
-{
-  return this->bulletScrew->getLinearPos();
 }
 
 //////////////////////////////////////////////////
@@ -186,6 +183,8 @@ math::Vector3 BulletScrewJoint::GetGlobalAxis(int /*_index*/) const
 //////////////////////////////////////////////////
 math::Angle BulletScrewJoint::GetAngleImpl(int /*_index*/) const
 {
-  gzerr << "BulletScrewJoint::GetAngleImpl not implemented\n";
-  return math::Angle();
+  math::Angle result;
+  if (this->bulletScrew)
+    result = this->bulletScrew->getLinearPos();
+  return result;
 }
