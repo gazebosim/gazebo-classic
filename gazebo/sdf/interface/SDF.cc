@@ -15,6 +15,7 @@
  *
  */
 #include "common/Color.hh"
+#include "common/Assert.hh"
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"

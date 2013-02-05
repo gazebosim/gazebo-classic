@@ -330,7 +330,6 @@ TEST(gz_log, Echo)
     "    </joint>\n"
     "  </model>";
 
-  std::cout << validEcho << "\n";
   EXPECT_EQ(validEcho, echo);
 
   // Test joint filter
