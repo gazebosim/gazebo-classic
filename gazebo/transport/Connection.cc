@@ -812,6 +812,7 @@ void Connection::OnConnect(const boost::system::error_code &_error,
     else
     {
       this->connectError = true;
+      gzerr << "Invalid socket connection\n";
     }
 
     // Notify the condition that it may proceed.
