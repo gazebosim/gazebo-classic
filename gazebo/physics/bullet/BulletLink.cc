@@ -260,7 +260,7 @@ math::Vector3 BulletLink::GetWorldLinearVel() const
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
       BulletTypes::ConvertVector3(-(wPose.rot*this->inertial->GetCoG())));
 
-  return math::Vector3(vel.x(), vel.y(), vel.z());
+  return BulletTypes::ConvertVector3(vel);
 }
 
 //////////////////////////////////////////////////
@@ -271,7 +271,7 @@ math::Vector3 BulletLink::GetWorldCoGLinearVel() const
 
   btVector3 vel = this->rigidLink->getLinearVelocity();
 
-  return math::Vector3(vel.x(), vel.y(), vel.z());
+  return BulletTypes::ConvertVector3(vel);
 }
 
 //////////////////////////////////////////////////
@@ -285,7 +285,22 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset) const
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
       BulletTypes::ConvertVector3(offsetFromCoG));
 
-  return math::Vector3(vel.x(), vel.y(), vel.z());
+  return BulletTypes::ConvertVector3(vel);
+}
+
+//////////////////////////////////////////////////
+math::Vector3 BulletLink::GetWorldLinearVel(const math::Pose &_pose) const
+{
+  if (!this->rigidLink)
+    return math::Vector3(0, 0, 0);
+
+  math::Pose wPose = this->GetWorldPose();
+  math::Vector3 offsetFromCoG = _pose.rot*_pose.pos
+        - wPose.rot*this->inertial->GetCoG();
+  btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
+      BulletTypes::ConvertVector3(offsetFromCoG));
+
+  return BulletTypes::ConvertVector3(vel);
 }
 
 //////////////////////////////////////////////////
