@@ -19,15 +19,16 @@
  * Date: 25 May 2009
  */
 
-#include "physics/Link.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletMotionState.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletMotionState.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletMotionState::BulletMotionState(Link *_link)
+BulletMotionState::BulletMotionState(LinkPtr _link)
   : btMotionState()
 {
   this->link = _link;
@@ -39,51 +40,21 @@ BulletMotionState::~BulletMotionState()
 }
 
 //////////////////////////////////////////////////
-math::Pose BulletMotionState::GetWorldPose() const
+void BulletMotionState::getWorldTransform(btTransform &_cogWorldTrans) const
 {
-  return this->worldPose;
+  _cogWorldTrans = BulletTypes::ConvertPose(this->link->GetWorldCoGPose());
 }
 
 //////////////////////////////////////////////////
-void BulletMotionState::SetWorldPosition(const math::Vector3 &_pos)
+void BulletMotionState::setWorldTransform(const btTransform &_cogWorldTrans)
 {
-  this->worldPose.pos = _pos;
-}
+  math::Pose pose = BulletTypes::ConvertPose(_cogWorldTrans);
 
-//////////////////////////////////////////////////
-void BulletMotionState::SetWorldRotation(const math::Quaternion &_rot)
-{
-  this->worldPose.rot = _rot;
-}
+  math::Vector3 cg = pose.rot.RotateVector(this->link->GetInertial()->GetCoG());
+  pose.pos -= cg;
 
-//////////////////////////////////////////////////
-void BulletMotionState::SetWorldPose(const math::Pose &_pose)
-{
-  this->worldPose = _pose;
-}
-
-//////////////////////////////////////////////////
-void BulletMotionState::SetCoG(const math::Vector3 &_cog)
-{
-  this->cog = _cog;
-  math::Vector3 cg = this->worldPose.rot.RotateVector(this->cog);
-  this->worldPose.pos += cg;
-}
-
-//////////////////////////////////////////////////
-void BulletMotionState::getWorldTransform(btTransform &_worldTrans) const
-{
-  math::Pose result = this->worldPose;
-  _worldTrans = BulletPhysics::ConvertPose(result);
-}
-
-//////////////////////////////////////////////////
-void BulletMotionState::setWorldTransform(const btTransform &_worldTrans)
-{
-  this->worldPose = BulletPhysics::ConvertPose(_worldTrans);
-
-  math::Vector3 cg = this->worldPose.rot.RotateVector(this->cog);
-  this->worldPose.pos -= cg;
-
-  this->link->SetWorldPose(this->worldPose, false);
+  // The second argument is set to false to prevent Entity.cc from propagating
+  // the pose change all the way back to bullet.
+  // \TODO: consider using the dirtyPose mechanism employed by ODE.
+  this->link->SetWorldPose(pose, false);
 }

@@ -15,25 +15,18 @@
  *
 */
 
-#ifndef GAZEBO_QT_HEADERS_H_
-#define GAZEBO_QT_HEADERS_H_
+#ifndef _TIMEPANEL_TEST_HH_
+#define _TIMEPANEL_TEST_HH_
 
-#pragma GCC system_header
+#include "gazebo/gui/QTestFixture.hh"
 
-#include <QtGui>
-#include <QX11Info>
-#include <QWidget>
-#include <QPushButton>
-#include <QPoint>
-#include <QFrame>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QGroupBox>
-#include <QApplication>
-#include <qmainwindow.h>
-#include <QAction>
-#include <QtTest/QtTest>
+/// \brief A test class for the DataLogger widget.
+class TimePanel_TEST : public QTestFixture
+{
+  Q_OBJECT
+
+  /// \brief Test that the TimePanel gets valid times from the server.
+  private slots: void ValidTimes();
+};
 
 #endif

@@ -376,6 +376,11 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
   background: none;
 }
 
+QTextEdit#tipsTextEdit
+{
+  border: 1px solid #808080;
+  background-color: #808080;
+}
 
 QTabBar
 {
