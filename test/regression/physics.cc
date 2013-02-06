@@ -253,50 +253,50 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   math::Vector3 v30 = math::Vector3::Zero;
   math::Vector3 cog;
 
-  std::vector<std::string> model_names;
+  std::vector<std::string> modelNames;
   std::vector<double> x0s;
   std::vector<double> y0s;
   std::vector<double> radii;
   std::vector<math::Vector3> cogs;
 
   // sphere1 and sphere2 have c.g. at center of sphere, different sizes
-  model_names.push_back("small_centered_sphere");
+  modelNames.push_back("small_centered_sphere");
   x0s.push_back(0);
   y0s.push_back(0);
   radii.push_back(r1);
   cogs.push_back(v30);
 
-  model_names.push_back("large_centered_sphere");
+  modelNames.push_back("large_centered_sphere");
   x0s.push_back(4);
   y0s.push_back(0);
   radii.push_back(r2);
   cogs.push_back(v30);
 
   // sphere3 has c.g. below the center
-  model_names.push_back("lowered_cog_sphere");
+  modelNames.push_back("lowered_cog_sphere");
   x0s.push_back(8);
   y0s.push_back(0);
   radii.push_back(r2);
   cogs.push_back(math::Vector3(0, 0, -r1));
 
   // sphere4 has c.g. above the center
-  model_names.push_back("raised_cog_sphere");
+  modelNames.push_back("raised_cog_sphere");
   x0s.push_back(-4);
   y0s.push_back(0);
   radii.push_back(r2);
   cogs.push_back(math::Vector3(0, 0, r1));
 
   // sphere5 has c.g. to the side along y axis; it will roll
-  model_names.push_back("cog_y_offset_sphere");
+  modelNames.push_back("cog_y_offset_sphere");
   x0s.push_back(-8);
   y0s.push_back(0);
   radii.push_back(r2);
   cogs.push_back(math::Vector3(0, r1, 0));
 
   unsigned int i;
-  for (i = 0; i < model_names.size(); i++)
+  for (i = 0; i < modelNames.size(); i++)
   {
-    SpawnSphere(model_names[i], math::Vector3(x0s[i], y0s[i], z0+radii[i]),
+    SpawnSphere(modelNames[i], math::Vector3(x0s[i], y0s[i], z0+radii[i]),
                 v30, cogs[i], radii[i]);
   }
 
@@ -308,16 +308,16 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   double t, x0 = 0, y0 = 0, radius;
   // This loop steps the world forward and makes sure that each model falls,
   // expecting downward z velocity and decreasing z position.
-  for (i = 0; i < model_names.size(); i++)
+  for (i = 0; i < modelNames.size(); i++)
   {
     // Make sure the model is loaded
-    model = world->GetModel(model_names[i]);
+    model = world->GetModel(modelNames[i]);
     x0 = x0s[i];
     y0 = y0s[i];
     radius = radii[i];
     if (model != NULL)
     {
-      gzdbg << "Check freefall of model " << model_names[i] << '\n';
+      gzdbg << "Check freefall of model " << modelNames[i] << '\n';
       // Step once and check downward z velocity
       world->StepWorld(1);
       vel1 = model->GetWorldLinearVel();
@@ -342,7 +342,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
     }
     else
     {
-      gzerr << "Error loading model " << model_names[i] << '\n';
+      gzerr << "Error loading model " << modelNames[i] << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
@@ -360,10 +360,10 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   // after the time of predicted ground contact. Except for sphere5,
   // the velocity is expected to be small, and the pose is expected
   // to be underneath the initial pose. sphere5 is expected to be rolling.
-  for (i = 0; i < model_names.size(); i++)
+  for (i = 0; i < modelNames.size(); i++)
   {
     // Make sure the model is loaded
-    model = world->GetModel(model_names[i]);
+    model = world->GetModel(modelNames[i]);
     x0 = x0s[i];
     y0 = y0s[i];
     radius = radii[i];
@@ -371,7 +371,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
     if (model != NULL)
     {
       gzdbg << "Check ground contact and roll without slip of model "
-            << model_names[i] << '\n';
+            << modelNames[i] << '\n';
 
       // Check that velocity is small
       vel1 = model->GetWorldLinearVel();
@@ -451,7 +451,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
     }
     else
     {
-      gzerr << "Error loading model " << model_names[i] << '\n';
+      gzerr << "Error loading model " << modelNames[i] << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }

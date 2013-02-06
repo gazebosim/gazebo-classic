@@ -19,16 +19,17 @@
  * Date: 13 Feb 2006
  */
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/World.hh"
+#include "gazebo/physics/World.hh"
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletCollision.hh"
-#include "physics/bullet/BulletMotionState.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletMotionState.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -63,6 +64,7 @@ void BulletLink::Init()
 {
   Link::Init();
 
+  GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
   btScalar mass = this->inertial->GetMass();
   // The bullet dynamics solver checks for zero mass to identify static and
   // kinematic bodies.
@@ -147,7 +149,10 @@ void BulletLink::Update()
 void BulletLink::SetGravityMode(bool _mode)
 {
   if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid link is NULL, unable to SetGravityMode" << std::endl;
     return;
+  }
 
   if (_mode == false)
     this->rigidLink->setGravity(btVector3(0, 0, 0));
@@ -169,11 +174,14 @@ void BulletLink::SetGravityMode(bool _mode)
 bool BulletLink::GetGravityMode() const
 {
   bool result = false;
-  if (this->rigidLink)
+  if (!this->rigidLink)
   {
-    btVector3 g = this->rigidLink->getGravity();
-    result = !math::equal(static_cast<double>(g.length()), 0.0);
+    gzlog << "Bullet rigid link is NULL, GetGravityMode returns "
+          << result << " by default." << std::endl;
+    return result;
   }
+  btVector3 g = this->rigidLink->getGravity();
+  result = !math::equal(static_cast<double>(g.length()), 0.0);
 
   return result;
 }
@@ -209,7 +217,11 @@ void BulletLink::OnPoseChange()
   Link::OnPoseChange();
 
   if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid link is NULL, unable to respond to OnPoseChange"
+          << std::endl;
     return;
+  }
 
   // this->SetEnabled(true);
 
@@ -245,7 +257,10 @@ void BulletLink::SetEnabled(bool /*_enable*/) const
 void BulletLink::SetLinearVel(const math::Vector3 &_vel)
 {
   if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid link is NULL, unable to SetLinearVel" << std::endl;
     return;
+  }
 
   this->rigidLink->setLinearVelocity(BulletTypes::ConvertVector3(_vel));
 }
@@ -254,7 +269,11 @@ void BulletLink::SetLinearVel(const math::Vector3 &_vel)
 math::Vector3 BulletLink::GetWorldCoGLinearVel() const
 {
   if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid link is NULL, GetWorldLinearVel returns "
+          << math::Vector3(0, 0, 0) << " by default." << std::endl;
     return math::Vector3(0, 0, 0);
+  }
 
   btVector3 vel = this->rigidLink->getLinearVelocity();
 
@@ -265,9 +284,14 @@ math::Vector3 BulletLink::GetWorldCoGLinearVel() const
 math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset) const
 {
   if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid link is NULL, GetWorldLinearVel returns "
+          << math::Vector3(0, 0, 0) << " by default." << std::endl;
     return math::Vector3(0, 0, 0);
+  }
 
   math::Pose wPose = this->GetWorldPose();
+  GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
   math::Vector3 offsetFromCoG = wPose.rot*(_offset - this->inertial->GetCoG());
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
       BulletTypes::ConvertVector3(offsetFromCoG));
@@ -279,9 +303,14 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset) const
 math::Vector3 BulletLink::GetWorldLinearVel(const math::Pose &_pose) const
 {
   if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid link is NULL, GetWorldLinearVel returns "
+          << math::Vector3(0, 0, 0) << " by default." << std::endl;
     return math::Vector3(0, 0, 0);
+  }
 
   math::Pose wPose = this->GetWorldPose();
+  GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
   math::Vector3 offsetFromCoG = _pose.rot*_pose.pos
         - wPose.rot*this->inertial->GetCoG();
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
@@ -294,7 +323,10 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Pose &_pose) const
 void BulletLink::SetAngularVel(const math::Vector3 &_vel)
 {
   if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid link is NULL, unable to SetAngularVel" << std::endl;
     return;
+  }
 
   this->rigidLink->setAngularVelocity(BulletTypes::ConvertVector3(_vel));
 }
@@ -303,11 +335,15 @@ void BulletLink::SetAngularVel(const math::Vector3 &_vel)
 math::Vector3 BulletLink::GetWorldAngularVel() const
 {
   if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid link is NULL, GetWorldAngularVel returns "
+          << math::Vector3(0, 0, 0) << " by default." << std::endl;
     return math::Vector3(0, 0, 0);
+  }
 
   btVector3 vel = this->rigidLink->getAngularVelocity();
 
-  return math::Vector3(vel.x(), vel.y(), vel.z());
+  return BulletTypes::ConvertVector3(vel);
 }
 
 //////////////////////////////////////////////////
@@ -342,9 +378,12 @@ math::Vector3 BulletLink::GetWorldForce() const
 void BulletLink::SetTorque(const math::Vector3 &_torque)
 {
   if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid link is NULL, unable to SetAngularVel" << std::endl;
     return;
+  }
 
-  this->rigidLink->applyTorque(btVector3(_torque.x, _torque.y, _torque.z));
+  this->rigidLink->applyTorque(BulletTypes::ConvertVector3(_torque));
 }
 
 //////////////////////////////////////////////////
@@ -372,17 +411,27 @@ btRigidBody *BulletLink::GetBulletLink() const
 //////////////////////////////////////////////////
 void BulletLink::SetLinearDamping(double _damping)
 {
-  if (this->rigidLink)
-    this->rigidLink->setDamping((btScalar)_damping,
-        (btScalar)this->rigidLink->getAngularDamping());
+  if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid link is NULL, unable to SetLinearDamping"
+          << std::endl;
+    return;
+  }
+  this->rigidLink->setDamping((btScalar)_damping,
+      (btScalar)this->rigidLink->getAngularDamping());
 }
 
 //////////////////////////////////////////////////
 void BulletLink::SetAngularDamping(double _damping)
 {
-  if (this->rigidLink)
-    this->rigidLink->setDamping(
-        (btScalar)this->rigidLink->getLinearDamping(), (btScalar)_damping);
+  if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid link is NULL, unable to SetAngularDamping"
+          << std::endl;
+    return;
+  }
+  this->rigidLink->setDamping(
+      (btScalar)this->rigidLink->getLinearDamping(), (btScalar)_damping);
 }
 
 //////////////////////////////////////////////////
@@ -410,36 +459,45 @@ void BulletLink::SetAngularDamping(double _damping)
 /////////////////////////////////////////////////
 void BulletLink::AddForce(const math::Vector3 &/*_force*/)
 {
+  gzlog << "BulletLink::AddForce not yet implemented." << std::endl;
 }
 
 /////////////////////////////////////////////////
 void BulletLink::AddRelativeForce(const math::Vector3 &/*_force*/)
 {
+  gzlog << "BulletLink::AddRelativeForce not yet implemented." << std::endl;
 }
 
 /////////////////////////////////////////////////
 void BulletLink::AddForceAtWorldPosition(const math::Vector3 &/*_force*/,
                                          const math::Vector3 &/*_pos*/)
 {
+  gzlog << "BulletLink::AddForceAtWorldPosition not yet implemented."
+        << std::endl;
 }
 
 /////////////////////////////////////////////////
 void BulletLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
                   const math::Vector3 &/*_relpos*/)
 {
+  gzlog << "BulletLink::AddForceAtRelativePosition not yet implemented."
+        << std::endl;
 }
 
 /////////////////////////////////////////////////
 void BulletLink::AddTorque(const math::Vector3 &/*_torque*/)
 {
+  gzlog << "BulletLink::AddTorque not yet implemented." << std::endl;
 }
 
 /////////////////////////////////////////////////
 void BulletLink::AddRelativeTorque(const math::Vector3 &/*_torque*/)
 {
+  gzlog << "BulletLink::AddRelativeTorque not yet implemented." << std::endl;
 }
 
 /////////////////////////////////////////////////
 void BulletLink::SetAutoDisable(bool /*_disable*/)
 {
+  gzlog << "BulletLink::SetAutoDisable not yet implemented." << std::endl;
 }
