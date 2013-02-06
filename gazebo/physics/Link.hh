@@ -95,7 +95,7 @@ namespace gazebo
 
       /// \brief Get the gravity mode.
       /// \return True if gravity is enabled.
-      public: virtual bool GetGravityMode() = 0;
+      public: virtual bool GetGravityMode() const = 0;
 
       /// \brief Set whether this body will collide with others in the
       /// model.
@@ -177,6 +177,12 @@ namespace gazebo
       /// body's own frame of reference.
       /// \param[in] _torque Torque value to add.
       public: virtual void AddRelativeTorque(const math::Vector3 &_torque) = 0;
+
+      /// \brief Get the pose of the body's center of gravity in the world
+      ///        coordinate frame.
+      /// \return Pose of the body's center of gravity in the world coordinate
+      ///         frame.
+      public: math::Pose GetWorldCoGPose() const;
 
       /// \brief Get the linear velocity of the body.
       /// \return Linear velocity of the body.

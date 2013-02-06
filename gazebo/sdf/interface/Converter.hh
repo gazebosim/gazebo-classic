@@ -33,12 +33,15 @@ namespace sdf
                                 const std::string &_toVersion,
                                 bool _quiet = false);
 
+    /// \cond
+    /// This is an internal function.
     /// \brief Generic convert function that converts the SDF based on the
     /// given Convert file.
     /// \param[in] _doc SDF xml doc
     /// \param[in] _convertDoc Convert xml doc
     public: static void Convert(TiXmlDocument *_doc,
         TiXmlDocument *_convertDoc);
+    /// \endcond
 
     private: static void ConvertImpl(TiXmlElement *_elem,
                                      TiXmlElement *_convert);

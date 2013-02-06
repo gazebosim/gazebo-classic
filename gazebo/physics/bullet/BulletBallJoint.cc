@@ -34,6 +34,7 @@ BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent)
     : BallJoint<BulletJoint>(_parent)
 {
   this->world = _world;
+  this->bulletBall = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -80,13 +81,13 @@ void BulletBallJoint::Attach(LinkPtr _one, LinkPtr _two)
                            - this->parentLink->GetWorldPose().pos;
   pivotB = this->anchorPos;
 
-  this->btBall = new btPoint2PointConstraint(
+  this->bulletBall = new btPoint2PointConstraint(
       *bulletParentLink->GetBulletLink(),
       *bulletChildLink->GetBulletLink(),
       btVector3(pivotA.x, pivotA.y, pivotA.z),
       btVector3(pivotB.x, pivotB.y, pivotB.z));
 
-  this->constraint = this->btBall;
+  this->constraint = this->bulletBall;
 
   // Add the joint to the world
   this->world->addConstraint(this->constraint);
@@ -145,12 +146,12 @@ math::Angle BulletBallJoint::GetAngleImpl(int /*_index*/) const
 void BulletBallJoint::SetHighStop(int /*_index*/,
                                    const math::Angle &/*_angle*/)
 {
-  if (this->btBall)
+  if (this->bulletBall)
   {
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    // this->btBall->setLimit(this->btBall->getLowerLimit(),
+    // this->bulletBall->setLimit(this->btBall->getLowerLimit(),
     //                         _angle.Radian());
   }
   else
@@ -163,13 +164,13 @@ void BulletBallJoint::SetHighStop(int /*_index*/,
 void BulletBallJoint::SetLowStop(int /*_index*/,
                                   const math::Angle &/*_angle*/)
 {
-  if (this->btBall)
+  if (this->bulletBall)
   {
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    // this->btBall->setLimit(-_angle.Radian(),
-    //                         this->btBall->getUpperLimit());
+    // this->bulletBall->setLimit(-_angle.Radian(),
+    //                         this->bulletBall->getUpperLimit());
   }
   else
     gzthrow("Joint must be created first");
