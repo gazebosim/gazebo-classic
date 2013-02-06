@@ -1033,6 +1033,37 @@ gazebo::common::Time Element::GetValueTime(const std::string &_key)
 }
 
 /////////////////////////////////////////////////
+void Element::RemoveFromParent()
+{
+  if (this->parent)
+  {
+    ElementPtr_V::iterator iter;
+    iter = std::find(this->parent->elements.begin(),
+        this->parent->elements.end(), shared_from_this());
+
+    if (iter != this->parent->elements.end())
+    {
+      this->parent->elements.erase(iter);
+      this->parent.reset();
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void Element::RemoveChild(ElementPtr _child)
+{
+  ElementPtr_V::iterator iter;
+  iter = std::find(this->elements.begin(),
+                   this->elements.end(), _child);
+
+  if (iter != this->elements.end())
+  {
+    _child->SetParent(ElementPtr());
+    this->elements.erase(iter);
+  }
+}
+
+/////////////////////////////////////////////////
 void Element::ClearElements()
 {
   this->elements.clear();

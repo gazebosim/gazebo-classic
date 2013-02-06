@@ -39,7 +39,6 @@ BulletLink::BulletLink(EntityPtr _parent)
 {
   this->rigidLink = NULL;
   this->compoundShape = new btCompoundShape();
-  this->motionState = new BulletMotionState(this);
 }
 
 //////////////////////////////////////////////////
@@ -68,13 +67,16 @@ void BulletLink::Init()
   // The bullet dynamics solver checks for zero mass to identify static and
   // kinematic bodies.
   if (this->IsStatic() || this->GetKinematic())
+  {
     mass = 0;
+    this->inertial->SetInertiaMatrix(0, 0, 0, 0, 0, 0);
+  }
   btVector3 fallInertia(0, 0, 0);
   math::Vector3 cogVec = this->inertial->GetCoG();
 
   // Set the initial pose of the body
-  this->motionState->SetWorldPose(this->GetWorldPose());
-  this->motionState->SetCoG(cogVec);
+  this->motionState.reset(new BulletMotionState(
+    boost::shared_dynamic_cast<Link>(shared_from_this())));
 
   for (Base_V::iterator iter = this->children.begin();
        iter != this->children.end(); ++iter)
@@ -89,15 +91,21 @@ void BulletLink::Init()
       relativePose.pos -= cogVec;
 
       this->compoundShape->addChildShape(
-          BulletPhysics::ConvertPose(relativePose), shape);
+          BulletTypes::ConvertPose(relativePose), shape);
     }
   }
 
-  this->compoundShape->calculateLocalInertia(mass, fallInertia);
+  // this->compoundShape->calculateLocalInertia(mass, fallInertia);
+  fallInertia = BulletTypes::ConvertVector3(
+    this->inertial->GetPrincipalMoments());
+  // TODO: inertia products not currently used
+  this->inertial->SetInertiaMatrix(fallInertia.x(), fallInertia.y(),
+                                   fallInertia.z(), 0, 0, 0);
 
   // Create a construction info object
   btRigidBody::btRigidBodyConstructionInfo
-    rigidLinkCI(mass, this->motionState, this->compoundShape, fallInertia);
+    rigidLinkCI(mass, this->motionState.get(), this->compoundShape,
+    fallInertia);
 
   rigidLinkCI.m_linearDamping = this->GetLinearDamping();
   rigidLinkCI.m_angularDamping = this->GetAngularDamping();
@@ -158,7 +166,7 @@ void BulletLink::SetGravityMode(bool _mode)
 }
 
 //////////////////////////////////////////////////
-bool BulletLink::GetGravityMode()
+bool BulletLink::GetGravityMode() const
 {
   bool result = false;
   if (this->rigidLink)
@@ -187,7 +195,7 @@ void BulletLink::SetSelfCollide(bool /*_collide*/)
 
   btTransform trans;
   math::Pose relativePose = _collision->GetRelativePose();
-  trans = BulletPhysics::ConvertPose(relativePose);
+  trans = BulletTypes::ConvertPose(relativePose);
 
   bcollision->SetCompoundShapeIndex(this->compoundShape->getNumChildShapes());
   this->compoundShape->addChildShape(trans, bcollision->GetCollisionShape());
@@ -195,16 +203,28 @@ void BulletLink::SetSelfCollide(bool /*_collide*/)
   */
 
 //////////////////////////////////////////////////
-/// changed
+/// Adapted from ODELink::OnPoseChange
 void BulletLink::OnPoseChange()
 {
-  /*
-  math::Pose pose = this->GetWorldPose();
+  Link::OnPoseChange();
 
-  this->motionState->SetWorldPose(pose);
-  if (this->rigidLink)
-    this->rigidLink->setMotionState(this->motionState);
-    */
+  if (!this->rigidLink)
+    return;
+
+  // this->SetEnabled(true);
+
+  const math::Pose myPose = this->GetWorldCoGPose();
+
+  this->rigidLink->setCenterOfMassTransform(
+    BulletTypes::ConvertPose(myPose));
+}
+
+//////////////////////////////////////////////////
+bool BulletLink::GetEnabled() const
+{
+  // This function and its counterpart BulletLink::SetEnabled
+  // don't do anything yet.
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -221,35 +241,13 @@ void BulletLink::SetEnabled(bool /*_enable*/) const
     */
 }
 
-/////////////////////////////////////////////////////////////////////
-/*
-  What's going on here?  In ODE the CoM of a body corresponds to the
-  origin of the body-fixed coordinate system.  In Gazebo, however, we
-  want to have arbitrary body coordinate systems (i.e., CoM may be
-  displaced from the body-fixed cs).  To get around this limitation in
-  Bullet, we have an extra fudge-factor (comPose), describing the pose of
-  the CoM relative to Gazebo's body-fixed cs.  When using low-level
-  Bullet functions, one must use apply this factor appropriately.
-
-  The UpdateCoM() function is used to compute this offset, based on
-  the mass distribution of attached collisions.  This function also shifts
-  the Bullet-pose of the collisions, to keep everything in the same place in
-  the Gazebo cs.  Simple, neh?
-*/
-void BulletLink::UpdateCoM()
-{
-  // Link::UpdateCoM();
-}
-
 //////////////////////////////////////////////////
-void BulletLink::SetLinearVel(const math::Vector3 & /*_vel*/)
+void BulletLink::SetLinearVel(const math::Vector3 &_vel)
 {
-  /*
   if (!this->rigidLink)
     return;
 
-  this->rigidLink->setLinearVelocity(btmath::Vector3(_vel.x, _vel.y, _vel.z));
-  */
+  this->rigidLink->setLinearVelocity(BulletTypes::ConvertVector3(_vel));
 }
 
 //////////////////////////////////////////////////
@@ -269,7 +267,7 @@ void BulletLink::SetAngularVel(const math::Vector3 &_vel)
   if (!this->rigidLink)
     return;
 
-  this->rigidLink->setAngularVelocity(btVector3(_vel.x, _vel.y, _vel.z));
+  this->rigidLink->setAngularVelocity(BulletTypes::ConvertVector3(_vel));
 }
 
 //////////////////////////////////////////////////
@@ -376,7 +374,7 @@ void BulletLink::SetAngularDamping(double _damping)
   {
     // Set the pose of the _collision in Bullet
     this->compoundShape->updateChildTransform(i,
-        BulletPhysics::ConvertPose(_newPose));
+        BulletTypes::ConvertPose(_newPose));
   }
 }*/
 
