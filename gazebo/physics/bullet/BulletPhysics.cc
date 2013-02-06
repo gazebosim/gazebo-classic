@@ -470,7 +470,7 @@ void BulletPhysics::SetSeed(uint32_t /*_seed*/)
 {
   // GEN_srand is defined in btRandom.h, but nothing in bullet uses it
   // GEN_srand(_seed);
-  
+
   // The best bet is probably btSequentialImpulseConstraintSolver::setRandSeed,
   // but it's not a static function.
   // There's 2 other instances of random number generation in bullet classes:
