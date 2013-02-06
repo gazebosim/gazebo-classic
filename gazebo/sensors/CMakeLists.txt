@@ -33,6 +33,7 @@ set (headers
 
 set (gtest_sources
   SensorManager_TEST.cc
+  RaySensor_TEST.cc
 )
 gz_build_tests(${gtest_sources})
 
