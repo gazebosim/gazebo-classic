@@ -81,12 +81,9 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetTorque(const math::Vector3 &_torque);
 
-      // Documentation inherited.
-      public: virtual math::Vector3 GetWorldLinearVel() const;
-
       // Documentation inherited
       public: virtual math::Vector3 GetWorldLinearVel(
-          const math::Vector3 &_offset) const;
+                  const math::Vector3 &_offset) const;
 
       // Documentation inherited
       public: virtual math::Vector3 GetWorldLinearVel(
