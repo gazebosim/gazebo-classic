@@ -42,6 +42,7 @@ Joint::Joint(BasePtr _parent)
   this->AddType(Base::JOINT);
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
+  this->lastForceAppliedTime = common::Time(0);
 }
 
 //////////////////////////////////////////////////
@@ -391,7 +392,18 @@ void Joint::SetForce(int _index, double _force)
 {
   /// \todo: should check to see if this type of joint has _index
   if (_index < 2)
-    this->forceApplied[_index] = _force;
+  {
+    common::Time curTime = this->world->GetSimTime();
+    if (curTime > this->lastForceAppliedTime)
+    {
+      // reset forceApplied accumulator if timestep advances
+      this->forceApplied[0] = 0;
+      this->forceApplied[1] = 0;
+      this->lastForceAppliedTime = curTime;
+    }
+
+    this->forceApplied[_index] += _force;
+  }
   else
     gzerr << "Invalid joint index [" << _index
           << "] when trying to apply force\n";

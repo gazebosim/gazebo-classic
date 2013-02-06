@@ -382,13 +382,14 @@ namespace gazebo
       private: math::Angle staticAngle;
 
       /// \brief apply damping for adding viscous damping forces on updates
-      protected: gazebo::event::ConnectionPtr applyDamping;
+      protected: event::ConnectionPtr applyDamping;
 
       /// \brief Save force applied by user
       /// This plus the joint feedback (joint contstraint forces) is the
       /// equivalent of simulated force torque sensor reading
       /// Allocate a 2 vector in case hinge2 joint is used.
       protected: double forceApplied[2];
+      protected: common::Time lastForceAppliedTime;
     };
     /// \}
   }
