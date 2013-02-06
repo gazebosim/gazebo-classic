@@ -171,6 +171,7 @@ macro (gz_build_tests)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport
+      libgazebo
       pthread
       )
   

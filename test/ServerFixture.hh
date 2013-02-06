@@ -78,6 +78,7 @@ class ServerFixture : public testing::Test
                gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
 
                path = TEST_PATH;
+               std::cout << "ADD PATH[" << path << "]\n";
                gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
              }
 

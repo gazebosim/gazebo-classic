@@ -34,7 +34,8 @@ TEST_F(SensorManager_TEST, InitEmpty)
 
   EXPECT_TRUE(mgr->SensorsInitialized());
   sensors::Sensor_V sensors = mgr->GetSensors();
-  EXPECT_EQ(sensors.size(), 0);
+  size_t size = 0;
+  EXPECT_EQ(sensors.size(), size);
 }
 
 /////////////////////////////////////////////////
@@ -49,7 +50,7 @@ TEST_F(SensorManager_TEST, Data)
   EXPECT_TRUE(mgr->SensorsInitialized());
 
   // Make sure we have the right number of sensors
-  int sensorCount = 4;
+  size_t sensorCount = 4;
   sensors::Sensor_V sensors = mgr->GetSensors();
   EXPECT_EQ(sensors.size(), sensorCount);
 
@@ -90,7 +91,7 @@ TEST_F(SensorManager_TEST, InitRemove)
   Load("worlds/pr2.world");
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
-  int sensorCount = 17;
+  size_t sensorCount = 17;
 
   // Make sure we have the correct number of sensors.
   EXPECT_TRUE(mgr->SensorsInitialized());
@@ -112,7 +113,7 @@ TEST_F(SensorManager_TEST, InitRemove)
   mgr->RemoveSensors();
 
   // Make sure all the sensors have been removed
-  EXPECT_EQ(mgr->GetSensors().size(), 0);
+  EXPECT_EQ(mgr->GetSensors().size(), size_t(0));
 }
 
 /////////////////////////////////////////////////
