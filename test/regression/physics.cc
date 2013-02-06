@@ -222,7 +222,10 @@ TEST_F(PhysicsTest, SpawnDropBullet)
 //  sphere2: larger radius, centered cg
 //  sphere3: larger radius, lowered cg
 //  sphere4: larger radius, raised cg
-//  sphere5: larger radius, laterally offset cg
+//  sphere5: larger radius, y offset cg
+//  sphere6: larger radius, x offset cg
+//  sphere7: larger radius, 45 deg offset cg
+//  sphere8: larger radius, -30 deg offset cg
 // The bottom of each sphere is at the same height, and it is verified
 // that they hit the ground at the same time. Also, sphere5 should start
 // rolling to the side when it hits the ground.
@@ -295,14 +298,14 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   cogs.push_back(math::Vector3(0, r1, 0));
 
   // sphere6 has c.g. to the side along x axis; it will roll
-  model_names.push_back("cog_x_offset_sphere");
+  modelNames.push_back("cog_x_offset_sphere");
   x0s.push_back(15);
   y0s.push_back(0);
   radii.push_back(r2);
   cogs.push_back(math::Vector3(r1, 0, 0));
 
   // sphere7 has c.g. to the side diagonally; it will roll
-  model_names.push_back("cog_xy_45deg_offset_sphere");
+  modelNames.push_back("cog_xy_45deg_offset_sphere");
   x0s.push_back(0);
   y0s.push_back(8);
   radii.push_back(r2);
@@ -311,7 +314,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
                                r1*sin(angle.Radian()), 0));
 
   // sphere8 has c.g. to the side diagonally; it will roll
-  model_names.push_back("cog_xy_-30deg_offset_sphere");
+  modelNames.push_back("cog_xy_-30deg_offset_sphere");
   x0s.push_back(0);
   y0s.push_back(-8);
   radii.push_back(r2);
