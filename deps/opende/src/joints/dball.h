@@ -20,30 +20,37 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef _ODE_JOINTS_H_
-#define _ODE_JOINTS_H_
-
-#include <ode/common.h>
+#ifndef _ODE_JOINT_DBALL_H_
+#define _ODE_JOINT_DBALL_H_
 
 #include "joint.h"
 
-#include "ball.h"
-#include "hinge.h"
-#include "slider.h"
-#include "screw.h"
-#include "dball.h"
-#include "dhinge.h"
-#include "gearbox.h"
-#include "contact.h"
-#include "universal.h"
-#include "hinge2.h"
-#include "fixed.h"
-#include "null.h"
-#include "amotor.h"
-#include "lmotor.h"
-#include "plane2d.h"
-#include "pu.h"
-#include "pr.h"
-#include "piston.h"
+// ball and socket
+
+struct dxJointDBall : public dxJoint
+{
+    dVector3 anchor1;   // anchor w.r.t first body
+    dVector3 anchor2;   // anchor w.r.t second body
+    dReal erp;          // error reduction
+    dReal cfm;          // constraint force mix in
+    dReal targetDistance;
+
+    void set( int num, dReal value );
+    dReal get( int num );
+
+    void updateTargetDistance();
+
+    dxJointDBall( dxWorld *w );
+    virtual void getSureMaxInfo( SureMaxInfo* info );
+    virtual void getInfo1( Info1* info );
+    virtual void getInfo2( dReal worldFPS, dReal worldERP, const Info2* info );
+    virtual void getInfo2( Info2* info );
+    virtual dJointType type() const;
+    virtual size_t size() const;
+
+    virtual void setRelativeValues();
+};
+
 
 #endif
+

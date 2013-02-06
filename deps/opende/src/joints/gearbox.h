@@ -20,30 +20,26 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef _ODE_JOINTS_H_
-#define _ODE_JOINTS_H_
+#ifndef _ODE_JOINT_GEARBOX_
+#define _ODE_JOINT_GEARBOX_
 
-#include <ode/common.h>
-
-#include "joint.h"
-
-#include "ball.h"
-#include "hinge.h"
-#include "slider.h"
-#include "screw.h"
-#include "dball.h"
 #include "dhinge.h"
-#include "gearbox.h"
-#include "contact.h"
-#include "universal.h"
-#include "hinge2.h"
-#include "fixed.h"
-#include "null.h"
-#include "amotor.h"
-#include "lmotor.h"
-#include "plane2d.h"
-#include "pu.h"
-#include "pr.h"
-#include "piston.h"
+
+struct dxJointGearbox : public dxJointDHinge 
+{
+    dVector3 axis1, axis2;
+    dReal ratio;        // gearbox ratio
+    dReal erp;          // error reduction
+    dReal cfm;          // constraint force mix in
+    
+    dxJointGearbox(dxWorld *w);
+
+    virtual void getSureMaxInfo( SureMaxInfo* info );
+    virtual void getInfo1( Info1* info );
+    virtual void getInfo2( Info2* info );
+    virtual dJointType type() const;
+    virtual size_t size() const;
+
+};
 
 #endif
