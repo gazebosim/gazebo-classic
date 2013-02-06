@@ -389,6 +389,12 @@ namespace gazebo
       /// equivalent of simulated force torque sensor reading
       /// Allocate a 2 vector in case hinge2 joint is used.
       protected: double forceApplied[2];
+
+      /// \brief Store Joint effort limit as specified in SDF
+      protected: double effortLimit[2];
+
+      /// \brief Store Joint velocity limit as specified in SDF
+      protected: double velocityLimit[2];
     };
     /// \}
   }
