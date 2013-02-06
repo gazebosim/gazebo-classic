@@ -184,17 +184,15 @@ namespace gazebo
       ///         frame.
       public: math::Pose GetWorldCoGPose() const;
 
-      /// \brief Get the linear velocity of the body in the world frame.
-      /// \return Linear velocity of the body in the world frame.
-      public: virtual math::Vector3 GetWorldLinearVel() const = 0;
-
       /// \brief Get the linear velocity of a point on the body in the world
-      ///        frame, using an offset expressed in a body-fixed frame.
+      ///        frame, using an offset expressed in a body-fixed frame. If
+      ///        no offset is given, the velocity at the origin of the Link
+      ///        frame will be returned.
       /// \param[in] _offset Offset of the point from the origin of the Link
-      ///                    frame, expressed in the body-fixed frame
+      ///                    frame, expressed in the body-fixed frame.
       /// \return Linear velocity of the point on the body
       public: virtual math::Vector3 GetWorldLinearVel(
-          const math::Vector3 &_offset) const = 0;
+          const math::Vector3 &_offset = math::Vector3(0, 0, 0)) const = 0;
 
       /// \brief Get the linear velocity of a point on the body in the world
       ///        frame, using an offset expressed in an arbitrary frame.

@@ -251,19 +251,6 @@ void BulletLink::SetLinearVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletLink::GetWorldLinearVel() const
-{
-  if (!this->rigidLink)
-    return math::Vector3(0, 0, 0);
-
-  math::Pose wPose = this->GetWorldPose();
-  btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
-      BulletTypes::ConvertVector3(-(wPose.rot*this->inertial->GetCoG())));
-
-  return BulletTypes::ConvertVector3(vel);
-}
-
-//////////////////////////////////////////////////
 math::Vector3 BulletLink::GetWorldCoGLinearVel() const
 {
   if (!this->rigidLink)

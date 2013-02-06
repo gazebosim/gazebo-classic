@@ -332,22 +332,6 @@ void ODELink::SetLinearVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODELink::GetWorldLinearVel() const
-{
-  math::Vector3 vel;
-
-  if (this->linkId)
-  {
-    dVector3 dvel;
-    math::Vector3 cog = this->inertial->GetCoG();
-    dBodyGetRelPointVel(this->linkId, -cog.x, -cog.y, -cog.z, dvel);
-    vel.Set(dvel[0], dvel[1], dvel[2]);
-  }
-
-  return vel;
-}
-
-//////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
 {
   math::Vector3 vel;
