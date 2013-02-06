@@ -53,6 +53,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Rand.hh"
 
 #include "BulletPhysics.hh"
 
@@ -117,6 +118,9 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   // TODO: Enable this to do custom contact setting
   gContactAddedCallback = ContactCallback;
   gContactProcessedCallback = ContactProcessed;
+
+  // Moved from physics::PhysicsEngine constructor
+  this->SetSeed(math::Rand::GetSeed());
 }
 
 //////////////////////////////////////////////////
@@ -461,4 +465,17 @@ void BulletPhysics::DebugPrint() const
 {
 }
 
+/////////////////////////////////////////////////
+void BulletPhysics::SetSeed(uint32_t /*_seed*/)
+{
+  // GEN_srand is defined in btRandom.h, but nothing in bullet uses it
+  // GEN_srand(_seed);
+  
+  // The best bet is probably btSequentialImpulseConstraintSolver::setRandSeed,
+  // but it's not a static function.
+  // There's 2 other instances of random number generation in bullet classes:
+  //  btSoftBody.cpp:1160
+  //  btConvexHullComputer.cpp:2188
 
+  // It's going to be blank for now.
+}

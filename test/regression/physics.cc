@@ -562,9 +562,11 @@ TEST_F(PhysicsTest, State)
 
 TEST_F(PhysicsTest, JointDampingTest)
 {
+  // Random seed is set to prevent brittle failures (gazebo issue #479)
+  math::Rand::SetSeed(18420503);
   Load("worlds/damp_test.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  ASSERT_TRUE(world != NULL);
 
   int i = 0;
   while (!this->HasEntity("model_4_mass_1_ixx_1_damping_10") && i < 20)
