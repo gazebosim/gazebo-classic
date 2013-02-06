@@ -253,8 +253,8 @@ math::Vector3 BulletSliderJoint::GetGlobalAxis(int /*_index*/) const
     // I have not verified the following math, though I based it on internal
     // bullet code at line 250 of btHingeConstraint.cpp
     btVector3 vec =
-      bulletSlider->getRigidBodyA().getCenterOfMassTransform().getBasis() *
-      bulletSlider->getFrameOffsetA().getBasis().getColumn(2);
+      this->bulletSlider->getRigidBodyA().getCenterOfMassTransform().getBasis() *
+      this->bulletSlider->getFrameOffsetA().getBasis().getColumn(2);
     result = BulletTypes::ConvertVector3(vec);
   }
   else

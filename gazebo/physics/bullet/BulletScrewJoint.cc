@@ -53,6 +53,8 @@ void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
 {
+  gzwarn << "Screw joint contraints are currenlty not enforced" << "\n";
+
   if (this->constraint)
     this->Detach();
 
@@ -63,21 +65,39 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
   BulletLinkPtr bulletParentLink =
     boost::shared_static_cast<BulletLink>(this->parentLink);
 
-  if (!bulletChildLink || !bulletParentLink)
-    gzthrow("Requires bullet bodies");
 
   btTransform frame1, frame2;
   frame1 = btTransform::getIdentity();
   frame2 = btTransform::getIdentity();
 
   math::Vector3 pivotA, pivotB;
+  math::Pose pose;
 
-  pivotA = this->anchorPos + this->childLink->GetWorldPose().pos
-                           - this->parentLink->GetWorldPose().pos;
+  pivotA = this->anchorPos;
   pivotB = this->anchorPos;
+  // Check if parentLink exists. If not, the parent will be the world.
+  if (this->parentLink)
+  {
+    // Compute relative pose between joint anchor and CoG of parent link.
+    pose = this->parentLink->GetWorldCoGPose();
+    // Subtract CoG position from anchor position, both in world frame.
+    pivotA -= pose.pos;
+    // Rotate pivot offset and axis into body-fixed frame of parent.
+    pivotA = pose.rot.RotateVectorReverse(pivotA);
+  }
+  // Check if childLink exists. If not, the child will be the world.
+  if (this->childLink)
+  {
+    // Compute relative pose between joint anchor and CoG of child link.
+    pose = this->childLink->GetWorldCoGPose();
+    // Subtract CoG position from anchor position, both in world frame.
+    pivotB -= pose.pos;
+    // Rotate pivot offset and axis into body-fixed frame of child.
+    pivotB = pose.rot.RotateVectorReverse(pivotB);
+  }
 
-  pivotA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(pivotA);
-  pivotB = this->childLink->GetWorldPose().rot.RotateVectorReverse(pivotB);
+  std::cout << "AnchorPos[" << this->anchorPos << "]\n";
+  std::cout << "Slider PivotA[" << pivotA << "] PivotB[" << pivotB << "]\n";
 
   frame1.setOrigin(btVector3(pivotA.x, pivotA.y, pivotA.z));
   frame2.setOrigin(btVector3(pivotB.x, pivotB.y, pivotB.z));
@@ -85,10 +105,33 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
   frame1.getBasis().setEulerZYX(0, M_PI*0.5, 0);
   frame2.getBasis().setEulerZYX(0, M_PI*0.5, 0);
 
-  this->bulletScrew = new btSliderConstraint(
-      *bulletChildLink->GetBulletLink(),
-      *bulletParentLink->GetBulletLink(),
-      frame2, frame1, true);
+  // If both links exist, then create a joint between the two links.
+  if (bulletChildLink && bulletParentLink)
+  {
+    this->bulletScrew = new btSliderConstraint(
+        *bulletParentLink->GetBulletLink(),
+        *bulletChildLink->GetBulletLink(),
+        frame1, frame2, true);
+  }
+  // If only the child exists, then create a joint between the child
+  // and the world.
+  else if (bulletChildLink)
+  {
+    this->bulletScrew = new btSliderConstraint(
+        *bulletChildLink->GetBulletLink(), frame2, true);
+  }
+  // If only the parent exists, then create a joint between the parent
+  // and the world.
+  else if (bulletParentLink)
+  {
+    this->bulletScrew = new btSliderConstraint(
+        *bulletParentLink->GetBulletLink(), frame1, true);
+  }
+  // Throw an error if no links are given.
+  else
+  {
+    gzthrow("joint without links\n");
+  }
 
   this->constraint = this->bulletScrew;
 
@@ -102,14 +145,17 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
 //////////////////////////////////////////////////
 double BulletScrewJoint::GetVelocity(int /*_index*/) const
 {
-  gzerr << "Not implemented in bullet\n";
-  return 0;
+  double result = 0;
+  if (this->bulletScrew)
+    result = this->bulletScrew->getTargetLinMotorVelocity();
+  return result;
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetVelocity(int /*_index*/, double /*_angle*/)
+void BulletScrewJoint::SetVelocity(int /*_index*/, double _angle)
 {
-  gzerr << "Not implemented in bullet\n";
+  if (this->bulletScrew)
+    this->bulletScrew->setTargetLinMotorVelocity(_angle);
 }
 
 //////////////////////////////////////////////////
@@ -119,9 +165,10 @@ void BulletScrewJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetDamping(int /*index*/, double /*_damping*/)
+void BulletScrewJoint::SetDamping(int /*index*/, double _damping)
 {
-  gzerr << "Not implemented\n";
+  if (this->bulletScrew)
+    this->bulletScrew->setDampingDirLin(_damping);
 }
 
 //////////////////////////////////////////////////
@@ -139,45 +186,67 @@ void BulletScrewJoint::SetForce(int /*_index*/, double /*_force*/)
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetHighStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->bulletScrew->setUpperLinLimit(_angle.Radian());
+  if (this->bulletScrew)
+    this->bulletScrew->setUpperLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetLowStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->bulletScrew->setLowerLinLimit(_angle.Radian());
+  if (this->bulletScrew)
+    this->bulletScrew->setLowerLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletScrewJoint::GetHighStop(int /*_index*/)
 {
-  return this->bulletScrew->getUpperLinLimit();
+  math::Angle result;
+  if (this->bulletScrew)
+    result = this->bulletScrew->getUpperLinLimit();
+  return result;
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletScrewJoint::GetLowStop(int /*_index*/)
 {
-  return this->bulletScrew->getLowerLinLimit();
+  math::Angle result;
+  if (this->bulletScrew)
+    result = this->bulletScrew->getLowerLinLimit();
+  return result;
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetMaxForce(int /*_index*/, double /*_force*/)
+void BulletScrewJoint::SetMaxForce(int /*_index*/, double _force)
 {
-  gzerr << "Not implemented\n";
+  if (this->bulletScrew)
+    this->bulletScrew->setMaxLinMotorForce(_force);
 }
 
 //////////////////////////////////////////////////
 double BulletScrewJoint::GetMaxForce(int /*index*/)
 {
-  gzerr << "Not implemented\n";
-  return 0;
+  double result = 0;
+  if (this->bulletScrew)
+    result = this->bulletScrew->getMaxLinMotorForce();
+  return result;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 BulletScrewJoint::GetGlobalAxis(int /*_index*/) const
 {
-  gzerr << "BulletScrewJoint::GetGlobalAxis not implemented\n";
-  return math::Vector3();
+  math::Vector3 result;
+  if (this->bulletScrew)
+  {
+    // I have not verified the following math, though I based it on internal
+    // bullet code at line 250 of btHingeConstraint.cpp
+    btVector3 vec =
+      this->bulletScrew->getRigidBodyA().getCenterOfMassTransform().getBasis() *
+      this->bulletScrew->getFrameOffsetA().getBasis().getColumn(2);
+    result = BulletTypes::ConvertVector3(vec);
+  }
+  else
+    gzwarn << "bulletHinge does not exist, returning fake axis\n";
+  return result;
 }
 
 //////////////////////////////////////////////////
