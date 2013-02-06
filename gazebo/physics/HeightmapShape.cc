@@ -55,7 +55,6 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
     gzthrow("Unable to find heightmap[" +
             this->sdf->GetValueString("uri") + "]\n");
   }
-  std::cout << "Filename[" << filename << "]\n";
 
   // Use the image to get the size of the heightmap
   this->img.Load(filename);
