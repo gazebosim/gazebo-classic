@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/sdf/sdf.hh"
+#include "gazebo/math/Angle.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -35,14 +36,14 @@ static std::string raySensorString =
 "        <horizontal>"
 "          <samples>640</samples>"
 "          <resolution>1.000000</resolution>"
-"          <min_angle>-2.268900</min_angle>"
-"          <max_angle>2.268900</max_angle>"
+"          <min_angle>-2.2689</min_angle>"
+"          <max_angle>2.2689</max_angle>"
 "        </horizontal>"
 "      </scan>"
 "      <range>"
-"        <min>0.080000</min>"
-"        <max>10.000000</max>"
-"        <resolution>0.010000</resolution>"
+"        <min>0.08</min>"
+"        <max>10.0</max>"
+"        <resolution>0.01</resolution>"
 "      </range>"
 "    </ray>"
 "  </sensor>"
@@ -76,14 +77,40 @@ TEST_F(RaySensor_TEST, CreateLaser)
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  EXPECT_EQ(sensor->GetAngleMin(), );
-  EXPECT_EQ(sensor->GetAngleMax(), );
-  EXPECT_EQ(sensor->GetRangeMin(), );
-  EXPECT_EQ(sensor->GetRangeMax(), );
-  EXPECT_EQ(sensor->GetAngleResolution(), );
-  EXPECT_EQ(sensor->GetRangeResolution(), );
-  EXPECT_EQ(sensor->GetRayCount(), );
-  EXPECT_EQ(sensor->GetRangeCount(), );
+  double angleRes = (sensor->GetAngleMax() - sensor->GetAngleMin()).Radian() /
+                    sensor->GetRayCount();
+  EXPECT_EQ(sensor->GetAngleMin(), math::Angle(-2.2689));
+  EXPECT_EQ(sensor->GetAngleMax(), math::Angle(2.2689));
+  EXPECT_NEAR(sensor->GetRangeMin(), 0.08, 1e-6);
+  EXPECT_NEAR(sensor->GetRangeMax(), 10.0, 1e-6);
+  EXPECT_NEAR(sensor->GetAngleResolution(), angleRes, 1e-3);
+  EXPECT_NEAR(sensor->GetRangeResolution(), 0.01, 1e-3);
+  EXPECT_EQ(sensor->GetRayCount(), 640);
+  EXPECT_EQ(sensor->GetRangeCount(), 640);
+
+  EXPECT_EQ(sensor->GetVerticalRayCount(), 1);
+  EXPECT_EQ(sensor->GetVerticalRangeCount(), 1);
+  EXPECT_EQ(sensor->GetVerticalAngleMin(), 0);
+  EXPECT_EQ(sensor->GetVerticalAngleMax(), 0);
+
+  EXPECT_TRUE(sensor->IsActive());
+
+  // Update the sensor
+  sensor->Update(true);
+
+  // Get all the range values
+  std::vector<double> ranges;
+  sensor->GetRanges(ranges);
+  EXPECT_EQ(ranges.size(), static_cast<size_t>(640));
+
+  // Check that all the range values
+  for (unsigned int i = 0; i < ranges.size(); ++i)
+  {
+    EXPECT_NEAR(ranges[i], sensor->GetRangeMax(), 1e-6);
+    EXPECT_NEAR(sensor->GetRange(i), ranges[i], 1e-6);
+    EXPECT_NEAR(sensor->GetRetro(i), 0, 1e-6);
+    EXPECT_EQ(sensor->GetFiducial(i), -1);
+  }
 }
 
 /////////////////////////////////////////////////
