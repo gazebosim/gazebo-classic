@@ -31,6 +31,11 @@ set (headers
   SensorManager.hh
 )
 
+set (gtest_sources
+  SensorManager_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(sensors_headers "sensors headers"

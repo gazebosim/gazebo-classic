@@ -53,7 +53,10 @@ namespace gazebo
       RAY = 1,
 
       /// \brief A type of sensor is not a RAY or IMAGE sensor.
-      OTHER = 2
+      OTHER = 2,
+
+      /// \brief Number of Sensor Categories
+      CATEGORY_COUNT = 3
     };
 
     /// \addtogroup gazebo_sensors

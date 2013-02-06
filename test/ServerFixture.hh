@@ -76,6 +76,9 @@ class ServerFixture : public testing::Test
                path = TEST_REGRESSION_PATH;
                path += "/../../build/plugins";
                gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+
+               path = TEST_PATH;
+               gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
              }
 
   protected: virtual void TearDown()

@@ -102,6 +102,10 @@ void SensorManager::Update(bool _force)
          iter != this->initSensors.end(); ++iter)
     {
       GZ_ASSERT((*iter) != NULL, "Sensor pointer is NULL");
+      GZ_ASSERT((*iter)->GetCategory() < 0 ||
+          (*iter)->GetCategory() < CATEGORY_COUNT, "Sensor category is empty");
+      GZ_ASSERT(this->sensorContainers[(*iter)->GetCategory()] != NULL,
+                "Sensor container is NULL");
 
       (*iter)->Init();
       this->sensorContainers[(*iter)->GetCategory()]->AddSensor(*iter);
