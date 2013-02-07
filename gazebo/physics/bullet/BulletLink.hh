@@ -143,7 +143,7 @@ namespace gazebo
 
       /// \brief Pointer to bullet compound shape, which is a container
       ///        for other child shapes.
-      private: btCompoundShape *compoundShape;
+      private: btCollisionShape *compoundShape;
 
       /// \brief Pointer to bullet motion state, which manages updates to the
       ///        world pose from bullet.

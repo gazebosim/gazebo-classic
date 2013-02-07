@@ -38,12 +38,14 @@ BulletLink::BulletLink(EntityPtr _parent)
     : Link(_parent)
 {
   this->rigidLink = NULL;
-  this->compoundShape = new btCompoundShape();
+  this->compoundShape = NULL;
 }
 
 //////////////////////////////////////////////////
 BulletLink::~BulletLink()
 {
+  if (this->compoundShape)
+    delete this->compoundShape;
 }
 
 //////////////////////////////////////////////////
@@ -89,11 +91,17 @@ void BulletLink::Init()
 
       math::Pose relativePose = collision->GetRelativePose();
       relativePose.pos -= cogVec;
-
-      this->compoundShape->addChildShape(
+      if (!this->compoundShape)
+        this->compoundShape = new btCompoundShape();
+      dynamic_cast<btCompoundShape *>(this->compoundShape)->addChildShape(
           BulletTypes::ConvertPose(relativePose), shape);
     }
   }
+
+  if (!this->compoundShape)
+    this->compoundShape = new btEmptyShape();
+
+//  gzerr << "collision size " << this->children.size() << "\n";
 
   // this->compoundShape->calculateLocalInertia(mass, fallInertia);
   fallInertia = BulletTypes::ConvertVector3(
