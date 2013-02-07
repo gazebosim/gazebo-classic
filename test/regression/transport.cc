@@ -39,11 +39,6 @@ bool g_sceneMsg = false;
 bool g_worldStatsMsg = false;
 bool g_worldStatsDebugMsg = false;
 
-std::vector<int> g_bwBytes;
-std::vector<common::Time> g_bwTime;
-
-boost::mutex g_mutex;
-
 void ReceiveStringMsg(ConstGzStringPtr &/*_msg*/)
 {
 }
@@ -67,14 +62,6 @@ void ReceiveWorldStatsDebugMsg(ConstGzStringPtr &/*_data*/)
 {
   g_worldStatsDebugMsg = true;
 }
-
-void BandwidthMsg(const std::string &_msg)
-{
-  boost::mutex::scoped_lock lock(g_mutex);
-  g_bwBytes.push_back(_msg.size());
-  g_bwTime.push_back(common::Time::GetWallTime());
-}
-
 
 TEST_F(TransportTest, PubSub)
 {
@@ -188,49 +175,7 @@ TEST_F(TransportTest, Errors)
   testNode.reset();
 }
 
-TEST_F(TransportTest, Bandwidth)
-{
-  Load("worlds/pr2.world");
 
-  transport::NodePtr node(new transport::Node());
-  node->Init("default");
-
-  std::string topic = "/gazebo/default/pose/info";
-
-  transport::SubscriberPtr sub = node->Subscribe(topic, BandwidthMsg);
-
-  while (true)
-  {
-    common::Time::MSleep(100);
-    {
-      boost::mutex::scoped_lock lock(g_mutex);
-      if (g_bwBytes.size() >= 100)
-      {
-        std::sort(g_bwBytes.begin(), g_bwBytes.end());
-
-        float sumSize = 0;
-        unsigned int count = g_bwBytes.size();
-        common::Time dt = g_bwTime[count - 1] - g_bwTime[0];
-
-        for (unsigned int i = 0; i < count; ++i)
-          sumSize += g_bwBytes[i];
-
-        float meanSize = sumSize / count;
-        float totalBw = sumSize / dt.Double();
-
-        printf("Bandwidth:\n");
-        printf("  Total[%6.2f B/s] Mean[%6.2f B] Messages[%d] Time[%4.2fs]\n",
-               totalBw, meanSize, count, dt.Double());
-
-        EXPECT_GT(totalBw, 1000.0);
-        g_bwBytes.clear();
-        g_bwTime.clear();
-
-        break;
-      }
-    }
-  }
-}
 
 // This test creates a child process to test interprocess communication
 // TODO: This test needs to be fixed
