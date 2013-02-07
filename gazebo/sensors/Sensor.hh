@@ -182,6 +182,8 @@ namespace gazebo
               {this->updated.Disconnect(_c);}
 
       /// \brief Get the category of the sensor.
+      /// \return The category of the sensor.
+      /// \sa SensorCategory
       public: SensorCategory GetCategory() const;
 
       /// \brief Load a plugin for this sensor.

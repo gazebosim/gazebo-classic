@@ -65,6 +65,12 @@ SensorManager::~SensorManager()
 //////////////////////////////////////////////////
 void SensorManager::Run()
 {
+  this->RunThreads();
+}
+
+//////////////////////////////////////////////////
+void SensorManager::RunThreads()
+{
   // Start the non-image sensor containers. The first item in the
   // sensorsContainers list are the image-based sensors, which rely on the
   // rendering engine, which in turn requires that they run in the main
@@ -480,7 +486,7 @@ SensorPtr SensorManager::SensorContainer::GetSensor(const std::string &_name,
     // We match on the scoped name (model::link::sensor) because multiple
     // sensors with the name leaf name make exists in a world.
     if ((_useLeafName && (*iter)->GetName() == _name) ||
-        (!_useLeafName && (*iter)->GetScopedName() == _name) )
+        (!_useLeafName && (*iter)->GetScopedName() == _name))
     {
       result = (*iter);
     }

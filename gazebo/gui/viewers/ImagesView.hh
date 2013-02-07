@@ -18,6 +18,9 @@
 #define _IMAGESVIEW_HH_
 
 #include <string>
+#include <utility>
+#include <vector>
+
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/common/Time.hh"

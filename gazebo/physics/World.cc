@@ -170,7 +170,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
-  this->posePub = this->node->Advertise<msgs::Pose_V>("~/pose/info", 100);
+  this->posePub = this->node->Advertise<msgs::Pose_V>("~/pose/info", 10);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
   if (this->sdf->HasElement("gui"))
@@ -188,7 +188,7 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->statPub =
-    this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 20);
+    this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 1);
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");

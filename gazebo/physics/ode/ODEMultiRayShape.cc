@@ -65,19 +65,11 @@ ODEMultiRayShape::~ODEMultiRayShape()
 //////////////////////////////////////////////////
 void ODEMultiRayShape::UpdateRays()
 {
-  // static bool first = true;
-
   ODEPhysicsPtr ode = boost::shared_dynamic_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (ode == NULL)
     gzthrow("Invalid physics engine. Must use ODE.");
-
-  /*if (first)
-  {
-    ode->InitForThread();
-    first = false;
-  }*/
 
   // Do we need to lock the physics engine here? YES!
   // especially when spawning models with sensors

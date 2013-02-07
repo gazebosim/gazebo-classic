@@ -368,7 +368,9 @@ void Server::Run()
   // Make sure the sensors are updated once before running the world.
   // This makes sure plugins get loaded properly.
   sensors::run_once(true);
-  sensors::run();
+
+  // Run the sensor threads
+  sensors::run_threads();
 
   // Run each world. Each world starts a new thread
   physics::run_worlds();

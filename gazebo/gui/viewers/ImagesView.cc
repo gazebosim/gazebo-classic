@@ -35,7 +35,7 @@ ImagesView::ImagesView(QWidget *_parent)
 {
   this->setWindowTitle(tr("Gazebo: Images View"));
 
-  // Create the image display
+  // Create the layout and frame for images
   // {
   this->frameLayout = new QGridLayout;
   this->frameLayout->setSizeConstraint(QLayout::SetMinimumSize);
@@ -155,7 +155,7 @@ void ImagesView::OnImages(ConstImagesStampedPtr &_msg)
   int dataSize = 0;
   this->addImage.clear();
 
-  for (int i=0; i < _msg->image_size(); ++i)
+  for (int i = 0; i < _msg->image_size(); ++i)
   {
     rgbData = NULL;
     rgbDataSize = 0;
