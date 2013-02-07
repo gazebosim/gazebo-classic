@@ -334,8 +334,8 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
       pose1 = model->GetWorldPose();
       EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL*PHYSICS_TOL);
       EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL*PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.z, z0+radius - g.z/2*t*t,
-                  (z0+radius-g.z/2*t*t)*PHYSICS_TOL);
+      EXPECT_NEAR(pose1.pos.z, z0+radius + g.z/2*t*t,
+                  (z0+radius+g.z/2*t*t)*PHYSICS_TOL);
 
       // Check once more and just make sure they keep falling
       world->StepWorld(steps);
