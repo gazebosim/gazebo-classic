@@ -38,6 +38,7 @@ Exception::Exception(const char *_file, int _line, std::string _msg)
   this->file = _file;
   this->line = _line;
   this->str = _msg;
+  this->Print();
 }
 
 //////////////////////////////////////////////////

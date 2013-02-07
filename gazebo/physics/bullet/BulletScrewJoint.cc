@@ -35,6 +35,7 @@ BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world, BasePtr _parent)
     : ScrewJoint<BulletJoint>(_parent)
 {
   this->world = _world;
+  this->bulletScrew = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -81,12 +82,12 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
   frame1.getBasis().setEulerZYX(0, M_PI*0.5, 0);
   frame2.getBasis().setEulerZYX(0, M_PI*0.5, 0);
 
-  this->btScrew = new btSliderConstraint(
+  this->bulletScrew = new btSliderConstraint(
       *bulletChildLink->GetBulletLink(),
       *bulletParentLink->GetBulletLink(),
       frame2, frame1, true);
 
-  this->constraint = this->btScrew;
+  this->constraint = this->bulletScrew;
 
   // Add the joint to the world
   this->world->addConstraint(this->constraint);
@@ -98,7 +99,7 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
 //////////////////////////////////////////////////
 math::Angle BulletScrewJoint::GetAngle(int /*_index*/) const
 {
-  return this->btScrew->getLinearPos();
+  return this->bulletScrew->getLinearPos();
 }
 
 //////////////////////////////////////////////////
@@ -141,25 +142,25 @@ void BulletScrewJoint::SetForce(int /*_index*/, double /*_force*/)
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetHighStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->btScrew->setUpperLinLimit(_angle.Radian());
+  this->bulletScrew->setUpperLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetLowStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->btScrew->setLowerLinLimit(_angle.Radian());
+  this->bulletScrew->setLowerLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletScrewJoint::GetHighStop(int /*_index*/)
 {
-  return this->btScrew->getUpperLinLimit();
+  return this->bulletScrew->getUpperLinLimit();
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletScrewJoint::GetLowStop(int /*_index*/)
 {
-  return this->btScrew->getLowerLinLimit();
+  return this->bulletScrew->getLowerLinLimit();
 }
 
 //////////////////////////////////////////////////
