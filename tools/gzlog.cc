@@ -181,28 +181,18 @@ void info(const std::string &_filename)
         // Store the start time. The end time is calculated by adding all
         // the time diffs to the start time.
         startTime = state.GetWallTime();
-        endTime = startTime;
       }
     }
 
+    // Get the last chunk for the endTime
     std::string stateString;
-    // Iterate over all the chunks, and add up the wall time. This will
-    // compute the final end time.
-    for (unsigned int i = 0; i < play->GetChunkCount(); ++i)
-    {
-      stateString.clear();
-      g_stateSdf->ClearElements();
+    play->GetChunk(play->GetChunkCount()-1, stateString);
 
-      play->Step(stateString);
+    g_stateSdf->ClearElements();
+    sdf::readString(stateString, g_stateSdf);
 
-      if (stateString.empty())
-        continue;
-
-      sdf::readString(stateString, g_stateSdf);
-
-      state.Load(g_stateSdf);
-      endTime += state.GetWallTime();
-    }
+    state.Load(g_stateSdf);
+    endTime = state.GetWallTime();
   }
 
   // Tell cout how to output boost dates

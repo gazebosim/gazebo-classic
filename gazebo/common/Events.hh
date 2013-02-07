@@ -18,6 +18,8 @@
 #define _EVENTS_HH_
 
 #include <string>
+
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
 
@@ -136,9 +138,9 @@ namespace gazebo
               {
                 // Putting in this comment so the deprecation message
                 // will be found easier: GAZEBO_DEPRECATED.
-                std::cerr << "Events::ConnectWorldUpdateStart is deprecated "
-                          << "in v 1.5.0. Please use "
-                          << "Events::ConnectWorldUpdateBegin\n";
+                gzerr << "Events::ConnectWorldUpdateStart is deprecated "
+                      << "in v 1.5.0. Please use "
+                      << "Events::ConnectWorldUpdateBegin\n";
                  return worldUpdateStart.Connect(_subscriber);
               }
 

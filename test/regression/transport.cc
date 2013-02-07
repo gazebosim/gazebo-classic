@@ -57,7 +57,7 @@ void ReceiveWorldStatsDebugMsg(ConstGzStringPtr &/*_data*/)
 
 TEST_F(TransportTest, Load)
 {
-  for (unsigned int i = 0; i < 2; i++)
+  for (unsigned int i = 0; i < 2; ++i)
   {
     Load("worlds/empty.world");
     Unload();
@@ -84,7 +84,7 @@ TEST_F(TransportTest, PubSub)
   std::vector<transport::PublisherPtr> pubs;
   std::vector<transport::SubscriberPtr> subs;
 
-  for (unsigned int i = 0; i < 10; i++)
+  for (unsigned int i = 0; i < 10; ++i)
   {
     pubs.push_back(node->Advertise<msgs::Scene>("~/scene"));
     subs.push_back(node->Subscribe("~/scene", &ReceiveSceneMsg));
