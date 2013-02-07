@@ -264,10 +264,13 @@ namespace gazebo
       /// \parma[in] _inertial Inertial value for the link.
       public: void SetInertial(const InertialPtr &_inertial);
 
+      /// \cond
+      /// This is an internal function
       /// \brief Get a collision by id.
       /// \param[in] _id Id of the collision object to find.
       /// \return Pointer to the collision, NULL if the id is invalid.
       public: CollisionPtr GetCollisionById(unsigned int _id) const;
+      /// \endcond
 
       /// \brief Get a child collision by name
       /// \param[in] _name Name of the collision object.

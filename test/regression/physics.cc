@@ -323,7 +323,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
                                r1*sin(angle.Radian()), 0));
 
   unsigned int i;
-  for (i = 0; i < modelNames.size(); i++)
+  for (i = 0; i < modelNames.size(); ++i)
   {
     SpawnSphere(modelNames[i], math::Vector3(x0s[i], y0s[i], z0+radii[i]),
                 v30, cogs[i], radii[i]);
@@ -337,7 +337,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   double t, x0 = 0, y0 = 0, radius;
   // This loop steps the world forward and makes sure that each model falls,
   // expecting downward z velocity and decreasing z position.
-  for (i = 0; i < modelNames.size(); i++)
+  for (i = 0; i < modelNames.size(); ++i)
   {
     // Make sure the model is loaded
     model = world->GetModel(modelNames[i]);
@@ -389,7 +389,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   // after the time of predicted ground contact. Except for sphere5,
   // the velocity is expected to be small, and the pose is expected
   // to be underneath the initial pose. sphere5 is expected to be rolling.
-  for (i = 0; i < modelNames.size(); i++)
+  for (i = 0; i < modelNames.size(); ++i)
   {
     // Make sure the model is loaded
     model = world->GetModel(modelNames[i]);
@@ -587,7 +587,7 @@ TEST_F(PhysicsTest, JointDampingTest)
     double dt = world->GetPhysicsEngine()->GetStepTime();
     int steps = test_duration/dt;
 
-    for (int i = 0; i < steps; i++)
+    for (int i = 0; i < steps; ++i)
     {
       world->StepWorld(1);  // theoretical contact, but
       // gzdbg << "box time [" << world->GetSimTime().Double()
@@ -651,7 +651,7 @@ TEST_F(PhysicsTest, DropStuff)
     int steps = test_duration/dt;
     bool post_contact_correction = false;
 
-    for (int i = 0; i < steps; i++)
+    for (int i = 0; i < steps; ++i)
     {
       // integrate here to see when the collision should happen
       v = v + dt * g;
@@ -759,7 +759,7 @@ TEST_F(PhysicsTest, CollisionTest)
 
     int steps = test_duration/dt;
 
-    for (int i = 0; i < steps; i++)
+    for (int i = 0; i < steps; ++i)
     {
       double t = world->GetSimTime().Double();
 

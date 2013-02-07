@@ -74,7 +74,14 @@ set (headers
   viewers/ViewFactory.hh
 )
 
+set (tests 
+  TimePanel_TEST.cc
+  )
+
+gz_build_qt_tests(${tests})
+
 set (resources resources.qrc)
+
 
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})

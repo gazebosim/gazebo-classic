@@ -150,7 +150,8 @@ void BulletLink::SetGravityMode(bool _mode)
 {
   if (!this->rigidLink)
   {
-    gzlog << "Bullet rigid link is NULL, unable to SetGravityMode" << std::endl;
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetGravityMode" << std::endl;
     return;
   }
 
@@ -176,7 +177,8 @@ bool BulletLink::GetGravityMode() const
   bool result = false;
   if (!this->rigidLink)
   {
-    gzlog << "Bullet rigid link is NULL, GetGravityMode returns "
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, GetGravityMode returns "
           << result << " by default." << std::endl;
     return result;
   }
@@ -218,7 +220,8 @@ void BulletLink::OnPoseChange()
 
   if (!this->rigidLink)
   {
-    gzlog << "Bullet rigid link is NULL, unable to respond to OnPoseChange"
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to respond to OnPoseChange"
           << std::endl;
     return;
   }
@@ -258,7 +261,8 @@ void BulletLink::SetLinearVel(const math::Vector3 &_vel)
 {
   if (!this->rigidLink)
   {
-    gzlog << "Bullet rigid link is NULL, unable to SetLinearVel" << std::endl;
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetLinearVel" << std::endl;
     return;
   }
 
@@ -270,7 +274,8 @@ math::Vector3 BulletLink::GetWorldCoGLinearVel() const
 {
   if (!this->rigidLink)
   {
-    gzlog << "Bullet rigid link is NULL, GetWorldLinearVel returns "
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, GetWorldLinearVel returns "
           << math::Vector3(0, 0, 0) << " by default." << std::endl;
     return math::Vector3(0, 0, 0);
   }
@@ -285,7 +290,8 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset) const
 {
   if (!this->rigidLink)
   {
-    gzlog << "Bullet rigid link is NULL, GetWorldLinearVel returns "
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, GetWorldLinearVel returns "
           << math::Vector3(0, 0, 0) << " by default." << std::endl;
     return math::Vector3(0, 0, 0);
   }
@@ -304,7 +310,8 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Pose &_pose) const
 {
   if (!this->rigidLink)
   {
-    gzlog << "Bullet rigid link is NULL, GetWorldLinearVel returns "
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, GetWorldLinearVel returns "
           << math::Vector3(0, 0, 0) << " by default." << std::endl;
     return math::Vector3(0, 0, 0);
   }
@@ -324,7 +331,8 @@ void BulletLink::SetAngularVel(const math::Vector3 &_vel)
 {
   if (!this->rigidLink)
   {
-    gzlog << "Bullet rigid link is NULL, unable to SetAngularVel" << std::endl;
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetAngularVel" << std::endl;
     return;
   }
 
@@ -336,7 +344,8 @@ math::Vector3 BulletLink::GetWorldAngularVel() const
 {
   if (!this->rigidLink)
   {
-    gzlog << "Bullet rigid link is NULL, GetWorldAngularVel returns "
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, GetWorldAngularVel returns "
           << math::Vector3(0, 0, 0) << " by default." << std::endl;
     return math::Vector3(0, 0, 0);
   }
@@ -379,7 +388,8 @@ void BulletLink::SetTorque(const math::Vector3 &_torque)
 {
   if (!this->rigidLink)
   {
-    gzlog << "Bullet rigid link is NULL, unable to SetAngularVel" << std::endl;
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetAngularVel" << std::endl;
     return;
   }
 
@@ -413,7 +423,8 @@ void BulletLink::SetLinearDamping(double _damping)
 {
   if (!this->rigidLink)
   {
-    gzlog << "Bullet rigid link is NULL, unable to SetLinearDamping"
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetLinearDamping"
           << std::endl;
     return;
   }
@@ -426,7 +437,8 @@ void BulletLink::SetAngularDamping(double _damping)
 {
   if (!this->rigidLink)
   {
-    gzlog << "Bullet rigid link is NULL, unable to SetAngularDamping"
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetAngularDamping"
           << std::endl;
     return;
   }
