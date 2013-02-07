@@ -65,10 +65,17 @@ namespace gazebo
       private: std::vector<QPixmap> pixmaps;
       private: std::vector<QImage> images;
 
+      /// \brief Pointer to the frame containing the images
       private: QGridLayout *frameLayout;
+
+      /// \brief Mutex to protect the image vectors
       private: boost::mutex mutex;
-      private: int toAdd;
+
+      /// \brief Set to true to clear the images from the widget
       private: bool clearImages;
+
+      /// \brief Vector of image sizes to add
+      private: std::vector<std::pair<int, int> > addImage;
     };
   }
 }
