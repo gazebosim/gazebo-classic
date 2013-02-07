@@ -21,7 +21,8 @@ class SpeedTest : public ServerFixture
 {
 };
 
-TEST_F(SpeedTest, BallTest)
+
+TEST_F(SpeedTest, PR2World)
 {
   Load("worlds/empty.world");
   double emptySpeed;
@@ -30,17 +31,8 @@ TEST_F(SpeedTest, BallTest)
   common::Time::MSleep(2000);
   emptySpeed = GetPercentRealTime();
 
-  // Load 500 spheres into the world
-  std::string name = "sphere";
-  math::Vector3 pos(0, 0, 5);
-
-  for (int i = 0; i < 500; ++i)
-  {
-    pos.z += i;
-    SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, math::Vector3(0, 0, 0), i == 499);
-  }
-
+  // Load the pr2into the world
+  SpawnModel("model://pr2");
   common::Time::MSleep(2000);
   double loadedSpeed = GetPercentRealTime();
 
@@ -50,42 +42,9 @@ TEST_F(SpeedTest, BallTest)
             << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
 #ifdef BUILD_TYPE_RELEASE
-  EXPECT_GT(speedRatio, 0.02);
+  EXPECT_GT(speedRatio, 0.5);
 #else
-  EXPECT_GT(speedRatio, 0.01);
-#endif
-}
-
-TEST_F(SpeedTest, ShapesWorld)
-{
-  Load("worlds/shapes.world");
-  double emptySpeed;
-  while ((emptySpeed = GetPercentRealTime()) == 0)
-    common::Time::MSleep(100);
-  common::Time::MSleep(2000);
-  emptySpeed = GetPercentRealTime();
-
-  // Load 500 spheres into the world
-  std::string name = "sphere";
-  math::Vector3 pos(0, 0, 5);
-  for (int i = 0; i < 500; ++i)
-  {
-    pos.z += i;
-    SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, math::Vector3(0, 0, 0), i == 499);
-  }
-  common::Time::MSleep(2000);
-
-  double loadedSpeed = GetPercentRealTime();
-  double speedRatio = loadedSpeed / emptySpeed;
-
-  std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
-            << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
-
-#ifdef BUILD_TYPE_RELEASE
-  EXPECT_GT(speedRatio, 0.08);
-#else
-  EXPECT_GT(speedRatio, 0.01);
+  EXPECT_GT(speedRatio, 0.3);
 #endif
 }
 

@@ -40,6 +40,7 @@ set (gtest_sources
   projector.cc
   server_fixture.cc
   speed.cc
+  speed_pr2.cc
   transport.cc)
 
 set (plugins)

@@ -91,7 +91,7 @@ TEST_F(SensorManager_TEST, InitRemove)
   Load("worlds/pr2.world");
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
-  size_t sensorCount = 17;
+  size_t sensorCount = 18;
 
   // Make sure we have the correct number of sensors.
   EXPECT_TRUE(mgr->SensorsInitialized());
