@@ -113,6 +113,7 @@ target_link_libraries(gzclient  gazebo_common
                                 ${QT_LIBRARIES}
                                 ${ogre_libraries}
                                 ${Boost_LIBRARIES}
+                                QtTest
                                 pthread)
 
 
