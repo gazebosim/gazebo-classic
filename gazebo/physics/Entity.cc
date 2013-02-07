@@ -23,22 +23,23 @@
 
 #include "msgs/msgs.hh"
 
-#include "common/Events.hh"
-#include "common/Console.hh"
-#include "common/Animation.hh"
-#include "common/KeyFrame.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Animation.hh"
+#include "gazebo/common/KeyFrame.hh"
 
-#include "transport/Publisher.hh"
-#include "transport/Transport.hh"
-#include "transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "physics/RayShape.hh"
-#include "physics/Collision.hh"
-#include "physics/Model.hh"
-#include "physics/Link.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Entity.hh"
+#include "gazebo/physics/RayShape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Entity.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -216,12 +217,10 @@ void Entity::StopAnimation()
 //////////////////////////////////////////////////
 void Entity::PublishPose()
 {
-  math::Pose relativePose = this->GetRelativePose();
-  if (relativePose != msgs::Convert(*this->poseMsg))
-  {
-    msgs::Set(this->poseMsg, relativePose);
-    this->world->EnqueueMsg(this->poseMsg);
-  }
+  GZ_ASSERT(this->GetParentModel() != NULL,
+      "An entity without a parent model should not happen");
+
+  this->world->PublishModePose(this->GetParentModel()->GetName());
 }
 
 //////////////////////////////////////////////////
@@ -465,6 +464,7 @@ ModelPtr Entity::GetParentModel()
     return boost::shared_dynamic_cast<Model>(shared_from_this());
 
   p = this->parent;
+  GZ_ASSERT(p, "Parent of an entity is NULL");
 
   while (p->GetParent() && p->GetParent()->HasType(MODEL))
     p = p->GetParent();

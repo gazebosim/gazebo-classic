@@ -32,15 +32,22 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 {
   this->prevMsg = NULL;
   this->queueLimitWarned = false;
+  this->updatePeriod = 0;
+  this->prevPublishTime = common::Time::GetWallTime();
 }
 
 //////////////////////////////////////////////////
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
-                     unsigned int _limit)
-  : topic(_topic), msgType(_msgType), queueLimit(_limit)
+                     unsigned int _limit, double _hzRate)
+  : topic(_topic), msgType(_msgType), queueLimit(_limit),
+    updatePeriod(0)
 {
+  if (!math::equal(_hzRate, 0.0))
+    this->updatePeriod = 1.0 / _hzRate;
+
   this->prevMsg = NULL;
   this->queueLimitWarned = false;
+  this->prevPublishTime = common::Time::GetWallTime();
 }
 
 //////////////////////////////////////////////////
@@ -87,6 +94,23 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
 
   // if (!this->HasConnections())
   // return;
+
+  // Check if a throttling rate has been set
+  if (this->updatePeriod > 0)
+  {
+    // Get the current time
+    this->currentTime = common::Time::GetWallTime();
+
+    // Skip publication if the time difference is less than the update period.
+    if ((this->currentTime - this->prevPublishTime).Double() <
+         this->updatePeriod)
+    {
+      return;
+    }
+
+    // Set the previous time a message was published
+    this->prevPublishTime = this->currentTime;
+  }
 
   // Save the latest message
   google::protobuf::Message *msg = _message.New();

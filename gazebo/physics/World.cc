@@ -170,7 +170,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
-  this->posePub = this->node->Advertise<msgs::Pose_V>("~/pose/info", 10);
+  this->posePub = this->node->Advertise<msgs::Pose_V>("~/pose/info", 10, 60.0);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
   if (this->sdf->HasElement("gui"))
@@ -1570,11 +1570,37 @@ void World::ProcessMessages()
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
 
   if (this->posePub && this->posePub->HasConnections() &&
-      this->poseMsgs.pose_size() > 0)
+      this->publishModelPoses.size() > 0)
   {
-    this->posePub->Publish(this->poseMsgs);
+    msgs::Pose_V msg;
+
+    for (std::list<std::string>::iterator iter =
+         this->publishModelPoses.begin();
+         iter != this->publishModelPoses.end(); ++iter)
+    {
+      ModelPtr model = this->GetModel(*iter);
+
+      // It's possible that the model was deleted somewhere along the line.
+      // So check to make sure we get a valid model pointer.
+      if (!model)
+        continue;
+
+      // Publish the model's relative pose
+      msgs::Set(msg.add_pose(), model->GetRelativePose());
+
+      // Publish each of the model's children relative poses
+      Link_V links = model->GetLinks();
+      for (Link_V::iterator linkIter = links.begin();
+           linkIter != links.end(); ++linkIter)
+      {
+        msgs::Pose *poseMsg = msg.add_pose();
+        poseMsg->set_name((*linkIter)->GetScopedName());
+        msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
+      }
+    }
+    this->posePub->Publish(msg);
   }
-  this->poseMsgs.clear_pose();
+  this->publishModelPoses.clear();
 
   if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
       this->processMsgsPeriod)
@@ -1606,25 +1632,16 @@ bool World::IsLoaded() const
 }
 
 //////////////////////////////////////////////////
-void World::EnqueueMsg(msgs::Pose *_msg)
+void World::PublishModelPose(const std::string &_modelName)
 {
-  if (!_msg)
-    return;
-
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
-  int i = 0;
 
-  // Replace old pose messages with the new one.
-  for (; i < this->poseMsgs.pose_size(); ++i)
-  {
-    if (this->poseMsgs.pose(i).name() == _msg->name())
-    {
-      this->poseMsgs.mutable_pose(i)->CopyFrom(*_msg);
-      break;
-    }
-  }
+  // Find an occurance of the modelName
+  std::list<std::string>::iterator iter = std::find(
+      this->publishModelPoses.begin(),
+      this->publishModelPoses.end(), _modelName);
 
-  // Add the pose message if no old pose messages were found.
-  if (i >= this->poseMsgs.pose_size())
-      this->poseMsgs.add_pose()->CopyFrom(*_msg);
+  // Only add if the model name is not in the list
+  if (iter == this->publishModelPoses.end())
+    this->publishModelPoses.push_back(_modelName);
 }
