@@ -132,8 +132,9 @@ void ODELink::Init()
   }
   else
   {
-    gzlog << "ODE link has no Id, unable to place collision bodies"
-          << "in ODELink::Init" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to place collision bodies"
+          << " in ODELink::Init" << std::endl;
   }
 
   // Update the Center of Mass.
@@ -146,7 +147,8 @@ void ODELink::Init()
   }
   else
   {
-    gzlog << "ODE link has no Id, unable to set callbacks in ODELink::Init"
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to set callbacks in ODELink::Init"
           << std::endl;
   }
 }
@@ -210,7 +212,8 @@ void ODELink::SetGravityMode(bool _mode)
   }
   else
   {
-    gzlog << "ODE link has no Id, unable to SetGravityMode" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetGravityMode" << std::endl;
   }
 }
 
@@ -224,7 +227,8 @@ bool ODELink::GetGravityMode() const
   }
   else
   {
-    gzlog << "ODE link has no Id, GetGravityMode returns default of "
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, GetGravityMode returns default of "
           << mode << std::endl;
   }
 
@@ -246,7 +250,8 @@ void ODELink::OnPoseChange()
 
   if (!this->linkId)
   {
-    gzlog << "ODE link has no Id, unable to respond to OnPoseChange"
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to respond to OnPoseChange"
           << std::endl;
     return;
   }
@@ -286,7 +291,8 @@ void ODELink::SetEnabled(bool _enable) const
 {
   if (!this->linkId)
   {
-    gzlog << "ODE link has no Id, unable to SetEnabled" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetEnabled" << std::endl;
     return;
   }
 
@@ -305,7 +311,8 @@ bool ODELink::GetEnabled() const
     result = dBodyIsEnabled(this->linkId);
   else
   {
-    gzlog << "ODE link has no Id, GetEnabled returns default of "
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, GetEnabled returns default of "
           << result << std::endl;
   }
 
@@ -336,7 +343,8 @@ void ODELink::UpdateMass()
 {
   if (!this->linkId)
   {
-    gzlog << "ODE link has no Id, unable to UpdateMass" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to UpdateMass" << std::endl;
     return;
   }
 
@@ -369,7 +377,8 @@ void ODELink::SetLinearVel(const math::Vector3 &_vel)
     dBodySetLinearVel(this->linkId, _vel.x, _vel.y, _vel.z);
   }
   else
-    gzlog << "ODE link has no Id, unable to SetLinearVel" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetLinearVel" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -388,7 +397,8 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
   }
   else
   {
-    gzlog << "ODE link has no Id, GetWorldLinearVel returns default of "
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, GetWorldLinearVel returns default of "
           << vel << std::endl;
   }
 
@@ -414,7 +424,8 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Pose &_pose) const
   }
   else
   {
-    gzlog << "ODE link has no Id, GetWorldLinearVel returns default of "
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, GetWorldLinearVel returns default of "
           << vel << std::endl;
   }
 
@@ -434,7 +445,8 @@ math::Vector3 ODELink::GetWorldCoGLinearVel() const
   }
   else
   {
-    gzlog << "ODE link has no Id, GetWorldCoGLinearVel returns default of "
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, GetWorldCoGLinearVel returns default of "
           << vel << std::endl;
   }
 
@@ -449,7 +461,8 @@ void ODELink::SetAngularVel(const math::Vector3 &_vel)
     dBodySetAngularVel(this->linkId, _vel.x, _vel.y, _vel.z);
   }
   else
-    gzlog << "ODE link has no Id, unable to SetAngularVel" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetAngularVel" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -467,7 +480,8 @@ math::Vector3 ODELink::GetWorldAngularVel() const
   }
   else
   {
-    gzlog << "ODE link has no Id, GetWorldAngularVel returns default of "
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, GetWorldAngularVel returns default of "
           << vel << std::endl;
   }
 
@@ -483,7 +497,8 @@ void ODELink::SetForce(const math::Vector3 &_force)
     dBodySetForce(this->linkId, _force.x, _force.y, _force.z);
   }
   else
-    gzlog << "ODE link has no Id, unable to SetForce" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetForce" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -495,7 +510,8 @@ void ODELink::SetTorque(const math::Vector3 &_torque)
     dBodySetTorque(this->linkId, _torque.x, _torque.y, _torque.z);
   }
   else
-    gzlog << "ODE link has no Id, unable to SetTorque" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetTorque" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -507,7 +523,8 @@ void ODELink::AddForce(const math::Vector3 &_force)
     dBodyAddForce(this->linkId, _force.x, _force.y, _force.z);
   }
   else
-    gzlog << "ODE link has no Id, unable to AddForce" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddForce" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -519,7 +536,8 @@ void ODELink::AddRelativeForce(const math::Vector3 &_force)
     dBodyAddRelForce(this->linkId, _force.x, _force.y, _force.z);
   }
   else
-    gzlog << "ODE link has no Id, unable to AddRelativeForce" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddRelativeForce" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -534,7 +552,8 @@ void ODELink::AddForceAtRelativePosition(const math::Vector3 &_force,
   }
   else
   {
-    gzlog << "ODE link has no Id, unable to AddForceAtRelativePosition"
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddForceAtRelativePosition"
           << std::endl;
   }
 }
@@ -551,7 +570,8 @@ void ODELink::AddForceAtWorldPosition(const math::Vector3 &_force,
   }
   else
   {
-    gzlog << "ODE link has no Id, unable to AddForceAtWorldPosition"
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddForceAtWorldPosition"
           << std::endl;
   }
 }
@@ -565,7 +585,8 @@ void ODELink::AddTorque(const math::Vector3 &_torque)
     dBodyAddTorque(this->linkId, _torque.x, _torque.y, _torque.z);
   }
   else
-    gzlog << "ODE link has no Id, unable to AddTorque" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddTorque" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -577,7 +598,8 @@ void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
     dBodyAddRelTorque(this->linkId, _torque.x, _torque.y, _torque.z);
   }
   else
-    gzlog << "ODE link has no Id, unable to AddRelativeTorque" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddRelativeTorque" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -597,7 +619,8 @@ math::Vector3 ODELink::GetWorldForce() const
   }
   else
   {
-    gzlog << "ODE link has no Id, GetWorldForce returns default of "
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, GetWorldForce returns default of "
           << force << std::endl;
   }
 
@@ -621,7 +644,8 @@ math::Vector3 ODELink::GetWorldTorque() const
   }
   else
   {
-    gzlog << "ODE link has no Id, GetWorldTorque returns default of "
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, GetWorldTorque returns default of "
           << torque << std::endl;
   }
 
@@ -646,7 +670,8 @@ void ODELink::SetLinearDamping(double _damping)
   if (this->GetODEId())
     dBodySetLinearDamping(this->GetODEId(), _damping);
   else
-    gzlog << "ODE link has no Id, unable to SetLinearDamping" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetLinearDamping" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -655,7 +680,8 @@ void ODELink::SetAngularDamping(double _damping)
   if (this->GetODEId())
     dBodySetAngularDamping(this->GetODEId(), _damping);
   else
-    gzlog << "ODE link has no Id, unable to SetAngularDamping" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetAngularDamping" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -670,7 +696,8 @@ void ODELink::SetKinematic(const bool &_state)
       dBodySetDynamic(this->linkId);
   }
   else
-    gzlog << "ODE link has no Id, unable to SetKinematic" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetKinematic" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -682,7 +709,8 @@ bool ODELink::GetKinematic() const
     result = dBodyIsKinematic(this->linkId);
   else
   {
-    gzlog << "ODE link has no Id, GetKinematic returns default of "
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, GetKinematic returns default of "
           << result << std::endl;
   }
 
@@ -697,7 +725,8 @@ void ODELink::SetAutoDisable(bool _disable)
     dBodySetAutoDisableFlag(this->linkId, _disable);
   }
   else if (!this->linkId)
-    gzlog << "ODE link has no Id, unable to SetAutoDisable" << std::endl;
+    gzlog << "ODE body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetAutoDisable" << std::endl;
   else
     gzlog << "ODE model has joints, unable to SetAutoDisable" << std::endl;
 }
