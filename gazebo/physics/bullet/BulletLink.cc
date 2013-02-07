@@ -98,10 +98,9 @@ void BulletLink::Init()
     }
   }
 
+  // if there are no collisions in the link then use an empty shape
   if (!this->compoundShape)
     this->compoundShape = new btEmptyShape();
-
-//  gzerr << "collision size " << this->children.size() << "\n";
 
   // this->compoundShape->calculateLocalInertia(mass, fallInertia);
   fallInertia = BulletTypes::ConvertVector3(
