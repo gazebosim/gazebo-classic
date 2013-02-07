@@ -89,6 +89,9 @@ namespace gazebo
       public: bool SaveFrame(const std::vector<std::string> &_filenames);
 
       // Documentation inherited
+      public: virtual bool IsActive();
+
+      // Documentation inherited
       protected: virtual void UpdateImpl(bool _force);
 
       // Documentation inherited
