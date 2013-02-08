@@ -275,7 +275,7 @@ TEST(Converter, Move)
   convertedElem = convertedElem->FirstChildElement();
   ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemC");
-   EXPECT_FALSE(convertedElem->Attribute("attrC"));
+  EXPECT_FALSE(convertedElem->Attribute("attrC"));
   convertedElem = convertedElem->FirstChildElement();
   ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemD");
