@@ -178,21 +178,25 @@ void info(const std::string &_filename)
       {
         state.Load(worldElem->GetElement("state"));
 
-        // Store the start time. The end time is calculated by adding all
-        // the time diffs to the start time.
+        // Store the start time.
         startTime = state.GetWallTime();
       }
     }
 
-    // Get the last chunk for the endTime
-    std::string stateString;
-    play->GetChunk(play->GetChunkCount()-1, stateString);
+      // Get the last chunk for the endTime
+    if (play->GetChunkCount() > 1)
+    {
+      std::string stateString;
+      play->GetChunk(play->GetChunkCount()-1, stateString);
 
-    g_stateSdf->ClearElements();
-    sdf::readString(stateString, g_stateSdf);
+      g_stateSdf->ClearElements();
+      sdf::readString(stateString, g_stateSdf);
 
-    state.Load(g_stateSdf);
-    endTime = state.GetWallTime();
+      state.Load(g_stateSdf);
+      endTime = state.GetWallTime();
+    }
+    else
+      endTime = startTime;
   }
 
   // Tell cout how to output boost dates
