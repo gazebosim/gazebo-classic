@@ -120,6 +120,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual double GetWorldCFM();
 
+      // Documentation inherited
+      public: virtual void SetSeed(uint32_t _seed);
+
       /// \brief Register a joint with the dynamics world
       public: btDynamicsWorld *GetDynamicsWorld() const
               {return this->dynamicsWorld;}
