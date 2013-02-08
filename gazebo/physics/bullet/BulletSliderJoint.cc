@@ -135,12 +135,8 @@ void BulletSliderJoint::Attach(LinkPtr _one, LinkPtr _two)
     gzthrow("joint without links\n");
   }
 
-  // this->bulletSlider->setLowerAngLimit(0.0);
-  // this->bulletSlider->setUpperAngLimit(0.0);
-
-  double pos = this->bulletSlider->getLinearPos();
-  this->bulletSlider->setLowerLinLimit(pos);
-  this->bulletSlider->setUpperLinLimit(pos+0.9);
+   this->bulletSlider->setLowerAngLimit(0.0);
+   this->bulletSlider->setUpperAngLimit(0.0);
 
   this->constraint = this->bulletSlider;
 
