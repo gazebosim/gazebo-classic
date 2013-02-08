@@ -17,7 +17,6 @@
 #include <urdf_parser/urdf_parser.h>
 #include <sdf/interface/parser_urdf.hh>
 #include <sdf/sdf.hh>
-#include <sdf/interface/parser_deprecated.hh>
 
 #include <fstream>
 #include <sstream>
@@ -483,30 +482,6 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
       }
       else
       {
-          std::ostringstream stream;
-          stream << "<blob xmlns:controller='http://gazebosim.org/'"
-                 <<     "  xmlns:joint='http://gazebosim.org/'"
-                 <<     "  xmlns:body='http://gazebosim.org/'"
-                 <<     "  xmlns:interface='http://gazebosim.org/'"
-                 <<     "  xmlns:sensor='http://gazebosim.org/'>"
-                 << *childElem << "</blob>";
-
-          // *************************************************
-          // convert to sdf 1.2 if it is the deprecated format
-          // check if blob is any of the deprecated format
-          // this is not needed if we don't support
-          // deprecated xml format any more, will be out
-          // from groovy
-          // *************************************************
-          xmlDocPtr xmlDoc =
-            xmlParseDoc(reinterpret_cast<const xmlChar*>(stream.str().c_str()));
-          xmlNodePtr node = xmlDocGetRootElement(xmlDoc)->xmlChildrenNode;
-
-          // gzerr << "name: " << node->name << "\n";
-          // gzerr << "str: " << stream.str() << "\n";
-          // gzerr << "doc: " << deprecated_sdf::ToString(xmlDoc) << "\n";
-          // gzerr << "node: " << deprecated_sdf::ToString(node) << "\n";
-
           sdf::SDFPtr includeSDF(new sdf::SDF);
           init_sdf(includeSDF);
           sdf::ElementPtr sdf;
@@ -514,68 +489,10 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
           // a place to store converted doc
           TiXmlDocument xmlNewDoc;
 
-          if (node->ns && (const char*)node->ns->prefix
-                == std::string("controller"))
-          {
-            sdf = includeSDF->root->GetElement("model")
-                                  ->GetElement("plugin");
-            deprecated_sdf::initPlugin(node, sdf);
-            // gzdbg << "controller:\n" << sdf->ToString("") << "\n";
-            xmlNewDoc.Parse(sdf->ToString("").c_str());
-          }
-          else if (node->ns && (const char*)node->ns->prefix
-                   == std::string("sensor"))
-          {
-            sdf = includeSDF->root->GetElement("model")
-                  ->GetElement("link")
-                  ->GetElement("sensor");
-            deprecated_sdf::initSensor(node, sdf);
-            // gzdbg << "sensor:\n" << sdf->ToString("") << "\n";
-            xmlNewDoc.Parse(sdf->ToString("").c_str());
-          }
-          else if (node->ns && (const char*)node->ns->prefix
-                == std::string("body"))
-          {
-            sdf = includeSDF->root->GetElement("model")
-                  ->GetElement("link");
-            deprecated_sdf::initLink(node, sdf);
-            // gzdbg << "body:\n" << sdf->ToString("") << "\n";
-            xmlNewDoc.Parse(sdf->ToString("").c_str());
-          }
-          else if (node->ns && (const char*)node->ns->prefix
-                == std::string("joint"))
-          {
-            sdf = includeSDF->root->GetElement("model")
-                  ->GetElement("joint");
-            deprecated_sdf::initJoint(node, sdf);
-            // gzdbg << "joint:\n" << sdf->ToString("") << "\n";
-            xmlNewDoc.Parse(sdf->ToString("").c_str());
-          }
-          else if (std::string((const char*)node->name) == "gripper")
-          {
-            sdf = includeSDF->root->GetElement("model")
-                  ->GetElement("gripper");
-            deprecated_sdf::initGripper(node, sdf);
-            // gzdbg << "gripper:\n" << sdf->ToString("") << "\n";
-            xmlNewDoc.Parse(sdf->ToString("").c_str());
-          }
-          else if (std::string((const char*)node->name)
-                   == "projector")
-          {
-            sdf = includeSDF->root->GetElement("model")
-                  ->GetElement("link")
-                  ->GetElement("projector");
-            deprecated_sdf::initProjector(node, sdf);
-            // gzdbg << "projector:\n" << sdf->ToString("") << "\n";
-            xmlNewDoc.Parse(sdf->ToString("").c_str());
-          }
-          else
-          {
-            std::ostringstream origStream;
-            origStream << *childElem;
-            gzdbg << "extension [" << origStream.str() << "] not converted.\n";
-            xmlNewDoc.Parse(origStream.str().c_str());
-          }
+          std::ostringstream origStream;
+          origStream << *childElem;
+          gzdbg << "extension [" << origStream.str() << "] not converted.\n";
+          xmlNewDoc.Parse(origStream.str().c_str());
 
           // save all unknown stuff in a vector of blobs
           TiXmlElement *blob = new TiXmlElement(*xmlNewDoc.FirstChildElement());
