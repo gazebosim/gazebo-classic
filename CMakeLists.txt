@@ -82,6 +82,12 @@ if(LD_LIBRARY_PATH)
   set (ENV{LD_LIBRARY_PATH} ${LD_LIBRARY_PATH}:$ENV{LD_LIBRARY_PATH})
 endif()
 
+# set flag to turn on DiagnosticTimers for profiling
+if (ENABLE_DIAGNOSTIC_TIMER)
+ set(ENABLE_TIMING_REPORT TRUE)
+else ()
+ set(ENABLE_TIMING_REPORT FALSE)
+endif ()
 
 set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo") 
 set (LIB_INSTALL_DIR "lib" CACHE STRING "Installation directory for libraries (relative to CMAKE_INSTALL_PREFIX)") 

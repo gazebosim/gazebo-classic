@@ -92,6 +92,7 @@ namespace gazebo
     class MouseEvent;
     class PoseAnimation;
     class NumericAnimation;
+    class DiagnosticTimer;
     class Animation;
     class Color;
     class SkeletonAnimation;
@@ -118,6 +119,10 @@ namespace gazebo
     /// \def NumericAnimationPtr
     /// \brief boost::shared_ptr to a NumericAnimation class
     typedef boost::shared_ptr<NumericAnimation> NumericAnimationPtr;
+
+    /// \def DiagnosticTimerPtr
+    /// \brief boost::shared_ptr to a DiagnosticTimer class
+    typedef boost::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
   }
 
   namespace event

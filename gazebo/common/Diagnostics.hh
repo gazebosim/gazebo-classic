@@ -24,9 +24,11 @@
 
 #include <map>
 #include <string>
+#include <boost/enable_shared_from_this.hpp>
 
-#include "common/SingletonT.hh"
-#include "common/Timer.hh"
+#include "gazebo_config.h"
+#include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/Timer.hh"
 
 namespace gazebo
 {
@@ -35,11 +37,24 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
-    /// \brief Create an instance of common::DiagnosticManager
-    #define DIAG_TIMER(name) DiagnosticManager::Instance()->CreateTimer(name);
+    #ifdef ENABLE_TIMING_REPORT
+      #define DIAG_TIMER_CREATE(name) \
+        common::DiagnosticManager::Instance()->SetEnabled(true); \
+        common::DiagnosticTimerPtr nameDiagnosticTimer = \
+          common::DiagnosticManager::Instance()->CreateTimer(name); \
+        nameDiagnosticTimer->Start();
+      #define DIAG_TIMER_LAP(name, prefix) \
+        gzerr << prefix << nameDiagnosticTimer->GetElapsed().Double() << "\n"; \
+        nameDiagnosticTimer->Start();
+    #else
+      #define DIAG_TIMER_CREATE(name) ((void)0)
+      #define DIAG_TIMER_LAP(name, prefix) ((void)0)
+    #endif
 
-    class DiagnosticTimer;
-    typedef boost::shared_ptr< DiagnosticTimer > DiagnosticTimerPtr;
+    /// \brief Create an instance of common::DiagnosticManager
+
+    // class DiagnosticTimer;
+    typedef boost::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
 
     /// \class DiagnosticManager Diagnostics.hh common/common.hh
     /// \brief A diagnostic manager class
@@ -58,11 +73,11 @@ namespace gazebo
 
       /// \brief A diagnostic timer has started
       /// \param[in] _timer The timer to start
-      public: void TimerStart(DiagnosticTimer *_timer);
+      public: void TimerStart(DiagnosticTimer* _timer);
 
       /// \brief A diagnostic timer has stopped
       /// \param[in] _time The timer to stop
-      public: void TimerStop(DiagnosticTimer *_timer);
+      public: void TimerStop(DiagnosticTimer* _timer);
 
       /// \brief Get the number of timers
       /// \return The number of timers
@@ -103,7 +118,8 @@ namespace gazebo
 
     /// \class DiagnosticTimer Diagnostics.hh common/common.hh
     /// \brief A timer designed for diagnostics
-    class DiagnosticTimer : public Timer
+    class DiagnosticTimer : public Timer,
+      public boost::enable_shared_from_this<DiagnosticTimer>
     {
       /// \brief Constructor
       /// \param[in] _name Name of the timer

@@ -45,6 +45,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/common/Diagnostics.hh"
 
 #include "gazebo/physics/Road.hh"
 #include "gazebo/physics/RayShape.hh"
@@ -380,8 +381,7 @@ void World::LogStep()
 //////////////////////////////////////////////////
 void World::Step()
 {
-  common::Timer stepTimer;
-  stepTimer.Start();
+  DIAG_TIMER_CREATE("worldStepTimer");
   /// need this because ODE does not call dxReallocateWorldProcessContext()
   /// until dWorld.*Step
   /// Plugins that manipulate joints (and probably other properties) require
@@ -393,8 +393,7 @@ void World::Step()
     this->pluginsLoaded = true;
   }
 
-  printf("pluginsLoaded [%f]\n", stepTimer.GetElapsed().Double()*1000.0);
-  stepTimer.Start();
+  DIAG_TIMER_LAP("worldStepTimer", "World::Step (World::LoadPlugins()) ");
 
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
@@ -402,8 +401,7 @@ void World::Step()
     this->PublishWorldStats();
   }
 
-  printf("pubStatsTime [%f]\n", stepTimer.GetElapsed().Double()*1000.0);
-  stepTimer.Start();
+  DIAG_TIMER_LAP("worldStepTimer", "World::Step (World::PublishWorldStats()) ");
 
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
@@ -422,8 +420,7 @@ void World::Step()
   this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
                       this->sleepOffset * 0.99;
 
-  printf("computeSleepTime [%f]\n", stepTimer.GetElapsed().Double()*1000.0);
-  stepTimer.Start();
+  DIAG_TIMER_LAP("worldStepTimer", "World::Step (update World::sleepOffset) ");
 
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
@@ -431,8 +428,8 @@ void World::Step()
          >= common::Time(this->physicsEngine->GetUpdatePeriod()))
   {
     boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
-    printf("getMutexTime [%f]\n", stepTimer.GetElapsed().Double()*1000.0);
-    stepTimer.Start();
+
+    DIAG_TIMER_LAP("worldStepTimer", "World::Step (get World::worldUpdateMutex) ");
 
     this->prevStepWallTime = common::Time::GetWallTime();
 
@@ -441,8 +438,7 @@ void World::Step()
       // query timestep to allow dynamic time step size updates
       this->simTime += this->physicsEngine->GetStepTime();
       this->Update();
-      printf("worldUpdateTime [%f]\n", stepTimer.GetElapsed().Double()*1000.0);
-      stepTimer.Start();
+      DIAG_TIMER_LAP("worldStepTimer", "World::Step (World::Update) ");
 
       if (this->IsPaused() && this->stepInc > 0)
         this->stepInc--;
@@ -453,7 +449,7 @@ void World::Step()
 
   this->ProcessMessages();
 
-  printf("processMessagesTime [%f]\n", stepTimer.GetElapsed().Double()*1000.0);
+  DIAG_TIMER_LAP("worldStepTimer", "World::Step (World::ProcessMessages) ");
 }
 
 //////////////////////////////////////////////////
@@ -484,8 +480,7 @@ void World::StepWorld(int _steps)
 //////////////////////////////////////////////////
 void World::Update()
 {
-  common::Timer updateTimer;
-  updateTimer.Start();
+  DIAG_TIMER_CREATE("worldUpdateTimer");
 
   if (this->needsReset)
   {
@@ -498,25 +493,21 @@ void World::Update()
     this->needsReset = false;
   }
   
-  printf("  Update reset [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
-  updateTimer.Start();
+  DIAG_TIMER_LAP("worldUpdateTimer", "World::Update (call resets) ");
 
   event::Events::worldUpdateStart();
 
-  printf("  UpdateStart event [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
-  updateTimer.Start();
+  DIAG_TIMER_LAP("worldUpdateTimer", "World::Update (worldUpdateStart) ");
 
   // Update all the models
   (*this.*modelUpdateFunc)();
 
-  printf("  Model::Update [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
-  updateTimer.Start();
+  DIAG_TIMER_LAP("worldUpdateTimer", "World::Update (Models Update) ");
 
   // This must be called before PhysicsEngine::UpdatePhysics.
   this->physicsEngine->UpdateCollision();
 
-  printf("  collision [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
-  updateTimer.Start();
+  DIAG_TIMER_LAP("worldUpdateTimer", "World::Update (PhysicsEngine::UpdateCollision) ");
 
   // Update the physics engine
   if (this->enablePhysicsEngine && this->physicsEngine)
@@ -524,8 +515,7 @@ void World::Update()
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
 
-    printf("  physics [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
-    updateTimer.Start();
+    DIAG_TIMER_LAP("worldUpdateTimer", "World::Update (PhysicsEngine::UpdatePhysics) ");
 
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
@@ -538,15 +528,13 @@ void World::Update()
 
     this->dirtyPoses.clear();
 
-    printf("  dirty poses [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
-    updateTimer.Start();
+    DIAG_TIMER_LAP("worldUpdateTimer", "World::Update (Get World::dirtyPoses) ");
   }
 
   // Output the contact information
   this->physicsEngine->GetContactManager()->PublishContacts();
 
-  printf("  pub contacts [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
-  updateTimer.Start();
+  DIAG_TIMER_LAP("worldUpdateTimer", "World::Update (PublishContacts) ");
 
   if (common::LogRecord::Instance()->GetRunning())
   {
@@ -564,12 +552,11 @@ void World::Update()
     }
   }
 
-  printf("  diffing [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
+  DIAG_TIMER_LAP("worldUpdateTimer", "World::Update (StateDiff) ");
 
   event::Events::worldUpdateEnd();
 
-  printf("  UpdateEnd event [%f]\n", updateTimer.GetElapsed().Double()*1000.0);
-  updateTimer.Start();
+  DIAG_TIMER_LAP("worldUpdateTimer", "World::Update (worldUpdateend) ");
 }
 
 //////////////////////////////////////////////////

@@ -19,12 +19,11 @@
  * Date: 2 Feb 2011
  */
 
-#include "common/Events.hh"
-#include "common/Diagnostics.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Diagnostics.hh"
 
 using namespace gazebo;
 using namespace common;
-
 
 DiagnosticManager *DiagnosticTimer::diagManager = DiagnosticManager::Instance();
 
@@ -42,14 +41,16 @@ DiagnosticManager::~DiagnosticManager()
 //////////////////////////////////////////////////
 DiagnosticTimerPtr DiagnosticManager::CreateTimer(const std::string &_name)
 {
+  DiagnosticTimerPtr dTimer;
+
   if (this->GetEnabled())
-    return DiagnosticTimerPtr(new DiagnosticTimer(_name));
-  else
-    return DiagnosticTimerPtr();
+    dTimer.reset(new DiagnosticTimer(_name));
+
+  return dTimer;
 }
 
 //////////////////////////////////////////////////
-void DiagnosticManager::TimerStart(DiagnosticTimer *_timer)
+void DiagnosticManager::TimerStart(DiagnosticTimer* _timer)
 {
   this->timers[_timer->GetName()] = Time();
   event::Events::diagTimerStart(_timer->GetName());
@@ -57,9 +58,10 @@ void DiagnosticManager::TimerStart(DiagnosticTimer *_timer)
 
 
 //////////////////////////////////////////////////
-void DiagnosticManager::TimerStop(DiagnosticTimer *_timer)
+void DiagnosticManager::TimerStop(DiagnosticTimer* _timer)
 {
-  this->timers[_timer->GetName()] = _timer->GetElapsed();
+  this->timers[_timer->GetName()] = _timer->GetElapsed() -
+    this->timers[_timer->GetName()];
   event::Events::diagTimerStop(_timer->GetName());
 }
 
