@@ -66,14 +66,14 @@ TEST(Converter, Move)
   TiXmlElement *convertedElem =  xmlDoc.FirstChildElement();
   EXPECT_EQ(convertedElem->ValueStr(), "elemA");
   convertedElem =  convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemB");
   EXPECT_TRUE(convertedElem->FirstChildElement("elemC"));
   EXPECT_TRUE(convertedElem->FirstChildElement("elemE"));
   std::string elemValue = convertedElem->FirstChildElement("elemE")->GetText();
   EXPECT_EQ(elemValue, "D");
   convertedElem =  convertedElem->FirstChildElement("elemC");
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_FALSE(convertedElem->FirstChildElement("elemD"));
 
   // Test moving from elem to attr
@@ -95,13 +95,13 @@ TEST(Converter, Move)
   convertedElem =  xmlDoc2.FirstChildElement();
   EXPECT_EQ(convertedElem->ValueStr(), "elemA");
   convertedElem =  convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemB");
   EXPECT_TRUE(convertedElem->Attribute("attrE"));
   std::string attrValue = convertedElem->Attribute("attrE");
   EXPECT_EQ(attrValue, "D");
   convertedElem =  convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemC");
   EXPECT_FALSE(convertedElem->FirstChildElement("elemD"));
 
@@ -124,17 +124,17 @@ TEST(Converter, Move)
   convertedElem =  xmlDoc3.FirstChildElement();
   EXPECT_EQ(convertedElem->ValueStr(), "elemA");
   convertedElem =  convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemB");
   EXPECT_TRUE(convertedElem->Attribute("attrE"));
   attrValue = convertedElem->Attribute("attrE");
   EXPECT_EQ(attrValue, "C");
   convertedElem =  convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemC");
   EXPECT_FALSE(convertedElem->Attribute("attrC"));
   convertedElem =  convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemD");
 
   // Test moving from attr to elem
@@ -156,17 +156,17 @@ TEST(Converter, Move)
   convertedElem =  xmlDoc4.FirstChildElement();
   EXPECT_EQ(convertedElem->ValueStr(), "elemA");
   convertedElem =  convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemB");
   EXPECT_TRUE(convertedElem->FirstChildElement("elemE"));
   elemValue = convertedElem->FirstChildElement("elemE")->GetText();
   EXPECT_EQ(elemValue, "C");
   EXPECT_TRUE(convertedElem->FirstChildElement("elemC"));
   convertedElem =  convertedElem->FirstChildElement("elemC");
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_FALSE(convertedElem->Attribute("attrC"));
   convertedElem =  convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemD");
 
   // Test moving from elem to elem across multiple levels
@@ -189,9 +189,9 @@ TEST(Converter, Move)
   elemValue = convertedElem->FirstChildElement("elemE")->GetText();
   EXPECT_EQ(elemValue, "D");
   convertedElem =  convertedElem->FirstChildElement("elemB");
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   convertedElem = convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemC");
   EXPECT_FALSE(convertedElem->FirstChildElement("elemD"));
 
@@ -210,18 +210,18 @@ TEST(Converter, Move)
   sdf::Converter::Convert(&xmlDoc6, &convertXmlDoc6);
 
   convertedElem =  xmlDoc6.FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemA");
   attrValue = convertedElem->Attribute("attrE");
   EXPECT_EQ(attrValue, "C");
   convertedElem = convertedElem->FirstChildElement("elemB");
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   convertedElem =  convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemC");
   EXPECT_FALSE(convertedElem->Attribute("attrC"));
   convertedElem = convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemD");
 
   // Test moving from elem to attr across multiple levels
@@ -239,14 +239,14 @@ TEST(Converter, Move)
   sdf::Converter::Convert(&xmlDoc7, &convertXmlDoc7);
 
   convertedElem =  xmlDoc7.FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemA");
   attrValue = convertedElem->Attribute("attrE");
   EXPECT_EQ(attrValue, "D");
   convertedElem = convertedElem->FirstChildElement("elemB");
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   convertedElem =  convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemC");
   EXPECT_FALSE(convertedElem->FirstChildElement("elemD"));
 
@@ -265,19 +265,19 @@ TEST(Converter, Move)
   sdf::Converter::Convert(&xmlDoc8, &convertXmlDoc8);
 
   convertedElem =  xmlDoc8.FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemA");
   EXPECT_TRUE(convertedElem->FirstChildElement("elemE"));
   elemValue = convertedElem->FirstChildElement("elemE")->GetText();
   EXPECT_EQ(elemValue, "C");
   convertedElem =  convertedElem->FirstChildElement("elemB");
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   convertedElem = convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemC");
    EXPECT_FALSE(convertedElem->Attribute("attrC"));
   convertedElem = convertedElem->FirstChildElement();
-  EXPECT_TRUE(convertedElem);
+  ASSERT_TRUE(convertedElem != NULL);
   EXPECT_EQ(convertedElem->ValueStr(), "elemD");
 }
 

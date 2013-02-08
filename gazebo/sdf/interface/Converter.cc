@@ -18,12 +18,10 @@
 #include <vector>
 #include <set>
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 
-#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/sdf/interface/Converter.hh"
