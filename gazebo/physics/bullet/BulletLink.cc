@@ -306,7 +306,8 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletLink::GetWorldLinearVel(const math::Pose &_pose) const
+math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset,
+                                            const math::Quaternion &_q) const
 {
   if (!this->rigidLink)
   {
@@ -318,7 +319,7 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Pose &_pose) const
 
   math::Pose wPose = this->GetWorldPose();
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
-  math::Vector3 offsetFromCoG = _pose.rot*_pose.pos
+  math::Vector3 offsetFromCoG = _q*_offset
         - wPose.rot*this->inertial->GetCoG();
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
       BulletTypes::ConvertVector3(offsetFromCoG));

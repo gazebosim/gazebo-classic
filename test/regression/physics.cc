@@ -412,13 +412,13 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
       // Use GetWorldLinearVel with global offset to check roll without slip
       // Expect small linear velocity at contact point
       math::Vector3 vel3 = model->GetLink()->GetWorldLinearVel(
-          math::Pose(0, 0, -radius, 0, 0, 0));
+          math::Vector3(0, 0, -radius), math::Quaternion(0, 0, 0));
       EXPECT_NEAR(vel3.x, 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.y, 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.z, 0, PHYSICS_TOL);
       // Expect speed at top of sphere to be double the speed at center
       math::Vector3 vel4 = model->GetLink()->GetWorldLinearVel(
-          math::Pose(0, 0, radius, 0, 0, 0));
+          math::Vector3(0, 0, radius), math::Quaternion(0, 0, 0));
       EXPECT_NEAR(vel4.y, 2*vel1.y, PHYSICS_TOL);
       EXPECT_NEAR(vel4.x, 2*vel1.x, PHYSICS_TOL);
       EXPECT_NEAR(vel4.z, 0, PHYSICS_TOL);
