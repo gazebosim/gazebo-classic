@@ -119,7 +119,8 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   gContactAddedCallback = ContactCallback;
   gContactProcessedCallback = ContactProcessed;
 
-  // Moved from physics::PhysicsEngine constructor
+  // Set random seed for physics engine based on gazebo's random seed.
+  // Note: this was moved from physics::PhysicsEngine constructor.
   this->SetSeed(math::Rand::GetSeed());
 }
 
@@ -478,4 +479,5 @@ void BulletPhysics::SetSeed(uint32_t /*_seed*/)
   //  btConvexHullComputer.cpp:2188
 
   // It's going to be blank for now.
+  /// \todo Implement this function.
 }

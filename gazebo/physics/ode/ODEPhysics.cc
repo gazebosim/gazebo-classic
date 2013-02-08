@@ -130,7 +130,8 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 
   this->colliders.resize(100);
 
-  // Moved from physics::PhysicsEngine constructor
+  // Set random seed for physics engine based on gazebo's random seed.
+  // Note: this was moved from physics::PhysicsEngine constructor.
   this->SetSeed(math::Rand::GetSeed());
 }
 
