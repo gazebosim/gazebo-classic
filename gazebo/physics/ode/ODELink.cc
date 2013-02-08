@@ -406,7 +406,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset
+math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset,
                                          const math::Quaternion &_q) const
 {
   math::Vector3 vel;
