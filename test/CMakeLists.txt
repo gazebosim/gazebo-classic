@@ -30,8 +30,8 @@ endif(HAVE_CONSOLE_BRIDGE)
 configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
 
 # Build gtest
-add_library(gtest gtest/src/gtest-all.cc)
-add_library(gtest_main gtest/src/gtest_main.cc)
+add_library(gtest STATIC gtest/src/gtest-all.cc)
+add_library(gtest_main STATIC gtest/src/gtest_main.cc)
 target_link_libraries(gtest_main gtest)
 set(GTEST_LIBRARY "${PROJECT_BINARY_DIR}/test/libgtest.a")
 set(GTEST_MAIN_LIBRARY "${PROJECT_BINARY_DIR}/test/libgtest_main.a")

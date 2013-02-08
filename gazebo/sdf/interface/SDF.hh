@@ -80,7 +80,8 @@ namespace sdf
     /// This generates the SDF html documentation.
     /// \param[out] _html Accumulated HTML for output
     /// \param[in] _spacing Amount of spacing for this element.
-    public: void PrintDocRightPane(std::string &_html, int _spacing);
+    public: void PrintDocRightPane(std::string &_html,
+                                  int _spacing, int &_index);
 
     private: void ToString(const std::string &_prefix,
                            std::ostringstream &_out) const;
@@ -168,6 +169,15 @@ namespace sdf
     public: ElementPtr GetElement(const std::string &_name);
     public: ElementPtr AddElement(const std::string &_name);
     public: void InsertElement(ElementPtr _elem);
+
+    /// \brief Remove this element from its parent.
+    public: void RemoveFromParent();
+
+    /// \brief Remove a child element.
+    /// \param[in] _child Pointer to the child to remove.
+    public: void RemoveChild(ElementPtr _child);
+
+    /// \brief Remove all child elements.
     public: void ClearElements();
 
     public: void Update();
