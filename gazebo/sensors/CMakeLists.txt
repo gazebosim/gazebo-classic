@@ -32,9 +32,15 @@ set (headers
 )
 
 set (gtest_sources
-  SensorManager_TEST.cc
   RaySensor_TEST.cc
 )
+
+if (${VALID_DRI_DISPLAY})
+  set (gtest_sources ${gtest_sources}
+    SensorManager_TEST.cc
+    )
+endif()
+
 gz_build_tests(${gtest_sources})
 
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
