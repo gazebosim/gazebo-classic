@@ -205,13 +205,6 @@ if (PKG_CONFIG_FOUND)
     set (OGRE_PLUGINDIR ${_pkgconfig_invoke_result})
   endif()
 
-  #################################################
-  # Find XML
-  pkg_check_modules(XML libxml-2.0)
-  if (NOT XML_FOUND)
-    BUILD_ERROR("Missing: libxml2(http://www.xmlsoft.org)")
-  endif ()
-
   ########################################
   # Find OpenAL
   # pkg_check_modules(OAL openal)
