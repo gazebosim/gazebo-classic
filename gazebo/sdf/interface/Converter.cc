@@ -24,6 +24,7 @@
 
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/sdf/interface/Converter.hh"
 
 
@@ -141,12 +142,18 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
 /////////////////////////////////////////////////
 void Converter::Convert(TiXmlDocument *_doc, TiXmlDocument *_convertDoc)
 {
+  GZ_ASSERT(_doc != NULL, "SDF XML doc is NULL");
+  GZ_ASSERT(_convertDoc != NULL, "Convert XML doc is NULL");
+
   ConvertImpl(_doc->FirstChildElement(), _convertDoc->FirstChildElement());
 }
 
 /////////////////////////////////////////////////
 void Converter::ConvertImpl(TiXmlElement *_elem, TiXmlElement *_convert)
 {
+  GZ_ASSERT(_elem != NULL, "SDF element is NULL");
+  GZ_ASSERT(_convert != NULL, "Convert element is NULL");
+
   CheckDeprecation(_elem, _convert);
 
   for (TiXmlElement *convertElem = _convert->FirstChildElement("convert");
@@ -177,6 +184,9 @@ void Converter::ConvertImpl(TiXmlElement *_elem, TiXmlElement *_convert)
 /////////////////////////////////////////////////
 void Converter::Rename(TiXmlElement *_elem, TiXmlElement *_renameElem)
 {
+  GZ_ASSERT(_elem != NULL, "SDF element is NULL");
+  GZ_ASSERT(_renameElem != NULL, "Rename element is NULL");
+
   TiXmlElement *fromConvertElem = _renameElem->FirstChildElement("from");
   TiXmlElement *toConvertElem = _renameElem->FirstChildElement("to");
 
@@ -220,6 +230,9 @@ void Converter::Rename(TiXmlElement *_elem, TiXmlElement *_renameElem)
 /////////////////////////////////////////////////
 void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
 {
+  GZ_ASSERT(_elem != NULL, "SDF element is NULL");
+  GZ_ASSERT(_moveElem != NULL, "Move element is NULL");
+
   TiXmlElement *fromConvertElem = _moveElem->FirstChildElement("from");
   TiXmlElement *toConvertElem = _moveElem->FirstChildElement("to");
 
