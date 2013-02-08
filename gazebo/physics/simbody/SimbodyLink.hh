@@ -79,7 +79,15 @@ namespace gazebo
       public: virtual void SetTorque(const math::Vector3 &force);
 
       /// \brief Get the linear velocity of the body in the world frame
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      public: virtual math::Vector3 GetWorldLinearVel(
+        const math::Vector3& _vector3) const;
+
+      /// \brief Get the linear velocity of the body in the world frame
+      public: virtual math::Vector3 GetWorldLinearVel(
+        const math::Pose &_pose) const;
+
+      /// \brief Get the linear velocity of the body in the world frame
+      public: virtual math::Vector3 GetWorldCoGLinearVel() const;
 
       /// \brief Get the angular velocity of the body in the world frame
       public: virtual math::Vector3 GetWorldAngularVel() const;
@@ -94,7 +102,7 @@ namespace gazebo
       public: virtual void SetGravityMode(bool mode);
 
       /// \brief Get the gravity mode
-      public: virtual bool GetGravityMode();
+      public: virtual bool GetGravityMode() const;
 
       /// \brief Set whether this body will collide with others in the model
       public: void SetSelfCollide(bool collide);

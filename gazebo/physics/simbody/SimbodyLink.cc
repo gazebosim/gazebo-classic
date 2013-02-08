@@ -105,7 +105,7 @@ void SimbodyLink::SetGravityMode(bool _mode)
 }
 
 //////////////////////////////////////////////////
-bool SimbodyLink::GetGravityMode()
+bool SimbodyLink::GetGravityMode() const
 {
   bool result = false;
   return result;
@@ -151,7 +151,21 @@ void SimbodyLink::SetLinearVel(const math::Vector3 & /*_vel*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyLink::GetWorldLinearVel() const
+math::Vector3 SimbodyLink::GetWorldLinearVel(
+  const math::Vector3& _vector3) const
+{
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+math::Vector3 SimbodyLink::GetWorldLinearVel(
+  const math::Pose &_pose) const
+{
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
 {
   return math::Vector3();
 }
