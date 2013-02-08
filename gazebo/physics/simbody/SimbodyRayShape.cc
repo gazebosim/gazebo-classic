@@ -33,7 +33,7 @@ using namespace physics;
 SimbodyRayShape::SimbodyRayShape(PhysicsEnginePtr _physicsEngine)
   : RayShape(_physicsEngine)
 {
-  this->SetName("Bullet Ray Shape");
+  this->SetName("Simbody Ray Shape");
 
   this->physicsEngine =
     boost::shared_static_cast<SimbodyPhysics>(_physicsEngine);

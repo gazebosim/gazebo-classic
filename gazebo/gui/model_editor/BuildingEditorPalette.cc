@@ -172,12 +172,8 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   mainLayout->addLayout(buttonsLayout);
   mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
-
-  QLabel *tipsLabel = new QLabel;
-  tipsLabel->setTextFormat(Qt::RichText);
-  tipsLabel->setWordWrap(true);
   std::stringstream tipsText;
-  tipsText << "<p><b> Tips: </b></b>"
+  tipsText << "<font size=3><p><b> Tips: </b></b>"
       << "<p>Draw Walls: Click/release to start a wall."
       << "<br>Click again to start a new, attached wall.</br>"
       << "<br>Double-click to stop drawing.</br></p>"
@@ -188,13 +184,16 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
       << "<p>Note: Currently, windows & doors are simple holes in the wall.</p>"
       << "<p>Note: Because Gazebo only supports simple primitive shapes, "
       << "all floors will be rectangular.</p>";
-  tipsLabel->setMinimumSize(300, 500);
-  tipsLabel->setMaximumSize(400, 800);
 
-  tipsLabel->setText(tr(tipsText.str().c_str()));
+  QTextEdit *tipsTextEdit = new QTextEdit(this);
+  tipsTextEdit->setObjectName("tipsTextEdit");
+  tipsTextEdit->setText(tr(tipsText.str().c_str()));
+  tipsTextEdit->setContentsMargins(0, 0, 0, 0);
+  tipsTextEdit->setReadOnly(true);
+
   mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                       QSizePolicy::Minimum));
-  mainLayout->addWidget(tipsLabel);
+  mainLayout->addWidget(tipsTextEdit);
 
   this->setLayout(mainLayout);
 
