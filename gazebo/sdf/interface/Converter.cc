@@ -14,13 +14,20 @@
  * limitations under the License.
  *
 */
+
 #include <vector>
+#include <set>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/regex.hpp>
+#include <boost/filesystem.hpp>
 
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/sdf/interface/Converter.hh"
+
 
 using namespace sdf;
 
@@ -62,21 +69,81 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
 
   elem->SetAttribute("version", _toVersion);
 
+  std::string origVersionStr = origVersion;
   boost::replace_all(origVersion, ".", "_");
 
   std::string filename = gazebo::common::find_file(
       std::string("sdf/") + _toVersion + "/" + origVersion + ".convert");
 
+
+  // Use convert file in the current sdf version folder for conversion. If file
+  // does not exist, then find intermediate convert files and iteratively
+  // convert the sdf elem. Ideally, users should use gzsdf convert so that the
+  // latest sdf versioned file is written and no subsequent conversions are
+  // necessary.
   TiXmlDocument xmlDoc;
   if (!xmlDoc.LoadFile(filename))
   {
-    gzerr << "Unable to load file[" << filename << "]\n";
+    // find all sdf version dirs in gazebo resource path
+    std::string sdfPath = gazebo::common::find_file(std::string("sdf/"), false);
+    boost::filesystem::directory_iterator endIter;
+    std::set<boost::filesystem::path> sdfDirs;
+    if (boost::filesystem::exists(sdfPath)
+        && boost::filesystem::is_directory(sdfPath))
+    {
+      for (boost::filesystem::directory_iterator dirIter(sdfPath);
+          dirIter != endIter ; ++dirIter)
+      {
+        if (boost::filesystem::is_directory(dirIter->status()))
+        {
+          if (boost::algorithm::ilexicographical_compare(
+              origVersionStr, (*dirIter).path().filename().string()))
+          {
+            sdfDirs.insert((*dirIter));
+          }
+        }
+      }
+    }
+
+    // loop through sdf dirs and do the intermediate conversions
+    for (std::set<boost::filesystem::path>::iterator it = sdfDirs.begin();
+        it != sdfDirs.end(); ++it)
+    {
+      boost::filesystem::path convertFile
+         = boost::filesystem::operator/((*it).string(), origVersion+".convert");
+      if (boost::filesystem::exists(convertFile))
+      {
+        if (!xmlDoc.LoadFile(convertFile.string()))
+        {
+            gzerr << "Unable to load file[" << convertFile << "]\n";
+            return false;
+        }
+        ConvertImpl(elem, xmlDoc.FirstChildElement("convert"));
+        if ((*it).filename() == _toVersion)
+          return true;
+
+        origVersion = (*it).filename().string();
+        boost::replace_all(origVersion, ".", "_");
+      }
+      else
+      {
+        continue;
+      }
+    }
+    gzerr << "Unable to convert from SDF version " << origVersionStr
+        << " to " << _toVersion << "\n";
     return false;
   }
 
   ConvertImpl(elem, xmlDoc.FirstChildElement("convert"));
 
   return true;
+}
+
+/////////////////////////////////////////////////
+void Converter::Convert(TiXmlDocument *_doc, TiXmlDocument *_convertDoc)
+{
+  ConvertImpl(_doc->FirstChildElement(), _convertDoc->FirstChildElement());
 }
 
 /////////////////////////////////////////////////
@@ -99,44 +166,159 @@ void Converter::ConvertImpl(TiXmlElement *_elem, TiXmlElement *_convert)
   for (TiXmlElement *renameElem = _convert->FirstChildElement("rename");
        renameElem; renameElem = renameElem->NextSiblingElement("rename"))
   {
-    TiXmlElement *fromConvertElem = renameElem->FirstChildElement("from");
-    TiXmlElement *toConvertElem = renameElem->FirstChildElement("to");
+    Rename(_elem, renameElem);
+  }
 
-    const char *fromElemName = fromConvertElem->Attribute("element");
-    const char *fromAttrName = fromConvertElem->Attribute("attribute");
+  for (TiXmlElement *moveElem = _convert->FirstChildElement("move");
+     moveElem; moveElem = moveElem->NextSiblingElement("move"))
+  {
+    Move(_elem, moveElem);
+  }
+}
 
-    const char *toElemName = toConvertElem->Attribute("element");
-    const char *toAttrName = toConvertElem->Attribute("attribute");
+/////////////////////////////////////////////////
+void Converter::Rename(TiXmlElement *_elem, TiXmlElement *_renameElem)
+{
+  TiXmlElement *fromConvertElem = _renameElem->FirstChildElement("from");
+  TiXmlElement *toConvertElem = _renameElem->FirstChildElement("to");
 
-    const char *value = GetValue(fromElemName, fromAttrName, _elem);
-    if (!value)
-      continue;
+  const char *fromElemName = fromConvertElem->Attribute("element");
+  const char *fromAttrName = fromConvertElem->Attribute("attribute");
 
-    if (!toElemName)
+  const char *toElemName = toConvertElem->Attribute("element");
+  const char *toAttrName = toConvertElem->Attribute("attribute");
+
+  const char *value = GetValue(fromElemName, fromAttrName, _elem);
+  if (!value)
+    return;
+
+  if (!toElemName)
+  {
+    gzerr << "No 'to' element name specified\n";
+    return;
+  }
+
+  TiXmlElement *replaceTo = new TiXmlElement(toElemName);
+  if (toAttrName)
+    replaceTo->SetAttribute(toAttrName, value);
+  else
+  {
+    TiXmlText *text = new TiXmlText(value);
+    replaceTo->LinkEndChild(text);
+  }
+
+  if (fromElemName)
+  {
+    TiXmlElement *replaceFrom = _elem->FirstChildElement(fromElemName);
+    _elem->ReplaceChild(replaceFrom, *replaceTo);
+  }
+  else if (fromAttrName)
+  {
+    _elem->RemoveAttribute(fromAttrName);
+    _elem->LinkEndChild(replaceTo);
+  }
+}
+
+/////////////////////////////////////////////////
+void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
+{
+  TiXmlElement *fromConvertElem = _moveElem->FirstChildElement("from");
+  TiXmlElement *toConvertElem = _moveElem->FirstChildElement("to");
+
+  const char *fromElemStr = fromConvertElem->Attribute("element");
+  const char *fromAttrStr = fromConvertElem->Attribute("attribute");
+
+  const char *toElemStr = toConvertElem->Attribute("element");
+  const char *toAttrStr = toConvertElem->Attribute("attribute");
+
+  // tokenize 'from' and 'to' strs
+  std::string fromStr = "";
+  if (fromElemStr)
+    fromStr = fromElemStr;
+  else if (fromAttrStr)
+    fromStr = fromAttrStr;
+  std::string toStr = "";
+  if (toElemStr)
+    toStr = toElemStr;
+  else if (toAttrStr)
+    toStr = toAttrStr;
+  std::vector<std::string> fromTokens;
+  std::vector<std::string> toTokens;
+  boost::algorithm::split_regex(fromTokens, fromStr, boost::regex("::"));
+  boost::algorithm::split_regex(toTokens, toStr, boost::regex("::"));
+
+  if (fromTokens.size() == 0)
+  {
+    gzerr << "Incorrect 'from' string format\n";
+    return;
+  }
+  if (toTokens.size() == 0)
+  {
+    gzerr << "Incorrect 'to' string format\n";
+    return;
+  }
+
+  // get value of the 'from' element/attribute
+  TiXmlElement *fromElem = _elem;
+  for (unsigned int i = 0; i < fromTokens.size()-1; ++i)
+  {
+    fromElem = fromElem->FirstChildElement(fromTokens[i]);
+    if (!fromElem)
     {
-      gzerr << "No 'to' element name specified\n";
-      continue;
+      gzerr << "Cannot find element: '" << fromTokens[i]
+          << "' in from string: '" << fromStr << "'\n";
+      return;
     }
+  }
 
-    TiXmlElement *replaceTo = new TiXmlElement(toElemName);
-    if (toAttrName)
-      replaceTo->SetAttribute(toAttrName, value);
-    else
-    {
-      TiXmlText *text = new TiXmlText(value);
-      replaceTo->LinkEndChild(text);
-    }
+  const char *fromName = fromTokens[fromTokens.size()-1].c_str();
+  const char *value = NULL;
+  if (fromElemStr)
+    value = GetValue(fromName, NULL, fromElem);
+  else if (fromAttrStr)
+    value = GetValue(NULL, fromName, fromElem);
 
-    if (fromElemName)
+  if (!value)
+  {
+    gzerr << "Element/attribute: '" << fromName << "' does not have a value\n";
+    return;
+  }
+
+  // get the new element/attribute name
+  const char *toName = toTokens[toTokens.size()-1].c_str();
+  TiXmlElement *toElem = _elem;
+  for (unsigned int i = 0; i < toTokens.size()-1; ++i)
+  {
+    toElem = toElem->FirstChildElement(toTokens[i]);
+    if (!toElem)
     {
-      TiXmlElement *replaceFrom = _elem->FirstChildElement(fromElemName);
-      _elem->ReplaceChild(replaceFrom, *replaceTo);
+      gzerr << "Cannot find element: '"<< toTokens[i] << "' in to string: '"
+          << toStr << "'\n";
+      return;
     }
-    else if (fromAttrName)
-    {
-      _elem->RemoveAttribute(fromAttrName);
-      _elem->LinkEndChild(replaceTo);
-    }
+  }
+
+  // move by creating a new element/attribute and deleting the old one
+  if (toElemStr)
+  {
+    TiXmlElement *moveTo = new TiXmlElement(toName);
+    TiXmlText *text = new TiXmlText(value);
+    moveTo->LinkEndChild(text);
+    toElem->LinkEndChild(moveTo);
+  }
+  else if (toAttrStr)
+  {
+    toElem->SetAttribute(toName, value);
+  }
+  if (fromElemStr)
+  {
+    TiXmlElement *moveFrom =
+        fromElem->FirstChildElement(fromName);
+    fromElem->RemoveChild(moveFrom);
+  }
+  else if (fromAttrStr)
+  {
+    fromElem->RemoveAttribute(fromName);
   }
 }
 
