@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,12 @@
  *
 */
 
-#ifndef GAZEBO_QT_HEADERS_H_
-#define GAZEBO_QT_HEADERS_H_
+#ifndef _BULLET_MATH_INC_H_
+#define _BULLET_MATH_INC_H_
 
+// This disables warning messages for Bullet
 #pragma GCC system_header
-
-#include <QtGui>
-#include <QX11Info>
-#include <QWidget>
-#include <QPushButton>
-#include <QPoint>
-#include <QFrame>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QGroupBox>
-#include <QApplication>
-#include <qmainwindow.h>
-#include <QAction>
-#include <QtTest/QtTest>
+#include <LinearMath/btVector3.h>
+#include <LinearMath/btTransform.h>
 
 #endif

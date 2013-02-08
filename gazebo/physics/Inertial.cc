@@ -84,7 +84,9 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   }
   this->SetCoG(center.x, center.y, center.z);
 
-  if (this->sdf->HasElement("inertia"))
+  // if (this->sdf->HasElement("inertia"))
+  // Do the following whether an inertia element was specified or not.
+  // Otherwise SetUpdateFunc won't get called.
   {
     sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");
     this->SetInertiaMatrix(
@@ -95,18 +97,18 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
         inertiaElem->GetValueDouble("ixz"),
         inertiaElem->GetValueDouble("iyz"));
 
-  inertiaElem->GetElement("ixx")->GetValue()->SetUpdateFunc(
-      boost::bind(&Inertial::GetIXX, this));
-  inertiaElem->GetElement("iyy")->GetValue()->SetUpdateFunc(
-      boost::bind(&Inertial::GetIYY, this));
-  inertiaElem->GetElement("izz")->GetValue()->SetUpdateFunc(
-      boost::bind(&Inertial::GetIZZ, this));
-  inertiaElem->GetElement("ixy")->GetValue()->SetUpdateFunc(
-      boost::bind(&Inertial::GetIXY, this));
-  inertiaElem->GetElement("ixz")->GetValue()->SetUpdateFunc(
-      boost::bind(&Inertial::GetIXZ, this));
-  inertiaElem->GetElement("iyz")->GetValue()->SetUpdateFunc(
-      boost::bind(&Inertial::GetIYZ, this));
+    inertiaElem->GetElement("ixx")->GetValue()->SetUpdateFunc(
+        boost::bind(&Inertial::GetIXX, this));
+    inertiaElem->GetElement("iyy")->GetValue()->SetUpdateFunc(
+        boost::bind(&Inertial::GetIYY, this));
+    inertiaElem->GetElement("izz")->GetValue()->SetUpdateFunc(
+        boost::bind(&Inertial::GetIZZ, this));
+    inertiaElem->GetElement("ixy")->GetValue()->SetUpdateFunc(
+        boost::bind(&Inertial::GetIXY, this));
+    inertiaElem->GetElement("ixz")->GetValue()->SetUpdateFunc(
+        boost::bind(&Inertial::GetIXZ, this));
+    inertiaElem->GetElement("iyz")->GetValue()->SetUpdateFunc(
+        boost::bind(&Inertial::GetIYZ, this));
   }
 
   this->SetMass(this->sdf->GetValueDouble("mass"));

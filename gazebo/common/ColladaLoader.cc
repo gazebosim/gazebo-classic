@@ -53,6 +53,9 @@ ColladaLoader::~ColladaLoader()
 //////////////////////////////////////////////////
 Mesh *ColladaLoader::Load(const std::string &_filename)
 {
+  // reset scale
+  this->meter = 1.0;
+
   TiXmlDocument xmlDoc;
 
   this->path.clear();
