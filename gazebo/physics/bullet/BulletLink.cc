@@ -45,8 +45,7 @@ BulletLink::BulletLink(EntityPtr _parent)
 //////////////////////////////////////////////////
 BulletLink::~BulletLink()
 {
-  if (this->compoundShape)
-    delete this->compoundShape;
+  delete this->compoundShape;
 }
 
 //////////////////////////////////////////////////
