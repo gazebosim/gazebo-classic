@@ -247,9 +247,14 @@ void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
   boost::algorithm::split_regex(fromTokens, fromStr, boost::regex("::"));
   boost::algorithm::split_regex(toTokens, toStr, boost::regex("::"));
 
-  if (fromTokens.size() == 0 || toTokens.size() == 0)
+  if (fromTokens.size() == 0)
   {
-    gzerr << "Incorrect 'from' or 'to' string format\n";
+    gzerr << "Incorrect 'from' string format\n";
+    return;
+  }
+  if (toTokens.size() == 0)
+  {
+    gzerr << "Incorrect 'to' string format\n";
     return;
   }
 
@@ -259,8 +264,13 @@ void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
   {
     fromElem = fromElem->FirstChildElement(fromTokens[i]);
     if (!fromElem)
+    {
+      gzerr << "Cannot find element: '" << fromTokens[i]
+          << "' in from string: '" << fromStr << "'\n";
       return;
+    }
   }
+
   const char *fromName = fromTokens[fromTokens.size()-1].c_str();
   const char *value = NULL;
   if (fromElemStr)
@@ -270,7 +280,7 @@ void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
 
   if (!value)
   {
-    gzerr << "No value found for element/attribute: " << fromName << "\n";
+    gzerr << "Element/attribute: '" << fromName << "' does not have a value\n";
     return;
   }
 
@@ -281,7 +291,11 @@ void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
   {
     toElem = toElem->FirstChildElement(toTokens[i]);
     if (!toElem)
+    {
+      gzerr << "Cannot find element: '"<< toTokens[i] << "' in to string: '"
+          << toStr << "'\n";
       return;
+    }
   }
 
   // move by creating a new element/attribute and deleting the old one
