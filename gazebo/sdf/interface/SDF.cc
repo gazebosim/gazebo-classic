@@ -335,19 +335,22 @@ void Element::PrintDescription(std::string _prefix)
 }
 
 /////////////////////////////////////////////////
-void Element::PrintDocRightPane(std::string &_html, int _spacing)
+void Element::PrintDocRightPane(std::string &_html, int _spacing, int &_index)
 {
   std::ostringstream stream;
   ElementPtr_V::iterator eiter;
+
+  int start = _index++;
 
   std::string childHTML;
   for (eiter = this->elementDescriptions.begin();
       eiter != this->elementDescriptions.end(); ++eiter)
   {
-    (*eiter)->PrintDocRightPane(childHTML, _spacing + 4);
+    (*eiter)->PrintDocRightPane(childHTML, _spacing + 4, _index);
   }
 
-  stream << "<a name=\"" << this->name << "\">&lt" << this->name << "&gt</a>";
+  stream << "<a name=\"" << this->name << start
+         << "\">&lt" << this->name << "&gt</a>";
 
   stream << "<div style='padding-left:" << _spacing << "px;'>\n";
 
@@ -427,7 +430,8 @@ void Element::PrintDocLeftPane(std::string &_html, int _spacing, int &_index)
   }
 
   stream << "<a id='" << start << "' onclick='highlight(" << start
-         << ");' href=\"#" << this->name << "\">&lt" << this->name << "&gt</a>";
+         << ");' href=\"#" << this->name << start
+         << "\">&lt" << this->name << "&gt</a>";
 
   stream << "<div style='padding-left:" << _spacing << "px;'>\n";
 
@@ -1048,6 +1052,9 @@ void Element::Update()
   {
     (*iter)->Update();
   }
+
+  if (this->value)
+    this->value->Update();
 }
 
 /////////////////////////////////////////////////
@@ -1297,7 +1304,8 @@ void SDF::PrintDoc()
   int index = 0;
   this->root->PrintDocLeftPane(html, 10, index);
 
-  this->root->PrintDocRightPane(html2, 10);
+  index = 0;
+  this->root->PrintDocRightPane(html2, 10, index);
 
   std::cout << "<!DOCTYPE HTML>\n"
   << "<html>\n"
@@ -1373,7 +1381,10 @@ void SDF::PrintDoc()
             << "<ul style='margin-left:12px'>"
             << "<li><b>&lt;uri&gt;</b>: URI of SDF model file to include.</li>"
             << "<li><b>&lt;name&gt;</b>: Name of the included SDF model.</li>"
-            << "<li><b>&lt;pose&gt;</b>: Pose of the included SDF model.</li>"
+            << "<li><b>&lt;pose&gt;</b>: Pose of the included SDF model, "
+            << "specified as &lt;pose&gt;x y z roll pitch yaw&lt;/pose&gt;, "
+            << "with x, y, and z representing a position in meters, and roll, "
+            << "pitch, and yaw representing Euler angles in radians.</li>"
             << "</ul>"
             << "</li>";
 

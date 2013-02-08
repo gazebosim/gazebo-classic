@@ -79,11 +79,15 @@ bool ContactProcessed()
 SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
     : PhysicsEngine(_world), system(), matter(system), forces(system), integ(NULL)
 {
-  // Create the dynamics solver
+  // Instantiate the Multibody System
+  // Instantiate the Simbody Matter Subsystem
+  // Instantiate the Simbody General Force Subsystem
 
-  // Instantiate the world
+  // Create an integrator
+  //this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
+  this->integ = new SimTK::ExplicitEulerIntegrator(system);
 
-  // TODO: Enable this to do custom contact setting
+
 
 }
 
@@ -121,9 +125,6 @@ void SimbodyPhysics::Init()
   SimTK::MobilizedBody::Pin pendulum(matter.Ground(), Transform(ZtoY, Vec3(0, 0, 0)), 
                                 pendulumBody,    Transform(ZtoY, Vec3(1, 0, 0)));
 
-  //this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
-  this->integ = new SimTK::ExplicitEulerIntegrator(system);
-
   SimTK::State state = this->system.realizeTopology();
 
   // pendulum.setAngle(state, Pi/4);
@@ -155,7 +156,7 @@ void SimbodyPhysics::UpdatePhysics()
                        this->world->GetSimTime().Double());
 
   const SimTK::State &s = integ->getState();
-  gzerr << "\n\ntime [" << s.getTime()
+  gzerr << "time [" << s.getTime()
         << "] q [" << s.getQ()
         << "] u [" << s.getU()
         << "] dt [" << this->stepTimeDouble

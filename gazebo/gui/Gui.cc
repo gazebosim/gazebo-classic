@@ -20,6 +20,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gazebo.hh"
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/LogRecord.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
@@ -176,7 +177,11 @@ unsigned int gui::get_entity_id(const std::string &_name)
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
 {
-  gazebo::common::LogRecord::Instance()->Init("gui");
+  // Initialize the informational logger. This will log warnings, and errors.
+  gazebo::common::Console::Instance()->Init("gzclient.log");
+
+  // Initialize the data logger. This will log state information.
+  gazebo::common::LogRecord::Instance()->Init("gzclient");
 
   if (!parse_args(_argc, _argv))
     return false;
