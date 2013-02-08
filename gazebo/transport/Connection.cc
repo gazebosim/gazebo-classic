@@ -120,10 +120,24 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
   boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
   boost::asio::ip::tcp::resolver::query query(host, service,
       boost::asio::ip::resolver_query_base::numeric_service);
-  boost::asio::ip::tcp::resolver::iterator endpoint_iter;
+  boost::asio::ip::tcp::resolver::iterator endpointIter;
+
   try
   {
-    endpoint_iter = resolver.resolve(query);
+    endpointIter = resolver.resolve(query);
+
+    // Find the first valid IPv4 address
+    for (; endpointIter != end &&
+           !(*endpointIter).endpoint().address().is_v4(); ++endpointIter)
+    {
+    }
+
+    // Make sure we didn't run off the end of the list.
+    if (endpointIter == end)
+    {
+      gzerr << "Unable to resolve uri[" << _host << ":" << _port << "]\n";
+      return false;
+    }
   }
   catch(...)
   {
@@ -136,9 +150,9 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
 
   // Use async connect so that we can use a custom timeout. This is useful
   // when trying to detect network errors.
-  this->socket->async_connect(*endpoint_iter++,
+  this->socket->async_connect(*endpointIter++,
       boost::bind(&Connection::OnConnect, this,
-        boost::asio::placeholders::error, endpoint_iter));
+        boost::asio::placeholders::error, endpointIter));
 
   // Wait for at most 2 seconds for a connection to be established.
   // The connectionCondition notification occurs in ::OnConnect.
@@ -675,7 +689,10 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
         continue;
 
       int family = ifa->ifa_addr->sa_family;
-      if (family == AF_INET || family == AF_INET6)
+      // \todo We currently don't handle AF_INET6 addresses. So I commented
+      // out the below line, and removed AF_INET6 for the if clause.
+      // if (family == AF_INET || family == AF_INET6)
+      if (family == AF_INET)
       {
         int s = getnameinfo(ifa->ifa_addr,
             (family == AF_INET) ? sizeof(struct sockaddr_in) :
