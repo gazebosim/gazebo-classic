@@ -114,10 +114,13 @@ void TopicView::Update()
     {
       avg += (*iter);
     }
-    avg /= this->dataTimes.size();
+
+    double avgDbl = 0;
+    if (this->dataTimes.size() != 0)
+      avgDbl = 1.0 / (avg.Double() / this->dataTimes.size());
 
     std::ostringstream stream;
-    stream << std::fixed << std::setprecision(2) << 1.0 / avg.Double();
+    stream << std::fixed << std::setprecision(2) << avgDbl;
     this->hzEdit->setText(tr(stream.str().c_str()));
   }
 

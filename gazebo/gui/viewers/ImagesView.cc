@@ -144,7 +144,10 @@ void ImagesView::AddImage(int _width, int _height)
 /////////////////////////////////////////////////
 void ImagesView::OnImages(ConstImagesStampedPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  // Only use a try lock so that we don't block the node thread.
+  boost::mutex::scoped_try_lock lock(this->mutex);
+  if (!lock)
+      return;
 
   unsigned char *rgbData = NULL;
   unsigned int rgbDataSize = 0;
