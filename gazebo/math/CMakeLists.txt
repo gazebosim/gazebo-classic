@@ -50,4 +50,4 @@ gz_add_library(gazebo_math ${sources})
 target_link_libraries(gazebo_math ${Boost_LIBRARIES})
 
 gz_install_library(gazebo_math)
-gz_install_includes("math" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gzmath.hh gzmath.h)
+gz_install_includes("math" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gzmath.hh)

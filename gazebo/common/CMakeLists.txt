@@ -113,4 +113,4 @@ if (HAVE_GTS)
 endif()
 
 gz_install_library(gazebo_common)
-gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh common.h)
+gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)

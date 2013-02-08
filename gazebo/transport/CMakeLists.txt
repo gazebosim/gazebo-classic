@@ -47,4 +47,4 @@ target_link_libraries(gazebo_transport gazebo_common
                                        ${Boost_LIBRARIES})
 
 gz_install_library(gazebo_transport)
-gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport.hh transport.h)
+gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport.hh)
