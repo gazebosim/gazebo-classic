@@ -35,7 +35,7 @@ void ReceiveHokuyoMsg(ConstLaserScanStampedPtr &/*_msg*/)
 /////////////////////////////////////////////////
 /// \brief Test that sensors will continue to update after Reset World
 ///        See bitbucket issue #236 for more background.
-TEST_F(Sensor_TEST, Data)
+TEST_F(Sensor_TEST, UpdateAfterReset)
 {
   // Load in a world with lasers
   Load("worlds/ray_test.world");
