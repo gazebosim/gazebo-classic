@@ -349,9 +349,8 @@ void MainWindow::Save()
       next = world->GetElement("light");
       while (next)
       {
-        current = next;
-        next = next->GetNextElement("light");
-        current->ClearElements();
+        next->RemoveFromParent();
+        next = world->GetElement("light");
       }
 
       // Get lights from current scene.
@@ -362,10 +361,9 @@ void MainWindow::Save()
       {
         sdf::ElementPtr elem;
         light = scene->GetLight(i);
-        gzwarn << light->GetName() << '\n';
+        // Clone light sdf and insert into world
         elem = light->CloneSDF();
-        gzwarn << elem->ToString("");
-        // Insert elem into world
+        world->InsertElement(elem);
       }
 
       msgData = sdfParsed.root->ToString("");
