@@ -114,6 +114,10 @@ namespace gazebo
       /// bzip2 compressed data with Base64 encoding.
       public: const std::string &GetEncoding() const;
 
+      /// \brief Return true if running.
+      /// \return True if LogRecord has been started.
+      public: bool GetRunning() const;
+
       /// \brief Update the log files
       ///
       /// Captures the current state of all registered entities, and outputs

@@ -31,6 +31,12 @@ QAction *gazebo::gui::g_quitAct = 0;
 QAction *gazebo::gui::g_newModelAct = 0;
 QAction *gazebo::gui::g_resetModelsAct = 0;
 QAction *gazebo::gui::g_resetWorldAct = 0;
+QAction *gazebo::gui::g_editBuildingAct = 0;
+
+QAction *gazebo::gui::g_buildingEditorSaveAct = 0;
+QAction *gazebo::gui::g_buildingEditorDiscardAct = 0;
+QAction *gazebo::gui::g_buildingEditorDoneAct = 0;
+QAction *gazebo::gui::g_buildingEditorExitAct = 0;
 
 QAction *gazebo::gui::g_playAct = 0;
 QAction *gazebo::gui::g_pauseAct = 0;
@@ -55,5 +61,7 @@ QAction *gazebo::gui::g_resetAct = 0;
 QAction *gazebo::gui::g_fullScreenAct = 0;
 QAction *gazebo::gui::g_fpsAct = 0;
 QAction *gazebo::gui::g_orbitAct = 0;
+
+QAction *gazebo::gui::g_topicVisAct = 0;
 
 gazebo::gui::DeleteAction *gazebo::gui::g_deleteAct = 0;

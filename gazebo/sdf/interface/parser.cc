@@ -280,7 +280,7 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
   {
 #ifdef HAVE_URDFDOM
     urdf2gazebo::URDF2Gazebo u2g;
-    TiXmlDocument doc = u2g.initModelFile(filename);
+    TiXmlDocument doc = u2g.InitModelFile(filename);
     if (sdf::readDoc(&doc, _sdf, "urdf file"))
     {
       gzwarn << "parse from urdf file [" << filename << "].\n";
@@ -308,7 +308,7 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
   {
 #ifdef HAVE_URDFDOM
     urdf2gazebo::URDF2Gazebo u2g;
-    TiXmlDocument doc = u2g.initModelString(_xmlString);
+    TiXmlDocument doc = u2g.InitModelString(_xmlString);
     if (sdf::readDoc(&doc, _sdf, "urdf string"))
     {
       gzwarn << "parse from urdf.\n";
@@ -564,14 +564,31 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
             }
           }
 
-          std::string manifest = modelPath + "/manifest.xml";
+          boost::filesystem::path manifestPath = modelPath;
+
+          // First try to get the GZ_MODEL_MANIFEST_FILENAME.
+          // If that file doesn't exist, try to get the deprecated version.
+          if (boost::filesystem::exists(
+                manifestPath / GZ_MODEL_MANIFEST_FILENAME))
+          {
+            manifestPath /= GZ_MODEL_MANIFEST_FILENAME;
+          }
+          else
+          {
+            gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
+                   << "Please rename manifest.xml to "
+                   << GZ_MODEL_MANIFEST_FILENAME << ".\n";
+
+            manifestPath /= "manifest.xml";
+          }
 
           TiXmlDocument manifestDoc;
-          if (manifestDoc.LoadFile(manifest))
+          if (manifestDoc.LoadFile(manifestPath.string()))
           {
             TiXmlElement *modelXML = manifestDoc.FirstChildElement("model");
             if (!modelXML)
-              gzerr << "No <model> element in manifest[" << manifest << "]\n";
+              gzerr << "No <model> element in manifest["
+                    << manifestPath << "]\n";
             else
             {
               TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");

@@ -19,7 +19,7 @@
 
 int main(int _argc, char *_argv[])
 {
-  #ifdef _MSC_VER
+#ifdef _MSC_VER
   // Don't print a silly message or stick a modal dialog box in my face,
   // please.
   _set_abort_behavior(0, ~0);

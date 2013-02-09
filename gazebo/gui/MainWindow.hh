@@ -32,8 +32,8 @@ namespace gazebo
   {
     class RenderWidget;
     class ToolsWidget;
-
     class ModelListWidget;
+    class BuildingEditorPalette;
 
     class MainWindow : public QMainWindow
     {
@@ -51,6 +51,7 @@ namespace gazebo
       protected: void closeEvent(QCloseEvent *_event);
 
       private: void OnGUI(ConstGUIPtr &_msg);
+
 
       private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
@@ -88,6 +89,26 @@ namespace gazebo
       private slots: void OnResetModelOnly();
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
+      private slots: void OnEditBuilding();
+
+      /// \brief Qt callback when the building editor's save action is
+      /// triggered.
+      private slots: void BuildingEditorSave();
+
+      /// \brief Qt callback when the building editor's discard action is
+      /// triggered.
+      private slots: void BuildingEditorDiscard();
+
+      /// \brief Qt callback when the building editor's done action is
+      /// triggered.
+      private slots: void BuildingEditorDone();
+
+      /// \brief Qt callback when the building editor's exit action is
+      /// triggered.
+      private slots: void BuildingEditorExit();
+
+      /// \brief Callback when topic selection action.
+      private slots: void SelectTopic();
 
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);
@@ -104,10 +125,10 @@ namespace gazebo
                                         const std::string &_mode);
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
-      private: QMenu *fileMenu;
-      private: QMenu *editMenu;
-      private: QMenu *viewMenu;
-      private: QMenu *helpMenu;
+      /// \brief Callback from the building editor when the building model
+      /// has been completed.
+      private: void OnFinishBuilding();
+
       private: QToolBar *playToolbar;
 
       private: RenderWidget *renderWidget;
@@ -135,8 +156,21 @@ namespace gazebo
       private: msgs::Request *requestMsg;
 
       // private: QTreeWidget *treeWidget;
+
+      /// \brief Building editor palette that contains different drawing modes
+      private: BuildingEditorPalette *buildingEditorPalette;
+
+      /// \brief Tab widget that holds the building editor palette
+      private: QTabWidget *buildingEditorTabWidget;
+
+      /// \brief Building editor's own separate menu bar of actions, e.g. save.
+      private: QMenuBar *buildingEditorMenuBar;
+
       private: QTabWidget *tabWidget;
       private: QMenuBar *menuBar;
+
+      /// \brief Frame layout that contains the menu bar.
+      private: QHBoxLayout *menuLayout;
 
       /// \brief The filename set via "Save As". This filename is used by
       /// the "Save" feature.

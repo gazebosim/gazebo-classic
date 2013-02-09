@@ -20,7 +20,8 @@ link_directories(
 #endif()
 
 if(HAVE_BULLET)
-  add_subdirectory(bullet)
+  include_directories ( ${BULLET_INCLUDE_DIRS} )
+  link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
@@ -38,6 +39,7 @@ set (gtest_sources
   pioneer2dx.cc
   pr2.cc
   projector.cc
+  server_fixture.cc
   speed.cc
   transport.cc)
 

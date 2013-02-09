@@ -39,7 +39,7 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
   else if (!elem)
     elem = _doc->FirstChildElement("sdf");
 
-  if (!elem->Attribute("version"))
+  if (!elem || !elem->Attribute("version"))
   {
     gzerr << "  Unable to determine original SDF version\n";
     return false;

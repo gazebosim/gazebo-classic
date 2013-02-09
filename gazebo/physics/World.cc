@@ -181,7 +181,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->controlSub = this->node->Subscribe("~/world_control",
                                            &World::OnControl, this);
   this->requestSub = this->node->Subscribe("~/request",
-                                           &World::OnRequest, this);
+                                           &World::OnRequest, this, true);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
@@ -286,7 +286,13 @@ void World::Init()
   common::LogRecord::Instance()->Add(this->GetName(), "state.log",
       boost::bind(&World::OnLog, this, _1));
 
+  this->prevStates[0].SetName(this->GetName());
+  this->prevStates[1].SetName(this->GetName());
+
   this->initialized = true;
+
+  // Mark the world initialization
+  gzlog << "World::Init" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -501,17 +507,20 @@ void World::Update()
   // Output the contact information
   this->physicsEngine->GetContactManager()->PublishContacts();
 
-  int currState = (this->stateToggle + 1) % 2;
-  this->prevStates[currState] = WorldState(shared_from_this());
-  WorldState diffState = this->prevStates[currState] -
-                         this->prevStates[this->stateToggle];
-
-  if (!diffState.IsZero())
+  if (common::LogRecord::Instance()->GetRunning())
   {
-    this->stateToggle = currState;
-    this->states.push_back(diffState);
-    if (this->states.size() > 1000)
-      this->states.pop_front();
+    int currState = (this->stateToggle + 1) % 2;
+    this->prevStates[currState] = WorldState(shared_from_this());
+    WorldState diffState = this->prevStates[currState] -
+      this->prevStates[this->stateToggle];
+
+    if (!diffState.IsZero())
+    {
+      this->stateToggle = currState;
+      this->states.push_back(diffState);
+      if (this->states.size() > 1000)
+        this->states.pop_front();
+    }
   }
 
   event::Events::worldUpdateEnd();
