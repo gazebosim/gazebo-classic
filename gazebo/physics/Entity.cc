@@ -220,7 +220,7 @@ void Entity::PublishPose()
   GZ_ASSERT(this->GetParentModel() != NULL,
       "An entity without a parent model should not happen");
 
-  this->world->PublishModePose(this->GetParentModel()->GetName());
+  this->world->PublishModelPose(this->GetParentModel()->GetName());
 }
 
 //////////////////////////////////////////////////
