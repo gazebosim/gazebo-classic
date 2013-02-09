@@ -134,20 +134,24 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
   this->connectError = false;
   this->remoteURI.clear();
 
-  // Use async connect so that we can use a custom timeout. This is useful
-  // when trying to detect network errors.
-  this->socket->async_connect(*endpoint_iter++,
-      boost::bind(&Connection::OnConnect, this,
-        boost::asio::placeholders::error, endpoint_iter));
+  {
+    // boost::mutex::scoped_lock socketLock(this->socketMutex);
+
+    // Use async connect so that we can use a custom timeout. This is useful
+    // when trying to detect network errors.
+    this->socket->async_connect(*endpoint_iter++,
+        boost::bind(&Connection::OnConnect, this,
+          boost::asio::placeholders::error, endpoint_iter));
+  }
 
   // Wait for at most 2 seconds for a connection to be established.
   // The connectionCondition notification occurs in ::OnConnect.
   if (!this->connectCondition.timed_wait(lock,
         boost::posix_time::milliseconds(60000)) || this->connectError)
   {
-    // \todo Log this output to a gazebo log file.
-    // gzlog << "Failed to create connection to remote host["
-    //       << host << ":" << _port << "]\n";
+    // boost::mutex::scoped_lock socketLock(this->socketMutex);
+    gzlog << "Failed to create connection to remote host["
+          << host << ":" << _port << "]\n";
     this->socket->close();
     return false;
   }
@@ -308,6 +312,7 @@ void Connection::ProcessWriteQueue()
 
   try
   {
+    // boost::mutex::scoped_lock lock(this->socketMutex);
     boost::asio::write(*this->socket, buffer->data());
   }
   catch(...)
@@ -366,20 +371,24 @@ void Connection::Shutdown()
 
   this->Cancel();
 
-  if (this->socket && this->socket->is_open())
-  {
-    this->Close();
-    boost::system::error_code ec;
-    this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-  }
+  this->Close();
 
-  delete this->socket;
-  this->socket = NULL;
+  {
+    boost::mutex::scoped_lock lock(this->socketMutex);
+    boost::system::error_code ec;
+    if (this->socket && this->socket->is_open())
+      this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+
+    delete this->socket;
+    this->socket = NULL;
+  }
 }
 
 //////////////////////////////////////////////////
 bool Connection::IsOpen() const
 {
+  // boost::mutex::scoped_lock lock(this->socketMutex);
+
   bool result = this->socket && this->socket->is_open();
   try
   {
@@ -397,6 +406,8 @@ bool Connection::IsOpen() const
 //////////////////////////////////////////////////
 void Connection::Close()
 {
+  boost::mutex::scoped_lock lock(this->socketMutex);
+
   if (this->socket && this->socket->is_open())
   {
     this->ProcessWriteQueue();
@@ -446,15 +457,18 @@ void Connection::Cancel()
     this->acceptor = NULL;
   }
 
-  if (this->socket && this->socket->is_open())
   {
-    try
+    // boost::mutex::scoped_lock lock(this->socketMutex);
+    if (this->socket && this->socket->is_open())
     {
-      this->socket->cancel();
-    }
-    catch(...)
-    {
-      this->socket->close();
+      try
+      {
+        this->socket->cancel();
+      }
+      catch(...)
+      {
+        this->socket->close();
+      }
     }
   }
 }
@@ -472,7 +486,11 @@ bool Connection::Read(std::string &data)
   this->readMutex->lock();
 
   // First read the header
-  this->socket->read_some(boost::asio::buffer(header), error);
+  {
+    // boost::mutex::scoped_lock lock(this->socketMutex);
+    this->socket->read_some(boost::asio::buffer(header), error);
+  }
+
   if (error)
   {
     gzerr << "Connection[" << this->id << "] Closed during Read\n";
@@ -483,6 +501,7 @@ bool Connection::Read(std::string &data)
   incoming_size = this->ParseHeader(header);
   if (incoming_size > 0)
   {
+    // boost::mutex::scoped_lock lock(this->socketMutex);
     incoming.resize(incoming_size);
 
     std::size_t len = 0;
@@ -521,6 +540,7 @@ unsigned int Connection::GetLocalPort() const
 {
   try
   {
+    // boost::mutex::scoped_lock lock(this->socketMutex);
     if (this->socket && this->socket->is_open())
       return this->socket->local_endpoint().port();
     else if (this->acceptor)
@@ -542,6 +562,7 @@ std::string Connection::GetRemoteAddress() const
 //////////////////////////////////////////////////
 unsigned int Connection::GetRemotePort() const
 {
+  // boost::mutex::scoped_lock lock(this->socketMutex);
   if (this->socket && this->socket->is_open())
     return this->socket->remote_endpoint().port();
   else
@@ -575,6 +596,7 @@ void Connection::ReadLoop(const ReadCallback &cb)
   {
     try
     {
+      // boost::mutex::scoped_lock lock(this->socketMutex);
       if (this->socket->available() >= HEADER_LENGTH)
       {
         if (this->Read(data))
@@ -728,6 +750,7 @@ bool Connection::ValidateIP(const std::string &_ip)
 boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
 {
   boost::asio::ip::tcp::endpoint ep;
+  // boost::mutex::scoped_lock lock(this->socketMutex);
   if (this->socket)
     ep = this->socket->remote_endpoint();
   return ep;
@@ -787,15 +810,18 @@ void Connection::OnConnect(const boost::system::error_code &_error,
     this->remoteURI = std::string("http://") + this->GetRemoteHostname()
       + ":" + boost::lexical_cast<std::string>(this->GetRemotePort());
 
-    if (this->socket && this->socket->is_open())
     {
-      this->remoteAddress =
-        this->socket->remote_endpoint().address().to_string();
-    }
-    else
-    {
-      this->connectError = true;
-      gzerr << "Invalid socket connection\n";
+      // boost::mutex::scoped_lock socketLock(this->socketMutex);
+      if (this->socket && this->socket->is_open())
+      {
+        this->remoteAddress =
+          this->socket->remote_endpoint().address().to_string();
+      }
+      else
+      {
+        this->connectError = true;
+        gzerr << "Invalid socket connection\n";
+      }
     }
 
     // Notify the condition that it may proceed.

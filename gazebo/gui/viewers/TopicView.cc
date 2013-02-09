@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
@@ -284,12 +285,26 @@ void TopicCombo::UpdateList()
   // Otherwise select all the topics to show in the combo box.
   else
   {
+    // Get all the types of viewers. The contents of the vector are message
+    // types.
+    std::vector<std::string> viewTypes;
+    ViewFactory::GetViewTypes(viewTypes);
+
     std::map<std::string, std::list<std::string> > allTopics;
     allTopics = transport::getAdvertisedTopics();
 
     for (std::map<std::string, std::list<std::string> >::iterator
          iter = allTopics.begin(); iter != allTopics.end(); ++iter)
     {
+      // If the topic's message type matches one of the available view types
+      // via the ViewFactory, then skip. We only want to show topics that
+      // don't have a specialized viewer.
+      if (std::find(viewTypes.begin(), viewTypes.end(), iter->first) !=
+          viewTypes.end())
+      {
+        continue;
+      }
+
       // Add all the topic names
       for (std::list<std::string>::iterator topicIter = iter->second.begin();
            topicIter != iter->second.end(); ++topicIter)

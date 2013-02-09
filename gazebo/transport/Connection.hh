@@ -180,9 +180,16 @@ namespace gazebo
                 {
                   if (_e.message() != "End of File")
                   {
-                    this->Close();
+                    try
+                    {
+                      this->Close();
+                    }
+                    catch (...)
+                    {
+                    }
                     // This will occur when the other side closes the
-                    // connection
+                    // connection. We don't want spew error messages in this
+                    // case.
                   }
                 }
                 else
@@ -335,6 +342,9 @@ namespace gazebo
 
       /// \brief Mutex to protect reads.
       private: boost::recursive_mutex *readMutex;
+
+      /// \brief Mutex to protect socket close.
+      private: mutable boost::mutex socketMutex;
 
       /// \brief Condition used for synchronization
       private: boost::condition_variable connectCondition;
