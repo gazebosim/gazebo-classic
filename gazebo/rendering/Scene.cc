@@ -2363,6 +2363,7 @@ std::string Scene::StripSceneName(const std::string &_name) const
 //////////////////////////////////////////////////
 Heightmap *Scene::GetHeightmap() const
 {
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
   return this->terrain;
 }
 

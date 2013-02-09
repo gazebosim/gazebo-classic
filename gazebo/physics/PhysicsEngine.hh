@@ -70,7 +70,7 @@ namespace gazebo
 
       /// \brief Set the random number seed for the physics engine.
       /// \param[in] _seed The random number seed.
-      public: virtual void SetSeed(uint32_t _seed);
+      public: virtual void SetSeed(uint32_t _seed) = 0;
 
       /// \brief Set the simulation update rate.
       /// \param[in] _value Value of the update rate.

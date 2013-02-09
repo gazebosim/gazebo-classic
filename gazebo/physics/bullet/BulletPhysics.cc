@@ -19,40 +19,41 @@
  * Date: 11 June 2007
  */
 
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
 
-#include "physics/bullet/BulletPlaneShape.hh"
-#include "physics/bullet/BulletSphereShape.hh"
-#include "physics/bullet/BulletHeightmapShape.hh"
-#include "physics/bullet/BulletMultiRayShape.hh"
-#include "physics/bullet/BulletBoxShape.hh"
-#include "physics/bullet/BulletCylinderShape.hh"
-#include "physics/bullet/BulletTrimeshShape.hh"
-#include "physics/bullet/BulletRayShape.hh"
+#include "gazebo/physics/bullet/BulletPlaneShape.hh"
+#include "gazebo/physics/bullet/BulletSphereShape.hh"
+#include "gazebo/physics/bullet/BulletHeightmapShape.hh"
+#include "gazebo/physics/bullet/BulletMultiRayShape.hh"
+#include "gazebo/physics/bullet/BulletBoxShape.hh"
+#include "gazebo/physics/bullet/BulletCylinderShape.hh"
+#include "gazebo/physics/bullet/BulletTrimeshShape.hh"
+#include "gazebo/physics/bullet/BulletRayShape.hh"
 
-#include "physics/bullet/BulletHingeJoint.hh"
-#include "physics/bullet/BulletUniversalJoint.hh"
-#include "physics/bullet/BulletBallJoint.hh"
-#include "physics/bullet/BulletSliderJoint.hh"
-#include "physics/bullet/BulletHinge2Joint.hh"
-#include "physics/bullet/BulletScrewJoint.hh"
+#include "gazebo/physics/bullet/BulletHingeJoint.hh"
+#include "gazebo/physics/bullet/BulletUniversalJoint.hh"
+#include "gazebo/physics/bullet/BulletBallJoint.hh"
+#include "gazebo/physics/bullet/BulletSliderJoint.hh"
+#include "gazebo/physics/bullet/BulletHinge2Joint.hh"
+#include "gazebo/physics/bullet/BulletScrewJoint.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/PhysicsFactory.hh"
-#include "physics/World.hh"
-#include "physics/Entity.hh"
-#include "physics/Model.hh"
-#include "physics/SurfaceParams.hh"
-#include "physics/Collision.hh"
-#include "physics/MapShape.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Entity.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/MapShape.hh"
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "math/Vector3.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Rand.hh"
 
 #include "BulletPhysics.hh"
 
@@ -117,6 +118,10 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   // TODO: Enable this to do custom contact setting
   gContactAddedCallback = ContactCallback;
   gContactProcessedCallback = ContactProcessed;
+
+  // Set random seed for physics engine based on gazebo's random seed.
+  // Note: this was moved from physics::PhysicsEngine constructor.
+  this->SetSeed(math::Rand::GetSeed());
 }
 
 //////////////////////////////////////////////////
@@ -159,6 +164,10 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   // ... #Split_Impulse
   info.m_splitImpulse = 1;
   info.m_splitImpulsePenetrationThreshold = -0.02;
+
+  // Use multiple friction directions.
+  // This is important for rolling without slip (see issue #480)
+  info.m_solverMode |= SOLVER_USE_2_FRICTION_DIRECTIONS;
 
   if (bulletElem->HasElement("constraints"))
   {
@@ -457,4 +466,18 @@ void BulletPhysics::DebugPrint() const
 {
 }
 
+/////////////////////////////////////////////////
+void BulletPhysics::SetSeed(uint32_t /*_seed*/)
+{
+  // GEN_srand is defined in btRandom.h, but nothing in bullet uses it
+  // GEN_srand(_seed);
 
+  // The best bet is probably btSequentialImpulseConstraintSolver::setRandSeed,
+  // but it's not a static function.
+  // There's 2 other instances of random number generation in bullet classes:
+  //  btSoftBody.cpp:1160
+  //  btConvexHullComputer.cpp:2188
+
+  // It's going to be blank for now.
+  /// \todo Implement this function.
+}

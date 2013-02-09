@@ -22,6 +22,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Exception.hh"
 
@@ -324,6 +325,8 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
 /////////////////////////////////////////////////
 double Heightmap::GetHeight(double _x, double _y, double _z)
 {
+  GZ_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
+
   Ogre::TerrainGroup::RayResult result = this->terrainGroup->rayIntersects(
       Ogre::Ray(Ogre::Vector3(_x, _y, _z), Ogre::Vector3(0, 0, -1)));
 
