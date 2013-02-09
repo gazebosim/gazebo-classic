@@ -153,6 +153,25 @@ class ServerFixture : public testing::Test
                this->RunServer(_worldFilename, false);
              }
 
+  protected: rendering::ScenePtr GetScene(
+                 const std::string &_sceneName = "default")
+             {
+               // Wait for the scene to get loaded.
+               int i = 0;
+               while (rendering::get_scene(_sceneName) == NULL && i < 20)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+
+               if (i >= 20)
+                 gzerr << "Unable to load the rendering scene.\n"
+                   << "Test will fail";
+
+               EXPECT_LT(i, 20);
+               return rendering::get_scene(_sceneName);
+             }
+
   protected: void RunServer(const std::string &_worldFilename, bool _paused)
              {
                ASSERT_NO_THROW(this->server = new Server());
