@@ -160,9 +160,12 @@ namespace gazebo
       /// \return Pointer to the joint
       public: JointPtr GetJoint(const std::string &name);
 
+      /// \cond
+      /// This is an internal function
       /// \brief Get a link by id.
       /// \return Pointer to the link, NULL if the id is invalid.
       public: LinkPtr GetLinkById(unsigned int _id) const;
+      /// \endcond
 
       /// \brief Get a link by name.
       /// \param[in] _name Name of the link to get.

@@ -21,7 +21,39 @@ set (sources
   BulletScrewJoint.cc
   BulletRayShape.cc
   BulletMultiRayShape.cc
-  BulletHeightmapShape.cc)
+  BulletHeightmapShape.cc
+)
+
+set (headers
+  bullet_inc.h
+  bullet_math.h
+  BulletBallJoint.hh
+  BulletBoxShape.hh
+  BulletCollision.hh
+  BulletCylinderShape.hh
+  BulletHeightmapShape.hh
+  BulletHinge2Joint.hh
+  BulletHingeJoint.hh
+  BulletJoint.hh
+  BulletLink.hh
+  BulletMotionState.hh
+  BulletMultiRayShape.hh
+  BulletPhysics.hh
+  BulletPlaneShape.hh
+  BulletRaySensor.hh
+  BulletRayShape.hh
+  BulletScrewJoint.hh
+  BulletSliderJoint.hh
+  BulletSphereShape.hh
+  BulletTrimeshShape.hh
+  BulletTypes.hh
+  BulletUniversalJoint.hh
+)
+
+set (gtest_sources
+  BulletTypes_TEST.cc
+)
+gz_build_tests(${gtest_sources})
 
 gz_add_library(gazebo_physics_bullet ${sources})
 #add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)

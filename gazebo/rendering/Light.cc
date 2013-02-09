@@ -271,8 +271,7 @@ void Light::CreateVisual()
 
     this->line->setMaterial("Gazebo/LightOn");
 
-    this->line->setVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE |
-                                   GZ_VISIBILITY_GUI);
+    this->line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
     this->visual->SetVisible(true);
 

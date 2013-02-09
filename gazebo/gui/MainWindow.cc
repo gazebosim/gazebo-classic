@@ -42,8 +42,12 @@
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/model_editor/BuildingEditorPalette.hh"
+#include "gazebo/gui/model_editor/EditorEvents.hh"
 
 #include "sdf/sdf.hh"
+
+#include "gazebo_config.h"
 
 using namespace gazebo;
 using namespace gui;
@@ -75,13 +79,24 @@ MainWindow::MainWindow()
   this->modelListWidget = new ModelListWidget(this);
   InsertModelWidget *insertModel = new InsertModelWidget(this);
 
+  int minimumTabWidth = 250;
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("mainTab");
   this->tabWidget->addTab(this->modelListWidget, "World");
   this->tabWidget->addTab(insertModel, "Insert");
   this->tabWidget->setSizePolicy(QSizePolicy::Expanding,
                                  QSizePolicy::Expanding);
-  this->tabWidget->setMinimumWidth(250);
+  this->tabWidget->setMinimumWidth(minimumTabWidth);
+
+  this->buildingEditorPalette = new BuildingEditorPalette(this);
+  this->buildingEditorTabWidget = new QTabWidget();
+  this->buildingEditorTabWidget->setObjectName("buildingEditorTab");
+  this->buildingEditorTabWidget->addTab(
+      this->buildingEditorPalette, "Building Editor");
+  this->buildingEditorTabWidget->setSizePolicy(QSizePolicy::Expanding,
+                                        QSizePolicy::Expanding);
+  this->buildingEditorTabWidget->setMinimumWidth(minimumTabWidth);
+  this->buildingEditorTabWidget->hide();
 
   this->toolsWidget = new ToolsWidget();
 
@@ -91,19 +106,25 @@ MainWindow::MainWindow()
 
   QSplitter *splitter = new QSplitter(this);
   splitter->addWidget(this->tabWidget);
+  splitter->addWidget(this->buildingEditorTabWidget);
   splitter->addWidget(this->renderWidget);
   splitter->addWidget(this->toolsWidget);
 
   QList<int> sizes;
+
+  sizes.push_back(250);
   sizes.push_back(250);
   sizes.push_back(this->width() - 250);
   sizes.push_back(0);
   splitter->setSizes(sizes);
+
   splitter->setStretchFactor(0, 0);
-  splitter->setStretchFactor(1, 2);
-  splitter->setStretchFactor(2, 0);
-  splitter->setCollapsible(1, false);
+  splitter->setStretchFactor(1, 0);
+  splitter->setStretchFactor(2, 2);
+  splitter->setStretchFactor(3, 0);
+  splitter->setCollapsible(2, false);
   splitter->setHandleWidth(10);
+
 
   centerLayout->addWidget(splitter);
   centerLayout->setContentsMargins(0, 0, 0, 0);
@@ -138,6 +159,10 @@ MainWindow::MainWindow()
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&MainWindow::OnSetSelectedEntity, this, _1, _2)));
+
+  this->connections.push_back(
+      gui::editor::Events::ConnectFinishBuildingModel(
+      boost::bind(&MainWindow::OnFinishBuilding, this)));
 
   gui::ViewFactory::RegisterAll();
 }
@@ -379,17 +404,57 @@ void MainWindow::Save()
 /////////////////////////////////////////////////
 void MainWindow::About()
 {
-  std::string helpTxt = "Gazebo is a 3D multi-robot simulator with dynamics. ";
-  helpTxt += "It is capable of simulating articulated robots in complex and ";
-  helpTxt += "realistic environments.\n\n";
+  std::string helpTxt;
 
-  helpTxt += "Web site:\t\thttp://gazebosim.org\n";
-  helpTxt += "Tutorials:\t\thttp://gazebosim.org/wiki/tutorials\n";
-  helpTxt += "User Guide:\t\thttp://gazebosim.org/user_guide\n";
-  helpTxt += "API:\t\thttp://gazebosim.org/api\n";
-  helpTxt += "SDF:\t\thttp://gazebosim.org/sdf\n";
-  helpTxt += "Messages:\t\thttp://gazebosim.org/msgs\n";
-  QMessageBox::about(this, tr("About Gazebo"), tr(helpTxt.c_str()));
+  helpTxt = "<table>"
+    "<tr><td style='padding-right:20px'>"
+    "<img src=':images/gazebo_neg_60x71.png'/></td>"
+    "<td>";
+  helpTxt += GAZEBO_VERSION_HEADER;
+  helpTxt += "</td></tr></table>";
+
+  helpTxt += "<div style='margin-left: 10px'>"
+  "<div>"
+    "<table>"
+      "<tr>"
+        "<td style='padding-right: 10px;'>Tutorials:</td>"
+        "<td><a href='http://gazebosim.org/wiki/tutorials' "
+        "style='text-decoration: none; color: #f58113'>"
+        "http://gazebosim.org/wiki/tutorials</a></td>"
+      "</tr>"
+      "<tr>"
+        "<td style='padding-right: 10px;'>User Guide:</td>"
+        "<td><a href='http://gazebosim.org/user_guide' "
+        "style='text-decoration: none; color: #f58113'>"
+        "http://gazebosim.org/user_guide</a></td>"
+      "</tr>"
+      "<tr>"
+        "<td style='padding-right: 10px;'>API:</td>"
+        "<td><a href='http://gazebosim.org/api' "
+        "style='text-decoration: none; color: #f58113'>"
+        "http://gazebosim.org/api</a></td>"
+      "</tr>"
+      "<tr>"
+        "<td style='padding-right: 10px;'>SDF:</td>"
+        "<td><a href='http://gazebosim.org/sdf' "
+        "style='text-decoration: none; color: #f58113'>"
+        "http://gazebosim.org/sdf</a></td>"
+      "</tr>"
+      "<tr>"
+        "<td style='padding-right: 10px;'>Messages:</td>"
+        "<td><a href='http://gazebosim.org/msgs' "
+        "style='text-decoration: none; color: #f58113'>"
+        "http://gazebosim.org/msgs</a></td>"
+      "</tr>"
+    "</table>"
+  "</div>";
+
+  QPixmap icon(":images/gazebo_neg_60x71.png");
+  QMessageBox aboutBox(this);
+  aboutBox.setWindowTitle("About Gazebo");
+  aboutBox.setTextFormat(Qt::RichText);
+  aboutBox.setText(QString::fromStdString(helpTxt));
+  aboutBox.exec();
 }
 
 /////////////////////////////////////////////////
@@ -447,6 +512,30 @@ void MainWindow::OnResetWorld()
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(true);
   this->worldControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnEditBuilding()
+{
+  bool isChecked = g_editBuildingAct->isChecked();
+  if (isChecked)
+  {
+    this->Pause();
+    this->renderWidget->ShowEditor(true);
+    this->tabWidget->hide();
+    this->buildingEditorTabWidget->show();
+    this->menuBar->hide();
+    this->buildingEditorMenuBar->show();
+  }
+  else
+  {
+    this->renderWidget->ShowEditor(false);
+    this->tabWidget->show();
+    this->buildingEditorTabWidget->hide();
+    this->buildingEditorMenuBar->hide();
+    this->menuBar->show();
+    this->Play();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -536,7 +625,8 @@ void MainWindow::OnFullScreen(bool _value)
   {
     this->showNormal();
     this->renderWidget->showNormal();
-    this->tabWidget->show();
+    if (!g_editBuildingAct->isChecked())
+      this->tabWidget->show();
     this->toolsWidget->show();
     this->menuBar->show();
   }
@@ -640,6 +730,30 @@ void MainWindow::Orbit()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::BuildingEditorSave()
+{
+  gui::editor::Events::saveBuildingEditor();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::BuildingEditorDiscard()
+{
+  gui::editor::Events::discardBuildingEditor();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::BuildingEditorDone()
+{
+  gui::editor::Events::doneBuildingEditor();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::BuildingEditorExit()
+{
+  gui::editor::Events::exitBuildingEditor();
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
   /*g_newAct = new QAction(tr("&New World"), this);
@@ -698,6 +812,13 @@ void MainWindow::CreateActions()
   g_resetWorldAct->setShortcut(tr("Ctrl+R"));
   g_resetWorldAct->setStatusTip(tr("Reset the world"));
   connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
+
+  g_editBuildingAct = new QAction(tr("&Building Editor"), this);
+  g_editBuildingAct->setShortcut(tr("Ctrl+B"));
+  g_editBuildingAct->setStatusTip(tr("Enter Building Editor Mode"));
+  g_editBuildingAct->setCheckable(true);
+  g_editBuildingAct->setChecked(false);
+  connect(g_editBuildingAct, SIGNAL(triggered()), this, SLOT(OnEditBuilding()));
 
   g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   g_playAct->setStatusTip(tr("Run the world"));
@@ -845,22 +966,50 @@ void MainWindow::CreateActions()
   g_orbitAct = new QAction(tr("Orbit View Control"), this);
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
+
+  g_buildingEditorSaveAct = new QAction(tr("&Save (As)"), this);
+  g_buildingEditorSaveAct->setStatusTip(tr("Save (As)"));
+  g_buildingEditorSaveAct->setShortcut(tr("Ctrl+S"));
+  g_buildingEditorSaveAct->setCheckable(false);
+  connect(g_buildingEditorSaveAct, SIGNAL(triggered()), this,
+          SLOT(BuildingEditorSave()));
+
+  g_buildingEditorDiscardAct = new QAction(tr("&Discard"), this);
+  g_buildingEditorDiscardAct->setStatusTip(tr("Discard"));
+  g_buildingEditorDiscardAct->setShortcut(tr("Ctrl+D"));
+  g_buildingEditorDiscardAct->setCheckable(false);
+  connect(g_buildingEditorDiscardAct, SIGNAL(triggered()), this,
+          SLOT(BuildingEditorDiscard()));
+
+  g_buildingEditorDoneAct = new QAction(tr("Don&e"), this);
+  g_buildingEditorDoneAct->setShortcut(tr("Ctrl+E"));
+  g_buildingEditorDoneAct->setStatusTip(tr("Done"));
+  g_buildingEditorDoneAct->setCheckable(false);
+  connect(g_buildingEditorDoneAct, SIGNAL(triggered()), this,
+          SLOT(BuildingEditorDone()));
+
+  g_buildingEditorExitAct = new QAction(tr("E&xit Building Editor"), this);
+  g_buildingEditorExitAct->setStatusTip(tr("Exit Building Editor"));
+  g_buildingEditorExitAct->setShortcut(tr("Ctrl+X"));
+  g_buildingEditorExitAct->setCheckable(false);
+  connect(g_buildingEditorExitAct, SIGNAL(triggered()), this,
+          SLOT(BuildingEditorExit()));
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateMenus()
 {
-  QHBoxLayout *menuLayout = new QHBoxLayout;
+  this->menuLayout = new QHBoxLayout;
 
   QFrame *frame = new QFrame;
   this->menuBar =  new QMenuBar;
   this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-  menuLayout->addWidget(this->menuBar);
-  menuLayout->addStretch(5);
-  menuLayout->setContentsMargins(0, 0, 0, 0);
+  this->menuLayout->addWidget(this->menuBar);
+  this->menuLayout->addStretch(5);
+  this->menuLayout->setContentsMargins(0, 0, 0, 0);
 
-  frame->setLayout(menuLayout);
+  frame->setLayout(this->menuLayout);
   frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
   this->setMenuWidget(frame);
@@ -877,6 +1026,7 @@ void MainWindow::CreateMenus()
   QMenu *editMenu = this->menuBar->addMenu(tr("&Edit"));
   editMenu->addAction(g_resetModelsAct);
   editMenu->addAction(g_resetWorldAct);
+  editMenu->addAction(g_editBuildingAct);
 
   QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
@@ -902,6 +1052,19 @@ void MainWindow::CreateMenus()
 
   QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
   helpMenu->addAction(g_aboutAct);
+
+  this->buildingEditorMenuBar = new QMenuBar;
+  this->buildingEditorMenuBar->setSizePolicy(QSizePolicy::Fixed,
+      QSizePolicy::Fixed);
+  this->menuLayout->insertWidget(0, this->buildingEditorMenuBar);
+  this->buildingEditorMenuBar->hide();
+
+  QMenu *buildingEditorFileMenu = this->buildingEditorMenuBar->addMenu(
+      tr("&File"));
+  buildingEditorFileMenu->addAction(g_buildingEditorSaveAct);
+  buildingEditorFileMenu->addAction(g_buildingEditorDiscardAct);
+  buildingEditorFileMenu->addAction(g_buildingEditorDoneAct);
+  buildingEditorFileMenu->addAction(g_buildingEditorExitAct);
 }
 
 /////////////////////////////////////////////////
@@ -1114,6 +1277,13 @@ void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void MainWindow::OnFinishBuilding()
+{
+  g_editBuildingAct->setChecked(!g_editBuildingAct->isChecked());
+  this->OnEditBuilding();
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 {
   _item->setExpanded(!_item->isExpanded());
@@ -1200,4 +1370,3 @@ QSize TreeViewDelegate::sizeHint(const QStyleOptionViewItem &_opt,
   QSize sz = QItemDelegate::sizeHint(_opt, _index) + QSize(2, 2);
   return sz;
 }
-

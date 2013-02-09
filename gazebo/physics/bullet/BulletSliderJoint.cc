@@ -35,6 +35,7 @@ BulletSliderJoint::BulletSliderJoint(btDynamicsWorld *_world, BasePtr _parent)
     : SliderJoint<BulletJoint>(_parent)
 {
   this->world = _world;
+  this->bulletSlider = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -84,22 +85,22 @@ void BulletSliderJoint::Attach(LinkPtr _one, LinkPtr _two)
   frame1.getBasis().setEulerZYX(0, M_PI*0.5, 0);
   frame2.getBasis().setEulerZYX(0, M_PI*0.5, 0);
 
-  this->btSlider = new btSliderConstraint(
+  this->bulletSlider = new btSliderConstraint(
       *bulletChildLink->GetBulletLink(),
       *bulletParentLink->GetBulletLink(),
       frame2, frame1, true);
 
-  // this->btSlider->setLowerAngLimit(0.0);
-  // this->btSlider->setUpperAngLimit(0.0);
+  // this->bulletSlider->setLowerAngLimit(0.0);
+  // this->bulletSlider->setUpperAngLimit(0.0);
 
-  double pos = this->btSlider->getLinearPos();
-  this->btSlider->setLowerLinLimit(pos);
-  this->btSlider->setUpperLinLimit(pos+0.9);
+  double pos = this->bulletSlider->getLinearPos();
+  this->bulletSlider->setLowerLinLimit(pos);
+  this->bulletSlider->setUpperLinLimit(pos+0.9);
 
-  this->constraint = this->btSlider;
+  this->constraint = this->bulletSlider;
 
   // Add the joint to the world
-  this->world->addConstraint(this->btSlider, true);
+  this->world->addConstraint(this->bulletSlider, true);
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
@@ -121,7 +122,7 @@ double BulletSliderJoint::GetVelocity(int /*_index*/) const
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetVelocity(int /*_index*/, double _angle)
 {
-  this->btSlider->setTargetLinMotorVelocity(_angle);
+  this->bulletSlider->setTargetLinMotorVelocity(_angle);
 }
 
 //////////////////////////////////////////////////
@@ -133,14 +134,14 @@ void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
 {
-  this->btSlider->setDampingDirLin(_damping);
+  this->bulletSlider->setDampingDirLin(_damping);
 }
 
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetForce(int /*_index*/, double _force)
 {
-  /*btVector3 hingeAxisLocal = this->btSlider->getAFrame().getBasis().getColumn(2); // z-axis of constraint frame
-  btVector3 hingeAxisWorld = this->btSlider->getRigidBodyA().getWorldTransform().getBasis() * hingeAxisLocal;
+  /*btVector3 hingeAxisLocal = this->bulletSlider->getAFrame().getBasis().getColumn(2); // z-axis of constraint frame
+  btVector3 hingeAxisWorld = this->bulletSlider->getRigidBodyA().getWorldTransform().getBasis() * hingeAxisLocal;
 
   btVector3 hingeTorque = _torque * hingeAxisWorld;
   */
@@ -154,38 +155,38 @@ void BulletSliderJoint::SetForce(int /*_index*/, double _force)
 void BulletSliderJoint::SetHighStop(int /*_index*/,
                                     const math::Angle &/*_angle*/)
 {
-  // this->btSlider->setUpperLinLimit(_angle.Radian());
+  // this->bulletSlider->setUpperLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetLowStop(int /*_index*/,
                                    const math::Angle &/*_angle*/)
 {
-  // this->btSlider->setLowerLinLimit(_angle.Radian());
+  // this->bulletSlider->setLowerLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletSliderJoint::GetHighStop(int /*_index*/)
 {
-  return this->btSlider->getUpperLinLimit();
+  return this->bulletSlider->getUpperLinLimit();
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletSliderJoint::GetLowStop(int /*_index*/)
 {
-  return this->btSlider->getLowerLinLimit();
+  return this->bulletSlider->getLowerLinLimit();
 }
 
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetMaxForce(int /*_index*/, double _force)
 {
-  this->btSlider->setMaxLinMotorForce(_force);
+  this->bulletSlider->setMaxLinMotorForce(_force);
 }
 
 //////////////////////////////////////////////////
 double BulletSliderJoint::GetMaxForce(int /*_index*/)
 {
-  return this->btSlider->getMaxLinMotorForce();
+  return this->bulletSlider->getMaxLinMotorForce();
 }
 
 //////////////////////////////////////////////////

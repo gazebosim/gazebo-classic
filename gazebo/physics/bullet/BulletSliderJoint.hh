@@ -94,7 +94,8 @@ namespace gazebo
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      private: btSliderConstraint *btSlider;
+      /// \brief Pointer to bullet slider constraint
+      private: btSliderConstraint *bulletSlider;
     };
 
   /// \}

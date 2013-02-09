@@ -337,6 +337,14 @@ void Mesh::Scale(double _factor)
 }
 
 //////////////////////////////////////////////////
+void Mesh::SetScale(const math::Vector3 &_factor)
+{
+  std::vector<SubMesh*>::iterator iter;
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
+    (*iter)->SetScale(_factor);
+}
+
+//////////////////////////////////////////////////
 void Mesh::GenSphericalTexCoord(const math::Vector3 &_center)
 {
   std::vector<SubMesh*>::iterator siter;
@@ -793,5 +801,17 @@ void SubMesh::Scale(double _factor)
        iter != this->vertices.end(); ++iter)
   {
     (*iter) *= _factor;
+  }
+}
+
+//////////////////////////////////////////////////
+void SubMesh::SetScale(const math::Vector3 &_factor)
+{
+  for (std::vector<math::Vector3>::iterator iter = this->vertices.begin();
+       iter != this->vertices.end(); ++iter)
+  {
+    (*iter).x *= _factor.x;
+    (*iter).y *= _factor.y;
+    (*iter).z *= _factor.z;
   }
 }

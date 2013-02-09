@@ -116,7 +116,7 @@ math::Angle ODEHinge2Joint::GetAngleImpl(int _index) const
       result = dJointGetHinge2Angle1(this->jointId);
   }
 
-  return math::Angle(0);
+  return result;
 }
 
 //////////////////////////////////////////////////
