@@ -13,13 +13,15 @@ execute_process(COMMAND pkg-config --modversion protobuf
 ########################################
 # 1. can not use BUILD_TYPE_PROFILE is defined after include this module
 # 2. TODO: TOUPPER is a hack until we fix the build system to support standard build names
-string(TOUPPER ${CMAKE_BUILD_TYPE} TMP_CMAKE_BUILD_TYPE)
-if ("${TMP_CMAKE_BUILD_TYPE}" STREQUAL "PROFILE")
-  include (${gazebo_cmake_dir}/FindGooglePerfTools.cmake)
-  if (GOOGLE_PERFTOOLS_FOUND)
-    message(STATUS "Include google-perftools")
-  else()
-    BUILD_ERROR("Need google/heap-profiler.h (libgoogle-perftools-dev) tools to compile in Profile mode")
+if (CMAKE_BUILD_TYPE)
+  string(TOUPPER ${CMAKE_BUILD_TYPE} TMP_CMAKE_BUILD_TYPE)
+  if ("${TMP_CMAKE_BUILD_TYPE}" STREQUAL "PROFILE")
+    include (${gazebo_cmake_dir}/FindGooglePerfTools.cmake)
+    if (GOOGLE_PERFTOOLS_FOUND)
+      message(STATUS "Include google-perftools")
+    else()
+      BUILD_ERROR("Need google/heap-profiler.h (libgoogle-perftools-dev) tools to compile in Profile mode")
+    endif()
   endif()
 endif()
 
