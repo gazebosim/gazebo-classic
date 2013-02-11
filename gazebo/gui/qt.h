@@ -34,5 +34,6 @@
 #include <QApplication>
 #include <qmainwindow.h>
 #include <QAction>
+#include <QtTest/QtTest>
 
 #endif

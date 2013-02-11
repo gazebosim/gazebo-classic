@@ -1994,6 +1994,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
           visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
       {
         visual->SetVisible(false);
+        visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
       }
 
       visual->ShowCOM(this->showCOMs);
@@ -2362,6 +2363,7 @@ std::string Scene::StripSceneName(const std::string &_name) const
 //////////////////////////////////////////////////
 Heightmap *Scene::GetHeightmap() const
 {
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
   return this->terrain;
 }
 
