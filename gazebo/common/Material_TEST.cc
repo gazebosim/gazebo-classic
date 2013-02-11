@@ -47,16 +47,16 @@ TEST(MaterialTest, Material)
   EXPECT_TRUE(mat.GetEmissive() == common::Color(0.1, 0.2, 0.3, 0.4));
 
   mat.SetTransparency(0.2);
-  EXPECT_NEAR(0.2, mat.GetTransparency(), 1e-6);
+  EXPECT_DOUBLE_EQ(0.2, mat.GetTransparency());
 
   mat.SetShininess(0.2);
-  EXPECT_NEAR(0.2, mat.GetShininess(), 1e-6);
+  EXPECT_DOUBLE_EQ(0.2, mat.GetShininess());
 
   mat.SetBlendFactors(.1, .5);
   double a, b;
   mat.GetBlendFactors(a, b);
-  EXPECT_NEAR(.1, a, 1e-6);
-  EXPECT_NEAR(0.5, b, 1e-6);
+  EXPECT_DOUBLE_EQ(.1, a);
+  EXPECT_DOUBLE_EQ(0.5, b);
 
   mat.SetBlendMode(common::Material::MODULATE);
   EXPECT_EQ(common::Material::MODULATE, mat.GetBlendMode());
@@ -65,7 +65,7 @@ TEST(MaterialTest, Material)
   EXPECT_EQ(common::Material::BLINN, mat.GetShadeMode());
 
   mat.SetPointSize(0.2);
-  EXPECT_NEAR(0.2, mat.GetPointSize(), 1e-6);
+  EXPECT_DOUBLE_EQ(0.2, mat.GetPointSize());
 
   mat.SetDepthWrite(false);
   EXPECT_FALSE(mat.GetDepthWrite());
