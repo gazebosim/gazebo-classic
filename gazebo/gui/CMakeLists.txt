@@ -77,6 +77,7 @@ set (headers
 
 set (tests
   DataLogger_TEST.cc
+  TimePanel_TEST.cc
 )
 
 # Generate executables for each of the QT unit tests

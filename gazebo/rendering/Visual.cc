@@ -22,6 +22,8 @@
 #include "rendering/ogre_gazebo.h"
 #include "sdf/sdf.hh"
 
+#include "msgs/msgs.hh"
+#include "common/Assert.hh"
 #include "common/Events.hh"
 #include "common/Common.hh"
 
@@ -1222,12 +1224,14 @@ void Visual::SetPosition(const math::Vector3 &_pos)
     this->staticGeom = NULL;
     // this->staticGeom->setOrigin(Ogre::Vector3(pos.x, pos.y, pos.z));
   }*/
+  GZ_ASSERT(this->sceneNode, "Visual SceneNode is NULL");
   this->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
 }
 
 //////////////////////////////////////////////////
 void Visual::SetRotation(const math::Quaternion &_rot)
 {
+  GZ_ASSERT(this->sceneNode, "Visual SceneNode is NULL");
   this->sceneNode->setOrientation(
       Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z));
 }

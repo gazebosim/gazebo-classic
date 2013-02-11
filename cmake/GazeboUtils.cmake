@@ -145,6 +145,10 @@ macro (gz_build_tests)
     string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
     add_executable(${BINARY_NAME} ${GTEST_SOURCE_file})
 
+    # This should be migrated to more fine control solution based on set_property APPEND
+    # directories. It's present on cmake 2.8.8 while precise version is 2.8.7  
+    include_directories("${PROJECT_SOURCE_DIR}/test/gtest/include")
+
     add_dependencies(${BINARY_NAME}
       gtest gtest_main
       gazebo_sdf_interface
@@ -190,10 +194,10 @@ macro (gz_build_qt_tests)
   foreach(QTEST_SOURCE_file ${ARGN})
     string(REGEX REPLACE ".cc" "" BINARY_NAME ${QTEST_SOURCE_file})
     string(REGEX REPLACE ".cc" ".hh" QTEST_HEADER_file ${QTEST_SOURCE_file})
-    QT4_WRAP_CPP(test_MOC ${QTEST_HEADER_file} TestFramework.hh)
+    QT4_WRAP_CPP(test_MOC ${QTEST_HEADER_file} QTestFixture.hh)
 
     add_executable(${BINARY_NAME}
-      ${test_MOC} ${QTEST_SOURCE_file} TestFramework.cc)
+      ${test_MOC} ${QTEST_SOURCE_file} QTestFixture.cc)
 
     add_dependencies(${BINARY_NAME}
       gazebo_gui

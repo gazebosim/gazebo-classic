@@ -538,6 +538,14 @@ void Link::SetAngularAccel(const math::Vector3 &_accel)
 }
 
 //////////////////////////////////////////////////
+math::Pose Link::GetWorldCoGPose() const
+{
+  math::Pose pose = this->GetWorldPose();
+  pose.pos += pose.rot.RotateVector(this->inertial->GetCoG());
+  return pose;
+}
+
+//////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeLinearVel() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(

@@ -153,6 +153,25 @@ class ServerFixture : public testing::Test
                this->RunServer(_worldFilename, false);
              }
 
+  protected: rendering::ScenePtr GetScene(
+                 const std::string &_sceneName = "default")
+             {
+               // Wait for the scene to get loaded.
+               int i = 0;
+               while (rendering::get_scene(_sceneName) == NULL && i < 20)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+
+               if (i >= 20)
+                 gzerr << "Unable to load the rendering scene.\n"
+                   << "Test will fail";
+
+               EXPECT_LT(i, 20);
+               return rendering::get_scene(_sceneName);
+             }
+
   protected: void RunServer(const std::string &_worldFilename, bool _paused)
              {
                ASSERT_NO_THROW(this->server = new Server());
@@ -391,11 +410,11 @@ class ServerFixture : public testing::Test
                  << "<model name ='" << _modelName << "'>"
                  << "<static>true</static>"
                  << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
                  << "<link name ='body'>"
                  << "  <sensor name ='" << _cameraName
                  << "' type ='camera'>"
@@ -417,7 +436,7 @@ class ServerFixture : public testing::Test
                  << "  </sensor>"
                  << "</link>"
                  << "</model>"
-                 << "</gazebo>";
+                 << "</sdf>";
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
@@ -436,11 +455,11 @@ class ServerFixture : public testing::Test
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
                  << "<link name ='body'>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
@@ -458,7 +477,7 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</gazebo>";
+                 << "</sdf>";
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
@@ -479,11 +498,11 @@ class ServerFixture : public testing::Test
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
                  << "<link name ='body'>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
@@ -497,7 +516,49 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</gazebo>";
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               // Wait for the entity to spawn
+               while (_wait && !this->HasEntity(_name))
+                 common::Time::MSleep(10);
+             }
+
+  protected: void SpawnSphere(const std::string &_name,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const math::Vector3 &_cog, double _radius,
+                 bool _wait = true)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<pose>" << _pos.x << " "
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <inertial>"
+                 << "    <pose>" << _cog << " 0 0 0</pose>"
+                 << "  </inertial>"
+                 << "  <collision name ='geom'>"
+                 << "    <geometry>"
+                 << "      <sphere><radius>" << _radius << "</radius></sphere>"
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << "      <sphere><radius>" << _radius << "</radius></sphere>"
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
@@ -517,11 +578,11 @@ class ServerFixture : public testing::Test
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
                  << "<link name ='body'>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
@@ -535,7 +596,35 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</gazebo>";
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name))
+                 common::Time::MSleep(10);
+             }
+
+  protected: void SpawnEmptyLink(const std::string &_name,
+                 const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<pose>" << _pos.x << " "
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
+                 << "<link name ='body'>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);

@@ -15,6 +15,7 @@
  *
  */
 #include "common/Color.hh"
+#include "common/Assert.hh"
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
@@ -1045,6 +1046,39 @@ gazebo::common::Time Element::GetValueTime(const std::string &_key)
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
   return result;
+}
+
+/////////////////////////////////////////////////
+void Element::RemoveFromParent()
+{
+  if (this->parent)
+  {
+    ElementPtr_V::iterator iter;
+    iter = std::find(this->parent->elements.begin(),
+        this->parent->elements.end(), shared_from_this());
+
+    if (iter != this->parent->elements.end())
+    {
+      this->parent->elements.erase(iter);
+      this->parent.reset();
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void Element::RemoveChild(ElementPtr _child)
+{
+  GZ_ASSERT(_child, "Cannot remove a NULL child pointer");
+
+  ElementPtr_V::iterator iter;
+  iter = std::find(this->elements.begin(),
+                   this->elements.end(), _child);
+
+  if (iter != this->elements.end())
+  {
+    _child->SetParent(ElementPtr());
+    this->elements.erase(iter);
+  }
 }
 
 /////////////////////////////////////////////////
