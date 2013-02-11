@@ -31,7 +31,7 @@ JointTrajectoryPlugin::JointTrajectoryPlugin()
 /////////////////////////////////////////////////
 JointTrajectoryPlugin::~JointTrajectoryPlugin()
 {
-  event::Events::DisconnectWorldUpdateStart(this->updateConnection);
+  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
 }
 
 /////////////////////////////////////////////////
@@ -51,8 +51,8 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
   // New Mechanism for Updating every World Cycle
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
-  this->updateConnection = event::Events::ConnectWorldUpdateStart(
-      boost::bind(&JointTrajectoryPlugin::UpdateStates, this));
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&JointTrajectoryPlugin::UpdateStates, this, _1));
 }
 
 /////////////////////////////////////////////////
@@ -79,7 +79,7 @@ void JointTrajectoryPlugin::UnfixLink()
 }
 
 /////////////////////////////////////////////////
-void JointTrajectoryPlugin::UpdateStates()
+void JointTrajectoryPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
 {
   common::Time cur_time = this->world->GetSimTime();
 

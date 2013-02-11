@@ -27,6 +27,7 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 
 set (gtest_sources
+  bandwidth.cc
   camera_sensor.cc
   factory.cc
   file_handling.cc

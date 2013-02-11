@@ -30,6 +30,8 @@ EventT<void (std::string)> Events::addEntity;
 EventT<void (std::string)> Events::deleteEntity;
 
 EventT<void ()> Events::worldUpdateStart;
+EventT<void (const common::UpdateInfo &)> Events::worldUpdateBegin;
+
 EventT<void ()> Events::worldUpdateEnd;
 
 EventT<void ()> Events::preRender;
@@ -38,3 +40,15 @@ EventT<void ()> Events::postRender;
 
 EventT<void (std::string)> Events::diagTimerStart;
 EventT<void (std::string)> Events::diagTimerStop;
+
+/////////////////////////////////////////////////
+void Events::DisconnectWorldUpdateStart(ConnectionPtr _subscriber)
+{
+  worldUpdateStart.Disconnect(_subscriber);
+}
+
+/////////////////////////////////////////////////
+void Events::DisconnectWorldUpdateBegin(ConnectionPtr _subscriber)
+{
+  worldUpdateBegin.Disconnect(_subscriber);
+}
