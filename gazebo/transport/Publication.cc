@@ -40,13 +40,20 @@ Publication::~Publication()
 //////////////////////////////////////////////////
 void Publication::AddSubscription(const NodePtr &_node)
 {
-  boost::mutex::scoped_lock lock(this->nodeMutex);
+  std::list<NodePtr>::iterator iter, endIter;
 
-  std::list<NodePtr>::iterator iter;
-  iter = std::find(this->nodes.begin(), this->nodes.end(), _node);
-  if (iter == this->nodes.end())
   {
-    this->nodes.push_back(_node);
+    boost::mutex::scoped_lock lock(this->nodeMutex);
+    endIter = this->nodes.end();
+    iter = std::find(this->nodes.begin(), this->nodes.end(), _node);
+  }
+
+  if (iter == endIter)
+  {
+    {
+      boost::mutex::scoped_lock lock(this->nodeMutex);
+      this->nodes.push_back(_node);
+    }
 
     std::vector<PublisherPtr>::iterator pubIter;
     for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
@@ -146,7 +153,14 @@ void Publication::RemoveTransport(const std::string &host_, unsigned int port_)
 //////////////////////////////////////////////////
 void Publication::RemoveSubscription(const NodePtr &_node)
 {
-  boost::mutex::scoped_lock lock(this->nodeMutex);
+  boost::mutex::scoped_try_lock lock(this->nodeMutex);
+  if (!lock)
+  {
+    boost::mutex::scoped_lock removeLock(this->nodeRemoveMutex);
+    this->removeNodes.push_back(_node->GetId());
+    return;
+  }
+
   std::list<NodePtr>::iterator iter;
 
   for (iter = this->nodes.begin(); iter != this->nodes.end(); ++iter)
@@ -196,18 +210,26 @@ void Publication::RemoveSubscription(const std::string &_host,
 //////////////////////////////////////////////////
 void Publication::LocalPublish(const std::string &data)
 {
-  boost::mutex::scoped_lock lock(this->nodeMutex);
+  std::list<NodePtr>::iterator iter, endIter;
 
-  std::list<NodePtr>::iterator iter;
-  iter = this->nodes.begin();
-
-  while (iter != this->nodes.end())
   {
-    if ((*iter)->HandleData(this->topic, data))
-      ++iter;
-    else
-      iter = this->nodes.erase(iter);
+    boost::mutex::scoped_lock lock(this->nodeMutex);
+
+    iter = this->nodes.begin();
+    endIter = this->nodes.end();
+    while (iter != endIter)
+    {
+      if ((*iter)->HandleData(this->topic, data))
+        ++iter;
+      else
+        this->nodes.erase(iter++);
+    }
   }
+
+  // It's possible that the function pointed to by "HandleData" (above) will in
+  // turn call Publication::RemoveSubscription. The following function call
+  // will clean up the nodes that have then been marked for removal
+  this->RemoveNodes();
 
   std::list< CallbackHelperPtr >::iterator cbIter;
   cbIter = this->callbacks.begin();
@@ -232,18 +254,26 @@ void Publication::Publish(const google::protobuf::Message &_msg,
   std::string data;
   _msg.SerializeToString(&data);
 
-  std::list<NodePtr>::iterator iter;
+  std::list<NodePtr>::iterator iter, endIter;
 
-  boost::mutex::scoped_lock lock(this->nodeMutex);
-
-  iter = this->nodes.begin();
-  while (iter != this->nodes.end())
   {
-    if ((*iter)->HandleData(this->topic, data))
-      ++iter;
-    else
-      this->nodes.erase(iter++);
+    boost::mutex::scoped_lock lock(this->nodeMutex);
+
+    iter = this->nodes.begin();
+    endIter = this->nodes.end();
+    while (iter != endIter)
+    {
+      if ((*iter)->HandleData(this->topic, data))
+        ++iter;
+      else
+        this->nodes.erase(iter++);
+    }
   }
+
+  // It's possible that the function pointed to by "HandleData" (above) will in
+  // turn call Publication::RemoveSubscription. The following function call
+  // will clean up the nodes that have then been marked for removal
+  this->RemoveNodes();
 
   std::list<CallbackHelperPtr>::iterator cbIter;
   cbIter = this->callbacks.begin();
@@ -316,4 +346,35 @@ void Publication::SetLocallyAdvertised(bool _value)
 void Publication::AddPublisher(PublisherPtr _pub)
 {
   this->publishers.push_back(_pub);
+}
+
+//////////////////////////////////////////////////
+void Publication::RemoveNodes()
+{
+  boost::mutex::scoped_lock lock(this->nodeMutex);
+  boost::mutex::scoped_lock removeLock(this->nodeRemoveMutex);
+
+  std::list<NodePtr>::iterator nodeIter;
+
+  for (std::list<unsigned int>::iterator iter = this->removeNodes.begin();
+       iter != this->removeNodes.end(); ++iter)
+  {
+    for (nodeIter = this->nodes.begin(); nodeIter != this->nodes.end();
+         ++nodeIter)
+    {
+      if ((*nodeIter)->GetId() == (*iter))
+      {
+        this->nodes.erase(nodeIter);
+        break;
+      }
+    }
+  }
+
+  this->removeNodes.clear();
+
+  // If no more subscribers, then disconnect from all publishers
+  if (this->nodes.size() == 0 && this->callbacks.size() == 0)
+  {
+    this->transports.clear();
+  }
 }

@@ -129,6 +129,9 @@ namespace gazebo
       /// \param[in,out] _pub Pointer to publisher object to be added
       public: void AddPublisher(PublisherPtr _pub);
 
+      /// \brief Remove nodes that have been marked for removal
+      private: void RemoveNodes();
+
       /// \brief Unique if of the publication.
       private: unsigned int id;
 
@@ -141,11 +144,14 @@ namespace gazebo
       /// \brief Type of message produced through the publication
       private: std::string msgType;
 
-      /// \brief Remove nodes that receieve messages
+      /// \brief Remove nodes that receieve messages.
       private: std::list<CallbackHelperPtr> callbacks;
 
-      /// \brief Local nodes that recieve messages
+      /// \brief Local nodes that recieve messages.
       private: std::list<NodePtr> nodes;
+
+      /// \brief ID of nodes to remove from nodes list.
+      private: std::list<unsigned int> removeNodes;
 
       /// \brief List of transport mechanisms.
       private: std::list<PublicationTransportPtr> transports;
@@ -156,8 +162,12 @@ namespace gazebo
       /// \brief True if the publication is advertised in the same process.
       private: bool locallyAdvertised;
 
-      /// \brief Mutex to protect the list of nodex.
+      /// \brief Mutex to protect the list of nodes.
       private: mutable boost::mutex nodeMutex;
+
+      /// \brief Mutex to protect the list of nodes id for removed.
+      private: mutable boost::mutex nodeRemoveMutex;
+
     };
     /// \}
   }

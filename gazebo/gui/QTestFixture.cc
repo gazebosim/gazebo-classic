@@ -38,11 +38,13 @@ void QTestFixture::initTestCase()
 
   path = TEST_PATH;
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+
 }
 
 /////////////////////////////////////////////////
 void QTestFixture::init()
 {
+  this->GetMemInfo(this->residentStart, this->shareStart);
 }
 
 /////////////////////////////////////////////////
@@ -90,6 +92,18 @@ void QTestFixture::SetPause(bool _pause)
 /////////////////////////////////////////////////
 void QTestFixture::cleanup()
 {
+  double residentEnd, shareEnd;
+  this->GetMemInfo(residentEnd, shareEnd);
+
+  // Calculate the percent change from the initial resident and shared
+  // memory
+  double resPercentChange = (residentEnd - residentStart) / residentStart;
+  double sharePercentChange = (shareEnd - shareStart) / shareStart;
+
+  // Make sure the percent change values are reasonable.
+  QVERIFY(resPercentChange < 2.0);
+  QVERIFY(sharePercentChange < 1.0);
+
   if (this->server)
   {
     this->server->Stop();
@@ -107,4 +121,23 @@ void QTestFixture::cleanup()
 /////////////////////////////////////////////////
 void QTestFixture::cleanupTestCase()
 {
+}
+
+/////////////////////////////////////////////////
+void QTestFixture::GetMemInfo(double &_resident, double &_share)
+{
+  int totalSize, residentPages, sharePages;
+  totalSize = residentPages = sharePages = 0;
+
+  std::ifstream buffer("/proc/self/statm");
+  buffer >> totalSize >> residentPages >> sharePages;
+  buffer.close();
+
+  // in case x86-64 is configured to use 2MB pages
+  long pageSizeKb = sysconf(_SC_PAGE_SIZE) / 1024;
+  _resident = residentPages * pageSizeKb;
+  std::cout << "Resident - " << _resident << " kB\n";
+
+  _share = sharePages * pageSizeKb;
+  std::cout << "Shared Memory - " << _share << " kB\n";
 }

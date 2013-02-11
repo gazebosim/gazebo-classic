@@ -121,9 +121,11 @@ namespace gazebo
         std::string decodedTopic = this->DecodeTopicName(_topic);
         ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
 
-        boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-        this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
-              new CallbackHelperT<M>(boost::bind(_fp, _obj, _1), _latching)));
+        {
+          boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+          this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
+                new CallbackHelperT<M>(boost::bind(_fp, _obj, _1), _latching)));
+        }
 
         SubscriberPtr result =
           transport::TopicManager::Instance()->Subscribe(ops);
@@ -148,9 +150,11 @@ namespace gazebo
         std::string decodedTopic = this->DecodeTopicName(_topic);
         ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
 
-        boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-        this->callbacks[decodedTopic].push_back(
-            CallbackHelperPtr(new CallbackHelperT<M>(_fp, _latching)));
+        {
+          boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+          this->callbacks[decodedTopic].push_back(
+              CallbackHelperPtr(new CallbackHelperT<M>(_fp, _latching)));
+        }
 
         SubscriberPtr result =
           transport::TopicManager::Instance()->Subscribe(ops);
@@ -176,9 +180,11 @@ namespace gazebo
         std::string decodedTopic = this->DecodeTopicName(_topic);
         ops.Init(decodedTopic, shared_from_this(), _latching);
 
-        boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-        this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
-              new RawCallbackHelper(boost::bind(_fp, _obj, _1))));
+        {
+          boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+          this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
+                new RawCallbackHelper(boost::bind(_fp, _obj, _1))));
+        }
 
         SubscriberPtr result =
           transport::TopicManager::Instance()->Subscribe(ops);
@@ -202,9 +208,11 @@ namespace gazebo
         std::string decodedTopic = this->DecodeTopicName(_topic);
         ops.Init(decodedTopic, shared_from_this(), _latching);
 
-        boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-        this->callbacks[decodedTopic].push_back(
-            CallbackHelperPtr(new RawCallbackHelper(_fp)));
+        {
+          boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+          this->callbacks[decodedTopic].push_back(
+              CallbackHelperPtr(new RawCallbackHelper(_fp)));
+        }
 
         SubscriberPtr result =
           transport::TopicManager::Instance()->Subscribe(ops);

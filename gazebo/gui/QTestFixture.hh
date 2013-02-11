@@ -43,6 +43,11 @@ class QTestFixture : public QObject
   /// \param[in] _pause True to pause the world
   protected: void SetPause(bool _pause);
 
+  /// \brief Get memory information about the current process.
+  /// \param[out] _resident Resident size, in Kb.
+  /// \param[out] _share Shared memory, in Kb.
+  protected: void GetMemInfo(double &_resident, double &_share);
+
   /// \brief QT slot that is called automatically when the whole test case
   /// begins
   private slots: void initTestCase();
@@ -64,6 +69,9 @@ class QTestFixture : public QObject
 
   /// \brief Thread to run the Gazebo server.
   protected: boost::thread *serverThread;
+
+  private: double residentStart;
+  private: double shareStart;
 };
 
 #endif
