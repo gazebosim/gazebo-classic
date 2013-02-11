@@ -102,7 +102,21 @@ namespace gazebo
       public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
 
       // Documentation inherited
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      public: virtual math::Vector3 GetWorldLinearVel(
+          const math::Vector3 &_offset = math::Vector3(0, 0, 0)) const
+      {
+        return math::Vector3();
+      };
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldLinearVel(
+                  const math::Pose &_pose) const
+      {
+        return math::Vector3();
+      };
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldCoGLinearVel() const;
 
       // Documentation inherited
       public: virtual math::Vector3 GetWorldAngularVel() const;
@@ -117,7 +131,7 @@ namespace gazebo
       public: virtual void SetGravityMode(bool _mode);
 
       // Documentation inherited
-      public: virtual bool GetGravityMode();
+      public: virtual bool GetGravityMode() const;
 
       // Documentation inherited
       public: void SetSelfCollide(bool _collide);

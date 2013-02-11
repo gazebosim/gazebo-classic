@@ -288,7 +288,7 @@ void RTQL8Link::AddRelativeTorque(const math::Vector3 & /*_torque*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 RTQL8Link::GetWorldLinearVel() const
+math::Vector3 RTQL8Link::GetWorldCoGLinearVel() const
 {
   math::Vector3 vel;
 
@@ -368,7 +368,7 @@ void RTQL8Link::SetGravityMode(bool _mode)
 }
 
 //////////////////////////////////////////////////
-bool RTQL8Link::GetGravityMode()
+bool RTQL8Link::GetGravityMode() const
 {
   int mode = 0;
 //   if (this->linkId)

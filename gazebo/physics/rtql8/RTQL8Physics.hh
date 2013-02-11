@@ -87,6 +87,11 @@ namespace gazebo
                                                    LinkPtr _body);
 
       /// \brief Create a new joint
+      public: virtual void SetSeed(uint32_t _seed)
+      {
+      };
+
+      /// \brief Create a new joint
       public: virtual JointPtr CreateJoint(const std::string& _type,
                                            ModelPtr _parent);
       
