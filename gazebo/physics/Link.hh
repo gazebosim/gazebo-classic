@@ -196,10 +196,10 @@ namespace gazebo
 
       /// \brief Get the linear velocity of a point on the body in the world
       ///        frame, using an offset expressed in an arbitrary frame.
+      /// \param[in] _offset Offset from the origin of the link frame expressed
+      ///                    in a frame defined by _q.
       /// \param[in] _q Describes the rotation of a reference frame relative to
       ///               the world reference frame.
-      /// \param[in] _offset Offset from the origin of the link frame expressed
-      ///                    frame defined by _q.
       /// \return Linear velocity of the point on the body in the world frame.
       public: virtual math::Vector3 GetWorldLinearVel(
                   const math::Vector3 &_offset,
