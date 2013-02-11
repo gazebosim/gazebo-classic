@@ -24,6 +24,7 @@
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/Server.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/qt_test.h"
 
 #include "gazebo_config.h"
 #include "test_config.h"
@@ -33,14 +34,30 @@ class QTestFixture : public QObject
 {
   Q_OBJECT
 
-  /// \brief QT slot that is called automatically when a test begins
+  /// \brief Load a world.
+  /// \param[in] _worldFilename Name of the world to load.
+  /// \param[in] _paused True to start the world paused.
+  protected: void Load(const std::string &_worldFilename, bool _paused=false);
+
+  /// \brief Pause or unpause the world.
+  /// \param[in] _pause True to pause the world
+  protected: void SetPause(bool _pause);
+
+  /// \brief QT slot that is called automatically when the whole test case
+  /// begins
   private slots: void initTestCase();
 
-  /// \brief QT slot that is called automatically when a test ends
+  /// \brief QT slot that is called automatically when each test begins
+  private slots: void init();
+
+  /// \brief QT slot that is called automatically when each test ends
+  private slots: void cleanup();
+
+  /// \brief QT slot that is called automatically when the whole test case ends
   private slots: void cleanupTestCase();
 
   /// \brief Run the Gazebo server in a thread.
-  private: void RunServer();
+  private: void RunServer(const std::string _worldFilename, bool _paused);
 
   /// \brief The Gazebo server, which is run in a thread.
   protected: gazebo::Server *server;

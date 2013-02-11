@@ -46,6 +46,7 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   this->topicCombo = new TopicCombo(this, this->msgTypeName,
       _viewType, this->node);
   this->topicCombo->setMinimumSize(300, 25);
+  this->topicCombo->setObjectName("topicViewTopicCombo");
 
   topicLayout->addSpacing(10);
   topicLayout->addWidget(topicLabel);

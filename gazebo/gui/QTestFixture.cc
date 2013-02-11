@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/physics/Physics.hh"
+
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/gazebo.hh"
@@ -27,9 +29,6 @@ void QTestFixture::initTestCase()
   // errors.
   gazebo::common::Console::Instance()->Init("test.log");
 
-  // Initialize the data logger. This will log state information.
-  gazebo::common::LogRecord::Instance()->Init("test");
-
   // Add local search paths
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(PROJECT_SOURCE_PATH);
 
@@ -37,9 +36,21 @@ void QTestFixture::initTestCase()
   path += "/sdf/worlds";
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
+  path = TEST_PATH;
+  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+}
+
+/////////////////////////////////////////////////
+void QTestFixture::init()
+{
+}
+
+/////////////////////////////////////////////////
+void QTestFixture::Load(const std::string &_worldFilename, bool _paused)
+{
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
-      boost::bind(&QTestFixture::RunServer, this));
+      boost::bind(&QTestFixture::RunServer, this, _worldFilename, _paused));
 
   // Wait for the server to come up
   // Use a 30 second timeout.
@@ -50,16 +61,16 @@ void QTestFixture::initTestCase()
 }
 
 /////////////////////////////////////////////////
-void QTestFixture::RunServer()
+void QTestFixture::RunServer(const std::string _worldFilename, bool _paused)
 {
   this->server = new gazebo::Server();
-  this->server->LoadFile("empty.world");
+  this->server->LoadFile(_worldFilename);
   this->server->Init();
 
   gazebo::rendering::create_scene(
       gazebo::physics::get_world()->GetName(), false);
 
-  // this->SetPause(false);
+  this->SetPause(_paused);
 
   this->server->Run();
 
@@ -71,7 +82,13 @@ void QTestFixture::RunServer()
 }
 
 /////////////////////////////////////////////////
-void QTestFixture::cleanupTestCase()
+void QTestFixture::SetPause(bool _pause)
+{
+  gazebo::physics::pause_worlds(_pause);
+}
+
+/////////////////////////////////////////////////
+void QTestFixture::cleanup()
 {
   if (this->server)
   {
@@ -85,4 +102,9 @@ void QTestFixture::cleanupTestCase()
 
   delete this->serverThread;
   this->serverThread = NULL;
+}
+
+/////////////////////////////////////////////////
+void QTestFixture::cleanupTestCase()
+{
 }

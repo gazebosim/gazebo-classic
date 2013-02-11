@@ -40,6 +40,8 @@ Publication::~Publication()
 //////////////////////////////////////////////////
 void Publication::AddSubscription(const NodePtr &_node)
 {
+  boost::mutex::scoped_lock lock(this->nodeMutex);
+
   std::list<NodePtr>::iterator iter;
   iter = std::find(this->nodes.begin(), this->nodes.end(), _node);
   if (iter == this->nodes.end())
@@ -144,6 +146,7 @@ void Publication::RemoveTransport(const std::string &host_, unsigned int port_)
 //////////////////////////////////////////////////
 void Publication::RemoveSubscription(const NodePtr &_node)
 {
+  boost::mutex::scoped_lock lock(this->nodeMutex);
   std::list<NodePtr>::iterator iter;
 
   for (iter = this->nodes.begin(); iter != this->nodes.end(); ++iter)
@@ -193,6 +196,8 @@ void Publication::RemoveSubscription(const std::string &_host,
 //////////////////////////////////////////////////
 void Publication::LocalPublish(const std::string &data)
 {
+  boost::mutex::scoped_lock lock(this->nodeMutex);
+
   std::list<NodePtr>::iterator iter;
   iter = this->nodes.begin();
 
@@ -228,6 +233,9 @@ void Publication::Publish(const google::protobuf::Message &_msg,
   _msg.SerializeToString(&data);
 
   std::list<NodePtr>::iterator iter;
+
+  boost::mutex::scoped_lock lock(this->nodeMutex);
+
   iter = this->nodes.begin();
   while (iter != this->nodes.end())
   {
@@ -273,6 +281,7 @@ unsigned int Publication::GetCallbackCount() const
 //////////////////////////////////////////////////
 unsigned int Publication::GetNodeCount() const
 {
+  boost::mutex::scoped_lock lock(this->nodeMutex);
   return this->nodes.size();
 }
 

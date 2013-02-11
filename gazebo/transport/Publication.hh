@@ -19,6 +19,7 @@
 #define _PUBLICATION_HH_
 
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 #include <list>
 #include <string>
 #include <vector>
@@ -128,9 +129,16 @@ namespace gazebo
       /// \param[in,out] _pub Pointer to publisher object to be added
       public: void AddPublisher(PublisherPtr _pub);
 
+      /// \brief Unique if of the publication.
       private: unsigned int id;
+
+      /// \brief Counter to produce unique IDs
       private: static unsigned int idCounter;
+
+      /// \brief Name of the topic messages are output on.
       private: std::string topic;
+
+      /// \brief Type of message produced through the publication
       private: std::string msgType;
 
       /// \brief Remove nodes that receieve messages
@@ -139,11 +147,17 @@ namespace gazebo
       /// \brief Local nodes that recieve messages
       private: std::list<NodePtr> nodes;
 
+      /// \brief List of transport mechanisms.
       private: std::list<PublicationTransportPtr> transports;
 
+      /// \brief List of publishers.
       private: std::vector<PublisherPtr> publishers;
 
+      /// \brief True if the publication is advertised in the same process.
       private: bool locallyAdvertised;
+
+      /// \brief Mutex to protect the list of nodex.
+      private: mutable boost::mutex nodeMutex;
     };
     /// \}
   }
