@@ -139,37 +139,37 @@ TEST(MeshTest, Mesh)
   mesh->FillArrays(&vertArray, &indArray);
 
   int i = 0;
-  EXPECT_EQ(.5, vertArray[i++]);
-  EXPECT_EQ(-.5, vertArray[i++]);
-  EXPECT_EQ(.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(.5, vertArray[i++]);
 
-  EXPECT_EQ(-.5, vertArray[i++]);
-  EXPECT_EQ(-.5, vertArray[i++]);
-  EXPECT_EQ(.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(.5, vertArray[i++]);
 
-  EXPECT_EQ(-.5, vertArray[i++]);
-  EXPECT_EQ(-.5, vertArray[i++]);
-  EXPECT_EQ(-.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
 
-  EXPECT_EQ(.5, vertArray[i++]);
-  EXPECT_EQ(-.5, vertArray[i++]);
-  EXPECT_EQ(-.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
 
-  EXPECT_EQ(-.5, vertArray[i++]);
-  EXPECT_EQ(.5, vertArray[i++]);
-  EXPECT_EQ(.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(.5, vertArray[i++]);
 
-  EXPECT_EQ(.5, vertArray[i++]);
-  EXPECT_EQ(.5, vertArray[i++]);
-  EXPECT_EQ(.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(.5, vertArray[i++]);
 
-  EXPECT_EQ(.5, vertArray[i++]);
-  EXPECT_EQ(.5, vertArray[i++]);
-  EXPECT_EQ(-.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
 
-  EXPECT_EQ(-.5, vertArray[i++]);
-  EXPECT_EQ(.5, vertArray[i++]);
-  EXPECT_EQ(-.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(.5, vertArray[i++]);
+  EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
 
   common::Mesh *newMesh = new common::Mesh();
   newMesh->SetName("testBox");
