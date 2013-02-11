@@ -88,6 +88,8 @@ bool Server::ParseArgs(int argc, char **argv)
   v_desc.add_options()
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
+    ("physics,e", po::value<std::string>(),
+     "Specify a physics engine (ode|bullet).")
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data to disk.")
     ("seed",  po::value<double>(),
@@ -202,7 +204,13 @@ bool Server::ParseArgs(int argc, char **argv)
       configFilename = this->vm["world_file"].as<std::string>();
 
     // Load the server
-    if (!this->LoadFile(configFilename))
+    if (this->vm.count("physics"))
+    {
+      std::string physics = this->vm["physics"].as<std::string>();
+      if (!this->LoadFile(configFilename, physics))
+        return false;
+    }
+    else if (!this->LoadFile(configFilename))
       return false;
   }
 
@@ -221,6 +229,43 @@ bool Server::GetInitialized() const
 /////////////////////////////////////////////////
 bool Server::LoadFile(const std::string &_filename)
 {
+  sdf::SDFPtr sdf;
+  // Try loading file into sdf object
+  if (!this->LoadFile(_filename, sdf))
+    return false;
+
+  // Try loading it further
+  return this->LoadImpl(sdf->root);
+}
+
+/////////////////////////////////////////////////
+bool Server::LoadFile(const std::string &_filename,
+                      const std::string &_physics)
+{
+  sdf::SDFPtr sdf;
+  // Try loading file into sdf object
+  if (!this->LoadFile(_filename, sdf))
+    return false;
+
+  // Try inserting physics engine name
+  if (sdf->root->HasElement("world") &&
+      sdf->root->GetElement("world")->HasElement("physics"))
+  {
+    sdf->root->GetElement("world")->GetElement("physics")
+             ->GetAttribute("type")->Set(_physics);
+  }
+  else
+  {
+    gzerr << "Unable to set physics engine: <world> does not have <physics>\n";
+  }
+
+  // Try loading it further
+  return this->LoadImpl(sdf->root);
+}
+
+/////////////////////////////////////////////////
+bool Server::LoadFile(const std::string &_filename, sdf::SDFPtr &_sdf)
+{
   // Quick test for a valid file
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
   if (!test)
@@ -231,20 +276,20 @@ bool Server::LoadFile(const std::string &_filename)
   fclose(test);
 
   // Load the world file
-  sdf::SDFPtr sdf(new sdf::SDF);
-  if (!sdf::init(sdf))
+  _sdf.reset(new sdf::SDF);
+  if (!sdf::init(_sdf))
   {
     gzerr << "Unable to initialize sdf\n";
     return false;
   }
 
-  if (!sdf::readFile(_filename, sdf))
+  if (!sdf::readFile(_filename, _sdf))
   {
     gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
   }
 
-  return this->LoadImpl(sdf->root);
+  return true;
 }
 
 /////////////////////////////////////////////////
