@@ -274,9 +274,12 @@ ModelState ModelState::operator-(const ModelState &_state) const
   {
     try
     {
-      LinkState state = (*iter) - _state.GetLinkState((*iter).GetName());
-      if (!state.IsZero())
-        result.linkStates.push_back(state);
+      if (_state.HasLinkState((*iter).GetName()))
+      {
+        LinkState state = (*iter) - _state.GetLinkState((*iter).GetName());
+        if (!state.IsZero())
+          result.linkStates.push_back(state);
+      }
     }
     catch(common::Exception &)
     {
@@ -291,9 +294,12 @@ ModelState ModelState::operator-(const ModelState &_state) const
   {
     try
     {
-      JointState state = (*iter) - _state.GetJointState((*iter).GetName());
-      if (!state.IsZero())
-        result.jointStates.push_back(state);
+      if (_state.HasJointState((*iter).GetName()))
+      {
+        JointState state = (*iter) - _state.GetJointState((*iter).GetName());
+        if (!state.IsZero())
+          result.jointStates.push_back(state);
+      }
     }
     catch(common::Exception &)
     {
@@ -320,8 +326,11 @@ ModelState ModelState::operator+(const ModelState &_state) const
   {
     try
     {
-      LinkState state = (*iter) + _state.GetLinkState((*iter).GetName());
-      result.linkStates.push_back(state);
+      if (_state.HasLinkState((*iter).GetName()))
+      {
+        LinkState state = (*iter) + _state.GetLinkState((*iter).GetName());
+        result.linkStates.push_back(state);
+      }
     }
     catch(common::Exception &)
     {
@@ -336,8 +345,11 @@ ModelState ModelState::operator+(const ModelState &_state) const
   {
     try
     {
-      JointState state = (*iter) + _state.GetJointState((*iter).GetName());
-      result.jointStates.push_back(state);
+      if (_state.HasJointState((*iter).GetName()))
+      {
+        JointState state = (*iter) + _state.GetJointState((*iter).GetName());
+        result.jointStates.push_back(state);
+      }
     }
     catch(common::Exception &)
     {

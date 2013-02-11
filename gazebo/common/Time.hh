@@ -22,6 +22,7 @@
 #ifndef _TIME_HH_
 #define _TIME_HH_
 
+#include <string>
 #include <stdlib.h>
 #include <time.h>
 #include <iostream>
@@ -68,6 +69,10 @@ namespace gazebo
       /// \brief Get the wall time
       /// \return the current time
       public: static const Time &GetWallTime();
+
+      /// \brief Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS
+      /// \return The current wall time as an ISO string.
+      public: static const std::string &GetWallTimeAsISOString();
 
       /// \brief Set the time to the wall time
       public: void SetToWallTime();
@@ -406,6 +411,9 @@ namespace gazebo
 
       /// \brief a singleton value of the last GetWallTime() value
       private: static Time wallTime;
+
+      /// \brief Wall time as an ISO string.
+      private: static std::string wallTimeISO;
 
       /// \brief Correct the time so that small additions/substractions
       /// preserve the internal seconds and nanoseconds separation

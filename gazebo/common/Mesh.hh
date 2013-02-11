@@ -148,6 +148,10 @@ namespace gazebo
       /// \param _factor Scaling factor
       public: void Scale(double _factor);
 
+      /// \brief Scale all vertices by the _factor vector
+      /// \param[in] _factor Scaling vector
+      public: void SetScale(const math::Vector3 &_factor);
+
       /// \brief The name of the mesh
       private: std::string name;
 
@@ -359,6 +363,10 @@ namespace gazebo
       /// \brief Scale all vertices by _factor
       /// \param[in] _factor Scaling factor
       public: void Scale(double _factor);
+
+      /// \brief Scale all vertices by the _factor vector
+      /// \param[in] _factor Scaling vector
+      public: void SetScale(const math::Vector3 &_factor);
 
       /// \brief the vertex array
       private: std::vector< math::Vector3 > vertices;

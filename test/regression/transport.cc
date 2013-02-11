@@ -25,24 +25,10 @@ class TransportTest : public ServerFixture
 {
 };
 
-TEST_F(TransportTest, Load)
-{
-  for (unsigned int i = 0; i < 2; i++)
-  {
-    Load("worlds/empty.world");
-    Unload();
-  }
-}
-
 bool g_worldStatsMsg2 = false;
 bool g_sceneMsg = false;
 bool g_worldStatsMsg = false;
 bool g_worldStatsDebugMsg = false;
-
-std::vector<int> g_bwBytes;
-std::vector<common::Time> g_bwTime;
-
-boost::mutex g_mutex;
 
 void ReceiveStringMsg(ConstGzStringPtr &/*_msg*/)
 {
@@ -68,11 +54,14 @@ void ReceiveWorldStatsDebugMsg(ConstGzStringPtr &/*_data*/)
   g_worldStatsDebugMsg = true;
 }
 
-void BandwidthMsg(const std::string &_msg)
+
+TEST_F(TransportTest, Load)
 {
-  boost::mutex::scoped_lock lock(g_mutex);
-  g_bwBytes.push_back(_msg.size());
-  g_bwTime.push_back(common::Time::GetWallTime());
+  for (unsigned int i = 0; i < 2; ++i)
+  {
+    Load("worlds/empty.world");
+    Unload();
+  }
 }
 
 
@@ -95,7 +84,7 @@ TEST_F(TransportTest, PubSub)
   std::vector<transport::PublisherPtr> pubs;
   std::vector<transport::SubscriberPtr> subs;
 
-  for (unsigned int i = 0; i < 10; i++)
+  for (unsigned int i = 0; i < 10; ++i)
   {
     pubs.push_back(node->Advertise<msgs::Scene>("~/scene"));
     subs.push_back(node->Subscribe("~/scene", &ReceiveSceneMsg));
@@ -105,7 +94,6 @@ TEST_F(TransportTest, PubSub)
   pubs.clear();
   subs.clear();
 }
-
 
 TEST_F(TransportTest, Errors)
 {
@@ -163,8 +151,6 @@ TEST_F(TransportTest, Errors)
   }
   EXPECT_LT(i, 20);
 
-
-
   putenv(const_cast<char*>("GAZEBO_MASTER_URI="));
   std::string masterHost;
   unsigned int masterPort;
@@ -188,50 +174,6 @@ TEST_F(TransportTest, Errors)
   testNode.reset();
 }
 
-TEST_F(TransportTest, Bandwidth)
-{
-  Load("worlds/pr2.world");
-
-  transport::NodePtr node(new transport::Node());
-  node->Init("default");
-
-  std::string topic = "/gazebo/default/pose/info";
-
-  transport::SubscriberPtr sub = node->Subscribe(topic, BandwidthMsg);
-
-  while (true)
-  {
-    common::Time::MSleep(100);
-    {
-      boost::mutex::scoped_lock lock(g_mutex);
-      if (g_bwBytes.size() >= 100)
-      {
-        std::sort(g_bwBytes.begin(), g_bwBytes.end());
-
-        float sumSize = 0;
-        unsigned int count = g_bwBytes.size();
-        common::Time dt = g_bwTime[count - 1] - g_bwTime[0];
-
-        for (unsigned int i = 0; i < count; ++i)
-          sumSize += g_bwBytes[i];
-
-        float meanSize = sumSize / count;
-        float totalBw = sumSize / dt.Double();
-
-        printf("Bandwidth:\n");
-        printf("  Total[%6.2f B/s] Mean[%6.2f B] Messages[%d] Time[%4.2fs]\n",
-               totalBw, meanSize, count, dt.Double());
-
-        EXPECT_GT(totalBw, 5000.0);
-        EXPECT_LT(totalBw, 30000.0);
-        g_bwBytes.clear();
-        g_bwTime.clear();
-
-        break;
-      }
-    }
-  }
-}
 
 // This test creates a child process to test interprocess communication
 // TODO: This test needs to be fixed
@@ -311,6 +253,7 @@ TEST_F(TransportTest, Bandwidth)
     kill(pid, SIGKILL);
   }
 }*/
+
 
 int main(int argc, char **argv)
 {

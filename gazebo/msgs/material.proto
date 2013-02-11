@@ -19,7 +19,7 @@ message Material
 
   message Script
   {
-    required string uri = 1;
+    repeated string uri = 1;
     required string name = 2;
   }
 

@@ -446,7 +446,7 @@ namespace gazebo
 
       /// \brief The name of the mesh set in the visual's SDF.
       /// \return Name of the mesh.
-      private: std::string GetMeshName() const;
+      public: std::string GetMeshName() const;
 
       /// \brief Clear parents.
       public: void ClearParent();

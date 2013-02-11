@@ -3,6 +3,11 @@ QLabel
   color: #d0d0d0;
 }
 
+QDialog
+{
+  background-color: #303030;
+}
+
 QWidget#topicSelector,
 QWidget#cameraSensor
 {
@@ -20,6 +25,11 @@ QWidget#cameraSensor > QLabel
   background-color: #303030;
 }
 
+QMessageBox
+{
+  color: #d0d0d0;
+  background-color: #303030;
+}
 
 QMainWindow#mainWindow
 {
@@ -89,7 +99,7 @@ QToolButton
   padding: 2px;
   margin: 2px;
   width: 20px;
-          
+
   border-radius: 8px;
   border: 0px solid #808080;
 }
@@ -170,6 +180,44 @@ QTreeView QHeaderView:section
   font-weight: bold;
   background: #404040;
   border: 0px;
+}
+
+QSpinBox
+{
+  color: #353535;
+  background: #737373;
+  border-radius: 4;
+  margin-right: 20px;  
+}
+
+QSpinBox::up-button
+{
+  subcontrol-origin: margin;
+  subcontrol-position: top right;
+
+  border: 1px outset #727272;
+  border-radius: 1px;
+  background: #737373;
+}
+
+QSpinBox::up-button:pressed
+{
+  border: 2px inset #727272;
+}
+
+QSpinBox::down-button
+{
+  subcontrol-origin: margin;
+  subcontrol-position: bottom right;
+
+  border: 1px outset #727272;
+  border-radius: 1px;
+  background: #737373;
+}
+
+QSpinBox::down-button:pressed
+{
+  border: 2px inset #727272;
 }
 
 QDoubleSpinBox,
@@ -328,6 +376,11 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
   background: none;
 }
 
+QTextEdit#tipsTextEdit
+{
+  border: 1px solid #808080;
+  background-color: #808080;
+}
 
 QTabBar
 {
@@ -400,7 +453,8 @@ QTabBar::tab:!selected
   margin-top: 2px;
 }
 
-QTabWidget#mainTab::pane
+QTabWidget#mainTab::pane,
+QTabWidget#buildingEditorTab::pane
 {
   border-left: 1px solid #101010;
   border-bottom: 1px solid #101010;
@@ -418,8 +472,6 @@ QTabWidget#mainTab::pane
   margin: 0px;
   color: #f0f0f0;
 }
-
-
 
 QTabWidget::tab
 {
@@ -463,7 +515,15 @@ QWidget#renderWidget > QWidget
   margin-right: 0px;
 }
 
-QWidget#toolFrame 
+QWidget#buildingEditorWidget > QWidget
+{
+  padding: 2px;
+  background-color: #808080;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+QWidget#toolFrame
 {
   border-bottom: 1px solid #101010;
   background-color: #808080;
@@ -471,7 +531,7 @@ QWidget#toolFrame
   border-top-right-radius: 10px;
 }
 
-QWidget#renderBottomFrame 
+QWidget#renderBottomFrame
 {
   border-top: 1px solid #101010;
   border-bottom-left-radius: 10px;
@@ -481,7 +541,7 @@ QWidget#renderBottomFrame
   border-bottom-right-radius: 10px;
 }
 
-QWidget#timePanel 
+QWidget#timePanel
 {
   background-color: #808080;
   border-bottom-right-radius: 10px;
