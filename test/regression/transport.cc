@@ -25,15 +25,6 @@ class TransportTest : public ServerFixture
 {
 };
 
-TEST_F(TransportTest, Load)
-{
-  for (unsigned int i = 0; i < 2; i++)
-  {
-    Load("worlds/empty.world");
-    Unload();
-  }
-}
-
 bool g_worldStatsMsg2 = false;
 bool g_sceneMsg = false;
 bool g_worldStatsMsg = false;
@@ -63,6 +54,17 @@ void ReceiveWorldStatsDebugMsg(ConstGzStringPtr &/*_data*/)
   g_worldStatsDebugMsg = true;
 }
 
+
+TEST_F(TransportTest, Load)
+{
+  for (unsigned int i = 0; i < 2; ++i)
+  {
+    Load("worlds/empty.world");
+    Unload();
+  }
+}
+
+
 TEST_F(TransportTest, PubSub)
 {
   Load("worlds/empty.world");
@@ -82,7 +84,7 @@ TEST_F(TransportTest, PubSub)
   std::vector<transport::PublisherPtr> pubs;
   std::vector<transport::SubscriberPtr> subs;
 
-  for (unsigned int i = 0; i < 10; i++)
+  for (unsigned int i = 0; i < 10; ++i)
   {
     pubs.push_back(node->Advertise<msgs::Scene>("~/scene"));
     subs.push_back(node->Subscribe("~/scene", &ReceiveSceneMsg));
@@ -92,7 +94,6 @@ TEST_F(TransportTest, PubSub)
   pubs.clear();
   subs.clear();
 }
-
 
 TEST_F(TransportTest, Errors)
 {
@@ -150,8 +151,6 @@ TEST_F(TransportTest, Errors)
   }
   EXPECT_LT(i, 20);
 
-
-
   putenv(const_cast<char*>("GAZEBO_MASTER_URI="));
   std::string masterHost;
   unsigned int masterPort;
@@ -174,7 +173,6 @@ TEST_F(TransportTest, Errors)
   statsSub.reset();
   testNode.reset();
 }
-
 
 
 // This test creates a child process to test interprocess communication

@@ -25,10 +25,10 @@ class BandwidthTest : public ServerFixture
 {
 };
 
+boost::mutex g_mutex;
 std::vector<int> g_bwBytes;
 std::vector<common::Time> g_bwTime;
 
-boost::mutex g_mutex;
 
 void BandwidthMsg(const std::string &_msg)
 {
@@ -69,7 +69,7 @@ TEST_F(BandwidthTest, Bandwidth)
 
         printf("Bandwidth:\n");
         printf("  Total[%6.2f B/s] Mean[%6.2f B] Messages[%d] Time[%4.2fs]\n",
-            totalBw, meanSize, count, dt.Double());
+               totalBw, meanSize, count, dt.Double());
 
         EXPECT_GT(totalBw, 1000.0);
         g_bwBytes.clear();

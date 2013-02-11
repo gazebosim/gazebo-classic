@@ -22,6 +22,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
+#include <boost/date_time.hpp>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Time.hh"
@@ -31,6 +32,8 @@ using namespace gazebo;
 using namespace common;
 
 Time Time::wallTime;
+std::string Time::wallTimeISO;
+
 struct timespec Time::clockResolution;
 
 /////////////////////////////////////////////////
@@ -89,6 +92,15 @@ const Time &Time::GetWallTime()
   clock_gettime(0, &tv);
   wallTime = tv;
   return wallTime;
+}
+
+/////////////////////////////////////////////////
+const std::string &Time::GetWallTimeAsISOString()
+{
+  wallTimeISO = boost::posix_time::to_iso_extended_string(
+      boost::posix_time::microsec_clock::local_time());
+
+  return wallTimeISO;
 }
 
 /////////////////////////////////////////////////
