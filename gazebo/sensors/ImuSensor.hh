@@ -60,7 +60,7 @@ namespace gazebo
       /// \return Angular velocity.
       public: math::Vector3 GetAngularVelocity() const;
 
-      /// \brief Returns the imu orientation.
+      /// \brief Returns the imu linear acceleration
       /// \return Linear acceleration.
       public: math::Vector3 GetLinearAcceleration() const;
 
