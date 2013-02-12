@@ -26,7 +26,7 @@ class PhysicsTest : public ServerFixture
   public: void EmptyWorld(const std::string &_physicsEngine);
   public: void SpawnDrop(const std::string &_physicsEngine);
   public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
-  public: void SimplePendulum(const std::string &_worldFile);
+  public: void SimplePendulum(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -830,21 +830,25 @@ TEST_F(PhysicsTest, CollisionTest)
 
 TEST_F(PhysicsTest, SimplePendulumODE)
 {
-  SimplePendulum("worlds/simple_pendulums.world");
+  SimplePendulum("ode");
 }
 
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, SimplePendulumBullet)
 {
-  SimplePendulum("worlds/simple_pendulums_bullet.world");
+  SimplePendulum("bullet");
 }
 #endif  // HAVE_BULLET
 
-void PhysicsTest::SimplePendulum(const std::string &_worldFile)
+void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
-  Load(_worldFile, true);
+  Load("worlds/simple_pendulums.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   int i = 0;
   while (!this->HasEntity("model_1") && i < 20)
