@@ -59,6 +59,7 @@ void ServerFixtureTest::LoadEmptyOfType(const std::string _physicsType)
   ASSERT_TRUE(world != NULL);
 
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsType);
 }
 
