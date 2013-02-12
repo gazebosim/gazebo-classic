@@ -283,6 +283,7 @@ void Connection::ProcessWriteQueue()
     return;
   }
 
+  printf("WriteCount[%d]\n", writeCount);
   boost::asio::streambuf *buffer = new boost::asio::streambuf;
   std::ostream os(buffer);
 
@@ -296,12 +297,11 @@ void Connection::ProcessWriteQueue()
   // Write the serialized data to the socket. We use
   // "gather-write" to send both the head and the data in
   // a single write operation
-  // Note: This seems to cause a memory leak.
-  /*boost::asio::async_write(*this->socket, buffer->data(),
+  boost::asio::async_write(*this->socket, buffer->data(),
     boost::bind(&Connection::OnWrite, shared_from_this(),
     boost::asio::placeholders::error, buffer));
-    */
 
+  /*
   try
   {
     boost::asio::write(*this->socket, buffer->data());
@@ -313,6 +313,7 @@ void Connection::ProcessWriteQueue()
 
   this->writeCount--;
   delete buffer;
+  */
 }
 
 //////////////////////////////////////////////////
@@ -333,8 +334,8 @@ void Connection::OnWrite(const boost::system::error_code &e,
 {
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    delete _buffer;
     this->writeCount--;
+    delete _buffer;
   }
 
   if (e)
@@ -367,8 +368,11 @@ void Connection::Shutdown()
   {
     boost::mutex::scoped_lock lock(this->socketMutex);
     boost::system::error_code ec;
-    if (this->socket && this->socket->is_open())
+    if (this->socket)// && this->socket->is_open())
+    {
       this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+      gzerr << "Soecket was shutdown.\n";
+    }
 
     delete this->socket;
     this->socket = NULL;

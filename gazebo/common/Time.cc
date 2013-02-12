@@ -151,6 +151,21 @@ Time Time::Sleep(const common::Time &_time)
     interval.tv_sec = _time.sec;
     interval.tv_nsec = _time.nsec;
 
+    // Sleeping for negative time doesn't make sense
+    if (interval.tv_sec < 0)
+    {
+      gzerr << "Cannot sleep for negative time[" << _time << "]\n";
+      return result;
+    }
+
+    // This assert conforms to the manpage for nanosleep
+    if (interval.tv_nsec < 0 || interval.tv_nsec > 999999999)
+    {
+      gzerr << "Nanoseconds of [" << interval.tv_nsec
+            << "] must be in the range0 to 999999999.\n";
+      return result;
+    }
+
     if (nanosleep(&interval, &remainder) == -1)
     {
       result.sec = remainder.tv_sec;

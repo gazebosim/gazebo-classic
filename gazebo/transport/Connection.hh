@@ -17,6 +17,7 @@
 #ifndef _CONNECTION_HH_
 #define _CONNECTION_HH_
 
+#include <tbb/task.h>
 #include <google/protobuf/message.h>
 
 #include <boost/asio.hpp>
@@ -47,6 +48,39 @@ namespace gazebo
     class IOManager;
     class Connection;
     typedef boost::shared_ptr<Connection> ConnectionPtr;
+
+    /// \cond
+    /// \brief A task instance that is created when data is read from
+    /// a socket and used by TBB
+    class ConnectionReadTask : public tbb::task
+    {
+      /// \brief Constructor
+      /// \param[_in] _func Boost function pointer, which is the function
+      /// that receives the data.
+      /// \param[in] _data Data to send to the boost function pointer.
+      public: ConnectionReadTask(
+                  boost::function<void (const std::string &)> _func,
+                  const std::string &_data)
+              {
+                this->func = _func;
+                this->data = _data;
+              }
+
+      /// \bried Overridden function from tbb::task that exectues the data
+      /// callback.
+      public: tbb::task *execute()
+              {
+                this->func(this->data);
+                return NULL;
+              }
+
+      /// \brief The boost function pointer
+      private: boost::function<void (const std::string &)> func;
+
+      /// \brief The data to send to the boost function pointer
+      private: std::string data;
+    };
+    /// \endcond
 
     /// \addtogroup gazebo_transport Transport
     /// \{
@@ -182,15 +216,19 @@ namespace gazebo
                   {
                     try
                     {
-                      this->Close();
+                      gzerr << "Need shutdown\n";
+                      this->Shutdown();
                     }
                     catch(...)
                     {
+                      gzerr << "Caught exception. Error reading header\n";
                     }
                     // This will occur when the other side closes the
                     // connection. We don't want spew error messages in this
                     // case.
                   }
+                  else
+                    gzerr << "OnReadHeader Error[" << _e.message() << "]\n";
                 }
                 else
                 {
@@ -260,7 +298,12 @@ namespace gazebo
 
                 if (!_e && !transport::is_stopped())
                 {
-                  boost::get<0>(_handler)(data);
+                  //boost::get<0>(_handler)(data);
+                  //new boost::thread(boost::get<0>(_handler), data);
+                  ConnectionReadTask *task = new (tbb::task::allocate_root())
+                        ConnectionReadTask(boost::get<0>(_handler), data);
+
+                  tbb::task::enqueue(*task);
                 }
               }
 

@@ -135,15 +135,6 @@ void ImagesView_TEST::SetTopic(gazebo::gui::ImagesView *_view,
   // Make sure the loop didn't exceed the maximum number of iterations
   QVERIFY(i < 1000);
 
-  for (i = 0; frame->children().size() != _count && i < 1000; ++i)
-  {
-    gazebo::common::Time::MSleep(10);
-    QCoreApplication::processEvents();
-  }
-
-  // Make sure the loop didn't exceed the maximum number of iterations
-  QVERIFY(i < 1000);
-
   // Wait a bit for the images to appear
   // This is done for visual confirmation that the test works.
   for (i = 0; i < 100; ++i)

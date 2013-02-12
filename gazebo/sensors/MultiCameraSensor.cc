@@ -187,6 +187,7 @@ void MultiCameraSensor::UpdateImpl(bool /*_force*/)
   msgs::ImagesStamped msg;
   msgs::Set(msg.mutable_time(), this->lastMeasurementTime);
 
+  std::cout << "UpdateImpl[" << this->GetName() << "]\n";
   // Update all the cameras
   for (std::vector<rendering::CameraPtr>::iterator iter = this->cameras.begin();
        iter != this->cameras.end(); ++iter)

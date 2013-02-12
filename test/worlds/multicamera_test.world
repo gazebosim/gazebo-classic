@@ -23,7 +23,7 @@
           </geometry>
         </visual>
 
-        <sensor name="cam" type="multicamera">
+        <sensor name="cam1" type="multicamera">
           <update_rate>15</update_rate>
           <camera name="left">
             <horizontal_fov>1.3962634</horizontal_fov>
@@ -60,7 +60,7 @@
           </geometry>
         </visual>
 
-        <sensor name="cam" type="multicamera">
+        <sensor name="cam2" type="multicamera">
           <update_rate>15</update_rate>
           <camera name="left">
             <horizontal_fov>1.3962634</horizontal_fov>
@@ -110,7 +110,7 @@
           </geometry>
         </visual>
 
-        <sensor name="cam" type="multicamera">
+        <sensor name="cam3" type="multicamera">
           <update_rate>15</update_rate>
           <camera name="top_left">
             <pose>0 -0.1 0.1 0 0 0</pose>
@@ -176,7 +176,7 @@
           </geometry>
         </visual>
 
-        <sensor name="cam" type="multicamera">
+        <sensor name="cam4" type="multicamera">
           <update_rate>15</update_rate>
           <camera name="top_left">
             <pose>0 -0.1 0.1 0 0 0</pose>
@@ -256,7 +256,7 @@
           </geometry>
         </visual>
 
-        <sensor name="cam" type="multicamera">
+        <sensor name="cam5" type="multicamera">
           <update_rate>15</update_rate>
           <camera name="top_left">
             <pose>0 -0.1 0.1 0 0 0</pose>
@@ -350,7 +350,7 @@
           </geometry>
         </visual>
 
-        <sensor name="cam" type="multicamera">
+        <sensor name="cam6" type="multicamera">
           <update_rate>15</update_rate>
           <camera name="top_left">
             <pose>0 -0.1 0.1 0 0 0</pose>
