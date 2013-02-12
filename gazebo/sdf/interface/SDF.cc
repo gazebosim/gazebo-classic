@@ -752,7 +752,13 @@ bool Element::GetValueBool(const std::string &_key)
   if (_key.empty())
   {
     if (this->value)
+    {
       this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << GetName() << "] has no value, attempting to get as a bool.\n";
+    }
   }
   else
   {
@@ -778,7 +784,13 @@ int Element::GetValueInt(const std::string &_key)
   if (_key.empty())
   {
     if (this->value)
+    {
       this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << GetName() << "] has no value, attempting to get as a int.\n";
+    }
   }
   else
   {
@@ -803,7 +815,13 @@ float Element::GetValueFloat(const std::string &_key)
   if (_key.empty())
   {
     if (this->value)
+    {
       this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << GetName() << "] has no value, attempting to get as a float.\n";
+    }
   }
   else
   {
@@ -834,6 +852,10 @@ double Element::GetValueDouble(const std::string &_key)
       else
         this->value->Get(result);
     }
+    else
+    {
+      gzwarn << "Parameter [" << GetName() << "] has no value, attempting to get as a double.\n";
+    }
   }
   else
   {
@@ -862,6 +884,10 @@ unsigned int Element::GetValueUInt(const std::string &_key)
         result = boost::lexical_cast<unsigned int>(this->value->GetAsString());
       else
         this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << GetName() << "] has no value, attempting to get as a unsigned int.\n";
     }
   }
   else
@@ -893,6 +919,10 @@ char Element::GetValueChar(const std::string &_key)
       else
         this->value->Get(result);
     }
+    else
+    {
+      gzwarn << "Parameter [" << GetName() << "] has no value, attempting to get as a char.\n";
+    }
   }
   else
   {
@@ -917,7 +947,13 @@ std::string Element::GetValueString(const std::string &_key)
   if (_key.empty())
   {
     if (this->value)
+    {
       this->value->Get(result);
+    }
+    else
+    {
+      // gzlog << "Parameter [" << GetName() << "] has no value, returning empty string.\n";
+    }
   }
   else
   {
@@ -942,7 +978,13 @@ gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
   if (_key.empty())
   {
     if (this->value)
+    {
       this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << GetName() << "] has no value, attempting to get as a vector3.\n";
+    }
   }
   else
   {
@@ -967,7 +1009,13 @@ gazebo::math::Vector2d Element::GetValueVector2d(const std::string &_key)
   if (_key.empty())
   {
     if (this->value)
+    {
       this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << GetName() << "] has no value, attempting to get as a vector2d.\n";
+    }
   }
   else
   {
@@ -992,7 +1040,13 @@ gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
   if (_key.empty())
   {
     if (this->value)
+    {
       this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << GetName() << "] has no value, attempting to get as a quaternion.\n";
+    }
   }
   else
   {
@@ -1017,7 +1071,13 @@ gazebo::math::Pose Element::GetValuePose(const std::string &_key)
   if (_key.empty())
   {
     if (this->value)
+    {
       this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << GetName() << "] has no value, attempting to get as a pose.\n";
+    }
   }
   else
   {
@@ -1042,7 +1102,13 @@ gazebo::common::Color Element::GetValueColor(const std::string &_key)
   if (_key.empty())
   {
     if (this->value)
+    {
       this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << GetName() << "] has no value, attempting to get as a color.\n";
+    }
   }
   else
   {
@@ -1067,7 +1133,13 @@ gazebo::common::Time Element::GetValueTime(const std::string &_key)
   if (_key.empty())
   {
     if (this->value)
+    {
       this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << GetName() << "] has no value, attempting to get as a time.\n";
+    }
   }
   else
   {
