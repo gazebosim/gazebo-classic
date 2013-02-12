@@ -151,22 +151,16 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
             imuPose.rot.GetInverse().RotateVector(
             this->parentEntity->GetWorldAngularVel()));
 
-  // compute linear velocity in parent entity frame
-  math::Vector3 imuAngularVelParentFrame =
-    parentEntityPose.rot.GetInverse().RotateVector(
-    this->parentEntity->GetWorldAngularVel());
-  math::Vector3 imuLinearVelParentFrame =
-    parentEntityPose.rot.GetInverse().RotateVector(
-    this->parentEntity->GetWorldLinearVel()) +
-    this->pose.pos.Cross(imuAngularVelParentFrame);
-  math::Vector3 imuLinearVelImuFrame =
-    this->pose.rot.GetInverse().RotateVector(imuLinearVelParentFrame);
+  // get linear velocity in world frame
+  math::Vector3 imuWorldLinearVel =
+    this->parentEntity->GetWorldLinearVel(this->pose.pos);
 
   // Compute and set the IMU linear acceleration
   if (dt > 0.0)
   {
-    this->linearAcc = (imuLinearVelImuFrame - this->lastLinearVel) / dt;
-    this->lastLinearVel = imuLinearVelImuFrame;
+    this->linearAcc = imuPose.rot.GetInverse().RotateVector(
+      (imuWorldLinearVel - this->lastLinearVel) / dt);
+    this->lastLinearVel = imuWorldLinearVel;
   }
 
   msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
