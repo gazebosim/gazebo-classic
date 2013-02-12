@@ -309,6 +309,8 @@ namespace gazebo
       /// \param[in] _msg The message to enqueue.
       public: void EnqueueMsg(msgs::Pose *_msg);
 
+      /// \cond
+      /// This is an internal function.
       /// \brief Get a model by id.
       ///
       /// Each Entity has a unique ID, this function finds a Model with
@@ -316,6 +318,7 @@ namespace gazebo
       /// \param[in] _id The id of the Model
       /// \return A pointer to the model, or NULL if no Model was found.
       private: ModelPtr GetModelById(unsigned int _id);
+      /// \endcond
 
       /// \brief Load all plugins.
       ///

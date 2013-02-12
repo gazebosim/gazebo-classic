@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,34 +15,13 @@
  *
 */
 
-#include "ServerFixture.hh"
-#include "gazebo/common/LogRecord.hh"
+#include <gtest/gtest.h>
+
+#include "gazebo/common/"
 
 using namespace gazebo;
-class LogRecordTest : public ServerFixture
-{
-};
 
-TEST_F(LogRecordTest, Init)
-{
-  EXPECT_TRUE(common::LogRecord::Instance()->Init("test"));
-
-  common::LogRecord::Instance()->Stop();
-  common::LogRecord::Instance()->Stop();
-
-  common::LogRecord::Instance()->Start();
-  common::LogRecord::Instance()->Start();
-
-  common::LogRecord::Instance()->Stop();
-  common::LogRecord::Instance()->Start();
-
-
-  common::LogRecord::Instance()->Start();
-  common::LogRecord::Instance()->Stop();
-
-  common::LogRecord::Instance()->Stop();
-}
-
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
