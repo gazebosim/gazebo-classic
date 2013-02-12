@@ -221,7 +221,7 @@ double BulletHingeJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetForce(int /*_index*/, double _torque)
+void BulletHingeJoint::SetForce(int _index, double _torque)
 {
   // math::Vector3 axis = this->GetLocalAxis(_index);
   // this->bulletHinge->enableAngularMotor(true);
@@ -233,6 +233,10 @@ void BulletHingeJoint::SetForce(int /*_index*/, double _torque)
   btVector3 hingeAxisWorld =
     this->bulletHinge->getRigidBodyA().getWorldTransform().getBasis() *
     hingeAxisLocal;
+
+  if (this->effortLimit[_index] > 0)
+    _torque = math::clamp(_torque, -this->effortLimit[_index],
+       this->effortLimit[_index]);
 
   btVector3 hingeTorque = _torque * hingeAxisWorld;
 

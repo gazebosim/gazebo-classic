@@ -138,13 +138,17 @@ void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetForce(int /*_index*/, double _force)
+void BulletSliderJoint::SetForce(int _index, double _force)
 {
   /*btVector3 hingeAxisLocal = this->bulletSlider->getAFrame().getBasis().getColumn(2); // z-axis of constraint frame
   btVector3 hingeAxisWorld = this->bulletSlider->getRigidBodyA().getWorldTransform().getBasis() * hingeAxisLocal;
 
   btVector3 hingeTorque = _torque * hingeAxisWorld;
   */
+
+  if (this->effortLimit[_index] > 0)
+    _force = math::clamp(_force, -this->effortLimit[_index],
+       this->effortLimit[_index]);
 
   btVector3 force(0, 0, _force);
   this->constraint->getRigidBodyA().applyCentralForce(force);
