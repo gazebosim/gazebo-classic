@@ -45,19 +45,11 @@ BulletMultiRayShape::~BulletMultiRayShape()
 //////////////////////////////////////////////////
 void BulletMultiRayShape::UpdateRays()
 {
-  BulletPhysicsPtr bullet = boost::shared_dynamic_cast<BulletPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
-
-  if (bullet == NULL)
-    gzthrow("Invalid physics engine.");
-
-  bullet->GetPhysicsUpdateMutex()->lock();
-  std::vector< RayShapePtr >::iterator iter;
+  std::vector<RayShapePtr>::iterator iter;
   for (iter = this->rays.begin(); iter != this->rays.end(); ++iter)
   {
     (*iter)->Update();
   }
-  bullet->GetPhysicsUpdateMutex()->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -66,12 +58,13 @@ void BulletMultiRayShape::AddRay(const math::Vector3 &_start,
 {
   MultiRayShape::AddRay(_start, _end);
 
-  BulletCollisionPtr bulletCollision(new BulletCollision(
-        this->collisionParent->GetLink()));
-  bulletCollision->SetName("bullet_ray_collision");
+//  BulletCollisionPtr bulletCollision(new BulletCollision(
+//        this->collisionParent->GetLink()));
+//  bulletCollision->SetName("bullet_ray_collision");
 
-  BulletRayShapePtr ray(new BulletRayShape(bulletCollision));
-  bulletCollision->SetShape(ray);
+//  BulletRayShapePtr ray(new BulletRayShape(bulletCollision));
+  BulletRayShapePtr ray(new BulletRayShape(this->collisionParent));
+//  bulletCollision->SetShape(ray);
   ray->SetPoints(_start, _end);
 
   this->rays.push_back(ray);

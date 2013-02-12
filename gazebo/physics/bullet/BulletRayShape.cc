@@ -31,8 +31,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 BulletRayShape::BulletRayShape(PhysicsEnginePtr _physicsEngine)
-  : RayShape(_physicsEngine),
-    rayCallback(btVector3(0, 0, 0), btVector3(0, 0, 0))
+  : RayShape(_physicsEngine)
 {
   this->SetName("Bullet Ray Shape");
 
@@ -42,8 +41,7 @@ BulletRayShape::BulletRayShape(PhysicsEnginePtr _physicsEngine)
 
 //////////////////////////////////////////////////
 BulletRayShape::BulletRayShape(CollisionPtr _parent)
-    : RayShape(_parent),
-    rayCallback(btVector3(0, 0, 0), btVector3(0, 0, 0))
+    : RayShape(_parent)
 {
   this->SetName("Bullet Ray Shape");
   this->physicsEngine = boost::shared_static_cast<BulletPhysics>(
@@ -72,25 +70,24 @@ void BulletRayShape::Update()
           this->relativeEndPos);
   }
 
-  this->rayCallback.m_rayFromWorld.setX(this->globalStartPos.x);
-  this->rayCallback.m_rayFromWorld.setY(this->globalStartPos.y);
-  this->rayCallback.m_rayFromWorld.setZ(this->globalStartPos.z);
+  btVector3 start(this->globalStartPos.x, this->globalStartPos.y,
+      this->globalStartPos.z);
+  btVector3 end(this->globalEndPos.x, this->globalEndPos.y,
+      this->globalEndPos.z);
 
-  this->rayCallback.m_rayToWorld.setX(this->globalEndPos.x);
-  this->rayCallback.m_rayToWorld.setY(this->globalEndPos.y);
-  this->rayCallback.m_rayToWorld.setZ(this->globalEndPos.z);
-
+  btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
+  this->physicsEngine->GetPhysicsUpdateMutex()->lock();
   this->physicsEngine->GetDynamicsWorld()->rayTest(
-      this->rayCallback.m_rayFromWorld, this->rayCallback.m_rayToWorld,
-      this->rayCallback);
+      start, end, rayCallback);
 
-  if (this->rayCallback.hasHit())
+  if (rayCallback.hasHit())
   {
-    math::Vector3 result(this->rayCallback.m_hitPointWorld.getX(),
-                         this->rayCallback.m_hitPointWorld.getY(),
-                         this->rayCallback.m_hitPointWorld.getZ());
+    math::Vector3 result(rayCallback.m_hitPointWorld.getX(),
+                         rayCallback.m_hitPointWorld.getY(),
+                         rayCallback.m_hitPointWorld.getZ());
     this->SetLength(this->globalStartPos.Distance(result));
   }
+  this->physicsEngine->GetPhysicsUpdateMutex()->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -101,17 +98,22 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
 
   if (this->physicsEngine && this->collisionParent)
   {
+    btVector3 start(this->globalStartPos.x, this->globalStartPos.y,
+        this->globalStartPos.z);
+    btVector3 end(this->globalEndPos.x, this->globalEndPos.y,
+        this->globalEndPos.z);
+
+    btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
     this->physicsEngine->GetDynamicsWorld()->rayTest(
-        this->rayCallback.m_rayFromWorld, this->rayCallback.m_rayToWorld,
-        this->rayCallback);
-    if (this->rayCallback.hasHit())
+        start, end, rayCallback);
+    if (rayCallback.hasHit())
     {
-      math::Vector3 result(this->rayCallback.m_hitPointWorld.getX(),
-                           this->rayCallback.m_hitPointWorld.getY(),
-                           this->rayCallback.m_hitPointWorld.getZ());
+      math::Vector3 result(rayCallback.m_hitPointWorld.getX(),
+                           rayCallback.m_hitPointWorld.getY(),
+                           rayCallback.m_hitPointWorld.getZ());
       _dist = this->globalStartPos.Distance(result);
       _entity = static_cast<BulletLink*>(
-          this->rayCallback.m_collisionObject->getUserPointer())->GetName();
+          rayCallback.m_collisionObject->getUserPointer())->GetName();
     }
   }
 }
@@ -121,12 +123,4 @@ void BulletRayShape::SetPoints(const math::Vector3 &_posStart,
                                    const math::Vector3 &_posEnd)
 {
   RayShape::SetPoints(_posStart, _posEnd);
-
-  this->rayCallback.m_rayFromWorld.setX(this->globalStartPos.x);
-  this->rayCallback.m_rayFromWorld.setY(this->globalStartPos.y);
-  this->rayCallback.m_rayFromWorld.setZ(this->globalStartPos.z);
-
-  this->rayCallback.m_rayToWorld.setX(this->globalEndPos.x);
-  this->rayCallback.m_rayToWorld.setY(this->globalEndPos.y);
-  this->rayCallback.m_rayToWorld.setZ(this->globalEndPos.z);
 }
