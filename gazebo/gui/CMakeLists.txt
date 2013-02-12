@@ -78,7 +78,7 @@ set (tests
   TimePanel_TEST.cc
   )
 
-gz_build_qt_tests(${tests})
+gz_build_display_tests(${tests})
 
 set (resources resources.qrc)
 
