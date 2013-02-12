@@ -52,7 +52,16 @@ namespace gazebo
     public: void PrintUsage();
     public: bool ParseArgs(int argc, char **argv);
 
+    /// \brief Load world file.
+    /// \param[in] _filename Name of the world file to load.
     public: bool LoadFile(const std::string &_filename="worlds/empty.world");
+
+    /// \brief Load a world file and override physics engine type.
+    /// \param[in] _filename Name of the world file to load.
+    /// \param[in] _physics Type of physics engine to use (ode|bullet).
+    public: bool LoadFile(const std::string &_filename,
+                          const std::string &_physics);
+
     public: bool LoadString(const std::string &_sdfString);
     public: void Init();
     public: void Run();
@@ -66,6 +75,11 @@ namespace gazebo
     /// \brief Load implementation.
     /// \param[in] _elem Description of the world to load.
     private: bool LoadImpl(sdf::ElementPtr _elem);
+
+    /// \brief Load world file into an sdf object.
+    /// \param[in] _filename Name of the world file to load.
+    /// \param[out] _sdf SDF object to read fill with world file info.
+    private: bool LoadFile(const std::string &_filename, sdf::SDFPtr &_sdf);
 
     private: static void SigInt(int _v);
 
