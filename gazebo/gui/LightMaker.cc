@@ -58,6 +58,8 @@ void LightMaker::Start(const rendering::UserCameraPtr _camera)
 
   this->light->SetLightType(this->lightTypename);
   this->light->SetPosition(math::Vector3(0, 0, 1));
+  if (this->lightTypename == "directional")
+    this->light->SetDirection(math::Vector3(.1, .1, -0.9));
 
   std::ostringstream stream;
   stream << "user_" << this->lightTypename << "_light_" << counter++;
