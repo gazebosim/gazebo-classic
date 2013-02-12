@@ -141,7 +141,7 @@ namespace gazebo
 
       /// \brief Get the local hostname
       /// \return The local hostname
-      public: std::string GetLocalHostname() const;
+      public: static std::string GetLocalHostname();
 
       /// \brief Peform an asyncronous read
       /// param[in] _handler Callback to invoke on received data
@@ -301,7 +301,7 @@ namespace gazebo
 
       /// \brief Get the local endpoint
       /// \return The endpoint
-      private: boost::asio::ip::tcp::endpoint GetLocalEndpoint() const;
+      private: static boost::asio::ip::tcp::endpoint GetLocalEndpoint();
 
       /// \brief Get the remote endpoint
       /// \return The endpoint

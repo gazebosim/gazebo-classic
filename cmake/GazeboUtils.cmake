@@ -194,10 +194,10 @@ macro (gz_build_qt_tests)
   foreach(QTEST_SOURCE_file ${ARGN})
     string(REGEX REPLACE ".cc" "" BINARY_NAME ${QTEST_SOURCE_file})
     string(REGEX REPLACE ".cc" ".hh" QTEST_HEADER_file ${QTEST_SOURCE_file})
-    QT4_WRAP_CPP(test_MOC ${QTEST_HEADER_file} QTestFixture.hh)
+    QT4_WRAP_CPP(${BINARY_NAME}_MOC ${QTEST_HEADER_file} QTestFixture.hh)
 
     add_executable(${BINARY_NAME}
-      ${test_MOC} ${QTEST_SOURCE_file} QTestFixture.cc)
+      ${${BINARY_NAME}_MOC} ${QTEST_SOURCE_file} QTestFixture.cc)
 
     add_dependencies(${BINARY_NAME}
       gazebo_gui
@@ -209,7 +209,7 @@ macro (gz_build_qt_tests)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport)
-  
+
     target_link_libraries(${BINARY_NAME}
       gazebo_gui
       gazebo_sdf_interface
@@ -225,7 +225,7 @@ macro (gz_build_qt_tests)
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
       )
-  
+ 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} -xml)
   
     set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)

@@ -76,21 +76,6 @@ void Element::SetParent(const ElementPtr _parent)
 }
 
 /////////////////////////////////////////////////
-void Element::RemoveChild(ElementPtr _child)
-{
-  for (ElementPtr_V::iterator iter = this->elements.begin();
-       iter != this->elements.end(); ++iter)
-  {
-    if ((*iter) == _child)
-    {
-      (*iter)->SetParent(ElementPtr());
-      this->elements.erase(iter);
-      break;
-    }
-  }
-}
-
-/////////////////////////////////////////////////
 void Element::SetName(const std::string &_name)
 {
   this->name = _name;

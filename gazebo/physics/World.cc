@@ -1740,6 +1740,9 @@ void World::PublishLogStatus()
   msg.mutable_log_file()->set_full_path(
     common::LogRecord::Instance()->GetFilename(this->GetName()));
 
+  // Set the URI of th log file
+  msg.mutable_log_file()->set_uri(transport::Connection::GetLocalHostname());
+
   // Get the size of the log file
   size = common::LogRecord::Instance()->GetFileSize(this->GetName());
 

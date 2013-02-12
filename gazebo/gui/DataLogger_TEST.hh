@@ -18,10 +18,10 @@
 #ifndef _DATALOGGER_TEST_HH_
 #define _DATALOGGER_TEST_HH_
 
-#include "gazebo/gui/TestFramework.hh"
+#include "gazebo/gui/QTestFixture.hh"
 
 /// \brief A test class for the DataLogger widget.
-class DataLogger_TEST : public TestFramework
+class DataLogger_TEST : public QTestFixture
 {
   Q_OBJECT
 

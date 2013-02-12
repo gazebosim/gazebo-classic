@@ -49,7 +49,7 @@ DataLogger::DataLogger(QWidget *_parent)
   // label, and a one word text message.
   // {
   QFrame *statusFrame = new QFrame;
-  statusFrame->setFixedWidth(290);
+  statusFrame->setFixedWidth(240);
   statusFrame->setObjectName("dataLoggerStatusFrame");
 
   // Textual status information
@@ -60,13 +60,14 @@ DataLogger::DataLogger(QWidget *_parent)
   // Duration of logging
   this->timeLabel = new QLabel("00:00:00.000");
   this->timeLabel->setObjectName("dataLoggerTimeLabel");
-  this->timeLabel->setFixedWidth(85);
+  this->timeLabel->setFixedWidth(90);
 
   // Size of log file
   this->sizeLabel = new QLabel("0.00 B");
   this->sizeLabel->setObjectName("dataLoggerSizeLabel");
 
   QHBoxLayout *timeLayout = new QHBoxLayout;
+  timeLayout->addStretch(1);
   timeLayout->addWidget(this->statusLabel);
   timeLayout->addSpacing(5);
   timeLayout->addWidget(this->timeLabel);
@@ -82,55 +83,6 @@ DataLogger::DataLogger(QWidget *_parent)
   statusFrame->setLayout(statusFrameLayout);
   // }
 
-  // Create the settings frame, where the user can input a save-to location
-  // {
-  /*QFrame *settingsMasterFrame = new QFrame;
-  settingsMasterFrame->setObjectName("dataLoggerSettingFrame");
-
-
-  QHBoxLayout *filenameLayout = new QHBoxLayout;
-  this->filenameEdit = new QLineEdit;
-  this->filenameEdit->setText("~/.gazebo/log");
-  filenameLayout->addWidget(new QLabel("Save to:"));
-  filenameLayout->addWidget(this->filenameEdit);
-
-  this->browseButton = new QPushButton("Browse");
-  this->browseButton->setFixedHeight(23);
-  this->browseButton->setFocusPolicy(Qt::NoFocus);
-  connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
-
-  filenameLayout->addWidget(browseButton);
-
-  QHBoxLayout *settingExpandLayout = new QHBoxLayout;
-
-  this->settingExpandButton = new QPushButton("Settings");
-  this->settingExpandButton->setObjectName("expandButton");
-  this->settingExpandButton->setCheckable(true);
-  this->settingExpandButton->setChecked(false);
-  this->settingExpandButton->setFocusPolicy(Qt::NoFocus);
-  connect(settingExpandButton, SIGNAL(toggled(bool)),
-          this, SLOT(OnToggleSettings(bool)));
-
-  settingExpandLayout->setContentsMargins(0, 0, 0, 0);
-  settingExpandLayout->addWidget(this->settingExpandButton);
-  settingExpandLayout->addStretch(1);
-
-  /// Create the frame that can be hidden by toggling the setting's button
-  this->settingsFrame = new QFrame;
-  QVBoxLayout *settingsLayout = new QVBoxLayout;
-  settingsLayout->setContentsMargins(2, 2, 2, 2);
-  settingsLayout->addLayout(filenameLayout);
-  this->settingsFrame->setLayout(settingsLayout);
-  this->settingsFrame->hide();
-
-  QVBoxLayout *settingsMasterFrameLayout = new QVBoxLayout;
-  settingsMasterFrameLayout->setContentsMargins(2, 2, 2, 2);
-
-  settingsMasterFrameLayout->addLayout(settingExpandLayout);
-  settingsMasterFrameLayout->addWidget(this->settingsFrame);
-  settingsMasterFrame->setLayout(settingsMasterFrameLayout);
-  // }
-*/
   // Layout to position the record button vertically
   QVBoxLayout *buttonLayout = new QVBoxLayout;
   buttonLayout->setContentsMargins(0, 0, 0, 0);
@@ -149,22 +101,32 @@ DataLogger::DataLogger(QWidget *_parent)
   topLayout->addStretch(4);
   topLayout->addLayout(statusLayout);
 
-  QHBoxLayout *destLayout = new QHBoxLayout;
-  this->destLabel = new QLabel;
-  this->destLabel->setObjectName("dataLoggerDestnationLabel");
-  this->destLabel->setStyleSheet("QLabel {color: #aeaeae; font-size: 11px;}");
+  QHBoxLayout *destPathLayout = new QHBoxLayout;
+  this->destPathLabel = new QLabel;
+  this->destPathLabel->setObjectName("dataLoggerDestnationPathLabel");
+  this->destPathLabel->setStyleSheet(
+      "QLabel {color: #aeaeae; font-size: 11px;}");
+  destPathLayout->setContentsMargins(0, 0, 0, 0);
+  destPathLayout->addSpacing(4);
+  destPathLayout->addWidget(this->destPathLabel);
+  destPathLayout->addStretch(1);
 
-  destLayout->setContentsMargins(0, 0, 0, 0);
-  destLayout->addSpacing(4);
-  destLayout->addWidget(this->destLabel);
-  destLayout->addStretch(1);
+  QHBoxLayout *destURILayout = new QHBoxLayout;
+  this->destURILabel = new QLabel;
+  this->destURILabel->setObjectName("dataLoggerDestnationURILabel");
+  this->destURILabel->setStyleSheet(
+      "QLabel {color: #aeaeae; font-size: 11px;}");
+  destURILayout->setContentsMargins(0, 0, 0, 0);
+  destURILayout->addSpacing(4);
+  destURILayout->addWidget(this->destURILabel);
+  destURILayout->addStretch(1);
 
   // Mainlayout for the whole widget
   // Create the main layout for this widget
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(topLayout);
-  mainLayout->addLayout(destLayout);
-  // mainLayout->addWidget(settingsMasterFrame);
+  mainLayout->addLayout(destURILayout);
+  mainLayout->addLayout(destPathLayout);
 
   // Let the stylesheet handle the margin sizes
   mainLayout->setContentsMargins(2, 2, 2, 2);
@@ -181,14 +143,15 @@ DataLogger::DataLogger(QWidget *_parent)
   connect(this, SIGNAL(SetSize(QString)),
           this->sizeLabel, SLOT(setText(QString)), Qt::QueuedConnection);
 
-  // Create a QueuedConnection to set filename. This is used for thread safety.
-  // connect(this, SIGNAL(SetFilename(QString)),
-  //        this, SLOT(OnSetFilename(QString)), Qt::QueuedConnection);
-
-  // Create a QueuedConnection to set destination.
+  // Create a QueuedConnection to set destination path.
   // This is used for thread safety.
-  connect(this, SIGNAL(SetDestination(QString)),
-          this, SLOT(OnSetDestination(QString)), Qt::QueuedConnection);
+  connect(this, SIGNAL(SetDestinationPath(QString)),
+          this, SLOT(OnSetDestinationPath(QString)), Qt::QueuedConnection);
+
+  // Create a QueuedConnection to set destination URI.
+  // This is used for thread safety.
+  connect(this, SIGNAL(SetDestinationURI(QString)),
+          this, SLOT(OnSetDestinationURI(QString)), Qt::QueuedConnection);
 
   // Create a node from communication.
   this->node = transport::NodePtr(new transport::Node());
@@ -220,10 +183,6 @@ void DataLogger::OnRecord(bool _toggle)
 
     this->statusLabel->setText("Recording");
 
-    // Disable filename editing while recording
-    // this->filenameEdit->setEnabled(false);
-    // this->browseButton->setEnabled(false);
-
     // Tell the server to start data logging
     msgs::LogControl msg;
     msg.set_start(true);
@@ -236,10 +195,6 @@ void DataLogger::OnRecord(bool _toggle)
     this->recordButton->setIcon(QPixmap(":/images/record.png"));
 
     this->statusLabel->setText("Ready");
-
-    // Enable filename editing while not recording
-    // this->filenameEdit->setEnabled(true);
-    // this->browseButton->setEnabled(true);
 
     // Tell the server to stop data logging
     msgs::LogControl msg;
@@ -281,17 +236,20 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
     {
       std::string basePath = _msg->log_file().base_path();
 
-      /// Display the root log filename
-      // this->SetFilename(QString::fromStdString(basePath));
-
       // Display the leaf log filename
       if (_msg->log_file().has_full_path() && !basePath.empty())
       {
         std::string leaf = _msg->log_file().full_path();
         if (!leaf.empty())
           leaf = leaf.substr(basePath.size());
-        this->SetDestination(QString::fromStdString(leaf));
+        this->SetDestinationPath(QString::fromStdString(leaf));
       }
+    }
+
+    // Display the URI
+    if (_msg->log_file().has_uri())
+    {
+      this->SetDestinationURI(QString::fromStdString(_msg->log_file().uri()));
     }
 
     // If there is log file size information...
@@ -326,28 +284,21 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void DataLogger::OnSetDestination(QString _filename)
+void DataLogger::OnSetDestinationPath(QString _filename)
 {
   if (!_filename.isEmpty())
-    this->destLabel->setText("Log: " + _filename);
+    this->destPathLabel->setText(_filename);
   else
-    this->destLabel->setText("");
+    this->destPathLabel->setText("");
 }
 
 /////////////////////////////////////////////////
-void DataLogger::OnSetFilename(QString _filename)
+void DataLogger::OnSetDestinationURI(QString _uri)
 {
-  /*
-  std::string filename = _filename.toStdString();
-
-  if (getenv("HOME"))
-  {
-    std::string homeDir = getenv("HOME");
-    boost::replace_first(filename, homeDir, "~");
-  }
-
-  this->filenameEdit->setText(filename.c_str());
-  */
+  if (!_uri.isEmpty())
+    this->destURILabel->setText("http://" + _uri + "/.gazebo/log");
+  else
+    this->destURILabel->setText("");
 }
 
 /////////////////////////////////////////////////

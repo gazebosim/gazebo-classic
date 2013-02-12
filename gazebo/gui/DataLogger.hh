@@ -53,21 +53,25 @@ namespace gazebo
       /// \param[in] _string The log filename
       signals: void SetFilename(QString _string);
 
-      /// \brief A signal used to set the destination label.
+      /// \brief A signal used to set the destination path label.
       /// \param[in] _string The log destination directory
-      signals: void SetDestination(QString _string);
+      signals: void SetDestinationPath(QString _string);
+
+      /// \brief A signal used to set the destination URI label.
+      /// \param[in] _string The log destination URI
+      signals: void SetDestinationURI(QString _string);
 
       /// \brief QT callback for the record button.
       /// \param[in] _toggle True if the record button was toggled.
       private slots: void OnRecord(bool _toggle);
 
-      /// \brief QT callback for setting the filename.
-      /// \param[in] _string Filename value.
-      private slots: void OnSetFilename(QString _string);
+      /// \brief QT callback for setting the destination path label.
+      /// \param[in] _string Destination path value.
+      private slots: void OnSetDestinationPath(QString _string);
 
-      /// \brief QT callback for setting the destination label.
-      /// \param[in] _string Destination value.
-      private slots: void OnSetDestination(QString _string);
+      /// \brief QT callback for setting the destination URI label.
+      /// \param[in] _string Destination URI value.
+      private slots: void OnSetDestinationURI(QString _string);
 
       /// \brief QT callback for setting the log path.
       private slots: void OnBrowse();
@@ -102,8 +106,11 @@ namespace gazebo
       /// \brief Label to display the log time.
       private: QLabel *timeLabel;
 
-      /// \brief Label to display the log destination.
-      private: QLabel *destLabel;
+      /// \brief Label to display the log destination path.
+      private: QLabel *destPathLabel;
+
+      /// \brief Label to display the log destination uri.
+      private: QLabel *destURILabel;
 
       /// \brief Label to display the log file size.
       private: QLabel *sizeLabel;
