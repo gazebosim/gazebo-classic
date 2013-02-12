@@ -19,12 +19,12 @@
  * Date: 24 May 2009
  */
 
-#include "physics/World.hh"
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletCollision.hh"
-#include "physics/bullet/BulletRayShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletRayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -58,18 +58,39 @@ BulletRayShape::~BulletRayShape()
 //////////////////////////////////////////////////
 void BulletRayShape::Update()
 {
+  if (this->collisionParent)
+  {
+    BulletCollisionPtr collision =
+      boost::shared_static_cast<BulletCollision>(this->collisionParent);
+
+    this->globalStartPos =
+      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
+          this->relativeStartPos);
+
+    this->globalEndPos =
+      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
+          this->relativeEndPos);
+  }
+
+  this->rayCallback.m_rayFromWorld.setX(this->globalStartPos.x);
+  this->rayCallback.m_rayFromWorld.setY(this->globalStartPos.y);
+  this->rayCallback.m_rayFromWorld.setZ(this->globalStartPos.z);
+
+  this->rayCallback.m_rayToWorld.setX(this->globalEndPos.x);
+  this->rayCallback.m_rayToWorld.setY(this->globalEndPos.y);
+  this->rayCallback.m_rayToWorld.setZ(this->globalEndPos.z);
+
   this->physicsEngine->GetDynamicsWorld()->rayTest(
-      this->rayCallback.m_rayFromWorld,
-      this->rayCallback.m_rayToWorld,
+      this->rayCallback.m_rayFromWorld, this->rayCallback.m_rayToWorld,
       this->rayCallback);
 
-    if (this->rayCallback.hasHit())
-    {
-      math::Vector3 result(this->rayCallback.m_hitPointWorld.getX(),
-                           this->rayCallback.m_hitPointWorld.getY(),
-                           this->rayCallback.m_hitPointWorld.getZ());
-      this->SetLength(this->globalStartPos.Distance(result));
-    }
+  if (this->rayCallback.hasHit())
+  {
+    math::Vector3 result(this->rayCallback.m_hitPointWorld.getX(),
+                         this->rayCallback.m_hitPointWorld.getY(),
+                         this->rayCallback.m_hitPointWorld.getZ());
+    this->SetLength(this->globalStartPos.Distance(result));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -81,10 +102,8 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
   if (this->physicsEngine && this->collisionParent)
   {
     this->physicsEngine->GetDynamicsWorld()->rayTest(
-        this->rayCallback.m_rayFromWorld,
-        this->rayCallback.m_rayToWorld,
+        this->rayCallback.m_rayFromWorld, this->rayCallback.m_rayToWorld,
         this->rayCallback);
-
     if (this->rayCallback.hasHit())
     {
       math::Vector3 result(this->rayCallback.m_hitPointWorld.getX(),
@@ -101,14 +120,13 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
 void BulletRayShape::SetPoints(const math::Vector3 &_posStart,
                                    const math::Vector3 &_posEnd)
 {
-  this->globalStartPos = _posStart;
-  this->globalEndPos = _posEnd;
+  RayShape::SetPoints(_posStart, _posEnd);
 
-  this->rayCallback.m_rayFromWorld.setX(_posStart.x);
-  this->rayCallback.m_rayFromWorld.setY(_posStart.y);
-  this->rayCallback.m_rayFromWorld.setZ(_posStart.z);
+  this->rayCallback.m_rayFromWorld.setX(this->globalStartPos.x);
+  this->rayCallback.m_rayFromWorld.setY(this->globalStartPos.y);
+  this->rayCallback.m_rayFromWorld.setZ(this->globalStartPos.z);
 
-  this->rayCallback.m_rayToWorld.setX(_posEnd.x);
-  this->rayCallback.m_rayToWorld.setY(_posEnd.y);
-  this->rayCallback.m_rayToWorld.setZ(_posEnd.z);
+  this->rayCallback.m_rayToWorld.setX(this->globalEndPos.x);
+  this->rayCallback.m_rayToWorld.setY(this->globalEndPos.y);
+  this->rayCallback.m_rayToWorld.setZ(this->globalEndPos.z);
 }
