@@ -53,7 +53,7 @@ void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
 {
-  gzwarn << "Screw joint contraints are currenlty not enforced" << "\n";
+  gzwarn << "Screw joint constraints are currently not enforced" << "\n";
 
   if (this->constraint)
     this->Detach();

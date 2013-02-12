@@ -52,6 +52,9 @@ void BulletHinge2Joint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
 {
+  if (this->constraint)
+    this->Detach();
+
   Hinge2Joint<BulletJoint>::Attach(_one, _two);
 
   BulletLinkPtr bulletChildLink =

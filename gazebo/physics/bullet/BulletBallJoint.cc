@@ -64,6 +64,9 @@ void BulletBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
 //////////////////////////////////////////////////
 void BulletBallJoint::Attach(LinkPtr _one, LinkPtr _two)
 {
+  if (this->constraint)
+    this->Detach();
+
   BallJoint<BulletJoint>::Attach(_one, _two);
 
   BulletLinkPtr bulletChildLink =

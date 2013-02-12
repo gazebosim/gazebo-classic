@@ -44,6 +44,9 @@ BulletUniversalJoint::~BulletUniversalJoint()
 //////////////////////////////////////////////////
 void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
 {
+  if (this->constraint)
+    this->Detach();
+
   UniversalJoint<BulletJoint>::Attach(_one, _two);
 
   BulletLinkPtr bulletChildLink =
