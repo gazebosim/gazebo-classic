@@ -95,9 +95,9 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
     laser->GetRanges(scan);
 
     DoubleCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
-    EXPECT_LT(diffMax, 1e-6);
-    EXPECT_LT(diffSum, 1e-5);
-    EXPECT_LT(diffAvg, 1e-6);
+    EXPECT_LT(diffMax, 3e-6);
+    EXPECT_LT(diffSum, 2e-4);
+    EXPECT_LT(diffAvg, 3e-6);
 
     // This line will print the current scan. Use this to generate
     // a new test scan sample

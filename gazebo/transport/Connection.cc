@@ -65,7 +65,6 @@ Connection::Connection()
   this->id = idCounter++;
 
   this->connectMutex = new boost::mutex();
-  this->writeMutex = new boost::recursive_mutex();
   this->readMutex = new boost::recursive_mutex();
   this->acceptor = NULL;
   this->readQuit = false;
@@ -84,9 +83,6 @@ Connection::~Connection()
   this->ProcessWriteQueue();
   this->writeQueue.clear();
   this->Shutdown();
-
-  delete this->writeMutex;
-  this->writeMutex = NULL;
 
   delete this->readMutex;
   this->readMutex = NULL;
@@ -241,8 +237,8 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
   }
 
   /*if (_force)
-  {
-    this->writeMutex->lock();
+    {
+    boost::recursive_mutex::scoped_lock lock(this->writeMutex);
     boost::asio::streambuf *buffer = new boost::asio::streambuf;
     std::ostream os(buffer);
     os << header_stream.str() << _buffer;
@@ -250,24 +246,24 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     std::size_t written = 0;
     written = boost::asio::write(*this->socket, buffer->data());
     if (written != buffer->size())
-      gzerr << "Didn't write all the data\n";
+    gzerr << "Didn't write all the data\n";
 
     delete buffer;
-    this->writeMutex->unlock();
-  }
-  else
+    }
+    else
+    {
+    */
   {
-  */
-    this->writeMutex->lock();
+    boost::recursive_mutex::scoped_lock lock(this->writeMutex);
     this->writeQueue.push_back(header_stream.str());
     this->writeQueue.push_back(_buffer);
-    this->writeMutex->unlock();
+  }
   // }
 
-    if (_force)
-    {
-      this->ProcessWriteQueue();
-    }
+  if (_force)
+  {
+    this->ProcessWriteQueue();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -278,13 +274,12 @@ void Connection::ProcessWriteQueue()
     return;
   }
 
-  this->writeMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
   // async_write should only be called when the last async_write has
   // completed. Therefore we have to check the writeCount attribute
   if (this->writeQueue.size() == 0 || this->writeCount > 0)
   {
-    this->writeMutex->unlock();
     return;
   }
 
@@ -318,7 +313,6 @@ void Connection::ProcessWriteQueue()
 
   this->writeCount--;
   delete buffer;
-  this->writeMutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -337,10 +331,11 @@ std::string Connection::GetRemoteURI() const
 void Connection::OnWrite(const boost::system::error_code &e,
                          boost::asio::streambuf *_buffer)
 {
-  this->writeMutex->lock();
-  delete _buffer;
-  this->writeCount--;
-  this->writeMutex->unlock();
+  {
+    boost::recursive_mutex::scoped_lock lock(this->writeMutex);
+    delete _buffer;
+    this->writeCount--;
+  }
 
   if (e)
   {

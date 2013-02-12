@@ -338,7 +338,7 @@ namespace gazebo
       private: boost::mutex *connectMutex;
 
       /// \brief Mutex to protect write.
-      private: boost::recursive_mutex *writeMutex;
+      private: boost::recursive_mutex writeMutex;
 
       /// \brief Mutex to protect reads.
       private: boost::recursive_mutex *readMutex;

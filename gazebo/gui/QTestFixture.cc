@@ -100,8 +100,10 @@ void QTestFixture::cleanup()
   double resPercentChange = (residentEnd - residentStart) / residentStart;
   double sharePercentChange = (shareEnd - shareStart) / shareStart;
 
+  std::cout << "REs[" << resPercentChange << "]\n";
+  std::cout << "Shared[" << sharePercentChange << "]\n";
   // Make sure the percent change values are reasonable.
-  QVERIFY(resPercentChange < 2.0);
+  QVERIFY(resPercentChange < 2.5);
   QVERIFY(sharePercentChange < 1.0);
 
   if (this->server)
@@ -135,9 +137,7 @@ void QTestFixture::GetMemInfo(double &_resident, double &_share)
 
   // in case x86-64 is configured to use 2MB pages
   long pageSizeKb = sysconf(_SC_PAGE_SIZE) / 1024;
-  _resident = residentPages * pageSizeKb;
-  std::cout << "Resident - " << _resident << " kB\n";
 
+  _resident = residentPages * pageSizeKb;
   _share = sharePages * pageSizeKb;
-  std::cout << "Shared Memory - " << _share << " kB\n";
 }
