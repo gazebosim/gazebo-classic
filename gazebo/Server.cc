@@ -227,44 +227,8 @@ bool Server::GetInitialized() const
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadFile(const std::string &_filename)
-{
-  sdf::SDFPtr sdf;
-  // Try loading file into sdf object
-  if (!this->LoadFile(_filename, sdf))
-    return false;
-
-  // Try loading it further
-  return this->LoadImpl(sdf->root);
-}
-
-/////////////////////////////////////////////////
 bool Server::LoadFile(const std::string &_filename,
                       const std::string &_physics)
-{
-  sdf::SDFPtr sdf;
-  // Try loading file into sdf object
-  if (!this->LoadFile(_filename, sdf))
-    return false;
-
-  // Try inserting physics engine name
-  if (sdf->root->HasElement("world") &&
-      sdf->root->GetElement("world")->HasElement("physics"))
-  {
-    sdf->root->GetElement("world")->GetElement("physics")
-             ->GetAttribute("type")->Set(_physics);
-  }
-  else
-  {
-    gzerr << "Unable to set physics engine: <world> does not have <physics>\n";
-  }
-
-  // Try loading it further
-  return this->LoadImpl(sdf->root);
-}
-
-/////////////////////////////////////////////////
-bool Server::LoadFile(const std::string &_filename, sdf::SDFPtr &_sdf)
 {
   // Quick test for a valid file
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
@@ -276,20 +240,36 @@ bool Server::LoadFile(const std::string &_filename, sdf::SDFPtr &_sdf)
   fclose(test);
 
   // Load the world file
-  _sdf.reset(new sdf::SDF);
-  if (!sdf::init(_sdf))
+  sdf::SDFPtr sdf(new sdf::SDF);
+  if (!sdf::init(sdf))
   {
     gzerr << "Unable to initialize sdf\n";
     return false;
   }
 
-  if (!sdf::readFile(_filename, _sdf))
+  if (!sdf::readFile(_filename, sdf))
   {
     gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
   }
 
-  return true;
+  // Try inserting physics engine name if one is given
+  if (_physics.length())
+  {
+    if (sdf->root->HasElement("world") &&
+        sdf->root->GetElement("world")->HasElement("physics"))
+    {
+      sdf->root->GetElement("world")->GetElement("physics")
+               ->GetAttribute("type")->Set(_physics);
+    }
+    else
+    {
+      gzerr << "Cannot set physics engine: <world> does not have <physics>\n";
+    }
+  }
+
+  // Try loading it further
+  return this->LoadImpl(sdf->root);
 }
 
 /////////////////////////////////////////////////
