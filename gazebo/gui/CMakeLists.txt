@@ -1,4 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+set(QT_USE_QTTEST 1)
 include ( ${QT_USE_FILE} )
 
 link_directories(

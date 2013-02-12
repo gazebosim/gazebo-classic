@@ -1,5 +1,6 @@
 link_directories(${urdfdom_LIBRARY_DIRS} ${urdfdom_headers_LIBRARY_DIRS} ${console_bridge_LIBRARY_DIRS})
 
+set(QT_USE_QTTEST 1)
 include ( ${QT_USE_FILE} )
 add_definitions(${QT_DEFINITIONS})
 
