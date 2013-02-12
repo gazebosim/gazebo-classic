@@ -184,7 +184,7 @@ namespace gazebo
                     {
                       this->Close();
                     }
-                    catch (...)
+                    catch(...)
                     {
                     }
                     // This will occur when the other side closes the

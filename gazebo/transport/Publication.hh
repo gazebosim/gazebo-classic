@@ -167,11 +167,8 @@ namespace gazebo
 
       /// \brief Mutex to protect the list of nodes id for removed.
       private: mutable boost::mutex nodeRemoveMutex;
-
     };
     /// \}
   }
 }
 #endif
-
-

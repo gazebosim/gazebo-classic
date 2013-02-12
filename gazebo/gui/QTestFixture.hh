@@ -18,6 +18,7 @@
 #ifndef _QTESTFIXTURE_HH_
 #define _QTESTFIXTURE_HH_
 
+#include <string>
 #include <boost/thread.hpp>
 
 #include "gazebo/physics/physics.hh"
@@ -37,7 +38,7 @@ class QTestFixture : public QObject
   /// \brief Load a world.
   /// \param[in] _worldFilename Name of the world to load.
   /// \param[in] _paused True to start the world paused.
-  protected: void Load(const std::string &_worldFilename, bool _paused=false);
+  protected: void Load(const std::string &_worldFilename, bool _paused = false);
 
   /// \brief Pause or unpause the world.
   /// \param[in] _pause True to pause the world
@@ -62,7 +63,7 @@ class QTestFixture : public QObject
   private slots: void cleanupTestCase();
 
   /// \brief Run the Gazebo server in a thread.
-  private: void RunServer(const std::string _worldFilename, bool _paused);
+  private: void RunServer(const std::string &_worldFilename, bool _paused);
 
   /// \brief The Gazebo server, which is run in a thread.
   protected: gazebo::Server *server;

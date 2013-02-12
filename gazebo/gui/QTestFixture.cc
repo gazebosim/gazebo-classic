@@ -38,7 +38,6 @@ void QTestFixture::initTestCase()
 
   path = TEST_PATH;
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
-
 }
 
 /////////////////////////////////////////////////
@@ -63,7 +62,7 @@ void QTestFixture::Load(const std::string &_worldFilename, bool _paused)
 }
 
 /////////////////////////////////////////////////
-void QTestFixture::RunServer(const std::string _worldFilename, bool _paused)
+void QTestFixture::RunServer(const std::string &_worldFilename, bool _paused)
 {
   this->server = new gazebo::Server();
   this->server->LoadFile(_worldFilename);
@@ -136,7 +135,7 @@ void QTestFixture::GetMemInfo(double &_resident, double &_share)
   buffer.close();
 
   // in case x86-64 is configured to use 2MB pages
-  long pageSizeKb = sysconf(_SC_PAGE_SIZE) / 1024;
+  int64_t pageSizeKb = sysconf(_SC_PAGE_SIZE) / 1024;
 
   _resident = residentPages * pageSizeKb;
   _share = sharePages * pageSizeKb;

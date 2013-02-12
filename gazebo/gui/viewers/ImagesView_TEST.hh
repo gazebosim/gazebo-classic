@@ -18,6 +18,8 @@
 #ifndef _IMAGESVIEW_TEST_HH_
 #define _IMAGESVIEW_TEST_HH_
 
+#include <string>
+
 #include "gazebo/gui/QTestFixture.hh"
 #include "gazebo/gui/viewers/ImagesView.hh"
 
