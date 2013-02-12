@@ -15,6 +15,7 @@
  *
  */
 #include "common/Color.hh"
+#include "common/Assert.hh"
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
@@ -1052,6 +1053,8 @@ void Element::RemoveFromParent()
 /////////////////////////////////////////////////
 void Element::RemoveChild(ElementPtr _child)
 {
+  GZ_ASSERT(_child, "Cannot remove a NULL child pointer");
+
   ElementPtr_V::iterator iter;
   iter = std::find(this->elements.begin(),
                    this->elements.end(), _child);

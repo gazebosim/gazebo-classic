@@ -97,6 +97,7 @@ void LogPlay::Open(const std::string &_logFile)
   // Read in the header.
   this->ReadHeader();
 
+  this->logCurrXml = this->logStartXml;
   this->encoding.clear();
 }
 
@@ -172,10 +173,12 @@ uint32_t LogPlay::GetRandSeed() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
-  if (!this->logCurrXml)
+  if (this->logCurrXml == this->logStartXml)
     this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
-  else
+  else if (this->logCurrXml)
     this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
+  else
+    return false;
 
   return this->GetChunkData(this->logCurrXml, _data);
 }
