@@ -88,6 +88,8 @@ bool Server::ParseArgs(int argc, char **argv)
   v_desc.add_options()
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
+    ("physics,e", po::value<std::string>(),
+     "Specify a physics engine (ode|bullet).")
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data to disk.")
     ("seed",  po::value<double>(),
@@ -202,7 +204,13 @@ bool Server::ParseArgs(int argc, char **argv)
       configFilename = this->vm["world_file"].as<std::string>();
 
     // Load the server
-    if (!this->LoadFile(configFilename))
+    if (this->vm.count("physics"))
+    {
+      std::string physics = this->vm["physics"].as<std::string>();
+      if (!this->LoadFile(configFilename, physics))
+        return false;
+    }
+    else if (!this->LoadFile(configFilename))
       return false;
   }
 
@@ -219,7 +227,8 @@ bool Server::GetInitialized() const
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadFile(const std::string &_filename)
+bool Server::LoadFile(const std::string &_filename,
+                      const std::string &_physics)
 {
   // Quick test for a valid file
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
@@ -244,6 +253,22 @@ bool Server::LoadFile(const std::string &_filename)
     return false;
   }
 
+  // Try inserting physics engine name if one is given
+  if (_physics.length())
+  {
+    if (sdf->root->HasElement("world") &&
+        sdf->root->GetElement("world")->HasElement("physics"))
+    {
+      sdf->root->GetElement("world")->GetElement("physics")
+               ->GetAttribute("type")->Set(_physics);
+    }
+    else
+    {
+      gzerr << "Cannot set physics engine: <world> does not have <physics>\n";
+    }
+  }
+
+  // Try loading it further
   return this->LoadImpl(sdf->root);
 }
 
