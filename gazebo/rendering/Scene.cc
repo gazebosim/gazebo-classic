@@ -23,6 +23,7 @@
 #include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/rendering/Road2d.hh"
@@ -1521,6 +1522,7 @@ void Scene::PreRender()
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
         math::Pose pose = msgs::Convert(*pIter);
+        GZ_ASSERT(iter->second, "Visual pointer is NULL");
         iter->second->SetPose(pose);
         PoseMsgs_L::iterator prev = pIter++;
         this->poseMsgs.erase(prev);
@@ -1994,6 +1996,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
           visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
       {
         visual->SetVisible(false);
+        visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
       }
 
       visual->ShowCOM(this->showCOMs);
@@ -2362,6 +2365,7 @@ std::string Scene::StripSceneName(const std::string &_name) const
 //////////////////////////////////////////////////
 Heightmap *Scene::GetHeightmap() const
 {
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
   return this->terrain;
 }
 
