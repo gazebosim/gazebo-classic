@@ -406,7 +406,7 @@ double Joint::GetForce(int _index)
   else
   {
     gzerr << "Invalid joint index [" << _index
-          << "] when trying to apply force\n";
+          << "] when trying to get force\n";
     return 0;
   }
 }

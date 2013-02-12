@@ -39,6 +39,8 @@ set (msgs
   laserscan_stamped.proto
   light.proto
   link.proto
+  log_control.proto
+  log_status.proto
   material.proto
   meshgeom.proto
   model.proto

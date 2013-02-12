@@ -172,8 +172,8 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                      const gazebo::physics::ModelState &_state)
       {
-        _out << "<model name='" << _state.GetName() << "'>\n";
-        _out << "<pose>" << _state.pose << "</pose>\n";
+        _out << "  <model name='" << _state.GetName() << "'>\n";
+        _out << "    <pose>" << _state.pose << "</pose>\n";
 
         for (std::vector<LinkState>::const_iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();
@@ -190,7 +190,7 @@ namespace gazebo
           _out << *iter;
         }
 
-        _out << "</model>\n";
+        _out << "  </model>\n";
 
         return _out;
       }
