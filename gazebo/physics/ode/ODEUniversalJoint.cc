@@ -140,6 +140,11 @@ void ODEUniversalJoint::SetForce(int _index, double _torque)
   ODEJoint::SetForce(_index, _torque);
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
+
+  if (this->effortLimit[_index] > 0.0)
+    _torque = math::clamp(_torque, -this->effortLimit[_index],
+      this->effortLimit[_index]);
+
   if (_index == 0)
     dJointAddUniversalTorques(this->jointId, _torque, 0);
   else

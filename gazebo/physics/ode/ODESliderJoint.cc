@@ -109,6 +109,10 @@ void ODESliderJoint::SetForce(int _index, double _force)
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
+  if (this->effortLimit[_index] > 0.0)
+    _force = math::clamp(_force, -this->effortLimit[_index],
+      this->effortLimit[_index]);
+
   dJointAddSliderForce(this->jointId, _force);
 }
 

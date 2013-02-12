@@ -149,11 +149,10 @@ void ODEHingeJoint::SetForce(int _index, double _torque)
     this->parentLink->SetEnabled(true);
 
   if (this->effortLimit[_index] > 0.0)
-    dJointAddHingeTorque(this->jointId, _torque);
-  else
-    dJointAddHingeTorque(this->jointId,
-      math::clamp(_torque,
-      -this->effortLimit[_index], this->effortLimit[_index]));
+    _torque = math::clamp(_torque,
+      -this->effortLimit[_index], this->effortLimit[_index]);
+
+  dJointAddHingeTorque(this->jointId, _torque);
 }
 
 //////////////////////////////////////////////////

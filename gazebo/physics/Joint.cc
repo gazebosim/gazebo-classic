@@ -244,6 +244,18 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
+double Joint::GetEffortLimit(int _index)
+{
+  return this->effortLimit[_index];
+}
+
+//////////////////////////////////////////////////
+double Joint::GetVelocityLimit(int _index)
+{
+  return this->velocityLimit[_index];
+}
+
+//////////////////////////////////////////////////
 void Joint::Update()
 {
   this->jointUpdate();
