@@ -203,14 +203,14 @@ bool Server::ParseArgs(int argc, char **argv)
     if (this->vm.count("world_file"))
       configFilename = this->vm["world_file"].as<std::string>();
 
-    // Load the server
+    // Get the physics engine name specified from the command line, or use ""
+    // if no physics engine is specified.
+    std::string physics;
     if (this->vm.count("physics"))
-    {
-      std::string physics = this->vm["physics"].as<std::string>();
-      if (!this->LoadFile(configFilename, physics))
-        return false;
-    }
-    else if (!this->LoadFile(configFilename))
+      physics = this->vm["physics"].as<std::string>();
+      
+    // Load the server
+    if (!this->LoadFile(configFilename, physics))
       return false;
   }
 
