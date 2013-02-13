@@ -28,6 +28,7 @@ using namespace gazebo;
 class RaySensor : public ServerFixture
 {
   public: void EmptyWorld(const std::string &_physicsEngine);
+  public: void RayUnitSphere(const std::string &_physicsEngine);
 };
 
 
@@ -47,8 +48,28 @@ void RaySensor::EmptyWorld(const std::string &_physicsEngine)
   std::string raySensorName = "ray_sensor";
   math::Pose testPose(math::Vector3(0, 0, 0),
       math::Quaternion(0, 0, 0));
+
+  double hMinAngle = -2.0;
+  double hMaxAngle = 2.0;
+  double minRange = 0.1;
+  double maxRange = 5.0;
+  double rangeResolution = 0.02;
+  unsigned int samples = 320;
+
   SpawnRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler());
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+      rangeResolution, samples);
+
+  sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
+  sensors::RaySensorPtr raySensor =
+    boost::shared_dynamic_cast<sensors::RaySensor>(sensor);
+
+  EXPECT_NEAR(raySensor->GetAngleMin().Radian(), -2.0, PHYSICS_TOL);
+  EXPECT_NEAR(raySensor->GetAngleMax().Radian(), 2.0, PHYSICS_TOL);
+  EXPECT_NEAR(raySensor->GetRangeMin(), 0.1, PHYSICS_TOL);
+  EXPECT_NEAR(raySensor->GetRangeMax(), 5.0, PHYSICS_TOL);
+  EXPECT_NEAR(raySensor->GetRangeResolution(), 0.02, PHYSICS_TOL);
+  EXPECT_EQ(raySensor->GetRayCount(), 320);
 }
 
 TEST_F(RaySensor, EmptyWorldODE)
@@ -56,12 +77,65 @@ TEST_F(RaySensor, EmptyWorldODE)
   EmptyWorld("ode");
 }
 
-
 TEST_F(RaySensor, EmptyWorldBullet)
 {
   EmptyWorld("bullet");
 }
 
+void RaySensor::RayUnitSphere(const std::string &_physicsEngine)
+{
+  Load("worlds/empty.world", true, _physicsEngine);
+  std::string modelName = "ray_model";
+  std::string raySensorName = "ray_sensor";
+  math::Pose testPose(math::Vector3(0, 0, 0),
+      math::Quaternion(0, 0, 0));
+  SpawnRaySensor(modelName, raySensorName, testPose.pos,
+      testPose.rot.GetAsEuler());
+
+  double hMinAngle = -2.0;
+  double hMaxAngle = 2.0;
+  double minRange = 0.1;
+  double maxRange = 5.0;
+  double rangeResolution = 0.02;
+  unsigned int samples = 320;
+
+  std::string sphere01 = "sphere_0";
+  math::Pose sphere01Pose(math::Vector3(1, 0, 0),
+      math::Quaternion(0, 0, 0));
+  SpawnRaySensor(modelName, raySensorName, testPose.pos,
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+      rangeResolution, samples);
+
+  sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
+  sensors::RaySensorPtr raySensor =
+    boost::shared_dynamic_cast<sensors::RaySensor>(sensor);
+  raySensor->Init();
+  raySensor->Update(true);
+
+  int mid = samples / 2;
+  double unitSphereRadius = 0.5;
+  double expectedRangeAtMidPoint = sphere01Pose.pos.x - unitSphereRadius;
+
+
+    gzerr << raySensor->GetRange(0)  << std::endl;
+  gzerr << raySensor->GetRange(1)  << std::endl;
+  gzerr << raySensor->GetRange(mid)  << std::endl;
+  gzerr << raySensor->GetRange(samples-1)  << std::endl;
+
+  EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, PHYSICS_TOL);
+
+
+}
+
+TEST_F(RaySensor, RaySphereODE)
+{
+  RayUnitSphere("ode");
+}
+
+TEST_F(RaySensor, RaySphereBullet)
+{
+  RayUnitSphere("bullet");
+}
 
 int main(int argc, char **argv)
 {
