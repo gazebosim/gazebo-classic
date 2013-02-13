@@ -215,11 +215,11 @@ void TopicManager::Unsubscribe(const std::string &_topic,
 }
 
 //////////////////////////////////////////////////
-void TopicManager::ConnectPubToSub(const std::string &topic,
+void TopicManager::ConnectPubToSub(const std::string &_topic,
                                    const SubscriptionTransportPtr _sublink)
 {
-  PublicationPtr publication = this->FindPublication(topic);
-  publication->AddSubscription(sublink);
+  PublicationPtr publication = this->FindPublication(_topic);
+  publication->AddSubscription(_sublink);
 }
 
 //////////////////////////////////////////////////
