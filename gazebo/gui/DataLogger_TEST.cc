@@ -31,8 +31,8 @@ void DataLogger_TEST::RecordButton()
       "dataLoggerRecordButton");
 
   // Get the destination label
-  QLabel *destLabel = dataLogger->findChild<QLabel*>(
-      "dataLoggerDestnationLabel");
+  QLabel *destPathLabel = dataLogger->findChild<QLabel*>(
+      "dataLoggerDestnationPathLabel");
 
   // Get the time label
   QLabel *timeLabel = dataLogger->findChild<QLabel*>("dataLoggerTimeLabel");
@@ -44,7 +44,7 @@ void DataLogger_TEST::RecordButton()
   QLabel *sizeLabel = dataLogger->findChild<QLabel*>("dataLoggerSizeLabel");
 
   QVERIFY(recordButton != NULL);
-  QVERIFY(destLabel != NULL);
+  QVERIFY(destPathLabel != NULL);
   QVERIFY(sizeLabel != NULL);
   QVERIFY(timeLabel != NULL);
   QVERIFY(statusLabel != NULL);
@@ -53,7 +53,7 @@ void DataLogger_TEST::RecordButton()
   recordButton->toggle();
 
   // Wait for a log status return message
-  while (destLabel->text().isEmpty())
+  while (destPathLabel->text().toStdString() == "Path: ")
   {
     // The following line tell QT to process its events. This is vital for
     // all tests, but it must be run in the main thread.
@@ -64,7 +64,7 @@ void DataLogger_TEST::RecordButton()
   std::string txt;
 
   // Make sure the destination log file is correct.
-  txt = destLabel->text().toStdString();
+  txt = destPathLabel->text().toStdString();
   QVERIFY(txt.find("test/state.log") != std::string::npos);
 
   // Make sure the initial size is zero

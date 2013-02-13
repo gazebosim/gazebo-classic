@@ -20,11 +20,11 @@
 #include <vector>
 #include <list>
 
-#include "gui/qt.h"
-#include "transport/TransportTypes.hh"
-#include "msgs/MessageTypes.hh"
-#include "common/Event.hh"
-#include "common/Time.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/Time.hh"
 
 class QLineEdit;
 class QLabel;
@@ -36,7 +36,11 @@ namespace gazebo
     class TimePanel : public QWidget
     {
       Q_OBJECT
+
+      /// \brief Constructor
       public: TimePanel(QWidget *_parent = 0);
+
+      /// \brief Destructor
       public: virtual ~TimePanel();
 
       /// \brief A signal used to set the sim time line edit.
@@ -51,27 +55,52 @@ namespace gazebo
       /// \param[in] _string String representation of iterations.
       signals: void SetIterations(QString _string);
 
+      /// \brief Update the data output.
       private slots: void Update();
 
+      /// \brief Called when the GUI enters/leaves full-screen mode.
+      /// \param[in] _value True when entering full screen, false when
+      /// leaving.
       private: void OnFullScreen(bool &_value);
+
+      /// \brief Called when a world stats message is received.
+      /// \param[in] _msg World statistics message.
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
+      /// \brief QT callback when the reset time button is pressed.
       private slots: void OnTimeReset();
 
+      /// \brief Display the real time percentage.
       private: QLineEdit *percentRealTimeEdit;
+
+      /// \brief Display the simulation time.
       private: QLineEdit *simTimeEdit;
+
+      /// \brief Display the real time.
       private: QLineEdit *realTimeEdit;
+
+      /// \brief Display the number of iterations.
       private: QLineEdit *iterationsEdit;
 
-      private: common::Time lastUpdateTime, statusUpdatePeriod;
-      private: common::Time simTime, realTime, pauseTime;
-
+      /// \brief Node used for communication.
       private: transport::NodePtr node;
+
+      /// \brief Subscriber to the statistics topic.
       private: transport::SubscriberPtr statsSub;
+
+      /// \brief Used to start, stop, and step simulation.
       private: transport::PublisherPtr worldControlPub;
 
+      /// \brief Event based connections.
       private: std::vector<event::ConnectionPtr> connections;
-      private: std::list<common::Time> simTimes, realTimes;
+
+      /// \brief List of simulation times used to compute averages.
+      private: std::list<common::Time> simTimes;
+
+      /// \brief List of real times used to compute averages.
+      private: std::list<common::Time> realTimes;
+
+      /// \brief Mutex to protect the memeber variables.
       private: boost::mutex mutex;
     };
   }

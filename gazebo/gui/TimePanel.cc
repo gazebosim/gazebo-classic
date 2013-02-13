@@ -99,7 +99,6 @@ TimePanel::TimePanel(QWidget *_parent)
       gui::Events::ConnectFullScreen(
         boost::bind(&TimePanel::OnFullScreen, this, _1)));
 
-  this->simTime.Set(0);
   this->show();
 
   // Create a QueuedConnection to set iterations.
@@ -147,9 +146,6 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   this->realTimes.push_back(msgs::Convert(_msg->real_time()));
   if (this->realTimes.size() > 20)
     this->realTimes.pop_front();
-
-  // this->simTime = msgs::Convert(_msg->sim_time());
-  this->realTime = msgs::Convert(_msg->real_time());
 
   if (_msg->paused() && (g_pauseAct && !g_pauseAct->isChecked()))
   {
