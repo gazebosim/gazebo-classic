@@ -33,40 +33,55 @@ namespace gazebo
     /// \{
 
     /// \class GearboxJoint GearboxJoint.hh physics/physics.hh
-    /// \brief A single axis hinge joint
+    /// \brief A double axis gearbox joint
     template<class T>
     class GearboxJoint : public T
     {
       /// \brief Constructor
       /// \param[in] _parent Parent link
       public: GearboxJoint(BasePtr _parent) : T(_parent)
-              { this->AddType(Base::HINGE_JOINT); }
+              { this->AddType(Base::GEARBOX_JOINT); }
       ///  \brief Destructor
       public: virtual ~GearboxJoint()
               { }
 
       /// \interal
       public: virtual unsigned int GetAngleCount() const
-              {return 1;}
+              {return 2;}
 
       /// \brief Load joint
       /// \param[in] _sdf Pointer to SDF element
       public: virtual void Load(sdf::ElementPtr _sdf)
               {
                 T::Load(_sdf);
+                if (_sdf->HasElement("gear_ratio"))
+                {
+                  this->gearRatio =
+                    _sdf->GetElement("gear_ratio")->GetValueDouble();
+                }
+                else
+                {
+                  gzerr << "should not see this\n";
+                  this->gearRatio = 1.0;
+                }
 
-                this->SetAxis(0,
-                    _sdf->GetElement("axis")->GetValueVector3("xyz"));
-
-                this->SetAxis(1,
-                    _sdf->GetElement("axis2")->GetValueVector3("xyz"));
               }
 
       /// \brief Initialize joint
-      // protected: virtual void Init()
-      //            {
-      //              T::Init();
-      //            }
+      protected: virtual void Init()
+                 {
+                   T::Init();
+                 }
+
+      /// \brief Set gearbox joint gear ratio.
+      ///
+      /// This must be implemented in a child class
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _gearRatio Gear ratio value.
+      public: virtual void SetGearRatio(double _gearRatio) = 0;
+
+      /// \brief Gearbox gearRatio
+      protected: double gearRatio;
     };
     /// \}
   }

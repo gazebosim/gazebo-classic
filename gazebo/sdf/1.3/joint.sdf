@@ -22,8 +22,12 @@
     <description>offset from child link origin in child link frame.</description>
   </element>
 
+  <element name="gear_ratio" type="double" default="1.0" required="0">
+    <description>Parameter for gearbox joints.</description>
+  </element>
+
   <element name="thread_pitch" type="double" default="1.0" required="0">
-    <description></description>
+    <description>Parameter for screw joints.</description>
   </element>
 
   <element name="axis" required="1">

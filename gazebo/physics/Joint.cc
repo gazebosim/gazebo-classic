@@ -132,6 +132,8 @@ void Joint::LoadImpl(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void Joint::Init()
 {
+  gzerr << "attach\n";
+
   this->Attach(this->parentLink, this->childLink);
 
   // Set the anchor vector
@@ -340,7 +342,8 @@ void Joint::FillMsg(msgs::Joint &_msg)
     _msg.add_angle(this->GetAngle(1).Radian());
   }
 
-  msgs::Set(_msg.mutable_axis1()->mutable_xyz(), this->GetGlobalAxis(0));
+  // msgs::Set(_msg.mutable_axis1()->mutable_xyz(), this->GetGlobalAxis(0));
+  msgs::Set(_msg.mutable_axis1()->mutable_xyz(), math::Vector3());
   _msg.mutable_axis1()->set_limit_lower(0);
   _msg.mutable_axis1()->set_limit_upper(0);
   _msg.mutable_axis1()->set_limit_effort(0);

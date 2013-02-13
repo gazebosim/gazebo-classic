@@ -126,9 +126,18 @@
               <xyz>1.000000 0.000000 0.000000</xyz>
             </axis>
         </joint>
-        <joint name="joint_1" type="gearbox">
+        <joint name="joint_1" type="revolute">
             <parent>link_1</parent>
             <child>link_2</child>
+            <axis>
+              <xyz>1.000000 0.000000 0.000000</xyz>
+            </axis>
+        </joint>
+        <joint name="joint_12" type="gearbox">
+            <parent>link_1</parent>
+            <child>link_2</child>
+            <pose>0 0 0 0 0 0</pose>
+            <gear_ratio>-2</gear_ratio>
             <axis>
               <xyz>1.000000 0.000000 0.000000</xyz>
             </axis>

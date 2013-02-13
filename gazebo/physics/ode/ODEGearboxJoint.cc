@@ -49,8 +49,13 @@ void ODEGearboxJoint::Load(sdf::ElementPtr _sdf)
 {
   GearboxJoint<ODEJoint>::Load(_sdf);
 
-  this->SetParam(dParamFMax, 0);
-  this->SetForce(0, 0);
+  this->SetGearRatio(this->gearRatio);
+}
+
+//////////////////////////////////////////////////
+void ODEGearboxJoint::SetGearRatio(double _gearRatio)
+{
+  dJointSetGearboxRatio(this->jointId, _gearRatio);
 }
 
 //////////////////////////////////////////////////
@@ -71,8 +76,6 @@ math::Vector3 ODEGearboxJoint::GetAnchor(int _index) const
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetAnchor(int _index, const math::Vector3 &_anchor)
 {
-  gzerr << "debug\n";
-
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
