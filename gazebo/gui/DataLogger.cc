@@ -102,7 +102,7 @@ DataLogger::DataLogger(QWidget *_parent)
   topLayout->addLayout(statusLayout);
 
   QHBoxLayout *destPathLayout = new QHBoxLayout;
-  this->destPathLabel = new QLabel;
+  this->destPathLabel = new QLabel("Path: ");
   this->destPathLabel->setObjectName("dataLoggerDestnationPathLabel");
   this->destPathLabel->setStyleSheet(
       "QLabel {color: #aeaeae; font-size: 11px;}");
@@ -112,7 +112,7 @@ DataLogger::DataLogger(QWidget *_parent)
   destPathLayout->addStretch(1);
 
   QHBoxLayout *destURILayout = new QHBoxLayout;
-  this->destURILabel = new QLabel;
+  this->destURILabel = new QLabel("Address: ");
   this->destURILabel->setObjectName("dataLoggerDestnationURILabel");
   this->destURILabel->setStyleSheet(
       "QLabel {color: #aeaeae; font-size: 11px;}");
@@ -248,9 +248,9 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 
     // Display the URI
     if (_msg->log_file().has_uri())
-    {
       this->SetDestinationURI(QString::fromStdString(_msg->log_file().uri()));
-    }
+    else
+      this->SetDestinationURI(tr(""));
 
     // If there is log file size information...
     if (_msg->log_file().has_size() && _msg->log_file().has_size_units())
@@ -287,18 +287,18 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 void DataLogger::OnSetDestinationPath(QString _filename)
 {
   if (!_filename.isEmpty())
-    this->destPathLabel->setText(_filename);
+    this->destPathLabel->setText("Path: " + _filename);
   else
-    this->destPathLabel->setText("");
+    this->destPathLabel->setText("Path: ");
 }
 
 /////////////////////////////////////////////////
 void DataLogger::OnSetDestinationURI(QString _uri)
 {
   if (!_uri.isEmpty())
-    this->destURILabel->setText("http://" + _uri + "/.gazebo/log");
+    this->destURILabel->setText("Address: " + _uri);
   else
-    this->destURILabel->setText("");
+    this->destURILabel->setText("Address: ");
 }
 
 /////////////////////////////////////////////////
