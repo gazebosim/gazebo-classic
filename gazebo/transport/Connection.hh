@@ -286,7 +286,10 @@ namespace gazebo
                               boost::tuple<Handler> _handler)
               {
                 if (_e)
-                  gzerr << "Error Reading data!\n";
+                {
+                  gzerr << "Error Reading data["
+                    << _e.message() << "]\n";
+                }
 
                 // Inform caller that data has been received
                 std::string data(&this->inboundData[0],
@@ -335,7 +338,7 @@ namespace gazebo
       /// \brief Callback when a write has occurred.
       /// \param[in] _e Error code
       /// \param[in] _b Buffer of the data that was written.
-      private: void OnWrite(const boost::system::error_code &e,
+      private: void OnWrite(const boost::system::error_code &_e,
                             boost::asio::streambuf *_b);
 
       /// \brief Handle new connections, if this is a server

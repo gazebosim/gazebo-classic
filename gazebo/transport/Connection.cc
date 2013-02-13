@@ -283,8 +283,7 @@ void Connection::ProcessWriteQueue()
     return;
   }
 
-  printf("WriteCount[%d]\n", writeCount);
-  boost::asio::streambuf *buffer = new boost::asio::streambuf;
+  boost::asio::streambuf *buffer(new boost::asio::streambuf);
   std::ostream os(buffer);
 
   for (unsigned int i = 0; i < this->writeQueue.size(); i++)
@@ -329,7 +328,7 @@ std::string Connection::GetRemoteURI() const
 }
 
 //////////////////////////////////////////////////
-void Connection::OnWrite(const boost::system::error_code &e,
+void Connection::OnWrite(const boost::system::error_code &_e,
                          boost::asio::streambuf *_buffer)
 {
   {
@@ -338,9 +337,9 @@ void Connection::OnWrite(const boost::system::error_code &e,
     delete _buffer;
   }
 
-  if (e)
+  if (_e)
   {
-    // gzerr << "onWrite error[" << e.message() << "]\n";
+    gzerr << "onWrite error[" << _e.message() << "]\n";
     // It will reach this point if the remote connection disconnects.
     this->Shutdown();
   }

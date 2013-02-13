@@ -242,7 +242,10 @@ namespace gazebo
       private: SubNodeMap subscribedNodes;
       private: std::vector<NodePtr> nodes;
 
-      private: boost::recursive_mutex *nodeMutex;
+      private: boost::recursive_mutex nodeMutex;
+
+      /// \brief Used to protect subscription connection creation.
+      private: boost::mutex subscriberMutex;
 
       private: bool pauseIncoming;
 

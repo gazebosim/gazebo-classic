@@ -153,6 +153,9 @@ namespace gazebo
       /// \brief ID of nodes to remove from nodes list.
       private: std::list<unsigned int> removeNodes;
 
+      private: std::list<std::pair<std::string, unsigned int> > removeCallbacks;
+
+
       /// \brief List of transport mechanisms.
       private: std::list<PublicationTransportPtr> transports;
 
@@ -164,6 +167,9 @@ namespace gazebo
 
       /// \brief Mutex to protect the list of nodes.
       private: mutable boost::mutex nodeMutex;
+
+      /// \brief Mutex to protect the list of nodes.
+      private: mutable boost::mutex callbackMutex;
 
       /// \brief Mutex to protect the list of nodes id for removed.
       private: mutable boost::mutex nodeRemoveMutex;

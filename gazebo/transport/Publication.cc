@@ -68,6 +68,8 @@ void Publication::AddSubscription(const NodePtr &_node)
 //////////////////////////////////////////////////
 void Publication::AddSubscription(const CallbackHelperPtr &_callback)
 {
+  boost::mutex::scoped_lock lock(this->callbackMutex);
+
   std::list< CallbackHelperPtr >::iterator iter;
   iter = std::find(this->callbacks.begin(), this->callbacks.end(), _callback);
 
@@ -156,6 +158,7 @@ void Publication::RemoveSubscription(const NodePtr &_node)
   boost::mutex::scoped_try_lock lock(this->nodeMutex);
   if (!lock)
   {
+    gzerr << "LOCKED!\n";
     boost::mutex::scoped_lock removeLock(this->nodeRemoveMutex);
     this->removeNodes.push_back(_node->GetId());
     return;
@@ -183,6 +186,15 @@ void Publication::RemoveSubscription(const NodePtr &_node)
 void Publication::RemoveSubscription(const std::string &_host,
                                      unsigned int _port)
 {
+  boost::mutex::scoped_try_lock lock(this->callbackMutex);
+  if (!lock)
+  {
+    gzerr << "LOCKED 2!\n";
+    boost::mutex::scoped_lock removeLock(this->nodeRemoveMutex);
+    this->removeCallbacks.push_back(std::make_pair(_host, _port));
+    return;
+  }
+
   SubscriptionTransportPtr subptr;
   std::list< CallbackHelperPtr >::iterator iter;
 
@@ -201,7 +213,7 @@ void Publication::RemoveSubscription(const std::string &_host,
   }
 
   // If no more subscribers, then disconnect from all publishers
-  if (this->callbacks.size() == 0)
+  if (this->nodes.size() == 0 && this->callbacks.size() == 0)
   {
     this->transports.clear();
   }
@@ -231,19 +243,22 @@ void Publication::LocalPublish(const std::string &data)
   // will clean up the nodes that have then been marked for removal
   this->RemoveNodes();
 
-  std::list< CallbackHelperPtr >::iterator cbIter;
-  cbIter = this->callbacks.begin();
-  while (cbIter != this->callbacks.end())
   {
-    if ((*cbIter)->IsLocal())
+    boost::mutex::scoped_lock lock(this->callbackMutex);
+    std::list< CallbackHelperPtr >::iterator cbIter;
+    cbIter = this->callbacks.begin();
+    while (cbIter != this->callbacks.end())
     {
-      if ((*cbIter)->HandleData(data))
-        ++cbIter;
+      if ((*cbIter)->IsLocal())
+      {
+        if ((*cbIter)->HandleData(data))
+          ++cbIter;
+        else
+          cbIter = this->callbacks.erase(cbIter);
+      }
       else
-        cbIter = this->callbacks.erase(cbIter);
+        ++cbIter;
     }
-    else
-      ++cbIter;
   }
 }
 
@@ -275,15 +290,18 @@ void Publication::Publish(const google::protobuf::Message &_msg,
   // will clean up the nodes that have then been marked for removal
   this->RemoveNodes();
 
-  std::list<CallbackHelperPtr>::iterator cbIter;
-  cbIter = this->callbacks.begin();
-
-  while (cbIter != this->callbacks.end())
   {
-    if ((*cbIter)->HandleData(data))
-      ++cbIter;
-    else
-      this->callbacks.erase(cbIter++);
+    boost::mutex::scoped_lock lock(this->callbackMutex);
+    std::list<CallbackHelperPtr>::iterator cbIter;
+    cbIter = this->callbacks.begin();
+
+    while (cbIter != this->callbacks.end())
+    {
+      if ((*cbIter)->HandleData(data))
+        ++cbIter;
+      else
+        this->callbacks.erase(cbIter++);
+    }
   }
 
   if (_cb)
@@ -305,6 +323,7 @@ unsigned int Publication::GetTransportCount() const
 //////////////////////////////////////////////////
 unsigned int Publication::GetCallbackCount() const
 {
+  boost::mutex::scoped_lock lock(this->callbackMutex);
   return this->callbacks.size();
 }
 
@@ -320,6 +339,7 @@ unsigned int Publication::GetRemoteSubscriptionCount()
 {
   unsigned int count = 0;
 
+  boost::mutex::scoped_lock lock(this->callbackMutex);
   std::list< CallbackHelperPtr >::iterator iter;
   for (iter = this->callbacks.begin(); iter != this->callbacks.end(); ++iter)
   {
@@ -351,30 +371,70 @@ void Publication::AddPublisher(PublisherPtr _pub)
 //////////////////////////////////////////////////
 void Publication::RemoveNodes()
 {
-  boost::mutex::scoped_lock lock(this->nodeMutex);
   boost::mutex::scoped_lock removeLock(this->nodeRemoveMutex);
 
-  std::list<NodePtr>::iterator nodeIter;
-
-  for (std::list<unsigned int>::iterator iter = this->removeNodes.begin();
-       iter != this->removeNodes.end(); ++iter)
+  // Remove queued nodes.
   {
-    for (nodeIter = this->nodes.begin(); nodeIter != this->nodes.end();
-         ++nodeIter)
+    std::list<NodePtr>::iterator nodeIter;
+
+    for (std::list<unsigned int>::iterator iter = this->removeNodes.begin();
+        iter != this->removeNodes.end(); ++iter)
     {
-      if ((*nodeIter)->GetId() == (*iter))
+      boost::mutex::scoped_lock lock(this->nodeMutex);
+      for (nodeIter = this->nodes.begin(); nodeIter != this->nodes.end();
+          ++nodeIter)
       {
-        this->nodes.erase(nodeIter);
-        break;
+        if ((*nodeIter)->GetId() == (*iter))
+        {
+          this->nodes.erase(nodeIter);
+          break;
+        }
       }
     }
   }
 
-  this->removeNodes.clear();
 
-  // If no more subscribers, then disconnect from all publishers
-  if (this->nodes.size() == 0 && this->callbacks.size() == 0)
+  // Remove queued subscriptions.
   {
-    this->transports.clear();
+
+    SubscriptionTransportPtr subptr;
+    std::list< CallbackHelperPtr >::iterator iter;
+    std::list<std::pair<std::string, unsigned int> >::iterator cbIter;
+
+    // Iterate over all the queued subscriptions for removal
+    for (cbIter = this->removeCallbacks.begin();
+         cbIter != this->removeCallbacks.end(); ++cbIter)
+    {
+      boost::mutex::scoped_lock lock(this->callbackMutex);
+
+      // Find the callback that matches the host and port information, and
+      // remove it.
+      iter = this->callbacks.begin();
+      while (iter != this->callbacks.end())
+      {
+        subptr = boost::shared_dynamic_cast<SubscriptionTransport>(*iter);
+        if (!subptr || !subptr->GetConnection()->IsOpen() ||
+            (subptr->GetConnection()->GetRemoteAddress() == (*cbIter).first &&
+             subptr->GetConnection()->GetRemotePort() == (*cbIter).second))
+        {
+          this->callbacks.erase(iter++);
+        }
+        else
+          ++iter;
+      }
+    }
+  }
+
+  // Clear the lists.
+  this->removeNodes.clear();
+  this->removeCallbacks.clear();
+
+  {
+    boost::mutex::scoped_lock lock(this->nodeMutex);
+    // If no more subscribers, then disconnect from all publishers
+    if (this->nodes.size() == 0 && this->callbacks.size() == 0)
+    {
+      this->transports.clear();
+    }
   }
 }

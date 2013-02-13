@@ -215,14 +215,17 @@ void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
 {
   boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
 
+  printf("Node::RemoveCallback\n");
+
   // Find the topic list in the map.
   Callback_M::iterator iter = this->callbacks.find(_topic);
 
   if (iter != this->callbacks.end())
   {
+    Callback_L::iterator liter;
+
     // Find the callback with the correct ID and remove it.
-    for (Callback_L::iterator liter = iter->second.begin();
-         liter != iter->second.end(); ++liter)
+    for (liter = iter->second.begin(); liter != iter->second.end(); ++liter)
     {
       if ((*liter)->GetId() == _id)
       {
@@ -231,5 +234,10 @@ void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
         break;
       }
     }
+
+    if (liter == iter->second.end())
+      gzerr << "Unable to remove callback\n";
   }
+  else
+    gzerr << "Unable to find callback\n";
 }

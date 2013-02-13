@@ -332,6 +332,8 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     msgs::Subscribe sub;
     sub.ParseFromString(packet.serialized_data());
 
+    std::cout << "Disconnect from Subscriber[" << sub.topic() << "]\n";
+
     // Disconnect a local publisher from a remote subscriber
     TopicManager::Instance()->DisconnectPubFromSub(sub.topic(),
         sub.host(), sub.port());
