@@ -88,12 +88,12 @@ void ImagesView_TEST::FastSwitch()
   QVERIFY(frame->children().size() == 1);
 
   std::map<int, std::string> topicMap;
-  topicMap[2] = "~/multicamera_1/link/cam/images";
-  topicMap[3] = "~/multicamera_2/link/cam/images";
-  topicMap[4] = "~/multicamera_3/link/cam/images";
-  topicMap[5] = "~/multicamera_4/link/cam/images";
-  topicMap[6] = "~/multicamera_5/link/cam/images";
-  topicMap[7] = "~/multicamera_6/link/cam/images";
+  topicMap[2] = "~/multicamera_1/link/cam1/images";
+  topicMap[3] = "~/multicamera_2/link/cam2/images";
+  topicMap[4] = "~/multicamera_3/link/cam3/images";
+  topicMap[5] = "~/multicamera_4/link/cam4/images";
+  topicMap[6] = "~/multicamera_5/link/cam5/images";
+  topicMap[7] = "~/multicamera_6/link/cam6/images";
 
   // Switch the topic 100 times
   for (unsigned int i = 0; i < 100; ++i)

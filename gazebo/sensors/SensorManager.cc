@@ -386,6 +386,7 @@ void SensorManager::SensorContainer::Stop()
   this->runCondition.notify_all();
   if (this->runThread)
   {
+    this->runThread->interrupt();
     this->runThread->join();
     delete this->runThread;
     this->runThread = NULL;
