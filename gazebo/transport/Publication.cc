@@ -77,6 +77,14 @@ void Publication::AddSubscription(const CallbackHelperPtr _callback)
   {
     this->callbacks.push_back(_callback);
 
+    /*SubscriptionTransportPtr subptr = boost::shared_dynamic_cast<SubscriptionTransport>(_callback);
+    if (subptr)
+    {
+      std::string host = subptr->GetConnection()->GetRemoteAddress();
+      // unsigned int port = subptr->GetConnection()->GetRemotePort();
+      // std::cout << "Publication[" << this->topic << "]::AddSub URI[" << host << ":" << port << "]\n";
+    }*/
+
     if (_callback->GetLatching())
     {
       std::vector<PublisherPtr>::iterator pubIter;
@@ -158,7 +166,6 @@ void Publication::RemoveSubscription(const NodePtr &_node)
   boost::mutex::scoped_try_lock lock(this->nodeMutex);
   if (!lock)
   {
-    gzerr << "LOCKED!\n";
     boost::mutex::scoped_lock removeLock(this->nodeRemoveMutex);
     this->removeNodes.push_back(_node->GetId());
     return;
@@ -189,11 +196,15 @@ void Publication::RemoveSubscription(const std::string &_host,
   boost::mutex::scoped_try_lock lock(this->callbackMutex);
   if (!lock)
   {
-    gzerr << "LOCKED 2!\n";
     boost::mutex::scoped_lock removeLock(this->nodeRemoveMutex);
     this->removeCallbacks.push_back(std::make_pair(_host, _port));
     return;
   }
+
+  // std::cout << "Publication[" << this->topic << "]::RemoveSub URI[" << _host << ":" << _port << "]\n";
+
+  // if (this->callbacks.size() == 0)
+  //  std::cout << "Publication[" << this->topic << "] RemoveSub nothing to remove\n";
 
   SubscriptionTransportPtr subptr;
   std::list< CallbackHelperPtr >::iterator iter;
@@ -202,18 +213,18 @@ void Publication::RemoveSubscription(const std::string &_host,
   while (iter != this->callbacks.end())
   {
     subptr = boost::shared_dynamic_cast<SubscriptionTransport>(*iter);
+    std::string host = subptr->GetConnection()->GetRemoteAddress();
     if (!subptr || !subptr->GetConnection()->IsOpen() ||
-        (subptr->GetConnection()->GetRemoteAddress() == _host &&
+        ((host.empty() || host == _host) &&
          subptr->GetConnection()->GetRemotePort() == _port))
     {
-      this->callbacks.erase(iter++);
+      subptr.reset();
+      // std::cout << "Publication[" << this->topic << "]::RemoveSub usecount[" << (*iter).use_count() << "]\n";
+      iter = this->callbacks.erase(iter);
     }
     else
       ++iter;
   }
-
-  if (iter == this->callbacks.end())
-    gzerr << "Unable to remove subscription callback\n";
 
   // If no more subscribers, then disconnect from all publishers
   if (this->nodes.size() == 0 && this->callbacks.size() == 0)

@@ -49,10 +49,10 @@ void Subscriber::Unsubscribe() const
 {
   if (this->node)
   {
-    printf("Subscriber::Unsubscribe\n");
+    // printf("Subscriber::Unsubscribe\n");
     TopicManager::Instance()->Unsubscribe(this->topic, this->node);
     this->node->RemoveCallback(this->topic, this->callbackId);
-    printf("Subscriber::Unsubscribe....Done\n");
+    // printf("Subscriber::Unsubscribe....Done\n");
   }
 }
 

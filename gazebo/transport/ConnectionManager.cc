@@ -332,7 +332,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     msgs::Subscribe sub;
     sub.ParseFromString(packet.serialized_data());
 
-    std::cout << "Disconnect from Subscriber[" << sub.topic() << "]\n";
+    // std::cout << "Disconnect from Subscriber[" << sub.topic() << "]\n";
 
     // Disconnect a local publisher from a remote subscriber
     TopicManager::Instance()->DisconnectPubFromSub(sub.topic(),
@@ -556,7 +556,7 @@ ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &host,
 }
 
 //////////////////////////////////////////////////
-void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
+void ConnectionManager::RemoveConnection(ConnectionPtr &_conn)
 {
   std::list<ConnectionPtr>::iterator iter;
 
@@ -564,13 +564,16 @@ void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
   iter = this->connections.begin();
   while (iter != this->connections.end())
   {
-    if ((*iter) == conn)
+    if ((*iter) == _conn)
+    {
+      // std::cout << "ConnectionManager::RemoveConnection usecount[" <<
+      //  (*iter).use_count() << "]\n";
       iter = this->connections.erase(iter);
+    }
     else
       ++iter;
   }
 }
-
 
 //////////////////////////////////////////////////
 ConnectionPtr ConnectionManager::FindConnection(const std::string &_host,
