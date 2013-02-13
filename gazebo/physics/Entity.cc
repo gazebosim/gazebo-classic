@@ -185,8 +185,8 @@ void Entity::SetAnimation(common::PoseAnimationPtr _anim)
   this->prevAnimationTime = this->world->GetSimTime();
   this->animation = _anim;
   this->onAnimationComplete.clear();
-  this->animationConnection = event::Events::ConnectWorldUpdateStart(
-      boost::bind(&Entity::UpdateAnimation, this));
+  this->animationConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&Entity::UpdateAnimation, this, _1));
 }
 
 //////////////////////////////////////////////////
@@ -198,8 +198,8 @@ void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
   this->prevAnimationTime = this->world->GetSimTime();
   this->animation = _anim;
   this->onAnimationComplete = _onComplete;
-  this->animationConnection = event::Events::ConnectWorldUpdateStart(
-      boost::bind(&Entity::UpdateAnimation, this));
+  this->animationConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&Entity::UpdateAnimation, this, _1));
 }
 
 //////////////////////////////////////////////////
@@ -209,7 +209,7 @@ void Entity::StopAnimation()
   this->onAnimationComplete.clear();
   if (this->animationConnection)
   {
-    event::Events::DisconnectWorldUpdateStart(this->animationConnection);
+    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
     this->animationConnection.reset();
   }
 }
@@ -545,12 +545,11 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Entity::UpdateAnimation()
+void Entity::UpdateAnimation(const common::UpdateInfo &_info)
 {
   common::PoseKeyFrame kf(0);
 
-  this->animation->AddTime(
-      (this->world->GetSimTime() - this->prevAnimationTime).Double());
+  this->animation->AddTime((_info.simTime - this->prevAnimationTime).Double());
   this->animation->GetInterpolatedKeyFrame(kf);
 
   math::Pose offset;
@@ -558,11 +557,11 @@ void Entity::UpdateAnimation()
   offset.rot = kf.GetRotation();
 
   this->SetWorldPose(offset);
-  this->prevAnimationTime = this->world->GetSimTime();
+  this->prevAnimationTime = _info.simTime;
 
   if (this->animation->GetLength() <= this->animation->GetTime())
   {
-    event::Events::DisconnectWorldUpdateStart(this->animationConnection);
+    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
     this->animationConnection.reset();
     if (this->onAnimationComplete)
     {

@@ -100,7 +100,16 @@ namespace gazebo
       public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
 
       // Documentation inherited
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      public: virtual math::Vector3 GetWorldLinearVel(
+          const math::Vector3 &_offset) const;
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldLinearVel(
+                  const math::Vector3 &_offset,
+                  const math::Quaternion &_q) const;
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldCoGLinearVel() const;
 
       // Documentation inherited
       public: virtual math::Vector3 GetWorldAngularVel() const;

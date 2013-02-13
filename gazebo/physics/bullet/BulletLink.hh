@@ -81,8 +81,17 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetTorque(const math::Vector3 &_torque);
 
-      // Documentation inherited.
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldLinearVel(
+                  const math::Vector3 &_offset) const;
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldLinearVel(
+                  const math::Vector3 &_offset,
+                  const math::Quaternion &_q) const;
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldCoGLinearVel() const;
 
       // Documentation inherited.
       public: virtual math::Vector3 GetWorldAngularVel() const;
@@ -143,7 +152,7 @@ namespace gazebo
 
       /// \brief Pointer to bullet compound shape, which is a container
       ///        for other child shapes.
-      private: btCompoundShape *compoundShape;
+      private: btCollisionShape *compoundShape;
 
       /// \brief Pointer to bullet motion state, which manages updates to the
       ///        world pose from bullet.
