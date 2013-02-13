@@ -640,7 +640,8 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   joint->Load(_sdf);
 
   if (this->GetJoint(joint->GetScopedName()) != NULL)
-    gzthrow("can't have two joint with the same name");
+    gzthrow("can't have two joint with the same name ["+
+      joint->GetScopedName() + "]\n");
 
   msgs::Joint msg;
   joint->FillMsg(msg);
