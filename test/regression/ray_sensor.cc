@@ -167,7 +167,6 @@ void RaySensor::RayUnitCylinder(const std::string &_physicsEngine)
   {
     EXPECT_NEAR(raySensor->GetRange(i), maxRange, PHYSICS_TOL);
   }
-
 }
 
 TEST_F(RaySensor, RayCylindereODE)

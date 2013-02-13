@@ -15,15 +15,15 @@
  *
  */
 
- #include "common/Exception.hh"
+ #include "gazebo/common/Exception.hh"
 
-#include "physics/World.hh"
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletCollision.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletRayShape.hh"
-#include "physics/bullet/BulletMultiRayShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletRayShape.hh"
+#include "gazebo/physics/bullet/BulletMultiRayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -58,13 +58,7 @@ void BulletMultiRayShape::AddRay(const math::Vector3 &_start,
 {
   MultiRayShape::AddRay(_start, _end);
 
-//  BulletCollisionPtr bulletCollision(new BulletCollision(
-//        this->collisionParent->GetLink()));
-//  bulletCollision->SetName("bullet_ray_collision");
-
-//  BulletRayShapePtr ray(new BulletRayShape(bulletCollision));
   BulletRayShapePtr ray(new BulletRayShape(this->collisionParent));
-//  bulletCollision->SetShape(ray);
   ray->SetPoints(_start, _end);
 
   this->rays.push_back(ray);
