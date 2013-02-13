@@ -55,7 +55,7 @@ namespace gazebo
 
       /// \brief Subscribe a callback to our topic
       /// \param[in] _callback The callback
-      public: void AddSubscription(const CallbackHelperPtr &_callback);
+      public: void AddSubscription(const CallbackHelperPtr _callback);
 
       /// \brief Subscribe a node to our topic
       /// \param[in] _node The node

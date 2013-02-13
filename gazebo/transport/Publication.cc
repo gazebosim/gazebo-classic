@@ -66,7 +66,7 @@ void Publication::AddSubscription(const NodePtr &_node)
 }
 
 //////////////////////////////////////////////////
-void Publication::AddSubscription(const CallbackHelperPtr &_callback)
+void Publication::AddSubscription(const CallbackHelperPtr _callback)
 {
   boost::mutex::scoped_lock lock(this->callbackMutex);
 
