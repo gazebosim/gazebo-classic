@@ -87,7 +87,8 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual math::Vector3 GetWorldLinearVel(
-                  const math::Pose &_pose) const;
+                  const math::Vector3 &_offset,
+                  const math::Quaternion &_q) const;
 
       // Documentation inherited
       public: virtual math::Vector3 GetWorldCoGLinearVel() const;
@@ -151,7 +152,7 @@ namespace gazebo
 
       /// \brief Pointer to bullet compound shape, which is a container
       ///        for other child shapes.
-      private: btCompoundShape *compoundShape;
+      private: btCollisionShape *compoundShape;
 
       /// \brief Pointer to bullet motion state, which manages updates to the
       ///        world pose from bullet.

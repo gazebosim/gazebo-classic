@@ -123,49 +123,6 @@ namespace gazebo
               const Ogre::Pass *_p, const Ogre::AutoParamDataSource *_s,
               const Ogre::LightList *_ll, bool _supp);
 
-      // Documentation inherited.
-      private: virtual void RenderImpl();
-
-      /// \brief Update a render target.
-      /// \param[in, out] _target Render target to update (render).
-      /// \param[in, out] _material Material used during render.
-      /// \param[in] _cam Camerat to render from.
-      /// \param[in] _updateTex True to update the textures in the material
-      private: void UpdateRenderTarget(Ogre::RenderTarget *_target,
-                                       Ogre::Material *_material,
-                                       Ogre::Camera *_cam,
-                                       bool _updateTex = false);
-
-      /// \brief Create an ortho camera.
-      private: void CreateOrthoCam();
-
-      /// \brief Create a mesh.
-      private: void CreateMesh();
-
-      /// \brief Create a canvas.
-      private: void CreateCanvas();
-
-      /// \brief Builds scaled Orthogonal Matrix from parameters.
-      /// \param[in] _left Left clip.
-      /// \param[in] _right Right clip.
-      /// \param[in] _bottom Bottom clip.
-      /// \param[in] _top Top clip.
-      /// \param[in] _near Near clip.
-      /// \param[in] _far Far clip.
-      /// \return The Scaled orthogonal Ogre::Matrix4
-      private: Ogre::Matrix4 BuildScaledOrthoMatrix(float _left, float _right,
-               float _bottom, float _top, float _near, float _far);
-
-      /// \brief Sets first pass target.
-      /// \param[in] _target Render target for the first pass.
-      /// \param[in] _index Index of the texture.
-      private: virtual void Set1stPassTarget(Ogre::RenderTarget *_target,
-                                             unsigned int _index);
-
-      /// \brief Sets second pass target.
-      /// \param[in] _target Render target for the second pass.
-      private: virtual void Set2ndPassTarget(Ogre::RenderTarget *_target);
-
       /// \brief Get (horizontal_max_angle + horizontal_min_angle) * 0.5
       /// \return (horizontal_max_angle + horizontal_min_angle) * 0.5
       public: double GetHorzHalfAngle() const;
@@ -237,61 +194,65 @@ namespace gazebo
       /// \param[in] vertical fov
       public: void SetVertFOV(double _vfov);
 
-      /// \brief Get near clip
-      /// \return near clip distance
+      /// \brief Get the number of cameras required
+      /// \return Number of cameras needed to generate the rays 
       public: double GetCameraCount() const;
 
-      /// \brief Sets the near clip distance
-      /// \param[in] near clip distance
+      /// \brief Set the number of cameras required
+      /// \param[in] _cameraCount The number of cameras required to generate
+      /// the rays
       public: void SetCameraCount(double _cameraCount);
 
-      /// \brief Get near clip
-      /// \return near clip distance
+      /// \brief Get the ray count ratio (equivalent to aspect ratio)
+      /// \return The ray count ratio (equivalent to aspect ratio)
       public: double GetRayCountRatio() const;
 
-      /// \brief Sets the near clip distance
-      /// \param[in] near clip distance
+      /// \brief Sets the ray count ratio (equivalen to aspect ratio)
+      /// \param[in] _rayCountRatio ray count ratio (equivalent to aspect ratio)
       public: void SetRayCountRatio(double _rayCountRatio);
 
-      private: event::EventT<void(const float *, unsigned int, unsigned int,
-                   unsigned int, const std::string &)> newLaserFrame;
+      // Documentation inherited.
+      private: virtual void RenderImpl();
 
-      private: float *laserBuffer;
-      private: float *laserScan;
-      private: Ogre::Material *mat_1st_pass;
-      private: Ogre::Material *mat_2nd_pass;
+      /// \brief Update a render target.
+      /// \param[in, out] _target Render target to update (render).
+      /// \param[in, out] _material Material used during render.
+      /// \param[in] _cam Camerat to render from.
+      /// \param[in] _updateTex True to update the textures in the material
+      private: void UpdateRenderTarget(Ogre::RenderTarget *_target,
+                                       Ogre::Material *_material,
+                                       Ogre::Camera *_cam,
+                                       bool _updateTex = false);
 
-      private: Ogre::Texture *_1stPassTextures[3];
-      private: Ogre::Texture *_2ndPassTexture;
-      private: Ogre::RenderTarget *_1stPassTargets[3];
-      private: Ogre::RenderTarget *_2ndPassTarget;
-      private: Ogre::Viewport *_1stPassViewports[3];
-      private: Ogre::Viewport *_2ndPassViewport;
+      /// \brief Create an ortho camera.
+      private: void CreateOrthoCam();
 
-      private: unsigned int _textureCount;
-      private: double cameraYaws[4];
+      /// \brief Create a mesh.
+      private: void CreateMesh();
 
-      private: Ogre::RenderTarget *current_target;
-      private: Ogre::Material *current_mat;
+      /// \brief Create a canvas.
+      private: void CreateCanvas();
 
-      private: Ogre::Camera *orthoCam;
+      /// \brief Builds scaled Orthogonal Matrix from parameters.
+      /// \param[in] _left Left clip.
+      /// \param[in] _right Right clip.
+      /// \param[in] _bottom Bottom clip.
+      /// \param[in] _top Top clip.
+      /// \param[in] _near Near clip.
+      /// \param[in] _far Far clip.
+      /// \return The Scaled orthogonal Ogre::Matrix4
+      private: Ogre::Matrix4 BuildScaledOrthoMatrix(float _left, float _right,
+               float _bottom, float _top, float _near, float _far);
 
-      private: Ogre::SceneNode *origParentNode_ortho;
-      private: Ogre::SceneNode *pitchNode_ortho;
+      /// \brief Sets first pass target.
+      /// \param[in] _target Render target for the first pass.
+      /// \param[in] _index Index of the texture.
+      private: virtual void Set1stPassTarget(Ogre::RenderTarget *_target,
+                                             unsigned int _index);
 
-      private: common::Mesh *undist_mesh;
-
-      private: Ogre::MovableObject *object;
-
-      private: VisualPtr visual;
-
-      private: unsigned int w2nd;
-      private: unsigned int h2nd;
-
-      private: double lastRenderDuration;
-
-      private: std::vector<int> texIdx;
-      private: static int texCount;
+      /// \brief Sets second pass target.
+      /// \param[in] _target Render target for the second pass.
+      private: virtual void Set2ndPassTarget(Ogre::RenderTarget *_target);
 
       /// \brief Horizontal half angle.
       protected: double horzHalfAngle;
@@ -325,6 +286,45 @@ namespace gazebo
 
       /// \brief Number of cameras.
       protected: unsigned int cameraCount;
+
+      private: event::EventT<void(const float *, unsigned int, unsigned int,
+                   unsigned int, const std::string &)> newLaserFrame;
+
+      private: float *laserBuffer;
+      private: float *laserScan;
+      private: Ogre::Material *matFirstPass;
+      private: Ogre::Material *matSecondPass;
+
+      private: Ogre::Texture *firstPassTextures[3];
+      private: Ogre::Texture *secondPassTexture;
+      private: Ogre::RenderTarget *firstPassTargets[3];
+      private: Ogre::RenderTarget *secondPassTarget;
+      private: Ogre::Viewport *firstPassViewports[3];
+      private: Ogre::Viewport *secondPassViewport;
+
+      private: unsigned int textureCount;
+      private: double cameraYaws[4];
+
+      private: Ogre::RenderTarget *currentTarget;
+      private: Ogre::Material *currentMat;
+
+      private: Ogre::Camera *orthoCam;
+
+      private: Ogre::SceneNode *pitchNodeOrtho;
+
+      private: common::Mesh *undistMesh;
+
+      private: Ogre::MovableObject *object;
+
+      private: VisualPtr visual;
+
+      private: unsigned int w2nd;
+      private: unsigned int h2nd;
+
+      private: double lastRenderDuration;
+
+      private: std::vector<int> texIdx;
+      private: static int texCount;
     };
     /// \}
   }

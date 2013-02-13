@@ -41,4 +41,3 @@ execute_process(COMMAND cmake -E make_directory ${CMAKE_BINARY_DIR}/test_results
 include_directories(${GTEST_INCLUDE_DIRS})
 
 add_subdirectory(regression)
-add_subdirectory(unit)

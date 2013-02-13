@@ -96,15 +96,18 @@ void PhysicsTest::SpawnDrop(const std::string &_worldFile)
 
   // spawn some simple shapes and check to see that they start falling
   double z0 = 3;
-  SpawnBox("test_box", math::Vector3(1, 1, 1), math::Vector3(0, 0, z0),
-    math::Vector3::Zero);
-  SpawnSphere("test_sphere", math::Vector3(4, 0, z0), math::Vector3::Zero);
-  SpawnCylinder("test_cylinder", math::Vector3(8, 0, z0), math::Vector3::Zero);
+  std::map<std::string, math::Vector3> modelPos;
+  modelPos["test_box"] = math::Vector3(0, 0, z0);
+  modelPos["test_sphere"] = math::Vector3(4, 0, z0);
+  modelPos["test_cylinder"] = math::Vector3(8, 0, z0);
+  modelPos["test_empty"] = math::Vector3(12, 0, z0);
 
-  std::list<std::string> model_names;
-  model_names.push_back("test_box");
-  model_names.push_back("test_sphere");
-  model_names.push_back("test_cylinder");
+  SpawnBox("test_box", math::Vector3(1, 1, 1), modelPos["test_box"],
+      math::Vector3::Zero);
+  SpawnSphere("test_sphere", modelPos["test_sphere"], math::Vector3::Zero);
+  SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
+      math::Vector3::Zero);
+  SpawnEmptyLink("test_empty", modelPos["test_empty"], math::Vector3::Zero);
 
   int steps = 2;
   physics::ModelPtr model;
@@ -114,14 +117,15 @@ void PhysicsTest::SpawnDrop(const std::string &_worldFile)
   double t, x0 = 0;
   // This loop steps the world forward and makes sure that each model falls,
   // expecting downward z velocity and decreasing z position.
-  for (std::list<std::string>::iterator iter = model_names.begin();
-    iter != model_names.end(); ++iter)
+  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
+    iter != modelPos.end(); ++iter)
   {
+    std::string name = iter->first;
     // Make sure the model is loaded
-    model = world->GetModel(*iter);
+    model = world->GetModel(name);
     if (model != NULL)
     {
-      gzdbg << "Check freefall of model " << *iter << '\n';
+      gzdbg << "Check freefall of model " << name << '\n';
       // Step once and check downward z velocity
       world->StepWorld(1);
       vel1 = model->GetWorldLinearVel();
@@ -132,16 +136,10 @@ void PhysicsTest::SpawnDrop(const std::string &_worldFile)
       // Need to step at least twice to check decreasing z position
       world->StepWorld(steps - 1);
       pose1 = model->GetWorldPose();
-      if (*iter == "test_box")
-        x0 = 0;
-      else if (*iter == "test_sphere")
-        x0 = 4;
-      else if (*iter == "test_cylinder")
-        x0 = 8;
+      x0 = modelPos[name].x;
       EXPECT_EQ(pose1.pos.x, x0);
       EXPECT_EQ(pose1.pos.y, 0);
-      EXPECT_NEAR(pose1.pos.z, z0 - g.z/2*t*t, (z0-g.z/2*t*t)*PHYSICS_TOL);
-
+      EXPECT_NEAR(pose1.pos.z, z0 + g.z/2*t*t, (z0+g.z/2*t*t)*PHYSICS_TOL);
       // Check once more and just make sure they keep falling
       world->StepWorld(steps);
       vel2 = model->GetWorldLinearVel();
@@ -151,7 +149,7 @@ void PhysicsTest::SpawnDrop(const std::string &_worldFile)
     }
     else
     {
-      gzerr << "Error loading model " << *iter << '\n';
+      gzerr << "Error loading model " << name << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
@@ -168,35 +166,41 @@ void PhysicsTest::SpawnDrop(const std::string &_worldFile)
   // This loop checks the velocity and pose of each model 0.5 seconds
   // after the time of predicted ground contact. The velocity is expected
   // to be small, and the pose is expected to be underneath the initial pose.
-  for (std::list<std::string>::iterator iter = model_names.begin();
-    iter != model_names.end(); ++iter)
+  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
+    iter != modelPos.end(); ++iter)
   {
+    std::string name = iter->first;
     // Make sure the model is loaded
-    model = world->GetModel(*iter);
+    model = world->GetModel(name);
     if (model != NULL)
     {
-      gzdbg << "Check ground contact of model " << *iter << '\n';
+      gzdbg << "Check ground contact of model " << name << '\n';
       // Check that velocity is small
       vel1 = model->GetWorldLinearVel();
+      t = world->GetSimTime().Double();
       EXPECT_NEAR(vel1.x, 0, PHYSICS_TOL);
       EXPECT_NEAR(vel1.y, 0, PHYSICS_TOL);
-      EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
+      if (name == "test_empty")
+        EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
+      else
+        EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
 
       // Check that model is resting on ground
       pose1 = model->GetWorldPose();
-      if (*iter == "test_box")
-        x0 = 0;
-      else if (*iter == "test_sphere")
-        x0 = 4;
-      else if (*iter == "test_cylinder")
-        x0 = 8;
+      x0 = modelPos[name].x;
       EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
       EXPECT_NEAR(pose1.pos.y, 0, PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.z, 0.5, PHYSICS_TOL);
+      if (name == "test_empty")
+      {
+        EXPECT_NEAR(pose1.pos.z, z0+g.z/2*t*t,
+            fabs((z0+g.z/2*t*t)*PHYSICS_TOL));
+      }
+      else
+        EXPECT_NEAR(pose1.pos.z, 0.5, PHYSICS_TOL);
     }
     else
     {
-      gzerr << "Error loading model " << *iter << '\n';
+      gzerr << "Error loading model " << name << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
@@ -222,7 +226,10 @@ TEST_F(PhysicsTest, SpawnDropBullet)
 //  sphere2: larger radius, centered cg
 //  sphere3: larger radius, lowered cg
 //  sphere4: larger radius, raised cg
-//  sphere5: larger radius, laterally offset cg
+//  sphere5: larger radius, y offset cg
+//  sphere6: larger radius, x offset cg
+//  sphere7: larger radius, 45 deg offset cg
+//  sphere8: larger radius, -30 deg offset cg
 // The bottom of each sphere is at the same height, and it is verified
 // that they hit the ground at the same time. Also, sphere5 should start
 // rolling to the side when it hits the ground.
@@ -252,6 +259,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   double r1 = 0.5, r2 = 1.5;
   math::Vector3 v30 = math::Vector3::Zero;
   math::Vector3 cog;
+  math::Angle angle;
 
   std::vector<std::string> modelNames;
   std::vector<double> x0s;
@@ -293,6 +301,31 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
   radii.push_back(r2);
   cogs.push_back(math::Vector3(0, r1, 0));
 
+  // sphere6 has c.g. to the side along x axis; it will roll
+  modelNames.push_back("cog_x_offset_sphere");
+  x0s.push_back(15);
+  y0s.push_back(0);
+  radii.push_back(r2);
+  cogs.push_back(math::Vector3(r1, 0, 0));
+
+  // sphere7 has c.g. to the side diagonally; it will roll
+  modelNames.push_back("cog_xy_45deg_offset_sphere");
+  x0s.push_back(0);
+  y0s.push_back(8);
+  radii.push_back(r2);
+  angle.SetFromDegree(45);
+  cogs.push_back(math::Vector3(r1*cos(angle.Radian()),
+                               r1*sin(angle.Radian()), 0));
+
+  // sphere8 has c.g. to the side diagonally; it will roll
+  modelNames.push_back("cog_xy_-30deg_offset_sphere");
+  x0s.push_back(0);
+  y0s.push_back(-8);
+  radii.push_back(r2);
+  angle.SetFromDegree(-30);
+  cogs.push_back(math::Vector3(r1*cos(angle.Radian()),
+                               r1*sin(angle.Radian()), 0));
+
   unsigned int i;
   for (i = 0; i < modelNames.size(); ++i)
   {
@@ -330,8 +363,8 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
       pose1 = model->GetWorldPose();
       EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL*PHYSICS_TOL);
       EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL*PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.z, z0+radius - g.z/2*t*t,
-                  (z0+radius-g.z/2*t*t)*PHYSICS_TOL);
+      EXPECT_NEAR(pose1.pos.z, z0+radius + g.z/2*t*t,
+                  (z0+radius+g.z/2*t*t)*PHYSICS_TOL);
 
       // Check once more and just make sure they keep falling
       world->StepWorld(steps);
@@ -412,13 +445,13 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
       // Use GetWorldLinearVel with global offset to check roll without slip
       // Expect small linear velocity at contact point
       math::Vector3 vel3 = model->GetLink()->GetWorldLinearVel(
-          math::Pose(0, 0, -radius, 0, 0, 0));
+          math::Vector3(0, 0, -radius), math::Quaternion(0, 0, 0));
       EXPECT_NEAR(vel3.x, 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.y, 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.z, 0, PHYSICS_TOL);
       // Expect speed at top of sphere to be double the speed at center
       math::Vector3 vel4 = model->GetLink()->GetWorldLinearVel(
-          math::Pose(0, 0, radius, 0, 0, 0));
+          math::Vector3(0, 0, radius), math::Quaternion(0, 0, 0));
       EXPECT_NEAR(vel4.y, 2*vel1.y, PHYSICS_TOL);
       EXPECT_NEAR(vel4.x, 2*vel1.x, PHYSICS_TOL);
       EXPECT_NEAR(vel4.z, 0, PHYSICS_TOL);
@@ -533,9 +566,11 @@ TEST_F(PhysicsTest, State)
 
 TEST_F(PhysicsTest, JointDampingTest)
 {
+  // Random seed is set to prevent brittle failures (gazebo issue #479)
+  math::Rand::SetSeed(18420503);
   Load("worlds/damp_test.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  ASSERT_TRUE(world != NULL);
 
   int i = 0;
   while (!this->HasEntity("model_4_mass_1_ixx_1_damping_10") && i < 20)

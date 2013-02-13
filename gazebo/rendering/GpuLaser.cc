@@ -47,13 +47,13 @@ int GpuLaser::texCount = 0;
 
 //////////////////////////////////////////////////
 GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
-                         bool _autoRender)
+                   bool _autoRender)
 : Camera(_namePrefix, _scene, _autoRender)
 {
   this->laserBuffer = NULL;
   this->laserScan = NULL;
-  this->mat_1st_pass = NULL;
-  this->mat_2nd_pass = NULL;
+  this->matFirstPass = NULL;
+  this->matSecondPass = NULL;
   this->w2nd = 0;
   this->h2nd = 0;
   this->visual.reset();
@@ -82,7 +82,7 @@ void GpuLaser::Init()
   Camera::Init();
   this->w2nd = this->GetImageWidth();
   this->h2nd = this->GetImageHeight();
-  this->visual.reset(new Visual(this->GetName()+"_2nd_pass_canvas",
+  this->visual.reset(new Visual(this->GetName()+"second_pass_canvas",
      this->GetScene()->GetWorldVisual()));
 }
 
@@ -100,9 +100,9 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 
   this->CreateOrthoCam();
 
-  this->_textureCount = this->cameraCount;
+  this->textureCount = this->cameraCount;
 
-  if (this->_textureCount == 2)
+  if (this->textureCount == 2)
   {
     cameraYaws[0] = -this->hfov/2;
     cameraYaws[1] = +this->hfov;
@@ -117,53 +117,53 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
     cameraYaws[3] = -this->hfov;
   }
 
-  for (unsigned int i = 0; i < this->_textureCount; i++)
+  for (unsigned int i = 0; i < this->textureCount; i++)
   {
     std::stringstream texName;
-    texName << _textureName << "_1st_pass_" << i;
-    this->_1stPassTextures[i] =
+    texName << _textureName << "first_pass_" << i;
+    this->firstPassTextures[i] =
       Ogre::TextureManager::getSingleton().createManual(
       texName.str(), "General", Ogre::TEX_TYPE_2D,
       this->GetImageWidth(), this->GetImageHeight(), 0,
       Ogre::PF_FLOAT32_RGB, Ogre::TU_RENDERTARGET).getPointer();
 
     this->Set1stPassTarget(
-        this->_1stPassTextures[i]->getBuffer()->getRenderTarget(), i);
+        this->firstPassTextures[i]->getBuffer()->getRenderTarget(), i);
 
-    RTShaderSystem::AttachViewport(this->_1stPassViewports[i],
+    RTShaderSystem::AttachViewport(this->firstPassViewports[i],
                                    this->GetScene());
-    this->_1stPassTargets[i]->setAutoUpdated(false);
+    this->firstPassTargets[i]->setAutoUpdated(false);
   }
 
-  this->mat_1st_pass = (Ogre::Material*)(
+  this->matFirstPass = (Ogre::Material*)(
   Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan1st").get());
 
-  this->mat_1st_pass->load();
+  this->matFirstPass->load();
 
-  this->_2ndPassTexture = Ogre::TextureManager::getSingleton().createManual(
-      _textureName + "_2nd_pass",
+  this->secondPassTexture = Ogre::TextureManager::getSingleton().createManual(
+      _textureName + "second_pass",
       "General",
       Ogre::TEX_TYPE_2D,
       this->GetImageWidth(), this->GetImageHeight(), 0,
       Ogre::PF_FLOAT32_RGB,
       Ogre::TU_RENDERTARGET).getPointer();
 
-  this->Set2ndPassTarget(this->_2ndPassTexture->getBuffer()->getRenderTarget());
-  RTShaderSystem::AttachViewport(this->_2ndPassViewport, this->GetScene());
-  this->_2ndPassTarget->setAutoUpdated(false);
+  this->Set2ndPassTarget(this->secondPassTexture->getBuffer()->getRenderTarget());
+  RTShaderSystem::AttachViewport(this->secondPassViewport, this->GetScene());
+  this->secondPassTarget->setAutoUpdated(false);
 
-  this->mat_2nd_pass = (Ogre::Material*)(
+  this->matSecondPass = (Ogre::Material*)(
   Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan2nd").get());
 
-  this->mat_2nd_pass->load();
+  this->matSecondPass->load();
 
   Ogre::TextureUnitState *tex_unit;
-  for (unsigned int i = 0; i < this->_textureCount; i++)
+  for (unsigned int i = 0; i < this->textureCount; i++)
   {
     unsigned int texIndex = texCount++;
     tex_unit =
-      this->mat_2nd_pass->getTechnique(0)->getPass(0)->createTextureUnitState(
-        this->_1stPassTextures[i]->getName(), texIndex);
+      this->matSecondPass->getTechnique(0)->getPass(0)->createTextureUnitState(
+        this->firstPassTextures[i]->getName(), texIndex);
 
     this->texIdx.push_back(texIndex);
 
@@ -181,20 +181,20 @@ void GpuLaser::PostRender()
 //  postRenderT.Start();
 //  double blitDur = 0.0;
 //  double postRenderDur = 0.0;
-  for (unsigned int i = 0; i < this->_textureCount; i++)
-    this->_1stPassTargets[i]->swapBuffers();
+  for (unsigned int i = 0; i < this->textureCount; i++)
+    this->firstPassTargets[i]->swapBuffers();
 
-  this->_2ndPassTarget->swapBuffers();
+  this->secondPassTarget->swapBuffers();
 
   if (this->newData && this->captureData)
   {
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
 
-    unsigned int width = this->_2ndPassViewport->getActualWidth();
-    unsigned int height = this->_2ndPassViewport->getActualHeight();
+    unsigned int width = this->secondPassViewport->getActualWidth();
+    unsigned int height = this->secondPassViewport->getActualHeight();
 
     // Get access to the buffer and make an image and write it to file
-    pixelBuffer = this->_2ndPassTexture->getBuffer();
+    pixelBuffer = this->secondPassTexture->getBuffer();
 
     size_t size = Ogre::PixelUtil::getMemorySize(
                     width, height, 1, Ogre::PF_FLOAT32_RGB);
@@ -333,19 +333,19 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
     _rend->setCustomParameter(1, Ogre::Vector4(0, 0, 0, 0));
   }
 
-  Ogre::Pass *my_pass = this->current_mat->getBestTechnique()->getPass(0);
+  Ogre::Pass *my_pass = this->currentMat->getBestTechnique()->getPass(0);
   Ogre::RenderSystem *renderSys =
                   this->scene->GetManager()->getDestinationRenderSystem();
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
-  Ogre::Viewport *vp = this->current_target->getViewport(0);
+  Ogre::Viewport *vp = this->currentTarget->getViewport(0);
 
   renderSys->_setViewport(vp);
   autoParamDataSource.setCurrentRenderable(_rend);
   autoParamDataSource.setCurrentPass(my_pass);
   autoParamDataSource.setCurrentViewport(vp);
-  autoParamDataSource.setCurrentRenderTarget(this->current_target);
+  autoParamDataSource.setCurrentRenderTarget(this->currentTarget);
   autoParamDataSource.setCurrentSceneManager(this->scene->GetManager());
   autoParamDataSource.setCurrentCamera(this->camera, true);
 
@@ -370,9 +370,9 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
 //////////////////////////////////////////////////
 void GpuLaser::RenderImpl()
 {
-  common::Timer _1stPassTimer, _2ndPassTimer;
+  common::Timer firstPassTimer, secondPassTimer;
 
-  _1stPassTimer.Start();
+  firstPassTimer.Start();
 
   Ogre::SceneManager *sceneMgr = this->scene->GetManager();
 
@@ -381,40 +381,40 @@ void GpuLaser::RenderImpl()
 
   sceneMgr->addRenderObjectListener(this);
 
-  for (unsigned int i = 0; i < this->_textureCount; i++)
+  for (unsigned int i = 0; i < this->textureCount; i++)
   {
-    if (this->_textureCount>1)
+    if (this->textureCount>1)
       this->RotateYaw(this->cameraYaws[i]);
 
-    this->current_mat = this->mat_1st_pass;
-    this->current_target = this->_1stPassTargets[i];
+    this->currentMat = this->matFirstPass;
+    this->currentTarget = this->firstPassTargets[i];
 
-    this->UpdateRenderTarget(this->_1stPassTargets[i],
-                  this->mat_1st_pass, this->camera);
-    this->_1stPassTargets[i]->update(false);
+    this->UpdateRenderTarget(this->firstPassTargets[i],
+                  this->matFirstPass, this->camera);
+    this->firstPassTargets[i]->update(false);
   }
 
-  if (this->_textureCount > 1)
+  if (this->textureCount > 1)
     this->RotateYaw(this->cameraYaws[3]);
 
   sceneMgr->removeRenderObjectListener(this);
 
-  double _1stPassDur = _1stPassTimer.GetElapsed().Double();
-  _2ndPassTimer.Start();
+  double firstPassDur = firstPassTimer.GetElapsed().Double();
+  secondPassTimer.Start();
 
   this->visual->SetVisible(true);
 
-  this->UpdateRenderTarget(this->_2ndPassTarget,
-                this->mat_2nd_pass, this->orthoCam, true);
-  this->_2ndPassTarget->update(false);
+  this->UpdateRenderTarget(this->secondPassTarget,
+                this->matSecondPass, this->orthoCam, true);
+  this->secondPassTarget->update(false);
 
   this->visual->SetVisible(false);
 
   sceneMgr->_suppressRenderStateChanges(false);
   sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 
-  double _2ndPassDur = _2ndPassTimer.GetElapsed().Double();
-  this->lastRenderDuration = _1stPassDur + _2ndPassDur;
+  double secondPassDur = secondPassTimer.GetElapsed().Double();
+  this->lastRenderDuration = firstPassDur + secondPassDur;
 }
 
 //////////////////////////////////////////////////
@@ -437,11 +437,11 @@ void GpuLaser::CreateOrthoCam()
 
   this->orthoCam->setDirection(1, 0, 0);
 
-  this->pitchNode_ortho =
+  this->pitchNodeOrtho =
     this->GetScene()->GetWorldVisual()->GetSceneNode()->createChildSceneNode(
       this->GetName()+"OrthoPitchNode");
 
-  this->pitchNode_ortho->attachObject(this->orthoCam);
+  this->pitchNodeOrtho->attachObject(this->orthoCam);
   this->orthoCam->setAutoAspectRatio(true);
 
   if (this->orthoCam)
@@ -478,17 +478,17 @@ Ogre::Matrix4 GpuLaser::BuildScaledOrthoMatrix(float _left, float _right,
 void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
                                 unsigned int _index)
 {
-  this->_1stPassTargets[_index] = _target;
+  this->firstPassTargets[_index] = _target;
 
-  if (this->_1stPassTargets[_index])
+  if (this->firstPassTargets[_index])
   {
     // Setup the viewport to use the texture
-    this->_1stPassViewports[_index] =
-      this->_1stPassTargets[_index]->addViewport(this->camera);
-    this->_1stPassViewports[_index]->setClearEveryFrame(true);
-    this->_1stPassViewports[_index]->setBackgroundColour(
+    this->firstPassViewports[_index] =
+      this->firstPassTargets[_index]->addViewport(this->camera);
+    this->firstPassViewports[_index]->setClearEveryFrame(true);
+    this->firstPassViewports[_index]->setBackgroundColour(
         Ogre::ColourValue(0.0, 0.0, 1.0));
-    this->_1stPassViewports[_index]->setVisibilityMask(
+    this->firstPassViewports[_index]->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
   }
   if (_index == 0)
@@ -501,16 +501,16 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
 //////////////////////////////////////////////////
 void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *_target)
 {
-  this->_2ndPassTarget = _target;
+  this->secondPassTarget = _target;
 
-  if (this->_2ndPassTarget)
+  if (this->secondPassTarget)
   {
     // Setup the viewport to use the texture
-    this->_2ndPassViewport = this->_2ndPassTarget->addViewport(this->orthoCam);
-    this->_2ndPassViewport->setClearEveryFrame(true);
-    this->_2ndPassViewport->setBackgroundColour(
+    this->secondPassViewport = this->secondPassTarget->addViewport(this->orthoCam);
+    this->secondPassViewport->setClearEveryFrame(true);
+    this->secondPassViewport->setBackgroundColour(
         Ogre::ColourValue(0.0, 1.0, 0.0));
-    this->_2ndPassViewport->setVisibilityMask(
+    this->secondPassViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
   }
   Ogre::Matrix4 p = this->BuildScaledOrthoMatrix(
@@ -569,13 +569,13 @@ void GpuLaser::CreateMesh()
       gamma = ((2 * phi / (this->h2nd - 1)) * j) + v_ang_min;
     for (unsigned int i = 0; i < this->w2nd; i++)
     {
-      double thfov = this->_textureCount * this->hfov;
+      double thfov = this->textureCount * this->hfov;
       double theta = this->hfov / 2;
       double delta = ((thfov / (this->w2nd - 1)) * i);
 
       unsigned int texture = delta / (theta*2);
 
-      if (texture > this->_textureCount-1)
+      if (texture > this->textureCount-1)
       {
         texture -= 1;
         delta -= (thfov / (this->w2nd - 1));
@@ -617,9 +617,9 @@ void GpuLaser::CreateMesh()
 
   mesh->AddSubMesh(submesh);
 
-  this->undist_mesh = mesh;
+  this->undistMesh = mesh;
 
-  common::MeshManager::Instance()->AddMesh(this->undist_mesh);
+  common::MeshManager::Instance()->AddMesh(this->undistMesh);
 }
 
 /////////////////////////////////////////////////
@@ -630,12 +630,12 @@ void GpuLaser::CreateCanvas()
   Ogre::Node *parent = this->visual->GetSceneNode()->getParent();
   parent->removeChild(this->visual->GetSceneNode());
 
-  this->pitchNode_ortho->addChild(this->visual->GetSceneNode());
+  this->pitchNodeOrtho->addChild(this->visual->GetSceneNode());
 
-  this->visual->InsertMesh(this->undist_mesh);
+  this->visual->InsertMesh(this->undistMesh);
 
   std::ostringstream stream;
-  std::string meshName = this->undist_mesh->GetName();
+  std::string meshName = this->undistMesh->GetName();
   stream << this->visual->GetSceneNode()->getName() << "_ENTITY_" << meshName;
 
   this->object = (Ogre::MovableObject*)
