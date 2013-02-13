@@ -75,6 +75,10 @@ void BulletRayShape::Update()
   btVector3 end(this->globalEndPos.x, this->globalEndPos.y,
       this->globalEndPos.z);
 
+
+//  gzerr << "start " << globalStartPos.x <<  " " << this->globalStartPos.y << " " << this->globalStartPos.z <<std::endl;
+//    gzerr << "end " << globalEndPos.x <<  " " << this->globalEndPos.y << " " << this->globalEndPos.z <<std::endl;
+
   btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
   this->physicsEngine->GetPhysicsUpdateMutex()->lock();
   this->physicsEngine->GetDynamicsWorld()->rayTest(

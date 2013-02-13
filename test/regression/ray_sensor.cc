@@ -28,7 +28,7 @@ using namespace gazebo;
 class RaySensor : public ServerFixture
 {
   public: void EmptyWorld(const std::string &_physicsEngine);
-  public: void RayUnitSphere(const std::string &_physicsEngine);
+  public: void RayUnitCylinder(const std::string &_physicsEngine);
 };
 
 
@@ -82,59 +82,102 @@ TEST_F(RaySensor, EmptyWorldBullet)
   EmptyWorld("bullet");
 }
 
-void RaySensor::RayUnitSphere(const std::string &_physicsEngine)
+void RaySensor::RayUnitCylinder(const std::string &_physicsEngine)
 {
+  // Test ray sensor with 3 cylinders in the world.
+  // First place 2 of 3 cylinders within range and verify range values,
+  // then move all 3 cylinder out of range and verify range values
+
   Load("worlds/empty.world", true, _physicsEngine);
+
   std::string modelName = "ray_model";
   std::string raySensorName = "ray_sensor";
-  math::Pose testPose(math::Vector3(0, 0, 0),
-      math::Quaternion(0, 0, 0));
-  SpawnRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler());
-
-  double hMinAngle = -2.0;
-  double hMaxAngle = 2.0;
+  double hMinAngle = -M_PI/2.0;
+  double hMaxAngle = M_PI/2.0;
   double minRange = 0.1;
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 320;
-
-  std::string sphere01 = "sphere_0";
-  math::Pose sphere01Pose(math::Vector3(1, 0, 0),
+  math::Pose testPose(math::Vector3(0, 0, 0),
       math::Quaternion(0, 0, 0));
+
   SpawnRaySensor(modelName, raySensorName, testPose.pos,
       testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
       rangeResolution, samples);
 
+  std::string cylinder01 = "cylinder_01";
+  std::string cylinder02 = "cylinder_02";
+  std::string cylinder03 = "cylinder_03";
+
+  // cylinder in front of ray sensor
+  math::Pose cylinder01Pose(math::Vector3(1, 0, 0),
+      math::Quaternion(0, 0, 0));
+  // cylinder on the right of ray sensor
+  math::Pose cylinder02Pose(math::Vector3(0, -1, 0),
+      math::Quaternion(0, 0, 0));
+  // cylinder on the left of the ray sensor but out of range
+  math::Pose cylinder03Pose(math::Vector3(0, maxRange + 1, 0),
+      math::Quaternion(0, 0, 0));
+
+  SpawnCylinder(cylinder01, cylinder01Pose.pos,
+      cylinder01Pose.rot.GetAsEuler());
+
+  SpawnCylinder(cylinder02, cylinder02Pose.pos,
+      cylinder02Pose.rot.GetAsEuler());
+
+  SpawnCylinder(cylinder03, cylinder03Pose.pos,
+      cylinder03Pose.rot.GetAsEuler());
+
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
     boost::shared_dynamic_cast<sensors::RaySensor>(sensor);
+
   raySensor->Init();
   raySensor->Update(true);
 
   int mid = samples / 2;
-  double unitSphereRadius = 0.5;
-  double expectedRangeAtMidPoint = sphere01Pose.pos.x - unitSphereRadius;
+  double unitCylinderRadius = 0.5;
+  double expectedRangeAtMidPoint = cylinder01Pose.pos.x - unitCylinderRadius;
 
-
-    gzerr << raySensor->GetRange(0)  << std::endl;
-  gzerr << raySensor->GetRange(1)  << std::endl;
-  gzerr << raySensor->GetRange(mid)  << std::endl;
-  gzerr << raySensor->GetRange(samples-1)  << std::endl;
+  // WARNING: gazebo returns distance to object from min range
+  // issue #503
+  expectedRangeAtMidPoint -= minRange;
 
   EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, PHYSICS_TOL);
+  EXPECT_NEAR(raySensor->GetRange(0), expectedRangeAtMidPoint, PHYSICS_TOL);
 
+  // WARNING: for readings of no return, gazebo returns max range rather
+  // than +inf. issue #124
+  EXPECT_NEAR(raySensor->GetRange(samples-1), maxRange, PHYSICS_TOL);
+
+  // Move all cylinders out of range
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world !=NULL);
+
+  world->GetModel(cylinder01)->SetWorldPose(
+        math::Pose(math::Vector3(maxRange + 1, 0, 0),
+        math::Quaternion(0, 0, 0)));
+  world->GetModel(cylinder02)->SetWorldPose(
+        math::Pose(math::Vector3(0, -(maxRange + 1), 0),
+        math::Quaternion(0, 0, 0)));
+  world->StepWorld(1);
+  raySensor->Update(true);
+
+  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+  {
+    EXPECT_NEAR(raySensor->GetRange(i), maxRange, PHYSICS_TOL);
+  }
 
 }
 
-TEST_F(RaySensor, RaySphereODE)
+TEST_F(RaySensor, RayCylindereODE)
 {
-  RayUnitSphere("ode");
+  RayUnitCylinder("ode");
 }
 
-TEST_F(RaySensor, RaySphereBullet)
+TEST_F(RaySensor, RayCylinderBullet)
 {
-  RayUnitSphere("bullet");
+  RayUnitCylinder("bullet");
 }
 
 int main(int argc, char **argv)
