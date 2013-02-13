@@ -18,6 +18,7 @@
 #ifndef _PUBLICATION_HH_
 #define _PUBLICATION_HH_
 
+#include <utility>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <list>
@@ -150,9 +151,10 @@ namespace gazebo
       /// \brief Local nodes that recieve messages.
       private: std::list<NodePtr> nodes;
 
-      /// \brief ID of nodes to remove from nodes list.
+      /// \brief List of node IDs to remove from nodes list.
       private: std::list<unsigned int> removeNodes;
 
+      /// \brief List of host and port callbacks to remove.
       private: std::list<std::pair<std::string, unsigned int> > removeCallbacks;
 
       /// \brief List of transport mechanisms.

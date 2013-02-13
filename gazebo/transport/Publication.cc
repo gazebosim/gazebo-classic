@@ -396,7 +396,6 @@ void Publication::RemoveNodes()
 
   // Remove queued subscriptions.
   {
-
     SubscriptionTransportPtr subptr;
     std::list< CallbackHelperPtr >::iterator iter;
     std::list<std::pair<std::string, unsigned int> >::iterator cbIter;

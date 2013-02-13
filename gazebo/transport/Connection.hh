@@ -297,8 +297,7 @@ namespace gazebo
 
                 if (!_e && !transport::is_stopped())
                 {
-                  //boost::get<0>(_handler)(data);
-                  ConnectionReadTask *task = new (tbb::task::allocate_root())
+                  ConnectionReadTask *task = new(tbb::task::allocate_root())
                         ConnectionReadTask(boost::get<0>(_handler), data);
 
                   tbb::task::enqueue(*task);
