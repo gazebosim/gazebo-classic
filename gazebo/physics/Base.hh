@@ -105,7 +105,7 @@ namespace gazebo
                 /// \brief UniversalJoint type
                 UNIVERSAL_JOINT = 0x00001000,
                 /// \brief GearboxJoint type
-                GEARBOX_JOINT     = 0x00002000,
+                GEARBOX_JOINT   = 0x00002000,
 
                 /// \brief Shape type
                 SHAPE           = 0x00002000,

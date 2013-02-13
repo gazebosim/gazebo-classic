@@ -333,6 +333,12 @@ void Joint::FillMsg(msgs::Joint &_msg)
     _msg.set_type(msgs::Joint::SCREW);
     _msg.add_angle(this->GetAngle(0).Radian());
   }
+  else if (this->HasType(Base::GEARBOX_JOINT))
+  {
+    _msg.set_type(msgs::Joint::GEARBOX);
+    _msg.add_angle(this->GetAngle(0).Radian());
+    _msg.add_angle(this->GetAngle(1).Radian());
+  }
   else if (this->HasType(Base::UNIVERSAL_JOINT))
   {
     _msg.set_type(msgs::Joint::UNIVERSAL);
