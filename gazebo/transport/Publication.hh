@@ -155,7 +155,6 @@ namespace gazebo
 
       private: std::list<std::pair<std::string, unsigned int> > removeCallbacks;
 
-
       /// \brief List of transport mechanisms.
       private: std::list<PublicationTransportPtr> transports;
 

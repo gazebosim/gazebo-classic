@@ -212,6 +212,9 @@ void Publication::RemoveSubscription(const std::string &_host,
       ++iter;
   }
 
+  if (iter == this->callbacks.end())
+    gzerr << "Unable to remove subscription callback\n";
+
   // If no more subscribers, then disconnect from all publishers
   if (this->nodes.size() == 0 && this->callbacks.size() == 0)
   {
