@@ -216,19 +216,15 @@ namespace gazebo
                   {
                     try
                     {
-                      gzerr << "Need shutdown\n";
                       this->Shutdown();
                     }
                     catch(...)
                     {
-                      gzerr << "Caught exception. Error reading header\n";
                     }
                     // This will occur when the other side closes the
                     // connection. We don't want spew error messages in this
                     // case.
                   }
-                  else
-                    gzerr << "OnReadHeader Error[" << _e.message() << "]\n";
                 }
                 else
                 {
@@ -302,7 +298,6 @@ namespace gazebo
                 if (!_e && !transport::is_stopped())
                 {
                   //boost::get<0>(_handler)(data);
-                  //new boost::thread(boost::get<0>(_handler), data);
                   ConnectionReadTask *task = new (tbb::task::allocate_root())
                         ConnectionReadTask(boost::get<0>(_handler), data);
 

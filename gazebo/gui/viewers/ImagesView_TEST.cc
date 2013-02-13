@@ -54,19 +54,19 @@ void ImagesView_TEST::Switch()
   // The layout should be the only child of the frame on construction.
   QVERIFY(frame->children().size() == 1);
 
-  this->SetTopic(view, "~/multicamera_1/link/cam/images", 2);
-  this->SetTopic(view, "~/multicamera_2/link/cam/images", 3);
-  this->SetTopic(view, "~/multicamera_3/link/cam/images", 4);
-  this->SetTopic(view, "~/multicamera_4/link/cam/images", 5);
-  this->SetTopic(view, "~/multicamera_5/link/cam/images", 6);
-  this->SetTopic(view, "~/multicamera_6/link/cam/images", 7);
+  this->SetTopic(view, "~/multicamera_1/link/cam1/images", 2);
+  this->SetTopic(view, "~/multicamera_2/link/cam2/images", 3);
+  this->SetTopic(view, "~/multicamera_3/link/cam3/images", 4);
+  this->SetTopic(view, "~/multicamera_4/link/cam4/images", 5);
+  this->SetTopic(view, "~/multicamera_5/link/cam5/images", 6);
+  this->SetTopic(view, "~/multicamera_6/link/cam6/images", 7);
 
-  this->SetTopic(view, "~/multicamera_6/link/cam/images", 7);
-  this->SetTopic(view, "~/multicamera_5/link/cam/images", 6);
-  this->SetTopic(view, "~/multicamera_4/link/cam/images", 5);
-  this->SetTopic(view, "~/multicamera_3/link/cam/images", 4);
-  this->SetTopic(view, "~/multicamera_2/link/cam/images", 3);
-  this->SetTopic(view, "~/multicamera_1/link/cam/images", 2);
+  this->SetTopic(view, "~/multicamera_6/link/cam6/images", 7);
+  this->SetTopic(view, "~/multicamera_5/link/cam5/images", 6);
+  this->SetTopic(view, "~/multicamera_4/link/cam4/images", 5);
+  this->SetTopic(view, "~/multicamera_3/link/cam3/images", 4);
+  this->SetTopic(view, "~/multicamera_2/link/cam2/images", 3);
+  this->SetTopic(view, "~/multicamera_1/link/cam1/images", 2);
 
   view->hide();
   delete view;

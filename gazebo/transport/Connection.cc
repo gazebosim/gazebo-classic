@@ -339,7 +339,6 @@ void Connection::OnWrite(const boost::system::error_code &_e,
 
   if (_e)
   {
-    gzerr << "onWrite error[" << _e.message() << "]\n";
     // It will reach this point if the remote connection disconnects.
     this->Shutdown();
   }
@@ -367,10 +366,9 @@ void Connection::Shutdown()
   {
     boost::mutex::scoped_lock lock(this->socketMutex);
     boost::system::error_code ec;
-    if (this->socket)// && this->socket->is_open())
+    if (this->socket)
     {
       this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-      gzerr << "Soecket was shutdown.\n";
     }
 
     delete this->socket;
@@ -450,6 +448,7 @@ void Connection::Cancel()
   }
 
   {
+    boost::mutex::scoped_lock lock(this->socketMutex);
     if (this->socket && this->socket->is_open())
     {
       try

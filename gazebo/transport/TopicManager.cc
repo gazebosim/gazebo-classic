@@ -207,7 +207,6 @@ void TopicManager::Unsubscribe(const std::string &_topic,
   if (publication)
     publication->RemoveSubscription(_node);
 
-  // std::cout << "Unsub Topic[" << _topic << "]\n";
   ConnectionManager::Instance()->Unsubscribe(_topic,
       _node->GetMsgType(_topic));
 
@@ -275,7 +274,6 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
 
   if (publication && !publication->HasTransport(_pub.host(), _pub.port()))
   {
-    // std::cout << "ConnectSubToPub Topic[" << _pub.topic() << "]\n";
     // Connect to the remote publisher
     ConnectionPtr conn = ConnectionManager::Instance()->ConnectToRemoteHost(
         _pub.host(), _pub.port());

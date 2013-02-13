@@ -77,14 +77,6 @@ void Publication::AddSubscription(const CallbackHelperPtr _callback)
   {
     this->callbacks.push_back(_callback);
 
-    /*SubscriptionTransportPtr subptr = boost::shared_dynamic_cast<SubscriptionTransport>(_callback);
-    if (subptr)
-    {
-      std::string host = subptr->GetConnection()->GetRemoteAddress();
-      // unsigned int port = subptr->GetConnection()->GetRemotePort();
-      // std::cout << "Publication[" << this->topic << "]::AddSub URI[" << host << ":" << port << "]\n";
-    }*/
-
     if (_callback->GetLatching())
     {
       std::vector<PublisherPtr>::iterator pubIter;
@@ -201,11 +193,6 @@ void Publication::RemoveSubscription(const std::string &_host,
     return;
   }
 
-  // std::cout << "Publication[" << this->topic << "]::RemoveSub URI[" << _host << ":" << _port << "]\n";
-
-  // if (this->callbacks.size() == 0)
-  //  std::cout << "Publication[" << this->topic << "] RemoveSub nothing to remove\n";
-
   SubscriptionTransportPtr subptr;
   std::list< CallbackHelperPtr >::iterator iter;
 
@@ -219,7 +206,6 @@ void Publication::RemoveSubscription(const std::string &_host,
          subptr->GetConnection()->GetRemotePort() == _port))
     {
       subptr.reset();
-      // std::cout << "Publication[" << this->topic << "]::RemoveSub usecount[" << (*iter).use_count() << "]\n";
       iter = this->callbacks.erase(iter);
     }
     else

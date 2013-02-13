@@ -332,8 +332,6 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     msgs::Subscribe sub;
     sub.ParseFromString(packet.serialized_data());
 
-    // std::cout << "Disconnect from Subscriber[" << sub.topic() << "]\n";
-
     // Disconnect a local publisher from a remote subscriber
     TopicManager::Instance()->DisconnectPubFromSub(sub.topic(),
         sub.host(), sub.port());
@@ -480,14 +478,17 @@ void ConnectionManager::Unsubscribe(const msgs::Subscribe &_sub)
 void ConnectionManager::Unsubscribe(const std::string &_topic,
                                      const std::string &_msgType)
 {
-  msgs::Subscribe msg;
-  msg.set_topic(_topic);
-  msg.set_msg_type(_msgType);
-  msg.set_host(this->serverConn->GetLocalAddress());
-  msg.set_port(this->serverConn->GetLocalPort());
+  if (this->serverConn)
+  {
+    msgs::Subscribe msg;
+    msg.set_topic(_topic);
+    msg.set_msg_type(_msgType);
+    msg.set_host(this->serverConn->GetLocalAddress());
+    msg.set_port(this->serverConn->GetLocalPort());
 
-  // Inform the master that we want to unsubscribe from a topic.
-  this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", msg), true);
+    // Inform the master that we want to unsubscribe from a topic.
+    this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", msg), true);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -566,8 +567,6 @@ void ConnectionManager::RemoveConnection(ConnectionPtr &_conn)
   {
     if ((*iter) == _conn)
     {
-      // std::cout << "ConnectionManager::RemoveConnection usecount[" <<
-      //  (*iter).use_count() << "]\n";
       iter = this->connections.erase(iter);
     }
     else

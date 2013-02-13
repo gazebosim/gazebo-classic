@@ -43,6 +43,7 @@ void QTestFixture::initTestCase()
 /////////////////////////////////////////////////
 void QTestFixture::init()
 {
+  this->serverThread = NULL;
   this->GetMemInfo(this->residentStart, this->shareStart);
 }
 

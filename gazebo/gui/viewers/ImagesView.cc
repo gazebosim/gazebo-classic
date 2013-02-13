@@ -116,8 +116,6 @@ void ImagesView::SetTopic(const std::string &_topicName)
 
   TopicView::SetTopic(_topicName);
 
-  this->sub.reset();
-
   // Subscribe to the new topic.
   this->sub = this->node->Subscribe(_topicName, &ImagesView::OnImages, this);
 }
