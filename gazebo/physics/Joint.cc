@@ -132,8 +132,6 @@ void Joint::LoadImpl(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void Joint::Init()
 {
-  gzerr << "attach\n";
-
   this->Attach(this->parentLink, this->childLink);
 
   // Set the anchor vector
