@@ -61,10 +61,10 @@ PhysicsEnginePtr PhysicsFactory::NewPhysicsEngine(const std::string &_classname,
 {
   PhysicsEnginePtr result;
 
-  if (engines[_classname])
-  {
-    result = (engines[_classname]) (_world);
-  }
+  std::map<std::string, PhysicsFactoryFn>::iterator iter =
+    engines.find(_classname);
+  if (iter != engines.end())
+    result = (iter->second)(_world);
   else
     gzerr << "Invalid Physics Type[" << _classname << "]\n";
 
