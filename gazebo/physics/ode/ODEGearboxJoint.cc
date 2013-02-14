@@ -46,15 +46,20 @@ ODEGearboxJoint::~ODEGearboxJoint()
     physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
+void ODEGearboxJoint::Init()
+{
+  Joint::Init();
+  LinkPtr link = this->model->GetLink(this->referenceBody);
+  if (link)
+    this->SetReferenceBody(link);
+}
+
 //////////////////////////////////////////////////
 void ODEGearboxJoint::Load(sdf::ElementPtr _sdf)
 {
   GearboxJoint<ODEJoint>::Load(_sdf);
 
   this->SetGearRatio(this->gearRatio);
-  LinkPtr link = this->model->GetLink(this->referenceBody);
-  if (link)
-    this->SetReferenceBody(link);
 }
 
 void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
@@ -64,7 +69,10 @@ void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
   if (odelink == NULL)
     gzwarn << "Reference body not valid, using inertial frame.\n";
   else
+  {
+    gzerr << "setting ref body " << this->GetName() << "\n";
     dJointSetGearboxReferenceBody(this->jointId, odelink->GetODEId());
+  }
 }
 
 //////////////////////////////////////////////////

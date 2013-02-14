@@ -65,9 +65,6 @@ namespace gazebo
       public: virtual void SetGearRatio(double _gearRatio);
 
       // Documentation inherited
-      public: virtual void SetReferenceBody(LinkPtr _body);
-
-      // Documentation inherited
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
       // Documentation inherited
@@ -90,6 +87,14 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetParam(int _parameter, double _value);
+
+      // Documentation inherited
+      protected: virtual void Init();
+
+      /// \brief Set gearbox joint gear reference body
+      /// \param[in] _body an ode body as the reference link for the gears.
+      private: void SetReferenceBody(LinkPtr _body);
+
     };
   }
 }

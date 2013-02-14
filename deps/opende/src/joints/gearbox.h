@@ -32,6 +32,10 @@ struct dxJointGearbox : public dxJointDHinge
     dReal erp;          // error reduction
     dReal cfm;          // constraint force mix in
     dxBody *refBody;    // reference body for calculating gear angles
+    dReal cumulative_angle1;
+    dReal cumulative_angle2;
+    dQuaternion qrel1;   // initial relative rotation refBody -> body1
+    dQuaternion qrel2;   // initial relative rotation refBody -> body2
     
     dxJointGearbox(dxWorld *w);
 

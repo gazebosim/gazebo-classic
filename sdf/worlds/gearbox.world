@@ -91,12 +91,11 @@
                 <mass>10.000000</mass>
             </inertial>
             <visual name="visual_cylinder">
-                <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+                <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
                 <geometry>
-                    <cylinder>
-                        <radius>0.100000</radius>
-                        <length>1.000000</length>
-                    </cylinder>
+                    <box>
+                        <size>0.2 0.2 0.2</size>
+                    </box>
                 </geometry>
                 <material>
                     <script>Gazebo/Green</script>
@@ -106,13 +105,12 @@
                 <transparency>0.000000</transparency>
             </visual>
             <collision name="collision_cylinder">
-                <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+                <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
                 <max_contacts>250</max_contacts>
                 <geometry>
-                    <cylinder>
-                        <radius>0.100000</radius>
-                        <length>1.000000</length>
-                    </cylinder>
+                    <box>
+                        <size>0.2 0.2 0.2</size>
+                    </box>
                 </geometry>
             </collision>
             <gravity>1</gravity>
@@ -167,6 +165,10 @@
             <child>link_2</child>
             <axis>
               <xyz>1.000000 0.000000 0.000000</xyz>
+              <limit>
+                <upper>0</upper>
+                <lower>0</lower>
+              </limit>
             </axis>
         </joint>
         <joint name="joint_12" type="revolute">
@@ -186,8 +188,7 @@
         <joint name="joint_13" type="gearbox">
             <parent>link_1</parent>
             <child>link_3</child>
-            <pose>0 0 0 0 0 0</pose>
-            <gear_ratio>-10</gear_ratio>
+            <gear_ratio>-0.01</gear_ratio>
             <reference_body>link_2</reference_body>
             <axis>
               <xyz>1.000000 0.000000 0.000000</xyz>
