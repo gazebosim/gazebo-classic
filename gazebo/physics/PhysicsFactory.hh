@@ -59,6 +59,11 @@ namespace gazebo
       public: static PhysicsEnginePtr NewPhysicsEngine(
                   const std::string &_className, WorldPtr _world);
 
+      /// \brief Check if a physics engine is registered.
+      /// \param[in] _name Name of the physics engine.
+      /// \return True if physics engine is registered, false otherwise.
+      public: static bool IsRegistered(const std::string _name) const;
+
       /// \brief A list of registered physics classes.
       private: static std::map<std::string, PhysicsFactoryFn> engines;
     };

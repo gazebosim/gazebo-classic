@@ -253,23 +253,7 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  // Try inserting physics engine name if one is given
-  if (_physics.length())
-  {
-    if (sdf->root->HasElement("world") &&
-        sdf->root->GetElement("world")->HasElement("physics"))
-    {
-      sdf->root->GetElement("world")->GetElement("physics")
-               ->GetAttribute("type")->Set(_physics);
-    }
-    else
-    {
-      gzerr << "Cannot set physics engine: <world> does not have <physics>\n";
-    }
-  }
-
-  // Try loading it further
-  return this->LoadImpl(sdf->root);
+  return this->LoadImpl(sdf->root, _physics);
 }
 
 /////////////////////////////////////////////////
@@ -293,7 +277,8 @@ bool Server::LoadString(const std::string &_sdfString)
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadImpl(sdf::ElementPtr _elem)
+bool Server::LoadImpl(sdf::ElementPtr _elem,
+                      const std::string &_physics);
 {
   std::string host = "";
   unsigned int port = 0;
@@ -313,6 +298,29 @@ bool Server::LoadImpl(sdf::ElementPtr _elem)
 
   /// Load the physics library
   physics::load();
+
+  // If a physics engine is specified,
+  if (_physics.length())
+  {
+    // Check if physics engine name is valid
+    // This must be done after physics::load();
+    if (!PhysicsFactory::IsRegistered(_physics))
+    {
+      gzerr << "Unregistered physics engine [" << _physics
+            << "], the default will be used instead.\n";
+    }
+    // Try inserting physics engine name if one is given
+    else if (_elem->HasElement("world") &&
+             _elem->GetElement("world")->HasElement("physics"))
+    {
+      _elem->GetElement("world")->GetElement("physics")
+           ->GetAttribute("type")->Set(_physics);
+    }
+    else
+    {
+      gzerr << "Cannot set physics engine: <world> does not have <physics>\n";
+    }
+  }
 
   sdf::ElementPtr worldElem = _elem->GetElement("world");
   if (worldElem)
