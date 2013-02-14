@@ -132,12 +132,13 @@ class ServerFixture : public testing::Test
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
                this->poseSub = this->node->Subscribe("~/pose/info",
-                   &ServerFixture::OnPose, this);
+                   &ServerFixture::OnPose, this, true);
                this->statsSub = this->node->Subscribe("~/world_stats",
                    &ServerFixture::OnStats, this);
 
                this->factoryPub =
                  this->node->Advertise<msgs::Factory>("~/factory");
+               this->factoryPub->WaitForConnection();
 
                // Wait for the world to reach the correct pause state.
                // This might not work properly with multiple worlds.
@@ -149,6 +150,7 @@ class ServerFixture : public testing::Test
                       ++waitCount < maxWaitCount)
                  common::Time::MSleep(10);
                ASSERT_LT(waitCount, maxWaitCount);
+
              }
 
   protected: void RunServer(const std::string &_worldFilename)
@@ -444,9 +446,14 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
+               int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName))
-                 common::Time::MSleep(10);
+               while (!this->HasEntity(_modelName) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
              }
 
   protected: void SpawnCylinder(const std::string &_name,
@@ -646,6 +653,10 @@ class ServerFixture : public testing::Test
 
   protected: void SpawnSDF(const std::string &_sdf)
              {
+               // Wait for the first pose message
+               while (this->poses.size() == 0)
+                 common::Time::MSleep(10);
+
                msgs::Factory msg;
                msg.set_sdf(_sdf);
                this->factoryPub->Publish(msg);
