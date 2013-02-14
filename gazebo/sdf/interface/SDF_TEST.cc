@@ -18,7 +18,8 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/sdf/sdf.hh"
-#include "gazebo/math/Pose.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/math/gzmath.hh"
 
 class SdfUpdateFixture
 {
@@ -257,6 +258,39 @@ TEST(SdfUpdate, ElementRemoveChild)
   EXPECT_FALSE(elem);
 }
 
+////////////////////////////////////////////////////
+/// Ensure that getting empty values with empty keys returns correct values.
+TEST(SdfUpdate, EmptyValues)
+{
+  sdf::ElementPtr elem(new sdf::Element());
+  std::string emptyString;
+
+  EXPECT_FALSE(elem->GetValueBool(emptyString));
+
+  EXPECT_EQ(elem->GetValueInt(emptyString), 0);
+
+  EXPECT_EQ(elem->GetValueUInt(emptyString), static_cast<unsigned int>(0));
+
+  EXPECT_EQ(elem->GetValueChar(emptyString), '\0');
+
+  EXPECT_EQ(elem->GetValueString(emptyString), "");
+
+  EXPECT_EQ(elem->GetValueVector2d(emptyString), gazebo::math::Vector2d());
+
+  EXPECT_EQ(elem->GetValueVector3(emptyString), gazebo::math::Vector3());
+
+  EXPECT_EQ(elem->GetValueQuaternion(emptyString), gazebo::math::Quaternion());
+
+  EXPECT_EQ(elem->GetValuePose(emptyString), gazebo::math::Pose());
+
+  EXPECT_EQ(elem->GetValueColor(emptyString), gazebo::common::Color());
+
+  EXPECT_EQ(elem->GetValueTime(emptyString), gazebo::common::Time());
+
+  EXPECT_NEAR(elem->GetValueFloat(emptyString), 0.0, 1e-6);
+
+  EXPECT_NEAR(elem->GetValueDouble(emptyString), 0.0, 1e-6);
+}
 
 /////////////////////////////////////////////////
 /// Main
