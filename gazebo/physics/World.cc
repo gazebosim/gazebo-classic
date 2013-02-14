@@ -670,6 +670,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     _sdf->PrintValues("  ");
   }
 
+  this->PublishModelPose(model->GetName());
   return model;
 }
 
@@ -1510,6 +1511,7 @@ void World::ProcessFactoryMsgs()
         model->Init();
 
         model->LoadPlugins();
+        std::cout << "Factory Create model[" << model->GetName() << "]\n";
       }
       else if (isLight)
       {
@@ -1660,6 +1662,7 @@ bool World::OnLog(std::ostringstream &_stream)
 void World::ProcessMessages()
 {
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  msgs::Pose *poseMsg;
 
   if (this->posePub && this->posePub->HasConnections() &&
       this->publishModelPoses.size() > 0)
@@ -1677,15 +1680,18 @@ void World::ProcessMessages()
       if (!model)
         continue;
 
+      poseMsg = msg.add_pose();
+
       // Publish the model's relative pose
-      msgs::Set(msg.add_pose(), model->GetRelativePose());
+      poseMsg->set_name(model->GetScopedName());
+      msgs::Set(poseMsg, model->GetRelativePose());
 
       // Publish each of the model's children relative poses
       Link_V links = model->GetLinks();
       for (Link_V::iterator linkIter = links.begin();
            linkIter != links.end(); ++linkIter)
       {
-        msgs::Pose *poseMsg = msg.add_pose();
+        poseMsg = msg.add_pose();
         poseMsg->set_name((*linkIter)->GetScopedName());
         msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
       }
