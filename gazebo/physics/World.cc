@@ -1511,7 +1511,6 @@ void World::ProcessFactoryMsgs()
         model->Init();
 
         model->LoadPlugins();
-        std::cout << "Factory Create model[" << model->GetName() << "]\n";
       }
       else if (isLight)
       {

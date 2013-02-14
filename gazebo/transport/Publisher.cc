@@ -33,7 +33,6 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
   this->prevMsg = NULL;
   this->queueLimitWarned = false;
   this->updatePeriod = 0;
-  this->prevPublishTime = common::Time::GetWallTime();
 }
 
 //////////////////////////////////////////////////
@@ -47,7 +46,6 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 
   this->prevMsg = NULL;
   this->queueLimitWarned = false;
-  this->prevPublishTime = common::Time::GetWallTime();
 }
 
 //////////////////////////////////////////////////
@@ -102,7 +100,8 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
     this->currentTime = common::Time::GetWallTime();
 
     // Skip publication if the time difference is less than the update period.
-    if ((this->currentTime - this->prevPublishTime).Double() <
+    if (this->prevPublishTime != common::Time(0,0) &&
+        (this->currentTime - this->prevPublishTime).Double() <
          this->updatePeriod)
     {
       return;
