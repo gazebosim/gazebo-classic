@@ -550,7 +550,16 @@ std::string Connection::GetRemoteAddress() const
 unsigned int Connection::GetRemotePort() const
 {
   if (this->socket && this->socket->is_open())
-    return this->socket->remote_endpoint().port();
+  {
+    try
+    {
+      return this->socket->remote_endpoint().port();
+    }
+    catch(...)
+    {
+      return 0;
+    }
+  }
   else
     return 0;
 }
