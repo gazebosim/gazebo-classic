@@ -100,7 +100,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
     this->currentTime = common::Time::GetWallTime();
 
     // Skip publication if the time difference is less than the update period.
-    if (this->prevPublishTime != common::Time(0,0) &&
+    if (this->prevPublishTime != common::Time(0, 0) &&
         (this->currentTime - this->prevPublishTime).Double() <
          this->updatePeriod)
     {
