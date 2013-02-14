@@ -1720,7 +1720,6 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
-
   Visual_M::iterator iter;
   iter = this->visuals.find(_msg->name() + "_JOINT_VISUAL__");
 
