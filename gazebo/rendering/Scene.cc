@@ -1720,22 +1720,29 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
-  VisualPtr childVis;
 
-  if (_msg->child() == "world")
-    childVis = this->worldVisual;
-  else
-    childVis = this->GetVisual(_msg->child());
+  Visual_M::iterator iter;
+  iter = this->visuals.find(_msg->name() + "_JOINT_VISUAL__");
 
-  if (!childVis)
-    return false;
+  if (iter == this->visuals.end())
+  {
+    VisualPtr childVis;
 
-  JointVisualPtr jointVis(new JointVisual(
-          _msg->name() + "_JOINT_VISUAL__", childVis));
-  jointVis->Load(_msg);
-  jointVis->SetVisible(this->showJoints);
+    if (_msg->child() == "world")
+      childVis = this->worldVisual;
+    else
+      childVis = this->GetVisual(_msg->child());
 
-  this->visuals[jointVis->GetName()] = jointVis;
+    if (!childVis)
+      return false;
+
+    JointVisualPtr jointVis(new JointVisual(
+            _msg->name() + "_JOINT_VISUAL__", childVis));
+    jointVis->Load(_msg);
+    jointVis->SetVisible(this->showJoints);
+
+    this->visuals[jointVis->GetName()] = jointVis;
+  }
   return true;
 }
 
