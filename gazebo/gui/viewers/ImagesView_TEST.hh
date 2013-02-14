@@ -34,10 +34,6 @@ class ImagesView_TEST : public QTestFixture
   /// \brief Test switching between cameras
   private slots: void Switch();
 
-  /// \brief Test fast switching between cameras. This test is designed to
-  /// find problems if the topic is switched in rapid succession.
-  private slots: void FastSwitch();
-
   /// \brief Switch the images view topic, and make sure the images appear.
   /// \param[in] _view Pointer to the ImagesView widget.
   /// \param[in] _topicName Name of the topic publishing images.

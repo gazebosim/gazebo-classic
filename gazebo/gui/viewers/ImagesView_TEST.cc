@@ -68,25 +68,6 @@ void ImagesView_TEST::Switch()
   this->SetTopic(view, "~/multicamera_2/link/cam2/images", 3);
   this->SetTopic(view, "~/multicamera_1/link/cam1/images", 2);
 
-  view->hide();
-  delete view;
-}
-
-/////////////////////////////////////////////////
-void ImagesView_TEST::FastSwitch()
-{
-  this->Load("worlds/multicamera_test.world");
-
-  // Create a new data logger widget
-  gazebo::gui::ImagesView *view = new gazebo::gui::ImagesView(NULL);
-  view->show();
-
-  // Get the frame that holds the images
-  QFrame *frame = view->findChild<QFrame*>("blackBorderFrame");
-
-  // The layout should be the only child of the frame on construction.
-  QVERIFY(frame->children().size() == 1);
-
   std::map<int, std::string> topicMap;
   topicMap[2] = "~/multicamera_1/link/cam1/images";
   topicMap[3] = "~/multicamera_2/link/cam2/images";
