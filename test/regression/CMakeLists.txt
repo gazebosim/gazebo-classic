@@ -39,7 +39,6 @@ set (gtest_sources
   pioneer2dx.cc
   pr2.cc
   projector.cc
-  ray_sensor.cc
   server_fixture.cc
   speed.cc
   transport.cc)
