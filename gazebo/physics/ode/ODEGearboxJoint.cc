@@ -147,6 +147,9 @@ void ODEGearboxJoint::SetAxis(int _index, const math::Vector3 &_axis)
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetDamping(int /*index*/, double _damping)
 {
+  gzlog << "damping not implemented for gearbox\n";
+  return;
+
   this->dampingCoefficient = _damping;
   // use below when ode version is fixed
   // dJointSetDamping(this->jointId, this->dampingCoefficient);
@@ -157,6 +160,9 @@ void ODEGearboxJoint::SetDamping(int /*index*/, double _damping)
 //////////////////////////////////////////////////
 math::Angle ODEGearboxJoint::GetAngleImpl(int /*index*/) const
 {
+  gzlog << "GetAngle not implemented for gearbox\n";
+  return math::Angle(0);
+
   math::Angle result;
   if (this->jointId)
     result = dJointGetHingeAngle(this->jointId);
@@ -166,6 +172,9 @@ math::Angle ODEGearboxJoint::GetAngleImpl(int /*index*/) const
 //////////////////////////////////////////////////
 double ODEGearboxJoint::GetVelocity(int /*index*/) const
 {
+  gzlog << "GetVelocity not implemented for gearbox\n";
+  return 0;
+
   double result = dJointGetHingeAngleRate(this->jointId);
 
   return result;
@@ -174,6 +183,9 @@ double ODEGearboxJoint::GetVelocity(int /*index*/) const
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetVelocity(int /*index*/, double _angle)
 {
+  gzlog << "SetVelocity not implemented for gearbox\n";
+  return;
+
   this->SetParam(dParamVel, _angle);
 }
 

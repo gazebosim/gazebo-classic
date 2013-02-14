@@ -12,7 +12,7 @@
     </include>
 
     <physics type="ode">
-        <gravity>0.000000 0.000000 -9.810000</gravity>
+        <gravity>0.000000 0.000000 0.00000</gravity>
         <ode>
             <solver>
                 <type>quick</type>
@@ -188,7 +188,7 @@
         <joint name="joint_13" type="gearbox">
             <parent>link_1</parent>
             <child>link_3</child>
-            <gear_ratio>-0.5</gear_ratio>
+            <gear_ratio>-1.5</gear_ratio>
             <reference_body>link_2</reference_body>
             <axis>
               <xyz>1.000000 0.000000 0.000000</xyz>

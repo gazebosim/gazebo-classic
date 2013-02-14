@@ -23,9 +23,9 @@
 #ifndef _ODE_JOINT_GEARBOX_
 #define _ODE_JOINT_GEARBOX_
 
-#include "dhinge.h"
+#include "joint.h"
 
-struct dxJointGearbox : public dxJointDHinge 
+struct dxJointGearbox : public dxJoint
 {
     dVector3 axis1, axis2;
     dReal ratio;        // gearbox ratio
@@ -44,10 +44,6 @@ struct dxJointGearbox : public dxJointDHinge
     virtual void getInfo2( Info2* info );
     virtual dJointType type() const;
     virtual size_t size() const;
-    double normalize_angle_positive(double angle);
-    double normalize_angle(double angle);
-    double shortest_angular_distance(double from, double to);
-
 };
 
 #endif

@@ -80,6 +80,19 @@ ODE_API dReal dMaxDifference (const dReal *A, const dReal *B, int n, int m);
  * n*n matrices */
 ODE_API dReal dMaxDifferenceLowerTriangle (const dReal *A, const dReal *B, int n);
 
+/* normalize angles about 2*M_PI to a minimum positive value. */
+ODE_API dReal dNormalizeAnglePositive(dReal angle);
+
+/* normalize [0, 2*M_PI] angles into [-M_PI, +M_PI]. */
+ODE_API dReal dNormalizeAngle(dReal angle);
+
+/* get shortest angular distance between 2 points on a circle. */
+ODE_API dReal dShortestAngularDistance(dReal from, dReal to);
+
+/* update angle using shortest angular distance between 2 points on a circle,
+   returns to if from and to differs by more than tol. */
+ODE_API dReal dShortestAngularDistanceUpdate(dReal from, dReal to, dReal tol = 0.5*M_PI);
+
 
 #ifdef __cplusplus
 }
