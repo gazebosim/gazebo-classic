@@ -125,6 +125,13 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
     const std::string &_type, const std::string &_defaultValue, bool _required,
     const std::string &_description)
 {
+  if (_type == "char")
+  {
+    boost::shared_ptr<ParamT<char> > param(
+        new ParamT<char>(_key, _defaultValue, _required, _type,
+                           _description));
+    return param;
+  }
   if (_type == "double")
   {
     boost::shared_ptr<ParamT<double> > param(
@@ -196,6 +203,13 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
   {
     boost::shared_ptr<ParamT<gazebo::math::Pose> > param(
         new ParamT<gazebo::math::Pose>(_key, _defaultValue, _required,
+                                       _type, _description));
+    return param;
+  }
+  else if (_type == "quaternion")
+  {
+    boost::shared_ptr<ParamT<gazebo::math::Quaternion> > param(
+        new ParamT<gazebo::math::Quaternion>(_key, _defaultValue, _required,
                                        _type, _description));
     return param;
   }

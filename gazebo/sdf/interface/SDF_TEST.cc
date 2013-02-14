@@ -262,34 +262,76 @@ TEST(SdfUpdate, ElementRemoveChild)
 /// Ensure that getting empty values with empty keys returns correct values.
 TEST(SdfUpdate, EmptyValues)
 {
-  sdf::ElementPtr elem(new sdf::Element());
   std::string emptyString;
+  sdf::ElementPtr elem;
 
+  elem.reset(new sdf::Element());
   EXPECT_FALSE(elem->GetValueBool(emptyString));
+  elem->AddValue("bool", "true", "0", "description");
+  EXPECT_TRUE(elem->GetValueBool(emptyString));
 
+  elem.reset(new sdf::Element());
   EXPECT_EQ(elem->GetValueInt(emptyString), 0);
+  elem->AddValue("int", "12", "0", "description");
+  EXPECT_EQ(elem->GetValueInt(emptyString), 12);
 
+  elem.reset(new sdf::Element());
   EXPECT_EQ(elem->GetValueUInt(emptyString), static_cast<unsigned int>(0));
+  elem->AddValue("unsigned int", "123", "0", "description");
+  EXPECT_EQ(elem->GetValueUInt(emptyString), static_cast<unsigned int>(123));
 
+  elem.reset(new sdf::Element());
   EXPECT_EQ(elem->GetValueChar(emptyString), '\0');
+  elem->AddValue("char", "a", "0", "description");
+  EXPECT_EQ(elem->GetValueChar(emptyString), 'a');
 
+  elem.reset(new sdf::Element());
   EXPECT_EQ(elem->GetValueString(emptyString), "");
+  elem->AddValue("string", "hello", "0", "description");
+  EXPECT_EQ(elem->GetValueString(emptyString), "hello");
 
+  elem.reset(new sdf::Element());
   EXPECT_EQ(elem->GetValueVector2d(emptyString), gazebo::math::Vector2d());
+  elem->AddValue("vector2d", "1 2", "0", "description");
+  EXPECT_EQ(elem->GetValueVector2d(emptyString), gazebo::math::Vector2d(1, 2));
 
+  elem.reset(new sdf::Element());
   EXPECT_EQ(elem->GetValueVector3(emptyString), gazebo::math::Vector3());
+  elem->AddValue("vector3", "1 2 3", "0", "description");
+  EXPECT_EQ(elem->GetValueVector3(emptyString), gazebo::math::Vector3(1, 2, 3));
 
+  elem.reset(new sdf::Element());
   EXPECT_EQ(elem->GetValueQuaternion(emptyString), gazebo::math::Quaternion());
+  elem->AddValue("quaternion", "1 2 3", "0", "description");
+  EXPECT_EQ(elem->GetValueQuaternion(emptyString),
+            gazebo::math::Quaternion(-2.14159, 1.14159, -0.141593));
 
+  elem.reset(new sdf::Element());
   EXPECT_EQ(elem->GetValuePose(emptyString), gazebo::math::Pose());
+  elem->AddValue("pose", "1 2 3 4 5 6", "0", "description");
+  EXPECT_EQ(elem->GetValuePose(emptyString),
+            gazebo::math::Pose(1, 2, 3, 4, 5, 6));
 
+  elem.reset(new sdf::Element());
   EXPECT_EQ(elem->GetValueColor(emptyString), gazebo::common::Color());
+  elem->AddValue("color", ".1 .2 .3 1.0", "0", "description");
+  EXPECT_EQ(elem->GetValueColor(emptyString),
+            gazebo::common::Color(.1, .2, .3, 1.0));
 
+  elem.reset(new sdf::Element());
   EXPECT_EQ(elem->GetValueTime(emptyString), gazebo::common::Time());
+  elem->AddValue("time", "1 2", "0", "description");
+  EXPECT_EQ(elem->GetValueTime(emptyString), gazebo::common::Time(1, 2));
 
+  elem.reset(new sdf::Element());
   EXPECT_NEAR(elem->GetValueFloat(emptyString), 0.0, 1e-6);
+  elem->AddValue("float", "12.34", "0", "description");
+  EXPECT_NEAR(elem->GetValueFloat(emptyString), 12.34, 1e-6);
 
+  elem.reset(new sdf::Element());
   EXPECT_NEAR(elem->GetValueDouble(emptyString), 0.0, 1e-6);
+  elem->AddValue("double", "12.34", "0", "description");
+  EXPECT_NEAR(elem->GetValueDouble(emptyString), 12.34, 1e-6);
 }
 
 /////////////////////////////////////////////////
