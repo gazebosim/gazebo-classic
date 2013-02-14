@@ -1668,7 +1668,7 @@ void World::ProcessMessages()
   {
     msgs::Pose_V msg;
 
-    for (std::list<std::string>::iterator iter =
+    for (std::set<std::string>::iterator iter =
          this->publishModelPoses.begin();
          iter != this->publishModelPoses.end(); ++iter)
     {
@@ -1734,14 +1734,8 @@ void World::PublishModelPose(const std::string &_modelName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
 
-  // Find an occurance of the modelName
-  std::list<std::string>::iterator iter = std::find(
-      this->publishModelPoses.begin(),
-      this->publishModelPoses.end(), _modelName);
-
   // Only add if the model name is not in the list
-  if (iter == this->publishModelPoses.end())
-    this->publishModelPoses.push_back(_modelName);
+  this->publishModelPoses.insert(_modelName);
 }
 
 //////////////////////////////////////////////////

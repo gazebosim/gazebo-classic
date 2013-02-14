@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <list>
+#include <set>
 #include <deque>
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
@@ -646,7 +647,7 @@ namespace gazebo
       private: sdf::SDFPtr factorySDF;
 
       /// \brief The list of pose messages to output.
-      private: std::list<std::string> publishModelPoses;
+      private: std::set<std::string> publishModelPoses;
 
       /// \brief Info passed through the WorldUpdateBegin event.
       private: common::UpdateInfo updateInfo;
