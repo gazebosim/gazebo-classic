@@ -405,10 +405,6 @@ class ServerFixture : public testing::Test
                  unsigned int _width = 320, unsigned int _height = 240,
                  double _rate = 25)
              {
-               // Wait for the first pose message
-               while (this->poses.size() == 0)
-                 common::Time::MSleep(10);
-
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
@@ -460,10 +456,6 @@ class ServerFixture : public testing::Test
   protected: void SpawnCylinder(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy)
              {
-               // Wait for the first pose message
-               while (this->poses.size() == 0)
-                 common::Time::MSleep(10);
-
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
@@ -507,10 +499,6 @@ class ServerFixture : public testing::Test
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  bool _wait = true)
              {
-               // Wait for the first pose message
-               while (this->poses.size() == 0)
-                 common::Time::MSleep(10);
-
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
@@ -550,10 +538,6 @@ class ServerFixture : public testing::Test
                  const math::Vector3 &_cog, double _radius,
                  bool _wait = true)
              {
-               // Wait for the first pose message
-               while (this->poses.size() == 0)
-                 common::Time::MSleep(10);
-
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
@@ -595,10 +579,6 @@ class ServerFixture : public testing::Test
                  const math::Vector3 &_size, const math::Vector3 &_pos,
                  const math::Vector3 &_rpy)
              {
-               // Wait for the first pose message
-               while (this->poses.size() == 0)
-                 common::Time::MSleep(10);
-
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
@@ -637,10 +617,6 @@ class ServerFixture : public testing::Test
                  const math::Vector3 &_pos,
                  const math::Vector3 &_rpy)
              {
-               // Wait for the first pose message
-               while (this->poses.size() == 0)
-                 common::Time::MSleep(10);
-
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
@@ -667,10 +643,6 @@ class ServerFixture : public testing::Test
 
   protected: void SpawnModel(const std::string &_filename)
              {
-               // Wait for the first pose message
-               while (this->poses.size() == 0)
-                 common::Time::MSleep(10);
-
                msgs::Factory msg;
                msg.set_sdf_filename(_filename);
                this->factoryPub->Publish(msg);
