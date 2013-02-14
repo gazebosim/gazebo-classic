@@ -16,7 +16,7 @@
         <ode>
             <solver>
                 <type>quick</type>
-                <dt>0.001000</dt>
+                <dt>0.000100</dt>
                 <iters>100</iters>
                 <precon_iters>0</precon_iters>
                 <sor>1.300000</sor>
@@ -188,7 +188,7 @@
         <joint name="joint_13" type="gearbox">
             <parent>link_1</parent>
             <child>link_3</child>
-            <gear_ratio>-0.01</gear_ratio>
+            <gear_ratio>-0.5</gear_ratio>
             <reference_body>link_2</reference_body>
             <axis>
               <xyz>1.000000 0.000000 0.000000</xyz>

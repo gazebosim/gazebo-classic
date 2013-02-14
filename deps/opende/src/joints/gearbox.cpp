@@ -134,7 +134,7 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
                      + shortest_angular_distance(cumulative_angle2,ang2);
 
     double err = shortest_angular_distance(cumulative_angle1,
-      ratio * cumulative_angle2);
+      -ratio * cumulative_angle2);
 
     // printf("a1(%f) a2(%f) e(%f)\n", ang1, ang2, err);
 
