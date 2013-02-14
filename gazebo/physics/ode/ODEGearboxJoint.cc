@@ -108,8 +108,6 @@ math::Vector3 ODEGearboxJoint::GetGlobalAxis(int _index) const
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
-  gzerr << "debug\n";
-
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
