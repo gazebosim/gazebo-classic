@@ -26,6 +26,7 @@ class PhysicsTest : public ServerFixture
   public: void EmptyWorld(const std::string &_physicsEngine);
   public: void SpawnDrop(const std::string &_physicsEngine);
   public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
+  public: void RevoluteJoint(const std::string &_physicsEngine);
   public: void SimplePendulum(const std::string &_physicsEngine);
 };
 
@@ -506,6 +507,40 @@ TEST_F(PhysicsTest, SpawnDropCoGOffsetODE)
 TEST_F(PhysicsTest, SpawnDropCoGOffsetBullet)
 {
   SpawnDropCoGOffset("bullet");
+}
+#endif  // HAVE_BULLET
+
+////////////////////////////////////////////////////////////////////////
+// RevoluteJoint:
+// 
+////////////////////////////////////////////////////////////////////////
+void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
+{
+  // Load an empty world
+  Load("worlds/revolute_joint_test.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // Don't throttle physics updates, so the tests run as fast as possible
+  physics->SetUpdateRate(0);
+
+  // 
+}
+
+TEST_F(PhysicsTest, RevoluteJointODE)
+{
+  RevoluteJoint("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, RevoluteJointBullet)
+{
+  RevoluteJoint("bullet");
 }
 #endif  // HAVE_BULLET
 
