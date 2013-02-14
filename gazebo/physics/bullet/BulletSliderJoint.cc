@@ -146,7 +146,7 @@ void BulletSliderJoint::SetForce(int _index, double _force)
   btVector3 hingeTorque = _torque * hingeAxisWorld;
   */
 
-  if (this->effortLimit[_index] > 0)
+  if (_index < this->GetAngleCount() && this->effortLimit[_index] > 0)
     _force = math::clamp(_force, -this->effortLimit[_index],
        this->effortLimit[_index]);
 

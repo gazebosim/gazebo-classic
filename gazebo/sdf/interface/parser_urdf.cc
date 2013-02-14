@@ -1721,7 +1721,7 @@ TiXmlDocument URDF2Gazebo::InitModelString(const std::string &_urdfStr,
     gazeboXmlOut.LinkEndChild(gazeboSdf);
 
     // debug
-    gazeboXmlOut.Print();
+    // gazeboXmlOut.Print();
 
     return gazeboXmlOut;
 }

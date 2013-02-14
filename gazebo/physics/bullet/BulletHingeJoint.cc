@@ -234,7 +234,7 @@ void BulletHingeJoint::SetForce(int _index, double _torque)
     this->bulletHinge->getRigidBodyA().getWorldTransform().getBasis() *
     hingeAxisLocal;
 
-  if (this->effortLimit[_index] > 0)
+  if (_index < this->GetAngleCount() && this->effortLimit[_index] > 0)
     _torque = math::clamp(_torque, -this->effortLimit[_index],
        this->effortLimit[_index]);
 

@@ -246,13 +246,21 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
 //////////////////////////////////////////////////
 double Joint::GetEffortLimit(int _index)
 {
-  return this->effortLimit[_index];
+  if (_index < this->GetAngleCount())
+    return this->effortLimit[_index];
+
+  gzerr << "GetEffortLimit index[" << _index << "] out of range\n";
+  return 0;
 }
 
 //////////////////////////////////////////////////
 double Joint::GetVelocityLimit(int _index)
 {
-  return this->velocityLimit[_index];
+  if (_index < this->GetAngleCount())
+    return this->velocityLimit[_index];
+
+  gzerr << "GetVelocityLimit index[" << _index << "] out of range\n";
+  return 0;
 }
 
 //////////////////////////////////////////////////

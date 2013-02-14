@@ -224,12 +224,12 @@ namespace gazebo
       public: virtual math::Angle GetLowStop(int _index) = 0;
 
       /// \brief Get the effort limit on axis(index).
-      /// \param[in] _index Index of the axis.
+      /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
       /// \return Effort limit specified in SDF
       public: virtual double GetEffortLimit(int _index);
 
       /// \brief Get the velocity limit on axis(index).
-      /// \param[in] _index Index of the axis.
+      /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
       /// \return Velocity limit specified in SDF
       public: virtual double GetVelocityLimit(int _index);
 
