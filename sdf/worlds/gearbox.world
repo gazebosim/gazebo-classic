@@ -16,8 +16,8 @@
         <ode>
             <solver>
                 <type>quick</type>
-                <dt>0.000100</dt>
-                <iters>100</iters>
+                <dt>0.00100</dt>
+                <iters>10</iters>
                 <precon_iters>0</precon_iters>
                 <sor>1.300000</sor>
             </solver>

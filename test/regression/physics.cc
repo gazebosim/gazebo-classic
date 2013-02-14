@@ -232,40 +232,47 @@ void PhysicsTest::GearboxTest(const std::string &_worldFile)
   physics::ModelPtr model = world->GetModel("model_1");
   physics::JointPtr joint1 = model->GetJoint("joint_12");
   physics::JointPtr joint3 = model->GetJoint("joint_23");
-  joint1->SetForce(0, -1.5);
-  joint3->SetForce(0,  1.0);
-  int steps = 100;
+  int steps = 10000;
   for (int i = 0; i < steps; ++i)
   {
-    world->StepWorld(100);  // theoretical contact, but
-    gzdbg << "gearbox time [" << world->GetSimTime().Double()
-          << "] vel [" << joint1->GetVelocity(0)
-          << "] pose [" << joint1->GetAngle(0).Radian()
-          << "] vel [" << joint3->GetVelocity(0)
-          << "] pose [" << joint3->GetAngle(0).Radian()
-          << "]\n";
-    EXPECT_EQ(joint1->GetVelocity(0), 0);
-    EXPECT_EQ(joint1->GetVelocity(0), 0);
-    EXPECT_EQ(joint3->GetAngle(0).Radian(), 0);
-    EXPECT_EQ(joint3->GetAngle(0).Radian(), 0);
+    joint1->SetForce(0, -1.5);
+    joint3->SetForce(0,  1.0);
+    world->StepWorld(1);  // theoretical contact, but
+    if (i%1000 == 0)
+      gzdbg << "gearbox time [" << world->GetSimTime().Double()
+            << "] vel [" << joint1->GetVelocity(0)
+            << "] pose [" << joint1->GetAngle(0).Radian()
+            << "] vel [" << joint3->GetVelocity(0)
+            << "] pose [" << joint3->GetAngle(0).Radian()
+            << "]\n";
   }
+  EXPECT_LT(joint1->GetVelocity(0), 1e-6);
+  EXPECT_LT(joint1->GetVelocity(0), 1e-6);
+  EXPECT_LT(joint3->GetAngle(0).Radian(), 1e-6);
+  EXPECT_LT(joint3->GetAngle(0).Radian(), 1e-6);
+  EXPECT_GT(joint1->GetVelocity(0), -1e-6);
+  EXPECT_GT(joint1->GetVelocity(0), -1e-6);
+  EXPECT_GT(joint3->GetAngle(0).Radian(), -1e-6);
+  EXPECT_GT(joint3->GetAngle(0).Radian(), -1e-6);
+
   // slight imbalance
-  joint1->SetForce(0, -1.0);
-  joint3->SetForce(0,  1.0);
   for (int i = 0; i < steps; ++i)
   {
-    world->StepWorld(100);  // theoretical contact, but
-    gzdbg << "gearbox time [" << world->GetSimTime().Double()
-          << "] vel [" << joint1->GetVelocity(0)
-          << "] pose [" << joint1->GetAngle(0).Radian()
-          << "] vel [" << joint3->GetVelocity(0)
-          << "] pose [" << joint3->GetAngle(0).Radian()
-          << "]\n";
-    EXPECT_GT(joint1->GetVelocity(0), 0);
-    EXPECT_GT(joint1->GetVelocity(0), 0);
-    EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
-    EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
+    joint1->SetForce(0, -1.0);
+    joint3->SetForce(0,  1.0);
+    world->StepWorld(1);  // theoretical contact, but
+    if (i%1000 == 0)
+      gzdbg << "gearbox time [" << world->GetSimTime().Double()
+            << "] vel [" << joint1->GetVelocity(0)
+            << "] pose [" << joint1->GetAngle(0).Radian()
+            << "] vel [" << joint3->GetVelocity(0)
+            << "] pose [" << joint3->GetAngle(0).Radian()
+            << "]\n";
   }
+  EXPECT_GT(joint1->GetVelocity(0), 0);
+  EXPECT_GT(joint1->GetVelocity(0), 0);
+  EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
+  EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
 
 }
 TEST_F(PhysicsTest, GearboxTestODE)
