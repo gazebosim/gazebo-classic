@@ -114,6 +114,14 @@ void dJointGetGearboxAxis2( dJointID j, dVector3 result )
                        result);
 }
 
+void dJointSetGearboxReferenceBody( dJointID j, dBodyID b )
+{
+    dxJointGearbox* joint = dynamic_cast<dxJointGearbox*>(j);
+    dUASSERT( joint, "bad joint argument" );
+
+    joint->refBody = b;
+}
+
 void dJointSetGearboxRatio( dJointID j, dReal value )
 {
     dxJointGearbox* joint = dynamic_cast<dxJointGearbox*>(j);

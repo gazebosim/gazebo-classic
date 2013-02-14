@@ -26,6 +26,10 @@
     <description>Parameter for gearbox joints.</description>
   </element>
 
+  <element name="reference_body" type="string" default="__default__" required="0">
+    <description>Parameter for gearbox joints.</description>
+  </element>
+
   <element name="thread_pitch" type="double" default="1.0" required="0">
     <description>Parameter for screw joints.</description>
   </element>

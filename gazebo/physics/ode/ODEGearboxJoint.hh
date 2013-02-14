@@ -65,6 +65,9 @@ namespace gazebo
       public: virtual void SetGearRatio(double _gearRatio);
 
       // Documentation inherited
+      public: virtual void SetReferenceBody(LinkPtr _body);
+
+      // Documentation inherited
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
       // Documentation inherited

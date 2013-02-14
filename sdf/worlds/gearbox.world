@@ -77,6 +77,49 @@
             <kinematic>0</kinematic>
         </link>
         <link name="link_2">
+            <pose>0.500000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+            <inertial>
+                <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+                <inertia>
+                    <ixx>1.000000</ixx>
+                    <ixy>0.000000</ixy>
+                    <ixz>0.000000</ixz>
+                    <iyy>1.000000</iyy>
+                    <iyz>0.000000</iyz>
+                    <izz>1.000000</izz>
+                </inertia>
+                <mass>10.000000</mass>
+            </inertial>
+            <visual name="visual_cylinder">
+                <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.100000</radius>
+                        <length>1.000000</length>
+                    </cylinder>
+                </geometry>
+                <material>
+                    <script>Gazebo/Green</script>
+                </material>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>100.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="collision_cylinder">
+                <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+                <max_contacts>250</max_contacts>
+                <geometry>
+                    <cylinder>
+                        <radius>0.100000</radius>
+                        <length>1.000000</length>
+                    </cylinder>
+                </geometry>
+            </collision>
+            <gravity>1</gravity>
+            <self_collide>1</self_collide>
+            <kinematic>0</kinematic>
+        </link>
+        <link name="link_3">
             <pose>1.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
             <inertial>
                 <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
@@ -119,25 +162,33 @@
             <self_collide>1</self_collide>
             <kinematic>0</kinematic>
         </link>
-        <joint name="joint_0" type="revolute">
+        <joint name="joint_02" type="revolute">
             <parent>world</parent>
+            <child>link_2</child>
+            <axis>
+              <xyz>1.000000 0.000000 0.000000</xyz>
+            </axis>
+        </joint>
+        <joint name="joint_12" type="revolute">
+            <parent>link_2</parent>
             <child>link_1</child>
             <axis>
               <xyz>1.000000 0.000000 0.000000</xyz>
             </axis>
         </joint>
-        <joint name="joint_1" type="revolute">
-            <parent>link_1</parent>
-            <child>link_2</child>
+        <joint name="joint_23" type="revolute">
+            <parent>link_2</parent>
+            <child>link_3</child>
             <axis>
               <xyz>1.000000 0.000000 0.000000</xyz>
             </axis>
         </joint>
-        <joint name="joint_12" type="gearbox">
+        <joint name="joint_13" type="gearbox">
             <parent>link_1</parent>
-            <child>link_2</child>
+            <child>link_3</child>
             <pose>0 0 0 0 0 0</pose>
             <gear_ratio>-10</gear_ratio>
+            <reference_body>link_2</reference_body>
             <axis>
               <xyz>1.000000 0.000000 0.000000</xyz>
             </axis>

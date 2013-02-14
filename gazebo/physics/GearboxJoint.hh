@@ -65,6 +65,16 @@ namespace gazebo
                   this->gearRatio = 1.0;
                 }
 
+                if (_sdf->HasElement("reference_body"))
+                {
+                  this->referenceBody =
+                    _sdf->GetElement("reference_body")->GetValueString();
+                }
+                else
+                {
+                  gzerr << "Gearbox joint missing reference body.\n";
+                }
+
               }
 
       /// \brief Initialize joint
@@ -82,6 +92,9 @@ namespace gazebo
 
       /// \brief Gearbox gearRatio
       protected: double gearRatio;
+
+      /// \brief reference link/body for computing joint angles
+      protected: std::string referenceBody;
     };
     /// \}
   }

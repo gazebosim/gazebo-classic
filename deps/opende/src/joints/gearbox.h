@@ -31,6 +31,7 @@ struct dxJointGearbox : public dxJointDHinge
     dReal ratio;        // gearbox ratio
     dReal erp;          // error reduction
     dReal cfm;          // constraint force mix in
+    dxBody *refBody;    // reference body for calculating gear angles
     
     dxJointGearbox(dxWorld *w);
 

@@ -21,11 +21,13 @@
 
 #include <boost/bind.hpp>
 
-#include "gazebo_config.h"
-#include "common/Console.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Console.hh"
 
-#include "physics/Link.hh"
-#include "physics/ode/ODEGearboxJoint.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODELink.hh"
+#include "gazebo/physics/ode/ODEGearboxJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -50,6 +52,19 @@ void ODEGearboxJoint::Load(sdf::ElementPtr _sdf)
   GearboxJoint<ODEJoint>::Load(_sdf);
 
   this->SetGearRatio(this->gearRatio);
+  LinkPtr link = this->model->GetLink(this->referenceBody);
+  if (link)
+    this->SetReferenceBody(link);
+}
+
+void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
+{
+  ODELinkPtr odelink = boost::shared_dynamic_cast<ODELink>(_body);
+
+  if (odelink == NULL)
+    gzwarn << "Reference body not valid, using inertial frame.\n";
+  else
+    dJointSetGearboxReferenceBody(this->jointId, odelink->GetODEId());
 }
 
 //////////////////////////////////////////////////
