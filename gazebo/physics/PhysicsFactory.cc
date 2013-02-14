@@ -72,7 +72,7 @@ PhysicsEnginePtr PhysicsFactory::NewPhysicsEngine(const std::string &_classname,
 }
 
 //////////////////////////////////////////////////
-bool PhysicsFactory::IsRegistered(const std::string _name) const
+bool PhysicsFactory::IsRegistered(const std::string _name)
 {
-  return (this->engines.count(_name) > 0);
+  return (engines.count(_name) > 0);
 }

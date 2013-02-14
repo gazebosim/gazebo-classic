@@ -33,6 +33,7 @@
 
 #include "gazebo/sensors/Sensors.hh"
 
+#include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/Physics.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
@@ -278,7 +279,7 @@ bool Server::LoadString(const std::string &_sdfString)
 
 /////////////////////////////////////////////////
 bool Server::LoadImpl(sdf::ElementPtr _elem,
-                      const std::string &_physics);
+                      const std::string &_physics)
 {
   std::string host = "";
   unsigned int port = 0;
@@ -304,7 +305,7 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
   {
     // Check if physics engine name is valid
     // This must be done after physics::load();
-    if (!PhysicsFactory::IsRegistered(_physics))
+    if (!physics::PhysicsFactory::IsRegistered(_physics))
     {
       gzerr << "Unregistered physics engine [" << _physics
             << "], the default will be used instead.\n";
