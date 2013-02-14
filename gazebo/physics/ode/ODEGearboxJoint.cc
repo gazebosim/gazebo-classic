@@ -69,10 +69,7 @@ void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
   if (odelink == NULL)
     gzwarn << "Reference body not valid, using inertial frame.\n";
   else
-  {
-    gzerr << "setting ref body " << this->GetName() << "\n";
     dJointSetGearboxReferenceBody(this->jointId, odelink->GetODEId());
-  }
 }
 
 //////////////////////////////////////////////////
