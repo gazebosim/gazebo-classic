@@ -30,57 +30,57 @@
 //****************************************************************************
 // helper function: shortest_angular_distance implementation
 
-  /*!
-   * \brief normalize_angle_positive
-   *
-   *        Normalizes the angle to be 0 to 2*M_PI
-   *        It takes and returns radians.
-   */
-  static inline double normalize_angle_positive(double angle)
-  {
-    return fmod(fmod(angle, 2.0*M_PI) + 2.0*M_PI, 2.0*M_PI);
-  }
+/*!
+ * \brief normalize_angle_positive
+ *
+ *        Normalizes the angle to be 0 to 2*M_PI
+ *        It takes and returns radians.
+ */
+double dxJointGearbox::normalize_angle_positive(double angle)
+{
+  return fmod(fmod(angle, 2.0*M_PI) + 2.0*M_PI, 2.0*M_PI);
+}
 
 
-  /*!
-   * \brief normalize
-   *
-   * Normalizes the angle to be -M_PI circle to +M_PI circle
-   * It takes and returns radians.
-   *
-   */
-  static inline double normalize_angle(double angle)
-  {
-    double a = normalize_angle_positive(angle);
-    if (a > M_PI)
-      a -= 2.0 *M_PI;
-    return a;
-  }
+/*!
+ * \brief normalize
+ *
+ * Normalizes the angle to be -M_PI circle to +M_PI circle
+ * It takes and returns radians.
+ *
+ */
+double dxJointGearbox::normalize_angle(double angle)
+{
+  double a = dxJointGearbox::normalize_angle_positive(angle);
+  if (a > M_PI)
+    a -= 2.0 *M_PI;
+  return a;
+}
 
 
-  /*!
-   * \function
-   * \brief shortest_angular_distance
-   *
-   * Given 2 angles, this returns the shortest angular
-   * difference.  The inputs and ouputs are of course radians.
-   *
-   * The result
-   * would always be -pi <= result <= pi.  Adding the result
-   * to "from" will always get you an equivelent angle to "to".
-   */
+/*!
+ * \function
+ * \brief shortest_angular_distance
+ *
+ * Given 2 angles, this returns the shortest angular
+ * difference.  The inputs and ouputs are of course radians.
+ *
+ * The result
+ * would always be -pi <= result <= pi.  Adding the result
+ * to "from" will always get you an equivelent angle to "to".
+ */
 
-  static inline double shortest_angular_distance(double from, double to)
-  {
-    double result = normalize_angle_positive(normalize_angle_positive(to) - normalize_angle_positive(from));
+double dxJointGearbox::shortest_angular_distance(double from, double to)
+{
+  double result = dxJointGearbox::normalize_angle_positive(dxJointGearbox::normalize_angle_positive(to) - dxJointGearbox::normalize_angle_positive(from));
 
-    if (result > M_PI)
-      // If the result > 180,
-      // It's shorter the other way.
-      result = -(2.0*M_PI - result);
+  if (result > M_PI)
+    // If the result > 180,
+    // It's shorter the other way.
+    result = -(2.0*M_PI - result);
 
-    return normalize_angle(result);
-  }
+  return dxJointGearbox::normalize_angle(result);
+}
 
 
 
@@ -125,18 +125,21 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     dBodyVectorToWorld(node[0].body, axis1[0], axis1[1], axis1[2], globalAxis1);
     dBodyVectorToWorld(node[1].body, axis2[0], axis2[1], axis2[2], globalAxis2);
 
-    double ang1 = getHingeAngle(refBody,node[0].body,axis1,qrel1);
+    double ang1 = getHingeAngle(refBody,node[0].body,globalAxis1,qrel1);
+
     cumulative_angle1 = cumulative_angle1
-                     + shortest_angular_distance(cumulative_angle1,ang1);
+                     + dxJointGearbox::shortest_angular_distance(cumulative_angle1,ang1);
 
-    double ang2 = getHingeAngle(refBody,node[1].body,axis2,qrel2);
+    double ang2 = getHingeAngle(refBody,node[1].body,globalAxis2,qrel2);
     cumulative_angle2 = cumulative_angle2
-                     + shortest_angular_distance(cumulative_angle2,ang2);
+                     + dxJointGearbox::shortest_angular_distance(cumulative_angle2,ang2);
 
-    double err = shortest_angular_distance(cumulative_angle1,
-      -ratio * cumulative_angle2);
+    double err = dxJointGearbox::shortest_angular_distance(
+     cumulative_angle1, -ratio * cumulative_angle2);
 
-    // printf("a1(%f) a2(%f) e(%f)\n", ang1, ang2, err);
+    // error calculation is not amenable to reset of poses,
+    // cumulative angle might snap to wrong angle value.
+    // printf("1(%f) 2(%f) e(%f)\n", cumulative_angle1, cumulative_angle2, err);
 
     info->J1a[0] = globalAxis1[0];
     info->J1a[1] = globalAxis1[1];

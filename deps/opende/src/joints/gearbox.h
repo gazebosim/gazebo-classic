@@ -44,6 +44,9 @@ struct dxJointGearbox : public dxJointDHinge
     virtual void getInfo2( Info2* info );
     virtual dJointType type() const;
     virtual size_t size() const;
+    double normalize_angle_positive(double angle);
+    double normalize_angle(double angle);
+    double shortest_angular_distance(double from, double to);
 
 };
 
