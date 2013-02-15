@@ -74,11 +74,11 @@ set (headers
   viewers/ViewFactory.hh
 )
 
-set (tests 
+set (display_tests 
   TimePanel_TEST.cc
   )
 
-gz_build_display_tests(${tests})
+gz_build_display_tests(${display_tests})
 
 set (resources resources.qrc)
 
@@ -111,6 +111,7 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_model_editor
                                 gzqtpropertybrowser
                                 ${QT_LIBRARIES}
+                                QtTest
                                 ${ogre_libraries}
                                 ${Boost_LIBRARIES}
                                 pthread)
