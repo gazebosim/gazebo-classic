@@ -42,15 +42,28 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletSphereShape() {}
 
-      /// \brief Set the radius
-      public: void SetRadius(double _radius)
+      /// \brief Load shape
+      /// \param[in] _sdf SDF description of shape geometry
+      public: void Load(sdf::ElementPtr _sdf)
               {
-                SphereShape::SetRadius(_radius);
+                Base::Load(_sdf);
                 BulletCollisionPtr bParent;
                 bParent = boost::shared_dynamic_cast<BulletCollision>(
                     this->collisionParent);
 
-                bParent->SetCollisionShape(new btSphereShape(_radius));
+                bParent->SetCollisionShape(
+                    new btSphereShape(this->sdf->GetValueDouble("radius")));
+              }
+
+      /// \brief Set the radius
+      public: void SetRadius(double _radius)
+              {
+                SphereShape::SetRadius(_radius);
+                /*BulletCollisionPtr bParent;
+                bParent = boost::shared_dynamic_cast<BulletCollision>(
+                    this->collisionParent);
+
+                bParent->SetCollisionShape(new btSphereShape(_radius));*/
               }
     };
     /// \}

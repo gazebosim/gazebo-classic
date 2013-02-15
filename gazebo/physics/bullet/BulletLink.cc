@@ -63,8 +63,6 @@ void BulletLink::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletLink::Init()
 {
-  Link::Init();
-
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
   btScalar mass = this->inertial->GetMass();
   // The bullet dynamics solver checks for zero mass to identify static and
@@ -124,7 +122,6 @@ void BulletLink::Init()
   this->rigidLink->setCollisionFlags(this->rigidLink->getCollisionFlags() |
       btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 
-
   // Setup motion clamping to prevent objects from moving too fast.
   // this->rigidLink->setCcdMotionThreshold(1);
   // math::Vector3 size = this->GetBoundingBox().GetSize();
@@ -135,6 +132,8 @@ void BulletLink::Init()
 
   btDynamicsWorld *wd = this->bulletPhysics->GetDynamicsWorld();
   wd->addRigidBody(this->rigidLink);
+
+  Link::Init();
   // this->rigidLink->setSleepingThresholds(0,0);
 }
 
