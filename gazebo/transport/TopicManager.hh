@@ -94,10 +94,13 @@ namespace gazebo
       /// \param[in] _topic The name of the topic
       /// \param[in] _queueLimit The maximum number of outgoing messages
       /// to queue
+      /// \param[in] _hz Update rate for the publisher. Units are
+      /// 1.0/seconds.
       /// \return Pointer to the newly created Publisher
       public: template<typename M>
               PublisherPtr Advertise(const std::string &_topic,
-                                     unsigned int _queueLimit)
+                                     unsigned int _queueLimit,
+                                     double _hzRate)
               {
                 google::protobuf::Message *msg = NULL;
                 M msgtype;
@@ -108,7 +111,7 @@ namespace gazebo
                 this->UpdatePublications(_topic, msg->GetTypeName());
 
                 PublisherPtr pub = PublisherPtr(new Publisher(_topic,
-                      msg->GetTypeName(), _queueLimit));
+                      msg->GetTypeName(), _queueLimit, _hzRate));
 
                 std::string msgTypename;
                 PublicationPtr publication;

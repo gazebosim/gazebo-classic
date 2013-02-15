@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <list>
+#include <set>
 #include <deque>
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
@@ -305,10 +306,11 @@ namespace gazebo
       /// \return True if World::Load has completed.
       public: bool IsLoaded() const;
 
-      /// \brief Enqueue a pose message for publication.
-      /// These messages will be transmitted at the end of every iteration.
-      /// \param[in] _msg The message to enqueue.
-      public: void EnqueueMsg(msgs::Pose *_msg);
+      /// \brief Publish pose updates for a model.
+      /// This list of models to publish is processed and cleared once every
+      /// iteration.
+      /// \param[in] _modelName Name of the model to publish.
+      public: void PublishModelPose(const std::string &_modelName);
 
       /// \cond
       /// This is an internal function.
@@ -645,7 +647,7 @@ namespace gazebo
       private: sdf::SDFPtr factorySDF;
 
       /// \brief The list of pose messages to output.
-      private: msgs::Pose_V poseMsgs;
+      private: std::set<std::string> publishModelPoses;
 
       /// \brief Info passed through the WorldUpdateBegin event.
       private: common::UpdateInfo updateInfo;
