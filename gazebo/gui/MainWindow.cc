@@ -1036,6 +1036,9 @@ void MainWindow::CreateMenus()
   buildingEditorFileMenu->addAction(g_buildingEditorDiscardAct);
   buildingEditorFileMenu->addAction(g_buildingEditorDoneAct);
   buildingEditorFileMenu->addAction(g_buildingEditorExitAct);
+
+  this->menuBar->setNativeMenuBar(false);
+  this->buildingEditorMenuBar->setNativeMenuBar(false);
 }
 
 /////////////////////////////////////////////////
