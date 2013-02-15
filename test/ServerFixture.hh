@@ -110,13 +110,19 @@ class ServerFixture : public testing::Test
 
   protected: virtual void Load(const std::string &_worldFilename, bool _paused)
              {
+               this->Load(_worldFilename, _paused, "");
+             }
+
+  protected: virtual void Load(const std::string &_worldFilename,
+                               bool _paused, const std::string &_physics)
+             {
                delete this->server;
                this->server = NULL;
 
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
                   boost::bind(&ServerFixture::RunServer, this, _worldFilename,
-                              _paused));
+                              _paused, _physics));
 
                // Wait for the server to come up
                // Use a 30 second timeout.
@@ -152,7 +158,7 @@ class ServerFixture : public testing::Test
 
   protected: void RunServer(const std::string &_worldFilename)
              {
-               this->RunServer(_worldFilename, false);
+               this->RunServer(_worldFilename, false, "");
              }
 
   protected: rendering::ScenePtr GetScene(
@@ -174,10 +180,15 @@ class ServerFixture : public testing::Test
                return rendering::get_scene(_sceneName);
              }
 
-  protected: void RunServer(const std::string &_worldFilename, bool _paused)
+  protected: void RunServer(const std::string &_worldFilename, bool _paused,
+                            const std::string &_physics)
              {
                ASSERT_NO_THROW(this->server = new Server());
-               ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
+               if (_physics.length())
+                 ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
+                                                        _physics));
+               else
+                 ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
 
                rendering::create_scene(
