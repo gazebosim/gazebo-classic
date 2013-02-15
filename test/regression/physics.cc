@@ -218,7 +218,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 // start gearbox.world, apply balancing forces across geared members,
 // check for equilibrium.
 ////////////////////////////////////////////////////////////////////////
-void PhysicsTest::GearboxTest(const std::string &_worldFile)
+void PhysicsTest::GearboxTest(const std::string &_physicsEngine)
 {
   // load an empty world
   Load("worlds/gearbox.world", true, _physicsEngine);
