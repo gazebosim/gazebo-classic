@@ -221,7 +221,7 @@ double BulletHingeJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetForce(int _index, double _torque)
+void BulletHingeJoint::SetForce(int _index, double _effort)
 {
   if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
   {
@@ -230,9 +230,18 @@ void BulletHingeJoint::SetForce(int _index, double _torque)
     return;
   }
 
+  // truncating SetForce effort if velocity limit reached.
+  if (this->velocityLimit[_index] >= 0)
+  {
+    if (this->GetVelocity(_index) > this->velocityLimit[_index])
+      _effort = _effort > 0 ? 0 : _effort;
+    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
+      _effort = _effort < 0 ? 0 : _effort;
+  }
+
   // truncate effort unless effortLimit is negative.
   if (this->effortLimit[_index] >= 0)
-    _torque = math::clamp(_torque, -this->effortLimit[_index],
+    _effort = math::clamp(_effort, -this->effortLimit[_index],
        this->effortLimit[_index]);
 
   // math::Vector3 axis = this->GetLocalAxis(_index);
@@ -246,7 +255,7 @@ void BulletHingeJoint::SetForce(int _index, double _torque)
     this->bulletHinge->getRigidBodyA().getWorldTransform().getBasis() *
     hingeAxisLocal;
 
-  btVector3 hingeTorque = _torque * hingeAxisWorld;
+  btVector3 hingeTorque = _effort * hingeAxisWorld;
 
   this->bulletHinge->getRigidBodyA().applyTorque(hingeTorque);
   this->bulletHinge->getRigidBodyB().applyTorque(-hingeTorque);
