@@ -378,6 +378,12 @@ void SystemPaths::ClearPluginPaths()
 }
 
 /////////////////////////////////////////////////
+void SystemPaths::ClearModelPaths()
+{
+  this->modelPaths.clear();
+}
+
+/////////////////////////////////////////////////
 void SystemPaths::AddGazeboPaths(const std::string &_path)
 {
   std::string delim(":");
@@ -421,6 +427,21 @@ void SystemPaths::AddPluginPaths(const std::string &_path)
     pos2 = _path.find(delim, pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->pluginPaths);
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddModelPaths(const std::string &_path)
+{
+  std::string delim(":");
+  size_t pos1 = 0;
+  size_t pos2 = _path.find(delim);
+  while (pos2 != std::string::npos)
+  {
+    this->InsertUnique(_path.substr(pos1, pos2-pos1), this->modelPaths);
+    pos1 = pos2+1;
+    pos2 = _path.find(delim, pos2+1);
+  }
+  this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->modelPaths);
 }
 
 /////////////////////////////////////////////////
