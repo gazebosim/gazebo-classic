@@ -33,6 +33,7 @@
 
 #include "gazebo/sensors/Sensors.hh"
 
+#include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/Physics.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
@@ -203,14 +204,14 @@ bool Server::ParseArgs(int argc, char **argv)
     if (this->vm.count("world_file"))
       configFilename = this->vm["world_file"].as<std::string>();
 
-    // Load the server
+    // Get the physics engine name specified from the command line, or use ""
+    // if no physics engine is specified.
+    std::string physics;
     if (this->vm.count("physics"))
-    {
-      std::string physics = this->vm["physics"].as<std::string>();
-      if (!this->LoadFile(configFilename, physics))
-        return false;
-    }
-    else if (!this->LoadFile(configFilename))
+      physics = this->vm["physics"].as<std::string>();
+
+    // Load the server
+    if (!this->LoadFile(configFilename, physics))
       return false;
   }
 
@@ -227,44 +228,8 @@ bool Server::GetInitialized() const
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadFile(const std::string &_filename)
-{
-  sdf::SDFPtr sdf;
-  // Try loading file into sdf object
-  if (!this->LoadFile(_filename, sdf))
-    return false;
-
-  // Try loading it further
-  return this->LoadImpl(sdf->root);
-}
-
-/////////////////////////////////////////////////
 bool Server::LoadFile(const std::string &_filename,
                       const std::string &_physics)
-{
-  sdf::SDFPtr sdf;
-  // Try loading file into sdf object
-  if (!this->LoadFile(_filename, sdf))
-    return false;
-
-  // Try inserting physics engine name
-  if (sdf->root->HasElement("world") &&
-      sdf->root->GetElement("world")->HasElement("physics"))
-  {
-    sdf->root->GetElement("world")->GetElement("physics")
-             ->GetAttribute("type")->Set(_physics);
-  }
-  else
-  {
-    gzerr << "Unable to set physics engine: <world> does not have <physics>\n";
-  }
-
-  // Try loading it further
-  return this->LoadImpl(sdf->root);
-}
-
-/////////////////////////////////////////////////
-bool Server::LoadFile(const std::string &_filename, sdf::SDFPtr &_sdf)
 {
   // Quick test for a valid file
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
@@ -276,20 +241,20 @@ bool Server::LoadFile(const std::string &_filename, sdf::SDFPtr &_sdf)
   fclose(test);
 
   // Load the world file
-  _sdf.reset(new sdf::SDF);
-  if (!sdf::init(_sdf))
+  sdf::SDFPtr sdf(new sdf::SDF);
+  if (!sdf::init(sdf))
   {
     gzerr << "Unable to initialize sdf\n";
     return false;
   }
 
-  if (!sdf::readFile(_filename, _sdf))
+  if (!sdf::readFile(_filename, sdf))
   {
     gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
   }
 
-  return true;
+  return this->LoadImpl(sdf->root, _physics);
 }
 
 /////////////////////////////////////////////////
@@ -313,7 +278,8 @@ bool Server::LoadString(const std::string &_sdfString)
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadImpl(sdf::ElementPtr _elem)
+bool Server::LoadImpl(sdf::ElementPtr _elem,
+                      const std::string &_physics)
 {
   std::string host = "";
   unsigned int port = 0;
@@ -333,6 +299,29 @@ bool Server::LoadImpl(sdf::ElementPtr _elem)
 
   /// Load the physics library
   physics::load();
+
+  // If a physics engine is specified,
+  if (_physics.length())
+  {
+    // Check if physics engine name is valid
+    // This must be done after physics::load();
+    if (!physics::PhysicsFactory::IsRegistered(_physics))
+    {
+      gzerr << "Unregistered physics engine [" << _physics
+            << "], the default will be used instead.\n";
+    }
+    // Try inserting physics engine name if one is given
+    else if (_elem->HasElement("world") &&
+             _elem->GetElement("world")->HasElement("physics"))
+    {
+      _elem->GetElement("world")->GetElement("physics")
+           ->GetAttribute("type")->Set(_physics);
+    }
+    else
+    {
+      gzerr << "Cannot set physics engine: <world> does not have <physics>\n";
+    }
+  }
 
   sdf::ElementPtr worldElem = _elem->GetElement("world");
   if (worldElem)

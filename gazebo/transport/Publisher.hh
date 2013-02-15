@@ -47,8 +47,10 @@ namespace gazebo
       /// \param[in] _topic Name of topic to be published
       /// \param[in] _msgType Type of the message to be published
       /// \param[in] _limit Maximum number of outgoing messages to queue
+      /// \param[in] _hz Update rate for the publisher. Units are
+      /// 1.0/seconds.
       public: Publisher(const std::string &_topic, const std::string &_msgType,
-                        unsigned int _limit);
+                        unsigned int _limit, double _hzRate);
 
       /// \brief Destructor
       public: virtual ~Publisher();
@@ -110,20 +112,41 @@ namespace gazebo
       /// \brief Callback when a publish is completed
       private: void OnPublishComplete();
 
+      /// \brief Topic on which messages are published.
       private: std::string topic;
+
+      /// \brief Type of message published.
       private: std::string msgType;
+
+      /// \brief Maximum number of messages that can be queued prior to
+      /// publication.
       private: unsigned int queueLimit;
+
+      /// \brief Period at which messages are published. Zero indicates no
+      /// limit.
+      private: double updatePeriod;
+
+      /// \brief True if queueLimit has been reached, and a warning message
+      /// was produced.
       private: bool queueLimitWarned;
+
+      /// \brief List of messages to publish.
       private: std::list<google::protobuf::Message *> messages;
+
+      /// \brief For mutual exclusion.
       private: mutable boost::recursive_mutex mutex;
+
+      /// \brief The publication pointers. One for normal publication, and
+      /// one for debug.
       private: PublicationPtr publications[2];
 
+      /// \brief The previous message published. Used for latching topics.
       private: google::protobuf::Message *prevMsg;
+
+      private: common::Time currentTime;
+      private: common::Time prevPublishTime;
     };
     /// \}
   }
 }
-
 #endif
-
-

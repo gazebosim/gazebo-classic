@@ -125,6 +125,13 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
     const std::string &_type, const std::string &_defaultValue, bool _required,
     const std::string &_description)
 {
+  if (_type == "char")
+  {
+    boost::shared_ptr<ParamT<char> > param(
+        new ParamT<char>(_key, _defaultValue, _required, _type,
+                           _description));
+    return param;
+  }
   if (_type == "double")
   {
     boost::shared_ptr<ParamT<double> > param(
@@ -196,6 +203,13 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
   {
     boost::shared_ptr<ParamT<gazebo::math::Pose> > param(
         new ParamT<gazebo::math::Pose>(_key, _defaultValue, _required,
+                                       _type, _description));
+    return param;
+  }
+  else if (_type == "quaternion")
+  {
+    boost::shared_ptr<ParamT<gazebo::math::Quaternion> > param(
+        new ParamT<gazebo::math::Quaternion>(_key, _defaultValue, _required,
                                        _type, _description));
     return param;
   }
@@ -757,7 +771,8 @@ bool Element::GetValueBool(const std::string &_key)
     }
     else
     {
-      gzwarn << "Parameter [" << this->GetName() << "] has no value when attempting to get as a bool.\n";
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a bool.\n";
     }
   }
   else
@@ -789,7 +804,8 @@ int Element::GetValueInt(const std::string &_key)
     }
     else
     {
-      gzwarn << "Parameter [" << this->GetName() << "] has no value when attempting to get as an int.\n";
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as an int.\n";
     }
   }
   else
@@ -820,7 +836,8 @@ float Element::GetValueFloat(const std::string &_key)
     }
     else
     {
-      gzwarn << "Parameter [" << this->GetName() << "] has no value when attempting to get as a float.\n";
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a float.\n";
     }
   }
   else
@@ -854,7 +871,8 @@ double Element::GetValueDouble(const std::string &_key)
     }
     else
     {
-      gzwarn << "Parameter [" << this->GetName() << "] has no value when attempting to get as a double.\n";
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a double.\n";
     }
   }
   else
@@ -887,7 +905,8 @@ unsigned int Element::GetValueUInt(const std::string &_key)
     }
     else
     {
-      gzwarn << "Parameter [" << this->GetName() << "] has no value when attempting to get as an unsigned int.\n";
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as an unsigned int.\n";
     }
   }
   else
@@ -921,7 +940,8 @@ char Element::GetValueChar(const std::string &_key)
     }
     else
     {
-      gzwarn << "Parameter [" << this->GetName() << "] has no value when attempting to get as a char.\n";
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a char.\n";
     }
   }
   else
@@ -952,7 +972,8 @@ std::string Element::GetValueString(const std::string &_key)
     }
     else
     {
-      // gzlog << "Parameter [" << GetName() << "] has no value, returning empty string.\n";
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value, returning empty string.\n";
     }
   }
   else
@@ -983,7 +1004,8 @@ gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
     }
     else
     {
-      gzwarn << "Parameter [" << this->GetName() << "] has no value when attempting to get as a vector3.\n";
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a vector3.\n";
     }
   }
   else
@@ -1014,7 +1036,8 @@ gazebo::math::Vector2d Element::GetValueVector2d(const std::string &_key)
     }
     else
     {
-      gzwarn << "Parameter [" << this->GetName() << "] has no value when attempting to get as a vector2d.\n";
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a vector2d.\n";
     }
   }
   else
@@ -1045,7 +1068,8 @@ gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
     }
     else
     {
-      gzwarn << "Parameter [" << this->GetName() << "] has no value when attempting to get as a quaternion.\n";
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a quaternion.\n";
     }
   }
   else
@@ -1076,7 +1100,8 @@ gazebo::math::Pose Element::GetValuePose(const std::string &_key)
     }
     else
     {
-      gzwarn << "Parameter [" << this->GetName() << "] has no value when attempting to get as a pose.\n";
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a pose.\n";
     }
   }
   else
@@ -1107,7 +1132,8 @@ gazebo::common::Color Element::GetValueColor(const std::string &_key)
     }
     else
     {
-      gzwarn << "Parameter [" << this->GetName() << "] has no value when attempting to get as a color.\n";
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a color.\n";
     }
   }
   else
@@ -1138,7 +1164,8 @@ gazebo::common::Time Element::GetValueTime(const std::string &_key)
     }
     else
     {
-      gzwarn << "Parameter [" << this->GetName() << "] has no value when attempting to get as a time.\n";
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a time.\n";
     }
   }
   else
