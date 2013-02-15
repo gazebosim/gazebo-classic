@@ -80,9 +80,6 @@ ODE_API dReal dMaxDifference (const dReal *A, const dReal *B, int n, int m);
  * n*n matrices */
 ODE_API dReal dMaxDifferenceLowerTriangle (const dReal *A, const dReal *B, int n);
 
-//****************************************************************************
-// helper function: dShortestAngularDistance implementation
-    
 /*!
  * \brief dNormalizeAnglePositive
  *
@@ -139,10 +136,6 @@ ODE_API static inline dReal dShortestAngularDistanceUpdate(dReal from, dReal to,
   else
     return from + result;
 }
-
-
-
-//****************************************************************************
 
 #ifdef __cplusplus
 }
