@@ -24,6 +24,7 @@
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/Server.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/qt_test.h"
 
 #include "gazebo_config.h"
 #include "test_config.h"

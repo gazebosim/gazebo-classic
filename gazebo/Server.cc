@@ -33,6 +33,7 @@
 
 #include "gazebo/sensors/Sensors.hh"
 
+#include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/Physics.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
@@ -88,6 +89,8 @@ bool Server::ParseArgs(int argc, char **argv)
   v_desc.add_options()
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
+    ("physics,e", po::value<std::string>(),
+     "Specify a physics engine (ode|bullet).")
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data to disk.")
     ("seed",  po::value<double>(),
@@ -201,8 +204,14 @@ bool Server::ParseArgs(int argc, char **argv)
     if (this->vm.count("world_file"))
       configFilename = this->vm["world_file"].as<std::string>();
 
+    // Get the physics engine name specified from the command line, or use ""
+    // if no physics engine is specified.
+    std::string physics;
+    if (this->vm.count("physics"))
+      physics = this->vm["physics"].as<std::string>();
+
     // Load the server
-    if (!this->LoadFile(configFilename))
+    if (!this->LoadFile(configFilename, physics))
       return false;
   }
 
@@ -219,7 +228,8 @@ bool Server::GetInitialized() const
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadFile(const std::string &_filename)
+bool Server::LoadFile(const std::string &_filename,
+                      const std::string &_physics)
 {
   // Quick test for a valid file
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
@@ -244,7 +254,7 @@ bool Server::LoadFile(const std::string &_filename)
     return false;
   }
 
-  return this->LoadImpl(sdf->root);
+  return this->LoadImpl(sdf->root, _physics);
 }
 
 /////////////////////////////////////////////////
@@ -268,7 +278,8 @@ bool Server::LoadString(const std::string &_sdfString)
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadImpl(sdf::ElementPtr _elem)
+bool Server::LoadImpl(sdf::ElementPtr _elem,
+                      const std::string &_physics)
 {
   std::string host = "";
   unsigned int port = 0;
@@ -288,6 +299,29 @@ bool Server::LoadImpl(sdf::ElementPtr _elem)
 
   /// Load the physics library
   physics::load();
+
+  // If a physics engine is specified,
+  if (_physics.length())
+  {
+    // Check if physics engine name is valid
+    // This must be done after physics::load();
+    if (!physics::PhysicsFactory::IsRegistered(_physics))
+    {
+      gzerr << "Unregistered physics engine [" << _physics
+            << "], the default will be used instead.\n";
+    }
+    // Try inserting physics engine name if one is given
+    else if (_elem->HasElement("world") &&
+             _elem->GetElement("world")->HasElement("physics"))
+    {
+      _elem->GetElement("world")->GetElement("physics")
+           ->GetAttribute("type")->Set(_physics);
+    }
+    else
+    {
+      gzerr << "Cannot set physics engine: <world> does not have <physics>\n";
+    }
+  }
 
   sdf::ElementPtr worldElem = _elem->GetElement("world");
   if (worldElem)

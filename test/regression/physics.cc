@@ -23,10 +23,10 @@
 using namespace gazebo;
 class PhysicsTest : public ServerFixture
 {
-  public: void EmptyWorld(const std::string &_worldFile);
-  public: void SpawnDrop(const std::string &_worldFile);
-  public: void SpawnDropCoGOffset(const std::string &_worldFile);
-  public: void SimplePendulum(const std::string &_worldFile);
+  public: void EmptyWorld(const std::string &_physicsEngine);
+  public: void SpawnDrop(const std::string &_physicsEngine);
+  public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
+  public: void SimplePendulum(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -34,12 +34,17 @@ class PhysicsTest : public ServerFixture
 // Load a world, take a few steps, and verify that time is increasing.
 // This is the most basic physics engine test.
 ////////////////////////////////////////////////////////////////////////
-void PhysicsTest::EmptyWorld(const std::string &_worldFile)
+void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
 {
   // Load an empty world
-  Load(_worldFile, true);
+  Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // simulate 1 step
   world->StepWorld(1);
@@ -58,13 +63,13 @@ void PhysicsTest::EmptyWorld(const std::string &_worldFile)
 
 TEST_F(PhysicsTest, EmptyWorldODE)
 {
-  EmptyWorld("worlds/empty.world");
+  EmptyWorld("ode");
 }
 
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, EmptyWorldBullet)
 {
-  EmptyWorld("worlds/empty_bullet.world");
+  EmptyWorld("bullet");
 }
 #endif  // HAVE_BULLET
 
@@ -74,16 +79,17 @@ TEST_F(PhysicsTest, EmptyWorldBullet)
 // shapes (box, sphere, cylinder), verify that they fall and hit the
 // ground plane. The test currently assumes inelastic collisions.
 ////////////////////////////////////////////////////////////////////////
-void PhysicsTest::SpawnDrop(const std::string &_worldFile)
+void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 {
   // load an empty world
-  Load(_worldFile, true);
+  Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
   EXPECT_EQ(g.x, 0);
@@ -208,13 +214,13 @@ void PhysicsTest::SpawnDrop(const std::string &_worldFile)
 
 TEST_F(PhysicsTest, SpawnDropODE)
 {
-  SpawnDrop("worlds/empty.world");
+  SpawnDrop("ode");
 }
 
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, SpawnDropBullet)
 {
-  SpawnDrop("worlds/empty_bullet.world");
+  SpawnDrop("bullet");
 }
 #endif  // HAVE_BULLET
 
@@ -234,16 +240,17 @@ TEST_F(PhysicsTest, SpawnDropBullet)
 // that they hit the ground at the same time. Also, sphere5 should start
 // rolling to the side when it hits the ground.
 ////////////////////////////////////////////////////////////////////////
-void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
+void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
 {
   // load an empty world
-  Load(_worldFile, true);
+  Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
   EXPECT_EQ(g.x, 0);
@@ -492,13 +499,13 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
 
 TEST_F(PhysicsTest, SpawnDropCoGOffsetODE)
 {
-  SpawnDropCoGOffset("worlds/empty.world");
+  SpawnDropCoGOffset("ode");
 }
 
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, SpawnDropCoGOffsetBullet)
 {
-  SpawnDropCoGOffset("worlds/empty_bullet.world");
+  SpawnDropCoGOffset("bullet");
 }
 #endif  // HAVE_BULLET
 
@@ -823,21 +830,25 @@ TEST_F(PhysicsTest, CollisionTest)
 
 TEST_F(PhysicsTest, SimplePendulumODE)
 {
-  SimplePendulum("worlds/simple_pendulums.world");
+  SimplePendulum("ode");
 }
 
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, SimplePendulumBullet)
 {
-  SimplePendulum("worlds/simple_pendulums_bullet.world");
+  SimplePendulum("bullet");
 }
 #endif  // HAVE_BULLET
 
-void PhysicsTest::SimplePendulum(const std::string &_worldFile)
+void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
-  Load(_worldFile, true);
+  Load("worlds/simple_pendulums.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   int i = 0;
   while (!this->HasEntity("model_1") && i < 20)

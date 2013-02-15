@@ -63,6 +63,7 @@ set (qt_headers
 
 set (headers
   qt.h
+  qt_test.h
   BoxMaker.hh
   CylinderMaker.hh
   EntityMaker.hh
@@ -75,13 +76,13 @@ set (headers
   viewers/ViewFactory.hh
 )
 
-set (tests
+set (display_tests
   DataLogger_TEST.cc
   TimePanel_TEST.cc
 )
 
 # Generate executables for each of the QT unit tests
-gz_build_qt_tests(${tests})
+gz_build_display_tests(${tests})
 
 set (resources resources.qrc)
 
