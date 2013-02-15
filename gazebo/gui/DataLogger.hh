@@ -107,10 +107,10 @@ namespace gazebo
       private: QLabel *timeLabel;
 
       /// \brief Label to display the log destination path.
-      private: QLabel *destPathLabel;
+      private: QLineEdit *destPath;
 
       /// \brief Label to display the log destination uri.
-      private: QLabel *destURILabel;
+      private: QLineEdit *destURI;
 
       /// \brief Label to display the log file size.
       private: QLabel *sizeLabel;
@@ -126,6 +126,9 @@ namespace gazebo
 
       /// \brief Button to browse for a log recording directory
       private: QPushButton *browseButton;
+
+      // private: QListWidget *logList;
+      private: QTextBrowser *logList;
     };
     /// \}
   }

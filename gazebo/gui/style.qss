@@ -131,7 +131,7 @@ QPushButton#expandButton
   background-color: transparent;
   selection-background-color: transparent;
   selection-color: transparent;
-  width: 70px;
+  width: 90px;
   text-align: left;
 
   background-image: url(:/images/right_arrow.png);
@@ -189,6 +189,7 @@ QListView::item
   color: #ffffff;
   border-radius: 4px;
 }
+
 
 QTreeView
 {
@@ -624,8 +625,16 @@ QListWidget#topicTextList::item
   border-bottom: 1px solid black;
   border-radius: 4px;
   color: #101010;
-  background-color: #b0b0b0;
+  background-color: #808080;
   margin: 4px;
+}
+
+QTextBrowser#dataLoggerRecordingsList
+{
+  color: #101010;
+  font-size: 11px;
+  background-color: #808080;
+  border: 0px;
 }
 
 QComboBox
@@ -676,14 +685,4 @@ QFrame#dataLoggerSettingFrame
   border-top: 1px solid #555555;
   margin: 0px;
   padding: 0px;
-}
-
-QLabel#dataLoggerStatusLabel
-{
-  border-top: 1px solid #202020;
-}
-
-QLabel#dataLoggerTimeLabel
-{
-  border: 1px solid #202020;
 }

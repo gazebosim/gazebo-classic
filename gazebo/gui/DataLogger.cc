@@ -83,6 +83,61 @@ DataLogger::DataLogger(QWidget *_parent)
   statusFrame->setLayout(statusFrameLayout);
   // }
 
+  // Create the settings frame, where the user can input a save-to location
+  // {
+  QFrame *settingsMasterFrame = new QFrame;
+  settingsMasterFrame->setObjectName("dataLoggerSettingFrame");
+
+  this->logList = new QTextBrowser(this);
+  this->logList->setObjectName("dataLoggerRecordingsList");
+
+  QVBoxLayout *logListLayout = new QVBoxLayout;
+  logListLayout->addWidget(this->logList);
+
+  /*QHBoxLayout *filenameLayout = new QHBoxLayout;
+  this->filenameEdit = new QLineEdit;
+  this->filenameEdit->setText("~/.gazebo/log");
+  filenameLayout->addWidget(new QLabel("Save to:"));
+  filenameLayout->addWidget(this->filenameEdit);
+
+  this->browseButton = new QPushButton("Browse");
+  this->browseButton->setFixedHeight(23);
+  this->browseButton->setFocusPolicy(Qt::NoFocus);
+  connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
+
+  filenameLayout->addWidget(browseButton);
+  */
+
+  QHBoxLayout *settingExpandLayout = new QHBoxLayout;
+
+  this->settingExpandButton = new QPushButton("Recordings");
+  this->settingExpandButton->setObjectName("expandButton");
+  this->settingExpandButton->setCheckable(true);
+  this->settingExpandButton->setChecked(false);
+  this->settingExpandButton->setFocusPolicy(Qt::NoFocus);
+  connect(settingExpandButton, SIGNAL(toggled(bool)),
+          this, SLOT(OnToggleSettings(bool)));
+
+  settingExpandLayout->setContentsMargins(0, 0, 0, 0);
+  settingExpandLayout->addWidget(this->settingExpandButton);
+  settingExpandLayout->addStretch(1);
+
+  /// Create the frame that can be hidden by toggling the setting's button
+  this->settingsFrame = new QFrame;
+  QVBoxLayout *settingsLayout = new QVBoxLayout;
+  settingsLayout->setContentsMargins(2, 2, 2, 2);
+  settingsLayout->addLayout(logListLayout);
+  this->settingsFrame->setLayout(settingsLayout);
+  this->settingsFrame->hide();
+
+  QVBoxLayout *settingsMasterFrameLayout = new QVBoxLayout;
+  settingsMasterFrameLayout->setContentsMargins(2, 2, 2, 2);
+
+  settingsMasterFrameLayout->addLayout(settingExpandLayout);
+  settingsMasterFrameLayout->addWidget(this->settingsFrame);
+  settingsMasterFrame->setLayout(settingsMasterFrameLayout);
+  // }
+
   // Layout to position the record button vertically
   QVBoxLayout *buttonLayout = new QVBoxLayout;
   buttonLayout->setContentsMargins(0, 0, 0, 0);
@@ -102,24 +157,35 @@ DataLogger::DataLogger(QWidget *_parent)
   topLayout->addLayout(statusLayout);
 
   QHBoxLayout *destPathLayout = new QHBoxLayout;
-  this->destPathLabel = new QLabel("Path: ");
-  this->destPathLabel->setObjectName("dataLoggerDestnationPathLabel");
-  this->destPathLabel->setStyleSheet(
-      "QLabel {color: #aeaeae; font-size: 11px;}");
+  this->destPath = new QLineEdit;
+  this->destPath->setReadOnly(true);
+  this->destPath->setObjectName("dataLoggerDestnationPathLabel");
+  this->destPath->setStyleSheet(
+      "QLineEdit {color: #aeaeae; font-size: 11px; "
+      "background-color: transparent;}");
+
+  QLabel *pathLabel = new QLabel("Path: ");
+  pathLabel->setStyleSheet(
+      "QLabel {color: #aeaeae; font-size: 11px; background: transparent}");
+
   destPathLayout->setContentsMargins(0, 0, 0, 0);
   destPathLayout->addSpacing(4);
-  destPathLayout->addWidget(this->destPathLabel);
-  destPathLayout->addStretch(1);
+  destPathLayout->addWidget(pathLabel);
+  destPathLayout->addWidget(this->destPath);
 
   QHBoxLayout *destURILayout = new QHBoxLayout;
-  this->destURILabel = new QLabel("Address: ");
-  this->destURILabel->setObjectName("dataLoggerDestnationURILabel");
-  this->destURILabel->setStyleSheet(
-      "QLabel {color: #aeaeae; font-size: 11px;}");
+  this->destURI = new QLineEdit;
+  this->destURI->setReadOnly(true);
+  this->destURI->setObjectName("dataLoggerDestnationURILabel");
+  this->destURI->setStyleSheet(
+      "QLineEdit {color: #aeaeae; font-size: 11px; background: transparent}");
+  QLabel *uriLabel = new QLabel("Address: ");
+  uriLabel->setStyleSheet(
+      "QLabel {color: #aeaeae; font-size: 11px; background: transparent}");
   destURILayout->setContentsMargins(0, 0, 0, 0);
   destURILayout->addSpacing(4);
-  destURILayout->addWidget(this->destURILabel);
-  destURILayout->addStretch(1);
+  destURILayout->addWidget(uriLabel);
+  destURILayout->addWidget(this->destURI);
 
   // Mainlayout for the whole widget
   // Create the main layout for this widget
@@ -127,6 +193,7 @@ DataLogger::DataLogger(QWidget *_parent)
   mainLayout->addLayout(topLayout);
   mainLayout->addLayout(destURILayout);
   mainLayout->addLayout(destPathLayout);
+  mainLayout->addWidget(settingsMasterFrame);
 
   // Let the stylesheet handle the margin sizes
   mainLayout->setContentsMargins(2, 2, 2, 2);
@@ -200,6 +267,8 @@ void DataLogger::OnRecord(bool _toggle)
     msgs::LogControl msg;
     msg.set_stop(true);
     this->pub->Publish(msg);
+
+    this->logList->append(this->destPath->text());
   }
 }
 
@@ -287,18 +356,18 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 void DataLogger::OnSetDestinationPath(QString _filename)
 {
   if (!_filename.isEmpty())
-    this->destPathLabel->setText("Path: " + _filename);
+    this->destPath->setText(_filename);
   else
-    this->destPathLabel->setText("Path: ");
+    this->destPath->setText("");
 }
 
 /////////////////////////////////////////////////
 void DataLogger::OnSetDestinationURI(QString _uri)
 {
   if (!_uri.isEmpty())
-    this->destURILabel->setText("Address: " + _uri);
+    this->destURI->setText(_uri);
   else
-    this->destURILabel->setText("Address: ");
+    this->destURI->setText("");
 }
 
 /////////////////////////////////////////////////
