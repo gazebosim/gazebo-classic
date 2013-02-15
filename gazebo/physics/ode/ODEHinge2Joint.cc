@@ -164,15 +164,23 @@ void ODEHinge2Joint::SetMaxForce(int _index, double _t)
 //////////////////////////////////////////////////
 void ODEHinge2Joint::SetForce(int _index, double _torque)
 {
+  if (_index < 0 || _index >= this->GetAngleCount())
+  {
+    gzerr << "Calling BulletHingeJoint::SetForce with an index ["
+          << _index << "] out of range\n";
+    return;
+  }
+
+  // truncate effort if effortLimit is not negative
+  if (this->effortLimit[_index] >= 0)
+    _torque = math::clamp(_torque,
+      -this->effortLimit[_index], this->effortLimit[_index]);
+
   ODEJoint::SetForce(_index, _torque);
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
-
-  if (_index < this->GetAngleCount() && this->effortLimit[_index] > 0)
-    _torque = math::clamp(_torque,
-      -this->effortLimit[_index], this->effortLimit[_index]);
 
   if (_index == 0)
     dJointAddHinge2Torques(this->jointId, _torque, 0);

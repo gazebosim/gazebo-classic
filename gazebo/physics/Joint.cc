@@ -246,7 +246,7 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
 //////////////////////////////////////////////////
 double Joint::GetEffortLimit(int _index)
 {
-  if (_index < this->GetAngleCount())
+  if (_index >= 0 && _index < this->GetAngleCount())
     return this->effortLimit[_index];
 
   gzerr << "GetEffortLimit index[" << _index << "] out of range\n";
@@ -256,7 +256,7 @@ double Joint::GetEffortLimit(int _index)
 //////////////////////////////////////////////////
 double Joint::GetVelocityLimit(int _index)
 {
-  if (_index < this->GetAngleCount())
+  if (_index >= 0 && _index < this->GetAngleCount())
     return this->velocityLimit[_index];
 
   gzerr << "GetVelocityLimit index[" << _index << "] out of range\n";
@@ -414,20 +414,23 @@ void Joint::SetState(const JointState &_state)
 //////////////////////////////////////////////////
 void Joint::SetForce(int _index, double _force)
 {
-  /// \todo: should check to see if this type of joint has _index
-  if (_index < 2)
+  // this bit of code actually doesn't do anything physical,
+  // it simply records the forces commanded inside forceApplied.
+  if (_index >= 0 && _index < this->GetAngleCount())
     this->forceApplied[_index] = _force;
   else
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to apply force\n";
+    gzerr << "Something's wrong, joint [" << this->GetName()
+          << "] index [" << _index
+          << "] out of range.\n";
 }
 
 //////////////////////////////////////////////////
 double Joint::GetForce(int _index)
 {
-  /// \todo: should check to see if this type of joint has _index
-  if (_index < 2)
+  if (_index >= 0 && _index < this->GetAngleCount())
+  {
     return this->forceApplied[_index];
+  }
   else
   {
     gzerr << "Invalid joint index [" << _index

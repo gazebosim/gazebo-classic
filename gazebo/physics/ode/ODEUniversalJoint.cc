@@ -137,13 +137,21 @@ void ODEUniversalJoint::SetVelocity(int _index, double _angle)
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetForce(int _index, double _torque)
 {
+  if (_index < 0 || _index >= this->GetAngleCount())
+  {
+    gzerr << "Calling ODEUniversalJoint::SetForce with an index ["
+          << _index << "] out of range\n";
+    return;
+  }
+
+  // truncate effort if effortLimit is not negative
+  if (this->effortLimit[_index] >= 0.0)
+    _torque = math::clamp(_torque, -this->effortLimit[_index],
+      this->effortLimit[_index]);
+
   ODEJoint::SetForce(_index, _torque);
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
-
-  if (this->effortLimit[_index] > 0.0)
-    _torque = math::clamp(_torque, -this->effortLimit[_index],
-      this->effortLimit[_index]);
 
   if (_index == 0)
     dJointAddUniversalTorques(this->jointId, _torque, 0);
