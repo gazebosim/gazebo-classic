@@ -111,7 +111,6 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_model_editor
                                 gzqtpropertybrowser
                                 ${QT_LIBRARIES}
-                                QtTest
                                 ${ogre_libraries}
                                 ${Boost_LIBRARIES}
                                 pthread)
