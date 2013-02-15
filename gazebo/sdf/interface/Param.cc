@@ -19,8 +19,9 @@
  * Date: 14 Aug 2008
  */
 
-#include "common/Exception.hh"
-#include "sdf/interface/Param.hh"
+#include <math.h>
+#include "gazebo/common/Exception.hh"
+#include "gazebo/sdf/interface/Param.hh"
 
 using namespace sdf;
 
@@ -153,13 +154,19 @@ bool Param::Set(const unsigned int &_value)
 //////////////////////////////////////////////////
 bool Param::Set(const float &_value)
 {
-  return this->SetFromString(boost::lexical_cast<std::string>(_value));
+  if (std::isfinite(_value))
+    return this->SetFromString(boost::lexical_cast<std::string>(_value));
+  else
+    return this->SetFromString("0");
 }
 
 //////////////////////////////////////////////////
 bool Param::Set(const double &_value)
 {
-  return this->SetFromString(boost::lexical_cast<std::string>(_value));
+  if (std::isfinite(_value))
+    return this->SetFromString(boost::lexical_cast<std::string>(_value));
+  else
+    return this->SetFromString("0");
 }
 
 //////////////////////////////////////////////////

@@ -166,7 +166,7 @@ std::string ModelDatabase::GetManifestImpl(const std::string &_uri)
     if (success != CURLE_OK)
     {
       gzwarn << "Unable to connect to model database using [" << _uri
-        << "]. Only locally installed models will be available.";
+        << "]. Only locally installed models will be available.\n";
     }
 
     curl_easy_cleanup(curl);

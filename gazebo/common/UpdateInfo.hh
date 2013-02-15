@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,30 @@
  * limitations under the License.
  *
 */
+#ifndef _UPDATEINFO_HH_
+#define _UPDATEINFO_HH_
 
-#ifndef GAZEBO_QT_HEADERS_H_
-#define GAZEBO_QT_HEADERS_H_
+#include <string>
+#include "gazebo/common/Time.hh"
 
-#pragma GCC system_header
+namespace gazebo
+{
+  namespace common
+  {
+    /// \class UpdateInfo UpdateInfo.hh common/common.hh
+    /// \brief Information for use in an update event.
+    class UpdateInfo
+    {
+      /// \brief Name of the world.
+      public: std::string worldName;
 
-#include <QtGui>
-#include <QX11Info>
-#include <QWidget>
-#include <QPushButton>
-#include <QPoint>
-#include <QFrame>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QGroupBox>
-#include <QApplication>
-#include <qmainwindow.h>
-#include <QAction>
+      /// \brief Current simulation time.
+      public: common::Time simTime;
+
+      /// \brief Current real time.
+      public: common::Time realTime;
+    };
+  }
+}
 
 #endif

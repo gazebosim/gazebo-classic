@@ -23,6 +23,7 @@
 #include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/rendering/Road2d.hh"
@@ -1521,6 +1522,7 @@ void Scene::PreRender()
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
         math::Pose pose = msgs::Convert(*pIter);
+        GZ_ASSERT(iter->second, "Visual pointer is NULL");
         iter->second->SetPose(pose);
         PoseMsgs_L::iterator prev = pIter++;
         this->poseMsgs.erase(prev);
@@ -1718,22 +1720,28 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
-  VisualPtr childVis;
+  Visual_M::iterator iter;
+  iter = this->visuals.find(_msg->name() + "_JOINT_VISUAL__");
 
-  if (_msg->child() == "world")
-    childVis = this->worldVisual;
-  else
-    childVis = this->GetVisual(_msg->child());
+  if (iter == this->visuals.end())
+  {
+    VisualPtr childVis;
 
-  if (!childVis)
-    return false;
+    if (_msg->child() == "world")
+      childVis = this->worldVisual;
+    else
+      childVis = this->GetVisual(_msg->child());
 
-  JointVisualPtr jointVis(new JointVisual(
-          _msg->name() + "_JOINT_VISUAL__", childVis));
-  jointVis->Load(_msg);
-  jointVis->SetVisible(this->showJoints);
+    if (!childVis)
+      return false;
 
-  this->visuals[jointVis->GetName()] = jointVis;
+    JointVisualPtr jointVis(new JointVisual(
+            _msg->name() + "_JOINT_VISUAL__", childVis));
+    jointVis->Load(_msg);
+    jointVis->SetVisible(this->showJoints);
+
+    this->visuals[jointVis->GetName()] = jointVis;
+  }
   return true;
 }
 
