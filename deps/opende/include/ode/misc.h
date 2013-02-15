@@ -80,19 +80,69 @@ ODE_API dReal dMaxDifference (const dReal *A, const dReal *B, int n, int m);
  * n*n matrices */
 ODE_API dReal dMaxDifferenceLowerTriangle (const dReal *A, const dReal *B, int n);
 
-/* normalize angles about 2*M_PI to a minimum positive value. */
-ODE_API dReal dNormalizeAnglePositive(dReal angle);
+//****************************************************************************
+// helper function: dShortestAngularDistance implementation
+    
+/*!
+ * \brief dNormalizeAnglePositive
+ *
+ *        Normalizes the angle to be 0 to 2*M_PI
+ *        It takes and returns radians.
+ */
+ODE_API static inline dReal dNormalizeAnglePositive(dReal angle)
+{
+  return fmod(fmod(angle, 2.0*M_PI) + 2.0*M_PI, 2.0*M_PI);
+}
 
-/* normalize [0, 2*M_PI] angles into [-M_PI, +M_PI]. */
-ODE_API dReal dNormalizeAngle(dReal angle);
 
-/* get shortest angular distance between 2 points on a circle. */
-ODE_API dReal dShortestAngularDistance(dReal from, dReal to);
+/*!
+ * \brief normalize
+ *
+ * Normalizes the angle from [0, 2*M_PI] to [-M_PI, +M_PI] circle
+ * It takes and returns radians.
+ *
+ */    
+ODE_API static inline dReal dNormalizeAngle(dReal angle)
+{
+  dReal a = dNormalizeAnglePositive(angle);
+  if (a > M_PI)
+    a -= 2.0 *M_PI;
+  return a;
+}
 
-/* update angle using shortest angular distance between 2 points on a circle,
-   returns to if from and to differs by more than tol. */
-ODE_API dReal dShortestAngularDistanceUpdate(dReal from, dReal to, dReal tol = 0.5*M_PI);
+  
+/*!
+ * \function
+ * \brief dShortestAngularDistance
+ *
+ * Given 2 angles, this returns the shortest angular
+ * difference.  The inputs and ouputs are of course radians.
+ *
+ * The result
+ * would always be -pi <= result <= pi.  Adding the result
+ * to "from" will always get you an equivelent angle to "to".
+ */
+  
+ODE_API static inline dReal dShortestAngularDistance(dReal from, dReal to)
+{
+  dReal result = dNormalizeAnglePositive(dNormalizeAnglePositive(to) - dNormalizeAnglePositive(from));
 
+  return dNormalizeAngle(result);
+}
+
+ODE_API static inline dReal dShortestAngularDistanceUpdate(dReal from, dReal to, dReal tol = 0.3)
+{
+  dReal result = dNormalizeAngle(dNormalizeAnglePositive(dNormalizeAnglePositive(to) - dNormalizeAnglePositive(from)));
+
+  if (dFabs(result) > tol)
+    return to;
+  else
+    return from + result;
+}
+
+
+
+//****************************************************************************
 
 #ifdef __cplusplus
 }
