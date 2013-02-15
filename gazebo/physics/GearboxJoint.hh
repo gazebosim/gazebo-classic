@@ -22,6 +22,8 @@
 #ifndef _GEARBOXJOINT_HH_
 #define _GEARBOXJOINT_HH_
 
+#include <string>
+
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 
@@ -74,7 +76,6 @@ namespace gazebo
                 {
                   gzerr << "Gearbox joint missing reference body.\n";
                 }
-
               }
 
       /// \brief Initialize joint

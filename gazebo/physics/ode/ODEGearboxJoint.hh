@@ -94,7 +94,6 @@ namespace gazebo
       /// \brief Set gearbox joint gear reference body
       /// \param[in] _body an ode body as the reference link for the gears.
       private: void SetReferenceBody(LinkPtr _body);
-
     };
   }
 }

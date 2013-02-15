@@ -269,8 +269,8 @@ void PhysicsTest::GearboxTest(const std::string &_worldFile)
   EXPECT_GT(joint1->GetVelocity(0), 0);
   EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
   EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
-
 }
+
 TEST_F(PhysicsTest, GearboxTestODE)
 {
   GearboxTest("worlds/gearbox.world");
