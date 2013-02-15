@@ -526,10 +526,83 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  // Don't throttle physics updates, so the tests run as fast as possible
-  physics->SetUpdateRate(0);
+  // Model names
+  std::vector<std::string> modelNames;
+  modelNames.push_back("pendulum_0deg");
+  modelNames.push_back("pendulum_45deg");
+  modelNames.push_back("pendulum_90deg");
+  modelNames.push_back("pendulum_135deg");
+  modelNames.push_back("pendulum_180deg");
+  modelNames.push_back("pendulum_225deg");
+  modelNames.push_back("pendulum_270deg");
+  modelNames.push_back("pendulum_315deg");
 
-  // 
+  // Link names
+  std::vector<std::string> linkNames;
+  linkNames.push_back("lower_link");
+  linkNames.push_back("upper_link");
+
+  // Step forward 0.75 seconds
+  double dt = physics->GetStepTime();
+  EXPECT_GT(dt, 0);
+  int steps = ceil(0.75 / dt);
+  world->StepWorld(steps);
+
+  // Get global angular velocity of each link
+  physics::ModelPtr model;
+  physics::LinkPtr link;
+  std::vector<std::string>::iterator modelIter;
+  math::Vector3 angVel;
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check angular velocity of model " << *modelIter << '\n';
+      link = model->GetLink("base");
+      if (link)
+      {
+        // Expect stationary base
+        angVel = link->GetWorldAngularVel();
+        EXPECT_NEAR(angVel.x, 0, PHYSICS_TOL*10);
+        EXPECT_NEAR(angVel.y, 0, PHYSICS_TOL*10);
+        EXPECT_NEAR(angVel.z, 0, PHYSICS_TOL*10);
+      }
+      else
+      {
+        gzerr << "Error loading base link of model " << *modelIter << '\n';
+        EXPECT_TRUE(link != NULL);
+      }
+
+      std::vector<std::string>::iterator linkIter;
+      for (linkIter  = linkNames.begin();
+           linkIter != linkNames.end(); ++linkIter)
+      {
+        link = model->GetLink(*linkIter);
+        if (link)
+        {
+          // Expect relative angular velocity of pendulum links to be negative
+          // and along x axis.
+          angVel = link->GetRelativeAngularVel().Normalize();
+          EXPECT_NEAR(angVel.x, -1, PHYSICS_TOL);
+          EXPECT_NEAR(angVel.y,  0, 2*PHYSICS_TOL);
+          EXPECT_NEAR(angVel.z,  0, 2*PHYSICS_TOL);
+        }
+        else
+        {
+          gzerr << "Error loading link " << *linkIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(link != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
 }
 
 TEST_F(PhysicsTest, RevoluteJointODE)
