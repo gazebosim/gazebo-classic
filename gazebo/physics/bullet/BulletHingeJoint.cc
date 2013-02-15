@@ -223,7 +223,7 @@ double BulletHingeJoint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetForce(int _index, double _torque)
 {
-  if (_index < 0 || _index >= this->GetAngleCount())
+  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
   {
     gzerr << "Calling BulletHingeJoint::SetForce with an index ["
           << _index << "] out of range\n";

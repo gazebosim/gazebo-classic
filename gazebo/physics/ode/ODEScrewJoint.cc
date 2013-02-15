@@ -111,7 +111,7 @@ void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 //////////////////////////////////////////////////
 void ODEScrewJoint::SetForce(int _index, double _force)
 {
-  if (_index < 0 || _index >= this->GetAngleCount())
+  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
   {
     gzerr << "Calling ODEScrewJoint::SetForce with an index ["
           << _index << "] out of range\n";
