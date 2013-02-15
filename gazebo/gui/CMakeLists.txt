@@ -23,6 +23,7 @@ set (sources
   InsertModelWidget.cc
   JointControlWidget.cc
   LightMaker.cc
+  LogPlayWidget.cc
   main.cc
   MainWindow.cc
   MeshMaker.cc
@@ -46,6 +47,7 @@ set (qt_headers
   GLWidget.hh
   InsertModelWidget.hh
   JointControlWidget.hh
+  LogPlayWidget.hh
   MainWindow.hh
   ModelListWidget.hh
   ModelEditWidget.hh

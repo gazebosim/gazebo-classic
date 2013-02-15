@@ -124,9 +124,9 @@ namespace gazebo
       /// This function is called before the camera is destructed
       public: virtual void Fini();
 
-      /// \brief Return true if the camera has been initialized
-      /// \return True if initialized was successful
-      public: inline bool IsInitialized() const {return this->initialized;}
+      /// \brief Deprecated 
+      /// \sa Camera::GetInitialized
+      public: inline bool IsInitialized() const GAZEBO_DEPRECATED;
 
       /// \internal
       /// \brief Set the ID of the window this camera is rendering into.
@@ -451,7 +451,7 @@ namespace gazebo
 
       /// \brief Returns true if initialized
       /// \return Ture if the camera is initialized
-      public: bool GetInitialized() const;
+      public: inline bool GetInitialized() const;
 
       /// \brief Return true if the camera is moving due to an animation.
       public: bool IsAnimating() const;

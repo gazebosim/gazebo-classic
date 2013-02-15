@@ -1039,11 +1039,11 @@ void Camera::SetCaptureData(bool _value)
 }
 
 //////////////////////////////////////////////////
-void Camera::CreateRenderTexture(const std::string &textureName)
+void Camera::CreateRenderTexture(const std::string &_textureName)
 {
   // Create the render texture
   this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
-      textureName,
+      _textureName,
       "General",
       Ogre::TEX_TYPE_2D,
       this->GetImageWidth(),
@@ -1260,16 +1260,19 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   return true;
 }
 
+/////////////////////////////////////////////////
 Ogre::Texture *Camera::GetRenderTexture() const
 {
   return this->renderTexture;
 }
 
+/////////////////////////////////////////////////
 math::Vector3 Camera::GetDirection() const
 {
   return Conversions::Convert(this->camera->getDerivedDirection());
 }
 
+/////////////////////////////////////////////////
 bool Camera::IsVisible(VisualPtr _visual)
 {
   if (this->camera && _visual)
@@ -1294,7 +1297,10 @@ bool Camera::IsVisible(const std::string &_visualName)
 /////////////////////////////////////////////////
 bool Camera::GetInitialized() const
 {
-  return this->initialized;
+  if (this->scene)
+    return this->initialized && this->scene->GetInitialized();
+  else
+    return false;
 }
 
 /////////////////////////////////////////////////
@@ -1459,4 +1465,10 @@ double Camera::GetRenderRate() const
 //////////////////////////////////////////////////
 void Camera::AnimationComplete()
 {
+}
+
+//////////////////////////////////////////////////
+void Camera::IsInitialized()
+{
+  return this->GetInitialized();
 }

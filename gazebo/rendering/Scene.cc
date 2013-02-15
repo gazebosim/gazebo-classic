@@ -81,6 +81,7 @@ struct VisualMessageLess {
 //////////////////////////////////////////////////
 Scene::Scene(const std::string &_name, bool _enableVisualizations)
 {
+  this->initialized = false;
   this->showCOMs = false;
   this->showCollisions = false;
   this->showJoints = false;
@@ -284,6 +285,8 @@ void Scene::Init()
 
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);
+
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -2465,4 +2468,10 @@ void Scene::ShowContacts(bool _show)
     vis->SetEnabled(_show);
   else
     gzerr << "Unable to get contact visualization. This should never happen.\n";
+}
+
+/////////////////////////////////////////////////
+void Scene::GetInitialized() const
+{
+  return this->initialized;
 }

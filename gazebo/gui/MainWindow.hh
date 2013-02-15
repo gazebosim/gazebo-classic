@@ -34,6 +34,7 @@ namespace gazebo
     class ToolsWidget;
     class ModelListWidget;
     class BuildingEditorPalette;
+    class LogPlayWidget;
 
     class MainWindow : public QMainWindow
     {
@@ -175,6 +176,9 @@ namespace gazebo
       /// \brief The filename set via "Save As". This filename is used by
       /// the "Save" feature.
       private: std::string saveFilename;
+
+      /// \brief Widget to control log playback.
+      private: LogPlayWidget *logPlay;
     };
 
     class TreeViewDelegate: public QItemDelegate

@@ -15,6 +15,7 @@
  *
  */
 
+#include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/viewers/TopicView.hh"
@@ -98,14 +99,21 @@ MainWindow::MainWindow()
 
   this->toolsWidget = new ToolsWidget();
 
-  this->renderWidget = new RenderWidget(mainWidget);
 
-  QHBoxLayout *centerLayout = new QHBoxLayout;
+  this->renderWidget = new RenderWidget(mainWidget);
+  this->logPlay = new LogPlayWidget;
+
+  QVBoxLayout *renderFrameLayout = new QVBoxLayout;
+  renderFrameLayout->addWidget(this->renderWidget);
+  renderFrameLayout->addWidget(this->logPlay);
+
+  QFrame *renderFrame = new QFrame;
+  renderFrame->setLayout(renderFrameLayout);
 
   QSplitter *splitter = new QSplitter(this);
   splitter->addWidget(this->tabWidget);
   splitter->addWidget(this->buildingEditorTabWidget);
-  splitter->addWidget(this->renderWidget);
+  splitter->addWidget(renderFrame);
   splitter->addWidget(this->toolsWidget);
 
   QList<int> sizes;
@@ -123,8 +131,9 @@ MainWindow::MainWindow()
   splitter->setCollapsible(2, false);
   splitter->setHandleWidth(10);
 
-
+  QVBoxLayout *centerLayout = new QVBoxLayout;
   centerLayout->addWidget(splitter);
+
   centerLayout->setContentsMargins(0, 0, 0, 0);
   centerLayout->setSpacing(0);
 
