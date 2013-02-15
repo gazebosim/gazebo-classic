@@ -305,9 +305,6 @@ void Joint::FillMsg(msgs::Joint &_msg)
   else
     msgs::Set(_msg.mutable_pose(), math::Pose(0, 0, 0, 0, 0, 0));
 
-  msgs::Set(_msg.mutable_pose()->mutable_position(), this->anchorPos);
-
-
   if (this->HasType(Base::HINGE_JOINT))
   {
     _msg.set_type(msgs::Joint::REVOLUTE);
@@ -346,8 +343,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
     _msg.add_angle(this->GetAngle(1).Radian());
   }
 
-  // msgs::Set(_msg.mutable_axis1()->mutable_xyz(), this->GetGlobalAxis(0));
-  msgs::Set(_msg.mutable_axis1()->mutable_xyz(), math::Vector3());
+  msgs::Set(_msg.mutable_axis1()->mutable_xyz(), this->GetLocalAxis(0));
   _msg.mutable_axis1()->set_limit_lower(0);
   _msg.mutable_axis1()->set_limit_upper(0);
   _msg.mutable_axis1()->set_limit_effort(0);
@@ -424,4 +420,3 @@ void Joint::ApplyDamping()
   double dampingForce = -this->dampingCoefficient * this->GetVelocity(0);
   this->SetForce(0, dampingForce);
 }
-

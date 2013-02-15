@@ -62,6 +62,7 @@ set (qt_headers
 
 set (headers
   qt.h
+  qt_test.h
   BoxMaker.hh
   CylinderMaker.hh
   EntityMaker.hh
