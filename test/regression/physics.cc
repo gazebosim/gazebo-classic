@@ -237,7 +237,7 @@ void PhysicsTest::GearboxTest(const std::string &_worldFile)
   {
     joint1->SetForce(0, -1.5);
     joint3->SetForce(0,  1.0);
-    world->StepWorld(1);  // theoretical contact, but
+    world->StepWorld(1);
     if (i%1000 == 0)
       gzdbg << "gearbox time [" << world->GetSimTime().Double()
             << "] vel [" << joint1->GetVelocity(0)
@@ -246,21 +246,17 @@ void PhysicsTest::GearboxTest(const std::string &_worldFile)
             << "] pose [" << joint3->GetAngle(0).Radian()
             << "]\n";
   }
-  EXPECT_LT(joint1->GetVelocity(0), 1e-6);
-  EXPECT_LT(joint1->GetVelocity(0), 1e-6);
-  EXPECT_LT(joint3->GetAngle(0).Radian(), 1e-6);
-  EXPECT_LT(joint3->GetAngle(0).Radian(), 1e-6);
-  EXPECT_GT(joint1->GetVelocity(0), -1e-6);
-  EXPECT_GT(joint1->GetVelocity(0), -1e-6);
-  EXPECT_GT(joint3->GetAngle(0).Radian(), -1e-6);
-  EXPECT_GT(joint3->GetAngle(0).Radian(), -1e-6);
+  EXPECT_NEAR(joint1->GetVelocity(0), 0, 1e-6);
+  EXPECT_NEAR(joint1->GetVelocity(0), 0, 1e-6);
+  EXPECT_NEAR(joint3->GetAngle(0).Radian(), 0, 1e-6);
+  EXPECT_NEAR(joint3->GetAngle(0).Radian(), 0, 1e-6);
 
   // slight imbalance
   for (int i = 0; i < steps; ++i)
   {
     joint1->SetForce(0, -1.0);
     joint3->SetForce(0,  1.0);
-    world->StepWorld(1);  // theoretical contact, but
+    world->StepWorld(1);
     if (i%1000 == 0)
       gzdbg << "gearbox time [" << world->GetSimTime().Double()
             << "] vel [" << joint1->GetVelocity(0)

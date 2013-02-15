@@ -189,18 +189,27 @@ void ODEGearboxJoint::SetVelocity(int /*index*/, double _angle)
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetMaxForce(int /*index*/, double _t)
 {
+  gzlog << "SetMaxForce not implemented for gearbox\n";
+  return;
+
   return this->SetParam(dParamFMax, _t);
 }
 
 //////////////////////////////////////////////////
 double ODEGearboxJoint::GetMaxForce(int /*index*/)
 {
+  gzlog << "GetMaxForce not implemented for gearbox\n";
+  return 0;
+
   return this->GetParam(dParamFMax);
 }
 
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetForce(int _index, double _torque)
 {
+  gzlog << "SetForce not implemented for gearbox\n";
+  return;
+
   ODEJoint::SetForce(_index, _torque);
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -212,6 +221,9 @@ void ODEGearboxJoint::SetForce(int _index, double _torque)
 //////////////////////////////////////////////////
 double ODEGearboxJoint::GetParam(int _parameter) const
 {
+  gzlog << "GetParam not implemented for gearbox\n";
+  return 0;
+
   double result = dJointGetHingeParam(this->jointId, _parameter);
 
   return result;
@@ -220,6 +232,9 @@ double ODEGearboxJoint::GetParam(int _parameter) const
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetParam(int _parameter, double _value)
 {
+  gzlog << "SetParam not implemented for gearbox\n";
+  return;
+
   ODEJoint::SetParam(_parameter, _value);
 
   dJointSetHingeParam(this->jointId, _parameter, _value);

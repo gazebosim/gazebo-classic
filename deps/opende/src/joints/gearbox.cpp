@@ -46,7 +46,7 @@ dxJointGearbox::dxJointGearbox(dxWorld* w) :
 void
 dxJointGearbox::getSureMaxInfo( SureMaxInfo* info )
 {
-    info->max_m = 5;
+    info->max_m = 1;
 }
 
 
