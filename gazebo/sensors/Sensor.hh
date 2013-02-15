@@ -40,7 +40,8 @@ namespace gazebo
 {
   namespace sensors
   {
-    /// \brief SensorClass is used to categorize sensors.
+    /// \brief SensorClass is used to categorize sensors. This is used to
+    /// put sensors into different threads.
     enum SensorCategory
     {
       // IMAGE must be the first element, and it must start with 0. Do not

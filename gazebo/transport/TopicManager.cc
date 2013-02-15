@@ -121,7 +121,7 @@ void TopicManager::ProcessNodes(bool _onlyOut)
     s = this->nodes.size();
   }
 
-  for (int i = 0; i < s; i ++)
+  for (int i = 0; i < s; ++i)
   {
     this->nodes[i]->ProcessPublishers();
   }
@@ -133,7 +133,7 @@ void TopicManager::ProcessNodes(bool _onlyOut)
       s = this->nodes.size();
     }
 
-    for (int i = 0; i < s; i ++)
+    for (int i = 0; i < s; ++i)
     {
       this->nodes[i]->ProcessIncoming();
       if (this->pauseIncoming)

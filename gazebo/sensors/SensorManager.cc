@@ -230,16 +230,19 @@ SensorPtr SensorManager::GetSensor(const std::string &_name) const
   // because we don't know which sensor is correct.
   if (!result)
   {
+    SensorPtr tmpSensor;
     for (iter = this->sensorContainers.begin();
          iter != this->sensorContainers.end(); ++iter)
     {
       GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
-      if (!(*iter)->GetSensor(_name, true))
+      tmpSensor = (*iter)->GetSensor(_name, true);
+
+      if (!tmpSensor)
         continue;
 
       if (!result)
       {
-        result = (*iter)->GetSensor(_name, true);
+        result = tmpSensor;
         GZ_ASSERT(result != NULL, "SensorContainer contains a NULL Sensor");
       }
       else
@@ -484,12 +487,14 @@ SensorPtr SensorManager::SensorContainer::GetSensor(const std::string &_name,
        iter != this->sensors.end() && !result; ++iter)
   {
     GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
+
     // We match on the scoped name (model::link::sensor) because multiple
     // sensors with the name leaf name make exists in a world.
     if ((_useLeafName && (*iter)->GetName() == _name) ||
         (!_useLeafName && (*iter)->GetScopedName() == _name))
     {
       result = (*iter);
+      break;
     }
   }
 
