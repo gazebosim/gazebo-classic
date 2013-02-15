@@ -211,7 +211,7 @@ bool Server::ParseArgs(int argc, char **argv)
       physics = this->vm["physics"].as<std::string>();
 
     // Load the server
-      if (!this->LoadFile(configFilename, physics))
+    if (!this->LoadFile(configFilename, physics))
       return false;
   }
 
