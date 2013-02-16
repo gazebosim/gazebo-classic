@@ -512,7 +512,9 @@ TEST_F(PhysicsTest, SpawnDropCoGOffsetBullet)
 
 ////////////////////////////////////////////////////////////////////////
 // RevoluteJoint:
-// 
+// Load 8 double pendulums arranged in a circle.
+// Measure angular velocity of links, and verify proper axis orientation.
+// Then set joint limits and verify that links remain within limits.
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
 {
@@ -541,6 +543,11 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   std::vector<std::string> linkNames;
   linkNames.push_back("lower_link");
   linkNames.push_back("upper_link");
+
+  // Link names
+  std::vector<std::string> jointNames;
+  jointNames.push_back("lower_joint");
+  jointNames.push_back("upper_joint");
 
   // Step forward 0.75 seconds
   double dt = physics->GetStepTime();
@@ -594,6 +601,74 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           gzerr << "Error loading link " << *linkIter
                 << " of model " << *modelIter << '\n';
           EXPECT_TRUE(link != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+
+  // Reset the world, and impose joint limits
+  world->Reset();
+  physics::JointPtr joint;
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      std::vector<std::string>::iterator jointIter;
+      for (jointIter  = jointNames.begin();
+           jointIter != jointNames.end(); ++jointIter)
+      {
+        joint = model->GetJoint(*jointIter);
+        if (joint)
+        {
+          joint->SetLowStop(0, math::Angle(-0.1));
+          joint->SetHighStop(0, math::Angle(0.1));
+        }
+        else
+        {
+          gzerr << "Error loading joint " << *jointIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(joint != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+
+  // Step forward again for 0.75 seconds and check that joint angles
+  // are within limits
+  world->StepWorld(steps);
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check angle limits on joints of of model " << *modelIter << '\n';
+      std::vector<std::string>::iterator jointIter;
+      for (jointIter  = jointNames.begin();
+           jointIter != jointNames.end(); ++jointIter)
+      {
+        joint = model->GetJoint(*jointIter);
+        if (joint)
+        {
+          EXPECT_NEAR(joint->GetAngle(0).Radian(), 0, 0.11);
+        }
+        else
+        {
+          gzerr << "Error loading joint " << *jointIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(joint != NULL);
         }
       }
     }
