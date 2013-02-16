@@ -387,6 +387,40 @@ void Joint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
+void Joint::SetHighStop(int _index, const math::Angle &_angle)
+{
+  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+  if (_index == 0)
+    this->sdf->GetElement("axis")->GetElement("limit")
+             ->GetElement("upper")->Set(_angle.Radian());
+  else if (_index == 1)
+    this->sdf->GetElement("axis2")->GetElement("limit")
+             ->GetElement("upper")->Set(_angle.Radian());
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to set high stop\n";
+  }
+}
+
+//////////////////////////////////////////////////
+void Joint::SetLowStop(int _index, const math::Angle &_angle)
+{
+  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+  if (_index == 0)
+    this->sdf->GetElement("axis")->GetElement("limit")
+             ->GetElement("lower")->Set(_angle.Radian());
+  else if (_index == 1)
+    this->sdf->GetElement("axis2")->GetElement("limit")
+             ->GetElement("lower")->Set(_angle.Radian());
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to set low stop\n";
+  }
+}
+
+//////////////////////////////////////////////////
 void Joint::SetAngle(int /*index*/, math::Angle _angle)
 {
   if (this->model->IsStatic())

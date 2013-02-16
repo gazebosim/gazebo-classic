@@ -97,6 +97,11 @@ void BulletHingeJoint::Init()
     axisB = pose.rot.RotateVectorReverse(axis);
     axisB = axisB.Normalize();
   }
+  gzerr << this->GetScopedName()
+        << " world:"  << axis
+        << " parent:" << axisA
+        << " child:"  << axisB
+        << '\n';
 
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
@@ -251,36 +256,40 @@ double BulletHingeJoint::GetForce(int /*_index*/)
 
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetHighStop(int /*_index*/,
-                                   const math::Angle &/*_angle*/)
+                      const math::Angle &_angle)
 {
-  if (this->bulletHinge)
-  {
-    // this function has additional parameters that we may one day
-    // implement. Be warned that this function will reset them to default
-    // settings
-    // this->bulletHinge->setLimit(this->bulletHinge->getLowerLimit(),
-    //                         _angle.Radian());
-  }
-  else
-  {
-    gzthrow("Joint must be created first");
-  }
+  Joint::SetHighStop(0, _angle);
+  gzerr << "not implemented\n";
+  // if (this->bulletHinge)
+  // {
+  //   // this function has additional parameters that we may one day
+  //   // implement. Be warned that this function will reset them to default
+  //   // settings
+  //   // this->bulletHinge->setLimit(this->bulletHinge->getLowerLimit(),
+  //   //                         _angle.Radian());
+  // }
+  // else
+  // {
+  //   gzthrow("Joint must be created first");
+  // }
 }
 
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetLowStop(int /*_index*/,
-                                  const math::Angle &/*_angle*/)
+                     const math::Angle &_angle)
 {
-  if (this->bulletHinge)
-  {
-    // this function has additional parameters that we may one day
-    // implement. Be warned that this function will reset them to default
-    // settings
-    // this->bulletHinge->setLimit(-_angle.Radian(),
-    //                         this->bulletHinge->getUpperLimit());
-  }
-  else
-    gzthrow("Joint must be created first");
+  Joint::SetLowStop(0, _angle);
+  gzerr << "not implemented\n";
+  // if (this->bulletHinge)
+  // {
+  //   // this function has additional parameters that we may one day
+  //   // implement. Be warned that this function will reset them to default
+  //   // settings
+  //   // this->bulletHinge->setLimit(-_angle.Radian(),
+  //   //                         this->bulletHinge->getUpperLimit());
+  // }
+  // else
+  //   gzthrow("Joint must be created first");
 }
 
 //////////////////////////////////////////////////

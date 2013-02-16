@@ -205,13 +205,13 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle High stop angle.
       public: virtual void SetHighStop(int _index,
-                                       const math::Angle &_angle) = 0;
+                        const math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Low stop angle.
       public: virtual void SetLowStop(int _index,
-                                      const math::Angle &_angle) = 0;
+                       const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
       /// \param[in] _index Index of the axis.
