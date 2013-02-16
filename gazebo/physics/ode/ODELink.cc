@@ -67,6 +67,8 @@ void ODELink::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void ODELink::Init()
 {
+
+
   if (!this->IsStatic())
   {
     this->linkId = dBodyCreate(this->odePhysics->GetWorldId());
@@ -85,6 +87,12 @@ void ODELink::Init()
       dBodySetAutoDisableFlag(this->linkId, 0);
     }
   }
+
+  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
+  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
+
+  this->SetLinearDamping(this->GetLinearDamping());
+  this->SetAngularDamping(this->GetAngularDamping());
 
   Link::Init();
 

@@ -44,15 +44,48 @@ namespace gazebo
       public: virtual ~BulletCylinderShape() {}
 
       /// \brief Set the size of the cylinder
+      /// \param[in] _radius Cylinder radius
+      /// \param[in] _length Cylinder length
       public: void SetSize(double _radius, double _length)
               {
+                if (_radius < 0)
+                {
+                    gzerr << "Cylinder shape does not support negative"
+                          << " radius\n";
+                    return;
+                }
+                if (_length < 0)
+                {
+                    gzerr << "Cylinder shape does not support negative"
+                          << " length\n";
+                    return;
+                }
+
                 CylinderShape::SetSize(_radius, _length);
                 BulletCollisionPtr bParent;
                 bParent = boost::shared_dynamic_cast<BulletCollision>(
                     this->collisionParent);
 
-                bParent->SetCollisionShape(new btCylinderShapeZ(
-                    btVector3(_radius, _radius, _length * 0.5)));
+                btCollisionShape *shape = bParent->GetCollisionShape();
+                if (!shape)
+                {
+                  bParent->SetCollisionShape(new btCylinderShapeZ(
+                      btVector3(_radius, _radius, _length * 0.5)));
+                }
+                else
+                {
+                  btVector3 scale = shape->getLocalScaling();
+                  double cylinderRadius = this->GetRadius();
+                  double cylinderLength = this->GetLength();
+                  if (cylinderRadius > 0)
+                  {
+                    scale.setX(_radius / cylinderRadius);
+                    scale.setY(scale.x());
+                  }
+                  if (cylinderLength > 0)
+                    scale.setZ(_length / cylinderLength);
+                  shape->setLocalScaling(scale);
+                }
               }
     };
     /// \}

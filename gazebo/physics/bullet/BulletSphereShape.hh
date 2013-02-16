@@ -42,28 +42,36 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletSphereShape() {}
 
-      /// \brief Load shape
-      /// \param[in] _sdf SDF description of shape geometry
-      public: void Load(sdf::ElementPtr _sdf)
+      /// \brief Set the radius
+      /// \param[in] _radius Sphere radius
+      public: void SetRadius(double _radius)
               {
-                Base::Load(_sdf);
+                if (_radius < 0)
+                {
+                    gzerr << "Sphere shape does not support negative"
+                          << " radius\n";
+                    return;
+                }
+
+                SphereShape::SetRadius(_radius);
                 BulletCollisionPtr bParent;
                 bParent = boost::shared_dynamic_cast<BulletCollision>(
                     this->collisionParent);
 
-                bParent->SetCollisionShape(
-                    new btSphereShape(this->sdf->GetValueDouble("radius")));
-              }
-
-      /// \brief Set the radius
-      public: void SetRadius(double _radius)
-              {
-                SphereShape::SetRadius(_radius);
-                /*BulletCollisionPtr bParent;
-                bParent = boost::shared_dynamic_cast<BulletCollision>(
-                    this->collisionParent);
-
-                bParent->SetCollisionShape(new btSphereShape(_radius));*/
+                btCollisionShape *shape = bParent->GetCollisionShape();
+                if (!shape)
+                {
+                  bParent->SetCollisionShape(new btSphereShape(_radius));
+                }
+                else
+                {
+                  double sphereRadius = this->GetRadius();
+                  if (sphereRadius > 0)
+                  {
+                    double scale = _radius / sphereRadius;
+                    shape->setLocalScaling(btVector3(scale, scale, scale));
+                  }
+                }
               }
     };
     /// \}

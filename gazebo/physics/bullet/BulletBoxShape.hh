@@ -42,31 +42,40 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletBoxShape() {}
 
-      /// \brief Load shape
-      /// \param[in] _sdf SDF description of shape geometry
-      public: void Load(sdf::ElementPtr _sdf)
+      /// \brief Set the size of the box
+      public: void SetSize(const math::Vector3 &_size)
               {
-                Base::Load(_sdf);
+                if (_size.x < 0 || _size.y < 0 || _size.z < 0)
+                {
+                    gzerr << "Box shape does not support negative"
+                          << " size\n";
+                    return;
+                }
+
+                BoxShape::SetSize(_size);
                 BulletCollisionPtr bParent;
                 bParent = boost::shared_dynamic_cast<BulletCollision>(
                     this->collisionParent);
 
-                math::Vector3 size = this->sdf->GetValueVector3("size");
-                bParent->SetCollisionShape(new btBoxShape(
-                    btVector3(size.x*0.5, size.y*0.5, size.z*0.5)));
-              }
-
-      /// \brief Set the size of the box
-      public: void SetSize(const math::Vector3 &_size)
-              {
-                BoxShape::SetSize(_size);
-                /*BulletCollisionPtr bParent;
-                bParent = boost::shared_dynamic_cast<BulletCollision>(
-                    this->collisionParent);
-
                 /// Bullet requires the half-extents of the box
-                bParent->SetCollisionShape(new btBoxShape(
-                    btVector3(_size.x*0.5, _size.y*0.5, _size.z*0.5)));*/
+                btCollisionShape *shape = bParent->GetCollisionShape();
+                if (!shape)
+                {
+                  bParent->SetCollisionShape(new btBoxShape(
+                      btVector3(_size.x*0.5, _size.y*0.5, _size.z*0.5)));
+                }
+                else
+                {
+                  btVector3 scale = shape->getLocalScaling();
+                  math::Vector3 boxSize = this->GetSize();
+                  if (boxSize.x > 0)
+                    scale.setX(_size.x / boxSize.x);
+                  if (boxSize.y > 0)
+                    scale.setY(_size.y / boxSize.y);
+                  if (boxSize.z > 0)
+                    scale.setZ(_size.z / boxSize.z);
+                  shape->setLocalScaling(scale);
+                }
               }
     };
     /// \}
