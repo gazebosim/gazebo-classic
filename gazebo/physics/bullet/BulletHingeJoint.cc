@@ -18,12 +18,13 @@
  * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletHingeJoint.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletHingeJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -49,12 +50,9 @@ void BulletHingeJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletHingeJoint::Init()
 {
-  if (this->constraint)
-    this->Detach();
-
-  HingeJoint<BulletJoint>::Attach(_one, _two);
+  HingeJoint<BulletJoint>::Init();
 
   // Cast to BulletLink
   BulletLinkPtr bulletChildLink =
@@ -62,9 +60,14 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   BulletLinkPtr bulletParentLink =
     boost::shared_static_cast<BulletLink>(this->parentLink);
 
-  // Get axis from sdf.
-  sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-  math::Vector3 axis = axisElem->GetValueVector3("xyz");
+  // Get axis from sdf (expressed in world frame).
+  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+  math::Vector3 axis = this->initialWorldAxis;
+  if (axis == math::Vector3::Zero)
+  {
+    gzerr << "axis must have non-zero length, resetting to 0 0 1\n";
+    axis.Set(0, 0, 1);
+  }
 
   // Local variables used to compute pivots and axes in body-fixed frames
   // for the parent and child links.
@@ -85,6 +88,7 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
     // Rotate pivot offset and axis into body-fixed frame of parent.
     pivotA = pose.rot.RotateVectorReverse(pivotA);
     axisA = pose.rot.RotateVectorReverse(axis);
+    axisA = axisA.Normalize();
   }
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
@@ -96,10 +100,13 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
     // Rotate pivot offset and axis into body-fixed frame of child.
     pivotB = pose.rot.RotateVectorReverse(pivotB);
     axisB = pose.rot.RotateVectorReverse(axis);
+    axisB = axisB.Normalize();
   }
-
-  axisA = axisA.Round();
-  axisB = axisB.Round();
+  gzerr << this->GetScopedName()
+        << " world:"  << axis
+        << " parent:" << axisA
+        << " child:"  << axisB
+        << '\n';
 
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
@@ -118,8 +125,8 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   {
     this->bulletHinge = new btHingeConstraint(
         *(bulletChildLink->GetBulletLink()),
-        btVector3(pivotB.x, pivotB.y, pivotB.z),
-        btVector3(axisB.x, axisB.y, axisB.z));
+        BulletTypes::ConvertVector3(pivotB),
+        BulletTypes::ConvertVector3(axisB));
   }
   // If only the parent exists, then create a joint between the parent
   // and the world.
@@ -127,8 +134,8 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   {
     this->bulletHinge = new btHingeConstraint(
         *(bulletParentLink->GetBulletLink()),
-        btVector3(pivotA.x, pivotA.y, pivotA.z),
-        btVector3(axisA.x, axisA.y, axisA.z));
+        BulletTypes::ConvertVector3(pivotA),
+        BulletTypes::ConvertVector3(axisA));
   }
   // Throw an error if no links are given.
   else
@@ -171,8 +178,20 @@ void BulletHingeJoint::SetAnchor(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
+void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 {
+  // Note that _axis is given in a world frame,
+  // but bullet uses a body-fixed frame
+  if (this->bulletHinge == NULL)
+  {
+    // this hasn't been initialized yet, store axis in initialWorldAxis
+    this->initialWorldAxis = _axis;
+  }
+  else
+  {
+    gzerr << "not implemented\n";
+  }
+
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
   // points
   /*btmath::Vector3 vec(_axis.x, _axis.y, _axis.z);
@@ -251,36 +270,40 @@ double BulletHingeJoint::GetForce(int /*_index*/)
 
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetHighStop(int /*_index*/,
-                                   const math::Angle &/*_angle*/)
+                      const math::Angle &_angle)
 {
-  if (this->bulletHinge)
-  {
-    // this function has additional parameters that we may one day
-    // implement. Be warned that this function will reset them to default
-    // settings
-    // this->bulletHinge->setLimit(this->bulletHinge->getLowerLimit(),
-    //                         _angle.Radian());
-  }
-  else
-  {
-    gzthrow("Joint must be created first");
-  }
+  Joint::SetHighStop(0, _angle);
+  gzerr << "not implemented\n";
+  // if (this->bulletHinge)
+  // {
+  //   // this function has additional parameters that we may one day
+  //   // implement. Be warned that this function will reset them to default
+  //   // settings
+  //   // this->bulletHinge->setLimit(this->bulletHinge->getLowerLimit(),
+  //   //                         _angle.Radian());
+  // }
+  // else
+  // {
+  //   gzthrow("Joint must be created first");
+  // }
 }
 
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetLowStop(int /*_index*/,
-                                  const math::Angle &/*_angle*/)
+                     const math::Angle &_angle)
 {
-  if (this->bulletHinge)
-  {
-    // this function has additional parameters that we may one day
-    // implement. Be warned that this function will reset them to default
-    // settings
-    // this->bulletHinge->setLimit(-_angle.Radian(),
-    //                         this->bulletHinge->getUpperLimit());
-  }
-  else
-    gzthrow("Joint must be created first");
+  Joint::SetLowStop(0, _angle);
+  gzerr << "not implemented\n";
+  // if (this->bulletHinge)
+  // {
+  //   // this function has additional parameters that we may one day
+  //   // implement. Be warned that this function will reset them to default
+  //   // settings
+  //   // this->bulletHinge->setLimit(-_angle.Radian(),
+  //   //                         this->bulletHinge->getUpperLimit());
+  // }
+  // else
+  //   gzthrow("Joint must be created first");
 }
 
 //////////////////////////////////////////////////
