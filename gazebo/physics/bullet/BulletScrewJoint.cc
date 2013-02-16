@@ -159,7 +159,7 @@ void BulletScrewJoint::SetVelocity(int /*_index*/, double _angle)
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
+void BulletScrewJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 {
   Joint::SetAxis(0, _axis);
   gzerr << "Not implemented\n";

@@ -19,18 +19,19 @@
  * Date: 21 May 2003
  */
 
-#include "transport/Transport.hh"
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/PhysicsEngine.hh"
-#include "physics/Link.hh"
-#include "physics/Model.hh"
-#include "physics/World.hh"
-#include "physics/Joint.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Joint.hh"
 
 using namespace gazebo;
 using namespace physics;

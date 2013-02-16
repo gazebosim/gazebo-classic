@@ -105,7 +105,7 @@ void BulletUniversalJoint::SetDamping(int /*index*/, double /*_damping*/)
 
 //////////////////////////////////////////////////
 void BulletUniversalJoint::SetAxis(int _index,
-                const math::Vector3 &/*_axis*/)
+                  const math::Vector3 &_axis)
 {
   Joint::SetAxis(_index, _axis);
   gzerr << "Not implemented\n";

@@ -129,7 +129,7 @@ void BulletHinge2Joint::SetAnchor(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetAxis(int _index, const math::Vector3 &/*_axis*/)
+void BulletHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 {
   Joint::SetAxis(_index, _axis);
   gzerr << "Not implemented";

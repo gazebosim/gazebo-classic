@@ -101,6 +101,9 @@ namespace gazebo
       // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
+      /// \brief Pointer to the bullet hinge constraint.
+      private: btHingeConstraint *bulletHinge;
+
       /// \brief Offset angle used in GetAngleImpl, so that angles are reported
       ///        relative to the initial configuration.
       private: double angleOffset;

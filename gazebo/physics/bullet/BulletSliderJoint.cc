@@ -164,7 +164,7 @@ void BulletSliderJoint::SetVelocity(int /*_index*/, double _angle)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
+void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 {
   Joint::SetAxis(0, _axis);
   gzerr << "Not implemented in bullet\n";
