@@ -73,6 +73,8 @@ void ODEHinge2Joint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 //////////////////////////////////////////////////
 void ODEHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 {
+  Joint::SetAxis(_index, _axis);
+
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
 

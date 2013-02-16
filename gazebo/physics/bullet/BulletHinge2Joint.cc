@@ -129,8 +129,11 @@ void BulletHinge2Joint::SetAnchor(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
+void BulletHinge2Joint::SetAxis(int _index, const math::Vector3 &/*_axis*/)
 {
+  Joint::SetAxis(_index, _axis);
+  gzerr << "Not implemented";
+
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
   // points
   /*btmath::Vector3 vec(_axis.x, _axis.y, _axis.z);

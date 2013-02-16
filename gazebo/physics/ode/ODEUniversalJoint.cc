@@ -77,6 +77,8 @@ math::Vector3 ODEUniversalJoint::GetGlobalAxis(int _index) const
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
+  Joint::SetAxis(_index, _axis);
+
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
 

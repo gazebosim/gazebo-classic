@@ -84,8 +84,10 @@ math::Vector3 ODEHingeJoint::GetGlobalAxis(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
+void ODEHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 {
+  Joint::SetAxis(0, _axis);
+
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)

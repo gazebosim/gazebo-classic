@@ -157,8 +157,8 @@ namespace gazebo
 
       /// \brief Set the axis of rotation.
       /// \param[in] _index Index of the axis to set.
-      /// \param[in] _axis Axis value.
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis) = 0;
+      /// \param[in] _axis Unit vector in world frame of axis direction.
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
       /// \brief Set the joint damping.
       /// \param[in] _index Index of the axis to set.
@@ -366,11 +366,8 @@ namespace gazebo
       /// \brief Pointer to the parent model.
       protected: ModelPtr model;
 
-      /// \brief Anchor pose.
+      /// \brief Anchor position of joint, expressed in world frame.
       protected: math::Vector3 anchorPos;
-
-      /// \brief Anchor link.
-      protected: LinkPtr anchorLink;
 
       /// \brief Joint update event.
       private: event::EventT<void ()> jointUpdate;

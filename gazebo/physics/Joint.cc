@@ -120,13 +120,18 @@ void Joint::LoadImpl(const math::Pose &_pose)
 
   if (this->parentLink)
     this->parentLink->AddChildJoint(boost::shared_static_cast<Joint>(myBase));
-  this->childLink->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
+  else if (this->childLink)
+    this->childLink->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
+  else
+    gzthrow("both parent and child link do no exist");
+    
 
-  // setting anchor relative to gazebo link frame pose
+  // setting anchor relative to gazebo child link frame position
   if (this->childLink)
     this->anchorPos = (_pose + this->childLink->GetWorldPose()).pos;
+  // otherwise set anchor relative to world frame
   else
-    this->anchorPos = math::Vector3(0, 0, 0);
+    this->anchorPos = _pose.pos;
 }
 
 //////////////////////////////////////////////////
@@ -363,6 +368,21 @@ math::Angle Joint::GetAngle(int _index) const
     return this->staticAngle;
   else
     return this->GetAngleImpl(_index);
+}
+
+//////////////////////////////////////////////////
+void Joint::SetAxis(int _index, const math::Vector3 &_axis)
+{
+  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+  if (_index == 0)
+    this->sdf->GetElement("axis")->GetElement("xyz")->Set(_axis);
+  else if (_index == 1)
+    this->sdf->GetElement("axis2")->GetElement("xyz")->Set(_axis);
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to set axis\n";
+  }
 }
 
 //////////////////////////////////////////////////
