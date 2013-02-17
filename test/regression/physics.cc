@@ -540,16 +540,16 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   modelNames.push_back("pendulum_315deg");
 
   // Global axis
-  double sqrt2 = sqrt(2.0);
+  double sqrt1_2 = sqrt(2.0) / 2.0;
   std::vector<math::Vector3> globalAxes;
   globalAxes.push_back(math::Vector3(1, 0, 0));
-  globalAxes.push_back(math::Vector3(sqrt2, sqrt2, 0));
+  globalAxes.push_back(math::Vector3(sqrt1_2, sqrt1_2, 0));
   globalAxes.push_back(math::Vector3(0, 1, 0));
-  globalAxes.push_back(math::Vector3(-sqrt2, sqrt2, 0));
+  globalAxes.push_back(math::Vector3(-sqrt1_2, sqrt1_2, 0));
   globalAxes.push_back(math::Vector3(-1, 0, 0));
-  globalAxes.push_back(math::Vector3(-sqrt2, -sqrt2, 0));
+  globalAxes.push_back(math::Vector3(-sqrt1_2, -sqrt1_2, 0));
   globalAxes.push_back(math::Vector3(0, -1, 0));
-  globalAxes.push_back(math::Vector3(sqrt2, -sqrt2, 0));
+  globalAxes.push_back(math::Vector3(sqrt1_2, -sqrt1_2, 0));
 
   // Link names
   std::vector<std::string> linkNames;
@@ -564,9 +564,10 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   physics::ModelPtr model;
   physics::LinkPtr link;
   std::vector<std::string>::iterator modelIter;
+  physics::JointPtr joint;
 
   // Check global axes before simulation starts
-  std::vector<math::Vector3>::Iterator axisIter;
+  std::vector<math::Vector3>::iterator axisIter;
   axisIter = globalAxes.begin();
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
@@ -582,7 +583,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         joint = model->GetJoint(*jointIter);
         if (joint)
         {
-          math::Vector3 axis = joint->GetGlobalAxis();
+          math::Vector3 axis = joint->GetGlobalAxis(0);
           EXPECT_NEAR(axis.x, (*axisIter).x, PHYSICS_TOL);
           EXPECT_NEAR(axis.y, (*axisIter).y, PHYSICS_TOL);
           EXPECT_NEAR(axis.z, (*axisIter).z, PHYSICS_TOL);
@@ -664,7 +665,6 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
 
   // Reset the world, and impose joint limits
   world->Reset();
-  physics::JointPtr joint;
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
