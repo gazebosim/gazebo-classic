@@ -74,6 +74,11 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 
   this->parentLink = _parent;
   this->childLink = _child;
+
+  // Joint is loaded without sdf from a model
+  // Initialize this->sdf so it can be used for data storage
+  sdf::initFile("joint.sdf", this->sdf);
+
   this->LoadImpl(_pose);
 }
 
@@ -376,11 +381,15 @@ void Joint::SetHighStop(int _index, const math::Angle &_angle)
 {
   GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   if (_index == 0)
+  {
     this->sdf->GetElement("axis")->GetElement("limit")
              ->GetElement("upper")->Set(_angle.Radian());
+  }
   else if (_index == 1)
+  {
     this->sdf->GetElement("axis2")->GetElement("limit")
              ->GetElement("upper")->Set(_angle.Radian());
+  }
   else
   {
     gzerr << "Invalid joint index [" << _index
@@ -393,11 +402,15 @@ void Joint::SetLowStop(int _index, const math::Angle &_angle)
 {
   GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   if (_index == 0)
+  {
     this->sdf->GetElement("axis")->GetElement("limit")
              ->GetElement("lower")->Set(_angle.Radian());
+  }
   else if (_index == 1)
+  {
     this->sdf->GetElement("axis2")->GetElement("limit")
              ->GetElement("lower")->Set(_angle.Radian());
+  }
   else
   {
     gzerr << "Invalid joint index [" << _index

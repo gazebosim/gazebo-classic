@@ -60,8 +60,7 @@ void BulletHingeJoint::Init()
   BulletLinkPtr bulletParentLink =
     boost::shared_static_cast<BulletLink>(this->parentLink);
 
-  // Get axis from sdf (expressed in world frame).
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+  // Get axis unit vector (expressed in world frame).
   math::Vector3 axis = this->initialWorldAxis;
   if (axis == math::Vector3::Zero)
   {
@@ -138,6 +137,9 @@ void BulletHingeJoint::Init()
     gzthrow("joint without links\n");
   }
 
+  if (!this->bulletHinge)
+    gzthrow("memory allocation error\n");
+
   // Give parent class BulletJoint a pointer to this constraint.
   this->constraint = this->bulletHinge;
 
@@ -147,6 +149,7 @@ void BulletHingeJoint::Init()
 
   // Apply joint angle limits here.
   // TODO: velocity and effort limits.
+  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   sdf::ElementPtr limitElem;
   limitElem = this->sdf->GetElement("axis")->GetElement("limit");
   this->bulletHinge->setLimit(
