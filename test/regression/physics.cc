@@ -539,6 +539,18 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   modelNames.push_back("pendulum_270deg");
   modelNames.push_back("pendulum_315deg");
 
+  // Global axis
+  double sqrt2 = sqrt(2.0);
+  std::vector<math::Vector3> globalAxes;
+  globalAxes.push_back(math::Vector3(1, 0, 0));
+  globalAxes.push_back(math::Vector3(sqrt2, sqrt2, 0));
+  globalAxes.push_back(math::Vector3(0, 1, 0));
+  globalAxes.push_back(math::Vector3(-sqrt2, sqrt2, 0));
+  globalAxes.push_back(math::Vector3(-1, 0, 0));
+  globalAxes.push_back(math::Vector3(-sqrt2, -sqrt2, 0));
+  globalAxes.push_back(math::Vector3(0, -1, 0));
+  globalAxes.push_back(math::Vector3(sqrt2, -sqrt2, 0));
+
   // Link names
   std::vector<std::string> linkNames;
   linkNames.push_back("lower_link");
@@ -549,6 +561,48 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   jointNames.push_back("lower_joint");
   jointNames.push_back("upper_joint");
 
+  physics::ModelPtr model;
+  physics::LinkPtr link;
+  std::vector<std::string>::iterator modelIter;
+
+  // Check global axes before simulation starts
+  std::vector<math::Vector3>::Iterator axisIter;
+  axisIter = globalAxes.begin();
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check global axes of model " << *modelIter << '\n';
+      std::vector<std::string>::iterator jointIter;
+      for (jointIter  = jointNames.begin();
+           jointIter != jointNames.end(); ++jointIter)
+      {
+        joint = model->GetJoint(*jointIter);
+        if (joint)
+        {
+          math::Vector3 axis = joint->GetGlobalAxis();
+          EXPECT_NEAR(axis.x, (*axisIter).x, PHYSICS_TOL);
+          EXPECT_NEAR(axis.y, (*axisIter).y, PHYSICS_TOL);
+          EXPECT_NEAR(axis.z, (*axisIter).z, PHYSICS_TOL);
+        }
+        else
+        {
+          gzerr << "Error loading joint " << *jointIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(joint != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+    ++axisIter;
+  }
+
   // Step forward 0.75 seconds
   double dt = physics->GetStepTime();
   EXPECT_GT(dt, 0);
@@ -556,9 +610,6 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   world->StepWorld(steps);
 
   // Get global angular velocity of each link
-  physics::ModelPtr model;
-  physics::LinkPtr link;
-  std::vector<std::string>::iterator modelIter;
   math::Vector3 angVel;
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
