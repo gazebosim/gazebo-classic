@@ -137,17 +137,19 @@ macro (gz_setup_apple)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
 endmacro()
 
+# This should be migrated to more fine control solution based on set_property APPEND
+# directories. It's present on cmake 2.8.8 while precise version is 2.8.7  
+link_directories(${PROJECT_BINARY_DIR}/test)
+include_directories("${PROJECT_SOURCE_DIR}/test/gtest/include")
 #################################################
+# Hack: extra sources to build binaries can be supplied to gz_build_tests in the variable
+#       GZ_BUILD_TESTS_EXTRA_EXE_SRCS. This variable will be clean up at the end of the function
 macro (gz_build_tests)
 
   # Build all the tests
   foreach(GTEST_SOURCE_file ${ARGN})
     string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
-    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file})
-
-    # This should be migrated to more fine control solution based on set_property APPEND
-    # directories. It's present on cmake 2.8.8 while precise version is 2.8.7  
-    include_directories("${PROJECT_SOURCE_DIR}/test/gtest/include")
+    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
     add_dependencies(${BINARY_NAME}
       gtest gtest_main
@@ -185,6 +187,7 @@ macro (gz_build_tests)
              ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
   endforeach()
 
+  set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS,"")
 endmacro()
 
 #################################################
