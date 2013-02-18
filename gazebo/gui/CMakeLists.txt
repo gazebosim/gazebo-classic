@@ -75,11 +75,11 @@ set (headers
   viewers/ViewFactory.hh
 )
 
-set (display_tests 
+set (qt_tests 
   TimePanel_TEST.cc
   )
 
-gz_build_display_tests(${display_tests})
+gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 
