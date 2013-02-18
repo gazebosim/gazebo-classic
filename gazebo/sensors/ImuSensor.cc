@@ -28,6 +28,7 @@
 
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/ImuSensor.hh"
@@ -91,6 +92,8 @@ void ImuSensor::Load(const std::string &_worldName)
   this->referencePose = this->pose + this->parentEntity->GetWorldPose();
   this->lastLinearVel = this->referencePose.rot.RotateVector(
     this->parentEntity->GetWorldLinearVel());
+
+  this->gravity = this->world->GetPhysicsEngine()->GetGravity();
 }
 
 //////////////////////////////////////////////////
@@ -162,6 +165,9 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
       (imuWorldLinearVel - this->lastLinearVel) / dt);
     this->lastLinearVel = imuWorldLinearVel;
   }
+
+  // Add contribution from gravity
+  this->linearAcc += imuPose.rot.GetInverse().RotateVector(this->gravity);
 
   msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
 

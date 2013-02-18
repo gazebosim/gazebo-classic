@@ -81,6 +81,9 @@ namespace gazebo
       /// \brief Imu linear acceleration
       private: math::Vector3 linearAcc;
 
+      /// \brief store gravity vector to be added to the imu output.
+      private: math::Vector3 gravity;
+
       private: transport::PublisherPtr pub;
       private: physics::LinkPtr parentEntity;
       private: msgs::IMU imuMsg;
