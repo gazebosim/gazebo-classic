@@ -229,8 +229,13 @@ void BulletHingeJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 //////////////////////////////////////////////////
 double BulletHingeJoint::GetVelocity(int /*_index*/) const
 {
-  gzerr << "Not implemented...\n";
-  return 0;
+  double result = 0;
+  math::Vector3 globalAxis = this->GetGlobalAxis(0);
+  if (this->childLink)
+    result += globalAxis.Dot(this->childLink->GetWorldAngularVel());
+  if (this->parentLink)
+    result -= globalAxis.Dot(this->parentLink->GetWorldAngularVel());
+  return result;
 }
 
 //////////////////////////////////////////////////

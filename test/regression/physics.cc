@@ -705,7 +705,8 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     model = world->GetModel(*modelIter);
     if (model)
     {
-      gzdbg << "Check angle limits on joints of of model " << *modelIter << '\n';
+      gzdbg << "Check angle limits and velocity of joints of model "
+            << *modelIter << '\n';
       std::vector<std::string>::iterator jointIter;
       for (jointIter  = jointNames.begin();
            jointIter != jointNames.end(); ++jointIter)
@@ -720,6 +721,15 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           gzerr << "Error loading joint " << *jointIter
                 << " of model " << *modelIter << '\n';
           EXPECT_TRUE(joint != NULL);
+
+          // Expect joint velocity to be near angular velocity difference
+          // of child and parent, along global axis
+          // jointVel == DOT(angVelChild - angVelParent, axis)
+          double jointVel = joint->GetVelocity(0);
+          math::Vector3 axis = joint->GetGlobalAxis(0);
+          angVel  = joint->GetChild()->GetWorldAngularVel();
+          angVel -= joint->GetParent()->GetWorldAngularVel();
+          EXPECT_NEAR(jointVel, axis.Dot(angVel), PHYSICS_TOL);
         }
       }
     }
