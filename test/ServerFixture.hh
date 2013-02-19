@@ -110,13 +110,19 @@ class ServerFixture : public testing::Test
 
   protected: virtual void Load(const std::string &_worldFilename, bool _paused)
              {
+               this->Load(_worldFilename, _paused, "");
+             }
+
+  protected: virtual void Load(const std::string &_worldFilename,
+                               bool _paused, const std::string &_physics)
+             {
                delete this->server;
                this->server = NULL;
 
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
                   boost::bind(&ServerFixture::RunServer, this, _worldFilename,
-                              _paused));
+                              _paused, _physics));
 
                // Wait for the server to come up
                // Use a 30 second timeout.
@@ -129,12 +135,13 @@ class ServerFixture : public testing::Test
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
                this->poseSub = this->node->Subscribe("~/pose/info",
-                   &ServerFixture::OnPose, this);
+                   &ServerFixture::OnPose, this, true);
                this->statsSub = this->node->Subscribe("~/world_stats",
                    &ServerFixture::OnStats, this);
 
                this->factoryPub =
                  this->node->Advertise<msgs::Factory>("~/factory");
+               this->factoryPub->WaitForConnection();
 
                // Wait for the world to reach the correct pause state.
                // This might not work properly with multiple worlds.
@@ -146,17 +153,42 @@ class ServerFixture : public testing::Test
                       ++waitCount < maxWaitCount)
                  common::Time::MSleep(10);
                ASSERT_LT(waitCount, maxWaitCount);
+
              }
 
   protected: void RunServer(const std::string &_worldFilename)
              {
-               this->RunServer(_worldFilename, false);
+               this->RunServer(_worldFilename, false, "");
              }
 
-  protected: void RunServer(const std::string &_worldFilename, bool _paused)
+  protected: rendering::ScenePtr GetScene(
+                 const std::string &_sceneName = "default")
+             {
+               // Wait for the scene to get loaded.
+               int i = 0;
+               while (rendering::get_scene(_sceneName) == NULL && i < 20)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+
+               if (i >= 20)
+                 gzerr << "Unable to load the rendering scene.\n"
+                   << "Test will fail";
+
+               EXPECT_LT(i, 20);
+               return rendering::get_scene(_sceneName);
+             }
+
+  protected: void RunServer(const std::string &_worldFilename, bool _paused,
+                            const std::string &_physics)
              {
                ASSERT_NO_THROW(this->server = new Server());
-               ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
+               if (_physics.length())
+                 ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
+                                                        _physics));
+               else
+                 ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
 
                rendering::create_scene(
@@ -422,9 +454,14 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
+               int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName))
-                 common::Time::MSleep(10);
+               while (!this->HasEntity(_modelName) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
              }
 
   protected: void SpawnCylinder(const std::string &_name,
@@ -587,6 +624,34 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(10);
              }
 
+  protected: void SpawnEmptyLink(const std::string &_name,
+                 const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<pose>" << _pos.x << " "
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
+                 << "<link name ='body'>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name))
+                 common::Time::MSleep(10);
+             }
+
   protected: void SpawnModel(const std::string &_filename)
              {
                msgs::Factory msg;
@@ -596,6 +661,10 @@ class ServerFixture : public testing::Test
 
   protected: void SpawnSDF(const std::string &_sdf)
              {
+               // Wait for the first pose message
+               while (this->poses.size() == 0)
+                 common::Time::MSleep(10);
+
                msgs::Factory msg;
                msg.set_sdf(_sdf);
                this->factoryPub->Publish(msg);

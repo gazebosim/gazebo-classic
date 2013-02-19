@@ -74,6 +74,10 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
+      public: virtual std::string GetType() const
+                      { return "bullet"; }
+
+      // Documentation inherited
       public: virtual void SetStepTime(double _value);
 
       // Documentation inherited
@@ -119,6 +123,9 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual double GetWorldCFM();
+
+      // Documentation inherited
+      public: virtual void SetSeed(uint32_t _seed);
 
       /// \brief Register a joint with the dynamics world
       public: btDynamicsWorld *GetDynamicsWorld() const
