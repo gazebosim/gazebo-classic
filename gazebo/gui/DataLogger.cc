@@ -327,23 +327,22 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
       // Get the size of the log file.
       stream << std::fixed << std::setprecision(2) << _msg->log_file().size();
 
+
       // Get the size units.
-      if (_msg->log_file().size_units() == msgs::LogStatus::LogFile::BYTES)
+      switch(_msg->log_file().size_units())
       {
-        stream << "B";
+        case msgs::LogStatus::LogFile::BYTES:
+          stream << "B";
+        case msgs::LogStatus::LogFile::K_BYTES:
+          stream << "KB";
+          break;
+        case msgs::LogStatus::LogFile::M_BYTES:
+          stream << "MB";
+          break;
+        default:
+          stream << "GB";
+          break;
       }
-      else if (_msg->log_file().size_units() ==
-          msgs::LogStatus::LogFile::K_BYTES)
-      {
-        stream << "KB";
-      }
-      else if (_msg->log_file().size_units() ==
-          msgs::LogStatus::LogFile::M_BYTES)
-      {
-        stream << "MB";
-      }
-      else
-        stream << "GB";
 
       this->SetSize(QString::fromStdString(stream.str()));
     }
