@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <signal.h>
 #include <google/protobuf/message.h>
 
 #include "transport/Transport.hh"
@@ -28,6 +29,9 @@
 using namespace gazebo;
 
 std::list<common::Time> simTimes, realTimes;
+
+boost::mutex mutex;
+boost::condition_variable condition;
 
 /////////////////////////////////////////////////
 void help()
@@ -86,11 +90,26 @@ void cb(ConstWorldStatisticsPtr &_msg)
 
   printf("Factor[%4.2f] SimTime[%4.2f] RealTime[%4.2f] Paused[%c]\n",
       percent, simTime.Double(), realTime.Double(), paused);
+  fflush(stdout);
+}
+
+//////////////////////////////////////////////////
+void SignalHandler(int /*dummy*/)
+{
+  boost::mutex::scoped_lock lock(mutex);
+  condition.notify_all();
+  return;
 }
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
+  if (signal(SIGINT, SignalHandler) == SIG_ERR)
+  {
+    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
+    return -1;
+  }
+
   std::string worldName = "default";
   if (argc > 1)
     worldName = argv[1];
@@ -112,8 +131,10 @@ int main(int argc, char **argv)
   transport::SubscriberPtr sub = node->Subscribe(topic, cb);
   transport::run();
 
-  while (true)
-    common::Time::MSleep(10);
+  boost::mutex::scoped_lock lock(mutex);
+  condition.wait(lock);
 
   transport::fini();
+
+  return 0;
 }
