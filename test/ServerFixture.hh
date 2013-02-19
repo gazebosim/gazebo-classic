@@ -624,6 +624,47 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(10);
              }
 
+  protected: void SpawnTrimesh(const std::string &_name,
+                 const std::string &_modelPath, const math::Vector3 &_scale,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<pose>" << _pos.x << " "
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <collision name ='geom'>"
+                 << "    <geometry>"
+                 << "      <mesh>"
+                 << "        <uri>" << _modelPath << "</uri>"
+                 << "        <scale>" << _scale << "</scale>"
+                 << "      </mesh>"
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << "      <mesh><uri>" << _modelPath << "</uri></mesh>"
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name))
+                 common::Time::MSleep(10);
+             }
+
   protected: void SpawnEmptyLink(const std::string &_name,
                  const math::Vector3 &_pos,
                  const math::Vector3 &_rpy)
