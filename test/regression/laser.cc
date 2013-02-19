@@ -137,7 +137,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
 
     DoubleCompare(plane_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
     EXPECT_LT(diffMax, 2e-6);
-    EXPECT_LT(diffSum, 1e-5);
+    EXPECT_LT(diffSum, 1e-4);
     EXPECT_LT(diffAvg, 2e-6);
 
     // This line will print the current scan. Use this to generate
