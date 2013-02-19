@@ -36,6 +36,8 @@ std::string Time::wallTimeISO;
 
 struct timespec Time::clockResolution;
 
+const Time Time::Zero = common::Time(0, 0);
+
 /////////////////////////////////////////////////
 Time::Time()
 {

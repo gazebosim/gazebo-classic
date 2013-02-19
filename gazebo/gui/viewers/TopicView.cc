@@ -29,7 +29,7 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
-                     const std::string &_viewType)
+                     const std::string &_viewType, unsigned int _displayPeriod)
 : QDialog(_parent), msgTypeName(_msgTypeName)
 {
   this->node = transport::NodePtr(new transport::Node());
@@ -89,7 +89,9 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   this->layout()->setContentsMargins(8, 8, 8, 10);
   this->setSizeGripEnabled(true);
 
-  QTimer::singleShot(500, this, SLOT(Update()));
+  QTimer *displayTimer = new QTimer(this);
+  connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
+  displayTimer->start(_displayPeriod);
 
   this->setWindowFlags(Qt::Window);
 }
@@ -108,58 +110,62 @@ void TopicView::Update()
   // Update the child class.
   this->UpdateImpl();
 
-  // Update the Hz output
+  common::Time currTime = common::Time::GetWallTime();
+
+  if (currTime - this->prevDisplayTime >= common::Time(0, 500000000))
   {
-    common::Time avg;
-    for (std::list<common::Time>::iterator iter = this->dataTimes.begin();
-         iter != this->dataTimes.end(); ++iter)
+    // Update the Hz output
     {
-      avg += (*iter);
+      common::Time avg;
+      for (std::list<common::Time>::iterator iter = this->dataTimes.begin();
+          iter != this->dataTimes.end(); ++iter)
+      {
+        avg += (*iter);
+      }
+
+      double avgDbl = 0;
+      if (this->dataTimes.size() != 0)
+        avgDbl = 1.0 / (avg.Double() / this->dataTimes.size());
+
+      std::ostringstream stream;
+      stream << std::fixed << std::setprecision(2) << avgDbl;
+      this->hzEdit->setText(tr(stream.str().c_str()));
     }
 
-    double avgDbl = 0;
-    if (this->dataTimes.size() != 0)
-      avgDbl = 1.0 / (avg.Double() / this->dataTimes.size());
-
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(2) << avgDbl;
-    this->hzEdit->setText(tr(stream.str().c_str()));
-  }
-
-  // Update the Bandwidth output
-  {
-    std::ostringstream stream;
-
-    // Sum up the byte information
-    int sumBytes = 0;
-    for (std::list<int>::iterator iter = this->msgSizes.begin();
-        iter != this->msgSizes.end(); ++iter)
+    // Update the Bandwidth output
     {
-      sumBytes += *iter;
+      std::ostringstream stream;
+
+      // Sum up the byte information
+      int sumBytes = 0;
+      for (std::list<int>::iterator iter = this->msgSizes.begin();
+          iter != this->msgSizes.end(); ++iter)
+      {
+        sumBytes += *iter;
+      }
+
+      // Compute the bandwidth
+      common::Time dt = this->times.back() - this->times.front();
+      double bandwidth = 0;
+
+      if (dt != common::Time(0, 0))
+        bandwidth = sumBytes / dt.Double();
+
+      // Format the bandwidth output
+      stream << std::fixed << std::setprecision(2);
+
+      if (bandwidth < 1000)
+        stream << bandwidth << " B/s";
+      else if (bandwidth < 1000000)
+        stream << bandwidth / 1024.0f << " KB/s";
+      else
+        stream << bandwidth/1.049e6 << " MB/s";
+
+      this->bandwidthEdit->setText(tr(stream.str().c_str()));
     }
 
-    // Compute the bandwidth
-    common::Time dt = this->times.back() - this->times.front();
-    double bandwidth = 0;
-
-    if (dt != common::Time(0, 0))
-      bandwidth = sumBytes / dt.Double();
-
-    // Format the bandwidth output
-    stream << std::fixed << std::setprecision(2);
-
-    if (bandwidth < 1000)
-      stream << bandwidth << " B/s";
-    else if (bandwidth < 1000000)
-      stream << bandwidth / 1024.0f << " KB/s";
-    else
-      stream << bandwidth/1.049e6 << " MB/s";
-
-    this->bandwidthEdit->setText(tr(stream.str().c_str()));
+    this->prevDisplayTime = currTime;
   }
-
-  // Set the timer to update again.
-  QTimer::singleShot(500, this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
@@ -169,7 +175,6 @@ void TopicView::OnMsg(const common::Time &_dataTime, int _size)
   if (_dataTime != this->prevTime)
   {
     this->dataTimes.push_back(_dataTime - this->prevTime);
-    // std::cout << 1.0 / (_dataTime - this->prevTime).Double() << "\n";
     if (this->dataTimes.size() > 10)
       this->dataTimes.pop_front();
   }

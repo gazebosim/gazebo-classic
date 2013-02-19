@@ -20,6 +20,7 @@
  * Date: 18 Dec 2009
  */
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Time.hh"
 
 #include "gazebo/physics/Physics.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -409,7 +410,7 @@ void SensorManager::SensorContainer::RunLoop()
 
   engine->InitForThread();
 
-  common::Time sleepTime, startTime, diffTime;
+  common::Time sleepTime, startTime, eventTime;
   double maxUpdateRate = GZ_DBL_MIN;
 
   boost::mutex tmpMutex;
@@ -447,13 +448,16 @@ void SensorManager::SensorContainer::RunLoop()
     this->Update(false);
 
     // Compute the time it took to update the sensors.
-    diffTime = world->GetSimTime() - startTime;
+    eventTime = sleepTime - (world->GetSimTime() - startTime);
 
-    // Add an event to trigger when the appropriate simulation time has been
-    // reached.
-    SimTimeEventHandler::Instance()->AddRelativeEvent(sleepTime - diffTime,
-                                                      &this->runCondition);
-    this->runCondition.wait(lock2);
+    if (eventTime > common::Time::Zero)
+    {
+      // Add an event to trigger when the appropriate simulation time has been
+      // reached.
+      SimTimeEventHandler::Instance()->AddRelativeEvent(eventTime,
+          &this->runCondition);
+      this->runCondition.wait(lock2);
+    }
   }
 }
 

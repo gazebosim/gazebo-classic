@@ -41,6 +41,9 @@ namespace gazebo
     ///        stored as sec and nano-sec.
     class Time
     {
+      /// \brief A static zero time variable set to common::Time(0, 0).
+      public: static const Time Zero;
+
       /// \brief Constructors
       public: Time();
 

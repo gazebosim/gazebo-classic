@@ -31,7 +31,7 @@ GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.LaserScanStamped", LaserView)
 
 /////////////////////////////////////////////////
 LaserView::LaserView(QWidget *_parent)
-: TopicView(_parent, "gazebo.msgs.LaserScanStamped", "laser")
+: TopicView(_parent, "gazebo.msgs.LaserScanStamped", "laser", 33)
 {
   this->setWindowTitle(tr("Gazebo: Laser View"));
 
