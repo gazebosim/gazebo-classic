@@ -16,6 +16,7 @@
 */
 #include <signal.h>
 #include <google/protobuf/message.h>
+#include <boost/thread.hpp>
 
 #include "transport/Transport.hh"
 #include "transport/TransportTypes.hh"
