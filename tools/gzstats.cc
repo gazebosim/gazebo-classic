@@ -67,7 +67,7 @@ void cb(ConstWorldStatisticsPtr &_msg)
     ++realIter;
   }
 
-  // Prevernt divide by zero
+  // Prevent divide by zero
   if (realAvg <= 0)
     return;
 
