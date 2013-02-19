@@ -37,6 +37,24 @@ set (headers
   RotationSpline.hh
 )
 
+set (gtest_sources
+  Angle_TEST.cc
+  Box_TEST.cc
+  Matrix3_TEST.cc
+  Plane_TEST.cc
+  Pose_TEST.cc
+  Quaternion_TEST.cc
+  Rand_TEST.cc
+  Vector2d_TEST.cc
+  Vector2i_TEST.cc
+  Vector3_TEST.cc
+  Vector4_TEST.cc
+  Helpers_TEST.cc
+  Spline_TEST.cc
+  RotationSpline_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+
 set (math_headers "" CACHE INTERNAL "transport headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(math_headers
