@@ -3,7 +3,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 set (sources
   Angle.cc
   Box.cc
-  Helpes.cc
+  Helpers.cc
   Matrix3.cc
   Matrix4.cc
   Plane.cc
