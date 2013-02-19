@@ -500,6 +500,7 @@ void World::Update()
     for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
         iter != this->dirtyPoses.end(); ++iter)
     {
+      gzerr << "test [" << (*iter)->GetDirtyPose() << "]\n";
       (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
     }
 

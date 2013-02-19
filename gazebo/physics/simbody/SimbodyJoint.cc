@@ -34,6 +34,8 @@ SimbodyJoint::SimbodyJoint(BasePtr _parent)
   : Joint(_parent)
 {
   this->world = NULL;
+  this->isReversed = false;
+  this->mustBreakLoopHere = false;
 }
 
 //////////////////////////////////////////////////
@@ -46,6 +48,70 @@ SimbodyJoint::~SimbodyJoint()
 void SimbodyJoint::Load(sdf::ElementPtr _sdf)
 {
   Joint::Load(_sdf);
+
+  // read must_be_loop_joint
+  // \TODO: clean up
+  if (_sdf->HasElement("physics") &&
+    _sdf->GetElement("physics")->HasElement("simbody"))
+    this->mustBreakLoopHere = _sdf->GetElement("physics")->
+      GetElement("simbody")->GetValueBool("must_be_loop_joint");
+
+  // Read old style
+  //    <pose>pose on child</pose>
+  // or new style
+
+  // to support alternative unassembled joint pose specification
+  // check if the new style of pose specification exists
+  //    <parent>
+  //      <link>parentName</link>
+  //      <pose>parentPose</pose>
+  //    </parent>
+  // as compared to old style
+  //    <parent>parentName</parent>
+  //
+  // \TODO: consider storing the unassembled format parent pose when
+  // calling Joint::Load(sdf::ElementPtr)
+
+  math::Pose childPose = _sdf->GetValuePose("pose");
+  if (_sdf->GetElement("child")->HasElement("pose"))
+    childPose = _sdf->GetElement("child")->GetValuePose("pose");
+
+  this->X_CB = physics::SimbodyPhysics::Pose2Transform(childPose);
+
+  math::Pose parentPose;
+  if (_sdf->GetElement("parent")->HasElement("pose"))
+    this->X_PA = physics::SimbodyPhysics::GetPose(_sdf->GetElement("parent"));
+  else
+  {
+    const SimTK::Transform X_MC, X_MP, X_PC;
+    if (this->parentLink)
+    {
+      X_MP = physics::SimbodyPhysics::Pose2Transform(
+        this->parentLink->GetRelativePose());
+    }
+    else
+    {
+      // TODO: verify
+      // parent frame is at the world frame
+      X_MP = ~physics::SimbodyPhysics::Pose2Transform(
+        this->GetParentModel()->GetWorldPose());
+    }
+
+    if (this->childLink)
+    {
+      X_MC = physics::SimbodyPhysics::Pose2Transform(
+        this->childLink->GetRelativePose());
+    }
+    else
+    {
+      // TODO: verify
+      X_MC = ~physics::SimbodyPhysics::Pose2Transform(
+        this->GetParentModel()->GetWorldPose());
+    }
+
+    const Transform X_PC = ~X_MP*X_MC;
+    this->X_PA = X_PC*this->X_CB; // i.e., A spatially coincident with B 
+  }
 }
 
 //////////////////////////////////////////////////

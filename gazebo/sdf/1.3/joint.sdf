@@ -12,10 +12,16 @@
 
   <element name="parent" type="string" default="__default__" required="1">
     <description>Name of the parent link</description>
+    <element name="pose" type="Pose" default="0 0 0 0 0 0" required="0">
+      <description>Experimental:  alternative joint pose specification.</description>
+    </element>
   </element> <!-- End Parent -->
 
   <element name="child" type="string" default="__default__" required="1">
     <description>Name of the child link</description>
+    <element name="pose" type="Pose" default="0 0 0 0 0 0" required="0">
+      <description>Experimental:  alternative joint pose specification.</description>
+    </element>
   </element> <!-- End Child -->
 
   <element name="pose"  type="pose" default="0 0 0 0 0 0" required="0">
@@ -91,6 +97,12 @@
 
   <element name="physics" required="0">
     <description>Parameters that are specific to a certain physics engine.</description>
+    <element name="simbody" required="0">
+      <description>Simbody specific parameters</description>
+      <element name="must_be_loop_joint" type="bool" default="0" required="0">
+        <description>Force cut in the multibody graph at this joint.</description>
+      </element>
+    </element>
     <element name="ode" required="0">
       <description>ODE specific parameters</description>
       <element name="provide_feedback" type="bool" default="0" required="0">

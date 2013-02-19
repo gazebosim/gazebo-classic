@@ -36,6 +36,7 @@ using namespace physics;
 SimbodyLink::SimbodyLink(EntityPtr _parent)
     : Link(_parent)
 {
+  this->mustBeBaseLink = false;
 }
 
 //////////////////////////////////////////////////
@@ -51,6 +52,9 @@ void SimbodyLink::Load(sdf::ElementPtr _sdf)
 
   if (this->simbodyPhysics == NULL)
     gzthrow("Not using the simbody physics engine");
+
+  if (_sdf->HasElement("must_be_base_link"))
+    this->mustBeBaseLink = _sdf->GetValueBool("must_be_base_link");
 
   Link::Load(_sdf);
 }
@@ -249,3 +253,37 @@ void SimbodyLink::AddRelativeTorque(const math::Vector3 &/*_torque*/)
 void SimbodyLink::SetAutoDisable(bool /*_disable*/)
 {
 }
+
+/////////////////////////////////////////////////
+SimTK::MassProperties SimbodyLink::getMassProperties() const
+{
+  if (!this->IsStatic())
+  {
+    const SimTK::Real mass = this->inertial->GetMass();
+    Transform X_LI = physics::SimbodyPhysics::Pose2Transform(
+      this->inertial->GetPose());
+    const Vec3 &com_L = X_LI.p(); // vector from Lo to com, exp. in L
+    Xml::Element inertia = inertial.getOptionalElement("inertia");
+    if (mass==0 || !inertia.isValid())
+        return MassProperties(mass,com_L,UnitInertia(1,1,1));
+    // Get mass-weighted central inertia, expressed in I frame.
+    SimTK::Inertia Ic_I(this->inertial->GetIXX(),
+                 this->inertial->GetIYY(),
+                 this->inertial->GetIZZ(),
+                 this->inertial->GetIXY(),
+                 this->inertial->GetIXZ(),
+                 this->inertial->GetIYZ());
+    // Re-express the central inertia from the I frame to the L frame.
+    SimTK::Inertia Ic_L = Ic_I.reexpress(~X_LI.R()); // Ic_L=R_LI*Ic_I*R_IL
+    // Shift to L frame origin.
+    SimTK::Inertia Io_L = Ic_L.shiftFromMassCenter(-com_L, mass);
+    return MassProperties(mass, com_L, Io_L); // converts to unit inertia
+  }
+  else
+  {
+    gzerr << "inertial block no specified, using unit mass properties\n";
+    return MassProperties(1,Vec3(0),UnitInertia(1,1,1));
+  }
+    
+}
+

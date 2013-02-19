@@ -81,9 +81,33 @@ void Joint::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string parentName = _sdf->GetValueString("parent");
-  std::string childName = _sdf->GetValueString("child");
+  // check if the new style of pose specification exists
+  //    <child>
+  //      <link>childName</link>
+  //      <pose>childPose</pose>
+  //    </child>
+  // as compared to old style
+  //    <child>childName</child>
+  std::string parentName, childName;
+  // Read old-style child pose if there is one.
+  math::Pose childPose = _sdf->GetValuePose("pose");
 
+  if (_sdf->GetElement("parent")->HasElement("link"))
+  {
+    parentName = _sdf->GetElement("parent")->GetValueString("link");
+  }
+  else
+    parentName = _sdf->GetValueString("parent");
+
+  if (_sdf->GetElement("child")->HasElement("link"))
+  {
+    sdf::ElementPtr childElement = _sdf->GetElement("child");
+    childName = childElement->GetValueString("link");
+    childPose = childElement->GetValuePose("pose");
+  }
+  else
+    childName = _sdf->GetValueString("child");
+  
   if (this->model)
   {
     this->childLink = this->model->GetLink(childName);
@@ -104,7 +128,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  this->LoadImpl(_sdf->GetValuePose("pose"));
+  this->LoadImpl(childPose);
 }
 
 /////////////////////////////////////////////////

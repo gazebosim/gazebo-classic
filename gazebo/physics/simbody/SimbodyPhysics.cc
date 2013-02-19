@@ -77,7 +77,8 @@ bool ContactProcessed()
 
 //////////////////////////////////////////////////
 SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
-    : PhysicsEngine(_world), system(), matter(system), forces(system), integ(NULL)
+    : PhysicsEngine(_world), system(), matter(system), forces(system),
+      tracker(system), contact(system, tracker),  integ(NULL)
 {
   // Instantiate the Multibody System
   // Instantiate the Simbody Matter Subsystem
@@ -109,14 +110,31 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 
 
   // set gravity
-  SimTK::Force::UniformGravity(this->forces, this->matter, SimTK::Vec3(g.x, g.y, g.z));
-
-
+  SimTK::Force::UniformGravity(this->forces, this->matter,
+    SimTK::Vec3(g.x, g.y, g.z));
 }
 
 //////////////////////////////////////////////////
 void SimbodyPhysics::Init()
 {
+  try {
+    //----------------------- GENERATE MULTIBODY GRAPH -------------------------
+    MultibodyGraphMaker mbgraph;
+    createMultibodyGraph(mbgraph);
+    // Optional: dump the graph to stdout for debugging or curiosity.
+    mbgraph.dumpGraph(gzdbg);
+
+    //------------------------ CREATE SIMBODY SYSTEM ---------------------------
+    // Create a Simbody System and populate it with Subsystems we'll need.
+    SimbbodyPhysics::BuildSimbodySystem(mbgraph, this->GetGravity(),
+                       this->system, this->matter, this->forces, this->contact);
+
+  } catch (const std::exception& e) {
+      cout << "Simbody build EXCEPTION: " << e.what() << "\n";
+      return 1;
+  }
+
+
   // add pendulum body
   // default pin joint has axis in the +z direction,
   // rotate to get pin in x direction
@@ -165,8 +183,16 @@ void SimbodyPhysics::UpdatePhysics()
 
   ModelPtr model = this->world->GetModel("model1");
   LinkPtr link = model->GetLink("link1");
+
   JointPtr joint = model->GetJoint("model1::joint1");
   joint->SetAngle(0, s.getQ()[0]);
+
+  link->SetWorldPose(math::Pose(
+    math::Vector3(0, 0, s.getQ()[0]),
+    math::Quaternion(0, 0, 0)));
+  // set link pose
+  this->world->dirtyPoses.push_back(
+    boost::shared_static_cast<physics::Entity>(link).get());
 
   this->lastUpdateTime = currTime;
 }
@@ -296,5 +322,366 @@ void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 void SimbodyPhysics::DebugPrint() const
 {
 }
+
+//////////////////////////////////////////////////
+//==============================================================================
+//                           CREATE MULTIBODY GRAPH
+//==============================================================================
+// Define Gazebo joint types, then use links and joints in the given model
+// to construct a reasonable spanning-tree-plus-constraints multibody graph
+// to represent that model. An exception will be thrown if this fails.
+// Note that this step is not Simbody dependent.
+void SimbodyPhysics::CreateMultibodyGraph(MultibodyGraphMaker&   mbgraph)
+{
+  // Step 1: Tell MultibodyGraphMaker about joints it should know about.
+  // Note: "weld" and "free" are always predefined at 0 and 6 dofs, resp.
+  //                  Gazebo name  #dofs     Simbody equivalent
+  mbgraph.addJointType(GetTypeString(physics::Base::HINGE_JOINT),  1);
+  mbgraph.addJointType(GetTypeString(physics::Base::HINGE2_JOINT), 2);
+  mbgraph.addJointType(GetTypeString(physics::Base::SLIDER_JOINT), 1);
+  mbgraph.addJointType(GetTypeString(physics::Base::UNIVERSAL_JOINT), 2);
+  mbgraph.addJointType(GetTypeString(physics::Base::SCREW_JOINT), 1);
+  // Simbody has a Ball constraint that is a good choice if you need to
+  // break a loop at a ball joint.
+  mbgraph.addJointType(GetTypeString(physics::Base::BALL_JOINT), 3, true);
+
+  // Step 2: Tell it about all the links we read from the input file, 
+  // starting with world, and provide a reference pointer.
+  physics::Model_V models = this->world->GetModels();
+  for (physics::Model_V::iterator mi = models.begin();
+       mi != models.end(); ++mi)
+  {
+    physics::Link_V links = mi->GetLinks();
+    for (physics::Link_V::iterator li = links.begin();
+         li != links.end(); ++li)
+    {
+      SimbodyLinkPtr simbodyLink = boost::share_dynamic_cast<SimbodyLink>(*li);
+      if (simbodyLink)
+        mbgraph.addBody(li->GetName(), li->GetInertial()->GetMass(),
+                        simbodyLink->mustBeBaseLink, simbodyLink->get());
+      else
+        gzerr << "simbodyLink [" << li->GetName() << "]is not a SimbodyLinkPtr\n";
+    }
+
+    // Step 3: Tell it about all the joints we read from the input file,
+    // and provide a reference pointer.
+    physics::Joint_V joints = mi->GetJoints();
+    for (physics::Joint_V::iterator ji = Joints.begin();
+         ji != Joints.end(); ++ji)
+    {
+      SimbodyJointPtr simbodyJoint = boost::share_dynamic_cast<SimbodyJoint>(*ji);
+      if (simbodyJoint)
+        mbgraph.addJoint(ji->GetName(), GetTypeString(ji->GetType()),
+           ji->GetParent()->GetName(), ji->GetChild()->GetName(),
+                            simbodyJoint->mustBreakLoopHere, simbodyJoint->get());
+      else
+        gzerr << "simbodyJoint [" << ji->GetName() << "]is not a SimbodyJointPtr\n";
+    }
+  }
+
+  // Setp 4. Generate the multibody graph.
+  mbgraph.generateGraph();
+}
+
+//////////////////////////////////////////////////
+//==============================================================================
+//                            BUILD SIMBODY SYSTEM
+//==============================================================================
+// Given a desired multibody graph, gravity, and the Gazebo model that was
+// used to generate the graph, create a Simbody System for it. There are many
+// limitations here, especially in the handling of contact. Any Gazebo features
+// that we haven't modeled are just ignored.
+// The GazeboModel is updated so that its links and joints have references to
+// their corresponding Simbody elements.
+// We set up some visualization here so we can see what's happening but this
+// would not be needed in Gazebo since it does its own visualization.
+void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& mbgraph,
+                               const math::Vector3&       gravity,
+                               SimTK::MultibodySystem&           mbs,
+                               SimTK::SimbodyMatterSubsystem&    matter,
+                               SimTK::GeneralForceSubsystem&     forces,
+                               SimTK::CompliantContactSubsystem& contact) 
+{
+    const SimTK::Vec3 g(gravity.x, gravity.y, gravity.z);
+
+    // Set stiction max slip velocity to make it less stiff.
+    contact.setTransitionVelocity(0.1);
+
+    // Specify gravity (read in above from world).
+    SimTK::Force::UniformGravity(forces, matter, g);
+
+    // TODO: Edit physics::Surface class to support these properties
+    // Define a material to use for contact. This is not very stiff.
+    SimTK::ContactMaterial material(1e6,   // stiffness
+                                     0.1,  // dissipation
+                                     0.7,   // mu_static
+                                     0.5,   // mu_dynamic
+                                     0.5);  // mu_viscous
+
+    // Add a contact surface to represent the ground.
+    // Half space normal is -x; must rotate about y to make it +z.
+    matter.Ground().updBody().addContactSurface(Rotation(Pi/2,YAxis),
+       ContactSurface(ContactGeometry::HalfSpace(), material));
+
+    // Generate a contact clique we can put collision geometry in to prevent
+    // self-collisions.
+    ContactCliqueId modelClique = ContactSurface::createNewContactClique();
+
+    // Will specify explicitly when needed
+    // Record the MobilizedBody for the World link.
+    // model.links.updLink(0).masterMobod = matter.Ground();
+
+    // Run through all the mobilizers in the multibody graph, adding a Simbody
+    // MobilizedBody for each one. Also add visual and collision geometry to the
+    // bodies when they are mobilized.
+    for (int mobNum=0; mobNum < mbgraph.getNumMobilizers(); ++mobNum) {
+        // Get a mobilizer from the graph, then extract its corresponding
+        // joint and bodies. Note that these don't necessarily have equivalents
+        // in the GazeboLink and GazeboJoint inputs.
+        const MultibodyGraphMaker::Mobilizer& mob = mbgraph.getMobilizer(mobNum);
+        const std::string& type = mob.getJointTypeName();
+
+        // The inboard body always corresponds to one of the input links,
+        // because a slave link is always the outboard body of a mobilizer.
+        // The outboard body may be slave, but its master body is one of the
+        // Gazebo input links.
+        const bool isSlave = mob.isSlaveMobilizer();
+        GazeboLinkInfo& gzInb  = *(GazeboLinkInfo*)mob.getInboardBodyRef();
+        GazeboLinkInfo& gzOutb = *(GazeboLinkInfo*)mob.getOutboardMasterBodyRef();
+
+        const MassProperties massProps = 
+            gzOutb.getEffectiveMassProps(mob.getNumFragments());
+
+        // This will reference the new mobilized body once we create it.
+        MobilizedBody mobod; 
+
+        if (mob.isAddedBaseMobilizer()) {
+            // There is no corresponding Gazebo joint for this mobilizer.
+            // Create the joint and set its default position to be the default
+            // pose of the base link relative to the Ground frame.
+            assert(type=="free"); // May add more types later
+            if (type == "free") {
+                MobilizedBody::Free freeJoint(
+                    gzInb.masterMobod,  Transform(),
+                    massProps,    Transform());
+                freeJoint.setDefaultTransform(~gzInb.defX_ML*gzOutb.defX_ML);
+                mobod = freeJoint;
+            }
+        } else {
+            // This mobilizer does correspond to one of the input joints.
+            GazeboJointInfo& gzJoint = *(GazeboJointInfo*)mob.getJointRef();
+            const bool isReversed = mob.isReversedFromJoint();
+
+            // Find inboard and outboard frames for the mobilizer; these are
+            // parent and child frames or the reverse.
+
+            const Transform& X_IF0 = isReversed ? gzJoint.X_CB : gzJoint.X_PA;
+            const Transform& X_OM0 = isReversed ? gzJoint.X_PA : gzJoint.X_CB;
+
+            const MobilizedBody::Direction direction =
+                isReversed ? MobilizedBody::Reverse : MobilizedBody::Forward;
+
+            if (type == "free") {
+                MobilizedBody::Free freeJoint(
+                    gzInb.masterMobod,  X_IF0,
+                    massProps,          X_OM0, 
+                    direction);
+                Transform defX_FM = isReversed ? Transform(~gzJoint.defX_AB)
+                                               : gzJoint.defX_AB;
+                freeJoint.setDefaultTransform(defX_FM);
+                mobod = freeJoint;
+            } else if (type == "revolute") {
+                Xml::Element axisElt = gzJoint.element.getRequiredElement("axis");
+                UnitVec3 axis = 
+                    UnitVec3(axisElt.getRequiredElementValueAs<Vec3>("xyz")); 
+                Rotation R_JZ(axis, ZAxis); // Simbody's pin is along Z
+                Transform X_IF(X_IF0.R()*R_JZ, X_IF0.p());
+                Transform X_OM(X_OM0.R()*R_JZ, X_OM0.p());
+                MobilizedBody::Pin pinJoint(
+                    gzInb.masterMobod,      X_IF,
+                    massProps,              X_OM, 
+                    direction);
+                mobod = pinJoint;
+
+                #ifdef ADD_JOINT_SPRINGS
+                // KLUDGE add spring (stiffness proportional to mass)
+                Force::MobilityLinearSpring(forces,mobod,0,
+                                            30*massProps.getMass(),0);
+                #endif
+            } else if (type == "prismatic") {
+                Xml::Element axisElt = gzJoint.element.getRequiredElement("axis");
+                UnitVec3 axis = 
+                    UnitVec3(axisElt.getRequiredElementValueAs<Vec3>("xyz")); 
+                Rotation R_JX(axis, XAxis); // Simbody's slider is along X
+                Transform X_IF(X_IF0.R()*R_JX, X_IF0.p());
+                Transform X_OM(X_OM0.R()*R_JX, X_OM0.p());
+                MobilizedBody::Slider sliderJoint(
+                    gzInb.masterMobod,      X_IF,
+                    massProps,              X_OM, 
+                    direction);
+                mobod = sliderJoint;
+
+                #ifdef ADD_JOINT_SPRINGS
+                // KLUDGE add spring (stiffness proportional to mass)
+                Force::MobilityLinearSpring(forces,mobod,0,
+                                            30*massProps.getMass(),0);
+                #endif
+            } else if (type == "ball") {
+                MobilizedBody::Ball ballJoint(
+                    gzInb.masterMobod,  X_IF0,
+                    massProps,          X_OM0, 
+                    direction);
+                Rotation defR_FM = isReversed 
+                    ? Rotation(~gzJoint.defX_AB.R())
+                    : gzJoint.defX_AB.R();
+                ballJoint.setDefaultRotation(defR_FM);
+                mobod = ballJoint;
+            } 
+
+            // Created a mobilizer that corresponds to gzJoint. Keep track.
+            gzJoint.mobod = mobod;
+            gzJoint.isReversed = isReversed;
+        }
+
+        // Link gzOutb has been mobilized; keep track for later.
+        if (isSlave) gzOutb.slaveMobods.push_back(mobod);
+        else gzOutb.masterMobod = mobod;
+
+        // A mobilizer has been created; now add the visual and collision
+        // geometry for the new mobilized body.
+
+        Xml::Element master = gzOutb.element;
+        Vec3 color = isSlave ? Red : Cyan;
+        Real scale = isSlave ? 0.9 : 1.;
+        if (master.isValid()) {
+            // VISUAL
+            Array_<Xml::Element> visuals = master.getAllElements("visual");
+            for (unsigned i=0; i < visuals.size(); ++i)  {
+                Transform X_LV = getPose(visuals[i]);
+                Xml::Element geo = visuals[i].getRequiredElement("geometry");
+                Xml::Element box = geo.getOptionalElement("box");
+                if (box.isValid()) {
+                    Vec3 sz = box.getRequiredElementValueAs<Vec3>("size");
+                    mobod.addBodyDecoration(
+                        X_LV, DecorativeBrick(sz/2).setOpacity(.5)
+                                .setColor(color).setScale(scale));
+                }
+                Xml::Element sphere = geo.getOptionalElement("sphere");
+                if (sphere.isValid()) {
+                    Real r = sphere.getRequiredElementValueAs<Real>("radius");
+                    mobod.addBodyDecoration(
+                        X_LV, DecorativeSphere(r).setOpacity(.5)
+                                .setColor(color).setScale(scale));
+                }
+                Xml::Element cyl = geo.getOptionalElement("cylinder");
+                if (cyl.isValid()) {
+                    Real r = cyl.getRequiredElementValueAs<Real>("radius");
+                    Real l = cyl.getRequiredElementValueAs<Real>("length");
+                    // Cylinder is along Z in Gazebo, Y in Simbody
+                    Rotation YtoZ(Pi/2, XAxis);
+                    mobod.addBodyDecoration(
+                        Transform(X_LV.R()*YtoZ, X_LV.p()),
+                        DecorativeCylinder(r, l/2).setOpacity(.5)
+                                .setColor(color).setScale(scale));
+                }
+
+            } 
+
+            // COLLISION
+            Array_<Xml::Element> coll = master.getAllElements("collision");
+            for (unsigned i=0; i < coll.size(); ++i) {
+                Transform X_LC = getPose(coll[i]);
+                Xml::Element geo = coll[i].getRequiredElement("geometry");
+
+                // Model sphere collision surface.
+                Xml::Element sphere = geo.getOptionalElement("sphere");
+                if (sphere.isValid()) {
+                    Real r = sphere.getRequiredElementValueAs<Real>("radius");
+                    mobod.addBodyDecoration(
+                        X_LC, DecorativeSphere(r)
+                                .setRepresentation(DecorativeGeometry::DrawWireframe)
+                                .setColor(Gray));
+                    ContactSurface surface(ContactGeometry::Sphere(r),
+                                           material);
+                    if (!gzOutb.selfCollide)
+                        surface.joinClique(model.modelClique);
+                    mobod.updBody().addContactSurface(X_LC, surface);
+                }
+
+                // Model cylinder collision surface (must fake with ellipsoid).
+                Xml::Element cyl = geo.getOptionalElement("cylinder");
+                if (cyl.isValid()) {
+                    Real r   = cyl.getRequiredElementValueAs<Real>("radius");
+                    Real len = cyl.getRequiredElementValueAs<Real>("length");
+                    // Cylinder is along Z in Gazebo
+                    Vec3 esz = Vec3(r,r,len/2); // Use ellipsoid instead
+                    mobod.addBodyDecoration(X_LC, 
+                        DecorativeEllipsoid(esz)
+                            .setRepresentation(DecorativeGeometry::DrawWireframe)
+                            .setColor(Gray));
+                    ContactSurface surface(ContactGeometry::Ellipsoid(esz),
+                                           material);
+                    if (!gzOutb.selfCollide)
+                        surface.joinClique(model.modelClique);
+                    mobod.updBody().addContactSurface(X_LC, surface);
+                }
+
+
+                // Model box collision surface (must fake with ellipsoid).
+                Xml::Element box = geo.getOptionalElement("box");
+                if (box.isValid()) {
+                    Vec3 hsz = box.getRequiredElementValueAs<Vec3>("size")/2;
+                    mobod.addBodyDecoration(X_LC, 
+                        DecorativeEllipsoid(hsz) // use half dimensions
+                            .setRepresentation(DecorativeGeometry::DrawWireframe)
+                            .setColor(Gray));
+                    ContactSurface surface(ContactGeometry::Ellipsoid(hsz),
+                                           material);
+                    if (!gzOutb.selfCollide)
+                        surface.joinClique(model.modelClique);
+                    mobod.updBody().addContactSurface(X_LC, surface);
+                }
+            }
+        }
+    }
+
+    // Weld the slaves to their masters.
+    for (int lx=0; lx < model.links.size(); ++lx) {
+        GazeboLinkInfo& link = model.links.updLink(lx);
+        if (link.slaveMobods.empty()) continue;
+        for (unsigned i=0; i < link.slaveMobods.size(); ++i) {
+            Constraint::Weld weld(link.masterMobod, link.slaveMobods[i]);
+            link.slaveWelds.push_back(weld); // in case we want to know later
+        }
+    }
+
+    // Add the loop joints if any.
+    for (int lcx=0; lcx < mbgraph.getNumLoopConstraints(); ++lcx) {
+        const MultibodyGraphMaker::LoopConstraint& loop =
+            mbgraph.getLoopConstraint(lcx);
+
+        GazeboJointInfo& joint  = *(GazeboJointInfo*)loop.getJointRef();
+        GazeboLinkInfo&  parent = *(GazeboLinkInfo*) loop.getParentBodyRef();
+        GazeboLinkInfo&  child  = *(GazeboLinkInfo*) loop.getChildBodyRef();
+
+        if (joint.type == "weld") {
+            Constraint::Weld weld(parent.masterMobod, joint.X_PA, 
+                                  child.masterMobod,  joint.X_CB);
+            joint.constraint = weld;
+        } else if (joint.type == "ball") {
+            Constraint::Ball ball(parent.masterMobod, joint.X_PA.p(), 
+                                  child.masterMobod,  joint.X_CB.p());
+            joint.constraint = ball;
+        } else if (joint.type == "free") {
+            // A "free" loop constraint is no constraint at all so we can
+            // just ignore it. It might be more convenient if there were
+            // a 0-constraint Constraint::Free, just as there is a 0-mobility
+            // MobilizedBody::Weld.
+        } else
+            throw std::runtime_error(
+                "Unrecognized loop constraint type '" + joint.type + "'.");
+    }
+}
+
 
 

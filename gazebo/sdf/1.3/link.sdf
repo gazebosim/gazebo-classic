@@ -22,6 +22,10 @@
     <description>This is the pose of the link reference frame, relative to the model reference frame.</description>
   </element>
 
+  <element name="must_be_base_link" type="bool" default="false" required="0">
+    <description>If true, the link will have 6DOF and be a direct child of world.</description>
+  </element>
+
   <element name="velocity_decay" required="1">
     <description>Exponential damping of the link's velocity.</description>
     <element name="linear" type="double" default="0.0" required="1">

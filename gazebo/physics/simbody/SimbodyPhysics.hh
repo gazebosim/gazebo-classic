@@ -26,15 +26,12 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include <Simbody.h>
+
 #include "physics/simbody/simbody_inc.h"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Collision.hh"
 #include "physics/Shape.hh"
-
-// #include <SimTKcommon.h>
-#include <SimTKsimbody.h>
-// #include <Simbody.h>
-// using namespace SimTK;
 
 namespace gazebo
 {
@@ -121,10 +118,84 @@ namespace gazebo
 
       private: double stepTimeDouble;
 
+
+
+
       public: SimTK::MultibodySystem system;
       public: SimTK::SimbodyMatterSubsystem matter;
       public: SimTK::GeneralForceSubsystem forces;
+      public: SimTK::ContactTrackerSubsystem tracker;
+      public: SimTK::CompliantContactSubsystem contact;
       public: SimTK:: Integrator *integ;
+
+      // Convert the given pose in x,y,z,thetax,thetay,thetaz format to
+      // a Simbody Transform. The rotation angles are interpreted as a
+      // body-fixed sequence, meaning we rotation about x, then about
+      // the new y, then about the now twice-rotated z.
+      public: static SimTK::Transform Pose2Transform(const math::Pose& _pose)
+      {
+        SimTK::Quaternion q(_pose.rot.w, _pose.rot.x, _pose.rot.y,
+                         _pose.rot.z);
+        SimTK::Vec3 v(_pose.pos.x, _pose.pos.y, _pose.pos.z);
+        SimTK::Transform frame(q, v); 
+        return frame;
+      }
+
+      // Convert a Simbody transform to a pose in x,y,z,thetax,thetay,thetaz
+      // format.
+      public: static math::Pose Transform2Pose(const SimTK::Transform& X_AB)
+      {
+        SimTK::Quaternion q(X_AB.R());
+        const SimTK::Vec4 &qv = q.asVec4();
+        return pose(math::Vector3(X_AB.x(), X_AB.y(), X_AB.z()),
+          math::Quaternion(qv[0], qv[1], qv[2], qv[3]));
+      }
+
+      // If the given element contains a <pose> element, return it as a
+      // Transform. Otherwise return the identity Transform. If there
+      // is more than one <pose> element, only the first one is processed.
+      public: static SimTK::Transform GetPose(sdf::ElementPtr _element)
+      {
+        const math::Pose pose = _element->GetValuePose("pose");
+        return Pose2Transform(pose);
+      }
+
+      public: static std::string GetTypeString(physics::Base::EntityType _type)
+      {
+        if (!(_type & physics::Base::JOINT))
+          gzerr << "Not a joint type\n";
+        switch (_type)
+        {
+          case physics::Base::BALL_JOINT:
+            return "ball";
+          case physics::Base::HINGE2_JOINT:
+            return "revolute2";
+          case physics::Base::HINGE_JOINT:
+            return "revolute";
+          case physics::Base::SLIDER_JOINT:
+            return "prismatic";
+          case physics::Base::SCREW_JOINT:
+            return "screw";
+          case physics::Base::UNIVERSAL_JOINT:
+            return "universal";
+          default:
+            gzerr << "Unrecognized joint type\n";
+            return "UNRECOGNIZED";
+        }
+      }
+
+      /// \brief Helper functions
+      private: void SimbodyPhysics::CreateMultibodyGraph(
+                                 MultibodyGraphMaker&   mbgraph);
+
+      /// \brief Helper functions
+      private: void BuildSimbodySystem(const SimTK::MultibodyGraphMaker& mbgraph,
+                                     const math::Vector3&       gravity,
+                                     SimTK::MultibodySystem&           mbs,
+                                     SimTK::SimbodyMatterSubsystem&    matter,
+                                     SimTK::GeneralForceSubsystem&     forces,
+                                     SimTK::CompliantContactSubsystem& contact);
+
     };
 
   /// \}

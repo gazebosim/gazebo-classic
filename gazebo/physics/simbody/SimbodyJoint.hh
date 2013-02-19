@@ -25,6 +25,8 @@
 #include <boost/any.hpp>
 #include <string>
 
+#include <Simbody.h>
+
 #include "physics/simbody/SimbodyPhysics.hh"
 #include "physics/Joint.hh"
 
@@ -103,6 +105,31 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(int _index);
+
+      // Simbody specific variables
+      private: bool mustBreakLoopHere;
+
+      // Normally A=F, B=M. But if reversed, then B=F, A=M.
+      private: SimTK::Transform    X_PA; // parent body frame to mobilizer frame
+      private: SimTK::Transform    X_CB; // child body frame to mobilizer frame
+      private: SimTK::Transform defX_AB; // default mobilizer pose
+
+      // Members below here are set when we build the Simbody model.
+
+      // How this joint was modeled in the Simbody System. We used either a
+      // mobilizer or a constraint, but not both. The type of either one is the
+      // same as the joint type above.
+
+      // isValid() if we used a mobilizer
+      private: SimTK::MobilizedBody mobod;
+
+      /// \brief: if mobilizer, did it reverse parent&child?
+      private: SimTK::bool isReversed;
+
+      /// \brief: isValid() if we used a constraint
+      private: SimTK::Constraint constraint;
+
+
     };
     /// \}
   }
