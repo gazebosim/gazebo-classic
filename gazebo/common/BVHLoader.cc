@@ -104,7 +104,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
           if (words[0] == "CHANNELS")
           {
             if (words.size() < 3 ||
-                  (math::parseInt(words[1]) + 2) > words.size())
+                (math::parseInt(words[1]) + 2) > static_cast<int>(words.size()))
             {
               file.close();
               return NULL;

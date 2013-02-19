@@ -66,6 +66,11 @@ void cb(ConstWorldStatisticsPtr &_msg)
     ++simIter;
     ++realIter;
   }
+
+  // Prevernt divide by zero
+  if (realAvg <= 0)
+    return;
+
   simAvg = simAvg / realAvg;
 
   if (simAvg > 0)
