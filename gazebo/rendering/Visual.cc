@@ -1949,9 +1949,21 @@ std::string Visual::GetMeshName() const
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
 
-      filename = common::find_file(tmpElem->GetValueString("uri"));
+      std::string uri = tmpElem->GetValueString("uri");
+      if (uri.empty())
+      {
+        gzerr << "<uri> element missing for geometry element:\n";
+        geomElem->PrintValues("  ");
+
+        return std::string();
+      }
+
+      filename = common::find_file(uri);
+
       if (filename == "__default__" || filename.empty())
+      {
         gzerr << "No mesh specified\n";
+      }
 
       return filename;
     }
