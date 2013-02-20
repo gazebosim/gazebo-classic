@@ -77,6 +77,8 @@ namespace gazebo
       /// \return A pointer to the new diagnostic timer
       public: void StartTimer(const std::string &_name);
 
+      /// \brief Stop a currently running timer.
+      /// \param[in] _name Name of the timer to stop.
       public: void StopTimer(const std::string &_name);
 
       //// \brief Output the current elapsed time of an active timer with
@@ -133,7 +135,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~DiagnosticTimer();
 
-      public: void Lap(const std::string &_name);
+      /// \brief Output a lap time.
+      /// \param[in] _prefix Annotation to output with the elapsed time.
+      public: void Lap(const std::string &_prefix);
 
       // Documentation inherited
       public: virtual void Start();
@@ -146,9 +150,13 @@ namespace gazebo
       public: inline const std::string GetName() const
               { return this->name; }
 
-      /// \brief not used
+      /// \brief Name of the timer.
       private: std::string name;
+
+      /// \brief Log file.
       private: std::ofstream log;
+
+      /// \brief Time of the previous lap.
       private: common::Time prevLap;
     };
     /// \}
