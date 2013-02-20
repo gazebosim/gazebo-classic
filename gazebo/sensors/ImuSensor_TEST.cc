@@ -56,7 +56,7 @@ TEST_F(ImuSensor_TEST, BasicImuSensorCheck)
   // Update the sensor manager so that it can process new sensors.
   mgr->Update();
 
-  // Get a pointer to the Ray sensor
+  // Get a pointer to the IMU sensor
   sensors::ImuSensorPtr sensor = boost::shared_dynamic_cast<sensors::ImuSensor>
     (mgr->GetSensor(sensorName));
 
