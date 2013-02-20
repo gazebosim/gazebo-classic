@@ -88,7 +88,7 @@ namespace gazebo
       public: unsigned int GetCollisionContactCount(
                   const std::string &_collisionName) const;
 
-      /// \brief Get all the contacts
+      /// \brief Get all the contacts for the ContactSensor
       /// \return Message that contains contact information between collision
       /// pairs.
       ///
@@ -96,16 +96,24 @@ namespace gazebo
       /// world are pushed into a buffer within ContactManager.
       /// Subsequently, World::Update invokes ContactManager::PublishContacts
       /// to publish all contacts generated within a timestep onto
-      /// ~/physics/contacts.
+      /// Gazebo topic ~/physics/contacts.
       /// 
       /// Each ContactSensor subscribes to the Gazebo ~/physics/contacts topic,
       /// retrieves all contact pairs in a time step and filters them wthin
       /// ContactSensor::OnContacts against <collision> body name
-      /// specified by the ContactSensor SDF to retrieve relevant info.
+      /// specified by the ContactSensor SDF.
+      /// All collision pairs between ContactSensor <collision> body and
+      /// other bodies in the world are stored in an array inside
+      /// contacts.proto.
       /// 
-      /// See below for details on returned data within contact.proto:
+      /// Within each element of the contact.proto array inside contacts.proto,
+      /// list of collisions between collision bodies
+      /// (collision1 and collision 2) are stored in an array of
+      /// elements, (position, normal, depth, wrench).  A timestamp has also
+      /// been added (time).  Details are described below:
+      ///
       ///    string collision1  name of the first collision object.
-      ///    string collision2  name of the first collision object.
+      ///    string collision2  name of the second collision object.
       ///    Vector3d position  position of the contact joint in inertial frame.
       ///    Vector3d normal    normal of the contact joint in inertial frame.
       ///    double depth       intersection (penetration)
