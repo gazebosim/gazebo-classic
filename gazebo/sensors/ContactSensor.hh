@@ -90,8 +90,20 @@ namespace gazebo
 
       /// \brief Get all the contacts
       /// \return Message that contains contact information between collision
-      /// pairs.  See below for details on returned data within
-      /// contacts.proto and contact.proto:
+      /// pairs.
+      ///
+      /// Within ODEPhysics::UpdateCollisions, all collision pairs in the
+      /// world are pushed into a buffer within ContactManager.
+      /// Subsequently, World::Update invokes ContactManager::PublishContacts
+      /// to publish all contacts generated within a timestep onto
+      /// ~/physics/contacts.
+      /// 
+      /// Each ContactSensor subscribes to the Gazebo ~/physics/contacts topic,
+      /// retrieves all contact pairs in a time step and filters them wthin
+      /// ContactSensor::OnContacts against <collision> body name
+      /// specified by the ContactSensor SDF to retrieve relevant info.
+      /// 
+      /// See below for details on returned data within contact.proto:
       ///    string collision1  name of the first collision object.
       ///    string collision2  name of the first collision object.
       ///    Vector3d position  position of the contact joint in inertial frame.
