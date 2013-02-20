@@ -41,7 +41,7 @@ DiagnosticManager::DiagnosticManager()
     this->logPath /= ".gazebo";
   }
 
-  this->logPath = this->logPath / "timing" /
+  this->logPath = this->logPath / "diagnostics" /
     common::Time::GetWallTimeAsISOString();
 
   // Make sure the path exists.
