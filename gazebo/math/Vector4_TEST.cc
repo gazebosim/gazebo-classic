@@ -130,8 +130,8 @@ TEST(Vector4Test, Vector4)
 
   // ::operator[]
   v.Set(1, 2, 3, 4);
-  EXPECT_EQ(v[0], 1);
-  EXPECT_EQ(v[1], 2);
-  EXPECT_EQ(v[2], 3);
-  EXPECT_EQ(v[3], 4);
+  EXPECT_NEAR(v[0], 1, 1e-6);
+  EXPECT_NEAR(v[1], 2, 1e-6);
+  EXPECT_NEAR(v[2], 3, 1e-6);
+  EXPECT_NEAR(v[3], 4, 1e-6);
 }

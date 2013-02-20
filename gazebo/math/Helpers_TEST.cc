@@ -26,7 +26,7 @@ TEST(HelpersTest, Helpers)
   EXPECT_EQ(12345, math::parseInt("12345"));
   EXPECT_EQ(-12345, math::parseInt("-12345"));
 
-  EXPECT_EQ(12.345, math::parseFloat("12.345"));
-  EXPECT_EQ(-12.345, math::parseFloat("-12.345"));
+  EXPECT_NEAR(12.345, math::parseFloat("12.345"), 1e-6);
+  EXPECT_NEAR(-12.345, math::parseFloat("-12.345"), 1e-6);
   EXPECT_TRUE(math::equal(123.45, math::parseFloat("1.2345e2"), 1e-2));
 }
