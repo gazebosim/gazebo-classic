@@ -210,7 +210,7 @@ macro (_gz_build_qt_tests)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport)
-  
+
     target_link_libraries(${BINARY_NAME}
       gazebo_gui
       gazebo_sdf_interface
@@ -226,7 +226,7 @@ macro (_gz_build_qt_tests)
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
       )
-  
+ 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} -xml)
   
     set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)

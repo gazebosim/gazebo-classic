@@ -28,17 +28,17 @@
 #include <list>
 #include <vector>
 
-#include "common/Event.hh"
-#include "math/Box.hh"
-#include "math/Pose.hh"
-#include "math/Quaternion.hh"
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/math/Box.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
 
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
-#include "rendering/RenderTypes.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 namespace Ogre
 {
