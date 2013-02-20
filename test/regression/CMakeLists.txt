@@ -33,7 +33,6 @@ set (gtest_sources
   file_handling.cc
   heightmap.cc
   laser.cc
-  math.cc
   msgs.cc
   physics.cc
   pioneer2dx.cc
@@ -41,6 +40,7 @@ set (gtest_sources
   projector.cc
   server_fixture.cc
   speed.cc
+  speed_pr2.cc
   transport.cc)
 
 set (plugins)

@@ -19,12 +19,13 @@
  * Date: 14 Oct 2009
  */
 
-#include "physics/World.hh"
-#include "physics/Link.hh"
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODETypes.hh"
-#include "physics/ode/ODECollision.hh"
-#include "physics/ode/ODERayShape.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODETypes.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODERayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -48,6 +49,7 @@ ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine)
 ODERayShape::ODERayShape(CollisionPtr _parent)
     : RayShape(_parent)
 {
+  GZ_ASSERT(_parent, "Parent collision shape is NULL");
   this->SetName("ODE Ray Shape");
 
   ODECollisionPtr collision =
@@ -55,6 +57,8 @@ ODERayShape::ODERayShape(CollisionPtr _parent)
 
   this->physicsEngine = boost::shared_static_cast<ODEPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
+
+  GZ_ASSERT(collision->GetSpaceId() != 0, "Ray collision space is NULL");
   this->geomId = dCreateRay(collision->GetSpaceId(), 1.0);
 
   // Create default ray with unit length
@@ -110,13 +114,15 @@ void ODERayShape::GetIntersection(double &_dist, std::string &_entity)
     Intersection intersection;
     intersection.depth = 1000;
 
-    this->physicsEngine->GetPhysicsUpdateMutex()->lock();
+    {
+      boost::recursive_mutex::scoped_lock lock(
+          *this->physicsEngine->GetPhysicsUpdateMutex());
 
-    // Do collision detection
-    dSpaceCollide2(this->geomId,
-        (dGeomID)(this->physicsEngine->GetSpaceId()),
-        &intersection, &UpdateCallback);
-    this->physicsEngine->GetPhysicsUpdateMutex()->unlock();
+      // Do collision detection
+      dSpaceCollide2(this->geomId,
+          (dGeomID)(this->physicsEngine->GetSpaceId()),
+          &intersection, &UpdateCallback);
+    }
 
     _dist = intersection.depth;
     _entity = intersection.name;

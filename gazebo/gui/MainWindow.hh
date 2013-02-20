@@ -117,6 +117,12 @@ namespace gazebo
       private: void CreateMenus();
       private: void CreateToolbars();
 
+      /// \brief Attach Gazebo's main menu bar
+      private: void AttachMainMenuBar();
+
+      /// \brief Attach building editor's menu bar
+      private: void AttachEditorMenuBar();
+
       private: void OnModel(ConstModelPtr &_msg);
       private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnWorldModify(ConstWorldModifyPtr &_msg);
@@ -162,9 +168,6 @@ namespace gazebo
 
       /// \brief Tab widget that holds the building editor palette
       private: QTabWidget *buildingEditorTabWidget;
-
-      /// \brief Building editor's own separate menu bar of actions, e.g. save.
-      private: QMenuBar *buildingEditorMenuBar;
 
       private: QTabWidget *tabWidget;
       private: QMenuBar *menuBar;
