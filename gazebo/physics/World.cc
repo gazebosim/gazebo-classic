@@ -446,7 +446,7 @@ void World::Step()
     tmpTime - this->sleepOffset;
 
   if (sleepTime > 0)
-    common::Time::NSleep(sleepTime);
+    common::Time::Sleep(sleepTime);
   else
     sleepTime = 0;
 
@@ -1755,6 +1755,9 @@ void World::PublishLogStatus()
   // Get the full name of the log file
   msg.mutable_log_file()->set_full_path(
     common::LogRecord::Instance()->GetFilename(this->GetName()));
+
+  // Set the URI of th log file
+  msg.mutable_log_file()->set_uri(transport::Connection::GetLocalHostname());
 
   // Get the size of the log file
   size = common::LogRecord::Instance()->GetFileSize(this->GetName());

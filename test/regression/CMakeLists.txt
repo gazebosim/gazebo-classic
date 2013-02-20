@@ -45,7 +45,8 @@ set(dri_tests
       laser.cc
       pioneer2dx.cc
       pr2.cc
-      projector.cc)
+      projector.cc
+      speed_pr2.cc)
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
     "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc")

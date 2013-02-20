@@ -79,7 +79,13 @@ void sensors::remove_sensor(const std::string &_sensorName)
 /////////////////////////////////////////////////
 void sensors::run()
 {
-  sensors::SensorManager::Instance()->Run();
+  sensors::run_threads();
+}
+
+/////////////////////////////////////////////////
+void sensors::run_threads()
+{
+  sensors::SensorManager::Instance()->RunThreads();
 }
 
 /////////////////////////////////////////////////

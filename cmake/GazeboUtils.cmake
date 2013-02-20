@@ -173,6 +173,7 @@ macro (gz_build_tests)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport
+      libgazebo
       pthread
       )
   
@@ -217,7 +218,7 @@ if (VALID_DISPLAY)
      add_executable(${BINARY_NAME}
       ${test_MOC} ${QTEST_SOURCE_file} QTestFixture.cc)
 
-     add_dependencies(${BINARY_NAME}
+    add_dependencies(${BINARY_NAME}
       gazebo_gui
       gazebo_sdf_interface
       gazebo_common
