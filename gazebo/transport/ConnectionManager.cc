@@ -103,7 +103,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   {
     msgs::GzString msg;
     msg.ParseFromString(packet.serialized_data());
-    if (msg.data() == std::string("gazebo ") + GAZEBO_VERSION_FULL)
+    if (msg.data() == std::string("gazebo ") + GAZEBO_VERSION)
     {
       // TODO: set some flag.. maybe start "serverConn" when initialized
       gzmsg << "Connected to gazebo master @ "
