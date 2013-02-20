@@ -49,11 +49,11 @@ namespace gazebo
       /// \brief Load the BulletSliderJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Attach the two bodies with this joint
-      public: void Attach(LinkPtr _one, LinkPtr _two);
+      // Documentation inherited.
+      protected: virtual void Init();
 
       /// \brief Set the axis of motion
-      public: void SetAxis(int _index, const math::Vector3 &_axis);
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int _index, const double _damping);
@@ -93,6 +93,10 @@ namespace gazebo
 
       /// \brief Pointer to bullet slider constraint
       private: btSliderConstraint *bulletSlider;
+
+      /// \brief Initial value of joint axis, expressed as unit vector
+      ///        in world frame.
+      private: math::Vector3 initialWorldAxis;
     };
 
   /// \}
