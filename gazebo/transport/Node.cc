@@ -220,9 +220,10 @@ void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
 
   if (iter != this->callbacks.end())
   {
+    Callback_L::iterator liter;
+
     // Find the callback with the correct ID and remove it.
-    for (Callback_L::iterator liter = iter->second.begin();
-         liter != iter->second.end(); ++liter)
+    for (liter = iter->second.begin(); liter != iter->second.end(); ++liter)
     {
       if ((*liter)->GetId() == _id)
       {

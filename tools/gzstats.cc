@@ -15,7 +15,9 @@
  *
 */
 #include <boost/program_options.hpp>
+#include <signal.h>
 #include <google/protobuf/message.h>
+#include <boost/thread.hpp>
 
 #include "transport/Transport.hh"
 #include "transport/TransportTypes.hh"
@@ -30,6 +32,10 @@ namespace po = boost::program_options;
 using namespace gazebo;
 
 std::list<common::Time> simTimes, realTimes;
+
+boost::mutex mutex;
+boost::condition_variable condition;
+
 bool g_plot;
 
 /////////////////////////////////////////////////
@@ -95,9 +101,23 @@ void cb(ConstWorldStatisticsPtr &_msg)
         percent, simTime.Double(), realTime.Double(), paused);
 }
 
+//////////////////////////////////////////////////
+void SignalHandler(int /*dummy*/)
+{
+  boost::mutex::scoped_lock lock(mutex);
+  condition.notify_all();
+  return;
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
+  if (signal(SIGINT, SignalHandler) == SIG_ERR)
+  {
+    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
+    return -1;
+  }
+
   const std::string usage = "Usage: gzstats [options]\n";
   po::options_description desc("Allowed options");
   desc.add_options()
@@ -141,8 +161,10 @@ int main(int argc, char **argv)
   transport::SubscriberPtr sub = node->Subscribe(topic, cb);
   transport::run();
 
-  while (true)
-    common::Time::MSleep(10);
+  boost::mutex::scoped_lock lock(mutex);
+  condition.wait(lock);
 
   transport::fini();
+
+  return 0;
 }
