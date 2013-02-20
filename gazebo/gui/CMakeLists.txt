@@ -81,7 +81,6 @@ set (headers
 set (qt_tests 
   DataLogger_TEST.cc
   TimePanel_TEST.cc
-  DataLogger_TEST.cc
 )
 
 gz_build_qt_tests(${qt_tests})
@@ -93,10 +92,6 @@ QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 gz_add_executable(gzclient ${sources} main.cc ${headers_MOC} ${headers} ${resources_RCC})
-
-gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
-
-gz_add_executable(gzclient ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
 target_link_libraries(gazebo_gui gazebo_common
