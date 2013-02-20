@@ -452,7 +452,7 @@ void World::Step()
     tmpTime - this->sleepOffset;
 
   if (sleepTime > 0)
-    common::Time::NSleep(sleepTime);
+    common::Time::Sleep(sleepTime);
   else
     sleepTime = 0;
 
