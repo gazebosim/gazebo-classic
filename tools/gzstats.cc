@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/program_options.hpp>
 #include <google/protobuf/message.h>
 
 #include "transport/Transport.hh"
@@ -25,23 +26,16 @@
 
 #include "gazebo_config.h"
 
+namespace po = boost::program_options;
 using namespace gazebo;
 
 std::list<common::Time> simTimes, realTimes;
-
-/////////////////////////////////////////////////
-void help()
-{
-  std::cerr << "This tool displays statistics about a running Gazebo world.\n"
-            << "  Usage: gzstats <world_name>\n"
-            << "    <world_name> : Output statistics for the given world. "
-            << " (Default = \"default\")\n"
-            << "    help         : This help text\n";
-}
+bool g_plot;
 
 /////////////////////////////////////////////////
 void cb(ConstWorldStatisticsPtr &_msg)
 {
+  static bool first = true;
   double percent = 0;
   char paused;
   common::Time simTime  = msgs::Convert(_msg->sim_time());
@@ -84,21 +78,56 @@ void cb(ConstWorldStatisticsPtr &_msg)
   else
     paused = 'F';
 
-  printf("Factor[%4.2f] SimTime[%4.2f] RealTime[%4.2f] Paused[%c]\n",
-      percent, simTime.Double(), realTime.Double(), paused);
+  if(g_plot)
+  {
+    if(first)
+    {
+      printf("# real-time factor (percent), simtime (sec), realtime (sec), "
+             "paused (T or F)\n");
+      first = false;
+    }
+    printf("%4.2f, %16.6f, %16.6f, %c\n",
+        percent, simTime.Double(), realTime.Double(), paused);
+    fflush(stdout);
+  }
+  else
+    printf("Factor[%4.2f] SimTime[%4.2f] RealTime[%4.2f] Paused[%c]\n",
+        percent, simTime.Double(), realTime.Double(), paused);
 }
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  std::string worldName = "default";
-  if (argc > 1)
-    worldName = argv[1];
-
-  if (worldName == "help")
+  const std::string usage = "Usage: gzstats [options]\n";
+  po::options_description desc("Allowed options");
+  desc.add_options()
+    ("help,h", "print help message")
+    ("plot,p", "output comma-separated values, useful for processing and "
+               "plotting")
+    ("world-name,w", po::value<std::string>(), "the Gazebo world to monitor");
+  po::variables_map vm;
+  try
   {
-    help();
-    return -1;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+  }
+  catch(po::unknown_option& e)
+  {
+    std::cerr << e.what() << std::endl;
+    std::cerr << desc << std::endl;
+    return 1;
+  }
+  po::notify(vm); 
+
+  if(vm.count("help")) {
+    std::cerr << desc << std::endl;
+    return 1;
+  }
+  std::string worldName = "default";
+  if(vm.count("world-name")) {
+    worldName = vm["world-name"].as<std::string>(); 
+  }
+  if(vm.count("plot")) {
+    g_plot = true;
   }
 
   transport::init();
