@@ -40,7 +40,7 @@ GZ_REGISTER_STATIC_SENSOR("gpu_ray", GpuRaySensor)
 
 //////////////////////////////////////////////////
 GpuRaySensor::GpuRaySensor()
-    : Sensor()
+    : Sensor(sensors::IMAGE)
 {
   this->active = false;
 }

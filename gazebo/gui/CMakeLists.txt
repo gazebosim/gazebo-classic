@@ -35,6 +35,7 @@ set (sources
   ToolsWidget.cc
   TopicSelector.cc
   viewers/ImageView.cc
+  viewers/ImagesView.cc
   viewers/LaserView.cc
   viewers/TopicView.cc
   viewers/TextView.cc
@@ -56,6 +57,7 @@ set (qt_headers
   ToolsWidget.hh
   TopicSelector.hh
   viewers/ImageView.hh
+  viewers/ImagesView.hh
   viewers/LaserView.hh
   viewers/TextView.hh
   viewers/TopicView.hh
@@ -79,6 +81,7 @@ set (headers
 set (display_tests
   DataLogger_TEST.cc
   TimePanel_TEST.cc
+  viewers/ImagesView_TEST.cc
 )
 
 # Generate executables for each of the QT unit tests

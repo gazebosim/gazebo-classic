@@ -25,6 +25,7 @@
 #include <string>
 
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 

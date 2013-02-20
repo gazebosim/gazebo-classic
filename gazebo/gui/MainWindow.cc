@@ -495,16 +495,14 @@ void MainWindow::OnEditBuilding()
     this->renderWidget->ShowEditor(true);
     this->tabWidget->hide();
     this->buildingEditorTabWidget->show();
-    this->menuBar->hide();
-    this->buildingEditorMenuBar->show();
+    this->AttachEditorMenuBar();
   }
   else
   {
     this->renderWidget->ShowEditor(false);
     this->tabWidget->show();
     this->buildingEditorTabWidget->hide();
-    this->buildingEditorMenuBar->hide();
-    this->menuBar->show();
+    this->AttachMainMenuBar();
     this->Play();
   }
 }
@@ -979,22 +977,36 @@ void MainWindow::CreateActions()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::CreateMenus()
+void MainWindow::AttachEditorMenuBar()
 {
-  this->menuLayout = new QHBoxLayout;
+  if (this->menuBar)
+  {
+    delete menuBar;
+  }
 
-  QFrame *frame = new QFrame;
-  this->menuBar =  new QMenuBar;
-  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->menuBar = new QMenuBar;
+  this->menuBar->setSizePolicy(QSizePolicy::Fixed,
+      QSizePolicy::Fixed);
+  QMenu *buildingEditorFileMenu = this->menuBar->addMenu(
+      tr("&File"));
+  buildingEditorFileMenu->addAction(g_buildingEditorSaveAct);
+  buildingEditorFileMenu->addAction(g_buildingEditorDiscardAct);
+  buildingEditorFileMenu->addAction(g_buildingEditorDoneAct);
+  buildingEditorFileMenu->addAction(g_buildingEditorExitAct);
 
   this->menuLayout->addWidget(this->menuBar);
-  this->menuLayout->addStretch(5);
-  this->menuLayout->setContentsMargins(0, 0, 0, 0);
+}
 
-  frame->setLayout(this->menuLayout);
-  frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+/////////////////////////////////////////////////
+void MainWindow::AttachMainMenuBar()
+{
+  if (this->menuBar)
+  {
+    delete menuBar;
+  }
 
-  this->setMenuWidget(frame);
+  this->menuBar =  new QMenuBar;
+  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
   QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
   // fileMenu->addAction(g_openAct);
@@ -1037,18 +1049,25 @@ void MainWindow::CreateMenus()
   QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
   helpMenu->addAction(g_aboutAct);
 
-  this->buildingEditorMenuBar = new QMenuBar;
-  this->buildingEditorMenuBar->setSizePolicy(QSizePolicy::Fixed,
-      QSizePolicy::Fixed);
-  this->menuLayout->insertWidget(0, this->buildingEditorMenuBar);
-  this->buildingEditorMenuBar->hide();
+  this->menuLayout->addWidget(this->menuBar);
+}
 
-  QMenu *buildingEditorFileMenu = this->buildingEditorMenuBar->addMenu(
-      tr("&File"));
-  buildingEditorFileMenu->addAction(g_buildingEditorSaveAct);
-  buildingEditorFileMenu->addAction(g_buildingEditorDiscardAct);
-  buildingEditorFileMenu->addAction(g_buildingEditorDoneAct);
-  buildingEditorFileMenu->addAction(g_buildingEditorExitAct);
+/////////////////////////////////////////////////
+void MainWindow::CreateMenus()
+{
+  this->menuLayout = new QHBoxLayout;
+
+  QFrame *frame = new QFrame;
+
+  this->AttachMainMenuBar();
+
+  this->menuLayout->addStretch(5);
+  this->menuLayout->setContentsMargins(0, 0, 0, 0);
+
+  frame->setLayout(this->menuLayout);
+  frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+  this->setMenuWidget(frame);
 }
 
 /////////////////////////////////////////////////

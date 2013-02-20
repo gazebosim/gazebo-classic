@@ -21,13 +21,14 @@
 
 #include <sstream>
 
-#include "common/Console.hh"
-#include "math/Box.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/math/Box.hh"
 
-#include "physics/SurfaceParams.hh"
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODELink.hh"
-#include "physics/ode/ODECollision.hh"
+#include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODELink.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -103,7 +104,7 @@ void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
   if (dGeomGetSpace(this->collisionId) == 0)
   {
     dSpaceAdd(this->spaceId, this->collisionId);
-    assert(dGeomGetSpace(this->collisionId) != 0);
+    GZ_ASSERT(dGeomGetSpace(this->collisionId) != 0, "Collision ID is NULL");
   }
 
   if (this->collisionId && this->placeable)
