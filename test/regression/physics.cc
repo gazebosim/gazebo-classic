@@ -739,6 +739,100 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       EXPECT_TRUE(model != NULL);
     }
   }
+
+  // Reset world again, disable gravity, detach upper_joint
+  // Then apply torque at lower_joint and verify motion
+  world->Reset();
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check SetForce for model " << *modelIter << '\n';
+      std::vector<std::string>::iterator linkIter;
+      for (linkIter  = linkNames.begin();
+           linkIter != linkNames.end(); ++linkIter)
+      {
+        link = model->GetLink(*linkIter);
+        if (link)
+        {
+          // Disable gravity for links.
+          link->SetGravityMode(false);
+        }
+        else
+        {
+          gzerr << "Error loading link " << *linkIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(link != NULL);
+        }
+      }
+
+      joint = model->GetJoint("upper_joint");
+      if (joint)
+      {
+        // Detach upper_joint.
+        joint->Detach();
+      }
+      else
+      {
+        gzerr << "Error loading upper_joint "
+              << " of model " << *modelIter << '\n';
+        EXPECT_TRUE(joint != NULL);
+      }
+
+      // Step forward and let things settle a bit.
+      world->StepWorld(100);
+
+      joint = model->GetJoint("lower_joint");
+      if (joint)
+      {
+        double oldVel, newVel, force;
+        oldVel = joint->GetVelocity(0);
+        // Apply positive torque to the lower_joint and step forward.
+        force = 1;
+        for (int i = 0; i < 10; ++i)
+        {
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          newVel = joint->GetVelocity(0);
+          // Expect increasing velocities
+          EXPECT_GT(newVel, oldVel);
+          oldVel = newVel;
+        }
+        // Apply negative torque to lower_joint
+        force = -3;
+        for (int i = 0; i < 10; ++i)
+        {
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          newVel = joint->GetVelocity(0);
+          // Expect decreasing velocities
+          EXPECT_LT(newVel, oldVel);
+          oldVel = newVel;
+        }
+      }
+      else
+      {
+        gzerr << "Error loading lower_joint "
+              << " of model " << *modelIter << '\n';
+        EXPECT_TRUE(joint != NULL);
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
 }
 
 TEST_F(PhysicsTest, RevoluteJointODE)
