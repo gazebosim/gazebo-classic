@@ -33,7 +33,6 @@ set (gtest_sources
   file_handling.cc
   heightmap.cc
   laser.cc
-  math.cc
   msgs.cc
   physics.cc
   pioneer2dx.cc
