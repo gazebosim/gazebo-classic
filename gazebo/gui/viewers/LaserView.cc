@@ -353,6 +353,8 @@ QRectF LaserView::LaserItem::GetBoundingRect() const
 /////////////////////////////////////////////////
 double LaserView::LaserItem::GetHoverRange() const
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+
   // Compute the index of the ray that the mouse is hovering over.
   int index = static_cast<int>(
       rint((this->indexAngle - this->angleMin) / this->angleStep));
@@ -366,6 +368,7 @@ double LaserView::LaserItem::GetHoverRange() const
 /////////////////////////////////////////////////
 double LaserView::LaserItem::GetHoverAngle() const
 {
+  boost::mutex::scoped_lock lock(this->mutex);
   return this->radians ? this->indexAngle : GZ_RTOD(this->indexAngle);
 }
 

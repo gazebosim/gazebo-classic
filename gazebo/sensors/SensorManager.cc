@@ -613,7 +613,6 @@ void SimTimeEventHandler::AddRelativeEvent(const common::Time &_time,
 }
 
 /////////////////////////////////////////////////
-//void SimTimeEventHandler::RunLoop()
 void SimTimeEventHandler::OnUpdate(const common::UpdateInfo &_info)
 {
   GZ_ASSERT(this->world != NULL, "World pointer is NULL");

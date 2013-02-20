@@ -357,7 +357,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
   std::string path, suffix;
 
   if (!_forceDownload)
-   path = SystemPaths::Instance()->FindFileURI(_uri);
+    path = SystemPaths::Instance()->FindFileURI(_uri);
 
   struct stat st;
 
