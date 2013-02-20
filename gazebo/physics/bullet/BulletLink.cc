@@ -134,7 +134,8 @@ void BulletLink::Init()
     this->rigidLink->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
 
   btDynamicsWorld *wd = this->bulletPhysics->GetDynamicsWorld();
-  wd->addRigidBody(this->rigidLink);
+//  wd->addRigidBody(this->rigidLink);
+  wd->addRigidBody(this->rigidLink, );
 
   // this->rigidLink->setSleepingThresholds(0,0);
 }
@@ -197,6 +198,7 @@ bool BulletLink::GetGravityMode() const
 //////////////////////////////////////////////////
 void BulletLink::SetSelfCollide(bool /*_collide*/)
 {
+  this->sdf->GetElement("self_collide")->Set(_collide);
 }
 
 //////////////////////////////////////////////////

@@ -46,6 +46,12 @@ BulletCollision::~BulletCollision()
 void BulletCollision::Load(sdf::ElementPtr _sdf)
 {
   Collision::Load(_sdf);
+
+  if (this->IsStatic())
+  {
+    this->SetCategoryBits(GZ_FIXED_COLLIDE);
+    this->SetCollideBits(~GZ_FIXED_COLLIDE);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -60,13 +66,15 @@ void BulletCollision::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCategoryBits(unsigned int /*_bits*/)
+void BulletCollision::SetCategoryBits(unsigned int _bits)
 {
+  this->categoryBits = _bits;
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCollideBits(unsigned int /*_bits*/)
+void BulletCollision::SetCollideBits(unsigned int _bits)
 {
+  this->collideBits = _bits;
 }
 
 //////////////////////////////////////////////////

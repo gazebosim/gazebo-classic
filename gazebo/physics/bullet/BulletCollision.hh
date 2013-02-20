@@ -82,6 +82,10 @@ namespace gazebo
       public: void SetCompoundShapeIndex(int index);
 
       protected: btCollisionShape *collisionShape;
+
+      private: unsigned int categoryBits;
+
+      private: unsigned int collideBits;
     };
     /// \}
   }
