@@ -40,9 +40,8 @@ GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor)
 
 //////////////////////////////////////////////////
 ImuSensor::ImuSensor()
-    : Sensor(sensors::OTHER)
+  : Sensor(sensors::OTHER)
 {
-  this->linearAcc = math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////

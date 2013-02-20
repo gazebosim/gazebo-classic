@@ -22,13 +22,50 @@
 #include "gazebo/sensors/ImuSensor.hh"
 
 using namespace gazebo;
-class ImuSensorTest : public ServerFixture
+class ImuSensor_TEST : public ServerFixture
 {
 };
 
-TEST(ImuSensorTest, BasicImuSensorCheck)
+static std::string imuSensorString =
+"<sdf version='1.3'>"
+"  <sensor name='imu' type='imu'>"
+"    <always_on>1</always_on>"
+"    <update_rate>20.000000</update_rate>"
+"    <imu>"
+"      <topic>/test_imu</topic>"
+"    </imu>"
+"  </sensor>"
+"</sdf>";
+
+TEST_F(ImuSensor_TEST, BasicImuSensorCheck)
 {
-  EXPECT_TRUE(true);
+  Load("worlds/empty.world");
+  sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+
+  sdf::ElementPtr sdf(new sdf::Element);
+  sdf::initFile("sensor.sdf", sdf);
+  sdf::readString(imuSensorString, sdf);
+
+  // Create the IMU sensor
+  std::string sensorName = mgr->CreateSensor(sdf, "default",
+      "ground_plane::link");
+
+  // Make sure the returned sensor name is correct
+  EXPECT_EQ(sensorName, std::string("default::ground_plane::link::imu"));
+
+  // Update the sensor manager so that it can process new sensors.
+  mgr->Update();
+
+  // Get a pointer to the Ray sensor
+  sensors::ImuSensorPtr sensor = boost::shared_dynamic_cast<sensors::ImuSensor>
+    (mgr->GetSensor(sensorName));
+
+  // Make sure the above dynamic cast worked.
+  EXPECT_TRUE(sensor != NULL);
+
+  EXPECT_EQ(sensor->GetAngularVelocity(), math::Vector3::Zero);
+  EXPECT_EQ(sensor->GetLinearAcceleration(), math::Vector3::Zero);
+  EXPECT_EQ(sensor->GetOrientation(), math::Quaternion());
 }
 
 
