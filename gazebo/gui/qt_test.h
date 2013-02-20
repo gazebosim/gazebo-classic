@@ -15,24 +15,10 @@
  *
 */
 
-#ifndef GAZEBO_QT_HEADERS_H_
-#define GAZEBO_QT_HEADERS_H_
+#ifndef GAZEBO_QT_TEST_HEADERS_H_
+#define GAZEBO_QT_TEST_HEADERS_H_
 
 #pragma GCC system_header
 
-#include <QtGui>
-#include <QX11Info>
-#include <QWidget>
-#include <QPushButton>
-#include <QPoint>
-#include <QFrame>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QGroupBox>
-#include <QApplication>
-#include <qmainwindow.h>
-#include <QAction>
-
+#include <QtTest/QtTest>
 #endif

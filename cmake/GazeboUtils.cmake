@@ -188,8 +188,8 @@ macro (gz_build_tests)
 endmacro()
 
 #################################################
-macro (gz_build_qt_tests)
-
+# INTERNAL function: do not call directly use gz_build_display_tests or gz_build_dri_tests
+macro (_gz_build_qt_tests)
   # Build all the tests
   foreach(QTEST_SOURCE_file ${ARGN})
     string(REGEX REPLACE ".cc" "" BINARY_NAME ${QTEST_SOURCE_file})
@@ -235,5 +235,24 @@ macro (gz_build_qt_tests)
     add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
              ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
   endforeach()
-
 endmacro()
+
+# Define GUI testing macros as empty and redefine them if support is found
+macro (gz_build_display_tests)
+endmacro()
+macro (gz_build_dri_tests)
+endmacro()
+
+if (VALID_DRI_DISPLAY)
+  macro (gz_build_dri_tests)
+    _gz_build_qt_tests(${ARGV})
+  endmacro()
+endif()
+
+if (VALID_DISPLAY)
+  macro (gz_build_display_tests)
+    _gz_build_qt_tests(${ARGV})
+  endmacro()
+endif()
+
+

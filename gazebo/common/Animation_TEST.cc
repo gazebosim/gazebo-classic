@@ -29,25 +29,25 @@ TEST(AnimationTest, PoseAnimation)
   {
     common::PoseAnimation anim("test", 1.0, true);
     anim.SetTime(-0.5);
-    EXPECT_NEAR(0.5, anim.GetTime(), 1e-6);
+    EXPECT_DOUBLE_EQ(0.5, anim.GetTime());
   }
 
   {
     common::PoseAnimation anim("test", 1.0, false);
     anim.SetTime(-0.5);
-    EXPECT_NEAR(0.0, anim.GetTime(), 1e-6);
+    EXPECT_DOUBLE_EQ(0.0, anim.GetTime());
 
     anim.SetTime(1.5);
-    EXPECT_NEAR(1.0, anim.GetTime(), 1e-6);
+    EXPECT_DOUBLE_EQ(1.0, anim.GetTime());
   }
 
 
   common::PoseAnimation anim("pose_test", 5.0, false);
   common::PoseKeyFrame *key = anim.CreateKeyFrame(0.0);
 
-  EXPECT_NEAR(5.0, anim.GetLength(), 1e-6);
+  EXPECT_DOUBLE_EQ(5.0, anim.GetLength());
   anim.SetLength(10.0);
-  EXPECT_NEAR(10.0, anim.GetLength(), 1e-6);
+  EXPECT_DOUBLE_EQ(10.0, anim.GetLength());
 
   key->SetTranslation(math::Vector3(0, 0, 0));
   EXPECT_TRUE(key->GetTranslation() == math::Vector3(0, 0, 0));
@@ -63,10 +63,10 @@ TEST(AnimationTest, PoseAnimation)
   EXPECT_TRUE(key->GetRotation() == math::Quaternion(0.1, 0.2, 0.3));
 
   anim.AddTime(5.0);
-  EXPECT_NEAR(5.0, anim.GetTime(), 1e-6);
+  EXPECT_DOUBLE_EQ(5.0, anim.GetTime());
 
   anim.SetTime(4.0);
-  EXPECT_NEAR(4.0, anim.GetTime(), 1e-6);
+  EXPECT_DOUBLE_EQ(4.0, anim.GetTime());
 
   common::PoseKeyFrame interpolatedKey(-1.0);
   anim.GetInterpolatedKeyFrame(interpolatedKey);
@@ -82,21 +82,21 @@ TEST(AnimationTest, NumericAnimation)
   common::NumericKeyFrame *key = anim.CreateKeyFrame(0.0);
 
   key->SetValue(0.0);
-  EXPECT_NEAR(0.0, key->GetValue(), 1e-6);
+  EXPECT_DOUBLE_EQ(0.0, key->GetValue());
 
   key = anim.CreateKeyFrame(10.0);
   key->SetValue(30);
-  EXPECT_NEAR(30, key->GetValue(), 1e-6);
+  EXPECT_DOUBLE_EQ(30, key->GetValue());
 
   anim.AddTime(5.0);
-  EXPECT_NEAR(5.0, anim.GetTime(), 1e-6);
+  EXPECT_DOUBLE_EQ(5.0, anim.GetTime());
 
   anim.SetTime(4.0);
-  EXPECT_NEAR(4.0, anim.GetTime(), 1e-6);
+  EXPECT_DOUBLE_EQ(4.0, anim.GetTime());
 
   common::NumericKeyFrame interpolatedKey(0);
   anim.GetInterpolatedKeyFrame(interpolatedKey);
-  EXPECT_NEAR(12, interpolatedKey.GetValue(), 1e-6);
+  EXPECT_DOUBLE_EQ(12, interpolatedKey.GetValue());
 }
 
 

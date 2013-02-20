@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,18 @@
  *
 */
 
-#ifndef GAZEBO_QT_HEADERS_H_
-#define GAZEBO_QT_HEADERS_H_
+#include <gtest/gtest.h>
 
-#pragma GCC system_header
+#include "gazebo/math/Helpers.hh"
 
-#include <QtGui>
-#include <QX11Info>
-#include <QWidget>
-#include <QPushButton>
-#include <QPoint>
-#include <QFrame>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QGroupBox>
-#include <QApplication>
-#include <qmainwindow.h>
-#include <QAction>
+using namespace gazebo;
 
-#endif
+TEST(HelpersTest, Helpers)
+{
+  EXPECT_EQ(12345, math::parseInt("12345"));
+  EXPECT_EQ(-12345, math::parseInt("-12345"));
+
+  EXPECT_EQ(12.345, math::parseFloat("12.345"));
+  EXPECT_EQ(-12.345, math::parseFloat("-12.345"));
+  EXPECT_TRUE(math::equal(123.45, math::parseFloat("1.2345e2"), 1e-2));
+}
