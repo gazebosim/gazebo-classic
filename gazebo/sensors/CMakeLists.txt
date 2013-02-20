@@ -33,8 +33,13 @@ set (headers
   SensorManager.hh
 )
 
+set (gtest_sources
+  RaySensor_TEST.cc
+)
+
 if (${VALID_DRI_DISPLAY})
   set (gtest_sources ${gtest_sources}
+    SensorManager_TEST.cc
     GpuRaySensor_TEST.cc
     )
 endif()

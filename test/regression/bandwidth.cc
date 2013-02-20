@@ -15,6 +15,8 @@
  *
 */
 
+#include <unistd.h>
+
 #include "ServerFixture.hh"
 
 using namespace gazebo;
@@ -34,7 +36,6 @@ void BandwidthMsg(const std::string &_msg)
   g_bwBytes.push_back(_msg.size());
   g_bwTime.push_back(common::Time::GetWallTime());
 }
-
 
 TEST_F(BandwidthTest, Bandwidth)
 {

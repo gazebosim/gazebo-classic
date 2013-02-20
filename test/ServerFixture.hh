@@ -76,6 +76,9 @@ class ServerFixture : public testing::Test
                path = TEST_REGRESSION_PATH;
                path += "/../../build/plugins";
                gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+
+               path = TEST_PATH;
+               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
              }
 
   protected: virtual void TearDown()
@@ -110,13 +113,19 @@ class ServerFixture : public testing::Test
 
   protected: virtual void Load(const std::string &_worldFilename, bool _paused)
              {
+               this->Load(_worldFilename, _paused, "");
+             }
+
+  protected: virtual void Load(const std::string &_worldFilename,
+                               bool _paused, const std::string &_physics)
+             {
                delete this->server;
                this->server = NULL;
 
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
                   boost::bind(&ServerFixture::RunServer, this, _worldFilename,
-                              _paused));
+                              _paused, _physics));
 
                // Wait for the server to come up
                // Use a 30 second timeout.
@@ -129,12 +138,13 @@ class ServerFixture : public testing::Test
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
                this->poseSub = this->node->Subscribe("~/pose/info",
-                   &ServerFixture::OnPose, this);
+                   &ServerFixture::OnPose, this, true);
                this->statsSub = this->node->Subscribe("~/world_stats",
                    &ServerFixture::OnStats, this);
 
                this->factoryPub =
                  this->node->Advertise<msgs::Factory>("~/factory");
+               this->factoryPub->WaitForConnection();
 
                // Wait for the world to reach the correct pause state.
                // This might not work properly with multiple worlds.
@@ -146,11 +156,12 @@ class ServerFixture : public testing::Test
                       ++waitCount < maxWaitCount)
                  common::Time::MSleep(10);
                ASSERT_LT(waitCount, maxWaitCount);
+
              }
 
   protected: void RunServer(const std::string &_worldFilename)
              {
-               this->RunServer(_worldFilename, false);
+               this->RunServer(_worldFilename, false, "");
              }
 
   protected: rendering::ScenePtr GetScene(
@@ -172,10 +183,15 @@ class ServerFixture : public testing::Test
                return rendering::get_scene(_sceneName);
              }
 
-  protected: void RunServer(const std::string &_worldFilename, bool _paused)
+  protected: void RunServer(const std::string &_worldFilename, bool _paused,
+                            const std::string &_physics)
              {
                ASSERT_NO_THROW(this->server = new Server());
-               ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
+               if (_physics.length())
+                 ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
+                                                        _physics));
+               else
+                 ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
 
                rendering::create_scene(
@@ -441,9 +457,14 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
+               int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName))
-                 common::Time::MSleep(10);
+               while (!this->HasEntity(_modelName) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
              }
 
   protected: void SpawnCylinder(const std::string &_name,
@@ -643,6 +664,10 @@ class ServerFixture : public testing::Test
 
   protected: void SpawnSDF(const std::string &_sdf)
              {
+               // Wait for the first pose message
+               while (this->poses.size() == 0)
+                 common::Time::MSleep(10);
+
                msgs::Factory msg;
                msg.set_sdf(_sdf);
                this->factoryPub->Publish(msg);

@@ -30,7 +30,7 @@ GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.ImageStamped", ImageView)
 
 /////////////////////////////////////////////////
 ImageView::ImageView(QWidget *_parent)
-: TopicView(_parent, "gazebo.msgs.ImageStamped", "image")
+: TopicView(_parent, "gazebo.msgs.ImageStamped", "image", 33)
 {
   this->setWindowTitle(tr("Gazebo: Image View"));
 

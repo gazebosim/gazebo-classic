@@ -46,6 +46,10 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetTopic(const std::string &_topicName);
 
+      /// \brief Signal to add a message to the GUI list.
+      /// \param[in] _msg Text message to add.
+      signals: void AddMsg(QString _msg);
+
       // Documentation inherited
       private: virtual void UpdateImpl();
 
@@ -60,6 +64,10 @@ namespace gazebo
       /// \brief QT callback when the pause check box has been changed.
       /// \param[in] _value New value of the check box.
       private slots: void OnPause(bool _value);
+
+      /// \brief Callback from the ::AddMsg function.
+      /// \param[in] _msg Message to add to the list.
+      private slots: void OnAddMsg(QString _msg);
 
       /// \brief A scolling list of text data.
       private: QListWidget *msgList;

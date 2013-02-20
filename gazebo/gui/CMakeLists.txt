@@ -35,6 +35,7 @@ set (sources
   ToolsWidget.cc
   TopicSelector.cc
   viewers/ImageView.cc
+  viewers/ImagesView.cc
   viewers/LaserView.cc
   viewers/TopicView.cc
   viewers/TextView.cc
@@ -55,6 +56,7 @@ set (qt_headers
   ToolsWidget.hh
   TopicSelector.hh
   viewers/ImageView.hh
+  viewers/ImagesView.hh
   viewers/LaserView.hh
   viewers/TextView.hh
   viewers/TopicView.hh
@@ -62,6 +64,7 @@ set (qt_headers
 
 set (headers
   qt.h
+  qt_test.h
   BoxMaker.hh
   CylinderMaker.hh
   EntityMaker.hh
@@ -74,11 +77,12 @@ set (headers
   viewers/ViewFactory.hh
 )
 
-set (tests 
+set (display_tests 
   TimePanel_TEST.cc
-  )
+  viewers/ImagesView_TEST.cc
+)
 
-gz_build_qt_tests(${tests})
+gz_build_display_tests(${display_tests})
 
 set (resources resources.qrc)
 
