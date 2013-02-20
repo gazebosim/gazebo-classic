@@ -512,12 +512,14 @@ void World::Update()
 {
   if (this->needsReset)
   {
-    if (this->resetAll)
-      this->Reset();
+    if (this->resetModelOnly)
+      this->ResetEntities(Base::MODEL);
+
     else if (this->resetTimeOnly)
       this->ResetTime();
-    else if (this->resetModelOnly)
-      this->ResetEntities(Base::MODEL);
+
+    if (this->resetAll)
+      this->Reset();
     this->needsReset = false;
   }
 
@@ -833,7 +835,6 @@ void World::Reset()
   {
     boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
 
-    this->ResetTime();
     this->ResetEntities(Base::BASE);
     for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
         iter != this->plugins.end(); ++iter)

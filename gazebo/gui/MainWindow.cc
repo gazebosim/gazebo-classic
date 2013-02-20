@@ -482,6 +482,8 @@ void MainWindow::OnResetWorld()
 {
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(true);
+  msg.mutable_reset()->set_time_only(false);
+  msg.mutable_reset()->set_model_only(false);
   this->worldControlPub->Publish(msg);
 }
 
