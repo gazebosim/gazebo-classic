@@ -410,7 +410,7 @@ void SensorManager::SensorContainer::RunLoop()
 
   engine->InitForThread();
 
-  common::Time sleepTime, startTime, eventTime;
+  common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = GZ_DBL_MIN;
 
   boost::mutex tmpMutex;
@@ -448,7 +448,14 @@ void SensorManager::SensorContainer::RunLoop()
     this->Update(false);
 
     // Compute the time it took to update the sensors.
-    eventTime = sleepTime - (world->GetSimTime() - startTime);
+    diffTime = world->GetSimTime() - startTime;
+
+    // Set the default sleep time;
+    eventTime = sleepTime;
+
+    // Make sure we don't try to compute a negative time;
+    if (diffTime < sleepTime)
+      eventTime -= diffTime;
 
     if (eventTime > common::Time::Zero)
     {
