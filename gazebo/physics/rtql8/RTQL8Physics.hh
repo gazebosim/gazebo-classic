@@ -58,6 +58,10 @@ namespace gazebo
       /// \brief Finilize the RTQL8 engine.
       public: virtual void Fini();
        
+      // Documentation inherited
+      public: virtual std::string GetType() const
+                      { return "rtql8"; }
+
       /// \brief Rest the RTQL8 engine.
       public: virtual void Reset();
  
