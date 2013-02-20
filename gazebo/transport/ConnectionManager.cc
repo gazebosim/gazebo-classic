@@ -478,14 +478,17 @@ void ConnectionManager::Unsubscribe(const msgs::Subscribe &_sub)
 void ConnectionManager::Unsubscribe(const std::string &_topic,
                                      const std::string &_msgType)
 {
-  msgs::Subscribe msg;
-  msg.set_topic(_topic);
-  msg.set_msg_type(_msgType);
-  msg.set_host(this->serverConn->GetLocalAddress());
-  msg.set_port(this->serverConn->GetLocalPort());
+  if (this->serverConn)
+  {
+    msgs::Subscribe msg;
+    msg.set_topic(_topic);
+    msg.set_msg_type(_msgType);
+    msg.set_host(this->serverConn->GetLocalAddress());
+    msg.set_port(this->serverConn->GetLocalPort());
 
-  // Inform the master that we want to unsubscribe from a topic.
-  this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", msg), true);
+    // Inform the master that we want to unsubscribe from a topic.
+    this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", msg), true);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -554,7 +557,7 @@ ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &host,
 }
 
 //////////////////////////////////////////////////
-void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
+void ConnectionManager::RemoveConnection(ConnectionPtr &_conn)
 {
   std::list<ConnectionPtr>::iterator iter;
 
@@ -562,13 +565,14 @@ void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
   iter = this->connections.begin();
   while (iter != this->connections.end())
   {
-    if ((*iter) == conn)
+    if ((*iter) == _conn)
+    {
       iter = this->connections.erase(iter);
+    }
     else
       ++iter;
   }
 }
-
 
 //////////////////////////////////////////////////
 ConnectionPtr ConnectionManager::FindConnection(const std::string &_host,

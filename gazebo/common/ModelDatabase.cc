@@ -277,11 +277,13 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
   size_t size = 0;
 
   {
-    boost::mutex::scoped_try_lock tryLock(this->updateMutex);
-    if (!tryLock)
-      gzmsg << "Waiting for model database update to complete...\n";
-
+    {
+      boost::mutex::scoped_try_lock tryLock(this->updateMutex);
+      if (!tryLock)
+        gzmsg << "Waiting for model database update to complete...\n";
+    }
     boost::mutex::scoped_lock lock(this->updateMutex);
+
     size = this->modelCache.size();
   }
 
@@ -355,7 +357,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
   std::string path, suffix;
 
   if (!_forceDownload)
-   path = SystemPaths::Instance()->FindFileURI(_uri);
+    path = SystemPaths::Instance()->FindFileURI(_uri);
 
   struct stat st;
 
@@ -384,7 +386,8 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       endIndex - startIndex;
 
     std::string modelName = _uri.substr(startIndex, modelNameLen);
-    suffix = _uri.substr(endIndex, std::string::npos);
+    if (endIndex != std::string::npos)
+      suffix = _uri.substr(endIndex, std::string::npos);
 
     // store zip file in temp location
     std::string filename = "/tmp/gz_model.tar.gz";
