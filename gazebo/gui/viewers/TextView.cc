@@ -63,7 +63,8 @@ TextView::TextView(QWidget *_parent, const std::string &_msgType)
   frameLayout->addWidget(this->msgList);
   frameLayout->addLayout(controlLayout);
 
-  connect(this, SIGNAL(AddMsg(QString)), this, SLOT(OnAddMsg(QString)));
+  connect(this, SIGNAL(AddMsg(QString)), this, SLOT(OnAddMsg(QString)),
+          Qt::QueuedConnection);
 
   this->frame->setObjectName("blackBorderFrame");
   this->frame->setLayout(frameLayout);
@@ -117,7 +118,7 @@ void TextView::OnText(const std::string &_msg)
   this->msg->ParseFromString(_msg);
 
   // Signal to add message to the gui list.
-  this->AddMsg(QString::fromStdString(msg->DebugString()));
+  this->AddMsg(QString::fromStdString(this->msg->DebugString()));
 }
 
 /////////////////////////////////////////////////
