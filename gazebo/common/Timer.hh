@@ -43,10 +43,10 @@ namespace gazebo
       public: virtual ~Timer();
 
       /// \brief Start the timer
-      public: void Start();
+      public: virtual void Start();
 
       /// \brief Stop the timer
-      public: void Stop();
+      public: virtual void Stop();
 
       /// \brief Returns true if the timer is running.
       /// \return Tue if the timer has been started and not stopped.

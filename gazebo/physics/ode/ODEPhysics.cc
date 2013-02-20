@@ -327,6 +327,8 @@ void ODEPhysics::InitForThread()
 //////////////////////////////////////////////////
 void ODEPhysics::UpdateCollision()
 {
+  DIAG_TIMER_START(ODEPhysics__UpdateCollision);
+
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
   dJointGroupEmpty(this->contactGroup);
 
@@ -340,6 +342,7 @@ void ODEPhysics::UpdateCollision()
 
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide(this->spaceId, this, CollisionCallback);
+  DIAG_TIMER_LAP(ODEPhysics__UpdateCollision, "dSpaceCollide");
 
   // Generate non-trimesh collisions.
   for (i = 0; i < this->collidersCount; ++i)
@@ -347,6 +350,7 @@ void ODEPhysics::UpdateCollision()
     this->Collide(this->colliders[i].first,
         this->colliders[i].second, this->contactCollisions);
   }
+  DIAG_TIMER_LAP(ODEPhysics__UpdateCollision, "collideShapes");
 
   // Generate trimesh collision.
   // This must happen in this thread sequentially
@@ -356,11 +360,16 @@ void ODEPhysics::UpdateCollision()
     ODECollision *collision2 = this->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->contactCollisions);
   }
+  DIAG_TIMER_LAP(ODEPhysics__UpdateCollision, "collideTrimeshes");
+
+  DIAG_TIMER_STOP(ODEPhysics__UpdateCollision);
 }
 
 //////////////////////////////////////////////////
 void ODEPhysics::UpdatePhysics()
 {
+  DIAG_TIMER_START(ODEPhysics__UpdatePhysics);
+
   // need to lock, otherwise might conflict with world resetting
   {
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
@@ -395,6 +404,8 @@ void ODEPhysics::UpdatePhysics()
       }
     }
   }
+
+  DIAG_TIMER_STOP(ODEPhysics__UpdatePhysics);
 }
 
 //////////////////////////////////////////////////

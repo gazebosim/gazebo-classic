@@ -19,40 +19,34 @@
  * Date: 2 Feb 2011
  */
 
-#include <boost/filesystem.hpp>
-#include <boost/smart_ptr.hpp>
-
-#include "gazebo/common/Events.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Diagnostics.hh"
 
 using namespace gazebo;
 using namespace common;
 
-// DiagnosticManager *DiagnosticTimer::diagManager = DiagnosticManager::Instance();
-
 //////////////////////////////////////////////////
 DiagnosticManager::DiagnosticManager()
 {
-  boost::filesystem::path logPath;
-
   // Get the base of the time logging path
   if (!getenv("HOME"))
   {
     gzwarn << "HOME environment variable missing. Diagnostic timing "
       << "information will be logged to /tmp/gazebo.\n";
-    logPath = "/tmp/gazebo";
+    this->logPath = "/tmp/gazebo";
   }
   else
   {
-    logPath = getenv("HOME");
-    logPath /= ".gazebo";
+    this->logPath = getenv("HOME");
+    this->logPath /= ".gazebo";
   }
 
-  logPath /= "timing";
+  this->logPath = this->logPath / "timing" /
+    common::Time::GetWallTimeAsISOString();
 
   // Make sure the path exists.
-  if (!boost::filesystem::exists(logPath))
-    boost::filesystem::create_directory(logPath);
+  if (!boost::filesystem::exists(this->logPath))
+    boost::filesystem::create_directories(this->logPath);
 }
 
 //////////////////////////////////////////////////
@@ -61,12 +55,37 @@ DiagnosticManager::~DiagnosticManager()
 }
 
 //////////////////////////////////////////////////
-DiagnosticTimerPtr DiagnosticManager::CreateTimer(const std::string &_name)
+boost::filesystem::path DiagnosticManager::GetLogPath() const
 {
-  DiagnosticTimerPtr result(new DiagnosticTimer(_name));
-  this->timers.insert(
-      std::pair<std::string, DiagnostTimerWeakPtr>(_name, result));
-  return result;
+  return this->logPath;
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::StartTimer(const std::string &_name)
+{
+  TimerMap::iterator iter = this->timers.find(_name);
+  if (iter != this->timers.end())
+  {
+    GZ_ASSERT(iter->second != NULL, "DiagnosticTimerPtr is NULL");
+    iter->second->Start();
+  }
+  else
+  {
+    this->timers[_name] = DiagnosticTimerPtr(new DiagnosticTimer(_name));
+  }
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::StopTimer(const std::string &_name)
+{
+  TimerMap::iterator iter = this->timers.find(_name);
+  if (iter != this->timers.end())
+  {
+    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
+    iter->second->Stop();
+  }
+  else
+    gzerr << "Unable to find timer[" << _name << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -80,29 +99,11 @@ void DiagnosticManager::Lap(const std::string &_name,
     gzerr << "Unable to find timer with name[" << _name << "]\n";
   else
   {
-    if (DiagnosticTimerPtr ptr = iter->second.lock())
-    {
+    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
 
-      std::cerr << "Lap[" << _name << ":" << _prefix << "] " << 
-        ptr->GetElapsed().Double(); 
-      ptr->Start();
-      // event::Events::diagTimerLap(_name, _prefix);
-    }
+    iter->second->Lap(_prefix);
   }
 }
-
-//////////////////////////////////////////////////
-/*void DiagnosticManager::TimerStart(DiagnosticTimer *_timer)
-{
-  this->timers[_timer->GetName()] = Timer();
-}
-
-//////////////////////////////////////////////////
-void DiagnosticManager::TimerStop(DiagnosticTimer *_timer)
-{
-  this->timers[_timer->GetName()] = _timer->GetElapsed();
-  event::Events::diagTimerStop(_timer->GetName());
-}*/
 
 //////////////////////////////////////////////////
 int DiagnosticManager::GetTimerCount() const
@@ -113,14 +114,16 @@ int DiagnosticManager::GetTimerCount() const
 //////////////////////////////////////////////////
 Time DiagnosticManager::GetTime(int _index) const
 {
-  DiagnosticTimerPtr timer;
   TimerMap::const_iterator iter;
 
   iter = this->timers.begin();
   std::advance(iter, _index);
 
-  if (iter != this->timers.end() && (timer = iter->second.lock()))
-    return timer->GetElapsed();
+  if (iter != this->timers.end())
+  {
+    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
+    return iter->second->GetElapsed();
+  }
   else
     gzerr << "Error getting time\n";
 
@@ -146,15 +149,81 @@ std::string DiagnosticManager::GetLabel(int _index) const
 //////////////////////////////////////////////////
 Time DiagnosticManager::GetTime(const std::string &_label) const
 {
-  DiagnosticTimerPtr timer;
-
   TimerMap::const_iterator iter;
   iter = this->timers.find(_label);
 
-  if (iter != this->timers.end() && (timer = iter->second.lock()))
-    return timer->GetElapsed();
+  if (iter != this->timers.end())
+  {
+    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
+    return iter->second->GetElapsed();
+  }
   else
     gzerr << "Error getting time\n";
 
   return Time();
+}
+
+//////////////////////////////////////////////////
+DiagnosticTimer::DiagnosticTimer(const std::string &_name) : Timer()
+{
+  boost::filesystem::path logPath;
+
+  logPath = DiagnosticManager::Instance()->GetLogPath() / (_name + ".log");
+  this->log.open(logPath.string().c_str(), std::ios::out | std::ios::app);
+
+  this->name = _name;
+  this->Start();
+}
+
+//////////////////////////////////////////////////
+DiagnosticTimer::~DiagnosticTimer()
+{
+  this->Stop();
+  this->log.close();
+}
+
+//////////////////////////////////////////////////
+void DiagnosticTimer::Start()
+{
+  // Only start if not running.
+  if (!this->GetRunning())
+  {
+    // Start the timer
+    Timer::Start();
+
+    // Make sure the prev lap is reset
+    this->prevLap.Set(0, 0);
+  }
+}
+
+//////////////////////////////////////////////////
+void DiagnosticTimer::Stop()
+{
+  // Only stop is currently running
+  if (this->GetRunning())
+  {
+    // Stop the timer
+    Timer::Stop();
+
+    // Write out the total elapsed time.
+    this->log << this->name << " " << this->GetElapsed().Double() << std::endl;
+    this->log.flush();
+
+    // Reset the lap time
+    this->prevLap.Set(0, 0);
+  }
+}
+
+//////////////////////////////////////////////////
+void DiagnosticTimer::Lap(const std::string &_prefix)
+{
+  // Get the current elapsed time.
+  common::Time currTime = this->GetElapsed();
+
+  // Write out the delta time.
+  this->log << this->name << ":" << _prefix << " "
+    << (currTime - this->prevLap).Double() << std::endl;
+
+  // Store the prev lap time.
+  this->prevLap = currTime;
 }

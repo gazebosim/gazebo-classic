@@ -29,8 +29,7 @@ TEST(DiagnosticsTest, Diagnostics)
 
   common::Time prev = common::Time::GetWallTime();
   {
-    common::DiagnosticTimerPtr timer = mgr->CreateTimer("test");
-    EXPECT_STREQ("test", timer->GetName().c_str());
+    mgr->StartTimer("test");
     EXPECT_STREQ("test", mgr->GetLabel(0).c_str());
     EXPECT_EQ(1, mgr->GetTimerCount());
   }

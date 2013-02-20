@@ -422,7 +422,7 @@ void World::LogStep()
 //////////////////////////////////////////////////
 void World::Step()
 {
-  DIAG_TIMER("World::Step");
+  DIAG_TIMER_START(World__Step);
 
   /// need this because ODE does not call dxReallocateWorldProcessContext()
   /// until dWorld.*Step
@@ -435,7 +435,7 @@ void World::Step()
     this->pluginsLoaded = true;
   }
 
-  DIAG_TIMER_LAP("World::Step", "loadPlugins");
+  DIAG_TIMER_LAP(World__Step, "loadPlugins");
 
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
@@ -443,7 +443,7 @@ void World::Step()
     this->PublishWorldStats();
   }
 
-  DIAG_TIMER_LAP("World::Step", "publishWorldStats");
+  DIAG_TIMER_LAP(World__Step, "publishWorldStats");
 
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
@@ -462,7 +462,7 @@ void World::Step()
   this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
                       this->sleepOffset * 0.99;
 
-  DIAG_TIMER_LAP("World::Step", "sleepOffset");
+  DIAG_TIMER_LAP(World__Step, "sleepOffset");
 
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
@@ -471,7 +471,7 @@ void World::Step()
   {
     boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
 
-    DIAG_TIMER_LAP("World::Step", "worldUpdateMutex");
+    DIAG_TIMER_LAP(World__Step, "worldUpdateMutex");
 
     this->prevStepWallTime = common::Time::GetWallTime();
 
@@ -482,7 +482,7 @@ void World::Step()
       this->iterations++;
       this->Update();
 
-      DIAG_TIMER_LAP("World::Step", "update");
+      DIAG_TIMER_LAP(World__Step, "update");
 
       if (this->IsPaused() && this->stepInc > 0)
         this->stepInc--;
@@ -492,7 +492,7 @@ void World::Step()
   }
 
   this->ProcessMessages();
-  DIAG_TIMER_LAP("World::Step", "processMessages");
+  DIAG_TIMER_STOP(World__Step);
 }
 
 //////////////////////////////////////////////////
