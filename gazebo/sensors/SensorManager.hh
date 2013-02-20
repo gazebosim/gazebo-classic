@@ -30,6 +30,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/sdf/sdf.hh"
 
@@ -68,14 +69,12 @@ namespace gazebo
       public: void AddRelativeEvent(const common::Time &_time,
                   boost::condition_variable *_var);
 
-      /// \brief Run loop for the processing thread.
-      private: void RunLoop();
+      /// \brief Called when the world is updated.
+      /// \param[in] _info Update timing information.
+      private: void OnUpdate(const common::UpdateInfo &_info);
 
       /// \brief Mutex to mantain thread safety.
       private: boost::mutex mutex;
-
-      /// \brief Used by the thread to determine when to stop running.
-      private: bool stop;
 
       /// \brief The list of events to handle.
       private: std::list<SimTimeEvent*> events;
@@ -83,14 +82,11 @@ namespace gazebo
       /// \brief Get sim time from the world.
       private: physics::WorldPtr world;
 
-      /// \brief Processing thread.
-      private: boost::thread *thread;
-
-      /// \brief Condition used to tell the thread when to run.
-      private: boost::condition_variable condition;
-
       /// \brief This is a singleton class.
       private: friend class SingletonT<SimTimeEventHandler>;
+
+      /// \brief Connect to the World::UpdateBegin event.
+      private: event::ConnectionPtr updateConnection;
     };
     /// \endcond
 

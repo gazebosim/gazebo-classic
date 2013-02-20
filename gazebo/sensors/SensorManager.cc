@@ -580,23 +580,13 @@ SimTimeEventHandler::SimTimeEventHandler()
   this->world = physics::get_world();
   GZ_ASSERT(this->world != NULL, "World pointer is NULL");
 
-  this->thread = new boost::thread(
-      boost::bind(&SimTimeEventHandler::RunLoop, this));
-  GZ_ASSERT(this->thread != NULL, "Unable to create boost::thread");
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&SimTimeEventHandler::OnUpdate, this, _1));
 }
 
 /////////////////////////////////////////////////
 SimTimeEventHandler::~SimTimeEventHandler()
 {
-  // Stop the thread.
-  this->stop = true;
-  if (this->thread)
-  {
-    this->thread->join();
-    delete this->thread;
-    this->thread = NULL;
-  }
-
   // Cleanup the events.
   for (std::list<SimTimeEvent*>::iterator iter = this->events.begin();
        iter != this->events.end(); ++iter)
@@ -620,50 +610,36 @@ void SimTimeEventHandler::AddRelativeEvent(const common::Time &_time,
 
   // Add the event to the list.
   this->events.push_back(event);
-
-  // Tell the thread that an event has been added.
-  this->condition.notify_one();
 }
 
 /////////////////////////////////////////////////
-void SimTimeEventHandler::RunLoop()
+//void SimTimeEventHandler::RunLoop()
+void SimTimeEventHandler::OnUpdate(const common::UpdateInfo &_info)
 {
   GZ_ASSERT(this->world != NULL, "World pointer is NULL");
 
-  common::Time simTime;
-  this->stop = false;
-  while (!stop)
   {
+    boost::mutex::scoped_lock lock(this->mutex);
+
+    // Iterate over all the events.
+    for (std::list<SimTimeEvent*>::iterator iter = this->events.begin();
+        iter != this->events.end();)
     {
-      boost::mutex::scoped_lock lock(this->mutex);
+      GZ_ASSERT(*iter != NULL, "SimTimeEvent is NULL");
 
-      // Get the current simulation time
-      simTime = this->world->GetSimTime();
-
-      // Iterate over all the events.
-      for (std::list<SimTimeEvent*>::iterator iter = this->events.begin();
-          iter != this->events.end();)
+      // Find events that have a time less than or equal to simulation
+      // time.
+      if ((*iter)->time <= _info.simTime)
       {
-        GZ_ASSERT(*iter != NULL, "SimTimeEvent is NULL");
+        // Notify the event by triggering its condition.
+        (*iter)->condition->notify_all();
 
-        // Find events that have a time less than or equal to simulation
-        // time.
-        if ((*iter)->time <= simTime)
-        {
-          // Notify the event by triggering its condition.
-          (*iter)->condition->notify_all();
-
-          // Remove the event.
-          delete *iter;
-          this->events.erase(iter++);
-        }
-        else
-          ++iter;
+        // Remove the event.
+        delete *iter;
+        this->events.erase(iter++);
       }
-
-      // Wait if there are no events in the list.
-      if (this->events.size() == 0)
-        this->condition.wait(lock);
+      else
+        ++iter;
     }
   }
 }
