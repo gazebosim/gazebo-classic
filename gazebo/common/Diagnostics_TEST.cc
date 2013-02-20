@@ -23,11 +23,9 @@ using namespace gazebo;
 
 TEST(DiagnosticsTest, Diagnostics)
 {
+#ifdef ENABLE_DIAGNOSTICS
   common::DiagnosticManager *mgr = common::DiagnosticManager::Instance();
   EXPECT_TRUE(mgr != NULL);
-
-  mgr->SetEnabled(true);
-  EXPECT_TRUE(mgr->GetEnabled());
 
   common::Time prev = common::Time::GetWallTime();
   {
@@ -40,8 +38,8 @@ TEST(DiagnosticsTest, Diagnostics)
 
   EXPECT_TRUE(mgr->GetTime(0) == mgr->GetTime("test"));
   EXPECT_TRUE(mgr->GetTime(0) <= after - prev);
+#endif
 }
-
 
 
 /////////////////////////////////////////////////

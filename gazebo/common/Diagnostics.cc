@@ -19,17 +19,40 @@
  * Date: 2 Feb 2011
  */
 
+#include <boost/filesystem.hpp>
+#include <boost/smart_ptr.hpp>
+
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Diagnostics.hh"
 
 using namespace gazebo;
 using namespace common;
 
-DiagnosticManager *DiagnosticTimer::diagManager = DiagnosticManager::Instance();
+// DiagnosticManager *DiagnosticTimer::diagManager = DiagnosticManager::Instance();
 
 //////////////////////////////////////////////////
 DiagnosticManager::DiagnosticManager()
 {
+  boost::filesystem::path logPath;
+
+  // Get the base of the time logging path
+  if (!getenv("HOME"))
+  {
+    gzwarn << "HOME environment variable missing. Diagnostic timing "
+      << "information will be logged to /tmp/gazebo.\n";
+    logPath = "/tmp/gazebo";
+  }
+  else
+  {
+    logPath = getenv("HOME");
+    logPath /= ".gazebo";
+  }
+
+  logPath /= "timing";
+
+  // Make sure the path exists.
+  if (!boost::filesystem::exists(logPath))
+    boost::filesystem::create_directory(logPath);
 }
 
 //////////////////////////////////////////////////
@@ -40,14 +63,38 @@ DiagnosticManager::~DiagnosticManager()
 //////////////////////////////////////////////////
 DiagnosticTimerPtr DiagnosticManager::CreateTimer(const std::string &_name)
 {
-  return DiagnosticTimerPtr(new DiagnosticTimer(_name));
+  DiagnosticTimerPtr result(new DiagnosticTimer(_name));
+  this->timers.insert(
+      std::pair<std::string, DiagnostTimerWeakPtr>(_name, result));
+  return result;
 }
 
 //////////////////////////////////////////////////
-void DiagnosticManager::TimerStart(DiagnosticTimer *_timer)
+void DiagnosticManager::Lap(const std::string &_name,
+                            const std::string &_prefix)
 {
-  this->timers[_timer->GetName()] = Time();
-  event::Events::diagTimerStart(_timer->GetName());
+  TimerMap::iterator iter;
+  iter = this->timers.find(_name);
+
+  if (iter == this->timers.end())
+    gzerr << "Unable to find timer with name[" << _name << "]\n";
+  else
+  {
+    if (DiagnosticTimerPtr ptr = iter->second.lock())
+    {
+
+      std::cerr << "Lap[" << _name << ":" << _prefix << "] " << 
+        ptr->GetElapsed().Double(); 
+      ptr->Start();
+      // event::Events::diagTimerLap(_name, _prefix);
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+/*void DiagnosticManager::TimerStart(DiagnosticTimer *_timer)
+{
+  this->timers[_timer->GetName()] = Timer();
 }
 
 //////////////////////////////////////////////////
@@ -55,7 +102,7 @@ void DiagnosticManager::TimerStop(DiagnosticTimer *_timer)
 {
   this->timers[_timer->GetName()] = _timer->GetElapsed();
   event::Events::diagTimerStop(_timer->GetName());
-}
+}*/
 
 //////////////////////////////////////////////////
 int DiagnosticManager::GetTimerCount() const
@@ -66,13 +113,14 @@ int DiagnosticManager::GetTimerCount() const
 //////////////////////////////////////////////////
 Time DiagnosticManager::GetTime(int _index) const
 {
-  std::map<std::string, Time>::const_iterator iter;
+  DiagnosticTimerPtr timer;
+  TimerMap::const_iterator iter;
 
   iter = this->timers.begin();
   std::advance(iter, _index);
 
-  if (iter != this->timers.end())
-    return iter->second;
+  if (iter != this->timers.end() && (timer = iter->second.lock()))
+    return timer->GetElapsed();
   else
     gzerr << "Error getting time\n";
 
@@ -82,7 +130,7 @@ Time DiagnosticManager::GetTime(int _index) const
 //////////////////////////////////////////////////
 std::string DiagnosticManager::GetLabel(int _index) const
 {
-  std::map<std::string, Time>::const_iterator iter;
+  TimerMap::const_iterator iter;
 
   iter = this->timers.begin();
   std::advance(iter, _index);
@@ -98,11 +146,13 @@ std::string DiagnosticManager::GetLabel(int _index) const
 //////////////////////////////////////////////////
 Time DiagnosticManager::GetTime(const std::string &_label) const
 {
-  std::map<std::string, Time>::const_iterator iter;
+  DiagnosticTimerPtr timer;
+
+  TimerMap::const_iterator iter;
   iter = this->timers.find(_label);
 
-  if (iter != this->timers.end())
-    return iter->second;
+  if (iter != this->timers.end() && (timer = iter->second.lock()))
+    return timer->GetElapsed();
   else
     gzerr << "Error getting time\n";
 

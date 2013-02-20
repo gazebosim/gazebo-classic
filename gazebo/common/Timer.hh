@@ -45,11 +45,18 @@ namespace gazebo
       /// \brief Start the timer
       public: void Start();
 
+      /// \brief Stop the timer
+      public: void Stop();
+
+      /// \brief Returns true if the timer is running.
+      /// \return Tue if the timer has been started and not stopped.
+      public: bool GetRunning() const;
+
       /// \brief Get the elapsed time
       /// \return The time
       public: Time GetElapsed() const;
 
-      /// \brief stream operator friendly
+      /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
                                               const gazebo::common::Timer &t)
               {
@@ -57,8 +64,14 @@ namespace gazebo
                 return out;
               }
 
-      /// \brief the time of the last call to Start
+      /// \brief The time of the last call to Start
       private: Time start;
+
+      /// \brief The time when Stop was called.
+      private: Time stop;
+
+      /// \brief True if the timer is running.
+      private: bool running;
     };
     /// \}
   }
