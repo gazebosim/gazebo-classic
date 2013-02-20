@@ -333,6 +333,7 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
       {
         case msgs::LogStatus::LogFile::BYTES:
           stream << "B";
+          break;
         case msgs::LogStatus::LogFile::K_BYTES:
           stream << "KB";
           break;
