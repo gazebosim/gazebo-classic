@@ -33,50 +33,30 @@ class LaserTest : public ServerFixture
 
 void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world", false, _physicsEngine);
-  std::ostringstream laserModel;
-    laserModel << "<sdf version='" << SDF_VERSION << "'>"
-      "<model name='box'>"
-        "<static>true</static>"
-        "<link name='link'>"
-        "<pose>0 0 0.5 0 0 0</pose>"
-        "<sensor name='laser' type='ray'>"
-          "<always_on>true</always_on>"
-          "<update_rate>10</update_rate>"
-          "<visualize>true</visualize>"
-          "<topic>~/laser_scan</topic>"
-          "<ray>"
-            "<scan>"
-              "<horizontal>"
-                "<samples>640</samples>"
-                "<resolution>1</resolution>"
-                "<min_angle>-2.27</min_angle>"
-                "<max_angle>2.27</max_angle>"
-              "</horizontal>"
-            "</scan>"
-            "<range>"
-              "<min>0.0</min>"
-              "<max>10</max>"
-              "<resolution>0.01</resolution>"
-            "</range>"
-          "</ray>"
-        "</sensor>"
-      "</link>"
-    "</model>"
-  "</sdf>";
+  Load("worlds/empty.world", true, _physicsEngine);
 
-  SpawnSDF(laserModel.str());
-  while (!HasEntity("box"))
-    common::Time::MSleep(10);
+  std::string modelName = "ray_model";
+  std::string raySensorName = "ray_sensor";
+  double hMinAngle = -2.27;
+  double hMaxAngle = 2.27;
+  double minRange = 0.0;
+  double maxRange = 10.0;
+  double rangeResolution = 0.01;
+  unsigned int samples = 640;
+  math::Pose testPose(math::Vector3(0, 0, 0.5),
+      math::Quaternion(0, 0, 0));
+
+  SpawnRaySensor(modelName, raySensorName, testPose.pos,
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+      rangeResolution, samples);
 
   sensors::RaySensorPtr laser =
     boost::shared_static_cast<sensors::RaySensor>(
-        sensors::SensorManager::Instance()->GetSensor(
-          "default::box::link::laser"));
-  EXPECT_TRUE(laser);
+        sensors::SensorManager::Instance()->GetSensor(raySensorName));
+
+  ASSERT_TRUE(laser);
+  laser->Init();
   laser->Update(true);
-  while (laser->GetRange(0) == 0)
-    common::Time::MSleep(100);
 
   EXPECT_EQ(640, laser->GetRayCount());
   EXPECT_EQ(640, laser->GetRangeCount());
@@ -85,6 +65,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   EXPECT_NEAR(laser->GetRangeMin(), 0, DOUBLE_TOL);
   EXPECT_NEAR(laser->GetRangeMax(), 10, DOUBLE_TOL);
   EXPECT_NEAR(laser->GetRangeResolution(), 0.01, DOUBLE_TOL);
+
 
   for (int i = 0; i < laser->GetRangeCount(); ++i)
   {
@@ -103,10 +84,14 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
     std::vector<double> scan;
     laser->GetRanges(scan);
 
-    DoubleCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
-    EXPECT_LT(diffMax, 2e-6);
-    EXPECT_LT(diffSum, 1e-4);
-    EXPECT_LT(diffAvg, 2e-6);
+    // run test against pre-recorded range data only in ode
+    if (_physicsEngine == "ode")
+    {
+      DoubleCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
+      EXPECT_LT(diffMax, 2e-6);
+      EXPECT_LT(diffSum, 1e-4);
+      EXPECT_LT(diffAvg, 2e-6);
+    }
 
     // This line will print the current scan. Use this to generate
     // a new test scan sample
@@ -117,14 +102,12 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   {
     common::Time prevTime;
     physics::WorldPtr world = physics::get_world("default");
-    EXPECT_TRUE(world);
+    ASSERT_TRUE(world);
 
-    physics::ModelPtr model = world->GetModel("box");
+    physics::ModelPtr model = world->GetModel(modelName);
 
     prevTime = laser->GetLastUpdateTime();
     model->SetWorldPose(math::Pose(0, 0, 1.0, 0, M_PI*0.5, 0));
-    while (laser->GetLastUpdateTime() <= prevTime)
-      common::Time::MSleep(10);
 
     double diffMax, diffSum, diffAvg;
 
@@ -145,10 +128,14 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
     }
     laser->Update(true);
 
-    DoubleCompare(plane_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
-    EXPECT_LT(diffMax, 1e-6);
-    EXPECT_LT(diffSum, 1e-6);
-    EXPECT_LT(diffAvg, 1e-6);
+    // run test against pre-recorded range data only in ode
+    if (_physicsEngine == "ode")
+    {
+      DoubleCompare(plane_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
+      EXPECT_LT(diffMax, 1e-6);
+      EXPECT_LT(diffSum, 1e-6);
+      EXPECT_LT(diffAvg, 1e-6);
+    }
 
     // This line will print the current scan. Use this to generate
     // a new test scan sample
@@ -161,10 +148,12 @@ TEST_F(LaserTest, EmptyWorldODE)
   Stationary_EmptyWorld("ode");
 }
 
+#ifdef HAVE_BULLET
 TEST_F(LaserTest, EmptyWorldBullet)
 {
-//  Stationary_EmptyWorld("bullet");
+  Stationary_EmptyWorld("bullet");
 }
+#endif
 
 void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 {
