@@ -107,6 +107,9 @@ namespace gazebo
       /// triggered.
       private slots: void BuildingEditorExit();
 
+      /// \brief QT slot to open the data logger utility
+      private slots: void DataLogger();
+
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
 
@@ -172,7 +175,7 @@ namespace gazebo
       private: QTabWidget *tabWidget;
       private: QMenuBar *menuBar;
 
-      /// \brief Frame layout that contains the menu bar.
+      /// \brief A layout for the menu bar.
       private: QHBoxLayout *menuLayout;
 
       /// \brief The filename set via "Save As". This filename is used by

@@ -38,18 +38,18 @@ namespace gazebo
     /// \brief Initialize the plugin.
     public: virtual void Init();
 
-    private: void MakeBox(const std::string &_name, math::Vector3 &_pos,
+    private: void MakeBox(const std::string &_name, math::Pose &_pose,
                           math::Vector3 &_size, double _mass);
 
-    private: void MakeSphere(const std::string &_name, math::Vector3 &_pos,
-                             math::Vector3 &_size, double _mass);
+    private: void MakeCinderBlock(const std::string &_name, math::Pose &_pose,
+                                  math::Vector3 &_size, double _mass);
 
     private: void MakeCylinder(const std::string &_name, math::Vector3 &_pos,
                                math::Vector3 &_size, double _mass);
 
     private: class Obj
              {
-               public: math::Vector3 pos;
+               public: math::Pose pose;
                public: math::Vector3 size;
                public: int type;
              };
