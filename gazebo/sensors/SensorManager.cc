@@ -466,18 +466,14 @@ void SensorManager::SensorContainer::RunLoop()
     GZ_ASSERT(eventTime >= common::Time::Zero,
         "Time to next sensor update is negative.");
 
-    // Only wait if there is time to wait.
-    if (eventTime > common::Time::Zero)
-    {
-      boost::mutex::scoped_lock timingLock(SensorManager::sensorTimingMutex);
+    boost::mutex::scoped_lock timingLock(SensorManager::sensorTimingMutex);
 
-      // Add an event to trigger when the appropriate simulation time has been
-      // reached.
-      SimTimeEventHandler::Instance()->AddRelativeEvent(eventTime,
-          &this->runCondition);
+    // Add an event to trigger when the appropriate simulation time has been
+    // reached.
+    SimTimeEventHandler::Instance()->AddRelativeEvent(eventTime,
+        &this->runCondition);
 
-      this->runCondition.wait(timingLock);
-    }
+    this->runCondition.wait(timingLock);
   }
 }
 
