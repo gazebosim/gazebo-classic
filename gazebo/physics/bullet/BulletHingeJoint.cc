@@ -254,20 +254,26 @@ double BulletHingeJoint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetForce(int /*_index*/, double _torque)
 {
-  if (bulletHinge)
+  if (this->bulletHinge)
   {
     // z-axis of constraint frame
-    btVector3 hingeAxisLocal =
+    btVector3 hingeAxisLocalA =
       this->bulletHinge->getAFrame().getBasis().getColumn(2);
+    btVector3 hingeAxisLocalB =
+      this->bulletHinge->getBFrame().getBasis().getColumn(2);
 
-    btVector3 hingeAxisWorld =
+    btVector3 hingeAxisWorldA =
       this->bulletHinge->getRigidBodyA().getWorldTransform().getBasis() *
-      hingeAxisLocal;
+      hingeAxisLocalA;
+    btVector3 hingeAxisWorldB =
+      this->bulletHinge->getRigidBodyB().getWorldTransform().getBasis() *
+      hingeAxisLocalB;
 
-    btVector3 hingeTorque = _torque * hingeAxisWorld;
+    btVector3 hingeTorqueA = _torque * hingeAxisWorldA;
+    btVector3 hingeTorqueB = _torque * hingeAxisWorldB;
 
-    this->bulletHinge->getRigidBodyA().applyTorque(-hingeTorque);
-    this->bulletHinge->getRigidBodyB().applyTorque(hingeTorque);
+    this->bulletHinge->getRigidBodyA().applyTorque(-hingeTorqueA);
+    this->bulletHinge->getRigidBodyB().applyTorque( hingeTorqueB);
   }
 }
 
