@@ -54,9 +54,9 @@ TEST_F(ExampleBox, CopyConstructor)
 
 TEST_F(ExampleBox, GetLength)
 {
-  EXPECT_NEAR(box.GetXLength(), 1, 1e-6);
-  EXPECT_NEAR(box.GetYLength(), 1, 1e-6);
-  EXPECT_NEAR(box.GetZLength(), 1, 1e-6);
+  EXPECT_DOUBLE_EQ(box.GetXLength(), 1);
+  EXPECT_DOUBLE_EQ(box.GetYLength(), 1);
+  EXPECT_DOUBLE_EQ(box.GetZLength(), 1);
 }
 
 TEST_F(ExampleBox, GetSize)

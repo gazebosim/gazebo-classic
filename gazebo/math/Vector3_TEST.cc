@@ -42,8 +42,8 @@ TEST(Vector3Test, Vector3)
 
   // ::GetDistToLine
   v.Set(0, 0, 0);
-  EXPECT_NEAR(1.0, v.GetDistToLine(math::Vector3(1, -1, 0),
-                                 math::Vector3(1, 1, 0)), 1e-6);
+  EXPECT_DOUBLE_EQ(1.0, v.GetDistToLine(math::Vector3(1, -1, 0),
+        math::Vector3(1, 1, 0)));
 
   // ::operator= double
   v = 4.0;
@@ -62,9 +62,9 @@ TEST(Vector3Test, Vector3)
   EXPECT_TRUE(v == math::Vector3(4, 3, 2));
 
   // ::operator[]
-  EXPECT_NEAR(v[0], 4, 1e-6);
-  EXPECT_NEAR(v[1], 3, 1e-6);
-  EXPECT_NEAR(v[2], 2, 1e-6);
+  EXPECT_DOUBLE_EQ(v[0], 4);
+  EXPECT_DOUBLE_EQ(v[1], 3);
+  EXPECT_DOUBLE_EQ(v[2], 2);
 
   v.Set(1.23, 2.35, 3.654321);
   v.Round(1);
