@@ -348,6 +348,8 @@ LinkPtr BulletPhysics::CreateLink(ModelPtr _parent)
   BulletLinkPtr link(new BulletLink(_parent));
   link->SetWorld(_parent->GetWorld());
 
+//  link->SetID();
+
   return link;
 }
 

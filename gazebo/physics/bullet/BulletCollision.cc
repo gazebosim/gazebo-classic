@@ -78,6 +78,18 @@ void BulletCollision::SetCollideBits(unsigned int _bits)
 }
 
 //////////////////////////////////////////////////
+unsigned int BulletCollision::GetCategoryBits() const
+{
+  return this->categoryBits;
+}
+
+//////////////////////////////////////////////////
+unsigned int BulletCollision::GetCollideBits() const
+{
+  return this->collideBits;
+}
+
+//////////////////////////////////////////////////
 /*Mass BulletCollision::GetLinkMassMatrix()
 {
   Mass result;
