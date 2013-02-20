@@ -399,7 +399,7 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   };
 
   // Texture coords
-  float t[4][2] =
+  double t[4][2] =
   {
     {uvCoords.x, 0}, {0, 0}, {0, uvCoords.y}, {uvCoords.x, uvCoords.y}
   };

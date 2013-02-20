@@ -328,10 +328,8 @@ void ODEPhysics::InitForThread()
 //////////////////////////////////////////////////
 void ODEPhysics::UpdateCollision()
 {
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
-    dJointGroupEmpty(this->contactGroup);
-  }
+  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
+  dJointGroupEmpty(this->contactGroup);
 
   unsigned int i = 0;
   this->collidersCount = 0;

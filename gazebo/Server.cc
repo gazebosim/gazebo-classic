@@ -403,6 +403,9 @@ void Server::Run()
   // This makes sure plugins get loaded properly.
   sensors::run_once(true);
 
+  // Run the sensor threads
+  sensors::run_threads();
+
   // Run each world. Each world starts a new thread
   physics::run_worlds();
 

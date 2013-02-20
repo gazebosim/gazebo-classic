@@ -31,6 +31,9 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \cond
+    /// \brief A custom combobox that pull in a list of topics for user
+    /// selection.
     class TopicCombo : public QComboBox
     {
       /// \brief Constructor
@@ -66,7 +69,9 @@ namespace gazebo
 
       private: boost::mutex mutex;
     };
+    /// \endcond
 
+    /// \brief Base class for widgets that display topic data.
     class TopicView : public QDialog
     {
       Q_OBJECT
@@ -76,8 +81,10 @@ namespace gazebo
       /// \param[in] _msgType Type of message that the viewer can display.
       /// \param[in] _parent Pointer to the parent widget.
       /// \param[in] _viewType The type of the viewer.
+      /// \param[in] _displayPeriod Milliseconds between display updates.
       public: TopicView(QWidget *_parent, const std::string &_msgType,
-                        const std::string &_viewType);
+                        const std::string &_viewType,
+                        unsigned int _displayPeriod = 500);
 
       /// \brief Destructor
       public: virtual ~TopicView();
@@ -127,6 +134,9 @@ namespace gazebo
       /// \brief Previous time a message was received.
       private: common::Time prevTime;
 
+      /// \brief Previous display update time.
+      private: common::Time prevDisplayTime;
+
       /// \brief Output for the hz info.
       private: QLineEdit *hzEdit;
 
@@ -141,6 +151,9 @@ namespace gazebo
 
       /// \brief A list of clock times that messages have been received.
       private: std::list<common::Time> times;
+
+      /// \brief A list of clock times that messages have been generated.
+      private: std::list<common::Time> dataTimes;
 
       /// \brief A mutex to protect the update cycle.
       private: boost::mutex updateMutex;

@@ -254,7 +254,6 @@ TEST_F(TransportTest, Errors)
   }
 }*/
 
-
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
