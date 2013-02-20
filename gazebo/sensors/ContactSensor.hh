@@ -92,7 +92,7 @@ namespace gazebo
       /// \return Message that contains contact information between collision
       /// pairs.
       ///
-      /// Within ODEPhysics::UpdateCollisions, all collision pairs in the
+      /// During ODEPhysics::UpdateCollisions, all collision pairs in the
       /// world are pushed into a buffer within ContactManager.
       /// Subsequently, World::Update invokes ContactManager::PublishContacts
       /// to publish all contacts generated within a timestep onto
