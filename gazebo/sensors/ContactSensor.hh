@@ -89,7 +89,21 @@ namespace gazebo
                   const std::string &_collisionName) const;
 
       /// \brief Get all the contacts
-      /// \return Message that contains all the contact information
+      /// \return Message that contains contact information between collision
+      /// pairs.  See below for details on returned data within
+      /// contacts.proto and contact.proto:
+      ///    string collision1  name of the first collision object.
+      ///    string collision2  name of the first collision object.
+      ///    Vector3d position  position of the contact joint in inertial frame.
+      ///    Vector3d normal    normal of the contact joint in inertial frame.
+      ///    double depth       intersection (penetration)
+      ///                        depth of two collision bodies.
+      ///    JointWrench wrench Forces and torques acting on both collision
+      ///                       bodies.  See joint_wrench.proto for details.
+      ///                       The forces and torques are applied at the
+      ///                       CG of perspective links for each collision
+      ///                       body, specified in the inertial frame.
+      ///    Time time          time at which this contact happened.
       public: msgs::Contacts GetContacts() const;
 
       /// \brief Gets contacts of a collision
