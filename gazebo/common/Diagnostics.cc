@@ -19,18 +19,16 @@
  * Date: 2 Feb 2011
  */
 
-#include "common/Events.hh"
-#include "common/Diagnostics.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Diagnostics.hh"
 
 using namespace gazebo;
 using namespace common;
 
-
 DiagnosticManager *DiagnosticTimer::diagManager = DiagnosticManager::Instance();
 
 //////////////////////////////////////////////////
-  DiagnosticManager::DiagnosticManager()
-: enabled(false)
+DiagnosticManager::DiagnosticManager()
 {
 }
 
@@ -42,10 +40,7 @@ DiagnosticManager::~DiagnosticManager()
 //////////////////////////////////////////////////
 DiagnosticTimerPtr DiagnosticManager::CreateTimer(const std::string &_name)
 {
-  if (this->GetEnabled())
-    return DiagnosticTimerPtr(new DiagnosticTimer(_name));
-  else
-    return DiagnosticTimerPtr();
+  return DiagnosticTimerPtr(new DiagnosticTimer(_name));
 }
 
 //////////////////////////////////////////////////
@@ -54,7 +49,6 @@ void DiagnosticManager::TimerStart(DiagnosticTimer *_timer)
   this->timers[_timer->GetName()] = Time();
   event::Events::diagTimerStart(_timer->GetName());
 }
-
 
 //////////////////////////////////////////////////
 void DiagnosticManager::TimerStop(DiagnosticTimer *_timer)

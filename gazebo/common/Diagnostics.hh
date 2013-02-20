@@ -25,8 +25,8 @@
 #include <map>
 #include <string>
 
-#include "common/SingletonT.hh"
-#include "common/Timer.hh"
+#include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/Timer.hh"
 
 namespace gazebo
 {
@@ -36,10 +36,11 @@ namespace gazebo
     /// \{
 
     /// \brief Create an instance of common::DiagnosticManager
+#ifdef ENABLE_DIAGNOSTICS
     #define DIAG_TIMER(name) DiagnosticManager::Instance()->CreateTimer(name);
-
-    class DiagnosticTimer;
-    typedef boost::shared_ptr< DiagnosticTimer > DiagnosticTimerPtr;
+#else
+    #define DIAG_TIMER(name) ((void) 0)
+#endif
 
     /// \class DiagnosticManager Diagnostics.hh common/common.hh
     /// \brief A diagnostic manager class
@@ -82,17 +83,6 @@ namespace gazebo
       /// \param[in] _index Index of a timer instance
       /// \return Label of the specified timer
       public: std::string GetLabel(int _index) const;
-
-      /// \brief Set whether timers are enabled
-      /// \param[in] _e True = timers are enabled
-      public: void SetEnabled(bool _e) {this->enabled = _e;}
-
-      /// \brief Get whether the timers are enabled
-      /// \return TRue if the timers are enabled
-      public: inline bool GetEnabled() const {return this->enabled;}
-
-      /// \brief always false, has not effect
-      private: bool enabled;
 
       /// \brief dictionary of timers index by name
       private: std::map<std::string, Time> timers;
