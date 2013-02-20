@@ -71,7 +71,7 @@ namespace gazebo
       ///
       /// The URI must be fully qualified:
       /// http://gazebosim.org/gazebo_models/ground_plane or
-      /// models://gazebo_models
+      /// model://gazebo_models
       /// \param[in] _uri the model uri
       /// \return the model's name.
       public: std::string GetModelName(const std::string &_uri);
@@ -94,9 +94,11 @@ namespace gazebo
       ///
       /// Get the path to a model based on a URI. If the model is on
       /// a remote server, then the model fetched and installed locally.
-      /// param[in] _uri the model uri
+      /// \param[in] _uri the model uri
+      /// \param[in] _forceDownload True to skip searching local paths.
       /// \return path to a model directory
-      public: std::string GetModelPath(const std::string &_uri);
+      public: std::string GetModelPath(const std::string &_uri,
+                  bool _forceDownload = false);
 
       /// \brief Get a model's SDF file based on a URI.
       ///

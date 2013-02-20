@@ -180,7 +180,7 @@ namespace gazebo
       /// \param[in] _topic The topic to use
       /// \param[in] _sublink The subscription transport object to use
       public: void ConnectPubToSub(const std::string &_topic,
-                                    const SubscriptionTransportPtr &_sublink);
+                                    const SubscriptionTransportPtr _sublink);
 
       /// \brief Connect a local Subscriber to a remote Publisher
       /// \param[in] _pub The publish object to use
@@ -245,7 +245,10 @@ namespace gazebo
       private: SubNodeMap subscribedNodes;
       private: std::vector<NodePtr> nodes;
 
-      private: boost::recursive_mutex *nodeMutex;
+      private: boost::recursive_mutex nodeMutex;
+
+      /// \brief Used to protect subscription connection creation.
+      private: boost::mutex subscriberMutex;
 
       private: bool pauseIncoming;
 

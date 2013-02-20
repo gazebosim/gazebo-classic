@@ -28,15 +28,12 @@ using namespace transport;
 TopicManager::TopicManager()
 {
   this->pauseIncoming = false;
-  this->nodeMutex = new boost::recursive_mutex();
   this->advertisedTopicsEnd = this->advertisedTopics.end();
 }
 
 //////////////////////////////////////////////////
 TopicManager::~TopicManager()
 {
-  delete this->nodeMutex;
-  this->nodeMutex = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -71,16 +68,16 @@ void TopicManager::Fini()
 //////////////////////////////////////////////////
 void TopicManager::AddNode(NodePtr _node)
 {
-  this->nodeMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
   this->nodes.push_back(_node);
-  this->nodeMutex->unlock();
 }
 
 //////////////////////////////////////////////////
 void TopicManager::RemoveNode(unsigned int _id)
 {
   std::vector<NodePtr>::iterator iter;
-  this->nodeMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
+
   for (iter = this->nodes.begin(); iter != this->nodes.end(); ++iter)
   {
     if ((*iter)->GetId() == _id)
@@ -110,29 +107,33 @@ void TopicManager::RemoveNode(unsigned int _id)
       break;
     }
   }
-  this->nodeMutex->unlock();
 }
 
 //////////////////////////////////////////////////
 void TopicManager::ProcessNodes(bool _onlyOut)
 {
   std::vector<NodePtr>::iterator iter;
+  int s;
 
-  this->nodeMutex->lock();
-  // store as size might change (spawning)
-  int s = this->nodes.size();
-  this->nodeMutex->unlock();
-  for (int i = 0; i < s; i ++)
+  {
+    boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
+    // store as size might change (spawning)
+    s = this->nodes.size();
+  }
+
+  for (int i = 0; i < s; ++i)
   {
     this->nodes[i]->ProcessPublishers();
   }
 
   if (!this->pauseIncoming && !_onlyOut)
   {
-    this->nodeMutex->lock();
-    s = this->nodes.size();
-    this->nodeMutex->unlock();
-    for (int i = 0; i < s; i ++)
+    {
+      boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
+      s = this->nodes.size();
+    }
+
+    for (int i = 0; i < s; ++i)
     {
       this->nodes[i]->ProcessIncoming();
       if (this->pauseIncoming)
@@ -199,23 +200,25 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 void TopicManager::Unsubscribe(const std::string &_topic,
                                const NodePtr &_node)
 {
+  boost::mutex::scoped_lock lock(this->subscriberMutex);
+
   PublicationPtr publication = this->FindPublication(_topic);
+
   if (publication)
-  {
     publication->RemoveSubscription(_node);
-    ConnectionManager::Instance()->Unsubscribe(_topic,
-        _node->GetMsgType(_topic));
-  }
+
+  ConnectionManager::Instance()->Unsubscribe(_topic,
+      _node->GetMsgType(_topic));
 
   this->subscribedNodes[_topic].remove(_node);
 }
 
 //////////////////////////////////////////////////
-void TopicManager::ConnectPubToSub(const std::string &topic,
-                                   const SubscriptionTransportPtr &sublink)
+void TopicManager::ConnectPubToSub(const std::string &_topic,
+                                   const SubscriptionTransportPtr _sublink)
 {
-  PublicationPtr publication = this->FindPublication(topic);
-  publication->AddSubscription(sublink);
+  PublicationPtr publication = this->FindPublication(_topic);
+  publication->AddSubscription(_sublink);
 }
 
 //////////////////////////////////////////////////
@@ -264,6 +267,7 @@ void TopicManager::ConnectSubscribers(const std::string &_topic)
 //////////////////////////////////////////////////
 void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
 {
+  boost::mutex::scoped_lock lock(this->subscriberMutex);
   this->UpdatePublications(_pub.topic(), _pub.msg_type());
 
   PublicationPtr publication = this->FindPublication(_pub.topic());

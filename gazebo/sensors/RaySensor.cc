@@ -19,23 +19,25 @@
  * Date: 23 february 2004
 */
 
-#include "physics/World.hh"
-#include "physics/MultiRayShape.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Physics.hh"
-#include "physics/Model.hh"
-#include "physics/Link.hh"
-#include "physics/Collision.hh"
-#include "common/Exception.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/MultiRayShape.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Collision.hh"
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "math/Vector3.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "sensors/SensorFactory.hh"
-#include "sensors/RaySensor.hh"
+#include "gazebo/math/Vector3.hh"
+
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/RaySensor.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -44,7 +46,7 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor)
 
 //////////////////////////////////////////////////
 RaySensor::RaySensor()
-    : Sensor()
+    : Sensor(sensors::RAY)
 {
 }
 
@@ -75,19 +77,37 @@ void RaySensor::Load(const std::string &_worldName)
   this->scanPub = this->node->Advertise<msgs::LaserScanStamped>(
       this->GetTopic());
 
+  GZ_ASSERT(this->world != NULL,
+      "RaySensor did not get a valid World pointer");
+
   physics::PhysicsEnginePtr physicsEngine = this->world->GetPhysicsEngine();
+
+  GZ_ASSERT(physicsEngine != NULL,
+      "Unable to get a pointer to the physics engine");
+
   this->laserCollision = physicsEngine->CreateCollision("multiray",
       this->parentName);
+
+  GZ_ASSERT(this->laserCollision != NULL,
+      "Unable to create a multiray collision using the physics engine.");
+
   this->laserCollision->SetName("ray_sensor_collision");
   this->laserCollision->SetRelativePose(this->pose);
   this->laserCollision->SetInitialRelativePose(this->pose);
 
   this->laserShape = boost::dynamic_pointer_cast<physics::MultiRayShape>(
                      this->laserCollision->GetShape());
+
+  GZ_ASSERT(this->laserShape != NULL,
+      "Unable to get the laser shape from the multi-ray collision.");
+
   this->laserShape->Load(this->sdf);
   this->laserShape->Init();
 
   this->parentEntity = this->world->GetEntity(this->parentName);
+
+  GZ_ASSERT(this->parentEntity != NULL,
+      "Unable to get the parent entity.");
 }
 
 //////////////////////////////////////////////////

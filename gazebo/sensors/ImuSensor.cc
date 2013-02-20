@@ -40,9 +40,8 @@ GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor)
 
 //////////////////////////////////////////////////
 ImuSensor::ImuSensor()
-    : Sensor()
+    : Sensor(sensors::OTHER)
 {
-  std::cout << "NEW IMU\n";
   this->linearAcc = math::Vector3(0, 0, 0);
 }
 
@@ -55,8 +54,6 @@ ImuSensor::~ImuSensor()
 void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
-
-  // this->sdf->PrintValues("  ");
 
   if (this->sdf->HasElement("imu") &&
       this->sdf->GetElement("imu")->HasElement("topic") &&
