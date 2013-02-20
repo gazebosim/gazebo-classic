@@ -258,9 +258,9 @@ void BulletHingeJoint::SetForce(int /*_index*/, double _torque)
   {
     // z-axis of constraint frame
     btVector3 hingeAxisLocalA =
-      this->bulletHinge->getAFrame().getBasis().getColumn(2);
+      this->bulletHinge->getFrameOffsetA().getBasis().getColumn(2);
     btVector3 hingeAxisLocalB =
-      this->bulletHinge->getBFrame().getBasis().getColumn(2);
+      this->bulletHinge->getFrameOffsetB().getBasis().getColumn(2);
 
     btVector3 hingeAxisWorldA =
       this->bulletHinge->getRigidBodyA().getWorldTransform().getBasis() *

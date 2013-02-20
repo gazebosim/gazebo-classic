@@ -194,7 +194,7 @@ void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 {
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame
-  if (this->bulletSlider)
+  if (!this->bulletSlider)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
     this->initialWorldAxis = _axis;
@@ -215,15 +215,28 @@ void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetForce(int /*_index*/, double _force)
 {
-  /*btVector3 hingeAxisLocal = this->bulletSlider->getAFrame().getBasis().getColumn(2); // z-axis of constraint frame
-  btVector3 hingeAxisWorld = this->bulletSlider->getRigidBodyA().getWorldTransform().getBasis() * hingeAxisLocal;
+  if (this->bulletSlider && this->constraint)
+  {
+    // x-axis of constraint frame
+    btVector3 hingeAxisLocalA =
+      this->bulletSlider->getFrameOffsetA().getBasis().getColumn(0);
+    btVector3 hingeAxisLocalB =
+      this->bulletSlider->getFrameOffsetB().getBasis().getColumn(0);
 
-  btVector3 hingeTorque = _torque * hingeAxisWorld;
-  */
+    btVector3 hingeAxisWorldA =
+      this->bulletSlider->getRigidBodyA().getWorldTransform().getBasis() *
+      hingeAxisLocalA;
+    btVector3 hingeAxisWorldB =
+      this->bulletSlider->getRigidBodyB().getWorldTransform().getBasis() *
+      hingeAxisLocalB;
 
-  btVector3 force(0, 0, _force);
-  this->constraint->getRigidBodyA().applyCentralForce(force);
-  this->constraint->getRigidBodyB().applyCentralForce(-force);
+    btVector3 hingeForceA = _force * hingeAxisWorldA;
+    btVector3 hingeForceB = _force * hingeAxisWorldB;
+
+    // TODO: switch to applyForce and specify body-fixed offset
+    this->constraint->getRigidBodyA().applyCentralForce(-hingeForceA);
+    this->constraint->getRigidBodyB().applyCentralForce( hingeForceB);
+  }
 }
 
 //////////////////////////////////////////////////
