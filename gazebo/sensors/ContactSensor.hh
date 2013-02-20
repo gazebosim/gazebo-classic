@@ -112,18 +112,20 @@ namespace gazebo
       /// elements, (position, normal, depth, wrench).  A timestamp has also
       /// been added (time).  Details are described below:
       ///
-      ///    string collision1  name of the first collision object.
-      ///    string collision2  name of the second collision object.
-      ///    Vector3d position  position of the contact joint in inertial frame.
-      ///    Vector3d normal    normal of the contact joint in inertial frame.
-      ///    double depth       intersection (penetration)
-      ///                        depth of two collision bodies.
-      ///    JointWrench wrench Forces and torques acting on both collision
-      ///                       bodies.  See joint_wrench.proto for details.
-      ///                       The forces and torques are applied at the
-      ///                       CG of perspective links for each collision
-      ///                       body, specified in the inertial frame.
-      ///    Time time          time at which this contact happened.
+      ///    \li string collision1  name of the first collision object.
+      ///    \li string collision2  name of the second collision object.
+      ///    \li Vector3d position  position of the contact joint in
+      ///                           inertial frame.
+      ///    \li Vector3d normal    normal of the contact joint in
+      ///                           inertial frame.
+      ///    \li double depth       intersection (penetration)
+      ///                           depth of two collision bodies.
+      ///    \li JointWrench wrench Forces and torques acting on both collision
+      ///                           bodies.  See joint_wrench.proto for details.
+      ///                           The forces and torques are applied at the
+      ///                           CG of perspective links for each collision
+      ///                           body, specified in the inertial frame.
+      ///    \li Time time          time at which this contact happened.
       public: msgs::Contacts GetContacts() const;
 
       /// \brief Gets contacts of a collision
