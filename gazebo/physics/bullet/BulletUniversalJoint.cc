@@ -32,7 +32,7 @@ using namespace physics;
 BulletUniversalJoint::BulletUniversalJoint(btDynamicsWorld *_world,
   BasePtr _parent) : UniversalJoint<BulletJoint>(_parent)
 {
-  this->world = _world;
+  this->bulletWorld = _world;
   this->bulletUniversal = NULL;
 }
 
@@ -71,7 +71,7 @@ void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
   this->constraint = this->bulletUniversal;
 
   // Add the joint to the world
-  this->world->addConstraint(this->bulletUniversal, true);
+  this->bulletWorld->addConstraint(this->bulletUniversal, true);
 
   // Allows access to impulse
   this->bulletUniversal->enableFeedback(true);

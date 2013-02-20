@@ -33,7 +33,7 @@ using namespace physics;
 BulletHingeJoint::BulletHingeJoint(btDynamicsWorld *_world, BasePtr _parent)
     : HingeJoint<BulletJoint>(_parent)
 {
-  this->world = _world;
+  this->bulletWorld = _world;
   this->bulletHinge = NULL;
   this->angleOffset = 0;
 }
@@ -157,7 +157,7 @@ void BulletHingeJoint::Init()
     this->angleOffset + limitElem->GetValueDouble("upper"));
 
   // Add the joint to the world
-  this->world->addConstraint(this->bulletHinge, true);
+  this->bulletWorld->addConstraint(this->bulletHinge, true);
 
   // Allows access to impulse
   this->bulletHinge->enableFeedback(true);

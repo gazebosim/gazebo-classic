@@ -130,7 +130,6 @@ void Joint::LoadImpl(const math::Pose &_pose)
     this->childLink->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
   else
     gzthrow("both parent and child link do no exist");
-    
 
   // setting anchor relative to gazebo child link frame position
   if (this->childLink)

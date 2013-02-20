@@ -34,7 +34,7 @@ using namespace physics;
 BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world, BasePtr _parent)
     : ScrewJoint<BulletJoint>(_parent)
 {
-  this->world = _world;
+  this->bulletWorld = _world;
   this->bulletScrew = NULL;
 }
 
@@ -136,7 +136,7 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
   this->constraint = this->bulletScrew;
 
   // Add the joint to the world
-  this->world->addConstraint(this->constraint);
+  this->bulletWorld->addConstraint(this->constraint);
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);

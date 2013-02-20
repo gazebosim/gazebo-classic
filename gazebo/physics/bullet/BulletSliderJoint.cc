@@ -34,7 +34,7 @@ using namespace physics;
 BulletSliderJoint::BulletSliderJoint(btDynamicsWorld *_world, BasePtr _parent)
     : SliderJoint<BulletJoint>(_parent)
 {
-  this->world = _world;
+  this->bulletWorld = _world;
   this->bulletSlider = NULL;
 }
 
@@ -141,7 +141,7 @@ void BulletSliderJoint::Attach(LinkPtr _one, LinkPtr _two)
   this->constraint = this->bulletSlider;
 
   // Add the joint to the world
-  this->world->addConstraint(this->bulletSlider, true);
+  this->bulletWorld->addConstraint(this->bulletSlider, true);
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);

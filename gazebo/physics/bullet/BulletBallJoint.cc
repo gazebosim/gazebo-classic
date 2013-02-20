@@ -33,7 +33,7 @@ using namespace physics;
 BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent)
     : BallJoint<BulletJoint>(_parent)
 {
-  this->world = _world;
+  this->bulletWorld = _world;
   this->bulletBall = NULL;
 }
 
@@ -93,7 +93,7 @@ void BulletBallJoint::Attach(LinkPtr _one, LinkPtr _two)
   this->constraint = this->bulletBall;
 
   // Add the joint to the world
-  this->world->addConstraint(this->constraint);
+  this->bulletWorld->addConstraint(this->constraint);
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
