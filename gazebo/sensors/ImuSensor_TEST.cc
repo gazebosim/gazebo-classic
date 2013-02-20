@@ -65,7 +65,7 @@ TEST_F(ImuSensor_TEST, BasicImuSensorCheck)
 
   EXPECT_EQ(sensor->GetAngularVelocity(), math::Vector3::Zero);
   EXPECT_EQ(sensor->GetLinearAcceleration(), math::Vector3::Zero);
-  EXPECT_EQ(sensor->GetOrientation(), math::Quaternion());
+  EXPECT_EQ(sensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
 }
 
 
