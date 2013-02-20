@@ -27,7 +27,6 @@ endif()
 set(display_tests
       bandwidth.cc
       file_handling.cc
-      math.cc
       msgs.cc
       physics.cc
       server_fixture.cc
