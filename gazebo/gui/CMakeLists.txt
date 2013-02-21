@@ -81,6 +81,7 @@ set (headers
 set (qt_tests 
   DataLogger_TEST.cc
   TimePanel_TEST.cc
+  viewers/ImagesView_TEST.cc
 )
 
 gz_build_qt_tests(${qt_tests})
@@ -93,6 +94,9 @@ QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 gz_add_executable(gzclient ${sources} main.cc ${headers_MOC} ${headers} ${resources_RCC})
 gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+
+add_dependencies(gazebo_gui gazebo_msgs)
+add_dependencies(gzclient gazebo_msgs)
 
 target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_transport
