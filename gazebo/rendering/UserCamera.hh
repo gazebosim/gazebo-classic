@@ -171,6 +171,12 @@ namespace gazebo
       /// \param[in] _pt The focal point
       public: void SetFocalPoint(const math::Vector3 &_pt);
 
+      // Documentation inherited
+      public: virtual unsigned int GetImageWidth() const;
+
+      // Documentation inherited
+      public: virtual unsigned int GetImageHeight() const;
+
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.

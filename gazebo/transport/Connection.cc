@@ -613,7 +613,7 @@ void Connection::ReadLoop(const ReadCallback &cb)
 }
 
 //////////////////////////////////////////////////
-boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
+boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
 {
   boost::asio::ip::address_v4 address;
 
@@ -657,7 +657,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
   // find a valid address.
   if (ip && !std::string(ip).empty() && addressIsUnspecified(address))
   {
-    if (!this->ValidateIP(ip))
+    if (!ValidateIP(ip))
     {
       gzerr << "GAZEBO_IP environment variable with value[" << ip
             << "] is invalid. We will still try to use it, be warned.\n";
@@ -703,7 +703,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
                   gai_strerror(s) + "]\n");
 
         // Validate the IP address to make sure it's a valid dotted quad.
-        if (!this->ValidateIP(host))
+        if (!ValidateIP(host))
           continue;
 
         address = boost::asio::ip::address_v4::from_string(host);
@@ -785,9 +785,9 @@ std::string Connection::GetRemoteHostname() const
 }
 
 //////////////////////////////////////////////////
-std::string Connection::GetLocalHostname() const
+std::string Connection::GetLocalHostname()
 {
-  return this->GetHostname(this->GetLocalEndpoint());
+  return GetHostname(GetLocalEndpoint());
 }
 
 //////////////////////////////////////////////////
