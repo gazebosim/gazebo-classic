@@ -137,17 +137,19 @@ macro (gz_setup_apple)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
 endmacro()
 
-#################################################
-macro (gz_build_tests)
+# This should be migrated to more fine control solution based on set_property APPEND
+# directories. It's present on cmake 2.8.8 while precise version is 2.8.7  
+link_directories(${PROJECT_BINARY_DIR}/test)
+include_directories("${PROJECT_SOURCE_DIR}/test/gtest/include")
 
+#################################################
+# Hack: extra sources to build binaries can be supplied to gz_build_tests in the variable
+#       GZ_BUILD_TESTS_EXTRA_EXE_SRCS. This variable will be clean up at the end of the function
+macro (gz_build_tests)
   # Build all the tests
   foreach(GTEST_SOURCE_file ${ARGN})
     string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
-    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file})
-
-    # This should be migrated to more fine control solution based on set_property APPEND
-    # directories. It's present on cmake 2.8.8 while precise version is 2.8.7  
-    include_directories("${PROJECT_SOURCE_DIR}/test/gtest/include")
+    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
     add_dependencies(${BINARY_NAME}
       gtest gtest_main
@@ -186,18 +188,34 @@ macro (gz_build_tests)
              ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
   endforeach()
 
+  set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
 endmacro()
 
 #################################################
-# INTERNAL function: do not call directly use gz_build_display_tests or gz_build_dri_tests
-macro (_gz_build_qt_tests)
-  # Build all the tests
-  foreach(QTEST_SOURCE_file ${ARGN})
-    string(REGEX REPLACE ".cc" "" BINARY_NAME ${QTEST_SOURCE_file})
-    string(REGEX REPLACE ".cc" ".hh" QTEST_HEADER_file ${QTEST_SOURCE_file})
-    QT4_WRAP_CPP(${BINARY_NAME}_MOC ${QTEST_HEADER_file} QTestFixture.hh)
 
-    add_executable(${BINARY_NAME}
+# Define GUI testing macros as empty and redefine them if support is found
+macro (gz_build_qt_tests)
+endmacro()
+macro (gz_build_display_tests)
+endmacro()
+macro (gz_build_dri_tests)
+endmacro()
+
+if (VALID_DISPLAY)
+  # Redefine build display tests
+  macro (gz_build_display_tests)
+    gz_build_tests(${ARGV})
+  endmacro()
+
+  # Redefine build qt tests
+  macro (gz_build_qt_tests)
+   # Build all the tests
+   foreach(QTEST_SOURCE_file ${ARGN})
+     string(REGEX REPLACE ".cc" "" BINARY_NAME ${QTEST_SOURCE_file})
+     string(REGEX REPLACE ".cc" ".hh" QTEST_HEADER_file ${QTEST_SOURCE_file})
+     QT4_WRAP_CPP(${BINARY_NAME}_MOC ${QTEST_HEADER_file} QTestFixture.hh)
+
+     add_executable(${BINARY_NAME}
       ${${BINARY_NAME}_MOC} ${QTEST_SOURCE_file} QTestFixture.cc)
 
     add_dependencies(${BINARY_NAME}
@@ -226,34 +244,21 @@ macro (_gz_build_qt_tests)
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
       )
- 
-    add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} -xml)
-  
-    set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
-  
-    # Check that the test produced a result and create a failure if it didn't.
-    # Guards against crashed and timed out tests.
-    add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-             ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
-  endforeach()
-endmacro()
 
-# Define GUI testing macros as empty and redefine them if support is found
-macro (gz_build_display_tests)
-endmacro()
-macro (gz_build_dri_tests)
-endmacro()
+    add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} -xml)
+
+    set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
+
+      # Check that the test produced a result and create a failure if it didn't.
+      # Guards against crashed and timed out tests.
+      add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
+               ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+    endforeach()
+  endmacro()
+endif()
 
 if (VALID_DRI_DISPLAY)
   macro (gz_build_dri_tests)
-    _gz_build_qt_tests(${ARGV})
+    gz_build_tests(${ARGV})
   endmacro()
 endif()
-
-if (VALID_DISPLAY)
-  macro (gz_build_display_tests)
-    _gz_build_qt_tests(${ARGV})
-  endmacro()
-endif()
-
-
