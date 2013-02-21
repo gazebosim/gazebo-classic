@@ -504,9 +504,9 @@ void URDF2Gazebo::InsertGazeboExtensionLink(TiXmlElement *_elem,
           if ((*ge)->isDampingFactor)
           {
             /// @todo separate linear and angular velocity decay
-            this->AddKeyValue(_elem, "linear",
+            this->AddKeyValue(velocityDecay, "linear",
                         this->Values2str(1, &(*ge)->dampingFactor));
-            this->AddKeyValue(_elem, "angular",
+            this->AddKeyValue(velocityDecay, "angular",
                         this->Values2str(1, &(*ge)->dampingFactor));
           }
           _elem->LinkEndChild(velocityDecay);
