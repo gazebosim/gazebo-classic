@@ -451,12 +451,15 @@ void World::Step()
     common::Time(this->physicsEngine->GetUpdatePeriod()) -
     tmpTime - this->sleepOffset;
 
+  common::Time actualSleep = 0;
   if (sleepTime > 0)
+  {  
     common::Time::Sleep(sleepTime);
+    actualSleep = common::Time::GetWallTime() - tmpTime;
+  }
   else
     sleepTime = 0;
 
-  common::Time actualSleep = common::Time::GetWallTime() - tmpTime;
 
   // exponentially avg out
   this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
