@@ -22,7 +22,7 @@
 #include <tbb/blocked_range.h>
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/common/Diagnostics.hh"
+#include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"

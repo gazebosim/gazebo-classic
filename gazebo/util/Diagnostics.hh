@@ -27,14 +27,21 @@
 #include <boost/filesystem.hpp>
 
 #include "gazebo/gazebo_config.h"
+
+#include "gazebo/transport/TransportTypes.hh"
+
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/Timer.hh"
 
+#include "gazebo/util/UtilTypes.hh"
+
 namespace gazebo
 {
-  namespace common
+  namespace util
   {
-    /// \addtogroup gazebo_common Common
+    /// \addtogroup gazebo_util Utility
     /// \{
 
 #ifdef ENABLE_DIAGNOSTICS
@@ -42,7 +49,7 @@ namespace gazebo
     /// stop the timer.
     /// \param[in] _name Name of the timer to start.
     #define DIAG_TIMER_START(_name) \
-    gazebo::common::DiagnosticManager::Instance()->StartTimer(#_name);
+    gazebo::util::DiagnosticManager::Instance()->StartTimer(#_name);
 
     /// \brief Output a lap time annotated with a prefix string. A lap is
     /// the time from last call to DIAG_TIMER_LAP or DIAG_TIMER_START, which
@@ -50,19 +57,23 @@ namespace gazebo
     /// \param[in] _name Name of the timer.
     /// \param[in] _prefix String for annotation.
     #define DIAG_TIMER_LAP(_name, _prefix) \
-    gazebo::common::DiagnosticManager::Instance()->Lap(#_name, _prefix);
+    gazebo::util::DiagnosticManager::Instance()->Lap(#_name, _prefix);
 
     /// \brief Stop a diagnostic timer.
     /// \param[in] name Name of the timer to stop
     #define DIAG_TIMER_STOP(_name) \
-    gazebo::common::DiagnosticManager::Instance()->StopTimer(#_name);
+    gazebo::util::DiagnosticManager::Instance()->StopTimer(#_name);
+
+    /// \brief Publish diagnostic messages.
+    #define DIAG_PUBLISH() \
+    gazebo::util::DiagnosticManager::Instance()->Publish();
 #else
     #define DIAG_TIMER_START(_name) ((void) 0)
     #define DIAG_TIMER_LAP(_name, _prefix) ((void)0)
     #define DIAG_TIMER_STOP(_name) ((void) 0)
 #endif
 
-    /// \class DiagnosticManager Diagnostics.hh common/common.hh
+    /// \class DiagnosticManager Diagnostics.hh util/util.hh
     /// \brief A diagnostic manager class
     class DiagnosticManager : public SingletonT<DiagnosticManager>
     {
@@ -71,6 +82,10 @@ namespace gazebo
 
       /// \brief Destructor
       private: virtual ~DiagnosticManager();
+
+      /// \brief Initialize to report diagnostics about a world.
+      /// \param[in] _worldName Name of the world.
+      public: void Init(const std::string &_worldName);
 
       /// \brief Start a new timer instance
       /// \param[in] _name Name of the timer.
@@ -95,12 +110,12 @@ namespace gazebo
       /// \brief Get the time of a timer instance
       /// \param[in] _index The index of a timer instance
       /// \return Time of the specified timer
-      public: Time GetTime(int _index) const;
+      public: common::Time GetTime(int _index) const;
 
       /// \brief Get a time based on a label
       /// \param[in] _label Name of the timer instance
       /// \return Time of the specified timer
-      public: Time GetTime(const std::string &_label) const;
+      public: common::Time GetTime(const std::string &_label) const;
 
       /// \brief Get a label for a timer
       /// \param[in] _index Index of a timer instance
@@ -111,6 +126,17 @@ namespace gazebo
       /// \return The path in which logs are stored.
       public: boost::filesystem::path GetLogPath() const;
 
+      /// \brief Publish diagnostic messages.
+      public: void Publish();
+
+      /// \brief Add a time for publication.
+      /// \param[in] _name Name of the diagnostic time.
+      /// \param[in] _wallTime Wall clock time stamp.
+      /// \param[in] _elapsedTime Elapsed time, this is the time
+      /// measurement.
+      private: void AddTime(const std::string &_name, common::Time &_wallTime,
+                   common::Time &_elapsedtime);
+
       /// \brief Map of all the active timers.
       private: typedef std::map<std::string, DiagnosticTimerPtr> TimerMap;
 
@@ -120,13 +146,25 @@ namespace gazebo
       /// \brief Path in which to store timing logs.
       private: boost::filesystem::path logPath;
 
+      /// \brief Node for publishing diagnostic data.
+      private: transport::NodePtr node;
+
+      /// \brief Publisher of diagnostic data.
+      private: transport::PublisherPtr pub;
+
+      /// \brief The message to output
+      private: msgs::Diagnostics msg;
+
       // Singleton implementation
       private: friend class SingletonT<DiagnosticManager>;
+
+      /// \brief Give DiagnosticTimer special rights.
+      private: friend class DiagnosticTimer;
     };
 
-    /// \class DiagnosticTimer Diagnostics.hh common/common.hh
+    /// \class DiagnosticTimer Diagnostics.hh util/util.hh
     /// \brief A timer designed for diagnostics
-    class DiagnosticTimer : public Timer
+    class DiagnosticTimer : public common::Timer
     {
       /// \brief Constructor
       /// \param[in] _name Name of the timer

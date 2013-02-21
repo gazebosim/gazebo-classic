@@ -17,14 +17,15 @@
 
 #include <gtest/gtest.h>
 
-#include "gazebo/common/Diagnostics.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/util/Diagnostics.hh"
 
 using namespace gazebo;
 
 TEST(DiagnosticsTest, Diagnostics)
 {
 #ifdef ENABLE_DIAGNOSTICS
-  common::DiagnosticManager *mgr = common::DiagnosticManager::Instance();
+  util::DiagnosticManager *mgr = util::DiagnosticManager::Instance();
   EXPECT_TRUE(mgr != NULL);
 
   common::Time prev = common::Time::GetWallTime();

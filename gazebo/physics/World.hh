@@ -498,6 +498,9 @@ namespace gazebo
       /// \brief Publisher for world statistics messages.
       private: transport::PublisherPtr statPub;
 
+      /// \brief Publisher for diagnostic messages.
+      private: transport::PublisherPtr diagPub;
+
       /// \brief Publisher for request response messages.
       private: transport::PublisherPtr responsePub;
 

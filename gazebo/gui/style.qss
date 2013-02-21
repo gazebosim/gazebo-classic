@@ -9,7 +9,8 @@ QDialog
 }
 
 QWidget#topicSelector,
-QWidget#cameraSensor
+QWidget#cameraSensor,
+QWidget#diagnosticsPlot
 {
   background-color: #303030;
 }
@@ -617,4 +618,15 @@ QFrame#blackBorderFrame
   border: 1px solid #000000;
   padding: 0px;
   margin: 0px;
+}
+
+QwtTextLabel
+{
+  font-size: 10px;
+}
+
+QwtScaleWidget
+{
+  color: white;
+  font-size: 11px;
 }

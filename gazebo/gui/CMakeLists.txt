@@ -8,6 +8,7 @@ link_directories(
 add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
+add_subdirectory(qwt)
 add_subdirectory(model_editor)
 
 set (sources
@@ -15,11 +16,13 @@ set (sources
   Actions.cc
   BoxMaker.cc
   CylinderMaker.cc
+  Diagnostics.cc
   EntityMaker.cc
   RenderWidget.cc
   GLWidget.cc
   Gui.cc
   GuiEvents.cc
+  IncrementalPlot.cc
   InsertModelWidget.cc
   JointControlWidget.cc
   LightMaker.cc
@@ -44,7 +47,9 @@ set (sources
 
 set (qt_headers
   Actions.hh
+  Diagnostics.hh
   GLWidget.hh
+  IncrementalPlot.hh
   InsertModelWidget.hh
   JointControlWidget.hh
   MainWindow.hh
@@ -101,6 +106,7 @@ target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_msgs
                                  gazebo_model_editor
                                  gzqtpropertybrowser
+                                 gzqwt
                                  ${QT_LIBRARIES}
                                  ${ogre_libraries}
                                  ${Boost_LIBRARIES}
@@ -114,6 +120,7 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_msgs
                                 gazebo_model_editor
                                 gzqtpropertybrowser
+                                gzqwt
                                 ${QT_LIBRARIES}
                                 ${ogre_libraries}
                                 ${Boost_LIBRARIES}

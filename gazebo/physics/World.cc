@@ -40,11 +40,12 @@
 #include "gazebo/common/LogRecord.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Common.hh"
-#include "gazebo/common/Diagnostics.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
+
+#include "gazebo/util/Diagnostics.hh"
 
 #include "gazebo/physics/Road.hh"
 #include "gazebo/physics/RayShape.hh"
@@ -305,6 +306,8 @@ void World::Init()
 
   // Mark the world initialization
   gzlog << "World::Init" << std::endl;
+
+  util::DiagnosticManager::Instance()->Init(this->GetName());
 }
 
 //////////////////////////////////////////////////
@@ -492,7 +495,10 @@ void World::Step()
   }
 
   this->ProcessMessages();
+
   DIAG_TIMER_STOP(World__Step);
+
+  DIAG_PUBLISH();
 }
 
 //////////////////////////////////////////////////

@@ -19,15 +19,19 @@
  * Date: 2 Feb 2011
  */
 
+#include "gazebo/transport/transport.hh"
 #include "gazebo/common/Assert.hh"
-#include "gazebo/common/Diagnostics.hh"
+
+#include "gazebo/util/Diagnostics.hh"
 
 using namespace gazebo;
-using namespace common;
+using namespace util;
 
 //////////////////////////////////////////////////
 DiagnosticManager::DiagnosticManager()
 {
+  this->node = transport::NodePtr(new transport::Node());
+
   // Get the base of the time logging path
   if (!getenv("HOME"))
   {
@@ -55,9 +59,36 @@ DiagnosticManager::~DiagnosticManager()
 }
 
 //////////////////////////////////////////////////
+void DiagnosticManager::Init(const std::string &_worldName)
+{
+  this->node->Init(_worldName);
+
+  this->pub = this->node->Advertise<msgs::Diagnostics>("~/diagnostics");
+}
+
+//////////////////////////////////////////////////
 boost::filesystem::path DiagnosticManager::GetLogPath() const
 {
   return this->logPath;
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::Publish()
+{
+  if (this->pub)
+    this->pub->Publish(this->msg);
+
+  this->msg.clear_time();
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::AddTime(const std::string &_name,
+    common::Time &_wallTime, common::Time &_elapsedTime)
+{
+  msgs::Diagnostics::DiagTime *time = this->msg.add_time();
+  time->set_name(_name);
+  msgs::Set(time->mutable_elapsed(), _elapsedTime);
+  msgs::Set(time->mutable_wall(), _wallTime);
 }
 
 //////////////////////////////////////////////////
@@ -112,7 +143,7 @@ int DiagnosticManager::GetTimerCount() const
 }
 
 //////////////////////////////////////////////////
-Time DiagnosticManager::GetTime(int _index) const
+common::Time DiagnosticManager::GetTime(int _index) const
 {
   TimerMap::const_iterator iter;
 
@@ -127,7 +158,7 @@ Time DiagnosticManager::GetTime(int _index) const
   else
     gzerr << "Error getting time\n";
 
-  return Time();
+  return common::Time();
 }
 
 //////////////////////////////////////////////////
@@ -147,7 +178,7 @@ std::string DiagnosticManager::GetLabel(int _index) const
 }
 
 //////////////////////////////////////////////////
-Time DiagnosticManager::GetTime(const std::string &_label) const
+common::Time DiagnosticManager::GetTime(const std::string &_label) const
 {
   TimerMap::const_iterator iter;
   iter = this->timers.find(_label);
@@ -160,7 +191,7 @@ Time DiagnosticManager::GetTime(const std::string &_label) const
   else
     gzerr << "Error getting time\n";
 
-  return Time();
+  return common::Time();
 }
 
 //////////////////////////////////////////////////
@@ -205,9 +236,15 @@ void DiagnosticTimer::Stop()
     // Stop the timer
     Timer::Stop();
 
+    common::Time elapsed = this->GetElapsed();
+    common::Time currTime = common::Time::GetWallTime();
+
     // Write out the total elapsed time.
-    this->log << this->name << " " << this->GetElapsed().Double() << std::endl;
+    this->log << this->name << " " << currTime << " "
+      << elapsed.Double() << std::endl;
     this->log.flush();
+
+    DiagnosticManager::Instance()->AddTime(this->name, currTime, elapsed);
 
     // Reset the lap time
     this->prevLap.Set(0, 0);
@@ -218,12 +255,17 @@ void DiagnosticTimer::Stop()
 void DiagnosticTimer::Lap(const std::string &_prefix)
 {
   // Get the current elapsed time.
-  common::Time currTime = this->GetElapsed();
+  common::Time elapsed = this->GetElapsed();
+  common::Time delta = elapsed - this->prevLap;
+  common::Time currTime = common::Time::GetWallTime();
 
   // Write out the delta time.
-  this->log << this->name << ":" << _prefix << " "
-    << (currTime - this->prevLap).Double() << std::endl;
+  this->log << this->name << ":" << _prefix << " " <<
+    currTime << " " << delta.Double() << std::endl;
+
+  DiagnosticManager::Instance()->AddTime(this->name + ":" + _prefix,
+      currTime, delta);
 
   // Store the prev lap time.
-  this->prevLap = currTime;
+  this->prevLap = elapsed;
 }
