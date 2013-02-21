@@ -42,7 +42,7 @@ GZ_REGISTER_STATIC_SENSOR("rfid", RFIDSensor)
 
 /////////////////////////////////////////////////
 RFIDSensor::RFIDSensor()
-  : Sensor()
+  : Sensor(sensors::OTHER)
 {
   this->active = false;
 }
