@@ -329,7 +329,7 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 
 
       // Get the size units.
-      switch(_msg->log_file().size_units())
+      switch (_msg->log_file().size_units())
       {
         case msgs::LogStatus::LogFile::BYTES:
           stream << "B";

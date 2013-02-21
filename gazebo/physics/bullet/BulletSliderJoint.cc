@@ -213,8 +213,20 @@ void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetForce(int /*_index*/, double _force)
+void BulletSliderJoint::SetForce(int _index, double _force)
 {
+  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
+  {
+    gzerr << "Calling BulletSliderJoint::SetForce with an index ["
+          << _index << "] out of range\n";
+    return;
+  }
+
+  // truncate effort if effortLimit is not negative
+  if (this->effortLimit[_index] >= 0)
+    _force = math::clamp(_force, -this->effortLimit[_index],
+       this->effortLimit[_index]);
+
   if (this->bulletSlider && this->constraint)
   {
     // x-axis of constraint frame
