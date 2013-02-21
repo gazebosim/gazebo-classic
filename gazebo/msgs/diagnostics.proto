@@ -17,4 +17,5 @@ message Diagnostics
   }
 
   repeated DiagTime time = 1;
+  required double real_time_factor = 2;
 }

@@ -497,8 +497,6 @@ void World::Step()
   this->ProcessMessages();
 
   DIAG_TIMER_STOP(World__Step);
-
-  DIAG_PUBLISH();
 }
 
 //////////////////////////////////////////////////

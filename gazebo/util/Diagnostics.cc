@@ -21,6 +21,7 @@
 
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Events.hh"
 
 #include "gazebo/util/Diagnostics.hh"
 
@@ -56,6 +57,7 @@ DiagnosticManager::DiagnosticManager()
 //////////////////////////////////////////////////
 DiagnosticManager::~DiagnosticManager()
 {
+  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
 }
 
 //////////////////////////////////////////////////
@@ -64,6 +66,9 @@ void DiagnosticManager::Init(const std::string &_worldName)
   this->node->Init(_worldName);
 
   this->pub = this->node->Advertise<msgs::Diagnostics>("~/diagnostics");
+
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&DiagnosticManager::Update, this, _1));
 }
 
 //////////////////////////////////////////////////
@@ -73,8 +78,13 @@ boost::filesystem::path DiagnosticManager::GetLogPath() const
 }
 
 //////////////////////////////////////////////////
-void DiagnosticManager::Publish()
+void DiagnosticManager::Update(const common::UpdateInfo &_info)
 {
+  if (_info.realTime > 0)
+    this->msg.set_real_time_factor((_info.simTime / _info.realTime).Double());
+  else
+    this->msg.set_real_time_factor(0.0);
+
   if (this->pub)
     this->pub->Publish(this->msg);
 

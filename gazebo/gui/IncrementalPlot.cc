@@ -49,7 +49,22 @@ class CurveData: public QwtArraySeriesData<QPointF>
   public: inline void Add(const QPointF &_point)
           {
             this->d_samples += _point;
+
+            /*this->history.push_back(_point.y());
+            if (this->history.size() > 1000)
+              this->history.pop_front();
+              */
           }
+
+  /*public: inline double GetMaxY()
+          {
+            std::list<double>::iterator maxIter =
+              std::max_element(this->history.begin(),
+                  this->history.end());
+
+            return *maxIter;
+          }
+          */
 
   public: void Clear()
           {
@@ -57,11 +72,13 @@ class CurveData: public QwtArraySeriesData<QPointF>
             this->d_samples.squeeze();
             this->d_boundingRect = QRectF(0.0, 0.0, -1.0, -1.0);
           }
+
+  // private: std::list<double> history;
 };
 
 /////////////////////////////////////////////////
 IncrementalPlot::IncrementalPlot(QWidget *_parent)
-  : QwtPlot(_parent), curve(NULL)
+  : QwtPlot(_parent)
 {
   this->directPainter = new QwtPlotDirectPainter(this);
 
@@ -75,20 +92,6 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->canvas()->setAttribute(Qt::WA_PaintOutsidePaintEvent, true);
   this->canvas()->setAttribute(Qt::WA_PaintOnScreen, true );
 #endif
-
-  this->curve = new QwtPlotCurve("Test Curve");
-  this->curve->setStyle(QwtPlotCurve::Lines);
-  this->curve->setData(new CurveData());
-
-  this->curve->setSymbol(new QwtSymbol(QwtSymbol::Ellipse,
-        Qt::NoBrush, QPen(Qt::red), QSize(2, 2)));
-
-  QPen pen(QColor(255, 0, 0));
-  pen.setWidth(1.0);
-  this->curve->setStyle(QwtPlotCurve::Lines);
-  this->curve->setPen(pen);
-
-  this->curve->attach(this);
 
   this->setAutoReplot(true);
 
@@ -119,13 +122,27 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 /////////////////////////////////////////////////
 IncrementalPlot::~IncrementalPlot()
 {
-  delete this->curve;
+  for (CurveMap::iterator iter = this->curves.begin();
+       iter != this->curves.end(); ++iter)
+  {
+    delete iter->second;
+  }
+
+  this->curves.clear();
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::Add(const QPointF &_pt)
+void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
 {
-  CurveData *curveData = static_cast<CurveData *>(this->curve->data());
+  QwtPlotCurve *curve = NULL;
+
+  CurveMap::iterator iter = this->curves.find(_label);
+  if (iter == this->curves.end())
+    curve = this->AddCurve(_label);
+  else
+    curve = iter->second;
+
+  CurveData *curveData = static_cast<CurveData *>(curve->data());
 
   curveData->Add(_pt);
 
@@ -137,12 +154,12 @@ void IncrementalPlot::Add(const QPointF &_pt)
     // performance issue. F.e. for Qt Embedded this reduces the
     // part of the backing store that has to be copied out - maybe
     // to an unaccelerated frame buffer device.
-    const QwtScaleMap xMap = this->canvasMap(this->curve->xAxis());
-    const QwtScaleMap yMap = this->canvasMap(this->curve->yAxis());
+    const QwtScaleMap xMap = this->canvasMap(curve->xAxis());
+    const QwtScaleMap yMap = this->canvasMap(curve->yAxis());
 
     QRegion clipRegion;
 
-    const QSize symbolSize = this->curve->symbol()->size();
+    const QSize symbolSize = curve->symbol()->size();
     QRect r(0, 0, symbolSize.width() + 2, symbolSize.height() + 2);
 
     const QPointF center = QwtScaleMap::transform(xMap, yMap, _pt);
@@ -152,29 +169,91 @@ void IncrementalPlot::Add(const QPointF &_pt)
     this->directPainter->setClipRegion(clipRegion);
   }
 
-  this->history.push_back(_pt.y());
-  if (this->history.size() > 1000)
-    this->history.pop_front();
-
-  std::list<double>::iterator maxIter = std::max_element(this->history.begin(),
-      this->history.end());
-
   this->setAxisScale(this->xBottom,
       std::max(0.0, static_cast<double>(_pt.x() - 5.0)),
       std::max(1.0, static_cast<double>(_pt.x())));
 
-  this->setAxisScale(this->yLeft, 0.0, *maxIter);
+  this->setAxisScale(this->yLeft, 0.0, curve->maxYValue());
 
-  this->directPainter->drawSeries(this->curve,
+  this->directPainter->drawSeries(curve,
       curveData->size() - 1,
-      curveData->size() - 1 );
+      curveData->size() - 1);
+}
+
+/////////////////////////////////////////////////
+QwtPlotCurve *IncrementalPlot::AddCurve(const QString &_label)
+{
+  QwtPlotCurve *curve = new QwtPlotCurve(_label);
+
+  curve->setStyle(QwtPlotCurve::Lines);
+  curve->setData(new CurveData());
+
+  curve->setSymbol(new QwtSymbol(QwtSymbol::Ellipse,
+        Qt::NoBrush, QPen(Qt::red), QSize(2, 2)));
+
+  QPen pen(QColor(255, 0, 0));
+  pen.setWidth(1.0);
+  curve->setStyle(QwtPlotCurve::Lines);
+  curve->setPen(pen);
+
+  curve->attach(this);
+
+  // Delete an old curve if it exists.
+  if (this->curves.find(_label) != this->curves.end())
+  {
+    CurveData *curveData = static_cast<CurveData*>(
+        this->curves[_label]->data());
+    curveData->Clear();
+    delete this->curves[_label];
+  }
+
+  this->curves[_label] = curve;
+
+  if (this->curves.size() == 2)
+  {
+    this->enableAxis(QwtPlot::yRight);
+
+    QwtText ytitle("Real Time Factor (%)");
+    ytitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
+    this->setAxisTitle(QwtPlot::yRight, ytitle);
+    curve->setYAxis(QwtPlot::yRight);
+  }
+
+
+  return curve;
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::Clear(const QString &_label)
+{
+  CurveMap::iterator iter = this->curves.find(_label);
+
+  if (iter == this->curves.end())
+    return;
+
+  CurveData *curveData = static_cast<CurveData *>(iter->second->data());
+  curveData->Clear();;
+
+  delete iter->second;
+  this->curves.erase(iter);
+
+  this->replot();
 }
 
 /////////////////////////////////////////////////
 void IncrementalPlot::Clear()
 {
-  CurveData *curveData = static_cast<CurveData *>(this->curve->data());
-  curveData->Clear();
+  CurveData *curveData = NULL;
+
+  for (CurveMap::iterator iter = this->curves.begin();
+       iter != this->curves.end(); ++iter)
+  {
+    curveData = static_cast<CurveData *>(iter->second->data());
+    curveData->Clear();
+    delete iter->second;
+  }
+
+  this->curves.clear();
 
   this->replot();
 }

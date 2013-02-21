@@ -46,22 +46,34 @@ namespace gazebo
       /// \return Default size of the plot.
       public: virtual QSize sizeHint() const;
 
-      /// \brief Add a new point to the plot.
-      /// \param[in] _pt Point to add
-      public slots: void Add(const QPointF &_pt);
+      /// \brief Add a new point to a curve.
+      /// \param[in] _label Name of the curve to add a point to. A curve
+      /// will be added if it doesn't exist.
+      /// \param[in] _pt Point to add.
+      public slots: void Add(const QString &_label, const QPointF &_pt);
+
+      /// \brief Clear a single curve from the plot.
+      /// \param[in] _label Name of the curve to remove.
+      public: void Clear(const QString &_label);
 
       /// \brief Clear all points from the plot.
       public: void Clear();
 
+      /// \brief Add a named curve.
+      /// \param[in] _label Name of the curve.
+      /// \return A pointer to the new curve.
+      private: QwtPlotCurve *AddCurve(const QString &_label);
+
+      /// \def DiagnosticTimerPtr
+      /// \brief A map of strings to qwt plot curves.
+      private: typedef std::map<QString, QwtPlotCurve *> CurveMap;
+
       /// \brief The curve to draw.
-      private: QwtPlotCurve *curve;
+      private: CurveMap curves;
 
       /// \brief Drawing utility
       private: QwtPlotDirectPainter *directPainter;
-
-      private: std::list<double> history;
     };
   }
 }
-
 #endif

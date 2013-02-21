@@ -15,8 +15,10 @@
  *
 */
 
-#ifndef _DIAGNOSTICS_HH_
-#define _DIAGNOSTICS_HH_
+#ifndef _DIAGNOSTICS_WIDGET_HH_
+#define _DIAGNOSTICS_WIDGET_HH_
+
+#include <set>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Time.hh"
@@ -35,13 +37,16 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor.
+      /// \param[in] _parent Pointer to the parent widget.
       public: Diagnostics(QWidget *_parent);
 
       /// \brief Destructor.
       public: virtual ~Diagnostics();
 
       /// \brief Signal used to add a point to the plot.
-      signals: void AddPoint(const QPointF &_point);
+      /// \param[in] _label Name of the curve to add a point to.
+      /// \param[in] _pt Point to add
+      signals: void AddPoint(const QString &_label, const QPointF &_point);
 
       /// \brief Called when a diagnostic message is received.
       /// \param[in] _msg Diagnostic message.
@@ -71,7 +76,7 @@ namespace gazebo
       private: QListWidget *labelList;
 
       /// \brief The currently selected label.
-      private: std::string selectedLabel;
+      private: std::set<QString> selectedLabels;
 
       /// \brief True when plotting is paused.
       private: bool paused;

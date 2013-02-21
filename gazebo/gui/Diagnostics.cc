@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -63,8 +64,9 @@ Diagnostics::Diagnostics(QWidget *_parent)
   this->node->Init();
   this->sub = this->node->Subscribe("~/diagnostics", &Diagnostics::OnMsg, this);
 
-  connect(this, SIGNAL(AddPoint(const QPointF &)),
-          this->plot, SLOT(Add(const QPointF &)), Qt::QueuedConnection);
+  connect(this, SIGNAL(AddPoint(const QString &, const QPointF &)),
+          this->plot, SLOT(Add(const QString &, const QPointF &)),
+          Qt::QueuedConnection);
 }
 
 /////////////////////////////////////////////////
@@ -85,6 +87,7 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
     this->startTime = msgs::Convert(_msg->time(0).wall());
 
   common::Time wallTime, elapsedTime;
+  std::set<QString>::iterator labelIter;
 
   for (int i = 0; i < _msg->time_size(); ++i)
   {
@@ -99,7 +102,10 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
       this->labelList->addItem(item);
     }
 
-    if (this->selectedLabel == _msg->time(i).name())
+    labelIter = this->selectedLabels.find(
+        QString::fromStdString(_msg->time(i).name()));
+
+    if (labelIter!= this->selectedLabels.end())
     {
       wallTime = msgs::Convert(_msg->time(i).wall());
       elapsedTime = msgs::Convert(_msg->time(i).elapsed());
@@ -107,7 +113,7 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
       double msTime = elapsedTime.Double() * 1e3;
       QPointF pt((wallTime - this->startTime).Double(), msTime);
 
-      this->AddPoint(pt);
+      this->AddPoint(*labelIter, pt);
     }
   }
 }
@@ -115,8 +121,12 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
 /////////////////////////////////////////////////
 void Diagnostics::OnLabelSelected(QListWidgetItem *_item)
 {
-  this->selectedLabel = _item->text().toStdString();
-  this->plot->Clear();
+  // Add the label if it doens't exist. Otherwise remove the label
+  if (this->selectedLabels.find(_item->text()) !=
+      this->selectedLabels.end())
+    this->selectedLabels.insert(_item->text());
+  else
+    this->selectedLabels.erase(_item->text());
 }
 
 /////////////////////////////////////////////////

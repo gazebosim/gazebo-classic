@@ -32,6 +32,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 
+#include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/Timer.hh"
 
@@ -63,10 +64,6 @@ namespace gazebo
     /// \param[in] name Name of the timer to stop
     #define DIAG_TIMER_STOP(_name) \
     gazebo::util::DiagnosticManager::Instance()->StopTimer(#_name);
-
-    /// \brief Publish diagnostic messages.
-    #define DIAG_PUBLISH() \
-    gazebo::util::DiagnosticManager::Instance()->Publish();
 #else
     #define DIAG_TIMER_START(_name) ((void) 0)
     #define DIAG_TIMER_LAP(_name, _prefix) ((void)0)
@@ -126,8 +123,9 @@ namespace gazebo
       /// \return The path in which logs are stored.
       public: boost::filesystem::path GetLogPath() const;
 
-      /// \brief Publish diagnostic messages.
-      public: void Publish();
+      /// \brief Publishes diagnostic information.
+      /// \param[in] _info World update information.
+      private: void Update(const common::UpdateInfo &_info);
 
       /// \brief Add a time for publication.
       /// \param[in] _name Name of the diagnostic time.
@@ -154,6 +152,9 @@ namespace gazebo
 
       /// \brief The message to output
       private: msgs::Diagnostics msg;
+
+      /// \brief Pointer to the update event connection
+      private: event::ConnectionPtr updateConnection;
 
       // Singleton implementation
       private: friend class SingletonT<DiagnosticManager>;
