@@ -154,7 +154,7 @@ void QwtPlot::setAutoReplot( bool tf )
     d_data->autoReplot = tf;
 }
 
-/*! 
+/*!
   \return true if the autoReplot option is set.
   \sa setAutoReplot()
 */

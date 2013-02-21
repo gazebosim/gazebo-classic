@@ -24,6 +24,8 @@
 #include "gazebo/gui/qwt/qwt_plot_curve.h"
 #include "gazebo/gui/qwt/qwt_curve_fitter.h"
 #include "gazebo/gui/qwt/qwt_symbol.h"
+#include "gazebo/gui/qwt/qwt_legend.h"
+#include "gazebo/gui/qwt/qwt_legend_item.h"
 #include "gazebo/gui/qwt/qwt_plot_directpainter.h"
 
 #include "gazebo/math/Helpers.hh"
@@ -49,9 +51,7 @@ class CurveData: public QwtArraySeriesData<QPointF>
   public: inline void Add(const QPointF &_point)
           {
             this->d_samples += _point;
-
-            // Make sure the list of data doesn't grow too much
-            if (this->d_samples.size() >= 6000)
+            if (this->d_samples.size() > 6000)
               this->d_samples.remove(0, 1000);
           }
 
@@ -88,6 +88,10 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 
   this->plotLayout()->setAlignCanvasToScales(true);
 
+  QwtLegend *legend = new QwtLegend;
+  legend->setItemMode(QwtLegend::CheckableItem);
+  this->insertLegend(legend, QwtPlot::RightLegend);
+
   QwtPlotGrid *grid = new QwtPlotGrid;
   grid->setMajPen(QPen(Qt::gray, 0, Qt::DotLine));
   grid->attach(this);
@@ -104,6 +108,8 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->setAxisTitle(QwtPlot::yLeft, ytitle);
 
   this->replot();
+
+  this->setAcceptDrops(true);
 }
 
 /////////////////////////////////////////////////
@@ -263,4 +269,30 @@ void IncrementalPlot::Clear()
 QSize IncrementalPlot::sizeHint() const
 {
   return QSize(540, 400);
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::dragEnterEvent(QDragEnterEvent *_evt)
+{
+  if (_evt->mimeData()->hasFormat("application/x-item") &&
+      _evt->source() != this)
+  {
+    _evt->setDropAction(Qt::LinkAction);
+    _evt->acceptProposedAction();
+  }
+  else
+    _evt->ignore();
+}
+
+/////////////////////////////////////////////////
+bool IncrementalPlot::HasCurve(const QString &_label)
+{
+  return this->curves.find(_label) != this->curves.end();
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::dropEvent(QDropEvent *_evt)
+{
+  QString name = _evt->mimeData()->data("application/x-item");
+  this->AddCurve(name);
 }

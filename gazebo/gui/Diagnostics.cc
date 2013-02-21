@@ -19,11 +19,38 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/gui/PlotListWidget.hh"
 #include "gazebo/gui/IncrementalPlot.hh"
 #include "gazebo/gui/Diagnostics.hh"
 
 using namespace gazebo;
 using namespace gui;
+
+class MyListWidget : public QListWidget
+{
+  public: MyListWidget(QWidget *_parent)
+          : QListWidget(_parent)
+          {
+          }
+
+  protected: virtual void startDrag(Qt::DropActions /*_supportedActions*/)
+             {
+               QListWidgetItem *currItem = this->currentItem();
+               QMimeData *currMimeData = new QMimeData;
+               QByteArray ba;
+               ba = currItem->text().toLatin1().data();
+               currMimeData->setData("application/x-item", ba);
+               QDrag *drag = new QDrag(this);
+               drag->setMimeData(currMimeData);
+               drag->exec(Qt::LinkAction);
+             }
+
+  protected: virtual Qt::DropActions supportedDropActions()
+             {
+               return Qt::LinkAction;
+             }
+
+};
 
 /////////////////////////////////////////////////
 Diagnostics::Diagnostics(QWidget *_parent)
@@ -34,13 +61,15 @@ Diagnostics::Diagnostics(QWidget *_parent)
   this->setWindowTitle("Gazebo: Diagnostics");
   this->setObjectName("diagnosticsPlot");
 
+  // this->plots = new PlotListWidget(this);
   this->plot = new IncrementalPlot(this);
 
-  this->labelList = new QListWidget;
+  this->labelList = new MyListWidget(this);
+  this->labelList->setDragEnabled(true);
+  this->labelList->setDragDropMode(QAbstractItemView::DragOnly);
   QListWidgetItem *item = new QListWidgetItem("Real Time Factor");
+  item->setToolTip(tr("Drag onto graph to plot"));
   this->labelList->addItem(item);
-  connect(this->labelList, SIGNAL(itemClicked(QListWidgetItem *)),
-          this, SLOT(OnLabelSelected(QListWidgetItem *)));
 
   QCheckBox *pauseCheck = new QCheckBox;
   pauseCheck->setChecked(this->paused);
@@ -104,12 +133,9 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
     this->startTime = msgs::Convert(_msg->time(0).wall());
 
   common::Time wallTime, elapsedTime;
-  PointMap::iterator labelIter;
 
-  if (this->selectedLabels.find(QString("Real Time Factor")) !=
-      this->selectedLabels.end())
+  if (this->plot->HasCurve(QString("Real Time Factor")))
   {
-
     wallTime = msgs::Convert(_msg->real_time());
     this->selectedLabels[QString("Real Time Factor")].push_back(
         QPointF(wallTime.Double(), _msg->real_time_factor()));
@@ -125,13 +151,13 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
     if (items.size() == 0)
     {
       QListWidgetItem *item = new QListWidgetItem(qstr);
+      item->setToolTip(tr("Drag onto graph to plot"));
       this->labelList->addItem(item);
     }
 
-    labelIter = this->selectedLabels.find(
-        QString::fromStdString(_msg->time(i).name()));
+    QString labelStr(_msg->time(i).name().c_str());
 
-    if (labelIter != this->selectedLabels.end())
+    if (this->plot->HasCurve(labelStr))
     {
       wallTime = msgs::Convert(_msg->time(i).wall());
       elapsedTime = msgs::Convert(_msg->time(i).elapsed());
@@ -139,22 +165,9 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
       double msTime = elapsedTime.Double() * 1e3;
       QPointF pt((wallTime - this->startTime).Double(), msTime);
 
-      labelIter->second.push_back(pt);
+      this->selectedLabels[labelStr].push_back(pt);
     }
   }
-}
-
-/////////////////////////////////////////////////
-void Diagnostics::OnLabelSelected(QListWidgetItem *_item)
-{
-  // Add the label if it doens't exist. Otherwise remove the label
-  if (this->selectedLabels.find(_item->text()) ==
-      this->selectedLabels.end())
-  {
-    this->selectedLabels[_item->text()].clear();
-  }
-  else
-    this->selectedLabels.erase(_item->text());
 }
 
 /////////////////////////////////////////////////

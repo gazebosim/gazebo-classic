@@ -66,6 +66,14 @@ namespace gazebo
       /// \brief Clear all points from the plot.
       public: void Clear();
 
+      /// \brief Return true if the plot has the labled curve.
+      /// \param[in] _label Name of the curve to check for.
+      /// \return True if _label is currently plotted.
+      public: bool HasCurve(const QString &_label);
+
+      protected: void dragEnterEvent(QDragEnterEvent *_evt);
+      protected: void dropEvent(QDropEvent *_evt);
+
       /// \brief Add a named curve.
       /// \param[in] _label Name of the curve.
       /// \return A pointer to the new curve.

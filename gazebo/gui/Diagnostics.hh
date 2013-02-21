@@ -30,6 +30,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class PlotListWidget;
     class IncrementalPlot;
 
     /// \brief Plot diagnostic information
@@ -51,16 +52,9 @@ namespace gazebo
       /// \brief Update plots.
       private slots: void Update();
 
-      /// \brief QT callback when a diagnostic label is selected.
-      /// \param[in] _item The selected item.
-      private slots: void OnLabelSelected(QListWidgetItem *_item);
-
       /// \brief QT callback for the pause check button.
       /// \param[in] _value True when paused.
       private slots: void OnPause(bool _value);
-
-      /// \brief The plot.
-      private: IncrementalPlot *plot;
 
       /// \brief Node for communications.
       private: transport::NodePtr node;
@@ -84,6 +78,10 @@ namespace gazebo
 
       /// \brief Mutex to protect the point map
       private: boost::mutex mutex;
+
+      /// \brief List of plots.
+      private: PlotListWidget *plots;
+      private: IncrementalPlot *plot;
     };
   }
 }

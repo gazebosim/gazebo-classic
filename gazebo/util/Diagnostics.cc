@@ -85,8 +85,8 @@ void DiagnosticManager::Update(const common::UpdateInfo &_info)
   else
     this->msg.set_real_time_factor(0.0);
 
-  msgs::set(this->msg.mutable_real_time(), _info.realTime);
-  msgs::set(this->msg.mutable_sim_time(), _info.simTime);
+  msgs::Set(this->msg.mutable_real_time(), _info.realTime);
+  msgs::Set(this->msg.mutable_sim_time(), _info.simTime);
 
   if (this->pub)
     this->pub->Publish(this->msg);
