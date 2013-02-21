@@ -79,81 +79,84 @@ set (sources
   qwt_wheel.cpp
  ) 
 
-set (qt_headers
+set (headers
   qwt_abstract_scale_draw.h
   qwt_abstract_scale.h
-  qwt_abstract_slider.h
-  qwt_analog_clock.h
   qwt_arrow_button.h
   qwt_clipper.h
   qwt_color_map.h
   qwt_column_symbol.h
-  qwt_compass.h
   qwt_compass_rose.h
   qwt_compat.h
-  qwt_counter.h
   qwt_curve_fitter.h
-  qwt_dial.h
   qwt_dial_needle.h
   qwt_double_range.h
-  qwt_dyngrid_layout.h
   qwt_event_pattern.h
   qwt_global.h
   qwt.h
   qwt_interval.h
   qwt_interval_symbol.h
-  qwt_knob.h
-  qwt_legend.h
-  qwt_legend_item.h
   qwt_legend_itemmanager.h
-  qwt_magnifier.h
   qwt_math.h
   qwt_matrix_raster_data.h
   qwt_null_paintdevice.h
   qwt_painter.h
-  qwt_panner.h
-  qwt_picker.h
   qwt_picker_machine.h
-  qwt_plot_canvas.h
   qwt_plot_curve.h
   qwt_plot_dict.h
   qwt_plot_directpainter.h
   qwt_plot_grid.h
-  qwt_plot.h
   qwt_plot_histogram.h
   qwt_plot_intervalcurve.h
   qwt_plot_item.h
   qwt_plot_layout.h
-  qwt_plot_magnifier.h
   qwt_plot_marker.h
-  qwt_plot_panner.h
-  qwt_plot_picker.h
   qwt_plot_rasteritem.h
-  qwt_plot_renderer.h
   qwt_plot_rescaler.h
   qwt_plot_scaleitem.h
   qwt_plot_seriesitem.h
   qwt_plot_spectrocurve.h
   qwt_plot_spectrogram.h
   qwt_plot_svgitem.h
-  qwt_plot_zoomer.h
   qwt_point_3d.h
   qwt_point_polar.h
   qwt_raster_data.h
   qwt_round_scale_draw.h
-  qwt_sampling_thread.h
   qwt_scale_div.h
   qwt_scale_draw.h
   qwt_scale_engine.h
   qwt_scale_map.h
-  qwt_scale_widget.h
   qwt_series_data.h
-  qwt_slider.h
   qwt_spline.h
   qwt_symbol.h
   qwt_system_clock.h
   qwt_text_engine.h
   qwt_text.h
+  )
+
+set (qt_headers
+  qwt_abstract_slider.h
+  qwt_analog_clock.h
+  qwt_compass.h
+  qwt_counter.h
+  qwt_dial.h
+  qwt_dyngrid_layout.h
+  qwt_knob.h
+  qwt_legend.h
+  qwt_legend_item.h
+  qwt_magnifier.h
+  qwt_panner.h
+  qwt_picker.h
+  qwt_plot_canvas.h
+  qwt_plot.h
+  qwt_plot_magnifier.h
+  qwt_plot_panner.h
+  qwt_plot_picker.h
+  qwt_plot_renderer.h
+  qwt_plot_zoomer.h
+  qwt_sampling_thread.h
+  qwt_scale_widget.h
+  qwt_slider.h
   qwt_text_label.h
   qwt_thermo.h
   qwt_wheel.h
@@ -163,6 +166,5 @@ QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 add_library(gzqwt STATIC ${sources} ${headers_MOC} ${resources_RCC})
-
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

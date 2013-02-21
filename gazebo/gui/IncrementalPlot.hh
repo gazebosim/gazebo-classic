@@ -52,6 +52,13 @@ namespace gazebo
       /// \param[in] _pt Point to add.
       public slots: void Add(const QString &_label, const QPointF &_pt);
 
+      /// \brief Add new points to a curve.
+      /// \param[in] _label Name of the curve to add a point to. A curve
+      /// will be added if it doesn't exist.
+      /// \param[in] _pt Points to add.
+      public slots: void Add(const QString &_label,
+                             const std::list<QPointF> &_pts);
+
       /// \brief Clear a single curve from the plot.
       /// \param[in] _label Name of the curve to remove.
       public: void Clear(const QString &_label);

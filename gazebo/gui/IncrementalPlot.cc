@@ -50,21 +50,10 @@ class CurveData: public QwtArraySeriesData<QPointF>
           {
             this->d_samples += _point;
 
-            /*this->history.push_back(_point.y());
-            if (this->history.size() > 1000)
-              this->history.pop_front();
-              */
+            // Make sure the list of data doesn't grow too much
+            if (this->d_samples.size() >= 6000)
+              this->d_samples.remove(0, 1000);
           }
-
-  /*public: inline double GetMaxY()
-          {
-            std::list<double>::iterator maxIter =
-              std::max_element(this->history.begin(),
-                  this->history.end());
-
-            return *maxIter;
-          }
-          */
 
   public: void Clear()
           {
@@ -72,8 +61,6 @@ class CurveData: public QwtArraySeriesData<QPointF>
             this->d_samples.squeeze();
             this->d_boundingRect = QRectF(0.0, 0.0, -1.0, -1.0);
           }
-
-  // private: std::list<double> history;
 };
 
 /////////////////////////////////////////////////
@@ -132,6 +119,17 @@ IncrementalPlot::~IncrementalPlot()
 }
 
 /////////////////////////////////////////////////
+void IncrementalPlot::Add(const QString &_label,
+                          const std::list<QPointF> &_pts)
+{
+  for (std::list<QPointF>::const_iterator iter = _pts.begin();
+       iter != _pts.end(); ++iter)
+  {
+    this->Add(_label, *iter);
+  }
+}
+
+/////////////////////////////////////////////////
 void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
 {
   QwtPlotCurve *curve = NULL;
@@ -173,7 +171,7 @@ void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
       std::max(0.0, static_cast<double>(_pt.x() - 5.0)),
       std::max(1.0, static_cast<double>(_pt.x())));
 
-  this->setAxisScale(this->yLeft, 0.0, curve->maxYValue());
+  this->setAxisScale(curve->yAxis(), 0.0, curve->maxYValue() * 2.0);
 
   this->directPainter->drawSeries(curve,
       curveData->size() - 1,
@@ -188,16 +186,6 @@ QwtPlotCurve *IncrementalPlot::AddCurve(const QString &_label)
   curve->setStyle(QwtPlotCurve::Lines);
   curve->setData(new CurveData());
 
-  curve->setSymbol(new QwtSymbol(QwtSymbol::Ellipse,
-        Qt::NoBrush, QPen(Qt::red), QSize(2, 2)));
-
-  QPen pen(QColor(255, 0, 0));
-  pen.setWidth(1.0);
-  curve->setStyle(QwtPlotCurve::Lines);
-  curve->setPen(pen);
-
-  curve->attach(this);
-
   // Delete an old curve if it exists.
   if (this->curves.find(_label) != this->curves.end())
   {
@@ -209,8 +197,10 @@ QwtPlotCurve *IncrementalPlot::AddCurve(const QString &_label)
 
   this->curves[_label] = curve;
 
+  QColor penColor;
   if (this->curves.size() == 2)
   {
+    penColor.setRgb(0, 0, 255);
     this->enableAxis(QwtPlot::yRight);
 
     QwtText ytitle("Real Time Factor (%)");
@@ -218,7 +208,18 @@ QwtPlotCurve *IncrementalPlot::AddCurve(const QString &_label)
     this->setAxisTitle(QwtPlot::yRight, ytitle);
     curve->setYAxis(QwtPlot::yRight);
   }
+  else
+    penColor.setRgb(255, 0, 0);
 
+  QPen pen(penColor);
+  pen.setWidth(1.0);
+  curve->setPen(pen);
+  curve->setStyle(QwtPlotCurve::Lines);
+
+  curve->setSymbol(new QwtSymbol(QwtSymbol::Ellipse,
+        Qt::NoBrush, QPen(penColor), QSize(2, 2)));
+
+  curve->attach(this);
 
   return curve;
 }

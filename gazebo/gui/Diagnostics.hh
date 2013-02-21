@@ -18,7 +18,8 @@
 #ifndef _DIAGNOSTICS_WIDGET_HH_
 #define _DIAGNOSTICS_WIDGET_HH_
 
-#include <set>
+#include <map>
+#include <boost/thread/mutex.hpp>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Time.hh"
@@ -43,14 +44,12 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~Diagnostics();
 
-      /// \brief Signal used to add a point to the plot.
-      /// \param[in] _label Name of the curve to add a point to.
-      /// \param[in] _pt Point to add
-      signals: void AddPoint(const QString &_label, const QPointF &_point);
-
       /// \brief Called when a diagnostic message is received.
       /// \param[in] _msg Diagnostic message.
       private: void OnMsg(ConstDiagnosticsPtr &_msg);
+
+      /// \brief Update plots.
+      private slots: void Update();
 
       /// \brief QT callback when a diagnostic label is selected.
       /// \param[in] _item The selected item.
@@ -75,11 +74,16 @@ namespace gazebo
       /// \brief The list of diagnostic labels.
       private: QListWidget *labelList;
 
+      private: typedef std::map<QString, std::list<QPointF> > PointMap;
+
       /// \brief The currently selected label.
-      private: std::set<QString> selectedLabels;
+      private: PointMap selectedLabels;
 
       /// \brief True when plotting is paused.
       private: bool paused;
+
+      /// \brief Mutex to protect the point map
+      private: boost::mutex mutex;
     };
   }
 }

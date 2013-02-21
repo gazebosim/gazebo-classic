@@ -37,6 +37,8 @@ Diagnostics::Diagnostics(QWidget *_parent)
   this->plot = new IncrementalPlot(this);
 
   this->labelList = new QListWidget;
+  QListWidgetItem *item = new QListWidgetItem("Real Time Factor");
+  this->labelList->addItem(item);
   connect(this->labelList, SIGNAL(itemClicked(QListWidgetItem *)),
           this, SLOT(OnLabelSelected(QListWidgetItem *)));
 
@@ -64,14 +66,27 @@ Diagnostics::Diagnostics(QWidget *_parent)
   this->node->Init();
   this->sub = this->node->Subscribe("~/diagnostics", &Diagnostics::OnMsg, this);
 
-  connect(this, SIGNAL(AddPoint(const QString &, const QPointF &)),
-          this->plot, SLOT(Add(const QString &, const QPointF &)),
-          Qt::QueuedConnection);
+  QTimer *displayTimer = new QTimer(this);
+  connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
+  displayTimer->start(60);
 }
 
 /////////////////////////////////////////////////
 Diagnostics::~Diagnostics()
 {
+}
+
+/////////////////////////////////////////////////
+void Diagnostics::Update()
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+
+  for (PointMap::iterator iter = this->selectedLabels.begin();
+       iter != this->selectedLabels.end(); ++iter)
+  {
+    this->plot->Add(iter->first, iter->second);
+    iter->second.clear();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -83,11 +98,22 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
   if (_msg->time_size() == 0)
     return;
 
+  boost::mutex::scoped_lock lock(this->mutex);
+
   if (this->startTime == common::Time::Zero)
     this->startTime = msgs::Convert(_msg->time(0).wall());
 
   common::Time wallTime, elapsedTime;
-  std::set<QString>::iterator labelIter;
+  PointMap::iterator labelIter;
+
+  if (this->selectedLabels.find(QString("Real Time Factor")) !=
+      this->selectedLabels.end())
+  {
+
+    wallTime = msgs::Convert(_msg->real_time());
+    this->selectedLabels[QString("Real Time Factor")].push_back(
+        QPointF(wallTime.Double(), _msg->real_time_factor()));
+  }
 
   for (int i = 0; i < _msg->time_size(); ++i)
   {
@@ -105,7 +131,7 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
     labelIter = this->selectedLabels.find(
         QString::fromStdString(_msg->time(i).name()));
 
-    if (labelIter!= this->selectedLabels.end())
+    if (labelIter != this->selectedLabels.end())
     {
       wallTime = msgs::Convert(_msg->time(i).wall());
       elapsedTime = msgs::Convert(_msg->time(i).elapsed());
@@ -113,7 +139,7 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
       double msTime = elapsedTime.Double() * 1e3;
       QPointF pt((wallTime - this->startTime).Double(), msTime);
 
-      this->AddPoint(*labelIter, pt);
+      labelIter->second.push_back(pt);
     }
   }
 }
@@ -122,9 +148,11 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
 void Diagnostics::OnLabelSelected(QListWidgetItem *_item)
 {
   // Add the label if it doens't exist. Otherwise remove the label
-  if (this->selectedLabels.find(_item->text()) !=
+  if (this->selectedLabels.find(_item->text()) ==
       this->selectedLabels.end())
-    this->selectedLabels.insert(_item->text());
+  {
+    this->selectedLabels[_item->text()].clear();
+  }
   else
     this->selectedLabels.erase(_item->text());
 }

@@ -1,4 +1,5 @@
 #pragma GCC system_header
+#pragma GCC diagnostic ignored "-Wswitch-default"
 /* -*- mode: C++ ; c-file-style: "stroustrup" -*- *****************************
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
