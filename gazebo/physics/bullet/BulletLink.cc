@@ -46,6 +46,7 @@ BulletLink::BulletLink(EntityPtr _parent)
 BulletLink::~BulletLink()
 {
   delete this->compoundShape;
+  delete this->rigidLink;
 }
 
 //////////////////////////////////////////////////
@@ -143,6 +144,11 @@ void BulletLink::Init()
 void BulletLink::Fini()
 {
   Link::Fini();
+  btDynamicsWorld *wd = this->bulletPhysics->GetDynamicsWorld();
+  wd->removeRigidBody(this->rigidLink);
+
+  this->motionState.reset();
+  this->bulletPhysics.reset();
 }
 
 //////////////////////////////////////////////////
