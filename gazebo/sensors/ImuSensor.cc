@@ -39,9 +39,8 @@ GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor)
 
 //////////////////////////////////////////////////
 ImuSensor::ImuSensor()
-    : Sensor()
+    : Sensor(sensors::OTHER)
 {
-  std::cout << "NEW IMU\n";
 }
 
 //////////////////////////////////////////////////

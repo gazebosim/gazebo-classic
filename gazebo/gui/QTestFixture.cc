@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/physics/Physics.hh"
+
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/gazebo.hh"
@@ -27,9 +29,6 @@ void QTestFixture::initTestCase()
   // errors.
   gazebo::common::Console::Instance()->Init("test.log");
 
-  // Initialize the data logger. This will log state information.
-  gazebo::common::LogRecord::Instance()->Init("test");
-
   // Add local search paths
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(PROJECT_SOURCE_PATH);
 
@@ -37,9 +36,23 @@ void QTestFixture::initTestCase()
   path += "/sdf/worlds";
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
+  path = TEST_PATH;
+  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+}
+
+/////////////////////////////////////////////////
+void QTestFixture::init()
+{
+  this->serverThread = NULL;
+  this->GetMemInfo(this->residentStart, this->shareStart);
+}
+
+/////////////////////////////////////////////////
+void QTestFixture::Load(const std::string &_worldFilename, bool _paused)
+{
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
-      boost::bind(&QTestFixture::RunServer, this));
+      boost::bind(&QTestFixture::RunServer, this, _worldFilename, _paused));
 
   // Wait for the server to come up
   // Use a 30 second timeout.
@@ -50,16 +63,16 @@ void QTestFixture::initTestCase()
 }
 
 /////////////////////////////////////////////////
-void QTestFixture::RunServer()
+void QTestFixture::RunServer(const std::string &_worldFilename, bool _paused)
 {
   this->server = new gazebo::Server();
-  this->server->LoadFile("empty.world");
+  this->server->LoadFile(_worldFilename);
   this->server->Init();
 
   gazebo::rendering::create_scene(
       gazebo::physics::get_world()->GetName(), false);
 
-  // this->SetPause(false);
+  this->SetPause(_paused);
 
   this->server->Run();
 
@@ -71,8 +84,28 @@ void QTestFixture::RunServer()
 }
 
 /////////////////////////////////////////////////
-void QTestFixture::cleanupTestCase()
+void QTestFixture::SetPause(bool _pause)
 {
+  gazebo::physics::pause_worlds(_pause);
+}
+
+/////////////////////////////////////////////////
+void QTestFixture::cleanup()
+{
+  double residentEnd, shareEnd;
+  this->GetMemInfo(residentEnd, shareEnd);
+
+  // Calculate the percent change from the initial resident and shared
+  // memory
+  double resPercentChange = (residentEnd - residentStart) / residentStart;
+  double sharePercentChange = (shareEnd - shareStart) / shareStart;
+
+  std::cout << "REs[" << resPercentChange << "]\n";
+  std::cout << "Shared[" << sharePercentChange << "]\n";
+  // Make sure the percent change values are reasonable.
+  QVERIFY(resPercentChange < 2.5);
+  QVERIFY(sharePercentChange < 1.0);
+
   if (this->server)
   {
     this->server->Stop();
@@ -85,4 +118,26 @@ void QTestFixture::cleanupTestCase()
 
   delete this->serverThread;
   this->serverThread = NULL;
+}
+
+/////////////////////////////////////////////////
+void QTestFixture::cleanupTestCase()
+{
+}
+
+/////////////////////////////////////////////////
+void QTestFixture::GetMemInfo(double &_resident, double &_share)
+{
+  int totalSize, residentPages, sharePages;
+  totalSize = residentPages = sharePages = 0;
+
+  std::ifstream buffer("/proc/self/statm");
+  buffer >> totalSize >> residentPages >> sharePages;
+  buffer.close();
+
+  // in case x86-64 is configured to use 2MB pages
+  int64_t pageSizeKb = sysconf(_SC_PAGE_SIZE) / 1024;
+
+  _resident = residentPages * pageSizeKb;
+  _share = sharePages * pageSizeKb;
 }

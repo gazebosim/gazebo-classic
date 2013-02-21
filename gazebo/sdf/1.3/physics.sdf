@@ -20,7 +20,7 @@
 
   <element name="bullet" required="0">
     <description>Bullet specific physics properties</description>
-    <element name="dt" type="double" default="0.003" required="1">
+    <element name="dt" type="double" default="0.001" required="1">
       <description>Time step</description>
     </element>
   </element>

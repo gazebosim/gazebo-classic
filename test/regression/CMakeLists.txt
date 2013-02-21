@@ -27,12 +27,12 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 
 set (gtest_sources
+  bandwidth.cc
   camera_sensor.cc
   factory.cc
   file_handling.cc
   heightmap.cc
   laser.cc
-  math.cc
   msgs.cc
   physics.cc
   pioneer2dx.cc
@@ -40,6 +40,7 @@ set (gtest_sources
   projector.cc
   server_fixture.cc
   speed.cc
+  speed_pr2.cc
   transport.cc)
 
 set (plugins)

@@ -296,7 +296,7 @@ void bw()
     common::Time::MSleep(100);
     {
       boost::mutex::scoped_lock lock(mutex);
-      if (bwBytes.size() >= 100)
+      if (bwBytes.size() >= 10)
       {
         std::sort(bwBytes.begin(), bwBytes.end());
 

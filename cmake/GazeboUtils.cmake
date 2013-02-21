@@ -171,6 +171,7 @@ macro (gz_build_tests)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport
+      libgazebo
       pthread
       )
   
@@ -188,16 +189,16 @@ macro (gz_build_tests)
 endmacro()
 
 #################################################
-macro (gz_build_qt_tests)
-
+# INTERNAL function: do not call directly use gz_build_display_tests or gz_build_dri_tests
+macro (_gz_build_qt_tests)
   # Build all the tests
   foreach(QTEST_SOURCE_file ${ARGN})
     string(REGEX REPLACE ".cc" "" BINARY_NAME ${QTEST_SOURCE_file})
     string(REGEX REPLACE ".cc" ".hh" QTEST_HEADER_file ${QTEST_SOURCE_file})
-    QT4_WRAP_CPP(test_MOC ${QTEST_HEADER_file} QTestFixture.hh)
+    QT4_WRAP_CPP(${BINARY_NAME}_MOC ${QTEST_HEADER_file} QTestFixture.hh)
 
     add_executable(${BINARY_NAME}
-      ${test_MOC} ${QTEST_SOURCE_file} QTestFixture.cc)
+      ${${BINARY_NAME}_MOC} ${QTEST_SOURCE_file} QTestFixture.cc)
 
     add_dependencies(${BINARY_NAME}
       gazebo_gui
@@ -209,7 +210,7 @@ macro (gz_build_qt_tests)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport)
-  
+
     target_link_libraries(${BINARY_NAME}
       gazebo_gui
       gazebo_sdf_interface
@@ -225,7 +226,7 @@ macro (gz_build_qt_tests)
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
       )
-  
+ 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} -xml)
   
     set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
@@ -235,5 +236,24 @@ macro (gz_build_qt_tests)
     add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
              ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
   endforeach()
-
 endmacro()
+
+# Define GUI testing macros as empty and redefine them if support is found
+macro (gz_build_display_tests)
+endmacro()
+macro (gz_build_dri_tests)
+endmacro()
+
+if (VALID_DRI_DISPLAY)
+  macro (gz_build_dri_tests)
+    _gz_build_qt_tests(${ARGV})
+  endmacro()
+endif()
+
+if (VALID_DISPLAY)
+  macro (gz_build_display_tests)
+    _gz_build_qt_tests(${ARGV})
+  endmacro()
+endif()
+
+
