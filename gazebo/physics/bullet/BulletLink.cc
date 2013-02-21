@@ -135,7 +135,7 @@ void BulletLink::Init()
     this->rigidLink->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
 
   btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
-  GZ_ASSERT(bulletWorld != NULL, "Bullet dyanmics world is NULL");
+  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
   bulletWorld->addRigidBody(this->rigidLink);
 
   // this->rigidLink->setSleepingThresholds(0,0);
@@ -146,7 +146,7 @@ void BulletLink::Fini()
 {
   Link::Fini();
   btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
-  GZ_ASSERT(bulletWorld != NULL, "Bullet dyanmics world is NULL");
+  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
   bulletWorld->removeRigidBody(this->rigidLink);
 
   this->motionState.reset();
