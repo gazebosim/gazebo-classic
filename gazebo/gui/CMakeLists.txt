@@ -16,6 +16,7 @@ set (sources
   Actions.cc
   BoxMaker.cc
   CylinderMaker.cc
+  DataLogger.cc
   Diagnostics.cc
   EntityMaker.cc
   RenderWidget.cc
@@ -26,7 +27,6 @@ set (sources
   InsertModelWidget.cc
   JointControlWidget.cc
   LightMaker.cc
-  main.cc
   MainWindow.cc
   MeshMaker.cc
   ModelEditWidget.cc
@@ -47,6 +47,7 @@ set (sources
 
 set (qt_headers
   Actions.hh
+  DataLogger.hh
   Diagnostics.hh
   GLWidget.hh
   IncrementalPlot.hh
@@ -82,21 +83,26 @@ set (headers
   viewers/ViewFactory.hh
 )
 
-set (display_tests 
+set (display_tests
+  DataLogger_TEST.cc
   TimePanel_TEST.cc
   viewers/ImagesView_TEST.cc
 )
 
-gz_build_display_tests(${display_tests})
+# Generate executables for each of the QT unit tests
+gz_build_display_tests(${tests})
 
 set (resources resources.qrc)
-
 
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-gz_add_executable(gzclient ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+gz_add_executable(gzclient ${sources} main.cc ${headers_MOC} ${headers} ${resources_RCC})
+
 gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+
+add_dependencies(gazebo_gui gazebo_msgs)
+add_dependencies(gzclient gazebo_msgs)
 
 target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_transport
@@ -125,8 +131,6 @@ target_link_libraries(gzclient  gazebo_common
                                 ${ogre_libraries}
                                 ${Boost_LIBRARIES}
                                 pthread)
-
-
 
 add_definitions(${QT_DEFINITIONS})
 
