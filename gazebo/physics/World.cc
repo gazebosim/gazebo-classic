@@ -517,7 +517,10 @@ void World::Update()
     else if (this->resetTimeOnly)
       this->ResetTime();
     else if (this->resetModelOnly)
+    {
       this->ResetEntities(Base::MODEL);
+      this->ResetEntities(Base::LINK);
+    }
     this->needsReset = false;
   }
 
