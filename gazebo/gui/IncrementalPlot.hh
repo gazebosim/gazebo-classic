@@ -20,7 +20,7 @@
 
 #include "gazebo/math/Vector2d.hh"
 
-#include "gazebo/gui/qwt/qwt_plot.h"
+#include "qwt/qwt_plot.h"
 #include "gazebo/gui/qt.h"
 
 class QwtPlotCurve;
@@ -73,6 +73,10 @@ namespace gazebo
 
       protected: void dragEnterEvent(QDragEnterEvent *_evt);
       protected: void dropEvent(QDropEvent *_evt);
+
+      /// \brief Adjust a curve to fit new data.
+      /// \param[in] _curve Curve to adjust
+      private: void AdjustCurve(QwtPlotCurve *_curve);
 
       /// \brief Add a named curve.
       /// \param[in] _label Name of the curve.

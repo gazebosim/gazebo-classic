@@ -30,7 +30,6 @@ namespace gazebo
 {
   namespace gui
   {
-    class PlotListWidget;
     class IncrementalPlot;
 
     /// \brief Plot diagnostic information
@@ -79,8 +78,7 @@ namespace gazebo
       /// \brief Mutex to protect the point map
       private: boost::mutex mutex;
 
-      /// \brief List of plots.
-      private: PlotListWidget *plots;
+      /// \brief Plotting widget
       private: IncrementalPlot *plot;
     };
   }

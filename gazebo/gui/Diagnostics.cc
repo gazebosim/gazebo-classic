@@ -19,7 +19,6 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
-#include "gazebo/gui/PlotListWidget.hh"
 #include "gazebo/gui/IncrementalPlot.hh"
 #include "gazebo/gui/Diagnostics.hh"
 

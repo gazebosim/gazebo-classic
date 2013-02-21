@@ -5,10 +5,13 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
 )
 
+include_directories(
+  ${CMAKE_SOURCE_DIR}/deps
+)
+
 add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
-add_subdirectory(qwt)
 add_subdirectory(model_editor)
 
 set (sources

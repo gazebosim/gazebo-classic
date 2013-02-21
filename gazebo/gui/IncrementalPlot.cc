@@ -15,25 +15,26 @@
  *
 */
 
-#include "gazebo/gui/qwt/qwt_plot.h"
-#include "gazebo/gui/qwt/qwt_plot_panner.h"
-#include "gazebo/gui/qwt/qwt_plot_magnifier.h"
-#include "gazebo/gui/qwt/qwt_plot_layout.h"
-#include "gazebo/gui/qwt/qwt_plot_grid.h"
-#include "gazebo/gui/qwt/qwt_plot_canvas.h"
-#include "gazebo/gui/qwt/qwt_plot_curve.h"
-#include "gazebo/gui/qwt/qwt_curve_fitter.h"
-#include "gazebo/gui/qwt/qwt_symbol.h"
-#include "gazebo/gui/qwt/qwt_legend.h"
-#include "gazebo/gui/qwt/qwt_legend_item.h"
-#include "gazebo/gui/qwt/qwt_plot_directpainter.h"
+#include "qwt/qwt_plot.h"
+#include "qwt/qwt_plot_panner.h"
+#include "qwt/qwt_plot_magnifier.h"
+#include "qwt/qwt_plot_layout.h"
+#include "qwt/qwt_plot_grid.h"
+#include "qwt/qwt_plot_canvas.h"
+#include "qwt/qwt_plot_curve.h"
+#include "qwt/qwt_curve_fitter.h"
+#include "qwt/qwt_symbol.h"
+#include "qwt/qwt_legend.h"
+#include "qwt/qwt_legend_item.h"
+#include "qwt/qwt_plot_directpainter.h"
+
+#include "gazebo/common/Assert.hh"
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/gui/IncrementalPlot.hh"
 
 using namespace gazebo;
 using namespace gui;
-
 
 class CurveData: public QwtArraySeriesData<QPointF>
 {
@@ -88,16 +89,19 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 
   this->plotLayout()->setAlignCanvasToScales(true);
 
-  QwtLegend *legend = new QwtLegend;
-  legend->setItemMode(QwtLegend::CheckableItem);
-  this->insertLegend(legend, QwtPlot::RightLegend);
+  QwtLegend *qLegend = new QwtLegend;
+  qLegend->setItemMode(QwtLegend::CheckableItem);
+  this->insertLegend(qLegend, QwtPlot::RightLegend);
 
   QwtPlotGrid *grid = new QwtPlotGrid;
   grid->setMajPen(QPen(Qt::gray, 0, Qt::DotLine));
   grid->attach(this);
 
-  this->setAxisScale(QwtPlot::xBottom, 0, 1.0);
-  this->setAxisScale(QwtPlot::yLeft, 0, 0.002);
+  this->axisAutoScale(QwtPlot::yRight);
+  this->axisAutoScale(QwtPlot::yLeft);
+
+  this->setAxisScale(QwtPlot::xBottom, 0, 5.0);
+  // this->setAxisScale(QwtPlot::yLeft, 0, 0.002);
 
   QwtText xtitle("Real Time (s)");
   xtitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
@@ -128,16 +132,9 @@ IncrementalPlot::~IncrementalPlot()
 void IncrementalPlot::Add(const QString &_label,
                           const std::list<QPointF> &_pts)
 {
-  for (std::list<QPointF>::const_iterator iter = _pts.begin();
-       iter != _pts.end(); ++iter)
-  {
-    this->Add(_label, *iter);
-  }
-}
+  if (_label.isEmpty())
+    return;
 
-/////////////////////////////////////////////////
-void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
-{
   QwtPlotCurve *curve = NULL;
 
   CurveMap::iterator iter = this->curves.find(_label);
@@ -146,9 +143,59 @@ void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
   else
     curve = iter->second;
 
+  GZ_ASSERT(curve != NULL, "Curve is NULL");
+
+  // Get the  curve data
   CurveData *curveData = static_cast<CurveData *>(curve->data());
 
+  GZ_ASSERT(curveData != NULL, "Curve data is NULL");
+
+  // Add all the points
+  for (std::list<QPointF>::const_iterator ptIter = _pts.begin();
+       ptIter != _pts.end(); ++ptIter)
+  {
+    curveData->Add(*ptIter);
+  }
+
+  // Adjust the curve
+  this->AdjustCurve(curve );
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
+{
+  if (_label.isEmpty())
+    return;
+
+  QwtPlotCurve *curve = NULL;
+
+  CurveMap::iterator iter = this->curves.find(_label);
+  if (iter == this->curves.end())
+    curve = this->AddCurve(_label);
+  else
+    curve = iter->second;
+
+  GZ_ASSERT(curve != NULL, "Curve is NULL");
+
+  // Get the curve data
+  CurveData *curveData = static_cast<CurveData *>(curve->data());
+
+  GZ_ASSERT(curveData != NULL, "Curve data is NULL");
+
+  // Add a point
   curveData->Add(_pt);
+
+  // Adjust the curve
+  this->AdjustCurve(curve);
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::AdjustCurve(QwtPlotCurve *_curve)
+{
+  GZ_ASSERT(_curve != NULL, "Curve is NULL");
+
+  CurveData *curveData = static_cast<CurveData *>(_curve->data());
+  const QPointF &lastPoint = curveData->samples().back();
 
   const bool doClip = !this->canvas()->testAttribute(Qt::WA_PaintOnScreen);
 
@@ -158,15 +205,15 @@ void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
     // performance issue. F.e. for Qt Embedded this reduces the
     // part of the backing store that has to be copied out - maybe
     // to an unaccelerated frame buffer device.
-    const QwtScaleMap xMap = this->canvasMap(curve->xAxis());
-    const QwtScaleMap yMap = this->canvasMap(curve->yAxis());
+    const QwtScaleMap xMap = this->canvasMap(_curve->xAxis());
+    const QwtScaleMap yMap = this->canvasMap(_curve->yAxis());
 
     QRegion clipRegion;
 
-    const QSize symbolSize = curve->symbol()->size();
+    const QSize symbolSize = _curve->symbol()->size();
     QRect r(0, 0, symbolSize.width() + 2, symbolSize.height() + 2);
 
-    const QPointF center = QwtScaleMap::transform(xMap, yMap, _pt);
+    const QPointF center = QwtScaleMap::transform(xMap, yMap, lastPoint);
     r.moveCenter(center.toPoint());
     clipRegion += r;
 
@@ -174,14 +221,14 @@ void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
   }
 
   this->setAxisScale(this->xBottom,
-      std::max(0.0, static_cast<double>(_pt.x() - 5.0)),
-      std::max(1.0, static_cast<double>(_pt.x())));
+      std::max(0.0, static_cast<double>(lastPoint.x() - 5.0)),
+      std::max(1.0, static_cast<double>(lastPoint.x())));
 
-  this->setAxisScale(curve->yAxis(), 0.0, curve->maxYValue() * 2.0);
+  this->setAxisScale(_curve->yAxis(), 0.0, _curve->maxYValue() * 2.0);
 
-  this->directPainter->drawSeries(curve,
-      curveData->size() - 1,
-      curveData->size() - 1);
+  this->directPainter->drawSeries(_curve,
+      _curveData->size() - 1,
+      _curveData->size() - 1);
 }
 
 /////////////////////////////////////////////////
@@ -208,6 +255,7 @@ QwtPlotCurve *IncrementalPlot::AddCurve(const QString &_label)
   {
     penColor.setRgb(0, 0, 255);
     this->enableAxis(QwtPlot::yRight);
+    this->axisAutoScale(QwtPlot::yRight);
 
     QwtText ytitle("Real Time Factor (%)");
     ytitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
