@@ -1526,6 +1526,10 @@ void URDF2Gazebo::CreateJoint(TiXmlElement *_root,
                 this->Values2str(1, &_link->parent_joint->limits->lower));
               this->AddKeyValue(jointAxisLimit, "upper",
                 this->Values2str(1, &_link->parent_joint->limits->upper));
+              this->AddKeyValue(jointAxisLimit, "effort",
+                this->Values2str(1, &_link->parent_joint->limits->effort));
+              this->AddKeyValue(jointAxisLimit, "velocity",
+                this->Values2str(1, &_link->parent_joint->limits->velocity));
             }
             else if (_link->parent_joint->type != urdf::Joint::CONTINUOUS)
             {
@@ -1547,6 +1551,10 @@ void URDF2Gazebo::CreateJoint(TiXmlElement *_root,
                 this->Values2str(1, &_link->parent_joint->limits->lower));
               this->AddKeyValue(jointAxisLimit, "upper",
                 this->Values2str(1, &_link->parent_joint->limits->upper));
+              this->AddKeyValue(jointAxisLimit, "effort",
+                this->Values2str(1, &_link->parent_joint->limits->effort));
+              this->AddKeyValue(jointAxisLimit, "velocity",
+                this->Values2str(1, &_link->parent_joint->limits->velocity));
             }
           }
         }
