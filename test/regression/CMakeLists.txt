@@ -24,14 +24,24 @@ if(HAVE_BULLET)
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 
-set(display_tests
+set(tests
   bandwidth.cc
+  factory.cc
   file_handling.cc
+  laser.cc
   msgs.cc
   physics.cc
+  pioneer2dx.cc
+  transport.cc
   server_fixture.cc
   speed.cc
-  transport.cc
+  )
+
+set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
+    "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc")
+gz_build_tests(${tests})
+
+set(display_tests
 )
 
 # Build the display tests (need extra sources to compile)
@@ -41,10 +51,7 @@ gz_build_display_tests(${display_tests})
 
 set(dri_tests
   camera_sensor.cc
-  factory.cc
   heightmap.cc
-  laser.cc
-  pioneer2dx.cc
   pr2.cc
   projector.cc
   speed_pr2.cc
