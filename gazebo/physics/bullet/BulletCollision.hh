@@ -81,7 +81,10 @@ namespace gazebo
       public: virtual math::Box GetBoundingBox() const;
 
       /// \brief Set the collision shape
-      public: void SetCollisionShape(btCollisionShape *_shape);
+      /// \param[in] _shape Collision shape
+      /// \param[in] _placeable True to make the object movable.
+      public: void SetCollisionShape(btCollisionShape *_shape,
+          bool _placeable = true);
 
       /// \brief Get the bullet collision shape
       public: btCollisionShape *GetCollisionShape() const;
