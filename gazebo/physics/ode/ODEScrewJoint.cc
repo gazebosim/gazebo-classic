@@ -109,7 +109,7 @@ void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetForce(int _index, double _force)
+void ODEScrewJoint::SetForce(int _index, double _effort)
 {
   if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
   {
@@ -118,17 +118,26 @@ void ODEScrewJoint::SetForce(int _index, double _force)
     return;
   }
 
+  // truncating SetForce effort if velocity limit reached.
+  if (this->velocityLimit[_index] >= 0)
+  {
+    if (this->GetVelocity(_index) > this->velocityLimit[_index])
+      _effort = _effort > 0 ? 0 : _effort;
+    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
+      _effort = _effort < 0 ? 0 : _effort;
+  }
+
   // truncate effort if effortLimit is not negative
   if (this->effortLimit[_index] >= 0.0)
-    _force = math::clamp(_force,
+    _effort = math::clamp(_effort,
       -this->effortLimit[_index], this->effortLimit[_index]);
 
-  ODEJoint::SetForce(_index, _force);
+  ODEJoint::SetForce(_index, _effort);
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
 
-  // dJointAddScrewForce(this->jointId, _force);
-  dJointAddScrewTorque(this->jointId, _force);
+  // dJointAddScrewForce(this->jointId, _effort);
+  dJointAddScrewTorque(this->jointId, _effort);
 }
 
 //////////////////////////////////////////////////
