@@ -60,9 +60,29 @@ namespace gazebo
       /// \return Angular velocity.
       public: math::Vector3 GetAngularVelocity() const;
 
-      /// \brief Returns the linear acceleration.
+      /// \brief Returns the imu linear acceleration
       /// \return Linear acceleration.
       public: math::Vector3 GetLinearAcceleration() const;
+
+      /// \brief get orientation of the IMU relative to the reference pose
+      /// \return returns the orientation quaternion of the IMU relative to
+      /// the imu reference pose.
+      public: math::Quaternion GetOrientation() const;
+
+      /// \brief Sets the current pose as the IMU reference pose
+      public: void SetReferencePose();
+
+      /// \brief Imu reference pose
+      private: math::Pose referencePose;
+
+      /// \brief Save previous imu linear velocity for computing acceleration.
+      private: math::Vector3 lastLinearVel;
+
+      /// \brief Imu linear acceleration
+      private: math::Vector3 linearAcc;
+
+      /// \brief store gravity vector to be added to the imu output.
+      private: math::Vector3 gravity;
 
       private: transport::PublisherPtr pub;
       private: physics::LinkPtr parentEntity;

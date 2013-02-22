@@ -162,7 +162,7 @@ void ODEHinge2Joint::SetMaxForce(int _index, double _t)
 
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetForce(int _index, double _torque)
+void ODEHinge2Joint::SetForce(int _index, double _effort)
 {
   if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
   {
@@ -171,21 +171,30 @@ void ODEHinge2Joint::SetForce(int _index, double _torque)
     return;
   }
 
+  // truncating SetForce effort if velocity limit reached.
+  if (this->velocityLimit[_index] >= 0)
+  {
+    if (this->GetVelocity(_index) > this->velocityLimit[_index])
+      _effort = _effort > 0 ? 0 : _effort;
+    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
+      _effort = _effort < 0 ? 0 : _effort;
+  }
+
   // truncate effort if effortLimit is not negative
   if (this->effortLimit[_index] >= 0)
-    _torque = math::clamp(_torque,
+    _effort = math::clamp(_effort,
       -this->effortLimit[_index], this->effortLimit[_index]);
 
-  ODEJoint::SetForce(_index, _torque);
+  ODEJoint::SetForce(_index, _effort);
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
   if (_index == 0)
-    dJointAddHinge2Torques(this->jointId, _torque, 0);
+    dJointAddHinge2Torques(this->jointId, _effort, 0);
   else
-    dJointAddHinge2Torques(this->jointId, 0, _torque);
+    dJointAddHinge2Torques(this->jointId, 0, _effort);
 }
 
 //////////////////////////////////////////////////

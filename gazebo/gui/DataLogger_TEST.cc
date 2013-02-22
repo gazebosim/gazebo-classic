@@ -23,15 +23,19 @@
 /////////////////////////////////////////////////
 void DataLogger_TEST::RecordButton()
 {
+  this->Load("worlds/empty.world");
+
   // Create a new data logger widget
   gazebo::gui::DataLogger *dataLogger = new gazebo::gui::DataLogger;
+  dataLogger->show();
+  QCoreApplication::processEvents();
 
   // Get the record button
   QToolButton *recordButton = dataLogger->findChild<QToolButton*>(
       "dataLoggerRecordButton");
 
   // Get the destination label
-  QLabel *destPathLabel = dataLogger->findChild<QLabel*>(
+  QLineEdit *destPathLabel = dataLogger->findChild<QLineEdit*>(
       "dataLoggerDestnationPathLabel");
 
   // Get the time label
@@ -53,7 +57,7 @@ void DataLogger_TEST::RecordButton()
   recordButton->toggle();
 
   // Wait for a log status return message
-  while (destPathLabel->text().toStdString() == "Path: ")
+  while (destPathLabel->text().toStdString().empty())
   {
     // The following line tell QT to process its events. This is vital for
     // all tests, but it must be run in the main thread.
@@ -95,11 +99,15 @@ void DataLogger_TEST::RecordButton()
   // Make sure the status label says "Ready"
   txt = statusLabel->text().toStdString();
   QVERIFY(txt == "Ready");
+
+  dataLogger->hide();
 }
 
 /////////////////////////////////////////////////
 void DataLogger_TEST::StressTest()
 {
+  this->Load("worlds/empty.world");
+
   gazebo::transport::NodePtr node;
   gazebo::transport::PublisherPtr pub;
 

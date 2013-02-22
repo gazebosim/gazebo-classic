@@ -29,6 +29,9 @@ void QTestFixture::initTestCase()
   // errors.
   gazebo::common::Console::Instance()->Init("test.log");
 
+  // Initialize the data logger. This will log state information.
+  gazebo::common::LogRecord::Instance()->Init("test");
+
   // Add local search paths
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(PROJECT_SOURCE_PATH);
 
