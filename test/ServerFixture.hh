@@ -520,9 +520,14 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
+               int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName))
-                 common::Time::MSleep(10);
+               while (!this->HasEntity(_modelName) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
              }
 
   protected: void SpawnCylinder(const std::string &_name,

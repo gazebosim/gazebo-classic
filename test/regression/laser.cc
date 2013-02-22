@@ -21,62 +21,42 @@
 #include "common/common.hh"
 #include "scans_cmp.h"
 
-#define LASER_TOL 1e-2
+#define LASER_TOL 1e-5
 #define DOUBLE_TOL 1e-6
 
 using namespace gazebo;
 class LaserTest : public ServerFixture
 {
   public: void Stationary_EmptyWorld(const std::string &_physicsEngine);
-  public: void LaserUnitCylinder(const std::string &_physicsEngine);
+  public: void LaserUnitBox(const std::string &_physicsEngine);
 };
 
 void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world", false, _physicsEngine);
-  std::ostringstream laserModel;
-    laserModel << "<sdf version='" << SDF_VERSION << "'>"
-      "<model name='box'>"
-        "<static>true</static>"
-        "<link name='link'>"
-        "<pose>0 0 0.5 0 0 0</pose>"
-        "<sensor name='laser' type='ray'>"
-          "<always_on>true</always_on>"
-          "<update_rate>10</update_rate>"
-          "<visualize>true</visualize>"
-          "<topic>~/laser_scan</topic>"
-          "<ray>"
-            "<scan>"
-              "<horizontal>"
-                "<samples>640</samples>"
-                "<resolution>1</resolution>"
-                "<min_angle>-2.27</min_angle>"
-                "<max_angle>2.27</max_angle>"
-              "</horizontal>"
-            "</scan>"
-            "<range>"
-              "<min>0.0</min>"
-              "<max>10</max>"
-              "<resolution>0.01</resolution>"
-            "</range>"
-          "</ray>"
-        "</sensor>"
-      "</link>"
-    "</model>"
-  "</sdf>";
+  Load("worlds/empty.world", true, _physicsEngine);
 
-  SpawnSDF(laserModel.str());
-  while (!HasEntity("box"))
-    common::Time::MSleep(10);
+  std::string modelName = "ray_model";
+  std::string raySensorName = "ray_sensor";
+  double hMinAngle = -2.27;
+  double hMaxAngle = 2.27;
+  double minRange = 0.0;
+  double maxRange = 10.0;
+  double rangeResolution = 0.01;
+  unsigned int samples = 640;
+  math::Pose testPose(math::Vector3(0, 0, 0.5),
+      math::Quaternion(0, 0, 0));
+
+  SpawnRaySensor(modelName, raySensorName, testPose.pos,
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+      rangeResolution, samples);
 
   sensors::RaySensorPtr laser =
     boost::shared_static_cast<sensors::RaySensor>(
-        sensors::SensorManager::Instance()->GetSensor(
-          "default::box::link::laser"));
-  EXPECT_TRUE(laser);
+        sensors::SensorManager::Instance()->GetSensor(raySensorName));
+
+  ASSERT_TRUE(laser);
+  laser->Init();
   laser->Update(true);
-  while (laser->GetRange(0) == 0)
-    common::Time::MSleep(100);
 
   EXPECT_EQ(640, laser->GetRayCount());
   EXPECT_EQ(640, laser->GetRangeCount());
@@ -85,6 +65,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   EXPECT_NEAR(laser->GetRangeMin(), 0, DOUBLE_TOL);
   EXPECT_NEAR(laser->GetRangeMax(), 10, DOUBLE_TOL);
   EXPECT_NEAR(laser->GetRangeResolution(), 0.01, DOUBLE_TOL);
+
 
   for (int i = 0; i < laser->GetRangeCount(); ++i)
   {
@@ -103,10 +84,14 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
     std::vector<double> scan;
     laser->GetRanges(scan);
 
-    DoubleCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
-    EXPECT_LT(diffMax, 2e-6);
-    EXPECT_LT(diffSum, 1e-4);
-    EXPECT_LT(diffAvg, 2e-6);
+    // run test against pre-recorded range data only in ode
+    if (_physicsEngine == "ode")
+    {
+      DoubleCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
+      EXPECT_LT(diffMax, 2e-6);
+      EXPECT_LT(diffSum, 1e-4);
+      EXPECT_LT(diffAvg, 2e-6);
+    }
 
     // This line will print the current scan. Use this to generate
     // a new test scan sample
@@ -117,14 +102,12 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   {
     common::Time prevTime;
     physics::WorldPtr world = physics::get_world("default");
-    EXPECT_TRUE(world);
+    ASSERT_TRUE(world);
 
-    physics::ModelPtr model = world->GetModel("box");
+    physics::ModelPtr model = world->GetModel(modelName);
 
     prevTime = laser->GetLastUpdateTime();
     model->SetWorldPose(math::Pose(0, 0, 1.0, 0, M_PI*0.5, 0));
-    while (laser->GetLastUpdateTime() <= prevTime)
-      common::Time::MSleep(10);
 
     double diffMax, diffSum, diffAvg;
 
@@ -145,10 +128,14 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
     }
     laser->Update(true);
 
-    DoubleCompare(plane_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
-    EXPECT_LT(diffMax, 1e-6);
-    EXPECT_LT(diffSum, 1e-6);
-    EXPECT_LT(diffAvg, 1e-6);
+    // run test against pre-recorded range data only in ode
+    if (_physicsEngine == "ode")
+    {
+      DoubleCompare(plane_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
+      EXPECT_LT(diffMax, 1e-6);
+      EXPECT_LT(diffSum, 1e-6);
+      EXPECT_LT(diffAvg, 1e-6);
+    }
 
     // This line will print the current scan. Use this to generate
     // a new test scan sample
@@ -161,16 +148,18 @@ TEST_F(LaserTest, EmptyWorldODE)
   Stationary_EmptyWorld("ode");
 }
 
+#ifdef HAVE_BULLET
 TEST_F(LaserTest, EmptyWorldBullet)
 {
-//  Stationary_EmptyWorld("bullet");
+  Stationary_EmptyWorld("bullet");
 }
+#endif
 
-void LaserTest::LaserUnitCylinder(const std::string &_physicsEngine)
+void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 {
-  // Test ray sensor with 3 cylinders in the world.
-  // First place 2 of 3 cylinders within range and verify range values,
-  // then move all 3 cylinder out of range and verify range values
+  // Test ray sensor with 3 boxes in the world.
+  // First place 2 of 3 boxes within range and verify range values,
+  // then move all 3 boxes out of range and verify range values
 
   Load("worlds/empty.world", true, _physicsEngine);
 
@@ -178,7 +167,7 @@ void LaserTest::LaserUnitCylinder(const std::string &_physicsEngine)
   std::string raySensorName = "ray_sensor";
   double hMinAngle = -M_PI/2.0;
   double hMaxAngle = M_PI/2.0;
-  double minRange = 0.1;
+  double minRange = 0.0;
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 320;
@@ -189,28 +178,26 @@ void LaserTest::LaserUnitCylinder(const std::string &_physicsEngine)
       testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
       rangeResolution, samples);
 
-  std::string cylinder01 = "cylinder_01";
-  std::string cylinder02 = "cylinder_02";
-  std::string cylinder03 = "cylinder_03";
+  std::string box01 = "box_01";
+  std::string box02 = "box_02";
+  std::string box03 = "box_03";
 
-  // cylinder in front of ray sensor
-  math::Pose cylinder01Pose(math::Vector3(1, 0, 0),
-      math::Quaternion(0, 0, 0));
-  // cylinder on the right of ray sensor
-  math::Pose cylinder02Pose(math::Vector3(0, -1, 0),
-      math::Quaternion(0, 0, 0));
-  // cylinder on the left of the ray sensor but out of range
-  math::Pose cylinder03Pose(math::Vector3(0, maxRange + 1, 0),
+  // box in front of ray sensor
+  math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
+  // box on the right of ray sensor
+  math::Pose box02Pose(math::Vector3(0, -1, 0.5), math::Quaternion(0, 0, 0));
+  // box on the left of the ray sensor but out of range
+  math::Pose box03Pose(math::Vector3(0, maxRange + 1, 0.5),
       math::Quaternion(0, 0, 0));
 
-  SpawnCylinder(cylinder01, cylinder01Pose.pos,
-      cylinder01Pose.rot.GetAsEuler());
+  SpawnBox(box01, math::Vector3(1, 1, 1), box01Pose.pos,
+      box01Pose.rot.GetAsEuler());
 
-  SpawnCylinder(cylinder02, cylinder02Pose.pos,
-      cylinder02Pose.rot.GetAsEuler());
+  SpawnBox(box02, math::Vector3(1, 1, 1), box02Pose.pos,
+      box02Pose.rot.GetAsEuler());
 
-  SpawnCylinder(cylinder03, cylinder03Pose.pos,
-      cylinder03Pose.rot.GetAsEuler());
+  SpawnBox(box03, math::Vector3(1, 1, 1), box03Pose.pos,
+      box03Pose.rot.GetAsEuler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
@@ -220,8 +207,8 @@ void LaserTest::LaserUnitCylinder(const std::string &_physicsEngine)
   raySensor->Update(true);
 
   int mid = samples / 2;
-  double unitCylinderRadius = 0.5;
-  double expectedRangeAtMidPoint = cylinder01Pose.pos.x - unitCylinderRadius;
+  double unitBoxSize = 1.0;
+  double expectedRangeAtMidPoint = box01Pose.pos.x - unitBoxSize/2;
 
   // WARNING: gazebo returns distance to object from min range
   // issue #503
@@ -234,16 +221,15 @@ void LaserTest::LaserUnitCylinder(const std::string &_physicsEngine)
   // than +inf. issue #124
   EXPECT_NEAR(raySensor->GetRange(samples-1), maxRange, LASER_TOL);
 
-  // Move all cylinders out of range
+  // Move all boxes out of range
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world !=NULL);
+  ASSERT_TRUE(world != NULL);
 
-  world->GetModel(cylinder01)->SetWorldPose(
-        math::Pose(math::Vector3(maxRange + 1, 0, 0),
-        math::Quaternion(0, 0, 0)));
-  world->GetModel(cylinder02)->SetWorldPose(
-        math::Pose(math::Vector3(0, -(maxRange + 1), 0),
-        math::Quaternion(0, 0, 0)));
+  world->GetModel(box01)->SetWorldPose(
+      math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
+  world->GetModel(box02)->SetWorldPose(
+      math::Pose(math::Vector3(0, -(maxRange + 1), 0),
+      math::Quaternion(0, 0, 0)));
   world->StepWorld(1);
   raySensor->Update(true);
 
@@ -253,15 +239,17 @@ void LaserTest::LaserUnitCylinder(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(LaserTest, LaserCylindereODE)
+TEST_F(LaserTest, LaserBoxODE)
 {
-  LaserUnitCylinder("ode");
+  LaserUnitBox("ode");
 }
 
-TEST_F(LaserTest, LaserCylinderBullet)
+#ifdef HAVE_BULLET
+TEST_F(LaserTest, LaserBoxBullet)
 {
-  LaserUnitCylinder("bullet");
+  LaserUnitBox("bullet");
 }
+#endif  // HAVE_BULLET
 
 int main(int argc, char **argv)
 {
