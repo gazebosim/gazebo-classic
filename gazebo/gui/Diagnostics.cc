@@ -48,7 +48,6 @@ class MyListWidget : public QListWidget
              {
                return Qt::LinkAction;
              }
-
 };
 
 /////////////////////////////////////////////////
@@ -60,8 +59,28 @@ Diagnostics::Diagnostics(QWidget *_parent)
   this->setWindowTitle("Gazebo: Diagnostics");
   this->setObjectName("diagnosticsPlot");
 
-  // this->plots = new PlotListWidget(this);
-  this->plot = new IncrementalPlot(this);
+  this->plotLayout = new QVBoxLayout;
+
+  QScrollArea *plotScrollArea = new QScrollArea(this);
+  plotScrollArea->setLineWidth(0);
+  plotScrollArea->setFrameShape(QFrame::NoFrame);
+  plotScrollArea->setFrameShadow(QFrame::Plain);
+  plotScrollArea->setSizePolicy(QSizePolicy::Minimum,
+                                QSizePolicy::Minimum);
+
+  plotScrollArea->setWidgetResizable(true);
+  plotScrollArea->viewport()->installEventFilter(this);
+
+  QFrame *plotFrame = new QFrame(plotScrollArea);
+  plotFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  plotFrame->setLayout(this->plotLayout);
+
+  plotScrollArea->setWidget(plotFrame);
+
+
+  IncrementalPlot *plot = new IncrementalPlot(this);
+  this->plots.push_back(plot);
+  this->plotLayout->addWidget(plot);
 
   this->labelList = new MyListWidget(this);
   this->labelList->setDragEnabled(true);
@@ -70,6 +89,9 @@ Diagnostics::Diagnostics(QWidget *_parent)
   item->setToolTip(tr("Drag onto graph to plot"));
   this->labelList->addItem(item);
 
+  QPushButton *addPlotButton = new QPushButton("Add");
+  connect(addPlotButton, SIGNAL(clicked()), this, SLOT(OnAddPlot()));
+
   QCheckBox *pauseCheck = new QCheckBox;
   pauseCheck->setChecked(this->paused);
   connect(pauseCheck, SIGNAL(clicked(bool)), this, SLOT(OnPause(bool)));
@@ -77,6 +99,7 @@ Diagnostics::Diagnostics(QWidget *_parent)
   QHBoxLayout *pauseLayout = new QHBoxLayout;
   pauseLayout->addWidget(pauseCheck);
   pauseLayout->addWidget(new QLabel("Pause"));
+  pauseLayout->addWidget(addPlotButton);
   pauseLayout->addStretch(1);
 
   QVBoxLayout *leftLayout = new QVBoxLayout;
@@ -85,7 +108,7 @@ Diagnostics::Diagnostics(QWidget *_parent)
 
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addLayout(leftLayout);
-  mainLayout->addWidget(this->plot, 2);
+  mainLayout->addWidget(plotScrollArea, 2);
 
   this->setLayout(mainLayout);
   this->setSizeGripEnabled(true);
@@ -109,12 +132,18 @@ void Diagnostics::Update()
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
-  for (PointMap::iterator iter = this->selectedLabels.begin();
+  for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
+      iter != this->plots.end(); ++iter)
+  {
+    (*iter)->Update();
+  }
+
+  /*for (PointMap::iterator iter = this->selectedLabels.begin();
        iter != this->selectedLabels.end(); ++iter)
   {
-    this->plot->Add(iter->first, iter->second);
+    this->plots[0]->Add(iter->first, iter->second);
     iter->second.clear();
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -133,11 +162,18 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
 
   common::Time wallTime, elapsedTime;
 
-  if (this->plot->HasCurve(QString("Real Time Factor")))
+  for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
+      iter != this->plots.end(); ++iter)
   {
-    wallTime = msgs::Convert(_msg->real_time());
-    this->selectedLabels[QString("Real Time Factor")].push_back(
-        QPointF(wallTime.Double(), _msg->real_time_factor()));
+    if ((*iter)->HasCurve(QString("Real Time Factor")))
+    {
+      wallTime = msgs::Convert(_msg->real_time());
+      (*iter)->Add(QString("Real Time Factor"),
+                   QPointF(wallTime.Double(), _msg->real_time_factor()));
+
+      // this->selectedLabels[QString("Real Time Factor")].push_back(
+      //    QPointF(wallTime.Double(), _msg->real_time_factor()));
+    }
   }
 
   for (int i = 0; i < _msg->time_size(); ++i)
@@ -156,15 +192,20 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
 
     QString labelStr(_msg->time(i).name().c_str());
 
-    if (this->plot->HasCurve(labelStr))
+    for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
+        iter != this->plots.end(); ++iter)
     {
-      wallTime = msgs::Convert(_msg->time(i).wall());
-      elapsedTime = msgs::Convert(_msg->time(i).elapsed());
+      if ((*iter)->HasCurve(labelStr))
+      {
+        wallTime = msgs::Convert(_msg->time(i).wall());
+        elapsedTime = msgs::Convert(_msg->time(i).elapsed());
 
-      double msTime = elapsedTime.Double() * 1e3;
-      QPointF pt((wallTime - this->startTime).Double(), msTime);
+        double msTime = elapsedTime.Double() * 1e3;
+        QPointF pt((wallTime - this->startTime).Double(), msTime);
 
-      this->selectedLabels[labelStr].push_back(pt);
+        (*iter)->Add(labelStr, pt);
+        //this->selectedLabels[labelStr].push_back(pt);
+      }
     }
   }
 }
@@ -173,4 +214,24 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
 void Diagnostics::OnPause(bool _value)
 {
   this->paused = _value;
+}
+
+/////////////////////////////////////////////////
+void Diagnostics::OnAddPlot()
+{
+  IncrementalPlot *plot = new IncrementalPlot(this);
+  this->plotLayout->addWidget(plot);
+  this->plots.push_back(plot);
+}
+
+/////////////////////////////////////////////////
+bool Diagnostics::eventFilter(QObject *o, QEvent *e)
+{
+  if (e->type() == QEvent::Wheel)
+  {
+    e->ignore();
+    return true;
+  }
+
+  return QWidget::eventFilter(o, e);
 }

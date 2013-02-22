@@ -16,8 +16,8 @@
 */
 
 #include "qwt/qwt_plot.h"
+#include "qwt/qwt_scale_widget.h"
 #include "qwt/qwt_plot_panner.h"
-#include "qwt/qwt_plot_magnifier.h"
 #include "qwt/qwt_plot_layout.h"
 #include "qwt/qwt_plot_grid.h"
 #include "qwt/qwt_plot_canvas.h"
@@ -52,8 +52,9 @@ class CurveData: public QwtArraySeriesData<QPointF>
   public: inline void Add(const QPointF &_point)
           {
             this->d_samples += _point;
-            if (this->d_samples.size() > 6000)
+            /*if (this->d_samples.size() > 6000)
               this->d_samples.remove(0, 1000);
+              */
           }
 
   public: void Clear()
@@ -74,14 +75,14 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   (void) new QwtPlotPanner(this->canvas());
 
   // zoom in/out with the wheel
-  (void) new QwtPlotMagnifier(this->canvas());
+  this->magnifier = new QwtPlotMagnifier(this->canvas());
 
 #if defined(Q_WS_X11)
   this->canvas()->setAttribute(Qt::WA_PaintOutsidePaintEvent, true);
-  this->canvas()->setAttribute(Qt::WA_PaintOnScreen, true );
+  this->canvas()->setAttribute(Qt::WA_PaintOnScreen, true);
 #endif
 
-  this->setAutoReplot(true);
+  this->setAutoReplot(false);
 
   this->setFrameStyle(QFrame::NoFrame);
   this->setLineWidth(0);
@@ -97,10 +98,7 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   grid->setMajPen(QPen(Qt::gray, 0, Qt::DotLine));
   grid->attach(this);
 
-  this->axisAutoScale(QwtPlot::yRight);
-  this->axisAutoScale(QwtPlot::yLeft);
-
-  this->setAxisScale(QwtPlot::xBottom, 0, 5.0);
+  // this->setAxisScale(QwtPlot::xBottom, 0, 5.0);
   // this->setAxisScale(QwtPlot::yLeft, 0, 0.002);
 
   QwtText xtitle("Real Time (s)");
@@ -110,6 +108,13 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   QwtText ytitle("Duration (ms)");
   ytitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
   this->setAxisTitle(QwtPlot::yLeft, ytitle);
+
+  this->setAxisAutoScale(QwtPlot::yRight, true);
+  this->setAxisAutoScale(QwtPlot::yLeft, true);
+
+  QwtScaleWidget *scaleWidget = this->axisWidget(QwtPlot::yLeft);
+  scaleWidget->setMargin(20);
+  //scaleWidget->setSpacing(50);
 
   this->replot();
 
@@ -158,7 +163,7 @@ void IncrementalPlot::Add(const QString &_label,
   }
 
   // Adjust the curve
-  this->AdjustCurve(curve );
+  this->AdjustCurve(curve);
 }
 
 /////////////////////////////////////////////////
@@ -186,7 +191,7 @@ void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
   curveData->Add(_pt);
 
   // Adjust the curve
-  this->AdjustCurve(curve);
+  //this->AdjustCurve(curve);
 }
 
 /////////////////////////////////////////////////
@@ -221,14 +226,19 @@ void IncrementalPlot::AdjustCurve(QwtPlotCurve *_curve)
   }
 
   this->setAxisScale(this->xBottom,
-      std::max(0.0, static_cast<double>(lastPoint.x() - 5.0)),
+      std::max(0.0, static_cast<double>(lastPoint.x() -
+          5.0 * this->magnifier->wheelFactor())),
       std::max(1.0, static_cast<double>(lastPoint.x())));
 
-  this->setAxisScale(_curve->yAxis(), 0.0, _curve->maxYValue() * 2.0);
+  // this->setAxisScale(_curve->yAxis(), 0.0, _curve->maxYValue() * 2.0);
+
+  // this->setAxisAutoScale(this->yRight, true);
+  // this->setAxisAutoScale(this->yLeft, true);
 
   this->directPainter->drawSeries(_curve,
-      _curveData->size() - 1,
-      _curveData->size() - 1);
+      curveData->size() - 1, curveData->size() - 1);
+
+  this->replot();
 }
 
 /////////////////////////////////////////////////
@@ -287,7 +297,7 @@ void IncrementalPlot::Clear(const QString &_label)
     return;
 
   CurveData *curveData = static_cast<CurveData *>(iter->second->data());
-  curveData->Clear();;
+  curveData->Clear();
 
   delete iter->second;
   this->curves.erase(iter);
@@ -343,4 +353,14 @@ void IncrementalPlot::dropEvent(QDropEvent *_evt)
 {
   QString name = _evt->mimeData()->data("application/x-item");
   this->AddCurve(name);
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::Update()
+{
+  for (CurveMap::iterator iter = this->curves.begin();
+       iter != this->curves.end(); ++iter)
+  {
+    this->AdjustCurve(iter->second);
+  }
 }

@@ -1291,12 +1291,6 @@ bool Camera::IsVisible(const std::string &_visualName)
 }
 
 /////////////////////////////////////////////////
-bool Camera::GetInitialized() const
-{
-  return this->initialized;
-}
-
-/////////////////////////////////////////////////
 bool Camera::IsAnimating() const
 {
   return this->animState != NULL;
@@ -1458,4 +1452,16 @@ double Camera::GetRenderRate() const
 //////////////////////////////////////////////////
 void Camera::AnimationComplete()
 {
+}
+
+//////////////////////////////////////////////////
+bool Camera::IsInitialized() const
+{
+  return this->GetInitialized();
+}
+
+//////////////////////////////////////////////////
+bool Camera::GetInitialized() const
+{
+  return this->initialized && this->scene->GetInitialized();
 }

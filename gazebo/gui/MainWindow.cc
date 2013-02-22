@@ -58,6 +58,7 @@ extern bool g_fullscreen;
 MainWindow::MainWindow()
   : renderWidget(0)
 {
+  this->menuBar = NULL;
   this->setObjectName("mainWindow");
 
   this->requestMsg = NULL;

@@ -3,6 +3,11 @@ QLabel
   color: #d0d0d0;
 }
 
+QFrame
+{
+  background-color: transparent;
+}
+
 QDialog
 {
   background-color: #303030;
@@ -697,3 +702,4 @@ QwtScaleWidget
   color: white;
   font-size: 11px;
 }
+

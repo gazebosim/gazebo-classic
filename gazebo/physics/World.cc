@@ -456,7 +456,7 @@ void World::Step()
 
   common::Time actualSleep = 0;
   if (sleepTime > 0)
-  {  
+  {
     common::Time::Sleep(sleepTime);
     actualSleep = common::Time::GetWallTime() - tmpTime;
   }

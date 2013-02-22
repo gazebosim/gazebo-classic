@@ -18,9 +18,14 @@
 #ifndef _INCREMENTAL_PLOT_HH_
 #define _INCREMENTAL_PLOT_HH_
 
+#include <map>
+#include <list>
+
+#include "qwt/qwt_plot_magnifier.h"
+#include "qwt/qwt_plot.h"
+
 #include "gazebo/math/Vector2d.hh"
 
-#include "qwt/qwt_plot.h"
 #include "gazebo/gui/qt.h"
 
 class QwtPlotCurve;
@@ -71,6 +76,8 @@ namespace gazebo
       /// \return True if _label is currently plotted.
       public: bool HasCurve(const QString &_label);
 
+      public: void Update();
+
       protected: void dragEnterEvent(QDragEnterEvent *_evt);
       protected: void dropEvent(QDropEvent *_evt);
 
@@ -92,6 +99,8 @@ namespace gazebo
 
       /// \brief Drawing utility
       private: QwtPlotDirectPainter *directPainter;
+
+      private: QwtPlotMagnifier *magnifier;
     };
   }
 }

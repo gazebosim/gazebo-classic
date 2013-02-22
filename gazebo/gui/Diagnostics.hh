@@ -19,6 +19,7 @@
 #define _DIAGNOSTICS_WIDGET_HH_
 
 #include <map>
+#include <list>
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/msgs/msgs.hh"
@@ -44,6 +45,8 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~Diagnostics();
 
+      public: virtual bool eventFilter(QObject *o, QEvent *e);
+
       /// \brief Called when a diagnostic message is received.
       /// \param[in] _msg Diagnostic message.
       private: void OnMsg(ConstDiagnosticsPtr &_msg);
@@ -54,6 +57,9 @@ namespace gazebo
       /// \brief QT callback for the pause check button.
       /// \param[in] _value True when paused.
       private slots: void OnPause(bool _value);
+
+      /// \brief Qt Callback when a plot should be added.
+      private slots: void OnAddPlot();
 
       /// \brief Node for communications.
       private: transport::NodePtr node;
@@ -79,7 +85,9 @@ namespace gazebo
       private: boost::mutex mutex;
 
       /// \brief Plotting widget
-      private: IncrementalPlot *plot;
+      private: std::vector<IncrementalPlot *> plots;
+
+      private: QVBoxLayout *plotLayout;
     };
   }
 }
