@@ -286,15 +286,13 @@ void BulletPhysics::UpdateCollision()
 void BulletPhysics::UpdatePhysics()
 {
   // need to lock, otherwise might conflict with world resetting
-  this->physicsUpdateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
   // common::Time currTime =  this->world->GetRealTime();
 
   this->dynamicsWorld->stepSimulation(
       this->stepTimeDouble, 1, this->stepTimeDouble);
   // this->lastUpdateTime = currTime;
-
-  this->physicsUpdateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
