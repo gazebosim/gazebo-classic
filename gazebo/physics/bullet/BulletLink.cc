@@ -134,10 +134,10 @@ void BulletLink::Init()
     this->rigidLink->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
 
   btDynamicsWorld *wd = this->bulletPhysics->GetDynamicsWorld();
-//  wd->addRigidBody(this->rigidLink);
+  wd->addRigidBody(this->rigidLink);
 
   // work in progress
-  if (this->sdf->GetElement("self_collide"))
+/*  if (this->sdf->GetElement("self_collide"))
     wd->addRigidBody(this->rigidLink);
   else
   {
@@ -164,7 +164,7 @@ void BulletLink::Init()
     {
     }
   }
-  // this->rigidLink->setSleepingThresholds(0,0);
+  // this->rigidLink->setSleepingThresholds(0,0);*/
 }
 
 //////////////////////////////////////////////////
