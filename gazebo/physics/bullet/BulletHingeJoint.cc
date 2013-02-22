@@ -107,12 +107,12 @@ void BulletHingeJoint::Init()
   if (bulletChildLink && bulletParentLink)
   {
     this->bulletHinge = new btHingeConstraint(
-        *(bulletParentLink->GetBulletLink()),
         *(bulletChildLink->GetBulletLink()),
-        BulletTypes::ConvertVector3(pivotParent),
+        *(bulletParentLink->GetBulletLink()),
         BulletTypes::ConvertVector3(pivotChild),
-        BulletTypes::ConvertVector3(axisParent),
-        BulletTypes::ConvertVector3(axisChild));
+        BulletTypes::ConvertVector3(pivotParent),
+        BulletTypes::ConvertVector3(axisChild),
+        BulletTypes::ConvertVector3(axisParent));
   }
   // If only the child exists, then create a joint between the child
   // and the world.
@@ -284,8 +284,8 @@ void BulletHingeJoint::SetForce(int _index, double _torque)
     btVector3 hingeTorqueA = _torque * hingeAxisWorldA;
     btVector3 hingeTorqueB = _torque * hingeAxisWorldB;
 
-    this->bulletHinge->getRigidBodyA().applyTorque(-hingeTorqueA);
-    this->bulletHinge->getRigidBodyB().applyTorque(hingeTorqueB);
+    this->bulletHinge->getRigidBodyA().applyTorque(hingeTorqueA);
+    this->bulletHinge->getRigidBodyB().applyTorque(-hingeTorqueB);
   }
 }
 
