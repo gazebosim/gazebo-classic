@@ -58,7 +58,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Rand.hh"
 
-#include "BulletPhysics.hh"
+#include "gazebo/physics/BulletPhysics.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -74,15 +74,20 @@ struct CollisionFilter : public btOverlapFilterCallback {
   virtual bool needBroadphaseCollision(btBroadphaseProxy *proxy0,
       btBroadphaseProxy *proxy1) const
     {
+      bool collide = (proxy0->m_collisionFilterGroup
+          & proxy1->m_collisionFilterMask) != 0;
+      collide = collide && (proxy1->m_collisionFilterGroup
+          & proxy0->m_collisionFilterMask);
+
       btRigidBody* rb0 = btRigidBody::upcast(
               static_cast<btCollisionObject*>(proxy0->m_clientObject));
       if(!rb0)
-        return false;
+        return collide;
 
       btRigidBody* rb1 = btRigidBody::upcast(
               static_cast<btCollisionObject*>(proxy1->m_clientObject));
       if(!rb1)
-         return false;
+         return collide;
 
       BulletLink *link0 = static_cast<BulletLink *>(
           rb0->getUserPointer());
@@ -92,19 +97,11 @@ struct CollisionFilter : public btOverlapFilterCallback {
           rb1->getUserPointer());
       GZ_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
 
-      if (link0->GetModel() == link1->GetModel())
-        return false;
-
-      bool collide = (proxy0->m_collisionFilterGroup
-          & proxy1->m_collisionFilterMask) != 0;
-      collide = collide && (proxy1->m_collisionFilterGroup
-          & proxy0->m_collisionFilterMask);
-
-/*      gzerr << proxy0->m_collisionFilterGroup << " "
-              << proxy0->m_collisionFilterMask
-              << proxy1->m_collisionFilterGroup << " "
-              << proxy1->m_collisionFilterMask
-              << std::endl;*/
+      if (!link0->GetSelfCollide())
+      {
+        if (link0->GetModel() == link1->GetModel())
+          collide = false;
+      }
       return collide;
    }
 };
@@ -392,8 +389,6 @@ LinkPtr BulletPhysics::CreateLink(ModelPtr _parent)
 
   BulletLinkPtr link(new BulletLink(_parent));
   link->SetWorld(_parent->GetWorld());
-
-//  link->SetID();
 
   return link;
 }
