@@ -112,7 +112,7 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find bullet
-  pkg_check_modules(BULLET bullet)
+  pkg_check_modules(BULLET bullet>=2.81)
   if (BULLET_FOUND)
     set (HAVE_BULLET TRUE)
   else()
