@@ -84,9 +84,9 @@ void cb(ConstWorldStatisticsPtr &_msg)
   else
     paused = 'F';
 
-  if(g_plot)
+  if (g_plot)
   {
-    if(first)
+    if (first)
     {
       printf("# real-time factor (percent), simtime (sec), realtime (sec), "
              "paused (T or F)\n");
@@ -141,7 +141,7 @@ int main(int argc, char **argv)
 
   po::notify(vm);
 
-  if(vm.count("help"))
+  if (vm.count("help"))
   {
     std::cerr << "This tool displays statistics about a running Gazebo world.\n"
               << "Usage: gzstats [options]\n"
@@ -149,12 +149,12 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  if(vm.count("world-name"))
+  if (vm.count("world-name"))
   {
     worldName = vm["world-name"].as<std::string>();
   }
 
-  if(vm.count("plot"))
+  if (vm.count("plot"))
   {
     g_plot = true;
   }
