@@ -135,7 +135,7 @@ void BulletLink::Init()
 
   btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
   GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
-  bulletWorld->removeRigidBody(this->rigidLink);
+  bulletWorld->addRigidBody(this->rigidLink);
   // this->rigidLink->setSleepingThresholds(0,0);
 }
 
