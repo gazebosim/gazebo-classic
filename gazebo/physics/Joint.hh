@@ -223,6 +223,16 @@ namespace gazebo
       /// \return Angle of the low stop value.
       public: virtual math::Angle GetLowStop(int _index) = 0;
 
+      /// \brief Get the effort limit on axis(index).
+      /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
+      /// \return Effort limit specified in SDF
+      public: virtual double GetEffortLimit(int _index);
+
+      /// \brief Get the velocity limit on axis(index).
+      /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
+      /// \return Velocity limit specified in SDF
+      public: virtual double GetVelocityLimit(int _index);
+
       /// \brief Set the velocity of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _vel Velocity.
@@ -244,7 +254,7 @@ namespace gazebo
       public: virtual void SetForce(int _index, double _force);
 
       /// \brief @todo: not yet implemented.
-      /// Get the internal forces at a this Joint.
+      /// Get the forces applied at this Joint.
       /// Note that the unit of force should be consistent with the rest
       /// of the simulation scales.  E.g.  if you are using
       /// metric units, the unit for force is Newtons.  If using
@@ -254,7 +264,10 @@ namespace gazebo
       /// \return The force applied to an axis.
       public: virtual double GetForce(int _index);
 
-      /// \brief get force torque values at a joint
+      /// \brief get internal force and torque values at a joint
+      /// Note that you must set
+      ///   <provide_feedback>true<provide_feedback>
+      /// in the joint sdf to use this.
       /// \param[in] _index Force and torque on child link if _index = 0
       /// and on parent link of _index = 1
       /// \return The force and torque at the joint
@@ -389,6 +402,12 @@ namespace gazebo
       /// equivalent of simulated force torque sensor reading
       /// Allocate a 2 vector in case hinge2 joint is used.
       protected: double forceApplied[2];
+
+      /// \brief Store Joint effort limit as specified in SDF
+      protected: double effortLimit[2];
+
+      /// \brief Store Joint velocity limit as specified in SDF
+      protected: double velocityLimit[2];
     };
     /// \}
   }
