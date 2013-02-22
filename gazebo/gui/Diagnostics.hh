@@ -20,6 +20,7 @@
 
 #include <map>
 #include <list>
+#include <vector>
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/msgs/msgs.hh"
@@ -45,7 +46,10 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~Diagnostics();
 
-      public: virtual bool eventFilter(QObject *o, QEvent *e);
+      /// \brief Used to filter scroll wheel events.
+      /// \param[in] _o Object that receives the event.
+      /// \param[in] _event Pointer to the event.
+      public: virtual bool eventFilter(QObject *_o, QEvent *_e);
 
       /// \brief Called when a diagnostic message is received.
       /// \param[in] _msg Diagnostic message.
@@ -67,9 +71,6 @@ namespace gazebo
       /// \brief Subscribes to diagnostic info.
       private: transport::SubscriberPtr sub;
 
-      /// \brief Start time of plotting.
-      private: common::Time startTime;
-
       /// \brief The list of diagnostic labels.
       private: QListWidget *labelList;
 
@@ -87,6 +88,7 @@ namespace gazebo
       /// \brief Plotting widget
       private: std::vector<IncrementalPlot *> plots;
 
+      /// \brief Layout to hold all the plots.
       private: QVBoxLayout *plotLayout;
     };
   }

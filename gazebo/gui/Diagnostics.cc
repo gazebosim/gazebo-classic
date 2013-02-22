@@ -25,9 +25,11 @@
 using namespace gazebo;
 using namespace gui;
 
-class MyListWidget : public QListWidget
+// A special list widget that allows dragging of items from it to a
+// plot
+class DragableListWidget : public QListWidget
 {
-  public: MyListWidget(QWidget *_parent)
+  public: DragableListWidget(QWidget *_parent)
           : QListWidget(_parent)
           {
           }
@@ -82,7 +84,7 @@ Diagnostics::Diagnostics(QWidget *_parent)
   this->plots.push_back(plot);
   this->plotLayout->addWidget(plot);
 
-  this->labelList = new MyListWidget(this);
+  this->labelList = new DragableListWidget(this);
   this->labelList->setDragEnabled(true);
   this->labelList->setDragDropMode(QAbstractItemView::DragOnly);
   QListWidgetItem *item = new QListWidgetItem("Real Time Factor");
@@ -132,54 +134,48 @@ void Diagnostics::Update()
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
+  // Update all the plots
   for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
       iter != this->plots.end(); ++iter)
   {
     (*iter)->Update();
   }
-
-  /*for (PointMap::iterator iter = this->selectedLabels.begin();
-       iter != this->selectedLabels.end(); ++iter)
-  {
-    this->plots[0]->Add(iter->first, iter->second);
-    iter->second.clear();
-  }*/
 }
 
 /////////////////////////////////////////////////
 void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
 {
+  // Make sure plotting is not paused.
   if (this->paused)
     return;
 
+  // Make sure there is timing information
   if (_msg->time_size() == 0)
     return;
 
   boost::mutex::scoped_lock lock(this->mutex);
 
-  if (this->startTime == common::Time::Zero)
-    this->startTime = msgs::Convert(_msg->time(0).wall());
-
   common::Time wallTime, elapsedTime;
 
+  wallTime = msgs::Convert(_msg->real_time());
+
+  // Add real-time factor if it has been requested.
   for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
       iter != this->plots.end(); ++iter)
   {
     if ((*iter)->HasCurve(QString("Real Time Factor")))
     {
-      wallTime = msgs::Convert(_msg->real_time());
       (*iter)->Add(QString("Real Time Factor"),
                    QPointF(wallTime.Double(), _msg->real_time_factor()));
-
-      // this->selectedLabels[QString("Real Time Factor")].push_back(
-      //    QPointF(wallTime.Double(), _msg->real_time_factor()));
     }
   }
 
+  // Process each time point
   for (int i = 0; i < _msg->time_size(); ++i)
   {
     QString qstr = QString::fromStdString(_msg->time(i).name());
 
+    // Add the time label to the list if it's not already there.
     QList<QListWidgetItem*> items = this->labelList->findItems(qstr,
         Qt::MatchExactly);
 
@@ -192,19 +188,18 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
 
     QString labelStr(_msg->time(i).name().c_str());
 
+    // Check to see if the data belongs in a plot, and add it.
     for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
         iter != this->plots.end(); ++iter)
     {
       if ((*iter)->HasCurve(labelStr))
       {
-        wallTime = msgs::Convert(_msg->time(i).wall());
         elapsedTime = msgs::Convert(_msg->time(i).elapsed());
 
         double msTime = elapsedTime.Double() * 1e3;
-        QPointF pt((wallTime - this->startTime).Double(), msTime);
+        QPointF pt(wallTime.Double(), msTime);
 
         (*iter)->Add(labelStr, pt);
-        //this->selectedLabels[labelStr].push_back(pt);
       }
     }
   }

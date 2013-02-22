@@ -21,8 +21,8 @@
 #include <map>
 #include <list>
 
-#include "qwt/qwt_plot_magnifier.h"
-#include "qwt/qwt_plot.h"
+#include <qwt/qwt_plot_magnifier.h>
+#include <qwt/qwt_plot.h>
 
 #include "gazebo/math/Vector2d.hh"
 
@@ -76,9 +76,15 @@ namespace gazebo
       /// \return True if _label is currently plotted.
       public: bool HasCurve(const QString &_label);
 
+      /// \brief Update all the curves in the plot
       public: void Update();
 
+      /// \brief Used to accept drag enter events.
+      /// \param[in] _evt The drag event.
       protected: void dragEnterEvent(QDragEnterEvent *_evt);
+
+      /// \brief Used to accept drop events.
+      /// \param[in] _evt The drop event.
       protected: void dropEvent(QDropEvent *_evt);
 
       /// \brief Adjust a curve to fit new data.
@@ -100,6 +106,7 @@ namespace gazebo
       /// \brief Drawing utility
       private: QwtPlotDirectPainter *directPainter;
 
+      /// \brief Pointer to the plot maginfier
       private: QwtPlotMagnifier *magnifier;
     };
   }

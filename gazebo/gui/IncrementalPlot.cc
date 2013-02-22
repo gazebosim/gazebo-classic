@@ -15,18 +15,18 @@
  *
 */
 
-#include "qwt/qwt_plot.h"
-#include "qwt/qwt_scale_widget.h"
-#include "qwt/qwt_plot_panner.h"
-#include "qwt/qwt_plot_layout.h"
-#include "qwt/qwt_plot_grid.h"
-#include "qwt/qwt_plot_canvas.h"
-#include "qwt/qwt_plot_curve.h"
-#include "qwt/qwt_curve_fitter.h"
-#include "qwt/qwt_symbol.h"
-#include "qwt/qwt_legend.h"
-#include "qwt/qwt_legend_item.h"
-#include "qwt/qwt_plot_directpainter.h"
+#include <qwt/qwt_plot.h>
+#include <qwt/qwt_scale_widget.h>
+#include <qwt/qwt_plot_panner.h>
+#include <qwt/qwt_plot_layout.h>
+#include <qwt/qwt_plot_grid.h>
+#include <qwt/qwt_plot_canvas.h>
+#include <qwt/qwt_plot_curve.h>
+#include <qwt/qwt_curve_fitter.h>
+#include <qwt/qwt_symbol.h>
+#include <qwt/qwt_legend.h>
+#include <qwt/qwt_legend_item.h>
+#include <qwt/qwt_plot_directpainter.h>
 
 #include "gazebo/common/Assert.hh"
 
@@ -36,7 +36,10 @@
 using namespace gazebo;
 using namespace gui;
 
+// The number of unique color
 static const int ColorCount = 5;
+
+// The unique colors
 static const QColor Colors[ColorCount] =
 {
   QColor(255, 0, 0),
@@ -46,6 +49,7 @@ static const QColor Colors[ColorCount] =
   QColor(255, 0, 255)
 };
 
+// A class that manages plotting data
 class CurveData: public QwtArraySeriesData<QPointF>
 {
   public: CurveData()
@@ -188,9 +192,6 @@ void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
 
   // Add a point
   curveData->Add(_pt);
-
-  // Adjust the curve
-  //this->AdjustCurve(curve);
 }
 
 /////////////////////////////////////////////////
@@ -263,9 +264,9 @@ QwtPlotCurve *IncrementalPlot::AddCurve(const QString &_label)
 
   /// \todo The following will add the curve to the right hand axis. Need
   /// a better way to do this based on user input.
-  //this->enableAxis(QwtPlot::yRight);
-  //this->axisAutoScale(QwtPlot::yRight);
-  //curve->setYAxis(QwtPlot::yRight);
+  // this->enableAxis(QwtPlot::yRight);
+  // this->axisAutoScale(QwtPlot::yRight);
+  // curve->setYAxis(QwtPlot::yRight);
 
   QPen pen(penColor);
   pen.setWidth(1.0);
