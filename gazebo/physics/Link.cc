@@ -266,6 +266,16 @@ void Link::Fini()
 //////////////////////////////////////////////////
 void Link::Reset()
 {
+  // resets pose
+  Entity::Reset();
+
+  // resets velocity, acceleration, wrench
+  this->ResetPhysicsStates();
+}
+
+//////////////////////////////////////////////////
+void Link::ResetPhysicsStates()
+{
   Entity::Reset();
   this->SetAngularVel(math::Vector3(0, 0, 0));
   this->SetLinearVel(math::Vector3(0, 0, 0));
