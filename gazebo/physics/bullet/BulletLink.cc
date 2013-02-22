@@ -135,7 +135,6 @@ void BulletLink::Init()
 
   btDynamicsWorld *wd = this->bulletPhysics->GetDynamicsWorld();
   wd->addRigidBody(this->rigidLink);
-
   // this->rigidLink->setSleepingThresholds(0,0);
 }
 
