@@ -36,6 +36,16 @@
 using namespace gazebo;
 using namespace gui;
 
+static const int ColorCount = 5;
+static const QColor Colors[ColorCount] =
+{
+  QColor(255, 0, 0),
+  QColor(0, 255, 0),
+  QColor(0, 0, 255),
+  QColor(255, 255, 0),
+  QColor(255, 0, 255)
+};
+
 class CurveData: public QwtArraySeriesData<QPointF>
 {
   public: CurveData()
@@ -52,9 +62,8 @@ class CurveData: public QwtArraySeriesData<QPointF>
   public: inline void Add(const QPointF &_point)
           {
             this->d_samples += _point;
-            /*if (this->d_samples.size() > 6000)
+            if (this->d_samples.size() > 6000)
               this->d_samples.remove(0, 1000);
-              */
           }
 
   public: void Clear()
@@ -98,23 +107,13 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   grid->setMajPen(QPen(Qt::gray, 0, Qt::DotLine));
   grid->attach(this);
 
-  // this->setAxisScale(QwtPlot::xBottom, 0, 5.0);
-  // this->setAxisScale(QwtPlot::yLeft, 0, 0.002);
-
-  QwtText xtitle("Real Time (s)");
-  xtitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
-  this->setAxisTitle(QwtPlot::xBottom, xtitle);
-
+  /// \todo Figure out a way to properly lable the y-axis
   QwtText ytitle("Duration (ms)");
   ytitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
   this->setAxisTitle(QwtPlot::yLeft, ytitle);
 
   this->setAxisAutoScale(QwtPlot::yRight, true);
   this->setAxisAutoScale(QwtPlot::yLeft, true);
-
-  QwtScaleWidget *scaleWidget = this->axisWidget(QwtPlot::yLeft);
-  scaleWidget->setMargin(20);
-  //scaleWidget->setSpacing(50);
 
   this->replot();
 
@@ -260,20 +259,13 @@ QwtPlotCurve *IncrementalPlot::AddCurve(const QString &_label)
 
   this->curves[_label] = curve;
 
-  QColor penColor;
-  if (this->curves.size() == 2)
-  {
-    penColor.setRgb(0, 0, 255);
-    this->enableAxis(QwtPlot::yRight);
-    this->axisAutoScale(QwtPlot::yRight);
+  QColor penColor = Colors[(this->curves.size()-1) % ColorCount];
 
-    QwtText ytitle("Real Time Factor (%)");
-    ytitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
-    this->setAxisTitle(QwtPlot::yRight, ytitle);
-    curve->setYAxis(QwtPlot::yRight);
-  }
-  else
-    penColor.setRgb(255, 0, 0);
+  /// \todo The following will add the curve to the right hand axis. Need
+  /// a better way to do this based on user input.
+  //this->enableAxis(QwtPlot::yRight);
+  //this->axisAutoScale(QwtPlot::yRight);
+  //curve->setYAxis(QwtPlot::yRight);
 
   QPen pen(penColor);
   pen.setWidth(1.0);
