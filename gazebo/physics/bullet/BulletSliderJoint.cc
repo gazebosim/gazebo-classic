@@ -247,7 +247,7 @@ void BulletSliderJoint::SetForce(int _index, double _force)
 
     // TODO: switch to applyForce and specify body-fixed offset
     this->constraint->getRigidBodyA().applyCentralForce(-hingeForceA);
-    this->constraint->getRigidBodyB().applyCentralForce( hingeForceB);
+    this->constraint->getRigidBodyB().applyCentralForce(hingeForceB);
   }
 }
 

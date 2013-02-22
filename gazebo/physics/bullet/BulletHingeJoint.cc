@@ -285,7 +285,7 @@ void BulletHingeJoint::SetForce(int _index, double _torque)
     btVector3 hingeTorqueB = _torque * hingeAxisWorldB;
 
     this->bulletHinge->getRigidBodyA().applyTorque(-hingeTorqueA);
-    this->bulletHinge->getRigidBodyB().applyTorque( hingeTorqueB);
+    this->bulletHinge->getRigidBodyB().applyTorque(hingeTorqueB);
   }
 }
 
