@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,21 @@
  *
 */
 
-#include <gtest/gtest.h>
+#ifndef _DATALOGGER_TEST_HH_
+#define _DATALOGGER_TEST_HH_
 
-#include "gazebo/math/Helpers.hh"
+#include "gazebo/gui/QTestFixture.hh"
 
-using namespace gazebo;
-
-TEST(HelpersTest, Helpers)
+/// \brief A test class for the DataLogger widget.
+class DataLogger_TEST : public QTestFixture
 {
-  EXPECT_EQ(12345, math::parseInt("12345"));
-  EXPECT_EQ(-12345, math::parseInt("-12345"));
+  Q_OBJECT
 
-  EXPECT_FLOAT_EQ(12.345, math::parseFloat("12.345"));
-  EXPECT_FLOAT_EQ(-12.345, math::parseFloat("-12.345"));
-  EXPECT_TRUE(math::equal(123.45, math::parseFloat("1.2345e2"), 1e-2));
-}
+  /// \brief Test the record button on the data logging gui.
+  private slots: void RecordButton();
+
+  /// \brief Simulate pressing the record button many times.
+  private slots: void StressTest();
+};
+
+#endif

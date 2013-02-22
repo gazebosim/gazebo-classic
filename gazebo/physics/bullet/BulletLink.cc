@@ -164,7 +164,6 @@ void BulletLink::Init()
     {
     }
   }
-
   // this->rigidLink->setSleepingThresholds(0,0);
 }
 
