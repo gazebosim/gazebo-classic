@@ -135,6 +135,9 @@ void BulletLink::Init()
 
   btDynamicsWorld *wd = this->bulletPhysics->GetDynamicsWorld();
 
+  // bullet support setting bits to rigid body but not individual
+  // shapes/collisions so find the first child collision and set rigid body to
+  // use its category and collision bits.
   unsigned int categortyBits = GZ_ALL_COLLIDE;
   unsigned int collideBits = GZ_ALL_COLLIDE;
   for (Base_V::iterator iter = this->children.begin();
@@ -147,8 +150,6 @@ void BulletLink::Init()
       categortyBits = collision->GetCategoryBits();
       collideBits = collision->GetCollideBits();
       break;
-//      wd->addRigidBody(this->rigidLink, categortyBits, collideBits);
-//      return;
     }
   }
   wd->addRigidBody(this->rigidLink, categortyBits, collideBits);

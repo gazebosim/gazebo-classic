@@ -127,7 +127,6 @@ void Collision::SetCollision(bool _placeable)
   }
   else
   {
-  gzerr << " SetCollideMode " << std::endl;
     // collide with all
     this->SetCategoryBits(GZ_ALL_COLLIDE);
     this->SetCollideBits(GZ_ALL_COLLIDE);
