@@ -111,9 +111,22 @@ void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 //////////////////////////////////////////////////
 void ODEScrewJoint::SetForce(int _index, double _force)
 {
+  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
+  {
+    gzerr << "Calling ODEScrewJoint::SetForce with an index ["
+          << _index << "] out of range\n";
+    return;
+  }
+
+  // truncate effort if effortLimit is not negative
+  if (this->effortLimit[_index] >= 0.0)
+    _force = math::clamp(_force,
+      -this->effortLimit[_index], this->effortLimit[_index]);
+
   ODEJoint::SetForce(_index, _force);
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
+
   // dJointAddScrewForce(this->jointId, _force);
   dJointAddScrewTorque(this->jointId, _force);
 }

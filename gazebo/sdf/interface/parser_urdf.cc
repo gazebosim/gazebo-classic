@@ -504,9 +504,9 @@ void URDF2Gazebo::InsertGazeboExtensionLink(TiXmlElement *_elem,
           if ((*ge)->isDampingFactor)
           {
             /// @todo separate linear and angular velocity decay
-            this->AddKeyValue(_elem, "linear",
+            this->AddKeyValue(velocityDecay, "linear",
                         this->Values2str(1, &(*ge)->dampingFactor));
-            this->AddKeyValue(_elem, "angular",
+            this->AddKeyValue(velocityDecay, "angular",
                         this->Values2str(1, &(*ge)->dampingFactor));
           }
           _elem->LinkEndChild(velocityDecay);
@@ -1526,6 +1526,10 @@ void URDF2Gazebo::CreateJoint(TiXmlElement *_root,
                 this->Values2str(1, &_link->parent_joint->limits->lower));
               this->AddKeyValue(jointAxisLimit, "upper",
                 this->Values2str(1, &_link->parent_joint->limits->upper));
+              this->AddKeyValue(jointAxisLimit, "effort",
+                this->Values2str(1, &_link->parent_joint->limits->effort));
+              this->AddKeyValue(jointAxisLimit, "velocity",
+                this->Values2str(1, &_link->parent_joint->limits->velocity));
             }
             else if (_link->parent_joint->type != urdf::Joint::CONTINUOUS)
             {
@@ -1547,6 +1551,10 @@ void URDF2Gazebo::CreateJoint(TiXmlElement *_root,
                 this->Values2str(1, &_link->parent_joint->limits->lower));
               this->AddKeyValue(jointAxisLimit, "upper",
                 this->Values2str(1, &_link->parent_joint->limits->upper));
+              this->AddKeyValue(jointAxisLimit, "effort",
+                this->Values2str(1, &_link->parent_joint->limits->effort));
+              this->AddKeyValue(jointAxisLimit, "velocity",
+                this->Values2str(1, &_link->parent_joint->limits->velocity));
             }
           }
         }
@@ -1819,7 +1827,25 @@ void URDF2Gazebo::ReduceVisualsToParent(UrdfLinkPtr _link)
   {
     /// @todo: extend to different groups,
     /// only work with default meshes right now.
-    if (visualsIt->first.find(std::string("lump::")) == 0)
+    if (visualsIt->first == "default")
+    {
+      std::string lumpGroupName = std::string("lump::")+_link->name;
+      // gzdbg << "adding modified lump group name [" << lumpGroupName
+      //       << "] to link [" << _link->getParent()->name << "]\n.";
+      for (std::vector<UrdfVisualPtr>::iterator
+        visualIt = visualsIt->second->begin();
+        visualIt != visualsIt->second->end(); ++visualIt)
+      {
+        // transform visual origin from _link frame to
+        // parent link frame before adding to parent
+        (*visualIt)->origin = this->TransformToParentFrame((*visualIt)->origin,
+          _link->parent_joint->parent_to_joint_origin_transform);
+        // add the modified visual to parent
+        this->ReduceVisualToParent(_link->getParent(), lumpGroupName,
+          *visualIt);
+      }
+    }
+    else if (visualsIt->first.find(std::string("lump::")) == 0)
     {
       // it's a previously lumped mesh, re-lump under same _groupName
       std::string lumpGroupName = visualsIt->first;
@@ -1831,24 +1857,6 @@ void URDF2Gazebo::ReduceVisualsToParent(UrdfLinkPtr _link)
       {
         // transform visual origin from _link frame to parent link
         // frame before adding to parent
-        (*visualIt)->origin = this->TransformToParentFrame((*visualIt)->origin,
-          _link->parent_joint->parent_to_joint_origin_transform);
-        // add the modified visual to parent
-        this->ReduceVisualToParent(_link->getParent(), lumpGroupName,
-          *visualIt);
-      }
-    }
-    else  // if (visualsIt->first == "default")
-    {
-      std::string lumpGroupName = std::string("lump::")+_link->name;
-      // gzdbg << "adding modified lump group name [" << lumpGroupName
-      //       << "] to link [" << _link->getParent()->name << "]\n.";
-      for (std::vector<UrdfVisualPtr>::iterator
-        visualIt = visualsIt->second->begin();
-        visualIt != visualsIt->second->end(); ++visualIt)
-      {
-        // transform visual origin from _link frame to
-        // parent link frame before adding to parent
         (*visualIt)->origin = this->TransformToParentFrame((*visualIt)->origin,
           _link->parent_joint->parent_to_joint_origin_transform);
         // add the modified visual to parent
@@ -1872,29 +1880,7 @@ void URDF2Gazebo::ReduceCollisionsToParent(UrdfLinkPtr _link)
       collisionsIt = _link->collision_groups.begin();
       collisionsIt != _link->collision_groups.end(); ++collisionsIt)
     {
-      if (collisionsIt->first.find(std::string("lump::")) == 0)
-      {
-        // if it's a previously lumped mesh, relump under same _groupName
-        std::string lumpGroupName = collisionsIt->first;
-        // gzdbg << "re-lumping collision [" << collisionsIt->first
-        //       << "] for link [" << _link->name
-        //       << "] to parent [" << _link->getParent()->name
-        //       << "] with group name [" << lumpGroupName << "]\n";
-        for (std::vector<UrdfCollisionPtr>::iterator
-          collisionIt = collisionsIt->second->begin();
-          collisionIt != collisionsIt->second->end(); ++collisionIt)
-        {
-          // transform collision origin from _link frame to
-          // parent link frame before adding to parent
-          (*collisionIt)->origin = this->TransformToParentFrame(
-            (*collisionIt)->origin,
-            _link->parent_joint->parent_to_joint_origin_transform);
-          // add the modified collision to parent
-          this->ReduceCollisionToParent(_link->getParent(), lumpGroupName,
-            *collisionIt);
-        }
-      }
-      else  // if (collisionsIt->first == "default")
+      if (collisionsIt->first == "default")
       {
         // if it's a "default" mesh, it will be added under "lump::"+_link name
         std::string lumpGroupName = std::string("lump::")+_link->name;
@@ -1912,6 +1898,28 @@ void URDF2Gazebo::ReduceCollisionsToParent(UrdfLinkPtr _link)
             (*collisionIt)->origin,
             _link->parent_joint->parent_to_joint_origin_transform);
 
+          // add the modified collision to parent
+          this->ReduceCollisionToParent(_link->getParent(), lumpGroupName,
+            *collisionIt);
+        }
+      }
+      else if (collisionsIt->first.find(std::string("lump::")) == 0)
+      {
+        // if it's a previously lumped mesh, relump under same _groupName
+        std::string lumpGroupName = collisionsIt->first;
+        // gzdbg << "re-lumping collision [" << collisionsIt->first
+        //       << "] for link [" << _link->name
+        //       << "] to parent [" << _link->getParent()->name
+        //       << "] with group name [" << lumpGroupName << "]\n";
+        for (std::vector<UrdfCollisionPtr>::iterator
+          collisionIt = collisionsIt->second->begin();
+          collisionIt != collisionsIt->second->end(); ++collisionIt)
+        {
+          // transform collision origin from _link frame to
+          // parent link frame before adding to parent
+          (*collisionIt)->origin = this->TransformToParentFrame(
+            (*collisionIt)->origin,
+            _link->parent_joint->parent_to_joint_origin_transform);
           // add the modified collision to parent
           this->ReduceCollisionToParent(_link->getParent(), lumpGroupName,
             *collisionIt);
