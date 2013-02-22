@@ -173,6 +173,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   this->stepTimeDouble = solverElem->GetValueDouble("dt");
   this->stepType = solverElem->GetValueString("type");
+  this->disableJointFeedback = solverElem->GetValueBool("disable_joint_feedback");
 
   dWorldSetDamping(this->worldId, 0.0001, 0.0001);
 
@@ -903,8 +904,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
     // Create the contact joint. This introduces the contact constraint to
     // ODE
-    dJointID contactJoint =
-      dJointCreateContact(this->worldId, this->contactGroup, &contact);
+    dJointID contactJoint = NULL;
+    if (!this->disableJointFeedback)
+      contactJoint = dJointCreateContact(this->worldId, this->contactGroup,
+        &contact);
 
     // Store contact information.
     if (contactFeedback && jointFeedback)
@@ -925,7 +928,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
           _contactCollisions[this->indices[j]].normal[2]);
 
       // Set the joint feedback.
-      dJointSetFeedback(contactJoint, &(jointFeedback->feedbacks[j]));
+      if (!this->disableJointFeedback)
+    	  dJointSetFeedback(contactJoint, &(jointFeedback->feedbacks[j]));
 
       // Increase the counters
       contactFeedback->count++;
@@ -933,7 +937,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     }
 
     // Attach the contact joint.
-    dJointAttach(contactJoint, b1, b2);
+    if (!this->disableJointFeedback)  // When does this joint get detached?
+    	dJointAttach(contactJoint, b1, b2);
   }
 }
 

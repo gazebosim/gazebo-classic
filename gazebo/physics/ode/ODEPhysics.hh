@@ -55,6 +55,9 @@ namespace gazebo
 
       /// \brief Contact joint feedback information.
       public: dJointFeedback feedbacks[MAX_CONTACT_JOINTS];
+
+      // \brief Add in ability to disable joint feedback
+      private: bool disableJointFeedback;
     };
 
     /// \brief ODE physics engine.
