@@ -445,6 +445,10 @@ void SensorManager::SensorContainer::RunLoop()
   {
     // Get the start time of the update.
     startTime = world->GetSimTime();
+
+    if (this->sensors.size() == 0)
+      this->runCondition.wait(lock2);
+
     this->Update(false);
 
     // Compute the time it took to update the sensors.
@@ -474,7 +478,7 @@ void SensorManager::SensorContainer::Update(bool _force)
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   if (this->sensors.size() == 0)
-    gzerr << "Updating a sensor containing without any sensors.\n";
+    gzlog << "Updating a sensor containing without any sensors.\n";
 
   // Update all the sensors in this container.
   for (Sensor_V::iterator iter = this->sensors.begin();

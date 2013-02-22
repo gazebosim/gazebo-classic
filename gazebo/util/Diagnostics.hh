@@ -50,7 +50,7 @@ namespace gazebo
     /// stop the timer.
     /// \param[in] _name Name of the timer to start.
     #define DIAG_TIMER_START(_name) \
-    gazebo::util::DiagnosticManager::Instance()->StartTimer(#_name);
+    gazebo::util::DiagnosticManager::Instance()->StartTimer(_name);
 
     /// \brief Output a lap time annotated with a prefix string. A lap is
     /// the time from last call to DIAG_TIMER_LAP or DIAG_TIMER_START, which
@@ -58,12 +58,12 @@ namespace gazebo
     /// \param[in] _name Name of the timer.
     /// \param[in] _prefix String for annotation.
     #define DIAG_TIMER_LAP(_name, _prefix) \
-    gazebo::util::DiagnosticManager::Instance()->Lap(#_name, _prefix);
+    gazebo::util::DiagnosticManager::Instance()->Lap(_name, _prefix);
 
     /// \brief Stop a diagnostic timer.
     /// \param[in] name Name of the timer to stop
     #define DIAG_TIMER_STOP(_name) \
-    gazebo::util::DiagnosticManager::Instance()->StopTimer(#_name);
+    gazebo::util::DiagnosticManager::Instance()->StopTimer(_name);
 #else
     #define DIAG_TIMER_START(_name) ((void) 0)
     #define DIAG_TIMER_LAP(_name, _prefix) ((void)0)
