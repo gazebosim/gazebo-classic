@@ -1,5 +1,5 @@
 include_directories (
-  ${PROJECT_SOURCE_DIR}/gazebo 
+  ${PROJECT_SOURCE_DIR}/gazebo
   ${PROJECT_BINARY_DIR}/gazebo
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
@@ -8,9 +8,9 @@ include_directories (
   ${PROTOBUF_INCLUDE_DIR}
 )
 
-link_directories(  
+link_directories(
   ${ogre_library_dirs}
-  ${Boost_LIBRARY_DIRS} 
+  ${Boost_LIBRARY_DIRS}
   ${ODE_LIBRARY_DIRS}
 )
 
