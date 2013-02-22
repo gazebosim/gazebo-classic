@@ -135,7 +135,6 @@ void BulletLink::Init()
 
   btDynamicsWorld *wd = this->bulletPhysics->GetDynamicsWorld();
   wd->addRigidBody(this->rigidLink);
-
   this->SetKinematic(this->sdf->GetValueBool("kinematic"));
   this->SetGravityMode(this->sdf->GetValueBool("gravity"));
 
