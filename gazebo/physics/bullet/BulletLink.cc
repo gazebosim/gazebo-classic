@@ -133,9 +133,10 @@ void BulletLink::Init()
   if (mass <= 0.0)
     this->rigidLink->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
 
-  btDynamicsWorld *wd = this->bulletPhysics->GetDynamicsWorld();
-
-  // bullet support setting bits to rigid body but not individual
+  btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
+  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
+ 
+  // bullet supports setting bits to a rigid body but not individual
   // shapes/collisions so find the first child collision and set rigid body to
   // use its category and collision bits.
   unsigned int categortyBits = GZ_ALL_COLLIDE;
@@ -152,7 +153,7 @@ void BulletLink::Init()
       break;
     }
   }
-  wd->addRigidBody(this->rigidLink, categortyBits, collideBits);
+  bulletWorld->addRigidBody(this->rigidLink, categortyBits, collideBits);
   // this->rigidLink->setSleepingThresholds(0,0);
 }
 
@@ -160,6 +161,9 @@ void BulletLink::Init()
 void BulletLink::Fini()
 {
   Link::Fini();
+  btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
+  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
+  bulletWorld->removeRigidBody(this->rigidLink);
 }
 
 //////////////////////////////////////////////////
