@@ -27,6 +27,7 @@ class PhysicsTest : public ServerFixture
   public: void SpawnDrop(const std::string &_physicsEngine);
   public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
   public: void SimplePendulum(const std::string &_physicsEngine);
+  public: void CollisionFiltering(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -995,6 +996,120 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
     }
   }
 }
+
+////////////////////////////////////////////////////////////////////////
+// CollisionFiltering:
+// Load a world, spawn a model with two overlapping links. By default,
+// the links should not collide with each other as they have the same
+// parent model. Check the x and y velocities to see if they are 0
+////////////////////////////////////////////////////////////////////////
+void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
+{
+  // load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  std::stringstream newModelStr;
+
+  std::string modelName = "multiLinkModel";
+  math::Pose modelPose(0, 0, 2, 0, 0, 0);
+  math::Pose link01Pose(0, 0.1, 0, 0, 0, 0);
+  math::Pose link02Pose(0, -0.1, 0, 0, 0, 0);
+
+  // A model composed of two overlapping links at fixed y offset from origin
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+              << "<model name ='" << modelName << "'>"
+              << "<pose>" << modelPose.pos.x << " "
+                         << modelPose.pos.y << " "
+                         << modelPose.pos.z << " "
+                         << modelPose.rot.GetAsEuler().x << " "
+                         << modelPose.rot.GetAsEuler().y << " "
+                         << modelPose.rot.GetAsEuler().z << "</pose>"
+              << "<link name ='link01'>"
+              << "  <pose>" << link01Pose.pos.x << " "
+                         << link01Pose.pos.y << " "
+                         << link01Pose.pos.z << " "
+                         << link01Pose.rot.GetAsEuler().x << " "
+                         << link01Pose.rot.GetAsEuler().y << " "
+                         << link01Pose.rot.GetAsEuler().z << "</pose>"
+              << "  <collision name ='geom'>"
+              << "    <geometry>"
+              << "      <box><size>1 1 1</size></box>"
+              << "    </geometry>"
+              << "  </collision>"
+              << "  <visual name ='visual'>"
+              << "    <geometry>"
+              << "      <box><size>1 1 1</size></box>"
+              << "    </geometry>"
+              << "  </visual>"
+              << "</link>"
+              << "<link name ='link02'>"
+              << "  <pose>" << link02Pose.pos.x << " "
+                         << link02Pose.pos.y << " "
+                         << link02Pose.pos.z << " "
+                         << link02Pose.rot.GetAsEuler().x << " "
+                         << link02Pose.rot.GetAsEuler().y << " "
+                         << link02Pose.rot.GetAsEuler().z << "</pose>"
+              << "  <collision name ='geom'>"
+              << "    <geometry>"
+              << "      <box><size>1 1 1</size></box>"
+              << "    </geometry>"
+              << "  </collision>"
+              << "  <visual name ='visual'>"
+              << "    <geometry>"
+              << "      <box><size>1 1 1</size></box>"
+              << "    </geometry>"
+              << "  </visual>"
+              << "</link>"
+              << "</model>"
+              << "</sdf>";
+
+  SpawnSDF(newModelStr.str());
+
+  // Wait for the entity to spawn
+  int i = 0;
+  while (!this->HasEntity(modelName) && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+  if (i > 20)
+    gzthrow("Unable to spawn model");
+
+  world->StepWorld(5);
+  physics::ModelPtr model = world->GetModel(modelName);
+
+  math::Vector3 vel;
+
+  physics::Link_V links = model->GetLinks();
+  unsigned int linkCount = 2;
+  EXPECT_EQ(links.size(), linkCount);
+  for (physics::Link_V::const_iterator iter = links.begin();
+      iter != links.end(); ++iter)
+  {
+    // Links should not repel each other hence expecting zero x, y vel
+    vel = (*iter)->GetWorldLinearVel();
+    EXPECT_EQ(vel.x, 0);
+    EXPECT_EQ(vel.y, 0);
+
+    // Model should be falling
+    EXPECT_LT(vel.z, 0);
+  }
+}
+
+TEST_F(PhysicsTest, CollisionFilteringODE)
+{
+  CollisionFiltering("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, CollisionFilteringBullet)
+{
+  CollisionFiltering("bullet");
+}
+#endif  // HAVE_BULLET
+
 
 int main(int argc, char **argv)
 {
