@@ -67,8 +67,6 @@ void ODELink::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void ODELink::Init()
 {
-
-
   if (!this->IsStatic())
   {
     this->linkId = dBodyCreate(this->odePhysics->GetWorldId());
