@@ -112,13 +112,14 @@ void SignalHandler(int /*dummy*/)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
+  std::string worldName = "default";
+
   if (signal(SIGINT, SignalHandler) == SIG_ERR)
   {
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
     return -1;
   }
 
-  const std::string usage = "Usage: gzstats [options]\n";
   po::options_description desc("Allowed options");
   desc.add_options()
     ("help,h", "print help message")
@@ -126,6 +127,7 @@ int main(int argc, char **argv)
                "plotting")
     ("world-name,w", po::value<std::string>(), "the Gazebo world to monitor");
   po::variables_map vm;
+
   try
   {
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -136,17 +138,24 @@ int main(int argc, char **argv)
     std::cerr << desc << std::endl;
     return 1;
   }
-  po::notify(vm); 
 
-  if(vm.count("help")) {
-    std::cerr << desc << std::endl;
+  po::notify(vm);
+
+  if(vm.count("help"))
+  {
+    std::cerr << "This tool displays statistics about a running Gazebo world.\n"
+              << "Usage: gzstats [options]\n"
+              << desc << std::endl;
     return 1;
   }
-  std::string worldName = "default";
-  if(vm.count("world-name")) {
-    worldName = vm["world-name"].as<std::string>(); 
+
+  if(vm.count("world-name"))
+  {
+    worldName = vm["world-name"].as<std::string>();
   }
-  if(vm.count("plot")) {
+
+  if(vm.count("plot"))
+  {
     g_plot = true;
   }
 
