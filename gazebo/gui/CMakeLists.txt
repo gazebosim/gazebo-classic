@@ -7,6 +7,7 @@ link_directories(
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
+  ${QWT_INCLUDE_DIR}
 )
 
 add_definitions(${QT_DEFINITIONS})
@@ -20,13 +21,11 @@ set (sources
   BoxMaker.cc
   CylinderMaker.cc
   DataLogger.cc
-  Diagnostics.cc
   EntityMaker.cc
   RenderWidget.cc
   GLWidget.cc
   Gui.cc
   GuiEvents.cc
-  IncrementalPlot.cc
   InsertModelWidget.cc
   JointControlWidget.cc
   LightMaker.cc
@@ -51,9 +50,7 @@ set (sources
 set (qt_headers
   Actions.hh
   DataLogger.hh
-  Diagnostics.hh
   GLWidget.hh
-  IncrementalPlot.hh
   InsertModelWidget.hh
   JointControlWidget.hh
   MainWindow.hh
@@ -86,6 +83,17 @@ set (headers
   viewers/ViewFactory.hh
 )
 
+if (HAVE_QWT)
+  set (sources ${sources}
+    Diagnostics.cc
+    IncrementalPlot.cc
+  )
+  set (qt_headers ${qt_headers}
+    Diagnostics.hh
+    IncrementalPlot.hh
+  )
+endif()
+
 set (display_tests
   DataLogger_TEST.cc
   TimePanel_TEST.cc
@@ -115,10 +123,10 @@ target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_msgs
                                  gazebo_model_editor
                                  gzqtpropertybrowser
-                                 gzqwt
                                  ${QT_LIBRARIES}
                                  ${ogre_libraries}
                                  ${Boost_LIBRARIES}
+                                 ${QWT_LIBRARY}
                                  pthread)
 
 target_link_libraries(gzclient  gazebo_common
@@ -129,10 +137,10 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_msgs
                                 gazebo_model_editor
                                 gzqtpropertybrowser
-                                gzqwt
                                 ${QT_LIBRARIES}
                                 ${ogre_libraries}
                                 ${Boost_LIBRARIES}
+                                ${QWT_LIBRARY}
                                 pthread)
 
 add_definitions(${QT_DEFINITIONS})
