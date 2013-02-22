@@ -91,8 +91,10 @@ namespace gazebo
 
       protected: btCollisionShape *collisionShape;
 
+      /// \brief Category bits for collision detection
       private: unsigned int categoryBits;
 
+      /// \brief Collide bits for collision detection
       private: unsigned int collideBits;
     };
     /// \}

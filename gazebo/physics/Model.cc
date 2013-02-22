@@ -993,4 +993,3 @@ bool Model::GetAutoDisable() const
 {
   return this->sdf->GetValueBool("allow_auto_disable");
 }
-

@@ -134,37 +134,25 @@ void BulletLink::Init()
     this->rigidLink->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
 
   btDynamicsWorld *wd = this->bulletPhysics->GetDynamicsWorld();
-  wd->addRigidBody(this->rigidLink);
 
-  // work in progress
-/*  if (this->sdf->GetElement("self_collide"))
-    wd->addRigidBody(this->rigidLink);
-  else
+  unsigned int categortyBits = GZ_ALL_COLLIDE;
+  unsigned int collideBits = GZ_ALL_COLLIDE;
+  for (Base_V::iterator iter = this->children.begin();
+         iter != this->children.end(); ++iter)
   {
-    unsigned categortyBits = GZ_ALL_COLLIDE;
-    unsigned collideBits = GZ_ALL_COLLIDE;
-    if (this->children.size() > 0)
+    if ((*iter)->HasType(Base::COLLISION))
     {
-      for (Base_V::iterator iter = this->children.begin();
-             iter != this->children.end(); ++iter)
-      {
-        if ((*iter)->HasType(Base::COLLISION))
-        {
-          BulletCollisionPtr collision;
-          collision = boost::shared_static_cast<BulletCollision>(*iter);
-          categortyBits = collision->GetCategoryBits();
-          categortyBits = collision->GetCollideBits();
-          break;
-        }
-      }
-
-      wd->addRigidBody(this->rigidLink);
-    }
-    else
-    {
+      BulletCollisionPtr collision;
+      collision = boost::shared_static_cast<BulletCollision>(*iter);
+      categortyBits = collision->GetCategoryBits();
+      collideBits = collision->GetCollideBits();
+      break;
+//      wd->addRigidBody(this->rigidLink, categortyBits, collideBits);
+//      return;
     }
   }
-  // this->rigidLink->setSleepingThresholds(0,0);*/
+  wd->addRigidBody(this->rigidLink, categortyBits, collideBits);
+  // this->rigidLink->setSleepingThresholds(0,0);
 }
 
 //////////////////////////////////////////////////

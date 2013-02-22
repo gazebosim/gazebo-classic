@@ -70,32 +70,19 @@ extern ContactProcessedCallback gContactProcessedCallback;
 
 //////////////////////////////////////////////////
 struct CollisionFilter : public btOverlapFilterCallback {
-   // return true when pairs need collision
-   virtual bool needBroadphaseCollision(btBroadphaseProxy *proxy0,
-      btBroadphaseProxy *proxy1) const {
-
-
-
-        bool collide = (proxy0->m_collisionFilterGroup
-            & proxy1->m_collisionFilterMask) != 0;
-        collide = collide && (proxy1->m_collisionFilterGroup
-            & proxy0->m_collisionFilterMask);
-
-        btRigidBody* rb0 = btRigidBody::upcast(
-                static_cast<btCollisionObject*>(proxy0->m_clientObject));
-
-
+  // return true when pairs need collision
+  virtual bool needBroadphaseCollision(btBroadphaseProxy *proxy0,
+      btBroadphaseProxy *proxy1) const
+    {
+      btRigidBody* rb0 = btRigidBody::upcast(
+              static_cast<btCollisionObject*>(proxy0->m_clientObject));
       if(!rb0)
-         return false;
+        return false;
 
-        btRigidBody* rb1 = btRigidBody::upcast(
-                static_cast<btCollisionObject*>(proxy1->m_clientObject));
-
+      btRigidBody* rb1 = btRigidBody::upcast(
+              static_cast<btCollisionObject*>(proxy1->m_clientObject));
       if(!rb1)
          return false;
-
-//      return rb0->checkCollideWithOverride(
-//          static_cast<btCollisionObject*>(proxy1->m_clientObject));
 
       BulletLink *link0 = static_cast<BulletLink *>(
           rb0->getUserPointer());
@@ -105,12 +92,22 @@ struct CollisionFilter : public btOverlapFilterCallback {
           rb1->getUserPointer());
       GZ_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
 
+      if (link0->GetModel() == link1->GetModel())
+        return false;
+
+      bool collide = (proxy0->m_collisionFilterGroup
+          & proxy1->m_collisionFilterMask) != 0;
+      collide = collide && (proxy1->m_collisionFilterGroup
+          & proxy0->m_collisionFilterMask);
+
+/*      gzerr << proxy0->m_collisionFilterGroup << " "
+              << proxy0->m_collisionFilterMask
+              << proxy1->m_collisionFilterGroup << " "
+              << proxy1->m_collisionFilterMask
+              << std::endl;*/
       return collide;
    }
-
-
 };
-
 
 //////////////////////////////////////////////////
 bool ContactCallback(btManifoldPoint &/*_cp*/,

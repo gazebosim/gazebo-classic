@@ -114,6 +114,7 @@ math::Box BulletCollision::GetBoundingBox() const
 //////////////////////////////////////////////////
 void BulletCollision::SetCollisionShape(btCollisionShape *_shape)
 {
+  Collision::SetCollision(true);
   this->collisionShape = _shape;
 
   // btmath::Vector3 vec;
