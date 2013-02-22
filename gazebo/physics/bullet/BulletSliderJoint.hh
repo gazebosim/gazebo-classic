@@ -77,10 +77,10 @@ namespace gazebo
       public: virtual void SetVelocity(int _index, double _angle);
 
       /// \brief Set the slider force
-      public: virtual void SetForce(int _index, double _force);
+      public: virtual void SetForce(int _index, double _effort);
 
       /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int _index, double _t);
+      public: virtual void SetMaxForce(int _index, double _force);
 
       /// \brief Get the max allowed force of an axis(index).
       public: virtual double GetMaxForce(int _index);

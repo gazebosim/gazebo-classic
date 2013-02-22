@@ -213,7 +213,7 @@ void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetForce(int _index, double _force)
+void BulletSliderJoint::SetForce(int _index, double _effort)
 {
   if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
   {
@@ -222,9 +222,18 @@ void BulletSliderJoint::SetForce(int _index, double _force)
     return;
   }
 
+  // truncating SetForce effort if velocity limit reached.
+  if (this->velocityLimit[_index] >= 0)
+  {
+    if (this->GetVelocity(_index) > this->velocityLimit[_index])
+      _effort = _effort > 0 ? 0 : _effort;
+    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
+      _effort = _effort < 0 ? 0 : _effort;
+  }
+
   // truncate effort if effortLimit is not negative
   if (this->effortLimit[_index] >= 0)
-    _force = math::clamp(_force, -this->effortLimit[_index],
+    _effort = math::clamp(_effort, -this->effortLimit[_index],
        this->effortLimit[_index]);
 
   if (this->bulletSlider && this->constraint)
@@ -242,8 +251,8 @@ void BulletSliderJoint::SetForce(int _index, double _force)
       this->bulletSlider->getRigidBodyB().getWorldTransform().getBasis() *
       hingeAxisLocalB;
 
-    btVector3 hingeForceA = _force * hingeAxisWorldA;
-    btVector3 hingeForceB = _force * hingeAxisWorldB;
+    btVector3 hingeForceA = _effort * hingeAxisWorldA;
+    btVector3 hingeForceB = _effort * hingeAxisWorldB;
 
     // TODO: switch to applyForce and specify body-fixed offset
     this->constraint->getRigidBodyA().applyCentralForce(-hingeForceA);

@@ -1768,7 +1768,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
   }
   catch(Ogre::Exception &e)
   {
-    gzerr << "Unable to insert mesh[" << e.getDescription() << std::endl;
+    gzerr << "Unable to insert mesh[" << e.getDescription() << "]" << std::endl;
   }
 }
 

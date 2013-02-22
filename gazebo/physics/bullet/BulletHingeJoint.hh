@@ -78,7 +78,7 @@ namespace gazebo
       public: virtual double GetMaxForce(int _index);
 
       // Documentation inherited.
-      public: virtual void SetForce(int _index, double _torque);
+      public: virtual void SetForce(int _index, double _effort);
 
       // Documentation inherited.
       public: virtual double GetForce(int _index);

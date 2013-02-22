@@ -161,8 +161,10 @@ void Joint::Init()
       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
       this->SetLowStop(0, limitElem->GetValueDouble("lower"));
       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
-      this->effortLimit[0] = limitElem->GetValueDouble("effort");
-      this->velocityLimit[0] = limitElem->GetValueDouble("velocity");
+      if (limitElem->HasElement("effort"))
+        this->effortLimit[0] = limitElem->GetValueDouble("effort");
+      if (limitElem->HasElement("velocity"))
+        this->velocityLimit[0] = limitElem->GetValueDouble("velocity");
     }
   }
 
@@ -181,8 +183,10 @@ void Joint::Init()
       this->SetHighStop(1, limitElem->GetValueDouble("upper"));
       this->SetLowStop(1, limitElem->GetValueDouble("lower"));
       this->SetHighStop(1, limitElem->GetValueDouble("upper"));
-      this->effortLimit[1] = limitElem->GetValueDouble("effort");
-      this->velocityLimit[1] = limitElem->GetValueDouble("velocity");
+      if (limitElem->HasElement("effort"))
+        this->effortLimit[1] = limitElem->GetValueDouble("effort");
+      if (limitElem->HasElement("velocity"))
+        this->velocityLimit[1] = limitElem->GetValueDouble("velocity");
     }
   }
 
