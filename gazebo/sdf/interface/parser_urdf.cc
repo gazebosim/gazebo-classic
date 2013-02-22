@@ -504,9 +504,9 @@ void URDF2Gazebo::InsertGazeboExtensionLink(TiXmlElement *_elem,
           if ((*ge)->isDampingFactor)
           {
             /// @todo separate linear and angular velocity decay
-            this->AddKeyValue(_elem, "linear",
+            this->AddKeyValue(velocityDecay, "linear",
                         this->Values2str(1, &(*ge)->dampingFactor));
-            this->AddKeyValue(_elem, "angular",
+            this->AddKeyValue(velocityDecay, "angular",
                         this->Values2str(1, &(*ge)->dampingFactor));
           }
           _elem->LinkEndChild(velocityDecay);
@@ -879,7 +879,7 @@ urdf::Pose  URDF2Gazebo::TransformToParentFrame(
   // transform to gazebo::math::Pose then call TransformToParentFrame
   gazebo::math::Pose p1 = URDF2Gazebo::CopyPose(_transformInLinkFrame);
   gazebo::math::Pose p2 = URDF2Gazebo::CopyPose(_parentToLinkTransform);
-  return URDF2Gazebo::CopyPose(TransformToParentFrame(p1, p2));
+  return URDF2Gazebo::CopyPose(this->TransformToParentFrame(p1, p2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -889,7 +889,7 @@ gazebo::math::Pose  URDF2Gazebo::TransformToParentFrame(
 {
   // transform to gazebo::math::Pose then call TransformToParentFrame
   gazebo::math::Pose p2 = URDF2Gazebo::CopyPose(_parentToLinkTransform);
-  return TransformToParentFrame(_transformInLinkFrame, p2);
+  return this->TransformToParentFrame(_transformInLinkFrame, p2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -956,7 +956,7 @@ void URDF2Gazebo::ReduceGazeboExtensionToParent(UrdfLinkPtr _link)
     for (std::vector<GazeboExtension*>::iterator ge = ext->second.begin();
          ge != ext->second.end(); ++ge)
     {
-      (*ge)->reductionTransform = TransformToParentFrame(
+      (*ge)->reductionTransform = this->TransformToParentFrame(
         (*ge)->reductionTransform,
         _link->parent_joint->parent_to_joint_origin_transform);
       // for sensor and projector blocks only
@@ -1526,6 +1526,10 @@ void URDF2Gazebo::CreateJoint(TiXmlElement *_root,
                 this->Values2str(1, &_link->parent_joint->limits->lower));
               this->AddKeyValue(jointAxisLimit, "upper",
                 this->Values2str(1, &_link->parent_joint->limits->upper));
+              this->AddKeyValue(jointAxisLimit, "effort",
+                this->Values2str(1, &_link->parent_joint->limits->effort));
+              this->AddKeyValue(jointAxisLimit, "velocity",
+                this->Values2str(1, &_link->parent_joint->limits->velocity));
             }
             else if (_link->parent_joint->type != urdf::Joint::CONTINUOUS)
             {
@@ -1547,6 +1551,10 @@ void URDF2Gazebo::CreateJoint(TiXmlElement *_root,
                 this->Values2str(1, &_link->parent_joint->limits->lower));
               this->AddKeyValue(jointAxisLimit, "upper",
                 this->Values2str(1, &_link->parent_joint->limits->upper));
+              this->AddKeyValue(jointAxisLimit, "effort",
+                this->Values2str(1, &_link->parent_joint->limits->effort));
+              this->AddKeyValue(jointAxisLimit, "velocity",
+                this->Values2str(1, &_link->parent_joint->limits->velocity));
             }
           }
         }
@@ -1830,7 +1838,7 @@ void URDF2Gazebo::ReduceVisualsToParent(UrdfLinkPtr _link)
       {
         // transform visual origin from _link frame to
         // parent link frame before adding to parent
-        (*visualIt)->origin = TransformToParentFrame((*visualIt)->origin,
+        (*visualIt)->origin = this->TransformToParentFrame((*visualIt)->origin,
           _link->parent_joint->parent_to_joint_origin_transform);
         // add the modified visual to parent
         this->ReduceVisualToParent(_link->getParent(), lumpGroupName,
@@ -1849,7 +1857,7 @@ void URDF2Gazebo::ReduceVisualsToParent(UrdfLinkPtr _link)
       {
         // transform visual origin from _link frame to parent link
         // frame before adding to parent
-        (*visualIt)->origin = TransformToParentFrame((*visualIt)->origin,
+        (*visualIt)->origin = this->TransformToParentFrame((*visualIt)->origin,
           _link->parent_joint->parent_to_joint_origin_transform);
         // add the modified visual to parent
         this->ReduceVisualToParent(_link->getParent(), lumpGroupName,
@@ -1886,7 +1894,7 @@ void URDF2Gazebo::ReduceCollisionsToParent(UrdfLinkPtr _link)
         {
           // transform collision origin from _link frame to
           // parent link frame before adding to parent
-          (*collisionIt)->origin = TransformToParentFrame(
+          (*collisionIt)->origin = this->TransformToParentFrame(
             (*collisionIt)->origin,
             _link->parent_joint->parent_to_joint_origin_transform);
 
@@ -1909,7 +1917,7 @@ void URDF2Gazebo::ReduceCollisionsToParent(UrdfLinkPtr _link)
         {
           // transform collision origin from _link frame to
           // parent link frame before adding to parent
-          (*collisionIt)->origin = TransformToParentFrame(
+          (*collisionIt)->origin = this->TransformToParentFrame(
             (*collisionIt)->origin,
             _link->parent_joint->parent_to_joint_origin_transform);
           // add the modified collision to parent
@@ -1941,7 +1949,7 @@ void URDF2Gazebo::ReduceJointsToParent(UrdfLinkPtr _link)
         {
           jointAnchorTransform = jointAnchorTransform * jointAnchorTransform;
           parentJoint->parent_to_joint_origin_transform =
-            TransformToParentFrame(
+            this->TransformToParentFrame(
             parentJoint->parent_to_joint_origin_transform,
             newParentLink->parent_joint->parent_to_joint_origin_transform);
           newParentLink = newParentLink->getParent();
