@@ -25,13 +25,14 @@ if(HAVE_BULLET)
 endif()
 
 set(display_tests
-      bandwidth.cc
-      file_handling.cc
-      msgs.cc
-      physics.cc
-      server_fixture.cc
-      speed.cc
-      transport.cc)
+  bandwidth.cc
+  file_handling.cc
+  msgs.cc
+  physics.cc
+  server_fixture.cc
+  speed.cc
+  transport.cc
+)
 
 # Build the display tests (need extra sources to compile)
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
@@ -39,14 +40,15 @@ set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 gz_build_display_tests(${display_tests})
 
 set(dri_tests
-      camera_sensor.cc
-      factory.cc
-      heightmap.cc
-      laser.cc
-      pioneer2dx.cc
-      pr2.cc
-      projector.cc
-      speed_pr2.cc)
+  camera_sensor.cc
+  factory.cc
+  heightmap.cc
+  laser.cc
+  pioneer2dx.cc
+  pr2.cc
+  projector.cc
+  speed_pr2.cc
+)
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
     "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc")

@@ -249,10 +249,10 @@ if (VALID_DISPLAY)
 
     set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
 
-      # Check that the test produced a result and create a failure if it didn't.
-      # Guards against crashed and timed out tests.
-      add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-               ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+    # Check that the test produced a result and create a failure if it didn't.
+    # Guards against crashed and timed out tests.
+    add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
+             ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
     endforeach()
   endmacro()
 endif()
