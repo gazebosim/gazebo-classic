@@ -97,7 +97,7 @@ namespace gazebo
       /// Subsequently, World::Update invokes ContactManager::PublishContacts
       /// to publish all contacts generated within a timestep onto
       /// Gazebo topic ~/physics/contacts.
-      /// 
+      ///
       /// Each ContactSensor subscribes to the Gazebo ~/physics/contacts topic,
       /// retrieves all contact pairs in a time step and filters them wthin
       /// ContactSensor::OnContacts against <collision> body name
@@ -105,7 +105,7 @@ namespace gazebo
       /// All collision pairs between ContactSensor <collision> body and
       /// other bodies in the world are stored in an array inside
       /// contacts.proto.
-      /// 
+      ///
       /// Within each element of the contact.proto array inside contacts.proto,
       /// list of collisions between collision bodies
       /// (collision1 and collision 2) are stored in an array of

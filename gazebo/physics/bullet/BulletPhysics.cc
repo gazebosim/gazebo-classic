@@ -19,8 +19,6 @@
  * Date: 11 June 2007
  */
 
-
-
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
@@ -58,7 +56,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Rand.hh"
 
-#include "gazebo/physics/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -81,12 +79,12 @@ struct CollisionFilter : public btOverlapFilterCallback {
 
       btRigidBody* rb0 = btRigidBody::upcast(
               static_cast<btCollisionObject*>(proxy0->m_clientObject));
-      if(!rb0)
+      if (!rb0)
         return collide;
 
       btRigidBody* rb1 = btRigidBody::upcast(
               static_cast<btCollisionObject*>(proxy1->m_clientObject));
-      if(!rb1)
+      if (!rb1)
          return collide;
 
       BulletLink *link0 = static_cast<BulletLink *>(
@@ -97,13 +95,13 @@ struct CollisionFilter : public btOverlapFilterCallback {
           rb1->getUserPointer());
       GZ_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
 
-      if (!link0->GetSelfCollide())
+      if (!link0->GetSelfCollide() || !link1->GetSelfCollide())
       {
         if (link0->GetModel() == link1->GetModel())
           collide = false;
       }
       return collide;
-   }
+    }
 };
 
 //////////////////////////////////////////////////
