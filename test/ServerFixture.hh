@@ -76,6 +76,9 @@ class ServerFixture : public testing::Test
                path = TEST_REGRESSION_PATH;
                path += "/../../build/plugins";
                gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+
+               path = TEST_PATH;
+               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
              }
 
   protected: virtual void TearDown()
@@ -668,6 +671,47 @@ class ServerFixture : public testing::Test
                  << "  <visual name ='visual'>"
                  << "    <geometry>"
                  << "      <box><size>" << _size << "</size></box>"
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name))
+                 common::Time::MSleep(10);
+             }
+
+  protected: void SpawnTrimesh(const std::string &_name,
+                 const std::string &_modelPath, const math::Vector3 &_scale,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<pose>" << _pos.x << " "
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <collision name ='geom'>"
+                 << "    <geometry>"
+                 << "      <mesh>"
+                 << "        <uri>" << _modelPath << "</uri>"
+                 << "        <scale>" << _scale << "</scale>"
+                 << "      </mesh>"
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << "      <mesh><uri>" << _modelPath << "</uri></mesh>"
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"
