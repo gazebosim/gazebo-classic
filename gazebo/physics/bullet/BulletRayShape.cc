@@ -19,6 +19,8 @@
  * Date: 24 May 2009
  */
 
+#include "gazebo/common/Assert.hh"
+
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
@@ -61,12 +63,13 @@ void BulletRayShape::Update()
     BulletCollisionPtr collision =
       boost::shared_static_cast<BulletCollision>(this->collisionParent);
 
-    this->globalStartPos =
-      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
+    LinkPtr link = this->collisionParent->GetLink();
+    GZ_ASSERT(link != NULL, "Bullet link is NULL");
+
+    this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
           this->relativeStartPos);
 
-    this->globalEndPos =
-      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
+    this->globalEndPos = link->GetWorldPose().CoordPositionAdd(
           this->relativeEndPos);
   }
 
@@ -76,7 +79,10 @@ void BulletRayShape::Update()
       this->globalEndPos.z);
 
   btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
-  this->physicsEngine->GetPhysicsUpdateMutex()->lock();
+
+  boost::recursive_mutex::scoped_lock lock(
+      *this->physicsEngine->GetPhysicsUpdateMutex());
+
   this->physicsEngine->GetDynamicsWorld()->rayTest(
       start, end, rayCallback);
 
@@ -87,7 +93,6 @@ void BulletRayShape::Update()
                          rayCallback.m_hitPointWorld.getZ());
     this->SetLength(this->globalStartPos.Distance(result));
   }
-  this->physicsEngine->GetPhysicsUpdateMutex()->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -112,8 +117,11 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
                            rayCallback.m_hitPointWorld.getY(),
                            rayCallback.m_hitPointWorld.getZ());
       _dist = this->globalStartPos.Distance(result);
-      _entity = static_cast<BulletLink*>(
-          rayCallback.m_collisionObject->getUserPointer())->GetName();
+
+      BulletLink *link = static_cast<BulletLink *>(
+          rayCallback.m_collisionObject->getUserPointer());
+      GZ_ASSERT(link != NULL, "Bullet link is NULL");
+      _entity = link->GetName();
     }
   }
 }

@@ -63,7 +63,6 @@ void BulletLink::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletLink::Init()
 {
-
   Link::Init();
 
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
@@ -124,6 +123,7 @@ void BulletLink::Init()
   this->rigidLink->setUserPointer(this);
   this->rigidLink->setCollisionFlags(this->rigidLink->getCollisionFlags() |
       btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+
 
   // Setup motion clamping to prevent objects from moving too fast.
   // this->rigidLink->setCcdMotionThreshold(1);
