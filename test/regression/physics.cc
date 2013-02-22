@@ -672,6 +672,62 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     }
   }
 
+  // Keep stepping forward, verifying that joint angles move in the direction
+  // implied by the joint velocity
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    double jointVel1, jointVel2;
+    double angle1, angle2, angle3;
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check angle measurement for " << *modelIter << '\n';
+      std::vector<std::string>::iterator jointIter;
+      for (jointIter  = jointNames.begin();
+           jointIter != jointNames.end(); ++jointIter)
+      {
+        joint = model->GetJoint(*jointIter);
+        if (joint)
+        {
+          // Get first joint angle
+          angle1 = joint->GetAngle(0).Radian();
+
+          // Get joint velocity and assume it is not too small
+          jointVel1 = joint->GetVelocity(0);
+          EXPECT_GT(fabs(jointVel1), 1e-1);
+
+          // Take 1 step and measure again
+          world->StepWorld(1);
+
+          // Expect angle change in direction of joint velocity
+          angle2 = joint->GetAngle(0).Radian();
+          EXPECT_GT((angle2 - angle1) * math::clamp(jointVel1*1e4, -1.0, 1.0), 0);
+
+          jointVel2 = joint->GetVelocity(0);
+          EXPECT_GT(fabs(jointVel2), 1e-1);
+
+          // Take 1 step and measure the last angle, expect decrease
+          world->StepWorld(1);
+          angle3 = joint->GetAngle(0).Radian();
+          EXPECT_GT((angle3 - angle2) * math::clamp(jointVel2*1e4, -1.0, 1.0), 0);
+        }
+        else
+        {
+          gzerr << "Error loading joint " << *jointIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(joint != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+
+
   // Reset the world, and impose joint limits
   world->Reset();
   for (modelIter  = modelNames.begin();
@@ -730,15 +786,6 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           gzerr << "Error loading joint " << *jointIter
                 << " of model " << *modelIter << '\n';
           EXPECT_TRUE(joint != NULL);
-
-          // Expect joint velocity to be near angular velocity difference
-          // of child and parent, along global axis
-          // jointVel == DOT(angVelChild - angVelParent, axis)
-          double jointVel = joint->GetVelocity(0);
-          math::Vector3 axis = joint->GetGlobalAxis(0);
-          angVel  = joint->GetChild()->GetWorldAngularVel();
-          angVel -= joint->GetParent()->GetWorldAngularVel();
-          EXPECT_NEAR(jointVel, axis.Dot(angVel), PHYSICS_TOL);
         }
       }
     }
@@ -812,6 +859,15 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           // Expect increasing velocities
           EXPECT_GT(newVel, oldVel);
           oldVel = newVel;
+
+          // Expect joint velocity to be near angular velocity difference
+          // of child and parent, along global axis
+          // jointVel == DOT(angVelChild - angVelParent, axis)
+          double jointVel = joint->GetVelocity(0);
+          math::Vector3 axis = joint->GetGlobalAxis(0);
+          angVel  = joint->GetChild()->GetWorldAngularVel();
+          angVel -= joint->GetParent()->GetWorldAngularVel();
+          EXPECT_NEAR(jointVel, axis.Dot(angVel), PHYSICS_TOL);
         }
         // Apply negative torque to lower_joint
         force = -3;
@@ -826,7 +882,15 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           newVel = joint->GetVelocity(0);
           // Expect decreasing velocities
           EXPECT_LT(newVel, oldVel);
-          oldVel = newVel;
+
+          // Expect joint velocity to be near angular velocity difference
+          // of child and parent, along global axis
+          // jointVel == DOT(angVelChild - angVelParent, axis)
+          double jointVel = joint->GetVelocity(0);
+          math::Vector3 axis = joint->GetGlobalAxis(0);
+          angVel  = joint->GetChild()->GetWorldAngularVel();
+          angVel -= joint->GetParent()->GetWorldAngularVel();
+          EXPECT_NEAR(jointVel, axis.Dot(angVel), PHYSICS_TOL);
         }
       }
       else
