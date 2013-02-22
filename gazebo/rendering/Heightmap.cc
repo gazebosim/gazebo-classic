@@ -41,6 +41,7 @@ using namespace rendering;
 Heightmap::Heightmap(ScenePtr _scene)
 {
   this->scene = _scene;
+  this->terrainGlobals = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -86,6 +87,9 @@ Ogre::TerrainGroup *Heightmap::GetOgreTerrain() const
 //////////////////////////////////////////////////
 void Heightmap::Load()
 {
+  if (this->terrainGlobals != NULL)
+    return;
+
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
 
   if (this->heightImage.GetWidth() != this->heightImage.GetHeight() ||
