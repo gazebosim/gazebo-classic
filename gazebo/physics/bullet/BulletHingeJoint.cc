@@ -301,12 +301,6 @@ void BulletHingeJoint::SetForce(int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-double BulletHingeJoint::GetForce(int /*_index*/)
-{
-  return this->bulletHinge->getAppliedImpulse();
-}
-
-//////////////////////////////////////////////////
 void BulletHingeJoint::SetHighStop(int /*_index*/,
                       const math::Angle &_angle)
 {
