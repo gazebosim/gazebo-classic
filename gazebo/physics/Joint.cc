@@ -42,6 +42,10 @@ Joint::Joint(BasePtr _parent)
   this->AddType(Base::JOINT);
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
+  this->effortLimit[0] = -1;
+  this->effortLimit[1] = -1;
+  this->velocityLimit[0] = -1;
+  this->velocityLimit[1] = -1;
 }
 
 //////////////////////////////////////////////////
@@ -151,10 +155,8 @@ void Joint::Init()
       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
       this->SetLowStop(0, limitElem->GetValueDouble("lower"));
       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
-      if (limitElem->HasElement("effort"))
-        this->effortLimit[0] = limitElem->GetValueDouble("effort");
-      if (limitElem->HasElement("velocity"))
-        this->velocityLimit[0] = limitElem->GetValueDouble("velocity");
+      this->effortLimit[0] = limitElem->GetValueDouble("effort");
+      this->velocityLimit[0] = limitElem->GetValueDouble("velocity");
     }
   }
 
@@ -173,10 +175,8 @@ void Joint::Init()
       this->SetHighStop(1, limitElem->GetValueDouble("upper"));
       this->SetLowStop(1, limitElem->GetValueDouble("lower"));
       this->SetHighStop(1, limitElem->GetValueDouble("upper"));
-      if (limitElem->HasElement("effort"))
-        this->effortLimit[1] = limitElem->GetValueDouble("effort");
-      if (limitElem->HasElement("velocity"))
-        this->velocityLimit[1] = limitElem->GetValueDouble("velocity");
+      this->effortLimit[1] = limitElem->GetValueDouble("effort");
+      this->velocityLimit[1] = limitElem->GetValueDouble("velocity");
     }
   }
 
