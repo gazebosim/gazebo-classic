@@ -42,6 +42,10 @@ Joint::Joint(BasePtr _parent)
   this->AddType(Base::JOINT);
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
+  this->effortLimit[0] = -1;
+  this->effortLimit[1] = -1;
+  this->velocityLimit[0] = -1;
+  this->velocityLimit[1] = -1;
 }
 
 //////////////////////////////////////////////////

@@ -205,7 +205,7 @@ double ODEGearboxJoint::GetMaxForce(int /*index*/)
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetForce(int _index, double _torque)
+void ODEGearboxJoint::SetForce(int _index, double _effort)
 {
   gzlog << "SetForce not implemented for gearbox\n";
   return;
@@ -217,17 +217,27 @@ void ODEGearboxJoint::SetForce(int _index, double _torque)
     return;
   }
 
+  // truncating SetForce effort if velocity limit reached.
+  if (this->velocityLimit[_index] >= 0)
+  {
+    if (this->GetVelocity(_index) > this->velocityLimit[_index])
+      _effort = _effort > 0 ? 0 : _effort;
+    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
+      _effort = _effort < 0 ? 0 : _effort;
+  }
+
   // truncate effort if effortLimit is not negative
   if (this->effortLimit[_index] >= 0)
-    _torque = math::clamp(_torque,
+    _effort = math::clamp(_effort,
       -this->effortLimit[_index], this->effortLimit[_index]);
 
-  ODEJoint::SetForce(_index, _torque);
+  ODEJoint::SetForce(_index, _effort);
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
-  dJointAddHingeTorque(this->jointId, _torque);
+
+  dJointAddHingeTorque(this->jointId, _effort);
 }
 
 //////////////////////////////////////////////////

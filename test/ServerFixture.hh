@@ -194,8 +194,12 @@ class ServerFixture : public testing::Test
                  ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
 
-               rendering::create_scene(
-                   gazebo::physics::get_world()->GetName(), false);
+               if (!rendering::get_scene(
+                     gazebo::physics::get_world()->GetName()))
+               {
+                 rendering::create_scene(
+                     gazebo::physics::get_world()->GetName(), false);
+               }
 
                this->SetPause(_paused);
 
