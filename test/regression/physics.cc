@@ -527,7 +527,8 @@ TEST_F(PhysicsTest, SpawnDropCoGOffsetBullet)
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
 {
-  // Load an empty world
+  math::Rand::SetSeed(0);
+  // Load world
   Load("worlds/revolute_joint_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
