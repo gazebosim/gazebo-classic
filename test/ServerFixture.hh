@@ -194,8 +194,12 @@ class ServerFixture : public testing::Test
                  ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
 
-               rendering::create_scene(
-                   gazebo::physics::get_world()->GetName(), false);
+               if (!rendering::get_scene(
+                     gazebo::physics::get_world()->GetName()))
+               {
+                 rendering::create_scene(
+                     gazebo::physics::get_world()->GetName(), false);
+               }
 
                this->SetPause(_paused);
 
@@ -467,6 +471,69 @@ class ServerFixture : public testing::Test
                EXPECT_LT(i, 50);
              }
 
+  protected: void SpawnRaySensor(const std::string &_modelName,
+                 const std::string &_raySensorName,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
+                 double _minRange = 0.08, double _maxRange = 10,
+                 double _rangeResolution = 0.01, unsigned int _samples = 640)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _modelName << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos.x << " "
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
+                 << "<link name ='body'>"
+                 << "<collision name='parent_collision'>"
+                 << "  <pose>0 0 0.0205 0 0 0</pose>"
+                 << "  <geometry>"
+                 << "    <cylinder>"
+                 << "      <radius>0.021</radius>"
+                 << "      <length>0.029</length>"
+                 << "    </cylinder>"
+                 << "  </geometry>"
+                 << "</collision>"
+                 << "  <sensor name ='" << _raySensorName << "' type ='ray'>"
+                 << "    <ray>"
+                 << "      <scan>"
+                 << "        <horizontal>"
+                 << "          <samples>" << _samples << "</samples>"
+                 << "          <resolution> 1 </resolution>"
+                 << "          <min_angle>" << _hMinAngle << "</min_angle>"
+                 << "          <max_angle>" << _hMaxAngle << "</max_angle>"
+                 << "        </horizontal>"
+                 << "      </scan>"
+                 << "      <range>"
+                 << "        <min>" << _minRange << "</min>"
+                 << "        <max>" << _maxRange << "</max>"
+                 << "        <resolution>" << _rangeResolution <<"</resolution>"
+                 << "      </range>"
+                 << "    </ray>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_modelName) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
+             }
+
   protected: void SpawnCylinder(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy)
              {
@@ -613,6 +680,47 @@ class ServerFixture : public testing::Test
                  << "  <visual name ='visual'>"
                  << "    <geometry>"
                  << "      <box><size>" << _size << "</size></box>"
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name))
+                 common::Time::MSleep(10);
+             }
+
+  protected: void SpawnTrimesh(const std::string &_name,
+                 const std::string &_modelPath, const math::Vector3 &_scale,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<pose>" << _pos.x << " "
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <collision name ='geom'>"
+                 << "    <geometry>"
+                 << "      <mesh>"
+                 << "        <uri>" << _modelPath << "</uri>"
+                 << "        <scale>" << _scale << "</scale>"
+                 << "      </mesh>"
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << "      <mesh><uri>" << _modelPath << "</uri></mesh>"
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"

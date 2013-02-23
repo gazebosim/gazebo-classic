@@ -42,6 +42,10 @@ Joint::Joint(BasePtr _parent)
   this->AddType(Base::JOINT);
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
+  this->effortLimit[0] = -1;
+  this->effortLimit[1] = -1;
+  this->velocityLimit[0] = -1;
+  this->velocityLimit[1] = -1;
 }
 
 //////////////////////////////////////////////////
@@ -151,6 +155,8 @@ void Joint::Init()
       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
       this->SetLowStop(0, limitElem->GetValueDouble("lower"));
       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
+      this->effortLimit[0] = limitElem->GetValueDouble("effort");
+      this->velocityLimit[0] = limitElem->GetValueDouble("velocity");
     }
   }
 
@@ -169,6 +175,8 @@ void Joint::Init()
       this->SetHighStop(1, limitElem->GetValueDouble("upper"));
       this->SetLowStop(1, limitElem->GetValueDouble("lower"));
       this->SetHighStop(1, limitElem->GetValueDouble("upper"));
+      this->effortLimit[1] = limitElem->GetValueDouble("effort");
+      this->velocityLimit[1] = limitElem->GetValueDouble("velocity");
     }
   }
 
@@ -233,6 +241,26 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
   // vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
   // vec.Round();
   return vec;
+}
+
+//////////////////////////////////////////////////
+double Joint::GetEffortLimit(int _index)
+{
+  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+    return this->effortLimit[_index];
+
+  gzerr << "GetEffortLimit index[" << _index << "] out of range\n";
+  return 0;
+}
+
+//////////////////////////////////////////////////
+double Joint::GetVelocityLimit(int _index)
+{
+  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+    return this->velocityLimit[_index];
+
+  gzerr << "GetVelocityLimit index[" << _index << "] out of range\n";
+  return 0;
 }
 
 //////////////////////////////////////////////////
@@ -386,20 +414,23 @@ void Joint::SetState(const JointState &_state)
 //////////////////////////////////////////////////
 void Joint::SetForce(int _index, double _force)
 {
-  /// \todo: should check to see if this type of joint has _index
-  if (_index < 2)
+  // this bit of code actually doesn't do anything physical,
+  // it simply records the forces commanded inside forceApplied.
+  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
     this->forceApplied[_index] = _force;
   else
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to apply force\n";
+    gzerr << "Something's wrong, joint [" << this->GetName()
+          << "] index [" << _index
+          << "] out of range.\n";
 }
 
 //////////////////////////////////////////////////
 double Joint::GetForce(int _index)
 {
-  /// \todo: should check to see if this type of joint has _index
-  if (_index < 2)
+  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
     return this->forceApplied[_index];
+  }
   else
   {
     gzerr << "Invalid joint index [" << _index

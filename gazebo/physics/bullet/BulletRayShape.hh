@@ -58,8 +58,8 @@ namespace gazebo
       public: void SetPoints(const math::Vector3 &_posStart,
                              const math::Vector3 &_posEnd);
 
+      /// \brief Pointer to the Bullet physics engine
       private: BulletPhysicsPtr physicsEngine;
-      private: btCollisionWorld::ClosestRayResultCallback rayCallback;
     };
     /// \}
   }
