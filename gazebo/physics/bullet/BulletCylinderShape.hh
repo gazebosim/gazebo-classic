@@ -66,12 +66,12 @@ namespace gazebo
                   // otherwise later resize operations using setLocalScaling
                   // will not be possible
                   gzwarn << "Setting cylinder shape's radius to zero \n";
-                  _radius = 1e4;
+                  _radius = 1e-4;
                 }
                 if (math::equal(_length, 0.0))
                 {
                   gzwarn << "Setting cylinder shape's length to zero \n";
-                  _length = 1e4;
+                  _length = 1e-4;
                 }
 
                 CylinderShape::SetSize(_radius, _length);

@@ -58,17 +58,17 @@ namespace gazebo
                   // otherwise later resize operations using setLocalScaling
                   // will not be possible
                   gzwarn << "Setting box shape's x to zero \n";
-                  size.x = 1e4;
+                  size.x = 1e-4;
                 }
                 if (math::equal(size.y, 0.0))
                 {
                   gzwarn << "Setting box shape's y to zero \n";
-                  size.y = 1e4;
+                  size.y = 1e-4;
                 }
                 if (math::equal(size.z, 0.0))
                 {
                   gzwarn << "Setting box shape's z to zero \n";
-                  size.z = 1e4;
+                  size.z = 1e-4;
                 }
 
                 BoxShape::SetSize(size);

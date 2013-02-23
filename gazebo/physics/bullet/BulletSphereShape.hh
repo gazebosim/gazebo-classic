@@ -58,7 +58,7 @@ namespace gazebo
                   // otherwise later resize operations using setLocalScaling
                   // will not be possible
                   gzwarn << "Setting sphere shape's radius to zero \n";
-                  _radius = 1e4;
+                  _radius = 1e-4;
                 }
 
                 SphereShape::SetRadius(_radius);
