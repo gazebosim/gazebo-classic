@@ -60,6 +60,19 @@ namespace gazebo
                           << " length\n";
                     return;
                 }
+                if (math::equal(_radius, 0.0))
+                {
+                  // Warn user, but still create shape with very small value
+                  // otherwise later resize operations using setLocalScaling
+                  // will not be possible
+                  gzwarn << "Setting cylinder shape's radius to zero \n";
+                  _radius = 1e4;
+                }
+                if (math::equal(_length, 0.0))
+                {
+                  gzwarn << "Setting cylinder shape's length to zero \n";
+                  _length = 1e4;
+                }
 
                 CylinderShape::SetSize(_radius, _length);
                 BulletCollisionPtr bParent;
@@ -77,13 +90,9 @@ namespace gazebo
                   btVector3 scale = shape->getLocalScaling();
                   double cylinderRadius = this->GetRadius();
                   double cylinderLength = this->GetLength();
-                  if (cylinderRadius > 0)
-                  {
-                    scale.setX(_radius / cylinderRadius);
-                    scale.setY(scale.x());
-                  }
-                  if (cylinderLength > 0)
-                    scale.setZ(_length / cylinderLength);
+                  scale.setX(_radius / cylinderRadius);
+                  scale.setY(scale.x());
+                  scale.setZ(_length / cylinderLength);
                   shape->setLocalScaling(scale);
                 }
               }

@@ -51,8 +51,27 @@ namespace gazebo
                           << " size\n";
                     return;
                 }
+                math::Vector3 size = _size;
+                if (math::equal(size.x, 0.0))
+                {
+                  // Warn user, but still create shape with very small value
+                  // otherwise later resize operations using setLocalScaling
+                  // will not be possible
+                  gzwarn << "Setting box shape's x to zero \n";
+                  size.x = 1e4;
+                }
+                if (math::equal(size.y, 0.0))
+                {
+                  gzwarn << "Setting box shape's y to zero \n";
+                  size.y = 1e4;
+                }
+                if (math::equal(size.z, 0.0))
+                {
+                  gzwarn << "Setting box shape's z to zero \n";
+                  size.z = 1e4;
+                }
 
-                BoxShape::SetSize(_size);
+                BoxShape::SetSize(size);
                 BulletCollisionPtr bParent;
                 bParent = boost::shared_dynamic_cast<BulletCollision>(
                     this->collisionParent);
@@ -62,18 +81,15 @@ namespace gazebo
                 if (!shape)
                 {
                   bParent->SetCollisionShape(new btBoxShape(
-                      btVector3(_size.x*0.5, _size.y*0.5, _size.z*0.5)));
+                      btVector3(size.x*0.5, size.y*0.5, size.z*0.5)));
                 }
                 else
                 {
                   btVector3 scale = shape->getLocalScaling();
                   math::Vector3 boxSize = this->GetSize();
-                  if (boxSize.x > 0)
-                    scale.setX(_size.x / boxSize.x);
-                  if (boxSize.y > 0)
-                    scale.setY(_size.y / boxSize.y);
-                  if (boxSize.z > 0)
-                    scale.setZ(_size.z / boxSize.z);
+                  scale.setX(size.x / boxSize.x);
+                  scale.setY(size.y / boxSize.y);
+                  scale.setZ(size.z / boxSize.z);
                   shape->setLocalScaling(scale);
                 }
               }

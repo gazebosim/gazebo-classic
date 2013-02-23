@@ -52,6 +52,14 @@ namespace gazebo
                           << " radius\n";
                     return;
                 }
+                if (math::equal(_radius, 0.0))
+                {
+                  // Warn user, but still create shape with very small value
+                  // otherwise later resize operations using setLocalScaling
+                  // will not be possible
+                  gzwarn << "Setting sphere shape's radius to zero \n";
+                  _radius = 1e4;
+                }
 
                 SphereShape::SetRadius(_radius);
                 BulletCollisionPtr bParent;
@@ -66,11 +74,8 @@ namespace gazebo
                 else
                 {
                   double sphereRadius = this->GetRadius();
-                  if (sphereRadius > 0)
-                  {
-                    double scale = _radius / sphereRadius;
-                    shape->setLocalScaling(btVector3(scale, scale, scale));
-                  }
+                  double scale = _radius / sphereRadius;
+                  shape->setLocalScaling(btVector3(scale, scale, scale));
                 }
               }
     };
