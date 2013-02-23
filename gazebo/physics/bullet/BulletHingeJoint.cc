@@ -277,6 +277,8 @@ void BulletHingeJoint::SetForce(int _index, double _effort)
 
   if (this->bulletHinge)
   {
+    BulletJoint::SetForce(_index, _effort);
+
     // z-axis of constraint frame
     btVector3 hingeAxisLocalA =
       this->bulletHinge->getFrameOffsetA().getBasis().getColumn(2);

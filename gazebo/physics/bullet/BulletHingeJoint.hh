@@ -81,9 +81,6 @@ namespace gazebo
       public: virtual void SetForce(int _index, double _effort);
 
       // Documentation inherited.
-      public: virtual double GetForce(int _index);
-
-      // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
       // Documentation inherited.

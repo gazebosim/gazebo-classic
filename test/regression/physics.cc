@@ -863,6 +863,9 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           EXPECT_GT(newVel, oldVel);
           oldVel = newVel;
 
+          // Check that GetForce returns what we set
+          EXPECT_NEAR(joint->GetForce(0), force, PHYSICS_TOL);
+
           // Expect joint velocity to be near angular velocity difference
           // of child and parent, along global axis
           // jointVel == DOT(angVelChild - angVelParent, axis)
@@ -885,6 +888,9 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           newVel = joint->GetVelocity(0);
           // Expect decreasing velocities
           EXPECT_LT(newVel, oldVel);
+
+          // Check that GetForce returns what we set
+          EXPECT_NEAR(joint->GetForce(0), force, PHYSICS_TOL);
 
           // Expect joint velocity to be near angular velocity difference
           // of child and parent, along global axis
