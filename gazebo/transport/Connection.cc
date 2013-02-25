@@ -356,6 +356,9 @@ void Connection::OnWrite(const boost::system::error_code &_e,
 //////////////////////////////////////////////////
 void Connection::Shutdown()
 {
+  if (!this->socket)
+    return;
+
   this->ProcessWriteQueue(true);
 
   this->Cancel();
