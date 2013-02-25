@@ -52,7 +52,7 @@ namespace gazebo
       // Documentation inherited.
       protected: virtual void Init();
 
-      /// \brief Set the axis of motion
+      // Documentation inherited.
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
       /// \brief Set joint damping, not yet implemented

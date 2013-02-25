@@ -19,13 +19,14 @@
  * Date: 21 May 2003
  */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletHinge2Joint.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletHinge2Joint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -34,6 +35,7 @@ using namespace physics;
 BulletHinge2Joint::BulletHinge2Joint(btDynamicsWorld *_world, BasePtr _parent)
     : Hinge2Joint<BulletJoint>(_parent)
 {
+  GZ_ASSERT(_world, "bullet world pointer is NULL\n");
   this->bulletWorld = _world;
   this->bulletHinge2 = NULL;
 }
@@ -52,9 +54,6 @@ void BulletHinge2Joint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
 {
-  if (this->constraint)
-    this->Detach();
-
   Hinge2Joint<BulletJoint>::Attach(_one, _two);
 
   BulletLinkPtr bulletChildLink =
@@ -83,6 +82,7 @@ void BulletHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
   this->constraint = this->bulletHinge2;
 
   // Add the joint to the world
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL\n");
   this->bulletWorld->addConstraint(this->constraint, true);
 
   // Allows access to impulse

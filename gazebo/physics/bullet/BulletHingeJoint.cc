@@ -33,6 +33,7 @@ using namespace physics;
 BulletHingeJoint::BulletHingeJoint(btDynamicsWorld *_world, BasePtr _parent)
     : HingeJoint<BulletJoint>(_parent)
 {
+  GZ_ASSERT(_world, "bullet world pointer is NULL\n");
   this->bulletWorld = _world;
   this->bulletHinge = NULL;
   this->angleOffset = 0;
@@ -139,7 +140,7 @@ void BulletHingeJoint::Init()
   }
 
   if (!this->bulletHinge)
-    gzthrow("memory allocation error\n");
+    gzthrow("unable to create bullet hinge constraint\n");
 
   // Give parent class BulletJoint a pointer to this constraint.
   this->constraint = this->bulletHinge;
@@ -158,6 +159,7 @@ void BulletHingeJoint::Init()
     this->angleOffset + limitElem->GetValueDouble("upper"));
 
   // Add the joint to the world
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL\n");
   this->bulletWorld->addConstraint(this->bulletHinge, true);
 
   // Allows access to impulse
@@ -193,7 +195,7 @@ void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
   }
   else
   {
-    gzerr << "not implemented\n";
+    gzerr << "SetAxis for existing joint is not implemented\n";
   }
 
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
@@ -338,7 +340,7 @@ math::Angle BulletHingeJoint::GetHighStop(int /*_index*/)
   if (this->bulletHinge)
     result = this->bulletHinge->getUpperLimit();
   else
-    gzthrow("Joint must be created first");
+    gzerr << "Joint must be created before getting high stop\n";
 
   return result;
 }
@@ -350,7 +352,7 @@ math::Angle BulletHingeJoint::GetLowStop(int /*_index*/)
   if (this->bulletHinge)
     result = this->bulletHinge->getLowerLimit();
   else
-    gzthrow("Joint must be created first");
+    gzerr << "Joint must be created before getting low stop\n";
 
   return result;
 }

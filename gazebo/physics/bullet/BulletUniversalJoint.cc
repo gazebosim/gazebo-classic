@@ -19,11 +19,13 @@
  * Date: 24 May 2009
  */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletUniversalJoint.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletUniversalJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -32,6 +34,7 @@ using namespace physics;
 BulletUniversalJoint::BulletUniversalJoint(btDynamicsWorld *_world,
   BasePtr _parent) : UniversalJoint<BulletJoint>(_parent)
 {
+  GZ_ASSERT(_world, "bullet world pointer is NULL\n");
   this->bulletWorld = _world;
   this->bulletUniversal = NULL;
 }
@@ -44,9 +47,6 @@ BulletUniversalJoint::~BulletUniversalJoint()
 //////////////////////////////////////////////////
 void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
 {
-  if (this->constraint)
-    this->Detach();
-
   UniversalJoint<BulletJoint>::Attach(_one, _two);
 
   BulletLinkPtr bulletChildLink =
@@ -71,6 +71,7 @@ void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
   this->constraint = this->bulletUniversal;
 
   // Add the joint to the world
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL\n");
   this->bulletWorld->addConstraint(this->bulletUniversal, true);
 
   // Allows access to impulse

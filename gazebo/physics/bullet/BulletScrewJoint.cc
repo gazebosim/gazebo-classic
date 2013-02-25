@@ -19,13 +19,14 @@
  * Date: 13 Oct 2009
  */
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletScrewJoint.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletScrewJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -34,6 +35,7 @@ using namespace physics;
 BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world, BasePtr _parent)
     : ScrewJoint<BulletJoint>(_parent)
 {
+  GZ_ASSERT(_world, "bullet world pointer is NULL\n");
   this->bulletWorld = _world;
   this->bulletScrew = NULL;
 }
@@ -54,9 +56,6 @@ void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
 {
   gzwarn << "Screw joint constraints are currently not enforced" << "\n";
-
-  if (this->constraint)
-    this->Detach();
 
   ScrewJoint<BulletJoint>::Attach(_one, _two);
 
@@ -96,9 +95,6 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
     pivotB = pose.rot.RotateVectorReverse(pivotB);
   }
 
-  std::cout << "AnchorPos[" << this->anchorPos << "]\n";
-  std::cout << "Slider PivotA[" << pivotA << "] PivotB[" << pivotB << "]\n";
-
   frame1.setOrigin(btVector3(pivotA.x, pivotA.y, pivotA.z));
   frame2.setOrigin(btVector3(pivotB.x, pivotB.y, pivotB.z));
 
@@ -136,6 +132,7 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
   this->constraint = this->bulletScrew;
 
   // Add the joint to the world
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL\n");
   this->bulletWorld->addConstraint(this->constraint);
 
   // Allows access to impulse

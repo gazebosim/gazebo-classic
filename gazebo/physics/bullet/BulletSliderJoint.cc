@@ -35,6 +35,7 @@ using namespace physics;
 BulletSliderJoint::BulletSliderJoint(btDynamicsWorld *_world, BasePtr _parent)
     : SliderJoint<BulletJoint>(_parent)
 {
+  GZ_ASSERT(_world, "bullet world pointer is NULL\n");
   this->bulletWorld = _world;
   this->bulletSlider = NULL;
 }
@@ -148,7 +149,7 @@ void BulletSliderJoint::Init()
   }
 
   if (!this->bulletSlider)
-    gzthrow("memory allocation error\n");
+    gzthrow("unable to create bullet slider joint\n");
 
   // btSliderConstraint has 2 degrees-of-freedom (like a piston)
   // so disable the rotation.
@@ -166,6 +167,7 @@ void BulletSliderJoint::Init()
   this->constraint = this->bulletSlider;
 
   // Add the joint to the world
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL\n");
   this->bulletWorld->addConstraint(this->bulletSlider, true);
 
   // Allows access to impulse
@@ -201,7 +203,7 @@ void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
   }
   else
   {
-    gzerr << "not implemented\n";
+    gzerr << "SetAxis for existing joint is not implemented\n";
   }
 }
 
@@ -285,7 +287,7 @@ math::Angle BulletSliderJoint::GetHighStop(int /*_index*/)
   if (this->bulletSlider)
     result = this->bulletSlider->getUpperLinLimit();
   else
-    gzthrow("Joint must be created first");
+    gzerr << "Joint must be created before getting high stop\n";
   return result;
 }
 
@@ -296,7 +298,7 @@ math::Angle BulletSliderJoint::GetLowStop(int /*_index*/)
   if (this->bulletSlider)
     result = this->bulletSlider->getLowerLinLimit();
   else
-    gzthrow("Joint must be created first");
+    gzerr << "Joint must be created before getting low stop\n";
   return result;
 }
 
