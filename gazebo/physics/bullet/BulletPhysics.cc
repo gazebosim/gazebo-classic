@@ -81,12 +81,12 @@ struct CollisionFilter : public btOverlapFilterCallback
       collide = collide && (_proxy1->m_collisionFilterGroup
           & _proxy0->m_collisionFilterMask);
 
-      btRigidBody* rb0 = btRigidBody::upcast(
+      btRigidBody *rb0 = btRigidBody::upcast(
               static_cast<btCollisionObject*>(_proxy0->m_clientObject));
       if (!rb0)
         return collide;
 
-      btRigidBody* rb1 = btRigidBody::upcast(
+      btRigidBody *rb1 = btRigidBody::upcast(
               static_cast<btCollisionObject*>(_proxy1->m_clientObject));
       if (!rb1)
          return collide;
