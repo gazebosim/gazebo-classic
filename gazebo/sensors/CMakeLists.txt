@@ -32,8 +32,16 @@ set (headers
 )
 
 set (gtest_sources
+  RaySensor_TEST.cc
+  ImuSensor_TEST.cc
   Sensor_TEST.cc
 )
+
+if (${VALID_DRI_DISPLAY})
+  set (gtest_sources ${gtest_sources}
+    SensorManager_TEST.cc
+    )
+endif()
 
 gz_build_tests(${gtest_sources})
 

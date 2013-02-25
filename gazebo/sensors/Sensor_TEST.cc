@@ -25,11 +25,16 @@ class Sensor_TEST : public ServerFixture
 {
 };
 
+boost::mutex g_countMutex;
+boost::condition_variable g_countCondition;
+
 // global variable and callback for tracking hokuyo sensor messages
 unsigned int g_hokuyoMsgCount;
 void ReceiveHokuyoMsg(ConstLaserScanStampedPtr &/*_msg*/)
 {
   g_hokuyoMsgCount++;
+  if (g_hokuyoMsgCount >= 20)
+    g_countCondition.notify_one();
 }
 
 /////////////////////////////////////////////////
@@ -48,7 +53,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   // get the sensor manager
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
   EXPECT_TRUE(mgr->SensorsInitialized());
-  
+
   // get the hokuyo sensor
   sensors::SensorPtr sensor;
   sensor = mgr->GetSensor("default::hokuyo::link::laser");
@@ -60,21 +65,23 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   gzdbg << sensor->GetScopedName() << " loaded with update rate of "
         << sensor->GetUpdateRate() << " Hz\n";
 
+  g_hokuyoMsgCount = 0;
+
   // Subscribe to hokuyo laser scan messages
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
   transport::SubscriberPtr sceneSub = node->Subscribe(
       "~/hokuyo/link/laser/scan", &ReceiveHokuyoMsg);
-  unsigned int hokuyoMsgCount;
 
-  // Count messages received in 2 seconds
-  g_hokuyoMsgCount = 0;
-  for (i = 0; i < 20; ++i)
+  // Wait for messages to arrive
   {
-    common::Time::MSleep(100);
+    boost::mutex::scoped_lock lock(g_countMutex);
+    g_countCondition.wait(lock);
   }
-  hokuyoMsgCount = g_hokuyoMsgCount;
+
+  unsigned int hokuyoMsgCount = g_hokuyoMsgCount;
   now = world->GetSimTime().Double();
+
   gzdbg << "counted " << hokuyoMsgCount << " messages in "
         << now << " seconds\n";
 
@@ -104,9 +111,9 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
     common::Time::MSleep(100);
   }
   hokuyoMsgCount = g_hokuyoMsgCount;
-  now = world->GetSimTime().Double();
+  now = world->GetSimTime().Double() - now;
   gzdbg << "counted " << hokuyoMsgCount << " messages in "
-        << now << " seconds\n";
+        << now << " seconds. Expected[" << updateRate * now * 0.5 << "]\n";
 
   // Expect at least 50% of specified update rate
   // Note: this is where the failure documented in issue #236 occurs

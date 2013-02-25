@@ -21,6 +21,8 @@
 /////////////////////////////////////////////////
 void TimePanel_TEST::ValidTimes()
 {
+  this->Load("empty.world");
+
   // Create a new data logger widget
   gazebo::gui::TimePanel *timePanel = new gazebo::gui::TimePanel;
 
