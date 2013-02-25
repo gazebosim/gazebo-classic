@@ -65,7 +65,6 @@ Connection::Connection()
   this->id = idCounter++;
 
   this->connectMutex = new boost::mutex();
-  this->readMutex = new boost::recursive_mutex();
   this->acceptor = NULL;
   this->readQuit = false;
   this->writeQueue.clear();
@@ -80,12 +79,7 @@ Connection::Connection()
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
-  this->ProcessWriteQueue();
-  this->writeQueue.clear();
   this->Shutdown();
-
-  delete this->readMutex;
-  this->readMutex = NULL;
 
   if (iomanager)
   {
@@ -279,7 +273,7 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 }
 
 /////////////////////////////////////////////////
-void Connection::ProcessWriteQueue()
+void Connection::ProcessWriteQueue(bool _blocking)
 {
   if (!this->IsOpen())
   {
@@ -308,23 +302,26 @@ void Connection::ProcessWriteQueue()
   // Write the serialized data to the socket. We use
   // "gather-write" to send both the head and the data in
   // a single write operation
-  boost::asio::async_write(*this->socket, buffer->data(),
-    boost::bind(&Connection::OnWrite, shared_from_this(),
-    boost::asio::placeholders::error, buffer));
-
-  /*
-  try
+  if (!_blocking)
   {
-    boost::asio::write(*this->socket, buffer->data());
+    boost::asio::async_write(*this->socket, buffer->data(),
+        boost::bind(&Connection::OnWrite, shared_from_this(),
+          boost::asio::placeholders::error, buffer));
   }
-  catch(...)
+  else
   {
-    this->Shutdown();
-  }
+    try
+    {
+      boost::asio::write(*this->socket, buffer->data());
+    }
+    catch(...)
+    {
+      this->Shutdown();
+    }
 
-  this->writeCount--;
-  delete buffer;
-  */
+    this->writeCount--;
+    delete buffer;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -359,19 +356,12 @@ void Connection::OnWrite(const boost::system::error_code &_e,
 //////////////////////////////////////////////////
 void Connection::Shutdown()
 {
-  this->ProcessWriteQueue();
-
-  int iters = 0;
-  while (this->writeCount > 0 && iters < 50)
-  {
-    common::Time::MSleep(10);
-    iters++;
-  }
-
-  this->shutdown();
-  // this->StopRead();
+  this->ProcessWriteQueue(true);
 
   this->Cancel();
+
+  // Shutdown the TBB task
+  this->shutdown();
 
   this->Close();
 
@@ -412,7 +402,7 @@ void Connection::Close()
 
   if (this->socket && this->socket->is_open())
   {
-    this->ProcessWriteQueue();
+    this->ProcessWriteQueue(true);
     try
     {
       this->socket->close();
@@ -485,7 +475,7 @@ bool Connection::Read(std::string &data)
   std::size_t incoming_size;
   boost::system::error_code error;
 
-  this->readMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->readMutex);
 
   // First read the header
   this->socket->read_some(boost::asio::buffer(header), error);
@@ -523,7 +513,6 @@ bool Connection::Read(std::string &data)
     result = true;
   }
 
-  this->readMutex->unlock();
   return result;
 }
 

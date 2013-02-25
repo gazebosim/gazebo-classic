@@ -220,8 +220,9 @@ bool ModelDatabase::UpdateModelCacheImpl()
     }
 
     TiXmlElement *uriElem;
-    for (uriElem = modelsElem->FirstChildElement("uri"); uriElem != NULL;
-        uriElem = uriElem->NextSiblingElement("uri"))
+    for (uriElem = modelsElem->FirstChildElement("uri");
+         uriElem != NULL && !this->stop;
+         uriElem = uriElem->NextSiblingElement("uri"))
     {
       std::string uri = uriElem->GetText();
 

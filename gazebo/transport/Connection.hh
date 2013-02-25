@@ -318,7 +318,7 @@ namespace gazebo
               {this->shutdown.Disconnect(_subscriber);}
 
       /// \brief Handle on-write callbacks
-      public: void ProcessWriteQueue();
+      public: void ProcessWriteQueue(bool _blocking = false);
 
       /// \brief Get the ID of the connection.
       /// \return The connection's unique ID.
@@ -381,7 +381,7 @@ namespace gazebo
       private: boost::recursive_mutex writeMutex;
 
       /// \brief Mutex to protect reads.
-      private: boost::recursive_mutex *readMutex;
+      private: boost::recursive_mutex readMutex;
 
       /// \brief Mutex to protect socket close.
       private: mutable boost::mutex socketMutex;
