@@ -255,3 +255,11 @@ void SensorManager::RemoveSensors()
   this->sensors.clear();
   this->initSensors.clear();
 }
+
+//////////////////////////////////////////////////
+void SensorManager::ResetLastUpdateTimes()
+{
+  Sensor_V::iterator iter;
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+    (*iter)->ResetLastUpdateTime();
+}

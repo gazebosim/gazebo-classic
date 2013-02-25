@@ -104,6 +104,9 @@ namespace gazebo
       /// i.e. all sensors managed by SensorManager have been initialized
       public: bool SensorsInitialized();
 
+      /// \brief Reset the last update times for every sensor.
+      public: void ResetLastUpdateTimes();
+
       /// \brief Update loop
       private: void RunLoop();
 

@@ -155,6 +155,9 @@ namespace gazebo
               event::ConnectionPtr ConnectUpdated(T _subscriber)
               {return this->updated.Connect(_subscriber);}
 
+      /// \brief Reset the lastUpdateTime to zero.
+      public: void ResetLastUpdateTime();
+
       /// \brief Disconnect from a the updated signal.
       /// \param[in] _c The connection to disconnect
       /// \sa Sensor::ConnectUpdated
@@ -164,10 +167,6 @@ namespace gazebo
       /// \brief Load a plugin for this sensor.
       /// \param[in] _sdf SDF parameters.
       private: void LoadPlugin(sdf::ElementPtr _sdf);
-
-      /// \brief Callback when a world control message is received.
-      /// \param[in] _data The world control message.
-      private: void OnControl(ConstWorldControlPtr &_data);
 
       /// \brief True if sensor generation is active.
       protected: bool active;
@@ -189,9 +188,6 @@ namespace gazebo
 
       /// \brief Event triggered when a sensor is updated.
       private: event::EventT<void()> updated;
-
-      /// \brief Subscribe to control message.
-      private: transport::SubscriberPtr controlSub;
 
       /// \brief Publish sensor data.
       private: transport::PublisherPtr sensorPub;

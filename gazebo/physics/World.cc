@@ -760,6 +760,8 @@ void World::ResetTime()
   this->pauseTime = common::Time(0);
   this->startTime = common::Time::GetWallTime();
   this->realTimeOffset = common::Time(0);
+
+  sensors::SensorManager::Instance()->ResetLastUpdateTimes();
 }
 
 //////////////////////////////////////////////////
@@ -930,7 +932,7 @@ void World::OnControl(ConstWorldControlPtr &_data)
 
     if (_data->reset().has_all() && _data->reset().all())
     {
-        this->resetAll = true;
+      this->resetAll = true;
     }
     else
     {
