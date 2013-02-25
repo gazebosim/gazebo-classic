@@ -375,7 +375,7 @@ namespace gazebo
       private: std::deque<std::string> writeQueue;
 
       /// \brief Mutex to protect new connections.
-      private: boost::mutex *connectMutex;
+      private: boost::mutex connectMutex;
 
       /// \brief Mutex to protect write.
       private: boost::recursive_mutex writeMutex;
@@ -385,6 +385,10 @@ namespace gazebo
 
       /// \brief Mutex to protect socket close.
       private: mutable boost::mutex socketMutex;
+
+      /// \brief Mutex to protect reads.
+      private: boost::mutex shutdownMutex;
+
 
       /// \brief Condition used for synchronization
       private: boost::condition_variable connectCondition;

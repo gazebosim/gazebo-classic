@@ -64,7 +64,6 @@ Connection::Connection()
   iomanager->IncCount();
   this->id = idCounter++;
 
-  this->connectMutex = new boost::mutex();
   this->acceptor = NULL;
   this->readQuit = false;
   this->writeQueue.clear();
@@ -96,7 +95,7 @@ Connection::~Connection()
 //////////////////////////////////////////////////
 bool Connection::Connect(const std::string &_host, unsigned int _port)
 {
-  boost::mutex::scoped_lock lock(*this->connectMutex);
+  boost::mutex::scoped_lock lock(this->connectMutex);
 
   std::string service = boost::lexical_cast<std::string>(_port);
 
@@ -356,6 +355,8 @@ void Connection::OnWrite(const boost::system::error_code &_e,
 //////////////////////////////////////////////////
 void Connection::Shutdown()
 {
+  boost::mutex::scoped_lock shutdownLock(this->shutdownMutex);
+
   if (!this->socket)
     return;
 
@@ -802,7 +803,7 @@ void Connection::OnConnect(const boost::system::error_code &_error,
   // This function is called when a connection is successfully (or
   // unsuccessfully) established.
 
-  boost::mutex::scoped_lock lock(*this->connectMutex);
+  boost::mutex::scoped_lock lock(this->connectMutex);
   if (_error == 0)
   {
     this->remoteURI = std::string("http://") + this->GetRemoteHostname()
