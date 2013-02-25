@@ -687,7 +687,8 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
     }
   }
 
-  this->modelPub->Publish(msg);
+  // \todo Renable when modifying a model is fixed.
+  // this->modelPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
