@@ -530,6 +530,8 @@ void World::StepWorld(int _steps)
 //////////////////////////////////////////////////
 void World::Update()
 {
+  DIAG_TIMER_START("World::Update");
+
   if (this->needsReset)
   {
     if (this->resetAll)
@@ -541,22 +543,32 @@ void World::Update()
     this->needsReset = false;
   }
 
+  DIAG_TIMER_LAP("World::Update", "needsReset");
+
   event::Events::worldUpdateStart();
   this->updateInfo.simTime = this->GetSimTime();
   this->updateInfo.realTime = this->GetRealTime();
   event::Events::worldUpdateBegin(this->updateInfo);
 
+  DIAG_TIMER_LAP("World::Update", "Events::worldUpdateBegin");
+
   // Update all the models
   (*this.*modelUpdateFunc)();
 
+  DIAG_TIMER_LAP("World::Update", "Model::Update");
+
   // This must be called before PhysicsEngine::UpdatePhysics.
   this->physicsEngine->UpdateCollision();
+
+  DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
 
   // Update the physics engine
   if (this->enablePhysicsEngine && this->physicsEngine)
   {
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
+
+    DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdatePhysics");
 
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
@@ -568,10 +580,14 @@ void World::Update()
     }
 
     this->dirtyPoses.clear();
+
+    DIAG_TIMER_LAP("World::Update", "SetWorldPose(dirtyPoses)");
   }
 
   // Output the contact information
   this->physicsEngine->GetContactManager()->PublishContacts();
+
+  DIAG_TIMER_LAP("World::Update", "ContactManager::PublishContacts");
 
   // Only update state informatin if logging data.
   if (common::LogRecord::Instance()->GetRunning())
@@ -594,7 +610,11 @@ void World::Update()
     }
   }
 
+  DIAG_TIMER_LAP("World::Update", "LogRecord");
+
   event::Events::worldUpdateEnd();
+
+  DIAG_TIMER_LAP("World::Update", "Events::worldUpdateEnd");
 }
 
 //////////////////////////////////////////////////
