@@ -15,21 +15,71 @@
  *
 */
 
+#include <boost/program_options.hpp>
+
 #include <gazebo/gui/qt.h>
 #include <gazebo/gazebo.hh>
-#include <gazebo/gui/Diagnostics.hh>
+#include <gazebo/gui/TopicPlot.hh>
 #include <gazebo/gazebo_config.h>
+
+namespace po = boost::program_options;
 
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
+  po::options_description vDesc("Allowed options");
+  vDesc.add_options()
+    ("help,h", "print help message");
+
+  po::options_description hDesc("Hidden options");
+  hDesc.add_options()
+    ("topic", po::value<std::string>(), "Topic to plot")
+    ("field", po::value<std::string>(), "Topic to plot");
+
+  po::options_description desc("Allowed options");
+  desc.add(vDesc).add(hDesc);
+
+  po::positional_options_description pDesc;
+  pDesc.add("topic", 1).add("field", -1);
+  po::variables_map vm;
+
+  try
+  {
+    po::store(po::command_line_parser(_argc, _argv).options(desc).positional(
+          pDesc).allow_unregistered().run(), vm);
+
+    po::notify(vm);
+  }
+  catch(po::unknown_option& e)
+  {
+    std::cerr << e.what() << std::endl;
+    std::cerr << desc << std::endl;
+    return 1;
+  }
+
+
+  if (vm.count("help"))
+  {
+    std::cerr << "Plot data from a published topic.\n\n"
+              << "Usage: gzstats [options]\n"
+              << desc << std::endl;
+    return 1;
+  }
+
+  std::string topic, field;
+
+  if (vm.count("topic"))
+    topic = vm["topic"].as<std::string>();
+
+  if (vm.count("field"))
+    field = vm["field"].as<std::string>();
+
   if (!gazebo::load())
   {
     printf("load error\n");
     return -1;
   }
 
-  gazebo::init();
   gazebo::run();
 
   QApplication *app = new QApplication(_argc, _argv);
@@ -39,8 +89,9 @@ int main(int _argc, char **_argv)
 
   app->setStyleSheet(styleSheet);
 
-  gazebo::gui::Diagnostics *diagnostics = new gazebo::gui::Diagnostics(NULL);
-  diagnostics->show();
+  gazebo::gui::TopicPlot *plot = new gazebo::gui::TopicPlot(NULL);
+  plot->Init(topic, field);
+  plot->show();
 
   if (!gazebo::init())
   {

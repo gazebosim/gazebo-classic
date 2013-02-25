@@ -38,6 +38,7 @@ set (sources
   SphereMaker.cc
   TimePanel.cc
   ToolsWidget.cc
+  TopicPlot.cc
   TopicSelector.cc
   viewers/ImageView.cc
   viewers/ImagesView.cc
@@ -60,6 +61,7 @@ set (qt_headers
   RenderWidget.hh
   TimePanel.hh
   ToolsWidget.hh
+  TopicPlot.hh
   TopicSelector.hh
   viewers/ImageView.hh
   viewers/ImagesView.hh

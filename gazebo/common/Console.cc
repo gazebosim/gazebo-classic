@@ -30,7 +30,7 @@ Console::Console()
 {
   this->msgStream = &std::cerr;
   this->errStream = &std::cerr;
-  this->logStream = NULL;
+  this->logStream = new std::ofstream("/dev/null", std::ios::out);
 }
 
 //////////////////////////////////////////////////
@@ -72,9 +72,6 @@ std::ostream &Console::ColorMsg(const std::string &_lbl, int _color)
 //////////////////////////////////////////////////
 std::ofstream &Console::Log()
 {
-  if (!this->logStream)
-    gzthrow("Console has not been initialized\n");
-
   *this->logStream << "[" << common::Time::GetWallTime() << "] ";
   this->logStream->flush();
   return *this->logStream;
