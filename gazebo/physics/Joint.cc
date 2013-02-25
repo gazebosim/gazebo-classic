@@ -468,6 +468,7 @@ void Joint::ComputeInertiaRatio()
        ci->GetIXY(), ci->GetIYY(), ci->GetIYZ(),
        ci->GetIXZ(), ci->GetIYZ(), ci->GetIZZ());
       // matrix times axis
+      // \todo: add operator in Matrix3 class so we can do Matrix3 * Vector3
       math::Vector3 pia(
         pm[0][0] * axis.x + pm[0][1] * axis.y + pm[0][2] * axis.z,
         pm[1][0] * axis.x + pm[1][1] * axis.y + pm[1][2] * axis.z,
@@ -478,7 +479,6 @@ void Joint::ComputeInertiaRatio()
         cm[2][0] * axis.x + cm[2][1] * axis.y + cm[2][2] * axis.z);
       double piam = pia.GetLength();
       double ciam = cia.GetLength();
-      double ratio;
 
       // should we flip? sure, so the measure of ratio is between [1, +inf]
       if (piam > ciam)
@@ -486,5 +486,20 @@ void Joint::ComputeInertiaRatio()
       else
         this->inertiaRatio[i] = ciam/piam;
     }
+  }
+}
+
+//////////////////////////////////////////////////
+double Joint::GetInertiaRatio(int _index) const
+{
+  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    return this->inertiaRatio[_index];
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get inertia ratio across joint.\n";
+    return 0;
   }
 }
