@@ -65,6 +65,9 @@ void BulletLink::Init()
 {
   Link::Init();
 
+  GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
+  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
+
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
   btScalar mass = this->inertial->GetMass();
   // The bullet dynamics solver checks for zero mass to identify static and
@@ -137,7 +140,7 @@ void BulletLink::Init()
   GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
   bulletWorld->addRigidBody(this->rigidLink);
   // this->rigidLink->setSleepingThresholds(0,0);
-  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
+
   this->SetGravityMode(this->sdf->GetValueBool("gravity"));
 
   this->SetLinearDamping(this->GetLinearDamping());

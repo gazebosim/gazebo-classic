@@ -86,6 +86,7 @@ void ODELink::Init()
     }
   }
 
+  GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
   this->SetKinematic(this->sdf->GetValueBool("kinematic"));
   this->SetGravityMode(this->sdf->GetValueBool("gravity"));
 
