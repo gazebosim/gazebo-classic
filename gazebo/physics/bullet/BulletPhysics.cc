@@ -67,23 +67,27 @@ extern ContactAddedCallback gContactAddedCallback;
 extern ContactProcessedCallback gContactProcessedCallback;
 
 //////////////////////////////////////////////////
-struct CollisionFilter : public btOverlapFilterCallback {
+struct CollisionFilter : public btOverlapFilterCallback
+{
   // return true when pairs need collision
-  virtual bool needBroadphaseCollision(btBroadphaseProxy *proxy0,
-      btBroadphaseProxy *proxy1) const
+  virtual bool needBroadphaseCollision(btBroadphaseProxy *_proxy0,
+      btBroadphaseProxy *_proxy1) const
     {
-      bool collide = (proxy0->m_collisionFilterGroup
-          & proxy1->m_collisionFilterMask) != 0;
-      collide = collide && (proxy1->m_collisionFilterGroup
-          & proxy0->m_collisionFilterMask);
+      GZ_ASSERT(_proxy0 != NULL && _proxy1 != NULL,
+          "Bullet broadphase overlapping pair proxies are NULL");
+
+      bool collide = (_proxy0->m_collisionFilterGroup
+          & _proxy1->m_collisionFilterMask) != 0;
+      collide = collide && (_proxy1->m_collisionFilterGroup
+          & _proxy0->m_collisionFilterMask);
 
       btRigidBody* rb0 = btRigidBody::upcast(
-              static_cast<btCollisionObject*>(proxy0->m_clientObject));
+              static_cast<btCollisionObject*>(_proxy0->m_clientObject));
       if (!rb0)
         return collide;
 
       btRigidBody* rb1 = btRigidBody::upcast(
-              static_cast<btCollisionObject*>(proxy1->m_clientObject));
+              static_cast<btCollisionObject*>(_proxy1->m_clientObject));
       if (!rb1)
          return collide;
 
@@ -155,7 +159,10 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
       this->broadPhase, this->solver, this->collisionConfig);
 
   btOverlapFilterCallback *filterCallback = new CollisionFilter();
-  this->dynamicsWorld->getPairCache()->setOverlapFilterCallback(filterCallback);
+  btOverlappingPairCache* pairCache = this->dynamicsWorld->getPairCache();
+  GZ_ASSERT(pairCache != NULL,
+      "Bullet broadphase overlapping pair cache is NULL");
+  pairCache->setOverlapFilterCallback(filterCallback);
 
   // TODO: Enable this to do custom contact setting
   gContactAddedCallback = ContactCallback;

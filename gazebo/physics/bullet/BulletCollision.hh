@@ -90,7 +90,7 @@ namespace gazebo
       public: btCollisionShape *GetCollisionShape() const;
 
       /// \brief Set the index of the compound shape
-      public: void SetCompoundShapeIndex(int i_ndex);
+      public: void SetCompoundShapeIndex(int _index);
 
       protected: btCollisionShape *collisionShape;
 

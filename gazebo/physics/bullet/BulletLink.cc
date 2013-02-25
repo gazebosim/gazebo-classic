@@ -141,12 +141,12 @@ void BulletLink::Init()
   // use its category and collision bits.
   unsigned int categortyBits = GZ_ALL_COLLIDE;
   unsigned int collideBits = GZ_ALL_COLLIDE;
+  BulletCollisionPtr collision;
   for (Base_V::iterator iter = this->children.begin();
          iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
     {
-      BulletCollisionPtr collision;
       collision = boost::shared_static_cast<BulletCollision>(*iter);
       categortyBits = collision->GetCategoryBits();
       collideBits = collision->GetCollideBits();
