@@ -94,14 +94,14 @@ if (HAVE_QWT)
   )
 endif()
 
-set (display_tests
+set (qt_tests
   DataLogger_TEST.cc
   TimePanel_TEST.cc
   viewers/ImagesView_TEST.cc
 )
 
 # Generate executables for each of the QT unit tests
-gz_build_display_tests(${tests})
+gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 
@@ -109,7 +109,6 @@ QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 gz_add_executable(gzclient ${sources} main.cc ${headers_MOC} ${headers} ${resources_RCC})
-
 gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
 add_dependencies(gazebo_gui gazebo_msgs)

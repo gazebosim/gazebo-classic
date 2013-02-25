@@ -1972,8 +1972,13 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       {
         try
         {
-          this->terrain = new Heightmap(shared_from_this());
-          this->terrain->LoadFromMsg(_msg);
+          if (!this->terrain)
+          {
+            this->terrain = new Heightmap(shared_from_this());
+            this->terrain->LoadFromMsg(_msg);
+          }
+          else
+            gzerr << "Only one Heightmap can be created per Scene\n";
         } catch(...)
         {
           return false;
