@@ -678,4 +678,3 @@ void SimTimeEventHandler::OnUpdate(const common::UpdateInfo &_info)
     }
   }
 }
-
