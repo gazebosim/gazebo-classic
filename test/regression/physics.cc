@@ -23,10 +23,10 @@
 using namespace gazebo;
 class PhysicsTest : public ServerFixture
 {
-  public: void EmptyWorld(const std::string &_worldFile);
-  public: void SpawnDrop(const std::string &_worldFile);
-  public: void SpawnDropCoGOffset(const std::string &_worldFile);
-  public: void SimplePendulum(const std::string &_worldFile);
+  public: void EmptyWorld(const std::string &_physicsEngine);
+  public: void SpawnDrop(const std::string &_physicsEngine);
+  public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
+  public: void SimplePendulum(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -34,12 +34,17 @@ class PhysicsTest : public ServerFixture
 // Load a world, take a few steps, and verify that time is increasing.
 // This is the most basic physics engine test.
 ////////////////////////////////////////////////////////////////////////
-void PhysicsTest::EmptyWorld(const std::string &_worldFile)
+void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
 {
   // Load an empty world
-  Load(_worldFile, true);
+  Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // simulate 1 step
   world->StepWorld(1);
@@ -58,13 +63,13 @@ void PhysicsTest::EmptyWorld(const std::string &_worldFile)
 
 TEST_F(PhysicsTest, EmptyWorldODE)
 {
-  EmptyWorld("worlds/empty.world");
+  EmptyWorld("ode");
 }
 
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, EmptyWorldBullet)
 {
-  EmptyWorld("worlds/empty_bullet.world");
+  EmptyWorld("bullet");
 }
 #endif  // HAVE_BULLET
 
@@ -74,16 +79,17 @@ TEST_F(PhysicsTest, EmptyWorldBullet)
 // shapes (box, sphere, cylinder), verify that they fall and hit the
 // ground plane. The test currently assumes inelastic collisions.
 ////////////////////////////////////////////////////////////////////////
-void PhysicsTest::SpawnDrop(const std::string &_worldFile)
+void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 {
   // load an empty world
-  Load(_worldFile, true);
+  Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
   EXPECT_EQ(g.x, 0);
@@ -96,15 +102,27 @@ void PhysicsTest::SpawnDrop(const std::string &_worldFile)
 
   // spawn some simple shapes and check to see that they start falling
   double z0 = 3;
-  SpawnBox("test_box", math::Vector3(1, 1, 1), math::Vector3(0, 0, z0),
-    math::Vector3::Zero);
-  SpawnSphere("test_sphere", math::Vector3(4, 0, z0), math::Vector3::Zero);
-  SpawnCylinder("test_cylinder", math::Vector3(8, 0, z0), math::Vector3::Zero);
+  std::map<std::string, math::Vector3> modelPos;
+  modelPos["test_box"] = math::Vector3(0, 0, z0);
+  modelPos["test_sphere"] = math::Vector3(4, 0, z0);
+  modelPos["test_cylinder"] = math::Vector3(8, 0, z0);
+  modelPos["test_empty"] = math::Vector3(12, 0, z0);
 
-  std::list<std::string> model_names;
-  model_names.push_back("test_box");
-  model_names.push_back("test_sphere");
-  model_names.push_back("test_cylinder");
+  // FIXME Trimesh drop test passes in bullet but fails in ode because
+  // the mesh bounces to the side when it hits the ground.
+  // See issue #513. Uncomment test when issue is resolved.
+  // modelPos["test_trimesh"] = math::Vector3(16, 0, z0);
+
+  SpawnBox("test_box", math::Vector3(1, 1, 1), modelPos["test_box"],
+      math::Vector3::Zero);
+  SpawnSphere("test_sphere", modelPos["test_sphere"], math::Vector3::Zero);
+  SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
+      math::Vector3::Zero);
+  SpawnEmptyLink("test_empty", modelPos["test_empty"], math::Vector3::Zero);
+  std::string trimeshPath =
+      "file://media/models/cube_20k/meshes/cube_20k.stl";
+  // SpawnTrimesh("test_trimesh", trimeshPath, math::Vector3(0.5, 0.5, 0.5),
+  //    modelPos["test_trimesh"], math::Vector3::Zero);
 
   int steps = 2;
   physics::ModelPtr model;
@@ -114,14 +132,15 @@ void PhysicsTest::SpawnDrop(const std::string &_worldFile)
   double t, x0 = 0;
   // This loop steps the world forward and makes sure that each model falls,
   // expecting downward z velocity and decreasing z position.
-  for (std::list<std::string>::iterator iter = model_names.begin();
-    iter != model_names.end(); ++iter)
+  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
+    iter != modelPos.end(); ++iter)
   {
+    std::string name = iter->first;
     // Make sure the model is loaded
-    model = world->GetModel(*iter);
+    model = world->GetModel(name);
     if (model != NULL)
     {
-      gzdbg << "Check freefall of model " << *iter << '\n';
+      gzdbg << "Check freefall of model " << name << '\n';
       // Step once and check downward z velocity
       world->StepWorld(1);
       vel1 = model->GetWorldLinearVel();
@@ -132,16 +151,10 @@ void PhysicsTest::SpawnDrop(const std::string &_worldFile)
       // Need to step at least twice to check decreasing z position
       world->StepWorld(steps - 1);
       pose1 = model->GetWorldPose();
-      if (*iter == "test_box")
-        x0 = 0;
-      else if (*iter == "test_sphere")
-        x0 = 4;
-      else if (*iter == "test_cylinder")
-        x0 = 8;
+      x0 = modelPos[name].x;
       EXPECT_EQ(pose1.pos.x, x0);
       EXPECT_EQ(pose1.pos.y, 0);
-      EXPECT_NEAR(pose1.pos.z, z0 - g.z/2*t*t, (z0-g.z/2*t*t)*PHYSICS_TOL);
-
+      EXPECT_NEAR(pose1.pos.z, z0 + g.z/2*t*t, (z0+g.z/2*t*t)*PHYSICS_TOL);
       // Check once more and just make sure they keep falling
       world->StepWorld(steps);
       vel2 = model->GetWorldLinearVel();
@@ -151,7 +164,7 @@ void PhysicsTest::SpawnDrop(const std::string &_worldFile)
     }
     else
     {
-      gzerr << "Error loading model " << *iter << '\n';
+      gzerr << "Error loading model " << name << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
@@ -168,35 +181,41 @@ void PhysicsTest::SpawnDrop(const std::string &_worldFile)
   // This loop checks the velocity and pose of each model 0.5 seconds
   // after the time of predicted ground contact. The velocity is expected
   // to be small, and the pose is expected to be underneath the initial pose.
-  for (std::list<std::string>::iterator iter = model_names.begin();
-    iter != model_names.end(); ++iter)
+  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
+    iter != modelPos.end(); ++iter)
   {
+    std::string name = iter->first;
     // Make sure the model is loaded
-    model = world->GetModel(*iter);
+    model = world->GetModel(name);
     if (model != NULL)
     {
-      gzdbg << "Check ground contact of model " << *iter << '\n';
+      gzdbg << "Check ground contact of model " << name << '\n';
       // Check that velocity is small
       vel1 = model->GetWorldLinearVel();
+      t = world->GetSimTime().Double();
       EXPECT_NEAR(vel1.x, 0, PHYSICS_TOL);
       EXPECT_NEAR(vel1.y, 0, PHYSICS_TOL);
-      EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
+      if (name == "test_empty")
+        EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
+      else
+        EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
 
       // Check that model is resting on ground
       pose1 = model->GetWorldPose();
-      if (*iter == "test_box")
-        x0 = 0;
-      else if (*iter == "test_sphere")
-        x0 = 4;
-      else if (*iter == "test_cylinder")
-        x0 = 8;
+      x0 = modelPos[name].x;
       EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
       EXPECT_NEAR(pose1.pos.y, 0, PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.z, 0.5, PHYSICS_TOL);
+      if (name == "test_empty")
+      {
+        EXPECT_NEAR(pose1.pos.z, z0+g.z/2*t*t,
+            fabs((z0+g.z/2*t*t)*PHYSICS_TOL));
+      }
+      else
+        EXPECT_NEAR(pose1.pos.z, 0.5, PHYSICS_TOL);
     }
     else
     {
-      gzerr << "Error loading model " << *iter << '\n';
+      gzerr << "Error loading model " << name << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
@@ -204,13 +223,13 @@ void PhysicsTest::SpawnDrop(const std::string &_worldFile)
 
 TEST_F(PhysicsTest, SpawnDropODE)
 {
-  SpawnDrop("worlds/empty.world");
+  SpawnDrop("ode");
 }
 
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, SpawnDropBullet)
 {
-  SpawnDrop("worlds/empty_bullet.world");
+  SpawnDrop("bullet");
 }
 #endif  // HAVE_BULLET
 
@@ -230,16 +249,17 @@ TEST_F(PhysicsTest, SpawnDropBullet)
 // that they hit the ground at the same time. Also, sphere5 should start
 // rolling to the side when it hits the ground.
 ////////////////////////////////////////////////////////////////////////
-void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
+void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
 {
   // load an empty world
-  Load(_worldFile, true);
+  Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
   EXPECT_EQ(g.x, 0);
@@ -359,8 +379,8 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
       pose1 = model->GetWorldPose();
       EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL*PHYSICS_TOL);
       EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL*PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.z, z0+radius - g.z/2*t*t,
-                  (z0+radius-g.z/2*t*t)*PHYSICS_TOL);
+      EXPECT_NEAR(pose1.pos.z, z0+radius + g.z/2*t*t,
+                  (z0+radius+g.z/2*t*t)*PHYSICS_TOL);
 
       // Check once more and just make sure they keep falling
       world->StepWorld(steps);
@@ -441,13 +461,13 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
       // Use GetWorldLinearVel with global offset to check roll without slip
       // Expect small linear velocity at contact point
       math::Vector3 vel3 = model->GetLink()->GetWorldLinearVel(
-          math::Pose(0, 0, -radius, 0, 0, 0));
+          math::Vector3(0, 0, -radius), math::Quaternion(0, 0, 0));
       EXPECT_NEAR(vel3.x, 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.y, 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.z, 0, PHYSICS_TOL);
       // Expect speed at top of sphere to be double the speed at center
       math::Vector3 vel4 = model->GetLink()->GetWorldLinearVel(
-          math::Pose(0, 0, radius, 0, 0, 0));
+          math::Vector3(0, 0, radius), math::Quaternion(0, 0, 0));
       EXPECT_NEAR(vel4.y, 2*vel1.y, PHYSICS_TOL);
       EXPECT_NEAR(vel4.x, 2*vel1.x, PHYSICS_TOL);
       EXPECT_NEAR(vel4.z, 0, PHYSICS_TOL);
@@ -488,13 +508,13 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_worldFile)
 
 TEST_F(PhysicsTest, SpawnDropCoGOffsetODE)
 {
-  SpawnDropCoGOffset("worlds/empty.world");
+  SpawnDropCoGOffset("ode");
 }
 
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, SpawnDropCoGOffsetBullet)
 {
-  SpawnDropCoGOffset("worlds/empty_bullet.world");
+  SpawnDropCoGOffset("bullet");
 }
 #endif  // HAVE_BULLET
 
@@ -819,21 +839,25 @@ TEST_F(PhysicsTest, CollisionTest)
 
 TEST_F(PhysicsTest, SimplePendulumODE)
 {
-  SimplePendulum("worlds/simple_pendulums.world");
+  SimplePendulum("ode");
 }
 
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, SimplePendulumBullet)
 {
-  SimplePendulum("worlds/simple_pendulums_bullet.world");
+  SimplePendulum("bullet");
 }
 #endif  // HAVE_BULLET
 
-void PhysicsTest::SimplePendulum(const std::string &_worldFile)
+void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
-  Load(_worldFile, true);
+  Load("worlds/simple_pendulums.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   int i = 0;
   while (!this->HasEntity("model_1") && i < 20)

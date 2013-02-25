@@ -68,6 +68,7 @@ set (headers
   SystemPaths.hh
   Time.hh
   Timer.hh
+  UpdateInfo.hh
   Video.hh
  )
 

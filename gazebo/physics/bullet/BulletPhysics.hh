@@ -74,6 +74,10 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
+      public: virtual std::string GetType() const
+                      { return "bullet"; }
+
+      // Documentation inherited
       public: virtual void SetStepTime(double _value);
 
       // Documentation inherited

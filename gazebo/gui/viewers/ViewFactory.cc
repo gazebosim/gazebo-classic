@@ -20,10 +20,12 @@
 #include "gazebo/gui/viewers/ViewFactory.hh"
 
 #include "gazebo/gui/viewers/ImageView.hh"
+#include "gazebo/gui/viewers/ImagesView.hh"
 #include "gazebo/gui/viewers/LaserView.hh"
 #include "gazebo/gui/viewers/TextView.hh"
 
 void RegisterImageView();
+void RegisterImagesView();
 void RegisterLaserView();
 
 using namespace gazebo;
@@ -36,6 +38,7 @@ void ViewFactory::RegisterAll()
 {
   RegisterLaserView();
   RegisterImageView();
+  RegisterImagesView();
 }
 
 /////////////////////////////////////////////////
@@ -52,8 +55,9 @@ TopicView *ViewFactory::NewView(const std::string &_msgType,
 {
   TopicView *view = NULL;
 
-  if (viewMap[_msgType])
-    view = (viewMap[_msgType]) (_parent);
+  std::map<std::string, ViewFactoryFn>::iterator iter = viewMap.find(_msgType);
+  if (iter != viewMap.end())
+    view = (iter->second) (_parent);
   else
     view = new TextView(_parent, _msgType);
 

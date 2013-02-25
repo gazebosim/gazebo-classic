@@ -88,15 +88,18 @@ namespace gazebo
       /// \param[in] _topic The topic to advertise
       /// \param[in] _queueLimit The maximum number of outgoing messages to
       /// queue for delivery
+      /// \param[in] _hz Update rate for the publisher. Units are
+      /// 1.0/seconds.
       /// \return Pointer to new publisher object
       public: template<typename M>
       transport::PublisherPtr Advertise(const std::string &_topic,
-                                        unsigned int _queueLimit = 1000)
+                                        unsigned int _queueLimit = 1000,
+                                        double _hzRate = 0)
       {
         std::string decodedTopic = this->DecodeTopicName(_topic);
         PublisherPtr publisher =
           transport::TopicManager::Instance()->Advertise<M>(
-              decodedTopic, _queueLimit);
+              decodedTopic, _queueLimit, _hzRate);
 
         boost::recursive_mutex::scoped_lock lock(this->publisherMutex);
         this->publishers.push_back(publisher);
@@ -121,9 +124,11 @@ namespace gazebo
         std::string decodedTopic = this->DecodeTopicName(_topic);
         ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
 
-        boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-        this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
-              new CallbackHelperT<M>(boost::bind(_fp, _obj, _1), _latching)));
+        {
+          boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+          this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
+                new CallbackHelperT<M>(boost::bind(_fp, _obj, _1), _latching)));
+        }
 
         SubscriberPtr result =
           transport::TopicManager::Instance()->Subscribe(ops);
@@ -148,9 +153,11 @@ namespace gazebo
         std::string decodedTopic = this->DecodeTopicName(_topic);
         ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
 
-        boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-        this->callbacks[decodedTopic].push_back(
-            CallbackHelperPtr(new CallbackHelperT<M>(_fp, _latching)));
+        {
+          boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+          this->callbacks[decodedTopic].push_back(
+              CallbackHelperPtr(new CallbackHelperT<M>(_fp, _latching)));
+        }
 
         SubscriberPtr result =
           transport::TopicManager::Instance()->Subscribe(ops);
@@ -176,9 +183,11 @@ namespace gazebo
         std::string decodedTopic = this->DecodeTopicName(_topic);
         ops.Init(decodedTopic, shared_from_this(), _latching);
 
-        boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-        this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
-              new RawCallbackHelper(boost::bind(_fp, _obj, _1))));
+        {
+          boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+          this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
+                new RawCallbackHelper(boost::bind(_fp, _obj, _1))));
+        }
 
         SubscriberPtr result =
           transport::TopicManager::Instance()->Subscribe(ops);
@@ -202,9 +211,11 @@ namespace gazebo
         std::string decodedTopic = this->DecodeTopicName(_topic);
         ops.Init(decodedTopic, shared_from_this(), _latching);
 
-        boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-        this->callbacks[decodedTopic].push_back(
-            CallbackHelperPtr(new RawCallbackHelper(_fp)));
+        {
+          boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+          this->callbacks[decodedTopic].push_back(
+              CallbackHelperPtr(new RawCallbackHelper(_fp)));
+        }
 
         SubscriberPtr result =
           transport::TopicManager::Instance()->Subscribe(ops);

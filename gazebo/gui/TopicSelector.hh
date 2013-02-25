@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -81,6 +82,9 @@ namespace gazebo
 
       /// \brief The message type of the selected topic.
       private: std::string msgType;
+
+      /// \brief Previous update time.
+      private: common::Time prevTime;
     };
     /// \}
   }
