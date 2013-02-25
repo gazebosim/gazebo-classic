@@ -356,6 +356,9 @@ namespace gazebo
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);
 
+      /// \brief Accessor to inertia ratio across this joint
+      public: void GetInertiaRatio(int _index);
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
@@ -369,6 +372,11 @@ namespace gazebo
       /// This function is deprecated, use LoadImpl(math::Pose &)
       /// \param[in] _pos Position of the anchor.
       private: void LoadImpl(const math::Vector3 &_pos) GAZEBO_DEPRECATED;
+
+      /// \brief Computes inertiaRatio for this joint during Joint::Init
+      /// The inertia ratio for each joint between [1, +inf] gives a sense
+      /// of how well this model will perform in iterative LCP methods.
+      private: void ComputeInertiaRatio();
 
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;
@@ -408,6 +416,10 @@ namespace gazebo
 
       /// \brief Store Joint velocity limit as specified in SDF
       protected: double velocityLimit[2];
+
+      /// \brief Store Joint inertia ratio.  This is a measure of how well
+      /// this model behaves using interative LCP solvers.
+      protected: double inertiaRatio[2];
     };
     /// \}
   }

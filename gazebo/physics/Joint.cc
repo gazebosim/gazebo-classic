@@ -46,6 +46,8 @@ Joint::Joint(BasePtr _parent)
   this->effortLimit[1] = -1;
   this->velocityLimit[0] = -1;
   this->velocityLimit[1] = -1;
+  this->inertiaRatio[0] = 0;
+  this->inertiaRatio[1] = 0;
 }
 
 //////////////////////////////////////////////////
@@ -227,6 +229,7 @@ void Joint::Init()
       }
     }
   }
+  this->ComputeInertiaRatio();
 }
 
 //////////////////////////////////////////////////
@@ -444,4 +447,44 @@ void Joint::ApplyDamping()
 {
   double dampingForce = -this->dampingCoefficient * this->GetVelocity(0);
   this->SetForce(0, dampingForce);
+}
+
+//////////////////////////////////////////////////
+void Joint::ComputeInertiaRatio()
+{
+  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  {
+    math::Vector3 axis = this->GetGlobalAxis(i);
+    if (this->parentLink && this->childLink)
+    {
+      physics::InertialPtr pi = this->parentLink->GetInertial();
+      physics::InertialPtr ci = this->childLink->GetInertial();
+      math::Matrix3 pm(
+       pi->GetIXX(), pi->GetIXY(), pi->GetIXZ(),
+       pi->GetIXY(), pi->GetIYY(), pi->GetIYZ(),
+       pi->GetIXZ(), pi->GetIYZ(), pi->GetIZZ());
+      math::Matrix3 cm(
+       ci->GetIXX(), ci->GetIXY(), ci->GetIXZ(),
+       ci->GetIXY(), ci->GetIYY(), ci->GetIYZ(),
+       ci->GetIXZ(), ci->GetIYZ(), ci->GetIZZ());
+      // matrix times axis
+      math::Vector3 pia(
+        pm[0][0] * axis.x + pm[0][1] * axis.y + pm[0][2] * axis.z,
+        pm[1][0] * axis.x + pm[1][1] * axis.y + pm[1][2] * axis.z,
+        pm[2][0] * axis.x + pm[2][1] * axis.y + pm[2][2] * axis.z);
+      math::Vector3 cia(
+        cm[0][0] * axis.x + cm[0][1] * axis.y + cm[0][2] * axis.z,
+        cm[1][0] * axis.x + cm[1][1] * axis.y + cm[1][2] * axis.z,
+        cm[2][0] * axis.x + cm[2][1] * axis.y + cm[2][2] * axis.z);
+      double piam = pia.GetLength();
+      double ciam = cia.GetLength();
+      double ratio;
+
+      // should we flip? sure, so the measure of ratio is between [1, +inf]
+      if (piam > ciam)
+        this->inertiaRatio[i] = piam/ciam;
+      else
+        this->inertiaRatio[i] = ciam/piam;
+    }
+  }
 }
