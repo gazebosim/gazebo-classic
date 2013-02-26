@@ -23,22 +23,23 @@
 
 #include "msgs/msgs.hh"
 
-#include "common/Events.hh"
-#include "common/Console.hh"
-#include "common/Animation.hh"
-#include "common/KeyFrame.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Animation.hh"
+#include "gazebo/common/KeyFrame.hh"
 
-#include "transport/Publisher.hh"
-#include "transport/Transport.hh"
-#include "transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "physics/RayShape.hh"
-#include "physics/Collision.hh"
-#include "physics/Model.hh"
-#include "physics/Link.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Entity.hh"
+#include "gazebo/physics/RayShape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Entity.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -184,8 +185,8 @@ void Entity::SetAnimation(common::PoseAnimationPtr _anim)
   this->prevAnimationTime = this->world->GetSimTime();
   this->animation = _anim;
   this->onAnimationComplete.clear();
-  this->animationConnection = event::Events::ConnectWorldUpdateStart(
-      boost::bind(&Entity::UpdateAnimation, this));
+  this->animationConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&Entity::UpdateAnimation, this, _1));
 }
 
 //////////////////////////////////////////////////
@@ -197,8 +198,8 @@ void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
   this->prevAnimationTime = this->world->GetSimTime();
   this->animation = _anim;
   this->onAnimationComplete = _onComplete;
-  this->animationConnection = event::Events::ConnectWorldUpdateStart(
-      boost::bind(&Entity::UpdateAnimation, this));
+  this->animationConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&Entity::UpdateAnimation, this, _1));
 }
 
 //////////////////////////////////////////////////
@@ -208,7 +209,7 @@ void Entity::StopAnimation()
   this->onAnimationComplete.clear();
   if (this->animationConnection)
   {
-    event::Events::DisconnectWorldUpdateStart(this->animationConnection);
+    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
     this->animationConnection.reset();
   }
 }
@@ -216,12 +217,10 @@ void Entity::StopAnimation()
 //////////////////////////////////////////////////
 void Entity::PublishPose()
 {
-  math::Pose relativePose = this->GetRelativePose();
-  if (relativePose != msgs::Convert(*this->poseMsg))
-  {
-    msgs::Set(this->poseMsg, relativePose);
-    this->world->EnqueueMsg(this->poseMsg);
-  }
+  GZ_ASSERT(this->GetParentModel() != NULL,
+      "An entity without a parent model should not happen");
+
+  this->world->PublishModelPose(this->GetParentModel()->GetName());
 }
 
 //////////////////////////////////////////////////
@@ -465,6 +464,7 @@ ModelPtr Entity::GetParentModel()
     return boost::shared_dynamic_cast<Model>(shared_from_this());
 
   p = this->parent;
+  GZ_ASSERT(p, "Parent of an entity is NULL");
 
   while (p->GetParent() && p->GetParent()->HasType(MODEL))
     p = p->GetParent();
@@ -545,12 +545,11 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Entity::UpdateAnimation()
+void Entity::UpdateAnimation(const common::UpdateInfo &_info)
 {
   common::PoseKeyFrame kf(0);
 
-  this->animation->AddTime(
-      (this->world->GetSimTime() - this->prevAnimationTime).Double());
+  this->animation->AddTime((_info.simTime - this->prevAnimationTime).Double());
   this->animation->GetInterpolatedKeyFrame(kf);
 
   math::Pose offset;
@@ -558,11 +557,11 @@ void Entity::UpdateAnimation()
   offset.rot = kf.GetRotation();
 
   this->SetWorldPose(offset);
-  this->prevAnimationTime = this->world->GetSimTime();
+  this->prevAnimationTime = _info.simTime;
 
   if (this->animation->GetLength() <= this->animation->GetTime())
   {
-    event::Events::DisconnectWorldUpdateStart(this->animationConnection);
+    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
     this->animationConnection.reset();
     if (this->onAnimationComplete)
     {

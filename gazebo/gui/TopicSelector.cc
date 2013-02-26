@@ -16,9 +16,6 @@
  */
 
 #include "gazebo/transport/transport.hh"
-
-#include "gazebo/common/Events.hh"
-#include "gazebo/gui/JointControlWidget.hh"
 #include "gazebo/gui/TopicSelector.hh"
 
 using namespace gazebo;

@@ -100,9 +100,25 @@ std::string ModelDatabase::GetURI()
 bool ModelDatabase::HasModel(const std::string &_modelURI)
 {
   std::string uri = _modelURI;
+
+  size_t uriSeparator = uri.find("://");
+
+  // Make sure there is a URI separator
+  if (uriSeparator == std::string::npos)
+  {
+    gzerr << "URI[" << _modelURI << "] missing ://\n";
+    return false;
+  }
+
+  // Get only the model name from the URI
+  uriSeparator += 3;
+  size_t modelNameEnd = uri.find_first_of("/", uriSeparator);
+  uri = uri.substr(0, modelNameEnd);
+
   boost::replace_first(uri, "model://", ModelDatabase::GetURI());
 
   std::map<std::string, std::string> models = ModelDatabase::GetModels();
+
   for (std::map<std::string, std::string>::iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
@@ -166,7 +182,7 @@ std::string ModelDatabase::GetManifestImpl(const std::string &_uri)
     if (success != CURLE_OK)
     {
       gzwarn << "Unable to connect to model database using [" << _uri
-        << "]. Only locally installed models will be available.";
+        << "]. Only locally installed models will be available.\n";
     }
 
     curl_easy_cleanup(curl);
@@ -261,7 +277,13 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
   size_t size = 0;
 
   {
+    {
+      boost::mutex::scoped_try_lock tryLock(this->updateMutex);
+      if (!tryLock)
+        gzmsg << "Waiting for model database update to complete...\n";
+    }
     boost::mutex::scoped_lock lock(this->updateMutex);
+
     size = this->modelCache.size();
   }
 
@@ -329,9 +351,14 @@ std::string ModelDatabase::GetModelName(const std::string &_uri)
 }
 
 /////////////////////////////////////////////////
-std::string ModelDatabase::GetModelPath(const std::string &_uri)
+std::string ModelDatabase::GetModelPath(const std::string &_uri,
+                                        bool _forceDownload)
 {
-  std::string path = SystemPaths::Instance()->FindFileURI(_uri);
+  std::string path, suffix;
+
+  if (!_forceDownload)
+    path = SystemPaths::Instance()->FindFileURI(_uri);
+
   struct stat st;
 
   if (path.empty() || stat(path.c_str(), &st) != 0 )
@@ -346,8 +373,21 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
     // std::cout << "Getting uri[" << _uri << "] path[" << path << "]\n";
 
     // Get the model name from the uri
-    int index = _uri.find_last_of("/");
-    std::string modelName = _uri.substr(index+1, _uri.size() - index - 1);
+    size_t startIndex = _uri.find_first_of("://");
+    if (startIndex == std::string::npos)
+    {
+      gzerr << "URI[" << _uri << "] is missing ://\n";
+      return std::string();
+    }
+    startIndex += 3;
+
+    size_t endIndex = _uri.find_first_of("/", startIndex);
+    size_t modelNameLen = endIndex == std::string::npos ? std::string::npos :
+      endIndex - startIndex;
+
+    std::string modelName = _uri.substr(startIndex, modelNameLen);
+    if (endIndex != std::string::npos)
+      suffix = _uri.substr(endIndex, std::string::npos);
 
     // store zip file in temp location
     std::string filename = "/tmp/gz_model.tar.gz";
@@ -358,6 +398,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
       gzerr << "Unable to initialize libcurl\n";
       return std::string();
     }
+
     curl_easy_setopt(curl, CURLOPT_URL,
         (ModelDatabase::GetURI() + "/" +
          modelName + "/model.tar.gz").c_str());
@@ -434,7 +475,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
     }
   }
 
-  return path;
+  return path + suffix;
 }
 
 /////////////////////////////////////////////////

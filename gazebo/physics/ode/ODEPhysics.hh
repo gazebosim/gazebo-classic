@@ -89,6 +89,10 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
+      public: virtual std::string GetType() const
+                      { return "ode"; }
+
+      // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
       // Documentation inherited
