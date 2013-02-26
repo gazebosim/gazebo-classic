@@ -133,6 +133,20 @@ namespace gazebo
 
       public: virtual void DebugPrint() const;
 
+      /// Documentation inherited
+      public: virtual void SetAttribute(PhysicsAttribute _attr,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual void SetAttribute(const std::string &_key,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual boost::any GetAttribute(const std::string &_key) const;
+
+      /// Documentation inherited
+      public: virtual boost::any GetAttribute(PhysicsAttribute _attr) const;
+
       private: btBroadphaseInterface *broadPhase;
       private: btDefaultCollisionConfiguration *collisionConfig;
       private: btCollisionDispatcher *dispatcher;
