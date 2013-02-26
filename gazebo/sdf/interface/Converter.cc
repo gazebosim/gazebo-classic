@@ -275,11 +275,7 @@ void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
   {
     fromElem = fromElem->FirstChildElement(fromTokens[i]);
     if (!fromElem)
-    {
-      gzerr << "Cannot find element: '" << fromTokens[i]
-          << "' in from string: '" << fromStr << "'\n";
       return;
-    }
   }
 
   const char *fromName = fromTokens[fromTokens.size()-1].c_str();

@@ -42,6 +42,38 @@ namespace gazebo
     /// \brief Base class for a physics engine.
     class PhysicsEngine
     {
+      /// \enum Attribute
+      /// \brief Physics attribute types.
+      public: enum PhysicsAttribute
+      {
+        /// \brief Constraint force mixing
+        GLOBAL_CFM,
+
+        /// \brief Error reduction parameter
+        GLOBAL_ERP,
+
+        /// \brief True to enable auto disabling of bodies
+        AUTO_DISABLE,
+
+        /// \brief Number of iterations
+        SOR_PGS_PRECON_ITERS,
+
+        /// \brief Number of iterations
+        SOR_PGS_ITERS,
+
+        /// \brief SOR over-relaxation parameter
+        SOR_PGS_W,
+
+        /// \brief Max correcting velocity
+        CONTACT_MAX_CORRECTING_VEL,
+
+        /// \brief Surface layer depth
+        CONTACT_SURFACE_LAYER,
+
+        /// \brief Maximum number of contacts
+        MAX_CONTACTS
+      };
+
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
       public: explicit PhysicsEngine(WorldPtr _world);
