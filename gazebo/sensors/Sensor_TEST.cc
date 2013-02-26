@@ -25,7 +25,6 @@ class Sensor_TEST : public ServerFixture
 {
 };
 
-boost::mutex g_countMutex;
 boost::condition_variable g_countCondition;
 
 // global variable and callback for tracking hokuyo sensor messages
@@ -75,7 +74,8 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
 
   // Wait for messages to arrive
   {
-    boost::mutex::scoped_lock lock(g_countMutex);
+    boost::mutex countMutex;
+    boost::mutex::scoped_lock lock(countMutex);
     g_countCondition.wait(lock);
   }
 
