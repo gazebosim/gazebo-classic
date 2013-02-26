@@ -34,14 +34,14 @@ BulletJoint::BulletJoint(BasePtr _parent)
   : Joint(_parent)
 {
   this->constraint = NULL;
-  this->world = NULL;
+  this->bulletWorld = NULL;
 }
 
 //////////////////////////////////////////////////
 BulletJoint::~BulletJoint()
 {
   delete this->constraint;
-  this->world = NULL;
+  this->bulletWorld = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -97,7 +97,8 @@ void BulletJoint::Detach()
 {
   this->childLink.reset();
   this->parentLink.reset();
-
+  if (this->constraint && this->bulletWorld)
+    this->bulletWorld->removeConstraint(this->constraint);
   delete this->constraint;
 }
 

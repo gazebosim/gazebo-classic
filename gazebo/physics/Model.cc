@@ -190,6 +190,12 @@ void Model::Init()
        iter != this->joints.end(); ++iter)
   {
     (*iter)->Init();
+    // The following message used to be filled and sent in Model::LoadJoint
+    // It is moved here, after Joint::Init, so that the joint properties
+    // can be included in the message.
+    msgs::Joint msg;
+    (*iter)->FillMsg(msg);
+    this->jointPub->Publish(msg);
   }
 
   for (std::vector<Gripper*>::iterator iter = this->grippers.begin();
@@ -641,10 +647,6 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 
   if (this->GetJoint(joint->GetScopedName()) != NULL)
     gzthrow("can't have two joint with the same name");
-
-  msgs::Joint msg;
-  joint->FillMsg(msg);
-  this->jointPub->Publish(msg);
 
   this->joints.push_back(joint);
 
