@@ -66,7 +66,7 @@ namespace gazebo
                 this->data = _data;
               }
 
-      /// \bried Overridden function from tbb::task that exectues the data
+      /// \brief Overridden function from tbb::task that exectues the data
       /// callback.
       public: tbb::task *execute()
               {

@@ -13,6 +13,7 @@ set (msgs
   contactsensor.proto
   cylindergeom.proto
   diagnostics.proto
+  diagnostic_control.proto
   factory.proto
   fog.proto
   friction.proto

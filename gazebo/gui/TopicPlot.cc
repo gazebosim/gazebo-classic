@@ -101,6 +101,12 @@ void TopicPlot::Init(const std::string &_topic, const std::string &_field)
 }
 
 /////////////////////////////////////////////////
+void TopicPlot::SetPeriod(unsigned int _seconds)
+{
+  this->plot->SetPeriod(_seconds);
+}
+
+/////////////////////////////////////////////////
 void TopicPlot::Update()
 {
   boost::mutex::scoped_lock lock(this->mutex);
@@ -118,7 +124,6 @@ void TopicPlot::OnClock(ConstTimePtr &_msg)
 /////////////////////////////////////////////////
 void TopicPlot::OnMsg(const std::string &_msg)
 {
-  std::vector<std::string>::iterator iter;
   size_t openBracketIndex = std::string::npos;
   bool failed = false;
 
@@ -131,7 +136,8 @@ void TopicPlot::OnMsg(const std::string &_msg)
   const google::protobuf::Reflection *reflection = tmpMsg->GetReflection();
 
   // Loop through all the fields, except the last
-  for (iter = this->fields.begin(); iter != this->fields.end() - 1; ++iter)
+  std::vector<std::string>::iterator iter = this->fields.begin();
+  for (; iter != this->fields.end() - 1; ++iter)
   {
     if (!descriptor || !reflection)
     {
@@ -287,6 +293,12 @@ void TopicPlot::OnMsg(const std::string &_msg)
   // The last thing iter contains is the name of the field with the 
   // value to plot. Get the protobuf field now.
   field = descriptor->FindFieldByName(*iter);
+
+  if (!field)
+  {
+    gzerr << "Unable to get field[" << *iter << "] for plotting\n";
+    return;
+  }
 
   // TODO Get the type of the field, and cast to double.
   // Get the value of the field.

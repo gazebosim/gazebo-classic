@@ -31,8 +31,9 @@ using namespace util;
 //////////////////////////////////////////////////
 DiagnosticManager::DiagnosticManager()
 {
-  this->node = transport::NodePtr(new transport::Node());
+  this->enabled = false;
 
+  this->node = transport::NodePtr(new transport::Node());
   // Get the base of the time logging path
   if (!getenv("HOME"))
   {
@@ -48,27 +49,35 @@ DiagnosticManager::DiagnosticManager()
 
   this->logPath = this->logPath / "diagnostics" /
     common::Time::GetWallTimeAsISOString();
-
-  // Make sure the path exists.
-  if (!boost::filesystem::exists(this->logPath))
-    boost::filesystem::create_directories(this->logPath);
 }
 
 //////////////////////////////////////////////////
 DiagnosticManager::~DiagnosticManager()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
 void DiagnosticManager::Init(const std::string &_worldName)
 {
   this->node->Init(_worldName);
-
   this->pub = this->node->Advertise<msgs::Diagnostics>("~/diagnostics");
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&DiagnosticManager::Update, this, _1));
+  this->controlSub = this->node->Subscribe("~/diagnostic/control",
+      &DiagnosticManager::OnControl, this, true);
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::Fini()
+{
+  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+
+  // Stop all the timers
+  for (TimerMap::iterator iter = this->timers.begin();
+       iter != this->timers.end(); ++iter)
+  {
+    iter->second->Stop();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -129,7 +138,10 @@ void DiagnosticManager::StopTimer(const std::string &_name)
     iter->second->Stop();
   }
   else
-    gzerr << "Unable to find timer[" << _name << "]\n";
+  {
+    // Don't output a warning message. It's possible to endable Diagnostics
+    // in the middle of a DIAG_START and DIAG_STOP.
+  }
 }
 
 //////////////////////////////////////////////////
@@ -139,13 +151,16 @@ void DiagnosticManager::Lap(const std::string &_name,
   TimerMap::iterator iter;
   iter = this->timers.find(_name);
 
-  if (iter == this->timers.end())
-    gzerr << "Unable to find timer with name[" << _name << "]\n";
-  else
+  if (iter != this->timers.end())
   {
     GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
 
     iter->second->Lap(_prefix);
+  }
+  else
+  {
+    // Don't output a warning message. It's possible to endable Diagnostics
+    // in the middle of a DIAG_START and DIAG_STOP.
   }
 }
 
@@ -205,6 +220,48 @@ common::Time DiagnosticManager::GetTime(const std::string &_label) const
     gzerr << "Error getting time\n";
 
   return common::Time();
+}
+
+//////////////////////////////////////////////////
+bool DiagnosticManager::GetEnabled() const
+{
+  return this->enabled;
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::SetEnabled(bool _enabled)
+{
+  this->enabled = _enabled;
+
+  if (this->enabled)
+  {
+    // Make sure the path exists.
+    if (!boost::filesystem::exists(this->logPath))
+      boost::filesystem::create_directories(this->logPath);
+
+    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+        boost::bind(&DiagnosticManager::Update, this, _1));
+
+    _diagStartPtr = &_DiagnosticManager_Start;
+    _diagStopPtr = &_DiagnosticManager_Stop;
+    _diagLapPtr = &_DiagnosticManager_Lap;
+  }
+  else
+  {
+    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+
+    _diagStartPtr = &_DiagnosticManager_Noop1;
+    _diagStopPtr = &_DiagnosticManager_Noop1;
+    _diagLapPtr = &_DiagnosticManager_Noop2;
+
+  }
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::OnControl(ConstDiagnosticControlPtr &_msg)
+{
+  if (_msg->has_enabled())
+    this->SetEnabled(_msg->enabled());
 }
 
 //////////////////////////////////////////////////

@@ -29,7 +29,9 @@ int main(int _argc, char **_argv)
 {
   po::options_description vDesc("Allowed options");
   vDesc.add_options()
-    ("help,h", "print help message");
+    ("help,h", "print help message")
+    ("period,p", po::value<unsigned int>(), 
+     "Period length in seconds. Default[10]");
 
   po::options_description hDesc("Hidden options");
   hDesc.add_options()
@@ -74,6 +76,10 @@ int main(int _argc, char **_argv)
   if (vm.count("field"))
     field = vm["field"].as<std::string>();
 
+  unsigned int period = 10;
+  if (vm.count("period"))
+    period = vm["period"].as<unsigned int>();
+
   if (!gazebo::load())
   {
     printf("load error\n");
@@ -91,6 +97,7 @@ int main(int _argc, char **_argv)
 
   gazebo::gui::TopicPlot *plot = new gazebo::gui::TopicPlot(NULL);
   plot->Init(topic, field);
+  plot->SetPeriod(period);
   plot->show();
 
   if (!gazebo::init())

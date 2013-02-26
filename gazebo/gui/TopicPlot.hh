@@ -45,6 +45,10 @@ namespace gazebo
       /// \brief Setup to plot a specific topic.
       public: void Init(const std::string &_topic, const std::string &_field);
 
+      /// \brief Set the period over which to plot.
+      /// \param[in] _seconds Period duration in seconds.
+      public: void SetPeriod(unsigned int _seconds);
+
       /// \brief Called when a message is recieved.
       /// \param[in] _msg Message data.
       private: void OnMsg(const std::string &_msg);

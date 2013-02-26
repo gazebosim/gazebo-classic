@@ -45,12 +45,10 @@ namespace gazebo
     /// \addtogroup gazebo_util Utility
     /// \{
 
-#ifdef ENABLE_DIAGNOSTICS
     /// \brief Start a diagnostic timer. Make sure to run DIAG_TIMER_STOP to
     /// stop the timer.
     /// \param[in] _name Name of the timer to start.
-    #define DIAG_TIMER_START(_name) \
-    gazebo::util::DiagnosticManager::Instance()->StartTimer(_name);
+    #define DIAG_TIMER_START(_name) (*gazebo::util::_diagStartPtr)(_name);
 
     /// \brief Output a lap time annotated with a prefix string. A lap is
     /// the time from last call to DIAG_TIMER_LAP or DIAG_TIMER_START, which
@@ -58,17 +56,11 @@ namespace gazebo
     /// \param[in] _name Name of the timer.
     /// \param[in] _prefix String for annotation.
     #define DIAG_TIMER_LAP(_name, _prefix) \
-    gazebo::util::DiagnosticManager::Instance()->Lap(_name, _prefix);
+    (*gazebo::util::_diagLapPtr)(_name, _prefix);
 
     /// \brief Stop a diagnostic timer.
     /// \param[in] name Name of the timer to stop
-    #define DIAG_TIMER_STOP(_name) \
-    gazebo::util::DiagnosticManager::Instance()->StopTimer(_name);
-#else
-    #define DIAG_TIMER_START(_name) ((void) 0)
-    #define DIAG_TIMER_LAP(_name, _prefix) ((void)0)
-    #define DIAG_TIMER_STOP(_name) ((void) 0)
-#endif
+    #define DIAG_TIMER_STOP(_name) (*gazebo::util::_diagStopPtr)(_name);
 
     /// \class DiagnosticManager Diagnostics.hh util/util.hh
     /// \brief A diagnostic manager class
@@ -83,6 +75,9 @@ namespace gazebo
       /// \brief Initialize to report diagnostics about a world.
       /// \param[in] _worldName Name of the world.
       public: void Init(const std::string &_worldName);
+
+      /// \brief Shutdown diagnostics.
+      public: void Fini();
 
       /// \brief Start a new timer instance
       /// \param[in] _name Name of the timer.
@@ -123,6 +118,14 @@ namespace gazebo
       /// \return The path in which logs are stored.
       public: boost::filesystem::path GetLogPath() const;
 
+      /// \brief Returns true if diagnostics is active.
+      /// \return True when generating diagnostic information.
+      public: bool GetEnabled() const;
+
+      /// \brief Set whether diagnostics is active.
+      /// \param[in] _enabled True to enable diagnostics.
+      public: void SetEnabled(bool _enabled);
+
       /// \brief Publishes diagnostic information.
       /// \param[in] _info World update information.
       private: void Update(const common::UpdateInfo &_info);
@@ -134,6 +137,9 @@ namespace gazebo
       /// measurement.
       private: void AddTime(const std::string &_name, common::Time &_wallTime,
                    common::Time &_elapsedtime);
+
+      /// \brief Recive control messages.
+      private: void OnControl(ConstDiagnosticControlPtr &_msg);
 
       /// \brief Map of all the active timers.
       private: typedef std::map<std::string, DiagnosticTimerPtr> TimerMap;
@@ -150,11 +156,17 @@ namespace gazebo
       /// \brief Publisher of diagnostic data.
       private: transport::PublisherPtr pub;
 
+      /// \brief Listen to control messages
+      private: transport::SubscriberPtr controlSub;
+
       /// \brief The message to output
       private: msgs::Diagnostics msg;
 
       /// \brief Pointer to the update event connection
       private: event::ConnectionPtr updateConnection;
+
+      /// \brief True if diagnostics are enabled.
+      private: bool enabled;
 
       // Singleton implementation
       private: friend class SingletonT<DiagnosticManager>;
@@ -199,6 +211,48 @@ namespace gazebo
       private: common::Time prevLap;
     };
     /// \}
+   
+    /// \cond 
+    /// \brief A no-op function used by Diagnostics when it is disabled.
+    static inline void _DiagnosticManager_Noop1(const std::string &/*_name*/) {}
+
+    /// \brief A no-op function used by Diagnostics when it is disabled.
+    static inline void _DiagnosticManager_Noop2(const std::string &/*_name*/,
+        const std::string &/*_prefix*/) {}
+
+    /// \brief Function used to start a timer.
+    /// \param[in] _name Name of the timer to start
+    static inline void _DiagnosticManager_Start(const std::string &_name)
+    {
+      gazebo::util::DiagnosticManager::Instance()->StartTimer(_name);
+    }
+
+    /// \brief Function used to stop a timer.
+    /// \param[in] _name Name of the timer to stop
+    static inline void _DiagnosticManager_Stop(const std::string &_name)
+    {
+      gazebo::util::DiagnosticManager::Instance()->StopTimer(_name);
+    }
+
+    /// \brief Function used to produce a lap time.
+    /// \param[in] _name Name of the timer
+    /// \param[in] _prefix String to accompany the lap time.
+    static inline void _DiagnosticManager_Lap(const std::string &_name,
+                                              const std::string &_prefix)
+    {
+      gazebo::util::DiagnosticManager::Instance()->Lap(_name, _prefix);
+    }
+
+    /// \brief Function pointer to start a timer.
+    void (*_diagStartPtr)(const std::string &_name) = &_DiagnosticManager_Noop1;
+
+    /// \brief Function pointer to lap a timer.
+    void (*_diagLapPtr)(const std::string &_name, const std::string &_prefix) =
+      &_DiagnosticManager_Noop2;
+
+    /// \brief Function pointer to stop a timer.
+    void (*_diagStopPtr)(const std::string &_name) = &_DiagnosticManager_Noop1;
+    /// \endcond 
   }
 }
 #endif

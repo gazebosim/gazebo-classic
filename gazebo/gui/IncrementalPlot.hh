@@ -84,6 +84,10 @@ namespace gazebo
       /// \return A pointer to the new curve.
       public: QwtPlotCurve *AddCurve(const QString &_label);
 
+      /// \brief Set the period over which to plot.
+      /// \param[in] _seconds Period duration in seconds.
+      public: void SetPeriod(unsigned int _seconds);
+
       /// \brief Used to accept drag enter events.
       /// \param[in] _evt The drag event.
       protected: void dragEnterEvent(QDragEnterEvent *_evt);
@@ -108,6 +112,9 @@ namespace gazebo
 
       /// \brief Pointer to the plot maginfier
       private: QwtPlotMagnifier *magnifier;
+
+      /// \brief Period duration in seconds.
+      private: unsigned int period;
     };
   }
 }
