@@ -33,7 +33,7 @@ using namespace physics;
 BulletHingeJoint::BulletHingeJoint(btDynamicsWorld *_world, BasePtr _parent)
     : HingeJoint<BulletJoint>(_parent)
 {
-  GZ_ASSERT(_world, "bullet world pointer is NULL\n");
+  GZ_ASSERT(_world, "bullet world pointer is NULL");
   this->bulletWorld = _world;
   this->bulletHinge = NULL;
   this->angleOffset = 0;
@@ -159,7 +159,7 @@ void BulletHingeJoint::Init()
     this->angleOffset + limitElem->GetValueDouble("upper"));
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL\n");
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
   this->bulletWorld->addConstraint(this->bulletHinge, true);
 
   // Allows access to impulse
