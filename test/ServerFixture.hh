@@ -535,13 +535,15 @@ class ServerFixture : public testing::Test
              }
 
   protected: void SpawnCylinder(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _static = false)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
                  << "<pose>" << _pos.x << " "
                              << _pos.y << " "
                              << _pos.z << " "
@@ -578,13 +580,14 @@ class ServerFixture : public testing::Test
 
   protected: void SpawnSphere(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
-                 bool _wait = true)
+                 bool _wait = true, bool _static = false)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
                  << "<pose>" << _pos.x << " "
                              << _pos.y << " "
                              << _pos.z << " "
@@ -617,13 +620,14 @@ class ServerFixture : public testing::Test
   protected: void SpawnSphere(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  const math::Vector3 &_cog, double _radius,
-                 bool _wait = true)
+                 bool _wait = true, bool _static = false)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
                  << "<pose>" << _pos.x << " "
                              << _pos.y << " "
                              << _pos.z << " "
@@ -658,13 +662,14 @@ class ServerFixture : public testing::Test
 
   protected: void SpawnBox(const std::string &_name,
                  const math::Vector3 &_size, const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy)
+                 const math::Vector3 &_rpy, bool _static = false)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
                  << "<pose>" << _pos.x << " "
                              << _pos.y << " "
                              << _pos.z << " "
@@ -696,13 +701,15 @@ class ServerFixture : public testing::Test
 
   protected: void SpawnTrimesh(const std::string &_name,
                  const std::string &_modelPath, const math::Vector3 &_scale,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _static = false)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
                  << "<pose>" << _pos.x << " "
                              << _pos.y << " "
                              << _pos.z << " "
@@ -736,14 +743,15 @@ class ServerFixture : public testing::Test
              }
 
   protected: void SpawnEmptyLink(const std::string &_name,
-                 const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy)
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _static = false)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
                  << "<pose>" << _pos.x << " "
                              << _pos.y << " "
                              << _pos.z << " "
