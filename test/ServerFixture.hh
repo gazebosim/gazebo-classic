@@ -780,10 +780,6 @@ class ServerFixture : public testing::Test
 
   protected: void SpawnSDF(const std::string &_sdf)
              {
-               // Wait for the first pose message
-               while (this->poses.size() == 0)
-                 common::Time::MSleep(10);
-
                msgs::Factory msg;
                msg.set_sdf(_sdf);
                this->factoryPub->Publish(msg);
