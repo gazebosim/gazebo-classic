@@ -61,7 +61,8 @@ namespace gazebo
                 math::Vector3 n = this->GetNormal();
                 btVector3 vec(n.x, n.y, n.z);
 
-                bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0));
+                bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0),
+                    false);
               }
     };
     /// \}

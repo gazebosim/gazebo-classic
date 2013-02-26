@@ -18,12 +18,13 @@
  * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletHingeJoint.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletHingeJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -32,7 +33,8 @@ using namespace physics;
 BulletHingeJoint::BulletHingeJoint(btDynamicsWorld *_world, BasePtr _parent)
     : HingeJoint<BulletJoint>(_parent)
 {
-  this->world = _world;
+  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  this->bulletWorld = _world;
   this->bulletHinge = NULL;
   this->angleOffset = 0;
 }
@@ -49,9 +51,9 @@ void BulletHingeJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletHingeJoint::Init()
 {
-  HingeJoint<BulletJoint>::Attach(_one, _two);
+  HingeJoint<BulletJoint>::Init();
 
   // Cast to BulletLink
   BulletLinkPtr bulletChildLink =
@@ -59,29 +61,35 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   BulletLinkPtr bulletParentLink =
     boost::shared_static_cast<BulletLink>(this->parentLink);
 
-  // Get axis from sdf.
-  sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-  math::Vector3 axis = axisElem->GetValueVector3("xyz");
+  // Get axis unit vector (expressed in world frame).
+  math::Vector3 axis = this->initialWorldAxis;
+  if (axis == math::Vector3::Zero)
+  {
+    gzerr << "axis must have non-zero length, resetting to 0 0 1\n";
+    axis.Set(0, 0, 1);
+  }
 
   // Local variables used to compute pivots and axes in body-fixed frames
   // for the parent and child links.
-  math::Vector3 pivotA, pivotB, axisA, axisB;
+  math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
   math::Pose pose;
 
-  // Initialize pivot[AB] to anchorPos, which is expressed in the
+  // Initialize pivots to anchorPos, which is expressed in the
   // world coordinate frame.
-  pivotA = this->anchorPos;
-  pivotB = this->anchorPos;
+  pivotParent = this->anchorPos;
+  pivotChild = this->anchorPos;
+
   // Check if parentLink exists. If not, the parent will be the world.
   if (this->parentLink)
   {
     // Compute relative pose between joint anchor and CoG of parent link.
     pose = this->parentLink->GetWorldCoGPose();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotA -= pose.pos;
+    pivotParent -= pose.pos;
     // Rotate pivot offset and axis into body-fixed frame of parent.
-    pivotA = pose.rot.RotateVectorReverse(pivotA);
-    axisA = pose.rot.RotateVectorReverse(axis);
+    pivotParent = pose.rot.RotateVectorReverse(pivotParent);
+    axisParent = pose.rot.RotateVectorReverse(axis);
+    axisParent = axisParent.Normalize();
   }
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
@@ -89,25 +97,23 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
     // Compute relative pose between joint anchor and CoG of child link.
     pose = this->childLink->GetWorldCoGPose();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotB -= pose.pos;
+    pivotChild -= pose.pos;
     // Rotate pivot offset and axis into body-fixed frame of child.
-    pivotB = pose.rot.RotateVectorReverse(pivotB);
-    axisB = pose.rot.RotateVectorReverse(axis);
+    pivotChild = pose.rot.RotateVectorReverse(pivotChild);
+    axisChild = pose.rot.RotateVectorReverse(axis);
+    axisChild = axisChild.Normalize();
   }
-
-  axisA = axisA.Round();
-  axisB = axisB.Round();
 
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
     this->bulletHinge = new btHingeConstraint(
-        *(bulletParentLink->GetBulletLink()),
         *(bulletChildLink->GetBulletLink()),
-        BulletTypes::ConvertVector3(pivotA),
-        BulletTypes::ConvertVector3(pivotB),
-        BulletTypes::ConvertVector3(axisA),
-        BulletTypes::ConvertVector3(axisB));
+        *(bulletParentLink->GetBulletLink()),
+        BulletTypes::ConvertVector3(pivotChild),
+        BulletTypes::ConvertVector3(pivotParent),
+        BulletTypes::ConvertVector3(axisChild),
+        BulletTypes::ConvertVector3(axisParent));
   }
   // If only the child exists, then create a joint between the child
   // and the world.
@@ -115,8 +121,8 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   {
     this->bulletHinge = new btHingeConstraint(
         *(bulletChildLink->GetBulletLink()),
-        btVector3(pivotB.x, pivotB.y, pivotB.z),
-        btVector3(axisB.x, axisB.y, axisB.z));
+        BulletTypes::ConvertVector3(pivotChild),
+        BulletTypes::ConvertVector3(axisChild));
   }
   // If only the parent exists, then create a joint between the parent
   // and the world.
@@ -124,14 +130,17 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   {
     this->bulletHinge = new btHingeConstraint(
         *(bulletParentLink->GetBulletLink()),
-        btVector3(pivotA.x, pivotA.y, pivotA.z),
-        btVector3(axisA.x, axisA.y, axisA.z));
+        BulletTypes::ConvertVector3(pivotParent),
+        BulletTypes::ConvertVector3(axisParent));
   }
   // Throw an error if no links are given.
   else
   {
     gzthrow("joint without links\n");
   }
+
+  if (!this->bulletHinge)
+    gzthrow("unable to create bullet hinge constraint\n");
 
   // Give parent class BulletJoint a pointer to this constraint.
   this->constraint = this->bulletHinge;
@@ -140,11 +149,18 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   // GetAngleImpl will report angles relative to this offset.
   this->angleOffset = this->bulletHinge->getHingeAngle();
 
-  // TODO: apply joint limits here.
-  // this->bulletHinge->setLimit(angle - .4, angle + .4);
+  // Apply joint angle limits here.
+  // TODO: velocity and effort limits.
+  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+  sdf::ElementPtr limitElem;
+  limitElem = this->sdf->GetElement("axis")->GetElement("limit");
+  this->bulletHinge->setLimit(
+    this->angleOffset + limitElem->GetValueDouble("lower"),
+    this->angleOffset + limitElem->GetValueDouble("upper"));
 
   // Add the joint to the world
-  this->world->addConstraint(this->bulletHinge, true);
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
+  this->bulletWorld->addConstraint(this->bulletHinge, true);
 
   // Allows access to impulse
   this->bulletHinge->enableFeedback(true);
@@ -168,8 +184,20 @@ void BulletHingeJoint::SetAnchor(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
+void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 {
+  // Note that _axis is given in a world frame,
+  // but bullet uses a body-fixed frame
+  if (this->bulletHinge == NULL)
+  {
+    // this hasn't been initialized yet, store axis in initialWorldAxis
+    this->initialWorldAxis = _axis;
+  }
+  else
+  {
+    gzerr << "SetAxis for existing joint is not implemented\n";
+  }
+
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
   // points
   /*btmath::Vector3 vec(_axis.x, _axis.y, _axis.z);
@@ -187,7 +215,7 @@ void BulletHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
 math::Angle BulletHingeJoint::GetAngleImpl(int /*_index*/) const
 {
   math::Angle result;
-  if (this->bulletHinge != NULL)
+  if (this->bulletHinge)
     result = this->bulletHinge->getHingeAngle() - this->angleOffset;
   else
     gzwarn << "bulletHinge does not exist, returning default angle\n";
@@ -204,8 +232,13 @@ void BulletHingeJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 //////////////////////////////////////////////////
 double BulletHingeJoint::GetVelocity(int /*_index*/) const
 {
-  gzerr << "Not implemented...\n";
-  return 0;
+  double result = 0;
+  math::Vector3 globalAxis = this->GetGlobalAxis(0);
+  if (this->childLink)
+    result += globalAxis.Dot(this->childLink->GetWorldAngularVel());
+  if (this->parentLink)
+    result -= globalAxis.Dot(this->parentLink->GetWorldAngularVel());
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -244,61 +277,59 @@ void BulletHingeJoint::SetForce(int _index, double _effort)
     _effort = math::clamp(_effort, -this->effortLimit[_index],
        this->effortLimit[_index]);
 
-  // math::Vector3 axis = this->GetLocalAxis(_index);
-  // this->bulletHinge->enableAngularMotor(true);
+  if (this->bulletHinge)
+  {
+    BulletJoint::SetForce(_index, _effort);
 
-  // z-axis of constraint frame
-  btVector3 hingeAxisLocal =
-    this->bulletHinge->getAFrame().getBasis().getColumn(2);
+    // z-axis of constraint frame
+    btVector3 hingeAxisLocalA =
+      this->bulletHinge->getFrameOffsetA().getBasis().getColumn(2);
+    btVector3 hingeAxisLocalB =
+      this->bulletHinge->getFrameOffsetB().getBasis().getColumn(2);
 
-  btVector3 hingeAxisWorld =
-    this->bulletHinge->getRigidBodyA().getWorldTransform().getBasis() *
-    hingeAxisLocal;
+    btVector3 hingeAxisWorldA =
+      this->bulletHinge->getRigidBodyA().getWorldTransform().getBasis() *
+      hingeAxisLocalA;
+    btVector3 hingeAxisWorldB =
+      this->bulletHinge->getRigidBodyB().getWorldTransform().getBasis() *
+      hingeAxisLocalB;
 
-  btVector3 hingeTorque = _effort * hingeAxisWorld;
+    btVector3 hingeTorqueA = _effort * hingeAxisWorldA;
+    btVector3 hingeTorqueB = _effort * hingeAxisWorldB;
 
-  this->bulletHinge->getRigidBodyA().applyTorque(hingeTorque);
-  this->bulletHinge->getRigidBodyB().applyTorque(-hingeTorque);
-}
-
-//////////////////////////////////////////////////
-double BulletHingeJoint::GetForce(int /*_index*/)
-{
-  return this->bulletHinge->getAppliedImpulse();
+    this->bulletHinge->getRigidBodyA().applyTorque(hingeTorqueA);
+    this->bulletHinge->getRigidBodyB().applyTorque(-hingeTorqueB);
+  }
 }
 
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetHighStop(int /*_index*/,
-                                   const math::Angle &/*_angle*/)
+                      const math::Angle &_angle)
 {
+  Joint::SetHighStop(0, _angle);
   if (this->bulletHinge)
   {
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    // this->bulletHinge->setLimit(this->bulletHinge->getLowerLimit(),
-    //                         _angle.Radian());
-  }
-  else
-  {
-    gzthrow("Joint must be created first");
+    this->bulletHinge->setLimit(this->bulletHinge->getLowerLimit(),
+                                this->angleOffset + _angle.Radian());
   }
 }
 
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetLowStop(int /*_index*/,
-                                  const math::Angle &/*_angle*/)
+                     const math::Angle &_angle)
 {
+  Joint::SetLowStop(0, _angle);
   if (this->bulletHinge)
   {
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    // this->bulletHinge->setLimit(-_angle.Radian(),
-    //                         this->bulletHinge->getUpperLimit());
+    this->bulletHinge->setLimit(this->angleOffset + _angle.Radian(),
+                                this->bulletHinge->getUpperLimit());
   }
-  else
-    gzthrow("Joint must be created first");
 }
 
 //////////////////////////////////////////////////
@@ -309,7 +340,7 @@ math::Angle BulletHingeJoint::GetHighStop(int /*_index*/)
   if (this->bulletHinge)
     result = this->bulletHinge->getUpperLimit();
   else
-    gzthrow("Joint must be created first");
+    gzerr << "Joint must be created before getting high stop\n";
 
   return result;
 }
@@ -321,7 +352,7 @@ math::Angle BulletHingeJoint::GetLowStop(int /*_index*/)
   if (this->bulletHinge)
     result = this->bulletHinge->getLowerLimit();
   else
-    gzthrow("Joint must be created first");
+    gzerr << "Joint must be created before getting low stop\n";
 
   return result;
 }

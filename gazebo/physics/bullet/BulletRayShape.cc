@@ -61,7 +61,7 @@ void BulletRayShape::Update()
   if (this->collisionParent)
   {
     BulletCollisionPtr collision =
-      boost::shared_static_cast<BulletCollision>(this->collisionParent);
+        boost::shared_static_cast<BulletCollision>(this->collisionParent);
 
     LinkPtr link = this->collisionParent->GetLink();
     GZ_ASSERT(link != NULL, "Bullet link is NULL");
@@ -79,6 +79,8 @@ void BulletRayShape::Update()
       this->globalEndPos.z);
 
   btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
+  rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
+  rayCallback.m_collisionFilterMask = ~GZ_SENSOR_COLLIDE;
 
   boost::recursive_mutex::scoped_lock lock(
       *this->physicsEngine->GetPhysicsUpdateMutex());
@@ -109,6 +111,8 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
         this->globalEndPos.z);
 
     btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
+    rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
+    rayCallback.m_collisionFilterMask = ~GZ_SENSOR_COLLIDE;
     this->physicsEngine->GetDynamicsWorld()->rayTest(
         start, end, rayCallback);
     if (rayCallback.hasHit())
