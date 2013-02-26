@@ -86,16 +86,25 @@ namespace gazebo
       /// \param[in] _center Center of the gravity.
       public: void SetCoG(const math::Vector3 &_center);
 
+      /// \brief Set the center of gravity.
+      /// \param[in] _center Center of the gravity.
+      public: void SetCoG(double _cx, double _cy, double _cz,
+                          double _rx, double _ry, double _rz)
+
+      /// \brief Set the center of gravity.
+      /// \param[in] _center Center of the gravity.
+      publid: void SetCoG(const math::Pose &_c);
+
       /// \brief Get the center of gravity.
       /// \return The center of gravity.
       public: inline const math::Vector3 &GetCoG() const
-              {return this->cog;}
+              {return this->cog.pos;}
 
       /// \brief Get the pose about which the mass and inertia matrix is
       /// specified in the Link frame.
       /// \return The inertial pose.
       public: inline const math::Pose GetPose() const
-              { return math::Pose(this->cog, math::Quaternion());}
+              { return math::Pose(this->cog);}
 
       /// \brief Get the principal moments of inertia (Ixx, Iyy, Izz).
       /// \return The principal moments.
@@ -197,7 +206,7 @@ namespace gazebo
       private: double mass;
 
       /// \brief Center of gravity. Default is (0.0 0.0 0.0)
-      private: math::Vector3 cog;
+      private: math::Pose cog;
 
       /// \brief Principal moments of inertia. Default is (1.0 1.0 1.0)
       private: math::Vector3 principals;

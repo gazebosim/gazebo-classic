@@ -46,7 +46,7 @@ Inertial::Inertial(double _m)
   sdf::initFile("inertial.sdf", this->sdf);
 
   this->mass = _m;
-  this->cog.Set(0, 0, 0);
+  this->cog.Set(0, 0, 0, 0, 0, 0);
   this->principals.Set(1, 1, 1);
   this->products.Set(0, 0, 0);
 }
@@ -97,6 +97,9 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
         inertiaElem->GetValueDouble("ixz"),
         inertiaElem->GetValueDouble("iyz"));
 
+    // rotate inertia matrix based on it's pose specification
+    this->RotateInertiaMatrix(this->sdf->GetValuePose("pose").rot);
+
     inertiaElem->GetElement("ixx")->GetValue()->SetUpdateFunc(
         boost::bind(&Inertial::GetIXX, this));
     inertiaElem->GetElement("iyy")->GetValue()->SetUpdateFunc(
@@ -122,7 +125,7 @@ void Inertial::Reset()
   sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");
 
   this->mass = this->sdf->GetValueDouble("mass");
-  this->cog.Set(0, 0, 0);
+  this->cog.Set(0, 0, 0, 0, 0, 0);
   this->SetInertiaMatrix(
         inertiaElem->GetValueDouble("ixx"),
         inertiaElem->GetValueDouble("iyy"),
@@ -148,11 +151,24 @@ double Inertial::GetMass() const
 //////////////////////////////////////////////////
 void Inertial::SetCoG(double _cx, double _cy, double _cz)
 {
-  this->cog.Set(_cx, _cy, _cz);
+  this->cog.pos.Set(_cx, _cy, _cz);
 }
 
 //////////////////////////////////////////////////
 void Inertial::SetCoG(const math::Vector3 &_c)
+{
+  this->cog.pos = _c;
+}
+
+//////////////////////////////////////////////////
+void Inertial::SetCoG(double _cx, double _cy, double _cz,
+                      double _rx, double _ry, double _rz)
+{
+  this->cog.pos.Set(_cx, _cy, _cz, _rx, _ry, _rz);
+}
+
+//////////////////////////////////////////////////
+void Inertial::SetCoG(const math::Pose &_c)
 {
   this->cog = _c;
 }
@@ -181,7 +197,8 @@ math::Vector3 Inertial::GetProductsofInertia() const
 //////////////////////////////////////////////////
 void Inertial::Rotate(const math::Quaternion &_rot)
 {
-  this->cog = _rot.RotateVector(this->cog);
+  this->cog.pos = _rot.RotateVector(this->cog.pos);
+  this->cog.rot = _rot * this->cog.rot;
 }
 
 //////////////////////////////////////////////////
@@ -201,11 +218,16 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
   Inertial result;
   result.mass = this->mass + _inertial.mass;
 
-  result.cog = (this->cog*this->mass + _inertial.cog * _inertial.mass) /
+  // compute new center of mass
+  result.cog = (this->cog.pos*this->mass + _inertial.cog.pos * _inertial.mass) /
                 result.mass;
 
+  // FIXME: \TODO: below doesn't look right, fix and add unit test.
+  // Should rotate both MOI into link frame (zero cog.rot) and add
+  // via parallel axis theorem.
   result.principals = this->principals + _inertial.principals;
   result.products = this->products + _inertial.products;
+
   return result;
 }
 
