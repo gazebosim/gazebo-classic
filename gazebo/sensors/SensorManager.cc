@@ -570,7 +570,7 @@ void SensorManager::SensorContainer::ResetLastUpdateTimes()
 
   bool removed = false;
 
-  // Find the correct sensor based on name, and remove it.
+  // Rest last update times for all contained sensors.
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
   {
     GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
