@@ -276,7 +276,6 @@ void Link::Reset()
 //////////////////////////////////////////////////
 void Link::ResetPhysicsStates()
 {
-  Entity::Reset();
   this->SetAngularVel(math::Vector3(0, 0, 0));
   this->SetLinearVel(math::Vector3(0, 0, 0));
   this->SetAngularAccel(math::Vector3(0, 0, 0));
