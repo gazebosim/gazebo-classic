@@ -19,18 +19,19 @@
  * Date: 21 May 2003
  */
 
-#include "transport/Transport.hh"
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/PhysicsEngine.hh"
-#include "physics/Link.hh"
-#include "physics/Model.hh"
-#include "physics/World.hh"
-#include "physics/Joint.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Joint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -77,6 +78,11 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 
   this->parentLink = _parent;
   this->childLink = _child;
+
+  // Joint is loaded without sdf from a model
+  // Initialize this->sdf so it can be used for data storage
+  sdf::initFile("joint.sdf", this->sdf);
+
   this->LoadImpl(_pose);
 }
 
@@ -124,13 +130,17 @@ void Joint::LoadImpl(const math::Pose &_pose)
 
   if (this->parentLink)
     this->parentLink->AddChildJoint(boost::shared_static_cast<Joint>(myBase));
-  this->childLink->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
+  else if (this->childLink)
+    this->childLink->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
+  else
+    gzthrow("both parent and child link do no exist");
 
-  // setting anchor relative to gazebo link frame pose
+  // setting anchor relative to gazebo child link frame position
   if (this->childLink)
     this->anchorPos = (_pose + this->childLink->GetWorldPose()).pos;
+  // otherwise set anchor relative to world frame
   else
-    this->anchorPos = math::Vector3(0, 0, 0);
+    this->anchorPos = _pose.pos;
 }
 
 //////////////////////////////////////////////////
@@ -391,6 +401,48 @@ math::Angle Joint::GetAngle(int _index) const
     return this->staticAngle;
   else
     return this->GetAngleImpl(_index);
+}
+
+//////////////////////////////////////////////////
+void Joint::SetHighStop(int _index, const math::Angle &_angle)
+{
+  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+  if (_index == 0)
+  {
+    this->sdf->GetElement("axis")->GetElement("limit")
+             ->GetElement("upper")->Set(_angle.Radian());
+  }
+  else if (_index == 1)
+  {
+    this->sdf->GetElement("axis2")->GetElement("limit")
+             ->GetElement("upper")->Set(_angle.Radian());
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to set high stop\n";
+  }
+}
+
+//////////////////////////////////////////////////
+void Joint::SetLowStop(int _index, const math::Angle &_angle)
+{
+  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+  if (_index == 0)
+  {
+    this->sdf->GetElement("axis")->GetElement("limit")
+             ->GetElement("lower")->Set(_angle.Radian());
+  }
+  else if (_index == 1)
+  {
+    this->sdf->GetElement("axis2")->GetElement("limit")
+             ->GetElement("lower")->Set(_angle.Radian());
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to set low stop\n";
+  }
 }
 
 //////////////////////////////////////////////////

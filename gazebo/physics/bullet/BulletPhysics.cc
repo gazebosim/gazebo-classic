@@ -56,7 +56,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Rand.hh"
 
-#include "BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -65,6 +65,48 @@ GZ_REGISTER_PHYSICS_ENGINE("bullet", BulletPhysics)
 
 extern ContactAddedCallback gContactAddedCallback;
 extern ContactProcessedCallback gContactProcessedCallback;
+
+//////////////////////////////////////////////////
+struct CollisionFilter : public btOverlapFilterCallback
+{
+  // return true when pairs need collision
+  virtual bool needBroadphaseCollision(btBroadphaseProxy *_proxy0,
+      btBroadphaseProxy *_proxy1) const
+    {
+      GZ_ASSERT(_proxy0 != NULL && _proxy1 != NULL,
+          "Bullet broadphase overlapping pair proxies are NULL");
+
+      bool collide = (_proxy0->m_collisionFilterGroup
+          & _proxy1->m_collisionFilterMask) != 0;
+      collide = collide && (_proxy1->m_collisionFilterGroup
+          & _proxy0->m_collisionFilterMask);
+
+      btRigidBody *rb0 = btRigidBody::upcast(
+              static_cast<btCollisionObject*>(_proxy0->m_clientObject));
+      if (!rb0)
+        return collide;
+
+      btRigidBody *rb1 = btRigidBody::upcast(
+              static_cast<btCollisionObject*>(_proxy1->m_clientObject));
+      if (!rb1)
+         return collide;
+
+      BulletLink *link0 = static_cast<BulletLink *>(
+          rb0->getUserPointer());
+      GZ_ASSERT(link0 != NULL, "Link0 in collision pair is NULL");
+
+      BulletLink *link1 = static_cast<BulletLink *>(
+          rb1->getUserPointer());
+      GZ_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
+
+      if (!link0->GetSelfCollide() || !link1->GetSelfCollide())
+      {
+        if (link0->GetModel() == link1->GetModel())
+          collide = false;
+      }
+      return collide;
+    }
+};
 
 //////////////////////////////////////////////////
 bool ContactCallback(btManifoldPoint &/*_cp*/,
@@ -115,6 +157,12 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   // rigid bodies.
   this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher,
       this->broadPhase, this->solver, this->collisionConfig);
+
+  btOverlapFilterCallback *filterCallback = new CollisionFilter();
+  btOverlappingPairCache* pairCache = this->dynamicsWorld->getPairCache();
+  GZ_ASSERT(pairCache != NULL,
+      "Bullet broadphase overlapping pair cache is NULL");
+  pairCache->setOverlapFilterCallback(filterCallback);
 
   // TODO: Enable this to do custom contact setting
   gContactAddedCallback = ContactCallback;

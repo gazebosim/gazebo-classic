@@ -51,7 +51,7 @@ namespace gazebo
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: virtual void Attach(LinkPtr _one, LinkPtr _two);
+      public: virtual void Init();
 
       // Documentation inherited.
       public: virtual math::Vector3 GetAnchor(int _index) const;
@@ -81,9 +81,6 @@ namespace gazebo
       public: virtual void SetForce(int _index, double _effort);
 
       // Documentation inherited.
-      public: virtual double GetForce(int _index);
-
-      // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
       // Documentation inherited.
@@ -107,6 +104,10 @@ namespace gazebo
       /// \brief Offset angle used in GetAngleImpl, so that angles are reported
       ///        relative to the initial configuration.
       private: double angleOffset;
+
+      /// \brief Initial value of joint axis, expressed as unit vector
+      ///        in world frame.
+      private: math::Vector3 initialWorldAxis;
     };
     /// \}
   }

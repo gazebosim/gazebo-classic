@@ -157,7 +157,8 @@ namespace gazebo
 
       /// \brief Set the axis of rotation.
       /// \param[in] _index Index of the axis to set.
-      /// \param[in] _axis Axis value.
+      /// \param[in] _axis Vector in world frame of axis direction
+      ///                  (must have length greater than zero).
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis) = 0;
 
       /// \brief Set the joint damping.
@@ -205,13 +206,13 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle High stop angle.
       public: virtual void SetHighStop(int _index,
-                                       const math::Angle &_angle) = 0;
+                                       const math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Low stop angle.
       public: virtual void SetLowStop(int _index,
-                                      const math::Angle &_angle) = 0;
+                                      const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
       /// \param[in] _index Index of the axis.
@@ -379,11 +380,8 @@ namespace gazebo
       /// \brief Pointer to the parent model.
       protected: ModelPtr model;
 
-      /// \brief Anchor pose.
+      /// \brief Anchor position of joint, expressed in world frame.
       protected: math::Vector3 anchorPos;
-
-      /// \brief Anchor link.
-      protected: LinkPtr anchorLink;
 
       /// \brief Joint update event.
       private: event::EventT<void ()> jointUpdate;
