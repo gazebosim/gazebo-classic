@@ -355,12 +355,8 @@ void Connection::OnWrite(const boost::system::error_code &_e,
 //////////////////////////////////////////////////
 void Connection::Shutdown()
 {
-  boost::mutex::scoped_lock shutdownLock(this->shutdownMutex);
-
   if (!this->socket)
     return;
-
-  this->ProcessWriteQueue(true);
 
   this->Cancel();
 
@@ -368,18 +364,6 @@ void Connection::Shutdown()
   this->shutdown();
 
   this->Close();
-
-  {
-    boost::mutex::scoped_lock lock(this->socketMutex);
-    boost::system::error_code ec;
-    if (this->socket)
-    {
-      this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-    }
-
-    delete this->socket;
-    this->socket = NULL;
-  }
 }
 
 //////////////////////////////////////////////////
@@ -406,10 +390,11 @@ void Connection::Close()
 
   if (this->socket && this->socket->is_open())
   {
-    this->ProcessWriteQueue(true);
     try
     {
       this->socket->close();
+      boost::system::error_code ec;
+      this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     }
     catch(boost::system::system_error &e)
     {
@@ -417,6 +402,9 @@ void Connection::Close()
       // gzwarn << "Error closing socket[" << this->id << "] ["
              // << e.what() << "]\n";
     }
+
+    delete this->socket;
+    this->socket = NULL;
   }
 
   if (this->acceptor && this->acceptor->is_open())

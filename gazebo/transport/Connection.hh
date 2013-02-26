@@ -214,16 +214,11 @@ namespace gazebo
                 {
                   if (_e.message() != "End of File")
                   {
-                    try
-                    {
-                      this->Shutdown();
-                    }
-                    catch(...)
-                    {
-                    }
                     // This will occur when the other side closes the
                     // connection. We don't want spew error messages in this
                     // case.
+                    //
+                    // It's okay to do nothing here.
                   }
                 }
                 else
@@ -385,10 +380,6 @@ namespace gazebo
 
       /// \brief Mutex to protect socket close.
       private: mutable boost::mutex socketMutex;
-
-      /// \brief Mutex to protect reads.
-      private: boost::mutex shutdownMutex;
-
 
       /// \brief Condition used for synchronization
       private: boost::condition_variable connectCondition;
