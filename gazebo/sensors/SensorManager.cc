@@ -136,6 +136,18 @@ bool SensorManager::SensorsInitialized()
 }
 
 //////////////////////////////////////////////////
+void SensorManager::ResetLastUpdateTimes()
+{
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+  for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
+       iter != this->sensorContainers.end(); ++iter)
+  {
+    GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
+    (*iter)->ResetLastUpdateTimes();
+  }
+}
+
+//////////////////////////////////////////////////
 void SensorManager::Init()
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
@@ -556,6 +568,23 @@ bool SensorManager::SensorContainer::RemoveSensor(const std::string &_name)
   }
 
   return removed;
+}
+
+//////////////////////////////////////////////////
+void SensorManager::SensorContainer::ResetLastUpdateTimes()
+{
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
+  Sensor_V::iterator iter;
+
+  bool removed = false;
+
+  // Rest last update times for all contained sensors.
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+  {
+    GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
+    (*iter)->ResetLastUpdateTime();
+  }
 }
 
 //////////////////////////////////////////////////

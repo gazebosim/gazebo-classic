@@ -26,6 +26,7 @@ class PhysicsTest : public ServerFixture
   public: void EmptyWorld(const std::string &_physicsEngine);
   public: void SpawnDrop(const std::string &_physicsEngine);
   public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
+  public: void RevoluteJoint(const std::string &_physicsEngine);
   public: void SimplePendulum(const std::string &_physicsEngine);
   public: void CollisionFiltering(const std::string &_physicsEngine);
 };
@@ -516,6 +517,416 @@ TEST_F(PhysicsTest, SpawnDropCoGOffsetODE)
 TEST_F(PhysicsTest, SpawnDropCoGOffsetBullet)
 {
   SpawnDropCoGOffset("bullet");
+}
+#endif  // HAVE_BULLET
+
+////////////////////////////////////////////////////////////////////////
+// RevoluteJoint:
+// Load 8 double pendulums arranged in a circle.
+// Measure angular velocity of links, and verify proper axis orientation.
+// Then set joint limits and verify that links remain within limits.
+////////////////////////////////////////////////////////////////////////
+void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
+{
+  math::Rand::SetSeed(0);
+  // Load world
+  Load("worlds/revolute_joint_test.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // Model names
+  std::vector<std::string> modelNames;
+  modelNames.push_back("pendulum_0deg");
+  modelNames.push_back("pendulum_45deg");
+  modelNames.push_back("pendulum_90deg");
+  modelNames.push_back("pendulum_135deg");
+  modelNames.push_back("pendulum_180deg");
+  modelNames.push_back("pendulum_225deg");
+  modelNames.push_back("pendulum_270deg");
+  modelNames.push_back("pendulum_315deg");
+
+  // Global axis
+  double sqrt1_2 = sqrt(2.0) / 2.0;
+  std::vector<math::Vector3> globalAxes;
+  globalAxes.push_back(math::Vector3(1, 0, 0));
+  globalAxes.push_back(math::Vector3(sqrt1_2, sqrt1_2, 0));
+  globalAxes.push_back(math::Vector3(0, 1, 0));
+  globalAxes.push_back(math::Vector3(-sqrt1_2, sqrt1_2, 0));
+  globalAxes.push_back(math::Vector3(-1, 0, 0));
+  globalAxes.push_back(math::Vector3(-sqrt1_2, -sqrt1_2, 0));
+  globalAxes.push_back(math::Vector3(0, -1, 0));
+  globalAxes.push_back(math::Vector3(sqrt1_2, -sqrt1_2, 0));
+
+  // Link names
+  std::vector<std::string> linkNames;
+  linkNames.push_back("lower_link");
+  linkNames.push_back("upper_link");
+
+  // Link names
+  std::vector<std::string> jointNames;
+  jointNames.push_back("lower_joint");
+  jointNames.push_back("upper_joint");
+
+  physics::ModelPtr model;
+  physics::LinkPtr link;
+  std::vector<std::string>::iterator modelIter;
+  physics::JointPtr joint;
+
+  // Check global axes before simulation starts
+  std::vector<math::Vector3>::iterator axisIter;
+  axisIter = globalAxes.begin();
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check global axes of model " << *modelIter << '\n';
+      std::vector<std::string>::iterator jointIter;
+      for (jointIter  = jointNames.begin();
+           jointIter != jointNames.end(); ++jointIter)
+      {
+        joint = model->GetJoint(*jointIter);
+        if (joint)
+        {
+          math::Vector3 axis = joint->GetGlobalAxis(0);
+          EXPECT_NEAR(axis.x, (*axisIter).x, PHYSICS_TOL);
+          EXPECT_NEAR(axis.y, (*axisIter).y, PHYSICS_TOL);
+          EXPECT_NEAR(axis.z, (*axisIter).z, PHYSICS_TOL);
+        }
+        else
+        {
+          gzerr << "Error loading joint " << *jointIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(joint != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+    ++axisIter;
+  }
+
+  // Step forward 0.75 seconds
+  double dt = physics->GetStepTime();
+  EXPECT_GT(dt, 0);
+  int steps = ceil(0.75 / dt);
+  world->StepWorld(steps);
+
+  // Get global angular velocity of each link
+  math::Vector3 angVel;
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check angular velocity of model " << *modelIter << '\n';
+      link = model->GetLink("base");
+      if (link)
+      {
+        // Expect stationary base
+        angVel = link->GetWorldAngularVel();
+        EXPECT_NEAR(angVel.x, 0, PHYSICS_TOL*10);
+        EXPECT_NEAR(angVel.y, 0, PHYSICS_TOL*10);
+        EXPECT_NEAR(angVel.z, 0, PHYSICS_TOL*10);
+      }
+      else
+      {
+        gzerr << "Error loading base link of model " << *modelIter << '\n';
+        EXPECT_TRUE(link != NULL);
+      }
+
+      std::vector<std::string>::iterator linkIter;
+      for (linkIter  = linkNames.begin();
+           linkIter != linkNames.end(); ++linkIter)
+      {
+        link = model->GetLink(*linkIter);
+        if (link)
+        {
+          // Expect relative angular velocity of pendulum links to be negative
+          // and along x axis.
+          angVel = link->GetRelativeAngularVel().Normalize();
+          EXPECT_NEAR(angVel.x, -1, PHYSICS_TOL);
+          EXPECT_NEAR(angVel.y,  0, 2*PHYSICS_TOL);
+          EXPECT_NEAR(angVel.z,  0, 2*PHYSICS_TOL);
+        }
+        else
+        {
+          gzerr << "Error loading link " << *linkIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(link != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+
+  // Keep stepping forward, verifying that joint angles move in the direction
+  // implied by the joint velocity
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    double jointVel1, jointVel2;
+    double angle1, angle2, angle3;
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check angle measurement for " << *modelIter << '\n';
+      std::vector<std::string>::iterator jointIter;
+      for (jointIter  = jointNames.begin();
+           jointIter != jointNames.end(); ++jointIter)
+      {
+        joint = model->GetJoint(*jointIter);
+        if (joint)
+        {
+          // Get first joint angle
+          angle1 = joint->GetAngle(0).Radian();
+
+          // Get joint velocity and assume it is not too small
+          jointVel1 = joint->GetVelocity(0);
+          EXPECT_GT(fabs(jointVel1), 1e-1);
+
+          // Take 1 step and measure again
+          world->StepWorld(1);
+
+          // Expect angle change in direction of joint velocity
+          angle2 = joint->GetAngle(0).Radian();
+          EXPECT_GT((angle2 - angle1) * math::clamp(jointVel1*1e4, -1.0, 1.0)
+                    , 0);
+
+          jointVel2 = joint->GetVelocity(0);
+          EXPECT_GT(fabs(jointVel2), 1e-1);
+
+          // Take 1 step and measure the last angle, expect decrease
+          world->StepWorld(1);
+          angle3 = joint->GetAngle(0).Radian();
+          EXPECT_GT((angle3 - angle2) * math::clamp(jointVel2*1e4, -1.0, 1.0)
+                    , 0);
+        }
+        else
+        {
+          gzerr << "Error loading joint " << *jointIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(joint != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+
+
+  // Reset the world, and impose joint limits
+  world->Reset();
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      std::vector<std::string>::iterator jointIter;
+      for (jointIter  = jointNames.begin();
+           jointIter != jointNames.end(); ++jointIter)
+      {
+        joint = model->GetJoint(*jointIter);
+        if (joint)
+        {
+          joint->SetLowStop(0, math::Angle(-0.1));
+          joint->SetHighStop(0, math::Angle(0.1));
+        }
+        else
+        {
+          gzerr << "Error loading joint " << *jointIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(joint != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+
+  // Step forward again for 0.75 seconds and check that joint angles
+  // are within limits
+  world->StepWorld(steps);
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check angle limits and velocity of joints of model "
+            << *modelIter << '\n';
+      std::vector<std::string>::iterator jointIter;
+      for (jointIter  = jointNames.begin();
+           jointIter != jointNames.end(); ++jointIter)
+      {
+        joint = model->GetJoint(*jointIter);
+        if (joint)
+        {
+          EXPECT_NEAR(joint->GetAngle(0).Radian(), 0, 0.11);
+        }
+        else
+        {
+          gzerr << "Error loading joint " << *jointIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(joint != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+
+  // Reset world again, disable gravity, detach upper_joint
+  // Then apply torque at lower_joint and verify motion
+  world->Reset();
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check SetForce for model " << *modelIter << '\n';
+      std::vector<std::string>::iterator linkIter;
+      for (linkIter  = linkNames.begin();
+           linkIter != linkNames.end(); ++linkIter)
+      {
+        link = model->GetLink(*linkIter);
+        if (link)
+        {
+          // Disable gravity for links.
+          link->SetGravityMode(false);
+        }
+        else
+        {
+          gzerr << "Error loading link " << *linkIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(link != NULL);
+        }
+      }
+
+      joint = model->GetJoint("upper_joint");
+      if (joint)
+      {
+        // Detach upper_joint.
+        joint->Detach();
+      }
+      else
+      {
+        gzerr << "Error loading upper_joint "
+              << " of model " << *modelIter << '\n';
+        EXPECT_TRUE(joint != NULL);
+      }
+
+      // Step forward and let things settle a bit.
+      world->StepWorld(100);
+
+      joint = model->GetJoint("lower_joint");
+      if (joint)
+      {
+        double oldVel, newVel, force;
+        oldVel = joint->GetVelocity(0);
+        // Apply positive torque to the lower_joint and step forward.
+        force = 1;
+        for (int i = 0; i < 10; ++i)
+        {
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          newVel = joint->GetVelocity(0);
+          // Expect increasing velocities
+          EXPECT_GT(newVel, oldVel);
+          oldVel = newVel;
+
+          // Check that GetForce returns what we set
+          EXPECT_NEAR(joint->GetForce(0), force, PHYSICS_TOL);
+
+          // Expect joint velocity to be near angular velocity difference
+          // of child and parent, along global axis
+          // jointVel == DOT(angVelChild - angVelParent, axis)
+          double jointVel = joint->GetVelocity(0);
+          math::Vector3 axis = joint->GetGlobalAxis(0);
+          angVel  = joint->GetChild()->GetWorldAngularVel();
+          angVel -= joint->GetParent()->GetWorldAngularVel();
+          EXPECT_NEAR(jointVel, axis.Dot(angVel), PHYSICS_TOL);
+        }
+        // Apply negative torque to lower_joint
+        force = -3;
+        for (int i = 0; i < 10; ++i)
+        {
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          newVel = joint->GetVelocity(0);
+          // Expect decreasing velocities
+          EXPECT_LT(newVel, oldVel);
+
+          // Check that GetForce returns what we set
+          EXPECT_NEAR(joint->GetForce(0), force, PHYSICS_TOL);
+
+          // Expect joint velocity to be near angular velocity difference
+          // of child and parent, along global axis
+          // jointVel == DOT(angVelChild - angVelParent, axis)
+          double jointVel = joint->GetVelocity(0);
+          math::Vector3 axis = joint->GetGlobalAxis(0);
+          angVel  = joint->GetChild()->GetWorldAngularVel();
+          angVel -= joint->GetParent()->GetWorldAngularVel();
+          EXPECT_NEAR(jointVel, axis.Dot(angVel), PHYSICS_TOL);
+        }
+      }
+      else
+      {
+        gzerr << "Error loading lower_joint "
+              << " of model " << *modelIter << '\n';
+        EXPECT_TRUE(joint != NULL);
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+}
+
+TEST_F(PhysicsTest, RevoluteJointODE)
+{
+  RevoluteJoint("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, RevoluteJointBullet)
+{
+  RevoluteJoint("bullet");
 }
 #endif  // HAVE_BULLET
 
