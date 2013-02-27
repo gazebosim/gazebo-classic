@@ -206,13 +206,13 @@ void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetAttribute(PhysicsAttribute /*_attr*/,
+void PhysicsEngine::SetParam(PhysicsParam /*_param*/,
     const boost::any &/*_value*/)
 {
 }
 
 //////////////////////////////////////////////////
-boost::any PhysicsEngine::GetAttribute(PhysicsAttribute /*_attr*/) const
+boost::any PhysicsEngine::GetParam(PhysicsParam /*_param*/) const
 {
   return 0;
 }

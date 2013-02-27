@@ -43,8 +43,8 @@ namespace gazebo
     class PhysicsEngine
     {
       /// \enum Attribute
-      /// \brief Physics attribute types.
-      public: enum PhysicsAttribute
+      /// \brief Physics paramerter types.
+      public: enum PhysicsParam
       {
         /// \brief Constraint force mixing
         GLOBAL_CFM,
@@ -56,13 +56,13 @@ namespace gazebo
         AUTO_DISABLE,
 
         /// \brief Number of iterations
-        SOR_PGS_PRECON_ITERS,
+        SOR_PRECON_ITERS,
 
         /// \brief Number of iterations
-        SOR_PGS_ITERS,
+        SOR_ITERS,
 
         /// \brief SOR over-relaxation parameter
-        SOR_PGS_W,
+        SOR,
 
         /// \brief Max correcting velocity
         CONTACT_MAX_CORRECTING_VEL,
@@ -276,16 +276,16 @@ namespace gazebo
       /// \return Maximum number of allows contacts.
       public: virtual int GetMaxContacts() {return 0;}
 
-      /// \brief Set an attribute of the physics engine
-      /// \param[in] _attr An attribute listed in the PhysicsAttribute enum
+      /// \brief Set a parameter of the physics engine
+      /// \param[in] _attr A parameter listed in the PhysicsParam enum
       /// \param[in] _value The value to set to
-      public: virtual void SetAttribute(PhysicsAttribute _attr,
+      public: virtual void SetParam(PhysicsParam _param,
                   const boost::any &_value);
 
-      /// \brief Get an attribute of the physics engine
-      /// \param[in] _attr An attribute listed in the PhysicsAttribute enum
-      /// \return The value of the attribute
-      public: virtual boost::any GetAttribute(PhysicsAttribute _attr) const;
+      /// \brief Get an parameter of the physics engine
+      /// \param[in] _attr A parameter listed in the PhysicsParam enum
+      /// \return The value of the parameter
+      public: virtual boost::any GetParam(PhysicsParam _param) const;
 
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;

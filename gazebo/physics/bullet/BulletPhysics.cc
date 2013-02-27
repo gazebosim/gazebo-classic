@@ -231,9 +231,9 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
     info.m_erp = 0.2;
 
   info.m_numIterations =
-      boost::any_cast<int>(this->GetAttribute(SOR_PGS_ITERS));
+      boost::any_cast<int>(this->GetParam(SOR_ITERS));
   info.m_sor =
-      boost::any_cast<double>(this->GetAttribute(SOR_PGS_W));
+      boost::any_cast<double>(this->GetParam(SOR));
 }
 
 //////////////////////////////////////////////////
@@ -263,16 +263,16 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     // physicsMsg.set_solver_type(this->stepType);
     physicsMsg.set_dt(this->GetStepTime());
     physicsMsg.set_iters(
-        boost::any_cast<int>(this->GetAttribute(SOR_PGS_ITERS)));
+        boost::any_cast<int>(this->GetParam(SOR_ITERS)));
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(
-        boost::any_cast<double>(this->GetAttribute(SOR_PGS_W)));
+        boost::any_cast<double>(this->GetParam(SOR)));
     physicsMsg.set_cfm(
-        boost::any_cast<double>(this->GetAttribute(GLOBAL_CFM)));
+        boost::any_cast<double>(this->GetParam(GLOBAL_CFM)));
     physicsMsg.set_erp(
-        boost::any_cast<double>(this->GetAttribute(GLOBAL_ERP)));
+        boost::any_cast<double>(this->GetParam(GLOBAL_ERP)));
     physicsMsg.set_contact_surface_layer(
-        boost::any_cast<double>(this->GetAttribute(CONTACT_SURFACE_LAYER)));
+        boost::any_cast<double>(this->GetParam(CONTACT_SURFACE_LAYER)));
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
 
     response.set_type(physicsMsg.GetTypeName());
@@ -298,34 +298,34 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
       this->sdf->GetElement("bullet")->GetElement("solver");
     if (_msg->solver_type() == "sequential_impulse")
     {
-      solverElem->GetAttribute("type")->Set("sequential_impulse");
+      solverElem->GetParam("type")->Set("sequential_impulse");
       // this->physicsStepFunc = &dWorldQuickStep;
     }
      else if (_msg->solver_type() == "world")
     {
-      solverElem->GetAttribute("type")->Set("world");
+      solverElem->GetParam("type")->Set("world");
       // this->physicsStepFunc = &dWorldStep;
     }
     */
   }
 
   if (_msg->has_iters())
-    this->SetAttribute(SOR_PGS_ITERS, _msg->iters());
+    this->SetParam(SOR_ITERS, _msg->iters());
 
   if (_msg->has_sor())
-    this->SetAttribute(SOR_PGS_W, _msg->sor());
+    this->SetParam(SOR, _msg->sor());
 
   if (_msg->has_cfm())
-    this->SetAttribute(GLOBAL_CFM, _msg->cfm());
+    this->SetParam(GLOBAL_CFM, _msg->cfm());
 
   if (_msg->has_erp())
-    this->SetAttribute(GLOBAL_ERP, _msg->erp());
+    this->SetParam(GLOBAL_ERP, _msg->erp());
 
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
 
   if (_msg->has_contact_surface_layer())
-    this->SetAttribute(CONTACT_SURFACE_LAYER, _msg->contact_surface_layer());
+    this->SetParam(CONTACT_SURFACE_LAYER, _msg->contact_surface_layer());
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));
@@ -380,7 +380,7 @@ void BulletPhysics::Reset()
 
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetAttribute(PhysicsAttribute _attr,
+void BulletPhysics::SetParam(PhysicsParam _param,
     const boost::any &_value)
 {
   if (!this->dynamicsWorld)
@@ -391,7 +391,7 @@ void BulletPhysics::SetAttribute(PhysicsAttribute _attr,
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
 
-  switch (_attr)
+  switch (_param)
   {
     case GLOBAL_CFM:
     {
@@ -407,14 +407,14 @@ void BulletPhysics::SetAttribute(PhysicsAttribute _attr,
       info.m_erp = value;
       break;
     }
-    case SOR_PGS_ITERS:
+    case SOR_ITERS:
     {
       int value = boost::any_cast<int>(_value);
       bulletElem->GetElement("solver")->GetElement("iters")->Set(value);
       info.m_numIterations = value;
       break;
     }
-    case SOR_PGS_W:
+    case SOR:
     {
       double value = boost::any_cast<double>(_value);
       bulletElem->GetElement("solver")->GetElement("sor")->Set(value);
@@ -445,44 +445,42 @@ void BulletPhysics::SetAttribute(PhysicsAttribute _attr,
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetAttribute(const std::string &_key,
+void BulletPhysics::SetParam(const std::string &_key,
     const boost::any &_value)
 {
-  PhysicsAttribute attribute;
+  PhysicsParam param;
 
   if (_key == "global_cfm")
-    attribute = GLOBAL_CFM;
+    param = GLOBAL_CFM;
   else if (_key == "global_erp")
-    attribute = GLOBAL_ERP;
+    param = GLOBAL_ERP;
   else if (_key == "auto_disable")
-    attribute = AUTO_DISABLE;
-  else if (_key == "sor_pgs_precon_iters")
-    attribute = SOR_PGS_PRECON_ITERS;
-  else if (_key == "sor_pgs_iters")
-    attribute = SOR_PGS_ITERS;
+    param = AUTO_DISABLE;
+  else if (_key == "sor_iters")
+    param = SOR_ITERS;
   else if (_key == "sor")
-    attribute = SOR_PGS_W;
+    param = SOR;
   else if (_key == "contact_surface_layer")
-    attribute = CONTACT_SURFACE_LAYER;
+    param = CONTACT_SURFACE_LAYER;
   else if (_key == "max_contacts")
-    attribute = MAX_CONTACTS;
+    param = MAX_CONTACTS;
   else
   {
     gzwarn << _key << " is not supported in bullet" << std::endl;
     return;
   }
 
-  this->SetAttribute(attribute, _value);
+  this->SetParam(param, _value);
 }
 
 //////////////////////////////////////////////////
-boost::any BulletPhysics::GetAttribute(PhysicsAttribute _attr) const
+boost::any BulletPhysics::GetParam(PhysicsParam _param) const
 {
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   boost::any value = 0;
-  switch (_attr)
+  switch (_param)
   {
     case GLOBAL_CFM:
     {
@@ -494,12 +492,12 @@ boost::any BulletPhysics::GetAttribute(PhysicsAttribute _attr) const
       value = bulletElem->GetElement("constraints")->GetValueDouble("erp");
       break;
     }
-    case SOR_PGS_ITERS:
+    case SOR_ITERS:
     {
       value = bulletElem->GetElement("solver")->GetValueInt("iters");
       break;
     }
-    case SOR_PGS_W:
+    case SOR:
     {
       value = bulletElem->GetElement("solver")->GetValueDouble("sor");
       break;
@@ -525,27 +523,27 @@ boost::any BulletPhysics::GetAttribute(PhysicsAttribute _attr) const
 }
 
 //////////////////////////////////////////////////
-boost::any BulletPhysics::GetAttribute(const std::string &_key) const
+boost::any BulletPhysics::GetParam(const std::string &_key) const
 {
-  PhysicsAttribute attribute;
+  PhysicsParam param;
   if (_key == "global_cfm")
-    attribute = GLOBAL_CFM;
+    param = GLOBAL_CFM;
   else if (_key == "global_erp")
-    attribute = GLOBAL_ERP;
-  else if (_key == "sor_pgs_iters")
-    attribute = SOR_PGS_ITERS;
+    param = GLOBAL_ERP;
+  else if (_key == "sor_iters")
+    param = SOR_ITERS;
   else if (_key == "sor")
-    attribute = SOR_PGS_W;
+    param = SOR;
   else if (_key == "contact_surface_layer")
-    attribute = CONTACT_SURFACE_LAYER;
+    param = CONTACT_SURFACE_LAYER;
   else if (_key == "max_contacts")
-    attribute = MAX_CONTACTS;
+    param = MAX_CONTACTS;
   else
   {
     gzwarn << _key << " is not supported in bullet" << std::endl;
     return 0;
   }
-  return this->GetAttribute(attribute);
+  return this->GetParam(param);
 }
 
 LinkPtr BulletPhysics::CreateLink(ModelPtr _parent)
