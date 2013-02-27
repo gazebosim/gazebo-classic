@@ -452,8 +452,8 @@ void SensorManager::SensorContainer::RunLoop()
     // Compute the time it took to update the sensors.
     diffTime = world->GetSimTime() - startTime;
 
-    // Set the default sleep time;
-    eventTime = sleepTime - diffTime;
+    // Set the default sleep time
+    eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
     // Make sure update time is reasonable.
     GZ_ASSERT(diffTime.sec < 1, "Took over 1.0 seconds to update a sensor.");
