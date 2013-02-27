@@ -71,6 +71,19 @@ namespace gazebo
       /// \return The height at the specified location
       public: double GetHeight(double _x, double _y, double _z = 1000);
 
+      /// \brief Set the height at a specific point.
+      /// \param[in] _x X position in world coordinates
+      /// \param[in] _y Y position in world coordinates
+      /// \param[in] _z New Z (height) value in world coordinates
+      private: void ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
+                  double _weight);
+
+      public: void Raise(CameraPtr _camera, math::Vector2i _mousePos,
+                         double _brushSize, double _weight = 1.0);
+
+      public: void Lower(CameraPtr _camera, math::Vector2i _mousePos,
+                         double _brushSize, double _weight = 1.0);
+
       /// \brief Get a pointer to the OGRE terrain group object.
       /// \return Pointer to the OGRE terrain.
       public: Ogre::TerrainGroup *GetOgreTerrain() const;

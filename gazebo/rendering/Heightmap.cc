@@ -341,6 +341,91 @@ double Heightmap::GetHeight(double _x, double _y, double _z)
 }
 
 /////////////////////////////////////////////////
+void Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
+    double _brushSize, double _weight)
+{
+  Ogre::Ray mouseRay = _camera->GetOgreCamera()->getCameraToViewportRay(
+      static_cast<float>(_mousePos.x) /
+      _camera->GetViewport()->getActualWidth(),
+      static_cast<float>(_mousePos.y) /
+      _camera->GetViewport()->getActualHeight());
+
+  // The terrain uses a special ray intersection test.
+  Ogre::TerrainGroup::RayResult terrainResult =
+    this->terrainGroup->rayIntersects(mouseRay);
+
+  if (terrainResult.hit)
+    this->ModifyTerrain(terrainResult.position, _brushSize, _weight);
+}
+
+/////////////////////////////////////////////////
+void Heightmap::Lower(CameraPtr _camera, math::Vector2i _mousePos,
+    double _brushSize, double _weight)
+{
+  Ogre::Ray mouseRay = _camera->GetOgreCamera()->getCameraToViewportRay(
+      static_cast<float>(_mousePos.x) /
+      _camera->GetViewport()->getActualWidth(),
+      static_cast<float>(_mousePos.y) /
+      _camera->GetViewport()->getActualHeight());
+
+  // The terrain uses a special ray intersection test.
+  Ogre::TerrainGroup::RayResult terrainResult =
+    this->terrainGroup->rayIntersects(mouseRay);
+
+  if (terrainResult.hit)
+    this->ModifyTerrain(terrainResult.position, _brushSize, _weight);
+}
+
+/////////////////////////////////////////////////
+void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
+    double _weight)
+{
+  GZ_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
+  Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
+
+  if (!terrain)
+    gzerr << "Invalid heightmap position [" << _pos << "]\n";
+  else
+  {
+    uint16_t size = terrain->getSize();
+
+    Ogre::Vector3 pos;
+    terrain->getTerrainPosition(_pos, &pos);
+
+    long startx = (pos.x - _brushSize) * size;
+    long starty = (pos.y - _brushSize) * size;
+    long endx = (pos.x + _brushSize) * size;
+    long endy= (pos.y + _brushSize) * size;
+
+    startx = std::max(startx, 0L);
+    starty = std::max(starty, 0L);
+
+    endx = std::min(endx, (long)size);
+    endy = std::min(endy, (long)size);
+
+    for (long y = starty; y <= endy; ++y)
+    {
+      for (long x = startx; x <= endx; ++x)
+      {
+        double tsXdist = (x / (double)size) - pos.x;
+        double tsYdist = (y / (double)size)  - pos.y;
+
+        double weight = std::min(1.0,
+            sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / (0.5 * _brushSize));
+        weight = 1.0 - (weight * weight);
+
+        float addedHeight = weight * _weight;
+        float newHeight = terrain->getHeightAtPoint(x, y) + addedHeight;
+
+        terrain->setHeightAtPoint(x, y, newHeight);
+      }
+    }
+    terrain->dirty();
+    terrain->update();
+  }
+}
+
+/////////////////////////////////////////////////
 void Heightmap::SetupShadows(bool _enableShadows)
 {
   // Assume we get a shader model 2 material profile

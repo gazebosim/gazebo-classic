@@ -16,25 +16,27 @@
 */
 #include <math.h>
 
-#include "common/Exception.hh"
-#include "math/gzmath.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/math/gzmath.hh"
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "rendering/RenderEvents.hh"
-#include "rendering/Rendering.hh"
-#include "rendering/Visual.hh"
-#include "rendering/WindowManager.hh"
-#include "rendering/Scene.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/OrbitViewController.hh"
-#include "rendering/FPSViewController.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Heightmap.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/WindowManager.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/OrbitViewController.hh"
+#include "gazebo/rendering/FPSViewController.hh"
 
-#include "gui/Actions.hh"
-#include "gui/Gui.hh"
-#include "gui/ModelRightMenu.hh"
-#include "gui/GuiEvents.hh"
-#include "gui/GLWidget.hh"
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/ModelRightMenu.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GLWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -120,6 +122,9 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->selectedVis.reset();
   this->mouseMoveVis.reset();
+
+  connect(g_terrainRaiseAct, SIGNAL(triggered()), this,
+      SLOT(OnRaiseTerrain()));
 }
 
 /////////////////////////////////////////////////
@@ -349,6 +354,8 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
     this->OnMousePressNormal();
   else if (this->state == "translate" || this->state == "rotate")
     this->OnMousePressTranslate();
+  else if (this->state == "raise_terrain")
+    this->OnMousePressRaiseTerrain();
 }
 
 /////////////////////////////////////////////////
@@ -389,6 +396,42 @@ void GLWidget::OnMousePressMakeEntity()
 {
   if (this->entityMaker)
     this->entityMaker->OnMousePush(this->mouseEvent);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnMouseMoveRaiseTerrain()
+{
+  rendering::Heightmap *heightmap = this->scene ?
+    this->scene->GetHeightmap() : NULL;
+
+  if (heightmap && this->mouseEvent.dragging &&
+      this->mouseEvent.button == common::MouseEvent::LEFT)
+  {
+    heightmap->Raise(this->userCamera, this->mouseEvent.pos, 0.2, 0.05);
+  }
+  else
+    this->OnMouseMoveNormal();
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnMousePressRaiseTerrain()
+{
+  rendering::Heightmap *heightmap = this->scene ?
+    this->scene->GetHeightmap() : NULL;
+
+  if (heightmap)
+    heightmap->Raise(this->userCamera, this->mouseEvent.pos, 0.2, 0.2);
+  else
+    this->OnMousePressNormal();
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnRaiseTerrain()
+{
+  if (this->state != "raise_terrain")
+    this->state = "raise_terrain";
+  else
+    this->state = "select";
 }
 
 /////////////////////////////////////////////////
@@ -438,6 +481,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
     this->OnMouseMoveNormal();
   else if (this->state == "translate" || this->state == "rotate")
     this->OnMouseMoveTranslate();
+  else if (this->state == "raise_terrain")
+    this->OnMouseMoveRaiseTerrain();
 
   this->mouseEvent.prevPos = this->mouseEvent.pos;
 }

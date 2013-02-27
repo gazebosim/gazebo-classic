@@ -81,6 +81,7 @@ namespace gazebo
       private: void OnMouseMoveNormal();
       private: void OnMouseMoveTranslate();
       private: void OnMouseMoveMakeEntity();
+      private: void OnMouseMoveRaiseTerrain();
 
       private: void OnMouseReleaseNormal();
       private: void OnMouseReleaseTranslate();
@@ -89,6 +90,7 @@ namespace gazebo
       private: void OnMousePressNormal();
       private: void OnMousePressTranslate();
       private: void OnMousePressMakeEntity();
+      private: void OnMousePressRaiseTerrain();
 
       private: void OnRequest(ConstRequestPtr &_msg);
 
@@ -130,6 +132,9 @@ namespace gazebo
       /// \brief Set the visual being moved, which will highlight the
       /// visual
       private: void SetMouseMoveVisual(rendering::VisualPtr _vis);
+
+      /// \brief QT callback when the raise terrain action is used.
+      private slots: void OnRaiseTerrain();
 
       private: int windowId;
 
