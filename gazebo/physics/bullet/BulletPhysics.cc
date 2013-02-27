@@ -260,7 +260,7 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::BULLET);
     physicsMsg.set_update_rate(this->GetUpdateRate());
-    // physicsMsg.set_solver_type(this->stepType);
+    physicsMsg.set_solver_type(this->solverType);
     physicsMsg.set_dt(this->GetStepTime());
     physicsMsg.set_iters(
         boost::any_cast<int>(this->GetParam(SOR_ITERS)));
@@ -290,24 +290,8 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_update_rate())
     this->SetUpdateRate(_msg->update_rate());
 
-  // Like OnRequest, this function was copied from ODEPhysics.
-  // TODO: change this when changing OnRequest.
   if (_msg->has_solver_type())
-  {
-    /*sdf::ElementPtr solverElem =
-      this->sdf->GetElement("bullet")->GetElement("solver");
-    if (_msg->solver_type() == "sequential_impulse")
-    {
-      solverElem->GetParam("type")->Set("sequential_impulse");
-      // this->physicsStepFunc = &dWorldQuickStep;
-    }
-     else if (_msg->solver_type() == "world")
-    {
-      solverElem->GetParam("type")->Set("world");
-      // this->physicsStepFunc = &dWorldStep;
-    }
-    */
-  }
+    this->SetParam(SOLVER_TYPE, _msg->solver_type());
 
   if (_msg->has_iters())
     this->SetParam(SOR_ITERS, _msg->iters());
@@ -380,8 +364,7 @@ void BulletPhysics::Reset()
 
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetParam(PhysicsParam _param,
-    const boost::any &_value)
+void BulletPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
 {
   if (!this->dynamicsWorld)
     return;
@@ -393,6 +376,19 @@ void BulletPhysics::SetParam(PhysicsParam _param,
 
   switch (_param)
   {
+    case SOLVER_TYPE:
+    {
+      std::string value = boost::any_cast<std::string>(_value);
+      if (value == "sequential_impulse")
+      {
+        bulletElem->GetElement("solver")->GetElement("type")->Set(value);
+        this->solverType = value;
+      }
+      else
+        gzwarn << "Currently only 'sequential_impulse' solver is supported"
+            << std::endl;
+      break;
+    }
     case GLOBAL_CFM:
     {
       double value = boost::any_cast<double>(_value);
@@ -433,30 +429,29 @@ void BulletPhysics::SetParam(PhysicsParam _param,
     {
       int value = boost::any_cast<int>(_value);
       bulletElem->GetElement("max_contacts")->GetValue()->Set(value);
-      gzwarn << "Not yet implemented in bullet" << std::endl;
+      //gzwarn << "Not yet implemented in bullet" << std::endl;
       break;
     }
     default:
     {
-      gzwarn << "Attribute not supported in bullet" << std::endl;
+      gzwarn << "Param not supported in bullet" << std::endl;
       break;
     }
   }
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetParam(const std::string &_key,
-    const boost::any &_value)
+void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
   PhysicsParam param;
 
-  if (_key == "global_cfm")
+  if (_key == "type")
+    param = SOLVER_TYPE;
+  else if (_key == "cfm")
     param = GLOBAL_CFM;
-  else if (_key == "global_erp")
+  else if (_key == "erp")
     param = GLOBAL_ERP;
-  else if (_key == "auto_disable")
-    param = AUTO_DISABLE;
-  else if (_key == "sor_iters")
+  else if (_key == "iters")
     param = SOR_ITERS;
   else if (_key == "sor")
     param = SOR;
@@ -482,6 +477,11 @@ boost::any BulletPhysics::GetParam(PhysicsParam _param) const
   boost::any value = 0;
   switch (_param)
   {
+    case SOLVER_TYPE:
+    {
+      value = bulletElem->GetElement("solver")->GetValueString("type");
+      break;
+    }
     case GLOBAL_CFM:
     {
       value = bulletElem->GetElement("constraints")->GetValueDouble("cfm");
@@ -515,7 +515,7 @@ boost::any BulletPhysics::GetParam(PhysicsParam _param) const
     }
     default:
     {
-      gzwarn << "Attribute not supported in bullet" << std::endl;
+      gzwarn << "Param not supported in bullet" << std::endl;
       break;
     }
   }
@@ -526,11 +526,14 @@ boost::any BulletPhysics::GetParam(PhysicsParam _param) const
 boost::any BulletPhysics::GetParam(const std::string &_key) const
 {
   PhysicsParam param;
-  if (_key == "global_cfm")
+
+  if (_key == "type")
+    param = SOLVER_TYPE;
+  else if (_key == "cfm")
     param = GLOBAL_CFM;
-  else if (_key == "global_erp")
+  else if (_key == "erp")
     param = GLOBAL_ERP;
-  else if (_key == "sor_iters")
+  else if (_key == "iters")
     param = SOR_ITERS;
   else if (_key == "sor")
     param = SOR;
@@ -546,6 +549,7 @@ boost::any BulletPhysics::GetParam(const std::string &_key) const
   return this->GetParam(param);
 }
 
+//////////////////////////////////////////////////
 LinkPtr BulletPhysics::CreateLink(ModelPtr _parent)
 {
   if (_parent == NULL)

@@ -164,6 +164,20 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
 
+      /// Documentation inherited
+      public: virtual void SetParam(PhysicsParam _param,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual void SetParam(const std::string &_key,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(const std::string &_key) const;
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(PhysicsParam _attr) const;
+
       /// \brief Return the world space id.
       /// \return The space id for the world.
       public: dSpaceID GetSpaceId() const;

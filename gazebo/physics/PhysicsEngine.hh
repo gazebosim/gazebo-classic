@@ -46,6 +46,9 @@ namespace gazebo
       /// \brief Physics paramerter types.
       public: enum PhysicsParam
       {
+        /// \brief Solve type
+        SOLVER_TYPE,
+
         /// \brief Constraint force mixing
         GLOBAL_CFM,
 

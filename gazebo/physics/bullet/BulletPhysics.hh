@@ -148,6 +148,9 @@ namespace gazebo
       private: btDiscreteDynamicsWorld *dynamicsWorld;
 
       private: common::Time lastUpdateTime;
+
+      /// \brief The type of the solver.
+      private: std::string solverType;
     };
 
   /// \}
