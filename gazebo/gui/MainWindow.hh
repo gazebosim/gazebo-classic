@@ -48,6 +48,10 @@ namespace gazebo
       public: unsigned int GetEntityId(const std::string &_name);
       public: bool HasEntityName(const std::string &_name);
 
+      /// \brief Register a new tab widget with an associated name.
+      public: void RegisterTab(const std::string &_objName, 
+                  const std::string &_tabLabel, QWidget *_widget);
+
       protected: void closeEvent(QCloseEvent *_event);
 
       private: void OnGUI(ConstGUIPtr &_msg);
@@ -89,7 +93,12 @@ namespace gazebo
       private slots: void OnResetModelOnly();
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
+
+      /// \brief QT callback when entering building edit mode
       private slots: void OnEditBuilding();
+
+      /// \brief QT callback when entering terrain edit mode
+      private slots: void OnEditTerrain();
 
       /// \brief Qt callback when the building editor's save action is
       /// triggered.
@@ -162,38 +171,27 @@ namespace gazebo
       // A map that associates physics_id's with entity names
       private: std::map<std::string, unsigned int> entities;
 
+      /// \brief Message used to field requests.
       private: msgs::Request *requestMsg;
 
-      // private: QTreeWidget *treeWidget;
+      /// \brief Tab widgets that can turned on or off
+      private: std::map<std::string, QTabWidget*> contextTabWidgets;
 
-      /// \brief Building editor palette that contains different drawing modes
-      private: BuildingEditorPalette *buildingEditorPalette;
-
-      /// \brief Tab widget that holds the building editor palette
-      private: QTabWidget *buildingEditorTabWidget;
-
+      /// \brief The left-hand tab widget
       private: QTabWidget *tabWidget;
+
+      /// \brief Mainwindow's menubar
       private: QMenuBar *menuBar;
 
       /// \brief A layout for the menu bar.
       private: QHBoxLayout *menuLayout;
 
+      /// \brief Used to control size of each pane.
+      private: QSplitter *splitter;
+
       /// \brief The filename set via "Save As". This filename is used by
       /// the "Save" feature.
       private: std::string saveFilename;
-    };
-
-    class TreeViewDelegate: public QItemDelegate
-    {
-      Q_OBJECT
-      public: TreeViewDelegate(QTreeView *_view, QWidget *_parent);
-
-      public: void paint(QPainter *painter, const QStyleOptionViewItem &option,
-                         const QModelIndex &index) const;
-
-      public: virtual QSize sizeHint(const QStyleOptionViewItem &_opt,
-                                     const QModelIndex &_index) const;
-      private: QTreeView *view;
     };
   }
 }

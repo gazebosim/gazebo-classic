@@ -42,7 +42,6 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/model_editor/BuildingEditorPalette.hh"
-#include "gazebo/gui/TerrainEditorPalette.hh"
 #include "gazebo/gui/model_editor/EditorEvents.hh"
 
 #include "sdf/sdf.hh"
@@ -51,6 +50,8 @@
 
 using namespace gazebo;
 using namespace gui;
+
+#define MINIMUM_TAB_WIDTH 250
 
 extern bool g_fullscreen;
 
@@ -79,28 +80,22 @@ MainWindow::MainWindow()
   this->modelListWidget = new ModelListWidget(this);
   InsertModelWidget *insertModel = new InsertModelWidget(this);
 
-  // Create the terrain editor tab
-  TerrainEditorPalette *terrainEditorPalette = new TerrainEditorPalette(this);
-
-  int minimumTabWidth = 250;
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("mainTab");
   this->tabWidget->addTab(this->modelListWidget, "World");
   this->tabWidget->addTab(insertModel, "Insert");
-  this->tabWidget->addTab(terrainEditorPalette, "Terrain Editor");
   this->tabWidget->setSizePolicy(QSizePolicy::Expanding,
                                  QSizePolicy::Expanding);
-  this->tabWidget->setMinimumWidth(minimumTabWidth);
+  this->tabWidget->setMinimumWidth(MINIMUM_TAB_WIDTH);
 
-  this->buildingEditorPalette = new BuildingEditorPalette(this);
-  this->buildingEditorTabWidget = new QTabWidget();
-  this->buildingEditorTabWidget->setObjectName("buildingEditorTab");
-  this->buildingEditorTabWidget->addTab(
-      this->buildingEditorPalette, "Building Editor");
-  this->buildingEditorTabWidget->setSizePolicy(QSizePolicy::Expanding,
-                                        QSizePolicy::Expanding);
-  this->buildingEditorTabWidget->setMinimumWidth(minimumTabWidth);
-  this->buildingEditorTabWidget->hide();
+  this->terrainEditor = new TerrainEditor(this);
+  this->buildingEditor = new BuildingEditor(this);
+
+  // Create the building editor tab
+  BuildingEditorPalette *buildingEditorPalette =
+    new BuildingEditorPalette(this);
+  this->RegisterTab( "buildingEditorTab", "Buiding Editor",
+      buildingEditorPalette); 
 
   this->toolsWidget = new ToolsWidget();
 
@@ -108,14 +103,16 @@ MainWindow::MainWindow()
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
-  QSplitter *splitter = new QSplitter(this);
-  splitter->addWidget(this->tabWidget);
-  splitter->addWidget(this->buildingEditorTabWidget);
-  splitter->addWidget(this->renderWidget);
-  splitter->addWidget(this->toolsWidget);
+  this->splitter = new QSplitter(this);
+  this->splitter->addWidget(this->tabWidget);
+  this->splitter->addWidget(this->contextTabWidgets["buildingEditorTab"]);
+  this->splitter->addWidget(this->contextTabWidgets["terrainEditorTab"]);
+  this->splitter->addWidget(this->renderWidget);
+  this->splitter->addWidget(this->toolsWidget);
 
   QList<int> sizes;
 
+  sizes.push_back(250);
   sizes.push_back(250);
   sizes.push_back(250);
   sizes.push_back(this->width() - 250);
@@ -491,6 +488,24 @@ void MainWindow::OnResetWorld()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::OnEditTerrain()
+{
+  bool isChecked = g_editBuildingAct->isChecked();
+  if (isChecked)
+  {
+    this->Pause();
+    this->tabWidget->hide();
+    this->contextTabWidgets["terrainEditorTab"]->show();
+  }
+  else
+  {
+    this->tabWidget->show();
+    this->contextTabWidgets["terrainEditorTab"]->hide();
+    this->Play();
+  }
+}
+
+/////////////////////////////////////////////////
 void MainWindow::OnEditBuilding()
 {
   bool isChecked = g_editBuildingAct->isChecked();
@@ -499,14 +514,14 @@ void MainWindow::OnEditBuilding()
     this->Pause();
     this->renderWidget->ShowEditor(true);
     this->tabWidget->hide();
-    this->buildingEditorTabWidget->show();
+    this->contextTabWidgets["buildingEditorTab"]->show();
     this->AttachEditorMenuBar();
   }
   else
   {
     this->renderWidget->ShowEditor(false);
     this->tabWidget->show();
-    this->buildingEditorTabWidget->hide();
+    this->contextTabWidgets["buildingEditorTab"]->hide();
     this->AttachMainMenuBar();
     this->Play();
   }
@@ -800,6 +815,14 @@ void MainWindow::CreateActions()
   g_editBuildingAct->setCheckable(true);
   g_editBuildingAct->setChecked(false);
   connect(g_editBuildingAct, SIGNAL(triggered()), this, SLOT(OnEditBuilding()));
+
+  g_editTerrainAct = new QAction(tr("&Terrain Editor"), this);
+  g_editTerrainAct->setShortcut(tr("Ctrl+B"));
+  g_editTerrainAct->setStatusTip(tr("Enter Terrain Editor Mode"));
+  g_editTerrainAct->setCheckable(true);
+  g_editTerrainAct->setChecked(false);
+  connect(g_editTerrainAct, SIGNAL(triggered()), this, SLOT(OnEditTerrain()));
+
 
   g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   g_playAct->setStatusTip(tr("Run the world"));
@@ -1304,84 +1327,18 @@ void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
   _item->setExpanded(!_item->isExpanded());
 }
 
-/////////////////////////////////////////////////
-TreeViewDelegate::TreeViewDelegate(QTreeView *_view, QWidget *_parent)
-  : QItemDelegate(_parent), view(_view)
-{
-}
 
 /////////////////////////////////////////////////
-void TreeViewDelegate::paint(QPainter *painter,
-                          const QStyleOptionViewItem &option,
-                          const QModelIndex &index) const
+void MainWindow::RegisterTab(const std::string &_objName,
+    const std::string &_tabLabel, QWidget *_widget)
 {
-  const QAbstractItemModel *model = index.model();
-  Q_ASSERT(model);
+  QTabWidget *contextTabWidget = new QTabWidget(this);
+  contextTabWidget->setObjectName(tr(_objName.c_str()));
+  contextTabWidget->addTab(_widget, tr(_tabLabel.c_str()));
+  contextTabWidget->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Expanding);
+  contextTabWidget->setMinimumWidth(MINIMUM_TAB_WIDTH);
+  contextTabWidget->hide();
 
-  if (!model->parent(index).isValid())
-  {
-    QRect r = option.rect;
-
-    QColor orange(245, 129, 19);
-    QColor blue(71, 99, 183);
-    QColor grey(100, 100, 100);
-
-    if (option.state & QStyle::State_Open ||
-        option.state & QStyle::State_MouseOver)
-    {
-      painter->setPen(blue);
-      painter->setBrush(QBrush(blue));
-    }
-    else
-    {
-      painter->setPen(grey);
-      painter->setBrush(QBrush(grey));
-    }
-
-    if (option.state & QStyle::State_Open)
-      painter->drawLine(r.left()+8, r.top() + (r.height()*0.5 - 5),
-                        r.left()+8, r.top() + r.height()-1);
-
-    painter->save();
-    painter->setRenderHints(QPainter::Antialiasing |
-                            QPainter::TextAntialiasing);
-
-    painter->drawRoundedRect(r.left()+4, r.top() + (r.height()*0.5 - 5),
-                             10, 10, 20.0, 10.0, Qt::RelativeSize);
-
-
-    // draw text
-    QRect textrect = QRect(r.left() + 20, r.top(),
-                           r.width() - 40,
-                           r.height());
-
-    QString text = elidedText(
-        option.fontMetrics,
-        textrect.width(),
-        Qt::ElideMiddle,
-        model->data(index, Qt::DisplayRole).toString());
-
-    if (option.state & QStyle::State_MouseOver)
-      painter->setPen(QPen(orange, 1));
-    else
-      painter->setPen(QPen(grey, 1));
-
-    this->view->style()->drawItemText(painter, textrect, Qt::AlignLeft,
-        option.palette, this->view->isEnabled(), text);
-
-    painter->restore();
-  }
-  else
-  {
-      QItemDelegate::paint(painter, option, index);
-  }
-}
-
-/////////////////////////////////////////////////
-QSize TreeViewDelegate::sizeHint(const QStyleOptionViewItem &_opt,
-    const QModelIndex &_index) const
-{
-  QStyleOptionViewItem option = _opt;
-  QSize sz = QItemDelegate::sizeHint(_opt, _index) + QSize(2, 2);
-  return sz;
+  this->contextTabWidgets[_objName] = contextTabWidget;
 }
