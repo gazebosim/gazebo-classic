@@ -1523,9 +1523,7 @@ void Visual::InsertMesh(const std::string &_meshName)
   if (!common::MeshManager::Instance()->HasMesh(_meshName))
   {
     mesh = common::MeshManager::Instance()->Load(_meshName);
-    if (mesh)
-      RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
-    else
+    if (!mesh)
       gzthrow("Unable to create a mesh from " + _meshName);
   }
   else
@@ -1549,6 +1547,10 @@ void Visual::InsertMesh(const std::string &_meshName)
 void Visual::InsertMesh(const common::Mesh *_mesh)
 {
   Ogre::MeshPtr ogreMesh;
+
+  GZ_ASSERT(_mesh != NULL, "Unable to insert a NULL mesh");
+
+  RenderEngine::Instance()->AddResourcePath(_mesh->GetPath());
 
   if (_mesh->GetSubMeshCount() == 0)
   {
@@ -1768,7 +1770,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
   }
   catch(Ogre::Exception &e)
   {
-    gzerr << "Unable to insert mesh[" << e.getDescription() << std::endl;
+    gzerr << "Unable to insert mesh[" << e.getDescription() << "]" << std::endl;
   }
 }
 

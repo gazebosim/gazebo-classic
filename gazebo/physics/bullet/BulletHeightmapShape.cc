@@ -69,7 +69,7 @@ void BulletHeightmapShape::Init()
   BulletCollisionPtr bParent;
   bParent = boost::shared_dynamic_cast<BulletCollision>(this->collisionParent);
 
-  bParent->SetCollisionShape(this->heightFieldShape);
+  bParent->SetCollisionShape(this->heightFieldShape, false);
 
   math::Pose pose;
   pose.pos.x = 0;

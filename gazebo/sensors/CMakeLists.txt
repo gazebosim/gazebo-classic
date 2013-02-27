@@ -36,6 +36,7 @@ set (headers
 set (gtest_sources
   RaySensor_TEST.cc
   ImuSensor_TEST.cc
+  Sensor_TEST.cc
 )
 
 if (${VALID_DRI_DISPLAY})

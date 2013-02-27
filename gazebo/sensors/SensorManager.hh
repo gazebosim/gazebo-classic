@@ -162,6 +162,9 @@ namespace gazebo
       /// i.e. all sensors managed by SensorManager have been initialized
       public: bool SensorsInitialized();
 
+      /// \brief Reset last update times in all sensors.
+      public: void ResetLastUpdateTimes();
+
       /// \brief Add a new sensor to a sensor container.
       /// \param[in] _sensor Pointer to a sensor to add.
       private: void AddSensor(SensorPtr _sensor);
@@ -217,6 +220,9 @@ namespace gazebo
                  /// \brief Remove all sensors.
                  public: void RemoveSensors();
 
+                 /// \brief Reset last update times in all sensors.
+                 public: void ResetLastUpdateTimes();
+
                  /// \brief A loop to update the sensor. Used by the
                  /// runThread.
                  private: void RunLoop();
@@ -271,8 +277,18 @@ namespace gazebo
       /// \brief The sensor manager's vector of sensor containers.
       private: SensorContainer_V sensorContainers;
 
+      /// \brief A mutex used by SensorContainer and SimTimeEventHandler
+      /// for timing coordination.
+      private: static boost::mutex sensorTimingMutex;
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<SensorManager>;
+
+      /// \brief Allow access to sensorTimeMutex member var.
+      private: friend class SensorContainer;
+
+      /// \brief Allow access to sensorTimeMutex member var.
+      private: friend class SimTimeEventHandler;
     };
     /// \}
   }
