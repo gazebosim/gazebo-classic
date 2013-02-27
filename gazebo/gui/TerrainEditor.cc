@@ -15,6 +15,10 @@
  *
 */
 
+#include "gazebo/gui/qt.h"
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/TerrainEditorPalette.hh"
 #include "gazebo/gui/TerrainEditor.hh"
 
 using namespace gazebo;
@@ -25,8 +29,10 @@ TerrainEditor::TerrainEditor(MainWindow *_mainWindow)
   : Editor(_mainWindow)
 {
   // Create the terrain editor tab
-  this->terrainPalette = new TerrainPalette(this);
+  this->terrainPalette = new TerrainEditorPalette;
   this->Init("terrainEditorTab", "Terrain Editor", this->terrainPalette);
+
+  connect(g_editTerrainAct, SIGNAL(triggered()), this, SLOT(OnEdit()));
 }
 
 /////////////////////////////////////////////////
@@ -35,6 +41,20 @@ TerrainEditor::~TerrainEditor()
 }
 
 /////////////////////////////////////////////////
-void TerrainEditor::AttachMenuBar()
+void TerrainEditor::OnEdit()
 {
+  bool isChecked = g_editTerrainAct->isChecked();
+
+  if (isChecked)
+  {
+    this->mainWindow->Pause();
+    this->mainWindow->ShowLeftColumnWidget("terrainEditorTab");
+    // this->mainWindow->ShowMenuBar(this->menuBar);
+  }
+  else
+  {
+    this->mainWindow->ShowLeftColumnWidget();
+    // this->mainWindow->ShowMenuBar();
+    this->mainWindow->Play();
+  }
 }

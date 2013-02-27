@@ -26,17 +26,20 @@ namespace gazebo
   {
     class TerrainEditor : public Editor
     {
+      Q_OBJECT
+
       /// \brief Constuctor.
       public: TerrainEditor(MainWindow *_mainWindow);
 
       /// \brief Destuctor.
       public: virtual ~TerrainEditor();
 
-      // Documentation inherited.
-      public: virtual void AttachMenuBar();
+      /// \brief QT callback when entering building edit mode
+      private slots: void OnEdit();
 
+      /// \brief Contains all the terrain editor tools.
       private: TerrainEditorPalette *terrainPalette;
     };
   }
 }
-#endif 
+#endif

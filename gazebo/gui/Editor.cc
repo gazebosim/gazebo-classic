@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/Editor.hh"
 
 using namespace gazebo;
@@ -24,6 +25,7 @@ using namespace gui;
 Editor::Editor(MainWindow *_mainWindow)
   : mainWindow(_mainWindow)
 {
+  this->tabWidget = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -34,11 +36,6 @@ Editor::~Editor()
 }
 
 /////////////////////////////////////////////////
-void Editor::AttachMenuBar()
-{
-}
-
-/////////////////////////////////////////////////
 void Editor::Init(const std::string &_objName,
                   const std::string &_tabLabel, QWidget *_widget)
 {
@@ -46,13 +43,13 @@ void Editor::Init(const std::string &_objName,
     delete this->tabWidget;
 
   this->tabWidget = new QTabWidget;
-  this->tabWidget->setObjectName(tr(_objName.c_str()));
-  this->tabWidget->addTab(_widget, tr(_tabLabel.c_str()));
+  this->tabWidget->setObjectName(QString::fromStdString(_objName));
+  this->tabWidget->addTab(_widget, QString::fromStdString(_tabLabel));
   this->tabWidget->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
   this->tabWidget->setMinimumWidth(250);
   this->tabWidget->hide();
 
-  // MainWindow::AddToStack(this->tabWidget);
+  this->mainWindow->AddToLeftColumn(_objName, this->tabWidget);
 }
 

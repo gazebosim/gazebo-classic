@@ -17,26 +17,53 @@
 #ifndef _BUILDING_EDITOR_HH_
 #define _BUILDING_EDITOR_HH_
 
-#include "gazebo/gui/BuildingEditorPalette.hh"
 #include "gazebo/gui/Editor.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class BuildingEditorPalette;
+
     class BuildingEditor : public Editor
     {
+      Q_OBJECT
+
       /// \brief Constuctor.
       public: BuildingEditor(MainWindow *_mainWindow);
 
       /// \brief Destuctor.
       public: virtual ~BuildingEditor();
 
-      // Documentation inherited.
-      public: virtual void AttachMenuBar();
+      /// \brief Qt callback when the building editor's save action is
+      /// triggered.
+      private slots: void Save();
 
+      /// \brief Qt callback when the building editor's discard action is
+      /// triggered.
+      private slots: void Discard();
+
+      /// \brief Qt callback when the building editor's done action is
+      /// triggered.
+      private slots: void Done();
+
+      /// \brief Qt callback when the building editor's exit action is
+      /// triggered.
+      private slots: void Exit();
+
+      /// \brief Callback from the building editor when the building model
+      /// has been completed.
+      private: void OnFinish();
+
+      /// \brief QT callback when entering building edit mode
+      private slots: void OnEdit();
+
+      /// \brief Contains all the building editor tools.
       private: BuildingEditorPalette *buildingPalette;
+
+      /// \brief Our custom menubar
+      private: QMenuBar *menuBar;
     };
   }
 }
-#endif 
+#endif

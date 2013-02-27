@@ -17,22 +17,29 @@
 #ifndef _EDITOR_HH_
 #define _EDITOR_HH_
 
+#include <string>
+#include <vector>
+
+#include "gazebo/gui/qt.h"
+#include "gazebo/common/Event.hh"
+
 namespace gazebo
 {
   namespace gui
   {
+    class MainWindow;
+
     /// \brief Base class for editors, such as BuildingEditor and
     /// TerrainEditor
-    class Editor
+    class Editor : public QObject
     {
+      Q_OBJECT
+
       /// \brief Constuctor
       public: Editor(MainWindow *_mainWindow);
 
       /// \brief Destuctor
       public: virtual ~Editor();
-
-      /// \brief Attach a custom menu bar
-      public: virtual void AttachMenuBar();
 
       /// \brief Initialize the editor. Each child class should call this
       /// function on construction.
@@ -41,10 +48,16 @@ namespace gazebo
       /// \param[in] _lableName String used for the tab label.
       /// \param[in] _widget Widget that is put inside the tab.
       protected: void Init(const std::string &_objName,
-                     const std::string &_tabLabel, QWidget *_widget)
+                     const std::string &_tabLabel, QWidget *_widget);
 
       /// \brief The tab widget that holds the editor's set of buttons
       protected: QTabWidget *tabWidget;
+
+      /// \brief Pointer to the main window.
+      protected: MainWindow *mainWindow;
+
+      /// \brief List of Event based connections.
+      protected: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

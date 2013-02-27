@@ -507,7 +507,8 @@ QTabBar::tab:!selected
 }
 
 QTabWidget#mainTab::pane,
-QTabWidget#buildingEditorTab::pane
+QTabWidget#buildingEditorTab::pane,
+QTabWidget#terrainEditorTab::pane
 {
   border-left: 1px solid #101010;
   border-bottom: 1px solid #101010;
@@ -568,7 +569,8 @@ QWidget#renderWidget > QWidget
   margin-right: 0px;
 }
 
-QWidget#buildingEditorWidget > QWidget
+QWidget#buildingEditorWidget > QWidget,
+QWidget#terrainEditorWidget > QWidget
 {
   padding: 2px;
   background-color: #808080;

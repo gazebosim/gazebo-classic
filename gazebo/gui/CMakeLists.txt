@@ -13,8 +13,10 @@ add_subdirectory(model_editor)
 set (sources
   Actions.cc
   BoxMaker.cc
+  BuildingEditor.cc
   CylinderMaker.cc
   DataLogger.cc
+  Editor.cc
   EntityMaker.cc
   RenderWidget.cc
   GLWidget.cc
@@ -31,6 +33,7 @@ set (sources
   ModelRightMenu.cc
   MouseEventHandler.cc
   SphereMaker.cc
+  TerrainEditor.cc
   TerrainEditorPalette.cc
   TimePanel.cc
   ToolsWidget.cc
@@ -45,7 +48,9 @@ set (sources
 
 set (qt_headers
   Actions.hh
+  BuildingEditor.hh
   DataLogger.hh
+  Editor.hh
   GLWidget.hh
   InsertModelWidget.hh
   JointControlWidget.hh
@@ -54,6 +59,7 @@ set (qt_headers
   ModelEditWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
+  TerrainEditor.hh
   TerrainEditorPalette.hh
   TimePanel.hh
   ToolsWidget.hh
