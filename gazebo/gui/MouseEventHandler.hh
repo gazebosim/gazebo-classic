@@ -14,44 +14,40 @@
  * limitations under the License.
  *
 */
+#ifndef _MOUSE_EVENT_HANDLER_HH_
+#define _MOUSE_EVENT_HANDLER_HH_
 
-#ifndef _TERRAIN_EDITOR_PALETTE_HH_
-#define _TERRAIN_EDITOR_PALETTE_HH_
+#include <boost/function.hpp>
+#include <string>
+#include <list>
 
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/MouseEvent.hh"
-#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
   namespace gui
   {
-    /// \addtogroup gazebo_gui
-    /// \{
-
-    /// \class TerrainEditorPalette TerrainEditorPalette.hh
-    /// \brief A palette of building items which can be added to the editor.
-    class TerrainEditorPalette : public QWidget
+    /// \brief Processes and filters mouse events.
+    class MouseEventHandler : public SingletonT<MouseEventHandler>
     {
-      Q_OBJECT
+      public: typedef boost::function<bool (const common::MouseEvent &_event)>
+              MouseEventFilter;
 
       /// \brief Constructor
-      /// \param[in] _parent Parent QWidget.
-      public: TerrainEditorPalette(QWidget *_parent = 0);
+      private: MouseEventHandler();
 
       /// \brief Destructor
-      public: ~TerrainEditorPalette();
+      private: virtual ~MouseEventHandler();
 
-      private: bool OnMousePress(const common::MouseEvent &_event);
+      public: void AddFilter(const std::string &_name,
+                  MouseEventFilter _filter);
 
-      private slots: void OnRaise();
+      public: void Handle(const common::MouseEvent &_event);
 
-      private slots: void OnLower();
+      private: std::list<MouseEventFilter> filters;
 
-      private slots: void OnSave();
-
-      private: QSlider *brushSizeSlider;
-      private: QSlider *brushWeightSlider;
+      private: friend class SingletonT<MouseEventHandler>;
     };
   }
 }

@@ -87,6 +87,7 @@ namespace gazebo
       private: void OnMouseReleaseTranslate();
       private: void OnMouseReleaseMakeEntity();
 
+      private: bool OnMousePress(const common::MouseEvent &_event);
       private: void OnMousePressNormal();
       private: void OnMousePressTranslate();
       private: void OnMousePressMakeEntity();

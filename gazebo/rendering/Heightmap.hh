@@ -77,7 +77,8 @@ namespace gazebo
       /// coordinates.
       /// \param[in] _brushSize Controls the radius of effect.
       /// \param[in] _weight Controls modification magnitude.
-      public: void Raise(CameraPtr _camera, math::Vector2i _mousePos,
+      /// \return True if the terrain was modified
+      public: bool Raise(CameraPtr _camera, math::Vector2i _mousePos,
                          double _brushSize, double _weight = 0.1);
 
       /// \brief Lower the terrain based on a mouse press.
@@ -86,7 +87,8 @@ namespace gazebo
       /// coordinates.
       /// \param[in] _brushSize Controls the radius of effect.
       /// \param[in] _weight Controls modification magnitude.
-      public: void Lower(CameraPtr _camera, math::Vector2i _mousePos,
+      /// \return True if the terrain was modified
+      public: bool Lower(CameraPtr _camera, math::Vector2i _mousePos,
                          double _brushSize, double _weight = 0.1);
 
       /// \brief Get a pointer to the OGRE terrain group object.

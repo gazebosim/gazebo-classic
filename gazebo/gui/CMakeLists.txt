@@ -11,7 +11,6 @@ add_subdirectory(qtpropertybrowser)
 add_subdirectory(model_editor)
 
 set (sources
-  ../gazebo.cc
   Actions.cc
   BoxMaker.cc
   CylinderMaker.cc
@@ -30,6 +29,7 @@ set (sources
   ModelListWidget.cc
   ModelMaker.cc
   ModelRightMenu.cc
+  MouseEventHandler.cc
   SphereMaker.cc
   TerrainEditorPalette.cc
   TimePanel.cc
@@ -77,6 +77,7 @@ set (headers
   MeshMaker.hh
   ModelMaker.hh
   SphereMaker.hh
+  MouseEventHandler.hh
   viewers/ViewFactory.hh
 )
 
@@ -108,6 +109,7 @@ target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_msgs
                                  gazebo_model_editor
                                  gzqtpropertybrowser
+                                 libgazebo
                                  ${QT_LIBRARIES}
                                  ${ogre_libraries}
                                  ${Boost_LIBRARIES}
@@ -121,6 +123,7 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_msgs
                                 gazebo_model_editor
                                 gzqtpropertybrowser
+                                libgazebo
                                 ${QT_LIBRARIES}
                                 ${ogre_libraries}
                                 ${Boost_LIBRARIES}

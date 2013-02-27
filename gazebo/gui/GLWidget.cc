@@ -32,6 +32,7 @@
 #include "gazebo/rendering/OrbitViewController.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 
+#include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
@@ -125,6 +126,9 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(g_terrainRaiseAct, SIGNAL(triggered()), this,
       SLOT(OnRaiseTerrain()));
+
+  MouseEventHandler::Instance()->AddFilter("glwidget",
+      boost::bind(&GLWidget::OnMousePress, this, _1));
 }
 
 /////////////////////////////////////////////////
@@ -346,7 +350,15 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
     common::MouseEvent::MIDDLE : 0x0;
 
   this->mouseEvent.dragging = false;
-  gui::Events::mousePress(this->mouseEvent);
+
+  // Process Mouse Events
+  MouseEventHandler::Instance()->Handle(this->mouseEvent);
+}
+
+/////////////////////////////////////////////////
+bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
+{
+  // gui::Events::mousePress(this->mouseEvent);
 
   if (this->state == "make_entity")
     this->OnMousePressMakeEntity();
@@ -356,6 +368,8 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
     this->OnMousePressTranslate();
   else if (this->state == "raise_terrain" || this->state == "lower_terrain")
     this->OnMousePressRaiseTerrain();
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -419,19 +433,6 @@ void GLWidget::OnMouseMoveRaiseTerrain()
 /////////////////////////////////////////////////
 void GLWidget::OnMousePressRaiseTerrain()
 {
-  rendering::Heightmap *heightmap = this->scene ?
-    this->scene->GetHeightmap() : NULL;
-
-  if (heightmap)
-  {
-    if (this->mouseEvent.shift)
-      heightmap->Lower(this->userCamera, this->mouseEvent.pos, 0.2, 0.2);
-    else
-      heightmap->Raise(this->userCamera, this->mouseEvent.pos, 0.2, 0.2);
-    heightmap->GetImage();
-  }
-  else
-    this->OnMousePressNormal();
 }
 
 /////////////////////////////////////////////////

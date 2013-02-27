@@ -377,7 +377,7 @@ double Heightmap::GetHeight(double _x, double _y, double _z)
 }
 
 /////////////////////////////////////////////////
-void Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
+bool Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
     double _brushSize, double _weight)
 {
   Ogre::Ray mouseRay = _camera->GetOgreCamera()->getCameraToViewportRay(
@@ -392,10 +392,12 @@ void Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
 
   if (terrainResult.hit)
     this->ModifyTerrain(terrainResult.position, _brushSize, _weight, true);
+
+  return terrainResult.hit;
 }
 
 /////////////////////////////////////////////////
-void Heightmap::Lower(CameraPtr _camera, math::Vector2i _mousePos,
+bool Heightmap::Lower(CameraPtr _camera, math::Vector2i _mousePos,
     double _brushSize, double _weight)
 {
   Ogre::Ray mouseRay = _camera->GetOgreCamera()->getCameraToViewportRay(
@@ -410,6 +412,8 @@ void Heightmap::Lower(CameraPtr _camera, math::Vector2i _mousePos,
 
   if (terrainResult.hit)
     this->ModifyTerrain(terrainResult.position, _brushSize, _weight, false);
+
+  return terrainResult.hit;
 }
 
 /////////////////////////////////////////////////
