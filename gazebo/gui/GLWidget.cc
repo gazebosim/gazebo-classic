@@ -407,7 +407,10 @@ void GLWidget::OnMouseMoveRaiseTerrain()
   if (heightmap && this->mouseEvent.dragging &&
       this->mouseEvent.button == common::MouseEvent::LEFT)
   {
-    heightmap->Raise(this->userCamera, this->mouseEvent.pos, 0.2, 0.05);
+    if (this->mouseEvent.shift)
+      heightmap->Lower(this->userCamera, this->mouseEvent.pos, 0.2, 0.05);
+    else
+      heightmap->Raise(this->userCamera, this->mouseEvent.pos, 0.2, 0.05);
   }
   else
     this->OnMouseMoveNormal();
@@ -420,7 +423,12 @@ void GLWidget::OnMousePressRaiseTerrain()
     this->scene->GetHeightmap() : NULL;
 
   if (heightmap)
-    heightmap->Raise(this->userCamera, this->mouseEvent.pos, 0.2, 0.2);
+  {
+    if (this->mouseEvent.shift)
+      heightmap->Lower(this->userCamera, this->mouseEvent.pos, 0.2, 0.2);
+    else
+      heightmap->Raise(this->userCamera, this->mouseEvent.pos, 0.2, 0.2);
+  }
   else
     this->OnMousePressNormal();
 }

@@ -355,7 +355,7 @@ void Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
     this->terrainGroup->rayIntersects(mouseRay);
 
   if (terrainResult.hit)
-    this->ModifyTerrain(terrainResult.position, _brushSize, _weight);
+    this->ModifyTerrain(terrainResult.position, _brushSize, _weight, true);
 }
 
 /////////////////////////////////////////////////
@@ -373,12 +373,12 @@ void Heightmap::Lower(CameraPtr _camera, math::Vector2i _mousePos,
     this->terrainGroup->rayIntersects(mouseRay);
 
   if (terrainResult.hit)
-    this->ModifyTerrain(terrainResult.position, _brushSize, _weight);
+    this->ModifyTerrain(terrainResult.position, _brushSize, _weight, false);
 }
 
 /////////////////////////////////////////////////
 void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
-    double _weight)
+    double _weight, bool _raise)
 {
   GZ_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
   Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
@@ -415,7 +415,12 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
         weight = 1.0 - (weight * weight);
 
         float addedHeight = weight * _weight;
-        float newHeight = terrain->getHeightAtPoint(x, y) + addedHeight;
+        float newHeight = terrain->getHeightAtPoint(x, y);
+
+        if (_raise)
+          newHeight += addedHeight;
+        else
+          newHeight -= addedHeight;
 
         terrain->setHeightAtPoint(x, y, newHeight);
       }

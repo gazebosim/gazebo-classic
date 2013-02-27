@@ -76,13 +76,13 @@ namespace gazebo
       /// \param[in] _y Y position in world coordinates
       /// \param[in] _z New Z (height) value in world coordinates
       private: void ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
-                  double _weight);
+                  double _weight, bool _raise);
 
       public: void Raise(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _brushSize, double _weight = 1.0);
+                         double _brushSize, double _weight = 0.1);
 
       public: void Lower(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _brushSize, double _weight = 1.0);
+                         double _brushSize, double _weight = 0.1);
 
       /// \brief Get a pointer to the OGRE terrain group object.
       /// \return Pointer to the OGRE terrain.
