@@ -577,8 +577,6 @@ void SensorManager::SensorContainer::ResetLastUpdateTimes()
 
   Sensor_V::iterator iter;
 
-  bool removed = false;
-
   // Rest last update times for all contained sensors.
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
   {
