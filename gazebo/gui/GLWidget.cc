@@ -354,7 +354,7 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
     this->OnMousePressNormal();
   else if (this->state == "translate" || this->state == "rotate")
     this->OnMousePressTranslate();
-  else if (this->state == "raise_terrain")
+  else if (this->state == "raise_terrain" || this->state == "lower_terrain")
     this->OnMousePressRaiseTerrain();
 }
 
