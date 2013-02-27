@@ -428,6 +428,7 @@ void GLWidget::OnMousePressRaiseTerrain()
       heightmap->Lower(this->userCamera, this->mouseEvent.pos, 0.2, 0.2);
     else
       heightmap->Raise(this->userCamera, this->mouseEvent.pos, 0.2, 0.2);
+    heightmap->GetImage();
   }
   else
     this->OnMousePressNormal();
@@ -489,7 +490,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
     this->OnMouseMoveNormal();
   else if (this->state == "translate" || this->state == "rotate")
     this->OnMouseMoveTranslate();
-  else if (this->state == "raise_terrain")
+  else if (this->state == "raise_terrain" || this->state == "lower_terrain")
     this->OnMouseMoveRaiseTerrain();
 
   this->mouseEvent.prevPos = this->mouseEvent.pos;

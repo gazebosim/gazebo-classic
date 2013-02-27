@@ -85,6 +85,42 @@ Ogre::TerrainGroup *Heightmap::GetOgreTerrain() const
 }
 
 //////////////////////////////////////////////////
+common::Image Heightmap::GetImage() const
+{
+  double maxHeight = 10.0;
+  double height = 0.0;
+  unsigned char *imageData = NULL;
+
+  /// \todo Support multiple terrain objects
+  Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
+
+  // Get the number of vertices along one side of the terrain
+  uint16_t size = terrain->getSize();
+
+  // Create the image data buffer
+  imageData = new unsigned char[size * size];
+
+  // Get height data from all vertices
+  for (uint16_t y = 0; y < size; ++y)
+  {
+    for (uint16_t x = 0; x < size; ++x)
+    {
+      // Normalize height value
+      height = std::min(1.0, terrain->getHeightAtPoint(x, y) / maxHeight);
+
+      // Scale height to a value between 0 and 255
+      imageData[y*size+x] = static_cast<unsigned char>(height * 255.0);
+    }
+  }
+
+  common::Image result;
+  result.SetFromData(imageData, size, size, common::Image::L_INT8);
+
+  delete [] imageData;
+  return result;
+}
+
+//////////////////////////////////////////////////
 void Heightmap::Load()
 {
   if (this->terrainGlobals != NULL)

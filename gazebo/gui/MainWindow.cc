@@ -42,6 +42,7 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/model_editor/BuildingEditorPalette.hh"
+#include "gazebo/gui/TerrainEditorPalette.hh"
 #include "gazebo/gui/model_editor/EditorEvents.hh"
 
 #include "sdf/sdf.hh"
@@ -78,11 +79,15 @@ MainWindow::MainWindow()
   this->modelListWidget = new ModelListWidget(this);
   InsertModelWidget *insertModel = new InsertModelWidget(this);
 
+  // Create the terrain editor tab
+  TerrainEditorPalette *terrainEditorPalette = new TerrainEditorPalette(this);
+
   int minimumTabWidth = 250;
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("mainTab");
   this->tabWidget->addTab(this->modelListWidget, "World");
   this->tabWidget->addTab(insertModel, "Insert");
+  this->tabWidget->addTab(terrainEditorPalette, "Terrain Editor");
   this->tabWidget->setSizePolicy(QSizePolicy::Expanding,
                                  QSizePolicy::Expanding);
   this->tabWidget->setMinimumWidth(minimumTabWidth);

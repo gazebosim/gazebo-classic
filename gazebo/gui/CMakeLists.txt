@@ -31,6 +31,7 @@ set (sources
   ModelMaker.cc
   ModelRightMenu.cc
   SphereMaker.cc
+  TerrainEditorPalette.cc
   TimePanel.cc
   ToolsWidget.cc
   TopicSelector.cc
@@ -53,6 +54,7 @@ set (qt_headers
   ModelEditWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
+  TerrainEditorPalette.hh
   TimePanel.hh
   ToolsWidget.hh
   TopicSelector.hh

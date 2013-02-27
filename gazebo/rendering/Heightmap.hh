@@ -71,22 +71,38 @@ namespace gazebo
       /// \return The height at the specified location
       public: double GetHeight(double _x, double _y, double _z = 1000);
 
-      /// \brief Set the height at a specific point.
-      /// \param[in] _x X position in world coordinates
-      /// \param[in] _y Y position in world coordinates
-      /// \param[in] _z New Z (height) value in world coordinates
-      private: void ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
-                  double _weight, bool _raise);
-
+      /// \brief Raise the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _brushSize Controls the radius of effect.
+      /// \param[in] _weight Controls modification magnitude.
       public: void Raise(CameraPtr _camera, math::Vector2i _mousePos,
                          double _brushSize, double _weight = 0.1);
 
+      /// \brief Lower the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _brushSize Controls the radius of effect.
+      /// \param[in] _weight Controls modification magnitude.
       public: void Lower(CameraPtr _camera, math::Vector2i _mousePos,
                          double _brushSize, double _weight = 0.1);
 
       /// \brief Get a pointer to the OGRE terrain group object.
       /// \return Pointer to the OGRE terrain.
       public: Ogre::TerrainGroup *GetOgreTerrain() const;
+
+      /// \brief Get the heightmap as an image
+      public: common::Image GetImage() const;
+
+      /// \brief Modify the height at a specific point.
+      /// \param[in] _pos Position in world coordinates.
+      /// \param[in] _brushSize Controls the radius of effect.
+      /// \param[in] _weight Controls modification magnitude.
+      /// \param[in] _raise True to raise the terrain, false to lower.
+      private: void ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
+                   double _weight, bool _raise);
 
       /// \brief Initialize all the blend material maps.
       /// \param[in] _terrain The terrain to initialize the blend maps.
