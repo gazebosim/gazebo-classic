@@ -206,6 +206,18 @@ void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 }
 
 //////////////////////////////////////////////////
+void PhysicsEngine::SetAttribute(PhysicsAttribute /*_attr*/,
+    const boost::any &/*_value*/)
+{
+}
+
+//////////////////////////////////////////////////
+boost::any PhysicsEngine::GetAttribute(PhysicsAttribute /*_attr*/) const
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
 ContactManager *PhysicsEngine::GetContactManager() const
 {
   return this->contactManager;

@@ -260,12 +260,11 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::BULLET);
     physicsMsg.set_update_rate(this->GetUpdateRate());
-    // This function was copied from ODEPhysics with portions commented out.
-    // TODO: determine which of these should be implemented.
     // physicsMsg.set_solver_type(this->stepType);
     physicsMsg.set_dt(this->GetStepTime());
     physicsMsg.set_iters(
         boost::any_cast<int>(this->GetAttribute(SOR_PGS_ITERS)));
+    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(
         boost::any_cast<double>(this->GetAttribute(SOR_PGS_W)));
     physicsMsg.set_cfm(
@@ -321,6 +320,9 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   if (_msg->has_erp())
     this->SetAttribute(GLOBAL_ERP, _msg->erp());
+
+  if (_msg->has_enable_physics())
+    this->world->EnablePhysicsEngine(_msg->enable_physics());
 
   if (_msg->has_contact_surface_layer())
     this->SetAttribute(CONTACT_SURFACE_LAYER, _msg->contact_surface_layer());
@@ -424,7 +426,7 @@ void BulletPhysics::SetAttribute(PhysicsAttribute _attr,
       double value = boost::any_cast<double>(_value);
       bulletElem->GetElement("constraints")->GetElement(
           "contact_surface_layer")->Set(value);
-      gzwarn << "Not yet implemented in bullet" << std::endl;
+      //gzwarn << "Not yet implemented in bullet" << std::endl;
       break;
     }
     case MAX_CONTACTS:

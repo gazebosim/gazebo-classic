@@ -276,6 +276,17 @@ namespace gazebo
       /// \return Maximum number of allows contacts.
       public: virtual int GetMaxContacts() {return 0;}
 
+      /// \brief Set an attribute of the physics engine
+      /// \param[in] _attr An attribute listed in the PhysicsAttribute enum
+      /// \param[in] _value The value to set to
+      public: virtual void SetAttribute(PhysicsAttribute _attr,
+                  const boost::any &_value);
+
+      /// \brief Get an attribute of the physics engine
+      /// \param[in] _attr An attribute listed in the PhysicsAttribute enum
+      /// \return The value of the attribute
+      public: virtual boost::any GetAttribute(PhysicsAttribute _attr) const;
+
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;
 

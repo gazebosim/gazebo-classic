@@ -18,9 +18,11 @@
 #include "ServerFixture.hh"
 #include "physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
+
 class PhysicsTest : public ServerFixture
 {
   public: void EmptyWorld(const std::string &_physicsEngine);
@@ -29,7 +31,25 @@ class PhysicsTest : public ServerFixture
   public: void RevoluteJoint(const std::string &_physicsEngine);
   public: void SimplePendulum(const std::string &_physicsEngine);
   public: void CollisionFiltering(const std::string &_physicsEngine);
+  public: void PhysicsParam(const std::string &_physicsEngine);
+  public: void OnPhysicsMsgResponse(ConstResponsePtr &_msg);
+  public: static msgs::Physics physicsPubMsg;
+  public: static msgs::Physics physicsResponseMsg;
 };
+
+
+TEST_F(PhysicsTest, PhysicsParamODE)
+{
+  PhysicsParam("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, PhysicsParamBullet)
+{
+  PhysicsParam("bullet");
+}
+#endif  // HAVE_BULLET
+
 
 ////////////////////////////////////////////////////////////////////////
 // EmptyWorld:
@@ -1521,6 +1541,102 @@ TEST_F(PhysicsTest, CollisionFilteringBullet)
 }
 #endif  // HAVE_BULLET
 
+
+msgs::Physics PhysicsTest::physicsPubMsg;
+msgs::Physics PhysicsTest::physicsResponseMsg;
+
+/////////////////////////////////////////////////
+void PhysicsTest::OnPhysicsMsgResponse(ConstResponsePtr &_msg)
+{
+  physicsResponseMsg.ParseFromString(_msg->serialized_data());
+}
+
+void PhysicsTest::PhysicsParam(const std::string &_physicsEngine)
+{
+  physicsPubMsg.Clear();
+  physicsResponseMsg.Clear();
+
+  Load("worlds/empty.world", false, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
+  ASSERT_TRUE(engine != NULL);
+
+  transport::NodePtr phyNode;
+  phyNode = transport::NodePtr(new transport::Node());
+  phyNode->Init();
+
+  transport::PublisherPtr physicsPub
+       = phyNode->Advertise<msgs::Physics>("~/physics");
+  transport::PublisherPtr requestPub
+      = phyNode->Advertise<msgs::Request>("~/request");
+  transport::SubscriberPtr responseSub = phyNode->Subscribe("~/response",
+      &PhysicsTest::OnPhysicsMsgResponse, this);
+
+//  msgs::Physics msg;
+  physicsPubMsg.set_enable_physics(true);
+  physicsPubMsg.set_update_rate(500);
+  // solver
+  physicsPubMsg.set_dt(60);
+  physicsPubMsg.set_iters(60);
+  physicsPubMsg.set_sor(1.5);
+  // constraint
+  physicsPubMsg.set_cfm(0.1);
+  physicsPubMsg.set_erp(0.25);
+  physicsPubMsg.set_contact_max_correcting_vel(10);
+  physicsPubMsg.set_contact_surface_layer(0.01);
+
+  if (_physicsEngine == "ode")
+    physicsPubMsg.set_type(msgs::Physics::ODE);
+  else if (_physicsEngine == "bullet")
+    physicsPubMsg.set_type(msgs::Physics::BULLET);
+
+  physicsPub->Publish(physicsPubMsg);
+
+  msgs::Request *requestMsg = msgs::CreateRequest("physics_info", "");
+  requestPub->Publish(*requestMsg);
+
+  int waitCount = 0, maxWaitCount = 3000;
+  while (!physicsResponseMsg.IsInitialized() && ++waitCount < maxWaitCount)
+    common::Time::MSleep(10);
+  ASSERT_LT(waitCount, maxWaitCount);
+
+  EXPECT_EQ(physicsResponseMsg.enable_physics(),
+      physicsPubMsg.enable_physics());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.update_rate(),
+      physicsPubMsg.update_rate());
+  EXPECT_EQ(physicsResponseMsg.dt(),
+      physicsPubMsg.dt());
+  EXPECT_EQ(physicsResponseMsg.iters(),
+      physicsPubMsg.iters());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.sor(),
+      physicsPubMsg.sor());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.cfm(),
+      physicsPubMsg.cfm());
+  if (_physicsEngine == "ode")
+  {
+    EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_max_correcting_vel(),
+        physicsPubMsg.contact_max_correcting_vel());
+    EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_surface_layer(),
+        physicsPubMsg.contact_surface_layer());
+  }
+
+  phyNode->Fini();
+}
+/*
+TEST_F(PhysicsTest, PhysicsParamODE)
+{
+  PhysicsParam("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, PhysicsParamBullet)
+{
+  PhysicsParam("bullet");
+}
+#endif  // HAVE_BULLET
+*/
 
 int main(int argc, char **argv)
 {
