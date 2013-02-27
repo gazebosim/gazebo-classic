@@ -34,6 +34,7 @@ Publication::Publication(const std::string &_topic, const std::string &_msgType)
 //////////////////////////////////////////////////
 Publication::~Publication()
 {
+  boost::mutex::scoped_lock lock(this->callbackMutex);
   this->publishers.clear();
 }
 
@@ -54,6 +55,8 @@ void Publication::AddSubscription(const NodePtr &_node)
       boost::mutex::scoped_lock lock(this->nodeMutex);
       this->nodes.push_back(_node);
     }
+
+    boost::mutex::scoped_lock lock(this->callbackMutex);
 
     std::vector<PublisherPtr>::iterator pubIter;
     for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
@@ -365,6 +368,7 @@ void Publication::SetLocallyAdvertised(bool _value)
 //////////////////////////////////////////////////
 void Publication::AddPublisher(PublisherPtr _pub)
 {
+  boost::mutex::scoped_lock lock(this->callbackMutex);
   this->publishers.push_back(_pub);
 }
 
