@@ -497,6 +497,7 @@ void dxJointLimitMotor::set( int num, dReal value )
         bounce = value;
         break;
     case dParamCFM:
+        printf("cfm %f\n", value);
         normal_cfm = value;
         break;
     case dParamStopERP:

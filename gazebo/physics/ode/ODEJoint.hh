@@ -97,7 +97,10 @@ namespace gazebo
       public: dJointFeedback *GetFeedback();
 
       /// \brief simulating damping with CFM and meddling with Joint limits
-      private: void CFMDamping();
+      public: void CFMDamping();
+
+      /// \brief internal variable to keep track of cfm damping internals
+      private: int cfmDampingState;
 
       // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);

@@ -39,6 +39,7 @@ ODEJoint::ODEJoint(BasePtr _parent)
   : Joint(_parent)
 {
   this->jointId = NULL;
+  this->cfmDampingState = 0;
 }
 
 //////////////////////////////////////////////////
@@ -631,16 +632,31 @@ JointWrench ODEJoint::GetForceTorque(int /*_index*/)
 void ODEJoint::CFMDamping()
 {
   // check if we are violating joint limits
-  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  if (this->cfmDampingState != 1 &&
+      (this->GetAngle(i) >= this->upperLimit[i] ||
+       this->GetAngle(i) <= this->lowerLimit[i] ||
+       math::equal(this->dampingCoefficient, 0.0)))
   {
-    if (this->GetAngle(i) >= this->upperLimit[i] ||
-        this->GetAngle(i) <= this->lowerLimit[i])
+    this->cfmDampingState = 1;
+    for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
     {
-      // use hard stop cfm & erp
+      // no damping and use hard stop cfm & erp
+      this->SetAttribute("stop_erp", i, 0.2);
+      this->SetAttribute("stop_cfm", i, 0.0);
+      this->SetHighStop(i, this->upperLimit[i]);
+      this->SetLowStop(i, this->lowerLimit[i]);
     }
-    else
+  }
+  else if (this->cfmDampingState != 2)
+  {
+    this->cfmDampingState = 2;
+    for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
     {
-      // use soft cfm = 1/kd & erp = 0 to simulate joint damping
+      this->SetHighStop(i, 0.0);
+      this->SetLowStop(i, 0.0001);
+      this->SetAttribute("stop_erp", i, 0.0);
+      this->SetAttribute("stop_cfm", i, 1.0 / this->dampingCoefficient);
+      gzerr << 1.0 / this->dampingCoefficient << "\n";
     }
   }
 }
