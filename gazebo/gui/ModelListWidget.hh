@@ -124,6 +124,9 @@ namespace gazebo
       private: QTreeWidgetItem *GetListItem(const std::string &_name,
                                             QTreeWidgetItem *_parent);
 
+      /// \brief Fill property tree with world properties
+      /// \param[in] _msg World message containing world properties
+      /// \param[in] _parentItem Parent item
       private: void FillPropertyTree(const msgs::World &_msg,
                                      QtProperty *_parentItem);
 
@@ -197,8 +200,10 @@ namespace gazebo
       private: transport::PublisherPtr modelPub;
       private: transport::PublisherPtr scenePub;
       private: transport::PublisherPtr physicsPub;
-      private: transport::PublisherPtr worldPub;
       private: transport::PublisherPtr lightPub;
+
+      /// \brief Publisher for world messages.
+      private: transport::PublisherPtr worldPub;
 
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
@@ -208,6 +213,8 @@ namespace gazebo
       private: QTreeWidgetItem *physicsItem;
       private: QTreeWidgetItem *modelsItem;
       private: QTreeWidgetItem *lightsItem;
+
+      /// \brief World item which displays world properties
       private: QTreeWidgetItem *worldItem;
 
       private: QtVariantPropertyManager *variantManager;
@@ -231,7 +238,9 @@ namespace gazebo
       typedef std::list<std::string> RemoveEntity_L;
       private: RemoveEntity_L removeEntityList;
 
+      /// \brief Incoming world message.
       private: msgs::World worldMsg;
+
       private: msgs::Model modelMsg;
       private: msgs::Link linkMsg;
       private: msgs::Scene sceneMsg;
