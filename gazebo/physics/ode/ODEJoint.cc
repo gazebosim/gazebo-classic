@@ -657,7 +657,6 @@ void ODEJoint::CFMDamping()
       this->SetHighStop(i, 0.0);
       this->SetAttribute("stop_erp", i, 0.0);
       this->SetAttribute("stop_cfm", i, 1.0 / this->dampingCoefficient);
-      // gzerr << this->GetName() << " : " << 1.0 / this->dampingCoefficient << "\n";
     }
   }
 }
