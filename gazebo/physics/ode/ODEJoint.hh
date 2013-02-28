@@ -100,7 +100,7 @@ namespace gazebo
       public: void CFMDamping();
 
       /// \brief internal variable to keep track of cfm damping internals
-      private: int cfmDampingState;
+      private: int cfmDampingState[2];
 
       // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
