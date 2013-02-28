@@ -41,8 +41,8 @@
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/gui/BuildingEditor.hh"
-#include "gazebo/gui/TerrainEditor.hh"
+#include "gazebo/gui/building/BuildingEditor.hh"
+#include "gazebo/gui/terrain/TerrainEditor.hh"
 
 #include "sdf/sdf.hh"
 
@@ -94,8 +94,7 @@ MainWindow::MainWindow()
   this->tabWidget->setMinimumWidth(MINIMUM_TAB_WIDTH);
   this->AddToLeftColumn("default", this->tabWidget);
 
-  this->editors.push_back(new TerrainEditor(this));
-  this->editors.push_back(new BuildingEditor(this));
+  this->CreateEditors();
 
   this->toolsWidget = new ToolsWidget();
 
@@ -1238,4 +1237,14 @@ void MainWindow::ShowLeftColumnWidget(const std::string &_name)
 RenderWidget *MainWindow::GetRenderWidget() const
 {
   return this->renderWidget;
+}
+
+/////////////////////////////////////////////////
+void MainWindow::CreateEditors()
+{
+  // Create a Terrain Editor
+  this->editors.push_back(new TerrainEditor(this));
+
+  // Create a Building Editor
+  this->editors.push_back(new BuildingEditor(this));
 }

@@ -8,12 +8,12 @@ link_directories(
 add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
-add_subdirectory(model_editor)
+add_subdirectory(building)
+add_subdirectory(terrain)
 
 set (sources
   Actions.cc
   BoxMaker.cc
-  BuildingEditor.cc
   CylinderMaker.cc
   DataLogger.cc
   Editor.cc
@@ -33,8 +33,6 @@ set (sources
   ModelRightMenu.cc
   MouseEventHandler.cc
   SphereMaker.cc
-  TerrainEditor.cc
-  TerrainEditorPalette.cc
   TimePanel.cc
   ToolsWidget.cc
   TopicSelector.cc
@@ -48,7 +46,6 @@ set (sources
 
 set (qt_headers
   Actions.hh
-  BuildingEditor.hh
   DataLogger.hh
   Editor.hh
   GLWidget.hh
@@ -59,8 +56,6 @@ set (qt_headers
   ModelEditWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
-  TerrainEditor.hh
-  TerrainEditorPalette.hh
   TimePanel.hh
   ToolsWidget.hh
   TopicSelector.hh
@@ -113,7 +108,8 @@ target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_rendering
                                  gazebo_sensors
                                  gazebo_msgs
-                                 gazebo_model_editor
+                                 gazebo_gui_building
+                                 gazebo_gui_terrain
                                  gzqtpropertybrowser
                                  libgazebo
                                  ${QT_LIBRARIES}
@@ -127,7 +123,8 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_rendering
                                 gazebo_sensors
                                 gazebo_msgs
-                                gazebo_model_editor
+                                gazebo_gui_building
+                                gazebo_gui_terrain
                                 gzqtpropertybrowser
                                 libgazebo
                                 ${QT_LIBRARIES}
@@ -137,6 +134,13 @@ target_link_libraries(gzclient  gazebo_common
 
 add_definitions(${QT_DEFINITIONS})
 
+set (gui_headers "" CACHE INTERNAL "common headers" FORCE)
+foreach (hdr ${headers})
+  APPEND_TO_CACHED_STRING(gui_headers
+    "GUI Headers" "#include \"gui/${hdr}\"\n")
+endforeach()
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR}/gui.hh )
+
 gz_install_library(gazebo_gui)
-gz_install_includes("gui" ${headers})
+gz_install_includes("gui" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)

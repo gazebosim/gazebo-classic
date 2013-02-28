@@ -71,6 +71,26 @@ namespace gazebo
       /// \return The height at the specified location
       public: double GetHeight(double _x, double _y, double _z = 1000);
 
+      /// \brief Smooth the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _brushSize Controls the radius of effect.
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Smooth(CameraPtr _camera, math::Vector2i _mousePos,
+                         double _brushSize, double _weight = 0.1);
+
+      /// \brief Roughen the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _brushSize Controls the radius of effect.
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Roughen(CameraPtr _camera, math::Vector2i _mousePos,
+                         double _brushSize, double _weight = 0.1);
+
       /// \brief Raise the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.
       /// \param[in] _mousePos Position of the mouse in viewport
@@ -91,20 +111,34 @@ namespace gazebo
       public: bool Lower(CameraPtr _camera, math::Vector2i _mousePos,
                          double _brushSize, double _weight = 0.1);
 
+      /// \brief Get the average height around a point.
+      /// \param[in] _pos Position in world coordinates.
+      /// \param[in] _brushSize Controls the radius of effect.
+      public: double GetAvgHeight(Ogre::Vector3 _pos, double _brushSize);
+
       /// \brief Get a pointer to the OGRE terrain group object.
       /// \return Pointer to the OGRE terrain.
       public: Ogre::TerrainGroup *GetOgreTerrain() const;
 
       /// \brief Get the heightmap as an image
+      /// \return An image that contains the terrain data.
       public: common::Image GetImage() const;
+
+      /// \brief Calculate a mouse ray hit on the terrain.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \return The result of the mouse ray hit.
+      public: Ogre::TerrainGroup::RayResult GetMouseHit(CameraPtr _camera,
+                  math::Vector2i _mousePos);
 
       /// \brief Modify the height at a specific point.
       /// \param[in] _pos Position in world coordinates.
       /// \param[in] _brushSize Controls the radius of effect.
       /// \param[in] _weight Controls modification magnitude.
-      /// \param[in] _raise True to raise the terrain, false to lower.
+      /// \param[in] _op Type of operation to perform.
       private: void ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
-                   double _weight, bool _raise);
+                   double _weight, const std::string &_op);
 
       /// \brief Initialize all the blend material maps.
       /// \param[in] _terrain The terrain to initialize the blend maps.

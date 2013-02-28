@@ -130,6 +130,9 @@ namespace gazebo
       /// \brief Create the main menu bar.
       private: void CreateMenuBar();
 
+      /// \brief Create all the editors.
+      private: void CreateEditors();
+
       /// \brief Show a custom menubar. If NULL is used, the default menubar
       /// is shown.
       /// \param[in] _bar The menubar to show. NULL will show the default
