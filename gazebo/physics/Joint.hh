@@ -215,14 +215,16 @@ namespace gazebo
                                       const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
+      /// This function is deprecated, use GetUpperLimit(unsigned int)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the high stop value.
-      public: virtual math::Angle GetHighStop(int _index) = 0;
+      public: virtual math::Angle GetHighStop(int _index) GAZEBO_DEPRECATED = 0;
 
       /// \brief Get the low stop of an axis(index).
+      /// This function is deprecated, use GetLowerLimit(unsigned int)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the low stop value.
-      public: virtual math::Angle GetLowStop(int _index) = 0;
+      public: virtual math::Angle GetLowStop(int _index) GAZEBO_DEPRECATED = 0;
 
       /// \brief Get the effort limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
@@ -357,6 +359,24 @@ namespace gazebo
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);
 
+      /// \brief:  get the true joint limit (replace GetLowStop and GetHighStop)
+      public: math::Angle GetLowerLimit(unsigned int _index) const
+        {
+          if (_index < this->GetAngleCount())
+            return this->lowerLimit[_index];
+
+          gzwarn << "requesting lower limit of joint index out of bound\n";
+          return math::Angle();
+        }
+      public: math::Angle GetUpperLimit(unsigned int _index) const
+        {
+          if (_index < this->GetAngleCount())
+            return this->upperLimit[_index];
+
+          gzwarn << "requesting upper limit of joint index out of bound\n";
+          return math::Angle();
+        }
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
@@ -407,8 +427,8 @@ namespace gazebo
       /// \brief Store Joint velocity limit as specified in SDF
       protected: double velocityLimit[2];
 
-      protected: double lowerLimit[2];
-      protected: double upperLimit[2];
+      protected: math::Angle lowerLimit[2];
+      protected: math::Angle upperLimit[2];
     };
     /// \}
   }

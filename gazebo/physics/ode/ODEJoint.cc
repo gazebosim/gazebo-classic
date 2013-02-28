@@ -636,17 +636,17 @@ void ODEJoint::CFMDamping()
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
     if (this->cfmDampingState[i] != 1 &&
-        (this->GetAngle(i) >= this->upperLimit[i] ||
-         this->GetAngle(i) <= this->lowerLimit[i] ||
+        (this->GetAngle(i) >= this->upperLimit[i].Radian() ||
+         this->GetAngle(i) <= this->lowerLimit[i].Radian() ||
          math::equal(this->dampingCoefficient, 0.0)))
     {
       this->cfmDampingState[i] = 1;
       // no damping and use hard stop cfm & erp
       this->SetAttribute("stop_erp", i, 0.2);
       this->SetAttribute("stop_cfm", i, 0.0);
-      this->SetHighStop(i, this->upperLimit[i]);
-      this->SetLowStop(i, this->lowerLimit[i]);
-      this->SetHighStop(i, this->upperLimit[i]);
+      this->SetHighStop(i, this->upperLimit[i].Radian());
+      this->SetLowStop(i, this->lowerLimit[i].Radian());
+      this->SetHighStop(i, this->upperLimit[i].Radian());
     }
     else if (this->cfmDampingState[i] != 2 &&
          !math::equal(this->dampingCoefficient, 0.0))

@@ -166,9 +166,9 @@ void Joint::Init()
       // Perform this three step ordering to ensure the
       // parameters are set properly.
       // This is taken from the ODE wiki.
-      this->SetHighStop(0, this->upperLimit[0]);
-      this->SetLowStop(0, this->lowerLimit[0]);
-      this->SetHighStop(0, this->upperLimit[0]);
+      this->SetHighStop(0, this->upperLimit[0].Radian());
+      this->SetLowStop(0, this->lowerLimit[0].Radian());
+      this->SetHighStop(0, this->upperLimit[0].Radian());
 
       this->effortLimit[0] = limitElem->GetValueDouble("effort");
       this->velocityLimit[0] = limitElem->GetValueDouble("velocity");
@@ -190,9 +190,9 @@ void Joint::Init()
       // Perform this three step ordering to ensure the
       // parameters  are set properly.
       // This is taken from the ODE wiki.
-      this->SetHighStop(1, this->upperLimit[1]);
-      this->SetLowStop(1, this->lowerLimit[1]);
-      this->SetHighStop(1, this->upperLimit[1]);
+      this->SetHighStop(1, this->upperLimit[1].Radian());
+      this->SetLowStop(1, this->lowerLimit[1].Radian());
+      this->SetHighStop(1, this->upperLimit[1].Radian());
 
       this->effortLimit[1] = limitElem->GetValueDouble("effort");
       this->velocityLimit[1] = limitElem->GetValueDouble("velocity");
