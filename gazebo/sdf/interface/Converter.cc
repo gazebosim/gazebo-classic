@@ -74,7 +74,6 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
   std::string filename = gazebo::common::find_file(
       std::string("sdf/") + _toVersion + "/" + origVersion + ".convert");
 
-
   // Use convert file in the current sdf version folder for conversion. If file
   // does not exist, then find intermediate convert files and iteratively
   // convert the sdf elem. Ideally, users should use gzsdf convert so that the
@@ -280,16 +279,15 @@ void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
 
   const char *fromName = fromTokens[fromTokens.size()-1].c_str();
   const char *value = NULL;
+
+  // Get value, or return if no element/attribute found as they don't have to
+  // be specified in the sdf.
   if (fromElemStr)
     value = GetValue(fromName, NULL, fromElem);
   else if (fromAttrStr)
     value = GetValue(NULL, fromName, fromElem);
-
   if (!value)
-  {
-    gzerr << "Element/attribute: '" << fromName << "' does not have a value\n";
     return;
-  }
 
   // get the new element/attribute name
   const char *toName = toTokens[toTokens.size()-1].c_str();
