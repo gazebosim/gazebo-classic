@@ -98,10 +98,17 @@ void ODEHingeJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 void ODEHingeJoint::SetDamping(int /*index*/, double _damping)
 {
   this->dampingCoefficient = _damping;
+
   // use below when ode version is fixed
   // dJointSetDamping(this->jointId, this->dampingCoefficient);
+
+  // comment out explicit damping, testing cfm
+  // this->applyDamping = physics::Joint::ConnectJointUpdate(
+  //   boost::bind(&Joint::ApplyDamping, this));
+
+  // use cfm damping
   this->applyDamping = physics::Joint::ConnectJointUpdate(
-    boost::bind(&Joint::ApplyDamping, this));
+    boost::bind(&ODEJoint::CFMDamping, this));
 }
 
 //////////////////////////////////////////////////

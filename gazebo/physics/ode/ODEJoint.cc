@@ -626,3 +626,22 @@ JointWrench ODEJoint::GetForceTorque(int /*_index*/)
 
   return wrench;
 }
+
+//////////////////////////////////////////////////
+void ODEJoint::CFMDamping()
+{
+  // check if we are violating joint limits
+  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  {
+    if (this->GetAngle(i) >= this->upperLimit[i] ||
+        this->GetAngle(i) <= this->lowerLimit[i])
+    {
+      // use hard stop cfm & erp
+    }
+    else
+    {
+      // use soft cfm = 1/kd & erp = 0 to simulate joint damping
+    }
+  }
+}
+

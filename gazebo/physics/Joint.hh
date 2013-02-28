@@ -406,6 +406,9 @@ namespace gazebo
 
       /// \brief Store Joint velocity limit as specified in SDF
       protected: double velocityLimit[2];
+
+      protected: double lowerLimit[2];
+      protected: double upperLimit[2];
     };
     /// \}
   }

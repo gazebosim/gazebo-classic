@@ -96,6 +96,9 @@ namespace gazebo
       /// \return Pointer to the joint feedback.
       public: dJointFeedback *GetFeedback();
 
+      /// \brief simulating damping with CFM and meddling with Joint limits
+      private: void CFMDamping();
+
       // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
