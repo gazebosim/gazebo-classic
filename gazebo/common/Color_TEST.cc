@@ -24,64 +24,64 @@ using namespace gazebo;
 TEST(Color, Color)
 {
   common::Color clr(.1, .2, .3, 1.0);
-  EXPECT_EQ(0.1f, clr.r);
-  EXPECT_EQ(0.2f, clr.g);
-  EXPECT_EQ(0.3f, clr.b);
-  EXPECT_EQ(1.0f, clr.a);
+  EXPECT_FLOAT_EQ(0.1f, clr.r);
+  EXPECT_FLOAT_EQ(0.2f, clr.g);
+  EXPECT_FLOAT_EQ(0.3f, clr.b);
+  EXPECT_FLOAT_EQ(1.0f, clr.a);
 
   clr.Reset();
-  EXPECT_EQ(0.0f, clr.r);
-  EXPECT_EQ(0.0f, clr.g);
-  EXPECT_EQ(0.0f, clr.b);
-  EXPECT_EQ(0.0f, clr.a);
+  EXPECT_FLOAT_EQ(0.0f, clr.r);
+  EXPECT_FLOAT_EQ(0.0f, clr.g);
+  EXPECT_FLOAT_EQ(0.0f, clr.b);
+  EXPECT_FLOAT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(0, 0.5, 1.0);
-  EXPECT_EQ(1.0f, clr.r);
-  EXPECT_EQ(0.5f, clr.g);
-  EXPECT_EQ(0.5f, clr.b);
-  EXPECT_EQ(0.0f, clr.a);
+  EXPECT_FLOAT_EQ(1.0f, clr.r);
+  EXPECT_FLOAT_EQ(0.5f, clr.g);
+  EXPECT_FLOAT_EQ(0.5f, clr.b);
+  EXPECT_FLOAT_EQ(0.0f, clr.a);
 
   EXPECT_TRUE(clr.GetAsHSV() == math::Vector3(6, 0.5, 1));
 
   clr.SetFromHSV(60, 0.0, 1.0);
-  EXPECT_EQ(1.0f, clr.r);
-  EXPECT_EQ(1.0f, clr.g);
-  EXPECT_EQ(1.0f, clr.b);
-  EXPECT_EQ(0.0f, clr.a);
+  EXPECT_FLOAT_EQ(1.0f, clr.r);
+  EXPECT_FLOAT_EQ(1.0f, clr.g);
+  EXPECT_FLOAT_EQ(1.0f, clr.b);
+  EXPECT_FLOAT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(120, 0.5, 1.0);
-  EXPECT_EQ(0.5f, clr.r);
-  EXPECT_EQ(1.0f, clr.g);
-  EXPECT_EQ(0.5f, clr.b);
-  EXPECT_EQ(0.0f, clr.a);
+  EXPECT_FLOAT_EQ(0.5f, clr.r);
+  EXPECT_FLOAT_EQ(1.0f, clr.g);
+  EXPECT_FLOAT_EQ(0.5f, clr.b);
+  EXPECT_FLOAT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(180, 0.5, 1.0);
-  EXPECT_EQ(0.5f, clr.r);
-  EXPECT_EQ(1.0f, clr.g);
-  EXPECT_EQ(1.0f, clr.b);
-  EXPECT_EQ(0.0f, clr.a);
+  EXPECT_FLOAT_EQ(0.5f, clr.r);
+  EXPECT_FLOAT_EQ(1.0f, clr.g);
+  EXPECT_FLOAT_EQ(1.0f, clr.b);
+  EXPECT_FLOAT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(240, 0.5, 1.0);
-  EXPECT_EQ(0.5f, clr.r);
-  EXPECT_EQ(0.5f, clr.g);
-  EXPECT_EQ(1.0f, clr.b);
-  EXPECT_EQ(0.0f, clr.a);
+  EXPECT_FLOAT_EQ(0.5f, clr.r);
+  EXPECT_FLOAT_EQ(0.5f, clr.g);
+  EXPECT_FLOAT_EQ(1.0f, clr.b);
+  EXPECT_FLOAT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(300, 0.5, 1.0);
-  EXPECT_EQ(1.0f, clr[0]);
-  EXPECT_EQ(0.5f, clr[1]);
-  EXPECT_EQ(1.0f, clr[2]);
-  EXPECT_EQ(0.0f, clr[3]);
-  EXPECT_EQ(0.0f, clr[4]);
+  EXPECT_FLOAT_EQ(1.0f, clr[0]);
+  EXPECT_FLOAT_EQ(0.5f, clr[1]);
+  EXPECT_FLOAT_EQ(1.0f, clr[2]);
+  EXPECT_FLOAT_EQ(0.0f, clr[3]);
+  EXPECT_FLOAT_EQ(0.0f, clr[4]);
 
   clr.r = 0.1;
   clr.g = 0.2;
   clr.b = 0.3;
   clr.a = 0.4;
-  EXPECT_EQ(0.1f, clr[0]);
-  EXPECT_EQ(0.2f, clr[1]);
-  EXPECT_EQ(0.3f, clr[2]);
-  EXPECT_EQ(0.4f, clr[3]);
+  EXPECT_FLOAT_EQ(0.1f, clr[0]);
+  EXPECT_FLOAT_EQ(0.2f, clr[1]);
+  EXPECT_FLOAT_EQ(0.3f, clr[2]);
+  EXPECT_FLOAT_EQ(0.4f, clr[3]);
 
   clr.Set(0.1, 0.2, 0.3, 0.4);
   clr = clr + 0.2;

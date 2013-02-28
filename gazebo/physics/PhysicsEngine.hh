@@ -26,6 +26,8 @@
 
 #include "gazebo/sdf/sdf.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo
@@ -66,6 +68,10 @@ namespace gazebo
 
       /// \brief Update the physics engine collision.
       public: virtual void UpdateCollision() = 0;
+
+      /// \brief Return the type of the physics engine (ode|bullet).
+      /// \return Type of the physics engine.
+      public: virtual std::string GetType() const = 0;
 
       /// \brief Set the random number seed for the physics engine.
       /// \param[in] _seed The random number seed.
