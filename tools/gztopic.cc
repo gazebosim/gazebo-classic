@@ -182,7 +182,7 @@ void bwCB(const std::string &_data)
 }
 
 /////////////////////////////////////////////////
-void hz_cb(ConstGzStringPtr &/*_data*/)
+void hz_cb(const std::string &/*_data*/)
 {
   common::Time cur_time = common::Time::GetWallTime();
 
@@ -377,7 +377,6 @@ void hz()
   node->Init();
 
   std::string topic = params[1];
-  topic +=  "/__dbg";
 
   transport::SubscriberPtr sub = node->Subscribe(topic, hz_cb);
 
