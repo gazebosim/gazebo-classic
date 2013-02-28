@@ -80,10 +80,11 @@ set (msgs
   vector2d.proto
   vector3d.proto
   visual.proto
+  world.proto
   world_control.proto
-  world_reset.proto 
-  world_stats.proto 
-  world_modify.proto 
+  world_reset.proto
+  world_stats.proto
+  world_modify.proto
 )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

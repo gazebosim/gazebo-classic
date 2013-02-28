@@ -10,6 +10,4 @@ message WorldModify
   required string world_name = 1;
   optional bool remove = 2;
   optional bool create = 3;
-  optional double max_step_size = 4;
-  optional double real_time_update_rate = 5;
 }

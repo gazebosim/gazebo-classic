@@ -124,6 +124,9 @@ namespace gazebo
       private: QTreeWidgetItem *GetListItem(const std::string &_name,
                                             QTreeWidgetItem *_parent);
 
+      private: void FillPropertyTree(const msgs::World &_msg,
+                                     QtProperty *_parentItem);
+
       private: void FillPropertyTree(const msgs::Model &_msg,
                                      QtProperty *_parentItem);
 
@@ -182,6 +185,10 @@ namespace gazebo
       /// \param[in] _item The item that was changed.
       private: void PhysicsPropertyChanged(QtProperty *_item);
 
+      /// \brief Called when a world property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void WorldPropertyChanged(QtProperty *_item);
+
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
 
@@ -190,6 +197,7 @@ namespace gazebo
       private: transport::PublisherPtr modelPub;
       private: transport::PublisherPtr scenePub;
       private: transport::PublisherPtr physicsPub;
+      private: transport::PublisherPtr worldPub;
       private: transport::PublisherPtr lightPub;
 
       private: transport::SubscriberPtr responseSub;
@@ -200,6 +208,7 @@ namespace gazebo
       private: QTreeWidgetItem *physicsItem;
       private: QTreeWidgetItem *modelsItem;
       private: QTreeWidgetItem *lightsItem;
+      private: QTreeWidgetItem *worldItem;
 
       private: QtVariantPropertyManager *variantManager;
       private: QtVariantEditorFactory *variantFactory;
@@ -222,6 +231,7 @@ namespace gazebo
       typedef std::list<std::string> RemoveEntity_L;
       private: RemoveEntity_L removeEntityList;
 
+      private: msgs::World worldMsg;
       private: msgs::Model modelMsg;
       private: msgs::Link linkMsg;
       private: msgs::Scene sceneMsg;

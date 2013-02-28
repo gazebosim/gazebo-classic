@@ -412,6 +412,10 @@ namespace gazebo
       /// \param[in] _msg Incoming joint message.
       private: void JointLog(ConstJointPtr &_msg);
 
+      /// \brief Called when a world_modify message is received.
+      /// \param[in] _msg The world_modify message.
+      private: void OnWorldMsg(ConstWorldPtr &_msg);
+
       /// \brief Called when a factory message is received.
       /// \param[in] _data The factory message.
       private: void OnFactoryMsg(ConstFactoryPtr &_data);
@@ -435,21 +439,25 @@ namespace gazebo
       /// \param[in] _model Pointer to the model to get the data from.
       private: void FillModelMsg(msgs::Model &_msg, ModelPtr _model);
 
-      /// \brief Process all recieved entity messages.
+      /// \brief Process all received entity messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessEntityMsgs();
 
-      /// \brief Process all recieved request messages.
+      /// \brief Process all received request messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessRequestMsgs();
 
-      /// \brief Process all recieved factory messages.
+      /// \brief Process all received factory messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
 
-      /// \brief Process all recieved model messages.
+      /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
+
+      /// \brief Process all received world messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessWorldMsgs();
 
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
@@ -507,6 +515,9 @@ namespace gazebo
 
       /// \brief Transportation node.
       private: transport::NodePtr node;
+
+      /// \brief Subscribe to the world modify topic.
+      private: transport::SubscriberPtr worldSub;
 
       /// \brief Publisher for selection messages.
       private: transport::PublisherPtr selectionPub;
@@ -613,6 +624,9 @@ namespace gazebo
 
       /// \brief Model message buffer.
       private: std::list<msgs::Model> modelMsgs;
+
+      /// \brief World message buffer.
+      private: std::list<msgs::World> worldMsgs;
 
       /// \brief True to reset the world on next update.
       private: bool needsReset;

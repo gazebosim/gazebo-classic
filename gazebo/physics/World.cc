@@ -173,6 +173,8 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
+  this->worldSub = this->node->Subscribe("~/world", &World::OnWorldMsg, this);
+
   this->posePub = this->node->Advertise<msgs::Pose_V>("~/pose/info", 10, 60.0);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
@@ -1069,6 +1071,13 @@ void World::JointLog(ConstJointPtr &_msg)
 }
 
 //////////////////////////////////////////////////
+void World::OnWorldMsg(ConstWorldPtr &_msg)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  this->worldMsgs.push_back(*_msg);
+}
+
+//////////////////////////////////////////////////
 void World::OnModelMsg(ConstModelPtr &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
@@ -1343,6 +1352,16 @@ void World::ProcessRequestMsgs()
       this->sceneMsg.SerializeToString(serializedData);
       response.set_type(sceneMsg.GetTypeName());
     }
+    else if ((*iter).request() == "world_info")
+    {
+      msgs::World worldMsg;
+      worldMsg.set_real_time_update_rate(this->GetRealTimeUpdateRate());
+      worldMsg.set_max_step_size(this->GetMaxStepSize());
+
+      std::string *serializedData = response.mutable_serialized_data();
+      worldMsg.SerializeToString(serializedData);
+      response.set_type(worldMsg.GetTypeName());
+    }
     else
       send = false;
 
@@ -1356,11 +1375,26 @@ void World::ProcessRequestMsgs()
 }
 
 //////////////////////////////////////////////////
+void World::ProcessWorldMsgs()
+{
+  std::list<msgs::World>::iterator iter;
+  for (iter = this->worldMsgs.begin(); iter != this->worldMsgs.end(); ++iter)
+  {
+    if ((*iter).has_max_step_size())
+      this->SetMaxStepSize((*iter).max_step_size());
+
+    if ((*iter).has_real_time_update_rate())
+      this->SetRealTimeUpdateRate((*iter).real_time_update_rate());
+
+    this->worldMsgs.clear();
+  }
+}
+
+//////////////////////////////////////////////////
 void World::ProcessModelMsgs()
 {
   std::list<msgs::Model>::iterator iter;
-  for (iter = this->modelMsgs.begin();
-       iter != this->modelMsgs.end(); ++iter)
+  for (iter = this->modelMsgs.begin(); iter != this->modelMsgs.end(); ++iter)
   {
     ModelPtr model;
     if ((*iter).has_id())
@@ -1713,6 +1747,7 @@ void World::ProcessMessages()
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
+    this->ProcessWorldMsgs();
     this->prevProcessMsgsTime = common::Time::GetWallTime();
   }
 }

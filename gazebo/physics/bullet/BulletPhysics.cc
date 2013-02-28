@@ -259,10 +259,10 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::BULLET);
-    // deprecated
+    // update_rate is deprecated
     physicsMsg.set_update_rate(this->GetUpdateRate());
     physicsMsg.set_solver_type(this->solverType);
-    // deprecated
+    // dt is deprecated
     physicsMsg.set_dt(this->GetStepTime());
     physicsMsg.set_min_step_size(
         boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
