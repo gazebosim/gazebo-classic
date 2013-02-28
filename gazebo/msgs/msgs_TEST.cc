@@ -23,28 +23,28 @@ using namespace gazebo;
 
 TEST(MsgsTest, Msg)
 {
-    common::Time t = common::Time::GetWallTime();
+  common::Time t = common::Time::GetWallTime();
 
-    msgs::Test msg, msg2;
-    msgs::Init(msg, "_test_");
-    msgs::Init(msg2);
+  msgs::Test msg, msg2;
+  msgs::Init(msg, "_test_");
+  msgs::Init(msg2);
 
-    EXPECT_TRUE(msg.header().has_stamp());
-    EXPECT_TRUE(msg2.header().has_stamp());
+  EXPECT_TRUE(msg.header().has_stamp());
+  EXPECT_TRUE(msg2.header().has_stamp());
 
-    EXPECT_EQ(t.sec, msg.header().stamp().sec());
-    EXPECT_TRUE(t.nsec <= msg.header().stamp().nsec());
-    EXPECT_STREQ("_test_", msg.header().str_id().c_str());
+  EXPECT_EQ(t.sec, msg.header().stamp().sec());
+  EXPECT_TRUE(t.nsec <= msg.header().stamp().nsec());
+  EXPECT_STREQ("_test_", msg.header().str_id().c_str());
 
-    EXPECT_FALSE(msg2.header().has_str_id());
+  EXPECT_FALSE(msg2.header().has_str_id());
 
-    msgs::Header *header = msgs::GetHeader(msg);
-    EXPECT_STREQ("_test_", header->str_id().c_str());
+  msgs::Header *header = msgs::GetHeader(msg);
+  EXPECT_STREQ("_test_", header->str_id().c_str());
 
-    msgs::Header testHeader;
-    testHeader.set_str_id("_hello_");
-    header = msgs::GetHeader(testHeader);
-    EXPECT_STREQ("_hello_", header->str_id().c_str());
+  msgs::Header testHeader;
+  testHeader.set_str_id("_hello_");
+  header = msgs::GetHeader(testHeader);
+  EXPECT_STREQ("_hello_", header->str_id().c_str());
 }
 
 TEST(MsgsTest, Request)
@@ -128,7 +128,7 @@ TEST(MsgsTest, ConvertMsgsQuaterionToMath)
   msgs::Quaternion msg =
     msgs::Convert(math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
   math::Quaternion v = msgs::Convert(msg);
-  
+
   // TODO: to real unit test move math::equal to EXPECT_DOUBLE_EQ
   EXPECT_TRUE(math::equal(v.x, -0.65328148243818818));
   EXPECT_TRUE(math::equal(v.y, 0.27059805007309856));
