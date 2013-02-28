@@ -405,7 +405,15 @@ void BulletPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
     }
     case SOR_ITERS:
     {
-      int value = boost::any_cast<int>(_value);
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch (boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
       bulletElem->GetElement("solver")->GetElement("iters")->Set(value);
       info.m_numIterations = value;
       break;
@@ -427,7 +435,15 @@ void BulletPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
     }
     case MAX_CONTACTS:
     {
-      int value = boost::any_cast<int>(_value);
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch (boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
       bulletElem->GetElement("max_contacts")->GetValue()->Set(value);
       //gzwarn << "Not yet implemented in bullet" << std::endl;
       break;

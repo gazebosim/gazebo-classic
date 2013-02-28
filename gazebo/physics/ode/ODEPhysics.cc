@@ -273,12 +273,12 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
       this->sdf->GetElement("ode")->GetElement("solver");
     if (_msg->solver_type() == "quick")
     {
-      solverElem->GetAttribute("type")->Set("quick");
+      solverElem->GetElement("type")->Set("quick");
       this->physicsStepFunc = &dWorldQuickStep;
     }
     else if (_msg->solver_type() == "world")
     {
-      solverElem->GetAttribute("type")->Set("world");
+      solverElem->GetElement("type")->Set("world");
       this->physicsStepFunc = &dWorldStep;
     }
   }

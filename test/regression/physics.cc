@@ -1588,9 +1588,15 @@ void PhysicsTest::PhysicsParam(const std::string &_physicsEngine)
   physicsPubMsg.set_contact_surface_layer(0.01);
 
   if (_physicsEngine == "ode")
+  {
     physicsPubMsg.set_type(msgs::Physics::ODE);
+    physicsPubMsg.set_solver_type("quick");
+  }
   else if (_physicsEngine == "bullet")
+  {
     physicsPubMsg.set_type(msgs::Physics::BULLET);
+    physicsPubMsg.set_solver_type("sequential_impulse");
+  }
 
   physicsPub->Publish(physicsPubMsg);
 
@@ -1602,6 +1608,8 @@ void PhysicsTest::PhysicsParam(const std::string &_physicsEngine)
     common::Time::MSleep(10);
   ASSERT_LT(waitCount, maxWaitCount);
 
+  EXPECT_EQ(physicsResponseMsg.solver_type(),
+      physicsPubMsg.solver_type());
   EXPECT_EQ(physicsResponseMsg.enable_physics(),
       physicsPubMsg.enable_physics());
   EXPECT_DOUBLE_EQ(physicsResponseMsg.update_rate(),
