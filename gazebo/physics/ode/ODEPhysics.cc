@@ -239,7 +239,11 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_type(msgs::Physics::ODE);
     physicsMsg.set_update_rate(this->GetUpdateRate());
     physicsMsg.set_solver_type(this->stepType);
+    // dt is deprecated, use min_step_time instead
     physicsMsg.set_dt(this->GetStepTime());
+    physicsMsg.set_min_step_size(
+        boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
+    physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
     physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(this->GetSORPGSW());
@@ -259,11 +263,14 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  // deprecated
   if (_msg->has_dt())
-  {
     this->SetStepTime(_msg->dt());
-  }
 
+  if (_msg->has_min_step_size())
+    this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
+
+  // deprecated
   if (_msg->has_update_rate())
     this->SetUpdateRate(_msg->update_rate());
 
@@ -282,6 +289,9 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
       this->physicsStepFunc = &dWorldStep;
     }
   }
+
+  if (_msg->has_precon_iters())
+    this->SetSORPGSPreconIters(_msg->precon_iters());
 
   if (_msg->has_iters())
     this->SetSORPGSIters(_msg->iters());
@@ -1097,6 +1107,12 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
       odeElem->GetElement("max_contacts")->GetValue()->Set(value);
       break;
     }
+    case MIN_STEP_SIZE:
+    {
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
+      break;
+    }
     default:
     {
       gzwarn << "Param not supported in ode" << std::endl;
@@ -1128,6 +1144,8 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
     param = CONTACT_SURFACE_LAYER;
   else if (_key == "max_contacts")
     param = MAX_CONTACTS;
+  else if (_key == "min_step_size")
+    param = MIN_STEP_SIZE;
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;
@@ -1192,6 +1210,11 @@ boost::any ODEPhysics::GetParam(PhysicsParam _param) const
       value = odeElem->GetElement("max_contacts")->GetValueInt();
       break;
     }
+    case MIN_STEP_SIZE:
+    {
+      value = odeElem->GetElement("solver")->GetValueDouble("min_step_size");
+      break;
+    }
     default:
     {
       gzwarn << "Attribute not supported in bullet" << std::endl;
@@ -1224,6 +1247,8 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
     param = CONTACT_SURFACE_LAYER;
   else if (_key == "max_contacts")
     param = MAX_CONTACTS;
+  else if (_key == "min_step_size")
+    param = MIN_STEP_SIZE;
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;

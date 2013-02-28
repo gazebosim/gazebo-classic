@@ -71,7 +71,10 @@ namespace gazebo
         CONTACT_SURFACE_LAYER,
 
         /// \brief Maximum number of contacts
-        MAX_CONTACTS
+        MAX_CONTACTS,
+
+        /// \brief Minimum step size
+        MIN_STEP_SIZE
       };
 
       /// \brief Default constructor.

@@ -259,9 +259,13 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::BULLET);
+    // deprecated
     physicsMsg.set_update_rate(this->GetUpdateRate());
     physicsMsg.set_solver_type(this->solverType);
+    // deprecated
     physicsMsg.set_dt(this->GetStepTime());
+    physicsMsg.set_min_step_size(
+        boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
     physicsMsg.set_iters(
         boost::any_cast<int>(this->GetParam(SOR_ITERS)));
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
@@ -284,9 +288,14 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  // deprecated
   if (_msg->has_dt())
     this->SetStepTime(_msg->dt());
 
+  if (_msg->has_min_step_size())
+    this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
+
+  // deprecated
   if (_msg->has_update_rate())
     this->SetUpdateRate(_msg->update_rate());
 
@@ -448,6 +457,13 @@ void BulletPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
       //gzwarn << "Not yet implemented in bullet" << std::endl;
       break;
     }
+    case MIN_STEP_SIZE:
+    {
+      double value = boost::any_cast<double>(_value);
+      bulletElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
+      break;
+    }
+
     default:
     {
       gzwarn << "Param not supported in bullet" << std::endl;
@@ -475,6 +491,8 @@ void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
     param = CONTACT_SURFACE_LAYER;
   else if (_key == "max_contacts")
     param = MAX_CONTACTS;
+  else if (_key == "min_step_size")
+    param = MIN_STEP_SIZE;
   else
   {
     gzwarn << _key << " is not supported in bullet" << std::endl;
@@ -529,6 +547,11 @@ boost::any BulletPhysics::GetParam(PhysicsParam _param) const
       value = bulletElem->GetElement("max_contacts")->GetValueInt();
       break;
     }
+    case MIN_STEP_SIZE:
+    {
+      value = bulletElem->GetElement("solver")->GetValueDouble("min_step_size");
+      break;
+    }
     default:
     {
       gzwarn << "Param not supported in bullet" << std::endl;
@@ -557,6 +580,8 @@ boost::any BulletPhysics::GetParam(const std::string &_key) const
     param = CONTACT_SURFACE_LAYER;
   else if (_key == "max_contacts")
     param = MAX_CONTACTS;
+  else if (_key == "min_step_size")
+    param = MIN_STEP_SIZE;
   else
   {
     gzwarn << _key << " is not supported in bullet" << std::endl;
