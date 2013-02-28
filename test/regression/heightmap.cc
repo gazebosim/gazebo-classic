@@ -27,66 +27,10 @@ class HeightmapTest : public ServerFixture
 {
 };
 
-std::string heightmapModel =
-"<sdf version='1.3'>"
-"<model name='heightmap'>"
-"      <static>true</static>"
-"      <link name='link'>"
-"        <collision name='collision'>"
-"          <geometry>"
-"            <heightmap>"
-"              <uri>file://media/materials/textures/heightmap_bowl.png</uri>"
-"              <size>129 129 10</size>"
-"              <pos>0 0 0</pos>"
-"            </heightmap>"
-"          </geometry>"
-"        </collision>"
-"        <visual name='visual'>"
-"          <geometry>"
-"            <heightmap>"
-"              <texture>"
-"                <diffuse>file://media/materials/textures/"
-"dirt_diffusespecular.png</diffuse>"
-"                <normal>file://media/materials/textures/"
-"flat_normal.png</normal>"
-"                <size>50</size>"
-"              </texture>"
-"              <texture>"
-"                <diffuse>file://media/materials/textures/"
-"grass_diffusespecular.png</diffuse>"
-"                <normal>file://media/materials/textures/"
-"flat_normal.png</normal>"
-"                <size>20</size>"
-"              </texture>"
-"              <texture>"
-"                <diffuse>file://media/materials/textures/"
-"fungus_diffusespecular.png</diffuse>"
-"                <normal>file://media/materials/textures/"
-"flat_normal.png</normal>"
-"                <size>80</size>"
-"              </texture>"
-"              <blend>"
-"                <min_height>2</min_height>"
-"                <fade_dist>5</fade_dist>"
-"              </blend>"
-"              <blend>"
-"                <min_height>4</min_height>"
-"                <fade_dist>5</fade_dist>"
-"              </blend>"
-"              <uri>file://media/materials/textures/heightmap_bowl.png</uri>"
-"              <size>129 129 10</size>"
-"              <pos>0 0 0</pos>"
-"            </heightmap>"
-"          </geometry>"
-"        </visual>"
-"      </link>"
-"    </model>"
-"</sdf>";
-
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, Heights)
 {
-  Load("worlds/empty.world");
+  Load("worlds/heightmap_test.world");
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -99,16 +43,16 @@ TEST_F(HeightmapTest, Heights)
   // Make sure we can get a valid pointer to the scene.
   rendering::ScenePtr scene = GetScene();
 
-  // Spawn the heightmap.
-  SpawnSDF(heightmapModel);
+  rendering::Heightmap *heightmap = NULL;
 
   // Wait for the heightmap to get loaded by the scene.
   {
     int i = 0;
-    while (i < 20 && scene->GetHeightmap() == NULL)
+    while (i < 20 && (heightmap = scene->GetHeightmap()) == NULL)
     {
       // Make sure to PreRender so that the Scene can process its messages
       scene->PreRender();
+
       common::Time::MSleep(100);
       i++;
     }
@@ -119,7 +63,6 @@ TEST_F(HeightmapTest, Heights)
 
   physics::ModelPtr model = GetModel("heightmap");
   EXPECT_TRUE(model);
-
 
   physics::CollisionPtr collision =
     model->GetLink("link")->GetCollision("collision");
@@ -161,7 +104,7 @@ TEST_F(HeightmapTest, Heights)
 
       // The render test requires a point relative to the center of the
       // heightmap.
-      renderTest.push_back(scene->GetHeightmap()->GetHeight(xd, yd));
+      renderTest.push_back(heightmap->GetHeight(xd, yd));
 
       // Debug output
       if (fabs(physicsTest.back() - renderTest.back()) >= 0.13)

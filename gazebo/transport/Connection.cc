@@ -64,8 +64,6 @@ Connection::Connection()
   iomanager->IncCount();
   this->id = idCounter++;
 
-  this->connectMutex = new boost::mutex();
-  this->readMutex = new boost::recursive_mutex();
   this->acceptor = NULL;
   this->readQuit = false;
   this->writeQueue.clear();
@@ -80,12 +78,7 @@ Connection::Connection()
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
-  this->ProcessWriteQueue();
-  this->writeQueue.clear();
   this->Shutdown();
-
-  delete this->readMutex;
-  this->readMutex = NULL;
 
   if (iomanager)
   {
@@ -102,7 +95,7 @@ Connection::~Connection()
 //////////////////////////////////////////////////
 bool Connection::Connect(const std::string &_host, unsigned int _port)
 {
-  boost::mutex::scoped_lock lock(*this->connectMutex);
+  boost::mutex::scoped_lock lock(this->connectMutex);
 
   std::string service = boost::lexical_cast<std::string>(_port);
 
@@ -116,10 +109,24 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
   boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
   boost::asio::ip::tcp::resolver::query query(host, service,
       boost::asio::ip::resolver_query_base::numeric_service);
-  boost::asio::ip::tcp::resolver::iterator endpoint_iter;
+  boost::asio::ip::tcp::resolver::iterator endpointIter;
+
   try
   {
-    endpoint_iter = resolver.resolve(query);
+    endpointIter = resolver.resolve(query);
+
+    // Find the first valid IPv4 address
+    for (; endpointIter != end &&
+           !(*endpointIter).endpoint().address().is_v4(); ++endpointIter)
+    {
+    }
+
+    // Make sure we didn't run off the end of the list.
+    if (endpointIter == end)
+    {
+      gzerr << "Unable to resolve uri[" << _host << ":" << _port << "]\n";
+      return false;
+    }
   }
   catch(...)
   {
@@ -130,13 +137,11 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
   this->connectError = false;
   this->remoteURI.clear();
 
-  {
-    // Use async connect so that we can use a custom timeout. This is useful
-    // when trying to detect network errors.
-    this->socket->async_connect(*endpoint_iter++,
-        boost::bind(&Connection::OnConnect, this,
-          boost::asio::placeholders::error, endpoint_iter));
-  }
+  // Use async connect so that we can use a custom timeout. This is useful
+  // when trying to detect network errors.
+  this->socket->async_connect(*endpointIter++,
+      boost::bind(&Connection::OnConnect, this,
+        boost::asio::placeholders::error, endpointIter));
 
   // Wait for at most 2 seconds for a connection to be established.
   // The connectionCondition notification occurs in ::OnConnect.
@@ -246,7 +251,7 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     std::size_t written = 0;
     written = boost::asio::write(*this->socket, buffer->data());
     if (written != buffer->size())
-    gzerr << "Didn't write all the data\n";
+      gzerr << "Didn't write all the data\n";
 
     delete buffer;
     }
@@ -267,7 +272,7 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 }
 
 /////////////////////////////////////////////////
-void Connection::ProcessWriteQueue()
+void Connection::ProcessWriteQueue(bool _blocking)
 {
   if (!this->IsOpen())
   {
@@ -296,23 +301,26 @@ void Connection::ProcessWriteQueue()
   // Write the serialized data to the socket. We use
   // "gather-write" to send both the head and the data in
   // a single write operation
-  boost::asio::async_write(*this->socket, buffer->data(),
-    boost::bind(&Connection::OnWrite, shared_from_this(),
-    boost::asio::placeholders::error, buffer));
-
-  /*
-  try
+  if (!_blocking)
   {
-    boost::asio::write(*this->socket, buffer->data());
+    boost::asio::async_write(*this->socket, buffer->data(),
+        boost::bind(&Connection::OnWrite, shared_from_this(),
+          boost::asio::placeholders::error, buffer));
   }
-  catch(...)
+  else
   {
-    this->Shutdown();
-  }
+    try
+    {
+      boost::asio::write(*this->socket, buffer->data());
+    }
+    catch(...)
+    {
+      this->Shutdown();
+    }
 
-  this->writeCount--;
-  delete buffer;
-  */
+    this->writeCount--;
+    delete buffer;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -347,33 +355,15 @@ void Connection::OnWrite(const boost::system::error_code &_e,
 //////////////////////////////////////////////////
 void Connection::Shutdown()
 {
-  this->ProcessWriteQueue();
-
-  int iters = 0;
-  while (this->writeCount > 0 && iters < 50)
-  {
-    common::Time::MSleep(10);
-    iters++;
-  }
-
-  this->shutdown();
-  // this->StopRead();
+  if (!this->socket)
+    return;
 
   this->Cancel();
 
+  // Shutdown the TBB task
+  this->shutdown();
+
   this->Close();
-
-  {
-    boost::mutex::scoped_lock lock(this->socketMutex);
-    boost::system::error_code ec;
-    if (this->socket)
-    {
-      this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-    }
-
-    delete this->socket;
-    this->socket = NULL;
-  }
 }
 
 //////////////////////////////////////////////////
@@ -400,10 +390,11 @@ void Connection::Close()
 
   if (this->socket && this->socket->is_open())
   {
-    this->ProcessWriteQueue();
     try
     {
       this->socket->close();
+      boost::system::error_code ec;
+      this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     }
     catch(boost::system::system_error &e)
     {
@@ -411,6 +402,9 @@ void Connection::Close()
       // gzwarn << "Error closing socket[" << this->id << "] ["
              // << e.what() << "]\n";
     }
+
+    delete this->socket;
+    this->socket = NULL;
   }
 
   if (this->acceptor && this->acceptor->is_open())
@@ -473,12 +467,10 @@ bool Connection::Read(std::string &data)
   std::size_t incoming_size;
   boost::system::error_code error;
 
-  this->readMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->readMutex);
 
   // First read the header
-  {
-    this->socket->read_some(boost::asio::buffer(header), error);
-  }
+  this->socket->read_some(boost::asio::buffer(header), error);
 
   if (error)
   {
@@ -513,7 +505,6 @@ bool Connection::Read(std::string &data)
     result = true;
   }
 
-  this->readMutex->unlock();
   return result;
 }
 
@@ -691,7 +682,10 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
         continue;
 
       int family = ifa->ifa_addr->sa_family;
-      if (family == AF_INET || family == AF_INET6)
+      // \todo We currently don't handle AF_INET6 addresses. So I commented
+      // out the below line, and removed AF_INET6 for the if clause.
+      // if (family == AF_INET || family == AF_INET6)
+      if (family == AF_INET)
       {
         int s = getnameinfo(ifa->ifa_addr,
             (family == AF_INET) ? sizeof(struct sockaddr_in) :
@@ -797,7 +791,7 @@ void Connection::OnConnect(const boost::system::error_code &_error,
   // This function is called when a connection is successfully (or
   // unsuccessfully) established.
 
-  boost::mutex::scoped_lock lock(*this->connectMutex);
+  boost::mutex::scoped_lock lock(this->connectMutex);
   if (_error == 0)
   {
     this->remoteURI = std::string("http://") + this->GetRemoteHostname()
