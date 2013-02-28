@@ -158,7 +158,8 @@ TEST_F(LaserTest, EmptyWorldBullet)
 void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 {
   // Test ray sensor with 3 boxes in the world.
-  // First place 2 of 3 boxes within range and verify range values,
+  // First place 2 of 3 boxes within range and verify range values, one of them
+  // being a static model to verify collision filtering is working,
   // then move all 3 boxes out of range and verify range values
 
   Load("worlds/empty.world", true, _physicsEngine);
@@ -193,8 +194,9 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   SpawnBox(box01, math::Vector3(1, 1, 1), box01Pose.pos,
       box01Pose.rot.GetAsEuler());
 
+  // box02 is static
   SpawnBox(box02, math::Vector3(1, 1, 1), box02Pose.pos,
-      box02Pose.rot.GetAsEuler());
+      box02Pose.rot.GetAsEuler(), true);
 
   SpawnBox(box03, math::Vector3(1, 1, 1), box03Pose.pos,
       box03Pose.rot.GetAsEuler());
@@ -205,6 +207,11 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   raySensor->Init();
   raySensor->Update(true);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  EXPECT_TRUE(world->GetModel(box02)->IsStatic());
 
   int mid = samples / 2;
   double unitBoxSize = 1.0;
@@ -222,9 +229,6 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   EXPECT_NEAR(raySensor->GetRange(samples-1), maxRange, LASER_TOL);
 
   // Move all boxes out of range
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
   world->GetModel(box01)->SetWorldPose(
       math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
   world->GetModel(box02)->SetWorldPose(

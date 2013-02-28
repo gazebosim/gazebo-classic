@@ -24,54 +24,39 @@ if(HAVE_BULLET)
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 
-include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
-
-set (gtest_sources
+set(tests
   bandwidth.cc
-  camera_sensor.cc
   factory.cc
   file_handling.cc
-  heightmap.cc
   laser.cc
   msgs.cc
   physics.cc
   pioneer2dx.cc
-  pr2.cc
-  projector.cc
+  transport.cc
   server_fixture.cc
   speed.cc
+  )
+
+set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
+    "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc")
+gz_build_tests(${tests})
+
+set(display_tests
+)
+
+# Build the display tests (need extra sources to compile)
+set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
+    "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc")
+gz_build_display_tests(${display_tests})
+
+set(dri_tests
+  camera_sensor.cc
+  heightmap.cc
+  pr2.cc
+  projector.cc
   speed_pr2.cc
-  transport.cc)
+)
 
-set (plugins)
-
-# Build plugins
-foreach (src ${plugins})
-  add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo gazebo_sensors)
-endforeach (src ${plugins})
-
-# Build tests
-foreach(GTEST_SOURCE_file ${gtest_sources})
-  string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
-  add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${PROJECT_SOURCE_DIR}/gazebo/Server.cc ${PROJECT_SOURCE_DIR}/gazebo/Master.cc ${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc)
-
-target_link_libraries(${BINARY_NAME}
-  ${GTEST_LIBRARY}
-  ${GTEST_MAIN_LIBRARY}
-    gazebo_common
-    gazebo_sdf_interface
-    gazebo_transport
-    gazebo_physics
-    gazebo_sensors
-    gazebo_rendering
-    gazebo_msgs
-    pthread
-    ${tinyxml_libraries}
-    )
-  add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
-  set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
-  # Check that the test produced a result and create a failure if it didn't.
-  # Guards against crashed and timed out tests.
-  add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
-endforeach()
+set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
+    "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc")
+gz_build_dri_tests(${dri_tests})
