@@ -139,6 +139,29 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(int _index);
+
+      /// \brief Provide Feedback data for contact forces
+      private: double stopCFM[2];
+      private: double stopERP[2];
+
+      /// \brief Get access to stopCFM
+      public: double GetStopCFM(unsigned int _int)
+      {
+        if (_int < this->GetAngleCount())
+          return this->stopCFM[_int];
+        gzerr << "index out of bound when calling GetStopCFM.\n";
+        return 0;
+      }
+
+      /// \brief Get access to stopERP
+      public: double GetStopERP(unsigned int _int)
+      {
+        if (_int < this->GetAngleCount())
+          return this->stopERP[_int];
+        gzerr << "index out of bound when calling GetStopERP.\n";
+        return 0;
+      }
+
     };
   }
 }

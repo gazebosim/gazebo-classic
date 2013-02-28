@@ -67,10 +67,14 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 
     if (elem->HasElement("limit"))
     {
-      this->SetParam(dParamStopERP,
-          elem->GetElement("limit")->GetValueDouble("erp"));
-      this->SetParam(dParamStopCFM,
-          elem->GetElement("limit")->GetValueDouble("cfm"));
+      // initializa both axis, \todo: make cfm, erp per axis
+      this->stopERP[0] = elem->GetElement("limit")->GetValueDouble("erp");
+      this->stopERP[1] = elem->GetElement("limit")->GetValueDouble("erp");
+      this->SetParam(dParamStopERP, this->stopERP[9]);
+
+      this->stopCFM[0] = elem->GetElement("limit")->GetValueDouble("cfm");
+      this->stopCFM[1] = elem->GetElement("limit")->GetValueDouble("cfm");
+      this->SetParam(dParamStopCFM, this->stopCFM[9]);
     }
 
     if (elem->HasElement("suspension"))
@@ -368,9 +372,13 @@ void ODEJoint::SetAttribute(Attribute _attr, int /*_index*/, double _value)
       break;
     case STOP_ERP:
       this->SetParam(dParamStopERP, _value);
+      this->stopERP[0] = _value;
+      this->stopERP[1] = _value;
       break;
     case STOP_CFM:
       this->SetParam(dParamStopCFM, _value);
+      this->stopCFM[0] = _value;
+      this->stopCFM[1] = _value;
       break;
     case ERP:
       this->SetParam(dParamERP, _value);
@@ -438,6 +446,8 @@ void ODEJoint::SetAttribute(const std::string &_key, int /*_index*/,
     try
     {
       this->SetParam(dParamStopERP, boost::any_cast<double>(_value));
+      this->stopERP[0] = boost::any_cast<double>(_value);
+      this->stopERP[1] = boost::any_cast<double>(_value);
     }
     catch(boost::bad_any_cast &e)
     {
@@ -449,6 +459,8 @@ void ODEJoint::SetAttribute(const std::string &_key, int /*_index*/,
     try
     {
       this->SetParam(dParamStopCFM, boost::any_cast<double>(_value));
+      this->stopCFM[0] = boost::any_cast<double>(_value);
+      this->stopCFM[1] = boost::any_cast<double>(_value);
     }
     catch(boost::bad_any_cast &e)
     {
