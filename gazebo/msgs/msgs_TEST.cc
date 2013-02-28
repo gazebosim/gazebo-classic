@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "msgs/msgs.hh"
+#include "common/Exception.hh"
 
 using namespace gazebo;
 
@@ -97,18 +98,18 @@ TEST(MsgTest, BadPackage)
 TEST(MsgTest, CovertMathVector3ToMsgs)
 {
   msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
-  EXPECT_EQ(1, msg.x());
-  EXPECT_EQ(2, msg.y());
-  EXPECT_EQ(3, msg.z());
+  EXPECT_DOUBLE_EQ(1, msg.x());
+  EXPECT_DOUBLE_EQ(2, msg.y());
+  EXPECT_DOUBLE_EQ(3, msg.z());
 }
 
 TEST(MsgTest, ConvertMsgsVector3dToMath)
 {
   msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
   math::Vector3 v    = msgs::Convert(msg);
-  EXPECT_EQ(1, v.x);
-  EXPECT_EQ(2, v.y);
-  EXPECT_EQ(3, v.z);
+  EXPECT_DOUBLE_EQ(1, v.x);
+  EXPECT_DOUBLE_EQ(2, v.y);
+  EXPECT_DOUBLE_EQ(3, v.z);
 }
 
 TEST(MsgTest, ConvertMathQuaterionToMsgs)
@@ -165,7 +166,7 @@ TEST(TestMsg, ConvertMsgPoseToMath)
   EXPECT_TRUE(math::equal(v.rot.w, 0.27059805007309851));
 }
 
-TET(MsgTest, ConvertCommonColorToMsgs)
+TEST(MsgTest, ConvertCommonColorToMsgs)
 {
   msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
 
