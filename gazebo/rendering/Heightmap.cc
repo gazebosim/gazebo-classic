@@ -87,12 +87,18 @@ Ogre::TerrainGroup *Heightmap::GetOgreTerrain() const
 //////////////////////////////////////////////////
 common::Image Heightmap::GetImage() const
 {
-  double maxHeight = 10.0;
   double height = 0.0;
   unsigned char *imageData = NULL;
 
   /// \todo Support multiple terrain objects
   Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
+
+  GZ_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
+
+  double minHeight = terrain->getMinHeight();
+  double maxHeight = terrain->getMaxHeight() - minHeight;
+
+  std::cout << "MinHeight[" << minHeight << "] MaxHeight[" << maxHeight << "]\n";
 
   // Get the number of vertices along one side of the terrain
   uint16_t size = terrain->getSize();
@@ -106,10 +112,13 @@ common::Image Heightmap::GetImage() const
     for (uint16_t x = 0; x < size; ++x)
     {
       // Normalize height value
-      height = std::min(1.0, terrain->getHeightAtPoint(x, y) / maxHeight);
+      height = (terrain->getHeightAtPoint(x, y) - minHeight) / maxHeight;
+
+      GZ_ASSERT(height <= 1.0, "Normalized terrain height > 1.0");
+      GZ_ASSERT(height >= 0.0, "Normalized terrain height < 0.0");
 
       // Scale height to a value between 0 and 255
-      imageData[y*size+x] = static_cast<unsigned char>(height * 255.0);
+      imageData[(size - y - 1)*size+x] = static_cast<unsigned char>(height * 255.0);
     }
   }
 

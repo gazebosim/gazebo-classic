@@ -40,12 +40,25 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~MouseEventHandler();
 
-      public: void AddFilter(const std::string &_name,
+      public: void AddPressFilter(const std::string &_name,
                   MouseEventFilter _filter);
 
-      public: void Handle(const common::MouseEvent &_event);
+      public: void AddReleaseFilter(const std::string &_name,
+                  MouseEventFilter _filter);
 
-      private: std::list<MouseEventFilter> filters;
+      public: void AddMoveFilter(const std::string &_name,
+                  MouseEventFilter _filter);
+
+      public: void HandlePress(const common::MouseEvent &_event);
+      public: void HandleRelease(const common::MouseEvent &_event);
+      public: void HandleMove(const common::MouseEvent &_event);
+
+      private: void Handle(std::list<MouseEventFilter> &_list,
+                   const common::MouseEvent &_event);
+
+      private: std::list<MouseEventFilter> pressFilters;
+      private: std::list<MouseEventFilter> releaseFilters;
+      private: std::list<MouseEventFilter> moveFilters;
 
       private: friend class SingletonT<MouseEventHandler>;
     };

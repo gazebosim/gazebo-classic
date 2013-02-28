@@ -124,11 +124,14 @@ GLWidget::GLWidget(QWidget *_parent)
   this->selectedVis.reset();
   this->mouseMoveVis.reset();
 
-  connect(g_terrainRaiseAct, SIGNAL(triggered()), this,
-      SLOT(OnRaiseTerrain()));
-
-  MouseEventHandler::Instance()->AddFilter("glwidget",
+  MouseEventHandler::Instance()->AddPressFilter("glwidget",
       boost::bind(&GLWidget::OnMousePress, this, _1));
+
+  MouseEventHandler::Instance()->AddReleaseFilter("glwidget",
+      boost::bind(&GLWidget::OnMouseRelease, this, _1));
+
+  MouseEventHandler::Instance()->AddMoveFilter("glwidget",
+      boost::bind(&GLWidget::OnMouseMove, this, _1));
 }
 
 /////////////////////////////////////////////////
@@ -352,22 +355,45 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
   this->mouseEvent.dragging = false;
 
   // Process Mouse Events
-  MouseEventHandler::Instance()->Handle(this->mouseEvent);
+  MouseEventHandler::Instance()->HandlePress(this->mouseEvent);
 }
 
 /////////////////////////////////////////////////
 bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
 {
-  // gui::Events::mousePress(this->mouseEvent);
-
   if (this->state == "make_entity")
     this->OnMousePressMakeEntity();
   else if (this->state == "select")
     this->OnMousePressNormal();
   else if (this->state == "translate" || this->state == "rotate")
     this->OnMousePressTranslate();
-  else if (this->state == "raise_terrain" || this->state == "lower_terrain")
-    this->OnMousePressRaiseTerrain();
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
+{
+  if (this->state == "make_entity")
+    this->OnMouseReleaseMakeEntity();
+  else if (this->state == "select")
+    this->OnMouseReleaseNormal();
+  else if (this->state == "translate" || this->state == "rotate")
+    this->OnMouseReleaseTranslate();
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
+{
+  // Update the view depending on the current GUI state
+  if (this->state == "make_entity")
+    this->OnMouseMoveMakeEntity();
+  else if (this->state == "select")
+    this->OnMouseMoveNormal();
+  else if (this->state == "translate" || this->state == "rotate")
+    this->OnMouseMoveTranslate();
 
   return true;
 }
@@ -413,38 +439,6 @@ void GLWidget::OnMousePressMakeEntity()
 }
 
 /////////////////////////////////////////////////
-void GLWidget::OnMouseMoveRaiseTerrain()
-{
-  rendering::Heightmap *heightmap = this->scene ?
-    this->scene->GetHeightmap() : NULL;
-
-  if (heightmap && this->mouseEvent.dragging &&
-      this->mouseEvent.button == common::MouseEvent::LEFT)
-  {
-    if (this->mouseEvent.shift)
-      heightmap->Lower(this->userCamera, this->mouseEvent.pos, 0.2, 0.05);
-    else
-      heightmap->Raise(this->userCamera, this->mouseEvent.pos, 0.2, 0.05);
-  }
-  else
-    this->OnMouseMoveNormal();
-}
-
-/////////////////////////////////////////////////
-void GLWidget::OnMousePressRaiseTerrain()
-{
-}
-
-/////////////////////////////////////////////////
-void GLWidget::OnRaiseTerrain()
-{
-  if (this->state != "raise_terrain")
-    this->state = "raise_terrain";
-  else
-    this->state = "select";
-}
-
-/////////////////////////////////////////////////
 void GLWidget::wheelEvent(QWheelEvent *_event)
 {
   if (!this->scene)
@@ -484,15 +478,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
   else
     this->mouseEvent.dragging = false;
 
-  // Update the view depending on the current GUI state
-  if (this->state == "make_entity")
-    this->OnMouseMoveMakeEntity();
-  else if (this->state == "select")
-    this->OnMouseMoveNormal();
-  else if (this->state == "translate" || this->state == "rotate")
-    this->OnMouseMoveTranslate();
-  else if (this->state == "raise_terrain" || this->state == "lower_terrain")
-    this->OnMouseMoveRaiseTerrain();
+  // Process Mouse Events
+  MouseEventHandler::Instance()->HandleMove(this->mouseEvent);
 
   this->mouseEvent.prevPos = this->mouseEvent.pos;
 }
@@ -644,15 +631,10 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
   this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
     common::MouseEvent::MIDDLE : 0x0;
 
-  gui::Events::mouseRelease(this->mouseEvent);
-  emit clicked();
+  // Process Mouse Events
+  MouseEventHandler::Instance()->HandleRelease(this->mouseEvent);
 
-  if (this->state == "make_entity")
-    this->OnMouseReleaseMakeEntity();
-  else if (this->state == "select")
-    this->OnMouseReleaseNormal();
-  else if (this->state == "translate" || this->state == "rotate")
-    this->OnMouseReleaseTranslate();
+  emit clicked();
 }
 
 //////////////////////////////////////////////////

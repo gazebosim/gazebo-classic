@@ -73,7 +73,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolbar->addAction(g_pointLghtCreateAct);
   toolbar->addAction(g_spotLghtCreateAct);
   toolbar->addAction(g_dirLghtCreateAct);
-  toolbar->addAction(g_terrainRaiseAct);
 
   toolLayout->addSpacing(10);
   toolLayout->addWidget(toolbar);

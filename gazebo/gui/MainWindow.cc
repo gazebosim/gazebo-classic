@@ -839,11 +839,6 @@ void MainWindow::CreateActions()
   connect(g_dirLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateDirectionalLight()));
 
-  g_terrainRaiseAct = new QAction(QIcon(":/images/directionallight.png"),
-      tr("Raise terrain height"), this);
-  g_terrainRaiseAct->setStatusTip(tr("Raise terrain height"));
-  g_terrainRaiseAct->setCheckable(true);
-
   g_resetAct = new QAction(tr("Reset Camera"), this);
   g_resetAct->setStatusTip(tr("Move camera to pose"));
   connect(g_resetAct, SIGNAL(triggered()), this,
@@ -1026,7 +1021,6 @@ void MainWindow::OnMoveMode(bool _mode)
     g_pointLghtCreateAct->setChecked(false);
     g_spotLghtCreateAct->setChecked(false);
     g_dirLghtCreateAct->setChecked(false);
-    g_terrainRaiseAct->setChecked(false);
   }
 }
 

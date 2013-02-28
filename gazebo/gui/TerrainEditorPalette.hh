@@ -43,8 +43,9 @@ namespace gazebo
       public: ~TerrainEditorPalette();
 
       private: bool OnMousePress(const common::MouseEvent &_event);
+      private: bool OnMouseMove(const common::MouseEvent &_event);
 
-      private slots: void OnRaise();
+      private slots: void OnRaise(bool _toggle);
 
       private slots: void OnLower();
 

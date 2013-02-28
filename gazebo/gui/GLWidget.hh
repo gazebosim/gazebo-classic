@@ -78,11 +78,12 @@ namespace gazebo
 
       private: std::string GetOgreHandle() const;
 
+      private: bool OnMouseMove(const common::MouseEvent &_event);
       private: void OnMouseMoveNormal();
       private: void OnMouseMoveTranslate();
       private: void OnMouseMoveMakeEntity();
-      private: void OnMouseMoveRaiseTerrain();
 
+      private: bool OnMouseRelease(const common::MouseEvent &_event);
       private: void OnMouseReleaseNormal();
       private: void OnMouseReleaseTranslate();
       private: void OnMouseReleaseMakeEntity();
@@ -133,9 +134,6 @@ namespace gazebo
       /// \brief Set the visual being moved, which will highlight the
       /// visual
       private: void SetMouseMoveVisual(rendering::VisualPtr _vis);
-
-      /// \brief QT callback when the raise terrain action is used.
-      private slots: void OnRaiseTerrain();
 
       private: int windowId;
 

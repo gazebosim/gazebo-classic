@@ -31,17 +31,50 @@ MouseEventHandler::~MouseEventHandler()
 }
 
 /////////////////////////////////////////////////
-void MouseEventHandler::AddFilter(const std::string &_name,
+void MouseEventHandler::AddPressFilter(const std::string &_name,
     MouseEventFilter _filter)
 {
-  this->filters.push_back(_filter);
+  this->pressFilters.push_front(_filter);
 }
 
 /////////////////////////////////////////////////
-void MouseEventHandler::Handle(const common::MouseEvent &_event)
+void MouseEventHandler::AddReleaseFilter(const std::string &_name,
+    MouseEventFilter _filter)
 {
-  for (std::list<MouseEventFilter>::iterator iter = this->filters.begin();
-       iter != this->filters.end(); ++iter)
+  this->releaseFilters.push_front(_filter);
+}
+
+/////////////////////////////////////////////////
+void MouseEventHandler::AddMoveFilter(const std::string &_name,
+    MouseEventFilter _filter)
+{
+  this->moveFilters.push_front(_filter);
+}
+
+/////////////////////////////////////////////////
+void MouseEventHandler::HandlePress(const common::MouseEvent &_event)
+{
+  this->Handle(this->pressFilters, _event);
+}
+
+/////////////////////////////////////////////////
+void MouseEventHandler::HandleRelease(const common::MouseEvent &_event)
+{
+  this->Handle(this->releaseFilters, _event);
+}
+
+/////////////////////////////////////////////////
+void MouseEventHandler::HandleMove(const common::MouseEvent &_event)
+{
+  this->Handle(this->moveFilters, _event);
+}
+
+/////////////////////////////////////////////////
+void MouseEventHandler::Handle(std::list<MouseEventFilter> &_list,
+  const common::MouseEvent &_event)
+{
+  for (std::list<MouseEventFilter>::iterator iter = _list.begin();
+       iter != _list.end(); ++iter)
   {
     if ((*iter)(_event))
       break;

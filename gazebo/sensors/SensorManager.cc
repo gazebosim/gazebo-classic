@@ -452,7 +452,7 @@ void SensorManager::SensorContainer::RunLoop()
     // Compute the time it took to update the sensors.
     diffTime = world->GetSimTime() - startTime;
 
-    // Set the default sleep time;
+    // Set the default sleep time
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
     // Make sure update time is reasonable.
