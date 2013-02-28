@@ -15,7 +15,6 @@
  *
 */
 
-
 #include <gtest/gtest.h>
 
 #include "gazebo/physics/physics.hh"
@@ -23,8 +22,6 @@
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "test/ServerFixture.hh"
-
-#define NEAR_TOL 2e-5
 
 using namespace gazebo;
 using namespace physics;
@@ -51,7 +48,7 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   ASSERT_TRUE(bulletPhysics != NULL);
 
   std::string type = "sequential_impulse";
-   int iters = 45;
+  int iters = 45;
   double sor = 1.2;
   double cfm = 0.3;
   double erp = 0.12;

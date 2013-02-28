@@ -212,7 +212,19 @@ void PhysicsEngine::SetParam(PhysicsParam /*_param*/,
 }
 
 //////////////////////////////////////////////////
+void PhysicsEngine::SetParam(std::string /*_key*/,
+    const boost::any &/*_value*/)
+{
+}
+
+//////////////////////////////////////////////////
 boost::any PhysicsEngine::GetParam(PhysicsParam /*_param*/) const
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+boost::any PhysicsEngine::GetParam(std::string /*_key*/) const
 {
   return 0;
 }

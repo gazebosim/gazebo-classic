@@ -1,8 +1,8 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
-link_directories(  
-  ${CCD_LIBRARY_DIRS} 
+link_directories(
+  ${CCD_LIBRARY_DIRS}
 )
 
 
@@ -44,6 +44,11 @@ SET (headers
   ODETypes.hh
   ODEScrewJoint.hh
 )
+
+set (gtest_sources
+  ODEPhysics_TEST.cc
+)
+gz_build_tests(${gtest_sources})
 
 gz_add_library(gazebo_physics_ode ${sources})
 target_link_libraries(gazebo_physics_ode gazebo_ode gazebo_opcode ${TBB_LIBRARIES})

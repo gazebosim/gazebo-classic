@@ -42,7 +42,7 @@ namespace gazebo
     /// \brief Base class for a physics engine.
     class PhysicsEngine
     {
-      /// \enum Attribute
+      /// \enum PhysicsParam
       /// \brief Physics paramerter types.
       public: enum PhysicsParam
       {
@@ -55,10 +55,7 @@ namespace gazebo
         /// \brief Error reduction parameter
         GLOBAL_ERP,
 
-        /// \brief True to enable auto disabling of bodies
-        AUTO_DISABLE,
-
-        /// \brief Number of iterations
+        /// \brief Number of iterations (ODE specific)
         SOR_PRECON_ITERS,
 
         /// \brief Number of iterations
@@ -67,7 +64,7 @@ namespace gazebo
         /// \brief SOR over-relaxation parameter
         SOR,
 
-        /// \brief Max correcting velocity
+        /// \brief Max correcting velocity (ODE specific)
         CONTACT_MAX_CORRECTING_VEL,
 
         /// \brief Surface layer depth
@@ -280,15 +277,26 @@ namespace gazebo
       public: virtual int GetMaxContacts() {return 0;}
 
       /// \brief Set a parameter of the physics engine
-      /// \param[in] _attr A parameter listed in the PhysicsParam enum
+      /// \param[in] _param A parameter listed in the PhysicsParam enum
       /// \param[in] _value The value to set to
       public: virtual void SetParam(PhysicsParam _param,
+                  const boost::any &_value);
+
+      /// \brief Set a parameter of the physics engine
+      /// \param[in] _key String key
+      /// \param[in] _value The value to set to
+      public: virtual void SetParam(std::string _key,
                   const boost::any &_value);
 
       /// \brief Get an parameter of the physics engine
       /// \param[in] _attr A parameter listed in the PhysicsParam enum
       /// \return The value of the parameter
       public: virtual boost::any GetParam(PhysicsParam _param) const;
+
+      /// \brief Get an parameter of the physics engine
+      /// \param[in] _attr String key
+      /// \return The value of the parameter
+      public: virtual boost::any GetParam(std::string _key) const;
 
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;

@@ -1032,14 +1032,30 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
     }
     case SOR_PRECON_ITERS:
     {
-      int value = boost::any_cast<int>(_value);
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch (boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
       odeElem->GetElement("solver")->GetElement("precon_iters")->Set(value);
       dWorldSetQuickStepPreconIterations(this->worldId, value);
       break;
     }
     case SOR_ITERS:
     {
-      int value = boost::any_cast<int>(_value);
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch (boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
       odeElem->GetElement("solver")->GetElement("iters")->Set(value);
       dWorldSetQuickStepNumIterations(this->worldId, value);
       break;
@@ -1069,7 +1085,15 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
     }
     case MAX_CONTACTS:
     {
-      int value = boost::any_cast<int>(_value);
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch (boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
       odeElem->GetElement("max_contacts")->GetValue()->Set(value);
       break;
     }
@@ -1123,7 +1147,7 @@ boost::any ODEPhysics::GetParam(PhysicsParam _param) const
   {
     case SOLVER_TYPE:
     {
-      value = odeElem->GetElement("constraints")->GetValueString("type");
+      value = odeElem->GetElement("solver")->GetValueString("type");
       break;
     }
     case GLOBAL_CFM:
