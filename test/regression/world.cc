@@ -26,7 +26,6 @@ class WorldTest : public ServerFixture
   public: void WorldParam();
   public: static msgs::World worldPubMsg;
   public: static msgs::World worldResponseMsg;
-
 };
 
 msgs::World WorldTest::worldPubMsg;
