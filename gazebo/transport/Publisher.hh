@@ -63,10 +63,14 @@ namespace gazebo
       ///        publisher
       public: void WaitForConnection() const;
 
+      /// \brief DEPRECATED in version 1.5
+      /// \sa SetPublication
+      public: void SetPublication(PublicationPtr &_publication, int _i)
+              GAZEBO_DEPRECATED;
+
       /// \brief Set the publication object for a particular publication
       /// \param[in] _publication Pointer to the publication object to be set
-      /// \param[in] _i Index into publications vector that will be set
-      public: void SetPublication(PublicationPtr &_publication, int _i);
+      public: void SetPublication(PublicationPtr &_publication);
 
       /// \brief Publish a protobuf message on the topic
       /// \param[in] _message Message to be published
@@ -138,7 +142,7 @@ namespace gazebo
 
       /// \brief The publication pointers. One for normal publication, and
       /// one for debug.
-      private: PublicationPtr publications[2];
+      private: PublicationPtr publication;
 
       /// \brief The previous message published. Used for latching topics.
       private: google::protobuf::Message *prevMsg;

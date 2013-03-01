@@ -47,6 +47,8 @@ std::vector<common::Time> bwTime;
 
 boost::mutex mutex;
 
+boost::shared_ptr<google::protobuf::Message> g_echoMsg;
+
 /////////////////////////////////////////////////
 void help()
 {
@@ -153,8 +155,7 @@ void list()
   for (int i = 0; i < pubs.publisher_size(); i++)
   {
     const msgs::Publish &p = pubs.publisher(i);
-    if (p.topic().find("__dbg") == std::string::npos &&
-        std::find(listed.begin(), listed.end(), p.topic()) == listed.end())
+    if (std::find(listed.begin(), listed.end(), p.topic()) == listed.end())
     {
       std::cout << p.topic() << std::endl;
 
@@ -167,9 +168,10 @@ void list()
 }
 
 /////////////////////////////////////////////////
-void echo_cb(ConstGzStringPtr &_data)
+void echoCB(const std::string &_data)
 {
-  std::cout << _data->data() << "\n";
+  g_echoMsg->ParseFromString(_data);
+  std::cout << echoMsg->DebugString() << "\n";
 }
 
 /////////////////////////////////////////////////
@@ -251,15 +253,34 @@ void echo()
     return;
   }
 
+  std::string topic = params[1];
+
   transport::init();
 
   transport::NodePtr node(new transport::Node());
   node->Init();
 
-  std::string topic = params[1];
-  topic +=  "/__dbg";
+  // Get the message type on the topic.
+  std::string msgTypeName = gazebo::transport::getTopicMsgType(
+      this->node->DecodeTopicName(topic));
 
-  transport::SubscriberPtr sub = node->Subscribe(topic, echo_cb);
+  if (msgTypeName.empty())
+  {
+    gzerr << "Unable to get message type for topic[" << topic << "]\n";
+    tranport::fini();
+    return;
+  }
+
+  g_echoMsg = msgs::MsgFactory::NewMsg(msgTypeName);
+
+  if (!g_echoMsg)
+  {
+    gzerr << "Unable to create message of type[" << msgTyepName << "]\n";
+    tranport::fini();
+    return;
+  }
+
+  transport::SubscriberPtr sub = node->Subscribe(topic, echoCB);
 
   // Run the transport loop: starts a new thread
   transport::run();
