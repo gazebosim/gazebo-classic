@@ -189,7 +189,7 @@ void Publisher::OnPublishComplete()
 //////////////////////////////////////////////////
 void Publisher::SetPublication(PublicationPtr &_publication, int _i)
 {
-  if (i == 0)
+  if (_i == 0)
     this->publication = _publication;
 }
 
