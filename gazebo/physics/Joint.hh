@@ -371,7 +371,9 @@ namespace gazebo
       public: void FillMsg(msgs::Joint &_msg);
 
       /// \brief:  get the joint upper limit
-      /// (replace GetLowStop and GetHighStop)
+      /// (replaces GetLowStop and GetHighStop)
+      /// \param[in] _index Index of the axis.
+      /// \return Upper limit of the axis.
       public: math::Angle GetLowerLimit(unsigned int _index) const
         {
           if (_index < this->GetAngleCount())
@@ -382,7 +384,9 @@ namespace gazebo
         }
 
       /// \brief:  get the joint lower limit
-      /// (replace GetLowStop and GetHighStop)
+      /// (replacee GetLowStop and GetHighStop)
+      /// \param[in] _index Index of the axis.
+      /// \return Upper limit of the axis.
       public: math::Angle GetUpperLimit(unsigned int _index) const
         {
           if (_index < this->GetAngleCount())
