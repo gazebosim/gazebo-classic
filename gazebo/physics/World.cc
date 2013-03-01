@@ -614,7 +614,7 @@ void World::Update()
 
   event::Events::worldUpdateEnd();
 
-  DIAG_TIMER_LAP("World::Update", "Events::worldUpdateEnd");
+  DIAG_TIMER_STOP("World::Update");
 }
 
 //////////////////////////////////////////////////
