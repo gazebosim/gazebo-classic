@@ -582,7 +582,7 @@ namespace gazebo
       /// \brief Used to compute a more accurate real time value.
       private: common::Time realTimeOffset;
 
-      /// \brief Mutext to protect incoming message buffers.
+      /// \brief Mutex to protect incoming message buffers.
       private: boost::recursive_mutex *receiveMutex;
 
       /// \brief Mutex to protext loading of models.

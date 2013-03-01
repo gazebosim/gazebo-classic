@@ -1575,11 +1575,11 @@ void PhysicsTest::PhysicsParam(const std::string &_physicsEngine)
   transport::SubscriberPtr responseSub = phyNode->Subscribe("~/response",
       &PhysicsTest::OnPhysicsMsgResponse, this);
 
-//  msgs::Physics msg;
   physicsPubMsg.set_enable_physics(true);
-  physicsPubMsg.set_update_rate(500);
+  // update_rate and dt are deprecated
+  //physicsPubMsg.set_update_rate(500);
   // solver
-  physicsPubMsg.set_dt(60);
+  //physicsPubMsg.set_dt(60);
   physicsPubMsg.set_iters(60);
   physicsPubMsg.set_sor(1.5);
   // constraint
@@ -1605,7 +1605,7 @@ void PhysicsTest::PhysicsParam(const std::string &_physicsEngine)
   requestPub->Publish(*requestMsg);
 
   int waitCount = 0, maxWaitCount = 3000;
-  while (!physicsResponseMsg.ByteSize() == 0 && ++waitCount < maxWaitCount)
+  while (physicsResponseMsg.ByteSize() == 0 && ++waitCount < maxWaitCount)
     common::Time::MSleep(10);
   ASSERT_LT(waitCount, maxWaitCount);
 
@@ -1613,10 +1613,11 @@ void PhysicsTest::PhysicsParam(const std::string &_physicsEngine)
       physicsPubMsg.solver_type());
   EXPECT_EQ(physicsResponseMsg.enable_physics(),
       physicsPubMsg.enable_physics());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.update_rate(),
-      physicsPubMsg.update_rate());
-  EXPECT_EQ(physicsResponseMsg.dt(),
-      physicsPubMsg.dt());
+  // update_rate and dt are deprecated
+  // EXPECT_DOUBLE_EQ(physicsResponseMsg.update_rate(),
+  //     physicsPubMsg.update_rate());
+  // EXPECT_EQ(physicsResponseMsg.dt(),
+  //     physicsPubMsg.dt());
   EXPECT_EQ(physicsResponseMsg.iters(),
       physicsPubMsg.iters());
   EXPECT_DOUBLE_EQ(physicsResponseMsg.sor(),

@@ -237,10 +237,10 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::ODE);
-    physicsMsg.set_update_rate(this->GetUpdateRate());
+//    physicsMsg.set_update_rate(this->GetUpdateRate());
     physicsMsg.set_solver_type(this->stepType);
     // dt is deprecated, use min_step_time instead
-    physicsMsg.set_dt(this->GetStepTime());
+//    physicsMsg.set_dt(this->GetStepTime());
     physicsMsg.set_min_step_size(
         boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
     physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
@@ -264,15 +264,15 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   // deprecated
-  if (_msg->has_dt())
-    this->SetStepTime(_msg->dt());
+//  if (_msg->has_dt())
+//    this->SetStepTime(_msg->dt());
 
   if (_msg->has_min_step_size())
     this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
 
   // deprecated
-  if (_msg->has_update_rate())
-    this->SetUpdateRate(_msg->update_rate());
+//  if (_msg->has_update_rate())
+//    this->SetUpdateRate(_msg->update_rate());
 
   if (_msg->has_solver_type())
   {

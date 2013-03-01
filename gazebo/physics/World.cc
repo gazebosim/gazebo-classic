@@ -441,11 +441,13 @@ void World::Step()
     this->PublishWorldStats();
   }
 
+  double realTimeUpdateRate = this->GetRealTimeUpdateRate();
+  double updatePeriod = (realTimeUpdateRate > 0) ? 1.0/realTimeUpdateRate : 0;
+
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
   common::Time sleepTime = this->prevStepWallTime +
-    common::Time(this->physicsEngine->GetUpdatePeriod()) -
-    tmpTime - this->sleepOffset;
+    common::Time(updatePeriod) - tmpTime - this->sleepOffset;
 
   if (sleepTime > 0)
     common::Time::Sleep(sleepTime);
@@ -461,7 +463,7 @@ void World::Step()
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
   if (common::Time::GetWallTime() - this->prevStepWallTime + this->sleepOffset
-         >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+         >= common::Time(updatePeriod))
   {
     boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
 
@@ -470,7 +472,8 @@ void World::Step()
     if (!this->IsPaused() || this->stepInc > 0)
     {
       // query timestep to allow dynamic time step size updates
-      this->simTime += this->physicsEngine->GetStepTime();
+      this->simTime += this->GetMaxStepSize();
+      //this->physicsEngine->GetStepTime();
       this->iterations++;
       this->Update();
 
@@ -478,7 +481,8 @@ void World::Step()
         this->stepInc--;
     }
     else
-      this->pauseTime += this->physicsEngine->GetStepTime();
+      this->pauseTime += this->GetMaxStepSize();
+      //this->physicsEngine->GetStepTime();
   }
 
   this->ProcessMessages();
@@ -1818,15 +1822,13 @@ double World::GetMaxStepSize() const
 //////////////////////////////////////////////////
 void World::SetRealTimeUpdateRate(double _rate)
 {
-  /// TODO: may need to protect with mutex once other modules start using this
-  boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
+//  boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
   this->sdf->GetElement("real_time_update_rate")->Set(_rate);
-  gzerr << " real time update " << _rate << " " << this->sdf->GetElement("real_time_update_rate")->GetValueDouble() << std::endl;;
 }
 
 //////////////////////////////////////////////////
 void World::SetMaxStepSize(double _stepSize)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
+//  boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
   this->sdf->GetElement("max_step_size")->Set(_stepSize);
 }
