@@ -442,7 +442,10 @@ namespace gazebo
       /// \brief Store Joint velocity limit as specified in SDF
       protected: double velocityLimit[2];
 
+      /// \brief Store Joint position lower limit as specified in SDF
       protected: math::Angle lowerLimit[2];
+
+      /// \brief Store Joint position upper limit as specified in SDF
       protected: math::Angle upperLimit[2];
     };
     /// \}
