@@ -20,12 +20,18 @@
 
 #include <string>
 
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
+  namespace rendering
+  {
+    class Heightmap;
+  }
+
   namespace gui
   {
     /// \addtogroup gazebo_gui
@@ -55,11 +61,21 @@ namespace gazebo
       /// \brief Apply a brush
       /// \param[in] _event The mouse event.
       /// \return True if the brush was applied
-      private: bool Apply(const common::MouseEvent &_event);
+      private: bool Apply(const common::MouseEvent &_event,
+                   rendering::CameraPtr _camera,
+                   rendering::Heightmap *_heightmap);
+
+      /// \brief Add mouse event filters
+      private: void AddEventFilters();
+
+      /// \brief Remove mouse event filters
+      private: void RemoveEventFilters();
 
       private slots: void OnRaise(bool _toggle);
 
       private slots: void OnLower(bool _toggle);
+
+      private slots: void OnSmooth(bool _toggle);
 
       private slots: void OnSave();
 

@@ -49,6 +49,7 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
   smoothButton->setStatusTip(tr("Left-mouse press to smooth terrain."));
   smoothButton->setCheckable(true);
   smoothButton->setChecked(false);
+  connect(smoothButton, SIGNAL(toggled(bool)), this, SLOT(OnSmooth(bool)));
 
   QPushButton *courseButton = new QPushButton("Course", this);
   courseButton->setStatusTip(tr("Left-mouse press to course terrain."));
@@ -108,16 +109,12 @@ void TerrainEditorPalette::OnRaise(bool _toggle)
   if (_toggle)
   {
     this->state = "raise";
-    MouseEventHandler::Instance()->AddPressFilter("terrain",
-        boost::bind(&TerrainEditorPalette::OnMousePress, this, _1));
-
-    MouseEventHandler::Instance()->AddMoveFilter("terrain",
-        boost::bind(&TerrainEditorPalette::OnMouseMove, this, _1));
+    this->AddEventFilters();
   }
   else
   {
-    MouseEventHandler::Instance()->RemovePressFilter("terrain");
-    MouseEventHandler::Instance()->RemoveMoveFilter("terrain");
+    this->state.clear();
+    this->RemoveEventFilters();
   }
 }
 
@@ -127,17 +124,45 @@ void TerrainEditorPalette::OnLower(bool _toggle)
   if (_toggle)
   {
     this->state = "lower";
-    MouseEventHandler::Instance()->AddPressFilter("terrain",
-        boost::bind(&TerrainEditorPalette::OnMousePress, this, _1));
-
-    MouseEventHandler::Instance()->AddMoveFilter("terrain",
-        boost::bind(&TerrainEditorPalette::OnMouseMove, this, _1));
+    this->AddEventFilters();
   }
   else
   {
-    MouseEventHandler::Instance()->RemovePressFilter("terrain");
-    MouseEventHandler::Instance()->RemoveMoveFilter("terrain");
+    this->state.clear();
+    this->RemoveEventFilters();
   }
+}
+
+/////////////////////////////////////////////////
+void TerrainEditorPalette::OnSmooth(bool _toggle)
+{
+  if (_toggle)
+  {
+    this->state = "smooth";
+    this->AddEventFilters();
+  }
+  else
+  {
+    this->state.clear();
+    this->RemoveEventFilters();
+  }
+}
+
+/////////////////////////////////////////////////
+void TerrainEditorPalette::AddEventFilters()
+{
+  MouseEventHandler::Instance()->AddPressFilter("terrain",
+      boost::bind(&TerrainEditorPalette::OnMousePress, this, _1));
+
+  MouseEventHandler::Instance()->AddMoveFilter("terrain",
+      boost::bind(&TerrainEditorPalette::OnMouseMove, this, _1));
+}
+
+/////////////////////////////////////////////////
+void TerrainEditorPalette::RemoveEventFilters()
+{
+  MouseEventHandler::Instance()->RemovePressFilter("terrain");
+  MouseEventHandler::Instance()->RemoveMoveFilter("terrain");
 }
 
 /////////////////////////////////////////////////
@@ -180,7 +205,7 @@ bool TerrainEditorPalette::OnMousePress(const common::MouseEvent &_event)
   // Only try to modify if the heightmap exists, and the LEFT mouse button
   // was used.
   if (heightmap && !_event.shift)
-    handled = this->Apply(_event);
+    handled = this->Apply(_event, camera, heightmap);
 
   return handled;
 }
@@ -201,13 +226,14 @@ bool TerrainEditorPalette::OnMouseMove(const common::MouseEvent &_event)
   rendering::Heightmap *heightmap = scene ? scene->GetHeightmap() : NULL;
 
   if (heightmap && _event.dragging && !_event.shift)
-    handled = this->Apply(_event);
+    handled = this->Apply(_event, camera, heightmap);
 
   return handled;
 }
 
 /////////////////////////////////////////////////
-bool TerrainEditorPalette::Apply(const common::MouseEvent &_event)
+bool TerrainEditorPalette::Apply(const common::MouseEvent &_event,
+    rendering::CameraPtr _camera, rendering::Heightmap *_heightmap)
 {
   bool handled = false;
 
@@ -216,13 +242,13 @@ bool TerrainEditorPalette::Apply(const common::MouseEvent &_event)
   double brushSize = this->brushSizeSlider->value() / 100.0;
 
   if (this->state == "lower")
-    handled = heightmap->Lower(camera, _event.pos, brushSize, brushWeight);
+    handled = _heightmap->Lower(_camera, _event.pos, brushSize, brushWeight);
   else if (this->state == "raise")
-    handled = heightmap->Raise(camera, _event.pos, brushSize, brushWeight);
+    handled = _heightmap->Raise(_camera, _event.pos, brushSize, brushWeight);
   else if (this->state == "smooth")
-    handled = heightmap->Smooth(camera, _event.pos, brushSize, brushWeight);
+    handled = _heightmap->Smooth(_camera, _event.pos, brushSize, brushWeight);
   else if (this->state == "rough")
-    handled = heightmap->Roughen(camera, _event.pos, brushSize, brushWeight);
-  
+    handled = _heightmap->Roughen(_camera, _event.pos, brushSize, brushWeight);
+
   return handled;
 }

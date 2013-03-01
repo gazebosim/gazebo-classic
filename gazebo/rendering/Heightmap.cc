@@ -404,7 +404,7 @@ bool Heightmap::Roughen(CameraPtr _camera, math::Vector2i _mousePos,
                          double _brushSize, double _weight)
 {
   Ogre::TerrainGroup::RayResult terrainResult =
-    this->GetRayHit(_camera, _mousePos);
+    this->GetMouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
     this->ModifyTerrain(terrainResult.position, _brushSize, _weight, "rough");
@@ -417,7 +417,7 @@ bool Heightmap::Smooth(CameraPtr _camera, math::Vector2i _mousePos,
                          double _brushSize, double _weight)
 {
   Ogre::TerrainGroup::RayResult terrainResult =
-    this->GetRayHit(_camera, _mousePos);
+    this->GetMouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
     this->ModifyTerrain(terrainResult.position, _brushSize, _weight, "smooth");
@@ -431,7 +431,7 @@ bool Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
 {
   // The terrain uses a special ray intersection test.
   Ogre::TerrainGroup::RayResult terrainResult =
-    this->GetRayHit(_camera, _mousePos);
+    this->GetMouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
     this->ModifyTerrain(terrainResult.position, _brushSize, _weight, "raise");
@@ -445,7 +445,7 @@ bool Heightmap::Lower(CameraPtr _camera, math::Vector2i _mousePos,
 {
   // The terrain uses a special ray intersection test.
   Ogre::TerrainGroup::RayResult terrainResult =
-    this->GetRayHit(_camera, _mousePos);
+    this->GetMouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
     this->ModifyTerrain(terrainResult.position, _brushSize, _weight, "lower");
