@@ -388,15 +388,15 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
           else
             gazebo->provideFeedback = false;
       }
-      else if (childElem->ValueStr() == "useCFMDamping")
+      else if (childElem->ValueStr() == "cfmDamping")
       {
           std::string valueStr = this->GetKeyValueAsString(childElem);
 
           if (lowerStr(valueStr) == "true" || lowerStr(valueStr) == "yes" ||
               valueStr == "1")
-            gazebo->useCFMDamping = true;
+            gazebo->cfmDamping = true;
           else
-            gazebo->useCFMDamping = false;
+            gazebo->cfmDamping = false;
       }
       else
       {
@@ -575,8 +575,8 @@ void URDF2Gazebo::InsertGazeboExtensionJoint(TiXmlElement *_elem,
         else
             this->AddKeyValue(physicsOde, "provide_feedback", "false");
 
-        // insert useCFMDamping
-        if ((*ge)->useCFMDamping)
+        // insert cfmDamping
+        if ((*ge)->cfmDamping)
             this->AddKeyValue(physicsOde, "cfm_damping", "true");
         else
             this->AddKeyValue(physicsOde, "cfm_damping", "false");
