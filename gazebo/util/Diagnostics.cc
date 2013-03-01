@@ -31,8 +31,6 @@ using namespace util;
 //////////////////////////////////////////////////
 DiagnosticManager::DiagnosticManager()
 {
-  this->node = transport::NodePtr(new transport::Node());
-
   // Get the base of the time logging path
   if (!getenv("HOME"))
   {
@@ -63,6 +61,8 @@ DiagnosticManager::~DiagnosticManager()
 //////////////////////////////////////////////////
 void DiagnosticManager::Init(const std::string &_worldName)
 {
+  this->node.reset(new transport::Node());
+
   this->node->Init(_worldName);
 
   this->pub = this->node->Advertise<msgs::Diagnostics>("~/diagnostics");
