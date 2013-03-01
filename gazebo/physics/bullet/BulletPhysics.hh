@@ -25,6 +25,7 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/unordered_map.hpp>
 
 #include "physics/bullet/bullet_inc.h"
 #include "physics/PhysicsEngine.hh"
@@ -127,11 +128,20 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
 
+      public: boost::unordered_map<CollisionPtr, Contact *> GetContactMap();
+
       /// \brief Register a joint with the dynamics world
       public: btDynamicsWorld *GetDynamicsWorld() const
               {return this->dynamicsWorld;}
 
       public: virtual void DebugPrint() const;
+
+      private: void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep);
+
+      private: static bool ContactCallback(btManifoldPoint &_cp,
+        const btCollisionObjectWrapper *_obj0, int _partId0,
+        int _index0, const btCollisionObjectWrapper *_obj1,
+        int _partId1, int _index1);
 
       private: btBroadphaseInterface *broadPhase;
       private: btDefaultCollisionConfiguration *collisionConfig;
@@ -142,6 +152,8 @@ namespace gazebo
       private: common::Time lastUpdateTime;
 
       private: double stepTimeDouble;
+
+      private: boost::unordered_map<CollisionPtr, Contact *>contactMap;
     };
 
   /// \}
