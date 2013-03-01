@@ -114,7 +114,7 @@ namespace gazebo
       }
 
       /// \brief Get access to stopERP
-      public: double GetStopERP(unsigned int _int)
+      public: double GetStopERP()
       {
         return this->stopERP;
       }

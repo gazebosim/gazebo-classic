@@ -107,8 +107,12 @@ void ODEHingeJoint::SetDamping(int /*index*/, double _damping)
   //   boost::bind(&Joint::ApplyDamping, this));
 
   // use cfm damping
-  this->applyDamping = physics::Joint::ConnectJointUpdate(
-    boost::bind(&ODEJoint::CFMDamping, this));
+  if (this->useCFMDamping)
+    this->applyDamping = physics::Joint::ConnectJointUpdate(
+      boost::bind(&ODEJoint::CFMDamping, this));
+  else
+    this->applyDamping = physics::Joint::ConnectJointUpdate(
+      boost::bind(&ODEJoint::ApplyDamping, this));
 }
 
 //////////////////////////////////////////////////

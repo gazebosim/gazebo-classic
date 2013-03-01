@@ -88,8 +88,12 @@ void ODEHinge2Joint::SetDamping(int /*_index*/, double _damping)
   this->dampingCoefficient = _damping;
   // use below when ode version is fixed
   // dJointSetDamping(this->jointId, _damping);
-  this->applyDamping = physics::Joint::ConnectJointUpdate(
-    boost::bind(&ODEJoint::CFMDamping, this));
+  if (this->useCFMDamping)
+    this->applyDamping = physics::Joint::ConnectJointUpdate(
+      boost::bind(&ODEJoint::CFMDamping, this));
+  else
+    this->applyDamping = physics::Joint::ConnectJointUpdate(
+      boost::bind(&ODEJoint::ApplyDamping, this));
 }
 
 //////////////////////////////////////////////////

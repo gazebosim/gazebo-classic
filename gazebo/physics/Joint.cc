@@ -47,6 +47,7 @@ Joint::Joint(BasePtr _parent)
   this->effortLimit[1] = -1;
   this->velocityLimit[0] = -1;
   this->velocityLimit[1] = -1;
+  this->useCFMDamping = false;
 }
 
 //////////////////////////////////////////////////

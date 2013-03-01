@@ -65,6 +65,11 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       this->provideFeedback = elem->GetValueBool("provide_feedback");
     }
 
+    if (elem->HasElement("cfm_damping"))
+    {
+      this->useCFMDamping = elem->GetValueBool("cfm_damping");
+    }
+
     if (elem->HasElement("limit"))
     {
       // initializa both axis, \todo: make cfm, erp per axis

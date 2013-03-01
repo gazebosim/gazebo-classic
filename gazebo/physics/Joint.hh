@@ -451,6 +451,9 @@ namespace gazebo
 
       /// \brief Store Joint position upper limit as specified in SDF
       protected: math::Angle upperLimit[2];
+
+      /// \brief option to use CFM damping
+      protected: bool useCFMDamping;
     };
     /// \}
   }

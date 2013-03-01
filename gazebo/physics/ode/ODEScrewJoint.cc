@@ -98,8 +98,12 @@ void ODEScrewJoint::SetDamping(int /*index*/, double _damping)
 {
   this->dampingCoefficient = _damping;
   // dJointSetDamping(this->jointId, this->dampingCoefficient);
-  this->applyDamping = physics::Joint::ConnectJointUpdate(
-    boost::bind(&ODEJoint::CFMDamping, this));
+  if (this->useCFMDamping)
+    this->applyDamping = physics::Joint::ConnectJointUpdate(
+      boost::bind(&ODEJoint::CFMDamping, this));
+  else
+    this->applyDamping = physics::Joint::ConnectJointUpdate(
+      boost::bind(&ODEJoint::ApplyDamping, this));
 }
 
 //////////////////////////////////////////////////
