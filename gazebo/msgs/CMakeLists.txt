@@ -87,6 +87,11 @@ set (msgs
   world_modify.proto
 )
 
+set (msgs_tests_sources
+  msgs_TEST.cc
+)
+gz_build_tests(${msgs_tests_sources})
+
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 gz_add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
