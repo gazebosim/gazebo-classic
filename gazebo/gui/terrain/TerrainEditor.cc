@@ -33,7 +33,7 @@ TerrainEditor::TerrainEditor(MainWindow *_mainWindow)
   this->terrainPalette = new TerrainEditorPalette;
   this->Init("terrainEditorTab", "Terrain Editor", this->terrainPalette);
 
-  connect(g_editTerrainAct, SIGNAL(triggered()), this, SLOT(OnEdit()));
+  // connect(g_editTerrainAct, SIGNAL(triggered()), this, SLOT(OnEdit()));
 }
 
 /////////////////////////////////////////////////

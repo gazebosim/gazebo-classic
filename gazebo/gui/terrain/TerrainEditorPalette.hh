@@ -50,10 +50,12 @@ namespace gazebo
       /// \brief Destructor
       public: ~TerrainEditorPalette();
 
+      /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the brush was applied
       private: bool OnMousePress(const common::MouseEvent &_event);
 
+      /// \brief Mouse event filter callback when mouse is moved.
       /// \param[in] _event The mouse event.
       /// \return True if the brush was applied
       private: bool OnMouseMove(const common::MouseEvent &_event);
@@ -65,22 +67,49 @@ namespace gazebo
                    rendering::CameraPtr _camera,
                    rendering::Heightmap *_heightmap);
 
-      /// \brief Add mouse event filters
-      private: void AddEventFilters();
+      /// \brief Set the current state.
+      /// \param[in] _state String state(lower, raise, flatten ...). Empty
+      /// string to disable terrain modification.
+      private: void SetState(const std::string &_state);
 
-      /// \brief Remove mouse event filters
-      private: void RemoveEventFilters();
-
+      /// \brief QT callback when Raise button is toggled.
+      /// \param[in] _toggle True if the button is enabled.
       private slots: void OnRaise(bool _toggle);
 
+      /// \brief QT callback when Lower button is toggled.
+      /// \param[in] _toggle True if the button is enabled.
       private slots: void OnLower(bool _toggle);
 
-      private slots: void OnSmooth(bool _toggle);
+      /// \brief QT callback when Flatten button is toggled.
+      /// \param[in] _toggle True if the button is enabled.
+      private slots: void OnFlatten(bool _toggle);
 
+      /// \brief QT callback when Course button is toggled.
+      /// \param[in] _toggle True if the button is enabled.
+      private slots: void OnCourse(bool _toggle);
+
+      /// \brief QT callback when image is saved.
       private slots: void OnSave();
 
+      /// \brief Button to raise the terrain.
+      private: QPushButton *raiseButton;
+
+      /// \brief Button to lower the terrain.
+      private: QPushButton *lowerButton;
+
+      /// \brief Button to flatten the terrain.
+      private: QPushButton *flattenButton;
+
+      /// \brief Button to roughen the terrain.
+      private: QPushButton *courseButton;
+
+      /// \brief Slider to control the size of the brush.
       private: QSlider *brushSizeSlider;
+
+      /// \brief Slider to control the weight of the brush.
       private: QSlider *brushWeightSlider;
+
+      /// \brief The current brush state.
       private: std::string state;
     };
   }

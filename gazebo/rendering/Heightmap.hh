@@ -71,14 +71,14 @@ namespace gazebo
       /// \return The height at the specified location
       public: double GetHeight(double _x, double _y, double _z = 1000);
 
-      /// \brief Smooth the terrain based on a mouse press.
+      /// \brief Flatten the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.
       /// \param[in] _mousePos Position of the mouse in viewport
       /// coordinates.
       /// \param[in] _brushSize Controls the radius of effect.
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
-      public: bool Smooth(CameraPtr _camera, math::Vector2i _mousePos,
+      public: bool Flatten(CameraPtr _camera, math::Vector2i _mousePos,
                          double _brushSize, double _weight = 0.1);
 
       /// \brief Roughen the terrain based on a mouse press.

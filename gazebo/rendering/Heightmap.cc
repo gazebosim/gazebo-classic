@@ -413,14 +413,14 @@ bool Heightmap::Roughen(CameraPtr _camera, math::Vector2i _mousePos,
 }
 
 /////////////////////////////////////////////////
-bool Heightmap::Smooth(CameraPtr _camera, math::Vector2i _mousePos,
+bool Heightmap::Flatten(CameraPtr _camera, math::Vector2i _mousePos,
                          double _brushSize, double _weight)
 {
   Ogre::TerrainGroup::RayResult terrainResult =
     this->GetMouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
-    this->ModifyTerrain(terrainResult.position, _brushSize, _weight, "smooth");
+    this->ModifyTerrain(terrainResult.position, _brushSize, _weight, "flatten");
 
   return terrainResult.hit;
 }
@@ -526,7 +526,7 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
 
   double avgHeight = 0;
 
-  if (_op == "smooth" || _op == "rough")
+  if (_op == "flatten" || _op == "rough")
     avgHeight = this->GetAvgHeight(pos, _brushSize);
 
   for (long y = starty; y <= endy; ++y)
@@ -547,7 +547,7 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
         newHeight += addedHeight;
       else if (_op == "lower")
         newHeight -= addedHeight;
-      else if (_op == "smooth")
+      else if (_op == "flatten")
       {
         if (newHeight < avgHeight)
           newHeight += addedHeight;

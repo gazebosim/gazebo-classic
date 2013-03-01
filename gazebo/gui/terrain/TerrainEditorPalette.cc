@@ -33,59 +33,73 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
-  QPushButton *raiseButton = new QPushButton("Raise", this);
-  raiseButton->setStatusTip(tr("Left-mouse press to raise terrain."));
-  raiseButton->setCheckable(true);
-  raiseButton->setChecked(false);
-  connect(raiseButton, SIGNAL(toggled(bool)), this, SLOT(OnRaise(bool)));
+  // Create the button to raise terrain
+  this->raiseButton = new QPushButton("Raise", this);
+  this->raiseButton->setStatusTip(tr("Left-mouse press to raise terrain."));
+  this->raiseButton->setCheckable(true);
+  this->raiseButton->setChecked(false);
+  connect(this->raiseButton, SIGNAL(toggled(bool)), this, SLOT(OnRaise(bool)));
 
-  QPushButton *lowerButton = new QPushButton("Lower", this);
-  lowerButton->setStatusTip(tr("Left-mouse press to lower terrain."));
-  lowerButton->setCheckable(true);
-  lowerButton->setChecked(false);
-  connect(lowerButton, SIGNAL(toggled(bool)), this, SLOT(OnLower(bool)));
+  // Create the button to lower terrain
+  this->lowerButton = new QPushButton("Lower", this);
+  this->lowerButton->setStatusTip(tr("Left-mouse press to lower terrain."));
+  this->lowerButton->setCheckable(true);
+  this->lowerButton->setChecked(false);
+  connect(this->lowerButton, SIGNAL(toggled(bool)), this, SLOT(OnLower(bool)));
 
-  QPushButton *smoothButton = new QPushButton("Smooth", this);
-  smoothButton->setStatusTip(tr("Left-mouse press to smooth terrain."));
-  smoothButton->setCheckable(true);
-  smoothButton->setChecked(false);
-  connect(smoothButton, SIGNAL(toggled(bool)), this, SLOT(OnSmooth(bool)));
+  // Create the button to flatten terrain
+  this->flattenButton = new QPushButton("Flatten", this);
+  this->flattenButton->setStatusTip(tr("Left-mouse press to flatten terrain."));
+  this->flattenButton->setCheckable(true);
+  this->flattenButton->setChecked(false);
+  connect(this->flattenButton, SIGNAL(toggled(bool)),
+          this, SLOT(OnFlatten(bool)));
 
-  QPushButton *courseButton = new QPushButton("Course", this);
-  courseButton->setStatusTip(tr("Left-mouse press to course terrain."));
-  courseButton->setCheckable(true);
-  courseButton->setChecked(false);
+  // Create the button to roughen terrain
+  this->courseButton = new QPushButton("Course", this);
+  this->courseButton->setStatusTip(tr("Left-mouse press to course terrain."));
+  this->courseButton->setCheckable(true);
+  this->courseButton->setChecked(false);
+  connect(this->courseButton, SIGNAL(toggled(bool)),
+          this, SLOT(OnCourse(bool)));
 
+  // Create the layout to hold all the buttons
   QGridLayout *buttonLayout = new QGridLayout;
   buttonLayout->addWidget(raiseButton, 0, 0);
   buttonLayout->addWidget(lowerButton, 0, 1);
-  buttonLayout->addWidget(smoothButton, 1, 0);
+  buttonLayout->addWidget(flattenButton, 1, 0);
   buttonLayout->addWidget(courseButton, 1, 1);
 
+  // Add a save button
   QPushButton *saveButton = new QPushButton("Save Image", this);
   saveButton->setStatusTip(tr("Save terrain as a PNG."));
   connect(saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
 
+  // Create a slider to control the size of the brush
   this->brushSizeSlider = new QSlider(this);
-  this->brushSizeSlider->setRange(0, 100);
+  this->brushSizeSlider->setRange(1, 100);
   this->brushSizeSlider->setTickInterval(1);
   this->brushSizeSlider->setOrientation(Qt::Horizontal);
   this->brushSizeSlider->setValue(20);
 
+  // Create a layout to hold the brush size slider and its label
   QHBoxLayout *brushSizeLayout = new QHBoxLayout;
   brushSizeLayout->addWidget(new QLabel(tr("Brush Size: ")));
   brushSizeLayout->addWidget(this->brushSizeSlider);
 
+  // Create a slider to control the weight of the brush
   this->brushWeightSlider = new QSlider(this);
   this->brushWeightSlider->setRange(0, 100);
   this->brushWeightSlider->setTickInterval(1);
   this->brushWeightSlider->setOrientation(Qt::Horizontal);
   this->brushWeightSlider->setValue(10);
 
+  // Create a layout to hold the brush weight slider and its label
   QHBoxLayout *brushWeightLayout = new QHBoxLayout;
   brushWeightLayout->addWidget(new QLabel(tr("Brush Weight: ")));
   brushWeightLayout->addWidget(this->brushWeightSlider);
 
+  // Add all the layouts and widgets to the main layout
   mainLayout->addLayout(buttonLayout);
   mainLayout->addLayout(brushSizeLayout);
   mainLayout->addLayout(brushWeightLayout);
@@ -106,63 +120,62 @@ TerrainEditorPalette::~TerrainEditorPalette()
 /////////////////////////////////////////////////
 void TerrainEditorPalette::OnRaise(bool _toggle)
 {
-  if (_toggle)
-  {
-    this->state = "raise";
-    this->AddEventFilters();
-  }
-  else
-  {
-    this->state.clear();
-    this->RemoveEventFilters();
-  }
+  this->SetState(_toggle ? "raise" : std::string());
+  this->lowerButton->setChecked(false);
+  this->flattenButton->setChecked(false);
+  this->courseButton->setChecked(false);
 }
 
 /////////////////////////////////////////////////
 void TerrainEditorPalette::OnLower(bool _toggle)
 {
-  if (_toggle)
+  this->SetState(_toggle ? "lower" : std::string());
+  this->raiseButton->setChecked(false);
+  this->flattenButton->setChecked(false);
+  this->courseButton->setChecked(false);
+}
+
+/////////////////////////////////////////////////
+void TerrainEditorPalette::OnFlatten(bool _toggle)
+{
+  this->SetState(_toggle ? "flatten" : std::string());
+  this->raiseButton->setChecked(false);
+  this->lowerButton->setChecked(false);
+  this->courseButton->setChecked(false);
+}
+
+/////////////////////////////////////////////////
+void TerrainEditorPalette::OnCourse(bool _toggle)
+{
+  this->SetState(_toggle ? "course" : std::string());
+  this->raiseButton->setChecked(false);
+  this->lowerButton->setChecked(false);
+  this->flattenButton->setChecked(false);
+}
+
+/////////////////////////////////////////////////
+void TerrainEditorPalette::SetState(const std::string &_state)
+{
+  if (!_state.empty())
   {
-    this->state = "lower";
-    this->AddEventFilters();
+    this->state = _state;
+
+    // Add an event filter, which allows the TerrainEditor to capture
+    // mouse events.
+    MouseEventHandler::Instance()->AddPressFilter("terrain",
+        boost::bind(&TerrainEditorPalette::OnMousePress, this, _1));
+
+    MouseEventHandler::Instance()->AddMoveFilter("terrain",
+        boost::bind(&TerrainEditorPalette::OnMouseMove, this, _1));
   }
   else
   {
     this->state.clear();
-    this->RemoveEventFilters();
+
+    // Remove the event filters.
+    MouseEventHandler::Instance()->RemovePressFilter("terrain");
+    MouseEventHandler::Instance()->RemoveMoveFilter("terrain");
   }
-}
-
-/////////////////////////////////////////////////
-void TerrainEditorPalette::OnSmooth(bool _toggle)
-{
-  if (_toggle)
-  {
-    this->state = "smooth";
-    this->AddEventFilters();
-  }
-  else
-  {
-    this->state.clear();
-    this->RemoveEventFilters();
-  }
-}
-
-/////////////////////////////////////////////////
-void TerrainEditorPalette::AddEventFilters()
-{
-  MouseEventHandler::Instance()->AddPressFilter("terrain",
-      boost::bind(&TerrainEditorPalette::OnMousePress, this, _1));
-
-  MouseEventHandler::Instance()->AddMoveFilter("terrain",
-      boost::bind(&TerrainEditorPalette::OnMouseMove, this, _1));
-}
-
-/////////////////////////////////////////////////
-void TerrainEditorPalette::RemoveEventFilters()
-{
-  MouseEventHandler::Instance()->RemovePressFilter("terrain");
-  MouseEventHandler::Instance()->RemoveMoveFilter("terrain");
 }
 
 /////////////////////////////////////////////////
@@ -176,6 +189,7 @@ void TerrainEditorPalette::OnSave()
   rendering::Heightmap *heightmap = scene ? scene->GetHeightmap() : NULL;
   common::Image img = heightmap->GetImage();
 
+  // Get a filename to save to.
   std::string filename = QFileDialog::getSaveFileName(this,
       tr("Save Heightmap"), QString(),
       tr("PNG Files (*.png)")).toStdString();
@@ -205,7 +219,12 @@ bool TerrainEditorPalette::OnMousePress(const common::MouseEvent &_event)
   // Only try to modify if the heightmap exists, and the LEFT mouse button
   // was used.
   if (heightmap && !_event.shift)
+  {
     handled = this->Apply(_event, camera, heightmap);
+    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+  }
+  else
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
 
   return handled;
 }
@@ -225,8 +244,14 @@ bool TerrainEditorPalette::OnMouseMove(const common::MouseEvent &_event)
   // Get a pointer to the heightmap, if the scen is valid.
   rendering::Heightmap *heightmap = scene ? scene->GetHeightmap() : NULL;
 
-  if (heightmap && _event.dragging && !_event.shift)
-    handled = this->Apply(_event, camera, heightmap);
+  if (heightmap && !_event.shift)
+  {
+    if (_event.dragging)
+      handled = this->Apply(_event, camera, heightmap);
+    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+  }
+  else
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
 
   return handled;
 }
@@ -245,8 +270,8 @@ bool TerrainEditorPalette::Apply(const common::MouseEvent &_event,
     handled = _heightmap->Lower(_camera, _event.pos, brushSize, brushWeight);
   else if (this->state == "raise")
     handled = _heightmap->Raise(_camera, _event.pos, brushSize, brushWeight);
-  else if (this->state == "smooth")
-    handled = _heightmap->Smooth(_camera, _event.pos, brushSize, brushWeight);
+  else if (this->state == "flatten")
+    handled = _heightmap->Flatten(_camera, _event.pos, brushSize, brushWeight);
   else if (this->state == "rough")
     handled = _heightmap->Roughen(_camera, _event.pos, brushSize, brushWeight);
 
