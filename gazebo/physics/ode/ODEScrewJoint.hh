@@ -56,6 +56,9 @@ namespace gazebo
       public: virtual void SetThreadPitch(int _index, double _threadPitch);
 
       // Documentation inherited
+      public: virtual double GetThreadPitch(int _index);
+
+      // Documentation inherited
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
       // Documentation inherited

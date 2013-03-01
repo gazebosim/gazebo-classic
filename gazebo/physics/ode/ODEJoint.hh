@@ -35,6 +35,14 @@ namespace gazebo
     /// \brief ODE joint interface
     class ODEJoint : public Joint
     {
+      /// \brief internal variables used for cfm damping
+      public:  enum CFMMode
+      {
+        NONE           = 0x00000000,
+        DAMPING_ACTIVE = 0x00000001,
+        JOINT_LIMIT    = 0x00000002
+      };
+
       /// \brief Constructor.
       /// \param[in] _parent Parent of the Joint.
       public: ODEJoint(BasePtr _parent);
@@ -128,6 +136,10 @@ namespace gazebo
       public: virtual void SetAttribute(const std::string &_key, int _index,
                                         const boost::any &_value);
 
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &_key,
+                                               int _index);
+
       /// \brief This is our ODE ID
       protected: dJointID jointId;
 
@@ -141,25 +153,19 @@ namespace gazebo
       public: virtual JointWrench GetForceTorque(int _index);
 
       /// \brief Provide Feedback data for contact forces
-      private: double stopCFM[2];
-      private: double stopERP[2];
+      private: double stopCFM;
+      private: double stopERP;
 
       /// \brief Get access to stopCFM
-      public: double GetStopCFM(unsigned int _int)
+      public: double GetStopCFM()
       {
-        if (_int < this->GetAngleCount())
-          return this->stopCFM[_int];
-        gzerr << "index out of bound when calling GetStopCFM.\n";
-        return 0;
+        return this->stopCFM;
       }
 
       /// \brief Get access to stopERP
       public: double GetStopERP(unsigned int _int)
       {
-        if (_int < this->GetAngleCount())
-          return this->stopERP[_int];
-        gzerr << "index out of bound when calling GetStopERP.\n";
-        return 0;
+        return this->stopERP;
       }
 
     };

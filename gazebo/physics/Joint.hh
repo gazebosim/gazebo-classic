@@ -215,13 +215,17 @@ namespace gazebo
                                       const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
-      /// This function is deprecated, use GetUpperLimit(unsigned int)
+      /// This function is deprecated, use GetUpperLimit(unsigned int).
+      /// If you are interested in getting the value of dParamHiStop*,
+      /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the high stop value.
       public: virtual math::Angle GetHighStop(int _index) GAZEBO_DEPRECATED = 0;
 
       /// \brief Get the low stop of an axis(index).
-      /// This function is deprecated, use GetLowerLimit(unsigned int)
+      /// This function is deprecated, use GetLowerLimit(unsigned int).
+      /// If you are interested in getting the value of dParamHiStop*,
+      /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the low stop value.
       public: virtual math::Angle GetLowStop(int _index) GAZEBO_DEPRECATED = 0;
@@ -347,6 +351,13 @@ namespace gazebo
       public: virtual void SetAttribute(const std::string &_key, int _index,
                                         const boost::any &_value) = 0;
 
+      /// \brief Get a non-generic parameter for the joint.
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _value Value of the attribute.
+      public: virtual double GetAttribute(const std::string &_key,
+                                               int _index) = 0;
+
       /// \brief Get the child link
       /// \return Pointer to the child link.
       public: LinkPtr GetChild() const;
@@ -359,7 +370,8 @@ namespace gazebo
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);
 
-      /// \brief:  get the true joint limit (replace GetLowStop and GetHighStop)
+      /// \brief:  get the joint upper limit
+      /// (replace GetLowStop and GetHighStop)
       public: math::Angle GetLowerLimit(unsigned int _index) const
         {
           if (_index < this->GetAngleCount())
@@ -368,6 +380,9 @@ namespace gazebo
           gzwarn << "requesting lower limit of joint index out of bound\n";
           return math::Angle();
         }
+
+      /// \brief:  get the joint lower limit
+      /// (replace GetLowStop and GetHighStop)
       public: math::Angle GetUpperLimit(unsigned int _index) const
         {
           if (_index < this->GetAngleCount())

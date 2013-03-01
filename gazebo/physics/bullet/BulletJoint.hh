@@ -99,6 +99,11 @@ namespace gazebo
                                         const boost::any &/*_value*/)
               {gzerr << "Not implement in Bullet\n";}
 
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &/*_key*/,
+                                        int /*_index*/)
+              {gzerr << "Not implement in Bullet\n"; return 0;}
+
       protected: btTypedConstraint *constraint;
       protected: btDynamicsWorld *bulletWorld;
 

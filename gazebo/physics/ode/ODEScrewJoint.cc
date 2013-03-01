@@ -109,6 +109,13 @@ void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 }
 
 //////////////////////////////////////////////////
+double ODEScrewJoint::GetThreadPitch(int /*_index*/)
+{
+  gzerr << "not yet implemented\n";
+  return 0;
+}
+
+//////////////////////////////////////////////////
 void ODEScrewJoint::SetForce(int _index, double _effort)
 {
   if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
