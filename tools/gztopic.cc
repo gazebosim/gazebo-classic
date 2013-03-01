@@ -171,7 +171,7 @@ void list()
 void echoCB(const std::string &_data)
 {
   g_echoMsg->ParseFromString(_data);
-  std::cout << echoMsg->DebugString() << "\n";
+  std::cout << g_echoMsg->DebugString() << "\n";
 }
 
 /////////////////////////////////////////////////
@@ -262,12 +262,12 @@ void echo()
 
   // Get the message type on the topic.
   std::string msgTypeName = gazebo::transport::getTopicMsgType(
-      this->node->DecodeTopicName(topic));
+      node->DecodeTopicName(topic));
 
   if (msgTypeName.empty())
   {
     gzerr << "Unable to get message type for topic[" << topic << "]\n";
-    tranport::fini();
+    transport::fini();
     return;
   }
 
@@ -275,8 +275,8 @@ void echo()
 
   if (!g_echoMsg)
   {
-    gzerr << "Unable to create message of type[" << msgTyepName << "]\n";
-    tranport::fini();
+    gzerr << "Unable to create message of type[" << msgTypeName << "]\n";
+    transport::fini();
     return;
   }
 
