@@ -7,7 +7,6 @@ link_directories(
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
-  ${QWT_INCLUDE_DIR}
 )
 
 add_definitions(${QT_DEFINITIONS})
@@ -83,16 +82,16 @@ set (headers
   viewers/ViewFactory.hh
 )
 
-if (HAVE_QWT)
-  set (sources ${sources}
-    Diagnostics.cc
-    IncrementalPlot.cc
-  )
-  set (qt_headers ${qt_headers}
-    Diagnostics.hh
-    IncrementalPlot.hh
-  )
-endif()
+#if (HAVE_QWT)
+#  set (sources ${sources}
+#    Diagnostics.cc
+#    IncrementalPlot.cc
+#  )
+#  set (qt_headers ${qt_headers}
+#    Diagnostics.hh
+#    IncrementalPlot.hh
+#  )
+#endif()
 
 set (qt_tests
   DataLogger_TEST.cc
@@ -125,7 +124,6 @@ target_link_libraries(gazebo_gui gazebo_common
                                  ${QT_LIBRARIES}
                                  ${ogre_libraries}
                                  ${Boost_LIBRARIES}
-                                 ${QWT_LIBRARY}
                                  pthread)
 
 target_link_libraries(gzclient  gazebo_common
@@ -139,7 +137,6 @@ target_link_libraries(gzclient  gazebo_common
                                 ${QT_LIBRARIES}
                                 ${ogre_libraries}
                                 ${Boost_LIBRARIES}
-                                ${QWT_LIBRARY}
                                 pthread)
 
 add_definitions(${QT_DEFINITIONS})
