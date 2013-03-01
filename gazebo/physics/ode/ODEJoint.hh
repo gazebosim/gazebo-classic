@@ -107,6 +107,18 @@ namespace gazebo
       /// \brief simulating damping with CFM and meddling with Joint limits
       public: void CFMDamping();
 
+      /// \brief Get access to stopCFM
+      public: double GetStopCFM()
+      {
+        return this->stopCFM;
+      }
+
+      /// \brief Get access to stopERP
+      public: double GetStopERP(unsigned int _int)
+      {
+        return this->stopERP;
+      }
+
       /// \brief internal variable to keep track of cfm damping internals
       private: int cfmDampingState[2];
 
@@ -155,19 +167,6 @@ namespace gazebo
       /// \brief Provide Feedback data for contact forces
       private: double stopCFM;
       private: double stopERP;
-
-      /// \brief Get access to stopCFM
-      public: double GetStopCFM()
-      {
-        return this->stopCFM;
-      }
-
-      /// \brief Get access to stopERP
-      public: double GetStopERP(unsigned int _int)
-      {
-        return this->stopERP;
-      }
-
     };
   }
 }
