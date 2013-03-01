@@ -33,6 +33,7 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
+
   // Create the button to raise terrain
   this->raiseButton = new QPushButton("Raise", this);
   this->raiseButton->setStatusTip(tr("Left-mouse press to raise terrain."));
@@ -63,12 +64,19 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
   connect(this->courseButton, SIGNAL(toggled(bool)),
           this, SLOT(OnCourse(bool)));
 
+  QButtonGroup *buttonGroup = new QButtonGroup;
+
+  buttonGroup->addButton(this->raiseButton);
+  buttonGroup->addButton(this->lowerButton);
+  buttonGroup->addButton(this->flattenButton);
+  buttonGroup->addButton(this->courseButton);
+
   // Create the layout to hold all the buttons
   QGridLayout *buttonLayout = new QGridLayout;
-  buttonLayout->addWidget(raiseButton, 0, 0);
-  buttonLayout->addWidget(lowerButton, 0, 1);
-  buttonLayout->addWidget(flattenButton, 1, 0);
-  buttonLayout->addWidget(courseButton, 1, 1);
+  buttonLayout->addWidget(this->raiseButton, 0, 0);
+  buttonLayout->addWidget(this->lowerButton, 0, 1);
+  buttonLayout->addWidget(this->flattenButton, 1, 0);
+  buttonLayout->addWidget(this->courseButton, 1, 1);
 
   // Add a save button
   QPushButton *saveButton = new QPushButton("Save Image", this);
@@ -80,7 +88,7 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
   this->brushSizeSlider->setRange(1, 100);
   this->brushSizeSlider->setTickInterval(1);
   this->brushSizeSlider->setOrientation(Qt::Horizontal);
-  this->brushSizeSlider->setValue(20);
+  this->brushSizeSlider->setValue(10);
 
   // Create a layout to hold the brush size slider and its label
   QHBoxLayout *brushSizeLayout = new QHBoxLayout;
@@ -89,7 +97,7 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
 
   // Create a slider to control the weight of the brush
   this->brushWeightSlider = new QSlider(this);
-  this->brushWeightSlider->setRange(0, 100);
+  this->brushWeightSlider->setRange(1, 100);
   this->brushWeightSlider->setTickInterval(1);
   this->brushWeightSlider->setOrientation(Qt::Horizontal);
   this->brushWeightSlider->setValue(10);
@@ -121,36 +129,24 @@ TerrainEditorPalette::~TerrainEditorPalette()
 void TerrainEditorPalette::OnRaise(bool _toggle)
 {
   this->SetState(_toggle ? "raise" : std::string());
-  this->lowerButton->setChecked(false);
-  this->flattenButton->setChecked(false);
-  this->courseButton->setChecked(false);
 }
 
 /////////////////////////////////////////////////
 void TerrainEditorPalette::OnLower(bool _toggle)
 {
   this->SetState(_toggle ? "lower" : std::string());
-  this->raiseButton->setChecked(false);
-  this->flattenButton->setChecked(false);
-  this->courseButton->setChecked(false);
 }
 
 /////////////////////////////////////////////////
 void TerrainEditorPalette::OnFlatten(bool _toggle)
 {
   this->SetState(_toggle ? "flatten" : std::string());
-  this->raiseButton->setChecked(false);
-  this->lowerButton->setChecked(false);
-  this->courseButton->setChecked(false);
 }
 
 /////////////////////////////////////////////////
 void TerrainEditorPalette::OnCourse(bool _toggle)
 {
   this->SetState(_toggle ? "course" : std::string());
-  this->raiseButton->setChecked(false);
-  this->lowerButton->setChecked(false);
-  this->flattenButton->setChecked(false);
 }
 
 /////////////////////////////////////////////////
