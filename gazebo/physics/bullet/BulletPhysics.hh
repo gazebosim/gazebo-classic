@@ -74,6 +74,10 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
+      public: virtual std::string GetType() const
+                      { return "bullet"; }
+
+      // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
       // Documentation inherited
@@ -105,12 +109,6 @@ namespace gazebo
       public: virtual void ConvertMass(void *_engineMass,
                                        InertialPtr _inertial);
 
-      /// \brief Convert a bullet transform to a gazebo pose
-      public: static math::Pose ConvertPose(const btTransform &_bt);
-
-      /// \brief Convert a gazebo pose to a bullet transform
-      public: static btTransform ConvertPose(const math::Pose &_pose);
-
       // Documentation inherited
       public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
 
@@ -120,11 +118,28 @@ namespace gazebo
       // Documentation inherited
       public: virtual double GetWorldCFM();
 
+      // Documentation inherited
+      public: virtual void SetSeed(uint32_t _seed);
+
       /// \brief Register a joint with the dynamics world
       public: btDynamicsWorld *GetDynamicsWorld() const
               {return this->dynamicsWorld;}
 
       public: virtual void DebugPrint() const;
+
+      /// Documentation inherited
+      public: virtual void SetParam(PhysicsParam _param,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual void SetParam(const std::string &_key,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(const std::string &_key) const;
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(PhysicsParam _attr) const;
 
       private: btBroadphaseInterface *broadPhase;
       private: btDefaultCollisionConfiguration *collisionConfig;
@@ -133,6 +148,9 @@ namespace gazebo
       private: btDiscreteDynamicsWorld *dynamicsWorld;
 
       private: common::Time lastUpdateTime;
+
+      /// \brief The type of the solver.
+      private: std::string solverType;
     };
 
   /// \}

@@ -63,8 +63,6 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   // Create and initialized the contact manager.
   this->contactManager = new ContactManager();
   this->contactManager->Init(this->world);
-
-  this->SetSeed(math::Rand::GetSeed());
 }
 
 //////////////////////////////////////////////////
@@ -208,12 +206,31 @@ void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 }
 
 //////////////////////////////////////////////////
-ContactManager *PhysicsEngine::GetContactManager() const
+void PhysicsEngine::SetParam(PhysicsParam /*_param*/,
+    const boost::any &/*_value*/)
 {
-  return this->contactManager;
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetSeed(uint32_t /*_seed*/)
+void PhysicsEngine::SetParam(std::string /*_key*/,
+    const boost::any &/*_value*/)
 {
+}
+
+//////////////////////////////////////////////////
+boost::any PhysicsEngine::GetParam(PhysicsParam /*_param*/) const
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+boost::any PhysicsEngine::GetParam(std::string /*_key*/) const
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+ContactManager *PhysicsEngine::GetContactManager() const
+{
+  return this->contactManager;
 }

@@ -209,7 +209,7 @@ namespace gazebo
 
       /// \brief Get the width of the image
       /// \return Image width
-      public: unsigned int GetImageWidth() const;
+      public: virtual unsigned int GetImageWidth() const;
 
       /// \brief Get the width of the off-screen render texture
       /// \return Render texture width
@@ -217,7 +217,7 @@ namespace gazebo
 
       /// \brief Get the height of the image
       /// \return Image height
-      public: unsigned int GetImageHeight() const;
+      public: virtual unsigned int GetImageHeight() const;
 
       /// \brief Get the depth of the image
       /// \return Depth of the image

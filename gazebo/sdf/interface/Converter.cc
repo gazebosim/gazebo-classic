@@ -14,15 +14,19 @@
  * limitations under the License.
  *
 */
+
 #include <vector>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
+#include <set>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/sdf/interface/Converter.hh"
+
 
 using namespace sdf;
 
@@ -41,7 +45,7 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
   else if (!elem)
     elem = _doc->FirstChildElement("sdf");
 
-  if (!elem->Attribute("version"))
+  if (!elem || !elem->Attribute("version"))
   {
     gzerr << "  Unable to determine original SDF version\n";
     return false;
@@ -64,15 +68,68 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
 
   elem->SetAttribute("version", _toVersion);
 
+  std::string origVersionStr = origVersion;
   boost::replace_all(origVersion, ".", "_");
 
   std::string filename = gazebo::common::find_file(
       std::string("sdf/") + _toVersion + "/" + origVersion + ".convert");
 
+  // Use convert file in the current sdf version folder for conversion. If file
+  // does not exist, then find intermediate convert files and iteratively
+  // convert the sdf elem. Ideally, users should use gzsdf convert so that the
+  // latest sdf versioned file is written and no subsequent conversions are
+  // necessary.
   TiXmlDocument xmlDoc;
   if (!xmlDoc.LoadFile(filename))
   {
-    gzerr << "Unable to load file[" << filename << "]\n";
+    // find all sdf version dirs in gazebo resource path
+    std::string sdfPath = gazebo::common::find_file(std::string("sdf/"), false);
+    boost::filesystem::directory_iterator endIter;
+    std::set<boost::filesystem::path> sdfDirs;
+    if (boost::filesystem::exists(sdfPath)
+        && boost::filesystem::is_directory(sdfPath))
+    {
+      for (boost::filesystem::directory_iterator dirIter(sdfPath);
+          dirIter != endIter ; ++dirIter)
+      {
+        if (boost::filesystem::is_directory(dirIter->status()))
+        {
+          if (boost::algorithm::ilexicographical_compare(
+              origVersionStr, (*dirIter).path().filename().string()))
+          {
+            sdfDirs.insert((*dirIter));
+          }
+        }
+      }
+    }
+
+    // loop through sdf dirs and do the intermediate conversions
+    for (std::set<boost::filesystem::path>::iterator it = sdfDirs.begin();
+        it != sdfDirs.end(); ++it)
+    {
+      boost::filesystem::path convertFile
+         = boost::filesystem::operator/((*it).string(), origVersion+".convert");
+      if (boost::filesystem::exists(convertFile))
+      {
+        if (!xmlDoc.LoadFile(convertFile.string()))
+        {
+            gzerr << "Unable to load file[" << convertFile << "]\n";
+            return false;
+        }
+        ConvertImpl(elem, xmlDoc.FirstChildElement("convert"));
+        if ((*it).filename() == _toVersion)
+          return true;
+
+        origVersion = (*it).filename().string();
+        boost::replace_all(origVersion, ".", "_");
+      }
+      else
+      {
+        continue;
+      }
+    }
+    gzerr << "Unable to convert from SDF version " << origVersionStr
+        << " to " << _toVersion << "\n";
     return false;
   }
 
@@ -82,8 +139,20 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
 }
 
 /////////////////////////////////////////////////
+void Converter::Convert(TiXmlDocument *_doc, TiXmlDocument *_convertDoc)
+{
+  GZ_ASSERT(_doc != NULL, "SDF XML doc is NULL");
+  GZ_ASSERT(_convertDoc != NULL, "Convert XML doc is NULL");
+
+  ConvertImpl(_doc->FirstChildElement(), _convertDoc->FirstChildElement());
+}
+
+/////////////////////////////////////////////////
 void Converter::ConvertImpl(TiXmlElement *_elem, TiXmlElement *_convert)
 {
+  GZ_ASSERT(_elem != NULL, "SDF element is NULL");
+  GZ_ASSERT(_convert != NULL, "Convert element is NULL");
+
   CheckDeprecation(_elem, _convert);
 
   for (TiXmlElement *convertElem = _convert->FirstChildElement("convert");
@@ -114,6 +183,9 @@ void Converter::ConvertImpl(TiXmlElement *_elem, TiXmlElement *_convert)
 /////////////////////////////////////////////////
 void Converter::Rename(TiXmlElement *_elem, TiXmlElement *_renameElem)
 {
+  GZ_ASSERT(_elem != NULL, "SDF element is NULL");
+  GZ_ASSERT(_renameElem != NULL, "Rename element is NULL");
+
   TiXmlElement *fromConvertElem = _renameElem->FirstChildElement("from");
   TiXmlElement *toConvertElem = _renameElem->FirstChildElement("to");
 
@@ -157,6 +229,9 @@ void Converter::Rename(TiXmlElement *_elem, TiXmlElement *_renameElem)
 /////////////////////////////////////////////////
 void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
 {
+  GZ_ASSERT(_elem != NULL, "SDF element is NULL");
+  GZ_ASSERT(_moveElem != NULL, "Move element is NULL");
+
   TiXmlElement *fromConvertElem = _moveElem->FirstChildElement("from");
   TiXmlElement *toConvertElem = _moveElem->FirstChildElement("to");
 
@@ -182,9 +257,14 @@ void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
   boost::algorithm::split_regex(fromTokens, fromStr, boost::regex("::"));
   boost::algorithm::split_regex(toTokens, toStr, boost::regex("::"));
 
-  if (fromTokens.size() == 0 || toTokens.size() == 0)
+  if (fromTokens.size() == 0)
   {
-    gzerr << "Incorrect 'from' or 'to' string format\n";
+    gzerr << "Incorrect 'from' string format\n";
+    return;
+  }
+  if (toTokens.size() == 0)
+  {
+    gzerr << "Incorrect 'to' string format\n";
     return;
   }
 
@@ -196,18 +276,18 @@ void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
     if (!fromElem)
       return;
   }
+
   const char *fromName = fromTokens[fromTokens.size()-1].c_str();
   const char *value = NULL;
+
+  // Get value, or return if no element/attribute found as they don't have to
+  // be specified in the sdf.
   if (fromElemStr)
     value = GetValue(fromName, NULL, fromElem);
   else if (fromAttrStr)
     value = GetValue(NULL, fromName, fromElem);
-
   if (!value)
-  {
-    gzerr << "No value found for element/attribute: " << fromName << "\n";
     return;
-  }
 
   // get the new element/attribute name
   const char *toName = toTokens[toTokens.size()-1].c_str();
@@ -216,7 +296,11 @@ void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
   {
     toElem = toElem->FirstChildElement(toTokens[i]);
     if (!toElem)
+    {
+      gzerr << "Cannot find element: '"<< toTokens[i] << "' in to string: '"
+          << toStr << "'\n";
       return;
+    }
   }
 
   // move by creating a new element/attribute and deleting the old one

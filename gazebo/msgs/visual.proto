@@ -26,5 +26,3 @@ message Visual
   optional bool is_static      = 12;
   optional Plugin plugin       = 13;
 }
-
-

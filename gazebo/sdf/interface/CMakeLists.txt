@@ -2,6 +2,10 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources Param.cc SDF.cc parser.cc Converter.cc)
 set (headers SDF.hh Param.hh parser.hh Converter.hh)
+set (gtest_sources
+  SDF_TEST.cc
+  Converter_TEST.cc
+)
 
 if (HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
   include_directories(SYSTEM ${urdfdom_INCLUDE_DIRS}
@@ -14,6 +18,8 @@ if (HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
   # add_definitions(${urdfdom_LDFLAGS}
   # ${urdfdom_headers_LDFLAGS} ${console_bridge_LDFLAGS})
 endif(HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
+
+gz_build_tests(${gtest_sources})
 
 gz_add_library(gazebo_sdf_interface ${sources})
 

@@ -23,9 +23,11 @@
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Diagnostics.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Rand.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Timer.hh"
 
@@ -128,6 +130,10 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
   this->contactGroup = dJointGroupCreate(0);
 
   this->colliders.resize(100);
+
+  // Set random seed for physics engine based on gazebo's random seed.
+  // Note: this was moved from physics::PhysicsEngine constructor.
+  this->SetSeed(math::Rand::GetSeed());
 }
 
 //////////////////////////////////////////////////
@@ -166,7 +172,6 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   sdf::ElementPtr solverElem = odeElem->GetElement("solver");
 
-//  this->GetStepTime() = solverElem->GetValueDouble("dt");
   this->stepType = solverElem->GetValueString("type");
 
   dWorldSetDamping(this->worldId, 0.0001, 0.0001);
@@ -232,9 +237,13 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::ODE);
-    physicsMsg.set_update_rate(this->GetUpdateRate());
+//    physicsMsg.set_update_rate(this->GetUpdateRate());
     physicsMsg.set_solver_type(this->stepType);
-    physicsMsg.set_dt(this->GetStepTime());
+    // dt is deprecated, use min_step_time instead
+//    physicsMsg.set_dt(this->GetStepTime());
+    physicsMsg.set_min_step_size(
+        boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
+    physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
     physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(this->GetSORPGSW());
@@ -254,13 +263,16 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  if (_msg->has_dt())
-  {
-    this->SetStepTime(_msg->dt());
-  }
+  // deprecated
+//  if (_msg->has_dt())
+//    this->SetStepTime(_msg->dt());
 
-  if (_msg->has_update_rate())
-    this->SetUpdateRate(_msg->update_rate());
+  if (_msg->has_min_step_size())
+    this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
+
+  // deprecated
+//  if (_msg->has_update_rate())
+//    this->SetUpdateRate(_msg->update_rate());
 
   if (_msg->has_solver_type())
   {
@@ -268,15 +280,18 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
       this->sdf->GetElement("ode")->GetElement("solver");
     if (_msg->solver_type() == "quick")
     {
-      solverElem->GetAttribute("type")->Set("quick");
+      solverElem->GetElement("type")->Set("quick");
       this->physicsStepFunc = &dWorldQuickStep;
     }
     else if (_msg->solver_type() == "world")
     {
-      solverElem->GetAttribute("type")->Set("world");
+      solverElem->GetElement("type")->Set("world");
       this->physicsStepFunc = &dWorldStep;
     }
   }
+
+  if (_msg->has_precon_iters())
+    this->SetSORPGSPreconIters(_msg->precon_iters());
 
   if (_msg->has_iters())
     this->SetSORPGSIters(_msg->iters());
@@ -322,10 +337,8 @@ void ODEPhysics::InitForThread()
 //////////////////////////////////////////////////
 void ODEPhysics::UpdateCollision()
 {
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
-    dJointGroupEmpty(this->contactGroup);
-  }
+  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
+  dJointGroupEmpty(this->contactGroup);
 
   unsigned int i = 0;
   this->collidersCount = 0;
@@ -496,7 +509,7 @@ void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
 void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
 {
   this->sdf->GetElement("ode")->GetElement("solver")->
-    GetElement("percon_iters")->Set(_iters);
+    GetElement("precon_iters")->Set(_iters);
 
   dWorldSetQuickStepPreconIterations(this->worldId, _iters);
 }
@@ -996,4 +1009,250 @@ void ODEPhysics::DebugPrint() const
 void ODEPhysics::SetSeed(uint32_t _seed)
 {
   dRandSetSeed(_seed);
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
+{
+  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
+  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
+
+  switch (_param)
+  {
+    case SOLVER_TYPE:
+    {
+      std::string value = boost::any_cast<std::string>(_value);
+      odeElem->GetElement("solver")->GetElement("type")->Set(value);
+      this->stepType = value;
+      break;
+    }
+    case GLOBAL_CFM:
+    {
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("constraints")->GetElement("cfm")->Set(value);
+      dWorldSetCFM(this->worldId, value);
+      break;
+    }
+    case GLOBAL_ERP:
+    {
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("constraints")->GetElement("erp")->Set(value);
+      dWorldSetERP(this->worldId, value);
+      break;
+    }
+    case SOR_PRECON_ITERS:
+    {
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch (boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
+      odeElem->GetElement("solver")->GetElement("precon_iters")->Set(value);
+      dWorldSetQuickStepPreconIterations(this->worldId, value);
+      break;
+    }
+    case SOR_ITERS:
+    {
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch (boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
+      odeElem->GetElement("solver")->GetElement("iters")->Set(value);
+      dWorldSetQuickStepNumIterations(this->worldId, value);
+      break;
+    }
+    case SOR:
+    {
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("solver")->GetElement("sor")->Set(value);
+      dWorldSetQuickStepW(this->worldId, value);
+      break;
+    }
+    case CONTACT_SURFACE_LAYER:
+    {
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("constraints")->GetElement(
+          "contact_surface_layer")->Set(value);
+      dWorldSetContactSurfaceLayer(this->worldId, value);
+      break;
+    }
+    case CONTACT_MAX_CORRECTING_VEL:
+    {
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("constraints")->GetElement(
+          "contact_max_correcting_vel")->Set(value);
+      dWorldSetContactMaxCorrectingVel(this->worldId, value);
+      break;
+    }
+    case MAX_CONTACTS:
+    {
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch (boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
+      odeElem->GetElement("max_contacts")->GetValue()->Set(value);
+      break;
+    }
+    case MIN_STEP_SIZE:
+    {
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
+      break;
+    }
+    default:
+    {
+      gzwarn << "Param not supported in ode" << std::endl;
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
+{
+  PhysicsParam param;
+
+  if (_key == "type")
+    param = SOLVER_TYPE;
+  else if (_key == "cfm")
+    param = GLOBAL_CFM;
+  else if (_key == "erp")
+    param = GLOBAL_ERP;
+  else if (_key == "precon_iters")
+    param = SOR_PRECON_ITERS;
+  else if (_key == "iters")
+    param = SOR_ITERS;
+  else if (_key == "sor")
+    param = SOR;
+  else if (_key == "contact_max_correcting_vel")
+    param = CONTACT_MAX_CORRECTING_VEL;
+  else if (_key == "contact_surface_layer")
+    param = CONTACT_SURFACE_LAYER;
+  else if (_key == "max_contacts")
+    param = MAX_CONTACTS;
+  else if (_key == "min_step_size")
+    param = MIN_STEP_SIZE;
+  else
+  {
+    gzwarn << _key << " is not supported in ode" << std::endl;
+    return;
+  }
+  this->SetParam(param, _value);
+}
+
+//////////////////////////////////////////////////
+boost::any ODEPhysics::GetParam(PhysicsParam _param) const
+{
+  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
+  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
+
+  boost::any value = 0;
+  switch (_param)
+  {
+    case SOLVER_TYPE:
+    {
+      value = odeElem->GetElement("solver")->GetValueString("type");
+      break;
+    }
+    case GLOBAL_CFM:
+    {
+      value = odeElem->GetElement("constraints")->GetValueDouble("cfm");
+      break;
+    }
+    case GLOBAL_ERP:
+    {
+      value = odeElem->GetElement("constraints")->GetValueDouble("erp");
+      break;
+    }
+    case SOR_PRECON_ITERS:
+    {
+      value = odeElem->GetElement("solver")->GetValueInt("precon_iters");
+      break;
+    }
+    case SOR_ITERS:
+    {
+      value = odeElem->GetElement("solver")->GetValueInt("iters");
+      break;
+    }
+    case SOR:
+    {
+      value = odeElem->GetElement("solver")->GetValueDouble("sor");
+      break;
+    }
+    case CONTACT_MAX_CORRECTING_VEL:
+    {
+      value = odeElem->GetElement("constraints")->GetValueDouble(
+          "contact_max_correcting_vel");
+      break;
+    }
+    case CONTACT_SURFACE_LAYER:
+    {
+      value = odeElem->GetElement("constraints")->GetValueDouble(
+          "contact_surface_layer");
+      break;
+    }
+    case MAX_CONTACTS:
+    {
+      value = odeElem->GetElement("max_contacts")->GetValueInt();
+      break;
+    }
+    case MIN_STEP_SIZE:
+    {
+      value = odeElem->GetElement("solver")->GetValueDouble("min_step_size");
+      break;
+    }
+    default:
+    {
+      gzwarn << "Attribute not supported in bullet" << std::endl;
+      break;
+    }
+  }
+  return value;
+}
+
+//////////////////////////////////////////////////
+boost::any ODEPhysics::GetParam(const std::string &_key) const
+{
+  PhysicsParam param;
+
+  if (_key == "type")
+    param = SOLVER_TYPE;
+  else if (_key == "cfm")
+    param = GLOBAL_CFM;
+  else if (_key == "erp")
+    param = GLOBAL_ERP;
+  else if (_key == "precon_iters")
+    param = SOR_PRECON_ITERS;
+  else if (_key == "iters")
+    param = SOR_ITERS;
+  else if (_key == "sor")
+    param = SOR;
+  else if (_key == "contact_max_correcting_vel")
+    param = CONTACT_MAX_CORRECTING_VEL;
+  else if (_key == "contact_surface_layer")
+    param = CONTACT_SURFACE_LAYER;
+  else if (_key == "max_contacts")
+    param = MAX_CONTACTS;
+  else if (_key == "min_step_size")
+    param = MIN_STEP_SIZE;
+  else
+  {
+    gzwarn << _key << " is not supported in ode" << std::endl;
+    return 0;
+  }
+  return this->GetParam(param);
 }

@@ -36,6 +36,8 @@ WorldState::WorldState()
 WorldState::WorldState(const WorldPtr _world)
   : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
 {
+  this->world = _world;
+
   // Add a state for all the models
   Model_V models = _world->GetModels();
   for (Model_V::const_iterator iter = models.begin();
@@ -55,6 +57,7 @@ WorldState::WorldState(const sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 WorldState::~WorldState()
 {
+  this->world.reset();
   this->modelStates.clear();
 }
 
@@ -79,6 +82,12 @@ void WorldState::Load(const sdf::ElementPtr _elem)
       childElem = childElem->GetNextElement("model");
     }
   }
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetWorld(const WorldPtr _world)
+{
+  this->world = _world;
 }
 
 /////////////////////////////////////////////////
@@ -138,10 +147,10 @@ bool WorldState::HasModelState(const std::string &_modelName) const
 /////////////////////////////////////////////////
 bool WorldState::IsZero() const
 {
-  bool result = true;
+  bool result = this->insertions.size() == 0 && this->deletions.size() == 0;
 
   for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end(); ++iter)
+       iter != this->modelStates.end() && result; ++iter)
   {
     result = result && (*iter).IsZero();
   }
@@ -157,12 +166,23 @@ WorldState &WorldState::operator=(const WorldState &_state)
   // Clear the model states
   this->modelStates.clear();
 
+  this->insertions.clear();
+  this->deletions.clear();
+
   // Copy the model states.
   for (std::vector<ModelState>::const_iterator iter =
        _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
   {
     this->modelStates.push_back(ModelState(*iter));
   }
+
+  // Copy the insertions
+  std::copy(_state.insertions.begin(),
+            _state.insertions.end(), this->insertions.begin());
+
+  // Copy the deletions
+  std::copy(_state.deletions.begin(),
+            _state.deletions.end(), this->deletions.begin());
 
   return *this;
 }
@@ -173,9 +193,9 @@ WorldState WorldState::operator-(const WorldState &_state) const
   WorldState result;
 
   result.name = this->name;
-  result.simTime = this->simTime - _state.simTime;
-  result.realTime = this->realTime - _state.realTime;
-  result.wallTime = this->wallTime - _state.wallTime;
+  result.simTime = this->simTime;
+  result.realTime = this->realTime;
+  result.wallTime = this->wallTime;
 
   // Subtract the model states.
   for (std::vector<ModelState>::const_iterator iter =
@@ -184,11 +204,27 @@ WorldState WorldState::operator-(const WorldState &_state) const
     if (this->HasModelState((*iter).GetName()))
     {
       ModelState state = this->GetModelState((*iter).GetName()) - *iter;
+
       if (!state.IsZero())
+      {
         result.modelStates.push_back(state);
+      }
     }
     else
-      result.modelStates.push_back(*iter);
+    {
+      result.deletions.push_back((*iter).GetName());
+    }
+  }
+
+  // Add in the new model states
+  for (std::vector<ModelState>::const_iterator iter =
+       this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
+  {
+    if (!_state.HasModelState((*iter).GetName()) && this->world)
+    {
+      ModelPtr model = this->world->GetModel((*iter).GetName());
+      result.insertions.push_back(model->GetSDF()->ToString(""));
+    }
   }
 
   return result;
@@ -200,9 +236,9 @@ WorldState WorldState::operator+(const WorldState &_state) const
   WorldState result;
 
   result.name = this->name;
-  result.simTime = this->simTime + _state.simTime;
-  result.realTime = this->realTime + _state.realTime;
-  result.wallTime = this->wallTime + _state.wallTime;
+  result.simTime = this->simTime;
+  result.realTime = this->realTime;
+  result.wallTime = this->wallTime;
 
   // Add the states.
   for (std::vector<ModelState>::const_iterator iter =

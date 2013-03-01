@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <list>
+#include <set>
 #include <deque>
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
@@ -34,6 +35,7 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
 
 #include "gazebo/physics/Base.hh"
@@ -304,10 +306,11 @@ namespace gazebo
       /// \return True if World::Load has completed.
       public: bool IsLoaded() const;
 
-      /// \brief Enqueue a pose message for publication.
-      /// These messages will be transmitted at the end of every iteration.
-      /// \param[in] _msg The message to enqueue.
-      public: void EnqueueMsg(msgs::Pose *_msg);
+      /// \brief Publish pose updates for a model.
+      /// This list of models to publish is processed and cleared once every
+      /// iteration.
+      /// \param[in] _modelName Name of the model to publish.
+      public: void PublishModelPose(const std::string &_modelName);
 
       /// \brief Get real time update rate
       /// \return Update rate
@@ -325,6 +328,8 @@ namespace gazebo
       /// \param[in] _stepSize Max step size.
       public: void SetMaxStepSize(double _stepSize);
 
+      /// \cond
+      /// This is an internal function.
       /// \brief Get a model by id.
       ///
       /// Each Entity has a unique ID, this function finds a Model with
@@ -332,6 +337,7 @@ namespace gazebo
       /// \param[in] _id The id of the Model
       /// \return A pointer to the model, or NULL if no Model was found.
       private: ModelPtr GetModelById(unsigned int _id);
+      /// \endcond
 
       /// \brief Load all plugins.
       ///
@@ -384,6 +390,10 @@ namespace gazebo
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
 
+      /// \brief Called when a log control message is received.
+      /// \param[in] _data The log control message.
+      private: void OnLogControl(ConstLogControlPtr &_data);
+
       /// \brief Called when a request message is received.
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
@@ -401,6 +411,10 @@ namespace gazebo
       /// \brief Logs joint information.
       /// \param[in] _msg Incoming joint message.
       private: void JointLog(ConstJointPtr &_msg);
+
+      /// \brief Called when a world_modify message is received.
+      /// \param[in] _msg The world_modify message.
+      private: void OnWorldMsg(ConstWorldPtr &_msg);
 
       /// \brief Called when a factory message is received.
       /// \param[in] _data The factory message.
@@ -425,21 +439,25 @@ namespace gazebo
       /// \param[in] _model Pointer to the model to get the data from.
       private: void FillModelMsg(msgs::Model &_msg, ModelPtr _model);
 
-      /// \brief Process all recieved entity messages.
+      /// \brief Process all received entity messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessEntityMsgs();
 
-      /// \brief Process all recieved request messages.
+      /// \brief Process all received request messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessRequestMsgs();
 
-      /// \brief Process all recieved factory messages.
+      /// \brief Process all received factory messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
 
-      /// \brief Process all recieved model messages.
+      /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
+
+      /// \brief Process all received world messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessWorldMsgs();
 
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
@@ -449,6 +467,9 @@ namespace gazebo
 
       /// \brief Publish the world stats message.
       private: void PublishWorldStats();
+
+      /// \brief Publish log status message.
+      private: void PublishLogStatus();
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
@@ -495,6 +516,9 @@ namespace gazebo
       /// \brief Transportation node.
       private: transport::NodePtr node;
 
+      /// \brief Subscribe to the world modify topic.
+      private: transport::SubscriberPtr worldSub;
+
       /// \brief Publisher for selection messages.
       private: transport::PublisherPtr selectionPub;
 
@@ -518,6 +542,12 @@ namespace gazebo
 
       /// \brief Subscriber to world control messages.
       private: transport::SubscriberPtr controlSub;
+
+      /// \brief Subscriber to log control messages.
+      private: transport::SubscriberPtr logControlSub;
+
+      /// \brief Publisher of log status messages.
+      private: transport::PublisherPtr logStatusPub;
 
       /// \brief Subscriber to factory messages.
       private: transport::SubscriberPtr factorySub;
@@ -552,7 +582,7 @@ namespace gazebo
       /// \brief Used to compute a more accurate real time value.
       private: common::Time realTimeOffset;
 
-      /// \brief Mutext to protect incoming message buffers.
+      /// \brief Mutex to protect incoming message buffers.
       private: boost::recursive_mutex *receiveMutex;
 
       /// \brief Mutex to protext loading of models.
@@ -644,13 +674,13 @@ namespace gazebo
       private: sdf::SDFPtr factorySDF;
 
       /// \brief The list of pose messages to output.
-      private: msgs::Pose_V poseMsgs;
+      private: std::set<std::string> publishModelPoses;
 
-      /// \brief Real time update rate.
-      private: double realTimeUpdateRate;
+      /// \brief Info passed through the WorldUpdateBegin event.
+      private: common::UpdateInfo updateInfo;
 
-      /// \brief Max step size;
-      private: double maxStepSize;
+      /// \brief The number of simulation iterations.
+      private: uint64_t iterations;
     };
     /// \}
   }
