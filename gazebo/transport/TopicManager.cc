@@ -315,6 +315,12 @@ PublicationPtr TopicManager::UpdatePublications(const std::string &topic,
       gzthrow("Attempting to advertise on an existing topic with"
               " a conflicting message type\n");
   }
+  else
+  {
+    pub = PublicationPtr(new Publication(topic, msgType));
+    this->advertisedTopics[topic] =  pub;
+    this->advertisedTopicsEnd = this->advertisedTopics.end();
+  }
 
   return pub;
 }

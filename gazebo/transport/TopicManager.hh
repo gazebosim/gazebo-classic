@@ -23,18 +23,19 @@
 #include <string>
 #include <vector>
 
-#include "common/Exception.hh"
-#include "msgs/msgs.hh"
-#include "common/SingletonT.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/SingletonT.hh"
 
-#include "transport/TransportTypes.hh"
-#include "transport/SubscribeOptions.hh"
-#include "transport/SubscriptionTransport.hh"
-#include "transport/PublicationTransport.hh"
-#include "transport/ConnectionManager.hh"
-#include "transport/Publisher.hh"
-#include "transport/Publication.hh"
-#include "transport/Subscriber.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/SubscribeOptions.hh"
+#include "gazebo/transport/SubscriptionTransport.hh"
+#include "gazebo/transport/PublicationTransport.hh"
+#include "gazebo/transport/ConnectionManager.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Publication.hh"
+#include "gazebo/transport/Subscriber.hh"
 
 namespace gazebo
 {
@@ -117,26 +118,27 @@ namespace gazebo
                 PublicationPtr publication;
 
                 // Connect all local subscription to the publisher
-                std::string t;
-                t = _topic;
                 msgTypename = msg->GetTypeName();
 
-                publication = this->FindPublication(t);
+                publication = this->FindPublication(_topic);
+                GZ_ASSERT(publication != NULL, "FindPublication returned NULL");
+
                 publication->AddPublisher(pub);
                 if (!publication->GetLocallyAdvertised())
                 {
-                  ConnectionManager::Instance()->Advertise(t, msgTypename);
+                  ConnectionManager::Instance()->Advertise(_topic, msgTypename);
                 }
 
                 publication->SetLocallyAdvertised(true);
                 pub->SetPublication(publication);
 
+
                 SubNodeMap::iterator iter2;
                 SubNodeMap::iterator st_end2 = this->subscribedNodes.end();
                 for (iter2 = this->subscribedNodes.begin();
-                    iter2 != st_end2; iter2++)
+                     iter2 != st_end2; iter2++)
                 {
-                  if (iter2->first == t)
+                  if (iter2->first == _topic)
                   {
                     std::list<NodePtr>::iterator liter;
                     std::list<NodePtr>::iterator l_end = iter2->second.end();
@@ -147,7 +149,6 @@ namespace gazebo
                     }
                   }
                 }
-
 
                 return pub;
               }

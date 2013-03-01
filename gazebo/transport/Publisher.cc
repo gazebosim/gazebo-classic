@@ -194,7 +194,7 @@ void Publisher::SetPublication(PublicationPtr &_publication, int _i)
 }
 
 //////////////////////////////////////////////////
-void Publisher::SetPublication(PublicationPtr &_publication)
+void Publisher::SetPublication(PublicationPtr _publication)
 {
   this->publication = _publication;
 }
