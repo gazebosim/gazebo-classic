@@ -31,6 +31,7 @@ set(tests
   laser.cc
   msgs.cc
   physics.cc
+  world.cc
   pioneer2dx.cc
   transport.cc
   server_fixture.cc

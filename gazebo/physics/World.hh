@@ -625,9 +625,6 @@ namespace gazebo
       /// \brief Model message buffer.
       private: std::list<msgs::Model> modelMsgs;
 
-      /// \brief World message buffer.
-      private: std::list<msgs::World> worldMsgs;
-
       /// \brief True to reset the world on next update.
       private: bool needsReset;
 
@@ -684,11 +681,6 @@ namespace gazebo
 
       /// \brief The number of simulation iterations.
       private: uint64_t iterations;
-
-      /// \brief Real time update rate.
-      private: double realTimeUpdateRate;
-
-      private: double maxStepSize;
     };
     /// \}
   }

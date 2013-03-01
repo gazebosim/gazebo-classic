@@ -1548,7 +1548,8 @@ msgs::Physics PhysicsTest::physicsResponseMsg;
 /////////////////////////////////////////////////
 void PhysicsTest::OnPhysicsMsgResponse(ConstResponsePtr &_msg)
 {
-  physicsResponseMsg.ParseFromString(_msg->serialized_data());
+  if (_msg->type() == physicsPubMsg.GetTypeName())
+    physicsResponseMsg.ParseFromString(_msg->serialized_data());
 }
 
 void PhysicsTest::PhysicsParam(const std::string &_physicsEngine)
@@ -1604,7 +1605,7 @@ void PhysicsTest::PhysicsParam(const std::string &_physicsEngine)
   requestPub->Publish(*requestMsg);
 
   int waitCount = 0, maxWaitCount = 3000;
-  while (!physicsResponseMsg.IsInitialized() && ++waitCount < maxWaitCount)
+  while (!physicsResponseMsg.ByteSize() == 0 && ++waitCount < maxWaitCount)
     common::Time::MSleep(10);
   ASSERT_LT(waitCount, maxWaitCount);
 
