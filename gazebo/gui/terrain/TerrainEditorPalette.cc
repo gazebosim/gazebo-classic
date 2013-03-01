@@ -33,84 +33,152 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
-
   // Create the button to raise terrain
-  this->raiseButton = new QPushButton("Raise", this);
-  this->raiseButton->setStatusTip(tr("Left-mouse press to raise terrain."));
-  this->raiseButton->setCheckable(true);
-  this->raiseButton->setChecked(false);
-  connect(this->raiseButton, SIGNAL(toggled(bool)), this, SLOT(OnRaise(bool)));
+  QPushButton *raiseButton = new QPushButton("Raise / Lower", this);
+  raiseButton->setStatusTip(tr("Left-mouse press to raise terrain."));
+  raiseButton->setCheckable(true);
+  raiseButton->setChecked(false);
+  connect(raiseButton, SIGNAL(toggled(bool)), this, SLOT(OnRaise(bool)));
 
   // Create the button to lower terrain
-  this->lowerButton = new QPushButton("Lower", this);
-  this->lowerButton->setStatusTip(tr("Left-mouse press to lower terrain."));
-  this->lowerButton->setCheckable(true);
-  this->lowerButton->setChecked(false);
-  connect(this->lowerButton, SIGNAL(toggled(bool)), this, SLOT(OnLower(bool)));
+  QPushButton *lowerButton = new QPushButton("Flatten", this);
+  lowerButton->setStatusTip(tr("Left-mouse press to flatten terrain."));
+  lowerButton->setCheckable(true);
+  lowerButton->setChecked(false);
+  connect(lowerButton, SIGNAL(toggled(bool)), this, SLOT(OnLower(bool)));
 
   // Create the button to flatten terrain
-  this->flattenButton = new QPushButton("Flatten", this);
-  this->flattenButton->setStatusTip(tr("Left-mouse press to flatten terrain."));
-  this->flattenButton->setCheckable(true);
-  this->flattenButton->setChecked(false);
-  connect(this->flattenButton, SIGNAL(toggled(bool)),
-          this, SLOT(OnFlatten(bool)));
+  QPushButton *flattenButton = new QPushButton("Smooth", this);
+  flattenButton->setStatusTip(tr("Left-mouse press to smooth terrain."));
+  flattenButton->setCheckable(true);
+  flattenButton->setChecked(false);
+  connect(flattenButton, SIGNAL(toggled(bool)), this, SLOT(OnFlatten(bool)));
 
   // Create the button to roughen terrain
-  this->courseButton = new QPushButton("Course", this);
-  this->courseButton->setStatusTip(tr("Left-mouse press to course terrain."));
-  this->courseButton->setCheckable(true);
-  this->courseButton->setChecked(false);
-  connect(this->courseButton, SIGNAL(toggled(bool)),
-          this, SLOT(OnCourse(bool)));
+  QPushButton *heightButton = new QPushButton("Pick Height", this);
+  heightButton->setStatusTip(
+      tr("Left-mouse press to select a terrain height."));
+  heightButton->setCheckable(true);
+  heightButton->setChecked(false);
+  connect(heightButton, SIGNAL(toggled(bool)), this, SLOT(OnPickHeight(bool)));
 
   QButtonGroup *buttonGroup = new QButtonGroup;
-
-  buttonGroup->addButton(this->raiseButton);
-  buttonGroup->addButton(this->lowerButton);
-  buttonGroup->addButton(this->flattenButton);
-  buttonGroup->addButton(this->courseButton);
+  buttonGroup->addButton(raiseButton);
+  buttonGroup->addButton(lowerButton);
+  buttonGroup->addButton(flattenButton);
+  buttonGroup->addButton(heightButton);
 
   // Create the layout to hold all the buttons
   QGridLayout *buttonLayout = new QGridLayout;
-  buttonLayout->addWidget(this->raiseButton, 0, 0);
-  buttonLayout->addWidget(this->lowerButton, 0, 1);
-  buttonLayout->addWidget(this->flattenButton, 1, 0);
-  buttonLayout->addWidget(this->courseButton, 1, 1);
+  buttonLayout->addWidget(raiseButton, 0, 0);
+  buttonLayout->addWidget(lowerButton, 0, 1);
+  buttonLayout->addWidget(flattenButton, 1, 0);
+  buttonLayout->addWidget(heightButton, 1, 1);
 
   // Add a save button
   QPushButton *saveButton = new QPushButton("Save Image", this);
   saveButton->setStatusTip(tr("Save terrain as a PNG."));
   connect(saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
 
-  // Create a slider to control the size of the brush
-  this->brushSizeSlider = new QSlider(this);
-  this->brushSizeSlider->setRange(1, 100);
-  this->brushSizeSlider->setTickInterval(1);
-  this->brushSizeSlider->setOrientation(Qt::Horizontal);
-  this->brushSizeSlider->setValue(10);
+  // Create a slider to control the outer size of the brush
+  this->outsideRadiusSlider = new QSlider(this);
+  this->outsideRadiusSlider->setRange(1, 1000);
+  this->outsideRadiusSlider->setTickInterval(1);
+  this->outsideRadiusSlider->setOrientation(Qt::Horizontal);
+  this->outsideRadiusSlider->setValue(10);
 
-  // Create a layout to hold the brush size slider and its label
-  QHBoxLayout *brushSizeLayout = new QHBoxLayout;
-  brushSizeLayout->addWidget(new QLabel(tr("Brush Size: ")));
-  brushSizeLayout->addWidget(this->brushSizeSlider);
+  this->outsideRadiusSpin = new QDoubleSpinBox(this);
+  connect(this->outsideRadiusSlider, SIGNAL(sliderMoved(int)),
+      this, SLOT(OnOutsideRadiusSlider(int)));
+
+
+  // Create a layout to hold the outer brush size slider and its label
+  QHBoxLayout *outsideRadiusSpinLayout = new QHBoxLayout;
+  outsideRadiusSpinLayout->addWidget(new QLabel(tr("Outside radius: ")));
+  outsideRadiusSpinLayout->addStretch(2);
+  outsideRadiusSpinLayout->addWidget(this->outsideRadiusSpin);
+
+  QVBoxLayout *outsideRadiusLayout = new QVBoxLayout;
+  outsideRadiusLayout->addLayout(outsideRadiusSpinLayout);
+  outsideRadiusLayout->addWidget(this->outsideRadiusSlider);
+
+
+  // Create a slider to control the inner size of the brush
+  this->insideRadiusSlider = new QSlider(this);
+  this->insideRadiusSlider->setRange(0, 1000);
+  this->insideRadiusSlider->setTickInterval(1);
+  this->insideRadiusSlider->setOrientation(Qt::Horizontal);
+  this->insideRadiusSlider->setValue(20);
+  connect(this->insideRadiusSlider, SIGNAL(sliderMoved(int)),
+      this, SLOT(OnInsideRadiusSlider(int)));
+
+
+  this->insideRadiusSpin = new QDoubleSpinBox(this);
+  this->insideRadiusSpin->setRange(0, 1.0);
+
+  // Create a layout to hold the inner brush size slider and its label
+  QHBoxLayout *insideRadiusSpinLayout = new QHBoxLayout;
+  insideRadiusSpinLayout->addWidget(new QLabel(tr("Inside radius: ")));
+  insideRadiusSpinLayout->addStretch(2);
+  insideRadiusSpinLayout->addWidget(this->insideRadiusSpin);
+
+  QVBoxLayout *insideRadiusLayout = new QVBoxLayout;
+  insideRadiusLayout->addLayout(insideRadiusSpinLayout);
+  insideRadiusLayout->addWidget(this->insideRadiusSlider);
 
   // Create a slider to control the weight of the brush
-  this->brushWeightSlider = new QSlider(this);
-  this->brushWeightSlider->setRange(1, 100);
-  this->brushWeightSlider->setTickInterval(1);
-  this->brushWeightSlider->setOrientation(Qt::Horizontal);
-  this->brushWeightSlider->setValue(10);
+  this->weightSlider = new QSlider(this);
+  this->weightSlider->setRange(1, 1000);
+  this->weightSlider->setTickInterval(1);
+  this->weightSlider->setOrientation(Qt::Horizontal);
+  this->weightSlider->setValue(10);
+  connect(this->weightSlider, SIGNAL(sliderMoved(int)),
+      this, SLOT(OnWeightSlider(int)));
+
+
+  this->weightSpin = new QDoubleSpinBox(this);
+  this->weightSpin->setRange(.01, 1.0);
 
   // Create a layout to hold the brush weight slider and its label
-  QHBoxLayout *brushWeightLayout = new QHBoxLayout;
-  brushWeightLayout->addWidget(new QLabel(tr("Brush Weight: ")));
-  brushWeightLayout->addWidget(this->brushWeightSlider);
+  QHBoxLayout *weightSpinLayout = new QHBoxLayout;
+  weightSpinLayout->addWidget(new QLabel(tr("Weight: ")));
+  weightSpinLayout->addStretch(2);
+  weightSpinLayout->addWidget(this->weightSpin);
+
+  QVBoxLayout *weightLayout = new QVBoxLayout;
+  weightLayout->addLayout(weightSpinLayout);
+  weightLayout->addWidget(this->weightSlider);
+
+
+  // Create a slider to control the weight of the brush
+  this->heightSlider = new QSlider(this);
+  this->heightSlider->setRange(1, 100);
+  this->heightSlider->setTickInterval(1);
+  this->heightSlider->setOrientation(Qt::Horizontal);
+  this->heightSlider->setValue(10);
+  connect(this->heightSlider, SIGNAL(sliderMoved(int)),
+      this, SLOT(OnHeightSlider(int)));
+
+  this->heightSpin = new QDoubleSpinBox(this);
+
+  // Create a layout to hold the brush height slider and its label
+  QHBoxLayout *heightSpinLayout = new QHBoxLayout;
+  heightSpinLayout->addWidget(new QLabel(tr("Height: ")));
+  heightSpinLayout->addStretch(2);
+  heightSpinLayout->addWidget(this->heightSpin);
+
+  QVBoxLayout *heightLayout = new QVBoxLayout;
+  heightLayout->setContentsMargins(0, 0, 0, 0);
+  heightLayout->addLayout(heightSpinLayout);
+  heightLayout->addWidget(this->heightSlider);
+
 
   // Add all the layouts and widgets to the main layout
   mainLayout->addLayout(buttonLayout);
-  mainLayout->addLayout(brushSizeLayout);
-  mainLayout->addLayout(brushWeightLayout);
+  mainLayout->addLayout(outsideRadiusLayout);
+  mainLayout->addLayout(insideRadiusLayout);
+  mainLayout->addLayout(weightLayout);
+  mainLayout->addLayout(heightLayout);
   mainLayout->addStretch(1);
   mainLayout->addWidget(saveButton);
 
@@ -144,9 +212,8 @@ void TerrainEditorPalette::OnFlatten(bool _toggle)
 }
 
 /////////////////////////////////////////////////
-void TerrainEditorPalette::OnCourse(bool _toggle)
+void TerrainEditorPalette::OnPickHeight(bool /*_toggle*/)
 {
-  this->SetState(_toggle ? "course" : std::string());
 }
 
 /////////////////////////////////////////////////
@@ -259,17 +326,42 @@ bool TerrainEditorPalette::Apply(const common::MouseEvent &_event,
   bool handled = false;
 
   // Get the brush weight and size from the sliders.
-  double brushWeight = this->brushWeightSlider->value() / 100.0;
-  double brushSize = this->brushSizeSlider->value() / 100.0;
+  double weight = this->weightSpin->value();
+  double outsideRadius = this->outsideRadiusSpin->value();
 
   if (this->state == "lower")
-    handled = _heightmap->Lower(_camera, _event.pos, brushSize, brushWeight);
+    handled = _heightmap->Lower(_camera, _event.pos, outsideRadius, weight);
   else if (this->state == "raise")
-    handled = _heightmap->Raise(_camera, _event.pos, brushSize, brushWeight);
+    handled = _heightmap->Raise(_camera, _event.pos, outsideRadius, weight);
   else if (this->state == "flatten")
-    handled = _heightmap->Flatten(_camera, _event.pos, brushSize, brushWeight);
-  else if (this->state == "rough")
-    handled = _heightmap->Roughen(_camera, _event.pos, brushSize, brushWeight);
+    handled = _heightmap->Flatten(_camera, _event.pos, outsideRadius, weight);
+  else if (this->state == "smooth")
+    handled = _heightmap->Smooth(_camera, _event.pos, outsideRadius, weight);
 
   return handled;
+}
+
+/////////////////////////////////////////////////
+void TerrainEditorPalette::OnOutsideRadiusSlider(int _value)
+{
+  this->outsideRadiusSpin->setValue(_value / 10.0);
+}
+
+/////////////////////////////////////////////////
+void TerrainEditorPalette::OnInsideRadiusSlider(int _value)
+{
+  this->insideRadiusSpin->setValue(_value /
+      (double)this->insideRadiusSlider->maximum());
+}
+
+/////////////////////////////////////////////////
+void TerrainEditorPalette::OnWeightSlider(int _value)
+{
+  this->weightSpin->setValue(_value / (double)this->weightSlider->maximum());
+}
+
+/////////////////////////////////////////////////
+void TerrainEditorPalette::OnHeightSlider(int _value)
+{
+  this->heightSpin->setValue(_value / 10.0);
 }

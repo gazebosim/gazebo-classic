@@ -84,30 +84,41 @@ namespace gazebo
       /// \param[in] _toggle True if the button is enabled.
       private slots: void OnFlatten(bool _toggle);
 
-      /// \brief QT callback when Course button is toggled.
+      /// \brief QT callback when pick height button is toggled.
       /// \param[in] _toggle True if the button is enabled.
-      private slots: void OnCourse(bool _toggle);
+      private slots: void OnPickHeight(bool _toggle);
 
       /// \brief QT callback when image is saved.
       private slots: void OnSave();
 
-      /// \brief Button to raise the terrain.
-      private: QPushButton *raiseButton;
+      private slots: void OnOutsideRadiusSlider(int _value);
+      private slots: void OnInsideRadiusSlider(int _value);
+      private slots: void OnWeightSlider(int _value);
+      private slots: void OnHeightSlider(int _value);
 
-      /// \brief Button to lower the terrain.
-      private: QPushButton *lowerButton;
+      /// \brief Spin to control the outside size of the brush.
+      private: QDoubleSpinBox *outsideRadiusSpin;
 
-      /// \brief Button to flatten the terrain.
-      private: QPushButton *flattenButton;
+      /// \brief Slider to control the outside size of the brush.
+      private: QSlider *outsideRadiusSlider;
 
-      /// \brief Button to roughen the terrain.
-      private: QPushButton *courseButton;
+      /// \brief Spin to control the inside size of the brush.
+      private: QDoubleSpinBox *insideRadiusSpin;
 
-      /// \brief Slider to control the size of the brush.
-      private: QSlider *brushSizeSlider;
+      /// \brief Slider to control the inside size of the brush.
+      private: QSlider *insideRadiusSlider;
+
+      /// \brief Spin to control the weight of the brush.
+      private: QDoubleSpinBox *weightSpin;
 
       /// \brief Slider to control the weight of the brush.
-      private: QSlider *brushWeightSlider;
+      private: QSlider *weightSlider;
+
+      /// \brief Spin to control the weight of the brush.
+      private: QDoubleSpinBox *heightSpin;
+
+      /// \brief Slider to control the weight of the brush.
+      private: QSlider *heightSlider;
 
       /// \brief The current brush state.
       private: std::string state;

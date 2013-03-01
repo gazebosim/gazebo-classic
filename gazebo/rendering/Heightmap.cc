@@ -400,14 +400,14 @@ Ogre::TerrainGroup::RayResult Heightmap::GetMouseHit(CameraPtr _camera,
 }
 
 /////////////////////////////////////////////////
-bool Heightmap::Roughen(CameraPtr _camera, math::Vector2i _mousePos,
+bool Heightmap::Smooth(CameraPtr _camera, math::Vector2i _mousePos,
                          double _brushSize, double _weight)
 {
   Ogre::TerrainGroup::RayResult terrainResult =
     this->GetMouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
-    this->ModifyTerrain(terrainResult.position, _brushSize, _weight, "rough");
+    this->ModifyTerrain(terrainResult.position, _brushSize, _weight, "smooth");
 
   return terrainResult.hit;
 }
@@ -526,7 +526,7 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
 
   double avgHeight = 0;
 
-  if (_op == "flatten" || _op == "rough")
+  if (_op == "flatten" || _op == "smooth")
     avgHeight = this->GetAvgHeight(pos, _brushSize);
 
   for (long y = starty; y <= endy; ++y)
@@ -554,12 +554,12 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
         else
           newHeight -= addedHeight;
       }
-      else if (_op == "rough")
+      else if (_op == "smooth")
       {
         if (newHeight < avgHeight)
-          newHeight -= addedHeight;
-        else
           newHeight += addedHeight;
+        else
+          newHeight -= addedHeight;
       }
       else
         gzerr << "Unknown terrain operation[" << _op << "]\n";
