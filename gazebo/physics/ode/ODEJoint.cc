@@ -609,7 +609,7 @@ JointWrench ODEJoint::GetForceTorque(int /*_index*/)
         math::Vector3 cgPos = ((this->parentLink->GetInertial()->GetPose() +
                               parentPose) - childPose).pos;
 
-        // rotate moement arms into world frame
+        // rotate momeent arms into world frame
         math::Vector3 parentMomentArm =
           childPose.rot.RotateVector(
           this->anchorPos - cgPos);
