@@ -351,11 +351,11 @@ void ODEJoint::SetAttribute(Attribute _attr, int _index, double _value)
       break;
     case STOP_ERP:
       this->SetParam(dParamStopERP, _value);
-      this->stopERP = _value;
+      // this->stopERP = _value;
       break;
     case STOP_CFM:
       this->SetParam(dParamStopCFM, _value);
-      this->stopCFM = _value;
+      // this->stopCFM = _value;
       break;
     case ERP:
       this->SetParam(dParamERP, _value);
@@ -423,7 +423,7 @@ void ODEJoint::SetAttribute(const std::string &_key, int _index,
     try
     {
       this->SetParam(dParamStopERP, boost::any_cast<double>(_value));
-      this->stopERP = boost::any_cast<double>(_value);
+      // this->stopERP = boost::any_cast<double>(_value);
     }
     catch(boost::bad_any_cast &e)
     {
@@ -435,7 +435,7 @@ void ODEJoint::SetAttribute(const std::string &_key, int _index,
     try
     {
       this->SetParam(dParamStopCFM, boost::any_cast<double>(_value));
-      this->stopCFM = boost::any_cast<double>(_value);
+      // this->stopCFM = boost::any_cast<double>(_value);
     }
     catch(boost::bad_any_cast &e)
     {
