@@ -36,6 +36,7 @@ add_subdirectory(rendering)
 add_subdirectory(gui)
 add_subdirectory(physics)
 add_subdirectory(sensors)
+add_subdirectory(util)
 
 add_dependencies(gazebo_physics gazebo_msgs)
 add_dependencies(gazebo_physics_ode gazebo_msgs)
@@ -63,6 +64,7 @@ target_link_libraries(gzmaster gazebo_common
 
 
 target_link_libraries(gzserver gazebo_common
+                               gazebo_util
                                gazebo_sdf_interface
                                gazebo_transport
                                gazebo_physics
@@ -73,6 +75,7 @@ target_link_libraries(gzserver gazebo_common
 )
 
 target_link_libraries(gazebo gazebo_common
+                             gazebo_util
                              gazebo_sdf_interface
                              gazebo_transport
                              gazebo_physics
@@ -96,6 +99,7 @@ gz_add_library(libgazebo Server.cc Master.cc gazebo.cc)
 set_target_properties(libgazebo PROPERTIES OUTPUT_NAME "gazebo")
 
 target_link_libraries(libgazebo gazebo_common
+                                gazebo_util
                                 gazebo_transport
                                 gazebo_physics
                                 gazebo_sensors

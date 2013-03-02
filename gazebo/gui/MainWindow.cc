@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include "gazebo_config.h"
 
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
@@ -46,7 +47,10 @@
 
 #include "sdf/sdf.hh"
 
-#include "gazebo_config.h"
+#ifdef HAVE_QWT
+#include "gazebo/gui/Diagnostics.hh"
+#endif
+
 
 using namespace gazebo;
 using namespace gui;
@@ -57,6 +61,7 @@ extern bool g_fullscreen;
 MainWindow::MainWindow()
   : renderWidget(0)
 {
+  this->menuBar = NULL;
   this->setObjectName("mainWindow");
 
   this->requestMsg = NULL;
@@ -234,6 +239,15 @@ void MainWindow::New()
   msgs::ServerControl msg;
   msg.set_new_world(true);
   this->serverControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Diagnostics()
+{
+#ifdef HAVE_QWT
+  gui::Diagnostics *diag = new gui::Diagnostics(this);
+  diag->show();
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -728,6 +742,7 @@ void MainWindow::BuildingEditorExit()
 {
   gui::editor::Events::exitBuildingEditor();
 }
+
 /////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
@@ -741,6 +756,14 @@ void MainWindow::CreateActions()
   g_topicVisAct->setShortcut(tr("Ctrl+T"));
   g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
   connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
+
+#ifdef HAVE_QWT
+  /*g_diagnosticsAct = new QAction(tr("Diagnostic Plot"), this);
+  g_diagnosticsAct->setShortcut(tr("Ctrl+U"));
+  g_diagnosticsAct->setStatusTip(tr("Plot diagnostic information"));
+  connect(g_diagnosticsAct, SIGNAL(triggered()), this, SLOT(Diagnostics()));
+  */
+#endif
 
   g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
@@ -1043,6 +1066,10 @@ void MainWindow::AttachMainMenuBar()
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
+
+#ifdef HAVE_QWT
+  // windowMenu->addAction(g_diagnosticsAct);
+#endif
 
   this->menuBar->addSeparator();
 
