@@ -379,8 +379,16 @@ namespace gazebo
       /// \brief Pointer to the parent model.
       protected: ModelPtr model;
 
-      /// \brief Anchor pose.
+      /// \brief Anchor pose.  This is the xyz offset of the joint frame from
+      /// child frame specified in the parent link frame
       protected: math::Vector3 anchorPos;
+
+      /// \brief Anchor pose specified in SDF <joint><pose> tag.
+      /// AnchorPose is the transform from child link frame to joint frame
+      /// specified in the child link frame.
+      /// AnchorPos is more relevant in normal usage, but sometimes,
+      /// we do need this (e.g. GetForceTorque and joint visualization).
+      protected: math::Pose anchorPose;
 
       /// \brief Anchor link.
       protected: LinkPtr anchorLink;
