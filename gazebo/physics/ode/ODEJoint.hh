@@ -108,12 +108,14 @@ namespace gazebo
       public: void CFMDamping();
 
       /// \brief Get access to stopCFM
+      /// \return Returns joint's cfm for end stops
       public: double GetStopCFM()
       {
         return this->stopCFM;
       }
 
       /// \brief Get access to stopERP
+      /// \return Returns joint's erp for end stops
       public: double GetStopERP()
       {
         return this->stopERP;
@@ -164,8 +166,10 @@ namespace gazebo
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(int _index);
 
-      /// \brief Provide Feedback data for contact forces
+      /// \brief CFM for joint's limit constraint
       private: double stopCFM;
+
+      /// \brief ERP for joint's limit constraint
       private: double stopERP;
     };
   }
