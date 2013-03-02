@@ -19,7 +19,7 @@
  * Date: 22 Nov 2009
  */
 
-#include "common/Timer.hh"
+#include "gazebo/common/Timer.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -27,6 +27,7 @@ using namespace common;
 
 //////////////////////////////////////////////////
 Timer::Timer()
+  : running(false)
 {
 }
 
@@ -39,16 +40,32 @@ Timer::~Timer()
 void Timer::Start()
 {
   this->start = Time::GetWallTime();
+  this->running = true;
+}
+
+//////////////////////////////////////////////////
+void Timer::Stop()
+{
+  this->stop = Time::GetWallTime();
+  this->running = false;
+}
+
+//////////////////////////////////////////////////
+bool Timer::GetRunning() const
+{
+  return this->running;
 }
 
 //////////////////////////////////////////////////
 Time Timer::GetElapsed() const
 {
-  Time currentTime;
+  if (this->running)
+  {
+    Time currentTime;
+    currentTime = Time::GetWallTime();
 
-  currentTime = Time::GetWallTime();
-
-  return currentTime - this->start;
+    return currentTime - this->start;
+  }
+  else
+    return this->stop - this->start;
 }
-
-
