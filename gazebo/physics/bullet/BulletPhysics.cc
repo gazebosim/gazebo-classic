@@ -188,9 +188,14 @@ bool BulletPhysics::ContactCallback(btManifoldPoint &_cp,
   BulletPhysicsPtr bulletPhysics =
         boost::shared_static_cast<BulletPhysics>(engine);
 
-  Contact *contactFeedback = NULL;
-  boost::unordered_map<CollisionPtr, Contact *> contactMap
+
+
+  /*Contact *contactFeedback = NULL;
+  boost::unordered_map<CollisionPtr, Contact *> &contactMap
       = bulletPhysics->GetContactMap();
+  gzerr << "contact feedback " << contactMap.size() << std::endl;
+
+
   if (contactMap.find(collisionPtr0) != contactMap.end())
   {
     contactFeedback = contactMap[collisionPtr0];
@@ -212,6 +217,7 @@ bool BulletPhysics::ContactCallback(btManifoldPoint &_cp,
     contactMap[collisionPtr1] = contactFeedback;
   }
 
+
 //  const btVector3& ptA = _cp.getPositionWorldOnA();
   const btVector3& ptB = _cp.getPositionWorldOnB();
   const btVector3& normalOnB = _cp.m_normalWorldOnB;
@@ -219,17 +225,58 @@ bool BulletPhysics::ContactCallback(btManifoldPoint &_cp,
   int contactIndex = std::max(0, contactFeedback->count - 1);
   contactFeedback->positions[contactIndex] = BulletTypes::ConvertVector3(ptB);
   contactFeedback->normals[contactIndex] = BulletTypes::ConvertVector3(normalOnB);
-  contactFeedback->count++;
+  contactFeedback->count++;*/
 
+  const btVector3& ptB = _cp.getPositionWorldOnB();
+  const btVector3& normalOnB = _cp.m_normalWorldOnB;
 
+  bulletPhysics->AddContact(collisionPtr0, collisionPtr1,
+    BulletTypes::ConvertVector3(ptB), BulletTypes::ConvertVector3(normalOnB));
 
+//  gzerr << contactFeedback->count++ << std::endl;
   return false;
 }
 
 //////////////////////////////////////////////////
-boost::unordered_map<CollisionPtr, Contact *> BulletPhysics::GetContactMap()
+void BulletPhysics::AddContact(CollisionPtr _col0, CollisionPtr _col1,
+    math::Vector3 _pos, math::Vector3 _normal)
 {
-  return this->contactMap;
+  Contact *contactFeedback = NULL;
+  if (contactMap.find(_col0) != contactMap.end())
+  {
+    contactFeedback = contactMap[_col0];
+    gzerr << " f " << std::endl;
+  }
+  else if (contactMap.find(_col1) != contactMap.end())
+  {
+    contactFeedback = contactMap[_col1];
+    gzerr << " f1 " << std::endl;
+  }
+  else
+  {
+    contactFeedback = this->contactManager->
+        NewContact(_col0.get(),
+        _col1.get(), _col0->GetWorld()->GetSimTime());
+
+    if (!contactFeedback)
+      return;
+
+    contactMap[_col0] = contactFeedback;
+    contactMap[_col1] = contactFeedback;
+
+    gzerr << " new " << contactMap.size() << std::endl;
+  }
+
+  int contactIndex = std::max(0, contactFeedback->count - 1);
+  contactFeedback->positions[contactIndex] = _pos;
+  contactFeedback->normals[contactIndex] = _normal;
+  contactFeedback->count++;
+}
+
+//////////////////////////////////////////////////
+boost::unordered_map<CollisionPtr, Contact *> &BulletPhysics::GetContactMap()
+{
+  return contactMap;
 }
 
 //////////////////////////////////////////////////
@@ -447,6 +494,8 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 //////////////////////////////////////////////////
 void BulletPhysics::UpdateCollision()
 {
+  contactMap.clear();
+  gzerr << " clear " << std::endl;
 }
 
 //////////////////////////////////////////////////

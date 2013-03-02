@@ -128,7 +128,10 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
 
-      public: boost::unordered_map<CollisionPtr, Contact *> GetContactMap();
+      public: boost::unordered_map<CollisionPtr, Contact *> &GetContactMap();
+
+      public: void AddContact(CollisionPtr _col0, CollisionPtr _col1,
+          math::Vector3 _pos, math::Vector3 _normal);
 
       /// \brief Register a joint with the dynamics world
       public: btDynamicsWorld *GetDynamicsWorld() const
