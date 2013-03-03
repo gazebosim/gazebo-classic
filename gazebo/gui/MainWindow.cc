@@ -1004,7 +1004,8 @@ void MainWindow::AttachEditorMenuBar()
 {
   if (this->menuBar)
   {
-    delete menuBar;
+    this->menuLayout->removeWidget(this->menuBar);
+    delete this->menuBar;
   }
 
   this->menuBar = new QMenuBar;
@@ -1017,7 +1018,7 @@ void MainWindow::AttachEditorMenuBar()
   buildingEditorFileMenu->addAction(g_buildingEditorDoneAct);
   buildingEditorFileMenu->addAction(g_buildingEditorExitAct);
 
-  this->menuLayout->addWidget(this->menuBar);
+  this->menuLayout->setMenuBar(this->menuBar);
 }
 
 /////////////////////////////////////////////////
@@ -1025,7 +1026,8 @@ void MainWindow::AttachMainMenuBar()
 {
   if (this->menuBar)
   {
-    delete menuBar;
+    this->menuLayout->removeWidget(this->menuBar);
+    delete this->menuBar;
   }
 
   this->menuBar =  new QMenuBar;
@@ -1076,7 +1078,7 @@ void MainWindow::AttachMainMenuBar()
   QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
   helpMenu->addAction(g_aboutAct);
 
-  this->menuLayout->addWidget(this->menuBar);
+  this->menuLayout->setMenuBar(this->menuBar);
 }
 
 /////////////////////////////////////////////////
