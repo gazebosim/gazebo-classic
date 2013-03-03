@@ -2,7 +2,7 @@
 <sdf version="1.3">
   <world name="default">
 
-    <physics type="simbody">
+    <physics type="ode">
       <gravity>0 0 -9.8</gravity>
       <simbody>
         <dt>0.001</dt>

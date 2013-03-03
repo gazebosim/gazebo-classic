@@ -21,6 +21,7 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
+#include "physics/Model.hh"
 
 #include "physics/simbody/simbody_inc.h"
 #include "physics/simbody/SimbodyLink.hh"
@@ -83,7 +84,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     this->X_PA = physics::SimbodyPhysics::GetPose(_sdf->GetElement("parent"));
   else
   {
-    const SimTK::Transform X_MC, X_MP, X_PC;
+    SimTK::Transform X_MC, X_MP;
     if (this->parentLink)
     {
       X_MP = physics::SimbodyPhysics::Pose2Transform(
@@ -94,7 +95,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
       // TODO: verify
       // parent frame is at the world frame
       X_MP = ~physics::SimbodyPhysics::Pose2Transform(
-        this->GetParentModel()->GetWorldPose());
+        this->model->GetWorldPose());
     }
 
     if (this->childLink)
@@ -106,10 +107,10 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     {
       // TODO: verify
       X_MC = ~physics::SimbodyPhysics::Pose2Transform(
-        this->GetParentModel()->GetWorldPose());
+        this->model->GetWorldPose());
     }
 
-    const Transform X_PC = ~X_MP*X_MC;
+    const SimTK::Transform X_PC = ~X_MP*X_MC;
     this->X_PA = X_PC*this->X_CB; // i.e., A spatially coincident with B 
   }
 }

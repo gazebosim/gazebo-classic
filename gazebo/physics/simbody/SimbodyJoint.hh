@@ -107,12 +107,12 @@ namespace gazebo
       public: virtual JointWrench GetForceTorque(int _index);
 
       // Simbody specific variables
-      private: bool mustBreakLoopHere;
+      public: bool mustBreakLoopHere;
 
       // Normally A=F, B=M. But if reversed, then B=F, A=M.
-      private: SimTK::Transform    X_PA; // parent body frame to mobilizer frame
-      private: SimTK::Transform    X_CB; // child body frame to mobilizer frame
-      private: SimTK::Transform defX_AB; // default mobilizer pose
+      public: SimTK::Transform    X_PA; // parent body frame to mobilizer frame
+      public: SimTK::Transform    X_CB; // child body frame to mobilizer frame
+      public: SimTK::Transform defX_AB; // default mobilizer pose
 
       // Members below here are set when we build the Simbody model.
 
@@ -121,13 +121,13 @@ namespace gazebo
       // same as the joint type above.
 
       // isValid() if we used a mobilizer
-      private: SimTK::MobilizedBody mobod;
+      public: SimTK::MobilizedBody mobod;
 
       /// \brief: if mobilizer, did it reverse parent&child?
-      private: SimTK::bool isReversed;
+      public: bool isReversed;
 
       /// \brief: isValid() if we used a constraint
-      private: SimTK::Constraint constraint;
+      public: SimTK::Constraint constraint;
 
 
     };

@@ -147,25 +147,28 @@ namespace gazebo
       /// \copydoc Link::SetAutoDisable(bool)
       public: virtual void SetAutoDisable(bool _disable);
 
+      private: SimbodyPhysicsPtr simbodyPhysics;
+
       /// \brief: Force this link to be a base body, where its inboard
       /// body is the world with 6DOF.
       public: bool mustBeBaseLink;
 
       // Below to be filled in after everything is loaded
       // Which MobilizedBody corresponds to the master instance of this link.
-      private: SimTK::MobilizedBody                   masterMobod;
+      public: SimTK::MobilizedBody                   masterMobod;
 
       // If this link got split into a master and slaves, these are the 
       // MobilizedBodies used to mobilize the slaves.
-      private: SimTK::std::vector<MobilizedBody>      slaveMobods;
+      public: std::vector<SimTK::MobilizedBody>      slaveMobods;
 
       // And these are the Weld constraints used to attach slaves to master.
-      private: SimTK::std::vector<Constraint::Weld>   slaveWelds;
+      public: std::vector<SimTK::Constraint::Weld>   slaveWelds;
 
       // Convert Gazebo Inertia to Simbody MassProperties
       // Where Simbody MassProperties contains mass,
       // center of mass location, and unit inertia about body origin.
-      public: SimTK::MassProperties getMassProperties() const;
+      public: SimTK::MassProperties GetMassProperties() const;
+      public: SimTK::MassProperties GetEffectiveMassProps(int _numFragments) const;
     };
     /// \}
   }

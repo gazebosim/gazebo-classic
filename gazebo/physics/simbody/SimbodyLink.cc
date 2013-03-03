@@ -75,7 +75,6 @@ void SimbodyLink::Init()
     {
       SimbodyCollisionPtr collision;
       collision = boost::shared_static_cast<SimbodyCollision>(*iter);
-      SimTK::ContactGeometry *shape = collision->GetCollisionShape();
 
       math::Pose relativePose = collision->GetRelativePose();
       relativePose.pos -= cogVec;
@@ -85,10 +84,7 @@ void SimbodyLink::Init()
 
 
   // Create a construction info object
-
   // Create the new rigid body
-
-  SimTK::MultibodySystem *wd = this->simbodyPhysics->GetDynamicsWorld();
 }
 
 //////////////////////////////////////////////////
@@ -104,7 +100,7 @@ void SimbodyLink::Update()
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetGravityMode(bool _mode)
+void SimbodyLink::SetGravityMode(bool /*_mode*/)
 {
 }
 
@@ -156,14 +152,14 @@ void SimbodyLink::SetLinearVel(const math::Vector3 & /*_vel*/)
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldLinearVel(
-  const math::Vector3& _vector3) const
+  const math::Vector3& /*_vector3*/) const
 {
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldLinearVel(
-  const math::Pose &_pose) const
+  const math::Pose &/*_pose*/) const
 {
   return math::Vector3();
 }
@@ -175,7 +171,7 @@ math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetAngularVel(const math::Vector3 &_vel)
+void SimbodyLink::SetAngularVel(const math::Vector3 &/*_vel*/)
 {
 }
 
@@ -197,7 +193,7 @@ math::Vector3 SimbodyLink::GetWorldForce() const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetTorque(const math::Vector3 &_torque)
+void SimbodyLink::SetTorque(const math::Vector3 &/*_torque*/)
 {
 }
 
@@ -208,12 +204,12 @@ math::Vector3 SimbodyLink::GetWorldTorque() const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetLinearDamping(double _damping)
+void SimbodyLink::SetLinearDamping(double /*_damping*/)
 {
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetAngularDamping(double _damping)
+void SimbodyLink::SetAngularDamping(double /*_damping*/)
 {
 }
 
@@ -255,17 +251,18 @@ void SimbodyLink::SetAutoDisable(bool /*_disable*/)
 }
 
 /////////////////////////////////////////////////
-SimTK::MassProperties SimbodyLink::getMassProperties() const
+SimTK::MassProperties SimbodyLink::GetMassProperties() const
 {
   if (!this->IsStatic())
   {
     const SimTK::Real mass = this->inertial->GetMass();
-    Transform X_LI = physics::SimbodyPhysics::Pose2Transform(
+    SimTK::Transform X_LI = physics::SimbodyPhysics::Pose2Transform(
       this->inertial->GetPose());
-    const Vec3 &com_L = X_LI.p(); // vector from Lo to com, exp. in L
-    Xml::Element inertia = inertial.getOptionalElement("inertia");
-    if (mass==0 || !inertia.isValid())
-        return MassProperties(mass,com_L,UnitInertia(1,1,1));
+    const SimTK::Vec3 &com_L = X_LI.p(); // vector from Lo to com, exp. in L
+
+    if (math::equal(mass, 0.0))
+      return SimTK::MassProperties(mass,com_L,SimTK::UnitInertia(1,1,1));
+
     // Get mass-weighted central inertia, expressed in I frame.
     SimTK::Inertia Ic_I(this->inertial->GetIXX(),
                  this->inertial->GetIYY(),
@@ -277,13 +274,26 @@ SimTK::MassProperties SimbodyLink::getMassProperties() const
     SimTK::Inertia Ic_L = Ic_I.reexpress(~X_LI.R()); // Ic_L=R_LI*Ic_I*R_IL
     // Shift to L frame origin.
     SimTK::Inertia Io_L = Ic_L.shiftFromMassCenter(-com_L, mass);
-    return MassProperties(mass, com_L, Io_L); // converts to unit inertia
+    return SimTK::MassProperties(mass, com_L, Io_L); // converts to unit inertia
   }
   else
   {
     gzerr << "inertial block no specified, using unit mass properties\n";
-    return MassProperties(1,Vec3(0),UnitInertia(1,1,1));
+    return SimTK::MassProperties(1,SimTK::Vec3(0),SimTK::UnitInertia(1,1,1));
   }
-    
+}
+
+// When a link is broken into several fragments (master and slaves), they
+// share the mass equally. Given the number of fragments, this returns the
+// appropriate mass properties to use for each fragment. Per Simbody's
+// convention, COM is measured from, and inertia taken about, the link 
+// origin and both are expressed in the link frame.
+SimTK::MassProperties SimbodyLink::GetEffectiveMassProps(int _numFragments) const
+{
+    SimTK::MassProperties massProps = this->GetMassProperties();
+    assert(_numFragments > 0); // must be at least 1 for the master
+    return SimTK::MassProperties(massProps.getMass()/_numFragments,
+                          massProps.getMassCenter(),
+                          massProps.getUnitInertia());
 }
 

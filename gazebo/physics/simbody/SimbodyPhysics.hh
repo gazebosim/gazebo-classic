@@ -128,6 +128,16 @@ namespace gazebo
       public: SimTK::CompliantContactSubsystem contact;
       public: SimTK:: Integrator *integ;
 
+      public: static SimTK::Vec3 Vector3ToVec3(const math::Vector3& _v)
+      {
+        return SimTK::Vec3(_v.x, _v.y, _v.z);
+      }
+
+      public: static math::Vector3 Vec3ToVector3(const SimTK::Vec3& _v)
+      {
+        return math::Vector3(_v[0], _v[1], _v[2]);
+      }
+
       // Convert the given pose in x,y,z,thetax,thetay,thetaz format to
       // a Simbody Transform. The rotation angles are interpreted as a
       // body-fixed sequence, meaning we rotation about x, then about
@@ -137,7 +147,7 @@ namespace gazebo
         SimTK::Quaternion q(_pose.rot.w, _pose.rot.x, _pose.rot.y,
                          _pose.rot.z);
         SimTK::Vec3 v(_pose.pos.x, _pose.pos.y, _pose.pos.z);
-        SimTK::Transform frame(q, v); 
+        SimTK::Transform frame(SimTK::Rotation(q), v); 
         return frame;
       }
 
@@ -147,7 +157,7 @@ namespace gazebo
       {
         SimTK::Quaternion q(X_AB.R());
         const SimTK::Vec4 &qv = q.asVec4();
-        return pose(math::Vector3(X_AB.x(), X_AB.y(), X_AB.z()),
+        return math::Pose(math::Vector3(X_AB.p()[0], X_AB.p()[1], X_AB.p()[2]),
           math::Quaternion(qv[0], qv[1], qv[2], qv[3]));
       }
 
@@ -158,6 +168,11 @@ namespace gazebo
       {
         const math::Pose pose = _element->GetValuePose("pose");
         return Pose2Transform(pose);
+      }
+
+      public: static std::string GetTypeString(unsigned int _type)
+      {
+        return SimbodyPhysics::GetTypeString(physics::Base::EntityType(_type));
       }
 
       public: static std::string GetTypeString(physics::Base::EntityType _type)
@@ -185,8 +200,8 @@ namespace gazebo
       }
 
       /// \brief Helper functions
-      private: void SimbodyPhysics::CreateMultibodyGraph(
-                                 MultibodyGraphMaker&   mbgraph);
+      private: void CreateMultibodyGraph(
+                                 SimTK::MultibodyGraphMaker&   mbgraph);
 
       /// \brief Helper functions
       private: void BuildSimbodySystem(const SimTK::MultibodyGraphMaker& mbgraph,
@@ -195,7 +210,6 @@ namespace gazebo
                                      SimTK::SimbodyMatterSubsystem&    matter,
                                      SimTK::GeneralForceSubsystem&     forces,
                                      SimTK::CompliantContactSubsystem& contact);
-
     };
 
   /// \}
