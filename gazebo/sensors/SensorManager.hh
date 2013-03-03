@@ -271,8 +271,18 @@ namespace gazebo
       /// \brief The sensor manager's vector of sensor containers.
       private: SensorContainer_V sensorContainers;
 
+      /// \brief A mutex used by SensorContainer and SimTimeEventHandler
+      /// for timing coordination.
+      private: static boost::mutex sensorTimingMutex;
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<SensorManager>;
+
+      /// \brief Allow access to sensorTimeMutex member var.
+      private: friend class SensorContainer;
+
+      /// \brief Allow access to sensorTimeMutex member var.
+      private: friend class SimTimeEventHandler;
     };
     /// \}
   }
