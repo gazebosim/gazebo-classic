@@ -475,10 +475,10 @@ void Joint::ComputeInertiaRatio()
       {
         // get each column, and inverse rotate by pose
         math::Vector3 pmCol(pm[0][col], pm[1][col], pm[2][col]);
-        pmCol = pPose.rot.RotateVectorReverse(pmCol);
+        pmCol = pPose.rot.RotateVector(pmCol);
         pm.SetCol(col, pmCol);
         math::Vector3 cmCol(cm[0][col], cm[1][col], cm[2][col]);
-        cmCol = pPose.rot.RotateVectorReverse(cmCol);
+        cmCol = pPose.rot.RotateVector(cmCol);
         cm.SetCol(col, cmCol);
       }
 
