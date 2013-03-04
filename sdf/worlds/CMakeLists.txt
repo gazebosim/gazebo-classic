@@ -24,6 +24,7 @@ set (files
   rubble.world
   shapes.world
   simple_pendulum_rtql8.world
+  simple_pendulum_ode.world
   simple_pendulums_rtql8.world
   weshare2012.world
   willowgarage.world)

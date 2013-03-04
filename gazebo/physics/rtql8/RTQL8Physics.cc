@@ -99,8 +99,8 @@ void RTQL8Physics::Load(sdf::ElementPtr _sdf)
   this->rtql8World->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
   
   // Time step
-  double timeStep = this->sdf->GetValueDouble("time_step");
-  this->rtql8World->setTimeStep(timeStep);
+  //double timeStep = this->sdf->GetValueDouble("time_step");
+  //this->rtql8World->setTimeStep(timeStep);
   
   // TODO: Elements for rtql8 settings
   //sdf::ElementPtr rtql8Elem = this->sdf->GetElement("rtql8");

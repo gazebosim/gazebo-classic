@@ -137,6 +137,8 @@ bool RTQL8Joint::AreConnected(LinkPtr _one, LinkPtr _two) const
   //  if (rtql8Link1 == NULL || rtql8Link2 == NULL)
   //    gzthrow("RTQL8Joint requires RTQL8 bodies\n");
 
+  gzerr << "Not implemented...\n";
+
   //  return dAreConnected(odeLink1->GetODEId(), odeLink2->GetODEId());
   return (this->childLink.get() == _one.get() && this->parentLink.get() == _two.get())
       || (this->childLink.get() == _two.get() && this->parentLink.get() == _one.get());
@@ -167,6 +169,8 @@ void RTQL8Joint::Attach(LinkPtr _parent, LinkPtr _child)
   //         this->childLink)->GetBodyNode();
 
   //   this->rtql8Joint = new rtql8::kinematics::Joint(parentBodyNode, childBodyNode);
+
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -186,21 +190,23 @@ void RTQL8Joint::Detach()
   //        this->childLink)->GetBodyNode();
 
   //  this->rtql8Joint = new rtql8::kinematics::Joint(NULL, NULL);
+
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
-void RTQL8Joint::SetHighStop(int _index, const math::Angle &/*_angle*/)
+void RTQL8Joint::SetHighStop(int _index, const math::Angle& _angle)
 {
   switch (_index)
   {
     case 0:
-      //       this->SetParam(dParamHiStop, _angle.Radian());
+      this->rtql8Joint->getDof(_index)->setMax(_angle.Radian());
       break;
     case 1:
-      //       this->SetParam(dParamHiStop2, _angle.Radian());
+      this->rtql8Joint->getDof(_index)->setMax(_angle.Radian());
       break;
     case 2:
-      //       this->SetParam(dParamHiStop3, _angle.Radian());
+      this->rtql8Joint->getDof(_index)->setMax(_angle.Radian());
       break;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
@@ -209,56 +215,56 @@ void RTQL8Joint::SetHighStop(int _index, const math::Angle &/*_angle*/)
 }
 
 //////////////////////////////////////////////////
-void RTQL8Joint::SetLowStop(int _index, const math::Angle &/*_angle*/)
+void RTQL8Joint::SetLowStop(int _index, const math::Angle& _angle)
 {
   switch (_index)
   {
-    case 0:
-      //       this->SetParam(dParamLoStop, _angle.Radian());
-      break;
-    case 1:
-      //       this->SetParam(dParamLoStop2, _angle.Radian());
-      break;
-    case 2:
-      //       this->SetParam(dParamLoStop3, _angle.Radian());
-      break;
-    default:
-      gzerr << "Invalid index[" << _index << "]\n";
+  case 0:
+    this->rtql8Joint->getDof(_index)->setMin(_angle.Radian());
+    break;
+  case 1:
+    this->rtql8Joint->getDof(_index)->setMin(_angle.Radian());
+    break;
+  case 2:
+    this->rtql8Joint->getDof(_index)->setMin(_angle.Radian());
+    break;
+  default:
+    gzerr << "Invalid index[" << _index << "]\n";
   };
 }
 
 //////////////////////////////////////////////////
-math::Angle RTQL8Joint::GetHighStop(int /*_index*/)
+math::Angle RTQL8Joint::GetHighStop(int _index)
 {
-  //   switch (_index)
-  //   {
-  //     case 0:
-  //       return this->GetParam(dParamHiStop);
-  //     case 1:
-  //       return this->GetParam(dParamHiStop2);
-  //     case 2:
-  //       return this->GetParam(dParamHiStop3);
-  //     default:
-  //       gzerr << "Invalid index[" << _index << "]\n";
-  //   };
+  switch (_index)
+  {
+  case 0:
+    return this->rtql8Joint->getDof(_index)->getMax();
+  case 1:
+    return this->rtql8Joint->getDof(_index)->getMax();
+  case 2:
+    return this->rtql8Joint->getDof(_index)->getMax();
+  default:
+    gzerr << "Invalid index[" << _index << "]\n";
+  };
 
   return 0;
 }
 
 //////////////////////////////////////////////////
-math::Angle RTQL8Joint::GetLowStop(int /*_index*/)
+math::Angle RTQL8Joint::GetLowStop(int _index)
 {
-  //   switch (_index)
-  //   {
-  //     case 0:
-  //       return this->GetParam(dParamLoStop);
-  //     case 1:
-  //       return this->GetParam(dParamLoStop2);
-  //     case 2:
-  //       return this->GetParam(dParamLoStop3);
-  //     default:
-  //       gzerr << "Invalid index[" << _index << "]\n";
-  //   };
+  switch (_index)
+  {
+  case 0:
+    return this->rtql8Joint->getDof(_index)->getMin();
+  case 1:
+    return this->rtql8Joint->getDof(_index)->getMin();
+  case 2:
+    return this->rtql8Joint->getDof(_index)->getMin();
+  default:
+    gzerr << "Invalid index[" << _index << "]\n";
+  };
 
   return 0;
 }
@@ -276,6 +282,8 @@ math::Vector3 RTQL8Joint::GetLinkForce(unsigned int /*_index*/) const
   //     result.Set(jointFeedback->f2[0], jointFeedback->f2[1],
   //                jointFeedback->f2[2]);
 
+  gzerr << "RTQL8Joint::GetLinkForce(...): Not implemented...\n";
+
   return result;
 }
 
@@ -291,6 +299,8 @@ math::Vector3 RTQL8Joint::GetLinkTorque(unsigned int /*_index*/) const
   //   else
   //     result.Set(jointFeedback->t2[0], jointFeedback->t2[1],
   //                jointFeedback->t2[2]);
+
+  gzerr << "RTQL8Joint::GetLinkTorque(...): Not implemented...\n";
 
   return result;
 }
@@ -337,6 +347,7 @@ void RTQL8Joint::SetAttribute(Attribute /*_attr*/, int /*_index*/, double /*_val
   //       gzerr << "Unable to handle joint attribute[" << _attr << "]\n";
   //       break;
   //   };
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -492,6 +503,7 @@ void RTQL8Joint::SetAttribute(const std::string &/*_key*/, int /*_index*/,
   //       gzerr << "boost any_cast error:" << e.what() << "\n";
   //     }
   //   }
+  gzerr << "Not implemented...\n";
 }
 
 JointWrench RTQL8Joint::GetForceTorque(int /*_index*/)
@@ -560,6 +572,8 @@ JointWrench RTQL8Joint::GetForceTorque(int /*_index*/)
   //    // forgot to set provide_feedback?
   //    gzwarn << "GetForceTorque: forget to set <provide_feedback>?\n";
   //  }
+
+  gzerr << "Not implemented...\n";
 
   return wrench;
 }

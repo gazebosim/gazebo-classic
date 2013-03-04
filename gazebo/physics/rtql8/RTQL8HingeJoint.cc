@@ -117,20 +117,10 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
     this->rtql8Joint->addTransform(rot, false);
   }
 
-
   //---- Step 2. Transformation by the rotate axis.
-
-  assert(this->sdf->HasElement("axis"));
-
-  sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-
-  math::Vector3 xyz = axisElem->GetValueVector3("xyz");
-  Eigen::Vector3d axisHinge(xyz.x, xyz.y, xyz.z);
-
+  Eigen::Vector3d axisHinge;
   rtql8::kinematics::Dof* dofHinge = new rtql8::kinematics::Dof(0);
-
-  rtql8::kinematics::TrfmRotateAxis1* rotHinge
-      = new rtql8::kinematics::TrfmRotateAxis1(axisHinge, dofHinge);
+  rotHinge = new rtql8::kinematics::TrfmRotateAxis1(axisHinge, dofHinge);
 
   //
   this->rtql8Joint->addTransform(rotHinge, true);
@@ -138,25 +128,8 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
   // Get the model associated with
   // Add the transform to the skeletone in the model.
   // add to model because it's variable
-//    boost::shared_dynamic_cast<RTQL8Model>(this->model)->GetSkeletonDynamics()->addTransform(rotHinge);
   RTQL8ModelPtr rtql8Model = boost::shared_dynamic_cast<RTQL8Model>(this->model);
   rtql8Model->GetSkeletonDynamics()->addTransform(rotHinge);
-
-
-
-
-
-
-
-  if (axisElem->HasElement("limit"))
-  {
-    sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-    dofHinge->setMin(limitElem->GetValueDouble("lower"));
-    dofHinge->setMax(limitElem->GetValueDouble("upper"));
-  }
-
-
-
 
 
   //---- Step 3. Transformation from rotated joint frame to child link frame.
@@ -191,7 +164,7 @@ math::Vector3 RTQL8HingeJoint::GetAnchor(int /*index*/) const
 // 
 //   return math::Vector3(result[0], result[1], result[2]);
 
-  gzerr << "Not implemented...\n";
+  gzerr << "RTQL8HingeJoint::GetAnchor(...): Not implemented...\n";
 
   return math::Vector3(0, 0, 0);
 }
@@ -199,34 +172,35 @@ math::Vector3 RTQL8HingeJoint::GetAnchor(int /*index*/) const
 //////////////////////////////////////////////////
 void RTQL8HingeJoint::SetAnchor(int /*index*/, const math::Vector3& /*_anchor*/)
 {
-//   if (this->childLink)
-//     this->childLink->SetEnabled(true);
-//   if (this->parentLink)
-//     this->parentLink->SetEnabled(true);
-// 
-//   dJointSetHingeAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
-  gzerr << "Not implemented...\n";
+  // TODO: We do not do anything here because RTQL8 does not store the positon
+  // of the joint.
 }
-
 
 //////////////////////////////////////////////////
 math::Vector3 RTQL8HingeJoint::GetGlobalAxis(int /*_index*/) const
 {
-//     dVector3 result;
-//     dJointGetHingeAxis(this->jointId, result);
-//     return math::Vector3(result[0], result[1], result[2]);
-  return math::Vector3(0, 0, 0);
+  // Axis in local frame of this joint
+  Eigen::Vector3d localAxis_Eigen = rotHinge->getAxis();
+  math::Vector3 localAxis(localAxis_Eigen.x(), localAxis_Eigen.y(), localAxis_Eigen.z());
+  math::Vector3 globalAxis;
+
+  if (this->parentLink)
+  {
+    math::Pose worldPoseOfParentLink = this->parentLink->GetWorldPose();
+    globalAxis = worldPoseOfParentLink.rot * localAxis;
+  }
+  else
+  {
+    globalAxis = localAxis;
+  }
+
+  return globalAxis;
 }
 
 //////////////////////////////////////////////////
-void RTQL8HingeJoint::SetAxis(int /*index*/, const math::Vector3& /*_axis*/)
+void RTQL8HingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
 {
-//   if (this->childLink)
-//     this->childLink->SetEnabled(true);
-//   if (this->parentLink)
-//     this->parentLink->SetEnabled(true);
-// 
-//   dJointSetHingeAxis(this->jointId, _axis.x, _axis.y, _axis.z);
+  rotHinge->setAxis(Eigen::Vector3d(_axis.x, _axis.y, _axis.z));
 }
 
 //////////////////////////////////////////////////
@@ -234,6 +208,7 @@ void RTQL8HingeJoint::SetDamping(int /*index*/, double /*_damping*/)
 {
 //   this->damping_coefficient = _damping;
 //   dJointSetDamping(this->jointId, this->damping_coefficient);
+  gzerr << "RTQL8HingeJoint::SetDamping(...): Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -248,6 +223,7 @@ math::Angle RTQL8HingeJoint::GetAngleImpl(int /*index*/) const
 {
    math::Angle result;
 
+   // TODO: need test
    assert(this->rtql8Joint);
    assert(this->rtql8Joint->getNumDofs() == 1);
 
@@ -267,6 +243,7 @@ double RTQL8HingeJoint::GetVelocity(int /*index*/) const
 //   double result = dJointGetHingeAngleRate(this->jointId);
 // 
 //   return result;
+  gzerr << "RTQL8HingeJoint::GetVelocity(...): Not implemented...\n";
   return 0;
 }
 
@@ -274,19 +251,22 @@ double RTQL8HingeJoint::GetVelocity(int /*index*/) const
 void RTQL8HingeJoint::SetVelocity(int /*index*/, double /*_angle*/)
 {
 //   this->SetParam(dParamVel, _angle);
+  gzerr << "RTQL8HingeJoint::SetVelocity(...): Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
 void RTQL8HingeJoint::SetMaxForce(int /*index*/, double /*_t*/)
 {
 //   return this->SetParam(dParamFMax, _t);
+  gzerr << "RTQL8HingeJoint::SetMaxForce(...): Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
 double RTQL8HingeJoint::GetMaxForce(int /*index*/)
 {
 //   return this->GetParam(dParamFMax);
-    return 0.0;
+  gzerr << "RTQL8HingeJoint::GetMaxForce(...): Not implemented...\n";
+  return 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -297,6 +277,7 @@ void RTQL8HingeJoint::SetForce(int /*index*/, double /*_torque*/)
 //   if (this->parentLink)
 //     this->parentLink->SetEnabled(true);
 //   dJointAddHingeTorque(this->jointId, _torque);
+  gzerr << "RTQL8HingeJoint::SetForce(...): Not implemented...\n";
 }
 
 //////////////////////////////////////////////////

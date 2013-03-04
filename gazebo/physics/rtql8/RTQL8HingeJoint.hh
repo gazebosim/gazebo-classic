@@ -82,6 +82,9 @@ namespace gazebo
 
       // Documentation inherited
       //public: virtual void SetParam(int _parameter, double _value);
+
+      /// \brief
+      private: rtql8::kinematics::TrfmRotateAxis1* rotHinge;
     };
   }
 }
