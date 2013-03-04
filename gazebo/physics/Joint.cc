@@ -428,9 +428,9 @@ void Joint::SetForce(int _index, double _force)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetForce(int _index)
+double Joint::GetForce(unsigned int _index)
 {
-  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
     return this->forceApplied[_index];
   }
@@ -440,6 +440,12 @@ double Joint::GetForce(int _index)
           << "] when trying to get force\n";
     return 0;
   }
+}
+
+//////////////////////////////////////////////////
+double Joint::GetForce(int _index)
+{
+  return this->GetForce(static_cast<unsigned int>(_index));
 }
 
 //////////////////////////////////////////////////
@@ -507,7 +513,7 @@ void Joint::ComputeInertiaRatio()
 //////////////////////////////////////////////////
 double Joint::GetInertiaRatio(unsigned int _index) const
 {
-  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
     return this->inertiaRatio[_index];
   }
