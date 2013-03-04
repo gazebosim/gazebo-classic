@@ -6,7 +6,12 @@
 //#include <rtql8/integration/Integrator.h>
 
 #include <rtql8/kinematics/BodyNode.h>
+#include <rtql8/kinematics/Dof.h>
 #include <rtql8/kinematics/Joint.h>
+#include <rtql8/kinematics/Shape.h>
+#include <rtql8/kinematics/ShapeCube.h>
+#include <rtql8/kinematics/ShapeEllipsoid.h>
+#include <rtql8/kinematics/ShapeMesh.h>
 #include <rtql8/kinematics/Transformation.h>
 #include <rtql8/kinematics/TrfmRotateEuler.h>
 #include <rtql8/kinematics/TrfmRotateExpmap.h>

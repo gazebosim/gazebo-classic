@@ -26,6 +26,7 @@
 #include "gazebo/physics/rtql8/RTQL8Physics.hh"
 #include "gazebo/physics/rtql8/RTQL8Model.hh"
 #include "gazebo/physics/rtql8/RTQL8Link.hh"
+#include "gazebo/physics/rtql8/RTQL8Joint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -46,18 +47,44 @@ RTQL8Link::~RTQL8Link()
 
 void RTQL8Link::Load(sdf::ElementPtr _sdf)
 {
-  // TODO: (JS in test)
-  this->rtql8Physics = boost::shared_dynamic_cast<RTQL8Physics>(
-      this->GetWorld()->GetPhysicsEngine());
-
-  if (this->rtql8Physics == NULL)
+  if (this->GetRTQL8Physics() == NULL)
     gzthrow("Not using the rtql8 physics engine");
 
   Link::Load(_sdf);
 
   // Create rtql8's body node according to gazebo's link.
-  this->rtql8BodyNode = new rtql8::kinematics::BodyNode();
+  this->rtql8BodyNode = this->GetRTQL8Model()->GetSkeletonDynamics()->createBodyNode();
 
+  // Add rtql8's body node to rtql8's skeleton.
+  GetRTQL8Model()->GetSkeletonDynamics()->addNode(rtql8BodyNode, false);
+}
+
+//////////////////////////////////////////////////
+void RTQL8Link::Init()
+{
+  //----------------------------------------------------------------------------
+  Link::Init();
+
+  //----------------------------------------------------------------------------
+  // TODO: need to do something here.
+  rtql8::kinematics::ShapeCube* shape
+          = new rtql8::kinematics::ShapeCube(Eigen::Vector3d(1, 1, 1), 1);
+  this->rtql8BodyNode->setShape(shape);
+
+  //----------------------------------------------------------------------------
+  // TODO: need test
+  math::Vector3 cog = this->inertial->GetCoG();
+  math::Pose poseJointToChildLink
+      = this->rtql8ParentJoint->GetPose_JointToChildLink();
+
+  Eigen::Vector3d rtql8COMLocal(poseJointToChildLink.pos.x + cog.x,
+                                poseJointToChildLink.pos.y + cog.y,
+                                poseJointToChildLink.pos.z + cog.z);
+
+  this->rtql8BodyNode->setLocalCOM(rtql8COMLocal);
+
+  //----------------------------------------------------------------------------
+  // Gazebo's Link Pose -->> RTQL8's BodyNode Transform
   // Set rtql8's body node transformation from gazebo's link pose.
   math::Pose worldPose = this->GetWorldPose();
   Eigen::Matrix4d newTrfm;
@@ -70,23 +97,6 @@ void RTQL8Link::Load(sdf::ElementPtr _sdf)
   newTrfm(2, 3) = worldPose.pos.z;
   newTrfm(3, 3) = 1.0;
   this->rtql8BodyNode->setWorldTransform(newTrfm);
-
-  // Add rtql8's body node to rtql8's skeleton.
-  RTQL8ModelPtr rtql8Model
-      = boost::shared_dynamic_cast<RTQL8Model>(this->GetModel());
-  rtql8Model->GetSkeletonDynamics()->addNode(rtql8BodyNode, false);
-}
-
-//////////////////////////////////////////////////
-void RTQL8Link::Init()
-{
-  Link::Init();
-
-  // TODO:
-  math::Pose worldPose = this->GetWorldPose();
-
-  // Set pose
-  rtql8BodyNode;
 }
 
 //////////////////////////////////////////////////
@@ -483,13 +493,34 @@ void RTQL8Link::updateDirtyPoseFromRTQL8Transformation()
 }
 
 
+//////////////////////////////////////////////////
+RTQL8PhysicsPtr RTQL8Link::GetRTQL8Physics(void) const {
+  return boost::shared_dynamic_cast<RTQL8Physics>(this->GetWorld()->GetPhysicsEngine());
+}
 
+//////////////////////////////////////////////////
+rtql8::simulation::World* RTQL8Link::GetRTQL8World(void) const
+{
+  return GetRTQL8Physics()->GetRTQL8World();
+}
 
+//////////////////////////////////////////////////
+RTQL8ModelPtr RTQL8Link::GetRTQL8Model() const
+{
+  return boost::shared_dynamic_cast<RTQL8Model>(this->GetModel());
+}
 
+//////////////////////////////////////////////////
+void RTQL8Link::SetRTQL8ParentJoint(RTQL8JointPtr _rtql8ParentJoint)
+{
+  rtql8ParentJoint = _rtql8ParentJoint;
+}
 
-
-
-
+//////////////////////////////////////////////////
+void RTQL8Link::AddRTQL8ChildJoint(RTQL8JointPtr _rtql8ChildJoint)
+{
+  rtql8ChildJoints.push_back(_rtql8ChildJoint);
+}
 
 
 

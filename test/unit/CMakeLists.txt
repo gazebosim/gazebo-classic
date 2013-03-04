@@ -44,6 +44,7 @@ target_link_libraries(${BINARY_NAME}
     gazebo_sdf_interface
     gazebo_transport
     gazebo_physics
+    gazebo_physics_rtql8
     gazebo_sensors
     gazebo_rendering
     gazebo_msgs

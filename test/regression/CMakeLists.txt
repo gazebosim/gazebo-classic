@@ -40,7 +40,7 @@ set (gtest_sources
   math.cc
   msgs.cc
   physics.cc
-  #physics_rtql8.cc
+  physics_rtql8.cc
   pioneer2dx.cc
   pr2.cc
   projector.cc
@@ -68,6 +68,7 @@ target_link_libraries(${BINARY_NAME}
     gazebo_sdf_interface
     gazebo_transport
     gazebo_physics
+    gazebo_physics_rtql8
     gazebo_sensors
     gazebo_rendering
     gazebo_msgs

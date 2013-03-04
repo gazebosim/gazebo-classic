@@ -55,7 +55,7 @@ namespace gazebo
       }
 
       // Documentation inherited
-      public: virtual void SetAltitude(const math::Vector3 &_pos)
+      public: virtual void SetAltitude(const math::Vector3 &/*_pos*/)
       {
 //         PlaneShape::SetAltitude(_pos);
 //         RTQL8CollisionPtr odeParent;

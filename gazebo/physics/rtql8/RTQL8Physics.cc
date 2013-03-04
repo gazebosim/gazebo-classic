@@ -148,9 +148,18 @@ void RTQL8Physics::UpdatePhysics()
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
     //this->physicsUpdateMutex->lock();
 
+    std::vector<Eigen::VectorXd> dofs = this->rtql8World->getDofs();
+    Eigen::VectorXd FirstDof = dofs[0];
+    double state = FirstDof[0];
+
     //common::Time currTime =  this->world->GetRealTime();
-    //this->rtql8World->updatePhysics();
-    this->rtql8World->updateKinematics();
+    this->rtql8World->updatePhysics();
+
+    dofs = this->rtql8World->getDofs();
+    FirstDof = dofs[0];
+    state = FirstDof[0];
+    //gzerr << (this->rtql8World->getDofs().at(0))[0];
+    //this->rtql8World->updateKinematics();
     //this->lastUpdateTime = currTime;
 
     // Update all the transformation of RTQL8's links to gazebo's links
@@ -158,15 +167,15 @@ void RTQL8Physics::UpdatePhysics()
     unsigned int modelCount = this->world->GetModelCount();
     ModelPtr modelItr;
 
-    for (int i = 0; i < modelCount; ++i)
+    for (unsigned int i = 0; i < modelCount; ++i)
     {
       modelItr = this->world->GetModel(i);
       // TODO: need to improve speed
       Link_V links = modelItr->GetLinks();
-      unsigned int linkCound = links.size();
+      unsigned int linkCount = links.size();
       RTQL8LinkPtr rtql8LinkItr;
 
-      for (int j = 0; j < linkCound; ++j)
+      for (unsigned int j = 0; j < linkCount; ++j)
       {
         rtql8LinkItr
             = boost::shared_dynamic_cast<RTQL8Link>(links.at(j));
@@ -376,7 +385,7 @@ void RTQL8Physics::OnRequest(ConstRequestPtr &_msg)
   }
 }
 
-void RTQL8Physics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
+void RTQL8Physics::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
 {
 //  if (_msg->has_dt())
 //  {

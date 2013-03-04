@@ -37,7 +37,7 @@ namespace gazebo
       public: virtual ~RTQL8CylinderShape() {}
 
       // Documentation inerited.
-      public: void SetSize(double _radius, double _length)
+      public: void SetSize(double /*_radius*/, double /*_length*/)
       {
 //         CylinderShape::SetSize(_radius, _length);
 //         RTQL8CollisionPtr oParent;

@@ -38,7 +38,7 @@ namespace gazebo
       public: virtual ~RTQL8SphereShape() {}
 
       // Documentation inherited.
-      public: virtual void SetRadius(double _radius)
+      public: virtual void SetRadius(double /*_radius*/)
       {
 //         SphereShape::SetRadius(_radius);
 //         RTQL8CollisionPtr oParent;

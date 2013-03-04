@@ -21,8 +21,9 @@
 #include <boost/any.hpp>
 #include <string>
 
-#include "gazebo/physics/rtql8/RTQL8Physics.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/rtql8/RTQL8Physics.hh"
 
 namespace gazebo
 {
@@ -87,6 +88,24 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(int _index);
+
+      /// \brief
+      public: math::Pose GetPose_ParentLinkToJoint() const
+      {
+        return poseParentLinkToJoint;
+      }
+
+      /// \brief
+      public: math::Pose GetPose_JointToChildLink() const
+      {
+        return poseJointToChildLink;
+      }
+
+      /// \brief
+      protected: math::Pose poseParentLinkToJoint;
+
+      /// \brief
+      protected: math::Pose poseJointToChildLink;
     };
   }
 }

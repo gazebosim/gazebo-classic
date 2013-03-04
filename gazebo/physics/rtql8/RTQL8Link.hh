@@ -144,11 +144,31 @@ namespace gazebo
       public: rtql8::kinematics::BodyNode* GetBodyNode() const {return rtql8BodyNode;}
 
       /// \brief
+      public: RTQL8PhysicsPtr GetRTQL8Physics(void) const;
+
+      /// \brief
+      public: rtql8::simulation::World* GetRTQL8World(void) const;
+
+      /// \brief
+      public: RTQL8ModelPtr GetRTQL8Model() const;
+
+      /// \brief
+      public: void SetRTQL8ParentJoint(RTQL8JointPtr _rtql8ParentJoint);
+
+      /// \brief
+      public: void AddRTQL8ChildJoint(RTQL8JointPtr _rtql8ChildJoint);
+
+      /// \brief
       private: rtql8::kinematics::BodyNode* rtql8BodyNode;
 	  
       /// \brief
-      private: RTQL8PhysicsPtr rtql8Physics;
+      //private: RTQL8PhysicsPtr rtql8Physics;
 
+      /// \brief
+      private: RTQL8JointPtr rtql8ParentJoint;
+
+      /// \brief
+      private: std::vector<RTQL8JointPtr> rtql8ChildJoints;
     };
     /// \}
   }

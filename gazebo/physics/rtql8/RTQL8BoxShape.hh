@@ -42,7 +42,7 @@ namespace gazebo
       public: virtual ~RTQL8BoxShape() {}
 
       // Documentation inherited.
-      public: virtual void SetSize(const math::Vector3 &_size)
+      public: virtual void SetSize(const math::Vector3 &/*_size*/)
       {
 //         BoxShape::SetSize(_size);
 // 
