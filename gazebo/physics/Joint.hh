@@ -356,8 +356,10 @@ namespace gazebo
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);
 
-      /// \brief Accessor to inertia ratio across this joint
-      public: double GetInertiaRatio(int _index) const;
+      /// \brief Accessor to inertia ratio across this joint.
+      /// \param[in] _index Joint axis index.
+      /// \return returns the inertia ratio across specified joint axis.
+      public: double GetInertiaRatio(unsigned int _index) const;
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.

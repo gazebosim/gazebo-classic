@@ -467,6 +467,10 @@ void Joint::ComputeInertiaRatio()
        ci->GetIXX(), ci->GetIXY(), ci->GetIXZ(),
        ci->GetIXY(), ci->GetIYY(), ci->GetIYZ(),
        ci->GetIXZ(), ci->GetIYZ(), ci->GetIZZ());
+
+      // rotate pm and cm into inertia frame
+     
+
       // matrix times axis
       // \todo: add operator in Matrix3 class so we can do Matrix3 * Vector3
       math::Vector3 pia(
@@ -490,9 +494,9 @@ void Joint::ComputeInertiaRatio()
 }
 
 //////////////////////////////////////////////////
-double Joint::GetInertiaRatio(int _index) const
+double Joint::GetInertiaRatio(unsigned int _index) const
 {
-  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
   {
     return this->inertiaRatio[_index];
   }
