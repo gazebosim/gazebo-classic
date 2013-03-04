@@ -139,7 +139,7 @@ namespace gazebo
 
       public: virtual void DebugPrint() const;
 
-      private: void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep);
+      //private: void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep);
 
       private: static bool ContactCallback(btManifoldPoint &_cp,
         const btCollisionObjectWrapper *_obj0, int _partId0,
