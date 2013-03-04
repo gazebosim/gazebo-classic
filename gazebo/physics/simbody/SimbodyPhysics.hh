@@ -175,29 +175,7 @@ namespace gazebo
         return SimbodyPhysics::GetTypeString(physics::Base::EntityType(_type));
       }
 
-      public: static std::string GetTypeString(physics::Base::EntityType _type)
-      {
-        if (!(_type & physics::Base::JOINT))
-          gzerr << "Not a joint type\n";
-        switch (_type)
-        {
-          case physics::Base::BALL_JOINT:
-            return "ball";
-          case physics::Base::HINGE2_JOINT:
-            return "revolute2";
-          case physics::Base::HINGE_JOINT:
-            return "revolute";
-          case physics::Base::SLIDER_JOINT:
-            return "prismatic";
-          case physics::Base::SCREW_JOINT:
-            return "screw";
-          case physics::Base::UNIVERSAL_JOINT:
-            return "universal";
-          default:
-            gzerr << "Unrecognized joint type\n";
-            return "UNRECOGNIZED";
-        }
-      }
+      public: static std::string GetTypeString(physics::Base::EntityType _type);
 
       /// \brief Helper functions
       private: void CreateMultibodyGraph(

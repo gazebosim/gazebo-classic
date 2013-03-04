@@ -108,13 +108,6 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
   sdf::ElementPtr simbodyElem = this->sdf->GetElement("simbody");
 
   this->stepTimeDouble = simbodyElem->GetElement("dt")->GetValueDouble();
-
-  math::Vector3 g = this->sdf->GetValueVector3("gravity");
-
-
-  // set gravity
-  SimTK::Force::UniformGravity(this->forces, this->matter,
-    SimTK::Vec3(g.x, g.y, g.z));
 }
 
 //////////////////////////////////////////////////
@@ -129,6 +122,7 @@ void SimbodyPhysics::Init()
 
     //------------------------ CREATE SIMBODY SYSTEM ---------------------------
     // Create a Simbody System and populate it with Subsystems we'll need.
+    gzerr << this->GetGravity() << "\n";
     SimbodyPhysics::BuildSimbodySystem(mbgraph, this->GetGravity(),
                        this->system, this->matter, this->forces, this->contact);
 
@@ -136,18 +130,7 @@ void SimbodyPhysics::Init()
       gzthrow(std::string("Simbody build EXCEPTION: ") + e.what());
   }
 
-
-  // add pendulum body
-  // default pin joint has axis in the +z direction,
-  // rotate to get pin in x direction
-  const SimTK::Rotation ZtoY( -SimTK::Pi/2, SimTK::XAxis);
-  SimTK::Body::Rigid pendulumBody(MassProperties(1.0, Vec3(-1, 0, 0), UnitInertia::pointMassAt(Vec3(-1,0,0))));
-  SimTK::MobilizedBody::Pin pendulum(matter.Ground(), Transform(ZtoY, Vec3(0, 0, 0)), 
-                                pendulumBody,    Transform(ZtoY, Vec3(1, 0, 0)));
-
   SimTK::State state = this->system.realizeTopology();
-
-  // pendulum.setAngle(state, Pi/4);
 
   this->integ->initialize(state);
 }
@@ -183,6 +166,28 @@ void SimbodyPhysics::UpdatePhysics()
         << "] t [" << this->world->GetSimTime().Double()
         << "]\n";
 
+  physics::Model_V models = this->world->GetModels();
+  for (physics::Model_V::iterator mi = models.begin();
+       mi != models.end(); ++mi)
+  {
+    physics::Link_V links = (*mi)->GetLinks();
+    for (physics::Link_V::iterator li = links.begin();
+         li != links.end(); ++li)
+    {
+      gzerr << "link: " << (*li)->GetName() << "\n";
+    }
+
+    // Step 3: Tell it about all the joints we read from the input file,
+    // and provide a reference pointer.
+    physics::Joint_V joints = (*mi)->GetJoints();
+    for (physics::Joint_V::iterator ji = joints.begin();
+         ji != joints.end(); ++ji)
+    {
+      gzerr << "joint: " << (*ji)->GetName() << "\n";
+    }
+  }
+
+  
   ModelPtr model = this->world->GetModel("model1");
   LinkPtr link = model->GetLink("link1");
 
@@ -192,6 +197,7 @@ void SimbodyPhysics::UpdatePhysics()
   link->SetWorldPose(math::Pose(
     math::Vector3(0, 0, s.getQ()[0]),
     math::Quaternion(0, 0, 0)));
+
   // set link pose
   this->world->dirtyPoses.push_back(
     boost::shared_static_cast<physics::Entity>(link).get());
@@ -352,6 +358,9 @@ void SimbodyPhysics::CreateMultibodyGraph(SimTK::MultibodyGraphMaker&   mbgraph)
 
   // Step 2: Tell it about all the links we read from the input file, 
   // starting with world, and provide a reference pointer.
+  mbgraph.addBody("world", SimTK::Infinity,
+                  false);
+
   physics::Model_V models = this->world->GetModels();
   for (physics::Model_V::iterator mi = models.begin();
        mi != models.end(); ++mi)
@@ -376,9 +385,14 @@ void SimbodyPhysics::CreateMultibodyGraph(SimTK::MultibodyGraphMaker&   mbgraph)
     {
       SimbodyJointPtr simbodyJoint = boost::shared_dynamic_cast<SimbodyJoint>(*ji);
       if (simbodyJoint)
-        mbgraph.addJoint((*ji)->GetName(), GetTypeString((*ji)->GetType()),
-           (*ji)->GetParent()->GetName(), (*ji)->GetChild()->GetName(),
-                            simbodyJoint->mustBreakLoopHere, simbodyJoint.get());
+        if ((*ji)->GetParent())
+          mbgraph.addJoint((*ji)->GetName(), GetTypeString((*ji)->GetType()),
+             (*ji)->GetParent()->GetName(), (*ji)->GetChild()->GetName(),
+                              simbodyJoint->mustBreakLoopHere, simbodyJoint.get());
+        else
+          mbgraph.addJoint((*ji)->GetName(), GetTypeString((*ji)->GetType()),
+             "world", (*ji)->GetChild()->GetName(),
+                              simbodyJoint->mustBreakLoopHere, simbodyJoint.get());
       else
         gzerr << "simbodyJoint [" << (*ji)->GetName() << "]is not a SimbodyJointPtr\n";
     }
@@ -402,7 +416,7 @@ void SimbodyPhysics::CreateMultibodyGraph(SimTK::MultibodyGraphMaker&   mbgraph)
 // would not be needed in Gazebo since it does its own visualization.
 void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& _mbgraph,
                                const math::Vector3&       _gravity,
-                               SimTK::MultibodySystem&           _mbs,
+                               SimTK::MultibodySystem&           /*_mbs*/,
                                SimTK::SimbodyMatterSubsystem&    _matter,
                                SimTK::GeneralForceSubsystem&     _forces,
                                SimTK::CompliantContactSubsystem& _contact) 
@@ -462,6 +476,8 @@ void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& _mbgra
     // This will reference the new mobilized body once we create it.
     MobilizedBody mobod; 
 
+    MobilizedBody parentMobod = gzInb == NULL ? _matter.Ground() : gzInb->masterMobod;
+
     if (mob.isAddedBaseMobilizer()) {
         // There is no corresponding Gazebo joint for this mobilizer.
         // Create the joint and set its default position to be the default
@@ -469,7 +485,7 @@ void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& _mbgra
         assert(type=="free"); // May add more types later
         if (type == "free") {
             MobilizedBody::Free freeJoint(
-                gzInb->masterMobod,  Transform(),
+                parentMobod,  Transform(),
                 massProps,    Transform());
 
             SimTK::Transform inboard_X_ML =
@@ -497,7 +513,7 @@ void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& _mbgra
 
         if (type == "free") {
             MobilizedBody::Free freeJoint(
-                gzInb->masterMobod,  X_IF0,
+                parentMobod,  X_IF0,
                 massProps,          X_OM0, 
                 direction);
             Transform defX_FM = isReversed ? Transform(~gzJoint->defX_AB)
@@ -511,7 +527,7 @@ void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& _mbgra
             Transform X_IF(X_IF0.R()*R_JZ, X_IF0.p());
             Transform X_OM(X_OM0.R()*R_JZ, X_OM0.p());
             MobilizedBody::Pin pinJoint(
-                gzInb->masterMobod,      X_IF,
+                parentMobod,      X_IF,
                 massProps,              X_OM, 
                 direction);
             mobod = pinJoint;
@@ -528,7 +544,7 @@ void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& _mbgra
             Transform X_IF(X_IF0.R()*R_JX, X_IF0.p());
             Transform X_OM(X_OM0.R()*R_JX, X_OM0.p());
             MobilizedBody::Slider sliderJoint(
-                gzInb->masterMobod,      X_IF,
+                parentMobod,      X_IF,
                 massProps,              X_OM, 
                 direction);
             mobod = sliderJoint;
@@ -540,7 +556,7 @@ void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& _mbgra
             #endif
         } else if (type == "ball") {
             MobilizedBody::Ball ballJoint(
-                gzInb->masterMobod,  X_IF0,
+                parentMobod,  X_IF0,
                 massProps,          X_OM0, 
                 direction);
             Rotation defR_FM = isReversed 
@@ -599,18 +615,20 @@ void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& _mbgra
     } */
 
     // COLLISION
-    for (Collision_V::iterator ci =  gzOutb->GetCollisions().begin();
-                               ci !=  gzOutb->GetCollisions().end(); ++ci)
+    Collision_V collisions =  gzOutb->GetCollisions();
+    for (Collision_V::iterator ci =  collisions.begin();
+                               ci !=  collisions.end(); ++ci)
     {
       Transform X_LC =
         SimbodyPhysics::Pose2Transform((*ci)->GetRelativePose());
 
-      switch ((*ci)->GetShapeType())
+      switch ((*ci)->GetShapeType() & (~physics::Entity::SHAPE))
       {
         case physics::Entity::SPHERE_SHAPE:
         {
-          double r =
-            (boost::shared_dynamic_cast<physics::SphereShape>(*ci))->GetRadius();
+          boost::shared_ptr<physics::SphereShape> s =
+            boost::shared_dynamic_cast<physics::SphereShape>((*ci)->GetShape());
+          double r = s->GetRadius();
           ContactSurface surface(ContactGeometry::Sphere(r), material);
           if (!gzOutb->GetSelfCollide())
               surface.joinClique(modelClique);
@@ -620,10 +638,10 @@ void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& _mbgra
 
         case physics::Entity::CYLINDER_SHAPE:
         {
-          double r =
-            (boost::shared_dynamic_cast<physics::CylinderShape>(*ci))->GetRadius();
-          double len =
-            (boost::shared_dynamic_cast<physics::CylinderShape>(*ci))->GetLength();
+          boost::shared_ptr<physics::CylinderShape> c =
+            boost::shared_dynamic_cast<physics::CylinderShape>((*ci)->GetShape());
+          double r = c->GetRadius();
+          double len = c->GetLength();
           Vec3 esz = Vec3(r,r,len/2); // Use ellipsoid instead
           ContactSurface surface(ContactGeometry::Ellipsoid(esz),
                                  material);
@@ -636,7 +654,7 @@ void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& _mbgra
         case physics::Entity::BOX_SHAPE:
         {
           Vec3 hsz = SimbodyPhysics::Vector3ToVec3(
-            (boost::shared_dynamic_cast<physics::BoxShape>(*ci))->GetSize())/2;
+            (boost::shared_dynamic_cast<physics::BoxShape>((*ci)->GetShape()))->GetSize())/2;
           ContactSurface surface(ContactGeometry::Ellipsoid(hsz),
                                  material);
           if (!gzOutb->GetSelfCollide())
@@ -700,5 +718,54 @@ void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& _mbgra
   } */
 }
 
+std::string SimbodyPhysics::GetTypeString(physics::Base::EntityType _type)
+{
+  if (!(_type & physics::Base::JOINT))
+    gzerr << "Not a joint type\n";
+
+/*
+  switch (_type)
+  {
+    case physics::Base::BALL_JOINT:
+      gzerr << "here\n";
+      return "ball";
+      break;
+    case physics::Base::HINGE2_JOINT:
+      return "revolute2";
+      break;
+    case physics::Base::HINGE_JOINT:
+      return "revolute";
+      break;
+    case physics::Base::SLIDER_JOINT:
+      return "prismatic";
+      break;
+    case physics::Base::SCREW_JOINT:
+      return "screw";
+      break;
+    case physics::Base::UNIVERSAL_JOINT:
+      return "universal";
+      break;
+    default:
+      gzerr << "Unrecognized joint type\n";
+      return "UNRECOGNIZED";
+  }
+*/ 
+  if (_type & physics::Base::BALL_JOINT)
+    return "ball";
+  else if (_type & physics::Base::HINGE2_JOINT)
+      return "revolute2";
+  else if (_type & physics::Base::HINGE_JOINT)
+      return "revolute";
+  else if (_type & physics::Base::SLIDER_JOINT)
+      return "prismatic";
+  else if (_type & physics::Base::SCREW_JOINT)
+      return "screw";
+  else if (_type & physics::Base::UNIVERSAL_JOINT)
+      return "universal";
+
+  gzerr << "Unrecognized joint type\n";
+  return "UNRECOGNIZED";
+
+}
 
 

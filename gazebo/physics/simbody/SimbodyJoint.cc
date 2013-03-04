@@ -34,7 +34,6 @@ using namespace physics;
 SimbodyJoint::SimbodyJoint(BasePtr _parent)
   : Joint(_parent)
 {
-  this->world = NULL;
   this->isReversed = false;
   this->mustBreakLoopHere = false;
 }
@@ -42,7 +41,6 @@ SimbodyJoint::SimbodyJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 SimbodyJoint::~SimbodyJoint()
 {
-  this->world = NULL;
 }
 
 //////////////////////////////////////////////////
