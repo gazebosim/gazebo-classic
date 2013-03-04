@@ -507,7 +507,7 @@ void Joint::ComputeInertiaRatio()
 //////////////////////////////////////////////////
 double Joint::GetInertiaRatio(unsigned int _index) const
 {
-  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
     return this->inertiaRatio[_index];
   }
