@@ -104,6 +104,13 @@ namespace gazebo
       /// \param[in] _threadPitch Thread pitch value.
       public: virtual void SetThreadPitch(int _index, double _threadPitch) = 0;
 
+      /// \brief Get screw joint thread pitch.
+      ///
+      /// This must be implemented in a child class
+      /// \param[in] _index Index of the axis.
+      /// \return _threadPitch Thread pitch value.
+      public: virtual double GetThreadPitch(int _index) = 0;
+
       /// \brief The anchor value is not used internally.
       protected: math::Vector3 fakeAnchor;
 

@@ -215,14 +215,20 @@ namespace gazebo
                                       const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
+      /// This function is deprecated, use GetUpperLimit(unsigned int).
+      /// If you are interested in getting the value of dParamHiStop*,
+      /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the high stop value.
-      public: virtual math::Angle GetHighStop(int _index) = 0;
+      public: virtual math::Angle GetHighStop(int _index) GAZEBO_DEPRECATED = 0;
 
       /// \brief Get the low stop of an axis(index).
+      /// This function is deprecated, use GetLowerLimit(unsigned int).
+      /// If you are interested in getting the value of dParamHiStop*,
+      /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the low stop value.
-      public: virtual math::Angle GetLowStop(int _index) = 0;
+      public: virtual math::Angle GetLowStop(int _index) GAZEBO_DEPRECATED = 0;
 
       /// \brief Get the effort limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
@@ -345,6 +351,13 @@ namespace gazebo
       public: virtual void SetAttribute(const std::string &_key, int _index,
                                         const boost::any &_value) = 0;
 
+      /// \brief Get a non-generic parameter for the joint.
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _value Value of the attribute.
+      public: virtual double GetAttribute(const std::string &_key,
+                                               int _index) = 0;
+
       /// \brief Get the child link
       /// \return Pointer to the child link.
       public: LinkPtr GetChild() const;
@@ -356,6 +369,32 @@ namespace gazebo
       /// \brief Fill a joint message.
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);
+
+      /// \brief:  get the joint upper limit
+      /// (replaces GetLowStop and GetHighStop)
+      /// \param[in] _index Index of the axis.
+      /// \return Upper limit of the axis.
+      public: math::Angle GetLowerLimit(unsigned int _index) const
+        {
+          if (_index < this->GetAngleCount())
+            return this->lowerLimit[_index];
+
+          gzwarn << "requesting lower limit of joint index out of bound\n";
+          return math::Angle();
+        }
+
+      /// \brief:  get the joint lower limit
+      /// (replacee GetLowStop and GetHighStop)
+      /// \param[in] _index Index of the axis.
+      /// \return Upper limit of the axis.
+      public: math::Angle GetUpperLimit(unsigned int _index) const
+        {
+          if (_index < this->GetAngleCount())
+            return this->upperLimit[_index];
+
+          gzwarn << "requesting upper limit of joint index out of bound\n";
+          return math::Angle();
+        }
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
@@ -417,6 +456,15 @@ namespace gazebo
 
       /// \brief Store Joint velocity limit as specified in SDF
       protected: double velocityLimit[2];
+
+      /// \brief Store Joint position lower limit as specified in SDF
+      protected: math::Angle lowerLimit[2];
+
+      /// \brief Store Joint position upper limit as specified in SDF
+      protected: math::Angle upperLimit[2];
+
+      /// \brief option to use CFM damping
+      protected: bool useCFMDamping;
     };
     /// \}
   }

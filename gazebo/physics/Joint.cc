@@ -47,6 +47,7 @@ Joint::Joint(BasePtr _parent)
   this->effortLimit[1] = -1;
   this->velocityLimit[0] = -1;
   this->velocityLimit[1] = -1;
+  this->useCFMDamping = false;
 }
 
 //////////////////////////////////////////////////
@@ -160,12 +161,17 @@ void Joint::Init()
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
+      // store upper and lower joint limits
+      this->upperLimit[0] = limitElem->GetValueDouble("upper");
+      this->lowerLimit[0] = limitElem->GetValueDouble("lower");
+
       // Perform this three step ordering to ensure the
       // parameters are set properly.
       // This is taken from the ODE wiki.
-      this->SetHighStop(0, limitElem->GetValueDouble("upper"));
-      this->SetLowStop(0, limitElem->GetValueDouble("lower"));
-      this->SetHighStop(0, limitElem->GetValueDouble("upper"));
+      this->SetHighStop(0, this->upperLimit[0].Radian());
+      this->SetLowStop(0, this->lowerLimit[0].Radian());
+      this->SetHighStop(0, this->upperLimit[0].Radian());
+
       this->effortLimit[0] = limitElem->GetValueDouble("effort");
       this->velocityLimit[0] = limitElem->GetValueDouble("velocity");
     }
@@ -179,13 +185,17 @@ void Joint::Init()
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
+      // store upper and lower joint limits
+      this->upperLimit[1] = limitElem->GetValueDouble("upper");
+      this->lowerLimit[1] = limitElem->GetValueDouble("lower");
+
       // Perform this three step ordering to ensure the
       // parameters  are set properly.
       // This is taken from the ODE wiki.
-      limitElem = axisElem->GetElement("limit");
-      this->SetHighStop(1, limitElem->GetValueDouble("upper"));
-      this->SetLowStop(1, limitElem->GetValueDouble("lower"));
-      this->SetHighStop(1, limitElem->GetValueDouble("upper"));
+      this->SetHighStop(1, this->upperLimit[1].Radian());
+      this->SetLowStop(1, this->lowerLimit[1].Radian());
+      this->SetHighStop(1, this->upperLimit[1].Radian());
+
       this->effortLimit[1] = limitElem->GetValueDouble("effort");
       this->velocityLimit[1] = limitElem->GetValueDouble("velocity");
     }

@@ -388,6 +388,16 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
           else
             gazebo->provideFeedback = false;
       }
+      else if (childElem->ValueStr() == "cfmDamping")
+      {
+          std::string valueStr = this->GetKeyValueAsString(childElem);
+
+          if (lowerStr(valueStr) == "true" || lowerStr(valueStr) == "yes" ||
+              valueStr == "1")
+            gazebo->cfmDamping = true;
+          else
+            gazebo->cfmDamping = false;
+      }
       else
       {
           std::ostringstream stream;
@@ -564,6 +574,12 @@ void URDF2Gazebo::InsertGazeboExtensionJoint(TiXmlElement *_elem,
             this->AddKeyValue(physicsOde, "provide_feedback", "true");
         else
             this->AddKeyValue(physicsOde, "provide_feedback", "false");
+
+        // insert cfmDamping
+        if ((*ge)->cfmDamping)
+            this->AddKeyValue(physicsOde, "cfm_damping", "true");
+        else
+            this->AddKeyValue(physicsOde, "cfm_damping", "false");
 
         // insert fudgeFactor
         if ((*ge)->isFudgeFactor)

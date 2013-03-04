@@ -175,6 +175,13 @@ void BulletScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
 }
 
 //////////////////////////////////////////////////
+double BulletScrewJoint::GetThreadPitch(int /*_index*/)
+{
+  gzerr << "Not implemented\n";
+  return 0;
+}
+
+//////////////////////////////////////////////////
 void BulletScrewJoint::SetForce(int /*_index*/, double /*_force*/)
 {
   gzerr << "Not implemented\n";
