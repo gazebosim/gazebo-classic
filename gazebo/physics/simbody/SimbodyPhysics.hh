@@ -72,6 +72,10 @@ namespace gazebo
       /// \brief Finilize the Simbody engine
       public: virtual void Fini();
 
+      // Documentation inherited
+      public: virtual std::string GetType() const
+                      { return "simbody"; }
+
       /// \brief Set the simulation step time
       public: virtual void SetStepTime(double _value);
 
@@ -111,6 +115,9 @@ namespace gazebo
       public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);
 
       public: virtual void DebugPrint() const;
+
+      // Documentation inherited
+      public: virtual void SetSeed(uint32_t _seed);
 
       private: SimTK::MultibodySystem *dynamicsWorld;
 

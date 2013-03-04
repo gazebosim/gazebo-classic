@@ -68,6 +68,7 @@ set (headers
   SystemPaths.hh
   Time.hh
   Timer.hh
+  UpdateInfo.hh
   Video.hh
  )
 
@@ -83,7 +84,17 @@ set (headers
 endif()
 
 set (gtest_sources
+  Animation_TEST.cc
+  Color_TEST.cc
   Console_TEST.cc
+  Diagnostics_TEST.cc
+  Exception_TEST.cc
+  LogRecord_TEST.cc
+  Material_TEST.cc
+  Mesh_TEST.cc
+  Image_TEST.cc
+  SystemPaths_TEST.cc
+  Time_TEST.cc
 )
 gz_build_tests(${gtest_sources})
 

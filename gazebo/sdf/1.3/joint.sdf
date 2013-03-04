@@ -54,10 +54,10 @@
       <element name="upper" type="double" default="1e16" required="1">
         <description>An attribute specifying the upper joint limit (radians for revolute joints, meters for prismatic joints). Omit if joint is continuous.</description>
       </element>
-      <element name="effort" type="double" default="0" required="0">
-        <description>(not implemented) An attribute for enforcing the maximum joint effort.</description>
+      <element name="effort" type="double" default="-1" required="0">
+        <description>An attribute for enforcing the maximum joint effort applied by Joint::SetForce.  Limit is not enforced if value is negative.</description>
       </element>
-      <element name="velocity" type="double" default="0" required="0">
+      <element name="velocity" type="double" default="-1" required="0">
         <description>(not implemented) An attribute for enforcing the maximum joint velocity.</description>
       </element>
     </element> <!-- End Limit -->
@@ -86,10 +86,10 @@
       <element name="upper" type="double" default="1e16" required="0">
         <description>An attribute specifying the upper joint limit (radians for revolute joints, meters for prismatic joints). Omit if joint is continuous.</description>
       </element>
-      <element name="effort" type="double" default="0" required="0">
-        <description>(not implemented) An attribute for enforcing the maximum joint effort.</description>
+      <element name="effort" type="double" default="-1" required="0">
+        <description>An attribute for enforcing the maximum joint effort applied by Joint::SetForce.  Limit is not enforced if value is negative.</description>
       </element>
-      <element name="velocity" type="double" default="0" required="0">
+      <element name="velocity" type="double" default="-1" required="0">
         <description>(not implemented) An attribute for enforcing the maximum joint velocity.</description>
       </element>
     </element> <!-- End Limit -->

@@ -42,7 +42,7 @@ GZ_REGISTER_STATIC_SENSOR("depth", DepthCameraSensor)
 
 //////////////////////////////////////////////////
 DepthCameraSensor::DepthCameraSensor()
-    : Sensor()
+    : Sensor(sensors::IMAGE)
 {
 }
 

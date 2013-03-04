@@ -159,7 +159,8 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldLinearVel(
-  const math::Pose &/*_pose*/) const
+  const math::Vector3 &/*_offset*/,
+  const math::Quaternion &/*_q*/) const
 {
   return math::Vector3();
 }

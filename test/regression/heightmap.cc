@@ -30,9 +30,7 @@ class HeightmapTest : public ServerFixture
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, Heights)
 {
-  Load("worlds/heightmap.world");
-  physics::ModelPtr model = GetModel("heightmap");
-  EXPECT_TRUE(model);
+  Load("worlds/heightmap_test.world");
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -43,26 +41,28 @@ TEST_F(HeightmapTest, Heights)
   }
 
   // Make sure we can get a valid pointer to the scene.
-  rendering::ScenePtr scene = rendering::get_scene("default");
-  if (!scene)
-  {
-    gzthrow("Unable to get scene.");
-    return;
-  }
+  rendering::ScenePtr scene = GetScene();
+
+  rendering::Heightmap *heightmap = NULL;
 
   // Wait for the heightmap to get loaded by the scene.
   {
     int i = 0;
-    while (i < 20 && scene->GetHeightmap() == NULL)
+    while (i < 20 && (heightmap = scene->GetHeightmap()) == NULL)
     {
-      common::Time::MSleep(1000);
+      // Make sure to PreRender so that the Scene can process its messages
+      scene->PreRender();
+
+      common::Time::MSleep(100);
       i++;
     }
 
-    common::Time::MSleep(100);
     if (i >= 20)
       gzthrow("Unable to get heightmap");
   }
+
+  physics::ModelPtr model = GetModel("heightmap");
+  EXPECT_TRUE(model);
 
   physics::CollisionPtr collision =
     model->GetLink("link")->GetCollision("collision");
@@ -104,7 +104,7 @@ TEST_F(HeightmapTest, Heights)
 
       // The render test requires a point relative to the center of the
       // heightmap.
-      renderTest.push_back(scene->GetHeightmap()->GetHeight(xd, yd));
+      renderTest.push_back(heightmap->GetHeight(xd, yd));
 
       // Debug output
       if (fabs(physicsTest.back() - renderTest.back()) >= 0.13)

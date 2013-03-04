@@ -768,4 +768,8 @@ std::string SimbodyPhysics::GetTypeString(physics::Base::EntityType _type)
 
 }
 
-
+/////////////////////////////////////////////////
+void SimbodyPhysics::SetSeed(uint32_t /*_seed*/)
+{
+  gzerr << "SimbodyPhysics::SetSeed not implemented\n";
+}

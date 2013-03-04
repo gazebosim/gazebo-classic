@@ -69,12 +69,6 @@ void SimbodyScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetAngle(int /*_index*/) const
-{
-  return math::Angle();
-}
-
-//////////////////////////////////////////////////
 double SimbodyScrewJoint::GetVelocity(int /*_index*/) const
 {
   gzerr << "Not implemented in simbody\n";

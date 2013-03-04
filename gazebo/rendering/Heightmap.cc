@@ -22,6 +22,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Exception.hh"
 
@@ -40,6 +41,7 @@ using namespace rendering;
 Heightmap::Heightmap(ScenePtr _scene)
 {
   this->scene = _scene;
+  this->terrainGlobals = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -85,6 +87,9 @@ Ogre::TerrainGroup *Heightmap::GetOgreTerrain() const
 //////////////////////////////////////////////////
 void Heightmap::Load()
 {
+  if (this->terrainGlobals != NULL)
+    return;
+
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
 
   if (this->heightImage.GetWidth() != this->heightImage.GetHeight() ||
@@ -266,7 +271,7 @@ void Heightmap::DefineTerrain(int x, int y)
     this->terrainGroup->defineTerrain(x, y, &img);
     this->terrainsImported = true;
 
-    // delete [] data;
+    delete [] data;
   }
 }
 
@@ -324,6 +329,8 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
 /////////////////////////////////////////////////
 double Heightmap::GetHeight(double _x, double _y, double _z)
 {
+  GZ_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
+
   Ogre::TerrainGroup::RayResult result = this->terrainGroup->rayIntersects(
       Ogre::Ray(Ogre::Vector3(_x, _y, _z), Ogre::Vector3(0, 0, -1)));
 

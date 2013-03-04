@@ -14,33 +14,38 @@
  * limitations under the License.
  *
 */
-
 #include "ServerFixture.hh"
-#include "gazebo/common/LogRecord.hh"
 
 using namespace gazebo;
-class LogRecordTest : public ServerFixture
+class SpeedTest : public ServerFixture
 {
 };
 
-TEST_F(LogRecordTest, Init)
+
+TEST_F(SpeedTest, PR2World)
 {
-  EXPECT_TRUE(common::LogRecord::Instance()->Init("test"));
+  Load("worlds/empty.world");
+  double emptySpeed;
+  while ((emptySpeed = GetPercentRealTime()) == 0)
+    common::Time::MSleep(100);
+  common::Time::MSleep(2000);
+  emptySpeed = GetPercentRealTime();
 
-  common::LogRecord::Instance()->Stop();
-  common::LogRecord::Instance()->Stop();
+  // Load the pr2into the world
+  SpawnModel("model://pr2");
+  common::Time::MSleep(2000);
+  double loadedSpeed = GetPercentRealTime();
 
-  common::LogRecord::Instance()->Start();
-  common::LogRecord::Instance()->Start();
+  double speedRatio = loadedSpeed / emptySpeed;
 
-  common::LogRecord::Instance()->Stop();
-  common::LogRecord::Instance()->Start();
+  std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
+            << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
-
-  common::LogRecord::Instance()->Start();
-  common::LogRecord::Instance()->Stop();
-
-  common::LogRecord::Instance()->Stop();
+#ifdef BUILD_TYPE_RELEASE
+  EXPECT_GT(speedRatio, 0.5);
+#else
+  EXPECT_GT(speedRatio, 0.3);
+#endif
 }
 
 int main(int argc, char **argv)
