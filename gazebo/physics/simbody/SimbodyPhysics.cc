@@ -166,28 +166,6 @@ void SimbodyPhysics::UpdatePhysics()
         << "] t [" << this->world->GetSimTime().Double()
         << "]\n";
 
-  physics::Model_V models = this->world->GetModels();
-  for (physics::Model_V::iterator mi = models.begin();
-       mi != models.end(); ++mi)
-  {
-    physics::Link_V links = (*mi)->GetLinks();
-    for (physics::Link_V::iterator li = links.begin();
-         li != links.end(); ++li)
-    {
-      gzerr << "link: " << (*li)->GetName() << "\n";
-    }
-
-    // Step 3: Tell it about all the joints we read from the input file,
-    // and provide a reference pointer.
-    physics::Joint_V joints = (*mi)->GetJoints();
-    for (physics::Joint_V::iterator ji = joints.begin();
-         ji != joints.end(); ++ji)
-    {
-      gzerr << "joint: " << (*ji)->GetName() << "\n";
-    }
-  }
-
-  
   ModelPtr model = this->world->GetModel("model1");
   LinkPtr link = model->GetLink("link1");
 
@@ -372,7 +350,7 @@ void SimbodyPhysics::CreateMultibodyGraph(SimTK::MultibodyGraphMaker&   mbgraph)
       SimbodyLinkPtr simbodyLink = boost::shared_dynamic_cast<SimbodyLink>(*li);
       if (simbodyLink)
         mbgraph.addBody((*li)->GetName(), (*li)->GetInertial()->GetMass(),
-                        simbodyLink->mustBeBaseLink, simbodyLink.get());
+                        simbodyLink->mustBeBaseLink, (*li).get());
       else
         gzerr << "simbodyLink [" << (*li)->GetName() << "]is not a SimbodyLinkPtr\n";
     }
@@ -388,11 +366,11 @@ void SimbodyPhysics::CreateMultibodyGraph(SimTK::MultibodyGraphMaker&   mbgraph)
         if ((*ji)->GetParent())
           mbgraph.addJoint((*ji)->GetName(), GetTypeString((*ji)->GetType()),
              (*ji)->GetParent()->GetName(), (*ji)->GetChild()->GetName(),
-                              simbodyJoint->mustBreakLoopHere, simbodyJoint.get());
+                              simbodyJoint->mustBreakLoopHere, (*ji).get());
         else
           mbgraph.addJoint((*ji)->GetName(), GetTypeString((*ji)->GetType()),
              "world", (*ji)->GetChild()->GetName(),
-                              simbodyJoint->mustBreakLoopHere, simbodyJoint.get());
+                              simbodyJoint->mustBreakLoopHere, (*ji).get());
       else
         gzerr << "simbodyJoint [" << (*ji)->GetName() << "]is not a SimbodyJointPtr\n";
     }
@@ -467,8 +445,10 @@ void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& _mbgra
     // The outboard body may be slave, but its master body is one of the
     // Gazebo input links.
     const bool isSlave = mob.isSlaveMobilizer();
-    SimbodyLinkPtr gzInb((SimbodyLink*)mob.getInboardBodyRef());
-    SimbodyLinkPtr gzOutb((SimbodyLink*)mob.getOutboardMasterBodyRef());
+    // note: do not use boost shared pointer here, on scope out the
+    // original pointer get scrambled
+    SimbodyLink* gzInb = static_cast<SimbodyLink*>(mob.getInboardBodyRef());
+    SimbodyLink* gzOutb = static_cast<SimbodyLink*>(mob.getOutboardMasterBodyRef());
 
     const MassProperties massProps = 
         gzOutb->GetEffectiveMassProps(mob.getNumFragments());
@@ -499,7 +479,9 @@ void SimbodyPhysics::BuildSimbodySystem(const SimTK::MultibodyGraphMaker& _mbgra
         }
     } else {
         // This mobilizer does correspond to one of the input joints.
-        SimbodyJointPtr gzJoint((SimbodyJoint*)mob.getJointRef());
+        // note: do not use boost shared pointer here, on scope out the
+        // original pointer get scrambled
+        SimbodyJoint* gzJoint = static_cast<SimbodyJoint*>(mob.getJointRef());
         const bool isReversed = mob.isReversedFromJoint();
 
         // Find inboard and outboard frames for the mobilizer; these are
