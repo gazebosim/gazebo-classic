@@ -140,14 +140,36 @@ double ODEHingeJoint::GetMaxForce(int /*index*/)
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetForce(int _index, double _torque)
+void ODEHingeJoint::SetForce(int _index, double _effort)
 {
-  ODEJoint::SetForce(_index, _torque);
+  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
+  {
+    gzerr << "Calling ODEHingeJoint::SetForce with an index ["
+          << _index << "] out of range\n";
+    return;
+  }
+
+  // truncating SetForce effort if velocity limit reached.
+  if (this->velocityLimit[_index] >= 0)
+  {
+    if (this->GetVelocity(_index) > this->velocityLimit[_index])
+      _effort = _effort > 0 ? 0 : _effort;
+    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
+      _effort = _effort < 0 ? 0 : _effort;
+  }
+
+  // truncate effort if effortLimit is not negative
+  if (this->effortLimit[_index] >= 0)
+    _effort = math::clamp(_effort,
+      -this->effortLimit[_index], this->effortLimit[_index]);
+
+  ODEJoint::SetForce(_index, _effort);
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
-  dJointAddHingeTorque(this->jointId, _torque);
+
+  dJointAddHingeTorque(this->jointId, _effort);
 }
 
 //////////////////////////////////////////////////

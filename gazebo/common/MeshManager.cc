@@ -27,12 +27,16 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/ColladaLoader.hh"
 #include "gazebo/common/STLLoader.hh"
+#include "gazebo_config.h"
+
+#ifdef HAVE_GTS
+  #include "gazebo/common/MeshCSG.hh"
+#endif
 
 #include "gazebo/common/MeshManager.hh"
 
 using namespace gazebo;
 using namespace common;
-
 
 //////////////////////////////////////////////////
 MeshManager::MeshManager()
@@ -395,7 +399,7 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   };
 
   // Texture coords
-  float t[4][2] =
+  double t[4][2] =
   {
     {uvCoords.x, 0}, {0, 0}, {0, uvCoords.y}, {uvCoords.x, uvCoords.y}
   };
@@ -960,5 +964,17 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
   }
 }
 
+#ifdef HAVE_GTS
+//////////////////////////////////////////////////
+void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
+    const Mesh *_m2, int _operation, const math::Pose &_offset)
+{
+  if (this->HasMesh(_name))
+    return;
 
-
+  MeshCSG csg;
+  Mesh *mesh = csg.CreateBoolean(_m1, _m2, _operation, _offset);
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
+}
+#endif

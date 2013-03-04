@@ -43,7 +43,7 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 
 //////////////////////////////////////////////////
 CameraSensor::CameraSensor()
-    : Sensor()
+    : Sensor(sensors::IMAGE)
 {
 }
 

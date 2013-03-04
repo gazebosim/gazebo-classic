@@ -23,6 +23,7 @@
 #include "sdf/sdf.hh"
 
 #include "msgs/msgs.hh"
+#include "common/Assert.hh"
 #include "common/Events.hh"
 #include "common/Common.hh"
 
@@ -300,7 +301,11 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       sdf::ElementPtr elem =
         this->sdf->GetElement("material")->GetElement("script");
       elem->GetElement("name")->Set(_msg->material().script().name());
-      elem->GetElement("uri")->Set(_msg->material().script().uri());
+      for (int i = 0; i < _msg->material().script().uri_size(); ++i)
+      {
+        sdf::ElementPtr uriElem = elem->AddElement("uri");
+        uriElem->Set(_msg->material().script().uri(i));
+      }
     }
 
     if (_msg->material().has_ambient())
@@ -420,11 +425,19 @@ void Visual::Load()
     if (matElem->HasElement("script"))
     {
       sdf::ElementPtr scriptElem = matElem->GetElement("script");
-      std::string matUri = scriptElem->GetValueString("uri");
+      sdf::ElementPtr uriElem = scriptElem->GetElement("uri");
+
+      // Add all the URI paths to the render engine
+      while (uriElem)
+      {
+        std::string matUri = uriElem->GetValueString();
+        if (!matUri.empty())
+          RenderEngine::Instance()->AddResourcePath(matUri);
+        uriElem = uriElem->GetNextElement("uri");
+      }
+
       std::string matName = scriptElem->GetValueString("name");
 
-      if (!matUri.empty())
-        RenderEngine::Instance()->AddResourcePath(matUri);
       if (!matName.empty())
         this->SetMaterial(matName);
     }
@@ -1211,12 +1224,14 @@ void Visual::SetPosition(const math::Vector3 &_pos)
     this->staticGeom = NULL;
     // this->staticGeom->setOrigin(Ogre::Vector3(pos.x, pos.y, pos.z));
   }*/
+  GZ_ASSERT(this->sceneNode, "Visual SceneNode is NULL");
   this->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
 }
 
 //////////////////////////////////////////////////
 void Visual::SetRotation(const math::Quaternion &_rot)
 {
+  GZ_ASSERT(this->sceneNode, "Visual SceneNode is NULL");
   this->sceneNode->setOrientation(
       Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z));
 }
@@ -1753,7 +1768,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
   }
   catch(Ogre::Exception &e)
   {
-    gzerr << "Unable to insert mesh[" << e.getDescription() << std::endl;
+    gzerr << "Unable to insert mesh[" << e.getDescription() << "]" << std::endl;
   }
 }
 
@@ -1778,8 +1793,11 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   {
     if (_msg->material().has_script())
     {
-      RenderEngine::Instance()->AddResourcePath(
-          _msg->material().script().uri());
+      for (int i = 0; i < _msg->material().script().uri_size(); ++i)
+      {
+        RenderEngine::Instance()->AddResourcePath(
+            _msg->material().script().uri(i));
+      }
       this->SetMaterial(_msg->material().script().name());
     }
 
@@ -1931,7 +1949,17 @@ std::string Visual::GetMeshName() const
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
 
-      filename = common::find_file(tmpElem->GetValueString("uri"));
+      std::string uri = tmpElem->GetValueString("uri");
+      if (uri.empty())
+      {
+        gzerr << "<uri> element missing for geometry element:\n";
+        geomElem->PrintValues("  ");
+
+        return std::string();
+      }
+
+      filename = common::find_file(uri);
+
       if (filename == "__default__" || filename.empty())
         gzerr << "No mesh specified\n";
 

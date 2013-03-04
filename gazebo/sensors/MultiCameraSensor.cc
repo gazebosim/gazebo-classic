@@ -38,7 +38,7 @@ GZ_REGISTER_STATIC_SENSOR("multicamera", MultiCameraSensor)
 
 //////////////////////////////////////////////////
 MultiCameraSensor::MultiCameraSensor()
-    : Sensor()
+    : Sensor(sensors::IMAGE)
 {
 }
 
@@ -134,7 +134,10 @@ void MultiCameraSensor::Init()
     camera->SetWorldPose(cameraPose);
     camera->AttachToVisual(this->parentName, true);
 
-    this->cameras.push_back(camera);
+    {
+      boost::mutex::scoped_lock lock(this->cameraMutex);
+      this->cameras.push_back(camera);
+    }
 
     cameraSdf = cameraSdf->GetNextElement("camera");
   }
@@ -147,6 +150,8 @@ void MultiCameraSensor::Fini()
 {
   Sensor::Fini();
 
+  boost::mutex::scoped_lock lock(this->cameraMutex);
+
   for (std::vector<rendering::CameraPtr>::iterator iter =
       this->cameras.begin(); iter != this->cameras.end(); ++iter)
   {
@@ -158,6 +163,8 @@ void MultiCameraSensor::Fini()
 //////////////////////////////////////////////////
 rendering::CameraPtr MultiCameraSensor::GetCamera(unsigned int _index) const
 {
+  boost::mutex::scoped_lock lock(this->cameraMutex);
+
   if (_index < this->cameras.size())
     return this->cameras[_index];
   else
@@ -168,6 +175,8 @@ rendering::CameraPtr MultiCameraSensor::GetCamera(unsigned int _index) const
 //////////////////////////////////////////////////
 void MultiCameraSensor::UpdateImpl(bool /*_force*/)
 {
+  boost::mutex::scoped_lock lock(this->cameraMutex);
+
   if (this->cameras.size() == 0)
     return;
 
@@ -203,6 +212,13 @@ void MultiCameraSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
+unsigned int MultiCameraSensor::GetCameraCount() const
+{
+  boost::mutex::scoped_lock lock(this->cameraMutex);
+  return this->cameras.size();
+}
+
+//////////////////////////////////////////////////
 unsigned int MultiCameraSensor::GetImageWidth(unsigned int _index) const
 {
   return this->GetCamera(_index)->GetImageWidth();
@@ -225,6 +241,7 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
 {
   this->SetActive(true);
 
+  boost::mutex::scoped_lock lock(this->cameraMutex);
   if (_filenames.size() != this->cameras.size())
   {
     gzerr << "Filename count[" << _filenames.size() << "] does not match "
@@ -242,4 +259,10 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+bool MultiCameraSensor::IsActive()
+{
+  return Sensor::IsActive() || this->imagePub->HasConnections();
 }

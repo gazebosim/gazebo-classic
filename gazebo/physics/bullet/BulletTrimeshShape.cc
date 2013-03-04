@@ -92,7 +92,9 @@ void BulletTrimeshShape::Init()
     mTriMesh->addTriangle(bv0, bv1, bv2);
   }
 
-  bParent->SetCollisionShape(new btConvexTriangleMeshShape(mTriMesh, true));
+  btConvexShape* convexShape = new btConvexTriangleMeshShape(mTriMesh, true);
+  convexShape->setMargin(0.001f);
+  bParent->SetCollisionShape(convexShape);
 
   delete [] vertices;
   delete [] indices;

@@ -15,6 +15,7 @@
  *
  */
 #include "common/Color.hh"
+#include "common/Assert.hh"
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
@@ -124,6 +125,13 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
     const std::string &_type, const std::string &_defaultValue, bool _required,
     const std::string &_description)
 {
+  if (_type == "char")
+  {
+    boost::shared_ptr<ParamT<char> > param(
+        new ParamT<char>(_key, _defaultValue, _required, _type,
+                           _description));
+    return param;
+  }
   if (_type == "double")
   {
     boost::shared_ptr<ParamT<double> > param(
@@ -195,6 +203,13 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
   {
     boost::shared_ptr<ParamT<gazebo::math::Pose> > param(
         new ParamT<gazebo::math::Pose>(_key, _defaultValue, _required,
+                                       _type, _description));
+    return param;
+  }
+  else if (_type == "quaternion")
+  {
+    boost::shared_ptr<ParamT<gazebo::math::Quaternion> > param(
+        new ParamT<gazebo::math::Quaternion>(_key, _defaultValue, _required,
                                        _type, _description));
     return param;
   }
@@ -335,19 +350,22 @@ void Element::PrintDescription(std::string _prefix)
 }
 
 /////////////////////////////////////////////////
-void Element::PrintDocRightPane(std::string &_html, int _spacing)
+void Element::PrintDocRightPane(std::string &_html, int _spacing, int &_index)
 {
   std::ostringstream stream;
   ElementPtr_V::iterator eiter;
+
+  int start = _index++;
 
   std::string childHTML;
   for (eiter = this->elementDescriptions.begin();
       eiter != this->elementDescriptions.end(); ++eiter)
   {
-    (*eiter)->PrintDocRightPane(childHTML, _spacing + 4);
+    (*eiter)->PrintDocRightPane(childHTML, _spacing + 4, _index);
   }
 
-  stream << "<a name=\"" << this->name << "\">&lt" << this->name << "&gt</a>";
+  stream << "<a name=\"" << this->name << start
+         << "\">&lt" << this->name << "&gt</a>";
 
   stream << "<div style='padding-left:" << _spacing << "px;'>\n";
 
@@ -427,7 +445,8 @@ void Element::PrintDocLeftPane(std::string &_html, int _spacing, int &_index)
   }
 
   stream << "<a id='" << start << "' onclick='highlight(" << start
-         << ");' href=\"#" << this->name << "\">&lt" << this->name << "&gt</a>";
+         << ");' href=\"#" << this->name << start
+         << "\">&lt" << this->name << "&gt</a>";
 
   stream << "<div style='padding-left:" << _spacing << "px;'>\n";
 
@@ -745,7 +764,17 @@ bool Element::GetValueBool(const std::string &_key)
   bool result = false;
 
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+    {
+      this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a bool.\n";
+    }
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -758,6 +787,7 @@ bool Element::GetValueBool(const std::string &_key)
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
+
   return result;
 }
 
@@ -765,8 +795,19 @@ bool Element::GetValueBool(const std::string &_key)
 int Element::GetValueInt(const std::string &_key)
 {
   int result = 0;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+    {
+      this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as an int.\n";
+    }
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -786,8 +827,19 @@ int Element::GetValueInt(const std::string &_key)
 float Element::GetValueFloat(const std::string &_key)
 {
   float result = 0.0;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+    {
+      this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a float.\n";
+    }
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -807,12 +859,21 @@ float Element::GetValueFloat(const std::string &_key)
 double Element::GetValueDouble(const std::string &_key)
 {
   double result = 0.0;
+
   if (_key.empty())
   {
-    if (this->value->IsStr())
-      result = boost::lexical_cast<double>(this->value->GetAsString());
+    if (this->value)
+    {
+      if (this->value->IsStr())
+        result = boost::lexical_cast<double>(this->value->GetAsString());
+      else
+        this->value->Get(result);
+    }
     else
-      this->value->Get(result);
+    {
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a double.\n";
+    }
   }
   else
   {
@@ -835,10 +896,18 @@ unsigned int Element::GetValueUInt(const std::string &_key)
   unsigned int result = 0;
   if (_key.empty())
   {
-    if (this->value->IsStr())
-      result = boost::lexical_cast<unsigned int>(this->value->GetAsString());
+    if (this->value)
+    {
+      if (this->value->IsStr())
+        result = boost::lexical_cast<unsigned int>(this->value->GetAsString());
+      else
+        this->value->Get(result);
+    }
     else
-      this->value->Get(result);
+    {
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as an unsigned int.\n";
+    }
   }
   else
   {
@@ -859,12 +928,21 @@ unsigned int Element::GetValueUInt(const std::string &_key)
 char Element::GetValueChar(const std::string &_key)
 {
   char result = '\0';
+
   if (_key.empty())
   {
-    if (this->value->IsStr())
-      result = boost::lexical_cast<char>(this->value->GetAsString());
+    if (this->value)
+    {
+      if (this->value->IsStr())
+        result = boost::lexical_cast<char>(this->value->GetAsString());
+      else
+        this->value->Get(result);
+    }
     else
-      this->value->Get(result);
+    {
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a char.\n";
+    }
   }
   else
   {
@@ -885,8 +963,19 @@ char Element::GetValueChar(const std::string &_key)
 std::string Element::GetValueString(const std::string &_key)
 {
   std::string result = "";
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+    {
+      this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value, returning empty string.\n";
+    }
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -906,8 +995,19 @@ std::string Element::GetValueString(const std::string &_key)
 gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
 {
   gazebo::math::Vector3 result;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+    {
+      this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a vector3.\n";
+    }
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -927,8 +1027,19 @@ gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
 gazebo::math::Vector2d Element::GetValueVector2d(const std::string &_key)
 {
   gazebo::math::Vector2d result;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+    {
+      this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a vector2d.\n";
+    }
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -948,8 +1059,19 @@ gazebo::math::Vector2d Element::GetValueVector2d(const std::string &_key)
 gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
 {
   gazebo::math::Quaternion result;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+    {
+      this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a quaternion.\n";
+    }
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -969,8 +1091,19 @@ gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
 gazebo::math::Pose Element::GetValuePose(const std::string &_key)
 {
   gazebo::math::Pose result;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+    {
+      this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a pose.\n";
+    }
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -990,8 +1123,19 @@ gazebo::math::Pose Element::GetValuePose(const std::string &_key)
 gazebo::common::Color Element::GetValueColor(const std::string &_key)
 {
   gazebo::common::Color result;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+    {
+      this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a color.\n";
+    }
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -1011,8 +1155,19 @@ gazebo::common::Color Element::GetValueColor(const std::string &_key)
 gazebo::common::Time Element::GetValueTime(const std::string &_key)
 {
   gazebo::common::Time result;
+
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value)
+    {
+      this->value->Get(result);
+    }
+    else
+    {
+      gzwarn << "Parameter [" << this->GetName()
+             << "] has no value when attempting to get as a time.\n";
+    }
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -1026,6 +1181,39 @@ gazebo::common::Time Element::GetValueTime(const std::string &_key)
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
   return result;
+}
+
+/////////////////////////////////////////////////
+void Element::RemoveFromParent()
+{
+  if (this->parent)
+  {
+    ElementPtr_V::iterator iter;
+    iter = std::find(this->parent->elements.begin(),
+        this->parent->elements.end(), shared_from_this());
+
+    if (iter != this->parent->elements.end())
+    {
+      this->parent->elements.erase(iter);
+      this->parent.reset();
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void Element::RemoveChild(ElementPtr _child)
+{
+  GZ_ASSERT(_child, "Cannot remove a NULL child pointer");
+
+  ElementPtr_V::iterator iter;
+  iter = std::find(this->elements.begin(),
+                   this->elements.end(), _child);
+
+  if (iter != this->elements.end())
+  {
+    _child->SetParent(ElementPtr());
+    this->elements.erase(iter);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1048,6 +1236,9 @@ void Element::Update()
   {
     (*iter)->Update();
   }
+
+  if (this->value)
+    this->value->Update();
 }
 
 /////////////////////////////////////////////////
@@ -1297,7 +1488,8 @@ void SDF::PrintDoc()
   int index = 0;
   this->root->PrintDocLeftPane(html, 10, index);
 
-  this->root->PrintDocRightPane(html2, 10);
+  index = 0;
+  this->root->PrintDocRightPane(html2, 10, index);
 
   std::cout << "<!DOCTYPE HTML>\n"
   << "<html>\n"
@@ -1373,7 +1565,10 @@ void SDF::PrintDoc()
             << "<ul style='margin-left:12px'>"
             << "<li><b>&lt;uri&gt;</b>: URI of SDF model file to include.</li>"
             << "<li><b>&lt;name&gt;</b>: Name of the included SDF model.</li>"
-            << "<li><b>&lt;pose&gt;</b>: Pose of the included SDF model.</li>"
+            << "<li><b>&lt;pose&gt;</b>: Pose of the included SDF model, "
+            << "specified as &lt;pose&gt;x y z roll pitch yaw&lt;/pose&gt;, "
+            << "with x, y, and z representing a position in meters, and roll, "
+            << "pitch, and yaw representing Euler angles in radians.</li>"
             << "</ul>"
             << "</li>";
 

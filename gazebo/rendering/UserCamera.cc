@@ -21,11 +21,12 @@
 
 #include <sstream>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "common/Events.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Events.hh"
 
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -110,11 +111,11 @@ void UserCamera::Init()
   else if (RenderEngine::Instance()->GetRenderPathType() ==
            RenderEngine::FORWARD)
   {
-    this->SetClipDist(0.1, 5000);
+    this->SetClipDist(.1, 5000);
   }
   else
   {
-    this->SetClipDist(0.1, 5000);
+    this->SetClipDist(.1, 5000);
   }
 
   // Removing for now because the axis doesn't not move properly when the
@@ -196,20 +197,22 @@ void UserCamera::PostRender()
   {
     std::string path = elem->GetValueString("path");
 
+    std::string friendlyName = this->GetName();
+    boost::replace_all(friendlyName, "::", "_");
+
     char tmp[1024];
     if (!path.empty())
     {
       snprintf(tmp, sizeof(tmp), "%s/%s-%04d.jpg", path.c_str(),
-          this->name.c_str(), this->saveCount);
+          friendlyName.c_str(), this->saveCount);
     }
     else
     {
       snprintf(tmp, sizeof(tmp),
-          "%s-%04d.jpg", this->name.c_str(), this->saveCount);
+          "%s-%04d.jpg", friendlyName.c_str(), this->saveCount);
     }
 
-    // TODO: Use the window manager instead.
-    // this->window->writeContentsToFile(tmp);
+    this->viewport->getTarget()->writeContentsToFile(tmp);
 
     this->saveCount++;
   }
@@ -337,11 +340,15 @@ void UserCamera::SetViewController(const std::string &type,
 }
 
 //////////////////////////////////////////////////
-std::string UserCamera::GetViewControllerTypeString()
+unsigned int UserCamera::GetImageWidth() const
 {
-  if (this->viewController)
-    return this->viewController->GetTypeString();
-  return "";
+  return this->viewport->getActualWidth();
+}
+
+//////////////////////////////////////////////////
+unsigned int UserCamera::GetImageHeight() const
+{
+  return this->viewport->getActualHeight();
 }
 
 //////////////////////////////////////////////////
@@ -611,4 +618,11 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+std::string UserCamera::GetViewControllerTypeString()
+{
+  GZ_ASSERT(this->viewController, "ViewController != NULL");
+  return this->viewController->GetTypeString();
 }
