@@ -35,7 +35,6 @@ SimbodySliderJoint::SimbodySliderJoint(SimTK::MultibodySystem *_world,
                                        BasePtr _parent)
     : SliderJoint<SimbodyJoint>(_parent)
 {
-  this->world = _world;
 }
 
 //////////////////////////////////////////////////

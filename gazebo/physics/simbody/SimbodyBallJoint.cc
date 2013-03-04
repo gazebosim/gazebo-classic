@@ -34,7 +34,6 @@ SimbodyBallJoint::SimbodyBallJoint(SimTK::MultibodySystem *_world,
                                    BasePtr _parent)
     : BallJoint<SimbodyJoint>(_parent)
 {
-  this->world = _world;
 }
 
 //////////////////////////////////////////////////

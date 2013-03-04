@@ -44,8 +44,13 @@ Base::Base(BasePtr _parent)
   this->sdf.reset(new sdf::Element);
   this->sdf->AddAttribute("name", "string", "__default__", true);
 
+  // std::string n = this->GetName();
+  // gzerr << n << "\n";
+
   if (this->parent)
   {
+    // physics::BasePtr p = this->parent;
+    // gzerr << p->GetName() << "\n";
     this->world = this->parent->GetWorld();
   }
 }

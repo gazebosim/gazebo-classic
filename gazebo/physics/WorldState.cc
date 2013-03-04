@@ -43,6 +43,7 @@ WorldState::WorldState(const WorldPtr _world)
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
+    // gzerr << "pushing ModelState for " << (*iter)->GetName() << "\n";
     this->modelStates.push_back(ModelState(*iter));
   }
 }

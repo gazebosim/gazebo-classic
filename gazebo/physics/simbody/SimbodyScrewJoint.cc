@@ -35,7 +35,6 @@ SimbodyScrewJoint::SimbodyScrewJoint(SimTK::MultibodySystem *_world,
                                      BasePtr _parent)
     : ScrewJoint<SimbodyJoint>(_parent)
 {
-  this->world = _world;
 }
 
 //////////////////////////////////////////////////

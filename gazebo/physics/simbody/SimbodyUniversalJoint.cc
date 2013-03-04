@@ -32,7 +32,6 @@ using namespace physics;
 SimbodyUniversalJoint::SimbodyUniversalJoint(SimTK::MultibodySystem *_world,
   BasePtr _parent) : UniversalJoint<SimbodyJoint>(_parent)
 {
-  this->world = _world;
 }
 
 //////////////////////////////////////////////////
