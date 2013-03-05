@@ -41,6 +41,7 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->jointId = NULL;
   this->cfmDampingState[0] = ODEJoint::NONE;
   this->cfmDampingState[1] = ODEJoint::NONE;
+  this->dampingInitialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -370,10 +371,38 @@ void ODEJoint::SetAttribute(Attribute _attr, int _index, double _value)
       this->SetParam(dParamVel, _value);
       break;
     case HI_STOP:
-      this->SetParam(dParamHiStop, _value);
+      switch (_index)
+      {
+        case 0:
+          this->SetParam(dParamHiStop, _value);
+          break;
+        case 1:
+          this->SetParam(dParamHiStop2, _value);
+          break;
+        case 2:
+          this->SetParam(dParamHiStop3, _value);
+          break;
+        default:
+          gzerr << "Invalid index[" << _index << "]\n";
+          break;
+      };
       break;
     case LO_STOP:
-      this->SetParam(dParamLoStop, _value);
+      switch (_index)
+      {
+        case 0:
+          this->SetParam(dParamLoStop, _value);
+          break;
+        case 1:
+          this->SetParam(dParamLoStop2, _value);
+          break;
+        case 2:
+          this->SetParam(dParamLoStop3, _value);
+          break;
+        default:
+          gzerr << "Invalid index[" << _index << "]\n";
+          break;
+      };
       break;
     default:
       gzerr << "Unable to handle joint attribute[" << _attr << "]\n";
@@ -916,3 +945,23 @@ void ODEJoint::CFMDamping()
   }
 }
 
+//////////////////////////////////////////////////
+void ODEJoint::SetDamping(int _index, double _damping)
+{
+  this->dampingCoefficient = _damping;
+
+  // trigger an update in CFMDAmping if this is called
+  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+    this->cfmDampingState[i] = ODEJoint::NONE;
+
+  if (!this->dampingInitialized)
+  {
+    if (this->useCFMDamping)
+      this->applyDamping = physics::Joint::ConnectJointUpdate(
+        boost::bind(&ODEJoint::CFMDamping, this));
+    else
+      this->applyDamping = physics::Joint::ConnectJointUpdate(
+        boost::bind(&ODEJoint::ApplyDamping, this));
+    this->dampingInitialized = true;
+  }
+}
