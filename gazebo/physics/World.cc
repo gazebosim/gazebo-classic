@@ -713,7 +713,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     _sdf->PrintValues("  ");
   }
 
-  this->PublishModelPose(model->GetName());
+  this->PublishModelPose(model);
   return model;
 }
 
@@ -1706,31 +1706,24 @@ void World::ProcessMessages()
 {
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   msgs::Pose *poseMsg;
+  DIAG_TIMER_START("World::ProcessMessages");
 
   if (this->posePub && this->posePub->HasConnections() &&
       this->publishModelPoses.size() > 0)
   {
     msgs::Pose_V msg;
 
-    for (std::set<std::string>::iterator iter =
-         this->publishModelPoses.begin();
+    for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
          iter != this->publishModelPoses.end(); ++iter)
     {
-      ModelPtr model = this->GetModel(*iter);
-
-      // It's possible that the model was deleted somewhere along the line.
-      // So check to make sure we get a valid model pointer.
-      if (!model)
-        continue;
-
       poseMsg = msg.add_pose();
 
       // Publish the model's relative pose
-      poseMsg->set_name(model->GetScopedName());
-      msgs::Set(poseMsg, model->GetRelativePose());
+      poseMsg->set_name((*iter)->GetScopedName());
+      msgs::Set(poseMsg, (*iter)->GetRelativePose());
 
       // Publish each of the model's children relative poses
-      Link_V links = model->GetLinks();
+      Link_V links = (*iter)->GetLinks();
       for (Link_V::iterator linkIter = links.begin();
            linkIter != links.end(); ++linkIter)
       {
@@ -1742,16 +1735,23 @@ void World::ProcessMessages()
     this->posePub->Publish(msg);
   }
   this->publishModelPoses.clear();
+  DIAG_TIMER_LAP("World::ProcessMessages", "Pose");
 
   if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
       this->processMsgsPeriod)
   {
     this->ProcessEntityMsgs();
+    DIAG_TIMER_LAP("World::ProcessMessages", "Entities");
     this->ProcessRequestMsgs();
+    DIAG_TIMER_LAP("World::ProcessMessages", "Requests");
     this->ProcessFactoryMsgs();
+    DIAG_TIMER_LAP("World::ProcessMessages", "Factory");
     this->ProcessModelMsgs();
+    DIAG_TIMER_LAP("World::ProcessMessages", "Model");
     this->prevProcessMsgsTime = common::Time::GetWallTime();
   }
+
+  DIAG_TIMER_STOP("World::ProcessMessages");
 }
 
 //////////////////////////////////////////////////
@@ -1774,12 +1774,12 @@ bool World::IsLoaded() const
 }
 
 //////////////////////////////////////////////////
-void World::PublishModelPose(const std::string &_modelName)
+void World::PublishModelPose(physics::ModelPtr _model)
 {
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
 
   // Only add if the model name is not in the list
-  this->publishModelPoses.insert(_modelName);
+  this->publishModelPoses.insert(_model);
 }
 
 //////////////////////////////////////////////////
