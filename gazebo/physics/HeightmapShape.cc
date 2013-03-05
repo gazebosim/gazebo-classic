@@ -22,11 +22,12 @@
 #include <string.h>
 #include <math.h>
 
-#include "common/Image.hh"
-#include "common/Common.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/common/Common.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/HeightmapShape.hh"
+#include "gazebo/physics/HeightmapShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -101,8 +102,8 @@ void HeightmapShape::FillHeightMap()
 {
   unsigned int x, y;
   float h = 0;
-  float h1 = 0;
-  float h2 = 0;
+  // float h1 = 0;
+  // float h2 = 0;
 
   // Resize the vector to match the size of the vertices
   this->heights.resize(this->vertSize * this->vertSize);
@@ -110,9 +111,9 @@ void HeightmapShape::FillHeightMap()
   // this->img.Rescale(this->vertSize, this->vertSize);
   common::Color pixel;
 
-  double yf, xf, dy, dx;
-  int y1, y2, x1, x2;
-  double px1, px2, px3, px4;
+  // double yf, xf, dy, dx;
+  //int y1, y2, x1, x2;
+  double px1;//, px2, px3, px4;
 
   int imgHeight = this->img.GetHeight();
   int imgWidth = this->img.GetWidth();
@@ -134,8 +135,8 @@ void HeightmapShape::FillHeightMap()
   {
     for (x = 0; x < this->vertSize; ++x)
     {
-      px1 = static_cast<int>(data[y * pitch + x * bpp]) / 255.0;
-      std::cout << "XY[" << x << " " << y << "] H[" << px1 << "] \n";
+      px1 = static_cast<int>(data[y * pitch + x * bpp]) / 256.0;
+      // std::cout << "XY[" << x << " " << y << "] H[" << px1 << "] \n";
 
       h = px1 * this->scale.z;
 
@@ -236,7 +237,7 @@ math::Vector2i HeightmapShape::GetVertexCount() const
 }
 
 /////////////////////////////////////////////////
-float HeightmapShape::GetHeight(int _x, int _y)
+float HeightmapShape::GetHeight(int _x, int _y) const
 {
   return this->heights[(_y * this->subSampling) * this->vertSize +
                        (_x * this->subSampling)];
@@ -266,4 +267,47 @@ float HeightmapShape::GetMinHeight() const
   }
 
   return min;
+}
+
+//////////////////////////////////////////////////
+common::Image HeightmapShape::GetImage() const
+{
+  double height = 0.0;
+  unsigned char *imageData = NULL;
+
+  /// \todo Support multiple terrain objects
+  double minHeight = this->GetMinHeight();
+  double maxHeight = this->GetMaxHeight() - minHeight;
+
+  std::cout << "MinHeight[" << minHeight << "] MaxHeight[" << maxHeight << "]\n";
+
+  // Get the number of vertices along one side of the terrain
+  // uint16_t size = terrain->getSize();
+
+  // Create the image data buffer
+  imageData = new unsigned char[this->vertSize * this->vertSize];
+
+  // Get height data from all vertices
+  for (uint16_t y = 0; y < this->vertSize; ++y)
+  {
+    for (uint16_t x = 0; x < this->vertSize; ++x)
+    {
+      // Normalize height value
+      height = (this->GetHeight((int)x, (int)y) - minHeight) / maxHeight;
+
+      GZ_ASSERT(height <= 1.0, "Normalized terrain height > 1.0");
+      GZ_ASSERT(height >= 0.0, "Normalized terrain height < 0.0");
+
+      // Scale height to a value between 0 and 255
+      imageData[y * this->vertSize + x] =
+        static_cast<unsigned char>(height * 255.0);
+    }
+  }
+
+  common::Image result;
+  result.SetFromData(imageData, this->vertSize, this->vertSize,
+                     common::Image::L_INT8);
+
+  delete [] imageData;
+  return result;
 }

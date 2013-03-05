@@ -188,6 +188,8 @@ void Heightmap::Load()
   }
 
   this->terrainGroup->freeTemporaryResources();
+  common::Image img = this->GetImage();
+  img.SavePNG("/tmp/heights_rendering.png");
 }
 
 ///////////////////////////////////////////////////

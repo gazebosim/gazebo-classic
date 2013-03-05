@@ -79,7 +79,7 @@ namespace gazebo
       /// \param[in] _x X position.
       /// \param[in] _y Y position.
       /// \return The height at a the specified location.
-      public: float GetHeight(int _x, int _y);
+      public: float GetHeight(int _x, int _y) const;
 
       /// \brief Fill a geometry message with this shape's data.
       /// \param[in] _msg Message to fill.
@@ -100,6 +100,11 @@ namespace gazebo
       /// \brief Get the amount of subsampling.
       /// \return Amount of subsampling.
       public: int GetSubSampling() const;
+
+      /// \brief Return an image representation of the heightmap.
+      /// \return Image where white pixels represents the highest locations,
+      /// and black pixels the lowest.
+      public: common::Image GetImage() const;
 
       /// \brief Create a lookup table of the terrain's height.
       private: void FillHeightMap();
