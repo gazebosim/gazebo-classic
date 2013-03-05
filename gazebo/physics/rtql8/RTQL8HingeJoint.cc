@@ -158,15 +158,18 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 math::Vector3 RTQL8HingeJoint::GetAnchor(int /*index*/) const
 {
-//   dVector3 result;
-// 
-//   dJointGetHingeAnchor(this->jointId, result);
-// 
-//   return math::Vector3(result[0], result[1], result[2]);
+  //TODO: need test
 
-  gzerr << "RTQL8HingeJoint::GetAnchor(...): Not implemented...\n";
+  math::Vector3 result;
+  math::Pose poseChildLinkToJoint = -(this->poseJointToChildLink);
 
-  return math::Vector3(0, 0, 0);
+  // setting anchor relative to gazebo link frame pose
+  if (this->childLink)
+    result = poseChildLinkToJoint.pos + this->childLink->GetWorldPose().pos;
+  else
+    result = math::Vector3(0, 0, 0);
+
+  return result;
 }
 
 //////////////////////////////////////////////////

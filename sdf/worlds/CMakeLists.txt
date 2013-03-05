@@ -7,6 +7,7 @@ set (files
   joint_damping_demo.world
   depth_camera.world
   double_pendulum_rtql8.world
+  double_pendulum_ode.world
   empty.world
   force_torque_demo.world
   joints.world
