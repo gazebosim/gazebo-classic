@@ -25,7 +25,7 @@
         </visual>
       </link>
     </model>
-    <!--
+
     <model name="sphere">
       <pose>0 1.5 0.5 0 0 0</pose>
       <link name="link">
@@ -48,6 +48,7 @@
         </visual>
       </link>
     </model>
+
     <model name="cylinder">
       <pose>0 -1.5 0.5 0 0 0</pose>
       <link name="link">
@@ -72,6 +73,5 @@
         </visual>
       </link>
     </model>
--->
   </world>
 </sdf>

@@ -14,20 +14,20 @@
  * limitations under the License.
  *
 */
-#include <string.h>
-#include "math/Helpers.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/Node.hh"
 
-#include "rendering/RenderEngine.hh"
 #include "ServerFixture.hh"
-
 
 using namespace gazebo;
 class ServerFixtureTest : public ServerFixture
 {
+  public: void LoadEmptyOfType(const std::string _physicsType);
 };
 
+////////////////////////////////////////////////////////////////////////
+// LoadPaused:
+// Verify that ServerFixture can load world in paused state
+// Gazebo issue #334
+////////////////////////////////////////////////////////////////////////
 TEST_F(ServerFixtureTest, LoadPaused)
 {
   // Note the second argument of Load sets the pause state
@@ -45,6 +45,35 @@ TEST_F(ServerFixtureTest, LoadPaused)
   gzdbg << "Check IsPaused with 1000 ms delay\n";
   EXPECT_TRUE(world->IsPaused());
 }
+
+////////////////////////////////////////////////////////////////////////
+// LoadEmptyOfType:
+// Verify that ServerFixture can load empty world with different types
+// of physics engines (issue #486)
+////////////////////////////////////////////////////////////////////////
+void ServerFixtureTest::LoadEmptyOfType(const std::string _physicsType)
+{
+  // Note the second argument of Load sets the pause state
+  Load("worlds/empty.world", true, _physicsType);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsType);
+}
+
+TEST_F(ServerFixtureTest, LoadODE)
+{
+  LoadEmptyOfType("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(ServerFixtureTest, LoadBullet)
+{
+  LoadEmptyOfType("bullet");
+}
+#endif  // HAVE_BULLET
 
 int main(int argc, char **argv)
 {

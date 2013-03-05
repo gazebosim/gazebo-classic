@@ -17,6 +17,7 @@
 #ifndef _CONNECTION_HH_
 #define _CONNECTION_HH_
 
+#include <tbb/task.h>
 #include <google/protobuf/message.h>
 
 #include <boost/asio.hpp>
@@ -47,6 +48,39 @@ namespace gazebo
     class IOManager;
     class Connection;
     typedef boost::shared_ptr<Connection> ConnectionPtr;
+
+    /// \cond
+    /// \brief A task instance that is created when data is read from
+    /// a socket and used by TBB
+    class ConnectionReadTask : public tbb::task
+    {
+      /// \brief Constructor
+      /// \param[_in] _func Boost function pointer, which is the function
+      /// that receives the data.
+      /// \param[in] _data Data to send to the boost function pointer.
+      public: ConnectionReadTask(
+                  boost::function<void (const std::string &)> _func,
+                  const std::string &_data)
+              {
+                this->func = _func;
+                this->data = _data;
+              }
+
+      /// \bried Overridden function from tbb::task that exectues the data
+      /// callback.
+      public: tbb::task *execute()
+              {
+                this->func(this->data);
+                return NULL;
+              }
+
+      /// \brief The boost function pointer
+      private: boost::function<void (const std::string &)> func;
+
+      /// \brief The data to send to the boost function pointer
+      private: std::string data;
+    };
+    /// \endcond
 
     /// \addtogroup gazebo_transport Transport
     /// \{
@@ -141,7 +175,7 @@ namespace gazebo
 
       /// \brief Get the local hostname
       /// \return The local hostname
-      public: std::string GetLocalHostname() const;
+      public: static std::string GetLocalHostname();
 
       /// \brief Peform an asyncronous read
       /// param[in] _handler Callback to invoke on received data
@@ -180,9 +214,16 @@ namespace gazebo
                 {
                   if (_e.message() != "End of File")
                   {
-                    this->Close();
+                    try
+                    {
+                      this->Shutdown();
+                    }
+                    catch(...)
+                    {
+                    }
                     // This will occur when the other side closes the
-                    // connection
+                    // connection. We don't want spew error messages in this
+                    // case.
                   }
                 }
                 else
@@ -241,7 +282,10 @@ namespace gazebo
                               boost::tuple<Handler> _handler)
               {
                 if (_e)
-                  gzerr << "Error Reading data!\n";
+                {
+                  gzerr << "Error Reading data["
+                    << _e.message() << "]\n";
+                }
 
                 // Inform caller that data has been received
                 std::string data(&this->inboundData[0],
@@ -253,7 +297,10 @@ namespace gazebo
 
                 if (!_e && !transport::is_stopped())
                 {
-                  boost::get<0>(_handler)(data);
+                  ConnectionReadTask *task = new(tbb::task::allocate_root())
+                        ConnectionReadTask(boost::get<0>(_handler), data);
+
+                  tbb::task::enqueue(*task);
                 }
               }
 
@@ -285,7 +332,7 @@ namespace gazebo
       /// \brief Callback when a write has occurred.
       /// \param[in] _e Error code
       /// \param[in] _b Buffer of the data that was written.
-      private: void OnWrite(const boost::system::error_code &e,
+      private: void OnWrite(const boost::system::error_code &_e,
                             boost::asio::streambuf *_b);
 
       /// \brief Handle new connections, if this is a server
@@ -301,7 +348,7 @@ namespace gazebo
 
       /// \brief Get the local endpoint
       /// \return The endpoint
-      private: boost::asio::ip::tcp::endpoint GetLocalEndpoint() const;
+      private: static boost::asio::ip::tcp::endpoint GetLocalEndpoint();
 
       /// \brief Get the remote endpoint
       /// \return The endpoint
@@ -331,10 +378,13 @@ namespace gazebo
       private: boost::mutex *connectMutex;
 
       /// \brief Mutex to protect write.
-      private: boost::recursive_mutex *writeMutex;
+      private: boost::recursive_mutex writeMutex;
 
       /// \brief Mutex to protect reads.
       private: boost::recursive_mutex *readMutex;
+
+      /// \brief Mutex to protect socket close.
+      private: mutable boost::mutex socketMutex;
 
       /// \brief Condition used for synchronization
       private: boost::condition_variable connectCondition;

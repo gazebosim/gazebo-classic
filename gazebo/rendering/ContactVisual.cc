@@ -183,6 +183,11 @@ void ContactVisual::CreateNewPoint()
 
   cp->depth->AddPoint(math::Vector3(0, 0, 0));
   cp->depth->AddPoint(math::Vector3(0, 0, -1));
+
+  obj->setVisibilityFlags(GZ_VISIBILITY_GUI);
+  cp->depth->setVisibilityFlags(GZ_VISIBILITY_GUI);
+  cp->normal->setVisibilityFlags(GZ_VISIBILITY_GUI);
+
   cp->sceneNode->attachObject(cp->depth);
   cp->sceneNode->attachObject(cp->normal);
   cp->sceneNode->setVisible(false);

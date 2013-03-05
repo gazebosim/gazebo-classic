@@ -94,10 +94,13 @@ namespace gazebo
       /// \param[in] _topic The name of the topic
       /// \param[in] _queueLimit The maximum number of outgoing messages
       /// to queue
+      /// \param[in] _hz Update rate for the publisher. Units are
+      /// 1.0/seconds.
       /// \return Pointer to the newly created Publisher
       public: template<typename M>
               PublisherPtr Advertise(const std::string &_topic,
-                                     unsigned int _queueLimit)
+                                     unsigned int _queueLimit,
+                                     double _hzRate)
               {
                 google::protobuf::Message *msg = NULL;
                 M msgtype;
@@ -108,7 +111,7 @@ namespace gazebo
                 this->UpdatePublications(_topic, msg->GetTypeName());
 
                 PublisherPtr pub = PublisherPtr(new Publisher(_topic,
-                      msg->GetTypeName(), _queueLimit));
+                      msg->GetTypeName(), _queueLimit, _hzRate));
 
                 std::string msgTypename;
                 PublicationPtr publication;
@@ -177,7 +180,7 @@ namespace gazebo
       /// \param[in] _topic The topic to use
       /// \param[in] _sublink The subscription transport object to use
       public: void ConnectPubToSub(const std::string &_topic,
-                                    const SubscriptionTransportPtr &_sublink);
+                                    const SubscriptionTransportPtr _sublink);
 
       /// \brief Connect a local Subscriber to a remote Publisher
       /// \param[in] _pub The publish object to use
@@ -242,7 +245,10 @@ namespace gazebo
       private: SubNodeMap subscribedNodes;
       private: std::vector<NodePtr> nodes;
 
-      private: boost::recursive_mutex *nodeMutex;
+      private: boost::recursive_mutex nodeMutex;
+
+      /// \brief Used to protect subscription connection creation.
+      private: boost::mutex subscriberMutex;
 
       private: bool pauseIncoming;
 
