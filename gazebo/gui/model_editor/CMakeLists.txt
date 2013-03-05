@@ -67,5 +67,6 @@ QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 add_library(gazebo_model_editor STATIC ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+add_dependencies(gazebo_model_editor gazebo_msgs)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
