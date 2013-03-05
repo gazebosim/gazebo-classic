@@ -166,6 +166,9 @@ namespace gazebo
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(int _index);
 
+      // Documentation inherited.
+      public: virtual JointWrench GetForceTorque(unsigned int _index);
+
       /// \brief CFM for joint's limit constraint
       private: double stopCFM;
 

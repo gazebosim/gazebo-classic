@@ -758,7 +758,13 @@ void ODEJoint::Reset()
 }
 
 //////////////////////////////////////////////////
-JointWrench ODEJoint::GetForceTorque(int /*_index*/)
+JointWrench ODEJoint::GetForceTorque(int _index)
+{
+  return this->GetForceTorque(static_cast<unsigned int>(_index));
+}
+
+//////////////////////////////////////////////////
+JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 {
   JointWrench wrench;
   // Note that:
