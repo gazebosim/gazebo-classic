@@ -125,36 +125,45 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     const btRigidBody *rbA = btRigidBody::upcast(obA);
     const btRigidBody *rbB = btRigidBody::upcast(obB);
 
-    BulletLink *link0 = static_cast<BulletLink *>(
-        obA->getUserPointer());
-    GZ_ASSERT(link0 != NULL, "Link0 in collision pair is NULL");
-
     BulletLink *link1 = static_cast<BulletLink *>(
+        obA->getUserPointer());
+    GZ_ASSERT(link1 != NULL, "Link0 in collision pair is NULL");
+
+    BulletLink *link2 = static_cast<BulletLink *>(
         obB->getUserPointer());
-    GZ_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
+    GZ_ASSERT(link2 != NULL, "Link1 in collision pair is NULL");
 
     unsigned int colIndex = 0;
-    CollisionPtr collisionPtr0 = link0->GetCollision(colIndex);
     CollisionPtr collisionPtr1 = link1->GetCollision(colIndex);
+    CollisionPtr collisionPtr2 = link2->GetCollision(colIndex);
 
-    if (!collisionPtr0 || !collisionPtr1)
+    if (!collisionPtr1 || !collisionPtr2)
       return;
 
-    PhysicsEnginePtr engine = collisionPtr0->GetWorld()->GetPhysicsEngine();
+    PhysicsEnginePtr engine = collisionPtr1->GetWorld()->GetPhysicsEngine();
     BulletPhysicsPtr bulletPhysics =
           boost::shared_static_cast<BulletPhysics>(engine);
 
     // Add a new contact to the manager. This will return NULL if no one is
     // listening for contact information.
     Contact *contactFeedback = bulletPhysics->GetContactManager()->NewContact(
-        collisionPtr0.get(), collisionPtr1.get(),
-        collisionPtr0->GetWorld()->GetSimTime());
+        collisionPtr1.get(), collisionPtr2.get(),
+        collisionPtr1->GetWorld()->GetSimTime());
 
     if (!contactFeedback)
       return;
 
-    int numContacts = contactManifold->getNumContacts();
+    math::Pose body1Pose = link1->GetWorldPose();
+    math::Pose body2Pose = link2->GetWorldPose();
+    math::Vector3 cg1Pos = link1->GetInertial()->GetPose().pos;
+    math::Vector3 cg2Pos = link2->GetInertial()->GetPose().pos;
+    math::Vector3 localForce1;
+    math::Vector3 localForce2;
+    math::Vector3 localTorque1;
+    math::Vector3 localTorque2;
 
+    int numContacts = contactManifold->getNumContacts();
+    gzerr << "==" << std::endl;
     for (int j = 0; j < numContacts; ++j)
     {
       btManifoldPoint& pt = contactManifold->getContactPoint(j);
@@ -165,28 +174,33 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         const btVector3 &normalOnB = pt.m_normalWorldOnB;
         btVector3 impulse = pt.m_appliedImpulse * normalOnB;
         btVector3 force = impulse/_timeStep;
-        btVector3 torqueA =
-            (ptB-rbA->getCenterOfMassPosition()).cross(force);
-        btVector3 torqueB =
-            (ptB-rbB->getCenterOfMassPosition()).cross(-force);
+        localForce1 = body1Pose.rot.RotateVectorReverse(
+            BulletTypes::ConvertVector3(force));
+        localForce2 = body2Pose.rot.RotateVectorReverse(
+            BulletTypes::ConvertVector3(force));
+
+        btVector3 torqueA = force.cross(ptB-rbA->getCenterOfMassPosition());
+        btVector3 torqueB = -force.cross(ptB-rbB->getCenterOfMassPosition());
+
+        localTorque1 = body1Pose.rot.RotateVectorReverse(
+            BulletTypes::ConvertVector3(torqueA));
+        localTorque2 = body2Pose.rot.RotateVectorReverse(
+            BulletTypes::ConvertVector3(torqueB));
 
         contactFeedback->positions[j] = BulletTypes::ConvertVector3(ptB);
         contactFeedback->normals[j] = BulletTypes::ConvertVector3(normalOnB);
         contactFeedback->depths[j] = -pt.getDistance();
-        if (!link0->IsStatic())
-        {
-          contactFeedback->wrench[j].body1Force =
-              BulletTypes::ConvertVector3(force);
-          contactFeedback->wrench[j].body1Torque =
-              BulletTypes::ConvertVector3(torqueA);
-        }
         if (!link1->IsStatic())
         {
-          contactFeedback->wrench[j].body2Force =
-              BulletTypes::ConvertVector3(-force);
-          contactFeedback->wrench[j].body2Torque =
-              BulletTypes::ConvertVector3(torqueB);
-
+          contactFeedback->wrench[j].body1Force = localForce1;
+          contactFeedback->wrench[j].body1Torque = localTorque1;
+          gzerr << link1->GetScopedName() << " " << pt.m_appliedImpulse << " " << localForce1 << std::endl;
+        }
+        if (!link2->IsStatic())
+        {
+          contactFeedback->wrench[j].body2Force = -localForce2;
+          contactFeedback->wrench[j].body2Torque = localTorque2;
+          gzerr << link2->GetScopedName() << " " << pt.m_appliedImpulse << " " << localForce2 << std::endl;
         }
         contactFeedback->count++;
       }

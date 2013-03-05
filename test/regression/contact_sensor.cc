@@ -34,7 +34,7 @@ TEST_F(ContactSensor, EmptyWorld)
 
 void ContactSensor::StackTest(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world", true, _physicsEngine);
+  Load("worlds/empty.world", false, _physicsEngine);
 
   std::stringstream contactModelStr01;
   std::string modelName01 = "contactModel01";
@@ -63,10 +63,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
   ASSERT_TRUE(contactSensor02);
 
-  contactSensor01->Init();
-  contactSensor02->Init();
-  contactSensor01->Update(true);
-  contactSensor02->Update(true);
+  sensors::SensorManager::Instance()->Init();
+  sensors::SensorManager::Instance()->RunThreads();
 
   EXPECT_FALSE(contactSensor01->IsActive());
   EXPECT_FALSE(contactSensor02->IsActive());
@@ -84,11 +82,13 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   EXPECT_TRUE(contactSensor01->IsActive());
   EXPECT_TRUE(contactSensor02->IsActive());
 
-  contactSensor01->Update(true);
-  contactSensor02->Update(true);
+//  contactSensor01->Update(true);
+//  contactSensor02->Update(true);
 
    // Get all the contacts.
   msgs::Contacts contacts;
+
+
   contacts = contactSensor01->GetContacts();
 
   gzerr << contacts.contact_size() << std::endl;
@@ -100,16 +100,16 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
     for (int j = 0; j < contacts.contact(i).position_size(); ++j)
     {
-      std::cout << j << "  Position:"
+      gzerr << j << "  Position:"
                 << contacts.contact(i).position(j).x() << " "
                 << contacts.contact(i).position(j).y() << " "
                 << contacts.contact(i).position(j).z() << "\n";
-      std::cout << "   Normal:"
+      gzerr << "   Normal:"
                 << contacts.contact(i).normal(j).x() << " "
                 << contacts.contact(i).normal(j).y() << " "
                 << contacts.contact(i).normal(j).z() << "\n";
-      std::cout << "   Depth:" << contacts.contact(i).depth(j) << "\n";
-      std::cout << "   Normal force 1: "
+      gzerr << "   Depth:" << contacts.contact(i).depth(j) << "\n";
+      gzerr << "   Normal force 1: "
                 << contacts.contact(i).normal(j).x() *
                    contacts.contact(i).wrench(j).body_1_force().x() +
                    contacts.contact(i).normal(j).y() *
@@ -118,8 +118,6 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
                    contacts.contact(i).wrench(j).body_1_force().z() << "\n";
     }
   }
-
-
 
 //  msgs::Contact
 
