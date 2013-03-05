@@ -687,7 +687,10 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
     }
   }
 
-  this->modelPub->Publish(msg);
+  // \todo Renable when modifying a model is fixed.
+  // this->modelPub->Publish(msg);
+  gzwarn << "Model modification is currently disabled. "
+         << "Look for this feature in Gazebo 2.0\n";
 }
 
 /////////////////////////////////////////////////

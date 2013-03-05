@@ -6,7 +6,6 @@ link_directories(
 )
 
 include_directories(
-  ${CMAKE_SOURCE_DIR}/deps
   ${QWT_INCLUDE_DIR}
 )
 

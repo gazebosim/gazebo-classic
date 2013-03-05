@@ -1,0 +1,10 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Diagnostic control 
+/// \brief Turn on and off diagnostics
+
+message DiagnosticControl
+{
+  required bool enabled = 1;
+}
