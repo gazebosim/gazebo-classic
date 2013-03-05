@@ -171,6 +171,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
+  this->clockPub = this->node->Advertise<msgs::Time>("~/clock", 10);
   this->posePub = this->node->Advertise<msgs::Pose_V>("~/pose/info", 10, 60.0);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
@@ -488,16 +489,17 @@ void World::Step()
       this->iterations++;
       this->Update();
 
-      DIAG_TIMER_LAP("World::Step", "update");
-
       if (this->IsPaused() && this->stepInc > 0)
         this->stepInc--;
     }
     else
       this->pauseTime += this->physicsEngine->GetStepTime();
+
+    DIAG_TIMER_LAP("World::Step", "update");
   }
 
   this->ProcessMessages();
+  DIAG_TIMER_LAP("World::Step", "processMessages");
 
   DIAG_TIMER_STOP("World::Step");
 }
@@ -550,25 +552,25 @@ void World::Update()
   this->updateInfo.realTime = this->GetRealTime();
   event::Events::worldUpdateBegin(this->updateInfo);
 
-  DIAG_TIMER_LAP("World::Update", "Events::worldUpdateBegin");
+  DIAG_TIMER_LAP("World::Update", "beginEvent");
+
+  /// \brief Publish clock
+  this->clockPub->Publish(msgs::Convert(this->updateInfo.simTime));
 
   // Update all the models
   (*this.*modelUpdateFunc)();
-
-  DIAG_TIMER_LAP("World::Update", "Model::Update");
+  DIAG_TIMER_LAP("World::Update", "modelUpdate");
 
   // This must be called before PhysicsEngine::UpdatePhysics.
   this->physicsEngine->UpdateCollision();
-
-  DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
+  DIAG_TIMER_LAP("World::Update", "collision");
 
   // Update the physics engine
   if (this->enablePhysicsEngine && this->physicsEngine)
   {
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
-
-    DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdatePhysics");
+    DIAG_TIMER_LAP("World::Update", "physics");
 
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
@@ -578,16 +580,14 @@ void World::Update()
     {
       (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
     }
+    DIAG_TIMER_LAP("World::Update", "dirtyPoses");
 
     this->dirtyPoses.clear();
-
-    DIAG_TIMER_LAP("World::Update", "SetWorldPose(dirtyPoses)");
   }
 
   // Output the contact information
   this->physicsEngine->GetContactManager()->PublishContacts();
-
-  DIAG_TIMER_LAP("World::Update", "ContactManager::PublishContacts");
+  DIAG_TIMER_LAP("World::Update", "pubContacts");
 
   // Only update state informatin if logging data.
   if (common::LogRecord::Instance()->GetRunning())
@@ -608,11 +608,12 @@ void World::Update()
       /// Publish a log status message if the logger is running.
       this->PublishLogStatus();
     }
+
+    DIAG_TIMER_LAP("World::Update", "stateLog");
   }
 
-  DIAG_TIMER_LAP("World::Update", "LogRecord");
-
   event::Events::worldUpdateEnd();
+  DIAG_TIMER_LAP("World::Update", "endEvent");
 
   DIAG_TIMER_STOP("World::Update");
 }
@@ -639,6 +640,8 @@ void World::Fini()
 
   this->prevStates[0].SetWorld(WorldPtr());
   this->prevStates[1].SetWorld(WorldPtr());
+
+  util::DiagnosticManager::Instance()->Fini();
 }
 
 //////////////////////////////////////////////////

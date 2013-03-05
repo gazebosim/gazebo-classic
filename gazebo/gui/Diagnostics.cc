@@ -119,6 +119,10 @@ Diagnostics::Diagnostics(QWidget *_parent)
   this->node->Init();
   this->sub = this->node->Subscribe("~/diagnostics", &Diagnostics::OnMsg, this);
 
+  msgs::DiagnosticControl msg;
+  msg.set_enabled(true);
+  this->node->Publish<msgs::DiagnosticControl>("~/diagnostic/control", msg);
+
   QTimer *displayTimer = new QTimer(this);
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
   displayTimer->start(60);
@@ -229,4 +233,14 @@ bool Diagnostics::eventFilter(QObject *o, QEvent *e)
   }
 
   return QWidget::eventFilter(o, e);
+}
+
+/////////////////////////////////////////////////
+void Diagnostics::closeEvent(QCloseEvent *_evt)
+{
+  msgs::DiagnosticControl msg;
+  msg.set_enabled(false);
+  this->node->Publish<msgs::DiagnosticControl>("~/diagnostic/control", msg);
+
+  QDialog::closeEvent(_evt);
 }
