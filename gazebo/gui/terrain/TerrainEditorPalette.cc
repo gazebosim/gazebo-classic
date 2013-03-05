@@ -86,11 +86,12 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
   this->outsideRadiusSlider->setTickInterval(1);
   this->outsideRadiusSlider->setOrientation(Qt::Horizontal);
   this->outsideRadiusSlider->setValue(10);
-
-  this->outsideRadiusSpin = new QDoubleSpinBox(this);
-  connect(this->outsideRadiusSlider, SIGNAL(sliderMoved(int)),
+  connect(this->outsideRadiusSlider, SIGNAL(valueChanged(int)),
       this, SLOT(OnOutsideRadiusSlider(int)));
 
+  this->outsideRadiusSpin = new QDoubleSpinBox(this);
+  connect(this->outsideRadiusSpin, SIGNAL(valueChanged(double)),
+      this, SLOT(OnOutsideRadiusSpin(double)));
 
   // Create a layout to hold the outer brush size slider and its label
   QHBoxLayout *outsideRadiusSpinLayout = new QHBoxLayout;
@@ -109,12 +110,15 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
   this->insideRadiusSlider->setTickInterval(1);
   this->insideRadiusSlider->setOrientation(Qt::Horizontal);
   this->insideRadiusSlider->setValue(20);
-  connect(this->insideRadiusSlider, SIGNAL(sliderMoved(int)),
+  connect(this->insideRadiusSlider, SIGNAL(valueChanged(int)),
       this, SLOT(OnInsideRadiusSlider(int)));
-
 
   this->insideRadiusSpin = new QDoubleSpinBox(this);
   this->insideRadiusSpin->setRange(0, 1.0);
+  this->insideRadiusSpin->setSingleStep(0.1);
+  connect(this->insideRadiusSpin, SIGNAL(valueChanged(double)),
+      this, SLOT(OnInsideRadiusSpin(double)));
+
 
   // Create a layout to hold the inner brush size slider and its label
   QHBoxLayout *insideRadiusSpinLayout = new QHBoxLayout;
@@ -132,12 +136,15 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
   this->weightSlider->setTickInterval(1);
   this->weightSlider->setOrientation(Qt::Horizontal);
   this->weightSlider->setValue(10);
-  connect(this->weightSlider, SIGNAL(sliderMoved(int)),
+  connect(this->weightSlider, SIGNAL(valueChanged(int)),
       this, SLOT(OnWeightSlider(int)));
-
 
   this->weightSpin = new QDoubleSpinBox(this);
   this->weightSpin->setRange(.01, 1.0);
+  this->weightSpin->setSingleStep(.1);
+  connect(this->weightSpin, SIGNAL(valueChanged(double)),
+      this, SLOT(OnWeightSpin(double)));
+
 
   // Create a layout to hold the brush weight slider and its label
   QHBoxLayout *weightSpinLayout = new QHBoxLayout;
@@ -156,10 +163,12 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
   this->heightSlider->setTickInterval(1);
   this->heightSlider->setOrientation(Qt::Horizontal);
   this->heightSlider->setValue(10);
-  connect(this->heightSlider, SIGNAL(sliderMoved(int)),
+  connect(this->heightSlider, SIGNAL(valueChanged(int)),
       this, SLOT(OnHeightSlider(int)));
 
   this->heightSpin = new QDoubleSpinBox(this);
+  connect(this->heightSpin, SIGNAL(valueChanged(double)),
+      this, SLOT(OnHeightSpin(double)));
 
   // Create a layout to hold the brush height slider and its label
   QHBoxLayout *heightSpinLayout = new QHBoxLayout;
@@ -328,40 +337,120 @@ bool TerrainEditorPalette::Apply(const common::MouseEvent &_event,
   // Get the brush weight and size from the sliders.
   double weight = this->weightSpin->value();
   double outsideRadius = this->outsideRadiusSpin->value();
+  double insideRadius = this->insideRadiusSpin->value();
 
   if (this->state == "lower")
-    handled = _heightmap->Lower(_camera, _event.pos, outsideRadius, weight);
+    handled = _heightmap->Lower(_camera, _event.pos, outsideRadius,
+        insideRadius, weight);
   else if (this->state == "raise")
-    handled = _heightmap->Raise(_camera, _event.pos, outsideRadius, weight);
+    handled = _heightmap->Raise(_camera, _event.pos, outsideRadius,
+        insideRadius, weight);
   else if (this->state == "flatten")
-    handled = _heightmap->Flatten(_camera, _event.pos, outsideRadius, weight);
+    handled = _heightmap->Flatten(_camera, _event.pos, outsideRadius,
+        insideRadius, weight);
   else if (this->state == "smooth")
-    handled = _heightmap->Smooth(_camera, _event.pos, outsideRadius, weight);
+    handled = _heightmap->Smooth(_camera, _event.pos, outsideRadius,
+        insideRadius, weight);
 
   return handled;
 }
 
 /////////////////////////////////////////////////
+void TerrainEditorPalette::OnOutsideRadiusSpin(double _value)
+{
+  disconnect(this->outsideRadiusSlider, SIGNAL(valueChanged(int)),
+      this, SLOT(OnOutsideRadiusSlider(int)));
+
+  this->outsideRadiusSlider->setValue(static_cast<int>(rint(_value * 10.0)));
+
+  connect(this->outsideRadiusSlider, SIGNAL(valueChanged(int)),
+      this, SLOT(OnOutsideRadiusSlider(int)));
+}
+
+/////////////////////////////////////////////////
 void TerrainEditorPalette::OnOutsideRadiusSlider(int _value)
 {
+  disconnect(this->outsideRadiusSpin, SIGNAL(valueChanged(double)),
+      this, SLOT(OnOutsideRadiusSpin(double)));
+
   this->outsideRadiusSpin->setValue(_value / 10.0);
+
+  connect(this->outsideRadiusSpin, SIGNAL(valueChanged(double)),
+      this, SLOT(OnOutsideRadiusSpin(double)));
+}
+
+/////////////////////////////////////////////////
+void TerrainEditorPalette::OnInsideRadiusSpin(double _value)
+{
+  disconnect(this->insideRadiusSlider, SIGNAL(valueChanged(int)),
+      this, SLOT(OnInsideRadiusSlider(int)));
+
+  this->insideRadiusSlider->setValue(
+      static_cast<int>(rint(_value * this->insideRadiusSlider->maximum())));
+
+  connect(this->insideRadiusSlider, SIGNAL(valueChanged(int)),
+      this, SLOT(OnInsideRadiusSlider(int)));
 }
 
 /////////////////////////////////////////////////
 void TerrainEditorPalette::OnInsideRadiusSlider(int _value)
 {
+  disconnect(this->insideRadiusSpin, SIGNAL(valueChanged(double)),
+      this, SLOT(OnInsideRadiusSpin(double)));
+
+
   this->insideRadiusSpin->setValue(_value /
       (double)this->insideRadiusSlider->maximum());
+
+  connect(this->insideRadiusSpin, SIGNAL(valueChanged(double)),
+      this, SLOT(OnInsideRadiusSpin(double)));
+}
+
+/////////////////////////////////////////////////
+void TerrainEditorPalette::OnWeightSpin(double _value)
+{
+  disconnect(this->weightSlider, SIGNAL(valueChanged(int)),
+      this, SLOT(OnWeightSlider(int)));
+
+  this->weightSlider->setValue(
+      static_cast<int>(rint(_value * this->weightSlider->maximum())));
+
+  connect(this->weightSlider, SIGNAL(valueChanged(int)),
+      this, SLOT(OnWeightSlider(int)));
 }
 
 /////////////////////////////////////////////////
 void TerrainEditorPalette::OnWeightSlider(int _value)
 {
+  disconnect(this->weightSpin, SIGNAL(valueChanged(double)),
+             this, SLOT(OnWeightSpin(double)));
+
   this->weightSpin->setValue(_value / (double)this->weightSlider->maximum());
+
+  connect(this->weightSpin, SIGNAL(valueChanged(double)),
+      this, SLOT(OnWeightSpin(double)));
+}
+
+/////////////////////////////////////////////////
+void TerrainEditorPalette::OnHeightSpin(double _value)
+{
+  disconnect(this->heightSlider, SIGNAL(valueChanged(int)),
+      this, SLOT(OnHeightSlider(int)));
+
+  this->heightSlider->setValue(static_cast<int>(rint(_value)));
+
+  connect(this->heightSlider, SIGNAL(valueChanged(int)),
+      this, SLOT(OnHeightSlider(int)));
 }
 
 /////////////////////////////////////////////////
 void TerrainEditorPalette::OnHeightSlider(int _value)
 {
+  disconnect(this->heightSpin, SIGNAL(valueChanged(double)),
+      this, SLOT(OnHeightSpin(double)));
+
   this->heightSpin->setValue(_value / 10.0);
+
+  connect(this->heightSpin, SIGNAL(valueChanged(double)),
+      this, SLOT(OnHeightSpin(double)));
 }

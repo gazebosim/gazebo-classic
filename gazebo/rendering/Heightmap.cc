@@ -198,7 +198,7 @@ void Heightmap::ConfigureTerrainDefaults()
   // MaxPixelError: Decides how precise our terrain is going to be.
   // A lower number will mean a more accurate terrain, at the cost of
   // performance (because of more vertices)
-  this->terrainGlobals->setMaxPixelError(2);
+  this->terrainGlobals->setMaxPixelError(0);
 
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
@@ -401,60 +401,66 @@ Ogre::TerrainGroup::RayResult Heightmap::GetMouseHit(CameraPtr _camera,
 
 /////////////////////////////////////////////////
 bool Heightmap::Smooth(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _brushSize, double _weight)
+                         double _outsideRadius, double _insideRadius,
+                         double _weight)
 {
   Ogre::TerrainGroup::RayResult terrainResult =
     this->GetMouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
-    this->ModifyTerrain(terrainResult.position, _brushSize, _weight, "smooth");
+    this->ModifyTerrain(terrainResult.position, _outsideRadius, _insideRadius,
+        _weight, "smooth");
 
   return terrainResult.hit;
 }
 
 /////////////////////////////////////////////////
 bool Heightmap::Flatten(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _brushSize, double _weight)
+                         double _outsideRadius, double _insideRadius,
+                         double _weight)
 {
   Ogre::TerrainGroup::RayResult terrainResult =
     this->GetMouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
-    this->ModifyTerrain(terrainResult.position, _brushSize, _weight, "flatten");
+    this->ModifyTerrain(terrainResult.position, _outsideRadius, 
+        _insideRadius, _weight, "flatten");
 
   return terrainResult.hit;
 }
 
 /////////////////////////////////////////////////
 bool Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
-    double _brushSize, double _weight)
+    double _outsideRadius, double _insideRadius, double _weight)
 {
   // The terrain uses a special ray intersection test.
   Ogre::TerrainGroup::RayResult terrainResult =
     this->GetMouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
-    this->ModifyTerrain(terrainResult.position, _brushSize, _weight, "raise");
+    this->ModifyTerrain(terrainResult.position, _outsideRadius,
+       _insideRadius, _weight, "raise");
 
   return terrainResult.hit;
 }
 
 /////////////////////////////////////////////////
 bool Heightmap::Lower(CameraPtr _camera, math::Vector2i _mousePos,
-    double _brushSize, double _weight)
+    double _outsideRadius, double _insideRadius, double _weight)
 {
   // The terrain uses a special ray intersection test.
   Ogre::TerrainGroup::RayResult terrainResult =
     this->GetMouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
-    this->ModifyTerrain(terrainResult.position, _brushSize, _weight, "lower");
+    this->ModifyTerrain(terrainResult.position, _outsideRadius,
+        _insideRadius, _weight, "lower");
 
   return terrainResult.hit;
 }
 
 /////////////////////////////////////////////////
-double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _brushSize)
+double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _radius)
 {
   GZ_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
   Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
@@ -470,10 +476,10 @@ double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _brushSize)
   Ogre::Vector3 pos;
   terrain->getTerrainPosition(_pos, &pos);
 
-  long startx = (pos.x - _brushSize) * size;
-  long starty = (pos.y - _brushSize) * size;
-  long endx = (pos.x + _brushSize) * size;
-  long endy= (pos.y + _brushSize) * size;
+  long startx = (pos.x - _radius) * size;
+  long starty = (pos.y - _radius) * size;
+  long endx = (pos.x + _radius) * size;
+  long endy= (pos.y + _radius) * size;
 
   startx = std::max(startx, 0L);
   starty = std::max(starty, 0L);
@@ -496,8 +502,8 @@ double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _brushSize)
 }
 
 /////////////////////////////////////////////////
-void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
-    double _weight, const std::string &_op)
+void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
+    double _insideRadius, double _weight, const std::string &_op)
 {
   GZ_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
   Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
@@ -513,10 +519,10 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
   Ogre::Vector3 pos;
   terrain->getTerrainPosition(_pos, &pos);
 
-  long startx = (pos.x - _brushSize) * size;
-  long starty = (pos.y - _brushSize) * size;
-  long endx = (pos.x + _brushSize) * size;
-  long endy= (pos.y + _brushSize) * size;
+  long startx = (pos.x - _outsideRadius) * size;
+  long starty = (pos.y - _outsideRadius) * size;
+  long endx = (pos.x + _outsideRadius) * size;
+  long endy= (pos.y + _outsideRadius) * size;
 
   startx = std::max(startx, 0L);
   starty = std::max(starty, 0L);
@@ -527,7 +533,7 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
   double avgHeight = 0;
 
   if (_op == "flatten" || _op == "smooth")
-    avgHeight = this->GetAvgHeight(pos, _brushSize);
+    avgHeight = this->GetAvgHeight(pos, _outsideRadius);
 
   for (long y = starty; y <= endy; ++y)
   {
@@ -536,9 +542,14 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
       double tsXdist = (x / (double)size) - pos.x;
       double tsYdist = (y / (double)size)  - pos.y;
 
-      double weight = std::min(1.0,
-          sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / (0.5 * _brushSize));
-      weight = 1.0 - (weight * weight);
+      double weight = 1.0;
+      double dist = sqrt(tsYdist * tsYdist + tsXdist * tsXdist);
+
+      if (dist > _insideRadius)
+      {
+        weight = math::clamp(dist / _outsideRadius, 0.0, 1.0);
+        weight = 1.0 - (weight * weight);
+      }
 
       float addedHeight = weight * _weight;
       float newHeight = terrain->getHeightAtPoint(x, y);

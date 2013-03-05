@@ -506,8 +506,6 @@ material Gazebo/LightOff
   }
 }
 
-
-
 material Gazebo/BlueLaser
 {
   receive_shadows off

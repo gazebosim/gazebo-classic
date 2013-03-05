@@ -19,10 +19,13 @@
  * Date: 14 Dec 2007
  */
 
-#include "transport/transport.hh"
-#include "rendering/Scene.hh"
-#include "rendering/DynamicLines.hh"
-#include "rendering/LaserVisual.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/transport/transport.hh"
+
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/LaserVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -43,6 +46,18 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   this->rayFan->setMaterial("Gazebo/BlueLaser");
   this->rayFan->AddPoint(math::Vector3(0, 0, 0));
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  common::MeshManager::Instance()->CreateSphere("laser_contact_sphere",
+      0.01, 5, 5);
+
+  // Add the mesh into OGRE
+  if (!this->sceneNode->getCreator()->hasEntity("laser_contact_sphere") &&
+      common::MeshManager::Instance()->HasMesh("laser_contact_sphere"))
+  {
+    const common::Mesh *mesh =
+      common::MeshManager::Instance()->GetMesh("laser_contact_sphere");
+    this->InsertMesh(mesh);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -70,7 +85,7 @@ void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
                       this->GetWorldPose();
 
   this->rayFan->SetPoint(0, offset.pos);
-  for (int i = 0; i < _msg->scan().ranges_size(); i++)
+  for (size_t i = 0; static_cast<int>(i) < _msg->scan().ranges_size(); i++)
   {
     r = _msg->scan().ranges(i) + _msg->scan().range_min();
     pt.x = 0 + r * cos(angle);
@@ -78,10 +93,29 @@ void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
     pt.z = 0;
     pt += offset.pos;
 
-    if (i+1 >= static_cast<int>(this->rayFan->GetPointCount()))
+    if (i+1 >= this->rayFan->GetPointCount())
       this->rayFan->AddPoint(pt);
     else
       this->rayFan->SetPoint(i+1, pt);
+
+    if (i >= this->points.size())
+    {
+      std::string objName = this->GetName() + "_lasercontactpoint_" +
+        boost::lexical_cast<std::string>(this->points.size());
+
+      Ogre::Entity *obj = this->scene->GetManager()->createEntity(
+          objName, "laser_contact_sphere");
+      obj->setMaterialName("Gazebo/RedTransparent");
+
+      LaserVisual::ContactPoint *cp = new LaserVisual::ContactPoint();
+      cp->sceneNode = this->sceneNode->createChildSceneNode(objName + "_node");
+      cp->sceneNode->attachObject(obj);
+      cp->sceneNode->setVisible(true);
+      cp->sceneNode->setPosition(Conversions::Convert(pt));
+      this->points.push_back(cp); 
+    }
+    else
+      this->points[i]->sceneNode->setPosition(Conversions::Convert(pt));
 
     angle += _msg->scan().angle_step();
   }

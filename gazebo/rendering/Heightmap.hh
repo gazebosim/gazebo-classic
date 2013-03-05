@@ -75,41 +75,53 @@ namespace gazebo
       /// \param[in] _camera Camera associated with the mouse press.
       /// \param[in] _mousePos Position of the mouse in viewport
       /// coordinates.
-      /// \param[in] _brushSize Controls the radius of effect.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
       public: bool Flatten(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _brushSize, double _weight = 0.1);
+                         double _outsideRadius, double _insideRadius,
+                         double _weight = 0.1);
 
       /// \brief Smooth the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.
       /// \param[in] _mousePos Position of the mouse in viewport
       /// coordinates.
-      /// \param[in] _brushSize Controls the radius of effect.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
       public: bool Smooth(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _brushSize, double _weight = 0.1);
+                         double _outsideRadius, double _insideRadius,
+                         double _weight = 0.1);
 
       /// \brief Raise the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.
       /// \param[in] _mousePos Position of the mouse in viewport
       /// coordinates.
-      /// \param[in] _brushSize Controls the radius of effect.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
       public: bool Raise(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _brushSize, double _weight = 0.1);
+                         double _outsideRadius, double _insideRadius,
+                         double _weight = 0.1);
 
       /// \brief Lower the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.
       /// \param[in] _mousePos Position of the mouse in viewport
       /// coordinates.
-      /// \param[in] _brushSize Controls the radius of effect.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
       public: bool Lower(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _brushSize, double _weight = 0.1);
+                         double _outsideRadius, double _insideRadius,
+                         double _weight = 0.1);
 
       /// \brief Get the average height around a point.
       /// \param[in] _pos Position in world coordinates.
@@ -134,11 +146,14 @@ namespace gazebo
 
       /// \brief Modify the height at a specific point.
       /// \param[in] _pos Position in world coordinates.
-      /// \param[in] _brushSize Controls the radius of effect.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \param[in] _op Type of operation to perform.
-      private: void ModifyTerrain(Ogre::Vector3 _pos, double _brushSize,
-                   double _weight, const std::string &_op);
+      private: void ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
+                   double _insideRadius, double _weight,
+                   const std::string &_op);
 
       /// \brief Initialize all the blend material maps.
       /// \param[in] _terrain The terrain to initialize the blend maps.

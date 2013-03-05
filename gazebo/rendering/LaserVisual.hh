@@ -65,6 +65,16 @@ namespace gazebo
 
       /// \brief Renders the laser data.
       private: DynamicLines *rayFan;
+
+      /// \brief A contact point visualization.
+      private: class ContactPoint
+               {
+                 /// \brief The scene node for the contact visualization.
+                 public: Ogre::SceneNode *sceneNode;
+               };
+
+      /// \brief All the contact points.
+      private: std::vector<LaserVisual::ContactPoint*> points;
     };
     /// \}
   }

@@ -91,9 +91,36 @@ namespace gazebo
       /// \brief QT callback when image is saved.
       private slots: void OnSave();
 
+      /// \brief QT callback, when outside radius spin box is modified.
+      /// \param[in] _value The new value.
+      private slots: void OnOutsideRadiusSpin(double _value);
+
+      /// \brief QT callback, when outside radius slider is modified.
+      /// \param[in] _value The new value.
       private slots: void OnOutsideRadiusSlider(int _value);
+
+      /// \brief QT callback, when inside radius spin box is modified.
+      /// \param[in] _value The new value.
+      private slots: void OnInsideRadiusSpin(double _value);
+
+      /// \brief QT callback, when inside radius slider is modified.
+      /// \param[in] _value The new value.
       private slots: void OnInsideRadiusSlider(int _value);
+
+      /// \brief QT callback, when weight spin box is modified.
+      /// \param[in] _value The new value.
+      private slots: void OnWeightSpin(double _value);
+
+      /// \brief QT callback, when weight slider is modified.
+      /// \param[in] _value The new value.
       private slots: void OnWeightSlider(int _value);
+
+      /// \brief QT callback, when height spin box is modified.
+      /// \param[in] _value The new value.
+      private slots: void OnHeightSpin(double _value);
+
+      /// \brief QT callback, when height slider is modified.
+      /// \param[in] _value The new value.
       private slots: void OnHeightSlider(int _value);
 
       /// \brief Spin to control the outside size of the brush.
