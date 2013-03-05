@@ -274,7 +274,7 @@ namespace gazebo
       /// not (lb-mass), etc.
       /// \param[in] _index Index of the axis.
       /// \return The force applied to an axis.
-      public: virtual double GetForce(unsigned int _index) GAZEBO_DEPRECATED;
+      public: virtual double GetForce(unsigned int _index);
 
       /// \brief get internal force and torque values at a joint
       /// Note that you must set
