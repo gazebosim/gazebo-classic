@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface gui_manipulation 
+/// \brief Message for manipulation physics via the GUI
+
+
+import "vector3d.proto";
+
+
+message GUIManipulation
+{
+  required string state          = 1;
+  required string link_name      = 2;
+  required Vector3d pos_on_link  = 3;
+  required Vector3d delta        = 4;
+}
