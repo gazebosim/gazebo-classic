@@ -198,7 +198,7 @@ void Heightmap::ConfigureTerrainDefaults()
   // MaxPixelError: Decides how precise our terrain is going to be.
   // A lower number will mean a more accurate terrain, at the cost of
   // performance (because of more vertices)
-  this->terrainGlobals->setMaxPixelError(0);
+  this->terrainGlobals->setMaxPixelError(1);
 
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
@@ -286,6 +286,16 @@ void Heightmap::DefineTerrain(int x, int y)
     unsigned char *data = NULL;
     unsigned int count = 0;
     this->heightImage.GetData(&data, count);
+/*
+    for (int y = 0; y < 129; ++y)
+    {
+      for (int x = 0; x < 129; ++x)
+      {
+        double px1 = static_cast<int>(data[y * 387 + x * 3]) / 255.0;
+        std::cout << "XY[" << x << " " << y << "] H[" << px1 << "] \n";
+      }
+    }
+    */
 
     if (this->heightImage.GetPixelFormat() == common::Image::L_INT8)
     {
@@ -423,7 +433,7 @@ bool Heightmap::Flatten(CameraPtr _camera, math::Vector2i _mousePos,
     this->GetMouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
-    this->ModifyTerrain(terrainResult.position, _outsideRadius, 
+    this->ModifyTerrain(terrainResult.position, _outsideRadius,
         _insideRadius, _weight, "flatten");
 
   return terrainResult.hit;

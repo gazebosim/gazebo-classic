@@ -89,6 +89,9 @@ void HeightmapShape::Init()
   else
     this->scale.z = fabs(terrainSize.z) / this->img.GetMaxColor().r;
 
+  std::cout << "Vert Size[" << this->vertSize << "] Scale[" << this->scale
+            << "] Terrain Size[" << terrainSize << "] MaxCOlor[" << this->img.GetMaxColor().r << "]\n";
+
   // Step 1: Construct the heightmap lookup table
   this->FillHeightMap();
 }
@@ -104,6 +107,7 @@ void HeightmapShape::FillHeightMap()
   // Resize the vector to match the size of the vertices
   this->heights.resize(this->vertSize * this->vertSize);
 
+  // this->img.Rescale(this->vertSize, this->vertSize);
   common::Color pixel;
 
   double yf, xf, dy, dx;
@@ -112,17 +116,42 @@ void HeightmapShape::FillHeightMap()
 
   int imgHeight = this->img.GetHeight();
   int imgWidth = this->img.GetWidth();
+
   // Bytes per row
   unsigned int pitch = this->img.GetPitch();
+
   // Bytes per pixel
   unsigned int bpp = pitch / imgWidth;
+
+  std::cout << "Image WxH[" << imgWidth << " " << imgHeight << "] Pitch["
+            << pitch << "] BPP[" << bpp << "]\n";
 
   unsigned char *data = NULL;
   unsigned int count;
   this->img.GetData(&data, count);
 
+  for (y = 0; y < this->vertSize; ++y)
+  {
+    for (x = 0; x < this->vertSize; ++x)
+    {
+      px1 = static_cast<int>(data[y * pitch + x * bpp]) / 255.0;
+      std::cout << "XY[" << x << " " << y << "] H[" << px1 << "] \n";
+
+      h = px1 * this->scale.z;
+
+      // invert pixel definition so 1=ground, 0=full height,
+      //   if the terrain size has a negative z component
+      //   this is mainly for backward compatibility
+      if (this->GetSize().z < 0)
+        h = 1.0 - h;
+
+      // Store the height for future use
+      this->heights[y * this->vertSize + x] = h;
+    }
+  }
+
   // Iterate over all the vertices
-  for (y = 0; y < this->vertSize; y++)
+  /*for (y = 0; y < this->vertSize; y++)
   {
     // yf ranges between 0 and 4
     yf = y / static_cast<double>(this->subSampling);
@@ -149,6 +178,7 @@ void HeightmapShape::FillHeightMap()
       px4 = static_cast<int>(data[y2 * pitch + x2 * bpp]) / 255.0;
       h2 = (px3 - ((px3 - px4) * dx));
 
+
       h = (h1 - ((h1 - h2) * dy)) * this->scale.z;
 
       // invert pixel definition so 1=ground, 0=full height,
@@ -160,7 +190,7 @@ void HeightmapShape::FillHeightMap()
       // Store the height for future use
       this->heights[y * this->vertSize + x] = h;
     }
-  }
+  }*/
 
   delete [] data;
 }

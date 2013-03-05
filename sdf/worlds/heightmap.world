@@ -6,6 +6,10 @@
       <uri>model://sun</uri>
     </include>
 
+    <include>
+      <uri>model://hokuyo</uri>
+    </include>
+
     <model name="heightmap">
       <static>true</static>
       <link name="link">
@@ -14,7 +18,7 @@
             <heightmap>
               <uri>file://media/materials/textures/heightmap_bowl.png</uri>
               <size>129 129 10</size>
-              <pos>0 0 0</pos>
+              <pos>0 0 -5.5</pos>
             </heightmap>
           </geometry>
         </collision>
@@ -47,7 +51,7 @@
               </blend>
               <uri>file://media/materials/textures/heightmap_bowl.png</uri>
               <size>129 129 10</size>
-              <pos>0 0 0</pos>
+              <pos>0 0 -5.5</pos>
             </heightmap>
           </geometry>
         </visual>
