@@ -227,12 +227,12 @@ namespace gazebo
       /// \brief Get the effort limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
       /// \return Effort limit specified in SDF
-      public: virtual double GetEffortLimit(int _index);
+      public: virtual double GetEffortLimit(unsigned int _index);
 
       /// \brief Get the velocity limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
       /// \return Velocity limit specified in SDF
-      public: virtual double GetVelocityLimit(int _index);
+      public: virtual double GetVelocityLimit(unsigned int _index);
 
       /// \brief Set the velocity of an axis(index).
       /// \param[in] _index Index of the axis.
@@ -252,7 +252,7 @@ namespace gazebo
       /// not (lb-mass), etc.
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Force value.
-      public: virtual void SetForce(int _index, double _force);
+      public: virtual void SetForce(unsigned int _index, double _force);
 
       /// \brief @todo: not yet implemented.
       /// Get the forces applied at this Joint.
@@ -263,7 +263,7 @@ namespace gazebo
       /// not (lb-mass), etc.
       /// \param[in] _index Index of the axis.
       /// \return The force applied to an axis.
-      public: virtual double GetForce(int _index);
+      public: virtual double GetForce(unsigned int _index) const;
 
       /// \brief get internal force and torque values at a joint
       /// Note that you must set
@@ -272,7 +272,7 @@ namespace gazebo
       /// \param[in] _index Force and torque on child link if _index = 0
       /// and on parent link of _index = 1
       /// \return The force and torque at the joint
-      public: virtual JointWrench GetForceTorque(int _index) = 0;
+      public: virtual JointWrench GetForceTorque(int _index) const = 0;
 
       /// \brief Set the max allowed force of an axis(index).
       /// Note that the unit of force should be consistent with the rest
@@ -292,7 +292,7 @@ namespace gazebo
       /// not (lb-mass), etc.
       /// \param[in] _index Index of the axis.
       /// \return The maximum force.
-      public: virtual double GetMaxForce(int _index) = 0;
+      public: virtual double GetMaxForce(int _index) const = 0;
 
       /// \brief Get the angle of rotation of an axis(index)
       /// \param[in] _index Index of the axis.
