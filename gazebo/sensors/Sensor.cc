@@ -129,6 +129,7 @@ std::string Sensor::GetParentName() const
 //////////////////////////////////////////////////
 void Sensor::Update(bool _force)
 {
+  gzerr << " udpate " << std::endl;
   if (this->IsActive() || _force)
   {
     if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod

@@ -534,6 +534,56 @@ class ServerFixture : public testing::Test
                EXPECT_LT(i, 50);
              }
 
+  protected: void SpawnBoxContactSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const math::Vector3 &_size, const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy, bool _static = false)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
+                 << "<pose>" << _pos.x << " "
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <collision name ='geom'>"
+                 << "    <geometry>"
+                 << "      <box><size>" << _size << "</size></box>"
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << "      <box><size>" << _size << "</size></box>"
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "  <sensor name='" << _sensorName << "' type='contact'>"
+                 << "    <contact>"
+                 << "      <collision>box_collision</collision>"
+                 << "    </contact>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
+             }
+
   protected: void SpawnCylinder(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  bool _static = false)

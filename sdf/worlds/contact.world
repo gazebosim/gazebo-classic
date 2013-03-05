@@ -38,5 +38,34 @@
         </sensor>
       </link>
     </model>
+    <model name="box2">
+      <link name="link">
+        <pose>0 0 1.5 0 0 0</pose>
+
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+
+        <sensor name='my_contact' type='contact'>
+          <contact>
+            <collision>box_collision</collision>
+          </contact>
+
+          <plugin name="my_plugin" filename="libContactPlugin.so"/>
+        </sensor>
+      </link>
+    </model>
   </world>
 </sdf>

@@ -24,12 +24,131 @@
 using namespace gazebo;
 class ContactSensor : public ServerFixture
 {
+  public: void StackTest(const std::string &_physicsEngine);
 };
 
 TEST_F(ContactSensor, EmptyWorld)
 {
   Load("worlds/empty.world");
 }
+
+void ContactSensor::StackTest(const std::string &_physicsEngine)
+{
+  Load("worlds/empty.world", true, _physicsEngine);
+
+  std::stringstream contactModelStr01;
+  std::string modelName01 = "contactModel01";
+  std::string contactSensorName01 = "contactSensor01";
+  math::Pose modelPose01(0, 0, 0.5, 0, 0, 0);
+
+  std::stringstream contactModelStr02;
+  std::string modelName02 = "contactModel02";
+  std::string contactSensorName02 = "contactSensor02";
+  math::Pose modelPose02(0, 0, 1.5, 0, 0, 0);
+
+  SpawnBoxContactSensor(modelName01, contactSensorName01,
+      math::Vector3(1, 1, 1), modelPose01.pos, modelPose01.rot.GetAsEuler());
+  SpawnBoxContactSensor(modelName02, contactSensorName02,
+      math::Vector3(1, 1, 1), modelPose02.pos, modelPose02.rot.GetAsEuler());
+
+  sensors::SensorPtr sensor01 = sensors::get_sensor(contactSensorName01);
+  sensors::ContactSensorPtr contactSensor01 =
+      boost::shared_dynamic_cast<sensors::ContactSensor>(sensor01);
+
+  ASSERT_TRUE(contactSensor01);
+
+  sensors::SensorPtr sensor02 = sensors::get_sensor(contactSensorName02);
+  sensors::ContactSensorPtr contactSensor02 =
+      boost::shared_dynamic_cast<sensors::ContactSensor>(sensor02);
+
+  ASSERT_TRUE(contactSensor02);
+
+  contactSensor01->Init();
+  contactSensor02->Init();
+  contactSensor01->Update(true);
+  contactSensor02->Update(true);
+
+  EXPECT_FALSE(contactSensor01->IsActive());
+  EXPECT_FALSE(contactSensor02->IsActive());
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  unsigned int expectedColCount = 1;
+  EXPECT_EQ(contactSensor01->GetCollisionCount(), expectedColCount);
+  EXPECT_EQ(contactSensor02->GetCollisionCount(), expectedColCount);
+
+  contactSensor01->SetActive(true);
+  contactSensor02->SetActive(true);
+
+  EXPECT_TRUE(contactSensor01->IsActive());
+  EXPECT_TRUE(contactSensor02->IsActive());
+
+  contactSensor01->Update(true);
+  contactSensor02->Update(true);
+
+   // Get all the contacts.
+  msgs::Contacts contacts;
+  contacts = contactSensor01->GetContacts();
+
+  gzerr << contacts.contact_size() << std::endl;
+
+  for (int i = 0; i < contacts.contact_size(); ++i)
+  {
+    std::cout << "Collision between[" << contacts.contact(i).collision1()
+              << "] and [" << contacts.contact(i).collision2() << "]\n";
+
+    for (int j = 0; j < contacts.contact(i).position_size(); ++j)
+    {
+      std::cout << j << "  Position:"
+                << contacts.contact(i).position(j).x() << " "
+                << contacts.contact(i).position(j).y() << " "
+                << contacts.contact(i).position(j).z() << "\n";
+      std::cout << "   Normal:"
+                << contacts.contact(i).normal(j).x() << " "
+                << contacts.contact(i).normal(j).y() << " "
+                << contacts.contact(i).normal(j).z() << "\n";
+      std::cout << "   Depth:" << contacts.contact(i).depth(j) << "\n";
+      std::cout << "   Normal force 1: "
+                << contacts.contact(i).normal(j).x() *
+                   contacts.contact(i).wrench(j).body_1_force().x() +
+                   contacts.contact(i).normal(j).y() *
+                   contacts.contact(i).wrench(j).body_1_force().y() +
+                   contacts.contact(i).normal(j).z() *
+                   contacts.contact(i).wrench(j).body_1_force().z() << "\n";
+    }
+  }
+
+
+
+//  msgs::Contact
+
+
+
+//  EXPECT_TRUE(contactSensor01->GetCollisionContactCount(
+//    contactSensor01->GetCollisionName(0)) >= 0);
+
+//  EXPECT_TRUE(contactSensor02->GetCollisionContactCount(
+//    contactSensor01->GetCollisionName(0)) >= 0);
+
+
+//  gzerr << contactSensor01->GetCollisionName(0) << std::endl;;
+
+}
+
+TEST_F(ContactSensor, StackTestODE)
+{
+  StackTest("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(ContactSensor, StackTestBullet)
+{
+  StackTest("bullet");
+}
+#endif  // HAVE_BULLET
+
+
 
 int main(int argc, char **argv)
 {
