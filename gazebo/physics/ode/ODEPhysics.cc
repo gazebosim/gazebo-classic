@@ -392,6 +392,14 @@ void ODEPhysics::UpdatePhysics()
             this->jointFeedbacks[i]->feedbacks[j].t2[0],
             this->jointFeedbacks[i]->feedbacks[j].t2[1],
             this->jointFeedbacks[i]->feedbacks[j].t2[2]);
+
+            gzerr << "force " << this->jointFeedbacks[i]->contact->wrench[j].body1Force
+             << " " << this->jointFeedbacks[i]->contact->wrench[j].body2Force
+             << std::endl;
+
+            gzerr << "torque " << this->jointFeedbacks[i]->contact->wrench[j].body1Torque
+             << " " << this->jointFeedbacks[i]->contact->wrench[j].body2Torque
+             << std::endl;
       }
     }
   }

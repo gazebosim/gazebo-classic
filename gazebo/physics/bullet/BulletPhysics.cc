@@ -122,6 +122,9 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     const btCollisionObject *obB =
         static_cast<const btCollisionObject *>(contactManifold->getBody1());
 
+    const btRigidBody *rbA = btRigidBody::upcast(obA);
+    const btRigidBody *rbB = btRigidBody::upcast(obB);
+
     BulletLink *link0 = static_cast<BulletLink *>(
         obA->getUserPointer());
     GZ_ASSERT(link0 != NULL, "Link0 in collision pair is NULL");
@@ -133,6 +136,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr0 = link0->GetCollision(colIndex);
     CollisionPtr collisionPtr1 = link1->GetCollision(colIndex);
+
     if (!collisionPtr0 || !collisionPtr1)
       return;
 
@@ -150,7 +154,6 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
       return;
 
     int numContacts = contactManifold->getNumContacts();
-//    numContacts = std::min(bulletPhysics->GetMaxContacts(), numContacts);
 
     for (int j = 0; j < numContacts; ++j)
     {
@@ -158,11 +161,33 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
       if (pt.getDistance() < 0.f)
       {
         //const btVector3& ptA = pt.getPositionWorldOnA();
-        const btVector3& ptB = pt.getPositionWorldOnB();
-        const btVector3& normalOnB = pt.m_normalWorldOnB;
+        const btVector3 &ptB = pt.getPositionWorldOnB();
+        const btVector3 &normalOnB = pt.m_normalWorldOnB;
+        btVector3 impulse = pt.m_appliedImpulse * normalOnB;
+        btVector3 force = impulse/_timeStep;
+        btVector3 torqueA =
+            (ptB-rbA->getCenterOfMassPosition()).cross(force);
+        btVector3 torqueB =
+            (ptB-rbB->getCenterOfMassPosition()).cross(-force);
 
         contactFeedback->positions[j] = BulletTypes::ConvertVector3(ptB);
         contactFeedback->normals[j] = BulletTypes::ConvertVector3(normalOnB);
+        contactFeedback->depths[j] = -pt.getDistance();
+        if (!link0->IsStatic())
+        {
+          contactFeedback->wrench[j].body1Force =
+              BulletTypes::ConvertVector3(force);
+          contactFeedback->wrench[j].body1Torque =
+              BulletTypes::ConvertVector3(torqueA);
+        }
+        if (!link1->IsStatic())
+        {
+          contactFeedback->wrench[j].body2Force =
+              BulletTypes::ConvertVector3(-force);
+          contactFeedback->wrench[j].body2Torque =
+              BulletTypes::ConvertVector3(torqueB);
+
+        }
         contactFeedback->count++;
       }
     }
@@ -202,50 +227,11 @@ bool BulletPhysics::ContactCallback(btManifoldPoint &_cp,
   BulletPhysicsPtr bulletPhysics =
         boost::shared_static_cast<BulletPhysics>(engine);
 
-  /*Contact *contactFeedback = NULL;
-  boost::unordered_map<CollisionPtr, Contact *> &contactMap
-      = bulletPhysics->GetContactMap();
-  gzerr << "contact feedback " << contactMap.size() << std::endl;
-
-
-  if (contactMap.find(collisionPtr0) != contactMap.end())
-  {
-    contactFeedback = contactMap[collisionPtr0];
-  }
-  else if (contactMap.find(collisionPtr1) != contactMap.end())
-  {
-    contactFeedback = contactMap[collisionPtr1];
-  }
-  else
-  {
-    contactFeedback = bulletPhysics->GetContactManager()->
-        NewContact(collisionPtr0.get(),
-        collisionPtr1.get(), collisionPtr0->GetWorld()->GetSimTime());
-
-    if (!contactFeedback)
-      return false;
-
-    contactMap[collisionPtr0] = contactFeedback;
-    contactMap[collisionPtr1] = contactFeedback;
-  }
-
-
-//  const btVector3& ptA = _cp.getPositionWorldOnA();
-  const btVector3& ptB = _cp.getPositionWorldOnB();
-  const btVector3& normalOnB = _cp.m_normalWorldOnB;
-
-  int contactIndex = std::max(0, contactFeedback->count - 1);
-  contactFeedback->positions[contactIndex] = BulletTypes::ConvertVector3(ptB);
-  contactFeedback->normals[contactIndex] = BulletTypes::ConvertVector3(normalOnB);
-  contactFeedback->count++;*/
-
   const btVector3& ptB = _cp.getPositionWorldOnB();
   const btVector3& normalOnB = _cp.m_normalWorldOnB;
 
   bulletPhysics->AddContact(collisionPtr0, collisionPtr1,
     BulletTypes::ConvertVector3(ptB), BulletTypes::ConvertVector3(normalOnB));
-
-//  gzerr << contactFeedback->count++ << std::endl;
   return false;
 }
 
@@ -254,17 +240,37 @@ void BulletPhysics::AddContact(CollisionPtr _col0, CollisionPtr _col1,
     math::Vector3 _pos, math::Vector3 _normal)
 {
   Contact *contactFeedback = NULL;
-  if (contactMap.find(_col0) != contactMap.end())
+
+
+  std::pair<boost::unordered_multimap<CollisionPtr, Contact *>::iterator,
+      boost::unordered_multimap<CollisionPtr, Contact *>::iterator> ret;
+  ret = contactMap.equal_range(_col0);
+
+  for (boost::unordered_multimap<CollisionPtr, Contact *>::iterator it
+      = ret.first; it != ret.second; ++it)
   {
-    contactFeedback = contactMap[_col0];
-//    gzerr << " f " << std::endl;
+      if (it->second->collision2 == _col1->GetScopedName())
+      {
+        contactFeedback = it->second;
+        break;
+      }
   }
-  else if (contactMap.find(_col1) != contactMap.end())
+
+  if (!contactFeedback)
   {
-    contactFeedback = contactMap[_col1];
-//    gzerr << " f1 " << std::endl;
+    ret = contactMap.equal_range(_col1);
+    for (boost::unordered_multimap<CollisionPtr, Contact *>::iterator it
+        = ret.first; it != ret.second; ++it)
+    {
+        if (it->second->collision1 == _col0->GetScopedName())
+        {
+          contactFeedback = it->second;
+          break;
+        }
+    }
   }
-  else
+
+  if (!contactFeedback)
   {
     contactFeedback = this->contactManager->
         NewContact(_col0.get(),
@@ -273,21 +279,17 @@ void BulletPhysics::AddContact(CollisionPtr _col0, CollisionPtr _col1,
     if (!contactFeedback)
       return;
 
-    contactMap[_col0] = contactFeedback;
-    contactMap[_col1] = contactFeedback;
-
-//    gzerr << " new " << contactMap.size() << std::endl;
+    contactMap.insert(std::pair<CollisionPtr, Contact *>(_col0, contactFeedback));
   }
 
   int contactIndex = std::max(0, contactFeedback->count - 1);
-//  gzerr << "cont " << contactIndex << " " << _pos << " " << _normal << std::endl;
   contactFeedback->positions[contactIndex] = _pos;
   contactFeedback->normals[contactIndex] = _normal;
   contactFeedback->count++;
 }
 
 //////////////////////////////////////////////////
-boost::unordered_map<CollisionPtr, Contact *> &BulletPhysics::GetContactMap()
+boost::unordered_multimap<CollisionPtr, Contact *> &BulletPhysics::GetContactMap()
 {
   return contactMap;
 }
@@ -340,11 +342,11 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   pairCache->setOverlapFilterCallback(filterCallback);
 
   // TODO: Enable this to do custom contact setting
-  gContactAddedCallback = ContactCallback;
+//  gContactAddedCallback = ContactCallback;
   gContactProcessedCallback = ContactProcessed;
 
-//  this->dynamicsWorld->setInternalTickCallback(
-//      InternalTickCallback, static_cast<void *>(this));
+  this->dynamicsWorld->setInternalTickCallback(
+      InternalTickCallback, static_cast<void *>(this));
 
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
@@ -508,8 +510,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 void BulletPhysics::UpdateCollision()
 {
   this->contactManager->ResetCount();
-//  contactMap.clear();
-//  gzerr << " clear " << std::endl;
+  contactMap.clear();
 }
 
 //////////////////////////////////////////////////
