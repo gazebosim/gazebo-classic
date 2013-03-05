@@ -758,11 +758,10 @@ void MainWindow::CreateActions()
   connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
 
 #ifdef HAVE_QWT
-  /*g_diagnosticsAct = new QAction(tr("Diagnostic Plot"), this);
+  g_diagnosticsAct = new QAction(tr("Diagnostic Plot"), this);
   g_diagnosticsAct->setShortcut(tr("Ctrl+U"));
   g_diagnosticsAct->setStatusTip(tr("Plot diagnostic information"));
   connect(g_diagnosticsAct, SIGNAL(triggered()), this, SLOT(Diagnostics()));
-  */
 #endif
 
   g_openAct = new QAction(tr("&Open World"), this);
@@ -1070,7 +1069,7 @@ void MainWindow::AttachMainMenuBar()
   windowMenu->addAction(g_dataLoggerAct);
 
 #ifdef HAVE_QWT
-  // windowMenu->addAction(g_diagnosticsAct);
+  windowMenu->addAction(g_diagnosticsAct);
 #endif
 
   this->menuBar->addSeparator();
