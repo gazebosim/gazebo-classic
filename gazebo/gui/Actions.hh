@@ -71,6 +71,8 @@ namespace gazebo
 
     extern QAction *g_topicVisAct;
 
+    extern QAction *g_dragLinkAct;
+
     extern QAction *g_buildingEditorSaveAct;
     extern QAction *g_buildingEditorDiscardAct;
     extern QAction *g_buildingEditorDoneAct;

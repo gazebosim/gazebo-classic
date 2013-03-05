@@ -526,6 +526,12 @@ void MainWindow::Rotate()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::OnDragLink()
+{
+  gui::Events::manipMode("drag");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
   g_arrowAct->setChecked(true);
@@ -838,6 +844,11 @@ void MainWindow::CreateActions()
   g_boxCreateAct->setCheckable(true);
   connect(g_boxCreateAct, SIGNAL(triggered()), this, SLOT(CreateBox()));
 
+  g_dragLinkAct = new QAction(QIcon(":/images/box.png"), tr("Drag"), this);
+  g_dragLinkAct->setStatusTip(tr("Drag a link"));
+  g_dragLinkAct->setCheckable(true);
+  connect(g_dragLinkAct, SIGNAL(triggered()), this, SLOT(OnDragLink()));
+
   g_sphereCreateAct = new QAction(QIcon(":/images/sphere.png"),
       tr("Sphere"), this);
   g_sphereCreateAct->setStatusTip(tr("Create a sphere"));
@@ -1085,6 +1096,7 @@ void MainWindow::OnMoveMode(bool _mode)
   if (_mode)
   {
     g_boxCreateAct->setChecked(false);
+    g_dragLinkAct->setChecked(false);
     g_sphereCreateAct->setChecked(false);
     g_cylinderCreateAct->setChecked(false);
     g_meshCreateAct->setChecked(false);

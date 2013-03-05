@@ -114,6 +114,10 @@ namespace gazebo
                                            ModelPtr _parent);
 
       // Documentation inherited
+      public: virtual JointPtr CreateJoint(const std::string &_type,
+                                           LinkPtr _parent);
+
+      // Documentation inherited
       public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
 
       // Documentation inherited

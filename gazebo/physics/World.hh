@@ -396,6 +396,10 @@ namespace gazebo
       /// \param[in] _msg Incoming joint message.
       private: void JointLog(ConstJointPtr &_msg);
 
+      /// \brief Called when a user has started manipulating a link.
+      /// \param[in] _msg GUI Manipulation msg pointer.
+      private: void OnLinkManipMsg(ConstGUIManipulationPtr &_msg);
+
       /// \brief Called when a factory message is received.
       /// \param[in] _data The factory message.
       private: void OnFactoryMsg(ConstFactoryPtr &_data);
@@ -521,6 +525,9 @@ namespace gazebo
 
       /// \brief Publisher of log status messages.
       private: transport::PublisherPtr logStatusPub;
+
+      /// \brief Subscriber to GUI manipulation messages.
+      private: transport::SubscriberPtr linkManip;
 
       /// \brief Subscriber to factory messages.
       private: transport::SubscriberPtr factorySub;
@@ -654,6 +661,9 @@ namespace gazebo
 
       /// \brief The number of simulation iterations.
       private: uint64_t iterations;
+
+      //private: JointPtr pickJoint;
+      private: std::list<std::pair<LinkPtr, JointPtr> > picks;
     };
     /// \}
   }

@@ -95,6 +95,10 @@ namespace gazebo
                                            ModelPtr _parent);
 
       // Documentation inherited
+      public: virtual JointPtr CreateJoint(const std::string &_type,
+                                           LinkPtr _parent);
+
+      // Documentation inherited
       public: virtual ShapePtr CreateShape(const std::string &_shapeType,
                                            CollisionPtr _collision);
 

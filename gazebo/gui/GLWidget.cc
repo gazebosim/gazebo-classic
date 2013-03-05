@@ -108,6 +108,8 @@ GLWidget::GLWidget(QWidget *_parent)
   this->node->Init();
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+  this->linkManipPub = this->node->Advertise<msgs::GUIManipulation>(
+      "~/link_manip");
 
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
   this->selectionSub = this->node->Subscribe("~/selection",
@@ -349,6 +351,8 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
     this->OnMousePressNormal();
   else if (this->state == "translate" || this->state == "rotate")
     this->OnMousePressTranslate();
+  else if (this->state == "drag")
+    this->OnMousePressDrag();
 }
 
 /////////////////////////////////////////////////
@@ -438,6 +442,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
     this->OnMouseMoveNormal();
   else if (this->state == "translate" || this->state == "rotate")
     this->OnMouseMoveTranslate();
+  else if (this->state == "drag")
+    this->OnMouseMoveDrag();
 
   this->mouseEvent.prevPos = this->mouseEvent.pos;
 }
@@ -598,6 +604,8 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
     this->OnMouseReleaseNormal();
   else if (this->state == "translate" || this->state == "rotate")
     this->OnMouseReleaseTranslate();
+  else if (this->state == "drag")
+    this->OnMouseReleaseDrag();
 }
 
 //////////////////////////////////////////////////
@@ -1108,5 +1116,75 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
     }
     if (this->mouseMoveVis && this->mouseMoveVis->GetName() == _msg->data())
       this->SetMouseMoveVisual(rendering::VisualPtr());
+  }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnMousePressDrag()
+{
+  if (!this->manipVis)
+  {
+    // Create a visual that is used a reference point.
+    this->manipVis.reset(new rendering::Visual("__MANIPULATION_VISUAL__",
+          this->userCamera->GetScene()));
+
+    this->manipVis->Init();
+    this->manipVis->AttachMesh("unit_sphere");
+    this->manipVis->SetScale(math::Vector3(0.2, 0.2, 0.1));
+    this->manipVis->SetCastShadows(false);
+    this->manipVis->SetMaterial("Gazebo/YellowTransparent");
+    this->manipVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  }
+
+  this->manipVis->SetVisible(true);
+
+  rendering::VisualPtr vis =
+    this->userCamera->GetVisual(this->mouseEvent.pos);
+  if (this->mouseEvent.button == common::MouseEvent::LEFT)
+  {
+    this->linkManipVis = vis->GetParent();
+
+    this->scene->GetFirstContact(this->userCamera,
+        this->mouseEvent.pressPos, this->linkManipStartPos);
+
+    this->manipVis->SetPosition(this->linkManipStartPos);
+    this->mouseMoveVisStartPose.pos = this->linkManipStartPos;
+
+    msgs::GUIManipulation msg;
+    msg.set_state("press");
+    msg.set_link_name(this->linkManipVis->GetName());
+    msgs::Set(msg.mutable_pos_on_link(), this->linkManipStartPos);
+    msgs::Set(msg.mutable_delta(), math::Vector3());
+    this->linkManipPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnMouseReleaseDrag()
+{
+
+  msgs::GUIManipulation msg;
+  msg.set_state("release");
+  msg.set_link_name(this->linkManipVis->GetName());
+  msgs::Set(msg.mutable_pos_on_link(), this->linkManipStartPos);
+  msgs::Set(msg.mutable_delta(), this->manipVis->GetWorldPose().pos);
+  this->manipVis->SetVisible(false);
+
+  this->linkManipPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnMouseMoveDrag()
+{
+  if (this->mouseEvent.dragging == true)
+  {
+    this->TranslateEntity(this->manipVis);
+
+    msgs::GUIManipulation msg;
+    msg.set_state("move");
+    msg.set_link_name(this->linkManipVis->GetName());
+    msgs::Set(msg.mutable_pos_on_link(), this->linkManipStartPos);
+    msgs::Set(msg.mutable_delta(), this->manipVis->GetWorldPose().pos);
+    this->linkManipPub->Publish(msg);
   }
 }

@@ -429,19 +429,22 @@ double ODEPhysics::GetStepTime()
 //////////////////////////////////////////////////
 LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
 {
-  if (_parent == NULL)
-    gzthrow("Link must have a parent\n");
-
-  std::map<std::string, dSpaceID>::iterator iter;
-  iter = this->spaces.find(_parent->GetName());
-
-  if (iter == this->spaces.end())
-    this->spaces[_parent->GetName()] = dSimpleSpaceCreate(this->spaceId);
+  // if (_parent == NULL)
+  //  gzthrow("Link must have a parent\n");
 
   ODELinkPtr link(new ODELink(_parent));
 
-  link->SetSpaceId(this->spaces[_parent->GetName()]);
-  link->SetWorld(_parent->GetWorld());
+  if (_parent)
+  {
+    std::map<std::string, dSpaceID>::iterator iter;
+    iter = this->spaces.find(_parent->GetName());
+
+    if (iter == this->spaces.end())
+      this->spaces[_parent->GetName()] = dSimpleSpaceCreate(this->spaceId);
+
+    link->SetSpaceId(this->spaces[_parent->GetName()]);
+    link->SetWorld(_parent->GetWorld());
+  }
 
   return link;
 }
@@ -656,6 +659,29 @@ void ODEPhysics::ConvertMass(void *_engineMass, InertialPtr _inertial)
 
   odeMass->I[1*4+2] = _inertial->GetProductsofInertia()[2];
   odeMass->I[2*4+1] = _inertial->GetProductsofInertia()[2];
+}
+
+//////////////////////////////////////////////////
+JointPtr ODEPhysics::CreateJoint(const std::string &_type, LinkPtr _parent)
+{
+  JointPtr joint;
+
+  if (_type == "prismatic")
+    joint.reset(new ODESliderJoint(this->worldId, _parent));
+  else if (_type == "screw")
+    joint.reset(new ODEScrewJoint(this->worldId, _parent));
+  else if (_type == "revolute")
+    joint.reset(new ODEHingeJoint(this->worldId, _parent));
+  else if (_type == "revolute2")
+    joint.reset(new ODEHinge2Joint(this->worldId, _parent));
+  else if (_type == "ball")
+    joint.reset(new ODEBallJoint(this->worldId, _parent));
+  else if (_type == "universal")
+    joint.reset(new ODEUniversalJoint(this->worldId, _parent));
+  else
+    gzthrow("Unable to create joint of type[" << _type << "]");
+
+  return joint;
 }
 
 //////////////////////////////////////////////////

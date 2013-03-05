@@ -176,6 +176,9 @@ void World::Load(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("gui"))
     this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
 
+  this->linkManip = this->node->Subscribe("~/link_manip",
+                                           &World::OnLinkManipMsg, this);
+
   this->factorySub = this->node->Subscribe("~/factory",
                                            &World::OnFactoryMsg, this);
   this->controlSub = this->node->Subscribe("~/world_control",
@@ -956,6 +959,56 @@ void World::SetPaused(bool _p)
     this->realTimeOffset += common::Time::GetWallTime() - this->pauseStartTime;
 
   event::Events::pause(_p);
+}
+
+//////////////////////////////////////////////////
+void World::OnLinkManipMsg(ConstGUIManipulationPtr &_msg)
+{
+  if (_msg->state() == "press")
+  {
+    boost::recursive_mutex::scoped_lock lock(
+        *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
+    LinkPtr pickLink = this->GetPhysicsEngine()->CreateLink(ModelPtr());
+    pickLink->SetWorld(shared_from_this());
+    pickLink->Load(sdf::ElementPtr());
+    pickLink->Init();
+
+    pickLink->SetWorldPose(math::Pose(msgs::Convert(_msg->pos_on_link()),
+            math::Quaternion()));
+
+    pickLink->SetKinematic(true);
+
+    JointPtr pickJoint =
+      this->GetPhysicsEngine()->CreateJoint("ball", ModelPtr());
+
+    pickJoint->Load(
+        boost::shared_dynamic_cast<Link>(this->GetEntity(_msg->link_name())),
+        pickLink,
+        math::Pose(msgs::Convert(_msg->pos_on_link()), math::Quaternion()));
+
+    pickJoint->SetAttribute("cfm", 0, 0.5);
+    pickJoint->SetAttribute("erp", 0, 0);
+    pickJoint->Init();
+    this->picks.push_back(std::make_pair(pickLink, pickJoint));
+
+    std::cout << "StartPose[" << pickLink->GetWorldPose().pos << "]\n";
+  }
+  else if (_msg->state() == "move")
+  {
+    math::Pose pose = this->picks.front().first->GetWorldPose();
+    pose.pos = msgs::Convert(_msg->delta());
+    std::cout << "MovePose[" << pose.pos << "]\n";
+    this->picks.front().first->SetWorldPose(pose, true, false);
+  }
+  else if (_msg->state() == "release")
+  {
+    boost::recursive_mutex::scoped_lock lock(
+        *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+    this->picks.front().second->Reset();
+    this->picks.front().second->Detach();
+    this->picks.clear();
+  }
 }
 
 //////////////////////////////////////////////////

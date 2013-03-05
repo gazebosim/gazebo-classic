@@ -34,6 +34,8 @@ QAction *gazebo::gui::g_resetModelsAct = 0;
 QAction *gazebo::gui::g_resetWorldAct = 0;
 QAction *gazebo::gui::g_editBuildingAct = 0;
 
+QAction *gazebo::gui::g_dragLinkAct = 0;
+
 QAction *gazebo::gui::g_buildingEditorSaveAct = 0;
 QAction *gazebo::gui::g_buildingEditorDiscardAct = 0;
 QAction *gazebo::gui::g_buildingEditorDoneAct = 0;

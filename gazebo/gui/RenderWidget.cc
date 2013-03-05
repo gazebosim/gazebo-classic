@@ -73,6 +73,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolbar->addAction(g_pointLghtCreateAct);
   toolbar->addAction(g_spotLghtCreateAct);
   toolbar->addAction(g_dirLghtCreateAct);
+  toolbar->addSeparator();
+  toolbar->addAction(g_dragLinkAct);
 
   toolLayout->addSpacing(10);
   toolLayout->addWidget(toolbar);

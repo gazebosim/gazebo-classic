@@ -69,6 +69,7 @@ namespace gazebo
       private slots: void Translate();
       private slots: void Rotate();
 
+      private slots: void OnDragLink();
       private slots: void CreateBox();
       private slots: void CreateSphere();
       private slots: void CreateCylinder();

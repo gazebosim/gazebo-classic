@@ -81,14 +81,17 @@ namespace gazebo
       private: void OnMouseMoveNormal();
       private: void OnMouseMoveTranslate();
       private: void OnMouseMoveMakeEntity();
+      private: void OnMouseMoveDrag();
 
       private: void OnMouseReleaseNormal();
       private: void OnMouseReleaseTranslate();
       private: void OnMouseReleaseMakeEntity();
+      private: void OnMouseReleaseDrag();
 
       private: void OnMousePressNormal();
       private: void OnMousePressTranslate();
       private: void OnMousePressMakeEntity();
+      private: void OnMousePressDrag();
 
       private: void OnRequest(ConstRequestPtr &_msg);
 
@@ -155,6 +158,7 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
       private: transport::PublisherPtr lightPub;
+      private: transport::PublisherPtr linkManipPub;
       private: transport::SubscriberPtr selectionSub, requestSub;
 
       private: std::string keyText;
@@ -167,6 +171,12 @@ namespace gazebo
       private: std::string state;
 
       private: std::list<std::pair<std::string, math::Pose> > moveHistory;
+
+      private: rendering::VisualPtr linkManipVis;
+      private: math::Vector3 linkManipStartPos;
+
+      private: rendering::VisualPtr manipVis;
+
     };
   }
 }

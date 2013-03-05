@@ -217,10 +217,11 @@ void Entity::StopAnimation()
 //////////////////////////////////////////////////
 void Entity::PublishPose()
 {
-  GZ_ASSERT(this->GetParentModel() != NULL,
-      "An entity without a parent model should not happen");
-
-  this->world->PublishModelPose(this->GetParentModel()->GetName());
+  // Only publish pose if the entity has a parent model. Otherwise, the
+  // entity is used for internal purposes only (at least as of this
+  // writing - 03/01/2013.
+  if (this->GetParentModel())
+    this->world->PublishModelPose(this->GetParentModel()->GetName());
 }
 
 //////////////////////////////////////////////////
@@ -462,6 +463,9 @@ ModelPtr Entity::GetParentModel()
   BasePtr p;
   if (this->HasType(MODEL))
     return boost::shared_dynamic_cast<Model>(shared_from_this());
+
+  if (!this->parent)
+    return ModelPtr();
 
   p = this->parent;
   GZ_ASSERT(p, "Parent of an entity is NULL");

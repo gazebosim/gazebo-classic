@@ -127,6 +127,9 @@ namespace gazebo
       public: virtual JointPtr CreateJoint(const std::string &_type,
                                            ModelPtr _parent) = 0;
 
+      public: virtual JointPtr CreateJoint(const std::string &_type,
+                                           LinkPtr _parent) = 0;
+
       /// \brief Return the gavity vector.
       /// \return The gavity vector.
       public: virtual math::Vector3 GetGravity() const;

@@ -19,6 +19,7 @@ set (msgs
   gui_overlay_config.proto
   gui_camera.proto
   gui.proto
+  gui_manipulation.proto
   gz_string.proto
   gz_string_v.proto
   header.proto

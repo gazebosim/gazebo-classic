@@ -53,7 +53,6 @@ Link::Link(EntityPtr _parent)
   this->childJoints.clear();
 }
 
-
 //////////////////////////////////////////////////
 Link::~Link()
 {
@@ -89,7 +88,14 @@ Link::~Link()
 //////////////////////////////////////////////////
 void Link::Load(sdf::ElementPtr _sdf)
 {
-  Entity::Load(_sdf);
+  if (_sdf)
+    Entity::Load(_sdf);
+  else
+  {
+    this->sdf.reset(new sdf::Element);
+    sdf::initFile("link.sdf", this->sdf);
+    Entity::Load(this->sdf);
+  }
 
   // before loading child collsion, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
