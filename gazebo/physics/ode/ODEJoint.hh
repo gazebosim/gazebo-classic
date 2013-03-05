@@ -78,6 +78,9 @@ namespace gazebo
       /// \param[in] _value Value to set.
       public: virtual void SetParam(int _parameter, double _value);
 
+      // Documentation inherited
+      public: virtual void SetDamping(int _index, double _damping);
+
       // Documentation inherited.
       public: virtual void Attach(LinkPtr _parent, LinkPtr _child);
 
@@ -123,6 +126,10 @@ namespace gazebo
 
       /// \brief internal variable to keep track of cfm damping internals
       private: int cfmDampingState[2];
+
+      /// \brief internal variable to keep track if ConnectJointUpdate
+      /// has been called on a damping method
+      private: bool dampingInitialized;
 
       // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);

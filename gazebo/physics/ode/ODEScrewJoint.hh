@@ -50,9 +50,6 @@ namespace gazebo
       public: virtual void SetAxis(int index, const math::Vector3 &_axis);
 
       // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
-
-      // Documentation inherited
       public: virtual void SetThreadPitch(int _index, double _threadPitch);
 
       // Documentation inherited
