@@ -66,7 +66,7 @@ TEST_F(ODEJoint_TEST, GetForceTorque)
   physics::JointPtr joint_12 = model_1->GetJoint("joint_12");
 
   gzdbg << "-------------------Test 1-------------------\n";
-  for (unsigned int i = 0; i < 1; ++i)
+  for (unsigned int i = 0; i < 5; ++i)
   {
     world->StepWorld(1);
     // test joint_01 wrench
@@ -125,7 +125,7 @@ TEST_F(ODEJoint_TEST, GetForceTorque)
   world->StepWorld(2000);
   // check force torques in new system
   gzdbg << "\n-------------------Test 2-------------------\n";
-  for (unsigned int i = 0; i < 1; ++i)
+  for (unsigned int i = 0; i < 5; ++i)
   {
     world->StepWorld(1);
 
