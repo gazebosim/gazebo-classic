@@ -124,9 +124,13 @@ namespace gazebo
       /// This function is called before the camera is destructed
       public: virtual void Fini();
 
+      /// Deprecated.
+      /// \sa GetInitialized
+      public: inline bool IsInitialized() const GAZEBO_DEPRECATED;
+
       /// \brief Return true if the camera has been initialized
       /// \return True if initialized was successful
-      public: inline bool IsInitialized() const {return this->initialized;}
+      public: bool GetInitialized() const;
 
       /// \internal
       /// \brief Set the ID of the window this camera is rendering into.
@@ -448,10 +452,6 @@ namespace gazebo
       /// \param[in] _visualName Name of the visual to check for visibility
       /// \return True if the _visual is in the camera's frustum
       public: bool IsVisible(const std::string &_visualName);
-
-      /// \brief Returns true if initialized
-      /// \return Ture if the camera is initialized
-      public: bool GetInitialized() const;
 
       /// \brief Return true if the camera is moving due to an animation.
       public: bool IsAnimating() const;
