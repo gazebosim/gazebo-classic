@@ -263,7 +263,18 @@ namespace gazebo
       /// not (lb-mass), etc.
       /// \param[in] _index Index of the axis.
       /// \return The force applied to an axis.
-      public: virtual double GetForce(int _index);
+      public: virtual double GetForce(int _index) GAZEBO_DEPRECATED;
+
+      /// \brief @todo: not yet implemented.
+      /// Get the forces applied at this Joint.
+      /// Note that the unit of force should be consistent with the rest
+      /// of the simulation scales.  E.g.  if you are using
+      /// metric units, the unit for force is Newtons.  If using
+      /// imperial units (sorry), then unit of force is lb-force
+      /// not (lb-mass), etc.
+      /// \param[in] _index Index of the axis.
+      /// \return The force applied to an axis.
+      public: virtual double GetForce(unsigned int _index);
 
       /// \brief get internal force and torque values at a joint
       /// Note that you must set
@@ -272,7 +283,17 @@ namespace gazebo
       /// \param[in] _index Force and torque on child link if _index = 0
       /// and on parent link of _index = 1
       /// \return The force and torque at the joint
-      public: virtual JointWrench GetForceTorque(int _index) = 0;
+      public: virtual JointWrench GetForceTorque(int _index)
+        GAZEBO_DEPRECATED = 0;
+
+      /// \brief get internal force and torque values at a joint
+      /// Note that you must set
+      ///   <provide_feedback>true<provide_feedback>
+      /// in the joint sdf to use this.
+      /// \param[in] _index Force and torque on child link if _index = 0
+      /// and on parent link of _index = 1
+      /// \return The force and torque at the joint
+      public: virtual JointWrench GetForceTorque(unsigned int _index) = 0;
 
       /// \brief Set the max allowed force of an axis(index).
       /// Note that the unit of force should be consistent with the rest
@@ -357,6 +378,11 @@ namespace gazebo
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);
 
+      /// \brief Accessor to inertia ratio across this joint.
+      /// \param[in] _index Joint axis index.
+      /// \return returns the inertia ratio across specified joint axis.
+      public: double GetInertiaRatio(unsigned int _index) const;
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
@@ -371,6 +397,11 @@ namespace gazebo
       /// \param[in] _pos Position of the anchor.
       private: void LoadImpl(const math::Vector3 &_pos) GAZEBO_DEPRECATED;
 
+      /// \brief Computes inertiaRatio for this joint during Joint::Init
+      /// The inertia ratio for each joint between [1, +inf] gives a sense
+      /// of how well this model will perform in iterative LCP methods.
+      private: void ComputeInertiaRatio();
+
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;
 
@@ -380,8 +411,19 @@ namespace gazebo
       /// \brief Pointer to the parent model.
       protected: ModelPtr model;
 
-      /// \brief Anchor position of joint, expressed in world frame.
+      /// \brief Anchor pose.  This is the xyz offset of the joint frame from
+      /// child frame specified in the parent link frame
       protected: math::Vector3 anchorPos;
+
+      /// \brief Anchor pose specified in SDF <joint><pose> tag.
+      /// AnchorPose is the transform from child link frame to joint frame
+      /// specified in the child link frame.
+      /// AnchorPos is more relevant in normal usage, but sometimes,
+      /// we do need this (e.g. GetForceTorque and joint visualization).
+      protected: math::Pose anchorPose;
+
+      /// \brief Anchor link.
+      protected: LinkPtr anchorLink;
 
       /// \brief Joint update event.
       private: event::EventT<void ()> jointUpdate;
@@ -406,6 +448,10 @@ namespace gazebo
 
       /// \brief Store Joint velocity limit as specified in SDF
       protected: double velocityLimit[2];
+
+      /// \brief Store Joint inertia ratio.  This is a measure of how well
+      /// this model behaves using interative LCP solvers.
+      protected: double inertiaRatio[2];
     };
     /// \}
   }
