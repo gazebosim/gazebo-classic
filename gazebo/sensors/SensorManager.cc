@@ -425,7 +425,7 @@ void SensorManager::SensorContainer::RunLoop()
   engine->InitForThread();
 
   common::Time sleepTime, startTime, eventTime, diffTime;
-  double maxUpdateRate = GZ_DBL_MIN;
+  double maxUpdateRate = 0;
 
   boost::mutex tmpMutex;
   boost::mutex::scoped_lock lock2(tmpMutex);
@@ -466,17 +466,15 @@ void SensorManager::SensorContainer::RunLoop()
     this->Update(false);
 
     // Compute the time it took to update the sensors.
-    diffTime = world->GetSimTime() - startTime;
+    // It's possible that the world time was reset during the Update. This
+    // would case a negative diffTime. Instead, just use a event time of zero
+    diffTime = std::max(common::Time::Zero, world->GetSimTime() - startTime);
 
     // Set the default sleep time
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
     // Make sure update time is reasonable.
     GZ_ASSERT(diffTime.sec < 1, "Took over 1.0 seconds to update a sensor.");
-
-    // Make sure diffTime is not negative.
-    GZ_ASSERT(diffTime >= common::Time::Zero,
-        "Took negative time to update a sensor.");
 
     // Make sure eventTime is not negative.
     GZ_ASSERT(eventTime >= common::Time::Zero,
