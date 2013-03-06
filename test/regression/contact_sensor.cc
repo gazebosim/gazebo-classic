@@ -134,7 +134,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   for (unsigned int k = 0; k < contacts.size(); ++k)
   {
     double mass = models[k]->GetLink()->GetInertial()->GetMass();
-    expectedForce = models[k]->GetLink()->GetWorldCoGPose().rot
+    expectedForce = models[k]->GetLink()->GetWorldCoGPose().rot.GetInverse()
         * math::Vector3(0, 0, (gravityZ * mass));
     expectedTorque = math::Vector3(0, 0, 0);
 

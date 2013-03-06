@@ -10,9 +10,8 @@
     </include>
 
     <model name="box">
+      <pose>0 0 0.5 1.57 0 0</pose>
       <link name="link">
-        <pose>0 0 0.5 1.57 0 0</pose>
-
         <collision name="box_collision">
           <geometry>
             <box>
@@ -39,6 +38,29 @@
         </sensor>
       </link>
     </model>
+
+    <model name="sphere">
+      <pose>0 0 1.5 0 0 0</pose>
+      <link name="link2">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="sphere_collision">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
     <!--
     <model name="box2">
       <link name="link">

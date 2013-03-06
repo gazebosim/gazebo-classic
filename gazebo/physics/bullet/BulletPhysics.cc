@@ -180,7 +180,9 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 //            BulletTypes::ConvertVector3(force));
         localForce2 = body2Pose.rot.RotateVectorReverse(
             BulletTypes::ConvertVector3(-force));
-//         gzerr << " one " << body1Pose.rot.GetAsEuler() << " , " << body2Pose.rot.GetAsEuler() << std::endl;
+//        localForce2 = body2Pose.rot.GetInverse() *
+//            BulletTypes::ConvertVector3(-force);
+//         gzerr << " pose " << body1Pose.rot.GetAsEuler() << " , " << body2Pose.rot.GetAsEuler() << std::endl;
 
         btVector3 torqueA = (ptB-rbA->getCenterOfMassPosition()).cross(force);
         btVector3 torqueB = (ptB-rbB->getCenterOfMassPosition()).cross(-force);
