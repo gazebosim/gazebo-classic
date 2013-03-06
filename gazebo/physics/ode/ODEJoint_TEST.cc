@@ -188,7 +188,6 @@ TEST_F(ODEJoint_TEST, GetForceTorque)
 
 
   Unload();
-
 }
 
 int main(int argc, char **argv)
