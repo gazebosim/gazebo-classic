@@ -55,7 +55,7 @@ class Position2dInterface : public GazeboInterface
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe();
 
-  private: void OnPoseMsg(ConstPosePtr &_msg);
+  private: void OnPoseMsg(ConstPose_VPtr &_msg);
 
   /// \brief Timestamp on last data update
   private: double datatime;
