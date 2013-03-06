@@ -120,6 +120,19 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   #################################################
+  # Find rtql8
+  find_package(RTQL8)
+  if (RTQL8_FOUND)
+    message (STATUS "Looking for RTQL8, found")
+    set (HAVE_RTQL8 TRUE)
+  else()
+    message (STATUS "Looking for RTQL8, not found")
+    set (HAVE_RTQL8 FALSE)
+  endif()
+
+  #################################################
+
+  #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
   find_path (tinyxml_include_dir tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
   if (NOT tinyxml_include_dir)

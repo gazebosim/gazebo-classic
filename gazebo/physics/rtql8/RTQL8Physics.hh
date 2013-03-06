@@ -61,14 +61,20 @@ namespace gazebo
       /// \brief Rest the RTQL8 engine.
       public: virtual void Reset();
  
-      /// \brief Init the RTQL8 for threads.
+      // Documentation inherited
       public: virtual void InitForThread();
 
-      /// \brief Update the RTQL8 collision
+      // Documentation inherited
       public: virtual void UpdateCollision();
 
-      /// \brief Update the Bullet engine
+      // Documentation inherited
       public: virtual void UpdatePhysics();
+
+      // Documentation inherited
+      public: virtual std::string GetType() const;
+
+      // Documentation inherited
+      public: virtual void SetSeed(uint32_t _seed);
 
       /// \brief Set the simulation step time
       public: virtual void SetStepTime(double _value);

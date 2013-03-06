@@ -187,6 +187,18 @@ void RTQL8Physics::UpdatePhysics()
 }
 
 //////////////////////////////////////////////////
+std::string RTQL8Physics::GetType() const
+{
+  return "rtql8";
+}
+
+//////////////////////////////////////////////////
+void RTQL8Physics::SetSeed(uint32_t /*_seed*/)
+{
+  gzerr << "Not implemented yet...\n";
+}
+
+//////////////////////////////////////////////////
 void RTQL8Physics::SetStepTime(double _value)
 {
 //   this->sdf->GetElement("rtql8")->GetElement(

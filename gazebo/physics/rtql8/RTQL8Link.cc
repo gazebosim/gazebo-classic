@@ -140,6 +140,7 @@ void RTQL8Link::OnPoseChange()
 // 
 //   // Set the rotation of the ODE link
 //   dBodySetQuaternion(this->linkId, q);
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -152,6 +153,7 @@ void RTQL8Link::SetEnabled(bool _enable) const
 //     dBodyEnable(this->linkId);
 //   else
 //     dBodyDisable(this->linkId);
+  gzerr << "Not implemented...\n";
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -162,6 +164,7 @@ bool RTQL8Link::GetEnabled() const
 //   if (this->linkId)
 //     result = dBodyIsEnabled(this->linkId);
 
+  gzerr << "Not implemented...\n";
   return result;
 }
 
@@ -189,6 +192,7 @@ void RTQL8Link::UpdateMass()
 //     dBodySetMass(this->linkId, &odeMass);
 //   else
 //     gzthrow("Setting custom link " + this->GetName() + "mass to zero!");
+  gzerr << "Not implemented...\n";
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -209,6 +213,7 @@ void RTQL8Link::UpdateSurface()
 //       }
 //     }
 //   }
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -218,6 +223,7 @@ void RTQL8Link::SetLinearVel(const math::Vector3 &_vel)
 //   {
 //     dBodySetLinearVel(this->linkId, _vel.x, _vel.y, _vel.z);
 //   }
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -227,6 +233,7 @@ void RTQL8Link::SetAngularVel(const math::Vector3 &_vel)
 //   {
 //     dBodySetAngularVel(this->linkId, _vel.x, _vel.y, _vel.z);
 //   }
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -237,6 +244,7 @@ void RTQL8Link::SetForce(const math::Vector3 &_force)
 //     this->SetEnabled(true);
 //     dBodySetForce(this->linkId, _force.x, _force.y, _force.z);
 //   }
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -247,6 +255,7 @@ void RTQL8Link::SetTorque(const math::Vector3 &_torque)
 //     this->SetEnabled(true);
 //     dBodySetTorque(this->linkId, _torque.x, _torque.y, _torque.z);
 //   }
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -257,6 +266,7 @@ void RTQL8Link::AddForce(const math::Vector3 &_force)
 //     this->SetEnabled(true);
 //     dBodyAddForce(this->linkId, _force.x, _force.y, _force.z);
 //   }
+  gzerr << "Not implemented...\n";
 }
 
 /////////////////////////////////////////////////
@@ -267,6 +277,7 @@ void RTQL8Link::AddRelativeForce(const math::Vector3 &_force)
 //     this->SetEnabled(true);
 //     dBodyAddRelForce(this->linkId, _force.x, _force.y, _force.z);
 //   }
+  gzerr << "Not implemented...\n";
 }
 
 /////////////////////////////////////////////////
@@ -279,7 +290,9 @@ void RTQL8Link::AddForceAtWorldPosition(const math::Vector3 &_force,
 //     dBodyAddForceAtPos(this->linkId, _force.x, _force.y, _force.z,
 //                           _pos.x, _pos.y, _pos.z);
 //   }
+  gzerr << "Not implemented...\n";
 }
+
 /////////////////////////////////////////////////
 void RTQL8Link::AddForceAtRelativePosition(const math::Vector3 &_force,
                                const math::Vector3 &_relpos)
@@ -290,6 +303,7 @@ void RTQL8Link::AddForceAtRelativePosition(const math::Vector3 &_force,
 //     dBodyAddForceAtRelPos(this->linkId, _force.x, _force.y, _force.z,
 //                           _relpos.x, _relpos.y, _relpos.z);
 //   }
+  gzerr << "Not implemented...\n";
 }
 
 /////////////////////////////////////////////////
@@ -313,7 +327,8 @@ void RTQL8Link::AddRelativeTorque(const math::Vector3 &_torque)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 RTQL8Link::GetWorldLinearVel() const
+math::Vector3 RTQL8Link::GetWorldLinearVel(
+    const math::Vector3& /*_offset*/) const
 {
   math::Vector3 vel;
 
@@ -323,6 +338,32 @@ math::Vector3 RTQL8Link::GetWorldLinearVel() const
 //     dvel = dBodyGetLinearVel(this->linkId);
 //     vel.Set(dvel[0], dvel[1], dvel[2]);
 //   }
+
+  return vel;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 RTQL8Link::GetWorldLinearVel(
+    const gazebo::math::Vector3& /*_offset*/,
+    const gazebo::math::Quaternion& /*_q*/) const
+{
+  math::Vector3 vel;
+
+//   if (this->linkId)
+//   {
+//     const dReal *dvel;
+//     dvel = dBodyGetLinearVel(this->linkId);
+//     vel.Set(dvel[0], dvel[1], dvel[2]);
+//   }
+
+  return vel;
+}
+
+math::Vector3 RTQL8Link::GetWorldCoGLinearVel() const
+{
+  math::Vector3 vel;
+
+  gzerr << "Not implemented yet...";
 
   return vel;
 }
@@ -379,6 +420,7 @@ math::Vector3 RTQL8Link::GetWorldTorque() const
 //     torque.z = dtorque[2];
 //   }
 
+  gzerr << "Not implemented...\n";
   return torque;
 }
 
@@ -390,10 +432,11 @@ void RTQL8Link::SetGravityMode(bool _mode)
 //   {
 //     dBodySetGravityMode(this->linkId, _mode ? 1: 0);
 //   }
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
-bool RTQL8Link::GetGravityMode()
+bool RTQL8Link::GetGravityMode() const
 {
   int mode = 0;
 //   if (this->linkId)
@@ -401,6 +444,7 @@ bool RTQL8Link::GetGravityMode()
 //     mode = dBodyGetGravityMode(this->linkId);
 //   }
 
+  gzerr << "Not implemented...\n";
   return mode;
 }
 
