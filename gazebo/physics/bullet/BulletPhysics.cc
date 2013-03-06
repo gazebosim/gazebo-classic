@@ -162,8 +162,8 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     math::Vector3 localTorque1;
     math::Vector3 localTorque2;
 
+//    gzerr << "==" <<std::endl;
     int numContacts = contactManifold->getNumContacts();
-    gzerr << "==" << std::endl;
     for (int j = 0; j < numContacts; ++j)
     {
       btManifoldPoint& pt = contactManifold->getContactPoint(j);
@@ -176,11 +176,14 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         btVector3 force = impulse/_timeStep;
         localForce1 = body1Pose.rot.RotateVectorReverse(
             BulletTypes::ConvertVector3(force));
+//        localForce1 = body1Pose.rot.RotateVector(
+//            BulletTypes::ConvertVector3(force));
         localForce2 = body2Pose.rot.RotateVectorReverse(
-            BulletTypes::ConvertVector3(force));
+            BulletTypes::ConvertVector3(-force));
+//         gzerr << " one " << body1Pose.rot.GetAsEuler() << " , " << body2Pose.rot.GetAsEuler() << std::endl;
 
-        btVector3 torqueA = force.cross(ptB-rbA->getCenterOfMassPosition());
-        btVector3 torqueB = -force.cross(ptB-rbB->getCenterOfMassPosition());
+        btVector3 torqueA = (ptB-rbA->getCenterOfMassPosition()).cross(force);
+        btVector3 torqueB = (ptB-rbB->getCenterOfMassPosition()).cross(-force);
 
         localTorque1 = body1Pose.rot.RotateVectorReverse(
             BulletTypes::ConvertVector3(torqueA));
@@ -194,13 +197,13 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         {
           contactFeedback->wrench[j].body1Force = localForce1;
           contactFeedback->wrench[j].body1Torque = localTorque1;
-          gzerr << link1->GetScopedName() << " " << pt.m_appliedImpulse << " " << localForce1 << std::endl;
+//          gzerr << link1->GetScopedName() << " one " << localForce1 << " " << BulletTypes::ConvertVector3(force) << std::endl;
         }
         if (!link2->IsStatic())
         {
-          contactFeedback->wrench[j].body2Force = -localForce2;
+          contactFeedback->wrench[j].body2Force = localForce2;
           contactFeedback->wrench[j].body2Torque = localTorque2;
-          gzerr << link2->GetScopedName() << " " << pt.m_appliedImpulse << " " << localForce2 << std::endl;
+//          gzerr << link2->GetScopedName() << " two " << localForce2 << " " << BulletTypes::ConvertVector3(-force) << std::endl;
         }
         contactFeedback->count++;
       }

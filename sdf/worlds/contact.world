@@ -11,7 +11,7 @@
 
     <model name="box">
       <link name="link">
-        <pose>0 0 0.5 0 0 0</pose>
+        <pose>0 0 0.5 1.57 0 0</pose>
 
         <collision name="box_collision">
           <geometry>
@@ -30,7 +30,7 @@
         </visual>
 
         <sensor name='my_contact' type='contact'>
-          <update_rate> 0.1 </update_rate>
+          <update_rate> 1 </update_rate>
           <contact>
             <collision>box_collision</collision>
           </contact>
@@ -39,9 +39,10 @@
         </sensor>
       </link>
     </model>
+    <!--
     <model name="box2">
       <link name="link">
-        <pose>0 0 1.5 0 0 0</pose>
+        <pose>0 2 0.5 0 0 0</pose>
 
         <collision name="box_collision">
           <geometry>
@@ -65,9 +66,9 @@
             <collision>box_collision</collision>
           </contact>
 
-<!--          <plugin name="my_plugin" filename="libContactPlugin.so"/>-->
+<!--          <plugin name="my_plugin" filename="libContactPlugin.so"/>
         </sensor>
       </link>
-    </model>
+    </model>-->
   </world>
 </sdf>
