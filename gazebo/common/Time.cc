@@ -51,7 +51,7 @@ Time::Time()
   this->nsec = 0;
 
 #ifdef __MACH__
-  clock_resolution.tv_sec = 1 / sysconf(_SC_CLK_TCK);
+  clockResolution.tv_sec = 1 / sysconf(_SC_CLK_TCK);
 #else
   // get clock resolution, skip sleep if resolution is larger then
   // requested sleep time
