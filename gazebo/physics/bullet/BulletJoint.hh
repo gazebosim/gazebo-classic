@@ -101,7 +101,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual double GetAttribute(const std::string &/*_key*/,
-                                        int /*_index*/)
+                                                unsigned int /*_index*/)
               {gzerr << "Not implement in Bullet\n"; return 0;}
 
       protected: btTypedConstraint *constraint;

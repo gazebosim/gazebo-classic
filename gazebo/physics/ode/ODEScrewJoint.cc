@@ -100,7 +100,7 @@ void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::GetThreadPitch(int /*_index*/)
+double ODEScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 {
   gzerr << "not yet implemented\n";
   return 0;

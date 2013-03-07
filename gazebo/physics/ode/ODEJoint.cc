@@ -650,7 +650,7 @@ void ODEJoint::SetAttribute(const std::string &_key, int _index,
 }
 
 //////////////////////////////////////////////////
-double ODEJoint::GetAttribute(const std::string &_key, int _index)
+double ODEJoint::GetAttribute(const std::string &_key, unsigned int _index)
 {
   if (_key == "fudge_factor")
   {
@@ -960,10 +960,11 @@ void ODEJoint::CFMDamping()
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetDamping(int _index, double _damping)
+void ODEJoint::SetDamping(int /*_index*/, double _damping)
 {
   this->dampingCoefficient = _damping;
 
+  // \TODO: implement on a per axis basis (requires additional sdf parameters)
   // trigger an update in CFMDAmping if this is called
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
     this->cfmDampingState[i] = ODEJoint::NONE;
