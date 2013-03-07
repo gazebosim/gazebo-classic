@@ -14,6 +14,9 @@ link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
   ${ODE_LIBRARY_DIRS}
+  # TODO Only enable this with OSX
+  # TODO Properly search for X11 lib
+  /opt/X11/lib
 )
 
 if(HAVE_URDFDOM_HEADERS)
