@@ -71,17 +71,15 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       this->useCFMDamping = elem->GetValueBool("cfm_damping");
     }
 
-    if (elem->HasElement("limit"))
-    {
-      // initializa both axis, \todo: make cfm, erp per axis
-      this->stopERP = elem->GetElement("limit")->GetValueDouble("erp");
-      for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
-        this->SetAttribute("stop_erp", i, this->stopERP);
+    // initializa both axis, \todo: make cfm, erp per axis
+    this->stopERP = elem->GetElement("limit")->GetValueDouble("erp");
+    for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+      this->SetAttribute("stop_erp", i, this->stopERP);
 
-      this->stopCFM = elem->GetElement("limit")->GetValueDouble("cfm");
-      for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
-        this->SetAttribute("stop_cfm", i, this->stopERP);
-    }
+    // initializa both axis, \todo: make cfm, erp per axis
+    this->stopCFM = elem->GetElement("limit")->GetValueDouble("cfm");
+    for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+      this->SetAttribute("stop_cfm", i, this->stopCFM);
 
     if (elem->HasElement("suspension"))
     {
