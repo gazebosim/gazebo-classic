@@ -73,8 +73,8 @@ endif()
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 #
-# MAC_OSX_VERSION defines the Mac OSX Version, e.g.
-#   MAC_OSX_VERSION = 106
+# MAC_OS_X_VERSION defines the Mac OSX Version, e.g.
+#   MAC_OS_X_VERSION = 1060
 # specifies OSX Snow Leopard (10.6)
 #
 if (APPLE)
@@ -85,15 +85,15 @@ if (APPLE)
 	#    11.x.x = Mac OSX Lion (10.7)
 	#    12.x.x = Mac OSX Mountain Lion (10.8)
 	if (${CMAKE_SYSTEM_VERSION} LESS 10)
-		add_definitions(-DMAC_OSX_VERSION=1050)
+		add_definitions(-DMAC_OS_X_VERSION=1050)
 	elseif (${CMAKE_SYSTEM_VERSION} GREATER 10 AND ${CMAKE_SYSTEM_VERSION} LESS 11)
-		add_definitions(-DMAC_OSX_VERSION=1060)
+		add_definitions(-DMAC_OS_X_VERSION=1060)
 	elseif (${CMAKE_SYSTEM_VERSION} GREATER 11 AND ${CMAKE_SYSTEM_VERSION} LESS 12)
-		add_definitions(-DMAC_OSX_VERSION=1070)
+		add_definitions(-DMAC_OS_X_VERSION=1070)
 	elseif (${CMAKE_SYSTEM_VERSION} GREATER 12 OR ${CMAKE_SYSTEM_VERSION} EQUAL 12)
-		add_definitions(-DMAC_OSX_VERSION=1080)
+		add_definitions(-DMAC_OS_X_VERSION=1080)
 	else ()
-		add_definitions(-DMAC_OSX_VERSION=0)
+		add_definitions(-DMAC_OS_X_VERSION=0)
 	endif ()
 endif ()
 
