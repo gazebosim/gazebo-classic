@@ -36,6 +36,11 @@
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/JointWrench.hh"
 
+/// \brief maximum number of axis per joint anticipated.
+/// Currently, this is 2 as 3-axis joints (e.g. ball)
+/// actuation, control is not there yet.
+#define MAX_JOINT_AXIS 2
+
 namespace gazebo
 {
   namespace physics
@@ -215,11 +220,17 @@ namespace gazebo
                                       const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
+      /// This function is replaced by GetUpperLimit(unsigned int).
+      /// If you are interested in getting the value of dParamHiStop*,
+      /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the high stop value.
       public: virtual math::Angle GetHighStop(int _index) = 0;
 
       /// \brief Get the low stop of an axis(index).
+      /// This function is replaced by GetLowerLimit(unsigned int).
+      /// If you are interested in getting the value of dParamHiStop*,
+      /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the low stop value.
       public: virtual math::Angle GetLowStop(int _index) = 0;
@@ -366,6 +377,13 @@ namespace gazebo
       public: virtual void SetAttribute(const std::string &_key, int _index,
                                         const boost::any &_value) = 0;
 
+      /// \brief Get a non-generic parameter for the joint.
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _value Value of the attribute.
+      public: virtual double GetAttribute(const std::string &_key,
+                                                unsigned int _index) = 0;
+
       /// \brief Get the child link
       /// \return Pointer to the child link.
       public: LinkPtr GetChild() const;
@@ -382,6 +400,32 @@ namespace gazebo
       /// \param[in] _index Joint axis index.
       /// \return returns the inertia ratio across specified joint axis.
       public: double GetInertiaRatio(unsigned int _index) const;
+
+      /// \brief:  get the joint upper limit
+      /// (replaces GetLowStop and GetHighStop)
+      /// \param[in] _index Index of the axis.
+      /// \return Upper limit of the axis.
+      public: math::Angle GetLowerLimit(unsigned int _index) const
+        {
+          if (_index < this->GetAngleCount())
+            return this->lowerLimit[_index];
+
+          gzwarn << "requesting lower limit of joint index out of bound\n";
+          return math::Angle();
+        }
+
+      /// \brief:  get the joint lower limit
+      /// (replacee GetLowStop and GetHighStop)
+      /// \param[in] _index Index of the axis.
+      /// \return Upper limit of the axis.
+      public: math::Angle GetUpperLimit(unsigned int _index) const
+        {
+          if (_index < this->GetAngleCount())
+            return this->upperLimit[_index];
+
+          gzwarn << "requesting upper limit of joint index out of bound\n";
+          return math::Angle();
+        }
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
@@ -441,17 +485,26 @@ namespace gazebo
       /// This plus the joint feedback (joint contstraint forces) is the
       /// equivalent of simulated force torque sensor reading
       /// Allocate a 2 vector in case hinge2 joint is used.
-      protected: double forceApplied[2];
+      protected: double forceApplied[MAX_JOINT_AXIS];
 
       /// \brief Store Joint effort limit as specified in SDF
-      protected: double effortLimit[2];
+      protected: double effortLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint velocity limit as specified in SDF
-      protected: double velocityLimit[2];
+      protected: double velocityLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint inertia ratio.  This is a measure of how well
       /// this model behaves using interative LCP solvers.
-      protected: double inertiaRatio[2];
+      protected: double inertiaRatio[MAX_JOINT_AXIS];
+
+      /// \brief Store Joint position lower limit as specified in SDF
+      protected: math::Angle lowerLimit[MAX_JOINT_AXIS];
+
+      /// \brief Store Joint position upper limit as specified in SDF
+      protected: math::Angle upperLimit[MAX_JOINT_AXIS];
+
+      /// \brief option to use CFM damping
+      protected: bool useCFMDamping;
     };
     /// \}
   }
