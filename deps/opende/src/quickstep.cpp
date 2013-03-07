@@ -1094,6 +1094,9 @@ static void SOR_LCP (dxWorldProcessContext *context,
   dSetZero (lambda_erp,m);
 #endif
 
+  // save m
+  qs->num_constraints = m;
+
   // precompute iMJ = inv(M)*J'
   dReal *iMJ = context->AllocateArray<dReal> (m*12);
   compute_invM_JT (m,J,iMJ,jb,body,invI);

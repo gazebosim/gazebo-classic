@@ -233,6 +233,9 @@ namespace gazebo
       private: void AddCollider(ODECollision *_collision1,
                                 ODECollision *_collision2);
 
+      /// \brief Physics get solver info function.
+      private: int GetSolverInfo();
+
       /// \brief Top-level world for all bodies
       private: dWorldID worldId;
 
@@ -276,8 +279,20 @@ namespace gazebo
       /// \brief Physics step function.
       private: int (*physicsStepFunc)(dxWorld*, dReal);
 
+      /// \brief Physics step function.
+      private: boost::function<int ()> physicsSolverInfoFunc;
+
       /// \brief Indices used during creation of contact joints.
       private: int indices[MAX_CONTACT_JOINTS];
+
+      /// \brief RMS of Delta Lambda at the end of LCP solve
+      private: double rmsError;
+
+      /// \brief Total number of constraints in this solve
+      private: double numConstraints;
+
+      /// \brief Total number of constraints for contacts in this solve
+      private: double numContactConstraints;
     };
   }
 }

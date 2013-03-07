@@ -133,6 +133,11 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
   this->SetSeed(math::Rand::GetSeed());
+
+  // Preset error info for solver
+  this->rmsError = 0;
+  this->numConstraints = 0;
+  this->numContactConstraints = 0;
 }
 
 //////////////////////////////////////////////////
@@ -217,9 +222,16 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   // Set the physics update function
   if (this->stepType == "quick")
+  {
     this->physicsStepFunc = &dWorldQuickStep;
+    this->physicsSolverInfoFunc =
+      boost::bind(&ODEPhysics::GetSolverInfo, this);
+  }
   else if (this->stepType == "world")
+  {
     this->physicsStepFunc = &dWorldStep;
+    this->physicsSolverInfoFunc = NULL;
+  }
   else
     gzthrow(std::string("Invalid step type[") + this->stepType);
 }
@@ -275,11 +287,14 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     {
       solverElem->GetAttribute("type")->Set("quick");
       this->physicsStepFunc = &dWorldQuickStep;
+      this->physicsSolverInfoFunc =
+        boost::bind(&ODEPhysics::GetSolverInfo, this);
     }
     else if (_msg->solver_type() == "world")
     {
       solverElem->GetAttribute("type")->Set("world");
       this->physicsStepFunc = &dWorldStep;
+      this->physicsSolverInfoFunc = NULL;
     }
   }
 
@@ -365,6 +380,14 @@ void ODEPhysics::UpdateCollision()
   DIAG_TIMER_STOP("ODEPhysics::UpdateCollision");
 }
 
+int ODEPhysics::GetSolverInfo()
+{
+  this->rmsError = dWorldGetQuickStepRMSError (this->worldId);
+  this->numConstraints = dWorldGetQuickStepNumConstraints(this->worldId);
+  this->numContactConstraints = this->contactManager->GetContactCount();
+  return 0;
+}
+
 //////////////////////////////////////////////////
 void ODEPhysics::UpdatePhysics()
 {
@@ -376,6 +399,8 @@ void ODEPhysics::UpdatePhysics()
 
     // Update the dynamical model
     (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
+    if (physicsSolverInfoFunc)
+      (physicsSolverInfoFunc)();
 
     // Set the joint contact feedback for each contact.
     for (unsigned int i = 0; i < this->jointFeedbackIndex; ++i)
