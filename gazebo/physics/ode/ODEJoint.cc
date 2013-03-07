@@ -75,10 +75,12 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
     {
       // initializa both axis, \todo: make cfm, erp per axis
       this->stopERP = elem->GetElement("limit")->GetValueDouble("erp");
-      this->SetParam(dParamStopERP, this->stopERP);
+      for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+        this->SetAttribute("stop_erp", i, this->stopERP);
 
       this->stopCFM = elem->GetElement("limit")->GetValueDouble("cfm");
-      this->SetParam(dParamStopCFM, this->stopCFM);
+      for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+        this->SetAttribute("stop_cfm", i, this->stopERP);
     }
 
     if (elem->HasElement("suspension"))
@@ -351,12 +353,38 @@ void ODEJoint::SetAttribute(Attribute _attr, int _index, double _value)
       this->SetParam(dParamSuspensionCFM, _value);
       break;
     case STOP_ERP:
-      this->SetParam(dParamStopERP, _value);
-      // this->stopERP = _value;
+      switch (_index)
+      {
+        case 0:
+          this->SetParam(dParamStopERP, _value);
+          break;
+        case 1:
+          this->SetParam(dParamStopERP2, _value);
+          break;
+        case 2:
+          this->SetParam(dParamStopERP3, _value);
+          break;
+        default:
+          gzerr << "Invalid index[" << _index << "]\n";
+          break;
+      };
       break;
     case STOP_CFM:
-      this->SetParam(dParamStopCFM, _value);
-      // this->stopCFM = _value;
+      switch (_index)
+      {
+        case 0:
+          this->SetParam(dParamStopCFM, _value);
+          break;
+        case 1:
+          this->SetParam(dParamStopCFM2, _value);
+          break;
+        case 2:
+          this->SetParam(dParamStopCFM3, _value);
+          break;
+        default:
+          gzerr << "Invalid index[" << _index << "]\n";
+          break;
+      };
       break;
     case ERP:
       this->SetParam(dParamERP, _value);
@@ -451,8 +479,21 @@ void ODEJoint::SetAttribute(const std::string &_key, int _index,
   {
     try
     {
-      this->SetParam(dParamStopERP, boost::any_cast<double>(_value));
-      // this->stopERP = boost::any_cast<double>(_value);
+      switch (_index)
+      {
+        case 0:
+          this->SetParam(dParamStopERP, boost::any_cast<double>(_value));
+          break;
+        case 1:
+          this->SetParam(dParamStopERP2, boost::any_cast<double>(_value));
+          break;
+        case 2:
+          this->SetParam(dParamStopERP3, boost::any_cast<double>(_value));
+          break;
+        default:
+          gzerr << "Invalid index[" << _index << "]\n";
+          break;
+      };
     }
     catch(boost::bad_any_cast &e)
     {
@@ -463,8 +504,21 @@ void ODEJoint::SetAttribute(const std::string &_key, int _index,
   {
     try
     {
-      this->SetParam(dParamStopCFM, boost::any_cast<double>(_value));
-      // this->stopCFM = boost::any_cast<double>(_value);
+      switch (_index)
+      {
+        case 0:
+          this->SetParam(dParamStopCFM, boost::any_cast<double>(_value));
+          break;
+        case 1:
+          this->SetParam(dParamStopCFM2, boost::any_cast<double>(_value));
+          break;
+        case 2:
+          this->SetParam(dParamStopCFM3, boost::any_cast<double>(_value));
+          break;
+        default:
+          gzerr << "Invalid index[" << _index << "]\n";
+          break;
+      };
     }
     catch(boost::bad_any_cast &e)
     {
@@ -638,6 +692,7 @@ double ODEJoint::GetAttribute(const std::string &_key, int _index)
   {
     try
     {
+      /// \TODO: switch based on index
       return this->GetParam(dParamStopERP);
     }
     catch(common::Exception &e)
@@ -650,6 +705,7 @@ double ODEJoint::GetAttribute(const std::string &_key, int _index)
   {
     try
     {
+      /// \TODO: switch based on index
       return this->GetParam(dParamStopCFM);
     }
     catch(common::Exception &e)
