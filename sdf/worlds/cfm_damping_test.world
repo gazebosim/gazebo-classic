@@ -37,7 +37,7 @@
                     <iyz>0.000000</iyz>
                     <izz>1.000000</izz>
                 </inertia>
-                <mass>100.000000</mass>
+                <mass>10.000000</mass>
             </inertial>
             <visual name="visual_cylinder">
                 <pose>0 0 -0.5 0 0 0</pose>
@@ -73,7 +73,7 @@
                     <iyz>0.000000</iyz>
                     <izz>1.000000</izz>
                 </inertia>
-                <mass>100.000000</mass>
+                <mass>10.000000</mass>
             </inertial>
             <visual name="visual_box">
                 <pose>0 0 -0.5 0 0 0</pose>
@@ -105,10 +105,9 @@
             <pose>0 0 0 0 0 0</pose>
             <axis>
                 <limit>
+                    <!-- effectively fixed -->
                     <lower>0.000000</lower>
                     <upper>0.000000</upper>
-                    <effort>1000.000000</effort>
-                    <velocity>1000.000000</velocity>
                 </limit>
                 <dynamics>
                     <damping>1.000000</damping>
@@ -145,7 +144,7 @@
                     <velocity>1000.000000</velocity>
                 </limit>
                 <dynamics>
-                    <damping>1000.000000</damping>
+                    <damping>2000.000000</damping>
                 </dynamics>
                 <xyz>0.000000 1.000000 0.000000</xyz>
             </axis2>
