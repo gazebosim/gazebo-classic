@@ -925,32 +925,36 @@ void ODEJoint::CFMDamping()
   // check if we are violating joint limits
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
-    if (this->cfmDampingState[i] != ODEJoint::JOINT_LIMIT &&
-        (this->GetAngle(i) >= this->upperLimit[i] ||
-         this->GetAngle(i) <= this->lowerLimit[i] ||
-         math::equal(this->dampingCoefficient, 0.0)))
+    if (this->GetAngle(i) >= this->upperLimit[i] ||
+        this->GetAngle(i) <= this->lowerLimit[i] ||
+        math::equal(this->dampingCoefficient, 0.0))
     {
-      this->cfmDampingState[i] = ODEJoint::JOINT_LIMIT;
-      // we have hit the actual joint limit!
-      // turn off simulated damping by recovering cfm and erp,
-      // and recover joint limits
-      this->SetAttribute("stop_erp", i, this->stopERP);
-      this->SetAttribute("stop_cfm", i, this->stopCFM);
-      this->SetAttribute("hi_stop", i, this->upperLimit[i].Radian());
-      this->SetAttribute("lo_stop", i, this->lowerLimit[i].Radian());
-      this->SetAttribute("hi_stop", i, this->upperLimit[i].Radian());
+      if (this->cfmDampingState[i] != ODEJoint::JOINT_LIMIT)
+      {
+        // we have hit the actual joint limit!
+        // turn off simulated damping by recovering cfm and erp,
+        // and recover joint limits
+        this->SetAttribute("stop_erp", i, this->stopERP);
+        this->SetAttribute("stop_cfm", i, this->stopCFM);
+        this->SetAttribute("hi_stop", i, this->upperLimit[i].Radian());
+        this->SetAttribute("lo_stop", i, this->lowerLimit[i].Radian());
+        this->SetAttribute("hi_stop", i, this->upperLimit[i].Radian());
+        this->cfmDampingState[i] = ODEJoint::JOINT_LIMIT;
+      }
     }
-    else if (this->cfmDampingState[i] != ODEJoint::DAMPING_ACTIVE &&
-         !math::equal(this->dampingCoefficient, 0.0))
+    else if (!math::equal(this->dampingCoefficient, 0.0))
     {
-      // add additional constraint row by fake hitting joint limit
-      // then, set erp and cfm to simulate viscous joint damping
-      this->cfmDampingState[i] = ODEJoint::DAMPING_ACTIVE;
-      this->SetAttribute("stop_erp", i, 0.0);
-      this->SetAttribute("stop_cfm", i, 1.0 / this->dampingCoefficient);
-      this->SetAttribute("hi_stop", i, 0.0);
-      this->SetAttribute("lo_stop", i, 0.0);
-      this->SetAttribute("hi_stop", i, 0.0);
+      if (this->cfmDampingState[i] != ODEJoint::DAMPING_ACTIVE)
+      {
+        // add additional constraint row by fake hitting joint limit
+        // then, set erp and cfm to simulate viscous joint damping
+        this->SetAttribute("stop_erp", i, 0.0);
+        this->SetAttribute("stop_cfm", i, 1.0 / this->dampingCoefficient);
+        this->SetAttribute("hi_stop", i, 0.0);
+        this->SetAttribute("lo_stop", i, 0.0);
+        this->SetAttribute("hi_stop", i, 0.0);
+        this->cfmDampingState[i] = ODEJoint::DAMPING_ACTIVE;
+      }
     }
   }
 }
