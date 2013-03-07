@@ -11,6 +11,12 @@ include_directories(
   ${PROTOBUF_INCLUDE_DIR}
 )
 
+# TODO Only enable this with OSX
+# TODO Properly search for X11 lib
+link_directories(
+   /opt/X11/lib
+)
+
 add_subdirectory(test)
 
 add_executable(gzsdf gzsdf.cc)
