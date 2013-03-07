@@ -134,7 +134,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
     contacts01 = contactSensor01->GetContacts();
     contacts02 = contactSensor02->GetContacts();
   }
-  EXPECT_TRUE(steps > 0);
+  EXPECT_GT(steps, 0);
 
   std::vector<msgs::Contacts> contacts;
   contacts.push_back(contacts01);
@@ -231,7 +231,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
               ? 0 : 1;
           vi = (fabs(expectedForce[vi]) > fabs(expectedForce.z))
               ? vi : 2;
-          EXPECT_TRUE((expectedForce[vi] >= 0) ^ (actualForce[vi] < 0));
+          EXPECT_EQ((expectedForce[vi] < 0), (actualForce[vi] < 0));
 
           // Verify torque with a large tolerance
           double odeTorqueTol = 1;
@@ -333,7 +333,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
     contacts = contactSensor->GetContacts();
   }
 
-  EXPECT_TRUE(steps > 0);
+  EXPECT_GT(steps, 0);
 
   contacts = contactSensor->GetContacts();
 
@@ -376,7 +376,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
       }
       // contact sensor should have positive x torque and relatively large
       // compared to y and z
-      EXPECT_TRUE(actualTorque.x > 0);
+      EXPECT_GT(actualTorque.x, 0);
       EXPECT_TRUE(actualTorque.x > fabs(actualTorque.y));
       EXPECT_TRUE(actualTorque.x > fabs(actualTorque.z));
       EXPECT_TRUE(fabs(actualTorque.y) < tol);

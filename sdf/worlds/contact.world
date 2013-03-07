@@ -8,10 +8,11 @@
      <include>
       <uri>model://sun</uri>
     </include>
-<!--
+
     <model name="box">
-      <pose>0 0 0.5 1.57 0 0</pose>
       <link name="link">
+        <pose>0 0 0.5 0 0 0</pose>
+
         <collision name="box_collision">
           <geometry>
             <box>
@@ -29,83 +30,11 @@
         </visual>
 
         <sensor name='my_contact' type='contact'>
-          <update_rate> 1 </update_rate>
           <contact>
             <collision>box_collision</collision>
           </contact>
 
-
-        </sensor>
-      </link>
-    </model>
-
-    <model name="sphere">
-      <pose>0 0 1.5 0 0 0</pose>
-      <link name="link2">
-        <pose>0 0 0 0 0 0</pose>
-        <collision name="sphere_collision">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-        </visual>
-      </link>
-    </model>-->
-<!--          <plugin name="my_plugin" filename="libContactPlugin.so"/>-->
-  <model name="cylinder">
-      <pose>0 0 0.5 0 1.57 0</pose>
-      <link name="link">
-        <collision name="cylinder_collision">
-          <geometry>
-            <cylinder>
-              <radius>0.5</radius><length>1</length>
-            </cylinder>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <cylinder>
-              <radius>0.5</radius><length>1</length>
-            </cylinder>
-          </geometry>
-        </visual>
-      </link>
-    </model>
-
-    <model name="cylinder_contact">
-      <pose>0 -0.3 1.5 1.57 0 0</pose>
-      <link name="link">
-        <collision name="cylinder_collision">
-          <geometry>
-            <cylinder>
-              <radius>0.5</radius><length>1</length>
-            </cylinder>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <cylinder>
-              <radius>0.5</radius><length>1</length>
-            </cylinder>
-          </geometry>
-        </visual>
-
-        <sensor name='my_contact' type='contact'>
-          <update_rate> 1 </update_rate>
-          <contact>
-            <collision>cylinder_collision</collision>
-          </contact>
+          <plugin name="my_plugin" filename="libContactPlugin.so"/>
         </sensor>
       </link>
     </model>
