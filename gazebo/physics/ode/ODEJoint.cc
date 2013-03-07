@@ -19,8 +19,9 @@
  * Date: 12 Oct 2009
  */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Assert.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Link.hh"
@@ -822,6 +823,11 @@ double ODEJoint::GetAttribute(const std::string &_key, unsigned int _index)
         return 0;
       }
     }
+    else
+    {
+      gzerr << "Trying to get thread_pitch for non-screw joints.\n";
+      return 0;
+    }
   }
   else
   {
@@ -967,6 +973,13 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 void ODEJoint::CFMDamping()
 {
   // check if we are violating joint limits
+  if (this->GetAngleCount() > 2)
+  {
+     gzerr << "Incompatible joint type, GetAngleCount() = "
+           << this->GetAngleCount() << " > 2\n";
+     return;
+  }
+
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
     if (this->GetAngle(i) >= this->upperLimit[i] ||
@@ -1010,8 +1023,17 @@ void ODEJoint::SetDamping(int /*_index*/, double _damping)
 
   // \TODO: implement on a per axis basis (requires additional sdf parameters)
   // trigger an update in CFMDAmping if this is called
-  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
-    this->cfmDampingState[i] = ODEJoint::NONE;
+  if (this->useCFMDamping)
+  {
+    if (this->GetAngleCount() > 2)
+    {
+       gzerr << "Incompatible joint type, GetAngleCount() = "
+             << this->GetAngleCount() << " > 2\n";
+       return;
+    }
+    for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+      this->cfmDampingState[i] = ODEJoint::NONE;
+  }
 
   if (!this->dampingInitialized)
   {

@@ -38,8 +38,11 @@ namespace gazebo
       /// \brief internal variables used for cfm damping
       public:  enum CFMMode
       {
+        /// \brief cfm damping not active
         NONE           = 0x00000000,
+        /// \brief cfm damping active, joints within limits
         DAMPING_ACTIVE = 0x00000001,
+        /// \brief cfm damping not active, enforcing joints limits
         JOINT_LIMIT    = 0x00000002
       };
 
@@ -125,7 +128,7 @@ namespace gazebo
       }
 
       /// \brief internal variable to keep track of cfm damping internals
-      private: int cfmDampingState[2];
+      private: int cfmDampingState[3];
 
       /// \brief internal variable to keep track if ConnectJointUpdate
       /// has been called on a damping method

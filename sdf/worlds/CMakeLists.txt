@@ -4,7 +4,6 @@ set (files
   actor_circle.world
   two_actors.world
   camera.world
-  cfm_damping_test.world
   joint_damping_demo.world
   depth_camera.world
   empty.world

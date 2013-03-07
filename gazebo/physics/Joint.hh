@@ -36,6 +36,11 @@
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/JointWrench.hh"
 
+/// \brief maximum number of axis per joint anticipated.
+/// Currently, this is 2 as 3-axis joints (e.g. ball)
+/// actuation, control is not there yet.
+#define MAX_JOINT_AXIS 2
+
 namespace gazebo
 {
   namespace physics
@@ -480,23 +485,23 @@ namespace gazebo
       /// This plus the joint feedback (joint contstraint forces) is the
       /// equivalent of simulated force torque sensor reading
       /// Allocate a 2 vector in case hinge2 joint is used.
-      protected: double forceApplied[2];
+      protected: double forceApplied[MAX_JOINT_AXIS];
 
       /// \brief Store Joint effort limit as specified in SDF
-      protected: double effortLimit[2];
+      protected: double effortLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint velocity limit as specified in SDF
-      protected: double velocityLimit[2];
+      protected: double velocityLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint inertia ratio.  This is a measure of how well
       /// this model behaves using interative LCP solvers.
-      protected: double inertiaRatio[2];
+      protected: double inertiaRatio[MAX_JOINT_AXIS];
 
       /// \brief Store Joint position lower limit as specified in SDF
-      protected: math::Angle lowerLimit[2];
+      protected: math::Angle lowerLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint position upper limit as specified in SDF
-      protected: math::Angle upperLimit[2];
+      protected: math::Angle upperLimit[MAX_JOINT_AXIS];
 
       /// \brief option to use CFM damping
       protected: bool useCFMDamping;
