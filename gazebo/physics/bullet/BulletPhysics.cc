@@ -187,6 +187,29 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         btVector3 torqueA = (ptB-rbA->getCenterOfMassPosition()).cross(force);
         btVector3 torqueB = (ptB-rbB->getCenterOfMassPosition()).cross(-force);
 
+//        btVector3 torqueA = force.cross(ptB-rbA->getCenterOfMassPosition());
+//        btVector3 torqueB = (-force).cross(ptB-rbB->getCenterOfMassPosition());
+
+/*        if (!link1->IsStatic() && !link2->IsStatic() && ptB.z() > 0.5)
+        {
+        btVector3 v1 = ptB-rbA->getCenterOfMassPosition();
+        btVector3 v2 = ptB-rbB->getCenterOfMassPosition();
+        gzerr << " posA " << ptB.x() << " " << ptB.y() << " " <<
+            ptB.z() << " , " << rbA->getCenterOfMassPosition().x() << " " << rbA->getCenterOfMassPosition().y() << " " << rbA->getCenterOfMassPosition().z() << std::endl;
+        gzerr << " posB " << ptB.x() << " " << ptB.y() << " " <<
+            ptB.z() << " , " << rbB->getCenterOfMassPosition().x() << " " << rbB->getCenterOfMassPosition().y() << " " << rbB->getCenterOfMassPosition().z() << std::endl;
+        gzerr << " v " << v1.x() << " " << v1.y() << " " <<
+            v1.z() << " , " << v2.x() << " " << v2.y() << " " << v2.z() << std::endl;
+        gzerr << " force " << force.x() << " " << force.y() << " " <<
+            force.z() << std::endl;
+        gzerr << " torqueA " << torqueA.x() << " " << torqueA.y() << " " <<
+            torqueA.z() << std::endl;
+        gzerr << " torqueB " << torqueB.x() << " " << torqueB.y() << " " <<
+            torqueB.z() << std::endl;
+//        gzerr << " torque " << torqueB.x() << " " << torqueB.y() << " " <<
+//            torqueB.z() << std::endl;
+        }*/
+
         localTorque1 = body1Pose.rot.RotateVectorReverse(
             BulletTypes::ConvertVector3(torqueA));
         localTorque2 = body2Pose.rot.RotateVectorReverse(
