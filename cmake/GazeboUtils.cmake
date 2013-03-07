@@ -104,6 +104,9 @@ endmacro ()
 macro (gz_add_executable _name)
   add_executable(${_name} ${ARGN})
   target_link_libraries (${_name} ${general_libraries})
+
+  # TODO Only add this line if OSX
+  set_property(TARGET ${OGRE_PROJECT_NAME} PROPERTY MACOSX_BUNDLE TRUE)
 endmacro ()
 
 

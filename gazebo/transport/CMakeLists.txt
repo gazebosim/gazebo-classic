@@ -28,7 +28,7 @@ set (headers
   Subscriber.hh
   SubscriptionTransport.hh
   TopicManager.hh
-  Transport.hh
+  TransportIface.hh
   TransportTypes.hh
 )
 
