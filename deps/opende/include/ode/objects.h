@@ -498,6 +498,13 @@ ODE_API dReal dWorldGetQuickStepW (dWorldID);
  */
 ODE_API dReal dWorldGetQuickStepRMSError (dWorldID);
 
+/**
+ * @brief Get the number of rows in the constraint matrix
+ * @ingroup world
+ * @returns the number of rows
+ */
+ODE_API int dWorldGetQuickStepNumConstraints (dWorldID);
+
 /* World contact parameter functions */
 
 /**

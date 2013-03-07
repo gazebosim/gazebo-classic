@@ -108,6 +108,8 @@ public:
     { return dWorldGetQuickStepW (get_id()); }
   dReal getQuickStepRMSError() const
     { return dWorldGetQuickStepRMSError (get_id()); }
+  int getQuickStepNumConstraints() const
+    { return dWorldGetQuickStepNumConstraints (get_id()); }
 
   void  setAutoDisableLinearThreshold (dReal threshold) 
     { dWorldSetAutoDisableLinearThreshold (get_id(), threshold); }
