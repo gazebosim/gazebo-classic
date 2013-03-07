@@ -69,6 +69,9 @@ namespace gazebo
       /// \brief Reset the link.
       public: void Reset();
 
+      /// \brief Reset the link.
+      public: void ResetPhysicsStates();
+
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);

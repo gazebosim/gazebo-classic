@@ -85,16 +85,17 @@ namespace gazebo
 
   namespace common
   {
-    class Param;
-    class Time;
+    class Animation;
+    class Color;
+    class DiagnosticTimer;
     class Image;
     class Mesh;
     class MouseEvent;
-    class PoseAnimation;
     class NumericAnimation;
-    class Animation;
-    class Color;
+    class Param;
+    class PoseAnimation;
     class SkeletonAnimation;
+    class Time;
 
     template <typename T>
     class ParamT;
@@ -118,6 +119,10 @@ namespace gazebo
     /// \def NumericAnimationPtr
     /// \brief boost::shared_ptr to a NumericAnimation class
     typedef boost::shared_ptr<NumericAnimation> NumericAnimationPtr;
+
+    /// \def DiagnosticTimerPtr
+    /// \brief boost::shared_ptr to a DiagnosticTimer class
+    typedef boost::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
   }
 
   namespace event

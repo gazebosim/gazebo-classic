@@ -157,12 +157,6 @@ void Link::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Link::Init()
 {
-  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
-  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
-
-  this->SetLinearDamping(this->GetLinearDamping());
-  this->SetAngularDamping(this->GetAngularDamping());
-
   this->linearAccel.Set(0, 0, 0);
   this->angularAccel.Set(0, 0, 0);
 
@@ -266,7 +260,16 @@ void Link::Fini()
 //////////////////////////////////////////////////
 void Link::Reset()
 {
+  // resets pose
   Entity::Reset();
+
+  // resets velocity, acceleration, wrench
+  this->ResetPhysicsStates();
+}
+
+//////////////////////////////////////////////////
+void Link::ResetPhysicsStates()
+{
   this->SetAngularVel(math::Vector3(0, 0, 0));
   this->SetLinearVel(math::Vector3(0, 0, 0));
   this->SetAngularAccel(math::Vector3(0, 0, 0));

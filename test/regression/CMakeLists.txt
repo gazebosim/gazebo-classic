@@ -29,7 +29,6 @@ set(tests
   factory.cc
   file_handling.cc
   laser.cc
-  msgs.cc
   physics.cc
   pioneer2dx.cc
   transport.cc

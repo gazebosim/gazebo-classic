@@ -32,6 +32,8 @@
 using namespace gazebo;
 using namespace sensors;
 
+boost::mutex SensorManager::sensorTimingMutex;
+
 //////////////////////////////////////////////////
 SensorManager::SensorManager()
   : initialized(false)
@@ -131,6 +133,18 @@ bool SensorManager::SensorsInitialized()
   boost::recursive_mutex::scoped_lock lock(this->mutex);
   bool result = this->initSensors.empty();
   return result;
+}
+
+//////////////////////////////////////////////////
+void SensorManager::ResetLastUpdateTimes()
+{
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+  for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
+       iter != this->sensorContainers.end(); ++iter)
+  {
+    GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
+    (*iter)->ResetLastUpdateTimes();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -411,7 +425,7 @@ void SensorManager::SensorContainer::RunLoop()
   engine->InitForThread();
 
   common::Time sleepTime, startTime, eventTime, diffTime;
-  double maxUpdateRate = GZ_DBL_MIN;
+  double maxUpdateRate = 0;
 
   boost::mutex tmpMutex;
   boost::mutex::scoped_lock lock2(tmpMutex);
@@ -445,26 +459,37 @@ void SensorManager::SensorContainer::RunLoop()
   {
     // Get the start time of the update.
     startTime = world->GetSimTime();
+
+    if (this->sensors.size() == 0)
+      this->runCondition.wait(lock2);
+
     this->Update(false);
 
     // Compute the time it took to update the sensors.
     diffTime = world->GetSimTime() - startTime;
 
-    // Set the default sleep time;
-    eventTime = sleepTime;
+    // Set the default sleep time
+    eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
-    // Make sure we don't try to compute a negative time;
-    if (diffTime < sleepTime)
-      eventTime -= diffTime;
+    // Make sure update time is reasonable.
+    GZ_ASSERT(diffTime.sec < 1, "Took over 1.0 seconds to update a sensor.");
 
-    if (eventTime > common::Time::Zero)
-    {
-      // Add an event to trigger when the appropriate simulation time has been
-      // reached.
-      SimTimeEventHandler::Instance()->AddRelativeEvent(eventTime,
-          &this->runCondition);
-      this->runCondition.wait(lock2);
-    }
+    // Make sure diffTime is not negative.
+    GZ_ASSERT(diffTime >= common::Time::Zero,
+        "Took negative time to update a sensor.");
+
+    // Make sure eventTime is not negative.
+    GZ_ASSERT(eventTime >= common::Time::Zero,
+        "Time to next sensor update is negative.");
+
+    boost::mutex::scoped_lock timingLock(SensorManager::sensorTimingMutex);
+
+    // Add an event to trigger when the appropriate simulation time has been
+    // reached.
+    SimTimeEventHandler::Instance()->AddRelativeEvent(eventTime,
+        &this->runCondition);
+
+    this->runCondition.wait(timingLock);
   }
 }
 
@@ -474,7 +499,7 @@ void SensorManager::SensorContainer::Update(bool _force)
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   if (this->sensors.size() == 0)
-    gzerr << "Updating a sensor containing without any sensors.\n";
+    gzlog << "Updating a sensor containing without any sensors.\n";
 
   // Update all the sensors in this container.
   for (Sensor_V::iterator iter = this->sensors.begin();
@@ -547,6 +572,21 @@ bool SensorManager::SensorContainer::RemoveSensor(const std::string &_name)
   }
 
   return removed;
+}
+
+//////////////////////////////////////////////////
+void SensorManager::SensorContainer::ResetLastUpdateTimes()
+{
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
+  Sensor_V::iterator iter;
+
+  // Rest last update times for all contained sensors.
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+  {
+    GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
+    (*iter)->ResetLastUpdateTime();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -624,28 +664,27 @@ void SimTimeEventHandler::OnUpdate(const common::UpdateInfo &_info)
 {
   GZ_ASSERT(this->world != NULL, "World pointer is NULL");
 
+  boost::mutex::scoped_lock timingLock(SensorManager::sensorTimingMutex);
+  boost::mutex::scoped_lock lock(this->mutex);
+
+  // Iterate over all the events.
+  for (std::list<SimTimeEvent*>::iterator iter = this->events.begin();
+      iter != this->events.end();)
   {
-    boost::mutex::scoped_lock lock(this->mutex);
+    GZ_ASSERT(*iter != NULL, "SimTimeEvent is NULL");
 
-    // Iterate over all the events.
-    for (std::list<SimTimeEvent*>::iterator iter = this->events.begin();
-        iter != this->events.end();)
+    // Find events that have a time less than or equal to simulation
+    // time.
+    if ((*iter)->time <= _info.simTime)
     {
-      GZ_ASSERT(*iter != NULL, "SimTimeEvent is NULL");
+      // Notify the event by triggering its condition.
+      (*iter)->condition->notify_all();
 
-      // Find events that have a time less than or equal to simulation
-      // time.
-      if ((*iter)->time <= _info.simTime)
-      {
-        // Notify the event by triggering its condition.
-        (*iter)->condition->notify_all();
-
-        // Remove the event.
-        delete *iter;
-        this->events.erase(iter++);
-      }
-      else
-        ++iter;
+      // Remove the event.
+      delete *iter;
+      this->events.erase(iter++);
     }
+    else
+      ++iter;
   }
 }
