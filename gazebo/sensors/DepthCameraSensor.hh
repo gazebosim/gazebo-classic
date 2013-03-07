@@ -81,14 +81,37 @@ namespace gazebo
       public: rendering::DepthCameraPtr GetDepthCamera() const
               {return this->camera;}
 
+      /// \brief Gets the width of the image in pixels.
+      /// \return The image width in pixels.
+      public: unsigned int GetImageWidth() const;
+
+      /// \brief Gets the height of the image in pixels.
+      /// \return The image height in pixels.
+      public: unsigned int GetImageHeight() const;
+
+      /// \brief Gets the raw image data from the sensor.
+      /// \return The pointer to the image data array.
+      public: const unsigned char *GetImageData();
+
       /// \brief Saves an image frame of depth camera sensor to file
       /// \param[in] Name of file to save as
       /// \return True if saved, false if not
       public: bool SaveFrame(const std::string &_filename);
 
+      // Documentation inherited
+      public: virtual bool IsActive();
+
+      /// \brief Pointer to the camera userd for rendering.
       private: rendering::DepthCameraPtr camera;
 
+      /// \brief Pointer to the scene.
       private: rendering::ScenePtr scene;
+
+      /// \brief Publisher of RGB image frames.
+      private: transport::PublisherPtr imagePub;
+
+      /// \brief Publisher of depth image frames.
+      private: transport::PublisherPtr depthPub;
     };
     /// \}
   }

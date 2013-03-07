@@ -6,9 +6,9 @@
     <description></description>
   </attribute>
 
-  <attribute name="static" type="bool" default="false" required="0">
+  <element name="static" type="bool" default="false" required="0">
     <description></description>
-  </attribute>
+  </element>
 
   <element name="pose" type="pose" default="0 0 0 0 0 0" required="0">
     <description>Origin of the actor</description>
@@ -17,7 +17,7 @@
   <element name="skin" required="1">
     <description></description>
 
-    <element name="filename" type="string" default="__default__" required="1">
+    <element name="uri" type="string" default="__default__" required="1">
       <description></description>
     </element>
 
@@ -33,12 +33,14 @@
       <description></description>
     </attribute>
 
-    <element name="filename" type="string" default="__default__" required="1">
+    <element name="uri" type="string" default="__default__" required="1">
       <description></description>
     </element>
+
     <element name="scale" type="double" default="1.0" required="0">
       <description></description>
     </element>
+
     <element name="interpolate_x" type="bool" default="false" required="0">
       <description></description>
     </element>

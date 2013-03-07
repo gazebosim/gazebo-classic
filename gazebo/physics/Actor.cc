@@ -21,28 +21,29 @@
 #include <limits>
 #include <algorithm>
 
-#include "common/KeyFrame.hh"
-#include "common/Animation.hh"
-#include "common/Plugin.hh"
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/CommonTypes.hh"
-#include "common/MeshManager.hh"
-#include "common/Mesh.hh"
-#include "common/Skeleton.hh"
-#include "common/SkeletonAnimation.hh"
-#include "common/BVHLoader.hh"
+#include "gazebo/common/Common.hh"
+#include "gazebo/common/KeyFrame.hh"
+#include "gazebo/common/Animation.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/common/SkeletonAnimation.hh"
+#include "gazebo/common/BVHLoader.hh"
 
-#include "physics/World.hh"
-#include "physics/Joint.hh"
-#include "physics/Link.hh"
-#include "physics/Model.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Actor.hh"
-#include "physics/Physics.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Actor.hh"
+#include "gazebo/physics/Physics.hh"
 
-#include "transport/Node.hh"
+#include "gazebo/transport/Node.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -52,6 +53,7 @@ using namespace common;
 Actor::Actor(BasePtr _parent)
   : Model(_parent)
 {
+  printf("New actor\n");
   this->AddType(ACTOR);
   this->mesh = NULL;
   this->skeleton = NULL;
@@ -69,8 +71,12 @@ Actor::~Actor()
 //////////////////////////////////////////////////
 void Actor::Load(sdf::ElementPtr _sdf)
 {
+  printf("load actor\n");
   sdf::ElementPtr skinSdf = _sdf->GetElement("skin");
-  this->skinFile = skinSdf->GetValueString("filename");
+
+  std::cout << "URI[" << skinSdf->GetValueString("uri") << "]\n";
+  this->skinFile = common::find_file(skinSdf->GetValueString("uri"));
+  std::cout << "SKinFile[" << this->skinFile << "]\n";
   this->skinScale = skinSdf->GetValueDouble("scale");
 
   MeshManager::Instance()->Load(this->skinFile);
@@ -325,7 +331,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
   }
   else
   {
-    std::string animFile = _sdf->GetValueString("filename");
+    std::string animFile = _sdf->GetValueString("uri");
     std::string extension = animFile.substr(animFile.rfind(".") + 1,
         animFile.size());
     double scale = _sdf->GetValueDouble("scale");
@@ -689,7 +695,7 @@ void Actor::AddActorVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
   visualPoseSdf->Set(_pose);
   sdf::ElementPtr geomVisSdf = visualSdf->GetElement("geometry");
   sdf::ElementPtr meshSdf = geomVisSdf->GetElement("mesh");
-  meshSdf->GetElement("filename")->Set(this->skinFile);
+  meshSdf->GetElement("uri")->Set(this->skinFile);
   meshSdf->GetElement("scale")->Set(math::Vector3(this->skinScale,
       this->skinScale, this->skinScale));
 }

@@ -21,19 +21,20 @@
 
 #include <sstream>
 
-#include "physics/World.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/common/Image.hh"
 
-#include "common/Events.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "rendering/DepthCamera.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Rendering.hh"
+#include "gazebo/rendering/DepthCamera.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Rendering.hh"
 
-#include "sensors/SensorFactory.hh"
-#include "sensors/DepthCameraSensor.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/DepthCameraSensor.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -68,6 +69,15 @@ void DepthCameraSensor::Load(const std::string &_worldName,
 void DepthCameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
+
+  std::string topicName = "~/" + this->parentName + "/" + this->GetName();
+  boost::replace_all(topicName, "::", "/");
+
+  std::string imageTopicName = topicName + "/image";
+  std::string depthTopicName = topicName + "/depth";
+
+  this->imagePub = this->node->Advertise<msgs::ImageStamped>(imageTopicName);
+  this->depthPub = this->node->Advertise<msgs::ImageStamped>(depthTopicName);
 }
 
 //////////////////////////////////////////////////
@@ -138,7 +148,63 @@ void DepthCameraSensor::UpdateImpl(bool /*_force*/)
     this->camera->Render();
     this->camera->PostRender();
     this->lastMeasurementTime = this->world->GetSimTime();
+
+    if (this->imagePub->HasConnections())
+    {
+      msgs::ImageStamped msg;
+      msgs::Set(msg.mutable_time(), this->world->GetSimTime());
+      msg.mutable_image()->set_width(this->camera->GetImageWidth());
+      msg.mutable_image()->set_height(this->camera->GetImageHeight());
+      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+            this->camera->GetImageFormat()));
+
+      msg.mutable_image()->set_step(this->camera->GetImageWidth() *
+          this->camera->GetImageDepth());
+      msg.mutable_image()->set_data(this->camera->GetImageData(),
+          msg.image().width() * this->camera->GetImageDepth() *
+          msg.image().height());
+      this->imagePub->Publish(msg);
+    }
+
+    if (this->depthPub->HasConnections())
+    {
+      msgs::ImageStamped msg;
+      msgs::Set(msg.mutable_time(), this->world->GetSimTime());
+      msg.mutable_image()->set_width(this->camera->GetImageWidth());
+      msg.mutable_image()->set_height(this->camera->GetImageHeight());
+      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+            this->camera->GetImageFormat()));
+
+      msg.mutable_image()->set_step(this->camera->GetImageWidth() *
+          this->camera->GetImageDepth());
+      msg.mutable_image()->set_data(this->camera->GetImageData(),
+          msg.image().width() * this->camera->GetImageDepth() *
+          msg.image().height());
+      this->depthPub->Publish(msg);
+    }
   }
+}
+
+//////////////////////////////////////////////////
+unsigned int DepthCameraSensor::GetImageWidth() const
+{
+  if (this->camera)
+    return this->camera->GetImageWidth();
+  return 0;
+}
+
+//////////////////////////////////////////////////
+unsigned int DepthCameraSensor::GetImageHeight() const
+{
+  if (this->camera)
+    return this->camera->GetImageHeight();
+  return 0;
+}
+
+//////////////////////////////////////////////////
+const unsigned char *DepthCameraSensor::GetImageData()
+{
+  return this->camera->GetImageData(0);
 }
 
 //////////////////////////////////////////////////
@@ -148,3 +214,8 @@ bool DepthCameraSensor::SaveFrame(const std::string &_filename)
   return this->camera->SaveFrame(_filename);
 }
 
+//////////////////////////////////////////////////
+bool DepthCameraSensor::IsActive()
+{
+  return Sensor::IsActive() || this->imagePub->HasConnections();
+}

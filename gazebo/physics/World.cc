@@ -717,6 +717,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 //////////////////////////////////////////////////
 ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
 {
+  printf("World LoadActor\n");
   ActorPtr actor(new Actor(_parent));
   actor->SetWorld(shared_from_this());
   actor->Load(_sdf);
@@ -741,6 +742,7 @@ RoadPtr World::LoadRoad(sdf::ElementPtr _sdf , BasePtr _parent)
 //////////////////////////////////////////////////
 void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 {
+  printf("Load Entities\n");
   if (_sdf->HasElement("light"))
   {
     sdf::ElementPtr childElem = _sdf->GetElement("light");
