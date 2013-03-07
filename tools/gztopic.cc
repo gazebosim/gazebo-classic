@@ -184,7 +184,7 @@ void bwCB(const std::string &_data)
 }
 
 /////////////////////////////////////////////////
-void hz_cb(const std::string &/*_data*/)
+void hzCB(const std::string &/*_data*/)
 {
   common::Time cur_time = common::Time::GetWallTime();
 
@@ -399,7 +399,7 @@ void hz()
 
   std::string topic = params[1];
 
-  transport::SubscriberPtr sub = node->Subscribe(topic, hz_cb);
+  transport::SubscriberPtr sub = node->Subscribe(topic, hzCB);
 
   // Run the transport loop: starts a new thread
   transport::run();
