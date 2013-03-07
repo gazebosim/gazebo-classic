@@ -15,6 +15,12 @@ if(HAVE_CONSOLE_BRIDGE)
     ${console_bridge_LIBRARY_DIRS})
 endif(HAVE_CONSOLE_BRIDGE)
 
+# TODO Only enable this with OSX
+# TODO Properly search for X11 lib
+link_directories(
+  /opt/X11/lib
+)
+
 set (plugins
   CameraPlugin
   DepthCameraPlugin
