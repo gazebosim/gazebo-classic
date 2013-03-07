@@ -121,7 +121,8 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  this->LoadImpl(_sdf->GetValuePose("pose"));
+  this->anchorPose = _sdf->GetValuePose("pose");
+  this->LoadImpl(this->anchorPose);
 }
 
 /////////////////////////////////////////////////
@@ -352,13 +353,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
 {
   _msg.set_name(this->GetScopedName());
 
-  if (this->sdf->HasElement("pose"))
-  {
-    msgs::Set(_msg.mutable_pose(),
-              this->sdf->GetValuePose("pose"));
-  }
-  else
-    msgs::Set(_msg.mutable_pose(), math::Pose(0, 0, 0, 0, 0, 0));
+  msgs::Set(_msg.mutable_pose(), this->anchorPose);
 
   if (this->HasType(Base::HINGE_JOINT))
   {
