@@ -835,15 +835,33 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
              }
 
+             /// \brief Send a factory message based on an SDF string.
+             /// \param[in] _sdf SDF string to publish.
   protected: void SpawnSDF(const std::string &_sdf)
              {
-               // Wait for the first pose message
-               while (this->poses.size() == 0)
-                 common::Time::MSleep(10);
-
                msgs::Factory msg;
                msg.set_sdf(_sdf);
                this->factoryPub->Publish(msg);
+
+               // The code above sends a message, but it will take some time
+               // before the message is processed.
+               //
+               // The code below parses the sdf string to find a model name,
+               // then this function will block until that model
+               // has been processed and recognized by the Server Fixture.
+               sdf::SDF sdfParsed;
+               sdfParsed.SetFromString(_sdf);
+               // Check that sdf contains a model
+               if (sdfParsed.root->HasElement("model"))
+               {
+                 // Timeout of 30 seconds (3000 * 10 ms)
+                 int waitCount = 0, maxWaitCount = 3000;
+                 sdf::ElementPtr model = sdfParsed.root->GetElement("model");
+                 std::string name = model->GetValueString("name");
+                 while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
+                   common::Time::MSleep(10);
+                 ASSERT_LT(waitCount, maxWaitCount);
+               }
              }
 
   protected: void LoadPlugin(const std::string &_filename,

@@ -125,7 +125,7 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
       BulletLink *link = static_cast<BulletLink *>(
           rayCallback.m_collisionObject->getUserPointer());
       GZ_ASSERT(link != NULL, "Bullet link is NULL");
-      _entity = link->GetName();
+      _entity = link->GetScopedName();
     }
   }
 }

@@ -17,22 +17,21 @@
 
 #include <gtest/gtest.h>
 
-#include "gazebo/common/Diagnostics.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/util/Diagnostics.hh"
 
 using namespace gazebo;
 
 TEST(DiagnosticsTest, Diagnostics)
 {
-  common::DiagnosticManager *mgr = common::DiagnosticManager::Instance();
+#ifdef ENABLE_DIAGNOSTICS
+  util::DiagnosticManager *mgr = util::DiagnosticManager::Instance();
   EXPECT_TRUE(mgr != NULL);
-
-  mgr->SetEnabled(true);
-  EXPECT_TRUE(mgr->GetEnabled());
 
   common::Time prev = common::Time::GetWallTime();
   {
-    common::DiagnosticTimerPtr timer = mgr->CreateTimer("test");
-    EXPECT_STREQ("test", timer->GetName().c_str());
+    mgr->StartTimer("test");
+    mgr->StopTimer("test");
     EXPECT_STREQ("test", mgr->GetLabel(0).c_str());
     EXPECT_EQ(1, mgr->GetTimerCount());
   }
@@ -40,8 +39,8 @@ TEST(DiagnosticsTest, Diagnostics)
 
   EXPECT_TRUE(mgr->GetTime(0) == mgr->GetTime("test"));
   EXPECT_TRUE(mgr->GetTime(0) <= after - prev);
+#endif
 }
-
 
 
 /////////////////////////////////////////////////
