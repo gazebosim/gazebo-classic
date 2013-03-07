@@ -404,6 +404,7 @@ void ODEPhysics::UpdatePhysics()
         t1.Set(fb.t1[0], fb.t1[1], fb.t1[2]);
         t2.Set(fb.t2[0], fb.t2[1], fb.t2[2]);
 
+        // set force torque in link frame
         this->jointFeedbacks[i]->contact->wrench[j].body1Force =
              col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(f1);
         this->jointFeedbacks[i]->contact->wrench[j].body2Force =

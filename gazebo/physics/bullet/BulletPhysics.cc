@@ -127,11 +127,11 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 
     BulletLink *link1 = static_cast<BulletLink *>(
         obA->getUserPointer());
-    GZ_ASSERT(link1 != NULL, "Link0 in collision pair is NULL");
+    GZ_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
 
     BulletLink *link2 = static_cast<BulletLink *>(
         obB->getUserPointer());
-    GZ_ASSERT(link2 != NULL, "Link1 in collision pair is NULL");
+    GZ_ASSERT(link2 != NULL, "Link2 in collision pair is NULL");
 
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = link1->GetCollision(colIndex);
@@ -171,15 +171,19 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         const btVector3 &ptB = pt.getPositionWorldOnB();
         const btVector3 &normalOnB = pt.m_normalWorldOnB;
         btVector3 impulse = pt.m_appliedImpulse * normalOnB;
+
+        // calculate force in world frame
         btVector3 force = impulse/_timeStep;
+
+        // calculate torque in world frame
+        btVector3 torqueA = (ptB-rbA->getCenterOfMassPosition()).cross(force);
+        btVector3 torqueB = (ptB-rbB->getCenterOfMassPosition()).cross(-force);
+
+        // Convert from world to link frame
         localForce1 = body1Pose.rot.RotateVectorReverse(
             BulletTypes::ConvertVector3(force));
         localForce2 = body2Pose.rot.RotateVectorReverse(
             BulletTypes::ConvertVector3(-force));
-
-        btVector3 torqueA = (ptB-rbA->getCenterOfMassPosition()).cross(force);
-        btVector3 torqueB = (ptB-rbB->getCenterOfMassPosition()).cross(-force);
-
         localTorque1 = body1Pose.rot.RotateVectorReverse(
             BulletTypes::ConvertVector3(torqueA));
         localTorque2 = body2Pose.rot.RotateVectorReverse(
@@ -205,7 +209,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 }
 
 //////////////////////////////////////////////////
-bool BulletPhysics::ContactCallback(btManifoldPoint &/*_cp*/,
+bool ContactCallback(btManifoldPoint &/*_cp*/,
     const btCollisionObjectWrapper */*_obj0*/, int /*_partId0*/,
     int /*_index0*/, const btCollisionObjectWrapper */*_obj1*/,
     int /*_partId1*/, int /*_index1*/)
@@ -261,7 +265,7 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   pairCache->setOverlapFilterCallback(filterCallback);
 
   // TODO: Enable this to do custom contact setting
-//  gContactAddedCallback = ContactCallback;
+  gContactAddedCallback = ContactCallback;
   gContactProcessedCallback = ContactProcessed;
 
   this->dynamicsWorld->setInternalTickCallback(

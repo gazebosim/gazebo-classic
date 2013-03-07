@@ -25,7 +25,6 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/unordered_map.hpp>
 
 #include "physics/bullet/bullet_inc.h"
 #include "physics/PhysicsEngine.hh"
@@ -133,11 +132,6 @@ namespace gazebo
               {return this->dynamicsWorld;}
 
       public: virtual void DebugPrint() const;
-
-      private: static bool ContactCallback(btManifoldPoint &_cp,
-        const btCollisionObjectWrapper *_obj0, int _partId0,
-        int _index0, const btCollisionObjectWrapper *_obj1,
-        int _partId1, int _index1);
 
       private: btBroadphaseInterface *broadPhase;
       private: btDefaultCollisionConfiguration *collisionConfig;
