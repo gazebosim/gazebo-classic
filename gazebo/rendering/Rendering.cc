@@ -19,7 +19,7 @@
 #include "common/Console.hh"
 
 #include "rendering/RenderEngine.hh"
-#include "Rendering.hh"
+#include "RenderingIface.hh"
 
 using namespace gazebo;
 

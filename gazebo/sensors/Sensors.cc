@@ -24,7 +24,7 @@
 #include "sensors/SensorFactory.hh"
 #include "sensors/SensorManager.hh"
 #include "sensors/Sensor.hh"
-#include "sensors/Sensors.hh"
+#include "sensors/SensorsIface.hh"
 
 using namespace gazebo;
 
