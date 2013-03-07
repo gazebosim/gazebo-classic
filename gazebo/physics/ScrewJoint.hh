@@ -109,7 +109,7 @@ namespace gazebo
       /// This must be implemented in a child class
       /// \param[in] _index Index of the axis.
       /// \return _threadPitch Thread pitch value.
-      public: virtual double GetThreadPitch(int _index) = 0;
+      public: virtual double GetThreadPitch(unsigned int _index) = 0;
 
       /// \brief The anchor value is not used internally.
       protected: math::Vector3 fakeAnchor;

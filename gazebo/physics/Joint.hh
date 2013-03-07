@@ -377,7 +377,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
       public: virtual double GetAttribute(const std::string &_key,
-                                               int _index) = 0;
+                                                unsigned int _index) = 0;
 
       /// \brief Get the child link
       /// \return Pointer to the child link.
