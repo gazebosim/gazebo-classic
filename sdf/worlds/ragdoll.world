@@ -1,8 +1,24 @@
 <?xml version="1.0" ?>
-<!-- this was initially generated from ragdoll.urdf,
-     but have sence been updated to turn off gravity for certain links
-     and various tweaks -->
 <sdf version="1.3">
+  <world name="default">
+
+    <physics type="simbody">
+      <gravity>0 0 -9.81</gravity>
+      <ode>
+        <solver>
+          <dt>0.001</dt>
+        </solver>
+      </ode>
+      <simbody>
+        <dt>0.001</dt>
+      </simbody>
+    </physics>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
     <model name="ragdoll">
         <pose>0.000000 0.000000 1.4 0.000000 -0.000000 0.000000</pose>
         <link name="hip">
@@ -18,7 +34,6 @@
                     <izz>0.100000</izz>
                 </inertia>
                 <mass>10.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="hip_geom">
                 <pose>0.000000 0.000000 0.125000 0.000000 -0.000000 0.000000</pose>
@@ -82,7 +97,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="l_thigh_pan_geom">
                 <pose>0.000000 0.000000 -0.030000 0.000000 -0.000000 0.000000</pose>
@@ -146,7 +160,6 @@
                     <izz>0.050000</izz>
                 </inertia>
                 <mass>5.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="l_thigh_lift_geom">
                 <pose>0.000000 0.000000 -0.350000 0.000000 -0.000000 0.000000</pose>
@@ -212,7 +225,6 @@
                     <izz>0.020000</izz>
                 </inertia>
                 <mass>2.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="l_calf_geom">
                 <pose>0.000000 0.000000 -0.300000 0.000000 -0.000000 0.000000</pose>
@@ -278,7 +290,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="l_ankle_geom">
                 <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
@@ -342,7 +353,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="l_foot_geom">
                 <pose>0.100000 0.000000 -0.025000 0.000000 -0.000000 0.000000</pose>
@@ -406,7 +416,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="r_thigh_pan_geom">
                 <pose>0.000000 0.000000 -0.030000 0.000000 -0.000000 0.000000</pose>
@@ -470,7 +479,6 @@
                     <izz>0.050000</izz>
                 </inertia>
                 <mass>5.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="r_thigh_lift_geom">
                 <pose>0.000000 0.000000 -0.350000 0.000000 -0.000000 0.000000</pose>
@@ -536,7 +544,6 @@
                     <izz>0.020000</izz>
                 </inertia>
                 <mass>2.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="r_calf_geom">
                 <pose>0.000000 0.000000 -0.300000 0.000000 -0.000000 0.000000</pose>
@@ -602,7 +609,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="r_ankle_geom">
                 <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
@@ -666,7 +672,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="r_foot_geom">
                 <pose>0.100000 0.000000 -0.025000 0.000000 -0.000000 0.000000</pose>
@@ -730,7 +735,6 @@
                     <izz>0.300000</izz>
                 </inertia>
                 <mass>30.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="torso_geom">
                 <pose>0.000000 0.000000 0.350000 0.000000 -0.000000 0.000000</pose>
@@ -794,7 +798,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="l_shoulder_geom">
                 <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
@@ -858,7 +861,6 @@
                     <izz>0.020000</izz>
                 </inertia>
                 <mass>2.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="l_upper_arm_geom">
                 <pose>0.000000 0.000000 -0.300000 0.000000 -0.000000 0.000000</pose>
@@ -924,7 +926,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="l_forearm_geom">
                 <pose>0.000000 0.000000 -0.225000 0.000000 -0.000000 0.000000</pose>
@@ -990,7 +991,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="l_wrist_geom">
                 <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
@@ -1054,7 +1054,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="l_hand_geom">
                 <pose>0.000000 0.000000 -0.100000 0.000000 -0.000000 0.000000</pose>
@@ -1118,7 +1117,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="neck_geom">
                 <pose>0.000000 0.000000 0.100000 0.000000 -0.000000 0.000000</pose>
@@ -1184,7 +1182,6 @@
                     <izz>0.100000</izz>
                 </inertia>
                 <mass>10.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="head_geom">
                 <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
@@ -1248,7 +1245,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="r_shoulder_geom">
                 <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
@@ -1312,7 +1308,6 @@
                     <izz>0.020000</izz>
                 </inertia>
                 <mass>2.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="r_upper_arm_geom">
                 <pose>0.000000 0.000000 -0.300000 0.000000 -0.000000 0.000000</pose>
@@ -1378,7 +1373,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="r_forearm_geom">
                 <pose>0.000000 0.000000 -0.225000 0.000000 -0.000000 0.000000</pose>
@@ -1444,7 +1438,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="r_wrist_geom">
                 <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
@@ -1508,7 +1501,6 @@
                     <izz>0.010000</izz>
                 </inertia>
                 <mass>1.000000</mass>
-                <density>1.000000</density>
             </inertial>
             <collision name="r_hand_geom">
                 <pose>0.000000 0.000000 -0.100000 0.000000 -0.000000 0.000000</pose>
@@ -1859,5 +1851,20 @@
             </axis>
         </joint>
         <static>0</static>
+      <joint name="joint1" type="revolute">
+        <parent>world</parent>
+        <child>r_hand</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <xyz>1.0 0.0 0.0</xyz>
+          <limit>
+            <lower>1000</lower>
+            <upper>-1000</upper>
+            <effort>0</effort>
+            <velocity>1000</velocity>
+          </limit>
+        </axis>
+      </joint>
     </model>
+  </world>
 </sdf>

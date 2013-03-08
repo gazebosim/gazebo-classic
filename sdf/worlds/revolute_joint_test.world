@@ -1,5 +1,17 @@
 <sdf version="1.3">
   <world name="default">
+    <physics type="simbody">
+      <gravity>0 0 0</gravity>
+      <ode>
+        <solver>
+          <dt>0.001</dt>
+        </solver>
+      </ode>
+      <simbody>
+        <dt>0.001</dt>
+      </simbody>
+    </physics>
+
     <model name="double_pendulum_with_base">
       <link name="base_pendulum_0deg">
         <pose>0 2.1 0  0 0 0</pose>
@@ -1607,6 +1619,20 @@
         <child>lower_link_pendulum_45deg</child>
         <axis>
           <xyz>1.0 0 0</xyz>
+        </axis>
+      </joint>
+      <joint name="joint1" type="revolute">
+        <parent>world</parent>
+        <child>base_pendulum_0deg</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <xyz>1.0 0.0 0.0</xyz>
+          <limit>
+            <lower>1000</lower>
+            <upper>-1000</upper>
+            <effort>0</effort>
+            <velocity>1000</velocity>
+          </limit>
         </axis>
       </joint>
     </model>
