@@ -85,12 +85,12 @@ Pose Pose::GetInverse() const
 }
 
 //////////////////////////////////////////////////
-Pose Pose::operator+(const Pose &obj) const
+Pose Pose::operator+(const Pose &_obj) const
 {
   Pose result;
 
-  result.pos = this->CoordPositionAdd(obj);
-  result.rot = this->CoordRotationAdd(obj.rot);
+  result.pos = this->CoordPositionAdd(_obj);
+  result.rot = this->CoordRotationAdd(_obj.rot);
 
   return result;
 }
