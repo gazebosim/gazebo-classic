@@ -190,28 +190,26 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
       this->labelList->addItem(item);
     }
 
-    QString labelStr(_msg->time(i).name().c_str());
-
     // Check to see if the data belongs in a plot, and add it.
     for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
         iter != this->plots.end(); ++iter)
     {
-      if ((*iter)->HasCurve(labelStr))
+      if ((*iter)->HasCurve(qstr))
       {
         elapsedTime = msgs::Convert(_msg->time(i).elapsed());
 
         double msTime = elapsedTime.Double() * 1e3;
         QPointF pt(wallTime.Double(), msTime);
 
-        (*iter)->Add(labelStr, pt);
+        (*iter)->Add(qstr, pt);
       }
     }
   }
 
   // Process each variable
-  for (int i = 0; i < _msg->var_size(); ++i)
+  for (int i = 0; i < _msg->variable_size(); ++i)
   {
-    QString qstr = QString::fromStdString(_msg->time(i).name());
+    QString qstr = QString::fromStdString(_msg->variable(i).name());
 
     // Add the time label to the list if it's not already there.
     QList<QListWidgetItem*> items = this->labelList->findItems(qstr,
@@ -222,6 +220,41 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
       QListWidgetItem *item = new QListWidgetItem(qstr);
       item->setToolTip(tr("Drag onto graph to plot"));
       this->labelList->addItem(item);
+    }
+
+    // Check to see if the data belongs in a plot, and add it.
+    for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
+        iter != this->plots.end(); ++iter)
+    {
+      if ((*iter)->HasCurve(qstr))
+      {
+        QPointF pt(wallTime.Double(), _msg->variable(i).value());
+        (*iter)->Add(qstr, pt);
+      }
+    }
+  }
+
+  // Process each marker
+  for (int i = 0; i < _msg->marker_size(); ++i)
+  {
+    QString qstr = QString::fromStdString(_msg->marker(i).name());
+
+    // Add the time label to the list if it's not already there.
+    QList<QListWidgetItem*> items = this->labelList->findItems(qstr,
+        Qt::MatchExactly);
+
+    if (items.size() == 0)
+    {
+      QListWidgetItem *item = new QListWidgetItem(qstr);
+      item->setToolTip(tr("Drag onto graph to plot"));
+      this->labelList->addItem(item);
+    }
+
+    // Add all marker to all plots
+    for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
+        iter != this->plots.end(); ++iter)
+    {
+      (*iter)->AddVLine(qstr, wallTime.Double());
     }
   }
 }

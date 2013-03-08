@@ -580,7 +580,6 @@ void World::Update()
     }
     DIAG_TIMER_LAP("World::Update", "dirtyPoses");
 
-    DIAG_VARIABLE("dirty_poses", this->dirtyPoses.size());
     this->dirtyPoses.clear();
   }
 
@@ -986,6 +985,8 @@ void World::SetPaused(bool _p)
 {
   if (this->pause == _p)
     return;
+
+  DIAG_MARKER("paused");
 
   {
     boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);

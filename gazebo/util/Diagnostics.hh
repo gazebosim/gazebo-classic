@@ -64,9 +64,15 @@ namespace gazebo
 
     /// \brief Add an a arbitrary variable to diagnostics.
     /// \param[in] _name Name associated with the variable.
-    /// \param[in] _value Value of the variable.
+    /// \param[in] _value Value of the variable. Value must be a double.
     #define DIAG_VARIABLE(_name, _value) \
     (*gazebo::util::_diagVariablePtr)(_name, _value);
+
+    /// \brief Add a marker at the current time.
+    /// \param[in] _name Name of the marker
+    #define DIAG_MARKER(_name) \
+    (*gazebo::util::_diagMarkerPtr)(_name);
+
 
     /// \class DiagnosticManager Diagnostics.hh util/util.hh
     /// \brief A diagnostic manager class
@@ -100,6 +106,15 @@ namespace gazebo
       /// \param[in] _prefix Informational string that is output with the
       /// elapsed time.
       public: void Lap(const std::string &_name, const std::string &_prefix);
+
+      /// \brief Add an an arbitrary variable to diagnostics.
+      /// \param[in] _name Name associated with the variable.
+      /// \param[in] _value Value of the variable.
+      public: void Variable(const std::string &_name, double _value);
+
+      /// \brief Add an a marker to diagnostics.
+      /// \param[in] _name Name of the marker.
+      public: void Marker(const std::string &_name);
 
       /// \brief Get the number of timers
       /// \return The number of timers
@@ -179,6 +194,9 @@ namespace gazebo
 
       /// \brief Give DiagnosticTimer special rights.
       private: friend class DiagnosticTimer;
+
+      /// \brief Log file for variables.
+      private: std::ofstream varLog;
     };
 
     /// \class DiagnosticTimer Diagnostics.hh util/util.hh
@@ -228,7 +246,7 @@ namespace gazebo
 
     /// \brief A no-op function used by Diagnostics when it is disabled.
     static inline void _DiagnosticManager_Noop3(const std::string &/*_name*/,
-        const boost::any &/*_value*/) {}
+        double /*_value*/) {}
 
 
     /// \brief Function used to start a timer.
@@ -258,17 +276,16 @@ namespace gazebo
     /// \param[in] _name Name associated with the variable.
     /// \param[in] _value A value to add
     static inline void _DiagnosticManager_Variable(const std::string &_name,
-                                                   const boost::any &_value)
+                                                   double _value)
     {
-      try
-      {
-      gazebo::util::DiagnosticManager::Instance()->Variable(_name,
-          boost::any_cast<double>(_value));
-      }
-      catch (...)
-        gzerr << "Unable to convert boost::any value to double for diagnostic "
-        << "variable[" << _name << "]\n";
-      }
+      gazebo::util::DiagnosticManager::Instance()->Variable(_name, _value);
+    }
+
+    /// \brief Function used to add a marker to diagnostics.
+    /// \param[in] _name Name of the marker.
+    static inline void _DiagnosticManager_Marker(const std::string &_name)
+    {
+      gazebo::util::DiagnosticManager::Instance()->Marker(_name);
     }
 
     /// \brief Function pointer to start a timer.
@@ -280,11 +297,15 @@ namespace gazebo
 
     /// \brief Function pointer to stop a timer.
     void (*_diagStopPtr)(const std::string &_name) = &_DiagnosticManager_Noop1;
-    /// \endcond
 
     /// \brief Function pointer a variable diagnostic information.
-    void (*_diagVariablePtr)(const std::string &_name, const boost::any &_var) =
+    void (*_diagVariablePtr)(const std::string &_name, double _var) =
       &_DiagnosticManager_Noop3;
+
+    /// \brief Function pointer for a marker.
+    void (*_diagMarkerPtr)(const std::string &_name) =
+      &_DiagnosticManager_Noop1;
+
     /// \endcond
 
   }
