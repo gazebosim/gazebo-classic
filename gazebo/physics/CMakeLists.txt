@@ -103,6 +103,7 @@ gz_add_library(gazebo_physics ${sources})
 
 target_link_libraries(gazebo_physics
   gazebo_common 
+  gazebo_util 
   gazebo_sdf_interface
   gazebo_physics_ode
   ${TBB_LIBRARIES} 
@@ -115,14 +116,16 @@ if (HAVE_BULLET)
 endif()
 
 gz_add_executable(gzphysics server.cc)
-target_link_libraries(gzphysics gazebo_common
-                                gazebo_transport
-                                gazebo_physics
-                                gazebo_sensors
-                                gazebo_sdf_interface
-                                gazebo_msgs
-                                pthread
-                                )
+target_link_libraries(gzphysics
+  gazebo_common
+  gazebo_util 
+  gazebo_transport
+  gazebo_physics
+  gazebo_sensors
+  gazebo_sdf_interface
+  gazebo_msgs
+  pthread
+  )
 
 gz_install_executable( gzphysics )
 gz_install_library(gazebo_physics)

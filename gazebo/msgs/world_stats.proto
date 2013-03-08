@@ -17,5 +17,3 @@ message WorldStatistics
   required uint64 iterations = 6;
   optional int32 model_count = 7;
 }
-
-

@@ -425,7 +425,7 @@ void SensorManager::SensorContainer::RunLoop()
   engine->InitForThread();
 
   common::Time sleepTime, startTime, eventTime, diffTime;
-  double maxUpdateRate = GZ_DBL_MIN;
+  double maxUpdateRate = 0;
 
   boost::mutex tmpMutex;
   boost::mutex::scoped_lock lock2(tmpMutex);
@@ -459,20 +459,22 @@ void SensorManager::SensorContainer::RunLoop()
   {
     // Get the start time of the update.
     startTime = world->GetSimTime();
+
+    if (this->sensors.size() == 0)
+      this->runCondition.wait(lock2);
+
     this->Update(false);
 
     // Compute the time it took to update the sensors.
-    diffTime = world->GetSimTime() - startTime;
+    // It's possible that the world time was reset during the Update. This
+    // would case a negative diffTime. Instead, just use a event time of zero
+    diffTime = std::max(common::Time::Zero, world->GetSimTime() - startTime);
 
     // Set the default sleep time
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
     // Make sure update time is reasonable.
     GZ_ASSERT(diffTime.sec < 1, "Took over 1.0 seconds to update a sensor.");
-
-    // Make sure diffTime is not negative.
-    GZ_ASSERT(diffTime >= common::Time::Zero,
-        "Took negative time to update a sensor.");
 
     // Make sure eventTime is not negative.
     GZ_ASSERT(eventTime >= common::Time::Zero,
@@ -495,7 +497,7 @@ void SensorManager::SensorContainer::Update(bool _force)
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   if (this->sensors.size() == 0)
-    gzerr << "Updating a sensor containing without any sensors.\n";
+    gzlog << "Updating a sensor containing without any sensors.\n";
 
   // Update all the sensors in this container.
   for (Sensor_V::iterator iter = this->sensors.begin();
@@ -576,8 +578,6 @@ void SensorManager::SensorContainer::ResetLastUpdateTimes()
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   Sensor_V::iterator iter;
-
-  bool removed = false;
 
   // Rest last update times for all contained sensors.
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
