@@ -24,7 +24,7 @@
       </ode>
     </physics>
     <model name="model_cube">
-      <pose>0 0 1 0 0 0</pose>
+      <pose>0 0 10 0 0 0</pose>
       <link name="cube">
 	<pose>0 0 0 0 0 0</pose>
         <inertial>
@@ -43,6 +43,35 @@
           <geometry>
             <box>
               <size>0.2 0.4 0.6</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="model_ground">
+      <static>true</static>
+      <pose>0 0 0 0 0 0</pose>
+      <link name="ground">
+	<pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>10.0</mass>
+        </inertial>
+        <visual name="visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>4 4 0.1</size>
             </box>
           </geometry>
           <material>

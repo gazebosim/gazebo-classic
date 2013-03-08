@@ -40,6 +40,7 @@ RTQL8HingeJoint::RTQL8HingeJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 RTQL8HingeJoint::~RTQL8HingeJoint()
 {
+
 }
 
 //////////////////////////////////////////////////
@@ -63,7 +64,6 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
     poseChildLinkToJoint;
   }
 
-
   //---- Step 1. Transformation from parent link frame to joint link frame.
   // Set Pose: offset from child link origin in child link frame.
   if (_sdf->GetValueString("parent") == std::string("world"))
@@ -72,19 +72,26 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
           /*+ */(this->childLink->GetWorldPose())
           + poseChildLinkToJoint;
 
-      rtql8::kinematics::Dof* tranX = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.x);
-      rtql8::kinematics::Dof* tranY = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.y);
-      rtql8::kinematics::Dof* tranZ = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.z);
+      rtql8::kinematics::Dof* tranX
+              = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.x);
+      rtql8::kinematics::Dof* tranY
+              = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.y);
+      rtql8::kinematics::Dof* tranZ
+              = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.z);
 
       rtql8::kinematics::TrfmTranslate* tran
           = new rtql8::kinematics::TrfmTranslate(tranX, tranY, tranZ);
 
       this->rtql8Joint->addTransform(tran, false);
 
-      rtql8::kinematics::Dof* rotW = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.w);
-      rtql8::kinematics::Dof* rotX = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.x);
-      rtql8::kinematics::Dof* rotY = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.y);
-      rtql8::kinematics::Dof* rotZ = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.z);
+      rtql8::kinematics::Dof* rotW
+              = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.w);
+      rtql8::kinematics::Dof* rotX
+              = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.x);
+      rtql8::kinematics::Dof* rotY
+              = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.y);
+      rtql8::kinematics::Dof* rotZ
+              = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.z);
 
       rtql8::kinematics::TrfmRotateQuat* rot
           = new rtql8::kinematics::TrfmRotateQuat(rotW, rotX, rotY, rotZ);
@@ -97,19 +104,26 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
         + (this->childLink->GetWorldPose())
         + poseChildLinkToJoint;
 
-    rtql8::kinematics::Dof* tranX = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.x);
-    rtql8::kinematics::Dof* tranY = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.y);
-    rtql8::kinematics::Dof* tranZ = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.z);
+    rtql8::kinematics::Dof* tranX
+            = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.x);
+    rtql8::kinematics::Dof* tranY
+            = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.y);
+    rtql8::kinematics::Dof* tranZ
+            = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.z);
 
     rtql8::kinematics::TrfmTranslate* tran
         = new rtql8::kinematics::TrfmTranslate(tranX, tranY, tranZ);
 
     this->rtql8Joint->addTransform(tran, false);
 
-    rtql8::kinematics::Dof* rotW = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.w);
-    rtql8::kinematics::Dof* rotX = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.x);
-    rtql8::kinematics::Dof* rotY = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.y);
-    rtql8::kinematics::Dof* rotZ = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.z);
+    rtql8::kinematics::Dof* rotW
+            = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.w);
+    rtql8::kinematics::Dof* rotX
+            = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.x);
+    rtql8::kinematics::Dof* rotY
+            = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.y);
+    rtql8::kinematics::Dof* rotZ
+            = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.z);
 
     rtql8::kinematics::TrfmRotateQuat* rot
         = new rtql8::kinematics::TrfmRotateQuat(rotW, rotX, rotY, rotZ);
@@ -128,29 +142,39 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
   // Get the model associated with
   // Add the transform to the skeletone in the model.
   // add to model because it's variable
-  RTQL8ModelPtr rtql8Model = boost::shared_dynamic_cast<RTQL8Model>(this->model);
+  RTQL8ModelPtr rtql8Model
+          = boost::shared_dynamic_cast<RTQL8Model>(this->model);
   rtql8Model->GetSkeletonDynamics()->addTransform(rotHinge);
 
 
   //---- Step 3. Transformation from rotated joint frame to child link frame.
   poseJointToChildLink = -poseChildLinkToJoint;
 
-  rtql8::kinematics::Dof* tranJ2CL_X = new rtql8::kinematics::Dof(poseJointToChildLink.pos.x);
-  rtql8::kinematics::Dof* tranJ2CL_Y = new rtql8::kinematics::Dof(poseJointToChildLink.pos.y);
-  rtql8::kinematics::Dof* tranJ2CL_Z = new rtql8::kinematics::Dof(poseJointToChildLink.pos.z);
+  rtql8::kinematics::Dof* tranJ2CL_X
+          = new rtql8::kinematics::Dof(poseJointToChildLink.pos.x);
+  rtql8::kinematics::Dof* tranJ2CL_Y
+          = new rtql8::kinematics::Dof(poseJointToChildLink.pos.y);
+  rtql8::kinematics::Dof* tranJ2CL_Z
+          = new rtql8::kinematics::Dof(poseJointToChildLink.pos.z);
 
   rtql8::kinematics::TrfmTranslate* tranJ2CL
-      = new rtql8::kinematics::TrfmTranslate(tranJ2CL_X, tranJ2CL_Y, tranJ2CL_Z);
+      = new rtql8::kinematics::TrfmTranslate(
+              tranJ2CL_X, tranJ2CL_Y, tranJ2CL_Z);
 
   this->rtql8Joint->addTransform(tranJ2CL, false);
 
-  rtql8::kinematics::Dof* rotJ2CL_W = new rtql8::kinematics::Dof(poseJointToChildLink.rot.w);
-  rtql8::kinematics::Dof* rotJ2CL_X = new rtql8::kinematics::Dof(poseJointToChildLink.rot.x);
-  rtql8::kinematics::Dof* rotJ2CL_Y = new rtql8::kinematics::Dof(poseJointToChildLink.rot.y);
-  rtql8::kinematics::Dof* rotJ2CL_Z = new rtql8::kinematics::Dof(poseJointToChildLink.rot.z);
+  rtql8::kinematics::Dof* rotJ2CL_W
+          = new rtql8::kinematics::Dof(poseJointToChildLink.rot.w);
+  rtql8::kinematics::Dof* rotJ2CL_X
+          = new rtql8::kinematics::Dof(poseJointToChildLink.rot.x);
+  rtql8::kinematics::Dof* rotJ2CL_Y
+          = new rtql8::kinematics::Dof(poseJointToChildLink.rot.y);
+  rtql8::kinematics::Dof* rotJ2CL_Z
+          = new rtql8::kinematics::Dof(poseJointToChildLink.rot.z);
 
   rtql8::kinematics::TrfmRotateQuat* rotJ2CL
-      = new rtql8::kinematics::TrfmRotateQuat(rotJ2CL_W, rotJ2CL_X, rotJ2CL_Y, rotJ2CL_Z);
+      = new rtql8::kinematics::TrfmRotateQuat(
+              rotJ2CL_W, rotJ2CL_X, rotJ2CL_Y, rotJ2CL_Z);
 
   this->rtql8Joint->addTransform(rotJ2CL, false);
 }
