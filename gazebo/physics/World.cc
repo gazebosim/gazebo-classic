@@ -580,6 +580,7 @@ void World::Update()
     }
     DIAG_TIMER_LAP("World::Update", "dirtyPoses");
 
+    DIAG_VARIABLE("dirty_poses", this->dirtyPoses.size());
     this->dirtyPoses.clear();
   }
 

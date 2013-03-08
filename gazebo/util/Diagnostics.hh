@@ -59,8 +59,14 @@ namespace gazebo
     (*gazebo::util::_diagLapPtr)(_name, _prefix);
 
     /// \brief Stop a diagnostic timer.
-    /// \param[in] name Name of the timer to stop
+    /// \param[in] _name Name of the timer to stop
     #define DIAG_TIMER_STOP(_name) (*gazebo::util::_diagStopPtr)(_name);
+
+    /// \brief Add an a arbitrary variable to diagnostics.
+    /// \param[in] _name Name associated with the variable.
+    /// \param[in] _value Value of the variable.
+    #define DIAG_VARIABLE(_name, _value) \
+    (*gazebo::util::_diagVariablePtr)(_name, _value);
 
     /// \class DiagnosticManager Diagnostics.hh util/util.hh
     /// \brief A diagnostic manager class
@@ -211,14 +217,19 @@ namespace gazebo
       private: common::Time prevLap;
     };
     /// \}
-   
-    /// \cond 
+
+    /// \cond
     /// \brief A no-op function used by Diagnostics when it is disabled.
     static inline void _DiagnosticManager_Noop1(const std::string &/*_name*/) {}
 
     /// \brief A no-op function used by Diagnostics when it is disabled.
     static inline void _DiagnosticManager_Noop2(const std::string &/*_name*/,
         const std::string &/*_prefix*/) {}
+
+    /// \brief A no-op function used by Diagnostics when it is disabled.
+    static inline void _DiagnosticManager_Noop3(const std::string &/*_name*/,
+        const boost::any &/*_value*/) {}
+
 
     /// \brief Function used to start a timer.
     /// \param[in] _name Name of the timer to start
@@ -243,6 +254,23 @@ namespace gazebo
       gazebo::util::DiagnosticManager::Instance()->Lap(_name, _prefix);
     }
 
+    /// \brief Function used to add a variable to diagnostics.
+    /// \param[in] _name Name associated with the variable.
+    /// \param[in] _value A value to add
+    static inline void _DiagnosticManager_Variable(const std::string &_name,
+                                                   const boost::any &_value)
+    {
+      try
+      {
+      gazebo::util::DiagnosticManager::Instance()->Variable(_name,
+          boost::any_cast<double>(_value));
+      }
+      catch (...)
+        gzerr << "Unable to convert boost::any value to double for diagnostic "
+        << "variable[" << _name << "]\n";
+      }
+    }
+
     /// \brief Function pointer to start a timer.
     void (*_diagStartPtr)(const std::string &_name) = &_DiagnosticManager_Noop1;
 
@@ -252,7 +280,13 @@ namespace gazebo
 
     /// \brief Function pointer to stop a timer.
     void (*_diagStopPtr)(const std::string &_name) = &_DiagnosticManager_Noop1;
-    /// \endcond 
+    /// \endcond
+
+    /// \brief Function pointer a variable diagnostic information.
+    void (*_diagVariablePtr)(const std::string &_name, const boost::any &_var) =
+      &_DiagnosticManager_Noop3;
+    /// \endcond
+
   }
 }
 #endif

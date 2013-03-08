@@ -245,6 +245,7 @@ void DiagnosticManager::SetEnabled(bool _enabled)
     _diagStartPtr = &_DiagnosticManager_Start;
     _diagStopPtr = &_DiagnosticManager_Stop;
     _diagLapPtr = &_DiagnosticManager_Lap;
+    _diagVariablePtr = &_DiagnosticManager_Variable;
   }
   else
   {
@@ -253,7 +254,7 @@ void DiagnosticManager::SetEnabled(bool _enabled)
     _diagStartPtr = &_DiagnosticManager_Noop1;
     _diagStopPtr = &_DiagnosticManager_Noop1;
     _diagLapPtr = &_DiagnosticManager_Noop2;
-
+    _diagVariablePtr = &_DiagnosticManager_Noop3;
   }
 }
 
@@ -338,4 +339,19 @@ void DiagnosticTimer::Lap(const std::string &_prefix)
 
   // Store the prev lap time.
   this->prevLap = elapsed;
+}
+
+//////////////////////////////////////////////////
+void DiagnosticTimer::Variable(const std::string &_prefix, double &_value)
+{
+  // Get the current elapsed time.
+  common::Time currTime = common::Time::GetWallTime();
+
+  // Write out the delta time.
+  this->log << _prefix << " " << currTime << " " << _value << std::endl;
+
+  msgs::Diagnostics::DiagVariable *var = this->msg.add_variable();
+  var->set_name(_prefix);
+  var->set_value(_value);
+  msgs::Set(var->mutable_wall(), _wallTime);
 }

@@ -207,6 +207,23 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
       }
     }
   }
+
+  // Process each variable
+  for (int i = 0; i < _msg->var_size(); ++i)
+  {
+    QString qstr = QString::fromStdString(_msg->time(i).name());
+
+    // Add the time label to the list if it's not already there.
+    QList<QListWidgetItem*> items = this->labelList->findItems(qstr,
+        Qt::MatchExactly);
+
+    if (items.size() == 0)
+    {
+      QListWidgetItem *item = new QListWidgetItem(qstr);
+      item->setToolTip(tr("Drag onto graph to plot"));
+      this->labelList->addItem(item);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
