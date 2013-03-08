@@ -2,7 +2,7 @@
 <!-- this was initially generated from ragdoll.urdf,
      but have sence been updated to turn off gravity for certain links
      and various tweaks -->
-<gazebo version="1.2">
+<sdf version="1.3">
     <model name="ragdoll">
         <pose>0.000000 0.000000 1.4 0.000000 -0.000000 0.000000</pose>
         <link name="hip">
@@ -1860,4 +1860,4 @@
         </joint>
         <static>0</static>
     </model>
-</gazebo>
+</sdf>

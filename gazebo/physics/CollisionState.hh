@@ -99,9 +99,9 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                  const gazebo::physics::CollisionState &_state)
       {
-        _out << "<collision name='" << _state.name << "'>\n"
-             << "<pose>" << _state.pose << "</pose>\n";
-        _out << "</collision>\n";
+        _out << "      <collision name='" << _state.name << "'>\n"
+             << "        <pose>" << _state.pose << "</pose>\n";
+        _out << "      </collision>\n";
 
         return _out;
       }

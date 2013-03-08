@@ -35,7 +35,6 @@ SimbodyHinge2Joint::SimbodyHinge2Joint(SimTK::MultibodySystem *_world,
                                        BasePtr _parent)
     : Hinge2Joint<SimbodyJoint>(_parent)
 {
-  this->world = _world;
 }
 
 //////////////////////////////////////////////////

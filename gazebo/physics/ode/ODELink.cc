@@ -86,6 +86,13 @@ void ODELink::Init()
     }
   }
 
+  GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
+  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
+  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
+
+  this->SetLinearDamping(this->GetLinearDamping());
+  this->SetAngularDamping(this->GetAngularDamping());
+
   Link::Init();
 
   if (this->linkId)
@@ -406,7 +413,8 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODELink::GetWorldLinearVel(const math::Pose &_pose) const
+math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset,
+                                         const math::Quaternion &_q) const
 {
   math::Vector3 vel;
 
@@ -416,7 +424,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Pose &_pose) const
     math::Pose wPose = this->GetWorldPose();
     GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
     math::Vector3 offsetFromCoG =
-        wPose.rot.RotateVectorReverse(_pose.rot * _pose.pos)
+        wPose.rot.RotateVectorReverse(_q * _offset)
         - this->inertial->GetCoG();
     dBodyGetRelPointVel(this->linkId, offsetFromCoG.x, offsetFromCoG.y,
         offsetFromCoG.z, dvel);

@@ -35,7 +35,6 @@ SimbodyScrewJoint::SimbodyScrewJoint(SimTK::MultibodySystem *_world,
                                      BasePtr _parent)
     : ScrewJoint<SimbodyJoint>(_parent)
 {
-  this->world = _world;
 }
 
 //////////////////////////////////////////////////
@@ -66,12 +65,6 @@ void SimbodyScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
   // Add the joint to the world
 
   // Allows access to impulse
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetAngle(int /*_index*/) const
-{
-  return math::Angle();
 }
 
 //////////////////////////////////////////////////

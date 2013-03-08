@@ -33,7 +33,6 @@ SimbodyHingeJoint::SimbodyHingeJoint(SimTK::MultibodySystem *_world,
                                      BasePtr _parent)
     : HingeJoint<SimbodyJoint>(_parent)
 {
-  this->world = _world;
 }
 
 //////////////////////////////////////////////////
@@ -45,47 +44,6 @@ SimbodyHingeJoint::~SimbodyHingeJoint()
 void SimbodyHingeJoint::Load(sdf::ElementPtr _sdf)
 {
   HingeJoint<SimbodyJoint>::Load(_sdf);
-}
-
-//////////////////////////////////////////////////
-void SimbodyHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
-{
-  HingeJoint<SimbodyJoint>::Attach(_one, _two);
-
-  SimbodyLinkPtr simbodyChildLink =
-    boost::shared_static_cast<SimbodyLink>(this->childLink);
-  SimbodyLinkPtr simbodyParentLink =
-    boost::shared_static_cast<SimbodyLink>(this->parentLink);
-
-  // if (!simbodyChildLink || !simbodyParentLink)
-  //   gzthrow("Requires simbody bodies");
-
-  sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-  math::Vector3 axis = axisElem->GetValueVector3("xyz");
-
-  math::Vector3 pivotA, pivotB, axisA, axisB;
-
-  if (this->parentLink)
-  {
-    // Compute the pivot point, based on the anchorPos
-    pivotA = this->anchorPos + this->childLink->GetWorldPose().pos
-                             - this->parentLink->GetWorldPose().pos;
-    pivotA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(pivotA);
-    // Compute axis
-    axisA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(axis);
-    axisA = axisA.Round();
-  }
-  if (this->childLink)
-  {
-    pivotB = this->anchorPos;
-    pivotB = this->childLink->GetWorldPose().rot.RotateVectorReverse(pivotB);
-    axisB = this->childLink->GetWorldPose().rot.RotateVectorReverse(axis);
-    axisB = axisB.Round();
-  }
-
-  // Add the joint to the world
-
-  // Allows access to impulse
 }
 
 //////////////////////////////////////////////////

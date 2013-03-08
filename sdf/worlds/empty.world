@@ -4,6 +4,11 @@
 
     <physics type="simbody">
       <gravity>0 0 -9.8</gravity>
+      <ode>
+        <solver>
+          <dt>0.001</dt>
+        </solver>
+      </ode>
       <simbody>
         <dt>0.001</dt>
       </simbody>
@@ -17,11 +22,11 @@
     <!-- A pendulum -->
 
     <model name="model1">
-      <pose>0 0 0 -1.57079 0 0</pose>
+      <pose>0 0 2 0.0 0 0</pose>
       <link name="link1">
-        <pose>0 0 0 0 0 0</pose>
+        <pose>0 0 0 0.0 0.0 0</pose>
         <inertial>
-          <pose>-1 0 0 0 0 0</pose>
+          <pose>0 -1 0 0 0 0</pose>
           <inertia>
             <ixx>1.0</ixx>
             <ixy>0.0</ixy>
@@ -33,7 +38,7 @@
           <mass>1.0</mass>
         </inertial>
         <collision name="collision">
-          <pose>-1 0 0 0 0 0</pose>
+          <pose>0 -1 0 0 0 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -41,7 +46,7 @@
           </geometry>
         </collision>
         <visual name="visual">
-          <pose>-1 0 0 0 0 0</pose>
+          <pose>0 -1 0 0 0 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -59,13 +64,14 @@
         <axis>
           <xyz>1.0 0.0 0.0</xyz>
           <limit>
-            <lower>0</lower>
-            <upper>0</upper>
+            <lower>1000</lower>
+            <upper>-1000</upper>
             <effort>0</effort>
-            <velocity>0</velocity>
+            <velocity>1000</velocity>
           </limit>
         </axis>
       </joint>
+      <static>0</static>
     </model>
 
   </world>

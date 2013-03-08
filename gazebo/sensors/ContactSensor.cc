@@ -40,7 +40,7 @@ GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 
 //////////////////////////////////////////////////
 ContactSensor::ContactSensor()
-: Sensor()
+: Sensor(sensors::OTHER)
 {
 }
 

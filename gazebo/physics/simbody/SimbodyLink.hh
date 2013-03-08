@@ -22,6 +22,8 @@
 #ifndef _SIMBODYLINK_HH_
 #define _SIMBODYLINK_HH_
 
+#include <Simbody.h>
+
 #include "physics/simbody/simbody_inc.h"
 #include "physics/simbody/SimbodyTypes.hh"
 #include "physics/Link.hh"
@@ -84,7 +86,8 @@ namespace gazebo
 
       /// \brief Get the linear velocity of the body in the world frame
       public: virtual math::Vector3 GetWorldLinearVel(
-        const math::Pose &_pose) const;
+          const math::Vector3 &_offset,
+          const math::Quaternion &_q) const;
 
       /// \brief Get the linear velocity of the body in the world frame
       public: virtual math::Vector3 GetWorldCoGLinearVel() const;
@@ -146,7 +149,31 @@ namespace gazebo
       public: virtual void SetAutoDisable(bool _disable);
 
       private: SimbodyPhysicsPtr simbodyPhysics;
-      protected: math::Pose pose;
+
+      /// \brief: Force this link to be a base body, where its inboard
+      /// body is the world with 6DOF.
+      public: bool mustBeBaseLink;
+
+      // Below to be filled in after everything is loaded
+      // Which MobilizedBody corresponds to the master instance of this link.
+      public: SimTK::MobilizedBody                   masterMobod;
+
+      // If this link got split into a master and slaves, these are the 
+      // MobilizedBodies used to mobilize the slaves.
+      public: std::vector<SimTK::MobilizedBody>      slaveMobods;
+
+      // And these are the Weld constraints used to attach slaves to master.
+      public: std::vector<SimTK::Constraint::Weld>   slaveWelds;
+
+      // Convert Gazebo Inertia to Simbody MassProperties
+      // Where Simbody MassProperties contains mass,
+      // center of mass location, and unit inertia about body origin.
+      public: SimTK::MassProperties GetMassProperties() const;
+      public: SimTK::MassProperties GetEffectiveMassProps(int _numFragments) const;
+      public: void SetDirtyPose(math::Pose _pose)
+              {
+                this->dirtyPose = _pose;
+              }
     };
     /// \}
   }

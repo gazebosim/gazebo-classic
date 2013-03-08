@@ -16,6 +16,7 @@
  */
 
 #include "gazebo/gui/TopicSelector.hh"
+#include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/viewers/TopicView.hh"
 #include "gazebo/gui/viewers/ImageView.hh"
@@ -122,7 +123,6 @@ MainWindow::MainWindow()
   splitter->setStretchFactor(3, 0);
   splitter->setCollapsible(2, false);
   splitter->setHandleWidth(10);
-
 
   centerLayout->addWidget(splitter);
   centerLayout->setContentsMargins(0, 0, 0, 0);
@@ -239,7 +239,7 @@ void MainWindow::New()
 /////////////////////////////////////////////////
 void MainWindow::SelectTopic()
 {
-  TopicSelector *selector = new TopicSelector();
+  TopicSelector *selector = new TopicSelector(this);
   selector->exec();
   std::string topic = selector->GetTopic();
   std::string msgType = selector->GetMsgType();
@@ -337,7 +337,7 @@ void MainWindow::Save()
 
       cameraElem->GetElement("pose")->Set(cam->GetWorldPose());
       cameraElem->GetElement("view_controller")->Set(
-        cam->GetViewControllerTypeString());
+          cam->GetViewControllerTypeString());
       // TODO: export track_visual properties as well.
       msgData = sdf_parsed.root->ToString("");
     }
@@ -495,16 +495,14 @@ void MainWindow::OnEditBuilding()
     this->renderWidget->ShowEditor(true);
     this->tabWidget->hide();
     this->buildingEditorTabWidget->show();
-    this->menuBar->hide();
-    this->buildingEditorMenuBar->show();
+    this->AttachEditorMenuBar();
   }
   else
   {
     this->renderWidget->ShowEditor(false);
     this->tabWidget->show();
     this->buildingEditorTabWidget->hide();
-    this->buildingEditorMenuBar->hide();
-    this->menuBar->show();
+    this->AttachMainMenuBar();
     this->Play();
   }
 }
@@ -701,6 +699,13 @@ void MainWindow::Orbit()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::DataLogger()
+{
+  gui::DataLogger *dataLogger = new gui::DataLogger(this);
+  dataLogger->show();
+}
+
+////////////////////////////////////////////////
 void MainWindow::BuildingEditorSave()
 {
   gui::editor::Events::saveBuildingEditor();
@@ -723,7 +728,6 @@ void MainWindow::BuildingEditorExit()
 {
   gui::editor::Events::exitBuildingEditor();
 }
-
 /////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
@@ -938,6 +942,11 @@ void MainWindow::CreateActions()
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 
+  g_dataLoggerAct = new QAction(tr("&Log Data"), this);
+  g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
+  g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
+  connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
+
   g_buildingEditorSaveAct = new QAction(tr("&Save (As)"), this);
   g_buildingEditorSaveAct->setStatusTip(tr("Save (As)"));
   g_buildingEditorSaveAct->setShortcut(tr("Ctrl+S"));
@@ -968,22 +977,36 @@ void MainWindow::CreateActions()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::CreateMenus()
+void MainWindow::AttachEditorMenuBar()
 {
-  this->menuLayout = new QHBoxLayout;
+  if (this->menuBar)
+  {
+    delete menuBar;
+  }
 
-  QFrame *frame = new QFrame;
-  this->menuBar =  new QMenuBar;
-  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->menuBar = new QMenuBar;
+  this->menuBar->setSizePolicy(QSizePolicy::Fixed,
+      QSizePolicy::Fixed);
+  QMenu *buildingEditorFileMenu = this->menuBar->addMenu(
+      tr("&File"));
+  buildingEditorFileMenu->addAction(g_buildingEditorSaveAct);
+  buildingEditorFileMenu->addAction(g_buildingEditorDiscardAct);
+  buildingEditorFileMenu->addAction(g_buildingEditorDoneAct);
+  buildingEditorFileMenu->addAction(g_buildingEditorExitAct);
 
   this->menuLayout->addWidget(this->menuBar);
-  this->menuLayout->addStretch(5);
-  this->menuLayout->setContentsMargins(0, 0, 0, 0);
+}
 
-  frame->setLayout(this->menuLayout);
-  frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+/////////////////////////////////////////////////
+void MainWindow::AttachMainMenuBar()
+{
+  if (this->menuBar)
+  {
+    delete menuBar;
+  }
 
-  this->setMenuWidget(frame);
+  this->menuBar =  new QMenuBar;
+  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
   QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
   // fileMenu->addAction(g_openAct);
@@ -1018,24 +1041,33 @@ void MainWindow::CreateMenus()
 
   QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
+  windowMenu->addSeparator();
+  windowMenu->addAction(g_dataLoggerAct);
 
   this->menuBar->addSeparator();
 
   QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
   helpMenu->addAction(g_aboutAct);
 
-  this->buildingEditorMenuBar = new QMenuBar;
-  this->buildingEditorMenuBar->setSizePolicy(QSizePolicy::Fixed,
-      QSizePolicy::Fixed);
-  this->menuLayout->insertWidget(0, this->buildingEditorMenuBar);
-  this->buildingEditorMenuBar->hide();
+  this->menuLayout->addWidget(this->menuBar);
+}
 
-  QMenu *buildingEditorFileMenu = this->buildingEditorMenuBar->addMenu(
-      tr("&File"));
-  buildingEditorFileMenu->addAction(g_buildingEditorSaveAct);
-  buildingEditorFileMenu->addAction(g_buildingEditorDiscardAct);
-  buildingEditorFileMenu->addAction(g_buildingEditorDoneAct);
-  buildingEditorFileMenu->addAction(g_buildingEditorExitAct);
+/////////////////////////////////////////////////
+void MainWindow::CreateMenus()
+{
+  this->menuLayout = new QHBoxLayout;
+
+  QFrame *frame = new QFrame;
+
+  this->AttachMainMenuBar();
+
+  this->menuLayout->addStretch(5);
+  this->menuLayout->setContentsMargins(0, 0, 0, 0);
+
+  frame->setLayout(this->menuLayout);
+  frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+  this->setMenuWidget(frame);
 }
 
 /////////////////////////////////////////////////

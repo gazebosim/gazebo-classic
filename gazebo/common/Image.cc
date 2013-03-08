@@ -407,7 +407,10 @@ Image::PixelFormat Image::GetPixelFormat() const
     else if (bpp == 24)
       redMask == 0xff0000 ? fmt = RGB_INT8 : fmt = BGR_INT8;
     else if (bpp == 32)
-      redMask == 0xff0000 ? fmt = RGBA_INT8 : fmt = BGRA_INT8;
+    {
+      redMask == 0xff0000 || redMask == 0xff000000 ?
+        fmt = RGBA_INT8 : fmt = BGRA_INT8;
+    }
   }
   else if (type == FIT_RGB16)
     fmt = RGB_INT16;
