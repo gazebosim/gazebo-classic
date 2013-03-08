@@ -26,7 +26,7 @@
     <!--include><uri>model://ground_plane</uri></include-->
     <!-- 25.3kg total mass -->
     <model name="test_model">
-      <pose>0 0 0.0 0 0 0</pose>
+      <pose>0 0 5 0 0 0</pose>
       <link name="link1">
 	<pose>0 0 0 0 0 0</pose>
         <inertial>

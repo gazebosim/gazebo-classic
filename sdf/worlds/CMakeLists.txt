@@ -6,8 +6,6 @@ set (files
   camera.world
   joint_damping_demo.world
   depth_camera.world
-  double_pendulum_rtql8.world
-  double_pendulum_ode.world
   empty.world
   force_torque_demo.world
   joints.world
@@ -24,10 +22,11 @@ set (files
   projector.world
   rubble.world
   shapes.world
-  simple_pendulum_rtql8.world
-  simple_pendulum_ode.world
-  simple_pendulums_rtql8.world
   weshare2012.world
   willowgarage.world)
+
+if (HAVE_RTQL8)
+  add_subdirectory(rtql8)
+endif()
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/)
