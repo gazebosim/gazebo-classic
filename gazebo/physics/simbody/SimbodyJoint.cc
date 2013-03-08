@@ -153,7 +153,13 @@ void SimbodyJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-JointWrench SimbodyJoint::GetForceTorque(int /*_index*/)
+JointWrench SimbodyJoint::GetForceTorque(int _index)
+{
+  return this->GetFroceTorque(static_cast<unsigned int>(_index));
+}
+
+//////////////////////////////////////////////////
+JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
 {
   JointWrench wrench;
   return wrench;
