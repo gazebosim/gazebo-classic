@@ -67,7 +67,8 @@ void ForceTorquePlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
     if (i < 2)
       this->joints[i]->SetForce(0, 1.0);
 
-    physics::JointWrench jw = this->joints[i]->GetForceTorque(0);
+    physics::JointWrench jw = this->joints[i]->GetForceTorque(
+        static_cast<unsigned int>(0));
     gzdbg << "model [" << this->model->GetName()
           << "] joint [" << this->joints[i]->GetName()
           << "] b1f [" << jw.body1Force
