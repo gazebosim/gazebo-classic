@@ -986,6 +986,8 @@ void World::SetPaused(bool _p)
   if (this->pause == _p)
     return;
 
+  DIAG_MARKER("paused");
+
   {
     boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
     this->pause = _p;

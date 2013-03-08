@@ -344,6 +344,9 @@ void ODEPhysics::UpdateCollision()
   dSpaceCollide(this->spaceId, this, CollisionCallback);
   DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "dSpaceCollide");
 
+  DIAG_VARIABLE("colliders", this->collidersCount);
+  DIAG_VARIABLE("trimesh colliders", this->trimeshCollidersCount);
+
   // Generate non-trimesh collisions.
   for (i = 0; i < this->collidersCount; ++i)
   {

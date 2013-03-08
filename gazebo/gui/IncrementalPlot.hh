@@ -64,6 +64,11 @@ namespace gazebo
       public slots: void Add(const QString &_label,
                              const std::list<QPointF> &_pts);
 
+      /// \brief Add a vertical line to the plot.
+      /// \param[in] _label Label for the line.
+      /// \param[in] _x X position for the vertical line.
+      public: void AddVLine(const QString &_label, double _x);
+
       /// \brief Clear a single curve from the plot.
       /// \param[in] _label Name of the curve to remove.
       public: void Clear(const QString &_label);

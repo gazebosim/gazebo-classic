@@ -34,6 +34,7 @@ DiagnosticManager::DiagnosticManager()
   this->enabled = false;
 
   this->node = transport::NodePtr(new transport::Node());
+
   // Get the base of the time logging path
   if (!getenv("HOME"))
   {
@@ -72,6 +73,8 @@ void DiagnosticManager::Fini()
 {
   event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
 
+  this->varLog.close();
+
   // Stop all the timers
   for (TimerMap::iterator iter = this->timers.begin();
        iter != this->timers.end(); ++iter)
@@ -101,6 +104,8 @@ void DiagnosticManager::Update(const common::UpdateInfo &_info)
     this->pub->Publish(this->msg);
 
   this->msg.clear_time();
+  this->msg.clear_variable();
+  this->msg.clear_marker();
 }
 
 //////////////////////////////////////////////////
@@ -239,12 +244,20 @@ void DiagnosticManager::SetEnabled(bool _enabled)
     if (!boost::filesystem::exists(this->logPath))
       boost::filesystem::create_directories(this->logPath);
 
+    boost::filesystem::path varLogPath;
+
+    varLogPath = this->logPath / "variables.log";
+    this->varLog.open(varLogPath.string().c_str(),
+        std::ios::out | std::ios::app);
+
     this->updateConnection = event::Events::ConnectWorldUpdateBegin(
         boost::bind(&DiagnosticManager::Update, this, _1));
 
     _diagStartPtr = &_DiagnosticManager_Start;
     _diagStopPtr = &_DiagnosticManager_Stop;
     _diagLapPtr = &_DiagnosticManager_Lap;
+    _diagVariablePtr = &_DiagnosticManager_Variable;
+    _diagMarkerPtr = &_DiagnosticManager_Marker;
   }
   else
   {
@@ -253,7 +266,8 @@ void DiagnosticManager::SetEnabled(bool _enabled)
     _diagStartPtr = &_DiagnosticManager_Noop1;
     _diagStopPtr = &_DiagnosticManager_Noop1;
     _diagLapPtr = &_DiagnosticManager_Noop2;
-
+    _diagVariablePtr = &_DiagnosticManager_Noop3;
+    _diagMarkerPtr = &_DiagnosticManager_Noop1;
   }
 }
 
@@ -262,6 +276,35 @@ void DiagnosticManager::OnControl(ConstDiagnosticControlPtr &_msg)
 {
   if (_msg->has_enabled())
     this->SetEnabled(_msg->enabled());
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::Variable(const std::string &_name, double _value)
+{
+  // Get the current elapsed time.
+  common::Time currTime = common::Time::GetWallTime();
+
+  // Write out the delta time
+  this->varLog << _name << " " << currTime << " " << _value << std::endl;
+
+  msgs::Diagnostics::DiagVariable *var = this->msg.add_variable();
+  var->set_name(_name);
+  var->set_value(_value);
+  msgs::Set(var->mutable_wall(), currTime);
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::Marker(const std::string &_name)
+{
+  // Get the current elapsed time.
+  common::Time currTime = common::Time::GetWallTime();
+
+  // Write out the delta time
+  this->varLog << _name << " " << currTime << std::endl;
+
+  msgs::Diagnostics::DiagMarker *marker = this->msg.add_marker();
+  marker->set_name(_name);
+  msgs::Set(marker->mutable_wall(), currTime);
 }
 
 //////////////////////////////////////////////////
@@ -339,3 +382,5 @@ void DiagnosticTimer::Lap(const std::string &_prefix)
   // Store the prev lap time.
   this->prevLap = elapsed;
 }
+
+
