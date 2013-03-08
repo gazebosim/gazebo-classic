@@ -81,6 +81,7 @@ struct VisualMessageLess {
 //////////////////////////////////////////////////
 Scene::Scene(const std::string &_name, bool _enableVisualizations)
 {
+  this->initialized = false;
   this->showCOMs = false;
   this->showCollisions = false;
   this->showJoints = false;
@@ -228,6 +229,7 @@ void Scene::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Scene::Load()
 {
+  this->initialized = false;
   Ogre::Root *root = RenderEngine::Instance()->root;
 
   if (this->manager)
@@ -284,6 +286,14 @@ void Scene::Init()
 
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);
+
+  this->initialized = true;
+}
+
+//////////////////////////////////////////////////
+bool Scene::GetInitialized() const
+{
+  return this->initialized;
 }
 
 //////////////////////////////////////////////////

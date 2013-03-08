@@ -54,3 +54,9 @@ gz_add_library(gazebo_physics_ode ${sources})
 target_link_libraries(gazebo_physics_ode gazebo_ode gazebo_opcode ${TBB_LIBRARIES})
 
 gz_install_library(gazebo_physics_ode)
+
+# unit tests
+set (gtest_sources
+  ODEJoint_TEST.cc
+)
+gz_build_tests(${gtest_sources})

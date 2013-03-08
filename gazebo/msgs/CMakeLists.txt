@@ -12,6 +12,7 @@ set (msgs
   contacts.proto
   contactsensor.proto
   cylindergeom.proto
+  diagnostics.proto
   factory.proto
   fog.proto
   friction.proto
