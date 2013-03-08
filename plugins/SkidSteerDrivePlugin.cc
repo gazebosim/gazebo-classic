@@ -30,19 +30,19 @@ SkidSteerDrivePlugin::SkidSteerDrivePlugin()
   this->MaxForce = 5.0;
   this->wheelRadius = 0.0;
   this->wheelSeparation = 0.0;
-  this->fatal_error = false;
 }
 
 /////////////////////////////////////////////////
-void SkidSteerDrivePlugin::RegisterJoint(int index, std::string name)
+int SkidSteerDrivePlugin::RegisterJoint(int index, std::string name)
 {  
   this->Joints[index] = this->model->GetJoint(name);
   
-  if (this->Joints[index]) return;
+  if (this->Joints[index]) return 0;
   
   gzerr << "Unable to find the " << name 
         <<  " joint in model " << this->model->GetName() << "." << std::endl;
-  this->fatal_error = true;
+  
+  return 1;
 }
 
 /////////////////////////////////////////////////
@@ -53,28 +53,28 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->model->GetWorld()->GetName());
+  
+  int err = 0;
+  err += RegisterJoint(RIGHT_FRONT, "right_front");
+  err += RegisterJoint(RIGHT_REAR,  "right_rear");
+  err += RegisterJoint(LEFT_FRONT,  "left_front");
+  err += RegisterJoint(LEFT_REAR,   "left_rear");
+  if(err > 0)  return;
 
-  this->velSub = this->node->Subscribe( 
-    std::string("~/") + this->model->GetName() + std::string("/vel_cmd"), 
-    &SkidSteerDrivePlugin::OnVelMsg, this);
-
-  RegisterJoint(RIGHT_FRONT, "right_front");
-  RegisterJoint(RIGHT_REAR,  "right_rear");
-  RegisterJoint(LEFT_FRONT,  "left_front");
-  RegisterJoint(LEFT_REAR,   "left_rear");
 
   if (_sdf->HasElement("MaxForce"))
     this->MaxForce = _sdf->GetElement("MaxForce")->GetValueDouble();
   else
     gzwarn << "No MaxForce value set in the model sdf, default value is 5.0.\n";
-
+  
+  
   // This assumes that front and rear wheel spacing is identical
   this->wheelSeparation = this->Joints[RIGHT_FRONT]->GetAnchor(0).Distance(
                           this->Joints[LEFT_FRONT]->GetAnchor(0));                
                       
   // This assumes that the largest dimension of the wheel is the diameter
   // and that all wheels have the same diameter
-  physics::EntityPtr wheel_link = boost::shared_dynamic_cast<physics::Entity>(this->Joints[RIGHT_FRONT]->GetChild());
+  physics::EntityPtr wheel_link = boost::shared_dynamic_cast<physics::Entity>(this->Joints[RIGHT_FRONT]->GetChild() );
   if(wheel_link)
   {
     math::Box bb = wheel_link->GetBoundingBox();
@@ -86,29 +86,32 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
   {
     gzerr << "Unable to find the wheel separation distance." << std::endl
           << "  This could mean that the right_front link and the left_front link are overlapping." << std::endl;
-    this->fatal_error = true;
+    return;
   }   
   if (this->wheelRadius <= 0)
   {
     gzerr << "Unable to find the wheel radius." << std::endl
           << "  This could mean that the sdf is missing a wheel link on the right_front joint." << std::endl;
-    this->fatal_error = true;
+    return;
   }
+        
+  this->velSub = this->node->Subscribe( 
+    std::string("~/") + this->model->GetName() + std::string("/vel_cmd"), 
+    &SkidSteerDrivePlugin::OnVelMsg, this);
 }
+
 
 /////////////////////////////////////////////////
 void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &msg)
 {
-  gzmsg << "cmd_vel: " << msg->position().x() << ", " << msg->position().z();
-  
-  if(fatal_error) return; 
-  
+  gzmsg << "cmd_vel: " << msg->position().x()  
+        << ", "        << msgs::Convert(msg->orientation()).GetAsEuler().z << std::endl;
+
   for(int i = 0; i < NUMBER_OF_WHEELS; i++)
     this->Joints[i]->SetMaxForce(0, this->MaxForce);
 
   double vel_lin = msg->position().x() / this->wheelRadius;
-  double vel_rot = msg->position().z()
-  // msgs::Convert(msg->orientation()).GetAsEuler().z 
+  double vel_rot = msgs::Convert(msg->orientation()).GetAsEuler().z 
                    * (this->wheelSeparation / this->wheelRadius);
 
   this->Joints[RIGHT_FRONT]->SetVelocity(0, vel_lin - vel_rot);

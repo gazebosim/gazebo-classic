@@ -30,15 +30,15 @@ namespace gazebo
   class SkidSteerDrivePlugin : public ModelPlugin
   {
     public: SkidSteerDrivePlugin();
-    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
-
+    public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    
     public: enum {RIGHT_FRONT, RIGHT_REAR, LEFT_FRONT, LEFT_REAR};
 
-    private: void RegisterJoint(int index, std::string name);
+    private: int RegisterJoint(int index, std::string name);
     private: void OnVelMsg(ConstPosePtr &_msg);
 
     private: transport::NodePtr node;
-    private: transport::SubscriberPtr velSub;
+    private: transport::SubscriberPtr velSub; 
 
     private: physics::ModelPtr model;
     private: physics::JointPtr Joints[NUMBER_OF_WHEELS];
@@ -47,7 +47,6 @@ namespace gazebo
     private: double wheelSeparation;
     private: double wheelRadius;
     
-    private: bool fatal_error;
   };
 }
 #endif
