@@ -118,7 +118,6 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
           this->relativeEndPos);
   }
 
-
   if (this->physicsEngine)
   {
     btVector3 start(this->globalStartPos.x, this->globalStartPos.y,
