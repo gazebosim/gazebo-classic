@@ -41,8 +41,8 @@ RTQL8Link::RTQL8Link(EntityPtr _parent)
 //////////////////////////////////////////////////
 RTQL8Link::~RTQL8Link()
 {
-  if (rtql8BodyNode)
-    delete rtql8BodyNode;
+  // We don't need to delete rtql8BodyNode because skeletone will delete
+  // rtql8BodyNode if this is registered to the skeletone.
 }
 
 void RTQL8Link::Load(sdf::ElementPtr _sdf)
@@ -74,8 +74,15 @@ void RTQL8Link::Init()
   //----------------------------------------------------------------------------
   // TODO: need test
   math::Vector3 cog = this->inertial->GetCoG();
-  math::Pose poseJointToChildLink
-      = this->rtql8ParentJoint->GetPose_JointToChildLink();
+  math::Pose poseJointToChildLink;
+  if (this->rtql8ParentJoint)
+  {
+    poseJointToChildLink = this->rtql8ParentJoint->GetPose_JointToChildLink();
+  }
+  else
+  {
+    poseJointToChildLink = this->GetWorldPose();
+  }
 
   Eigen::Vector3d rtql8COMLocal(poseJointToChildLink.pos.x + cog.x,
                                 poseJointToChildLink.pos.y + cog.y,

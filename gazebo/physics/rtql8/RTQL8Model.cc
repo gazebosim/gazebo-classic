@@ -50,8 +50,11 @@ void RTQL8Model::Load(sdf::ElementPtr _sdf)
 
   Model::Load(_sdf);
 
-  // TODO: This should be set by sdf.
-  rtql8SkeletonDynamics->setImmobileState(false);
+  //  if (this->IsStatic())
+  //    rtql8SkeletonDynamics->setImmobileState(true);
+  //  else
+  //    rtql8SkeletonDynamics->setImmobileState(false);
+  rtql8SkeletonDynamics->setImmobileState(!this->IsStatic());
 }
 
 //////////////////////////////////////////////////
@@ -110,8 +113,8 @@ void RTQL8Model::Init()
     rtql8::kinematics::Dof* rotY = new rtql8::kinematics::Dof(0, -6.1416, 6.1416);
     rtql8::kinematics::Dof* rotZ = new rtql8::kinematics::Dof(0, -3.1416, 3.1416);
 
-    rtql8::kinematics::TrfmTranslate* trfmRotate
-        = new rtql8::kinematics::TrfmTranslate(rotX, rotY, rotZ);
+    rtql8::kinematics::TrfmRotateExpMap* trfmRotate
+        = new rtql8::kinematics::TrfmRotateExpMap(rotX, rotY, rotZ);
 
     rtql8CanonicalJoint->addTransform(trfmRotate, true);
     this->GetSkeletonDynamics()->addTransform(trfmRotate);
@@ -140,6 +143,8 @@ void RTQL8Model::Init()
 
     rtql8CanonicalJoint->addTransform(rotJ2CL, false);
   }
+
+
 
   rtql8SkeletonDynamics->initSkel();
 }
