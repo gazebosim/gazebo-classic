@@ -159,6 +159,8 @@ void SimbodyPhysics::UpdatePhysics()
                        this->world->GetSimTime().Double());
 
   const SimTK::State &s = integ->getState();
+
+/* debug
   gzerr << "time [" << s.getTime()
         << "] q [" << s.getQ()
         << "] u [" << s.getU()
@@ -166,21 +168,27 @@ void SimbodyPhysics::UpdatePhysics()
         << "] t [" << this->world->GetSimTime().Double()
         << "]\n";
 
-  ModelPtr model = this->world->GetModel("model1");
-  LinkPtr link = model->GetLink("link1");
-
-  JointPtr joint = model->GetJoint("model1::joint1");
-  joint->SetAngle(0, s.getQ()[0]);
-
-  link->SetWorldPose(math::Pose(
-    math::Vector3(0, 0, s.getQ()[0]),
-    math::Quaternion(0, 0, 0)));
-
-  // set link pose
-  this->world->dirtyPoses.push_back(
-    boost::shared_static_cast<physics::Entity>(link).get());
-
   this->lastUpdateTime = currTime;
+*/
+
+  // Weld the slaves to their masters.
+  physics::Model_V models = this->world->GetModels();
+  for (physics::Model_V::iterator mi = models.begin();
+       mi != models.end(); ++mi)
+  {
+    physics::Link_V links = (*mi)->GetLinks();
+    for (physics::Link_V::iterator lx = links.begin();
+         lx != links.end(); ++lx)
+    {
+      physics::SimbodyLinkPtr simbodyLink =
+        boost::shared_dynamic_cast<physics::SimbodyLink>(*lx);
+      math::Pose pose = SimbodyPhysics::Transform2Pose(
+        simbodyLink->masterMobod.getBodyTransform(s));
+      simbodyLink->SetDirtyPose(pose);
+      this->world->dirtyPoses.push_back(
+        boost::shared_static_cast<Entity>(*lx).get());
+    }
+  }
 }
 
 //////////////////////////////////////////////////
