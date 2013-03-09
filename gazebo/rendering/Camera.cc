@@ -325,6 +325,8 @@ void Camera::PostRender()
 
   if (this->newData && this->captureData)
   {
+    if (!this->renderTexture)
+      this->CreateRenderTexture("saveframes_render_texture");
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
 
     size_t size;
@@ -645,8 +647,8 @@ void Camera::EnableSaveFrame(bool enable)
   elem->GetAttribute("enabled")->Set(enable);
   this->captureData = true;
 
-  if (!this->renderTexture)
-    this->CreateRenderTexture("saveframes_render_texture");
+  //if (!this->renderTexture)
+  //  this->CreateRenderTexture("saveframes_render_texture");
 }
 
 //////////////////////////////////////////////////
