@@ -348,24 +348,32 @@ void RenderEngine::LoadPlugins()
     std::vector<std::string> plugins;
     std::vector<std::string>::iterator piter;
 
-    plugins.push_back(path+"/RenderSystem_GL");
-    plugins.push_back(path+"/Plugin_ParticleFX");
-    plugins.push_back(path+"/Plugin_BSPSceneManager");
-    plugins.push_back(path+"/Plugin_OctreeSceneManager");
+#ifdef __APPLE__
+	std::string prefix = "lib";
+	std::string extension = ".dylib";
+#else
+	std::string prefix = "";
+	std::string extension = ".so";
+#endif
+
+    plugins.push_back(path+"/"+prefix+"RenderSystem_GL");
+    plugins.push_back(path+"/"+prefix+"Plugin_ParticleFX");
+    plugins.push_back(path+"/"+prefix+"Plugin_BSPSceneManager");
+    plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");
 
     for (piter = plugins.begin(); piter!= plugins.end(); ++piter)
     {
       try
       {
         // Load the plugin into OGRE
-        this->root->loadPlugin(*piter+".so");
+        this->root->loadPlugin(*piter+extension);
       }
       catch(Ogre::Exception &e)
       {
         try
         {
           // Load the debug plugin into OGRE
-          this->root->loadPlugin(*piter+"_d.so");
+          this->root->loadPlugin(*piter+"_d"+extension);
         }
         catch(Ogre::Exception &ed)
         {
