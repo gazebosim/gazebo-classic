@@ -104,8 +104,8 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &msg)
 {
-  gzmsg << "cmd_vel: " << msg->position().x()  
-        << ", "        << msgs::Convert(msg->orientation()).GetAsEuler().z << std::endl;
+  //gzmsg << "cmd_vel: " << msg->position().x()  
+  //      << ", "        << msgs::Convert(msg->orientation()).GetAsEuler().z << std::endl;
 
   for(int i = 0; i < NUMBER_OF_WHEELS; i++)
     this->Joints[i]->SetMaxForce(0, this->MaxForce);
