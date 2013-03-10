@@ -160,7 +160,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
     ASSERT_TRUE(col);
 
     // calculate tolerance based on magnitude of force
-    // Uncomment lines before once we are able to accurately determine the
+    // Uncomment lines below once we are able to accurately determine the
     // expected force output, see issue #565
     // tolX = std::max(tolPercentage*expectedForce.x, tol);
     // tolY = std::max(tolPercentage*expectedForce.y, tol);
