@@ -49,7 +49,6 @@ ModelState::ModelState(const ModelPtr _model)
   for (Joint_V::const_iterator iter = joints.begin();
        iter != joints.end(); ++iter)
   {
-    gzerr << "pushing JointState for " << (*iter)->GetName() << "\n";
     this->jointStates.push_back(JointState(*iter));
   }
 }

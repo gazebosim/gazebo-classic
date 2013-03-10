@@ -671,7 +671,6 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
     gzthrow("can't have two joint with the same name");
   }
 
-  gzerr << "loading joint " << joint->GetName() << "\n";
   this->joints.push_back(joint);
 
   if (!this->jointController)

@@ -152,8 +152,6 @@ void World::Load(sdf::ElementPtr _sdf)
 {
   this->loaded = false;
   this->sdf = _sdf;
-  gzerr << "world file\n";
-  this->sdf->PrintValues(" ");
 
   if (this->sdf->GetValueString("name").empty())
     gzwarn << "create_world(world_name =["
