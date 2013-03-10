@@ -32,6 +32,7 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/Collision.hh"
 #include "physics/Shape.hh"
+#include "physics/simbody/SimbodyTypes.hh"
 
 namespace gazebo
 {
@@ -59,6 +60,9 @@ namespace gazebo
 
       /// \brief Initialize the Simbody engine
       public: virtual void Init();
+
+      /// \brief Add a Model to the Simbody system
+      public: void InitModel(const physics::Model* _model);
 
       /// \brief Init the engine for threads.
       public: virtual void InitForThread();
@@ -186,15 +190,20 @@ namespace gazebo
 
       /// \brief Helper functions
       private: void CreateMultibodyGraph(
-                                 SimTK::MultibodyGraphMaker&   mbgraph);
+        SimTK::MultibodyGraphMaker& _mbgraph, const physics::Model* _model);
 
-      /// \brief Helper functions
-      private: void BuildSimbodySystem(const SimTK::MultibodyGraphMaker& mbgraph,
-                                     const math::Vector3&       gravity,
-                                     SimTK::MultibodySystem&           mbs,
-                                     SimTK::SimbodyMatterSubsystem&    matter,
-                                     SimTK::GeneralForceSubsystem&     forces,
-                                     SimTK::CompliantContactSubsystem& contact);
+      /// \brief Initialize an empty simbody system
+      private: void InitSimbodySystem();
+
+      /// \brief Add Model to simbody system, and reinitialize state
+      private: void AddStaticModelToSimbodySystem(const physics::Model* _model);
+      private: void AddDynamicModelToSimbodySystem(
+        const SimTK::MultibodyGraphMaker& _mbgraph,
+        const physics::Model* _model);
+
+      /// \brief helper function for building SimbodySystem
+      private: void AddCollisionsToLink(const physics::SimbodyLink* _link,
+        SimTK::MobilizedBody &_mobod, SimTK::ContactCliqueId _modelClique);
     };
 
   /// \}

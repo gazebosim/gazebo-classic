@@ -3,7 +3,7 @@
   <world name="default">
 
     <physics type="simbody">
-      <gravity>0 0 -9.81</gravity>
+      <gravity>0 0 -9.8</gravity>
       <ode>
         <solver>
           <dt>0.001</dt>
@@ -18,6 +18,43 @@
     <include>
       <uri>model://sun</uri>
     </include>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
 
     <model name="ragdoll">
         <pose>0.000000 0.000000 1.4 0.000000 -0.000000 0.000000</pose>
@@ -1851,6 +1888,7 @@
             </axis>
         </joint>
         <static>0</static>
+<!--
       <joint name="joint1" type="revolute">
         <parent>world</parent>
         <child>r_hand</child>
@@ -1865,6 +1903,7 @@
           </limit>
         </axis>
       </joint>
+-->
     </model>
   </world>
 </sdf>
