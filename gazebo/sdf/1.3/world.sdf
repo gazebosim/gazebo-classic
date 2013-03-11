@@ -5,6 +5,21 @@
     <description>Unique name of the world</description>
   </attribute>
 
+  <element name="max_step_size" type="double" default="0.001" required="1">
+    <description>Maximum time step size at which every system in simulation can interact with the states of the world.  (was physics.sdf's dt).</description>
+  </element>
+
+  <!-- real_time_factor (simulation speedup) might be more intuitive to end
+       users than real_time_update_rate -->
+  <element name="real_time_factor" type="double" default="1.0" required="1">
+    <description>target simulation speedup factor, defined by ratio of simulation time to real-time.</description>
+  </element>
+
+  <!-- to be deprecated by real_time_factor -->
+  <element name="real_time_update_rate" type="double" default="1000" required="1">
+    <description>Rate at which to update the physics engine (UpdatePhysics calls per real-time second). (was physics.sdf's update_rate).</description>
+  </element>
+
   <include filename="gui.sdf" required="0"/>
   <include filename="physics.sdf" required="1"/>
   <include filename="scene.sdf" required="1"/>
