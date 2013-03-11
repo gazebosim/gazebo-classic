@@ -30,6 +30,10 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/WindowManager.hh"
 
+#ifdef  __APPLE__
+#include <QtCore/qglobal.h>
+#endif
+
 using namespace gazebo;
 using namespace rendering;
 
@@ -79,6 +83,18 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   params["parentWindowHandle"] = _ogreHandle;
   params["externalGLControl"] = true;
   params["FSAA"] = "4";
+
+#ifdef __APPLE__
+  // Set the macAPI for Ogre based on the Qt implementation
+  #ifdef QT_MAC_USE_COCOA
+    std::cout << "COCOA!" << std::endl;
+    params["macAPI"] = "cocoa";
+    params["macAPICocoaUseNSView"] = "true";
+  #else
+    std::cout << "CARBON!" << std::endl;
+    params["macAPI"] = "carbon";
+  #endif
+#endif
 
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";
