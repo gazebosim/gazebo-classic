@@ -1121,14 +1121,17 @@ void World::JointLog(ConstJointPtr &_msg)
 //////////////////////////////////////////////////
 void World::OnWorldMsg(ConstWorldPtr &_msg)
 {
-  if (_msg->has_max_step_size())
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  this->worldMsgs.push_back(*_msg);
+
+/*  if (_msg->has_max_step_size())
     this->SetMaxStepSize(_msg->max_step_size());
 
   if (_msg->has_real_time_update_rate())
     this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
 
   if (_msg->has_real_time_factor())
-    this->SetRealTimeFactor(_msg->real_time_factor());
+    this->SetRealTimeFactor(_msg->real_time_factor());*/
 }
 
 //////////////////////////////////////////////////
@@ -1426,6 +1429,24 @@ void World::ProcessRequestMsgs()
   }
 
   this->requestMsgs.clear();
+}
+
+//////////////////////////////////////////////////
+void World::ProcessWorldMsgs()
+{
+  std::list<msgs::World>::iterator iter;
+  for (iter = this->worldMsgs.begin(); iter != this->worldMsgs.end(); ++iter)
+  {
+    if ((*iter).has_max_step_size())
+      this->SetMaxStepSize((*iter).max_step_size());
+
+    if ((*iter).has_real_time_update_rate())
+      this->SetRealTimeUpdateRate((*iter).real_time_update_rate());
+
+    if ((*iter).has_real_time_factor())
+      this->SetRealTimeFactor((*iter).real_time_factor());
+  }
+  this->worldMsgs.clear();
 }
 
 //////////////////////////////////////////////////
@@ -1782,6 +1803,7 @@ void World::ProcessMessages()
       this->processMsgsPeriod)
   {
     this->ProcessEntityMsgs();
+    this->ProcessWorldMsgs();
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
