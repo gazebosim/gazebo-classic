@@ -18,7 +18,7 @@ IF((DEFINED ENV{DISPLAY}) AND NOT ("$ENV{DISPLAY}" STREQUAL ""))
   IF (GLXINFO)
     EXECUTE_PROCESS(
       COMMAND glxinfo
-      COMMAND grep GL_EXT_framebuffer_object
+      COMMAND grep "direct rendering:[[:space:]]*Yes[[:space:]]*"
       ERROR_QUIET
       OUTPUT_VARIABLE GLX)
 
