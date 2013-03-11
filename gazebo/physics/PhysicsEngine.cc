@@ -58,8 +58,6 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
 
   this->physicsUpdateMutex = new boost::recursive_mutex();
 
-//  this->updateRateDouble = 0.0;
-
   // Create and initialized the contact manager.
   this->contactManager = new ContactManager();
   this->contactManager->Init(this->world);
@@ -69,8 +67,6 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
 void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
-//  if (this->sdf->HasElement("update_rate"))
-//    this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
 }
 
 //////////////////////////////////////////////////
@@ -145,7 +141,7 @@ void PhysicsEngine::SetStepTime(double _value)
 }
 
 //////////////////////////////////////////////////
-double PhysicsEngine::GetStepTime()
+double PhysicsEngine::GetStepTime() const
 {
   return this->world->GetMaxStepSize();
 }

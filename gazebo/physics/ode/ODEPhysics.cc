@@ -237,11 +237,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::ODE);
-    // update_rate is deprecated, moved to World's real_time_update_rate
-    // physicsMsg.set_update_rate(this->GetUpdateRate());
     physicsMsg.set_solver_type(this->stepType);
-    // dt is deprecated, moved to World's max_step_size
-    // physicsMsg.set_dt(this->GetStepTime());
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(
         boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));

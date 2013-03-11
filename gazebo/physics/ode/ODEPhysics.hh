@@ -250,9 +250,6 @@ namespace gazebo
       /// \brief Collision attributes
       private: dJointGroupID contactGroup;
 
-      /// \brief Store the value of the stepTime parameter to improve efficiency
-//      private: double stepTimeDouble;
-
       /// \brief The type of the solver.
       private: std::string stepType;
 
