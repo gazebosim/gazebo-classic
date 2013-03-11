@@ -141,7 +141,7 @@ void PhysicsEngine::SetStepTime(double _value)
 }
 
 //////////////////////////////////////////////////
-double PhysicsEngine::GetStepTime() const
+double PhysicsEngine::GetStepTime()
 {
   return this->world->GetMaxStepSize();
 }
