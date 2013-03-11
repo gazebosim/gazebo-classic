@@ -15,7 +15,7 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "test/ServerFixture.hh"
 #include "gazebo/msgs/msgs.hh"
 
 using namespace gazebo;
@@ -61,7 +61,7 @@ void WorldTest::WorldParam()
 
   worldPubMsg.set_max_step_size(0.01);
   worldPubMsg.set_real_time_update_rate(500);
-  worldPubMsg.set_real_time_factor(1.0);
+  worldPubMsg.set_real_time_factor(1.2);
 
   worldPub->Publish(worldPubMsg);
 

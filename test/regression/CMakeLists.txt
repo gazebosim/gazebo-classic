@@ -30,7 +30,6 @@ set(tests
   file_handling.cc
   laser.cc
   physics.cc
-  world.cc
   pioneer2dx.cc
   transport.cc
   server_fixture.cc
