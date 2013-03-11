@@ -111,7 +111,7 @@ void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &msg)
     this->Joints[i]->SetMaxForce(0, this->MaxForce);
 
   double vel_lin = msg->position().x() / this->wheelRadius;
-  double vel_rot = msgs::Convert(msg->orientation()).GetAsEuler().z 
+  double vel_rot = -1 * msgs::Convert(msg->orientation()).GetAsEuler().z 
                    * (this->wheelSeparation / this->wheelRadius);
 
   this->Joints[RIGHT_FRONT]->SetVelocity(0, vel_lin - vel_rot);
