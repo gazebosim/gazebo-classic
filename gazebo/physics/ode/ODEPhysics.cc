@@ -219,7 +219,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   dWorldSetQuickStepNumIterations(this->worldId, this->GetSORPGSIters());
   dWorldSetQuickStepW(this->worldId, this->GetSORPGSW());
-  dWorldSetIslandThreads (this->worldId, 4);
+  // dWorldSetIslandThreads (this->worldId, 4);
 
   // Set the physics update function
   if (this->stepType == "quick")
