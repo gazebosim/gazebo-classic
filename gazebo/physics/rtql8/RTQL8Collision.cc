@@ -35,6 +35,7 @@ RTQL8Collision::RTQL8Collision(LinkPtr _link)
 //   this->SetName("ODE_Collision");
 //   this->collisionId = NULL;
 //   this->onPoseChangeFunc = &RTQL8Collision::OnPoseChangeNull;
+  gzerr << "Not yet implemented." << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -43,12 +44,13 @@ RTQL8Collision::~RTQL8Collision()
 //   if (this->collisionId)
 //     dGeomDestroy(this->collisionId);
 //   this->collisionId = NULL;
+  gzerr << "Not yet implemented." << std::endl;
 }
 
 //////////////////////////////////////////////////
 void RTQL8Collision::Load(sdf::ElementPtr _sdf)
 {
-//   Collision::Load(_sdf);
+   Collision::Load(_sdf);
 // 
 //   this->SetSpaceId(
 //       boost::shared_static_cast<ODELink>(this->link)->GetSpaceId());
@@ -58,6 +60,7 @@ void RTQL8Collision::Load(sdf::ElementPtr _sdf)
 //     this->SetCategoryBits(GZ_FIXED_COLLIDE);
 //     this->SetCollideBits(~GZ_FIXED_COLLIDE);
 //   }
+  gzerr << "Not yet implemented." << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -73,6 +76,8 @@ void RTQL8Collision::Fini()
      this->spaceId = NULL;
      */
 
+  gzerr << "Not yet implemented." << std::endl;
+
   Collision::Fini();
 }
 
@@ -82,7 +87,7 @@ void RTQL8Collision::SetCollision(bool _placeable)
 //   // Must go first in this function
 //   this->collisionId = _collisionId;
 // 
-//   Collision::SetCollision(_placeable);
+   Collision::SetCollision(_placeable);
 // 
 //   if (dGeomGetSpace(this->collisionId) == 0)
 //   {
@@ -103,6 +108,7 @@ void RTQL8Collision::SetCollision(bool _placeable)
 //   }
 // 
 //   dGeomSetData(this->collisionId, this);
+  gzerr << "Not yet implemented." << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -115,6 +121,7 @@ void RTQL8Collision::OnPoseChange()
 //     this->OnPoseChangeGlobal();
 //   else if (this->collisionId && this->placeable)
 //     this->OnPoseChangeRelative();
+  gzerr << "Not yet implemented." << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -124,6 +131,7 @@ void RTQL8Collision::SetCategoryBits(unsigned int _bits)
 //     dGeomSetCategoryBits(this->collisionId, _bits);
 //   if (this->spaceId)
 //     dGeomSetCategoryBits((dGeomID)this->spaceId, _bits);
+  gzerr << "Not yet implemented." << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -133,6 +141,8 @@ void RTQL8Collision::SetCollideBits(unsigned int _bits)
 //     dGeomSetCollideBits(this->collisionId, _bits);
 //   if (this->spaceId)
 //     dGeomSetCollideBits((dGeomID)this->spaceId, _bits);
+
+  gzerr << "Not yet implemented." << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -151,6 +161,7 @@ math::Box RTQL8Collision::GetBoundingBox() const
 // 
 //   box.min.Set(aabb[0], aabb[2], aabb[4]);
 //   box.max.Set(aabb[1], aabb[3], aabb[5]);
+  gzerr << "Not yet implemented." << std::endl;
 
   return box;
 }

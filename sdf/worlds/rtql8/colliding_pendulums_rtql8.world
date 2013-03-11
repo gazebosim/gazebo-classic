@@ -23,10 +23,12 @@
         </constraints>
       </ode>
     </physics>
-    <model name="model_cube">
-      <pose>0 0 1 0 0 0</pose>
-      <link name="cube">
-	<pose>0 0 0 0 0 0</pose>
+    <!--include><uri>model://ground_plane</uri></include-->
+    <!-- 25.3kg total mass -->
+    <model name="test_model">
+      <pose>0 0 4 0 0 0</pose>
+      <link name="link1">
+	<pose>0 0 -2 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -50,37 +52,15 @@
           </material>
         </visual>
       </link>
+      <joint name="joint01" type="revolute">
+        <pose>0 -0.5 0 0 0 0</pose>
+        <parent>world</parent>
+        <child>link1</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
     </model>
-
-    <model name="model_ground">
-      <pose>0 0 0 0 0 0</pose>
-      <link name="ground">
-	<pose>0 0 0 0 0 0</pose>
-        <inertial>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-          <mass>10.0</mass>
-        </inertial>
-        <visual name="visual">
-          <pose>0 0 0 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>4 4 0.1</size>
-            </box>
-          </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
-        </visual>
-      </link>
-    </model>
-
     <light type="directional" name="sun">
       <pose>0 0 10 0 0 0</pose>
       <diffuse>.8 .8 .8 1</diffuse>

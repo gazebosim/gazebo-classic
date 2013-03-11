@@ -67,12 +67,13 @@ void RTQL8Link::Init()
 
   //----------------------------------------------------------------------------
   // TODO: need to do something here.
+  static double TEMP_SIZE = 2.0;
   rtql8::kinematics::ShapeCube* shape
-          = new rtql8::kinematics::ShapeCube(Eigen::Vector3d(1, 1, 1), 1);
+          = new rtql8::kinematics::ShapeCube(Eigen::Vector3d(TEMP_SIZE, TEMP_SIZE, TEMP_SIZE), 1);
+  TEMP_SIZE -= 1.0;
   this->rtql8BodyNode->setShape(shape);
 
   //----------------------------------------------------------------------------
-  // TODO: need test
   math::Vector3 cog = this->inertial->GetCoG();
   math::Pose poseJointToChildLink;
   if (this->rtql8ParentJoint)
@@ -81,7 +82,8 @@ void RTQL8Link::Init()
   }
   else
   {
-    poseJointToChildLink = this->GetWorldPose();
+    //poseJointToChildLink = this->GetWorldPose();
+    poseJointToChildLink = math::Pose::Zero;
   }
 
   Eigen::Vector3d rtql8COMLocal(poseJointToChildLink.pos.x + cog.x,

@@ -6,7 +6,7 @@
       <background>0 0 0 1.0</background>
       <shadows>true</shadows>
     </scene>
-    <physics type="rtql8">
+    <physics type="ode">
       <gravity>0 0 -10.0</gravity>
       <ode>
         <solver>
@@ -25,35 +25,10 @@
     </physics>
     <!--include><uri>model://ground_plane</uri></include-->
     <!-- 25.3kg total mass -->
-    <model name="double_pendulum_1">
-      <pose>0 0 5 0 0 0</pose>
+    <model name="test_model">
+      <pose>0 0 4 0 0 0</pose>
       <link name="link1">
-	<pose>0 0 0 0 0 0</pose>
-        <inertial>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-          <mass>1.0</mass>
-        </inertial>
-        <visual name="visual">
-          <pose>0 0 0 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>0.2 0.4 0.6</size>
-            </box>
-          </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
-        </visual>
-      </link>
-      <link name="link2">
-	<pose>0 1 0 0 0 0</pose>
+	<pose>0 0 -2 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -82,15 +57,7 @@
         <parent>world</parent>
         <child>link1</child>
         <axis>
-          <xyz>1.0 0.0 0.0</xyz>
-        </axis>
-      </joint>
-      <joint name="joint12" type="revolute">
-        <pose>0 -0.5 0 0 0 0</pose>
-        <parent>link1</parent>
-        <child>link2</child>
-        <axis>
-          <xyz>1.0 0.0 0.0</xyz>
+          <xyz>1 0 0</xyz>
         </axis>
       </joint>
     </model>

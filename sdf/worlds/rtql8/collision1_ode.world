@@ -6,7 +6,7 @@
       <background>0 0 0 1.0</background>
       <shadows>true</shadows>
     </scene>
-    <physics type="rtql8">
+    <physics type="ode">
       <gravity>0 0 -10.0</gravity>
       <ode>
         <solver>
@@ -24,7 +24,7 @@
       </ode>
     </physics>
     <model name="model_cube">
-      <pose>0 0 7 0 0 0</pose>
+      <pose>0 0 5 0 0 0</pose>
       <link name="cube">
 	<pose>0 0 0 0 0 0</pose>
         <inertial>
@@ -88,7 +88,7 @@
     </model>
     <model name="model_ground">
       <static>true</static>
-      <pose>0 0 0 0 0 0</pose>
+      <pose>0 0 1 0 0 0</pose>
       <link name="ground">
 	<pose>0 0 0 0 0 0</pose>
         <inertial>

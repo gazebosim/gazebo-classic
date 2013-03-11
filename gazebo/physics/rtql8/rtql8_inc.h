@@ -18,6 +18,13 @@
 #include <rtql8/kinematics/TrfmRotateQuat.h>
 #include <rtql8/kinematics/TrfmTranslate.h>
 
+#include <rtql8/dynamics/BodyNodeDynamics.h>
+#include <rtql8/dynamics/ClosedLoopConstraint.h>
+#include <rtql8/dynamics/Constraint.h>
+#include <rtql8/dynamics/ConstraintDynamics.h>
+#include <rtql8/dynamics/ContactDynamics.h>
+#include <rtql8/dynamics/JointLimitDynamics.h>
+#include <rtql8/dynamics/PointConstraint.h>
 #include <rtql8/dynamics/SkeletonDynamics.h>
 
 #include <rtql8/simulation/World.h>
