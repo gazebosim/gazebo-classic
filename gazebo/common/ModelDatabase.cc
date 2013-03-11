@@ -110,11 +110,6 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
     return false;
   }
 
-  // Get only the model name from the URI
-  uriSeparator += 3;
-  size_t modelNameEnd = uri.find_first_of("/", uriSeparator);
-  uri = uri.substr(0, modelNameEnd);
-
   boost::replace_first(uri, "model://", ModelDatabase::GetURI());
 
   std::map<std::string, std::string> models = ModelDatabase::GetModels();
@@ -380,13 +375,17 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       gzerr << "URI[" << _uri << "] is missing ://\n";
       return std::string();
     }
-    startIndex += 3;
 
-    size_t endIndex = _uri.find_first_of("/", startIndex);
+    std::string modelName = _uri;
+    boost::replace_first(modelName, "model://", "");
+    boost::replace_first(modelName, ModelDatabase::GetURI(), "");
+
+    startIndex = modelName[0] == '/' ? 1 : 0;
+    size_t endIndex = modelName.find_first_of("/", startIndex);
     size_t modelNameLen = endIndex == std::string::npos ? std::string::npos :
       endIndex - startIndex;
 
-    std::string modelName = _uri.substr(startIndex, modelNameLen);
+    modelName = modelName.substr(startIndex, modelNameLen);
     if (endIndex != std::string::npos)
       suffix = _uri.substr(endIndex, std::string::npos);
 

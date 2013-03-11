@@ -388,6 +388,9 @@ namespace gazebo
       /// \param[in] _show True to enable contact visualization.
       public: void ShowContacts(bool _show);
 
+      /// \brief Return true if the Scene has been initialized.
+      public: bool GetInitialized() const;
+
       /// \brief Helper function to setup the sky.
       private: void SetSky();
 
@@ -732,6 +735,9 @@ namespace gazebo
 
       /// \brief True when all objects should be transparent.
       private: bool transparent;
+
+      /// \brief Initialized.
+      private: bool initialized;
     };
     /// \}
   }
