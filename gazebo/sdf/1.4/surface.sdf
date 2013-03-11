@@ -5,17 +5,8 @@
     <element name="restitution_coefficient" type="double" default="0" min="0.0" max="1.0" required="0">
       <description>Bounciness coefficient of restitution, from [0...1], where 0=no bounciness.</description>
     </element>
-    <element name="dissipation_coefficient" type="double" default="0" required="0">
-      <description>Based on Hunt and Crossley restitution coefficient model.</description>
-    </element>
-
-    <!-- coupling effects with accuracy colerances need to be addressed -->
     <element name="threshold" type="double" default="100000" required="0">
       <description>Bounce capture velocity, below which effective coefficient of restitution is 0.</description>
-    </element>
-
-    <element name="impact_model" required="0">
-      <description>To be determined based on impact modeling experiments.</description>
     </element>
   </element> <!-- End Bounce -->
 
