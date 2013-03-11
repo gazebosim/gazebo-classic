@@ -54,7 +54,7 @@ void RTQL8Model::Load(sdf::ElementPtr _sdf)
   //    rtql8SkeletonDynamics->setImmobileState(true);
   //  else
   //    rtql8SkeletonDynamics->setImmobileState(false);
-  rtql8SkeletonDynamics->setImmobileState(!this->IsStatic());
+  rtql8SkeletonDynamics->setImmobileState(this->IsStatic());
 }
 
 //////////////////////////////////////////////////
@@ -143,8 +143,6 @@ void RTQL8Model::Init()
 
     rtql8CanonicalJoint->addTransform(rotJ2CL, false);
   }
-
-
 
   rtql8SkeletonDynamics->initSkel();
 }
