@@ -70,6 +70,7 @@ namespace urdf2gazebo
       isInitialJointPosition = false;
       isFudgeFactor = false;
       provideFeedback = false;
+      cfmDamping = false;
       blobs.clear();
 
       dampingFactor = 0;
@@ -106,6 +107,7 @@ namespace urdf2gazebo
       isInitialJointPosition = ge.isInitialJointPosition;
       isFudgeFactor = ge.isFudgeFactor;
       provideFeedback = ge.provideFeedback;
+      cfmDamping = ge.cfmDamping;
       oldLinkName = ge.oldLinkName;
       reductionTransform = ge.reductionTransform;
       blobs = ge.blobs;
@@ -153,6 +155,7 @@ namespace urdf2gazebo
     private: bool isStopCfm, isStopErp, isInitialJointPosition, isFudgeFactor;
     private: double stopCfm, stopErp, initialJointPosition, fudgeFactor;
     private: bool provideFeedback;
+    private: bool cfmDamping;
 
     // blobs into body or robot
     private: std::vector<TiXmlElement*> blobs;
