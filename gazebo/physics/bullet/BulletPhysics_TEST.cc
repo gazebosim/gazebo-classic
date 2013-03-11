@@ -21,6 +21,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -28,7 +29,14 @@ using namespace physics;
 
 class BulletPhysics_TEST : public ServerFixture
 {
+  public: void PhysicsMsgParam();
+  public: void OnPhysicsMsgResponse(ConstResponsePtr &_msg);
+  public: static msgs::Physics physicsPubMsg;
+  public: static msgs::Physics physicsResponseMsg;
 };
+
+msgs::Physics BulletPhysics_TEST::physicsPubMsg;
+msgs::Physics BulletPhysics_TEST::physicsResponseMsg;
 
 /////////////////////////////////////////////////
 /// Test setting and getting bullet physics params
@@ -117,6 +125,77 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   value = bulletPhysics->GetParam(PhysicsEngine::CONTACT_SURFACE_LAYER);
   contactSurfaceLayerRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
+}
+
+/////////////////////////////////////////////////
+void BulletPhysics_TEST::OnPhysicsMsgResponse(ConstResponsePtr &_msg)
+{
+  if (_msg->type() == physicsPubMsg.GetTypeName())
+    physicsResponseMsg.ParseFromString(_msg->serialized_data());
+}
+
+/////////////////////////////////////////////////
+void BulletPhysics_TEST::PhysicsMsgParam()
+{
+  physicsPubMsg.Clear();
+  physicsResponseMsg.Clear();
+
+  std::string physicsEngineStr = "bullet";
+  Load("worlds/empty.world", false, physicsEngineStr);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
+  ASSERT_TRUE(engine != NULL);
+
+  transport::NodePtr phyNode;
+  phyNode = transport::NodePtr(new transport::Node());
+  phyNode->Init();
+
+  transport::PublisherPtr physicsPub
+       = phyNode->Advertise<msgs::Physics>("~/physics");
+  transport::PublisherPtr requestPub
+      = phyNode->Advertise<msgs::Request>("~/request");
+  transport::SubscriberPtr responseSub = phyNode->Subscribe("~/response",
+      &BulletPhysics_TEST::OnPhysicsMsgResponse, this);
+
+  physicsPubMsg.set_enable_physics(true);
+  physicsPubMsg.set_iters(60);
+  physicsPubMsg.set_sor(1.5);
+  physicsPubMsg.set_cfm(0.1);
+  physicsPubMsg.set_erp(0.25);
+  physicsPubMsg.set_contact_max_correcting_vel(10);
+  physicsPubMsg.set_contact_surface_layer(0.01);
+  physicsPubMsg.set_type(msgs::Physics::BULLET);
+  physicsPubMsg.set_solver_type("sequential_impulse");
+  physicsPub->Publish(physicsPubMsg);
+
+  msgs::Request *requestMsg = msgs::CreateRequest("physics_info", "");
+  requestPub->Publish(*requestMsg);
+
+  int waitCount = 0, maxWaitCount = 3000;
+  while (physicsResponseMsg.ByteSize() == 0 && ++waitCount < maxWaitCount)
+    common::Time::MSleep(10);
+  ASSERT_LT(waitCount, maxWaitCount);
+
+  EXPECT_EQ(physicsResponseMsg.solver_type(),
+      physicsPubMsg.solver_type());
+  EXPECT_EQ(physicsResponseMsg.enable_physics(),
+      physicsPubMsg.enable_physics());
+  EXPECT_EQ(physicsResponseMsg.iters(),
+      physicsPubMsg.iters());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.sor(),
+      physicsPubMsg.sor());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.cfm(),
+      physicsPubMsg.cfm());
+
+  phyNode->Fini();
+}
+
+/////////////////////////////////////////////////
+TEST_F(BulletPhysics_TEST, PhysicsMsgParam)
+{
+  PhysicsMsgParam();
 }
 
 /////////////////////////////////////////////////

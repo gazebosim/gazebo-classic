@@ -98,6 +98,9 @@ World::World(const std::string &_name)
   this->pause = false;
   this->thread = NULL;
   this->stop = false;
+  this->realTimeFactor = 0;
+  this->realTimeUpdateRate = 0;
+  this->maxStepSize = 0;
 
   this->stateToggle = 0;
 
@@ -207,6 +210,13 @@ void World::Load(sdf::ElementPtr _sdf)
 
   if (this->physicsEngine == NULL)
     gzthrow("Unable to create physics engine\n");
+
+  this->realTimeUpdateRate =
+      this->sdf->GetElement("real_time_update_rate")->GetValueDouble();
+  this->realTimeFactor =
+      this->sdf->GetElement("real_time_factor")->GetValueDouble();
+  this->maxStepSize =
+      this->sdf->GetElement("max_step_size")->GetValueDouble();
 
   // This should come before loading of entities
   this->physicsEngine->Load(this->sdf->GetElement("physics"));
@@ -450,8 +460,8 @@ void World::Step()
 
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
 
-  double realTimeUpdateRate = this->GetRealTimeUpdateRate();
-  double updatePeriod = (realTimeUpdateRate > 0) ? 1.0/realTimeUpdateRate : 0;
+  double updatePeriod =
+      (this->realTimeUpdateRate > 0) ? 1.0/this->realTimeUpdateRate : 0;
 
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
@@ -488,7 +498,7 @@ void World::Step()
     if (!this->IsPaused() || this->stepInc > 0)
     {
       // query timestep to allow dynamic time step size updates
-      this->simTime += this->GetMaxStepSize();
+      this->simTime += this->maxStepSize;
       //this->physicsEngine->GetStepTime();
       this->iterations++;
       this->Update();
@@ -499,7 +509,7 @@ void World::Step()
         this->stepInc--;
     }
     else
-      this->pauseTime += this->GetMaxStepSize();
+      this->pauseTime += this->maxStepSize;
       //this->physicsEngine->GetStepTime();
   }
 
@@ -1399,9 +1409,9 @@ void World::ProcessRequestMsgs()
     else if ((*iter).request() == "world_info")
     {
       msgs::World worldMsg;
-      worldMsg.set_real_time_update_rate(this->GetRealTimeUpdateRate());
-      worldMsg.set_real_time_factor(this->GetRealTimeFactor());
-      worldMsg.set_max_step_size(this->GetMaxStepSize());
+      worldMsg.set_real_time_update_rate(this->realTimeUpdateRate);
+      worldMsg.set_real_time_factor(this->realTimeFactor);
+      worldMsg.set_max_step_size(this->maxStepSize);
       std::string *serializedData = response.mutable_serialized_data();
       worldMsg.SerializeToString(serializedData);
       response.set_type(worldMsg.GetTypeName());
@@ -1855,38 +1865,38 @@ void World::PublishLogStatus()
 //////////////////////////////////////////////////
 double World::GetRealTimeFactor() const
 {
-  return this->sdf->GetElement("real_time_factor")->GetValueDouble();
+  return this->realTimeFactor;
 }
 
 //////////////////////////////////////////////////
 double World::GetRealTimeUpdateRate() const
 {
-  return this->sdf->GetElement("real_time_update_rate")->GetValueDouble();
+  return this->realTimeUpdateRate;
 }
 
 //////////////////////////////////////////////////
 double World::GetMaxStepSize() const
 {
-  return this->sdf->GetElement("max_step_size")->GetValueDouble();
+  return this->maxStepSize;
 }
 
 //////////////////////////////////////////////////
 void World::SetRealTimeFactor(double _factor)
 {
-//  boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
   this->sdf->GetElement("real_time_factor")->Set(_factor);
+  this->realTimeFactor = _factor;
 }
 
 //////////////////////////////////////////////////
 void World::SetRealTimeUpdateRate(double _rate)
 {
-//  boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
   this->sdf->GetElement("real_time_update_rate")->Set(_rate);
+  this->realTimeUpdateRate = _rate;
 }
 
 //////////////////////////////////////////////////
 void World::SetMaxStepSize(double _stepSize)
 {
-//  boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
   this->sdf->GetElement("max_step_size")->Set(_stepSize);
+  this->maxStepSize = _stepSize;
 }

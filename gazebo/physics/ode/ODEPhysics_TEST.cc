@@ -28,7 +28,14 @@ using namespace physics;
 
 class ODEPhysics_TEST : public ServerFixture
 {
+  public: void PhysicsMsgParam();
+  public: void OnPhysicsMsgResponse(ConstResponsePtr &_msg);
+  public: static msgs::Physics physicsPubMsg;
+  public: static msgs::Physics physicsResponseMsg;
 };
+
+msgs::Physics ODEPhysics_TEST::physicsPubMsg;
+msgs::Physics ODEPhysics_TEST::physicsResponseMsg;
 
 /////////////////////////////////////////////////
 /// Test setting and getting ode physics params
@@ -161,6 +168,83 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   EXPECT_DOUBLE_EQ(contactMaxCorrectingVel,
       odePhysics->GetContactMaxCorrectingVel());
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, odePhysics->GetContactSurfaceLayer());
+}
+
+/////////////////////////////////////////////////
+void ODEPhysics_TEST::OnPhysicsMsgResponse(ConstResponsePtr &_msg)
+{
+  if (_msg->type() == physicsPubMsg.GetTypeName())
+    physicsResponseMsg.ParseFromString(_msg->serialized_data());
+}
+
+/////////////////////////////////////////////////
+void ODEPhysics_TEST::PhysicsMsgParam()
+{
+  physicsPubMsg.Clear();
+  physicsResponseMsg.Clear();
+
+  std::string physicsEngineStr = "ode";
+  Load("worlds/empty.world", false, physicsEngineStr);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
+  ASSERT_TRUE(engine != NULL);
+
+  transport::NodePtr phyNode;
+  phyNode = transport::NodePtr(new transport::Node());
+  phyNode->Init();
+
+  transport::PublisherPtr physicsPub
+       = phyNode->Advertise<msgs::Physics>("~/physics");
+  transport::PublisherPtr requestPub
+      = phyNode->Advertise<msgs::Request>("~/request");
+  transport::SubscriberPtr responseSub = phyNode->Subscribe("~/response",
+      &ODEPhysics_TEST::OnPhysicsMsgResponse, this);
+
+  physicsPubMsg.set_enable_physics(true);
+  physicsPubMsg.set_iters(60);
+  physicsPubMsg.set_sor(1.5);
+  physicsPubMsg.set_cfm(0.1);
+  physicsPubMsg.set_erp(0.25);
+  physicsPubMsg.set_contact_max_correcting_vel(10);
+  physicsPubMsg.set_contact_surface_layer(0.01);
+
+  physicsPubMsg.set_type(msgs::Physics::ODE);
+  physicsPubMsg.set_solver_type("quick");
+
+  physicsPub->Publish(physicsPubMsg);
+
+  msgs::Request *requestMsg = msgs::CreateRequest("physics_info", "");
+  requestPub->Publish(*requestMsg);
+
+  int waitCount = 0, maxWaitCount = 3000;
+  while (physicsResponseMsg.ByteSize() == 0 && ++waitCount < maxWaitCount)
+    common::Time::MSleep(10);
+  ASSERT_LT(waitCount, maxWaitCount);
+
+  EXPECT_EQ(physicsResponseMsg.solver_type(),
+      physicsPubMsg.solver_type());
+  EXPECT_EQ(physicsResponseMsg.enable_physics(),
+      physicsPubMsg.enable_physics());
+  EXPECT_EQ(physicsResponseMsg.iters(),
+      physicsPubMsg.iters());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.sor(),
+      physicsPubMsg.sor());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.cfm(),
+      physicsPubMsg.cfm());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_max_correcting_vel(),
+      physicsPubMsg.contact_max_correcting_vel());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_surface_layer(),
+      physicsPubMsg.contact_surface_layer());
+
+  phyNode->Fini();
+}
+
+/////////////////////////////////////////////////
+TEST_F(ODEPhysics_TEST, PhysicsMsgParam)
+{
+  PhysicsMsgParam();
 }
 
 /////////////////////////////////////////////////

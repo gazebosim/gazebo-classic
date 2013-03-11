@@ -692,6 +692,15 @@ namespace gazebo
 
       /// \brief The number of simulation iterations.
       private: uint64_t iterations;
+
+      /// \brief Real time update rate.
+      private: double realTimeUpdateRate;
+
+      /// \brief Real time factor.
+      private: double realTimeFactor;
+
+      /// \brief Real time update rate.
+      private: double maxStepSize;
     };
     /// \}
   }
