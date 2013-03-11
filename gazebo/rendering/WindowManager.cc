@@ -87,11 +87,9 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
 #ifdef __APPLE__
   // Set the macAPI for Ogre based on the Qt implementation
   #ifdef QT_MAC_USE_COCOA
-    std::cout << "COCOA!" << std::endl;
     params["macAPI"] = "cocoa";
     params["macAPICocoaUseNSView"] = "true";
   #else
-    std::cout << "CARBON!" << std::endl;
     params["macAPI"] = "carbon";
   #endif
 #endif
