@@ -421,7 +421,7 @@ void BulletPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
       {
         value = boost::any_cast<int>(_value);
       }
-      catch (boost::bad_any_cast &e)
+      catch(boost::bad_any_cast &e)
       {
         value = boost::any_cast<unsigned int>(_value);
       }
@@ -441,7 +441,6 @@ void BulletPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
       double value = boost::any_cast<double>(_value);
       bulletElem->GetElement("constraints")->GetElement(
           "contact_surface_layer")->Set(value);
-      //gzwarn << "Not yet implemented in bullet" << std::endl;
       break;
     }
     case MAX_CONTACTS:
@@ -451,12 +450,11 @@ void BulletPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
       {
         value = boost::any_cast<int>(_value);
       }
-      catch (boost::bad_any_cast &e)
+      catch(boost::bad_any_cast &e)
       {
         value = boost::any_cast<unsigned int>(_value);
       }
       bulletElem->GetElement("max_contacts")->GetValue()->Set(value);
-      //gzwarn << "Not yet implemented in bullet" << std::endl;
       break;
     }
     case MIN_STEP_SIZE:

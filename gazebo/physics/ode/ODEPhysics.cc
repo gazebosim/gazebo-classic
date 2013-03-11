@@ -1061,7 +1061,7 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
       {
         value = boost::any_cast<int>(_value);
       }
-      catch (boost::bad_any_cast &e)
+      catch(boost::bad_any_cast &e)
       {
         value = boost::any_cast<unsigned int>(_value);
       }
@@ -1076,7 +1076,7 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
       {
         value = boost::any_cast<int>(_value);
       }
-      catch (boost::bad_any_cast &e)
+      catch(boost::bad_any_cast &e)
       {
         value = boost::any_cast<unsigned int>(_value);
       }
@@ -1114,7 +1114,7 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
       {
         value = boost::any_cast<int>(_value);
       }
-      catch (boost::bad_any_cast &e)
+      catch(boost::bad_any_cast &e)
       {
         value = boost::any_cast<unsigned int>(_value);
       }

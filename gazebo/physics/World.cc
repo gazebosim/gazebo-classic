@@ -499,7 +499,6 @@ void World::Step()
     {
       // query timestep to allow dynamic time step size updates
       this->simTime += this->maxStepSize;
-      //this->physicsEngine->GetStepTime();
       this->iterations++;
       this->Update();
 
@@ -510,7 +509,6 @@ void World::Step()
     }
     else
       this->pauseTime += this->maxStepSize;
-      //this->physicsEngine->GetStepTime();
   }
 
   this->ProcessMessages();
