@@ -27,6 +27,7 @@
 int main()
 {
   // Initialize transport
+  gazebo::common::Console::Instance()->Init("gztopic.log");
   gazebo::transport::init();
 
   // Create our node for communication

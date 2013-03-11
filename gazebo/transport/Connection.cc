@@ -148,8 +148,8 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
   if (!this->connectCondition.timed_wait(lock,
         boost::posix_time::milliseconds(60000)) || this->connectError)
   {
-    //gzlog << "Failed to create connection to remote host["
-    //      << host << ":" << _port << "]\n";
+    gzlog << "Failed to create connection to remote host["
+          << host << ":" << _port << "]\n";
     this->socket->close();
     return false;
   }
