@@ -237,10 +237,12 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::ODE);
-//    physicsMsg.set_update_rate(this->GetUpdateRate());
+    // update_rate is deprecated, moved to World's real_time_update_rate
+    // physicsMsg.set_update_rate(this->GetUpdateRate());
     physicsMsg.set_solver_type(this->stepType);
-    // dt is deprecated, use min_step_time instead
-//    physicsMsg.set_dt(this->GetStepTime());
+    // dt is deprecated, moved to World's max_step_size
+    // physicsMsg.set_dt(this->GetStepTime());
+    // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(
         boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
     physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
@@ -831,10 +833,11 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     (1.0 / _collision1->GetSurface()->kp + 1.0 / _collision2->GetSurface()->kp);
   double kd = _collision1->GetSurface()->kd + _collision2->GetSurface()->kd;
 
-  contact.surface.soft_erp = (this->GetStepTime() * kp) /
-                             (this->GetStepTime() * kp + kd);
+  double stepTimeDouble = this->GetStepTime();
+  contact.surface.soft_erp = (stepTimeDouble * kp) /
+                             (stepTimeDouble * kp + kd);
 
-  contact.surface.soft_cfm = 1.0 / (this->GetStepTime() * kp + kd);
+  contact.surface.soft_cfm = 1.0 / (stepTimeDouble * kp + kd);
 
   // contact.surface.soft_erp = 0.5*(_collision1->surface->softERP +
   //                                _collision2->surface->softERP);

@@ -1116,6 +1116,9 @@ void World::OnWorldMsg(ConstWorldPtr &_msg)
 
   if (_msg->has_real_time_update_rate())
     this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+
+  if (_msg->has_real_time_factor())
+    this->SetRealTimeFactor(_msg->real_time_factor());
 }
 
 //////////////////////////////////////////////////
@@ -1397,6 +1400,7 @@ void World::ProcessRequestMsgs()
     {
       msgs::World worldMsg;
       worldMsg.set_real_time_update_rate(this->GetRealTimeUpdateRate());
+      worldMsg.set_real_time_factor(this->GetRealTimeFactor());
       worldMsg.set_max_step_size(this->GetMaxStepSize());
       std::string *serializedData = response.mutable_serialized_data();
       worldMsg.SerializeToString(serializedData);
@@ -1849,6 +1853,12 @@ void World::PublishLogStatus()
 }
 
 //////////////////////////////////////////////////
+double World::GetRealTimeFactor() const
+{
+  return this->sdf->GetElement("real_time_factor")->GetValueDouble();
+}
+
+//////////////////////////////////////////////////
 double World::GetRealTimeUpdateRate() const
 {
   return this->sdf->GetElement("real_time_update_rate")->GetValueDouble();
@@ -1858,6 +1868,13 @@ double World::GetRealTimeUpdateRate() const
 double World::GetMaxStepSize() const
 {
   return this->sdf->GetElement("max_step_size")->GetValueDouble();
+}
+
+//////////////////////////////////////////////////
+void World::SetRealTimeFactor(double _factor)
+{
+//  boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
+  this->sdf->GetElement("real_time_factor")->Set(_factor);
 }
 
 //////////////////////////////////////////////////

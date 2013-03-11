@@ -312,6 +312,10 @@ namespace gazebo
       /// \param[in] _modelName Name of the model to publish.
       public: void PublishModelPose(const std::string &_modelName);
 
+      /// \brief Get real time factor
+      /// \return Real time factor
+      public: double GetRealTimeFactor() const;
+
       /// \brief Get real time update rate
       /// \return Update rate
       public: double GetRealTimeUpdateRate() const;
@@ -319,6 +323,10 @@ namespace gazebo
       /// \brief Get max step size.
       /// \return Max step size.
       public: double GetMaxStepSize() const;
+
+      /// \brief Set real time factor
+      /// \param[in] _factor Real time factor
+      public: void SetRealTimeFactor(double _factor);
 
       /// \brief Set real time update rate
       /// \param[in] _rate Update rate

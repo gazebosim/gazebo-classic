@@ -259,11 +259,12 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::BULLET);
-    // update_rate is deprecated
-//    physicsMsg.set_update_rate(this->GetUpdateRate());
+    // update_rate is deprecated, moved to World's real_time_update_rate
+    // physicsMsg.set_update_rate(this->GetUpdateRate());
     physicsMsg.set_solver_type(this->solverType);
-    // dt is deprecated
-//    physicsMsg.set_dt(this->GetStepTime());
+    // dt is deprecated, moved to World's max_step_size
+    // physicsMsg.set_dt(this->GetStepTime());
+    // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(
         boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
     physicsMsg.set_iters(
@@ -340,8 +341,9 @@ void BulletPhysics::UpdatePhysics()
 
   // common::Time currTime =  this->world->GetRealTime();
 
+  double stepTimeDouble = this->GetStepTime();
   this->dynamicsWorld->stepSimulation(
-      this->GetStepTime(), 1, this->GetStepTime());
+      stepTimeDouble, 1, stepTimeDouble);
   // this->lastUpdateTime = currTime;
 }
 

@@ -14,9 +14,9 @@
       <description>Bounce capture velocity, below which effective coefficient of restitution is 0.</description>
     </element>
 
-    <element name="impact_model">
+    <element name="impact_model" required="0">
       <description>To be determined based on impact modeling experiments.</description>
-    </eelement>
+    </element>
   </element> <!-- End Bounce -->
 
   <element name="friction" required="0">

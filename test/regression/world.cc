@@ -61,6 +61,7 @@ void WorldTest::WorldParam()
 
   worldPubMsg.set_max_step_size(0.01);
   worldPubMsg.set_real_time_update_rate(500);
+  worldPubMsg.set_real_time_factor(1.0);
 
   worldPub->Publish(worldPubMsg);
 
@@ -77,6 +78,8 @@ void WorldTest::WorldParam()
       worldPubMsg.max_step_size());
   EXPECT_DOUBLE_EQ(worldResponseMsg.real_time_update_rate(),
       worldPubMsg.real_time_update_rate());
+  EXPECT_DOUBLE_EQ(worldResponseMsg.real_time_factor(),
+      worldPubMsg.real_time_factor());
 
   worldNode->Fini();
 }
