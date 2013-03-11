@@ -646,9 +646,6 @@ void Camera::EnableSaveFrame(bool enable)
   sdf::ElementPtr elem = this->sdf->GetElement("save");
   elem->GetAttribute("enabled")->Set(enable);
   this->captureData = true;
-
-  //if (!this->renderTexture)
-  //  this->CreateRenderTexture("saveframes_render_texture");
 }
 
 //////////////////////////////////////////////////
