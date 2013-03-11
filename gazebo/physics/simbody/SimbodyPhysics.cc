@@ -90,7 +90,10 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
   // Create an integrator
   //this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
   // this->integ = new SimTK::ExplicitEulerIntegrator(system);
-  this->integ = new SimTK::RungeKutta3Integrator(system);
+  // this->integ = new SimTK::RungeKutta3Integrator(system);
+  this->integ = new SimTK::RungeKutta2Integrator(system);
+  /// \TODO:  make sdf parameter
+  this->integ->setAccuracy(0.1);
 }
 
 //////////////////////////////////////////////////

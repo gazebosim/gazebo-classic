@@ -1,14 +1,14 @@
 <sdf version="1.3">
   <world name="default">
-    <physics type="ode">
+    <physics type="simbody">
       <gravity>0 0 -9.8</gravity>
       <ode>
         <solver>
-          <dt>0.005</dt>
+          <dt>0.001</dt>
         </solver>
       </ode>
       <simbody>
-        <dt>0.005</dt>
+        <dt>0.001</dt>
       </simbody>
     </physics>
 
