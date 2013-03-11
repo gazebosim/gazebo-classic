@@ -2308,14 +2308,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     item->setValue(_msg.enable_physics());
   this->propTreeBrowser->addProperty(item);
 
-  item = this->variantManager->addProperty(QVariant::Double, tr("update rate"));
-  static_cast<QtVariantPropertyManager*>
-    (this->variantFactory->propertyManager(item))->setAttribute(
-        item, "decimals", 6);
-  if (_msg.has_update_rate())
-    item->setValue(_msg.update_rate());
-  this->propTreeBrowser->addProperty(item);
-
   QtProperty *gravityItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("gravity"));
   this->propTreeBrowser->addProperty(gravityItem);
@@ -2333,14 +2325,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   QtProperty *solverItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("solver"));
   this->propTreeBrowser->addProperty(solverItem);
-
-  item = this->variantManager->addProperty(QVariant::Double, tr("step size"));
-  static_cast<QtVariantPropertyManager*>
-    (this->variantFactory->propertyManager(item))->setAttribute(
-        item, "decimals", 6);
-  if (_msg.has_dt())
-    item->setValue(_msg.dt());
-  solverItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Int, tr("iterations"));
   if (_msg.has_iters())

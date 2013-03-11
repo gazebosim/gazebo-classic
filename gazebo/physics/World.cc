@@ -1121,15 +1121,6 @@ void World::OnWorldMsg(ConstWorldPtr &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   this->worldMsgs.push_back(*_msg);
-
-/*  if (_msg->has_max_step_size())
-    this->SetMaxStepSize(_msg->max_step_size());
-
-  if (_msg->has_real_time_update_rate())
-    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
-
-  if (_msg->has_real_time_factor())
-    this->SetRealTimeFactor(_msg->real_time_factor());*/
 }
 
 //////////////////////////////////////////////////

@@ -291,14 +291,17 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   // deprecated
   if (_msg->has_dt())
-    this->SetStepTime(_msg->dt());
+    gzwarn << "Physics dt is deprecated by World's max step size\n";
 
   if (_msg->has_min_step_size())
     this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
 
   // deprecated
   if (_msg->has_update_rate())
-    this->SetUpdateRate(_msg->update_rate());
+  {
+    gzwarn <<
+        "Physics update rate is deprecated by World's real time update rate\n";
+  }
 
   if (_msg->has_solver_type())
     this->SetParam(SOLVER_TYPE, _msg->solver_type());
