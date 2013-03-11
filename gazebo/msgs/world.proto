@@ -1,0 +1,13 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface World
+/// \brief A message containing a description of the world properties
+
+
+message World
+{
+  optional double real_time_factor = 1;
+  optional double real_time_update_rate = 2;
+  optional double max_step_size = 3;
+}
