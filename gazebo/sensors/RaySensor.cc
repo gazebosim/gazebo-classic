@@ -246,7 +246,6 @@ int RaySensor::GetFiducial(int index)
 //////////////////////////////////////////////////
 void RaySensor::UpdateImpl(bool /*_force*/)
 {
-  printf("----------------\n");
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
   // need to move mutex lock after this? or make the OnNewLaserScan connection
@@ -278,8 +277,6 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   for (unsigned int j = 0; j < (unsigned int)this->GetVerticalRayCount(); j++)
   for (unsigned int i = 0; i < (unsigned int)this->GetRayCount(); i++)
   {
-    std::cout << "Range[" << 
-this->laserShape->GetRange(j * this->GetRayCount() + i) << "]\n";
     scan->add_ranges(
         this->laserShape->GetRange(j * this->GetRayCount() + i) + 0.08);
     scan->add_intensities(
