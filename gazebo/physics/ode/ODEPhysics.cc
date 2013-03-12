@@ -384,17 +384,8 @@ void ODEPhysics::UpdatePhysics()
     for (unsigned int i = 0; i < this->jointFeedbackIndex; ++i)
     {
       Contact *contactFeedback = this->jointFeedbacks[i]->contact;
-
-      // Note: GetByName could be expensive, should consider storing
-      // CollisionPtr in Contact class so we do not need to search by
-      // collision scoped names for every feedback
-//      Collision *col1 = contactFeedback->collisionPtr1;
-//      Collision *col2 = contactFeedback->collisionPtr2;
-      Collision *col1 = boost::shared_dynamic_cast<Collision>(
-      this->world->GetEntity(contactFeedback->collision1)).get();
-      Collision *col2 = boost::shared_dynamic_cast<Collision>(
-      this->world->GetEntity(contactFeedback->collision2)).get();
-
+      Collision *col1 = contactFeedback->collisionPtr1;
+      Collision *col2 = contactFeedback->collisionPtr2;
 
       GZ_ASSERT(col1 != NULL, "Collision 1 is NULL");
       GZ_ASSERT(col2 != NULL, "Collision 2 is NULL");
