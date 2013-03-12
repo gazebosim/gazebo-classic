@@ -70,13 +70,11 @@ Model::Model(BasePtr _parent)
   : Entity(_parent)
 {
   this->AddType(MODEL);
-  this->updateMutex = new boost::recursive_mutex();
 }
 
 //////////////////////////////////////////////////
 Model::~Model()
 {
-  delete this->updateMutex;
 }
 
 //////////////////////////////////////////////////
@@ -209,7 +207,7 @@ void Model::Init()
 //////////////////////////////////////////////////
 void Model::Update()
 {
-  this->updateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
 
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
@@ -253,8 +251,6 @@ void Model::Update()
     }
     this->prevAnimationTime = this->world->GetSimTime();
   }
-
-  this->updateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -862,7 +858,8 @@ void Model::SetJointAnimation(
     const std::map<std::string, common::NumericAnimationPtr> _anims,
     boost::function<void()> _onComplete)
 {
-  this->updateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
+
   std::map<std::string, common::NumericAnimationPtr>::const_iterator iter;
   for (iter = _anims.begin(); iter != _anims.end(); ++iter)
   {
@@ -870,17 +867,16 @@ void Model::SetJointAnimation(
   }
   this->onJointAnimationComplete = _onComplete;
   this->prevAnimationTime = this->world->GetSimTime();
-  this->updateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
 void Model::StopAnimation()
 {
-  this->updateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
+
   Entity::StopAnimation();
   this->onJointAnimationComplete.clear();
   this->jointAnimations.clear();
-  this->updateMutex->unlock();
 }
 
 //////////////////////////////////////////////////

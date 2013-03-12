@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/thread.hpp>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -343,7 +344,7 @@ namespace gazebo
       private: common::Time prevAnimationTime;
 
       /// \brief Mutex used during the update cycle.
-      private: boost::recursive_mutex *updateMutex;
+      private: boost::recursive_mutex updateMutex;
 
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;

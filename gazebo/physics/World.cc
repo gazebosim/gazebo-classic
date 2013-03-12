@@ -62,19 +62,18 @@
 using namespace gazebo;
 using namespace physics;
 
-
 class ModelUpdate_TBB
 {
-  public: ModelUpdate_TBB(Model_V *_models) : models(_models) {}
+  public: ModelUpdate_TBB(BasePtr _root) : rootElement(_root) {}
   public: void operator() (const tbb::blocked_range<size_t> &_r) const
   {
     for (size_t i = _r.begin(); i != _r.end(); i++)
     {
-      (*models)[i]->Update();
+      this->rootElement->GetChild(i)->Update();
     }
   }
 
-  private: Model_V *models;
+  private: BasePtr rootElement;
 };
 
 //////////////////////////////////////////////////
@@ -244,13 +243,7 @@ void World::Load(sdf::ElementPtr _sdf)
       this->GetModel(i)->LoadJoints();
   }
 
-  // TODO: Performance test to see if TBB model updating is necessary
-  // Choose threaded or unthreaded model updating depending on the number of
-  // models in the scene
-  // if (this->GetModelCount() < 20)
   this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
-  // else
-  // this->modelUpdateFunc = &World::ModelUpdateTBB;
 
   event::Events::worldCreated(this->GetName());
 
@@ -590,6 +583,14 @@ void World::Update()
   // Only update state informatin if logging data.
   if (common::LogRecord::Instance()->GetRunning())
   {
+    /*this->states.push_back(WorldState(shared_from_this()));
+    if (this->states.size() > 1000)
+      this->states.pop_front();
+
+    /// Publish a log status message if the logger is running.
+    this->PublishLogStatus();
+    */
+
     int currState = (this->stateToggle + 1) % 2;
     this->prevStates[currState] = WorldState(shared_from_this());
 
@@ -712,6 +713,13 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
   }
 
   this->PublishModelPose(model);
+
+  // TODO: Performance test to see if TBB model updating is necessary
+  // Choose threaded or unthreaded model updating depending on the number of
+  // models in the scene
+  if (this->GetModelCount() > 20)
+    this->modelUpdateFunc = &World::ModelUpdateTBB;
+
   return model;
 }
 
@@ -1129,13 +1137,13 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
   }
 }
 
-
 //////////////////////////////////////////////////
-/*void World::ModelUpdateTBB()
+void World::ModelUpdateTBB()
 {
-  tbb::parallel_for(tbb::blocked_range<size_t>(0, this->models.size(), 10),
-      ModelUpdate_TBB(&this->models));
-}*/
+  tbb::parallel_for(tbb::blocked_range<size_t>(0,
+        this->rootElement->GetChildCount(), 10),
+      ModelUpdate_TBB(this->rootElement));
+}
 
 //////////////////////////////////////////////////
 void World::ModelUpdateSingleLoop()
@@ -1144,7 +1152,6 @@ void World::ModelUpdateSingleLoop()
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
     this->rootElement->GetChild(i)->Update();
 }
-
 
 //////////////////////////////////////////////////
 void World::LoadPlugins()
@@ -1262,6 +1269,12 @@ void World::ProcessEntityMsgs()
     this->EnableAllModels();
     this->deleteEntity.clear();
   }
+
+  // TODO: Performance test to see if TBB model updating is necessary
+  // Choose threaded or unthreaded model updating depending on the number of
+  // models in the scene
+  if (this->GetModelCount() < 20)
+    this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
 }
 
 //////////////////////////////////////////////////

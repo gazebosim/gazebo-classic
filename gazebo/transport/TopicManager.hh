@@ -254,7 +254,6 @@ namespace gazebo
       // Singleton implementation
       private: friend class SingletonT<TopicManager>;
     };
-
     /// \}
   }
 }

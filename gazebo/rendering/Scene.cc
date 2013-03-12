@@ -2117,6 +2117,7 @@ void Scene::OnModelMsg(ConstModelPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 {
+  return;
   SkyX::VClouds::VClouds *vclouds =
     this->skyx->getVCloudsManager()->getVClouds();
 
@@ -2176,6 +2177,8 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::SetSky()
 {
+  return;
+
   // Create SkyX
   this->skyxController = new SkyX::BasicController();
   this->skyx = new SkyX::SkyX(this->manager, this->skyxController);

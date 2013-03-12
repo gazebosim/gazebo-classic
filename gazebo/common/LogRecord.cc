@@ -413,7 +413,6 @@ void LogRecord::Update(const common::UpdateInfo &_info)
       this->startTime = _info.simTime;
     }
 
-
     // Signal that new data is available.
     if (size > 0)
       this->dataAvailableCondition.notify_one();
