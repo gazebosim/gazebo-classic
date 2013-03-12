@@ -158,22 +158,21 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
     g_playAct->setChecked(true);
   }
 
+  unsigned int hour, min, sec, msec;
+
   // Set simulation time
   {
     stream.str("");
 
-    double simDbl = msgs::Convert(_msg->sim_time()).Double();
-    if (simDbl > 31536000)
-      stream << std::fixed << std::setprecision(2) << simDbl/31536000 << " dys";
-    else if (simDbl > 86400)
-      stream << std::fixed << std::setprecision(2) << simDbl/86400 << " dys";
-    else if (simDbl > 3600)
-      stream << std::fixed << std::setprecision(2) << simDbl/3600 << " hrs";
-    else if (simDbl > 999)
-      stream << std::fixed << std::setprecision(2) << simDbl/60 << " min";
-    else
-      stream << std::fixed << std::setprecision(2) << simDbl << " sec";
+    sec = _msg->sim_time().sec();
+    hour = sec / 3600;
+    min = (sec - hour * 3600) / 60;
+    sec = (sec - hour * 3600 - min * 60);
+    msec = rint(_msg->sim_time().nsec() * 1e-6);
 
+    stream << std::setw(2) << std::setfill('0') << hour << ":" << min
+           << ":" << sec;
+    stream << std::setw(3) << std::setfill('0')  << "." << msec;
     this->SetSimTime(QString::fromStdString(stream.str()));
   }
 
@@ -181,19 +180,15 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   {
     stream.str("");
 
-    double realDbl = msgs::Convert(_msg->real_time()).Double();
-    if (realDbl > 31536000)
-      stream << std::fixed << std::setprecision(2)
-             << realDbl/31536000 << " dys";
-    else if (realDbl > 86400)
-      stream << std::fixed << std::setprecision(2) << realDbl/86400 << " dys";
-    else if (realDbl > 3600)
-      stream << std::fixed << std::setprecision(2) << realDbl/3600 << " hrs";
-    else if (realDbl > 999)
-      stream << std::fixed << std::setprecision(2) << realDbl/60 << " min";
-    else
-      stream << std::fixed << std::setprecision(2) << realDbl << " sec";
+    sec = _msg->real_time().sec();
+    hour = sec / 3600;
+    min = (sec - hour * 3600) / 60;
+    sec = (sec - hour * 3600 - min * 60);
+    msec = rint(_msg->sim_time().nsec() * 1e-6);
 
+    stream << std::setw(2) << std::setfill('0') << hour << ":" << min
+           << ":" << sec;
+    stream << std::setw(3) << std::setfill('0')  << "." << msec;
     this->SetRealTime(QString::fromStdString(stream.str()));
   }
 
