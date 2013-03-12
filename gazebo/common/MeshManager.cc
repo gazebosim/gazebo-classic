@@ -144,6 +144,12 @@ const Mesh *MeshManager::Load(const std::string &_filename)
       {
         mesh = this->meshes[_filename];
       }
+
+      std::cout << "Submesh Count[" << mesh->GetSubMeshCount() << "]\n";
+      for (unsigned int i=0; i < mesh->GetSubMeshCount(); ++i)
+      {
+        std::cout << "SubMesh[" << mesh->GetSubMesh(i)->GetName() << "]\n";
+      }
     }
     catch(gazebo::common::Exception &e)
     {

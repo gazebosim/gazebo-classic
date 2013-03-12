@@ -503,6 +503,13 @@ namespace gazebo
 
           geomMsg->mutable_mesh()->set_filename(
               geomElem->GetValueString("uri"));
+
+          if (geomElem->HasElement("submesh") &&
+              geomElem->GetValueString("submesh") != "__default__")
+          {
+            geomMsg->mutable_mesh()->set_submesh(
+                geomElem->GetValueString("submesh"));
+          }
         }
         else if (geomElem->GetName() == "empty")
         {

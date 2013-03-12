@@ -158,7 +158,8 @@ namespace gazebo
       /// \param[in] _objName Name of the attached Object to put the mesh
       /// onto.
       public: Ogre::MovableObject *AttachMesh(const std::string &_meshName,
-                                              const std::string &_objName="");
+                  const std::string &_subMesh="",
+                  const std::string &_objName="");
 
       /// \brief Set the scale.
       /// \param[in] _scale The scaling factor for the visual.
@@ -325,11 +326,15 @@ namespace gazebo
 
       /// \brief Insert a mesh into Ogre.
       /// \param[in] _meshName Name of the mesh to insert.
-      public: void InsertMesh(const std::string &_meshName);
+      /// \param[in] _subMesh Name of the mesh within _meshName to insert.
+      public: void InsertMesh(const std::string &_meshName,
+                  const std::string &_subMesh = "");
 
       /// \brief Insert a mesh into Ogre.
       /// \param[in] _mesh Pointer to the mesh to insert.
-      public: static void InsertMesh(const common::Mesh *_mesh);
+      /// \param[in] _subMesh Name of the mesh within _meshName to insert.
+      public: static void InsertMesh(const common::Mesh *_mesh,
+                  const std::string &_subMesh = "");
 
       /// \brief Update a visual based on a message.
       /// \param[in] _msg The visual message.
@@ -447,6 +452,11 @@ namespace gazebo
       /// \brief The name of the mesh set in the visual's SDF.
       /// \return Name of the mesh.
       public: std::string GetMeshName() const;
+
+      /// \brief Get the name of the sub mesh set in the visual's SDF.
+      /// \return Name of the submesh. Empty string if no submesh is
+      /// specified.
+      public: std::string GetSubMeshName() const;
 
       /// \brief Clear parents.
       public: void ClearParent();

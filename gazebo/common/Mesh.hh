@@ -195,6 +195,14 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SubMesh();
 
+      /// \brief Set the name of this mesh
+      /// \param[in] _n the name to set
+      public: void SetName(const std::string &_n);
+
+      /// \brief Get the name of this mesh
+      /// \return the name
+      public: std::string GetName() const;
+
       /// \brief Set the primitive type
       /// \param[in] _type the type
       public: void SetPrimitiveType(PrimitiveType _type);
@@ -389,6 +397,9 @@ namespace gazebo
       /// \brief The material index for this mesh. Relates to the parent
       /// mesh material list.
       private: int materialIndex;
+
+      /// \brief The name of the sub-mesh
+      private: std::string name;
     };
     /// \}
   }

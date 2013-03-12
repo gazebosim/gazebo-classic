@@ -815,3 +815,15 @@ void SubMesh::SetScale(const math::Vector3 &_factor)
     (*iter).z *= _factor.z;
   }
 }
+
+//////////////////////////////////////////////////
+void SubMesh::SetName(const std::string &_n)
+{
+  this->name = _n;
+}
+
+//////////////////////////////////////////////////
+std::string SubMesh::GetName() const
+{
+  return this->name;
+}
