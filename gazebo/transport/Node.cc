@@ -139,7 +139,7 @@ bool Node::HandleData(const std::string &_topic, const std::string &_msg)
 bool Node::HandleMessage(const std::string &_topic, MessagePtr _msg)
 {
   boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-  this->incomingMsgsB[_topic].push_back(_msg);
+  this->incomingMsgsLocal[_topic].push_back(_msg);
   return true;
 }
 
@@ -185,8 +185,8 @@ void Node::ProcessIncoming()
     std::list<MessagePtr>::iterator msgIter;
     std::map<std::string, std::list<MessagePtr> >::iterator inIter;
     std::map<std::string, std::list<MessagePtr> >::iterator endIter;
-    inIter = this->incomingMsgsB.begin();
-    endIter = this->incomingMsgsB.end();
+    inIter = this->incomingMsgsLocal.begin();
+    endIter = this->incomingMsgsLocal.end();
 
     for (; inIter != endIter; ++inIter)
     {
@@ -207,7 +207,7 @@ void Node::ProcessIncoming()
         }
       }
     }
-    this->incomingMsgsB.clear();
+    this->incomingMsgsLocal.clear();
   }
 }
 

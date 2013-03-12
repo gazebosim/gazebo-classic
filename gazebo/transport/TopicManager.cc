@@ -26,10 +26,15 @@
 using namespace gazebo;
 using namespace transport;
 
+/// \brief Class to facilitate parallel processing of nodes.
 class NodeProcess_TBB
 {
+  /// \brief Constructor.
+  /// \param[in] _nodes List of nodes to process.
   public: NodeProcess_TBB(std::vector<NodePtr> *_nodes) : nodes(_nodes) {}
 
+  /// \brief Used by TBB during parallel execution.
+  /// \param[in] _r Range within this->nodes to process.
   public: void operator() (const tbb::blocked_range<size_t> &_r) const
   {
     for (size_t i = _r.begin(); i != _r.end(); i++)
@@ -38,6 +43,7 @@ class NodeProcess_TBB
     }
   }
 
+  /// \brief The list of nodes to process.
   private: std::vector<NodePtr> *nodes;
 };
 

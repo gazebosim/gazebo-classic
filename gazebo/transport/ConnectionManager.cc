@@ -25,8 +25,10 @@
 using namespace gazebo;
 using namespace transport;
 
+/// TBB task to process nodes.
 class TopicManagerProcessTask : public tbb::task
 {
+  /// Implements the necessary execute function
   public: tbb::task *execute()
           {
             TopicManager::Instance()->ProcessNodes();
@@ -225,13 +227,12 @@ void ConnectionManager::RunUpdate()
 
   this->masterConn->ProcessWriteQueue();
 
-  TopicManager::Instance()->ProcessNodes();
 
-  /*TopicManagerProcessTask *task = new(tbb::task::allocate_root())
+  // Use TBB to process nodes.
+  TopicManagerProcessTask *task = new(tbb::task::allocate_root())
     TopicManagerProcessTask();
-
   tbb::task::enqueue(*task);
-  */
+  // TopicManager::Instance()->ProcessNodes();
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);

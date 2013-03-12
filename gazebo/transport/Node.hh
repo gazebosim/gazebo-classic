@@ -333,7 +333,9 @@ namespace gazebo
       private: typedef std::map<std::string, Callback_L> Callback_M;
       private: Callback_M callbacks;
       private: std::map<std::string, std::list<std::string> > incomingMsgs;
-      private: std::map<std::string, std::list<MessagePtr> > incomingMsgsB;
+
+      /// \brief List of newly arrive messages
+      private: std::map<std::string, std::list<MessagePtr> > incomingMsgsLocal;
 
       private: boost::recursive_mutex publisherMutex;
       private: boost::recursive_mutex incomingMutex;
