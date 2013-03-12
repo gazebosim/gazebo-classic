@@ -200,7 +200,7 @@ void Heightmap::ConfigureTerrainDefaults()
   // MaxPixelError: Decides how precise our terrain is going to be.
   // A lower number will mean a more accurate terrain, at the cost of
   // performance (because of more vertices)
-  this->terrainGlobals->setMaxPixelError(1);
+  this->terrainGlobals->setMaxPixelError(0);
 
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
@@ -394,7 +394,10 @@ double Heightmap::GetHeight(double _x, double _y, double _z)
   if (result.hit)
     return result.position.z;
   else
+  {
+    printf("Didn't hit\n");
     return 0;
+  }
 }
 
 /////////////////////////////////////////////////

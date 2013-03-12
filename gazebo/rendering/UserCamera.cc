@@ -59,6 +59,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   this->viewController = NULL;
 
   this->selectionBuffer = NULL;
+
   // Set default UserCamera render rate to 30Hz
   this->SetRenderRate(30.0);
 }
@@ -551,6 +552,7 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
                                 std::string &_mod)
 {
   VisualPtr result;
+
   if (!this->selectionBuffer)
     return result;
 

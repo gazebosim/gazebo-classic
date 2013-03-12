@@ -8,6 +8,7 @@
 
     <include>
       <uri>model://hokuyo</uri>
+      <pose>0 0 2 0 1.570796 0</pose>
     </include>
 
     <model name="heightmap">

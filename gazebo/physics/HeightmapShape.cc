@@ -76,7 +76,7 @@ int HeightmapShape::GetSubSampling() const
 //////////////////////////////////////////////////
 void HeightmapShape::Init()
 {
-  this->subSampling = 1;
+  this->subSampling = 2;
 
   math::Vector3 terrainSize = this->GetSize();
 
@@ -102,8 +102,8 @@ void HeightmapShape::FillHeightMap()
 {
   unsigned int x, y;
   float h = 0;
-  // float h1 = 0;
-  // float h2 = 0;
+  float h1 = 0;
+  float h2 = 0;
 
   // Resize the vector to match the size of the vertices
   this->heights.resize(this->vertSize * this->vertSize);
@@ -111,9 +111,9 @@ void HeightmapShape::FillHeightMap()
   // this->img.Rescale(this->vertSize, this->vertSize);
   common::Color pixel;
 
-  // double yf, xf, dy, dx;
-  //int y1, y2, x1, x2;
-  double px1;//, px2, px3, px4;
+  double yf, xf, dy, dx;
+  int y1, y2, x1, x2;
+  double px1, px2, px3, px4;
 
   int imgHeight = this->img.GetHeight();
   int imgWidth = this->img.GetWidth();
@@ -131,12 +131,11 @@ void HeightmapShape::FillHeightMap()
   unsigned int count;
   this->img.GetData(&data, count);
 
-  for (y = 0; y < this->vertSize; ++y)
+  /*for (y = 0; y < this->vertSize; ++y)
   {
     for (x = 0; x < this->vertSize; ++x)
     {
-      px1 = static_cast<int>(data[y * pitch + x * bpp]) / 256.0;
-      // std::cout << "XY[" << x << " " << y << "] H[" << px1 << "] \n";
+      px1 = static_cast<int>(data[y * pitch + x * bpp]) / 255.0f;
 
       h = px1 * this->scale.z;
 
@@ -144,15 +143,15 @@ void HeightmapShape::FillHeightMap()
       //   if the terrain size has a negative z component
       //   this is mainly for backward compatibility
       if (this->GetSize().z < 0)
-        h = 1.0 - h;
+        h = 1.0f - h;
 
       // Store the height for future use
       this->heights[y * this->vertSize + x] = h;
     }
-  }
+  }*/
 
   // Iterate over all the vertices
-  /*for (y = 0; y < this->vertSize; y++)
+  for (y = 0; y < this->vertSize; y++)
   {
     // yf ranges between 0 and 4
     yf = y / static_cast<double>(this->subSampling);
@@ -191,7 +190,7 @@ void HeightmapShape::FillHeightMap()
       // Store the height for future use
       this->heights[y * this->vertSize + x] = h;
     }
-  }*/
+  }
 
   delete [] data;
 }
@@ -239,8 +238,18 @@ math::Vector2i HeightmapShape::GetVertexCount() const
 /////////////////////////////////////////////////
 float HeightmapShape::GetHeight(int _x, int _y) const
 {
-  return this->heights[(_y * this->subSampling) * this->vertSize +
-                       (_x * this->subSampling)];
+  if (_x < 0 || _y < 0)
+    return 0.0;
+
+  std::cout << "GetHeight[" << _x << " " << _y << "] = " << this->heights[_y * this->vertSize + _x] << std::endl;
+
+  //int index = _y * this->vertSize + _x;
+  /*if (_x == 1 && _y == 0)
+    printf("HeightmapShape::GetHeight Index[%d]H[%f]\n", index,
+        this->heights[_y * this->vertSize + (_x * this->subSampling)]);
+        */
+
+  return this->heights[_y * this->vertSize + _x];
 }
 
 /////////////////////////////////////////////////
