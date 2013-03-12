@@ -323,7 +323,6 @@ void Connection::ProcessWriteQueue(bool _blocking)
   }
 }
 
-
 //////////////////////////////////////////////////
 std::string Connection::GetLocalURI() const
 {
@@ -391,10 +390,11 @@ void Connection::Close()
 
   if (this->socket && this->socket->is_open())
   {
-    this->ProcessWriteQueue();
     try
     {
       this->socket->close();
+      boost::system::error_code ec;
+      this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     }
     catch(boost::system::system_error &e)
     {
@@ -402,6 +402,9 @@ void Connection::Close()
       // gzwarn << "Error closing socket[" << this->id << "] ["
              // << e.what() << "]\n";
     }
+
+    delete this->socket;
+    this->socket = NULL;
   }
 
   if (this->acceptor && this->acceptor->is_open())
@@ -464,7 +467,7 @@ bool Connection::Read(std::string &data)
   std::size_t incoming_size;
   boost::system::error_code error;
 
-  boost::scoped_lock lock(this->readMutex);
+  boost::recursive_mutex::scoped_lock lock(this->readMutex);
 
   // First read the header
   this->socket->read_some(boost::asio::buffer(header), error);
