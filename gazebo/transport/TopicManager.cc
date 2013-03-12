@@ -143,22 +143,13 @@ void TopicManager::ProcessNodes(bool _onlyOut)
 }
 
 //////////////////////////////////////////////////
-void TopicManager::Publish(const std::string &_topic,
-                           const google::protobuf::Message &_message,
-                           const boost::function<void()> &_cb)
+void TopicManager::Publish(const std::string &_topic, MessagePtr _message,
+    const boost::function<void()> &_cb)
 {
   PublicationPtr pub = this->FindPublication(_topic);
-  PublicationPtr dbgPub = this->FindPublication(_topic+"/__dbg");
 
   if (pub)
     pub->Publish(_message, _cb);
-
-  if (dbgPub && dbgPub->GetCallbackCount() > 0)
-  {
-    msgs::GzString dbgMsg;
-    dbgMsg.set_data(_message.DebugString());
-    dbgPub->Publish(dbgMsg);
-  }
 }
 
 //////////////////////////////////////////////////

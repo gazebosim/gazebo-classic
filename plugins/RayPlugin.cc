@@ -19,6 +19,7 @@
  * Author: Nate Koenig mod by John Hsu
  */
 
+#include "gazebo/util/Diagnostics.hh"
 #include "physics/physics.hh"
 #include "RayPlugin.hh"
 
@@ -59,5 +60,7 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
 /////////////////////////////////////////////////
 void RayPlugin::OnNewLaserScans()
 {
+  DIAG_TIMER_START("TEST");
+  DIAG_TIMER_STOP("TEST");
   /* overload with useful callback here */
 }

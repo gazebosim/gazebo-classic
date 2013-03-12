@@ -67,8 +67,8 @@ class CurveData: public QwtArraySeriesData<QPointF>
   public: inline void Add(const QPointF &_point)
           {
             this->d_samples += _point;
-            if (this->d_samples.size() > 11000)
-              this->d_samples.remove(0, 1000);
+            // if (this->d_samples.size() > 11000)
+            //  this->d_samples.remove(0, 1000);
           }
 
   public: void Clear()

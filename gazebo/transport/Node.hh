@@ -120,9 +120,9 @@ namespace gazebo
       /// \return True if a latched subscriber exists.
       public: bool HasLatchedSubscriber(const std::string &_topic) const;
 
- 
+
       /// \brief A convenience function for a one-time publication of
-      /// a message. This is inefficient, compared to 
+      /// a message. This is inefficient, compared to
       /// Node::Advertise followed by Publisher::Publish. This function
       /// should only be used when sending a message very infrequently.
       /// \param[in] _topic The topic to advertise
@@ -287,6 +287,12 @@ namespace gazebo
       public: bool HandleData(const std::string &_topic,
                               const std::string &_msg);
 
+      /// \brief Handle incoming msg.
+      /// \param[in] _topic Topic for which the data was received
+      /// \param[in] _msg The message that was received
+      /// \return true if the message was handled successfully, false otherwise
+      public: bool HandleMessage(const std::string &_topic, MessagePtr _msg);
+
       /// \brief Add a latched message to the node for publication.
       ///
       /// This is called when a subscription is connected to a
@@ -295,6 +301,15 @@ namespace gazebo
       /// \param[in] _msg The message to publish.
       public: void InsertLatchedMsg(const std::string &_topic,
                                     const std::string &_msg);
+
+      /// \brief Add a latched message to the node for publication.
+      ///
+      /// This is called when a subscription is connected to a
+      /// publication.
+      /// \param[in] _topic Name of the topic to publish data on.
+      /// \param[in] _msg The message to publish.
+      public: void InsertLatchedMsg(const std::string &_topic,
+                                    MessagePtr _msg);
 
       /// \brief Get the message type for a topic
       /// \param[in] _topic The topic
@@ -319,6 +334,8 @@ namespace gazebo
       private: typedef std::map<std::string, Callback_L> Callback_M;
       private: Callback_M callbacks;
       private: std::map<std::string, std::list<std::string> > incomingMsgs;
+      private: std::map<std::string, std::list<MessagePtr> > incomingMsgsB;
+
       private: boost::recursive_mutex publisherMutex;
       private: boost::recursive_mutex incomingMutex;
 
