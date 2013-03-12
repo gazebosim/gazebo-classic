@@ -272,7 +272,7 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 }
 
 /////////////////////////////////////////////////
-void Connection::ProcessWriteQueue()
+void Connection::ProcessWriteQueue(bool _blocking)
 {
   if (!this->IsOpen())
   {
@@ -301,24 +301,28 @@ void Connection::ProcessWriteQueue()
   // Write the serialized data to the socket. We use
   // "gather-write" to send both the head and the data in
   // a single write operation
-  boost::asio::async_write(*this->socket, buffer->data(),
-    boost::bind(&Connection::OnWrite, shared_from_this(),
-    boost::asio::placeholders::error, buffer));
-
-  /*
-  try
+  if (!_blocking)
   {
-    boost::asio::write(*this->socket, buffer->data());
+    boost::asio::async_write(*this->socket, buffer->data(),
+        boost::bind(&Connection::OnWrite, shared_from_this(),
+          boost::asio::placeholders::error, buffer));
   }
-  catch(...)
+  else
   {
-    this->Shutdown();
-  }
+    try
+    {
+      boost::asio::write(*this->socket, buffer->data());
+    }
+    catch(...)
+    {
+      this->Shutdown();
+    }
 
-  this->writeCount--;
-  delete buffer;
-  */
+    this->writeCount--;
+    delete buffer;
+  }
 }
+
 
 //////////////////////////////////////////////////
 std::string Connection::GetLocalURI() const
@@ -352,33 +356,15 @@ void Connection::OnWrite(const boost::system::error_code &_e,
 //////////////////////////////////////////////////
 void Connection::Shutdown()
 {
-  this->ProcessWriteQueue();
-
-  int iters = 0;
-  while (this->writeCount > 0 && iters < 50)
-  {
-    common::Time::MSleep(10);
-    iters++;
-  }
-
-  this->shutdown();
-  // this->StopRead();
+  if (!this->socket)
+    return;
 
   this->Cancel();
 
+  // Shutdown the TBB task
+  this->shutdown();
+
   this->Close();
-
-  {
-    boost::mutex::scoped_lock lock(this->socketMutex);
-    boost::system::error_code ec;
-    if (this->socket)
-    {
-      this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-    }
-
-    delete this->socket;
-    this->socket = NULL;
-  }
 }
 
 //////////////////////////////////////////////////
