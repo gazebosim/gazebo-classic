@@ -36,7 +36,7 @@ TEST_F(ContactSensor, EmptyWorld)
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Test contact sensor using two configurations. Both places a sphere over
+// Test contact sensor using two configurations. Both place a sphere over
 // a box collision contact sensor. It is expected that there is one point of
 // contact in the negative z direction (world frame). The second contact sensor
 // model differ from the first in that it is rotated by 90 degrees about the
