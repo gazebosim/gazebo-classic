@@ -53,6 +53,9 @@ namespace gazebo
       /// \return true if the message was handled successfully, false otherwise
       public: virtual bool HandleData(const std::string &_newdata);
 
+      // Documentation inherited
+      public: virtual bool HandleMessage(MessagePtr _newMsg);
+
       /// \brief Get the connection we're using
       /// \return Pointer to the connection we're using
       public: const ConnectionPtr &GetConnection() const;

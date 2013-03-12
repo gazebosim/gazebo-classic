@@ -64,6 +64,8 @@ Connection::Connection()
   iomanager->IncCount();
   this->id = idCounter++;
 
+  this->connectMutex = new boost::mutex();
+  this->readMutex = new boost::recursive_mutex();
   this->acceptor = NULL;
   this->readQuit = false;
   this->writeQueue.clear();
@@ -78,7 +80,12 @@ Connection::Connection()
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
+  this->ProcessWriteQueue();
+  this->writeQueue.clear();
   this->Shutdown();
+
+  delete this->readMutex;
+  this->readMutex = NULL;
 
   if (iomanager)
   {
@@ -95,7 +102,7 @@ Connection::~Connection()
 //////////////////////////////////////////////////
 bool Connection::Connect(const std::string &_host, unsigned int _port)
 {
-  boost::mutex::scoped_lock lock(this->connectMutex);
+  boost::mutex::scoped_lock lock(*this->connectMutex);
 
   std::string service = boost::lexical_cast<std::string>(_port);
 
@@ -272,7 +279,7 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 }
 
 /////////////////////////////////////////////////
-void Connection::ProcessWriteQueue(bool _blocking)
+void Connection::ProcessWriteQueue()
 {
   if (!this->IsOpen())
   {
@@ -301,26 +308,23 @@ void Connection::ProcessWriteQueue(bool _blocking)
   // Write the serialized data to the socket. We use
   // "gather-write" to send both the head and the data in
   // a single write operation
-  if (!_blocking)
-  {
-    boost::asio::async_write(*this->socket, buffer->data(),
-        boost::bind(&Connection::OnWrite, shared_from_this(),
-          boost::asio::placeholders::error, buffer));
-  }
-  else
-  {
-    try
-    {
-      boost::asio::write(*this->socket, buffer->data());
-    }
-    catch(...)
-    {
-      this->Shutdown();
-    }
+  boost::asio::async_write(*this->socket, buffer->data(),
+    boost::bind(&Connection::OnWrite, shared_from_this(),
+    boost::asio::placeholders::error, buffer));
 
-    this->writeCount--;
-    delete buffer;
+  /*
+  try
+  {
+    boost::asio::write(*this->socket, buffer->data());
   }
+  catch(...)
+  {
+    this->Shutdown();
+  }
+
+  this->writeCount--;
+  delete buffer;
+  */
 }
 
 //////////////////////////////////////////////////
@@ -355,15 +359,33 @@ void Connection::OnWrite(const boost::system::error_code &_e,
 //////////////////////////////////////////////////
 void Connection::Shutdown()
 {
-  if (!this->socket)
-    return;
+  this->ProcessWriteQueue();
+
+  int iters = 0;
+  while (this->writeCount > 0 && iters < 50)
+  {
+    common::Time::MSleep(10);
+    iters++;
+  }
+
+  this->shutdown();
+  // this->StopRead();
 
   this->Cancel();
 
-  // Shutdown the TBB task
-  this->shutdown();
-
   this->Close();
+
+  {
+    boost::mutex::scoped_lock lock(this->socketMutex);
+    boost::system::error_code ec;
+    if (this->socket)
+    {
+      this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    }
+
+    delete this->socket;
+    this->socket = NULL;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -390,11 +412,10 @@ void Connection::Close()
 
   if (this->socket && this->socket->is_open())
   {
+    this->ProcessWriteQueue();
     try
     {
       this->socket->close();
-      boost::system::error_code ec;
-      this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     }
     catch(boost::system::system_error &e)
     {
@@ -402,9 +423,6 @@ void Connection::Close()
       // gzwarn << "Error closing socket[" << this->id << "] ["
              // << e.what() << "]\n";
     }
-
-    delete this->socket;
-    this->socket = NULL;
   }
 
   if (this->acceptor && this->acceptor->is_open())
@@ -467,7 +485,7 @@ bool Connection::Read(std::string &data)
   std::size_t incoming_size;
   boost::system::error_code error;
 
-  boost::recursive_mutex::scoped_lock lock(this->readMutex);
+  this->readMutex->lock();
 
   // First read the header
   this->socket->read_some(boost::asio::buffer(header), error);
@@ -505,6 +523,7 @@ bool Connection::Read(std::string &data)
     result = true;
   }
 
+  this->readMutex->unlock();
   return result;
 }
 
@@ -791,7 +810,7 @@ void Connection::OnConnect(const boost::system::error_code &_error,
   // This function is called when a connection is successfully (or
   // unsuccessfully) established.
 
-  boost::mutex::scoped_lock lock(this->connectMutex);
+  boost::mutex::scoped_lock lock(*this->connectMutex);
   if (_error == 0)
   {
     this->remoteURI = std::string("http://") + this->GetRemoteHostname()

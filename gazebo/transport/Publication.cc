@@ -34,7 +34,6 @@ Publication::Publication(const std::string &_topic, const std::string &_msgType)
 //////////////////////////////////////////////////
 Publication::~Publication()
 {
-  boost::mutex::scoped_lock lock(this->callbackMutex);
   this->publishers.clear();
 }
 
@@ -56,14 +55,12 @@ void Publication::AddSubscription(const NodePtr &_node)
       this->nodes.push_back(_node);
     }
 
-    boost::mutex::scoped_lock lock(this->callbackMutex);
-
     std::vector<PublisherPtr>::iterator pubIter;
     for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
          ++pubIter)
     {
-      if (!(*pubIter)->GetPrevMsg().empty())
-        _node->InsertLatchedMsg(this->topic, (*pubIter)->GetPrevMsg());
+      if ((*pubIter)->GetPrevMsgPtr())
+        _node->InsertLatchedMsg(this->topic, (*pubIter)->GetPrevMsgPtr());
     }
   }
 }
@@ -86,8 +83,8 @@ void Publication::AddSubscription(const CallbackHelperPtr _callback)
       for (pubIter = this->publishers.begin();
            pubIter != this->publishers.end(); ++pubIter)
       {
-        if (!(*pubIter)->GetPrevMsg().empty())
-          _callback->HandleData((*pubIter)->GetPrevMsg());
+        if ((*pubIter)->GetPrevMsgPtr())
+          _callback->HandleMessage((*pubIter)->GetPrevMsgPtr());
       }
     }
   }
@@ -266,12 +263,8 @@ void Publication::LocalPublish(const std::string &data)
 }
 
 //////////////////////////////////////////////////
-void Publication::Publish(const google::protobuf::Message &_msg,
-                          const boost::function<void()> &_cb)
+void Publication::Publish(MessagePtr _msg, const boost::function<void()> &_cb)
 {
-  std::string data;
-  _msg.SerializeToString(&data);
-
   std::list<NodePtr>::iterator iter, endIter;
 
   {
@@ -281,7 +274,7 @@ void Publication::Publish(const google::protobuf::Message &_msg,
     endIter = this->nodes.end();
     while (iter != endIter)
     {
-      if ((*iter)->HandleData(this->topic, data))
+      if ((*iter)->HandleMessage(this->topic, _msg))
         ++iter;
       else
         this->nodes.erase(iter++);
@@ -295,15 +288,21 @@ void Publication::Publish(const google::protobuf::Message &_msg,
 
   {
     boost::mutex::scoped_lock lock(this->callbackMutex);
-    std::list<CallbackHelperPtr>::iterator cbIter;
-    cbIter = this->callbacks.begin();
 
-    while (cbIter != this->callbacks.end())
+    if (this->callbacks.size() > 0)
     {
-      if ((*cbIter)->HandleData(data))
-        ++cbIter;
-      else
-        this->callbacks.erase(cbIter++);
+      std::string data;
+      _msg->SerializeToString(&data);
+      std::list<CallbackHelperPtr>::iterator cbIter;
+      cbIter = this->callbacks.begin();
+
+      while (cbIter != this->callbacks.end())
+      {
+        if ((*cbIter)->HandleData(data))
+          ++cbIter;
+        else
+          this->callbacks.erase(cbIter++);
+      }
     }
   }
 
@@ -368,7 +367,6 @@ void Publication::SetLocallyAdvertised(bool _value)
 //////////////////////////////////////////////////
 void Publication::AddPublisher(PublisherPtr _pub)
 {
-  boost::mutex::scoped_lock lock(this->callbackMutex);
   this->publishers.push_back(_pub);
 }
 

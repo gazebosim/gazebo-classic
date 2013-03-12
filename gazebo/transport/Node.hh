@@ -18,6 +18,7 @@
 #ifndef _NODE_HH_
 #define _NODE_HH_
 
+#include <tbb/task.h>
 #include <boost/enable_shared_from_this.hpp>
 #include <map>
 #include <list>
@@ -31,6 +32,41 @@ namespace gazebo
 {
   namespace transport
   {
+
+    /// \cond
+    /// \brief Task used by Node::Publish to publish on a one-time publisher
+    class PublishTask : public tbb::task
+    {
+      /// \brief Constructor
+      /// \param[in] _pub Publisher to publish the message on.
+      /// \param[in] _message Message to publish
+      public: PublishTask(transport::PublisherPtr _pub,
+                  const google::protobuf::Message &_message)
+              : pub(_pub)
+      {
+        this->msg = _message.New();
+        this->msg->CopyFrom(_message);
+      }
+
+      /// \brief Overridden function from tbb::task that exectues the
+      /// publish task.
+      public: tbb::task *execute()
+              {
+                this->pub->WaitForConnection();
+                this->pub->Publish(*this->msg, true);
+                delete this->msg;
+                this->pub.reset();
+                return NULL;
+              }
+
+      /// \brief Pointer to the publisher.
+      private: transport::PublisherPtr pub;
+
+      /// \brief Message to publish
+      private: google::protobuf::Message *msg;
+    };
+    /// \endcond
+
     /// \addtogroup gazebo_transport
     /// \{
 
@@ -83,6 +119,25 @@ namespace gazebo
       /// \param[in] _topic Name of the topic to check.
       /// \return True if a latched subscriber exists.
       public: bool HasLatchedSubscriber(const std::string &_topic) const;
+
+
+      /// \brief A convenience function for a one-time publication of
+      /// a message. This is inefficient, compared to
+      /// Node::Advertise followed by Publisher::Publish. This function
+      /// should only be used when sending a message very infrequently.
+      /// \param[in] _topic The topic to advertise
+      /// \param[in] _message Message to be published
+      public: template<typename M>
+              void Publish(const std::string &_topic,
+                  const google::protobuf::Message &_message)
+              {
+                transport::PublisherPtr pub = this->Advertise<M>(_topic);
+                PublishTask *task = new(tbb::task::allocate_root())
+                  PublishTask(pub, _message);
+
+                tbb::task::enqueue(*task);
+                return;
+              }
 
       /// \brief Adverise a topic
       /// \param[in] _topic The topic to advertise
@@ -232,6 +287,12 @@ namespace gazebo
       public: bool HandleData(const std::string &_topic,
                               const std::string &_msg);
 
+      /// \brief Handle incoming msg.
+      /// \param[in] _topic Topic for which the data was received
+      /// \param[in] _msg The message that was received
+      /// \return true if the message was handled successfully, false otherwise
+      public: bool HandleMessage(const std::string &_topic, MessagePtr _msg);
+
       /// \brief Add a latched message to the node for publication.
       ///
       /// This is called when a subscription is connected to a
@@ -240,6 +301,15 @@ namespace gazebo
       /// \param[in] _msg The message to publish.
       public: void InsertLatchedMsg(const std::string &_topic,
                                     const std::string &_msg);
+
+      /// \brief Add a latched message to the node for publication.
+      ///
+      /// This is called when a subscription is connected to a
+      /// publication.
+      /// \param[in] _topic Name of the topic to publish data on.
+      /// \param[in] _msg The message to publish.
+      public: void InsertLatchedMsg(const std::string &_topic,
+                                    MessagePtr _msg);
 
       /// \brief Get the message type for a topic
       /// \param[in] _topic The topic
@@ -264,6 +334,8 @@ namespace gazebo
       private: typedef std::map<std::string, Callback_L> Callback_M;
       private: Callback_M callbacks;
       private: std::map<std::string, std::list<std::string> > incomingMsgs;
+      private: std::map<std::string, std::list<MessagePtr> > incomingMsgsB;
+
       private: boost::recursive_mutex publisherMutex;
       private: boost::recursive_mutex incomingMutex;
 

@@ -66,7 +66,7 @@ namespace gazebo
                 this->data = _data;
               }
 
-      /// \bried Overridden function from tbb::task that exectues the data
+      /// \brief Overridden function from tbb::task that exectues the data
       /// callback.
       public: tbb::task *execute()
               {
@@ -214,11 +214,16 @@ namespace gazebo
                 {
                   if (_e.message() != "End of File")
                   {
+                    try
+                    {
+                      this->Shutdown();
+                    }
+                    catch(...)
+                    {
+                    }
                     // This will occur when the other side closes the
                     // connection. We don't want spew error messages in this
                     // case.
-                    //
-                    // It's okay to do nothing here.
                   }
                 }
                 else
@@ -313,7 +318,7 @@ namespace gazebo
               {this->shutdown.Disconnect(_subscriber);}
 
       /// \brief Handle on-write callbacks
-      public: void ProcessWriteQueue(bool _blocking = false);
+      public: void ProcessWriteQueue();
 
       /// \brief Get the ID of the connection.
       /// \return The connection's unique ID.
@@ -370,13 +375,13 @@ namespace gazebo
       private: std::deque<std::string> writeQueue;
 
       /// \brief Mutex to protect new connections.
-      private: boost::mutex connectMutex;
+      private: boost::mutex *connectMutex;
 
       /// \brief Mutex to protect write.
       private: boost::recursive_mutex writeMutex;
 
       /// \brief Mutex to protect reads.
-      private: boost::recursive_mutex readMutex;
+      private: boost::recursive_mutex *readMutex;
 
       /// \brief Mutex to protect socket close.
       private: mutable boost::mutex socketMutex;
