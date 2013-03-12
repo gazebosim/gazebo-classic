@@ -24,8 +24,7 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/rtql8/RTQL8Model.hh"
 #include "gazebo/physics/rtql8/RTQL8HingeJoint.hh"
-
-
+#include "gazebo/physics/rtql8/RTQL8Utils.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -150,16 +149,8 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
   //---- Step 3. Transformation from rotated joint frame to child link frame.
   poseJointToChildLink = -poseChildLinkToJoint;
 
-  rtql8::kinematics::Dof* tranJ2CL_X
-          = new rtql8::kinematics::Dof(poseJointToChildLink.pos.x);
-  rtql8::kinematics::Dof* tranJ2CL_Y
-          = new rtql8::kinematics::Dof(poseJointToChildLink.pos.y);
-  rtql8::kinematics::Dof* tranJ2CL_Z
-          = new rtql8::kinematics::Dof(poseJointToChildLink.pos.z);
-
   rtql8::kinematics::TrfmTranslate* tranJ2CL
-      = new rtql8::kinematics::TrfmTranslate(
-              tranJ2CL_X, tranJ2CL_Y, tranJ2CL_Z);
+      = RTQL8Utils::createTrfmTranslate(poseChildLinkToJoint.pos);
 
   this->rtql8Joint->addTransform(tranJ2CL, false);
 

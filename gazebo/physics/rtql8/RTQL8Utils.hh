@@ -40,6 +40,10 @@ namespace gazebo
       /// \brief Convert from Eigen::Matrix4d to gazebo::math::Pose.
       public: static void ConvMatToPose(math::Pose* _pose,
                                         const Eigen::Matrix4d& _mat);
+
+      /// \brief
+      public: static rtql8::kinematics::TrfmTranslate* createTrfmTranslate(
+          const math::Vector3& _vec);
     };
     /// \}
   }

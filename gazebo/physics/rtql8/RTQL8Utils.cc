@@ -55,3 +55,17 @@ void RTQL8Utils::ConvMatToPose(math::Pose* _pose, const Eigen::Matrix4d& _mat)
   Eigen::Quaterniond quat = rtql8::utils::rotation::matrixToQuat(mat3x3);
   _pose->rot.Set(quat.w(), quat.x(), quat.y(), quat.z());
 }
+
+//////////////////////////////////////////////////
+rtql8::kinematics::TrfmTranslate* RTQL8Utils::createTrfmTranslate(
+    const math::Vector3& _vec)
+{
+  rtql8::kinematics::Dof* dofX = new rtql8::kinematics::Dof(_vec.x);
+  rtql8::kinematics::Dof* dofY = new rtql8::kinematics::Dof(_vec.y);
+  rtql8::kinematics::Dof* dofZ = new rtql8::kinematics::Dof(_vec.z);
+
+  rtql8::kinematics::TrfmTranslate* ret
+      = new rtql8::kinematics::TrfmTranslate(dofX, dofY, dofZ);
+
+  return ret;
+}
