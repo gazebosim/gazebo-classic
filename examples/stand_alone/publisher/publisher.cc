@@ -33,30 +33,31 @@ int main()
   // Create our node for communication
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
   node->Init();
-  
+
   // Start transport
   gazebo::transport::run();
 
   // Publish to a Gazebo topic
-  gazebo::transport::PublisherPtr pub = node->Advertise<gazebo::msgs::Pose>("~/pose_example");
-  
+  gazebo::transport::PublisherPtr pub =
+    node->Advertise<gazebo::msgs::Pose>("~/pose_example");
+
   // Wait for a subscriber to connect
   pub->WaitForConnection();
-  
+
   // Generate a pose
-  gazebo::math::Pose pose(1,2,3,4,5,6);
-  
+  gazebo::math::Pose pose(1, 2, 3, 4, 5, 6);
+
   // Convert to a pose message
   gazebo::msgs::Pose msg;
   gazebo::msgs::Set(&msg, pose);
-    
+
   // Busy wait loop...replace with your own code as needed.
   while (true)
   {
     gazebo::common::Time::MSleep(100);
     pub->Publish(msg);
-  }  
-    
+  }
+
   // Make sure to shut everything down.
   gazebo::transport::fini();
 }

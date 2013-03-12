@@ -18,6 +18,8 @@
 #ifndef __GAZEBO_SkidSteerDrive_PLUGIN_HH__
 #define __GAZEBO_SkidSteerDrive_PLUGIN_HH__
 
+#include <string>
+
 #include "common/common.hh"
 #include "physics/physics.hh"
 #include "transport/TransportTypes.hh"
@@ -31,14 +33,14 @@ namespace gazebo
   {
     public: SkidSteerDrivePlugin();
     public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
-    
+
     public: enum {RIGHT_FRONT, RIGHT_REAR, LEFT_FRONT, LEFT_REAR};
 
-    private: int RegisterJoint(int index, std::string name);
+    private: int RegisterJoint(int _index, const std::string _name);
     private: void OnVelMsg(ConstPosePtr &_msg);
 
     private: transport::NodePtr node;
-    private: transport::SubscriberPtr velSub; 
+    private: transport::SubscriberPtr velSub;
 
     private: physics::ModelPtr model;
     private: physics::JointPtr Joints[NUMBER_OF_WHEELS];
@@ -46,7 +48,6 @@ namespace gazebo
     private: double MaxForce;
     private: double wheelSeparation;
     private: double wheelRadius;
-    
   };
 }
 #endif
