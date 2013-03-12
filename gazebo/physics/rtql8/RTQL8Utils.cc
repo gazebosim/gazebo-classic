@@ -45,13 +45,13 @@ void RTQL8Utils::ConvPoseToMat(Eigen::Matrix4d* _mat, const math::Pose& _pose)
 //////////////////////////////////////////////////
 void RTQL8Utils::ConvMatToPose(math::Pose* _pose, const Eigen::Matrix4d& _mat)
 {
-    assert(_pose);
+  assert(_pose);
 
-    // Set position
-    _pose->pos.Set(_mat(0,3), _mat(1,3), _mat(2,3));
+  // Set position
+  _pose->pos.Set(_mat(0,3), _mat(1,3), _mat(2,3));
 
-    // Set rotation
-    Eigen::Matrix3d mat3x3 = _mat.topLeftCorner(3,3);
-    Eigen::Quaterniond quat = rtql8::utils::rotation::matrixToQuat(mat3x3);
-    _pose->rot.Set(quat.w(), quat.x(), quat.y(), quat.z());
+  // Set rotation
+  Eigen::Matrix3d mat3x3 = _mat.topLeftCorner(3,3);
+  Eigen::Quaterniond quat = rtql8::utils::rotation::matrixToQuat(mat3x3);
+  _pose->rot.Set(quat.w(), quat.x(), quat.y(), quat.z());
 }
