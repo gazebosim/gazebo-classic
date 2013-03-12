@@ -158,21 +158,31 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
     g_playAct->setChecked(true);
   }
 
-  unsigned int hour, min, sec, msec;
+  unsigned int day, hour, min, sec, msec;
 
   // Set simulation time
   {
     stream.str("");
 
     sec = _msg->sim_time().sec();
+
+    day = sec / 86400;
+    sec -= day * 86400;
+
     hour = sec / 3600;
-    min = (sec - hour * 3600) / 60;
-    sec = (sec - hour * 3600 - min * 60);
+    sec -= hour * 3600;
+
+    min = sec / 60;
+    sec -= min * 60;
+
     msec = rint(_msg->sim_time().nsec() * 1e-6);
 
-    stream << std::setw(2) << std::setfill('0') << hour << ":" << min
-           << ":" << sec;
-    stream << std::setw(3) << std::setfill('0')  << "." << msec;
+    stream << std::setw(2) << std::setfill('0') << day << " ";
+    stream << std::setw(2) << std::setfill('0') << hour << ":";
+    stream << std::setw(2) << std::setfill('0') << min << ":";
+    stream << std::setw(2) << std::setfill('0') << sec << ".";
+    stream << std::setw(3) << std::setfill('0') << msec;
+
     this->SetSimTime(QString::fromStdString(stream.str()));
   }
 
@@ -181,14 +191,24 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
     stream.str("");
 
     sec = _msg->real_time().sec();
+
+    day = sec / 86400;
+    sec -= day * 86400;
+
     hour = sec / 3600;
-    min = (sec - hour * 3600) / 60;
-    sec = (sec - hour * 3600 - min * 60);
+    sec -= hour * 3600;
+
+    min = sec / 60;
+    sec -= min * 60;
+
     msec = rint(_msg->sim_time().nsec() * 1e-6);
 
-    stream << std::setw(2) << std::setfill('0') << hour << ":" << min
-           << ":" << sec;
-    stream << std::setw(3) << std::setfill('0')  << "." << msec;
+    stream << std::setw(2) << std::setfill('0') << day << " ";
+    stream << std::setw(2) << std::setfill('0') << hour << ":";
+    stream << std::setw(2) << std::setfill('0') << min << ":";
+    stream << std::setw(2) << std::setfill('0') << sec << ".";
+    stream << std::setw(3) << std::setfill('0') << msec;
+
     this->SetRealTime(QString::fromStdString(stream.str()));
   }
 
