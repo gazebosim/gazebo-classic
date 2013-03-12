@@ -489,6 +489,8 @@ void World::Step()
       this->iterations++;
       this->Update();
 
+      DIAG_TIMER_LAP("World::Step", "update");
+
       if (this->IsPaused() && this->stepInc > 0)
         this->stepInc--;
     }
@@ -612,6 +614,8 @@ void World::Update()
     DIAG_TIMER_LAP("World::Update", "stateLog");
   }
 
+  DIAG_TIMER_LAP("World::Update", "LogRecord");
+
   event::Events::worldUpdateEnd();
   DIAG_TIMER_LAP("World::Update", "endEvent");
 
@@ -623,6 +627,8 @@ void World::Fini()
 {
   this->Stop();
   this->plugins.clear();
+
+  this->publishModelPoses.clear();
 
   this->node->Fini();
 
