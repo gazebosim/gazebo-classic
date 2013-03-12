@@ -24,11 +24,8 @@
       <uri>model://sun</uri>
     </include>
     <model name="model_1">
-      <pose>0 0 0 0 0 0</pose>
       <link name="link_1">
-        <pose>0 0 0 0 0 0</pose>
         <inertial>
-          <pose>0 0 0 0 0 0</pose>
           <inertia>
             <ixx>1.000000</ixx>
             <ixy>0.000000</ixy>
@@ -102,7 +99,6 @@
       <joint name="joint_0" type="revolute">
         <parent>world</parent>
         <child>link_1</child>
-        <pose>0 0 0 0 0 0</pose>
         <axis>
           <limit>
             <!-- effectively fixed -->
@@ -123,7 +119,6 @@
       <joint name="joint_1" type="universal">
         <parent>link_1</parent>
         <child>link_2</child>
-        <pose>0 0 0 0 0 0</pose>
         <axis>
           <limit>
             <lower>-0.7</lower>
