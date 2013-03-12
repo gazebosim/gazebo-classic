@@ -865,7 +865,8 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           oldVel = newVel;
 
           // Check that GetForce returns what we set
-          EXPECT_NEAR(joint->GetForce(0), force, PHYSICS_TOL);
+          EXPECT_NEAR(joint->GetForce(0u),
+              force, PHYSICS_TOL);
 
           // Expect joint velocity to be near angular velocity difference
           // of child and parent, along global axis
@@ -891,7 +892,8 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           EXPECT_LT(newVel, oldVel);
 
           // Check that GetForce returns what we set
-          EXPECT_NEAR(joint->GetForce(0), force, PHYSICS_TOL);
+          EXPECT_NEAR(joint->GetForce(0u),
+              force, PHYSICS_TOL);
 
           // Expect joint velocity to be near angular velocity difference
           // of child and parent, along global axis
@@ -944,9 +946,9 @@ TEST_F(PhysicsTest, State)
   physics::CollisionState collisionState = linkState.GetCollisionState(0);
 
   math::Pose pose;
-  EXPECT_EQ(static_cast<unsigned int>(1), worldState.GetModelStateCount());
-  EXPECT_EQ(static_cast<unsigned int>(1), modelState.GetLinkStateCount());
-  EXPECT_EQ(static_cast<unsigned int>(1), linkState.GetCollisionStateCount());
+  EXPECT_EQ(1u, worldState.GetModelStateCount());
+  EXPECT_EQ(1u, modelState.GetLinkStateCount());
+  EXPECT_EQ(1u, linkState.GetCollisionStateCount());
   EXPECT_EQ(pose, modelState.GetPose());
   EXPECT_EQ(pose, linkState.GetPose());
   EXPECT_EQ(pose, collisionState.GetPose());

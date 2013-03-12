@@ -70,7 +70,7 @@ TEST_F(ODEJoint_TEST, GetForceTorque)
   {
     world->StepWorld(1);
     // test joint_01 wrench
-    physics::JointWrench wrench_01 = joint_01->GetForceTorque(0);
+    physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
     EXPECT_NEAR(wrench_01.body1Force.x,    0.0, TOL);
     EXPECT_NEAR(wrench_01.body1Force.y,    0.0, TOL);
     EXPECT_NEAR(wrench_01.body1Force.z, 1000.0, TOL);
@@ -93,7 +93,7 @@ TEST_F(ODEJoint_TEST, GetForceTorque)
           << "]\n";
 
     // test joint_12 wrench
-    physics::JointWrench wrench_12 = joint_12->GetForceTorque(0);
+    physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
     EXPECT_NEAR(wrench_12.body1Force.x,    0.0, TOL);
     EXPECT_NEAR(wrench_12.body1Force.y,    0.0, TOL);
     EXPECT_NEAR(wrench_12.body1Force.z,  500.0, TOL);
@@ -130,7 +130,7 @@ TEST_F(ODEJoint_TEST, GetForceTorque)
     world->StepWorld(1);
 
     // test joint_01 wrench
-    physics::JointWrench wrench_01 = joint_01->GetForceTorque(0);
+    physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
     EXPECT_NEAR(wrench_01.body1Force.x,   600.0,  6.0);
     EXPECT_NEAR(wrench_01.body1Force.y, -1000.0, 10.0);
     EXPECT_NEAR(wrench_01.body1Force.z,  -200.0,  2.0);
@@ -154,7 +154,7 @@ TEST_F(ODEJoint_TEST, GetForceTorque)
           << "]\n";
 
     // test joint_12 wrench
-    physics::JointWrench wrench_12 = joint_12->GetForceTorque(0);
+    physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
     EXPECT_NEAR(wrench_12.body1Force.x,   300.0,  3.0);
     EXPECT_NEAR(wrench_12.body1Force.y,  -500.0,  5.0);
     EXPECT_NEAR(wrench_12.body1Force.z,  -100.0,  1.0);
