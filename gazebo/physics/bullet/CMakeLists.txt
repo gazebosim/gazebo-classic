@@ -52,6 +52,7 @@ set (headers
 
 set (gtest_sources
   BulletTypes_TEST.cc
+  BulletJoint_TEST.cc
 )
 gz_build_tests(${gtest_sources})
 

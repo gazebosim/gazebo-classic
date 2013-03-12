@@ -58,6 +58,10 @@ namespace gazebo
       /// \brief Determines of the two bodies are connected by a joint
       public: bool AreConnected(LinkPtr _one, LinkPtr _two) const;
 
+      /// \brief Get the feedback data structure for this joint, if set
+      /// \return Pointer to the joint feedback.
+      public: btJointFeedback *GetFeedback();
+
       /// \brief Detach this joint from all bodies
       public: virtual void Detach();
 
@@ -107,6 +111,9 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);
+
+      /// \brief Feedback data for this joint
+      protected: btJointFeedback *feedback;
     };
     /// \}
   }

@@ -164,6 +164,9 @@ void BulletHingeJoint::Init()
 
   // Allows access to impulse
   this->bulletHinge->enableFeedback(true);
+
+  this->feedback = new btJointFeedback();
+  this->constraint->setJointFeedback(this->feedback);
 }
 
 //////////////////////////////////////////////////
