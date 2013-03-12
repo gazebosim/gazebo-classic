@@ -32,7 +32,6 @@ namespace gazebo
 {
   namespace transport
   {
-
     /// \cond
     /// \brief Task used by Node::Publish to publish on a one-time publisher
     class PublishTask : public tbb::task

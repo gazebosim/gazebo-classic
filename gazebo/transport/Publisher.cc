@@ -83,7 +83,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
 
   if (!_message.IsInitialized())
   {
-    gzerr << "Publishing an uninitialized message on topic[" << 
+    gzerr << "Publishing an uninitialized message on topic[" <<
         this->topic << "]. Required field [" <<
         _message.InitializationErrorString() << "] missing.\n";
     return;

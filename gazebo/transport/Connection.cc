@@ -64,8 +64,6 @@ Connection::Connection()
   iomanager->IncCount();
   this->id = idCounter++;
 
-  this->connectMutex = new boost::mutex();
-  this->readMutex = new boost::recursive_mutex();
   this->acceptor = NULL;
   this->readQuit = false;
   this->writeQueue.clear();
@@ -80,12 +78,7 @@ Connection::Connection()
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
-  this->ProcessWriteQueue();
-  this->writeQueue.clear();
   this->Shutdown();
-
-  delete this->readMutex;
-  this->readMutex = NULL;
 
   if (iomanager)
   {
@@ -102,7 +95,7 @@ Connection::~Connection()
 //////////////////////////////////////////////////
 bool Connection::Connect(const std::string &_host, unsigned int _port)
 {
-  boost::mutex::scoped_lock lock(*this->connectMutex);
+  boost::mutex::scoped_lock lock(this->connectMutex);
 
   std::string service = boost::lexical_cast<std::string>(_port);
 
@@ -485,7 +478,7 @@ bool Connection::Read(std::string &data)
   std::size_t incoming_size;
   boost::system::error_code error;
 
-  this->readMutex->lock();
+  boost::scoped_lock lock(this->readMutex);
 
   // First read the header
   this->socket->read_some(boost::asio::buffer(header), error);
@@ -523,7 +516,6 @@ bool Connection::Read(std::string &data)
     result = true;
   }
 
-  this->readMutex->unlock();
   return result;
 }
 
@@ -810,7 +802,7 @@ void Connection::OnConnect(const boost::system::error_code &_error,
   // This function is called when a connection is successfully (or
   // unsuccessfully) established.
 
-  boost::mutex::scoped_lock lock(*this->connectMutex);
+  boost::mutex::scoped_lock lock(this->connectMutex);
   if (_error == 0)
   {
     this->remoteURI = std::string("http://") + this->GetRemoteHostname()
