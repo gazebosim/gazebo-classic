@@ -143,8 +143,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   math::Vector3 expectedForce;
   math::Vector3 expectedTorque;
 
-  double tolPercentage = 0.1;
-  double tol = 1e-2;
+  // double tolPercentage = 0.1;
+  // double tol = 1e-2;
   // double tolX, tolY, tolZ;
 
   // Run the test once for each contact sensor
