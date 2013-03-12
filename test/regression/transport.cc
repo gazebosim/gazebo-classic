@@ -54,6 +54,16 @@ void ReceiveWorldStatsDebugMsg(ConstGzStringPtr &/*_data*/)
   g_worldStatsDebugMsg = true;
 }
 
+unsigned int g_localPublishMessageCount = 1000;
+unsigned int g_localPublishCount = 0;
+common::Time g_localPublishEndTime;
+void LocalPublishCB(ConstImagePtr & /*_msg*/)
+{
+  if (g_localPublishCount+1 >= g_localPublishMessageCount)
+    g_localPublishEndTime = common::Time::GetWallTime();
+  g_localPublishCount++;
+}
+
 
 TEST_F(TransportTest, Load)
 {
@@ -168,6 +178,55 @@ TEST_F(TransportTest, Errors)
   testNode.reset();
 }
 
+
+TEST_F(TransportTest, LocalPublish)
+{
+  Load("worlds/empty.world");
+  transport::NodePtr testNode = transport::NodePtr(new transport::Node());
+  testNode->Init("default");
+
+  transport::PublisherPtr pub = testNode->Advertise<msgs::Image>(
+      "~/test/local_publish__");
+
+  transport::SubscriberPtr sub = testNode->Subscribe("~/test/local_publish__",
+      &LocalPublishCB);
+
+  unsigned int width = 2048;
+  unsigned int height = 2048;
+  unsigned char *fakeData = new unsigned char[width * height];
+
+  msgs::Image fakeMsg;
+  fakeMsg.set_width(width);
+  fakeMsg.set_height(height);
+  fakeMsg.set_pixel_format(0);
+  fakeMsg.set_step(1);
+  fakeMsg.set_data(fakeData, width*height);
+
+  common::Time startTime = common::Time::GetWallTime();
+  for (unsigned int i = 0; i < g_localPublishMessageCount; ++i)
+  {
+    pub->Publish(fakeMsg);
+  }
+
+  int waitCount = 0;
+  while (g_localPublishCount < g_localPublishMessageCount && waitCount < 50)
+  {
+    common::Time::MSleep(1000);
+    waitCount++;
+  }
+
+  // Time it took to publish the messages.
+  common::Time diff = g_localPublishEndTime - startTime;
+
+  EXPECT_LT(waitCount, 50);
+  EXPECT_EQ(diff.sec, 0);
+  EXPECT_LT(diff.nsec, 30000000);
+
+  gzmsg << "Time to publish " << g_localPublishMessageCount  << " messages = "
+    << diff << "\n";
+
+  delete [] fakeData;
+}
 
 // This test creates a child process to test interprocess communication
 // TODO: This test needs to be fixed
