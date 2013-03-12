@@ -9,6 +9,8 @@ set (files
   simple_pendulum_ode.world
   pendulums_rtql8.world
   pendulums_ode.world
+  poses_rtql8.world
+  poses_ode.world
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/rtql8)

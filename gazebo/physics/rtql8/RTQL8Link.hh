@@ -52,8 +52,8 @@ namespace gazebo
 
       /// \brief Update the body
       public: virtual void Update();
-	  
-	  // Documentation inherited
+
+    // Documentation inherited
       public: virtual void OnPoseChange();
 
       // Documentation inherited
@@ -169,7 +169,7 @@ namespace gazebo
 
       /// \brief
       private: rtql8::kinematics::BodyNode* rtql8BodyNode;
-	  
+
       /// \brief
       //private: RTQL8PhysicsPtr rtql8Physics;
 

@@ -21,12 +21,11 @@
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/physics/rtql8/rtql8_inc.h"
-//#include "physics/bullet/BulletCollision.hh"
-//#include "physics/bullet/BulletMotionState.hh"
 #include "gazebo/physics/rtql8/RTQL8Physics.hh"
 #include "gazebo/physics/rtql8/RTQL8Model.hh"
 #include "gazebo/physics/rtql8/RTQL8Link.hh"
 #include "gazebo/physics/rtql8/RTQL8Joint.hh"
+#include "gazebo/physics/rtql8/RTQL8Utils.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -97,14 +96,7 @@ void RTQL8Link::Init()
   // Set rtql8's body node transformation from gazebo's link pose.
   math::Pose worldPose = this->GetWorldPose();
   Eigen::Matrix4d newTrfm;
-  newTrfm.setZero();
-  Eigen::Quaterniond quat(worldPose.rot.w, worldPose.rot.x,
-                          worldPose.rot.y, worldPose.rot.z);
-  newTrfm.topLeftCorner(3, 3) = rtql8::utils::rotation::quatToMatrix(quat);
-  newTrfm(0, 3) = worldPose.pos.x;
-  newTrfm(1, 3) = worldPose.pos.y;
-  newTrfm(2, 3) = worldPose.pos.z;
-  newTrfm(3, 3) = 1.0;
+  RTQL8Utils::ConvPose(&newTrfm, worldPose);
   this->rtql8BodyNode->setWorldTransform(newTrfm);
 }
 
@@ -128,25 +120,25 @@ void RTQL8Link::OnPoseChange()
 
 //   if (!this->linkId)
 //     return;
-// 
+//
 //   this->SetEnabled(true);
-// 
+//
 //   const math::Pose myPose = this->GetWorldPose();
-// 
+//
 //   math::Vector3 cog = myPose.rot.RotateVector(this->inertial->GetCoG());
-// 
+//
 //   // adding cog location for ode pose
 //   dBodySetPosition(this->linkId,
 //       myPose.pos.x + cog.x,
 //       myPose.pos.y + cog.y,
 //       myPose.pos.z + cog.z);
-// 
+//
 //   dQuaternion q;
 //   q[0] = myPose.rot.w;
 //   q[1] = myPose.rot.x;
 //   q[2] = myPose.rot.y;
 //   q[3] = myPose.rot.z;
-// 
+//
 //   // Set the rotation of the ODE link
 //   dBodySetQuaternion(this->linkId, q);
   gzerr << "Not implemented...\n";
@@ -182,21 +174,21 @@ void RTQL8Link::UpdateMass()
 {
 //   if (!this->linkId)
 //     return;
-// 
+//
 //   dMass odeMass;
 //   dMassSetZero(&odeMass);
-// 
+//
 //   // The CoG must always be (0, 0, 0)
 //   math::Vector3 cog(0, 0, 0);
-// 
+//
 //   math::Vector3 principals = this->inertial->GetPrincipalMoments();
 //   math::Vector3 products = this->inertial->GetProductsofInertia();
-// 
+//
 //   dMassSetParameters(&odeMass, this->inertial->GetMass(),
 //       cog.x, cog.y, cog.z,
 //       principals.x, principals.y, principals.z,
 //       products.x, products.y, products.z);
-// 
+//
 //   if (this->inertial->GetMass() > 0)
 //     dBodySetMass(this->linkId, &odeMass);
 //   else
@@ -385,9 +377,9 @@ math::Vector3 RTQL8Link::GetWorldAngularVel() const
 //   if (this->linkId)
 //   {
 //     const dReal *dvel;
-// 
+//
 //     dvel = dBodyGetAngularVel(this->linkId);
-// 
+//
 //     vel.Set(dvel[0], dvel[1], dvel[2]);
 //   }
 
@@ -402,9 +394,9 @@ math::Vector3 RTQL8Link::GetWorldForce() const
 //   if (this->linkId)
 //   {
 //     const dReal *dforce;
-// 
+//
 //     dforce = dBodyGetForce(this->linkId);
-// 
+//
 //     force.x = dforce[0];
 //     force.y = dforce[1];
 //     force.z = dforce[2];
@@ -421,9 +413,9 @@ math::Vector3 RTQL8Link::GetWorldTorque() const
 //   if (this->linkId)
 //   {
 //     const dReal *dtorque;
-// 
+//
 //     dtorque = dBodyGetTorque(this->linkId);
-// 
+//
 //     torque.x = dtorque[0];
 //     torque.y = dtorque[1];
 //     torque.z = dtorque[2];
