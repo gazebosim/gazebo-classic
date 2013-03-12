@@ -72,11 +72,6 @@ endif()
 
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
-#
-# MAC_OS_X_VERSION defines the Mac OSX Version, e.g.
-#   MAC_OS_X_VERSION = 1060
-# specifies OSX Snow Leopard (10.6)
-#
 if (APPLE)
 	# NOTE MacOSX provides different system versions than CMake is parsing.
 	#      The following table lists the most recent OSX versions

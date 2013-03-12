@@ -11,11 +11,12 @@ include_directories(
   ${PROTOBUF_INCLUDE_DIR}
 )
 
-# TODO Only enable this with OSX
 # TODO Properly search for X11 lib
-link_directories(
-   /opt/X11/lib
-)
+if (APPLE)
+  link_directories(
+    /opt/X11/lib
+  )
+endif()
 
 add_subdirectory(test)
 
