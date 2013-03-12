@@ -58,7 +58,7 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
 
   if (!_quiet)
   {
-    std::cout << gzclr_start(33)
+    gzwarn << gzclr_start(33)
               << "  Version[" << origVersion << "] to Version[" << _toVersion
               << "]\n"
               << "  Please use the gzsdf tool to update your SDF files.\n"
