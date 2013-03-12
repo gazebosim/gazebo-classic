@@ -131,6 +131,9 @@ namespace gazebo
       public: btDynamicsWorld *GetDynamicsWorld() const
               {return this->dynamicsWorld;}
 
+      // Documentation inherited
+      public: virtual void SetSORPGSIters(unsigned int iters);
+
       public: virtual void DebugPrint() const;
 
       private: btBroadphaseInterface *broadPhase;

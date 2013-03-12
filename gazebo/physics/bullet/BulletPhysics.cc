@@ -229,6 +229,8 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
     // m_erp: Baumgarte factor
     info.m_erp = bulletElem->GetElement("constraints")->GetValueDouble("erp");
   }
+
+  this->SetSORPGSIters(40);
 }
 
 //////////////////////////////////////////////////
@@ -377,14 +379,14 @@ double BulletPhysics::GetStepTime()
   return this->stepTimeDouble;
 }
 
-// //////////////////////////////////////////////////
-// void BulletPhysics::SetSORPGSIters(unsigned int _iters)
-// {
-//   // TODO: set SDF parameter
-//   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
-//   // Line below commented out because it wasn't helping pendulum test.
-//   // info.m_numIterations = _iters;
-// }
+//////////////////////////////////////////////////
+void BulletPhysics::SetSORPGSIters(unsigned int _iters)
+{
+  // TODO: set SDF parameter
+  btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
+  // Line below commented out because it wasn't helping pendulum test.
+  info.m_numIterations = _iters;
+}
 
 //////////////////////////////////////////////////
 LinkPtr BulletPhysics::CreateLink(ModelPtr _parent)
