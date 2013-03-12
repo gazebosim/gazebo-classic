@@ -29,24 +29,52 @@
 
 namespace gazebo
 {
+  // \class SkidSteerDrivePlugin SkidSteerDrivePlugin.hh
+  /// \brief A gazebo model plugin that controls a four wheel skid-steer
+  ///        robot via a gazebo topic. See the Pioneer3AT model in the 
+  ///        OSRF model database for an example use case.
   class SkidSteerDrivePlugin : public ModelPlugin
   {
+    /// \brief Default Contstuctor
     public: SkidSteerDrivePlugin();
+
+    /// \brief Called when the plugin is loaded
+    /// \param[in] _model Pointer to the model for which the plugin is loaded
+    /// \param[in] _sdf Pointer to the SDF for _model
     public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
+    /// \def ID for each of the four wheels
     public: enum {RIGHT_FRONT, RIGHT_REAR, LEFT_FRONT, LEFT_REAR};
 
+    /// \brief Associates a joint to each of the wheels
+    /// \param[in] _index Internal wheel index (Zero based)
+    /// \param[in] _name Name wheel joint
+    /// \return {0: Success, else: Error}
     private: int RegisterJoint(int _index, const std::string _name);
+
+    /// \brief Callback for gazebo topic
+    /// \param[in] _msg Pose message from external publisher
     private: void OnVelMsg(ConstPosePtr &_msg);
 
+    /// \brief Node for subscriber
     private: transport::NodePtr node;
+
+    /// \brief Gazebo topic subscriber
     private: transport::SubscriberPtr velSub;
 
+    /// \brief Pointer to the model which this plugin is attached
     private: physics::ModelPtr model;
+
+    /// \brief Pointer to each wheel joint
     private: physics::JointPtr Joints[NUMBER_OF_WHEELS];
 
+    /// \brief Max force limit for each wheel joint (Default 5.0)
     private: double MaxForce;
+
+    /// \brief Distance between wheels on the same axis (Determined from SDF)
     private: double wheelSeparation;
+
+    /// \brief Radius of the wheels (Determined from SDF)
     private: double wheelRadius;
   };
 }
