@@ -134,16 +134,16 @@ namespace gazebo
 
 
                 SubNodeMap::iterator iter2;
-                SubNodeMap::iterator st_end2 = this->subscribedNodes.end();
+                SubNodeMap::iterator stEnd2 = this->subscribedNodes.end();
                 for (iter2 = this->subscribedNodes.begin();
-                     iter2 != st_end2; iter2++)
+                     iter2 != stEnd2; ++iter2)
                 {
                   if (iter2->first == _topic)
                   {
                     std::list<NodePtr>::iterator liter;
-                    std::list<NodePtr>::iterator l_end = iter2->second.end();
+                    std::list<NodePtr>::iterator lEnd = iter2->second.end();
                     for (liter = iter2->second.begin();
-                        liter != l_end; liter++)
+                        liter != lEnd; ++liter)
                     {
                       publication->AddSubscription(*liter);
                     }
