@@ -388,10 +388,13 @@ void ODEPhysics::UpdatePhysics()
       // Note: GetByName could be expensive, should consider storing
       // CollisionPtr in Contact class so we do not need to search by
       // collision scoped names for every feedback
-      CollisionPtr col1 = boost::shared_static_cast<Collision>(
-          this->world->GetByName(contactFeedback->collision1));
-      CollisionPtr col2 = boost::shared_static_cast<Collision>(
-          this->world->GetByName(contactFeedback->collision2));
+//      Collision *col1 = contactFeedback->collisionPtr1;
+//      Collision *col2 = contactFeedback->collisionPtr2;
+      Collision *col1 = boost::shared_dynamic_cast<Collision>(
+      this->world->GetEntity(contactFeedback->collision1)).get();
+      Collision *col2 = boost::shared_dynamic_cast<Collision>(
+      this->world->GetEntity(contactFeedback->collision2)).get();
+
 
       GZ_ASSERT(col1 != NULL, "Collision 1 is NULL");
       GZ_ASSERT(col2 != NULL, "Collision 2 is NULL");

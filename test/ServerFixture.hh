@@ -524,6 +524,13 @@ class ServerFixture : public testing::Test
                EXPECT_LT(i, 50);
              }
 
+  /// \brief Spawn a contact sensor with the specified collision geometry
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _collisionType Type of collision, box or cylinder
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _static True to make the model static
   protected: void SpawnUnitContactSensor(const std::string &_name,
                  const std::string &_sensorName,
                  const std::string &_collisionType, const math::Vector3 &_pos,
