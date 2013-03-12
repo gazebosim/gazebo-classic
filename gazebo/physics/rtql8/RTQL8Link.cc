@@ -96,7 +96,7 @@ void RTQL8Link::Init()
   // Set rtql8's body node transformation from gazebo's link pose.
   math::Pose worldPose = this->GetWorldPose();
   Eigen::Matrix4d newTrfm;
-  RTQL8Utils::ConvPose(&newTrfm, worldPose);
+  RTQL8Utils::ConvPoseToMat(&newTrfm, worldPose);
   this->rtql8BodyNode->setWorldTransform(newTrfm);
 }
 
@@ -510,17 +510,8 @@ void RTQL8Link::updateDirtyPoseFromRTQL8Transformation()
   Eigen::Matrix4d tran = this->rtql8BodyNode->getWorldTransform();
 
   //-- Step 2: set gazebo link's pose using the transformation
-
-  // a) prepare new pose
   math::Pose newPose;
-  //math::Pose myPose = this->GetWorldPose();
-  // b) set position
-  newPose.pos.Set(tran(0,3), tran(1,3), tran(2,3));
-
-  // c) set rotation
-  Eigen::Matrix3d mat3x3 = tran.topLeftCorner(3,3);
-  Eigen::Quaterniond quat = rtql8::utils::rotation::matrixToQuat(mat3x3);
-  newPose.rot.Set(quat.w(), quat.x(), quat.y(), quat.z());
+  RTQL8Utils::ConvMatToPose(&newPose, tran);
 
   // subtracting cog location from ode pose
 //  math::Vector3 cog = this->dirtyPose.rot.RotateVector(
@@ -530,7 +521,6 @@ void RTQL8Link::updateDirtyPoseFromRTQL8Transformation()
 
   // set the new pose to this link
   this->dirtyPose = newPose;
-  //this->dirtyPose = myPose;
 
   // set the new pose to the world
   // TODO: below method can be changed in gazebo code

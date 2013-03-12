@@ -27,30 +27,31 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-Eigen::Matrix4d RTQL8Utils::ConvPose(const math::Pose& _pose)
+void RTQL8Utils::ConvPoseToMat(Eigen::Matrix4d* _mat, const math::Pose& _pose)
 {
-  Eigen::Matrix4d ret;
-  Eigen::Quaterniond quat(_pose.rot.w, _pose.rot.x,
-                          _pose.rot.y, _pose.rot.z);
-  ret.topLeftCorner(3, 3) = rtql8::utils::rotation::quatToMatrix(quat);
-  ret(0, 3) = _pose.pos.x;
-  ret(1, 3) = _pose.pos.y;
-  ret(2, 3) = _pose.pos.z;
-  ret(3, 3) = 1.0;
+  assert(_mat);
 
-  return ret;
-}
-
-//////////////////////////////////////////////////
-bool RTQL8Utils::ConvPose(Eigen::Matrix4d* _mat, const math::Pose& _pose)
-{
   Eigen::Quaterniond quat(_pose.rot.w, _pose.rot.x,
                           _pose.rot.y, _pose.rot.z);
   _mat->topLeftCorner(3, 3) = rtql8::utils::rotation::quatToMatrix(quat);
+
   (*_mat)(0, 3) = _pose.pos.x;
   (*_mat)(1, 3) = _pose.pos.y;
   (*_mat)(2, 3) = _pose.pos.z;
-  (*_mat)(3, 3) = 1.0;
 
-  return true;
+  (*_mat)(3, 3) = 1.0;
+}
+
+//////////////////////////////////////////////////
+void RTQL8Utils::ConvMatToPose(math::Pose* _pose, const Eigen::Matrix4d& _mat)
+{
+    assert(_pose);
+
+    // Set position
+    _pose->pos.Set(_mat(0,3), _mat(1,3), _mat(2,3));
+
+    // Set rotation
+    Eigen::Matrix3d mat3x3 = _mat.topLeftCorner(3,3);
+    Eigen::Quaterniond quat = rtql8::utils::rotation::matrixToQuat(mat3x3);
+    _pose->rot.Set(quat.w(), quat.x(), quat.y(), quat.z());
 }

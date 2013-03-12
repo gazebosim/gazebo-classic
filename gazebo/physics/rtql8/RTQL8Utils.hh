@@ -34,11 +34,12 @@ namespace gazebo
     class RTQL8Utils
     {
       /// \brief Convert from gazebo::math::Pose to Eigen::Matrix4d.
-      public: static Eigen::Matrix4d ConvPose(const math::Pose& _pose);
+      public: static void ConvPoseToMat(Eigen::Matrix4d* _mat,
+                                        const math::Pose& _pose);
 
-      /// \brief Convert from gazebo::math::Pose to Eigen::Matrix4d.
-      public: static bool ConvPose(Eigen::Matrix4d* _mat,
-                                   const math::Pose& _pose);
+      /// \brief Convert from Eigen::Matrix4d to gazebo::math::Pose.
+      public: static void ConvMatToPose(math::Pose* _pose,
+                                        const Eigen::Matrix4d& _mat);
     };
     /// \}
   }
