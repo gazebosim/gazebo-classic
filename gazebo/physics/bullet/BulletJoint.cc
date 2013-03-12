@@ -112,5 +112,13 @@ JointWrench BulletJoint::GetForceTorque(int _index)
 JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 {
   JointWrench wrench;
+  btJointFeedback *fb = this->constraint->getJointFeedback();
+  if (fb)
+  {
+    wrench.body1Force = BulletTypes::ConvertVector3(fb->m_appliedForceBodyA);
+    wrench.body2Force = BulletTypes::ConvertVector3(fb->m_appliedForceBodyB);
+    wrench.body1Torque = BulletTypes::ConvertVector3(fb->m_appliedForceBodyA);
+    wrench.body2Torque = BulletTypes::ConvertVector3(fb->m_appliedForceBodyB);
+  }
   return wrench;
 }
