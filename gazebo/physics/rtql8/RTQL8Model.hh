@@ -55,6 +55,9 @@ namespace gazebo
       /// \brief Finalize the model.
       public: virtual void Fini();
 
+      // Documentation inherited.
+      public: virtual void Reset();
+
       /// \brief
       public: rtql8::dynamics::SkeletonDynamics* GetSkeletonDynamics() {
         return rtql8SkeletonDynamics;

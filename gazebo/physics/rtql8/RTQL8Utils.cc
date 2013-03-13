@@ -69,3 +69,51 @@ rtql8::kinematics::TrfmTranslate* RTQL8Utils::createTrfmTranslate(
 
   return ret;
 }
+
+//////////////////////////////////////////////////
+rtql8::kinematics::TrfmRotateQuat* RTQL8Utils::createTrfmRotateQuat(
+    const math::Quaternion& _quat)
+{
+  rtql8::kinematics::Dof* dofW = new rtql8::kinematics::Dof(_quat.w);
+  rtql8::kinematics::Dof* dofX = new rtql8::kinematics::Dof(_quat.x);
+  rtql8::kinematics::Dof* dofY = new rtql8::kinematics::Dof(_quat.y);
+  rtql8::kinematics::Dof* dofZ = new rtql8::kinematics::Dof(_quat.z);
+
+  rtql8::kinematics::TrfmRotateQuat* ret
+      = new rtql8::kinematics::TrfmRotateQuat(dofW, dofX, dofY, dofZ);
+
+  return ret;
+}
+
+//////////////////////////////////////////////////
+void RTQL8Utils::addTransformToRTQL8Joint(rtql8::kinematics::Joint* _rtl8Joint,
+                                          const math::Pose& _pose)
+{
+  rtql8::kinematics::TrfmTranslate* trfmTrans
+      = RTQL8Utils::createTrfmTranslate(_pose.pos);
+
+  _rtl8Joint->addTransform(trfmTrans, false);
+
+  rtql8::kinematics::TrfmRotateQuat* trfmRot
+      = RTQL8Utils::createTrfmRotateQuat(_pose.rot);
+
+  _rtl8Joint->addTransform(trfmRot, false);
+}
+
+//////////////////////////////////////////////////
+void RTQL8Utils::add6DOFToRTQL8Joint(rtql8::kinematics::Joint* _rtql8Joint,
+                                     const math::Pose& _initialPose)
+{
+
+}
+
+
+
+
+
+
+
+
+
+
+

@@ -66,10 +66,10 @@ void RTQL8Link::Init()
 
   //----------------------------------------------------------------------------
   // TODO: need to do something here.
-  static double TEMP_SIZE = 2.0;
+  static double TEMP_SIZE = 1.0;
   rtql8::kinematics::ShapeCube* shape
-          = new rtql8::kinematics::ShapeCube(Eigen::Vector3d(TEMP_SIZE, TEMP_SIZE, TEMP_SIZE), 1);
-  TEMP_SIZE -= 1.0;
+          = new rtql8::kinematics::ShapeCube(Eigen::Vector3d(TEMP_SIZE, TEMP_SIZE, 1), 1);
+  TEMP_SIZE += 100.0;
   this->rtql8BodyNode->setShape(shape);
 
   //----------------------------------------------------------------------------
@@ -513,17 +513,11 @@ void RTQL8Link::updateDirtyPoseFromRTQL8Transformation()
   math::Pose newPose;
   RTQL8Utils::ConvMatToPose(&newPose, tran);
 
-  // subtracting cog location from ode pose
-//  math::Vector3 cog = this->dirtyPose.rot.RotateVector(
-//      this->inertial->GetCoG());
-
-//  this->dirtyPose.pos -= cog;
-
-  // set the new pose to this link
+  // Set the new pose to this link
   this->dirtyPose = newPose;
 
-  // set the new pose to the world
-  // TODO: below method can be changed in gazebo code
+  // Set the new pose to the world
+  // (Below method can be changed in gazebo code)
   this->world->dirtyPoses.push_back(this);
 }
 

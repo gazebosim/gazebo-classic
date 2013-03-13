@@ -71,31 +71,8 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
           /*+ */(this->childLink->GetWorldPose())
           + poseChildLinkToJoint;
 
-      rtql8::kinematics::Dof* tranX
-              = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.x);
-      rtql8::kinematics::Dof* tranY
-              = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.y);
-      rtql8::kinematics::Dof* tranZ
-              = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.z);
-
-      rtql8::kinematics::TrfmTranslate* tran
-          = new rtql8::kinematics::TrfmTranslate(tranX, tranY, tranZ);
-
-      this->rtql8Joint->addTransform(tran, false);
-
-      rtql8::kinematics::Dof* rotW
-              = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.w);
-      rtql8::kinematics::Dof* rotX
-              = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.x);
-      rtql8::kinematics::Dof* rotY
-              = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.y);
-      rtql8::kinematics::Dof* rotZ
-              = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.z);
-
-      rtql8::kinematics::TrfmRotateQuat* rot
-          = new rtql8::kinematics::TrfmRotateQuat(rotW, rotX, rotY, rotZ);
-
-      this->rtql8Joint->addTransform(rot, false);
+      RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint,
+                                           poseParentLinkToJoint);
   }
   else
   {
@@ -103,31 +80,8 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
         + (this->childLink->GetWorldPose())
         + poseChildLinkToJoint;
 
-    rtql8::kinematics::Dof* tranX
-            = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.x);
-    rtql8::kinematics::Dof* tranY
-            = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.y);
-    rtql8::kinematics::Dof* tranZ
-            = new rtql8::kinematics::Dof(poseParentLinkToJoint.pos.z);
-
-    rtql8::kinematics::TrfmTranslate* tran
-        = new rtql8::kinematics::TrfmTranslate(tranX, tranY, tranZ);
-
-    this->rtql8Joint->addTransform(tran, false);
-
-    rtql8::kinematics::Dof* rotW
-            = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.w);
-    rtql8::kinematics::Dof* rotX
-            = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.x);
-    rtql8::kinematics::Dof* rotY
-            = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.y);
-    rtql8::kinematics::Dof* rotZ
-            = new rtql8::kinematics::Dof(poseParentLinkToJoint.rot.z);
-
-    rtql8::kinematics::TrfmRotateQuat* rot
-        = new rtql8::kinematics::TrfmRotateQuat(rotW, rotX, rotY, rotZ);
-
-    this->rtql8Joint->addTransform(rot, false);
+    RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint,
+                                         poseParentLinkToJoint);
   }
 
   //---- Step 2. Transformation by the rotate axis.
@@ -145,29 +99,10 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
           = boost::shared_dynamic_cast<RTQL8Model>(this->model);
   rtql8Model->GetSkeletonDynamics()->addTransform(rotHinge);
 
-
   //---- Step 3. Transformation from rotated joint frame to child link frame.
   poseJointToChildLink = -poseChildLinkToJoint;
 
-  rtql8::kinematics::TrfmTranslate* tranJ2CL
-      = RTQL8Utils::createTrfmTranslate(poseChildLinkToJoint.pos);
-
-  this->rtql8Joint->addTransform(tranJ2CL, false);
-
-  rtql8::kinematics::Dof* rotJ2CL_W
-          = new rtql8::kinematics::Dof(poseJointToChildLink.rot.w);
-  rtql8::kinematics::Dof* rotJ2CL_X
-          = new rtql8::kinematics::Dof(poseJointToChildLink.rot.x);
-  rtql8::kinematics::Dof* rotJ2CL_Y
-          = new rtql8::kinematics::Dof(poseJointToChildLink.rot.y);
-  rtql8::kinematics::Dof* rotJ2CL_Z
-          = new rtql8::kinematics::Dof(poseJointToChildLink.rot.z);
-
-  rtql8::kinematics::TrfmRotateQuat* rotJ2CL
-      = new rtql8::kinematics::TrfmRotateQuat(
-              rotJ2CL_W, rotJ2CL_X, rotJ2CL_Y, rotJ2CL_Z);
-
-  this->rtql8Joint->addTransform(rotJ2CL, false);
+  RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint, poseJointToChildLink);
 }
 
 //////////////////////////////////////////////////

@@ -20,6 +20,7 @@
 #include "gazebo/physics/rtql8/RTQL8Physics.hh"
 #include "gazebo/physics/rtql8/RTQL8Link.hh"
 #include "gazebo/physics/rtql8/RTQL8Model.hh"
+#include "gazebo/physics/rtql8/RTQL8Utils.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -84,43 +85,46 @@ void RTQL8Model::Init()
 
     this->rtql8CanonicalJoint
         = new rtql8::kinematics::Joint(parentBodyNode, childBodyNode);
-
     this->rtql8SkeletonDynamics->addJoint(rtql8CanonicalJoint);
-
 
     //---- Step 1. Transformation from rotated joint frame to child link frame.
     math::Pose canonicalLinkPose = canonicalLink_->GetWorldPose();
-
-    rtql8::kinematics::Dof* tranJ2CL_X = new rtql8::kinematics::Dof(canonicalLinkPose.pos.x);
-    rtql8::kinematics::Dof* tranJ2CL_Y = new rtql8::kinematics::Dof(canonicalLinkPose.pos.y);
-    rtql8::kinematics::Dof* tranJ2CL_Z = new rtql8::kinematics::Dof(canonicalLinkPose.pos.z);
-    rtql8::kinematics::Dof* rotJ2CL_W = new rtql8::kinematics::Dof(canonicalLinkPose.rot.w);
-    rtql8::kinematics::Dof* rotJ2CL_X = new rtql8::kinematics::Dof(canonicalLinkPose.rot.x);
-    rtql8::kinematics::Dof* rotJ2CL_Y = new rtql8::kinematics::Dof(canonicalLinkPose.rot.y);
-    rtql8::kinematics::Dof* rotJ2CL_Z = new rtql8::kinematics::Dof(canonicalLinkPose.rot.z);
-
-    rtql8::kinematics::TrfmTranslate* tranJ2CL
-        = new rtql8::kinematics::TrfmTranslate(tranJ2CL_X, tranJ2CL_Y, tranJ2CL_Z);
-    rtql8::kinematics::TrfmRotateQuat* rotJ2CL
-        = new rtql8::kinematics::TrfmRotateQuat(rotJ2CL_W, rotJ2CL_X, rotJ2CL_Y, rotJ2CL_Z);
-
-    rtql8CanonicalJoint->addTransform(tranJ2CL, false);
-    rtql8CanonicalJoint->addTransform(rotJ2CL, false);
-
-
+//    RTQL8Utils::addTransformToRTQL8Joint(this->rtql8CanonicalJoint,
+//                                         canonicalLinkPose);
 
     //---- Step 2. Transformation by the rotate axis.
-    rtql8::kinematics::Dof* tranX = new rtql8::kinematics::Dof(0, -100, 100);
-    rtql8::kinematics::Dof* tranY = new rtql8::kinematics::Dof(0, -100, 100);
-    rtql8::kinematics::Dof* tranZ = new rtql8::kinematics::Dof(0, -100, 100);
-    rtql8::kinematics::Dof* rotX = new rtql8::kinematics::Dof(0, -3.1416, 3.1416);
-    rtql8::kinematics::Dof* rotY = new rtql8::kinematics::Dof(0, -6.1416, 6.1416);
-    rtql8::kinematics::Dof* rotZ = new rtql8::kinematics::Dof(0, -3.1416, 3.1416);
+    rtql8::kinematics::Dof* tranX = new rtql8::kinematics::Dof(0, -10000, 10000);
+    rtql8::kinematics::Dof* tranY = new rtql8::kinematics::Dof(0, -10000, 10000);
+    rtql8::kinematics::Dof* tranZ = new rtql8::kinematics::Dof(0, -10000, 10000);
+//    rtql8::kinematics::Dof* rotX = new rtql8::kinematics::Dof(0, -6.1416, 6.1416);
+//    rtql8::kinematics::Dof* rotY = new rtql8::kinematics::Dof(0, -6.1416, 6.1416);
+//    rtql8::kinematics::Dof* rotZ = new rtql8::kinematics::Dof(0, -6.1416, 6.1416);
+    rtql8::kinematics::Dof* rotX = new rtql8::kinematics::Dof(0, -60.1416, 60.1416);
+    rtql8::kinematics::Dof* rotY = new rtql8::kinematics::Dof(0, -60.1416, 60.1416);
+    rtql8::kinematics::Dof* rotZ = new rtql8::kinematics::Dof(0, -60.1416, 60.1416);
 
     rtql8::kinematics::TrfmTranslate* trfmTranslateCanonical
         = new rtql8::kinematics::TrfmTranslate(tranX, tranY, tranZ);
     rtql8::kinematics::TrfmRotateExpMap* trfmRotateCanonical
         = new rtql8::kinematics::TrfmRotateExpMap(rotX, rotY, rotZ);
+
+    // Set the initial pose (transformation) of bodies.
+    tranX->setValue(canonicalLinkPose.pos.x);
+    tranY->setValue(canonicalLinkPose.pos.y);
+    tranZ->setValue(canonicalLinkPose.pos.z);
+
+    Eigen::Quaterniond eigenQuat(canonicalLinkPose.rot.w,
+                                canonicalLinkPose.rot.x,
+                                canonicalLinkPose.rot.y,
+                                canonicalLinkPose.rot.z);
+
+    //Eigen::Quaterniond expToQuat(Eigen::Vector3d& v);
+    Eigen::Vector3d iegenVec3 = rtql8::utils::rotation::quatToExp(eigenQuat);
+
+    rotX->setValue(iegenVec3(0));
+    rotY->setValue(iegenVec3(1));
+    rotZ->setValue(iegenVec3(2));
+
 
     // Get the model associated with
     // Add the transform to the skeletone in the model.
@@ -148,6 +152,13 @@ void RTQL8Model::Fini()
 {
   Model::Fini();
   
+}
+
+//////////////////////////////////////////////////
+void RTQL8Model::Reset()
+{
+  Model::Reset();
+
 }
 
 //////////////////////////////////////////////////

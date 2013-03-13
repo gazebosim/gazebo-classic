@@ -41,9 +41,23 @@ namespace gazebo
       public: static void ConvMatToPose(math::Pose* _pose,
                                         const Eigen::Matrix4d& _mat);
 
-      /// \brief
+      /// \brief Create rtql8::kinematics::TrfmTranslate from math::Vector3.
       public: static rtql8::kinematics::TrfmTranslate* createTrfmTranslate(
           const math::Vector3& _vec);
+
+      /// \brief Create rtql8::kinematics::TrfmRotateQuat from math::Vector3.
+      public: static rtql8::kinematics::TrfmRotateQuat* createTrfmRotateQuat(
+          const math::Quaternion& _quat);
+
+      /// \brief addTransform from math::Pose.
+      public: static void addTransformToRTQL8Joint(
+          rtql8::kinematics::Joint* _rtl8Joint,
+          const math::Pose& _pose);
+
+      /// \brief Add 6dof joint for free floating body.
+      public: static void add6DOFToRTQL8Joint(
+          rtql8::kinematics::Joint* _rtql8Joint,
+          const math::Pose& _initialPose);
     };
     /// \}
   }
