@@ -511,6 +511,8 @@ void Server::ProcessControlMsgs()
 /////////////////////////////////////////////////
 bool Server::OpenWorld(const std::string &_filename)
 {
+  return false;
+  /*
   sdf::SDFPtr sdf(new sdf::SDF);
   if (!sdf::init(sdf))
   {
@@ -552,4 +554,5 @@ bool Server::OpenWorld(const std::string &_filename)
   worldMsg.set_create(true);
   this->worldModPub->Publish(worldMsg);
   return true;
+  */
 }

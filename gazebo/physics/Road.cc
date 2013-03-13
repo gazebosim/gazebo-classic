@@ -37,7 +37,7 @@ Road::~Road()
 void Road::Load(sdf::ElementPtr _elem)
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("default");
+  this->node->Init();
 
   this->roadPub = this->node->Advertise<msgs::Road>("~/roads", 10);
 
