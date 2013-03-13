@@ -304,7 +304,7 @@ else (build_errors)
   ########################################
   # Make the cmake config files
   set(PKG_NAME ${PROJECT_NAME_LOWER})
-  set(PKG_LIBRARIES libgazebo gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_sdf_interface gazebo_msgs gazebo_transport)
+  set(PKG_LIBRARIES gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_sdf_interface gazebo_msgs gazebo_transport)
   set(PKG_DEPENDS Boost)
   set(cmake_conf_file "${CMAKE_CURRENT_SOURCE_DIR}/cmake/gazebo-config.cmake")
   configure_file("${cmake_conf_file}.in" "${cmake_conf_file}" @ONLY)
