@@ -30,10 +30,10 @@ void cb(ConstWorldStatisticsPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-int main(int argc, char **argv)
+int main(int _argc, char **_argv)
 {
   // Load gazebo
-  gazebo::load(argc, argv);
+  gazebo::load(_argc, _argv);
 
   // Create our node for communication
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
