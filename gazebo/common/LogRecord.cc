@@ -494,16 +494,16 @@ unsigned int LogRecord::Log::Update()
   // Get log data via the callback.
   if (this->logCB(stream) && !stream.str().empty())
   {
-    const std::string encoding = this->parent->GetEncoding();
+    const std::string encodingLocal = this->parent->GetEncoding();
 
     this->buffer.append("<chunk encoding='");
-    this->buffer.append(encoding);
+    this->buffer.append(encodingLocal);
     this->buffer.append("'>\n");
 
     this->buffer.append("<![CDATA[");
     {
       // Compress the data.
-      if (encoding == "bz2")
+      if (encodingLocal == "bz2")
       {
         std::string str;
 
@@ -521,10 +521,10 @@ unsigned int LogRecord::Log::Update()
                   Base64Text(str.c_str() + str.size()),
                   std::back_inserter(this->buffer));
       }
-      else if (encoding == "txt")
+      else if (encodingLocal == "txt")
         this->buffer.append(stream.str());
       else
-        gzerr << "Unknown log file encoding[" << encoding << "]\n";
+        gzerr << "Unknown log file encoding[" << encodingLocal << "]\n";
     }
     this->buffer.append("]]>\n");
 
