@@ -17,6 +17,7 @@
 
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
+#include <gazebo/gazebo.hh>
 
 #include <iostream>
 
