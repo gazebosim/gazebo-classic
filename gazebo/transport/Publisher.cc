@@ -127,15 +127,11 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
       {
         gzwarn << "Queue limit reached for topic "
                << this->topic
-               << ", deleting message"
-               << " (only this warning is printed to the console, "
-               << "see the ~/.gazebo/gzserver.log and "
-               << "~/.gazebo/gzclient.log files for future warnings).\n";
+               << ", deleting message. "
+               << "This warning is printed only once." << std::endl;
         queueLimitWarned = true;
       }
-      gzlog << "Queue limit reached for topic "
-            << this->topic
-            << ", deleting message\n";
+
       this->messages.pop_front();
     }
   }
