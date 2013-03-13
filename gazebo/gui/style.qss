@@ -3,6 +3,11 @@ QLabel
   color: #d0d0d0;
 }
 
+QFrame
+{
+  background-color: transparent;
+}
+
 QDialog
 {
   background-color: #303030;
@@ -10,6 +15,7 @@ QDialog
 
 QWidget#topicSelector,
 QWidget#cameraSensor,
+QWidget#diagnosticsPlot,
 QWidget#dataLogger
 {
   background-color: #303030;
@@ -189,7 +195,6 @@ QListView::item
   color: #ffffff;
   border-radius: 4px;
 }
-
 
 QTreeView
 {
@@ -701,3 +706,15 @@ QFrame#dataLoggerSettingFrame
   margin: 0px;
   padding: 0px;
 }
+
+QwtTextLabel
+{
+  font-size: 10px;
+}
+
+QwtScaleWidget
+{
+  color: white;
+  font-size: 11px;
+}
+

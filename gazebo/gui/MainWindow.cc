@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include "gazebo_config.h"
 
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
@@ -46,7 +47,10 @@
 
 #include "sdf/sdf.hh"
 
-#include "gazebo_config.h"
+#ifdef HAVE_QWT
+#include "gazebo/gui/Diagnostics.hh"
+#endif
+
 
 using namespace gazebo;
 using namespace gui;
@@ -232,6 +236,15 @@ void MainWindow::New()
   msgs::ServerControl msg;
   msg.set_new_world(true);
   this->serverControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Diagnostics()
+{
+#ifdef HAVE_QWT
+  gui::Diagnostics *diag = new gui::Diagnostics(this);
+  diag->show();
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -694,6 +707,14 @@ void MainWindow::CreateActions()
   g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
   connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
 
+#ifdef HAVE_QWT
+  /*g_diagnosticsAct = new QAction(tr("Diagnostic Plot"), this);
+  g_diagnosticsAct->setShortcut(tr("Ctrl+U"));
+  g_diagnosticsAct->setStatusTip(tr("Plot diagnostic information"));
+  connect(g_diagnosticsAct, SIGNAL(triggered()), this, SLOT(Diagnostics()));
+  */
+#endif
+
   g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
   g_openAct->setStatusTip(tr("Open an world file"));
@@ -903,7 +924,6 @@ void MainWindow::CreateActions()
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
   connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
-
 }
 
 /////////////////////////////////////////////////
@@ -938,7 +958,6 @@ void MainWindow::CreateMenuBar()
   {
     delete menuBar;
   }
-
 
   this->menuBar = new QMenuBar;
   this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -980,6 +999,10 @@ void MainWindow::CreateMenuBar()
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
 
+#ifdef HAVE_QWT
+  // windowMenu->addAction(g_diagnosticsAct);
+#endif
+
   this->menuBar->addSeparator();
 
   QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
@@ -989,7 +1012,6 @@ void MainWindow::CreateMenuBar()
 /////////////////////////////////////////////////
 void MainWindow::CreateMenus()
 {
-
   this->ShowMenuBar();
 
   QFrame *frame = new QFrame;
