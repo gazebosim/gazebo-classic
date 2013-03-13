@@ -4,12 +4,12 @@ endif()
 set(@PKG_NAME@_CONFIG_INCLUDED TRUE)
 
 list(APPEND @PKG_NAME@_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include)
-list(APPEND @PKG_NAME@_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include/gazebo-@gazebo_version@)
-list(APPEND @PKG_NAME@_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include/gazebo-@gazebo_version@/gazebo)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include/gazebo-@GAZEBO_VERSION@)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include/gazebo-@GAZEBO_VERSION@/gazebo)
 
 list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/include)
-list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/include/gazebo-@gazebo_version@)
-list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/include/gazebo-@gazebo_version@/gazebo)
+list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/include/gazebo-@GAZEBO_VERSION@)
+list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/include/gazebo-@GAZEBO_VERSION@/gazebo)
 
 foreach(lib @PKG_LIBRARIES@)
   set(onelib "${lib}-NOTFOUND")
