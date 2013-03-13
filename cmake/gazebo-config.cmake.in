@@ -1,0 +1,26 @@
+if (@PKG_NAME@_CONFIG_INCLUDED)
+  return()
+endif()
+set(@PKG_NAME@_CONFIG_INCLUDED TRUE)
+
+set(@PKG_NAME@_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include)
+
+foreach(lib @PKG_LIBRARIES@)
+  set(onelib "${lib}-NOTFOUND")
+  find_library(onelib ${lib}
+    PATHS @CMAKE_INSTALL_PREFIX@/lib
+    NO_DEFAULT_PATH
+    )
+  if(NOT onelib)
+    message(FATAL_ERROR "Library '${lib}' in package @PKG_NAME@ is not installed properly")
+  endif()
+  list(APPEND @PKG_NAME@_LIBRARIES ${onelib})
+endforeach()
+
+foreach(dep @PKG_DEPENDS@)
+  if(NOT ${dep}_FOUND)
+    find_package(${dep})
+  endif()
+  list(APPEND @PKG_NAME@_INCLUDE_DIRS ${${dep}_INCLUDE_DIRS})
+  list(APPEND @PKG_NAME@_LIBRARIES ${${dep}_LIBRARIES})
+endforeach()
