@@ -64,6 +64,7 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   this->saveFrameBuffer = NULL;
   this->saveCount = 0;
+  this->screenshotCount = 0;
   this->bayerFrameBuffer = NULL;
 
   std::ostringstream stream;
@@ -74,6 +75,7 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
   this->renderTexture = NULL;
 
   this->captureData = false;
+  this->captureDataOnce = false;
 
   this->camera = NULL;
   this->viewport = NULL;
@@ -323,7 +325,7 @@ void Camera::PostRender()
 {
   this->renderTarget->swapBuffers();
 
-  if (this->newData && this->captureData)
+  if (this->newData && (this->captureData || this->captureDataOnce))
   {
     size_t size;
     unsigned int width = this->GetImageWidth();
@@ -345,7 +347,11 @@ void Camera::PostRender()
 
     this->viewport->getTarget()->copyContentsToMemory(box);
 
-    // record render time stamp
+    if (this->captureDataOnce)
+    {
+      this->SaveFrame(this->GetFrameFilename());
+      this->captureDataOnce = false;
+    }
 
     if (this->sdf->HasElement("save") &&
         this->sdf->GetElement("save")->GetValueBool("enabled"))
@@ -802,7 +808,15 @@ std::string Camera::GetFrameFilename()
       gzerr << "Error making directory\n";
   }
 
+  unsigned int *count = &this->saveCount;
   std::string friendlyName = this->GetName();
+
+  if (this->captureDataOnce)
+  {
+    count = &this->screenshotCount;
+    friendlyName += "_screenshot";
+  }
+
   boost::replace_all(friendlyName, "::", "_");
 
   char tmp[1024];
@@ -814,15 +828,16 @@ std::string Camera::GetFrameFilename()
     // int msec = static_cast<int>((wallTime*1000 - min*60000 - sec*1000));
 
     snprintf(tmp, sizeof(tmp), "%s/%s-%04d.jpg", path.c_str(),
-             friendlyName.c_str(), this->saveCount);
+             friendlyName.c_str(), *count);
   }
   else
   {
     snprintf(tmp, sizeof(tmp), "%s-%04d.jpg", friendlyName.c_str(),
-             this->saveCount);
+             *count);
   }
 
-  this->saveCount++;
+  (*count)++;
+
   closedir(dir);
   return tmp;
 }
@@ -1027,6 +1042,12 @@ void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
 void Camera::SetCaptureData(bool _value)
 {
   this->captureData = _value;
+}
+
+//////////////////////////////////////////////////
+void Camera::SetCaptureDataOnce()
+{
+  this->captureDataOnce = true;
 }
 
 //////////////////////////////////////////////////

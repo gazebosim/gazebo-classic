@@ -589,6 +589,13 @@ void MainWindow::CreateDirectionalLight()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::CaptureScreenshot()
+{
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->SetCaptureDataOnce();
+}
+
+/////////////////////////////////////////////////
 void MainWindow::InsertModel()
 {
 }
@@ -997,6 +1004,12 @@ void MainWindow::CreateActions()
   g_buildingEditorExitAct->setCheckable(false);
   connect(g_buildingEditorExitAct, SIGNAL(triggered()), this,
           SLOT(BuildingEditorExit()));
+
+  g_screenshotAct = new QAction(QIcon(":/images/screenshot.png"),
+      tr("Screenshot"), this);
+  g_screenshotAct->setStatusTip(tr("Take a screenshot"));
+  connect(g_screenshotAct, SIGNAL(triggered()), this,
+      SLOT(CaptureScreenshot()));
 }
 
 /////////////////////////////////////////////////

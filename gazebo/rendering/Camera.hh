@@ -365,6 +365,9 @@ namespace gazebo
       /// \param[in] _value Set to true to capture data into a memory buffer.
       public: void SetCaptureData(bool _value);
 
+      /// \brief Capture data once and save to disk
+      public: void SetCaptureDataOnce();
+
       /// \brief Set the render target
       /// \param[in] _textureName Name of the new render texture
       public: void CreateRenderTexture(const std::string &_textureName);
@@ -410,7 +413,7 @@ namespace gazebo
       /// \return Direction the camera is facing
       public: math::Vector3 GetDirection() const;
 
-      /// \brief Connect a to the new image signal
+      /// \brief Connect to the new image signal
       /// \param[in] _subscriber Callback that is called when a new image is
       /// generated
       /// \return A pointer to the connection. This must be kept in scope.
@@ -579,6 +582,9 @@ namespace gazebo
       /// \brief Number of saved frames.
       protected: unsigned int saveCount;
 
+      /// \brief Number of saved screenshots.
+      protected: unsigned int screenshotCount;
+
       /// \brief Format for saving images.
       protected: int imageFormat;
 
@@ -596,6 +602,9 @@ namespace gazebo
 
       /// \brief True to capture frames into an image buffer.
       protected: bool captureData;
+
+      /// \brief True to capture a frame once and save to disk.
+      protected: bool captureDataOnce;
 
       /// \brief True if new data is available.
       protected: bool newData;
