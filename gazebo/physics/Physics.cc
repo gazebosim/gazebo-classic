@@ -86,7 +86,10 @@ void physics::init_worlds()
 {
   std::vector<WorldPtr>::iterator iter;
   for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
+  {
+    gzerr << "init_worlds iter " << *iter << '\n';
     (*iter)->Init();
+  }
 }
 
 /////////////////////////////////////////////////

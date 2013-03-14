@@ -135,10 +135,11 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(10);
                if (waitCount >= maxWaitCount)
                {
-                 gzerr << "this->server " << this->server << "  "
+                 gzerr << "this->server " << this->server << "\n"
                        << "this->server->GetInitialized() "
-                       << this->server->GetInitialized() << "  "
-                       << "other relevant stuff...\n";
+                       << this->server->GetInitialized() << "\n"
+                       << "transport::is_stopped() "
+                       << transport::is_stopped() << "\n";
                  ASSERT_LT(waitCount, maxWaitCount);
                }
 

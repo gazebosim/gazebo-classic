@@ -356,12 +356,16 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
 /////////////////////////////////////////////////
 void Server::Init()
 {
+  gzerr << "gazebo::init()\n"
   gazebo::init();
 
+  gzerr << "sensors::init()\n"
   sensors::init();
 
+  gzerr << "physics::init_worlds()\n"
   physics::init_worlds();
   this->stop = false;
+  gzerr << "this->stop " << this->stop << '\n';
 }
 
 /////////////////////////////////////////////////
