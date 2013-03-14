@@ -51,7 +51,7 @@ BulletLink::~BulletLink()
 //////////////////////////////////////////////////
 void BulletLink::Load(sdf::ElementPtr _sdf)
 {
-  this->bulletPhysics = boost::shared_dynamic_cast<BulletPhysics>(
+  this->bulletPhysics = boost::dynamic_pointer_cast<BulletPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (this->bulletPhysics == NULL)
@@ -82,7 +82,7 @@ void BulletLink::Init()
 
   // Set the initial pose of the body
   this->motionState.reset(new BulletMotionState(
-    boost::shared_dynamic_cast<Link>(shared_from_this())));
+    boost::dynamic_pointer_cast<Link>(shared_from_this())));
 
   for (Base_V::iterator iter = this->children.begin();
        iter != this->children.end(); ++iter)

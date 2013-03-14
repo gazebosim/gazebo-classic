@@ -196,7 +196,7 @@ void Link::Init()
       for (Base_V::iterator giter = this->children.begin();
            giter != this->children.end(); giter++)
       {
-        EntityPtr e = boost::shared_dynamic_cast<Entity>(*giter);
+        EntityPtr e = boost::dynamic_pointer_cast<Entity>(*giter);
 
         msgs::Point *pt;
         pt = g_msg.add_points();
@@ -326,7 +326,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
     while (collisionElem)
     {
-      CollisionPtr collision = boost::shared_dynamic_cast<Collision>(
+      CollisionPtr collision = boost::dynamic_pointer_cast<Collision>(
           this->GetChild(collisionElem->GetValueString("name")));
 
       if (collision)
@@ -478,7 +478,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 CollisionPtr Link::GetCollisionById(unsigned int _id) const
 {
-  return boost::shared_dynamic_cast<Collision>(this->GetById(_id));
+  return boost::dynamic_pointer_cast<Collision>(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -490,7 +490,7 @@ CollisionPtr Link::GetCollision(const std::string &_name)
   {
     if ((*biter)->GetName() == _name)
     {
-      result = boost::shared_dynamic_cast<Collision>(*biter);
+      result = boost::dynamic_pointer_cast<Collision>(*biter);
       break;
     }
   }
@@ -601,7 +601,7 @@ math::Vector3 Link::GetRelativeTorque() const
 //////////////////////////////////////////////////
 ModelPtr Link::GetModel() const
 {
-  return boost::shared_dynamic_cast<Model>(this->GetParent());
+  return boost::dynamic_pointer_cast<Model>(this->GetParent());
 }
 
 //////////////////////////////////////////////////
@@ -710,7 +710,7 @@ void Link::FillMsg(msgs::Link &_msg)
   {
     if (this->GetChild(j)->HasType(Base::COLLISION))
     {
-      CollisionPtr coll = boost::shared_dynamic_cast<Collision>(
+      CollisionPtr coll = boost::dynamic_pointer_cast<Collision>(
           this->GetChild(j));
       coll->FillMsg(*_msg.add_collision());
     }

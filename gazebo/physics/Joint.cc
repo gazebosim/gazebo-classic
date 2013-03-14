@@ -108,10 +108,10 @@ void Joint::Load(sdf::ElementPtr _sdf)
   }
   else
   {
-    this->childLink = boost::shared_dynamic_cast<Link>(
+    this->childLink = boost::dynamic_pointer_cast<Link>(
         this->GetWorld()->GetByName(childName));
 
-    this->parentLink = boost::shared_dynamic_cast<Link>(
+    this->parentLink = boost::dynamic_pointer_cast<Link>(
         this->GetWorld()->GetByName(parentName));
   }
 

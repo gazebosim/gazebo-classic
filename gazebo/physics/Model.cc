@@ -334,7 +334,7 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr linkElem = _sdf->GetElement("link");
     while (linkElem)
     {
-      LinkPtr link = boost::shared_dynamic_cast<Link>(
+      LinkPtr link = boost::dynamic_pointer_cast<Link>(
           this->GetChild(linkElem->GetValueString("name")));
       link->UpdateParameters(linkElem);
       linkElem = linkElem->GetNextElement("link");
@@ -347,7 +347,7 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr jointElem = _sdf->GetElement("joint");
     while (jointElem)
     {
-      JointPtr joint = boost::shared_dynamic_cast<Joint>(this->GetChild(jointElem->GetValueString("name")));
+      JointPtr joint = boost::dynamic_pointer_cast<Joint>(this->GetChild(jointElem->GetValueString("name")));
       joint->UpdateParameters(jointElem);
       jointElem = jointElem->GetNextElement("joint");
     }
@@ -588,7 +588,7 @@ JointPtr Model::GetJoint(const std::string &_name)
 //////////////////////////////////////////////////
 LinkPtr Model::GetLinkById(unsigned int _id) const
 {
-  return boost::shared_dynamic_cast<Link>(this->GetById(_id));
+  return boost::dynamic_pointer_cast<Link>(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -627,7 +627,7 @@ LinkPtr Model::GetLink(const std::string &_name) const
       if (((*biter)->GetScopedName() == _name) ||
           ((*biter)->GetName() == _name))
       {
-        result = boost::shared_dynamic_cast<Link>(*biter);
+        result = boost::dynamic_pointer_cast<Link>(*biter);
         break;
       }
     }
@@ -660,7 +660,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 
   if (!this->jointController)
     this->jointController.reset(new JointController(
-        boost::shared_dynamic_cast<Model>(shared_from_this())));
+        boost::dynamic_pointer_cast<Model>(shared_from_this())));
   this->jointController->AddJoint(joint);
 }
 
@@ -826,7 +826,7 @@ void Model::FillMsg(msgs::Model &_msg)
   {
     if (this->GetChild(j)->HasType(Base::LINK))
     {
-      LinkPtr link = boost::shared_dynamic_cast<Link>(this->GetChild(j));
+      LinkPtr link = boost::dynamic_pointer_cast<Link>(this->GetChild(j));
       link->FillMsg(*_msg.add_link());
     }
   }

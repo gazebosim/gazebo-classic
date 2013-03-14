@@ -57,7 +57,7 @@ Entity::Entity(BasePtr _parent)
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
-    this->parentEntity = boost::shared_dynamic_cast<Entity>(this->parent);
+    this->parentEntity = boost::dynamic_pointer_cast<Entity>(this->parent);
     this->SetStatic(this->parentEntity->IsStatic());
   }
 
@@ -141,7 +141,7 @@ void Entity::SetStatic(const bool &_s)
 
   for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
   {
-    EntityPtr e = boost::shared_dynamic_cast<Entity>(*iter);
+    EntityPtr e = boost::dynamic_pointer_cast<Entity>(*iter);
     if (e)
       e->SetStatic(_s);
   }
@@ -461,7 +461,7 @@ ModelPtr Entity::GetParentModel()
 {
   BasePtr p;
   if (this->HasType(MODEL))
-    return boost::shared_dynamic_cast<Model>(shared_from_this());
+    return boost::dynamic_pointer_cast<Model>(shared_from_this());
 
   p = this->parent;
   GZ_ASSERT(p, "Parent of an entity is NULL");
@@ -469,7 +469,7 @@ ModelPtr Entity::GetParentModel()
   while (p->GetParent() && p->GetParent()->HasType(MODEL))
     p = p->GetParent();
 
-  return boost::shared_dynamic_cast<Model>(p);
+  return boost::dynamic_pointer_cast<Model>(p);
 }
 
 //////////////////////////////////////////////////
@@ -477,7 +477,7 @@ CollisionPtr Entity::GetChildCollision(const std::string &_name)
 {
   BasePtr base = this->GetByName(_name);
   if (base)
-    return boost::shared_dynamic_cast<Collision>(base);
+    return boost::dynamic_pointer_cast<Collision>(base);
 
   return CollisionPtr();
 }
@@ -487,7 +487,7 @@ LinkPtr Entity::GetChildLink(const std::string &_name)
 {
   BasePtr base = this->GetByName(_name);
   if (base)
-    return boost::shared_dynamic_cast<Link>(base);
+    return boost::dynamic_pointer_cast<Link>(base);
 
   return LinkPtr();
 }
@@ -593,7 +593,7 @@ math::Box Entity::GetCollisionBoundingBox() const
 math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
 {
   if (_base->HasType(COLLISION))
-    return boost::shared_dynamic_cast<Collision>(_base)->GetBoundingBox();
+    return boost::dynamic_pointer_cast<Collision>(_base)->GetBoundingBox();
 
   math::Box box;
 
@@ -621,7 +621,7 @@ void Entity::PlaceOnEntity(const std::string &_entityName)
 void Entity::GetNearestEntityBelow(double &_distBelow,
                                    std::string &_entityName)
 {
-  RayShapePtr rayShape = boost::shared_dynamic_cast<RayShape>(
+  RayShapePtr rayShape = boost::dynamic_pointer_cast<RayShape>(
     this->GetWorld()->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
   math::Box box = this->GetCollisionBoundingBox();

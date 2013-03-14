@@ -51,7 +51,7 @@ ODETrimeshShape::~ODETrimeshShape()
 void ODETrimeshShape::Update()
 {
   ODECollisionPtr ocollision =
-    boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+    boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
 
   /// FIXME: use below to update trimesh geometry for collision without
   // using above Ogre codes

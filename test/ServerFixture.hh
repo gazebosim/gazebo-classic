@@ -392,7 +392,7 @@ class ServerFixture : public testing::Test
                sensors::SensorPtr sensor = sensors::get_sensor(_cameraName);
                EXPECT_TRUE(sensor);
                sensors::CameraSensorPtr camSensor =
-                 boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+                 boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
                _width = camSensor->GetImageWidth();
                _height = camSensor->GetImageHeight();

@@ -151,7 +151,7 @@ void VehiclePlugin::Init()
   this->chassis = this->joints[0]->GetParent();
 
   // This assumes that the largest dimension of the wheel is the diameter
-  physics::EntityPtr parent = boost::shared_dynamic_cast<physics::Entity>(
+  physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->joints[0]->GetChild());
   math::Box bb = parent->GetBoundingBox();
   this->wheelRadius = bb.GetSize().GetMax() * 0.5;
