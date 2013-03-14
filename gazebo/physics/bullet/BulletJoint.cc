@@ -133,14 +133,27 @@ JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
   btJointFeedback *fb = this->constraint->getJointFeedback();
   if (fb)
   {
-/*    wrench.body1Force = BulletTypes::ConvertVector3(fb->m_appliedForceBodyA);
-    wrench.body2Force = BulletTypes::ConvertVector3(fb->m_appliedForceBodyB);
-    wrench.body1Torque = BulletTypes::ConvertVector3(fb->m_appliedForceBodyA);
-    wrench.body2Torque = BulletTypes::ConvertVector3(fb->m_appliedForceBodyB);*/
+/*    wrench.body1Force = BulletTypes::ConvertVector3(fb->m_appliedForceBodyB);
+    wrench.body2Force = BulletTypes::ConvertVector3(fb->m_appliedForceBodyA);
+    wrench.body1Torque = BulletTypes::ConvertVector3(fb->m_appliedTorqueBodyB);
+    wrench.body2Torque = BulletTypes::ConvertVector3(fb->m_appliedTorqueBodyA);*/
     wrench.body1Force = BulletTypes::ConvertVector3(fb->m_appliedForceBodyB);
     wrench.body2Force = BulletTypes::ConvertVector3(fb->m_appliedForceBodyA);
     wrench.body1Torque = BulletTypes::ConvertVector3(fb->m_appliedTorqueBodyB);
     wrench.body2Torque = BulletTypes::ConvertVector3(fb->m_appliedTorqueBodyA);
+
+    gzerr << "force " << wrench.body1Force << " , " << wrench.body2Force << std::endl;
+    gzerr << "torque " << wrench.body1Torque << " , " << wrench.body2Torque << std::endl;
+
+    gzerr << "anchor " << this->anchorPos << ", " << this->anchorPose << " "<< std::endl;
+    gzerr << "global axis " << this->GetGlobalAxis(0) << std::endl;
+    gzerr << "angle " << this->GetAngle(0) << std::endl;
+/*    gzerr << " btbody A " <<
+        BulletTypes::ConvertVector3(this->constraint->getRigidBodyA().getGravity())
+        << ", " << this->constraint->getRigidBodyA().getInvMass()
+        << ", " << BulletTypes::ConvertVector3(this->constraint->getRigidBodyA().getLinearFactor()) << std::endl;
+
+    gzerr << this->childLink->GetInertial()->GetMass() << std::endl;*/
 
     if (this->childLink)
     {
@@ -201,7 +214,13 @@ JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
       //       << "] fxp[" << wrench.body1Force.Cross(parentMomentArm)
       //       << "]\n";
 
+      gzerr << " parent link b4 body1torque " << wrench.body1Torque << std::endl;
+
       wrench.body1Torque += wrench.body1Force.Cross(parentMomentArm);
+
+      gzerr << " parent link body1torque " << wrench.body1Torque << std::endl;
+      gzerr << " parentMomentArm " << parentMomentArm << std::endl;
+      gzerr << " cgPos " << cgPos << std::endl;
 
       // rotate resulting body1Force in world frame into link frame
       wrench.body1Force = parentPose.rot.RotateVectorReverse(
