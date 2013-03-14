@@ -31,6 +31,19 @@ set (headers
   SensorManager.hh
 )
 
+set (gtest_sources
+  RaySensor_TEST.cc
+  ImuSensor_TEST.cc
+)
+
+if (${VALID_DRI_DISPLAY})
+  set (gtest_sources ${gtest_sources}
+    SensorManager_TEST.cc
+    )
+endif()
+
+gz_build_tests(${gtest_sources})
+
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(sensors_headers "sensors headers"

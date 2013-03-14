@@ -127,7 +127,7 @@ math::Vector3 RTQL8HingeJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8HingeJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
+void RTQL8HingeJoint::SetAnchor(int /*index*/, const math::Vector3 &/*_anchor*/)
 {
 //   if (this->childLink)
 //     this->childLink->SetEnabled(true);
@@ -149,7 +149,7 @@ math::Vector3 RTQL8HingeJoint::GetGlobalAxis(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8HingeJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
+void RTQL8HingeJoint::SetAxis(int /*index*/, const math::Vector3 &/*_axis*/)
 {
 //   if (this->childLink)
 //     this->childLink->SetEnabled(true);
@@ -160,7 +160,7 @@ void RTQL8HingeJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void RTQL8HingeJoint::SetDamping(int /*index*/, double _damping)
+void RTQL8HingeJoint::SetDamping(int /*index*/, double /*_damping*/)
 {
 //   this->damping_coefficient = _damping;
 //   dJointSetDamping(this->jointId, this->damping_coefficient);
@@ -201,13 +201,13 @@ double RTQL8HingeJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8HingeJoint::SetVelocity(int /*index*/, double _angle)
+void RTQL8HingeJoint::SetVelocity(int /*index*/, double /*_angle*/)
 {
 //   this->SetParam(dParamVel, _angle);
 }
 
 //////////////////////////////////////////////////
-void RTQL8HingeJoint::SetMaxForce(int /*index*/, double _t)
+void RTQL8HingeJoint::SetMaxForce(int /*index*/, double /*_t*/)
 {
 //   return this->SetParam(dParamFMax, _t);
 }
@@ -216,10 +216,11 @@ void RTQL8HingeJoint::SetMaxForce(int /*index*/, double _t)
 double RTQL8HingeJoint::GetMaxForce(int /*index*/)
 {
 //   return this->GetParam(dParamFMax);
+  return 0;
 }
 
 //////////////////////////////////////////////////
-void RTQL8HingeJoint::SetForce(int /*index*/, double _torque)
+void RTQL8HingeJoint::SetForce(int /*index*/, double /*_torque*/)
 {
 //   if (this->childLink)
 //     this->childLink->SetEnabled(true);

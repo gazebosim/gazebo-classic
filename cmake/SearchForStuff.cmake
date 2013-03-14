@@ -6,9 +6,24 @@ include (${gazebo_cmake_dir}/FindOS.cmake)
 include (FindPkgConfig)
 include (${gazebo_cmake_dir}/FindFreeimage.cmake)
 
-execute_process(COMMAND pkg-config --modversion protobuf 
+execute_process(COMMAND pkg-config --modversion protobuf
   OUTPUT_VARIABLE PROTOBUF_VERSION
   RESULT_VARIABLE protobuf_modversion_failed)
+
+########################################
+# 1. can not use BUILD_TYPE_PROFILE is defined after include this module
+# 2. TODO: TOUPPER is a hack until we fix the build system to support standard build names
+if (CMAKE_BUILD_TYPE)
+  string(TOUPPER ${CMAKE_BUILD_TYPE} TMP_CMAKE_BUILD_TYPE)
+  if ("${TMP_CMAKE_BUILD_TYPE}" STREQUAL "PROFILE")
+    include (${gazebo_cmake_dir}/FindGooglePerfTools.cmake)
+    if (GOOGLE_PERFTOOLS_FOUND)
+      message(STATUS "Include google-perftools")
+    else()
+      BUILD_ERROR("Need google/heap-profiler.h (libgoogle-perftools-dev) tools to compile in Profile mode")
+    endif()
+  endif()
+endif()
 
 ########################################
 if (PROTOBUF_VERSION LESS 2.3.0)
@@ -33,11 +48,11 @@ include (FindOpenGL)
 if (NOT OPENGL_FOUND)
   BUILD_ERROR ("Missing: OpenGL")
 else ()
- APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                       ${gazeboserver_include_dirs_desc} 
+ APPEND_TO_CACHED_LIST(gazeboserver_include_dirs
+                       ${gazeboserver_include_dirs_desc}
                        ${OPENGL_INCLUDE_DIR})
- APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                       ${gazeboserver_link_libs_desc} 
+ APPEND_TO_CACHED_LIST(gazeboserver_link_libs
+                       ${gazeboserver_link_libs_desc}
                        ${OPENGL_LIBRARIES})
 endif ()
 
@@ -97,7 +112,7 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find bullet
-  pkg_check_modules(BULLET bullet)
+  pkg_check_modules(BULLET bullet>=2.81)
   if (BULLET_FOUND)
     set (HAVE_BULLET TRUE)
   else()
@@ -119,50 +134,50 @@ if (PKG_CONFIG_FOUND)
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
   find_path (tinyxml_include_dir tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
   if (NOT tinyxml_include_dir)
-    message (STATUS "Looking for tinyxml.h - not found") 
+    message (STATUS "Looking for tinyxml.h - not found")
     BUILD_ERROR("Missing: tinyxml")
   else ()
     message (STATUS "Looking for tinyxml.h - found")
-    set (tinyxml_include_dirs ${tinyxml_include_dir} CACHE STRING 
-      "tinyxml include paths. Use this to override automatic detection.") 
+    set (tinyxml_include_dirs ${tinyxml_include_dir} CACHE STRING
+      "tinyxml include paths. Use this to override automatic detection.")
     set (tinyxml_libraries "tinyxml" CACHE INTERNAL "tinyxml libraries")
   endif ()
 
   #################################################
-  # Find libtar. 
+  # Find libtar.
   find_path (libtar_include_dir libtar.h /usr/include /usr/local/include ENV CPATH)
   if (NOT libtar_include_dir)
-    message (STATUS "Looking for libtar.h - not found") 
+    message (STATUS "Looking for libtar.h - not found")
     BUILD_ERROR("Missing: libtar")
   else ()
     message (STATUS "Looking for libtar.h - found")
     set (libtar_libraries "tar" CACHE INTERNAL "tinyxml libraries")
   endif ()
 
-  ################################################# 
+  #################################################
   # Use internal CCD (built as libgazebo_ccd.so)
   #
   set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
-  set(CCD_LIBRARIES gazebo_ccd) 
+  set(CCD_LIBRARIES gazebo_ccd)
 
   #################################################
   # Find TBB
   pkg_check_modules(TBB tbb)
   if (NOT TBB_FOUND)
-    message(STATUS "TBB not found, attempting to detect manually") 
+    message(STATUS "TBB not found, attempting to detect manually")
 
-    find_library(tbb_library tbb ENV LD_LIBRARY_PATH) 
-    if (tbb_library) 
-      set(TBB_FOUND true) 
-      set(TBB_LIBRARIES ${tbb_library}) 
-    else (tbb_library) 
-      BUILD_ERROR ("Missing: TBB - Threading Building Blocks")   
-    endif(tbb_library) 
+    find_library(tbb_library tbb ENV LD_LIBRARY_PATH)
+    if (tbb_library)
+      set(TBB_FOUND true)
+      set(TBB_LIBRARIES ${tbb_library})
+    else (tbb_library)
+      BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
+    endif(tbb_library)
   endif (NOT TBB_FOUND)
 
   #################################################
-  # Find OGRE 
-  execute_process(COMMAND pkg-config --modversion OGRE 
+  # Find OGRE
+  execute_process(COMMAND pkg-config --modversion OGRE
                   OUTPUT_VARIABLE OGRE_VERSION)
   string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
 
@@ -226,7 +241,7 @@ if (PKG_CONFIG_FOUND)
   # else (NOT OAL_FOUND)
   #   set (HAVE_OPENAL TRUE)
   # endif ()
- 
+
   ########################################
   # Find libswscale format
   pkg_check_modules(libswscale libswscale)
@@ -254,25 +269,35 @@ if (PKG_CONFIG_FOUND)
 
   ########################################
   # Find urdfdom and urdfdom_headers
-  find_package(urdfdom_headers)
+  # look for the cmake modules first, and .pc pkg_config second
+  find_package(urdfdom_headers QUIET)
   if (NOT urdfdom_headers_FOUND)
-    BUILD_WARNING ("urdfdom_headers not found, urdf parser will not be built.")
+    pkg_check_modules(urdfdom_headers urdfdom_headers)
+    if (NOT urdfdom_headers_FOUND)
+      BUILD_WARNING ("urdfdom_headers not found, urdf parser will not be built.")
+    endif ()
   endif ()
   if (urdfdom_headers_FOUND)
     set (HAVE_URDFDOM_HEADERS TRUE)
   endif ()
 
-  find_package(urdfdom)
+  find_package(urdfdom QUIET)
   if (NOT urdfdom_FOUND)
-    BUILD_WARNING ("urdfdom not found, urdf parser will not be built.")
+    pkg_check_modules(urdfdom urdfdom)
+    if (NOT urdfdom_FOUND)
+      BUILD_WARNING ("urdfdom not found, urdf parser will not be built.")
+    endif ()
   endif ()
   if (urdfdom_FOUND)
     set (HAVE_URDFDOM TRUE)
   endif ()
 
-  find_package(console_bridge)
+  find_package(console_bridge QUIET)
   if (NOT console_bridge_FOUND)
-    BUILD_WARNING ("console_bridge not found, urdf parser will not be built.")
+    pkg_check_modules(console_bridge console_bridge)
+    if (NOT console_bridge_FOUND)
+      BUILD_WARNING ("console_bridge not found, urdf parser will not be built.")
+    endif ()
   endif ()
   if (console_bridge_FOUND)
     set (HAVE_CONSOLE_BRIDGE TRUE)
@@ -294,6 +319,26 @@ if (PKG_CONFIG_FOUND)
          "Player libraries")
   endif ()
 
+  ########################################
+  # Find GNU Triangulation Surface Library
+  pkg_check_modules(gts gts)
+  if (gts_FOUND)
+    message (STATUS "Looking for GTS - found")
+    set (HAVE_GTS TRUE)
+  else ()
+    set (HAVE_GTS FALSE)
+    BUILD_WARNING ("GNU Triangulation Surface library not found - Gazebo will not have CSG support.")
+  endif ()
+
+  #################################################
+  # Find bullet
+  pkg_check_modules(BULLET bullet)
+  if (BULLET_FOUND)
+    set (HAVE_BULLET TRUE)
+  else()
+    set (HAVE_BULLET FALSE)
+  endif()
+
 else (PKG_CONFIG_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
   BUILD_ERROR ("Error: pkg-config not found")
@@ -312,7 +357,7 @@ find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesyste
 if (NOT Boost_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
   BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
-endif() 
+endif()
 
 ########################################
 # Find urdfdom_headers
@@ -338,11 +383,11 @@ ENDIF (NOT HAVE_URDFDOM_HEADERS)
 ########################################
 # Find urdfdom
 IF (NOT HAVE_URDFDOM)
-  SET (urdfdom_search_path 
-    /usr/include /usr/local/include 
+  SET (urdfdom_search_path
+    /usr/include /usr/local/include
     /usr/include/urdf_parser
   )
-  
+
   FIND_PATH(URDFDOM_PATH urdf_parser.h ${urdfdom_search_path})
   IF (NOT URDFDOM_PATH)
     MESSAGE (STATUS "Looking for urdf_parser/urdf_parser.h - not found")
@@ -363,10 +408,10 @@ ENDIF (NOT HAVE_URDFDOM)
 ########################################
 # Find console_bridge
 IF (NOT HAVE_CONSOLE_BRIDGE)
-  SET (console_bridge_search_path 
-    /usr/include /usr/local/include 
+  SET (console_bridge_search_path
+    /usr/include /usr/local/include
   )
-  
+
   FIND_PATH(CONSOLE_BRIDGE_PATH console_bridge/console.h ${console_bridge_search_path})
   IF (NOT CONSOLE_BRIDGE_PATH)
     MESSAGE (STATUS "Looking for console_bridge/console.h - not found")
@@ -388,16 +433,16 @@ ENDIF (NOT HAVE_CONSOLE_BRIDGE)
 ########################################
 # Find avformat and avcodec
 IF (HAVE_FFMPEG)
-  SET (libavformat_search_path 
-    /usr/include /usr/include/libavformat /usr/local/include 
+  SET (libavformat_search_path
+    /usr/include /usr/include/libavformat /usr/local/include
     /usr/local/include/libavformat /usr/include/ffmpeg
   )
-  
-  SET (libavcodec_search_path 
-    /usr/include /usr/include/libavcodec /usr/local/include 
+
+  SET (libavcodec_search_path
+    /usr/include /usr/include/libavcodec /usr/local/include
     /usr/local/include/libavcodec /usr/include/ffmpeg
   )
-  
+
   FIND_PATH(LIBAVFORMAT_PATH avformat.h ${libavformat_search_path})
   IF (NOT LIBAVFORMAT_PATH)
     MESSAGE (STATUS "Looking for avformat.h - not found")

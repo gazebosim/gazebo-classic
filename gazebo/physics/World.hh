@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <list>
+#include <set>
 #include <deque>
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
@@ -34,6 +35,7 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
 
 #include "gazebo/physics/Base.hh"
@@ -304,11 +306,14 @@ namespace gazebo
       /// \return True if World::Load has completed.
       public: bool IsLoaded() const;
 
-      /// \brief Enqueue a pose message for publication.
-      /// These messages will be transmitted at the end of every iteration.
-      /// \param[in] _msg The message to enqueue.
-      public: void EnqueueMsg(msgs::Pose *_msg);
+      /// \brief Publish pose updates for a model.
+      /// This list of models to publish is processed and cleared once every
+      /// iteration.
+      /// \param[in] _modelName Name of the model to publish.
+      public: void PublishModelPose(const std::string &_modelName);
 
+      /// \cond
+      /// This is an internal function.
       /// \brief Get a model by id.
       ///
       /// Each Entity has a unique ID, this function finds a Model with
@@ -316,6 +321,7 @@ namespace gazebo
       /// \param[in] _id The id of the Model
       /// \return A pointer to the model, or NULL if no Model was found.
       private: ModelPtr GetModelById(unsigned int _id);
+      /// \endcond
 
       /// \brief Load all plugins.
       ///
@@ -367,6 +373,10 @@ namespace gazebo
       /// \brief Called when a world control message is received.
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
+
+      /// \brief Called when a log control message is received.
+      /// \param[in] _data The log control message.
+      private: void OnLogControl(ConstLogControlPtr &_data);
 
       /// \brief Called when a request message is received.
       /// \param[in] _msg The request message.
@@ -433,6 +443,9 @@ namespace gazebo
 
       /// \brief Publish the world stats message.
       private: void PublishWorldStats();
+
+      /// \brief Publish log status message.
+      private: void PublishLogStatus();
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
@@ -502,6 +515,12 @@ namespace gazebo
 
       /// \brief Subscriber to world control messages.
       private: transport::SubscriberPtr controlSub;
+
+      /// \brief Subscriber to log control messages.
+      private: transport::SubscriberPtr logControlSub;
+
+      /// \brief Publisher of log status messages.
+      private: transport::PublisherPtr logStatusPub;
 
       /// \brief Subscriber to factory messages.
       private: transport::SubscriberPtr factorySub;
@@ -628,7 +647,13 @@ namespace gazebo
       private: sdf::SDFPtr factorySDF;
 
       /// \brief The list of pose messages to output.
-      private: msgs::Pose_V poseMsgs;
+      private: std::set<std::string> publishModelPoses;
+
+      /// \brief Info passed through the WorldUpdateBegin event.
+      private: common::UpdateInfo updateInfo;
+
+      /// \brief The number of simulation iterations.
+      private: uint64_t iterations;
     };
     /// \}
   }

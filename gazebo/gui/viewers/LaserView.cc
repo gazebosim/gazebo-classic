@@ -31,7 +31,7 @@ GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.LaserScanStamped", LaserView)
 
 /////////////////////////////////////////////////
 LaserView::LaserView(QWidget *_parent)
-: TopicView(_parent, "gazebo.msgs.LaserScanStamped", "laser")
+: TopicView(_parent, "gazebo.msgs.LaserScanStamped", "laser", 33)
 {
   this->setWindowTitle(tr("Gazebo: Laser View"));
 
@@ -64,9 +64,21 @@ LaserView::LaserView(QWidget *_parent)
   degreeToggle->setText("Degrees");
   connect(degreeToggle, SIGNAL(toggled(bool)), this, SLOT(OnDegree(bool)));
 
+  this->rangeEdit = new QLineEdit;
+  this->rangeEdit->setReadOnly(true);
+  this->rangeEdit->setFixedWidth(80);
+
+  this->angleEdit = new QLineEdit;
+  this->angleEdit->setReadOnly(true);
+  this->angleEdit->setFixedWidth(80);
+
   controlLayout->addWidget(degreeToggle);
   controlLayout->addWidget(fitButton);
   controlLayout->addStretch(1);
+  controlLayout->addWidget(new QLabel("Range"));
+  controlLayout->addWidget(this->rangeEdit);
+  controlLayout->addWidget(new QLabel("Angle"));
+  controlLayout->addWidget(this->angleEdit);
 
   frameLayout->addWidget(this->view);
   frameLayout->addLayout(controlLayout);
@@ -84,6 +96,15 @@ LaserView::~LaserView()
 /////////////////////////////////////////////////
 void LaserView::UpdateImpl()
 {
+  std::ostringstream value;
+  value << this->laserItem->GetHoverRange();
+  this->rangeEdit->setText(tr(value.str().c_str()));
+
+  value.str(std::string());
+  double angle = this->laserItem->GetHoverAngle();
+  angle = angle <= -999 ? 0.0 : angle;
+  value << angle;
+  this->angleEdit->setText(tr(value.str().c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -125,7 +146,7 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
   for (unsigned int i = 0;
        i < static_cast<unsigned int>(_msg->scan().ranges_size()); i++)
   {
-    r = _msg->scan().ranges(i) + _msg->scan().range_min();
+    r = _msg->scan().ranges(i);
 
     if (i+1 >= this->laserItem->GetRangeCount())
       this->laserItem->AddRange(r);
@@ -215,6 +236,8 @@ void LaserView::LaserItem::paint(QPainter *_painter,
 
     double rangeScaled = this->ranges[index] * this->scale;
     double rangeMaxScaled = this->rangeMax * this->scale;
+
+    this->indexAngle = this->angleMin + index * this->angleStep;
 
     // Draw the ray
     x1 = rangeScaled * cos(this->indexAngle);
@@ -328,6 +351,28 @@ QRectF LaserView::LaserItem::GetBoundingRect() const
 }
 
 /////////////////////////////////////////////////
+double LaserView::LaserItem::GetHoverRange() const
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+
+  // Compute the index of the ray that the mouse is hovering over.
+  int index = static_cast<int>(
+      rint((this->indexAngle - this->angleMin) / this->angleStep));
+
+  if (index >= 0 && index < static_cast<int>(this->ranges.size()))
+    return this->ranges[index];
+
+  return 0.0;
+}
+
+/////////////////////////////////////////////////
+double LaserView::LaserItem::GetHoverAngle() const
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+  return this->radians ? this->indexAngle : GZ_RTOD(this->indexAngle);
+}
+
+/////////////////////////////////////////////////
 QRectF LaserView::LaserItem::boundingRect() const
 {
   return this->GetBoundingRect();
@@ -399,7 +444,7 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
   if (this->rangeMin > 0.0)
   {
     // Create the inner circle that denotes the min range
-    for (int i = this->ranges.size()-1; i >=0 ; --i)
+    for (unsigned int i = 0; i < this->ranges.size(); ++i)
     {
       QPointF pt(this->rangeMin * this->scale * cos(angle),
           -this->rangeMin * this->scale * sin(angle));
@@ -429,6 +474,12 @@ void LaserView::LaserItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 {
   this->indexAngle = atan2(-_event->pos().y(), _event->pos().x());
 
+  if (this->indexAngle < this->angleMin)
+    this->indexAngle = this->angleMin;
+
+  if (this->indexAngle > this->angleMax)
+    this->indexAngle = this->angleMax;
+
   QApplication::setOverrideCursor(Qt::CrossCursor);
 }
 
@@ -444,4 +495,10 @@ void LaserView::LaserItem::hoverLeaveEvent(
 void LaserView::LaserItem::hoverMoveEvent(QGraphicsSceneHoverEvent *_event)
 {
   this->indexAngle = atan2(-_event->pos().y(), _event->pos().x());
+
+  if (this->indexAngle < this->angleMin)
+    this->indexAngle = this->angleMin;
+
+  if (this->indexAngle > this->angleMax)
+    this->indexAngle = this->angleMax;
 }

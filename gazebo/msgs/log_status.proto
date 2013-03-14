@@ -1,0 +1,30 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface LogStatus
+/// \brief A message that contains information about data logging
+
+import "time.proto";
+
+message LogStatus
+{
+  message LogFile
+  {
+    enum Units
+    {
+      BYTES = 1;
+      K_BYTES = 2;
+      M_BYTES = 3;
+      G_BYTES = 4;
+    }
+
+    optional string uri        = 1;
+    optional string base_path  = 2;
+    optional string full_path  = 3;
+    optional float size        = 4;
+    optional Units size_units  = 5;
+  }
+
+  optional Time sim_time     = 1;
+  optional LogFile log_file  = 2;
+}

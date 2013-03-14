@@ -99,7 +99,7 @@ void RTQL8RayShape::Update()
 }
 
 //////////////////////////////////////////////////
-void RTQL8RayShape::GetIntersection(double &_dist, std::string &_entity)
+void RTQL8RayShape::GetIntersection(double &/*_dist*/, std::string &/*_entity*/)
 {
 //   if (this->physicsEngine)
 //   {
@@ -120,8 +120,8 @@ void RTQL8RayShape::GetIntersection(double &_dist, std::string &_entity)
 }
 
 //////////////////////////////////////////////////
-void RTQL8RayShape::SetPoints(const math::Vector3 &_posStart,
-                            const math::Vector3 &_posEnd)
+void RTQL8RayShape::SetPoints(const math::Vector3 &/*_posStart*/,
+                            const math::Vector3 &/*_posEnd*/)
 {
 //   math::Vector3 dir;
 //   RayShape::SetPoints(_posStart, _posEnd);

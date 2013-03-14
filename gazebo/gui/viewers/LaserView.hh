@@ -89,6 +89,16 @@ namespace gazebo
                  /// \brief Return the bounding rectangle for this item.
                  public: QRectF GetBoundingRect() const;
 
+                 /// \brief Get the range of the ray selected by the mouse
+                 /// position.
+                 /// \return Range reading for ray under mouse
+                 public: double GetHoverRange() const;
+
+                 /// \brief Get the angle of the ray selected by the mouse
+                 /// position.
+                 /// \return Angle reading for ray under mouse
+                 public: double GetHoverAngle() const;
+
                  /// \brief Update the list of points to draw.
                  /// \param[in] _angleMin Minimum angle, in radians.
                  /// \param[in] _angleMax Maximum angle, in radians.
@@ -197,6 +207,12 @@ namespace gazebo
 
       /// \brief Flag used to determine if a recieved message is the first.
       private: bool firstMsg;
+
+      /// \brief Range output
+      private: QLineEdit *rangeEdit;
+
+      /// \brief Angle output
+      private: QLineEdit *angleEdit;
     };
   }
 }

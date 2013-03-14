@@ -28,7 +28,7 @@ using namespace common;
 //////////////////////////////////////////////////
 Console::Console()
 {
-  this->msgStream = &std::cout;
+  this->msgStream = &std::cerr;
   this->errStream = &std::cerr;
   this->logStream = NULL;
 }

@@ -22,25 +22,27 @@ set (sources ODEPhysics.cc
              ODEScrewJoint.cc
 )
 
-SET (headers ODEPhysics.hh
-             ODECollision.hh
-             ODELink.hh
-             ODEJoint.hh
-             ODESliderJoint.hh
-             ODEHingeJoint.hh
-             ODEHinge2Joint.hh
-             ODEUniversalJoint.hh
-             ODEBallJoint.hh
-             ODETrimeshShape.hh
-             ODERayShape.hh
-             ODEMultiRayShape.hh
-             ODEHeightmapShape.hh
-             ODESphereShape.hh
-             ODEBoxShape.hh
-             ODEPlaneShape.hh
-             ODECylinderShape.hh
-             ODETypes.hh
-             ODEScrewJoint.hh
+SET (headers
+  ode_inc.h
+  ODEPhysics.hh
+  ODECollision.hh
+  ODELink.hh
+  ODEJoint.hh
+  ODESliderJoint.hh
+  ODEHingeJoint.hh
+  ODEHinge2Joint.hh
+  ODEUniversalJoint.hh
+  ODEBallJoint.hh
+  ODETrimeshShape.hh
+  ODERayShape.hh
+  ODEMultiRayShape.hh
+  ODEHeightmapShape.hh
+  ODESphereShape.hh
+  ODEBoxShape.hh
+  ODEPlaneShape.hh
+  ODECylinderShape.hh
+  ODETypes.hh
+  ODEScrewJoint.hh
 )
 
 gz_add_library(gazebo_physics_ode ${sources})
