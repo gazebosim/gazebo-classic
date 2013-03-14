@@ -152,6 +152,12 @@ namespace gazebo
       /// \brief Mutex to protect reads and writes.
       private: mutable boost::mutex mutex;
 
+      /// \brief returns a pointer to the mutex for locking while reading
+      ///        internally kept map of map of collision names and contacts
+      /// \return The mutex for the sensor
+      public: boost::mutex* GetUpdateMutex()
+              {return &(this->mutex);}
+
       /// \brief Contacts message used to output sensor data.
       private: msgs::Contacts contactsMsg;
 

@@ -26,11 +26,11 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "transport/TransportTypes.hh"
-#include "sensors/Sensor.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {
@@ -192,6 +192,10 @@ namespace gazebo
       /// \return True if horizontal, false if not
       public: bool IsHorizontal() const;
 
+      /// Deprecated
+      /// \sa GetRayCountRatio
+      public: double Get1stRatio() const GAZEBO_DEPRECATED;
+
       /// \brief Return the ratio of horizontal ray count to vertical ray
       /// count.
       ///
@@ -199,6 +203,10 @@ namespace gazebo
       /// is the total number of data points returned. When range count
       /// != ray count, then values are interpolated between rays.
       public: double GetRayCountRatio() const;
+
+      /// Deprecated
+      /// \sa GetRangeCountRatio
+      public: double Get2ndRatio() const GAZEBO_DEPRECATED;
 
       /// \brief Return the ratio of horizontal range count to vertical
       /// range count.
@@ -208,24 +216,47 @@ namespace gazebo
       /// != ray count, then values are interpolated between rays.
       public: double GetRangeCountRatio() const;
 
+      /// Deprecated.
+      /// \sa GetHorzFOV
+      public: double GetHFOV() const GAZEBO_DEPRECATED;
+
       /// \brief Get the horizontal field of view of the laser sensor.
       /// \return The horizontal field of view of the laser sensor.
       public: double GetHorzFOV() const;
+
+      /// Deprecated
+      public: double GetCHFOV() const GAZEBO_DEPRECATED;
 
       /// \brief Get Cos Horz field-of-view
       /// \return 2 * atan(tan(this->hfov/2) / cos(this->vfov/2))
       public: double GetCosHorzFOV() const;
 
+      /// Deprecated
+      /// \sa GetVertFOV
+      public: double GetVFOV() const GAZEBO_DEPRECATED;
+
       /// \brief Get the vertical field-of-view.
       public: double GetVertFOV() const;
+
+      /// Deprecated
+      /// \sa GetCosVertFOV
+      public: double GetCVFOV() const GAZEBO_DEPRECATED;
 
       /// \brief Get Cos Vert field-of-view
       /// \return 2 * atan(tan(this->vfov/2) / cos(this->hfov/2))
       public: double GetCosVertFOV() const;
 
+      /// Deprecated.
+      /// \sa GetHorzHalfAngle
+      public: double GetHAngle() const GAZEBO_DEPRECATED;
+
       /// \brief Get (horizontal_max_angle + horizontal_min_angle) * 0.5
       /// \return (horizontal_max_angle + horizontal_min_angle) * 0.5
       public: double GetHorzHalfAngle() const;
+
+      /// Deprecated.
+      /// \sa GetVertHalfAngle
+      public: double GetVAngle() const GAZEBO_DEPRECATED;
 
       /// \brief Get (vertical_max_angle + vertical_min_angle) * 0.5
       /// \return (vertical_max_angle + vertical_min_angle) * 0.5
@@ -256,33 +287,6 @@ namespace gazebo
       /// \brief Camera SDF element.
       protected: sdf::ElementPtr cameraElem;
 
-      /// \brief Number of cameras.
-      protected: unsigned int cameraCount;
-
-      /// \brief Horizontal field-of-view.
-      protected: double hfov;
-
-      /// \brief Vertical field-of-view.
-      protected: double vfov;
-
-      /// \brief Cos horizontal field-of-view.
-      protected: double chfov;
-
-      /// \brief Cos vertical field-of-view.
-      protected: double cvfov;
-
-      /// \brief Horizontal half angle.
-      protected: double horzHalfAngle;
-
-      /// \brief Vertical half angle.
-      protected: double vertHalfAngle;
-
-      /// \brief Near clip plane.
-      protected: double near;
-
-      /// \brief Far clip plane.
-      protected: double far;
-
       /// \brief Horizontal ray count.
       protected: unsigned int horzRayCount;
 
@@ -295,14 +299,8 @@ namespace gazebo
       /// \brief Vertical range count.
       protected: unsigned int vertRangeCount;
 
-      /// \brief Ray count ratio.
-      protected: double rayCountRatio;
-
       /// \brief Range count ratio.
       protected: double rangeCountRatio;
-
-      /// \brief True if the sensor is horizontal only.
-      protected: bool isHorizontal;
 
       /// \brief GPU laser rendering.
       private: rendering::GpuLaserPtr laserCam;

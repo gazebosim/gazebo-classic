@@ -116,6 +116,18 @@ namespace gazebo
       /// \return the product
       public: double Dot(const Vector3 &_pt) const;
 
+      /// \brief Deprecated
+      public: Vector3 GetCrossProd(const Vector3 &_pt) const GAZEBO_DEPRECATED
+      {
+        return this->Cross(_pt);
+      }
+
+      /// \brief Deprecated
+      public: double GetDotProd(const Vector3 &_pt) const GAZEBO_DEPRECATED
+      {
+        return this->Dot(_pt);
+      }
+
       /// \brief Get the absolute value of the vector
       /// \return a vector with positive elements
       public: Vector3 GetAbs() const;
