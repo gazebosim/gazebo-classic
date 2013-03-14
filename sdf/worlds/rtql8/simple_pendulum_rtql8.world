@@ -1,11 +1,7 @@
 <?xml version="1.0" ?>
 <sdf version="1.4">
   <world name="default">
-    <scene>
-      <ambient>1.0 1.0 1.0 1</ambient>
-      <background>0 0 0 1.0</background>
-      <shadows>true</shadows>
-    </scene>
+    <include><uri>model://sun</uri></include>
     <physics type="rtql8">
       <gravity>0 0 -10.0</gravity>
       <ode>
@@ -26,9 +22,9 @@
     <!--include><uri>model://ground_plane</uri></include-->
     <!-- 25.3kg total mass -->
     <model name="test_model">
-      <pose>0 0 4 0 0 0</pose>
+      <pose>0 0 2 0 0 0</pose>
       <link name="link1">
-	<pose>0 0 -2 0 0 0</pose>
+	<pose>0 0 0 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -61,18 +57,5 @@
         </axis>
       </joint>
     </model>
-    <light type="directional" name="sun">
-      <pose>0 0 10 0 0 0</pose>
-      <diffuse>.8 .8 .8 1</diffuse>
-      <specular>.1 .1 .1 1</specular>
-      <attenuation>
-        <range>10</range>
-        <linear>0.01</linear>
-        <constant>0.8</constant>
-        <quadratic>0.0</quadratic>
-      </attenuation>
-      <direction>0 .5 -.5</direction>
-      <cast_shadows>true</cast_shadows>
-    </light>
   </world>
 </sdf>

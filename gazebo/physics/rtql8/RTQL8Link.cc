@@ -69,7 +69,7 @@ void RTQL8Link::Init()
   static double TEMP_SIZE = 1.0;
   rtql8::kinematics::ShapeCube* shape
           = new rtql8::kinematics::ShapeCube(Eigen::Vector3d(TEMP_SIZE, TEMP_SIZE, 1), 1);
-  TEMP_SIZE += 100.0;
+  //TEMP_SIZE += 100.0;
   this->rtql8BodyNode->setShape(shape);
 
   //----------------------------------------------------------------------------
