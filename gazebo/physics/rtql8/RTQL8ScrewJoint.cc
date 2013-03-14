@@ -106,6 +106,13 @@ void RTQL8ScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
 }
 
 //////////////////////////////////////////////////
+double RTQL8ScrewJoint::GetThreadPitch(unsigned int /*_index*/)
+{
+  gzerr << "not yet implemented\n";
+  return 0;
+}
+
+//////////////////////////////////////////////////
 void RTQL8ScrewJoint::ApplyDamping()
 {
 //   double damping_force = this->damping_coefficient * this->GetVelocity(0);

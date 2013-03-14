@@ -498,7 +498,20 @@ void RTQL8Joint::SetAttribute(const std::string &/*_key*/, int /*_index*/,
 //   }
 }
 
-JointWrench RTQL8Joint::GetForceTorque(int /*_index*/)
+//////////////////////////////////////////////////
+double RTQL8Joint::GetAttribute(const std::string &_key, unsigned int _index)
+{
+  gzerr << "RTQL8Joint::GetAttribute not yet implemented\n";
+}
+
+//////////////////////////////////////////////////
+JointWrench RTQL8Joint::GetForceTorque(int _index)
+{
+  return this->GetForceTorque(static_cast<unsigned int>(_index));
+}
+
+//////////////////////////////////////////////////
+JointWrench RTQL8Joint::GetForceTorque(unsigned int /*_index*/)
 {
   JointWrench wrench;
 //  // Note that:

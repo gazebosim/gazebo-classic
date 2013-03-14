@@ -82,11 +82,19 @@ namespace gazebo
       public: virtual void SetAttribute(const std::string &_key, int _index,
                                         const boost::any &_value);
 
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &_key,
+                                                unsigned int _index);
+
       /// \brief
       protected: rtql8::kinematics::Joint* rtql8Joint;
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(int _index);
+
+      // Documentation inherited.
+      public: virtual JointWrench GetForceTorque(unsigned int _index);
+
     };
   }
 }
