@@ -51,7 +51,7 @@ gz_build_display_tests(${display_tests})
 
 set(dri_tests
   camera_sensor.cc
-  heightmap.cc
+  #heightmap.cc
   pr2.cc
   projector.cc
   speed_pr2.cc

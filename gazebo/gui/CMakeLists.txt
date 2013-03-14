@@ -100,11 +100,15 @@ set (qt_tests
 )
 
 # Generate executables for each of the QT unit tests
-gz_build_qt_tests(${qt_tests})
+#gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 
-QT4_WRAP_CPP(headers_MOC ${qt_headers})
+# Macro BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION defined to workaround
+# QTBUG-22829 issue with qt < qt5 and boost 1.53
+# https://bugreports.qt-project.org/browse/QTBUG-22829
+QT4_WRAP_CPP(headers_MOC ${qt_headers}
+             OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 gz_add_executable(gzclient ${sources} main.cc ${headers_MOC} ${headers} ${resources_RCC})

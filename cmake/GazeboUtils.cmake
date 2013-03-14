@@ -106,7 +106,7 @@ macro (gz_add_executable _name)
   target_link_libraries (${_name} ${general_libraries})
 
 if (APPLE)
-  set_property(TARGET ${_name} PROPERTY MACOSX_BUNDLE TRUE)
+  #set_property(TARGET ${_name} PROPERTY MACOSX_BUNDLE TRUE)
 endif()
 endmacro ()
 

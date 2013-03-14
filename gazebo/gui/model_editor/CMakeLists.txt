@@ -63,7 +63,11 @@ set (headers
 )
 
 set (resources ../resources.qrc)
-QT4_WRAP_CPP(headers_MOC ${qt_headers})
+# Macro BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION defined to workaround
+# QTBUG-22829 issue with qt < qt5 and boost 1.53
+# https://bugreports.qt-project.org/browse/QTBUG-22829
+QT4_WRAP_CPP(headers_MOC ${qt_headers}
+             OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 add_library(gazebo_model_editor STATIC ${sources} ${headers_MOC} ${headers} ${resources_RCC})
