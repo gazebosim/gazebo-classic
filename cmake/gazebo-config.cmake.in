@@ -31,6 +31,6 @@ foreach(dep @PKG_DEPENDS@)
   list(APPEND @PKG_NAME@_LIBRARIES ${${dep}_LIBRARIES})
 endforeach()
 
-list(APPEND @PKG_NAME@_LDFLAGS -Wl,-rpath,@CMAKE_INSTALL_PREFIX@/lib,-rpath,${prefix}/lib/gazebo-@GAZEBO_VERSION@/plugins)
+list(APPEND @PKG_NAME@_LDFLAGS -Wl,-rpath,@CMAKE_INSTALL_PREFIX@/lib,-rpath,@CMAKE_INSTALL_PREFIX@/lib/gazebo-@GAZEBO_VERSION@/plugins)
 list(APPEND @PKG_NAME@_LDFLAGS -L@CMAKE_INSTALL_PREFIX@/lib)
 list(APPEND @PKG_NAME@_LDFLAGS -L@CMAKE_INSTALL_PREFIX@/lib/gazebo-@GAZEBO_VERSION@/plugins)
