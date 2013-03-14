@@ -133,7 +133,14 @@ class ServerFixture : public testing::Test
                while ((!this->server || !this->server->GetInitialized()) &&
                       ++waitCount < maxWaitCount)
                  common::Time::MSleep(10);
-               ASSERT_LT(waitCount, maxWaitCount);
+               if (waitCount >= maxWaitCount)
+               {
+                 gzerr << "this->server " << this->server << "  "
+                       << "this->server->GetInitialized() "
+                       << this->server->GetInitialized() << "  "
+                       << "other relevant stuff...\n";
+                 ASSERT_LT(waitCount, maxWaitCount);
+               }
 
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
