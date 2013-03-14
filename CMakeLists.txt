@@ -302,6 +302,16 @@ else (build_errors)
   endforeach()
 
   ########################################
+  # Make the cmake config files
+  set(PKG_NAME ${PROJECT_NAME_LOWER})
+  set(PKG_LIBRARIES gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_sdf_interface gazebo_msgs gazebo_transport)
+  set(PKG_DEPENDS Boost)
+  set(cmake_conf_file "${CMAKE_CURRENT_SOURCE_DIR}/cmake/gazebo-config.cmake")
+  configure_file("${cmake_conf_file}.in" "${cmake_conf_file}" @ONLY)
+  install(FILES ${cmake_conf_file} DESTINATION share/${PROJECT_NAME_LOWER}/cmake/ COMPONENT cmake)
+
+
+  ########################################
   # If present, load platform-specific build hooks.  This system is used,
   # for example, by the Ubuntu overlay (in the gazebo-release repo), to
   # arrange for installation of Ubuntu-specific application-launching
