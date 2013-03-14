@@ -113,6 +113,9 @@ namespace gazebo
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
 
+      /// \brief Callback for diagnostics action.
+      private slots: void Diagnostics();
+
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);
 

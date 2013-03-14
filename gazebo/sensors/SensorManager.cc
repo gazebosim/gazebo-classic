@@ -136,6 +136,18 @@ bool SensorManager::SensorsInitialized()
 }
 
 //////////////////////////////////////////////////
+void SensorManager::ResetLastUpdateTimes()
+{
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+  for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
+       iter != this->sensorContainers.end(); ++iter)
+  {
+    GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
+    (*iter)->ResetLastUpdateTimes();
+  }
+}
+
+//////////////////////////////////////////////////
 void SensorManager::Init()
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
@@ -447,6 +459,10 @@ void SensorManager::SensorContainer::RunLoop()
   {
     // Get the start time of the update.
     startTime = world->GetSimTime();
+
+    if (this->sensors.size() == 0)
+      this->runCondition.wait(lock2);
+
     this->Update(false);
 
     // Compute the time it took to update the sensors.
@@ -483,7 +499,7 @@ void SensorManager::SensorContainer::Update(bool _force)
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   if (this->sensors.size() == 0)
-    gzerr << "Updating a sensor containing without any sensors.\n";
+    gzlog << "Updating a sensor containing without any sensors.\n";
 
   // Update all the sensors in this container.
   for (Sensor_V::iterator iter = this->sensors.begin();
@@ -556,6 +572,21 @@ bool SensorManager::SensorContainer::RemoveSensor(const std::string &_name)
   }
 
   return removed;
+}
+
+//////////////////////////////////////////////////
+void SensorManager::SensorContainer::ResetLastUpdateTimes()
+{
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
+  Sensor_V::iterator iter;
+
+  // Rest last update times for all contained sensors.
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+  {
+    GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
+    (*iter)->ResetLastUpdateTime();
+  }
 }
 
 //////////////////////////////////////////////////
