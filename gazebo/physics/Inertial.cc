@@ -77,12 +77,9 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
 
-  math::Vector3 center(0, 0, 0);
-  if (this->sdf->HasElement("pose"))
-  {
-    center = this->sdf->GetValuePose("pose").pos;
-  }
-  this->SetCoG(center.x, center.y, center.z);
+  // use default pose (identity) if not specified in sdf
+  math::Pose pose = this->sdf->GetValuePose("pose").pos;
+  this->SetCoG(pose);
 
   // if (this->sdf->HasElement("inertia"))
   // Do the following whether an inertia element was specified or not.
@@ -98,7 +95,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
         inertiaElem->GetValueDouble("iyz"));
 
     // rotate inertia matrix based on it's pose specification
-    this->RotateInertiaMatrix(this->sdf->GetValuePose("pose").rot);
+    this->RotateInertiaMatrix(this->cog.rot);
 
     inertiaElem->GetElement("ixx")->GetValue()->SetUpdateFunc(
         boost::bind(&Inertial::GetIXX, this));

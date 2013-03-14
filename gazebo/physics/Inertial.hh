@@ -185,6 +185,13 @@ namespace gazebo
       /// \param[in] _msg Message to read
       public: void ProcessMsg(const msgs::Inertial &_msg);
 
+      /// \brief Get transformed Inertial parameters.
+      /// \param[in] _inertial pointer to Inertial class.
+      /// \param[in] _pose Transform to apply to the Inertial parameters.
+      /// \return returns a copy of rotated input Inertial class.
+      public: Inertial ComputeTransformedInertial(const InertialPtr &_inertial,
+        const math::Pose &_pose);
+
       /// \brief Output operator.
       /// \param[in] _out Output stream.
       /// \param[in] _inertial Inertial object to output.
@@ -202,6 +209,19 @@ namespace gazebo
                 return _out;
               }
 
+      /// \brief returns Moments of Inertia as a Matrix3
+      /// \return Moments of Inertia as a Matrix3
+      public: math::Matrix3 GetMOI();
+
+      /// \brief Sets Moments of Inertia from a Matrix3
+      /// \param[in] Moments of Inertia as a Matrix3
+      public: void SetMOI(const math::Matrix3 &_moi);
+
+      /// \brief Rotates Inertial::principals and Inertia::products
+      /// Moments of Inertia (MOI).
+      /// \param[in] _rot Quaternion to rotate current MOI by.
+      private: void RotateInertiaMatrix(const math::Quaternion &_rot);
+
       /// \brief Mass the object. Default is 1.0.
       private: double mass;
 
@@ -209,9 +229,11 @@ namespace gazebo
       private: math::Pose cog;
 
       /// \brief Principal moments of inertia. Default is (1.0 1.0 1.0)
+      /// These MOI are specified in the Inertial frame.
       private: math::Vector3 principals;
 
       /// \brief Product moments of inertia. Default is (0.0 0.0 0.0)
+      /// These MOI off-diagonals are specified in the Inertial frame.
       private: math::Vector3 products;
 
       /// \brief Our SDF values.
