@@ -234,12 +234,12 @@ void info(const std::string &_filename)
 /// \brief Filter a state string.
 /// \param[in] _stateString State string data.
 /// \param[in] _filter Filter argument.
-std::string filter_state(const std::string &_stateString,
-                         std::string _filter)
+std::string filterState(const std::string &_stateString,
+                        const std::string &_filter)
 {
   std::ostringstream result;
   gazebo::physics::WorldState state;
-  std::vector<std::string> names;
+  std::vector<std::string> filterParts;
 
   // Read and parse the state information
   g_stateSdf->ClearElements();
@@ -247,57 +247,75 @@ std::string filter_state(const std::string &_stateString,
   state.Load(g_stateSdf);
 
   // Split the filter on "::"
-  boost::split_regex(names, _filter, boost::regex("::"));
-  std::vector<std::string>::iterator iter = names.begin();
+  boost::split_regex(filterParts, _filter, boost::regex("/"));
+  std::vector<std::string>::iterator iter = filterParts.begin();
 
   // Continue if the filter is valid. Otherwise output the raw state data.
-  if (iter != names.end() && !(*iter).empty())
+  if (iter != filterParts.end() && !(*iter).empty())
   {
-    // The first element in the filter must be a model name.
-    gazebo::physics::ModelState modelState = state.GetModelState(*(iter++));
+    std::vector<gazebo::physics::ModelState> modelStates;
 
-    // Continue if there is more to the filter and the current filter
-    // item valid. Otheriwise, use all of the model state data.
-    if (iter != names.end() && !(*iter).empty())
+    // The first element in the filter must be a model name or a star.
+    if ((*iter) != "*")
+      modelStates.push_back(state.GetModelState(*iter));
+    else
+      modelStates = state.GetModelStates();
+
+    iter++;
+
+    // Filter all the model states that were found.
+    for (std::vector<gazebo::physics::ModelState>::iterator modelIter =
+        modelStates.begin(); modelIter != modelStates.end(); ++modelIter)
     {
-      // Check to see if the next element in the filter is a link.
-      if (modelState.HasLinkState(*iter))
+      // Continue if there is more to the filter and the current filter
+      // item valid. Otheriwise, use all of the model state data.
+      if (iter != filterParts.end() && !(*iter).empty())
       {
-        gazebo::physics::LinkState linkState;
+        std::vector<gazebo::physics::LinkState> linkStates;
 
-        // Get the link.
-        linkState = modelState.GetLinkState(*(iter++));
-
-        // Continue if the next element in the filter is valid. Otherwise
-        // use all of the link's data.
-        if (iter != names.end() && !(*iter).empty())
-        {
-          // Each data value in a link starts with a unique character, so we
-          // allow the user to use just the first character in the filter.
-          switch ((*iter)[0])
-          {
-            default:
-            case 'p':
-              result << linkState.GetPose();
-              break;
-            case 'v':
-              result << linkState.GetVelocity();
-              break;
-            case 'a':
-              result << linkState.GetAcceleration();
-              break;
-            case 'w':
-              result << linkState.GetAcceleration();
-              break;
-          }
-        }
+        if ((*iter) != "*" && (*modelIter).HasLinkState(*iter))
+          linkStates.push_back((*modelIter).GetLinkState((*iter)));
         else
-          result << linkState;
-      }
-      // Otherwise check to see if the next element in the filter is a joint.
-      else if (modelState.HasJointState(*iter))
-      {
-        gazebo::physics::JointState jointState;
+        {
+          printf("All links\n");
+          linkStates = (*modelIter).GetLinkStates();
+        }
+
+        iter++;
+
+        for(std::vector<gazebo::physics::LinkState>::iterator linkIter =
+            linkStates.begin(); linkIter != linkStates.end(); ++linkIter)
+        {
+          // Continue if the next element in the filter is valid. Otherwise
+          // use all of the link's data.
+          if (iter != filterParts.end() && !(*iter).empty())
+          {
+            // Each data value in a link starts with a unique character, so we
+            // allow the user to use just the first character in the filter.
+            switch ((*iter)[0])
+            {
+              default:
+              case 'p':
+                result << (*linkIter).GetPose();
+                break;
+              case 'v':
+                result << (*linkIter).GetVelocity();
+                break;
+              case 'a':
+                result << (*linkIter).GetAcceleration();
+                break;
+              case 'w':
+                result << (*linkIter).GetAcceleration();
+                break;
+            }
+          }
+          else
+            result << *linkIter;
+        }
+        /*// Otherwise check to see if the next element in the filter is a joint.
+          else if (modelState.HasJointState(*iter))
+          {
+          gazebo::physics::JointState jointState;
 
         // Get the joint.
         jointState = modelState.GetJointState(*(iter++));
@@ -306,29 +324,30 @@ std::string filter_state(const std::string &_stateString,
         // is valid. Otherwise use all of the joint's data.
         if (iter != names.end() && !(*iter).empty())
         {
-          // Try to get the index of the axis for output
-          try
-          {
-            int index = boost::lexical_cast<int>(*iter);
-            result << jointState.GetAngle(index);
-          }
-          catch(boost::bad_lexical_cast &_e)
-          {
-            gzerr << "Invalid joint angle index[" << *iter << "]\n";
-          }
+        // Try to get the index of the axis for output
+        try
+        {
+        int index = boost::lexical_cast<int>(*iter);
+        result << jointState.GetAngle(index);
+        }
+        catch(boost::bad_lexical_cast &_e)
+        {
+        gzerr << "Invalid joint angle index[" << *iter << "]\n";
+        }
         }
         else
-          result << jointState;
-      }
-      // Otherwise don't use any data.
-      else
-      {
+        result << jointState;
+        }
+        // Otherwise don't use any data.
+        else
+        {
         // Don't output an error here. A link or joint will not get logged
         // if there was no change in it's state values.
+        }*/
       }
+      else
+        result << *modelIter;
     }
-    else
-      result << modelState;
   }
   else
     result << g_stateSdf;
@@ -339,7 +358,7 @@ std::string filter_state(const std::string &_stateString,
 /////////////////////////////////////////////////
 /// \brief Dump the contents of a log file to screen
 /// \param[in] _filter Filter string
-void echo(const std::string _filter)
+void echo(const std::string &_filter)
 {
   std::string stateString;
 
@@ -350,7 +369,7 @@ void echo(const std::string _filter)
     gazebo::common::LogPlay::Instance()->Step(stateString);
 
     if (!_filter.empty() && i > 0)
-      stateString = filter_state(stateString, _filter);
+      stateString = filterState(stateString, _filter);
     else if (!_filter.empty())
       stateString.clear();
 
@@ -375,7 +394,7 @@ void step(const std::string &_filter)
     play->Step(stateString);
 
     if (!_filter.empty() && i > 0)
-      stateString = filter_state(stateString, _filter);
+      stateString = filterState(stateString, _filter);
     else if (!_filter.empty())
       stateString.clear();
 
