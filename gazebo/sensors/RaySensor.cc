@@ -262,7 +262,7 @@ void RaySensor::UpdateImpl(bool /*_force*/)
 
   // Store the latest laser scans into laserMsg
   msgs::Set(scan->mutable_world_pose(),
-            this->parentEntity->GetWorldPose() + this->GetPose());
+            this->pose + this->parentEntity->GetWorldPose());
   scan->set_angle_min(this->GetAngleMin().Radian());
   scan->set_angle_max(this->GetAngleMax().Radian());
   scan->set_angle_step(this->GetAngleResolution());

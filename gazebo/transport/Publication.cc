@@ -202,7 +202,7 @@ void Publication::RemoveSubscription(const std::string &_host,
   iter = this->callbacks.begin();
   while (iter != this->callbacks.end())
   {
-    subptr = boost::shared_dynamic_cast<SubscriptionTransport>(*iter);
+    subptr = boost::dynamic_pointer_cast<SubscriptionTransport>(*iter);
     std::string host = subptr->GetConnection()->GetRemoteAddress();
     if (!subptr || !subptr->GetConnection()->IsOpen() ||
         ((host.empty() || host == _host) &&
@@ -415,7 +415,7 @@ void Publication::RemoveNodes()
       iter = this->callbacks.begin();
       while (iter != this->callbacks.end())
       {
-        subptr = boost::shared_dynamic_cast<SubscriptionTransport>(*iter);
+        subptr = boost::dynamic_pointer_cast<SubscriptionTransport>(*iter);
         if (!subptr || !subptr->GetConnection()->IsOpen() ||
             (subptr->GetConnection()->GetRemoteAddress() == (*cbIter).first &&
              subptr->GetConnection()->GetRemotePort() == (*cbIter).second))

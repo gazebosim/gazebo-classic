@@ -51,7 +51,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
       rangeResolution, samples);
 
   sensors::RaySensorPtr laser =
-    boost::shared_static_cast<sensors::RaySensor>(
+    boost::static_pointer_cast<sensors::RaySensor>(
         sensors::SensorManager::Instance()->GetSensor(raySensorName));
 
   ASSERT_TRUE(laser);
@@ -203,7 +203,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
-    boost::shared_dynamic_cast<sensors::RaySensor>(sensor);
+    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
   raySensor->Init();
   raySensor->Update(true);

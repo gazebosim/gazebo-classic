@@ -66,7 +66,7 @@ TEST(MsgFactory, NewMsg)
   goodMsg.SerializeToString(&serializedData);
 
   gazebo::msgs::Vector3dPtr msg =
-    boost::shared_dynamic_cast<gazebo::msgs::Vector3d>(
+    boost::dynamic_pointer_cast<gazebo::msgs::Vector3d>(
         gazebo::msgs::MsgFactory::NewMsg("gazebo.msgs.Vector3d"));
 
   msg->ParseFromString(serializedData);
