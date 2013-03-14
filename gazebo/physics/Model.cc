@@ -372,6 +372,14 @@ void Model::Reset()
     (*iter)->Reset();
   }
 
+  // reset link velocities when resetting model
+  Link_V links = this->GetLinks();
+  for (Link_V::iterator liter = links.begin();
+       liter!= links.end(); ++liter)
+  {
+    (*liter)->ResetPhysicsStates();
+  }
+
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter!= this->joints.end(); ++jiter)
   {
@@ -995,4 +1003,3 @@ bool Model::GetAutoDisable() const
 {
   return this->sdf->GetValueBool("allow_auto_disable");
 }
-

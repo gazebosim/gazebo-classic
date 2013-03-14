@@ -91,16 +91,6 @@ void ODESliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetDamping(int /*index*/, double _damping)
-{
-  this->dampingCoefficient = _damping;
-  // use below when ode version is fixed
-  // dJointSetDamping(this->jointId, this->dampingCoefficient);
-  this->applyDamping = physics::Joint::ConnectJointUpdate(
-    boost::bind(&Joint::ApplyDamping, this));
-}
-
-//////////////////////////////////////////////////
 void ODESliderJoint::SetForce(int _index, double _effort)
 {
   if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())

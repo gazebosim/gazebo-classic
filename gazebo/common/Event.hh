@@ -465,6 +465,9 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Disconnect(ConnectionPtr _c)
     {
+      if (!_c)
+        return;
+
       this->Disconnect(_c->GetId());
       _c->event = NULL;
       _c->id = -1;

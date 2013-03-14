@@ -10,7 +10,7 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 set (GAZEBO_VERSION_NAME "lithium")
 set (GAZEBO_MAJOR_VERSION 1)
-set (GAZEBO_MINOR_VERSION 4)
+set (GAZEBO_MINOR_VERSION 5)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
@@ -183,44 +183,46 @@ set (CMAKE_C_FLAGS_CHECK " -g -O0 -Wformat=2 --coverage -fno-inline ${CMAKE_C_FL
 set (CMAKE_CXX_FLAGS_CHECK "${CMAKE_C_FLAGS_CHECK} -fno-elide-constructors -fno-default-inline -fno-implicit-inline-templates")
 
 #####################################
+MESSAGE(STATUS "Checking gazebo build type")
 # Set the default build type
 if (NOT CMAKE_BUILD_TYPE)
-  set (CMAKE_BUILD_TYPE "RELWITHDEBINFO" CACHE STRING 
-    "Choose the type of build, options are: debug release relwithdebinfo profile check" FORCE)
+    set (CMAKE_BUILD_TYPE "Release" CACHE STRING 
+        "Choose the type of build, options are: Debug Release RelWithDebInfo Profile Check" FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
-string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
+# TODO: still convert to uppercase to keep backwards compatibility with 
+# uppercase old supported and deprecated modes
+string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPERCASE)
 
 #####################################
 # Set all the global build flags
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
-set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
-set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
+set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
+set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
+set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
 
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "PROFILE")
+set (BUILD_TYPE_PROFILE FALSE)
+set (BUILD_TYPE_RELEASE FALSE)
+set (BUILD_TYPE_RELWITHDEBINFO FALSE)
+set (BUILD_TYPE_DEBUG FALSE)
+
+if ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "PROFILE")
   set (BUILD_TYPE_PROFILE TRUE)
-else()
-  set (BUILD_TYPE_PROFILE FALSE)
-endif()
-
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "RELEASE")
+elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "RELEASE")
   set (BUILD_TYPE_RELEASE TRUE)
-else()
-  set (BUILD_TYPE_RELEASE FALSE)
-endif()
-
-if ( "${CMAKE_BUILD_TYPE}" STREQUAL "RELWITHDEBINFO")
+elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "RELWITHDEBINFO")
   set (BUILD_TYPE_RELWITHDEBINFO TRUE)
-else()
-  set (BUILD_TYPE_RELWITHDEBINFO FALSE)
-endif()
-
-if ( "${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
+elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "DEBUG")
   set (BUILD_TYPE_DEBUG TRUE)
 else()
-  set (BUILD_TYPE_DEBUG FALSE)
+  build_error("CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} unknown. Valid options are: Debug Release RelWithDebInfo Profile Check")
 endif()
+
+# TODO: remove this check when transtition period ends
+# Check if build type was sent in old uppercase format
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "${CMAKE_BUILD_TYPE_UPPERCASE}")
+    build_warning("CMAKE_BUILD_TYPE was specified in uppercase. This will stop to be supported soon. Valid types: Debug Release RelWithDebInfo Profile Check")
+endif ()
 
 message (STATUS "\n\n====== Configuring 3rd Party Packages ======")
 add_subdirectory(deps)
