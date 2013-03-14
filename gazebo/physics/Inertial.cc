@@ -255,8 +255,21 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
   // FIXME: \TODO: below doesn't look right, fix and add unit test.
   // Should rotate both MOI into link frame (zero cog.rot) and add
   // via parallel axis theorem.
-  result.principals = this->principals + _inertial.principals;
-  result.products = this->products + _inertial.products;
+
+  // transform this->principals and this->products to result.cog
+  math::Matrix3 moi1 = this->GetMOI();
+  math::Vector3 principals1;
+  math::Vector3 products1;
+
+  // transform _inertial.principals and _inertial.products to result.cog
+  math::Matrix3 moi2 = _inertial.GetMOI();
+  math::Vector3 principals2;
+  math::Vector3 products2;
+
+
+  // add them
+  result.principals = principals1 + principals2;
+  result.products = products1 + products2;
 
   return result;
 }
