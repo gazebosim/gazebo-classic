@@ -31,19 +31,19 @@ set (headers
   SensorManager.hh
 )
 
-set (gtest_sources
+set (gtest_sources_display
   RaySensor_TEST.cc
   ImuSensor_TEST.cc
   Sensor_TEST.cc
 )
 
-if (${VALID_DRI_DISPLAY})
-  set (gtest_sources ${gtest_sources}
-    SensorManager_TEST.cc
-    )
-endif()
+gz_build_display_tests(${gtest_sources_display})
 
-gz_build_tests(${gtest_sources})
+set (gtest_sources_dri
+  SensorManager_TEST.cc
+)
+
+gz_build_dri_tests(${gtest_sources_dri})
 
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
 foreach (hdr ${headers})
