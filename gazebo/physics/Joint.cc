@@ -137,9 +137,9 @@ void Joint::LoadImpl(const math::Pose &_pose)
   BasePtr myBase = shared_from_this();
 
   if (this->parentLink)
-    this->parentLink->AddChildJoint(boost::shared_static_cast<Joint>(myBase));
+    this->parentLink->AddChildJoint(boost::static_pointer_cast<Joint>(myBase));
   else if (this->childLink)
-    this->childLink->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
+    this->childLink->AddParentJoint(boost::static_pointer_cast<Joint>(myBase));
   else
     gzthrow("both parent and child link do no exist");
 
@@ -325,8 +325,8 @@ void Joint::Detach()
 
   if (this->parentLink)
     this->parentLink->RemoveChildJoint(
-      boost::shared_static_cast<Joint>(myBase));
-  this->childLink->RemoveParentJoint(boost::shared_static_cast<Joint>(myBase));
+      boost::static_pointer_cast<Joint>(myBase));
+  this->childLink->RemoveParentJoint(boost::static_pointer_cast<Joint>(myBase));
 }
 
 //////////////////////////////////////////////////

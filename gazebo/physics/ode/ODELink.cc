@@ -104,7 +104,7 @@ void ODELink::Init()
     {
       if ((*iter)->HasType(Base::COLLISION))
       {
-        ODECollisionPtr g = boost::shared_static_cast<ODECollision>(*iter);
+        ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(*iter);
         if (g->IsPlaceable() && g->GetCollisionId())
         {
           dGeomSetBody(g->GetCollisionId(), this->linkId);
@@ -335,7 +335,7 @@ void ODELink::UpdateSurface()
   {
     if ((*iter)->HasType(Base::COLLISION))
     {
-      ODECollisionPtr g = boost::shared_static_cast<ODECollision>(*iter);
+      ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(*iter);
       if (g->IsPlaceable() && g->GetCollisionId())
       {
         // Set surface properties max_vel and min_depth

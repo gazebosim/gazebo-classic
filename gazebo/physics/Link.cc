@@ -225,7 +225,7 @@ void Link::Init()
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-      boost::shared_static_cast<Collision>(*iter)->Init();
+      boost::static_pointer_cast<Collision>(*iter)->Init();
   }
 }
 
@@ -407,7 +407,7 @@ void Link::SetLaserRetro(float _retro)
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-      boost::shared_static_cast<Collision>(*iter)->SetLaserRetro(_retro);
+      boost::static_pointer_cast<Collision>(*iter)->SetLaserRetro(_retro);
   }
 }
 
@@ -467,7 +467,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
     this->SetStatic(true);
 
   collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(geomType,
-      boost::shared_static_cast<Link>(shared_from_this()));
+      boost::static_pointer_cast<Link>(shared_from_this()));
 
   if (!collision)
     gzthrow("Unknown Collisionetry Type[" + geomType + "]");
@@ -507,7 +507,7 @@ Collision_V Link::GetCollisions() const
   {
     if ((*biter)->HasType(Base::COLLISION))
     {
-      result.push_back(boost::shared_static_cast<Collision>(*biter));
+      result.push_back(boost::static_pointer_cast<Collision>(*biter));
     }
   }
 
@@ -519,7 +519,7 @@ CollisionPtr Link::GetCollision(unsigned int _index) const
 {
   CollisionPtr collision;
   if (_index <= this->GetChildCount())
-    collision = boost::shared_static_cast<Collision>(this->GetChild(_index));
+    collision = boost::static_pointer_cast<Collision>(this->GetChild(_index));
   else
     gzerr << "Index is out of range\n";
 
@@ -616,7 +616,7 @@ math::Box Link::GetBoundingBox() const
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-      box += boost::shared_static_cast<Collision>(*iter)->GetBoundingBox();
+      box += boost::static_pointer_cast<Collision>(*iter)->GetBoundingBox();
   }
 
   return box;

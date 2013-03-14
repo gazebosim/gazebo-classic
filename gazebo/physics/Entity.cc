@@ -275,7 +275,7 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
       {
         if ((*iter)->HasType(ENTITY))
         {
-          EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
+          EntityPtr entity = boost::static_pointer_cast<Entity>(*iter);
           entity->SetWorldTwist(_linear, _angular, _updateChildren);
         }
       }
@@ -309,7 +309,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
   {
     if ((*iter)->HasType(ENTITY))
     {
-      EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
+      EntityPtr entity = boost::static_pointer_cast<Entity>(*iter);
 
       if (entity->IsCanonicalLink())
         entity->worldPose = (entity->initialRelativePose + _pose);
@@ -424,7 +424,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
       if ((*iter)->HasType(LINK))
       {
         // call child Link::OnPoseChange()
-        boost::shared_static_cast<Link>(*iter)->OnPoseChange();
+        boost::static_pointer_cast<Link>(*iter)->OnPoseChange();
       }
     }
   }
@@ -437,7 +437,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
     for (Base_V::iterator iter = this->children.begin();
          iter != this->childrenEnd; ++iter)
     {
-      CollisionPtr coll = boost::shared_static_cast<Collision>(*iter);
+      CollisionPtr coll = boost::static_pointer_cast<Collision>(*iter);
       if (coll && (*iter)->HasType(COLLISION))
       {
         // update collision pose

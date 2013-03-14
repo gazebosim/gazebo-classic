@@ -818,7 +818,7 @@ ModelPtr World::GetModel(unsigned int _index) const
       {
         if (count == _index)
         {
-          model = boost::shared_static_cast<Model>(
+          model = boost::static_pointer_cast<Model>(
               this->rootElement->GetChild(i));
           break;
         }
@@ -1117,7 +1117,7 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
     if (_entity->HasType(Entity::MODEL))
     {
       msgs::Model *modelMsg = _scene.add_model();
-      boost::shared_static_cast<Model>(_entity)->FillMsg(*modelMsg);
+      boost::static_pointer_cast<Model>(_entity)->FillMsg(*modelMsg);
     }
 
     for (unsigned int i = 0; i < _entity->GetChildCount(); ++i)
@@ -1163,7 +1163,7 @@ void World::LoadPlugins()
   {
     if (this->rootElement->GetChild(i)->HasType(Base::MODEL))
     {
-      ModelPtr model = boost::shared_static_cast<Model>(
+      ModelPtr model = boost::static_pointer_cast<Model>(
           this->rootElement->GetChild(i));
       model->LoadPlugins();
     }

@@ -60,9 +60,9 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
   ScrewJoint<BulletJoint>::Attach(_one, _two);
 
   BulletLinkPtr bulletChildLink =
-    boost::shared_static_cast<BulletLink>(this->childLink);
+    boost::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
-    boost::shared_static_cast<BulletLink>(this->parentLink);
+    boost::static_pointer_cast<BulletLink>(this->parentLink);
 
 
   btTransform frame1, frame2;
