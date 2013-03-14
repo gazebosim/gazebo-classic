@@ -78,7 +78,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   this->sdf = _sdf;
 
   // use default pose (identity) if not specified in sdf
-  math::Pose pose = this->sdf->GetValuePose("pose").pos;
+  math::Pose pose = this->sdf->GetValuePose("pose");
   this->SetCoG(pose);
 
   // if (this->sdf->HasElement("inertia"))
@@ -161,7 +161,7 @@ void Inertial::SetCoG(const math::Vector3 &_c)
 void Inertial::SetCoG(double _cx, double _cy, double _cz,
                       double _rx, double _ry, double _rz)
 {
-  this->cog.pos.Set(_cx, _cy, _cz, _rx, _ry, _rz);
+  this->cog.Set(_cx, _cy, _cz, _rx, _ry, _rz);
 }
 
 //////////////////////////////////////////////////
@@ -192,6 +192,35 @@ math::Vector3 Inertial::GetProductsofInertia() const
 }
 
 //////////////////////////////////////////////////
+void Inertial::SetMOI(const math::Matrix3 &_moi)
+{
+  /// \TODO: check symmetry of incoming _moi matrix
+  this->principals = math::Vector3(_moi[0][0], _moi[1][1], _moi[2][2]);
+  this->products = math::Vector3(_moi[0][1], _moi[0][2], _moi[1][2]);
+}
+
+//////////////////////////////////////////////////
+math::Matrix3 Inertial::GetMOI() const
+{
+  return math::Matrix3(
+    this->principals.x, this->products.x,   this->products.y,
+    this->products.x,   this->principals.y, this->products.z,
+    this->products.y,   this->products.z,   this->principals.z);
+}
+
+//////////////////////////////////////////////////
+math::Matrix3 Inertial::RotateInertiaMatrix(const math::Quaternion &_rot)
+{
+  // return a rotated internal matrix
+  math::Matrix3 rotatedInertia = this->GetMOI();
+
+  // rotate it by _rot
+  math::Matrix3 rot = _rot.GetAsMatrix3();
+
+  return rotatedInertia;
+}
+
+//////////////////////////////////////////////////
 void Inertial::Rotate(const math::Quaternion &_rot)
 {
   this->cog.pos = _rot.RotateVector(this->cog.pos);
@@ -210,14 +239,18 @@ Inertial &Inertial::operator=(const Inertial &_inertial)
 }
 
 //////////////////////////////////////////////////
+// returns this + _inertial, where the resulting
+// cog is computed from masses, and both MOI contributions
+// relocated to the new cog.
 Inertial Inertial::operator+(const Inertial &_inertial) const
 {
   Inertial result;
   result.mass = this->mass + _inertial.mass;
 
   // compute new center of mass
-  result.cog = (this->cog.pos*this->mass + _inertial.cog.pos * _inertial.mass) /
-                result.mass;
+  result.cog.pos =
+    (this->cog.pos*this->mass + _inertial.cog.pos * _inertial.mass) /
+    result.mass;
 
   // FIXME: \TODO: below doesn't look right, fix and add unit test.
   // Should rotate both MOI into link frame (zero cog.rot) and add

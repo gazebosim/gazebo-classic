@@ -23,6 +23,8 @@
 #include "gazebo/sdf/sdf.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Matrix3.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo
 {
@@ -89,22 +91,26 @@ namespace gazebo
       /// \brief Set the center of gravity.
       /// \param[in] _center Center of the gravity.
       public: void SetCoG(double _cx, double _cy, double _cz,
-                          double _rx, double _ry, double _rz)
+                          double _rx, double _ry, double _rz);
 
       /// \brief Set the center of gravity.
       /// \param[in] _center Center of the gravity.
-      publid: void SetCoG(const math::Pose &_c);
+      public: void SetCoG(const math::Pose &_c);
 
       /// \brief Get the center of gravity.
       /// \return The center of gravity.
       public: inline const math::Vector3 &GetCoG() const
-              {return this->cog.pos;}
+              {
+                return this->cog.pos;
+              }
 
       /// \brief Get the pose about which the mass and inertia matrix is
       /// specified in the Link frame.
       /// \return The inertial pose.
       public: inline const math::Pose GetPose() const
-              { return math::Pose(this->cog);}
+              {
+                return math::Pose(this->cog);
+              }
 
       /// \brief Get the principal moments of inertia (Ixx, Iyy, Izz).
       /// \return The principal moments.
@@ -211,16 +217,16 @@ namespace gazebo
 
       /// \brief returns Moments of Inertia as a Matrix3
       /// \return Moments of Inertia as a Matrix3
-      public: math::Matrix3 GetMOI();
+      public: math::Matrix3 GetMOI() const;
 
       /// \brief Sets Moments of Inertia from a Matrix3
       /// \param[in] Moments of Inertia as a Matrix3
       public: void SetMOI(const math::Matrix3 &_moi);
 
-      /// \brief Rotates Inertial::principals and Inertia::products
-      /// Moments of Inertia (MOI).
+      /// \brief Returns a rotated Inertial Moments of Inertia (MOI) Matrix3.
       /// \param[in] _rot Quaternion to rotate current MOI by.
-      private: void RotateInertiaMatrix(const math::Quaternion &_rot);
+      /// \return returns a Matrix3 containing rotated MOI.
+      public: math::Matrix3 RotateInertiaMatrix(const math::Quaternion &_rot);
 
       /// \brief Mass the object. Default is 1.0.
       private: double mass;
