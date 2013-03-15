@@ -89,7 +89,7 @@ TEST_F(Inertial_TEST, InertialOperators)
   gzdbg << "i1 [" << i1 << "]\n";
 
   // Get i2 from origin of link
-  physics::Inertial i3 = i2.GetEquivalentInertiaAt(math::Pose());
+  physics::Inertial i3.SetMOI(i2.GetEquivalentInertiaAt(math::Pose()));
   EXPECT_NEAR(i3.GetIXX(), 1 + 2, TOL);
   EXPECT_NEAR(i3.GetIYY(), 2 + 2, TOL);
   EXPECT_NEAR(i3.GetIZZ(), 3, TOL);
