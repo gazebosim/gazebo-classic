@@ -88,6 +88,12 @@ TEST_F(Inertial_TEST, InertialOperators)
   EXPECT_NEAR(i1.GetIZZ(), 1.3, TOL);
   gzdbg << "i1 [" << i1 << "]\n";
 
+  // Get i2 from origin of link
+  physics::Inertial i3 = i2.GetEquivalentInertiaAt(math::Pose());
+  EXPECT_NEAR(i3.GetIXX(), 1 + 2, TOL);
+  EXPECT_NEAR(i3.GetIYY(), 2 + 2, TOL);
+  EXPECT_NEAR(i3.GetIZZ(), 3, TOL);
+
   gzdbg << "i2 [" << i2 << "]\n";
   gzdbg << "R [" << math::Quaternion(0, 0, 0.5*M_PI).GetAsMatrix3() << "]\n";
   gzdbg << "I [" << i2.GetMOI() << "]\n";
@@ -97,11 +103,6 @@ TEST_F(Inertial_TEST, InertialOperators)
   EXPECT_NEAR(i2.GetIYY(), 1, TOL);
   EXPECT_NEAR(i2.GetIZZ(), 3, TOL);
 
-  // Get i2 from origin of link
-  physics::Inertial i3 = i2.GetEquivalentInertiaAt(math::Pose());
-  EXPECT_NEAR(i3.GetIXX(), 2 + 2, TOL);
-  EXPECT_NEAR(i3.GetIYY(), 1 + 2, TOL);
-  EXPECT_NEAR(i3.GetIZZ(), 3, TOL);
 }
 
 int main(int argc, char **argv)
