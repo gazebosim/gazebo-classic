@@ -45,6 +45,10 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   this->sdf.reset(new sdf::Element);
   sdf::initFile("physics.sdf", this->sdf);
 
+  this->realTimeFactor = 0;
+  this->realTimeUpdateRate = 0;
+  this->maxStepSize = 0;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->world->GetName());
   this->physicsSub = this->node->Subscribe("~/physics",
@@ -67,6 +71,13 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
 void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
+
+  this->realTimeUpdateRate =
+      this->sdf->GetElement("real_time_update_rate")->GetValueDouble();
+  this->realTimeFactor =
+      this->sdf->GetElement("real_time_factor")->GetValueDouble();
+  this->maxStepSize =
+      this->sdf->GetElement("max_step_size")->GetValueDouble();
 }
 
 //////////////////////////////////////////////////
@@ -115,19 +126,19 @@ CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
 //////////////////////////////////////////////////
 void PhysicsEngine::SetUpdateRate(double _value)
 {
-  this->world->SetRealTimeUpdateRate(_value);
+  this->SetRealTimeUpdateRate(_value);
 }
 
 //////////////////////////////////////////////////
 double PhysicsEngine::GetUpdateRate()
 {
-  return this->world->GetRealTimeUpdateRate();
+  return this->GetRealTimeUpdateRate();
 }
 
 //////////////////////////////////////////////////
 double PhysicsEngine::GetUpdatePeriod()
 {
-  double updateRate = this->world->GetRealTimeUpdateRate();
+  double updateRate = this->GetRealTimeUpdateRate();
   if (updateRate > 0)
     return 1.0/updateRate;
   else
@@ -137,13 +148,52 @@ double PhysicsEngine::GetUpdatePeriod()
 //////////////////////////////////////////////////
 void PhysicsEngine::SetStepTime(double _value)
 {
-  this->world->SetMaxStepSize(_value);
+  this->SetMaxStepSize(_value);
 }
 
 //////////////////////////////////////////////////
 double PhysicsEngine::GetStepTime()
 {
-  return this->world->GetMaxStepSize();
+  return this->GetMaxStepSize();
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::GetRealTimeFactor() const
+{
+  return this->realTimeFactor;
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::GetRealTimeUpdateRate() const
+{
+  return this->realTimeUpdateRate;
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::GetMaxStepSize() const
+{
+  return this->maxStepSize;
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetRealTimeFactor(double _factor)
+{
+  this->sdf->GetElement("real_time_factor")->Set(_factor);
+  this->realTimeFactor = _factor;
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetRealTimeUpdateRate(double _rate)
+{
+  this->sdf->GetElement("real_time_update_rate")->Set(_rate);
+  this->realTimeUpdateRate = _rate;
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetMaxStepSize(double _stepSize)
+{
+  this->sdf->GetElement("max_step_size")->Set(_stepSize);
+  this->maxStepSize = _stepSize;
 }
 
 //////////////////////////////////////////////////

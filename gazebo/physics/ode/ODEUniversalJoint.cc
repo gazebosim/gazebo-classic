@@ -87,16 +87,6 @@ void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetDamping(int /*_index*/, double _damping)
-{
-  this->dampingCoefficient = _damping;
-  // use below when ode version is fixed
-  // dJointSetDamping(this->jointId, _damping);
-  this->applyDamping = physics::Joint::ConnectJointUpdate(
-    boost::bind(&Joint::ApplyDamping, this));
-}
-
-//////////////////////////////////////////////////
 math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
 {
   math::Angle result;

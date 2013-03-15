@@ -312,30 +312,6 @@ namespace gazebo
       /// \param[in] _modelName Name of the model to publish.
       public: void PublishModelPose(const std::string &_modelName);
 
-      /// \brief Get real time factor
-      /// \return Real time factor
-      public: double GetRealTimeFactor() const;
-
-      /// \brief Get real time update rate
-      /// \return Update rate
-      public: double GetRealTimeUpdateRate() const;
-
-      /// \brief Get max step size.
-      /// \return Max step size.
-      public: double GetMaxStepSize() const;
-
-      /// \brief Set real time factor
-      /// \param[in] _factor Real time factor
-      public: void SetRealTimeFactor(double _factor);
-
-      /// \brief Set real time update rate
-      /// \param[in] _rate Update rate
-      public: void SetRealTimeUpdateRate(double _rate);
-
-      /// \brief Set max step size.
-      /// \param[in] _stepSize Max step size.
-      public: void SetMaxStepSize(double _stepSize);
-
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.
@@ -420,10 +396,6 @@ namespace gazebo
       /// \param[in] _msg Incoming joint message.
       private: void JointLog(ConstJointPtr &_msg);
 
-      /// \brief Called when a world_modify message is received.
-      /// \param[in] _msg The world_modify message.
-      private: void OnWorldMsg(ConstWorldPtr &_msg);
-
       /// \brief Called when a factory message is received.
       /// \param[in] _data The factory message.
       private: void OnFactoryMsg(ConstFactoryPtr &_data);
@@ -462,10 +434,6 @@ namespace gazebo
       /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
-
-      /// \brief Process all received world messages.
-      /// Must only be called from the World::ProcessMessages function.
-      private: void ProcessWorldMsgs();
 
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
@@ -636,9 +604,6 @@ namespace gazebo
       /// \brief Model message buffer.
       private: std::list<msgs::Model> modelMsgs;
 
-      /// \brief World message buffer.
-      private: std::list<msgs::World> worldMsgs;
-
       /// \brief True to reset the world on next update.
       private: bool needsReset;
 
@@ -695,15 +660,6 @@ namespace gazebo
 
       /// \brief The number of simulation iterations.
       private: uint64_t iterations;
-
-      /// \brief Real time update rate.
-      private: double realTimeUpdateRate;
-
-      /// \brief Real time factor.
-      private: double realTimeFactor;
-
-      /// \brief Real time update rate.
-      private: double maxStepSize;
     };
     /// \}
   }

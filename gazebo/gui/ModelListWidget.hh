@@ -124,12 +124,6 @@ namespace gazebo
       private: QTreeWidgetItem *GetListItem(const std::string &_name,
                                             QTreeWidgetItem *_parent);
 
-      /// \brief Fill property tree with world properties
-      /// \param[in] _msg World message containing world properties
-      /// \param[in] _parentItem Parent item
-      private: void FillPropertyTree(const msgs::World &_msg,
-                                     QtProperty *_parentItem);
-
       private: void FillPropertyTree(const msgs::Model &_msg,
                                      QtProperty *_parentItem);
 
@@ -188,10 +182,6 @@ namespace gazebo
       /// \param[in] _item The item that was changed.
       private: void PhysicsPropertyChanged(QtProperty *_item);
 
-      /// \brief Called when a world property is changed by the user.
-      /// \param[in] _item The item that was changed.
-      private: void WorldPropertyChanged(QtProperty *_item);
-
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
 
@@ -202,9 +192,6 @@ namespace gazebo
       private: transport::PublisherPtr physicsPub;
       private: transport::PublisherPtr lightPub;
 
-      /// \brief Publisher for world messages.
-      private: transport::PublisherPtr worldPub;
-
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
       private: transport::SubscriberPtr lightSub;
@@ -213,9 +200,6 @@ namespace gazebo
       private: QTreeWidgetItem *physicsItem;
       private: QTreeWidgetItem *modelsItem;
       private: QTreeWidgetItem *lightsItem;
-
-      /// \brief World item which displays world properties
-      private: QTreeWidgetItem *worldItem;
 
       private: QtVariantPropertyManager *variantManager;
       private: QtVariantEditorFactory *variantFactory;
@@ -238,9 +222,6 @@ namespace gazebo
       typedef std::list<std::string> RemoveEntity_L;
       private: RemoveEntity_L removeEntityList;
 
-      /// \brief Incoming world message.
-      private: msgs::World worldMsg;
-
       private: msgs::Model modelMsg;
       private: msgs::Link linkMsg;
       private: msgs::Scene sceneMsg;
@@ -252,6 +233,9 @@ namespace gazebo
       private: std::deque<std::string> fillTypes;
 
       private: msgs::Light::LightType lightType;
+
+      /// \brief Type of physics engine.
+      private: msgs::Physics_Type physicsType;
     };
 
     class ModelListSheetDelegate: public QItemDelegate

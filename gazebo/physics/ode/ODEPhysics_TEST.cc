@@ -203,6 +203,9 @@ void ODEPhysics_TEST::PhysicsMsgParam()
       &ODEPhysics_TEST::OnPhysicsMsgResponse, this);
 
   physicsPubMsg.set_enable_physics(true);
+  physicsPubMsg.set_max_step_size(0.001);
+  physicsPubMsg.set_real_time_update_rate(800);
+  physicsPubMsg.set_real_time_factor(1.1);
   physicsPubMsg.set_iters(60);
   physicsPubMsg.set_sor(1.5);
   physicsPubMsg.set_cfm(0.1);
@@ -223,6 +226,12 @@ void ODEPhysics_TEST::PhysicsMsgParam()
     common::Time::MSleep(10);
   ASSERT_LT(waitCount, maxWaitCount);
 
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.max_step_size(),
+      physicsPubMsg.max_step_size());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.real_time_update_rate(),
+      physicsPubMsg.real_time_update_rate());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.real_time_factor(),
+      physicsPubMsg.real_time_factor());
   EXPECT_EQ(physicsResponseMsg.solver_type(),
       physicsPubMsg.solver_type());
   EXPECT_EQ(physicsResponseMsg.enable_physics(),

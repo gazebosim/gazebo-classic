@@ -49,6 +49,7 @@
 #include "gazebo/physics/SurfaceParams.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/MapShape.hh"
+#include "gazebo/physics/ContactManager.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -82,12 +83,12 @@ struct CollisionFilter : public btOverlapFilterCallback
           & _proxy0->m_collisionFilterMask);
 
       btRigidBody *rb0 = btRigidBody::upcast(
-              static_cast<btCollisionObject*>(_proxy0->m_clientObject));
+              static_cast<btCollisionObject *>(_proxy0->m_clientObject));
       if (!rb0)
         return collide;
 
       btRigidBody *rb1 = btRigidBody::upcast(
-              static_cast<btCollisionObject*>(_proxy1->m_clientObject));
+              static_cast<btCollisionObject *>(_proxy1->m_clientObject));
       if (!rb1)
          return collide;
 
@@ -109,9 +110,108 @@ struct CollisionFilter : public btOverlapFilterCallback
 };
 
 //////////////////////////////////////////////////
+void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
+{
+  int numManifolds = _world->getDispatcher()->getNumManifolds();
+  for (int i = 0; i < numManifolds; ++i)
+  {
+    btPersistentManifold *contactManifold =
+        _world->getDispatcher()->getManifoldByIndexInternal(i);
+    const btCollisionObject *obA =
+        static_cast<const btCollisionObject *>(contactManifold->getBody0());
+    const btCollisionObject *obB =
+        static_cast<const btCollisionObject *>(contactManifold->getBody1());
+
+    const btRigidBody *rbA = btRigidBody::upcast(obA);
+    const btRigidBody *rbB = btRigidBody::upcast(obB);
+
+    BulletLink *link1 = static_cast<BulletLink *>(
+        obA->getUserPointer());
+    GZ_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
+
+    BulletLink *link2 = static_cast<BulletLink *>(
+        obB->getUserPointer());
+    GZ_ASSERT(link2 != NULL, "Link2 in collision pair is NULL");
+
+    unsigned int colIndex = 0;
+    CollisionPtr collisionPtr1 = link1->GetCollision(colIndex);
+    CollisionPtr collisionPtr2 = link2->GetCollision(colIndex);
+
+    if (!collisionPtr1 || !collisionPtr2)
+      return;
+
+    PhysicsEnginePtr engine = collisionPtr1->GetWorld()->GetPhysicsEngine();
+    BulletPhysicsPtr bulletPhysics =
+          boost::shared_static_cast<BulletPhysics>(engine);
+
+    // Add a new contact to the manager. This will return NULL if no one is
+    // listening for contact information.
+    Contact *contactFeedback = bulletPhysics->GetContactManager()->NewContact(
+        collisionPtr1.get(), collisionPtr2.get(),
+        collisionPtr1->GetWorld()->GetSimTime());
+
+    if (!contactFeedback)
+      return;
+
+    math::Pose body1Pose = link1->GetWorldPose();
+    math::Pose body2Pose = link2->GetWorldPose();
+    math::Vector3 cg1Pos = link1->GetInertial()->GetPose().pos;
+    math::Vector3 cg2Pos = link2->GetInertial()->GetPose().pos;
+    math::Vector3 localForce1;
+    math::Vector3 localForce2;
+    math::Vector3 localTorque1;
+    math::Vector3 localTorque2;
+
+    int numContacts = contactManifold->getNumContacts();
+    for (int j = 0; j < numContacts; ++j)
+    {
+      btManifoldPoint &pt = contactManifold->getContactPoint(j);
+      if (pt.getDistance() < 0.f)
+      {
+        const btVector3 &ptB = pt.getPositionWorldOnB();
+        const btVector3 &normalOnB = pt.m_normalWorldOnB;
+        btVector3 impulse = pt.m_appliedImpulse * normalOnB;
+
+        // calculate force in world frame
+        btVector3 force = impulse/_timeStep;
+
+        // calculate torque in world frame
+        btVector3 torqueA = (ptB-rbA->getCenterOfMassPosition()).cross(force);
+        btVector3 torqueB = (ptB-rbB->getCenterOfMassPosition()).cross(-force);
+
+        // Convert from world to link frame
+        localForce1 = body1Pose.rot.RotateVectorReverse(
+            BulletTypes::ConvertVector3(force));
+        localForce2 = body2Pose.rot.RotateVectorReverse(
+            BulletTypes::ConvertVector3(-force));
+        localTorque1 = body1Pose.rot.RotateVectorReverse(
+            BulletTypes::ConvertVector3(torqueA));
+        localTorque2 = body2Pose.rot.RotateVectorReverse(
+            BulletTypes::ConvertVector3(torqueB));
+
+        contactFeedback->positions[j] = BulletTypes::ConvertVector3(ptB);
+        contactFeedback->normals[j] = BulletTypes::ConvertVector3(normalOnB);
+        contactFeedback->depths[j] = -pt.getDistance();
+        if (!link1->IsStatic())
+        {
+          contactFeedback->wrench[j].body1Force = localForce1;
+          contactFeedback->wrench[j].body1Torque = localTorque1;
+        }
+        if (!link2->IsStatic())
+        {
+          contactFeedback->wrench[j].body2Force = localForce2;
+          contactFeedback->wrench[j].body2Torque = localTorque2;
+        }
+        contactFeedback->count++;
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 bool ContactCallback(btManifoldPoint &/*_cp*/,
-    const btCollisionObjectWrapper * /*_obj0*/, int /*_partId0*/,
-    int /*_index0*/, const btCollisionObjectWrapper * /*_obj1*/,
+    const btCollisionObjectWrapper */*_obj0*/, int /*_partId0*/,
+    int /*_index0*/, const btCollisionObjectWrapper */*_obj1*/,
     int /*_partId1*/, int /*_index1*/)
 {
   return true;
@@ -167,6 +267,9 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   // TODO: Enable this to do custom contact setting
   gContactAddedCallback = ContactCallback;
   gContactProcessedCallback = ContactProcessed;
+
+  this->dynamicsWorld->setInternalTickCallback(
+      InternalTickCallback, static_cast<void *>(this));
 
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
@@ -275,6 +378,9 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_contact_surface_layer(
         boost::any_cast<double>(this->GetParam(CONTACT_SURFACE_LAYER)));
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
+    physicsMsg.set_real_time_factor(this->realTimeFactor);
+    physicsMsg.set_max_step_size(this->maxStepSize);
 
     response.set_type(physicsMsg.GetTypeName());
     physicsMsg.SerializeToString(serializedData);
@@ -287,7 +393,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   // deprecated
   if (_msg->has_dt())
-    gzwarn << "Physics dt is deprecated by World's max step size\n";
+    gzwarn << "Physics dt is deprecated by max step size\n";
 
   if (_msg->has_min_step_size())
     this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
@@ -296,7 +402,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_update_rate())
   {
     gzwarn <<
-        "Physics update rate is deprecated by World's real time update rate\n";
+        "Physics update rate is deprecated by real time update rate\n";
   }
 
   if (_msg->has_solver_type())
@@ -323,6 +429,15 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));
 
+  if (_msg->has_real_time_factor())
+    this->SetRealTimeFactor(_msg->real_time_factor());
+
+  if (_msg->has_real_time_update_rate())
+    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+
+  if (_msg->has_max_step_size())
+    this->SetMaxStepSize(_msg->max_step_size());
+
   /// Make sure all models get at least one update cycle.
   this->world->EnableAllModels();
 }
@@ -330,6 +445,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 //////////////////////////////////////////////////
 void BulletPhysics::UpdateCollision()
 {
+  this->contactManager->ResetCount();
 }
 
 //////////////////////////////////////////////////
@@ -340,9 +456,8 @@ void BulletPhysics::UpdatePhysics()
 
   // common::Time currTime =  this->world->GetRealTime();
 
-  double stepTimeDouble = this->GetStepTime();
   this->dynamicsWorld->stepSimulation(
-      stepTimeDouble, 1, stepTimeDouble);
+      this->maxStepSize, 1, this->maxStepSize);
   // this->lastUpdateTime = currTime;
 }
 
