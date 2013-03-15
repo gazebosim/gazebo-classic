@@ -244,10 +244,10 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
   result.cog.rot = math::Quaternion(1, 0, 0, 0);
 
   // compute equivalent I for (*this) at the new CoG
-  math::Matrix3 Ithis = this->GetEquivalentInertiaAt(result.cog);
+  math::Matrix3 Ithis = this->GetMOI(result.cog);
 
   // compute equivalent I for _inertial at the new CoG
-  math::Matrix3 Iparam = _inertial.GetEquivalentInertiaAt(result.cog);
+  math::Matrix3 Iparam = _inertial.GetMOI(result.cog);
 
   // sum up principals and products now they are at the same location
   result.SetMOI(Ithis + Iparam);
@@ -256,7 +256,7 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
 }
 
 //////////////////////////////////////////////////
-math::Matrix3 Inertial::GetEquivalentInertiaAt(const math::Pose &_pose) const
+math::Matrix3 Inertial::GetMOI(const math::Pose &_pose) const
 {
   // get MOI as a Matrix3
   math::Matrix3 moi = this->GetMOI();

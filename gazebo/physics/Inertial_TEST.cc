@@ -83,13 +83,13 @@ TEST_F(Inertial_TEST, InertialOperators)
                           0, 2, 0,
                           0, 0, 3));
 
-  math::Matrix3 i11 = i1.GetEquivalentInertiaAt(math::Pose(1, 0, 0, 0, 0, 0));
+  math::Matrix3 i11 = i1.GetMOI(math::Pose(1, 0, 0, 0, 0, 0));
   EXPECT_NEAR(i11[2][2], 1.3, TOL);
   gzdbg << "i11 [" << i11 << "]\n";
 
   // Get i2 from origin of link
   physics::Inertial i3;
-  i3.SetMOI(i2.GetEquivalentInertiaAt(math::Pose()));
+  i3.SetMOI(i2.GetMOI(math::Pose()));
   EXPECT_NEAR(i3.GetIXX(), 1 + 2, TOL);
   EXPECT_NEAR(i3.GetIYY(), 2 + 2, TOL);
   EXPECT_NEAR(i3.GetIZZ(), 3, TOL);
@@ -97,7 +97,7 @@ TEST_F(Inertial_TEST, InertialOperators)
   gzdbg << "i2 [" << i2 << "]\n";
   gzdbg << "R [" << math::Quaternion(0, 0, 0.5*M_PI).GetAsMatrix3() << "]\n";
   gzdbg << "I [" << i2.GetMOI() << "]\n";
-  i2.SetMOI(i2.GetEquivalentInertiaAt(math::Pose(0, 0, 1, 0, 0, 0.5*M_PI)));
+  i2.SetMOI(i2.GetMOI(math::Pose(0, 0, 1, 0, 0, 0.5*M_PI)));
   gzdbg << "i2 [" << i2 << "]\n";
   EXPECT_NEAR(i2.GetIXX(), 2, TOL);
   EXPECT_NEAR(i2.GetIYY(), 1, TOL);
