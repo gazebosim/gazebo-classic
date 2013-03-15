@@ -195,8 +195,8 @@ namespace gazebo
 
       /// \brief Get the equivalent inertia from a point in local Link frame
       /// \param[in] _pose location in Link local frame
-      /// \return equivalent inertia at _psoe
-      public: Inertial GetEquivalentInertiaAt(const math::Pose &_psoe);
+      /// \return equivalent inertia at _pose
+      public: Inertial GetEquivalentInertiaAt(const math::Pose &_pose);
 
       /// \brief Transforme Inertial parameters to new CoG.
       /// \param[in] _cog new desired cog.
