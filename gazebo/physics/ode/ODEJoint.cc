@@ -1035,7 +1035,7 @@ void ODEJoint::SetDamping(int /*_index*/, double _damping)
       this->cfmDampingState[i] = ODEJoint::NONE;
   }
 
-  if (!this->dampingInitialized)
+  if (!this->dampingInitialized && !this->GetParent()->IsStatic())
   {
     if (this->useCFMDamping)
       this->applyDamping = physics::Joint::ConnectJointUpdate(

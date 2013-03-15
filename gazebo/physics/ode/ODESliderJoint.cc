@@ -70,7 +70,9 @@ math::Angle ODESliderJoint::GetAngleImpl(int /*_index*/) const
 //////////////////////////////////////////////////
 double ODESliderJoint::GetVelocity(int /*index*/) const
 {
-  double result = dJointGetSliderPositionRate(this->jointId);
+  double result = 0;
+  if (this->jointId)
+    result = dJointGetSliderPositionRate(this->jointId);
   return result;
 }
 
