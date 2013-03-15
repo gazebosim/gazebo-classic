@@ -77,7 +77,7 @@ TEST_F(Inertial_TEST, InertialOperators)
   i1.SetIZZ(0.3);
   i1.SetIXY(0.0);
   i1.SetIXZ(0.0);
-  i1.SetIYY(0.0);
+  i1.SetIYZ(0.0);
 
   i2.SetMOI(math::Matrix3(1, 0, 0,
                           0, 2, 0,
@@ -87,6 +87,10 @@ TEST_F(Inertial_TEST, InertialOperators)
   physics::Inertial isum = i1 + i2;
   gzdbg << "isum: \n"
         << isum << "\n";
+  gzdbg << "i1 new cg: \n"
+        << i1.GetMOI(isum.GetPose()) << "\n";
+  gzdbg << "i2 new cg: \n"
+        << i2.GetMOI(isum.GetPose()) << "\n";
   EXPECT_NEAR(isum.GetPose().pos.z, 2.0/3.0, TOL);
   EXPECT_NEAR(isum.GetIXX(),
     1.0 + 0.1 + 1.0*(2.0/3.0)*(2.0/3.0)
@@ -94,6 +98,7 @@ TEST_F(Inertial_TEST, InertialOperators)
   EXPECT_NEAR(isum.GetIYY(),
     2.0 + 0.2 + 1.0*(2.0/3.0)*(2.0/3.0)
               + 2.0*(1-2.0/3.0)*(1-2.0/3.0), TOL);
+  EXPECT_NEAR(isum.GetIZZ(), 3.0 + 0.3, TOL);
   
   // Test GetMOI
   math::Matrix3 i11 = i1.GetMOI(math::Pose(1, 0, 0, 0, 0, 0));
