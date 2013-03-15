@@ -83,7 +83,10 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   result->count = 0;
   result->collision1 = _collision1->GetScopedName();
   result->collision2 = _collision2->GetScopedName();
+  result->collisionPtr1 = _collision1;
+  result->collisionPtr2 = _collision2;
   result->time = _time;
+  result->world = this->world;
 
   return result;
 }

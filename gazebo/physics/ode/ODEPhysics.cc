@@ -25,6 +25,7 @@
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Rand.hh"
@@ -388,30 +389,35 @@ void ODEPhysics::UpdatePhysics()
     // Update the dynamical model
     (*physicsStepFunc)(this->worldId, this->GetStepTime());
 
+    math::Vector3 f1, f2, t1, t2;
+
     // Set the joint contact feedback for each contact.
     for (unsigned int i = 0; i < this->jointFeedbackIndex; ++i)
     {
+      Contact *contactFeedback = this->jointFeedbacks[i]->contact;
+      Collision *col1 = contactFeedback->collisionPtr1;
+      Collision *col2 = contactFeedback->collisionPtr2;
+
+      GZ_ASSERT(col1 != NULL, "Collision 1 is NULL");
+      GZ_ASSERT(col2 != NULL, "Collision 2 is NULL");
+
       for (int j = 0; j < this->jointFeedbacks[i]->count; ++j)
       {
-        this->jointFeedbacks[i]->contact->wrench[j].body1Force.Set(
-            this->jointFeedbacks[i]->feedbacks[j].f1[0],
-            this->jointFeedbacks[i]->feedbacks[j].f1[1],
-            this->jointFeedbacks[i]->feedbacks[j].f1[2]);
+        dJointFeedback fb = this->jointFeedbacks[i]->feedbacks[j];
+        f1.Set(fb.f1[0], fb.f1[1], fb.f1[2]);
+        f2.Set(fb.f2[0], fb.f2[1], fb.f2[2]);
+        t1.Set(fb.t1[0], fb.t1[1], fb.t1[2]);
+        t2.Set(fb.t2[0], fb.t2[1], fb.t2[2]);
 
-        this->jointFeedbacks[i]->contact->wrench[j].body2Force.Set(
-            this->jointFeedbacks[i]->feedbacks[j].f2[0],
-            this->jointFeedbacks[i]->feedbacks[j].f2[1],
-            this->jointFeedbacks[i]->feedbacks[j].f2[2]);
-
-        this->jointFeedbacks[i]->contact->wrench[j].body1Torque.Set(
-            this->jointFeedbacks[i]->feedbacks[j].t1[0],
-            this->jointFeedbacks[i]->feedbacks[j].t1[1],
-            this->jointFeedbacks[i]->feedbacks[j].t1[2]);
-
-        this->jointFeedbacks[i]->contact->wrench[j].body2Torque.Set(
-            this->jointFeedbacks[i]->feedbacks[j].t2[0],
-            this->jointFeedbacks[i]->feedbacks[j].t2[1],
-            this->jointFeedbacks[i]->feedbacks[j].t2[2]);
+        // set force torque in link frame
+        this->jointFeedbacks[i]->contact->wrench[j].body1Force =
+             col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(f1);
+        this->jointFeedbacks[i]->contact->wrench[j].body2Force =
+             col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(f2);
+        this->jointFeedbacks[i]->contact->wrench[j].body1Torque =
+             col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(t1);
+        this->jointFeedbacks[i]->contact->wrench[j].body2Torque =
+             col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(t2);
       }
     }
   }
