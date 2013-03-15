@@ -182,9 +182,9 @@ namespace gazebo
       public: Inertial &operator=(const Inertial &_inertial);
 
       /// \brief Addition operator.
-      /// Assuming both CG and MOI's are defined in the same reference frame.
-      /// New CG is computed, and both MOI contributions
-      /// relocated to the new cog.
+      /// Assuming both CG and MOI's are defined in the same reference Link frame.
+      /// New CG is computed from masses and perspective offsets,
+      /// and both MOI contributions relocated to the new cog.
       /// \param[in] _inertial Inertial to add.
       /// \return The result of the addition.
       public: Inertial operator+(const Inertial &_inertial) const;
@@ -199,6 +199,11 @@ namespace gazebo
       public: void ProcessMsg(const msgs::Inertial &_msg);
 
       /// \brief Get the equivalent inertia from a point in local Link frame
+      /// If you specify GetMOI(this->GetPose()), you should get
+      /// back the MOI exactly as specified in the SDF.
+      /// If _pose is different from pose of the Inertial block, then
+      /// the MOI is rotated accordingly, and contributions from changes
+      /// in MOI location location due to point mass is added to the final MOI.
       /// \param[in] _pose location in Link local frame
       /// \return equivalent inertia at _pose
       public: math::Matrix3 GetMOI(const math::Pose &_pose)

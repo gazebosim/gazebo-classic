@@ -192,8 +192,8 @@ math::Vector3 Inertial::GetProductsofInertia() const
 void Inertial::SetMOI(const math::Matrix3 &_moi)
 {
   /// \TODO: check symmetry of incoming _moi matrix
-  this->principals = math::Vector3(_moi[0][0], _moi[1][1], _moi[2][2]);
-  this->products = math::Vector3(_moi[0][1], _moi[0][2], _moi[1][2]);
+  this->principals.Set(_moi[0][0], _moi[1][1], _moi[2][2]);
+  this->products.Set(_moi[0][1], _moi[0][2], _moi[1][2]);
 }
 
 //////////////////////////////////////////////////
@@ -208,6 +208,7 @@ math::Matrix3 Inertial::GetMOI() const
 //////////////////////////////////////////////////
 void Inertial::Rotate(const math::Quaternion &_rot)
 {
+  /// \TODO: double check what this does, if needed
   this->cog.pos = _rot.RotateVector(this->cog.pos);
   this->cog.rot = _rot * this->cog.rot;
 }
@@ -224,10 +225,6 @@ Inertial &Inertial::operator=(const Inertial &_inertial)
 }
 
 //////////////////////////////////////////////////
-// returns this + _inertial, where the resulting
-// cog is computed from masses, and both MOI contributions
-// relocated to the new cog.
-// Assuming both cg and MOI are defined in the same reference frame.
 Inertial Inertial::operator+(const Inertial &_inertial) const
 {
   Inertial result(*this);
