@@ -201,7 +201,8 @@ namespace gazebo
       /// \brief Get the equivalent inertia from a point in local Link frame
       /// \param[in] _pose location in Link local frame
       /// \return equivalent inertia at _pose
-      public: math::Matrix3 GetEquivalentInertiaAt(const math::Pose &_pose);
+      public: math::Matrix3 GetEquivalentInertiaAt(const math::Pose &_pose)
+        const;
 
       /// \brief Output operator.
       /// \param[in] _out Output stream.

@@ -256,13 +256,13 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
 }
 
 //////////////////////////////////////////////////
-math::Matrix3 Inertial::GetEquivalentInertiaAt(const math::Pose &_pose)
+math::Matrix3 Inertial::GetEquivalentInertiaAt(const math::Pose &_pose) const
 {
   // get MOI as a Matrix3
   math::Matrix3 moi = this->GetMOI();
 
-  // transform from new _cog to old this->cog, specified in new _cog frame
-  math::Pose new2Old = this->cog - _cog;
+  // transform from new _pose to old this->cog, specified in new _pose frame
+  math::Pose new2Old = this->cog - _pose;
 
   // rotate moi into new cog frame
   moi = new2Old.rot.GetAsMatrix3() * moi *
