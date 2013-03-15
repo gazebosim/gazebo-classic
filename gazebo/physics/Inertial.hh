@@ -68,7 +68,7 @@ namespace gazebo
       public: double GetMass() const;
 
       /// \brief Set the mass matrix.
-      /// \param[in] _ixx X second moment of inertia about x axis.
+      /// \param[in] _ixx X second moment of inertia (MOI) about x axis.
       /// \param[in] _iyy Y second moment of inertia about y axis.
       /// \param[in] _izz Z second moment of inertia about z axis.
       /// \param[in] _ixy XY inertia.
@@ -91,9 +91,9 @@ namespace gazebo
       /// \param[in] _cx Center offset in x-direction in Link frame
       /// \param[in] _cy Center offset in y-direction in Link frame
       /// \param[in] _cz Center offset in z-direction in Link frame
-      /// \param[in] _rx MOI rotation in x-axis in Link frame
-      /// \param[in] _ry MOI rotation in y-axis in Link frame
-      /// \param[in] _rz MOI rotation in z-axis in Link frame
+      /// \param[in] _rx Moment of Inertia (MOI) about x-axis in Link frame
+      /// \param[in] _ry MOI about y-axis in Link frame
+      /// \param[in] _rz MOI about z-axis in Link frame
       public: void SetCoG(double _cx, double _cy, double _cz,
                           double _rx, double _ry, double _rz);
 
@@ -182,7 +182,8 @@ namespace gazebo
       public: Inertial &operator=(const Inertial &_inertial);
 
       /// \brief Addition operator.
-      /// Assuming both CG and MOI's are defined in the same reference Link frame.
+      /// Assuming both CG and Moement of Inertia (MOI) are defined
+      /// in the same reference Link frame.
       /// New CG is computed from masses and perspective offsets,
       /// and both MOI contributions relocated to the new cog.
       /// \param[in] _inertial Inertial to add.
@@ -200,7 +201,7 @@ namespace gazebo
 
       /// \brief Get the equivalent inertia from a point in local Link frame
       /// If you specify GetMOI(this->GetPose()), you should get
-      /// back the MOI exactly as specified in the SDF.
+      /// back the Moment of Inertia (MOI) exactly as specified in the SDF.
       /// If _pose is different from pose of the Inertial block, then
       /// the MOI is rotated accordingly, and contributions from changes
       /// in MOI location location due to point mass is added to the final MOI.
@@ -237,7 +238,7 @@ namespace gazebo
       /// \return Moments of Inertia as a Matrix3
       public: math::Matrix3 GetMOI() const;
 
-      /// \brief Sets Moments of Inertia from a Matrix3
+      /// \brief Sets Moments of Inertia (MOI) from a Matrix3
       /// \param[in] Moments of Inertia as a Matrix3
       public: void SetMOI(const math::Matrix3 &_moi);
 
@@ -248,11 +249,11 @@ namespace gazebo
       private: math::Pose cog;
 
       /// \brief Principal moments of inertia. Default is (1.0 1.0 1.0)
-      /// These MOI are specified in the Inertial frame.
+      /// These Moments of Inertia are specified in the local Link frame.
       private: math::Vector3 principals;
 
       /// \brief Product moments of inertia. Default is (0.0 0.0 0.0)
-      /// These MOI off-diagonals are specified in the Inertial frame.
+      /// These MOI off-diagonals are specified in the local Link frame.
       /// Where products.x is Ixy, products.y is Ixz and products.z is Iyz.
       private: math::Vector3 products;
 
