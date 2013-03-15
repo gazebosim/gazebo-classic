@@ -142,6 +142,7 @@ class ServerFixture : public testing::Test
                        << transport::is_stopped() << "\n";
                  ASSERT_LT(waitCount, maxWaitCount);
                }
+               gzerr << "waitCount " << waitCount << '\n';
 
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
