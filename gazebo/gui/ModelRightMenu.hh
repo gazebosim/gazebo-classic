@@ -22,8 +22,11 @@
 #include <string>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
+
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include "gazebo/msgs/msgs.hh"
+#endif
 
 namespace gazebo
 {

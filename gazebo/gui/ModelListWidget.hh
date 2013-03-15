@@ -22,11 +22,14 @@
 #include <vector>
 #include <deque>
 
-#include "gui/qt.h"
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
-#include "transport/TransportTypes.hh"
-#include "rendering/RenderTypes.hh"
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include "gazebo/sdf/sdf.hh"
+# include "gazebo/msgs/msgs.hh"
+#endif
+
+#include "gazebo/gui/qt.h"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 class QTreeWidget;
 class QTreeWidgetItem;

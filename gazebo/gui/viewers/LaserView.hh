@@ -22,7 +22,10 @@
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/common/Time.hh"
-#include "gazebo/msgs/msgs.hh"
+
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include "gazebo/msgs/msgs.hh"
+#endif
 
 #include "gazebo/transport/TransportTypes.hh"
 

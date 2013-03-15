@@ -21,14 +21,16 @@
 #include <string>
 #include <boost/thread.hpp>
 
-#include "gazebo/physics/physics.hh"
-#include "gazebo/rendering/rendering.hh"
-#include "gazebo/Server.hh"
-#include "gazebo/gui/qt.h"
-#include "gazebo/gui/qt_test.h"
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include "gazebo/physics/physics.hh"
+# include "gazebo/rendering/rendering.hh"
+# include "gazebo/Server.hh"
+# include "gazebo/gui/qt.h"
+# include "gazebo/gui/qt_test.h"
 
-#include "gazebo_config.h"
-#include "test_config.h"
+# include "gazebo_config.h"
+# include "test_config.h"
+#endif
 
 /// \brief Base class for all Gazebo GUI unit tests.
 class QTestFixture : public QObject

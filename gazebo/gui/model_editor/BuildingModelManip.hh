@@ -20,7 +20,10 @@
 #include <string>
 #include <vector>
 #include "gazebo/gui/qt.h"
-#include "gazebo/rendering/Visual.hh"
+
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include "gazebo/rendering/Visual.hh"
+#endif
 
 namespace gazebo
 {

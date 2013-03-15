@@ -17,9 +17,12 @@
 #ifndef _EDIT_MODEL_WIDGET_HH_
 #define _EDIT_MODEL_WIDGET_HH_
 
-#include "gui/qt.h"
-#include "transport/TransportTypes.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/transport/TransportTypes.hh"
+
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include "gazebo/msgs/msgs.hh"
+#endif
 
 class QTreeWidget;
 
