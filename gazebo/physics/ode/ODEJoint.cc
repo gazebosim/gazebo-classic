@@ -869,12 +869,12 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
     wrench.body1Force.Set(fb->f2[0], fb->f2[1], fb->f2[2]);
     wrench.body1Torque.Set(fb->t2[0], fb->t2[1], fb->t2[2]);
 
-    gzerr << "force " << wrench.body1Force << " , " << wrench.body2Force << std::endl;
+/*    gzerr << "force " << wrench.body1Force << " , " << wrench.body2Force << std::endl;
     gzerr << "torque " << wrench.body1Torque << " , " << wrench.body2Torque << std::endl;
 
     gzerr << "anchor " << this->anchorPos << ", " << this->anchorPose << " "<< std::endl;
     gzerr << "global axis " << this->GetGlobalAxis(0) << std::endl;
-    gzerr << "angle " << this->GetAngle(0) << std::endl;
+    gzerr << "angle " << this->GetAngle(0) << std::endl;*/
 
     if (this->childLink)
     {
