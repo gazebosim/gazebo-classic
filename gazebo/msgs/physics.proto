@@ -30,4 +30,7 @@ message Physics
   optional Vector3d gravity = 13;
   optional double update_rate = 14;
   optional bool enable_physics = 15;
+  optional double real_time_factor = 16;
+  optional double real_time_update_rate = 17;
+  optional double max_step_size = 18;
 }

@@ -25,7 +25,6 @@
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Rand.hh"
@@ -252,6 +251,9 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
         this->GetContactMaxCorrectingVel());
     physicsMsg.set_contact_surface_layer(this->GetContactSurfaceLayer());
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
+    physicsMsg.set_real_time_factor(this->realTimeFactor);
+    physicsMsg.set_max_step_size(this->maxStepSize);
 
     response.set_type(physicsMsg.GetTypeName());
     physicsMsg.SerializeToString(serializedData);
@@ -264,7 +266,7 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   // deprecated
   if (_msg->has_dt())
-    gzwarn << "Physics dt is deprecated by World's max step size\n";
+    gzwarn << "Physics dt is deprecated by max step size\n";
 
   if (_msg->has_min_step_size())
     this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
@@ -273,7 +275,7 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_update_rate())
   {
     gzwarn <<
-        "Physics update rate is deprecated by World's real time update rate\n";
+        "Physics update rate is deprecated by real time update rate\n";
   }
 
   if (_msg->has_solver_type())
@@ -318,6 +320,15 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));
+
+  if (_msg->has_real_time_factor())
+    this->SetRealTimeFactor(_msg->real_time_factor());
+
+  if (_msg->has_real_time_update_rate())
+    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+
+  if (_msg->has_max_step_size())
+    this->SetMaxStepSize(_msg->max_step_size());
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
@@ -387,7 +398,7 @@ void ODEPhysics::UpdatePhysics()
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
     // Update the dynamical model
-    (*physicsStepFunc)(this->worldId, this->GetStepTime());
+    (*physicsStepFunc)(this->worldId, this->maxStepSize);
 
     math::Vector3 f1, f2, t1, t2;
 
@@ -838,11 +849,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     (1.0 / _collision1->GetSurface()->kp + 1.0 / _collision2->GetSurface()->kp);
   double kd = _collision1->GetSurface()->kd + _collision2->GetSurface()->kd;
 
-  double stepTimeDouble = this->GetStepTime();
-  contact.surface.soft_erp = (stepTimeDouble * kp) /
-                             (stepTimeDouble * kp + kd);
+  contact.surface.soft_erp = (this->maxStepSize * kp) /
+                             (this->maxStepSize * kp + kd);
 
-  contact.surface.soft_cfm = 1.0 / (stepTimeDouble * kp + kd);
+  contact.surface.soft_cfm = 1.0 / (this->maxStepSize * kp + kd);
 
   // contact.surface.soft_erp = 0.5*(_collision1->surface->softERP +
   //                                _collision2->surface->softERP);

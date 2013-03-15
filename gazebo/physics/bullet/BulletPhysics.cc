@@ -378,6 +378,9 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_contact_surface_layer(
         boost::any_cast<double>(this->GetParam(CONTACT_SURFACE_LAYER)));
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
+    physicsMsg.set_real_time_factor(this->realTimeFactor);
+    physicsMsg.set_max_step_size(this->maxStepSize);
 
     response.set_type(physicsMsg.GetTypeName());
     physicsMsg.SerializeToString(serializedData);
@@ -390,7 +393,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   // deprecated
   if (_msg->has_dt())
-    gzwarn << "Physics dt is deprecated by World's max step size\n";
+    gzwarn << "Physics dt is deprecated by max step size\n";
 
   if (_msg->has_min_step_size())
     this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
@@ -399,7 +402,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_update_rate())
   {
     gzwarn <<
-        "Physics update rate is deprecated by World's real time update rate\n";
+        "Physics update rate is deprecated by real time update rate\n";
   }
 
   if (_msg->has_solver_type())
@@ -426,6 +429,15 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));
 
+  if (_msg->has_real_time_factor())
+    this->SetRealTimeFactor(_msg->real_time_factor());
+
+  if (_msg->has_real_time_update_rate())
+    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+
+  if (_msg->has_max_step_size())
+    this->SetMaxStepSize(_msg->max_step_size());
+
   /// Make sure all models get at least one update cycle.
   this->world->EnableAllModels();
 }
@@ -444,9 +456,8 @@ void BulletPhysics::UpdatePhysics()
 
   // common::Time currTime =  this->world->GetRealTime();
 
-  double stepTimeDouble = this->GetStepTime();
   this->dynamicsWorld->stepSimulation(
-      stepTimeDouble, 1, stepTimeDouble);
+      this->maxStepSize, 1, this->maxStepSize);
   // this->lastUpdateTime = currTime;
 }
 

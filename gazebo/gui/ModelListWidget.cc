@@ -148,11 +148,6 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
   {
     std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
     this->propTreeBrowser->clear();
-    if (name == "World")
-    {
-      this->requestMsg = msgs::CreateRequest("world_info", "");
-      this->requestPub->Publish(*this->requestMsg);
-    }
     if (name == "Scene")
     {
       this->requestMsg = msgs::CreateRequest("scene_info",
@@ -233,9 +228,7 @@ void ModelListWidget::Update()
     this->fillingPropertyTree = true;
     this->propTreeBrowser->clear();
 
-    if (this->fillTypes[0] == "World")
-      this->FillPropertyTree(this->worldMsg, NULL);
-    else if (this->fillTypes[0] == "Model")
+    if (this->fillTypes[0] == "Model")
       this->FillPropertyTree(this->modelMsg, NULL);
     else if (this->fillTypes[0] == "Link")
       this->FillPropertyTree(this->linkMsg, NULL);
@@ -353,14 +346,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
-  if (_msg->has_type() && _msg->type() == this->worldMsg.GetTypeName())
-  {
-    this->propMutex->lock();
-    this->worldMsg.ParseFromString(_msg->serialized_data());
-    this->fillTypes.push_back("World");
-    this->propMutex->unlock();
-  }
-  else if (_msg->has_type() && _msg->type() == this->modelMsg.GetTypeName())
+  if (_msg->has_type() && _msg->type() == this->modelMsg.GetTypeName())
   {
     this->propMutex->lock();
     this->modelMsg.ParseFromString(_msg->serialized_data());
@@ -523,8 +509,6 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     this->ScenePropertyChanged(_item);
   else if (this->modelTreeWidget->currentItem() == this->physicsItem)
     this->PhysicsPropertyChanged(_item);
-  else if (this->modelTreeWidget->currentItem() == this->worldItem)
-    this->WorldPropertyChanged(_item);
 }
 
 /////////////////////////////////////////////////
@@ -599,14 +583,10 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
   {
     if ((*iter)->propertyName().toStdString() == "gravity")
       this->FillVector3Msg((*iter), msg.mutable_gravity());
-    else if ((*iter)->propertyName().toStdString() == "update rate")
-      msg.set_update_rate(this->variantManager->value((*iter)).toDouble());
     else if ((*iter)->propertyName().toStdString() == "enable physics")
       msg.set_enable_physics(this->variantManager->value((*iter)).toBool());
     else if ((*iter)->propertyName().toStdString() == "solver")
     {
-      msg.set_dt(this->variantManager->value(
-            this->GetChildItem((*iter), "step size")).toDouble());
       msg.set_iters(this->variantManager->value(
             this->GetChildItem((*iter), "iterations")).toInt());
       msg.set_sor(this->variantManager->value(
@@ -623,22 +603,7 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
       msg.set_contact_surface_layer(this->variantManager->value(
             this->GetChildItem((*iter), "surface layer")).toDouble());
     }
-  }
-
-  msg.set_type(msgs::Physics::ODE);
-  this->physicsPub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget::WorldPropertyChanged(QtProperty * /*_item*/)
-{
-  msgs::World msg;
-
-  QList<QtProperty*> properties = this->propTreeBrowser->properties();
-  for (QList<QtProperty*>::iterator iter = properties.begin();
-       iter != properties.end(); ++iter)
-  {
-    if ((*iter)->propertyName().toStdString() == "real time update rate")
+    else if ((*iter)->propertyName().toStdString() == "real time update rate")
     {
       msg.set_real_time_update_rate(
           this->variantManager->value((*iter)).toDouble());
@@ -648,7 +613,9 @@ void ModelListWidget::WorldPropertyChanged(QtProperty * /*_item*/)
       msg.set_max_step_size(this->variantManager->value((*iter)).toDouble());
     }
   }
-  this->worldPub->Publish(msg);
+
+  msg.set_type(msgs::Physics::ODE);
+  this->physicsPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
@@ -2100,7 +2067,6 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
-  this->worldPub = this->node->Advertise<msgs::World>("~/world");
 
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
@@ -2122,13 +2088,6 @@ void ModelListWidget::ResetTree()
 
   // Create the top level of items in the tree widget
   {
-    this->worldItem = new QTreeWidgetItem(
-        static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("%1").arg(tr("World"))));
-    this->worldItem->setData(0, Qt::UserRole, QVariant(tr("World")));
-    this->modelTreeWidget->addTopLevelItem(this->worldItem);
-    this->ResetScene();
-
     this->physicsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Physics"))));
@@ -2209,32 +2168,6 @@ void ModelListWidget::ResetScene()
   this->modelTreeWidget->addTopLevelItem(this->sceneItem);
 }
 
-
-/////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::World &_msg,
-                                       QtProperty * /*_parent*/)
-{
-  QtVariantProperty *item = NULL;
-
-  item = this->variantManager->addProperty(QVariant::Double,
-      tr("real time update rate"));
-  static_cast<QtVariantPropertyManager*>
-    (this->variantFactory->propertyManager(item))->setAttribute(
-        item, "decimals", 6);
-  if (_msg.has_real_time_update_rate())
-    item->setValue(_msg.real_time_update_rate());
-  this->propTreeBrowser->addProperty(item);
-
-  item = this->variantManager->addProperty(QVariant::Double,
-      tr("max step size"));
-  static_cast<QtVariantPropertyManager*>
-    (this->variantFactory->propertyManager(item))->setAttribute(
-        item, "decimals", 6);
-  if (_msg.has_max_step_size())
-    item->setValue(_msg.max_step_size());
-  this->propTreeBrowser->addProperty(item);
-}
-
 /////////////////////////////////////////////////
 void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
                                        QtProperty * /*_parent*/)
@@ -2306,6 +2239,24 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     tr("enable physics"));
   if (_msg.has_enable_physics())
     item->setValue(_msg.enable_physics());
+  this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double,
+      tr("real time update rate"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_real_time_update_rate())
+    item->setValue(_msg.real_time_update_rate());
+  this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double,
+      tr("max step size"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_max_step_size())
+    item->setValue(_msg.max_step_size());
   this->propTreeBrowser->addProperty(item);
 
   QtProperty *gravityItem = this->variantManager->addProperty(
