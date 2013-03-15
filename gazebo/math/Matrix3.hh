@@ -80,9 +80,9 @@ namespace gazebo
       {
         return Matrix3(
           // first row
-          this->m[0][0]+_m[0][0],this->m[0][1]+_m[0][1],this->m[0][2]*_m[0][2],
-          this->m[1][0]*_m[1][0],this->m[1][1]*_m[1][1],this->m[1][2]*_m[1][2],
-          this->m[2][0]*_m[2][0],this->m[2][1]*_m[2][1],this->m[2][2]*_m[2][2]);
+          this->m[0][0]+_m[0][0],this->m[0][1]+_m[0][1],this->m[0][2]+_m[0][2],
+          this->m[1][0]+_m[1][0],this->m[1][1]+_m[1][1],this->m[1][2]+_m[1][2],
+          this->m[2][0]+_m[2][0],this->m[2][1]+_m[2][1],this->m[2][2]+_m[2][2]);
       }
 
       /// \brief Matrix multiplication operator
