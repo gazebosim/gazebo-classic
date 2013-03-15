@@ -69,6 +69,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   this->masterConn.reset(new Connection());
   delete this->serverConn;
   this->serverConn = new Connection();
+  gzerr << "ConnectionManager::Init\n";
 
   // Create a new TCP server on a free port
   this->serverConn->Listen(0,
@@ -83,6 +84,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     common::Time::MSleep(1000);
   }
   printf("\n");
+  gzerr << "ConnectionManager::Init\n";
 
   if (!this->IsRunning())
   {
@@ -90,12 +92,14 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     return false;
   }
 
+  gzerr << "ConnectionManager::Init\n";
   std::string initData, namespacesData, publishersData;
   this->masterConn->Read(initData);
   this->masterConn->Read(namespacesData);
   this->masterConn->Read(publishersData);
 
 
+  gzerr << "ConnectionManager::Init\n";
   msgs::Packet packet;
   packet.ParseFromString(initData);
 
@@ -118,6 +122,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   else
     gzerr << "Didn't receive an init from the master\n";
 
+  gzerr << "ConnectionManager::Init\n";
   packet.ParseFromString(namespacesData);
   if (packet.type() == "topic_namepaces_init")
   {
@@ -132,6 +137,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   else
     gzerr << "Did not get topic_namespaces_init msg from master\n";
 
+  gzerr << "ConnectionManager::Init\n";
   packet.ParseFromString(publishersData);
   if (packet.type() == "publishers_init")
   {
@@ -148,9 +154,11 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   else
     gzerr << "Did not get publishers_init msg from master\n";
 
+  gzerr << "ConnectionManager::Init\n";
   this->masterConn->AsyncRead(
       boost::bind(&ConnectionManager::OnMasterRead, this, _1));
 
+  gzerr << "ConnectionManager::Init\n";
   this->initialized = true;
 
   // Tell the user what address will be publicized to other nodes.

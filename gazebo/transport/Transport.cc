@@ -92,6 +92,7 @@ bool transport::init(const std::string &_masterHost, unsigned int _masterPort)
 void transport::run()
 {
   g_stopped = false;
+  gzerr << "transport::run(), g_stopped " << g_stopped << '\n';
   g_runThread = new boost::thread(&transport::ConnectionManager::Run,
                                 transport::ConnectionManager::Instance());
 
@@ -112,6 +113,7 @@ void transport::run()
 
     trys++;
   }
+  gzerr << "transport::run(), g_stopped " << g_stopped << '\n';
 
   if (trys >= limit)
     gzerr << "Unable to get topic namespaces in [" << trys << "] tries.\n";
@@ -127,6 +129,7 @@ bool transport::is_stopped()
 void transport::stop()
 {
   g_stopped = true;
+  gzerr << "transport::stop(), g_stopped " << g_stopped << '\n';
   transport::ConnectionManager::Instance()->Stop();
 }
 
