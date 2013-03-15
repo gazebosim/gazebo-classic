@@ -22,31 +22,35 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "sdf/sdf.hh"
-#include "common/Image.hh"
-#include "common/SystemPaths.hh"
-#include "common/Console.hh"
-#include "common/Events.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
 
-#include "rendering/Light.hh"
-#include "rendering/RenderEvents.hh"
-#include "rendering/Rendering.hh"
-#include "rendering/Scene.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Visual.hh"
-#include "gui/Gui.hh"
+#include "gazebo/rendering/Light.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/gui/Gui.hh"
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 
-#include "math/Angle.hh"
-#include "math/Helpers.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "gui/GuiEvents.hh"
-#include "gui/ModelRightMenu.hh"
-#include "gui/qtpropertybrowser/qttreepropertybrowser.h"
-#include "gui/qtpropertybrowser/qtvariantproperty.h"
-#include "gui/ModelListWidget.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Helpers.hh"
+
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/ModelRightMenu.hh"
+#include "gazebo/gui/qtpropertybrowser/qttreepropertybrowser.h"
+#include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
+#include "gazebo/gui/ModelListWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -62,7 +66,6 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->requestMsg = NULL;
   this->propMutex = new boost::mutex();
   this->receiveMutex = new boost::mutex();
-
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->modelTreeWidget = new QTreeWidget();
@@ -614,7 +617,7 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
     }
   }
 
-  msg.set_type(msgs::Physics::ODE);
+  msg.set_type(this->physicsType);
   this->physicsPub->Publish(msg);
 }
 
@@ -2234,6 +2237,9 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
                                        QtProperty * /*_parent*/)
 {
   QtVariantProperty *item = NULL;
+
+  if (_msg.has_type())
+    this->physicsType = _msg.type();
 
   item = this->variantManager->addProperty(QVariant::Bool,
     tr("enable physics"));
