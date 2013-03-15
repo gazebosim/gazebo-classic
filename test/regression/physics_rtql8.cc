@@ -57,7 +57,14 @@ TEST_F(PhysicsTest, EmptyWorldRTQL8)
 #ifdef HAVE_RTQL8
 TEST_F(PhysicsTest, SimplePendulumRTQL8_Loading)
 {
-  EmptyWorld("worlds/rtql8/simple_pendulum_rtql8.world");
+  //EmptyWorld("worlds/rtql8/simple_pendulum.world");
+}
+#endif // HAVE_RTQL8
+
+#ifdef HAVE_RTQL8
+TEST_F(PhysicsTest, Shapes)
+{
+  EmptyWorld("worlds/rtql8/shapes.world");
 }
 #endif // HAVE_RTQL8
 
@@ -224,7 +231,7 @@ void PhysicsTest::SimplePendulum(const std::string& _physicsEngine)
 #ifdef HAVE_RTQL8
 TEST_F(PhysicsTest, Collision1RTQL8)
 {
-  //EmptyWorld("worlds/rtql8/collision1_rtql8.world");
+  //EmptyWorld("worlds/rtql8/collision1.world");
 }
 #endif // HAVE_RTQL8
 

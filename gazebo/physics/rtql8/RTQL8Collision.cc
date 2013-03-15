@@ -60,6 +60,17 @@ void RTQL8Collision::Load(sdf::ElementPtr _sdf)
 //     this->SetCategoryBits(GZ_FIXED_COLLIDE);
 //     this->SetCollideBits(~GZ_FIXED_COLLIDE);
 //   }
+
+
+  this->link;
+
+
+//  static double TEMP_SIZE = 1.0;
+//  rtql8::kinematics::ShapeCube* shape
+//      = new rtql8::kinematics::ShapeCube(Eigen::Vector3d(TEMP_SIZE, TEMP_SIZE, 1), 1);
+//  TEMP_SIZE += 100.0;
+//  this->rtql8BodyNode->setShape(shape);
+
   gzerr << "Not yet implemented." << std::endl;
 }
 
@@ -125,7 +136,7 @@ void RTQL8Collision::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-void RTQL8Collision::SetCategoryBits(unsigned int _bits)
+void RTQL8Collision::SetCategoryBits(unsigned int /*_bits*/)
 {
 //   if (this->collisionId)
 //     dGeomSetCategoryBits(this->collisionId, _bits);
@@ -135,7 +146,7 @@ void RTQL8Collision::SetCategoryBits(unsigned int _bits)
 }
 
 //////////////////////////////////////////////////
-void RTQL8Collision::SetCollideBits(unsigned int _bits)
+void RTQL8Collision::SetCollideBits(unsigned int /*_bits*/)
 {
 //   if (this->collisionId)
 //     dGeomSetCollideBits(this->collisionId, _bits);

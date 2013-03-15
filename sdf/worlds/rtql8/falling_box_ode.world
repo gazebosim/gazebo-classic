@@ -21,9 +21,9 @@
     </physics>
     <model name="model_cube">
       <!--static>true</static-->
-      <pose>0 0 3.5 1 2 3</pose>
+      <pose>0 0 0 0 0 0</pose>
       <link name="cube">
-	<pose>0 0 0 0 0 0</pose>
+	<pose>0 0 20 1 2 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -103,7 +103,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <box>
-              <size>2 2 2</size>
+              <size>10 10 1</size>
             </box>
           </geometry>
           <material>
@@ -115,7 +115,7 @@
           <max_contacts>250</max_contacts>
           <geometry>
             <box>
-              <size>2 2 2</size>
+              <size>10 10 1</size>
             </box>
           </geometry>
           <surface>
@@ -147,18 +147,5 @@
         </collision>
       </link>
     </model>
-    <light type="directional" name="sun">
-      <pose>0 0 10 0 0 0</pose>
-      <diffuse>.8 .8 .8 1</diffuse>
-      <specular>.1 .1 .1 1</specular>
-      <attenuation>
-        <range>10</range>
-        <linear>0.01</linear>
-        <constant>0.8</constant>
-        <quadratic>0.0</quadratic>
-      </attenuation>
-      <direction>0 .5 -.5</direction>
-      <cast_shadows>true</cast_shadows>
-    </light>
   </world>
 </sdf>

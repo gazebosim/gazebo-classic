@@ -52,7 +52,8 @@ void RTQL8Link::Load(sdf::ElementPtr _sdf)
   Link::Load(_sdf);
 
   // Create rtql8's body node according to gazebo's link.
-  this->rtql8BodyNode = this->GetRTQL8Model()->GetSkeletonDynamics()->createBodyNode();
+  this->rtql8BodyNode
+      = this->GetRTQL8Model()->GetSkeletonDynamics()->createBodyNode();
 
   // Add rtql8's body node to rtql8's skeleton.
   GetRTQL8Model()->GetSkeletonDynamics()->addNode(rtql8BodyNode, false);
@@ -64,13 +65,45 @@ void RTQL8Link::Init()
   //----------------------------------------------------------------------------
   Link::Init();
 
-  //----------------------------------------------------------------------------
-  // TODO: need to do something here.
-  static double TEMP_SIZE = 1.0;
-  rtql8::kinematics::ShapeCube* shape
-          = new rtql8::kinematics::ShapeCube(Eigen::Vector3d(TEMP_SIZE, TEMP_SIZE, 1), 1);
-  //TEMP_SIZE += 100.0;
-  this->rtql8BodyNode->setShape(shape);
+  //////////////////////////////////////////////////////////////////////////////
+  // TODO: At some point, RTQL8 should support collision shape and ...
+  //
+  //////////////////////////////////////////////////////////////////////////////
+  if (this->sdf->HasElement("visual"))
+  {
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    sdf::ElementPtr geometryElem = visualElem->GetElement("geometry");
+    std::string geomType = geometryElem->GetFirstElement()->GetName();
+
+    if (geomType == "sphere")
+      gzerr << "Not implemented yet...";
+    else if (geomType == "plane")
+      gzerr << "Not implemented yet...";
+    else if (geomType == "box")
+    {
+      math::Vector3 mathSize = geometryElem->GetFirstElement()->GetValueVector3("size");
+      Eigen::Vector3d eigenSize(mathSize.x, mathSize.y, mathSize.z);
+      rtql8::kinematics::ShapeCube* shape
+              = new rtql8::kinematics::ShapeCube(eigenSize, 1);
+      this->rtql8BodyNode->setShape(shape);
+    }
+    else if (geomType == "cylinder")
+      gzerr << "Not implemented yet...";
+    else if (geomType == "multiray")
+      gzerr << "Not implemented yet...";
+    else if (geomType == "mesh" || geomType == "trimesh")
+      gzerr << "Not implemented yet...";
+    else if (geomType == "heightmap")
+      gzerr << "Not implemented yet...";
+    else if (geomType == "map" || geomType == "image")
+      gzerr << "Not implemented yet...";
+    else if (geomType == "ray")
+      gzerr << "Not implemented yet...";
+    else
+      gzerr << "Unknown visual type[" << geomType << "]\n";
+
+  }
+  //////////////////////////////////////////////////////////////////////////////
 
   //----------------------------------------------------------------------------
   math::Vector3 cog = this->inertial->GetCoG();
