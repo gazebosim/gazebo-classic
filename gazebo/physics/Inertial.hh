@@ -209,6 +209,13 @@ namespace gazebo
       public: math::Matrix3 GetMOI(const math::Pose &_pose)
         const;
 
+      /// \brief Get equivalent Inertia values with the Link frame offset,
+      /// while holding the Pose of CoG constant in the world frame.
+      /// \param[in] _frameOffset amount to offset the Link frame by, this
+      /// is a transform defined in the Link frame.
+      /// \return Inertial parameters with the shifted frame.
+      public: Inertial GetInertial(const math::Pose &_frameOffset) const;
+
       /// \brief Output operator.
       /// \param[in] _out Output stream.
       /// \param[in] _inertial Inertial object to output.

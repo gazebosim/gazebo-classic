@@ -114,6 +114,21 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+Inertial Inertial::GetInertial(const math::Pose &_frameOffset) const
+{
+  // make a copy of the current Inertial
+  Inertial result(*this);
+
+  // new CoG location after link frame offset
+  result.cog = result.cog - _frameOffset;
+
+  // new MOI after link frame offset
+  result.SetMOI(this->GetMOI(result.cog));
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 void Inertial::Reset()
 {
   sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");

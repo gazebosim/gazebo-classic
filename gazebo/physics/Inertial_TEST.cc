@@ -100,6 +100,15 @@ TEST_F(Inertial_TEST, InertialOperators)
               + 2.0*(1-2.0/3.0)*(1-2.0/3.0), TOL);
   EXPECT_NEAR(isum.GetIZZ(), 3.0 + 0.3, TOL);
   
+  // Test GetInertial(offset)
+  physics::Inertial i1Offset = i1.GetInertial(math::Pose(0, 0, 0, 0, 0, 0));
+  EXPECT_TRUE(i1.GetMOI() == i1Offset.GetMOI());
+  EXPECT_TRUE(i1.GetPose() == i1Offset.GetPose());
+  i1Offset = i1.GetInertial(math::Pose(1, 0, 0, 0, 0, 0));
+  EXPECT_TRUE(i1.GetMOI(math::Pose(1, 0, 0, 0, 0, 0)) == i1Offset.GetMOI());
+  gzdbg << i1.GetPose() << " : " <<  i1Offset.GetPose() << "\n";
+  EXPECT_TRUE(i1.GetPose() == math::Pose(1, 0, 0, 0, 0, 0)+i1Offset.GetPose());
+
   // Test GetMOI
   math::Matrix3 i11 = i1.GetMOI(math::Pose(1, 0, 0, 0, 0, 0));
   EXPECT_NEAR(i11[2][2], 1.3, TOL);
