@@ -95,6 +95,24 @@ namespace gazebo
           this->m[2][0]+_m[2][0],this->m[2][1]+_m[2][1],this->m[2][2]+_m[2][2]);
       }
 
+      /// \brief returns the element wise scalar multiplication
+      public: Matrix3 operator*(const double &_s) const
+      {
+        return Matrix3(
+          // first row
+          _s * this->m[0][0], _s * this->m[0][1], _s * this->m[0][2],
+          _s * this->m[1][0], _s * this->m[1][1], _s * this->m[1][2],
+          _s * this->m[2][0], _s * this->m[2][1], _s * this->m[2][2]);
+      }
+
+      /// \brief Multiplication operators
+      /// \param[in] _s the scaling factor
+      /// \param[in] _m input matrix
+      /// \return a scaled matrix
+      public: friend inline Matrix3 operator*(double _s,
+                                              const Matrix3 &_m)
+      { return _m * _s; }
+
       /// \brief Matrix multiplication operator
       /// \param[in] _m Matrix3 to multiply
       /// \return product of this * _m
