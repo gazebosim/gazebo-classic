@@ -88,12 +88,17 @@ namespace gazebo
       public: void SetCoG(const math::Vector3 &_center);
 
       /// \brief Set the center of gravity.
-      /// \param[in] _center Center of the gravity.
+      /// \param[in] _cx Center offset in x-direction in Link frame
+      /// \param[in] _cy Center offset in y-direction in Link frame
+      /// \param[in] _cz Center offset in z-direction in Link frame
+      /// \param[in] _rx MOI rotation in x-axis in Link frame
+      /// \param[in] _ry MOI rotation in y-axis in Link frame
+      /// \param[in] _rz MOI rotation in z-axis in Link frame
       public: void SetCoG(double _cx, double _cy, double _cz,
                           double _rx, double _ry, double _rz);
 
       /// \brief Set the center of gravity.
-      /// \param[in] _center Center of the gravity.
+      /// \param[in] _c Transform to center of gravity.
       public: void SetCoG(const math::Pose &_c);
 
       /// \brief Get the center of gravity.
@@ -115,7 +120,7 @@ namespace gazebo
       /// \return The principal moments.
       public: math::Vector3 GetPrincipalMoments() const;
 
-      /// \brief Get the products of inertia (Ixy, Ixy, Iyz).
+      /// \brief Get the products of inertia (Ixy, Ixz, Iyz).
       /// \return The products of inertia.
       public: math::Vector3 GetProductsofInertia() const;
 
@@ -196,11 +201,7 @@ namespace gazebo
       /// \brief Get the equivalent inertia from a point in local Link frame
       /// \param[in] _pose location in Link local frame
       /// \return equivalent inertia at _pose
-      public: Inertial GetEquivalentInertiaAt(const math::Pose &_pose);
-
-      /// \brief Transforme Inertial parameters to new CoG.
-      /// \param[in] _cog new desired cog.
-      public: void MoveInertialToNewCoG(const math::Pose &_cog);
+      public: math::Matrix3 GetEquivalentInertiaAt(const math::Pose &_pose);
 
       /// \brief Output operator.
       /// \param[in] _out Output stream.
@@ -227,15 +228,10 @@ namespace gazebo
       /// \param[in] Moments of Inertia as a Matrix3
       public: void SetMOI(const math::Matrix3 &_moi);
 
-      /// \brief Returns a rotated Inertial Moments of Inertia (MOI) Matrix3.
-      /// \param[in] _rot Quaternion to rotate current MOI by.
-      /// \return returns a Matrix3 containing rotated MOI.
-      public: math::Matrix3 RotateInertiaMatrix(const math::Quaternion &_rot);
-
       /// \brief Mass the object. Default is 1.0.
       private: double mass;
 
-      /// \brief Center of gravity. Default is (0.0 0.0 0.0)
+      /// \brief Center of gravity in the Link frame. Default is (0.0 0.0 0.0)
       private: math::Pose cog;
 
       /// \brief Principal moments of inertia. Default is (1.0 1.0 1.0)
@@ -244,6 +240,7 @@ namespace gazebo
 
       /// \brief Product moments of inertia. Default is (0.0 0.0 0.0)
       /// These MOI off-diagonals are specified in the Inertial frame.
+      /// Where products.x is Ixy, products.y is Ixz and products.z is Iyz.
       private: math::Vector3 products;
 
       /// \brief Our SDF values.

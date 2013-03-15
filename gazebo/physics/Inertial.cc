@@ -94,9 +94,6 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
         inertiaElem->GetValueDouble("ixz"),
         inertiaElem->GetValueDouble("iyz"));
 
-    // rotate inertia matrix based on it's pose specification
-    this->RotateInertiaMatrix(this->cog.rot);
-
     inertiaElem->GetElement("ixx")->GetValue()->SetUpdateFunc(
         boost::bind(&Inertial::GetIXX, this));
     inertiaElem->GetElement("iyy")->GetValue()->SetUpdateFunc(
@@ -209,18 +206,6 @@ math::Matrix3 Inertial::GetMOI() const
 }
 
 //////////////////////////////////////////////////
-math::Matrix3 Inertial::RotateInertiaMatrix(const math::Quaternion &_rot)
-{
-  // return a rotated internal matrix
-  math::Matrix3 rotatedInertia = this->GetMOI();
-
-  // rotate it by _rot
-  math::Matrix3 rot = _rot.GetAsMatrix3();
-
-  return rotatedInertia;
-}
-
-//////////////////////////////////////////////////
 void Inertial::Rotate(const math::Quaternion &_rot)
 {
   this->cog.pos = _rot.RotateVector(this->cog.pos);
@@ -236,39 +221,6 @@ Inertial &Inertial::operator=(const Inertial &_inertial)
   this->products = _inertial.products;
 
   return *this;
-}
-
-//////////////////////////////////////////////////
-void Inertial::MoveInertialToNewCoG(const math::Pose &_cog)
-{
-  // transform this->principals and this->products to _cog
-
-  // get MOI as a Matrix3
-  math::Matrix3 moi = this->GetMOI();
-
-  // transform from new _cog to old this->cog, specified in new _cog frame
-  math::Pose new2Old = this->cog - _cog;
-
-  // rotate moi into new cog frame
-  moi = new2Old.rot.GetAsMatrix3() * moi *
-        new2Old.rot.GetInverse().GetAsMatrix3();
-
-  // parallel axis theorem to get MOI at the new cog location
-  // integrating point mass at some offset
-  math::Vector3 offset = new2Old.pos;
-  moi[0][0] += (offset.y * offset.y + offset.z * offset.z) * this->mass;
-  moi[0][1] -= (offset.x * offset.y) * this->mass;
-  moi[0][2] -= (offset.x * offset.z) * this->mass;
-  moi[1][0] -= (offset.y * offset.x) * this->mass;
-  moi[1][1] += (offset.x * offset.x + offset.z * offset.z) * this->mass;
-  moi[1][2] -= (offset.y * offset.z) * this->mass;
-  moi[2][0] -= (offset.z * offset.x) * this->mass;
-  moi[2][1] -= (offset.z * offset.y) * this->mass;
-  moi[2][2] += (offset.x * offset.x + offset.y * offset.y) * this->mass;
-  this->SetMOI(moi);
-
-  // new cog location is _cog
-  this->cog = _cog;
 }
 
 //////////////////////////////////////////////////
@@ -292,26 +244,44 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
   result.cog.rot = math::Quaternion(1, 0, 0, 0);
 
   // compute equivalent I for (*this) at the new CoG
-  Inertial Ithis(*this);
-  Ithis.MoveInertialToNewCoG(result.cog);
+  math::Matrix3 Ithis = this->GetEquivalentInertiaAt(result.cog);
 
   // compute equivalent I for _inertial at the new CoG
-  Inertial Iparam(_inertial);
-  Iparam.MoveInertialToNewCoG(result.cog);
+  math::Matrix3 Iparam = _inertial.GetEquivalentInertiaAt(result.cog);
 
   // sum up principals and products now they are at the same location
-  result.principals = Ithis.principals + Iparam.principals;
-  result.products = Ithis.products + Iparam.products;
+  result.SetMOI(Ithis + Iparam);
 
   return result;
 }
 
 //////////////////////////////////////////////////
-Inertial Inertial::GetEquivalentInertiaAt(const math::Pose &_pose)
+math::Matrix3 Inertial::GetEquivalentInertiaAt(const math::Pose &_pose)
 {
-  Inertial result(*this);
-  result.MoveInertialToNewCoG(_pose);
-  return result;
+  // get MOI as a Matrix3
+  math::Matrix3 moi = this->GetMOI();
+
+  // transform from new _cog to old this->cog, specified in new _cog frame
+  math::Pose new2Old = this->cog - _cog;
+
+  // rotate moi into new cog frame
+  moi = new2Old.rot.GetAsMatrix3() * moi *
+        new2Old.rot.GetInverse().GetAsMatrix3();
+
+  // parallel axis theorem to get MOI at the new cog location
+  // integrating point mass at some offset
+  math::Vector3 offset = new2Old.pos;
+  moi[0][0] += (offset.y * offset.y + offset.z * offset.z) * this->mass;
+  moi[0][1] -= (offset.x * offset.y) * this->mass;
+  moi[0][2] -= (offset.x * offset.z) * this->mass;
+  moi[1][0] -= (offset.y * offset.x) * this->mass;
+  moi[1][1] += (offset.x * offset.x + offset.z * offset.z) * this->mass;
+  moi[1][2] -= (offset.y * offset.z) * this->mass;
+  moi[2][0] -= (offset.z * offset.x) * this->mass;
+  moi[2][1] -= (offset.z * offset.y) * this->mass;
+  moi[2][2] += (offset.x * offset.x + offset.y * offset.y) * this->mass;
+
+  return moi;
 }
 
 //////////////////////////////////////////////////

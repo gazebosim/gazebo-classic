@@ -83,7 +83,7 @@ TEST_F(Inertial_TEST, InertialOperators)
                           0, 2, 0,
                           0, 0, 3));
 
-  i1.MoveInertialToNewCoG(math::Pose(1, 0, 0, 0, 0, 0));
+  i1.SetMOI(i1.GetEquivalentInertiaAt(math::Pose(1, 0, 0, 0, 0, 0)));
   EXPECT_NEAR(i1.GetPose().pos.x, 1, TOL);
   EXPECT_NEAR(i1.GetIZZ(), 1.3, TOL);
   gzdbg << "i1 [" << i1 << "]\n";
@@ -97,7 +97,7 @@ TEST_F(Inertial_TEST, InertialOperators)
   gzdbg << "i2 [" << i2 << "]\n";
   gzdbg << "R [" << math::Quaternion(0, 0, 0.5*M_PI).GetAsMatrix3() << "]\n";
   gzdbg << "I [" << i2.GetMOI() << "]\n";
-  i2.MoveInertialToNewCoG(math::Pose(0, 0, 1, 0, 0, 0.5*M_PI));
+  i2.SetMOI(i2.GetEquivalentInertiaAt(math::Pose(0, 0, 1, 0, 0, 0.5*M_PI)));
   gzdbg << "i2 [" << i2 << "]\n";
   EXPECT_NEAR(i2.GetIXX(), 2, TOL);
   EXPECT_NEAR(i2.GetIYY(), 1, TOL);

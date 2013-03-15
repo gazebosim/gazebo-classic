@@ -75,7 +75,7 @@ namespace gazebo
       /// \param[in] _v The value to set in each row of the column
       public: void SetCol(unsigned int _c, const Vector3 &_v);
 
-      /// \brief Matrix multiplication operatorr
+      /// \brief Matrix multiplication operator
       /// \param[in] _m Matrix3 to multiply
       /// \return product of this * _m
       public: Matrix3 operator*(const Matrix3 &_m) const
@@ -95,7 +95,7 @@ namespace gazebo
           this->m[2][0]*_m[0][2]+this->m[2][1]*_m[1][2]+this->m[2][2]*_m[2][2]);
       }
 
-      /// \brief Equality test operatorr
+      /// \brief Equality test operator
       /// \param[in] _m Matrix3 to test
       /// \return True if equal (using the default tolerance of 1e-6)
       public: bool operator==(const Matrix3 &_m) const;
