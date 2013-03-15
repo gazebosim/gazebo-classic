@@ -75,6 +75,16 @@ namespace gazebo
       /// \param[in] _v The value to set in each row of the column
       public: void SetCol(unsigned int _c, const Vector3 &_v);
 
+      /// \brief returns the element wise sum of two matrices
+      public: Matrix3 operator+(const Matrix3 &_m) const
+      {
+        return Matrix3(
+          // first row
+          this->m[0][0]+_m[0][0],this->m[0][1]+_m[0][1],this->m[0][2]*_m[0][2],
+          this->m[1][0]*_m[1][0],this->m[1][1]*_m[1][1],this->m[1][2]*_m[1][2],
+          this->m[2][0]*_m[2][0],this->m[2][1]*_m[2][1],this->m[2][2]*_m[2][2]);
+      }
+
       /// \brief Matrix multiplication operator
       /// \param[in] _m Matrix3 to multiply
       /// \return product of this * _m
