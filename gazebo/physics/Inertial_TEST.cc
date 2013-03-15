@@ -96,6 +96,12 @@ TEST_F(Inertial_TEST, InertialOperators)
   EXPECT_NEAR(i2.GetIXX(), 2, TOL);
   EXPECT_NEAR(i2.GetIYY(), 1, TOL);
   EXPECT_NEAR(i2.GetIZZ(), 3, TOL);
+
+  // Get i2 from origin of link
+  physics::Inertial i3 = i2.GetEquivalentInertiaAt(math::Pose());
+  EXPECT_NEAR(i3.GetIXX(), 2 + 2, TOL);
+  EXPECT_NEAR(i3.GetIYY(), 1 + 2, TOL);
+  EXPECT_NEAR(i3.GetIZZ(), 3, TOL);
 }
 
 int main(int argc, char **argv)

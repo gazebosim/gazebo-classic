@@ -307,6 +307,13 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
 }
 
 //////////////////////////////////////////////////
+Inertial Inertial::GetEquivalentInertiaAt(const math::Pose &_psoe)
+{
+  Inertial result(*this);
+  return result.MoveInertialToNewCoG(_pose);
+}
+
+//////////////////////////////////////////////////
 const Inertial &Inertial::operator+=(const Inertial &_inertial)
 {
   *this = *this + _inertial;

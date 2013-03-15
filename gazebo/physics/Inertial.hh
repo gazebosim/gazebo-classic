@@ -193,6 +193,11 @@ namespace gazebo
       /// \param[in] _msg Message to read
       public: void ProcessMsg(const msgs::Inertial &_msg);
 
+      /// \brief Get the equivalent inertia from a point in local Link frame
+      /// \param[in] _pose location in Link local frame
+      /// \return equivalent inertia at _psoe
+      public: Inertial GetEquivalentInertiaAt(const math::Pose &_psoe);
+
       /// \brief Transforme Inertial parameters to new CoG.
       /// \param[in] _cog new desired cog.
       public: void MoveInertialToNewCoG(const math::Pose &_cog);
