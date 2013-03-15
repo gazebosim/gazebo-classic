@@ -109,6 +109,7 @@ void TextView::OnText(const std::string &_msg)
 {
   if (this->paused)
     return;
+
   boost::mutex::scoped_lock lock(this->mutex);
 
   // Update the Hz and Bandwidth info.
