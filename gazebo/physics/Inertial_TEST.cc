@@ -83,10 +83,9 @@ TEST_F(Inertial_TEST, InertialOperators)
                           0, 2, 0,
                           0, 0, 3));
 
-  i1.SetMOI(i1.GetEquivalentInertiaAt(math::Pose(1, 0, 0, 0, 0, 0)));
-  EXPECT_NEAR(i1.GetPose().pos.x, 1, TOL);
-  EXPECT_NEAR(i1.GetIZZ(), 1.3, TOL);
-  gzdbg << "i1 [" << i1 << "]\n";
+  math::Matrix3 i11 = i1.GetEquivalentInertiaAt(math::Pose(1, 0, 0, 0, 0, 0));
+  EXPECT_NEAR(i11[2][2], 1.3, TOL);
+  gzdbg << "i11 [" << i11 << "]\n";
 
   // Get i2 from origin of link
   physics::Inertial i3;
