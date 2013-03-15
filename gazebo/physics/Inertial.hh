@@ -24,7 +24,6 @@
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix3.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo
 {
@@ -178,6 +177,9 @@ namespace gazebo
       public: Inertial &operator=(const Inertial &_inertial);
 
       /// \brief Addition operator.
+      /// Assuming both CG and MOI's are defined in the same reference frame.
+      /// New CG is computed, and both MOI contributions
+      /// relocated to the new cog.
       /// \param[in] _inertial Inertial to add.
       /// \return The result of the addition.
       public: Inertial operator+(const Inertial &_inertial) const;
@@ -191,12 +193,9 @@ namespace gazebo
       /// \param[in] _msg Message to read
       public: void ProcessMsg(const msgs::Inertial &_msg);
 
-      /// \brief Get transformed Inertial parameters.
-      /// \param[in] _inertial pointer to Inertial class.
-      /// \param[in] _pose Transform to apply to the Inertial parameters.
-      /// \return returns a copy of rotated input Inertial class.
-      public: Inertial ComputeTransformedInertial(const InertialPtr &_inertial,
-        const math::Pose &_pose);
+      /// \brief Transforme Inertial parameters to new CoG.
+      /// \param[in] _cog new desired cog.
+      public: void MoveInertialToNewCoG(const math::Pose &_cog);
 
       /// \brief Output operator.
       /// \param[in] _out Output stream.

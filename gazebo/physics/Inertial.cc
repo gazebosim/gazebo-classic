@@ -239,12 +239,48 @@ Inertial &Inertial::operator=(const Inertial &_inertial)
 }
 
 //////////////////////////////////////////////////
+void Inertial::MoveInertialToNewCoG(const math::Pose &_cog)
+{
+  // transform this->principals and this->products to _cog
+
+  // get MOI as a Matrix3
+  math::Matrix3 moi = this->GetMOI();
+
+  // transform from new _cog to old this->cog, specified in new _cog frame
+  math::Pose new2Old = this->cog - _cog;
+
+  // rotate moi into new cog frame
+  moi = new2Old.rot.GetAsMatrix3() * moi *
+        new2Old.rot.GetInverse().GetAsMatrix3();
+
+  // parallel axis theorem to get MOI at the new cog location
+  // integrating point mass at some offset
+  math::Vector3 offset = new2Old.pos;
+  moi[0][0] += (offset.y * offset.y + offset.z * offset.z) * this->mass;
+  moi[0][1] -= (offset.x * offset.y) * this->mass;
+  moi[0][2] -= (offset.x * offset.z) * this->mass;
+  moi[1][0] -= (offset.y * offset.x) * this->mass;
+  moi[1][1] += (offset.x * offset.x + offset.z * offset.z) * this->mass;
+  moi[1][2] -= (offset.y * offset.z) * this->mass;
+  moi[2][0] -= (offset.z * offset.x) * this->mass;
+  moi[2][1] -= (offset.z * offset.y) * this->mass;
+  moi[2][2] += (offset.x * offset.x + offset.y * offset.y) * this->mass;
+  this->SetMOI(moi);
+
+  // new cog location is _cog
+  this->cog = _cog;
+}
+
+//////////////////////////////////////////////////
 // returns this + _inertial, where the resulting
 // cog is computed from masses, and both MOI contributions
 // relocated to the new cog.
+// Assuming both cg and MOI are defined in the same reference frame.
 Inertial Inertial::operator+(const Inertial &_inertial) const
 {
-  Inertial result;
+  Inertial result(*this);
+
+  // update mass with sum
   result.mass = this->mass + _inertial.mass;
 
   // compute new center of mass
@@ -252,24 +288,20 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
     (this->cog.pos*this->mass + _inertial.cog.pos * _inertial.mass) /
     result.mass;
 
-  // FIXME: \TODO: below doesn't look right, fix and add unit test.
-  // Should rotate both MOI into link frame (zero cog.rot) and add
-  // via parallel axis theorem.
+  // make a decision on the new orientation, set it to identity
+  result.cog.rot = math::Quaternion(1, 0, 0, 0);
 
-  // transform this->principals and this->products to result.cog
-  math::Matrix3 moi1 = this->GetMOI();
-  math::Vector3 principals1;
-  math::Vector3 products1;
+  // compute equivalent I for (*this) at the new CoG
+  Inertial Ithis(*this);
+  Ithis.MoveInertialToNewCoG(result.cog);
 
-  // transform _inertial.principals and _inertial.products to result.cog
-  math::Matrix3 moi2 = _inertial.GetMOI();
-  math::Vector3 principals2;
-  math::Vector3 products2;
+  // compute equivalent I for _inertial at the new CoG
+  Inertial Iparam(_inertial);
+  Iparam.MoveInertialToNewCoG(result.cog);
 
-
-  // add them
-  result.principals = principals1 + principals2;
-  result.products = products1 + products2;
+  // sum up principals and products now they are at the same location
+  result.principals = Ithis.principals + Iparam.principals;
+  result.products = Ithis.products + Iparam.products;
 
   return result;
 }
