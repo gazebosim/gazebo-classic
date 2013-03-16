@@ -325,17 +325,13 @@ void Camera::PostRender()
 
   if (this->newData && this->captureData)
   {
-    Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
-
     size_t size;
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
 
     // Get access to the buffer and make an image and write it to file
-    pixelBuffer = this->renderTexture->getBuffer();
-
-    Ogre::PixelFormat format = pixelBuffer->getFormat();
-
+    Ogre::PixelFormat format =
+        this->viewport->getTarget()->suggestPixelFormat();
     size = Ogre::PixelUtil::getMemorySize(width, height, 1, format);
 
     // Allocate buffer
@@ -347,7 +343,7 @@ void Camera::PostRender()
     Ogre::PixelBox box(width, height, 1,
         (Ogre::PixelFormat)this->imageFormat, this->saveFrameBuffer);
 
-    pixelBuffer->blitToMemory(box);
+    this->viewport->getTarget()->copyContentsToMemory(box);
 
     // record render time stamp
 
@@ -381,7 +377,6 @@ void Camera::PostRender()
 
   this->newData = false;
 }
-
 
 //////////////////////////////////////////////////
 math::Pose Camera::GetWorldPose()
@@ -644,9 +639,6 @@ void Camera::EnableSaveFrame(bool enable)
   sdf::ElementPtr elem = this->sdf->GetElement("save");
   elem->GetAttribute("enabled")->Set(enable);
   this->captureData = true;
-
-  if (!this->renderTexture)
-    this->CreateRenderTexture("saveframes_render_texture");
 }
 
 //////////////////////////////////////////////////
