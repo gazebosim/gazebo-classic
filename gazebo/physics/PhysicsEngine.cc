@@ -45,7 +45,7 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   this->sdf.reset(new sdf::Element);
   sdf::initFile("physics.sdf", this->sdf);
 
-  this->realTimeFactor = 0;
+  this->targetRealTimeFactor = 0;
   this->realTimeUpdateRate = 0;
   this->maxStepSize = 0;
 
@@ -74,7 +74,7 @@ void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 
   this->realTimeUpdateRate =
       this->sdf->GetElement("real_time_update_rate")->GetValueDouble();
-  this->realTimeFactor =
+  this->targetRealTimeFactor =
       this->sdf->GetElement("real_time_factor")->GetValueDouble();
   this->maxStepSize =
       this->sdf->GetElement("max_step_size")->GetValueDouble();
@@ -158,9 +158,9 @@ double PhysicsEngine::GetStepTime()
 }
 
 //////////////////////////////////////////////////
-double PhysicsEngine::GetRealTimeFactor() const
+double PhysicsEngine::GetTargetRealTimeFactor() const
 {
-  return this->realTimeFactor;
+  return this->targetRealTimeFactor;
 }
 
 //////////////////////////////////////////////////
@@ -176,10 +176,10 @@ double PhysicsEngine::GetMaxStepSize() const
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetRealTimeFactor(double _factor)
+void PhysicsEngine::SetTargetRealTimeFactor(double _factor)
 {
   this->sdf->GetElement("real_time_factor")->Set(_factor);
-  this->realTimeFactor = _factor;
+  this->targetRealTimeFactor = _factor;
 }
 
 //////////////////////////////////////////////////

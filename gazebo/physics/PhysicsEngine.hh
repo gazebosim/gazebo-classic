@@ -135,9 +135,9 @@ namespace gazebo
       /// \return Simulation step time.
       public: virtual double GetStepTime() GAZEBO_DEPRECATED;
 
-      /// \brief Get real time factor
-      /// \return Real time factor
-      public: double GetRealTimeFactor() const;
+      /// \brief Get target real time factor
+      /// \return Target real time factor
+      public: double GetTargetRealTimeFactor() const;
 
       /// \brief Get real time update rate
       /// \return Update rate
@@ -147,9 +147,9 @@ namespace gazebo
       /// \return Max step size.
       public: double GetMaxStepSize() const;
 
-      /// \brief Set real time factor
-      /// \param[in] _factor Real time factor
-      public: void SetRealTimeFactor(double _factor);
+      /// \brief Set target real time factor
+      /// \param[in] _factor Target real time factor
+      public: void SetTargetRealTimeFactor(double _factor);
 
       /// \brief Set real time update rate
       /// \param[in] _rate Update rate
@@ -377,8 +377,8 @@ namespace gazebo
       /// \brief Real time update rate.
       protected: double realTimeUpdateRate;
 
-      /// \brief Real time factor.
-      protected: double realTimeFactor;
+      /// \brief Target real time factor.
+      protected: double targetRealTimeFactor;
 
       /// \brief Real time update rate.
       protected: double maxStepSize;

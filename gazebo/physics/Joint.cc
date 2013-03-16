@@ -98,8 +98,14 @@ void Joint::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string parentName = _sdf->GetValueString("parent");
-  std::string childName = _sdf->GetValueString("child");
+  sdf::ElementPtr parentElem = _sdf->GetElement("parent");
+  sdf::ElementPtr childElem = _sdf->GetElement("child");
+
+  GZ_ASSERT(parentElem, "Parent element is NULL");
+  GZ_ASSERT(childElem, "Child element is NULL");
+
+  std::string parentName = parentElem->GetValueString("link_name");
+  std::string childName = childElem->GetValueString("link_name");
 
   if (this->model)
   {

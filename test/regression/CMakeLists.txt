@@ -33,6 +33,7 @@ set(tests
   physics.cc
   pioneer2dx.cc
   transport.cc
+  sdf_version.cc
   server_fixture.cc
   speed.cc
   )

@@ -58,12 +58,10 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
 
   if (!_quiet)
   {
-    gzwarn << gzclr_start(33)
-              << "  Version[" << origVersion << "] to Version[" << _toVersion
-              << "]\n"
-              << "  Please use the gzsdf tool to update your SDF files.\n"
-              << "    $ gzsdf convert [sdf_file]\n"
-              << gzclr_end;
+    gzwarn << "  Version[" << origVersion << "] to Version[" << _toVersion
+           << "]\n"
+           << "  Please use the gzsdf tool to update your SDF files.\n"
+           << "    $ gzsdf convert [sdf_file]\n";
   }
 
   elem->SetAttribute("version", _toVersion);
@@ -289,32 +287,8 @@ void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
   if (!value)
     return;
 
-  // get the new element/attribute name
-  const char *toName = toTokens[toTokens.size()-1].c_str();
-  TiXmlElement *toElem = _elem;
-  for (unsigned int i = 0; i < toTokens.size()-1; ++i)
-  {
-    toElem = toElem->FirstChildElement(toTokens[i]);
-    if (!toElem)
-    {
-      gzerr << "Cannot find element: '"<< toTokens[i] << "' in to string: '"
-          << toStr << "'\n";
-      return;
-    }
-  }
-
+  std::string valueStr = value;
   // move by creating a new element/attribute and deleting the old one
-  if (toElemStr)
-  {
-    TiXmlElement *moveTo = new TiXmlElement(toName);
-    TiXmlText *text = new TiXmlText(value);
-    moveTo->LinkEndChild(text);
-    toElem->LinkEndChild(moveTo);
-  }
-  else if (toAttrStr)
-  {
-    toElem->SetAttribute(toName, value);
-  }
   if (fromElemStr)
   {
     TiXmlElement *moveFrom =
@@ -324,6 +298,47 @@ void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
   else if (fromAttrStr)
   {
     fromElem->RemoveAttribute(fromName);
+  }
+
+  unsigned int newDirIndex = 0;
+  // get the new element/attribute name
+  const char *toName = toTokens[toTokens.size()-1].c_str();
+  TiXmlElement *toElem = _elem;
+  TiXmlElement *childElem = NULL;
+  for (unsigned int i = 0; i < toTokens.size()-1; ++i)
+  {
+    childElem = toElem->FirstChildElement(toTokens[i]);
+    if (!childElem)
+    {
+      newDirIndex = i;
+      break;
+    }
+    toElem = childElem;
+  }
+
+  // found elements in 'to' string that is not present, so create new
+  // elements
+  if (!childElem)
+  {
+    while (newDirIndex < (toTokens.size() - 1))
+    {
+      TiXmlElement *newElem = new TiXmlElement(toTokens[newDirIndex]);
+      toElem->LinkEndChild(newElem);
+      toElem = newElem;
+      newDirIndex++;
+    }
+  }
+
+  if (toElemStr)
+  {
+    TiXmlElement *moveTo = new TiXmlElement(toName);
+    TiXmlText *text = new TiXmlText(valueStr);
+    moveTo->LinkEndChild(text);
+    toElem->LinkEndChild(moveTo);
+  }
+  else if (toAttrStr)
+  {
+    toElem->SetAttribute(toName, valueStr);
   }
 }
 

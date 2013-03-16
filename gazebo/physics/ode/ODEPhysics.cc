@@ -252,7 +252,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_contact_surface_layer(this->GetContactSurfaceLayer());
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
-    physicsMsg.set_real_time_factor(this->realTimeFactor);
+    physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
 
     response.set_type(physicsMsg.GetTypeName());
@@ -264,20 +264,6 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  // deprecated
-  if (_msg->has_dt())
-    gzwarn << "Physics dt is deprecated by max step size\n";
-
-  if (_msg->has_min_step_size())
-    this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
-
-  // deprecated
-  if (_msg->has_update_rate())
-  {
-    gzwarn <<
-        "Physics update rate is deprecated by real time update rate\n";
-  }
-
   if (_msg->has_solver_type())
   {
     sdf::ElementPtr solverElem =
@@ -322,13 +308,28 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetGravity(msgs::Convert(_msg->gravity()));
 
   if (_msg->has_real_time_factor())
-    this->SetRealTimeFactor(_msg->real_time_factor());
+    this->SetTargetRealTimeFactor(_msg->real_time_factor());
 
   if (_msg->has_real_time_update_rate())
+  {
     this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+  }
+  else if (_msg->has_update_rate())
+  {
+    this->SetRealTimeUpdateRate(_msg->update_rate());
+    gzwarn <<
+        "Physics update rate is deprecated by real time update rate\n";
+  }
 
   if (_msg->has_max_step_size())
+  {
     this->SetMaxStepSize(_msg->max_step_size());
+  }
+  else if (_msg->has_dt())
+  {
+    this->SetMaxStepSize(_msg->dt());
+    gzwarn << "Physics dt is deprecated by max step size\n";
+  }
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
@@ -1050,21 +1051,48 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
   {
     case SOLVER_TYPE:
     {
-      std::string value = boost::any_cast<std::string>(_value);
+      std::string value;
+      try
+      {
+        value = boost::any_cast<std::string>(_value);
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return;
+      }
       odeElem->GetElement("solver")->GetElement("type")->Set(value);
       this->stepType = value;
       break;
     }
     case GLOBAL_CFM:
     {
-      double value = boost::any_cast<double>(_value);
+      double value;
+      try
+      {
+        value = boost::any_cast<double>(_value);
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return;
+      }
       odeElem->GetElement("constraints")->GetElement("cfm")->Set(value);
       dWorldSetCFM(this->worldId, value);
       break;
     }
     case GLOBAL_ERP:
     {
-      double value = boost::any_cast<double>(_value);
+      double value;
+      try
+      {
+        value = boost::any_cast<double>(_value);
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return;
+      }
       odeElem->GetElement("constraints")->GetElement("erp")->Set(value);
       dWorldSetERP(this->worldId, value);
       break;
@@ -1108,7 +1136,15 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
     }
     case CONTACT_SURFACE_LAYER:
     {
-      double value = boost::any_cast<double>(_value);
+      double value;
+      try
+      {
+        value = boost::any_cast<double>(_value);
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
       odeElem->GetElement("constraints")->GetElement(
           "contact_surface_layer")->Set(value);
       dWorldSetContactSurfaceLayer(this->worldId, value);
@@ -1138,7 +1174,16 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
     }
     case MIN_STEP_SIZE:
     {
-      double value = boost::any_cast<double>(_value);
+      /// TODO: Implement min step size param
+      double value;
+      try
+      {
+        value = boost::any_cast<double>(_value);
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
       odeElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
       break;
     }
