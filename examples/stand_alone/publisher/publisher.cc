@@ -16,6 +16,7 @@
  *
 */
 
+#include <gazebo/gazebo.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <math/gzmath.hh>
@@ -24,11 +25,10 @@
 
 
 /////////////////////////////////////////////////
-int main()
+int main(int _argc, char **_argv)
 {
-  // Initialize transport
-  gazebo::common::Console::Instance()->Init("gztopic.log");
-  gazebo::transport::init();
+  // Load gazebo
+  gazebo::load(_argc, _argv);
 
   // Create our node for communication
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
@@ -44,17 +44,19 @@ int main()
   // Wait for a subscriber to connect
   pub->WaitForConnection();
 
-  // Generate a pose
-  gazebo::math::Pose pose(1, 2, 3, 4, 5, 6);
-
-  // Convert to a pose message
-  gazebo::msgs::Pose msg;
-  gazebo::msgs::Set(&msg, pose);
-
-  // Busy wait loop...replace with your own code as needed.
+  // Publisher loop...replace with your own code.
   while (true)
   {
+    // Throttle Publication
     gazebo::common::Time::MSleep(100);
+
+    // Generate a pose
+    gazebo::math::Pose pose(1, 2, 3, 4, 5, 6);
+
+    // Convert to a pose message
+    gazebo::msgs::Pose msg;
+    gazebo::msgs::Set(&msg, pose);
+
     pub->Publish(msg);
   }
 
