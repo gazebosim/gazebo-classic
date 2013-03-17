@@ -81,6 +81,8 @@ bool ContactProcessed()
 //////////////////////////////////////////////////
 SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
     : PhysicsEngine(_world), system(), matter(system), forces(system),
+      gravity(forces, matter, -SimTK::ZAxis, 0),
+      discreteForces(forces, matter),
       tracker(system), contact(system, tracker),  integ(NULL)
 {
   // Instantiate the Multibody System
@@ -88,10 +90,10 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
   // Instantiate the Simbody General Force Subsystem
 
   // Create an integrator
-  //this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
-  // this->integ = new SimTK::ExplicitEulerIntegrator(system);
+  // this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
   // this->integ = new SimTK::RungeKutta3Integrator(system);
   this->integ = new SimTK::RungeKutta2Integrator(system);
+  // this->integ = new SimTK::ExplicitEulerIntegrator(system);
   /// \TODO:  make sdf parameter
   this->integ->setAccuracy(0.1);
 }
@@ -139,7 +141,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
       MultibodyGraphMaker mbgraph;
       this->CreateMultibodyGraph(mbgraph, _model);
       // Optional: dump the graph to stdout for debugging or curiosity.
-      mbgraph.dumpGraph(gzdbg);
+      // mbgraph.dumpGraph(gzdbg);
 
       SimbodyPhysics::AddDynamicModelToSimbodySystem(mbgraph, _model);
     }
@@ -176,7 +178,7 @@ void SimbodyPhysics::UpdatePhysics()
     this->integ->stepTo(this->world->GetSimTime().Double(),
                        this->world->GetSimTime().Double());
 
-  const SimTK::State &s = integ->getState();
+  const SimTK::State &s = this->integ->getState();
 
 /* debug
   gzerr << "time [" << s.getTime()
@@ -207,6 +209,8 @@ void SimbodyPhysics::UpdatePhysics()
         boost::shared_static_cast<Entity>(*lx).get());
     }
   }
+
+  this->discreteForces.clearAllForces(this->integ->updAdvancedState());
 }
 
 //////////////////////////////////////////////////
@@ -418,14 +422,17 @@ void SimbodyPhysics::CreateMultibodyGraph(
 // would not be needed in Gazebo since it does its own visualization.
 void SimbodyPhysics::InitSimbodySystem()
 {
-  math::Vector3 gravity = this->GetGravity();
-  const SimTK::Vec3 g(gravity.x, gravity.y, gravity.z);
+  math::Vector3 gzGravity = this->GetGravity();
+  const SimTK::Vec3 g(gzGravity.x, gzGravity.y, gzGravity.z);
 
   // Set stiction max slip velocity to make it less stiff.
   this->contact.setTransitionVelocity(0.1);
 
   // Specify gravity (read in above from world).
-  SimTK::Force::UniformGravity(this->forces, this->matter, g);
+  if (!math::equal(g.norm(), 0.0))
+    this->gravity.setDefaultGravityVector(g);
+  else
+    this->gravity.setDefaultMagnitude(0.0);
 }
 
 void SimbodyPhysics::AddStaticModelToSimbodySystem(const physics::Model* _model)
@@ -653,9 +660,6 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
 std::string SimbodyPhysics::GetTypeString(physics::Base::EntityType _type)
 {
-  if (!(_type & physics::Base::JOINT))
-    gzerr << "Not a joint type\n";
-
 /*
   switch (_type)
   {
@@ -713,6 +717,8 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
 {
   // TODO: Edit physics::Surface class to support these properties
   // Define a material to use for contact. This is not very stiff.
+  // use stiffness of 1e8 and dissipation of 1000.0 to approximate inelastic
+  // collision.
   SimTK::ContactMaterial material(1e6,   // stiffness
                                   0.1,  // dissipation
                                   0.7,   // mu_static

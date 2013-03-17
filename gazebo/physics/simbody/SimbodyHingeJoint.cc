@@ -89,10 +89,15 @@ void SimbodyHingeJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 }
 
 //////////////////////////////////////////////////
-double SimbodyHingeJoint::GetVelocity(int /*_index*/) const
+double SimbodyHingeJoint::GetVelocity(int _index) const
 {
-  gzerr << "Not implemented...\n";
-  return 0;
+  if (_index < this->GetAngleCount())
+    return this->mobod.getOneU(
+      this->simbodyPhysics->integ->getState(),
+      SimTK::MobilizerUIndex(_index));
+  else
+    gzerr << "Invalid index for joint, returning NaN\n";
+  return SimTK::NaN;
 }
 
 //////////////////////////////////////////////////
@@ -109,9 +114,14 @@ double SimbodyHingeJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetForce(int /*_index*/, double _torque)
+void SimbodyHingeJoint::SetForce(int _index, double _torque)
 {
-  gzerr << "Not implemented...\n";
+  gzerr << "Setting Joint Force " << _torque << "\n";
+
+  if (_index < this->GetAngleCount())
+    this->simbodyPhysics->discreteForces.setOneMobilityForce(
+      this->simbodyPhysics->integ->updAdvancedState(),
+      this->mobod, SimTK::MobilizerUIndex(_index), _torque);
 }
 
 //////////////////////////////////////////////////

@@ -135,9 +135,21 @@ namespace gazebo
       public: SimTK::MultibodySystem system;
       public: SimTK::SimbodyMatterSubsystem matter;
       public: SimTK::GeneralForceSubsystem forces;
+      public: SimTK::Force::Gravity gravity;
+      public: SimTK::Force::DiscreteForces discreteForces;
       public: SimTK::ContactTrackerSubsystem tracker;
       public: SimTK::CompliantContactSubsystem contact;
       public: SimTK:: Integrator *integ;
+
+      public: static SimTK::Quaternion QuadToQuad(const math::Quaternion & _q)
+      {
+        return SimTK::Quaternion(_q.w, _q.x, _q.y, _q.z);
+      }
+
+      public: static math::Quaternion QuadToQuad(const SimTK::Quaternion & _q)
+      {
+        return math::Quaternion(_q[0], _q[1], _q[2], _q[3]);
+      }
 
       public: static SimTK::Vec3 Vector3ToVec3(const math::Vector3& _v)
       {

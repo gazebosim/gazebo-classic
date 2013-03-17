@@ -132,18 +132,6 @@ if (PKG_CONFIG_FOUND)
   message ("\n\n\nfound simbody: ${HAVE_Simbody}\n\n\n")
   
   #################################################
-  # Find Simbody
-  message ("\n\nCMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}\n\n\n")
-  set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
-  find_package(Simbody REQUIRED)
-  if (SIMBODY_FOUND)
-    set (HAVE_Simbody TRUE)
-  else()
-    set (HAVE_Simbody FALSE)
-  endif()
-  message ("\n\n\nfound simbody: ${HAVE_Simbody}\n\n\n")
-  
-  #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
   find_path (tinyxml_include_dir tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
   if (NOT tinyxml_include_dir)
