@@ -35,15 +35,14 @@ int main(int _argc, char **_argv)
   // Load gazebo
   gazebo::load(_argc, _argv);
 
+  gazebo::run();
+
   // Create our node for communication
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
   node->Init();
 
   // Listen to Gazebo world_stats topic
   gazebo::transport::SubscriberPtr sub = node->Subscribe("~/world_stats", cb);
-
-  // Start transport
-  gazebo::transport::run();
 
   // Busy wait loop...replace with your own code as needed.
   while (true)

@@ -16,7 +16,8 @@
 */
 
 #include <boost/algorithm/string.hpp>
-#include "Node.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
 
 using namespace gazebo;
 using namespace transport;
