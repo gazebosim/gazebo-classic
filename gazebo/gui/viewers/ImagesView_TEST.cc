@@ -19,34 +19,24 @@
 #include "gazebo/gui/viewers/ImagesView_TEST.hh"
 
 /////////////////////////////////////////////////
-void ImagesView_TEST::SetTopic(gazebo::gui::ImagesView *_view,
-    const std::string &_topicName, int _count)
+void ImagesView_TEST::Construction()
 {
-  QFrame *frame = _view->findChild<QFrame*>("blackBorderFrame");
+  this->Load("worlds/empty.world");
 
-  _view->SetTopic(_topicName);
+  // Create a new data logger widget
+  gazebo::gui::ImagesView *view = new gazebo::gui::ImagesView(NULL);
+  view->show();
 
-  int i = 0;
+  QCoreApplication::processEvents();
 
-  for (i = 0; frame->children().size() != 1 && i < 1000; ++i)
-  {
-    gazebo::common::Time::MSleep(10);
-    QCoreApplication::processEvents();
-  }
+  // Get the frame that holds the images
+  QFrame *frame = view->findChild<QFrame*>("blackBorderFrame");
 
-  // Make sure the loop didn't exceed the maximum number of iterations
-  QVERIFY(i < 1000);
+  // The layout should be the only child of the frame on construction.
+  QVERIFY(frame->children().size() == 1);
 
-  // Wait a bit for the images to appear
-  // This is done for visual confirmation that the test works.
-  for (i = 0; i < 100; ++i)
-  {
-    gazebo::common::Time::MSleep(10);
-    QCoreApplication::processEvents();
-  }
-
-  // Make sure the number of images is correct.
-  QVERIFY(frame->children().size() == _count);
+  view->hide();
+  delete view;
 }
 
 /////////////////////////////////////////////////
@@ -108,26 +98,35 @@ void ImagesView_TEST::Switch()
 }
 
 /////////////////////////////////////////////////
-void ImagesView_TEST::Construction()
+void ImagesView_TEST::SetTopic(gazebo::gui::ImagesView *_view,
+    const std::string &_topicName, int _count)
 {
-  this->Load("worlds/empty.world");
+  QFrame *frame = _view->findChild<QFrame*>("blackBorderFrame");
 
-  // Create a new data logger widget
-  gazebo::gui::ImagesView *view = new gazebo::gui::ImagesView(NULL);
-  view->show();
+  _view->SetTopic(_topicName);
 
-  QCoreApplication::processEvents();
+  int i = 0;
 
-  // Get the frame that holds the images
-  QFrame *frame = view->findChild<QFrame*>("blackBorderFrame");
+  for (i = 0; frame->children().size() != 1 && i < 1000; ++i)
+  {
+    gazebo::common::Time::MSleep(10);
+    QCoreApplication::processEvents();
+  }
 
-  // The layout should be the only child of the frame on construction.
-  QVERIFY(frame->children().size() == 1);
+  // Make sure the loop didn't exceed the maximum number of iterations
+  QVERIFY(i < 1000);
 
-  view->hide();
-  delete view;
+  // Wait a bit for the images to appear
+  // This is done for visual confirmation that the test works.
+  for (i = 0; i < 100; ++i)
+  {
+    gazebo::common::Time::MSleep(10);
+    QCoreApplication::processEvents();
+  }
+
+  // Make sure the number of images is correct.
+  QVERIFY(frame->children().size() == _count);
 }
-
 
 // Generate a main function for the test
 QTEST_MAIN(ImagesView_TEST)
