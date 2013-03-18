@@ -191,33 +191,7 @@ void UserCamera::AnimationComplete()
 void UserCamera::PostRender()
 {
   Camera::PostRender();
-  sdf::ElementPtr elem = this->sdf->GetElement("save");
-
-  if (elem->GetValueBool("enabled"))
-  {
-    std::string path = elem->GetValueString("path");
-
-    std::string friendlyName = this->GetName();
-    boost::replace_all(friendlyName, "::", "_");
-
-    char tmp[1024];
-    if (!path.empty())
-    {
-      snprintf(tmp, sizeof(tmp), "%s/%s-%04d.jpg", path.c_str(),
-          friendlyName.c_str(), this->saveCount);
-    }
-    else
-    {
-      snprintf(tmp, sizeof(tmp),
-          "%s-%04d.jpg", friendlyName.c_str(), this->saveCount);
-    }
-
-    this->viewport->getTarget()->writeContentsToFile(tmp);
-
-    this->saveCount++;
-  }
 }
-
 
 //////////////////////////////////////////////////
 void UserCamera::Fini()
