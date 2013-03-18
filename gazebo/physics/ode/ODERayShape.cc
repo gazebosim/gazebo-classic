@@ -203,7 +203,7 @@ void ODERayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
         if (contact.depth < inter->depth)
         {
           inter->depth = contact.depth;
-          inter->name = hitCollision->GetName();
+          inter->name = hitCollision->GetScopedName();
         }
       }
     }

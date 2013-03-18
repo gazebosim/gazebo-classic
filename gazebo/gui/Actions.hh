@@ -72,6 +72,8 @@ namespace gazebo
 
     extern QAction *g_topicVisAct;
 
+    extern QAction *g_diagnosticsAct;
+
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
     class DeleteAction : public QAction

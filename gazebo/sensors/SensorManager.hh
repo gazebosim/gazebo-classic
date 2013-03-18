@@ -162,6 +162,9 @@ namespace gazebo
       /// i.e. all sensors managed by SensorManager have been initialized
       public: bool SensorsInitialized();
 
+      /// \brief Reset last update times in all sensors.
+      public: void ResetLastUpdateTimes();
+
       /// \brief Add a new sensor to a sensor container.
       /// \param[in] _sensor Pointer to a sensor to add.
       private: void AddSensor(SensorPtr _sensor);
@@ -216,6 +219,9 @@ namespace gazebo
 
                  /// \brief Remove all sensors.
                  public: void RemoveSensors();
+
+                 /// \brief Reset last update times in all sensors.
+                 public: void ResetLastUpdateTimes();
 
                  /// \brief A loop to update the sensor. Used by the
                  /// runThread.
