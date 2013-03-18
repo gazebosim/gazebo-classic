@@ -235,11 +235,12 @@ void Joint::Init()
     if (this->sdf->HasElement("axis"))
     {
       this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-      if (this->sdf->GetValueString("parent") != "world")
+      if (this->sdf->GetElement("parent")->GetValueString("link_name")
+          != "world")
       {
         gzwarn << "joint [" << this->GetScopedName()
           << "] has a non-real parentLink ["
-          << this->sdf->GetValueString("parent")
+          << this->sdf->GetElement("parent")->GetValueString("link_name")
           << "], loading axis from SDF ["
           << this->sdf->GetElement("axis")->GetValueVector3("xyz")
           << "]\n";
@@ -249,11 +250,12 @@ void Joint::Init()
     {
       this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
 
-      if (this->sdf->GetValueString("parent") != "world")
+      if (this->sdf->GetElement("parent")->GetValueString("link_name")
+          != "world")
       {
         gzwarn << "joint [" << this->GetScopedName()
           << "] has a non-real parentLink ["
-          << this->sdf->GetValueString("parent")
+          << this->sdf->GetElement("parent")->GetValueString("link_name")
           << "], loading axis2 from SDF ["
           << this->sdf->GetElement("axis2")->GetValueVector3("xyz")
           << "]\n";
