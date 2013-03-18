@@ -1322,7 +1322,7 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
     //       << "] v[" << vel
     //       << "]\n";
   }
-  physicsEngine->SetStepTime(0.0001);
+  physicsEngine->SetMaxStepSize(0.0001);
   physicsEngine->SetSORPGSIters(1000);
 
   {

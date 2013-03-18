@@ -492,9 +492,6 @@ namespace gazebo
       /// \brief Transportation node.
       private: transport::NodePtr node;
 
-      /// \brief Subscribe to the world modify topic.
-      private: transport::SubscriberPtr worldSub;
-
       /// \brief Publisher for selection messages.
       private: transport::PublisherPtr selectionPub;
 
