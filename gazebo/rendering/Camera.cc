@@ -826,7 +826,6 @@ std::string Camera::GetFrameFilename()
   if (!boost::filesystem::exists(pathToFile.parent_path()))
     boost::filesystem::create_directories(pathToFile.parent_path());
 
-gzerr << pathToFile.string() << std::endl;;
   return pathToFile.string();
 }
 
