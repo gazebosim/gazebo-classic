@@ -57,7 +57,7 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
   math::Vector3 axis(1, 0, 0);
   double upper = M_PI;
   double lower = -M_PI;
-  for (unsigned int i = 0; i < 100; ++i)
+  for (unsigned int i = 0; i < 100000; ++i)
   {
     // try creating a joint
     {
@@ -100,9 +100,6 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
       world->SetPaused(paused);
     }
   }
-
-
-  Unload();
 }
 
 int main(int argc, char **argv)
