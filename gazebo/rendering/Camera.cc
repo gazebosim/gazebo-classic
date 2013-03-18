@@ -816,7 +816,7 @@ std::string Camera::GetFrameFilename()
   }
   else
   {
-    pathToFile = (path.empty()) ? "" : ".";
+    pathToFile = (path.empty()) ? "." : path;
     pathToFile /= str(boost::format("%s-%04d.jpg")
         % friendlyName.c_str() % this->saveCount);
     this->saveCount++;
@@ -826,6 +826,7 @@ std::string Camera::GetFrameFilename()
   if (!boost::filesystem::exists(pathToFile.parent_path()))
     boost::filesystem::create_directories(pathToFile.parent_path());
 
+gzerr << pathToFile.string() << std::endl;;
   return pathToFile.string();
 }
 
