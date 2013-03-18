@@ -22,8 +22,9 @@
 
 #include <dirent.h>
 #include <sstream>
+#include <boost/filesystem.hpp>
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
@@ -64,7 +65,6 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   this->saveFrameBuffer = NULL;
   this->saveCount = 0;
-  this->screenshotCount = 0;
   this->bayerFrameBuffer = NULL;
 
   std::ostringstream stream;
@@ -82,6 +82,9 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   this->pitchNode = NULL;
   this->sceneNode = NULL;
+
+  this->screenshotPath = getenv("HOME");
+  this->screenshotPath += "/.gazebo/pictures";
 
   // Connect to the render signal
   this->connections.push_back(
@@ -797,51 +800,40 @@ std::string Camera::GetFrameFilename()
   sdf::ElementPtr saveElem = this->sdf->GetElement("save");
 
   std::string path = saveElem->GetValueString("path");
+  boost::filesystem::path pathToFile;
 
-  // Create a directory if not present
-  DIR *dir = opendir(path.c_str());
-  if (!dir)
-  {
-    std::string command;
-    command = "mkdir " + path + " 2>>/dev/null";
-    if (system(command.c_str()) < 0)
-      gzerr << "Error making directory\n";
-  }
-
-  unsigned int *count = &this->saveCount;
   std::string friendlyName = this->GetName();
-
-  if (this->captureDataOnce)
-  {
-    count = &this->screenshotCount;
-    friendlyName += "_screenshot";
-  }
+  std::string filename;
 
   boost::replace_all(friendlyName, "::", "_");
 
-  char tmp[1024];
-  if (!path.empty())
+  if (this->captureDataOnce)
   {
-    // double wallTime = common::Time::GetWallTime().Double();
-    // int min = static_cast<int>((wallTime / 60.0));
-    // int sec = static_cast<int>((wallTime - min*60));
-    // int msec = static_cast<int>((wallTime*1000 - min*60000 - sec*1000));
-
-    snprintf(tmp, sizeof(tmp), "%s/%s-%04d.jpg", path.c_str(),
-             friendlyName.c_str(), *count);
+    friendlyName += "_screenshot";
+    pathToFile = this->screenshotPath;
+    pathToFile /= std::string(friendlyName + "-"
+        + common::Time::GetWallTimeAsISOString() + ".jpg");
   }
   else
   {
-    snprintf(tmp, sizeof(tmp), "%s-%04d.jpg", friendlyName.c_str(),
-             *count);
+    pathToFile = (path.empty()) ? "" : ".";
+    pathToFile /= str(boost::format("%s-%04d.jpg")
+        % friendlyName.c_str() % this->saveCount);
+    this->saveCount++;
   }
 
-  (*count)++;
+  // Create a directory if not present
+  if (!boost::filesystem::exists(pathToFile.parent_path()))
+    boost::filesystem::create_directories(pathToFile.parent_path());
 
-  closedir(dir);
-  return tmp;
+  return pathToFile.string();
 }
 
+/////////////////////////////////////////////////
+std::string Camera::GetScreenshotPath() const
+{
+  return this->screenshotPath;
+}
 
 /////////////////////////////////////////////////
 bool Camera::SaveFrame(const unsigned char *_image,

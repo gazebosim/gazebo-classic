@@ -477,6 +477,10 @@ namespace gazebo
                                    double _time,
                                    boost::function<void()> _onComplete = NULL);
 
+      /// \brief Get the path to saved screenshots.
+      /// \return Path to saved screenshots.
+      public: std::string GetScreenshotPath() const;
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 
@@ -582,8 +586,8 @@ namespace gazebo
       /// \brief Number of saved frames.
       protected: unsigned int saveCount;
 
-      /// \brief Number of saved screenshots.
-      protected: unsigned int screenshotCount;
+      /// \brief Path to saved screenshots.
+      protected: std::string screenshotPath;
 
       /// \brief Format for saving images.
       protected: int imageFormat;

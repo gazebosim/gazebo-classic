@@ -593,6 +593,8 @@ void MainWindow::CaptureScreenshot()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->SetCaptureDataOnce();
+  this->renderWidget->DisplayOverlayMsg(
+      "Screenshot saved in: " + cam->GetScreenshotPath(), 2000);
 }
 
 /////////////////////////////////////////////////

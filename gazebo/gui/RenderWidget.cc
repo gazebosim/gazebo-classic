@@ -88,13 +88,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
       QSizePolicy::Expanding);
   this->buildingEditorWidget->hide();
 
-  this->viewOnlyLabel = new QLabel("Building is View Only", this->glWidget);
-  this->viewOnlyLabel->resize(
-      viewOnlyLabel->fontMetrics().width(this->viewOnlyLabel->text()),
-      viewOnlyLabel->fontMetrics().height());
-  this->viewOnlyLabel->setStyleSheet(
+  this->msgOverlayLabel = new QLabel(this->glWidget);
+  this->msgOverlayLabel->setStyleSheet(
       "QLabel { background-color : white; color : gray; }");
-  this->viewOnlyLabel->setVisible(false);
+  this->msgOverlayLabel->setVisible(false);
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
@@ -249,13 +246,15 @@ void RenderWidget::ShowEditor(bool _show)
   if (_show)
   {
     this->buildingEditorWidget->show();
-    this->viewOnlyLabel->setVisible(true);
+    this->baseOverlayMsg = "Building is View Only";
+    this->OnUpdateRenderOverlayMsg();
     this->bottomFrame->hide();
   }
   else
   {
     this->buildingEditorWidget->hide();
-    this->viewOnlyLabel->setVisible(false);
+    this->baseOverlayMsg = "";
+    this->OnUpdateRenderOverlayMsg();
     this->bottomFrame->show();
   }
 }
@@ -272,4 +271,36 @@ void RenderWidget::CreateScene(const std::string &_name)
 {
   this->create = true;
   this->createName = _name;
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
+{
+  std::string msg = this->baseOverlayMsg.empty() ? _msg
+      : this->baseOverlayMsg + "\n" + _msg;
+  this->msgOverlayLabel->setText(tr(msg.c_str()));
+  if (msg.empty())
+  {
+    this->msgOverlayLabel->setVisible(false);
+    return;
+  }
+  this->msgOverlayLabel->resize(
+    msgOverlayLabel->fontMetrics().width(tr(msg.c_str())),
+    msgOverlayLabel->fontMetrics().height());
+  this->msgOverlayLabel->setVisible(true);
+
+  if (_duration > 0)
+    QTimer::singleShot(_duration, this, SLOT(OnUpdateRenderOverlayMsg()));
+}
+
+/////////////////////////////////////////////////
+std::string RenderWidget::GetOverlayMsg() const
+{
+  return this->msgOverlayLabel->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::OnUpdateRenderOverlayMsg()
+{
+  this->DisplayOverlayMsg("");
 }
