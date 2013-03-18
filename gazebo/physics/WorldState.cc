@@ -64,11 +64,8 @@ WorldState::~WorldState()
 /////////////////////////////////////////////////
 void WorldState::Load(const sdf::ElementPtr _elem)
 {
-  // Copy the name and time information
+  // Copy the name
   this->name = _elem->GetValueString("world_name");
-  this->simTime = _elem->GetValueTime("sim_time");
-  this->wallTime = _elem->GetValueTime("wall_time");
-  this->realTime = _elem->GetValueTime("real_time");
 
   // Add the model states
   this->modelStates.clear();
@@ -82,6 +79,11 @@ void WorldState::Load(const sdf::ElementPtr _elem)
       childElem = childElem->GetNextElement("model");
     }
   }
+
+  // Copy the name and time information
+  this->SetSimTime(_elem->GetValueTime("sim_time"));
+  this->SetWallTime(_elem->GetValueTime("wall_time"));
+  this->SetRealTime(_elem->GetValueTime("real_time"));
 }
 
 /////////////////////////////////////////////////
@@ -94,6 +96,23 @@ void WorldState::SetWorld(const WorldPtr _world)
 const std::vector<ModelState> &WorldState::GetModelStates() const
 {
   return this->modelStates;
+}
+
+/////////////////////////////////////////////////
+std::vector<ModelState> WorldState::GetModelStates(
+    const boost::regex &_regex) const
+{
+  std::vector<ModelState> result;
+
+  // Search for matching link names
+  for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
+       iter != this->modelStates.end(); ++iter)
+  {
+    if (boost::regex_match((*iter).GetName(), _regex))
+      result.push_back(*iter);
+  }
+
+  return result;
 }
 
 /////////////////////////////////////////////////
@@ -266,5 +285,41 @@ void WorldState::FillSDF(sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr elem = _sdf->AddElement("model");
     (*iter).FillSDF(elem);
+  }
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetWallTime(const common::Time &_time)
+{
+  State::SetWallTime(_time);
+
+  for (std::vector<ModelState>::iterator iter = this->modelStates.begin();
+       iter != this->modelStates.end(); ++iter)
+  {
+    (*iter).SetWallTime(_time);
+  }
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetRealTime(const common::Time &_time)
+{
+  State::SetRealTime(_time);
+
+  for (std::vector<ModelState>::iterator iter = this->modelStates.begin();
+           iter != this->modelStates.end(); ++iter)
+  {
+    (*iter).SetRealTime(_time);
+  }
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetSimTime(const common::Time &_time)
+{
+  State::SetSimTime(_time);
+
+  for (std::vector<ModelState>::iterator iter = this->modelStates.begin();
+       iter != this->modelStates.end(); ++iter)
+  {
+    (*iter).SetSimTime(_time);
   }
 }

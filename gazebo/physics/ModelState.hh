@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <string>
+#include <boost/regex.hpp>
 
 #include "gazebo/math/Pose.hh"
 
@@ -85,6 +86,20 @@ namespace gazebo
       /// This returns the number of Links recorded.
       /// \return Number of LinkState recorded.
       public: unsigned int GetLinkStateCount() const;
+
+      /// \brief Get link states based on a regular expression.
+      /// \param[in] _regex The regular expression.
+      /// \return List of link states whose names match the regular
+      /// expression.
+      public: std::vector<LinkState> GetLinkStates(
+                  const boost::regex &_regex) const;
+
+      /// \brief Get joint states based on a regular expression.
+      /// \param[in] _regex The regular expression.
+      /// \return List of joint states whose names match the regular
+      /// expression.
+      public: std::vector<JointState> GetJointStates(
+                  const boost::regex &_regex) const;
 
       /// \brief Get a link state.
       ///
@@ -149,6 +164,19 @@ namespace gazebo
       /// \brief Populate a state SDF element with data from the object.
       /// \param[out] _sdf SDF element to populate.
       public: void FillSDF(sdf::ElementPtr _sdf);
+
+      /// \brief Set the wall time when this state was generated
+      /// \param[in] _time The absolute clock time when the State
+      /// data was recorded.
+      public: virtual void SetWallTime(const common::Time &_time);
+
+      /// \brief Set the real time when this state was generated
+      /// \param[in] _time Clock time since simulation was stated.
+      public: virtual void SetRealTime(const common::Time &_time);
+
+      /// \brief Set the sim time when this state was generated
+      /// \param[in] _time Simulation time when the data was recorded.
+      public: virtual void SetSimTime(const common::Time &_time);
 
       /// \brief Assignment operator
       /// \param[in] _state State value

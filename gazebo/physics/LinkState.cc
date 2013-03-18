@@ -277,3 +277,42 @@ void LinkState::FillSDF(sdf::ElementPtr _sdf)
     (*iter).FillSDF(elem);
   }
 }
+
+/////////////////////////////////////////////////
+void LinkState::SetWallTime(const common::Time &_time)
+{
+  State::SetWallTime(_time);
+
+  for (std::vector<CollisionState>::iterator
+       iter = this->collisionStates.begin();
+       iter != this->collisionStates.end(); ++iter)
+  {
+    (*iter).SetWallTime(_time);
+  }
+}
+
+/////////////////////////////////////////////////
+void LinkState::SetRealTime(const common::Time &_time)
+{
+  State::SetRealTime(_time);
+
+  for (std::vector<CollisionState>::iterator
+       iter = this->collisionStates.begin();
+       iter != this->collisionStates.end(); ++iter)
+  {
+    (*iter).SetRealTime(_time);
+  }
+}
+
+/////////////////////////////////////////////////
+void LinkState::SetSimTime(const common::Time &_time)
+{
+  State::SetSimTime(_time);
+
+  for (std::vector<CollisionState>::iterator
+       iter = this->collisionStates.begin();
+       iter != this->collisionStates.end(); ++iter)
+  {
+    (*iter).SetSimTime(_time);
+  }
+}

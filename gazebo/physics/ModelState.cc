@@ -137,6 +137,40 @@ unsigned int ModelState::GetLinkStateCount() const
 }
 
 /////////////////////////////////////////////////
+std::vector<LinkState> ModelState::GetLinkStates(
+    const boost::regex &_regex) const
+{
+  std::vector<LinkState> result;
+
+  // Search for matching link names
+  for (std::vector<LinkState>::const_iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end(); ++iter)
+  {
+    if (boost::regex_match((*iter).GetName(), _regex))
+      result.push_back(*iter);
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+std::vector<JointState> ModelState::GetJointStates(
+    const boost::regex &_regex) const
+{
+  std::vector<JointState> result;
+
+  // Search for matching link names
+  for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end(); ++iter)
+  {
+    if (boost::regex_match((*iter).GetName(), _regex))
+      result.push_back(*iter);
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
 LinkState ModelState::GetLinkState(unsigned int _index) const
 {
   if (_index < this->linkStates.size())
@@ -381,5 +415,59 @@ void ModelState::FillSDF(sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr elem = _sdf->AddElement("joint");
     (*iter).FillSDF(elem);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelState::SetWallTime(const common::Time &_time)
+{
+  State::SetWallTime(_time);
+
+  for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end(); ++iter)
+  {
+    (*iter).SetWallTime(_time);
+  }
+
+  for (std::vector<JointState>::iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end(); ++iter)
+  {
+    (*iter).SetWallTime(_time);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelState::SetRealTime(const common::Time &_time)
+{
+  State::SetRealTime(_time);
+
+  for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
+           iter != this->linkStates.end(); ++iter)
+  {
+    (*iter).SetRealTime(_time);
+  }
+
+  for (std::vector<JointState>::iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end(); ++iter)
+  {
+    (*iter).SetRealTime(_time);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelState::SetSimTime(const common::Time &_time)
+{
+  State::SetSimTime(_time);
+
+  for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end(); ++iter)
+  {
+    (*iter).SetSimTime(_time);
+  }
+
+  for (std::vector<JointState>::iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end(); ++iter)
+  {
+    (*iter).SetSimTime(_time);
   }
 }

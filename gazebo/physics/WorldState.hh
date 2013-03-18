@@ -71,6 +71,13 @@ namespace gazebo
       /// \param[in] _world Pointer to the world.
       public: void SetWorld(const WorldPtr _world);
 
+      /// \brief Get model states based on a regular expression.
+      /// \param[in] _regex The regular expression.
+      /// \return List of model states whose names match the regular
+      /// expression.
+      public: std::vector<ModelState> GetModelStates(
+                  const boost::regex &_regex) const;
+
       /// \brief Get the model states.
       /// \return A vector of model states.
       public: const std::vector<ModelState> &GetModelStates() const;
@@ -111,6 +118,19 @@ namespace gazebo
       /// \brief Populate a state SDF element with data from the object.
       /// \param[out] _sdf SDF element to populate.
       public: void FillSDF(sdf::ElementPtr _sdf);
+
+      /// \brief Set the wall time when this state was generated
+      /// \param[in] _time The absolute clock time when the State
+      /// data was recorded.
+      public: virtual void SetWallTime(const common::Time &_time);
+
+      /// \brief Set the real time when this state was generated
+      /// \param[in] _time Clock time since simulation was stated.
+      public: virtual void SetRealTime(const common::Time &_time);
+
+      /// \brief Set the sim time when this state was generated
+      /// \param[in] _time Simulation time when the data was recorded.
+      public: virtual void SetSimTime(const common::Time &_time);
 
       /// \brief Assignment operator
       /// \param[in] _state State value

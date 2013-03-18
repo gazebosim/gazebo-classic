@@ -1003,7 +1003,7 @@ TEST(gz_log, EchoFilter)
 
   // Test joint filter with angle
   echo = custom_exec(
-      std::string("gzlog echo --filter pr2::r_upper_arm_roll_joint::0 ") +
+      std::string("gzlog echo --filter pr2/r_upper_arm_roll_joint ") +
       PROJECT_SOURCE_PATH + "/tools/test/data/pr2_state.log");
   boost::trim_right(echo);
 
