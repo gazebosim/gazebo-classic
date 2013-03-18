@@ -310,8 +310,8 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
 
   // Split impulse feature. This reduces large bounces from deep penetrations,
   // but can lead to improper stacking of objects, see
-  // http://bulletphysics.org/mediawiki-1.5.8/index.php/BtContactSolverInfo ...
-  // ... #Split_Impulse
+  // http://web.archive.org/web/20120430155635/http://bulletphysics.org/
+  //     mediawiki-1.5.8/index.php/BtContactSolverInfo#Split_Impulse
   info.m_splitImpulse = 1;
   info.m_splitImpulsePenetrationThreshold = -0.02;
 
@@ -319,9 +319,7 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   // This is important for rolling without slip (see issue #480)
   info.m_solverMode |= SOLVER_USE_2_FRICTION_DIRECTIONS;
 
-  // the following are undocumented members of btContactSolverInfo, see
-  // bulletphysics.org/mediawiki-1.5.8/index.php/BtContactSolverInfo ...
-  // ... #Undocumented_members_of_btContactSolverInfo
+  // the following are undocumented members of btContactSolverInfo
   // m_globalCfm: constraint force mixing
   info.m_globalCfm =
     bulletElem->GetElement("constraints")->GetValueDouble("cfm");
