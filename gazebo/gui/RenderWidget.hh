@@ -61,8 +61,8 @@ namespace gazebo
 
       private slots: virtual void update();
 
-      /// \brief Qt callback to update overlay message if
-      /// if a message duration is specified
+      /// \brief Qt callback to update overlay message if a duration is
+      /// specified
       private slots: void OnUpdateRenderOverlayMsg();
 
       private: void OnFullScreen(bool &_value);
