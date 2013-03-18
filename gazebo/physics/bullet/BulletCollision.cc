@@ -20,6 +20,7 @@
  */
 
 #include "physics/bullet/bullet_inc.h"
+#include "physics/bullet/BulletLink.hh"
 #include "physics/bullet/BulletCollision.hh"
 
 using namespace gazebo;
@@ -57,12 +58,10 @@ void BulletCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletCollision::OnPoseChange()
 {
-  /*
   math::Pose pose = this->GetRelativePose();
-  BulletLink *bbody = static_cast<BulletLink*>(this->body);
+  BulletLinkPtr bbody = boost::shared_dynamic_cast<BulletLink>(this->parent);
 
-  bbody->SetCollisionRelativePose(this, pose);
-  */
+  // bbody->motionState.setWorldTransform(this, pose);
 }
 
 //////////////////////////////////////////////////

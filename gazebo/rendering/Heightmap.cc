@@ -118,7 +118,8 @@ common::Image Heightmap::GetImage() const
       GZ_ASSERT(height >= 0.0, "Normalized terrain height < 0.0");
 
       // Scale height to a value between 0 and 255
-      imageData[(size - y - 1)*size+x] = static_cast<unsigned char>(height * 255.0);
+      imageData[(size - y - 1)*size+x] =
+        static_cast<unsigned char>(height * 255.0);
     }
   }
 

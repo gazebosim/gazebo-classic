@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <sdf version="1.3">
   <world name="default">
+    <physics type="bullet"/>
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>

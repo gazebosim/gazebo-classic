@@ -46,18 +46,6 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   this->rayFan->setMaterial("Gazebo/BlueLaser");
   this->rayFan->AddPoint(math::Vector3(0, 0, 0));
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-
-  common::MeshManager::Instance()->CreateSphere("laser_contact_sphere",
-      0.01, 5, 5);
-
-  // Add the mesh into OGRE
-  if (!this->sceneNode->getCreator()->hasEntity("laser_contact_sphere") &&
-      common::MeshManager::Instance()->HasMesh("laser_contact_sphere"))
-  {
-    const common::Mesh *mesh =
-      common::MeshManager::Instance()->GetMesh("laser_contact_sphere");
-    this->InsertMesh(mesh);
-  }
 }
 
 /////////////////////////////////////////////////
@@ -97,25 +85,6 @@ void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
       this->rayFan->AddPoint(pt);
     else
       this->rayFan->SetPoint(i+1, pt);
-
-    if (i >= this->points.size())
-    {
-      std::string objName = this->GetName() + "_lasercontactpoint_" +
-        boost::lexical_cast<std::string>(this->points.size());
-
-      Ogre::Entity *obj = this->scene->GetManager()->createEntity(
-          objName, "laser_contact_sphere");
-      obj->setMaterialName("Gazebo/RedTransparent");
-
-      LaserVisual::ContactPoint *cp = new LaserVisual::ContactPoint();
-      cp->sceneNode = this->sceneNode->createChildSceneNode(objName + "_node");
-      cp->sceneNode->attachObject(obj);
-      cp->sceneNode->setVisible(true);
-      cp->sceneNode->setPosition(Conversions::Convert(pt));
-      this->points.push_back(cp); 
-    }
-    else
-      this->points[i]->sceneNode->setPosition(Conversions::Convert(pt));
 
     angle += _msg->scan().angle_step();
   }

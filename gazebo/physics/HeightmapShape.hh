@@ -97,9 +97,8 @@ namespace gazebo
       /// \return The minimum height.
       public: float GetMinHeight() const;
 
-      /// \brief Get the amount of subsampling.
-      /// \return Amount of subsampling.
-      public: int GetSubSampling() const;
+      /// \brief Deprecated
+      public: int GetSubSampling() const GAZEBO_DEPRECATED;
 
       /// \brief Return an image representation of the heightmap.
       /// \return Image where white pixels represents the highest locations,
@@ -121,7 +120,10 @@ namespace gazebo
       /// \brief Scaling factor.
       protected: math::Vector3 scale;
 
-      /// \brief Level of subsampling.
+      /// \brief True to flip the heights along the y direction.
+      protected: bool flipY;
+
+      /// \brief The amount of subsampling. Default is 2.
       protected: int subSampling;
     };
     /// \}
