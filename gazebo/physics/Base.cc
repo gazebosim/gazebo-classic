@@ -76,7 +76,6 @@ void Base::Load(sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
 
-  this->sdf.reset();
   this->sdf = _sdf;
   if (this->parent)
   {
