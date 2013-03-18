@@ -67,6 +67,7 @@ Base::~Base()
   }
   this->children.clear();
   this->childrenEnd = this->children.end();
+  this->sdf->Reset();
   this->sdf.reset();
 }
 
@@ -75,6 +76,7 @@ void Base::Load(sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
 
+  this->sdf.reset();
   this->sdf = _sdf;
   if (this->parent)
   {
@@ -97,7 +99,8 @@ void Base::Fini()
   Base_V::iterator iter;
 
   for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
-    (*iter)->Fini();
+    if (*iter)
+      (*iter)->Fini();
 
   this->children.clear();
   this->childrenEnd = this->children.end();
