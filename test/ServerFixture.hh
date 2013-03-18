@@ -128,11 +128,16 @@ class ServerFixture : public testing::Test
                               _paused, _physics));
 
                // Wait for the server to come up
-               // Use a 30 second timeout.
-               int waitCount = 0, maxWaitCount = 3000;
+               // Use a 60 second timeout.
+               int waitCount = 0, maxWaitCount = 6000;
                while ((!this->server || !this->server->GetInitialized()) &&
                       ++waitCount < maxWaitCount)
                  common::Time::MSleep(10);
+               gzwarn << "ServerFixture load in "
+                      << static_cast<double>(waitCount)/100.0
+                      << " seconds, timeout after "
+                      << static_cast<double>(maxWaitCount)/100.0
+                      << " seconds\n";
                ASSERT_LT(waitCount, maxWaitCount);
 
                this->node = transport::NodePtr(new transport::Node());

@@ -106,9 +106,6 @@ TEST_F(TransportTest, Errors)
     testNode->Subscribe("~/world_stats", &ReceiveWorldStatsMsg);
   EXPECT_STREQ("/gazebo/default/world_stats", statsSub->GetTopic().c_str());
 
-  transport::SubscriberPtr statsSubDebug =
-    testNode->Subscribe("~/world_stats/__dbg", &ReceiveWorldStatsDebugMsg);
-
   // This generates a warning message
   // EXPECT_THROW(testNode->Advertise<math::Vector3>("~/scene"),
   //             common::Exception);
