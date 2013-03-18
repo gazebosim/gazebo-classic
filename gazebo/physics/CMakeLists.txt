@@ -86,6 +86,7 @@ set (headers
   WorldState.hh)
 
 set (gtest_sources
+  Joint_TEST.cc
   PhysicsEngine_TEST.cc
 )
 gz_build_tests(${gtest_sources})
