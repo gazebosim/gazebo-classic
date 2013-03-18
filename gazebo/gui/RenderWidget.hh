@@ -61,9 +61,9 @@ namespace gazebo
 
       private slots: virtual void update();
 
-      /// \brief Qt callback to update overlay message if a duration is
+      /// \brief Qt callback to clear overlay message if a duration is
       /// specified
-      private slots: void OnUpdateRenderOverlayMsg();
+      private slots: void OnClearOverlayMsg();
 
       private: void OnFullScreen(bool &_value);
 
@@ -104,7 +104,7 @@ namespace gazebo
       private: std::string createName;
       private: QTimer *timer;
 
-      /// \brief Base message displayed;
+      /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
     };
   }

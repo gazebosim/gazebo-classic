@@ -247,14 +247,14 @@ void RenderWidget::ShowEditor(bool _show)
   {
     this->buildingEditorWidget->show();
     this->baseOverlayMsg = "Building is View Only";
-    this->OnUpdateRenderOverlayMsg();
+    this->OnClearOverlayMsg();
     this->bottomFrame->hide();
   }
   else
   {
     this->buildingEditorWidget->hide();
     this->baseOverlayMsg = "";
-    this->OnUpdateRenderOverlayMsg();
+    this->OnClearOverlayMsg();
     this->bottomFrame->show();
   }
 }
@@ -285,12 +285,12 @@ void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
     return;
   }
   this->msgOverlayLabel->resize(
-    msgOverlayLabel->fontMetrics().width(tr(msg.c_str())),
-    msgOverlayLabel->fontMetrics().height());
+      this->msgOverlayLabel->fontMetrics().width(tr(msg.c_str())),
+      this->msgOverlayLabel->fontMetrics().height());
   this->msgOverlayLabel->setVisible(true);
 
   if (_duration > 0)
-    QTimer::singleShot(_duration, this, SLOT(OnUpdateRenderOverlayMsg()));
+    QTimer::singleShot(_duration, this, SLOT(OnClearOverlayMsg()));
 }
 
 /////////////////////////////////////////////////
@@ -300,7 +300,7 @@ std::string RenderWidget::GetOverlayMsg() const
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::OnUpdateRenderOverlayMsg()
+void RenderWidget::OnClearOverlayMsg()
 {
   this->DisplayOverlayMsg("");
 }
