@@ -55,6 +55,11 @@ namespace Ogre
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Encoder;
+  }
+
   /// \ingroup gazebo_rendering
   /// \brief Rendering namespace
   namespace rendering
@@ -368,6 +373,10 @@ namespace gazebo
       /// \brief Capture data once and save to disk
       public: void SetCaptureDataOnce();
 
+      /// \brief Set whether to encode frames to video buffer
+      /// \param[in] _value Set to true to encode to video buffer.
+      public: void SetEncodeData(bool _value);
+
       /// \brief Set the render target
       /// \param[in] _textureName Name of the new render texture
       public: void CreateRenderTexture(const std::string &_textureName);
@@ -604,11 +613,17 @@ namespace gazebo
       /// \brief Texture that receives results from rendering.
       protected: Ogre::Texture *renderTexture;
 
+      /// \brief Video frame encoder
+      protected: common::Encoder *encoder;
+
       /// \brief True to capture frames into an image buffer.
       protected: bool captureData;
 
       /// \brief True to capture a frame once and save to disk.
       protected: bool captureDataOnce;
+
+      /// \brief True to encode frames to video buffer.
+      protected: bool encodeData;
 
       /// \brief True if new data is available.
       protected: bool newData;

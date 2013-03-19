@@ -47,11 +47,7 @@ Encoder::Encoder()
   this->avFrame = NULL;
   this->swsCtx = NULL;
   this->pic = NULL;
-
-  // default values
-  this->bitRate = 400000;
-  this->frameWidth = 352;
-  this->frameHeight = 288;
+  this->initialized = false;
 //#ifdef HAVE_FFMPEG
   static bool first = true;
   if (first)
@@ -59,8 +55,8 @@ Encoder::Encoder()
     first = false;
     av_register_all();
   }
-  this->pic = new AVPicture;
-  this->initialized = false;
+
+  this->Reset();
 
 //  this->pic = new AVthis->avFrame;
 //#endif
@@ -84,7 +80,7 @@ void Encoder::Cleanup()
   // Close the video file
 //  av_close_input_file(this->formatCtx);
 
-//  av_free(this->pic);
+  av_free(this->pic);
 //#endif
 
   if (this->picture_buf)
@@ -138,6 +134,8 @@ void Encoder::Init()
 //  int outSize;
 
   printf("Video encoding\n");
+
+  this->pic = new AVPicture;
 
   // find the mpeg1 video encoder
   codec = avcodec_find_encoder(CODEC_ID_MPEG1VIDEO);
@@ -330,6 +328,16 @@ void Encoder::Fini()
   fclose(this->fileHandle);
 
   this->Cleanup();
+}
+
+/////////////////////////////////////////////////
+void Encoder::Reset()
+{
+  this->Cleanup();
+  // set default values
+  this->bitRate = 400000;
+  this->frameWidth = 352;
+  this->frameHeight = 288;
 }
 
 /////////////////////////////////////////////////

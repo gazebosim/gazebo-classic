@@ -69,6 +69,10 @@ namespace gazebo
       /// \param[in] _height Frame height
       public: void SetFrameHeight(unsigned int _height);
 
+      /// \brief Reset to default video properties and clean up allocated
+      /// memories.
+      public: void Reset();
+
       /// \brief free up open Video object, close files, streams
       private: void Cleanup();
 

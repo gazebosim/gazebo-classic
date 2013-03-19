@@ -74,9 +74,11 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   this->renderTarget = NULL;
   this->renderTexture = NULL;
+  this->encoder = NULL;
 
   this->captureData = false;
   this->captureDataOnce = false;
+  this->encodeData = false;
 
   this->camera = NULL;
   this->viewport = NULL;
@@ -329,7 +331,8 @@ void Camera::PostRender()
 {
   this->renderTarget->swapBuffers();
 
-  if (this->newData && (this->captureData || this->captureDataOnce))
+  if (this->newData
+      && (this->captureData || this->captureDataOnce || this->encodeData))
   {
     size_t size;
     unsigned int width = this->GetImageWidth();
@@ -353,15 +356,12 @@ void Camera::PostRender()
 
     if (this->captureDataOnce)
     {
-/*      common::Encoder *encode = new common::Encoder();
-      encode->Init();
-      encode->EncodeFrame(this->saveFrameBuffer, width, height);
-      encode->Fini();
-
-      delete encode;*/
-
       this->SaveFrame(this->GetFrameFilename());
       this->captureDataOnce = false;
+    }
+    else if (this->encodeData)
+    {
+      this->encoder->EncodeFrame(this->saveFrameBuffer, width, height);
     }
 
     if (this->sdf->HasElement("save") &&
@@ -1048,6 +1048,29 @@ void Camera::SetCaptureData(bool _value)
 void Camera::SetCaptureDataOnce()
 {
   this->captureDataOnce = true;
+}
+
+//////////////////////////////////////////////////
+void Camera::SetEncodeData(bool _encode)
+{
+  if (this->encodeData == _encode)
+    return;
+
+  this->encodeData = _encode;
+
+  if (this->encodeData)
+  {
+    if (!this->encoder)
+    {
+      this->encoder = new common::Encoder();
+      this->encoder->Init();
+    }
+  }
+  else
+  {
+    this->encoder->Fini();
+    this->encoder->Reset();
+  }
 }
 
 //////////////////////////////////////////////////
