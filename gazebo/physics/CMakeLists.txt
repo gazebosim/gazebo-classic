@@ -124,3 +124,8 @@ target_link_libraries(gzphysics
 gz_install_executable( gzphysics )
 gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
+
+# unit tests
+set (gtest_sources
+  Joint_TEST.cc)
+gz_build_tests(${gtest_sources})
