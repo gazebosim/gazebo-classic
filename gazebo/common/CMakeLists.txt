@@ -6,7 +6,7 @@ if (HAVE_GTS)
   add_definitions(${gts_CFLAGS})
 endif()
 
-set (sources 
+set (sources
   Animation.cc
   Assert.cc
   BVHLoader.cc
@@ -14,6 +14,7 @@ set (sources
   Color.cc
   Common.cc
   Console.cc
+  Encoder.cc
   Event.cc
   Events.cc
   Exception.cc
@@ -36,7 +37,7 @@ set (sources
   Video.cc
 )
 
-set (headers 
+set (headers
   Animation.hh
   Assert.hh
   BVHLoader.hh
@@ -45,6 +46,7 @@ set (headers
   CommonTypes.hh
   Color.hh
   Console.hh
+  Encoder.hh
   Event.hh
   Events.hh
   Exception.hh

@@ -31,6 +31,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/Encoder.hh"
 #include "gazebo/math/Pose.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -352,6 +353,13 @@ void Camera::PostRender()
 
     if (this->captureDataOnce)
     {
+/*      common::Encoder *encode = new common::Encoder();
+      encode->Init();
+      encode->EncodeFrame(this->saveFrameBuffer, width, height);
+      encode->Fini();
+
+      delete encode;*/
+
       this->SaveFrame(this->GetFrameFilename());
       this->captureDataOnce = false;
     }
