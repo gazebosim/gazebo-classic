@@ -58,7 +58,7 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
   double upper = M_PI;
   double lower = -M_PI;
 
-  double residentLast, shareLast;
+  double residentLast = 0, shareLast = 0;
   double residentCur, shareCur;
 
   for (unsigned int i = 0; i < 100; ++i)
@@ -106,8 +106,8 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
     this->GetMemInfo(residentCur, shareCur);
     if (i > 1)  // give it 2 cycles to stabilize
     {
-      EXPECT_EQ(residentCur, residentLast);
-      EXPECT_EQ(shareCur, shareLast);
+      EXPECT_NEAR(residentCur, residentLast, 1e-2);
+      EXPECT_NEAR(shareCur, shareLast, 1e-2);
     }
     // gzdbg << "memory res[" << residentCur
     //       << "] shr[" << shareCur
