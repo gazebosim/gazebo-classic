@@ -375,7 +375,7 @@ namespace gazebo
 
       /// \brief Set whether to encode frames to video buffer
       /// \param[in] _value Set to true to encode to video buffer.
-      public: void SetEncodeData(bool _value);
+      public: void SetEncodeVideo(bool _value);
 
       /// \brief Set the render target
       /// \param[in] _textureName Name of the new render texture
@@ -623,7 +623,7 @@ namespace gazebo
       protected: bool captureDataOnce;
 
       /// \brief True to encode frames to video buffer.
-      protected: bool encodeData;
+      protected: bool encodeVideo;
 
       /// \brief True if new data is available.
       protected: bool newData;

@@ -80,6 +80,9 @@ namespace gazebo
       /// \brief Qt callback when the screenshot action is triggered
       private slots: void CaptureScreenshot();
 
+      /// \brief Qt callback when the record video action is triggered
+      private slots: void RecordVideo();
+
       private slots: void InsertModel();
       private slots: void ShowGrid();
       private slots: void ShowCollisions();

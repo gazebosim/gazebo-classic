@@ -78,7 +78,7 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   this->captureData = false;
   this->captureDataOnce = false;
-  this->encodeData = false;
+  this->encodeVideo = false;
 
   this->camera = NULL;
   this->viewport = NULL;
@@ -332,7 +332,7 @@ void Camera::PostRender()
   this->renderTarget->swapBuffers();
 
   if (this->newData
-      && (this->captureData || this->captureDataOnce || this->encodeData))
+      && (this->captureData || this->captureDataOnce || this->encodeVideo))
   {
     size_t size;
     unsigned int width = this->GetImageWidth();
@@ -359,7 +359,7 @@ void Camera::PostRender()
       this->SaveFrame(this->GetFrameFilename());
       this->captureDataOnce = false;
     }
-    else if (this->encodeData)
+    else if (this->encodeVideo)
     {
       this->encoder->EncodeFrame(this->saveFrameBuffer, width, height);
     }
@@ -1051,14 +1051,14 @@ void Camera::SetCaptureDataOnce()
 }
 
 //////////////////////////////////////////////////
-void Camera::SetEncodeData(bool _encode)
+void Camera::SetEncodeVideo(bool _encode)
 {
-  if (this->encodeData == _encode)
+  if (this->encodeVideo == _encode)
     return;
 
-  this->encodeData = _encode;
+  this->encodeVideo = _encode;
 
-  if (this->encodeData)
+  if (this->encodeVideo)
   {
     if (!this->encoder)
     {

@@ -598,6 +598,23 @@ void MainWindow::CaptureScreenshot()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::RecordVideo()
+{
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->SetEncodeVideo(g_recordVideoAct->isChecked());
+  if (g_recordVideoAct->isChecked())
+  {
+    g_recordVideoAct->setIcon(QIcon(":/images/record_stop.png"));
+  }
+  else
+  {
+    g_recordVideoAct->setIcon(QIcon(":/images/record.png"));
+    this->renderWidget->DisplayOverlayMsg(
+        "Video saved in: " + cam->GetScreenshotPath(), 2000);
+  }
+}
+
+/////////////////////////////////////////////////
 void MainWindow::InsertModel()
 {
 }
@@ -1012,6 +1029,14 @@ void MainWindow::CreateActions()
   g_screenshotAct->setStatusTip(tr("Take a screenshot"));
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
+
+  g_recordVideoAct = new QAction(QIcon(":/images/record.png"),
+      tr("Video"), this);
+  g_recordVideoAct->setStatusTip(tr("Record a video"));
+  g_recordVideoAct->setCheckable(true);
+  g_recordVideoAct->setChecked(false);
+  connect(g_recordVideoAct, SIGNAL(triggered()), this,
+      SLOT(RecordVideo()));
 }
 
 /////////////////////////////////////////////////

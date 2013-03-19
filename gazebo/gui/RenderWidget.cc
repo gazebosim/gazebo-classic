@@ -75,6 +75,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolbar->addAction(g_dirLghtCreateAct);
   toolbar->addSeparator();
   toolbar->addAction(g_screenshotAct);
+  toolbar->addAction(g_recordVideoAct);
 
   toolLayout->addSpacing(10);
   toolLayout->addWidget(toolbar);
