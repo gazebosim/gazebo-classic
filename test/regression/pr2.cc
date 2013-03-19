@@ -20,6 +20,7 @@
 using namespace gazebo;
 class PR2Test : public ServerFixture
 {
+  public: void StaticPR2(std::string _physicsEngine);
 };
 
 TEST_F(PR2Test, Load)
@@ -58,6 +59,52 @@ TEST_F(PR2Test, Load)
     common::Time::MSleep(100);
   }
 }
+
+////////////////////////////////////////////////////////////////////////
+// StaticPR2:
+// Issue #586 noted a segfault when loading a pr2 as static and stepping
+// physics forward. This test loads a world with several objects and
+// steps time forward.
+////////////////////////////////////////////////////////////////////////
+void PR2Test::StaticPR2(std::string _physicsEngine)
+{
+  Load("worlds/static_pr2.world", true, _physicsEngine);
+
+  // The body of this is copied from PhysicsTest::EmptyWorld
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // simulate 1 step
+  world->StepWorld(1);
+  double t = world->GetSimTime().Double();
+  // verify that time moves forward
+  EXPECT_GT(t, 0);
+
+  // simulate a few steps
+  int steps = 20;
+  world->StepWorld(steps);
+  double dt = world->GetPhysicsEngine()->GetStepTime();
+  EXPECT_GT(dt, 0);
+  t = world->GetSimTime().Double();
+  EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
+}
+
+TEST_F(PR2Test, StaticPR2ODE)
+{
+  StaticPR2("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(PR2Test, StaticPR2Bullet)
+{
+  StaticPR2("bullet");
+}
+#endif  // HAVE_BULLET
 
 int main(int argc, char **argv)
 {
