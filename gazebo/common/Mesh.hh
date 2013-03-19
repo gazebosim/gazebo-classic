@@ -113,6 +113,11 @@ namespace gazebo
       /// bounds
       public: const SubMesh *GetSubMesh(unsigned int _i) const;
 
+      /// \brief Get a child mesh by names.
+      /// \param[in] _name Name of the submesh.
+      /// \return The submesh, NULL if the _name is not found.
+      public: const SubMesh *GetSubMesh(const std::string &_name) const;
+
       /// \brief Put all the data into flat arrays
       /// \param[out] _vertArr the vertex array
       /// \param[out] _indArr the index array
@@ -152,8 +157,13 @@ namespace gazebo
       /// \param[in] _factor Scaling vector
       public: void SetScale(const math::Vector3 &_factor);
 
-      public: void CenterAt();
+      /// \brief Move the center of the mesh to the given coordinate. This
+      /// will move all the vertices in all submeshes.
+      /// \param[in] _center Location of the mesh center.
+      public: void Center(const math::Vector3 &_center = math::Vector3::Zero);
 
+      /// \brief Move all vertices in all submesshes by _vec.
+      /// \param[in] _vec Amount to translate vertices.
       public: void Translate(const math::Vector3 &_vec);
 
       /// \brief The name of the mesh
@@ -376,6 +386,13 @@ namespace gazebo
       /// \param[in] _factor Scaling factor
       public: void Scale(double _factor);
 
+      /// \brief Move the center of the submesh to the given coordinate. This
+      /// will move all the vertices.
+      /// \param[in] _center Location of the mesh center.
+      public: void Center(const math::Vector3 &_center = math::Vector3::Zero);
+
+      /// \brief Move all vertices by _vec.
+      /// \param[in] _vec Amount to translate vertices.
       public: void Translate(const math::Vector3 &_vec);
 
       /// \brief Scale all vertices by the _factor vector

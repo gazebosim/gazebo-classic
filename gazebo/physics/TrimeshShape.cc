@@ -63,6 +63,21 @@ void TrimeshShape::Init()
 
   if ((this->mesh = meshManager->Load(filename)) == NULL)
     gzerr << "Unable to load mesh from file[" << filename << "]\n";
+
+
+  this->submesh = NULL;
+  if (this->sdf->HasElement("submesh"))
+  {
+    sdf::ElementPtr submeshElem = this->sdf->GetElement("submesh");
+    this->submesh = this->mesh->GetSubMesh(submeshElem->GetValueString("name"));
+
+    if (!this->submesh)
+      gzthrow("Unable to get submesh with name[" +
+          submeshElem->GetValueString("name") + "]");
+
+    if (submeshElem->HasElement("center"))
+      const_cast<common::SubMesh*>(this->submesh)->Center();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -80,20 +95,37 @@ math::Vector3 TrimeshShape::GetSize() const
 //////////////////////////////////////////////////
 std::string TrimeshShape::GetFilename() const
 {
+  return this->GetMeshURI();
+}
+
+//////////////////////////////////////////////////
+std::string TrimeshShape::GetMeshURI() const
+{
   return this->sdf->GetValueString("uri");
 }
 
 //////////////////////////////////////////////////
 void TrimeshShape::SetFilename(const std::string &_filename)
 {
-  if (_filename.find("://") == std::string::npos)
+  this->SetMesh(_filename);
+}
+
+//////////////////////////////////////////////////
+void TrimeshShape::SetMesh(const std::string &_uri,
+                           const std::string &_submesh,
+                           bool _center)
+{
+  if (_uri.find("://") == std::string::npos)
   {
-    gzerr << "Invalid filename[" << _filename
-          << "]. Must use a URI, like file://" << _filename << "\n";
+    gzerr << "Invalid URI[" << _uri
+          << "]. Must use a URI, like file://" << _uri << "\n";
     return;
   }
 
-  this->sdf->GetElement("uri")->Set(_filename);
+  this->sdf->GetElement("uri")->Set(_uri);
+  this->sdf->GetElement("submesh")->GetElement("name")->Set(_submesh);
+  this->sdf->GetElement("submesh")->GetElement("center")->Set(_center);
+
   this->Init();
 }
 
@@ -101,13 +133,24 @@ void TrimeshShape::SetFilename(const std::string &_filename)
 void TrimeshShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::MESH);
+  _msg.mutable_mesh()->CopyFrom(msgs::MeshFromSDF(this->sdf));
+
+/*
   _msg.mutable_mesh()->set_filename(this->GetFilename());
+  if (!this->GetSubmeshName().empty())
+  {
+    _msg.mutable_mesh()->set_submesh(this->GetSubmeshName());
+    _msg.mutable_mesh()->set_center_submesh(this->GetSubmeshName());
+  }
   msgs::Set(_msg.mutable_mesh()->mutable_scale(), this->GetSize());
+  */
 }
 
 //////////////////////////////////////////////////
 void TrimeshShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetScale(msgs::Convert(_msg.mesh().scale()));
-  this->SetFilename(_msg.mesh().filename());
+  this->SetMesh(_msg.mesh().filename(),
+      _msg.mesh().has_submesh() ? _msg.mesh().submesh() : std::string(),
+      _msg.mesh().has_center_submesh() ? _msg.mesh().center_submesh() :  false);
 }

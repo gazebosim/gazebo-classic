@@ -217,6 +217,20 @@ const SubMesh *Mesh::GetSubMesh(unsigned int i) const
 }
 
 //////////////////////////////////////////////////
+const SubMesh *Mesh::GetSubMesh(const std::string &_name) const
+{
+  // Find the submesh with the provided name.
+  for (std::vector<SubMesh *>::const_iterator iter = this->submeshes.begin();
+       iter != this->submeshes.end(); ++iter)
+  {
+    if ((*iter)->GetName() == _name)
+      return *iter;
+  }
+
+  return NULL;
+}
+
+//////////////////////////////////////////////////
 int Mesh::AddMaterial(Material *_mat)
 {
   int result = -1;
@@ -352,17 +366,18 @@ void Mesh::GenSphericalTexCoord(const math::Vector3 &_center)
     (*siter)->GenSphericalTexCoord(_center);
 }
 
-void Mesh::CenterAt()
+//////////////////////////////////////////////////
+void Mesh::Center(const math::Vector3 &_center)
 {
   math::Vector3 min, max, half;
   min = this->GetMin();
   max = this->GetMax();
   half = (max - min) * 0.5;
 
-  std::cout << "Min[" << min << "] Max[" << max << "] Half[" << half << "]\n";
-  this->Translate(-1 * (min+half));
+  this->Translate(_center - (min + half));
 }
 
+//////////////////////////////////////////////////
 void Mesh::Translate(const math::Vector3 &_vec)
 {
   std::vector<SubMesh*>::iterator iter;
@@ -838,6 +853,17 @@ void SubMesh::SetScale(const math::Vector3 &_factor)
     (*iter).y *= _factor.y;
     (*iter).z *= _factor.z;
   }
+}
+
+//////////////////////////////////////////////////
+void SubMesh::Center(const math::Vector3 &_center)
+{
+  math::Vector3 min, max, half;
+  min = this->GetMin();
+  max = this->GetMax();
+  half = (max - min) * 0.5;
+
+  this->Translate(_center - (min + half));
 }
 
 //////////////////////////////////////////////////

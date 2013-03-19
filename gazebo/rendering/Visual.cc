@@ -285,7 +285,14 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
       if (_msg->geometry().mesh().has_submesh())
       {
-        elem->GetElement("submesh")->Set(_msg->geometry().mesh().submesh());
+        elem->GetElement("submesh")->GetElement("name")->Set(
+            _msg->geometry().mesh().submesh());
+      }
+
+      if (_msg->geometry().mesh().has_center_submesh())
+      {
+        elem->GetElement("submesh")->GetElement("center")->Set(
+            _msg->geometry().mesh().center_submesh());
       }
     }
   }
@@ -385,13 +392,7 @@ void Visual::Load()
 
   std::string meshName = this->GetMeshName();
   std::string subMeshName = this->GetSubMeshName();
-
-  if (subMeshName == "Rear_Wheel_Right")
-  {
-    std::cout << "Visual::Load SubMesh[" << subMeshName << "] Pose[" << pose << "]\n";
-    pose = math::Pose(-0.85, -0.6, 0.32, 0, 0, 0) - pose;
-    std::cout << "  Pose2[" << pose << "]\n";
-  }
+  bool centerSubMesh = this->GetCenterSubMesh();
 
   if (!meshName.empty())
   {
@@ -399,7 +400,8 @@ void Visual::Load()
     {
       // Create the visual
       stream << "VISUAL_" << this->sceneNode->getName();
-      obj = this->AttachMesh(meshName, subMeshName, stream.str());
+      obj = this->AttachMesh(meshName, subMeshName, centerSubMesh,
+          stream.str());
     }
     catch(Ogre::Exception &e)
     {
@@ -644,6 +646,7 @@ void Visual::MakeStatic()
 //////////////////////////////////////////////////
 Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
                                         const std::string &_subMesh,
+                                        bool _centerSubmesh,
                                         const std::string &_objName)
 {
   if (_meshName.empty())
@@ -657,7 +660,7 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
   if (objName.empty())
     objName = this->sceneNode->getName() + "_ENTITY_" + meshName;
 
-  this->InsertMesh(_meshName, _subMesh);
+  this->InsertMesh(_meshName, _subMesh, _centerSubmesh);
 
   obj = (Ogre::MovableObject*)
     (this->sceneNode->getCreator()->createEntity(objName, meshName));
@@ -1535,7 +1538,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 
 //////////////////////////////////////////////////
 void Visual::InsertMesh(const std::string &_meshName,
-                        const std::string &_subMesh)
+                        const std::string &_subMesh,
+                        bool _centerSubmesh)
 {
   const common::Mesh *mesh;
   if (!common::MeshManager::Instance()->HasMesh(_meshName))
@@ -1549,7 +1553,7 @@ void Visual::InsertMesh(const std::string &_meshName,
     mesh = common::MeshManager::Instance()->GetMesh(_meshName);
   }
 
-  this->InsertMesh(mesh, _subMesh);
+  this->InsertMesh(mesh, _subMesh, _centerSubmesh);
 
   // Add the mesh into OGRE
   /*if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
@@ -1562,7 +1566,8 @@ void Visual::InsertMesh(const std::string &_meshName,
 }
 
 //////////////////////////////////////////////////
-void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh)
+void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
+    bool _centerSubmesh)
 {
   Ogre::MeshPtr ogreMesh;
 
@@ -1643,7 +1648,11 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh)
 
       size_t currOffset = 0;
 
-      const common::SubMesh *subMesh = _mesh->GetSubMesh(i);
+      common::SubMesh *subMesh = const_cast<common::SubMesh*>(
+          _mesh->GetSubMesh(i));
+
+      if (_centerSubmesh)
+        subMesh->Center();
 
       ogreSubMesh = ogreMesh->createSubMesh();
       ogreSubMesh->useSharedVertices = false;
@@ -2016,7 +2025,26 @@ std::string Visual::GetSubMeshName() const
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       if (tmpElem->HasElement("submesh"))
-        result = tmpElem->GetValueString("submesh");
+        result = tmpElem->GetElement("submesh")->GetValueString("name");
+    }
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+bool Visual::GetCenterSubMesh() const
+{
+  bool result = false;
+
+  if (this->sdf->HasElement("geometry"))
+  {
+    sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+    if (geomElem->HasElement("mesh"))
+    {
+      sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
+      if (tmpElem->HasElement("submesh"))
+        result = tmpElem->GetElement("submesh")->GetValueBool("center");
     }
   }
 

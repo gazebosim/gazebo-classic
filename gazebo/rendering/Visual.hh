@@ -155,10 +155,14 @@ namespace gazebo
 
       /// \brief Attach a mesh to this visual by name.
       /// \param[in] _meshName Name of the mesh.
+      /// \param[in] _subMesh Name of the submesh. Empty string to use all
+      /// submeshes.
+      /// \param[in] _centerSubmesh True to center a submesh.
       /// \param[in] _objName Name of the attached Object to put the mesh
       /// onto.
       public: Ogre::MovableObject *AttachMesh(const std::string &_meshName,
                   const std::string &_subMesh="",
+                  bool _centerSubmesh = false,
                   const std::string &_objName="");
 
       /// \brief Set the scale.
@@ -327,14 +331,18 @@ namespace gazebo
       /// \brief Insert a mesh into Ogre.
       /// \param[in] _meshName Name of the mesh to insert.
       /// \param[in] _subMesh Name of the mesh within _meshName to insert.
+      /// \param[in] _centerSubmesh True to center the submesh.
       public: void InsertMesh(const std::string &_meshName,
-                  const std::string &_subMesh = "");
+                  const std::string &_subMesh = "",
+                  bool _centerSubmesh = false);
 
       /// \brief Insert a mesh into Ogre.
       /// \param[in] _mesh Pointer to the mesh to insert.
       /// \param[in] _subMesh Name of the mesh within _meshName to insert.
+      /// \param[in] _centerSubmesh True to center the submesh.
       public: static void InsertMesh(const common::Mesh *_mesh,
-                  const std::string &_subMesh = "");
+                  const std::string &_subMesh = "",
+                  bool _centerSubmesh = false);
 
       /// \brief Update a visual based on a message.
       /// \param[in] _msg The visual message.
@@ -469,6 +477,11 @@ namespace gazebo
 
       /// \brief Parent visual.
       protected: VisualPtr parent;
+
+      /// \brief Return true if the submesh should be centered.
+      /// \return True if the submesh should be centered when it's inserted
+      /// into OGRE.
+      private: bool GetCenterSubMesh() const;
 
       /// \brief Destroy all the movable objects attached to a scene node.
       /// \param[in] _sceneNode Pointer to the scene node to process.
