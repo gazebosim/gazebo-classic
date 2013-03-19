@@ -36,7 +36,6 @@ Element::Element()
 /////////////////////////////////////////////////
 Element::~Element()
 {
-  this->parent.reset();
   for (Param_V::iterator iter = this->attributes.begin();
       iter != this->attributes.end(); ++iter)
   {
@@ -60,6 +59,7 @@ Element::~Element()
 
   this->value.reset();
 
+  this->parent.reset();
   // this->Reset();
 }
 
@@ -1247,8 +1247,6 @@ void Element::Update()
 /////////////////////////////////////////////////
 void Element::Reset()
 {
-  this->parent.reset();
-
   for (ElementPtr_V::iterator iter = this->elements.begin();
       iter != this->elements.end(); ++iter)
   {
@@ -1266,6 +1264,8 @@ void Element::Reset()
   this->elementDescriptions.clear();
 
   this->value.reset();
+
+  this->parent.reset();
 }
 
 /////////////////////////////////////////////////
