@@ -131,7 +131,6 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
   if (_elem->Attribute("name"))
   {
     this->currentNodeName = _elem->Attribute("name");
-    std::cout << "Current Node Name[" << this->currentNodeName << "]\n";
   }
 
   nodeXml = _elem->FirstChildElement("node");

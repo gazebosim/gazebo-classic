@@ -212,6 +212,7 @@ namespace gazebo
       /// \brief directory of COLLADA file name
       private: std::string path;
 
+      /// \brief Name of the current node.
       private: std::string currentNodeName;
     };
     /// \}
