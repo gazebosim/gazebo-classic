@@ -106,8 +106,8 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
     this->GetMemInfo(residentCur, shareCur);
     if (i > 1)  // give it 2 cycles to stabilize
     {
-      EXPECT_NEAR(residentCur, residentLast, 1e-2);
-      EXPECT_NEAR(shareCur, shareLast, 1e-2);
+      EXPECT_LE(residentCur, residentLast);
+      EXPECT_LE(shareCur, shareLast);
     }
     // gzdbg << "memory res[" << residentCur
     //       << "] shr[" << shareCur
