@@ -40,6 +40,5 @@ class ImagesView_TEST : public QTestFixture
   /// \param[in] _count Number of expected images on the topic.
   private: void SetTopic(gazebo::gui::ImagesView *_view,
                          const std::string &_topicName, int _count);
-
 };
 #endif
