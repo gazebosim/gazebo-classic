@@ -854,6 +854,22 @@ class ServerFixture : public testing::Test
                world->RemovePlugin(_name);
              }
 
+  protected: void GetMemInfo(double &_resident, double &_share)
+            {
+              int totalSize, residentPages, sharePages;
+              totalSize = residentPages = sharePages = 0;
+
+              std::ifstream buffer("/proc/self/statm");
+              buffer >> totalSize >> residentPages >> sharePages;
+              buffer.close();
+
+              // in case x86-64 is configured to use 2MB pages
+              int64_t pageSizeKb = sysconf(_SC_PAGE_SIZE) / 1024;
+
+              _resident = residentPages * pageSizeKb;
+              _share = sharePages * pageSizeKb;
+            }
+
   protected: Server *server;
   protected: boost::thread *serverThread;
 
