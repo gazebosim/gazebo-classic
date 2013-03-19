@@ -144,6 +144,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
       {
         mesh = this->meshes[_filename];
       }
+      mesh->CenterAt();
 
       std::cout << "Submesh Count[" << mesh->GetSubMeshCount() << "]\n";
       for (unsigned int i=0; i < mesh->GetSubMeshCount(); ++i)

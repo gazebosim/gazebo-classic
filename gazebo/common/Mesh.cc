@@ -352,6 +352,30 @@ void Mesh::GenSphericalTexCoord(const math::Vector3 &_center)
     (*siter)->GenSphericalTexCoord(_center);
 }
 
+void Mesh::CenterAt()
+{
+  math::Vector3 min, max, half;
+  min = this->GetMin();
+  max = this->GetMax();
+  half = (max - min) * 0.5;
+
+  std::cout << "Min[" << min << "] Max[" << max << "] Half[" << half << "]\n";
+  this->Translate(-1 * (min+half));
+}
+
+void Mesh::Translate(const math::Vector3 &_vec)
+{
+  std::vector<SubMesh*>::iterator iter;
+
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
+  {
+    if ((*iter)->GetVertexCount() <= 2)
+      continue;
+
+    (*iter)->Translate(_vec);
+  }
+}
+
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 
@@ -813,6 +837,16 @@ void SubMesh::SetScale(const math::Vector3 &_factor)
     (*iter).x *= _factor.x;
     (*iter).y *= _factor.y;
     (*iter).z *= _factor.z;
+  }
+}
+
+//////////////////////////////////////////////////
+void SubMesh::Translate(const math::Vector3 &_vec)
+{
+  for (std::vector<math::Vector3>::iterator iter = this->vertices.begin();
+       iter != this->vertices.end(); ++iter)
+  {
+    (*iter) += _vec;
   }
 }
 
