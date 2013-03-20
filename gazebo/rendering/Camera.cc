@@ -334,10 +334,13 @@ void Camera::PostRender()
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
 
+
     // Get access to the buffer and make an image and write it to file
     Ogre::PixelFormat format =
         this->viewport->getTarget()->suggestPixelFormat();
     size = Ogre::PixelUtil::getMemorySize(width, height, 1, format);
+
+    std::cout << "WxH[" << width << " " << height << "] Size[" << size << "]\n";
 
     // Allocate buffer
     if (!this->saveFrameBuffer)
@@ -535,6 +538,7 @@ void Camera::SetImageHeight(unsigned int _h)
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageWidth() const
 {
+  return this->viewport->getActualWidth();
   sdf::ElementPtr elem = this->sdf->GetElement("image");
   return elem->GetValueInt("width");
 }
@@ -542,6 +546,7 @@ unsigned int Camera::GetImageWidth() const
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageHeight() const
 {
+  return this->viewport->getActualHeight();
   sdf::ElementPtr elem = this->sdf->GetElement("image");
   // gzerr << "image height " << elem->GetValueInt("height") << "\n";
   return elem->GetValueInt("height");
