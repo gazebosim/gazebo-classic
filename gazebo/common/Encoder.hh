@@ -47,15 +47,19 @@ namespace gazebo
 
       public: void Init2();
 
-      /// \brief Encode a sigle frame
+      /// \brief True if the enoder is initialized, false otherwise
+      public: bool IsInitialized();
+
+      /// \brief Add a single frame to be encoded
       /// \param[in] _frame Image buffer to be encoded
       /// \param[in] _w Input frame width
       /// \param[in] _h Input frame height
-      public: void EncodeFrame(unsigned char *_frame, unsigned int _w,
+      public: void AddFrame(unsigned char *_frame, unsigned int _w,
           unsigned int _h);
 
-      /// \brief Finalize encoding and write to file
-      public: void Fini();
+      /// \brief Write data buffer to to disk
+      /// param[in] _filename File in which to save the encoded data
+      public: void SaveToFile(const std::string &_filename);
 
       /// \brief Set the video encoding bit rate
       /// \param[in] _bitrate Video encoding bit rate
@@ -73,6 +77,8 @@ namespace gazebo
       /// memories.
       public: void Reset();
 
+      public: void Encode();
+
       /// \brief free up open Video object, close files, streams
       private: void Cleanup();
 
@@ -82,19 +88,11 @@ namespace gazebo
       /// \brief libav main external API structure
       private: AVCodecContext *codecCtx;
 
-      /// \brief audio video frame
-      private: AVFrame *avFrame;
-
       /// \brief audi video picture
       //private: AVPicture *pic;
 
       /// \brief Encoding buffer
       private: unsigned char *outbuf;
-
-      private: unsigned char *picture_buf;
-
-      /// \brief Handl to the output video file
-      private: FILE *fileHandle;
 
       /// \brief True if the encoder is initialized
       private: bool initialized;
@@ -108,9 +106,6 @@ namespace gazebo
       /// \brief Frame height
       private: unsigned int frameHeight;
 
-      /// \brief Number of bytes used from buffer
-      private: int outSize;
-
       private: int outBufferSize;
 
       /// \brief Audio video picture
@@ -119,6 +114,13 @@ namespace gazebo
       /// \brief Software scaling context
       private: SwsContext *swsCtx;
 
+      private: int currentBufferSize;
+
+      private: std::vector<AVFrame *> frames;
+
+      private: unsigned int outputFrameSize;
+
+      private: std::string filename;
     };
     /// \}
   }

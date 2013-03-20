@@ -33,6 +33,7 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderEvents.hh"
 
+#include "gazebo/gui/SaveDialog.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
@@ -609,8 +610,23 @@ void MainWindow::RecordVideo()
   else
   {
     g_recordVideoAct->setIcon(QIcon(":/images/record.png"));
-    this->renderWidget->DisplayOverlayMsg(
-        "Video saved in: " + cam->GetScreenshotPath(), 2000);
+
+    std::string friendlyName = cam->GetName();
+    boost::replace_all(friendlyName, "::", "_");
+    std::string timestamp = common::Time::GetWallTimeAsISOString();
+    boost::replace_all(timestamp, ":", "_");
+
+    SaveDialog saveDialog;
+    saveDialog.SetSaveName(friendlyName + "_" + timestamp);
+    saveDialog.SetSaveLocation(QDir::homePath().toStdString());
+    if (saveDialog.exec() == QDialog::Accepted)
+    {
+      std::string name = saveDialog.GetSaveName();
+      std::string location = saveDialog.GetSaveLocation();
+      cam->SaveVideo(location + "/" + name);
+      this->renderWidget->DisplayOverlayMsg(
+        name + " saved in: " + location, 2000);
+    }
   }
 }
 

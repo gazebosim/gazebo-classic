@@ -281,6 +281,11 @@ namespace gazebo
       /// \return True if saving was successful
       public: bool SaveFrame(const std::string &_filename);
 
+      /// \brief Save the last encoded video to disk
+      /// \param[in] _filename File in which to save the encoded video
+      /// \return True if saving was successful
+      public: bool SaveVideo(const std::string &_filename);
+
       /// \brief Get a pointer to the ogre camera
       /// \return Pointer to the OGRE camera
       public: Ogre::Camera *GetOgreCamera() const;

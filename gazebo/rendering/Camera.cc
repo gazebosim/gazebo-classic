@@ -361,7 +361,7 @@ void Camera::PostRender()
     }
     else if (this->encodeVideo)
     {
-      this->encoder->EncodeFrame(this->saveFrameBuffer, width, height);
+      this->encoder->AddFrame(this->saveFrameBuffer, width, height);
     }
 
     if (this->sdf->HasElement("save") &&
@@ -803,6 +803,20 @@ bool Camera::SaveFrame(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
+bool Camera::SaveVideo(const std::string &_filename)
+{
+  if (!this->encoder || !this->encoder->IsInitialized())
+  {
+    gzwarn << "Video encoder not initialized\n";
+    return false;
+  }
+
+  this->encoder->SaveToFile(_filename);
+  this->encoder->Reset();
+  return true;
+}
+
+//////////////////////////////////////////////////
 std::string Camera::GetFrameFilename()
 {
   sdf::ElementPtr saveElem = this->sdf->GetElement("save");
@@ -1065,11 +1079,6 @@ void Camera::SetEncodeVideo(bool _encode)
       this->encoder = new common::Encoder();
       this->encoder->Init();
     }
-  }
-  else
-  {
-    this->encoder->Fini();
-    this->encoder->Reset();
   }
 }
 
