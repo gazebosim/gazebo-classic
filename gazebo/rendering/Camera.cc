@@ -336,9 +336,8 @@ void Camera::PostRender()
 
 
     // Get access to the buffer and make an image and write it to file
-    Ogre::PixelFormat format =
-        this->viewport->getTarget()->suggestPixelFormat();
-    size = Ogre::PixelUtil::getMemorySize(width, height, 1, format);
+    size = Ogre::PixelUtil::getMemorySize(width, height, 1,
+        static_cast<Ogre::PixelFormat>(this->imageFormat));
 
     std::cout << "WxH[" << width << " " << height << "] Size[" << size << "]\n";
 
@@ -349,7 +348,8 @@ void Camera::PostRender()
     memset(this->saveFrameBuffer, 128, size);
 
     Ogre::PixelBox box(width, height, 1,
-        (Ogre::PixelFormat)this->imageFormat, this->saveFrameBuffer);
+        static_cast<Ogre::PixelFormat>(this->imageFormat),
+        this->saveFrameBuffer);
 
     this->viewport->getTarget()->copyContentsToMemory(box);
 
@@ -814,10 +814,10 @@ std::string Camera::GetFrameFilename()
 
   if (this->captureDataOnce)
   {
-    friendlyName += "_screenshot";
     pathToFile = this->screenshotPath;
-    pathToFile /= std::string(friendlyName + "-"
-        + common::Time::GetWallTimeAsISOString() + ".jpg");
+    std::string timestamp = common::Time::GetWallTimeAsISOString();
+    boost::replace_all(timestamp, ":", "_");
+    pathToFile /= friendlyName + "-" + timestamp + ".jpg";
   }
   else
   {
