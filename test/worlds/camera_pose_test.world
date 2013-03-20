@@ -1,0 +1,187 @@
+<?xml version="1.0" ?>
+<sdf version="1.3">
+  <world name="default">
+    <include><uri>model://ground_plane</uri></include>
+    <include><uri>model://sun</uri></include>
+
+    <model name="rotated_box">
+      <pose>-3 0 0.5 -1.5708 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+
+        <sensor name="cam1" type="camera">
+          <pose>0 0 0  1.5708 0 0</pose>
+          <update_rate>15</update_rate>
+          <camera name="left">
+            <pose>0 0 0  0 0 0</pose>
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+              <width>1024</width>
+              <height>544</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.02</near>
+              <far>100</far>
+            </clip>
+          </camera>
+        </sensor>
+        <sensor name="cam2" type="camera">
+          <pose>0 0 0  0.7854 0 0</pose>
+          <update_rate>15</update_rate>
+          <camera name="left">
+            <pose>0 0 0  0.7854 0 0</pose>
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+              <width>1024</width>
+              <height>544</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.02</near>
+              <far>100</far>
+            </clip>
+          </camera>
+        </sensor>
+        <sensor name="cam3" type="camera">
+          <pose>0 0 0  0 0 0</pose>
+          <update_rate>15</update_rate>
+          <camera name="left">
+            <pose>0 0 0  1.5708 0 0</pose>
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+              <width>1024</width>
+              <height>544</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.02</near>
+              <far>100</far>
+            </clip>
+          </camera>
+        </sensor>
+        <sensor name="mcam1" type="multicamera">
+          <update_rate>15</update_rate>
+          <pose>0 0 0  1.5708 0 0</pose>
+          <camera name="left">
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+              <width>1024</width>
+              <height>544</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.02</near>
+              <far>100</far>
+            </clip>
+          </camera>
+          <camera name="right">
+            <pose>0 -1.0 0  0 0 0</pose>
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+              <width>1024</width>
+              <height>544</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.02</near>
+              <far>100</far>
+            </clip>
+          </camera>
+        </sensor>
+      </link>
+    </model>
+
+    <model name="box1">
+      <pose>0 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="box2">
+      <pose>0 1 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="box3">
+      <pose>0 -1 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="box4">
+      <pose>0 0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>
