@@ -425,7 +425,7 @@ void SensorManager::SensorContainer::RunLoop()
   engine->InitForThread();
 
   common::Time sleepTime, startTime, eventTime, diffTime;
-  double maxUpdateRate = GZ_DBL_MIN;
+  double maxUpdateRate = 0;
 
   boost::mutex tmpMutex;
   boost::mutex::scoped_lock lock2(tmpMutex);
