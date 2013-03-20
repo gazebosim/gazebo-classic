@@ -329,12 +329,10 @@ void Joint::Attach(LinkPtr _parent, LinkPtr _child)
 //////////////////////////////////////////////////
 void Joint::Detach()
 {
-  BasePtr myBase = shared_from_this();
-
   if (this->parentLink)
-    this->parentLink->RemoveChildJoint(
-      boost::shared_static_cast<Joint>(myBase));
-  this->childLink->RemoveParentJoint(boost::shared_static_cast<Joint>(myBase));
+    this->parentLink->RemoveChildJoint(this->GetName());
+  if (this->childLink)
+    this->childLink->RemoveParentJoint(this->GetName());
 }
 
 //////////////////////////////////////////////////
