@@ -36,6 +36,7 @@ using namespace physics;
 TrimeshShape::TrimeshShape(CollisionPtr _parent)
   : Shape(_parent)
 {
+  this->submesh = NULL;
   this->AddType(Base::TRIMESH_SHAPE);
 }
 
