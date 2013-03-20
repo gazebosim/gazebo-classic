@@ -102,9 +102,51 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
   }
 }
 
+TEST_F(Joint_TEST, joint_SDF14)
+{
+  Load("worlds/SDF_1_4.world");
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+
+  int i = 0;
+  while (!this->HasEntity("joint14_model") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get joint14_model");
+
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  EXPECT_TRUE(physicsEngine);
+  physics::ModelPtr model = world->GetModel("joint14_model");
+  EXPECT_TRUE(model);
+  physics::LinkPtr link1 = model->GetLink("body1");
+  EXPECT_TRUE(link1);
+  physics::LinkPtr link2 = model->GetLink("body2");
+  EXPECT_TRUE(link2);
+
+  EXPECT_EQ(model->GetJointCount(), 1u);
+  physics::JointPtr joint = model->GetJoint("joint14_revolute_joint");
+  EXPECT_TRUE(joint);
+
+  physics::LinkPtr parent = joint->GetParent();
+  EXPECT_TRUE(parent);
+  physics::LinkPtr child = joint->GetChild();
+  EXPECT_TRUE(child);
+  EXPECT_EQ(parent->GetName(), "body2");
+  EXPECT_EQ(child->GetName(), "body1");
+}
+
+
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-

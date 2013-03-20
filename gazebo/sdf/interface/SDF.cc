@@ -222,7 +222,6 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
   }
   else
   {
-    gzerr << "Unknown attribute _type[" << _type << "]\n";
     return boost::shared_ptr<Param>();
   }
 }
