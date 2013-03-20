@@ -91,7 +91,7 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
   //Eigen::Vector3d axisHinge(xyz.x, xyz.y, xyz.z);
   Eigen::Vector3d axisHinge;
   rtql8::kinematics::Dof* dofHinge = new rtql8::kinematics::Dof(0);
-  rotHinge = new rtql8::kinematics::TrfmRotateAxis1(axisHinge, dofHinge);
+  rotHinge = new rtql8::kinematics::TrfmRotateAxis(axisHinge, dofHinge);
   this->rtql8Joint->addTransform(rotHinge, true);
   // Get the model associated with
   // Add the transform to the skeletone in the model.

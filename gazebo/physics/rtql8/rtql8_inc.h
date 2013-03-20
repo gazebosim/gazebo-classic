@@ -15,6 +15,7 @@
 #include <rtql8/kinematics/Transformation.h>
 #include <rtql8/kinematics/TrfmRotateEuler.h>
 #include <rtql8/kinematics/TrfmRotateExpmap.h>
+#include <rtql8/kinematics/TrfmRotateAxis.h>
 #include <rtql8/kinematics/TrfmRotateQuat.h>
 #include <rtql8/kinematics/TrfmTranslate.h>
 
