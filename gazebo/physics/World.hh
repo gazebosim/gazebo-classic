@@ -309,7 +309,7 @@ namespace gazebo
       /// \brief Publish pose updates for a model.
       /// This list of models to publish is processed and cleared once every
       /// iteration.
-      /// \param[in] _modelName Name of the model to publish.
+      /// \param[in] _model Pointer to the model to publish.
       public: void PublishModelPose(physics::ModelPtr _model);
 
       /// \cond
