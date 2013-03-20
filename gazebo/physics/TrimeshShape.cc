@@ -64,19 +64,22 @@ void TrimeshShape::Init()
   if ((this->mesh = meshManager->Load(filename)) == NULL)
     gzerr << "Unable to load mesh from file[" << filename << "]\n";
 
-
+  if (this->submesh)
+    delete this->submesh;
   this->submesh = NULL;
+
   if (this->sdf->HasElement("submesh"))
   {
     sdf::ElementPtr submeshElem = this->sdf->GetElement("submesh");
-    this->submesh = this->mesh->GetSubMesh(submeshElem->GetValueString("name"));
+    this->submesh = new common::SubMesh(
+      this->mesh->GetSubMesh(submeshElem->GetValueString("name")));
 
     if (!this->submesh)
       gzthrow("Unable to get submesh with name[" +
           submeshElem->GetValueString("name") + "]");
 
     if (submeshElem->HasElement("center"))
-      const_cast<common::SubMesh*>(this->submesh)->Center();
+      this->submesh->Center();
   }
 }
 
@@ -134,16 +137,6 @@ void TrimeshShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::MESH);
   _msg.mutable_mesh()->CopyFrom(msgs::MeshFromSDF(this->sdf));
-
-/*
-  _msg.mutable_mesh()->set_filename(this->GetFilename());
-  if (!this->GetSubmeshName().empty())
-  {
-    _msg.mutable_mesh()->set_submesh(this->GetSubmeshName());
-    _msg.mutable_mesh()->set_center_submesh(this->GetSubmeshName());
-  }
-  msgs::Set(_msg.mutable_mesh()->mutable_scale(), this->GetSize());
-  */
 }
 
 //////////////////////////////////////////////////

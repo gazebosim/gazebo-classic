@@ -71,6 +71,7 @@ namespace gazebo
       /// \brief Set the mesh uri and submesh name.
       /// \param[in] _uri Filename of the mesh file to load from.
       /// \param[in] _submesh Name of the submesh to use within the mesh
+      /// \param[in] _center True to center the submesh.
       /// specified in the _uri.
       public: void SetMesh(const std::string &_uri,
                            const std::string &_submesh = "",
@@ -94,7 +95,7 @@ namespace gazebo
       protected: const common::Mesh *mesh;
 
       /// \brief The submesh to use from within the parent mesh.
-      protected: const common::SubMesh *submesh;
+      protected: common::SubMesh *submesh;
     };
     /// \}
   }

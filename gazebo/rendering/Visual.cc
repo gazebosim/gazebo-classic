@@ -1648,29 +1648,31 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
 
       size_t currOffset = 0;
 
-      common::SubMesh *subMesh = const_cast<common::SubMesh*>(
-          _mesh->GetSubMesh(i));
+      // Copy the original submesh. We may need to modify the vertices, and
+      // we don't want to change the original.
+      common::SubMesh subMesh(_mesh->GetSubMesh(i));
 
+      // Recenter the vertices if requested.
       if (_centerSubmesh)
-        subMesh->Center();
+        subMesh.Center();
 
       ogreSubMesh = ogreMesh->createSubMesh();
       ogreSubMesh->useSharedVertices = false;
-      if (subMesh->GetPrimitiveType() == common::SubMesh::TRIANGLES)
+      if (subMesh.GetPrimitiveType() == common::SubMesh::TRIANGLES)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_LIST;
-      else if (subMesh->GetPrimitiveType() == common::SubMesh::LINES)
+      else if (subMesh.GetPrimitiveType() == common::SubMesh::LINES)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_LINE_LIST;
-      else if (subMesh->GetPrimitiveType() == common::SubMesh::LINESTRIPS)
+      else if (subMesh.GetPrimitiveType() == common::SubMesh::LINESTRIPS)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_LINE_STRIP;
-      else if (subMesh->GetPrimitiveType() == common::SubMesh::TRIFANS)
+      else if (subMesh.GetPrimitiveType() == common::SubMesh::TRIFANS)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_FAN;
-      else if (subMesh->GetPrimitiveType() == common::SubMesh::TRISTRIPS)
+      else if (subMesh.GetPrimitiveType() == common::SubMesh::TRISTRIPS)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_STRIP;
-      else if (subMesh->GetPrimitiveType() == common::SubMesh::POINTS)
+      else if (subMesh.GetPrimitiveType() == common::SubMesh::POINTS)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_POINT_LIST;
       else
         gzerr << "Unknown primitive type["
-              << subMesh->GetPrimitiveType() << "]\n";
+              << subMesh.GetPrimitiveType() << "]\n";
 
       ogreSubMesh->vertexData = new Ogre::VertexData();
       vertexData = ogreSubMesh->vertexData;
@@ -1685,7 +1687,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       // TODO: blending weights
 
       // normals
-      if (subMesh->GetNormalCount() > 0)
+      if (subMesh.GetNormalCount() > 0)
       {
         vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3,
                                Ogre::VES_NORMAL);
@@ -1697,7 +1699,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       // TODO: specular colors
 
       // two dimensional texture coordinates
-      if (subMesh->GetTexCoordCount() > 0)
+      if (subMesh.GetTexCoordCount() > 0)
       {
         vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT2,
             Ogre::VES_TEXTURE_COORDINATES, 0);
@@ -1705,7 +1707,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       }
 
       // allocate the vertex buffer
-      vertexData->vertexCount = subMesh->GetVertexCount();
+      vertexData->vertexCount = subMesh.GetVertexCount();
 
       vBuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
                  vertexDecl->getVertexSize(0),
@@ -1720,9 +1722,9 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       if (_mesh->HasSkeleton())
       {
         common::Skeleton *skel = _mesh->GetSkeleton();
-        for (unsigned int j = 0; j < subMesh->GetNodeAssignmentsCount(); j++)
+        for (unsigned int j = 0; j < subMesh.GetNodeAssignmentsCount(); j++)
         {
-          common::NodeAssignment na = subMesh->GetNodeAssignment(j);
+          common::NodeAssignment na = subMesh.GetNodeAssignment(j);
           Ogre::VertexBoneAssignment vba;
           vba.vertexIndex = na.vertexIndex;
           vba.boneIndex = ogreSkeleton->getBone(skel->GetNodeByHandle(
@@ -1733,7 +1735,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       }
 
       // allocate index buffer
-      ogreSubMesh->indexData->indexCount = subMesh->GetIndexCount();
+      ogreSubMesh->indexData->indexCount = subMesh.GetIndexCount();
 
       ogreSubMesh->indexData->indexBuffer =
         Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
@@ -1749,32 +1751,32 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       unsigned int j;
 
       // Add all the vertices
-      for (j = 0; j < subMesh->GetVertexCount(); j++)
+      for (j = 0; j < subMesh.GetVertexCount(); j++)
       {
-        *vertices++ = subMesh->GetVertex(j).x;
-        *vertices++ = subMesh->GetVertex(j).y;
-        *vertices++ = subMesh->GetVertex(j).z;
+        *vertices++ = subMesh.GetVertex(j).x;
+        *vertices++ = subMesh.GetVertex(j).y;
+        *vertices++ = subMesh.GetVertex(j).z;
 
-        if (subMesh->GetNormalCount() > 0)
+        if (subMesh.GetNormalCount() > 0)
         {
-          *vertices++ = subMesh->GetNormal(j).x;
-          *vertices++ = subMesh->GetNormal(j).y;
-          *vertices++ = subMesh->GetNormal(j).z;
+          *vertices++ = subMesh.GetNormal(j).x;
+          *vertices++ = subMesh.GetNormal(j).y;
+          *vertices++ = subMesh.GetNormal(j).z;
         }
 
-        if (subMesh->GetTexCoordCount() > 0)
+        if (subMesh.GetTexCoordCount() > 0)
         {
-          *vertices++ = subMesh->GetTexCoord(j).x;
-          *vertices++ = subMesh->GetTexCoord(j).y;
+          *vertices++ = subMesh.GetTexCoord(j).x;
+          *vertices++ = subMesh.GetTexCoord(j).y;
         }
       }
 
       // Add all the indices
-      for (j = 0; j < subMesh->GetIndexCount(); j++)
-        *indices++ = subMesh->GetIndex(j);
+      for (j = 0; j < subMesh.GetIndexCount(); j++)
+        *indices++ = subMesh.GetIndex(j);
 
       const common::Material *material;
-      material = _mesh->GetMaterial(subMesh->GetMaterialIndex());
+      material = _mesh->GetMaterial(subMesh.GetMaterialIndex());
       if (material)
       {
         rendering::Material::Update(material);

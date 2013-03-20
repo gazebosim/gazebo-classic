@@ -15,15 +15,15 @@
  *
 */
 
-#ifndef COLLADALOADER_HH
-#define COLLADALOADER_HH
+#ifndef _COLLADALOADER_HH_
+#define _COLLADALOADER_HH_
 
 #include <map>
 #include <string>
 #include <vector>
 
-#include "common/MeshLoader.hh"
-#include "math/MathTypes.hh"
+#include "gazebo/common/MeshLoader.hh"
+#include "gazebo/math/MathTypes.hh"
 
 class TiXmlElement;
 

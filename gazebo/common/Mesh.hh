@@ -186,14 +186,14 @@ namespace gazebo
     /// visualization
     struct NodeAssignment
     {
-        /// \brief index of the vertex
-        unsigned int vertexIndex;
+      /// \brief index of the vertex
+      unsigned int vertexIndex;
 
-        /// \brieaf node (or bone) index
-        unsigned int nodeIndex;
+      /// \brieaf node (or bone) index
+      unsigned int nodeIndex;
 
-        /// \brief the weight (between 0 and 1)
-        float weight;
+      /// \brief the weight (between 0 and 1)
+      float weight;
     };
 
     /// \brief A child mesh
@@ -205,6 +205,9 @@ namespace gazebo
 
       /// \brief Constructor
       public: SubMesh();
+
+      /// \brief Copy Constructor
+      public: SubMesh(const SubMesh *_mesh);
 
       /// \brief Destructor
       public: virtual ~SubMesh();

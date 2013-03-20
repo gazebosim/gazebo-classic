@@ -17,10 +17,12 @@
 
 #include <gtest/gtest.h>
 
+#include "test_config.h"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Mesh.hh"
+#include "gazebo/common/ColladaLoader.hh"
 
 using namespace gazebo;
 
@@ -113,6 +115,7 @@ std::string asciiSTLBox =
 endsolid MYSOLID";
 
 
+/////////////////////////////////////////////////
 TEST(MeshTest, Mesh)
 {
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
@@ -230,6 +233,55 @@ TEST(MeshTest, Mesh)
   EXPECT_TRUE(max == math::Vector3(1, 1, 1));
 }
 
+/////////////////////////////////////////////////
+// Test centering a submesh.
+TEST(MeshTest, MeshMove)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) + "/test/data/box_offset.dae");
+
+  // The default location of the box_offest is not centered
+  EXPECT_EQ(math::Vector3(5.46554, 2.18039, 4.8431), mesh->GetMax());
+  EXPECT_EQ(math::Vector3(3.46555, 0.180391, 2.8431), mesh->GetMin());
+
+  mesh->Center();
+
+  EXPECT_EQ(math::Vector3(1.0, 1.0, 1.0), mesh->GetMax());
+  EXPECT_EQ(math::Vector3(-1.0, -1.0, -1.0), mesh->GetMin());
+
+  mesh->Translate(math::Vector3(1, 2, 3));
+  EXPECT_EQ(math::Vector3(2.0, 3.0, 4.0), mesh->GetMax());
+  EXPECT_EQ(math::Vector3(0.0, 1.0, 2.0), mesh->GetMin());
+}
+
+/////////////////////////////////////////////////
+// Test centering a submesh.
+TEST(MeshTest, SubMeshCenter)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) + "/test/data/box_offset.dae");
+
+  // The default location of the box_offest is not centered
+  EXPECT_EQ(math::Vector3(5.46554, 2.18039, 4.8431), mesh->GetMax());
+  EXPECT_EQ(math::Vector3(3.46555, 0.180391, 2.8431), mesh->GetMin());
+
+  // Get the Cube submesh
+  common::SubMesh submesh(mesh->GetSubMesh("Cube"));
+
+  submesh.Center(math::Vector3(1, 2, 3));
+  EXPECT_EQ(math::Vector3(0, 1, 2), submesh.GetMin());
+  EXPECT_EQ(math::Vector3(2, 3, 4), submesh.GetMax());
+
+  submesh.Translate(math::Vector3(1, 2, 3));
+  EXPECT_EQ(math::Vector3(1, 3, 5), submesh.GetMin());
+  EXPECT_EQ(math::Vector3(3, 5, 7), submesh.GetMax());
+
+  // The original mesh should not change
+  EXPECT_EQ(math::Vector3(5.46554, 2.18039, 4.8431), mesh->GetMax());
+  EXPECT_EQ(math::Vector3(3.46555, 0.180391, 2.8431), mesh->GetMin());
+}
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

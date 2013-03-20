@@ -402,6 +402,24 @@ SubMesh::SubMesh()
 }
 
 //////////////////////////////////////////////////
+SubMesh::SubMesh(const SubMesh *_mesh)
+{
+  this->name = _mesh->name;
+  this->materialIndex = _mesh->materialIndex;
+  this->primitiveType = _mesh->primitiveType;
+
+  std::copy(_mesh->nodeAssignments.begin(), _mesh->nodeAssignments.end(),
+      std::back_inserter(this->nodeAssignments));
+
+  std::copy(_mesh->indices.begin(), _mesh->indices.end(),
+      std::back_inserter(this->indices));
+  std::copy(_mesh->texCoords.begin(), _mesh->texCoords.end(),
+      std::back_inserter(this->texCoords));
+  std::copy(_mesh->vertices.begin(), _mesh->vertices.end(),
+      std::back_inserter(this->vertices));
+}
+
+//////////////////////////////////////////////////
 SubMesh::~SubMesh()
 {
   this->vertices.clear();
