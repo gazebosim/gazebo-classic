@@ -793,7 +793,7 @@ TEST(MsgsTest, MeshFromSDF)
       "<sdf version='" SDF_VERSION "'>\
            <geometry>\
              <mesh>\
-               <uri>model://test/mesh.dae</uri>\
+               <uri>test/mesh.dae</uri>\
                <scale>1 2 3</scale>\
                <submesh>\
                  <name>test_name</name>\
@@ -806,7 +806,7 @@ TEST(MsgsTest, MeshFromSDF)
 
   msgs::MeshGeom msg = msgs::MeshFromSDF(sdf->GetElement("mesh"));
   EXPECT_TRUE(msg.has_filename());
-  EXPECT_STREQ("model://test/mesh.dae", msg.filename().c_str());
+  EXPECT_STREQ("test/mesh.dae", msg.filename().c_str());
 
   EXPECT_TRUE(msg.has_scale());
   EXPECT_DOUBLE_EQ(msg.scale().x(), 1.0);
