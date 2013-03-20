@@ -102,7 +102,7 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
   }
 }
 
-TEST_F(JointTest, joint_SDF14)
+TEST_F(Joint_TEST, joint_SDF14)
 {
   Load("worlds/SDF_1_4.world");
 
