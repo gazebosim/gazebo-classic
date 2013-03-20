@@ -1,0 +1,159 @@
+<!-- Joint -->
+<element name="joint" required="*">
+  <description>A joint connections two links with kinematic and dynamic properties.</description>
+
+  <attribute name="name" type="string" default="__default__" required="1">
+    <description>A unique name for the joint within the scope of the model.</description>
+  </attribute>
+
+  <attribute name="type" type="string" default="__default__" required="1">
+    <description>The type of joint, which must be one of the following: (revolute) a hinge joint that rotates on a single axis with either a fixed or continuous range of motion, (revolute2) same as two revolute joints connected in series, (prismatic) a sliding joint that slides along an axis with a limited range specified by upper and lower limits, (ball) a ball and socket joint, (universal), like a ball joint, but constrains one degree of freedom, (piston) similar to a Slider joint except that rotation around the translation axis is possible.</description>
+  </attribute>
+
+  <element name="parent" required="1">
+    <description>Parent link of the joint</description>
+    <element name="link_name" type="string" default="__default__" required="1">
+      <description>Name of the parent link</description>
+    </element>
+    <element name="pose" type="Pose" default="0 0 0 0 0 0" required="0">
+      <description>Experimental:  alternative joint pose specification.</description>
+    </element>
+  </element> <!-- End Parent -->
+
+  <element name="child" required="1">
+    <description>Child link of the joint</description>
+    <element name="link_name" type="string" default="__default__" required="1">
+      <description>Name of the child link</description>
+    </element>
+    <element name="pose" type="Pose" default="0 0 0 0 0 0" required="0">
+      <description>Experimental:  alternative joint pose specification.</description>
+    </element>
+  </element> <!-- End Child -->
+
+  <element name="pose"  type="pose" default="0 0 0 0 0 0" required="0">
+    <description>offset from child link origin in child link frame.</description>
+  </element>
+
+  <element name="thread_pitch" type="double" default="1.0" required="0">
+    <description></description>
+  </element>
+
+  <element name="axis" required="1">
+      <description>The joint axis specified in the joint frame. This is the axis of rotation for revolute joints, the axis of translation for prismatic joints. The axis is specified in the joint frame of reference.</description>
+    <element name="xyz" type="vector3" default="0 0 1" required="1">
+      <description>Represents the x,y,z components of a vector. The vector should be normalized.</description>
+    </element>
+    <element name="dynamics" required="0">
+      <description>An element specifying physical properties of the joint. These values are used to specify modeling properties of the joint, particularly useful for simulation.</description>
+      <element name="damping" type="double" default="0" required="0">
+        <description>The physical velocity dependent viscous damping coefficient of the joint.</description>
+      </element>
+      <element name="friction" type="double" default="0" required="0">
+        <description>The physical static friction value of the joint.</description>
+      </element>
+    </element> <!-- End Dynamics -->
+    <element name="limit" required="1">
+      <description>specifies the limits of this joint</description>
+      <element name="lower" type="double" default="-1e16" required="1">
+        <description>An attribute specifying the lower joint limit (radians for revolute joints, meters for prismatic joints). Omit if joint is continuous.</description>
+      </element>
+      <element name="upper" type="double" default="1e16" required="1">
+        <description>An attribute specifying the upper joint limit (radians for revolute joints, meters for prismatic joints). Omit if joint is continuous.</description>
+      </element>
+      <element name="effort" type="double" default="-1" required="0">
+        <description>An attribute for enforcing the maximum joint effort applied by Joint::SetForce.  Limit is not enforced if value is negative.</description>
+      </element>
+      <element name="velocity" type="double" default="-1" required="0">
+        <description>(not implemented) An attribute for enforcing the maximum joint velocity.</description>
+      </element>
+    </element> <!-- End Limit -->
+  </element> <!-- End Axis -->
+
+  <element name="axis2" required="0">
+    <description>The second joint axis specified in the joint frame. This is the second axis of rotation for revolute2 joints and universal joints. The axis is specified in the joint frame of reference.</description>
+    <element name="xyz" type="vector3" default="0 0 1" required="1">
+      <description>Represents the x,y,z components of a vector. The vector should be normalized.</description>
+    </element>
+    <element name="dynamics" required="0">
+      <description>An element specifying physical properties of the joint. These values are used to specify modeling properties of the joint, particularly useful for simulation.</description>
+      <element name="damping" type="double" default="0" required="0">
+        <description>The physical velocity dependent viscous damping coefficient of the joint.</description>
+      </element>
+      <element name="friction" type="double" default="0" required="0">
+        <description>The physical static friction value of the joint.</description>
+      </element>
+    </element> <!-- End Dynamics -->
+
+    <element name="limit" required="0">
+      <description></description>
+      <element name="lower" type="double" default="-1e16" required="0">
+        <description>An attribute specifying the lower joint limit (radians for revolute joints, meters for prismatic joints). Omit if joint is continuous.</description>
+      </element>
+      <element name="upper" type="double" default="1e16" required="0">
+        <description>An attribute specifying the upper joint limit (radians for revolute joints, meters for prismatic joints). Omit if joint is continuous.</description>
+      </element>
+      <element name="effort" type="double" default="-1" required="0">
+        <description>An attribute for enforcing the maximum joint effort applied by Joint::SetForce.  Limit is not enforced if value is negative.</description>
+      </element>
+      <element name="velocity" type="double" default="-1" required="0">
+        <description>(not implemented) An attribute for enforcing the maximum joint velocity.</description>
+      </element>
+    </element> <!-- End Limit -->
+  </element> <!-- End Axis2 -->
+
+  <element name="physics" required="0">
+    <description>Parameters that are specific to a certain physics engine.</description>
+    <element name="simbody" required="0">
+      <description>Simbody specific parameters</description>
+      <element name="must_be_loop_joint" type="bool" default="0" required="0">
+        <description>Force cut in the multibody graph at this joint.</description>
+      </element>
+    </element>
+    <element name="ode" required="0">
+      <description>ODE specific parameters</description>
+      <element name="provide_feedback" type="bool" default="0" required="0">
+        <description>If provide_feedback is set to true, ODE will compute the constraint forces at this joint.</description>
+      </element>
+
+      <element name="cfm_damping" type="bool" default="0" required="0">
+        <description>If cfm_damping is set to true, ODE will use CFM to simulate damping, allows for infinite damping, and one additional constraint row (previously used for joint limit) is always active.</description>
+      </element>
+
+      <element name="fudge_factor" type="double" default="0" required="0">
+        <description>Scale the excess for in a joint motor at joint limits. Should be between zero and one.</description>
+      </element>
+      <element name="cfm" type="double" default="0" required="0">
+        <description>Constraint force mixing used when not at a stop</description>
+      </element>
+      <element name="bounce" type="double" default="0" required="0">
+        <description>Bounciness of the limits</description>
+      </element>
+      <element name="max_force" type="double" default="0" required="0">
+        <description>Maximum force or torque used to reach the desired velocity.</description>
+      </element>
+      <element name="velocity" type="double" default="0" required="0">
+        <description>The desired velocity of the joint. Should only be set if you want the joint to move on load.</description>
+      </element>
+
+      <element name="limit" required="0">
+        <description></description>
+        <element name="cfm" type="double" default="0.0" required="1">
+          <description>Constraint force mixing parameter used by the joint stop</description>
+        </element>
+        <element name="erp" type="double" default="0.2" required="1">
+          <description>Error reduction parameter used by the joint stop</description>
+        </element>
+      </element>
+
+      <element name="suspension" required="0">
+        <description></description>
+        <element name="cfm" type="double" default="0.0" required="1">
+          <description>Suspension constraint force mixing parameter</description>
+        </element>
+        <element name="erp" type="double" default="0.2" required="1">
+          <description>Suspension error reduction parameter</description>
+        </element>
+      </element>
+    </element>
+  </element> <!-- End Physics -->
+</element> <!-- End Joint -->
