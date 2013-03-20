@@ -345,6 +345,9 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
       this->gui->Resize(this->viewport->getActualWidth(),
                         this->viewport->getActualHeight());
     }
+
+    delete [] this->saveFrameBuffer;
+    this->saveFrameBuffer = NULL;
   }
 }
 
