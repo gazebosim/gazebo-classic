@@ -36,6 +36,7 @@ class PhysicsTest : public ServerFixture
 #ifdef HAVE_SIMBODY
 TEST_F(PhysicsTest, RevoluteJointSimbody)
 {
+  gzerr << "running RevoluteJointSimbody\n";
   RevoluteJoint("simbody");
 }
 #endif  // HAVE_SIMBODY
@@ -71,13 +72,8 @@ TEST_F(PhysicsTest, CollisionTest)
 
     int steps = test_duration/dt;
 
-    bool start = false;
     for (int i = 0; i < steps; ++i)
     {
-
-      // if (!start)
-      //   getchar();
-      // start = true;
 
       double t = world->GetSimTime().Double();
 
@@ -709,6 +705,9 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   std::vector<std::string>::iterator modelIter;
   physics::JointPtr joint;
 
+  gzerr << "RevoluteJointSimbody 1 \n";
+  getchar();
+
   // Check global axes before simulation starts
   std::vector<math::Vector3>::iterator axisIter;
   axisIter = globalAxes.begin();
@@ -747,8 +746,8 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     ++axisIter;
   }
 
-  // gzerr << "waiting for getchar\n";
-  // getchar();
+  gzerr << "RevoluteJointSimbody 2 \n";
+  getchar();
 
   // Step forward 0.75 seconds
   double dt = physics->GetStepTime();
@@ -809,8 +808,8 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     }
   }
 
-  // gzerr << "waiting for getchar\n";
-  // getchar();
+  gzerr << "RevoluteJointSimbody 3 \n";
+  getchar();
 
   // Keep stepping forward, verifying that joint angles move in the direction
   // implied by the joint velocity
@@ -870,8 +869,9 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   }
 
 
-  // gzerr << "waiting for getchar (about to reset world)\n";
-  // getchar();
+  gzerr << "RevoluteJointSimbody 4 (Resetting world and setting stops"
+        << ", no test here) \n";
+  getchar();
 
   // Reset the world, and impose joint limits
   world->Reset();
@@ -906,8 +906,9 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     }
   }
 
-  // gzerr << "Step forward again for 0.75 seconds and check that joint angles\n";
-  // getchar();
+  gzerr << "RevoluteJointSimbody 5 \n";
+  getchar();
+
 
   // Step forward again for 0.75 seconds and check that joint angles
   // are within limits
@@ -944,9 +945,9 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     }
   }
 
-  // gzerr << "Reset world again, disable gravity, detach upper_joint"
-  //       << " Then apply torque at lower_joint and verify motion\n";
-  // getchar();
+  gzerr << "Reset world again, disable gravity, detach upper_joint"
+        << " Then apply torque at lower_joint and verify motion\n";
+  getchar();
 
   // Reset world again, disable gravity, detach upper_joint
   // Then apply torque at lower_joint and verify motion
@@ -1000,8 +1001,8 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         double oldVel, newVel, force;
         oldVel = joint->GetVelocity(0);
         // Apply positive torque to the lower_joint and step forward.
-        force = 100;
-        for (int i = 0; i < 1000; ++i)
+        force = 1;
+        for (int i = 0; i < 10; ++i)
         {
           joint->SetForce(0, force);
           world->StepWorld(1);
@@ -1029,8 +1030,8 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         // gzerr << "setting force to -300\n";
         // getchar();
         // Apply negative torque to lower_joint
-        force = -300;
-        for (int i = 0; i < 1000; ++i)
+        force = -3;
+        for (int i = 0; i < 10; ++i)
         {
           joint->SetForce(0, force);
           world->StepWorld(1);
@@ -1068,6 +1069,8 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       EXPECT_TRUE(model != NULL);
     }
   }
+  gzerr << "done RevoluteJointSimbody\n";
+  getchar();
 }
 
 TEST_F(PhysicsTest, RevoluteJointODE)
