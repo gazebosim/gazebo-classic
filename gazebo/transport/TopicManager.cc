@@ -148,17 +148,9 @@ void TopicManager::Publish(const std::string &_topic,
                            const boost::function<void()> &_cb)
 {
   PublicationPtr pub = this->FindPublication(_topic);
-  PublicationPtr dbgPub = this->FindPublication(_topic+"/__dbg");
 
   if (pub)
     pub->Publish(_message, _cb);
-
-  if (dbgPub && dbgPub->GetCallbackCount() > 0)
-  {
-    msgs::GzString dbgMsg;
-    dbgMsg.set_data(_message.DebugString());
-    dbgPub->Publish(dbgMsg);
-  }
 }
 
 //////////////////////////////////////////////////
@@ -325,14 +317,8 @@ PublicationPtr TopicManager::UpdatePublications(const std::string &topic,
   }
   else
   {
-    PublicationPtr dbgPub;
-    msgs::GzString tmp;
-
     pub = PublicationPtr(new Publication(topic, msgType));
-    dbgPub = PublicationPtr(new Publication(topic+"/__dbg",
-          tmp.GetTypeName()));
     this->advertisedTopics[topic] =  pub;
-    this->advertisedTopics[topic+"/__dbg"] = dbgPub;
     this->advertisedTopicsEnd = this->advertisedTopics.end();
   }
 
@@ -344,20 +330,14 @@ void TopicManager::Unadvertise(const std::string &_topic)
 {
   std::string t;
 
-  for (int i = 0; i < 2; i ++)
-  {
-    if (i == 0)
-      t = _topic;
-    else
-      t = _topic + "/__dbg";
+  t = _topic;
 
-    PublicationPtr publication = this->FindPublication(t);
-    if (publication && publication->GetLocallyAdvertised() &&
-        publication->GetTransportCount() == 0)
-    {
-      publication->SetLocallyAdvertised(false);
-      ConnectionManager::Instance()->Unadvertise(t);
-    }
+  PublicationPtr publication = this->FindPublication(t);
+  if (publication && publication->GetLocallyAdvertised() &&
+      publication->GetTransportCount() == 0)
+  {
+    publication->SetLocallyAdvertised(false);
+    ConnectionManager::Instance()->Unadvertise(t);
   }
 }
 

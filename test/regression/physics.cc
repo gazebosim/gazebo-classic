@@ -18,9 +18,11 @@
 #include "ServerFixture.hh"
 #include "physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
+
 class PhysicsTest : public ServerFixture
 {
   public: void EmptyWorld(const std::string &_physicsEngine);
@@ -57,7 +59,7 @@ void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
   // simulate a few steps
   int steps = 20;
   world->StepWorld(steps);
-  double dt = world->GetPhysicsEngine()->GetStepTime();
+  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   t = world->GetSimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
@@ -99,7 +101,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   EXPECT_LE(g.z, -9.8);
 
   // get physics time step
-  double dt = physics->GetStepTime();
+  double dt = physics->GetMaxStepSize();
   EXPECT_GT(dt, 0);
 
   // spawn some simple shapes and check to see that they start falling
@@ -269,7 +271,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   EXPECT_LT(g.z, 0);
 
   // get physics time step
-  double dt = physics->GetStepTime();
+  double dt = physics->GetMaxStepSize();
   EXPECT_GT(dt, 0);
 
   // spawn some spheres and check to see that they start falling
@@ -616,7 +618,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   }
 
   // Step forward 0.75 seconds
-  double dt = physics->GetStepTime();
+  double dt = physics->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   int steps = ceil(0.75 / dt);
   world->StepWorld(steps);
@@ -1016,7 +1018,7 @@ TEST_F(PhysicsTest, JointDampingTest)
   {
     // compare against recorded data only
     double test_duration = 1.5;
-    double dt = world->GetPhysicsEngine()->GetStepTime();
+    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
     int steps = test_duration/dt;
 
     for (int i = 0; i < steps; ++i)
@@ -1075,7 +1077,7 @@ TEST_F(PhysicsTest, DropStuff)
     double z = 10.5;
     double v = 0.0;
     double g = -10.0;
-    double dt = world->GetPhysicsEngine()->GetStepTime();
+    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
 
     // world->StepWorld(1428);  // theoretical contact, but
     // world->StepWorld(100);  // integration error requires few more steps
@@ -1183,7 +1185,7 @@ TEST_F(PhysicsTest, CollisionTest)
   {
     // todo: get parameters from drop_test.world
     double test_duration = 1.1;
-    double dt = world->GetPhysicsEngine()->GetStepTime();
+    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
 
     double f = 1000.0;
     double v = 0;
@@ -1308,7 +1310,7 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
     //       << "] v[" << vel
     //       << "]\n";
   }
-  physicsEngine->SetStepTime(0.0001);
+  physicsEngine->SetMaxStepSize(0.0001);
   physicsEngine->SetSORPGSIters(1000);
 
   {
@@ -1520,7 +1522,6 @@ TEST_F(PhysicsTest, CollisionFilteringBullet)
   CollisionFiltering("bullet");
 }
 #endif  // HAVE_BULLET
-
 
 int main(int argc, char **argv)
 {

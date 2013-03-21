@@ -128,11 +128,16 @@ class ServerFixture : public testing::Test
                               _paused, _physics));
 
                // Wait for the server to come up
-               // Use a 30 second timeout.
-               int waitCount = 0, maxWaitCount = 3000;
+               // Use a 60 second timeout.
+               int waitCount = 0, maxWaitCount = 6000;
                while ((!this->server || !this->server->GetInitialized()) &&
                       ++waitCount < maxWaitCount)
                  common::Time::MSleep(10);
+               gzwarn << "ServerFixture load in "
+                      << static_cast<double>(waitCount)/100.0
+                      << " seconds, timeout after "
+                      << static_cast<double>(maxWaitCount)/100.0
+                      << " seconds\n";
                ASSERT_LT(waitCount, maxWaitCount);
 
                this->node = transport::NodePtr(new transport::Node());
@@ -429,12 +434,7 @@ class ServerFixture : public testing::Test
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _modelName << "'>"
                  << "<static>true</static>"
-                 << "<pose>" << _pos.x << " "
-                             << _pos.y << " "
-                             << _pos.z << " "
-                             << _rpy.x << " "
-                             << _rpy.y << " "
-                             << _rpy.z << "</pose>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='body'>"
                  << "  <sensor name ='" << _cameraName
                  << "' type ='camera'>"
@@ -484,12 +484,7 @@ class ServerFixture : public testing::Test
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _modelName << "'>"
                  << "<static>true</static>"
-                 << "<pose>" << _pos.x << " "
-                             << _pos.y << " "
-                             << _pos.z << " "
-                             << _rpy.x << " "
-                             << _rpy.y << " "
-                             << _rpy.z << "</pose>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='body'>"
                  << "<collision name='parent_collision'>"
                  << "  <pose>0 0 0.0205 0 0 0</pose>"
@@ -534,6 +529,66 @@ class ServerFixture : public testing::Test
                EXPECT_LT(i, 50);
              }
 
+  /// \brief Spawn a contact sensor with the specified collision geometry
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _collisionType Type of collision, box or cylinder
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _static True to make the model static
+  protected: void SpawnUnitContactSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const std::string &_collisionType, const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy, bool _static = false)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+               std::ostringstream shapeStr;
+               if (_collisionType == "box")
+                 shapeStr << " <box><size>1 1 1</size></box>";
+               else if (_collisionType == "cylinder")
+               {
+                 shapeStr << "<cylinder>"
+                          << "  <radius>.5</radius><length>1.0</length>"
+                          << "</cylinder>";
+               }
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <collision name ='contact_collision'>"
+                 << "    <geometry>"
+                 << shapeStr.str()
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << shapeStr.str()
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "  <sensor name='" << _sensorName << "' type='contact'>"
+                 << "    <contact>"
+                 << "      <collision>contact_collision</collision>"
+                 << "    </contact>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
+             }
+
   protected: void SpawnCylinder(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  bool _static = false)
@@ -544,12 +599,7 @@ class ServerFixture : public testing::Test
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
-                 << "<pose>" << _pos.x << " "
-                             << _pos.y << " "
-                             << _pos.z << " "
-                             << _rpy.x << " "
-                             << _rpy.y << " "
-                             << _rpy.z << "</pose>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='body'>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
@@ -577,7 +627,6 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(10);
              }
 
-
   protected: void SpawnSphere(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  bool _wait = true, bool _static = false)
@@ -588,12 +637,7 @@ class ServerFixture : public testing::Test
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
-                 << "<pose>" << _pos.x << " "
-                             << _pos.y << " "
-                             << _pos.z << " "
-                             << _rpy.x << " "
-                             << _rpy.y << " "
-                             << _rpy.z << "</pose>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='body'>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
@@ -628,12 +672,7 @@ class ServerFixture : public testing::Test
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
-                 << "<pose>" << _pos.x << " "
-                             << _pos.y << " "
-                             << _pos.z << " "
-                             << _rpy.x << " "
-                             << _rpy.y << " "
-                             << _rpy.z << "</pose>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='body'>"
                  << "  <inertial>"
                  << "    <pose>" << _cog << " 0 0 0</pose>"
@@ -670,12 +709,7 @@ class ServerFixture : public testing::Test
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
-                 << "<pose>" << _pos.x << " "
-                             << _pos.y << " "
-                             << _pos.z << " "
-                             << _rpy.x << " "
-                             << _rpy.y << " "
-                             << _rpy.z << "</pose>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='body'>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
@@ -710,12 +744,7 @@ class ServerFixture : public testing::Test
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
-                 << "<pose>" << _pos.x << " "
-                             << _pos.y << " "
-                             << _pos.z << " "
-                             << _rpy.x << " "
-                             << _rpy.y << " "
-                             << _rpy.z << "</pose>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='body'>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
@@ -752,12 +781,7 @@ class ServerFixture : public testing::Test
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
-                 << "<pose>" << _pos.x << " "
-                             << _pos.y << " "
-                             << _pos.z << " "
-                             << _rpy.x << " "
-                             << _rpy.y << " "
-                             << _rpy.z << "</pose>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='body'>"
                  << "</link>"
                  << "</model>"
