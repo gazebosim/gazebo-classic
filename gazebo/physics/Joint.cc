@@ -226,32 +226,15 @@ void Joint::Init()
   }
   else
   {
+    // if parentLink is NULL, it's name be the world
+    this->sdf->GetElement("parent")->Set("world");
     if (this->sdf->HasElement("axis"))
     {
       this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-      if (this->sdf->GetValueString("parent") != "world")
-      {
-        gzwarn << "joint [" << this->GetScopedName()
-          << "] has a non-real parentLink ["
-          << this->sdf->GetValueString("parent")
-          << "], loading axis from SDF ["
-          << this->sdf->GetElement("axis")->GetValueVector3("xyz")
-          << "]\n";
-      }
     }
     if (this->sdf->HasElement("axis2"))
     {
       this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
-
-      if (this->sdf->GetValueString("parent") != "world")
-      {
-        gzwarn << "joint [" << this->GetScopedName()
-          << "] has a non-real parentLink ["
-          << this->sdf->GetValueString("parent")
-          << "], loading axis2 from SDF ["
-          << this->sdf->GetElement("axis2")->GetValueVector3("xyz")
-          << "]\n";
-      }
     }
   }
   this->ComputeInertiaRatio();
@@ -321,12 +304,10 @@ void Joint::Attach(LinkPtr _parent, LinkPtr _child)
 //////////////////////////////////////////////////
 void Joint::Detach()
 {
-  BasePtr myBase = shared_from_this();
-
   if (this->parentLink)
-    this->parentLink->RemoveChildJoint(
-      boost::shared_static_cast<Joint>(myBase));
-  this->childLink->RemoveParentJoint(boost::shared_static_cast<Joint>(myBase));
+    this->parentLink->RemoveChildJoint(this->GetName());
+  if (this->childLink)
+    this->childLink->RemoveParentJoint(this->GetName());
 }
 
 //////////////////////////////////////////////////
