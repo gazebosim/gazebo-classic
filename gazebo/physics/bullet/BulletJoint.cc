@@ -138,11 +138,11 @@ JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
     wrench.body1Torque = BulletTypes::ConvertVector3(fb->m_appliedTorqueBodyB);
     wrench.body2Torque = BulletTypes::ConvertVector3(fb->m_appliedTorqueBodyA);
 
-/*    gzerr << "num constraints " << this->bulletWorld->getNumConstraints() << std::endl;
+//    gzerr << "num constraints " << this->bulletWorld->getNumConstraints() << std::endl;
     gzerr << "force " << wrench.body1Force << " , " << wrench.body2Force << std::endl;
     gzerr << "torque " << wrench.body1Torque << " , " << wrench.body2Torque << std::endl;
 
-    gzerr << " bt torque " << fb->m_appliedTorqueBodyB.x() << " " << fb->m_appliedTorqueBodyB.y() << " " << fb->m_appliedTorqueBodyB.z() << std::endl;
+/*    gzerr << " bt torque " << fb->m_appliedTorqueBodyB.x() << " " << fb->m_appliedTorqueBodyB.y() << " " << fb->m_appliedTorqueBodyB.z() << std::endl;
 
     gzerr << "anchor " << this->anchorPos << ", " << this->anchorPose << " "<< std::endl;
     gzerr << "global axis " << this->GetGlobalAxis(0) << std::endl;
