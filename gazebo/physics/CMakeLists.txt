@@ -128,5 +128,5 @@ gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 # unit tests
 set (gtest_sources
   Inertial_TEST.cc
-)
+  Joint_TEST.cc)
 gz_build_tests(${gtest_sources})
