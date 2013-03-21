@@ -24,6 +24,10 @@ struct AVCodecContext;
 struct AVFrame;
 struct AVPicture;
 struct SwsContext;
+struct AVOutputFormat;
+struct AVFormatContext;
+struct AVStream;
+struct AVPacket;
 
 namespace gazebo
 {
@@ -44,8 +48,6 @@ namespace gazebo
 
       /// \brief Initialize the encoder
       public: void Init();
-
-      public: void Init2();
 
       /// \brief True if the enoder is initialized, false otherwise
       public: bool IsInitialized();
@@ -88,11 +90,19 @@ namespace gazebo
       /// \brief libav main external API structure
       private: AVCodecContext *codecCtx;
 
+      private: AVOutputFormat *pOutputFormat;
+
+      private: AVFormatContext *pFormatCtx;
+
+      private: AVStream *pVideoStream;
+
       /// \brief audi video picture
       //private: AVPicture *pic;
 
       /// \brief Encoding buffer
       private: unsigned char *outbuf;
+
+      private: unsigned char *pictureBuf;
 
       /// \brief True if the encoder is initialized
       private: bool initialized;
@@ -116,11 +126,24 @@ namespace gazebo
 
       private: int currentBufferSize;
 
+      private: AVFrame *avFrame;
+
       private: std::vector<AVFrame *> frames;
 
       private: unsigned int outputFrameSize;
 
       private: std::string filename;
+
+      private: std::string format;
+
+      /// \brief Handl to the output video file
+      private: FILE *fileHandle;
+
+      /// \brief Number of bytes used from buffer
+      private: int outSize;
+
+      private: unsigned int fps;
+
     };
     /// \}
   }
