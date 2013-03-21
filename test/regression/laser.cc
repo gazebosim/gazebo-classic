@@ -271,7 +271,9 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
   double rangeResolution = 0.02;
   unsigned int samples = 320;
   std::string noiseType = "gaussian";
-  double noiseMean = 1.0;
+  // Give negative bias so that we can see the effect (positive bias 
+  // would be removed by clamp(minRange,maxRange).
+  double noiseMean = -1.0;
   double noiseStdDev = 0.01;
   math::Pose testPose(math::Vector3(0, 0, 0),
       math::Quaternion(0, 0, 0));

@@ -305,8 +305,8 @@ void RaySensor::UpdateImpl(bool /*_force*/)
         case GAUSSIAN:
           // Add independent (uncorrelated) Gaussian noise to each beam.
           range += math::Rand::GetDblNormal(this->noiseMean, this->noiseStdDev);
-          // No real laser would return a negative range.
-          range = math::clamp(range, 0.0, range);
+          // No real laser would return a range outside its stated limits.
+          range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
           break;
         default:
           GZ_ASSERT(false, "Invalid noise model type");
