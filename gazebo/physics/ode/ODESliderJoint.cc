@@ -54,7 +54,11 @@ void ODESliderJoint::Load(sdf::ElementPtr _sdf)
 math::Vector3 ODESliderJoint::GetGlobalAxis(int /*_index*/) const
 {
   dVector3 result;
-  dJointGetSliderAxis(this->jointId, result);
+  if (this->jointId)
+    dJointGetSliderAxis(this->jointId, result);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
   return math::Vector3(result[0], result[1], result[2]);
 }
 
@@ -64,6 +68,9 @@ math::Angle ODESliderJoint::GetAngleImpl(int /*_index*/) const
   math::Angle result;
   if (this->jointId)
     result = dJointGetSliderPosition(this->jointId);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
   return result;
 }
 
@@ -73,6 +80,9 @@ double ODESliderJoint::GetVelocity(int /*index*/) const
   double result = 0;
   if (this->jointId)
     result = dJointGetSliderPositionRate(this->jointId);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
   return result;
 }
 
@@ -89,7 +99,10 @@ void ODESliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
     this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
 
-  dJointSetSliderAxis(this->jointId, _axis.x, _axis.y, _axis.z);
+  if (this->jointId)
+    dJointSetSliderAxis(this->jointId, _axis.x, _axis.y, _axis.z);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -122,7 +135,10 @@ void ODESliderJoint::SetForce(int _index, double _effort)
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  dJointAddSliderForce(this->jointId, _effort);
+  if (this->jointId)
+    dJointAddSliderForce(this->jointId, _effort);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -135,7 +151,13 @@ void ODESliderJoint::SetParam(int _parameter, double _value)
 //////////////////////////////////////////////////
 double ODESliderJoint::GetParam(int _parameter) const
 {
-  double result = dJointGetSliderParam(this->jointId, _parameter);
+  double result = 0;
+
+  if (this->jointId)
+   result = dJointGetSliderParam(this->jointId, _parameter);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
   return result;
 }
 
@@ -150,8 +172,3 @@ double ODESliderJoint::GetMaxForce(int /*_index*/)
 {
   return this->GetParam(dParamFMax);
 }
-
-
-
-
-
