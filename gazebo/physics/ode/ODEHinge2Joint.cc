@@ -54,10 +54,15 @@ math::Vector3 ODEHinge2Joint::GetAnchor(int _index) const
 {
   dVector3 result;
 
-  if (_index == 0)
-    dJointGetHinge2Anchor(this->jointId, result);
+  if (this->jointId)
+  {
+    if (_index == 0)
+      dJointGetHinge2Anchor(this->jointId, result);
+    else
+      dJointGetHinge2Anchor2(this->jointId, result);
+  }
   else
-    dJointGetHinge2Anchor2(this->jointId, result);
+    gzerr << "ODE Joint ID is invalid\n";
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -65,21 +70,34 @@ math::Vector3 ODEHinge2Joint::GetAnchor(int _index) const
 //////////////////////////////////////////////////
 void ODEHinge2Joint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 {
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
-  dJointSetHinge2Anchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  if (this->childLink)
+    this->childLink->SetEnabled(true);
+  if (this->parentLink)
+    this->parentLink->SetEnabled(true);
+
+  if (this->jointId)
+    dJointSetHinge2Anchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
 void ODEHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 {
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childLink)
+    this->childLink->SetEnabled(true);
+  if (this->parentLink)
+    this->parentLink->SetEnabled(true);
 
-  if (_index == 0)
-    dJointSetHinge2Axis1(this->jointId, _axis.x, _axis.y, _axis.z);
+  if (this->jointId)
+  {
+    if (_index == 0)
+      dJointSetHinge2Axis1(this->jointId, _axis.x, _axis.y, _axis.z);
+    else
+      dJointSetHinge2Axis2(this->jointId, _axis.x, _axis.y, _axis.z);
+  }
   else
-    dJointSetHinge2Axis2(this->jointId, _axis.x, _axis.y, _axis.z);
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -105,6 +123,8 @@ math::Angle ODEHinge2Joint::GetAngleImpl(int _index) const
     if (_index == 0)
       result = dJointGetHinge2Angle1(this->jointId);
   }
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -112,12 +132,17 @@ math::Angle ODEHinge2Joint::GetAngleImpl(int _index) const
 //////////////////////////////////////////////////
 double ODEHinge2Joint::GetVelocity(int _index) const
 {
-  double result;
+  double result = 0;
 
-  if (_index == 0)
-    result = dJointGetHinge2Angle1Rate(this->jointId);
+  if (this->jointId)
+  {
+    if (_index == 0)
+      result = dJointGetHinge2Angle1Rate(this->jointId);
+    else
+      result = dJointGetHinge2Angle2Rate(this->jointId);
+  }
   else
-    result = dJointGetHinge2Angle2Rate(this->jointId);
+    gzerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -181,16 +206,27 @@ void ODEHinge2Joint::SetForce(int _index, double _effort)
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  if (_index == 0)
-    dJointAddHinge2Torques(this->jointId, _effort, 0);
+  if (this->jointId)
+  {
+    if (_index == 0)
+      dJointAddHinge2Torques(this->jointId, _effort, 0);
+    else
+      dJointAddHinge2Torques(this->jointId, 0, _effort);
+  }
   else
-    dJointAddHinge2Torques(this->jointId, 0, _effort);
+    gzerr << "ODE Joint ID is invalid\n";
+
 }
 
 //////////////////////////////////////////////////
 double ODEHinge2Joint::GetParam(int _parameter) const
 {
-  double result = dJointGetHinge2Param(this->jointId, _parameter);
+  double result = 0;
+
+  if (this->jointId)
+    result = dJointGetHinge2Param(this->jointId, _parameter);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -199,5 +235,8 @@ double ODEHinge2Joint::GetParam(int _parameter) const
 void ODEHinge2Joint::SetParam(int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
-  dJointSetHinge2Param(this->jointId, _parameter, _value);
+  if (this->jointId)
+    dJointSetHinge2Param(this->jointId, _parameter, _value);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
