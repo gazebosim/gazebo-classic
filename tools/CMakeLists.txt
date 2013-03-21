@@ -12,7 +12,7 @@ include_directories(
 )
 
 set (test_sources 
-  gz_log_TEST.cc 
+  gzlog_TEST.cc 
 )
 
 gz_build_tests(${test_sources})

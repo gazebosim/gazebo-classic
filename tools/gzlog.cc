@@ -48,8 +48,8 @@ class FilterBase
   }
 
   /// \brief Output a line of date
-  public: std::ostringstream &Out(std::ostringstream &_stream, 
-              const gazebo::physics::State &_state) __attribute__ ((deprecated)) #pragma message "my deprecation warning"
+  public: std::ostringstream &Out(std::ostringstream &_stream,
+              const gazebo::physics::State &_state)
           {
             if (!this->xmlOutput && !this->stamp.empty())
             {
@@ -66,7 +66,7 @@ class FilterBase
 
   /// \brief Filter a pose.
   /// \param[in] _pose The pose to filter.
-  /// \param[in] _filter The filter string [x,y,z]. 
+  /// \param[in] _filter The filter string [x,y,z].
   public: std::string FilterPose(const gazebo::math::Pose &_pose,
               const std::string &_xmlName,
               std::string _filter,
@@ -103,7 +103,7 @@ class FilterBase
                   elements.begin(); elemIter != elements.end();
                   ++elemIter)
               {
-                switch((*elemIter)[0])
+                switch ((*elemIter)[0])
                 {
                   case 'x':
                     this->Out(result, _state) << std::fixed
@@ -212,24 +212,17 @@ class JointFilter : public FilterBase
 
                   if (this->xmlOutput)
                   {
-                    result << "<angle axis='" << *elemIter << "'>" << angle
-                      << "</angle>\n";
+                    result << "<angle axis='" << *elemIter << "'>"
+                      << std::fixed << angle << "</angle>\n";
                   }
                   else
-                    this->Out(result, _state) << angle << " ";
+                    this->Out(result, _state) << std::fixed << angle << " ";
                 }
-                catch (...)
+                catch(...)
                 {
                   gzerr << "Inavlid axis value[" << *elemIter << "]\n";
                 }
               }
-              result << std::endl;
-            }
-            else
-            {
-              // No filter, so output the whole pose.
-              //result << std::fixed << xmlPrefix << _pose
-              //  << xmlSuffix << std::endl;
             }
 
             return result.str();
@@ -275,7 +268,12 @@ class JointFilter : public FilterBase
                   result << "</joint>\n";
               }
               else
-                result << *iter << std::endl;
+              {
+                if (!this->xmlOutput && (*iter).GetAngleCount() == 1)
+                  result << std::fixed <<  (*iter).GetAngle(0);
+                else
+                  result << std::fixed << *iter;
+              }
             }
 
             return result.str();
@@ -386,7 +384,7 @@ class LinkFilter : public FilterBase
                   result << "</link>\n";
               }
               else
-                result << *iter << std::endl;
+                result << std::fixed << *iter << std::endl;
             }
 
             return result.str();
@@ -421,24 +419,26 @@ class ModelFilter : public FilterBase
           {
             this->linkFilter = NULL;
             this->jointFilter = NULL;
+            this->parts.clear();
+
+            if (_filter.empty())
+              return;
 
             std::list<std::string> mainParts;
             boost::split(mainParts, _filter, boost::is_any_of("/"));
 
-            // Get the model filter from the command line argument.
-            // size_t index = _filter.find("/");
-            // std::string modelFilter = _filter.substr(0, index);
-
-            // Split the model filter on dots.
-          
             // Create the model filter
-            if (mainParts.size()) 
+            if (mainParts.size())
             {
               boost::split(this->parts, mainParts.front(),
-                           boost::is_any_of("."));
+                  boost::is_any_of("."));
               if (this->parts.size() == 0 && !mainParts.front().empty())
                 this->parts.push_back(mainParts.front());
             }
+
+            if (!mainParts.size())
+              return;
+
             mainParts.pop_front();
 
             // Create the link filter
@@ -447,12 +447,17 @@ class ModelFilter : public FilterBase
               this->linkFilter = new LinkFilter(this->xmlOutput, this->stamp);
               this->linkFilter->Init(mainParts.front());
             }
+
+            if (!mainParts.size())
+              return;
+
             mainParts.pop_front();
 
             // Create the joint filter
             if (mainParts.size())
             {
-              this->jointFilter = new JointFilter(this->xmlOutput, this->stamp);
+              this->jointFilter = new JointFilter(this->xmlOutput,
+                  this->stamp);
               this->jointFilter->Init(mainParts.front());
             }
           }
@@ -517,9 +522,9 @@ class ModelFilter : public FilterBase
             {
               // If no link filter, and no model parts, then output the
               // whole model state.
-              if (!this->linkFilter && !this->jointFilter && 
+              if (!this->linkFilter && !this->jointFilter &&
                   partIter == this->parts.end())
-                result << *iter << std::endl;
+                result << std::fixed << *iter;
               else
               {
                 if (this->xmlOutput)
@@ -560,8 +565,10 @@ class StateFilter : public FilterBase
 {
   /// \brief Constructor
   /// \param[in] _xmlOutput True to format output as XML
-  public: StateFilter(bool _xmlOutput, const std::string &_stamp)
-          : FilterBase(_xmlOutput, _stamp), filter(_xmlOutput, _stamp)
+  public: StateFilter(bool _xmlOutput, const std::string &_stamp,
+              double _hz = 0)
+          : FilterBase(_xmlOutput, _stamp), filter(_xmlOutput, _stamp),
+          hz(_hz)
           {}
 
   /// \brief Initialize the filter with a set of parameters.
@@ -584,6 +591,15 @@ class StateFilter : public FilterBase
 
             std::ostringstream result;
 
+            if (this->hz > 0.0 && this->prevTime != gazebo::common::Time::Zero)
+            {
+              if ((state.GetRealTime() - this->prevTime).Double() <
+                  1.0 / this->hz)
+              {
+                return result.str();
+              }
+            }
+
             if (this->xmlOutput)
             {
               result << "<state name='" << state.GetName() << "'>\n"
@@ -595,13 +611,20 @@ class StateFilter : public FilterBase
             result << this->filter.Filter(state);
 
             if (this->xmlOutput)
-              result << "</state>";
+              result << "</state>\n";
 
+            this->prevTime = state.GetRealTime();
             return result.str();
           }
 
-   /// \brief Filter for a model.
-   public: ModelFilter filter;
+  /// \brief Filter for a model.
+  private: ModelFilter filter;
+
+  /// \brief Rate at which to output states.
+  private: double hz;
+
+  /// \brief Previous time a state was output.
+  private: gazebo::common::Time prevTime;
 };
 
 
@@ -801,11 +824,12 @@ void info(const std::string &_filename)
 /////////////////////////////////////////////////
 /// \brief Dump the contents of a log file to screen
 /// \param[in] _filter Filter string
-void echo(const std::string &_filter, bool _raw, const std::string &_stamp)
+void echo(const std::string &_filter, bool _raw, const std::string &_stamp,
+    double _hz)
 {
   std::string stateString;
 
-  StateFilter filter(!_raw, _stamp);
+  StateFilter filter(!_raw, _stamp, _hz);
   filter.Init(_filter);
 
   for (unsigned int i = 0;
@@ -820,21 +844,22 @@ void echo(const std::string &_filter, bool _raw, const std::string &_stamp)
       stateString.clear();
 
     if (!stateString.empty())
-      std::cout << stateString << "\n";
+      std::cout << stateString;
   }
 }
 
 /////////////////////////////////////////////////
 /// \brief Step through a log file.
 /// \param[in] _filter Filter string
-void step(const std::string &_filter, bool _raw, const std::string &_stamp)
+void step(const std::string &_filter, bool _raw, const std::string &_stamp,
+    double _hz)
 {
   std::string stateString;
   gazebo::common::LogPlay *play = gazebo::common::LogPlay::Instance();
 
   char c = '\0';
 
-  StateFilter filter(!_raw, _stamp);
+  StateFilter filter(!_raw, _stamp, _hz);
   filter.Init(_filter);
 
   for (unsigned int i = 0; i < play->GetChunkCount() && c != 'q'; ++i)
@@ -847,15 +872,19 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp)
     else if (!_filter.empty())
       stateString.clear();
 
-    std::cout << stateString << "\n";
+    // Only wait for user input if there is some state to output.
+    if (!stateString.empty())
+    {
+      std::cout << stateString;
 
-    std::cout << "\n--- Press space to continue, 'q' to quit ---\n";
+      std::cout << "\n--- Press space to continue, 'q' to quit ---\n";
 
-    c = '\0';
+      c = '\0';
 
-    // Wait for a space or 'q' key press
-    while (c != ' ' && c != 'q')
-      c = get_ch();
+      // Wait for a space or 'q' key press
+      while (c != ' ' && c != 'q')
+        c = get_ch();
+    }
   }
 }
 
@@ -872,8 +901,10 @@ int main(int argc, char **argv)
   visibleOptions.add_options()
     ("help,h", "Output this help message.")
     ("raw,r", "Output the data from echo and step without XML formatting.")
-    ("stamp,s",po::value<std::string>(),"Add a timestamp to each line of "
+    ("stamp,s", po::value<std::string>(), "Add a timestamp to each line of "
      "output. Valid values are (sim,real,wall)")
+    ("hz,z", po::value<double>(), "Filter output to the specified Hz rate.\
+     Only valid for echo and step commands.")
     ("file,f", po::value<std::string>(), "Path to a log file.")
     ("filter", po::value<std::string>(),
      "Filter output. Valid only for the echo and step commands");
@@ -940,13 +971,17 @@ int main(int argc, char **argv)
   if (vm.count("stamp"))
     stamp = vm["stamp"].as<std::string>();
 
+  double hz = 0;
+  if (vm.count("hz"))
+    hz = vm["hz"].as<double>();
+
   // Process the command
   if (command == "info")
     info(filename);
   else if (command == "echo")
-    echo(filter, vm.count("raw"), stamp);
+    echo(filter, vm.count("raw"), stamp, hz);
   else if (command == "step")
-    step(filter, vm.count("raw"), stamp);
+    step(filter, vm.count("raw"), stamp, hz);
 
   return 0;
 }
