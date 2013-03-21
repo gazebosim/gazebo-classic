@@ -42,8 +42,8 @@
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/gui/model_editor/BuildingEditorPalette.hh"
-#include "gazebo/gui/model_editor/EditorEvents.hh"
+#include "gazebo/gui/building/BuildingEditorPalette.hh"
+#include "gazebo/gui/building/EditorEvents.hh"
 
 #include "sdf/sdf.hh"
 
