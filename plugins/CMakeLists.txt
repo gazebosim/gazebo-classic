@@ -27,6 +27,7 @@ set (plugins
   RubblePlugin
   SpringTestPlugin
   DiffDrivePlugin
+  SkidSteerDrivePlugin
   JointTrajectoryPlugin
   VehiclePlugin)
 

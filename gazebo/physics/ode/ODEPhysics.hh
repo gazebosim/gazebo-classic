@@ -93,12 +93,6 @@ namespace gazebo
                       { return "ode"; }
 
       // Documentation inherited
-      public: virtual void SetStepTime(double _value);
-
-      // Documentation inherited
-      public: virtual double GetStepTime();
-
-      // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
       // Documentation inherited
@@ -169,6 +163,20 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
+
+      /// Documentation inherited
+      public: virtual void SetParam(PhysicsParam _param,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual void SetParam(const std::string &_key,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(const std::string &_key) const;
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(PhysicsParam _attr) const;
 
       /// \brief Return the world space id.
       /// \return The space id for the world.
@@ -241,9 +249,6 @@ namespace gazebo
 
       /// \brief Collision attributes
       private: dJointGroupID contactGroup;
-
-      /// \brief Store the value of the stepTime parameter to improve efficiency
-      private: double stepTimeDouble;
 
       /// \brief The type of the solver.
       private: std::string stepType;

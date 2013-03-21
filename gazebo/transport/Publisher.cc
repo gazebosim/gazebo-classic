@@ -59,12 +59,9 @@ Publisher::~Publisher()
 //////////////////////////////////////////////////
 bool Publisher::HasConnections() const
 {
-  return ((this->publications[0] &&
-           (this->publications[0]->GetCallbackCount() > 0 ||
-            this->publications[0]->GetNodeCount() > 0)) ||
-          (this->publications[1] &&
-           (this->publications[1]->GetCallbackCount() > 0 ||
-            this->publications[1]->GetNodeCount() > 0)));
+  return (this->publication &&
+      (this->publication->GetCallbackCount() > 0 ||
+       this->publication->GetNodeCount() > 0));
 }
 
 //////////////////////////////////////////////////
@@ -184,7 +181,14 @@ void Publisher::OnPublishComplete()
 //////////////////////////////////////////////////
 void Publisher::SetPublication(PublicationPtr &_publication, int _i)
 {
-  this->publications[_i] = _publication;
+  if (_i == 0)
+    this->publication = _publication;
+}
+
+//////////////////////////////////////////////////
+void Publisher::SetPublication(PublicationPtr _publication)
+{
+  this->publication = _publication;
 }
 
 //////////////////////////////////////////////////

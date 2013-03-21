@@ -26,6 +26,7 @@ endif()
 
 set(tests
   bandwidth.cc
+  contact_sensor.cc
   factory.cc
   file_handling.cc
   laser.cc
