@@ -1,5 +1,6 @@
 /*
  * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Dereck Wonnacott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +19,10 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
-
+#include <math/gzmath.hh>
 
 #include <iostream>
 
-/////////////////////////////////////////////////
-// Function is called everytime a message is received.
-void cb(ConstWorldStatisticsPtr &_msg)
-{
-  // Dump the message contents to stdout.
-  std::cout << _msg->DebugString();
-}
 
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
@@ -40,15 +34,31 @@ int main(int _argc, char **_argv)
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
   node->Init();
 
-  // Listen to Gazebo world_stats topic
-  gazebo::transport::SubscriberPtr sub = node->Subscribe("~/world_stats", cb);
-
   // Start transport
   gazebo::transport::run();
 
-  // Busy wait loop...replace with your own code as needed.
+  // Publish to a Gazebo topic
+  gazebo::transport::PublisherPtr pub =
+    node->Advertise<gazebo::msgs::Pose>("~/pose_example");
+
+  // Wait for a subscriber to connect
+  pub->WaitForConnection();
+
+  // Publisher loop...replace with your own code.
   while (true)
-    gazebo::common::Time::MSleep(10);
+  {
+    // Throttle Publication
+    gazebo::common::Time::MSleep(100);
+
+    // Generate a pose
+    gazebo::math::Pose pose(1, 2, 3, 4, 5, 6);
+
+    // Convert to a pose message
+    gazebo::msgs::Pose msg;
+    gazebo::msgs::Set(&msg, pose);
+
+    pub->Publish(msg);
+  }
 
   // Make sure to shut everything down.
   gazebo::transport::fini();
