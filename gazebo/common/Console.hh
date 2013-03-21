@@ -77,6 +77,10 @@ namespace gazebo
       /// \brief Load the message parameters
       public: void Init(const std::string &_logFilename);
 
+      /// \brief Return true if Init has been called.
+      /// \return True is initialized.
+      public: bool IsInitialized() const;
+
       /// \brief Set quiet output
       /// \param[in] q True to prevent warning
       public: void SetQuiet(bool _q);

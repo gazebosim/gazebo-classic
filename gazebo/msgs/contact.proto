@@ -20,5 +20,5 @@ message Contact
   repeated JointWrench wrench = 6;
 
   required Time time         = 7;
+  required string world      = 8;
 }
-
