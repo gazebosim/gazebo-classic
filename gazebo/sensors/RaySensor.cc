@@ -118,10 +118,12 @@ void RaySensor::Load(const std::string &_worldName)
       this->noiseMean = noiseElem->GetValueDouble("mean");
       this->noiseStdDev = noiseElem->GetValueDouble("stddev");
       this->noiseActive = true;
-      gzlog << "applying Gaussian noise model with mean " << this->noiseMean << " and stddev " << this->noiseStdDev << std::endl;
+      gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
+        " and stddev " << this->noiseStdDev << std::endl;
     }
     else
-      gzwarn << "ignoring unknown noise model type \"" << type << "\"" << std::endl;
+      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
+        std::endl;
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);

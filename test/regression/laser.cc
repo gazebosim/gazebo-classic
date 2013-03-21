@@ -271,7 +271,7 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
   double rangeResolution = 0.02;
   unsigned int samples = 320;
   std::string noiseType = "gaussian";
-  // Give negative bias so that we can see the effect (positive bias 
+  // Give negative bias so that we can see the effect (positive bias
   // would be removed by clamp(minRange,maxRange).
   double noiseMean = -1.0;
   double noiseStdDev = 0.01;
@@ -280,7 +280,7 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
 
   SpawnRaySensor(modelName, raySensorName, testPose.pos,
       testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
-      rangeResolution, samples, 
+      rangeResolution, samples,
       noiseType, noiseMean, noiseStdDev);
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);

@@ -186,7 +186,7 @@ namespace gazebo
       // If noiseType==GAUSSIAN, noiseMean is the mean of the distibution
       // from which we sample
       private: double noiseMean;
-      // If noiseType==GAUSSIAN, noiseStdDev is the standard devation of 
+      // If noiseType==GAUSSIAN, noiseStdDev is the standard devation of
       // the distibution from which we sample
       private: double noiseStdDev;
     };
