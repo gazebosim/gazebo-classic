@@ -1058,8 +1058,9 @@ static std::string pr2StateLog =
 "  </model>\n"
 "</state>";
 
-std::string custom_exec(const std::string &_cmd)
+std::string custom_exec(std::string _cmd)
 {
+  _cmd += " 2>/dev/null";
   FILE* pipe = popen(_cmd.c_str(), "r");
 
   if (!pipe)

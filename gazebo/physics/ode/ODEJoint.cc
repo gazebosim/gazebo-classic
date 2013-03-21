@@ -43,11 +43,13 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->cfmDampingState[0] = ODEJoint::NONE;
   this->cfmDampingState[1] = ODEJoint::NONE;
   this->dampingInitialized = false;
+  this->feedback = NULL;
 }
 
 //////////////////////////////////////////////////
 ODEJoint::~ODEJoint()
 {
+  delete this->feedback;
   this->Detach();
   dJointDestroy(this->jointId);
 }
@@ -207,6 +209,7 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 //////////////////////////////////////////////////
 void ODEJoint::Detach()
 {
+  Joint::Detach();
   this->childLink.reset();
   this->parentLink.reset();
   dJointAttach(this->jointId, 0, 0);
