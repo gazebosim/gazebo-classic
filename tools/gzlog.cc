@@ -41,13 +41,16 @@ sdf::ElementPtr g_stateSdf;
 class FilterBase
 {
   /// \brief Constructor
-  /// \param[in] _xmlOutput True if the output should be in XML format
+  /// \param[in] _xmlOutput True if the output should be in XML format.
+  /// \param[in[ _stamp Type of stamp to apply.
   public: FilterBase(bool _xmlOutput, const std::string &_stamp)
           : xmlOutput(_xmlOutput), stamp(_stamp)
   {
   }
 
-  /// \brief Output a line of date
+  /// \brief Output a line of data.
+  /// \param[in] _stream The output stream.
+  /// \param[in] _state Current state.
   public: std::ostringstream &Out(std::ostringstream &_stream,
               const gazebo::physics::State &_state)
           {
@@ -66,7 +69,9 @@ class FilterBase
 
   /// \brief Filter a pose.
   /// \param[in] _pose The pose to filter.
-  /// \param[in] _filter The filter string [x,y,z].
+  /// \param[in] _xmlName Name of the xml tag.
+  /// \param[in] _filter The filter string [x,y,z,r,p,a].
+  /// \param[in] _state Current state.
   public: std::string FilterPose(const gazebo::math::Pose &_pose,
               const std::string &_xmlName,
               std::string _filter,
@@ -105,24 +110,32 @@ class FilterBase
               {
                 switch ((*elemIter)[0])
                 {
+                  case 'X':
                   case 'x':
                     this->Out(result, _state) << std::fixed
                       << _pose.pos.x << " ";
                     break;
+                  case 'Y':
                   case 'y':
-                    result << std::fixed << _pose.pos.y << " ";
+                    this->Out(result, _state) << std::fixed
+                      << _pose.pos.y << " ";
                     break;
+                  case 'Z':
                   case 'z':
-                    result << std::fixed << _pose.pos.z << " ";
+                    this->Out(result, _state) << std::fixed
+                      << _pose.pos.z << " ";
                     break;
+                  case 'R':
                   case 'r':
-                    result << std::fixed << rpy.x << " ";
+                    this->Out(result, _state) << std::fixed << rpy.x << " ";
                     break;
+                  case 'P':
                   case 'p':
-                    result << std::fixed << rpy.y << " ";
+                    this->Out(result, _state) << std::fixed << rpy.y << " ";
                     break;
+                  case 'A':
                   case 'a':
-                    result << std::fixed << rpy.z << " ";
+                    this->Out(result, _state) << std::fixed << rpy.z << " ";
                     break;
                   default:
                     gzerr << "Invalid pose value[" << *elemIter << "]\n";
@@ -141,7 +154,7 @@ class FilterBase
             return result.str();
           }
 
-  /// \brief True if XML output is requeested.
+  /// \brief True if XML output is requested.
   protected: bool xmlOutput;
 
   /// \brief Time stamp type
