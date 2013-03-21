@@ -7,9 +7,7 @@ package gazebo.msgs;
 
 message WorldModify
 {
-  required string world_name    = 1;
-  optional bool remove          = 2;
-  optional bool create          = 3;
+  required string world_name = 1;
+  optional bool remove = 2;
+  optional bool create = 3;
 }
-
-
