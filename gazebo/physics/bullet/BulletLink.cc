@@ -163,7 +163,6 @@ void BulletLink::Init()
       this->GetModel()->GetJointCount() == 0 &&
       this->GetSensorCount() == 0)
   {
-
     this->rigidLink->setSleepingThresholds(0.1, 0.1);
     this->rigidLink->setDeactivationTime(1.0);
   }

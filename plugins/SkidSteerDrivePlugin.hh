@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_SkidSteerDrive_PLUGIN_HH__
-#define __GAZEBO_SkidSteerDrive_PLUGIN_HH__
+#ifndef _GAZEBO_SkidSteerDrive_PLUGIN_HH_
+#define _GAZEBO_SkidSteerDrive_PLUGIN_HH_
 
 #include <string>
 
-#include "common/common.hh"
-#include "physics/physics.hh"
-#include "transport/TransportTypes.hh"
-#include "gazebo.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/gazebo.hh"
 
 #define NUMBER_OF_WHEELS 4
 
@@ -30,7 +30,7 @@ namespace gazebo
 {
   // \class SkidSteerDrivePlugin SkidSteerDrivePlugin.hh
   /// \brief A gazebo model plugin that controls a four wheel skid-steer
-  ///        robot via a gazebo topic. See the Pioneer3AT model in the 
+  ///        robot via a gazebo topic. See the Pioneer3AT model in the
   ///        OSRF model database for an example use case.
   class SkidSteerDrivePlugin : public ModelPlugin
   {

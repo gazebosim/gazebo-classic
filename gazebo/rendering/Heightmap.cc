@@ -98,8 +98,6 @@ common::Image Heightmap::GetImage() const
   double minHeight = terrain->getMinHeight();
   double maxHeight = terrain->getMaxHeight() - minHeight;
 
-  std::cout << "MinHeight[" << minHeight << "] MaxHeight[" << maxHeight << "]\n";
-
   // Get the number of vertices along one side of the terrain
   uint16_t size = terrain->getSize();
 
@@ -487,27 +485,27 @@ double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _radius)
     return 0.0;
   }
 
-  uint16_t size = terrain->getSize();
+  int size = static_cast<int>(terrain->getSize());
 
   Ogre::Vector3 pos;
   terrain->getTerrainPosition(_pos, &pos);
 
-  long startx = (pos.x - _radius) * size;
-  long starty = (pos.y - _radius) * size;
-  long endx = (pos.x + _radius) * size;
-  long endy= (pos.y + _radius) * size;
+  int startx = (pos.x - _radius) * size;
+  int starty = (pos.y - _radius) * size;
+  int endx = (pos.x + _radius) * size;
+  int endy= (pos.y + _radius) * size;
 
-  startx = std::max(startx, 0L);
-  starty = std::max(starty, 0L);
+  startx = std::max(startx, 0);
+  starty = std::max(starty, 0);
 
-  endx = std::min(endx, (long)size);
-  endy = std::min(endy, (long)size);
+  endx = std::min(endx, size);
+  endy = std::min(endy, size);
 
   double sum = 0.0;
   int count = 0;
-  for (long y = starty; y <= endy; ++y)
+  for (int y = starty; y <= endy; ++y)
   {
-    for (long x = startx; x <= endx; ++x)
+    for (int x = startx; x <= endx; ++x)
     {
       sum += terrain->getHeightAtPoint(x, y);
       count++;
@@ -530,33 +528,33 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
     return;
   }
 
-  uint16_t size = terrain->getSize();
+  int size = static_cast<int>(terrain->getSize());
 
   Ogre::Vector3 pos;
   terrain->getTerrainPosition(_pos, &pos);
 
-  long startx = (pos.x - _outsideRadius) * size;
-  long starty = (pos.y - _outsideRadius) * size;
-  long endx = (pos.x + _outsideRadius) * size;
-  long endy= (pos.y + _outsideRadius) * size;
+  int startx = (pos.x - _outsideRadius) * size;
+  int starty = (pos.y - _outsideRadius) * size;
+  int endx = (pos.x + _outsideRadius) * size;
+  int endy= (pos.y + _outsideRadius) * size;
 
-  startx = std::max(startx, 0L);
-  starty = std::max(starty, 0L);
+  startx = std::max(startx, 0);
+  starty = std::max(starty, 0);
 
-  endx = std::min(endx, (long)size);
-  endy = std::min(endy, (long)size);
+  endx = std::min(endx, size);
+  endy = std::min(endy, size);
 
   double avgHeight = 0;
 
   if (_op == "flatten" || _op == "smooth")
     avgHeight = this->GetAvgHeight(pos, _outsideRadius);
 
-  for (long y = starty; y <= endy; ++y)
+  for (int y = starty; y <= endy; ++y)
   {
-    for (long x = startx; x <= endx; ++x)
+    for (int x = startx; x <= endx; ++x)
     {
-      double tsXdist = (x / (double)size) - pos.x;
-      double tsYdist = (y / (double)size)  - pos.y;
+      double tsXdist = (x / static_cast<double>(size)) - pos.x;
+      double tsYdist = (y / static_cast<double>(size))  - pos.y;
 
       double weight = 1.0;
       double dist = sqrt(tsYdist * tsYdist + tsXdist * tsXdist);

@@ -400,7 +400,7 @@ void TerrainEditorPalette::OnInsideRadiusSlider(int _value)
 
 
   this->insideRadiusSpin->setValue(_value /
-      (double)this->insideRadiusSlider->maximum());
+      static_cast<double>(this->insideRadiusSlider->maximum()));
 
   connect(this->insideRadiusSpin, SIGNAL(valueChanged(double)),
       this, SLOT(OnInsideRadiusSpin(double)));
@@ -425,7 +425,8 @@ void TerrainEditorPalette::OnWeightSlider(int _value)
   disconnect(this->weightSpin, SIGNAL(valueChanged(double)),
              this, SLOT(OnWeightSpin(double)));
 
-  this->weightSpin->setValue(_value / (double)this->weightSlider->maximum());
+  this->weightSpin->setValue(_value /
+      static_cast<double>(this->weightSlider->maximum()));
 
   connect(this->weightSpin, SIGNAL(valueChanged(double)),
       this, SLOT(OnWeightSpin(double)));

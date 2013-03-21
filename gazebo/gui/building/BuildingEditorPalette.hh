@@ -20,6 +20,8 @@
 
 #include <string>
 #include <vector>
+#include <list>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Events.hh"
 

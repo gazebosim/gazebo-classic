@@ -291,13 +291,13 @@ common::Image HeightmapShape::GetImage() const
   {
     for (uint16_t x = 0; x < size; x++)
     {
-      int sx = (int)(x * this->subSampling);
+      int sx = static_cast<int>(x * this->subSampling);
       int sy;
 
       if (!this->flipY)
-        sy = (int)(y * this->subSampling);
+        sy = static_cast<int>(y * this->subSampling);
       else
-        sy = (int)(size - 1 -y) * this->subSampling;
+        sy = static_cast<int>(size - 1 -y) * this->subSampling;
 
       // Normalize height value
       height = (this->GetHeight(sx, sy) - minHeight) / maxHeight;

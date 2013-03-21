@@ -20,6 +20,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <list>
 
 #include "gui/qt.h"
 #include "common/Event.hh"

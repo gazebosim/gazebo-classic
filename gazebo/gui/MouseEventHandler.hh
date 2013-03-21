@@ -79,19 +79,19 @@ namespace gazebo
 
       /// \brief Add a filter to a mouse press event.
       /// \param[in] _name Name associated with the filter.
-      /// \param[in] _filter Function to call when press event occurs. 
+      /// \param[in] _filter Function to call when press event occurs.
       public: void AddPressFilter(const std::string &_name,
                   MouseEventFilter _filter);
 
       /// \brief Add a filter to a mouse release event.
       /// \param[in] _name Name associated with the filter.
-      /// \param[in] _filter Function to call when release event occurs. 
+      /// \param[in] _filter Function to call when release event occurs.
       public: void AddReleaseFilter(const std::string &_name,
                   MouseEventFilter _filter);
 
       /// \brief Add a filter to a mouse move.
       /// \param[in] _name Name associated with the filter.
-      /// \param[in] _filter Function to call when move event occurs. 
+      /// \param[in] _filter Function to call when move event occurs.
       public: void AddMoveFilter(const std::string &_name,
                   MouseEventFilter _filter);
 
