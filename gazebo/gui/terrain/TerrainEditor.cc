@@ -33,7 +33,7 @@ TerrainEditor::TerrainEditor(MainWindow *_mainWindow)
   this->terrainPalette = new TerrainEditorPalette;
   this->Init("terrainEditorTab", "Terrain Editor", this->terrainPalette);
 
-  connect(g_editTerrainAct, SIGNAL(triggered()), this, SLOT(OnEdit()));
+  connect(g_editTerrainAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 }
 
 /////////////////////////////////////////////////
@@ -42,11 +42,9 @@ TerrainEditor::~TerrainEditor()
 }
 
 /////////////////////////////////////////////////
-void TerrainEditor::OnEdit()
+void TerrainEditor::OnEdit(bool _checked)
 {
-  bool isChecked = g_editTerrainAct->isChecked();
-
-  if (isChecked)
+  if (_checked)
   {
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("terrainEditorTab");

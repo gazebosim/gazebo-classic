@@ -40,7 +40,8 @@ namespace gazebo
       public: virtual ~TerrainEditor();
 
       /// \brief QT callback when entering building edit mode
-      private slots: void OnEdit();
+      /// \param[in] _checked True if the menu item is checked
+      private slots: void OnEdit(bool _checked);
 
       /// \brief Contains all the terrain editor tools.
       private: TerrainEditorPalette *terrainPalette;

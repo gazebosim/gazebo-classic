@@ -67,7 +67,7 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
   fileMenu->addAction(doneAct);
   fileMenu->addAction(exitAct);
 
-  connect(g_editBuildingAct, SIGNAL(triggered()), this, SLOT(OnEdit()));
+  connect(g_editBuildingAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
   this->connections.push_back(
       gui::editor::Events::ConnectFinishBuildingModel(
@@ -107,14 +107,13 @@ void BuildingEditor::Exit()
 void BuildingEditor::OnFinish()
 {
   g_editBuildingAct->setChecked(!g_editBuildingAct->isChecked());
-  this->OnEdit();
+  this->OnEdit(false);
 }
 
 /////////////////////////////////////////////////
-void BuildingEditor::OnEdit()
+void BuildingEditor::OnEdit(bool _checked)
 {
-  bool isChecked = g_editBuildingAct->isChecked();
-  if (isChecked)
+  if (_checked)
   {
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("buildingEditorTab");
