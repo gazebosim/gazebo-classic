@@ -221,7 +221,7 @@ void ODEHinge2Joint::SetForce(int _index, double _effort)
 //////////////////////////////////////////////////
 double ODEHinge2Joint::GetParam(int _parameter) const
 {
-  double result;
+  double result = 0;
 
   if (this->jointId)
     result = dJointGetHinge2Param(this->jointId, _parameter);
