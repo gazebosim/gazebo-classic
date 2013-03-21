@@ -132,7 +132,7 @@ math::Angle ODEHinge2Joint::GetAngleImpl(int _index) const
 //////////////////////////////////////////////////
 double ODEHinge2Joint::GetVelocity(int _index) const
 {
-  double result;
+  double result = 0;
 
   if (this->jointId)
   {

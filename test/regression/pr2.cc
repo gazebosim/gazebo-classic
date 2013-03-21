@@ -88,7 +88,7 @@ void PR2Test::StaticPR2(std::string _physicsEngine)
   // simulate a few steps
   int steps = 20;
   world->StepWorld(steps);
-  double dt = world->GetPhysicsEngine()->GetStepTime();
+  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   t = world->GetSimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
