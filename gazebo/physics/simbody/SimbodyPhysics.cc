@@ -91,11 +91,11 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
 
   // Create an integrator
   // this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
-  // this->integ = new SimTK::RungeKutta3Integrator(system);
-  this->integ = new SimTK::RungeKutta2Integrator(system);
+  this->integ = new SimTK::RungeKutta3Integrator(system);
+  // this->integ = new SimTK::RungeKutta2Integrator(system);
   // this->integ = new SimTK::ExplicitEulerIntegrator(system);
   /// \TODO:  make sdf parameter
-  this->integ->setAccuracy(0.1);
+  this->integ->setAccuracy(0.01);
 }
 
 //////////////////////////////////////////////////
@@ -111,6 +111,12 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
   sdf::ElementPtr simbodyElem = this->sdf->GetElement("simbody");
 
   this->stepTimeDouble = simbodyElem->GetElement("dt")->GetValueDouble();
+}
+
+//////////////////////////////////////////////////
+void SimbodyPhysics::Reset()
+{
+  this->integ->initialize(this->system.getDefaultState());
 }
 
 //////////////////////////////////////////////////
@@ -426,7 +432,7 @@ void SimbodyPhysics::InitSimbodySystem()
   const SimTK::Vec3 g(gzGravity.x, gzGravity.y, gzGravity.z);
 
   // Set stiction max slip velocity to make it less stiff.
-  this->contact.setTransitionVelocity(0.1);
+  this->contact.setTransitionVelocity(0.01);
 
   // Specify gravity (read in above from world).
   if (!math::equal(g.norm(), 0.0))
@@ -720,10 +726,16 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
   // use stiffness of 1e8 and dissipation of 1000.0 to approximate inelastic
   // collision.
   SimTK::ContactMaterial material(1e6,   // stiffness
-                                  0.1,  // dissipation
-                                  0.7,   // mu_static
-                                  0.5,   // mu_dynamic
+                                  10.0,  // dissipation
+                                  1.0,   // mu_static
+                                  1.0,   // mu_dynamic
                                   0.5);  // mu_viscous
+  // works for SpawnDrop
+  // SimTK::ContactMaterial material(1e6,   // stiffness
+  //                                 10.0,  // dissipation
+  //                                 0.7,   // mu_static
+  //                                 0.5,   // mu_dynamic
+  //                                 0.5);  // mu_viscous
 
   bool addModelClique = _modelClique.isValid() && !_link->GetSelfCollide();
 
@@ -782,9 +794,17 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
           boost::shared_dynamic_cast<physics::CylinderShape>((*ci)->GetShape());
         double r = c->GetRadius();
         double len = c->GetLength();
-        Vec3 esz = Vec3(r,r,len/2); // Use ellipsoid instead
-        ContactSurface surface(ContactGeometry::Ellipsoid(esz),
-                               material);
+
+        const int resolution = 1; // chunky hexagonal shape
+        const PolygonalMesh mesh = PolygonalMesh::
+            createCylinderMesh(ZAxis,r,len/2,resolution);
+        const ContactGeometry::TriangleMesh triMesh(mesh);
+        ContactSurface surface(triMesh, material,1 /*Thickness*/);
+
+        // Vec3 esz = Vec3(r,r,len/2); // Use ellipsoid instead
+        // ContactSurface surface(ContactGeometry::Ellipsoid(esz),
+        //                        material);
+
         if (addModelClique)
             surface.joinClique(_modelClique);
         _mobod.updBody().addContactSurface(X_LC, surface);
@@ -794,9 +814,19 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
       case physics::Entity::BOX_SHAPE:
       {
         Vec3 hsz = SimbodyPhysics::Vector3ToVec3(
-          (boost::shared_dynamic_cast<physics::BoxShape>((*ci)->GetShape()))->GetSize())/2;
-        ContactSurface surface(ContactGeometry::Ellipsoid(hsz),
-                               material);
+          (boost::shared_dynamic_cast<physics::BoxShape>(
+          (*ci)->GetShape()))->GetSize())/2;
+
+        // const int resolution = 1;  // number times to chop the longest side.
+        const int resolution = 2 * (int)(max(hsz)/min(hsz) + 0.5);
+        const PolygonalMesh mesh = PolygonalMesh::
+            createBrickMesh(hsz, resolution);
+        const ContactGeometry::TriangleMesh triMesh(mesh);
+        ContactSurface surface(triMesh, material,1 /*Thickness*/);
+
+        // ContactSurface surface(ContactGeometry::Ellipsoid(hsz),
+        //                        material);
+
         if (addModelClique)
             surface.joinClique(_modelClique);
         _mobod.updBody().addContactSurface(X_LC, surface);

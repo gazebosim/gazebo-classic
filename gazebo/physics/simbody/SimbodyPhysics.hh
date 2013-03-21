@@ -61,6 +61,9 @@ namespace gazebo
       /// \brief Initialize the Simbody engine
       public: virtual void Init();
 
+      // Documentation inherited
+      public: virtual void Reset();
+
       /// \brief Add a Model to the Simbody system
       public: void InitModel(const physics::Model* _model);
 
