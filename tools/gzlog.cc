@@ -147,8 +147,13 @@ class FilterBase
             else
             {
               // No filter, so output the whole pose.
-              result << std::fixed << xmlPrefix << _pose
-                << xmlSuffix << std::endl;
+              if (!xmlPrefix.empty())
+              {
+                result << std::fixed << xmlPrefix << _pose
+                  << xmlSuffix << std::endl;
+              }
+              else
+                this->Out(result, _state) << _pose << std::endl;
             }
 
             return result.str();
