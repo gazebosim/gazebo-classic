@@ -82,10 +82,15 @@ set (msgs
   vector3d.proto
   visual.proto
   world_control.proto
-  world_reset.proto 
-  world_stats.proto 
-  world_modify.proto 
+  world_reset.proto
+  world_stats.proto
+  world_modify.proto
 )
+
+set (msgs_tests_sources
+  msgs_TEST.cc
+)
+gz_build_tests(${msgs_tests_sources})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

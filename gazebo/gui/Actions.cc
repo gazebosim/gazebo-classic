@@ -51,6 +51,8 @@ QAction *gazebo::gui::g_pointLghtCreateAct = 0;
 QAction *gazebo::gui::g_spotLghtCreateAct = 0;
 QAction *gazebo::gui::g_dirLghtCreateAct = 0;
 
+QAction *gazebo::gui::g_screenshotAct = 0;
+
 QAction *gazebo::gui::g_showCollisionsAct = 0;
 QAction *gazebo::gui::g_showGridAct = 0;
 QAction *gazebo::gui::g_showContactsAct = 0;

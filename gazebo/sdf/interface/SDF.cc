@@ -222,7 +222,6 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
   }
   else
   {
-    gzerr << "Unknown attribute _type[" << _type << "]\n";
     return boost::shared_ptr<Param>();
   }
 }
@@ -382,7 +381,12 @@ void Element::PrintDocRightPane(std::string &_html, int _spacing, int &_index)
 
   stream << "<font style='font-weight:bold'>Type: </font>";
   if (this->value)
-    stream << this->value->GetTypeName() << "\n";
+  {
+    stream << this->value->GetTypeName()
+           << "&nbsp;&nbsp;&nbsp;\n"
+           << "<font style='font-weight:bold'>Default: </font>"
+           << this->value->GetDefaultAsString() << '\n';
+  }
   else
     stream << "n/a\n";
 

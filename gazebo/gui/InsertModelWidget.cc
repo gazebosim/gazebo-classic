@@ -175,6 +175,8 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   QList<QTreeWidgetItem *> matchList = this->fileTreeWidget->findItems(qpath,
       Qt::MatchExactly);
 
+  boost::filesystem::path dir(_path);
+
   // Create a top-level tree item for the path
   if (matchList.size() == 0)
   {
@@ -183,7 +185,8 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
     this->fileTreeWidget->addTopLevelItem(topItem);
 
     // Add the new path to the directory watcher
-    this->watcher->addPath(qpath);
+    if (boost::filesystem::exists(dir))
+      this->watcher->addPath(qpath);
   }
   else
     topItem = matchList.first();
@@ -191,7 +194,6 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   // Remove current items.
   topItem->takeChildren();
 
-  boost::filesystem::path dir(_path);
   std::list<boost::filesystem::path> resultSet;
 
   if (boost::filesystem::exists(dir) &&

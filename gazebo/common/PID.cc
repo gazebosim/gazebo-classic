@@ -103,8 +103,6 @@ void PID::Reset()
   this->iErr = 0.0;
   this->dErr = 0.0;
   this->cmd = 0.0;
-  this->cmdMax = 0.0;
-  this->cmdMin = 0.0;
 }
 
 /////////////////////////////////////////////////
