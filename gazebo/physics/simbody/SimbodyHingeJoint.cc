@@ -29,7 +29,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyHingeJoint::SimbodyHingeJoint(SimTK::MultibodySystem *_world,
+SimbodyHingeJoint::SimbodyHingeJoint(SimTK::MultibodySystem * /*_world*/,
                                      BasePtr _parent)
     : HingeJoint<SimbodyJoint>(_parent)
 {
@@ -73,13 +73,6 @@ void SimbodyHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 void SimbodyHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
 {
   gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyHingeJoint::GetAngle(int /*_index*/) const
-{
-  gzerr << "Not implemented...\n";
-  return math::Angle();
 }
 
 //////////////////////////////////////////////////
@@ -162,15 +155,37 @@ math::Angle SimbodyHingeJoint::GetLowStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHingeJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 SimbodyHingeJoint::GetGlobalAxis(int _index) const
 {
-  gzerr << "SimbodyHingeJoint::GetGlobalAxis not implemented\n";
-  return math::Vector3();
+  if (_index < static_cast<int>(this->GetAngleCount()))
+  {
+    const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
+      this->simbodyPhysics->integ->getState());
+
+    // express Z-axis of X_OM in world frame
+    SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
+      this->simbodyPhysics->integ->getState(), X_OM.z()));
+
+    return SimbodyPhysics::Vec3ToVector3(z_W);
+  }
+  else
+  {
+    gzerr << "index out of bound\n";
+    return math::Vector3();
+  }
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHingeJoint::GetAngleImpl(int /*_index*/) const
+math::Angle SimbodyHingeJoint::GetAngleImpl(int _index) const
 {
-  gzerr << "SimbodyHingeJoint::GetAngleImpl not implemented\n";
-  return math::Angle();
+  if (_index < static_cast<int>(this->GetAngleCount()))
+  {
+    return math::Angle(this->mobod.getOneQ(
+      this->simbodyPhysics->integ->getState(), _index));
+  }
+  else
+  {
+    gzerr << "index out of bound\n";
+    return math::Angle();
+  }
 }
