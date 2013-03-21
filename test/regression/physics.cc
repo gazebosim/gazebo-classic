@@ -75,6 +75,13 @@ TEST_F(PhysicsTest, EmptyWorldBullet)
 }
 #endif  // HAVE_BULLET
 
+#ifdef HAVE_RTQL8
+TEST_F(PhysicsTest, EmptyWorldRTQL8)
+{
+  EmptyWorld("rtql8");
+}
+#endif  // HAVE_RTQL8
+
 ////////////////////////////////////////////////////////////////////////
 // SpawnDrop:
 // Load a world, check that gravity points along z axis, spawn simple
@@ -234,6 +241,13 @@ TEST_F(PhysicsTest, SpawnDropBullet)
   SpawnDrop("bullet");
 }
 #endif  // HAVE_BULLET
+
+#ifdef HAVE_RTQL8
+TEST_F(PhysicsTest, SpawnDropRTQL8)
+{
+  SpawnDrop("rtql8");
+}
+#endif  // HAVE_RTQL8
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnDropCoGOffset:
@@ -519,6 +533,13 @@ TEST_F(PhysicsTest, SpawnDropCoGOffsetBullet)
   SpawnDropCoGOffset("bullet");
 }
 #endif  // HAVE_BULLET
+
+#ifdef HAVE_RTQL8
+TEST_F(PhysicsTest, SpawnDropCoGOffsetRTQL8)
+{
+  SpawnDropCoGOffset("rtql8");
+}
+#endif  // HAVE_RTQL8
 
 ////////////////////////////////////////////////////////////////////////
 // RevoluteJoint:
@@ -930,6 +951,13 @@ TEST_F(PhysicsTest, RevoluteJointBullet)
 }
 #endif  // HAVE_BULLET
 
+#ifdef HAVE_RTQL8
+TEST_F(PhysicsTest, RevoluteJointRTQL8)
+{
+  RevoluteJoint("rtql8");
+}
+#endif  // HAVE_RTQL8
+
 TEST_F(PhysicsTest, State)
 {
   /// \TODO: Redo state test
@@ -1261,6 +1289,13 @@ TEST_F(PhysicsTest, SimplePendulumBullet)
 }
 #endif  // HAVE_BULLET
 
+#ifdef HAVE_RTQL8
+TEST_F(PhysicsTest, SimplePendulumRTQL8)
+{
+  SimplePendulum("rtql8");
+}
+#endif  // HAVE_RTQL8
+
 void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
   Load("worlds/simple_pendulums.world", true, _physicsEngine);
@@ -1520,6 +1555,13 @@ TEST_F(PhysicsTest, CollisionFilteringBullet)
   CollisionFiltering("bullet");
 }
 #endif  // HAVE_BULLET
+
+#ifdef HAVE_RTQL8
+TEST_F(PhysicsTest, CollisionFilteringRTQL8)
+{
+  CollisionFiltering("rtql8");
+}
+#endif  // HAVE_RTQL8
 
 
 int main(int argc, char **argv)
