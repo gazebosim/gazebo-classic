@@ -935,6 +935,12 @@ void MainWindow::CreateActions()
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
   connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
+
+  g_screenshotAct = new QAction(QIcon(":/images/screenshot.png"),
+      tr("Screenshot"), this);
+  g_screenshotAct->setStatusTip(tr("Take a screenshot"));
+  connect(g_screenshotAct, SIGNAL(triggered()), this,
+      SLOT(CaptureScreenshot()));
 }
 
 /////////////////////////////////////////////////
