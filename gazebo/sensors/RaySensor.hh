@@ -173,14 +173,21 @@ namespace gazebo
       private: boost::mutex mutex;
       private: msgs::LaserScanStamped laserMsg;
 
-      enum noise_model_type_t
+      // Which noise type we support
+      enum NoiseModelType
       {
         NONE,
         GAUSSIAN
       };
+      // If true, apply the noise model specified by other noise parameters
       private: bool noiseActive;
-      private: enum noise_model_type_t noiseType;
+      // Which type of noise we're applying
+      private: enum NoiseModelType noiseType;
+      // If noiseType==GAUSSIAN, noiseMean is the mean of the distibution
+      // from which we sample
       private: double noiseMean;
+      // If noiseType==GAUSSIAN, noiseStdDev is the standard devation of 
+      // the distibution from which we sample
       private: double noiseStdDev;
     };
     /// \}
