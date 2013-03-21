@@ -172,6 +172,16 @@ namespace gazebo
       private: transport::PublisherPtr scanPub;
       private: boost::mutex mutex;
       private: msgs::LaserScanStamped laserMsg;
+
+      enum noise_model_type_t
+      {
+        NONE,
+        GAUSSIAN
+      };
+      private: bool noiseActive;
+      private: enum noise_model_type_t noiseType;
+      private: double noiseMean;
+      private: double noiseStdDev;
     };
     /// \}
   }
