@@ -62,6 +62,7 @@ Encoder::Encoder()
   }
 
   this->Reset();
+//  this->time = common::Time();
 
 //  this->pic = new AVthis->avFrame;
 //#endif
@@ -83,19 +84,19 @@ void Encoder::Cleanup()
     return;
 
 
-  // Close the codec
+/*  // Close the codec
   if (this->codecCtx)
   {
     avcodec_close(this->codecCtx);
     av_free(this->codecCtx);
     this->codecCtx = NULL;
-  }
+  }*/
 
   if (this->pFormatCtx)
   {
     for(unsigned int i = 0; i < this->pFormatCtx->nb_streams; ++i)
     {
-//      av_freep(&this->pFormatCtx->streams[i]->codec);
+      av_freep(&this->pFormatCtx->streams[i]->codec);
       av_freep(&this->pFormatCtx->streams[i]);
     }
     av_free(this->pFormatCtx);
@@ -175,12 +176,23 @@ void Encoder::Init()
     return;
   }
 
-  this->pic = new AVPicture;
+  this->pFormatCtx = avformat_alloc_context();
+  this->pFormatCtx->oformat = this->pOutputFormat;
+  snprintf(this->pFormatCtx->filename,
+      sizeof(this->pFormatCtx->filename),
+      "%s", this->filename.c_str());
+  this->pVideoStream = avformat_new_stream(this->pFormatCtx, codec);
 
-//  this->codecCtx = this->pVideoStream->codec;
+  // some formats want stream headers to be separate
+  if(this->pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER)
+    this->codecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+
+  this->codecCtx = this->pVideoStream->codec;
 //  this->codecCtx->codec_id = this->pOutputFormat->video_codec;
 //  this->codecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
-  this->codecCtx = avcodec_alloc_context3(codec);
+
+
+//  this->codecCtx = avcodec_alloc_context3(codec);
   // put sample parameters
   this->codecCtx->bit_rate = this->bitRate;
   // resolution must be a multiple of two
@@ -189,24 +201,28 @@ void Encoder::Init()
   // frames per second
   this->codecCtx->time_base.den= this->fps;
   this->codecCtx->time_base.num= 1;
-  this->codecCtx->gop_size = 10; // emit one intra frame every ten frames
+  this->codecCtx->gop_size = 12; // emit one intra frame every ten frames
   this->codecCtx->max_b_frames=1;
   this->codecCtx->pix_fmt = PIX_FMT_YUV420P;
   this->codecCtx->thread_count = 3;
+  if (this->codecCtx->codec_id == CODEC_ID_MPEG1VIDEO)
+  {
+    // Needed to avoid using macroblocks in which some coeffs overflow.
+    // This does not happen with normal video, it just happens here as
+    // the motion of the chroma plane does not match the luma plane.
+    this->codecCtx->mb_decision = 2;
+  }
 //  avcodec_thread_init(this->codecCtx, 10);
 
 
-/*  // some formats want stream headers to be separate
-  if(this->pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER)
-    this->codecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
-  if (av_set_parameters(this->pFormatCtx, NULL) < 0)
+
+/*  if (av_set_parameters(this->pFormatCtx, NULL) < 0)
   {
     gzerr << "Invalid output format parameters\n";
     return;
   }
   dump_format(this->pFormatCtx, 0, filename.c_str(), 1);*/
-
 
   // open it
   if (avcodec_open2(this->codecCtx, codec, NULL) < 0)
@@ -214,6 +230,7 @@ void Encoder::Init()
     gzerr << "Could not open codec\n";
     return;
   }
+  this->pic = new AVPicture;
 
   this->fileHandle = fopen(filename.c_str(), "wb");
   if (!this->fileHandle)
@@ -228,7 +245,7 @@ void Encoder::Init()
     return;
   }*/
 
-  this->avFrame = avcodec_alloc_frame();
+/*  this->avFrame = avcodec_alloc_frame();
   // size for YUV 420
   this->pictureBuf = new unsigned char[(this->outputFrameSize * 3) / 2];
   this->avFrame->data[0] = this->pictureBuf;
@@ -236,7 +253,27 @@ void Encoder::Init()
   this->avFrame->data[2] = this->avFrame->data[1] + this->outputFrameSize / 4;
   this->avFrame->linesize[0] = this->codecCtx->width;
   this->avFrame->linesize[1] = this->codecCtx->width / 2;
-  this->avFrame->linesize[2] = this->codecCtx->width / 2;
+  this->avFrame->linesize[2] = this->codecCtx->width / 2;*/
+  this->avFrame = avcodec_alloc_frame();
+  int size = avpicture_get_size(this->codecCtx->pix_fmt, this->codecCtx->width,
+      this->codecCtx->height);
+  this->pictureBuf = new unsigned char[size];
+  avpicture_fill((AVPicture *)this->avFrame, this->pictureBuf,
+      this->codecCtx->pix_fmt, this->codecCtx->width, this->codecCtx->height);
+
+  av_dump_format(this->pFormatCtx, 0, this->filename.c_str(), 1);
+
+  if (!(this->pOutputFormat->flags & AVFMT_NOFILE))
+  {
+    if (avio_open(&this->pFormatCtx->pb, this->filename.c_str(),
+        AVIO_FLAG_WRITE) < 0)
+    {
+      gzerr << "Could not open '" << this->filename << "'\n";
+      return;
+    }
+  }
+  // Write the stream header, if any.
+  avformat_write_header(this->pFormatCtx, NULL);
 
   // alloc image and output buffer
   this->outBufferSize = 100000;
@@ -269,12 +306,15 @@ bool Encoder::IsInitialized()
  }
 // #endif
 
+int ppp = -1;
+
 /////////////////////////////////////////////////
 void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
     unsigned int _h)
 {
   if (!this->initialized)
     this->Init();
+
 
   if (!this->swsCtx)
   {
@@ -291,27 +331,29 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
 
   memcpy(this->pic->data[0], _frame, _w * _h * 3);
 
-//  sws_scale(this->swsCtx, this->pic->data, this->pic->linesize, 0,
-//  _h, this->avFrame->data, this->avFrame->linesize);
-
   sws_scale(this->swsCtx, this->pic->data, this->pic->linesize, 0,
       _h, this->avFrame->data, this->avFrame->linesize);
 
+  ppp += 2;
+  this->codecCtx->coded_frame->pts = ppp;
 
+  this->outSize = avcodec_encode_video(this->codecCtx, this->outbuf,
+      this->outBufferSize, this->avFrame);
+//  fwrite(this->outbuf, 1, this->outSize, this->fileHandle);
+
+  this->codecCtx->coded_frame->pts = ppp;
+/*
   AVPacket avPacket;
   av_init_packet(&avPacket);
   avPacket.data = NULL;
-  this->outSize = avcodec_encode_video(this->codecCtx, this->outbuf,
-      this->outBufferSize, this->avFrame);
-  fwrite(this->outbuf, 1, this->outSize, this->fileHandle);
-/*  int ret = avcodec_encode_video2(this->codecCtx, &avPacket,
+  int ret = avcodec_encode_video2(this->codecCtx, &avPacket,
       this->avFrame, &this->outSize);
   if (ret < 0)
     gzerr << "Error encding frame\n";
   fwrite(avPacket.data, 1, avPacket.size, this->fileHandle);
   av_free_packet(&avPacket);*/
 
-/*
+
   AVPacket avPacket;
   av_init_packet(&avPacket);
 
@@ -324,7 +366,7 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
           this->codecCtx->time_base, this->pVideoStream->time_base);
     }
     if(this->codecCtx->coded_frame->key_frame)
-       avPacket->flags |= AV_PKT_FLAG_KEY;
+       avPacket.flags |= AV_PKT_FLAG_KEY;
 
     //printf("c %d. pts %d. codedframepts: %ld pkt.pts: %ld\n",custompts,pts,pCodecCtx->coded_frame->pts,pkt.pts);
 
@@ -335,7 +377,7 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
     //printf("Wrote %d\n",ret);
 //    if(ret<0)
 //       return -1;
-  }*/
+  }
 
 
 
@@ -458,8 +500,8 @@ fwrite(bufferHead, 1, currentBufferSize, this->fileHandle);
    // Close file
 //   url_fclose(this->pFormatCtx->pb);
 
-  // get the delayed frames
-  for(; this->outSize; /*i++*/)
+/*  // get the delayed frames
+  for(; this->outSize; /)
   {
     fflush(stdout);
     this->outSize = avcodec_encode_video(this->codecCtx, this->outbuf,
@@ -474,7 +516,9 @@ fwrite(bufferHead, 1, currentBufferSize, this->fileHandle);
   this->outbuf[3] = 0xb7;
 
   fwrite(this->outbuf, 1, 4, this->fileHandle);
-  fclose(this->fileHandle);
+  fclose(this->fileHandle);*/
+
+  av_write_trailer(this->pFormatCtx);
 
 //  this->filename = _filename;
 //  this->Encode();
@@ -487,7 +531,7 @@ void Encoder::Reset()
 {
   this->Cleanup();
   // set default values
-  this->bitRate = 400000;
+  this->bitRate = 20000000;
   this->frameWidth = 800;
   this->frameHeight = 600;
   this->fps = 25;
@@ -495,4 +539,5 @@ void Encoder::Reset()
   this->outputFrameSize = this->frameWidth * this->frameHeight;
   this->initialized = false;
   this->format = "mpeg";
+  this->swsCtx = NULL;
 }

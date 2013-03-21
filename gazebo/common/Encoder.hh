@@ -84,9 +84,6 @@ namespace gazebo
       /// \brief free up open Video object, close files, streams
       private: void Cleanup();
 
-      /// \brief libav Format I/O context
-      //private: AVFormatContext *formatCtx;
-
       /// \brief libav main external API structure
       private: AVCodecContext *codecCtx;
 
