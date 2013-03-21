@@ -1,0 +1,385 @@
+/*
+ * Copyright 2012 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
+#include <gtest/gtest.h>
+#include "physics/physics.hh"
+#include "test/ServerFixture.hh"
+
+#define TOL 1e-4
+using namespace gazebo;
+
+class BulletJoint_TEST : public ServerFixture
+{
+};
+
+
+////////////////////////////////////////////////////////////////////////
+// EmptyWorld:
+// Load a world, take a few steps, and verify that time is increasing.
+// This is the most basic physics engine test.
+////////////////////////////////////////////////////////////////////////
+TEST_F(BulletJoint_TEST, GetForceTorque2)
+{
+  // Load our force torque test world
+  Load("worlds/force_torque_demo.world", true, "bullet");
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), "bullet");
+
+  //physics->SetGravity(math::Vector3(0, 0, -50));
+
+  // simulate 1 step
+  world->StepWorld(1);
+  double t = world->GetSimTime().Double();
+
+  // get time step size
+  double dt = world->GetPhysicsEngine()->GetStepTime();
+  EXPECT_GT(dt, 0);
+  gzdbg << "dt : " << dt << "\n";
+
+  // verify that time moves forward
+  EXPECT_GT(t, 0);
+  gzdbg << "t after one step : " << t << "\n";
+
+  // get joint and get force torque
+  physics::ModelPtr model_1 = world->GetModel("model_1");
+  physics::JointPtr joint_01 = model_1->GetJoint("joint_01");
+  physics::JointPtr joint_12 = model_1->GetJoint("joint_12");
+
+
+/*
+  world->StepWorld(1000);
+  gzdbg << "-------------------Test 1-------------------\n";
+  for (unsigned int i = 0; i < 5; ++i)
+  {
+    world->StepWorld(1);
+    // test joint_01 wrench
+    physics::JointWrench wrench_01 = joint_01->GetForceTorque(0);
+    EXPECT_NEAR(wrench_01.body1Force.x,    0.0, TOL);
+    EXPECT_NEAR(wrench_01.body1Force.y,    0.0, TOL);
+    EXPECT_NEAR(wrench_01.body1Force.z, 1000.0, TOL);
+    EXPECT_NEAR(wrench_01.body1Torque.x,   0.0, TOL);
+    EXPECT_NEAR(wrench_01.body1Torque.y,   0.0, TOL);
+    EXPECT_NEAR(wrench_01.body1Torque.z,   0.0, TOL);
+
+    EXPECT_NEAR(wrench_01.body2Force.x,  -wrench_01.body1Force.x,  TOL);
+    EXPECT_NEAR(wrench_01.body2Force.y,  -wrench_01.body1Force.y,  TOL);
+    EXPECT_NEAR(wrench_01.body2Force.z,  -wrench_01.body1Force.z,  TOL);
+    EXPECT_NEAR(wrench_01.body2Torque.x, -wrench_01.body1Torque.x, TOL);
+    EXPECT_NEAR(wrench_01.body2Torque.y, -wrench_01.body1Torque.y, TOL);
+    EXPECT_NEAR(wrench_01.body2Torque.z, -wrench_01.body1Torque.z, TOL);
+
+    gzdbg << "joint_01 force torque : "
+          << "force1 [" << wrench_01.body1Force
+          << "] torque1 [" << wrench_01.body1Torque
+          << "] force2 [" << wrench_01.body2Force
+          << "] torque2 [" << wrench_01.body2Torque
+          << "]\n";
+
+    // test joint_12 wrench
+    physics::JointWrench wrench_12 = joint_12->GetForceTorque(0);
+    EXPECT_NEAR(wrench_12.body1Force.x,    0.0, TOL);
+    EXPECT_NEAR(wrench_12.body1Force.y,    0.0, TOL);
+    EXPECT_NEAR(wrench_12.body1Force.z,  500.0, TOL);
+    EXPECT_NEAR(wrench_12.body1Torque.x,   0.0, TOL);
+    EXPECT_NEAR(wrench_12.body1Torque.y,   0.0, TOL);
+    EXPECT_NEAR(wrench_12.body1Torque.z,   0.0, TOL);
+
+    EXPECT_NEAR(wrench_12.body2Force.x,  -wrench_12.body1Force.x,  TOL);
+    EXPECT_NEAR(wrench_12.body2Force.y,  -wrench_12.body1Force.y,  TOL);
+    EXPECT_NEAR(wrench_12.body2Force.z,  -wrench_12.body1Force.z,  TOL);
+    EXPECT_NEAR(wrench_12.body2Torque.x, -wrench_12.body1Torque.x, TOL);
+    EXPECT_NEAR(wrench_12.body2Torque.y, -wrench_12.body1Torque.y, TOL);
+    EXPECT_NEAR(wrench_12.body2Torque.z, -wrench_12.body1Torque.z, TOL);
+
+    gzdbg << "joint_12 force torque : "
+          << "force1 [" << wrench_12.body1Force
+          << "] torque1 [" << wrench_12.body1Torque
+          << "] force2 [" << wrench_12.body2Force
+          << "] torque2 [" << wrench_12.body2Torque
+          << "]\n";
+  }
+*/
+
+  /*info.m_globalCfm = 0;
+  info.m_erp = 0.2;
+  info.m_numIterations = 1000;
+  info.m_sor = 1.0;*/
+
+
+//  gzerr << "child b4 "
+//    << joint_12->GetChild()->GetWorldCoGPose().pos << std::endl;
+  // perturbe joints so top link topples over, then remeasure
+
+  math::Vector3 gravity(-30, 10, -50);
+
+  physics->SetGravity(math::Vector3(gravity.x, 0, 0));
+  // tune joint stop properties
+  joint_01->SetAttribute("stop_erp", 0, 0.02);
+  joint_12->SetAttribute("stop_erp", 0, 0.02);
+  // wait for dynamics to stabilize
+  world->StepWorld(2000);
+
+//  gzerr << "child after "
+//    << joint_12->GetChild()->GetWorldCoGPose().pos  << std::endl;
+
+
+  // check force torques in new system
+  gzdbg << "\n-------------------Test 2-------------------\n";
+  for (unsigned int i = 0; i < 1; ++i)
+  {
+    world->StepWorld(1);
+
+    // test joint_01 wrench
+    physics::JointWrench wrench_01 = joint_01->GetForceTorque(0);
+    EXPECT_NEAR(wrench_01.body1Force.x,   600.0,  6.0);
+    EXPECT_NEAR(wrench_01.body1Force.y, -1000.0, 10.0);
+    EXPECT_NEAR(wrench_01.body1Force.z,  -200.0,  2.0);
+    EXPECT_NEAR(wrench_01.body1Torque.x,  750.0,  7.5);
+    EXPECT_NEAR(wrench_01.body1Torque.y,  450.0,  4.5);
+    EXPECT_NEAR(wrench_01.body1Torque.z,    0.0,  0.1);
+
+    // since first link is world, these should be exact
+    EXPECT_NEAR(wrench_01.body2Force.x,  -wrench_01.body1Force.x,  TOL);
+    EXPECT_NEAR(wrench_01.body2Force.y,  -wrench_01.body1Force.y,  TOL);
+    EXPECT_NEAR(wrench_01.body2Force.z,  -wrench_01.body1Force.z,  TOL);
+    EXPECT_NEAR(wrench_01.body2Torque.x, -wrench_01.body1Torque.x, TOL);
+    EXPECT_NEAR(wrench_01.body2Torque.y, -wrench_01.body1Torque.y, TOL);
+    EXPECT_NEAR(wrench_01.body2Torque.z, -wrench_01.body1Torque.z, TOL);
+
+    gzdbg << "joint_01 force torque : "
+          << "force1 [" << wrench_01.body1Force
+          << "] torque1 [" << wrench_01.body1Torque
+          << "] force2 [" << wrench_01.body2Force
+          << "] torque2 [" << wrench_01.body2Torque
+          << "]\n";
+
+    // test joint_12 wrench
+    physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
+
+    EXPECT_NEAR(wrench_12.body1Force.x,   300.0,  3.0);
+    EXPECT_NEAR(wrench_12.body1Force.y,  -500.0,  5.0);
+    EXPECT_NEAR(wrench_12.body1Force.z,  -100.0,  1.0);
+    EXPECT_NEAR(wrench_12.body1Torque.x,  250.0,  5.0);
+    EXPECT_NEAR(wrench_12.body1Torque.y,  150.0,  3.0);
+    EXPECT_NEAR(wrench_12.body1Torque.z,    0.0,  0.1);
+
+    // A good check is that
+    // the computed body1Torque shoud in fact be opposite of body1Torque
+    EXPECT_NEAR(wrench_12.body2Force.x,  -wrench_12.body1Force.x,  1e-1);
+    EXPECT_NEAR(wrench_12.body2Force.y,  -wrench_12.body1Force.y,  1e-1);
+    EXPECT_NEAR(wrench_12.body2Force.z,  -wrench_12.body1Force.z,  1e-1);
+    EXPECT_NEAR(wrench_12.body2Torque.x, -wrench_12.body1Torque.x, 1e-1);
+    EXPECT_NEAR(wrench_12.body2Torque.y, -wrench_12.body1Torque.y, 1e-1);
+    EXPECT_NEAR(wrench_12.body2Torque.z, -wrench_12.body1Torque.z, 1e-1);
+
+    gzdbg << "joint_12 force torque : "
+          << "force1 [" << wrench_12.body1Force
+          << "] torque1 [" << wrench_12.body1Torque
+          << "] force2 [" << wrench_12.body2Force
+          << "] torque2 [" << wrench_12.body2Torque
+          << "]\n";
+  }
+
+  // simulate a few steps
+  int steps = 20;
+  world->StepWorld(steps);
+  t = world->GetSimTime().Double();
+  EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
+  gzdbg << "t after 20 steps : " << t << "\n";
+
+
+  Unload();
+}
+
+/*
+////////////////////////////////////////////////////////////////////////
+// EmptyWorld:
+// Load a world, take a few steps, and verify that time is increasing.
+// This is the most basic physics engine test.
+////////////////////////////////////////////////////////////////////////
+TEST_F(BulletJoint_TEST, GetForceTorque)
+{
+  // Load our force torque test world
+  Load("worlds/force_torque_demo.world", true, "bullet");
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), "bullet");
+
+  physics->SetGravity(math::Vector3(0, 0, -50));
+
+  // simulate 1 step
+  world->StepWorld(1);
+  double t = world->GetSimTime().Double();
+
+  // get time step size
+  double dt = world->GetPhysicsEngine()->GetStepTime();
+  EXPECT_GT(dt, 0);
+  gzdbg << "dt : " << dt << "\n";
+
+  // verify that time moves forward
+  EXPECT_GT(t, 0);
+  gzdbg << "t after one step : " << t << "\n";
+
+  // get joint and get force torque
+  physics::ModelPtr model_1 = world->GetModel("model_1");
+  physics::JointPtr joint_01 = model_1->GetJoint("joint_01");
+  physics::JointPtr joint_12 = model_1->GetJoint("joint_12");
+
+  gzdbg << "-------------------Test 1-------------------\n";
+  for (unsigned int i = 0; i < 5; ++i)
+  {
+    world->StepWorld(1);
+    // test joint_01 wrench
+    physics::JointWrench wrench_01 = joint_01->GetForceTorque(0);
+    EXPECT_NEAR(wrench_01.body1Force.x,    0.0, TOL);
+    EXPECT_NEAR(wrench_01.body1Force.y,    0.0, TOL);
+    EXPECT_NEAR(wrench_01.body1Force.z, 1000.0, TOL);
+    EXPECT_NEAR(wrench_01.body1Torque.x,   0.0, TOL);
+    EXPECT_NEAR(wrench_01.body1Torque.y,   0.0, TOL);
+    EXPECT_NEAR(wrench_01.body1Torque.z,   0.0, TOL);
+
+    EXPECT_NEAR(wrench_01.body2Force.x,  -wrench_01.body1Force.x,  TOL);
+    EXPECT_NEAR(wrench_01.body2Force.y,  -wrench_01.body1Force.y,  TOL);
+    EXPECT_NEAR(wrench_01.body2Force.z,  -wrench_01.body1Force.z,  TOL);
+    EXPECT_NEAR(wrench_01.body2Torque.x, -wrench_01.body1Torque.x, TOL);
+    EXPECT_NEAR(wrench_01.body2Torque.y, -wrench_01.body1Torque.y, TOL);
+    EXPECT_NEAR(wrench_01.body2Torque.z, -wrench_01.body1Torque.z, TOL);
+
+    gzdbg << "joint_01 force torque : "
+          << "force1 [" << wrench_01.body1Force
+          << "] torque1 [" << wrench_01.body1Torque
+          << "] force2 [" << wrench_01.body2Force
+          << "] torque2 [" << wrench_01.body2Torque
+          << "]\n";
+
+    // test joint_12 wrench
+    physics::JointWrench wrench_12 = joint_12->GetForceTorque(0);
+    EXPECT_NEAR(wrench_12.body1Force.x,    0.0, TOL);
+    EXPECT_NEAR(wrench_12.body1Force.y,    0.0, TOL);
+    EXPECT_NEAR(wrench_12.body1Force.z,  500.0, TOL);
+    EXPECT_NEAR(wrench_12.body1Torque.x,   0.0, TOL);
+    EXPECT_NEAR(wrench_12.body1Torque.y,   0.0, TOL);
+    EXPECT_NEAR(wrench_12.body1Torque.z,   0.0, TOL);
+
+    EXPECT_NEAR(wrench_12.body2Force.x,  -wrench_12.body1Force.x,  TOL);
+    EXPECT_NEAR(wrench_12.body2Force.y,  -wrench_12.body1Force.y,  TOL);
+    EXPECT_NEAR(wrench_12.body2Force.z,  -wrench_12.body1Force.z,  TOL);
+    EXPECT_NEAR(wrench_12.body2Torque.x, -wrench_12.body1Torque.x, TOL);
+    EXPECT_NEAR(wrench_12.body2Torque.y, -wrench_12.body1Torque.y, TOL);
+    EXPECT_NEAR(wrench_12.body2Torque.z, -wrench_12.body1Torque.z, TOL);
+
+    gzdbg << "joint_12 force torque : "
+          << "force1 [" << wrench_12.body1Force
+          << "] torque1 [" << wrench_12.body1Torque
+          << "] force2 [" << wrench_12.body2Force
+          << "] torque2 [" << wrench_12.body2Torque
+          << "]\n";
+  }
+
+  // perturbe joints so top link topples over, then remeasure
+  physics->SetGravity(math::Vector3(-30, 10, -50));
+  // tune joint stop properties
+  joint_01->SetAttribute("stop_erp", 0, 0.02);
+  joint_12->SetAttribute("stop_erp", 0, 0.02);
+  // wait for dynamics to stabilize
+  world->StepWorld(2000);
+  // check force torques in new system
+  gzdbg << "\n-------------------Test 2-------------------\n";
+  for (unsigned int i = 0; i < 5; ++i)
+  {
+    world->StepWorld(1);
+
+    // test joint_01 wrench
+    physics::JointWrench wrench_01 = joint_01->GetForceTorque(0);
+    EXPECT_NEAR(wrench_01.body1Force.x,   600.0,  6.0);
+    EXPECT_NEAR(wrench_01.body1Force.y, -1000.0, 10.0);
+    EXPECT_NEAR(wrench_01.body1Force.z,  -200.0,  2.0);
+    EXPECT_NEAR(wrench_01.body1Torque.x,  750.0,  7.5);
+    EXPECT_NEAR(wrench_01.body1Torque.y,  450.0,  4.5);
+    EXPECT_NEAR(wrench_01.body1Torque.z,    0.0,  0.1);
+
+    // since first link is world, these should be exact
+    EXPECT_NEAR(wrench_01.body2Force.x,  -wrench_01.body1Force.x,  TOL);
+    EXPECT_NEAR(wrench_01.body2Force.y,  -wrench_01.body1Force.y,  TOL);
+    EXPECT_NEAR(wrench_01.body2Force.z,  -wrench_01.body1Force.z,  TOL);
+    EXPECT_NEAR(wrench_01.body2Torque.x, -wrench_01.body1Torque.x, TOL);
+    EXPECT_NEAR(wrench_01.body2Torque.y, -wrench_01.body1Torque.y, TOL);
+    EXPECT_NEAR(wrench_01.body2Torque.z, -wrench_01.body1Torque.z, TOL);
+
+    gzdbg << "joint_01 force torque : "
+          << "force1 [" << wrench_01.body1Force
+          << "] torque1 [" << wrench_01.body1Torque
+          << "] force2 [" << wrench_01.body2Force
+          << "] torque2 [" << wrench_01.body2Torque
+          << "]\n";
+
+    // test joint_12 wrench
+    physics::JointWrench wrench_12 = joint_12->GetForceTorque(0);
+    EXPECT_NEAR(wrench_12.body1Force.x,   300.0,  3.0);
+    EXPECT_NEAR(wrench_12.body1Force.y,  -500.0,  5.0);
+    EXPECT_NEAR(wrench_12.body1Force.z,  -100.0,  1.0);
+    EXPECT_NEAR(wrench_12.body1Torque.x,  250.0,  5.0);
+    EXPECT_NEAR(wrench_12.body1Torque.y,  150.0,  3.0);
+    EXPECT_NEAR(wrench_12.body1Torque.z,    0.0,  0.1);
+
+    // A good check is that
+    // the computed body1Torque shoud in fact be opposite of body1Torque
+    EXPECT_NEAR(wrench_12.body2Force.x,  -wrench_12.body1Force.x,  1e-1);
+    EXPECT_NEAR(wrench_12.body2Force.y,  -wrench_12.body1Force.y,  1e-1);
+    EXPECT_NEAR(wrench_12.body2Force.z,  -wrench_12.body1Force.z,  1e-1);
+    EXPECT_NEAR(wrench_12.body2Torque.x, -wrench_12.body1Torque.x, 1e-1);
+    EXPECT_NEAR(wrench_12.body2Torque.y, -wrench_12.body1Torque.y, 1e-1);
+    EXPECT_NEAR(wrench_12.body2Torque.z, -wrench_12.body1Torque.z, 1e-1);
+
+    gzdbg << "joint_12 force torque : "
+          << "force1 [" << wrench_12.body1Force
+          << "] torque1 [" << wrench_12.body1Torque
+          << "] force2 [" << wrench_12.body2Force
+          << "] torque2 [" << wrench_12.body2Torque
+          << "]\n";
+  }
+
+  // simulate a few steps
+  int steps = 20;
+  world->StepWorld(steps);
+  t = world->GetSimTime().Double();
+  EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
+  gzdbg << "t after 20 steps : " << t << "\n";
+
+
+  Unload();
+
+}*/
+
+int main(int argc, char **argv)
+{
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
