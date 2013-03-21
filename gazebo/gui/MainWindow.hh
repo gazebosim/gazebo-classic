@@ -76,6 +76,10 @@ namespace gazebo
       private slots: void CreatePointLight();
       private slots: void CreateSpotLight();
       private slots: void CreateDirectionalLight();
+
+      /// \brief Qt callback when the screenshot action is triggered
+      private slots: void CaptureScreenshot();
+
       private slots: void InsertModel();
       private slots: void ShowGrid();
       private slots: void ShowCollisions();
