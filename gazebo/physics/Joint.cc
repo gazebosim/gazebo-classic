@@ -240,7 +240,9 @@ void Joint::Init()
       }
     }
   }
-  this->ComputeInertiaRatio();
+  // \TODO: this requres Joint::GetGlobalAxis, which breaks Simbody's
+  // Init order, state has not been created yet.
+  // this->ComputeInertiaRatio();
 }
 
 //////////////////////////////////////////////////
