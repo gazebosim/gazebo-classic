@@ -322,7 +322,6 @@ void RenderWidget::OnClearOverlayMsg()
   this->DisplayOverlayMsg("");
 }
 
-
 /////////////////////////////////////////////////
 void RenderWidget::OnStepValueChanged(int _value)
 {

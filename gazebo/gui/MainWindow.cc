@@ -455,7 +455,6 @@ void MainWindow::Play()
 
   g_pauseAct->setVisible(true);
   g_playAct->setVisible(false);
-  gzerr << "play " << std::endl;
   this->worldControlPub->Publish(msg);
 }
 
@@ -474,8 +473,6 @@ void MainWindow::Pause()
 void MainWindow::Step()
 {
   msgs::WorldControl msg;
-
-  //msg.set_step(true);
   msg.set_multi_step(this->inputStepSize);
 
   this->worldControlPub->Publish(msg);
