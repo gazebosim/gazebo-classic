@@ -64,6 +64,8 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
     type = msgs::Physics::ODE;
   else if (_physicsEngine == "bullet")
     type = msgs::Physics::BULLET;
+  else
+    type = msgs::Physics::ODE;
   physicsPubMsg.set_type(type);
   physicsPubMsg.set_max_step_size(0.01);
   physicsPubMsg.set_real_time_update_rate(500);

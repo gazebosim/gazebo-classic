@@ -42,8 +42,8 @@
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/gui/model_editor/BuildingEditorPalette.hh"
-#include "gazebo/gui/model_editor/EditorEvents.hh"
+#include "gazebo/gui/building/BuildingEditorPalette.hh"
+#include "gazebo/gui/building/EditorEvents.hh"
 
 #include "sdf/sdf.hh"
 
@@ -681,6 +681,17 @@ void MainWindow::SetTransparent()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::SetWireframe()
+{
+  if (g_viewWireframeAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "set_wireframe", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "set_solid", "all");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowCOM()
 {
   if (g_showCOMAct->isChecked())
@@ -939,6 +950,13 @@ void MainWindow::CreateActions()
   connect(g_transparentAct, SIGNAL(triggered()), this,
           SLOT(SetTransparent()));
 
+  g_viewWireframeAct = new QAction(tr("Wireframe"), this);
+  g_viewWireframeAct->setStatusTip(tr("Wireframe"));
+  g_viewWireframeAct->setCheckable(true);
+  g_viewWireframeAct->setChecked(false);
+  connect(g_viewWireframeAct, SIGNAL(triggered()), this,
+          SLOT(SetWireframe()));
+
   g_showCOMAct = new QAction(tr("Center of Mass"), this);
   g_showCOMAct->setStatusTip(tr("Show COM"));
   g_showCOMAct->setCheckable(true);
@@ -1067,6 +1085,8 @@ void MainWindow::AttachMainMenuBar()
   viewMenu->addSeparator();
 
   viewMenu->addAction(g_transparentAct);
+  viewMenu->addAction(g_viewWireframeAct);
+  viewMenu->addSeparator();
   viewMenu->addAction(g_showCollisionsAct);
   viewMenu->addAction(g_showJointsAct);
   viewMenu->addAction(g_showCOMAct);
