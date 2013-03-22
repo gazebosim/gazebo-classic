@@ -193,7 +193,8 @@ namespace gazebo
       /// \brief User specified step size for manually stepping the world
       private: int inputStepSize;
 
-      /// \brief Handle event for changing the manual step size;
+      /// \brief Handle event for changing the manual step size.
+      /// \param[in] _value New input step size.
       private: void OnInputStepSizeChanged(int _value);
     };
 
