@@ -233,7 +233,7 @@ void Joint::Init()
   else
   {
     // if parentLink is NULL, it's name be the world
-    this->sdf->GetElement("parent")->Set("world");
+    this->sdf->GetElement("parent")->GetElement("link_name")->Set("world");
     if (this->sdf->HasElement("axis"))
     {
       this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
