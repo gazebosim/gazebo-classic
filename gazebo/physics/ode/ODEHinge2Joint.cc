@@ -215,7 +215,6 @@ void ODEHinge2Joint::SetForce(int _index, double _effort)
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
-
 }
 
 //////////////////////////////////////////////////
