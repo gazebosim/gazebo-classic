@@ -885,10 +885,8 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
     // Get and output the state string
     play->Step(stateString);
 
-    if (!_filter.empty() && i > 0)
+    if (i > 0)
       stateString = filter.Filter(stateString);
-    else if (!_filter.empty())
-      stateString.clear();
 
     // Only wait for user input if there is some state to output.
     if (!stateString.empty())
