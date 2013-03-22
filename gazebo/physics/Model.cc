@@ -462,6 +462,7 @@ math::Vector3 Model::GetRelativeLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldLinearVel() const
 {
+  gzerr << " model linear vel " << std::endl;;
   if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldLinearVel();
   else

@@ -24,6 +24,9 @@
 using namespace gazebo;
 class ImuSensor_TEST : public ServerFixture
 {
+  public: void BasicImuSensorCheck(const std::string &_physicsEngine);
+  public: void LinearAccelerationTest(const std::string &_physicsEngine);
+  public: void AngularVelocityTest(const std::string &_physicsEngine);
 };
 
 static std::string imuSensorString =
@@ -37,9 +40,9 @@ static std::string imuSensorString =
 "  </sensor>"
 "</sdf>";
 
-TEST_F(ImuSensor_TEST, BasicImuSensorCheck)
+void ImuSensor_TEST::BasicImuSensorCheck(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world");
+  Load("worlds/empty.world", false, _physicsEngine);
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   sdf::ElementPtr sdf(new sdf::Element);
@@ -68,6 +71,134 @@ TEST_F(ImuSensor_TEST, BasicImuSensorCheck)
   EXPECT_EQ(sensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
 }
 
+TEST_F(ImuSensor_TEST, BasicImuSensorCheckODE)
+{
+  BasicImuSensorCheck("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(ImuSensor_TEST, BasicImuSensorCheckBullet)
+{
+  BasicImuSensorCheck("bullet");
+}
+#endif
+
+// Drop a model with imu sensor and measure its linear acceleration
+void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
+{
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  std::string modelName = "imuModel";
+  std::string imuSensorName = "imuSensor";
+  math::Pose modelPose(0, 0, 30, 0, 0, 0);
+
+  std::string topic = "~/" + imuSensorName + "_" + _physicsEngine;
+  // spawn imu sensor
+  SpawnUnitImuSensor(modelName, imuSensorName,
+      "box", topic, modelPose.pos, modelPose.rot.GetAsEuler());
+
+  sensors::SensorPtr sensor = sensors::get_sensor(imuSensorName);
+  sensors::ImuSensorPtr imuSensor =
+      boost::shared_dynamic_cast<sensors::ImuSensor>(sensor);
+
+  ASSERT_TRUE(imuSensor);
+
+  sensors::SensorManager::Instance()->Init();
+  sensors::SensorManager::Instance()->RunThreads();
+  imuSensor->SetActive(true);
+
+  EXPECT_EQ(imuSensor->GetAngularVelocity(), math::Vector3::Zero);
+  EXPECT_EQ(imuSensor->GetLinearAcceleration(), math::Vector3::Zero);
+  EXPECT_EQ(imuSensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
+
+  // step world and verify imu's linear acceleration becomes negative
+//  world->StepWorld(300);
+  for ( int i = 0 ; i< 200; i++)
+  {
+    world->StepWorld(1);
+    gzerr << imuSensor->GetLinearAcceleration() << std::endl;
+  }
+
+  EXPECT_LT(imuSensor->GetLinearAcceleration().z, 0);
+}
+
+TEST_F(ImuSensor_TEST, LinearAccelerationTestODE)
+{
+  LinearAccelerationTest("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(ImuSensor_TEST, LinearAccelerationTestBullet)
+{
+  LinearAccelerationTest("bullet");
+}
+#endif
+
+// Drop a model with imu sensor and measure its linear acceleration
+void ImuSensor_TEST::AngularVelocityTest(const std::string &_physicsEngine)
+{
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  std::string modelName = "imuModel";
+  std::string imuSensorName = "imuSensor";
+  math::Pose modelPose(0, 0, 1.5, 0, 0, 0);
+
+  std::string boxName = "boxModel";
+  math::Pose boxPose(0, 0.4, 0.5, 0, 0, 0);
+  SpawnBox(boxName, math::Vector3(1, 1, 1), boxPose.pos,
+      boxPose.rot.GetAsEuler());
+
+  std::string topic = "~/" + imuSensorName;
+  // spawn imu sensor
+  SpawnUnitImuSensor(modelName, imuSensorName,
+      "box", topic, modelPose.pos, modelPose.rot.GetAsEuler());
+
+  sensors::SensorPtr sensor = sensors::get_sensor(imuSensorName);
+  sensors::ImuSensorPtr imuSensor =
+      boost::shared_dynamic_cast<sensors::ImuSensor>(sensor);
+
+  ASSERT_TRUE(imuSensor);
+  imuSensor->SetActive(true);
+
+  EXPECT_EQ(imuSensor->GetAngularVelocity(), math::Vector3::Zero);
+  EXPECT_EQ(imuSensor->GetLinearAcceleration(), math::Vector3::Zero);
+  EXPECT_EQ(imuSensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
+
+  // step world
+//  world->StepWorld(200);
+
+  for ( int i = 0 ; i< 200; i++)
+  {
+    world->StepWorld(1);
+    gzerr << "imu ang vel " << imuSensor->GetAngularVelocity() << std::endl;
+  }
+}
+/*
+TEST_F(ImuSensor_TEST, AngularVelocityTestODE)
+{
+  AngularVelocityTest("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(ImuSensor_TEST, AngularVelocityTestBullet)
+{
+  AngularVelocityTest("bullet");
+}
+#endif*/
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

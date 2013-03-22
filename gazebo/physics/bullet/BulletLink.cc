@@ -338,6 +338,7 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset) const
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
       BulletTypes::ConvertVector3(offsetFromCoG));
 
+  gzerr << " bullet linear vel " << BulletTypes::ConvertVector3(vel) << std::endl;;
   return BulletTypes::ConvertVector3(vel);
 }
 
