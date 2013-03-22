@@ -341,6 +341,12 @@ math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
+void ODEJoint::SetAxis(int _index, const math::Vector3 &_axis)
+{
+  this->sdf->GetElement("axis")->GetElement("xyz")->Set(_axis);
+}
+
+//////////////////////////////////////////////////
 void ODEJoint::SetAttribute(Attribute _attr, int _index, double _value)
 {
   switch (_attr)
