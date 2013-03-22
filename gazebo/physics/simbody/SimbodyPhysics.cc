@@ -110,7 +110,7 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr simbodyElem = this->sdf->GetElement("simbody");
 
-  this->stepTimeDouble = simbodyElem->GetElement("dt")->GetValueDouble();
+  this->stepTimeDouble = this->GetStepTime();
 }
 
 //////////////////////////////////////////////////
@@ -159,6 +159,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   SimTK::State state = this->system.realizeTopology();
 
   this->integ->initialize(state);
+  gzerr << "system state realized\n";
 }
 
 //////////////////////////////////////////////////
@@ -568,6 +569,12 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
                 direction);
             mobod = pinJoint;
 
+            double low = gzJoint->GetLowerLimit(0u).Radian();
+            double high = gzJoint->GetUpperLimit(0u).Radian();
+            gzJoint->limitForce.reset(
+              new Force::MobilityLinearStop(this->forces, mobod,
+              SimTK::MobilizerQIndex(0), 1.0e8, 10.0, low, high));
+
             #ifdef ADD_JOINT_SPRINGS
             // KLUDGE add spring (stiffness proportional to mass)
             Force::MobilityLinearSpring(this->forces,mobod,0,
@@ -724,7 +731,8 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
   // TODO: Edit physics::Surface class to support these properties
   // Define a material to use for contact. This is not very stiff.
   // use stiffness of 1e8 and dissipation of 1000.0 to approximate inelastic
-  // collision.
+  // collision. but 1e6 and 10 seems sufficient when TransitionVelocity is
+  // reduced from 0.1 to 0.01
   SimTK::ContactMaterial material(1e6,   // stiffness
                                   10.0,  // dissipation
                                   1.0,   // mu_static

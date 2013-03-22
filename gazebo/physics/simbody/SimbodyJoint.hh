@@ -128,6 +128,9 @@ namespace gazebo
       // mobilizer or a constraint, but not both. The type of either one is the
       // same as the joint type above.
 
+      /// \brief: for enforcing joint stops
+      public: boost::shared_ptr<SimTK::Force::MobilityLinearStop> limitForce;
+
       // isValid() if we used a mobilizer
       public: SimTK::MobilizedBody mobod;
 

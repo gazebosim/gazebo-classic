@@ -128,14 +128,14 @@ double SimbodyHingeJoint::GetForce(int /*_index*/)
 void SimbodyHingeJoint::SetHighStop(int /*_index*/,
                                    const math::Angle &/*_angle*/)
 {
-  gzerr << "Not implemented...\n";
+  gzerr << "SetHighStop\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetLowStop(int /*_index*/,
                                   const math::Angle &/*_angle*/)
 {
-  gzerr << "Not implemented...\n";
+  gzerr << "SetLowStop\n";
 }
 
 //////////////////////////////////////////////////

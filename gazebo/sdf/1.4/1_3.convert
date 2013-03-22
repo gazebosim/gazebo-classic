@@ -13,6 +13,10 @@
         <from element="bullet::dt"/>
         <to element="max_step_size"/>
       </move>
+      <move>
+        <from element="simbody::dt"/>
+        <to element="max_step_size"/>
+      </move>
     </convert>
 
     <convert name="model">
