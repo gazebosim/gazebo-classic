@@ -101,6 +101,11 @@ namespace gazebo
                                         const boost::any &/*_value*/)
               {gzerr << "Not implement in Simbody\n";}
 
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &_key,
+                                                unsigned int _index)
+              {gzerr << "Not implement in Simbody\n"; return 0;}
+
       protected: SimTK::MultibodySystem *world;
 
       // Documentation inherited.

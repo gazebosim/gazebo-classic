@@ -47,6 +47,11 @@ Joint::Joint(BasePtr _parent)
   this->effortLimit[1] = -1;
   this->velocityLimit[0] = -1;
   this->velocityLimit[1] = -1;
+  this->useCFMDamping = false;
+  this->lowerLimit[0] = -1e16;
+  this->lowerLimit[1] = -1e16;
+  this->upperLimit[0] =  1e16;
+  this->upperLimit[1] =  1e16;
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
 }
@@ -93,8 +98,14 @@ void Joint::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string parentName = _sdf->GetValueString("parent");
-  std::string childName = _sdf->GetValueString("child");
+  sdf::ElementPtr parentElem = _sdf->GetElement("parent");
+  sdf::ElementPtr childElem = _sdf->GetElement("child");
+
+  GZ_ASSERT(parentElem, "Parent element is NULL");
+  GZ_ASSERT(childElem, "Child element is NULL");
+
+  std::string parentName = parentElem->GetValueString("link_name");
+  std::string childName = childElem->GetValueString("link_name");
 
   if (this->model)
   {
@@ -162,12 +173,17 @@ void Joint::Init()
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
+      // store upper and lower joint limits
+      this->upperLimit[0] = limitElem->GetValueDouble("upper");
+      this->lowerLimit[0] = limitElem->GetValueDouble("lower");
+
       // Perform this three step ordering to ensure the
       // parameters are set properly.
       // This is taken from the ODE wiki.
-      this->SetHighStop(0, limitElem->GetValueDouble("upper"));
-      this->SetLowStop(0, limitElem->GetValueDouble("lower"));
-      this->SetHighStop(0, limitElem->GetValueDouble("upper"));
+      this->SetHighStop(0, this->upperLimit[0].Radian());
+      this->SetLowStop(0, this->lowerLimit[0].Radian());
+      this->SetHighStop(0, this->upperLimit[0].Radian());
+
       this->effortLimit[0] = limitElem->GetValueDouble("effort");
       this->velocityLimit[0] = limitElem->GetValueDouble("velocity");
     }
@@ -181,13 +197,17 @@ void Joint::Init()
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
+      // store upper and lower joint limits
+      this->upperLimit[1] = limitElem->GetValueDouble("upper");
+      this->lowerLimit[1] = limitElem->GetValueDouble("lower");
+
       // Perform this three step ordering to ensure the
       // parameters  are set properly.
       // This is taken from the ODE wiki.
-      limitElem = axisElem->GetElement("limit");
-      this->SetHighStop(1, limitElem->GetValueDouble("upper"));
-      this->SetLowStop(1, limitElem->GetValueDouble("lower"));
-      this->SetHighStop(1, limitElem->GetValueDouble("upper"));
+      this->SetHighStop(1, this->upperLimit[1].Radian());
+      this->SetLowStop(1, this->lowerLimit[1].Radian());
+      this->SetHighStop(1, this->upperLimit[1].Radian());
+
       this->effortLimit[1] = limitElem->GetValueDouble("effort");
       this->velocityLimit[1] = limitElem->GetValueDouble("velocity");
     }
@@ -215,11 +235,12 @@ void Joint::Init()
     if (this->sdf->HasElement("axis"))
     {
       this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-      if (this->sdf->GetValueString("parent") != "world")
+      if (this->sdf->GetElement("parent")->GetValueString("link_name")
+          != "world")
       {
         gzwarn << "joint [" << this->GetScopedName()
           << "] has a non-real parentLink ["
-          << this->sdf->GetValueString("parent")
+          << this->sdf->GetElement("parent")->GetValueString("link_name")
           << "], loading axis from SDF ["
           << this->sdf->GetElement("axis")->GetValueVector3("xyz")
           << "]\n";
@@ -229,11 +250,12 @@ void Joint::Init()
     {
       this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
 
-      if (this->sdf->GetValueString("parent") != "world")
+      if (this->sdf->GetElement("parent")->GetValueString("link_name")
+          != "world")
       {
         gzwarn << "joint [" << this->GetScopedName()
           << "] has a non-real parentLink ["
-          << this->sdf->GetValueString("parent")
+          << this->sdf->GetElement("parent")->GetValueString("link_name")
           << "], loading axis2 from SDF ["
           << this->sdf->GetElement("axis2")->GetValueVector3("xyz")
           << "]\n";
@@ -309,12 +331,10 @@ void Joint::Attach(LinkPtr _parent, LinkPtr _child)
 //////////////////////////////////////////////////
 void Joint::Detach()
 {
-  BasePtr myBase = shared_from_this();
-
   if (this->parentLink)
-    this->parentLink->RemoveChildJoint(
-      boost::shared_static_cast<Joint>(myBase));
-  this->childLink->RemoveParentJoint(boost::shared_static_cast<Joint>(myBase));
+    this->parentLink->RemoveChildJoint(this->GetName());
+  if (this->childLink)
+    this->childLink->RemoveParentJoint(this->GetName());
 }
 
 //////////////////////////////////////////////////
