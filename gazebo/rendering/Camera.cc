@@ -1182,6 +1182,12 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
       // this->ssaoInstance->setEnabled(false);
     }
 
+    // Noise
+    this->gaussianNoiseInstance =
+      Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+          "CameraNoise/Gaussian");
+    this->gaussianNoiseInstance->setEnabled(true);
+
     if (this->GetScene()->skyx != NULL)
       this->renderTarget->addListener(this->GetScene()->skyx);
   }

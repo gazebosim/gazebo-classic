@@ -666,6 +666,9 @@ namespace gazebo
       /// \brief Screen space ambient occlusion compositor.
       private: Ogre::CompositorInstance *ssaoInstance;
 
+      /// \brief Gaussian noise compositor
+      private: Ogre::CompositorInstance *gaussianNoiseInstance;
+
       /// \brief Queue of move positions.
       private: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
 

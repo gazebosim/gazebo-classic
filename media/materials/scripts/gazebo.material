@@ -832,3 +832,25 @@ material drc/san_fauxcity_sign
     }
   }
 }
+
+vertex_program Gazebo/GaussianCameraNoiseVS glsl
+{
+  source camera_noise_gaussian_vs.glsl
+}
+
+fragment_program Gazebo/GaussianCameraNoiseFS glsl
+{
+  source camera_noise_gaussian_fs.glsl
+}
+
+material Gazebo/GaussianCameraNoise
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/GaussianCameraNoiseVS { }
+      fragment_program_ref Gazebo/GaussianCameraNoiseFS { }
+    }
+  }
+}
