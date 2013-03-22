@@ -1047,6 +1047,9 @@ void World::OnControl(ConstWorldControlPtr &_data)
   if (_data->has_step())
     this->OnStep();
 
+  if (_data->has_multi_step())
+    this->StepWorld(_data->multi_step());
+
   if (_data->has_seed())
   {
     math::Rand::SetSeed(_data->seed());

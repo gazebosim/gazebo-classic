@@ -97,24 +97,41 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   TimePanel *timePanel = new TimePanel(this);
 
-  QHBoxLayout *playControlLayout = new QHBoxLayout;
-  playControlLayout->setContentsMargins(0, 0, 0, 0);
-
   this->bottomFrame = new QFrame;
   this->bottomFrame->setObjectName("renderBottomFrame");
   this->bottomFrame->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Minimum);
 
+  QLabel *stepLabel = new QLabel(tr("# of Steps:"));
+  QSpinBox *stepSpinBox = new QSpinBox;
+  stepSpinBox->setRange(0, 9999);
+  stepSpinBox->setValue(1);
+  connect(stepSpinBox, SIGNAL(valueChanged(int)), this,
+      SLOT(OnStepValueChanged(int)));
+
   QFrame *playFrame = new QFrame;
-  QToolBar *playToolbar = new QToolBar;
   playFrame->setFrameShape(QFrame::NoFrame);
   playFrame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   playFrame->setFixedHeight(25);
+  QToolBar *playToolbar = new QToolBar;
   playToolbar->addAction(g_playAct);
   playToolbar->addAction(g_pauseAct);
+
+  QLabel *emptyLabel = new QLabel(tr("  "));
+  QLabel *parenthesisOpenLabel = new QLabel(tr("("));
+  QLabel *parenthesisCloseLabel = new QLabel(tr(")"));
+  playToolbar->addWidget(emptyLabel);
   playToolbar->addAction(g_stepAct);
-  playControlLayout->addWidget(playToolbar);
+  playToolbar->addWidget(parenthesisOpenLabel);
+  playToolbar->addWidget(stepLabel);
+  playToolbar->addWidget(stepSpinBox);
+  playToolbar->addWidget(parenthesisCloseLabel);
+
+  QHBoxLayout *playControlLayout = new QHBoxLayout;
   playControlLayout->setContentsMargins(0, 0, 0, 0);
+  playControlLayout->addWidget(playToolbar);
+  playControlLayout->addItem(new QSpacerItem(15, -1, QSizePolicy::Expanding,
+                             QSizePolicy::Minimum));
   playFrame->setLayout(playControlLayout);
 
   bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Expanding,
@@ -303,4 +320,11 @@ std::string RenderWidget::GetOverlayMsg() const
 void RenderWidget::OnClearOverlayMsg()
 {
   this->DisplayOverlayMsg("");
+}
+
+
+/////////////////////////////////////////////////
+void RenderWidget::OnStepValueChanged(int _value)
+{
+  emit gui::Events::inputStepSize(_value);
 }

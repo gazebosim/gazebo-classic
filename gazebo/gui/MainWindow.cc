@@ -64,6 +64,7 @@ MainWindow::MainWindow()
   this->menuBar = NULL;
   this->setObjectName("mainWindow");
 
+  this->inputStepSize = 1;
   this->requestMsg = NULL;
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -166,6 +167,10 @@ MainWindow::MainWindow()
   this->connections.push_back(
       gui::editor::Events::ConnectFinishBuildingModel(
       boost::bind(&MainWindow::OnFinishBuilding, this)));
+
+  this->connections.push_back(
+      gui::Events::ConnectInputStepSize(
+      boost::bind(&MainWindow::OnInputStepSizeChanged, this, _1)));
 
   gui::ViewFactory::RegisterAll();
 }
@@ -449,6 +454,8 @@ void MainWindow::Play()
   msg.set_pause(false);
 
   g_pauseAct->setChecked(false);
+  g_pauseAct->setVisible(true);
+  g_playAct->setVisible(false);
   this->worldControlPub->Publish(msg);
 }
 
@@ -459,6 +466,8 @@ void MainWindow::Pause()
   msg.set_pause(true);
 
   g_playAct->setChecked(false);
+  g_pauseAct->setVisible(false);
+  g_playAct->setVisible(true);
   this->worldControlPub->Publish(msg);
 }
 
@@ -466,9 +475,17 @@ void MainWindow::Pause()
 void MainWindow::Step()
 {
   msgs::WorldControl msg;
-  msg.set_step(true);
+
+  //msg.set_step(true);
+  msg.set_multi_step(this->inputStepSize);
 
   this->worldControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnInputStepSizeChanged(int _value)
+{
+  this->inputStepSize = _value;
 }
 
 /////////////////////////////////////////////////
@@ -842,12 +859,14 @@ void MainWindow::CreateActions()
   g_playAct->setStatusTip(tr("Run the world"));
   g_playAct->setCheckable(true);
   g_playAct->setChecked(true);
+  g_playAct->setVisible(false);
   connect(g_playAct, SIGNAL(triggered()), this, SLOT(Play()));
 
   g_pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
   g_pauseAct->setStatusTip(tr("Pause the world"));
   g_pauseAct->setCheckable(true);
   g_pauseAct->setChecked(false);
+  g_pauseAct->setVisible(true);
   connect(g_pauseAct, SIGNAL(triggered()), this, SLOT(Pause()));
 
   g_stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
@@ -1335,11 +1354,15 @@ void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
   {
     g_playAct->setChecked(false);
     g_pauseAct->setChecked(true);
+    g_playAct->setVisible(true);
+    g_playAct->setVisible(false);
   }
   else if (!_msg->paused() && !g_playAct->isChecked())
   {
     g_playAct->setChecked(true);
     g_pauseAct->setChecked(false);
+    g_pauseAct->setVisible(true);
+    g_playAct->setVisible(false);
   }
 }
 

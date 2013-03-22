@@ -151,11 +151,15 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   {
     g_pauseAct->setChecked(true);
     g_playAct->setChecked(false);
+    g_playAct->setVisible(true);
+    g_pauseAct->setVisible(false);
   }
   else if (!_msg->paused() && (g_playAct && !g_playAct->isChecked()))
   {
     g_pauseAct->setChecked(false);
     g_playAct->setChecked(true);
+    g_pauseAct->setVisible(true);
+    g_playAct->setVisible(false);
   }
 
   unsigned int day, hour, min, sec, msec;

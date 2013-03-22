@@ -189,6 +189,12 @@ namespace gazebo
       /// \brief The filename set via "Save As". This filename is used by
       /// the "Save" feature.
       private: std::string saveFilename;
+
+      /// \brief User specified step size for manually stepping the world
+      private: int inputStepSize;
+
+      /// \brief Handle event for changing the manual step size;
+      private: void OnInputStepSizeChanged(int _value);
     };
 
     class TreeViewDelegate: public QItemDelegate
