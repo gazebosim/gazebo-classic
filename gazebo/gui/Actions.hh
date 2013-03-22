@@ -75,6 +75,8 @@ namespace gazebo
 
     extern QAction *g_diagnosticsAct;
 
+    extern QAction *g_viewWireframeAct;
+
     extern QAction *g_buildingEditorSaveAct;
     extern QAction *g_buildingEditorDiscardAct;
     extern QAction *g_buildingEditorDoneAct;

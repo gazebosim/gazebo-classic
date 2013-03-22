@@ -880,7 +880,6 @@ double ODEJoint::GetAttribute(const std::string &_key, unsigned int _index)
 //////////////////////////////////////////////////
 void ODEJoint::Reset()
 {
-
   if (this->jointId)
     dJointReset(this->jointId);
   else

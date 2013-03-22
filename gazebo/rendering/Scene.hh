@@ -367,6 +367,10 @@ namespace gazebo
       /// nothing is selected.
       public: VisualPtr GetSelectedVisual() const;
 
+      /// \brief Enable or disable wireframe for all visuals.
+      /// \param[in] _show True to enable wireframe for all visuals.
+      public: void SetWireframe(bool _show);
+
       /// \brief Enable or disable transparency for all visuals.
       /// \param[in] _show True to enable transparency for all visuals.
       public: void SetTransparent(bool _show);
@@ -734,6 +738,9 @@ namespace gazebo
 
       /// \brief True when all objects should be transparent.
       private: bool transparent;
+
+      /// \brief True when all objects should be wireframe.
+      private: bool wireframe;
 
       /// \brief Initialized.
       private: bool initialized;
