@@ -36,7 +36,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 

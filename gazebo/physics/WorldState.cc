@@ -65,7 +65,7 @@ WorldState::~WorldState()
 void WorldState::Load(const sdf::ElementPtr _elem)
 {
   // Copy the name and time information
-  this->name = _elem->GetValueString("world_name");
+  this->name = _elem->Get<std::string>("world_name");
   this->simTime = _elem->Get<common::Time>("sim_time");
   this->wallTime = _elem->Get<common::Time>("wall_time");
   this->realTime = _elem->Get<common::Time>("real_time");

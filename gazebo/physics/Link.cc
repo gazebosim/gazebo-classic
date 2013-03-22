@@ -914,7 +914,7 @@ void Link::SetState(const LinkState & /*_state*/)
 double Link::GetLinearDamping() const
 {
   if (this->sdf->HasElement("velocity_decay"))
-    return this->sdf->GetElement("velocity_decay")->GetValueDouble("linear");
+    return this->sdf->GetElement("velocity_decay")->Get<double>("linear");
   else
     return 0.0;
 }

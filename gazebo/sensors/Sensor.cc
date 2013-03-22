@@ -19,7 +19,7 @@
  * Date: 25 May 2007
  */
 
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "transport/transport.hh"
 
 #include "physics/Physics.hh"
@@ -76,10 +76,10 @@ void Sensor::Load(const std::string &_worldName)
 {
   if (this->sdf->HasElement("pose"))
   {
-    this->pose = this->sdf->GetValuePose("pose");
+    this->pose = this->sdf->Get<math::Pose>("pose");
   }
 
-  if (this->sdf->GetValueBool("always_on"))
+  if (this->sdf->Get<bool>("always_on"))
     this->SetActive(true);
 
   this->world = physics::get_world(_worldName);
@@ -94,7 +94,7 @@ void Sensor::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void Sensor::Init()
 {
-  this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
+  this->SetUpdateRate(this->sdf->Get<double>("update_rate"));
 
   // Load the plugins
   if (this->sdf->HasElement("plugin"))
@@ -148,7 +148,7 @@ void Sensor::Fini()
 //////////////////////////////////////////////////
 std::string Sensor::GetName() const
 {
-  return this->sdf->GetValueString("name");
+  return this->sdf->Get<std::string>("name");
 }
 
 //////////////////////////////////////////////////
@@ -161,8 +161,8 @@ std::string Sensor::GetScopedName() const
 //////////////////////////////////////////////////
 void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string name = _sdf->GetValueString("name");
-  std::string filename = _sdf->GetValueString("filename");
+  std::string name = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
   gazebo::SensorPluginPtr plugin = gazebo::SensorPlugin::Create(filename, name);
 
   if (plugin)
@@ -232,13 +232,13 @@ common::Time Sensor::GetLastMeasurementTime()
 //////////////////////////////////////////////////
 std::string Sensor::GetType() const
 {
-  return this->sdf->GetValueString("type");
+  return this->sdf->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
 bool Sensor::GetVisualize() const
 {
-  return this->sdf->GetValueBool("visualize");
+  return this->sdf->Get<bool>("visualize");
 }
 
 //////////////////////////////////////////////////

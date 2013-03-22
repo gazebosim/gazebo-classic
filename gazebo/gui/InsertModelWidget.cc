@@ -18,7 +18,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "common/SystemPaths.hh"
 #include "common/Console.hh"
 #include "common/ModelDatabase.hh"

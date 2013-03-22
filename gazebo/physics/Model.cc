@@ -1003,5 +1003,5 @@ void Model::SetAutoDisable(bool _auto)
 /////////////////////////////////////////////////
 bool Model::GetAutoDisable() const
 {
-  return this->sdf->GetValueBool("allow_auto_disable");
+  return this->sdf->Get<bool>("allow_auto_disable");
 }

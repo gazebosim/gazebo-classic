@@ -20,7 +20,7 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"

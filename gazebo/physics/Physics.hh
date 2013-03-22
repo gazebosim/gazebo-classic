@@ -20,7 +20,7 @@
 #include <string>
 
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 namespace gazebo
 {

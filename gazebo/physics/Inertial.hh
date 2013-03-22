@@ -20,7 +20,7 @@
 #include <string>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Vector3.hh"
 

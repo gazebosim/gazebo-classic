@@ -38,7 +38,7 @@
 
 #include "physics/PhysicsTypes.hh"
 #include "sensors/SensorTypes.hh"
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "rendering/RenderTypes.hh"
 
 namespace gazebo

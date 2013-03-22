@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "math/Pose.hh"
 #include "common/Console.hh"
 #include "common/MeshManager.hh"
@@ -204,9 +204,9 @@ void ProcessLight(sdf::ElementPtr _elem)
   gazebo::math::Pose pose;
   gazebo::common::Color diffuse, specular;
 
-  pose = _elem->GetOrCreateElement("origin")->GetValuePose("pose");
-  diffuse = _elem->GetValueColor("diffuse");
-  specular = _elem->GetValueColor("specular");
+  pose = _elem->GetOrCreateElement("origin")->Get<math::Pose>("pose");
+  diffuse = _elem->Get<common::Color>("diffuse");
+  specular = _elem->Get<common::Color>("specular");
   // double fadeDist =
   // _elem->GetElement("attenuation")->GetValueDouble("range");
   // double constant =
@@ -244,7 +244,7 @@ void ProcessLight(sdf::ElementPtr _elem)
   if (_elem->HasElement("direction"))
   {
     gazebo::math::Vector3 dir =
-      _elem->GetElement("direction")->GetValueVector3("xyz");
+      _elem->GetElement("direction")->Get<math::Vector3>("xyz");
     gazebo::math::Plane plane(gazebo::math::Vector3(0, 0, 1));
 
     double d = plane.Distance(pose.pos, dir);
@@ -264,13 +264,13 @@ void ProcessScene(sdf::ElementPtr _elem)
   gazebo::common::Color color;
   if (_elem->HasElement("background"))
   {
-    color = _elem->GetValueColor("background");
+    color = _elem->Get<common::Color>("background");
     printf("background { rgb <%f, %f, %f> }\n", color.r, color.g, color.b);
   }
 
   if (_elem->HasElement("ambient"))
   {
-    color = _elem->GetValueColor("ambient");
+    color = _elem->Get<common::Color>("ambient");
     // printf("global_settings { ambient_light rgb <%f, %f, %f> }\n",
         // color.R(), color.G(), color.B());
   }
@@ -298,7 +298,7 @@ void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
   if (_elem->HasElement("plane"))
   {
     sdf::ElementPtr planeElem = _elem->GetElement("plane");
-    gazebo::math::Vector3 normal = planeElem->GetValueVector3("normal");
+    gazebo::math::Vector3 normal = planeElem->Get<math::Vector3>("normal");
     printf("plane {\n");
     printf("  <%f, %f, %f>, 0\n", normal.x, normal.y, normal.z);
     printf("  texture {pigment { color Yellow } }\n");
@@ -307,7 +307,7 @@ void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
   else if (_elem->HasElement("box"))
   {
     sdf::ElementPtr boxElem = _elem->GetElement("box");
-    gazebo::math::Vector3 size = boxElem->GetValueVector3("size");
+    gazebo::math::Vector3 size = boxElem->Get<math::Vector3>("size");
     printf("box {\n");
     gazebo::math::Vector3 corner1 = _pose.pos - (size/2.0);
     gazebo::math::Vector3 corner2 = _pose.pos + (size/2.0);
@@ -401,12 +401,12 @@ int main(int argc, char **argv)
     sdf::ElementPtr modelElem = worldElem->GetElement("model");
     while (modelElem)
     {
-      modelPose = modelElem->GetOrCreateElement("origin")->GetValuePose("pose");
+      modelPose = modelElem->GetOrCreateElement("origin")->Get<math::Pose>("pose");
 
       sdf::ElementPtr linkElem = modelElem->GetElement("link");
       while (linkElem)
       {
-        linkPose = linkElem->GetOrCreateElement("origin")->GetValuePose("pose");
+        linkPose = linkElem->GetOrCreateElement("origin")->Get<math::Pose>("pose");
 
         if (linkElem->HasElement("visual"))
         {
@@ -414,7 +414,7 @@ int main(int argc, char **argv)
           while (visualElem)
           {
             visualPose =
-              visualElem->GetOrCreateElement("origin")->GetValuePose("pose");
+              visualElem->GetOrCreateElement("origin")->Get<math::Pose>("pose");
             // visualPose = (visualPose + linkPose) + modelPose;
             visualPose = modelPose + (linkPose + visualPose);
             // visualPose.pos = modelPose.pos + linkPose.pos + visualPose.pos;

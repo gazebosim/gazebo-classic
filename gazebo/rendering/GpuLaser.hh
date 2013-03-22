@@ -36,7 +36,7 @@
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector2i.hh"
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 namespace Ogre
 {

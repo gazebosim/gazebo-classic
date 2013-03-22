@@ -15,7 +15,7 @@
  *
 */
 #ifndef _ASSERT_HH_
-#define _ASSERT_HH_ 1
+#define _ASSERT_HH_
 
 #include <boost/assert.hpp>
 

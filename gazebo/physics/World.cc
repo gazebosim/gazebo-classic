@@ -402,7 +402,7 @@ void World::LogStep()
         while (nameElem)
         {
           transport::requestNoReply(this->GetName(), "entity_delete",
-                                    nameElem->GetValueString());
+                                    nameElem->Get<std::string>());
           nameElem = nameElem->GetNextElement("name");
         }
       }
@@ -1247,7 +1247,7 @@ void World::ProcessEntityMsgs()
     if (this->sdf->HasElement("model"))
     {
       sdf::ElementPtr childElem = this->sdf->GetElement("model");
-      while (childElem && childElem->GetValueString("name") != (*iter))
+      while (childElem && childElem->Get<std::string>("name") != (*iter))
         childElem = childElem->GetNextElement("model");
       if (childElem)
         this->sdf->RemoveChild(childElem);

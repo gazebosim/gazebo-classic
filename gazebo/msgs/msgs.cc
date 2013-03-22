@@ -299,8 +299,7 @@ namespace gazebo
 
         if (camSDF->HasElement("pose"))
         {
-          msgs::Set(guiCam->mutable_origin(),
-                    camSDF->Get<math::Pose>("pose"));
+          msgs::Set(guiCam->mutable_pose(), camSDF->Get<math::Pose>("pose"));
         }
 
         if (camSDF->HasElement("view_controller"))
@@ -509,7 +508,7 @@ namespace gazebo
         {
           geomMsg->set_type(msgs::Geometry::EMPTY);
           // msgs::Set(geomMsg->mutable_mesh()->mutable_scale(),
-              // geomElem->GetValueVector3("scale"));
+              // geomElem->Get<math::Vector3>("scale"));
         }
         else
           gzthrow("Unknown geometry type\n");
@@ -584,9 +583,9 @@ namespace gazebo
         sdf::ElementPtr elem = _sdf->GetElement("plugin");
         msgs::Plugin *plgnMsg = result.mutable_plugin();
         // if (elem->HasElement("name"))
-          plgnMsg->set_name(elem->GetValueString("name"));
+          plgnMsg->set_name(elem->Get<std::string>("name"));
         // if (elem->HasElement("filename"))
-          plgnMsg->set_filename(elem->GetValueString("filename"));
+          plgnMsg->set_filename(elem->Get<std::string>("filename"));
       }
 
       return result;

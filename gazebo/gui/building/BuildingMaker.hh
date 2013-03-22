@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "gazebo/common/Events.hh"
 #include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/qt.h"

@@ -31,7 +31,7 @@
 #include "common/Event.hh"
 #include "common/Color.hh"
 
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 namespace Ogre
 {

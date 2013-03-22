@@ -30,7 +30,7 @@
 #include "math/Pose.hh"
 #include "math/Vector2i.hh"
 
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 #include "rendering/Camera.hh"
 

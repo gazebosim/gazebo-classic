@@ -27,7 +27,7 @@
 
 #include <gazebo/gazebo.hh>
 
-#include <gazebo/sdf/sdf.hh>
+#include <sdf/sdf.hh>
 
 #include <gazebo/physics/WorldState.hh>
 #include <gazebo/common/Time.hh>

@@ -58,7 +58,7 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   // Create a publisher for the contact information.
   if (this->sdf->HasElement("contact") &&
       this->sdf->GetElement("contact")->HasElement("topic") &&
-      this->sdf->GetElement("contact")->GetValueString("topic")
+      this->sdf->GetElement("contact")->Get<std::string>("topic")
       != "__default_topic__")
   {
     // This will create a topic based on the name specified in SDF.

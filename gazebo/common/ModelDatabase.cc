@@ -28,7 +28,7 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
@@ -153,12 +153,6 @@ std::string ModelDatabase::GetModelConfig(const std::string &_uri)
   }
 
   return xmlString;
-}
-
-/////////////////////////////////////////////////
-std::string ModelDatabase::GetManifest(const std::string &_uri)
-{
-  return this->GetModelConfig(_uri);
 }
 
 /////////////////////////////////////////////////
