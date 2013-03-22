@@ -17,9 +17,12 @@
 
 #include "gazebo/physics/Physics.hh"
 
+#include "gazebo/rendering/Rendering.hh"
+
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/gazebo.hh"
+#include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/QTestFixture.hh"
 
 /////////////////////////////////////////////////
@@ -46,6 +49,9 @@ void QTestFixture::initTestCase()
 /////////////////////////////////////////////////
 void QTestFixture::init()
 {
+  this->resMaxPercentChange = 2.5;
+  this->shareMaxPercentChange = 1.0;
+
   this->serverThread = NULL;
   this->GetMemInfo(this->residentStart, this->shareStart);
 }
@@ -103,11 +109,10 @@ void QTestFixture::cleanup()
   double resPercentChange = (residentEnd - residentStart) / residentStart;
   double sharePercentChange = (shareEnd - shareStart) / shareStart;
 
-  std::cout << "REs[" << resPercentChange << "]\n";
-  std::cout << "Shared[" << sharePercentChange << "]\n";
+  std::cout << "ResPercentChange[" << resPercentChange << "]\n";
   // Make sure the percent change values are reasonable.
-  QVERIFY(resPercentChange < 2.5);
-  QVERIFY(sharePercentChange < 1.0);
+  QVERIFY(resPercentChange < this->resMaxPercentChange);
+  QVERIFY(sharePercentChange < this->shareMaxPercentChange);
 
   if (this->server)
   {

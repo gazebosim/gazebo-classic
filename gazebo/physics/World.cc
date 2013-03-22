@@ -321,6 +321,7 @@ void World::Run()
 //////////////////////////////////////////////////
 void World::Stop()
 {
+  common::ModelDatabase::Instance()->Fini();
   this->stop = true;
   if (this->thread)
   {

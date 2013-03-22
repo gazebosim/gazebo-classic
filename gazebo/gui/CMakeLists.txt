@@ -95,6 +95,7 @@ set (headers
 
 set (qt_tests
   DataLogger_TEST.cc
+  MainWindow_TEST.cc
   TimePanel_TEST.cc
   viewers/ImagesView_TEST.cc
 )

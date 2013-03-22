@@ -72,12 +72,21 @@ ModelDatabase::ModelDatabase()
 /////////////////////////////////////////////////
 ModelDatabase::~ModelDatabase()
 {
+  this->Fini();
+}
+
+/////////////////////////////////////////////////
+void ModelDatabase::Fini()
+{
+  this->callbacks.clear();
+
   // Stop the update thread.
   this->stop = true;
   this->updateCacheCondition.notify_one();
-  this->updateCacheThread->join();
-
+  if (this->updateCacheThread)
+    this->updateCacheThread->join();
   delete this->updateCacheThread;
+  this->updateCacheThread = NULL;
 }
 
 /////////////////////////////////////////////////

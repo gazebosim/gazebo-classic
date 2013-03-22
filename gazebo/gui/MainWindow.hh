@@ -172,8 +172,6 @@ namespace gazebo
 
       private: msgs::Request *requestMsg;
 
-      // private: QTreeWidget *treeWidget;
-
       /// \brief Building editor palette that contains different drawing modes
       private: BuildingEditorPalette *buildingEditorPalette;
 
@@ -189,19 +187,6 @@ namespace gazebo
       /// \brief The filename set via "Save As". This filename is used by
       /// the "Save" feature.
       private: std::string saveFilename;
-    };
-
-    class TreeViewDelegate: public QItemDelegate
-    {
-      Q_OBJECT
-      public: TreeViewDelegate(QTreeView *_view, QWidget *_parent);
-
-      public: void paint(QPainter *painter, const QStyleOptionViewItem &option,
-                         const QModelIndex &index) const;
-
-      public: virtual QSize sizeHint(const QStyleOptionViewItem &_opt,
-                                     const QModelIndex &_index) const;
-      private: QTreeView *view;
     };
   }
 }

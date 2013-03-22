@@ -35,7 +35,6 @@ ConnectionManager::ConnectionManager()
 
   this->serverConn = NULL;
   this->listMutex = new boost::recursive_mutex();
-  this->masterMessagesMutex = new boost::recursive_mutex();
   this->connectionMutex = new boost::recursive_mutex();
 
   this->eventConnections.push_back(
@@ -49,9 +48,6 @@ ConnectionManager::~ConnectionManager()
 
   delete this->listMutex;
   this->listMutex = NULL;
-
-  delete this->masterMessagesMutex;
-  this->masterMessagesMutex = NULL;
 
   delete this->connectionMutex;
   this->connectionMutex = NULL;
@@ -199,7 +195,7 @@ void ConnectionManager::RunUpdate()
   unsigned int msize = 0;
 
   {
-    boost::recursive_mutex::scoped_lock lock(*this->masterMessagesMutex);
+    boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
     msize = this->masterMessages.size();
   }
 
@@ -208,7 +204,7 @@ void ConnectionManager::RunUpdate()
     this->ProcessMessage(this->masterMessages.front());
 
     {
-      boost::recursive_mutex::scoped_lock lock(*this->masterMessagesMutex);
+      boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
       this->masterMessages.pop_front();
       msize = this->masterMessages.size();
     }
@@ -269,7 +265,7 @@ void ConnectionManager::OnMasterRead(const std::string &_data)
 
   if (!_data.empty())
   {
-    boost::recursive_mutex::scoped_lock lock(*this->masterMessagesMutex);
+    boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
     this->masterMessages.push_back(std::string(_data));
   }
   else

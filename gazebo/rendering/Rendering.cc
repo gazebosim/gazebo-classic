@@ -72,17 +72,20 @@ rendering::ScenePtr rendering::get_scene(const std::string &_name)
 rendering::ScenePtr rendering::create_scene(const std::string &_name,
                                             bool _enableVisualizations)
 {
-  ScenePtr scene;
+  ScenePtr scene = get_scene(_name);
 
-  // Create a default scene for the gui
-  try
+  if (!scene)
   {
-    scene = rendering::RenderEngine::Instance()->CreateScene(_name,
-        _enableVisualizations);
-  }
-  catch(common::Exception &e)
-  {
-    gzerr << "Failed to create a scene in the Rendering engine" << e;
+    // Create a default scene for the gui
+    try
+    {
+      scene = rendering::RenderEngine::Instance()->CreateScene(_name,
+          _enableVisualizations);
+    }
+    catch(common::Exception &e)
+    {
+      gzerr << "Failed to create a scene in the Rendering engine" << e;
+    }
   }
 
   return scene;
