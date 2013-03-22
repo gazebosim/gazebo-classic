@@ -453,9 +453,9 @@ void MainWindow::Play()
   msgs::WorldControl msg;
   msg.set_pause(false);
 
-  g_pauseAct->setChecked(false);
   g_pauseAct->setVisible(true);
   g_playAct->setVisible(false);
+  gzerr << "play " << std::endl;
   this->worldControlPub->Publish(msg);
 }
 
@@ -465,7 +465,6 @@ void MainWindow::Pause()
   msgs::WorldControl msg;
   msg.set_pause(true);
 
-  g_playAct->setChecked(false);
   g_pauseAct->setVisible(false);
   g_playAct->setVisible(true);
   this->worldControlPub->Publish(msg);
@@ -857,15 +856,11 @@ void MainWindow::CreateActions()
 
   g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   g_playAct->setStatusTip(tr("Run the world"));
-  g_playAct->setCheckable(true);
-  g_playAct->setChecked(true);
   g_playAct->setVisible(false);
   connect(g_playAct, SIGNAL(triggered()), this, SLOT(Play()));
 
   g_pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
   g_pauseAct->setStatusTip(tr("Pause the world"));
-  g_pauseAct->setCheckable(true);
-  g_pauseAct->setChecked(false);
   g_pauseAct->setVisible(true);
   connect(g_pauseAct, SIGNAL(triggered()), this, SLOT(Pause()));
 
@@ -1350,17 +1345,13 @@ void MainWindow::OnSetSelectedEntity(const std::string &_name,
 /////////////////////////////////////////////////
 void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
 {
-  if (_msg->paused() && g_playAct->isChecked())
+  if (_msg->paused() && g_pauseAct->isVisible())
   {
-    g_playAct->setChecked(false);
-    g_pauseAct->setChecked(true);
+    g_pauseAct->setVisible(false);
     g_playAct->setVisible(true);
-    g_playAct->setVisible(false);
   }
-  else if (!_msg->paused() && !g_playAct->isChecked())
+  else if (!_msg->paused() && !g_playAct->isVisible())
   {
-    g_playAct->setChecked(true);
-    g_pauseAct->setChecked(false);
     g_pauseAct->setVisible(true);
     g_playAct->setVisible(false);
   }

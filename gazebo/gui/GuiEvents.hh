@@ -136,7 +136,7 @@ namespace gazebo
       public: static event::EventT<void (const common::MouseEvent &)>
               mouseRelease;
 
-      /// \brief User specified step size for manually stepping the world
+      /// \brief Step size changed event
       public: static event::EventT<void (int)> inputStepSize;
     };
   }
