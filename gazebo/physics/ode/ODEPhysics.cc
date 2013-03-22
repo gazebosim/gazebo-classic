@@ -672,22 +672,6 @@ void ODEPhysics::ConvertMass(void *_engineMass, InertialPtr _inertial)
 //////////////////////////////////////////////////
 JointPtr ODEPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 {
-  if (!_parent)
-  {
-    gzerr << "Deprecated behavior, please specify a model parent for Joint\n";
-
-    if (this->world->GetModelCount() == 0)
-    {
-      gzthrow("World has no Models, cannot create joint.");
-    }
-    else
-    {
-      // choose the first available model for parent
-      unsigned int i = 0;
-      _parent = this->world->GetModel(i);
-    }
-  }
-
   JointPtr joint;
 
   if (_type == "prismatic")
