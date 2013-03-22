@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,69 +52,94 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletPhysics();
 
-      /// \brief Load the Bullet engine
+      // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Initialize the Bullet engine
+      // Documentation inherited
       public: virtual void Init();
 
-      /// \brief Init the engine for threads.
+      // Documentation inherited
+      public: virtual void Reset();
+
+      // Documentation inherited
       public: virtual void InitForThread();
 
-      /// \brief Update the Bullet collision
+      // Documentation inherited
       public: virtual void UpdateCollision();
 
-      /// \brief Update the Bullet engine
+      // Documentation inherited
       public: virtual void UpdatePhysics();
 
-      /// \brief Finilize the Bullet engine
+      // Documentation inherited
       public: virtual void Fini();
 
-      /// \brief Set the simulation step time
-      public: virtual void SetStepTime(double _value);
+      // Documentation inherited
+      public: virtual std::string GetType() const
+                      { return "bullet"; }
 
-      /// \brief Get the simulation step time
-      public: virtual double GetStepTime();
-
-      /// \brief Create a new body
+      // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
-      /// \brief Create a new collision
+      // Documentation inherited
       public: virtual CollisionPtr CreateCollision(const std::string &_type,
                                                    LinkPtr _body);
 
-      /// \brief Create a new joint
+      // Documentation inherited
       public: virtual JointPtr CreateJoint(const std::string &_type,
                                            ModelPtr _parent);
 
+      // Documentation inherited
       public: virtual ShapePtr CreateShape(const std::string &_shapeType,
                                            CollisionPtr _collision);
 
       /// \brief Create a physics based ray sensor
       // public: virtual PhysicsRaySensor *CreateRaySensor(Link *body);
 
-      /// \brief Convert an bullet mass to a gazebo Mass
+      // Documentation inherited
+      protected: virtual void OnRequest(ConstRequestPtr &_msg);
+
+      // Documentation inherited
+      protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
+
+      /// \brief Convert a bullet mass to a gazebo Mass
       public: virtual void ConvertMass(InertialPtr _inertial,
                                        void *_engineMass);
 
-      /// \brief Convert an gazebo Mass to a bullet Mass
+      /// \brief Convert a gazebo Mass to a bullet Mass
       public: virtual void ConvertMass(void *_engineMass,
                                        InertialPtr _inertial);
 
-      /// \brief Convert a bullet transform to a gazebo pose
-      public: static math::Pose ConvertPose(const btTransform &_bt);
+      // Documentation inherited
+      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
 
-      /// \brief Convert a gazebo pose to a bullet transform
-      public: static btTransform ConvertPose(const math::Pose &_pose);
+      // Documentation inherited
+      public: virtual void SetWorldCFM(double _cfm);
+
+      // Documentation inherited
+      public: virtual double GetWorldCFM();
+
+      // Documentation inherited
+      public: virtual void SetSeed(uint32_t _seed);
 
       /// \brief Register a joint with the dynamics world
       public: btDynamicsWorld *GetDynamicsWorld() const
               {return this->dynamicsWorld;}
 
-      /// \brief Set the gavity vector
-      public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);
-
       public: virtual void DebugPrint() const;
+
+      /// Documentation inherited
+      public: virtual void SetParam(PhysicsParam _param,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual void SetParam(const std::string &_key,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(const std::string &_key) const;
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(PhysicsParam _attr) const;
 
       private: btBroadphaseInterface *broadPhase;
       private: btDefaultCollisionConfiguration *collisionConfig;
@@ -124,7 +149,8 @@ namespace gazebo
 
       private: common::Time lastUpdateTime;
 
-      private: double stepTimeDouble;
+      /// \brief The type of the solver.
+      private: std::string solverType;
     };
 
   /// \}

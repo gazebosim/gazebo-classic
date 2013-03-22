@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,14 +54,6 @@ Image::Image(const std::string &_filename)
       this->Load(filename);
     else
       gzerr << "Unable to find image[" << _filename << "]\n";
-  }
-  else
-  {
-      /// @todo: fixme: this error shows for any
-      /// regular constructor without a filename
-      /// a parameter, since it defaults to empty.
-      /// is this error really needed?
-      gzerr << "Image filename is empty.\n";
   }
 }
 
@@ -191,6 +183,7 @@ void Image::GetRGBData(unsigned char **_data, unsigned int &_count) const
 {
   FIBITMAP *tmp = FreeImage_ConvertTo24Bits(this->bitmap);
   this->GetDataImpl(_data, _count, tmp);
+  FreeImage_Unload(tmp);
 }
 
 //////////////////////////////////////////////////
@@ -399,7 +392,7 @@ std::string Image::GetFilename() const
 //////////////////////////////////////////////////
 Image::PixelFormat Image::GetPixelFormat() const
 {
-  Image::PixelFormat fmt = UNKNOWN;
+  Image::PixelFormat fmt = UNKNOWN_PIXEL_FORMAT;
   FREE_IMAGE_TYPE type = FreeImage_GetImageType(this->bitmap);
 
   unsigned int redMask = FreeImage_GetRedMask(this->bitmap);
@@ -414,7 +407,10 @@ Image::PixelFormat Image::GetPixelFormat() const
     else if (bpp == 24)
       redMask == 0xff0000 ? fmt = RGB_INT8 : fmt = BGR_INT8;
     else if (bpp == 32)
-      redMask == 0xff0000 ? fmt = RGBA_INT8 : fmt = BGRA_INT8;
+    {
+      redMask == 0xff0000 || redMask == 0xff000000 ?
+        fmt = RGBA_INT8 : fmt = BGRA_INT8;
+    }
   }
   else if (type == FIT_RGB16)
     fmt = RGB_INT16;
@@ -425,3 +421,20 @@ Image::PixelFormat Image::GetPixelFormat() const
 
   return fmt;
 }
+
+/////////////////////////////////////////////////
+Image::PixelFormat Image::ConvertPixelFormat(const std::string &_format)
+{
+  // Handle old format strings
+  if (_format == "L8" || _format == "L_INT8")
+    return L_INT8;
+  else if (_format == "R8G8B8" || _format == "RGB_INT8")
+    return RGB_INT8;
+
+  for (unsigned int i = 0; i < PIXEL_FORMAT_COUNT; ++i)
+    if (PixelFormatNames[i] == _format)
+      return static_cast<PixelFormat>(i);
+
+  return UNKNOWN_PIXEL_FORMAT;
+}
+

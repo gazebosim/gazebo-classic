@@ -7,13 +7,14 @@ include_directories(SYSTEM
 )
 
 include_directories(
-  ${PROJECT_SOURCE_DIR}/gazebo 
-  ${PROJECT_BINARY_DIR}/gazebo 
+  ${PROJECT_SOURCE_DIR}/gazebo
+  ${PROJECT_BINARY_DIR}/gazebo
 )
 
-link_directories(  
+link_directories(
   ${ogre_library_dirs}
-  ${Boost_LIBRARY_DIRS} 
+  ${Boost_LIBRARY_DIRS}
+  ${PROJECT_BINARY_DIR}/test
 )
 
 add_subdirectory(msgs)
@@ -24,6 +25,7 @@ add_subdirectory(rendering)
 add_subdirectory(gui)
 add_subdirectory(physics)
 add_subdirectory(sensors)
+add_subdirectory(util)
 
 add_dependencies(gazebo_physics gazebo_msgs)
 add_dependencies(gazebo_physics_ode gazebo_msgs)
@@ -32,6 +34,9 @@ add_dependencies(gazebo_rendering gazebo_msgs)
 add_dependencies(gazebo_sensors gazebo_rendering)
 if(HAVE_BULLET)
   add_dependencies(gazebo_physics_bullet gazebo_msgs)
+endif()
+if (HAVE_Simbody)
+  add_dependencies(gazebo_physics_simbody gazebo_msgs)
 endif()
 
 gz_add_executable(gzmaster master_main.cc Master.cc gazebo.cc)
@@ -48,6 +53,7 @@ target_link_libraries(gzmaster gazebo_common
 
 
 target_link_libraries(gzserver gazebo_common
+                               gazebo_util
                                gazebo_transport
                                gazebo_physics
                                gazebo_sensors
@@ -58,6 +64,7 @@ target_link_libraries(gzserver gazebo_common
 )
 
 target_link_libraries(gazebo gazebo_common
+                             gazebo_util
                              gazebo_transport
                              gazebo_physics
                              gazebo_sensors
@@ -81,6 +88,7 @@ gz_add_library(libgazebo Server.cc Master.cc gazebo.cc)
 set_target_properties(libgazebo PROPERTIES OUTPUT_NAME "gazebo")
 
 target_link_libraries(libgazebo gazebo_common
+                                gazebo_util
                                 gazebo_transport
                                 gazebo_physics
                                 gazebo_sensors

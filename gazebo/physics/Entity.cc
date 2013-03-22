@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,23 @@
 
 #include "msgs/msgs.hh"
 
-#include "common/Events.hh"
-#include "common/Console.hh"
-#include "common/Animation.hh"
-#include "common/KeyFrame.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Animation.hh"
+#include "gazebo/common/KeyFrame.hh"
 
-#include "transport/Publisher.hh"
-#include "transport/Transport.hh"
-#include "transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "physics/RayShape.hh"
-#include "physics/Collision.hh"
-#include "physics/Model.hh"
-#include "physics/Link.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Entity.hh"
+#include "gazebo/physics/RayShape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Entity.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -77,7 +78,6 @@ Entity::~Entity()
   delete this->poseMsg;
   this->poseMsg = NULL;
 
-  this->posePub.reset();
   this->visPub.reset();
   this->requestPub.reset();
   this->poseSub.reset();
@@ -89,7 +89,6 @@ void Entity::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
   this->node->Init(this->GetWorld()->GetName());
-  this->posePub = this->node->Advertise<msgs::Pose>("~/pose/info", 10);
 
   this->poseSub = this->node->Subscribe("~/pose/modify",
       &Entity::OnPoseMsg, this);
@@ -124,7 +123,6 @@ void Entity::Load(sdf::ElementPtr _sdf)
   else
     this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
 }
-
 
 //////////////////////////////////////////////////
 void Entity::SetName(const std::string &_name)
@@ -162,6 +160,12 @@ void Entity::SetInitialRelativePose(const math::Pose &_p)
 }
 
 //////////////////////////////////////////////////
+math::Pose Entity::GetInitialRelativePose() const
+{
+  return this->initialRelativePose;
+}
+
+//////////////////////////////////////////////////
 math::Box Entity::GetBoundingBox() const
 {
   return math::Box(math::Vector3(0, 0, 0), math::Vector3(1, 1, 1));
@@ -181,8 +185,8 @@ void Entity::SetAnimation(common::PoseAnimationPtr _anim)
   this->prevAnimationTime = this->world->GetSimTime();
   this->animation = _anim;
   this->onAnimationComplete.clear();
-  this->animationConnection = event::Events::ConnectWorldUpdateStart(
-      boost::bind(&Entity::UpdateAnimation, this));
+  this->animationConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&Entity::UpdateAnimation, this, _1));
 }
 
 //////////////////////////////////////////////////
@@ -194,8 +198,8 @@ void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
   this->prevAnimationTime = this->world->GetSimTime();
   this->animation = _anim;
   this->onAnimationComplete = _onComplete;
-  this->animationConnection = event::Events::ConnectWorldUpdateStart(
-      boost::bind(&Entity::UpdateAnimation, this));
+  this->animationConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&Entity::UpdateAnimation, this, _1));
 }
 
 //////////////////////////////////////////////////
@@ -205,7 +209,7 @@ void Entity::StopAnimation()
   this->onAnimationComplete.clear();
   if (this->animationConnection)
   {
-    event::Events::DisconnectWorldUpdateStart(this->animationConnection);
+    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
     this->animationConnection.reset();
   }
 }
@@ -213,21 +217,20 @@ void Entity::StopAnimation()
 //////////////////////////////////////////////////
 void Entity::PublishPose()
 {
-  if (this->posePub && this->posePub->HasConnections())
-  {
-    math::Pose relativePose = this->GetRelativePose();
-    if (relativePose != msgs::Convert(*this->poseMsg))
-    {
-      msgs::Set(this->poseMsg, relativePose);
-      this->posePub->Publish(*this->poseMsg);
-    }
-  }
+  GZ_ASSERT(this->GetParentModel() != NULL,
+      "An entity without a parent model should not happen");
+
+  this->world->PublishModelPose(this->GetParentModel()->GetName());
 }
 
 //////////////////////////////////////////////////
 math::Pose Entity::GetRelativePose() const
 {
-  if (this->IsCanonicalLink())
+  // We return the initialRelativePose for COLLISION objects because they
+  // cannot move relative to their parent link.
+  // \todo Look into storing relative poses for all objects instead of world
+  // poses. It may simplify pose updating.
+  if (this->IsCanonicalLink() || this->HasType(COLLISION))
   {
     return this->initialRelativePose;
   }
@@ -300,17 +303,16 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 
   // force an update of all children
   // update all children pose, moving them with the model.
+  // The outer loop updates all the links.
   for (Base_V::iterator iter = this->children.begin();
-       iter != this->childrenEnd; ++iter)
+      iter != this->childrenEnd; ++iter)
   {
     if ((*iter)->HasType(ENTITY))
     {
       EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
 
       if (entity->IsCanonicalLink())
-      {
         entity->worldPose = (entity->initialRelativePose + _pose);
-      }
       else
       {
         entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
@@ -400,12 +402,10 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
 //
 void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
 {
-  this->GetWorld()->GetSetWorldPoseMutex()->lock();
-
-  (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
-
-  this->GetWorld()->GetSetWorldPoseMutex()->unlock();
-
+  {
+    boost::mutex::scoped_lock lock(*this->GetWorld()->GetSetWorldPoseMutex());
+    (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
+  }
   if (_publish)
     this->PublishPose();
 }
@@ -464,6 +464,7 @@ ModelPtr Entity::GetParentModel()
     return boost::shared_dynamic_cast<Model>(shared_from_this());
 
   p = this->parent;
+  GZ_ASSERT(p, "Parent of an entity is NULL");
 
   while (p->GetParent() && p->GetParent()->HasType(MODEL))
     p = p->GetParent();
@@ -544,12 +545,11 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Entity::UpdateAnimation()
+void Entity::UpdateAnimation(const common::UpdateInfo &_info)
 {
   common::PoseKeyFrame kf(0);
 
-  this->animation->AddTime(
-      (this->world->GetSimTime() - this->prevAnimationTime).Double());
+  this->animation->AddTime((_info.simTime - this->prevAnimationTime).Double());
   this->animation->GetInterpolatedKeyFrame(kf);
 
   math::Pose offset;
@@ -557,11 +557,11 @@ void Entity::UpdateAnimation()
   offset.rot = kf.GetRotation();
 
   this->SetWorldPose(offset);
-  this->prevAnimationTime = this->world->GetSimTime();
+  this->prevAnimationTime = _info.simTime;
 
   if (this->animation->GetLength() <= this->animation->GetTime())
   {
-    event::Events::DisconnectWorldUpdateStart(this->animationConnection);
+    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
     this->animationConnection.reset();
     if (this->onAnimationComplete)
     {

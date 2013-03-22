@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ namespace gazebo
 
   namespace gui
   {
+    class BuildingEditorWidget;
+
     class RenderWidget : public QWidget
     {
       Q_OBJECT
@@ -43,13 +45,38 @@ namespace gazebo
       public: void RemoveScene(const std::string &_name);
       public: void CreateScene(const std::string &_name);
 
+      /// \brief Show editor widget in the main window
+      /// param[in] _show True to show the editor widget, false to hide it.
+      public: void ShowEditor(bool _show);
+
+      /// \brief Display an overlay message
+      /// \param[in] _msg Message to be displayed
+      /// \param [in] _duration Duration in milliseconds
+      public: void DisplayOverlayMsg(const std::string &_msg,
+          int _duration = -1);
+
+      /// \brief Get the overlay message being displayed
+      /// \return Message displayed in the render window
+      public: std::string GetOverlayMsg() const;
+
       private slots: virtual void update();
+
+      /// \brief Qt callback to clear overlay message if a duration is
+      /// specified
+      private slots: void OnClearOverlayMsg();
 
       private: void OnFullScreen(bool &_value);
 
       private: QHBoxLayout *bottomBarLayout;
       private: GLWidget *glWidget;
+
+      // \brief Building editor widget for creating a building model
+      private: BuildingEditorWidget *buildingEditorWidget;
+
       private: QFrame *mainFrame;
+
+      /// \brief Bottom frame that holds the play/pause widgets
+      private: QFrame *bottomFrame;
       private: QLabel *xyzLabel;
       private: QLineEdit *xPosEdit;
       private: QLineEdit *yPosEdit;
@@ -65,6 +92,9 @@ namespace gazebo
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 
+      /// \brief An overlay label on the 3D render widget
+      private: QLabel *msgOverlayLabel;
+
       private: std::vector<event::ConnectionPtr> connections;
 
       private: bool clear;
@@ -73,9 +103,10 @@ namespace gazebo
       private: bool create;
       private: std::string createName;
       private: QTimer *timer;
+
+      /// \brief Base overlay message;
+      private: std::string baseOverlayMsg;
     };
   }
 }
 #endif
-
-

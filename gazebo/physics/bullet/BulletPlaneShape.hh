@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,8 @@ namespace gazebo
                 math::Vector3 n = this->GetNormal();
                 btVector3 vec(n.x, n.y, n.z);
 
-                bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0));
+                bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0),
+                    false);
               }
     };
     /// \}

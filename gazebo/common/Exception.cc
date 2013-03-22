@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,10 @@ using namespace gazebo;
 using namespace common;
 using namespace std;
 
+//////////////////////////////////////////////////
+Exception::Exception()
+{
+}
 
 //////////////////////////////////////////////////
 Exception::Exception(const char *_file, int _line, std::string _msg)
@@ -34,12 +38,16 @@ Exception::Exception(const char *_file, int _line, std::string _msg)
   this->file = _file;
   this->line = _line;
   this->str = _msg;
-  gazebo::common::Console::Instance()->ColorErr("Exception",
-      this->file, this->line, 31) << *this << "\n";
+  this->Print();
 }
 
 //////////////////////////////////////////////////
 Exception::~Exception()
+{
+}
+
+//////////////////////////////////////////////////
+void Exception::Print() const
 {
   gazebo::common::Console::Instance()->ColorErr("Exception",
       this->file, this->line, 31) << *this << "\n";
@@ -55,4 +63,40 @@ std::string Exception::GetErrorFile() const
 std::string Exception::GetErrorStr() const
 {
   return this->str;
+}
+
+//////////////////////////////////////////////////
+InternalError::InternalError()
+{
+}
+
+//////////////////////////////////////////////////
+InternalError::InternalError(const char *_file, int _line,
+                             const std::string _msg) :
+  Exception(_file, _line, _msg)
+{
+}
+
+//////////////////////////////////////////////////
+InternalError::~InternalError()
+{
+}
+
+//////////////////////////////////////////////////
+AssertionInternalError::AssertionInternalError(
+    const char * _file, int _line,
+    const std::string _expr,
+    const std::string _function,
+    const std::string _msg) :
+  InternalError(_file, _line,
+      "GAZEBO ASSERTION                     \n" +
+      _msg                               + "\n" +
+      "In function       : " + _function + "\n" +
+      "Assert expression : " + _expr     + "\n")
+{
+}
+
+//////////////////////////////////////////////////
+AssertionInternalError::~AssertionInternalError()
+{
 }

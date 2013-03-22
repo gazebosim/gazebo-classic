@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,10 @@
 #define _EVENTS_HH_
 
 #include <string>
-#include "common/Event.hh"
+
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/UpdateInfo.hh"
+#include "gazebo/common/Event.hh"
 
 namespace gazebo
 {
@@ -38,10 +41,12 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectPause(T _subscriber)
               { return pause.Connect(_subscriber); }
+
       /// \brief Disconnect a boost::slot the the pause signal
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectPause(ConnectionPtr _subscriber)
               { pause.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the step signal
       /// \param[in] _subscriber the subscriber to this event
@@ -130,11 +135,33 @@ namespace gazebo
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectWorldUpdateStart(T _subscriber)
-              { return worldUpdateStart.Connect(_subscriber); }
+              {
+                // Putting in this comment so the deprecation message
+                // will be found easier: GAZEBO_DEPRECATED.
+                gzerr << "Events::ConnectWorldUpdateStart is deprecated "
+                      << "in v 1.5.0. Please use "
+                      << "Events::ConnectWorldUpdateBegin\n";
+                 return worldUpdateStart.Connect(_subscriber);
+              }
+
       /// \brief Disconnect a boost::slot the the world update start signal
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectWorldUpdateStart(ConnectionPtr _subscriber)
-              { worldUpdateStart.Disconnect(_subscriber); }
+              GAZEBO_DEPRECATED;
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot the the world update start signal
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      public: template<typename T>
+              static ConnectionPtr ConnectWorldUpdateBegin(T _subscriber)
+              { return worldUpdateBegin.Connect(_subscriber); }
+
+      /// \brief Disconnect a boost::slot the the world update start signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectWorldUpdateBegin(
+                  ConnectionPtr _subscriber);
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the world update end signal
       /// \param[in] _subscriber the subscriber to this event
@@ -229,6 +256,9 @@ namespace gazebo
 
       /// \brief World update has started
       public: static EventT<void ()> worldUpdateStart;
+
+      /// \brief World update has started
+      public: static EventT<void (const common::UpdateInfo &)> worldUpdateBegin;
 
       /// \brief World update has ended
       public: static EventT<void ()> worldUpdateEnd;

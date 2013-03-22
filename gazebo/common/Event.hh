@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,6 +109,10 @@ namespace gazebo
       /// \brief Disconnect a callback to this event
       /// \param[in] _id The id of the connection to disconnect
       public: virtual void Disconnect(int _id);
+
+      /// \brief Get the number of connections.
+      /// \return Number of connection to this Event.
+      public: unsigned int ConnectionCount() const;
 
       /// \brief Access the signal
       public: void operator()()
@@ -461,9 +465,18 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Disconnect(ConnectionPtr _c)
     {
+      if (!_c)
+        return;
+
       this->Disconnect(_c->GetId());
       _c->event = NULL;
       _c->id = -1;
+    }
+
+    template<typename T>
+    unsigned int EventT<T>::ConnectionCount() const
+    {
+      return this->connections.size();
     }
 
     /// \brief Removes a connection

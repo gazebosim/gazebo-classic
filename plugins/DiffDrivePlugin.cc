@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,8 +80,6 @@ void DiffDrivePlugin::Init()
 
   physics::EntityPtr parent = boost::shared_dynamic_cast<physics::Entity>(
       this->leftJoint->GetChild());
-
-  std::cout << "Parent[" << parent->GetName() << "]\n";
 
   math::Box bb = parent->GetBoundingBox();
   // This assumes that the largest dimension of the wheel is the diameter

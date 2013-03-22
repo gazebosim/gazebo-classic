@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@
 using namespace gazebo;
 using namespace physics;
 
+sdf::ElementPtr Inertial::sdfInertial;
+
 //////////////////////////////////////////////////
 Inertial::Inertial()
 {
@@ -27,8 +29,14 @@ Inertial::Inertial()
   this->principals.Set(1, 1, 1);
   this->products.Set(0, 0, 0);
 
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("inertial.sdf", this->sdf);
+  if (!this->sdfInertial)
+  {
+    this->sdfInertial.reset(new sdf::Element);
+    sdf::initFile("inertial.sdf", this->sdfInertial);
+  }
+
+  // This is the only time this->sdfInertial should be used.
+  this->sdf = this->sdfInertial->Clone();
 }
 
 //////////////////////////////////////////////////
@@ -76,7 +84,9 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   }
   this->SetCoG(center.x, center.y, center.z);
 
-  if (this->sdf->HasElement("inertia"))
+  // if (this->sdf->HasElement("inertia"))
+  // Do the following whether an inertia element was specified or not.
+  // Otherwise SetUpdateFunc won't get called.
   {
     sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");
     this->SetInertiaMatrix(
@@ -87,18 +97,18 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
         inertiaElem->Get<double>("ixz"),
         inertiaElem->Get<double>("iyz"));
 
-  inertiaElem->GetElement("ixx")->GetValue()->SetUpdateFunc(
-      boost::bind(&Inertial::GetIXX, this));
-  inertiaElem->GetElement("iyy")->GetValue()->SetUpdateFunc(
-      boost::bind(&Inertial::GetIYY, this));
-  inertiaElem->GetElement("izz")->GetValue()->SetUpdateFunc(
-      boost::bind(&Inertial::GetIZZ, this));
-  inertiaElem->GetElement("ixy")->GetValue()->SetUpdateFunc(
-      boost::bind(&Inertial::GetIXY, this));
-  inertiaElem->GetElement("ixz")->GetValue()->SetUpdateFunc(
-      boost::bind(&Inertial::GetIXZ, this));
-  inertiaElem->GetElement("iyz")->GetValue()->SetUpdateFunc(
-      boost::bind(&Inertial::GetIYZ, this));
+    inertiaElem->GetElement("ixx")->GetValue()->SetUpdateFunc(
+        boost::bind(&Inertial::GetIXX, this));
+    inertiaElem->GetElement("iyy")->GetValue()->SetUpdateFunc(
+        boost::bind(&Inertial::GetIYY, this));
+    inertiaElem->GetElement("izz")->GetValue()->SetUpdateFunc(
+        boost::bind(&Inertial::GetIZZ, this));
+    inertiaElem->GetElement("ixy")->GetValue()->SetUpdateFunc(
+        boost::bind(&Inertial::GetIXY, this));
+    inertiaElem->GetElement("ixz")->GetValue()->SetUpdateFunc(
+        boost::bind(&Inertial::GetIXZ, this));
+    inertiaElem->GetElement("iyz")->GetValue()->SetUpdateFunc(
+        boost::bind(&Inertial::GetIYZ, this));
   }
 
   this->SetMass(this->sdf->Get<double>("mass"));

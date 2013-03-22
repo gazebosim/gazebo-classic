@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,12 @@ namespace gazebo
     extern QAction *g_aboutAct;
     extern QAction *g_quitAct;
 
+    extern QAction *g_dataLoggerAct;
+
     extern QAction *g_newModelAct;
     extern QAction *g_resetModelsAct;
     extern QAction *g_resetWorldAct;
+    extern QAction *g_editBuildingAct;
 
     extern QAction *g_playAct;
     extern QAction *g_pauseAct;
@@ -50,15 +53,34 @@ namespace gazebo
     extern QAction *g_spotLghtCreateAct;
     extern QAction *g_dirLghtCreateAct;
 
-    extern QAction *g_viewGridAct;
-    extern QAction *g_viewResetAct;
-    extern QAction *g_viewFullScreenAct;
-    extern QAction *g_viewFPSAct;
-    extern QAction *g_viewOrbitAct;
+    extern QAction *g_screenshotAct;
+
+    extern QAction *g_showCollisionsAct;
+    extern QAction *g_showGridAct;
+    extern QAction *g_showContactsAct;
+    extern QAction *g_showJointsAct;
+    extern QAction *g_showCOMAct;
+    extern QAction *g_transparentAct;
+
+    extern QAction *g_resetAct;
+    extern QAction *g_fullScreenAct;
+    extern QAction *g_fpsAct;
+    extern QAction *g_orbitAct;
 
     extern QAction *g_arrowAct;
     extern QAction *g_translateAct;
     extern QAction *g_rotateAct;
+
+    extern QAction *g_topicVisAct;
+
+    extern QAction *g_diagnosticsAct;
+
+    extern QAction *g_viewWireframeAct;
+
+    extern QAction *g_buildingEditorSaveAct;
+    extern QAction *g_buildingEditorDiscardAct;
+    extern QAction *g_buildingEditorDoneAct;
+    extern QAction *g_buildingEditorExitAct;
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 15 July 2003
  */
 
-#ifndef CAMERASENSOR_HH
-#define CAMERASENSOR_HH
+#ifndef _CAMERASENSOR_HH_
+#define _CAMERASENSOR_HH_
 
 #include <string>
 
@@ -77,10 +77,6 @@ namespace gazebo
       /// \brief Finalize the camera
       protected: virtual void Fini();
 
-      /// \brief Set whether the sensor is active or not
-      /// \param[in] _value True if active, false if not
-      public: virtual void SetActive(bool _value);
-
       /// \brief Returns a pointer to the rendering::Camera.
       /// \return The Pointer to the camera sensor.
       public: rendering::CameraPtr GetCamera() const
@@ -102,6 +98,9 @@ namespace gazebo
       /// \param[in] _filename The name of the file to be saved.
       /// \return True if successful, false if unsuccessful.
       public: bool SaveFrame(const std::string &_filename);
+
+      // Documentation inherited
+      public: virtual bool IsActive();
 
       private: rendering::CameraPtr camera;
       private: rendering::ScenePtr scene;

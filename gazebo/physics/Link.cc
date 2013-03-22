@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,26 @@
  * Date: 13 Feb 2006
  */
 
-#include <float.h>
 #include <sstream>
 
 #include "msgs/msgs.hh"
 
-#include "common/Events.hh"
-#include "math/Quaternion.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Assert.hh"
 
-#include "sensors/Sensors.hh"
-#include "sensors/Sensor.hh"
+#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/Sensor.hh"
 
-#include "physics/Model.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Collision.hh"
-#include "physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Link.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Publisher.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -157,22 +157,6 @@ void Link::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Link::Init()
 {
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-  {
-    if ((*iter)->HasType(Base::COLLISION))
-      boost::shared_static_cast<Collision>(*iter)->Init();
-  }
-
-  this->SetKinematic(this->sdf->Get<bool>("kinematic"));
-
-  // If no collisions are attached, then don't let gravity affect the body.
-  if (this->children.size()== 0 || !this->sdf->Get<bool>("gravity"))
-    this->SetGravityMode(false);
-
-  this->SetLinearDamping(this->GetLinearDamping());
-  this->SetAngularDamping(this->GetAngularDamping());
-
   this->linearAccel.Set(0, 0, 0);
   this->angularAccel.Set(0, 0, 0);
 
@@ -232,9 +216,17 @@ void Link::Init()
 
   this->enabled = true;
 
-  // DO THIS LAST!
+  // Set Link pose before setting pose of child collisions
   this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
   this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
+
+  // Call Init for child collisions, which whill set their pose
+  Base_V::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    if ((*iter)->HasType(Base::COLLISION))
+      boost::shared_static_cast<Collision>(*iter)->Init();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -268,7 +260,16 @@ void Link::Fini()
 //////////////////////////////////////////////////
 void Link::Reset()
 {
+  // resets pose
   Entity::Reset();
+
+  // resets velocity, acceleration, wrench
+  this->ResetPhysicsStates();
+}
+
+//////////////////////////////////////////////////
+void Link::ResetPhysicsStates()
+{
   this->SetAngularVel(math::Vector3(0, 0, 0));
   this->SetLinearVel(math::Vector3(0, 0, 0));
   this->SetAngularAccel(math::Vector3(0, 0, 0));
@@ -391,7 +392,11 @@ void Link::SetCollideMode(const std::string &_mode)
 //////////////////////////////////////////////////
 bool Link::GetSelfCollide()
 {
-  return this->sdf->Get<bool>("self_collide");
+  GZ_ASSERT(this->sdf != NULL, "Link sdf member is NULL");
+  if (this->sdf->HasElement("self_collide"))
+    return this->sdf->Get<bool>("self_collide");
+  else
+    return false;
 }
 
 //////////////////////////////////////////////////
@@ -494,6 +499,22 @@ CollisionPtr Link::GetCollision(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+Collision_V Link::GetCollisions() const
+{
+  Collision_V result;
+  Base_V::const_iterator biter;
+  for (biter = this->children.begin(); biter != this->children.end(); ++biter)
+  {
+    if ((*biter)->HasType(Base::COLLISION))
+    {
+      result.push_back(boost::shared_static_cast<Collision>(*biter));
+    }
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 CollisionPtr Link::GetCollision(unsigned int _index) const
 {
   CollisionPtr collision;
@@ -520,6 +541,14 @@ void Link::SetAngularAccel(const math::Vector3 &_accel)
 }
 
 //////////////////////////////////////////////////
+math::Pose Link::GetWorldCoGPose() const
+{
+  math::Pose pose = this->GetWorldPose();
+  pose.pos += pose.rot.RotateVector(this->inertial->GetCoG());
+  return pose;
+}
+
+//////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeLinearVel() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(
@@ -530,7 +559,7 @@ math::Vector3 Link::GetRelativeLinearVel() const
 math::Vector3 Link::GetRelativeAngularVel() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(
-      this->GetWorldAngularVel());
+         this->GetWorldAngularVel());
 }
 
 //////////////////////////////////////////////////
@@ -581,7 +610,7 @@ math::Box Link::GetBoundingBox() const
   math::Box box;
   Base_V::const_iterator iter;
 
-  box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
+  box.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
   box.max.Set(0, 0, 0);
 
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
@@ -655,9 +684,35 @@ void Link::RemoveChildJoint(JointPtr _joint)
 }
 
 //////////////////////////////////////////////////
-void Link::FillLinkMsg(msgs::Link &_msg)
+void Link::RemoveParentJoint(const std::string &_jointName)
 {
-  this->FillMsg(_msg);
+  for (std::vector<JointPtr>::iterator iter = this->parentJoints.begin();
+                                       iter != this->parentJoints.end();
+                                       ++iter)
+  {
+    /// @todo: can we assume there are no repeats?
+    if ((*iter)->GetName() == _jointName)
+    {
+      this->parentJoints.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Link::RemoveChildJoint(const std::string &_jointName)
+{
+  for (std::vector<JointPtr>::iterator iter = this->childJoints.begin();
+                                       iter != this->childJoints.end();
+                                       ++iter)
+  {
+    /// @todo: can we assume there are no repeats?
+    if ((*iter)->GetName() == _jointName)
+    {
+      this->childJoints.erase(iter);
+      break;
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -839,16 +894,11 @@ void Link::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-LinkState Link::GetState()
+void Link::SetState(const LinkState & /*_state*/)
 {
-  return LinkState(boost::shared_static_cast<Link>(shared_from_this()));
-}
+  // this->SetRelativePose(_state.GetPose());
 
-//////////////////////////////////////////////////
-void Link::SetState(const LinkState &_state)
-{
-  this->SetRelativePose(_state.GetPose());
-
+  /*
   for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)
   {
     CollisionState collisionState = _state.GetCollisionState(i);
@@ -857,7 +907,7 @@ void Link::SetState(const LinkState &_state)
       collision->SetState(collisionState);
     else
       gzerr << "Unable to find collision[" << collisionState.GetName() << "]\n";
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////

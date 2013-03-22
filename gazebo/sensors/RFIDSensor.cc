@@ -1,5 +1,5 @@
-/*  Copyright (C)
- *     Jonas Mellin & Zakiruz Zaman
+/*
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- */
+*/
 /* Desc: RFID Sensor
  * Author: Jonas Mellin & Zakiruz Zaman
  * Date: 6th December 2011
@@ -42,7 +42,7 @@ GZ_REGISTER_STATIC_SENSOR("rfid", RFIDSensor)
 
 /////////////////////////////////////////////////
 RFIDSensor::RFIDSensor()
-  : Sensor()
+  : Sensor(sensors::OTHER)
 {
   this->active = false;
 }

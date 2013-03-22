@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ BoxMaker::BoxMaker()
   this->state = 0;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::BOX);
-  this->visualMsg->mutable_material()->mutable_script()->set_uri(
+  this->visualMsg->mutable_material()->mutable_script()->add_uri(
       "gazebo://media/materials/scripts/gazebo.material");
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
@@ -177,7 +177,7 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
 std::string BoxMaker::GetSDFString()
 {
   std::ostringstream newModelStr;
-  newModelStr << "<sdf version ='1.3'>"
+  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
     << "<model name='unit_box_" << counter << "'>"
     << "<pose>0 0 0.5 0 0 0</pose>"
     << "<link name ='link'>"

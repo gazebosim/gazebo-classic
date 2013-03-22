@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +33,12 @@ TEST_F(SpeedTest, BallTest)
   // Load 500 spheres into the world
   std::string name = "sphere";
   math::Vector3 pos(0, 0, 5);
+
   for (int i = 0; i < 500; ++i)
   {
     pos.z += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, math::Vector3(0, 0, 0));
+        pos, math::Vector3(0, 0, 0), i == 499);
   }
 
   common::Time::MSleep(2000);
@@ -71,7 +72,7 @@ TEST_F(SpeedTest, ShapesWorld)
   {
     pos.z += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, math::Vector3(0, 0, 0));
+        pos, math::Vector3(0, 0, 0), i == 499);
   }
   common::Time::MSleep(2000);
 
@@ -85,32 +86,6 @@ TEST_F(SpeedTest, ShapesWorld)
   EXPECT_GT(speedRatio, 0.08);
 #else
   EXPECT_GT(speedRatio, 0.01);
-#endif
-}
-
-TEST_F(SpeedTest, PR2World)
-{
-  Load("worlds/empty.world");
-  double emptySpeed;
-  while ((emptySpeed = GetPercentRealTime()) == 0)
-    common::Time::MSleep(100);
-  common::Time::MSleep(2000);
-  emptySpeed = GetPercentRealTime();
-
-  // Load the pr2into the world
-  SpawnModel("model://pr2");
-  common::Time::MSleep(2000);
-  double loadedSpeed = GetPercentRealTime();
-
-  double speedRatio = loadedSpeed / emptySpeed;
-
-  std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
-            << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
-
-#ifdef BUILD_TYPE_RELEASE
-  EXPECT_GT(speedRatio, 0.5);
-#else
-  EXPECT_GT(speedRatio, 0.3);
 #endif
 }
 

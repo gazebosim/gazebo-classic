@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _scene Pointer to the scene that contains the Light.
-      public: Light(Scene *_scene);
+      public: Light(ScenePtr _scene);
 
       /// \brief Destructor
       public: virtual ~Light();
@@ -204,7 +204,7 @@ namespace gazebo
       private: static unsigned int lightCounter;
 
       /// \brief Pointer to the scene.
-      private: Scene *scene;
+      private: ScenePtr scene;
     };
     /// \}
   }

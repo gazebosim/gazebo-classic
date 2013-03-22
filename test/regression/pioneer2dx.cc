@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,16 @@ TEST_F(Pioneer2dx, StraightLine)
   Load("worlds/pioneer2dx.world");
   transport::PublisherPtr velPub = this->node->Advertise<gazebo::msgs::Pose>(
       "~/pioneer2dx/vel_cmd");
+
+  int i = 0;
+  while (!this->HasEntity("pioneer2dx") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get pioneer2dx");
 
   gazebo::msgs::Pose msg;
   gazebo::msgs::Set(msg.mutable_position(),

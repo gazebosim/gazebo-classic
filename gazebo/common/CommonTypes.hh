@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,16 +85,17 @@ namespace gazebo
 
   namespace common
   {
-    class Param;
-    class Time;
+    class Animation;
+    class Color;
+    class DiagnosticTimer;
     class Image;
     class Mesh;
     class MouseEvent;
-    class PoseAnimation;
     class NumericAnimation;
-    class Animation;
-    class Color;
+    class Param;
+    class PoseAnimation;
     class SkeletonAnimation;
+    class Time;
 
     template <typename T>
     class ParamT;
@@ -118,6 +119,10 @@ namespace gazebo
     /// \def NumericAnimationPtr
     /// \brief boost::shared_ptr to a NumericAnimation class
     typedef boost::shared_ptr<NumericAnimation> NumericAnimationPtr;
+
+    /// \def DiagnosticTimerPtr
+    /// \brief boost::shared_ptr to a DiagnosticTimer class
+    typedef boost::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
   }
 
   namespace event

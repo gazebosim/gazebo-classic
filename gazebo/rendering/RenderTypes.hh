@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,11 @@
 
 /// \def GZ_VISIBILITY_ALL
 /// \brief Render everything visibility mask.
-#define GZ_VISIBILITY_ALL             0xFFFFFFFF
+#define GZ_VISIBILITY_ALL             0x0FFFFFFF
+
+/// \def GZ_VISIBILITY_SELECTION
+/// \brief Renders only objects that can be selected.
+#define GZ_VISIBILITY_SELECTION       0x10000000
 
 /// \def GZ_VISIBILITY_GUI
 /// \brief Render GUI visuals mask.

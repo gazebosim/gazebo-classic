@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
 
 #include <string>
 
-#include "rendering/ViewController.hh"
-#include "math/Vector3.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/ViewController.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {
@@ -48,11 +48,6 @@ namespace gazebo
       /// \param[in] _focalPoint Point to look at.
       public: virtual void Init(const math::Vector3 &_focalPoint);
 
-      /// \brief Set the min and max distance from the focal point.
-      /// \param[in] _minDist Min distance to the focal point.
-      /// \param[in] _maxDist Max distance from the focal point.
-      public: void SetDistanceRange(double _minDist, double _maxDist);
-
       /// \brief Update.
       public: virtual void Update();
 
@@ -76,14 +71,6 @@ namespace gazebo
       /// \return The focal point
       public: math::Vector3 GetFocalPoint() const;
 
-      /// \brief Set the yaw angle of the camera.
-      /// \param[in] _yaw angle in radians
-      public: void SetYaw(double _yaw);
-
-      /// \brief Set the pitch angle of the camera.
-      /// \param[in] _pitch Pitch angle in radians.
-      public: void SetPitch(double _pitch);
-
       // Documentation inherited from parent
       public: void HandleKeyReleaseEvent(const std::string &_key);
 
@@ -92,11 +79,11 @@ namespace gazebo
 
       /// \brief Translate the focal point in the local coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      private: void TranslateLocal(math::Vector3 _vec);
+      private: void TranslateLocal(const math::Vector3 &_vec);
 
       /// \brief Translate the focal point in the global coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      private: void TranslateGlobal(math::Vector3 _vec);
+      private: void TranslateGlobal(const math::Vector3 &_vec);
 
       /// \brief Zoom the camera.
       /// \paramp[in] _amount Zoom quatity.
@@ -104,25 +91,43 @@ namespace gazebo
 
       /// \brief Normalize yaw value.
       /// \paramp[in] _v Normalize a yaw value.
-      private: void NormalizeYaw(float &_v);
+      /// \return The normalized value.
+      private: double NormalizeYaw(double _v);
 
       /// \brief Normalize pitch value.
       /// \paramp[in] _v Normalize a pitch value.
-      private: void NormalizePitch(float &_v);
+      /// \return The normalized value.
+      private: double NormalizePitch(double _v);
 
-      /// \brief Update the camera's pose.
-      private: void UpdatePose();
+      /// \brief Update the reference visual.
+      private: void UpdateRefVisual();
 
-      private: float yaw, pitch;
+      /// \brief Update the camera's pose based on a rotation update.
+      /// \param[in] _dy Delta yaw movement.
+      /// \param[in] _dp Delta pitch movement.
+      private: void Orbit(double _dy, double _dp);
+
+      /// \brief Yaw value.
+      private: float yaw, initYaw;
+
+      /// \brief Pitch value.
+      private: float pitch, initPitch;
+
+      /// \brief Distance to the focal point.
       private: float distance;
-      private: float minDist, maxDist;
+
+      /// \brief The focal point.
       private: math::Vector3 focalPoint;
 
+      /// \brief A reference visual.
       private: VisualPtr refVisual;
-      private: math::Vector2i posCache;
-      private: math::Vector3 worldFocal;
 
+      /// \brief Key that is currently pressed.
       private: std::string key;
+
+      /// \brief A flag used to inidicate that the view controller has just
+      /// been initialized.
+      private: bool init;
     };
     /// \}
   }

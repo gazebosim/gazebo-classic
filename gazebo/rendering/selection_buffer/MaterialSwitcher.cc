@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,8 +83,9 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
       return this->lastTechnique;
     }
     // else
-    //   gzerr << "Object is not a SubEntity: "
-    //         << _rend->getMaterial()->getName() << std::endl;
+    //    gzerr << "Object is not a SubEntity["
+    //          << _rend->getMaterial()->getName() << "] Type[" <<
+    //          typeid(*_rend).name() << "]\n";
   }
   // else
   //  gzerr << "Rendering scheme without a Renderable: " << _schemeName

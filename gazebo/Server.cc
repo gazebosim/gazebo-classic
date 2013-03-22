@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,9 @@
 
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
+
+#include "gazebo/common/LogRecord.hh"
+#include "gazebo/common/LogPlay.hh"
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
@@ -30,6 +33,7 @@
 
 #include "gazebo/sensors/Sensors.hh"
 
+#include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/Physics.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
@@ -80,12 +84,17 @@ bool Server::ParseArgs(int argc, char **argv)
       this->systemPluginsArgv[i][j] = argv[i][j];
   }
 
-  std::string configFilename;
 
   po::options_description v_desc("Allowed options");
   v_desc.add_options()
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
+    ("physics,e", po::value<std::string>(),
+     "Specify a physics engine (ode|bullet).")
+    ("play,p", po::value<std::string>(), "Play a log file.")
+    ("record,r", "Record state data to disk.")
+    ("seed",  po::value<double>(),
+     "Start with a given random number seed.")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
@@ -105,16 +114,30 @@ bool Server::ParseArgs(int argc, char **argv)
 
   try
   {
-    po::store(
-        po::command_line_parser(argc, argv).options(desc).positional(
+    po::store(po::command_line_parser(argc, argv).options(desc).positional(
           p_desc).allow_unregistered().run(), this->vm);
+
     po::notify(this->vm);
-  } catch(boost::exception &_e)
+  }
+  catch(boost::exception &_e)
   {
     std::cerr << "Error. Invalid arguments\n";
     // NOTE: boost::diagnostic_information(_e) breaks lucid
     // std::cerr << boost::diagnostic_information(_e) << "\n";
     return false;
+  }
+
+  // Set the random number seed if present on the command line.
+  if (this->vm.count("seed"))
+  {
+    try
+    {
+      math::Rand::SetSeed(this->vm["seed"].as<double>());
+    }
+    catch(boost::bad_any_cast &_e)
+    {
+      gzerr << "Unable to set random number seed. Must supply a number.\n";
+    }
   }
 
   if (this->vm.count("help"))
@@ -137,18 +160,60 @@ bool Server::ParseArgs(int argc, char **argv)
     }
   }
 
+  // Set the parameter to record a log file
+  if (this->vm.count("record"))
+    this->params["record"] = "bz2";
+
   if (this->vm.count("pause"))
     this->params["pause"] = "true";
   else
     this->params["pause"] = "false";
 
-  if (this->vm.count("world_file"))
-    configFilename = this->vm["world_file"].as<std::string>();
-  else
-    configFilename = "worlds/empty.world";
+  // The following "if" block must be processed directly before
+  // this->ProcessPrarams.
+  //
+  // Set the parameter to playback a log file. The log file contains the
+  // world description, so don't try to reead the world file from the
+  // command line.
+  if (this->vm.count("play"))
+  {
+    // Load the log file
+    common::LogPlay::Instance()->Open(this->vm["play"].as<std::string>());
 
-  if (!this->Load(configFilename))
-    return false;
+    gzmsg << "\nLog playback:\n"
+      << "  Log Version: "
+      << common::LogPlay::Instance()->GetLogVersion() << "\n"
+      << "  Gazebo Version: "
+      << common::LogPlay::Instance()->GetGazeboVersion() << "\n"
+      << "  Random Seed: "
+      << common::LogPlay::Instance()->GetRandSeed() << "\n";
+
+    // Get the SDF world description from the log file
+    std::string sdfString;
+    common::LogPlay::Instance()->Step(sdfString);
+
+    // Load the server
+    if (!this->LoadString(sdfString))
+      return false;
+  }
+  else
+  {
+    // Get the world file name from the command line, or use "empty.world"
+    // if no world file is specified.
+    std::string configFilename = "worlds/empty.world";
+    if (this->vm.count("world_file"))
+      configFilename = this->vm["world_file"].as<std::string>();
+
+    // Get the physics engine name specified from the command line, or use ""
+    // if no physics engine is specified.
+    std::string physics;
+    if (this->vm.count("physics"))
+      physics = this->vm["physics"].as<std::string>();
+
+    // Load the server
+    if (!this->LoadFile(configFilename, physics))
+      return false;
+  }
 
   this->ProcessParams();
   this->Init();
@@ -163,7 +228,8 @@ bool Server::GetInitialized() const
 }
 
 /////////////////////////////////////////////////
-bool Server::Load(const std::string &_filename)
+bool Server::LoadFile(const std::string &_filename,
+                      const std::string &_physics)
 {
   // Quick test for a valid file
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
@@ -173,15 +239,6 @@ bool Server::Load(const std::string &_filename)
     return false;
   }
   fclose(test);
-
-  std::string host = "";
-  unsigned int port = 0;
-
-  gazebo::transport::get_master_uri(host, port);
-
-  this->master = new gazebo::Master();
-  this->master->Init(port);
-  this->master->RunThread();
 
   // Load the world file
   sdf::SDFPtr sdf(new sdf::SDF);
@@ -197,6 +254,43 @@ bool Server::Load(const std::string &_filename)
     return false;
   }
 
+  return this->LoadImpl(sdf->root, _physics);
+}
+
+/////////////////////////////////////////////////
+bool Server::LoadString(const std::string &_sdfString)
+{
+  // Load the world file
+  sdf::SDFPtr sdf(new sdf::SDF);
+  if (!sdf::init(sdf))
+  {
+    gzerr << "Unable to initialize sdf\n";
+    return false;
+  }
+
+  if (!sdf::readString(_sdfString, sdf))
+  {
+    gzerr << "Unable to read SDF string[" << _sdfString << "]\n";
+    return false;
+  }
+
+  return this->LoadImpl(sdf->root);
+}
+
+/////////////////////////////////////////////////
+bool Server::LoadImpl(sdf::ElementPtr _elem,
+                      const std::string &_physics)
+{
+  std::string host = "";
+  unsigned int port = 0;
+
+  gazebo::transport::get_master_uri(host, port);
+
+  this->master = new gazebo::Master();
+  this->master->Init(port);
+  this->master->RunThread();
+
+
   // Load gazebo
   gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
 
@@ -206,7 +300,30 @@ bool Server::Load(const std::string &_filename)
   /// Load the physics library
   physics::load();
 
-  sdf::ElementPtr worldElem = sdf->root->GetElement("world");
+  // If a physics engine is specified,
+  if (_physics.length())
+  {
+    // Check if physics engine name is valid
+    // This must be done after physics::load();
+    if (!physics::PhysicsFactory::IsRegistered(_physics))
+    {
+      gzerr << "Unregistered physics engine [" << _physics
+            << "], the default will be used instead.\n";
+    }
+    // Try inserting physics engine name if one is given
+    else if (_elem->HasElement("world") &&
+             _elem->GetElement("world")->HasElement("physics"))
+    {
+      _elem->GetElement("world")->GetElement("physics")
+           ->GetAttribute("type")->Set(_physics);
+    }
+    else
+    {
+      gzerr << "Cannot set physics engine: <world> does not have <physics>\n";
+    }
+  }
+
+  sdf::ElementPtr worldElem = _elem->GetElement("world");
   if (worldElem)
   {
     physics::WorldPtr world = physics::create_world();
@@ -220,8 +337,6 @@ bool Server::Load(const std::string &_filename)
     {
       gzthrow("Failed to load the World\n"  << e);
     }
-
-    this->worldFilenames[world->GetName()] = _filename;
   }
 
   this->node = transport::NodePtr(new transport::Node());
@@ -288,6 +403,9 @@ void Server::Run()
   // This makes sure plugins get loaded properly.
   sensors::run_once(true);
 
+  // Run the sensor threads
+  sensors::run_threads();
+
   // Run each world. Each world starts a new thread
   physics::run_worlds();
 
@@ -295,7 +413,7 @@ void Server::Run()
   while (!this->stop)
   {
     this->ProcessControlMsgs();
-    sensors::run_once(true);
+    sensors::run_once();
     common::Time::MSleep(1);
   }
 
@@ -341,6 +459,10 @@ void Server::ProcessParams()
 
       physics::pause_worlds(p);
     }
+    else if (iter->first == "record")
+    {
+      common::LogRecord::Instance()->Start(iter->second);
+    }
   }
 }
 
@@ -372,7 +494,7 @@ void Server::ProcessControlMsgs()
       if ((*iter).has_save_filename())
         world->Save((*iter).save_filename());
       else
-        world->Save(this->worldFilenames[world->GetName()]);
+        gzerr << "No filename specified.\n";
     }
     else if ((*iter).has_new_world() && (*iter).new_world())
     {

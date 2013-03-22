@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,6 @@ using namespace gazebo;
 class TransportTest : public ServerFixture
 {
 };
-
-TEST_F(TransportTest, Load)
-{
-  for (unsigned int i = 0; i < 2; i++)
-  {
-    Load("worlds/empty.world");
-    Unload();
-  }
-}
 
 bool g_worldStatsMsg2 = false;
 bool g_sceneMsg = false;
@@ -63,6 +54,17 @@ void ReceiveWorldStatsDebugMsg(ConstGzStringPtr &/*_data*/)
   g_worldStatsDebugMsg = true;
 }
 
+
+TEST_F(TransportTest, Load)
+{
+  for (unsigned int i = 0; i < 2; ++i)
+  {
+    Load("worlds/empty.world");
+    Unload();
+  }
+}
+
+
 TEST_F(TransportTest, PubSub)
 {
   Load("worlds/empty.world");
@@ -82,7 +84,7 @@ TEST_F(TransportTest, PubSub)
   std::vector<transport::PublisherPtr> pubs;
   std::vector<transport::SubscriberPtr> subs;
 
-  for (unsigned int i = 0; i < 10; i++)
+  for (unsigned int i = 0; i < 10; ++i)
   {
     pubs.push_back(node->Advertise<msgs::Scene>("~/scene"));
     subs.push_back(node->Subscribe("~/scene", &ReceiveSceneMsg));
@@ -92,7 +94,6 @@ TEST_F(TransportTest, PubSub)
   pubs.clear();
   subs.clear();
 }
-
 
 TEST_F(TransportTest, Errors)
 {
@@ -104,9 +105,6 @@ TEST_F(TransportTest, Errors)
   transport::SubscriberPtr statsSub =
     testNode->Subscribe("~/world_stats", &ReceiveWorldStatsMsg);
   EXPECT_STREQ("/gazebo/default/world_stats", statsSub->GetTopic().c_str());
-
-  transport::SubscriberPtr statsSubDebug =
-    testNode->Subscribe("~/world_stats/__dbg", &ReceiveWorldStatsDebugMsg);
 
   // This generates a warning message
   // EXPECT_THROW(testNode->Advertise<math::Vector3>("~/scene"),
@@ -150,8 +148,6 @@ TEST_F(TransportTest, Errors)
   }
   EXPECT_LT(i, 20);
 
-
-
   putenv(const_cast<char*>("GAZEBO_MASTER_URI="));
   std::string masterHost;
   unsigned int masterPort;
@@ -174,6 +170,7 @@ TEST_F(TransportTest, Errors)
   statsSub.reset();
   testNode.reset();
 }
+
 
 // This test creates a child process to test interprocess communication
 // TODO: This test needs to be fixed

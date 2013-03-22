@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
  * Date: k13 Oct 2009
  */
 
-#include "gazebo_config.h"
-#include "common/Console.hh"
-#include "physics/ode/ODEBallJoint.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/ode/ODEBallJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -36,13 +36,19 @@ ODEBallJoint::ODEBallJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEBallJoint::~ODEBallJoint()
 {
+  if (this->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 ODEBallJoint::GetAnchor(int /*_index*/) const
 {
   dVector3 result;
-  dJointGetBallAnchor(jointId, result);
+  if (this->jointId)
+    dJointGetBallAnchor(jointId, result);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
   return math::Vector3(result[0], result[1], result[2]);
 }
 
@@ -50,11 +56,8 @@ math::Vector3 ODEBallJoint::GetAnchor(int /*_index*/) const
 //////////////////////////////////////////////////
 void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
 {
-  dJointSetBallAnchor(jointId, _anchor.x, _anchor.y, _anchor.z);
-}
-
-//////////////////////////////////////////////////
-void ODEBallJoint::SetDamping(int /*_index*/, double _damping)
-{
-  dJointSetDamping(this->jointId, _damping);
+  if (this->jointId)
+    dJointSetBallAnchor(jointId, _anchor.x, _anchor.y, _anchor.z);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }

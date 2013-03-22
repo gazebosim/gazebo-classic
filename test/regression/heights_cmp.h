@@ -18,6 +18,15 @@
 #ifndef TEST_HEIGHTS_CMP_H_
 #define TEST_HEIGHTS_CMP_H_
 
+#ifdef __GNUC__
+    #define MAYBE_UNUSED __attribute__((used))
+#elif defined _MSC_VER
+    #pragma warning(disable: Cxxxxx)
+    #define MAYBE_UNUSED
+#else
+    #define MAYBE_UNUSED
+#endif
+
 static float __heights[] = {
 0.000000, 0.019685, 0.039370, 0.059055, 0.078740, 0.098425, 0.118110,
 0.137795, 0.157480, 0.177165, 0.196850, 0.216535, 0.236220, 0.255906,
@@ -2397,6 +2406,6 @@ static float __heights[] = {
 2.972441, 2.992126, 3.011811, 3.031496, 3.051181, 3.070866, 3.090551,
 3.110236, 3.129921, 3.149606, 3.169291, 3.188977, 3.208662, 3.228347,
 3.248032, 3.267717, 3.314469};
-static float *heights = __heights;
+static float *heights MAYBE_UNUSED = __heights;
 
 #endif

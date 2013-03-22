@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/UpdateInfo.hh"
 
 #include "gazebo/math/MathTypes.hh"
 #include "gazebo/math/Box.hh"
@@ -89,6 +90,10 @@ namespace gazebo
       /// \brief Set the initial pose.
       /// \param[in] _pose The initial pose.
       public: void SetInitialRelativePose(const math::Pose &_pose);
+
+      /// \brief Get the initial relative pose.
+      /// \return The initial relative pose.
+      public: math::Pose GetInitialRelativePose() const;
 
       /// \brief Return the bounding box for the entity.
       /// \return The bounding box.
@@ -276,7 +281,8 @@ namespace gazebo
       private: void UpdatePhysicsPose(bool update_children = true);
 
       /// \brief Update an animation.
-      private: void UpdateAnimation();
+      /// \param[in] _info Update information.
+      private: void UpdateAnimation(const common::UpdateInfo &_info);
 
       /// \brief A helper that prevents numerous dynamic_casts.
       protected: EntityPtr parentEntity;
@@ -311,7 +317,7 @@ namespace gazebo
       /// \brief Visual message container.
       protected: msgs::Visual *visualMsg;
 
-      /// \brief Pose message containr.
+      /// \brief Pose message container.
       protected: msgs::Pose *poseMsg;
 
       /// \brief Current pose animation
@@ -338,7 +344,6 @@ namespace gazebo
       /// \brief The function used to to set the world pose.
       private: void (Entity::*setWorldPoseFunc)(const math::Pose &, bool, bool);
     };
-
     /// \}
   }
 }

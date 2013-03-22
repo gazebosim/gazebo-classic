@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ void SelectionBuffer::CreateRTTBuffer()
   this->renderTexture->addListener(this->selectionTargetListener);
   this->renderTexture->getViewport(0)->setMaterialScheme("aa");
   this->renderTexture->getViewport(0)->setVisibilityMask(
-      GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_NOT_SELECTABLE);
+      ~GZ_VISIBILITY_NOT_SELECTABLE);
   Ogre::HardwarePixelBufferSharedPtr pixelBuffer = this->texture->getBuffer();
   size_t bufferSize = pixelBuffer->getSizeInBytes();
 

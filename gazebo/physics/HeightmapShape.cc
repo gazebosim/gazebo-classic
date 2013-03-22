@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,9 +71,15 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+int HeightmapShape::GetSubSampling() const
+{
+  return this->subSampling;
+}
+
+//////////////////////////////////////////////////
 void HeightmapShape::Init()
 {
-  this->subSampling = 4;
+  this->subSampling = 1;
 
   math::Vector3 terrainSize = this->GetSize();
 
@@ -87,8 +93,7 @@ void HeightmapShape::Init()
   else
     this->scale.z = fabs(terrainSize.z) / this->img.GetMaxColor().r;
 
-  // Step 1: Construct the heightmap lookup table, using the ogre ray scene
-  // query functionality
+  // Step 1: Construct the heightmap lookup table
   this->FillHeightMap();
 }
 
@@ -120,7 +125,7 @@ void HeightmapShape::FillHeightMap()
   unsigned int count;
   this->img.GetData(&data, count);
 
-  // Iterate over all the verices
+  // Iterate over all the vertices
   for (y = 0; y < this->vertSize; y++)
   {
     // yf ranges between 0 and 4
@@ -201,13 +206,14 @@ void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 //////////////////////////////////////////////////
 math::Vector2i HeightmapShape::GetVertexCount() const
 {
-  return math::Vector2i(this->img.GetWidth(), this->img.GetHeight());
+  return math::Vector2i(this->vertSize, this->vertSize);
 }
 
 /////////////////////////////////////////////////
 float HeightmapShape::GetHeight(int _x, int _y)
 {
-  return this->heights[_y * this->vertSize + _x];
+  return this->heights[(_y * this->subSampling) * this->vertSize +
+                       (_x * this->subSampling)];
 }
 
 /////////////////////////////////////////////////

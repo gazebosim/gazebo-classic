@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IOMANAGER_HH
-#define IOMANAGER_HH
+#ifndef _IOMANAGER_HH_
+#define _IOMANAGER_HH_
 
 #include <boost/thread/thread.hpp>
 #include <boost/asio.hpp>
@@ -42,8 +42,10 @@ namespace gazebo
 
       /// \brief Increment the event count by 1
       public: void IncCount();
+
       /// \brief Decrement the event count by 1
       public: void DecCount();
+
       /// \brief Get the event count
       /// \return The event count
       public: unsigned int GetCount() const;

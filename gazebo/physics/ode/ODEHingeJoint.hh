@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,12 +59,6 @@ namespace gazebo
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
       // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
-
-      /// \brief callback to apply damping force to joint.
-      public: void ApplyDamping();
-
-      // Documentation inherited
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
       // Documentation inherited
@@ -80,7 +74,7 @@ namespace gazebo
       public: virtual double GetMaxForce(int _index);
 
       // Documentation inherited
-      public: virtual void SetForce(int _index, double _torque);
+      public: virtual void SetForce(int _index, double _effort);
 
       // Documentation inherited
       public: virtual double GetParam(int _parameter) const;

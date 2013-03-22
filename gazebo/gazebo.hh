@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace gazebo
   void print_version();
   void add_plugin(const std::string &_filename);
 
-  bool load(int argc = 0, char** argv = 0);
+  bool load(int _argc = 0, char **_argv = 0);
   bool init();
   void run();
   void stop();

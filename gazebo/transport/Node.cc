@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -198,4 +198,39 @@ std::string Node::GetMsgType(const std::string &_topic) const
     return iter->second.front()->GetMsgType();
 
   return std::string();
+}
+
+/////////////////////////////////////////////////
+bool Node::HasLatchedSubscriber(const std::string &_topic) const
+{
+  Callback_M::const_iterator iter = this->callbacks.find(_topic);
+  if (iter != this->callbacks.end())
+    return iter->second.front()->GetLatching();
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
+{
+  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+
+  // Find the topic list in the map.
+  Callback_M::iterator iter = this->callbacks.find(_topic);
+
+  if (iter != this->callbacks.end())
+  {
+    Callback_L::iterator liter;
+
+    // Find the callback with the correct ID and remove it.
+    for (liter = iter->second.begin(); liter != iter->second.end(); ++liter)
+    {
+      if ((*liter)->GetId() == _id)
+      {
+        iter->second.erase(liter);
+        (*liter).reset();
+        break;
+      }
+    }
+  }
 }

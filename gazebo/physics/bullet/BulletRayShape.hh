@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,8 +58,8 @@ namespace gazebo
       public: void SetPoints(const math::Vector3 &_posStart,
                              const math::Vector3 &_posEnd);
 
+      /// \brief Pointer to the Bullet physics engine
       private: BulletPhysicsPtr physicsEngine;
-      private: btCollisionWorld::ClosestRayResultCallback rayCallback;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
  *
 */
 
-#ifndef PUBLICATION_HH
-#define PUBLICATION_HH
+#ifndef _PUBLICATION_HH_
+#define _PUBLICATION_HH_
 
+#include <utility>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 #include <list>
 #include <string>
 #include <vector>
@@ -54,7 +56,7 @@ namespace gazebo
 
       /// \brief Subscribe a callback to our topic
       /// \param[in] _callback The callback
-      public: void AddSubscription(const CallbackHelperPtr &_callback);
+      public: void AddSubscription(const CallbackHelperPtr _callback);
 
       /// \brief Subscribe a node to our topic
       /// \param[in] _node The node
@@ -128,26 +130,52 @@ namespace gazebo
       /// \param[in,out] _pub Pointer to publisher object to be added
       public: void AddPublisher(PublisherPtr _pub);
 
+      /// \brief Remove nodes that have been marked for removal
+      private: void RemoveNodes();
+
+      /// \brief Unique if of the publication.
       private: unsigned int id;
+
+      /// \brief Counter to produce unique IDs
       private: static unsigned int idCounter;
+
+      /// \brief Name of the topic messages are output on.
       private: std::string topic;
+
+      /// \brief Type of message produced through the publication
       private: std::string msgType;
 
-      /// \brief Remove nodes that receieve messages
+      /// \brief Remove nodes that receieve messages.
       private: std::list<CallbackHelperPtr> callbacks;
 
-      /// \brief Local nodes that recieve messages
+      /// \brief Local nodes that recieve messages.
       private: std::list<NodePtr> nodes;
 
+      /// \brief List of node IDs to remove from nodes list.
+      private: std::list<unsigned int> removeNodes;
+
+      /// \brief List of host and port callbacks to remove.
+      private: std::list<std::pair<std::string, unsigned int> > removeCallbacks;
+
+      /// \brief List of transport mechanisms.
       private: std::list<PublicationTransportPtr> transports;
 
+      /// \brief List of publishers.
       private: std::vector<PublisherPtr> publishers;
 
+      /// \brief True if the publication is advertised in the same process.
       private: bool locallyAdvertised;
+
+      /// \brief Mutex to protect the list of nodes.
+      private: mutable boost::mutex nodeMutex;
+
+      /// \brief Mutex to protect the list of nodes.
+      private: mutable boost::mutex callbackMutex;
+
+      /// \brief Mutex to protect the list of nodes id for removed.
+      private: mutable boost::mutex nodeRemoveMutex;
     };
     /// \}
   }
 }
 #endif
-
-

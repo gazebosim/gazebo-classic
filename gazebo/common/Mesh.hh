@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,6 +147,10 @@ namespace gazebo
       /// \brief Scale all vertices by _factor
       /// \param _factor Scaling factor
       public: void Scale(double _factor);
+
+      /// \brief Scale all vertices by the _factor vector
+      /// \param[in] _factor Scaling vector
+      public: void SetScale(const math::Vector3 &_factor);
 
       /// \brief The name of the mesh
       private: std::string name;
@@ -359,6 +363,10 @@ namespace gazebo
       /// \brief Scale all vertices by _factor
       /// \param[in] _factor Scaling factor
       public: void Scale(double _factor);
+
+      /// \brief Scale all vertices by the _factor vector
+      /// \param[in] _factor Scaling vector
+      public: void SetScale(const math::Vector3 &_factor);
 
       /// \brief the vertex array
       private: std::vector< math::Vector3 > vertices;

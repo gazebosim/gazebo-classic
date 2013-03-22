@@ -1,5 +1,5 @@
-/* Copyright (C)
- *     John Hsu
+/*
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *
+*/
 /* Desc: Simple pendulum motion integrator
  * Author: John Hsu
  * Date: 2012/04/20

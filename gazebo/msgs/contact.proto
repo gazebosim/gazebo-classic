@@ -7,16 +7,18 @@ package gazebo.msgs;
 
 import "vector3d.proto";
 import "time.proto";
+import "joint_wrench.proto";
 
 message Contact
 {
   required string collision1 = 1;
   required string collision2 = 2;
 
-  repeated Vector3d position = 3;
-  repeated Vector3d normal   = 4;
-  repeated double depth      = 5;
+  repeated Vector3d position  = 3;
+  repeated Vector3d normal    = 4;
+  repeated double depth       = 5;
+  repeated JointWrench wrench = 6;
 
-  required Time time         = 6;
+  required Time time         = 7;
+  required string world      = 8;
 }
-

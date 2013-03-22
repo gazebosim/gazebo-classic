@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gazebo.hh"
 
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
@@ -177,6 +176,9 @@ unsigned int gui::get_entity_id(const std::string &_name)
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
 {
+  // Initialize the informational logger. This will log warnings, and errors.
+  gazebo::common::Console::Instance()->Init("gzclient.log");
+
   if (!parse_args(_argc, _argv))
     return false;
 
@@ -201,6 +203,7 @@ bool gui::run(int _argc, char **_argv)
 /////////////////////////////////////////////////
 void gui::stop()
 {
+  gazebo::stop();
   g_active_camera.reset();
   g_app->quit();
 }

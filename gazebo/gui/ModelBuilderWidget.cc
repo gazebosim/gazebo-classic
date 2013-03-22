@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 #include "transport/Publisher.hh"
 
 #include "gui/GLWidget.hh"
-
 #include "gui/ModelBuilderWidget.hh"
 
 using namespace gazebo;
@@ -175,5 +174,3 @@ void ModelBuilderWidget::OnCylinderCreate(const math::Vector3 &/*pos*/,
                                      const math::Vector3 &/*scale*/)
 {
 }
-
-

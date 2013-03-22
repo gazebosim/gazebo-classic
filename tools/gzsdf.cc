@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,8 @@ bool file_exists(const std::string &_filename)
 /////////////////////////////////////////////////
 int main(int argc, char** argv)
 {
+  bool success = false;
+
   // Get parameters from command line
   for (int i = 1; i < argc; i++)
   {
@@ -94,15 +96,19 @@ int main(int argc, char** argv)
       std::cerr << "Error: SDF parsing the xml failed\n";
       return -1;
     }
+
+    success = true;
     std::cout << "Check complete\n";
   }
   else if (params[0] == "describe")
   {
     sdf->PrintDescription();
+    success = true;
   }
   else if (params[0] == "doc")
   {
     sdf->PrintDoc();
+    success = true;
   }
   else if (params[0] == "convert")
   {
@@ -119,8 +125,11 @@ int main(int argc, char** argv)
     TiXmlDocument xmlDoc;
     if (xmlDoc.LoadFile(params[1]))
     {
-      sdf::Converter::Convert(&xmlDoc, SDF::version, true);
-      xmlDoc.SaveFile(params[1]);
+      if (sdf::Converter::Convert(&xmlDoc, SDF::version, true))
+      {
+        success = true;
+        xmlDoc.SaveFile(params[1]);
+      }
     }
     else
       std::cerr << "Unable to load file[" << params[1] << "]\n";
@@ -142,6 +151,7 @@ int main(int argc, char** argv)
       std::cerr << "Error: SDF parsing the xml failed\n";
       return -1;
     }
+    success = true;
     sdf->PrintValues();
   }
   else
@@ -150,7 +160,7 @@ int main(int argc, char** argv)
     std::cerr << "Error: Unknown option[" << params[0] << "]\n";
   }
 
-  if (params[0] != "print" && params[0] != "doc")
+  if (params[0] != "print" && params[0] != "doc" && success)
     std::cout << "Success\n";
   return 0;
 }

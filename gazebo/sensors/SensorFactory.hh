@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,16 +56,16 @@ namespace gazebo
     public: static void RegisterAll();
 
     /// \brief Register a sensor class (called by sensor registration function).
-    /// \param[in] _classname Name of class of sensor to register.
+    /// \param[in] _className Name of class of sensor to register.
     /// \param[in] _factoryfn Function handle for registration.
-    public: static void RegisterSensor(const std::string &_classname,
+    public: static void RegisterSensor(const std::string &_className,
                                        SensorFactoryFn _factoryfn);
 
     /// \brief Create a new instance of a sensor.  Used by the world when
     /// reading the world file.
-    /// \param[in] Name of sensor class
+    /// \param[in] _className Name of sensor class
     /// \return Pointer to Sensor
-    public: static SensorPtr NewSensor(const std::string &_classname);
+    public: static SensorPtr NewSensor(const std::string &_className);
 
     /// \brief Get all the sensor types
     /// \param _types Vector of strings of the sensor types,

@@ -14,5 +14,3 @@ message Pose
   required Vector3d position      = 2;
   required Quaternion orientation = 3;
 }
-
-

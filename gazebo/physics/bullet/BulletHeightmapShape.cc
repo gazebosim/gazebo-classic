@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ void BulletHeightmapShape::Init()
   BulletCollisionPtr bParent;
   bParent = boost::shared_dynamic_cast<BulletCollision>(this->collisionParent);
 
-  bParent->SetCollisionShape(this->heightFieldShape);
+  bParent->SetCollisionShape(this->heightFieldShape, false);
 
   math::Pose pose;
   pose.pos.x = 0;

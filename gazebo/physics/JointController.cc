@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,9 +50,11 @@ void JointController::AddJoint(JointPtr _joint)
 /////////////////////////////////////////////////
 void JointController::Reset()
 {
+  // Reset setpoints and feed-forward.
   this->positions.clear();
   this->velocities.clear();
   this->forces.clear();
+  // Should the PID's be reset as well?
 }
 
 /////////////////////////////////////////////////
@@ -62,39 +64,47 @@ void JointController::Update()
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
 
-  if (this->forces.size() > 0)
+  // Skip the update step if SimTime appears to have gone backward.
+  // Negative update time wreaks havok on the integrators.
+  // This happens when World::ResetTime is called.
+  // TODO: fix this when World::ResetTime is improved
+  if (stepTime > 0)
   {
-    std::map<std::string, double>::iterator iter;
-    for (iter = this->forces.begin(); iter != this->forces.end(); ++iter)
-      this->joints[iter->first]->SetForce(0, iter->second);
-  }
-
-  if (this->positions.size() > 0)
-  {
-    double cmd;
-    std::map<std::string, double>::iterator iter;
-
-    for (iter = this->positions.begin(); iter != this->positions.end(); ++iter)
+    if (this->forces.size() > 0)
     {
-      cmd = this->posPids[iter->first].Update(
-          this->joints[iter->first]->GetAngle(0).Radian() - iter->second,
-          stepTime);
-      this->joints[iter->first]->SetForce(0, cmd);
+      std::map<std::string, double>::iterator iter;
+      for (iter = this->forces.begin(); iter != this->forces.end(); ++iter)
+        this->joints[iter->first]->SetForce(0, iter->second);
     }
-  }
 
-  if (this->velocities.size() > 0)
-  {
-    double cmd;
-    std::map<std::string, double>::iterator iter;
-
-    for (iter = this->velocities.begin();
-         iter != this->velocities.end(); ++iter)
+    if (this->positions.size() > 0)
     {
-      cmd = this->velPids[iter->first].Update(
-          this->joints[iter->first]->GetVelocity(0) - iter->second,
-          stepTime);
-      this->joints[iter->first]->SetForce(0, cmd);
+      double cmd;
+      std::map<std::string, double>::iterator iter;
+
+      for (iter = this->positions.begin(); iter != this->positions.end();
+           ++iter)
+      {
+        cmd = this->posPids[iter->first].Update(
+            this->joints[iter->first]->GetAngle(0).Radian() - iter->second,
+            stepTime);
+        this->joints[iter->first]->SetForce(0, cmd);
+      }
+    }
+
+    if (this->velocities.size() > 0)
+    {
+      double cmd;
+      std::map<std::string, double>::iterator iter;
+
+      for (iter = this->velocities.begin();
+           iter != this->velocities.end(); ++iter)
+      {
+        cmd = this->velPids[iter->first].Update(
+            this->joints[iter->first]->GetVelocity(0) - iter->second,
+            stepTime);
+        this->joints[iter->first]->SetForce(0, cmd);
+      }
     }
   }
 

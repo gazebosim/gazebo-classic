@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,16 @@
  * Author: Nate Koenig
  */
 
-#include "rendering/ogre_gazebo.h"
-#include "common/MeshManager.hh"
-#include "transport/Node.hh"
-#include "transport/Subscriber.hh"
-#include "msgs/msgs.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
-#include "rendering/DynamicLines.hh"
-#include "rendering/ContactVisual.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
+#include "gazebo/msgs/msgs.hh"
+
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/ContactVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -36,13 +37,16 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
                              const std::string &_topicName)
 : Visual(_name, _vis)
 {
+  this->receivedMsg = false;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
-  this->contactsSub = this->node->Subscribe(_topicName,
+  this->topicName = _topicName;
+  this->contactsSub = this->node->Subscribe(this->topicName,
       &ContactVisual::OnContact, this);
 
-  common::MeshManager::Instance()->CreateSphere("contact_sphere", 0.05, 10, 10);
+  common::MeshManager::Instance()->CreateSphere("contact_sphere", 0.02, 10, 10);
 
   // Add the mesh into OGRE
   if (!this->sceneNode->getCreator()->hasEntity("contact_sphere") &&
@@ -51,33 +55,6 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
     const common::Mesh *mesh =
       common::MeshManager::Instance()->GetMesh("contact_sphere");
     this->InsertMesh(mesh);
-  }
-
-  for (unsigned int i = 0; i < 10; i++)
-  {
-    std::string objName = this->GetName() +
-        "_contactpoint_" + boost::lexical_cast<std::string>(i);
-    Ogre::Entity *obj = this->scene->GetManager()->createEntity(
-        objName, "contact_sphere");
-    obj->setMaterialName("Gazebo/BlueLaser");
-
-    ContactVisual::ContactPoint *cp = new ContactVisual::ContactPoint();
-    cp->sceneNode = this->sceneNode->createChildSceneNode(objName + "_node");
-    cp->sceneNode->attachObject(obj);
-
-    cp->normal = new DynamicLines(RENDERING_LINE_LIST);
-    cp->depth = new DynamicLines(RENDERING_LINE_LIST);
-
-    cp->normal->AddPoint(math::Vector3(0, 0, 0));
-    cp->normal->AddPoint(math::Vector3(0, 0, 0.1));
-
-    cp->depth->AddPoint(math::Vector3(0, 0, 0));
-    cp->depth->AddPoint(math::Vector3(0, 0, -1));
-    cp->sceneNode->attachObject(cp->depth);
-    cp->sceneNode->attachObject(cp->normal);
-    cp->sceneNode->setVisible(false);
-
-    this->points.push_back(cp);
   }
 
   this->connections.push_back(
@@ -93,15 +70,23 @@ ContactVisual::~ContactVisual()
 /////////////////////////////////////////////////
 void ContactVisual::Update()
 {
-  int c = 0;
+  boost::mutex::scoped_lock lock(this->mutex);
 
-  if (!this->contactsMsg)
+  if (!this->contactsMsg || !this->receivedMsg)
     return;
 
+  // The following values are used to calculate normal scaling factor based
+  // on force value.
+  double magScale = 100;
+  double vMax = 0.5;
+  double vMin = 0.1;
+  double vRange = vMax - vMin;
+  double offset = vRange - vMin;
+
+  unsigned int c = 0;
   for (int i = 0; i < this->contactsMsg->contact_size(); i++)
   {
-    for (int j = 0;
-        c < 10 && j < this->contactsMsg->contact(i).position_size(); j++)
+    for (int j = 0; j < this->contactsMsg->contact(i).position_size(); j++)
     {
       math::Vector3 pos = msgs::Convert(
           this->contactsMsg->contact(i).position(j));
@@ -109,10 +94,22 @@ void ContactVisual::Update()
           this->contactsMsg->contact(i).normal(j));
       double depth = this->contactsMsg->contact(i).depth(j);
 
+      math::Vector3 force = msgs::Convert(
+          this->contactsMsg->contact(i).wrench(j).body_1_force());
+
+      // Scaling factor for the normal line.
+      // Eq in the family of Y = 1/(1+exp(-(x^2)))
+      double normalScale = (2.0 * vRange) / (1 + exp
+          (-force.GetSquaredLength() / magScale)) - offset;
+
+      // Create a new contact visualization point if necessary
+      if (c >= this->points.size())
+        this->CreateNewPoint();
+
       this->points[c]->sceneNode->setVisible(true);
       this->points[c]->sceneNode->setPosition(Conversions::Convert(pos));
 
-      this->points[c]->normal->SetPoint(1, normal*0.1);
+      this->points[c]->normal->SetPoint(1, normal*normalScale);
       this->points[c]->depth->SetPoint(1, normal*-depth*10);
 
       this->points[c]->normal->setMaterial("Gazebo/LightOn");
@@ -123,12 +120,77 @@ void ContactVisual::Update()
     }
   }
 
-  for ( ; c < 10; c++)
+  for ( ; c < this->points.size(); c++)
     this->points[c]->sceneNode->setVisible(false);
+
+  this->receivedMsg = false;
 }
 
 /////////////////////////////////////////////////
 void ContactVisual::OnContact(ConstContactsPtr &_msg)
 {
-  this->contactsMsg = _msg;
+  boost::mutex::scoped_lock lock(this->mutex);
+  if (this->enabled)
+  {
+    this->contactsMsg = _msg;
+    this->receivedMsg = true;
+  }
+}
+
+/////////////////////////////////////////////////
+void ContactVisual::SetEnabled(bool _enabled)
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+  this->enabled = _enabled;
+
+  if (!enabled)
+  {
+    this->contactsSub.reset();
+
+    this->contactsMsg.reset();
+    this->receivedMsg = false;
+
+    for (unsigned int c = 0 ; c < this->points.size(); c++)
+      this->points[c]->sceneNode->setVisible(false);
+  }
+  else if (!this->contactsSub)
+  {
+    this->contactsSub = this->node->Subscribe(this->topicName,
+        &ContactVisual::OnContact, this);
+  }
+}
+
+/////////////////////////////////////////////////
+void ContactVisual::CreateNewPoint()
+{
+  std::string objName = this->GetName() +
+    "_contactpoint_" + boost::lexical_cast<std::string>(this->points.size());
+
+  /// \todo We can improve this by using instanced geometry.
+  Ogre::Entity *obj = this->scene->GetManager()->createEntity(
+                      objName, "contact_sphere");
+  obj->setMaterialName("Gazebo/BlueLaser");
+
+  ContactVisual::ContactPoint *cp = new ContactVisual::ContactPoint();
+  cp->sceneNode = this->sceneNode->createChildSceneNode(objName + "_node");
+  cp->sceneNode->attachObject(obj);
+
+  cp->normal = new DynamicLines(RENDERING_LINE_LIST);
+  cp->depth = new DynamicLines(RENDERING_LINE_LIST);
+
+  cp->normal->AddPoint(math::Vector3(0, 0, 0));
+  cp->normal->AddPoint(math::Vector3(0, 0, 0.1));
+
+  cp->depth->AddPoint(math::Vector3(0, 0, 0));
+  cp->depth->AddPoint(math::Vector3(0, 0, -1));
+
+  obj->setVisibilityFlags(GZ_VISIBILITY_GUI);
+  cp->depth->setVisibilityFlags(GZ_VISIBILITY_GUI);
+  cp->normal->setVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  cp->sceneNode->attachObject(cp->depth);
+  cp->sceneNode->attachObject(cp->normal);
+  cp->sceneNode->setVisible(false);
+
+  this->points.push_back(cp);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,8 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
           if (words[0] == "CHANNELS")
           {
             if (words.size() < 3 ||
-                  (math::parseInt(words[1]) + 2) > words.size())
+                static_cast<size_t>(math::parseInt(words[1]) + 2) >
+                 words.size())
             {
               file.close();
               return NULL;

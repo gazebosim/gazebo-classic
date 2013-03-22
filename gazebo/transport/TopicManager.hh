@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef TOPICMANAGER_HH
-#define TOPICMANAGER_HH
+#ifndef _TOPICMANAGER_HH_
+#define _TOPICMANAGER_HH_
 
 #include <boost/bind.hpp>
 #include <map>
@@ -23,18 +23,19 @@
 #include <string>
 #include <vector>
 
-#include "common/Exception.hh"
-#include "msgs/msgs.hh"
-#include "common/SingletonT.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/SingletonT.hh"
 
-#include "transport/TransportTypes.hh"
-#include "transport/SubscribeOptions.hh"
-#include "transport/SubscriptionTransport.hh"
-#include "transport/PublicationTransport.hh"
-#include "transport/ConnectionManager.hh"
-#include "transport/Publisher.hh"
-#include "transport/Publication.hh"
-#include "transport/Subscriber.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/SubscribeOptions.hh"
+#include "gazebo/transport/SubscriptionTransport.hh"
+#include "gazebo/transport/PublicationTransport.hh"
+#include "gazebo/transport/ConnectionManager.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Publication.hh"
+#include "gazebo/transport/Subscriber.hh"
 
 namespace gazebo
 {
@@ -66,7 +67,7 @@ namespace gazebo
       public: void AddNode(NodePtr _node);
 
       /// \brief Remove a node by its id
-      /// \param[in] The ID of the node to be removed
+      /// \param[in] _id The ID of the node to be removed
       public: void RemoveNode(unsigned int _id);
 
       /// \brief Process all nodes under management
@@ -94,13 +95,13 @@ namespace gazebo
       /// \param[in] _topic The name of the topic
       /// \param[in] _queueLimit The maximum number of outgoing messages
       /// to queue
-      /// \param[in] _latch If true, latch the latest message; if false,
-      /// don't latch
+      /// \param[in] _hz Update rate for the publisher. Units are
+      /// 1.0/seconds.
       /// \return Pointer to the newly created Publisher
       public: template<typename M>
               PublisherPtr Advertise(const std::string &_topic,
                                      unsigned int _queueLimit,
-                                     bool _latch)
+                                     double _hzRate)
               {
                 google::protobuf::Message *msg = NULL;
                 M msgtype;
@@ -111,51 +112,40 @@ namespace gazebo
                 this->UpdatePublications(_topic, msg->GetTypeName());
 
                 PublisherPtr pub = PublisherPtr(new Publisher(_topic,
-                      msg->GetTypeName(), _queueLimit, _latch));
+                      msg->GetTypeName(), _queueLimit, _hzRate));
 
                 std::string msgTypename;
                 PublicationPtr publication;
 
                 // Connect all local subscription to the publisher
-                for (int i = 0; i < 2; i ++)
+                msgTypename = msg->GetTypeName();
+
+                publication = this->FindPublication(_topic);
+                GZ_ASSERT(publication != NULL, "FindPublication returned NULL");
+
+                publication->AddPublisher(pub);
+                if (!publication->GetLocallyAdvertised())
                 {
-                  std::string t;
-                  if (i == 0)
-                  {
-                    t = _topic;
-                    msgTypename = msg->GetTypeName();
-                  }
-                  else
-                  {
-                    t = _topic + "/__dbg";
-                    msgs::GzString tmp;
-                    msgTypename = tmp.GetTypeName();
-                  }
+                  ConnectionManager::Instance()->Advertise(_topic, msgTypename);
+                }
 
-                  publication = this->FindPublication(t);
-                  publication->AddPublisher(pub);
-                  if (!publication->GetLocallyAdvertised())
-                  {
-                    ConnectionManager::Instance()->Advertise(t, msgTypename);
-                  }
+                publication->SetLocallyAdvertised(true);
+                pub->SetPublication(publication);
 
-                  publication->SetLocallyAdvertised(true);
-                  pub->SetPublication(publication, i);
 
-                  SubNodeMap::iterator iter2;
-                  SubNodeMap::iterator st_end2 = this->subscribedNodes.end();
-                  for (iter2 = this->subscribedNodes.begin();
-                       iter2 != st_end2; iter2++)
+                SubNodeMap::iterator iter2;
+                SubNodeMap::iterator stEnd2 = this->subscribedNodes.end();
+                for (iter2 = this->subscribedNodes.begin();
+                     iter2 != stEnd2; ++iter2)
+                {
+                  if (iter2->first == _topic)
                   {
-                    if (iter2->first == t)
+                    std::list<NodePtr>::iterator liter;
+                    std::list<NodePtr>::iterator lEnd = iter2->second.end();
+                    for (liter = iter2->second.begin();
+                        liter != lEnd; ++liter)
                     {
-                      std::list<NodePtr>::iterator liter;
-                      std::list<NodePtr>::iterator l_end = iter2->second.end();
-                      for (liter = iter2->second.begin();
-                           liter != l_end; liter++)
-                      {
-                        publication->AddSubscription(*liter);
-                      }
+                      publication->AddSubscription(*liter);
                     }
                   }
                 }
@@ -180,7 +170,7 @@ namespace gazebo
       /// \param[in] _topic The topic to use
       /// \param[in] _sublink The subscription transport object to use
       public: void ConnectPubToSub(const std::string &_topic,
-                                    const SubscriptionTransportPtr &_sublink);
+                                    const SubscriptionTransportPtr _sublink);
 
       /// \brief Connect a local Subscriber to a remote Publisher
       /// \param[in] _pub The publish object to use
@@ -219,8 +209,15 @@ namespace gazebo
       public: void RegisterTopicNamespace(const std::string &_name);
 
       /// \brief Get all the topic namespaces
-      /// \param[out] The list of namespaces will be written here
+      /// \param[out] _namespaces The list of namespaces will be written here
       public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
+
+      /// \brief Get a list of all the topics.
+      /// \return A map where keys are message types, and values are a list
+      /// of topic names.
+      /// \sa transport::GetAdvertisedTopics
+      public: std::map<std::string, std::list<std::string> >
+              GetAdvertisedTopics() const GAZEBO_DEPRECATED;
 
       /// \brief Clear all buffers
       public: void ClearBuffers();
@@ -238,15 +235,18 @@ namespace gazebo
       private: SubNodeMap subscribedNodes;
       private: std::vector<NodePtr> nodes;
 
-      private: boost::recursive_mutex *nodeMutex;
+      private: boost::recursive_mutex nodeMutex;
+
+      /// \brief Used to protect subscription connection creation.
+      private: boost::mutex subscriberMutex;
 
       private: bool pauseIncoming;
 
       // Singleton implementation
       private: friend class SingletonT<TopicManager>;
     };
+
     /// \}
   }
 }
 #endif
-

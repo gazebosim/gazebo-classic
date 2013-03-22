@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -404,9 +404,15 @@ namespace gazebo
       msgs::Visual result;
 
       result.set_name(_sdf->Get<std::string>("name"));
-      result.set_cast_shadows(_sdf->Get<bool>("cast_shadows"));
-      result.set_transparency(_sdf->Get<double>("transparency"));
-      result.set_laser_retro(_sdf->Get<double>("laser_retro"));
+
+      if (_sdf->HasElement("cast_shadows"))
+        result.set_cast_shadows(_sdf->Get<bool>("cast_shadows"));
+
+      if (_sdf->HasElement("transparency"))
+        result.set_transparency(_sdf->Get<double>("transparency"));
+
+      if (_sdf->HasElement("laser_retro"))
+        result.set_laser_retro(_sdf->Get<double>("laser_retro"));
 
       // Load the geometry
       if (_sdf->HasElement("geometry"))
@@ -496,19 +502,8 @@ namespace gazebo
           msgs::Set(geomMsg->mutable_mesh()->mutable_scale(),
               geomElem->Get<math::Vector3>("scale"));
 
-          // The if clause is used to detect instances of "filename" with
-          // the sdf. Eventually this code will be deprecated as people
-          // switch to using uris.
-          if (geomElem->Get<std::string>("filename") != "__default__")
-          {
-            geomMsg->mutable_mesh()->set_filename(
-                common::find_file(geomElem->Get<std::string>("filename")));
-          }
-          else
-          {
-            geomMsg->mutable_mesh()->set_filename(
-                geomElem->Get<std::string>("uri"));
-          }
+          geomMsg->mutable_mesh()->set_filename(
+              geomElem->Get<std::string>("uri"));
         }
         else if (geomElem->GetName() == "empty")
         {
@@ -531,8 +526,13 @@ namespace gazebo
           sdf::ElementPtr scriptElem = elem->GetElement("script");
           matMsg->mutable_script()->set_name(
               scriptElem->Get<std::string>("name"));
-          matMsg->mutable_script()->set_uri(
-              scriptElem->Get<std::string>("uri"));
+
+          sdf::ElementPtr uriElem = scriptElem->GetElement("uri");
+          while (uriElem)
+          {
+            matMsg->mutable_script()->add_uri(uriElem->Get<std::string>());
+            uriElem = uriElem->GetNextElement("uri");
+          }
         }
 
         if (elem->HasElement("shader"))

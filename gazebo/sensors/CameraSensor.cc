@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/Image.hh"
 
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -42,7 +43,7 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 
 //////////////////////////////////////////////////
 CameraSensor::CameraSensor()
-    : Sensor()
+    : Sensor(sensors::IMAGE)
 {
 }
 
@@ -129,7 +130,10 @@ void CameraSensor::Init()
 
     this->camera->Init();
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
-    this->camera->SetWorldPose(this->pose);
+    math::Pose cameraPose = this->pose;
+    if (cameraSdf->HasElement("pose"))
+      cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
+    this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentName, true);
   }
   else
@@ -149,12 +153,6 @@ void CameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-void CameraSensor::SetActive(bool value)
-{
-  Sensor::SetActive(value);
-}
-
-//////////////////////////////////////////////////
 void CameraSensor::UpdateImpl(bool /*_force*/)
 {
   if (this->camera)
@@ -169,10 +167,14 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
       msgs::Set(msg.mutable_time(), this->world->GetSimTime());
       msg.mutable_image()->set_width(this->camera->GetImageWidth());
       msg.mutable_image()->set_height(this->camera->GetImageHeight());
-      // msg.mutable_image()->set_pixel_format(this->camera->GetImageFormat());
-      msg.mutable_image()->set_step(this->camera->GetImageWidth() * 3);
+      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+            this->camera->GetImageFormat()));
+
+      msg.mutable_image()->set_step(this->camera->GetImageWidth() *
+          this->camera->GetImageDepth());
       msg.mutable_image()->set_data(this->camera->GetImageData(),
-          msg.image().width() * 3 * msg.image().height());
+          msg.image().width() * this->camera->GetImageDepth() *
+          msg.image().height());
       this->imagePub->Publish(msg);
     }
   }
@@ -205,4 +207,10 @@ bool CameraSensor::SaveFrame(const std::string &_filename)
 {
   this->SetActive(true);
   return this->camera->SaveFrame(_filename);
+}
+
+//////////////////////////////////////////////////
+bool CameraSensor::IsActive()
+{
+  return Sensor::IsActive() || this->imagePub->HasConnections();
 }

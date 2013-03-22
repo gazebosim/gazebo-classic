@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -192,10 +192,6 @@ namespace gazebo
       /// \return True if horizontal, false if not
       public: bool IsHorizontal() const;
 
-      /// Deprecated
-      /// \sa GetRayCountRatio
-      public: double Get1stRatio() const GAZEBO_DEPRECATED;
-
       /// \brief Return the ratio of horizontal ray count to vertical ray
       /// count.
       ///
@@ -203,10 +199,6 @@ namespace gazebo
       /// is the total number of data points returned. When range count
       /// != ray count, then values are interpolated between rays.
       public: double GetRayCountRatio() const;
-
-      /// Deprecated
-      /// \sa GetRangeCountRatio
-      public: double Get2ndRatio() const GAZEBO_DEPRECATED;
 
       /// \brief Return the ratio of horizontal range count to vertical
       /// range count.
@@ -216,47 +208,24 @@ namespace gazebo
       /// != ray count, then values are interpolated between rays.
       public: double GetRangeCountRatio() const;
 
-      /// Deprecated.
-      /// \sa GetHorzFOV
-      public: double GetHFOV() const GAZEBO_DEPRECATED;
-
       /// \brief Get the horizontal field of view of the laser sensor.
       /// \return The horizontal field of view of the laser sensor.
       public: double GetHorzFOV() const;
-
-      /// Deprecated
-      public: double GetCHFOV() const GAZEBO_DEPRECATED;
 
       /// \brief Get Cos Horz field-of-view
       /// \return 2 * atan(tan(this->hfov/2) / cos(this->vfov/2))
       public: double GetCosHorzFOV() const;
 
-      /// Deprecated
-      /// \sa GetVertFOV
-      public: double GetVFOV() const GAZEBO_DEPRECATED;
-
       /// \brief Get the vertical field-of-view.
       public: double GetVertFOV() const;
-
-      /// Deprecated
-      /// \sa GetCosVertFOV
-      public: double GetCVFOV() const GAZEBO_DEPRECATED;
 
       /// \brief Get Cos Vert field-of-view
       /// \return 2 * atan(tan(this->vfov/2) / cos(this->hfov/2))
       public: double GetCosVertFOV() const;
 
-      /// Deprecated.
-      /// \sa GetHorzHalfAngle
-      public: double GetHAngle() const GAZEBO_DEPRECATED;
-
       /// \brief Get (horizontal_max_angle + horizontal_min_angle) * 0.5
       /// \return (horizontal_max_angle + horizontal_min_angle) * 0.5
       public: double GetHorzHalfAngle() const;
-
-      /// Deprecated.
-      /// \sa GetVertHalfAngle
-      public: double GetVAngle() const GAZEBO_DEPRECATED;
 
       /// \brief Get (vertical_max_angle + vertical_min_angle) * 0.5
       /// \return (vertical_max_angle + vertical_min_angle) * 0.5

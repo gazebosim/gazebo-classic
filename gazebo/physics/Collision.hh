@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ namespace gazebo
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Set the encapsulated collsion object.
-      /// \param[in] _placeable True to make the object m.
+      /// \param[in] _placeable True to make the object movable.
       public: void SetCollision(bool _placeable);
 
       /// \brief Return whether this collision is movable.
@@ -169,21 +169,14 @@ namespace gazebo
       /// \param[in] The collision state.
       public: void SetState(const CollisionState &_state);
 
-      /// \brief Setup callback for contact event
-      /// \param[in] _subscriber The callback.
-      /// \return Pointer to the new connection, which must be kept in
-      /// scope.
+      /// Deprecated.
       public: template<typename T>
               event::ConnectionPtr ConnectContact(T _subscriber)
               {return contact.Connect(_subscriber);}
 
-      /// \brief Disconnect callback for contact event.
-      /// \param[in] _conn The connection to disconnect.
+      /// Deprecated.
       public: void DisconnectContact(event::ConnectionPtr &_conn)
               {contact.Disconnect(_conn);}
-
-      /// \brief DEPRECATED.
-      public: void FillCollisionMsg(msgs::Collision &_msg) GAZEBO_DEPRECATED;
 
       /// \brief Fill a collision message.
       /// \param[out] _msg The message to fill with this collision's data.
@@ -223,6 +216,8 @@ namespace gazebo
 
       /// \brief The laser retro value.
       private: float laserRetro;
+
+      private: CollisionState state;
     };
     /// \}
   }

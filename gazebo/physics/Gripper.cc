@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ using namespace physics;
 Gripper::Gripper(ModelPtr _model)
 {
   this->model = _model;
-  this->physics = this->model->GetWorld()->GetPhysicsEngine();
+  this->world = this->model->GetWorld();
+  this->physics = this->world->GetPhysicsEngine();
 
   this->diffs.resize(10);
   this->diffIndex = 0;
@@ -50,6 +51,7 @@ Gripper::~Gripper()
 {
   this->model.reset();
   this->physics.reset();
+  this->world.reset();
   this->connections.clear();
 }
 
@@ -84,8 +86,7 @@ void Gripper::Load(sdf::ElementPtr _sdf)
       if (collIter != this->collisions.end())
         continue;
       collision->SetContactsEnabled(true);
-      this->connections.push_back(collision->ConnectContact(
-            boost::bind(&Gripper::OnContact, this, _1, _2)));
+
       this->collisions[collision->GetScopedName()] = collision;
     }
     gripperLinkElem = gripperLinkElem->GetNextElement("gripper_link");
@@ -122,9 +123,9 @@ void Gripper::OnUpdate()
     this->posCount = std::max(0, this->posCount-1);
   }
 
-  if (this->posCount > this->attach_steps && !this->attached)
+  if (this->posCount > this->attachSteps && !this->attached)
     this->HandleAttach();
-  else if (this->zeroCount > this->detach_steps && this->attached)
+  else if (this->zeroCount > this->detachSteps && this->attached)
     this->HandleDetach();
 
   this->contacts.clear();
@@ -140,23 +141,25 @@ void Gripper::HandleAttach()
     return;
   }
 
-  std::map<std::string, physics::Collision*> cc;
+  std::map<std::string, physics::CollisionPtr> cc;
   std::map<std::string, int> contactCounts;
   std::map<std::string, int>::iterator iter;
 
   for (unsigned int i = 0; i < this->contacts.size(); ++i)
   {
-    std::string name1 = this->contacts[i].collision1->GetScopedName();
-    std::string name2 = this->contacts[i].collision2->GetScopedName();
+    std::string name1 = this->contacts[i].collision1;
+    std::string name2 = this->contacts[i].collision2;
 
     if (this->collisions.find(name1) == this->collisions.end())
     {
-      cc[name1] = this->contacts[i].collision1;
+      cc[name1] = boost::shared_dynamic_cast<Collision>(
+          this->world->GetEntity(this->contacts[i].collision1));
       contactCounts[name1] += 1;
     }
     if (this->collisions.find(name2) == this->collisions.end())
     {
-      cc[name2] = this->contacts[i].collision2;
+      cc[name2] = boost::shared_dynamic_cast<Collision>(
+          this->world->GetEntity(this->contacts[i].collision2));
       contactCounts[name2] += 1;
     }
   }
@@ -168,7 +171,7 @@ void Gripper::HandleAttach()
       contactCounts.erase(iter++);
     else
     {
-      if (!this->attached)
+      if (!this->attached && cc[iter->first])
       {
         math::Pose diff = cc[iter->first]->GetLink()->GetWorldPose() -
           this->palmLink->GetWorldPose();
@@ -186,7 +189,7 @@ void Gripper::HandleAttach()
           this->attached = true;
 
           this->fixedJoint->Load(this->palmLink,
-              cc[iter->first]->GetLink(), math::Pose(0, 0, 0, 0, 0, 0));
+              cc[iter->first]->GetLink(), math::Pose());
           this->fixedJoint->Init();
           this->fixedJoint->SetHighStop(0, 0);
           this->fixedJoint->SetLowStop(0, 0);
@@ -208,10 +211,19 @@ void Gripper::HandleDetach()
 
 /////////////////////////////////////////////////
 void Gripper::OnContact(const std::string &/*_collisionName*/,
-                              const physics::Contact &_contact)
+                        const physics::Contact &_contact)
 {
-  if (_contact.collision1->IsStatic() || _contact.collision2->IsStatic())
+  CollisionPtr collision1 = boost::shared_dynamic_cast<Collision>(
+        this->world->GetEntity(_contact.collision1));
+
+  CollisionPtr collision2 = boost::shared_dynamic_cast<Collision>(
+        this->world->GetEntity(_contact.collision1));
+
+  if ((collision1 && collision1->IsStatic()) ||
+      (collision2 && collision2->IsStatic()))
+  {
     return;
+  }
 
   this->contacts.push_back(_contact);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef CONNECTION_HH
-#define CONNECTION_HH
+#ifndef _CONNECTION_HH_
+#define _CONNECTION_HH_
 
+#include <tbb/task.h>
 #include <google/protobuf/message.h>
 
 #include <boost/asio.hpp>
@@ -48,6 +49,39 @@ namespace gazebo
     class Connection;
     typedef boost::shared_ptr<Connection> ConnectionPtr;
 
+    /// \cond
+    /// \brief A task instance that is created when data is read from
+    /// a socket and used by TBB
+    class ConnectionReadTask : public tbb::task
+    {
+      /// \brief Constructor
+      /// \param[_in] _func Boost function pointer, which is the function
+      /// that receives the data.
+      /// \param[in] _data Data to send to the boost function pointer.
+      public: ConnectionReadTask(
+                  boost::function<void (const std::string &)> _func,
+                  const std::string &_data)
+              {
+                this->func = _func;
+                this->data = _data;
+              }
+
+      /// \bried Overridden function from tbb::task that exectues the data
+      /// callback.
+      public: tbb::task *execute()
+              {
+                this->func(this->data);
+                return NULL;
+              }
+
+      /// \brief The boost function pointer
+      private: boost::function<void (const std::string &)> func;
+
+      /// \brief The data to send to the boost function pointer
+      private: std::string data;
+    };
+    /// \endcond
+
     /// \addtogroup gazebo_transport Transport
     /// \{
 
@@ -72,12 +106,12 @@ namespace gazebo
 
       /// \brief Start a server that listens on a port
       /// \param[in] _port The port to listen on
-      /// \param[in] _port The callback to invoke when a new connection has
+      /// \param[in] _acceptCB The callback to invoke when a new connection has
       /// been accepted
-      public: void Listen(unsigned int _port, const AcceptCallback &_accept_cb);
+      public: void Listen(unsigned int _port, const AcceptCallback &_acceptCB);
 
       /// \brief The signature of a connection read callback
-      typedef boost::function<void(const std::string &data)> ReadCallback;
+      typedef boost::function<void(const std::string &_data)> ReadCallback;
 
       /// \brief Start a thread that reads from the connection and passes
       ///        new message to the ReadCallback
@@ -141,7 +175,7 @@ namespace gazebo
 
       /// \brief Get the local hostname
       /// \return The local hostname
-      public: std::string GetLocalHostname() const;
+      public: static std::string GetLocalHostname();
 
       /// \brief Peform an asyncronous read
       /// param[in] _handler Callback to invoke on received data
@@ -157,9 +191,9 @@ namespace gazebo
                 void (Connection::*f)(const boost::system::error_code &,
                     boost::tuple<Handler>) = &Connection::OnReadHeader<Handler>;
 
-                this->inbound_header.resize(HEADER_LENGTH);
+                this->inboundHeader.resize(HEADER_LENGTH);
                 boost::asio::async_read(*this->socket,
-                    boost::asio::buffer(this->inbound_header),
+                    boost::asio::buffer(this->inboundHeader),
                     boost::bind(f, this,
                                 boost::asio::placeholders::error,
                                 boost::make_tuple(_handler)));
@@ -180,31 +214,33 @@ namespace gazebo
                 {
                   if (_e.message() != "End of File")
                   {
-                    this->Close();
                     // This will occur when the other side closes the
-                    // connection
+                    // connection. We don't want spew error messages in this
+                    // case.
+                    //
+                    // It's okay to do nothing here.
                   }
                 }
                 else
                 {
-                  std::size_t inbound_data_size = 0;
-                  std::string header(&this->inbound_header[0],
-                                      this->inbound_header.size());
-                  this->inbound_header.clear();
+                  std::size_t inboundData_size = 0;
+                  std::string header(&this->inboundHeader[0],
+                                      this->inboundHeader.size());
+                  this->inboundHeader.clear();
 
-                  inbound_data_size = this->ParseHeader(header);
+                  inboundData_size = this->ParseHeader(header);
 
-                 if (inbound_data_size > 0)
+                 if (inboundData_size > 0)
                   {
                     // Start the asynchronous call to receive data
-                    this->inbound_data.resize(inbound_data_size);
+                    this->inboundData.resize(inboundData_size);
 
                     void (Connection::*f)(const boost::system::error_code &e,
                         boost::tuple<Handler>) =
                       &Connection::OnReadData<Handler>;
 
                     boost::asio::async_read(*this->socket,
-                        boost::asio::buffer(this->inbound_data),
+                        boost::asio::buffer(this->inboundData),
                         boost::bind(f, this,
                                     boost::asio::placeholders::error,
                                     _handler));
@@ -215,14 +251,14 @@ namespace gazebo
                     boost::get<0>(_handler)("");
                     // This code tries to read the header again. We should
                     // never get here.
-                    // this->inbound_header.resize(HEADER_LENGTH);
+                    // this->inboundHeader.resize(HEADER_LENGTH);
 
                     // void (Connection::*f)(const boost::system::error_code &,
                     // boost::tuple<Handler>) =
                     // &Connection::OnReadHeader<Handler>;
 
                     // boost::asio::async_read(*this->socket,
-                    //    boost::asio::buffer(this->inbound_header),
+                    //    boost::asio::buffer(this->inboundHeader),
                     //    boost::bind(f, this,
                     //      boost::asio::placeholders::error, _handler));
                   }
@@ -241,101 +277,159 @@ namespace gazebo
                               boost::tuple<Handler> _handler)
               {
                 if (_e)
-                  gzerr << "Error Reading data!\n";
+                {
+                  gzerr << "Error Reading data["
+                    << _e.message() << "]\n";
+                }
 
                 // Inform caller that data has been received
-                std::string data(&this->inbound_data[0],
-                                  this->inbound_data.size());
-                this->inbound_data.clear();
+                std::string data(&this->inboundData[0],
+                                  this->inboundData.size());
+                this->inboundData.clear();
 
                 if (data.empty())
                   gzerr << "OnReadData got empty data!!!\n";
 
                 if (!_e && !transport::is_stopped())
                 {
-                  boost::get<0>(_handler)(data);
+                  ConnectionReadTask *task = new(tbb::task::allocate_root())
+                        ConnectionReadTask(boost::get<0>(_handler), data);
+
+                  tbb::task::enqueue(*task);
                 }
               }
 
-     /// \brief Register a function to be called when the connection is shut
-     /// down \param[in] _subscriber Function to be called \return Handle
-     /// that can be used to unregister the function
-     public: event::ConnectionPtr ConnectToShutdown(boost::function<void()>
+      /// \brief Register a function to be called when the connection is shut
+      /// down \param[in] _subscriber Function to be called \return Handle
+      /// that can be used to unregister the function
+      public: event::ConnectionPtr ConnectToShutdown(boost::function<void()>
                  _subscriber)
-             { return this->shutdown.Connect(_subscriber); }
+              { return this->shutdown.Connect(_subscriber); }
 
-     /// \brief Unregister a function to be called when the connection is
-     /// shut down \param[in] _subscriber Handle previously returned by
-     /// ConnectToShutdown()
-     public: void DisconnectShutdown(event::ConnectionPtr _subscriber)
-             {this->shutdown.Disconnect(_subscriber);}
+      /// \brief Unregister a function to be called when the connection is
+      /// shut down \param[in] _subscriber Handle previously returned by
+      /// ConnectToShutdown()
+      public: void DisconnectShutdown(event::ConnectionPtr _subscriber)
+              {this->shutdown.Disconnect(_subscriber);}
 
-     /// \brief Handle on-write callbacks
-     public: void ProcessWriteQueue();
+      /// \brief Handle on-write callbacks
+      public: void ProcessWriteQueue(bool _blocking = false);
 
-     private: void OnWrite(const boost::system::error_code &e,
-                  boost::asio::streambuf *_b);
+      /// \brief Get the ID of the connection.
+      /// \return The connection's unique ID.
+      public: unsigned int GetId() const;
 
-     /// \brief Handle new connections, if this is a server
-     private: void OnAccept(const boost::system::error_code &e);
+      /// \brief Return true if the _ip is a valid.
+      /// \param[in] _ip Dotted quad to validate.
+      /// \return True if the _ip is a valid.
+      public: static bool ValidateIP(const std::string &_ip);
 
-     /// \brief Parse a header to get the size of a packet
-     private: std::size_t ParseHeader(const std::string &header);
+      /// \brief Callback when a write has occurred.
+      /// \param[in] _e Error code
+      /// \param[in] _b Buffer of the data that was written.
+      private: void OnWrite(const boost::system::error_code &_e,
+                            boost::asio::streambuf *_b);
 
-     /// \brief the read thread
-     private: void ReadLoop(const ReadCallback &cb);
+      /// \brief Handle new connections, if this is a server
+      /// \param[in] _e Error code for accept method
+      private: void OnAccept(const boost::system::error_code &_e);
 
-     /// \brief Get the local endpoint
-     private: boost::asio::ip::tcp::endpoint GetLocalEndpoint() const;
+      /// \brief Parse a header to get the size of a packet
+      /// \param[in] _header Header as a string
+      private: std::size_t ParseHeader(const std::string &_header);
 
-     /// \brief Get the remote endpoint
-     private: boost::asio::ip::tcp::endpoint GetRemoteEndpoint() const;
+      /// \brief the read thread
+      private: void ReadLoop(const ReadCallback &_cb);
 
-     private: static std::string GetHostname(boost::asio::ip::tcp::endpoint ep);
+      /// \brief Get the local endpoint
+      /// \return The endpoint
+      private: static boost::asio::ip::tcp::endpoint GetLocalEndpoint();
 
-     private: void OnConnect(const boost::system::error_code &_error,
+      /// \brief Get the remote endpoint
+      /// \return The endpoint
+      private: boost::asio::ip::tcp::endpoint GetRemoteEndpoint() const;
+
+      /// \brief Gets hostname
+      /// \param[in] _ep The end point to get the hostename of
+      private: static std::string GetHostname(
+                   boost::asio::ip::tcp::endpoint _ep);
+
+      /// \brief Callback method when connected
+      /// \param[in] _error Error code thrown during connection
+      /// \param[in] _endPointIter Pointer to resolver iterator
+      private: void OnConnect(const boost::system::error_code &_error,
                   boost::asio::ip::tcp::resolver::iterator _endPointIter);
 
+      /// \brief Socket pointer
       private: boost::asio::ip::tcp::socket *socket;
+
+      /// \brief Accepts new connections.
       private: boost::asio::ip::tcp::acceptor *acceptor;
 
+      /// \brief Outgoing data queue
       private: std::deque<std::string> writeQueue;
-      private: std::deque<unsigned int> writeCounts;
-      private: boost::mutex *connectMutex;
-      private: boost::recursive_mutex *writeMutex;
-      private: boost::recursive_mutex *readMutex;
 
+      /// \brief Mutex to protect new connections.
+      private: boost::mutex connectMutex;
+
+      /// \brief Mutex to protect write.
+      private: boost::recursive_mutex writeMutex;
+
+      /// \brief Mutex to protect reads.
+      private: boost::recursive_mutex readMutex;
+
+      /// \brief Mutex to protect socket close.
+      private: mutable boost::mutex socketMutex;
+
+      /// \brief Condition used for synchronization
       private: boost::condition_variable connectCondition;
 
-      // Called when a new connection is received
+      /// \brief Called when a new connection is received
       private: AcceptCallback acceptCB;
 
-      private: std::vector<char> inbound_header;
-      private: std::vector<char> inbound_data;
+      /// \brief Header data from a new message.
+      private: std::vector<char> inboundHeader;
 
-      private: boost::thread *readThread;
+      /// \brief Content data from a new message.
+      private: std::vector<char> inboundData;
+
+      /// \brief Set to true to stop reading on the connection.
       private: bool readQuit;
 
-      public: unsigned int id;
+      /// \brief Integer id of the connection.
+      private: unsigned int id;
+
+      /// \brief ID counter, used to create unique ids
       private: static unsigned int idCounter;
+
+      /// \brief Created when a new connection is accepted.
       private: ConnectionPtr acceptConn;
 
+      /// \brief Shutdown event
       private: event::EventT<void()> shutdown;
+
+      /// \brief Pointer to the IO manager
       private: static IOManager *iomanager;
 
-      public: unsigned int writeCount;
+      /// \brief Number of writes that are being processed.
+      private: unsigned int writeCount;
 
+      /// \brief Local URI string
       private: std::string localURI;
+
+      /// \brief Local address string
       private: std::string localAddress;
+
+      /// \brief Remote URI string
       private: std::string remoteURI;
+
+      /// \brief Remote address string
       private: std::string remoteAddress;
 
+      /// \brief True if the connection has an error
       private: bool connectError;
     };
     /// \}
   }
 }
-
 #endif
-
-

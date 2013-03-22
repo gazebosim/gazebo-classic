@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 using namespace gazebo;
 using namespace math;
 
+const Vector3 Vector3::Zero = math::Vector3(0, 0, 0);
 
 //////////////////////////////////////////////////
 Vector3::Vector3()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,13 @@ void sensors::remove_sensor(const std::string &_sensorName)
 /////////////////////////////////////////////////
 void sensors::run()
 {
-  sensors::SensorManager::Instance()->Run();
+  sensors::run_threads();
+}
+
+/////////////////////////////////////////////////
+void sensors::run_threads()
+{
+  sensors::SensorManager::Instance()->RunThreads();
 }
 
 /////////////////////////////////////////////////

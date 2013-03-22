@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,14 @@
 #define _CONTACT_HH_
 
 #include <vector>
+#include <string>
 
+#include "gazebo/msgs/msgs.hh"
+
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/physics/JointFeedback.hh"
+#include "gazebo/physics/JointWrench.hh"
 
 // For the sake of efficiency, use fixed size arrays for collision
 // MAX_COLLIDE_RETURNS limits contact detection, needs to be large
@@ -58,25 +62,43 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~Contact();
 
-      /// \brief Deprecated
-      public: Contact Clone() const GAZEBO_DEPRECATED;
-
       /// \brief Operator =.
       /// \param[in] _contact Contact to copy.
       /// \return Reference to this contact
       public: Contact &operator =(const Contact &_contact);
 
+      /// \brief Operator =.
+      /// \param[in] _contact msgs::Contact to copy.
+      /// \return Reference to this contact
+      public: Contact &operator =(const msgs::Contact &_contact);
+
+      /// \brief Populate a msgs::Contact with data from this.
+      /// \param[out] _msg Contact message the will hold the data.
+      public: void FillMsg(msgs::Contact &_msg) const;
+
+      /// \brief Produce a debug string.
+      /// \return A string that contains the values of the contact.
+      public: std::string DebugString() const;
+
       /// \brief Reset to default values.
       public: void Reset();
 
-      /// \brief Pointer to the first collision in the contact.
-      public: Collision *collision1;
+      /// \brief Name of the first collision object
+      public: std::string collision1;
 
-      /// \brief Pointer to the second collision in the contact.
-      public: Collision *collision2;
+      /// \brief Name of the second collision object
+      public: std::string collision2;
+
+      /// \brief Pointer to the first collision object
+      public: Collision *collisionPtr1;
+
+      /// \brief Pointer to the second collision object
+      public: Collision *collisionPtr2;
 
       /// \brief Array of forces for the contact.
-      public: JointFeedback forces[MAX_CONTACT_JOINTS];
+      /// All forces and torques are relative to the center of mass of the
+      /// respective links that the collision elments are attached to.
+      public: JointWrench wrench[MAX_CONTACT_JOINTS];
 
       /// \brief Array of force positions.
       public: math::Vector3 positions[MAX_CONTACT_JOINTS];
@@ -90,8 +112,11 @@ namespace gazebo
       /// \brief Length of all the arrays.
       public: int count;
 
-      /// \brief Time at which the contact occured.
+      /// \brief Time at which the contact occurred.
       public: common::Time time;
+
+      /// \brief World in which the contact occurred
+      public: WorldPtr world;
     };
     /// \}
   }

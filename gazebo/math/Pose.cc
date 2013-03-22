@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,12 +85,12 @@ Pose Pose::GetInverse() const
 }
 
 //////////////////////////////////////////////////
-Pose Pose::operator+(const Pose &obj) const
+Pose Pose::operator+(const Pose &_obj) const
 {
   Pose result;
 
-  result.pos = this->CoordPositionAdd(obj);
-  result.rot = this->CoordRotationAdd(obj.rot);
+  result.pos = this->CoordPositionAdd(_obj);
+  result.rot = this->CoordRotationAdd(_obj.rot);
 
   return result;
 }

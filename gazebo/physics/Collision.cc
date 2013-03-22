@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,10 +109,10 @@ void Collision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Collision::Init()
 {
+  this->shape->Init();
+
   this->SetRelativePose(
     this->sdf->Get<math::Pose>("pose"));
-
-  this->shape->Init();
 }
 
 //////////////////////////////////////////////////
@@ -192,7 +192,7 @@ void Collision::SetContactsEnabled(bool _enable)
 //////////////////////////////////////////////////
 bool Collision::GetContactsEnabled() const
 {
-  return this->contactsEnabled;
+  return this->contact.ConnectionCount() > 0 || this->contactsEnabled;
 }
 
 //////////////////////////////////////////////////
@@ -285,12 +285,6 @@ void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Collision::FillCollisionMsg(msgs::Collision &_msg)
-{
-  this->FillMsg(_msg);
-}
-
-//////////////////////////////////////////////////
 void Collision::FillMsg(msgs::Collision &_msg)
 {
   msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
@@ -347,7 +341,7 @@ msgs::Visual Collision::CreateCollisionVisual()
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
   msgs::Set(msg.mutable_pose(), this->GetRelativePose());
-  msg.mutable_material()->mutable_script()->set_uri(
+  msg.mutable_material()->mutable_script()->add_uri(
       "file://media/materials/scripts/gazebo.material");
   msg.mutable_material()->mutable_script()->set_name(
       "Gazebo/OrangeTransparent");
@@ -413,12 +407,11 @@ msgs::Visual Collision::CreateCollisionVisual()
 /////////////////////////////////////////////////
 CollisionState Collision::GetState()
 {
-  return CollisionState(
-      boost::shared_static_cast<Collision>(shared_from_this()));
+  return this->state;
 }
 
 /////////////////////////////////////////////////
 void Collision::SetState(const CollisionState &_state)
 {
-  this->SetWorldPose(_state.GetPose());
+  this->SetRelativePose(_state.GetPose());
 }

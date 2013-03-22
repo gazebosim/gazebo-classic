@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,15 +28,12 @@ using namespace transport;
 TopicManager::TopicManager()
 {
   this->pauseIncoming = false;
-  this->nodeMutex = new boost::recursive_mutex();
   this->advertisedTopicsEnd = this->advertisedTopics.end();
 }
 
 //////////////////////////////////////////////////
 TopicManager::~TopicManager()
 {
-  delete this->nodeMutex;
-  this->nodeMutex = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -71,16 +68,16 @@ void TopicManager::Fini()
 //////////////////////////////////////////////////
 void TopicManager::AddNode(NodePtr _node)
 {
-  this->nodeMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
   this->nodes.push_back(_node);
-  this->nodeMutex->unlock();
 }
 
 //////////////////////////////////////////////////
 void TopicManager::RemoveNode(unsigned int _id)
 {
   std::vector<NodePtr>::iterator iter;
-  this->nodeMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
+
   for (iter = this->nodes.begin(); iter != this->nodes.end(); ++iter)
   {
     if ((*iter)->GetId() == _id)
@@ -110,29 +107,33 @@ void TopicManager::RemoveNode(unsigned int _id)
       break;
     }
   }
-  this->nodeMutex->unlock();
 }
 
 //////////////////////////////////////////////////
 void TopicManager::ProcessNodes(bool _onlyOut)
 {
   std::vector<NodePtr>::iterator iter;
+  int s;
 
-  this->nodeMutex->lock();
-  // store as size might change (spawning)
-  int s = this->nodes.size();
-  this->nodeMutex->unlock();
-  for (int i = 0; i < s; i ++)
+  {
+    boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
+    // store as size might change (spawning)
+    s = this->nodes.size();
+  }
+
+  for (int i = 0; i < s; ++i)
   {
     this->nodes[i]->ProcessPublishers();
   }
 
   if (!this->pauseIncoming && !_onlyOut)
   {
-    this->nodeMutex->lock();
-    s = this->nodes.size();
-    this->nodeMutex->unlock();
-    for (int i = 0; i < s; i ++)
+    {
+      boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
+      s = this->nodes.size();
+    }
+
+    for (int i = 0; i < s; ++i)
     {
       this->nodes[i]->ProcessIncoming();
       if (this->pauseIncoming)
@@ -147,17 +148,9 @@ void TopicManager::Publish(const std::string &_topic,
                            const boost::function<void()> &_cb)
 {
   PublicationPtr pub = this->FindPublication(_topic);
-  PublicationPtr dbgPub = this->FindPublication(_topic+"/__dbg");
 
   if (pub)
     pub->Publish(_message, _cb);
-
-  if (dbgPub && dbgPub->GetCallbackCount() > 0)
-  {
-    msgs::GzString dbgMsg;
-    dbgMsg.set_data(_message.DebugString());
-    dbgPub->Publish(dbgMsg);
-  }
 }
 
 //////////////////////////////////////////////////
@@ -199,23 +192,25 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 void TopicManager::Unsubscribe(const std::string &_topic,
                                const NodePtr &_node)
 {
+  boost::mutex::scoped_lock lock(this->subscriberMutex);
+
   PublicationPtr publication = this->FindPublication(_topic);
+
   if (publication)
-  {
     publication->RemoveSubscription(_node);
-    ConnectionManager::Instance()->Unsubscribe(_topic,
-        _node->GetMsgType(_topic));
-  }
+
+  ConnectionManager::Instance()->Unsubscribe(_topic,
+      _node->GetMsgType(_topic));
 
   this->subscribedNodes[_topic].remove(_node);
 }
 
 //////////////////////////////////////////////////
-void TopicManager::ConnectPubToSub(const std::string &topic,
-                                   const SubscriptionTransportPtr &sublink)
+void TopicManager::ConnectPubToSub(const std::string &_topic,
+                                   const SubscriptionTransportPtr _sublink)
 {
-  PublicationPtr publication = this->FindPublication(topic);
-  publication->AddSubscription(sublink);
+  PublicationPtr publication = this->FindPublication(_topic);
+  publication->AddSubscription(_sublink);
 }
 
 //////////////////////////////////////////////////
@@ -264,6 +259,7 @@ void TopicManager::ConnectSubscribers(const std::string &_topic)
 //////////////////////////////////////////////////
 void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
 {
+  boost::mutex::scoped_lock lock(this->subscriberMutex);
   this->UpdatePublications(_pub.topic(), _pub.msg_type());
 
   PublicationPtr publication = this->FindPublication(_pub.topic());
@@ -280,7 +276,23 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
       // send data to a Publication.
       PublicationTransportPtr publink(new PublicationTransport(_pub.topic(),
             _pub.msg_type()));
-      publink->Init(conn);
+
+      bool latched = false;
+      SubNodeMap::iterator nodeIter = this->subscribedNodes.find(_pub.topic());
+
+      // Find if any local node has a latched subscriber for the new topic
+      // publication transport.
+      if (nodeIter != this->subscribedNodes.end())
+      {
+        std::list<NodePtr>::iterator cbIter;
+        for (cbIter = nodeIter->second.begin();
+             cbIter != nodeIter->second.end() && !latched; ++cbIter)
+        {
+          latched = (*cbIter)->HasLatchedSubscriber(_pub.topic());
+        }
+      }
+
+      publink->Init(conn, latched);
 
       publication->AddTransport(publink);
     }
@@ -305,14 +317,8 @@ PublicationPtr TopicManager::UpdatePublications(const std::string &topic,
   }
   else
   {
-    PublicationPtr dbgPub;
-    msgs::GzString tmp;
-
     pub = PublicationPtr(new Publication(topic, msgType));
-    dbgPub = PublicationPtr(new Publication(topic+"/__dbg",
-          tmp.GetTypeName()));
     this->advertisedTopics[topic] =  pub;
-    this->advertisedTopics[topic+"/__dbg"] = dbgPub;
     this->advertisedTopicsEnd = this->advertisedTopics.end();
   }
 
@@ -324,20 +330,14 @@ void TopicManager::Unadvertise(const std::string &_topic)
 {
   std::string t;
 
-  for (int i = 0; i < 2; i ++)
-  {
-    if (i == 0)
-      t = _topic;
-    else
-      t = _topic + "/__dbg";
+  t = _topic;
 
-    PublicationPtr publication = this->FindPublication(t);
-    if (publication && publication->GetLocallyAdvertised() &&
-        publication->GetTransportCount() == 0)
-    {
-      publication->SetLocallyAdvertised(false);
-      ConnectionManager::Instance()->Unadvertise(t);
-    }
+  PublicationPtr publication = this->FindPublication(t);
+  if (publication && publication->GetLocallyAdvertised() &&
+      publication->GetTransportCount() == 0)
+  {
+    publication->SetLocallyAdvertised(false);
+    ConnectionManager::Instance()->Unadvertise(t);
   }
 }
 
@@ -351,6 +351,24 @@ void TopicManager::RegisterTopicNamespace(const std::string &_name)
 void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 {
   ConnectionManager::Instance()->GetTopicNamespaces(_namespaces);
+}
+
+//////////////////////////////////////////////////
+std::map<std::string, std::list<std::string> >
+TopicManager::GetAdvertisedTopics() const
+{
+  std::map<std::string, std::list<std::string> > result;
+  std::list<msgs::Publish> publishers;
+
+  ConnectionManager::Instance()->GetAllPublishers(publishers);
+
+  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
+      iter != publishers.end(); ++iter)
+  {
+    result[(*iter).msg_type()].push_back((*iter).topic());
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////

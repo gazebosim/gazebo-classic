@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wshadow"
-#define BOOST_FILESYSTEM_VERSION 2
 
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
@@ -27,15 +26,16 @@
 #include <map>
 #include <string>
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "common/SystemPaths.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsTypes.hh"
-#include "physics/Physics.hh"
-#include "sensors/sensors.hh"
-#include "rendering/rendering.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/Physics.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/rendering/rendering.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo_config.h"
 #include "gazebo/Server.hh"
@@ -48,7 +48,6 @@ class ServerFixture : public testing::Test
 {
   protected: ServerFixture()
              {
-               this->receiveMutex = new boost::mutex();
                this->server = NULL;
                this->serverRunning = false;
                this->paused = false;
@@ -57,6 +56,7 @@ class ServerFixture : public testing::Test
                this->imgData = NULL;
                this->serverThread = NULL;
 
+               common::Console::Instance()->Init("test.log");
                common::SystemPaths::Instance()->AddGazeboPaths(
                    TEST_REGRESSION_PATH);
 
@@ -76,12 +76,14 @@ class ServerFixture : public testing::Test
                path = TEST_REGRESSION_PATH;
                path += "/../../build/plugins";
                gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+
+               path = TEST_PATH;
+               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
              }
 
   protected: virtual void TearDown()
              {
                this->Unload();
-               delete this->receiveMutex;
              }
 
   protected: virtual void Unload()
@@ -111,41 +113,105 @@ class ServerFixture : public testing::Test
 
   protected: virtual void Load(const std::string &_worldFilename, bool _paused)
              {
+               this->Load(_worldFilename, _paused, "");
+             }
+
+  protected: virtual void Load(const std::string &_worldFilename,
+                               bool _paused, const std::string &_physics)
+             {
                delete this->server;
                this->server = NULL;
 
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
                   boost::bind(&ServerFixture::RunServer, this, _worldFilename,
-                              _paused));
+                              _paused, _physics));
 
                // Wait for the server to come up
-               while (!this->server || !this->server->GetInitialized())
+               // Use a 60 second timeout.
+               int waitCount = 0, maxWaitCount = 6000;
+               while ((!this->server || !this->server->GetInitialized()) &&
+                      ++waitCount < maxWaitCount)
                  common::Time::MSleep(10);
+               gzwarn << "ServerFixture load in "
+                      << static_cast<double>(waitCount)/100.0
+                      << " seconds, timeout after "
+                      << static_cast<double>(maxWaitCount)/100.0
+                      << " seconds\n";
+               ASSERT_LT(waitCount, maxWaitCount);
 
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
                this->poseSub = this->node->Subscribe("~/pose/info",
-                   &ServerFixture::OnPose, this);
+                   &ServerFixture::OnPose, this, true);
                this->statsSub = this->node->Subscribe("~/world_stats",
                    &ServerFixture::OnStats, this);
 
                this->factoryPub =
                  this->node->Advertise<msgs::Factory>("~/factory");
+               this->factoryPub->WaitForConnection();
+
+               // Wait for the world to reach the correct pause state.
+               // This might not work properly with multiple worlds.
+               // Use a 30 second timeout.
+               waitCount = 0;
+               maxWaitCount = 3000;
+               while ((!physics::get_world() ||
+                        physics::get_world()->IsPaused() != _paused) &&
+                      ++waitCount < maxWaitCount)
+                 common::Time::MSleep(10);
+               ASSERT_LT(waitCount, maxWaitCount);
+
              }
 
   protected: void RunServer(const std::string &_worldFilename)
              {
-               this->RunServer(_worldFilename, false);
+               this->RunServer(_worldFilename, false, "");
              }
 
-  protected: void RunServer(const std::string &_worldFilename, bool _paused)
+  protected: rendering::ScenePtr GetScene(
+                 const std::string &_sceneName = "default")
+             {
+               // Wait for the scene to get loaded.
+               int i = 0;
+               while (rendering::get_scene(_sceneName) == NULL && i < 20)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+
+               if (i >= 20)
+                 gzerr << "Unable to load the rendering scene.\n"
+                   << "Test will fail";
+
+               EXPECT_LT(i, 20);
+               return rendering::get_scene(_sceneName);
+             }
+
+  protected: void RunServer(const std::string &_worldFilename, bool _paused,
+                            const std::string &_physics)
              {
                ASSERT_NO_THROW(this->server = new Server());
-               ASSERT_NO_THROW(this->server->Load(_worldFilename));
+               if (_physics.length())
+                 ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
+                                                        _physics));
+               else
+                 ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
+
+               if (!rendering::get_scene(
+                     gazebo::physics::get_world()->GetName()))
+               {
+                 rendering::create_scene(
+                     gazebo::physics::get_world()->GetName(), false);
+               }
+
                this->SetPause(_paused);
+
                this->server->Run();
+
+               rendering::remove_scene(gazebo::physics::get_world()->GetName());
+
                ASSERT_NO_THROW(this->server->Fini());
                delete this->server;
                this->server = NULL;
@@ -180,29 +246,31 @@ class ServerFixture : public testing::Test
                return this->percentRealTime;
              }
 
-  protected: void OnPose(ConstPosePtr &_msg)
+  protected: void OnPose(ConstPose_VPtr &_msg)
              {
-               this->receiveMutex->lock();
-               this->poses[_msg->name()] = msgs::Convert(*_msg);
-               this->receiveMutex->unlock();
+               boost::mutex::scoped_lock lock(this->receiveMutex);
+               for (int i = 0; i < _msg->pose_size(); ++i)
+               {
+                 this->poses[_msg->pose(i).name()] =
+                   msgs::Convert(_msg->pose(i));
+               }
              }
 
   protected: math::Pose GetEntityPose(const std::string &_name)
              {
+               boost::mutex::scoped_lock lock(this->receiveMutex);
+
                std::map<std::string, math::Pose>::iterator iter;
-               this->receiveMutex->lock();
                iter = this->poses.find(_name);
                EXPECT_TRUE(iter != this->poses.end());
-               this->receiveMutex->unlock();
                return iter->second;
              }
 
   protected: bool HasEntity(const std::string &_name)
              {
+               boost::mutex::scoped_lock lock(this->receiveMutex);
                std::map<std::string, math::Pose>::iterator iter;
-               this->receiveMutex->lock();
                iter = this->poses.find(_name);
-               this->receiveMutex->unlock();
                return iter != this->poses.end();
              }
 
@@ -366,12 +434,7 @@ class ServerFixture : public testing::Test
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _modelName << "'>"
                  << "<static>true</static>"
-                 << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='body'>"
                  << "  <sensor name ='" << _cameraName
                  << "' type ='camera'>"
@@ -393,30 +456,150 @@ class ServerFixture : public testing::Test
                  << "  </sensor>"
                  << "</link>"
                  << "</model>"
-                 << "</gazebo>";
+                 << "</sdf>";
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
+               int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName))
-                 common::Time::MSleep(10);
+               while (!this->HasEntity(_modelName) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
+             }
+
+  protected: void SpawnRaySensor(const std::string &_modelName,
+                 const std::string &_raySensorName,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
+                 double _minRange = 0.08, double _maxRange = 10,
+                 double _rangeResolution = 0.01, unsigned int _samples = 640)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _modelName << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "<collision name='parent_collision'>"
+                 << "  <pose>0 0 0.0205 0 0 0</pose>"
+                 << "  <geometry>"
+                 << "    <cylinder>"
+                 << "      <radius>0.021</radius>"
+                 << "      <length>0.029</length>"
+                 << "    </cylinder>"
+                 << "  </geometry>"
+                 << "</collision>"
+                 << "  <sensor name ='" << _raySensorName << "' type ='ray'>"
+                 << "    <ray>"
+                 << "      <scan>"
+                 << "        <horizontal>"
+                 << "          <samples>" << _samples << "</samples>"
+                 << "          <resolution> 1 </resolution>"
+                 << "          <min_angle>" << _hMinAngle << "</min_angle>"
+                 << "          <max_angle>" << _hMaxAngle << "</max_angle>"
+                 << "        </horizontal>"
+                 << "      </scan>"
+                 << "      <range>"
+                 << "        <min>" << _minRange << "</min>"
+                 << "        <max>" << _maxRange << "</max>"
+                 << "        <resolution>" << _rangeResolution <<"</resolution>"
+                 << "      </range>"
+                 << "    </ray>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_modelName) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
+             }
+
+  /// \brief Spawn a contact sensor with the specified collision geometry
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _collisionType Type of collision, box or cylinder
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _static True to make the model static
+  protected: void SpawnUnitContactSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const std::string &_collisionType, const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy, bool _static = false)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+               std::ostringstream shapeStr;
+               if (_collisionType == "box")
+                 shapeStr << " <box><size>1 1 1</size></box>";
+               else if (_collisionType == "cylinder")
+               {
+                 shapeStr << "<cylinder>"
+                          << "  <radius>.5</radius><length>1.0</length>"
+                          << "</cylinder>";
+               }
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <collision name ='contact_collision'>"
+                 << "    <geometry>"
+                 << shapeStr.str()
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << shapeStr.str()
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "  <sensor name='" << _sensorName << "' type='contact'>"
+                 << "    <contact>"
+                 << "      <collision>contact_collision</collision>"
+                 << "    </contact>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
              }
 
   protected: void SpawnCylinder(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _static = false)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
-                 << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
+                 << "<static>" << _static << "</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='body'>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
@@ -434,7 +617,7 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</gazebo>";
+                 << "</sdf>";
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
@@ -444,21 +627,17 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(10);
              }
 
-
   protected: void SpawnSphere(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _wait = true, bool _static = false)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
-                 << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
+                 << "<static>" << _static << "</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='body'>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
@@ -472,31 +651,65 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</gazebo>";
+                 << "</sdf>";
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name))
+               while (_wait && !this->HasEntity(_name))
+                 common::Time::MSleep(10);
+             }
+
+  protected: void SpawnSphere(const std::string &_name,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const math::Vector3 &_cog, double _radius,
+                 bool _wait = true, bool _static = false)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <inertial>"
+                 << "    <pose>" << _cog << " 0 0 0</pose>"
+                 << "  </inertial>"
+                 << "  <collision name ='geom'>"
+                 << "    <geometry>"
+                 << "      <sphere><radius>" << _radius << "</radius></sphere>"
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << "      <sphere><radius>" << _radius << "</radius></sphere>"
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               // Wait for the entity to spawn
+               while (_wait && !this->HasEntity(_name))
                  common::Time::MSleep(10);
              }
 
   protected: void SpawnBox(const std::string &_name,
                  const math::Vector3 &_size, const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy)
+                 const math::Vector3 &_rpy, bool _static = false)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
-                 << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
+                 << "<static>" << _static << "</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='body'>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
@@ -510,7 +723,69 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</gazebo>";
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name))
+                 common::Time::MSleep(10);
+             }
+
+  protected: void SpawnTrimesh(const std::string &_name,
+                 const std::string &_modelPath, const math::Vector3 &_scale,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _static = false)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <collision name ='geom'>"
+                 << "    <geometry>"
+                 << "      <mesh>"
+                 << "        <uri>" << _modelPath << "</uri>"
+                 << "        <scale>" << _scale << "</scale>"
+                 << "      </mesh>"
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << "      <mesh><uri>" << _modelPath << "</uri></mesh>"
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name))
+                 common::Time::MSleep(10);
+             }
+
+  protected: void SpawnEmptyLink(const std::string &_name,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _static = false)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
@@ -527,11 +802,33 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
              }
 
+             /// \brief Send a factory message based on an SDF string.
+             /// \param[in] _sdf SDF string to publish.
   protected: void SpawnSDF(const std::string &_sdf)
              {
                msgs::Factory msg;
                msg.set_sdf(_sdf);
                this->factoryPub->Publish(msg);
+
+               // The code above sends a message, but it will take some time
+               // before the message is processed.
+               //
+               // The code below parses the sdf string to find a model name,
+               // then this function will block until that model
+               // has been processed and recognized by the Server Fixture.
+               sdf::SDF sdfParsed;
+               sdfParsed.SetFromString(_sdf);
+               // Check that sdf contains a model
+               if (sdfParsed.root->HasElement("model"))
+               {
+                 // Timeout of 30 seconds (3000 * 10 ms)
+                 int waitCount = 0, maxWaitCount = 3000;
+                 sdf::ElementPtr model = sdfParsed.root->GetElement("model");
+                 std::string name = model->GetValueString("name");
+                 while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
+                   common::Time::MSleep(10);
+                 ASSERT_LT(waitCount, maxWaitCount);
+               }
              }
 
   protected: void LoadPlugin(const std::string &_filename,
@@ -566,7 +863,7 @@ class ServerFixture : public testing::Test
   protected: transport::PublisherPtr factoryPub;
 
   protected: std::map<std::string, math::Pose> poses;
-  protected: boost::mutex *receiveMutex;
+  protected: boost::mutex receiveMutex;
 
   private: unsigned char **imgData;
   private: int gotImage;

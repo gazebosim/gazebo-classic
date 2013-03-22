@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,17 +28,17 @@
 #include <list>
 #include <vector>
 
-#include "common/Event.hh"
-#include "math/Box.hh"
-#include "math/Pose.hh"
-#include "math/Quaternion.hh"
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/math/Box.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
 
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
-#include "rendering/RenderTypes.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 namespace Ogre
 {
@@ -190,6 +190,10 @@ namespace gazebo
 
       /// \brief Attach visualization axes
       public: void AttachAxes();
+
+      /// \brief Enable or disable wireframe for this visual.
+      /// \param[in] _show True to enable wireframe for this visual.
+      public: void SetWireframe(bool _show);
 
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
@@ -446,7 +450,7 @@ namespace gazebo
 
       /// \brief The name of the mesh set in the visual's SDF.
       /// \return Name of the mesh.
-      private: std::string GetMeshName() const;
+      public: std::string GetMeshName() const;
 
       /// \brief Clear parents.
       public: void ClearParent();

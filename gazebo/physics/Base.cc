@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,11 @@
  */
 
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "physics/World.hh"
-#include "physics/Base.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Base.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -66,12 +67,15 @@ Base::~Base()
   }
   this->children.clear();
   this->childrenEnd = this->children.end();
+  this->sdf->Reset();
   this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
 void Base::Load(sdf::ElementPtr _sdf)
 {
+  GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
+
   this->sdf = _sdf;
   if (this->parent)
   {
@@ -83,6 +87,8 @@ void Base::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Base::UpdateParameters(sdf::ElementPtr _sdf)
 {
+  GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
+  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
   this->sdf->Copy(_sdf);
 }
 
@@ -92,7 +98,8 @@ void Base::Fini()
   Base_V::iterator iter;
 
   for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
-    (*iter)->Fini();
+    if (*iter)
+      (*iter)->Fini();
 
   this->children.clear();
   this->childrenEnd = this->children.end();
@@ -122,12 +129,16 @@ void Base::Reset(Base::EntityType _resetType)
 //////////////////////////////////////////////////
 void Base::SetName(const std::string &_name)
 {
+  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
+  GZ_ASSERT(this->sdf->GetAttribute("name"), "Base sdf missing name attribute");
   this->sdf->GetAttribute("name")->Set(_name);
 }
 
 //////////////////////////////////////////////////
 std::string Base::GetName() const
 {
+  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
+
   if (this->sdf->HasAttribute("name"))
     return this->sdf->Get<std::string>("name");
   else
@@ -371,6 +382,7 @@ const WorldPtr &Base::GetWorld() const
 //////////////////////////////////////////////////
 const sdf::ElementPtr Base::GetSDF()
 {
+  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
   this->sdf->Update();
   return this->sdf;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ namespace gazebo
 
       /// \brief Set the encapsulated collsion object.
       /// \param[in] _collisionId ODE id of the collision object.
-      /// \param[in] _placeable True to make the object m.
+      /// \param[in] _placeable True to make the object movable.
       public: void SetCollision(dGeomID _collisionId, bool _placeable);
 
       /// \brief Return the collision id.

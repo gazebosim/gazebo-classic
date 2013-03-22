@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,10 +80,10 @@ void MultiRayShape::Init()
 
   this->offset = this->collisionParent->GetRelativePose();
 
-  // Create and array of ray collisions
-  for (unsigned int j = 0; j < (unsigned int)vertSamples; j++)
+  // Create an array of ray collisions
+  for (unsigned int j = 0; j < (unsigned int)vertSamples; ++j)
   {
-    for (unsigned int i = 0; i < (unsigned int)horzSamples; i++)
+    for (unsigned int i = 0; i < (unsigned int)horzSamples; ++i)
     {
       yawAngle = (horzSamples == 1) ? 0 :
         i * yDiff / (horzSamples - 1) + horzMinAngle;

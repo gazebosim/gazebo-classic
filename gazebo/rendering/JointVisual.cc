@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,8 +48,8 @@ void JointVisual::Load(ConstJointPtr &_msg)
       new AxisVisual(this->GetName() + "_AXIS", shared_from_this()));
   this->axisVisual->Load();
 
-  this->SetWorldPosition(msgs::Convert(_msg->pose().position()));
-  this->SetWorldRotation(msgs::Convert(_msg->pose().orientation()));
+  this->SetPosition(msgs::Convert(_msg->pose().position()));
+  this->SetRotation(msgs::Convert(_msg->pose().orientation()));
 
   if (math::equal(_msg->axis1().xyz().x(), 1.0))
     this->axisVisual->ShowRotation(0);

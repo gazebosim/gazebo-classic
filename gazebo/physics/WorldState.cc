@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@
  * Author: Nate Koenig
  */
 
-
-#include "gazebo/common/Console.hh"
-
+#include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/WorldState.hh"
@@ -32,51 +30,70 @@ using namespace physics;
 WorldState::WorldState()
   : State()
 {
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("state.sdf", this->sdf);
 }
 
 /////////////////////////////////////////////////
-WorldState::WorldState(WorldPtr _world)
+WorldState::WorldState(const WorldPtr _world)
   : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
 {
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("state.sdf", this->sdf);
+  this->world = _world;
 
-  this->sdf->GetElement("time")->Set(_world->GetSimTime());
-
-  for (unsigned int i = 0; i < _world->GetModelCount(); ++i)
+  // Add a state for all the models
+  Model_V models = _world->GetModels();
+  for (Model_V::const_iterator iter = models.begin();
+       iter != models.end(); ++iter)
   {
-    sdf::ElementPtr modelElem = this->sdf->AddElement("model");
-    this->modelStates.push_back(_world->GetModel(i)->GetState());
-    this->modelStates.back().FillStateSDF(modelElem);
+    this->modelStates.push_back(ModelState(*iter));
   }
+}
+
+/////////////////////////////////////////////////
+WorldState::WorldState(const sdf::ElementPtr _sdf)
+  : State()
+{
+  this->Load(_sdf);
 }
 
 /////////////////////////////////////////////////
 WorldState::~WorldState()
 {
-  this->sdf.reset();
+  this->world.reset();
   this->modelStates.clear();
 }
 
 /////////////////////////////////////////////////
-void WorldState::Load(sdf::ElementPtr _elem)
+void WorldState::Load(const sdf::ElementPtr _elem)
 {
-  this->name = _elem->Get<std::string>("world_name");
+  // Copy the name and time information
+  this->name = _elem->GetValueString("world_name");
+  this->simTime = _elem->Get<common::Time>("sim_time");
+  this->wallTime = _elem->Get<common::Time>("wall_time");
+  this->realTime = _elem->Get<common::Time>("real_time");
 
+  // Add the model states
+  this->modelStates.clear();
   if (_elem->HasElement("model"))
   {
     sdf::ElementPtr childElem = _elem->GetElement("model");
 
     while (childElem)
     {
-      ModelState state;
-      state.Load(childElem);
-      this->modelStates.push_back(state);
+      this->modelStates.push_back(ModelState(childElem));
       childElem = childElem->GetNextElement("model");
     }
   }
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetWorld(const WorldPtr _world)
+{
+  this->world = _world;
+}
+
+/////////////////////////////////////////////////
+const std::vector<ModelState> &WorldState::GetModelStates() const
+{
+  return this->modelStates;
 }
 
 /////////////////////////////////////////////////
@@ -86,14 +103,9 @@ unsigned int WorldState::GetModelStateCount() const
 }
 
 /////////////////////////////////////////////////
-const sdf::ElementPtr &WorldState::GetSDF() const
-{
-  return this->sdf;
-}
-
-/////////////////////////////////////////////////
 ModelState WorldState::GetModelState(unsigned int _index) const
 {
+  // Check to see if the _index is valid.
   if (_index < this->modelStates.size())
     return this->modelStates[_index];
   else
@@ -105,14 +117,154 @@ ModelState WorldState::GetModelState(unsigned int _index) const
 /////////////////////////////////////////////////
 ModelState WorldState::GetModelState(const std::string &_modelName) const
 {
-  std::vector<ModelState>::const_iterator iter;
-
-  for (iter = this->modelStates.begin();
+  // Search for the model name
+  for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
        iter != this->modelStates.end(); ++iter)
   {
     if ((*iter).GetName() == _modelName)
       return *iter;
   }
 
+  // Throw exception if the model name doesn't exist.
+  gzthrow("Invalid model name[" + _modelName + "].");
   return ModelState();
+}
+
+/////////////////////////////////////////////////
+bool WorldState::HasModelState(const std::string &_modelName) const
+{
+  // Search for the model name
+  for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
+       iter != this->modelStates.end(); ++iter)
+  {
+    if ((*iter).GetName() == _modelName)
+      return true;
+  }
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool WorldState::IsZero() const
+{
+  bool result = this->insertions.size() == 0 && this->deletions.size() == 0;
+
+  for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
+       iter != this->modelStates.end() && result; ++iter)
+  {
+    result = result && (*iter).IsZero();
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+WorldState &WorldState::operator=(const WorldState &_state)
+{
+  State::operator=(_state);
+
+  // Clear the model states
+  this->modelStates.clear();
+
+  this->insertions.clear();
+  this->deletions.clear();
+
+  // Copy the model states.
+  for (std::vector<ModelState>::const_iterator iter =
+       _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
+  {
+    this->modelStates.push_back(ModelState(*iter));
+  }
+
+  // Copy the insertions
+  std::copy(_state.insertions.begin(),
+            _state.insertions.end(), this->insertions.begin());
+
+  // Copy the deletions
+  std::copy(_state.deletions.begin(),
+            _state.deletions.end(), this->deletions.begin());
+
+  return *this;
+}
+
+/////////////////////////////////////////////////
+WorldState WorldState::operator-(const WorldState &_state) const
+{
+  WorldState result;
+
+  result.name = this->name;
+  result.simTime = this->simTime;
+  result.realTime = this->realTime;
+  result.wallTime = this->wallTime;
+
+  // Subtract the model states.
+  for (std::vector<ModelState>::const_iterator iter =
+       _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
+  {
+    if (this->HasModelState((*iter).GetName()))
+    {
+      ModelState state = this->GetModelState((*iter).GetName()) - *iter;
+
+      if (!state.IsZero())
+      {
+        result.modelStates.push_back(state);
+      }
+    }
+    else
+    {
+      result.deletions.push_back((*iter).GetName());
+    }
+  }
+
+  // Add in the new model states
+  for (std::vector<ModelState>::const_iterator iter =
+       this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
+  {
+    if (!_state.HasModelState((*iter).GetName()) && this->world)
+    {
+      ModelPtr model = this->world->GetModel((*iter).GetName());
+      result.insertions.push_back(model->GetSDF()->ToString(""));
+    }
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+WorldState WorldState::operator+(const WorldState &_state) const
+{
+  WorldState result;
+
+  result.name = this->name;
+  result.simTime = this->simTime;
+  result.realTime = this->realTime;
+  result.wallTime = this->wallTime;
+
+  // Add the states.
+  for (std::vector<ModelState>::const_iterator iter =
+       _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
+  {
+    ModelState state = this->GetModelState((*iter).GetName()) + *iter;
+    result.modelStates.push_back(state);
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+void WorldState::FillSDF(sdf::ElementPtr _sdf)
+{
+  _sdf->ClearElements();
+
+  _sdf->GetAttribute("world_name")->Set(this->name);
+  _sdf->GetElement("sim_time")->Set(this->simTime);
+  _sdf->GetElement("real_time")->Set(this->realTime);
+  _sdf->GetElement("wall_time")->Set(this->wallTime);
+
+  for (std::vector<ModelState>::iterator iter =
+       this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
+  {
+    sdf::ElementPtr elem = _sdf->AddElement("model");
+    (*iter).FillSDF(elem);
+  }
 }

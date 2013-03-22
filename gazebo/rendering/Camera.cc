@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@
 
 #include <dirent.h>
 #include <sstream>
+#include <boost/filesystem.hpp>
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
@@ -47,7 +48,8 @@ using namespace rendering;
 unsigned int Camera::cameraCounter = 0;
 
 //////////////////////////////////////////////////
-Camera::Camera(const std::string &_namePrefix, Scene *_scene, bool _autoRender)
+Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
+               bool _autoRender)
 {
   this->initialized = false;
   this->sdf.reset(new sdf::Element);
@@ -65,16 +67,15 @@ Camera::Camera(const std::string &_namePrefix, Scene *_scene, bool _autoRender)
   this->saveCount = 0;
   this->bayerFrameBuffer = NULL;
 
-  this->myCount = cameraCounter++;
-
   std::ostringstream stream;
-  stream << _namePrefix << "(" << this->myCount << ")";
+  stream << _namePrefix << "(" << this->cameraCounter++ << ")";
   this->name = stream.str();
 
   this->renderTarget = NULL;
   this->renderTexture = NULL;
 
   this->captureData = false;
+  this->captureDataOnce = false;
 
   this->camera = NULL;
   this->viewport = NULL;
@@ -82,9 +83,12 @@ Camera::Camera(const std::string &_namePrefix, Scene *_scene, bool _autoRender)
   this->pitchNode = NULL;
   this->sceneNode = NULL;
 
+  this->screenshotPath = getenv("HOME");
+  this->screenshotPath += "/.gazebo/pictures";
+
   // Connect to the render signal
   this->connections.push_back(
-      event::Events::ConnectPreRender(boost::bind(&Camera::Update, this)));
+      event::Events::ConnectPostRender(boost::bind(&Camera::Update, this)));
 
   if (_autoRender)
   {
@@ -97,8 +101,8 @@ Camera::Camera(const std::string &_namePrefix, Scene *_scene, bool _autoRender)
 
   this->lastRenderWallTime = common::Time::GetWallTime();
 
-  // Set default render rate to 30Hz
-  this->SetRenderRate(30.0);
+  // Set default render rate to unlimited
+  this->SetRenderRate(0.0);
 }
 
 //////////////////////////////////////////////////
@@ -139,22 +143,22 @@ void Camera::Load()
   sdf::ElementPtr imgElem = this->sdf->GetElement("image");
   if (imgElem)
   {
-    this->imageWidth = imgElem->Get<int>("width");
-    this->imageHeight = imgElem->Get<int>("height");
+    this->imageWidth = imgElem->GetValueInt("width");
+    this->imageHeight = imgElem->GetValueInt("height");
     this->imageFormat = this->GetOgrePixelFormat(
-        imgElem->Get<std::string>("format"));
+        imgElem->GetValueString("format"));
   }
   else
     gzthrow("Camera has no <image> tag.");
 
   // Create the directory to store frames
   if (this->sdf->HasElement("save") &&
-      this->sdf->GetElement("save")->Get<bool>("enabled"))
+      this->sdf->GetElement("save")->GetValueBool("enabled"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("save");
     std::string command;
 
-    command = "mkdir " + elem->Get<std::string>("path")+ " 2>>/dev/null";
+    command = "mkdir " + elem->GetValueString("path")+ " 2>>/dev/null";
     if (system(command.c_str()) < 0)
       gzerr << "Error making directory\n";
   }
@@ -162,7 +166,7 @@ void Camera::Load()
   if (this->sdf->HasElement("horizontal_fov"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("horizontal_fov");
-    double angle = elem->Get<double>();
+    double angle = elem->GetValueDouble();
     if (angle < 0.01 || angle > M_PI)
     {
       gzthrow("Camera horizontal field of veiw invalid.");
@@ -187,6 +191,9 @@ void Camera::Init()
 
   this->pitchNode->attachObject(this->camera);
   this->camera->setAutoAspectRatio(true);
+
+  this->sceneNode->setInheritScale(false);
+  this->pitchNode->setInheritScale(false);
 
   this->saveCount = 0;
 
@@ -214,7 +221,7 @@ unsigned int Camera::GetWindowId() const
 }
 
 //////////////////////////////////////////////////
-void Camera::SetScene(Scene *_scene)
+void Camera::SetScene(ScenePtr _scene)
 {
   this->scene = _scene;
 }
@@ -262,7 +269,11 @@ void Camera::Update()
       } catch(Ogre::Exception &_e)
       {
       }
+
       this->animState = NULL;
+
+      this->AnimationComplete();
+
       if (this->onAnimationComplete)
         this->onAnimationComplete();
 
@@ -317,20 +328,15 @@ void Camera::PostRender()
 {
   this->renderTarget->swapBuffers();
 
-  if (this->newData && this->captureData)
+  if (this->newData && (this->captureData || this->captureDataOnce))
   {
-    Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
-
     size_t size;
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
 
     // Get access to the buffer and make an image and write it to file
-    pixelBuffer = this->renderTexture->getBuffer();
-
-    Ogre::PixelFormat format = pixelBuffer->getFormat();
-
-    size = Ogre::PixelUtil::getMemorySize(width, height, 1, format);
+    size = Ogre::PixelUtil::getMemorySize(width, height, 1,
+        static_cast<Ogre::PixelFormat>(this->imageFormat));
 
     // Allocate buffer
     if (!this->saveFrameBuffer)
@@ -339,14 +345,19 @@ void Camera::PostRender()
     memset(this->saveFrameBuffer, 128, size);
 
     Ogre::PixelBox box(width, height, 1,
-        (Ogre::PixelFormat)this->imageFormat, this->saveFrameBuffer);
+        static_cast<Ogre::PixelFormat>(this->imageFormat),
+        this->saveFrameBuffer);
 
-    pixelBuffer->blitToMemory(box);
+    this->viewport->getTarget()->copyContentsToMemory(box);
 
-    // record render time stamp
+    if (this->captureDataOnce)
+    {
+      this->SaveFrame(this->GetFrameFilename());
+      this->captureDataOnce = false;
+    }
 
     if (this->sdf->HasElement("save") &&
-        this->sdf->GetElement("save")->Get<bool>("enabled"))
+        this->sdf->GetElement("save")->GetValueBool("enabled"))
     {
       this->SaveFrame(this->GetFrameFilename());
     }
@@ -375,7 +386,6 @@ void Camera::PostRender()
 
   this->newData = false;
 }
-
 
 //////////////////////////////////////////////////
 math::Pose Camera::GetWorldPose()
@@ -411,6 +421,7 @@ void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
   if (this->animState)
     return;
+
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
 }
 
@@ -463,9 +474,9 @@ void Camera::SetClipDist()
 
   if (this->camera)
   {
-    this->camera->setNearClipDistance(clipElem->Get<double>("near"));
-    this->camera->setFarClipDistance(clipElem->Get<double>("far"));
-    this->camera->setRenderingDistance(clipElem->Get<double>("far"));
+    this->camera->setNearClipDistance(clipElem->GetValueDouble("near"));
+    this->camera->setFarClipDistance(clipElem->GetValueDouble("far"));
+    this->camera->setRenderingDistance(clipElem->GetValueDouble("far"));
   }
   else
     gzerr << "Setting clip distances failed -- no camera yet\n";
@@ -491,7 +502,7 @@ void Camera::SetHFOV(math::Angle _angle)
 //////////////////////////////////////////////////
 math::Angle Camera::GetHFOV() const
 {
-  return math::Angle(this->sdf->Get<double>("horizontal_fov"));
+  return math::Angle(this->sdf->GetValueDouble("horizontal_fov"));
 }
 
 //////////////////////////////////////////////////
@@ -524,29 +535,46 @@ void Camera::SetImageHeight(unsigned int _h)
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageWidth() const
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("image");
-  return elem->Get<int>("width");
+  unsigned int width = 0;
+  if (this->viewport)
+  {
+    width = this->viewport->getActualWidth();
+  }
+  else
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("image");
+    width = elem->Get<int>("width");
+  }
+  return width;
 }
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageHeight() const
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("image");
-  // gzerr << "image height " << elem->Get<int>("height") << "\n";
-  return elem->Get<int>("height");
+  unsigned int height = 0;
+  if (this->viewport)
+  {
+    height = this->viewport->getActualHeight();
+  }
+  else
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("image");
+    height = elem->Get<int>("height");
+  }
+  return height;
 }
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageDepth() const
 {
   sdf::ElementPtr imgElem = this->sdf->GetElement("image");
-  std::string imgFmt = imgElem->Get<std::string>("format");
+  std::string imgFmt = imgElem->GetValueString("format");
 
-  if (imgFmt == "L8")
+  if (imgFmt == "L8" || imgFmt == "L_INT8")
     return 1;
-  else if (imgFmt == "R8G8B8")
+  else if (imgFmt == "R8G8B8" || imgFmt == "RGB_INT8")
     return 3;
-  else if (imgFmt == "B8G8R8")
+  else if (imgFmt == "B8G8R8" || imgFmt == "BGR_INT8")
     return 3;
   else if ((imgFmt == "BAYER_RGGB8") || (imgFmt == "BAYER_BGGR8") ||
             (imgFmt == "BAYER_GBRG8") || (imgFmt == "BAYER_GRBG8"))
@@ -563,7 +591,7 @@ unsigned int Camera::GetImageDepth() const
 std::string Camera::GetImageFormat() const
 {
   sdf::ElementPtr imgElem = this->sdf->GetElement("image");
-  return imgElem->Get<std::string>("format");
+  return imgElem->GetValueString("format");
 }
 
 //////////////////////////////////////////////////
@@ -583,8 +611,8 @@ unsigned int Camera::GetTextureHeight() const
 size_t Camera::GetImageByteSize() const
 {
   sdf::ElementPtr elem = this->sdf->GetElement("image");
-  return this->GetImageByteSize(elem->Get<int>("width"),
-                                elem->Get<int>("height"),
+  return this->GetImageByteSize(elem->GetValueInt("width"),
+                                elem->GetValueInt("height"),
                                 this->GetImageFormat());
 }
 
@@ -602,11 +630,11 @@ int Camera::GetOgrePixelFormat(const std::string &_format)
 {
   int result;
 
-  if (_format == "L8")
+  if (_format == "L8" || _format == "L_INT8")
     result = static_cast<int>(Ogre::PF_L8);
-  else if (_format == "R8G8B8")
+  else if (_format == "R8G8B8" || _format == "RGB_INT8")
     result = static_cast<int>(Ogre::PF_BYTE_RGB);
-  else if (_format == "B8G8R8")
+  else if (_format == "B8G8R8" || _format == "BGR_INT8")
     result = static_cast<int>(Ogre::PF_BYTE_BGR);
   else if (_format == "FLOAT32")
     result = static_cast<int>(Ogre::PF_FLOAT32_R);
@@ -637,9 +665,6 @@ void Camera::EnableSaveFrame(bool enable)
   sdf::ElementPtr elem = this->sdf->GetElement("save");
   elem->GetAttribute("enabled")->Set(enable);
   this->captureData = true;
-
-  if (!this->renderTexture)
-    this->CreateRenderTexture("saveframes_render_texture");
 }
 
 //////////////////////////////////////////////////
@@ -649,10 +674,10 @@ void Camera::SetSaveFramePathname(const std::string &_pathname)
   elem->GetElement("path")->Set(_pathname);
 
   // Create the directory to store frames
-  if (elem->Get<bool>("enabled"))
+  if (elem->GetValueBool("enabled"))
   {
     std::string command;
-    command = "mkdir " + _pathname + " 2>>/dev/null";
+    command = "mkdir -p " + _pathname + " 2>>/dev/null";
     if (system(command.c_str()) <0)
       gzerr << "Error making directory\n";
   }
@@ -745,6 +770,12 @@ void Camera::SetSceneNode(Ogre::SceneNode *node)
 //////////////////////////////////////////////////
 Ogre::SceneNode *Camera::GetSceneNode() const
 {
+  return this->sceneNode;
+}
+
+//////////////////////////////////////////////////
+Ogre::SceneNode *Camera::GetPitchNode() const
+{
   return this->pitchNode;
 }
 
@@ -785,44 +816,41 @@ std::string Camera::GetFrameFilename()
 {
   sdf::ElementPtr saveElem = this->sdf->GetElement("save");
 
-  std::string path = saveElem->Get<std::string>("path");
-
-  // Create a directory if not present
-  DIR *dir = opendir(path.c_str());
-  if (!dir)
-  {
-    std::string command;
-    command = "mkdir " + path + " 2>>/dev/null";
-    if (system(command.c_str()) < 0)
-      gzerr << "Error making directory\n";
-  }
+  std::string path = saveElem->GetValueString("path");
+  boost::filesystem::path pathToFile;
 
   std::string friendlyName = this->GetName();
+  std::string filename;
+
   boost::replace_all(friendlyName, "::", "_");
 
-
-  char tmp[1024];
-  if (!path.empty())
+  if (this->captureDataOnce)
   {
-    // double wallTime = common::Time::GetWallTime().Double();
-    // int min = static_cast<int>((wallTime / 60.0));
-    // int sec = static_cast<int>((wallTime - min*60));
-    // int msec = static_cast<int>((wallTime*1000 - min*60000 - sec*1000));
-
-    snprintf(tmp, sizeof(tmp), "%s/%s-%04d.jpg", path.c_str(),
-             friendlyName.c_str(), this->saveCount);
+    pathToFile = this->screenshotPath;
+    std::string timestamp = common::Time::GetWallTimeAsISOString();
+    boost::replace_all(timestamp, ":", "_");
+    pathToFile /= friendlyName + "-" + timestamp + ".jpg";
   }
   else
   {
-    snprintf(tmp, sizeof(tmp), "%s-%04d.jpg", friendlyName.c_str(),
-             this->saveCount);
+    pathToFile = (path.empty()) ? "." : path;
+    pathToFile /= str(boost::format("%s-%04d.jpg")
+        % friendlyName.c_str() % this->saveCount);
+    this->saveCount++;
   }
 
-  this->saveCount++;
-  closedir(dir);
-  return tmp;
+  // Create a directory if not present
+  if (!boost::filesystem::exists(pathToFile.parent_path()))
+    boost::filesystem::create_directories(pathToFile.parent_path());
+
+  return pathToFile.string();
 }
 
+/////////////////////////////////////////////////
+std::string Camera::GetScreenshotPath() const
+{
+  return this->screenshotPath;
+}
 
 /////////////////////////////////////////////////
 bool Camera::SaveFrame(const unsigned char *_image,
@@ -1026,6 +1054,12 @@ void Camera::SetCaptureData(bool _value)
 }
 
 //////////////////////////////////////////////////
+void Camera::SetCaptureDataOnce()
+{
+  this->captureDataOnce = true;
+}
+
+//////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &textureName)
 {
   // Create the render texture
@@ -1044,7 +1078,7 @@ void Camera::CreateRenderTexture(const std::string &textureName)
 }
 
 //////////////////////////////////////////////////
-Scene *Camera::GetScene() const
+ScenePtr Camera::GetScene() const
 {
   return this->scene;
 }
@@ -1272,14 +1306,16 @@ bool Camera::IsVisible(VisualPtr _visual)
   return false;
 }
 
+/////////////////////////////////////////////////
 bool Camera::IsVisible(const std::string &_visualName)
 {
   return this->IsVisible(this->scene->GetVisual(_visualName));
 }
 
-bool Camera::GetInitialized() const
+/////////////////////////////////////////////////
+bool Camera::IsAnimating() const
 {
-  return this->initialized;
+  return this->animState != NULL;
 }
 
 /////////////////////////////////////////////////
@@ -1423,11 +1459,31 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
 //////////////////////////////////////////////////
 void Camera::SetRenderRate(double _hz)
 {
-  this->renderPeriod = 1.0 / _hz;
+  if (_hz > 0.0)
+    this->renderPeriod = 1.0 / _hz;
+  else
+    this->renderPeriod = 0.0;
 }
 
 //////////////////////////////////////////////////
 double Camera::GetRenderRate() const
 {
   return 1.0 / this->renderPeriod.Double();
+}
+
+//////////////////////////////////////////////////
+void Camera::AnimationComplete()
+{
+}
+
+//////////////////////////////////////////////////
+bool Camera::IsInitialized() const
+{
+  return this->GetInitialized();
+}
+
+//////////////////////////////////////////////////
+bool Camera::GetInitialized() const
+{
+  return this->initialized && this->scene->GetInitialized();
 }

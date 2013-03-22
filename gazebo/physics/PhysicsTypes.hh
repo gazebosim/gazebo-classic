@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ namespace gazebo
     class Link;
     class Collision;
     class Joint;
+    class JointController;
     class Contact;
     class PhysicsEngine;
     class Mass;
@@ -86,6 +87,10 @@ namespace gazebo
     /// \def JointPtr
     /// \brief Boost shared pointer to a Joint object
     typedef boost::shared_ptr<Joint> JointPtr;
+
+    /// \def JointControllerPtr
+    /// \brief Boost shared pointer to a JointController object
+    typedef boost::shared_ptr<JointController> JointControllerPtr;
 
     /// \def  PhysicsEnginePtr
     /// \brief Boost shared pointer to a PhysicsEngine object
@@ -151,6 +156,10 @@ namespace gazebo
     /// \brief Vector of JointPtr
     typedef std::vector<JointPtr> Joint_V;
 
+    /// \def JointController_V
+    /// \brief Vector of JointControllerPtr
+    typedef std::vector<JointControllerPtr> JointController_V;
+
     /// \def Link_V
     /// \brief Vector of LinkPtr
     typedef std::vector<LinkPtr>  Link_V;
@@ -176,7 +185,7 @@ namespace gazebo
 
     /// \def GZ_SENSOR_COLLIDE
     /// \brief Collision object will collide only with sensors
-    #define GZ_SENSOR_COLLIDE 0x00000003
+    #define GZ_SENSOR_COLLIDE 0x00000002
 
     /// \def GZ_GHOST_COLLIDE
     /// \brief Collides with everything else but other ghost.

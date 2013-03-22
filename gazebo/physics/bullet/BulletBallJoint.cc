@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@
  * Date: 21 May 2003
  */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletBallJoint.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletBallJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -33,7 +34,9 @@ using namespace physics;
 BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent)
     : BallJoint<BulletJoint>(_parent)
 {
-  this->world = _world;
+  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  this->bulletWorld = _world;
+  this->bulletBall = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -76,19 +79,21 @@ void BulletBallJoint::Attach(LinkPtr _one, LinkPtr _two)
   math::Vector3 pivotA, pivotB;
 
   // Compute the pivot point, based on the anchorPos
-  pivotA = this->anchorPos - this->parentLink->GetWorldPose().pos;
-  pivotB = this->anchorPos - this->childLink->GetWorldPose().pos;
+  pivotA = this->anchorPos + this->childLink->GetWorldPose().pos
+                           - this->parentLink->GetWorldPose().pos;
+  pivotB = this->anchorPos;
 
-  this->btBall = new btPoint2PointConstraint(
+  this->bulletBall = new btPoint2PointConstraint(
       *bulletParentLink->GetBulletLink(),
       *bulletChildLink->GetBulletLink(),
       btVector3(pivotA.x, pivotA.y, pivotA.z),
       btVector3(pivotB.x, pivotB.y, pivotB.z));
 
-  this->constraint = this->btBall;
+  this->constraint = this->bulletBall;
 
   // Add the joint to the world
-  this->world->addConstraint(this->constraint);
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
+  this->bulletWorld->addConstraint(this->constraint);
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
@@ -144,12 +149,12 @@ math::Angle BulletBallJoint::GetAngleImpl(int /*_index*/) const
 void BulletBallJoint::SetHighStop(int /*_index*/,
                                    const math::Angle &/*_angle*/)
 {
-  if (this->btBall)
+  if (this->bulletBall)
   {
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    // this->btBall->setLimit(this->btBall->getLowerLimit(),
+    // this->bulletBall->setLimit(this->btBall->getLowerLimit(),
     //                         _angle.Radian());
   }
   else
@@ -162,13 +167,13 @@ void BulletBallJoint::SetHighStop(int /*_index*/,
 void BulletBallJoint::SetLowStop(int /*_index*/,
                                   const math::Angle &/*_angle*/)
 {
-  if (this->btBall)
+  if (this->bulletBall)
   {
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    // this->btBall->setLimit(-_angle.Radian(),
-    //                         this->btBall->getUpperLimit());
+    // this->bulletBall->setLimit(-_angle.Radian(),
+    //                         this->bulletBall->getUpperLimit());
   }
   else
     gzthrow("Joint must be created first");

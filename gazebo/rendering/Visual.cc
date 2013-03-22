@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@
 #include "sdf/sdf.hh"
 
 #include "msgs/msgs.hh"
+#include "common/Assert.hh"
 #include "common/Events.hh"
 #include "common/Common.hh"
-#include "gazebo/common/Plugin.hh"
 
 #include "rendering/WireBox.hh"
 #include "rendering/Conversions.hh"
@@ -40,6 +40,7 @@
 #include "common/Skeleton.hh"
 #include "rendering/Material.hh"
 #include "rendering/Visual.hh"
+#include "gazebo/common/Plugin.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -63,7 +64,16 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
   if (_parent)
     pnode = _parent->GetSceneNode();
   else
+  {
     gzerr << "Create a visual, invalid parent!!!\n";
+    return;
+  }
+
+  if (!pnode)
+  {
+    gzerr << "Unable to get parent scene node\n";
+    return;
+  }
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -291,7 +301,11 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       sdf::ElementPtr elem =
         this->sdf->GetElement("material")->GetElement("script");
       elem->GetElement("name")->Set(_msg->material().script().name());
-      elem->GetElement("uri")->Set(_msg->material().script().uri());
+      for (int i = 0; i < _msg->material().script().uri_size(); ++i)
+      {
+        sdf::ElementPtr uriElem = elem->AddElement("uri");
+        uriElem->Set(_msg->material().script().uri(i));
+      }
     }
 
     if (_msg->material().has_ambient())
@@ -362,7 +376,7 @@ void Visual::Load()
     this->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
-  pose = this->sdf->Get<math::Pose>("pose");
+  pose = this->sdf->GetValuePose("pose");
 
   std::string meshName = this->GetMeshName();
 
@@ -390,7 +404,7 @@ void Visual::Load()
     for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
     {
       ent->getSubEntity(i)->setCustomParameter(1, Ogre::Vector4(
-          this->sdf->Get<double>("laser_retro"), 0.0, 0.0, 0.0));
+          this->sdf->GetValueDouble("laser_retro"), 0.0, 0.0, 0.0));
     }
   }
 
@@ -411,26 +425,34 @@ void Visual::Load()
     if (matElem->HasElement("script"))
     {
       sdf::ElementPtr scriptElem = matElem->GetElement("script");
-      std::string matUri = scriptElem->Get<std::string>("uri");
+      sdf::ElementPtr uriElem = scriptElem->GetElement("uri");
+
+      // Add all the URI paths to the render engine
+      while (uriElem)
+      {
+        std::string matUri = uriElem->Get<std::string>();
+        if (!matUri.empty())
+          RenderEngine::Instance()->AddResourcePath(matUri);
+        uriElem = uriElem->GetNextElement("uri");
+      }
+
       std::string matName = scriptElem->Get<std::string>("name");
 
-      if (!matUri.empty())
-        RenderEngine::Instance()->AddResourcePath(matUri);
       if (!matName.empty())
         this->SetMaterial(matName);
     }
     else if (matElem->HasElement("ambient"))
-      this->SetAmbient(matElem->Get<common::Color>("ambient"));
+      this->SetAmbient(matElem->GetValueColor("ambient"));
     else if (matElem->HasElement("diffuse"))
-      this->SetDiffuse(matElem->Get<common::Color>("diffuse"));
+      this->SetDiffuse(matElem->GetValueColor("diffuse"));
     else if (matElem->HasElement("specular"))
-      this->SetSpecular(matElem->Get<common::Color>("specular"));
+      this->SetSpecular(matElem->GetValueColor("specular"));
     else if (matElem->HasElement("emissive"))
-      this->SetEmissive(matElem->Get<common::Color>("emissive"));
+      this->SetEmissive(matElem->GetValueColor("emissive"));
   }
 
   // Allow the mesh to cast shadows
-  this->SetCastShadows(this->sdf->Get<bool>("cast_shadows"));
+  this->SetCastShadows(this->sdf->GetValueBool("cast_shadows"));
   this->LoadPlugins();
 }
 
@@ -464,8 +486,6 @@ void Visual::Update()
     {
       this->animState = NULL;
       this->sceneNode->getCreator()->destroyAnimation(
-          this->GetName() + "_animation");
-      this->sceneNode->getCreator()->destroyAnimationState(
           this->GetName() + "_animation");
       if (this->onAnimationComplete)
         this->onAnimationComplete();
@@ -659,28 +679,28 @@ math::Vector3 Visual::GetScale()
 
     if (geomElem->HasElement("box"))
     {
-      result = geomElem->GetElement("box")->Get<math::Vector3>("size");
+      result = geomElem->GetElement("box")->GetValueVector3("size");
     }
     else if (geomElem->HasElement("sphere"))
     {
-      double r = geomElem->GetElement("sphere")->Get<double>("radius");
+      double r = geomElem->GetElement("sphere")->GetValueDouble("radius");
       result.Set(r * 2.0, r * 2.0, r * 2.0);
     }
     else if (geomElem->HasElement("cylinder"))
     {
-      double r = geomElem->GetElement("cylinder")->Get<double>("radius");
-      double l = geomElem->GetElement("cylinder")->Get<double>("length");
+      double r = geomElem->GetElement("cylinder")->GetValueDouble("radius");
+      double l = geomElem->GetElement("cylinder")->GetValueDouble("length");
       result.Set(r * 2.0, r * 2.0, l);
     }
     else if (geomElem->HasElement("plane"))
     {
       math::Vector2d size =
-        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
+        geomElem->GetElement("plane")->GetValueVector2d("size");
       result.Set(size.x, size.y, 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
-      result = geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
+      result = geomElem->GetElement("mesh")->GetValueVector3("scale");
     }
   }
 
@@ -756,7 +776,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 
       if (dynamic_cast<Ogre::Entity*>(obj))
         ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
-      else
+      else if (dynamic_cast<Ogre::SimpleRenderable*>(obj))
         ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
     }
 
@@ -1007,6 +1027,53 @@ void Visual::AttachAxes()
 
 
 //////////////////////////////////////////////////
+void Visual::SetWireframe(bool _show)
+{
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    (*iter)->SetWireframe(_show);
+  }
+
+  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
+  {
+    Ogre::Entity *entity = NULL;
+    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+
+    if (!entity)
+      continue;
+
+    // For each ogre::entity
+    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
+    {
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+
+      unsigned int techniqueCount, passCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
+           techniqueCount++)
+      {
+        technique = material->getTechnique(techniqueCount);
+
+        for (passCount = 0; passCount < technique->getNumPasses(); passCount++)
+        {
+          pass = technique->getPass(passCount);
+          if (_show)
+            pass->setPolygonMode(Ogre::PM_WIREFRAME);
+          else
+            pass->setPolygonMode(Ogre::PM_SOLID);
+        }
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 void Visual::SetTransparency(float _trans)
 {
   if (math::equal(_trans, this->transparency))
@@ -1204,12 +1271,14 @@ void Visual::SetPosition(const math::Vector3 &_pos)
     this->staticGeom = NULL;
     // this->staticGeom->setOrigin(Ogre::Vector3(pos.x, pos.y, pos.z));
   }*/
+  GZ_ASSERT(this->sceneNode, "Visual SceneNode is NULL");
   this->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
 }
 
 //////////////////////////////////////////////////
 void Visual::SetRotation(const math::Quaternion &_rot)
 {
+  GZ_ASSERT(this->sceneNode, "Visual SceneNode is NULL");
   this->sceneNode->setOrientation(
       Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z));
 }
@@ -1313,7 +1382,7 @@ void Visual::DisableTrackVisual()
 std::string Visual::GetNormalMap() const
 {
   return this->sdf->GetElement("material")->GetElement(
-      "shader")->GetElement("normal_map")->Get<std::string>();
+      "shader")->GetElement("normal_map")->GetValueString();
 }
 
 //////////////////////////////////////////////////
@@ -1329,7 +1398,7 @@ void Visual::SetNormalMap(const std::string &_nmap)
 std::string Visual::GetShaderType() const
 {
   return this->sdf->GetElement("material")->GetElement(
-      "shader")->Get<std::string>("type");
+      "shader")->GetValueString("type");
 }
 
 //////////////////////////////////////////////////
@@ -1398,13 +1467,13 @@ DynamicLines *Visual::CreateDynamicLine(RenderOpType type)
 }
 
 //////////////////////////////////////////////////
-void Visual::DeleteDynamicLine(DynamicLines *line)
+void Visual::DeleteDynamicLine(DynamicLines *_line)
 {
   // delete instance from lines vector
   for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
        iter!= this->lines.end(); ++iter)
   {
-    if (*iter == line)
+    if (*iter == _line)
     {
       this->lines.erase(iter);
       break;
@@ -1468,19 +1537,20 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       posDiff = Conversions::Convert(node->_getDerivedPosition()) -
                 this->GetWorldPose().pos;
 
-      min = rotDiff * Conversions::Convert(bb.getMinimum() * node->getScale())
-            + posDiff;
-      max = rotDiff * Conversions::Convert(bb.getMaximum() * node->getScale())
-            + posDiff;
-
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
       {
-        min = Conversions::Convert(node->getPosition());
-        max = Conversions::Convert(node->getPosition());
-        min -= math::Vector3(0.5, 0.5, 0.5);
-        max += math::Vector3(0.5, 0.5, 0.5);
+        min = math::Vector3(-0.5, -0.5, -0.5);
+        max = math::Vector3(0.5, 0.5, 0.5);
       }
+      else
+      {
+        min = rotDiff *
+          Conversions::Convert(bb.getMinimum() * node->getScale()) + posDiff;
+        max = rotDiff *
+          Conversions::Convert(bb.getMaximum() * node->getScale()) + posDiff;
+      }
+
 
       box.Merge(math::Box(min, max));
     }
@@ -1500,9 +1570,7 @@ void Visual::InsertMesh(const std::string &_meshName)
   if (!common::MeshManager::Instance()->HasMesh(_meshName))
   {
     mesh = common::MeshManager::Instance()->Load(_meshName);
-    if (mesh)
-      RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
-    else
+    if (!mesh)
       gzthrow("Unable to create a mesh from " + _meshName);
   }
   else
@@ -1526,6 +1594,10 @@ void Visual::InsertMesh(const std::string &_meshName)
 void Visual::InsertMesh(const common::Mesh *_mesh)
 {
   Ogre::MeshPtr ogreMesh;
+
+  GZ_ASSERT(_mesh != NULL, "Unable to insert a NULL mesh");
+
+  RenderEngine::Instance()->AddResourcePath(_mesh->GetPath());
 
   if (_mesh->GetSubMeshCount() == 0)
   {
@@ -1745,7 +1817,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
   }
   catch(Ogre::Exception &e)
   {
-    gzerr << "Unable to insert mesh[" << e.getDescription() << std::endl;
+    gzerr << "Unable to insert mesh[" << e.getDescription() << "]" << std::endl;
   }
 }
 
@@ -1770,8 +1842,11 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   {
     if (_msg->material().has_script())
     {
-      RenderEngine::Instance()->AddResourcePath(
-          _msg->material().script().uri());
+      for (int i = 0; i < _msg->material().script().uri_size(); ++i)
+      {
+        RenderEngine::Instance()->AddResourcePath(
+            _msg->material().script().uri(i));
+      }
       this->SetMaterial(_msg->material().script().name());
     }
 
@@ -1923,20 +1998,19 @@ std::string Visual::GetMeshName() const
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
 
-      if (tmpElem->Get<std::string>("filename") != "__default__")
+      std::string uri = tmpElem->Get<std::string>("uri");
+      if (uri.empty())
       {
-        filename = tmpElem->Get<std::string>("filename");
+        gzerr << "<uri> element missing for geometry element:\n";
+        geomElem->PrintValues("  ");
 
-        gzerr << "<mesh><filename>" << filename << "</filename></mesh>"
-          << " is deprecated.\n";
-        gzerr << "Use <mesh><uri>file://" << filename << "</uri></mesh>\n";
+        return std::string();
       }
-      else
-      {
-        filename = common::find_file(tmpElem->Get<std::string>("uri"));
-        if (filename == "__default__" || filename.empty())
-          gzerr << "No mesh specified\n";
-      }
+
+      filename = common::find_file(uri);
+
+      if (filename == "__default__" || filename.empty())
+        gzerr << "No mesh specified\n";
 
       return filename;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,11 @@ namespace gazebo
       /// \param[in] _world World to pass to the created physics engine.
       public: static PhysicsEnginePtr NewPhysicsEngine(
                   const std::string &_className, WorldPtr _world);
+
+      /// \brief Check if a physics engine is registered.
+      /// \param[in] _name Name of the physics engine.
+      /// \return True if physics engine is registered, false otherwise.
+      public: static bool IsRegistered(const std::string _name);
 
       /// \brief A list of registered physics classes.
       private: static std::map<std::string, PhysicsFactoryFn> engines;

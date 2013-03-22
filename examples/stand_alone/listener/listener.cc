@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,10 @@
  *
 */
 
+#include <gazebo/gazebo.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
+
 
 #include <iostream>
 
@@ -29,10 +31,10 @@ void cb(ConstWorldStatisticsPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-int main()
+int main(int _argc, char **_argv)
 {
-  // Initialize transport
-  gazebo::transport::init();
+  // Load gazebo
+  gazebo::load(_argc, _argv);
 
   // Create our node for communication
   gazebo::transport::NodePtr node(new gazebo::transport::Node());

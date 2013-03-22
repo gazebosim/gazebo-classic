@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,13 +43,20 @@ namespace gazebo
       public: virtual ~Timer();
 
       /// \brief Start the timer
-      public: void Start();
+      public: virtual void Start();
+
+      /// \brief Stop the timer
+      public: virtual void Stop();
+
+      /// \brief Returns true if the timer is running.
+      /// \return Tue if the timer has been started and not stopped.
+      public: bool GetRunning() const;
 
       /// \brief Get the elapsed time
       /// \return The time
       public: Time GetElapsed() const;
 
-      /// \brief stream operator friendly
+      /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
                                               const gazebo::common::Timer &t)
               {
@@ -57,8 +64,14 @@ namespace gazebo
                 return out;
               }
 
-      /// \brief the time of the last call to Start
+      /// \brief The time of the last call to Start
       private: Time start;
+
+      /// \brief The time when Stop was called.
+      private: Time stop;
+
+      /// \brief True if the timer is running.
+      private: bool running;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,9 @@ class Position2dInterface : public GazeboInterface
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe();
 
-  private: void OnPoseMsg(ConstPosePtr &_msg);
+  /// \brief Process pose messages.
+  /// \param[in] _msg A new pose message.
+  private: void OnPoseMsg(ConstPose_VPtr &_msg);
 
   /// \brief Timestamp on last data update
   private: double datatime;

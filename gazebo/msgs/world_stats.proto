@@ -14,7 +14,6 @@ message WorldStatistics
   required Time  pause_time  = 3;
   required Time  real_time   = 4;
   required bool  paused      = 5;
-  optional int32 model_count = 6;
+  required uint64 iterations = 6;
+  optional int32 model_count = 7;
 }
-
-

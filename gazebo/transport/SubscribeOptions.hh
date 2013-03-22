@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef SUBSCRIBEOPTIONS_HH
-#define SUBSCRIBEOPTIONS_HH
+#ifndef _SUBSCRIBEOPTIONS_HH_
+#define _SUBSCRIBEOPTIONS_HH_
 
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>
-#include "transport/CallbackHelper.hh"
+#include "gazebo/transport/CallbackHelper.hh"
 
 namespace gazebo
 {
@@ -44,8 +44,7 @@ namespace gazebo
       /// \param[in] _latching If true, latch the latest message; if false,
       /// don't latch
       public: template<class M>
-              void Init(const std::string &_topic,
-                        NodePtr _node,
+              void Init(const std::string &_topic, NodePtr _node,
                         bool _latching)
               {
                 google::protobuf::Message *msg = NULL;
@@ -57,6 +56,21 @@ namespace gazebo
                 this->node = _node;
                 this->topic = _topic;
                 this->msgType = msg->GetTypeName();
+                this->latching = _latching;
+              }
+
+      /// \brief Initialize the options. This version of init is only used
+      /// when creating subscribers of raw data.
+      /// \param[in] _topic Topic we're subscribing to
+      /// \param[in,out] _node The associated node
+      /// \param[in] _latching If true, latch the latest message; if false,
+      /// don't latch
+      public: void Init(const std::string &_topic, NodePtr _node,
+                        bool _latching)
+              {
+                this->node = _node;
+                this->topic = _topic;
+                this->msgType = "raw";
                 this->latching = _latching;
               }
 

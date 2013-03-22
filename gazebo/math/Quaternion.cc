@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -233,11 +233,17 @@ void Quaternion::Set(double _w, double _x, double _y, double _z)
 //////////////////////////////////////////////////
 void Quaternion::SetFromEuler(const Vector3 &_vec)
 {
+  this->SetFromEuler(_vec.x, _vec.y, _vec.z);
+}
+
+//////////////////////////////////////////////////
+void Quaternion::SetFromEuler(double _roll, double _pitch, double _yaw)
+{
   double phi, the, psi;
 
-  phi = _vec.x / 2.0;
-  the = _vec.y / 2.0;
-  psi = _vec.z / 2.0;
+  phi = _roll / 2.0;
+  the = _pitch / 2.0;
+  psi = _yaw / 2.0;
 
   this->w = cos(phi) * cos(the) * cos(psi) + sin(phi) * sin(the) * sin(psi);
   this->x = sin(phi) * cos(the) * cos(psi) - cos(phi) * sin(the) * sin(psi);

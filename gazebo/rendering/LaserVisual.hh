@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ namespace gazebo
       public: virtual void SetEmissive(const common::Color &_color);
 
       /// \brief Callback when laser data is received.
-      private: void OnScan(ConstLaserScanPtr &_msg);
+      private: void OnScan(ConstLaserScanStampedPtr &_msg);
 
       /// \brief Pointer to a node that handles communication.
       private: transport::NodePtr node;

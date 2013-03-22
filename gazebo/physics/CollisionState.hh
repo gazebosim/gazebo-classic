@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
  * Author: Nate Koenig
  */
 
-#ifndef _COLLISION_STATE_HH_
-#define _COLLISION_STATE_HH_
+#ifndef _COLLISIONSTATE_HH_
+#define _COLLISIONSTATE_HH_
 
-#include "physics/State.hh"
-#include "math/Pose.hh"
+#include "gazebo/physics/State.hh"
+#include "gazebo/math/Pose.hh"
 
 namespace gazebo
 {
@@ -48,7 +48,13 @@ namespace gazebo
       /// Build a CollisionState from an existing Collision.
       /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
-      public: CollisionState(const CollisionPtr _collision);
+      public: explicit CollisionState(const CollisionPtr _collision);
+
+      /// \brief Constructor
+      ///
+      /// Build a CollisionState from SDF data
+      /// \param[in] _sdf SDF data to load a collision state from.
+      public: explicit CollisionState(const sdf::ElementPtr _sdf);
 
       /// \brief Destructor
       public: virtual ~CollisionState();
@@ -57,12 +63,50 @@ namespace gazebo
       ///
       /// Load CollisionState information from stored data in and SDF::Element
       /// \param[in] _elem Pointer to the SDF::Element containing state info.
-      public: virtual void Load(sdf::ElementPtr _elem);
+      public: virtual void Load(const sdf::ElementPtr _elem);
 
       /// \brief Get the Collision pose
-      public: math::Pose GetPose() const;
+      /// \return The pose of the CollisionState
+      public: const math::Pose &GetPose() const;
 
-      /// \brief Pose of the Collision object
+      /// \brief Return true if the values in the state are zero.
+      /// \return True if the values in the state are zero.
+      public: bool IsZero() const;
+
+      /// \brief Populate a state SDF element with data from the object.
+      /// \param[out] _sdf SDF element to populate.
+      public: void FillSDF(sdf::ElementPtr _sdf);
+
+      /// \brief Assignment operator
+      /// \param[in] _state State value
+      /// \return Reference to this
+      public: CollisionState &operator=(const CollisionState &_state);
+
+      /// \brief Subtraction operator.
+      /// \param[in] _pt A state to substract.
+      /// \return The resulting state.
+      public: CollisionState operator-(const CollisionState &_state) const;
+
+      /// \brief Addition operator.
+      /// \param[in] _pt A state to add.
+      /// \return The resulting state.
+      public: CollisionState operator+(const CollisionState &_state) const;
+
+      /// \brief Stream insertion operator
+      /// \param[in] _out output stream
+      /// \param[in] _state Collision state to output
+      /// \return the stream
+      public: friend std::ostream &operator<<(std::ostream &_out,
+                                 const gazebo::physics::CollisionState &_state)
+      {
+        _out << "      <collision name='" << _state.name << "'>\n"
+             << "        <pose>" << _state.pose << "</pose>\n";
+        _out << "      </collision>\n";
+
+        return _out;
+      }
+
+      /// \brief Pose of the Collision object.
       private: math::Pose pose;
     };
     /// \}

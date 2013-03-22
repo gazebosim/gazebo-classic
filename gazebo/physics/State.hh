@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,12 +61,27 @@ namespace gazebo
       ///
       /// Populates the State information from data stored in an SDF::Element
       /// \param _elem Pointer to the SDF::Element
-      public: virtual void Load(sdf::ElementPtr _elem) = 0;
+      public: virtual void Load(const sdf::ElementPtr _elem);
+
+      /// \brief Assignment operator
+      /// \param[in] _state State value
+      /// \return this
+      public: State &operator=(const State &_state);
+
+      /// \brief Subtraction operator.
+      /// \param[in] _pt A state to substract.
+      /// \return The resulting state.
+      public: State operator-(const State &_state) const;
 
       /// \brief Get the name associated with this State
       /// \return Name associated with this state information. Typically
       /// a name of an Entity.
       public: std::string GetName() const;
+
+      /// \brief Set the name associated with this State.
+      /// \param[in] _name Name associated with this state information.
+      /// Typically the name of an Entity.
+      public: void SetName(const std::string &_name);
 
       /// \brief Get the wall time when this state was generated
       /// \return The absolute clock time when the State data was recorded.

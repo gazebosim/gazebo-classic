@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,22 @@
 
 #include <google/protobuf/message.h>
 
+#include <gazebo/gui/qt.h>
+#include <gazebo/gui/TopicSelector.hh>
+#include <gazebo/gui/viewers/TopicView.hh>
+#include <gazebo/gui/viewers/ViewFactory.hh>
+#include <gazebo/gazebo.hh>
+
+#include <gazebo/common/Time.hh>
+#include <gazebo/transport/Transport.hh>
+#include <gazebo/transport/TransportTypes.hh>
+#include <gazebo/transport/Node.hh>
+
+#include <gazebo/gazebo_config.h>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
-
-#include "common/Time.hh"
-
-#include "transport/Transport.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/Node.hh"
-
-#include "gazebo_config.h"
+#include <boost/thread/mutex.hpp>
 
 using namespace gazebo;
 
@@ -34,6 +40,14 @@ using namespace gazebo;
 std::vector<std::string> params;
 
 common::Time hz_prev_time;
+common::Time bw_prev_time;
+
+std::vector<int> bwBytes;
+std::vector<common::Time> bwTime;
+
+boost::mutex mutex;
+
+boost::shared_ptr<google::protobuf::Message> g_echoMsg;
 
 /////////////////////////////////////////////////
 void help()
@@ -43,7 +57,9 @@ void help()
             << "    list         : List all topics\n"
             << "    info <topic> : Get information about a topic\n"
             << "    echo <topic> : Output topic data to screen\n"
+            << "    view <topic> : View topic data using a QT widget\n"
             << "    hz <topic>   : Get publish frequency\n"
+            << "    bw <topic>   : Get topic bandwidth\n"
             << "    help         : This help text\n";
 }
 
@@ -85,11 +101,14 @@ bool parse(int argc, char **argv)
 }
 
 /////////////////////////////////////////////////
-transport::ConnectionPtr connect_to_master(const std::string &host,
-                                           unsigned short port)
+transport::ConnectionPtr connect_to_master()
 {
   std::string data, namespacesData, publishersData;
   msgs::Packet packet;
+
+  std::string host;
+  unsigned int port;
+  transport::get_master_uri(host, port);
 
   // Connect to the master
   transport::ConnectionPtr connection(new transport::Connection());
@@ -120,7 +139,7 @@ void list()
   msgs::Request request;
   msgs::Publishers pubs;
 
-  transport::ConnectionPtr connection = connect_to_master("localhost", 11345);
+  transport::ConnectionPtr connection = connect_to_master();
 
   request.set_id(0);
   request.set_request("get_publishers");
@@ -130,24 +149,42 @@ void list()
   packet.ParseFromString(data);
   pubs.ParseFromString(packet.serialized_data());
 
+  // This list is used to filter topic output.
+  std::list<std::string> listed;
+
   for (int i = 0; i < pubs.publisher_size(); i++)
   {
     const msgs::Publish &p = pubs.publisher(i);
-    if (p.topic().find("__dbg") == std::string::npos)
+    if (std::find(listed.begin(), listed.end(), p.topic()) == listed.end())
+    {
       std::cout << p.topic() << std::endl;
+
+      // Record the topics that have been listed to prevent duplicates.
+      listed.push_back(p.topic());
+    }
   }
 
   connection.reset();
 }
 
 /////////////////////////////////////////////////
-void echo_cb(ConstGzStringPtr &_data)
+void echoCB(const std::string &_data)
 {
-  std::cout << _data->data() << "\n";
+  g_echoMsg->ParseFromString(_data);
+  std::cout << g_echoMsg->DebugString() << "\n";
 }
 
 /////////////////////////////////////////////////
-void hz_cb(ConstGzStringPtr &/*_data*/)
+void bwCB(const std::string &_data)
+{
+  boost::mutex::scoped_lock lock(mutex);
+
+  bwBytes.push_back(_data.size());
+  bwTime.push_back(common::Time::GetWallTime());
+}
+
+/////////////////////////////////////////////////
+void hzCB(const std::string &/*_data*/)
 {
   common::Time cur_time = common::Time::GetWallTime();
 
@@ -165,7 +202,7 @@ msgs::TopicInfo get_topic_info(const std::string &_topic)
   msgs::Request *request = msgs::CreateRequest("topic_info", _topic);
   msgs::Packet packet;
 
-  transport::ConnectionPtr connection = connect_to_master("localhost", 11345);
+  transport::ConnectionPtr connection = connect_to_master();
 
   connection->EnqueueMsg(msgs::Package("request", *request), true);
 
@@ -216,21 +253,132 @@ void echo()
     return;
   }
 
+  std::string topic = params[1];
+
   transport::init();
 
   transport::NodePtr node(new transport::Node());
   node->Init();
 
-  std::string topic = params[1];
-  topic +=  "/__dbg";
+  // Get the message type on the topic.
+  std::string msgTypeName = gazebo::transport::getTopicMsgType(
+      node->DecodeTopicName(topic));
 
-  transport::SubscriberPtr sub = node->Subscribe(topic, echo_cb);
+  if (msgTypeName.empty())
+  {
+    gzerr << "Unable to get message type for topic[" << topic << "]\n";
+    transport::fini();
+    return;
+  }
+
+  g_echoMsg = msgs::MsgFactory::NewMsg(msgTypeName);
+
+  if (!g_echoMsg)
+  {
+    gzerr << "Unable to create message of type[" << msgTypeName << "]\n";
+    transport::fini();
+    return;
+  }
+
+  transport::SubscriberPtr sub = node->Subscribe(topic, echoCB);
 
   // Run the transport loop: starts a new thread
   transport::run();
 
   while (true)
     common::Time::MSleep(10);
+
+  transport::fini();
+}
+
+/////////////////////////////////////////////////
+void bw()
+{
+  if (params[1].empty())
+  {
+    std::cerr << "Error: No topic specified.\n";
+    return;
+  }
+
+  transport::init();
+
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  std::string topic = params[1];
+
+  transport::SubscriberPtr sub = node->Subscribe(topic, bwCB);
+
+  // Run the transport loop: starts a new thread
+  transport::run();
+
+  while (true)
+  {
+    common::Time::MSleep(100);
+    {
+      boost::mutex::scoped_lock lock(mutex);
+      if (bwBytes.size() >= 10)
+      {
+        std::sort(bwBytes.begin(), bwBytes.end());
+
+        float sumSize = 0;
+        unsigned int count = bwBytes.size();
+        common::Time dt = bwTime[count - 1] - bwTime[0];
+
+        for (unsigned int i = 0; i < count; ++i)
+        {
+          sumSize += bwBytes[i];
+        }
+
+        float meanBytes = sumSize / count;
+        float totalBps = sumSize / dt.Double();
+
+        // Create the output streams
+        std::ostringstream bandwidth, mean, min, max;
+        bandwidth << std::fixed << std::setprecision(2);
+        mean << std::fixed << std::setprecision(2);
+        min << std::fixed << std::setprecision(2);
+        max << std::fixed << std::setprecision(2);
+
+        // Format the bandwidth output
+        if (totalBps < 1000)
+          bandwidth << totalBps << " B/s";
+        else if (totalBps < 1000000)
+          bandwidth << totalBps / 1024.0f << " KB/s";
+        else
+          bandwidth << totalBps/1.049e6 << " MB/s";
+
+        // Format message size  output
+        if (meanBytes < 1000)
+        {
+          mean << meanBytes << " B";
+          min << bwBytes[0] << " B";
+          max << bwBytes[count-1] << " B";
+        }
+        else if (meanBytes < 1000000)
+        {
+          mean << meanBytes / 1024.0f << " KB";
+          min << bwBytes[0] / 1024.0f << " KB";
+          max << bwBytes[count-1] / 1024.0f << " KB";
+        }
+        else
+        {
+          mean << meanBytes / 1.049e6 << " MB";
+          min << bwBytes[0] / 1.049e6 << " MB";
+          max << bwBytes[count-1] / 1.049e6 << " MB";
+        }
+
+        std::cout << "Total[" << bandwidth.str() << "] "
+                  << "Mean[" << mean.str() << "] "
+                  << "Min[" << min.str() << "] "
+                  << "Max[" << max.str() << "] "
+                  << "Messages[" << count << "]\n";
+
+        bwBytes.clear();
+        bwTime.clear();
+      }
+    }
+  }
 
   transport::fini();
 }
@@ -250,9 +398,8 @@ void hz()
   node->Init();
 
   std::string topic = params[1];
-  topic +=  "/__dbg";
 
-  transport::SubscriberPtr sub = node->Subscribe(topic, hz_cb);
+  transport::SubscriberPtr sub = node->Subscribe(topic, hzCB);
 
   // Run the transport loop: starts a new thread
   transport::run();
@@ -261,6 +408,64 @@ void hz()
     common::Time::MSleep(10);
 
   transport::fini();
+}
+
+/////////////////////////////////////////////////
+void view(int _argc, char **_argv)
+{
+  if (!gazebo::load())
+  {
+    printf("load error\n");
+    return;
+  }
+
+  gazebo::run();
+
+  QApplication *app = new QApplication(_argc, _argv);
+
+  QFile file(":/style.qss");
+  file.open(QFile::ReadOnly);
+  QString styleSheet = QLatin1String(file.readAll());
+
+  app->setStyleSheet(styleSheet);
+
+  std::string topic;
+  std::string msgType;
+
+  if (params.size() == 1 || params[1].empty())
+  {
+    gui::TopicSelector *selector = new gui::TopicSelector();
+    selector->exec();
+
+    topic = selector->GetTopic();
+    msgType = selector->GetMsgType();
+    delete selector;
+  }
+  else
+  {
+    topic = params[1];
+    msgType = transport::getTopicMsgType(topic);
+  }
+
+  if (!topic.empty() && !msgType.empty())
+  {
+    gui::ViewFactory::RegisterAll();
+    gui::TopicView *view = gui::ViewFactory::NewView(msgType, topic);
+    if (view)
+      view->show();
+    else
+      gzerr << "Unable to create viewer for message type[" << msgType << "]\n";
+  }
+
+  if (!gazebo::init())
+  {
+    gzerr << "Unable to initialize Gazebo\n";
+    return;
+  }
+
+  app->exec();
+
+  gazebo::fini();
 }
 
 /////////////////////////////////////////////////
@@ -277,4 +482,8 @@ int main(int argc, char **argv)
     echo();
   else if (params[0] == "hz")
     hz();
+  else if (params[0] == "bw")
+    bw();
+  else if (params[0] == "view")
+    view(argc, argv);
 }

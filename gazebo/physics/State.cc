@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,8 @@
  *
  */
 
-#include "State.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/physics/State.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -40,9 +41,20 @@ State::~State()
 }
 
 /////////////////////////////////////////////////
+void State::Load(const sdf::ElementPtr /*_elem*/)
+{
+}
+
+/////////////////////////////////////////////////
 std::string State::GetName() const
 {
   return this->name;
+}
+
+/////////////////////////////////////////////////
+void State::SetName(const std::string &_name)
+{
+  this->name = _name;
 }
 
 /////////////////////////////////////////////////
@@ -61,4 +73,29 @@ common::Time State::GetRealTime() const
 common::Time State::GetSimTime() const
 {
   return this->simTime;
+}
+
+/////////////////////////////////////////////////
+State &State::operator=(const State &_state)
+{
+  this->name = _state.name;
+  this->wallTime = _state.wallTime;
+  this->realTime = _state.realTime;
+  this->simTime = _state.simTime;
+
+  return *this;
+}
+
+/////////////////////////////////////////////////
+State State::operator-(const State &_state) const
+{
+  // Make sure the names match
+  if (_state.name != this->name)
+  {
+    gzthrow("Invalid state substraction operator this[" + this->name +
+            "] != [" + _state.name + "]\n");
+  }
+
+  return State(this->name, this->realTime - _state.realTime,
+               this->simTime - _state.simTime);
 }

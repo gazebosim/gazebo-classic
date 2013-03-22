@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ namespace gazebo
       /// \param[in] _scene Scene that will contain the camera
       /// \param[in] _autoRender Almost everyone should leave this as true.
       public: DepthCamera(const std::string &_namePrefix,
-                          Scene *_scene, bool _autoRender = true);
+                          ScenePtr _scene, bool _autoRender = true);
 
       /// \brief Destructor
       public: virtual ~DepthCamera();

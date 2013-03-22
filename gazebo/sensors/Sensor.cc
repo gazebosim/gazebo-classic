@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,10 @@ using namespace gazebo;
 using namespace sensors;
 
 //////////////////////////////////////////////////
-Sensor::Sensor()
+Sensor::Sensor(SensorCategory _cat)
 {
+  this->category = _cat;
+
   this->sdf.reset(new sdf::Element);
   sdf::initFile("sensor.sdf", this->sdf);
 
@@ -74,25 +76,25 @@ void Sensor::Load(const std::string &_worldName)
 {
   if (this->sdf->HasElement("pose"))
   {
-    this->pose = this->sdf->Get<math::Pose>("pose");
+    this->pose = this->sdf->GetValuePose("pose");
   }
 
-  if (this->sdf->Get<bool>("always_on"))
+  if (this->sdf->GetValueBool("always_on"))
     this->SetActive(true);
 
   this->world = physics::get_world(_worldName);
-  this->lastUpdateTime = common::Time(0.0);  // loaded, but not updated
+
+  // loaded, but not updated
+  this->lastUpdateTime = common::Time(0.0);
 
   this->node->Init(this->world->GetName());
   this->sensorPub = this->node->Advertise<msgs::Sensor>("~/sensor");
-  this->controlSub = this->node->Subscribe("~/world_control",
-                                           &Sensor::OnControl, this);
 }
 
 //////////////////////////////////////////////////
 void Sensor::Init()
 {
-  this->SetUpdateRate(this->sdf->Get<double>("update_rate"));
+  this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
 
   // Load the plugins
   if (this->sdf->HasElement("plugin"))
@@ -125,12 +127,14 @@ std::string Sensor::GetParentName() const
 //////////////////////////////////////////////////
 void Sensor::Update(bool _force)
 {
-  if (this->IsActive())
+  if (this->IsActive() || _force)
   {
-    if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod)
+    if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod
+        || _force)
     {
       this->lastUpdateTime = this->world->GetSimTime();
       this->UpdateImpl(_force);
+      this->updated();
     }
   }
 }
@@ -144,7 +148,7 @@ void Sensor::Fini()
 //////////////////////////////////////////////////
 std::string Sensor::GetName() const
 {
-  return this->sdf->Get<std::string>("name");
+  return this->sdf->GetValueString("name");
 }
 
 //////////////////////////////////////////////////
@@ -157,8 +161,8 @@ std::string Sensor::GetScopedName() const
 //////////////////////////////////////////////////
 void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string name = _sdf->Get<std::string>("name");
-  std::string filename = _sdf->Get<std::string>("filename");
+  std::string name = _sdf->GetValueString("name");
+  std::string filename = _sdf->GetValueString("filename");
   gazebo::SensorPluginPtr plugin = gazebo::SensorPlugin::Create(filename, name);
 
   if (plugin)
@@ -196,6 +200,15 @@ math::Pose Sensor::GetPose() const
 }
 
 //////////////////////////////////////////////////
+double Sensor::GetUpdateRate()
+{
+  if (this->updatePeriod.Double() > 0.0)
+    return 1.0/this->updatePeriod.Double();
+  else
+    return 0.0;
+}
+
+//////////////////////////////////////////////////
 void Sensor::SetUpdateRate(double _hz)
 {
   if (_hz > 0.0)
@@ -219,21 +232,22 @@ common::Time Sensor::GetLastMeasurementTime()
 //////////////////////////////////////////////////
 std::string Sensor::GetType() const
 {
-  return this->sdf->Get<std::string>("type");
+  return this->sdf->GetValueString("type");
 }
 
 //////////////////////////////////////////////////
 bool Sensor::GetVisualize() const
 {
-  return this->sdf->Get<bool>("visualize");
+  return this->sdf->GetValueBool("visualize");
 }
 
 //////////////////////////////////////////////////
 std::string Sensor::GetTopic() const
 {
   std::string result;
-  if (this->sdf->HasElement("topic"))
-    result = this->sdf->GetElement("topic")->Get<std::string>();
+  if (this->sdf->HasElement("topic") &&
+      this->sdf->Get<std::string>("topic") != "__default__")
+    result = this->sdf->Get<std::string>("topic");
   return result;
 }
 
@@ -264,14 +278,13 @@ std::string Sensor::GetWorldName() const
 }
 
 //////////////////////////////////////////////////
-void Sensor::OnControl(ConstWorldControlPtr &_data)
+SensorCategory Sensor::GetCategory() const
 {
-  if (_data->has_reset())
-  {
-    if ((_data->reset().has_all() && _data->reset().all()) ||
-        (_data->reset().has_time_only() && _data->reset().time_only()))
-    {
-      this->lastUpdateTime = 0.0;
-    }
-  }
+  return this->category;
+}
+
+//////////////////////////////////////////////////
+void Sensor::ResetLastUpdateTime()
+{
+  this->lastUpdateTime = 0.0;
 }

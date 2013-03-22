@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,10 @@
 
 #include <vector>
 #include <map>
+#include <list>
 #include <string>
+
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/sensors/Sensor.hh"
@@ -36,21 +39,18 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
-    class Contact;
-
-    /// \class ContactSensor ContactSensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
+
+    /// \class ContactSensor ContactSensor.hh sensors/sensors.hh
     /// \brief Contact sensor. This sensor detects and reports contacts between
     ///  objects
     class ContactSensor: public Sensor
     {
-      /// \brief Constructor
-      /// \param body The underlying collision test uses an ODE collision, so
-      ///             ray sensors must be attached to a body.
+      /// \brief Constructor.
       public: ContactSensor();
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ContactSensor();
 
       /// \brief Load the sensor with SDF parameters
@@ -59,41 +59,74 @@ namespace gazebo
       public: virtual void Load(const std::string &_worldName,
                                 sdf::ElementPtr _sdf);
 
-      /// \brief Load the sensor with default parameters
-      /// \param[in] _worldName Name of world to load from
+      /// \brief Load the sensor with default parameters.
+      /// \param[in] _worldName Name of world to load from.
       public: virtual void Load(const std::string &_worldName);
 
-      /// \brief Initialize the sensor
+      /// \brief Initialize the sensor.
       public: virtual void Init();
 
-      /// \brief Update the sensor information
-      /// \param[in] _force True if update is forced, false if not
+      /// \brief Update the sensor information.
+      /// \param[in] _force True if update is forced, false if not.
       protected: virtual void UpdateImpl(bool _force);
 
-      /// \brief Finalize the sensor
+      /// \brief Finalize the sensor.
       protected: virtual void Fini();
 
-      /// \brief Get the number of collisions that the sensor is observing
-      /// \return Number of collisions
+      /// \brief Get the number of collisions that the sensor is observing.
+      /// \return Number of collisions.
       public: unsigned int GetCollisionCount() const;
 
-      /// \brief Get a collision name at index _index
-      /// \param[in] _index Index of collision in collection of collisions
-      /// \return name of collision
+      /// \brief Get a collision name at index _index.
+      /// \param[in] _index Index of collision in collection of collisions.
+      /// \return name of collision.
       public: std::string GetCollisionName(unsigned int _index) const;
 
-      /// \brief Return the number of contacts for an observed collision
-      /// \param[in] _collisionName The name of the observed collision
-      /// \return The collision contact count
+      /// \brief Return the number of contacts for an observed collision.
+      /// \param[in] _collisionName The name of the observed collision.
+      /// \return The collision contact count.
       public: unsigned int GetCollisionContactCount(
                   const std::string &_collisionName) const;
 
-      /// \brief Get a contact for a collision by index
-      /// \param[in] _collisionName Name of collision contact
-      /// \param[in] _index Index of collision to get
-      /// \return Contact object
-      public: physics::Contact GetCollisionContact(
-                  const std::string &_collisionName, unsigned int _index) const;
+      /// \brief Get all the contacts for the ContactSensor
+      /// \return Message that contains contact information between collision
+      /// pairs.
+      ///
+      /// During ODEPhysics::UpdateCollisions, all collision pairs in the
+      /// world are pushed into a buffer within ContactManager.
+      /// Subsequently, World::Update invokes ContactManager::PublishContacts
+      /// to publish all contacts generated within a timestep onto
+      /// Gazebo topic ~/physics/contacts.
+      ///
+      /// Each ContactSensor subscribes to the Gazebo ~/physics/contacts topic,
+      /// retrieves all contact pairs in a time step and filters them wthin
+      /// ContactSensor::OnContacts against <collision> body name
+      /// specified by the ContactSensor SDF.
+      /// All collision pairs between ContactSensor <collision> body and
+      /// other bodies in the world are stored in an array inside
+      /// contacts.proto.
+      ///
+      /// Within each element of the contact.proto array inside contacts.proto,
+      /// list of collisions between collision bodies
+      /// (collision1 and collision 2) are stored in an array of
+      /// elements, (position, normal, depth, wrench).  A timestamp has also
+      /// been added (time).  Details are described below:
+      ///
+      ///    \li string collision1  name of the first collision object.
+      ///    \li string collision2  name of the second collision object.
+      ///    \li Vector3d position  position of the contact joint in
+      ///                           inertial frame.
+      ///    \li Vector3d normal    normal of the contact joint in
+      ///                           inertial frame.
+      ///    \li double depth       intersection (penetration)
+      ///                           depth of two collision bodies.
+      ///    \li JointWrench wrench Forces and torques acting on both collision
+      ///                           bodies.  See joint_wrench.proto for details.
+      ///                           The forces and torques are applied at the
+      ///                           CG of perspective links for each collision
+      ///                           body, specified in the inertial frame.
+      ///    \li Time time          time at which this contact happened.
+      public: msgs::Contacts GetContacts() const;
 
       /// \brief Gets contacts of a collision
       /// \param[in] _collisionName Name of collision
@@ -101,33 +134,31 @@ namespace gazebo
       public: std::map<std::string, physics::Contact> GetContacts(
                   const std::string &_collisionName);
 
-      /// \brief Function callback that occurs during contact event
-      /// \param[in] _collisionName Name of collision
-      /// \param[in] _contact Contact undergoing event
-      private: void OnContact(const std::string &_collisionName,
-                              const physics::Contact &_contact);
+      // Documentation inherited.
+      public: virtual bool IsActive();
 
-      private: std::vector<physics::CollisionPtr> collisions;
+      /// \brief Callback for contact messages from the physics engine.
+      private: void OnContacts(ConstContactsPtr &_msg);
 
-      private: typedef std::map<std::string,
-               std::map<std::string, physics::Contact> > Contact_M;
+      /// \brief Collisions this sensor monitors for contacts
+      private: std::vector<std::string> collisions;
 
-      private: Contact_M contacts;
-
+      /// \brief Output contact information.
       private: transport::PublisherPtr contactsPub;
 
-      private: boost::mutex *mutex;
+      /// \brief Subscription to contact messages from the physics engine
+      private: transport::SubscriberPtr contactSub;
 
-      /// \brief returns a pointer to the mutex for locking while reading
-      ///        internally kept map of map of collision names and contacts
-      /// \return The mutex for the sensor
-      public: boost::mutex* GetUpdateMutex() const
-              {return this->mutex;}
+      /// \brief Mutex to protect reads and writes.
+      private: mutable boost::mutex mutex;
+
+      /// \brief Contacts message used to output sensor data.
+      private: msgs::Contacts contactsMsg;
+
+      typedef std::list<boost::shared_ptr<msgs::Contacts const> > ContactMsgs_L;
+      private: ContactMsgs_L incomingContacts;
     };
     /// \}
   }
 }
-
 #endif
-
-

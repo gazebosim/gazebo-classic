@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,10 +71,28 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
         _generator_context->OpenForInsert(headerFilename, "includes"));
     io::Printer printer(output.get(), '$');
 
-    printer.Print("#include <boost/shared_ptr.hpp>", "name", "includes");
+    printer.Print("#include <boost/shared_ptr.hpp>\n", "name", "includes");
+    printer.Print("#include \"gazebo/msgs/MsgFactory.hh\"\n",
+        "name", "includes");
   }
 
   // Add boost shared typedef
+  {
+    scoped_ptr<io::ZeroCopyOutputStream> output(
+        _generator_context->OpenForInsert(headerFilename, "namespace_scope"));
+    io::Printer printer(output.get(), '$');
+
+    std::string package = _file->package();
+    boost::replace_all(package, ".", "::");
+
+    std::string ptrType = "typedef boost::shared_ptr<" + package
+      + "::" + _file->message_type(0)->name() + "> "
+      + _file->message_type(0)->name() + "Ptr;\n";
+
+    printer.Print(ptrType.c_str(), "name", "namespace_scope");
+  }
+
+  // Add const boost shared typedef
   {
     scoped_ptr<io::ZeroCopyOutputStream> output(
         _generator_context->OpenForInsert(headerFilename, "global_scope"));
@@ -88,6 +106,22 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
       + _file->message_type(0)->name() + "Ptr;";
 
     printer.Print(constType.c_str(), "name", "global_scope");
+  }
+
+  // Add Message Factory register
+  {
+    scoped_ptr<io::ZeroCopyOutputStream> output(
+        _generator_context->OpenForInsert(sourceFilename, "global_scope"));
+    io::Printer printer(output.get(), '$');
+
+    std::string package = _file->package();
+    boost::replace_all(package, ".", "::");
+
+    std::string name = _file->message_type(0)->name();
+
+    std::string constType = "GZ_REGISTER_STATIC_MSG(\"" + _file->package() +
+      "." + name + "\", " + name + ")\n";
+    printer.Print(constType.c_str(), "name", "namespace_scope");
   }
 
   return true;

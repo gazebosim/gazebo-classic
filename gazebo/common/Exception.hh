@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,9 @@ namespace gazebo
       /// \return The error string
       public: std::string GetErrorStr() const;
 
+      /// \brief Print the exception to std out.
+      public: void Print() const;
+
       /// \brief The error function
       private: std::string file;
 
@@ -82,6 +85,49 @@ namespace gazebo
               {
                 return _out << _err.GetErrorStr();
               }
+    };
+
+    /// \class InternalError Exception.hh common/common.hh
+    /// \brief Class for generating Internal Gazebo Errors:
+    ///        those errors which should never happend and
+    ///        represent programming bugs.
+    class InternalError : public Exception
+    {
+      /// \brief Constructor
+      public: InternalError();
+
+      /// \brief Default constructor
+      /// \param[in] _file File name
+      /// \param[in] _line Line number where the error occurred
+      /// \param[in] _msg Error message
+      public: InternalError(const char *_file, int _line,
+                            const std::string _msg);
+
+      /// \brief Destructor
+      public: virtual ~InternalError();
+    };
+
+    /// \class AssertionInternalError Exception.hh common/common.hh
+    /// \brief Class for generating Exceptions which come from
+    ///        gazebo assertions. They include information about the
+    ///        assertion expression violated, function where problem
+    ///        appeared and assertion debug message.
+    class AssertionInternalError : public InternalError
+    {
+      /// \brief Constructor for assertions
+      /// \param[in] _file File name
+      /// \param[in] _line Line number where the error occurred
+      /// \param[in] _expr Assertion expression failed resulting in an
+      ///                  internal error
+      /// \param[in] _function Function where assertion failed
+      /// \param[in] _msg Function where assertion failed
+      public: AssertionInternalError(const char *_file,
+                                     int _line,
+                                     const std::string _expr,
+                                     const std::string _function,
+                                     const std::string _msg = "");
+      /// \brief Destructor
+      public: virtual ~AssertionInternalError();
     };
     /// \}
   }

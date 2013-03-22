@@ -12,6 +12,7 @@ set (sources
   Collision.cc
   CollisionState.cc
   Contact.cc
+  ContactManager.cc
   CylinderShape.cc
   Entity.cc
   Gripper.cc
@@ -39,7 +40,7 @@ set (sources
   TrimeshShape.cc
   World.cc
   WorldState.cc
-) 
+)
 
 set (headers
   Actor.hh
@@ -58,7 +59,7 @@ set (headers
   Gripper.hh
   Joint.hh
   JointController.hh
-  JointFeedback.hh
+  JointWrench.hh
   JointState.hh
   Link.hh
   LinkState.hh
@@ -84,6 +85,12 @@ set (headers
   World.hh
   WorldState.hh)
 
+set (gtest_sources
+  Joint_TEST.cc
+  PhysicsEngine_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+
 set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(physics_headers
@@ -95,10 +102,11 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.hh.in
 gz_add_library(gazebo_physics ${sources})
 
 target_link_libraries(gazebo_physics
-  gazebo_common 
+  gazebo_common
+  gazebo_util
   gazebo_physics_ode
-  ${TBB_LIBRARIES} 
-  ${libtool_library} 
+  ${TBB_LIBRARIES}
+  ${libtool_library}
   ${Boost_LIBRARIES}
   ${SDF_LIBRARIES}
 )
@@ -108,14 +116,16 @@ if (HAVE_BULLET)
 endif()
 
 gz_add_executable(gzphysics server.cc)
-target_link_libraries(gzphysics gazebo_common
-                                gazebo_transport
-                                gazebo_physics
-                                gazebo_sensors
-                                gazebo_msgs
-                                pthread
-                                ${SDF_LIBRARIES}
-                                )
+target_link_libraries(gzphysics
+  gazebo_common
+  gazebo_util
+  gazebo_transport
+  gazebo_physics
+  gazebo_sensors
+  gazebo_msgs
+  pthread
+  ${SDF_LIBRARIES}
+  )
 
 gz_install_executable( gzphysics )
 gz_install_library(gazebo_physics)

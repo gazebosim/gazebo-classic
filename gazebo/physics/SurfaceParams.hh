@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,9 +47,6 @@ namespace gazebo
       /// \brief Load the contact params.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf);
-
-      /// \brief Deprecated.
-      public: void FillSurfaceMsg(msgs::Surface &_msg) GAZEBO_DEPRECATED;
 
       /// \brief Fill in a surface message.
       /// \param[in] _msg Message to fill with this object's values.

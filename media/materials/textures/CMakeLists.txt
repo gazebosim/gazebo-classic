@@ -1,9 +1,10 @@
-set (files 
+set (files
   beigeWall.jpg
   ceiling_tiled.jpg
   clouds.jpg
   dirt_diffusespecular.png
   dirt_normal.png
+  flat_normal.png
   fungus_diffusespecular.png
   fungus_normal.png
   granite2.jpg

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,34 @@
  * Author: Nate Koenig
  */
 
-#include "common/Exception.hh"
-#include "transport/TopicManager.hh"
-#include "transport/Publisher.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/transport/TopicManager.hh"
+#include "gazebo/transport/Publisher.hh"
 
 using namespace gazebo;
 using namespace transport;
 
+//////////////////////////////////////////////////
+Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
+                     unsigned int _limit, bool /*_latch*/)
+  : topic(_topic), msgType(_msgType), queueLimit(_limit)
+{
+  this->prevMsg = NULL;
+  this->queueLimitWarned = false;
+  this->updatePeriod = 0;
+}
 
 //////////////////////////////////////////////////
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
-                     unsigned int _limit, bool _latch)
-  : topic(_topic), msgType(_msgType), queueLimit(_limit), latch(_latch)
+                     unsigned int _limit, double _hzRate)
+  : topic(_topic), msgType(_msgType), queueLimit(_limit),
+    updatePeriod(0)
 {
-  this->mutex = new boost::recursive_mutex();
+  if (!math::equal(_hzRate, 0.0))
+    this->updatePeriod = 1.0 / _hzRate;
+
   this->prevMsg = NULL;
+  this->queueLimitWarned = false;
 }
 
 //////////////////////////////////////////////////
@@ -43,19 +56,14 @@ Publisher::~Publisher()
 
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
-
-  delete this->mutex;
 }
 
 //////////////////////////////////////////////////
 bool Publisher::HasConnections() const
 {
-  return ((this->publications[0] &&
-           (this->publications[0]->GetCallbackCount() > 0 ||
-            this->publications[0]->GetNodeCount() > 0)) ||
-          (this->publications[1] &&
-           (this->publications[1]->GetCallbackCount() > 0 ||
-            this->publications[0]->GetNodeCount() > 0)));
+  return (this->publication &&
+      (this->publication->GetCallbackCount() > 0 ||
+       this->publication->GetNodeCount() > 0));
 }
 
 //////////////////////////////////////////////////
@@ -82,29 +90,61 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   // if (!this->HasConnections())
   // return;
 
+  // Check if a throttling rate has been set
+  if (this->updatePeriod > 0)
+  {
+    // Get the current time
+    this->currentTime = common::Time::GetWallTime();
+
+    // Skip publication if the time difference is less than the update period.
+    if (this->prevPublishTime != common::Time(0, 0) &&
+        (this->currentTime - this->prevPublishTime).Double() <
+         this->updatePeriod)
+    {
+      return;
+    }
+
+    // Set the previous time a message was published
+    this->prevPublishTime = this->currentTime;
+  }
+
   // Save the latest message
   google::protobuf::Message *msg = _message.New();
   msg->CopyFrom(_message);
 
-  this->mutex->lock();
-  if (this->prevMsg == NULL)
-    this->prevMsg = _message.New();
-  this->prevMsg->CopyFrom(_message);
-
-  this->messages.push_back(msg);
-
-  if (this->messages.size() > this->queueLimit)
   {
-    delete this->messages.front();
-    this->messages.pop_front();
+    boost::recursive_mutex::scoped_lock lock(this->mutex);
+    if (this->prevMsg == NULL)
+      this->prevMsg = _message.New();
+    this->prevMsg->CopyFrom(_message);
+
+    this->messages.push_back(msg);
+
+    if (this->messages.size() > this->queueLimit)
+    {
+      if (!queueLimitWarned)
+      {
+        gzwarn << "Queue limit reached for topic "
+               << this->topic
+               << ", deleting message"
+               << " (only this warning is printed to the console, "
+               << "see the ~/.gazebo/gzserver.log and "
+               << "~/.gazebo/gzclient.log files for future warnings).\n";
+        queueLimitWarned = true;
+      }
+      gzlog << "Queue limit reached for topic "
+            << this->topic
+            << ", deleting message\n";
+      delete this->messages.front();
+      this->messages.pop_front();
+    }
   }
-  this->mutex->unlock();
 }
 
 //////////////////////////////////////////////////
 void Publisher::SendMessage()
 {
-  this->mutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   if (this->messages.size() > 0)
   {
@@ -119,16 +159,13 @@ void Publisher::SendMessage()
 
     this->messages.clear();
   }
-
-  this->mutex->unlock();
 }
 
 //////////////////////////////////////////////////
 unsigned int Publisher::GetOutgoingCount() const
 {
-  this->mutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
   unsigned int c = this->messages.size();
-  this->mutex->unlock();
   return c;
 }
 
@@ -152,19 +189,27 @@ void Publisher::OnPublishComplete()
 //////////////////////////////////////////////////
 void Publisher::SetPublication(PublicationPtr &_publication, int _i)
 {
-  this->publications[_i] = _publication;
+  if (_i == 0)
+    this->publication = _publication;
+}
+
+//////////////////////////////////////////////////
+void Publisher::SetPublication(PublicationPtr _publication)
+{
+  this->publication = _publication;
 }
 
 //////////////////////////////////////////////////
 bool Publisher::GetLatching() const
 {
-  return this->latch;
+  return false;
 }
 
 //////////////////////////////////////////////////
 std::string Publisher::GetPrevMsg() const
 {
   std::string result;
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
   if (this->prevMsg)
     this->prevMsg->SerializeToString(&result);
   return result;

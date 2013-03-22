@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,6 +100,10 @@ namespace gazebo
       /// \param[in] _path the directory to add
       public: void AddGazeboPaths(const std::string &_path);
 
+      /// \brief Add colon delimited paths to modelPaths
+      /// \param[in] _path the directory to add
+      public: void AddModelPaths(const std::string &_path);
+
       /// \brief Add colon delimited paths to ogre install
       /// \param[in] _path the directory to add
       public: void AddOgrePaths(const std::string &_path);
@@ -110,6 +114,8 @@ namespace gazebo
 
       /// \brief clear out SystemPaths#gazeboPaths
       public: void ClearGazeboPaths();
+      /// \brief clear out SystemPaths#modelPaths
+      public: void ClearModelPaths();
       /// \brief clear out SystemPaths#ogrePaths
       public: void ClearOgrePaths();
       /// \brief clear out SystemPaths#pluginPaths
@@ -167,5 +173,3 @@ namespace gazebo
   }
 }
 #endif
-
-

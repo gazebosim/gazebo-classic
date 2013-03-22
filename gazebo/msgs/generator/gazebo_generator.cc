@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 int main(int _argc, char *_argv[])
 {
-  #ifdef _MSC_VER
+#ifdef _MSC_VER
   // Don't print a silly message or stick a modal dialog box in my face,
   // please.
   _set_abort_behavior(0, ~0);

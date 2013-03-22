@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,12 +74,6 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
       this->minDepth = contactOdeElem->Get<double>("min_depth");
     }
   }
-}
-
-/////////////////////////////////////////////////
-void SurfaceParams::FillSurfaceMsg(msgs::Surface &_msg)
-{
-  this->FillMsg(_msg);
 }
 
 /////////////////////////////////////////////////

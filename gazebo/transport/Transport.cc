@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,39 +32,51 @@ boost::condition_variable g_responseCondition;
 boost::mutex requestMutex;
 bool g_stopped = true;
 
-const msgs::Request *g_request = NULL;
-msgs::Response *g_response = NULL;
+std::list<msgs::Request *> g_requests;
+std::list<boost::shared_ptr<msgs::Response> > g_responses;
+
+#define DEFAULT_MASTER_PORT 11345
 
 /////////////////////////////////////////////////
-bool transport::get_master_uri(std::string &master_host,
-                               unsigned int &master_port)
+bool transport::get_master_uri(std::string &_masterHost,
+                               unsigned int &_masterPort)
 {
-  char *char_uri = getenv("GAZEBO_MASTER_URI");
+  char *charURI = getenv("GAZEBO_MASTER_URI");
 
   // Set to default host and port
-  if (!char_uri || strlen(char_uri) == 0)
+  if (!charURI || strlen(charURI) == 0)
   {
-    master_host = "localhost";
-    master_port = 11345;
+    _masterHost = "localhost";
+    _masterPort = DEFAULT_MASTER_PORT;
     return false;
   }
 
-  std::string master_uri = char_uri;
+  std::string masterURI = charURI;
 
-  boost::replace_first(master_uri, "http://", "");
-  int last_colon = master_uri.find_last_of(":");
-  master_host = master_uri.substr(0, last_colon);
-  master_port = boost::lexical_cast<unsigned int>(
-      master_uri.substr(last_colon+1, master_uri.size() - (last_colon+1)));
+  boost::replace_first(masterURI, "http://", "");
+  size_t lastColon = masterURI.find_last_of(":");
+  _masterHost = masterURI.substr(0, lastColon);
+
+  if (lastColon == std::string::npos)
+  {
+    gzerr << "Port missing in master URI[" << masterURI
+          << "]. Using default value of " << DEFAULT_MASTER_PORT << ".\n";
+    _masterPort = DEFAULT_MASTER_PORT;
+  }
+  else
+  {
+    _masterPort = boost::lexical_cast<unsigned int>(
+        masterURI.substr(lastColon + 1, masterURI.size() - (lastColon + 1)));
+  }
 
   return true;
 }
 
 /////////////////////////////////////////////////
-bool transport::init(const std::string &master_host, unsigned int master_port)
+bool transport::init(const std::string &_masterHost, unsigned int _masterPort)
 {
-  std::string host = master_host;
-  unsigned int port = master_port;
+  std::string host = _masterHost;
+  unsigned int port = _masterPort;
 
   if (host.empty())
     get_master_uri(host, port);
@@ -92,8 +104,11 @@ void transport::run()
   {
     TopicManager::Instance()->GetTopicNamespaces(namespaces);
 
-    // 25 seconds max wait time
-    common::Time::MSleep(500);
+    if (namespaces.empty())
+    {
+      // 25 seconds max wait time
+      common::Time::MSleep(500);
+    }
 
     trys++;
   }
@@ -146,23 +161,43 @@ void transport::pause_incoming(bool _pause)
 /////////////////////////////////////////////////
 void on_response(ConstResponsePtr &_msg)
 {
-  if (!g_request || _msg->id() != g_request->id())
+  if (g_requests.size() <= 0)
     return;
 
-  if (!g_response)
-    g_response = new msgs::Response;
+  std::list<msgs::Request *>::iterator iter;
+  for (iter = g_requests.begin(); iter != g_requests.end(); ++iter)
+  {
+    if (_msg->id() == (*iter)->id())
+      break;
+  }
 
-  g_response->CopyFrom(*_msg);
-  g_responseCondition.notify_one();
+  // Stop if the response is not for any of the request messages.
+  if (iter == g_requests.end())
+    return;
+
+  boost::shared_ptr<msgs::Response> response(new msgs::Response);
+  response->CopyFrom(*_msg);
+  g_responses.push_back(response);
+
+  g_responseCondition.notify_all();
 }
 
 /////////////////////////////////////////////////
-msgs::Response transport::request(const std::string &_worldName,
-                                  const msgs::Request &_request)
+void transport::get_topic_namespaces(std::list<std::string> &_namespaces)
 {
-  boost::unique_lock<boost::mutex> lock(requestMutex);
-  g_response = NULL;
-  g_request = &_request;
+  TopicManager::Instance()->GetTopicNamespaces(_namespaces);
+}
+
+/////////////////////////////////////////////////
+boost::shared_ptr<msgs::Response> transport::request(
+    const std::string &_worldName, const std::string &_request,
+    const std::string &_data)
+{
+  boost::mutex::scoped_lock lock(requestMutex);
+
+  msgs::Request *request = msgs::CreateRequest(_request, _data);
+
+  g_requests.push_back(request);
 
   NodePtr node = NodePtr(new Node());
   node->Init(_worldName);
@@ -170,22 +205,129 @@ msgs::Response transport::request(const std::string &_worldName,
   PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
   SubscriberPtr responseSub = node->Subscribe("~/response", &on_response);
 
-  requestPub->Publish(_request);
+  requestPub->Publish(*request);
 
-  g_responseCondition.wait(lock);
+  boost::shared_ptr<msgs::Response> response;
+  std::list<boost::shared_ptr<msgs::Response> >::iterator iter;
+
+  bool valid = false;
+  while (!valid)
+  {
+    // Wait for a response
+    g_responseCondition.wait(lock);
+
+    for (iter = g_responses.begin(); iter != g_responses.end(); ++iter)
+    {
+      if ((*iter)->id() == request->id())
+      {
+        response = *iter;
+        g_responses.erase(iter);
+        valid = true;
+        break;
+      }
+    }
+  }
 
   requestPub.reset();
   responseSub.reset();
   node.reset();
 
-  if (g_response != NULL)
-    return *g_response;
-  else
-    return msgs::Response();
+  delete request;
+  return response;
 }
 
 /////////////////////////////////////////////////
-void transport::get_topic_namespaces(std::list<std::string> &_namespaces)
+void transport::requestNoReply(const std::string &_worldName,
+                               const std::string &_request,
+                               const std::string &_data)
 {
-  TopicManager::Instance()->GetTopicNamespaces(_namespaces);
+  // Create a node for communication.
+  NodePtr node = NodePtr(new Node());
+
+  // Initialize the node, use the world name for the topic namespace.
+  node->Init(_worldName);
+
+  // Process the request.
+  requestNoReply(node, _request, _data);
+
+  // Cleanup the node.
+  node.reset();
+}
+
+/////////////////////////////////////////////////
+void transport::requestNoReply(NodePtr _node, const std::string &_request,
+                               const std::string &_data)
+{
+  // Create a publisher on the request topic.
+  PublisherPtr requestPub = _node->Advertise<msgs::Request>("~/request");
+
+  // Create a new request message
+  msgs::Request *request = msgs::CreateRequest(_request, _data);
+
+  // Publish the request message
+  requestPub->Publish(*request);
+
+  // Cleanup the request
+  delete request;
+
+  // Clean up the publisher.
+  requestPub.reset();
+}
+
+/////////////////////////////////////////////////
+std::map<std::string, std::list<std::string> > transport::getAdvertisedTopics()
+{
+  std::map<std::string, std::list<std::string> > result;
+  std::list<msgs::Publish> publishers;
+
+  ConnectionManager::Instance()->GetAllPublishers(publishers);
+
+  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
+      iter != publishers.end(); ++iter)
+  {
+    result[(*iter).msg_type()].push_back((*iter).topic());
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+std::list<std::string> transport::getAdvertisedTopics(
+    const std::string &_msgType)
+{
+  std::list<std::string> result;
+  std::list<msgs::Publish> publishers;
+
+  ConnectionManager::Instance()->GetAllPublishers(publishers);
+
+  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
+      iter != publishers.end(); ++iter)
+  {
+    if (std::find(result.begin(), result.end(), (*iter).topic()) !=
+        result.end())
+      continue;
+
+    if (_msgType.empty() || _msgType == (*iter).msg_type())
+      result.push_back((*iter).topic());
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+std::string transport::getTopicMsgType(const std::string &_topicName)
+{
+  std::string result;
+  std::list<msgs::Publish> publishers;
+
+  ConnectionManager::Instance()->GetAllPublishers(publishers);
+
+  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
+      iter != publishers.end() && result.empty(); ++iter)
+  {
+    if (_topicName == (*iter).topic())
+      result = (*iter).msg_type();
+  }
+
+  return result;
 }

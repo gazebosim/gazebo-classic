@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,9 @@ void BulletTrimeshShape::Init()
     mTriMesh->addTriangle(bv0, bv1, bv2);
   }
 
-  bParent->SetCollisionShape(new btConvexTriangleMeshShape(mTriMesh, true));
+  btConvexShape* convexShape = new btConvexTriangleMeshShape(mTriMesh, true);
+  convexShape->setMargin(0.001f);
+  bParent->SetCollisionShape(convexShape);
 
   delete [] vertices;
   delete [] indices;

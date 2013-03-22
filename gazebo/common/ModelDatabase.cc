@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  *
 */
 
-#define BOOST_FILESYSTEM_VERSION 2
-
 #include <tinyxml.h>
 #include <libtar.h>
 #include <curl/curl.h>
@@ -30,6 +28,8 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabase.hh"
@@ -100,9 +100,20 @@ std::string ModelDatabase::GetURI()
 bool ModelDatabase::HasModel(const std::string &_modelURI)
 {
   std::string uri = _modelURI;
+
+  size_t uriSeparator = uri.find("://");
+
+  // Make sure there is a URI separator
+  if (uriSeparator == std::string::npos)
+  {
+    gzerr << "URI[" << _modelURI << "] missing ://\n";
+    return false;
+  }
+
   boost::replace_first(uri, "model://", ModelDatabase::GetURI());
 
   std::map<std::string, std::string> models = ModelDatabase::GetModels();
+
   for (std::map<std::string, std::string>::iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
@@ -113,7 +124,7 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
 }
 
 /////////////////////////////////////////////////
-std::string ModelDatabase::GetManifest(const std::string &_uri)
+std::string ModelDatabase::GetDBConfig(const std::string &_uri)
 {
   std::string xmlString;
   std::string uri = _uri;
@@ -121,10 +132,43 @@ std::string ModelDatabase::GetManifest(const std::string &_uri)
 
   if (!uri.empty())
   {
-    std::string manifestURI = uri + "/manifest.xml";
+    std::string manifestURI = uri + "/" + GZ_MODEL_DB_MANIFEST_FILENAME;
+    xmlString = this->GetManifestImpl(manifestURI);
+  }
 
+  return xmlString;
+}
+
+/////////////////////////////////////////////////
+std::string ModelDatabase::GetModelConfig(const std::string &_uri)
+{
+  std::string xmlString;
+  std::string uri = _uri;
+  boost::replace_first(uri, "model://", ModelDatabase::GetURI());
+
+  if (!uri.empty())
+  {
+    std::string manifestURI = uri + "/" + GZ_MODEL_MANIFEST_FILENAME;
+    xmlString = this->GetManifestImpl(manifestURI);
+  }
+
+  return xmlString;
+}
+
+/////////////////////////////////////////////////
+std::string ModelDatabase::GetManifest(const std::string &_uri)
+{
+  return this->GetModelConfig(_uri);
+}
+
+/////////////////////////////////////////////////
+std::string ModelDatabase::GetManifestImpl(const std::string &_uri)
+{
+  std::string xmlString;
+  if (!_uri.empty())
+  {
     CURL *curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, manifestURI.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, _uri.c_str());
 
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, get_models_cb);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &xmlString);
@@ -133,7 +177,7 @@ std::string ModelDatabase::GetManifest(const std::string &_uri)
     if (success != CURLE_OK)
     {
       gzwarn << "Unable to connect to model database using [" << _uri
-        << "]. Only locally installed models will be available.";
+        << "]. Only locally installed models will be available.\n";
     }
 
     curl_easy_cleanup(curl);
@@ -142,11 +186,10 @@ std::string ModelDatabase::GetManifest(const std::string &_uri)
   return xmlString;
 }
 
-
 /////////////////////////////////////////////////
 bool ModelDatabase::UpdateModelCacheImpl()
 {
-  std::string xmlString = ModelDatabase::GetManifest(ModelDatabase::GetURI());
+  std::string xmlString = ModelDatabase::GetDBConfig(ModelDatabase::GetURI());
 
   if (!xmlString.empty())
   {
@@ -156,22 +199,25 @@ bool ModelDatabase::UpdateModelCacheImpl()
     TiXmlElement *databaseElem = xmlDoc.FirstChildElement("database");
     if (!databaseElem)
     {
-      gzerr << "No <database> tag in the model database manifest.xml found"
-        << " here[" << ModelDatabase::GetURI() << "]\n";
+      gzerr << "No <database> tag in the model database "
+            << GZ_MODEL_DB_MANIFEST_FILENAME << " found"
+            << " here[" << ModelDatabase::GetURI() << "]\n";
       return false;
     }
 
     TiXmlElement *modelsElem = databaseElem->FirstChildElement("models");
     if (!modelsElem)
     {
-      gzerr << "No <models> tag in the model database manifest.xml found"
+      gzerr << "No <models> tag in the model database "
+        << GZ_MODEL_DB_MANIFEST_FILENAME << " found"
         << " here[" << ModelDatabase::GetURI() << "]\n";
       return false;
     }
 
     TiXmlElement *uriElem;
-    for (uriElem = modelsElem->FirstChildElement("uri"); uriElem != NULL;
-        uriElem = uriElem->NextSiblingElement("uri"))
+    for (uriElem = modelsElem->FirstChildElement("uri");
+         uriElem != NULL && !this->stop;
+         uriElem = uriElem->NextSiblingElement("uri"))
     {
       std::string uri = uriElem->GetText();
 
@@ -227,7 +273,13 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
   size_t size = 0;
 
   {
+    {
+      boost::mutex::scoped_try_lock tryLock(this->updateMutex);
+      if (!tryLock)
+        gzmsg << "Waiting for model database update to complete...\n";
+    }
     boost::mutex::scoped_lock lock(this->updateMutex);
+
     size = this->modelCache.size();
   }
 
@@ -240,6 +292,9 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
 
     // Tell the background thread to grab the models from online.
     this->updateCacheCondition.notify_one();
+
+    // Let the other thread start downloading.
+    common::Time::MSleep(100);
 
     // Wait for the thread to finish.
     boost::mutex::scoped_lock lock(this->updateMutex);
@@ -260,7 +315,7 @@ void ModelDatabase::GetModels(
 std::string ModelDatabase::GetModelName(const std::string &_uri)
 {
   std::string result;
-  std::string xmlStr = ModelDatabase::GetManifest(_uri);
+  std::string xmlStr = ModelDatabase::GetModelConfig(_uri);
 
   if (!xmlStr.empty())
   {
@@ -274,15 +329,16 @@ std::string ModelDatabase::GetModelName(const std::string &_uri)
         if (nameElem)
           result = nameElem->GetText();
         else
-          gzerr << "No <name> element in manifest.xml for model["
-                << _uri << "]\n";
+          gzerr << "No <name> element in " << GZ_MODEL_MANIFEST_FILENAME
+                << " for model[" << _uri << "]\n";
       }
       else
-        gzerr << "No <model> element in manifest.xml for model["
-              << _uri << "]\n";
+        gzerr << "No <model> element in " << GZ_MODEL_MANIFEST_FILENAME
+              << " for model[" << _uri << "]\n";
     }
     else
-      gzerr << "Unable to parse manifest.xml for model[" << _uri << "]\n";
+      gzerr << "Unable to parse " << GZ_MODEL_MANIFEST_FILENAME
+            << " for model[" << _uri << "]\n";
   }
   else
     gzerr << "Unable to get model name[" << _uri << "]\n";
@@ -291,9 +347,14 @@ std::string ModelDatabase::GetModelName(const std::string &_uri)
 }
 
 /////////////////////////////////////////////////
-std::string ModelDatabase::GetModelPath(const std::string &_uri)
+std::string ModelDatabase::GetModelPath(const std::string &_uri,
+                                        bool _forceDownload)
 {
-  std::string path = SystemPaths::Instance()->FindFileURI(_uri);
+  std::string path, suffix;
+
+  if (!_forceDownload)
+    path = SystemPaths::Instance()->FindFileURI(_uri);
+
   struct stat st;
 
   if (path.empty() || stat(path.c_str(), &st) != 0 )
@@ -308,8 +369,25 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
     // std::cout << "Getting uri[" << _uri << "] path[" << path << "]\n";
 
     // Get the model name from the uri
-    int index = _uri.find_last_of("/");
-    std::string modelName = _uri.substr(index+1, _uri.size() - index - 1);
+    size_t startIndex = _uri.find_first_of("://");
+    if (startIndex == std::string::npos)
+    {
+      gzerr << "URI[" << _uri << "] is missing ://\n";
+      return std::string();
+    }
+
+    std::string modelName = _uri;
+    boost::replace_first(modelName, "model://", "");
+    boost::replace_first(modelName, ModelDatabase::GetURI(), "");
+
+    startIndex = modelName[0] == '/' ? 1 : 0;
+    size_t endIndex = modelName.find_first_of("/", startIndex);
+    size_t modelNameLen = endIndex == std::string::npos ? std::string::npos :
+      endIndex - startIndex;
+
+    modelName = modelName.substr(startIndex, modelNameLen);
+    if (endIndex != std::string::npos)
+      suffix = _uri.substr(endIndex, std::string::npos);
 
     // store zip file in temp location
     std::string filename = "/tmp/gz_model.tar.gz";
@@ -320,6 +398,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
       gzerr << "Unable to initialize libcurl\n";
       return std::string();
     }
+
     curl_easy_setopt(curl, CURLOPT_URL,
         (ModelDatabase::GetURI() + "/" +
          modelName + "/model.tar.gz").c_str());
@@ -396,16 +475,29 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
     }
   }
 
-  return path;
+  return path + suffix;
 }
 
 /////////////////////////////////////////////////
 void ModelDatabase::DownloadDependencies(const std::string &_path)
 {
-  std::string manifest = _path + "/manifest.xml";
+  boost::filesystem::path manifestPath = _path;
+
+  // First try to get the GZ_MODEL_MANIFEST_FILENAME. If that file doesn't
+  // exist, try to get the deprecated version.
+  if (boost::filesystem::exists(manifestPath / GZ_MODEL_MANIFEST_FILENAME))
+    manifestPath /= GZ_MODEL_MANIFEST_FILENAME;
+  else
+  {
+    gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
+      << "Please rename manifest.xml to " << GZ_MODEL_MANIFEST_FILENAME
+      << " for model " << _path << "\n";
+
+    manifestPath /= "manifest.xml";
+  }
 
   TiXmlDocument xmlDoc;
-  if (xmlDoc.LoadFile(manifest))
+  if (xmlDoc.LoadFile(manifestPath.string()))
   {
     TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
     if (!modelXML)
@@ -430,12 +522,12 @@ void ModelDatabase::DownloadDependencies(const std::string &_path)
       else
       {
         gzerr << "Model depend is missing <uri> in manifest["
-              << manifest << "]\n";
+              << manifestPath << "]\n";
       }
     }
   }
   else
-    gzerr << "Unable to load manifest file[" << manifest << "]\n";
+    gzerr << "Unable to load manifest file[" << manifestPath << "]\n";
 }
 
 /////////////////////////////////////////////////
@@ -446,33 +538,62 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
   // This will download the model if necessary
   std::string path = ModelDatabase::GetModelPath(_uri);
 
-  std::string manifest = path + "/manifest.xml";
+  boost::filesystem::path manifestPath = path;
+
+  // First try to get the GZ_MODEL_MANIFEST_FILENAME. If that file doesn't
+  // exist, try to get the deprecated version.
+  if (boost::filesystem::exists(manifestPath / GZ_MODEL_MANIFEST_FILENAME))
+    manifestPath /= GZ_MODEL_MANIFEST_FILENAME;
+  else
+  {
+    gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
+      << "Please rename manifest.xml to " << GZ_MODEL_MANIFEST_FILENAME
+      << " for model " << manifestPath << "\n";
+
+    manifestPath /= "manifest.xml";
+  }
 
   TiXmlDocument xmlDoc;
-  if (xmlDoc.LoadFile(manifest))
+  if (xmlDoc.LoadFile(manifestPath.string()))
   {
     TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
     if (modelXML)
     {
       TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");
+      TiXmlElement *sdfSearch = sdfXML;
+
+      // Find the SDF element that matches our current SDF version.
+      while (sdfSearch)
+      {
+        if (sdfSearch->Attribute("version") &&
+            std::string(sdfSearch->Attribute("version")) == SDF_VERSION)
+        {
+          sdfXML = sdfSearch;
+          break;
+        }
+
+        sdfSearch = sdfSearch->NextSiblingElement("sdf");
+      }
+
       if (sdfXML)
       {
         result = path + "/" + sdfXML->GetText();
       }
       else
       {
-        gzerr << "Manifest[" << manifest << "] doesn't have "
+        gzerr << "Manifest[" << manifestPath << "] doesn't have "
               << "<model><sdf>...</sdf></model> element.\n";
       }
     }
     else
     {
-      gzerr << "Manifest[" << manifest << "] doesn't have a <model> element\n";
+      gzerr << "Manifest[" << manifestPath
+            << "] doesn't have a <model> element\n";
     }
   }
   else
   {
-    gzerr << "Invalid model manifest file[" << manifest << "]\n";
+    gzerr << "Invalid model manifest file[" << manifestPath << "]\n";
   }
 
   return result;

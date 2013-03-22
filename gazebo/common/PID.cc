@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,8 +103,6 @@ void PID::Reset()
   this->iErr = 0.0;
   this->dErr = 0.0;
   this->cmd = 0.0;
-  this->cmdMax = 0.0;
-  this->cmdMin = 0.0;
 }
 
 /////////////////////////////////////////////////

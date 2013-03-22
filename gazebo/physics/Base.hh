@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -208,10 +208,13 @@ namespace gazebo
       /// \return The number of children.
       public: unsigned int GetChildCount() const;
 
+      /// \cond
+      /// This is an internal function.
       /// \brief Get a child or self by id.
       /// \param[in] _id ID of the object to retreive.
       /// \return A pointer to the object, NULL if not found
       public: BasePtr GetById(unsigned int _id) const;
+      /// \endcond
 
       /// \brief Get by name.
       /// \param[in] _name Get a child (or self) object by name
@@ -313,6 +316,8 @@ namespace gazebo
 
       /// \brief True if selected.
       private: bool selected;
+
+      protected: friend class Entity;
     };
     /// \}
   }

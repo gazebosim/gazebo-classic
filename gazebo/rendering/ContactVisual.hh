@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,10 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ContactVisual();
 
+      /// \brief Set to true to enable contact visualization.
+      /// \param[in] _enabled True to show contacts, false to hide.
+      public: void SetEnabled(bool _enabled);
+
       /// \brief Update the Visual
       private: void Update();
 
@@ -68,9 +72,8 @@ namespace gazebo
       /// \param[in] _msg The Contact message
       private: void OnContact(ConstContactsPtr &_msg);
 
-      /// \brief Create an instanced material to a given entity.
-      /// \param[in] _ent Pointer to the entity.
-      private: void SetupInstancedMaterialToEntity(Ogre::Entity *_ent);
+      /// \brief Create a new contact visualization point.
+      private: void CreateNewPoint();
 
       /// \brief Node for communication.
       private: transport::NodePtr node;
@@ -95,6 +98,18 @@ namespace gazebo
 
       /// \brief All the contact points.
       private: std::vector<ContactVisual::ContactPoint*> points;
+
+      /// \brief Mutex to protect the contact message.
+      private: boost::mutex mutex;
+
+      /// \brief True if we have received a message.
+      private: bool receivedMsg;
+
+      /// \brief True if this visualization is enabled.
+      private: bool enabled;
+
+      /// \brief Name of the topic contact information is published on
+      private: std::string topicName;
     };
     /// \}
   }

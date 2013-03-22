@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,9 @@ namespace gazebo
       /// \brief Reset the link.
       public: void Reset();
 
+      /// \brief Reset the link.
+      public: void ResetPhysicsStates();
+
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
@@ -95,7 +98,7 @@ namespace gazebo
 
       /// \brief Get the gravity mode.
       /// \return True if gravity is enabled.
-      public: virtual bool GetGravityMode() = 0;
+      public: virtual bool GetGravityMode() const = 0;
 
       /// \brief Set whether this body will collide with others in the
       /// model.
@@ -178,6 +181,39 @@ namespace gazebo
       /// \param[in] _torque Torque value to add.
       public: virtual void AddRelativeTorque(const math::Vector3 &_torque) = 0;
 
+      /// \brief Get the pose of the body's center of gravity in the world
+      ///        coordinate frame.
+      /// \return Pose of the body's center of gravity in the world coordinate
+      ///         frame.
+      public: math::Pose GetWorldCoGPose() const;
+
+      /// \brief Get the linear velocity of a point on the body in the world
+      ///        frame, using an offset expressed in a body-fixed frame. If
+      ///        no offset is given, the velocity at the origin of the Link
+      ///        frame will be returned.
+      /// \param[in] _offset Offset of the point from the origin of the Link
+      ///                    frame, expressed in the body-fixed frame.
+      /// \return Linear velocity of the point on the body
+      public: virtual math::Vector3 GetWorldLinearVel(
+          const math::Vector3 &_offset = math::Vector3(0, 0, 0)) const = 0;
+
+      /// \brief Get the linear velocity of a point on the body in the world
+      ///        frame, using an offset expressed in an arbitrary frame.
+      /// \param[in] _offset Offset from the origin of the link frame expressed
+      ///                    in a frame defined by _q.
+      /// \param[in] _q Describes the rotation of a reference frame relative to
+      ///               the world reference frame.
+      /// \return Linear velocity of the point on the body in the world frame.
+      public: virtual math::Vector3 GetWorldLinearVel(
+                  const math::Vector3 &_offset,
+                  const math::Quaternion &_q) const = 0;
+
+      /// \brief Get the linear velocity at the body's center of gravity in the
+      ///        world frame.
+      /// \return Linear velocity at the body's center of gravity in the world
+      ///         frame.
+      public: virtual math::Vector3 GetWorldCoGLinearVel() const = 0;
+
       /// \brief Get the linear velocity of the body.
       /// \return Linear velocity of the body.
       public: math::Vector3 GetRelativeLinearVel() const;
@@ -231,10 +267,13 @@ namespace gazebo
       /// \parma[in] _inertial Inertial value for the link.
       public: void SetInertial(const InertialPtr &_inertial);
 
+      /// \cond
+      /// This is an internal function
       /// \brief Get a collision by id.
       /// \param[in] _id Id of the collision object to find.
       /// \return Pointer to the collision, NULL if the id is invalid.
       public: CollisionPtr GetCollisionById(unsigned int _id) const;
+      /// \endcond
 
       /// \brief Get a child collision by name
       /// \param[in] _name Name of the collision object.
@@ -245,6 +284,10 @@ namespace gazebo
       /// \param[in] _index Index of the collision object.
       /// \return Pointer to the collision, NULL if the name was not found.
       public: CollisionPtr GetCollision(unsigned int _index) const;
+
+      /// \brief Get all the child collisions.
+      /// \return A std::vector of all the child collisions.
+      public: Collision_V GetCollisions() const;
 
       /// \brief Get the bounding box for the link and all the child
       /// elements.
@@ -310,9 +353,6 @@ namespace gazebo
       public: void DisconnectEnabled(event::ConnectionPtr &_conn)
               {enabledSignal.Disconnect(_conn);}
 
-      /// \brief DEPRECATED
-      public: void FillLinkMsg(msgs::Link &_msg) GAZEBO_DEPRECATED;
-
       /// \brief Fill a link message
       /// \param[out] _msg Message to fill
       public: void FillMsg(msgs::Link &_msg);
@@ -331,11 +371,19 @@ namespace gazebo
 
       /// \brief Remove Joints that have this Link as a parent Link.
       /// \param[in] _joint Joint that is a child of this link.
-      public: void RemoveChildJoint(JointPtr _joint);
+      public: void RemoveChildJoint(JointPtr _joint) GAZEBO_DEPRECATED;
 
       /// \brief Remove Joints that have this Link as a child Link
       /// \param[in] _joint Joint that is a parent of this link.
-      public: void RemoveParentJoint(JointPtr _joint);
+      public: void RemoveParentJoint(JointPtr _joint) GAZEBO_DEPRECATED;
+
+      /// \brief Remove Joints that have this Link as a child Link.
+      /// \param[in] _jointName Parent Joint name.
+      public: void RemoveParentJoint(const std::string &_jointName);
+
+      /// \brief Remove Joints that have this Link as a parent Link
+      /// \param[in] _jointName Child Joint name.
+      public: void RemoveChildJoint(const std::string &_jointName);
 
       /// \brief Attach a static model to this link
       /// \param[in] _model Pointer to a static model.
@@ -353,10 +401,6 @@ namespace gazebo
       /// \internal
       /// \brief Called when the pose is changed. Do not call this directly.
       public: virtual void OnPoseChange();
-
-      /// \brief Get the link state.
-      /// \return The state of this link.
-      public: LinkState GetState();
 
       /// \brief Set the current link state.
       /// \param[in] _state The state to set the link to.

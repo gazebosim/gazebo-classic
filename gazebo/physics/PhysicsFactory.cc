@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,12 +61,18 @@ PhysicsEnginePtr PhysicsFactory::NewPhysicsEngine(const std::string &_classname,
 {
   PhysicsEnginePtr result;
 
-  if (engines[_classname])
-  {
-    result = (engines[_classname]) (_world);
-  }
+  std::map<std::string, PhysicsFactoryFn>::iterator iter =
+    engines.find(_classname);
+  if (iter != engines.end())
+    result = (iter->second)(_world);
   else
     gzerr << "Invalid Physics Type[" << _classname << "]\n";
 
   return result;
+}
+
+//////////////////////////////////////////////////
+bool PhysicsFactory::IsRegistered(const std::string _name)
+{
+  return (engines.count(_name) > 0);
 }

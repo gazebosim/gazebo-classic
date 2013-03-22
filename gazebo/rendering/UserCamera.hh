@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _name Name of the camera.
       /// \param[in] _scene Scene to put the camera in.
-      public: UserCamera(const std::string &_name, Scene *_scene);
+      public: UserCamera(const std::string &_name, ScenePtr _scene);
 
       /// \brief Destructor
       public: virtual ~UserCamera();
@@ -98,6 +98,10 @@ namespace gazebo
       /// \param[in] _pos The initial pose of the camera.
       public: void SetViewController(const std::string &_type,
                                      const math::Vector3 &_pos);
+
+      /// \brief Get current view controller type.
+      /// \return Type of the current view controller: "orbit", "fps"
+      public: std::string GetViewControllerTypeString();
 
       /// \brief Resize the camera.
       /// \param[in] _w Width of the camera image.
@@ -167,6 +171,12 @@ namespace gazebo
       /// \param[in] _pt The focal point
       public: void SetFocalPoint(const math::Vector3 &_pt);
 
+      // Documentation inherited
+      public: virtual unsigned int GetImageWidth() const;
+
+      // Documentation inherited
+      public: virtual unsigned int GetImageHeight() const;
+
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.
@@ -181,6 +191,9 @@ namespace gazebo
       protected: virtual bool AttachToVisualImpl(VisualPtr _visual,
                      bool _inheritOrientation, double _minDist = 0,
                      double _maxDist = 0);
+
+      // Documentation inherited.
+      protected: virtual void AnimationComplete();
 
       /// \brief Set the camera to track a scene node.
       ///

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ namespace gazebo
       public: virtual ~BulletJoint();
 
       /// \brief Load a BulletJoint
-      public: void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Reset the joint
       public: virtual void Reset();
@@ -64,43 +64,71 @@ namespace gazebo
       /// \brief Set the anchor point
       public: virtual void SetAnchor(int /*index*/,
                                       const gazebo::math::Vector3 & /*anchor*/)
-              {gzerr << "Not implement in Bullet\n";}
+              {
+                gzerr << "Not implement in Bullet\n";
+              }
 
       /// \brief Set the joint damping
       public: virtual void SetDamping(int /*index*/,
                                       const double /*damping*/)
-              {gzerr << "Not implement in Bullet\n";}
+              {
+                gzerr << "Not implement in Bullet\n";
+              }
 
       /// \brief Get the anchor point
       public: virtual math::Vector3 GetAnchor(int /*_index*/) const
-              {gzerr << "Not implement in Bullet\n";
-               return math::Vector3();}
+              {
+                gzerr << "Not implement in Bullet\n";
+                return math::Vector3();
+              }
 
       /// \brief Get the force the joint applies to the first body
       /// \param index The index of the body(0 or 1)
       public: virtual math::Vector3 GetLinkForce(unsigned int /*_index*/) const
-              {gzerr << "Not implement in Bullet\n";
-               return math::Vector3();}
+              {
+                gzerr << "Not implement in Bullet\n";
+                return math::Vector3();
+              }
 
       /// \brief Get the torque the joint applies to the first body
       /// \param index The index of the body(0 or 1)
       public: virtual math::Vector3 GetLinkTorque(unsigned int /*_index*/) const
-              {gzerr << "Not implement in Bullet\n";
-               return math::Vector3();}
+              {
+                gzerr << "Not implement in Bullet\n";
+                return math::Vector3();
+              }
 
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute(Attribute, int /*_index*/,
                                         double /*_value*/)
-              {gzerr << "Not implement in Bullet\n";}
+              {
+                gzerr << "Not implement in Bullet\n";
+              }
 
       // Documentation inherited.
       public: virtual void SetAttribute(const std::string &/*_key*/,
                                         int /*_index*/,
                                         const boost::any &/*_value*/)
-              {gzerr << "Not implement in Bullet\n";}
+              {
+                gzerr << "Not implement in Bullet\n";
+              }
+
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &/*_key*/,
+                                                unsigned int /*_index*/)
+              {
+                gzerr << "Not implement in Bullet\n";
+                return 0;
+              }
 
       protected: btTypedConstraint *constraint;
-      protected: btDynamicsWorld *world;
+      protected: btDynamicsWorld *bulletWorld;
+
+      // Documentation inherited.
+      public: virtual JointWrench GetForceTorque(int _index);
+
+      // Documentation inherited.
+      public: virtual JointWrench GetForceTorque(unsigned int _index);
     };
     /// \}
   }
