@@ -57,4 +57,17 @@
       <description>Linear resolution of each ray.</description>
     </element>
   </element> <!-- End Range -->
+
+  <element name="noise" required="0">
+    <description>The properties of the noise model that should be applied to generated scans</description>
+    <element name="type" type="string" default="gaussian" required="1">
+      <description>The type of noise.  Currently supported types are: "gaussian" (draw noise values independently for each beam from a Gaussian distribution).</description>
+    </element>
+    <element name="mean" type="double" default="0.0" required="0">
+      <description>For type "gaussian," the mean of the Gaussian distribution from which noise values are drawn.</description>
+    </element>
+    <element name="stddev" type="double" default="0.0" required="0">
+      <description>For type "gaussian," the standard deviation of the Gaussian distribution from which noise values are drawn.</description>
+    </element>
+  </element> <!-- End Noise -->
 </element> <!-- End Ray -->
