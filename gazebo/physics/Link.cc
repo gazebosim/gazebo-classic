@@ -932,3 +932,12 @@ double Link::GetAngularDamping() const
 void Link::SetKinematic(const bool &/*_kinematic*/)
 {
 }
+
+/*/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldLinearVel(common::Time &_time,
+    const math::Vector3 &_offset)
+{
+  math::Vector3 vel = this->GetWorldLinearVel(_offset);
+  _time = this->world->GetSimTime();
+  return vel;
+}*/

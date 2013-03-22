@@ -128,14 +128,27 @@ void ImuSensor::SetReferencePose()
 //////////////////////////////////////////////////
 void ImuSensor::UpdateImpl(bool /*_force*/)
 {
-  double dt = (this->world->GetSimTime() - this->lastMeasurementTime).Double();
+//  common::Time timestamp = this->world->GetSimTime() ;
+//  double dt = (this->world->GetSimTime() - this->lastMeasurementTime).Double();
+//  double dt = (timestamp - this->lastMeasurementTime).Double();
+//  this->lastMeasurementTime = timestamp;
+//  this->lastMeasurementTime = this->world->GetSimTime();
 
-  this->lastMeasurementTime = this->world->GetSimTime();
+  common::Time timestamp;
+  // get linear velocity in world frame
+  math::Vector3 imuWorldLinearVel =
+    this->parentEntity->GetWorldLinearVel(timestamp, this->pose.pos);
+
+  double dt = (timestamp - this->lastMeasurementTime).Double();
+
+//  gzerr << " dt " << dt << std::endl;
+//  gzerr << velTimestamp << " vs " << this->lastMeasurementTime << std::endl;
 
   this->imuMsg.set_entity_name(this->parentName);
 
   // Set the time stamp
-  msgs::Set(this->imuMsg.mutable_stamp(), this->world->GetSimTime());
+//  msgs::Set(this->imuMsg.mutable_stamp(), this->world->GetSimTime());
+  msgs::Set(this->imuMsg.mutable_stamp(), timestamp);
 
   math::Pose parentEntityPose = this->parentEntity->GetWorldPose();
   math::Pose imuPose = this->pose + parentEntityPose;
@@ -150,20 +163,26 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
             this->parentEntity->GetWorldAngularVel()));
 
   // get linear velocity in world frame
-  math::Vector3 imuWorldLinearVel =
-    this->parentEntity->GetWorldLinearVel(this->pose.pos);
+  //math::Vector3 imuWorldLinearVel =
+//    this->parentEntity->GetWorldLinearVel(this->pose.pos);
 
   // Compute and set the IMU linear acceleration
   if (dt > 0.0)
   {
     this->linearAcc = imuPose.rot.GetInverse().RotateVector(
       (imuWorldLinearVel - this->lastLinearVel) / dt);
+
+    gzerr << "dt " << this->linearAcc << ", " <<  dt << ", "<<
+        imuWorldLinearVel << ", " << this->lastLinearVel << std::endl;
+
     this->lastLinearVel = imuWorldLinearVel;
+    this->lastMeasurementTime = timestamp;
+//    gzerr << "ve " << imuWorldLinearVel << std::endl;
   }
 
   // Add contribution from gravity
   this->gravity = this->world->GetPhysicsEngine()->GetGravity();
-  this->linearAcc += imuPose.rot.GetInverse().RotateVector(this->gravity);
+  this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
 
   msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
 

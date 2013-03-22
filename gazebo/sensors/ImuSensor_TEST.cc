@@ -123,7 +123,8 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   for ( int i = 0 ; i< 200; i++)
   {
     world->StepWorld(1);
-    gzerr << imuSensor->GetLinearAcceleration() << std::endl;
+//    imuSensor->GetLinearAcceleration();
+//    gzerr << imuSensor->GetLinearAcceleration() << std::endl;
   }
 
   EXPECT_LT(imuSensor->GetLinearAcceleration().z, 0);
@@ -184,7 +185,7 @@ void ImuSensor_TEST::AngularVelocityTest(const std::string &_physicsEngine)
   for ( int i = 0 ; i< 200; i++)
   {
     world->StepWorld(1);
-    gzerr << "imu ang vel " << imuSensor->GetAngularVelocity() << std::endl;
+//    gzerr << "imu ang vel " << imuSensor->GetAngularVelocity() << std::endl;
   }
 }
 /*

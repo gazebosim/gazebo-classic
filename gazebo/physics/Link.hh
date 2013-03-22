@@ -197,6 +197,16 @@ namespace gazebo
       public: virtual math::Vector3 GetWorldLinearVel(
           const math::Vector3 &_offset = math::Vector3(0, 0, 0)) const = 0;
 
+      /// \internal
+      /// \brief Get timestamped linear velocity of a point on the body in the
+      ///        world frame, using an offset expressed in a body-fixed frame.
+      ///        If no offset is given, the velocity at the origin of the Link
+      ///        frame will be returned.
+      /// \param[out] _time timestamp in simulation time
+      /// \return A math::Vector3 for the linear velocity.
+      public: virtual math::Vector3 GetWorldLinearVel(common::Time &_time,
+           const math::Vector3 &_offset = math::Vector3(0, 0, 0)) = 0;
+
       /// \brief Get the linear velocity of a point on the body in the world
       ///        frame, using an offset expressed in an arbitrary frame.
       /// \param[in] _offset Offset from the origin of the link frame expressed
