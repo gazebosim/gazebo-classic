@@ -51,7 +51,9 @@ ODEJoint::~ODEJoint()
 {
   delete this->feedback;
   this->Detach();
-  dJointDestroy(this->jointId);
+
+  if (this->jointId)
+    dJointDestroy(this->jointId);
 }
 
 //////////////////////////////////////////////////
@@ -135,7 +137,11 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
   if (this->provideFeedback)
   {
     this->feedback = new dJointFeedback;
-    dJointSetFeedback(this->jointId, this->feedback);
+
+    if (this->jointId)
+      dJointSetFeedback(this->jointId, this->feedback);
+    else
+      gzerr << "ODE Joint ID is invalid\n";
   }
 }
 
@@ -143,6 +149,11 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 LinkPtr ODEJoint::GetJointLink(int _index) const
 {
   LinkPtr result;
+  if (!this->jointId)
+  {
+    gzerr << "ODE Joint ID is invalid\n";
+    return result;
+  }
 
   if (_index == 0 || _index == 1)
   {
@@ -188,6 +199,8 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
   if (odechild == NULL && odeparent == NULL)
     gzthrow("ODEJoint requires at least one ODE link\n");
 
+  if (!this->jointId)
+    gzerr << "ODE Joint ID is invalid\n";
 
   if (!odechild && odeparent)
   {
@@ -212,7 +225,11 @@ void ODEJoint::Detach()
   Joint::Detach();
   this->childLink.reset();
   this->parentLink.reset();
-  dJointAttach(this->jointId, 0, 0);
+
+  if (this->jointId)
+    dJointAttach(this->jointId, 0, 0);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -252,7 +269,11 @@ double ODEJoint::GetCFM()
 //////////////////////////////////////////////////
 dJointFeedback *ODEJoint::GetFeedback()
 {
-  return dJointGetFeedback(this->jointId);
+  if (this->jointId)
+    return dJointGetFeedback(this->jointId);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+  return NULL;
 }
 
 //////////////////////////////////////////////////
@@ -312,6 +333,13 @@ math::Angle ODEJoint::GetLowStop(int _index)
 math::Vector3 ODEJoint::GetLinkForce(unsigned int _index) const
 {
   math::Vector3 result;
+
+  if (!this->jointId)
+  {
+    return result;
+    gzerr << "ODE Joint ID is invalid\n";
+  }
+
   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
 
   if (_index == 0)
@@ -328,6 +356,13 @@ math::Vector3 ODEJoint::GetLinkForce(unsigned int _index) const
 math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
 {
   math::Vector3 result;
+
+  if (!this->jointId)
+  {
+    return result;
+    gzerr << "ODE Joint ID is invalid\n";
+  }
+
   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
 
   if (_index == 0)
@@ -845,7 +880,11 @@ double ODEJoint::GetAttribute(const std::string &_key, unsigned int _index)
 //////////////////////////////////////////////////
 void ODEJoint::Reset()
 {
-  dJointReset(this->jointId);
+  if (this->jointId)
+    dJointReset(this->jointId);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
   Joint::Reset();
 }
 
@@ -1038,7 +1077,10 @@ void ODEJoint::SetDamping(int /*_index*/, double _damping)
       this->cfmDampingState[i] = ODEJoint::NONE;
   }
 
-  if (!this->dampingInitialized)
+  bool parentStatic = this->GetParent() ? this->GetParent()->IsStatic() : false;
+  bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
+
+  if (!this->dampingInitialized && !parentStatic && !childStatic)
   {
     if (this->useCFMDamping)
       this->applyDamping = physics::Joint::ConnectJointUpdate(
