@@ -62,8 +62,8 @@ void Gripper::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr grasp_check = _sdf->GetElement("grasp_check");
   this->min_contact_count = grasp_check->Get<unsigned int>("min_contact_count");
-  this->attach_steps = grasp_check->Get<int>("attach_steps");
-  this->detach_steps = grasp_check->Get<int>("detach_steps");
+  this->attachSteps = grasp_check->Get<int>("attach_steps");
+  this->detachSteps = grasp_check->Get<int>("detach_steps");
 
   sdf::ElementPtr palmLinkElem = _sdf->GetElement("palm_link");
   this->palmLink = this->model->GetLink(palmLinkElem->Get<std::string>());
