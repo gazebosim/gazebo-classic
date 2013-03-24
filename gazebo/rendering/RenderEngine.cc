@@ -18,10 +18,14 @@
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
+ 
+#include <QtCore/qglobal.h>
 
+#ifndef Q_OS_MAC
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <GL/glx.h>
+#endif
 
 #include <sys/types.h>
 #include <dirent.h>
@@ -313,6 +317,7 @@ void RenderEngine::Fini()
   delete this->logManager;
   this->logManager = NULL;
 
+#ifndef Q_OS_MAC
   if (this->dummyDisplay)
   {
     glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
@@ -322,6 +327,7 @@ void RenderEngine::Fini()
     XCloseDisplay(static_cast<Display*>(this->dummyDisplay));
     this->dummyDisplay = NULL;
   }
+#endif
 
   this->initialized = false;
 }
@@ -608,6 +614,9 @@ bool RenderEngine::CreateContext()
 {
   bool result = true;
 
+#ifdef Q_OS_MAC
+  this->dummyDisplay = 0;
+#else
   try
   {
     this->dummyDisplay = XOpenDisplay(0);
@@ -654,7 +663,7 @@ bool RenderEngine::CreateContext()
   {
     result = false;
   }
-
+#endif
 
   return result;
 }

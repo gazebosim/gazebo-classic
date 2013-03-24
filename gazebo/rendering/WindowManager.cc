@@ -80,18 +80,20 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
 
+#ifdef Q_OS_MAC
+  params["externalWindowHandle"] = _ogreHandle;
+#else
   params["parentWindowHandle"] = _ogreHandle;
+#endif
   params["externalGLControl"] = true;
   params["FSAA"] = "4";
 
-#ifdef __APPLE__
   // Set the macAPI for Ogre based on the Qt implementation
-  #ifdef QT_MAC_USE_COCOA
-    params["macAPI"] = "cocoa";
-    params["macAPICocoaUseNSView"] = "true";
-  #else
-    params["macAPI"] = "carbon";
-  #endif
+#ifdef QT_MAC_USE_COCOA
+  params["macAPI"] = "cocoa";
+  params["macAPICocoaUseNSView"] = "true";
+#else
+  params["macAPI"] = "carbon";
 #endif
 
   std::ostringstream stream;

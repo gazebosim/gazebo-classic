@@ -16,20 +16,6 @@ link_directories(
   ${PROJECT_BINARY_DIR}/test
 )
 
-# TODO Properly search for X11 include
-if(APPLE)
-  include_directories(
-    /opt/X11/include
-  )
-endif()
-
-# TODO Properly search for X11 lib
-if(APPLE)
-  link_directories(
-    /opt/X11/lib
-  )
-endif()
-
 if(HAVE_URDFDOM_HEADERS)
   link_directories(
     ${urdfdom_LIBRARY_DIRS}
