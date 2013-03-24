@@ -16,18 +16,6 @@ link_directories(
   ${PROJECT_BINARY_DIR}/test
 )
 
-# TODO Only enable this with OSX
-# TODO Properly search for X11 include
-include_directories(
-  /opt/X11/include
-)
-
-# TODO Only enable this with OSX
-# TODO Properly search for X11 lib
-link_directories(
-  /opt/X11/lib
-)
-
 if(HAVE_URDFDOM_HEADERS)
   link_directories(
     ${urdfdom_LIBRARY_DIRS}

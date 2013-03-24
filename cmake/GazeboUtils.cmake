@@ -104,10 +104,6 @@ endmacro ()
 macro (gz_add_executable _name)
   add_executable(${_name} ${ARGN})
   target_link_libraries (${_name} ${general_libraries})
-
-if (APPLE)
-  set_property(TARGET ${_name} PROPERTY MACOSX_BUNDLE TRUE)
-endif()
 endmacro ()
 
 
@@ -139,6 +135,8 @@ endmacro()
 #################################################
 macro (gz_setup_apple)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
+
+  FIND_LIBRARY(Cocoa_LIBRARIES Cocoa)
 endmacro()
 
 # This should be migrated to more fine control solution based on set_property APPEND
