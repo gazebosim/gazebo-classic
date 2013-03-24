@@ -11,13 +11,6 @@ include_directories(
   ${PROTOBUF_INCLUDE_DIR}
 )
 
-# TODO Properly search for X11 lib
-if (APPLE)
-  link_directories(
-    /opt/X11/lib
-  )
-endif()
-
 add_subdirectory(test)
 
 add_executable(gzsdf gzsdf.cc)

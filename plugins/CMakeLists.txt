@@ -15,13 +15,6 @@ if(HAVE_CONSOLE_BRIDGE)
     ${console_bridge_LIBRARY_DIRS})
 endif(HAVE_CONSOLE_BRIDGE)
 
-# TODO Properly search for X11 lib
-if (APPLE)
-  link_directories(
-    /opt/X11/lib
-  )
-endif()
-
 set (plugins
   CameraPlugin
   DepthCameraPlugin

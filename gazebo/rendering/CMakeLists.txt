@@ -116,9 +116,7 @@ target_link_libraries( gazebo_rendering
   ${CEGUI_LIBRARIES}
 )
 
-if (APPLE)
-#  target_link_libraries(gazebo_rendering ${Cocoa_LIBRARIES})
-else()
+if (NOT APPLE)
   target_link_libraries(gazebo_rendering X11)
 endif()
 
