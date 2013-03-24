@@ -19,13 +19,14 @@
  * Date: 15 May 2009
  */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "physics/Model.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/World.hh"
 
-#include "physics/simbody/simbody_inc.h"
-#include "physics/simbody/SimbodyLink.hh"
-#include "physics/simbody/SimbodyJoint.hh"
+#include "gazebo/physics/simbody/simbody_inc.h"
+#include "gazebo/physics/simbody/SimbodyLink.hh"
+#include "gazebo/physics/simbody/SimbodyJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -46,6 +47,10 @@ SimbodyJoint::~SimbodyJoint()
 //////////////////////////////////////////////////
 void SimbodyJoint::Load(sdf::ElementPtr _sdf)
 {
+  // store a pointer to the simbody physics engine for convenience
+  this->simbodyPhysics = boost::shared_dynamic_cast<SimbodyPhysics>(
+    this->model->GetWorld()->GetPhysicsEngine());
+
   Joint::Load(_sdf);
 
   // read must_be_loop_joint

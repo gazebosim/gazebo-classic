@@ -81,6 +81,8 @@ bool ContactProcessed()
 //////////////////////////////////////////////////
 SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
     : PhysicsEngine(_world), system(), matter(system), forces(system),
+      gravity(forces, matter, -SimTK::ZAxis, 0),
+      discreteForces(forces, matter),
       tracker(system), contact(system, tracker),  integ(NULL)
 {
   // Instantiate the Multibody System
@@ -88,12 +90,12 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
   // Instantiate the Simbody General Force Subsystem
 
   // Create an integrator
-  //this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
+  // this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
+  this->integ = new SimTK::RungeKutta3Integrator(system);
+  // this->integ = new SimTK::RungeKutta2Integrator(system);
   // this->integ = new SimTK::ExplicitEulerIntegrator(system);
-  // this->integ = new SimTK::RungeKutta3Integrator(system);
-  this->integ = new SimTK::RungeKutta2Integrator(system);
   /// \TODO:  make sdf parameter
-  this->integ->setAccuracy(0.1);
+  this->integ->setAccuracy(0.01);
 }
 
 //////////////////////////////////////////////////
@@ -108,7 +110,13 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr simbodyElem = this->sdf->GetElement("simbody");
 
-  this->stepTimeDouble = simbodyElem->GetElement("dt")->GetValueDouble();
+  this->stepTimeDouble = this->GetStepTime();
+}
+
+//////////////////////////////////////////////////
+void SimbodyPhysics::Reset()
+{
+  this->integ->initialize(this->system.getDefaultState());
 }
 
 //////////////////////////////////////////////////
@@ -139,7 +147,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
       MultibodyGraphMaker mbgraph;
       this->CreateMultibodyGraph(mbgraph, _model);
       // Optional: dump the graph to stdout for debugging or curiosity.
-      mbgraph.dumpGraph(gzdbg);
+      // mbgraph.dumpGraph(gzdbg);
 
       SimbodyPhysics::AddDynamicModelToSimbodySystem(mbgraph, _model);
     }
@@ -151,6 +159,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   SimTK::State state = this->system.realizeTopology();
 
   this->integ->initialize(state);
+  gzerr << "system state realized\n";
 }
 
 //////////////////////////////////////////////////
@@ -176,7 +185,7 @@ void SimbodyPhysics::UpdatePhysics()
     this->integ->stepTo(this->world->GetSimTime().Double(),
                        this->world->GetSimTime().Double());
 
-  const SimTK::State &s = integ->getState();
+  const SimTK::State &s = this->integ->getState();
 
 /* debug
   gzerr << "time [" << s.getTime()
@@ -207,6 +216,8 @@ void SimbodyPhysics::UpdatePhysics()
         boost::shared_static_cast<Entity>(*lx).get());
     }
   }
+
+  this->discreteForces.clearAllForces(this->integ->updAdvancedState());
 }
 
 //////////////////////////////////////////////////
@@ -418,14 +429,17 @@ void SimbodyPhysics::CreateMultibodyGraph(
 // would not be needed in Gazebo since it does its own visualization.
 void SimbodyPhysics::InitSimbodySystem()
 {
-  math::Vector3 gravity = this->GetGravity();
-  const SimTK::Vec3 g(gravity.x, gravity.y, gravity.z);
+  math::Vector3 gzGravity = this->GetGravity();
+  const SimTK::Vec3 g(gzGravity.x, gzGravity.y, gzGravity.z);
 
   // Set stiction max slip velocity to make it less stiff.
-  this->contact.setTransitionVelocity(0.1);
+  this->contact.setTransitionVelocity(0.01);
 
   // Specify gravity (read in above from world).
-  SimTK::Force::UniformGravity(this->forces, this->matter, g);
+  if (!math::equal(g.norm(), 0.0))
+    this->gravity.setDefaultGravityVector(g);
+  else
+    this->gravity.setDefaultMagnitude(0.0);
 }
 
 void SimbodyPhysics::AddStaticModelToSimbodySystem(const physics::Model* _model)
@@ -555,6 +569,12 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
                 direction);
             mobod = pinJoint;
 
+            double low = gzJoint->GetLowerLimit(0u).Radian();
+            double high = gzJoint->GetUpperLimit(0u).Radian();
+            gzJoint->limitForce.reset(
+              new Force::MobilityLinearStop(this->forces, mobod,
+              SimTK::MobilizerQIndex(0), 1.0e8, 10.0, low, high));
+
             #ifdef ADD_JOINT_SPRINGS
             // KLUDGE add spring (stiffness proportional to mass)
             Force::MobilityLinearSpring(this->forces,mobod,0,
@@ -653,9 +673,6 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
 std::string SimbodyPhysics::GetTypeString(physics::Base::EntityType _type)
 {
-  if (!(_type & physics::Base::JOINT))
-    gzerr << "Not a joint type\n";
-
 /*
   switch (_type)
   {
@@ -713,11 +730,20 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
 {
   // TODO: Edit physics::Surface class to support these properties
   // Define a material to use for contact. This is not very stiff.
+  // use stiffness of 1e8 and dissipation of 1000.0 to approximate inelastic
+  // collision. but 1e6 and 10 seems sufficient when TransitionVelocity is
+  // reduced from 0.1 to 0.01
   SimTK::ContactMaterial material(1e6,   // stiffness
-                                  0.1,  // dissipation
-                                  0.7,   // mu_static
-                                  0.5,   // mu_dynamic
+                                  10.0,  // dissipation
+                                  1.0,   // mu_static
+                                  1.0,   // mu_dynamic
                                   0.5);  // mu_viscous
+  // works for SpawnDrop
+  // SimTK::ContactMaterial material(1e6,   // stiffness
+  //                                 10.0,  // dissipation
+  //                                 0.7,   // mu_static
+  //                                 0.5,   // mu_dynamic
+  //                                 0.5);  // mu_viscous
 
   bool addModelClique = _modelClique.isValid() && !_link->GetSelfCollide();
 
@@ -776,9 +802,17 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
           boost::shared_dynamic_cast<physics::CylinderShape>((*ci)->GetShape());
         double r = c->GetRadius();
         double len = c->GetLength();
-        Vec3 esz = Vec3(r,r,len/2); // Use ellipsoid instead
-        ContactSurface surface(ContactGeometry::Ellipsoid(esz),
-                               material);
+
+        const int resolution = 1; // chunky hexagonal shape
+        const PolygonalMesh mesh = PolygonalMesh::
+            createCylinderMesh(ZAxis,r,len/2,resolution);
+        const ContactGeometry::TriangleMesh triMesh(mesh);
+        ContactSurface surface(triMesh, material,1 /*Thickness*/);
+
+        // Vec3 esz = Vec3(r,r,len/2); // Use ellipsoid instead
+        // ContactSurface surface(ContactGeometry::Ellipsoid(esz),
+        //                        material);
+
         if (addModelClique)
             surface.joinClique(_modelClique);
         _mobod.updBody().addContactSurface(X_LC, surface);
@@ -788,9 +822,19 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
       case physics::Entity::BOX_SHAPE:
       {
         Vec3 hsz = SimbodyPhysics::Vector3ToVec3(
-          (boost::shared_dynamic_cast<physics::BoxShape>((*ci)->GetShape()))->GetSize())/2;
-        ContactSurface surface(ContactGeometry::Ellipsoid(hsz),
-                               material);
+          (boost::shared_dynamic_cast<physics::BoxShape>(
+          (*ci)->GetShape()))->GetSize())/2;
+
+        // const int resolution = 1;  // number times to chop the longest side.
+        const int resolution = 2 * (int)(max(hsz)/min(hsz) + 0.5);
+        const PolygonalMesh mesh = PolygonalMesh::
+            createBrickMesh(hsz, resolution);
+        const ContactGeometry::TriangleMesh triMesh(mesh);
+        ContactSurface surface(triMesh, material,1 /*Thickness*/);
+
+        // ContactSurface surface(ContactGeometry::Ellipsoid(hsz),
+        //                        material);
+
         if (addModelClique)
             surface.joinClique(_modelClique);
         _mobod.updBody().addContactSurface(X_LC, surface);

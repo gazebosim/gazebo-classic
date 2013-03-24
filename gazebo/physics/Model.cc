@@ -192,12 +192,6 @@ void Model::Init()
        iter != this->joints.end(); ++iter)
   {
     (*iter)->Init();
-    // The following message used to be filled and sent in Model::LoadJoint
-    // It is moved here, after Joint::Init, so that the joint properties
-    // can be included in the message.
-    msgs::Joint msg;
-    (*iter)->FillMsg(msg);
-    this->jointPub->Publish(msg);
   }
 
   for (std::vector<Gripper*>::iterator iter = this->grippers.begin();
@@ -212,6 +206,18 @@ void Model::Init()
       this->GetWorld()->GetPhysicsEngine());
   if (simbodyPhysics)
     simbodyPhysics->InitModel(this);
+
+  // Initialize the joints messages for visualizer
+  for (Joint_V::iterator iter = this->joints.begin();
+       iter != this->joints.end(); ++iter)
+  {
+    // The following message used to be filled and sent in Model::LoadJoint
+    // It is moved here, after Joint::Init, so that the joint properties
+    // can be included in the message.
+    msgs::Joint msg;
+    (*iter)->FillMsg(msg);
+    this->jointPub->Publish(msg);
+  }
 }
 
 

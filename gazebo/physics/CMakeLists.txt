@@ -44,7 +44,7 @@ set (sources
   TrimeshShape.cc
   World.cc
   WorldState.cc
-) 
+)
 
 set (headers
   Actor.hh
@@ -89,6 +89,12 @@ set (headers
   World.hh
   WorldState.hh)
 
+set (gtest_sources
+  Joint_TEST.cc
+  PhysicsEngine_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+
 set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(physics_headers
@@ -100,12 +106,12 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.hh.in
 gz_add_library(gazebo_physics ${sources})
 
 target_link_libraries(gazebo_physics
-  gazebo_common 
-  gazebo_util 
+  gazebo_common
+  gazebo_util
   gazebo_sdf_interface
   gazebo_physics_ode
-  ${TBB_LIBRARIES} 
-  ${libtool_library} 
+  ${TBB_LIBRARIES}
+  ${libtool_library}
   ${Boost_LIBRARIES}
 )
 
@@ -120,7 +126,7 @@ endif()
 gz_add_executable(gzphysics server.cc)
 target_link_libraries(gzphysics
   gazebo_common
-  gazebo_util 
+  gazebo_util
   gazebo_transport
   gazebo_physics
   gazebo_sensors

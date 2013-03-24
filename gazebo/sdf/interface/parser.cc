@@ -651,6 +651,13 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
                 elemXml->FirstChildElement("pose")->GetText());
         }
 
+        if (elemXml->FirstChildElement("static"))
+        {
+          includeSDF->root->GetElement("model")->GetElement(
+              "static")->GetValue()->SetFromString(
+                elemXml->FirstChildElement("static")->GetText());
+        }
+
         for (TiXmlElement *childElemXml = elemXml->FirstChildElement();
              childElemXml; childElemXml = childElemXml->NextSiblingElement())
         {

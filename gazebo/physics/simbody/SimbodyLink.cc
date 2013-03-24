@@ -152,23 +152,41 @@ void SimbodyLink::SetLinearVel(const math::Vector3 & /*_vel*/)
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldLinearVel(
-  const math::Vector3& /*_vector3*/) const
+  const math::Vector3& _offset) const
 {
-  return math::Vector3();
+  SimTK::Vec3 station = SimbodyPhysics::Vector3ToVec3(_offset);
+  SimTK::Vec3 v = 
+    this->masterMobod.findStationVelocityInGround(
+    this->simbodyPhysics->integ->getState(), station);
+  return SimbodyPhysics::Vec3ToVector3(v);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldLinearVel(
-  const math::Vector3 &/*_offset*/,
-  const math::Quaternion &/*_q*/) const
+  const math::Vector3 &_offset,
+  const math::Quaternion &_q) const
 {
-  return math::Vector3();
+  SimTK::Rotation R_WF(SimbodyPhysics::QuadToQuad(_q));
+  SimTK::Vec3 p_F(SimbodyPhysics::Vector3ToVec3(_offset));
+  SimTK::Vec3 p_W(R_WF * p_F);
+  const SimTK::Rotation &R_WL = this->masterMobod.getBodyRotation(
+    this->simbodyPhysics->integ->getState());
+  SimTK::Vec3 p_B(~R_WL * p_W);
+  SimTK::Vec3 v = 
+    this->masterMobod.findStationVelocityInGround(
+    this->simbodyPhysics->integ->getState(), p_B);
+  return SimbodyPhysics::Vec3ToVector3(v);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
 {
-  return math::Vector3();
+  SimTK::Vec3 station = this->masterMobod.getBodyMassCenterStation(
+     this->simbodyPhysics->integ->getState());
+  SimTK::Vec3 v = 
+    this->masterMobod.findStationVelocityInGround(
+    this->simbodyPhysics->integ->getState(), station);
+  return SimbodyPhysics::Vec3ToVector3(v);
 }
 
 //////////////////////////////////////////////////
@@ -179,12 +197,21 @@ void SimbodyLink::SetAngularVel(const math::Vector3 &/*_vel*/)
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldAngularVel() const
 {
-  return math::Vector3();
+  SimTK::Vec3 w = 
+    this->masterMobod.getBodyAngularVelocity(
+    this->simbodyPhysics->integ->getState());
+  return SimbodyPhysics::Vec3ToVector3(w);
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetForce(const math::Vector3 &/*_force*/)
+void SimbodyLink::SetForce(const math::Vector3 &_force)
 {
+  gzerr << "setting force " << _force << "\n";
+  SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force));
+
+  this->simbodyPhysics->discreteForces.setOneBodyForce(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    this->masterMobod, SimTK::SpatialVec(SimTK::Vec3(0), f));
 }
 
 //////////////////////////////////////////////////

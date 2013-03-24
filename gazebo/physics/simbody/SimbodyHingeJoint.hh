@@ -60,9 +60,6 @@ namespace gazebo
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int _index, double _damping);
 
-      /// \brief Get the angle of rotation
-      public: virtual math::Angle GetAngle(int _index) const;
-
        /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int _index, double _angle);
 

@@ -148,6 +148,7 @@ namespace gazebo
       /// \copydoc Link::SetAutoDisable(bool)
       public: virtual void SetAutoDisable(bool _disable);
 
+      /// \brief keep a pointer to the simbody physics engine for convenience
       private: SimbodyPhysicsPtr simbodyPhysics;
 
       /// \brief: Force this link to be a base body, where its inboard

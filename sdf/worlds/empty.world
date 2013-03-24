@@ -1,7 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.3">
   <world name="default">
-
     <physics type="simbody">
       <gravity>0 0 -9.8</gravity>
       <ode>
@@ -13,66 +12,14 @@
         <dt>0.001</dt>
       </simbody>
     </physics>
-
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
     </include>
 
-    <!-- A pendulum -->
-
-    <model name="model1">
-      <pose>0 0 2 0.0 0 0</pose>
-      <link name="link1">
-        <pose>0 0 0 0.0 0.0 0</pose>
-        <inertial>
-          <pose>0 -1 0 0 0 0</pose>
-          <inertia>
-            <ixx>1.0</ixx>
-            <ixy>0.0</ixy>
-            <ixz>0.0</ixz>
-            <iyy>1.0</iyy>
-            <iyz>0.0</iyz>
-            <izz>1.0</izz>
-          </inertia>
-          <mass>1.0</mass>
-        </inertial>
-        <collision name="collision">
-          <pose>0 -1 0 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.1</radius>
-            </sphere>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <pose>0 -1 0 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.1</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
-        </visual>
-      </link>
-      <joint name="joint1" type="revolute">
-        <parent>world</parent>
-        <child>link1</child>
-        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
-        <axis>
-          <xyz>1.0 0.0 0.0</xyz>
-          <limit>
-            <lower>1000</lower>
-            <upper>-1000</upper>
-            <effort>0</effort>
-            <velocity>1000</velocity>
-          </limit>
-        </axis>
-      </joint>
-      <static>0</static>
-    </model>
-
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
   </world>
 </sdf>

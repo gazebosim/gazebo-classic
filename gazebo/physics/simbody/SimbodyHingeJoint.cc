@@ -29,7 +29,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyHingeJoint::SimbodyHingeJoint(SimTK::MultibodySystem *_world,
+SimbodyHingeJoint::SimbodyHingeJoint(SimTK::MultibodySystem * /*_world*/,
                                      BasePtr _parent)
     : HingeJoint<SimbodyJoint>(_parent)
 {
@@ -76,23 +76,21 @@ void SimbodyHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHingeJoint::GetAngle(int /*_index*/) const
-{
-  gzerr << "Not implemented...\n";
-  return math::Angle();
-}
-
-//////////////////////////////////////////////////
 void SimbodyHingeJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 {
   gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
-double SimbodyHingeJoint::GetVelocity(int /*_index*/) const
+double SimbodyHingeJoint::GetVelocity(int _index) const
 {
-  gzerr << "Not implemented...\n";
-  return 0;
+  if (_index < this->GetAngleCount())
+    return this->mobod.getOneU(
+      this->simbodyPhysics->integ->getState(),
+      SimTK::MobilizerUIndex(_index));
+  else
+    gzerr << "Invalid index for joint, returning NaN\n";
+  return SimTK::NaN;
 }
 
 //////////////////////////////////////////////////
@@ -109,9 +107,14 @@ double SimbodyHingeJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetForce(int /*_index*/, double _torque)
+void SimbodyHingeJoint::SetForce(int _index, double _torque)
 {
-  gzerr << "Not implemented...\n";
+  gzerr << "Setting Joint Force " << _torque << "\n";
+
+  if (_index < this->GetAngleCount())
+    this->simbodyPhysics->discreteForces.setOneMobilityForce(
+      this->simbodyPhysics->integ->updAdvancedState(),
+      this->mobod, SimTK::MobilizerUIndex(_index), _torque);
 }
 
 //////////////////////////////////////////////////
@@ -125,14 +128,14 @@ double SimbodyHingeJoint::GetForce(int /*_index*/)
 void SimbodyHingeJoint::SetHighStop(int /*_index*/,
                                    const math::Angle &/*_angle*/)
 {
-  gzerr << "Not implemented...\n";
+  gzerr << "SetHighStop\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetLowStop(int /*_index*/,
                                   const math::Angle &/*_angle*/)
 {
-  gzerr << "Not implemented...\n";
+  gzerr << "SetLowStop\n";
 }
 
 //////////////////////////////////////////////////
@@ -152,15 +155,37 @@ math::Angle SimbodyHingeJoint::GetLowStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHingeJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 SimbodyHingeJoint::GetGlobalAxis(int _index) const
 {
-  gzerr << "SimbodyHingeJoint::GetGlobalAxis not implemented\n";
-  return math::Vector3();
+  if (_index < static_cast<int>(this->GetAngleCount()))
+  {
+    const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
+      this->simbodyPhysics->integ->getState());
+
+    // express Z-axis of X_OM in world frame
+    SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
+      this->simbodyPhysics->integ->getState(), X_OM.z()));
+
+    return SimbodyPhysics::Vec3ToVector3(z_W);
+  }
+  else
+  {
+    gzerr << "index out of bound\n";
+    return math::Vector3();
+  }
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHingeJoint::GetAngleImpl(int /*_index*/) const
+math::Angle SimbodyHingeJoint::GetAngleImpl(int _index) const
 {
-  gzerr << "SimbodyHingeJoint::GetAngleImpl not implemented\n";
-  return math::Angle();
+  if (_index < static_cast<int>(this->GetAngleCount()))
+  {
+    return math::Angle(this->mobod.getOneQ(
+      this->simbodyPhysics->integ->getState(), _index));
+  }
+  else
+  {
+    gzerr << "index out of bound\n";
+    return math::Angle();
+  }
 }

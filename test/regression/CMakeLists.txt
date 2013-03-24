@@ -26,10 +26,12 @@ endif()
 
 set(tests
   bandwidth.cc
+  contact_sensor.cc
   factory.cc
   file_handling.cc
   laser.cc
   physics.cc
+  physics_spawn_drop.cc
   pioneer2dx.cc
   transport.cc
   server_fixture.cc
