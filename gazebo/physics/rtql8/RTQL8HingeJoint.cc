@@ -27,6 +27,7 @@
 
 #include "rtql8/kinematics/Dof.h"
 #include "rtql8/kinematics/TrfmRotateEuler.h"
+#include "rtql8/kinematics/TrfmRotateAxis.h"
 
 using namespace gazebo;
 using namespace physics;
@@ -57,8 +58,8 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
 
     rtql8::kinematics::Dof* dofHinge = new rtql8::kinematics::Dof(0);
 
-    rtql8::kinematics::TrfmRotateAxis1* rotHinge
-        = new rtql8::kinematics::TrfmRotateAxis1(axisHinge, dofHinge);
+    rtql8::kinematics::TrfmRotateAxis* rotHinge
+        = new rtql8::kinematics::TrfmRotateAxis(axisHinge, dofHinge);
 
     this->rtql8Joint->addTransform(rotHinge);
 
