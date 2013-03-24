@@ -57,7 +57,11 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
   math::Vector3 axis(1, 0, 0);
   double upper = M_PI;
   double lower = -M_PI;
-  for (unsigned int i = 0; i < 100000; ++i)
+
+  double residentLast, shareLast;
+  double residentCur, shareCur;
+
+  for (unsigned int i = 0; i < 100; ++i)
   {
     // try creating a joint
     {
@@ -99,6 +103,19 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
       }
       world->SetPaused(paused);
     }
+    this->GetMemInfo(residentCur, shareCur);
+    if (i > 1)  // give it 2 cycles to stabilize
+    {
+      EXPECT_EQ(residentCur, residentLast);
+      EXPECT_EQ(shareCur, shareLast);
+    }
+    // gzdbg << "memory res[" << residentCur
+    //       << "] shr[" << shareCur
+    //       << "] res[" << residentLast
+    //       << "] shr[" << shareLast
+    //       << "]\n";
+    residentLast = residentCur;
+    shareLast = shareCur;
   }
 }
 

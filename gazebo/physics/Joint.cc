@@ -232,34 +232,15 @@ void Joint::Init()
   }
   else
   {
+    // if parentLink is NULL, it's name be the world
+    this->sdf->GetElement("parent")->Set("world");
     if (this->sdf->HasElement("axis"))
     {
       this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-      if (this->sdf->GetElement("parent")->GetValueString("link_name")
-          != "world")
-      {
-        gzwarn << "joint [" << this->GetScopedName()
-          << "] has a non-real parentLink ["
-          << this->sdf->GetElement("parent")->GetValueString("link_name")
-          << "], loading axis from SDF ["
-          << this->sdf->GetElement("axis")->GetValueVector3("xyz")
-          << "]\n";
-      }
     }
     if (this->sdf->HasElement("axis2"))
     {
       this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
-
-      if (this->sdf->GetElement("parent")->GetValueString("link_name")
-          != "world")
-      {
-        gzwarn << "joint [" << this->GetScopedName()
-          << "] has a non-real parentLink ["
-          << this->sdf->GetElement("parent")->GetValueString("link_name")
-          << "], loading axis2 from SDF ["
-          << this->sdf->GetElement("axis2")->GetValueVector3("xyz")
-          << "]\n";
-      }
     }
   }
   // \TODO: this requres Joint::GetGlobalAxis, which breaks Simbody's
