@@ -448,11 +448,11 @@ void World::Step()
 
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
 
+  double updatePeriod = this->physicsEngine->GetUpdatePeriod();
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
   common::Time sleepTime = this->prevStepWallTime +
-    common::Time(this->physicsEngine->GetUpdatePeriod()) -
-    tmpTime - this->sleepOffset;
+    common::Time(updatePeriod) - tmpTime - this->sleepOffset;
 
   common::Time actualSleep = 0;
   if (sleepTime > 0)
@@ -463,7 +463,6 @@ void World::Step()
   else
     sleepTime = 0;
 
-
   // exponentially avg out
   this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
                       this->sleepOffset * 0.99;
@@ -473,7 +472,7 @@ void World::Step()
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
   if (common::Time::GetWallTime() - this->prevStepWallTime + this->sleepOffset
-         >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+         >= common::Time(updatePeriod))
   {
     boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
 
@@ -481,10 +480,11 @@ void World::Step()
 
     this->prevStepWallTime = common::Time::GetWallTime();
 
+    double stepTime = this->physicsEngine->GetMaxStepSize();
     if (!this->IsPaused() || this->stepInc > 0)
     {
       // query timestep to allow dynamic time step size updates
-      this->simTime += this->physicsEngine->GetStepTime();
+      this->simTime += stepTime;
       this->iterations++;
       this->Update();
 
@@ -494,7 +494,7 @@ void World::Step()
         this->stepInc--;
     }
     else
-      this->pauseTime += this->physicsEngine->GetStepTime();
+      this->pauseTime += stepTime;
   }
 
   this->ProcessMessages();
@@ -1394,8 +1394,7 @@ void World::ProcessRequestMsgs()
 void World::ProcessModelMsgs()
 {
   std::list<msgs::Model>::iterator iter;
-  for (iter = this->modelMsgs.begin();
-       iter != this->modelMsgs.end(); ++iter)
+  for (iter = this->modelMsgs.begin(); iter != this->modelMsgs.end(); ++iter)
   {
     ModelPtr model;
     if ((*iter).has_id())

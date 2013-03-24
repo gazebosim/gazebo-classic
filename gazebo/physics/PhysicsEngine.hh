@@ -43,6 +43,41 @@ namespace gazebo
     /// \brief Base class for a physics engine.
     class PhysicsEngine
     {
+      /// \enum PhysicsParam
+      /// \brief Physics paramerter types.
+      public: enum PhysicsParam
+      {
+        /// \brief Solve type
+        SOLVER_TYPE,
+
+        /// \brief Constraint force mixing
+        GLOBAL_CFM,
+
+        /// \brief Error reduction parameter
+        GLOBAL_ERP,
+
+        /// \brief Number of iterations (ODE specific)
+        SOR_PRECON_ITERS,
+
+        /// \brief Number of iterations
+        SOR_ITERS,
+
+        /// \brief SOR over-relaxation parameter
+        SOR,
+
+        /// \brief Max correcting velocity (ODE specific)
+        CONTACT_MAX_CORRECTING_VEL,
+
+        /// \brief Surface layer depth
+        CONTACT_SURFACE_LAYER,
+
+        /// \brief Maximum number of contacts
+        MAX_CONTACTS,
+
+        /// \brief Minimum step size
+        MIN_STEP_SIZE
+      };
+
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
       public: explicit PhysicsEngine(WorldPtr _world);
@@ -78,24 +113,52 @@ namespace gazebo
       public: virtual void SetSeed(uint32_t _seed) = 0;
 
       /// \brief Set the simulation update rate.
+      /// This funciton is deprecated, use PhysicsEngine::SetRealTimeUpdateRate.
       /// \param[in] _value Value of the update rate.
-      public: void SetUpdateRate(double _value);
+      public: void SetUpdateRate(double _value) GAZEBO_DEPRECATED;
 
       /// \brief Get the simulation update rate.
+      /// This funciton is deprecated, use PhysicsEngine::GetRealTimeUpdateRate.
       /// \return Update rate.
-      public: double GetUpdateRate();
+      public: double GetUpdateRate() GAZEBO_DEPRECATED;
 
       /// \brief Get the simulation update period.
       /// \return Simulation update period.
       public: double GetUpdatePeriod();
 
       /// \brief Set the simulation step time.
+      /// This funciton is deprecated, use World::SetMaxStepSize.
       /// \param[in] _value Value of the step time.
-      public: virtual void SetStepTime(double _value) = 0;
+      public: virtual void SetStepTime(double _value) GAZEBO_DEPRECATED;
 
       /// \brief Get the simulation step time.
+      /// This funciton is deprecated, use World::GetMaxStepSize.
       /// \return Simulation step time.
-      public: virtual double GetStepTime() = 0;
+      public: virtual double GetStepTime() GAZEBO_DEPRECATED;
+
+      /// \brief Get target real time factor
+      /// \return Target real time factor
+      public: double GetTargetRealTimeFactor() const;
+
+      /// \brief Get real time update rate
+      /// \return Update rate
+      public: double GetRealTimeUpdateRate() const;
+
+      /// \brief Get max step size.
+      /// \return Max step size.
+      public: double GetMaxStepSize() const;
+
+      /// \brief Set target real time factor
+      /// \param[in] _factor Target real time factor
+      public: void SetTargetRealTimeFactor(double _factor);
+
+      /// \brief Set real time update rate
+      /// \param[in] _rate Update rate
+      public: void SetRealTimeUpdateRate(double _rate);
+
+      /// \brief Set max step size.
+      /// \param[in] _stepSize Max step size.
+      public: void SetMaxStepSize(double _stepSize);
 
       /// \brief Update the physics engine.
       public: virtual void UpdatePhysics() {}
@@ -249,6 +312,28 @@ namespace gazebo
       /// \return Maximum number of allows contacts.
       public: virtual int GetMaxContacts() {return 0;}
 
+      /// \brief Set a parameter of the physics engine
+      /// \param[in] _param A parameter listed in the PhysicsParam enum
+      /// \param[in] _value The value to set to
+      public: virtual void SetParam(PhysicsParam _param,
+                  const boost::any &_value);
+
+      /// \brief Set a parameter of the physics engine
+      /// \param[in] _key String key
+      /// \param[in] _value The value to set to
+      public: virtual void SetParam(std::string _key,
+                  const boost::any &_value);
+
+      /// \brief Get an parameter of the physics engine
+      /// \param[in] _attr A parameter listed in the PhysicsParam enum
+      /// \return The value of the parameter
+      public: virtual boost::any GetParam(PhysicsParam _param) const;
+
+      /// \brief Get an parameter of the physics engine
+      /// \param[in] _attr String key
+      /// \return The value of the parameter
+      public: virtual boost::any GetParam(std::string _key) const;
+
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;
 
@@ -294,9 +379,14 @@ namespace gazebo
       /// engine.
       protected: ContactManager *contactManager;
 
-      /// \brief Store the value of the updateRate parameter in double form.
-      /// To improve efficiency.
-      private: double updateRateDouble;
+      /// \brief Real time update rate.
+      protected: double realTimeUpdateRate;
+
+      /// \brief Target real time factor.
+      protected: double targetRealTimeFactor;
+
+      /// \brief Real time update rate.
+      protected: double maxStepSize;
     };
     /// \}
   }

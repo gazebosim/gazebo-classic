@@ -51,7 +51,7 @@ TEST_F(ODEJoint_TEST, CFMDamping)
   double t = world->GetSimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetStepTime();
+  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzdbg << "dt : " << dt << "\n";
 
@@ -131,7 +131,7 @@ TEST_F(ODEJoint_TEST, GetForceTorque)
   double t = world->GetSimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetStepTime();
+  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzdbg << "dt : " << dt << "\n";
 
