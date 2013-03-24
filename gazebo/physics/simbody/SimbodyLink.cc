@@ -100,15 +100,19 @@ void SimbodyLink::Update()
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetGravityMode(bool /*_mode*/)
+void SimbodyLink::SetGravityMode(bool _mode)
 {
+  gzerr << "SetGravityMode\n";
+  this->simbodyPhysics->gravity.setBodyIsExcluded(
+    this->simbodyPhysics->integ->updAdvancedState(), this->masterMobod, _mode);
 }
 
 //////////////////////////////////////////////////
 bool SimbodyLink::GetGravityMode() const
 {
-  bool result = false;
-  return result;
+  gzerr << "GetGravityMode\n";
+  return this->simbodyPhysics->gravity.getBodyIsExcluded(
+    this->simbodyPhysics->integ->getState(), this->masterMobod);
 }
 
 //////////////////////////////////////////////////
