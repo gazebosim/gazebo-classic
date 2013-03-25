@@ -522,7 +522,7 @@ class ModelFilter : public FilterBase
             std::list<std::string>::iterator partIter = this->parts.begin();
 
             // The first element in the filter must be a model name or a star.
-            if (*partIter != "*" && !(*partIter).empty())
+            if (!(*partIter).empty() && (*partIter) != "*")
             {
               std::string regexStr = *partIter;
               boost::replace_all(regexStr, "*", ".*");
