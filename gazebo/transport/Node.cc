@@ -138,6 +138,8 @@ bool Node::HandleData(const std::string &_topic, const std::string &_msg)
 /////////////////////////////////////////////////
 void Node::ProcessIncoming()
 {
+  boost::recursive_mutex::scoped_lock lock(this->processIncomingMutex);
+
   Callback_M::iterator cbIter;
   Callback_L::iterator liter;
   std::list<std::string>::iterator msgIter;
