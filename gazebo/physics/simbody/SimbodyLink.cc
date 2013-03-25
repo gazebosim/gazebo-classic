@@ -37,6 +37,7 @@ SimbodyLink::SimbodyLink(EntityPtr _parent)
     : Link(_parent)
 {
   this->mustBeBaseLink = false;
+  this->physicsInitialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -102,7 +103,7 @@ void SimbodyLink::Update()
 //////////////////////////////////////////////////
 void SimbodyLink::SetGravityMode(bool _mode)
 {
-  if (this->simbodyPhysics->simbodyPhysicsInitialized)
+  if (this->physicsInitialized)
   {
     this->simbodyPhysics->gravity.setBodyIsExcluded(
       this->simbodyPhysics->integ->updAdvancedState(),
@@ -111,14 +112,14 @@ void SimbodyLink::SetGravityMode(bool _mode)
   else
   {
     this->gravityMode = _mode;
-    gzerr << "SetGravityMode, but physics not initialized, caching\n";
+    gzdbg << "SetGravityMode, but physics not initialized, caching\n";
   }
 }
 
 //////////////////////////////////////////////////
 bool SimbodyLink::GetGravityMode() const
 {
-  if (this->simbodyPhysics->simbodyPhysicsInitialized)
+  if (this->physicsInitialized)
   {
     return this->simbodyPhysics->gravity.getBodyIsExcluded(
       this->simbodyPhysics->integ->getState(), this->masterMobod);

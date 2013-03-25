@@ -85,7 +85,6 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
       discreteForces(forces, matter),
       tracker(system), contact(system, tracker),  integ(NULL)
 {
-  this->simbodyPhysicsInitialized = false;
   // Instantiate the Multibody System
   // Instantiate the Simbody Matter Subsystem
   // Instantiate the Simbody General Force Subsystem
@@ -107,9 +106,6 @@ SimbodyPhysics::~SimbodyPhysics()
 //////////////////////////////////////////////////
 void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 {
-  // need to reset flag, in case loading mu;tiple models.
-  this->simbodyPhysicsInitialized = false;
-
   PhysicsEngine::Load(_sdf);
 
   sdf::ElementPtr simbodyElem = this->sdf->GetElement("simbody");
@@ -164,9 +160,6 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
 
   this->integ->initialize(state);
 
-  gzdbg << "system state initialized\n";
-  this->simbodyPhysicsInitialized = true;
-
   Link_V links = _model->GetLinks();
   for(Link_V::iterator li = links.begin(); li != links.end(); ++li)
   {
@@ -180,6 +173,32 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   }
 
   this->system.realize(this->integ->getAdvancedState(), Stage::Velocity);
+
+  // mark links as initialized
+  for(Link_V::iterator li = links.begin(); li != links.end(); ++li)
+  {
+    physics::SimbodyLinkPtr simbodyLink =
+      boost::shared_dynamic_cast<physics::SimbodyLink>(*li);
+    if (simbodyLink)
+      simbodyLink->physicsInitialized = true;
+    else
+      gzerr << "failed to cast link [" << (*li)->GetName()
+            << "] as simbody link\n";
+  }
+
+  // mark joints as initialized
+  physics::Joint_V joints = _model->GetJoints();
+  for (physics::Joint_V::iterator ji = joints.begin();
+       ji != joints.end(); ++ji)
+  {
+    SimbodyJointPtr simbodyJoint =
+      boost::shared_dynamic_cast<SimbodyJoint>(*ji);
+    if (simbodyJoint)
+      simbodyJoint->physicsInitialized = true;
+    else
+      gzerr << "simbodyJoint [" << (*ji)->GetName()
+            << "]is not a SimbodyJointPtr\n";
+  }
 }
 
 //////////////////////////////////////////////////

@@ -140,6 +140,9 @@ namespace gazebo
       /// \brief: isValid() if we used a constraint
       public: SimTK::Constraint constraint;
 
+      // Keeps track if physics has been initialized
+      public: bool physicsInitialized;
+
       /// \brief keep a pointer to the simbody physics engine for convenience
       protected: SimbodyPhysicsPtr simbodyPhysics;
 

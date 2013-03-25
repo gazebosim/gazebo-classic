@@ -143,7 +143,6 @@ namespace gazebo
       public: SimTK::ContactTrackerSubsystem tracker;
       public: SimTK::CompliantContactSubsystem contact;
       public: SimTK:: Integrator *integ;
-      public: bool simbodyPhysicsInitialized;
 
       public: static SimTK::Quaternion QuadToQuad(const math::Quaternion & _q)
       {

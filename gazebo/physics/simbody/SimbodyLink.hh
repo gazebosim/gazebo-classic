@@ -162,6 +162,9 @@ namespace gazebo
       // Which MobilizedBody corresponds to the master instance of this link.
       public: SimTK::MobilizedBody                   masterMobod;
 
+      // Keeps track if physics has been initialized
+      public: bool physicsInitialized;
+
       // If this link got split into a master and slaves, these are the 
       // MobilizedBodies used to mobilize the slaves.
       public: std::vector<SimTK::MobilizedBody>      slaveMobods;

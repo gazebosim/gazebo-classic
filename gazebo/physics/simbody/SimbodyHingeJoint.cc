@@ -33,6 +33,7 @@ SimbodyHingeJoint::SimbodyHingeJoint(SimTK::MultibodySystem * /*_world*/,
                                      BasePtr _parent)
     : HingeJoint<SimbodyJoint>(_parent)
 {
+  this->physicsInitialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -131,7 +132,7 @@ void SimbodyHingeJoint::SetHighStop(int _index,
   gzdbg << "SetHighStop\n";
   if (_index < this->GetAngleCount())
   {
-    if (simbodyPhysics->simbodyPhysicsInitialized)
+    if (this->physicsInitialized)
     {
       if (this->limitForce)
         this->limitForce->setBounds(
@@ -160,7 +161,7 @@ void SimbodyHingeJoint::SetLowStop(int _index,
   gzdbg << "SetLowStop\n";
   if (_index < this->GetAngleCount())
   {
-    if (simbodyPhysics->simbodyPhysicsInitialized)
+    if (this->physicsInitialized)
     {
       if (this->limitForce)
         this->limitForce->setBounds(
