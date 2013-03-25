@@ -191,7 +191,7 @@ ScenePtr RenderEngine::GetScene(const std::string &_name)
   std::vector<ScenePtr>::iterator iter;
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
-    if ((*iter)->GetName() == _name)
+    if (_name.empty() || (*iter)->GetName() == _name)
       return (*iter);
 
   return ScenePtr();

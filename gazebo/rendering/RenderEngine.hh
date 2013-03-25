@@ -99,7 +99,7 @@ namespace gazebo
       /// \param[in] _name Name of the scene to retreive.
       /// \return A pointer to the Scene, or NULL if the scene doesn't
       /// exist.
-      public: ScenePtr GetScene(const std::string &_name);
+      public: ScenePtr GetScene(const std::string &_name="");
 
       /// \brief Get a scene by index. The index should be between 0 and
       /// GetSceneCount().

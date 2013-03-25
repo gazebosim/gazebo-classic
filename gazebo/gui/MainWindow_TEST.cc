@@ -51,19 +51,73 @@ void MainWindow_TEST::Wireframe()
   mainWindow->Init();
   mainWindow->show();
 
-  // Trigger the wireframe request.
-  gazebo::gui::g_viewWireframeAct->trigger();
-
-  // Wait a little bit so that time increases.
-  for (unsigned int i = 0; i < 100; ++i)
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
     mainWindow->repaint();
   }
 
+  // Get the user camera, and tell it to save frames
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  cam->EnableSaveFrame(true);
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the image data
+  const unsigned char *image = cam->GetImageData();
+  unsigned int height = cam->GetImageHeight();
+  unsigned int width = cam->GetImageWidth();
+  unsigned int depth = 3;
+
+  // Calculate the average color.
+  unsigned int sum = 0;
+  for (unsigned int y = 0; y < height; y++)
+  {
+    for (unsigned int x = 0; x < width*depth; x++)
+    {
+      unsigned int a = image[(y*width*depth)+x];
+      sum += a;
+    }
+  }
+  double avgPreWireframe = static_cast<double>(sum) / (height*width*depth);
+
+  // Trigger the wireframe request.
+  gazebo::gui::g_viewWireframeAct->trigger();
+
+  // Redraw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the new image data, and calculate the new average color
+  image = cam->GetImageData();
+  sum = 0;
+  for (unsigned int y = 0; y < height; y++)
+  {
+    for (unsigned int x = 0; x < width*depth; x++)
+    {
+      unsigned int a = image[(y*width*depth)+x];
+      sum += a;
+    }
+  }
+  double avgPostWireframe = static_cast<double>(sum) / (height*width*depth);
+
   // Make sure the request was set.
   QVERIFY(g_gotSetWireframe);
+
+  // Removing the grey ground plane should make the average color brighter.
+  QVERIFY(avgPreWireframe < avgPostWireframe);
 
   mainWindow->hide();
   delete mainWindow;

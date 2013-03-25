@@ -120,6 +120,7 @@ void QTestFixture::cleanup()
     gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
     this->server->Fini();
+
     delete this->server;
     this->server = NULL;
   }
@@ -131,6 +132,25 @@ void QTestFixture::cleanup()
 /////////////////////////////////////////////////
 void QTestFixture::cleanupTestCase()
 {
+  if (this->server)
+  {
+    this->server->Stop();
+
+    if (this->serverThread)
+    {
+      this->serverThread->join();
+    }
+
+    gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
+
+    this->server->Fini();
+
+    delete this->server;
+    this->server = NULL;
+  }
+
+  delete this->serverThread;
+  this->serverThread = NULL;
 }
 
 /////////////////////////////////////////////////
