@@ -100,15 +100,35 @@ void SimbodyLink::Update()
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetGravityMode(bool /*_mode*/)
+void SimbodyLink::SetGravityMode(bool _mode)
 {
+  if (this->simbodyPhysics->simbodyPhysicsInitialized)
+  {
+    this->simbodyPhysics->gravity.setBodyIsExcluded(
+      this->simbodyPhysics->integ->updAdvancedState(),
+      this->masterMobod, _mode);
+  }
+  else
+  {
+    this->gravityMode = _mode;
+    gzerr << "SetGravityMode, but physics not initialized, caching\n";
+  }
 }
 
 //////////////////////////////////////////////////
 bool SimbodyLink::GetGravityMode() const
 {
-  bool result = false;
-  return result;
+  if (this->simbodyPhysics->simbodyPhysicsInitialized)
+  {
+    return this->simbodyPhysics->gravity.getBodyIsExcluded(
+      this->simbodyPhysics->integ->getState(), this->masterMobod);
+  }
+  else
+  {
+    gzdbg << "GetGravityMode, but physics not initialized, returning"
+          << " cached value\n";
+    return this->gravityMode;
+  }
 }
 
 //////////////////////////////////////////////////

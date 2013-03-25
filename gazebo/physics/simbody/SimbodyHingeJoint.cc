@@ -57,7 +57,7 @@ math::Vector3 SimbodyHingeJoint::GetAnchor(int /*_index*/) const
 void SimbodyHingeJoint::SetAnchor(int /*_index*/,
                                  const math::Vector3 &/*_anchor*/)
 {
-  gzerr << "Not implemented...\n";
+  gzerr << "SetAnchor Not implemented...\n";
   // The anchor (pivot in Simbody lingo), can only be set on creation
 }
 
@@ -66,19 +66,19 @@ void SimbodyHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
-  gzerr << "Not implemented...\n";
+  gzerr << "SetAxis Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
 {
-  gzerr << "Not implemented\n";
+  gzerr << "SetDamping Not implemented\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 {
-  gzerr << "Not implemented...\n";
+  gzerr << "SetVelocity Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -125,17 +125,53 @@ double SimbodyHingeJoint::GetForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetHighStop(int /*_index*/,
-                                   const math::Angle &/*_angle*/)
+void SimbodyHingeJoint::SetHighStop(int _index,
+                                   const math::Angle &_angle)
 {
-  gzerr << "SetHighStop\n";
+  gzdbg << "SetHighStop\n";
+  if (_index < this->GetAngleCount())
+  {
+    if (simbodyPhysics->simbodyPhysicsInitialized)
+    {
+      this->limitForce->setBounds(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        this->limitForce->getLowerBound(
+          this->simbodyPhysics->integ->updAdvancedState()),
+        _angle.Radian()
+        );
+    }
+    else
+    {
+      gzerr << "SetHighStop: State not initialized.\n";
+    }
+  }
+  else
+    gzerr << "SetHighStop: index out of bounds.\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetLowStop(int /*_index*/,
-                                  const math::Angle &/*_angle*/)
+void SimbodyHingeJoint::SetLowStop(int _index,
+                                  const math::Angle &_angle)
 {
-  gzerr << "SetLowStop\n";
+  gzdbg << "SetLowStop\n";
+  if (_index < this->GetAngleCount())
+  {
+    if (simbodyPhysics->simbodyPhysicsInitialized)
+    {
+      this->limitForce->setBounds(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        _angle.Radian(),
+        this->limitForce->getUpperBound(
+          this->simbodyPhysics->integ->updAdvancedState())
+        );
+    }
+    else
+    {
+      gzerr << "SetLowStop: State not initialized.\n";
+    }
+  }
+  else
+    gzerr << "SetLowStop: index out of bounds.\n";
 }
 
 //////////////////////////////////////////////////

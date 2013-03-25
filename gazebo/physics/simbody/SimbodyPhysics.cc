@@ -85,6 +85,7 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
       discreteForces(forces, matter),
       tracker(system), contact(system, tracker),  integ(NULL)
 {
+  this->simbodyPhysicsInitialized = false;
   // Instantiate the Multibody System
   // Instantiate the Simbody Matter Subsystem
   // Instantiate the Simbody General Force Subsystem
@@ -159,7 +160,21 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   SimTK::State state = this->system.realizeTopology();
 
   this->integ->initialize(state);
-  gzerr << "system state realized\n";
+
+  gzdbg << "system state initialized\n";
+  this->simbodyPhysicsInitialized = true;
+
+  Link_V links = _model->GetLinks();
+  for(Link_V::iterator li = links.begin(); li != links.end(); ++li)
+  {
+    physics::SimbodyLinkPtr simbodyLink =
+      boost::shared_dynamic_cast<physics::SimbodyLink>(*li);
+    if (simbodyLink)
+      simbodyLink->SetGravityMode(simbodyLink->gravityMode);
+    else
+      gzerr << "failed to cast link [" << (*li)->GetName()
+            << "] as simbody link\n";
+  }
 }
 
 //////////////////////////////////////////////////

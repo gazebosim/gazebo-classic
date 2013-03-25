@@ -5,7 +5,7 @@ if (HAVE_BULLET)
   add_subdirectory(bullet)
 endif()
 
-if (HAVE_Simbody)
+if (HAVE_SIMBODY)
   add_subdirectory(simbody)
 endif()
 
@@ -113,7 +113,7 @@ if (HAVE_BULLET)
   target_link_libraries(gazebo_physics gazebo_physics_bullet)
 endif()
 
-if (HAVE_Simbody)
+if (HAVE_SIMBODY)
   target_link_libraries(gazebo_physics gazebo_physics_simbody)
 endif()
 
