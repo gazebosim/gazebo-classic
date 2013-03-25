@@ -15,10 +15,20 @@
  *
 */
 
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/MainWindow_TEST.hh"
+
+bool g_gotSetWireframe = false;
+void OnRequest(ConstRequestPtr &_msg)
+{
+  if (_msg->request() == "set_wireframe")
+    g_gotSetWireframe = true;
+}
 
 /////////////////////////////////////////////////
 void MainWindow_TEST::Wireframe()
@@ -27,20 +37,33 @@ void MainWindow_TEST::Wireframe()
   this->shareMaxPercentChange = 1.0;
 
   this->Load("empty.world");
-  QCoreApplication::processEvents();
+  gazebo::transport::NodePtr node;
+  gazebo::transport::SubscriberPtr sub;
 
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  node->Init();
+  sub = node->Subscribe("~/request", &OnRequest, this);
+
+  // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
 
+  // Trigger the wireframe request.
+  gazebo::gui::g_viewWireframeAct->trigger();
+
   // Wait a little bit so that time increases.
-  for (unsigned int i = 0; i < 10; ++i)
+  for (unsigned int i = 0; i < 100; ++i)
   {
-    gazebo::common::Time::MSleep(100);
+    gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
+    mainWindow->repaint();
   }
+
+  // Make sure the request was set.
+  QVERIFY(g_gotSetWireframe);
 
   mainWindow->hide();
   delete mainWindow;

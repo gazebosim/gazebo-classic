@@ -63,7 +63,7 @@ class QTestFixture : public QObject
   private slots: void cleanupTestCase();
 
   /// \brief Run the Gazebo server in a thread.
-  private: void RunServer(const std::string &_worldFilename, bool _paused);
+  private: void RunServer();
 
   /// \brief The Gazebo server, which is run in a thread.
   protected: gazebo::Server *server;

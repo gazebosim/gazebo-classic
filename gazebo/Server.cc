@@ -379,7 +379,6 @@ void Server::Stop()
 /////////////////////////////////////////////////
 void Server::Fini()
 {
-  printf("Fini\n");
   this->Stop();
 
   gazebo::fini();

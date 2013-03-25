@@ -25,7 +25,8 @@ class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test wireframe view mode.
+  /// \brief Test that trigger of the view wireframe action creates an
+  /// appropriate request.
   private slots: void Wireframe();
 };
 

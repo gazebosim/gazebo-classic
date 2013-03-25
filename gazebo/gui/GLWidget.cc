@@ -180,11 +180,13 @@ void GLWidget::moveEvent(QMoveEvent *_e)
 /////////////////////////////////////////////////
 void GLWidget::paintEvent(QPaintEvent *_e)
 {
+  printf("GLWidget::paintEvent\n");
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->GetInitialized())
   {
     event::Events::preRender();
 
+    printf("GLWidget::render\n");
     // Tell all the cameras to render
     event::Events::render();
 
