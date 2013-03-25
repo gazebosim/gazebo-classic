@@ -121,21 +121,11 @@ bool ModelState::IsZero() const
     result = result && (*iter).IsZero();
   }
 
-    // Update all links
-    while (childElem)
-    {
-      // Find matching link state
-      for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
-          iter != this->linkStates.end(); ++iter)
-      {
-        if ((*iter).GetName() == childElem->Get<std::string>("name"))
-        {
-          (*iter).UpdateLinkSDF(childElem);
-        }
-      }
 
-      childElem = childElem->GetNextElement("link");
-    }
+  for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end() && result; ++iter)
+  {
+    result = result && (*iter).IsZero();
   }
 
   return result && this->pose == math::Pose::Zero;

@@ -104,9 +104,6 @@ void Joint::Load(sdf::ElementPtr _sdf)
   GZ_ASSERT(parentElem, "Parent element is NULL");
   GZ_ASSERT(childElem, "Child element is NULL");
 
-  std::string parentName = parentElem->Get<std::string>("link_name");
-  std::string childName = childElem->Get<std::string>("link_name");
-
   if (this->model)
   {
     this->childLink = this->model->GetLink(childName);

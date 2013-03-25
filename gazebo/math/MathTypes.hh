@@ -24,6 +24,7 @@ namespace gazebo
 {
   namespace math
   {
+    class Pose;
     class Quaternion;
     class Vector2i;
     class Vector2d;

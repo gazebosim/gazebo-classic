@@ -22,6 +22,8 @@
 #include <vector>
 #include <map>
 #include <sdf/sdf.hh>
+
+#include "gazebo/math/Pose.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/qt.h"
