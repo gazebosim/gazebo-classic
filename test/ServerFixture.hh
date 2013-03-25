@@ -476,7 +476,9 @@ class ServerFixture : public testing::Test
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
                  double _minRange = 0.08, double _maxRange = 10,
-                 double _rangeResolution = 0.01, unsigned int _samples = 640)
+                 double _rangeResolution = 0.01, unsigned int _samples = 640,
+                 const std::string &_noiseType = "", double _noiseMean = 0.0,
+                 double _noiseStdDev = 0.0)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
@@ -509,8 +511,16 @@ class ServerFixture : public testing::Test
                  << "        <min>" << _minRange << "</min>"
                  << "        <max>" << _maxRange << "</max>"
                  << "        <resolution>" << _rangeResolution <<"</resolution>"
-                 << "      </range>"
-                 << "    </ray>"
+                 << "      </range>";
+
+               if (_noiseType.size() > 0)  
+                 newModelStr << "      <noise>"
+                 << "        <type>" << _noiseType << "</type>"
+                 << "        <mean>" << _noiseMean << "</mean>"
+                 << "        <stddev>" << _noiseStdDev << "</stddev>"
+                 << "      </noise>";
+
+               newModelStr << "    </ray>"
                  << "  </sensor>"
                  << "</link>"
                  << "</model>"
