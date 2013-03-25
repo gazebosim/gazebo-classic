@@ -18,14 +18,14 @@
 #include <string.h>
 #include <algorithm>
 
-#include "math/Helpers.hh"
+#include "gazebo/math/Helpers.hh"
 
-#include "common/Material.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/Mesh.hh"
-#include "common/Skeleton.hh"
-#include "gazebo_config.h"
+#include "gazebo/common/Material.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 using namespace common;
@@ -413,6 +413,8 @@ SubMesh::SubMesh(const SubMesh *_mesh)
 
   std::copy(_mesh->indices.begin(), _mesh->indices.end(),
       std::back_inserter(this->indices));
+  std::copy(_mesh->normals.begin(), _mesh->normals.end(),
+      std::back_inserter(this->normals));
   std::copy(_mesh->texCoords.begin(), _mesh->texCoords.end(),
       std::back_inserter(this->texCoords));
   std::copy(_mesh->vertices.begin(), _mesh->vertices.end(),
