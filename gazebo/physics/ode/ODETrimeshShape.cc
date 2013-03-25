@@ -112,7 +112,7 @@ void ODETrimeshShape::Init()
     this->mesh->GetVertexCount();
 
   unsigned int numIndices = this->submesh ? this->submesh->GetIndexCount() :
-    this->mesh->GetVertexCount();
+    this->mesh->GetIndexCount();
 
   this->vertices = NULL;
   this->indices = NULL;

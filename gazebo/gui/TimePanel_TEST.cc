@@ -52,7 +52,7 @@ void TimePanel_TEST::ValidTimes()
   std::string txt;
   double value;
 
-  // Make sure real time is greater than to zero
+  // Make sure real time is greater than zero
   txt = realTimeEdit->text().toStdString();
   value = boost::lexical_cast<double>(txt.substr(txt.find(".")));
   QVERIFY(value > 0.0);
