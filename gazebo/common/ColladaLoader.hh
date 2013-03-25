@@ -22,8 +22,8 @@
 #include <string>
 #include <vector>
 
-#include "common/MeshLoader.hh"
-#include "math/MathTypes.hh"
+#include "gazebo/common/MeshLoader.hh"
+#include "gazebo/math/MathTypes.hh"
 
 class TiXmlElement;
 

@@ -22,9 +22,9 @@
 #include <math.h>
 #include <algorithm>
 
-#include "math/Helpers.hh"
-#include "common/Console.hh"
-#include "common/Color.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Color.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -52,6 +52,13 @@ Color::Color(float _r, float _g, float _b, const float _a)
 
 //////////////////////////////////////////////////
 Color::Color(const Color &_pt)
+: r(_pt.r), g(_pt.g), b(_pt.b), a(_pt.a)
+{
+  this->Clamp();
+}
+
+//////////////////////////////////////////////////
+Color::Color(const sdf::Color &_pt)
 : r(_pt.r), g(_pt.g), b(_pt.b), a(_pt.a)
 {
   this->Clamp();
@@ -396,7 +403,18 @@ void Color::SetFromABGR(const Color::ABGR _v)
 }
 
 //////////////////////////////////////////////////
-Color &Color::operator =(const Color &_pt)
+Color &Color::operator =(const Color &_clr)
+{
+  this->r = _clr.r;
+  this->g = _clr.g;
+  this->b = _clr.b;
+  this->a = _clr.a;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+Color &Color::operator =(const sdf::Color &_pt)
 {
   this->r = _pt.r;
   this->g = _pt.g;
@@ -510,18 +528,27 @@ const Color &Color::operator*=(const Color &pt)
 
 
 //////////////////////////////////////////////////
-bool Color::operator ==(const Color &pt) const
+bool Color::operator ==(const Color &_pt) const
 {
-  return math::equal(this->r, pt.r) &&
-         math::equal(this->g, pt.g) &&
-         math::equal(this->b, pt.b) &&
-         math::equal(this->a, pt.a);
+  return math::equal(this->r, _pt.r) &&
+         math::equal(this->g, _pt.g) &&
+         math::equal(this->b, _pt.b) &&
+         math::equal(this->a, _pt.a);
 }
 
 //////////////////////////////////////////////////
-bool Color::operator!=(const Color &pt) const
+bool Color::operator!=(const Color &_pt) const
 {
-  return !(*this == pt);
+  return !(*this == _pt);
+}
+
+//////////////////////////////////////////////////
+bool Color::operator!=(const sdf::Color &_pt) const
+{
+  return !math::equal(this->r, _pt.r) ||
+         !math::equal(this->g, _pt.g) ||
+         !math::equal(this->b, _pt.b) ||
+         !math::equal(this->a, _pt.a);
 }
 
 //////////////////////////////////////////////////

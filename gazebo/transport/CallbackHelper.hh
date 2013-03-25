@@ -24,9 +24,9 @@
 #include <vector>
 #include <string>
 
-#include "common/Console.hh"
-#include "msgs/msgs.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Exception.hh"
 
 namespace gazebo
 {

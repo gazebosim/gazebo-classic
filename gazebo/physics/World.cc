@@ -30,7 +30,7 @@
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -56,8 +56,8 @@
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/World.hh"
 
-#include "physics/Collision.hh"
-#include "physics/ContactManager.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ContactManager.hh"
 
 using namespace gazebo;
 using namespace physics;

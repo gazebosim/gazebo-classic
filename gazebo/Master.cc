@@ -15,7 +15,7 @@
  *
 */
 #include <google/protobuf/descriptor.h>
-#include "transport/IOManager.hh"
+#include "gazebo/transport/IOManager.hh"
 
 #include "Master.hh"
 

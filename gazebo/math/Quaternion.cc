@@ -19,8 +19,8 @@
  * Date: 03 Apr 2007
  */
 #include <math.h>
-#include "math/Helpers.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Quaternion.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -69,8 +69,28 @@ Quaternion::Quaternion(const Quaternion &_qt)
 }
 
 //////////////////////////////////////////////////
+Quaternion::Quaternion(const sdf::Quaternion &_qt)
+{
+  this->w = _qt.w;
+  this->x = _qt.x;
+  this->y = _qt.y;
+  this->z = _qt.z;
+}
+
+//////////////////////////////////////////////////
 Quaternion::~Quaternion()
 {
+}
+
+//////////////////////////////////////////////////
+Quaternion &Quaternion::operator =(const sdf::Quaternion &_qt)
+{
+  this->w = _qt.w;
+  this->x = _qt.x;
+  this->y = _qt.y;
+  this->z = _qt.z;
+
+  return *this;
 }
 
 //////////////////////////////////////////////////

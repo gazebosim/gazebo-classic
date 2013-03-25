@@ -16,12 +16,12 @@
 */
 #include <boost/lexical_cast.hpp>
 
-#include "rendering/ogre_gazebo.h"
-#include "rendering/Visual.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
-#include "common/MeshManager.hh"
-#include "rendering/SelectionObj.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 
 using namespace gazebo;
 using namespace rendering;

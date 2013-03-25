@@ -74,12 +74,18 @@ namespace gazebo
     /// \param qt Quaternion to copy
     public: Quaternion(const Quaternion &_qt);
 
+    /// Deprecated
+    public: Quaternion(const sdf::Quaternion &_qt) GAZEBO_DEPRECATED;
+
     /// \brief Destructor
     public: ~Quaternion();
 
     /// \brief Equal operator
     /// \param[in] _qt Quaternion to copy
     public: Quaternion &operator =(const Quaternion &_qt);
+
+    /// Deprecated
+    public: Quaternion &operator =(const sdf::Quaternion &_qt);
 
     /// \brief Invert the quaternion
     public: void Invert();

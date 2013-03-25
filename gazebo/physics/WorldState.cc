@@ -18,6 +18,7 @@
  * Author: Nate Koenig
  */
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"

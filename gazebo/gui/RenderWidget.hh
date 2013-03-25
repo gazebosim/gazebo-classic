@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "gui/qt.h"
-#include "common/Event.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/common/Event.hh"
 
 class QLineEdit;
 class QLabel;

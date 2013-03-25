@@ -22,8 +22,8 @@
 #ifndef _BULLETSPHERESHAPE_HH_
 #define _BULLETSPHERESHAPE_HH_
 
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/SphereShape.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/SphereShape.hh"
 
 namespace gazebo
 {

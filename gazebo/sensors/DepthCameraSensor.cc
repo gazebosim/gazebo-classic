@@ -21,19 +21,19 @@
 
 #include <sstream>
 
-#include "physics/World.hh"
+#include "gazebo/physics/World.hh"
 
-#include "common/Events.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "rendering/DepthCamera.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Rendering.hh"
+#include "gazebo/rendering/DepthCamera.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Rendering.hh"
 
-#include "sensors/SensorFactory.hh"
-#include "sensors/DepthCameraSensor.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/DepthCameraSensor.hh"
 
 using namespace gazebo;
 using namespace sensors;

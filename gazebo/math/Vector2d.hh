@@ -25,6 +25,9 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <sdf/sdf.hh>
+
+#include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
 {
@@ -48,6 +51,9 @@ namespace gazebo
       /// \brief Copy constructor
       /// \param[in] _v the value
       public: Vector2d(const Vector2d &_v);
+
+      /// Deprecated
+      public: Vector2d(const sdf::Vector2d &_v) GAZEBO_DEPRECATED;
 
       /// \brief Destructor
       public: virtual ~Vector2d();
@@ -74,6 +80,9 @@ namespace gazebo
       /// \param[in] _v a value for x and y element
       /// \return this
       public: Vector2d &operator =(const Vector2d &_v);
+
+      /// Deprecated
+      public: Vector2d &operator =(const sdf::Vector2d &_v) GAZEBO_DEPRECATED;
 
       /// \brief Assignment operator
       /// \param[in] _v the value for x and y element

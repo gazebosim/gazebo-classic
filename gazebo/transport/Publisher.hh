@@ -26,7 +26,7 @@
 #include <string>
 #include <list>
 
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {

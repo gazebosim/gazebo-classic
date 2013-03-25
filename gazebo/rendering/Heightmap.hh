@@ -27,10 +27,10 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "common/Image.hh"
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
+#include "gazebo/rendering/Scene.hh"
 
 namespace Ogre
 {

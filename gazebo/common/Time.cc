@@ -56,6 +56,12 @@ Time::Time(const Time &_time)
 }
 
 /////////////////////////////////////////////////
+Time::Time(const sdf::Time &_time)
+: sec(_time.sec), nsec(_time.nsec)
+{
+}
+
+/////////////////////////////////////////////////
 Time::Time(const struct timeval &_tv)
 {
   this->sec = _tv.tv_sec;
@@ -428,6 +434,15 @@ Time Time::operator /(const Time &_time) const
 const Time &Time::operator /=(const Time &_time)
 {
   *this = *this / _time;
+  return *this;
+}
+
+
+/////////////////////////////////////////////////
+Time &Time::operator =(const sdf::Time &_time)
+{
+  this->sec = _time.sec;
+  this->nsec = _time.nsec;
   return *this;
 }
 

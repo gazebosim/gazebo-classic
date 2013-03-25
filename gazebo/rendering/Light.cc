@@ -22,19 +22,18 @@
 
 #include <boost/bind.hpp>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
-#include "rendering/Scene.hh"
-#include "rendering/DynamicLines.hh"
-#include "rendering/Visual.hh"
-#include "rendering/Light.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Light.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -465,7 +464,7 @@ void Light::SetDiffuseColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("diffuse");
 
-  if (elem->GetValueColor() != _color)
+  if (_color != elem->GetValueColor())
     elem->Set(_color);
 
   this->light->setDiffuseColour(_color.r, _color.g, _color.b);
@@ -488,7 +487,7 @@ void Light::SetSpecularColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("specular");
 
-  if (elem->GetValueColor() != _color)
+  if (elem->Get<common::Color>() != _color)
     elem->Set(_color);
 
   this->light->setSpecularColour(_color.r, _color.g, _color.b);
@@ -501,7 +500,7 @@ void Light::SetDirection(const math::Vector3 &_dir)
   math::Vector3 vec = _dir;
   vec.Normalize();
 
-  if (this->sdf->GetValueVector3("direction") != vec)
+  if (vec != this->sdf->GetValueVector3("direction"))
     this->sdf->GetElement("direction")->Set(vec);
 
   this->light->setDirection(vec.x, vec.y, vec.z);

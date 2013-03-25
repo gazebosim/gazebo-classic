@@ -18,13 +18,13 @@
 #include <string.h>
 #include <algorithm>
 
-#include "math/Helpers.hh"
+#include "gazebo/math/Helpers.hh"
 
-#include "common/Material.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/Mesh.hh"
-#include "common/Skeleton.hh"
+#include "gazebo/common/Material.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Skeleton.hh"
 #include "gazebo_config.h"
 
 using namespace gazebo;

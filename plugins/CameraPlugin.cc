@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "sensors/DepthCameraSensor.hh"
+#include "gazebo/sensors/DepthCameraSensor.hh"
 #include "plugins/CameraPlugin.hh"
 
 using namespace gazebo;

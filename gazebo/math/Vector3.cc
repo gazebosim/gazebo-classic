@@ -19,8 +19,8 @@
  * Date: 4 Apr 2007
  */
 
-#include "math/Helpers.hh"
-#include "math/Vector3.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -41,6 +41,12 @@ Vector3::Vector3(const double &_x, const double &_y, const double &_z)
 
 //////////////////////////////////////////////////
 Vector3::Vector3(const Vector3 &_pt)
+    : x(_pt.x), y(_pt.y), z(_pt.z)
+{
+}
+
+//////////////////////////////////////////////////
+Vector3::Vector3(const sdf::Vector3 &_pt)
     : x(_pt.x), y(_pt.y), z(_pt.z)
 {
 }
@@ -201,6 +207,16 @@ double Vector3::GetMin() const
 }
 
 //////////////////////////////////////////////////
+Vector3 &Vector3::operator =(const sdf::Vector3 &_pt)
+{
+  this->x = _pt.x;
+  this->y = _pt.y;
+  this->z = _pt.z;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
 Vector3 &Vector3::operator =(const Vector3 &_pt)
 {
   this->x = _pt.x;
@@ -319,9 +335,17 @@ bool Vector3::operator ==(const Vector3 &_pt) const
 }
 
 //////////////////////////////////////////////////
-bool Vector3::operator!=(const Vector3 &pt) const
+bool Vector3::operator!=(const Vector3 &_pt) const
 {
-  return !(*this == pt);
+  return !equal(this->x, _pt.x, 0.001) ||
+         !equal(this->y, _pt.y, 0.001) ||
+         !equal(this->z, _pt.z, 0.001);
+}
+
+//////////////////////////////////////////////////
+bool Vector3::operator!=(const sdf::Vector3 &_pt) const
+{
+  return !(*this == _pt);
 }
 
 //////////////////////////////////////////////////

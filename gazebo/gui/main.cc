@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "gui/Gui.hh"
+#include "gazebo/gui/Gui.hh"
 
 //////////////////////////////////////////////////
 int main(int _argc, char **_argv)

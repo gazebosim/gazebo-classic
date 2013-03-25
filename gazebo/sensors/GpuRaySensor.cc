@@ -19,19 +19,19 @@
  * Date: 29 March 2012
 */
 
-#include "physics/World.hh"
+#include "gazebo/physics/World.hh"
 
-#include "common/Exception.hh"
-#include "common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Events.hh"
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "rendering/Scene.hh"
-#include "rendering/Rendering.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Rendering.hh"
 
-#include "sensors/SensorFactory.hh"
-#include "sensors/GpuRaySensor.hh"
-#include "rendering/GpuLaser.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/GpuRaySensor.hh"
+#include "gazebo/rendering/GpuLaser.hh"
 
 using namespace gazebo;
 using namespace sensors;

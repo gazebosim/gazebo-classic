@@ -19,7 +19,7 @@
  * Date: 03 Apr 2007
  */
 
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -43,6 +43,19 @@ Pose::Pose(double _x, double _y, double _z,
            double _roll, double _pitch, double _yaw)
 : pos(_x, _y, _z), rot(_roll, _pitch, _yaw)
 {
+}
+
+//////////////////////////////////////////////////
+Pose::Pose(const sdf::Pose &_pose)
+{
+  this->pos.x = _pose.pos.x;
+  this->pos.y = _pose.pos.y;
+  this->pos.z = _pose.pos.z;
+
+  this->rot.x = _pose.rot.x;
+  this->rot.y = _pose.rot.y;
+  this->rot.z = _pose.rot.z;
+  this->rot.w = _pose.rot.w;
 }
 
 //////////////////////////////////////////////////
@@ -129,6 +142,29 @@ bool Pose::operator!=(const Pose &_pose) const
 Pose Pose::operator*(const Pose &pose)
 {
   return Pose(this->CoordPositionAdd(pose),  pose.rot * this->rot);
+}
+
+//////////////////////////////////////////////////
+Pose &Pose::operator=(const Pose &_pose)
+{
+  this->pos = _pose.pos;
+  this->rot = _pose.rot;
+  return *this;
+}
+
+//////////////////////////////////////////////////
+Pose &Pose::operator=(const sdf::Pose &_pose)
+{
+  this->pos.x = _pose.pos.x;
+  this->pos.y = _pose.pos.y;
+  this->pos.z = _pose.pos.z;
+
+  this->rot.x = _pose.rot.x;
+  this->rot.y = _pose.rot.y;
+  this->rot.z = _pose.rot.z;
+  this->rot.w = _pose.rot.w;
+
+  return *this;
 }
 
 //////////////////////////////////////////////////

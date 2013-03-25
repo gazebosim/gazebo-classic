@@ -22,8 +22,8 @@
 #define _STATE_HH_
 
 #include <string>
+#include <sdf/sdf.hh>
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/Time.hh"
 

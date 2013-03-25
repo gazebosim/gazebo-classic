@@ -17,10 +17,10 @@
 #ifndef _MODEL_BUILDER_WIDGET_HH_
 #define _MODEL_BUILDER_WIDGET_HH_
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 #include "physics/PhysicsTypes.hh"
-#include "transport/TransportTypes.hh"
-#include "math/Vector3.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {

@@ -132,7 +132,7 @@ void CameraSensor::Init()
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
     this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentName, true);
   }

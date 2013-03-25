@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <iostream>
+#include <sdf/Types.hh>
 
 #include "gazebo/common/CommonTypes.hh"
 
@@ -50,6 +51,9 @@ namespace gazebo
       /// \brief Copy constructor
       /// \param[in] time Time to copy
       public: Time(const Time &_time);
+
+      /// Deprecated
+      public: Time(const sdf::Time &_time) GAZEBO_DEPRECATED;
 
       /// \brief Constructor
       /// \param[in] _tv Time to initialize to
@@ -118,6 +122,9 @@ namespace gazebo
       /// \param[in] _time is a Time
       /// \return Time actually slept
       public: static Time NSleep(Time _time) GAZEBO_DEPRECATED;
+
+      /// Deprecated
+      public: Time &operator =(const sdf::Time &_time) GAZEBO_DEPRECATED;
 
       /// \brief Assignment operator
       /// \param[in] _tv the new time

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#include "transport/ConnectionManager.hh"
-#include "transport/SubscriptionTransport.hh"
+#include "gazebo/transport/ConnectionManager.hh"
+#include "gazebo/transport/SubscriptionTransport.hh"
 
 using namespace gazebo;
 using namespace transport;

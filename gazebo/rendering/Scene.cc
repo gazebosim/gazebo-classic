@@ -20,7 +20,6 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
@@ -57,11 +56,11 @@
 #include "gazebo/rendering/deferred_shading/DeferredLightCP.hh"
 #endif
 
-#include "rendering/RTShaderSystem.hh"
-#include "transport/Transport.hh"
-#include "transport/Node.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "rendering/Scene.hh"
+#include "gazebo/rendering/Scene.hh"
 
 using namespace gazebo;
 using namespace rendering;

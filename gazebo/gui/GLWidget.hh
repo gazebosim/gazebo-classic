@@ -22,24 +22,24 @@
 #include <utility>
 #include <list>
 
-#include "gui/qt.h"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/rendering/RenderTypes.hh"
 
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
-#include "common/MouseEvent.hh"
-#include "common/Event.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/Event.hh"
 
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "gui/BoxMaker.hh"
-#include "gui/SphereMaker.hh"
-#include "gui/CylinderMaker.hh"
-#include "gui/MeshMaker.hh"
-#include "gui/ModelMaker.hh"
-#include "gui/LightMaker.hh"
+#include "gazebo/gui/BoxMaker.hh"
+#include "gazebo/gui/SphereMaker.hh"
+#include "gazebo/gui/CylinderMaker.hh"
+#include "gazebo/gui/MeshMaker.hh"
+#include "gazebo/gui/ModelMaker.hh"
+#include "gazebo/gui/LightMaker.hh"
 
 namespace gazebo
 {

@@ -22,11 +22,13 @@
 #include <string.h>
 #include <math.h>
 
-#include "common/Image.hh"
-#include "common/Common.hh"
-#include "common/Exception.hh"
+#include "gazebo/math/gzmath.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/common/Common.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/HeightmapShape.hh"
+#include "gazebo/physics/HeightmapShape.hh"
 
 using namespace gazebo;
 using namespace physics;

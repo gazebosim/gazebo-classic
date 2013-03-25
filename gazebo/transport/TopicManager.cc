@@ -16,10 +16,10 @@
 */
 
 
-#include "msgs/msgs.hh"
-#include "transport/Node.hh"
-#include "transport/Publication.hh"
-#include "transport/TopicManager.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publication.hh"
+#include "gazebo/transport/TopicManager.hh"
 
 using namespace gazebo;
 using namespace transport;

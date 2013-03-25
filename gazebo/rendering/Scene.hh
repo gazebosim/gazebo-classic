@@ -24,15 +24,16 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
+#include <sdf/sdf.hh>
 
-#include "rendering/RenderTypes.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "transport/TransportTypes.hh"
-#include "common/Events.hh"
-#include "common/Color.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/math/Vector2i.hh"
 
 namespace SkyX
 {

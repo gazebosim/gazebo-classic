@@ -23,6 +23,8 @@
 #define GAZEBO_COLOR_HH
 
 #include <iostream>
+#include <sdf/Types.hh>
+
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Vector3.hh"
 
@@ -82,6 +84,9 @@ namespace gazebo
       /// \param[in] _clr Color to copy
       public: Color(const Color &_clr);
 
+      /// Deprecated
+      public: Color(const sdf::Color &_clr) GAZEBO_DEPRECATED;
+
       /// \brief Destructor
       public: virtual ~Color();
 
@@ -119,6 +124,9 @@ namespace gazebo
       /// \param[in] _pt Color to copy
       /// \return Reference to this color
       public: Color &operator =(const Color &_pt);
+
+      /// Deprecated
+      public: Color &operator =(const sdf::Color &_clr) GAZEBO_DEPRECATED;
 
       /// \brief Array index operator
       /// \param[in] _index Color component index(0=red, 1=green, 2=blue)
@@ -227,6 +235,9 @@ namespace gazebo
       /// \param[in] _pt The color to check for inequality
       /// \return True if the this color does not equal _pt
       public: bool operator!=(const Color &_pt) const;
+
+      /// Deprecated
+      public: bool operator!=(const sdf::Color &_pt) const GAZEBO_DEPRECATED;
 
       /// \brief Clamp the color values to valid ranges
       private: void Clamp();

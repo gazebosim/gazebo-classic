@@ -1,9 +1,9 @@
 include_directories (
-  ${PROJECT_SOURCE_DIR}/gazebo
   ${PROJECT_BINARY_DIR}/gazebo
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
+  ${SDF_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/test/gtest/include
   ${PROJECT_SOURCE_DIR}/test/gtest
@@ -15,17 +15,6 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
   ${ODE_LIBRARY_DIRS}
 )
-
-if(HAVE_URDFDOM_HEADERS)
-  link_directories(
-    ${urdfdom_LIBRARY_DIRS}
-    ${urdfdom_headers_LIBRARY_DIRS})
-endif(HAVE_URDFDOM_HEADERS)
-
-if(HAVE_CONSOLE_BRIDGE)
-  link_directories(
-    ${console_bridge_LIBRARY_DIRS})
-endif(HAVE_CONSOLE_BRIDGE)
 
 configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
 

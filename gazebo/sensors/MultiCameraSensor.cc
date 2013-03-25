@@ -130,7 +130,7 @@ void MultiCameraSensor::Init()
 
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
     camera->AttachToVisual(this->parentName, true);
 

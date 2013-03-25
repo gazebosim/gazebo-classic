@@ -25,8 +25,8 @@
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 
-#include "transport/TransportTypes.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "physics/PhysicsTypes.hh"
 #include "physics/World.hh"
 

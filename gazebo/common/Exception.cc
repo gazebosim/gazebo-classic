@@ -20,8 +20,8 @@
  * Date: 07 May 2007
  */
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
 using namespace gazebo;
 using namespace common;

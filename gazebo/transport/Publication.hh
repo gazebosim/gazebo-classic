@@ -25,9 +25,9 @@
 #include <string>
 #include <vector>
 
-#include "transport/CallbackHelper.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/PublicationTransport.hh"
+#include "gazebo/transport/CallbackHelper.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/PublicationTransport.hh"
 
 namespace gazebo
 {

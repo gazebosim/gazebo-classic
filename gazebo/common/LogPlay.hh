@@ -24,7 +24,7 @@
 #include <string>
 #include <fstream>
 
-#include "common/SingletonT.hh"
+#include "gazebo/common/SingletonT.hh"
 
 namespace gazebo
 {

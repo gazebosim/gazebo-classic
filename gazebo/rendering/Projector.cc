@@ -19,12 +19,12 @@
  * Author: Jared Duke, John Hsu, Nate Koenig
  */
 
-#include "rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
 
-#include "rendering/Conversions.hh"
-#include "rendering/Visual.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Projector.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Projector.hh"
 
 using namespace gazebo;
 using namespace rendering;

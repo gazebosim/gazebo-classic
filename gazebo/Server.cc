@@ -29,7 +29,7 @@
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Common.hh"
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 #include "gazebo/sensors/Sensors.hh"
 

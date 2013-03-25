@@ -281,15 +281,14 @@ else (build_errors)
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
  
-
   if (BUILD_GAZEBO)
     add_subdirectory(gazebo)
-    add_subdirectory(sdf)
     add_subdirectory(media)
     add_subdirectory(test)
     add_subdirectory(tools)
     add_subdirectory(plugins)
     add_subdirectory(interfaces)
+    add_subdirectory(sdf)
   endif (BUILD_GAZEBO)
 
   ########################################

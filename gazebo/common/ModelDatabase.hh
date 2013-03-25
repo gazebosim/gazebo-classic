@@ -22,7 +22,9 @@
 #include <list>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
+
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 /// \brief The file name of model XML configuration.
 #define GZ_MODEL_MANIFEST_FILENAME "model.config"
@@ -87,8 +89,8 @@ namespace gazebo
       /// \brief Deprecated.
       /// \sa ModelDatabase::GetModelConfig
       /// \sa ModelDatabase::GetDBConfig
-      public: std::string GetManifest(const std::string &_uri)
-              GAZEBO_DEPRECATED;
+      public: std::string GetManifest(
+                  const std::string &_uri) GAZEBO_DEPRECATED;
 
       /// \brief Get the local path to a model.
       ///

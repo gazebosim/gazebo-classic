@@ -25,6 +25,7 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <sdf/sdf.hh>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/common/CommonTypes.hh"
@@ -57,6 +58,9 @@ namespace gazebo
       /// \brief Copy constructor
       /// \param[in] _v a vector
       public: Vector3(const Vector3 &_v);
+
+      /// Deprecated
+      public: Vector3(const sdf::Vector3 &_v) GAZEBO_DEPRECATED;
 
       /// \brief Destructor
       public: virtual ~Vector3();
@@ -161,6 +165,9 @@ namespace gazebo
       /// \return this
       public: Vector3 &operator =(const Vector3 &_v);
 
+      /// Deprecated
+      public: Vector3 &operator =(const sdf::Vector3 &_v) GAZEBO_DEPRECATED;
+
       /// \brief Assignment operator
       /// \param[in] _value assigned to all elements
       /// \return this
@@ -257,6 +264,9 @@ namespace gazebo
       /// \return true if each component is equal withing a
       /// default tolerence (1e-6), false otherwise
       public: bool operator!=(const Vector3 &_v) const;
+
+      /// Deprecated
+      public: bool operator!=(const sdf::Vector3 &_v) const GAZEBO_DEPRECATED;
 
       /// \brief See if a point is finite (e.g., not nan)
       public: bool IsFinite() const;
