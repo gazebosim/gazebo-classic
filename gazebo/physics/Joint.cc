@@ -98,8 +98,14 @@ void Joint::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string parentName = _sdf->GetValueString("parent");
-  std::string childName = _sdf->GetValueString("child");
+  sdf::ElementPtr parentElem = _sdf->GetElement("parent");
+  sdf::ElementPtr childElem = _sdf->GetElement("child");
+
+  GZ_ASSERT(parentElem, "Parent element is NULL");
+  GZ_ASSERT(childElem, "Child element is NULL");
+
+  std::string parentName = parentElem->GetValueString("link_name");
+  std::string childName = childElem->GetValueString("link_name");
 
   if (this->model)
   {
@@ -226,32 +232,15 @@ void Joint::Init()
   }
   else
   {
+    // if parentLink is NULL, it's name be the world
+    this->sdf->GetElement("parent")->GetElement("link_name")->Set("world");
     if (this->sdf->HasElement("axis"))
     {
       this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-      if (this->sdf->GetValueString("parent") != "world")
-      {
-        gzwarn << "joint [" << this->GetScopedName()
-          << "] has a non-real parentLink ["
-          << this->sdf->GetValueString("parent")
-          << "], loading axis from SDF ["
-          << this->sdf->GetElement("axis")->GetValueVector3("xyz")
-          << "]\n";
-      }
     }
     if (this->sdf->HasElement("axis2"))
     {
       this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
-
-      if (this->sdf->GetValueString("parent") != "world")
-      {
-        gzwarn << "joint [" << this->GetScopedName()
-          << "] has a non-real parentLink ["
-          << this->sdf->GetValueString("parent")
-          << "], loading axis2 from SDF ["
-          << this->sdf->GetElement("axis2")->GetValueVector3("xyz")
-          << "]\n";
-      }
     }
   }
   this->ComputeInertiaRatio();
@@ -321,12 +310,10 @@ void Joint::Attach(LinkPtr _parent, LinkPtr _child)
 //////////////////////////////////////////////////
 void Joint::Detach()
 {
-  BasePtr myBase = shared_from_this();
-
   if (this->parentLink)
-    this->parentLink->RemoveChildJoint(
-      boost::static_pointer_cast<Joint>(myBase));
-  this->childLink->RemoveParentJoint(boost::static_pointer_cast<Joint>(myBase));
+    this->parentLink->RemoveChildJoint(this->GetName());
+  if (this->childLink)
+    this->childLink->RemoveParentJoint(this->GetName());
 }
 
 //////////////////////////////////////////////////

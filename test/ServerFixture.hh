@@ -19,6 +19,11 @@
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wshadow"
 
+// The following is needed to enable the GetMemInfo function for OSX
+#ifdef __MACH__
+# include <mach/mach.h>
+#endif  // __MACH__
+
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
@@ -128,11 +133,16 @@ class ServerFixture : public testing::Test
                               _paused, _physics));
 
                // Wait for the server to come up
-               // Use a 30 second timeout.
-               int waitCount = 0, maxWaitCount = 3000;
+               // Use a 60 second timeout.
+               int waitCount = 0, maxWaitCount = 6000;
                while ((!this->server || !this->server->GetInitialized()) &&
                       ++waitCount < maxWaitCount)
                  common::Time::MSleep(10);
+               gzwarn << "ServerFixture load in "
+                      << static_cast<double>(waitCount)/100.0
+                      << " seconds, timeout after "
+                      << static_cast<double>(maxWaitCount)/100.0
+                      << " seconds\n";
                ASSERT_LT(waitCount, maxWaitCount);
 
                this->node = transport::NodePtr(new transport::Node());
@@ -471,7 +481,9 @@ class ServerFixture : public testing::Test
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
                  double _minRange = 0.08, double _maxRange = 10,
-                 double _rangeResolution = 0.01, unsigned int _samples = 640)
+                 double _rangeResolution = 0.01, unsigned int _samples = 640,
+                 const std::string &_noiseType = "", double _noiseMean = 0.0,
+                 double _noiseStdDev = 0.0)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
@@ -504,8 +516,16 @@ class ServerFixture : public testing::Test
                  << "        <min>" << _minRange << "</min>"
                  << "        <max>" << _maxRange << "</max>"
                  << "        <resolution>" << _rangeResolution <<"</resolution>"
-                 << "      </range>"
-                 << "    </ray>"
+                 << "      </range>";
+
+               if (_noiseType.size() > 0)  
+                 newModelStr << "      <noise>"
+                 << "        <type>" << _noiseType << "</type>"
+                 << "        <mean>" << _noiseMean << "</mean>"
+                 << "        <stddev>" << _noiseStdDev << "</stddev>"
+                 << "      </noise>";
+
+               newModelStr << "    </ray>"
                  << "  </sensor>"
                  << "</link>"
                  << "</model>"
@@ -848,6 +868,42 @@ class ServerFixture : public testing::Test
                physics::WorldPtr world = physics::get_world();
                world->RemovePlugin(_name);
              }
+
+  protected: void GetMemInfo(double &_resident, double &_share)
+            {
+              int totalSize, residentPages, sharePages;
+              totalSize = residentPages = sharePages = 0;
+
+#ifdef __linux__
+              std::ifstream buffer("/proc/self/statm");
+              buffer >> totalSize >> residentPages >> sharePages;
+              buffer.close();
+
+              // in case x86-64 is configured to use 2MB pages
+              int64_t pageSizeKb = sysconf(_SC_PAGE_SIZE) / 1024;
+
+              _resident = residentPages * pageSizeKb;
+              _share = sharePages * pageSizeKb;
+#elif __MACH__
+              // /proc is only available on Linux
+              // for OSX, use task_info to get resident and virtual memory
+              struct task_basic_info t_info;
+              mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
+              if (KERN_SUCCESS != task_info(mach_task_self(),
+                                            TASK_BASIC_INFO,
+                                            (task_info_t)&t_info,
+                                            &t_info_count))
+              {
+                gzerr << "failure calling task_info\n";
+                return;
+              }
+              _resident = static_cast<double>(t_info.resident_size/1024);
+              _share = static_cast<double>(t_info.virtual_size/1024);
+#else
+              gzerr << "Unsupported architecture\n";
+              return;
+#endif
+            }
 
   protected: Server *server;
   protected: boost::thread *serverThread;

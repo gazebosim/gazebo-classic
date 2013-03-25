@@ -22,8 +22,9 @@
 
 #include <dirent.h>
 #include <sstream>
+#include <boost/filesystem.hpp>
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
@@ -74,12 +75,16 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
   this->renderTexture = NULL;
 
   this->captureData = false;
+  this->captureDataOnce = false;
 
   this->camera = NULL;
   this->viewport = NULL;
 
   this->pitchNode = NULL;
   this->sceneNode = NULL;
+
+  this->screenshotPath = getenv("HOME");
+  this->screenshotPath += "/.gazebo/pictures";
 
   // Connect to the render signal
   this->connections.push_back(
@@ -323,20 +328,15 @@ void Camera::PostRender()
 {
   this->renderTarget->swapBuffers();
 
-  if (this->newData && this->captureData)
+  if (this->newData && (this->captureData || this->captureDataOnce))
   {
-    Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
-
     size_t size;
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
 
     // Get access to the buffer and make an image and write it to file
-    pixelBuffer = this->renderTexture->getBuffer();
-
-    Ogre::PixelFormat format = pixelBuffer->getFormat();
-
-    size = Ogre::PixelUtil::getMemorySize(width, height, 1, format);
+    size = Ogre::PixelUtil::getMemorySize(width, height, 1,
+        static_cast<Ogre::PixelFormat>(this->imageFormat));
 
     // Allocate buffer
     if (!this->saveFrameBuffer)
@@ -345,11 +345,16 @@ void Camera::PostRender()
     memset(this->saveFrameBuffer, 128, size);
 
     Ogre::PixelBox box(width, height, 1,
-        (Ogre::PixelFormat)this->imageFormat, this->saveFrameBuffer);
+        static_cast<Ogre::PixelFormat>(this->imageFormat),
+        this->saveFrameBuffer);
 
-    pixelBuffer->blitToMemory(box);
+    this->viewport->getTarget()->copyContentsToMemory(box);
 
-    // record render time stamp
+    if (this->captureDataOnce)
+    {
+      this->SaveFrame(this->GetFrameFilename());
+      this->captureDataOnce = false;
+    }
 
     if (this->sdf->HasElement("save") &&
         this->sdf->GetElement("save")->GetValueBool("enabled"))
@@ -381,7 +386,6 @@ void Camera::PostRender()
 
   this->newData = false;
 }
-
 
 //////////////////////////////////////////////////
 math::Pose Camera::GetWorldPose()
@@ -531,16 +535,33 @@ void Camera::SetImageHeight(unsigned int _h)
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageWidth() const
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("image");
-  return elem->GetValueInt("width");
+  unsigned int width = 0;
+  if (this->viewport)
+  {
+    width = this->viewport->getActualWidth();
+  }
+  else
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("image");
+    width = elem->GetValueInt("width");
+  }
+  return width;
 }
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageHeight() const
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("image");
-  // gzerr << "image height " << elem->GetValueInt("height") << "\n";
-  return elem->GetValueInt("height");
+  unsigned int height = 0;
+  if (this->viewport)
+  {
+    height = this->viewport->getActualHeight();
+  }
+  else
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("image");
+    height = elem->GetValueInt("height");
+  }
+  return height;
 }
 
 //////////////////////////////////////////////////
@@ -644,9 +665,6 @@ void Camera::EnableSaveFrame(bool enable)
   sdf::ElementPtr elem = this->sdf->GetElement("save");
   elem->GetAttribute("enabled")->Set(enable);
   this->captureData = true;
-
-  if (!this->renderTexture)
-    this->CreateRenderTexture("saveframes_render_texture");
 }
 
 //////////////////////////////////////////////////
@@ -799,42 +817,40 @@ std::string Camera::GetFrameFilename()
   sdf::ElementPtr saveElem = this->sdf->GetElement("save");
 
   std::string path = saveElem->GetValueString("path");
-
-  // Create a directory if not present
-  DIR *dir = opendir(path.c_str());
-  if (!dir)
-  {
-    std::string command;
-    command = "mkdir " + path + " 2>>/dev/null";
-    if (system(command.c_str()) < 0)
-      gzerr << "Error making directory\n";
-  }
+  boost::filesystem::path pathToFile;
 
   std::string friendlyName = this->GetName();
+  std::string filename;
+
   boost::replace_all(friendlyName, "::", "_");
 
-  char tmp[1024];
-  if (!path.empty())
+  if (this->captureDataOnce)
   {
-    // double wallTime = common::Time::GetWallTime().Double();
-    // int min = static_cast<int>((wallTime / 60.0));
-    // int sec = static_cast<int>((wallTime - min*60));
-    // int msec = static_cast<int>((wallTime*1000 - min*60000 - sec*1000));
-
-    snprintf(tmp, sizeof(tmp), "%s/%s-%04d.jpg", path.c_str(),
-             friendlyName.c_str(), this->saveCount);
+    pathToFile = this->screenshotPath;
+    std::string timestamp = common::Time::GetWallTimeAsISOString();
+    boost::replace_all(timestamp, ":", "_");
+    pathToFile /= friendlyName + "-" + timestamp + ".jpg";
   }
   else
   {
-    snprintf(tmp, sizeof(tmp), "%s-%04d.jpg", friendlyName.c_str(),
-             this->saveCount);
+    pathToFile = (path.empty()) ? "." : path;
+    pathToFile /= str(boost::format("%s-%04d.jpg")
+        % friendlyName.c_str() % this->saveCount);
+    this->saveCount++;
   }
 
-  this->saveCount++;
-  closedir(dir);
-  return tmp;
+  // Create a directory if not present
+  if (!boost::filesystem::exists(pathToFile.parent_path()))
+    boost::filesystem::create_directories(pathToFile.parent_path());
+
+  return pathToFile.string();
 }
 
+/////////////////////////////////////////////////
+std::string Camera::GetScreenshotPath() const
+{
+  return this->screenshotPath;
+}
 
 /////////////////////////////////////////////////
 bool Camera::SaveFrame(const unsigned char *_image,
@@ -1035,6 +1051,12 @@ void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
 void Camera::SetCaptureData(bool _value)
 {
   this->captureData = _value;
+}
+
+//////////////////////////////////////////////////
+void Camera::SetCaptureDataOnce()
+{
+  this->captureDataOnce = true;
 }
 
 //////////////////////////////////////////////////
