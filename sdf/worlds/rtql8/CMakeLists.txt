@@ -5,6 +5,8 @@ set (files
   falling_box_ode.world
   falling_boxes.world
   falling_boxes_ode.world
+  falling_shapes.world
+  falling_shapes_ode.world
   double_pendulum.world
   double_pendulum_ode.world
   simple_pendulum.world

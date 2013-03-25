@@ -24,7 +24,7 @@
       <static>true</static>
       <pose>-2 0 0 0 0 0</pose>
       <link name="link_box1">
-	<pose>0 0 0 0 0 0</pose>
+	    <pose>0 0 0 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -44,7 +44,7 @@
             </box>
           </geometry>
         </visual>
-	<collision name="coll_box1">
+	    <collision name="coll_box1">
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <box>
@@ -54,12 +54,12 @@
         </collision>
       </link>
     </model>
-
-    <model name="model_box2">
+   
+    <model name="model_cylinder1">
       <static>true</static>
-      <pose>-2 0 1 0 0 0</pose>
-      <link name="link_box2">
-	<pose>0 0 0 0 0 0</pose>
+      <pose>2 0 0 0 0 0</pose>
+      <link name="link_cylinder1">
+	    <pose>0 0 0 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -71,20 +71,22 @@
           </inertia>
           <mass>1.0</mass>
         </inertial>
-        <visual name="visual_box2">
+        <visual name="visual_cylinder1">
           <pose>0 0 0 0 0 0</pose>
           <geometry>
-            <box>
-              <size>0.2 0.4 0.6</size>
-            </box>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
           </geometry>
         </visual>
-	<collision name="coll_box2">
+	    <collision name="coll_cylinder1">
           <pose>0 0 0 0 0 0</pose>
           <geometry>
-            <box>
-              <size>0.2 0.4 0.6</size>
-            </box>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
           </geometry>
         </collision>
       </link>

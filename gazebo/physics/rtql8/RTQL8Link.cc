@@ -88,7 +88,16 @@ void RTQL8Link::Init()
       this->rtql8BodyNode->setShape(shape);
     }
     else if (geomType == "cylinder")
-      gzerr << "Not implemented yet...";
+    {
+      double radius = geometryElem->GetFirstElement()->GetValueDouble("radius");
+      double length = geometryElem->GetFirstElement()->GetValueDouble("length");
+      Eigen::Vector3d eigenSize(radius, length, 1);
+//      rtql8::kinematics::ShapeCylinder* shape
+//              = new rtql8::kinematics::ShapeCylinder(radius, length);
+      rtql8::kinematics::ShapeCylinder* shape
+          = new rtql8::kinematics::ShapeCylinder(eigenSize, 1);
+      this->rtql8BodyNode->setShape(shape);
+    }
     else if (geomType == "multiray")
       gzerr << "Not implemented yet...";
     else if (geomType == "mesh" || geomType == "trimesh")

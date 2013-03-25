@@ -10,6 +10,7 @@
 #include <rtql8/kinematics/Joint.h>
 #include <rtql8/kinematics/Shape.h>
 #include <rtql8/kinematics/ShapeCube.h>
+#include <rtql8/kinematics/ShapeCylinder.h>
 #include <rtql8/kinematics/ShapeEllipsoid.h>
 #include <rtql8/kinematics/ShapeMesh.h>
 #include <rtql8/kinematics/Transformation.h>
