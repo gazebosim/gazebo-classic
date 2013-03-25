@@ -107,6 +107,9 @@ SimbodyPhysics::~SimbodyPhysics()
 //////////////////////////////////////////////////
 void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 {
+  // need to reset flag, in case loading mu;tiple models.
+  this->simbodyPhysicsInitialized = false;
+
   PhysicsEngine::Load(_sdf);
 
   sdf::ElementPtr simbodyElem = this->sdf->GetElement("simbody");
@@ -175,6 +178,8 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
       gzerr << "failed to cast link [" << (*li)->GetName()
             << "] as simbody link\n";
   }
+
+  this->system.realize(this->integ->getAdvancedState(), Stage::Velocity);
 }
 
 //////////////////////////////////////////////////
@@ -584,6 +589,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
                 direction);
             mobod = pinJoint;
 
+            gzdbg << "Setting limitForce for [" << gzJoint->GetName()
+                  << "]\n";
             double low = gzJoint->GetLowerLimit(0u).Radian();
             double high = gzJoint->GetUpperLimit(0u).Radian();
             gzJoint->limitForce.reset(

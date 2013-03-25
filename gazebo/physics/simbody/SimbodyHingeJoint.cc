@@ -133,12 +133,16 @@ void SimbodyHingeJoint::SetHighStop(int _index,
   {
     if (simbodyPhysics->simbodyPhysicsInitialized)
     {
-      this->limitForce->setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        this->limitForce->getLowerBound(
-          this->simbodyPhysics->integ->updAdvancedState()),
-        _angle.Radian()
-        );
+      if (this->limitForce)
+        this->limitForce->setBounds(
+          this->simbodyPhysics->integ->updAdvancedState(),
+          this->limitForce->getLowerBound(
+            this->simbodyPhysics->integ->updAdvancedState()),
+          _angle.Radian()
+          );
+      else
+        gzdbg << "limitForce for joint ["
+              << this->GetName() << "] is NULL, new model added?\n";
     }
     else
     {
@@ -158,12 +162,16 @@ void SimbodyHingeJoint::SetLowStop(int _index,
   {
     if (simbodyPhysics->simbodyPhysicsInitialized)
     {
-      this->limitForce->setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        _angle.Radian(),
-        this->limitForce->getUpperBound(
-          this->simbodyPhysics->integ->updAdvancedState())
-        );
+      if (this->limitForce)
+        this->limitForce->setBounds(
+          this->simbodyPhysics->integ->updAdvancedState(),
+          _angle.Radian(),
+          this->limitForce->getUpperBound(
+            this->simbodyPhysics->integ->updAdvancedState())
+          );
+      else
+        gzdbg << "limitForce for joint ["
+              << this->GetName() << "] is NULL, new model added?\n";
     }
     else
     {
