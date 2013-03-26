@@ -113,6 +113,10 @@ namespace gazebo
       /// \return The previously published message, if any
       public: std::string GetPrevMsg() const;
 
+      /// \brief Get the previously published message
+      /// \return The previously published message, if any
+      public: MessagePtr GetPrevMsgPtr() const;
+
       /// \brief Callback when a publish is completed
       private: void OnPublishComplete();
 
@@ -135,7 +139,7 @@ namespace gazebo
       private: bool queueLimitWarned;
 
       /// \brief List of messages to publish.
-      private: std::list<google::protobuf::Message *> messages;
+      private: std::list<MessagePtr> messages;
 
       /// \brief For mutual exclusion.
       private: mutable boost::recursive_mutex mutex;
@@ -145,7 +149,7 @@ namespace gazebo
       private: PublicationPtr publication;
 
       /// \brief The previous message published. Used for latching topics.
-      private: google::protobuf::Message *prevMsg;
+      private: MessagePtr prevMsg;
 
       private: common::Time currentTime;
       private: common::Time prevPublishTime;
