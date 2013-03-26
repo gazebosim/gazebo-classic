@@ -234,7 +234,9 @@ void Joint::Init()
   {
     if (this->sdf->HasElement("axis"))
     {
-      this->SetAxis(0, this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+      this->SetAxis(0,
+          this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+
       if (this->sdf->GetElement("parent")->Get<std::string>("link_name")
           != "world")
       {
@@ -248,7 +250,8 @@ void Joint::Init()
     }
     if (this->sdf->HasElement("axis2"))
     {
-      this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
+      this->SetAxis(1,
+          this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
 
       if (this->sdf->GetElement("parent")->Get<std::string>("link_name")
           != "world")

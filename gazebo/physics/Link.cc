@@ -775,7 +775,8 @@ void Link::FillMsg(msgs::Link &_msg)
     sdf::ElementPtr elem = this->sdf->GetElement("projector");
 
     msgs::Projector *proj = _msg.add_projector();
-    proj->set_name(this->GetScopedName() + "::" + elem->Get<std::string>("name"));
+    proj->set_name(
+        this->GetScopedName() + "::" + elem->Get<std::string>("name"));
     proj->set_texture(elem->Get<std::string>("texture"));
     proj->set_fov(elem->Get<double>("fov"));
     proj->set_near_clip(elem->Get<double>("near_clip"));

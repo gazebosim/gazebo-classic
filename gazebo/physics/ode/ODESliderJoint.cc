@@ -154,7 +154,7 @@ double ODESliderJoint::GetParam(int _parameter) const
   double result = 0;
 
   if (this->jointId)
-   result = dJointGetSliderParam(this->jointId, _parameter);
+    result = dJointGetSliderParam(this->jointId, _parameter);
   else
     gzerr << "ODE Joint ID is invalid\n";
 

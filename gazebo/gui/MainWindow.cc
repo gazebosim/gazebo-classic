@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+#include <sdf/sdf.hh>
+
 #include "gazebo_config.h"
 
 #include "gazebo/gui/TopicSelector.hh"
@@ -45,7 +47,6 @@
 #include "gazebo/gui/building/BuildingEditorPalette.hh"
 #include "gazebo/gui/building/EditorEvents.hh"
 
-#include "sdf/sdf.hh"
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"

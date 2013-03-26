@@ -14,7 +14,8 @@
  * limitations under the License.
  *
 */
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "math/Pose.hh"
 #include "common/Console.hh"
 #include "common/MeshManager.hh"

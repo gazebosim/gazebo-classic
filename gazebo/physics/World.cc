@@ -27,10 +27,11 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
-#include <sdf/sdf.hh>
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Publisher.hh"

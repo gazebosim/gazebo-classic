@@ -607,7 +607,9 @@ namespace gazebo
       else
         gzthrow(std::string("Unknown fog type[") + type + "]");
 
-      result.mutable_color()->CopyFrom(Convert(_sdf->Get<common::Color>("color")));
+      result.mutable_color()->CopyFrom(
+          Convert(_sdf->Get<common::Color>("color")));
+
       result.set_density(_sdf->Get<double>("density"));
       result.set_start(_sdf->Get<double>("start"));
       result.set_end(_sdf->Get<double>("end"));

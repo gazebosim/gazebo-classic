@@ -49,7 +49,9 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     return;
   }
 
-  this->joints[1] = this->model->GetJoint(_sdf->Get<std::string>("front_right"));
+  this->joints[1] = this->model->GetJoint(
+      _sdf->Get<std::string>("front_right"));
+
   if (!this->joints[1])
   {
     gzerr << "Unable to find joint: front_right\n";
@@ -85,7 +87,8 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   this->gasJoint = this->model->GetJoint(_sdf->Get<std::string>("gas"));
   this->brakeJoint = this->model->GetJoint(_sdf->Get<std::string>("brake"));
-  this->steeringJoint = this->model->GetJoint(_sdf->Get<std::string>("steering"));
+  this->steeringJoint = this->model->GetJoint(
+      _sdf->Get<std::string>("steering"));
 
   if (!this->gasJoint)
   {

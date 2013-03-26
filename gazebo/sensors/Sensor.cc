@@ -19,7 +19,8 @@
  * Date: 25 May 2007
  */
 
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/physics/Physics.hh"

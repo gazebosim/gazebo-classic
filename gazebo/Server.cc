@@ -19,6 +19,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -28,8 +30,6 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Common.hh"
-
-#include <sdf/sdf.hh>
 
 #include "gazebo/sensors/Sensors.hh"
 

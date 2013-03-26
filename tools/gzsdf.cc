@@ -16,7 +16,7 @@
 */
 
 #include <sys/stat.h>
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 std::vector<std::string> params;
 

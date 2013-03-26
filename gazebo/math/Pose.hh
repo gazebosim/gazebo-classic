@@ -238,8 +238,6 @@ namespace gazebo
 
       /// \brief The rotation
       public: Quaternion rot;
-
-
     };
     /// \}
   }
