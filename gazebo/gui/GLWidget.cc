@@ -132,7 +132,6 @@ GLWidget::~GLWidget()
   this->selectionSub.reset();
 
   this->userCamera.reset();
-
 }
 
 /////////////////////////////////////////////////

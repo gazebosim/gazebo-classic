@@ -73,6 +73,7 @@ void DataLogger_TEST::RecordButton()
 
   // Make sure the initial size is zero
   txt = sizeLabel->text().toStdString();
+  std::cout << "TXT[" << txt << "]\n";
   QVERIFY(txt == "0.00 B");
 
   // Make sure the initial time is zero
@@ -107,6 +108,9 @@ void DataLogger_TEST::RecordButton()
 void DataLogger_TEST::StressTest()
 {
   this->Load("worlds/empty.world");
+
+  // Cleanup test directory.
+  boost::filesystem::remove_all("/tmp/gazebo_test");
 
   gazebo::transport::NodePtr node;
   gazebo::transport::PublisherPtr pub;
@@ -146,10 +150,10 @@ void DataLogger_TEST::StressTest()
   {
   }
 
-  QVERIFY(dirCount == count / 2);
-
   // Cleanup after ourselves.
   boost::filesystem::remove_all("/tmp/gazebo_test");
+
+  QVERIFY(dirCount == count / 2);
 }
 
 // Generate a main function for the test
