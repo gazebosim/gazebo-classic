@@ -135,8 +135,6 @@ endmacro()
 #################################################
 macro (gz_setup_apple)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
-
-  FIND_LIBRARY(Cocoa_LIBRARIES Cocoa)
 endmacro()
 
 # This should be migrated to more fine control solution based on set_property APPEND
