@@ -1271,6 +1271,32 @@ TEST(gz_log, HzFilter)
 }
 
 /////////////////////////////////////////////////
+/// Check to make sure that 'gzlog step' returns correct information
+/// Just check number of characters returned for now
+TEST(gz_log, Step)
+{
+  std::string stepCmd;
+  stepCmd = std::string("gzlog step ") + PROJECT_SOURCE_PATH +
+    std::string("/test/data/pr2_state.log");
+
+  // Call gzlog step and press q immediately
+  std::string stepq0 = custom_exec(std::string("echo 'q' | ") + stepCmd);
+  EXPECT_EQ(stepq0.length(), 115358u);
+
+  // Call gzlog step and press space once, then q
+  std::string stepq1 = custom_exec(std::string("echo ' q' | ") + stepCmd);
+  EXPECT_EQ(stepq1.length(), 130172u);
+
+  // Call gzlog step and press space twice, then q
+  std::string stepq2 = custom_exec(std::string("echo '  q' | ") + stepCmd);
+  EXPECT_EQ(stepq2.length(), 145523u);
+
+  // Call gzlog step and press space thrice, then q
+  std::string stepq3 = custom_exec(std::string("echo '   q' | ") + stepCmd);
+  EXPECT_EQ(stepq3.length(), 145523u);
+}
+
+/////////////////////////////////////////////////
 /// Main
 int main(int argc, char **argv)
 {
