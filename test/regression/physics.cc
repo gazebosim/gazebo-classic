@@ -25,7 +25,6 @@ using namespace gazebo;
 
 class PhysicsTest : public ServerFixture
 {
-  public: void GearboxTest(const std::string &_physicsEngine);
   public: void EmptyWorld(const std::string &_physicsEngine);
   public: void SpawnDrop(const std::string &_physicsEngine);
   public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
@@ -225,83 +224,6 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
     }
   }
 }
-
-////////////////////////////////////////////////////////////////////////
-// GearboxTest:
-// start gearbox.world, apply balancing forces across geared members,
-// check for equilibrium.
-////////////////////////////////////////////////////////////////////////
-void PhysicsTest::GearboxTest(const std::string &_physicsEngine)
-{
-  // load an empty world
-  Load("worlds/gearbox.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
-
-  // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x, 0);
-  EXPECT_EQ(g.y, 0);
-  EXPECT_LE(g.z, 0);
-
-  physics::ModelPtr model = world->GetModel("model_1");
-  physics::JointPtr joint1 = model->GetJoint("joint_12");
-  physics::JointPtr joint3 = model->GetJoint("joint_23");
-  int steps = 10000;
-  for (int i = 0; i < steps; ++i)
-  {
-    joint1->SetForce(0, -1.5);
-    joint3->SetForce(0,  1.0);
-    world->StepWorld(1);
-    if (i%1000 == 0)
-      gzdbg << "gearbox time [" << world->GetSimTime().Double()
-            << "] vel [" << joint1->GetVelocity(0)
-            << "] pose [" << joint1->GetAngle(0).Radian()
-            << "] vel [" << joint3->GetVelocity(0)
-            << "] pose [" << joint3->GetAngle(0).Radian()
-            << "]\n";
-  }
-  EXPECT_NEAR(joint1->GetVelocity(0), 0, 1e-6);
-  EXPECT_NEAR(joint1->GetVelocity(0), 0, 1e-6);
-  EXPECT_NEAR(joint3->GetAngle(0).Radian(), 0, 1e-6);
-  EXPECT_NEAR(joint3->GetAngle(0).Radian(), 0, 1e-6);
-
-  // slight imbalance
-  for (int i = 0; i < steps; ++i)
-  {
-    joint1->SetForce(0, -1.0);
-    joint3->SetForce(0,  1.0);
-    world->StepWorld(1);
-    if (i%1000 == 0)
-      gzdbg << "gearbox time [" << world->GetSimTime().Double()
-            << "] vel [" << joint1->GetVelocity(0)
-            << "] pose [" << joint1->GetAngle(0).Radian()
-            << "] vel [" << joint3->GetVelocity(0)
-            << "] pose [" << joint3->GetAngle(0).Radian()
-            << "]\n";
-  }
-  EXPECT_GT(joint1->GetVelocity(0), 0);
-  EXPECT_GT(joint1->GetVelocity(0), 0);
-  EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
-  EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
-}
-
-TEST_F(PhysicsTest, GearboxTestODE)
-{
-  GearboxTest("ode");
-}
-
-// #ifdef HAVE_BULLET
-// TEST_F(PhysicsTest, GearboxTestBullet)
-// {
-//   GearboxTest("bullet");
-// }
-// #endif  // HAVE_BULLET
 
 TEST_F(PhysicsTest, SpawnDropODE)
 {
