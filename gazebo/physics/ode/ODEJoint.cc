@@ -343,7 +343,12 @@ math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
 //////////////////////////////////////////////////
 void ODEJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
-  this->sdf->GetElement("axis")->GetElement("xyz")->Set(_axis);
+  if (_index == 0)
+    this->sdf->GetElement("axis")->GetElement("xyz")->Set(_axis);
+  else if (_index == 1)
+    this->sdf->GetElement("axis2")->GetElement("xyz")->Set(_axis);
+  else
+    gzerr << "SetAxis index [" << _index << "] out of bounds\n";
 }
 
 //////////////////////////////////////////////////
