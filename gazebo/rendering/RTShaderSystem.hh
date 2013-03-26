@@ -30,7 +30,7 @@
 #include "gazebo_config.h"
 
 #include "rendering/Camera.hh"
-#include "common/SingletonT.hh"
+#include "gazebo/common/ThreadSingletonT.hh"
 
 namespace gazebo
 {
@@ -47,7 +47,7 @@ namespace gazebo
     ///
     /// This class allows Gazebo to generate per-pixel shaders for every
     /// material at run-time.
-    class RTShaderSystem : public SingletonT<RTShaderSystem>
+    class RTShaderSystem : public ThreadSingletonT<RTShaderSystem>
     {
       /// \enum LightingModel.
       /// \brief The type of lighting.
@@ -66,10 +66,10 @@ namespace gazebo
               };
 
       /// \brief Constructor.
-      private: RTShaderSystem();
+      public: RTShaderSystem();
 
       /// \brief Destructor.
-      private: virtual ~RTShaderSystem();
+      public: virtual ~RTShaderSystem();
 
       /// \brief Init the run time shader system.
       public: void Init();
@@ -164,7 +164,7 @@ namespace gazebo
       private: Ogre::PSSMShadowCameraSetup *pssmSetup;
 
       /// \brief Make the RTShader system a singleton.
-      private: friend class SingletonT<RTShaderSystem>;
+      private: friend class ThreadSingletonT<RTShaderSystem>;
     };
     /// \}
   }

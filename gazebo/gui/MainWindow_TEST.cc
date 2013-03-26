@@ -36,7 +36,7 @@ void MainWindow_TEST::Wireframe()
   this->resMaxPercentChange = 3.0;
   this->shareMaxPercentChange = 1.0;
 
-  this->Load("empty.world");
+  this->LoadServer("empty.world", false);
   gazebo::transport::NodePtr node;
   gazebo::transport::SubscriberPtr sub;
 

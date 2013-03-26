@@ -70,10 +70,10 @@ namespace gazebo
 
       /// \brief Constructor. This is a singleton, use
       /// RenderEngine::Instance() to access the render engine.
-      private: RenderEngine();
+      public: RenderEngine();
 
       /// \brief Destructor
-      private: virtual ~RenderEngine();
+      public: virtual ~RenderEngine();
 
       /// \brief Load the parameters for Ogre. Load must happen before Init.
       public: void Load();
@@ -120,6 +120,10 @@ namespace gazebo
       /// automatically determined based on the computers capabilities
       /// \return The RenderPathType
       public: RenderPathType GetRenderPathType() const;
+
+      /// \brief Get a pointer to the window manager.
+      /// \return Pointer to the window manager.
+      public: WindowManagerPtr GetWindowManager() const;
 
       /// \brief Create a render context.
       /// \return True if the context was created.
@@ -179,6 +183,9 @@ namespace gazebo
 
       /// \brief The type of render path used.
       private: RenderPathType renderPathType;
+
+      /// \brief Pointer to the window manager.
+      private: WindowManagerPtr windowManager;
 
       /// \brief Makes this class a singleton.
       private: friend class SingletonT<RenderEngine>;

@@ -42,9 +42,9 @@
 /////////////////////////////////////////////////
 void ImagesView_TEST::Switch()
 {
-  printf("A\n");
-  this->Load("worlds/multicamera_test.world");
-  printf("B\n");
+  this->LoadServer("worlds/multicamera_test.world");
+
+  gazebo::common::Time::MSleep(1000);
 
   // Create a new data logger widget
   gazebo::gui::ImagesView *view = new gazebo::gui::ImagesView(NULL);

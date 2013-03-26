@@ -361,13 +361,15 @@ void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
 //////////////////////////////////////////////////
 float UserCamera::GetAvgFPS() const
 {
-  return WindowManager::Instance()->GetAvgFPS(this->windowId);
+  return RenderEngine::Instance()->GetWindowManager()->GetAvgFPS(
+      this->windowId);
 }
 
 //////////////////////////////////////////////////
 float UserCamera::GetTriangleCount() const
 {
-  return WindowManager::Instance()->GetTriangleCount(this->windowId);
+  return RenderEngine::Instance()->GetWindowManager()->GetTriangleCount(
+      this->windowId);
 }
 
 //////////////////////////////////////////////////

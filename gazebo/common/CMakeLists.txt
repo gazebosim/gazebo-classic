@@ -64,6 +64,7 @@ set (headers
   SingletonT.hh
   STLLoader.hh
   SystemPaths.hh
+  ThreadSingletonT.hh
   Time.hh
   Timer.hh
   UpdateInfo.hh

@@ -25,6 +25,7 @@
 #include "rendering/Rendering.hh"
 #include "rendering/Visual.hh"
 #include "rendering/WindowManager.hh"
+#include "rendering/RenderEngine.hh"
 #include "rendering/Scene.hh"
 #include "rendering/UserCamera.hh"
 #include "rendering/OrbitViewController.hh"
@@ -150,13 +151,14 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 void GLWidget::showEvent(QShowEvent *_event)
 {
   QApplication::flush();
-  this->windowId = rendering::WindowManager::Instance()->CreateWindow(
-      this->GetOgreHandle(), this->width(), this->height());
+  this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
+    CreateWindow(this->GetOgreHandle(), this->width(), this->height());
 
   QWidget::showEvent(_event);
 
   if (this->userCamera)
-    rendering::WindowManager::Instance()->SetCamera(this->windowId,
+    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+        this->windowId,
                                                     this->userCamera);
   this->setFocus();
 }
@@ -173,7 +175,8 @@ void GLWidget::moveEvent(QMoveEvent *_e)
 
   if (_e->isAccepted() && this->windowId >= 0)
   {
-    rendering::WindowManager::Instance()->Moved(this->windowId);
+    rendering::RenderEngine::Instance()->GetWindowManager()->Moved(
+        this->windowId);
   }
 }
 
@@ -204,8 +207,8 @@ void GLWidget::resizeEvent(QResizeEvent *_e)
 
   if (this->windowId >= 0)
   {
-    rendering::WindowManager::Instance()->Resize(this->windowId,
-        _e->size().width(), _e->size().height());
+    rendering::RenderEngine::Instance()->GetWindowManager()->Resize(
+        this->windowId, _e->size().width(), _e->size().height());
     this->userCamera->Resize(_e->size().width(), _e->size().height());
   }
 }
@@ -683,8 +686,8 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
 
   if (this->windowId >= 0)
   {
-    rendering::WindowManager::Instance()->SetCamera(this->windowId,
-                                                    this->userCamera);
+    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+        this->windowId, this->userCamera);
   }
 }
 

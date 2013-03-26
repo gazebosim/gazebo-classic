@@ -61,6 +61,46 @@ void QTestFixture::init()
   this->GetMemInfo(this->residentStart, this->shareStart);
 }
 
+void QTestFixture::LoadServer(const std::string &_worldFilename, bool _paused)
+{
+  // Create, load, and run the server in its own thread
+  this->serverThread = new boost::thread(
+      boost::bind(&QTestFixture::RunServer2, this, _worldFilename, _paused));
+
+  // Wait for the server to come up
+  // Use a 30 second timeout.
+  int waitCount = 0, maxWaitCount = 3000;
+  while ((!this->server || !this->server->GetInitialized()) &&
+      ++waitCount < maxWaitCount)
+    gazebo::common::Time::MSleep(10);
+
+  printf("Here***\n");
+  gazebo::rendering::create_scene(
+      gazebo::physics::get_world()->GetName(), false);
+}
+
+/////////////////////////////////////////////////
+void QTestFixture::RunServer2(const std::string &_worldFilename, bool _paused)
+{
+  this->server = new gazebo::Server();
+  this->server->LoadFile(_worldFilename);
+  this->server->Init();
+
+  this->SetPause(_paused);
+
+  gazebo::rendering::create_scene(
+      gazebo::physics::get_world()->GetName(), false);
+
+  this->server->Run();
+
+  this->server->Fini();
+  printf("Stop4\n");
+
+  delete this->server;
+  this->server = NULL;
+  printf("Stop5\n");
+}
+
 /////////////////////////////////////////////////
 void QTestFixture::Load(const std::string &_worldFilename, bool _paused)
 {
@@ -73,10 +113,12 @@ void QTestFixture::Load(const std::string &_worldFilename, bool _paused)
   gazebo::rendering::create_scene(
       gazebo::physics::get_world()->GetName(), false);
 
+  printf("HERE\n");
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
       boost::bind(&QTestFixture::RunServer, this));
 
+  printf("Yup\n");
   // Wait for the server to come up
   // Use a 30 second timeout.
   int waitCount = 0, maxWaitCount = 3000;
@@ -88,7 +130,9 @@ void QTestFixture::Load(const std::string &_worldFilename, bool _paused)
 /////////////////////////////////////////////////
 void QTestFixture::RunServer()
 {
+  printf("RUN\n");
   this->server->Run();
+  printf("RUN STOP\n");
 }
 
 /////////////////////////////////////////////////
@@ -100,6 +144,7 @@ void QTestFixture::SetPause(bool _pause)
 /////////////////////////////////////////////////
 void QTestFixture::cleanup()
 {
+  printf("QTestFixture::cleanup\n");
   double residentEnd, shareEnd;
   this->GetMemInfo(residentEnd, shareEnd);
 
@@ -115,21 +160,31 @@ void QTestFixture::cleanup()
 
   if (this->server)
   {
+    gazebo::common::Time::MSleep(100000);
+    printf("Stop\n");
     this->server->Stop();
+    gazebo::common::Time::MSleep(100000);
 
     if (this->serverThread)
     {
+      printf("Stop2\n");
       this->serverThread->join();
     }
+    printf("Stop2a\n");
 
-    gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
+    // gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
+    printf("Stop3\n");
 
-    this->server->Fini();
+/*    this->server->Fini();
+    printf("Stop4\n");
 
     delete this->server;
     this->server = NULL;
+    printf("Stop5\n");
+    */
   }
 
+    printf("Stop6\n");
   delete this->serverThread;
   this->serverThread = NULL;
 }
@@ -137,6 +192,7 @@ void QTestFixture::cleanup()
 /////////////////////////////////////////////////
 void QTestFixture::cleanupTestCase()
 {
+  printf("QTestFixture::cleanupTestCase\n");
   if (this->server)
   {
     this->server->Stop();
@@ -146,12 +202,10 @@ void QTestFixture::cleanupTestCase()
       this->serverThread->join();
     }
 
-    gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
-
-    this->server->Fini();
-
-    delete this->server;
-    this->server = NULL;
+    // gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
+    // this->server->Fini();
+    // delete this->server;
+    // this->server = NULL;
   }
 
   delete this->serverThread;
