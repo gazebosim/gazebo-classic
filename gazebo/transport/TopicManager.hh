@@ -217,7 +217,7 @@ namespace gazebo
       /// of topic names.
       /// \sa transport::GetAdvertisedTopics
       public: std::map<std::string, std::list<std::string> >
-              GetAdvertisedTopics() const GAZEBO_DEPRECATED;
+              GetAdvertisedTopics() const GAZEBO_DEPRECATED(1.5);
 
       /// \brief Clear all buffers
       public: void ClearBuffers();
