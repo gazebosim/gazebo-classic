@@ -51,7 +51,7 @@ ODETrimeshShape::~ODETrimeshShape()
 void ODETrimeshShape::Update()
 {
   ODECollisionPtr ocollision =
-    boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+    boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
 
   /// FIXME: use below to update trimesh geometry for collision without
   // using above Ogre codes
@@ -102,7 +102,7 @@ void ODETrimeshShape::Init()
     return;
 
   ODECollisionPtr pcollision =
-    boost::shared_static_cast<ODECollision>(this->collisionParent);
+    boost::static_pointer_cast<ODECollision>(this->collisionParent);
 
   /// This will hold the vertex data of the triangle mesh
   if (this->odeData == NULL)
