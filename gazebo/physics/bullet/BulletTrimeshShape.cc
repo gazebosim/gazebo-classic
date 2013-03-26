@@ -53,7 +53,7 @@ void BulletTrimeshShape::Init()
   TrimeshShape::Init();
 
   BulletCollisionPtr bParent =
-    boost::shared_static_cast<BulletCollision>(this->collisionParent);
+    boost::static_pointer_cast<BulletCollision>(this->collisionParent);
 
   float *vertices = NULL;
   int *indices = NULL;

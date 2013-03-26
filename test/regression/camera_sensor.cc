@@ -64,7 +64,7 @@ TEST_F(CameraSensor, CheckThrottle)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   image_count = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
@@ -114,7 +114,7 @@ TEST_F(CameraSensor, UnlimitedTest)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   image_count = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
@@ -166,7 +166,7 @@ TEST_F(CameraSensor, MultiSenseHigh)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   image_count = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
@@ -219,7 +219,7 @@ TEST_F(CameraSensor, MultiSenseLow)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   image_count = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =

@@ -24,9 +24,11 @@
 #include <vector>
 #include <string>
 
-#include "common/Console.hh"
-#include "msgs/msgs.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Exception.hh"
+
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -55,6 +57,11 @@ namespace gazebo
       /// \param[in] _newdata Incoming data to be processed
       /// \return true if successfully processed; false otherwise
       public: virtual bool HandleData(const std::string &_newdata) = 0;
+
+      /// \brief Process new incoming message
+      /// \param[in] _newMsg Incoming message to be processed
+      /// \return true if successfully processed; false otherwise
+      public: virtual bool HandleMessage(MessagePtr _newMsg) = 0;
 
       /// \brief Is the callback local?
       /// \return true if the callback is local, false if the callback
@@ -128,6 +135,13 @@ namespace gazebo
               }
 
       // documentation inherited
+      public: virtual bool HandleMessage(MessagePtr _newMsg)
+              {
+                this->callback(boost::shared_dynamic_cast<M>(_newMsg));
+                return true;
+              }
+
+      // documentation inherited
       public: virtual bool IsLocal() const
               {
                 return true;
@@ -166,6 +180,16 @@ namespace gazebo
                 this->callback(_newdata);
                 return true;
               }
+
+      // documentation inherited
+      public: virtual bool HandleMessage(MessagePtr _newMsg)
+              {
+                std::string data;
+                _newMsg->SerializeToString(&data);
+                this->callback(data);
+                return true;
+              }
+
 
       // documentation inherited
       public: virtual bool IsLocal() const

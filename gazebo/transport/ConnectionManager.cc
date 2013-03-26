@@ -25,6 +25,17 @@
 using namespace gazebo;
 using namespace transport;
 
+/// TBB task to process nodes.
+class TopicManagerProcessTask : public tbb::task
+{
+  /// Implements the necessary execute function
+  public: tbb::task *execute()
+          {
+            TopicManager::Instance()->ProcessNodes();
+            return NULL;
+          }
+};
+
 //////////////////////////////////////////////////
 ConnectionManager::ConnectionManager()
 {
@@ -91,7 +102,6 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   this->masterConn->Read(namespacesData);
   this->masterConn->Read(publishersData);
 
-
   msgs::Packet packet;
   packet.ParseFromString(initData);
 
@@ -119,11 +129,13 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   {
     msgs::GzString_V result;
     result.ParseFromString(packet.serialized_data());
-    boost::recursive_mutex::scoped_lock lock(*this->listMutex);
+    boost::mutex::scoped_lock lock(this->namespaceMutex);
+
     for (int i = 0; i < result.data_size(); i++)
     {
       this->namespaces.push_back(std::string(result.data(i)));
     }
+    this->namespaceCondition.notify_all();
   }
   else
     gzerr << "Did not get topic_namespaces_init msg from master\n";
@@ -211,7 +223,13 @@ void ConnectionManager::RunUpdate()
   }
 
   this->masterConn->ProcessWriteQueue();
-  TopicManager::Instance()->ProcessNodes();
+
+
+  // Use TBB to process nodes.
+  TopicManagerProcessTask *task = new(tbb::task::allocate_root())
+    TopicManagerProcessTask();
+  tbb::task::enqueue(*task);
+  // TopicManager::Instance()->ProcessNodes();
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);
@@ -305,8 +323,9 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     msgs::GzString result;
     result.ParseFromString(packet.serialized_data());
 
-    boost::recursive_mutex::scoped_lock lock(*this->listMutex);
+    boost::mutex::scoped_lock lock(this->namespaceMutex);
     this->namespaces.push_back(std::string(result.data()));
+    this->namespaceCondition.notify_all();
   }
 
   // Publisher_update. This occurs when we try to subscribe to a topic, and
@@ -455,7 +474,17 @@ void ConnectionManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 {
   _namespaces.clear();
 
-  boost::recursive_mutex::scoped_lock lock(*this->listMutex);
+  boost::mutex::scoped_lock lock(this->namespaceMutex);
+
+  if (!this->namespaces.size())
+  {
+    if (!this->namespaceCondition.timed_wait(lock,
+          boost::posix_time::milliseconds(60000)))
+    {
+      gzerr << "Unable to get namespaces from master\n";
+    }
+  }
+
   for (std::list<std::string>::iterator iter = this->namespaces.begin();
        iter != this->namespaces.end(); ++iter)
   {

@@ -19,6 +19,7 @@
 
 
 #include <boost/shared_ptr.hpp>
+#include <boost/thread.hpp>
 #include <string>
 #include <list>
 #include <vector>
@@ -160,12 +161,18 @@ namespace gazebo
 
       private: unsigned int tmpIndex;
       private: boost::recursive_mutex *listMutex;
+
+      /// \brief A namespace to protect the namespace list.
+      private: boost::mutex namespaceMutex;
       private: boost::recursive_mutex masterMessagesMutex;
       private: boost::recursive_mutex *connectionMutex;
 
       private: std::list<msgs::Publish> publishers;
       private: std::list<std::string> namespaces;
       private: std::list<std::string> masterMessages;
+
+      /// \brief Condition used for synchronization
+      private: boost::condition_variable namespaceCondition;
 
       // Singleton implementation
       private: friend class SingletonT<ConnectionManager>;
