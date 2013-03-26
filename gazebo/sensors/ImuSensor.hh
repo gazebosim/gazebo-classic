@@ -56,6 +56,10 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void Fini();
 
+      private: void OnResponse(ConstResponsePtr &_msg);
+
+      private: void OnLinkData(ConstLinkDataPtr &_msg);
+
       /// \brief Returns the angular velocity.
       /// \return Angular velocity.
       public: math::Vector3 GetAngularVelocity() const;
@@ -85,8 +89,22 @@ namespace gazebo
       private: math::Vector3 gravity;
 
       private: transport::PublisherPtr pub;
+
+      private: transport::SubscriberPtr responseSub;
+
       private: physics::LinkPtr parentEntity;
       private: msgs::IMU imuMsg;
+
+      private: transport::PublisherPtr requestPub;
+
+      private: msgs::Request *requestMsg;
+
+      /// \brief Mutex to protect reads and writes.
+      private: mutable boost::mutex mutex;
+
+      typedef std::list<boost::shared_ptr<msgs::LinkData const> >
+          LinkDataMsgs_L;
+      private: LinkDataMsgs_L incomingLinkData;
     };
     /// \}
   }

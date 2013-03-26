@@ -1377,6 +1377,30 @@ void World::ProcessRequestMsgs()
       this->sceneMsg.SerializeToString(serializedData);
       response.set_type(sceneMsg.GetTypeName());
     }
+    else if ((*iter).request() == "link_publish")
+    {
+      BasePtr entity = this->rootElement->GetByName((*iter).data());
+      if (entity)
+      {
+        if (entity->HasType(Base::LINK))
+        {
+          LinkPtr link = boost::shared_dynamic_cast<Link>(entity);
+          link->SetPublishData(true);
+        }
+      }
+    }
+    else if ((*iter).request() == "link_stop_publish")
+    {
+      BasePtr entity = this->rootElement->GetByName((*iter).data());
+      if (entity)
+      {
+        if (entity->HasType(Base::LINK))
+        {
+          LinkPtr link = boost::shared_dynamic_cast<Link>(entity);
+          link->SetPublishData(false);
+        }
+      }
+    }
     else
       send = false;
 

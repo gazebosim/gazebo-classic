@@ -416,6 +416,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
 math::Vector3 ODELink::GetWorldLinearVel(common::Time &_time,
     const math::Vector3 &_offset)
 {
+  boost::recursive_mutex::scoped_lock lock(*(this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex()));
   math::Vector3 vel;
 
   if (this->linkId)

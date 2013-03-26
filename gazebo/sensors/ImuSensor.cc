@@ -42,6 +42,7 @@ GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor)
 ImuSensor::ImuSensor()
   : Sensor(sensors::OTHER)
 {
+
 }
 
 //////////////////////////////////////////////////
@@ -70,6 +71,14 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 
     this->pub = this->node->Advertise<msgs::IMU>(topicName);
   }
+
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  this->responseSub = this->node->Subscribe("~/response",
+      &ImuSensor::OnResponse, this);
+
+
+  this->requestMsg = msgs::CreateRequest("link_publish");
+  this->requestPub->Publish(*this->requestMsg);
 }
 
 //////////////////////////////////////////////////
@@ -99,6 +108,41 @@ void ImuSensor::Init()
 //////////////////////////////////////////////////
 void ImuSensor::Fini()
 {
+}
+
+/////////////////////////////////////////////////
+void ImuSensor::OnResponse(ConstResponsePtr &_msg)
+{
+  if (!this->requestMsg || _msg->id() != this->requestMsg->id())
+    return;
+
+  // TODO change below to get topic from serialized data
+//  sceneMsg.ParseFromString(_msg->serialized_data());
+
+  std::string topic = "~/" + this->parentEntity->GetScopedName();
+  this->responseSub = this->node->Subscribe(topic,
+    &ImuSensor::OnLinkData, this);
+
+
+  delete this->requestMsg;
+  this->requestMsg = NULL;
+}
+
+//////////////////////////////////////////////////
+void ImuSensor::OnLinkData(ConstLinkDataPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+
+  // Only store information if the sensor is active
+  if (this->IsActive())
+  {
+    // Store the contacts message for processing in UpdateImpl
+    this->incomingLinkData.push_back(_msg);
+
+    // Prevent the incomingContacts list to grow indefinitely.
+    if (this->incomingLinkData.size() > 100)
+      this->incomingLinkData.pop_front();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -133,6 +177,8 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
 //  double dt = (timestamp - this->lastMeasurementTime).Double();
 //  this->lastMeasurementTime = timestamp;
 //  this->lastMeasurementTime = this->world->GetSimTime();
+
+  boost::mutex::scoped_lock lock(this->mutex);
 
   common::Time timestamp;
   // get linear velocity in world frame
