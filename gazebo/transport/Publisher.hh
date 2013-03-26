@@ -41,7 +41,7 @@ namespace gazebo
     {
       /// Deprecated
       public: Publisher(const std::string &_topic, const std::string &_msgType,
-                        unsigned int _limit, bool _latch) GAZEBO_DEPRECATED(1.5);
+                  unsigned int _limit, bool _latch) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Constructor
       /// \param[in] _topic Name of topic to be published
