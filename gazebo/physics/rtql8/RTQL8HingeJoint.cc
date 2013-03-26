@@ -47,9 +47,9 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
 {
   HingeJoint<RTQL8Joint>::Load(_sdf);
 
-  //////////////////////////////////////////////////////////////////////////////
-  //---- Step 0.
-  //////////////////////////////////////////////////////////////////////////////
+  //----------------------------------------------------------------------------
+  // Step 0.
+  //----------------------------------------------------------------------------
   math::Pose poseChildLinkToJoint;
 
   if (this->sdf->HasElement("pose"))
@@ -64,9 +64,9 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
     poseChildLinkToJoint;
   }
 
-  //////////////////////////////////////////////////////////////////////////////
-  //---- Step 1. Transformation from parent link frame to joint link frame. ----
-  //////////////////////////////////////////////////////////////////////////////
+  //----------------------------------------------------------------------------
+  // Step 1. Transformation from parent link frame to joint link frame.
+  //----------------------------------------------------------------------------
   // Set Pose: offset from child link origin in child link frame.
   if (_sdf->GetValueString("parent") == std::string("world"))
   {
@@ -83,9 +83,9 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
   RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint,
                                        poseParentLinkToJoint);
 
-  //////////////////////////////////////////////////////////////////////////////
-  //---- Step 2. Transformation by the rotate axis. ----------------------------
-  //////////////////////////////////////////////////////////////////////////////
+  //----------------------------------------------------------------------------
+  // Step 2. Transformation by the rotate axis.
+  //----------------------------------------------------------------------------
   //sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
   //math::Vector3 xyz = axisElem->GetValueVector3("xyz");
   //Eigen::Vector3d axisHinge(xyz.x, xyz.y, xyz.z);
@@ -100,12 +100,18 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
           = boost::shared_dynamic_cast<RTQL8Model>(this->model);
   rtql8Model->GetSkeletonDynamics()->addTransform(rotHinge);
 
-  //////////////////////////////////////////////////////////////////////////////
-  //---- Step 3. Transformation from rotated joint frame to child link frame. --
-  //////////////////////////////////////////////////////////////////////////////
+  //----------------------------------------------------------------------------
+  // Step 3. Transformation from rotated joint frame to child link frame.
+  //----------------------------------------------------------------------------
   poseJointToChildLink = -poseChildLinkToJoint;
 
+//  math::Pose currentJointToChildJoint;
+
+//  LinkPtr childLink = this->GetChild();
+//  JointPtr childJoint = childLink->GetChild();
+
   RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint, poseJointToChildLink);
+  //RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint, poseJointToChildLink);
 }
 
 //////////////////////////////////////////////////

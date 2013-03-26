@@ -63,24 +63,24 @@ void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 
-TEST_F(PhysicsTest, EmptyWorldODE)
-{
-  EmptyWorld("ode");
-}
+//TEST_F(PhysicsTest, EmptyWorldODE)
+//{
+//  EmptyWorld("ode");
+//}
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, EmptyWorldBullet)
-{
-  EmptyWorld("bullet");
-}
-#endif  // HAVE_BULLET
+//#ifdef HAVE_BULLET
+//TEST_F(PhysicsTest, EmptyWorldBullet)
+//{
+//  EmptyWorld("bullet");
+//}
+//#endif  // HAVE_BULLET
 
-#ifdef HAVE_RTQL8
-TEST_F(PhysicsTest, EmptyWorldRTQL8)
-{
-  EmptyWorld("rtql8");
-}
-#endif  // HAVE_RTQL8
+//#ifdef HAVE_RTQL8
+//TEST_F(PhysicsTest, EmptyWorldRTQL8)
+//{
+//  EmptyWorld("rtql8");
+//}
+//#endif  // HAVE_RTQL8
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnDrop:
@@ -230,17 +230,17 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, SpawnDropODE)
-{
-  SpawnDrop("ode");
-}
+//TEST_F(PhysicsTest, SpawnDropODE)
+//{
+//  SpawnDrop("ode");
+//}
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SpawnDropBullet)
-{
-  SpawnDrop("bullet");
-}
-#endif  // HAVE_BULLET
+//#ifdef HAVE_BULLET
+//TEST_F(PhysicsTest, SpawnDropBullet)
+//{
+//  SpawnDrop("bullet");
+//}
+//#endif  // HAVE_BULLET
 
 #ifdef HAVE_RTQL8
 TEST_F(PhysicsTest, SpawnDropRTQL8)
@@ -522,24 +522,24 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, SpawnDropCoGOffsetODE)
-{
-  SpawnDropCoGOffset("ode");
-}
+//TEST_F(PhysicsTest, SpawnDropCoGOffsetODE)
+//{
+//  SpawnDropCoGOffset("ode");
+//}
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SpawnDropCoGOffsetBullet)
-{
-  SpawnDropCoGOffset("bullet");
-}
-#endif  // HAVE_BULLET
+//#ifdef HAVE_BULLET
+//TEST_F(PhysicsTest, SpawnDropCoGOffsetBullet)
+//{
+//  SpawnDropCoGOffset("bullet");
+//}
+//#endif  // HAVE_BULLET
 
-#ifdef HAVE_RTQL8
-TEST_F(PhysicsTest, SpawnDropCoGOffsetRTQL8)
-{
-  SpawnDropCoGOffset("rtql8");
-}
-#endif  // HAVE_RTQL8
+//#ifdef HAVE_RTQL8
+//TEST_F(PhysicsTest, SpawnDropCoGOffsetRTQL8)
+//{
+//  SpawnDropCoGOffset("rtql8");
+//}
+//#endif  // HAVE_RTQL8
 
 ////////////////////////////////////////////////////////////////////////
 // RevoluteJoint:
@@ -939,24 +939,24 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, RevoluteJointODE)
-{
-  RevoluteJoint("ode");
-}
+//TEST_F(PhysicsTest, RevoluteJointODE)
+//{
+//  RevoluteJoint("ode");
+//}
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, RevoluteJointBullet)
-{
-  RevoluteJoint("bullet");
-}
-#endif  // HAVE_BULLET
+//#ifdef HAVE_BULLET
+//TEST_F(PhysicsTest, RevoluteJointBullet)
+//{
+//  RevoluteJoint("bullet");
+//}
+//#endif  // HAVE_BULLET
 
-#ifdef HAVE_RTQL8
-TEST_F(PhysicsTest, RevoluteJointRTQL8)
-{
-  RevoluteJoint("rtql8");
-}
-#endif  // HAVE_RTQL8
+//#ifdef HAVE_RTQL8
+//TEST_F(PhysicsTest, RevoluteJointRTQL8)
+//{
+//  RevoluteJoint("rtql8");
+//}
+//#endif  // HAVE_RTQL8
 
 TEST_F(PhysicsTest, State)
 {
@@ -1277,24 +1277,24 @@ TEST_F(PhysicsTest, CollisionTest)
 }
 
 
-TEST_F(PhysicsTest, SimplePendulumODE)
-{
-  SimplePendulum("ode");
-}
+//TEST_F(PhysicsTest, SimplePendulumODE)
+//{
+//  SimplePendulum("ode");
+//}
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SimplePendulumBullet)
-{
-  SimplePendulum("bullet");
-}
-#endif  // HAVE_BULLET
+//#ifdef HAVE_BULLET
+//TEST_F(PhysicsTest, SimplePendulumBullet)
+//{
+//  SimplePendulum("bullet");
+//}
+//#endif  // HAVE_BULLET
 
-#ifdef HAVE_RTQL8
-TEST_F(PhysicsTest, SimplePendulumRTQL8)
-{
-  SimplePendulum("rtql8");
-}
-#endif  // HAVE_RTQL8
+//#ifdef HAVE_RTQL8
+//TEST_F(PhysicsTest, SimplePendulumRTQL8)
+//{
+//  SimplePendulum("rtql8");
+//}
+//#endif  // HAVE_RTQL8
 
 void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
@@ -1544,24 +1544,24 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, CollisionFilteringODE)
-{
-  CollisionFiltering("ode");
-}
+//TEST_F(PhysicsTest, CollisionFilteringODE)
+//{
+//  CollisionFiltering("ode");
+//}
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, CollisionFilteringBullet)
-{
-  CollisionFiltering("bullet");
-}
-#endif  // HAVE_BULLET
+//#ifdef HAVE_BULLET
+//TEST_F(PhysicsTest, CollisionFilteringBullet)
+//{
+//  CollisionFiltering("bullet");
+//}
+//#endif  // HAVE_BULLET
 
-#ifdef HAVE_RTQL8
-TEST_F(PhysicsTest, CollisionFilteringRTQL8)
-{
-  CollisionFiltering("rtql8");
-}
-#endif  // HAVE_RTQL8
+//#ifdef HAVE_RTQL8
+//TEST_F(PhysicsTest, CollisionFilteringRTQL8)
+//{
+//  CollisionFiltering("rtql8");
+//}
+//#endif  // HAVE_RTQL8
 
 
 int main(int argc, char **argv)

@@ -111,6 +111,7 @@ void RTQL8Physics::Load(sdf::ElementPtr _sdf)
 void RTQL8Physics::Init()
 {
   this->rtql8World->init();
+  //this->rtql8World->setRuntimeMode();
 }
 
 //////////////////////////////////////////////////

@@ -11,12 +11,19 @@ set (files
   double_pendulum_ode.world
   simple_pendulum.world
   simple_pendulum_ode.world
+  simple_pendulum2.world
+  simple_pendulum2_ode.world
+  simple_pendulums.world
+  simple_pendulums_ode.world
   pendulums.world
   pendulums_ode.world
   poses.world
   poses_ode.world
   shapes.world
   shapes_ode.world
+  revolute_joint_test.world
+  revolute_joints.world
+  revolute_joints_ode.world
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/rtql8)
