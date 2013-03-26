@@ -125,8 +125,6 @@ target_link_libraries(gazebo_gui
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
-  GL
-  GLU
   pthread)
 
 target_link_libraries(gzclient 
@@ -141,8 +139,6 @@ target_link_libraries(gzclient
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
-  GL
-  GLU
   pthread)
 
 add_definitions(${QT_DEFINITIONS})
