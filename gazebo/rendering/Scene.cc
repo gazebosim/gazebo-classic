@@ -86,6 +86,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->showCollisions = false;
   this->showJoints = false;
   this->transparent = false;
+  this->wireframe = false;
 
   this->requestMsg = NULL;
   this->enableVisualizations = _enableVisualizations;
@@ -1918,6 +1919,28 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
         vis->SetTransparency(0.5);
     }
   }
+  else if (_msg->request() == "set_wireframe")
+  {
+    if (_msg->data() == "all")
+      this->SetWireframe(true);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->SetWireframe(true);
+    }
+  }
+  else if (_msg->request() == "set_solid")
+  {
+    if (_msg->data() == "all")
+      this->SetWireframe(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->SetWireframe(false);
+    }
+  }
   else if (_msg->request() == "set_opaque")
   {
     if (_msg->data() == "all")
@@ -2024,6 +2047,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       visual->ShowCollision(this->showCollisions);
       visual->ShowJoints(this->showJoints);
       visual->SetTransparency(this->transparent ? 0.5 : 0.0);
+      visual->SetWireframe(this->wireframe);
     }
   }
 
@@ -2422,6 +2446,17 @@ VisualPtr Scene::CloneVisual(const std::string &_visualName,
     this->visuals[_newName] = result;
   }
   return result;
+}
+
+/////////////////////////////////////////////////
+void Scene::SetWireframe(bool _show)
+{
+  this->wireframe = _show;
+  for (Visual_M::iterator iter = this->visuals.begin();
+       iter != this->visuals.end(); ++iter)
+  {
+    iter->second->SetWireframe(_show);
+  }
 }
 
 /////////////////////////////////////////////////

@@ -108,13 +108,20 @@ void ODETrimeshShape::Init()
   if (this->odeData == NULL)
     this->odeData = dGeomTriMeshDataCreate();
 
-  unsigned int numVertices = this->mesh->GetVertexCount();
-  unsigned int numIndices = this->mesh->GetIndexCount();
+  unsigned int numVertices = this->submesh ? this->submesh->GetVertexCount() :
+    this->mesh->GetVertexCount();
+
+  unsigned int numIndices = this->submesh ? this->submesh->GetIndexCount() :
+    this->mesh->GetIndexCount();
+
   this->vertices = NULL;
   this->indices = NULL;
 
   // Get all the vertex and index data
-  this->mesh->FillArrays(&this->vertices, &this->indices);
+  if (!this->submesh)
+    this->mesh->FillArrays(&this->vertices, &this->indices);
+  else
+    this->submesh->FillArrays(&this->vertices, &this->indices);
 
   // Scale the vertex data
   for (unsigned int j = 0;  j < numVertices; j++)

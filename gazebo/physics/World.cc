@@ -448,11 +448,11 @@ void World::Step()
 
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
 
+  double updatePeriod = this->physicsEngine->GetUpdatePeriod();
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
   common::Time sleepTime = this->prevStepWallTime +
-    common::Time(this->physicsEngine->GetUpdatePeriod()) -
-    tmpTime - this->sleepOffset;
+    common::Time(updatePeriod) - tmpTime - this->sleepOffset;
 
   common::Time actualSleep = 0;
   if (sleepTime > 0)
@@ -463,7 +463,6 @@ void World::Step()
   else
     sleepTime = 0;
 
-
   // exponentially avg out
   this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
                       this->sleepOffset * 0.99;
@@ -473,7 +472,7 @@ void World::Step()
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
   if (common::Time::GetWallTime() - this->prevStepWallTime + this->sleepOffset
-         >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+         >= common::Time(updatePeriod))
   {
     boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
 
@@ -481,10 +480,11 @@ void World::Step()
 
     this->prevStepWallTime = common::Time::GetWallTime();
 
+    double stepTime = this->physicsEngine->GetMaxStepSize();
     if (!this->IsPaused() || this->stepInc > 0)
     {
       // query timestep to allow dynamic time step size updates
-      this->simTime += this->physicsEngine->GetStepTime();
+      this->simTime += stepTime;
       this->iterations++;
       this->Update();
 
@@ -494,7 +494,7 @@ void World::Step()
         this->stepInc--;
     }
     else
-      this->pauseTime += this->physicsEngine->GetStepTime();
+      this->pauseTime += stepTime;
   }
 
   this->ProcessMessages();
@@ -623,6 +623,8 @@ void World::Fini()
   this->Stop();
   this->plugins.clear();
 
+  this->publishModelPoses.clear();
+
   this->node->Fini();
 
   if (this->rootElement)
@@ -710,7 +712,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     _sdf->PrintValues("  ");
   }
 
-  this->PublishModelPose(model->GetName());
+  this->PublishModelPose(model);
   return model;
 }
 
@@ -1393,8 +1395,7 @@ void World::ProcessRequestMsgs()
 void World::ProcessModelMsgs()
 {
   std::list<msgs::Model>::iterator iter;
-  for (iter = this->modelMsgs.begin();
-       iter != this->modelMsgs.end(); ++iter)
+  for (iter = this->modelMsgs.begin(); iter != this->modelMsgs.end(); ++iter)
   {
     ModelPtr model;
     if ((*iter).has_id())
@@ -1709,27 +1710,19 @@ void World::ProcessMessages()
   {
     msgs::Pose_V msg;
 
-    for (std::set<std::string>::iterator iter =
-         this->publishModelPoses.begin();
-         iter != this->publishModelPoses.end(); ++iter)
+    for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
+        iter != this->publishModelPoses.end(); ++iter)
     {
-      ModelPtr model = this->GetModel(*iter);
-
-      // It's possible that the model was deleted somewhere along the line.
-      // So check to make sure we get a valid model pointer.
-      if (!model)
-        continue;
-
       poseMsg = msg.add_pose();
 
       // Publish the model's relative pose
-      poseMsg->set_name(model->GetScopedName());
-      msgs::Set(poseMsg, model->GetRelativePose());
+      poseMsg->set_name((*iter)->GetScopedName());
+      msgs::Set(poseMsg, (*iter)->GetRelativePose());
 
       // Publish each of the model's children relative poses
-      Link_V links = model->GetLinks();
+      Link_V links = (*iter)->GetLinks();
       for (Link_V::iterator linkIter = links.begin();
-           linkIter != links.end(); ++linkIter)
+          linkIter != links.end(); ++linkIter)
       {
         poseMsg = msg.add_pose();
         poseMsg->set_name((*linkIter)->GetScopedName());
@@ -1739,6 +1732,7 @@ void World::ProcessMessages()
     this->posePub->Publish(msg);
   }
   this->publishModelPoses.clear();
+
 
   if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
       this->processMsgsPeriod)
@@ -1771,12 +1765,12 @@ bool World::IsLoaded() const
 }
 
 //////////////////////////////////////////////////
-void World::PublishModelPose(const std::string &_modelName)
+void World::PublishModelPose(physics::ModelPtr _model)
 {
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
 
   // Only add if the model name is not in the list
-  this->publishModelPoses.insert(_modelName);
+  this->publishModelPoses.insert(_model);
 }
 
 //////////////////////////////////////////////////
