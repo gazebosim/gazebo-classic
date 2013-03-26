@@ -447,8 +447,6 @@ namespace gazebo
       if (!geomElem)
         gzthrow("Invalid geometry element");
 
-      math::Vector3 scale(1, 1, 1);
-
       if (geomElem->GetName() == "box")
       {
         result.set_type(msgs::Geometry::BOX);
@@ -528,8 +526,6 @@ namespace gazebo
       else if (geomElem->GetName() == "empty")
       {
         result.set_type(msgs::Geometry::EMPTY);
-        // msgs::Set(result.mutable_mesh()->mutable_scale(),
-        // geomElem->GetValueVector3("scale"));
       }
       else
         gzthrow("Unknown geometry type\n");

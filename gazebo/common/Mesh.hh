@@ -113,7 +113,7 @@ namespace gazebo
       /// bounds
       public: const SubMesh *GetSubMesh(unsigned int _i) const;
 
-      /// \brief Get a child mesh by names.
+      /// \brief Get a child mesh by name.
       /// \param[in] _name Name of the submesh.
       /// \return The submesh, NULL if the _name is not found.
       public: const SubMesh *GetSubMesh(const std::string &_name) const;
@@ -162,7 +162,7 @@ namespace gazebo
       /// \param[in] _center Location of the mesh center.
       public: void Center(const math::Vector3 &_center = math::Vector3::Zero);
 
-      /// \brief Move all vertices in all submesshes by _vec.
+      /// \brief Move all vertices in all submeshes by _vec.
       /// \param[in] _vec Amount to translate vertices.
       public: void Translate(const math::Vector3 &_vec);
 
@@ -189,7 +189,7 @@ namespace gazebo
       /// \brief index of the vertex
       unsigned int vertexIndex;
 
-      /// \brieaf node (or bone) index
+      /// \brief node (or bone) index
       unsigned int nodeIndex;
 
       /// \brief the weight (between 0 and 1)
