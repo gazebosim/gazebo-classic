@@ -157,12 +157,6 @@ void Link::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Link::Init()
 {
-  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
-  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
-
-  this->SetLinearDamping(this->GetLinearDamping());
-  this->SetAngularDamping(this->GetAngularDamping());
-
   this->linearAccel.Set(0, 0, 0);
   this->angularAccel.Set(0, 0, 0);
 
@@ -266,7 +260,16 @@ void Link::Fini()
 //////////////////////////////////////////////////
 void Link::Reset()
 {
+  // resets pose
   Entity::Reset();
+
+  // resets velocity, acceleration, wrench
+  this->ResetPhysicsStates();
+}
+
+//////////////////////////////////////////////////
+void Link::ResetPhysicsStates()
+{
   this->SetAngularVel(math::Vector3(0, 0, 0));
   this->SetLinearVel(math::Vector3(0, 0, 0));
   this->SetAngularAccel(math::Vector3(0, 0, 0));
@@ -673,6 +676,38 @@ void Link::RemoveChildJoint(JointPtr _joint)
   {
     /// @todo: can we assume there are no repeats?
     if ((*iter)->GetName() == _joint->GetName())
+    {
+      this->childJoints.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Link::RemoveParentJoint(const std::string &_jointName)
+{
+  for (std::vector<JointPtr>::iterator iter = this->parentJoints.begin();
+                                       iter != this->parentJoints.end();
+                                       ++iter)
+  {
+    /// @todo: can we assume there are no repeats?
+    if ((*iter)->GetName() == _jointName)
+    {
+      this->parentJoints.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Link::RemoveChildJoint(const std::string &_jointName)
+{
+  for (std::vector<JointPtr>::iterator iter = this->childJoints.begin();
+                                       iter != this->childJoints.end();
+                                       ++iter)
+  {
+    /// @todo: can we assume there are no repeats?
+    if ((*iter)->GetName() == _jointName)
     {
       this->childJoints.erase(iter);
       break;

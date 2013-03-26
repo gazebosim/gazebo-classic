@@ -35,27 +35,39 @@ bool g_stopped = true;
 std::list<msgs::Request *> g_requests;
 std::list<boost::shared_ptr<msgs::Response> > g_responses;
 
+#define DEFAULT_MASTER_PORT 11345
+
 /////////////////////////////////////////////////
 bool transport::get_master_uri(std::string &_masterHost,
                                unsigned int &_masterPort)
 {
-  char *char_uri = getenv("GAZEBO_MASTER_URI");
+  char *charURI = getenv("GAZEBO_MASTER_URI");
 
   // Set to default host and port
-  if (!char_uri || strlen(char_uri) == 0)
+  if (!charURI || strlen(charURI) == 0)
   {
     _masterHost = "localhost";
-    _masterPort = 11345;
+    _masterPort = DEFAULT_MASTER_PORT;
     return false;
   }
 
-  std::string master_uri = char_uri;
+  std::string masterURI = charURI;
 
-  boost::replace_first(master_uri, "http://", "");
-  int last_colon = master_uri.find_last_of(":");
-  _masterHost = master_uri.substr(0, last_colon);
-  _masterPort = boost::lexical_cast<unsigned int>(
-      master_uri.substr(last_colon+1, master_uri.size() - (last_colon+1)));
+  boost::replace_first(masterURI, "http://", "");
+  size_t lastColon = masterURI.find_last_of(":");
+  _masterHost = masterURI.substr(0, lastColon);
+
+  if (lastColon == std::string::npos)
+  {
+    gzerr << "Port missing in master URI[" << masterURI
+          << "]. Using default value of " << DEFAULT_MASTER_PORT << ".\n";
+    _masterPort = DEFAULT_MASTER_PORT;
+  }
+  else
+  {
+    _masterPort = boost::lexical_cast<unsigned int>(
+        masterURI.substr(lastColon + 1, masterURI.size() - (lastColon + 1)));
+  }
 
   return true;
 }

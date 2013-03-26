@@ -163,7 +163,7 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
 
   // Add contribution from gravity
   this->gravity = this->world->GetPhysicsEngine()->GetGravity();
-  this->linearAcc += imuPose.rot.GetInverse().RotateVector(this->gravity);
+  this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
 
   msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
 

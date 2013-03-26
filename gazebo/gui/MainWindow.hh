@@ -76,6 +76,10 @@ namespace gazebo
       private slots: void CreatePointLight();
       private slots: void CreateSpotLight();
       private slots: void CreateDirectionalLight();
+
+      /// \brief Qt callback when the screenshot action is triggered
+      private slots: void CaptureScreenshot();
+
       private slots: void InsertModel();
       private slots: void ShowGrid();
       private slots: void ShowCollisions();
@@ -90,6 +94,7 @@ namespace gazebo
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
       private slots: void OnEditBuilding();
+      private slots: void SetWireframe();
 
       /// \brief Qt callback when the building editor's save action is
       /// triggered.
@@ -112,6 +117,9 @@ namespace gazebo
 
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
+
+      /// \brief Callback for diagnostics action.
+      private slots: void Diagnostics();
 
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);

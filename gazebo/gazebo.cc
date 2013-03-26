@@ -55,13 +55,18 @@ void gazebo::add_plugin(const std::string &_filename)
 }
 
 /////////////////////////////////////////////////
-bool gazebo::load(int argc, char** argv)
+bool gazebo::load(int _argc, char **_argv)
 {
+  // Initialize the informational logger. This will log warnings, and
+  // errors.
+  if (!gazebo::common::Console::Instance()->IsInitialized())
+    gazebo::common::Console::Instance()->Init("default.log");
+
   // Load all the plugins
   for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
        g_plugins.begin(); iter != g_plugins.end(); ++iter)
   {
-    (*iter)->Load(argc, argv);
+    (*iter)->Load(_argc, _argv);
   }
 
   // Start the transport system by connecting to the master.

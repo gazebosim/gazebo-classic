@@ -34,14 +34,14 @@ BulletJoint::BulletJoint(BasePtr _parent)
   : Joint(_parent)
 {
   this->constraint = NULL;
-  this->world = NULL;
+  this->bulletWorld = NULL;
 }
 
 //////////////////////////////////////////////////
 BulletJoint::~BulletJoint()
 {
   delete this->constraint;
-  this->world = NULL;
+  this->bulletWorld = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -97,12 +97,19 @@ void BulletJoint::Detach()
 {
   this->childLink.reset();
   this->parentLink.reset();
-
+  if (this->constraint && this->bulletWorld)
+    this->bulletWorld->removeConstraint(this->constraint);
   delete this->constraint;
 }
 
 //////////////////////////////////////////////////
-JointWrench BulletJoint::GetForceTorque(int /*_index*/)
+JointWrench BulletJoint::GetForceTorque(int _index)
+{
+  return this->GetForceTorque(static_cast<unsigned int>(_index));
+}
+
+//////////////////////////////////////////////////
+JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 {
   JointWrench wrench;
   return wrench;

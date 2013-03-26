@@ -183,9 +183,9 @@ void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
 {
   std::ostringstream newModelStr;
 
-  float w = _size.y;
-  float h = _size.z;
-  float d = _size.x;
+  float sx = _size.x;
+  float sy = _size.y;
+  float sz = _size.z;
 
   newModelStr << "<sdf version='1.3'>"
     "<model name='" << _name << "'>"
@@ -197,9 +197,9 @@ void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
       "</velocity_decay>"
       "<inertial><mass>" << _mass << "</mass>"
         "<inertia>"
-        "<ixx>" << (1.0/12.0) * _mass * (h*h + d*d) << "</ixx>"
-        "<iyy>" << (1.0/12.0) * _mass * (w*w + d*d) << "</iyy>"
-        "<izz>" << (1.0/12.0) * _mass * (w*w + h*h) << "</izz>"
+        "<ixx>" << (1.0/12.0) * _mass * (sy*sy + sz*sz) << "</ixx>"
+        "<iyy>" << (1.0/12.0) * _mass * (sz*sz + sx*sx) << "</iyy>"
+        "<izz>" << (1.0/12.0) * _mass * (sx*sx + sy*sy) << "</izz>"
         "<ixy>" << 0.0 << "</ixy>"
         "<ixz>" << 0.0 << "</ixz>"
         "<iyz>" << 0.0 << "</iyz>"
@@ -228,9 +228,10 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
 {
   std::ostringstream newModelStr;
 
-  float w = _size.y;
-  float h = _size.z;
-  float d = _size.x;
+  float sx = _size.x;
+  float sy = _size.y;
+  float sz = _size.z;
+
   newModelStr << "<sdf version='1.3'>"
     "<model name='" << _name << "'>"
     "<allow_auto_disable>true</allow_auto_disable>"
@@ -242,9 +243,9 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
       "</velocity_decay>"
       "<inertial><mass>" << _mass << "</mass>"
         "<inertia>"
-        "<ixx>" << (1.0/12.0) * _mass * (h*h + d*d) << "</ixx>"
-        "<iyy>" << (1.0/12.0) * _mass * (w*w + d*d) << "</iyy>"
-        "<izz>" << (1.0/12.0) * _mass * (w*w + h*h) << "</izz>"
+        "<ixx>" << (1.0/12.0) * _mass * (sy*sy + sz*sz) << "</ixx>"
+        "<iyy>" << (1.0/12.0) * _mass * (sz*sz + sx*sx) << "</iyy>"
+        "<izz>" << (1.0/12.0) * _mass * (sx*sx + sy*sy) << "</izz>"
         "<ixy>" << 0.0 << "</ixy>"
         "<ixz>" << 0.0 << "</ixz>"
         "<iyz>" << 0.0 << "</iyz>"
@@ -288,7 +289,7 @@ void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
         "<inertia>"
           "<ixx>" << (1.0/12.0) * _mass * (3*r*r + h*h) << "</ixx>"
           "<iyy>" << (1.0/12.0) * _mass * (3*r*r + h*h) << "</iyy>"
-          "<izz>" << (1.0/12.0) * _mass * r * r << "</izz>"
+          "<izz>" << (1.0/2.0)  * _mass * r * r << "</izz>"
           "<ixy>" << 0.0 << "</ixy>"
           "<ixz>" << 0.0 << "</ixz>"
           "<iyz>" << 0.0 << "</iyz>"

@@ -46,6 +46,12 @@ BulletCollision::~BulletCollision()
 void BulletCollision::Load(sdf::ElementPtr _sdf)
 {
   Collision::Load(_sdf);
+
+  if (this->IsStatic())
+  {
+    this->SetCategoryBits(GZ_FIXED_COLLIDE);
+    this->SetCollideBits(~GZ_FIXED_COLLIDE);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -60,13 +66,27 @@ void BulletCollision::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCategoryBits(unsigned int /*_bits*/)
+void BulletCollision::SetCategoryBits(unsigned int _bits)
 {
+  this->categoryBits = _bits;
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCollideBits(unsigned int /*_bits*/)
+void BulletCollision::SetCollideBits(unsigned int _bits)
 {
+  this->collideBits = _bits;
+}
+
+//////////////////////////////////////////////////
+unsigned int BulletCollision::GetCategoryBits() const
+{
+  return this->categoryBits;
+}
+
+//////////////////////////////////////////////////
+unsigned int BulletCollision::GetCollideBits() const
+{
+  return this->collideBits;
 }
 
 //////////////////////////////////////////////////
@@ -92,8 +112,10 @@ math::Box BulletCollision::GetBoundingBox() const
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCollisionShape(btCollisionShape *_shape)
+void BulletCollision::SetCollisionShape(btCollisionShape *_shape,
+    bool _placeable)
 {
+  Collision::SetCollision(_placeable);
   this->collisionShape = _shape;
 
   // btmath::Vector3 vec;

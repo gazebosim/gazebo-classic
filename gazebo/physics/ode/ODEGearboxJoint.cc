@@ -163,6 +163,9 @@ math::Angle ODEGearboxJoint::GetAngleImpl(int /*index*/) const
   math::Angle result;
   if (this->jointId)
     result = dJointGetHingeAngle(this->jointId);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
   return result;
 }
 
@@ -237,7 +240,10 @@ void ODEGearboxJoint::SetForce(int _index, double _effort)
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  dJointAddHingeTorque(this->jointId, _effort);
+  if (this->jointId)
+    dJointAddHingeTorque(this->jointId, _effort);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -246,7 +252,12 @@ double ODEGearboxJoint::GetParam(int _parameter) const
   gzlog << "GetParam not implemented for gearbox\n";
   return 0;
 
-  double result = dJointGetHingeParam(this->jointId, _parameter);
+  double result = 0;
+
+  if (this->jointId)
+    result = dJointGetHingeParam(this->jointId, _parameter);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -258,6 +269,8 @@ void ODEGearboxJoint::SetParam(int _parameter, double _value)
   return;
 
   ODEJoint::SetParam(_parameter, _value);
-
-  dJointSetHingeParam(this->jointId, _parameter, _value);
+  if (this->jointId)
+    dJointSetHingeParam(this->jointId, _parameter, _value);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
