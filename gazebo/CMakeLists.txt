@@ -13,6 +13,7 @@ include_directories(
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
+  ${SDF_LIBRARY_DIRS}
   ${PROJECT_BINARY_DIR}/test
 )
 
@@ -46,12 +47,10 @@ gz_add_executable(gzmaster master_main.cc Master.cc gazebo.cc)
 gz_add_executable(gzserver server_main.cc Server.cc Master.cc gazebo.cc)
 gz_add_executable(gazebo gazebo_main.cc Server.cc Master.cc gazebo.cc)
 
-
 target_link_libraries(gzmaster
   gazebo_common
   gazebo_transport
   gazebo_msgs
-  ${SDF_LIBRARIES}
   pthread
 )
 
@@ -65,7 +64,6 @@ target_link_libraries(gzserver
   gazebo_rendering
   gazebo_msgs
   pthread
-  ${SDF_LIBRARIES}
 )
 
 target_link_libraries(gazebo
@@ -78,7 +76,6 @@ target_link_libraries(gazebo
   gazebo_msgs
   gazebo_gui
   pthread
-  ${SDF_LIBRARIES}
 )
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
@@ -103,7 +100,6 @@ target_link_libraries(libgazebo
   gazebo_msgs
   gazebo_math
   pthread
-  ${SDF_LIBRARIES}
 )
 
 add_dependencies(libgazebo gazebo_msgs)

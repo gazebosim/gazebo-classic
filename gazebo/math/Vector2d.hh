@@ -27,8 +27,6 @@
 #include <fstream>
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/CommonTypes.hh"
-
 namespace gazebo
 {
   namespace math
@@ -53,7 +51,7 @@ namespace gazebo
       public: Vector2d(const Vector2d &_v);
 
       /// Deprecated
-      public: Vector2d(const sdf::Vector2d &_v) GAZEBO_DEPRECATED;
+      public: Vector2d(const sdf::Vector2d &_v) __attribute__((deprecated));
 
       /// \brief Destructor
       public: virtual ~Vector2d();
@@ -82,7 +80,8 @@ namespace gazebo
       public: Vector2d &operator =(const Vector2d &_v);
 
       /// Deprecated
-      public: Vector2d &operator =(const sdf::Vector2d &_v) GAZEBO_DEPRECATED;
+      public: Vector2d &operator =(const sdf::Vector2d &_v)
+              __attribute__((deprecated));
 
       /// \brief Assignment operator
       /// \param[in] _v the value for x and y element

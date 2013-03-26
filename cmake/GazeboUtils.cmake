@@ -161,7 +161,6 @@ macro (gz_build_tests)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport
-      ${SDF_LIBRARIES}
       )
   
     target_link_libraries(${BINARY_NAME}
@@ -176,7 +175,6 @@ macro (gz_build_tests)
       gazebo_transport
       libgazebo
       pthread
-      ${SDF_LIBRARIES}
       )
   
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
@@ -229,7 +227,6 @@ if (VALID_DISPLAY)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport
-      ${SDF_LIBRARIES}
       )
 
     target_link_libraries(${BINARY_NAME}
@@ -245,7 +242,6 @@ if (VALID_DISPLAY)
       pthread
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
-      ${SDF_LIBRARIES}
       )
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} -xml)

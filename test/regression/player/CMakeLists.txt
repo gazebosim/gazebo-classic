@@ -32,8 +32,6 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
     gazebo_sensors
     gazebo_rendering
     gazebo_msgs
-    pthread
-    ${SDF_LIBRARIES}
     ${tinyxml_libraries}
     ${PLAYER_LINK_LIBS}
     )

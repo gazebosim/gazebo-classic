@@ -123,7 +123,6 @@ target_link_libraries(gazebo_msgs
   gazebo_common
   gazebo_math
   ${PROTOBUF_LIBRARY}
-  ${SDF_LIBRARIES}
 )
 
 add_dependencies(gazebo_msgs gazebomsgs_out)

@@ -104,8 +104,8 @@ void Joint::Load(sdf::ElementPtr _sdf)
   GZ_ASSERT(parentElem, "Parent element is NULL");
   GZ_ASSERT(childElem, "Child element is NULL");
 
-  std::string parentName = parentElem->GetValueString("link_name");
-  std::string childName = childElem->GetValueString("link_name");
+  std::string parentName = parentElem->Get<std::string>("link_name");
+  std::string childName = childElem->Get<std::string>("link_name");
 
   if (this->model)
   {
@@ -127,7 +127,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  this->anchorPose = _sdf->GetValuePose("pose");
+  this->anchorPose = _sdf->Get<math::Pose>("pose");
   this->LoadImpl(this->anchorPose);
 }
 
@@ -168,14 +168,14 @@ void Joint::Init()
   if (this->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    this->SetAxis(0, axisElem->GetValueVector3("xyz"));
+    this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
       // store upper and lower joint limits
-      this->upperLimit[0] = limitElem->GetValueDouble("upper");
-      this->lowerLimit[0] = limitElem->GetValueDouble("lower");
+      this->upperLimit[0] = limitElem->Get<double>("upper");
+      this->lowerLimit[0] = limitElem->Get<double>("lower");
 
       // Perform this three step ordering to ensure the
       // parameters are set properly.
@@ -184,22 +184,22 @@ void Joint::Init()
       this->SetLowStop(0, this->lowerLimit[0].Radian());
       this->SetHighStop(0, this->upperLimit[0].Radian());
 
-      this->effortLimit[0] = limitElem->GetValueDouble("effort");
-      this->velocityLimit[0] = limitElem->GetValueDouble("velocity");
+      this->effortLimit[0] = limitElem->Get<double>("effort");
+      this->velocityLimit[0] = limitElem->Get<double>("velocity");
     }
   }
 
   if (this->sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
-    this->SetAxis(1, axisElem->GetValueVector3("xyz"));
+    this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
       // store upper and lower joint limits
-      this->upperLimit[1] = limitElem->GetValueDouble("upper");
-      this->lowerLimit[1] = limitElem->GetValueDouble("lower");
+      this->upperLimit[1] = limitElem->Get<double>("upper");
+      this->lowerLimit[1] = limitElem->Get<double>("lower");
 
       // Perform this three step ordering to ensure the
       // parameters  are set properly.
@@ -208,8 +208,8 @@ void Joint::Init()
       this->SetLowStop(1, this->lowerLimit[1].Radian());
       this->SetHighStop(1, this->upperLimit[1].Radian());
 
-      this->effortLimit[1] = limitElem->GetValueDouble("effort");
-      this->velocityLimit[1] = limitElem->GetValueDouble("velocity");
+      this->effortLimit[1] = limitElem->Get<double>("effort");
+      this->velocityLimit[1] = limitElem->Get<double>("velocity");
     }
   }
 
@@ -221,43 +221,43 @@ void Joint::Init()
     if (this->sdf->HasElement("axis"))
     {
       this->SetAxis(0, modelPose.rot.RotateVector(
-            this->sdf->GetElement("axis")->GetValueVector3("xyz")));
+            this->sdf->GetElement("axis")->Get<math::Vector3>("xyz")));
     }
 
     if (this->sdf->HasElement("axis2"))
     {
       this->SetAxis(1, modelPose.rot.RotateVector(
-            this->sdf->GetElement("axis2")->GetValueVector3("xyz")));
+            this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz")));
     }
   }
   else
   {
     if (this->sdf->HasElement("axis"))
     {
-      this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-      if (this->sdf->GetElement("parent")->GetValueString("link_name")
+      this->SetAxis(0, this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+      if (this->sdf->GetElement("parent")->Get<std::string>("link_name")
           != "world")
       {
         gzwarn << "joint [" << this->GetScopedName()
           << "] has a non-real parentLink ["
-          << this->sdf->GetElement("parent")->GetValueString("link_name")
+          << this->sdf->GetElement("parent")->Get<std::string>("link_name")
           << "], loading axis from SDF ["
-          << this->sdf->GetElement("axis")->GetValueVector3("xyz")
+          << this->sdf->GetElement("axis")->Get<math::Vector3>("xyz")
           << "]\n";
       }
     }
     if (this->sdf->HasElement("axis2"))
     {
-      this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+      this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
 
-      if (this->sdf->GetElement("parent")->GetValueString("link_name")
+      if (this->sdf->GetElement("parent")->Get<std::string>("link_name")
           != "world")
       {
         gzwarn << "joint [" << this->GetScopedName()
           << "] has a non-real parentLink ["
-          << this->sdf->GetElement("parent")->GetValueString("link_name")
+          << this->sdf->GetElement("parent")->Get<std::string>("link_name")
           << "], loading axis2 from SDF ["
-          << this->sdf->GetElement("axis2")->GetValueVector3("xyz")
+          << this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz")
           << "]\n";
       }
     }
@@ -271,9 +271,9 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
   math::Vector3 vec;
 
   if (_index == 0 && this->sdf->HasElement("axis"))
-    vec = this->sdf->GetElement("axis")->GetValueVector3("xyz");
+    vec = this->sdf->GetElement("axis")->Get<math::Vector3>("xyz");
   else if (this->sdf->HasElement("axis2"))
-    vec = this->sdf->GetElement("axis2")->GetValueVector3("xyz");
+    vec = this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz");
   // vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
   // vec.Round();
   return vec;

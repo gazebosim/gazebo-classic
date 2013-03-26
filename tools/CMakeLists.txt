@@ -1,12 +1,15 @@
 include ( ${QT_USE_FILE} )
 add_definitions(${QT_DEFINITIONS})
 
-
 include_directories( 
   ${PROJECT_BINARY_DIR}/gazebo 
   ${tinyxml_include_dirs}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDF_INCLUDE_DIRS}
+)
+
+link_directories( 
+  ${SDF_LIBRARY_DIRS}
 )
 
 add_subdirectory(test)
@@ -20,7 +23,7 @@ target_link_libraries(gztopic gazebo_msgs gazebo_common gazebo_transport pthread
 gz_install_executable(gztopic)
 
 add_executable(gzlog gzlog.cc)
-target_link_libraries(gzlog gazebo_common gazebo_physics gazebo_transport gazebo_sensors gazebo_msgs ${SDF_LIBRARIES} pthread)
+target_link_libraries(gzlog gazebo_common gazebo_physics gazebo_transport gazebo_sensors gazebo_msgs pthread)
 gz_install_executable(gzlog)
 
 add_executable(gzstats gzstats.cc)
@@ -32,7 +35,7 @@ gz_install_executable(gzstats)
 #gz_install_executable(sdf2pov)
 
 add_executable(gzfactory gzfactory.cc)
-target_link_libraries(gzfactory gazebo_common gazebo_transport ${Boost_LIBRARIES} pthread)
+target_link_libraries(gzfactory gazebo_common gazebo_transport pthread)
 gz_install_executable(gzfactory)
 
 install (FILES gzmodel_create.sh DESTINATION ${BIN_INSTALL_DIR})

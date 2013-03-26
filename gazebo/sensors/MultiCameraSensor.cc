@@ -109,12 +109,12 @@ void MultiCameraSensor::Init()
   while (cameraSdf)
   {
     rendering::CameraPtr camera = scene->CreateCamera(
-          cameraSdf->GetValueString("name"), false);
+          cameraSdf->Get<std::string>("name"), false);
 
     if (!camera)
     {
       gzthrow("Unable to create multicamera sensor[" +
-              cameraSdf->GetValueString("name"));
+              cameraSdf->Get<std::string>("name"));
       return;
     }
 

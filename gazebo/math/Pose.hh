@@ -65,7 +65,7 @@ namespace gazebo
       public: Pose(const Pose &_pose);
 
       /// Deprecated
-      public: Pose(const sdf::Pose &_pose) GAZEBO_DEPRECATED;
+      public: Pose(const sdf::Pose &_pose) __attribute__((deprecated));
 
       /// \brief Destructor
       public: virtual ~Pose();
@@ -150,7 +150,8 @@ namespace gazebo
       public: Pose &operator=(const Pose &_pose);
 
       /// Deprecated
-      public: Pose &operator=(const sdf::Pose &_pose) GAZEBO_DEPRECATED;
+      public: Pose &operator=(const sdf::Pose &_pose)
+              __attribute__((deprecated));
 
       /// \brief Add one point to a vector: result = this + pos
       /// \param[in] _pos Position to add to this pose

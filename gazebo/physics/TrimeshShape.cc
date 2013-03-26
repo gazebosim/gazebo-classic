@@ -54,7 +54,7 @@ void TrimeshShape::Init()
   this->mesh = NULL;
   common::MeshManager *meshManager = common::MeshManager::Instance();
 
-  filename = common::find_file(this->sdf->GetValueString("uri"));
+  filename = common::find_file(this->sdf->Get<std::string>("uri"));
 
   if (filename == "__default__" || filename.empty())
   {
@@ -75,13 +75,13 @@ void TrimeshShape::SetScale(const math::Vector3 &_scale)
 //////////////////////////////////////////////////
 math::Vector3 TrimeshShape::GetSize() const
 {
-  return this->sdf->GetValueVector3("scale");
+  return this->sdf->Get<math::Vector3>("scale");
 }
 
 //////////////////////////////////////////////////
 std::string TrimeshShape::GetFilename() const
 {
-  return this->sdf->GetValueString("uri");
+  return this->sdf->Get<std::string>("uri");
 }
 
 //////////////////////////////////////////////////

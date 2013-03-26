@@ -337,15 +337,15 @@ bool Vector3::operator ==(const Vector3 &_pt) const
 //////////////////////////////////////////////////
 bool Vector3::operator!=(const Vector3 &_pt) const
 {
-  return !equal(this->x, _pt.x, 0.001) ||
-         !equal(this->y, _pt.y, 0.001) ||
-         !equal(this->z, _pt.z, 0.001);
+  return !(*this == _pt);
 }
 
 //////////////////////////////////////////////////
 bool Vector3::operator!=(const sdf::Vector3 &_pt) const
 {
-  return !(*this == _pt);
+  return !equal(this->x, _pt.x, 0.001) ||
+         !equal(this->y, _pt.y, 0.001) ||
+         !equal(this->z, _pt.z, 0.001);
 }
 
 //////////////////////////////////////////////////

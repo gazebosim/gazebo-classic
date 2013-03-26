@@ -110,7 +110,6 @@ target_link_libraries( gazebo_rendering
   gazebo_common 
   gazebo_skyx
   gazebo_selection_buffer
-  ${SDF_LIBRARIES}
   ${ogre_libraries} 
   ${OPENGL_LIBRARIES} 
   ${CEGUI_LIBRARIES}

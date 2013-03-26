@@ -121,11 +121,7 @@ target_link_libraries(gazebo_gui
   gazebo_msgs
   gazebo_building
   gzqtpropertybrowser
-  ${SDF_LIBRARIES}
   ${QT_LIBRARIES}
-  ${ogre_libraries}
-  ${Boost_LIBRARIES}
-  pthread
 )
 
 target_link_libraries(gzclient
@@ -136,11 +132,8 @@ target_link_libraries(gzclient
   gazebo_msgs
   gazebo_building
   gzqtpropertybrowser
-  ${SDF_LIBRARIES}
   ${QT_LIBRARIES}
-  ${ogre_libraries}
-  ${Boost_LIBRARIES}
-  pthread)
+)
 
 add_definitions(${QT_DEFINITIONS})
 

@@ -56,11 +56,11 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 
   if (this->sdf->HasElement("imu") &&
       this->sdf->GetElement("imu")->HasElement("topic") &&
-      this->sdf->GetElement("imu")->GetValueString("topic")
+      this->sdf->GetElement("imu")->Get<std::string>("topic")
       != "__default_topic__")
   {
     this->pub = this->node->Advertise<msgs::IMU>(
-        this->sdf->GetElement("imu")->GetValueString("topic"));
+        this->sdf->GetElement("imu")->Get<std::string>("topic"));
   }
   else
   {

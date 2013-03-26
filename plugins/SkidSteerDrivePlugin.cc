@@ -78,7 +78,7 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
 
   if (_sdf->HasElement("MaxForce"))
   {
-    this->MaxForce = _sdf->GetElement("MaxForce")->GetValueDouble();
+    this->MaxForce = _sdf->GetElement("MaxForce")->Get<double>();
   }
   else
   {

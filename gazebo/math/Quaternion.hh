@@ -75,7 +75,7 @@ namespace gazebo
     public: Quaternion(const Quaternion &_qt);
 
     /// Deprecated
-    public: Quaternion(const sdf::Quaternion &_qt) GAZEBO_DEPRECATED;
+    public: Quaternion(const sdf::Quaternion &_qt) __attribute__((deprecated));
 
     /// \brief Destructor
     public: ~Quaternion();

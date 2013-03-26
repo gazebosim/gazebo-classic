@@ -104,18 +104,23 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_
 
 gz_add_library(gazebo_common ${sources})
 
-target_link_libraries(gazebo_common gazebo_math
-                                    ${libdl_library}
-                                    ${Boost_LIBRARIES}
-                                    ${freeimage_library}
-                                    ${tinyxml_libraries}
-                                    ${libavcodec_LIBRARIES}
-                                    ${libavformat_LIBRARIES}
-                                    ${CURL_LIBRARIES}
-                                    ${libswscale_LIBRARIES}
-                                    ${libtar_libraries}
-                                    rt
-                                    )
+target_link_libraries(gazebo_common
+  gazebo_math
+  ${SDF_LIBRARIES}
+  ${libdl_library}
+  ${libtool_library}
+  ${Boost_LIBRARIES}
+  ${freeimage_library}
+  ${tinyxml_libraries}
+  ${libavcodec_LIBRARIES}
+  ${libavformat_LIBRARIES}
+  ${CURL_LIBRARIES}
+  ${libswscale_LIBRARIES}
+  ${libtar_libraries}
+  ${TBB_LIBRARIES}
+  rt
+  pthread
+)
 
 if (HAVE_GTS)
   target_link_libraries(gazebo_common ${gts_LIBRARIES})
