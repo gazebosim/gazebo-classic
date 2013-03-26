@@ -416,7 +416,7 @@ Time Time::operator /(const Time &_time) const
 {
   Time result(*this);
 
-  if (math::equal(_time.Double(), 0.0))
+  if (_time.sec == 0 && _time.nsec == 0)
     gzerr << "Time divide by zero\n";
   else
     result.Set(this->Double() / _time.Double());
