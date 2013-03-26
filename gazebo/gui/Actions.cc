@@ -29,6 +29,7 @@ QAction *gazebo::gui::g_aboutAct = 0;
 QAction *gazebo::gui::g_quitAct = 0;
 QAction *gazebo::gui::g_dataLoggerAct = 0;
 
+
 QAction *gazebo::gui::g_newModelAct = 0;
 QAction *gazebo::gui::g_resetModelsAct = 0;
 QAction *gazebo::gui::g_resetWorldAct = 0;
@@ -59,6 +60,7 @@ QAction *gazebo::gui::g_showContactsAct = 0;
 QAction *gazebo::gui::g_showJointsAct = 0;
 QAction *gazebo::gui::g_showCOMAct = 0;
 QAction *gazebo::gui::g_transparentAct = 0;
+QAction *gazebo::gui::g_viewWireframeAct = 0;
 
 QAction *gazebo::gui::g_resetAct = 0;
 QAction *gazebo::gui::g_fullScreenAct = 0;
