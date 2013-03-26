@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ODE gearbox joint
- * Author: Nate Koenig
- * Date: 21 May 2003
- */
 
 #ifndef _ODEGEARBOXJOINT_HH_
 #define _ODEGEARBOXJOINT_HH_
@@ -32,6 +28,7 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \class ODEGearboxJoint ODEGearboxJoint.hh physics/physics.hh
     /// \brief A double axis gearbox joint.
     class ODEGearboxJoint : public GearboxJoint<ODEJoint>
     {

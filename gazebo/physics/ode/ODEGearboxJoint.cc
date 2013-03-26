@@ -46,12 +46,15 @@ ODEGearboxJoint::~ODEGearboxJoint()
     physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
+//////////////////////////////////////////////////
 void ODEGearboxJoint::Init()
 {
   Joint::Init();
   LinkPtr link = this->model->GetLink(this->referenceBody);
   if (link)
     this->SetReferenceBody(link);
+  else
+    gzerr << "reference Link has not been set yet.\n";
 }
 
 //////////////////////////////////////////////////
@@ -62,6 +65,7 @@ void ODEGearboxJoint::Load(sdf::ElementPtr _sdf)
   this->SetGearRatio(this->gearRatio);
 }
 
+//////////////////////////////////////////////////
 void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
 {
   ODELinkPtr odelink = boost::shared_dynamic_cast<ODELink>(_body);

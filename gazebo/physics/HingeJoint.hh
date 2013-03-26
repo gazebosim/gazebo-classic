@@ -45,7 +45,7 @@ namespace gazebo
       public: virtual ~HingeJoint()
               { }
 
-      /// \interal
+      // Documentation inherited.
       public: virtual unsigned int GetAngleCount() const
               {return 1;}
 

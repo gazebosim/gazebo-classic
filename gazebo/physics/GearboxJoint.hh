@@ -43,11 +43,11 @@ namespace gazebo
       /// \param[in] _parent Parent link
       public: GearboxJoint(BasePtr _parent) : T(_parent)
               { this->AddType(Base::GEARBOX_JOINT); }
-      ///  \brief Destructor
+      /// \brief Destructor
       public: virtual ~GearboxJoint()
               { }
 
-      /// \interal
+      // Documentation inherited.
       public: virtual unsigned int GetAngleCount() const
               {return 2;}
 
