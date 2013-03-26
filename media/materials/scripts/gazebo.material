@@ -841,6 +841,10 @@ vertex_program Gazebo/GaussianCameraNoiseVS glsl
 fragment_program Gazebo/GaussianCameraNoiseFS glsl
 {
   source camera_noise_gaussian_fs.glsl
+  default_params
+  {
+    param_named RT int 0
+  }
 }
 
 material Gazebo/GaussianCameraNoise
@@ -851,6 +855,13 @@ material Gazebo/GaussianCameraNoise
     {
       vertex_program_ref Gazebo/GaussianCameraNoiseVS { }
       fragment_program_ref Gazebo/GaussianCameraNoiseFS { }
+
+      texture_unit RT
+      {
+        tex_coord_set 0
+        tex_address_mode clamp
+        filtering linear linear linear
+      }
     }
   }
 }
