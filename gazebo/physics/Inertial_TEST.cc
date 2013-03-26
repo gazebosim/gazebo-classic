@@ -51,7 +51,7 @@ TEST_F(Inertial_TEST, InertialWorld)
   double t = world->GetSimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetStepTime();
+  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
 
   // verify that time moves forward
