@@ -43,7 +43,7 @@ TEST_F(PR2Test, Load)
   EXPECT_TRUE(sensor);
 
   sensors::CameraSensorPtr camSensor =
-    boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor);
 
   while (!camSensor->SaveFrame("/tmp/frame_10.jpg"))

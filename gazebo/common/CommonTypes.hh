@@ -90,6 +90,7 @@ namespace gazebo
     class DiagnosticTimer;
     class Image;
     class Mesh;
+    class SubMesh;
     class MouseEvent;
     class NumericAnimation;
     class Param;

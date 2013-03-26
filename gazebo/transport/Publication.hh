@@ -112,7 +112,7 @@ namespace gazebo
       /// \param[in] _msg Message to be published
       /// \param[in] _cb If non-null, callback to be invoked after publishing
       /// is completed
-      public: void Publish(const google::protobuf::Message &_msg,
+      public: void Publish(MessagePtr _msg,
                            const boost::function<void()> &_cb = NULL);
 
       /// \brief Add a transport

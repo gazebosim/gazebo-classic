@@ -91,9 +91,9 @@ void UserCamera::Load()
 void UserCamera::Init()
 {
   this->orbitViewController = new OrbitViewController(
-      boost::shared_dynamic_cast<UserCamera>(shared_from_this()));
+      boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
   this->fpsViewController = new FPSViewController(
-      boost::shared_dynamic_cast<UserCamera>(shared_from_this()));
+      boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
   this->viewController = this->orbitViewController;
 
   Camera::Init();

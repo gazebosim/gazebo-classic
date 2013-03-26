@@ -57,9 +57,9 @@ void BulletHingeJoint::Init()
 
   // Cast to BulletLink
   BulletLinkPtr bulletChildLink =
-    boost::shared_static_cast<BulletLink>(this->childLink);
+    boost::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
-    boost::shared_static_cast<BulletLink>(this->parentLink);
+    boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   // Get axis unit vector (expressed in world frame).
   math::Vector3 axis = this->initialWorldAxis;
