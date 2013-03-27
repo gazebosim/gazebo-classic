@@ -6,4 +6,6 @@ add_subdirectory(1.4)
 
 set (headers sdf.hh)
 
-gz_install_includes("sdf" ${headers})
+if (NOT HAVE_SDF)
+  gz_install_includes("sdf" ${headers})
+endif()
