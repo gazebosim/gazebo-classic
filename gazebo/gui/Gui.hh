@@ -24,10 +24,6 @@ namespace gazebo
 {
   namespace gui
   {
-    void load();
-
-    void init();
-
     bool run(int _argc, char **_argv);
     void stop();
 

@@ -66,10 +66,10 @@ namespace gazebo
               };
 
       /// \brief Constructor.
-      public: RTShaderSystem();
+      private: RTShaderSystem();
 
       /// \brief Destructor.
-      public: virtual ~RTShaderSystem();
+      private: virtual ~RTShaderSystem();
 
       /// \brief Init the run time shader system.
       public: void Init();

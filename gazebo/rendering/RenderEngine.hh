@@ -70,10 +70,10 @@ namespace gazebo
 
       /// \brief Constructor. This is a singleton, use
       /// RenderEngine::Instance() to access the render engine.
-      public: RenderEngine();
+      private: RenderEngine();
 
       /// \brief Destructor
-      public: virtual ~RenderEngine();
+      private: virtual ~RenderEngine();
 
       /// \brief Load the parameters for Ogre. Load must happen before Init.
       public: void Load();

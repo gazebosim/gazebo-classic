@@ -35,7 +35,7 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
-  // this->setWindowIcon(QIcon(":/images/gazebo.svg"));
+  this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Topic View"));
   this->setObjectName("cameraSensor");
 
