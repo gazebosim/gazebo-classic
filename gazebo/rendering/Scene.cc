@@ -2506,7 +2506,7 @@ void Scene::ShowJoints(bool _show)
 /////////////////////////////////////////////////
 void Scene::ShowContacts(bool _show)
 {
-  ContactVisualPtr vis = boost::shared_dynamic_cast<ContactVisual>(
+  ContactVisualPtr vis = boost::dynamic_pointer_cast<ContactVisual>(
       this->visuals["__GUIONLY_CONTACT_VISUAL__"]);
 
   if (!vis && _show)
