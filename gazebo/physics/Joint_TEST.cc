@@ -103,6 +103,9 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
       }
       world->SetPaused(paused);
     }
+
+    gazebo::common::Time::MSleep(10);
+
     this->GetMemInfo(residentCur, shareCur);
     if (i > 1)  // give it 2 cycles to stabilize
     {

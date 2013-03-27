@@ -127,13 +127,6 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    void init()
-    {
-      g_main_win->show();
-      g_main_win->Init();
-    }
-
-    /////////////////////////////////////////////////
     void load()
     {
       g_modelRightMenu = new gui::ModelRightMenu();
@@ -155,6 +148,13 @@ namespace gazebo
 
       g_main_win->Load();
       g_main_win->resize(1024, 768);
+    }
+
+    /////////////////////////////////////////////////
+    void init()
+    {
+      g_main_win->show();
+      g_main_win->Init();
     }
 
     /////////////////////////////////////////////////
