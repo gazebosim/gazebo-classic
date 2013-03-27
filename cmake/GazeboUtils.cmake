@@ -178,14 +178,14 @@ macro (gz_build_tests)
       )
   
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
-      --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
   
     set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
   
     # Check that the test produced a result and create a failure if it didn't.
     # Guards against crashed and timed out tests.
     add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-             ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+	${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
   endforeach()
 
   set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
@@ -245,14 +245,14 @@ if (VALID_DISPLAY)
       ${QT_LIBRARIES}
       )
 
-    add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} -xml)
+    add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${TEST_TYPE}_${BINARY_NAME} -xml)
 
     set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
 
     # Check that the test produced a result and create a failure if it didn't.
     # Guards against crashed and timed out tests.
     add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-             ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+	${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
     endforeach()
   endmacro()
 endif()
