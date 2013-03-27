@@ -36,7 +36,7 @@ void MainWindow_TEST::Wireframe()
   this->resMaxPercentChange = 3.0;
   this->shareMaxPercentChange = 1.0;
 
-  this->LoadServer("empty.world", false);
+  this->Load("empty.world", false);
   gazebo::transport::NodePtr node;
   gazebo::transport::SubscriberPtr sub;
 
@@ -61,6 +61,9 @@ void MainWindow_TEST::Wireframe()
 
   // Get the user camera, and tell it to save frames
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  if (!cam)
+    return;
+
   cam->EnableSaveFrame(true);
 
   // Process some events, and draw the screen

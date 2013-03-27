@@ -32,55 +32,37 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
                      const std::string &_viewType, unsigned int _displayPeriod)
 : QDialog(_parent), msgTypeName(_msgTypeName)
 {
-  printf("I\n");
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
   // this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Topic View"));
   this->setObjectName("cameraSensor");
-  printf("II\n");
 
   // Create the topic label and combo box
   // {
   QHBoxLayout *topicLayout = new QHBoxLayout;
-  printf("IIa\n");
   QLabel *topicLabel = new QLabel(tr("Topic: "));
-  printf("IIb\n");
   this->topicCombo = new TopicCombo(this, this->msgTypeName,
       _viewType, this->node);
-  printf("IIc\n");
   this->topicCombo->setMinimumSize(300, 25);
-  printf("IId\n");
   this->topicCombo->setObjectName("topicViewTopicCombo");
-  printf("IIe\n");
 
   topicLayout->addSpacing(10);
-  printf("IIf\n");
   topicLayout->addWidget(topicLabel);
-  printf("IIg\n");
   topicLayout->addWidget(this->topicCombo);
-  printf("IIh\n");
   topicLayout->addSpacing(10);
-  printf("IIi\n");
   topicLayout->addStretch(4);
-  printf("IIj\n");
   // }
 
   // Create the Hz and bandwidth labels
   // {
   QHBoxLayout *infoLayout = new QHBoxLayout;
-  printf("IIk\n");
   QLabel *hzLabel = new QLabel(tr("Hz: "));
-  printf("IIl\n");
   this->hzEdit = new QLineEdit;
-  printf("IIm\n");
   this->hzEdit->setReadOnly(true);
-  printf("IIn\n");
   this->hzEdit->setFixedWidth(80);
-  printf("IIo\n");
 
-  printf("III\n");
   QLabel *bandwidthLabel = new QLabel(tr("Bandwidth: "));
   this->bandwidthEdit = new QLineEdit;
   this->bandwidthEdit->setReadOnly(true);
@@ -112,7 +94,6 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   displayTimer->start(_displayPeriod);
 
   this->setWindowFlags(Qt::Window);
-  printf("IV\n");
 }
 
 /////////////////////////////////////////////////

@@ -373,7 +373,6 @@ void Server::SigInt(int)
 /////////////////////////////////////////////////
 void Server::Stop()
 {
-  printf("Server::STOP\n");
   this->stop = true;
 }
 
@@ -400,28 +399,15 @@ void Server::Run()
   if (this->stop)
     return;
 
-  printf("Server::Run\n");
   // Make sure the sensors are updated once before running the world.
   // This makes sure plugins get loaded properly.
   sensors::run_once(true);
-  printf("Server::Run run_once\n");
-
-  if (this->stop)
-    return;
 
   // Run the sensor threads
   sensors::run_threads();
-  printf("Server::Run run_thread\n");
-
-  if (this->stop)
-    return;
 
   // Run each world. Each world starts a new thread
   physics::run_worlds();
-  printf("Server::Run run_worlds\n");
-
-  if (this->stop)
-    return;
 
   // Update the sensors.
   while (!this->stop)
@@ -430,18 +416,14 @@ void Server::Run()
     sensors::run_once();
     common::Time::MSleep(1);
   }
-  printf("Stopping\n");
 
   // Stop all the worlds
   physics::stop_worlds();
-  printf("Stoped worlds\n");
 
   sensors::stop();
 
-  printf("Stoped sensors\n");
   // Stop gazebo
   gazebo::stop();
-  printf("Stoped gazebo\n");
 
   // Stop the master
   this->master->Stop();

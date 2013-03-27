@@ -58,10 +58,10 @@
 using namespace gazebo;
 using namespace rendering;
 
-
 //////////////////////////////////////////////////
 RenderEngine::RenderEngine()
 {
+  printf("RenderEngine::RenderEngine\n");
   this->logManager = NULL;
   this->root = NULL;
 
@@ -82,54 +82,53 @@ RenderEngine::~RenderEngine()
 //////////////////////////////////////////////////
 void RenderEngine::Load()
 {
+  printf("RenderEngine::Load()");
   if (!this->CreateContext())
   {
     gzwarn << "Unable to create X window. Rendering will be disabled\n";
     return;
   }
 
-  this->connections.push_back(event::Events::ConnectPreRender(
-        boost::bind(&RenderEngine::PreRender, this)));
-  this->connections.push_back(event::Events::ConnectRender(
-        boost::bind(&RenderEngine::Render, this)));
-  this->connections.push_back(event::Events::ConnectPostRender(
-        boost::bind(&RenderEngine::PostRender, this)));
-
-  // Create a new log manager and prevent output from going to stdout
-  this->logManager = new Ogre::LogManager();
-
-  std::string logPath = common::SystemPaths::Instance()->GetLogPath();
-  logPath += "/ogre.log";
-
-  this->logManager->createLog(logPath, true, false, false);
-
-  if (this->root)
+  if (!this->root)
   {
-    gzerr << "Attempting to load, but root already exist\n";
-    return;
+    this->connections.push_back(event::Events::ConnectPreRender(
+          boost::bind(&RenderEngine::PreRender, this)));
+    this->connections.push_back(event::Events::ConnectRender(
+          boost::bind(&RenderEngine::Render, this)));
+    this->connections.push_back(event::Events::ConnectPostRender(
+          boost::bind(&RenderEngine::PostRender, this)));
+
+    // Create a new log manager and prevent output from going to stdout
+    this->logManager = new Ogre::LogManager();
+
+    std::string logPath = common::SystemPaths::Instance()->GetLogPath();
+    logPath += "/ogre.log";
+
+    this->logManager->createLog(logPath, true, false, false);
+
+    // Make the root
+    try
+    {
+      this->root = new Ogre::Root();
+    }
+    catch(Ogre::Exception &e)
+    {
+      gzthrow("Unable to create an Ogre rendering environment, no Root ");
+    }
+
+    // Load all the plugins
+    this->LoadPlugins();
+
+    // Setup the rendering system, and create the context
+    this->SetupRenderSystem();
+
+
+    // Initialize the root node, and don't create a window
+    this->root->initialise(false);
+
+    // Setup the available resources
+    this->SetupResources();
   }
-
-  // Make the root
-  try
-  {
-    this->root = new Ogre::Root();
-  }
-  catch(Ogre::Exception &e)
-  {
-    gzthrow("Unable to create an Ogre rendering environment, no Root ");
-  }
-
-  // Load all the plugins
-  this->LoadPlugins();
-
-  // Setup the rendering system, and create the context
-  this->SetupRenderSystem();
-
-  // Initialize the root node, and don't create a window
-  this->root->initialise(false);
-
-  // Setup the available resources
-  this->SetupResources();
 
   std::stringstream stream;
   stream << (int32_t)this->dummyWindowId;
@@ -646,7 +645,6 @@ bool RenderEngine::CreateContext()
   {
     result = false;
   }
-
 
   return result;
 }

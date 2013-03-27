@@ -16,26 +16,26 @@
 */
 #include <math.h>
 
-#include "common/Exception.hh"
-#include "math/gzmath.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/math/gzmath.hh"
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "rendering/RenderEvents.hh"
-#include "rendering/Rendering.hh"
-#include "rendering/Visual.hh"
-#include "rendering/WindowManager.hh"
-#include "rendering/RenderEngine.hh"
-#include "rendering/Scene.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/OrbitViewController.hh"
-#include "rendering/FPSViewController.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/WindowManager.hh"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/OrbitViewController.hh"
+#include "gazebo/rendering/FPSViewController.hh"
 
-#include "gui/Actions.hh"
-#include "gui/Gui.hh"
-#include "gui/ModelRightMenu.hh"
-#include "gui/GuiEvents.hh"
-#include "gui/GLWidget.hh"
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/ModelRightMenu.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GLWidget.hh"
 
 using namespace gazebo;
 using namespace gui;

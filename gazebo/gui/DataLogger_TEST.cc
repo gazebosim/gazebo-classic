@@ -73,7 +73,6 @@ void DataLogger_TEST::RecordButton()
 
   // Make sure the initial size is zero
   txt = sizeLabel->text().toStdString();
-  std::cout << "TXT[" << txt << "]\n";
   QVERIFY(txt == "0.00 B");
 
   // Make sure the initial time is zero

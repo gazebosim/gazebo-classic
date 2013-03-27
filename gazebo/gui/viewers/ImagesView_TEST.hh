@@ -29,7 +29,7 @@ class ImagesView_TEST : public QTestFixture
   Q_OBJECT
 
   /// \brief Test construction and usage in an empty world
-  // private slots: void Construction();
+  private slots: void Construction();
 
   /// \brief Test switching between cameras
   private slots: void Switch();

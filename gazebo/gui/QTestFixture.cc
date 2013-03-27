@@ -20,6 +20,8 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
+#include <unistd.h>
+
 #include "gazebo/physics/Physics.hh"
 
 #include "gazebo/rendering/Rendering.hh"
@@ -59,8 +61,9 @@ void QTestFixture::init()
 
   this->serverThread = NULL;
   this->GetMemInfo(this->residentStart, this->shareStart);
+  gazebo::rendering::load();
 }
-
+/*
 void QTestFixture::LoadServer(const std::string &_worldFilename, bool _paused)
 {
   // Create, load, and run the server in its own thread
@@ -99,10 +102,29 @@ void QTestFixture::RunServer2(const std::string &_worldFilename, bool _paused)
   delete this->server;
   this->server = NULL;
   printf("Stop5\n");
-}
+}*/
 
 /////////////////////////////////////////////////
 void QTestFixture::Load(const std::string &_worldFilename, bool _paused)
+{
+  // Create, load, and run the server in its own thread
+  this->serverThread = new boost::thread(
+      boost::bind(&QTestFixture::RunServer, this, _worldFilename, _paused));
+
+  // Wait for the server to come up
+  // Use a 30 second timeout.
+  int waitCount = 0, maxWaitCount = 3000;
+  while ((!this->server || !this->server->GetInitialized()) &&
+      ++waitCount < maxWaitCount)
+    gazebo::common::Time::MSleep(10);
+
+  gazebo::common::Time::MSleep(1000);
+  gazebo::rendering::create_scene(
+      gazebo::physics::get_world()->GetName(), false);
+}
+
+/////////////////////////////////////////////////
+void QTestFixture::RunServer(const std::string &_worldFilename, bool _paused)
 {
   this->server = new gazebo::Server();
   this->server->LoadFile(_worldFilename);
@@ -110,29 +132,12 @@ void QTestFixture::Load(const std::string &_worldFilename, bool _paused)
 
   this->SetPause(_paused);
 
-  gazebo::rendering::create_scene(
-      gazebo::physics::get_world()->GetName(), false);
-
-  printf("HERE\n");
-  // Create, load, and run the server in its own thread
-  this->serverThread = new boost::thread(
-      boost::bind(&QTestFixture::RunServer, this));
-
-  printf("Yup\n");
-  // Wait for the server to come up
-  // Use a 30 second timeout.
-  int waitCount = 0, maxWaitCount = 3000;
-  while ((!this->server || !this->server->GetInitialized()) &&
-      ++waitCount < maxWaitCount)
-    gazebo::common::Time::MSleep(10);
-}
-
-/////////////////////////////////////////////////
-void QTestFixture::RunServer()
-{
-  printf("RUN\n");
   this->server->Run();
-  printf("RUN STOP\n");
+
+  this->server->Fini();
+
+  delete this->server;
+  this->server = NULL;
 }
 
 /////////////////////////////////////////////////

@@ -94,7 +94,6 @@ void MultiCameraSensor::Init()
 
   if (!scene)
   {
-    printf("Create scene\n");
     scene = rendering::create_scene(worldName, false);
 
     // This usually means rendering is not available
@@ -104,8 +103,6 @@ void MultiCameraSensor::Init()
       return;
     }
   }
-  else
-    printf("Has scene\n");
 
   // Create and initialize all the cameras
   sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
