@@ -127,7 +127,12 @@ target_link_libraries(gazebo_msgs
 
 # Remove this whole if conditional in Gazebo 1.8
 if (NOT HAVE_SDF)
-target_link_libraries(gazebo_msgs gazebo_sdf_interface)
+  link_directories(
+    ${urdfdom_LIBRARY_DIRS}
+    ${urdfdom_headers_LIBRARY_DIRS}
+    ${console_bridge_LIBRARY_DIRS}
+    )
+  target_link_libraries(gazebo_msgs gazebo_sdf_interface)
 endif()
 
 add_dependencies(gazebo_msgs gazebomsgs_out)

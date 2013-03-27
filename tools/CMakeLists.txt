@@ -12,6 +12,16 @@ link_directories(
   ${SDF_LIBRARY_DIRS}
 )
 
+# Remove this whole if block in Gazebo 1.8
+if (NOT HAVE_SDF)
+  link_directories(
+    ${urdfdom_LIBRARY_DIRS}
+    ${urdfdom_headers_LIBRARY_DIRS}
+    ${console_bridge_LIBRARY_DIRS}
+    )
+endif()
+
+
 add_subdirectory(test)
 
 add_executable(gzsdf gzsdf.cc)
