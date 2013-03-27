@@ -21,12 +21,13 @@
 #include "test/ServerFixture.hh"
 #include "gazebo/sensors/ImuSensor.hh"
 
+#define TOL 1e-4
+
 using namespace gazebo;
 class ImuSensor_TEST : public ServerFixture
 {
   public: void BasicImuSensorCheck(const std::string &_physicsEngine);
   public: void LinearAccelerationTest(const std::string &_physicsEngine);
-  public: void AngularVelocityTest(const std::string &_physicsEngine);
 };
 
 static std::string imuSensorString =
@@ -123,10 +124,12 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
 
   // step world and verify imu's linear acceleration is zero on free fall
   world->StepWorld(200);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, 0, TOL);
   world->StepWorld(1);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, 0, TOL);
-  world->StepWorld(1);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, 0, TOL);
 
   // Predict time of contact with ground plane.

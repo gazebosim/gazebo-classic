@@ -97,7 +97,7 @@ namespace gazebo
       /// \brief Subscriber to link data published by parent entity
       private: transport::SubscriberPtr linkDataSub;
 
-      /// \brief Parent entity which the Imu is attached to
+      /// \brief Parent entity which the IMU is attached to
       private: physics::LinkPtr parentEntity;
 
       /// \brief Imu message

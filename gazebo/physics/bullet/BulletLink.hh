@@ -90,11 +90,6 @@ namespace gazebo
                   const math::Vector3 &_offset,
                   const math::Quaternion &_q) const;
 
-      /// \internal
-      // Documentation inherited
-      public: virtual math::Vector3 GetWorldLinearVel(common::Time &_time,
-           const math::Vector3 &_offset = math::Vector3(0, 0, 0));
-
       // Documentation inherited
       public: virtual math::Vector3 GetWorldCoGLinearVel() const;
 

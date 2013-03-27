@@ -42,7 +42,6 @@ GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor)
 ImuSensor::ImuSensor()
   : Sensor(sensors::OTHER)
 {
-
 }
 
 //////////////////////////////////////////////////
@@ -188,7 +187,6 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
                 imuPose.rot.GetInverse().RotateVector(
                 imuWorldAngularVel));
 
-
       imuWorldLinearVel +=
           imuWorldAngularVel.Cross(parentEntityPose.pos - imuPose.pos);
 
@@ -200,8 +198,6 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
       // Add contribution from gravity
       this->gravity = this->world->GetPhysicsEngine()->GetGravity();
       this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
-
-      gzerr << this->linearAcc << std::endl;
     }
 
     msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);

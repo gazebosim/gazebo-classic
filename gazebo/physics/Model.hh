@@ -27,7 +27,6 @@
 #include <vector>
 
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/Time.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
