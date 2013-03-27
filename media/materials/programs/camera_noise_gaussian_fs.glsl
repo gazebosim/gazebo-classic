@@ -19,7 +19,7 @@
 // So we're doing something mildly complicated:
 //
 // 1. On the CPU, before each call to this shader, generate 3 random numbers
-// that are uniformly distributed on [0,min(width,height)] and pass them here,
+// that are uniformly distributed on [0,1.0] and pass them here,
 // in the `offsets` parameter.
 //
 // 2. Each time we need a random number here, add one of the CPU-provided
@@ -33,11 +33,6 @@
 //
 // 4. Having produced a Gaussian sample, we add this value to each channel of
 // the input image.
-//
-// Note: In step 1, the sampling range was chosen to keep the vectors that we
-// pass to the pseudo-random number generator close in magnitude to screen-sized
-// textures.  It's not clear whether that function behaves well when given very
-// large vectors as inputs.
 
 // The input texture, which is set up by the Ogre Compositor infrastructure.
 uniform sampler2D RT;

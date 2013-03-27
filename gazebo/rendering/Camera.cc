@@ -59,25 +59,23 @@ class GaussianNoiseCompositorListener :
   public Ogre::CompositorInstance::Listener
 {
   private:
-    // We'll sample in the range [0,max_]
-    int max_;
     // Mean and standard deviation that we'll pass down to the GLSL fragment
     // shader.
     double mean_, stddev_;
   public:
-    GaussianNoiseCompositorListener(int max, double mean, double stddev): 
-      max_(max), mean_(mean), stddev_(stddev) {}
+    GaussianNoiseCompositorListener(double mean, double stddev): 
+      mean_(mean), stddev_(stddev) {}
     void notifyMaterialRender(unsigned int pass_id, Ogre::MaterialPtr & mat)
     {
       // modify material here (wont alter the base material!), called for
       // every drawn geometry instance (i.e. compositor render_quad)
       
-      // Sample three values within the range (0,max] and set them for use in
+      // Sample three values within the range [0,1.0] and set them for use in
       // the fragment shader, which will interpret them as offsets from (0,0) 
       // to use when computing pseudo-random values.
-      Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, this->max_),
-                            math::Rand::GetDblUniform(0.0, this->max_),
-                            math::Rand::GetDblUniform(0.0, this->max_));
+      Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
+                            math::Rand::GetDblUniform(0.0, 1.0),
+                            math::Rand::GetDblUniform(0.0, 1.0));
       // These calls are setting parameters that are declared in two places:
       // 1. media/materials/scripts/gazebo.material, in 
       //    fragment_program Gazebo/GaussianCameraNoiseFS
@@ -236,9 +234,7 @@ void Camera::Load()
       this->noiseStdDev = noiseElem->GetValueDouble("stddev");
       this->noiseActive = true;
       this->gaussianNoiseCompositorListener.reset(new
-        GaussianNoiseCompositorListener(
-          std::min(this->imageWidth, this->imageHeight),
-          this->noiseMean, this->noiseStdDev));
+        GaussianNoiseCompositorListener(this->noiseMean, this->noiseStdDev));
       gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
         " and stddev " << this->noiseStdDev << std::endl;
     }
