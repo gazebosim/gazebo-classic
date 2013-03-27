@@ -16,6 +16,15 @@ link_directories(
   ${ODE_LIBRARY_DIRS}
 )
 
+# Remove this whole if block in Gazebo 1.8
+if (NOT HAVE_SDF)
+  link_directories(
+    ${urdfdom_LIBRARY_DIRS}
+    ${urdfdom_headers_LIBRARY_DIRS}
+    ${console_bridge_LIBRARY_DIRS}
+    )
+endif()
+
 configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
 
 # Build gtest
