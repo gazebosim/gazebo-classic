@@ -56,10 +56,6 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void Fini();
 
-      /// \brief Callback when link data is received
-      /// \param[in] _msg Message containing link data
-      private: void OnLinkData(ConstLinkDataPtr &_msg);
-
       /// \brief Returns the angular velocity.
       /// \return Angular velocity.
       public: math::Vector3 GetAngularVelocity() const;
@@ -78,6 +74,10 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual bool IsActive();
+
+      /// \brief Callback when link data is received
+      /// \param[in] _msg Message containing link data
+      private: void OnLinkData(ConstLinkDataPtr &_msg);
 
       /// \brief Imu reference pose
       private: math::Pose referencePose;

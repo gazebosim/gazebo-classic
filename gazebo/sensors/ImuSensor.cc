@@ -115,8 +115,7 @@ void ImuSensor::OnLinkData(ConstLinkDataPtr &_msg)
   // Store the contacts message for processing in UpdateImpl
   this->incomingLinkData.push_back(_msg);
 
-  // For now, always keep only the latest data
-  if (this->incomingLinkData.size() > 2)
+  if (this->incomingLinkData.size() > 3)
     this->incomingLinkData.pop_front();
 }
 
@@ -147,67 +146,66 @@ void ImuSensor::SetReferencePose()
 //////////////////////////////////////////////////
 void ImuSensor::UpdateImpl(bool /*_force*/)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  msgs::LinkData msg;
 
-  // Don't do anything if there is no new data to process.
-  if (this->incomingLinkData.empty())
-    return;
-
-  // Iterate over all the link data messages
-  for (LinkDataMsgs_L::iterator iter = this->incomingLinkData.begin();
-      iter != this->incomingLinkData.end(); ++iter)
   {
-    common::Time timestamp = msgs::Convert((*iter)->time());
+    boost::mutex::scoped_lock lock(this->mutex);
 
-    double dt = (timestamp - this->lastMeasurementTime).Double();
+    // Don't do anything if there is no new data to process.
+    if (this->incomingLinkData.empty())
+      return;
+
+    msg.CopyFrom(*this->incomingLinkData.front().get());
+    this->incomingLinkData.pop_front();
+  }
+
+  common::Time timestamp = msgs::Convert(msg.time());
+
+  double dt = (timestamp - this->lastMeasurementTime).Double();
+
+  if (dt > 0.0)
+  {
+    this->imuMsg.set_entity_name(this->parentName);
+
+    msgs::Set(this->imuMsg.mutable_stamp(), timestamp);
+
+    math::Pose parentEntityPose = this->parentEntity->GetWorldPose();
+    math::Pose imuPose = this->pose + parentEntityPose;
+
+    // Compute and set the IMU linear acceleration
+    math::Vector3 imuWorldLinearVel
+        = msgs::Convert(msg.linear_velocity());
+    math::Vector3 imuWorldAngularVel
+        = msgs::Convert(msg.angular_velocity());
+
+    // Set the IMU orientation
+    msgs::Set(this->imuMsg.mutable_orientation(),
+              imuPose.rot * this->referencePose.rot.GetInverse());
+
+    // Set the IMU angular velocity
+    msgs::Set(this->imuMsg.mutable_angular_velocity(),
+              imuPose.rot.GetInverse().RotateVector(
+              imuWorldAngularVel));
+
+    imuWorldLinearVel +=
+        imuWorldAngularVel.Cross(parentEntityPose.pos - imuPose.pos);
+
+    this->linearAcc = imuPose.rot.GetInverse().RotateVector(
+      (imuWorldLinearVel - this->lastLinearVel) / dt);
+
+    this->lastLinearVel = imuWorldLinearVel;
+
+    // Add contribution from gravity
+    this->gravity = this->world->GetPhysicsEngine()->GetGravity();
+    this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
 
     this->lastMeasurementTime = timestamp;
-
-    if (dt > 0.0)
-    {
-      this->imuMsg.set_entity_name(this->parentName);
-
-      msgs::Set(this->imuMsg.mutable_stamp(), timestamp);
-
-      math::Pose parentEntityPose = this->parentEntity->GetWorldPose();
-      math::Pose imuPose = this->pose + parentEntityPose;
-
-      // Compute and set the IMU linear acceleration
-      math::Vector3 imuWorldLinearVel
-          = msgs::Convert((*iter)->linear_velocity());
-      math::Vector3 imuWorldAngularVel
-          = msgs::Convert((*iter)->angular_velocity());
-
-      // Set the IMU orientation
-      msgs::Set(this->imuMsg.mutable_orientation(),
-                imuPose.rot * this->referencePose.rot.GetInverse());
-
-      // Set the IMU angular velocity
-      msgs::Set(this->imuMsg.mutable_angular_velocity(),
-                imuPose.rot.GetInverse().RotateVector(
-                imuWorldAngularVel));
-
-      imuWorldLinearVel +=
-          imuWorldAngularVel.Cross(parentEntityPose.pos - imuPose.pos);
-
-      this->linearAcc = imuPose.rot.GetInverse().RotateVector(
-        (imuWorldLinearVel - this->lastLinearVel) / dt);
-
-      this->lastLinearVel = imuWorldLinearVel;
-
-      // Add contribution from gravity
-      this->gravity = this->world->GetPhysicsEngine()->GetGravity();
-      this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
-    }
 
     msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
 
     if (this->pub)
       this->pub->Publish(this->imuMsg);
   }
-
-  // Clear the incoming data link list.
-  this->incomingLinkData.clear();
 }
 
 //////////////////////////////////////////////////
