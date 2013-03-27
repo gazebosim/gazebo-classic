@@ -84,7 +84,6 @@ rendering::ScenePtr rendering::create_scene(const std::string &_name,
     // Create a default scene for the gui
     try
     {
-      printf("Making a scene\n");
       scene = rendering::RenderEngine::Instance()->CreateScene(_name,
           _enableVisualizations);
     }

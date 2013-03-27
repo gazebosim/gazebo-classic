@@ -61,7 +61,6 @@ using namespace rendering;
 //////////////////////////////////////////////////
 RenderEngine::RenderEngine()
 {
-  printf("RenderEngine::RenderEngine\n");
   this->logManager = NULL;
   this->root = NULL;
 
@@ -82,7 +81,6 @@ RenderEngine::~RenderEngine()
 //////////////////////////////////////////////////
 void RenderEngine::Load()
 {
-  printf("RenderEngine::Load()");
   if (!this->CreateContext())
   {
     gzwarn << "Unable to create X window. Rendering will be disabled\n";
@@ -121,7 +119,6 @@ void RenderEngine::Load()
 
     // Setup the rendering system, and create the context
     this->SetupRenderSystem();
-
 
     // Initialize the root node, and don't create a window
     this->root->initialise(false);
@@ -274,7 +271,10 @@ void RenderEngine::Fini()
   if (!this->initialized)
     return;
 
-  this->node->Fini();
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
+
   this->connections.clear();
 
   // TODO: this was causing a segfault on shutdown

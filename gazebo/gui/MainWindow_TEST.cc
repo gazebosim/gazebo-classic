@@ -36,7 +36,7 @@ void MainWindow_TEST::Wireframe()
   this->resMaxPercentChange = 3.0;
   this->shareMaxPercentChange = 1.0;
 
-  this->Load("empty.world", false);
+  this->Load("empty.world", false, false, true);
   gazebo::transport::NodePtr node;
   gazebo::transport::SubscriberPtr sub;
 
@@ -119,8 +119,8 @@ void MainWindow_TEST::Wireframe()
   // Make sure the request was set.
   QVERIFY(g_gotSetWireframe);
 
-  // Removing the grey ground plane should make the average color brighter.
-  QVERIFY(avgPreWireframe < avgPostWireframe);
+  // Removing the grey ground plane should change the image.
+  QVERIFY(fabs(avgPreWireframe - avgPostWireframe) > 10);
 
   mainWindow->hide();
   delete mainWindow;

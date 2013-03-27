@@ -205,7 +205,7 @@ TEST_F(TransportStressTest, ManyNodes)
       (g_localPublishMessageCount * nodes.size()) * 1500);
 
   // The total receive duration will be longer.
-  EXPECT_LT(receiveDiff.sec, g_localPublishCount * 1e-6);
+  EXPECT_LT(receiveDiff.sec, g_localPublishCount * 1e-5);
 
   // Out time time for human testing purposes
   gzmsg << "Time to publish " << g_localPublishMessageCount * nodes.size()

@@ -49,6 +49,7 @@ GLWidget::GLWidget(QWidget *_parent)
 {
   this->setObjectName("GLWidget");
   this->state = "select";
+  this->sceneCreated = false;
 
   this->setFocusPolicy(Qt::StrongFocus);
 
@@ -183,7 +184,9 @@ void GLWidget::moveEvent(QMoveEvent *_e)
 /////////////////////////////////////////////////
 void GLWidget::paintEvent(QPaintEvent *_e)
 {
-  if (rendering::get_scene())
+  // Timing may cause GLWidget to miss the OnCreateScene event. So, we check
+  // here to make sure it's handled.
+  if (!this->sceneCreated && rendering::get_scene())
     this->OnCreateScene(rendering::get_scene()->GetName());
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
@@ -757,6 +760,7 @@ void GLWidget::OnCreateScene(const std::string &_name)
   this->SetMouseMoveVisual(rendering::VisualPtr());
 
   this->ViewScene(rendering::get_scene(_name));
+  this->sceneCreated = true;
 }
 
 /////////////////////////////////////////////////
