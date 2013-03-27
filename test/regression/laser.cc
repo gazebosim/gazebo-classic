@@ -285,7 +285,7 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
-    boost::shared_dynamic_cast<sensors::RaySensor>(sensor);
+    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
   raySensor->Init();
   raySensor->Update(true);
