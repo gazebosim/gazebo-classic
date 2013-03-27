@@ -62,6 +62,7 @@ namespace gazebo
     class MouseEvent;
     class ViewController;
     class Scene;
+    class GaussianNoiseCompositorListener;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \brief A set of rendering related class, functions, and definitions
@@ -669,11 +670,37 @@ namespace gazebo
       /// \brief Gaussian noise compositor
       private: Ogre::CompositorInstance *gaussianNoiseInstance;
 
+      /// \brief Gaussian noise compositor listener
+      private: boost::shared_ptr<GaussianNoiseCompositorListener>
+        gaussianNoiseCompositorListener;
+
       /// \brief Queue of move positions.
       private: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
 
       /// \brief Render period.
       private: common::Time renderPeriod;
+
+      /// \brief Which noise type we support
+      enum NoiseModelType
+      {
+        NONE,
+        GAUSSIAN
+      };
+
+      /// \brief If true, apply the noise model specified by other 
+      /// noise parameters
+      private: bool noiseActive;
+
+      /// \brief Which type of noise we're applying
+      private: enum NoiseModelType noiseType;
+
+      /// \brief If noiseType==GAUSSIAN, noiseMean is the mean of the 
+      /// distibution from which we sample
+      private: double noiseMean;
+
+      /// \brief If noiseType==GAUSSIAN, noiseStdDev is the standard 
+      /// devation of the distibution from which we sample
+      private: double noiseStdDev;
     };
     /// \}
   }
