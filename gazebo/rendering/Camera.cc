@@ -55,7 +55,7 @@ namespace rendering
 {
 // We'll create an instance of this class for each camera, to be used to inject
 // random values on each render call.
-class GaussianNoiseCompositorListener : 
+class GaussianNoiseCompositorListener :
   public Ogre::CompositorInstance::Listener
 {
   private:
@@ -63,21 +63,21 @@ class GaussianNoiseCompositorListener :
     // shader.
     double mean_, stddev_;
   public:
-    GaussianNoiseCompositorListener(double mean, double stddev): 
+    GaussianNoiseCompositorListener(double mean, double stddev):
       mean_(mean), stddev_(stddev) {}
     void notifyMaterialRender(unsigned int pass_id, Ogre::MaterialPtr & mat)
     {
       // modify material here (wont alter the base material!), called for
       // every drawn geometry instance (i.e. compositor render_quad)
-      
+
       // Sample three values within the range [0,1.0] and set them for use in
-      // the fragment shader, which will interpret them as offsets from (0,0) 
+      // the fragment shader, which will interpret them as offsets from (0,0)
       // to use when computing pseudo-random values.
       Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
                             math::Rand::GetDblUniform(0.0, 1.0),
                             math::Rand::GetDblUniform(0.0, 1.0));
       // These calls are setting parameters that are declared in two places:
-      // 1. media/materials/scripts/gazebo.material, in 
+      // 1. media/materials/scripts/gazebo.material, in
       //    fragment_program Gazebo/GaussianCameraNoiseFS
       // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
       mat->getTechnique(0)->getPass(pass_id)->
@@ -275,6 +275,7 @@ void Camera::Fini()
   if (this->gaussianNoiseCompositorListener)
     this->gaussianNoiseInstance->removeListener(
       this->gaussianNoiseCompositorListener.get());
+
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
   this->renderTarget->removeAllViewports();
   this->connections.clear();
