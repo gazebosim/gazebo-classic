@@ -71,7 +71,7 @@ TEST_F(RaySensor_TEST, CreateLaser)
   mgr->Update();
 
   // Get a pointer to the Ray sensor
-  sensors::RaySensorPtr sensor = boost::shared_dynamic_cast<sensors::RaySensor>
+  sensors::RaySensorPtr sensor = boost::dynamic_pointer_cast<sensors::RaySensor>
     (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.

@@ -49,6 +49,12 @@ void Console::Init(const std::string &_logFilename)
   boost::filesystem::path logPath(getenv("HOME"));
   logPath = logPath / ".gazebo/" / _logFilename;
 
+  if (this->logStream)
+  {
+    this->logStream->close();
+    delete this->logStream;
+  }
+
   this->logStream = new std::ofstream(logPath.string().c_str(), std::ios::out);
 }
 
