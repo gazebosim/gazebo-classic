@@ -45,6 +45,18 @@ namespace gazebo
       /// \brief math::Vector3(0, 0, 0)
       public: static const Vector3 Zero;
 
+      /// \brief math::Vector3(1, 1, 1)
+      public: static const Vector3 One;
+
+      /// \brief math::Vector3(1, 0, 0)
+      public: static const Vector3 UnitX;
+
+      /// \brief math::Vector3(0, 1, 0)
+      public: static const Vector3 UnitY;
+
+      /// \brief math::Vector3(0, 0, 1)
+      public: static const Vector3 UnitZ;
+
       /// \brief Constructor
       public: Vector3();
 

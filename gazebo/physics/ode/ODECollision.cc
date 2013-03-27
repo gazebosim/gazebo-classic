@@ -56,7 +56,7 @@ void ODECollision::Load(sdf::ElementPtr _sdf)
   Collision::Load(_sdf);
 
   this->SetSpaceId(
-      boost::shared_static_cast<ODELink>(this->link)->GetSpaceId());
+      boost::static_pointer_cast<ODELink>(this->link)->GetSpaceId());
 
   if (this->IsStatic())
   {

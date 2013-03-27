@@ -19,6 +19,11 @@
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wshadow"
 
+// The following is needed to enable the GetMemInfo function for OSX
+#ifdef __MACH__
+# include <mach/mach.h>
+#endif  // __MACH__
+
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
@@ -397,7 +402,7 @@ class ServerFixture : public testing::Test
                sensors::SensorPtr sensor = sensors::get_sensor(_cameraName);
                EXPECT_TRUE(sensor);
                sensors::CameraSensorPtr camSensor =
-                 boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+                 boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
                _width = camSensor->GetImageWidth();
                _height = camSensor->GetImageHeight();
@@ -925,6 +930,42 @@ class ServerFixture : public testing::Test
                physics::WorldPtr world = physics::get_world();
                world->RemovePlugin(_name);
              }
+
+  protected: void GetMemInfo(double &_resident, double &_share)
+            {
+              int totalSize, residentPages, sharePages;
+              totalSize = residentPages = sharePages = 0;
+
+#ifdef __linux__
+              std::ifstream buffer("/proc/self/statm");
+              buffer >> totalSize >> residentPages >> sharePages;
+              buffer.close();
+
+              // in case x86-64 is configured to use 2MB pages
+              int64_t pageSizeKb = sysconf(_SC_PAGE_SIZE) / 1024;
+
+              _resident = residentPages * pageSizeKb;
+              _share = sharePages * pageSizeKb;
+#elif __MACH__
+              // /proc is only available on Linux
+              // for OSX, use task_info to get resident and virtual memory
+              struct task_basic_info t_info;
+              mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
+              if (KERN_SUCCESS != task_info(mach_task_self(),
+                                            TASK_BASIC_INFO,
+                                            (task_info_t)&t_info,
+                                            &t_info_count))
+              {
+                gzerr << "failure calling task_info\n";
+                return;
+              }
+              _resident = static_cast<double>(t_info.resident_size/1024);
+              _share = static_cast<double>(t_info.virtual_size/1024);
+#else
+              gzerr << "Unsupported architecture\n";
+              return;
+#endif
+            }
 
   protected: Server *server;
   protected: boost::thread *serverThread;

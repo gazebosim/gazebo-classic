@@ -60,7 +60,7 @@ void ImuSensor_TEST::BasicImuSensorCheck(const std::string &_physicsEngine)
   mgr->Update();
 
   // Get a pointer to the IMU sensor
-  sensors::ImuSensorPtr sensor = boost::shared_dynamic_cast<sensors::ImuSensor>
+  sensors::ImuSensorPtr sensor = boost::dynamic_pointer_cast<sensors::ImuSensor>
     (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.

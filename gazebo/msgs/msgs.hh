@@ -176,31 +176,40 @@ namespace gazebo
     /// \return The new msgs::TrackVisual object
     msgs::TrackVisual TrackVisualFromSDF(sdf::ElementPtr _sdf);
 
-
     /// \brief Create a msgs::GUI from a GUI SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::GUI object
-    msgs::GUI      GUIFromSDF(sdf::ElementPtr _sdf);
+    msgs::GUI GUIFromSDF(sdf::ElementPtr _sdf);
 
     /// \brief Create a msgs::Light from a light SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Light object
-    msgs::Light      LightFromSDF(sdf::ElementPtr _sdf);
+    msgs::Light LightFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::MeshGeom from a mesh SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::MeshGeom object
+    msgs::MeshGeom MeshFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Geometry from a geometry SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Geometry object
+    msgs::Geometry GeometryFromSDF(sdf::ElementPtr _sdf);
 
     /// \brief Create a msgs::Visual from a visual SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Visual object
-    msgs::Visual     VisualFromSDF(sdf::ElementPtr _sdf);
+    msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf);
 
     /// \brief Create a msgs::Fog from a fog SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Fog object
-    msgs::Fog        FogFromSDF(sdf::ElementPtr _sdf);
+    msgs::Fog FogFromSDF(sdf::ElementPtr _sdf);
 
     /// \brief Create a msgs::Scene from a scene SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Scene object
-    msgs::Scene      SceneFromSDF(sdf::ElementPtr _sdf);
+    msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
 
     /// \cond
     const google::protobuf::FieldDescriptor *GetFD(
