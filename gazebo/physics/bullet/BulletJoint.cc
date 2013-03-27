@@ -85,10 +85,10 @@ LinkPtr BulletJoint::GetJointLink(int _index) const
   if (_index == 0 || _index == 1)
   {
     BulletLinkPtr bulletLink1 =
-      boost::shared_static_cast<BulletLink>(this->childLink);
+      boost::static_pointer_cast<BulletLink>(this->childLink);
 
     BulletLinkPtr bulletLink2 =
-      boost::shared_static_cast<BulletLink>(this->parentLink);
+      boost::static_pointer_cast<BulletLink>(this->parentLink);
 
     btRigidBody rigidLink = this->constraint->getRigidBodyA();
 

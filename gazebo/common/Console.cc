@@ -49,7 +49,19 @@ void Console::Init(const std::string &_logFilename)
   boost::filesystem::path logPath(getenv("HOME"));
   logPath = logPath / ".gazebo/" / _logFilename;
 
+  if (this->logStream)
+  {
+    this->logStream->close();
+    delete this->logStream;
+  }
+
   this->logStream = new std::ofstream(logPath.string().c_str(), std::ios::out);
+}
+
+//////////////////////////////////////////////////
+bool Console::IsInitialized() const
+{
+  return this->logStream != NULL;
 }
 
 //////////////////////////////////////////////////
@@ -73,7 +85,7 @@ std::ostream &Console::ColorMsg(const std::string &_lbl, int _color)
 std::ofstream &Console::Log()
 {
   if (!this->logStream)
-    gzthrow("Console has not been initialized\n");
+    this->logStream = new std::ofstream("/dev/null", std::ios::out);
 
   *this->logStream << "[" << common::Time::GetWallTime() << "] ";
   this->logStream->flush();

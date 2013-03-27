@@ -78,12 +78,6 @@ namespace gazebo
                       { return "bullet"; }
 
       // Documentation inherited
-      public: virtual void SetStepTime(double _value);
-
-      // Documentation inherited
-      public: virtual double GetStepTime();
-
-      // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
       // Documentation inherited
@@ -133,6 +127,20 @@ namespace gazebo
 
       public: virtual void DebugPrint() const;
 
+      /// Documentation inherited
+      public: virtual void SetParam(PhysicsParam _param,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual void SetParam(const std::string &_key,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(const std::string &_key) const;
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(PhysicsParam _attr) const;
+
       private: btBroadphaseInterface *broadPhase;
       private: btDefaultCollisionConfiguration *collisionConfig;
       private: btCollisionDispatcher *dispatcher;
@@ -141,7 +149,8 @@ namespace gazebo
 
       private: common::Time lastUpdateTime;
 
-      private: double stepTimeDouble;
+      /// \brief The type of the solver.
+      private: std::string solverType;
     };
 
   /// \}

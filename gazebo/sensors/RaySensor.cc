@@ -35,6 +35,7 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Rand.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/RaySensor.hh"
@@ -103,6 +104,27 @@ void RaySensor::Load(const std::string &_worldName)
 
   this->laserShape->Load(this->sdf);
   this->laserShape->Init();
+
+  // Handle noise model settings.
+  this->noiseActive = false;
+  sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
+  if (rayElem->HasElement("noise"))
+  {
+    sdf::ElementPtr noiseElem = rayElem->GetElement("noise");
+    std::string type = noiseElem->GetValueString("type");
+    if (type == "gaussian")
+    {
+      this->noiseType = GAUSSIAN;
+      this->noiseMean = noiseElem->GetValueDouble("mean");
+      this->noiseStdDev = noiseElem->GetValueDouble("stddev");
+      this->noiseActive = true;
+      gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
+        " and stddev " << this->noiseStdDev << std::endl;
+    }
+    else
+      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
+        std::endl;
+  }
 
   this->parentEntity = this->world->GetEntity(this->parentName);
 
@@ -277,8 +299,22 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   for (unsigned int j = 0; j < (unsigned int)this->GetVerticalRayCount(); j++)
   for (unsigned int i = 0; i < (unsigned int)this->GetRayCount(); i++)
   {
-    scan->add_ranges(
-        this->laserShape->GetRange(j * this->GetRayCount() + i));
+    double range = this->laserShape->GetRange(j * this->GetRayCount() + i);
+    if (this->noiseActive)
+    {
+      switch (this->noiseType)
+      {
+        case GAUSSIAN:
+          // Add independent (uncorrelated) Gaussian noise to each beam.
+          range += math::Rand::GetDblNormal(this->noiseMean, this->noiseStdDev);
+          // No real laser would return a range outside its stated limits.
+          range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
+          break;
+        default:
+          GZ_ASSERT(false, "Invalid noise model type");
+      }
+    }
+    scan->add_ranges(range);
     scan->add_intensities(
         this->laserShape->GetRetro(j * this->GetRayCount() + i));
   }
