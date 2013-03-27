@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "Inertial.hh"
 
 using namespace gazebo;
@@ -80,7 +80,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   math::Vector3 center(0, 0, 0);
   if (this->sdf->HasElement("pose"))
   {
-    center = this->sdf->GetValuePose("pose").pos;
+    center = this->sdf->Get<math::Pose>("pose").pos;
   }
   this->SetCoG(center.x, center.y, center.z);
 
@@ -90,12 +90,12 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");
     this->SetInertiaMatrix(
-        inertiaElem->GetValueDouble("ixx"),
-        inertiaElem->GetValueDouble("iyy"),
-        inertiaElem->GetValueDouble("izz"),
-        inertiaElem->GetValueDouble("ixy"),
-        inertiaElem->GetValueDouble("ixz"),
-        inertiaElem->GetValueDouble("iyz"));
+        inertiaElem->Get<double>("ixx"),
+        inertiaElem->Get<double>("iyy"),
+        inertiaElem->Get<double>("izz"),
+        inertiaElem->Get<double>("ixy"),
+        inertiaElem->Get<double>("ixz"),
+        inertiaElem->Get<double>("iyz"));
 
     inertiaElem->GetElement("ixx")->GetValue()->SetUpdateFunc(
         boost::bind(&Inertial::GetIXX, this));
@@ -111,7 +111,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
         boost::bind(&Inertial::GetIYZ, this));
   }
 
-  this->SetMass(this->sdf->GetValueDouble("mass"));
+  this->SetMass(this->sdf->Get<double>("mass"));
   this->sdf->GetElement("mass")->GetValue()->SetUpdateFunc(
       boost::bind(&Inertial::GetMass, this));
 }
@@ -121,16 +121,16 @@ void Inertial::Reset()
 {
   sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");
 
-  this->mass = this->sdf->GetValueDouble("mass");
+  this->mass = this->sdf->Get<double>("mass");
   this->cog.Set(0, 0, 0);
   this->SetInertiaMatrix(
-        inertiaElem->GetValueDouble("ixx"),
-        inertiaElem->GetValueDouble("iyy"),
-        inertiaElem->GetValueDouble("izz"),
+        inertiaElem->Get<double>("ixx"),
+        inertiaElem->Get<double>("iyy"),
+        inertiaElem->Get<double>("izz"),
 
-        inertiaElem->GetValueDouble("ixy"),
-        inertiaElem->GetValueDouble("ixz"),
-        inertiaElem->GetValueDouble("iyz"));
+        inertiaElem->Get<double>("ixy"),
+        inertiaElem->Get<double>("ixz"),
+        inertiaElem->Get<double>("iyz"));
 }
 
 //////////////////////////////////////////////////

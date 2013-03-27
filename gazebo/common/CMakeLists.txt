@@ -99,24 +99,33 @@ gz_build_tests(${gtest_sources})
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(common_headers
-    "Common Headers" "#include \"common/${hdr}\"\n")
+    "Common Headers" "#include \"gazebo/common/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_DIR}/common.hh )
 
 gz_add_library(gazebo_common ${sources})
 
-target_link_libraries(gazebo_common gazebo_math
-                                    ${libdl_library}
-                                    ${Boost_LIBRARIES}
-                                    ${freeimage_library}
-                                    ${tinyxml_libraries}
-                                    ${libavcodec_LIBRARIES}
-                                    ${libavformat_LIBRARIES}
-                                    ${CURL_LIBRARIES}
-                                    ${libswscale_LIBRARIES}
-                                    ${libtar_libraries}
-                                    rt
-                                    )
+target_link_libraries(gazebo_common
+  gazebo_math
+  ${libdl_library}
+  ${libtool_library}
+  ${Boost_LIBRARIES}
+  ${freeimage_library}
+  ${tinyxml_libraries}
+  ${libavcodec_LIBRARIES}
+  ${libavformat_LIBRARIES}
+  ${CURL_LIBRARIES}
+  ${libswscale_LIBRARIES}
+  ${libtar_libraries}
+  ${TBB_LIBRARIES}
+  rt
+  pthread
+)
+
+# Remove this conditional in Gazebo 1.8. Only leave ${SDF_LIBRARIES} in tact.
+if (HAVE_SDF)
+  target_link_libraries(gazebo_common ${SDF_LIBRARIES})
+endif()
 
 if (HAVE_GTS)
   target_link_libraries(gazebo_common ${gts_LIBRARIES})

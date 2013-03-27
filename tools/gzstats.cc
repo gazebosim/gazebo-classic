@@ -19,14 +19,14 @@
 #include <google/protobuf/message.h>
 #include <boost/thread.hpp>
 
-#include "transport/Transport.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/Node.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "common/Animation.hh"
-#include "common/KeyFrame.hh"
+#include "gazebo/common/Animation.hh"
+#include "gazebo/common/KeyFrame.hh"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 namespace po = boost::program_options;
 using namespace gazebo;

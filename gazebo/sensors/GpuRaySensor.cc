@@ -19,19 +19,19 @@
  * Date: 29 March 2012
 */
 
-#include "physics/World.hh"
+#include "gazebo/physics/World.hh"
 
-#include "common/Exception.hh"
-#include "common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Events.hh"
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "rendering/Scene.hh"
-#include "rendering/Rendering.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Rendering.hh"
 
-#include "sensors/SensorFactory.hh"
-#include "sensors/GpuRaySensor.hh"
-#include "rendering/GpuLaser.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/GpuRaySensor.hh"
+#include "gazebo/rendering/GpuLaser.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -201,7 +201,7 @@ void GpuRaySensor::Init()
       this->scene = rendering::create_scene(worldName, false);
 
     this->laserCam = this->scene->CreateGpuLaser(
-        this->sdf->GetValueString("name"), false);
+        this->sdf->Get<std::string>("name"), false);
 
     if (!this->laserCam)
     {
@@ -301,7 +301,7 @@ double GpuRaySensor::GetRangeCountRatio() const
 //////////////////////////////////////////////////
 math::Angle GpuRaySensor::GetAngleMin() const
 {
-  return this->horzElem->GetValueDouble("min_angle");
+  return this->horzElem->Get<double>("min_angle");
 }
 
 //////////////////////////////////////////////////
@@ -313,7 +313,7 @@ void GpuRaySensor::SetAngleMin(double _angle)
 //////////////////////////////////////////////////
 math::Angle GpuRaySensor::GetAngleMax() const
 {
-  return this->horzElem->GetValueDouble("max_angle");
+  return this->horzElem->Get<double>("max_angle");
 }
 
 //////////////////////////////////////////////////
@@ -325,13 +325,13 @@ void GpuRaySensor::SetAngleMax(double _angle)
 //////////////////////////////////////////////////
 double GpuRaySensor::GetRangeMin() const
 {
-  return this->rangeElem->GetValueDouble("min");
+  return this->rangeElem->Get<double>("min");
 }
 
 //////////////////////////////////////////////////
 double GpuRaySensor::GetRangeMax() const
 {
-  return this->rangeElem->GetValueDouble("max");
+  return this->rangeElem->Get<double>("max");
 }
 
 /////////////////////////////////////////////////
@@ -344,27 +344,27 @@ double GpuRaySensor::GetAngleResolution() const
 //////////////////////////////////////////////////
 double GpuRaySensor::GetRangeResolution() const
 {
-  return this->rangeElem->GetValueDouble("resolution");
+  return this->rangeElem->Get<double>("resolution");
 }
 
 //////////////////////////////////////////////////
 int GpuRaySensor::GetRayCount() const
 {
-  return this->horzElem->GetValueUInt("samples");
+  return this->horzElem->Get<unsigned int>("samples");
 }
 
 //////////////////////////////////////////////////
 int GpuRaySensor::GetRangeCount() const
 {
   return this->GetRayCount() *
-        this->horzElem->GetValueDouble("resolution");
+        this->horzElem->Get<double>("resolution");
 }
 
 //////////////////////////////////////////////////
 int GpuRaySensor::GetVerticalRayCount() const
 {
   if (this->scanElem->HasElement("vertical"))
-    return this->vertElem->GetValueUInt("samples");
+    return this->vertElem->Get<unsigned int>("samples");
   else
     return 1;
 }
@@ -375,7 +375,7 @@ int GpuRaySensor::GetVerticalRangeCount() const
   if (this->scanElem->HasElement("vertical"))
   {
     int rows =  (this->GetVerticalRayCount() *
-          this->vertElem->GetValueDouble("resolution"));
+          this->vertElem->Get<double>("resolution"));
     if (rows > 1)
       return rows;
     else
@@ -389,7 +389,7 @@ int GpuRaySensor::GetVerticalRangeCount() const
 math::Angle GpuRaySensor::GetVerticalAngleMin() const
 {
   if (this->scanElem->HasElement("vertical"))
-    return this->vertElem->GetValueDouble("min_angle");
+    return this->vertElem->Get<double>("min_angle");
   else
     return math::Angle(0);
 }
@@ -405,7 +405,7 @@ void GpuRaySensor::SetVerticalAngleMin(double _angle)
 math::Angle GpuRaySensor::GetVerticalAngleMax() const
 {
   if (this->scanElem->HasElement("vertical"))
-    return this->vertElem->GetValueDouble("max_angle");
+    return this->vertElem->Get<double>("max_angle");
   else
     return math::Angle(0);
 }

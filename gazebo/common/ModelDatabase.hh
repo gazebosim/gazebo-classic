@@ -22,7 +22,9 @@
 #include <list>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
+
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 /// \brief The file name of model XML configuration.
 #define GZ_MODEL_MANIFEST_FILENAME "model.config"

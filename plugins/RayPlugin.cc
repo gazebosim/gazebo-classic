@@ -19,7 +19,7 @@
  * Author: Nate Koenig mod by John Hsu
  */
 
-#include "physics/physics.hh"
+#include "gazebo/physics/physics.hh"
 #include "RayPlugin.hh"
 
 using namespace gazebo;

@@ -22,7 +22,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"

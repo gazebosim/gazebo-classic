@@ -26,6 +26,12 @@
 #include <iostream>
 #include <fstream>
 
+// Remove the gazebo_confif and ifdefs in Gazebo 1.8
+#include "gazebo/gazebo_config.h"
+#ifdef HAVE_SDF
+#include "sdf/sdf.hh"
+#endif
+
 namespace gazebo
 {
   namespace math
@@ -48,6 +54,15 @@ namespace gazebo
       /// \brief Copy constructor
       /// \param[in] _v the value
       public: Vector2d(const Vector2d &_v);
+
+#ifdef HAVE_SDF
+      /// Deprecated
+      public: Vector2d(const sdf::Vector2d &_v) __attribute__((deprecated));
+
+      /// Deprecated
+      public: Vector2d &operator =(const sdf::Vector2d &_v)
+              __attribute__((deprecated));
+#endif
 
       /// \brief Destructor
       public: virtual ~Vector2d();

@@ -137,7 +137,7 @@ namespace gazebo
               static ConnectionPtr ConnectWorldUpdateStart(T _subscriber)
               {
                 // Putting in this comment so the deprecation message
-                // will be found easier: GAZEBO_DEPRECATED.
+                // will be found easier: GAZEBO_DEPRECATED(1.5).
                 gzerr << "Events::ConnectWorldUpdateStart is deprecated "
                       << "in v 1.5.0. Please use "
                       << "Events::ConnectWorldUpdateBegin\n";

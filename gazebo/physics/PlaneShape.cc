@@ -15,8 +15,8 @@
  *
 */
 
-#include "physics/Collision.hh"
-#include "physics/PlaneShape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/PlaneShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -61,7 +61,7 @@ void PlaneShape::SetNormal(const math::Vector3 &_norm)
 //////////////////////////////////////////////////
 math::Vector3 PlaneShape::GetNormal() const
 {
-  return this->sdf->GetValueVector3("normal");
+  return this->sdf->Get<math::Vector3>("normal");
 }
 
 //////////////////////////////////////////////////
@@ -73,7 +73,7 @@ void PlaneShape::SetSize(const math::Vector2d &_size)
 //////////////////////////////////////////////////
 math::Vector2d PlaneShape::GetSize() const
 {
-  return this->sdf->GetValueVector2d("size");
+  return this->sdf->Get<math::Vector2d>("size");
 }
 
 //////////////////////////////////////////////////

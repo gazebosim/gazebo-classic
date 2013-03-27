@@ -18,6 +18,7 @@
  * Author: Nate Koenig
  */
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"
@@ -65,10 +66,10 @@ WorldState::~WorldState()
 void WorldState::Load(const sdf::ElementPtr _elem)
 {
   // Copy the name and time information
-  this->name = _elem->GetValueString("world_name");
-  this->simTime = _elem->GetValueTime("sim_time");
-  this->wallTime = _elem->GetValueTime("wall_time");
-  this->realTime = _elem->GetValueTime("real_time");
+  this->name = _elem->Get<std::string>("world_name");
+  this->simTime = _elem->Get<common::Time>("sim_time");
+  this->wallTime = _elem->Get<common::Time>("wall_time");
+  this->realTime = _elem->Get<common::Time>("real_time");
 
   // Add the model states
   this->modelStates.clear();

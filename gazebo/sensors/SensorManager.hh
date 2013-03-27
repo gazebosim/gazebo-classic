@@ -27,12 +27,12 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <sdf/sdf.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/sensors/SensorTypes.hh"
-#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {

@@ -16,10 +16,9 @@
 */
 #ifndef _MATRIX3_HH_
 #define _MATRIX3_HH_
-
 #include <assert.h>
 
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {

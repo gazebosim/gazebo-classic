@@ -22,9 +22,9 @@
 #include <list>
 #include <map>
 
-#include "transport/TransportTypes.hh"
-#include "transport/SubscribeOptions.hh"
-#include "transport/TopicManager.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/SubscribeOptions.hh"
+#include "gazebo/transport/TopicManager.hh"
 
 namespace gazebo
 {

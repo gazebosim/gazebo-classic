@@ -17,8 +17,8 @@
 
 #include <string>
 
-#include "physics/physics.hh"
-#include "transport/transport.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 #include "plugins/SkidSteerDrivePlugin.hh"
 
 using namespace gazebo;
@@ -78,7 +78,7 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
 
   if (_sdf->HasElement("MaxForce"))
   {
-    this->MaxForce = _sdf->GetElement("MaxForce")->GetValueDouble();
+    this->MaxForce = _sdf->GetElement("MaxForce")->Get<double>();
   }
   else
   {

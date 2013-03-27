@@ -25,11 +25,11 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "common/Console.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "transport/IOManager.hh"
-#include "transport/Connection.hh"
+#include "gazebo/transport/IOManager.hh"
+#include "gazebo/transport/Connection.hh"
 
 using namespace gazebo;
 using namespace transport;

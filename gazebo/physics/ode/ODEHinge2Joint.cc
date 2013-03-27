@@ -20,10 +20,10 @@
  */
 
 #include "gazebo_config.h"
-#include "common/Console.hh"
+#include "gazebo/common/Console.hh"
 
-#include "physics/Link.hh"
-#include "physics/ode/ODEHinge2Joint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODEHinge2Joint.hh"
 
 using namespace gazebo;
 using namespace physics;

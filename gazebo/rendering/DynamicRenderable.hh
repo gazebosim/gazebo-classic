@@ -17,8 +17,8 @@
 #ifndef _DYNAMICRENDERABLE_HH_
 #define _DYNAMICRENDERABLE_HH_
 
-#include "rendering/ogre_gazebo.h"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

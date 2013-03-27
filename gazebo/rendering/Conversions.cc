@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "rendering/Conversions.hh"
+#include "gazebo/rendering/Conversions.hh"
 
 using namespace gazebo;
 using namespace rendering;

@@ -18,14 +18,14 @@
 #include <iostream>
 #include <sstream>
 
-#include "transport/Node.hh"
-#include "gui/GuiEvents.hh"
-#include "common/MouseEvent.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Light.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Light.hh"
+#include "gazebo/rendering/Scene.hh"
 
-#include "gui/LightMaker.hh"
+#include "gazebo/gui/LightMaker.hh"
 
 using namespace gazebo;
 using namespace gui;

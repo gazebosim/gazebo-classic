@@ -20,7 +20,7 @@
  */
 
 #include <float.h>
-#include "physics/SurfaceParams.hh"
+#include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -40,25 +40,25 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
 {
   {
     sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
-    this->bounce = bounceElem->GetValueDouble("restitution_coefficient");
-    this->bounceThreshold = bounceElem->GetValueDouble("threshold");
+    this->bounce = bounceElem->Get<double>("restitution_coefficient");
+    this->bounceThreshold = bounceElem->Get<double>("threshold");
   }
 
   {
     sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
     {
       sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
-      this->mu1 = frictionOdeElem->GetValueDouble("mu");
-      this->mu2 = frictionOdeElem->GetValueDouble("mu2");
+      this->mu1 = frictionOdeElem->Get<double>("mu");
+      this->mu2 = frictionOdeElem->Get<double>("mu2");
 
       if (this->mu1 < 0)
         this->mu1 = FLT_MAX;
       if (this->mu2 < 0)
         this->mu2 = FLT_MAX;
 
-      this->slip1 = frictionOdeElem->GetValueDouble("slip1");
-      this->slip2 = frictionOdeElem->GetValueDouble("slip2");
-      this->fdir1 = frictionOdeElem->GetValueVector3("fdir1");
+      this->slip1 = frictionOdeElem->Get<double>("slip1");
+      this->slip2 = frictionOdeElem->Get<double>("slip2");
+      this->fdir1 = frictionOdeElem->Get<math::Vector3>("fdir1");
     }
   }
 
@@ -66,12 +66,12 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr contactElem = _sdf->GetElement("contact");
     {
       sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
-      this->kp = contactOdeElem->GetValueDouble("kp");
-      this->kd = contactOdeElem->GetValueDouble("kd");
-      this->cfm = contactOdeElem->GetValueDouble("soft_cfm");
-      this->erp = contactOdeElem->GetValueDouble("soft_erp");
-      this->maxVel = contactOdeElem->GetValueDouble("max_vel");
-      this->minDepth = contactOdeElem->GetValueDouble("min_depth");
+      this->kp = contactOdeElem->Get<double>("kp");
+      this->kd = contactOdeElem->Get<double>("kd");
+      this->cfm = contactOdeElem->Get<double>("soft_cfm");
+      this->erp = contactOdeElem->Get<double>("soft_erp");
+      this->maxVel = contactOdeElem->Get<double>("max_vel");
+      this->minDepth = contactOdeElem->Get<double>("min_depth");
     }
   }
 }

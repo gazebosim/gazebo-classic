@@ -190,7 +190,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
                                         const std::string &_worldName,
                                         const std::string &_parentName)
 {
-  std::string type = _elem->GetValueString("type");
+  std::string type = _elem->Get<std::string>("type");
   SensorPtr sensor = sensors::SensorFactory::NewSensor(type);
 
   if (!sensor)

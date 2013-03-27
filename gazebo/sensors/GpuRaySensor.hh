@@ -26,11 +26,11 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "transport/TransportTypes.hh"
-#include "sensors/Sensor.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

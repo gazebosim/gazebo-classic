@@ -15,14 +15,14 @@
  *
 */
 #include <string.h>
-#include "math/Helpers.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/Node.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "rendering/RenderEngine.hh"
-#include "rendering/Camera.hh"
-#include "sensors/Sensors.hh"
-#include "sensors/CameraSensor.hh"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 #include "ServerFixture.hh"
 #include "images_cmp.h"
 

@@ -23,23 +23,22 @@
 #include <dirent.h>
 #include <sstream>
 
-#include "sdf/sdf.hh"
-#include "rendering/ogre_gazebo.h"
-#include "rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RTShaderSystem.hh"
 
-#include "common/Events.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "common/Mesh.hh"
-#include "common/MeshManager.hh"
-#include "common/Timer.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/Timer.hh"
 #include "sensors/GpuRaySensor.hh"
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
-#include "rendering/Visual.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
-#include "rendering/GpuLaser.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/GpuLaser.hh"
 
 using namespace gazebo;
 using namespace rendering;

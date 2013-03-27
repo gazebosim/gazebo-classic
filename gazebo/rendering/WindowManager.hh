@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "common/SingletonT.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/common/SingletonT.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace Ogre
 {

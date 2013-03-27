@@ -19,9 +19,9 @@
  * Date: 12 Nov 2009
  */
 
-#include "common/Exception.hh"
-#include "physics/ode/ODECollision.hh"
-#include "physics/ode/ODEHeightmapShape.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEHeightmapShape.hh"
 
 using namespace gazebo;
 using namespace physics;

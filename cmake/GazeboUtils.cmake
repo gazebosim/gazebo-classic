@@ -149,23 +149,23 @@ macro (gz_build_tests)
   # Build all the tests
   foreach(GTEST_SOURCE_file ${ARGN})
     string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
-    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
+    add_executable(${BINARY_NAME}
+      ${GTEST_SOURCE_file} ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
     add_dependencies(${BINARY_NAME}
       gtest gtest_main
-      gazebo_sdf_interface
       gazebo_common
       gazebo_math
       gazebo_physics
       gazebo_sensors
       gazebo_rendering
       gazebo_msgs
-      gazebo_transport)
+      gazebo_transport
+      )
   
     target_link_libraries(${BINARY_NAME}
       libgtest.a
       libgtest_main.a
-      gazebo_sdf_interface
       gazebo_common
       gazebo_math
       gazebo_physics
@@ -176,6 +176,12 @@ macro (gz_build_tests)
       libgazebo
       pthread
       )
+
+    # Remove in Gazebo 1.8
+    if (NOT HAVE_SDF)
+      target_link_libraries(${BINARY_NAME} gazebo_sdf_interface)
+      add_dependencies(${BINARY_NAME} gazebo_sdf_interface)
+    endif()
   
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
       --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
@@ -220,18 +226,17 @@ if (VALID_DISPLAY)
 
     add_dependencies(${BINARY_NAME}
       gazebo_gui
-      gazebo_sdf_interface
       gazebo_common
       gazebo_math
       gazebo_physics
       gazebo_sensors
       gazebo_rendering
       gazebo_msgs
-      gazebo_transport)
+      gazebo_transport
+      )
 
     target_link_libraries(${BINARY_NAME}
       gazebo_gui
-      gazebo_sdf_interface
       gazebo_common
       gazebo_math
       gazebo_physics
@@ -244,6 +249,12 @@ if (VALID_DISPLAY)
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
       )
+
+    # Remove in Gazebo 1.8
+    if (NOT HAVE_SDF)
+      target_link_libraries(${BINARY_NAME} gazebo_sdf_interface)
+      add_dependencies(${BINARY_NAME} gazebo_sdf_interface)
+    endif()
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} -xml)
 

@@ -66,7 +66,7 @@ void BulletLink::Init()
   Link::Init();
 
   GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
-  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
+  this->SetKinematic(this->sdf->Get<bool>("kinematic"));
 
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
   btScalar mass = this->inertial->GetMass();
@@ -159,7 +159,7 @@ void BulletLink::Init()
   bulletWorld->addRigidBody(this->rigidLink, categortyBits, collideBits);
   // this->rigidLink->setSleepingThresholds(0,0);
 
-  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
+  this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
   this->SetLinearDamping(this->GetLinearDamping());
   this->SetAngularDamping(this->GetAngularDamping());

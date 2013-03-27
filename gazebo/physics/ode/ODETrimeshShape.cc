@@ -19,13 +19,13 @@
  * Date: 16 Oct 2009
  */
 
-#include "common/Mesh.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
-#include "physics/ode/ODECollision.hh"
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODETrimeshShape.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODETrimeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -127,11 +127,11 @@ void ODETrimeshShape::Init()
   for (unsigned int j = 0;  j < numVertices; j++)
   {
     this->vertices[j*3+0] = this->vertices[j*3+0] *
-      this->sdf->GetValueVector3("scale").x;
+      this->sdf->Get<math::Vector3>("scale").x;
     this->vertices[j*3+1] = this->vertices[j*3+1] *
-      this->sdf->GetValueVector3("scale").y;
+      this->sdf->Get<math::Vector3>("scale").y;
     this->vertices[j*3+2] = this->vertices[j*3+2] *
-      this->sdf->GetValueVector3("scale").z;
+      this->sdf->Get<math::Vector3>("scale").z;
   }
 
   // Build the ODE triangle mesh

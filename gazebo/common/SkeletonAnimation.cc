@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#include <common/SkeletonAnimation.hh>
-#include <common/Console.hh>
+
+#include "gazebo/common/SkeletonAnimation.hh"
+#include "gazebo/common/Console.hh"
 
 using namespace gazebo;
 using namespace common;

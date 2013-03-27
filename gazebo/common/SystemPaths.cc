@@ -29,7 +29,8 @@
 #include <fstream>
 #include <sstream>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Exception.hh"
@@ -54,6 +55,7 @@ SystemPaths::SystemPaths()
   else
     home = homePath;
 
+  sdf::addURIPath("model://", home + "/.gazebo/models");
   this->modelPaths.push_back(home + "/.gazebo/models");
 
   char *path = getenv("GAZEBO_LOG_PATH");
@@ -154,6 +156,7 @@ void SystemPaths::UpdateModelPaths()
   size_t pos2 = path.find(delim);
   while (pos2 != std::string::npos)
   {
+    sdf::addURIPath("model://", path.substr(pos1, pos2-pos1));
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->modelPaths);
     pos1 = pos2+1;
     pos2 = path.find(delim, pos2+1);

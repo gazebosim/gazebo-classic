@@ -17,11 +17,11 @@
 #ifndef _MATRIX4_HH_
 #define _MATRIX4_HH_
 
-#include <assert.h>
 #include <iostream>
+#include <assert.h>
 
-#include "math/Vector3.hh"
-#include "math/Matrix3.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Matrix3.hh"
 
 namespace gazebo
 {

@@ -140,7 +140,7 @@ std::string Base::GetName() const
   GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
 
   if (this->sdf->HasAttribute("name"))
-    return this->sdf->GetValueString("name");
+    return this->sdf->Get<std::string>("name");
   else
     return std::string();
 }

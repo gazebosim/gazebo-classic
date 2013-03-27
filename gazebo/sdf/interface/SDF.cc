@@ -25,6 +25,14 @@
 
 using namespace sdf;
 
+void sdf::addURIPath(const std::string &/*_uri*/, const std::string &/*_path*/)
+{
+}
+
+void setFindCallback(boost::function<std::string (const std::string &)> /*_cb*/)
+{
+}
+
 std::string SDF::version = SDF_VERSION;
 
 /////////////////////////////////////////////////

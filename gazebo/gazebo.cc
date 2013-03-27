@@ -16,6 +16,7 @@
  */
 #include <vector>
 #include <boost/thread/mutex.hpp>
+#include <sdf/sdf.hh>
 
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/common.hh"
@@ -76,6 +77,8 @@ bool gazebo::load(int _argc, char **_argv)
 /////////////////////////////////////////////////
 bool gazebo::init()
 {
+  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
+
   for (std::vector<SystemPluginPtr>::iterator iter = g_plugins.begin();
        iter != g_plugins.end(); ++iter)
   {
