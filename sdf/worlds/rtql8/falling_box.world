@@ -23,7 +23,7 @@
       <!--static>true</static-->
       <pose>0 0 0 0 0 0</pose>
       <link name="cube">
-	<pose>0 0 20 1 2 0</pose>
+      <pose>0 0 20 1 2 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -46,7 +46,7 @@
             <script>Gazebo/WoodPallet</script>
           </material>
         </visual>
-	<collision name="coll_cube">
+        <collision name="coll_cube">
           <pose>0 0 0 0 0 0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
