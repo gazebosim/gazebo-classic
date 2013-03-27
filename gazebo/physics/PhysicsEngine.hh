@@ -114,12 +114,12 @@ namespace gazebo
       /// \brief Set the simulation update rate.
       /// This funciton is deprecated, use PhysicsEngine::SetRealTimeUpdateRate.
       /// \param[in] _value Value of the update rate.
-      public: void SetUpdateRate(double _value) GAZEBO_DEPRECATED;
+      public: void SetUpdateRate(double _value) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Get the simulation update rate.
       /// This funciton is deprecated, use PhysicsEngine::GetRealTimeUpdateRate.
       /// \return Update rate.
-      public: double GetUpdateRate() GAZEBO_DEPRECATED;
+      public: double GetUpdateRate() GAZEBO_DEPRECATED(1.5);
 
       /// \brief Get the simulation update period.
       /// \return Simulation update period.
@@ -128,12 +128,12 @@ namespace gazebo
       /// \brief Set the simulation step time.
       /// This funciton is deprecated, use World::SetMaxStepSize.
       /// \param[in] _value Value of the step time.
-      public: virtual void SetStepTime(double _value) GAZEBO_DEPRECATED;
+      public: virtual void SetStepTime(double _value) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Get the simulation step time.
       /// This funciton is deprecated, use World::GetMaxStepSize.
       /// \return Simulation step time.
-      public: virtual double GetStepTime() GAZEBO_DEPRECATED;
+      public: virtual double GetStepTime() GAZEBO_DEPRECATED(1.5);
 
       /// \brief Get target real time factor
       /// \return Target real time factor

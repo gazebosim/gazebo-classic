@@ -91,7 +91,7 @@ namespace gazebo
       /// \sa ModelDatabase::GetModelConfig
       /// \sa ModelDatabase::GetDBConfig
       public: std::string GetManifest(const std::string &_uri)
-              GAZEBO_DEPRECATED;
+              GAZEBO_DEPRECATED(1.5);
 
       /// \brief Get the local path to a model.
       ///
