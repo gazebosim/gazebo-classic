@@ -72,13 +72,11 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     this->pub = this->node->Advertise<msgs::IMU>(topicName);
   }
 
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
-  this->responseSub = this->node->Subscribe("~/response",
-      &ImuSensor::OnResponse, this);
+  this->parentEntity->SetPublishData(true);
 
-
-  this->requestMsg = msgs::CreateRequest("link_publish");
-  this->requestPub->Publish(*this->requestMsg);
+  std::string topic = "~/" + this->parentEntity->GetScopedName();
+  this->linkDataSub = this->node->Subscribe(topic,
+    &ImuSensor::OnLinkData, this);
 }
 
 //////////////////////////////////////////////////
@@ -91,7 +89,7 @@ void ImuSensor::Load(const std::string &_worldName)
 
   if (!this->parentEntity)
   {
-    gzthrow("IMU has invalid paret[" + this->parentName +
+    gzthrow("IMU has invalid parent[" + this->parentName +
             "]. Must be a link\n");
   }
   this->referencePose = this->pose + this->parentEntity->GetWorldPose();
@@ -108,41 +106,19 @@ void ImuSensor::Init()
 //////////////////////////////////////////////////
 void ImuSensor::Fini()
 {
-}
-
-/////////////////////////////////////////////////
-void ImuSensor::OnResponse(ConstResponsePtr &_msg)
-{
-  if (!this->requestMsg || _msg->id() != this->requestMsg->id())
-    return;
-
-  // TODO change below to get topic from serialized data
-//  sceneMsg.ParseFromString(_msg->serialized_data());
-
-  std::string topic = "~/" + this->parentEntity->GetScopedName();
-  this->responseSub = this->node->Subscribe(topic,
-    &ImuSensor::OnLinkData, this);
-
-
-  delete this->requestMsg;
-  this->requestMsg = NULL;
+  this->parentEntity->SetPublishData(false);
 }
 
 //////////////////////////////////////////////////
 void ImuSensor::OnLinkData(ConstLinkDataPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->mutex);
+  // Store the contacts message for processing in UpdateImpl
+  this->incomingLinkData.push_back(_msg);
 
-  // Only store information if the sensor is active
-  if (this->IsActive())
-  {
-    // Store the contacts message for processing in UpdateImpl
-    this->incomingLinkData.push_back(_msg);
-
-    // Prevent the incomingContacts list to grow indefinitely.
-    if (this->incomingLinkData.size() > 100)
-      this->incomingLinkData.pop_front();
-  }
+  // For now, always keep only the latest data
+  if (this->incomingLinkData.size() > 2)
+    this->incomingLinkData.pop_front();
 }
 
 //////////////////////////////////////////////////
@@ -172,66 +148,75 @@ void ImuSensor::SetReferencePose()
 //////////////////////////////////////////////////
 void ImuSensor::UpdateImpl(bool /*_force*/)
 {
-//  common::Time timestamp = this->world->GetSimTime() ;
-//  double dt = (this->world->GetSimTime() - this->lastMeasurementTime).Double();
-//  double dt = (timestamp - this->lastMeasurementTime).Double();
-//  this->lastMeasurementTime = timestamp;
-//  this->lastMeasurementTime = this->world->GetSimTime();
-
   boost::mutex::scoped_lock lock(this->mutex);
 
-  common::Time timestamp;
-  // get linear velocity in world frame
-  math::Vector3 imuWorldLinearVel =
-    this->parentEntity->GetWorldLinearVel(timestamp, this->pose.pos);
+  // Don't do anything if there is no new data to process.
+  if (this->incomingLinkData.empty())
+    return;
 
-  double dt = (timestamp - this->lastMeasurementTime).Double();
-
-//  gzerr << " dt " << dt << std::endl;
-//  gzerr << velTimestamp << " vs " << this->lastMeasurementTime << std::endl;
-
-  this->imuMsg.set_entity_name(this->parentName);
-
-  // Set the time stamp
-//  msgs::Set(this->imuMsg.mutable_stamp(), this->world->GetSimTime());
-  msgs::Set(this->imuMsg.mutable_stamp(), timestamp);
-
-  math::Pose parentEntityPose = this->parentEntity->GetWorldPose();
-  math::Pose imuPose = this->pose + parentEntityPose;
-
-  // Set the IMU orientation
-  msgs::Set(this->imuMsg.mutable_orientation(),
-            imuPose.rot * this->referencePose.rot.GetInverse());
-
-  // Set the IMU angular velocity
-  msgs::Set(this->imuMsg.mutable_angular_velocity(),
-            imuPose.rot.GetInverse().RotateVector(
-            this->parentEntity->GetWorldAngularVel()));
-
-  // get linear velocity in world frame
-  //math::Vector3 imuWorldLinearVel =
-//    this->parentEntity->GetWorldLinearVel(this->pose.pos);
-
-  // Compute and set the IMU linear acceleration
-  if (dt > 0.0)
+  // Iterate over all the link data messages
+  for (LinkDataMsgs_L::iterator iter = this->incomingLinkData.begin();
+      iter != this->incomingLinkData.end(); ++iter)
   {
-    this->linearAcc = imuPose.rot.GetInverse().RotateVector(
-      (imuWorldLinearVel - this->lastLinearVel) / dt);
+    common::Time timestamp = msgs::Convert((*iter)->time());
 
-    gzerr << "dt " << this->linearAcc << ", " <<  dt << ", "<<
-        imuWorldLinearVel << ", " << this->lastLinearVel << std::endl;
+    double dt = (timestamp - this->lastMeasurementTime).Double();
 
-    this->lastLinearVel = imuWorldLinearVel;
     this->lastMeasurementTime = timestamp;
-//    gzerr << "ve " << imuWorldLinearVel << std::endl;
+
+    if (dt > 0.0)
+    {
+      this->imuMsg.set_entity_name(this->parentName);
+
+      msgs::Set(this->imuMsg.mutable_stamp(), timestamp);
+
+      math::Pose parentEntityPose = this->parentEntity->GetWorldPose();
+      math::Pose imuPose = this->pose + parentEntityPose;
+
+      // Compute and set the IMU linear acceleration
+      math::Vector3 imuWorldLinearVel
+          = msgs::Convert((*iter)->linear_velocity());
+      math::Vector3 imuWorldAngularVel
+          = msgs::Convert((*iter)->angular_velocity());
+
+      // Set the IMU orientation
+      msgs::Set(this->imuMsg.mutable_orientation(),
+                imuPose.rot * this->referencePose.rot.GetInverse());
+
+      // Set the IMU angular velocity
+      msgs::Set(this->imuMsg.mutable_angular_velocity(),
+                imuPose.rot.GetInverse().RotateVector(
+                imuWorldAngularVel));
+
+
+      imuWorldLinearVel +=
+          imuWorldAngularVel.Cross(parentEntityPose.pos - imuPose.pos);
+
+      this->linearAcc = imuPose.rot.GetInverse().RotateVector(
+        (imuWorldLinearVel - this->lastLinearVel) / dt);
+
+      this->lastLinearVel = imuWorldLinearVel;
+
+      // Add contribution from gravity
+      this->gravity = this->world->GetPhysicsEngine()->GetGravity();
+      this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
+
+      gzerr << this->linearAcc << std::endl;
+    }
+
+    msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
+
+    if (this->pub)
+      this->pub->Publish(this->imuMsg);
   }
 
-  // Add contribution from gravity
-  this->gravity = this->world->GetPhysicsEngine()->GetGravity();
-  this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
+  // Clear the incoming data link list.
+  this->incomingLinkData.clear();
+}
 
-  msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
-
-  if (this->pub)
-    this->pub->Publish(this->imuMsg);
+//////////////////////////////////////////////////
+bool ImuSensor::IsActive()
+{
+  return this->active ||
+         (this->pub && this->pub->HasConnections());
 }

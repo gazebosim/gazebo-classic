@@ -957,7 +957,6 @@ void Link::SetPublishData(bool _enable)
   }
   else
   {
-    this->requestPub.reset();
     this->dataPub.reset();
     this->connections.clear();
   }

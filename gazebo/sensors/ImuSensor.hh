@@ -56,8 +56,8 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void Fini();
 
-      private: void OnResponse(ConstResponsePtr &_msg);
-
+      /// \brief Callback when link data is received
+      /// \param[in] _msg Message containing link data
       private: void OnLinkData(ConstLinkDataPtr &_msg);
 
       /// \brief Returns the angular velocity.
@@ -76,6 +76,9 @@ namespace gazebo
       /// \brief Sets the current pose as the IMU reference pose
       public: void SetReferencePose();
 
+      // Documentation inherited.
+      public: virtual bool IsActive();
+
       /// \brief Imu reference pose
       private: math::Pose referencePose;
 
@@ -88,22 +91,25 @@ namespace gazebo
       /// \brief store gravity vector to be added to the imu output.
       private: math::Vector3 gravity;
 
+      /// \brief Imu data publisher
       private: transport::PublisherPtr pub;
 
-      private: transport::SubscriberPtr responseSub;
+      /// \brief Subscriber to link data published by parent entity
+      private: transport::SubscriberPtr linkDataSub;
 
+      /// \brief Parent entity which the Imu is attached to
       private: physics::LinkPtr parentEntity;
+
+      /// \brief Imu message
       private: msgs::IMU imuMsg;
-
-      private: transport::PublisherPtr requestPub;
-
-      private: msgs::Request *requestMsg;
 
       /// \brief Mutex to protect reads and writes.
       private: mutable boost::mutex mutex;
 
       typedef std::list<boost::shared_ptr<msgs::LinkData const> >
           LinkDataMsgs_L;
+
+      /// \brief Buffer for storing link data
       private: LinkDataMsgs_L incomingLinkData;
     };
     /// \}

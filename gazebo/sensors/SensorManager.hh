@@ -79,9 +79,6 @@ namespace gazebo
       /// \brief The list of events to handle.
       private: std::list<SimTimeEvent*> events;
 
-      /// \brief Get sim time from the world.
-      private: physics::WorldPtr world;
-
       /// \brief This is a singleton class.
       private: friend class SingletonT<SimTimeEventHandler>;
 

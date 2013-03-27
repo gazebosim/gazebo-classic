@@ -408,36 +408,6 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
           << " does not exist, GetWorldLinearVel returns default of "
           << vel << std::endl;
   }
-
-  return vel;
-}
-
-/////////////////////////////////////////////////
-math::Vector3 ODELink::GetWorldLinearVel(common::Time &_time,
-    const math::Vector3 &_offset)
-{
-  boost::recursive_mutex::scoped_lock lock(*(this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex()));
-  math::Vector3 vel;
-
-  if (this->linkId)
-  {
-    dVector3 dvel;
-    GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
-    math::Vector3 offsetFromCoG = _offset - this->inertial->GetCoG();
-    common::Time time2 = this->world->GetSimTime();
-    dBodyGetRelPointVel(this->linkId, offsetFromCoG.x, offsetFromCoG.y,
-        offsetFromCoG.z, dvel);
-    _time = this->world->GetSimTime();
-
-      gzerr << " time  " << _time  << " " << time2 << dvel[0] << " " <<  dvel[1] << " " << dvel[2] << std::endl;
-    vel.Set(dvel[0], dvel[1], dvel[2]);
-  }
-  else
-  {
-    gzlog << "ODE body for link [" << this->GetName() << "]"
-          << " does not exist, GetWorldLinearVel returns default of "
-          << vel << std::endl;
-  }
   return vel;
 }
 
