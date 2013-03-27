@@ -30,14 +30,17 @@ class CameraSensor : public ServerFixture
 };
 
 unsigned char* img = NULL;
+unsigned char* img_2 = NULL;
 int image_count = 0;
-void OnNewCameraFrame(const unsigned char *_image,
+int image_count_2 = 0;
+void OnNewCameraFrame(int* image_counter, unsigned char* _image_dest,
+                  const unsigned char *_image,
                   unsigned int _width, unsigned int _height,
                   unsigned int _depth,
                   const std::string &/*_format*/)
 {
-  memcpy(img, _image, _width * _height * _depth);
-  image_count+= 1;
+  memcpy(_image_dest, _image, _width * _height * _depth);
+  *image_counter += 1;
 }
 
 TEST_F(CameraSensor, CheckThrottle)
@@ -69,7 +72,7 @@ TEST_F(CameraSensor, CheckThrottle)
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame,
+        boost::bind(&::OnNewCameraFrame, &image_count, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
   timer.Start();
@@ -119,7 +122,7 @@ TEST_F(CameraSensor, UnlimitedTest)
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame,
+        boost::bind(&::OnNewCameraFrame, &image_count, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
   timer.Start();
@@ -171,7 +174,7 @@ TEST_F(CameraSensor, MultiSenseHigh)
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame,
+        boost::bind(&::OnNewCameraFrame, &image_count, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
   timer.Start();
@@ -224,7 +227,7 @@ TEST_F(CameraSensor, MultiSenseLow)
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame,
+        boost::bind(&::OnNewCameraFrame, &image_count, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
   timer.Start();
@@ -241,6 +244,70 @@ TEST_F(CameraSensor, MultiSenseLow)
 
   delete img;
   Unload();
+}
+
+TEST_F(CameraSensor, CheckNoise)
+{
+  Load("worlds/empty_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // Spawn two cameras in the same location, one with noise and one without.
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  std::string modelNameNoisy = "camera_model_noisy";
+  std::string cameraNameNoisy = "camera_sensor_noisy";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  double noiseMean = 0.1;
+  double noiseStdDev = 0.01;
+  math::Pose setPose, testPose(
+      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.pos,
+      setPose.rot.GetAsEuler(), width, height, updateRate);
+  SpawnCamera(modelNameNoisy, cameraNameNoisy, setPose.pos,
+      setPose.rot.GetAsEuler(), width, height, updateRate,
+      "gaussian", noiseMean, noiseStdDev);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  sensor = sensors::get_sensor(cameraNameNoisy);
+  sensors::CameraSensorPtr camSensorNoisy =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  image_count = 0;
+  image_count_2 = 0;
+  img = new unsigned char[width * height*3];
+  img_2 = new unsigned char[width * height*3];
+  event::ConnectionPtr c =
+    camSensor->GetCamera()->ConnectNewImageFrame(
+        boost::bind(&::OnNewCameraFrame, &image_count, img,
+          _1, _2, _3, _4, _5));
+  event::ConnectionPtr c2 =
+    camSensorNoisy->GetCamera()->ConnectNewImageFrame(
+        boost::bind(&::OnNewCameraFrame, &image_count_2, img_2,
+          _1, _2, _3, _4, _5));
+
+  // Get some images
+  while(image_count < 10 || image_count_2 < 10)
+    common::Time::MSleep(10);
+
+  unsigned int diffMax=0, diffSum=0;
+  double diffAvg=0.0;
+  this->ImageCompare(img, img_2, width, height, 3, 
+                     diffMax, diffSum, diffAvg);
+  // We expect that there will be some non-zero difference between the two
+  // images.
+  EXPECT_NE(diffSum, (unsigned int)0);
+  // We expect that the average difference will be well within 3-sigma.
+  EXPECT_NEAR(diffAvg/255., noiseMean, 3*noiseStdDev);
 }
 
 int main(int argc, char **argv)
