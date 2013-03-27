@@ -167,7 +167,6 @@ macro (gz_build_tests)
 
     # Remove in Gazebo 1.8
     if (HAVE_SDF)
-      message (STATUS "***** HAVE SDF|${HAVE_SDF}|")
       target_link_libraries(${BINARY_NAME}
         libgtest.a
         libgtest_main.a
@@ -253,7 +252,6 @@ if (VALID_DISPLAY)
 
     # Remove in Gazebo 1.8
     if (HAVE_SDF)
-      message (STATUS "\n\n HERE\n\n")
       target_link_libraries(${BINARY_NAME}
         gazebo_gui
         gazebo_common
