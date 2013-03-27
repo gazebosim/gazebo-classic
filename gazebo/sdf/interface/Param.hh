@@ -67,7 +67,7 @@ namespace sdf
             GAZEBO_DEPRECATED(1.6)
             {return true;}
     /// \brief Reset the parameter
-    public: virtual void Reset() = 0 GAZEBO_DEPRECATED(1.6);
+    public: virtual void Reset() GAZEBO_DEPRECATED(1.6) = 0;
 
     public: const std::string &GetKey() const GAZEBO_DEPRECATED(1.6)
             {return this->key;}
@@ -77,21 +77,20 @@ namespace sdf
     /// \brief Return true if the parameter has been set
     public: bool GetSet() const  GAZEBO_DEPRECATED(1.6)
             { return this->set; }
-    public: virtual boost::shared_ptr<Param> Clone() const = 0
-            GAZEBO_DEPRECATED(1.6);
+    public: virtual boost::shared_ptr<Param> Clone() const
+            GAZEBO_DEPRECATED(1.6) = 0;
 
     /// \brief Update function
     public: template<typename T> void SetUpdateFunc(T _updateFunc)
-            GAZEBO_DEPRECATED(1.6)
             { this->updateFunc = _updateFunc; }
-    public: virtual void Update() = 0 GAZEBO_DEPRECATED(1.6);
+    public: virtual void Update() GAZEBO_DEPRECATED(1.6) = 0;
 
     /// \brief Get the value of the parameter.
     /// \param[out] _value The value of the parameter.
     /// \return True if parameter was successfully cast to the value type
     /// passed in.
     public: template<typename T>
-            bool Get(T &_value) GAZEBO_DEPRECATED(1.6)
+            bool Get(T &_value)
             {
               try
               {

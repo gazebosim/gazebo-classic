@@ -38,7 +38,7 @@ namespace sdf
 
   /// A function that is used in the external SDF library. This is here to
   /// make the build work if the external SDF library is not present.
-  void addURIPath(const std::string &/*_uri*/, const std::string &_path);
+  void addURIPath(const std::string &_uri, const std::string &_path);
 
   /// A function that is used in the external SDF library. This is here to
   /// make the build work if the external SDF library is not present.
