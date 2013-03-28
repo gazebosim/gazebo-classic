@@ -8,3 +8,4 @@ Ogre.log
 *.orig
 *.user
 *.autosave
+*.kdev4
