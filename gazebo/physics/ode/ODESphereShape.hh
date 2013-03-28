@@ -43,7 +43,7 @@ namespace gazebo
         SphereShape::SetRadius(_radius);
         ODECollisionPtr oParent;
         oParent =
-          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+          boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
 
         // Create the sphere geometry
         if (oParent->GetCollisionId() == NULL)

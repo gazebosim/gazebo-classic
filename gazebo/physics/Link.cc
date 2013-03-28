@@ -196,7 +196,7 @@ void Link::Init()
       for (Base_V::iterator giter = this->children.begin();
            giter != this->children.end(); giter++)
       {
-        EntityPtr e = boost::shared_dynamic_cast<Entity>(*giter);
+        EntityPtr e = boost::dynamic_pointer_cast<Entity>(*giter);
 
         msgs::Point *pt;
         pt = g_msg.add_points();
@@ -225,7 +225,7 @@ void Link::Init()
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-      boost::shared_static_cast<Collision>(*iter)->Init();
+      boost::static_pointer_cast<Collision>(*iter)->Init();
   }
 }
 
@@ -326,7 +326,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
     while (collisionElem)
     {
-      CollisionPtr collision = boost::shared_dynamic_cast<Collision>(
+      CollisionPtr collision = boost::dynamic_pointer_cast<Collision>(
           this->GetChild(collisionElem->GetValueString("name")));
 
       if (collision)
@@ -407,7 +407,7 @@ void Link::SetLaserRetro(float _retro)
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-      boost::shared_static_cast<Collision>(*iter)->SetLaserRetro(_retro);
+      boost::static_pointer_cast<Collision>(*iter)->SetLaserRetro(_retro);
   }
 }
 
@@ -467,7 +467,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
     this->SetStatic(true);
 
   collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(geomType,
-      boost::shared_static_cast<Link>(shared_from_this()));
+      boost::static_pointer_cast<Link>(shared_from_this()));
 
   if (!collision)
     gzthrow("Unknown Collisionetry Type[" + geomType + "]");
@@ -478,7 +478,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 CollisionPtr Link::GetCollisionById(unsigned int _id) const
 {
-  return boost::shared_dynamic_cast<Collision>(this->GetById(_id));
+  return boost::dynamic_pointer_cast<Collision>(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -490,7 +490,7 @@ CollisionPtr Link::GetCollision(const std::string &_name)
   {
     if ((*biter)->GetName() == _name)
     {
-      result = boost::shared_dynamic_cast<Collision>(*biter);
+      result = boost::dynamic_pointer_cast<Collision>(*biter);
       break;
     }
   }
@@ -507,7 +507,7 @@ Collision_V Link::GetCollisions() const
   {
     if ((*biter)->HasType(Base::COLLISION))
     {
-      result.push_back(boost::shared_static_cast<Collision>(*biter));
+      result.push_back(boost::static_pointer_cast<Collision>(*biter));
     }
   }
 
@@ -519,7 +519,7 @@ CollisionPtr Link::GetCollision(unsigned int _index) const
 {
   CollisionPtr collision;
   if (_index <= this->GetChildCount())
-    collision = boost::shared_static_cast<Collision>(this->GetChild(_index));
+    collision = boost::static_pointer_cast<Collision>(this->GetChild(_index));
   else
     gzerr << "Index is out of range\n";
 
@@ -601,7 +601,7 @@ math::Vector3 Link::GetRelativeTorque() const
 //////////////////////////////////////////////////
 ModelPtr Link::GetModel() const
 {
-  return boost::shared_dynamic_cast<Model>(this->GetParent());
+  return boost::dynamic_pointer_cast<Model>(this->GetParent());
 }
 
 //////////////////////////////////////////////////
@@ -616,7 +616,7 @@ math::Box Link::GetBoundingBox() const
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-      box += boost::shared_static_cast<Collision>(*iter)->GetBoundingBox();
+      box += boost::static_pointer_cast<Collision>(*iter)->GetBoundingBox();
   }
 
   return box;
@@ -684,6 +684,38 @@ void Link::RemoveChildJoint(JointPtr _joint)
 }
 
 //////////////////////////////////////////////////
+void Link::RemoveParentJoint(const std::string &_jointName)
+{
+  for (std::vector<JointPtr>::iterator iter = this->parentJoints.begin();
+                                       iter != this->parentJoints.end();
+                                       ++iter)
+  {
+    /// @todo: can we assume there are no repeats?
+    if ((*iter)->GetName() == _jointName)
+    {
+      this->parentJoints.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Link::RemoveChildJoint(const std::string &_jointName)
+{
+  for (std::vector<JointPtr>::iterator iter = this->childJoints.begin();
+                                       iter != this->childJoints.end();
+                                       ++iter)
+  {
+    /// @todo: can we assume there are no repeats?
+    if ((*iter)->GetName() == _jointName)
+    {
+      this->childJoints.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 void Link::FillMsg(msgs::Link &_msg)
 {
   _msg.set_id(this->GetId());
@@ -710,7 +742,7 @@ void Link::FillMsg(msgs::Link &_msg)
   {
     if (this->GetChild(j)->HasType(Base::COLLISION))
     {
-      CollisionPtr coll = boost::shared_dynamic_cast<Collision>(
+      CollisionPtr coll = boost::dynamic_pointer_cast<Collision>(
           this->GetChild(j));
       coll->FillMsg(*_msg.add_collision());
     }
