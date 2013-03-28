@@ -125,7 +125,6 @@ void RTQL8Model::Init()
     rotY->setValue(iegenVec3(1));
     rotZ->setValue(iegenVec3(2));
 
-
     // Get the model associated with
     // Add the transform to the skeletone in the model.
     // add to model because it's variable
