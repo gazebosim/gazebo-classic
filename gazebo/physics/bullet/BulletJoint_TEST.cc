@@ -46,7 +46,7 @@ TEST_F(BulletJoint_TEST, GetForceTorque2)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), "bullet");
 
-  //physics->SetGravity(math::Vector3(0, 0, -50));
+  physics->SetGravity(math::Vector3(0, 0, -50));
 
   // simulate 1 step
   world->StepWorld(1);
@@ -133,12 +133,15 @@ TEST_F(BulletJoint_TEST, GetForceTorque2)
 
   math::Vector3 gravity(-30, 10, -50);
 
-  physics->SetGravity(math::Vector3(gravity.x, 0, 0));
+//  physics->SetGravity(math::Vector3(gravity.x, 0, 0));
+  physics->SetGravity(gravity);
   // tune joint stop properties
   joint_01->SetAttribute("stop_erp", 0, 0.02);
   joint_12->SetAttribute("stop_erp", 0, 0.02);
   // wait for dynamics to stabilize
   world->StepWorld(2000);
+
+
 
 //  gzerr << "child after "
 //    << joint_12->GetChild()->GetWorldCoGPose().pos  << std::endl;

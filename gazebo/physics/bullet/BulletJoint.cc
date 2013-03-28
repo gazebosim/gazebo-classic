@@ -142,6 +142,14 @@ JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
     gzerr << "force " << wrench.body1Force << " , " << wrench.body2Force << std::endl;
     gzerr << "torque " << wrench.body1Torque << " , " << wrench.body2Torque << std::endl;
 
+/*    gzerr << " existing torque " <<
+      BulletTypes::ConvertVector3(this->constraint->getRigidBodyA().getTotalTorque())
+      << " , " <<
+      BulletTypes::ConvertVector3(this->constraint->getRigidBodyB().getTotalTorque())
+      << std::endl;*/
+
+    gzerr << "anchor " << this->anchorPos << ", " << this->anchorPose << " "<< std::endl;
+
 /*    gzerr << " bt torque " << fb->m_appliedTorqueBodyB.x() << " " << fb->m_appliedTorqueBodyB.y() << " " << fb->m_appliedTorqueBodyB.z() << std::endl;
 
     gzerr << "anchor " << this->anchorPos << ", " << this->anchorPose << " "<< std::endl;
@@ -175,7 +183,32 @@ JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
       //       << "] fxp[" << wrench.body2Force.Cross(childMomentArm)
       //       << "]\n";
 
+      btRigidBody bodyA = this->constraint->getRigidBodyA();
+      int numConstraints = bodyA.getNumConstraintRefs();
+      btTypedConstraint *otherConstraint;
+        for ( int i = 0; i < numConstraints; ++i)
+        {
+          otherConstraint = bodyA.getConstraintRef(i);
+          if ( otherConstraint != this->constraint)
+          {
+            if (otherConstraint->getRigidBodyA().getUserPointer()
+                == bodyA.getUserPointer())
+            {
+              wrench.body1Torque += BulletTypes::ConvertVector3(
+                  otherConstraint->getJointFeedback()->
+                  m_appliedTorqueBodyB);
+            }
+            else
+            {
+              wrench.body1Torque += BulletTypes::ConvertVector3(
+                  otherConstraint->getJointFeedback()->
+                  m_appliedTorqueBodyA);
+            }
+          }
+        }
+
       wrench.body2Torque += wrench.body2Force.Cross(childMomentArm);
+
 
       // rotate resulting body1Force in world frame into link frame
       wrench.body2Force = childPose.rot.RotateVectorReverse(
@@ -184,6 +217,8 @@ JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
       // rotate resulting body1Torque in world frame into link frame
       wrench.body2Torque = childPose.rot.RotateVectorReverse(
         -wrench.body2Torque);
+
+      gzerr << "b2t child modment arm " << childMomentArm << ", " << wrench.body2Force << ", " << wrench.body2Torque << std::endl;
     }
 
     // convert torque from about parent CG to joint anchor location
@@ -215,7 +250,50 @@ JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 
 //      gzerr << " parent link b4 body1torque " << wrench.body1Torque << std::endl;
 
+      btRigidBody bodyB = this->constraint->getRigidBodyB();
+      int numConstraints = bodyB.getNumConstraintRefs();
+      btTypedConstraint *otherConstraint;
+        for ( int i = 0; i < numConstraints; ++i)
+        {
+          otherConstraint = bodyB.getConstraintRef(i);
+          if ( otherConstraint != this->constraint)
+          {
+            if (otherConstraint->getRigidBodyA().getUserPointer()
+                == bodyB.getUserPointer())
+            {
+              wrench.body1Torque += BulletTypes::ConvertVector3(
+                  otherConstraint->getJointFeedback()->
+                  m_appliedTorqueBodyB);
+            }
+            else
+            {
+              wrench.body1Torque += BulletTypes::ConvertVector3(
+                  otherConstraint->getJointFeedback()->
+                  m_appliedTorqueBodyA);
+            }
+          }
+        }
+
       wrench.body1Torque += wrench.body1Force.Cross(parentMomentArm);
+
+      if ( this->constraint->getRigidBodyB().getNumConstraintRefs() > 1)
+      {
+        gzerr << " another joint constraint b1a " <<
+        BulletTypes::ConvertVector3(
+        this->constraint->getRigidBodyB().getConstraintRef(1)->getJointFeedback()->m_appliedTorqueBodyA) << std::endl;
+        gzerr << " another joint constraint b1b " <<
+        BulletTypes::ConvertVector3(
+        this->constraint->getRigidBodyB().getConstraintRef(1)->getJointFeedback()->m_appliedTorqueBodyB) << std::endl;
+        gzerr << " another joint constraint b0a " <<
+        BulletTypes::ConvertVector3(
+        this->constraint->getRigidBodyB().getConstraintRef(0)->getJointFeedback()->m_appliedTorqueBodyA) << std::endl;
+        gzerr << " another joint constraint b0b " <<
+        BulletTypes::ConvertVector3(
+        this->constraint->getRigidBodyB().getConstraintRef(0)->getJointFeedback()->m_appliedTorqueBodyB) << std::endl;
+      }
+
+
+      gzerr << "b2t parent modment arm " << parentMomentArm << ", " << wrench.body1Force << ", " << wrench.body1Torque << std::endl;
 
 //      gzerr << " parent link body1torque " << wrench.body1Torque << std::endl;
 //      gzerr << " parentMomentArm " << parentMomentArm << std::endl;

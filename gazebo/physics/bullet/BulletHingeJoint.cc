@@ -107,6 +107,7 @@ void BulletHingeJoint::Init()
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
+    gzerr << "pivots child parent " << pivotChild << ", " << pivotParent << std::endl;
     this->bulletHinge = new btHingeConstraint(
         *(bulletChildLink->GetBulletLink()),
         *(bulletParentLink->GetBulletLink()),

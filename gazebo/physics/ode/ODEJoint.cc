@@ -911,10 +911,12 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
     wrench.body1Force.Set(fb->f2[0], fb->f2[1], fb->f2[2]);
     wrench.body1Torque.Set(fb->t2[0], fb->t2[1], fb->t2[2]);
 
-/*    gzerr << "force " << wrench.body1Force << " , " << wrench.body2Force << std::endl;
+    gzerr << "anchor " << this->anchorPos << ", " << this->anchorPose << " "<< std::endl;
+
+    gzerr << "force " << wrench.body1Force << " , " << wrench.body2Force << std::endl;
     gzerr << "torque " << wrench.body1Torque << " , " << wrench.body2Torque << std::endl;
 
-    gzerr << "anchor " << this->anchorPos << ", " << this->anchorPose << " "<< std::endl;
+/*    gzerr << "anchor " << this->anchorPos << ", " << this->anchorPose << " "<< std::endl;
     gzerr << "global axis " << this->GetGlobalAxis(0) << std::endl;
     gzerr << "angle " << this->GetAngle(0) << std::endl;*/
 
@@ -940,6 +942,8 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       //       << "]\n";
 
       wrench.body2Torque += wrench.body2Force.Cross(childMomentArm);
+
+      gzerr << "b2t child modment arm " << childMomentArm << ", " << wrench.body2Force << ", " << wrench.body2Torque << std::endl;
 
       // rotate resulting body1Force in world frame into link frame
       wrench.body2Force = childPose.rot.RotateVectorReverse(
@@ -979,9 +983,11 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 
       wrench.body1Torque += wrench.body1Force.Cross(parentMomentArm);
 
-      gzerr << " parent link body1torque " << wrench.body1Torque << std::endl;
+      gzerr << "b2t parent modment arm " << parentMomentArm << ", " << wrench.body1Force << ", " << wrench.body1Torque << std::endl;
+
+      /*gzerr << " parent link body1torque " << wrench.body1Torque << std::endl;
       gzerr << " parentMomentArm " << parentMomentArm << std::endl;
-      gzerr << " cgPos " << cgPos << std::endl;
+      gzerr << " cgPos " << cgPos << std::endl;*/
 
       // rotate resulting body1Force in world frame into link frame
       wrench.body1Force = parentPose.rot.RotateVectorReverse(
