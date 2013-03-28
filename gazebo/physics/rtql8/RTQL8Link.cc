@@ -52,8 +52,12 @@ void RTQL8Link::Load(sdf::ElementPtr _sdf)
   Link::Load(_sdf);
 
   // Create rtql8's body node according to gazebo's link.
-  this->rtql8BodyNode
+  rtql8::kinematics::BodyNode* bodyNode
       = this->GetRTQL8Model()->GetSkeletonDynamics()->createBodyNode();
+  rtql8::dynamics::BodyNodeDynamics* bodyNodeDyn
+      = static_cast<rtql8::dynamics::BodyNodeDynamics*>(bodyNode);
+
+  this->rtql8BodyNode = bodyNodeDyn;
 
   // Add rtql8's body node to rtql8's skeleton.
   GetRTQL8Model()->GetSkeletonDynamics()->addNode(rtql8BodyNode, false);
@@ -156,9 +160,8 @@ void RTQL8Link::Init()
   //----------------------------------------------------------------------------
   // Gazebo's Link Pose -->> RTQL8's BodyNode Transform
   // Set rtql8's body node transformation from gazebo's link pose.
-  math::Pose worldPose = this->GetWorldPose();
   Eigen::Matrix4d newTrfm;
-  RTQL8Utils::ConvPoseToMat(&newTrfm, worldPose);
+  RTQL8Utils::ConvPoseToMat(&newTrfm, this->GetWorldPose());
   this->rtql8BodyNode->setWorldTransform(newTrfm);
 }
 
@@ -207,7 +210,7 @@ void RTQL8Link::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-void RTQL8Link::SetEnabled(bool _enable) const
+void RTQL8Link::SetEnabled(bool /*_enable*/) const
 {
   //   if (!this->linkId)
   //     return;
@@ -280,7 +283,7 @@ void RTQL8Link::UpdateSurface()
 }
 
 //////////////////////////////////////////////////
-void RTQL8Link::SetLinearVel(const math::Vector3 &_vel)
+void RTQL8Link::SetLinearVel(const math::Vector3& /*_vel*/)
 {
   //   if (this->linkId)
   //   {
@@ -290,7 +293,7 @@ void RTQL8Link::SetLinearVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-void RTQL8Link::SetAngularVel(const math::Vector3 &_vel)
+void RTQL8Link::SetAngularVel(const math::Vector3& /*_vel*/)
 {
   //   if (this->linkId)
   //   {
@@ -300,7 +303,7 @@ void RTQL8Link::SetAngularVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-void RTQL8Link::SetForce(const math::Vector3 &_force)
+void RTQL8Link::SetForce(const math::Vector3& /*_force*/)
 {
   //   if (this->linkId)
   //   {
@@ -311,7 +314,7 @@ void RTQL8Link::SetForce(const math::Vector3 &_force)
 }
 
 //////////////////////////////////////////////////
-void RTQL8Link::SetTorque(const math::Vector3 &_torque)
+void RTQL8Link::SetTorque(const math::Vector3& /*_torque*/)
 {
   //   if (this->linkId)
   //   {
@@ -322,7 +325,7 @@ void RTQL8Link::SetTorque(const math::Vector3 &_torque)
 }
 
 //////////////////////////////////////////////////
-void RTQL8Link::AddForce(const math::Vector3 &_force)
+void RTQL8Link::AddForce(const math::Vector3& /*_force*/)
 {
   //   if (this->linkId)
   //   {
@@ -333,7 +336,7 @@ void RTQL8Link::AddForce(const math::Vector3 &_force)
 }
 
 /////////////////////////////////////////////////
-void RTQL8Link::AddRelativeForce(const math::Vector3 &_force)
+void RTQL8Link::AddRelativeForce(const math::Vector3& /*_force*/)
 {
   //   if (this->linkId)
   //   {
@@ -344,8 +347,8 @@ void RTQL8Link::AddRelativeForce(const math::Vector3 &_force)
 }
 
 /////////////////////////////////////////////////
-void RTQL8Link::AddForceAtWorldPosition(const math::Vector3 &_force,
-                                        const math::Vector3 &_pos)
+void RTQL8Link::AddForceAtWorldPosition(const math::Vector3& /*_force*/,
+                                        const math::Vector3& /*_pos*/)
 {
   //   if (this->linkId)
   //   {
@@ -357,8 +360,8 @@ void RTQL8Link::AddForceAtWorldPosition(const math::Vector3 &_force,
 }
 
 /////////////////////////////////////////////////
-void RTQL8Link::AddForceAtRelativePosition(const math::Vector3 &_force,
-                                           const math::Vector3 &_relpos)
+void RTQL8Link::AddForceAtRelativePosition(const math::Vector3& /*_force*/,
+                                           const math::Vector3& /*_relpos*/)
 {
   //   if (this->linkId)
   //   {
@@ -370,7 +373,7 @@ void RTQL8Link::AddForceAtRelativePosition(const math::Vector3 &_force,
 }
 
 /////////////////////////////////////////////////
-void RTQL8Link::AddTorque(const math::Vector3 &_torque)
+void RTQL8Link::AddTorque(const math::Vector3& /*_torque*/)
 {
   //   if (this->linkId)
   //   {
@@ -380,7 +383,7 @@ void RTQL8Link::AddTorque(const math::Vector3 &_torque)
 }
 
 /////////////////////////////////////////////////
-void RTQL8Link::AddRelativeTorque(const math::Vector3 &_torque)
+void RTQL8Link::AddRelativeTorque(const math::Vector3& /*_torque*/)
 {
   //   if (this->linkId)
   //   {
@@ -394,6 +397,13 @@ math::Vector3 RTQL8Link::GetWorldLinearVel(
     const math::Vector3& /*_offset*/) const
 {
   math::Vector3 vel;
+
+  // TODO: This is the velocity in body frame not world frame.
+  Eigen::Vector3d linVel = this->rtql8BodyNode->mVelBody;
+
+  vel.x = linVel[0];
+  vel.y = linVel[1];
+  vel.z = linVel[2];
 
   //   if (this->linkId)
   //   {
@@ -512,7 +522,7 @@ bool RTQL8Link::GetGravityMode() const
 }
 
 //////////////////////////////////////////////////
-void RTQL8Link::SetSelfCollide(bool _collide)
+void RTQL8Link::SetSelfCollide(bool /*_collide*/)
 {
   //   this->sdf->GetElement("self_collide")->Set(_collide);
   //   if (_collide)
@@ -520,21 +530,21 @@ void RTQL8Link::SetSelfCollide(bool _collide)
 }
 
 //////////////////////////////////////////////////
-void RTQL8Link::SetLinearDamping(double _damping)
+void RTQL8Link::SetLinearDamping(double /*_damping*/)
 {
   //   if (this->GetODEId())
   //     dBodySetLinearDamping(this->GetODEId(), _damping);
 }
 
 //////////////////////////////////////////////////
-void RTQL8Link::SetAngularDamping(double _damping)
+void RTQL8Link::SetAngularDamping(double /*_damping*/)
 {
   //   if (this->GetODEId())
   //     dBodySetAngularDamping(this->GetODEId(), _damping);
 }
 
 //////////////////////////////////////////////////
-void RTQL8Link::SetKinematic(const bool &_state)
+void RTQL8Link::SetKinematic(const bool& _state)
 {
   this->sdf->GetElement("kinematic")->Set(_state);
   //   if (this->linkId)
@@ -558,7 +568,7 @@ bool RTQL8Link::GetKinematic() const
 }
 
 //////////////////////////////////////////////////
-void RTQL8Link::SetAutoDisable(bool _disable)
+void RTQL8Link::SetAutoDisable(bool /*_disable*/)
 {
   //   if (this->GetModel()->GetJointCount() == 0 && this->linkId)
   //   {

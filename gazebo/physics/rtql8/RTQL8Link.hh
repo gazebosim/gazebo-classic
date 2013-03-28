@@ -168,7 +168,7 @@ namespace gazebo
       public: void AddRTQL8ChildJoint(RTQL8JointPtr _rtql8ChildJoint);
 
       /// \brief
-      private: rtql8::kinematics::BodyNode* rtql8BodyNode;
+      private: rtql8::dynamics::BodyNodeDynamics* rtql8BodyNode;
 
       /// \brief
       //private: RTQL8PhysicsPtr rtql8Physics;
