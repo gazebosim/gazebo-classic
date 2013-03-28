@@ -69,6 +69,7 @@
             <static>1</static>
         </model>
         <model name="box_01_model">
+            <allow_auto_disable>false</allow_auto_disable>
             <pose>2.000000 8.000000 0.500000 0.000000 -0.000000 0.000000</pose>
             <link name="box_01_body">
                 <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
@@ -139,6 +140,7 @@
             <static>0</static>
         </model>
         <model name="box_02_model">
+            <allow_auto_disable>false</allow_auto_disable>
             <pose>4.000000 8.000000 0.500000 0.000000 -0.000000 0.000000</pose>
             <link name="box_02_body">
                 <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
@@ -209,6 +211,7 @@
             <static>0</static>
         </model>
         <model name="box_03_model">
+            <allow_auto_disable>false</allow_auto_disable>
             <pose>6.000000 8.000000 0.500000 0.000000 -0.000000 0.000000</pose>
             <link name="box_03_body">
                 <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
@@ -279,6 +282,7 @@
             <static>0</static>
         </model>
         <model name="box_04_model">
+            <allow_auto_disable>false</allow_auto_disable>
             <pose>8.000000 8.000000 0.500000 0.000000 -0.000000 0.000000</pose>
             <link name="box_04_body">
                 <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
@@ -349,6 +353,7 @@
             <static>0</static>
         </model>
         <model name="box_05_model">
+            <allow_auto_disable>false</allow_auto_disable>
             <pose>10.000000 8.000000 0.500000 0.000000 -0.000000 0.000000</pose>
             <link name="box_05_body">
                 <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
@@ -419,6 +424,7 @@
             <static>0</static>
         </model>
         <model name="box_06_model">
+            <allow_auto_disable>false</allow_auto_disable>
             <pose>12.000000 8.000000 0.500000 0.000000 -0.000000 0.000000</pose>
             <link name="box_06_body">
                 <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
