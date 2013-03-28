@@ -106,11 +106,18 @@ namespace gazebo
       /// \brief Mutex to protect reads and writes.
       private: mutable boost::mutex mutex;
 
-      typedef std::list<boost::shared_ptr<msgs::LinkData const> >
-          LinkDataMsgs_L;
+      //typedef std::list<boost::shared_ptr<msgs::LinkData const> >
+      //    LinkDataMsgs_L;
 
       /// \brief Buffer for storing link data
-      private: LinkDataMsgs_L incomingLinkData;
+      private: boost::shared_ptr<msgs::LinkData const> incomingLinkData[2];
+      //private: LinkDataMsgs_L incomingLinkData;
+
+      /// \brief Index for accessing element in the link data array
+      private: unsigned int dataIndex;
+
+      /// \brief True if new link data is received
+      private: bool dataDirty;
     };
     /// \}
   }

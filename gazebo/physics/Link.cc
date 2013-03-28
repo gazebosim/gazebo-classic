@@ -54,6 +54,7 @@ Link::Link(EntityPtr _parent)
   this->parentJoints.clear();
   this->childJoints.clear();
   this->publishData = false;
+  this->publishDataMutex = new boost::recursive_mutex();
 }
 
 
@@ -91,6 +92,9 @@ Link::~Link()
   this->requestPub.reset();
   this->dataPub.reset();
   this->connections.clear();
+
+  delete this->publishDataMutex;
+  this->publishDataMutex = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -943,11 +947,14 @@ void Link::SetKinematic(const bool &/*_kinematic*/)
 /////////////////////////////////////////////////
 void Link::SetPublishData(bool _enable)
 {
-  if (this->publishData == _enable)
-    return;
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->publishDataMutex);
+    if (this->publishData == _enable)
+      return;
 
-  this->publishData = _enable;
-  if (this->publishData)
+    this->publishData = _enable;
+  }
+  if (_enable)
   {
     std::string topic = "~/" + this->GetScopedName();
     this->dataPub = this->node->Advertise<msgs::LinkData>(topic);
@@ -976,12 +983,3 @@ void Link::PublishData()
     this->dataPub->Publish(this->linkDataMsg);
   }
 }
-
-/*/////////////////////////////////////////////////
-math::Vector3 Link::GetWorldLinearVel(common::Time &_time,
-    const math::Vector3 &_offset)
-{
-  math::Vector3 vel = this->GetWorldLinearVel(_offset);
-  _time = this->world->GetSimTime();
-  return vel;
-}*/

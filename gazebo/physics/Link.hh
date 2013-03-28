@@ -489,6 +489,9 @@ namespace gazebo
 
       /// \brief True to publish data, false otherwise
       private: bool publishData;
+
+      /// \brief Mutex to protect the publishData variable
+      private: boost::recursive_mutex *publishDataMutex;
     };
     /// \}
   }
