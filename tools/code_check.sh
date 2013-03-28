@@ -43,7 +43,7 @@ else
 
   # Finally, check the configuration
   cppcheck --enable=missingInclude -q -j 4 --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces -name "*.cc"` -I gazebo -I gazebo/rendering/skyx/include -I . -I $builddir -I $builddir/gazebo -I $builddir/gazebo/msgs -I deps -I deps/opende/include -I test --check-config
-#fi
+fi
 
 # cpplint
 if [ $xmlout -eq 1 ]; then

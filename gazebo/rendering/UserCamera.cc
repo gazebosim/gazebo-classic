@@ -104,7 +104,7 @@ void UserCamera::Init()
   // lighting. When using deferred shading, the light's use geometry that
   // trigger shaders. If the far clip is too close, the light's geometry is
   // clipped and wholes appear in the lighting.
-  switch(RenderEngine::Instance()->GetRenderPathType()) 
+  switch (RenderEngine::Instance()->GetRenderPathType())
   {
     case RenderEngine::VERTEX:
       this->SetClipDist(0.1, 100);
@@ -115,7 +115,7 @@ void UserCamera::Init()
       this->SetClipDist(.1, 5000);
       break;
 
-    default: 
+    default:
       this->SetClipDist(.1, 5000);
       break;
   }

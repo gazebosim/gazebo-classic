@@ -32,7 +32,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 ODEScrewJoint::ODEScrewJoint(dWorldID _worldId, BasePtr _parent)
-    : ScrewJoint<ODEJoint>(_parent)
+    : ScrewJoint<ODEJoint>(_parent), threadPitch(0)
 {
   this->jointId = dJointCreateScrew(_worldId, NULL);
 }
