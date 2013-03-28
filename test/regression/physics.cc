@@ -130,6 +130,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 
   int steps = 2;
   physics::ModelPtr model;
+  gzerr << model->GetLink();
   math::Pose pose1, pose2;
   math::Vector3 vel1, vel2;
 

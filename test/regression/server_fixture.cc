@@ -110,6 +110,7 @@ TEST_F(ServerFixtureTest, SpawnSDF)
   SpawnSDF(sdfStr.str());
 
   physics::ModelPtr model;
+  gzerr << model->GetLink();
   model = world->GetModel("box");
   ASSERT_TRUE(model != NULL);
 
