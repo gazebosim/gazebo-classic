@@ -19,17 +19,17 @@
 
 #include <string>
 
-#include "msgs/MessageTypes.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/sdf/sdf.hh"
 
-#include "math/MathTypes.hh"
-#include "math/Vector3.hh"
-#include "math/Pose.hh"
-#include "math/Plane.hh"
-#include "math/Box.hh"
+#include "gazebo/math/MathTypes.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Plane.hh"
+#include "gazebo/math/Box.hh"
 
-#include "common/Color.hh"
-#include "common/Time.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Time.hh"
 
 namespace gazebo
 {

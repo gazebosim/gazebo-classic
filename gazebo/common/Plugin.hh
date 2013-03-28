@@ -21,7 +21,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <gazebo_config.h>
+#include <gazebo/gazebo_config.h>
 #ifdef HAVE_DL
 #include <dlfcn.h>
 #elif HAVE_LTDL
