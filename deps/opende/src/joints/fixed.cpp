@@ -74,6 +74,9 @@ dxJointFixed::getInfo2 ( dxJoint::Info2 *info )
     info->cfm[0] = cfm;
     info->cfm[1] = cfm;
     info->cfm[2] = cfm;
+    info->cfm[3] = cfm;
+    info->cfm[4] = cfm;
+    info->cfm[5] = cfm;
 
     dVector3 ofs;
     dMultiply0_331 ( ofs, node[0].body->posr.R, offset );

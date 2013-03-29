@@ -157,6 +157,12 @@ dxJointSlider::getInfo2 ( dxJoint::Info2 *info )
 {
     // Added by OSRF
     info->erp = this->erp;
+    info->cfm[0] = this->cfm;
+    info->cfm[1] = this->cfm;
+    info->cfm[2] = this->cfm;
+    info->cfm[3] = this->cfm;
+    info->cfm[4] = this->cfm;
+    info->cfm[5] = this->cfm;
 
     int i, s = info->rowskip;
     int s3 = 3 * s, s4 = 4 * s;
