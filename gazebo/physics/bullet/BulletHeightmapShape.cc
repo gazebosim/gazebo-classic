@@ -71,7 +71,7 @@ void BulletHeightmapShape::Init()
 
   // Get a pointer to the parent collision
   BulletCollisionPtr bParent;
-  bParent = boost::shared_dynamic_cast<BulletCollision>(this->collisionParent);
+  bParent = boost::dynamic_pointer_cast<BulletCollision>(this->collisionParent);
 
   GZ_ASSERT(bParent != NULL, "Bullet collision parent of a heightmap is NULL");
 

@@ -52,7 +52,7 @@ BulletLink::~BulletLink()
 //////////////////////////////////////////////////
 void BulletLink::Load(sdf::ElementPtr _sdf)
 {
-  this->bulletPhysics = boost::shared_dynamic_cast<BulletPhysics>(
+  this->bulletPhysics = boost::dynamic_pointer_cast<BulletPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (this->bulletPhysics == NULL)
@@ -91,7 +91,7 @@ void BulletLink::Init()
     if ((*iter)->HasType(Base::COLLISION))
     {
       BulletCollisionPtr collision;
-      collision = boost::shared_static_cast<BulletCollision>(*iter);
+      collision = boost::static_pointer_cast<BulletCollision>(*iter);
       btCollisionShape *shape = collision->GetCollisionShape();
 
       math::Pose relativePose = collision->GetRelativePose();
@@ -150,7 +150,7 @@ void BulletLink::Init()
   {
     if ((*iter)->HasType(Base::COLLISION))
     {
-      collision = boost::shared_static_cast<BulletCollision>(*iter);
+      collision = boost::static_pointer_cast<BulletCollision>(*iter);
       categortyBits = collision->GetCategoryBits();
       collideBits = collision->GetCollideBits();
       break;

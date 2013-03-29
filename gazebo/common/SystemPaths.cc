@@ -309,8 +309,16 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     bool found = false;
 
-    path = boost::filesystem::operator/(boost::filesystem::current_path(),
-                                        _filename);
+    try
+    {
+      path = boost::filesystem::operator/(boost::filesystem::current_path(),
+          _filename);
+    }
+    catch(boost::filesystem3::filesystem_error &_e)
+    {
+      gzerr << "Filesystem error[" << _e.what() << "]\n";
+      return std::string();
+    }
 
     if (_searchLocalPath && boost::filesystem::exists(path))
     {

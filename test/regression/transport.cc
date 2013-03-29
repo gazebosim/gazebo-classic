@@ -16,7 +16,6 @@
 */
 
 #include <unistd.h>
-
 #include "ServerFixture.hh"
 
 using namespace gazebo;
@@ -63,7 +62,6 @@ TEST_F(TransportTest, Load)
     Unload();
   }
 }
-
 
 TEST_F(TransportTest, PubSub)
 {
@@ -128,12 +126,6 @@ TEST_F(TransportTest, Errors)
   EXPECT_STREQ("~/factory",
                testNode->EncodeTopicName("/gazebo/default/factory").c_str());
 
-  msgs::Scene sceneMsg;
-  EXPECT_THROW(scenePub->Publish(sceneMsg), common::Exception);
-
-  msgs::Factory factoryMsg;
-  EXPECT_THROW(scenePub->Publish(factoryMsg), common::Exception);
-
   // Get the original URI
   char *uri = getenv("GAZEBO_MASTER_URI");
   std::string origURI = "GAZEBO_MASTER_URI=";
@@ -170,7 +162,6 @@ TEST_F(TransportTest, Errors)
   statsSub.reset();
   testNode.reset();
 }
-
 
 // This test creates a child process to test interprocess communication
 // TODO: This test needs to be fixed

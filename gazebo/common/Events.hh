@@ -147,7 +147,7 @@ namespace gazebo
       /// \brief Disconnect a boost::slot the the world update start signal
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectWorldUpdateStart(ConnectionPtr _subscriber)
-              GAZEBO_DEPRECATED;
+              GAZEBO_DEPRECATED(1.5);
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the world update start signal
