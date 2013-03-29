@@ -30,17 +30,17 @@ class CameraSensor : public ServerFixture
 };
 
 unsigned char* img = NULL;
-unsigned char* img_2 = NULL;
-int image_count = 0;
-int image_count_2 = 0;
-void OnNewCameraFrame(int* image_counter, unsigned char* _image_dest,
+unsigned char* img2 = NULL;
+int imageCount = 0;
+int imageCount2 = 0;
+void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
                   const unsigned char *_image,
                   unsigned int _width, unsigned int _height,
                   unsigned int _depth,
                   const std::string &/*_format*/)
 {
-  memcpy(_image_dest, _image, _width * _height * _depth);
-  *image_counter += 1;
+  memcpy(_imageDest, _image, _width * _height * _depth);
+  *_imageCounter += 1;
 }
 
 TEST_F(CameraSensor, CheckThrottle)
@@ -68,11 +68,11 @@ TEST_F(CameraSensor, CheckThrottle)
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  image_count = 0;
+  imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &image_count, img,
+        boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
   timer.Start();
@@ -80,7 +80,7 @@ TEST_F(CameraSensor, CheckThrottle)
   // time how long it takes to get 50 images @ 10Hz
   int total_images = 50;
 
-  while (image_count < total_images)
+  while (imageCount < total_images)
     common::Time::MSleep(10);
   common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
@@ -118,17 +118,17 @@ TEST_F(CameraSensor, UnlimitedTest)
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  image_count = 0;
+  imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &image_count, img,
+        boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
   timer.Start();
   // time how long it takes to get N images
   int total_images = 500;
-  while (image_count < total_images)
+  while (imageCount < total_images)
     common::Time::MSleep(10);
   common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
@@ -170,17 +170,17 @@ TEST_F(CameraSensor, MultiSenseHigh)
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  image_count = 0;
+  imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &image_count, img,
+        boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
   timer.Start();
   // time how long it takes to get N images
   int total_images = 500;
-  while (image_count < total_images)
+  while (imageCount < total_images)
     common::Time::MSleep(10);
   common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
@@ -223,17 +223,17 @@ TEST_F(CameraSensor, MultiSenseLow)
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  image_count = 0;
+  imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &image_count, img,
+        boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
   timer.Start();
   // time how long it takes to get N images
   int total_images = 500;
-  while (image_count < total_images)
+  while (imageCount < total_images)
     common::Time::MSleep(10);
   common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
@@ -282,32 +282,34 @@ TEST_F(CameraSensor, CheckNoise)
   sensors::CameraSensorPtr camSensorNoisy =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
-  image_count = 0;
-  image_count_2 = 0;
+  imageCount = 0;
+  imageCount2 = 0;
   img = new unsigned char[width * height*3];
-  img_2 = new unsigned char[width * height*3];
+  img2 = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &image_count, img,
+        boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   event::ConnectionPtr c2 =
     camSensorNoisy->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &image_count_2, img_2,
+        boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
           _1, _2, _3, _4, _5));
 
   // Get some images
-  while(image_count < 10 || image_count_2 < 10)
+  while(imageCount < 10 || imageCount2 < 10)
     common::Time::MSleep(10);
 
   unsigned int diffMax=0, diffSum=0;
   double diffAvg=0.0;
-  this->ImageCompare(img, img_2, width, height, 3, 
+  this->ImageCompare(img, img2, width, height, 3, 
                      diffMax, diffSum, diffAvg);
   // We expect that there will be some non-zero difference between the two
   // images.
-  EXPECT_NE(diffSum, (unsigned int)0);
+  EXPECT_NE(diffSum, 0u);
   // We expect that the average difference will be well within 3-sigma.
   EXPECT_NEAR(diffAvg/255., noiseMean, 3*noiseStdDev);
+  delete[] img;
+  delete[] img2;
 }
 
 int main(int argc, char **argv)

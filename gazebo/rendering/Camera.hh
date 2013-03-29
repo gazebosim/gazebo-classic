@@ -681,7 +681,7 @@ namespace gazebo
       private: common::Time renderPeriod;
 
       /// \brief Which noise type we support
-      enum NoiseModelType
+      private: enum NoiseModelType
       {
         NONE,
         GAUSSIAN
