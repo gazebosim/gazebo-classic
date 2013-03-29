@@ -55,28 +55,28 @@ namespace rendering
 {
 // We'll create an instance of this class for each camera, to be used to inject
 // random values on each render call.
-class GaussianNoiseCompositorListener : 
-  public Ogre::CompositorInstance::Listener
+class GaussianNoiseCompositorListener
+  : public Ogre::CompositorInstance::Listener
 {
   /// \brief Constructor, setting mean and standard deviation.
-  public: GaussianNoiseCompositorListener(double _mean, double _stddev): 
+  public: GaussianNoiseCompositorListener(double _mean, double _stddev):
       mean(_mean), stddev(_stddev) {}
 
   /// \brief Callback that OGRE will invoke for us on each render call
-  public: virtual void notifyMaterialRender(unsigned int _pass_id, 
+  public: virtual void notifyMaterialRender(unsigned int _pass_id,
                                             Ogre::MaterialPtr & _mat)
   {
       // modify material here (wont alter the base material!), called for
       // every drawn geometry instance (i.e. compositor render_quad)
-      
+
       // Sample three values within the range [0,1.0] and set them for use in
-      // the fragment shader, which will interpret them as offsets from (0,0) 
+      // the fragment shader, which will interpret them as offsets from (0,0)
       // to use when computing pseudo-random values.
       Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
                             math::Rand::GetDblUniform(0.0, 1.0),
                             math::Rand::GetDblUniform(0.0, 1.0));
       // These calls are setting parameters that are declared in two places:
-      // 1. media/materials/scripts/gazebo.material, in 
+      // 1. media/materials/scripts/gazebo.material, in
       //    fragment_program Gazebo/GaussianCameraNoiseFS
       // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
       _mat->getTechnique(0)->getPass(_pass_id)->
@@ -96,8 +96,8 @@ class GaussianNoiseCompositorListener :
   /// shader.
   private: double stddev;
 };
-} // namespace rendering
-} // namespace gazebo
+}  // namespace rendering
+}  // namespace gazebo
 
 //////////////////////////////////////////////////
 Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
@@ -1260,9 +1260,9 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
     }
 
     // Noise
-    if(this->noiseActive)
+    if (this->noiseActive)
     {
-      switch(this->noiseType)
+      switch (this->noiseType)
       {
         case GAUSSIAN:
           this->gaussianNoiseInstance =

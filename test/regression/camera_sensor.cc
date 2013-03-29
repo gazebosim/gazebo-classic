@@ -296,12 +296,12 @@ TEST_F(CameraSensor, CheckNoise)
           _1, _2, _3, _4, _5));
 
   // Get some images
-  while(imageCount < 10 || imageCount2 < 10)
+  while (imageCount < 10 || imageCount2 < 10)
     common::Time::MSleep(10);
 
-  unsigned int diffMax=0, diffSum=0;
-  double diffAvg=0.0;
-  this->ImageCompare(img, img2, width, height, 3, 
+  unsigned int diffMax = 0, diffSum = 0;
+  double diffAvg = 0.0;
+  this->ImageCompare(img, img2, width, height, 3,
                      diffMax, diffSum, diffAvg);
   // We expect that there will be some non-zero difference between the two
   // images.
