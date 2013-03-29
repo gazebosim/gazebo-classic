@@ -159,8 +159,7 @@ void GLWidget::showEvent(QShowEvent *_event)
 
   if (this->userCamera)
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-        this->windowId,
-                                                    this->userCamera);
+        this->windowId, this->userCamera);
   this->setFocus();
 }
 

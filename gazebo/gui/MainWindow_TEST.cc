@@ -64,7 +64,7 @@ void MainWindow_TEST::Wireframe()
   if (!cam)
     return;
 
-  cam->EnableSaveFrame(true);
+  cam->SetCaptureData(true);
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
@@ -82,9 +82,9 @@ void MainWindow_TEST::Wireframe()
 
   // Calculate the average color.
   unsigned int sum = 0;
-  for (unsigned int y = 0; y < height; y++)
+  for (unsigned int y = 0; y < height; ++y)
   {
-    for (unsigned int x = 0; x < width*depth; x++)
+    for (unsigned int x = 0; x < width*depth; ++x)
     {
       unsigned int a = image[(y*width*depth)+x];
       sum += a;
@@ -106,9 +106,9 @@ void MainWindow_TEST::Wireframe()
   // Get the new image data, and calculate the new average color
   image = cam->GetImageData();
   sum = 0;
-  for (unsigned int y = 0; y < height; y++)
+  for (unsigned int y = 0; y < height; ++y)
   {
-    for (unsigned int x = 0; x < width*depth; x++)
+    for (unsigned int x = 0; x < width*depth; ++x)
     {
       unsigned int a = image[(y*width*depth)+x];
       sum += a;
