@@ -163,6 +163,9 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
 void
 dxJointScrew::getInfo2( dxJoint::Info2 *info )
 {
+    // Added by OSRF
+    info->erp = this->erp;
+
     // constrain the slider like DOFs
     {
       // pull out pos and R for both bodies. also get the `connection'

@@ -139,6 +139,9 @@ dxJointHinge::getInfo1( dxJoint::Info1 *info )
 void
 dxJointHinge::getInfo2( dxJoint::Info2 *info )
 {
+    // Added by OSRF
+    info->erp = this->erp;
+
     // set the three ball-and-socket rows
     setBall( this, info, anchor1, anchor2 );
 

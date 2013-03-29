@@ -127,6 +127,9 @@ dxJointHinge2::getAxisInfo(dVector3 ax1, dVector3 ax2, dVector3 axCross,
 void
 dxJointHinge2::getInfo2( dxJoint::Info2 *info )
 {
+    // Added by OSRF
+    info->erp = this->erp;
+
     // get information we need to set the hinge row
     dReal s, c;
     dVector3 q;

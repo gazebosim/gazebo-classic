@@ -220,6 +220,9 @@ dxJointPiston::getInfo1 ( dxJoint::Info1 *info )
 void
 dxJointPiston::getInfo2 ( dxJoint::Info2 *info )
 {
+    // Added by OSRF
+    info->erp = this->erp;
+
     const int s0 = 0;
     const int s1 = info->rowskip;
     const int s2 = 2 * s1, s3 = 3 * s1 /*, s4=4*s1*/;

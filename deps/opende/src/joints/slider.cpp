@@ -155,6 +155,9 @@ dxJointSlider::getInfo1 ( dxJoint::Info1 *info )
 void
 dxJointSlider::getInfo2 ( dxJoint::Info2 *info )
 {
+    // Added by OSRF
+    info->erp = this->erp;
+
     int i, s = info->rowskip;
     int s3 = 3 * s, s4 = 4 * s;
 
