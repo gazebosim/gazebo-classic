@@ -486,7 +486,7 @@ void BulletPhysics::Reset()
 
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
+void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
 {
   if (!this->dynamicsWorld)
     return;
@@ -642,7 +642,7 @@ void BulletPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
 //////////////////////////////////////////////////
 void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
-  PhysicsParam param;
+  BulletParam param;
 
   if (_key == "type")
     param = SOLVER_TYPE;
@@ -670,7 +670,7 @@ void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 }
 
 //////////////////////////////////////////////////
-boost::any BulletPhysics::GetParam(PhysicsParam _param) const
+boost::any BulletPhysics::GetParam(BulletParam _param) const
 {
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
@@ -731,7 +731,7 @@ boost::any BulletPhysics::GetParam(PhysicsParam _param) const
 //////////////////////////////////////////////////
 boost::any BulletPhysics::GetParam(const std::string &_key) const
 {
-  PhysicsParam param;
+  BulletParam param;
 
   if (_key == "type")
     param = SOLVER_TYPE;

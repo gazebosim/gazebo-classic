@@ -1042,7 +1042,7 @@ void ODEPhysics::SetSeed(uint32_t _seed)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
+void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
@@ -1198,7 +1198,7 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
 //////////////////////////////////////////////////
 void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
-  PhysicsParam param;
+  ODEParam param;
 
   if (_key == "type")
     param = SOLVER_TYPE;
@@ -1229,7 +1229,7 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 }
 
 //////////////////////////////////////////////////
-boost::any ODEPhysics::GetParam(PhysicsParam _param) const
+boost::any ODEPhysics::GetParam(ODEParam _param) const
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
@@ -1301,7 +1301,7 @@ boost::any ODEPhysics::GetParam(PhysicsParam _param) const
 //////////////////////////////////////////////////
 boost::any ODEPhysics::GetParam(const std::string &_key) const
 {
-  PhysicsParam param;
+  ODEParam param;
 
   if (_key == "type")
     param = SOLVER_TYPE;

@@ -60,6 +60,42 @@ namespace gazebo
     /// \brief ODE physics engine.
     class ODEPhysics : public PhysicsEngine
     {
+
+      /// \enum ODEParam
+      /// \brief ODE Physics paramerter types.
+      public: enum ODEParam
+      {
+        /// \brief Solve type
+        SOLVER_TYPE,
+
+        /// \brief Constraint force mixing
+        GLOBAL_CFM,
+
+        /// \brief Error reduction parameter
+        GLOBAL_ERP,
+
+        /// \brief Number of iterations
+        SOR_PRECON_ITERS,
+
+        /// \brief Number of iterations
+        SOR_ITERS,
+
+        /// \brief SOR over-relaxation parameter
+        SOR,
+
+        /// \brief Max correcting velocity
+        CONTACT_MAX_CORRECTING_VEL,
+
+        /// \brief Surface layer depth
+        CONTACT_SURFACE_LAYER,
+
+        /// \brief Maximum number of contacts
+        MAX_CONTACTS,
+
+        /// \brief Minimum step size
+        MIN_STEP_SIZE
+      };
+
       /// \brief Constructor.
       /// \param[in] _world The World that uses this physics engine.
       public: ODEPhysics(WorldPtr _world);
@@ -164,8 +200,10 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
 
-      /// Documentation inherited
-      public: virtual void SetParam(PhysicsParam _param,
+      /// \brief Set a parameter of the bullet physics engine
+      /// \param[in] _param A parameter listed in the ODEParam enum
+      /// \param[in] _value The value to set to
+      public: virtual void SetParam(ODEParam _param,
                   const boost::any &_value);
 
       /// Documentation inherited
@@ -175,8 +213,10 @@ namespace gazebo
       /// Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
 
-      /// Documentation inherited
-      public: virtual boost::any GetParam(PhysicsParam _attr) const;
+      /// \brief Get an parameter of the physics engine
+      /// \param[in] _param A parameter listed in the ODEParam enum
+      /// \return The value of the parameter
+      public: virtual boost::any GetParam(ODEParam _param) const;
 
       /// \brief Return the world space id.
       /// \return The space id for the world.

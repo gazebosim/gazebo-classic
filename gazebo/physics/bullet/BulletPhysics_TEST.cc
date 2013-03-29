@@ -63,31 +63,31 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   double contactSurfaceLayer = 0.02;
 
   // test setting/getting physics engine params
-  bulletPhysics->SetParam(PhysicsEngine::SOLVER_TYPE, type);
-  bulletPhysics->SetParam(PhysicsEngine::SOR_ITERS, iters);
-  bulletPhysics->SetParam(PhysicsEngine::SOR, sor);
-  bulletPhysics->SetParam(PhysicsEngine::GLOBAL_CFM, cfm);
-  bulletPhysics->SetParam(PhysicsEngine::GLOBAL_ERP, erp);
-  bulletPhysics->SetParam(PhysicsEngine::CONTACT_SURFACE_LAYER,
+  bulletPhysics->SetParam(BulletPhysics::SOLVER_TYPE, type);
+  bulletPhysics->SetParam(BulletPhysics::SOR_ITERS, iters);
+  bulletPhysics->SetParam(BulletPhysics::SOR, sor);
+  bulletPhysics->SetParam(BulletPhysics::GLOBAL_CFM, cfm);
+  bulletPhysics->SetParam(BulletPhysics::GLOBAL_ERP, erp);
+  bulletPhysics->SetParam(BulletPhysics::CONTACT_SURFACE_LAYER,
       contactSurfaceLayer);
 
   boost::any value;
-  value = bulletPhysics->GetParam(PhysicsEngine::SOLVER_TYPE);
+  value = bulletPhysics->GetParam(BulletPhysics::SOLVER_TYPE);
   std::string typeRet = boost::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
-  value = bulletPhysics->GetParam(PhysicsEngine::SOR_ITERS);
+  value = bulletPhysics->GetParam(BulletPhysics::SOR_ITERS);
   int itersRet = boost::any_cast<int>(value);
   EXPECT_EQ(iters, itersRet);
-  value = bulletPhysics->GetParam(PhysicsEngine::SOR);
+  value = bulletPhysics->GetParam(BulletPhysics::SOR);
   double sorRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(sor, sorRet);
-  value = bulletPhysics->GetParam(PhysicsEngine::GLOBAL_CFM);
+  value = bulletPhysics->GetParam(BulletPhysics::GLOBAL_CFM);
   double cfmRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(cfm, cfmRet);
-  value = bulletPhysics->GetParam(PhysicsEngine::GLOBAL_ERP);
+  value = bulletPhysics->GetParam(BulletPhysics::GLOBAL_ERP);
   double erpRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(erp, erpRet);
-  value = bulletPhysics->GetParam(PhysicsEngine::CONTACT_SURFACE_LAYER);
+  value = bulletPhysics->GetParam(BulletPhysics::CONTACT_SURFACE_LAYER);
   double contactSurfaceLayerRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
 
@@ -99,30 +99,30 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   erp = 0.22;
   contactSurfaceLayer = 0.03;
 
-  bulletPhysics->SetParam(PhysicsEngine::SOLVER_TYPE, type);
-  bulletPhysics->SetParam(PhysicsEngine::SOR_ITERS, iters);
-  bulletPhysics->SetParam(PhysicsEngine::SOR, sor);
-  bulletPhysics->SetParam(PhysicsEngine::GLOBAL_CFM, cfm);
-  bulletPhysics->SetParam(PhysicsEngine::GLOBAL_ERP, erp);
-  bulletPhysics->SetParam(PhysicsEngine::CONTACT_SURFACE_LAYER,
+  bulletPhysics->SetParam("type", type);
+  bulletPhysics->SetParam("iters", iters);
+  bulletPhysics->SetParam("sor", sor);
+  bulletPhysics->SetParam("cfm", cfm);
+  bulletPhysics->SetParam("erp", erp);
+  bulletPhysics->SetParam("contact_surface_layer",
       contactSurfaceLayer);
 
-  value = bulletPhysics->GetParam(PhysicsEngine::SOLVER_TYPE);
+  value = bulletPhysics->GetParam("type");
   typeRet = boost::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
-  value = bulletPhysics->GetParam(PhysicsEngine::SOR_ITERS);
+  value = bulletPhysics->GetParam("iters");
   itersRet = boost::any_cast<int>(value);
   EXPECT_EQ(iters, itersRet);
-  value = bulletPhysics->GetParam(PhysicsEngine::SOR);
+  value = bulletPhysics->GetParam("sor");
   sorRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(sor, sorRet);
-  value = bulletPhysics->GetParam(PhysicsEngine::GLOBAL_CFM);
+  value = bulletPhysics->GetParam("cfm");
   cfmRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(cfm, cfmRet);
-  value = bulletPhysics->GetParam(PhysicsEngine::GLOBAL_ERP);
+  value = bulletPhysics->GetParam("erp");
   erpRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(erp, erpRet);
-  value = bulletPhysics->GetParam(PhysicsEngine::CONTACT_SURFACE_LAYER);
+  value = bulletPhysics->GetParam("contact_surface_layer");
   contactSurfaceLayerRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
 }
