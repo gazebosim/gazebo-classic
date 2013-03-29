@@ -33,8 +33,9 @@ dxJointBall::dxJointBall( dxWorld *w ) :
 {
     dSetZero( anchor1, 4 );
     dSetZero( anchor2, 4 );
-    erp = world->global_erp;
-    cfm = world->global_cfm;
+    // These are now set in dxJoint constructor
+    // erp = world->global_erp;
+    // cfm = world->global_cfm;
 }
 
 

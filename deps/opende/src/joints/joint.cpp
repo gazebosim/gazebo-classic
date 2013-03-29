@@ -61,6 +61,10 @@ dxJoint::dxJoint( dxWorld *w ) :
     // joint damping
     use_damping = false;
     damping_coefficient = 0.0;
+
+    // Moved here by OSRF
+    erp = world->global_erp;
+    cfm = world->global_cfm;
 }
 
 dxJoint::~dxJoint()
