@@ -117,7 +117,7 @@ namespace gazebo
       /// \brief Nano sleep
       /// \param[in] _time is a Time
       /// \return Time actually slept
-      public: static Time NSleep(Time _time) GAZEBO_DEPRECATED;
+      public: static Time NSleep(Time _time) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Assignment operator
       /// \param[in] _tv the new time
