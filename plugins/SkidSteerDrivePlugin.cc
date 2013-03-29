@@ -34,7 +34,7 @@ SkidSteerDrivePlugin::SkidSteerDrivePlugin()
 }
 
 /////////////////////////////////////////////////
-int SkidSteerDrivePlugin::RegisterJoint(int _index, const std::string _name)
+int SkidSteerDrivePlugin::RegisterJoint(int _index, const std::string &_name)
 {
   // Bounds checking on index
   if (_index < 0 or _index >= NUMBER_OF_WHEELS)
