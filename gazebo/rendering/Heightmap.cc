@@ -864,12 +864,11 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
 {
   bool compression = false;
 
+  _outStream << "#version 130\n\n";
+
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
   compression = _terrain->_getUseVertexCompression() &&
                 _tt != RENDER_COMPOSITE_MAP;
-#endif
-
-  _outStream << "#version 130\n\n";
 
   if (compression)
   {
@@ -879,6 +878,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
                << "in vec4 uv0;\n";
   }
   else
+#endif
   {
     // The parameter "in vec4 vertex;" is automatically bound by OGRE.
     // The parameter "in vec4 uv0'" is automatically bound by OGRE.
