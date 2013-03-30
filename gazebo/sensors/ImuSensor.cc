@@ -103,7 +103,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         // negative).
         if (math::Rand::GetDblUniform() < 0.5)
           this->rateBias = -this->rateBias;
-        gzlog << "applying Gaussian noise model with mean " <<
+        gzlog << "applying Gaussian noise model to rate with mean " <<
           this->rateNoiseMean << " and stddev " << this->rateNoiseStdDev <<
           ", bias " << this->rateBias << std::endl;
       }
@@ -122,7 +122,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         // negative).
         if (math::Rand::GetDblUniform() < 0.5)
           this->accelBias = -this->accelBias;
-        gzlog << "applying Gaussian noise model with mean " <<
+        gzlog << "applying Gaussian noise model to accel with mean " <<
           this->accelNoiseMean << " and stddev " << this->accelNoiseStdDev <<
           ", bias " << this->accelBias << std::endl;
       }
