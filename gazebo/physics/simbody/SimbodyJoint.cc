@@ -69,6 +69,8 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
+      /// \TODO: switch to GetElement so default values apply
+      /// \TODO: check all physics engines
       if (dynamicsElem->HasElement("damping"))
       {
         this->dampingCoefficient = dynamicsElem->GetValueDouble("damping");
