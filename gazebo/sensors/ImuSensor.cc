@@ -96,8 +96,11 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         this->rateNoiseStdDev = rateElem->GetValueDouble("stddev");
         double rateBiasMean = rateElem->GetValueDouble("bias_mean");
         double rateBiasStddev = rateElem->GetValueDouble("bias_stddev");
-        // Sample the bias the we'll use later
+        // Sample the bias that we'll use later
         this->rateBias = math::Rand::GetDblNormal(rateBiasMean, rateBiasStddev);
+        // With equal probability, we pick a negative bias (by convention,
+        // rateBiasMean should be positive, though it would work fine if
+        // negative).
         if (math::Rand::GetDblUniform() < 0.5)
           this->rateBias = -this->rateBias;
         gzlog << "applying Gaussian noise model with mean " <<
@@ -111,9 +114,12 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         this->accelNoiseStdDev = accelElem->GetValueDouble("stddev");
         double accelBiasMean = accelElem->GetValueDouble("bias_mean");
         double accelBiasStddev = accelElem->GetValueDouble("bias_stddev");
-        // Sample the bias the we'll use later
+        // Sample the bias that we'll use later
         this->accelBias = math::Rand::GetDblNormal(accelBiasMean,
                                                    accelBiasStddev);
+        // With equal probability, we pick a negative bias (by convention,
+        // accelBiasMean should be positive, though it would work fine if
+        // negative).
         if (math::Rand::GetDblUniform() < 0.5)
           this->accelBias = -this->accelBias;
         gzlog << "applying Gaussian noise model with mean " <<
