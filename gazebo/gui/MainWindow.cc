@@ -455,6 +455,7 @@ void MainWindow::Play()
 
   g_pauseAct->setVisible(true);
   g_playAct->setVisible(false);
+  g_stepAct->setEnabled(false);
   this->worldControlPub->Publish(msg);
 }
 
@@ -466,6 +467,7 @@ void MainWindow::Pause()
 
   g_pauseAct->setVisible(false);
   g_playAct->setVisible(true);
+  g_stepAct->setEnabled(true);
   this->worldControlPub->Publish(msg);
 }
 
@@ -1346,11 +1348,13 @@ void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
   {
     g_pauseAct->setVisible(false);
     g_playAct->setVisible(true);
+    g_stepAct->setEnabled(true);
   }
   else if (!_msg->paused() && !g_playAct->isVisible())
   {
     g_pauseAct->setVisible(true);
     g_playAct->setVisible(false);
+    g_stepAct->setEnabled(false);
   }
 }
 
