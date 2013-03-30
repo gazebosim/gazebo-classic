@@ -111,15 +111,15 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
   // or negative
   d1 = fabs(rates.x - (rateNoiseMean + rateBiasMean));
   d2 = fabs(rates.x - (rateNoiseMean - rateBiasMean));
-  EXPECT_NEAR(0.0, std::min(d1,d2),
+  EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
   d1 = fabs(rates.y - (rateNoiseMean + rateBiasMean));
   d2 = fabs(rates.y - (rateNoiseMean - rateBiasMean));
-  EXPECT_NEAR(0.0, std::min(d1,d2),
+  EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
   d1 = fabs(rates.z - (rateNoiseMean + rateBiasMean));
   d2 = fabs(rates.z - (rateNoiseMean - rateBiasMean));
-  EXPECT_NEAR(0.0, std::min(d1,d2),
+  EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
 
   math::Vector3 accels = imu->GetLinearAcceleration();
@@ -127,15 +127,15 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
   // or negative
   d1 = fabs(accels.x - (accelNoiseMean + accelBiasMean));
   d2 = fabs(accels.x - (accelNoiseMean - accelBiasMean));
-  EXPECT_NEAR(0.0, std::min(d1,d2),
+  EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
   d1 = fabs(accels.y - (accelNoiseMean + accelBiasMean));
   d2 = fabs(accels.y - (accelNoiseMean - accelBiasMean));
-  EXPECT_NEAR(0.0, std::min(d1,d2),
+  EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
   d1 = fabs(accels.z - (accelNoiseMean + accelBiasMean));
   d2 = fabs(accels.z - (accelNoiseMean - accelBiasMean));
-  EXPECT_NEAR(GRAVITY, std::min(d1,d2),
+  EXPECT_NEAR(GRAVITY, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
 }
 
@@ -189,15 +189,15 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
   // or negative
   d1 = fabs(rates.x - (rateNoiseMean + rateBiasMean));
   d2 = fabs(rates.x - (rateNoiseMean - rateBiasMean));
-  EXPECT_NEAR(0.0, std::min(d1,d2),
+  EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
   d1 = fabs(rates.y - (rateNoiseMean + rateBiasMean));
   d2 = fabs(rates.y - (rateNoiseMean - rateBiasMean));
-  EXPECT_NEAR(0.0, std::min(d1,d2),
+  EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
   d1 = fabs(rates.z - (rateNoiseMean + rateBiasMean));
   d2 = fabs(rates.z - (rateNoiseMean - rateBiasMean));
-  EXPECT_NEAR(0.0, std::min(d1,d2),
+  EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
 
   math::Vector3 accels = imu->GetLinearAcceleration();
@@ -205,15 +205,15 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
   // or negative
   d1 = fabs(accels.x - (accelNoiseMean + accelBiasMean));
   d2 = fabs(accels.x - (accelNoiseMean - accelBiasMean));
-  EXPECT_NEAR(0.0, std::min(d1,d2),
+  EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
   d1 = fabs(accels.y - (accelNoiseMean + accelBiasMean));
   d2 = fabs(accels.y - (accelNoiseMean - accelBiasMean));
-  EXPECT_NEAR(0.0, std::min(d1,d2),
+  EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
   d1 = fabs(accels.z - (accelNoiseMean + accelBiasMean));
   d2 = fabs(accels.z - (accelNoiseMean - accelBiasMean));
-  EXPECT_NEAR(GRAVITY, std::min(d1,d2),
+  EXPECT_NEAR(GRAVITY, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
 }
 
