@@ -23,6 +23,8 @@
 using namespace gazebo;
 class PhysicsTest : public ServerFixture
 {
+  public: void EmptyWorld_JS(std::string _worldFile);
+
   public: void EmptyWorld(const std::string &_physicsEngine);
   public: void SpawnDrop(const std::string &_physicsEngine);
   public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
@@ -30,6 +32,29 @@ class PhysicsTest : public ServerFixture
   public: void SimplePendulum(const std::string &_physicsEngine);
   public: void CollisionFiltering(const std::string &_physicsEngine);
 };
+
+void PhysicsTest::EmptyWorld_JS(std::string _worldFile)
+{
+  // Load an empty world
+  Load(_worldFile, true);
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  // simulate a couple seconds
+  world->StepWorld(2000);
+  double t = world->GetSimTime().Double();
+  // verify that time moves forward
+  EXPECT_GT(t, 0);
+
+  Unload();
+}
+
+#ifdef HAVE_RTQL8
+TEST_F(PhysicsTest, RTQL8_FIRST_TEST)
+{
+  EmptyWorld("worlds/rtql8/falling_box.world");
+}
+#endif // HAVE_RTQL8
 
 ////////////////////////////////////////////////////////////////////////
 // EmptyWorld:
