@@ -475,6 +475,11 @@ namespace gazebo
       /// \brief joint dampingCoefficient
       protected: double dampingCoefficient;
 
+      public: double GetDampingCoefficient()
+              {
+                return this->dampingCoefficient;
+              }
+
       /// \brief Angle used when the joint is paret of a static model.
       private: math::Angle staticAngle;
 

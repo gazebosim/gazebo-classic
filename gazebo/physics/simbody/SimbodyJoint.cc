@@ -57,8 +57,24 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   // \TODO: clean up
   if (_sdf->HasElement("physics") &&
     _sdf->GetElement("physics")->HasElement("simbody"))
+  {
     this->mustBreakLoopHere = _sdf->GetElement("physics")->
       GetElement("simbody")->GetValueBool("must_be_loop_joint");
+  }
+
+  if (this->sdf->HasElement("axis"))
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    if (axisElem->HasElement("dynamics"))
+    {
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+
+      if (dynamicsElem->HasElement("damping"))
+      {
+        this->dampingCoefficient = dynamicsElem->GetValueDouble("damping");
+      }
+    }
+  }
 
   // Read old style
   //    <pose>pose on child</pose>

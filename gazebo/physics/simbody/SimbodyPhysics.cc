@@ -614,7 +614,16 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             double high = gzJoint->GetUpperLimit(0u).Radian();
             gzJoint->limitForce.reset(
               new Force::MobilityLinearStop(this->forces, mobod,
-              SimTK::MobilizerQIndex(0), 1.0e8, 10.0, low, high));
+              SimTK::MobilizerQIndex(0), 1.0e7, 50.0, low, high));
+
+            if (gzJoint->GetDampingCoefficient() > 0.0)
+            {
+              gzerr << "SimbodyPhysics SetDamping ("
+                    << gzJoint->GetDampingCoefficient()
+                    << ")\n";
+              Force::MobilityLinearDamper(this->forces,mobod,0,
+                                         gzJoint->GetDampingCoefficient());
+            }
 
             #ifdef ADD_JOINT_SPRINGS
             // KLUDGE add spring (stiffness proportional to mass)
@@ -774,8 +783,8 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
   // use stiffness of 1e8 and dissipation of 1000.0 to approximate inelastic
   // collision. but 1e6 and 10 seems sufficient when TransitionVelocity is
   // reduced from 0.1 to 0.01
-  SimTK::ContactMaterial material(1e6,   // stiffness
-                                  10.0,  // dissipation
+  SimTK::ContactMaterial material(1e8,   // stiffness
+                                  100.0,  // dissipation
                                   1.0,   // mu_static
                                   1.0,   // mu_dynamic
                                   0.5);  // mu_viscous
@@ -867,7 +876,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
           (*ci)->GetShape()))->GetSize())/2;
 
         // const int resolution = 1;  // number times to chop the longest side.
-        const int resolution = 2 * (int)(max(hsz)/min(hsz) + 0.5);
+        const int resolution = 10 * (int)(max(hsz)/min(hsz) + 0.5);
         const PolygonalMesh mesh = PolygonalMesh::
             createBrickMesh(hsz, resolution);
         const ContactGeometry::TriangleMesh triMesh(mesh);

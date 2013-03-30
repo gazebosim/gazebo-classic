@@ -130,6 +130,7 @@ namespace gazebo
 
       /// \brief: for enforcing joint stops
       public: boost::shared_ptr<SimTK::Force::MobilityLinearStop> limitForce;
+      // public: SimTK::Force::MobilityLinearStop limitForce;
 
       // isValid() if we used a mobilizer
       public: SimTK::MobilizedBody mobod;

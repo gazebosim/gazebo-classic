@@ -75,9 +75,6 @@ namespace gazebo
       /// \brief Set the torque of a joint.
       public: void SetForce(int _index, double _torque);
 
-      /// \brief Get the torque of a joint.
-      public: virtual double GetForce(int _index);
-
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 

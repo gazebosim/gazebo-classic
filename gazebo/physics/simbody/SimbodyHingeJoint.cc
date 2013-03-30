@@ -110,19 +110,12 @@ double SimbodyHingeJoint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetForce(int _index, double _torque)
 {
-  gzerr << "Setting Joint Force " << _torque << "\n";
+  SimbodyJoint::SetForce(_index, _torque);
 
   if (_index < this->GetAngleCount())
     this->simbodyPhysics->discreteForces.setOneMobilityForce(
       this->simbodyPhysics->integ->updAdvancedState(),
       this->mobod, SimTK::MobilizerUIndex(_index), _torque);
-}
-
-//////////////////////////////////////////////////
-double SimbodyHingeJoint::GetForce(int /*_index*/)
-{
-  gzerr << "Not implemented...\n";
-  return 0;
 }
 
 //////////////////////////////////////////////////

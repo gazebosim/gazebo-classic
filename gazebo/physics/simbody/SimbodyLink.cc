@@ -103,15 +103,16 @@ void SimbodyLink::Update()
 //////////////////////////////////////////////////
 void SimbodyLink::SetGravityMode(bool _mode)
 {
+  this->gravityMode = _mode;
   if (this->physicsInitialized)
   {
+    gzerr << "success physics SetGravityMode\n";
     this->simbodyPhysics->gravity.setBodyIsExcluded(
       this->simbodyPhysics->integ->updAdvancedState(),
-      this->masterMobod, _mode);
+      this->masterMobod, !_mode);
   }
   else
   {
-    this->gravityMode = _mode;
     gzdbg << "SetGravityMode, but physics not initialized, caching\n";
   }
 }
@@ -227,7 +228,6 @@ math::Vector3 SimbodyLink::GetWorldAngularVel() const
 //////////////////////////////////////////////////
 void SimbodyLink::SetForce(const math::Vector3 &_force)
 {
-  gzerr << "setting force " << _force << "\n";
   SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force));
 
   this->simbodyPhysics->discreteForces.setOneBodyForce(
