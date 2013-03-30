@@ -366,6 +366,8 @@ void dJointSetHingeParam( dJointID j, int parameter, dReal value )
         joint->erp = value;
       case dParamCFM:
         joint->cfm = value;
+        // dParamCFM label is also used for normal_cfm
+        joint->limot.set( parameter, value );
       default:
         joint->limot.set( parameter, value );
     }

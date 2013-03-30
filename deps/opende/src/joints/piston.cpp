@@ -576,8 +576,10 @@ void dJointSetPistonParam ( dJointID j, int parameter, dReal value )
           joint->erp = value;
         case dParamCFM:
           joint->cfm = value;
+          // dParamCFM label is also used for normal_cfm
+          joint->limotP.set( parameter, value );
         default:
-          joint->limotP.set ( parameter, value );
+          joint->limotP.set( parameter, value );
       }
     }
 }
