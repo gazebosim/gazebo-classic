@@ -2242,7 +2242,8 @@ void URDF2Gazebo::ReduceGazeboExtensionContactSensorFrameReplace(
           contact->RemoveChild(collision);
           TiXmlElement* collisionNameKey = new TiXmlElement("collision");
           std::ostringstream collisionNameStream;
-          collisionNameStream << newLinkName << "_collision_" << linkName;
+          collisionNameStream << newLinkName << this->collisionExt
+                              << "_" << linkName;
           TiXmlText* collisionNameTxt = new TiXmlText(
             collisionNameStream.str());
           collisionNameKey->LinkEndChild(collisionNameTxt);
