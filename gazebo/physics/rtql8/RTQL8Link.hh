@@ -150,7 +150,7 @@ namespace gazebo
       public: void updateDirtyPoseFromRTQL8Transformation();
 
       /// \brief
-      public: rtql8::kinematics::BodyNode* GetBodyNode() const {return rtql8BodyNode;}
+      public: rtql8::dynamics::BodyNodeDynamics* GetBodyNode() const {return rtql8BodyNode;}
 
       /// \brief
       public: RTQL8PhysicsPtr GetRTQL8Physics(void) const;

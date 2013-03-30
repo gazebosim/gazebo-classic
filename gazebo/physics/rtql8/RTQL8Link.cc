@@ -85,20 +85,20 @@ void RTQL8Link::Init()
       Eigen::Vector3d eigenSize(length, 0.0, 0.0);
       rtql8::kinematics::ShapeEllipsoid* shape
           = new rtql8::kinematics::ShapeEllipsoid(eigenSize, 1);
-      this->rtql8BodyNode->setShape(shape);
+      this->rtql8BodyNode->setVisualShape(shape);
       gzerr << "Not implemented yet...";
     }
     else if (geomType == "plane")
     {
       // TODO: rtql8 does not support plane!!!
-      math::Vector3 normal
-          = geometryElem->GetFirstElement()->GetValueVector3("normal");
+//      math::Vector3 normal
+//          = geometryElem->GetFirstElement()->GetValueVector3("normal");
       math::Vector2d size
           = geometryElem->GetFirstElement()->GetValueVector2d("size");
       Eigen::Vector3d eigenSize(size.x, size.y, 0.001);
       rtql8::kinematics::ShapeCube* shape
           = new rtql8::kinematics::ShapeCube(eigenSize, 1);
-      this->rtql8BodyNode->setShape(shape);
+      this->rtql8BodyNode->setVisualShape(shape);
       gzerr << "Not implemented yet...";
     }
 
@@ -109,7 +109,7 @@ void RTQL8Link::Init()
       Eigen::Vector3d eigenSize(mathSize.x, mathSize.y, mathSize.z);
       rtql8::kinematics::ShapeCube* shape
           = new rtql8::kinematics::ShapeCube(eigenSize, 1);
-      this->rtql8BodyNode->setShape(shape);
+      this->rtql8BodyNode->setVisualShape(shape);
     }
     else if (geomType == "cylinder")
     {
@@ -120,7 +120,7 @@ void RTQL8Link::Init()
       //              = new rtql8::kinematics::ShapeCylinder(radius, length);
       rtql8::kinematics::ShapeCylinder* shape
           = new rtql8::kinematics::ShapeCylinder(eigenSize, 1);
-      this->rtql8BodyNode->setShape(shape);
+      this->rtql8BodyNode->setVisualShape(shape);
     }
     else if (geomType == "multiray")
       gzerr << "Not implemented yet...";

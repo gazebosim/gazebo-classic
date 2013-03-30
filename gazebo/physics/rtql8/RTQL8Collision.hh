@@ -43,6 +43,9 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
+      public: virtual void Init();
+
+      // Documentation inherited.
       public: virtual void Fini();
 
       /// \brief Set the encapsulated collsion object.
