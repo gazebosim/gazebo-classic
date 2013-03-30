@@ -570,7 +570,15 @@ void dJointSetPistonParam ( dJointID j, int parameter, dReal value )
     }
     else
     {
-        joint->limotP.set ( parameter, value );
+      switch (parameter)
+      {
+        case dParamERP:
+          joint->erp = value;
+        case dParamCFM:
+          joint->cfm = value;
+        default:
+          joint->limotP.set ( parameter, value );
+      }
     }
 }
 
@@ -587,7 +595,15 @@ dReal dJointGetPistonParam ( dJointID j, int parameter )
     }
     else
     {
-        return joint->limotP.get ( parameter );
+      switch (parameter)
+      {
+        case dParamERP:
+          return joint->erp;
+        case dParamCFM:
+          return joint->cfm;
+        default:
+          return joint->limotP.get( parameter );
+      }
     }
 }
 

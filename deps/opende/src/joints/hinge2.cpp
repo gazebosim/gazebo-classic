@@ -277,9 +277,19 @@ void dJointSetHinge2Param( dJointID j, int parameter, dReal value )
     }
     else
     {
-        if ( parameter == dParamSuspensionERP ) joint->susp_erp = value;
-        else if ( parameter == dParamSuspensionCFM ) joint->susp_cfm = value;
-        else joint->limot1.set( parameter, value );
+        switch (parameter)
+        {
+          case dParamERP:
+            joint->erp = value;
+          case dParamCFM:
+            joint->cfm = value;
+          case dParamSuspensionERP:
+            joint->susp_erp = value;
+          case dParamSuspensionCFM:
+            joint->susp_cfm = value;
+          default:
+            joint->limot1.set( parameter, value );
+        }
     }
 }
 
@@ -347,9 +357,19 @@ dReal dJointGetHinge2Param( dJointID j, int parameter )
     }
     else
     {
-        if ( parameter == dParamSuspensionERP ) return joint->susp_erp;
-        else if ( parameter == dParamSuspensionCFM ) return joint->susp_cfm;
-        else return joint->limot1.get( parameter );
+        switch (parameter)
+        {
+          case dParamERP:
+            return joint->erp;
+          case dParamCFM:
+            return joint->cfm;
+          case dParamSuspensionERP:
+            return joint->susp_erp;
+          case dParamSuspensionCFM:
+            return joint->susp_cfm;
+          default:
+            return joint->limot1.get( parameter );
+        }
     }
 }
 

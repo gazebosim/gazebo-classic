@@ -311,7 +311,15 @@ void dJointSetSliderParam ( dJointID j, int parameter, dReal value )
     dxJointSlider* joint = ( dxJointSlider* ) j;
     dUASSERT ( joint, "bad joint argument" );
     checktype ( joint, Slider );
-    joint->limot.set ( parameter, value );
+    switch (parameter)
+    {
+      case dParamERP:
+        joint->erp = value;
+      case dParamCFM:
+        joint->cfm = value;
+      default:
+        joint->limot.set ( parameter, value );
+    }
 }
 
 
@@ -320,7 +328,15 @@ dReal dJointGetSliderParam ( dJointID j, int parameter )
     dxJointSlider* joint = ( dxJointSlider* ) j;
     dUASSERT ( joint, "bad joint argument" );
     checktype ( joint, Slider );
-    return joint->limot.get ( parameter );
+    switch (parameter)
+    {
+      case dParamERP:
+        return joint->erp;
+      case dParamCFM:
+        return joint->cfm;
+      default:
+        return joint->limot.get( parameter );
+    }
 }
 
 

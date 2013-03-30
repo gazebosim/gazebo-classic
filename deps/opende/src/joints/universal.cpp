@@ -628,7 +628,15 @@ void dJointSetUniversalParam( dJointID j, int parameter, dReal value )
     }
     else
     {
-        joint->limot1.set( parameter, value );
+      switch (parameter)
+      {
+        case dParamERP:
+          joint->erp = value;
+        case dParamCFM:
+          joint->cfm = value;
+        default:
+          joint->limot1.set ( parameter, value );
+      }
     }
 }
 
@@ -644,7 +652,15 @@ dReal dJointGetUniversalParam( dJointID j, int parameter )
     }
     else
     {
-        return joint->limot1.get( parameter );
+      switch (parameter)
+      {
+        case dParamERP:
+          return joint->erp;
+        case dParamCFM:
+          return joint->cfm;
+        default:
+          return joint->limot1.get( parameter );
+      }
     }
 }
 

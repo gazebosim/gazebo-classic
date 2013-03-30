@@ -360,7 +360,15 @@ void dJointSetHingeParam( dJointID j, int parameter, dReal value )
     dxJointHinge* joint = ( dxJointHinge* )j;
     dUASSERT( joint, "bad joint argument" );
     checktype( joint, Hinge );
-    joint->limot.set( parameter, value );
+    switch (parameter)
+    {
+      case dParamERP:
+        joint->erp = value;
+      case dParamCFM:
+        joint->cfm = value;
+      default:
+        joint->limot.set( parameter, value );
+    }
 }
 
 
@@ -369,7 +377,15 @@ dReal dJointGetHingeParam( dJointID j, int parameter )
     dxJointHinge* joint = ( dxJointHinge* )j;
     dUASSERT( joint, "bad joint argument" );
     checktype( joint, Hinge );
-    return joint->limot.get( parameter );
+    switch (parameter)
+    {
+      case dParamERP:
+        return joint->erp;
+      case dParamCFM:
+        return joint->cfm;
+      default:
+        return joint->limot.get( parameter );
+    }
 }
 
 

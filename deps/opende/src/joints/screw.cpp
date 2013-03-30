@@ -541,7 +541,15 @@ void dJointSetScrewParam( dJointID j, int parameter, dReal value )
     dxJointScrew* joint = ( dxJointScrew* )j;
     dUASSERT( joint, "bad joint argument" );
     checktype( joint, Screw );
-    joint->limot.set( parameter, value );
+    switch (parameter)
+    {
+      case dParamERP:
+        joint->erp = value;
+      case dParamCFM:
+        joint->cfm = value;
+      default:
+        joint->limot.set ( parameter, value );
+    }
 }
 
 
@@ -550,7 +558,15 @@ dReal dJointGetScrewParam( dJointID j, int parameter )
     dxJointScrew* joint = ( dxJointScrew* )j;
     dUASSERT( joint, "bad joint argument" );
     checktype( joint, Screw );
-    return joint->limot.get( parameter );
+    switch (parameter)
+    {
+      case dParamERP:
+        return joint->erp;
+      case dParamCFM:
+        return joint->cfm;
+      default:
+        return joint->limot.get( parameter );
+    }
 }
 
 
