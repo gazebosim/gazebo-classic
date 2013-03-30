@@ -47,7 +47,7 @@ void RTQL8Model::Load(sdf::ElementPtr _sdf)
   rtql8SkeletonDynamics = new rtql8::dynamics::SkeletonDynamics();
 
   // add skeleton to world
-  this->GetRTQL8World()->addSkeleton(rtql8SkeletonDynamics);
+  //this->GetRTQL8World()->addSkeleton(rtql8SkeletonDynamics);
 
   Model::Load(_sdf);
 
@@ -135,7 +135,12 @@ void RTQL8Model::Init()
     this->GetSkeletonDynamics()->addTransform(trfmRotateCanonical);
   }
 
+  // init the kinematics and dynamics
   rtql8SkeletonDynamics->initSkel();
+  rtql8SkeletonDynamics->initDynamics();
+
+  // add skeleton to world
+  this->GetRTQL8World()->addSkeleton(rtql8SkeletonDynamics);
 }
 
 

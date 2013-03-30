@@ -127,7 +127,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   SpawnSphere("test_sphere", modelPos["test_sphere"], math::Vector3::Zero);
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
       math::Vector3::Zero);
-  SpawnEmptyLink("test_empty", modelPos["test_empty"], math::Vector3::Zero);
+  //SpawnEmptyLink("test_empty", modelPos["test_empty"], math::Vector3::Zero);
   std::string trimeshPath =
       "file://media/models/cube_20k/meshes/cube_20k.stl";
   // SpawnTrimesh("test_trimesh", trimeshPath, math::Vector3(0.5, 0.5, 0.5),
