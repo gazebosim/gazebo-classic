@@ -67,7 +67,7 @@ void BulletHeightmapShape::Init()
   this->heightFieldShape->setLocalScaling(localScaling);
 
   BulletCollisionPtr bParent;
-  bParent = boost::shared_dynamic_cast<BulletCollision>(this->collisionParent);
+  bParent = boost::dynamic_pointer_cast<BulletCollision>(this->collisionParent);
 
   bParent->SetCollisionShape(this->heightFieldShape, false);
 

@@ -78,7 +78,7 @@ void DiffDrivePlugin::Init()
   this->wheelSeparation = this->leftJoint->GetAnchor(0).Distance(
       this->rightJoint->GetAnchor(0));
 
-  physics::EntityPtr parent = boost::shared_dynamic_cast<physics::Entity>(
+  physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->leftJoint->GetChild());
 
   math::Box bb = parent->GetBoundingBox();
