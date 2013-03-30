@@ -140,13 +140,19 @@ void
 dxJointHinge::getInfo2( dxJoint::Info2 *info )
 {
     // Added by OSRF
-    info->erp = this->erp;
-    info->cfm[0] = this->cfm;
-    info->cfm[1] = this->cfm;
-    info->cfm[2] = this->cfm;
-    info->cfm[3] = this->cfm;
-    info->cfm[4] = this->cfm;
-    info->cfm[5] = this->cfm;
+    // If joint values of erp and cfm are negative, then ignore them.
+    // info->erp, info->cfm already have the global values from quickstep
+    if (this->erp >= 0)
+      info->erp = erp;
+    if (this->cfm >= 0)
+    {
+      info->cfm[0] = cfm;
+      info->cfm[1] = cfm;
+      info->cfm[2] = cfm;
+      info->cfm[3] = cfm;
+      info->cfm[4] = cfm;
+      info->cfm[5] = cfm;
+    }
 
     // set the three ball-and-socket rows
     setBall( this, info, anchor1, anchor2 );
