@@ -96,6 +96,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         this->rateNoiseStdDev = rateElem->GetValueDouble("stddev");
         double rateBiasMean = rateElem->GetValueDouble("bias_mean");
         double rateBiasStddev = rateElem->GetValueDouble("bias_stddev");
+        // Sample the bias the we'll use later
         this->rateBias = math::Rand::GetDblNormal(rateBiasMean, rateBiasStddev);
         if (math::Rand::GetDblUniform() < 0.5)
           this->rateBias = -this->rateBias;
@@ -110,6 +111,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         this->accelNoiseStdDev = accelElem->GetValueDouble("stddev");
         double accelBiasMean = accelElem->GetValueDouble("bias_mean");
         double accelBiasStddev = accelElem->GetValueDouble("bias_stddev");
+        // Sample the bias the we'll use later
         this->accelBias = math::Rand::GetDblNormal(accelBiasMean, accelBiasStddev);
         if (math::Rand::GetDblUniform() < 0.5)
           this->accelBias = -this->accelBias;
@@ -134,7 +136,7 @@ void ImuSensor::Load(const std::string &_worldName)
 
   if (!this->parentEntity)
   {
-    gzthrow("IMU has invalid paret[" + this->parentName +
+    gzthrow("IMU has invalid parent[" + this->parentName +
             "]. Must be a link\n");
   }
   this->referencePose = this->pose + this->parentEntity->GetWorldPose();
