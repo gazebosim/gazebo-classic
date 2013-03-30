@@ -871,10 +871,10 @@ class ServerFixture : public testing::Test
 
   protected: void GetMemInfo(double &_resident, double &_share)
             {
+#ifdef __linux__
               int totalSize, residentPages, sharePages;
               totalSize = residentPages = sharePages = 0;
 
-#ifdef __linux__
               std::ifstream buffer("/proc/self/statm");
               buffer >> totalSize >> residentPages >> sharePages;
               buffer.close();

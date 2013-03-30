@@ -35,6 +35,8 @@ class QTestFixture : public QObject
 {
   Q_OBJECT
 
+  public: QTestFixture();
+
   /// \brief Load a world.
   /// \param[in] _worldFilename Name of the world to load.
   /// \param[in] _paused True to start the world paused.
@@ -90,4 +92,5 @@ class QTestFixture : public QObject
   /// \brief Amount of shared memory at start.
   private: double shareStart;
 };
+
 #endif

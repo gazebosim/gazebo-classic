@@ -33,6 +33,12 @@
 #include "gazebo/gui/QTestFixture.hh"
 
 /////////////////////////////////////////////////
+QTestFixture::QTestFixture()
+  : server(NULL), serverThread(NULL), residentStart(0), shareStart(0)
+{
+}
+
+/////////////////////////////////////////////////
 void QTestFixture::initTestCase()
 {
   // Initialize the informational logger. This will log warnings, and
@@ -156,10 +162,10 @@ void QTestFixture::cleanupTestCase()
 /////////////////////////////////////////////////
 void QTestFixture::GetMemInfo(double &_resident, double &_share)
 {
+#ifdef __linux__
   int totalSize, residentPages, sharePages;
   totalSize = residentPages = sharePages = 0;
 
-#ifdef __linux__
   std::ifstream buffer("/proc/self/statm");
   buffer >> totalSize >> residentPages >> sharePages;
   buffer.close();

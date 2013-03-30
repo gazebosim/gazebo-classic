@@ -538,7 +538,7 @@ void BuildingMaker::GenerateSDF()
 
   // loop through all model manips
   for (itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
-      itemsIt++)
+      ++itemsIt)
   {
     visualNameStream.str("");
     collisionNameStream.str("");

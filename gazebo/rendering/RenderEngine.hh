@@ -57,13 +57,13 @@ namespace gazebo
       public: enum RenderPathType
               {
                 /// \brief No rendering is done.
-                NONE,
+                NONE = 0,
                 /// \brief Most basic rendering, with least fidelity.
-                VERTEX,
+                VERTEX = 1,
                 /// \brief Utilizes the RTT shader system.
-                FORWARD,
+                FORWARD = 2,
                 /// \brief Utilizes deferred rendering. Best fidelity.
-                DEFERRED,
+                DEFERRED = 3,
                 /// \brief Count of the rendering path enums.
                 RENDER_PATH_COUNT
               };

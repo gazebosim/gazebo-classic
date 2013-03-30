@@ -784,7 +784,7 @@ void EditorView::OnAddLevel()
   this->levels.push_back(newlevel);
   emit gui::editor::Events::changeBuildingLevelName(this->currentLevel,
       levelName);
-  if (wallList.size() == 0)
+  if (this->wallList.empty())
   {
     newlevel->height = 0;
     return;
@@ -795,7 +795,7 @@ void EditorView::OnAddLevel()
   double maxHeight = wallHeight;
   int wallLevel = 0;
 
-  wallIt++;
+  ++wallIt;
   for (wallIt; wallIt != this->wallList.end(); ++wallIt)
   {
     wallHeight = (*wallIt)->GetHeight() + (*wallIt)->GetLevelBaseHeight();
