@@ -95,7 +95,7 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
   // this->integ = new SimTK::RungeKutta2Integrator(system);
   // this->integ = new SimTK::ExplicitEulerIntegrator(system);
   /// \TODO:  make sdf parameter
-  this->integ->setAccuracy(0.01);
+  this->integ->setAccuracy(0.001);
 }
 
 //////////////////////////////////////////////////
