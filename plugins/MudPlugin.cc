@@ -26,6 +26,7 @@ GZ_REGISTER_MODEL_PLUGIN(MudPlugin)
 
 /////////////////////////////////////////////////
 MudPlugin::MudPlugin()
+  : mudEnabled(false), hysteresis(0.2), newMsg(false)
 {
 }
 
@@ -34,13 +35,13 @@ void MudPlugin::Load(physics::ModelPtr _model,
                      sdf::ElementPtr _sdf)
 {
   this->model = _model;
-
-  gzerr << "hello\n";
+  this->world = this->model->GetWorld();
+  this->link = _model->GetLink("link");
 
   GZ_ASSERT(_sdf, "MudPlugin _sdf pointer is NULL");
-  if (_sdf->HasElement("contactSensorName"))
+  if (_sdf->HasElement("contact_sensor_name"))
   {
-    this->contactSensorName = _sdf->GetValueString("contactSensorName");
+    this->contactSensorName = _sdf->GetValueString("contact_sensor_name");
 
     this->node = transport::NodePtr(new transport::Node());
     this->node->Init(this->model->GetWorld()->GetName());
@@ -55,6 +56,9 @@ void MudPlugin::Load(physics::ModelPtr _model,
     gzerr << "contactSensorName not supplied, ignoring contacts\n";
   }
 
+  if (_sdf->HasElement("hysteresis"))
+    this->hysteresis = _sdf->GetValueDouble("hysteresis");
+
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&MudPlugin::OnUpdate, this));
 }
@@ -65,21 +69,84 @@ void MudPlugin::Init()
 }
 
 /////////////////////////////////////////////////
-void MudPlugin::OnContact(ConstContactsPtr &/*_msg*/)
+void MudPlugin::OnContact(ConstContactsPtr &_msg)
 {
-  gzerr << "hello\n";
+  boost::mutex::scoped_lock lock(this->mutex);
+  this->newestContactsMsg = *_msg;
+  this->newMsg = true;
 }
 
 /////////////////////////////////////////////////
 void MudPlugin::OnUpdate()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
-  common::Time stepTime = currTime - this->prevUpdateTime;
-  this->prevUpdateTime = currTime;
-
+  if (this->newMsg)
   {
-    // ignore everything else, get position and force only
-    math::Pose pose;
-    //this->model->SetWorldPose(pose);
+    boost::mutex::scoped_lock lock(this->mutex);
+
+    common::Time currTime = this->world->GetSimTime();
+    common::Time stepTime = currTime - this->prevUpdateTime;
+    double physicsStep = this->world->GetPhysicsEngine()->GetMaxStepSize();
+    double mySteps = stepTime.Double() / physicsStep;
+    double contactStepRatio = 
+      static_cast<double>(this->newestContactsMsg.contact_size()) / mySteps;
+
+    // Use hysteresis based on contactStepRatio for enabling and disabling mud
+    if (!this->joint && contactStepRatio > (0.5+hysteresis))
+    {
+      physics::LinkPtr link2;
+      link2 = this->world->GetModel("unit_box_1")->GetLink("link");
+      // Create the joint
+      if (link2)
+      {
+        this->joint = this->world->GetPhysicsEngine()->CreateJoint(
+          "revolute", this->model);
+
+        this->joint->Attach(this->link, link2);
+        this->joint->Load(this->link, link2, math::Pose());
+        this->joint->SetName("mud_joint");
+
+        this->joint->SetAttribute("erp", 0, 0.0);
+        this->joint->SetAttribute("suspension_erp", 0, 0.0);
+        this->joint->SetAttribute("stop_erp", 0, 0.0);
+
+        this->joint->Init();
+
+        this->joint->SetAttribute("erp", 0, 0.0);
+        this->joint->SetAttribute("suspension_erp", 0, 0.0);
+        this->joint->SetAttribute("stop_erp", 0, 0.0);
+
+        gzerr << "erp " << this->joint->GetAttribute("erp", 0) << '\n';
+        gzerr << "suspension_erp " << this->joint->GetAttribute("suspension_erp", 0) << '\n';
+      }
+    }
+    else if (this->joint && contactStepRatio < (0.5-hysteresis))
+    {
+      bool paused = this->world->IsPaused();
+      this->world->SetPaused(true);
+
+      // reenable collision between the link pair
+      physics::LinkPtr parent = this->joint->GetParent();
+      physics::LinkPtr child = this->joint->GetChild();
+      if (parent)
+        parent->SetCollideMode("all");
+      if (child)
+        child->SetCollideMode("all");
+
+      this->joint->Detach();
+      this->joint.reset();
+
+      this->world->SetPaused(paused);
+    }
+    
+    // Debugging
+    std::stringstream stream;
+    stream << "mySteps " << mySteps << ' '
+           << "contactStepRatio " << contactStepRatio << ' '
+           << "this->joint " << this->joint << ' ';
+    stream << ", now " << this->model->GetWorld()->GetSimTime() << '\n';;
+    gzerr << stream.str();
+
+    this->prevUpdateTime = currTime;
+    this->newMsg = false;
   }
 }

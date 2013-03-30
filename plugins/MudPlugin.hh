@@ -38,12 +38,34 @@ namespace gazebo
 
     private: event::ConnectionPtr updateConnection;
 
+    private: physics::WorldPtr world;
     private: physics::ModelPtr model;
+    private: physics::LinkPtr link;
 
-    private: common::Time prevUpdateTime;
-
-    /// \brief Name of contact sensor relative to model, scoped with '/'.
+    /// \brief Name of contact sensor relative to model, scoped with '/',
     private: std::string contactSensorName;
+
+    /// \brief Flag that indicates whether mud is enabled or disabled.
+    private: bool mudEnabled;
+
+    /// \brief Hysteresis parameter used for switching mudEnabled,
+    ///        defaults to 0.2.
+    private: double hysteresis;
+
+    /// \brief Mutex to protect reads and writes.
+    private: mutable boost::mutex mutex;
+
+    /// \brief Store newest contacts message.
+    private: msgs::Contacts newestContactsMsg;
+
+    /// \brief Flag to indicate new contact message.
+    private: bool newMsg;
+
+    /// \brief Dynamically created joint for simulating mud forces.
+    private: physics::JointPtr joint;
+
+    /// \brief Timestamp of last update that had newMsg == true
+    private: common::Time prevUpdateTime;
   };
 }
 #endif
