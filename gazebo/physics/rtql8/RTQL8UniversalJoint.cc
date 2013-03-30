@@ -107,7 +107,7 @@ math::Angle RTQL8UniversalJoint::GetAngleImpl(int /*_index*/) const
 //////////////////////////////////////////////////
 double RTQL8UniversalJoint::GetVelocity(int /*_index*/) const
 {
-  double result;
+  double result = 0;
 
 //   if (_index == 0)
 //     result = dJointGetUniversalAngle1Rate(this->jointId);

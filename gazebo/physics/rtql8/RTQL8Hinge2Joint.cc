@@ -115,7 +115,7 @@ math::Angle RTQL8Hinge2Joint::GetAngleImpl(int _index) const
 //////////////////////////////////////////////////
 double RTQL8Hinge2Joint::GetVelocity(int /*_index*/) const
 {
-  double result;
+  double result = 0;
 
 //   if (_index == 0)
 //     result = dJointGetHinge2Angle1Rate(this->jointId);
@@ -141,6 +141,7 @@ double RTQL8Hinge2Joint::GetMaxForce(int /*_index*/)
 //     return this->GetParam(dParamFMax);
 //   else
 //     return this->GetParam(dParamFMax2);
+  return 0;
 }
 
 
