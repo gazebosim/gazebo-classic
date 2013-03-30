@@ -48,7 +48,7 @@ namespace gazebo
       protected: virtual void Load(const std::string &_worldName);
 
       /// \brief Initialize the IMU.
-      protected: virtual void Init();
+      public: virtual void Init();
 
       // Documentation inherited
       protected: virtual void UpdateImpl(bool _force);
@@ -87,6 +87,35 @@ namespace gazebo
       private: transport::PublisherPtr pub;
       private: physics::LinkPtr parentEntity;
       private: msgs::IMU imuMsg;
+
+      // Which noise type we support
+      private: enum NoiseModelType
+      {
+        NONE,
+        GAUSSIAN
+      };
+      // If true, apply the noise model specified by other noise parameters
+      private: bool noiseActive;
+      // Which type of noise we're applying
+      private: enum NoiseModelType noiseType;
+
+      // If noiseType==GAUSSIAN, the mean of the distibution
+      // from which we sample when adding noise to accelerations
+      private: double accelNoiseMean;
+      // If accelNoiseType==GAUSSIAN, the standard devation of the
+      // distibution from which we sample when adding noise to accelerations
+      private: double accelNoiseStdDev;
+      // If noiseType==GAUSSIAN, the bias we'll add to acceleratations
+      private: double accelBias;
+
+      // If noiseType==GAUSSIAN, the mean of the distibution
+      // from which we sample when adding noise to rates
+      private: double rateNoiseMean;
+      // If noiseType==GAUSSIAN, the standard devation of the
+      // distibution from which we sample when adding noise to rates
+      private: double rateNoiseStdDev;
+      // If noiseType==GAUSSIAN, the bias we'll add to rates
+      private: double rateBias;
     };
     /// \}
   }

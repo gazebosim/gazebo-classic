@@ -25,6 +25,7 @@
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
+#include "gazebo/math/Rand.hh"
 
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
@@ -69,6 +70,57 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     boost::replace_all(topicName, "::", "/");
 
     this->pub = this->node->Advertise<msgs::IMU>(topicName);
+  }
+
+  // Handle noise model settings.
+  this->noiseActive = false;
+  sdf::ElementPtr imuElem = this->sdf->GetElement("imu");
+  if (imuElem->HasElement("noise"))
+  {
+    sdf::ElementPtr noiseElem = imuElem->GetElement("noise");
+    std::string type = noiseElem->GetValueString("type");
+    if (type == "gaussian")
+    {
+      this->noiseActive = true;
+      this->noiseType = GAUSSIAN;
+      this->rateNoiseMean = 0.0;
+      this->rateNoiseStdDev = 0.0;
+      this->rateBias = 0.0;
+      this->accelNoiseMean = 0.0;
+      this->accelNoiseStdDev = 0.0;
+      this->accelBias = 0.0;
+      if (noiseElem->HasElement("rate"))
+      {
+        sdf::ElementPtr rateElem = noiseElem->GetElement("rate");
+        this->rateNoiseMean = rateElem->GetValueDouble("mean");
+        this->rateNoiseStdDev = rateElem->GetValueDouble("stddev");
+        double rateBiasMean = rateElem->GetValueDouble("bias_mean");
+        double rateBiasStddev = rateElem->GetValueDouble("bias_stddev");
+        this->rateBias = math::Rand::GetDblNormal(rateBiasMean, rateBiasStddev);
+        if (math::Rand::GetDblUniform() < 0.5)
+          this->rateBias = -this->rateBias;
+        gzlog << "applying Gaussian noise model with mean " <<
+          this->rateNoiseMean << " and stddev " << this->rateNoiseStdDev <<
+          ", bias " << this->rateBias << std::endl;
+      }
+      if (noiseElem->HasElement("accel"))
+      {
+        sdf::ElementPtr accelElem = noiseElem->GetElement("accel");
+        this->accelNoiseMean = accelElem->GetValueDouble("mean");
+        this->accelNoiseStdDev = accelElem->GetValueDouble("stddev");
+        double accelBiasMean = accelElem->GetValueDouble("bias_mean");
+        double accelBiasStddev = accelElem->GetValueDouble("bias_stddev");
+        this->accelBias = math::Rand::GetDblNormal(accelBiasMean, accelBiasStddev);
+        if (math::Rand::GetDblUniform() < 0.5)
+          this->accelBias = -this->accelBias;
+        gzlog << "applying Gaussian noise model with mean " <<
+          this->accelNoiseMean << " and stddev " << this->accelNoiseStdDev <<
+          ", bias " << this->accelBias << std::endl;
+      }
+    }
+    else
+      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
+        std::endl;
   }
 }
 
@@ -166,6 +218,40 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
   this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
 
   msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
+
+  if (this->noiseActive)
+  {
+    switch (this->noiseType)
+    {
+      case GAUSSIAN:
+        // Add Gaussian noise + fixed bias to each rate
+        this->imuMsg.mutable_angular_velocity()->set_x(
+          this->imuMsg.angular_velocity().x() + this->rateBias +
+          math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
+        this->imuMsg.mutable_angular_velocity()->set_y(
+          this->imuMsg.angular_velocity().y() + this->rateBias +
+          math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
+        this->imuMsg.mutable_angular_velocity()->set_z(
+          this->imuMsg.angular_velocity().z() + this->rateBias +
+          math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
+
+        // Add Gaussian noise + fixed bias to each acceleration
+        this->imuMsg.mutable_linear_acceleration()->set_x(
+          this->imuMsg.linear_acceleration().x() + this->accelBias +
+          math::Rand::GetDblNormal(this->accelNoiseMean, this->accelNoiseStdDev));
+        this->imuMsg.mutable_linear_acceleration()->set_y(
+          this->imuMsg.linear_acceleration().y() + this->accelBias +
+          math::Rand::GetDblNormal(this->accelNoiseMean, this->accelNoiseStdDev));
+        this->imuMsg.mutable_linear_acceleration()->set_z(
+          this->imuMsg.linear_acceleration().z() + this->accelBias +
+          math::Rand::GetDblNormal(this->accelNoiseMean, this->accelNoiseStdDev));
+
+        // TODO: add noise to orientation
+        break;
+      default:
+        GZ_ASSERT(false, "Invalid noise model type");
+    }
+  }
 
   if (this->pub)
     this->pub->Publish(this->imuMsg);
