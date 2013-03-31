@@ -17,6 +17,7 @@
 #ifndef _ENCODER_HH_
 #define _ENCODER_HH_
 
+#include <gazebo/common/Time.hh>
 #include <string>
 
 //struct AVFormatContext;
@@ -140,6 +141,12 @@ namespace gazebo
       private: int outSize;
 
       private: unsigned int fps;
+
+      private: common::Time timePrev;
+
+      private: int sampleRate;
+
+      private: double totalTime;
 
     };
     /// \}

@@ -32,7 +32,7 @@ extern "C"
 
 }
 //#endif
-
+#include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Encoder.hh"
@@ -62,8 +62,6 @@ Encoder::Encoder()
   }
 
   this->Reset();
-//  this->time = common::Time();
-
 //  this->pic = new AVthis->avFrame;
 //#endif
 }
@@ -201,10 +199,15 @@ void Encoder::Init()
   // frames per second
   this->codecCtx->time_base.den= this->fps;
   this->codecCtx->time_base.num= 1;
-  this->codecCtx->gop_size = 12; // emit one intra frame every ten frames
-  this->codecCtx->max_b_frames=1;
+  this->codecCtx->gop_size = 10; // emit one intra frame every ten frames
+  this->codecCtx->max_b_frames = 1;
   this->codecCtx->pix_fmt = PIX_FMT_YUV420P;
-  this->codecCtx->thread_count = 3;
+
+  // this removes VBV buffer size not set warning msg
+  this->codecCtx->rc_initial_buffer_occupancy = this->bitRate;
+  this->codecCtx->rc_max_rate = this->bitRate;
+  this->codecCtx->rc_buffer_size = this->bitRate;
+  this->codecCtx->thread_count = 5;
   if (this->codecCtx->codec_id == CODEC_ID_MPEG1VIDEO)
   {
     // Needed to avoid using macroblocks in which some coeffs overflow.
@@ -212,17 +215,6 @@ void Encoder::Init()
     // the motion of the chroma plane does not match the luma plane.
     this->codecCtx->mb_decision = 2;
   }
-//  avcodec_thread_init(this->codecCtx, 10);
-
-
-
-
-/*  if (av_set_parameters(this->pFormatCtx, NULL) < 0)
-  {
-    gzerr << "Invalid output format parameters\n";
-    return;
-  }
-  dump_format(this->pFormatCtx, 0, filename.c_str(), 1);*/
 
   // open it
   if (avcodec_open2(this->codecCtx, codec, NULL) < 0)
@@ -263,6 +255,13 @@ void Encoder::Init()
 
   av_dump_format(this->pFormatCtx, 0, this->filename.c_str(), 1);
 
+  // setting mux preload and max delay avoids buffer underflow when writing to
+  // mpeg format
+  double muxPreload  = 0.5f;
+  double muxMaxDelay = 0.7f;
+  this->pFormatCtx->preload = static_cast<int>(muxPreload * AV_TIME_BASE);
+  this->pFormatCtx->max_delay = static_cast<int>(muxMaxDelay * AV_TIME_BASE);
+
   if (!(this->pOutputFormat->flags & AVFMT_NOFILE))
   {
     if (avio_open(&this->pFormatCtx->pb, this->filename.c_str(),
@@ -276,9 +275,11 @@ void Encoder::Init()
   avformat_write_header(this->pFormatCtx, NULL);
 
   // alloc image and output buffer
-  this->outBufferSize = 100000;
-  this->outbuf = new unsigned char[this->outBufferSize];
   this->outputFrameSize = this->codecCtx->width * this->codecCtx->height;
+//  this->outBufferSize = 100000;
+  this->outBufferSize = this->outputFrameSize;
+  this->outbuf = new unsigned char[this->outBufferSize];
+
 
 //  av_write_header(this->pFormatCtx);
   this->initialized = true;
@@ -315,6 +316,13 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
   if (!this->initialized)
     this->Init();
 
+  Time timeNow = common::Time::GetWallTime();
+
+  double dt = (timeNow - this->timePrev).Double();
+  if ( dt < 1.0/this->sampleRate)
+    return;
+
+  this->timePrev = timeNow;
 
   if (!this->swsCtx)
   {
@@ -334,14 +342,26 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
   sws_scale(this->swsCtx, this->pic->data, this->pic->linesize, 0,
       _h, this->avFrame->data, this->avFrame->linesize);
 
-  ppp += 2;
-  this->codecCtx->coded_frame->pts = ppp;
+  double actualRate = 1.0/dt;
+  int pts = 0;
+  if (!math::equal(dt, timeNow.Double()))
+  {
+//    pts = 1.0/this->fps * this-> * this->videoPts;
+    pts = this->fps * this->totalTime ;//* this->sampleRate;
+   // int incr = totalTime / (1.0/this->sampleRate);
+  //  this->videoPts++;
+//    this->videoPts += incr;
+    this->totalTime += dt;
+    //gzerr << "pts " << pts << ", " << actualRate << " , " << totalTime * fps << std::endl;
+  }
+
+  this->codecCtx->coded_frame->pts = pts;
 
   this->outSize = avcodec_encode_video(this->codecCtx, this->outbuf,
       this->outBufferSize, this->avFrame);
 //  fwrite(this->outbuf, 1, this->outSize, this->fileHandle);
 
-  this->codecCtx->coded_frame->pts = ppp;
+  this->codecCtx->coded_frame->pts = pts;
 /*
   AVPacket avPacket;
   av_init_packet(&avPacket);
@@ -360,7 +380,8 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
   if (outSize > 0)
   {
     //if (pCodecCtx->coded_frame->pts != AV_NOPTS_VALUE)
-    if (this->codecCtx->coded_frame->pts != (0x8000000000000000LL))
+    //if (this->codecCtx->coded_frame->pts != (0x8000000000000000LL))
+    //if (this->codecCtx->coded_frame->pts != AV_NOPTS_VALUE)
     {
       avPacket.pts= av_rescale_q(this->codecCtx->coded_frame->pts,
           this->codecCtx->time_base, this->pVideoStream->time_base);
@@ -372,14 +393,12 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
 
     avPacket.stream_index= this->pVideoStream->index;
     avPacket.data= this->outbuf;
-    avPacket.size= outSize;
+    avPacket.size= this->outSize;
     int ret = av_interleaved_write_frame(this->pFormatCtx, &avPacket);
-    //printf("Wrote %d\n",ret);
-//    if(ret<0)
+    if (ret < 0)
+      gzerr << "Error writing frame" << std::endl;
 //       return -1;
   }
-
-
 
 //  this->frames.push_back(frame);
 
@@ -531,7 +550,7 @@ void Encoder::Reset()
 {
   this->Cleanup();
   // set default values
-  this->bitRate = 20000000;
+  this->bitRate = 2000000;
   this->frameWidth = 800;
   this->frameHeight = 600;
   this->fps = 25;
@@ -540,4 +559,7 @@ void Encoder::Reset()
   this->initialized = false;
   this->format = "mpeg";
   this->swsCtx = NULL;
+  this->timePrev = 0;
+  this->sampleRate = this->fps * 2;
+  this->totalTime = 0;
 }
