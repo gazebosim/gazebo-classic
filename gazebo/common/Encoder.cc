@@ -154,7 +154,7 @@ void Encoder::Init()
 
   printf("Video encoding\n");
 
-  this->filename = "test_encode.mpeg";
+  this->filename = "test_encode.mp4";
 
   this->pOutputFormat = av_guess_format(NULL, this->filename.c_str(), NULL);
   if (!this->pOutputFormat)
@@ -181,14 +181,13 @@ void Encoder::Init()
       "%s", this->filename.c_str());
   this->pVideoStream = avformat_new_stream(this->pFormatCtx, codec);
 
-  // some formats want stream headers to be separate
-  if(this->pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER)
-    this->codecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-
   this->codecCtx = this->pVideoStream->codec;
 //  this->codecCtx->codec_id = this->pOutputFormat->video_codec;
 //  this->codecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
 
+  // some formats want stream headers to be separate
+  if(this->pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER)
+    this->codecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
 //  this->codecCtx = avcodec_alloc_context3(codec);
   // put sample parameters
@@ -342,7 +341,6 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
   sws_scale(this->swsCtx, this->pic->data, this->pic->linesize, 0,
       _h, this->avFrame->data, this->avFrame->linesize);
 
-  double actualRate = 1.0/dt;
   int pts = 0;
   if (!math::equal(dt, timeNow.Double()))
   {
@@ -395,6 +393,7 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
     avPacket.data= this->outbuf;
     avPacket.size= this->outSize;
     int ret = av_interleaved_write_frame(this->pFormatCtx, &avPacket);
+    av_free_packet(&avPacket);
     if (ret < 0)
       gzerr << "Error writing frame" << std::endl;
 //       return -1;
