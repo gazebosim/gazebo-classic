@@ -36,7 +36,6 @@ Element::Element()
 /////////////////////////////////////////////////
 Element::~Element()
 {
-  this->parent.reset();
   for (Param_V::iterator iter = this->attributes.begin();
       iter != this->attributes.end(); ++iter)
   {
@@ -60,6 +59,7 @@ Element::~Element()
 
   this->value.reset();
 
+  this->parent.reset();
   // this->Reset();
 }
 
@@ -222,7 +222,6 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
   }
   else
   {
-    gzerr << "Unknown attribute _type[" << _type << "]\n";
     return boost::shared_ptr<Param>();
   }
 }
@@ -382,7 +381,12 @@ void Element::PrintDocRightPane(std::string &_html, int _spacing, int &_index)
 
   stream << "<font style='font-weight:bold'>Type: </font>";
   if (this->value)
-    stream << this->value->GetTypeName() << "\n";
+  {
+    stream << this->value->GetTypeName()
+           << "&nbsp;&nbsp;&nbsp;\n"
+           << "<font style='font-weight:bold'>Default: </font>"
+           << this->value->GetDefaultAsString() << '\n';
+  }
   else
     stream << "n/a\n";
 
@@ -1244,8 +1248,6 @@ void Element::Update()
 /////////////////////////////////////////////////
 void Element::Reset()
 {
-  this->parent.reset();
-
   for (ElementPtr_V::iterator iter = this->elements.begin();
       iter != this->elements.end(); ++iter)
   {
@@ -1263,6 +1265,8 @@ void Element::Reset()
   this->elementDescriptions.clear();
 
   this->value.reset();
+
+  this->parent.reset();
 }
 
 /////////////////////////////////////////////////

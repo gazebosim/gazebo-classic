@@ -52,7 +52,7 @@ namespace gazebo
 
     /// \brief Deprecated
     /// \sa run_threads
-    void run() GAZEBO_DEPRECATED;
+    void run() GAZEBO_DEPRECATED(1.5);
 
     /// \brief Run sensors in a threads. This is a non-blocking call.
     void run_threads();

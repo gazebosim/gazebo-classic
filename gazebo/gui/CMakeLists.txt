@@ -12,7 +12,7 @@ include_directories(
 add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
-add_subdirectory(model_editor)
+add_subdirectory(building)
 
 set (sources
   ../gazebo.cc
@@ -121,7 +121,7 @@ target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_rendering
                                  gazebo_sensors
                                  gazebo_msgs
-                                 gazebo_model_editor
+                                 gazebo_building
                                  gzqtpropertybrowser
                                  ${QT_LIBRARIES}
                                  ${ogre_libraries}
@@ -134,7 +134,7 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_rendering
                                 gazebo_sensors
                                 gazebo_msgs
-                                gazebo_model_editor
+                                gazebo_building
                                 gzqtpropertybrowser
                                 ${QT_LIBRARIES}
                                 ${ogre_libraries}

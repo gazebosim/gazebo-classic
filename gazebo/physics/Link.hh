@@ -371,11 +371,19 @@ namespace gazebo
 
       /// \brief Remove Joints that have this Link as a parent Link.
       /// \param[in] _joint Joint that is a child of this link.
-      public: void RemoveChildJoint(JointPtr _joint);
+      public: void RemoveChildJoint(JointPtr _joint) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Remove Joints that have this Link as a child Link
       /// \param[in] _joint Joint that is a parent of this link.
-      public: void RemoveParentJoint(JointPtr _joint);
+      public: void RemoveParentJoint(JointPtr _joint) GAZEBO_DEPRECATED(1.5);
+
+      /// \brief Remove Joints that have this Link as a child Link.
+      /// \param[in] _jointName Parent Joint name.
+      public: void RemoveParentJoint(const std::string &_jointName);
+
+      /// \brief Remove Joints that have this Link as a parent Link
+      /// \param[in] _jointName Child Joint name.
+      public: void RemoveChildJoint(const std::string &_jointName);
 
       /// \brief Attach a static model to this link
       /// \param[in] _model Pointer to a static model.

@@ -339,9 +339,8 @@ void Camera::PostRender()
     unsigned int height = this->GetImageHeight();
 
     // Get access to the buffer and make an image and write it to file
-    Ogre::PixelFormat format =
-        this->viewport->getTarget()->suggestPixelFormat();
-    size = Ogre::PixelUtil::getMemorySize(width, height, 1, format);
+    size = Ogre::PixelUtil::getMemorySize(width, height, 1,
+        static_cast<Ogre::PixelFormat>(this->imageFormat));
 
     // Allocate buffer
     if (!this->saveFrameBuffer)
@@ -350,7 +349,8 @@ void Camera::PostRender()
     memset(this->saveFrameBuffer, 128, size);
 
     Ogre::PixelBox box(width, height, 1,
-        (Ogre::PixelFormat)this->imageFormat, this->saveFrameBuffer);
+        static_cast<Ogre::PixelFormat>(this->imageFormat),
+        this->saveFrameBuffer);
 
     this->viewport->getTarget()->copyContentsToMemory(box);
 
@@ -543,16 +543,33 @@ void Camera::SetImageHeight(unsigned int _h)
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageWidth() const
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("image");
-  return elem->GetValueInt("width");
+  unsigned int width = 0;
+  if (this->viewport)
+  {
+    width = this->viewport->getActualWidth();
+  }
+  else
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("image");
+    width = elem->GetValueInt("width");
+  }
+  return width;
 }
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageHeight() const
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("image");
-  // gzerr << "image height " << elem->GetValueInt("height") << "\n";
-  return elem->GetValueInt("height");
+  unsigned int height = 0;
+  if (this->viewport)
+  {
+    height = this->viewport->getActualHeight();
+  }
+  else
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("image");
+    height = elem->GetValueInt("height");
+  }
+  return height;
 }
 
 //////////////////////////////////////////////////
@@ -825,16 +842,15 @@ std::string Camera::GetFrameFilename()
   boost::filesystem::path pathToFile;
 
   std::string friendlyName = this->GetName();
-  std::string filename;
 
   boost::replace_all(friendlyName, "::", "_");
 
   if (this->captureDataOnce)
   {
-    friendlyName += "_screenshot";
     pathToFile = this->screenshotPath;
-    pathToFile /= std::string(friendlyName + "-"
-        + common::Time::GetWallTimeAsISOString() + ".jpg");
+    std::string timestamp = common::Time::GetWallTimeAsISOString();
+    boost::replace_all(timestamp, ":", "_");
+    pathToFile /= friendlyName + "-" + timestamp + ".jpg";
   }
   else
   {

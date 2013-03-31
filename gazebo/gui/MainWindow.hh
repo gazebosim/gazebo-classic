@@ -97,6 +97,7 @@ namespace gazebo
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
       private slots: void OnEditBuilding();
+      private slots: void SetWireframe();
 
       /// \brief Qt callback when the building editor's save action is
       /// triggered.

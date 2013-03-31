@@ -131,7 +131,7 @@ namespace gazebo
 
       /// Deprecated.
       /// \sa GetInitialized
-      public: inline bool IsInitialized() const GAZEBO_DEPRECATED;
+      public: inline bool IsInitialized() const GAZEBO_DEPRECATED(1.5);
 
       /// \brief Return true if the camera has been initialized
       /// \return True if initialized was successful
