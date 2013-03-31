@@ -17,7 +17,7 @@
 #include <gtest/gtest.h>
 #include <stdio.h>
 
-TEST(Cmake, Config)
+TEST(PkgConfig, Config)
 {
   char cmd[1024];
 
