@@ -55,6 +55,7 @@ namespace gazebo
 
     extern QAction *g_screenshotAct;
     extern QAction *g_recordVideoAct;
+    extern QWidgetAction *g_recordVideoFormatAct;
 
     extern QAction *g_showCollisionsAct;
     extern QAction *g_showGridAct;

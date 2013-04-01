@@ -130,15 +130,21 @@ void Encoder::SetBitRate(unsigned int _bitRate)
 }
 
 /////////////////////////////////////////////////
-void Encoder:: SetFrameWidth(unsigned int _width)
+void Encoder::SetFrameWidth(unsigned int _width)
 {
   this->frameWidth = _width;
 }
 
 /////////////////////////////////////////////////
-void Encoder:: SetFrameHeight(unsigned int _height)
+void Encoder::SetFrameHeight(unsigned int _height)
 {
   this->frameHeight = _height;
+}
+
+/////////////////////////////////////////////////
+void Encoder::SetFormat(const std::string &_format)
+{
+  this->format = _format;
 }
 
 /////////////////////////////////////////////////

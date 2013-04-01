@@ -382,6 +382,10 @@ namespace gazebo
       /// \param[in] _value Set to true to encode to video buffer.
       public: void SetEncodeVideo(bool _value);
 
+      /// \brief Set the video format to encode in
+      /// \param[in] _format Video format
+      public: void SetEncodeVideoFormat(const std::string &_format);
+
       /// \brief Set the render target
       /// \param[in] _textureName Name of the new render texture
       public: void CreateRenderTexture(const std::string &_textureName);
@@ -691,6 +695,9 @@ namespace gazebo
 
       /// \brief Render period.
       private: common::Time renderPeriod;
+
+      /// \brief Video encoding format
+      private: std::string videoEncodeFormat;
     };
     /// \}
   }

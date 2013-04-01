@@ -54,6 +54,7 @@ QAction *gazebo::gui::g_dirLghtCreateAct = 0;
 
 QAction *gazebo::gui::g_screenshotAct = 0;
 QAction *gazebo::gui::g_recordVideoAct = 0;
+QWidgetAction *gazebo::gui::g_recordVideoFormatAct = 0;
 
 QAction *gazebo::gui::g_showCollisionsAct = 0;
 QAction *gazebo::gui::g_showGridAct = 0;

@@ -79,6 +79,7 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
   this->captureData = false;
   this->captureDataOnce = false;
   this->encodeVideo = false;
+  this->videoEncodeFormat = "";
 
   this->camera = NULL;
   this->viewport = NULL;
@@ -1093,9 +1094,17 @@ void Camera::SetEncodeVideo(bool _encode)
     if (!this->encoder)
     {
       this->encoder = new common::Encoder();
+      if (!this->videoEncodeFormat.empty())
+        this->encoder->SetFormat(this->videoEncodeFormat);
       this->encoder->Init();
     }
   }
+}
+
+//////////////////////////////////////////////////
+void Camera::SetEncodeVideoFormat(const std::string &_format)
+{
+  this->videoEncodeFormat = _format;
 }
 
 //////////////////////////////////////////////////

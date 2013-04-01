@@ -83,6 +83,12 @@ namespace gazebo
       /// \brief Qt callback when the record video action is triggered
       private slots: void RecordVideo();
 
+      /// \brief Qt callback when a video format menu action is triggered
+      private slots: void SetRecordVideoFormat(QAction *_action);
+
+      /// \brief Qt callback when the record video format button is clicked
+      private slots: void ShowVideoFormatMenu();
+
       private slots: void InsertModel();
       private slots: void ShowGrid();
       private slots: void ShowCollisions();

@@ -75,6 +75,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolbar->addAction(g_dirLghtCreateAct);
   toolbar->addSeparator();
   toolbar->addAction(g_recordVideoAct);
+
+/*  QPushButton *videoFormatButton =
+      new QPushButton(QIcon(":/images/down_arrow.png"), "");
+  toolbar->addWidget(videoFormatButton);*/
+  toolbar->addAction(g_recordVideoFormatAct);
+
   toolbar->addSeparator();
   toolbar->addAction(g_screenshotAct);
 

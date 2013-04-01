@@ -631,6 +631,20 @@ void MainWindow::RecordVideo()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::SetRecordVideoFormat(QAction *_action)
+{
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->SetEncodeVideoFormat(_action->text().toStdString());
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowVideoFormatMenu()
+{
+  QWidget *defaultWidget = g_recordVideoFormatAct->defaultWidget();
+  qobject_cast<QToolButton *>(defaultWidget)->showMenu();
+}
+
+/////////////////////////////////////////////////
 void MainWindow::InsertModel()
 {
 }
@@ -1071,6 +1085,23 @@ void MainWindow::CreateActions()
   g_recordVideoAct->setChecked(false);
   connect(g_recordVideoAct, SIGNAL(triggered()), this,
       SLOT(RecordVideo()));
+
+  g_recordVideoFormatAct = new QWidgetAction(NULL);
+  g_recordVideoFormatAct->setStatusTip(tr("Select video format"));
+  g_recordVideoFormatAct->setCheckable(false);
+
+  QMenu *videoFormatSubmenu = new QMenu;
+  videoFormatSubmenu->addAction("mpeg");
+  videoFormatSubmenu->addAction("mp4");
+  connect(videoFormatSubmenu, SIGNAL(triggered(QAction *)), this,
+      SLOT(SetRecordVideoFormat(QAction *)));
+
+  QToolButton *videoFormatButton = new QToolButton();
+  videoFormatButton->setIcon(QIcon(":/images/down_arrow.png"));
+  videoFormatButton->setMenu(videoFormatSubmenu);
+  g_recordVideoFormatAct->setDefaultWidget(videoFormatButton);
+  connect(videoFormatButton, SIGNAL(clicked()), this,
+    SLOT(ShowVideoFormatMenu()));
 }
 
 /////////////////////////////////////////////////

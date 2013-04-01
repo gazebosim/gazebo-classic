@@ -76,6 +76,10 @@ namespace gazebo
       /// \param[in] _height Frame height
       public: void SetFrameHeight(unsigned int _height);
 
+      /// \brief Set the encoding format
+      /// \param[in] _height Frame height
+      public: void SetFormat(const std::string &_format);
+
       /// \brief Reset to default video properties and clean up allocated
       /// memories.
       public: void Reset();
