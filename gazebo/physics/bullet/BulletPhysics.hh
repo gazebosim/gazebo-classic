@@ -48,7 +48,7 @@ namespace gazebo
     {
 
       /// \enum BulletParam
-      /// \brief Bullet physics paramerter types.
+      /// \brief Bullet physics parameter types.
       public: enum BulletParam
       {
         /// \brief Solve type

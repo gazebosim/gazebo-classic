@@ -62,7 +62,7 @@ namespace gazebo
     {
 
       /// \enum ODEParam
-      /// \brief ODE Physics paramerter types.
+      /// \brief ODE Physics parameter types.
       public: enum ODEParam
       {
         /// \brief Solve type
