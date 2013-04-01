@@ -80,7 +80,8 @@ namespace gazebo
       /// memories.
       public: void Reset();
 
-      public: void Encode();
+      /// \brief Finalize encoding
+      public: void Fini();
 
       /// \brief free up open Video object, close files, streams
       private: void Cleanup();
@@ -125,10 +126,6 @@ namespace gazebo
       private: int currentBufferSize;
 
       private: AVFrame *avFrame;
-
-      private: std::vector<AVFrame *> frames;
-
-      private: unsigned int outputFrameSize;
 
       private: std::string tmpFilename;
 

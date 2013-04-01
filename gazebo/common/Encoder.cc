@@ -19,7 +19,7 @@
 
 #include <gazebo/gazebo_config.h>
 
-//#ifdef HAVE_FFMPEG
+#ifdef HAVE_FFMPEG
 #ifndef INT64_C
 #define INT64_C(codec) (codec ## LL)
 #define UINT64_C(codec) (codec ## ULL)
@@ -33,7 +33,8 @@ extern "C"
 #include "libavutil/mathematics.h"
 
 }
-//#endif
+#endif
+
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -42,11 +43,9 @@ extern "C"
 using namespace gazebo;
 using namespace common;
 
-
 /////////////////////////////////////////////////
 Encoder::Encoder()
 {
-//  this->formatCtx = NULL;
   this->outbuf = NULL;
   this->pictureBuf = NULL;
   this->codecCtx = NULL;
@@ -55,7 +54,7 @@ Encoder::Encoder()
   this->avFrame = NULL;
   this->pFormatCtx = NULL;
 
-//#ifdef HAVE_FFMPEG
+#ifdef HAVE_FFMPEG
   static bool first = true;
   if (first)
   {
@@ -65,16 +64,16 @@ Encoder::Encoder()
 
   this->Reset();
 //  this->pic = new AVthis->avFrame;
-//#endif
+#endif
 }
 
 /////////////////////////////////////////////////
 Encoder::~Encoder()
 {
   this->Cleanup();
-//#ifdef HAVE_FFMPEG
+#ifdef HAVE_FFMPEG
   delete this->pic;
-//#endif
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -84,18 +83,12 @@ void Encoder::Cleanup()
     return;
 
 
-/*  // Close the codec
-  if (this->codecCtx)
-  {
-    avcodec_close(this->codecCtx);
-    av_free(this->codecCtx);
-    this->codecCtx = NULL;
-  }*/
-
+#ifdef HAVE_FFMPEG
   if (this->pFormatCtx)
   {
     for(unsigned int i = 0; i < this->pFormatCtx->nb_streams; ++i)
     {
+      avcodec_close(this->pFormatCtx->streams[i]->codec);
       av_freep(&this->pFormatCtx->streams[i]->codec);
       av_freep(&this->pFormatCtx->streams[i]);
     }
@@ -109,13 +102,12 @@ void Encoder::Cleanup()
     this->avFrame = NULL;
   }
 
-//#ifdef HAVE_FFMPEG
   if (this->pic)
   {
     av_free(this->pic);
     this->pic = NULL;
   }
-//#endif
+#endif
 
   if (this->outbuf)
   {
@@ -148,7 +140,9 @@ void Encoder:: SetFrameHeight(unsigned int _height)
 {
   this->frameHeight = _height;
 }
+
 /////////////////////////////////////////////////
+#ifdef HAVE_FFMPEG
 void Encoder::Init()
 {
   if (this->initialized)
@@ -188,7 +182,6 @@ void Encoder::Init()
   if(this->pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER)
     this->codecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
-//  this->codecCtx = avcodec_alloc_context3(codec);
   // put sample parameters
   this->codecCtx->bit_rate = this->bitRate;
   // resolution must be a multiple of two
@@ -229,21 +222,6 @@ void Encoder::Init()
     return;
   }
 
-/*  if (url_fopen(&this->pFormatCtx->pb, filename.c_str(), URL_WRONLY) < 0)
-  {
-    gzerr << "Could not open '" << filename << "\n";
-    return;
-  }*/
-
-/*  this->avFrame = avcodec_alloc_frame();
-  // size for YUV 420
-  this->pictureBuf = new unsigned char[(this->outputFrameSize * 3) / 2];
-  this->avFrame->data[0] = this->pictureBuf;
-  this->avFrame->data[1] = this->avFrame->data[0] + this->outputFrameSize;
-  this->avFrame->data[2] = this->avFrame->data[1] + this->outputFrameSize / 4;
-  this->avFrame->linesize[0] = this->codecCtx->width;
-  this->avFrame->linesize[1] = this->codecCtx->width / 2;
-  this->avFrame->linesize[2] = this->codecCtx->width / 2;*/
   this->avFrame = avcodec_alloc_frame();
   int size = avpicture_get_size(this->codecCtx->pix_fmt, this->codecCtx->width,
       this->codecCtx->height);
@@ -273,15 +251,19 @@ void Encoder::Init()
   avformat_write_header(this->pFormatCtx, NULL);
 
   // alloc image and output buffer
-  this->outputFrameSize = this->codecCtx->width * this->codecCtx->height;
-//  this->outBufferSize = 100000;
-  this->outBufferSize = this->outputFrameSize;
+  this->outBufferSize = this->codecCtx->width * this->codecCtx->height;
   this->outbuf = new unsigned char[this->outBufferSize];
 
-
-//  av_write_header(this->pFormatCtx);
   this->initialized = true;
 }
+#else
+void Encoder::Init()
+{
+  gzwarn << "Encoding capability not available! "
+      << "Please install libavcodec, libavformat and libswscale dev packages."
+      << std::endl;
+}
+#endif
 
 ////////////////////////////////////////////////
 bool Encoder::IsInitialized()
@@ -289,25 +271,8 @@ bool Encoder::IsInitialized()
   return this->initialized;
 }
 
-////////////////////////////////////////////////
-// #ifdef HAVE_FFMPEG
- static void pgm_save(unsigned char *buf, int wrap, int xsize, int ysize,
-                      char *filename)
- {
-   FILE *f;
-   int i;
-
-   f = fopen(filename, "w");
-   fprintf(f, "P6\n%d %d\n%d\n", xsize, ysize, 255);
-   for(i = 0; i < ysize; i++)
-     fwrite(buf + i * wrap, 1, xsize * 3, f);
-   fclose(f);
- }
-// #endif
-
-int ppp = -1;
-
 /////////////////////////////////////////////////
+#ifdef HAVE_FFMPEG
 void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
     unsigned int _h)
 {
@@ -343,13 +308,9 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
   int pts = 0;
   if (!math::equal(dt, timeNow.Double()))
   {
-//    pts = 1.0/this->fps * this-> * this->videoPts;
-    pts = this->fps * this->totalTime ;//* this->sampleRate;
-   // int incr = totalTime / (1.0/this->sampleRate);
-  //  this->videoPts++;
-//    this->videoPts += incr;
+    // pts = 1.0/this->fps * this->sampleRate * this->videoPts;
+    pts = this->fps * this->totalTime;
     this->totalTime += dt;
-    //gzerr << "pts " << pts << ", " << actualRate << " , " << totalTime * fps << std::endl;
   }
 
   this->codecCtx->coded_frame->pts = pts;
@@ -364,7 +325,7 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
   av_init_packet(&avPacket);
   avPacket.data = NULL;
   int ret = avcodec_encode_video2(this->codecCtx, &avPacket,
-      this->avFrame, &this->outSize);
+      this->avFrame, &this->outSize);293
   if (ret < 0)
     gzerr << "Error encding frame\n";
   fwrite(avPacket.data, 1, avPacket.size, this->fileHandle);
@@ -395,156 +356,37 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
     av_free_packet(&avPacket);
     if (ret < 0)
       gzerr << "Error writing frame" << std::endl;
-//       return -1;
   }
-
-//  this->frames.push_back(frame);
-
-/*///////////////////////////
-  /// TODO testing, take me out later
-  AVPicture *pic2 = new AVPicture;
-  avpicture_alloc(pic2, PIX_FMT_RGB24, this->codecCtx->width,
-                this->codecCtx->height);
-
-  SwsContext *swsCtx2;
-  swsCtx2 = sws_getContext(
-      this->codecCtx->width,
-      this->codecCtx->height,
-      PIX_FMT_YUV420P,
-      this->codecCtx->width,
-      this->codecCtx->height,
-      PIX_FMT_RGB24,
-      SWS_BICUBIC, NULL, NULL, NULL);
-
-  sws_scale(swsCtx2, this->avFrame->data, this->avFrame->linesize, 0,
-    this->codecCtx->height, pic2->data, pic2->linesize);
-
-//   Debug:
-   pgm_save(pic2->data[0], pic2->linesize[0],
-            this->codecCtx->width, this->codecCtx->height, "encode_debug");
-*/
-/*  SwsContext *swsCtx2;
-  swsCtx2 = sws_getContext(
-      _w,
-      _h,
-      PIX_FMT_RGB24,
-      this->codecCtx->width,
-      this->codecCtx->height,
-      PIX_FMT_RGB24,
-      SWS_BICUBIC, NULL, NULL, NULL);
-
-
-//   pgm_save(pic->data[0], pic->linesize[0],
-//            _w, _h, "encode_debug");
-///////////////////////////*/
-
-  // encode the image
-/*  this->outSize = avcodec_encode_video(this->codecCtx, this->outbuf,
-      this->outBufferSize, this->avFrame);
-
-  currentBufferSize += outSize;
-
-//  this->frames.push_back(std::make_pair(this->outbuf, this->outSize);
-//  printf("encoding frame %3d (size=%5d)\n", i, this->outSize);
-  fwrite(this->outbuf, 1, this->outSize, this->fileHandle);*/
 }
-
-/*/////////////////////////////////////////////////
-void Encoder::Encode()
+#else
+void Encoder::AddFrame(unsigned char */*_frame*/, unsigned int /*_w*/,
+    unsigned int /*_h*/)
 {
-  FILE *outFile = fopen(this->filename.c_str(), "wb");
-  if (!outFile)
-  {
-    gzerr << "Could not open '" << this->filename.c_str() << "' for encoding\n";
-    return;
-  }
+}
+#endif
 
-  unsigned int outSize;
-  for (int i = 0; i < this->frames.size(); ++i)
-  {
-    outSize = avcodec_encode_video(this->codecCtx, this->outbuf,
-        this->outBufferSize, this->frames[i]);
-    fwrite(this->outbuf, 1, outSize, outFile);
-
-    // free resource
-    delete[] this->frames[i]->data[0];
-    av_free(this->frames[i]);
-  }
-
-  // get the delayed frames
-  for (; outSize; )
-  {
-    fflush(stdout);
-    outSize = avcodec_encode_video(this->codecCtx, this->outbuf,
-        this->outBufferSize, NULL);
-    currentBufferSize += outSize;
-//    printf("write frame %3d (size=%5d)\n", i, outSize);
-    fwrite(this->outbuf, 1, outSize, outFile);
-  }
-
-  // add sequence end code to have a real mpeg file
-  this->outbuf[0] = 0x00;
-  this->outbuf[1] = 0x00;
-  this->outbuf[2] = 0x01;
-  this->outbuf[3] = 0xb7;
-
-  fwrite(this->outbuf, 1, 4, outFile);
-  fclose(outFile);
-}*/
+/////////////////////////////////////////////////
+void Encoder::Fini()
+{
+#ifdef HAVE_FFMPEG
+  if (this->pFormatCtx)
+    av_write_trailer(this->pFormatCtx);
+#endif
+}
 
 /////////////////////////////////////////////////
 void Encoder::SaveToFile(const std::string &_filename)
 {
-//  if (this->initialized)
-//    this->Fini();
-
-/*  this->fileHandle = fopen(_filename.c_str(), "wb");
-  if (!this->fileHandle)
-  {
-    gzerr << "Could not open '" << _filename << "' for encoding\n";
-    return;
-  }
-
-fwrite(bufferHead, 1, currentBufferSize, this->fileHandle);
-
-  for (int i = 0; i < 4; i++)
-    this->outbuf--;
-
-
-  fclose(this->fileHandle);*/
-
-//   av_write_trailer(this->pFormatCtx);
-   // Close file
-//   url_fclose(this->pFormatCtx->pb);
-
-/*  // get the delayed frames
-  for(; this->outSize; /)
-  {
-    fflush(stdout);
-    this->outSize = avcodec_encode_video(this->codecCtx, this->outbuf,
-        this->outBufferSize, NULL);
-    fwrite(this->outbuf, 1, this->outSize, this->fileHandle);
-  }
-
-  // add sequence end code to have a real mpeg file
-  this->outbuf[0] = 0x00;
-  this->outbuf[1] = 0x00;
-  this->outbuf[2] = 0x01;
-  this->outbuf[3] = 0xb7;
-
-  fwrite(this->outbuf, 1, 4, this->fileHandle);
-  fclose(this->fileHandle);*/
-
-  av_write_trailer(this->pFormatCtx);
-
+#ifdef HAVE_FFMPEG
+  this->Fini();
 
   boost::filesystem::rename(this->tmpFilename + "." + this->format,
       _filename + "." + this->format);
 
-//  this->filename = _filename;
-//  this->Encode();
-
   this->Cleanup();
+#else
+  gzwarn << _filename << " not saved" << std::endl;
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -557,7 +399,6 @@ void Encoder::Reset()
   this->frameHeight = 600;
   this->fps = 25;
   this->tmpFilename = "tmp_recording";
-  this->outputFrameSize = this->frameWidth * this->frameHeight;
   this->initialized = false;
   this->format = "mpeg";
   this->swsCtx = NULL;
