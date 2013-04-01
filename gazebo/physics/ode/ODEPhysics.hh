@@ -60,7 +60,6 @@ namespace gazebo
     /// \brief ODE physics engine.
     class ODEPhysics : public PhysicsEngine
     {
-
       /// \enum ODEParam
       /// \brief ODE Physics parameter types.
       public: enum ODEParam

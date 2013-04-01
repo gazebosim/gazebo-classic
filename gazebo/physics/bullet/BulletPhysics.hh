@@ -46,7 +46,6 @@ namespace gazebo
     /// \brief Bullet physics engine
     class BulletPhysics : public PhysicsEngine
     {
-
       /// \enum BulletParam
       /// \brief Bullet physics parameter types.
       public: enum BulletParam
