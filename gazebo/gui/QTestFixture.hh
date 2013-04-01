@@ -35,6 +35,8 @@ class QTestFixture : public QObject
 {
   Q_OBJECT
 
+  public: QTestFixture();
+
   /// \brief Load a world.
   /// \param[in] _worldFilename Name of the world to load.
   /// \param[in] _paused True to start the world paused.
@@ -71,7 +73,10 @@ class QTestFixture : public QObject
   /// \brief Thread to run the Gazebo server.
   protected: boost::thread *serverThread;
 
+  /// \brief Resident memory at test start
   private: double residentStart;
+
+  /// \brief Shared memory at test start
   private: double shareStart;
 };
 

@@ -33,11 +33,10 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world, BasePtr _parent)
-    : ScrewJoint<BulletJoint>(_parent)
+    : ScrewJoint<BulletJoint>(_parent), bulletScrew(NULL)
 {
   GZ_ASSERT(_world, "bullet world pointer is NULL");
   this->bulletWorld = _world;
-  this->bulletScrew = NULL;
 }
 
 //////////////////////////////////////////////////
