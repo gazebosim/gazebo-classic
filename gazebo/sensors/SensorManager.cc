@@ -120,6 +120,35 @@ void SensorManager::Update(bool _force)
       this->sensorContainers[(*iter)->GetCategory()]->AddSensor(*iter);
     }
     this->initSensors.clear();
+
+    for (iter = this->removeSensors.begin();
+         iter != this->removeSensors.end(); ++iter)
+    {
+      GZ_ASSERT((*iter) != NULL, "Sensor pointer is NULL");
+      GZ_ASSERT((*iter)->GetCategory() < 0 ||
+          (*iter)->GetCategory() < CATEGORY_COUNT, "Sensor category is empty");
+      GZ_ASSERT(this->sensorContainers[(*iter)->GetCategory()] != NULL,
+                "Sensor container is NULL");
+      bool removed = false;
+      std::string scopedName = (*iter)->GetScopedName();
+      for (SensorContainer_V::iterator iter2 = this->sensorContainers.begin();
+           iter2 != this->sensorContainers.end() && !removed; ++iter2)
+      {
+        GZ_ASSERT((*iter2) != NULL, "SensorContainer is NULL");
+
+        removed = (*iter2)->RemoveSensor(scopedName);
+      }
+
+      if (!removed)
+      {
+        gzerr << "RemoveSensor failed. The SensorManager's list of sensors "
+              << "changed during sensor removal. This is bad, and should "
+              << "never happen.\n";
+      }
+
+
+    }
+    this->removeSensors.clear();
   }
 
   // Only update if there are sensors
@@ -306,21 +335,9 @@ void SensorManager::RemoveSensor(const std::string &_name)
   else
   {
     bool removed = false;
-
-    std::string scopedName = sensor->GetScopedName();
-    for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
-         iter != this->sensorContainers.end() && !removed; ++iter)
-    {
-      GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
-      removed = (*iter)->RemoveSensor(scopedName);
-    }
-
-    if (!removed)
-    {
-      gzerr << "RemoveSensor failed. The SensorManager's list of sensors "
-            << "changed during sensor removal. This is bad, and should "
-            << "never happen.\n";
-    }
+    // Push it on the list, to be removed by the main sensor thread,
+    // to ensure correct access to rendering resources.
+    this->removeSensors.push_back(sensor);
   }
 }
 
