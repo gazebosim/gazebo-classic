@@ -19,9 +19,6 @@
 #include "sensors/sensors.hh"
 #include "common/common.hh"
 
-// How tightly to compare for deterministic values
-#define IMU_TOL 1e-5
-
 using namespace gazebo;
 class ImuTest : public ServerFixture
 {
@@ -89,20 +86,20 @@ void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   math::Quaternion orientation;
   this->GetImuData(imu, 1, rateMean, accelMean, orientation);
 
-  EXPECT_NEAR(rateMean.x, 0.0, IMU_TOL);
-  EXPECT_NEAR(rateMean.y, 0.0, IMU_TOL);
-  EXPECT_NEAR(rateMean.z, 0.0, IMU_TOL);
+  EXPECT_DOUBLE_EQ(rateMean.x, 0.0);
+  EXPECT_DOUBLE_EQ(rateMean.y, 0.0);
+  EXPECT_DOUBLE_EQ(rateMean.z, 0.0);
 
   math::Vector3 g;
   this->GetGravity(testPose.rot, g);
-  EXPECT_NEAR(accelMean.x, -g.x, IMU_TOL);
-  EXPECT_NEAR(accelMean.y, -g.y, IMU_TOL);
-  EXPECT_NEAR(accelMean.z, -g.z, IMU_TOL);
+  EXPECT_DOUBLE_EQ(accelMean.x, -g.x);
+  EXPECT_DOUBLE_EQ(accelMean.y, -g.y);
+  EXPECT_DOUBLE_EQ(accelMean.z, -g.z);
 
-  EXPECT_NEAR(orientation.x, testPose.rot.x, IMU_TOL);
-  EXPECT_NEAR(orientation.y, testPose.rot.y, IMU_TOL);
-  EXPECT_NEAR(orientation.z, testPose.rot.z, IMU_TOL);
-  EXPECT_NEAR(orientation.w, testPose.rot.w, IMU_TOL);
+  EXPECT_DOUBLE_EQ(orientation.x, testPose.rot.x);
+  EXPECT_DOUBLE_EQ(orientation.y, testPose.rot.y);
+  EXPECT_DOUBLE_EQ(orientation.z, testPose.rot.z);
+  EXPECT_DOUBLE_EQ(orientation.w, testPose.rot.w);
 }
 
 TEST_F(ImuTest, EmptyWorldODE)
@@ -184,10 +181,10 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
 
-  EXPECT_NEAR(orientation.x, testPose.rot.x, IMU_TOL);
-  EXPECT_NEAR(orientation.y, testPose.rot.y, IMU_TOL);
-  EXPECT_NEAR(orientation.z, testPose.rot.z, IMU_TOL);
-  EXPECT_NEAR(orientation.w, testPose.rot.w, IMU_TOL);
+  EXPECT_DOUBLE_EQ(orientation.x, testPose.rot.x);
+  EXPECT_DOUBLE_EQ(orientation.y, testPose.rot.y);
+  EXPECT_DOUBLE_EQ(orientation.z, testPose.rot.z);
+  EXPECT_DOUBLE_EQ(orientation.w, testPose.rot.w);
 }
 
 TEST_F(ImuTest, EmptyWorldNoiseODE)
@@ -269,10 +266,10 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
 
-  EXPECT_NEAR(orientation.x, testPose.rot.x, IMU_TOL);
-  EXPECT_NEAR(orientation.y, testPose.rot.y, IMU_TOL);
-  EXPECT_NEAR(orientation.z, testPose.rot.z, IMU_TOL);
-  EXPECT_NEAR(orientation.w, testPose.rot.w, IMU_TOL);
+  EXPECT_DOUBLE_EQ(orientation.x, testPose.rot.x);
+  EXPECT_DOUBLE_EQ(orientation.y, testPose.rot.y);
+  EXPECT_DOUBLE_EQ(orientation.z, testPose.rot.z);
+  EXPECT_DOUBLE_EQ(orientation.w, testPose.rot.w);
 }
 
 TEST_F(ImuTest, EmptyWorldBiasODE)
