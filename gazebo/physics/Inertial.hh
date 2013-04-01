@@ -87,13 +87,14 @@ namespace gazebo
       /// \param[in] _center Center of the gravity.
       public: void SetCoG(const math::Vector3 &_center);
 
-      /// \brief Set the center of gravity.
+      /// \brief Set the center of gravity and rotation offset of inertial
+      ///        coordinate frame relative to Link frame.
       /// \param[in] _cx Center offset in x-direction in Link frame
       /// \param[in] _cy Center offset in y-direction in Link frame
       /// \param[in] _cz Center offset in z-direction in Link frame
-      /// \param[in] _rx Moment of Inertia (MOI) about x-axis in Link frame
-      /// \param[in] _ry MOI about y-axis in Link frame
-      /// \param[in] _rz MOI about z-axis in Link frame
+      /// \param[in] _rx Roll angle offset of inertial coordinate frame.
+      /// \param[in] _ry Pitch angle offset of inertial coordinate frame.
+      /// \param[in] _rz Yaw angle offset of inertial coordinate frame.
       public: void SetCoG(double _cx, double _cy, double _cz,
                           double _rx, double _ry, double _rz);
 
@@ -182,7 +183,7 @@ namespace gazebo
       public: Inertial &operator=(const Inertial &_inertial);
 
       /// \brief Addition operator.
-      /// Assuming both CG and Moement of Inertia (MOI) are defined
+      /// Assuming both CG and Moment of Inertia (MOI) are defined
       /// in the same reference Link frame.
       /// New CG is computed from masses and perspective offsets,
       /// and both MOI contributions relocated to the new cog.
@@ -245,15 +246,16 @@ namespace gazebo
       /// \brief Mass the object. Default is 1.0.
       private: double mass;
 
-      /// \brief Center of gravity in the Link frame. Default is (0.0 0.0 0.0)
+      /// \brief Center of gravity in the Link frame.
+      ///        Default is (0.0 0.0 0.0  0.0 0.0 0.0)
       private: math::Pose cog;
 
       /// \brief Principal moments of inertia. Default is (1.0 1.0 1.0)
-      /// These Moments of Inertia are specified in the local Link frame.
+      /// These Moments of Inertia are specified in the local Inertial frame.
       private: math::Vector3 principals;
 
       /// \brief Product moments of inertia. Default is (0.0 0.0 0.0)
-      /// These MOI off-diagonals are specified in the local Link frame.
+      /// These MOI off-diagonals are specified in the local Inertial frame.
       /// Where products.x is Ixy, products.y is Ixz and products.z is Iyz.
       private: math::Vector3 products;
 
