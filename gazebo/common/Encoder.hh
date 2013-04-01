@@ -130,7 +130,7 @@ namespace gazebo
 
       private: unsigned int outputFrameSize;
 
-      private: std::string filename;
+      private: std::string tmpFilename;
 
       private: std::string format;
 

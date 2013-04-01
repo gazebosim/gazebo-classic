@@ -15,6 +15,8 @@
  *
 */
 
+#include <boost/filesystem.hpp>
+
 #include <gazebo/gazebo_config.h>
 
 //#ifdef HAVE_FFMPEG
@@ -152,11 +154,8 @@ void Encoder::Init()
   if (this->initialized)
     return;
 
-  printf("Video encoding\n");
-
-  this->filename = "test_encode.mp4";
-
-  this->pOutputFormat = av_guess_format(NULL, this->filename.c_str(), NULL);
+  std::string tmpFileNameFull = this->tmpFilename + "." + this->format;
+  this->pOutputFormat = av_guess_format(NULL, tmpFileNameFull.c_str(), NULL);
   if (!this->pOutputFormat)
   {
     gzerr << "Could not deduce output format from file extension: "
@@ -178,7 +177,7 @@ void Encoder::Init()
   this->pFormatCtx->oformat = this->pOutputFormat;
   snprintf(this->pFormatCtx->filename,
       sizeof(this->pFormatCtx->filename),
-      "%s", this->filename.c_str());
+      "%s", tmpFileNameFull.c_str());
   this->pVideoStream = avformat_new_stream(this->pFormatCtx, codec);
 
   this->codecCtx = this->pVideoStream->codec;
@@ -223,10 +222,10 @@ void Encoder::Init()
   }
   this->pic = new AVPicture;
 
-  this->fileHandle = fopen(filename.c_str(), "wb");
+  this->fileHandle = fopen(tmpFileNameFull.c_str(), "wb");
   if (!this->fileHandle)
   {
-    gzerr << "Could not open '" << filename << "' for encoding\n";
+    gzerr << "Could not open '" << tmpFileNameFull << "' for encoding\n";
     return;
   }
 
@@ -252,7 +251,7 @@ void Encoder::Init()
   avpicture_fill((AVPicture *)this->avFrame, this->pictureBuf,
       this->codecCtx->pix_fmt, this->codecCtx->width, this->codecCtx->height);
 
-  av_dump_format(this->pFormatCtx, 0, this->filename.c_str(), 1);
+  av_dump_format(this->pFormatCtx, 0, tmpFileNameFull.c_str(), 1);
 
   // setting mux preload and max delay avoids buffer underflow when writing to
   // mpeg format
@@ -263,10 +262,10 @@ void Encoder::Init()
 
   if (!(this->pOutputFormat->flags & AVFMT_NOFILE))
   {
-    if (avio_open(&this->pFormatCtx->pb, this->filename.c_str(),
+    if (avio_open(&this->pFormatCtx->pb, tmpFileNameFull.c_str(),
         AVIO_FLAG_WRITE) < 0)
     {
-      gzerr << "Could not open '" << this->filename << "'\n";
+      gzerr << "Could not open '" << tmpFileNameFull << "'\n";
       return;
     }
   }
@@ -538,6 +537,10 @@ fwrite(bufferHead, 1, currentBufferSize, this->fileHandle);
 
   av_write_trailer(this->pFormatCtx);
 
+
+  boost::filesystem::rename(this->tmpFilename + "." + this->format,
+      _filename + "." + this->format);
+
 //  this->filename = _filename;
 //  this->Encode();
 
@@ -553,7 +556,7 @@ void Encoder::Reset()
   this->frameWidth = 800;
   this->frameHeight = 600;
   this->fps = 25;
-  this->filename = "EncodedVideo.mpeg";
+  this->tmpFilename = "tmp_recording";
   this->outputFrameSize = this->frameWidth * this->frameHeight;
   this->initialized = false;
   this->format = "mpeg";
