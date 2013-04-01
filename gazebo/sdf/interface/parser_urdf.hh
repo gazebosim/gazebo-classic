@@ -53,6 +53,7 @@ namespace urdf2gazebo
     private: GazeboExtension()
     {
       material.clear();
+      material_color.clear();
       setStaticFlag = false;
       gravity = true;
       isDampingFactor = false;
@@ -94,6 +95,7 @@ namespace urdf2gazebo
     private: GazeboExtension(const GazeboExtension &ge)
     {
       material = ge.material;
+      material_color = ge.material_color;
       setStaticFlag = ge.setStaticFlag;
       gravity = ge.gravity;
       isDampingFactor = ge.isDampingFactor;
@@ -140,6 +142,7 @@ namespace urdf2gazebo
 
     // visual
     private: std::string material;
+    private: std::string material_color;
 
     // body, default off
     private: bool setStaticFlag;
@@ -437,6 +440,10 @@ namespace urdf2gazebo
     /// create SDF geometry block based on URDF
     private: void CreateGeometry(TiXmlElement* _elem,
       boost::shared_ptr<urdf::Geometry> _geometry);
+
+    /// create SDF material block based on URDF
+    private: void CreateMaterial(TiXmlElement* _elem,
+      boost::shared_ptr<urdf::Material> _material);
 
     private: std::map<std::string, std::vector<GazeboExtension*> > extensions;
 

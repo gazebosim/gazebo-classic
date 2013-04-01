@@ -344,6 +344,21 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
       if (childElem->ValueStr() == "material")
       {
           gazebo->material = this->GetKeyValueAsString(childElem);
+          for (TiXmlElement *matElem = childElem->FirstChildElement();
+               matElem; matElem = matElem->NextSiblingElement())
+          {
+            if (matElem->ValueStr() == "color")
+            {
+              // translate rgba attribute into diffuse color
+              gazebo->material_color = matElem->Attribute("rgba");
+            }
+            if (matElem->ValueStr() == "texture")
+            {
+              // translate attribute filename is not used, give warning
+              gzwarn << "<material><texture filename=... /></material>"
+                     << " not supported by parser.\n";
+            }
+          }
       }
       else if (childElem->ValueStr() == "static")
       {
@@ -580,6 +595,10 @@ void URDF2Gazebo::InsertGazeboExtensionVisual(TiXmlElement *_elem,
     for (std::vector<GazeboExtension*>::iterator ge = gazeboIt->second.begin();
          ge != gazeboIt->second.end(); ++ge)
     {
+      // std::string lumpedLinkName = _linkName + this->visualExt +
+      //       (*ge)->oldLinkName;
+      // gzerr << lumpedLinkName << " : "
+      //       << _linkName << " : " << (*ge)->oldLinkName << "\n";
       if ((*ge)->oldLinkName == _linkName)
       {
         // insert material block
@@ -590,6 +609,16 @@ void URDF2Gazebo::InsertGazeboExtensionVisual(TiXmlElement *_elem,
           TiXmlElement *scriptElem = new TiXmlElement("script");
           this->AddKeyValue(scriptElem, "name", (*ge)->material);
           materialElem->LinkEndChild(scriptElem);
+
+          if (!(*ge)->material_color.empty())
+          {
+            // parse color to sdf <material><diffuse>...</diffuse></material>
+            TiXmlElement *diffuseElem = new TiXmlElement("diffuse");
+            TiXmlText* colorTxt = new TiXmlText((*ge)->material_color);
+            diffuseElem->LinkEndChild(colorTxt);
+            materialElem->LinkEndChild(diffuseElem);
+          }
+
           _elem->LinkEndChild(materialElem);
         }
       }
@@ -746,6 +775,61 @@ void URDF2Gazebo::InsertGazeboExtensionRobot(TiXmlElement *_elem)
       }
     }
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void URDF2Gazebo::CreateMaterial(TiXmlElement* _elem,
+  boost::shared_ptr<urdf::Material> _material)
+{
+  // parse urdf material to sdf material
+  // urdf material
+  //   <visual>
+  //     <material name="my_material">
+  //       <color rgba="0.5 0.5 0.8 1"/>
+  //       <texture filename="package://my_ros_pacakge/file.png"/>
+  //     </material>
+  //   </visual>
+  // parse to:
+  // sdf material
+  //   <visual>
+  //     <material>
+  //       <script>
+  //         <name>my_material</name>
+  //       </script>
+  //       <diffuse>0.5 0.5 0.8 1</diffuse>
+  //     </material>
+  //   </visual>
+
+  TiXmlElement *materialElem = new TiXmlElement("material");
+  if (!_material->name.empty())
+  {
+    TiXmlElement *scriptElem = new TiXmlElement("script");
+    this->AddKeyValue(scriptElem, "name", _material->name);
+    materialElem->LinkEndChild(scriptElem);
+  }
+
+  // parse color to sdf <material><diffuse>...</diffuse></material>
+  /// \TODO: there is no way of knowing if a color has been
+  /// specified in urdf, since urdf::Material::color is not a pointer,
+  /// and if color has been cleared, it sets color to (0, 0, 0, 1).
+  /// For now, if color is (0, 0, 0, 1), skip adding <color>.
+  if (!gazebo::math::equal(_material->color.r, 0.0f) ||
+      !gazebo::math::equal(_material->color.g, 0.0f) ||
+      !gazebo::math::equal(_material->color.b, 0.0f) ||
+      !gazebo::math::equal(_material->color.a, 1.0f))
+  {
+    TiXmlElement *diffuseElem = new TiXmlElement("diffuse");
+    std::ostringstream rgbaStream;
+    rgbaStream << _material->color.r << " " << _material->color.g
+                << " " << _material->color.b << " " << _material->color.a;
+    TiXmlText* colorTxt = new TiXmlText(rgbaStream.str());
+    diffuseElem->LinkEndChild(colorTxt);
+    materialElem->LinkEndChild(diffuseElem);
+  }
+
+  /// \TODO: something with texture filename?
+
+  _elem->LinkEndChild(materialElem);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1789,6 +1873,15 @@ void URDF2Gazebo::CreateVisual(TiXmlElement *_elem, ConstUrdfLinkPtr _link,
     else
       CreateGeometry(gazeboVisual, _visual->geometry);
 
+    /* insert material */
+    if (!_visual || !_visual->material)
+    {
+      // gzdbg << "urdf2gazebo: visual of link [" << _link->name
+      //       << "] has no <material>\n.";
+    }
+    else
+      CreateMaterial(gazeboVisual, _visual->material);
+
     /* set additional data from extensions */
     this->InsertGazeboExtensionVisual(gazeboVisual, _oldLinkName);
 
@@ -2242,8 +2335,7 @@ void URDF2Gazebo::ReduceGazeboExtensionContactSensorFrameReplace(
           contact->RemoveChild(collision);
           TiXmlElement* collisionNameKey = new TiXmlElement("collision");
           std::ostringstream collisionNameStream;
-          collisionNameStream << newLinkName << this->collisionExt
-                              << "_" << linkName;
+          collisionNameStream << newLinkName << "_collision_" << linkName;
           TiXmlText* collisionNameTxt = new TiXmlText(
             collisionNameStream.str());
           collisionNameKey->LinkEndChild(collisionNameTxt);
