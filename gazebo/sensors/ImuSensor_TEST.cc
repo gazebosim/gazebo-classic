@@ -28,6 +28,7 @@ class ImuSensor_TEST : public ServerFixture
 {
   public: void BasicImuSensorCheck(const std::string &_physicsEngine);
   public: void LinearAccelerationTest(const std::string &_physicsEngine);
+  public: void OrientationTest(const std::string &_physicsEngine);
 };
 
 static std::string imuSensorString =
@@ -153,6 +154,53 @@ TEST_F(ImuSensor_TEST, LinearAccelerationTestODE)
 TEST_F(ImuSensor_TEST, LinearAccelerationTestBullet)
 {
   LinearAccelerationTest("bullet");
+}
+#endif
+
+// Rotate and translate the imu and check its orientation
+void ImuSensor_TEST::OrientationTest(const std::string &_physicsEngine)
+{
+
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  std::string modelName = "imuModel";
+  std::string imuSensorName = "imuSensor";
+  math::Pose modelPose(0, 0, 0.5, 0, 0, 0);
+
+  std::string topic = "~/" + imuSensorName + "_" + _physicsEngine;
+  // spawn imu sensor
+  SpawnUnitImuSensor(modelName, imuSensorName,
+      "box", topic, modelPose.pos, modelPose.rot.GetAsEuler());
+
+  sensors::SensorPtr sensor = sensors::get_sensor(imuSensorName);
+  sensors::ImuSensorPtr imuSensor =
+      boost::shared_dynamic_cast<sensors::ImuSensor>(sensor);
+
+  ASSERT_TRUE(imuSensor);
+
+  sensors::SensorManager::Instance()->Init();
+  imuSensor->SetActive(true);
+
+  EXPECT_EQ(imuSensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
+}
+
+
+TEST_F(ImuSensor_TEST, OrientationTestODE)
+{
+  OrientationTest("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(ImuSensor_TEST, OrientationTestBullet)
+{
+  OrientationTest("bullet");
 }
 #endif
 
