@@ -118,14 +118,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
   playToolbar->addAction(g_pauseAct);
 
   QLabel *emptyLabel = new QLabel(tr("  "));
-  QLabel *parenthesisOpenLabel = new QLabel(tr("("));
-  QLabel *parenthesisCloseLabel = new QLabel(tr(")"));
   playToolbar->addWidget(emptyLabel);
   playToolbar->addAction(g_stepAct);
-  playToolbar->addWidget(parenthesisOpenLabel);
   playToolbar->addWidget(stepLabel);
   playToolbar->addWidget(stepSpinBox);
-  playToolbar->addWidget(parenthesisCloseLabel);
 
   QHBoxLayout *playControlLayout = new QHBoxLayout;
   playControlLayout->setContentsMargins(0, 0, 0, 0);
