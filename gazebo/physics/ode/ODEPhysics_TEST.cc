@@ -66,7 +66,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   // test setting/getting physics engine params
   odePhysics->SetParam(ODEPhysics::SOLVER_TYPE, type);
   odePhysics->SetParam(ODEPhysics::SOR_PRECON_ITERS, preconIters);
-  odePhysics->SetParam(ODEPhysics::SOR_ITERS, iters);
+  odePhysics->SetParam(ODEPhysics::PGS_ITERS, iters);
   odePhysics->SetParam(ODEPhysics::SOR, sor);
   odePhysics->SetParam(ODEPhysics::GLOBAL_CFM, cfm);
   odePhysics->SetParam(ODEPhysics::GLOBAL_ERP, erp);
@@ -82,7 +82,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   value = odePhysics->GetParam(ODEPhysics::SOR_PRECON_ITERS);
   int preconItersRet = boost::any_cast<int>(value);
   EXPECT_EQ(preconIters, preconItersRet);
-  value = odePhysics->GetParam(ODEPhysics::SOR_ITERS);
+  value = odePhysics->GetParam(ODEPhysics::PGS_ITERS);
   int itersRet = boost::any_cast<int>(value);
   EXPECT_EQ(iters, itersRet);
   value = odePhysics->GetParam(ODEPhysics::SOR);

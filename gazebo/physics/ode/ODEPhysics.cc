@@ -1112,7 +1112,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       dWorldSetQuickStepPreconIterations(this->worldId, value);
       break;
     }
-    case SOR_ITERS:
+    case PGS_ITERS:
     {
       int value;
       try
@@ -1209,7 +1209,7 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "precon_iters")
     param = SOR_PRECON_ITERS;
   else if (_key == "iters")
-    param = SOR_ITERS;
+    param = PGS_ITERS;
   else if (_key == "sor")
     param = SOR;
   else if (_key == "contact_max_correcting_vel")
@@ -1257,7 +1257,7 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
       value = odeElem->GetElement("solver")->GetValueInt("precon_iters");
       break;
     }
-    case SOR_ITERS:
+    case PGS_ITERS:
     {
       value = odeElem->GetElement("solver")->GetValueInt("iters");
       break;
@@ -1312,7 +1312,7 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
   else if (_key == "precon_iters")
     param = SOR_PRECON_ITERS;
   else if (_key == "iters")
-    param = SOR_ITERS;
+    param = PGS_ITERS;
   else if (_key == "sor")
     param = SOR;
   else if (_key == "contact_max_correcting_vel")

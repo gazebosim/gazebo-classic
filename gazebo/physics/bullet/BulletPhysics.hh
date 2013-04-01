@@ -60,7 +60,7 @@ namespace gazebo
         GLOBAL_ERP,
 
         /// \brief Number of iterations
-        SOR_ITERS,
+        PGS_ITERS,
 
         /// \brief SOR over-relaxation parameter
         SOR,

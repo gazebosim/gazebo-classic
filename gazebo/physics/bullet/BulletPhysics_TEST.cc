@@ -64,7 +64,7 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
 
   // test setting/getting physics engine params
   bulletPhysics->SetParam(BulletPhysics::SOLVER_TYPE, type);
-  bulletPhysics->SetParam(BulletPhysics::SOR_ITERS, iters);
+  bulletPhysics->SetParam(BulletPhysics::PGS_ITERS, iters);
   bulletPhysics->SetParam(BulletPhysics::SOR, sor);
   bulletPhysics->SetParam(BulletPhysics::GLOBAL_CFM, cfm);
   bulletPhysics->SetParam(BulletPhysics::GLOBAL_ERP, erp);
@@ -75,7 +75,7 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   value = bulletPhysics->GetParam(BulletPhysics::SOLVER_TYPE);
   std::string typeRet = boost::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
-  value = bulletPhysics->GetParam(BulletPhysics::SOR_ITERS);
+  value = bulletPhysics->GetParam(BulletPhysics::PGS_ITERS);
   int itersRet = boost::any_cast<int>(value);
   EXPECT_EQ(iters, itersRet);
   value = bulletPhysics->GetParam(BulletPhysics::SOR);
