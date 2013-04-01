@@ -252,7 +252,7 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libavcodec not found. Audio-video capabilities will be disabled.")
   endif ()
 
-  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale)
+  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
   endif ()
 
@@ -511,16 +511,16 @@ endif ()
 #find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
 #  /usr/include
 #  /usr/local/include
-#  "$ENV{LIB_DIR}/include" 
-#  "$ENV{INCLUDE}" 
+#  "$ENV{LIB_DIR}/include"
+#  "$ENV{INCLUDE}"
 #  PATH_SUFFIXES qwt-qt4 qwt qwt5
 #  )
 #
-#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS 
+#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
 #  /usr/lib
 #  /usr/local/lib
-#  "$ENV{LIB_DIR}/lib" 
-#  "$ENV{LIB}/lib" 
+#  "$ENV{LIB_DIR}/lib"
+#  "$ENV{LIB}/lib"
 #  )
 #
 #if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
