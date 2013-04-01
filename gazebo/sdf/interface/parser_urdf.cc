@@ -801,12 +801,6 @@ void URDF2Gazebo::CreateMaterial(TiXmlElement* _elem,
   //   </visual>
 
   TiXmlElement *materialElem = new TiXmlElement("material");
-  if (!_material->name.empty())
-  {
-    TiXmlElement *scriptElem = new TiXmlElement("script");
-    this->AddKeyValue(scriptElem, "name", _material->name);
-    materialElem->LinkEndChild(scriptElem);
-  }
 
   // parse color to sdf <material><diffuse>...</diffuse></material>
   /// \TODO: there is no way of knowing if a color has been
@@ -825,6 +819,14 @@ void URDF2Gazebo::CreateMaterial(TiXmlElement* _elem,
     TiXmlText* colorTxt = new TiXmlText(rgbaStream.str());
     diffuseElem->LinkEndChild(colorTxt);
     materialElem->LinkEndChild(diffuseElem);
+  }
+  else if (!_material->name.empty())
+  {
+    // parse script from name only if color is not specified,
+    // otherwise, it is overwritten
+    TiXmlElement *scriptElem = new TiXmlElement("script");
+    this->AddKeyValue(scriptElem, "name", _material->name);
+    materialElem->LinkEndChild(scriptElem);
   }
 
   /// \TODO: something with texture filename?
