@@ -168,7 +168,7 @@ endif()
 # Check for DRI capable Display
 include (${gazebo_cmake_dir}/CheckDRIDisplay.cmake)
 
-set (CMAKE_C_FLAGS_FAST " -s -OFast -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for fast" FORCE)
+set (CMAKE_C_FLAGS_FAST " -s -Ofast -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for fast" FORCE)
 set (CMAKE_CXX_FLAGS_FAST ${CMAKE_C_FLAGS_FAST})
 
 set (CMAKE_C_FLAGS_RELEASE " -s -O3 -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release" FORCE)
