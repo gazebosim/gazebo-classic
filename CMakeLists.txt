@@ -165,6 +165,14 @@ else()
   message(STATUS "\nSSE4 disabled.\n")
 endif()
 
+if (ENABLE_FUNROLL)
+    set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -funroll-loops")
+endif()
+
+if (ENABLE_MARCH_NATIVE)
+    set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -march=native")
+endif()
+
 # Check for DRI capable Display
 include (${gazebo_cmake_dir}/CheckDRIDisplay.cmake)
 
