@@ -148,14 +148,8 @@ void ODEGearboxJoint::SetAxis(int _index, const math::Vector3 &_axis)
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetDamping(int /*index*/, double _damping)
 {
-  gzlog << "damping not implemented for gearbox\n";
-  return;
-
   this->dampingCoefficient = _damping;
-  // use below when ode version is fixed
-  // dJointSetDamping(this->jointId, this->dampingCoefficient);
-  this->applyDamping = physics::Joint::ConnectJointUpdate(
-    boost::bind(&Joint::ApplyDamping, this));
+  gzlog << "damping not available for gearbox\n";
 }
 
 //////////////////////////////////////////////////
