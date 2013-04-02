@@ -28,14 +28,14 @@ class ImuTest : public ServerFixture
   public: void Stationary_EmptyWorld(const std::string &_physicsEngine);
   public: void Stationary_EmptyWorld_Noise(const std::string &_physicsEngine);
   public: void Stationary_EmptyWorld_Bias(const std::string &_physicsEngine);
-  private: void GetGravity(const math::Quaternion& _rot, math::Vector3& _g);
+  private: void GetGravity(const math::Quaternion& _rot, math::Vector3 &_g);
   private: void GetImuData(sensors::ImuSensorPtr _imu, unsigned int _cnt,
-                           math::Vector3& _rateMean,
-                           math::Vector3& _accelMean,
-                           math::Quaternion& _orientation);
+                           math::Vector3 &_rateMean,
+                           math::Vector3 &_accelMean,
+                           math::Quaternion &_orientation);
 };
 
-void ImuTest::GetGravity(const math::Quaternion& _rot, math::Vector3& _g)
+void ImuTest::GetGravity(const math::Quaternion &_rot, math::Vector3 &_g)
 {
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
@@ -47,15 +47,15 @@ void ImuTest::GetGravity(const math::Quaternion& _rot, math::Vector3& _g)
 
 void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
                          unsigned int _cnt,
-                         math::Vector3& _rateMean,
-                         math::Vector3& _accelMean,
+                         math::Vector3 &_rateMean,
+                         math::Vector3 &_accelMean,
                          math::Quaternion& _orientation)
 {
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
   // Collect a number of samples and return the average rate and accel values
   math::Vector3 rateSum, accelSum;
-  for (unsigned int i = 0; i < _cnt; i++)
+  for (unsigned int i = 0; i < _cnt; ++i)
   {
     world->StepWorld(1);
     _imu->Update(true);
