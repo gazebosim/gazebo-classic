@@ -56,6 +56,10 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void Fini();
 
+      /// \brief Returns the imu message
+      /// \return Imu message.
+      public: msgs::IMU GetImuMessage() const;
+
       /// \brief Returns the angular velocity.
       /// \return Angular velocity.
       public: math::Vector3 GetAngularVelocity() const;
@@ -123,6 +127,9 @@ namespace gazebo
 
       /// \brief If noiseType==GAUSSIAN, the bias we'll add to rates
       private: double rateBias;
+
+      /// \brief Prevent imuMsg update race condition when
+      private: mutable boost::mutex mutex;
     };
     /// \}
   }

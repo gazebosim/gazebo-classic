@@ -163,20 +163,30 @@ void ImuSensor::Fini()
 }
 
 //////////////////////////////////////////////////
+msgs::IMU ImuSensor::GetImuMessage() const
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+  return this->imuMsg;
+}
+
+//////////////////////////////////////////////////
 math::Vector3 ImuSensor::GetAngularVelocity() const
 {
+  boost::mutex::scoped_lock lock(this->mutex);
   return msgs::Convert(this->imuMsg.angular_velocity());
 }
 
 //////////////////////////////////////////////////
 math::Vector3 ImuSensor::GetLinearAcceleration() const
 {
+  boost::mutex::scoped_lock lock(this->mutex);
   return msgs::Convert(this->imuMsg.linear_acceleration());
 }
 
 //////////////////////////////////////////////////
 math::Quaternion ImuSensor::GetOrientation() const
 {
+  boost::mutex::scoped_lock lock(this->mutex);
   return msgs::Convert(this->imuMsg.orientation());
 }
 
@@ -189,79 +199,82 @@ void ImuSensor::SetReferencePose()
 //////////////////////////////////////////////////
 void ImuSensor::UpdateImpl(bool /*_force*/)
 {
-  double dt = (this->world->GetSimTime() - this->lastMeasurementTime).Double();
-
-  this->lastMeasurementTime = this->world->GetSimTime();
-
-  this->imuMsg.set_entity_name(this->parentName);
-
-  // Set the time stamp
-  msgs::Set(this->imuMsg.mutable_stamp(), this->world->GetSimTime());
-
-  math::Pose parentEntityPose = this->parentEntity->GetWorldPose();
-  math::Pose imuPose = this->pose + parentEntityPose;
-
-  // Set the IMU orientation
-  msgs::Set(this->imuMsg.mutable_orientation(),
-            imuPose.rot * this->referencePose.rot.GetInverse());
-
-  // Set the IMU angular velocity
-  msgs::Set(this->imuMsg.mutable_angular_velocity(),
-            imuPose.rot.GetInverse().RotateVector(
-            this->parentEntity->GetWorldAngularVel()));
-
-  // get linear velocity in world frame
-  math::Vector3 imuWorldLinearVel =
-    this->parentEntity->GetWorldLinearVel(this->pose.pos);
-
-  // Compute and set the IMU linear acceleration
-  if (dt > 0.0)
+  double dt= (this->world->GetSimTime() - this->lastMeasurementTime).Double();
   {
-    this->linearAcc = imuPose.rot.GetInverse().RotateVector(
-      (imuWorldLinearVel - this->lastLinearVel) / dt);
-    this->lastLinearVel = imuWorldLinearVel;
-  }
+    boost::mutex::scoped_lock lock(this->mutex);
 
-  // Add contribution from gravity
-  this->gravity = this->world->GetPhysicsEngine()->GetGravity();
-  this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
+    this->lastMeasurementTime = this->world->GetSimTime();
 
-  msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
+    this->imuMsg.set_entity_name(this->parentName);
 
-  if (this->noiseActive)
-  {
-    switch (this->noiseType)
+    // Set the time stamp
+    msgs::Set(this->imuMsg.mutable_stamp(), this->world->GetSimTime());
+
+    math::Pose parentEntityPose = this->parentEntity->GetWorldPose();
+    math::Pose imuPose = this->pose + parentEntityPose;
+
+    // Set the IMU orientation
+    msgs::Set(this->imuMsg.mutable_orientation(),
+              imuPose.rot * this->referencePose.rot.GetInverse());
+
+    // Set the IMU angular velocity
+    msgs::Set(this->imuMsg.mutable_angular_velocity(),
+              imuPose.rot.GetInverse().RotateVector(
+              this->parentEntity->GetWorldAngularVel()));
+
+    // get linear velocity in world frame
+    math::Vector3 imuWorldLinearVel =
+      this->parentEntity->GetWorldLinearVel(this->pose.pos);
+
+    // Compute and set the IMU linear acceleration
+    if (dt > 0.0)
     {
-      case GAUSSIAN:
-        // Add Gaussian noise + fixed bias to each rate
-        this->imuMsg.mutable_angular_velocity()->set_x(
-          this->imuMsg.angular_velocity().x() + this->rateBias +
-          math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
-        this->imuMsg.mutable_angular_velocity()->set_y(
-          this->imuMsg.angular_velocity().y() + this->rateBias +
-          math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
-        this->imuMsg.mutable_angular_velocity()->set_z(
-          this->imuMsg.angular_velocity().z() + this->rateBias +
-          math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
+      this->linearAcc = imuPose.rot.GetInverse().RotateVector(
+        (imuWorldLinearVel - this->lastLinearVel) / dt);
+      this->lastLinearVel = imuWorldLinearVel;
+    }
 
-        // Add Gaussian noise + fixed bias to each acceleration
-        this->imuMsg.mutable_linear_acceleration()->set_x(
-          this->imuMsg.linear_acceleration().x() + this->accelBias +
-          math::Rand::GetDblNormal(this->accelNoiseMean,
-                                   this->accelNoiseStdDev));
-        this->imuMsg.mutable_linear_acceleration()->set_y(
-          this->imuMsg.linear_acceleration().y() + this->accelBias +
-          math::Rand::GetDblNormal(this->accelNoiseMean,
-                                   this->accelNoiseStdDev));
-        this->imuMsg.mutable_linear_acceleration()->set_z(
-          this->imuMsg.linear_acceleration().z() + this->accelBias +
-          math::Rand::GetDblNormal(this->accelNoiseMean,
-                                   this->accelNoiseStdDev));
+    // Add contribution from gravity
+    this->gravity = this->world->GetPhysicsEngine()->GetGravity();
+    this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
 
-        // TODO: add noise to orientation
-        break;
-      default:
-        GZ_ASSERT(false, "Invalid noise model type");
+    msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
+
+    if (this->noiseActive)
+    {
+      switch (this->noiseType)
+      {
+        case GAUSSIAN:
+          // Add Gaussian noise + fixed bias to each rate
+          this->imuMsg.mutable_angular_velocity()->set_x(
+            this->imuMsg.angular_velocity().x() + this->rateBias +
+            math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
+          this->imuMsg.mutable_angular_velocity()->set_y(
+            this->imuMsg.angular_velocity().y() + this->rateBias +
+            math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
+          this->imuMsg.mutable_angular_velocity()->set_z(
+            this->imuMsg.angular_velocity().z() + this->rateBias +
+            math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
+
+          // Add Gaussian noise + fixed bias to each acceleration
+          this->imuMsg.mutable_linear_acceleration()->set_x(
+            this->imuMsg.linear_acceleration().x() + this->accelBias +
+            math::Rand::GetDblNormal(this->accelNoiseMean,
+                                     this->accelNoiseStdDev));
+          this->imuMsg.mutable_linear_acceleration()->set_y(
+            this->imuMsg.linear_acceleration().y() + this->accelBias +
+            math::Rand::GetDblNormal(this->accelNoiseMean,
+                                     this->accelNoiseStdDev));
+          this->imuMsg.mutable_linear_acceleration()->set_z(
+            this->imuMsg.linear_acceleration().z() + this->accelBias +
+            math::Rand::GetDblNormal(this->accelNoiseMean,
+                                     this->accelNoiseStdDev));
+
+          // TODO: add noise to orientation
+          break;
+        default:
+          GZ_ASSERT(false, "Invalid noise model type");
+      }
     }
   }
 
