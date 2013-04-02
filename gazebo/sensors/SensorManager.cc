@@ -145,8 +145,6 @@ void SensorManager::Update(bool _force)
               << "changed during sensor removal. This is bad, and should "
               << "never happen.\n";
       }
-
-
     }
     this->removeSensors.clear();
   }
