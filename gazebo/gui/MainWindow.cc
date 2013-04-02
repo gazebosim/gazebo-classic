@@ -74,6 +74,8 @@ MainWindow::MainWindow()
   this->CreateActions();
   this->CreateMenus();
 
+  this->recordVideoTimer = NULL;
+
   QWidget *mainWidget = new QWidget;
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainWidget->show();
@@ -606,9 +608,17 @@ void MainWindow::RecordVideo()
   if (g_recordVideoAct->isChecked())
   {
     g_recordVideoAct->setIcon(QIcon(":/images/record_stop.png"));
+    if (!this->recordVideoTimer)
+    {
+      this->recordVideoTimer = new QTimer(this);
+      connect(this->recordVideoTimer, SIGNAL(timeout()), this,
+          SLOT(DisplayRecordingMsg()));
+    }
+    this->recordVideoTimer->start(1000);
   }
   else
   {
+    this->recordVideoTimer->stop();
     g_recordVideoAct->setIcon(QIcon(":/images/record.png"));
 
     std::string friendlyName = cam->GetName();
@@ -644,6 +654,12 @@ void MainWindow::ShowVideoFormatMenu()
   qobject_cast<QToolButton *>(defaultWidget)->showMenu();
 }
 
+/////////////////////////////////////////////////
+void MainWindow::DisplayRecordingMsg()
+{
+  this->renderWidget->DisplayOverlayMsg("Recording...",
+      this->recordVideoTimer ? this->recordVideoTimer->interval()/2 : 500);
+}
 /////////////////////////////////////////////////
 void MainWindow::InsertModel()
 {

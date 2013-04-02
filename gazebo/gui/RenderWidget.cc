@@ -76,9 +76,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolbar->addSeparator();
   toolbar->addAction(g_recordVideoAct);
 
-/*  QPushButton *videoFormatButton =
-      new QPushButton(QIcon(":/images/down_arrow.png"), "");
-  toolbar->addWidget(videoFormatButton);*/
   toolbar->addAction(g_recordVideoFormatAct);
 
   toolbar->addSeparator();
@@ -98,7 +95,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   this->msgOverlayLabel = new QLabel(this->glWidget);
   this->msgOverlayLabel->setStyleSheet(
-      "QLabel { background-color : white; color : gray; }");
+      "QLabel { background-color : #303030; color : #d0d0d0; }");
   this->msgOverlayLabel->setVisible(false);
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;

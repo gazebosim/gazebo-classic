@@ -89,6 +89,10 @@ namespace gazebo
       /// \brief Qt callback when the record video format button is clicked
       private slots: void ShowVideoFormatMenu();
 
+      /// \brief Qt callback connected to a QTimer for displaying a blinking
+      /// recording text to the screen
+      private slots: void DisplayRecordingMsg();
+
       private slots: void InsertModel();
       private slots: void ShowGrid();
       private slots: void ShowCollisions();
@@ -198,6 +202,8 @@ namespace gazebo
       /// \brief The filename set via "Save As". This filename is used by
       /// the "Save" feature.
       private: std::string saveFilename;
+
+      private: QTimer *recordVideoTimer;
     };
 
     class TreeViewDelegate: public QItemDelegate
