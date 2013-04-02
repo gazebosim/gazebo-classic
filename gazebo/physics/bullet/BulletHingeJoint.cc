@@ -164,8 +164,6 @@ void BulletHingeJoint::Init()
 
   // Allows access to impulse
   this->bulletHinge->enableFeedback(true);
-
-  this->ComputeInertiaRatio();
 }
 
 //////////////////////////////////////////////////
@@ -238,9 +236,7 @@ double BulletHingeJoint::GetVelocity(int /*_index*/) const
   double result = 0;
   math::Vector3 globalAxis = this->GetGlobalAxis(0);
   if (this->childLink)
-  {
     result += globalAxis.Dot(this->childLink->GetWorldAngularVel());
-  }
   if (this->parentLink)
     result -= globalAxis.Dot(this->parentLink->GetWorldAngularVel());
   return result;

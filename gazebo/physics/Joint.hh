@@ -444,7 +444,7 @@ namespace gazebo
       /// \brief Computes inertiaRatio for this joint during Joint::Init
       /// The inertia ratio for each joint between [1, +inf] gives a sense
       /// of how well this model will perform in iterative LCP methods.
-      public: void ComputeInertiaRatio();
+      private: void ComputeInertiaRatio();
 
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;

@@ -266,8 +266,6 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
     this->GetMemInfo(residentCur, shareCur);
     if (i > 1)  // give it 2 cycles to stabilize
     {
-      // EXPECT_LE(residentCur, residentLast);
-      // EXPECT_LE(shareCur, shareLast);
       EXPECT_TRUE(math::equal(residentCur, residentLast));
       EXPECT_TRUE(math::equal(shareCur, shareLast));
     }
@@ -321,8 +319,6 @@ TEST_F(Joint_TEST, joint_SDF14)
   EXPECT_EQ(parent->GetName(), "body2");
   EXPECT_EQ(child->GetName(), "body1");
 }
-
-
 
 int main(int argc, char **argv)
 {
