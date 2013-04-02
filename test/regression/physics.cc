@@ -123,8 +123,8 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
       math::Vector3::Zero);
   SpawnEmptyLink("test_empty", modelPos["test_empty"], math::Vector3::Zero);
-  std::string trimeshPath =
-      "file://media/models/cube_20k/meshes/cube_20k.stl";
+  // std::string trimeshPath =
+  //    "file://media/models/cube_20k/meshes/cube_20k.stl";
   // SpawnTrimesh("test_trimesh", trimeshPath, math::Vector3(0.5, 0.5, 0.5),
   //    modelPos["test_trimesh"], math::Vector3::Zero);
 
@@ -681,11 +681,12 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    double jointVel1, jointVel2;
-    double angle1, angle2, angle3;
     model = world->GetModel(*modelIter);
     if (model)
     {
+      double jointVel1, jointVel2;
+      double angle1, angle2, angle3;
+
       gzdbg << "Check angle measurement for " << *modelIter << '\n';
       std::vector<std::string>::iterator jointIter;
       for (jointIter  = jointNames.begin();

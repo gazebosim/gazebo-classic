@@ -820,7 +820,6 @@ std::string Camera::GetFrameFilename()
   boost::filesystem::path pathToFile;
 
   std::string friendlyName = this->GetName();
-  std::string filename;
 
   boost::replace_all(friendlyName, "::", "_");
 

@@ -52,7 +52,7 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   EXPECT_EQ(physics->GetType(), physicsEngineStr);
 
   BulletPhysicsPtr bulletPhysics
-      = boost::shared_static_cast<BulletPhysics>(physics);
+      = boost::static_pointer_cast<BulletPhysics>(physics);
   ASSERT_TRUE(bulletPhysics != NULL);
 
   std::string type = "sequential_impulse";
