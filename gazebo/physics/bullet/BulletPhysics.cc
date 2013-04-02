@@ -268,8 +268,8 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   gContactAddedCallback = ContactCallback;
   gContactProcessedCallback = ContactProcessed;
 
-  this->dynamicsWorld->setInternalTickCallback(
-      InternalTickCallback, static_cast<void *>(this));
+//  this->dynamicsWorld->setInternalTickCallback(
+//      InternalTickCallback, static_cast<void *>(this));
 
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.

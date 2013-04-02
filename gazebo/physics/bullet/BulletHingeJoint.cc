@@ -164,6 +164,8 @@ void BulletHingeJoint::Init()
 
   // Allows access to impulse
   this->bulletHinge->enableFeedback(true);
+
+  this->ComputeInertiaRatio();
 }
 
 //////////////////////////////////////////////////
@@ -184,8 +186,9 @@ void BulletHingeJoint::SetAnchor(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
+void BulletHingeJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
+  BulletJoint::SetAxis(_index, _axis);
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame
   if (this->bulletHinge == NULL)
@@ -235,7 +238,9 @@ double BulletHingeJoint::GetVelocity(int /*_index*/) const
   double result = 0;
   math::Vector3 globalAxis = this->GetGlobalAxis(0);
   if (this->childLink)
+  {
     result += globalAxis.Dot(this->childLink->GetWorldAngularVel());
+  }
   if (this->parentLink)
     result -= globalAxis.Dot(this->parentLink->GetWorldAngularVel());
   return result;

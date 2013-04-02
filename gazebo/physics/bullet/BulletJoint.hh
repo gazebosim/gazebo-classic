@@ -129,6 +129,9 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);
+
+      // Documentation inherited
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
     };
     /// \}
   }

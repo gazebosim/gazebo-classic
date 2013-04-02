@@ -41,6 +41,7 @@ BulletJoint::BulletJoint(BasePtr _parent)
 BulletJoint::~BulletJoint()
 {
   delete this->constraint;
+  this->constraint = NULL;
   this->bulletWorld = NULL;
 }
 
@@ -95,11 +96,14 @@ bool BulletJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 //////////////////////////////////////////////////
 void BulletJoint::Detach()
 {
+  Joint::Detach();
+
   this->childLink.reset();
   this->parentLink.reset();
   if (this->constraint && this->bulletWorld)
     this->bulletWorld->removeConstraint(this->constraint);
   delete this->constraint;
+  this->constraint = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -113,4 +117,15 @@ JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 {
   JointWrench wrench;
   return wrench;
+}
+
+//////////////////////////////////////////////////
+void BulletJoint::SetAxis(int _index, const math::Vector3 &_axis)
+{
+  if (_index == 0)
+    this->sdf->GetElement("axis")->GetElement("xyz")->Set(_axis);
+  else if (_index == 1)
+    this->sdf->GetElement("axis2")->GetElement("xyz")->Set(_axis);
+  else
+    gzerr << "SetAxis index [" << _index << "] out of bounds\n";
 }

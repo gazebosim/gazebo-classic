@@ -153,6 +153,9 @@ namespace gazebo
       public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
 
       // Documentation inherited.
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+
+      // Documentation inherited.
       public: virtual void SetAttribute(Attribute _attr, int _index,
                                         double _value);
 
