@@ -157,6 +157,9 @@ namespace gazebo
                                         double _value);
 
       // Documentation inherited.
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+
+      // Documentation inherited.
       public: virtual void SetAttribute(const std::string &_key, int _index,
                                         const boost::any &_value);
 
