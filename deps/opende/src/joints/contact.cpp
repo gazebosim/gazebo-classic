@@ -116,10 +116,10 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
     }
 
     // set right hand side and cfm value for normal
-    dReal erp = info->erp;
+    dReal local_erp = info->erp;
     if ( contact.surface.mode & dContactSoftERP )
-        erp = contact.surface.soft_erp;
-    dReal k = info->fps * erp;
+        local_erp = contact.surface.soft_erp;
+    dReal k = info->fps * local_erp;
 
     // experimental - check relative acceleration at the contact
 
