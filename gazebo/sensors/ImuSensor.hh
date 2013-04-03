@@ -48,13 +48,17 @@ namespace gazebo
       protected: virtual void Load(const std::string &_worldName);
 
       /// \brief Initialize the IMU.
-      protected: virtual void Init();
+      public: virtual void Init();
 
       // Documentation inherited
       protected: virtual void UpdateImpl(bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
+
+      /// \brief Returns the imu message
+      /// \return Imu message.
+      public: msgs::IMU GetImuMessage() const;
 
       /// \brief Returns the angular velocity.
       /// \return Angular velocity.
@@ -87,6 +91,45 @@ namespace gazebo
       private: transport::PublisherPtr pub;
       private: physics::LinkPtr parentEntity;
       private: msgs::IMU imuMsg;
+
+      /// \brief Which noise type we support
+      private: enum NoiseModelType
+      {
+        NONE,
+        GAUSSIAN
+      };
+
+      /// \brief If true, apply the noise model specified by other noise
+      /// parameters
+      private: bool noiseActive;
+
+      /// \brief Which type of noise we're applying
+      private: enum NoiseModelType noiseType;
+
+      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
+      /// from which we sample when adding noise to accelerations
+      private: double accelNoiseMean;
+
+      /// \brief If accelNoiseType==GAUSSIAN, the standard devation of the
+      /// distibution from which we sample when adding noise to accelerations
+      private: double accelNoiseStdDev;
+
+      /// \brief If noiseType==GAUSSIAN, the bias we'll add to acceleratations
+      private: double accelBias;
+
+      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
+      /// from which we sample when adding noise to rates
+      private: double rateNoiseMean;
+
+      /// \brief If noiseType==GAUSSIAN, the standard devation of the
+      /// distibution from which we sample when adding noise to rates
+      private: double rateNoiseStdDev;
+
+      /// \brief If noiseType==GAUSSIAN, the bias we'll add to rates
+      private: double rateBias;
+
+      /// \brief Prevent imuMsg update race condition when
+      private: mutable boost::mutex mutex;
     };
     /// \}
   }
