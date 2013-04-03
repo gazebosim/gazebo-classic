@@ -107,9 +107,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   connect(stepSpinBox, SIGNAL(valueChanged(int)), this,
       SLOT(OnStepValueChanged(int)));
 
-//  connect(stepSpinBox, SIGNAL(editingFinished()), this,
-//      SLOT(OnClearOverlayMsg()));
-
   QWidget *stepWidget = new QWidget;
   QLabel *stepLabel = new QLabel(tr("Steps:"));
   QVBoxLayout *stepLayout = new QVBoxLayout;
@@ -130,6 +127,9 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->stepButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
   this->stepButton->setContentsMargins(0, 0, 0, 0);
   this->OnStepValueChanged(1);
+
+  connect(stepSpinBox, SIGNAL(editingFinished()), stepMenu,
+      SLOT(hide()));
 
   QFrame *playFrame = new QFrame;
   playFrame->setFrameShape(QFrame::NoFrame);
