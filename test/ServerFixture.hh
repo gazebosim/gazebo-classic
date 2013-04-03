@@ -358,8 +358,8 @@ class ServerFixture : public testing::Test
                _diffAvg = _diffSum / _sampleCount;
              }
 
-  protected: void ImageCompare(unsigned char **_imageA,
-                 unsigned char *_imageB[],
+  protected: void ImageCompare(unsigned char *_imageA,
+                 unsigned char *_imageB,
                  unsigned int _width, unsigned int _height, unsigned int _depth,
                  unsigned int &_diffMax, unsigned int &_diffSum,
                  double &_diffAvg)
@@ -372,10 +372,10 @@ class ServerFixture : public testing::Test
                {
                  for (unsigned int x = 0; x < _width*_depth; x++)
                  {
-                   unsigned int a = (*_imageA)[(y*_width*_depth)+x];
-                   unsigned int b = (*_imageB)[(y*_width*_depth)+x];
+                   unsigned int a = _imageA[(y*_width*_depth)+x];
+                   unsigned int b = _imageB[(y*_width*_depth)+x];
 
-                   unsigned int diff = (unsigned int)(fabs(a - b));
+                   unsigned int diff = (unsigned int)(abs(a - b));
 
                    if (diff > _diffMax)
                      _diffMax = diff;
@@ -431,7 +431,10 @@ class ServerFixture : public testing::Test
                  const std::string &_cameraName,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  unsigned int _width = 320, unsigned int _height = 240,
-                 double _rate = 25)
+                 double _rate = 25,
+                 const std::string &_noiseType = "", 
+                 double _noiseMean = 0.0,
+                 double _noiseStdDev = 0.0)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
@@ -455,9 +458,17 @@ class ServerFixture : public testing::Test
                  << "      </image>"
                  << "      <clip>"
                  << "        <near>0.1</near><far>100</far>"
-                 << "      </clip>"
+                 << "      </clip>";
                  // << "      <save enabled ='true' path ='/tmp/camera/'/>"
-                 << "    </camera>"
+
+               if (_noiseType.size() > 0)
+                 newModelStr << "      <noise>"
+                 << "        <type>" << _noiseType << "</type>"
+                 << "        <mean>" << _noiseMean << "</mean>"
+                 << "        <stddev>" << _noiseStdDev << "</stddev>"
+                 << "      </noise>";
+
+               newModelStr << "    </camera>"
                  << "  </sensor>"
                  << "</link>"
                  << "</model>"

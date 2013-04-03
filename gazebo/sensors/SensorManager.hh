@@ -271,6 +271,9 @@ namespace gazebo
       /// \brief List of sensors that require initialization.
       private: Sensor_V initSensors;
 
+      /// \brief List of sensors that require initialization.
+      private: Sensor_V removeSensors;
+
       /// \brief A vector of SensorContainer pointers.
       private: typedef std::vector<SensorContainer*> SensorContainer_V;
 
