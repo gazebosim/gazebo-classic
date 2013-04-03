@@ -118,6 +118,7 @@ void setBall( dxJoint *joint, dxJoint::Info2 *info,
 
     // set right hand side
     dReal k = info->fps * info->erp;
+    printf("setBall info->erp %f\n", info->erp);
     if ( joint->node[1].body )
     {
         for ( int j = 0; j < 3; j++ )

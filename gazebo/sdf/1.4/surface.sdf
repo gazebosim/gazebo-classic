@@ -48,6 +48,9 @@
 
   <element name="contact" required="0">
     <description></description>
+    <element name="collide_without_contact" type="bool" default="0" required="1">
+      <description>Flag to disable contact force generation, while still allowing collision checks and contact visualization to occur.</description>
+    </element>
     <element name="ode" required="0">
       <description>ODE contact parameters</description>
       <element name="soft_cfm" type="double" default="0" required="0">
