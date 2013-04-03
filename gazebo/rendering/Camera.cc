@@ -66,28 +66,28 @@ class GaussianNoiseCompositorListener
   public: virtual void notifyMaterialRender(unsigned int _pass_id,
                                             Ogre::MaterialPtr & _mat)
   {
-      // modify material here (wont alter the base material!), called for
-      // every drawn geometry instance (i.e. compositor render_quad)
+    // modify material here (wont alter the base material!), called for
+    // every drawn geometry instance (i.e. compositor render_quad)
 
-      // Sample three values within the range [0,1.0] and set them for use in
-      // the fragment shader, which will interpret them as offsets from (0,0)
-      // to use when computing pseudo-random values.
-      Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
-                            math::Rand::GetDblUniform(0.0, 1.0),
-                            math::Rand::GetDblUniform(0.0, 1.0));
-      // These calls are setting parameters that are declared in two places:
-      // 1. media/materials/scripts/gazebo.material, in
-      //    fragment_program Gazebo/GaussianCameraNoiseFS
-      // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
-      _mat->getTechnique(0)->getPass(_pass_id)->
-        getFragmentProgramParameters()->
-        setNamedConstant("offsets", offsets);
-      _mat->getTechnique(0)->getPass(_pass_id)->
-        getFragmentProgramParameters()->
-        setNamedConstant("mean", (Ogre::Real)this->mean);
-      _mat->getTechnique(0)->getPass(_pass_id)->
-        getFragmentProgramParameters()->
-        setNamedConstant("stddev", (Ogre::Real)this->stddev);
+    // Sample three values within the range [0,1.0] and set them for use in
+    // the fragment shader, which will interpret them as offsets from (0,0)
+    // to use when computing pseudo-random values.
+    Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
+                          math::Rand::GetDblUniform(0.0, 1.0),
+                          math::Rand::GetDblUniform(0.0, 1.0));
+    // These calls are setting parameters that are declared in two places:
+    // 1. media/materials/scripts/gazebo.material, in
+    //    fragment_program Gazebo/GaussianCameraNoiseFS
+    // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
+    _mat->getTechnique(0)->getPass(_pass_id)->
+      getFragmentProgramParameters()->
+      setNamedConstant("offsets", offsets);
+    _mat->getTechnique(0)->getPass(_pass_id)->
+      getFragmentProgramParameters()->
+      setNamedConstant("mean", (Ogre::Real)this->mean);
+    _mat->getTechnique(0)->getPass(_pass_id)->
+      getFragmentProgramParameters()->
+      setNamedConstant("stddev", (Ogre::Real)this->stddev);
   }
 
   /// \brief Mean that we'll pass down to the GLSL fragment shader.

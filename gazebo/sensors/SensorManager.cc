@@ -332,7 +332,6 @@ void SensorManager::RemoveSensor(const std::string &_name)
   }
   else
   {
-    bool removed = false;
     // Push it on the list, to be removed by the main sensor thread,
     // to ensure correct access to rendering resources.
     this->removeSensors.push_back(sensor);
