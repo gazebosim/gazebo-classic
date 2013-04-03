@@ -46,6 +46,35 @@ namespace gazebo
     /// \brief Bullet physics engine
     class BulletPhysics : public PhysicsEngine
     {
+      /// \enum BulletParam
+      /// \brief Bullet physics parameter types.
+      public: enum BulletParam
+      {
+        /// \brief Solve type
+        SOLVER_TYPE,
+
+        /// \brief Constraint force mixing
+        GLOBAL_CFM,
+
+        /// \brief Error reduction parameter
+        GLOBAL_ERP,
+
+        /// \brief Number of iterations
+        PGS_ITERS,
+
+        /// \brief SOR over-relaxation parameter
+        SOR,
+
+        /// \brief Surface layer depth
+        CONTACT_SURFACE_LAYER,
+
+        /// \brief Maximum number of contacts
+        MAX_CONTACTS,
+
+        /// \brief Minimum step size
+        MIN_STEP_SIZE
+      };
+
       /// \brief Constructor
       public: BulletPhysics(WorldPtr _world);
 
@@ -127,8 +156,10 @@ namespace gazebo
 
       public: virtual void DebugPrint() const;
 
-      /// Documentation inherited
-      public: virtual void SetParam(PhysicsParam _param,
+      /// \brief Set a parameter of the bullet physics engine
+      /// \param[in] _param A parameter listed in the BulletParam enum
+      /// \param[in] _value The value to set to
+      public: virtual void SetParam(BulletParam _param,
                   const boost::any &_value);
 
       /// Documentation inherited
@@ -138,8 +169,10 @@ namespace gazebo
       /// Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
 
-      /// Documentation inherited
-      public: virtual boost::any GetParam(PhysicsParam _attr) const;
+      /// \brief Get an parameter of the physics engine
+      /// \param[in] _param A parameter listed in the BulletParam enum
+      /// \return The value of the parameter
+      public: virtual boost::any GetParam(BulletParam _param) const;
 
       private: btBroadphaseInterface *broadPhase;
       private: btDefaultCollisionConfiguration *collisionConfig;

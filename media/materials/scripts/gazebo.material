@@ -832,3 +832,39 @@ material drc/san_fauxcity_sign
     }
   }
 }
+
+vertex_program Gazebo/GaussianCameraNoiseVS glsl
+{
+  source camera_noise_gaussian_vs.glsl
+}
+
+fragment_program Gazebo/GaussianCameraNoiseFS glsl
+{
+  source camera_noise_gaussian_fs.glsl
+  default_params
+  {
+    param_named RT int 0
+    param_named mean float 0.0
+    param_named stddev float 1.0
+    param_named offsets float3 0.0 0.0 0.0
+  }
+}
+
+material Gazebo/GaussianCameraNoise
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/GaussianCameraNoiseVS { }
+      fragment_program_ref Gazebo/GaussianCameraNoiseFS { }
+
+      texture_unit RT
+      {
+        tex_coord_set 0
+        tex_address_mode clamp
+        filtering linear linear linear
+      }
+    }
+  }
+}
