@@ -455,7 +455,6 @@ void MainWindow::Play()
 
   g_pauseAct->setVisible(true);
   g_playAct->setVisible(false);
-  g_stepAct->setEnabled(false);
   this->worldControlPub->Publish(msg);
 }
 
@@ -467,7 +466,6 @@ void MainWindow::Pause()
 
   g_pauseAct->setVisible(false);
   g_playAct->setVisible(true);
-  g_stepAct->setEnabled(true);
   this->worldControlPub->Publish(msg);
 }
 
@@ -853,21 +851,32 @@ void MainWindow::CreateActions()
   g_editBuildingAct->setChecked(false);
   connect(g_editBuildingAct, SIGNAL(triggered()), this, SLOT(OnEditBuilding()));
 
+  g_stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
+  g_stepAct->setStatusTip(tr("Step the world"));
+  connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
+  QIcon icon = g_stepAct->icon();
+
+  // step action's icon is already in gray scale so there is no change in
+  // appearance when it is disabled. So create a custom semi-transparent
+  // icon for the disabled state.
+  QPixmap pixmap(":/images/end.png");
+  QPainter p(&pixmap);
+  p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+  p.fillRect(pixmap.rect(), QColor(0, 0, 0, 100));
+  icon.addPixmap(pixmap, QIcon::Disabled);
+  g_stepAct->setIcon(icon);
+
   g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   g_playAct->setStatusTip(tr("Run the world"));
   g_playAct->setVisible(false);
   connect(g_playAct, SIGNAL(triggered()), this, SLOT(Play()));
+  connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
+  this->OnPlayActionChanged();
 
   g_pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
   g_pauseAct->setStatusTip(tr("Pause the world"));
   g_pauseAct->setVisible(true);
   connect(g_pauseAct, SIGNAL(triggered()), this, SLOT(Pause()));
-
-  g_stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
-  g_stepAct->setStatusTip(tr("Step the world"));
-  g_stepAct->setToolTip(tr("Pause the world before stepping"));
-  connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
-
 
   g_arrowAct = new QAction(QIcon(":/images/arrow.png"),
       tr("Selection Mode"), this);
@@ -1349,13 +1358,28 @@ void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
   {
     g_pauseAct->setVisible(false);
     g_playAct->setVisible(true);
-    g_stepAct->setEnabled(true);
   }
   else if (!_msg->paused() && !g_playAct->isVisible())
   {
     g_pauseAct->setVisible(true);
     g_playAct->setVisible(false);
+
+  }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnPlayActionChanged()
+{
+  if (g_playAct->isVisible())
+  {
+    g_stepAct->setToolTip("Step the world");
+    g_stepAct->setEnabled(true);
+  }
+  else
+  {
+    g_stepAct->setToolTip("Pause the world before stepping");
     g_stepAct->setEnabled(false);
+
   }
 }
 

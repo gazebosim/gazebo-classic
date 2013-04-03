@@ -103,8 +103,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
       QSizePolicy::Minimum);
 
   QSpinBox *stepSpinBox = new QSpinBox;
-  stepSpinBox->setRange(0, 9999);
-  stepSpinBox->setValue(1);
+  stepSpinBox->setRange(1, 9999);
   connect(stepSpinBox, SIGNAL(valueChanged(int)), this,
       SLOT(OnStepValueChanged(int)));
 
@@ -118,16 +117,19 @@ RenderWidget::RenderWidget(QWidget *_parent)
   stepLayout->addWidget(stepSpinBox);
   stepWidget->setLayout(stepLayout);
 
+  QLabel *stepToolBarLabel = new QLabel(tr("Steps:"));
+
   QMenu *stepMenu = new QMenu;
   this->stepButton = new QToolButton;
-  this->stepButton->setMaximumSize(25, stepButton->height());
+  this->stepButton->setMaximumSize(35, stepButton->height());
   QWidgetAction *stepAction = new QWidgetAction(stepMenu);
   stepAction->setDefaultWidget(stepWidget);
   stepMenu->addAction(stepAction);
   this->stepButton->setMenu(stepMenu);
   this->stepButton->setPopupMode(QToolButton::InstantPopup);
   this->stepButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
-  this->stepButton->setText(tr("1"));
+  this->stepButton->setContentsMargins(0, 0, 0, 0);
+  this->OnStepValueChanged(1);
 
   QFrame *playFrame = new QFrame;
   playFrame->setFrameShape(QFrame::NoFrame);
@@ -140,6 +142,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   QLabel *emptyLabel = new QLabel(tr("  "));
   playToolbar->addWidget(emptyLabel);
   playToolbar->addAction(g_stepAct);
+  playToolbar->addWidget(stepToolBarLabel);
   playToolbar->addWidget(this->stepButton);
 
   QHBoxLayout *playControlLayout = new QHBoxLayout;
@@ -340,11 +343,13 @@ void RenderWidget::OnClearOverlayMsg()
 /////////////////////////////////////////////////
 void RenderWidget::OnStepValueChanged(int _value)
 {
-  QString numStr = QString::number(_value);
+  // text formating and resizing for better presentation
+  std::string numStr = QString::number(_value).toStdString();
   QFont stepFont = this->stepButton->font();
-  stepFont.setPointSize(10 - numStr.size());
+  stepFont.setPointSizeF(11 - numStr.size()/2.0);
   this->stepButton->setFont(stepFont);
-  this->stepButton->setText(numStr);
+  numStr.insert(numStr.end(), 4 - numStr.size(), ' ');
+  this->stepButton->setText(tr(numStr.c_str()));
 
   emit gui::Events::inputStepSize(_value);
 }

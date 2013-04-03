@@ -1050,7 +1050,13 @@ void World::OnControl(ConstWorldControlPtr &_data)
     this->OnStep();
 
   if (_data->has_multi_step())
-    this->StepWorld(_data->multi_step());
+  {
+    // stepWorld is a blocking call so set stepInc directly so that world stats
+    // will still be published
+    this->SetPaused(true);
+    boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
+    this->stepInc = _data->multi_step();
+  }
 
   if (_data->has_seed())
   {
@@ -1756,6 +1762,8 @@ void World::PublishWorldStats()
   msgs::Set(this->worldStatsMsg.mutable_pause_time(), this->GetPauseTime());
   this->worldStatsMsg.set_iterations(this->iterations);
   this->worldStatsMsg.set_paused(this->IsPaused());
+
+//  gzerr << " pub " << msgs::Convert(this->worldStatsMsg.sim_time()) <<  std::endl;
 
   this->statPub->Publish(this->worldStatsMsg);
   this->prevStatTime = common::Time::GetWallTime();

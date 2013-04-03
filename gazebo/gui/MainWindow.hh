@@ -96,6 +96,9 @@ namespace gazebo
       private slots: void OnEditBuilding();
       private slots: void SetWireframe();
 
+      /// \brief Qt call back when the play action state changes
+      private slots: void OnPlayActionChanged();
+
       /// \brief Qt callback when the building editor's save action is
       /// triggered.
       private slots: void BuildingEditorSave();
