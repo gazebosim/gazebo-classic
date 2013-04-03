@@ -865,6 +865,7 @@ void MainWindow::CreateActions()
 
   g_stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
   g_stepAct->setStatusTip(tr("Step the world"));
+  g_stepAct->setToolTip(tr("Pause the world before stepping"));
   connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
 
 

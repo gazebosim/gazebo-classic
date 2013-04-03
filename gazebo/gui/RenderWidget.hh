@@ -109,6 +109,9 @@ namespace gazebo
 
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
+
+      /// \brief Tool button that holds the step widget
+      private: QToolButton *stepButton;
     };
   }
 }
