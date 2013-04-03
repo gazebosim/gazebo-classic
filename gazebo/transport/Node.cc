@@ -285,8 +285,8 @@ void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
     {
       if ((*liter)->GetId() == _id)
       {
-        iter->second.erase(liter);
         (*liter).reset();
+        iter->second.erase(liter);
         break;
       }
     }
