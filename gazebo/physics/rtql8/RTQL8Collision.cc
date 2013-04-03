@@ -31,21 +31,15 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 RTQL8Collision::RTQL8Collision(LinkPtr _link)
-  : Collision(_link)
+  : Collision(_link),
+    rtql8BodyNode(NULL),
+    rtql8CollShape(NULL)
 {
-  //   this->SetName("ODE_Collision");
-  //   this->collisionId = NULL;
-  //   this->onPoseChangeFunc = &RTQL8Collision::OnPoseChangeNull;
-  gzerr << "Not yet implemented." << std::endl;
 }
 
 //////////////////////////////////////////////////
 RTQL8Collision::~RTQL8Collision()
 {
-  //   if (this->collisionId)
-  //     dGeomDestroy(this->collisionId);
-  //   this->collisionId = NULL;
-  gzerr << "Not yet implemented." << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -58,55 +52,53 @@ void RTQL8Collision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void RTQL8Collision::Init()
 {
-  rtql8::dynamics::BodyNodeDynamics* rtql8BodyNode
+  this->rtql8BodyNode
       = boost::shared_static_cast<RTQL8Link>(this->link)->GetBodyNode();
 
   sdf::ElementPtr geometryElem = this->sdf->GetElement("geometry");
   std::string geomType = geometryElem->GetFirstElement()->GetName();
 
   if (geomType == "sphere")
-    {
-      double length = geometryElem->GetFirstElement()->GetValueDouble("radius");
-      Eigen::Vector3d eigenSize(length, 0.0, 0.0);
-      rtql8::kinematics::ShapeEllipsoid* rtql8Shape
-          = new rtql8::kinematics::ShapeEllipsoid(eigenSize, 1);
-      rtql8BodyNode->setCollisionShape(rtql8Shape);
-      gzerr << "Not implemented yet...";
-    }
+  {
+    double length = geometryElem->GetFirstElement()->GetValueDouble("radius");
+    Eigen::Vector3d eigenSize(length, 0.0, 0.0);
+    rtql8::kinematics::ShapeEllipsoid* rtql8Shape
+        = new rtql8::kinematics::ShapeEllipsoid(eigenSize, 1);
+    rtql8BodyNode->setCollisionShape(rtql8Shape);
+  }
   else if (geomType == "plane")
-    {
-      // TODO: rtql8 does not support plane!!!
-      //      math::Vector3 normal
-      //          = geometryElem->GetFirstElement()->GetValueVector3("normal");
-      math::Vector2d size
-          = geometryElem->GetFirstElement()->GetValueVector2d("size");
-      Eigen::Vector3d eigenSize(size.x, size.y, 0.001);
-      rtql8::kinematics::ShapeCube* rtql8Shape
-          = new rtql8::kinematics::ShapeCube(eigenSize, 1);
-      rtql8BodyNode->setCollisionShape(rtql8Shape);
-      gzerr << "Not implemented yet...";
-    }
+  {
+    // TODO: rtql8 does not support plane!!!
+    //      math::Vector3 normal
+    //          = geometryElem->GetFirstElement()->GetValueVector3("normal");
+    math::Vector2d size
+        = geometryElem->GetFirstElement()->GetValueVector2d("size");
+    Eigen::Vector3d eigenSize(size.x, size.y, 0.001);
+    rtql8::kinematics::ShapeCube* rtql8Shape
+        = new rtql8::kinematics::ShapeCube(eigenSize, 1);
+    rtql8BodyNode->setCollisionShape(rtql8Shape);
+  }
 
   else if (geomType == "box")
-    {
-      math::Vector3 mathSize
-          = geometryElem->GetFirstElement()->GetValueVector3("size");
-      Eigen::Vector3d eigenSize(mathSize.x, mathSize.y, mathSize.z);
-      rtql8::kinematics::ShapeCube* rtql8Shape
-          = new rtql8::kinematics::ShapeCube(eigenSize, 1);
-      rtql8BodyNode->setCollisionShape(rtql8Shape);
-    }
+  {
+    math::Vector3 mathSize
+        = geometryElem->GetFirstElement()->GetValueVector3("size");
+    Eigen::Vector3d eigenSize(mathSize.x, mathSize.y, mathSize.z);
+    rtql8::kinematics::ShapeCube* rtql8Shape
+        = new rtql8::kinematics::ShapeCube(eigenSize, 1);
+    rtql8BodyNode->setCollisionShape(rtql8Shape);
+  }
   else if (geomType == "cylinder")
-    {
-      double radius = geometryElem->GetFirstElement()->GetValueDouble("radius");
-      double length = geometryElem->GetFirstElement()->GetValueDouble("length");
-      Eigen::Vector3d eigenSize(radius, length, 0.0);
-      //      rtql8::kinematics::ShapeCylinder* shape
-      //              = new rtql8::kinematics::ShapeCylinder(radius, length);
-      rtql8::kinematics::ShapeCylinder* rtql8Shape
-          = new rtql8::kinematics::ShapeCylinder(eigenSize, 1);
-      rtql8BodyNode->setCollisionShape(rtql8Shape);
-    }
+  {
+    double radius = geometryElem->GetFirstElement()->GetValueDouble("radius");
+    double length = geometryElem->GetFirstElement()->GetValueDouble("length");
+    Eigen::Vector3d eigenSize(radius, length, 0.0);
+    //      rtql8::kinematics::ShapeCylinder* shape
+    //              = new rtql8::kinematics::ShapeCylinder(radius, length);
+    rtql8::kinematics::ShapeCylinder* rtql8Shape
+        = new rtql8::kinematics::ShapeCylinder(eigenSize, 1);
+    rtql8BodyNode->setCollisionShape(rtql8Shape);
+  }
   else if (geomType == "multiray")
     gzerr << "Not implemented yet...";
   else if (geomType == "mesh" || geomType == "trimesh")
@@ -161,14 +153,6 @@ void RTQL8Collision::SetCollision(bool _placeable)
 //////////////////////////////////////////////////
 void RTQL8Collision::OnPoseChange()
 {
-  //   // Update all the models
-  //   // (*this.*onPoseChangeFunc)();
-  //
-  //   if (this->IsStatic() && this->collisionId && this->placeable)
-  //     this->OnPoseChangeGlobal();
-  //   else if (this->collisionId && this->placeable)
-  //     this->OnPoseChangeRelative();
-  gzerr << "Not yet implemented." << std::endl;
 }
 
 //////////////////////////////////////////////////

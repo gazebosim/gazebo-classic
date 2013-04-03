@@ -53,7 +53,7 @@ namespace gazebo
       /// \brief Update the body
       public: virtual void Update();
 
-    // Documentation inherited
+      // Documentation inherited
       public: virtual void OnPoseChange();
 
       // Documentation inherited
@@ -92,8 +92,8 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void AddForceAtRelativePosition(
-                  const math::Vector3 &_force,
-                  const math::Vector3 &_relpos);
+          const math::Vector3 &_force,
+          const math::Vector3 &_relpos);
 
       // Documentation inherited
       public: virtual void AddTorque(const math::Vector3 &_torque);
@@ -150,7 +150,8 @@ namespace gazebo
       public: void updateDirtyPoseFromRTQL8Transformation();
 
       /// \brief
-      public: rtql8::dynamics::BodyNodeDynamics* GetBodyNode() const {return rtql8BodyNode;}
+      public: rtql8::dynamics::BodyNodeDynamics* GetBodyNode() const
+      {return rtql8BodyNode;}
 
       /// \brief
       public: RTQL8PhysicsPtr GetRTQL8Physics(void) const;

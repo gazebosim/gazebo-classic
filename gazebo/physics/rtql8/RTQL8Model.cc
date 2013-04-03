@@ -44,7 +44,7 @@ RTQL8Model::~RTQL8Model()
 void RTQL8Model::Load(sdf::ElementPtr _sdf)
 {
   // create skeletonDynamics of RTQL8
-  rtql8SkeletonDynamics = new rtql8::dynamics::SkeletonDynamics();
+  this->rtql8SkeletonDynamics = new rtql8::dynamics::SkeletonDynamics();
 
   // add skeleton to world
   //this->GetRTQL8World()->addSkeleton(rtql8SkeletonDynamics);
@@ -119,11 +119,11 @@ void RTQL8Model::Init()
                                 canonicalLinkPose.rot.z);
 
     //Eigen::Quaterniond expToQuat(Eigen::Vector3d& v);
-    Eigen::Vector3d iegenVec3 = rtql8::utils::rotation::quatToExp(eigenQuat);
+    Eigen::Vector3d eigenVec3 = rtql8::utils::rotation::quatToExp(eigenQuat);
 
-    rotX->setValue(iegenVec3(0));
-    rotY->setValue(iegenVec3(1));
-    rotZ->setValue(iegenVec3(2));
+    rotX->setValue(eigenVec3(0));
+    rotY->setValue(eigenVec3(1));
+    rotZ->setValue(eigenVec3(2));
 
     // Get the model associated with
     // Add the transform to the skeletone in the model.

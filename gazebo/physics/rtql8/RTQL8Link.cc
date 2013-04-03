@@ -32,7 +32,8 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 RTQL8Link::RTQL8Link(EntityPtr _parent)
-  : Link(_parent), rtql8BodyNode(NULL)
+  : Link(_parent),
+    rtql8BodyNode(NULL)
 {
 
 }
@@ -86,20 +87,18 @@ void RTQL8Link::Init()
       rtql8::kinematics::ShapeEllipsoid* shape
           = new rtql8::kinematics::ShapeEllipsoid(eigenSize, 1);
       this->rtql8BodyNode->setVisualShape(shape);
-      gzerr << "Not implemented yet...";
     }
     else if (geomType == "plane")
     {
       // TODO: rtql8 does not support plane!!!
-//      math::Vector3 normal
-//          = geometryElem->GetFirstElement()->GetValueVector3("normal");
+      //      math::Vector3 normal
+      //          = geometryElem->GetFirstElement()->GetValueVector3("normal");
       math::Vector2d size
           = geometryElem->GetFirstElement()->GetValueVector2d("size");
       Eigen::Vector3d eigenSize(size.x, size.y, 0.001);
       rtql8::kinematics::ShapeCube* shape
           = new rtql8::kinematics::ShapeCube(eigenSize, 1);
       this->rtql8BodyNode->setVisualShape(shape);
-      gzerr << "Not implemented yet...";
     }
 
     else if (geomType == "box")
@@ -183,58 +182,29 @@ void RTQL8Link::OnPoseChange()
 {
   Link::OnPoseChange();
 
-  //   if (!this->linkId)
-  //     return;
-  //
-  //   this->SetEnabled(true);
-  //
-  //   const math::Pose myPose = this->GetWorldPose();
-  //
-  //   math::Vector3 cog = myPose.rot.RotateVector(this->inertial->GetCoG());
-  //
-  //   // adding cog location for ode pose
-  //   dBodySetPosition(this->linkId,
-  //       myPose.pos.x + cog.x,
-  //       myPose.pos.y + cog.y,
-  //       myPose.pos.z + cog.z);
-  //
-  //   dQuaternion q;
-  //   q[0] = myPose.rot.w;
-  //   q[1] = myPose.rot.x;
-  //   q[2] = myPose.rot.y;
-  //   q[3] = myPose.rot.z;
-  //
-  //   // Set the rotation of the ODE link
-  //   dBodySetQuaternion(this->linkId, q);
-  gzerr << "Not implemented...\n";
+  const math::Pose myPose = this->GetWorldPose();
+  Eigen::Matrix4d trfm;
+  RTQL8Utils::ConvPoseToMat(&trfm, myPose);
+  this->rtql8BodyNode->setWorldTransform(trfm);
 }
 
 //////////////////////////////////////////////////
 void RTQL8Link::SetEnabled(bool /*_enable*/) const
 {
-  //   if (!this->linkId)
-  //     return;
-
-  //   if (_enable)
-  //     dBodyEnable(this->linkId);
-  //   else
-  //     dBodyDisable(this->linkId);
-  gzerr << "Not implemented...\n";
+  // TODO: RTQL8 does not support this function yet.
 }
 
-/////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool RTQL8Link::GetEnabled() const
 {
   bool result = true;
 
-  //   if (this->linkId)
-  //     result = dBodyIsEnabled(this->linkId);
+  // TODO: RTQL8 does not support this function yet.
 
-  gzerr << "Not implemented...\n";
   return result;
 }
 
-/////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void RTQL8Link::UpdateMass()
 {
   //   if (!this->linkId)
@@ -501,23 +471,17 @@ math::Vector3 RTQL8Link::GetWorldTorque() const
 void RTQL8Link::SetGravityMode(bool _mode)
 {
   this->sdf->GetElement("gravity")->Set(_mode);
-  //   if (this->linkId)
-  //   {
-  //     dBodySetGravityMode(this->linkId, _mode ? 1: 0);
-  //   }
-  gzerr << "Not implemented...\n";
+
+  this->rtql8BodyNode->setGravityMode(_mode);
 }
 
 //////////////////////////////////////////////////
 bool RTQL8Link::GetGravityMode() const
 {
   int mode = 0;
-  //   if (this->linkId)
-  //   {
-  //     mode = dBodyGetGravityMode(this->linkId);
-  //   }
 
-  gzerr << "Not implemented...\n";
+  this->rtql8BodyNode->getGravityMode();
+
   return mode;
 }
 
