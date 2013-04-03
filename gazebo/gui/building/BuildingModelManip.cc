@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
