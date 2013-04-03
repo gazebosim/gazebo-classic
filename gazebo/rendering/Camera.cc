@@ -26,14 +26,14 @@
 
 #include "gazebo/sdf/sdf.hh"
 
-#include "gazebo/rendering/skyx/include/SkyX.h"
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Rand.hh"
+
+#include "gazebo/rendering/skyx/include/SkyX.h"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
