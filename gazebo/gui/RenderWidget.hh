@@ -106,6 +106,8 @@ namespace gazebo
 
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
+
+      private: QTimer *msgDisplayTimer;
     };
   }
 }

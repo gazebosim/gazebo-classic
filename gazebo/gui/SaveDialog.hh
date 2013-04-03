@@ -65,6 +65,9 @@ namespace gazebo
       /// \param[in] _title Title of dialog.
       public: void SetTitle(const std::string &_title);
 
+      /// \brief Qt event emitted showing the dialog
+      protected: virtual void showEvent(QShowEvent *event);
+
       /// \brief Qt callback when the file directory browse button is pressed.
       private slots: void OnBrowse();
 

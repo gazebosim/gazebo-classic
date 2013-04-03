@@ -645,6 +645,8 @@ void MainWindow::SetRecordVideoFormat(QAction *_action)
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->SetEncodeVideoFormat(_action->text().toStdString());
+  this->renderWidget->DisplayOverlayMsg("Set video recording format to " +
+      _action->text().toStdString(), 2000);
 }
 
 /////////////////////////////////////////////////
@@ -1107,15 +1109,17 @@ void MainWindow::CreateActions()
   g_recordVideoFormatAct->setCheckable(false);
 
   QMenu *videoFormatSubmenu = new QMenu;
-  videoFormatSubmenu->addAction("mpeg");
+  videoFormatSubmenu->addAction("avi");
   videoFormatSubmenu->addAction("mp4");
+  videoFormatSubmenu->addAction("ogv");
   connect(videoFormatSubmenu, SIGNAL(triggered(QAction *)), this,
       SLOT(SetRecordVideoFormat(QAction *)));
 
   QToolButton *videoFormatButton = new QToolButton();
-  videoFormatButton->setIcon(QIcon(":/images/down_arrow.png"));
   videoFormatButton->setMenu(videoFormatSubmenu);
   g_recordVideoFormatAct->setDefaultWidget(videoFormatButton);
+  videoFormatButton->setMaximumSize(18, videoFormatButton->height()/2);
+
   connect(videoFormatButton, SIGNAL(clicked()), this,
     SLOT(ShowVideoFormatMenu()));
 }

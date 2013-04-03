@@ -169,6 +169,11 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->timer = new QTimer(this);
   connect(this->timer, SIGNAL(timeout()), this, SLOT(update()));
   this->timer->start(44);
+
+  this->msgDisplayTimer = new QTimer(this);
+  this->msgDisplayTimer->setSingleShot(true);
+  connect(this->msgDisplayTimer, SIGNAL(timeout()), this,
+      SLOT(OnClearOverlayMsg()));
 }
 
 /////////////////////////////////////////////////
@@ -295,7 +300,9 @@ void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
   this->msgOverlayLabel->setVisible(true);
 
   if (_duration > 0)
-    QTimer::singleShot(_duration, this, SLOT(OnClearOverlayMsg()));
+  {
+    this->msgDisplayTimer->start(_duration);
+  }
 }
 
 /////////////////////////////////////////////////

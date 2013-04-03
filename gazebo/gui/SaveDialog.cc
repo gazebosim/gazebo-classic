@@ -128,3 +128,9 @@ void SaveDialog::OnSave()
 {
   this->accept();
 }
+
+/////////////////////////////////////////////////
+void SaveDialog::showEvent(QShowEvent */*_event*/)
+{
+  this->nameLineEdit->selectAll();
+}

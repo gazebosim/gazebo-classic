@@ -148,6 +148,12 @@ void Encoder::SetFormat(const std::string &_format)
 }
 
 /////////////////////////////////////////////////
+std::string Encoder::GetFormat() const
+{
+  return this->format;
+}
+
+/////////////////////////////////////////////////
 #ifdef HAVE_FFMPEG
 void Encoder::Init()
 {
@@ -406,7 +412,7 @@ void Encoder::Reset()
   this->fps = 25;
   this->tmpFilename = "tmp_recording";
   this->initialized = false;
-  this->format = "mpeg";
+  this->format = "avi";
   this->swsCtx = NULL;
   this->timePrev = 0;
   this->sampleRate = this->fps * 2;

@@ -353,6 +353,8 @@ void Camera::PostRender()
         static_cast<Ogre::PixelFormat>(this->imageFormat),
         this->saveFrameBuffer);
 
+//    gzerr << width << " " << height << " " << this->imageFormat << " " << size << std::endl;
+
     this->viewport->getTarget()->copyContentsToMemory(box);
 
     if (this->captureDataOnce)
@@ -1094,10 +1096,10 @@ void Camera::SetEncodeVideo(bool _encode)
     if (!this->encoder)
     {
       this->encoder = new common::Encoder();
-      if (!this->videoEncodeFormat.empty())
-        this->encoder->SetFormat(this->videoEncodeFormat);
-      this->encoder->Init();
     }
+    if (!this->videoEncodeFormat.empty())
+      this->encoder->SetFormat(this->videoEncodeFormat);
+    this->encoder->Init();
   }
 }
 
