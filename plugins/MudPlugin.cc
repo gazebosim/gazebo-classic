@@ -98,6 +98,7 @@ void MudPlugin::OnUpdate()
       // Create the joint
       if (link2)
       {
+        link2->SetAutoDisable(false);
         this->joint = this->world->GetPhysicsEngine()->CreateJoint(
           "revolute", this->model);
 
@@ -106,17 +107,13 @@ void MudPlugin::OnUpdate()
         this->joint->SetName("mud_joint");
 
         this->joint->SetAttribute("erp", 0, 0.0);
-        this->joint->SetAttribute("suspension_erp", 0, 0.0);
+        this->joint->SetAttribute("cfm", 0, 0.1);
         this->joint->SetAttribute("stop_erp", 0, 0.0);
+        this->joint->SetAttribute("stop_cfm", 0, 0.1);
+        this->joint->SetHighStop(0, 0.0);
+        this->joint->SetLowStop(0, 0.0);
 
         this->joint->Init();
-
-        this->joint->SetAttribute("erp", 0, 0.0);
-        this->joint->SetAttribute("suspension_erp", 0, 0.0);
-        this->joint->SetAttribute("stop_erp", 0, 0.0);
-
-        gzerr << "erp " << this->joint->GetAttribute("erp", 0) << '\n';
-        gzerr << "suspension_erp " << this->joint->GetAttribute("suspension_erp", 0) << '\n';
       }
     }
     else if (this->joint && contactStepRatio < (0.5-hysteresis))
