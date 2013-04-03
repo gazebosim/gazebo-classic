@@ -135,6 +135,8 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   // Expect at least 50% of specified update rate
   EXPECT_GT(static_cast<double>(hokuyoMsgCount),
               updateRate*(now-then) * 0.5);
+
+  mgr->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -197,6 +199,8 @@ TEST_F(Sensor_TEST, ResetWorldStressTest)
     gzdbg << "counted " << g_hokuyoMsgCount << " hokuyo messages\n";
     common::Time::MSleep(200);
   }
+  
+  mgr->Fini();
 }
 
 /////////////////////////////////////////////////
