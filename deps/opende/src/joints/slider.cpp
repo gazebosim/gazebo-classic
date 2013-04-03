@@ -321,12 +321,15 @@ void dJointSetSliderParam ( dJointID j, int parameter, dReal value )
     {
       case dParamERP:
         joint->erp = value;
+        break;
       case dParamCFM:
         joint->cfm = value;
         // dParamCFM label is also used for normal_cfm
         joint->limot.set( parameter, value );
+        break;
       default:
         joint->limot.set( parameter, value );
+        break;
     }
 }
 

@@ -123,7 +123,10 @@
         <description>Scale the excess for in a joint motor at joint limits. Should be between zero and one.</description>
       </element>
       <element name="cfm" type="double" default="0" required="0">
-        <description>Constraint force mixing used when not at a stop</description>
+        <description>Constraint force mixing for constrained directions</description>
+      </element>
+      <element name="erp" type="double" default="0.2" required="0">
+        <description>Error reduction parameter for constrained directions</description>
       </element>
       <element name="bounce" type="double" default="0" required="0">
         <description>Bounciness of the limits</description>
