@@ -40,7 +40,7 @@
 #include "physics/Model.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Actor.hh"
-#include "physics/Physics.hh"
+#include "physics/PhysicsIface.hh"
 
 #include "transport/Node.hh"
 
