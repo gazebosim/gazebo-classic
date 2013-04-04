@@ -18,13 +18,13 @@
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
- 
+
 #include <QtCore/qglobal.h>
 
 #ifndef Q_OS_MAC
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <GL/glx.h>
+# include <X11/Xlib.h>
+# include <X11/Xutil.h>
+# include <GL/glx.h>
 #endif
 
 #include <sys/types.h>
@@ -355,11 +355,11 @@ void RenderEngine::LoadPlugins()
     std::vector<std::string>::iterator piter;
 
 #ifdef __APPLE__
-	std::string prefix = "lib";
-	std::string extension = ".dylib";
+    std::string prefix = "lib";
+    std::string extension = ".dylib";
 #else
-	std::string prefix = "";
-	std::string extension = ".so";
+    std::string prefix = "";
+    std::string extension = ".so";
 #endif
 
     plugins.push_back(path+"/"+prefix+"RenderSystem_GL");

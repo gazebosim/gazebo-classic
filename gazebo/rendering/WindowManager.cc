@@ -16,6 +16,10 @@
 */
 #include <math.h>
 
+#ifdef  __APPLE__
+# include <QtCore/qglobal.h>
+#endif
+
 #include "rendering/ogre_gazebo.h"
 
 #include "common/Events.hh"
@@ -29,10 +33,6 @@
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/WindowManager.hh"
-
-#ifdef  __APPLE__
-#include <QtCore/qglobal.h>
-#endif
 
 using namespace gazebo;
 using namespace rendering;
