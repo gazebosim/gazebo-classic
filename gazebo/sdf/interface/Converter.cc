@@ -255,12 +255,13 @@ void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
   boost::algorithm::split_regex(fromTokens, fromStr, boost::regex("::"));
   boost::algorithm::split_regex(toTokens, toStr, boost::regex("::"));
 
-  if (fromTokens.size() == 0)
+  if (fromTokens.empty())
   {
     gzerr << "Incorrect 'from' string format\n";
     return;
   }
-  if (toTokens.size() == 0)
+
+  if (toTokens.empty())
   {
     gzerr << "Incorrect 'to' string format\n";
     return;

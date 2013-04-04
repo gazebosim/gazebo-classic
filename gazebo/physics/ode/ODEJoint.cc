@@ -339,8 +339,8 @@ math::Vector3 ODEJoint::GetLinkForce(unsigned int _index) const
 
   if (!this->jointId)
   {
-    return result;
     gzerr << "ODE Joint ID is invalid\n";
+    return result;
   }
 
   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
@@ -362,8 +362,8 @@ math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
 
   if (!this->jointId)
   {
-    return result;
     gzerr << "ODE Joint ID is invalid\n";
+    return result;
   }
 
   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
