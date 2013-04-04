@@ -82,8 +82,8 @@ void RTQL8Link::Init()
 
     if (geomType == "sphere")
     {
-      double length = geometryElem->GetFirstElement()->GetValueDouble("radius");
-      Eigen::Vector3d eigenSize(length, 0.0, 0.0);
+      double radius = geometryElem->GetFirstElement()->GetValueDouble("radius");
+      Eigen::Vector3d eigenSize(radius, radius, radius);
       rtql8::kinematics::ShapeEllipsoid* shape
           = new rtql8::kinematics::ShapeEllipsoid(eigenSize, 1);
       this->rtql8BodyNode->setVisualShape(shape);
@@ -369,7 +369,7 @@ math::Vector3 RTQL8Link::GetWorldLinearVel(
   math::Vector3 vel;
 
   // TODO: This is the velocity in body frame not world frame.
-  Eigen::Vector3d linVel = this->rtql8BodyNode->mVelBody;
+  const Eigen::Vector3d& linVel = this->rtql8BodyNode->mVel;
 
   vel.x = linVel[0];
   vel.y = linVel[1];

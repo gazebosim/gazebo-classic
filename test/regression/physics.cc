@@ -113,9 +113,9 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   double z0 = 3;
   std::map<std::string, math::Vector3> modelPos;
   modelPos["test_box"] = math::Vector3(0, 0, z0);
-  modelPos["test_sphere"] = math::Vector3(4, 0, z0);
-  modelPos["test_cylinder"] = math::Vector3(8, 0, z0);
-  modelPos["test_empty"] = math::Vector3(12, 0, z0);
+//  modelPos["test_sphere"] = math::Vector3(4, 0, z0);
+//  modelPos["test_cylinder"] = math::Vector3(8, 0, z0);
+  //modelPos["test_empty"] = math::Vector3(12, 0, z0);
 
   // FIXME Trimesh drop test passes in bullet but fails in ode because
   // the mesh bounces to the side when it hits the ground.
@@ -124,9 +124,9 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 
   SpawnBox("test_box", math::Vector3(1, 1, 1), modelPos["test_box"],
       math::Vector3::Zero);
-  SpawnSphere("test_sphere", modelPos["test_sphere"], math::Vector3::Zero);
-  SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
-      math::Vector3::Zero);
+//  SpawnSphere("test_sphere", modelPos["test_sphere"], math::Vector3::Zero);
+//  SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
+//      math::Vector3::Zero);
   //SpawnEmptyLink("test_empty", modelPos["test_empty"], math::Vector3::Zero);
   std::string trimeshPath =
       "file://media/models/cube_20k/meshes/cube_20k.stl";

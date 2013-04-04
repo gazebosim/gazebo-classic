@@ -60,8 +60,8 @@ void RTQL8Collision::Init()
 
   if (geomType == "sphere")
   {
-    double length = geometryElem->GetFirstElement()->GetValueDouble("radius");
-    Eigen::Vector3d eigenSize(length, 0.0, 0.0);
+    double radius = geometryElem->GetFirstElement()->GetValueDouble("radius");
+    Eigen::Vector3d eigenSize(radius, radius, radius);
     rtql8::kinematics::ShapeEllipsoid* rtql8Shape
         = new rtql8::kinematics::ShapeEllipsoid(eigenSize, 1);
     rtql8BodyNode->setCollisionShape(rtql8Shape);
