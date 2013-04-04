@@ -63,6 +63,7 @@ SensorManager::~SensorManager()
   this->sensorContainers.clear();
 
   this->initSensors.clear();
+  this->removeSensors.clear();
 }
 
 //////////////////////////////////////////////////
@@ -204,6 +205,9 @@ void SensorManager::Fini()
   }
 
   this->initialized = false;
+
+  this->initSensors.clear();
+  this->removeSensors.clear();
 }
 
 //////////////////////////////////////////////////
@@ -350,6 +354,7 @@ void SensorManager::RemoveSensors()
     (*iter)->RemoveSensors();
   }
   this->initSensors.clear();
+  this->removeSensors.clear();
 }
 
 
