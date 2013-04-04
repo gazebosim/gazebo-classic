@@ -19,7 +19,7 @@
 #include "common/SystemPaths.hh"
 #include "common/Time.hh"
 #include "transport/Transport.hh"
-#include "sensors/Sensors.hh"
+#include "sensors/SensorsIface.hh"
 #include "rendering/Rendering.hh"
 #include "rendering/RenderEngine.hh"
 
