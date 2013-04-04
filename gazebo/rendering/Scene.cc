@@ -58,7 +58,7 @@
 #endif
 
 #include "rendering/RTShaderSystem.hh"
-#include "transport/Transport.hh"
+#include "transport/TransportIface.hh"
 #include "transport/Node.hh"
 
 #include "rendering/Scene.hh"

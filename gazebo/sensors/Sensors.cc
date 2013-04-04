@@ -17,7 +17,7 @@
 
 #include "common/Console.hh"
 
-#include "transport/Transport.hh"
+#include "transport/TransportIface.hh"
 
 #include "rendering/RenderingIface.hh"
 

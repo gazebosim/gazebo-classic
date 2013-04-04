@@ -24,7 +24,7 @@
 
 #include "physics/PhysicsIface.hh"
 #include "common/Time.hh"
-#include "transport/Transport.hh"
+#include "transport/TransportIface.hh"
 #include "sdf/sdf.hh"
 #include "gazebo_config.h"
 

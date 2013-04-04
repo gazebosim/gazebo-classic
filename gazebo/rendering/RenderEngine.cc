@@ -38,7 +38,7 @@
 
 #include "gazebo_config.h"
 
-#include "transport/Transport.hh"
+#include "transport/TransportIface.hh"
 #include "transport/Node.hh"
 #include "transport/Subscriber.hh"
 
