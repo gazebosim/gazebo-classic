@@ -19,7 +19,7 @@
 #include <google/protobuf/message.h>
 #include <boost/thread.hpp>
 
-#include "transport/Transport.hh"
+#include "transport/TransportIface.hh"
 #include "transport/TransportTypes.hh"
 #include "transport/Node.hh"
 
