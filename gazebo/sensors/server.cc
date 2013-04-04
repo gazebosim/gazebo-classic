@@ -18,9 +18,9 @@
 #include <iostream>
 #include "common/SystemPaths.hh"
 #include "common/Time.hh"
-#include "transport/Transport.hh"
-#include "sensors/Sensors.hh"
-#include "rendering/Rendering.hh"
+#include "transport/TransportIface.hh"
+#include "sensors/SensorsIface.hh"
+#include "rendering/RenderingIface.hh"
 #include "rendering/RenderEngine.hh"
 
 #include "gazebo.hh"

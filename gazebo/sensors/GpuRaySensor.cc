@@ -27,7 +27,7 @@
 #include "transport/transport.hh"
 
 #include "rendering/Scene.hh"
-#include "rendering/Rendering.hh"
+#include "rendering/RenderingIface.hh"
 
 #include "sensors/SensorFactory.hh"
 #include "sensors/GpuRaySensor.hh"

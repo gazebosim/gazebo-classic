@@ -22,7 +22,7 @@
 #include "sdf/sdf.hh"
 #include "transport/transport.hh"
 
-#include "physics/Physics.hh"
+#include "physics/PhysicsIface.hh"
 #include "physics/World.hh"
 
 #include "common/Timer.hh"

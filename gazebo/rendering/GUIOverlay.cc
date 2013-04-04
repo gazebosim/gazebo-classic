@@ -20,7 +20,7 @@
 
 #include "common/SystemPaths.hh"
 #include "msgs/msgs.hh"
-#include "transport/Transport.hh"
+#include "transport/TransportIface.hh"
 #include "transport/Node.hh"
 #include "math/Vector2d.hh"
 

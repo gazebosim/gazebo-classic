@@ -24,7 +24,7 @@
 #include "math/Plane.hh"
 #include "math/Rand.hh"
 
-#include "common/Common.hh"
+#include "common/CommonIface.hh"
 #include "common/Image.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"

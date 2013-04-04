@@ -19,7 +19,7 @@
  * Date: 16 Oct 2009
  */
 
-#include "common/Common.hh"
+#include "common/CommonIface.hh"
 #include "common/MeshManager.hh"
 #include "common/Mesh.hh"
 #include "common/Exception.hh"

@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#include "rendering/Rendering.hh"
+#include "rendering/RenderingIface.hh"
 #include "rendering/UserCamera.hh"
 
 #include "physics/World.hh"
-#include "physics/Physics.hh"
+#include "physics/PhysicsIface.hh"
 
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"

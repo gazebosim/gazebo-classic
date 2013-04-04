@@ -31,7 +31,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"

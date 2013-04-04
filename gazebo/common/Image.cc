@@ -27,7 +27,7 @@
 #include <boost/filesystem.hpp>
 
 #include "math/Vector3.hh"
-#include "common/Common.hh"
+#include "common/CommonIface.hh"
 #include "common/Console.hh"
 #include "common/Image.hh"
 #include "common/SystemPaths.hh"

@@ -17,9 +17,9 @@
 
 #include "common/Console.hh"
 
-#include "transport/Transport.hh"
+#include "transport/TransportIface.hh"
 
-#include "rendering/Rendering.hh"
+#include "rendering/RenderingIface.hh"
 
 #include "sensors/SensorFactory.hh"
 #include "sensors/SensorManager.hh"

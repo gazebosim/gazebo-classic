@@ -20,7 +20,7 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"

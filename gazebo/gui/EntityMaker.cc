@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "transport/Transport.hh"
+#include "transport/TransportIface.hh"
 #include "transport/Node.hh"
 #include "gui/EntityMaker.hh"
 

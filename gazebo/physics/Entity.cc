@@ -30,7 +30,7 @@
 #include "gazebo/common/KeyFrame.hh"
 
 #include "gazebo/transport/Publisher.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/physics/RayShape.hh"
