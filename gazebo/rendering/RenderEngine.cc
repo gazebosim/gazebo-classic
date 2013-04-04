@@ -19,13 +19,13 @@
  * Date: 13 Feb 2006
  */
 
-#include <QtCore/qglobal.h>
-
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MAC  // Not Apple
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
 # include <GL/glx.h>
-#endif
+#else  // Apple
+# include <QtCore/qglobal.h>
+#endif  // ifndef Q_OS_MAC
 
 #include <sys/types.h>
 #include <dirent.h>
