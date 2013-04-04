@@ -861,9 +861,35 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd =
-    (_collision1->GetSurface()->fdir1 + _collision2->GetSurface()->fdir1) * 0.5;
+  // averate surface normals?
+  math::Vector3 fd1 = _collision1->GetSurface()->fdir1;
+  if (fd1 != math::Vector3::Zero)
+  {
+    // assume fdir1 is in body local frame, rotate into world frame
+    /// \TODO: once fixed, we can do
+    /// fd1 = _collision1->GetWorldPose().rot.RotateVector(fd1);
+    fd1 = (_collision1->GetRelativePose() +
+           _collision1->GetLink()->GetWorldPose()).rot.RotateVector(fd1);
+  }
+  math::Vector3 fd2 = _collision2->GetSurface()->fdir1;
+  if (fd2 != math::Vector3::Zero)
+  {
+    // assume fdir1 is in body local frame, rotate into world frame
+    /// \TODO: once fixed, we can do
+    /// fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
+    fd2 = (_collision2->GetRelativePose() +
+           _collision2->GetLink()->GetWorldPose()).rot.RotateVector(fd2);
+  }
+  math::Vector3 fd = (fd1 + fd2) * 0.5;
 
+  // gzdbg << _collision1->GetRelativePose() +
+  //          _collision1->GetLink()->GetWorldPose()
+  //       << " : "
+  //       << _collision2->GetRelativePose() +
+  //          _collision2->GetLink()->GetWorldPose()
+  //       << "\n";
+  // gzdbg << fd << " : " << fd1 << " : " << fd2 << "\n";
+    
   if (fd != math::Vector3::Zero)
   {
     contact.surface.mode |= dContactFDir1;
