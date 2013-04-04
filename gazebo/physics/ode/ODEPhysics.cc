@@ -861,7 +861,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  // averate surface normals?
   math::Vector3 fd1 = _collision1->GetSurface()->fdir1;
   if (fd1 != math::Vector3::Zero)
   {
@@ -880,6 +879,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     fd2 = (_collision2->GetRelativePose() +
            _collision2->GetLink()->GetWorldPose()).rot.RotateVector(fd2);
   }
+
+  // average surface normals?
   math::Vector3 fd = (fd1 + fd2) * 0.5;
 
   // gzdbg << _collision1->GetRelativePose() +
