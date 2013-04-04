@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _RENDERING_HH_
-#define _RENDERING_HH_
+#ifndef _RENDERINGIFACE_HH_
+#define _RENDERINGIFACE_HH_
 
 #include <string>
 #include "RenderTypes.hh"
