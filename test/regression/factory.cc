@@ -21,7 +21,7 @@
 
 #include "rendering/RenderEngine.hh"
 #include "rendering/Camera.hh"
-#include "sensors/Sensors.hh"
+#include "sensors/SensorsIface.hh"
 #include "sensors/CameraSensor.hh"
 #include "ServerFixture.hh"
 #include "images_cmp.h"
