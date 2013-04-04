@@ -23,7 +23,7 @@
 #include "common/Console.hh"
 #include "common/ModelDatabase.hh"
 
-#include "rendering/Rendering.hh"
+#include "rendering/RenderingIface.hh"
 #include "rendering/Scene.hh"
 #include "rendering/UserCamera.hh"
 #include "rendering/Visual.hh"

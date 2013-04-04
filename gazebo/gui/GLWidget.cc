@@ -22,7 +22,7 @@
 #include "transport/transport.hh"
 
 #include "rendering/RenderEvents.hh"
-#include "rendering/Rendering.hh"
+#include "rendering/RenderingIface.hh"
 #include "rendering/Visual.hh"
 #include "rendering/WindowManager.hh"
 #include "rendering/Scene.hh"

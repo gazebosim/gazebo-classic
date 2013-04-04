@@ -20,7 +20,7 @@
 #include "common/Time.hh"
 #include "transport/Transport.hh"
 #include "sensors/SensorsIface.hh"
-#include "rendering/Rendering.hh"
+#include "rendering/RenderingIface.hh"
 #include "rendering/RenderEngine.hh"
 
 #include "gazebo.hh"

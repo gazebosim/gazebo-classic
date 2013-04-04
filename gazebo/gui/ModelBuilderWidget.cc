@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "rendering/Rendering.hh"
+#include "rendering/RenderingIface.hh"
 #include "rendering/UserCamera.hh"
 
 #include "physics/World.hh"

@@ -19,7 +19,7 @@
 
 #include "transport/Transport.hh"
 
-#include "rendering/Rendering.hh"
+#include "rendering/RenderingIface.hh"
 
 #include "sensors/SensorFactory.hh"
 #include "sensors/SensorManager.hh"
