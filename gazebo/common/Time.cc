@@ -101,7 +101,7 @@ Time::~Time()
 const Time &Time::GetWallTime()
 {
   struct timespec tv;
- // OS X does not have clock_gettime, use clock_get_time
+  // OS X does not have clock_gettime, use clock_get_time
 #ifdef __MACH__
   clock_serv_t cclock;
   mach_timespec_t mts;
