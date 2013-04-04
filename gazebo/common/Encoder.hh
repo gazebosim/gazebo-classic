@@ -20,7 +20,6 @@
 #include <gazebo/common/Time.hh>
 #include <string>
 
-//struct AVFormatContext;
 struct AVCodecContext;
 struct AVFrame;
 struct AVPicture;

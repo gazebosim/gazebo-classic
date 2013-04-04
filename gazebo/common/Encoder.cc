@@ -30,8 +30,7 @@ extern "C"
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
-#include "libavutil/mathematics.h"
-
+#include <libavutil/mathematics.h>
 }
 #endif
 
@@ -86,7 +85,7 @@ void Encoder::Cleanup()
 #ifdef HAVE_FFMPEG
   if (this->formatCtx)
   {
-    for(unsigned int i = 0; i < this->formatCtx->nb_streams; ++i)
+    for (unsigned int i = 0; i < this->formatCtx->nb_streams; ++i)
     {
       avcodec_close(this->formatCtx->streams[i]->codec);
       av_freep(&this->formatCtx->streams[i]->codec);
@@ -191,7 +190,7 @@ void Encoder::Init()
 //  this->codecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
 
   // some formats want stream headers to be separate
-  if(this->formatCtx->oformat->flags & AVFMT_GLOBALHEADER)
+  if (this->formatCtx->oformat->flags & AVFMT_GLOBALHEADER)
     this->codecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
   // put sample parameters
@@ -202,7 +201,8 @@ void Encoder::Init()
   // frames per second
   this->codecCtx->time_base.den= this->fps;
   this->codecCtx->time_base.num= 1;
-  this->codecCtx->gop_size = 10; // emit one intra frame every ten frames
+  // emit one intra frame every ten frames
+  this->codecCtx->gop_size = 10;
   this->codecCtx->max_b_frames = 1;
   this->codecCtx->pix_fmt = PIX_FMT_YUV420P;
 
@@ -238,16 +238,14 @@ void Encoder::Init()
   int size = avpicture_get_size(this->codecCtx->pix_fmt, this->codecCtx->width,
       this->codecCtx->height);
   this->pictureBuf = new unsigned char[size];
-  avpicture_fill((AVPicture *)this->avFrame, this->pictureBuf,
+  avpicture_fill(reinterpret_cast<AVPicture *>(this->avFrame), this->pictureBuf,
       this->codecCtx->pix_fmt, this->codecCtx->width, this->codecCtx->height);
 
   av_dump_format(this->formatCtx, 0, tmpFileNameFull.c_str(), 1);
 
   // setting mux preload and max delay avoids buffer underflow when writing to
   // mpeg format
-//  double muxPreload  = 0.5f;
   double muxMaxDelay = 0.7f;
-//  this->formatCtx->preload = static_cast<int>(muxPreload * AV_TIME_BASE);
   this->formatCtx->max_delay = static_cast<int>(muxMaxDelay * AV_TIME_BASE);
 
   if (!(this->outputFormat->flags & AVFMT_NOFILE))
@@ -341,13 +339,10 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
 
   if (outSize > 0)
   {
-    //if (this->codecCtx->coded_frame->pts != (0x8000000000000000LL))
-    //if (this->codecCtx->coded_frame->pts != AV_NOPTS_VALUE)
-    {
-      avPacket.pts= av_rescale_q(this->codecCtx->coded_frame->pts,
-          this->codecCtx->time_base, this->videoStream->time_base);
-    }
-    if(this->codecCtx->coded_frame->key_frame)
+    avPacket.pts= av_rescale_q(this->codecCtx->coded_frame->pts,
+        this->codecCtx->time_base, this->videoStream->time_base);
+
+    if (this->codecCtx->coded_frame->key_frame)
        avPacket.flags |= AV_PKT_FLAG_KEY;
 
     avPacket.stream_index= this->videoStream->index;

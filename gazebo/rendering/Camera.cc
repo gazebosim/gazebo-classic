@@ -353,8 +353,6 @@ void Camera::PostRender()
         static_cast<Ogre::PixelFormat>(this->imageFormat),
         this->saveFrameBuffer);
 
-//    gzerr << width << " " << height << " " << this->imageFormat << " " << size << std::endl;
-
     this->viewport->getTarget()->copyContentsToMemory(box);
 
     if (this->captureDataOnce)
