@@ -1763,8 +1763,6 @@ void World::PublishWorldStats()
   this->worldStatsMsg.set_iterations(this->iterations);
   this->worldStatsMsg.set_paused(this->IsPaused());
 
-//  gzerr << " pub " << msgs::Convert(this->worldStatsMsg.sim_time()) <<  std::endl;
-
   this->statPub->Publish(this->worldStatsMsg);
   this->prevStatTime = common::Time::GetWallTime();
 }
