@@ -153,6 +153,7 @@ namespace gazebo
 
       private: double totalTime;
 
+      private: int videoPts;
     };
     /// \}
   }

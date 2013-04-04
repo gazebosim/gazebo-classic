@@ -92,9 +92,6 @@ namespace gazebo
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 
-      /// \brief An overlay label on the 3D render widget
-      private: QLabel *msgOverlayLabel;
-
       private: std::vector<event::ConnectionPtr> connections;
 
       private: bool clear;
@@ -107,7 +104,14 @@ namespace gazebo
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
 
+      /// \brief Timer for clearing the message overlay
       private: QTimer *msgDisplayTimer;
+
+      /// \brief An overlay label on the 3D render widget
+      private: QLabel *msgOverlayLabel;
+
+      /// \brief Widget that contains the message overlay label
+      private: QWidget *msgOverlayWidget;
     };
   }
 }

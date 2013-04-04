@@ -1,3 +1,15 @@
+QToolButton
+{
+  border: none;
+  text-align: left;
+  color: #d0d0d0;
+}
+
+QToolButton::disabled
+{
+  color: #303030;  
+}
+
 QLabel
 {
   color: #d0d0d0;
@@ -702,4 +714,3 @@ QwtScaleWidget
   color: white;
   font-size: 11px;
 }
-

@@ -299,6 +299,18 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
 
   this->timePrev = timeNow;
 
+  int pts = 0;
+  if (this->videoPts != -1)
+  {
+    pts = this->fps * this->totalTime;
+    this->totalTime += dt;
+
+    if (this->videoPts == pts)
+      return;
+  }
+
+  this->videoPts = pts;
+
   if (!this->swsCtx)
   {
     avpicture_alloc(this->pic, PIX_FMT_RGB24, _w, _h);
@@ -317,39 +329,20 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
   sws_scale(this->swsCtx, this->pic->data, this->pic->linesize, 0,
       _h, this->avFrame->data, this->avFrame->linesize);
 
-  int pts = 0;
-  if (!math::equal(dt, timeNow.Double()))
-  {
-    // pts = 1.0/this->fps * this->sampleRate * this->videoPts;
-    pts = this->fps * this->totalTime;
-    this->totalTime += dt;
-  }
 
-  this->codecCtx->coded_frame->pts = pts;
+
+  this->codecCtx->coded_frame->pts = this->videoPts;
 
   this->outSize = avcodec_encode_video(this->codecCtx, this->outbuf,
       this->outBufferSize, this->avFrame);
-//  fwrite(this->outbuf, 1, this->outSize, this->fileHandle);
 
-  this->codecCtx->coded_frame->pts = pts;
-/*
-  AVPacket avPacket;
-  av_init_packet(&avPacket);
-  avPacket.data = NULL;
-  int ret = avcodec_encode_video2(this->codecCtx, &avPacket,
-      this->avFrame, &this->outSize);293
-  if (ret < 0)
-    gzerr << "Error encding frame\n";
-  fwrite(avPacket.data, 1, avPacket.size, this->fileHandle);
-  av_free_packet(&avPacket);*/
-
+  this->codecCtx->coded_frame->pts = this->videoPts;
 
   AVPacket avPacket;
   av_init_packet(&avPacket);
 
   if (outSize > 0)
   {
-    //if (pCodecCtx->coded_frame->pts != AV_NOPTS_VALUE)
     //if (this->codecCtx->coded_frame->pts != (0x8000000000000000LL))
     //if (this->codecCtx->coded_frame->pts != AV_NOPTS_VALUE)
     {
@@ -358,8 +351,6 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
     }
     if(this->codecCtx->coded_frame->key_frame)
        avPacket.flags |= AV_PKT_FLAG_KEY;
-
-    //printf("c %d. pts %d. codedframepts: %ld pkt.pts: %ld\n",custompts,pts,pCodecCtx->coded_frame->pts,pkt.pts);
 
     avPacket.stream_index= this->pVideoStream->index;
     avPacket.data= this->outbuf;
@@ -417,4 +408,5 @@ void Encoder::Reset()
   this->timePrev = 0;
   this->sampleRate = this->fps * 2;
   this->totalTime = 0;
+  this->videoPts = -1;
 }

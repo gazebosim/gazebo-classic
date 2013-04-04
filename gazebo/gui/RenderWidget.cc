@@ -93,10 +93,19 @@ RenderWidget::RenderWidget(QWidget *_parent)
       QSizePolicy::Expanding);
   this->buildingEditorWidget->hide();
 
-  this->msgOverlayLabel = new QLabel(this->glWidget);
-  this->msgOverlayLabel->setStyleSheet(
-      "QLabel { background-color : #303030; color : #d0d0d0; }");
-  this->msgOverlayLabel->setVisible(false);
+  std::string msgStyleSheet =
+      "QLabel { background-color : #303030; color : #d0d0d0; }";
+  this->msgOverlayWidget = new QWidget(this->glWidget);
+  this->msgOverlayWidget->setWindowFlags(Qt::FramelessWindowHint);
+  this->msgOverlayWidget->setContentsMargins(0, 0, 0, 0);
+  this->msgOverlayLabel = new QLabel;
+  this->msgOverlayLabel->setStyleSheet(tr(msgStyleSheet.c_str()));
+
+  QVBoxLayout *msglayout = new QVBoxLayout;
+  msglayout->addWidget(this->msgOverlayLabel);
+  msglayout->setContentsMargins(0, 0, 0, 0);
+  this->msgOverlayWidget->setLayout(msglayout);
+  this->msgOverlayWidget->setVisible(false);
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
@@ -256,7 +265,7 @@ void RenderWidget::ShowEditor(bool _show)
   if (_show)
   {
     this->buildingEditorWidget->show();
-    this->baseOverlayMsg = "Building is View Only";
+    this->baseOverlayMsg = "[Building is View Only]";
     this->OnClearOverlayMsg();
     this->bottomFrame->hide();
   }
@@ -286,18 +295,18 @@ void RenderWidget::CreateScene(const std::string &_name)
 /////////////////////////////////////////////////
 void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
 {
-  std::string msg = this->baseOverlayMsg.empty() ? _msg
-      : this->baseOverlayMsg + "\n" + _msg;
+  std::string msg = _msg.empty() ? this->baseOverlayMsg
+      : this->baseOverlayMsg + " " + _msg;
   this->msgOverlayLabel->setText(tr(msg.c_str()));
   if (msg.empty())
   {
-    this->msgOverlayLabel->setVisible(false);
+    this->msgOverlayWidget->setVisible(false);
     return;
   }
-  this->msgOverlayLabel->resize(
+  this->msgOverlayWidget->resize(
       this->msgOverlayLabel->fontMetrics().width(tr(msg.c_str())),
       this->msgOverlayLabel->fontMetrics().height());
-  this->msgOverlayLabel->setVisible(true);
+    this->msgOverlayWidget->setVisible(true);
 
   if (_duration > 0)
   {

@@ -615,6 +615,8 @@ void MainWindow::RecordVideo()
           SLOT(DisplayRecordingMsg()));
     }
     this->recordVideoTimer->start(1000);
+    QWidget *defaultWidget = g_recordVideoFormatAct->defaultWidget();
+    qobject_cast<QToolButton *>(defaultWidget)->setEnabled(false);
   }
   else
   {
@@ -637,6 +639,8 @@ void MainWindow::RecordVideo()
       this->renderWidget->DisplayOverlayMsg(
         name + " saved in: " + location, 2000);
     }
+    QWidget *defaultWidget = g_recordVideoFormatAct->defaultWidget();
+    qobject_cast<QToolButton *>(defaultWidget)->setEnabled(true);
   }
 }
 
@@ -1109,11 +1113,19 @@ void MainWindow::CreateActions()
   g_recordVideoFormatAct->setCheckable(false);
 
   QMenu *videoFormatSubmenu = new QMenu;
-  videoFormatSubmenu->addAction("avi");
-  videoFormatSubmenu->addAction("mp4");
-  videoFormatSubmenu->addAction("ogv");
+  std::vector<QAction *> formats;
+  formats.push_back(videoFormatSubmenu->addAction("avi"));
+  formats.push_back(videoFormatSubmenu->addAction("mp4"));
+  formats.push_back(videoFormatSubmenu->addAction("ogv"));
+  QActionGroup *formatActGroup = new QActionGroup(this);
+  for (unsigned int i = 0; i < formats.size(); ++i)
+  {
+    formats[i]->setCheckable(true);
+    formatActGroup->addAction(formats[i]);
+  }
   connect(videoFormatSubmenu, SIGNAL(triggered(QAction *)), this,
       SLOT(SetRecordVideoFormat(QAction *)));
+  formats[0]->setChecked(true);
 
   QToolButton *videoFormatButton = new QToolButton();
   videoFormatButton->setMenu(videoFormatSubmenu);
