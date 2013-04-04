@@ -42,7 +42,7 @@
 #include "transport/Node.hh"
 #include "transport/Subscriber.hh"
 
-#include "common/Common.hh"
+#include "common/CommonIface.hh"
 #include "common/Color.hh"
 #include "common/Events.hh"
 #include "common/Exception.hh"

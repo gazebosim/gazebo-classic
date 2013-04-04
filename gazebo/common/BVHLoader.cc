@@ -20,7 +20,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "common/Common.hh"
+#include "common/CommonIface.hh"
 #include "common/BVHLoader.hh"
 #include "common/SystemPaths.hh"
 #include "common/Skeleton.hh"
