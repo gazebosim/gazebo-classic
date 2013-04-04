@@ -92,7 +92,7 @@ void Video::Cleanup()
   av_free(this->avFrame);
 
   // Close the video file
-  av_close_input_file(this->formatCtx);
+  av_free(this->formatCtx);
 
   // Close the codec
   avcodec_close(this->codecCtx);
@@ -121,7 +121,7 @@ bool Video::Load(const std::string &_filename)
   }
 
   // Retrieve stream information
-  if (av_find_stream_info(this->formatCtx) < 0)
+  if (avformat_find_stream_info(this->formatCtx, NULL) < 0)
   {
     gzerr << "Couldn't find stream information\n";
     return false;

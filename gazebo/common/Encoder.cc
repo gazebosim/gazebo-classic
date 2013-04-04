@@ -245,9 +245,9 @@ void Encoder::Init()
 
   // setting mux preload and max delay avoids buffer underflow when writing to
   // mpeg format
-  double muxPreload  = 0.5f;
+//  double muxPreload  = 0.5f;
   double muxMaxDelay = 0.7f;
-  this->formatCtx->preload = static_cast<int>(muxPreload * AV_TIME_BASE);
+//  this->formatCtx->preload = static_cast<int>(muxPreload * AV_TIME_BASE);
   this->formatCtx->max_delay = static_cast<int>(muxMaxDelay * AV_TIME_BASE);
 
   if (!(this->outputFormat->flags & AVFMT_NOFILE))
