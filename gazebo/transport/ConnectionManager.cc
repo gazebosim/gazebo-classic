@@ -263,7 +263,7 @@ void ConnectionManager::Run()
   while (!this->stop)
   {
     this->RunUpdate();
-    common::Time::MSleep(30);
+    common::Time::NSleep(10000);
   }
   this->RunUpdate();
 
