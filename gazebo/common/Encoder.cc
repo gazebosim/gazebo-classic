@@ -52,7 +52,7 @@ Encoder::Encoder()
   this->swsCtx = NULL;
   this->pic = NULL;
   this->avFrame = NULL;
-  this->pFormatCtx = NULL;
+  this->formatCtx = NULL;
 
 #ifdef HAVE_FFMPEG
   static bool first = true;
@@ -84,16 +84,16 @@ void Encoder::Cleanup()
 
 
 #ifdef HAVE_FFMPEG
-  if (this->pFormatCtx)
+  if (this->formatCtx)
   {
-    for(unsigned int i = 0; i < this->pFormatCtx->nb_streams; ++i)
+    for(unsigned int i = 0; i < this->formatCtx->nb_streams; ++i)
     {
-      avcodec_close(this->pFormatCtx->streams[i]->codec);
-      av_freep(&this->pFormatCtx->streams[i]->codec);
-      av_freep(&this->pFormatCtx->streams[i]);
+      avcodec_close(this->formatCtx->streams[i]->codec);
+      av_freep(&this->formatCtx->streams[i]->codec);
+      av_freep(&this->formatCtx->streams[i]);
     }
-    av_free(this->pFormatCtx);
-    this->pFormatCtx = NULL;
+    av_free(this->formatCtx);
+    this->formatCtx = NULL;
   }
 
   if (this->avFrame)
@@ -161,37 +161,37 @@ void Encoder::Init()
     return;
 
   std::string tmpFileNameFull = this->tmpFilename + "." + this->format;
-  this->pOutputFormat = av_guess_format(NULL, tmpFileNameFull.c_str(), NULL);
-  if (!this->pOutputFormat)
+  this->outputFormat = av_guess_format(NULL, tmpFileNameFull.c_str(), NULL);
+  if (!this->outputFormat)
   {
     gzerr << "Could not deduce output format from file extension: "
         << "using MPEG.\n";
-    this->pOutputFormat = av_guess_format("mpeg", NULL, NULL);
+    this->outputFormat = av_guess_format("mpeg", NULL, NULL);
   }
 
   AVCodec *codec;
 
   // find the video encoder
-  codec = avcodec_find_encoder(this->pOutputFormat->video_codec);
+  codec = avcodec_find_encoder(this->outputFormat->video_codec);
   if (!codec)
   {
     gzerr << "Codec not found\n";
     return;
   }
 
-  this->pFormatCtx = avformat_alloc_context();
-  this->pFormatCtx->oformat = this->pOutputFormat;
-  snprintf(this->pFormatCtx->filename,
-      sizeof(this->pFormatCtx->filename),
+  this->formatCtx = avformat_alloc_context();
+  this->formatCtx->oformat = this->outputFormat;
+  snprintf(this->formatCtx->filename,
+      sizeof(this->formatCtx->filename),
       "%s", tmpFileNameFull.c_str());
-  this->pVideoStream = avformat_new_stream(this->pFormatCtx, codec);
+  this->videoStream = avformat_new_stream(this->formatCtx, codec);
 
-  this->codecCtx = this->pVideoStream->codec;
-//  this->codecCtx->codec_id = this->pOutputFormat->video_codec;
+  this->codecCtx = this->videoStream->codec;
+//  this->codecCtx->codec_id = this->outputFormat->video_codec;
 //  this->codecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
 
   // some formats want stream headers to be separate
-  if(this->pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER)
+  if(this->formatCtx->oformat->flags & AVFMT_GLOBALHEADER)
     this->codecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
   // put sample parameters
@@ -241,18 +241,18 @@ void Encoder::Init()
   avpicture_fill((AVPicture *)this->avFrame, this->pictureBuf,
       this->codecCtx->pix_fmt, this->codecCtx->width, this->codecCtx->height);
 
-  av_dump_format(this->pFormatCtx, 0, tmpFileNameFull.c_str(), 1);
+  av_dump_format(this->formatCtx, 0, tmpFileNameFull.c_str(), 1);
 
   // setting mux preload and max delay avoids buffer underflow when writing to
   // mpeg format
   double muxPreload  = 0.5f;
   double muxMaxDelay = 0.7f;
-  this->pFormatCtx->preload = static_cast<int>(muxPreload * AV_TIME_BASE);
-  this->pFormatCtx->max_delay = static_cast<int>(muxMaxDelay * AV_TIME_BASE);
+  this->formatCtx->preload = static_cast<int>(muxPreload * AV_TIME_BASE);
+  this->formatCtx->max_delay = static_cast<int>(muxMaxDelay * AV_TIME_BASE);
 
-  if (!(this->pOutputFormat->flags & AVFMT_NOFILE))
+  if (!(this->outputFormat->flags & AVFMT_NOFILE))
   {
-    if (avio_open(&this->pFormatCtx->pb, tmpFileNameFull.c_str(),
+    if (avio_open(&this->formatCtx->pb, tmpFileNameFull.c_str(),
         AVIO_FLAG_WRITE) < 0)
     {
       gzerr << "Could not open '" << tmpFileNameFull << "'\n";
@@ -260,7 +260,7 @@ void Encoder::Init()
     }
   }
   // Write the stream header, if any.
-  avformat_write_header(this->pFormatCtx, NULL);
+  avformat_write_header(this->formatCtx, NULL);
 
   // alloc image and output buffer
   this->outBufferSize = this->codecCtx->width * this->codecCtx->height;
@@ -285,8 +285,8 @@ bool Encoder::IsInitialized()
 
 /////////////////////////////////////////////////
 #ifdef HAVE_FFMPEG
-void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
-    unsigned int _h)
+void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
+    unsigned int _height)
 {
   if (!this->initialized)
     this->Init();
@@ -313,10 +313,10 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
 
   if (!this->swsCtx)
   {
-    avpicture_alloc(this->pic, PIX_FMT_RGB24, _w, _h);
-    this->swsCtx = sws_getContext(_w, _h, PIX_FMT_RGB24, this->codecCtx->width,
-        this->codecCtx->height, this->codecCtx->pix_fmt, SWS_BICUBIC, NULL,
-        NULL, NULL);
+    avpicture_alloc(this->pic, PIX_FMT_RGB24, _width, _height);
+    this->swsCtx = sws_getContext(_width, _height, PIX_FMT_RGB24,
+        this->codecCtx->width, this->codecCtx->height, this->codecCtx->pix_fmt,
+        SWS_BICUBIC, NULL, NULL, NULL);
     if (this->swsCtx == NULL)
     {
       gzerr << "Error while calling sws_getContext\n";
@@ -324,12 +324,10 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
     }
   }
 
-  memcpy(this->pic->data[0], _frame, _w * _h * 3);
+  memcpy(this->pic->data[0], _frame, _width * _height * 3);
 
   sws_scale(this->swsCtx, this->pic->data, this->pic->linesize, 0,
-      _h, this->avFrame->data, this->avFrame->linesize);
-
-
+      _height, this->avFrame->data, this->avFrame->linesize);
 
   this->codecCtx->coded_frame->pts = this->videoPts;
 
@@ -347,15 +345,15 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _w,
     //if (this->codecCtx->coded_frame->pts != AV_NOPTS_VALUE)
     {
       avPacket.pts= av_rescale_q(this->codecCtx->coded_frame->pts,
-          this->codecCtx->time_base, this->pVideoStream->time_base);
+          this->codecCtx->time_base, this->videoStream->time_base);
     }
     if(this->codecCtx->coded_frame->key_frame)
        avPacket.flags |= AV_PKT_FLAG_KEY;
 
-    avPacket.stream_index= this->pVideoStream->index;
+    avPacket.stream_index= this->videoStream->index;
     avPacket.data= this->outbuf;
     avPacket.size= this->outSize;
-    int ret = av_interleaved_write_frame(this->pFormatCtx, &avPacket);
+    int ret = av_interleaved_write_frame(this->formatCtx, &avPacket);
     av_free_packet(&avPacket);
     if (ret < 0)
       gzerr << "Error writing frame" << std::endl;
@@ -372,8 +370,8 @@ void Encoder::AddFrame(unsigned char */*_frame*/, unsigned int /*_w*/,
 void Encoder::Fini()
 {
 #ifdef HAVE_FFMPEG
-  if (this->pFormatCtx)
-    av_write_trailer(this->pFormatCtx);
+  if (this->formatCtx)
+    av_write_trailer(this->formatCtx);
 #endif
 }
 

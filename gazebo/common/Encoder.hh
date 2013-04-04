@@ -97,18 +97,28 @@ namespace gazebo
       /// \brief libav main external API structure
       private: AVCodecContext *codecCtx;
 
-      private: AVOutputFormat *pOutputFormat;
+      /// \brief libav muxing
+      private: AVOutputFormat *outputFormat;
 
-      private: AVFormatContext *pFormatCtx;
+      /// \brief libav format I/O context
+      private: AVFormatContext *formatCtx;
 
-      private: AVStream *pVideoStream;
+      /// \brief libav audio video stream
+      private: AVStream *videoStream;
 
-      /// \brief audi video picture
-      //private: AVPicture *pic;
+      /// \brief libav image data (used for storing RGB data)
+      private: AVPicture *pic;
+
+      /// \brief libav audio or video data (used for storing YUV data)
+      private: AVFrame *avFrame;
+
+      /// \brief Software scaling context
+      private: SwsContext *swsCtx;
 
       /// \brief Encoding buffer
       private: unsigned char *outbuf;
 
+      /// \brief Size of the picture buffer
       private: unsigned char *pictureBuf;
 
       /// \brief True if the encoder is initialized
@@ -117,42 +127,40 @@ namespace gazebo
       /// \brief Video encoding bit rate
       private: unsigned int bitRate;
 
-      /// \brief Frame width
+      /// \brief Output frame width
       private: unsigned int frameWidth;
 
-      /// \brief Frame height
+      /// \brief Output frame height
       private: unsigned int frameHeight;
 
+      /// \brief Size of the output buffer.
       private: int outBufferSize;
 
-      /// \brief Audio video picture
-      private: AVPicture *pic;
-
-      /// \brief Software scaling context
-      private: SwsContext *swsCtx;
-
-      private: int currentBufferSize;
-
-      private: AVFrame *avFrame;
-
+      /// \brief Temporary filename to write the file to.
       private: std::string tmpFilename;
 
+      /// \brief Encoding format
       private: std::string format;
 
-      /// \brief Handl to the output video file
+      /// \brief Handl to the output video file.
       private: FILE *fileHandle;
 
-      /// \brief Number of bytes used from buffer
+      /// \brief Number of bytes used from buffer.
       private: int outSize;
 
+      /// \brief Target framerate.
       private: unsigned int fps;
 
+      /// \brief Previous time when the frame is added.
       private: common::Time timePrev;
 
+      /// \brief Encoding sample rate.
       private: int sampleRate;
 
+      /// \brief total time elapsed.
       private: double totalTime;
 
+      /// \brief Video presenetation time stamp.
       private: int videoPts;
     };
     /// \}
