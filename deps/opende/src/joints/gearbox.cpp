@@ -201,6 +201,9 @@ void dJointSetGearboxParam( dJointID j, int parameter, dReal value )
         case dParamERP:
             joint->erp = value;
             break;
+        default:
+            dUASSERT( false, "unknown joint parameter" );
+            break;
     }
 }
 

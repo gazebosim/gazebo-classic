@@ -338,7 +338,8 @@ void dJointSetDBallParam( dJointID j, int parameter, dReal value )
             joint->erp = value;
             break;
         default:
-            return;
+            dUASSERT( false, "unknown joint parameter" );
+            break;
     }
 }
 
