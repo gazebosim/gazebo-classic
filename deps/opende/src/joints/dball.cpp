@@ -54,7 +54,7 @@ dxJointDBall::getInfo1( dxJoint::Info1 *info )
 }
 
 void
-dxJointDBall::getInfo2( dReal worldFPS, dReal worldERP, const Info2 *info )
+dxJointDBall::getInfo2( dReal worldFPS, dReal /*worldERP*/, const Info2 *info )
 {
     info->cfm[0] = this->cfm;
 
@@ -337,6 +337,8 @@ void dJointSetDBallParam( dJointID j, int parameter, dReal value )
         case dParamERP:
             joint->erp = value;
             break;
+        default:
+            return;
     }
 }
 
