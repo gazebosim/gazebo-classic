@@ -865,7 +865,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   if (fd1 != math::Vector3::Zero)
   {
     // assume fdir1 is in body local frame, rotate into world frame
-    /// \TODO: once fixed, we can do
+    /// \TODO: once issue #624 is fixed, switch to below:
     /// fd1 = _collision1->GetWorldPose().rot.RotateVector(fd1);
     fd1 = (_collision1->GetRelativePose() +
            _collision1->GetLink()->GetWorldPose()).rot.RotateVector(fd1);
@@ -874,7 +874,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   if (fd2 != math::Vector3::Zero)
   {
     // assume fdir1 is in body local frame, rotate into world frame
-    /// \TODO: once fixed, we can do
+    /// \TODO: once issue #624 is fixed, switch to below:
     /// fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
     fd2 = (_collision2->GetRelativePose() +
            _collision2->GetLink()->GetWorldPose()).rot.RotateVector(fd2);
