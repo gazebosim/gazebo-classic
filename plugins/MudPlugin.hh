@@ -40,6 +40,7 @@ namespace gazebo
 
     private: physics::WorldPtr world;
     private: physics::ModelPtr model;
+    private: std::string modelName;
     private: physics::LinkPtr link;
 
     /// \brief Name of contact sensor relative to model, scoped with '/',
@@ -64,8 +65,8 @@ namespace gazebo
     /// \brief Dynamically created joint for simulating mud forces.
     private: physics::JointPtr joint;
 
-    /// \brief Timestamp of last update that had newMsg == true
-    private: common::Time prevUpdateTime;
+    /// \brief Pointer to link currently targeted by mud joint.
+    private: physics::LinkPtr targetLink;
   };
 }
 #endif
