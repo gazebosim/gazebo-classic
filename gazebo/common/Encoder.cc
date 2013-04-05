@@ -30,7 +30,6 @@ extern "C"
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
-#include <libswscale/swscale_internal.h>
 #include <libavutil/mathematics.h>
 }
 #endif
@@ -48,13 +47,16 @@ Encoder::Encoder()
 {
   this->outbuf = NULL;
   this->pictureBuf = NULL;
-  this->codecCtx = NULL;
-  this->swsCtx = NULL;
-  this->pic = NULL;
-  this->avFrame = NULL;
-  this->formatCtx = NULL;
+  this->inFrameWidth = 0;
+  this->inFrameHeight = 0;
 
 #ifdef HAVE_FFMPEG
+  this->codecCtx = NULL;
+  this->swsCtx = NULL;
+  this->avInPicture = NULL;
+  this->avOutFrame = NULL;
+  this->formatCtx = NULL;
+
   static bool first = true;
   if (first)
   {
@@ -63,7 +65,7 @@ Encoder::Encoder()
   }
 
   this->Reset();
-//  this->pic = new AVthis->avFrame;
+//  this->avInPicture = new AVthis->avOutFrame;
 #endif
 }
 
@@ -71,9 +73,6 @@ Encoder::Encoder()
 Encoder::~Encoder()
 {
   this->Cleanup();
-#ifdef HAVE_FFMPEG
-  delete this->pic;
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -96,16 +95,16 @@ void Encoder::Cleanup()
     this->formatCtx = NULL;
   }
 
-  if (this->avFrame)
+  if (this->avOutFrame)
   {
-    av_free(this->avFrame);
-    this->avFrame = NULL;
+    av_free(this->avOutFrame);
+    this->avOutFrame = NULL;
   }
 
-  if (this->pic)
+  if (this->avInPicture)
   {
-    av_free(this->pic);
-    this->pic = NULL;
+    av_free(this->avInPicture);
+    this->avInPicture = NULL;
   }
 
   if (this->swsCtx)
@@ -229,7 +228,6 @@ void Encoder::Init()
     gzerr << "Could not open codec\n";
     return;
   }
-  this->pic = new AVPicture;
 
   this->fileHandle = fopen(tmpFileNameFull.c_str(), "wb");
   if (!this->fileHandle)
@@ -238,12 +236,13 @@ void Encoder::Init()
     return;
   }
 
-  this->avFrame = avcodec_alloc_frame();
+  this->avOutFrame = avcodec_alloc_frame();
   int size = avpicture_get_size(this->codecCtx->pix_fmt, this->codecCtx->width,
       this->codecCtx->height);
   this->pictureBuf = new unsigned char[size];
-  avpicture_fill(reinterpret_cast<AVPicture *>(this->avFrame), this->pictureBuf,
-      this->codecCtx->pix_fmt, this->codecCtx->width, this->codecCtx->height);
+  avpicture_fill(reinterpret_cast<AVPicture *>(this->avOutFrame),
+      this->pictureBuf, this->codecCtx->pix_fmt, this->codecCtx->width,
+      this->codecCtx->height);
 
   av_dump_format(this->formatCtx, 0, tmpFileNameFull.c_str(), 1);
 
@@ -320,23 +319,29 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
   this->videoPts = pts;
 
   // recreate the sws context on image resize
-  /*if (this->swsCtx)
+  if (this->swsCtx)
   {
-    if (this->swsCtx->srcW != _width || this->swsCtx->srcH != _height)
+    if (this->inFrameWidth != _width || this->inFrameHeight != _height)
     {
       sws_freeContext(this->swsCtx);
       this->swsCtx = NULL;
+      if (this->avInPicture)
+      {
+        av_free(this->avInPicture);
+        this->avInPicture = NULL;
+      }
     }
-    if (this->pic)
-    {
-      av_free(this->pic);
-      this->pic = NULL;
-    }
-  }*/
+  }
 
   if (!this->swsCtx)
   {
-    avpicture_alloc(this->pic, PIX_FMT_RGB24, _width, _height);
+    if (!this->avInPicture)
+    {
+      this->avInPicture = new AVPicture;
+      avpicture_alloc(this->avInPicture, PIX_FMT_RGB24, _width, _height);
+    }
+    this->inFrameWidth = _width;
+    this->inFrameHeight = _height;
     this->swsCtx = sws_getContext(_width, _height, PIX_FMT_RGB24,
         this->codecCtx->width, this->codecCtx->height, this->codecCtx->pix_fmt,
         SWS_BICUBIC, NULL, NULL, NULL);
@@ -345,17 +350,16 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
       gzerr << "Error while calling sws_getContext\n";
       return;
     }
+
   }
 
-  memcpy(this->pic->data[0], _frame, _width * _height * 3);
-
-  sws_scale(this->swsCtx, this->pic->data, this->pic->linesize, 0,
-      _height, this->avFrame->data, this->avFrame->linesize);
-
+  memcpy(this->avInPicture->data[0], _frame, _width * _height * 3);
+  sws_scale(this->swsCtx, this->avInPicture->data, this->avInPicture->linesize,
+      0, _height, this->avOutFrame->data, this->avOutFrame->linesize);
   this->codecCtx->coded_frame->pts = this->videoPts;
 
   this->outSize = avcodec_encode_video(this->codecCtx, this->outbuf,
-      this->outBufferSize, this->avFrame);
+      this->outBufferSize, this->avOutFrame);
 
   this->codecCtx->coded_frame->pts = this->videoPts;
 

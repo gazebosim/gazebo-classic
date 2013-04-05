@@ -114,10 +114,11 @@ namespace gazebo
       private: AVStream *videoStream;
 
       /// \brief libav image data (used for storing RGB data)
-      private: AVPicture *pic;
+      private: AVPicture *avInPicture;
+//      private: AVPicture *pic;
 
       /// \brief libav audio or video data (used for storing YUV data)
-      private: AVFrame *avFrame;
+      private: AVFrame *avOutFrame;
 
       /// \brief Software scaling context
       private: SwsContext *swsCtx;
@@ -169,6 +170,12 @@ namespace gazebo
 
       /// \brief Video presenetation time stamp.
       private: int videoPts;
+
+      /// \brief Input frame width
+      private: unsigned int inFrameWidth;
+
+      /// \brief Input frame height
+      private: unsigned int inFrameHeight;
     };
     /// \}
   }
