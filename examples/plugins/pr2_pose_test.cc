@@ -44,7 +44,7 @@ namespace gazebo
 
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
-      this->updateConnection = event::Events::ConnectWorldUpdateStart(
+      this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&PR2PoseTest::OnUpdate, this));
       gzdbg << "plugin model name: " << modelName << "\n";
 

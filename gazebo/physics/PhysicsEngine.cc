@@ -113,7 +113,7 @@ CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
 {
   CollisionPtr result;
   LinkPtr link =
-    boost::shared_dynamic_cast<Link>(this->world->GetEntity(_linkName));
+    boost::dynamic_pointer_cast<Link>(this->world->GetEntity(_linkName));
 
   if (!link)
     gzerr << "Unable to find link[" << _linkName << "]\n";
@@ -252,21 +252,9 @@ void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetParam(PhysicsParam /*_param*/,
-    const boost::any &/*_value*/)
-{
-}
-
-//////////////////////////////////////////////////
 void PhysicsEngine::SetParam(std::string /*_key*/,
     const boost::any &/*_value*/)
 {
-}
-
-//////////////////////////////////////////////////
-boost::any PhysicsEngine::GetParam(PhysicsParam /*_param*/) const
-{
-  return 0;
 }
 
 //////////////////////////////////////////////////

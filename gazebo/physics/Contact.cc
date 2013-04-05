@@ -78,9 +78,9 @@ Contact &Contact::operator =(const msgs::Contact &_contact)
 
   if (world)
   {
-    this->collisionPtr1 = boost::shared_dynamic_cast<Collision>(
+    this->collisionPtr1 = boost::dynamic_pointer_cast<Collision>(
         this->world->GetEntity(this->collision1)).get();
-    this->collisionPtr2 = boost::shared_dynamic_cast<Collision>(
+    this->collisionPtr2 = boost::dynamic_pointer_cast<Collision>(
       this->world->GetEntity(this->collision2)).get();
   }
   else

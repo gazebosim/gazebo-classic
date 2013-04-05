@@ -81,13 +81,13 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor01 = sensors::get_sensor(contactSensorName01);
   sensors::ContactSensorPtr contactSensor01 =
-      boost::shared_dynamic_cast<sensors::ContactSensor>(sensor01);
+      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor01);
 
   ASSERT_TRUE(contactSensor01);
 
   sensors::SensorPtr sensor02 = sensors::get_sensor(contactSensorName02);
   sensors::ContactSensorPtr contactSensor02 =
-      boost::shared_dynamic_cast<sensors::ContactSensor>(sensor02);
+      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor02);
 
   ASSERT_TRUE(contactSensor02);
 
@@ -296,7 +296,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(contactSensorName);
   sensors::ContactSensorPtr contactSensor =
-      boost::shared_dynamic_cast<sensors::ContactSensor>(sensor);
+      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
 
   ASSERT_TRUE(contactSensor);
 

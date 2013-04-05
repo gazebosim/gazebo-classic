@@ -119,12 +119,12 @@
     </element>
     <element name="ode" required="0">
       <description>ODE specific parameters</description>
-      <element name="provide_feedback" type="bool" default="0" required="0">
-        <description>If provide_feedback is set to true, ODE will compute the constraint forces at this joint.</description>
+      <element name="provide_feedback" type="bool" default="false" required="0">
+        <description>If provide feedback is set to true, ODE will compute the constraint forces at this joint.</description>
       </element>
 
-      <element name="cfm_damping" type="bool" default="0" required="0">
-        <description>If cfm_damping is set to true, ODE will use CFM to simulate damping, allows for infinite damping, and one additional constraint row (previously used for joint limit) is always active.</description>
+      <element name="cfm_damping" type="bool" default="false" required="0">
+        <description>If cfm damping is set to true, ODE will use CFM to simulate damping, allows for infinite damping, and one additional constraint row (previously used for joint limit) is always active.</description>
       </element>
 
       <element name="fudge_factor" type="double" default="0" required="0">

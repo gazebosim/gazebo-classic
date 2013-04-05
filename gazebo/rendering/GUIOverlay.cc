@@ -335,7 +335,7 @@ void GUIOverlay::Resize(unsigned int /*_width*/, unsigned int /*_height*/)
 bool GUIOverlay::AttachCameraToImage(DepthCameraPtr &_camera,
                                      const std::string &_windowName)
 {
-  CameraPtr cam = boost::shared_dynamic_cast<Camera>(_camera);
+  CameraPtr cam = boost::dynamic_pointer_cast<Camera>(_camera);
   return this->AttachCameraToImage(cam , _windowName);
 }
 

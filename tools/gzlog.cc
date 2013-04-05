@@ -339,7 +339,7 @@ std::string filter_state(const std::string &_stateString,
 /////////////////////////////////////////////////
 /// \brief Dump the contents of a log file to screen
 /// \param[in] _filter Filter string
-void echo(const std::string _filter)
+void echo(const std::string &_filter)
 {
   std::string stateString;
 

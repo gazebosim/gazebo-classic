@@ -358,8 +358,8 @@ class ServerFixture : public testing::Test
                _diffAvg = _diffSum / _sampleCount;
              }
 
-  protected: void ImageCompare(unsigned char **_imageA,
-                 unsigned char *_imageB[],
+  protected: void ImageCompare(unsigned char *_imageA,
+                 unsigned char *_imageB,
                  unsigned int _width, unsigned int _height, unsigned int _depth,
                  unsigned int &_diffMax, unsigned int &_diffSum,
                  double &_diffAvg)
@@ -372,10 +372,10 @@ class ServerFixture : public testing::Test
                {
                  for (unsigned int x = 0; x < _width*_depth; x++)
                  {
-                   unsigned int a = (*_imageA)[(y*_width*_depth)+x];
-                   unsigned int b = (*_imageB)[(y*_width*_depth)+x];
+                   unsigned int a = _imageA[(y*_width*_depth)+x];
+                   unsigned int b = _imageB[(y*_width*_depth)+x];
 
-                   unsigned int diff = (unsigned int)(fabs(a - b));
+                   unsigned int diff = (unsigned int)(abs(a - b));
 
                    if (diff > _diffMax)
                      _diffMax = diff;
@@ -402,7 +402,7 @@ class ServerFixture : public testing::Test
                sensors::SensorPtr sensor = sensors::get_sensor(_cameraName);
                EXPECT_TRUE(sensor);
                sensors::CameraSensorPtr camSensor =
-                 boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+                 boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
                _width = camSensor->GetImageWidth();
                _height = camSensor->GetImageHeight();
@@ -431,7 +431,10 @@ class ServerFixture : public testing::Test
                  const std::string &_cameraName,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  unsigned int _width = 320, unsigned int _height = 240,
-                 double _rate = 25)
+                 double _rate = 25,
+                 const std::string &_noiseType = "", 
+                 double _noiseMean = 0.0,
+                 double _noiseStdDev = 0.0)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
@@ -455,9 +458,17 @@ class ServerFixture : public testing::Test
                  << "      </image>"
                  << "      <clip>"
                  << "        <near>0.1</near><far>100</far>"
-                 << "      </clip>"
+                 << "      </clip>";
                  // << "      <save enabled ='true' path ='/tmp/camera/'/>"
-                 << "    </camera>"
+
+               if (_noiseType.size() > 0)
+                 newModelStr << "      <noise>"
+                 << "        <type>" << _noiseType << "</type>"
+                 << "        <mean>" << _noiseMean << "</mean>"
+                 << "        <stddev>" << _noiseStdDev << "</stddev>"
+                 << "      </noise>";
+
+               newModelStr << "    </camera>"
                  << "  </sensor>"
                  << "</link>"
                  << "</model>"
@@ -518,7 +529,7 @@ class ServerFixture : public testing::Test
                  << "        <resolution>" << _rangeResolution <<"</resolution>"
                  << "      </range>";
 
-               if (_noiseType.size() > 0)  
+               if (_noiseType.size() > 0)
                  newModelStr << "      <noise>"
                  << "        <type>" << _noiseType << "</type>"
                  << "        <mean>" << _noiseMean << "</mean>"
@@ -530,6 +541,74 @@ class ServerFixture : public testing::Test
                  << "</link>"
                  << "</model>"
                  << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_modelName) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
+             }
+
+  protected: void SpawnImuSensor(const std::string &_modelName,
+                 const std::string &_imuSensorName,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const std::string &_noiseType = "",
+                 double _rateNoiseMean = 0.0, double _rateNoiseStdDev = 0.0,
+                 double _rateBiasMean = 0.0, double _rateBiasStdDev = 0.0,
+                 double _accelNoiseMean = 0.0, double _accelNoiseStdDev = 0.0,
+                 double _accelBiasMean = 0.0, double _accelBiasStdDev = 0.0)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _modelName << "'>" << std::endl
+                 << "<static>true</static>" << std::endl
+                 << "<pose>" << _pos << " " << _rpy << "</pose>" << std::endl
+                 << "<link name ='body'>" << std::endl
+                 << "<inertial>" << std::endl
+                 << "<mass>0.1</mass>" << std::endl
+                 << "</inertial>" << std::endl
+                 << "<collision name='parent_collision'>" << std::endl
+                 << "  <pose>0 0 0.0205 0 0 0</pose>" << std::endl
+                 << "  <geometry>" << std::endl
+                 << "    <cylinder>" << std::endl
+                 << "      <radius>0.021</radius>" << std::endl
+                 << "      <length>0.029</length>" << std::endl
+                 << "    </cylinder>" << std::endl
+                 << "  </geometry>" << std::endl
+                 << "</collision>" << std::endl
+                 << "  <sensor name ='" << _imuSensorName << "' type ='imu'>" << std::endl
+                 << "    <imu>" << std::endl;
+
+               if (_noiseType.size() > 0)
+                 newModelStr << "      <noise>" << std::endl
+                 << "        <type>" << _noiseType << "</type>" << std::endl
+                 << "        <rate>" << std::endl
+                 << "          <mean>" << _rateNoiseMean << "</mean>" << std::endl
+                 << "          <stddev>" << _rateNoiseStdDev << "</stddev>" << std::endl
+                 << "          <bias_mean>" << _rateBiasMean << "</bias_mean>" << std::endl
+                 << "          <bias_stddev>" << _rateBiasStdDev << "</bias_stddev>" << std::endl
+                 << "        </rate>" << std::endl
+                 << "        <accel>" << std::endl
+                 << "          <mean>" << _accelNoiseMean << "</mean>" << std::endl
+                 << "          <stddev>" << _accelNoiseStdDev << "</stddev>" << std::endl
+                 << "          <bias_mean>" << _accelBiasMean << "</bias_mean>" << std::endl
+                 << "          <bias_stddev>" << _accelBiasStdDev << "</bias_stddev>" << std::endl
+                 << "        </accel>" << std::endl
+                 << "      </noise>" << std::endl;
+
+               newModelStr << "    </imu>" << std::endl
+                 << "  </sensor>" << std::endl
+                 << "</link>" << std::endl
+                 << "</model>" << std::endl
+                 << "</sdf>" << std::endl;
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
@@ -871,10 +950,10 @@ class ServerFixture : public testing::Test
 
   protected: void GetMemInfo(double &_resident, double &_share)
             {
+#ifdef __linux__
               int totalSize, residentPages, sharePages;
               totalSize = residentPages = sharePages = 0;
 
-#ifdef __linux__
               std::ifstream buffer("/proc/self/statm");
               buffer >> totalSize >> residentPages >> sharePages;
               buffer.close();
