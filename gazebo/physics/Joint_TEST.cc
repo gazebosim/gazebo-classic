@@ -58,7 +58,7 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
   double upper = M_PI;
   double lower = -M_PI;
 
-  double residentLast, shareLast;
+  double residentLast = 0, shareLast = 0;
   double residentCur, shareCur;
 
   for (unsigned int i = 0; i < 100; ++i)
@@ -103,11 +103,12 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
       }
       world->SetPaused(paused);
     }
+    gazebo::common::Time::MSleep(10);
     this->GetMemInfo(residentCur, shareCur);
     if (i > 1)  // give it 2 cycles to stabilize
     {
-      EXPECT_EQ(residentCur, residentLast);
-      EXPECT_EQ(shareCur, shareLast);
+      EXPECT_LE(residentCur, residentLast);
+      EXPECT_LE(shareCur, shareLast);
     }
     // gzdbg << "memory res[" << residentCur
     //       << "] shr[" << shareCur

@@ -52,14 +52,14 @@ void TimePanel_TEST::ValidTimes()
   std::string txt;
   double value;
 
-  // Make sure realt time is greater than zero
+  // Make sure real time is greater than zero
   txt = realTimeEdit->text().toStdString();
-  value = boost::lexical_cast<double>(txt.substr(0, txt.find(" ")));
+  value = boost::lexical_cast<double>(txt.substr(txt.find(".")));
   QVERIFY(value > 0.0);
 
   // Make sure sim time is greater than zero
   txt = simTimeEdit->text().toStdString();
-  value = boost::lexical_cast<double>(txt.substr(0, txt.find(" ")));
+  value = boost::lexical_cast<double>(txt.substr(txt.find(".")));
   QVERIFY(value > 0.0);
 
   // Make sure the percent real time is greater than zero

@@ -263,8 +263,8 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
       math::Vector3::Zero);
   SpawnEmptyLink("test_empty", modelPos["test_empty"], math::Vector3::Zero);
-  std::string trimeshPath =
-      "file://media/models/cube_20k/meshes/cube_20k.stl";
+  // std::string trimeshPath =
+  //    "file://media/models/cube_20k/meshes/cube_20k.stl";
   // SpawnTrimesh("test_trimesh", trimeshPath, math::Vector3(0.5, 0.5, 0.5),
   //    modelPos["test_trimesh"], math::Vector3::Zero);
 
@@ -835,11 +835,12 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    double jointVel1, jointVel2;
-    double angle1, angle2, angle3;
     model = world->GetModel(*modelIter);
     if (model)
     {
+      double jointVel1, jointVel2;
+      double angle1, angle2, angle3;
+
       gzdbg << "Check angle measurement for " << *modelIter << '\n';
       std::vector<std::string>::iterator jointIter;
       for (jointIter  = jointNames.begin();
@@ -1043,13 +1044,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           oldVel = newVel;
 
           // Check that GetForce returns what we set
-          // EXPECT_NEAR(joint->GetForce(0), force, PHYSICS_TOL);
-          {
-            // This block is added to avoid a compilation warning while
-            // GetForce(int) is being deprecated.
-            unsigned int index = 0;
-            EXPECT_NEAR(joint->GetForce(index), force, PHYSICS_TOL);
-          }
+          EXPECT_NEAR(joint->GetForce(0u), force, PHYSICS_TOL);
 
           // Expect joint velocity to be near angular velocity difference
           // of child and parent, along global axis
@@ -1088,13 +1083,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           EXPECT_LT(newVel, oldVel);
 
           // Check that GetForce returns what we set
-          // EXPECT_NEAR(joint->GetForce(0), force, PHYSICS_TOL);
-          {
-            // This block is added to avoid a compilation warning while
-            // GetForce(int) is being deprecated.
-            unsigned int index = 0;
-            EXPECT_NEAR(joint->GetForce(index), force, PHYSICS_TOL);
-          }
+          EXPECT_NEAR(joint->GetForce(0u), force, PHYSICS_TOL);
 
           // Expect joint velocity to be near angular velocity difference
           // of child and parent, along global axis
@@ -1153,9 +1142,9 @@ TEST_F(PhysicsTest, State)
   physics::CollisionState collisionState = linkState.GetCollisionState(0);
 
   math::Pose pose;
-  EXPECT_EQ(static_cast<unsigned int>(1), worldState.GetModelStateCount());
-  EXPECT_EQ(static_cast<unsigned int>(1), modelState.GetLinkStateCount());
-  EXPECT_EQ(static_cast<unsigned int>(1), linkState.GetCollisionStateCount());
+  EXPECT_EQ(1u, worldState.GetModelStateCount());
+  EXPECT_EQ(1u, modelState.GetLinkStateCount());
+  EXPECT_EQ(1u, linkState.GetCollisionStateCount());
   EXPECT_EQ(pose, modelState.GetPose());
   EXPECT_EQ(pose, linkState.GetPose());
   EXPECT_EQ(pose, collisionState.GetPose());

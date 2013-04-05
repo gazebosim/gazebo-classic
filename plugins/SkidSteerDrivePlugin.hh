@@ -49,7 +49,7 @@ namespace gazebo
     /// \param[in] _index Internal wheel index (Zero based)
     /// \param[in] _name Name wheel joint
     /// \return {0: Success, else: Error}
-    private: int RegisterJoint(int _index, const std::string _name);
+    private: int RegisterJoint(int _index, const std::string &_name);
 
     /// \brief Callback for gazebo topic
     /// \param[in] _msg Pose message from external publisher
