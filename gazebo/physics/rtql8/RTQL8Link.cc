@@ -83,7 +83,7 @@ void RTQL8Link::Init()
     if (geomType == "sphere")
     {
       double radius = geometryElem->GetFirstElement()->GetValueDouble("radius");
-      Eigen::Vector3d eigenSize(radius, radius, radius);
+      Eigen::Vector3d eigenSize(radius*2, radius*2, radius*2);
       rtql8::kinematics::ShapeEllipsoid* shape
           = new rtql8::kinematics::ShapeEllipsoid(eigenSize, 1);
       this->rtql8BodyNode->setVisualShape(shape);
@@ -95,8 +95,9 @@ void RTQL8Link::Init()
       //          = geometryElem->GetFirstElement()->GetValueVector3("normal");
       math::Vector2d size
           = geometryElem->GetFirstElement()->GetValueVector2d("size");
-      Eigen::Vector3d eigenSize(size.x, size.y, 0.001);
-      rtql8::kinematics::ShapeCube* shape
+      //Eigen::Vector3d eigenSize(size.x, size.y, 0.001);
+      Eigen::Vector3d eigenSize(100, 100, 0.001);
+            rtql8::kinematics::ShapeCube* shape
           = new rtql8::kinematics::ShapeCube(eigenSize, 1);
       this->rtql8BodyNode->setVisualShape(shape);
     }
@@ -134,6 +135,15 @@ void RTQL8Link::Init()
     else
       gzerr << "Unknown visual type[" << geomType << "]\n";
 
+  }
+  else
+  {
+      // TODO: Since rtql8 store mass in shape, we must create shape even though
+      //       no visual in sdf!
+      Eigen::Vector3d eigenSize(0.1, 0.1, 0.1);
+      rtql8::kinematics::ShapeEllipsoid* shape
+          = new rtql8::kinematics::ShapeEllipsoid(eigenSize, 1);
+      this->rtql8BodyNode->setVisualShape(shape);
   }
   //////////////////////////////////////////////////////////////////////////////
 
@@ -463,7 +473,7 @@ math::Vector3 RTQL8Link::GetWorldTorque() const
   //     torque.z = dtorque[2];
   //   }
 
-  gzerr << "Not implemented...\n";
+//  gzerr << "Not implemented...\n";
   return torque;
 }
 

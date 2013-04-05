@@ -61,7 +61,7 @@ void RTQL8Collision::Init()
   if (geomType == "sphere")
   {
     double radius = geometryElem->GetFirstElement()->GetValueDouble("radius");
-    Eigen::Vector3d eigenSize(radius, radius, radius);
+    Eigen::Vector3d eigenSize(radius*2, radius*2, radius*2);
     rtql8::kinematics::ShapeEllipsoid* rtql8Shape
         = new rtql8::kinematics::ShapeEllipsoid(eigenSize, 1);
     rtql8BodyNode->setCollisionShape(rtql8Shape);
@@ -73,7 +73,8 @@ void RTQL8Collision::Init()
     //          = geometryElem->GetFirstElement()->GetValueVector3("normal");
     math::Vector2d size
         = geometryElem->GetFirstElement()->GetValueVector2d("size");
-    Eigen::Vector3d eigenSize(size.x, size.y, 0.001);
+//    Eigen::Vector3d eigenSize(size.x, size.y, 0.001);
+    Eigen::Vector3d eigenSize(100, 100, 0.001);
     rtql8::kinematics::ShapeCube* rtql8Shape
         = new rtql8::kinematics::ShapeCube(eigenSize, 1);
     rtql8BodyNode->setCollisionShape(rtql8Shape);
