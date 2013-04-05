@@ -132,7 +132,6 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
 
-  #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
   find_path (tinyxml_include_dir tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
   if (NOT tinyxml_include_dir)

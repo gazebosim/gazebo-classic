@@ -5,10 +5,14 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
 )
 
+include_directories(
+  ${CMAKE_SOURCE_DIR}/deps
+)
+
 add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
-add_subdirectory(model_editor)
+add_subdirectory(building)
 
 set (sources
   ../gazebo.cc
@@ -78,16 +82,27 @@ set (headers
   viewers/ViewFactory.hh
 )
 
-set (qt_tests 
+#if (HAVE_QWT)
+#  set (sources ${sources}
+#    Diagnostics.cc
+#    IncrementalPlot.cc
+#  )
+#  set (qt_headers ${qt_headers}
+#    Diagnostics.hh
+#    IncrementalPlot.hh
+#  )
+#endif()
+
+set (qt_tests
   DataLogger_TEST.cc
   TimePanel_TEST.cc
   viewers/ImagesView_TEST.cc
 )
 
+# Generate executables for each of the QT unit tests
 gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
-
 
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
@@ -104,7 +119,7 @@ target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_rendering
                                  gazebo_sensors
                                  gazebo_msgs
-                                 gazebo_model_editor
+                                 gazebo_building
                                  gzqtpropertybrowser
                                  ${QT_LIBRARIES}
                                  ${ogre_libraries}
@@ -117,7 +132,7 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_rendering
                                 gazebo_sensors
                                 gazebo_msgs
-                                gazebo_model_editor
+                                gazebo_building
                                 gzqtpropertybrowser
                                 ${QT_LIBRARIES}
                                 ${ogre_libraries}

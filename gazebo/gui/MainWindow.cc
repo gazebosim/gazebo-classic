@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include "gazebo_config.h"
 
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
@@ -41,12 +42,15 @@
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/gui/model_editor/BuildingEditorPalette.hh"
-#include "gazebo/gui/model_editor/EditorEvents.hh"
+#include "gazebo/gui/building/BuildingEditorPalette.hh"
+#include "gazebo/gui/building/EditorEvents.hh"
 
 #include "sdf/sdf.hh"
 
-#include "gazebo_config.h"
+#ifdef HAVE_QWT
+#include "gazebo/gui/Diagnostics.hh"
+#endif
+
 
 using namespace gazebo;
 using namespace gui;
@@ -57,6 +61,7 @@ extern bool g_fullscreen;
 MainWindow::MainWindow()
   : renderWidget(0)
 {
+  this->menuBar = NULL;
   this->setObjectName("mainWindow");
 
   this->requestMsg = NULL;
@@ -234,6 +239,15 @@ void MainWindow::New()
   msgs::ServerControl msg;
   msg.set_new_world(true);
   this->serverControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Diagnostics()
+{
+#ifdef HAVE_QWT
+  gui::Diagnostics *diag = new gui::Diagnostics(this);
+  diag->show();
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -575,6 +589,15 @@ void MainWindow::CreateDirectionalLight()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::CaptureScreenshot()
+{
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->SetCaptureDataOnce();
+  this->renderWidget->DisplayOverlayMsg(
+      "Screenshot saved in: " + cam->GetScreenshotPath(), 2000);
+}
+
+/////////////////////////////////////////////////
 void MainWindow::InsertModel()
 {
 }
@@ -658,6 +681,17 @@ void MainWindow::SetTransparent()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::SetWireframe()
+{
+  if (g_viewWireframeAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "set_wireframe", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "set_solid", "all");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowCOM()
 {
   if (g_showCOMAct->isChecked())
@@ -728,6 +762,7 @@ void MainWindow::BuildingEditorExit()
 {
   gui::editor::Events::exitBuildingEditor();
 }
+
 /////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
@@ -741,6 +776,14 @@ void MainWindow::CreateActions()
   g_topicVisAct->setShortcut(tr("Ctrl+T"));
   g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
   connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
+
+#ifdef HAVE_QWT
+  /*g_diagnosticsAct = new QAction(tr("Diagnostic Plot"), this);
+  g_diagnosticsAct->setShortcut(tr("Ctrl+U"));
+  g_diagnosticsAct->setStatusTip(tr("Plot diagnostic information"));
+  connect(g_diagnosticsAct, SIGNAL(triggered()), this, SLOT(Diagnostics()));
+  */
+#endif
 
   g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
@@ -907,6 +950,13 @@ void MainWindow::CreateActions()
   connect(g_transparentAct, SIGNAL(triggered()), this,
           SLOT(SetTransparent()));
 
+  g_viewWireframeAct = new QAction(tr("Wireframe"), this);
+  g_viewWireframeAct->setStatusTip(tr("Wireframe"));
+  g_viewWireframeAct->setCheckable(true);
+  g_viewWireframeAct->setChecked(false);
+  connect(g_viewWireframeAct, SIGNAL(triggered()), this,
+          SLOT(SetWireframe()));
+
   g_showCOMAct = new QAction(tr("Center of Mass"), this);
   g_showCOMAct->setStatusTip(tr("Show COM"));
   g_showCOMAct->setCheckable(true);
@@ -974,6 +1024,12 @@ void MainWindow::CreateActions()
   g_buildingEditorExitAct->setCheckable(false);
   connect(g_buildingEditorExitAct, SIGNAL(triggered()), this,
           SLOT(BuildingEditorExit()));
+
+  g_screenshotAct = new QAction(QIcon(":/images/screenshot.png"),
+      tr("Screenshot"), this);
+  g_screenshotAct->setStatusTip(tr("Take a screenshot"));
+  connect(g_screenshotAct, SIGNAL(triggered()), this,
+      SLOT(CaptureScreenshot()));
 }
 
 /////////////////////////////////////////////////
@@ -981,7 +1037,8 @@ void MainWindow::AttachEditorMenuBar()
 {
   if (this->menuBar)
   {
-    delete menuBar;
+    this->menuLayout->removeWidget(this->menuBar);
+    delete this->menuBar;
   }
 
   this->menuBar = new QMenuBar;
@@ -994,7 +1051,7 @@ void MainWindow::AttachEditorMenuBar()
   buildingEditorFileMenu->addAction(g_buildingEditorDoneAct);
   buildingEditorFileMenu->addAction(g_buildingEditorExitAct);
 
-  this->menuLayout->addWidget(this->menuBar);
+  this->menuLayout->setMenuBar(this->menuBar);
 }
 
 /////////////////////////////////////////////////
@@ -1002,7 +1059,8 @@ void MainWindow::AttachMainMenuBar()
 {
   if (this->menuBar)
   {
-    delete menuBar;
+    this->menuLayout->removeWidget(this->menuBar);
+    delete this->menuBar;
   }
 
   this->menuBar =  new QMenuBar;
@@ -1027,6 +1085,8 @@ void MainWindow::AttachMainMenuBar()
   viewMenu->addSeparator();
 
   viewMenu->addAction(g_transparentAct);
+  viewMenu->addAction(g_viewWireframeAct);
+  viewMenu->addSeparator();
   viewMenu->addAction(g_showCollisionsAct);
   viewMenu->addAction(g_showJointsAct);
   viewMenu->addAction(g_showCOMAct);
@@ -1044,12 +1104,16 @@ void MainWindow::AttachMainMenuBar()
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
 
+#ifdef HAVE_QWT
+  // windowMenu->addAction(g_diagnosticsAct);
+#endif
+
   this->menuBar->addSeparator();
 
   QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
   helpMenu->addAction(g_aboutAct);
 
-  this->menuLayout->addWidget(this->menuBar);
+  this->menuLayout->setMenuBar(this->menuBar);
 }
 
 /////////////////////////////////////////////////

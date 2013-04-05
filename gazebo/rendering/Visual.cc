@@ -1027,6 +1027,53 @@ void Visual::AttachAxes()
 
 
 //////////////////////////////////////////////////
+void Visual::SetWireframe(bool _show)
+{
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    (*iter)->SetWireframe(_show);
+  }
+
+  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
+  {
+    Ogre::Entity *entity = NULL;
+    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+
+    if (!entity)
+      continue;
+
+    // For each ogre::entity
+    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
+    {
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+
+      unsigned int techniqueCount, passCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
+           techniqueCount++)
+      {
+        technique = material->getTechnique(techniqueCount);
+
+        for (passCount = 0; passCount < technique->getNumPasses(); passCount++)
+        {
+          pass = technique->getPass(passCount);
+          if (_show)
+            pass->setPolygonMode(Ogre::PM_WIREFRAME);
+          else
+            pass->setPolygonMode(Ogre::PM_SOLID);
+        }
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 void Visual::SetTransparency(float _trans)
 {
   if (math::equal(_trans, this->transparency))
@@ -1523,9 +1570,7 @@ void Visual::InsertMesh(const std::string &_meshName)
   if (!common::MeshManager::Instance()->HasMesh(_meshName))
   {
     mesh = common::MeshManager::Instance()->Load(_meshName);
-    if (mesh)
-      RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
-    else
+    if (!mesh)
       gzthrow("Unable to create a mesh from " + _meshName);
   }
   else
@@ -1549,6 +1594,10 @@ void Visual::InsertMesh(const std::string &_meshName)
 void Visual::InsertMesh(const common::Mesh *_mesh)
 {
   Ogre::MeshPtr ogreMesh;
+
+  GZ_ASSERT(_mesh != NULL, "Unable to insert a NULL mesh");
+
+  RenderEngine::Instance()->AddResourcePath(_mesh->GetPath());
 
   if (_mesh->GetSubMeshCount() == 0)
   {

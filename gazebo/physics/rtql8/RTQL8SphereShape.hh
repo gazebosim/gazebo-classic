@@ -40,16 +40,16 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetRadius(double /*_radius*/)
       {
-//         SphereShape::SetRadius(_radius);
-//         RTQL8CollisionPtr oParent;
-//         oParent =
-//           boost::shared_dynamic_cast<RTQL8Collision>(this->collisionParent);
+//      SphereShape::SetRadius(_radius);
+//      RTQL8CollisionPtr oParent;
+//      oParent =
+//        boost::shared_dynamic_cast<RTQL8Collision>(this->collisionParent);
 // 
-//         // Create the sphere geometry
-//         if (oParent->GetCollisionId() == NULL)
-//           oParent->SetCollision(dCreateSphere(0, _radius), true);
-//         else
-//           dGeomSphereSetRadius(oParent->GetCollisionId(), _radius);
+//      // Create the sphere geometry
+//      if (oParent->GetCollisionId() == NULL)
+//        oParent->SetCollision(dCreateSphere(0, _radius), true);
+//      else
+//        dGeomSphereSetRadius(oParent->GetCollisionId(), _radius);
       }
     };
   }

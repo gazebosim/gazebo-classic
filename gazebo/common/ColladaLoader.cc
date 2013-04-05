@@ -1007,8 +1007,8 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
     if (lambertXml)
     {
       this->LoadColorOrTexture(lambertXml, "ambient", mat);
-      this->LoadColorOrTexture(lambertXml, "diffuse", mat);
       this->LoadColorOrTexture(lambertXml, "emission", mat);
+      this->LoadColorOrTexture(lambertXml, "diffuse", mat);
       if (lambertXml->FirstChildElement("transparency"))
       {
         mat->SetTransparency(
@@ -1024,9 +1024,9 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
     else if (phongXml)
     {
       this->LoadColorOrTexture(phongXml, "ambient", mat);
-      this->LoadColorOrTexture(phongXml, "diffuse", mat);
       this->LoadColorOrTexture(phongXml, "emission", mat);
       this->LoadColorOrTexture(phongXml, "specular", mat);
+      this->LoadColorOrTexture(phongXml, "diffuse", mat);
       if (phongXml->FirstChildElement("shininess"))
         mat->SetShininess(
             this->LoadFloat(phongXml->FirstChildElement("shininess")));
@@ -1043,9 +1043,9 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
     else if (blinnXml)
     {
       this->LoadColorOrTexture(blinnXml, "ambient", mat);
-      this->LoadColorOrTexture(blinnXml, "diffuse", mat);
       this->LoadColorOrTexture(blinnXml, "emission", mat);
       this->LoadColorOrTexture(blinnXml, "specular", mat);
+      this->LoadColorOrTexture(blinnXml, "diffuse", mat);
       if (blinnXml->FirstChildElement("shininess"))
         mat->SetShininess(
             this->LoadFloat(blinnXml->FirstChildElement("shininess")));

@@ -191,6 +191,10 @@ namespace gazebo
       /// \brief Attach visualization axes
       public: void AttachAxes();
 
+      /// \brief Enable or disable wireframe for this visual.
+      /// \param[in] _show True to enable wireframe for this visual.
+      public: void SetWireframe(bool _show);
+
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
       /// transparency.

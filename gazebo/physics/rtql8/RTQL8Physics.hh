@@ -58,6 +58,10 @@ namespace gazebo
       /// \brief Finilize the RTQL8 engine.
       public: virtual void Fini();
        
+      // Documentation inherited
+      public: virtual std::string GetType() const
+                      { return "rtql8"; }
+
       /// \brief Rest the RTQL8 engine.
       public: virtual void Reset();
  
@@ -91,6 +95,11 @@ namespace gazebo
       /// \brief Create a new collision
       public: virtual CollisionPtr CreateCollision(const std::string& _type,
                                                    LinkPtr _body);
+
+      /// \brief Create a new joint
+      public: virtual void SetSeed(uint32_t _seed)
+      {
+      };
 
       /// \brief Create a new joint
       public: virtual JointPtr CreateJoint(const std::string& _type,

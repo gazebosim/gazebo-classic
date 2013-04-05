@@ -315,8 +315,7 @@ void TopicCombo::UpdateList()
       for (std::list<std::string>::iterator topicIter = iter->second.begin();
            topicIter != iter->second.end(); ++topicIter)
       {
-        if ((*topicIter).find("__dbg") == std::string::npos &&
-            std::find(topics.begin(), topics.end(), *topicIter) == topics.end())
+        if (std::find(topics.begin(), topics.end(), *topicIter) == topics.end())
         {
           topics.push_back(*topicIter);
         }
@@ -328,9 +327,6 @@ void TopicCombo::UpdateList()
   for (std::list<std::string>::iterator iter = topics.begin();
       iter != topics.end(); ++iter)
   {
-    if ((*iter).find("__dbg") != std::string::npos)
-      continue;
-
     // Get the shorthand notation for the topic.
     std::string topicName = this->node->EncodeTopicName(*iter);
 
