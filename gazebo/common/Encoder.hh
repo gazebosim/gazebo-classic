@@ -54,10 +54,18 @@ namespace gazebo
 
       /// \brief Add a single frame to be encoded
       /// \param[in] _frame Image buffer to be encoded
-      /// \param[in] _w Input frame width
-      /// \param[in] _h Input frame height
-      public: void AddFrame(unsigned char *_frame, unsigned int _w,
-          unsigned int _h);
+      /// \param[in] _width Input frame width
+      /// \param[in] _height Input frame height
+      public: void AddFrame(unsigned char *_frame, unsigned int _width,
+          unsigned int _height);
+
+      /// \brief Add a single timestamped frame to be encoded
+      /// \param[in] _frame Image buffer to be encoded
+      /// \param[in] _width Input frame width
+      /// \param[in] _height Input frame height
+      /// \param[in] _timestamp Timestamp of the image frame
+      public: void AddFrame(unsigned char *_frame, unsigned int _width,
+          unsigned int _height, common::Time _timestamp);
 
       /// \brief Write data buffer to to disk
       /// param[in] _filename File in which to save the encoded data

@@ -362,7 +362,7 @@ void Camera::PostRender()
     }
     else if (this->encodeVideo)
     {
-      this->encoder->AddFrame(this->saveFrameBuffer, width, height);
+        this->encoder->AddFrame(this->saveFrameBuffer, width, height);
     }
 
     if (this->sdf->HasElement("save") &&

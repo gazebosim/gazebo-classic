@@ -30,6 +30,7 @@ extern "C"
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
+#include <libswscale/swscale_internal.h>
 #include <libavutil/mathematics.h>
 }
 #endif
@@ -106,6 +107,9 @@ void Encoder::Cleanup()
     av_free(this->pic);
     this->pic = NULL;
   }
+
+  if (this->swsCtx)
+    sws_freeContext(this->swsCtx);
 #endif
 
   if (this->outbuf)
@@ -282,20 +286,26 @@ bool Encoder::IsInitialized()
 }
 
 /////////////////////////////////////////////////
-#ifdef HAVE_FFMPEG
 void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
     unsigned int _height)
+{
+  this->AddFrame(_frame, _width, _height,
+      common::Time::GetWallTime());
+}
+
+/////////////////////////////////////////////////
+#ifdef HAVE_FFMPEG
+void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
+    unsigned int _height, common::Time _timestamp)
 {
   if (!this->initialized)
     this->Init();
 
-  Time timeNow = common::Time::GetWallTime();
-
-  double dt = (timeNow - this->timePrev).Double();
+  double dt = (_timestamp - this->timePrev).Double();
   if ( dt < 1.0/this->sampleRate)
     return;
 
-  this->timePrev = timeNow;
+  this->timePrev = _timestamp;
 
   int pts = 0;
   if (this->videoPts != -1)
@@ -308,6 +318,21 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
   }
 
   this->videoPts = pts;
+
+  // recreate the sws context on image resize
+  /*if (this->swsCtx)
+  {
+    if (this->swsCtx->srcW != _width || this->swsCtx->srcH != _height)
+    {
+      sws_freeContext(this->swsCtx);
+      this->swsCtx = NULL;
+    }
+    if (this->pic)
+    {
+      av_free(this->pic);
+      this->pic = NULL;
+    }
+  }*/
 
   if (!this->swsCtx)
   {
