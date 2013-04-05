@@ -90,6 +90,33 @@ void MudPlugin::OnUpdate()
     double contactStepRatio = 
       static_cast<double>(this->newestContactsMsg.contact_size()) / mySteps;
 
+    gzerr << currTime << '\n';
+    int ci;
+    for (ci = 0; ci < this->newestContactsMsg.contact_size(); ++ci)
+    {
+      std::cout << msgs::Convert(this->newestContactsMsg.contact(ci).time()) << ':'
+                << this->newestContactsMsg.contact(ci).collision1() << ' '
+                << this->newestContactsMsg.contact(ci).collision2() << '\n';
+    }
+
+    // // Each contacts message, may have more than one contact
+    // // The first contact is usually the oldest, so take the last contact
+    // math::Vector3 contactPositionAverage;
+    // std::cout << "MudPlugin: " << currTime << ' ';
+    // if (this->newestContactsMsg.contact_size())
+    // {
+    //   int i = this->newestContactsMsg.contact_size() - 1;
+    //   std::cout << msgs::Convert(this->newestContactsMsg.contact(i).time()) << ' ';
+    //   for (int j = 0; j < this->newestContactsMsg.contact(i).position_size(); ++j)
+    //   {
+    //     std::cout << msgs::Convert(this->newestContactsMsg.contact(i).position(j)) << ',';
+    //     contactPositionAverage += msgs::Convert(this->newestContactsMsg.contact(i).position(j));
+    //   }
+    //   contactPositionAverage *= 1.0 / this->newestContactsMsg.contact(i).position_size();
+    //   std::cout << '\n' << contactPositionAverage;
+    // }
+    // std::cout << '\n';
+
     // Use hysteresis based on contactStepRatio for enabling and disabling mud
     if (!this->joint && contactStepRatio > (0.5+hysteresis))
     {
@@ -141,7 +168,7 @@ void MudPlugin::OnUpdate()
            << "contactStepRatio " << contactStepRatio << ' '
            << "this->joint " << this->joint << ' ';
     stream << ", now " << this->model->GetWorld()->GetSimTime() << '\n';;
-    gzerr << stream.str();
+    //gzerr << stream.str();
 
     this->prevUpdateTime = currTime;
     this->newMsg = false;
