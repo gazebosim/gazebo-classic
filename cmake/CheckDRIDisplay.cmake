@@ -4,7 +4,7 @@
 MESSAGE(STATUS "Looking for display capabilities")
 SET (VALID_DISPLAY FALSE)
 SET (VALID_DRI_DISPLAY FALSE)
-SET (CHECKER_ERROR "")
+SET (CHECKER_ERROR "(no glxinfo or pyopengl)")
 
 IF((DEFINED ENV{DISPLAY}) AND NOT ("$ENV{DISPLAY}" STREQUAL ""))
   MESSAGE(STATUS " + found a display available ($DISPLAY is set)")
@@ -27,7 +27,7 @@ IF((DEFINED ENV{DISPLAY}) AND NOT ("$ENV{DISPLAY}" STREQUAL ""))
       MESSAGE(STATUS " + found a valid dri display (glxinfo)")
       SET (VALID_DRI_DISPLAY TRUE)
     ELSE()
-      SET (CHECKER_ERROR "using glxinfo ")
+      SET (CHECKER_ERROR "using glxinfo")
     ENDIF ()
   ELSE ()
     EXECUTE_PROCESS(
@@ -35,12 +35,20 @@ IF((DEFINED ENV{DISPLAY}) AND NOT ("$ENV{DISPLAY}" STREQUAL ""))
       # returns 0 if ok and 1 if error (inverse than cmake IF)
       COMMAND ${PROJECT_SOURCE_DIR}/tools/gl-test.py
       RESULT_VARIABLE GL_FAIL_RESULT
-      ERROR_QUIET
+      ERROR_VARIABLE GL_ERROR
       OUTPUT_QUIET)
 
     IF (NOT GL_FAIL_RESULT)
       MESSAGE(STATUS " + found a valid dri display (pyopengl)")
       SET (VALID_DRI_DISPLAY TRUE)
+   ELSE()
+      # Check error string: no python module means no pyopengl
+      STRING(FIND ${GL_ERROR} 
+              "ImportError: No module named OpenGL.GLUT" ERROR_POS)
+      # -1 will imply pyopengl is present but real DRI test fails
+      IF ("${ERROR_POS}" STREQUAL "-1")
+        SET (CHECKER_ERROR "using pyopengl")
+      ENDIF ()
     ENDIF ()
   ENDIF ()
 ENDIF ()
