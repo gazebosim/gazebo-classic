@@ -4,6 +4,7 @@
 MESSAGE(STATUS "Looking for display capabilities")
 SET (VALID_DISPLAY FALSE)
 SET (VALID_DRI_DISPLAY FALSE)
+SET (CHECKER_ERROR "")
 
 IF((DEFINED ENV{DISPLAY}) AND NOT ("$ENV{DISPLAY}" STREQUAL ""))
   MESSAGE(STATUS " + found a display available ($DISPLAY is set)")
@@ -25,6 +26,8 @@ IF((DEFINED ENV{DISPLAY}) AND NOT ("$ENV{DISPLAY}" STREQUAL ""))
     IF (GLX)
       MESSAGE(STATUS " + found a valid dri display (glxinfo)")
       SET (VALID_DRI_DISPLAY TRUE)
+    ELSE()
+      SET (CHECKER_ERROR "using glxinfo ")
     ENDIF ()
   ELSE ()
     EXECUTE_PROCESS(
@@ -47,5 +50,5 @@ IF (NOT VALID_DISPLAY)
 ENDIF ()
 
 IF (NOT VALID_DRI_DISPLAY)
-  MESSAGE(STATUS " ! valid dri display not found")
+    MESSAGE(STATUS " ! valid dri display not found ${CHECKER_ERROR}")
 ENDIF ()
