@@ -36,7 +36,7 @@ void MainWindow_TEST::Wireframe()
   this->resMaxPercentChange = 3.0;
   this->shareMaxPercentChange = 1.0;
 
-  this->Load("empty.world");
+  this->Load("empty.world", false, false, true);
   gazebo::transport::NodePtr node;
   gazebo::transport::SubscriberPtr sub;
 
@@ -61,7 +61,10 @@ void MainWindow_TEST::Wireframe()
 
   // Get the user camera, and tell it to save frames
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  cam->EnableSaveFrame(true);
+  if (!cam)
+    return;
+
+  cam->SetCaptureData(true);
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
@@ -79,9 +82,9 @@ void MainWindow_TEST::Wireframe()
 
   // Calculate the average color.
   unsigned int sum = 0;
-  for (unsigned int y = 0; y < height; y++)
+  for (unsigned int y = 0; y < height; ++y)
   {
-    for (unsigned int x = 0; x < width*depth; x++)
+    for (unsigned int x = 0; x < width*depth; ++x)
     {
       unsigned int a = image[(y*width*depth)+x];
       sum += a;
@@ -103,9 +106,9 @@ void MainWindow_TEST::Wireframe()
   // Get the new image data, and calculate the new average color
   image = cam->GetImageData();
   sum = 0;
-  for (unsigned int y = 0; y < height; y++)
+  for (unsigned int y = 0; y < height; ++y)
   {
-    for (unsigned int x = 0; x < width*depth; x++)
+    for (unsigned int x = 0; x < width*depth; ++x)
     {
       unsigned int a = image[(y*width*depth)+x];
       sum += a;
@@ -116,8 +119,8 @@ void MainWindow_TEST::Wireframe()
   // Make sure the request was set.
   QVERIFY(g_gotSetWireframe);
 
-  // Removing the grey ground plane should make the average color brighter.
-  QVERIFY(avgPreWireframe < avgPostWireframe);
+  // Removing the grey ground plane should change the image.
+  QVERIFY(fabs(avgPreWireframe - avgPostWireframe) > 10);
 
   mainWindow->hide();
   delete mainWindow;

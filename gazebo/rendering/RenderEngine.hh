@@ -57,13 +57,13 @@ namespace gazebo
       public: enum RenderPathType
               {
                 /// \brief No rendering is done.
-                NONE,
+                NONE = 0,
                 /// \brief Most basic rendering, with least fidelity.
-                VERTEX,
+                VERTEX = 1,
                 /// \brief Utilizes the RTT shader system.
-                FORWARD,
+                FORWARD = 2,
                 /// \brief Utilizes deferred rendering. Best fidelity.
-                DEFERRED,
+                DEFERRED = 3,
                 /// \brief Count of the rendering path enums.
                 RENDER_PATH_COUNT
               };
@@ -120,6 +120,10 @@ namespace gazebo
       /// automatically determined based on the computers capabilities
       /// \return The RenderPathType
       public: RenderPathType GetRenderPathType() const;
+
+      /// \brief Get a pointer to the window manager.
+      /// \return Pointer to the window manager.
+      public: WindowManagerPtr GetWindowManager() const;
 
       /// \brief Create a render context.
       /// \return True if the context was created.
@@ -179,6 +183,9 @@ namespace gazebo
 
       /// \brief The type of render path used.
       private: RenderPathType renderPathType;
+
+      /// \brief Pointer to the window manager.
+      private: WindowManagerPtr windowManager;
 
       /// \brief Makes this class a singleton.
       private: friend class SingletonT<RenderEngine>;
