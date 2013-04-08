@@ -189,8 +189,6 @@ void Encoder::Init()
   this->videoStream = avformat_new_stream(this->formatCtx, codec);
 
   this->codecCtx = this->videoStream->codec;
-//  this->codecCtx->codec_id = this->outputFormat->video_codec;
-//  this->codecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
 
   // some formats want stream headers to be separate
   if (this->formatCtx->oformat->flags & AVFMT_GLOBALHEADER)
@@ -198,6 +196,8 @@ void Encoder::Init()
 
   // put sample parameters
   this->codecCtx->bit_rate = this->bitRate;
+  this->codecCtx->rc_max_rate = this->bitRate;
+  this->codecCtx->rc_min_rate = this->bitRate;
   // resolution must be a multiple of two
   this->codecCtx->width = this->frameWidth;
   this->codecCtx->height = this->frameHeight;
@@ -420,8 +420,8 @@ void Encoder::Reset()
   this->Cleanup();
   // set default values
   this->bitRate = 2000000;
-  this->frameWidth = 800;
-  this->frameHeight = 600;
+  this->frameWidth = 1024;
+  this->frameHeight = 800;
   this->fps = 25;
   this->tmpFilename = "tmp_recording";
   this->initialized = false;
