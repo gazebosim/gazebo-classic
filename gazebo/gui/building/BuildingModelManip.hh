@@ -20,7 +20,9 @@
 #include <string>
 #include <vector>
 #include "gazebo/gui/qt.h"
-#include "gazebo/rendering/Visual.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

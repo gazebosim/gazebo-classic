@@ -72,7 +72,7 @@ InternalError::InternalError()
 
 //////////////////////////////////////////////////
 InternalError::InternalError(const char *_file, int _line,
-                             const std::string _msg) :
+                             const std::string &_msg) :
   Exception(_file, _line, _msg)
 {
 }
@@ -85,9 +85,9 @@ InternalError::~InternalError()
 //////////////////////////////////////////////////
 AssertionInternalError::AssertionInternalError(
     const char * _file, int _line,
-    const std::string _expr,
-    const std::string _function,
-    const std::string _msg) :
+    const std::string &_expr,
+    const std::string &_function,
+    const std::string &_msg) :
   InternalError(_file, _line,
       "GAZEBO ASSERTION                     \n" +
       _msg                               + "\n" +
