@@ -1,6 +1,10 @@
 <?xml version="1.0" ?>
 <sdf version="1.3">
   <world name="default">
+    <physics type="ode">
+      <update_rate>0</update_rate>
+    </physics>
+
     <include>
       <uri>model://ground_plane</uri>
     </include>

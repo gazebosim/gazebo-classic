@@ -653,7 +653,7 @@ void MainWindow::ShowCollisions()
 void MainWindow::ShowGrid()
 {
   msgs::Scene msg;
-  msg.set_name("default");
+  msg.set_name(gui::get_world());
   msg.set_grid(g_showGridAct->isChecked());
   this->scenePub->Publish(msg);
 }

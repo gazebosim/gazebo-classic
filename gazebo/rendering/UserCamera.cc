@@ -52,7 +52,8 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 {
   std::stringstream stream;
 
-  this->gui = new GUIOverlay();
+  this->gui = NULL;
+  //this->gui = new GUIOverlay();
 
   this->orbitViewController = NULL;
   this->fpsViewController = NULL;
@@ -202,6 +203,7 @@ void UserCamera::Fini()
 //////////////////////////////////////////////////
 void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
+  return;
   if (!this->gui || !this->gui->HandleMouseEvent(_evt))
   {
     if (this->selectionBuffer)
@@ -218,6 +220,7 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 /////////////////////////////////////////////////
 void UserCamera::HandleKeyPressEvent(const std::string &_key)
 {
+  return;
   if (this->gui)
     this->gui->HandleKeyPressEvent(_key);
   this->viewController->HandleKeyPressEvent(_key);
@@ -226,6 +229,7 @@ void UserCamera::HandleKeyPressEvent(const std::string &_key)
 /////////////////////////////////////////////////
 void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
 {
+  return;
   if (this->gui)
     this->gui->HandleKeyReleaseEvent(_key);
   this->viewController->HandleKeyReleaseEvent(_key);
@@ -504,11 +508,15 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   Camera::SetRenderTarget(_target);
 
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
-  this->gui->Init(this->renderTarget);
+
+  if (this->gui)
+    this->gui->Init(this->renderTarget);
+
   this->initialized = true;
 
-  this->selectionBuffer = new SelectionBuffer(this->name,
+  /*this->selectionBuffer = new SelectionBuffer(this->name,
       this->scene->GetManager(), this->renderTarget);
+      */
 }
 
 //////////////////////////////////////////////////
