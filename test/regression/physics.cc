@@ -242,12 +242,12 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 //}
 //#endif  // HAVE_BULLET
 
-#ifdef HAVE_RTQL8
-TEST_F(PhysicsTest, SpawnDropRTQL8)
-{
-  SpawnDrop("rtql8");
-}
-#endif  // HAVE_RTQL8
+//#ifdef HAVE_RTQL8
+//TEST_F(PhysicsTest, SpawnDropRTQL8)
+//{
+//  SpawnDrop("rtql8");
+//}
+//#endif  // HAVE_RTQL8
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnDropCoGOffset:
@@ -1277,10 +1277,10 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
 //}
 
 
-//TEST_F(PhysicsTest, SimplePendulumODE)
-//{
-//  SimplePendulum("ode");
-//}
+TEST_F(PhysicsTest, SimplePendulumODE)
+{
+  SimplePendulum("ode");
+}
 
 //#ifdef HAVE_BULLET
 //TEST_F(PhysicsTest, SimplePendulumBullet)
@@ -1289,16 +1289,16 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
 //}
 //#endif  // HAVE_BULLET
 
-//#ifdef HAVE_RTQL8
-//TEST_F(PhysicsTest, SimplePendulumRTQL8)
-//{
-//  SimplePendulum("rtql8");
-//}
-//#endif  // HAVE_RTQL8
+#ifdef HAVE_RTQL8
+TEST_F(PhysicsTest, SimplePendulumRTQL8)
+{
+  SimplePendulum("rtql8");
+}
+#endif  // HAVE_RTQL8
 
 void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
-  Load("worlds/simple_pendulums.world", true, _physicsEngine);
+  Load("worlds/simple_pen-dulums.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 

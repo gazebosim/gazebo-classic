@@ -122,6 +122,15 @@
         </geometry>
       </collision>
     </link>
+    <joint name="joint01" type="revolute">
+      <pose>0 0 0 0 0 0</pose>
+      <parent>world</parent>
+      <child>base</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+      
     <!-- pin joint for upper link, at origin of upper link -->
     <joint name="upper_joint" type="revolute">
       <parent>base</parent>

@@ -91,15 +91,15 @@ rtql8::kinematics::TrfmRotateQuat* RTQL8Utils::createTrfmRotateQuat(
 void RTQL8Utils::addTransformToRTQL8Joint(rtql8::kinematics::Joint* _rtl8Joint,
                                           const math::Pose& _pose)
 {
-  rtql8::kinematics::TrfmTranslate* trfmTrans
-      = RTQL8Utils::createTrfmTranslate(_pose.pos);
-
-  _rtl8Joint->addTransform(trfmTrans, false);
-
   rtql8::kinematics::TrfmRotateQuat* trfmRot
       = RTQL8Utils::createTrfmRotateQuat(_pose.rot);
 
   _rtl8Joint->addTransform(trfmRot, false);
+
+  rtql8::kinematics::TrfmTranslate* trfmTrans
+      = RTQL8Utils::createTrfmTranslate(_pose.pos);
+
+  _rtl8Joint->addTransform(trfmTrans, false);
 }
 
 //////////////////////////////////////////////////
