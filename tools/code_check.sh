@@ -20,7 +20,6 @@ echo "*:gazebo/common/STLLoader.cc:94" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/STLLoader.cc:105" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/STLLoader.cc:126" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/STLLoader.cc:149" >> /tmp/gazebo_cpp_check.suppress
-echo "*:gazebo/rendering/RenderEngine:462" >> /tmp/gazebo_cpp_check.suppress
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> /tmp/gazebo_cpp_check.suppress
 
 
