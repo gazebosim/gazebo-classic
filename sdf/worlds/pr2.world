@@ -3,6 +3,7 @@
   <world name="default">
     <physics type="ode">
       <update_rate>0</update_rate>
+      <!--<real_time_factor>-1</real_time_factor>-->
     </physics>
 
     <include>

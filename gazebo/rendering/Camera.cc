@@ -389,7 +389,12 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
+    // Clear the buffers (color and depth)
+    this->viewport->clear();
+
+    // Render, but don't swap buffers.
     this->renderTarget->update(false);
+
     this->lastRenderWallTime = common::Time::GetWallTime();
   }
 }
@@ -1196,16 +1201,16 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
 }
 
 //////////////////////////////////////////////////
-void Camera::SetRenderTarget(Ogre::RenderTarget *target)
+void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
-  this->renderTarget = target;
+  this->renderTarget = _target;
 
   if (this->renderTarget)
   {
     // Setup the viewport to use the texture
     this->viewport = this->renderTarget->addViewport(this->camera);
-    this->viewport->setClearEveryFrame(true);
-    this->viewport->setShadowsEnabled(true);
+    this->viewport->setClearEveryFrame(false);
+    this->viewport->setShadowsEnabled(false);
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
@@ -1243,7 +1248,6 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
       this->dlMergeInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
             "DeferredLighting/ShowLit");
-
 
       // Screen space ambient occlusion
       // this->ssaoInstance =
