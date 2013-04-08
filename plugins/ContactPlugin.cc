@@ -38,7 +38,7 @@ void ContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 {
   // Get the parent sensor.
   this->parentSensor =
-    boost::shared_dynamic_cast<sensors::ContactSensor>(_sensor);
+    boost::dynamic_pointer_cast<sensors::ContactSensor>(_sensor);
 
   // Make sure the parent sensor is valid.
   if (!this->parentSensor)
