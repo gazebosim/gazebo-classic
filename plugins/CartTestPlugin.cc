@@ -101,14 +101,14 @@ void CartTestPlugin::Load(physics::ModelPtr _model,
   this->jointMaxEfforts[2] =
     _sdf->GetElement("left_eff")->GetValueDouble();
 
-  this->updateConnection = event::Events::ConnectWorldUpdateStart(
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&CartTestPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
 void CartTestPlugin::Init()
 {
-  // physics::EntityPtr parent = boost::shared_dynamic_cast<physics::Entity>(
+  // physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
   //   this->joints[0]->GetChild());
 }
 

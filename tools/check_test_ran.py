@@ -67,10 +67,10 @@ def check_main():
         
         with open(test_file, 'w') as f:
             test_name = os.path.basename(test_file)
-            d = {'test': test_name, 'test_file': test_file }
+            d = {'test': test_name, 'test_file': test_file , 'test_no_xml': test_name.replace('.xml', '')}
             f.write("""<?xml version="1.0" encoding="UTF-8"?>
 <testsuite tests="1" failures="1" time="1" errors="0" name="%(test)s">
-  <testcase name="test_ran" status="run" time="1" classname="Results">
+  <testcase name="test_ran" status="run" time="1" classname="%(test_no_xml)s">
     <failure message="Unable to find test results for %(test)s, test did not run.\nExpected results in %(test_file)s" type=""/>
   </testcase>
 </testsuite>"""%d)

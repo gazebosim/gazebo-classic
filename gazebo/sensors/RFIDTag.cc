@@ -72,7 +72,7 @@ void RFIDTag::Load(const std::string &_worldName)
   {
     if ((*iter)->GetType() == "rfid")
     {
-      boost::shared_dynamic_cast<RFIDSensor>(*iter)->AddTag(this);
+      boost::dynamic_pointer_cast<RFIDSensor>(*iter)->AddTag(this);
     }
   }
 }

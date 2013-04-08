@@ -41,7 +41,7 @@ namespace gazebo
         PlaneShape::CreatePlane();
         ODECollisionPtr oParent;
         oParent =
-          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+          boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
 
         double altitude = 0;
 
@@ -60,7 +60,7 @@ namespace gazebo
         PlaneShape::SetAltitude(_pos);
         ODECollisionPtr odeParent;
         odeParent =
-          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+          boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
 
         dVector4 vec4;
 

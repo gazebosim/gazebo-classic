@@ -33,11 +33,10 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world, BasePtr _parent)
-    : ScrewJoint<BulletJoint>(_parent)
+    : ScrewJoint<BulletJoint>(_parent), bulletScrew(NULL)
 {
   GZ_ASSERT(_world, "bullet world pointer is NULL");
   this->bulletWorld = _world;
-  this->bulletScrew = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -60,9 +59,9 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
   ScrewJoint<BulletJoint>::Attach(_one, _two);
 
   BulletLinkPtr bulletChildLink =
-    boost::shared_static_cast<BulletLink>(this->childLink);
+    boost::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
-    boost::shared_static_cast<BulletLink>(this->parentLink);
+    boost::static_pointer_cast<BulletLink>(this->parentLink);
 
 
   btTransform frame1, frame2;

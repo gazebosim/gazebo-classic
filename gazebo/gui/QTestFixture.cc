@@ -15,12 +15,23 @@
  *
 */
 
+// The following is needed to enable the GetMemInfo function for OSX
+#ifdef __MACH__
+# include <mach/mach.h>
+#endif  // __MACH__
+
 #include "gazebo/physics/Physics.hh"
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/gazebo.hh"
 #include "gazebo/gui/QTestFixture.hh"
+
+/////////////////////////////////////////////////
+QTestFixture::QTestFixture()
+  : server(NULL), serverThread(NULL), residentStart(0), shareStart(0)
+{
+}
 
 /////////////////////////////////////////////////
 void QTestFixture::initTestCase()
@@ -131,6 +142,7 @@ void QTestFixture::cleanupTestCase()
 /////////////////////////////////////////////////
 void QTestFixture::GetMemInfo(double &_resident, double &_share)
 {
+#ifdef __linux__
   int totalSize, residentPages, sharePages;
   totalSize = residentPages = sharePages = 0;
 
@@ -143,4 +155,23 @@ void QTestFixture::GetMemInfo(double &_resident, double &_share)
 
   _resident = residentPages * pageSizeKb;
   _share = sharePages * pageSizeKb;
+#elif __MACH__
+  // /proc is only available on Linux
+  // for OSX, use task_info to get resident and virtual memory
+  struct task_basic_info t_info;
+  mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
+  if (KERN_SUCCESS != task_info(mach_task_self(),
+                                TASK_BASIC_INFO,
+                                (task_info_t)&t_info,
+                                &t_info_count))
+  {
+    gzerr << "failure calling task_info\n";
+    return;
+  }
+  _resident = static_cast<double>(t_info.resident_size/1024);
+  _share = static_cast<double>(t_info.virtual_size/1024);
+#else
+  gzerr << "Unsupported architecture\n";
+  return;
+#endif
 }

@@ -488,7 +488,7 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
 {
   ShapePtr shape;
   ODECollisionPtr collision =
-    boost::shared_dynamic_cast<ODECollision>(_collision);
+    boost::dynamic_pointer_cast<ODECollision>(_collision);
 
   if (_type == "sphere")
     shape.reset(new ODESphereShape(collision));
@@ -1042,7 +1042,7 @@ void ODEPhysics::SetSeed(uint32_t _seed)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
+void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
@@ -1112,7 +1112,7 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
       dWorldSetQuickStepPreconIterations(this->worldId, value);
       break;
     }
-    case SOR_ITERS:
+    case PGS_ITERS:
     {
       int value;
       try
@@ -1198,7 +1198,7 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
 //////////////////////////////////////////////////
 void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
-  PhysicsParam param;
+  ODEParam param;
 
   if (_key == "type")
     param = SOLVER_TYPE;
@@ -1209,7 +1209,7 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "precon_iters")
     param = SOR_PRECON_ITERS;
   else if (_key == "iters")
-    param = SOR_ITERS;
+    param = PGS_ITERS;
   else if (_key == "sor")
     param = SOR;
   else if (_key == "contact_max_correcting_vel")
@@ -1229,7 +1229,7 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 }
 
 //////////////////////////////////////////////////
-boost::any ODEPhysics::GetParam(PhysicsParam _param) const
+boost::any ODEPhysics::GetParam(ODEParam _param) const
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
@@ -1257,7 +1257,7 @@ boost::any ODEPhysics::GetParam(PhysicsParam _param) const
       value = odeElem->GetElement("solver")->GetValueInt("precon_iters");
       break;
     }
-    case SOR_ITERS:
+    case PGS_ITERS:
     {
       value = odeElem->GetElement("solver")->GetValueInt("iters");
       break;
@@ -1301,7 +1301,7 @@ boost::any ODEPhysics::GetParam(PhysicsParam _param) const
 //////////////////////////////////////////////////
 boost::any ODEPhysics::GetParam(const std::string &_key) const
 {
-  PhysicsParam param;
+  ODEParam param;
 
   if (_key == "type")
     param = SOLVER_TYPE;
@@ -1312,7 +1312,7 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
   else if (_key == "precon_iters")
     param = SOR_PRECON_ITERS;
   else if (_key == "iters")
-    param = SOR_ITERS;
+    param = PGS_ITERS;
   else if (_key == "sor")
     param = SOR;
   else if (_key == "contact_max_correcting_vel")

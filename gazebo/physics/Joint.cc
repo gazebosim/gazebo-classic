@@ -114,10 +114,10 @@ void Joint::Load(sdf::ElementPtr _sdf)
   }
   else
   {
-    this->childLink = boost::shared_dynamic_cast<Link>(
+    this->childLink = boost::dynamic_pointer_cast<Link>(
         this->GetWorld()->GetByName(childName));
 
-    this->parentLink = boost::shared_dynamic_cast<Link>(
+    this->parentLink = boost::dynamic_pointer_cast<Link>(
         this->GetWorld()->GetByName(parentName));
   }
 
@@ -143,9 +143,9 @@ void Joint::LoadImpl(const math::Pose &_pose)
   BasePtr myBase = shared_from_this();
 
   if (this->parentLink)
-    this->parentLink->AddChildJoint(boost::shared_static_cast<Joint>(myBase));
+    this->parentLink->AddChildJoint(boost::static_pointer_cast<Joint>(myBase));
   else if (this->childLink)
-    this->childLink->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
+    this->childLink->AddParentJoint(boost::static_pointer_cast<Joint>(myBase));
   else
     gzthrow("both parent and child link do no exist");
 
@@ -232,34 +232,15 @@ void Joint::Init()
   }
   else
   {
+    // if parentLink is NULL, it's name be the world
+    this->sdf->GetElement("parent")->GetElement("link_name")->Set("world");
     if (this->sdf->HasElement("axis"))
     {
       this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-      if (this->sdf->GetElement("parent")->GetValueString("link_name")
-          != "world")
-      {
-        gzwarn << "joint [" << this->GetScopedName()
-          << "] has a non-real parentLink ["
-          << this->sdf->GetElement("parent")->GetValueString("link_name")
-          << "], loading axis from SDF ["
-          << this->sdf->GetElement("axis")->GetValueVector3("xyz")
-          << "]\n";
-      }
     }
     if (this->sdf->HasElement("axis2"))
     {
       this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
-
-      if (this->sdf->GetElement("parent")->GetValueString("link_name")
-          != "world")
-      {
-        gzwarn << "joint [" << this->GetScopedName()
-          << "] has a non-real parentLink ["
-          << this->sdf->GetElement("parent")->GetValueString("link_name")
-          << "], loading axis2 from SDF ["
-          << this->sdf->GetElement("axis2")->GetValueVector3("xyz")
-          << "]\n";
-      }
     }
   }
   this->ComputeInertiaRatio();
