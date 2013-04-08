@@ -1143,7 +1143,6 @@ void Camera::SetCaptureDataOnce()
 //////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &textureName)
 {
-  printf("Create Render Texture\n");
   // Create the render texture
   this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
       textureName,
@@ -1210,7 +1209,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     // Setup the viewport to use the texture
     this->viewport = this->renderTarget->addViewport(this->camera);
     this->viewport->setClearEveryFrame(false);
-    this->viewport->setShadowsEnabled(false);
+    this->viewport->setShadowsEnabled(true);
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
