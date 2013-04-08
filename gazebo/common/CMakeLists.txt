@@ -14,7 +14,6 @@ set (sources
   Color.cc
   Common.cc
   Console.cc
-  Diagnostics.cc
   Event.cc
   Events.cc
   Exception.cc
@@ -46,7 +45,6 @@ set (headers
   CommonTypes.hh
   Color.hh
   Console.hh
-  Diagnostics.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -85,9 +83,9 @@ endif()
 
 set (gtest_sources
   Animation_TEST.cc
+  ColladaLoader_TEST.cc
   Color_TEST.cc
   Console_TEST.cc
-  Diagnostics_TEST.cc
   Exception_TEST.cc
   LogRecord_TEST.cc
   Material_TEST.cc
@@ -106,6 +104,7 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_DIR}/common.hh )
 
 gz_add_library(gazebo_common ${sources})
+
 target_link_libraries(gazebo_common gazebo_math
                                     ${libdl_library}
                                     ${Boost_LIBRARIES}

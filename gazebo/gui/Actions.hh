@@ -53,6 +53,8 @@ namespace gazebo
     extern QAction *g_spotLghtCreateAct;
     extern QAction *g_dirLghtCreateAct;
 
+    extern QAction *g_screenshotAct;
+
     extern QAction *g_showCollisionsAct;
     extern QAction *g_showGridAct;
     extern QAction *g_showContactsAct;
@@ -70,6 +72,10 @@ namespace gazebo
     extern QAction *g_rotateAct;
 
     extern QAction *g_topicVisAct;
+
+    extern QAction *g_diagnosticsAct;
+
+    extern QAction *g_viewWireframeAct;
 
     extern QAction *g_buildingEditorSaveAct;
     extern QAction *g_buildingEditorDiscardAct;

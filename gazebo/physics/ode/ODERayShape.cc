@@ -37,7 +37,7 @@ ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine)
   this->SetName("ODE Ray Shape");
 
   this->physicsEngine =
-    boost::shared_static_cast<ODEPhysics>(_physicsEngine);
+    boost::static_pointer_cast<ODEPhysics>(_physicsEngine);
   this->geomId = dCreateRay(this->physicsEngine->GetSpaceId(), 2.0);
   dGeomSetCategoryBits(this->geomId, GZ_SENSOR_COLLIDE);
   dGeomSetCollideBits(this->geomId, ~GZ_SENSOR_COLLIDE);
@@ -53,9 +53,9 @@ ODERayShape::ODERayShape(CollisionPtr _parent)
   this->SetName("ODE Ray Shape");
 
   ODECollisionPtr collision =
-    boost::shared_static_cast<ODECollision>(this->collisionParent);
+    boost::static_pointer_cast<ODECollision>(this->collisionParent);
 
-  this->physicsEngine = boost::shared_static_cast<ODEPhysics>(
+  this->physicsEngine = boost::static_pointer_cast<ODEPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
 
   GZ_ASSERT(collision->GetSpaceId() != 0, "Ray collision space is NULL");
@@ -81,7 +81,7 @@ void ODERayShape::Update()
   if (this->collisionParent)
   {
     ODECollisionPtr collision =
-      boost::shared_static_cast<ODECollision>(this->collisionParent);
+      boost::static_pointer_cast<ODECollision>(this->collisionParent);
 
     this->globalStartPos =
       this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(

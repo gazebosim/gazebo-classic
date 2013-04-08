@@ -309,8 +309,8 @@ namespace gazebo
       /// \brief Publish pose updates for a model.
       /// This list of models to publish is processed and cleared once every
       /// iteration.
-      /// \param[in] _modelName Name of the model to publish.
-      public: void PublishModelPose(const std::string &_modelName);
+      /// \param[in] _model Pointer to the model to publish.
+      public: void PublishModelPose(physics::ModelPtr _model);
 
       /// \cond
       /// This is an internal function.
@@ -419,19 +419,19 @@ namespace gazebo
       /// \param[in] _model Pointer to the model to get the data from.
       private: void FillModelMsg(msgs::Model &_msg, ModelPtr _model);
 
-      /// \brief Process all recieved entity messages.
+      /// \brief Process all received entity messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessEntityMsgs();
 
-      /// \brief Process all recieved request messages.
+      /// \brief Process all received request messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessRequestMsgs();
 
-      /// \brief Process all recieved factory messages.
+      /// \brief Process all received factory messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
 
-      /// \brief Process all recieved model messages.
+      /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
 
@@ -498,6 +498,9 @@ namespace gazebo
       /// \brief Publisher for world statistics messages.
       private: transport::PublisherPtr statPub;
 
+      /// \brief Publisher for diagnostic messages.
+      private: transport::PublisherPtr diagPub;
+
       /// \brief Publisher for request response messages.
       private: transport::PublisherPtr responsePub;
 
@@ -555,7 +558,7 @@ namespace gazebo
       /// \brief Used to compute a more accurate real time value.
       private: common::Time realTimeOffset;
 
-      /// \brief Mutext to protect incoming message buffers.
+      /// \brief Mutex to protect incoming message buffers.
       private: boost::recursive_mutex *receiveMutex;
 
       /// \brief Mutex to protext loading of models.
@@ -646,8 +649,8 @@ namespace gazebo
       /// objects are inserted via the factory.
       private: sdf::SDFPtr factorySDF;
 
-      /// \brief The list of pose messages to output.
-      private: std::set<std::string> publishModelPoses;
+      /// \brief The list of models that need to publish their pose.
+      private: std::set<ModelPtr> publishModelPoses;
 
       /// \brief Info passed through the WorldUpdateBegin event.
       private: common::UpdateInfo updateInfo;

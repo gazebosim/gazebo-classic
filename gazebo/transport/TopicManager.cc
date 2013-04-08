@@ -15,14 +15,38 @@
  *
 */
 
+#include <tbb/parallel_for.h>
+#include <tbb/blocked_range.h>
 
-#include "msgs/msgs.hh"
-#include "transport/Node.hh"
-#include "transport/Publication.hh"
-#include "transport/TopicManager.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publication.hh"
+#include "gazebo/transport/TopicManager.hh"
 
 using namespace gazebo;
 using namespace transport;
+
+/// \brief Class to facilitate parallel processing of nodes.
+class NodeProcess_TBB
+{
+  /// \brief Constructor.
+  /// \param[in] _nodes List of nodes to process.
+  public: NodeProcess_TBB(std::vector<NodePtr> *_nodes) : nodes(_nodes) {}
+
+  /// \brief Used by TBB during parallel execution.
+  /// \param[in] _r Range within this->nodes to process.
+  public: void operator() (const tbb::blocked_range<size_t> &_r) const
+  {
+    for (size_t i = _r.begin(); i != _r.end(); i++)
+    {
+      (*this->nodes)[i]->ProcessPublishers();
+    }
+  }
+
+  /// \brief The list of nodes to process.
+  private: std::vector<NodePtr> *nodes;
+};
+
 
 //////////////////////////////////////////////////
 TopicManager::TopicManager()
@@ -117,14 +141,14 @@ void TopicManager::ProcessNodes(bool _onlyOut)
 
   {
     boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
+
     // store as size might change (spawning)
     s = this->nodes.size();
   }
 
-  for (int i = 0; i < s; ++i)
-  {
-    this->nodes[i]->ProcessPublishers();
-  }
+  // Process nodes in parallel
+  tbb::parallel_for(tbb::blocked_range<size_t>(0, this->nodes.size(), 10),
+      NodeProcess_TBB(&this->nodes));
 
   if (!this->pauseIncoming && !_onlyOut)
   {
@@ -143,22 +167,13 @@ void TopicManager::ProcessNodes(bool _onlyOut)
 }
 
 //////////////////////////////////////////////////
-void TopicManager::Publish(const std::string &_topic,
-                           const google::protobuf::Message &_message,
-                           const boost::function<void()> &_cb)
+void TopicManager::Publish(const std::string &_topic, MessagePtr _message,
+    const boost::function<void()> &_cb)
 {
   PublicationPtr pub = this->FindPublication(_topic);
-  PublicationPtr dbgPub = this->FindPublication(_topic+"/__dbg");
 
   if (pub)
     pub->Publish(_message, _cb);
-
-  if (dbgPub && dbgPub->GetCallbackCount() > 0)
-  {
-    msgs::GzString dbgMsg;
-    dbgMsg.set_data(_message.DebugString());
-    dbgPub->Publish(dbgMsg);
-  }
 }
 
 //////////////////////////////////////////////////
@@ -325,14 +340,8 @@ PublicationPtr TopicManager::UpdatePublications(const std::string &topic,
   }
   else
   {
-    PublicationPtr dbgPub;
-    msgs::GzString tmp;
-
     pub = PublicationPtr(new Publication(topic, msgType));
-    dbgPub = PublicationPtr(new Publication(topic+"/__dbg",
-          tmp.GetTypeName()));
     this->advertisedTopics[topic] =  pub;
-    this->advertisedTopics[topic+"/__dbg"] = dbgPub;
     this->advertisedTopicsEnd = this->advertisedTopics.end();
   }
 
@@ -344,20 +353,14 @@ void TopicManager::Unadvertise(const std::string &_topic)
 {
   std::string t;
 
-  for (int i = 0; i < 2; i ++)
-  {
-    if (i == 0)
-      t = _topic;
-    else
-      t = _topic + "/__dbg";
+  t = _topic;
 
-    PublicationPtr publication = this->FindPublication(t);
-    if (publication && publication->GetLocallyAdvertised() &&
-        publication->GetTransportCount() == 0)
-    {
-      publication->SetLocallyAdvertised(false);
-      ConnectionManager::Instance()->Unadvertise(t);
-    }
+  PublicationPtr publication = this->FindPublication(t);
+  if (publication && publication->GetLocallyAdvertised() &&
+      publication->GetTransportCount() == 0)
+  {
+    publication->SetLocallyAdvertised(false);
+    ConnectionManager::Instance()->Unadvertise(t);
   }
 }
 

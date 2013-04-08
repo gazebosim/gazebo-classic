@@ -120,7 +120,7 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
   std::vector<std::string>::iterator collIter;
-  std::string collision1, collision2;
+  std::string collision1;
 
   // Don't do anything if there is no new data to process.
   if (this->incomingContacts.size() == 0)
@@ -145,13 +145,10 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
       // If unable to find the first collision's name, try the second
       if (collIter == this->collisions.end())
       {
-        collision2 = collision1;
         collision1 = (*iter)->contact(i).collision2();
         collIter = std::find(this->collisions.begin(),
             this->collisions.end(), collision1);
       }
-      else
-        collision2 = (*iter)->contact(i).collision2();
 
       // If this sensor is monitoring one of the collision's in the
       // contact, then add the contact to our outgoing message.

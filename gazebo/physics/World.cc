@@ -40,11 +40,12 @@
 #include "gazebo/common/LogRecord.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Common.hh"
-#include "gazebo/common/Diagnostics.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
+
+#include "gazebo/util/Diagnostics.hh"
 
 #include "gazebo/physics/Road.hh"
 #include "gazebo/physics/RayShape.hh"
@@ -285,7 +286,7 @@ void World::Init()
   // Initialize the physics engine
   this->physicsEngine->Init();
 
-  this->testRay = boost::shared_dynamic_cast<RayShape>(
+  this->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
   common::LogRecord::Instance()->Add(this->GetName(), "state.log",
@@ -305,6 +306,8 @@ void World::Init()
 
   // Mark the world initialization
   gzlog << "World::Init" << std::endl;
+
+  util::DiagnosticManager::Instance()->Init(this->GetName());
 }
 
 //////////////////////////////////////////////////
@@ -422,6 +425,8 @@ void World::LogStep()
 //////////////////////////////////////////////////
 void World::Step()
 {
+  DIAG_TIMER_START("World::Step");
+
   /// need this because ODE does not call dxReallocateWorldProcessContext()
   /// until dWorld.*Step
   /// Plugins that manipulate joints (and probably other properties) require
@@ -433,53 +438,68 @@ void World::Step()
     this->pluginsLoaded = true;
   }
 
+  DIAG_TIMER_LAP("World::Step", "loadPlugins");
+
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
     this->PublishWorldStats();
   }
 
+  DIAG_TIMER_LAP("World::Step", "publishWorldStats");
+
+  double updatePeriod = this->physicsEngine->GetUpdatePeriod();
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
   common::Time sleepTime = this->prevStepWallTime +
-    common::Time(this->physicsEngine->GetUpdatePeriod()) -
-    tmpTime - this->sleepOffset;
+    common::Time(updatePeriod) - tmpTime - this->sleepOffset;
 
+  common::Time actualSleep = 0;
   if (sleepTime > 0)
+  {
     common::Time::Sleep(sleepTime);
+    actualSleep = common::Time::GetWallTime() - tmpTime;
+  }
   else
     sleepTime = 0;
-
-  common::Time actualSleep = common::Time::GetWallTime() - tmpTime;
 
   // exponentially avg out
   this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
                       this->sleepOffset * 0.99;
 
+  DIAG_TIMER_LAP("World::Step", "sleepOffset");
+
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
   if (common::Time::GetWallTime() - this->prevStepWallTime + this->sleepOffset
-         >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+         >= common::Time(updatePeriod))
   {
     boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
 
+    DIAG_TIMER_LAP("World::Step", "worldUpdateMutex");
+
     this->prevStepWallTime = common::Time::GetWallTime();
 
+    double stepTime = this->physicsEngine->GetMaxStepSize();
     if (!this->IsPaused() || this->stepInc > 0)
     {
       // query timestep to allow dynamic time step size updates
-      this->simTime += this->physicsEngine->GetStepTime();
+      this->simTime += stepTime;
       this->iterations++;
       this->Update();
+
+      DIAG_TIMER_LAP("World::Step", "update");
 
       if (this->IsPaused() && this->stepInc > 0)
         this->stepInc--;
     }
     else
-      this->pauseTime += this->physicsEngine->GetStepTime();
+      this->pauseTime += stepTime;
   }
 
   this->ProcessMessages();
+
+  DIAG_TIMER_STOP("World::Step");
 }
 
 //////////////////////////////////////////////////
@@ -510,6 +530,8 @@ void World::StepWorld(int _steps)
 //////////////////////////////////////////////////
 void World::Update()
 {
+  DIAG_TIMER_START("World::Update");
+
   if (this->needsReset)
   {
     if (this->resetAll)
@@ -521,22 +543,32 @@ void World::Update()
     this->needsReset = false;
   }
 
+  DIAG_TIMER_LAP("World::Update", "needsReset");
+
   event::Events::worldUpdateStart();
   this->updateInfo.simTime = this->GetSimTime();
   this->updateInfo.realTime = this->GetRealTime();
   event::Events::worldUpdateBegin(this->updateInfo);
 
+  DIAG_TIMER_LAP("World::Update", "Events::worldUpdateBegin");
+
   // Update all the models
   (*this.*modelUpdateFunc)();
 
+  DIAG_TIMER_LAP("World::Update", "Model::Update");
+
   // This must be called before PhysicsEngine::UpdatePhysics.
   this->physicsEngine->UpdateCollision();
+
+  DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
 
   // Update the physics engine
   if (this->enablePhysicsEngine && this->physicsEngine)
   {
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
+
+    DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdatePhysics");
 
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
@@ -548,10 +580,14 @@ void World::Update()
     }
 
     this->dirtyPoses.clear();
+
+    DIAG_TIMER_LAP("World::Update", "SetWorldPose(dirtyPoses)");
   }
 
   // Output the contact information
   this->physicsEngine->GetContactManager()->PublishContacts();
+
+  DIAG_TIMER_LAP("World::Update", "ContactManager::PublishContacts");
 
   // Only update state informatin if logging data.
   if (common::LogRecord::Instance()->GetRunning())
@@ -574,7 +610,11 @@ void World::Update()
     }
   }
 
+  DIAG_TIMER_LAP("World::Update", "LogRecord");
+
   event::Events::worldUpdateEnd();
+
+  DIAG_TIMER_STOP("World::Update");
 }
 
 //////////////////////////////////////////////////
@@ -582,6 +622,8 @@ void World::Fini()
 {
   this->Stop();
   this->plugins.clear();
+
+  this->publishModelPoses.clear();
 
   this->node->Fini();
 
@@ -628,20 +670,20 @@ BasePtr World::GetByName(const std::string &_name)
 /////////////////////////////////////////////////
 ModelPtr World::GetModelById(unsigned int _id)
 {
-  return boost::shared_dynamic_cast<Model>(this->rootElement->GetById(_id));
+  return boost::dynamic_pointer_cast<Model>(this->rootElement->GetById(_id));
 }
 
 //////////////////////////////////////////////////
 ModelPtr World::GetModel(const std::string &_name)
 {
   boost::mutex::scoped_lock lock(*this->loadModelMutex);
-  return boost::shared_dynamic_cast<Model>(this->GetByName(_name));
+  return boost::dynamic_pointer_cast<Model>(this->GetByName(_name));
 }
 
 //////////////////////////////////////////////////
 EntityPtr World::GetEntity(const std::string &_name)
 {
-  return boost::shared_dynamic_cast<Entity>(this->GetByName(_name));
+  return boost::dynamic_pointer_cast<Entity>(this->GetByName(_name));
 }
 
 //////////////////////////////////////////////////
@@ -670,7 +712,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     _sdf->PrintValues("  ");
   }
 
-  this->PublishModelPose(model->GetName());
+  this->PublishModelPose(model);
   return model;
 }
 
@@ -778,7 +820,7 @@ ModelPtr World::GetModel(unsigned int _index) const
       {
         if (count == _index)
         {
-          model = boost::shared_static_cast<Model>(
+          model = boost::static_pointer_cast<Model>(
               this->rootElement->GetChild(i));
           break;
         }
@@ -856,7 +898,7 @@ void World::SetSelectedEntityCB(const std::string &_name)
 {
   msgs::Selection msg;
   BasePtr base = this->GetByName(_name);
-  EntityPtr ent = boost::shared_dynamic_cast<Entity>(base);
+  EntityPtr ent = boost::dynamic_pointer_cast<Entity>(base);
 
   // unselect selectedEntity
   if (this->selectedEntity)
@@ -1077,7 +1119,7 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
     if (_entity->HasType(Entity::MODEL))
     {
       msgs::Model *modelMsg = _scene.add_model();
-      boost::shared_static_cast<Model>(_entity)->FillMsg(*modelMsg);
+      boost::static_pointer_cast<Model>(_entity)->FillMsg(*modelMsg);
     }
 
     for (unsigned int i = 0; i < _entity->GetChildCount(); ++i)
@@ -1123,7 +1165,7 @@ void World::LoadPlugins()
   {
     if (this->rootElement->GetChild(i)->HasType(Base::MODEL))
     {
-      ModelPtr model = boost::shared_static_cast<Model>(
+      ModelPtr model = boost::static_pointer_cast<Model>(
           this->rootElement->GetChild(i));
       model->LoadPlugins();
     }
@@ -1246,7 +1288,7 @@ void World::ProcessRequestMsgs()
         if (entity->HasType(Base::MODEL))
         {
           msgs::Model *modelMsg = modelVMsg.add_models();
-          ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
+          ModelPtr model = boost::dynamic_pointer_cast<Model>(entity);
           model->FillMsg(*modelMsg);
         }
       }
@@ -1267,7 +1309,7 @@ void World::ProcessRequestMsgs()
         if (entity->HasType(Base::MODEL))
         {
           msgs::Model modelMsg;
-          ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
+          ModelPtr model = boost::dynamic_pointer_cast<Model>(entity);
           model->FillMsg(modelMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
@@ -1277,7 +1319,7 @@ void World::ProcessRequestMsgs()
         else if (entity->HasType(Base::LINK))
         {
           msgs::Link linkMsg;
-          LinkPtr link = boost::shared_dynamic_cast<Link>(entity);
+          LinkPtr link = boost::dynamic_pointer_cast<Link>(entity);
           link->FillMsg(linkMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
@@ -1288,7 +1330,7 @@ void World::ProcessRequestMsgs()
         {
           msgs::Collision collisionMsg;
           CollisionPtr collision =
-            boost::shared_dynamic_cast<Collision>(entity);
+            boost::dynamic_pointer_cast<Collision>(entity);
           collision->FillMsg(collisionMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
@@ -1298,7 +1340,7 @@ void World::ProcessRequestMsgs()
         else if (entity->HasType(Base::JOINT))
         {
           msgs::Joint jointMsg;
-          JointPtr joint = boost::shared_dynamic_cast<Joint>(entity);
+          JointPtr joint = boost::dynamic_pointer_cast<Joint>(entity);
           joint->FillMsg(jointMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
@@ -1353,8 +1395,7 @@ void World::ProcessRequestMsgs()
 void World::ProcessModelMsgs()
 {
   std::list<msgs::Model>::iterator iter;
-  for (iter = this->modelMsgs.begin();
-       iter != this->modelMsgs.end(); ++iter)
+  for (iter = this->modelMsgs.begin(); iter != this->modelMsgs.end(); ++iter)
   {
     ModelPtr model;
     if ((*iter).has_id())
@@ -1669,27 +1710,19 @@ void World::ProcessMessages()
   {
     msgs::Pose_V msg;
 
-    for (std::set<std::string>::iterator iter =
-         this->publishModelPoses.begin();
-         iter != this->publishModelPoses.end(); ++iter)
+    for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
+        iter != this->publishModelPoses.end(); ++iter)
     {
-      ModelPtr model = this->GetModel(*iter);
-
-      // It's possible that the model was deleted somewhere along the line.
-      // So check to make sure we get a valid model pointer.
-      if (!model)
-        continue;
-
       poseMsg = msg.add_pose();
 
       // Publish the model's relative pose
-      poseMsg->set_name(model->GetScopedName());
-      msgs::Set(poseMsg, model->GetRelativePose());
+      poseMsg->set_name((*iter)->GetScopedName());
+      msgs::Set(poseMsg, (*iter)->GetRelativePose());
 
       // Publish each of the model's children relative poses
-      Link_V links = model->GetLinks();
+      Link_V links = (*iter)->GetLinks();
       for (Link_V::iterator linkIter = links.begin();
-           linkIter != links.end(); ++linkIter)
+          linkIter != links.end(); ++linkIter)
       {
         poseMsg = msg.add_pose();
         poseMsg->set_name((*linkIter)->GetScopedName());
@@ -1699,6 +1732,7 @@ void World::ProcessMessages()
     this->posePub->Publish(msg);
   }
   this->publishModelPoses.clear();
+
 
   if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
       this->processMsgsPeriod)
@@ -1731,12 +1765,12 @@ bool World::IsLoaded() const
 }
 
 //////////////////////////////////////////////////
-void World::PublishModelPose(const std::string &_modelName)
+void World::PublishModelPose(physics::ModelPtr _model)
 {
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
 
   // Only add if the model name is not in the list
-  this->publishModelPoses.insert(_modelName);
+  this->publishModelPoses.insert(_model);
 }
 
 //////////////////////////////////////////////////

@@ -19,6 +19,8 @@
  * Date: 10 Nov 2009
  */
 
+#include "gazebo/physics/physics.hh"
+#include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Contact.hh"
 
 using namespace gazebo;
@@ -45,8 +47,11 @@ Contact::~Contact()
 //////////////////////////////////////////////////
 Contact &Contact::operator =(const Contact &_contact)
 {
+  this->world = _contact.world;
   this->collision1 = _contact.collision1;
   this->collision2 = _contact.collision2;
+  this->collisionPtr1 = _contact.collisionPtr1;
+  this->collisionPtr2 = _contact.collisionPtr2;
 
   this->count = _contact.count;
   for (int i = 0; i < MAX_CONTACT_JOINTS; i++)
@@ -67,8 +72,22 @@ Contact &Contact::operator =(const msgs::Contact &_contact)
 {
   this->count = 0;
 
+  this->world = physics::get_world(_contact.world());
   this->collision1 = _contact.collision1();
   this->collision2 = _contact.collision2();
+
+  if (world)
+  {
+    this->collisionPtr1 = boost::dynamic_pointer_cast<Collision>(
+        this->world->GetEntity(this->collision1)).get();
+    this->collisionPtr2 = boost::dynamic_pointer_cast<Collision>(
+      this->world->GetEntity(this->collision2)).get();
+  }
+  else
+  {
+    gzwarn << "World: " << _contact.world() << " not found,"
+           << "contact collision pointers will be NULL";
+  }
 
   for (int j = 0; j < _contact.position_size(); ++j)
   {
@@ -82,7 +101,7 @@ Contact &Contact::operator =(const msgs::Contact &_contact)
       msgs::Convert(_contact.wrench(j).body_1_force());
 
     this->wrench[j].body2Force =
-      msgs::Convert(_contact.wrench(j).body_1_force());
+      msgs::Convert(_contact.wrench(j).body_2_force());
 
     this->wrench[j].body1Torque =
       msgs::Convert(_contact.wrench(j).body_1_torque());
@@ -109,7 +128,8 @@ std::string Contact::DebugString() const
 {
   std::ostringstream stream;
 
-  stream << "Collision 1[" << this->collision1 << "]\n"
+  stream << "World [" << this->world->GetName() << "]\n"
+         << "Collision 1[" << this->collision1 << "]\n"
          << "Collision 2[" << this->collision2 << "]\n"
          << "Time[" << this->time << "]\n"
          << "Contact Count[" << this->count << "]\n";
@@ -132,6 +152,7 @@ std::string Contact::DebugString() const
 //////////////////////////////////////////////////
 void Contact::FillMsg(msgs::Contact &_msg) const
 {
+  _msg.set_world(this->world->GetName());
   _msg.set_collision1(this->collision1);
   _msg.set_collision2(this->collision2);
   msgs::Set(_msg.mutable_time(), this->time);

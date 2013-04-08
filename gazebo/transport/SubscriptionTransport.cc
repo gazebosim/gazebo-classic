@@ -39,6 +39,14 @@ void SubscriptionTransport::Init(const ConnectionPtr &_conn, bool _latching)
 }
 
 //////////////////////////////////////////////////
+bool SubscriptionTransport::HandleMessage(MessagePtr _newMsg)
+{
+  std::string data;
+  _newMsg->SerializeToString(&data);
+  return this->HandleData(data);
+}
+
+//////////////////////////////////////////////////
 bool SubscriptionTransport::HandleData(const std::string &newdata)
 {
   bool result = false;

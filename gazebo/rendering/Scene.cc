@@ -81,10 +81,12 @@ struct VisualMessageLess {
 //////////////////////////////////////////////////
 Scene::Scene(const std::string &_name, bool _enableVisualizations)
 {
+  this->initialized = false;
   this->showCOMs = false;
   this->showCollisions = false;
   this->showJoints = false;
   this->transparent = false;
+  this->wireframe = false;
 
   this->requestMsg = NULL;
   this->enableVisualizations = _enableVisualizations;
@@ -228,6 +230,7 @@ void Scene::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Scene::Load()
 {
+  this->initialized = false;
   Ogre::Root *root = RenderEngine::Instance()->root;
 
   if (this->manager)
@@ -284,6 +287,14 @@ void Scene::Init()
 
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);
+
+  this->initialized = true;
+}
+
+//////////////////////////////////////////////////
+bool Scene::GetInitialized() const
+{
+  return this->initialized;
 }
 
 //////////////////////////////////////////////////
@@ -1908,6 +1919,28 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
         vis->SetTransparency(0.5);
     }
   }
+  else if (_msg->request() == "set_wireframe")
+  {
+    if (_msg->data() == "all")
+      this->SetWireframe(true);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->SetWireframe(true);
+    }
+  }
+  else if (_msg->request() == "set_solid")
+  {
+    if (_msg->data() == "all")
+      this->SetWireframe(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->SetWireframe(false);
+    }
+  }
   else if (_msg->request() == "set_opaque")
   {
     if (_msg->data() == "all")
@@ -2014,6 +2047,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       visual->ShowCollision(this->showCollisions);
       visual->ShowJoints(this->showJoints);
       visual->SetTransparency(this->transparent ? 0.5 : 0.0);
+      visual->SetWireframe(this->wireframe);
     }
   }
 
@@ -2415,6 +2449,17 @@ VisualPtr Scene::CloneVisual(const std::string &_visualName,
 }
 
 /////////////////////////////////////////////////
+void Scene::SetWireframe(bool _show)
+{
+  this->wireframe = _show;
+  for (Visual_M::iterator iter = this->visuals.begin();
+       iter != this->visuals.end(); ++iter)
+  {
+    iter->second->SetWireframe(_show);
+  }
+}
+
+/////////////////////////////////////////////////
 void Scene::SetTransparent(bool _show)
 {
   this->transparent = _show;
@@ -2461,7 +2506,7 @@ void Scene::ShowJoints(bool _show)
 /////////////////////////////////////////////////
 void Scene::ShowContacts(bool _show)
 {
-  ContactVisualPtr vis = boost::shared_dynamic_cast<ContactVisual>(
+  ContactVisualPtr vis = boost::dynamic_pointer_cast<ContactVisual>(
       this->visuals["__GUIONLY_CONTACT_VISUAL__"]);
 
   if (!vis && _show)
