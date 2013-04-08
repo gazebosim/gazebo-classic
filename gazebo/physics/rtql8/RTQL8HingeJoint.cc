@@ -206,14 +206,14 @@ double RTQL8HingeJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8HingeJoint::SetVelocity(int /*index*/, double /*_angle*/)
+void RTQL8HingeJoint::SetVelocity(int /*index*/, double /*_vel*/)
 {
 //   this->SetParam(dParamVel, _angle);
   gzerr << "RTQL8HingeJoint::SetVelocity(...): Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
-void RTQL8HingeJoint::SetMaxForce(int /*index*/, double /*_t*/)
+void RTQL8HingeJoint::SetMaxForce(int /*index*/, double /*_force*/)
 {
 //   return this->SetParam(dParamFMax, _t);
   gzerr << "RTQL8HingeJoint::SetMaxForce(...): Not implemented...\n";

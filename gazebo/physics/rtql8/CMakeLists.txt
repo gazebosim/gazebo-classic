@@ -24,16 +24,16 @@ set (sources
              RTQL8Collision.cc
              RTQL8Link.cc
              RTQL8Joint.cc
-             RTQL8SliderJoint.cc
+             #RTQL8SliderJoint.cc
              RTQL8HingeJoint.cc
-             RTQL8Hinge2Joint.cc
-             RTQL8UniversalJoint.cc
-             RTQL8BallJoint.cc
+             #RTQL8Hinge2Joint.cc
+             #RTQL8UniversalJoint.cc
+             #RTQL8BallJoint.cc
              RTQL8TrimeshShape.cc
              RTQL8RayShape.cc
              RTQL8MultiRayShape.cc
              RTQL8HeightmapShape.cc
-             RTQL8ScrewJoint.cc
+             #RTQL8ScrewJoint.cc
              RTQL8Model.cc
              RTQL8Utils.cc
 )
@@ -43,11 +43,11 @@ SET (headers
              RTQL8Collision.hh
              RTQL8Link.hh
              RTQL8Joint.hh
-             RTQL8SliderJoint.hh
+             #RTQL8SliderJoint.hh
              RTQL8HingeJoint.hh
-             RTQL8Hinge2Joint.hh
-             RTQL8UniversalJoint.hh
-             RTQL8BallJoint.hh
+             #RTQL8Hinge2Joint.hh
+             #RTQL8UniversalJoint.hh
+             #RTQL8BallJoint.hh
              RTQL8TrimeshShape.hh
              RTQL8RayShape.hh
              RTQL8MultiRayShape.hh
@@ -57,7 +57,7 @@ SET (headers
              RTQL8PlaneShape.hh
              RTQL8CylinderShape.hh
              RTQL8Types.hh
-             RTQL8ScrewJoint.hh
+             #RTQL8ScrewJoint.hh
              RTQL8Model.hh
              RTQL8Utils.hh
 )
