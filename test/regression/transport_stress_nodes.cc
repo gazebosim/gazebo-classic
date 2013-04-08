@@ -20,7 +20,7 @@
 
 using namespace gazebo;
 
-class TransportStressTest : public ServerFixture
+class TransportStressTestNodes : public ServerFixture
 {
 };
 
@@ -41,31 +41,43 @@ void LocalPublishCB(ConstImagePtr & /*_msg*/)
 }
 
 /////////////////////////////////////////////////
-// Test for local publication. This test will create a large image and
-// publish it to a local subscriber. Serialization should be bypassed,
-// resulting fast publication.
-TEST_F(TransportStressTest, LocalPublish)
+// Create a lot of nodes, each with a publisher and subscriber. Then send
+// out a few large messages.
+TEST_F(TransportStressTestNodes, ManyNodes)
 {
   Load("worlds/empty.world");
 
-  // Number of messages to publish
-  g_localPublishMessageCount = 1000000;
+  // Storage for all the nodes, subscribers, and publishers
+  std::list<transport::NodePtr> nodes;
+  std::list<transport::SubscriberPtr> subs;
+  std::list<transport::PublisherPtr> pubs;
 
-  /// Expected number of messages to receive
-  g_totalExpectedMsgCount = g_localPublishMessageCount;
+  // The number of nodes to create
+  unsigned int nodeCount = 2000;
+
+  // The number of messages to send
+  g_localPublishMessageCount = 10;
+
+  // The expected number of messages to receive
+  g_totalExpectedMsgCount = nodeCount * nodeCount * g_localPublishMessageCount;
 
   // Reset the received message counter
   g_localPublishCount = 0;
 
-  transport::NodePtr testNode = transport::NodePtr(new transport::Node());
-  testNode->Init("default");
+  // Create all the nodes.
+  for (unsigned int i = 0; i < nodeCount; ++i)
+  {
+    nodes.push_back(transport::NodePtr(new transport::Node()));
+    nodes.back()->Init();
 
-  transport::PublisherPtr pub = testNode->Advertise<msgs::Image>(
-      "~/test/local_publish__", g_localPublishMessageCount);
+    pubs.push_back(nodes.back()->Advertise<msgs::Image>(
+          "~/test/local_publish2__", nodeCount * g_localPublishMessageCount));
 
-  transport::SubscriberPtr sub = testNode->Subscribe("~/test/local_publish__",
-      &LocalPublishCB);
+    subs.push_back(nodes.back()->Subscribe("~/test/local_publish2__",
+          &LocalPublishCB));
+  }
 
+  // Use a 2048x2048 image as the message
   unsigned int width = 2048;
   unsigned int height = 2048;
   unsigned char *fakeData = new unsigned char[width * height];
@@ -84,9 +96,14 @@ TEST_F(TransportStressTest, LocalPublish)
   // Publish the messages many times
   for (unsigned int i = 0; i < g_localPublishMessageCount; ++i)
   {
-    pub->Publish(fakeMsg);
+    for (std::list<transport::PublisherPtr>::iterator iter = pubs.begin();
+        iter != pubs.end(); ++iter)
+    {
+      (*iter)->Publish(fakeMsg);
+    }
   }
-  gzmsg << "Publish Complete" << std::endl;
+  common::Time publishTime = common::Time::GetWallTime();
+  gzmsg << "Publish complete" << std::endl;
 
   // Wait for all the messages
   int waitCount = 0;
@@ -97,19 +114,31 @@ TEST_F(TransportStressTest, LocalPublish)
   }
 
   // Time it took to publish the messages.
-  common::Time diff = g_localPublishEndTime - startTime;
+  common::Time pubDiff = publishTime - startTime;
+
+  // Time it took to received the messages.
+  common::Time receiveDiff = g_localPublishEndTime - startTime;
 
   EXPECT_LT(waitCount, 50);
 
   // Make sure we received all the messages.
   EXPECT_EQ(g_totalExpectedMsgCount, g_localPublishCount);
 
-  // The total duration should always be very short.
-  EXPECT_LT(diff.sec, g_localPublishMessageCount * 0.0008);
+  // The total publish duration should always be very short.
+  // The calculation here is the number of messages published multiplied by
+  // the expected time to publish a single image message.
+  EXPECT_LT(static_cast<unsigned int>(pubDiff.nsec),
+      (g_localPublishMessageCount * nodes.size()) * 1500);
+
+  // The total receive duration will be longer.
+  EXPECT_LT(receiveDiff.sec, g_localPublishCount * 1e-6);
 
   // Out time time for human testing purposes
-  gzmsg << "Time to publish " << g_localPublishCount  << " messages = "
-    << diff << "\n";
+  gzmsg << "Time to publish " << g_localPublishMessageCount * nodes.size()
+    << " = " << pubDiff << std::endl;
+
+  gzmsg << "Time to receive " << g_localPublishCount << " = "
+    << receiveDiff << std::endl;
 
   delete [] fakeData;
 }

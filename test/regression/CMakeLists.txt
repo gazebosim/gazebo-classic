@@ -34,6 +34,7 @@ set(tests
   pioneer2dx.cc
   transport.cc
   transport_stress.cc
+  transport_stress_nodes.cc
   server_fixture.cc
   speed.cc
   )

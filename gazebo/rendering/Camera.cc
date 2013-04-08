@@ -179,7 +179,6 @@ Camera::~Camera()
 
   this->imageElem.reset();
   this->sdf.reset();
-  std::cout << "Done Delete Camera[" << this->name << "]\n";
 }
 
 //////////////////////////////////////////////////
