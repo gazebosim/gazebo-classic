@@ -1363,7 +1363,6 @@ void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
   {
     g_pauseAct->setVisible(true);
     g_playAct->setVisible(false);
-
   }
 }
 
@@ -1379,7 +1378,6 @@ void MainWindow::OnPlayActionChanged()
   {
     g_stepAct->setToolTip("Pause the world before stepping");
     g_stepAct->setEnabled(false);
-
   }
 }
 
