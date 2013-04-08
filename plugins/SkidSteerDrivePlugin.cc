@@ -34,7 +34,7 @@ SkidSteerDrivePlugin::SkidSteerDrivePlugin()
 }
 
 /////////////////////////////////////////////////
-int SkidSteerDrivePlugin::RegisterJoint(int _index, const std::string _name)
+int SkidSteerDrivePlugin::RegisterJoint(int _index, const std::string &_name)
 {
   // Bounds checking on index
   if (_index < 0 or _index >= NUMBER_OF_WHEELS)
@@ -91,7 +91,7 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
 
   // This assumes that the largest dimension of the wheel is the diameter
   // and that all wheels have the same diameter
-  physics::EntityPtr wheelLink = boost::shared_dynamic_cast<physics::Entity>(
+  physics::EntityPtr wheelLink = boost::dynamic_pointer_cast<physics::Entity>(
                                         this->Joints[RIGHT_FRONT]->GetChild() );
   if (wheelLink)
   {

@@ -138,7 +138,7 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->frontPower = _sdf->Get<double>("front_power");
   this->rearPower = _sdf->Get<double>("rear_power");
 
-  this->connections.push_back(event::Events::ConnectWorldUpdateStart(
+  this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
           boost::bind(&VehiclePlugin::OnUpdate, this)));
 
   this->node = transport::NodePtr(new transport::Node());

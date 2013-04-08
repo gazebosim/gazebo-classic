@@ -81,13 +81,13 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 
     laser->Update(true);
 
-    double diffMax, diffSum, diffAvg;
     std::vector<double> scan;
     laser->GetRanges(scan);
 
     // run test against pre-recorded range data only in ode
     if (_physicsEngine == "ode")
     {
+      double diffMax, diffSum, diffAvg;
       DoubleCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
       EXPECT_LT(diffMax, 2e-6);
       EXPECT_LT(diffSum, 1e-4);
@@ -285,7 +285,7 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
-    boost::shared_dynamic_cast<sensors::RaySensor>(sensor);
+    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
   EXPECT_TRUE(raySensor != NULL);
 

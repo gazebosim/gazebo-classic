@@ -28,6 +28,7 @@ set(tests
   contact_sensor.cc
   factory.cc
   file_handling.cc
+  imu.cc
   laser.cc
   physics.cc
   pioneer2dx.cc

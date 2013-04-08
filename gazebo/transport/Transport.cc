@@ -161,7 +161,7 @@ void transport::pause_incoming(bool _pause)
 /////////////////////////////////////////////////
 void on_response(ConstResponsePtr &_msg)
 {
-  if (g_requests.size() <= 0)
+  if (g_requests.empty())
     return;
 
   std::list<msgs::Request *>::iterator iter;

@@ -71,7 +71,7 @@ void ImagesView::UpdateImpl()
       (*labelIter)->hide();
       this->frameLayout->removeWidget(*labelIter);
       delete *labelIter;
-      this->imageLabels.erase(labelIter);
+      labelIter = this->imageLabels.erase(labelIter);
     }
 
     // Clear the lists

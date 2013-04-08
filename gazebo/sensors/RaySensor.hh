@@ -174,7 +174,7 @@ namespace gazebo
       private: msgs::LaserScanStamped laserMsg;
 
       // Which noise type we support
-      enum NoiseModelType
+      private: enum NoiseModelType
       {
         NONE,
         GAUSSIAN

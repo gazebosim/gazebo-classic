@@ -36,7 +36,7 @@ void SpringTestPlugin::Load(physics::ModelPtr _model,
   this->k =
     _sdf->GetElement("k")->Get<double>();
 
-  this->updateConnection = event::Events::ConnectWorldUpdateStart(
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&SpringTestPlugin::OnUpdate, this));
 }
 

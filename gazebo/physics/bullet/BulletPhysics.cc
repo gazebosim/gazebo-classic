@@ -327,7 +327,7 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   info.m_erp = bulletElem->GetElement("constraints")->Get<double>("erp");
 
   info.m_numIterations =
-      boost::any_cast<int>(this->GetParam(SOR_ITERS));
+      boost::any_cast<int>(this->GetParam(PGS_ITERS));
   info.m_sor =
       boost::any_cast<double>(this->GetParam(SOR));
 }
@@ -360,7 +360,7 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_min_step_size(
         boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
     physicsMsg.set_iters(
-        boost::any_cast<int>(this->GetParam(SOR_ITERS)));
+        boost::any_cast<int>(this->GetParam(PGS_ITERS)));
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(
         boost::any_cast<double>(this->GetParam(SOR)));
@@ -391,7 +391,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetParam(SOLVER_TYPE, _msg->solver_type());
 
   if (_msg->has_iters())
-    this->SetParam(SOR_ITERS, _msg->iters());
+    this->SetParam(PGS_ITERS, _msg->iters());
 
   if (_msg->has_sor())
     this->SetParam(SOR, _msg->sor());
@@ -486,7 +486,7 @@ void BulletPhysics::Reset()
 
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
+void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
 {
   if (!this->dynamicsWorld)
     return;
@@ -552,7 +552,7 @@ void BulletPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
       info.m_erp = value;
       break;
     }
-    case SOR_ITERS:
+    case PGS_ITERS:
     {
       int value;
       try
@@ -642,7 +642,7 @@ void BulletPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
 //////////////////////////////////////////////////
 void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
-  PhysicsParam param;
+  BulletParam param;
 
   if (_key == "type")
     param = SOLVER_TYPE;
@@ -651,7 +651,7 @@ void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "erp")
     param = GLOBAL_ERP;
   else if (_key == "iters")
-    param = SOR_ITERS;
+    param = PGS_ITERS;
   else if (_key == "sor")
     param = SOR;
   else if (_key == "contact_surface_layer")
@@ -670,7 +670,7 @@ void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 }
 
 //////////////////////////////////////////////////
-boost::any BulletPhysics::GetParam(PhysicsParam _param) const
+boost::any BulletPhysics::GetParam(BulletParam _param) const
 {
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
@@ -693,7 +693,7 @@ boost::any BulletPhysics::GetParam(PhysicsParam _param) const
       value = bulletElem->GetElement("constraints")->Get<double>("erp");
       break;
     }
-    case SOR_ITERS:
+    case PGS_ITERS:
     {
       value = bulletElem->GetElement("solver")->Get<int>("iters");
       break;
@@ -731,7 +731,7 @@ boost::any BulletPhysics::GetParam(PhysicsParam _param) const
 //////////////////////////////////////////////////
 boost::any BulletPhysics::GetParam(const std::string &_key) const
 {
-  PhysicsParam param;
+  BulletParam param;
 
   if (_key == "type")
     param = SOLVER_TYPE;
@@ -740,7 +740,7 @@ boost::any BulletPhysics::GetParam(const std::string &_key) const
   else if (_key == "erp")
     param = GLOBAL_ERP;
   else if (_key == "iters")
-    param = SOR_ITERS;
+    param = PGS_ITERS;
   else if (_key == "sor")
     param = SOR;
   else if (_key == "contact_surface_layer")
