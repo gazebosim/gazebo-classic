@@ -248,13 +248,16 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
           // Add Gaussian noise + fixed bias to each rate
           this->imuMsg.mutable_angular_velocity()->set_x(
             this->imuMsg.angular_velocity().x() + this->rateBias +
-            math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
+            math::Rand::GetDblNormal(this->rateNoiseMean,
+              this->rateNoiseStdDev));
           this->imuMsg.mutable_angular_velocity()->set_y(
             this->imuMsg.angular_velocity().y() + this->rateBias +
-            math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
+            math::Rand::GetDblNormal(this->rateNoiseMean,
+              this->rateNoiseStdDev));
           this->imuMsg.mutable_angular_velocity()->set_z(
             this->imuMsg.angular_velocity().z() + this->rateBias +
-            math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
+            math::Rand::GetDblNormal(this->rateNoiseMean,
+              this->rateNoiseStdDev));
 
           // Add Gaussian noise + fixed bias to each acceleration
           this->imuMsg.mutable_linear_acceleration()->set_x(
