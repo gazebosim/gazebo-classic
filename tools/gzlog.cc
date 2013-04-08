@@ -522,7 +522,8 @@ class ModelFilter : public FilterBase
             std::list<std::string>::iterator partIter = this->parts.begin();
 
             // The first element in the filter must be a model name or a star.
-            if (!(*partIter).empty() && (*partIter) != "*")
+            if (partIter != this->parts.end() && !(*partIter).empty() &&
+                (*partIter) != "*")
             {
               std::string regexStr = *partIter;
               boost::replace_all(regexStr, "*", ".*");
@@ -882,11 +883,12 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
 
   for (unsigned int i = 0; i < play->GetChunkCount() && c != 'q'; ++i)
   {
-    // Get and output the state string
-    play->Step(stateString);
+    stateString.clear();
 
-    if (i > 0)
-      stateString = filter.Filter(stateString);
+    // Get and output the state string
+    gazebo::common::LogPlay::Instance()->Step(stateString);
+
+    stateString = i > 0 ? filter.Filter(stateString): std::string();
 
     // Only wait for user input if there is some state to output.
     if (!stateString.empty())
