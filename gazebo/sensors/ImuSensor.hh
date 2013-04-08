@@ -48,13 +48,17 @@ namespace gazebo
       protected: virtual void Load(const std::string &_worldName);
 
       /// \brief Initialize the IMU.
-      protected: virtual void Init();
+      public: virtual void Init();
 
       // Documentation inherited
       protected: virtual void UpdateImpl(bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
+
+      /// \brief Returns the imu message
+      /// \return Imu message.
+      public: msgs::IMU GetImuMessage() const;
 
       /// \brief Returns the angular velocity.
       /// \return Angular velocity.
@@ -106,18 +110,50 @@ namespace gazebo
       /// \brief Mutex to protect reads and writes.
       private: mutable boost::mutex mutex;
 
-      //typedef std::list<boost::shared_ptr<msgs::LinkData const> >
-      //    LinkDataMsgs_L;
-
       /// \brief Buffer for storing link data
       private: boost::shared_ptr<msgs::LinkData const> incomingLinkData[2];
-      //private: LinkDataMsgs_L incomingLinkData;
 
       /// \brief Index for accessing element in the link data array
       private: unsigned int dataIndex;
 
       /// \brief True if new link data is received
       private: bool dataDirty;
+
+      /// \brief Which noise type we support
+      private: enum NoiseModelType
+      {
+        NONE,
+        GAUSSIAN
+      };
+
+      /// \brief If true, apply the noise model specified by other noise
+      /// parameters
+      private: bool noiseActive;
+
+      /// \brief Which type of noise we're applying
+      private: enum NoiseModelType noiseType;
+
+      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
+      /// from which we sample when adding noise to accelerations
+      private: double accelNoiseMean;
+
+      /// \brief If accelNoiseType==GAUSSIAN, the standard devation of the
+      /// distibution from which we sample when adding noise to accelerations
+      private: double accelNoiseStdDev;
+
+      /// \brief If noiseType==GAUSSIAN, the bias we'll add to acceleratations
+      private: double accelBias;
+
+      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
+      /// from which we sample when adding noise to rates
+      private: double rateNoiseMean;
+
+      /// \brief If noiseType==GAUSSIAN, the standard devation of the
+      /// distibution from which we sample when adding noise to rates
+      private: double rateNoiseStdDev;
+
+      /// \brief If noiseType==GAUSSIAN, the bias we'll add to rates
+      private: double rateBias;
     };
     /// \}
   }

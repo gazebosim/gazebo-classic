@@ -112,7 +112,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(imuSensorName);
   sensors::ImuSensorPtr imuSensor =
-      boost::shared_dynamic_cast<sensors::ImuSensor>(sensor);
+      boost::dynamic_pointer_cast<sensors::ImuSensor>(sensor);
 
   ASSERT_TRUE(imuSensor);
 
@@ -181,7 +181,7 @@ void ImuSensor_TEST::OrientationTest(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(imuSensorName);
   sensors::ImuSensorPtr imuSensor =
-      boost::shared_dynamic_cast<sensors::ImuSensor>(sensor);
+      boost::dynamic_pointer_cast<sensors::ImuSensor>(sensor);
 
   ASSERT_TRUE(imuSensor);
 
