@@ -459,7 +459,7 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
   catch(Ogre::Exception)
   {
     gzthrow(std::string("Unable to load Ogre Resources.\nMake sure the") +
-        "resources path in the world file is set correctly.");
+          std::string("resources path in the world file is set correctly."));
   }
 }
 
