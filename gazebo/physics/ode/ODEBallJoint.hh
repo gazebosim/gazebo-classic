@@ -51,9 +51,6 @@ namespace gazebo
               {return math::Vector3();}
 
       // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
-
-      // Documentation inherited
       public: virtual void SetVelocity(int /*index*/, double /*angle*/) {}
 
       // Documentation inherited

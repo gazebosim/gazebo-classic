@@ -20,7 +20,7 @@
 using namespace gazebo;
 class ServerFixtureTest : public ServerFixture
 {
-  public: void LoadEmptyOfType(const std::string _physicsType);
+  public: void LoadEmptyOfType(const std::string &_physicsType);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ TEST_F(ServerFixtureTest, LoadPaused)
 // Verify that ServerFixture can load empty world with different types
 // of physics engines (issue #486)
 ////////////////////////////////////////////////////////////////////////
-void ServerFixtureTest::LoadEmptyOfType(const std::string _physicsType)
+void ServerFixtureTest::LoadEmptyOfType(const std::string &_physicsType)
 {
   // Note the second argument of Load sets the pause state
   Load("worlds/empty.world", true, _physicsType);
@@ -74,6 +74,47 @@ TEST_F(ServerFixtureTest, LoadBullet)
   LoadEmptyOfType("bullet");
 }
 #endif  // HAVE_BULLET
+
+////////////////////////////////////////////////////////////////////////
+// SpawnSDF:
+// Verify that the SpawnSDF function does not get stuck in a loop
+// Gazebo issue #530
+////////////////////////////////////////////////////////////////////////
+TEST_F(ServerFixtureTest, SpawnSDF)
+{
+  // Note the second argument of Load sets the pause state
+  Load("worlds/blank.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  EXPECT_TRUE(world->IsPaused());
+
+  std::stringstream sdfStr;
+  math::Pose pose(1, 2, 3, 0, 0, 0);
+  sdfStr << "<sdf version='" << SDF_VERSION << "'>"
+         << "<model name='box'>"
+         << "  <pose>" << pose << "</pose>"
+         << "  <link name='link'>"
+         << "    <collision name='col'>"
+         << "      <geometry>"
+         << "        <box><size>1 1 1</size></box>"
+         << "      </geometry>"
+         << "    </collision>"
+         << "    <visual name='vis'>"
+         << "      <geometry>"
+         << "        <box><size>1 1 1</size></box>"
+         << "      </geometry>"
+         << "    </visual>"
+         << "  </link>"
+         << "</model>"
+         << "</sdf>";
+  SpawnSDF(sdfStr.str());
+
+  physics::ModelPtr model;
+  model = world->GetModel("box");
+  ASSERT_TRUE(model != NULL);
+
+  EXPECT_EQ(pose.pos, model->GetWorldPose().pos);
+}
 
 int main(int argc, char **argv)
 {

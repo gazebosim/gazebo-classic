@@ -128,6 +128,11 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
   math::Matrix4 transform = this->LoadNodeTransform(_elem);
   transform = _transform * transform;
 
+  if (_elem->Attribute("name"))
+  {
+    this->currentNodeName = _elem->Attribute("name");
+  }
+
   nodeXml = _elem->FirstChildElement("node");
   while (nodeXml)
   {
@@ -1007,8 +1012,8 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
     if (lambertXml)
     {
       this->LoadColorOrTexture(lambertXml, "ambient", mat);
-      this->LoadColorOrTexture(lambertXml, "diffuse", mat);
       this->LoadColorOrTexture(lambertXml, "emission", mat);
+      this->LoadColorOrTexture(lambertXml, "diffuse", mat);
       if (lambertXml->FirstChildElement("transparency"))
       {
         mat->SetTransparency(
@@ -1024,9 +1029,9 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
     else if (phongXml)
     {
       this->LoadColorOrTexture(phongXml, "ambient", mat);
-      this->LoadColorOrTexture(phongXml, "diffuse", mat);
       this->LoadColorOrTexture(phongXml, "emission", mat);
       this->LoadColorOrTexture(phongXml, "specular", mat);
+      this->LoadColorOrTexture(phongXml, "diffuse", mat);
       if (phongXml->FirstChildElement("shininess"))
         mat->SetShininess(
             this->LoadFloat(phongXml->FirstChildElement("shininess")));
@@ -1043,9 +1048,9 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
     else if (blinnXml)
     {
       this->LoadColorOrTexture(blinnXml, "ambient", mat);
-      this->LoadColorOrTexture(blinnXml, "diffuse", mat);
       this->LoadColorOrTexture(blinnXml, "emission", mat);
       this->LoadColorOrTexture(blinnXml, "specular", mat);
+      this->LoadColorOrTexture(blinnXml, "diffuse", mat);
       if (blinnXml->FirstChildElement("shininess"))
         mat->SetShininess(
             this->LoadFloat(blinnXml->FirstChildElement("shininess")));
@@ -1147,6 +1152,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   // each polylist polygon is convex, and we do decomposion
   // by anchoring each triangle about vertex 0 or each polygon
   SubMesh *subMesh = new SubMesh;
+  subMesh->SetName(this->currentNodeName);
   bool combinedVertNorms = false;
 
   subMesh->SetPrimitiveType(SubMesh::TRIANGLES);
@@ -1317,6 +1323,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
                                   Mesh *_mesh)
 {
   SubMesh *subMesh = new SubMesh;
+  subMesh->SetName(this->currentNodeName);
   bool combinedVertNorms = false;
 
   subMesh->SetPrimitiveType(SubMesh::TRIANGLES);
@@ -1445,6 +1452,7 @@ void ColladaLoader::LoadLines(TiXmlElement *_xml,
     Mesh *_mesh)
 {
   SubMesh *subMesh = new SubMesh;
+  subMesh->SetName(this->currentNodeName);
   subMesh->SetPrimitiveType(SubMesh::LINES);
 
   TiXmlElement *inputXml = _xml->FirstChildElement("input");

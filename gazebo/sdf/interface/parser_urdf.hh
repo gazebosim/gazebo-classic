@@ -70,6 +70,7 @@ namespace urdf2gazebo
       isInitialJointPosition = false;
       isFudgeFactor = false;
       provideFeedback = false;
+      cfmDamping = false;
       blobs.clear();
 
       dampingFactor = 0;
@@ -87,14 +88,16 @@ namespace urdf2gazebo
     };
 
     private: GazeboExtension(const GazeboExtension &ge)
+             : material(ge.material), fdir1(ge.fdir1),
+             oldLinkName(ge.oldLinkName),
+             reductionTransform(ge.reductionTransform),
+             blobs(ge.blobs)
     {
-      material = ge.material;
       setStaticFlag = ge.setStaticFlag;
       gravity = ge.gravity;
       isDampingFactor = ge.isDampingFactor;
       isMaxVel = ge.isMaxVel;
       isMinDepth = ge.isMinDepth;
-      fdir1 = ge.fdir1;
       isMu1 = ge.isMu1;
       isMu2 = ge.isMu2;
       isKp = ge.isKp;
@@ -106,10 +109,7 @@ namespace urdf2gazebo
       isInitialJointPosition = ge.isInitialJointPosition;
       isFudgeFactor = ge.isFudgeFactor;
       provideFeedback = ge.provideFeedback;
-      oldLinkName = ge.oldLinkName;
-      reductionTransform = ge.reductionTransform;
-      blobs = ge.blobs;
-
+      cfmDamping = ge.cfmDamping;
       dampingFactor = ge.dampingFactor;
       maxVel = ge.maxVel;
       minDepth = ge.minDepth;
@@ -124,12 +124,17 @@ namespace urdf2gazebo
       fudgeFactor = ge.fudgeFactor;
     };
 
+    // visual
+    private: std::string material;
+
+    private: std::string fdir1;
+
     // for reducing fixed joints and removing links
     private: std::string oldLinkName;
     private: gazebo::math::Pose reductionTransform;
 
-    // visual
-    private: std::string material;
+    // blobs into body or robot
+    private: std::vector<TiXmlElement*> blobs;
 
     // body, default off
     private: bool setStaticFlag;
@@ -145,7 +150,6 @@ namespace urdf2gazebo
     // geom, contact dynamics
     private: bool isMu1, isMu2, isKp, isKd;
     private: double mu1, mu2, kp, kd;
-    private: std::string fdir1;
     private: bool isLaserRetro;
     private: double laserRetro;
 
@@ -153,9 +157,7 @@ namespace urdf2gazebo
     private: bool isStopCfm, isStopErp, isInitialJointPosition, isFudgeFactor;
     private: double stopCfm, stopErp, initialJointPosition, fudgeFactor;
     private: bool provideFeedback;
-
-    // blobs into body or robot
-    private: std::vector<TiXmlElement*> blobs;
+    private: bool cfmDamping;
 
     friend class URDF2Gazebo;
   };

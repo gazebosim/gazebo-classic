@@ -91,9 +91,9 @@ void UserCamera::Load()
 void UserCamera::Init()
 {
   this->orbitViewController = new OrbitViewController(
-      boost::shared_dynamic_cast<UserCamera>(shared_from_this()));
+      boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
   this->fpsViewController = new FPSViewController(
-      boost::shared_dynamic_cast<UserCamera>(shared_from_this()));
+      boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
   this->viewController = this->orbitViewController;
 
   Camera::Init();
@@ -104,18 +104,20 @@ void UserCamera::Init()
   // lighting. When using deferred shading, the light's use geometry that
   // trigger shaders. If the far clip is too close, the light's geometry is
   // clipped and wholes appear in the lighting.
-  if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::VERTEX)
+  switch (RenderEngine::Instance()->GetRenderPathType())
   {
-    this->SetClipDist(0.1, 100);
-  }
-  else if (RenderEngine::Instance()->GetRenderPathType() ==
-           RenderEngine::FORWARD)
-  {
-    this->SetClipDist(.1, 5000);
-  }
-  else
-  {
-    this->SetClipDist(.1, 5000);
+    case RenderEngine::VERTEX:
+      this->SetClipDist(0.1, 100);
+      break;
+
+    case RenderEngine::DEFERRED:
+    case RenderEngine::FORWARD:
+      this->SetClipDist(.1, 5000);
+      break;
+
+    default:
+      this->SetClipDist(.1, 5000);
+      break;
   }
 
   // Removing for now because the axis doesn't not move properly when the
@@ -191,33 +193,7 @@ void UserCamera::AnimationComplete()
 void UserCamera::PostRender()
 {
   Camera::PostRender();
-  sdf::ElementPtr elem = this->sdf->GetElement("save");
-
-  if (elem->GetValueBool("enabled"))
-  {
-    std::string path = elem->GetValueString("path");
-
-    std::string friendlyName = this->GetName();
-    boost::replace_all(friendlyName, "::", "_");
-
-    char tmp[1024];
-    if (!path.empty())
-    {
-      snprintf(tmp, sizeof(tmp), "%s/%s-%04d.jpg", path.c_str(),
-          friendlyName.c_str(), this->saveCount);
-    }
-    else
-    {
-      snprintf(tmp, sizeof(tmp),
-          "%s-%04d.jpg", friendlyName.c_str(), this->saveCount);
-    }
-
-    this->viewport->getTarget()->writeContentsToFile(tmp);
-
-    this->saveCount++;
-  }
 }
-
 
 //////////////////////////////////////////////////
 void UserCamera::Fini()
@@ -371,6 +347,9 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
       this->gui->Resize(this->viewport->getActualWidth(),
                         this->viewport->getActualHeight());
     }
+
+    delete [] this->saveFrameBuffer;
+    this->saveFrameBuffer = NULL;
   }
 }
 

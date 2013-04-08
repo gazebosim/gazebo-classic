@@ -22,15 +22,18 @@
 
 #include <dirent.h>
 #include <sstream>
+#include <boost/filesystem.hpp>
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Pose.hh"
+#include "gazebo/math/Rand.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -45,6 +48,56 @@ using namespace rendering;
 
 
 unsigned int Camera::cameraCounter = 0;
+
+namespace gazebo
+{
+namespace rendering
+{
+// We'll create an instance of this class for each camera, to be used to inject
+// random values on each render call.
+class GaussianNoiseCompositorListener
+  : public Ogre::CompositorInstance::Listener
+{
+  /// \brief Constructor, setting mean and standard deviation.
+  public: GaussianNoiseCompositorListener(double _mean, double _stddev):
+      mean(_mean), stddev(_stddev) {}
+
+  /// \brief Callback that OGRE will invoke for us on each render call
+  public: virtual void notifyMaterialRender(unsigned int _pass_id,
+                                            Ogre::MaterialPtr & _mat)
+  {
+    // modify material here (wont alter the base material!), called for
+    // every drawn geometry instance (i.e. compositor render_quad)
+
+    // Sample three values within the range [0,1.0] and set them for use in
+    // the fragment shader, which will interpret them as offsets from (0,0)
+    // to use when computing pseudo-random values.
+    Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
+                          math::Rand::GetDblUniform(0.0, 1.0),
+                          math::Rand::GetDblUniform(0.0, 1.0));
+    // These calls are setting parameters that are declared in two places:
+    // 1. media/materials/scripts/gazebo.material, in
+    //    fragment_program Gazebo/GaussianCameraNoiseFS
+    // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
+    _mat->getTechnique(0)->getPass(_pass_id)->
+      getFragmentProgramParameters()->
+      setNamedConstant("offsets", offsets);
+    _mat->getTechnique(0)->getPass(_pass_id)->
+      getFragmentProgramParameters()->
+      setNamedConstant("mean", (Ogre::Real)this->mean);
+    _mat->getTechnique(0)->getPass(_pass_id)->
+      getFragmentProgramParameters()->
+      setNamedConstant("stddev", (Ogre::Real)this->stddev);
+  }
+
+  /// \brief Mean that we'll pass down to the GLSL fragment shader.
+  private: double mean;
+  /// \brief Standard deviation that we'll pass down to the GLSL fragment
+  /// shader.
+  private: double stddev;
+};
+}  // namespace rendering
+}  // namespace gazebo
 
 //////////////////////////////////////////////////
 Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
@@ -74,12 +127,16 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
   this->renderTexture = NULL;
 
   this->captureData = false;
+  this->captureDataOnce = false;
 
   this->camera = NULL;
   this->viewport = NULL;
 
   this->pitchNode = NULL;
   this->sceneNode = NULL;
+
+  this->screenshotPath = getenv("HOME");
+  this->screenshotPath += "/.gazebo/pictures";
 
   // Connect to the render signal
   this->connections.push_back(
@@ -168,6 +225,28 @@ void Camera::Load()
     }
     this->SetHFOV(angle);
   }
+
+  // Handle noise model settings.
+  this->noiseActive = false;
+  if (this->sdf->HasElement("noise"))
+  {
+    sdf::ElementPtr noiseElem = this->sdf->GetElement("noise");
+    std::string type = noiseElem->GetValueString("type");
+    if (type == "gaussian")
+    {
+      this->noiseType = GAUSSIAN;
+      this->noiseMean = noiseElem->GetValueDouble("mean");
+      this->noiseStdDev = noiseElem->GetValueDouble("stddev");
+      this->noiseActive = true;
+      this->gaussianNoiseCompositorListener.reset(new
+        GaussianNoiseCompositorListener(this->noiseMean, this->noiseStdDev));
+      gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
+        " and stddev " << this->noiseStdDev << std::endl;
+    }
+    else
+      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
+        std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -198,6 +277,9 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  if (this->gaussianNoiseCompositorListener)
+    this->gaussianNoiseInstance->removeListener(
+      this->gaussianNoiseCompositorListener.get());
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
   this->renderTarget->removeAllViewports();
   this->connections.clear();
@@ -323,20 +405,15 @@ void Camera::PostRender()
 {
   this->renderTarget->swapBuffers();
 
-  if (this->newData && this->captureData)
+  if (this->newData && (this->captureData || this->captureDataOnce))
   {
-    Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
-
     size_t size;
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
 
     // Get access to the buffer and make an image and write it to file
-    pixelBuffer = this->renderTexture->getBuffer();
-
-    Ogre::PixelFormat format = pixelBuffer->getFormat();
-
-    size = Ogre::PixelUtil::getMemorySize(width, height, 1, format);
+    size = Ogre::PixelUtil::getMemorySize(width, height, 1,
+        static_cast<Ogre::PixelFormat>(this->imageFormat));
 
     // Allocate buffer
     if (!this->saveFrameBuffer)
@@ -345,11 +422,16 @@ void Camera::PostRender()
     memset(this->saveFrameBuffer, 128, size);
 
     Ogre::PixelBox box(width, height, 1,
-        (Ogre::PixelFormat)this->imageFormat, this->saveFrameBuffer);
+        static_cast<Ogre::PixelFormat>(this->imageFormat),
+        this->saveFrameBuffer);
 
-    pixelBuffer->blitToMemory(box);
+    this->viewport->getTarget()->copyContentsToMemory(box);
 
-    // record render time stamp
+    if (this->captureDataOnce)
+    {
+      this->SaveFrame(this->GetFrameFilename());
+      this->captureDataOnce = false;
+    }
 
     if (this->sdf->HasElement("save") &&
         this->sdf->GetElement("save")->GetValueBool("enabled"))
@@ -381,7 +463,6 @@ void Camera::PostRender()
 
   this->newData = false;
 }
-
 
 //////////////////////////////////////////////////
 math::Pose Camera::GetWorldPose()
@@ -531,16 +612,33 @@ void Camera::SetImageHeight(unsigned int _h)
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageWidth() const
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("image");
-  return elem->GetValueInt("width");
+  unsigned int width = 0;
+  if (this->viewport)
+  {
+    width = this->viewport->getActualWidth();
+  }
+  else
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("image");
+    width = elem->GetValueInt("width");
+  }
+  return width;
 }
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageHeight() const
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("image");
-  // gzerr << "image height " << elem->GetValueInt("height") << "\n";
-  return elem->GetValueInt("height");
+  unsigned int height = 0;
+  if (this->viewport)
+  {
+    height = this->viewport->getActualHeight();
+  }
+  else
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("image");
+    height = elem->GetValueInt("height");
+  }
+  return height;
 }
 
 //////////////////////////////////////////////////
@@ -644,9 +742,6 @@ void Camera::EnableSaveFrame(bool enable)
   sdf::ElementPtr elem = this->sdf->GetElement("save");
   elem->GetAttribute("enabled")->Set(enable);
   this->captureData = true;
-
-  if (!this->renderTexture)
-    this->CreateRenderTexture("saveframes_render_texture");
 }
 
 //////////////////////////////////////////////////
@@ -799,42 +894,39 @@ std::string Camera::GetFrameFilename()
   sdf::ElementPtr saveElem = this->sdf->GetElement("save");
 
   std::string path = saveElem->GetValueString("path");
-
-  // Create a directory if not present
-  DIR *dir = opendir(path.c_str());
-  if (!dir)
-  {
-    std::string command;
-    command = "mkdir " + path + " 2>>/dev/null";
-    if (system(command.c_str()) < 0)
-      gzerr << "Error making directory\n";
-  }
+  boost::filesystem::path pathToFile;
 
   std::string friendlyName = this->GetName();
+
   boost::replace_all(friendlyName, "::", "_");
 
-  char tmp[1024];
-  if (!path.empty())
+  if (this->captureDataOnce)
   {
-    // double wallTime = common::Time::GetWallTime().Double();
-    // int min = static_cast<int>((wallTime / 60.0));
-    // int sec = static_cast<int>((wallTime - min*60));
-    // int msec = static_cast<int>((wallTime*1000 - min*60000 - sec*1000));
-
-    snprintf(tmp, sizeof(tmp), "%s/%s-%04d.jpg", path.c_str(),
-             friendlyName.c_str(), this->saveCount);
+    pathToFile = this->screenshotPath;
+    std::string timestamp = common::Time::GetWallTimeAsISOString();
+    boost::replace_all(timestamp, ":", "_");
+    pathToFile /= friendlyName + "-" + timestamp + ".jpg";
   }
   else
   {
-    snprintf(tmp, sizeof(tmp), "%s-%04d.jpg", friendlyName.c_str(),
-             this->saveCount);
+    pathToFile = (path.empty()) ? "." : path;
+    pathToFile /= str(boost::format("%s-%04d.jpg")
+        % friendlyName.c_str() % this->saveCount);
+    this->saveCount++;
   }
 
-  this->saveCount++;
-  closedir(dir);
-  return tmp;
+  // Create a directory if not present
+  if (!boost::filesystem::exists(pathToFile.parent_path()))
+    boost::filesystem::create_directories(pathToFile.parent_path());
+
+  return pathToFile.string();
 }
 
+/////////////////////////////////////////////////
+std::string Camera::GetScreenshotPath() const
+{
+  return this->screenshotPath;
+}
 
 /////////////////////////////////////////////////
 bool Camera::SaveFrame(const unsigned char *_image,
@@ -1038,6 +1130,12 @@ void Camera::SetCaptureData(bool _value)
 }
 
 //////////////////////////////////////////////////
+void Camera::SetCaptureDataOnce()
+{
+  this->captureDataOnce = true;
+}
+
+//////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &textureName)
 {
   // Create the render texture
@@ -1158,6 +1256,25 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
       this->dlMergeInstance->setEnabled(true);
 
       // this->ssaoInstance->setEnabled(false);
+    }
+
+    // Noise
+    if (this->noiseActive)
+    {
+      switch (this->noiseType)
+      {
+        case GAUSSIAN:
+          this->gaussianNoiseInstance =
+            Ogre::CompositorManager::getSingleton().addCompositor(
+              this->viewport, "CameraNoise/Gaussian");
+          this->gaussianNoiseInstance->setEnabled(true);
+          // gaussianNoiseCompositorListener was allocated in Load()
+          this->gaussianNoiseInstance->addListener(
+            this->gaussianNoiseCompositorListener.get());
+          break;
+        default:
+          GZ_ASSERT(false, "Invalid noise model type");
+      }
     }
 
     if (this->GetScene()->skyx != NULL)
@@ -1288,12 +1405,6 @@ bool Camera::IsVisible(VisualPtr _visual)
 bool Camera::IsVisible(const std::string &_visualName)
 {
   return this->IsVisible(this->scene->GetVisual(_visualName));
-}
-
-/////////////////////////////////////////////////
-bool Camera::GetInitialized() const
-{
-  return this->initialized;
 }
 
 /////////////////////////////////////////////////
@@ -1458,4 +1569,16 @@ double Camera::GetRenderRate() const
 //////////////////////////////////////////////////
 void Camera::AnimationComplete()
 {
+}
+
+//////////////////////////////////////////////////
+bool Camera::IsInitialized() const
+{
+  return this->GetInitialized();
+}
+
+//////////////////////////////////////////////////
+bool Camera::GetInitialized() const
+{
+  return this->initialized && this->scene->GetInitialized();
 }

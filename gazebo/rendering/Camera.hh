@@ -62,6 +62,7 @@ namespace gazebo
     class MouseEvent;
     class ViewController;
     class Scene;
+    class GaussianNoiseCompositorListener;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \brief A set of rendering related class, functions, and definitions
@@ -124,9 +125,13 @@ namespace gazebo
       /// This function is called before the camera is destructed
       public: virtual void Fini();
 
+      /// Deprecated.
+      /// \sa GetInitialized
+      public: inline bool IsInitialized() const GAZEBO_DEPRECATED(1.5);
+
       /// \brief Return true if the camera has been initialized
       /// \return True if initialized was successful
-      public: inline bool IsInitialized() const {return this->initialized;}
+      public: bool GetInitialized() const;
 
       /// \internal
       /// \brief Set the ID of the window this camera is rendering into.
@@ -361,6 +366,9 @@ namespace gazebo
       /// \param[in] _value Set to true to capture data into a memory buffer.
       public: void SetCaptureData(bool _value);
 
+      /// \brief Capture data once and save to disk
+      public: void SetCaptureDataOnce();
+
       /// \brief Set the render target
       /// \param[in] _textureName Name of the new render texture
       public: void CreateRenderTexture(const std::string &_textureName);
@@ -406,7 +414,7 @@ namespace gazebo
       /// \return Direction the camera is facing
       public: math::Vector3 GetDirection() const;
 
-      /// \brief Connect a to the new image signal
+      /// \brief Connect to the new image signal
       /// \param[in] _subscriber Callback that is called when a new image is
       /// generated
       /// \return A pointer to the connection. This must be kept in scope.
@@ -449,10 +457,6 @@ namespace gazebo
       /// \return True if the _visual is in the camera's frustum
       public: bool IsVisible(const std::string &_visualName);
 
-      /// \brief Returns true if initialized
-      /// \return Ture if the camera is initialized
-      public: bool GetInitialized() const;
-
       /// \brief Return true if the camera is moving due to an animation.
       public: bool IsAnimating() const;
 
@@ -473,6 +477,10 @@ namespace gazebo
       public: bool MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
                                    boost::function<void()> _onComplete = NULL);
+
+      /// \brief Get the path to saved screenshots.
+      /// \return Path to saved screenshots.
+      public: std::string GetScreenshotPath() const;
 
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
@@ -579,6 +587,9 @@ namespace gazebo
       /// \brief Number of saved frames.
       protected: unsigned int saveCount;
 
+      /// \brief Path to saved screenshots.
+      protected: std::string screenshotPath;
+
       /// \brief Format for saving images.
       protected: int imageFormat;
 
@@ -596,6 +607,9 @@ namespace gazebo
 
       /// \brief True to capture frames into an image buffer.
       protected: bool captureData;
+
+      /// \brief True to capture a frame once and save to disk.
+      protected: bool captureDataOnce;
 
       /// \brief True if new data is available.
       protected: bool newData;
@@ -653,11 +667,40 @@ namespace gazebo
       /// \brief Screen space ambient occlusion compositor.
       private: Ogre::CompositorInstance *ssaoInstance;
 
+      /// \brief Gaussian noise compositor
+      private: Ogre::CompositorInstance *gaussianNoiseInstance;
+
+      /// \brief Gaussian noise compositor listener
+      private: boost::shared_ptr<GaussianNoiseCompositorListener>
+        gaussianNoiseCompositorListener;
+
       /// \brief Queue of move positions.
       private: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
 
       /// \brief Render period.
       private: common::Time renderPeriod;
+
+      /// \brief Which noise type we support
+      private: enum NoiseModelType
+      {
+        NONE,
+        GAUSSIAN
+      };
+
+      /// \brief If true, apply the noise model specified by other
+      /// noise parameters
+      private: bool noiseActive;
+
+      /// \brief Which type of noise we're applying
+      private: enum NoiseModelType noiseType;
+
+      /// \brief If noiseType==GAUSSIAN, noiseMean is the mean of the
+      /// distibution from which we sample
+      private: double noiseMean;
+
+      /// \brief If noiseType==GAUSSIAN, noiseStdDev is the standard
+      /// devation of the distibution from which we sample
+      private: double noiseStdDev;
     };
     /// \}
   }

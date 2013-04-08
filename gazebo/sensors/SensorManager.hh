@@ -115,7 +115,7 @@ namespace gazebo
 
       /// \brief Deprecated
       /// \sa RunThreads
-      public: void Run() GAZEBO_DEPRECATED;
+      public: void Run() GAZEBO_DEPRECATED(1.5);
 
       /// \brief Run sensor updates in separate threads.
       /// This will only run non-image based sensor updates.
@@ -161,6 +161,9 @@ namespace gazebo
       /// \brief True if SensorManager::initSensors queue is empty
       /// i.e. all sensors managed by SensorManager have been initialized
       public: bool SensorsInitialized();
+
+      /// \brief Reset last update times in all sensors.
+      public: void ResetLastUpdateTimes();
 
       /// \brief Add a new sensor to a sensor container.
       /// \param[in] _sensor Pointer to a sensor to add.
@@ -217,6 +220,9 @@ namespace gazebo
                  /// \brief Remove all sensors.
                  public: void RemoveSensors();
 
+                 /// \brief Reset last update times in all sensors.
+                 public: void ResetLastUpdateTimes();
+
                  /// \brief A loop to update the sensor. Used by the
                  /// runThread.
                  private: void RunLoop();
@@ -264,6 +270,9 @@ namespace gazebo
 
       /// \brief List of sensors that require initialization.
       private: Sensor_V initSensors;
+
+      /// \brief List of sensors that require initialization.
+      private: Sensor_V removeSensors;
 
       /// \brief A vector of SensorContainer pointers.
       private: typedef std::vector<SensorContainer*> SensorContainer_V;
