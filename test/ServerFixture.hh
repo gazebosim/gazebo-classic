@@ -218,6 +218,7 @@ class ServerFixture : public testing::Test
                rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
                ASSERT_NO_THROW(this->server->Fini());
+
                delete this->server;
                this->server = NULL;
              }
@@ -432,7 +433,7 @@ class ServerFixture : public testing::Test
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  unsigned int _width = 320, unsigned int _height = 240,
                  double _rate = 25,
-                 const std::string &_noiseType = "", 
+                 const std::string &_noiseType = "",
                  double _noiseMean = 0.0,
                  double _noiseStdDev = 0.0)
              {

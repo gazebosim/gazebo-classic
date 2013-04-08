@@ -92,6 +92,3 @@ void rendering::remove_scene(const std::string &_name)
 {
   rendering::RenderEngine::Instance()->RemoveScene(_name);
 }
-
-
-

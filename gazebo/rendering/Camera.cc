@@ -164,8 +164,10 @@ Camera::~Camera()
   this->pitchNode = NULL;
   this->sceneNode = NULL;
 
-  if (this->renderTexture)
+  if (this->renderTexture && this->scene->GetInitialized())
     Ogre::TextureManager::getSingleton().remove(this->renderTexture->getName());
+  this->renderTexture = NULL;
+  this->renderTarget = NULL;
 
   if (this->camera)
   {
@@ -175,9 +177,9 @@ Camera::~Camera()
 
   this->connections.clear();
 
-  this->sdf->Reset();
   this->imageElem.reset();
   this->sdf.reset();
+  std::cout << "Done Delete Camera[" << this->name << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -276,10 +278,16 @@ void Camera::Init()
 void Camera::Fini()
 {
   if (this->gaussianNoiseCompositorListener)
+  {
     this->gaussianNoiseInstance->removeListener(
       this->gaussianNoiseCompositorListener.get());
+  }
+
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
-  this->renderTarget->removeAllViewports();
+
+  if (this->renderTarget && this->scene->GetInitialized())
+    this->renderTarget->removeAllViewports();
+
   this->connections.clear();
 }
 
@@ -1193,9 +1201,9 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
 }
 
 //////////////////////////////////////////////////
-void Camera::SetRenderTarget(Ogre::RenderTarget *target)
+void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
-  this->renderTarget = target;
+  this->renderTarget = _target;
 
   if (this->renderTarget)
   {

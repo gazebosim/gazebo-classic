@@ -156,7 +156,6 @@ void Scene::Clear()
   this->userCameras.clear();
   this->lights.clear();
 
-
   while (this->visuals.size() > 0)
     this->RemoveVisual(this->visuals.begin()->second);
   this->visuals.clear();
@@ -167,6 +166,8 @@ void Scene::Clear()
 
   this->sensorMsgs.clear();
   RTShaderSystem::Instance()->Clear();
+
+  this->initialized = false;
 }
 
 //////////////////////////////////////////////////
