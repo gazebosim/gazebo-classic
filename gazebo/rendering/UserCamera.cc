@@ -507,7 +507,6 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   Camera::SetRenderTarget(_target);
 
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
-  this->viewport->setShadowsEnabled(true);
 
   if (this->gui)
     this->gui->Init(this->renderTarget);

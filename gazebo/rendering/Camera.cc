@@ -389,9 +389,6 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
-    // Clear the buffers (color and depth)
-    this->viewport->clear();
-
     // Render, but don't swap buffers.
     this->renderTarget->update(false);
 
@@ -1208,7 +1205,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
   {
     // Setup the viewport to use the texture
     this->viewport = this->renderTarget->addViewport(this->camera);
-    this->viewport->setClearEveryFrame(false);
+    this->viewport->setClearEveryFrame(true);
     this->viewport->setShadowsEnabled(true);
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
