@@ -34,7 +34,7 @@ TEST_F(NonDefaultWorld, Load)
   // Wait for the entity to spawn
   while (!HasEntity("ground_plane") && i < 10)
   {
-    common::Time::MSleep(10);
+    common::Time::MSleep(100);
     ++i;
   }
 
