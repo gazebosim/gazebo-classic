@@ -227,11 +227,12 @@ void ConnectionManager::RunUpdate()
   if (this->masterConn)
     this->masterConn->ProcessWriteQueue();
 
-  // Use TBB to process nodes.
-  TopicManagerProcessTask *task = new(tbb::task::allocate_root())
-    TopicManagerProcessTask();
-  tbb::task::enqueue(*task);
-  // TopicManager::Instance()->ProcessNodes();
+  // Use TBB to process nodes. Need more testing to see if this makes
+  // a difference.
+  // TopicManagerProcessTask *task = new(tbb::task::allocate_root())
+  //   TopicManagerProcessTask();
+  // tbb::task::enqueue(*task);
+  TopicManager::Instance()->ProcessNodes();
 
   {
     boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
