@@ -1,13 +1,13 @@
 QToolButton
 {
-  border: none;
+  border: 0px;
   text-align: left;
   color: #d0d0d0;
 }
 
 QToolButton::disabled
 {
-  color: #303030;  
+  color: #303030;
 }
 
 QLabel
@@ -252,7 +252,7 @@ QSpinBox
   color: #353535;
   background: #737373;
   border-radius: 4;
-  margin-right: 20px;  
+  margin-right: 20px;
 }
 
 QSpinBox::up-button

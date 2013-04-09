@@ -196,7 +196,6 @@ void Encoder::Init()
   this->codecCtx->time_base.num= 1;
   // emit one intra frame every ten frames
   this->codecCtx->gop_size = 10;
-//  this->codecCtx->max_b_frames = 1;
   this->codecCtx->pix_fmt = PIX_FMT_YUV420P;
 
   // this removes VBV buffer size not set warning msg
