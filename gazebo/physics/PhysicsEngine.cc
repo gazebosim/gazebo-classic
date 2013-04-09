@@ -252,21 +252,9 @@ void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetParam(PhysicsParam /*_param*/,
-    const boost::any &/*_value*/)
-{
-}
-
-//////////////////////////////////////////////////
 void PhysicsEngine::SetParam(std::string /*_key*/,
     const boost::any &/*_value*/)
 {
-}
-
-//////////////////////////////////////////////////
-boost::any PhysicsEngine::GetParam(PhysicsParam /*_param*/) const
-{
-  return 0;
 }
 
 //////////////////////////////////////////////////

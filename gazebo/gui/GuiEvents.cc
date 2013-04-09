@@ -30,3 +30,4 @@ event::EventT<void (std::string)> Events::keyPress;
 event::EventT<void (const msgs::Model &)> Events::modelUpdate;
 event::EventT<void (const common::MouseEvent &)> Events::mousePress;
 event::EventT<void (const common::MouseEvent &)> Events::mouseRelease;
+event::EventT<void (int)> Events::inputStepSize;

@@ -42,7 +42,7 @@ TEST_F(ProjectorTest, Projector)
   unsigned int diffMax = 0;
   unsigned int diffSum = 0;
   double diffAvg = 0;
-  ImageCompare(&img, &projector_world_camera,
+  ImageCompare(img, projector_world_camera,
       width, height, 3, diffMax, diffSum, diffAvg);
   // PrintImage("projector_world_camera", &img, width, height, 3);
   ASSERT_EQ(diffSum, static_cast<unsigned int>(0));

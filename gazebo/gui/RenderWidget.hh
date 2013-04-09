@@ -59,6 +59,9 @@ namespace gazebo
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
 
+      /// \brief Qt call back when the step value in the spinbox changed
+      private slots: void OnStepValueChanged(int _value);
+
       private slots: virtual void update();
 
       /// \brief Qt callback to clear overlay message if a duration is
@@ -112,6 +115,9 @@ namespace gazebo
 
       /// \brief Widget that contains the message overlay label
       private: QWidget *msgOverlayWidget;
+
+      /// \brief Tool button that holds the step widget
+      private: QToolButton *stepButton;
     };
   }
 }
