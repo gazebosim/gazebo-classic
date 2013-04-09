@@ -1049,6 +1049,15 @@ void World::OnControl(ConstWorldControlPtr &_data)
   if (_data->has_step())
     this->OnStep();
 
+  if (_data->has_multi_step())
+  {
+    // stepWorld is a blocking call so set stepInc directly so that world stats
+    // will still be published
+    this->SetPaused(true);
+    boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
+    this->stepInc = _data->multi_step();
+  }
+
   if (_data->has_seed())
   {
     math::Rand::SetSeed(_data->seed());
