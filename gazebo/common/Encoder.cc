@@ -45,18 +45,8 @@ using namespace common;
 /////////////////////////////////////////////////
 Encoder::Encoder()
 {
-  this->outbuf = NULL;
-  this->pictureBuf = NULL;
-  this->inFrameWidth = 0;
-  this->inFrameHeight = 0;
-
+  this->initialized = false;
 #ifdef HAVE_FFMPEG
-  this->codecCtx = NULL;
-  this->swsCtx = NULL;
-  this->avInPicture = NULL;
-  this->avOutFrame = NULL;
-  this->formatCtx = NULL;
-
   static bool first = true;
   if (first)
   {
@@ -65,7 +55,6 @@ Encoder::Encoder()
   }
 
   this->Reset();
-//  this->avInPicture = new AVthis->avOutFrame;
 #endif
 }
 
@@ -187,6 +176,7 @@ void Encoder::Init()
       sizeof(this->formatCtx->filename),
       "%s", tmpFileNameFull.c_str());
   this->videoStream = avformat_new_stream(this->formatCtx, codec);
+  this->videoStream->id = this->formatCtx->nb_streams-1;
 
   this->codecCtx = this->videoStream->codec;
 
@@ -206,7 +196,7 @@ void Encoder::Init()
   this->codecCtx->time_base.num= 1;
   // emit one intra frame every ten frames
   this->codecCtx->gop_size = 10;
-  this->codecCtx->max_b_frames = 1;
+//  this->codecCtx->max_b_frames = 1;
   this->codecCtx->pix_fmt = PIX_FMT_YUV420P;
 
   // this removes VBV buffer size not set warning msg
@@ -261,7 +251,8 @@ void Encoder::Init()
     }
   }
   // Write the stream header, if any.
-  avformat_write_header(this->formatCtx, NULL);
+  if (avformat_write_header(this->formatCtx, NULL) < 0)
+    gzerr << " Error occured when opening output file" << std::endl;
 
   // alloc image and output buffer
   this->outBufferSize = this->codecCtx->width * this->codecCtx->height;
@@ -332,7 +323,6 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
       }
     }
   }
-
   if (!this->swsCtx)
   {
     if (!this->avInPicture)
@@ -350,9 +340,9 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
       gzerr << "Error while calling sws_getContext\n";
       return;
     }
-
   }
 
+  // encode
   memcpy(this->avInPicture->data[0], _frame, _width * _height * 3);
   sws_scale(this->swsCtx, this->avInPicture->data, this->avInPicture->linesize,
       0, _height, this->avOutFrame->data, this->avOutFrame->linesize);
@@ -363,11 +353,11 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
 
   this->codecCtx->coded_frame->pts = this->videoPts;
 
-  AVPacket avPacket;
-  av_init_packet(&avPacket);
-
+  // write the frame
   if (outSize > 0)
   {
+    AVPacket avPacket;
+    av_init_packet(&avPacket);
     avPacket.pts= av_rescale_q(this->codecCtx->coded_frame->pts,
         this->codecCtx->time_base, this->videoStream->time_base);
 
@@ -378,9 +368,10 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
     avPacket.data= this->outbuf;
     avPacket.size= this->outSize;
     int ret = av_interleaved_write_frame(this->formatCtx, &avPacket);
-    av_free_packet(&avPacket);
+
     if (ret < 0)
       gzerr << "Error writing frame" << std::endl;
+    av_free_packet(&avPacket);
   }
 }
 #else
@@ -421,14 +412,25 @@ void Encoder::Reset()
   // set default values
   this->bitRate = 2000000;
   this->frameWidth = 1024;
-  this->frameHeight = 800;
+  this->frameHeight = 768;
   this->fps = 25;
   this->tmpFilename = "tmp_recording";
-  this->initialized = false;
-  this->format = "avi";
-  this->swsCtx = NULL;
+  this->format = "ogv";
   this->timePrev = 0;
   this->sampleRate = this->fps * 2;
   this->totalTime = 0;
   this->videoPts = -1;
+  this->outbuf = NULL;
+  this->pictureBuf = NULL;
+  this->inFrameWidth = 0;
+  this->inFrameHeight = 0;
+  this->initialized = false;
+
+#ifdef HAVE_FFMPEG
+  this->codecCtx = NULL;
+  this->swsCtx = NULL;
+  this->avInPicture = NULL;
+  this->avOutFrame = NULL;
+  this->formatCtx = NULL;
+#endif
 }

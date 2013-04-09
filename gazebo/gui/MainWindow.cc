@@ -1114,9 +1114,9 @@ void MainWindow::CreateActions()
 
   QMenu *videoFormatSubmenu = new QMenu;
   std::vector<QAction *> formats;
+  formats.push_back(videoFormatSubmenu->addAction("ogv"));
   formats.push_back(videoFormatSubmenu->addAction("avi"));
   formats.push_back(videoFormatSubmenu->addAction("mp4"));
-  formats.push_back(videoFormatSubmenu->addAction("ogv"));
   QActionGroup *formatActGroup = new QActionGroup(this);
   for (unsigned int i = 0; i < formats.size(); ++i)
   {

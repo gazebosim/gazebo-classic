@@ -75,12 +75,12 @@ namespace gazebo
       /// \param[in] _bitrate Video encoding bit rate
       public: void SetBitRate(unsigned int _bitRate);
 
-      /// \brief Set the frame width
-      /// \param[in] _width Frame width
+      /// \brief Set the output frame width
+      /// \param[in] _width Frame width in pixels
       public: void SetFrameWidth(unsigned int _width);
 
-      /// \brief Set the frame height
-      /// \param[in] _height Frame height
+      /// \brief Set the output frame height
+      /// \param[in] _height Frame height in pixels
       public: void SetFrameHeight(unsigned int _height);
 
       /// \brief Set the encoding format
