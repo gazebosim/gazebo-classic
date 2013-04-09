@@ -109,6 +109,9 @@ class ServerFixture : public testing::Test
 
                delete this->serverThread;
                this->serverThread = NULL;
+
+               gazebo::transport::clear_buffers();
+               gazebo::transport::fini();
              }
 
   protected: virtual void Load(const std::string &_worldFilename)
@@ -138,7 +141,7 @@ class ServerFixture : public testing::Test
                while ((!this->server || !this->server->GetInitialized()) &&
                       ++waitCount < maxWaitCount)
                  common::Time::MSleep(10);
-               gzwarn << "ServerFixture load in "
+               gzdbg << "ServerFixture load in "
                       << static_cast<double>(waitCount)/100.0
                       << " seconds, timeout after "
                       << static_cast<double>(maxWaitCount)/100.0
@@ -432,7 +435,7 @@ class ServerFixture : public testing::Test
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  unsigned int _width = 320, unsigned int _height = 240,
                  double _rate = 25,
-                 const std::string &_noiseType = "", 
+                 const std::string &_noiseType = "",
                  double _noiseMean = 0.0,
                  double _noiseStdDev = 0.0)
              {

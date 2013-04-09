@@ -226,8 +226,8 @@ void ConnectionManager::RunUpdate()
     }
   }
 
-  this->masterConn->ProcessWriteQueue();
-
+  if (this->masterConn)
+    this->masterConn->ProcessWriteQueue();
 
   // Use TBB to process nodes.
   TopicManagerProcessTask *task = new(tbb::task::allocate_root())
