@@ -210,7 +210,7 @@ namespace gazebo
       /// the "Save" feature.
       private: std::string saveFilename;
 
-      /// \brieft Timer for displaying the video recording message
+      /// \brief Timer for displaying the video recording message
       private: QTimer *recordVideoTimer;
 
       /// \brief User specified step size for manually stepping the world
