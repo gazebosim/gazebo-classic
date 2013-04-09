@@ -110,7 +110,6 @@ class ServerFixture : public testing::Test
                delete this->serverThread;
                this->serverThread = NULL;
 
-               gazebo::transport::clear_buffers();
                gazebo::transport::fini();
              }
 

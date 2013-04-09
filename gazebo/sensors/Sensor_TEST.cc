@@ -169,7 +169,7 @@ TEST_F(Sensor_TEST, ResetWorldStressTest)
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
   transport::SubscriberPtr sceneSub = node->Subscribe(
-      "~/hokuyo/link/laser/scan", &ReceiveHokuyoMsg);
+      "/gazebo/default/hokuyo/link/laser/scan", &ReceiveHokuyoMsg);
 
   // Wait for messages to arrive
   {
@@ -178,6 +178,8 @@ TEST_F(Sensor_TEST, ResetWorldStressTest)
     g_countCondition.wait(lock);
     gzdbg << "counted " << g_hokuyoMsgCount << " hokuyo messages\n";
   }
+
+  EXPECT_GT(g_hokuyoMsgCount, 19u);
 
   // Send reset world message
   transport::PublisherPtr worldControlPub =

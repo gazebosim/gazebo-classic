@@ -19,7 +19,6 @@
 
 
 #include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
 #include <string>
 #include <list>
 #include <vector>
@@ -157,15 +156,14 @@ namespace gazebo
 
       private: bool initialized;
       private: bool stop, stopped;
-      private: boost::thread *thread;
 
       private: unsigned int tmpIndex;
-      private: boost::recursive_mutex *listMutex;
+      private: boost::recursive_mutex listMutex;
 
       /// \brief A namespace to protect the namespace list.
       private: boost::mutex namespaceMutex;
-      private: boost::recursive_mutex *masterMessagesMutex;
-      private: boost::recursive_mutex *connectionMutex;
+      private: boost::recursive_mutex masterMessagesMutex;
+      private: boost::recursive_mutex connectionMutex;
 
       private: std::list<msgs::Publish> publishers;
       private: std::list<std::string> namespaces;
