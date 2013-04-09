@@ -169,7 +169,7 @@ TEST_F(Sensor_TEST, ResetWorldStressTest)
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
   transport::SubscriberPtr sceneSub = node->Subscribe(
-      "/gazebo/default/hokuyo/link/laser/scan", &ReceiveHokuyoMsg);
+      "~/hokuyo/link/laser/scan", &ReceiveHokuyoMsg);
 
   // Wait for messages to arrive
   {

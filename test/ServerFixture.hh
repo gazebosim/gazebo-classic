@@ -109,8 +109,6 @@ class ServerFixture : public testing::Test
 
                delete this->serverThread;
                this->serverThread = NULL;
-
-               gazebo::transport::fini();
              }
 
   protected: virtual void Load(const std::string &_worldFilename)

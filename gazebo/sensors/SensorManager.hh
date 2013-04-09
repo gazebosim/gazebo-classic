@@ -283,7 +283,7 @@ namespace gazebo
       /// \brief Allow access to sensorTimeMutex member var.
       private: friend class SensorContainer;
 
-      /// \brief Allow access to sensorTimeMutex member var.
+      /// \brief Pointer to the sim time event handler.
       private: SimTimeEventHandler *simTimeEventHandler;
     };
     /// \}

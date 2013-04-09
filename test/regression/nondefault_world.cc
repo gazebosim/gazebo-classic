@@ -39,7 +39,7 @@ TEST_F(NonDefaultWorld, Load)
   }
 
   EXPECT_TRUE(HasEntity("ground_plane"));
-  EXPECT_TRUE(i < 10);
+  EXPECT_LT(i, 10);
 }
 
 int main(int argc, char **argv)
