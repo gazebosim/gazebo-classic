@@ -443,12 +443,13 @@ void GpuRaySensor::SetVerticalAngleMax(double _angle)
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::GetRanges(std::vector<double> &/*_ranges*/) const
+void GpuRaySensor::GetRanges(std::vector<double> &_ranges)
 {
-  /*boost::mutex::scoped_lock(this->mutex);
+  boost::mutex::scoped_lock lock(this->mutex);
+
   _ranges.resize(this->laserMsg.ranges_size());
   memcpy(&_ranges[0], this->laserMsg.ranges().data(),
-         sizeof(_ranges[0]) * this->laserMsg.ranges_size());*/
+         sizeof(_ranges[0]) * this->laserMsg.ranges_size());
 }
 
 //////////////////////////////////////////////////

@@ -23,7 +23,7 @@
             <max_step_size>0.001</max_step_size>
         </physics>
         <model name="model_1">
-            <pose>0.0 0.0 5.0 0.0 0.0 0.0</pose>
+            <pose>0.0 0.0 2.0 0.0 0.0 0.0</pose>
             <link name="link_1">
                 <pose>0.0 0.0 0.0 0.0 0.0 0.707</pose>
                 <inertial>
@@ -87,25 +87,6 @@
                     </surface>
                     <laser_retro>100.0</laser_retro>
                 </collision>
-                <!--sensor name="sensor_ray" type="gpu_ray" always_on="true" update_rate="20.0">
-                  <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
-                  <ray>
-                    <scan display="true">
-                      <horizontal samples="640" resolution="1" min_angle="-2.2688999999959423" max_angle="2.2688999999959423" />
-                    </scan>
-                    <range min="0.080000000000000002" max="10.0" resolution='0.01'/>
-                  </ray>
-
-                  <plugin name="plugin_1" filename="libgazebo_ros_gpu_laser.so">
-                    <gaussianNoise>0.00</gaussianNoise>
-                    <alwaysOn>true</alwaysOn>
-                    <updateRate>20</updateRate>
-                    <laserScanTopicName>test_block_laser</laserScanTopicName>
-                    <topicName>test_block_laser</topicName>
-                    <frameName>/map</frameName>
-                  </plugin>
-
-                </sensor-->
                 <sensor name="laser_sensor" type="gpu_ray">
                     <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
                     <ray>
@@ -119,8 +100,8 @@
                             <vertical>
                                 <samples>1</samples>
                                 <resolution>0.5</resolution>
-                                <min_angle>-0.7854</min_angle>
-                                <max_angle>0.7854</max_angle>
+                                <min_angle>-0.7554</min_angle>
+                                <max_angle>0.7554</max_angle>
                             </vertical>
                         </scan>
                         <range>
@@ -141,7 +122,9 @@
                     </plugin>
                     -->
                     <always_on>true</always_on>
+                    <visualize>true</visualize>
                     <update_rate>20.0</update_rate>
+                    <topic>gpu_scan</topic>
                 </sensor>
                 <gravity>false</gravity>
                 <self_collide>true</self_collide>
@@ -151,7 +134,7 @@
         <model name="model_2">
             <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
             <link name="link_1">
-                <pose>3.0 0.0 5.0 0.0 0.0 0.0</pose>
+                <pose>3.0 0.0 2.0 0.0 0.0 0.0</pose>
                 <inertial>
                     <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
                     <inertia>
@@ -218,7 +201,7 @@
                 <kinematic>false</kinematic>
             </link>
             <link name="link_2">
-                <pose>3.0 -0.5 6.8 0.0 0.0 0.0</pose>
+                <pose>3.0 -0.5 3.8 0.0 0.0 0.0</pose>
                 <inertial>
                     <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
                     <inertia>
@@ -285,7 +268,7 @@
                 <kinematic>false</kinematic>
             </link>
             <link name="link_3">
-                <pose>0.0 3.0 5.0 0.0 0.0 0.7</pose>
+                <pose>0.0 3.0 2.0 0.0 0.0 0.7</pose>
                 <inertial>
                     <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
                     <inertia>
@@ -352,7 +335,7 @@
                 <kinematic>false</kinematic>
             </link>
             <link name="link_4">
-                <pose>2.0 -2.0 5.0 0.0 0.0 0.0</pose>
+                <pose>2.0 -2.0 2.0 0.0 0.0 0.0</pose>
                 <inertial>
                     <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
                     <inertia>
@@ -421,7 +404,7 @@
                 <kinematic>false</kinematic>
             </link>
             <link name="link_5">
-                <pose>2.0 2.0 5.0 0.0 0.0 0.0</pose>
+                <pose>2.0 2.0 2.0 0.0 0.0 0.0</pose>
                 <inertial>
                     <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
                     <inertia>
@@ -488,7 +471,7 @@
                 <kinematic>false</kinematic>
             </link>
             <link name="link_6">
-                <pose>-2.0 -2.0 5.0 0.0 0.0 0.0</pose>
+                <pose>-2.0 -2.0 2.0 0.0 0.0 0.0</pose>
                 <inertial>
                     <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
                     <inertia>
@@ -555,7 +538,7 @@
                 <kinematic>false</kinematic>
             </link>
             <link name="link_7">
-                <pose>-1.5 0.0 5.0 0.0 0.0 0.0</pose>
+                <pose>-1.5 0.0 2.0 0.0 0.0 0.0</pose>
                 <inertial>
                     <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
                     <inertia>
@@ -638,11 +621,5 @@
             </spot>
             <cast_shadows>true</cast_shadows>
         </light>
-        <!--
-        <plugin name="gazebo_ros_api" filename="libgazebo_ros_api_plugin.so">
-            <alwaysOn>1</alwaysOn>
-            <updateRate>1000.0</updateRate>
-        </plugin>
-        -->
     </world>
 </sdf>

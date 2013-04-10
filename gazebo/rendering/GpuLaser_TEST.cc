@@ -19,9 +19,18 @@
 #include "gazebo/rendering/Rendering.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/GpuLaser.hh"
+#include "test/ServerFixture.hh"
+
+class GpuLaser_TEST : public ServerFixture
+{
+};
 
 /////////////////////////////////////////////////
-TEST_F(GpuLaserTest, Init)
+//                                             //
+//  bring up a GpuLaser and exercise API       //
+//                                             //
+/////////////////////////////////////////////////
+TEST_F(GpuLaser_TEST, BasicGpuLaserAPITest)
 {
   Load("worlds/empty.world");
 
@@ -52,7 +61,7 @@ TEST_F(GpuLaserTest, Init)
     EXPECT_NEAR(laserCam->GetVertHalfAngle(), 0.5, 1e-6);
 
     laserCam->SetIsHorizontal(false);
-    EXPECT_FALSE(laserCam->GetIsHorizontal());
+    EXPECT_FALSE(laserCam->IsHorizontal());
 
     laserCam->SetHorzFOV(2.4);
     EXPECT_NEAR(laserCam->GetHorzFOV(), 2.4, 1e-6);
@@ -70,7 +79,7 @@ TEST_F(GpuLaserTest, Init)
     EXPECT_NEAR(laserCam->GetRayCountRatio(), 0.344, 1e-6);
 
     laserCam->SetCameraCount(4);
-    EXPECT_EQ(laserCam->GetCameraCount(), 4);
+    EXPECT_EQ((int)laserCam->GetCameraCount(), 4);
   }
 }
 

@@ -160,7 +160,7 @@ namespace gazebo
 
       /// \brief Get all the ranges
       /// \param[out] _range A vector that will contain all the range data
-      public: void GetRanges(std::vector<double> &_ranges) const;
+      public: void GetRanges(std::vector<double> &_ranges);
 
       /// \brief Get detected retro (intensity) value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
