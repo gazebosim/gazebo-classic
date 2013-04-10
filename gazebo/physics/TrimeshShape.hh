@@ -56,13 +56,28 @@ namespace gazebo
       /// \return The size of the triangle mesh.
       public: virtual math::Vector3 GetSize() const;
 
-      /// \brief Get the filename of the mesh data.
-      /// \return The filename of the mesh data.
-      public: std::string GetFilename() const;
+      /// Deprecated
+      /// \sa GetMeshURI
+      public: std::string GetFilename() const GAZEBO_DEPRECATED(1.5);
 
-      /// \brief Set the filename of the triangle mesh.
-      /// \param[in] _filename Filename of the mesh file to load from.
-      public: void SetFilename(const std::string &_filename);
+      /// \brief Get the URI of the mesh data.
+      /// \return The URI of the mesh data.
+      public: std::string GetMeshURI() const;
+
+      /// Deprecated.
+      /// \sa SetMesh
+      public: void SetFilename(
+                  const std::string &_filename) GAZEBO_DEPRECATED(1.5);
+
+      /// \brief Set the mesh uri and submesh name.
+      /// \param[in] _uri Filename of the mesh file to load from.
+      /// \param[in] _submesh Name of the submesh to use within the mesh
+      /// \param[in] _center True to center the submesh.
+      /// specified in the _uri.
+      public: void SetMesh(const std::string &_uri,
+                           const std::string &_submesh = "",
+                           bool _center = false);
+
 
       /// \brief Set the scaling factor.
       /// \param[in] _scale Scaling factor.
@@ -79,6 +94,9 @@ namespace gazebo
 
       /// \brief Pointer to the mesh data.
       protected: const common::Mesh *mesh;
+
+      /// \brief The submesh to use from within the parent mesh.
+      protected: common::SubMesh *submesh;
     };
     /// \}
   }

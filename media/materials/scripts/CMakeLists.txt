@@ -9,6 +9,7 @@ set (files
   gazebo.material
   grid.material
   kitchen.material
+  noise.compositor
   perpixel.program
   picker.material
   ShadowCaster.material

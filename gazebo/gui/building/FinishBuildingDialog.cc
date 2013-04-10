@@ -28,7 +28,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
 
   if (_mode == MODEL_FINISH)
     this->setWindowTitle(tr("Finish Model"));
-  else if (_mode == MODEL_FINISH)
+  else if (_mode == MODEL_SAVE)
     this->setWindowTitle(tr("Save Model"));
 
   QLabel *messageLabel = new QLabel;
