@@ -928,7 +928,7 @@ class ServerFixture : public testing::Test
                  sdf::ElementPtr model = sdfParsed.root->GetElement("model");
                  std::string name = model->GetValueString("name");
                  while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
-                   common::Time::MSleep(10);
+                   common::Time::MSleep(50);
                  ASSERT_LT(waitCount, maxWaitCount);
                }
              }
