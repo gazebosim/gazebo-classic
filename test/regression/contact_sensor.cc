@@ -231,9 +231,9 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
         // Verify torque with a large tolerance
         double odeTorqueTol = 1;
-        EXPECT_TRUE(fabs(actualTorque.x) < odeTorqueTol);
-        EXPECT_TRUE(fabs(actualTorque.y) < odeTorqueTol);
-        EXPECT_TRUE(fabs(actualTorque.z) < odeTorqueTol);
+        EXPECT_LT(fabs(actualTorque.x), odeTorqueTol);
+        EXPECT_LT(fabs(actualTorque.y), odeTorqueTol);
+        EXPECT_LT(fabs(actualTorque.z), odeTorqueTol);
 
         // TODO: ODE and bullet produce slightly different results
         // In ODE the force and torque on an object seem to be affected by other

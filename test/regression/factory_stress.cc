@@ -14,25 +14,37 @@
  * limitations under the License.
  *
 */
-#include <string.h>
 #include "ServerFixture.hh"
 
 using namespace gazebo;
-class NonDefaultWorld : public ServerFixture
+class FactoryStressTest : public ServerFixture
 {
 };
 
 /////////////////////////////////////////////////
-TEST_F(NonDefaultWorld, Load)
+void OnWorldStats(ConstWorldStatisticsPtr &/*_msg*/)
 {
-  Load("worlds/empty_different_name.world");
-  physics::WorldPtr world = physics::get_world("not_the_default_world_name");
-  ASSERT_TRUE(world != NULL);
-
-  physics::ModelPtr model = world->GetModel("ground_plane");
-  ASSERT_TRUE(model);
 }
 
+/////////////////////////////////////////////////
+TEST_F(FactoryStressTest, Bookshelf)
+{
+  Load("worlds/empty.world");
+
+  gazebo::transport::SubscriberPtr sub =
+    this->node->Subscribe("~/world_stats", &OnWorldStats);
+
+  for (int i = 0; i < 100; ++i)
+  {
+    SpawnModel("model://bookshelf");
+    gazebo::common::Time::MSleep(500);
+    RemoveModel("bookshelf");
+  }
+
+  sub.reset();
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

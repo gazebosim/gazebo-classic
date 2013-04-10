@@ -28,6 +28,7 @@ set(tests
   bandwidth.cc
   contact_sensor.cc
   factory.cc
+  factory_stress.cc
   file_handling.cc
   imu.cc
   laser.cc

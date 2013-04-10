@@ -156,6 +156,10 @@ class ServerFixture : public testing::Test
                  this->node->Advertise<msgs::Factory>("~/factory");
                this->factoryPub->WaitForConnection();
 
+               this->requestPub =
+                 this->node->Advertise<msgs::Request>("~/request");
+               this->requestPub->WaitForConnection();
+
                // Wait for the world to reach the correct pause state.
                // This might not work properly with multiple worlds.
                // Use a 30 second timeout.
@@ -617,7 +621,7 @@ class ServerFixture : public testing::Test
                // Wait for the entity to spawn
                while (!this->HasEntity(_modelName) && i < 50)
                {
-                 common::Time::MSleep(20);
+                 common::Time::MSleep(50);
                  ++i;
                }
                EXPECT_LT(i, 50);
@@ -677,7 +681,7 @@ class ServerFixture : public testing::Test
                // Wait for the entity to spawn
                while (!this->HasEntity(_name) && i < 50)
                {
-                 common::Time::MSleep(20);
+                 common::Time::MSleep(50);
                  ++i;
                }
                EXPECT_LT(i, 50);
@@ -940,6 +944,12 @@ class ServerFixture : public testing::Test
                return world->GetModel(_name);
              }
 
+  protected: void RemoveModel(const std::string &_name)
+             {
+               msgs::Request *msg = msgs::CreateRequest("entity_delete", _name);
+               this->requestPub->Publish(*msg);
+               delete msg;
+             }
 
   protected: void RemovePlugin(const std::string &_name)
              {
@@ -991,6 +1001,7 @@ class ServerFixture : public testing::Test
   protected: transport::SubscriberPtr poseSub;
   protected: transport::SubscriberPtr statsSub;
   protected: transport::PublisherPtr factoryPub;
+  protected: transport::PublisherPtr requestPub;
 
   protected: std::map<std::string, math::Pose> poses;
   protected: boost::mutex receiveMutex;

@@ -202,8 +202,6 @@ TEST_F(TransportStressTest, ManyNodes)
   // The calculation here is the number of messages published multiplied by
   // the expected time to publish a single image message.
   EXPECT_EQ(pubDiff.sec, 0);
-  EXPECT_LT(static_cast<unsigned int>(pubDiff.nsec),
-      (g_localPublishMessageCount * nodes.size()) * 1600);
 
   // The total receive duration will be longer.
   EXPECT_LT(receiveDiff.sec, g_localPublishCount * 1e-5);
