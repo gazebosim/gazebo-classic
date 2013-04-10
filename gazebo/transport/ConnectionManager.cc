@@ -38,6 +38,7 @@ class TopicManagerProcessTask : public tbb::task
 
 //////////////////////////////////////////////////
 ConnectionManager::ConnectionManager()
+  // : updateSem(0)
 {
   this->tmpIndex = 0;
   this->initialized = false;
@@ -196,6 +197,7 @@ void ConnectionManager::Fini()
 void ConnectionManager::Stop()
 {
   this->stop = true;
+  this->updateCondition.notify_all();
   if (this->initialized)
     while (this->stopped == false)
       common::Time::MSleep(100);
@@ -258,11 +260,15 @@ void ConnectionManager::RunUpdate()
 //////////////////////////////////////////////////
 void ConnectionManager::Run()
 {
+  boost::mutex::scoped_lock lock(this->updateMutex);
+
   this->stopped = false;
+
   while (!this->stop)
   {
     this->RunUpdate();
-    common::Time::MSleep(1);
+    this->updateCondition.timed_wait(lock,
+       boost::posix_time::milliseconds(100));
   }
   this->RunUpdate();
 
@@ -291,6 +297,9 @@ void ConnectionManager::OnMasterRead(const std::string &_data)
   }
   else
     gzerr << "ConnectionManager::OnMasterRead empty data\n";
+
+  // Tell the ourself that we need an update
+  this->TriggerUpdate();
 }
 
 /////////////////////////////////////////////////
@@ -622,4 +631,10 @@ ConnectionPtr ConnectionManager::FindConnection(const std::string &_host,
   }
 
   return conn;
+}
+
+//////////////////////////////////////////////////
+void ConnectionManager::TriggerUpdate()
+{
+  this->updateCondition.notify_all();
 }

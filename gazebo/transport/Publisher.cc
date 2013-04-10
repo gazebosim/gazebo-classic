@@ -132,6 +132,9 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
       }
     }
   }
+
+  // Tell the connection manager that it needs to update
+  ConnectionManager::Instance()->TriggerUpdate();
 }
 
 //////////////////////////////////////////////////

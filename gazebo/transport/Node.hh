@@ -336,6 +336,7 @@ namespace gazebo
       private: std::map<std::string, std::list<MessagePtr> > incomingMsgsLocal;
 
       private: boost::mutex publisherMutex;
+      private: boost::mutex publisherDeleteMutex;
       private: boost::recursive_mutex incomingMutex;
 
       private: bool initialized;

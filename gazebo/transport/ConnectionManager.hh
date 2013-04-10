@@ -19,6 +19,7 @@
 
 
 #include <boost/shared_ptr.hpp>
+#include <boost/interprocess/sync/interprocess_semaphore.hpp>
 #include <string>
 #include <list>
 #include <vector>
@@ -126,6 +127,9 @@ namespace gazebo
       public: ConnectionPtr ConnectToRemoteHost(const std::string &_host,
                                                   unsigned int _port);
 
+      /// \brief Inform the connection manager that it needs an update.
+      public: void TriggerUpdate();
+
       /// \brief Callback function called when we have read data from the
       /// master
       /// \param[in] _data String of incoming data
@@ -146,7 +150,13 @@ namespace gazebo
       private: void ProcessMessage(const std::string &_packet);
 
       /// \brief Run the manager update loop once
-      public: void RunUpdate();
+      private: void RunUpdate();
+
+      /// \brief Condition used to trigger an update.
+      private: boost::condition_variable updateCondition;
+
+      /// \brief Mutex for updateCondition
+      private: boost::mutex updateMutex;
 
       private: ConnectionPtr masterConn;
       private: Connection *serverConn;

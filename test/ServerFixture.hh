@@ -137,7 +137,7 @@ class ServerFixture : public testing::Test
                int waitCount = 0, maxWaitCount = 6000;
                while ((!this->server || !this->server->GetInitialized()) &&
                       ++waitCount < maxWaitCount)
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
                gzdbg << "ServerFixture load in "
                       << static_cast<double>(waitCount)/100.0
                       << " seconds, timeout after "
@@ -168,7 +168,7 @@ class ServerFixture : public testing::Test
                while ((!physics::get_world() ||
                         physics::get_world()->IsPaused() != _paused) &&
                       ++waitCount < maxWaitCount)
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
                ASSERT_LT(waitCount, maxWaitCount);
 
              }
@@ -426,7 +426,7 @@ class ServerFixture : public testing::Test
                                  this, _1, _2, _3, _4, _5));
 
                while (this->gotImage < 20)
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
 
                camSensor->GetCamera()->DisconnectNewImageFrame(c);
              }
@@ -485,7 +485,7 @@ class ServerFixture : public testing::Test
                // Wait for the entity to spawn
                while (!this->HasEntity(_modelName) && i < 50)
                {
-                 common::Time::MSleep(20);
+                 common::Time::MSleep(100);
                  ++i;
                }
                EXPECT_LT(i, 50);
@@ -553,7 +553,7 @@ class ServerFixture : public testing::Test
                // Wait for the entity to spawn
                while (!this->HasEntity(_modelName) && i < 50)
                {
-                 common::Time::MSleep(20);
+                 common::Time::MSleep(100);
                  ++i;
                }
                EXPECT_LT(i, 50);
@@ -726,7 +726,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
              }
 
   protected: void SpawnSphere(const std::string &_name,
@@ -760,7 +760,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (_wait && !this->HasEntity(_name))
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
              }
 
   protected: void SpawnSphere(const std::string &_name,
@@ -798,7 +798,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (_wait && !this->HasEntity(_name))
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
              }
 
   protected: void SpawnBox(const std::string &_name,
@@ -832,7 +832,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
              }
 
   protected: void SpawnTrimesh(const std::string &_name,
@@ -870,7 +870,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
              }
 
   protected: void SpawnEmptyLink(const std::string &_name,
@@ -894,7 +894,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
              }
 
   protected: void SpawnModel(const std::string &_filename)
@@ -928,7 +928,7 @@ class ServerFixture : public testing::Test
                  sdf::ElementPtr model = sdfParsed.root->GetElement("model");
                  std::string name = model->GetValueString("name");
                  while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
-                   common::Time::MSleep(50);
+                   common::Time::MSleep(100);
                  ASSERT_LT(waitCount, maxWaitCount);
                }
              }
