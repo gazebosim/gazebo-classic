@@ -18,7 +18,7 @@ rm -rf /tmp/gazebo_build
 mkdir /tmp/gazebo_build
 
 # Clone
-hg clone https://bitbucket.org/osrf/gazebo /tmp/gazebo_build
+hg clone https://bitbucket.org/osrf/gazebo /tmp/gazebo_build/source
 
 start_time=`eval date +%s`
 
@@ -26,15 +26,16 @@ start_time=`eval date +%s`
 for branch in $branches
 do
   # Get the correct branch
-  cd /tmp/gazebo_build
+  cd /tmp/gazebo_build/source
   hg up $branch
 
   # Build
   rm -rf build
   mkdir build
   cd build
-  cmake ../
-  make -j4
+  cmake -DCMAKE_INSTALL_PREFIX=/tmp/gazebo_build/install ../
+  make -j4 install
+  source /tmp/gazebo_build/install/share/gazebo/setup.sh
 
   echo "Branch: $branch" >> $logfile
   echo "==================================================" >> $logfile
@@ -42,20 +43,21 @@ do
   # Run make test many times, only capture failures
   for i in {1..100}
   do
-    cd /tmp/gazebo_build/build
-    make test | grep "***" >> $logfile 
+    cd /tmp/gazebo_build/source/build
+    make test | grep "\*\*\*" >> $logfile 
   done
 
   echo "Code Check Results" >> $logfile
   # Run code checker
-  cd /tmp/gazebo_build/
+  cd /tmp/gazebo_build/source
   sh tools/code_check.sh >> $logfile
 done
 end_time=`eval date +%s`
 duration=`expr $end_time - $start_time`
-min=`expr $duration / 60`
-sec=`expr $duration - $min \* 60`
-echo "Duration: $min min $sec sec" >> $logfile
+hour=`expr $duration / 3600`
+min=`expr ($duration - $hour \* 3600) / 60`
+sec=`expr $duration - $hour \* 3600 - $min \* 60`
+echo "Duration: $hour hr $min min $sec sec" >> $logfile
 
 # Cleanup
 cd
