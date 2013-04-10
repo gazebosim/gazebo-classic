@@ -642,14 +642,18 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
                std::ostringstream shapeStr;
+
                if (_collisionType == "box")
+               {
                  shapeStr << " <box><size>1 1 1</size></box>";
+               }
                else if (_collisionType == "cylinder")
                {
                  shapeStr << "<cylinder>"
                           << "  <radius>.5</radius><length>1.0</length>"
                           << "</cylinder>";
                }
+
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
@@ -679,12 +683,12 @@ class ServerFixture : public testing::Test
 
                int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name) && i < 50)
+               while (!this->HasEntity(_name) && i < 100)
                {
-                 common::Time::MSleep(50);
+                 common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 50);
+               EXPECT_LT(i, 100);
              }
 
   protected: void SpawnCylinder(const std::string &_name,
