@@ -56,7 +56,7 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited.
-      public: virtual void Reset();
+      // public: virtual void Reset();
 
       /// \brief
       public: rtql8::dynamics::SkeletonDynamics* GetSkeletonDynamics() {

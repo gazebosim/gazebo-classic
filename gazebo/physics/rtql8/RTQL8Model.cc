@@ -159,11 +159,11 @@ void RTQL8Model::Fini()
 }
 
 //////////////////////////////////////////////////
-void RTQL8Model::Reset()
-{
-  Model::Reset();
+//void RTQL8Model::Reset()
+//{
+//  Model::Reset();
 
-}
+//}
 
 //////////////////////////////////////////////////
 RTQL8PhysicsPtr RTQL8Model::GetRTQL8Physics(void) const {
