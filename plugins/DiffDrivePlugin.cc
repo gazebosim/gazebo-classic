@@ -68,7 +68,7 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
     gzerr << "Unable to find right joint["
           << _sdf->GetElement("right_joint")->GetValueString() << "]\n";
 
-  this->updateConnection = event::Events::ConnectWorldUpdateStart(
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&DiffDrivePlugin::OnUpdate, this));
 }
 

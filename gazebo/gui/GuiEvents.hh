@@ -37,7 +37,7 @@ namespace gazebo
               { createEntity.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the move mode signal
+      /// \brief Connect a boost::slot to the move mode signal
       public: template<typename T>
               static event::ConnectionPtr ConnectMoveMode(T _subscriber)
               { return moveMode.Connect(_subscriber); }
@@ -45,7 +45,7 @@ namespace gazebo
               { moveMode.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the manip mode signal
+      /// \brief Connect a boost::slot to the manip mode signal
       public: template<typename T>
               static event::ConnectionPtr ConnectManipMode(T _subscriber)
               {return manipMode.Connect(_subscriber);}
@@ -53,28 +53,28 @@ namespace gazebo
               {manipMode.Disconnect(_subscriber);}
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the fullscreen signal
+      /// \brief Connect a boost::slot to the fullscreen signal
       public: template<typename T>
               static event::ConnectionPtr ConnectFullScreen(T _subscriber)
               { return fullScreen.Connect(_subscriber); }
       public: static void DisconnectFullScreen(event::ConnectionPtr _subscriber)
               { fullScreen.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the view FPS signal
+      /// \brief Connect a boost::slot to the view FPS signal
       public: template<typename T>
               static event::ConnectionPtr ConnectFPS(T _subscriber)
               { return fps.Connect(_subscriber); }
       public: static void DisconnectFPS(event::ConnectionPtr _subscriber)
               { fps.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the view Orbit signal
+      /// \brief Connect a boost::slot to the view Orbit signal
       public: template<typename T>
               static event::ConnectionPtr ConnectOrbit(T _subscriber)
               { return orbit.Connect(_subscriber); }
       public: static void DisconnectOrbit(event::ConnectionPtr _subscriber)
               { orbit.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the view KeyPress signal
+      /// \brief Connect a boost::slot to the view KeyPress signal
       public: template<typename T>
               static event::ConnectionPtr ConnectKeyPress(T _subscriber)
               { return keyPress.Connect(_subscriber); }
@@ -88,6 +88,15 @@ namespace gazebo
       public: static void DisconnectModelUpdate(
                   event::ConnectionPtr _subscriber)
               { modelUpdate.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the input step size signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectInputStepSize(T _subscriber)
+              { return inputStepSize.Connect(_subscriber); }
+      public: static void DisconnectInputStepSize(
+              event::ConnectionPtr _subscriber)
+              { inputStepSize.Disconnect(_subscriber); }
 
       ///  that indicates the user is moving the camera
       public: static event::EventT<void (bool)>  moveMode;
@@ -104,6 +113,9 @@ namespace gazebo
       public: static event::EventT<void ()> orbit;
 
       public: static event::EventT<void (std::string)> keyPress;
+
+      /// \brief Step size changed event
+      public: static event::EventT<void (int)> inputStepSize;
     };
   }
 }

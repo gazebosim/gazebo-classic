@@ -82,6 +82,8 @@ namespace gazebo
       private slots: void Save();
       private slots: void SaveAs();
       private slots: void About();
+      private slots: void Play();
+      private slots: void Pause();
       private slots: void Step();
 
       private slots: void NewModel();
@@ -113,6 +115,10 @@ namespace gazebo
       private slots: void OnResetModelOnly();
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
+      private slots: void SetWireframe();
+
+      /// \brief Qt call back when the play action state changes
+      private slots: void OnPlayActionChanged();
 
       /// \brief QT slot to open the data logger utility
       private slots: void DataLogger();
@@ -154,6 +160,10 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
+
+      /// \brief Handle event for changing the manual step size.
+      /// \param[in] _value New input step size.
+      private: void OnInputStepSizeChanged(int _value);
 
       private: QToolBar *playToolbar;
 
@@ -200,6 +210,9 @@ namespace gazebo
       /// \brief The filename set via "Save As". This filename is used by
       /// the "Save" feature.
       private: std::string saveFilename;
+
+      /// \brief User specified step size for manually stepping the world
+      private: int inputStepSize;
 
       /// \brief List of all the editors.
       private: std::list<Editor*> editors;
