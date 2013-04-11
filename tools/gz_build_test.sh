@@ -22,6 +22,9 @@ hg clone https://bitbucket.org/osrf/gazebo /tmp/gazebo_build/source
 
 start_time=`eval date +%s`
 
+PATH=/tmp/gazebo_build/install/bin:$PATH
+LD_LIBRARY_PATH=/tmp/gazebo_build/install/lib:$LD_LIBRARY_PATH
+
 # Process each branch from the command line
 for branch in $branches
 do
@@ -35,7 +38,7 @@ do
   cd build
   cmake -DCMAKE_INSTALL_PREFIX=/tmp/gazebo_build/install ../
   make -j4 install
-  source /tmp/gazebo_build/install/share/gazebo/setup.sh
+  . /tmp/gazebo_build/install/share/gazebo/setup.sh
 
   echo "Branch: $branch" >> $logfile
   echo "==================================================" >> $logfile
@@ -55,7 +58,7 @@ done
 end_time=`eval date +%s`
 duration=`expr $end_time - $start_time`
 hour=`expr $duration / 3600`
-min=`expr ($duration - $hour \* 3600) / 60`
+min=`expr $(($duration - $hour \* 3600)) / 60`
 sec=`expr $duration - $hour \* 3600 - $min \* 60`
 echo "Duration: $hour hr $min min $sec sec" >> $logfile
 
