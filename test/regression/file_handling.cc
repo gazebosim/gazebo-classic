@@ -27,6 +27,7 @@ TEST_F(FileHandling, Save)
 {
   // Cleanup test directory.
   boost::filesystem::remove_all("/tmp/gazebo_test");
+  boost::filesystem::create_directories("/tmp/gazebo_test");
 
   Load("worlds/empty.world");
 
