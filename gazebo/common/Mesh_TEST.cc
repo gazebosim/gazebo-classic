@@ -121,6 +121,7 @@ TEST(MeshTest, Mesh)
 {
   // Cleanup test directory.
   boost::filesystem::remove_all("/tmp/gazebo_test");
+  boost::filesystem::create_directories("/tmp/gazebo_test");
 
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.3ds"));
