@@ -72,10 +72,11 @@ do
   cd /tmp/gazebo_build/source
   sh tools/code_check.sh >> $logfile
 done
+
 end_time=`eval date +%s`
 duration=`expr $end_time - $start_time`
 hour=`expr $duration / 3600`
-min=`expr $(($duration - $hour \* 3600)) / 60`
+min=`expr $(( $duration - $hour * 3600 )) / 60`
 sec=`expr $duration - $hour \* 3600 - $min \* 60`
 echo "Duration: $hour hr $min min $sec sec" >> $logfile
 
