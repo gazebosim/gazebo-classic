@@ -2091,6 +2091,8 @@ void ModelListWidget::ResetTree()
 
   // Create the top level of items in the tree widget
   {
+    this->ResetScene();
+
     this->physicsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Physics"))));

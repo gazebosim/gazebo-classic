@@ -162,9 +162,8 @@ namespace gazebo
       /// \param _topic Name of the topic
       /// \param _message The message to send.
       /// \param _cb Callback, used when the publish is completed.
-      public: void Publish(const std::string &_topic,
-                            const google::protobuf::Message &_message,
-                            const boost::function<void()> &_cb = NULL);
+      public: void Publish(const std::string &_topic, MessagePtr _message,
+                  const boost::function<void()> &_cb = NULL);
 
       /// \brief Connection a local Publisher to a remote Subscriber
       /// \param[in] _topic The topic to use
@@ -217,7 +216,7 @@ namespace gazebo
       /// of topic names.
       /// \sa transport::GetAdvertisedTopics
       public: std::map<std::string, std::list<std::string> >
-              GetAdvertisedTopics() const GAZEBO_DEPRECATED;
+              GetAdvertisedTopics() const GAZEBO_DEPRECATED(1.5);
 
       /// \brief Clear all buffers
       public: void ClearBuffers();
@@ -245,7 +244,6 @@ namespace gazebo
       // Singleton implementation
       private: friend class SingletonT<TopicManager>;
     };
-
     /// \}
   }
 }

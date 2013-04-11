@@ -310,8 +310,8 @@ namespace gazebo
       /// \brief Publish pose updates for a model.
       /// This list of models to publish is processed and cleared once every
       /// iteration.
-      /// \param[in] _modelName Name of the model to publish.
-      public: void PublishModelPose(const std::string &_modelName);
+      /// \param[in] _model Pointer to the model to publish.
+      public: void PublishModelPose(physics::ModelPtr _model);
 
       /// \cond
       /// This is an internal function.
@@ -650,8 +650,8 @@ namespace gazebo
       /// objects are inserted via the factory.
       private: sdf::SDFPtr factorySDF;
 
-      /// \brief The list of pose messages to output.
-      private: std::set<std::string> publishModelPoses;
+      /// \brief The list of models that need to publish their pose.
+      private: std::set<ModelPtr> publishModelPoses;
 
       /// \brief Info passed through the WorldUpdateBegin event.
       private: common::UpdateInfo updateInfo;

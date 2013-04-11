@@ -276,18 +276,20 @@ JointPtr RTQL8Physics::CreateJoint(const std::string &_type, ModelPtr _parent)
 {
   JointPtr joint;
 
-  if (_type == "prismatic")
-    joint.reset(new RTQL8SliderJoint(_parent));
-  else if (_type == "screw")
-    joint.reset(new RTQL8ScrewJoint(_parent));
-  else if (_type == "revolute")
+//  if (_type == "prismatic")
+//    joint.reset(new RTQL8SliderJoint(_parent));
+//  else if (_type == "screw")
+//    joint.reset(new RTQL8ScrewJoint(_parent));
+//  else if (_type == "revolute")
+//    joint.reset(new RTQL8HingeJoint(_parent));
+//  else if (_type == "revolute2")
+//    joint.reset(new RTQL8Hinge2Joint(_parent));
+//  else if (_type == "ball")
+//    joint.reset(new RTQL8BallJoint(_parent));
+//  else if (_type == "universal")
+//    joint.reset(new RTQL8UniversalJoint(_parent));
+  if (_type == "revolute")
     joint.reset(new RTQL8HingeJoint(_parent));
-  else if (_type == "revolute2")
-    joint.reset(new RTQL8Hinge2Joint(_parent));
-  else if (_type == "ball")
-    joint.reset(new RTQL8BallJoint(_parent));
-  else if (_type == "universal")
-    joint.reset(new RTQL8UniversalJoint(_parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 

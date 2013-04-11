@@ -62,8 +62,8 @@ void Publication::AddSubscription(const NodePtr &_node)
     for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
          ++pubIter)
     {
-      if (!(*pubIter)->GetPrevMsg().empty())
-        _node->InsertLatchedMsg(this->topic, (*pubIter)->GetPrevMsg());
+      if ((*pubIter)->GetPrevMsgPtr())
+        _node->InsertLatchedMsg(this->topic, (*pubIter)->GetPrevMsgPtr());
     }
   }
 }
@@ -86,8 +86,8 @@ void Publication::AddSubscription(const CallbackHelperPtr _callback)
       for (pubIter = this->publishers.begin();
            pubIter != this->publishers.end(); ++pubIter)
       {
-        if (!(*pubIter)->GetPrevMsg().empty())
-          _callback->HandleData((*pubIter)->GetPrevMsg());
+        if ((*pubIter)->GetPrevMsgPtr())
+          _callback->HandleMessage((*pubIter)->GetPrevMsgPtr());
       }
     }
   }
@@ -202,7 +202,7 @@ void Publication::RemoveSubscription(const std::string &_host,
   iter = this->callbacks.begin();
   while (iter != this->callbacks.end())
   {
-    subptr = boost::shared_dynamic_cast<SubscriptionTransport>(*iter);
+    subptr = boost::dynamic_pointer_cast<SubscriptionTransport>(*iter);
     std::string host = subptr->GetConnection()->GetRemoteAddress();
     if (!subptr || !subptr->GetConnection()->IsOpen() ||
         ((host.empty() || host == _host) &&
@@ -266,12 +266,8 @@ void Publication::LocalPublish(const std::string &data)
 }
 
 //////////////////////////////////////////////////
-void Publication::Publish(const google::protobuf::Message &_msg,
-                          const boost::function<void()> &_cb)
+void Publication::Publish(MessagePtr _msg, const boost::function<void()> &_cb)
 {
-  std::string data;
-  _msg.SerializeToString(&data);
-
   std::list<NodePtr>::iterator iter, endIter;
 
   {
@@ -281,7 +277,7 @@ void Publication::Publish(const google::protobuf::Message &_msg,
     endIter = this->nodes.end();
     while (iter != endIter)
     {
-      if ((*iter)->HandleData(this->topic, data))
+      if ((*iter)->HandleMessage(this->topic, _msg))
         ++iter;
       else
         this->nodes.erase(iter++);
@@ -295,15 +291,21 @@ void Publication::Publish(const google::protobuf::Message &_msg,
 
   {
     boost::mutex::scoped_lock lock(this->callbackMutex);
-    std::list<CallbackHelperPtr>::iterator cbIter;
-    cbIter = this->callbacks.begin();
 
-    while (cbIter != this->callbacks.end())
+    if (this->callbacks.size() > 0)
     {
-      if ((*cbIter)->HandleData(data))
-        ++cbIter;
-      else
-        this->callbacks.erase(cbIter++);
+      std::string data;
+      _msg->SerializeToString(&data);
+      std::list<CallbackHelperPtr>::iterator cbIter;
+      cbIter = this->callbacks.begin();
+
+      while (cbIter != this->callbacks.end())
+      {
+        if ((*cbIter)->HandleData(data))
+          ++cbIter;
+        else
+          this->callbacks.erase(cbIter++);
+      }
     }
   }
 
@@ -415,7 +417,7 @@ void Publication::RemoveNodes()
       iter = this->callbacks.begin();
       while (iter != this->callbacks.end())
       {
-        subptr = boost::shared_dynamic_cast<SubscriptionTransport>(*iter);
+        subptr = boost::dynamic_pointer_cast<SubscriptionTransport>(*iter);
         if (!subptr || !subptr->GetConnection()->IsOpen() ||
             (subptr->GetConnection()->GetRemoteAddress() == (*cbIter).first &&
              subptr->GetConnection()->GetRemotePort() == (*cbIter).second))

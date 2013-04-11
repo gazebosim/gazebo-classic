@@ -20,7 +20,7 @@
 using namespace gazebo;
 class ServerFixtureTest : public ServerFixture
 {
-  public: void LoadEmptyOfType(const std::string _physicsType);
+  public: void LoadEmptyOfType(const std::string &_physicsType);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ TEST_F(ServerFixtureTest, LoadPaused)
 // Verify that ServerFixture can load empty world with different types
 // of physics engines (issue #486)
 ////////////////////////////////////////////////////////////////////////
-void ServerFixtureTest::LoadEmptyOfType(const std::string _physicsType)
+void ServerFixtureTest::LoadEmptyOfType(const std::string &_physicsType)
 {
   // Note the second argument of Load sets the pause state
   Load("worlds/empty.world", true, _physicsType);

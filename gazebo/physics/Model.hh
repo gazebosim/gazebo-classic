@@ -86,7 +86,7 @@ namespace gazebo
       public: virtual void RemoveChild(EntityPtr _child);
 
       /// \brief Reset the model.
-      public: virtual void Reset();
+      public: void Reset();
 
       /// \brief Set the linear velocity of the model, and all its links.
       /// \param[in] _vel The new linear velocity.

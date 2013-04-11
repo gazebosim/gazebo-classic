@@ -115,7 +115,7 @@ namespace gazebo
 
       /// \brief Deprecated
       /// \sa RunThreads
-      public: void Run() GAZEBO_DEPRECATED;
+      public: void Run() GAZEBO_DEPRECATED(1.5);
 
       /// \brief Run sensor updates in separate threads.
       /// This will only run non-image based sensor updates.
@@ -270,6 +270,9 @@ namespace gazebo
 
       /// \brief List of sensors that require initialization.
       private: Sensor_V initSensors;
+
+      /// \brief List of sensors that require initialization.
+      private: Sensor_V removeSensors;
 
       /// \brief A vector of SensorContainer pointers.
       private: typedef std::vector<SensorContainer*> SensorContainer_V;

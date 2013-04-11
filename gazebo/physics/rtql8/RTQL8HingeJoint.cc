@@ -80,8 +80,7 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
         + (this->childLink->GetWorldPose())
         + poseChildLinkToJoint;
   }
-  RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint,
-                                       poseParentLinkToJoint);
+
 
   //----------------------------------------------------------------------------
   // Step 2. Transformation by the rotate axis.
@@ -92,7 +91,7 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
   Eigen::Vector3d axisHinge;
   rtql8::kinematics::Dof* dofHinge = new rtql8::kinematics::Dof(0);
   rotHinge = new rtql8::kinematics::TrfmRotateAxis(axisHinge, dofHinge);
-  this->rtql8Joint->addTransform(rotHinge, true);
+
   // Get the model associated with
   // Add the transform to the skeletone in the model.
   // add to model because it's variable
@@ -105,13 +104,10 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
   //----------------------------------------------------------------------------
   poseJointToChildLink = -poseChildLinkToJoint;
 
-//  math::Pose currentJointToChildJoint;
-
-//  LinkPtr childLink = this->GetChild();
-//  JointPtr childJoint = childLink->GetChild();
-
-  RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint, poseJointToChildLink);
+RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint, poseParentLinkToJoint);
   //RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint, poseJointToChildLink);
+  this->rtql8Joint->addTransform(rotHinge, true);
+  RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint, poseJointToChildLink);
 }
 
 //////////////////////////////////////////////////
@@ -210,14 +206,14 @@ double RTQL8HingeJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8HingeJoint::SetVelocity(int /*index*/, double /*_angle*/)
+void RTQL8HingeJoint::SetVelocity(int /*index*/, double /*_vel*/)
 {
 //   this->SetParam(dParamVel, _angle);
   gzerr << "RTQL8HingeJoint::SetVelocity(...): Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
-void RTQL8HingeJoint::SetMaxForce(int /*index*/, double /*_t*/)
+void RTQL8HingeJoint::SetMaxForce(int /*index*/, double /*_force*/)
 {
 //   return this->SetParam(dParamFMax, _t);
   gzerr << "RTQL8HingeJoint::SetMaxForce(...): Not implemented...\n";

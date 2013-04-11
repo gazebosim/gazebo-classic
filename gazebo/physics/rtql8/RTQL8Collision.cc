@@ -43,7 +43,7 @@ RTQL8Collision::~RTQL8Collision()
 }
 
 //////////////////////////////////////////////////
-void RTQL8Collision::Load(sdf::ElementPtr /*_sdf*/)
+void RTQL8Collision::Load(sdf::ElementPtr _sdf)
 {
   Collision::Load(_sdf);
 
@@ -122,7 +122,7 @@ void RTQL8Collision::Fini()
 }
 
 //////////////////////////////////////////////////
-void RTQL8Collision::SetCollision(bool /*_placeable*/)
+void RTQL8Collision::SetCollision(bool _placeable)
 {
   //   // Must go first in this function
   //   this->collisionId = _collisionId;

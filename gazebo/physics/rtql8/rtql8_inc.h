@@ -1,10 +1,5 @@
-// This file should have a license
-
 #ifndef _RTQL8_INC_H_
 #define _RTQL8_INC_H_
-
-// This disables warning messages for ODE
-#pragma GCC system_header
 
 #include <rtql8/integration/EulerIntegrator.h>
 #include <rtql8/integration/RK4Integrator.h>

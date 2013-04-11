@@ -2,7 +2,7 @@
 <sdf version="1.4">
   <world name="default">
     <include><uri>model://sun</uri></include>
-    <physics type="rtql8">
+    <physics type="ode">
       <gravity>0 0 -10.0</gravity>
       <ode>
         <solver>
@@ -21,10 +21,11 @@
     </physics>
     <!--include><uri>model://ground_plane</uri></include-->
     <!-- 25.3kg total mass -->
+
     <model name="test_model">
-      <pose>0 0 2 0 0 0</pose>
+      <pose>0 0 0 0 1.57 0</pose>
       <link name="link1">
-	<pose>0 0 0 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -57,5 +58,6 @@
         </axis>
       </joint>
     </model>
+
   </world>
 </sdf>

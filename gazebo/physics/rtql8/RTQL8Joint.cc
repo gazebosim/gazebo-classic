@@ -306,206 +306,22 @@ math::Vector3 RTQL8Joint::GetLinkTorque(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8Joint::SetAttribute(Attribute /*_attr*/, int /*_index*/, double /*_value*/)
+void RTQL8Joint::SetAttribute(const std::string& /*_key*/, int /*_index*/,
+                              const boost::any& /*_value*/)
 {
-  //   switch (_attr)
-  //   {
-  //     case FUDGE_FACTOR:
-  //       this->SetParam(dParamFudgeFactor, _value);
-  //       break;
-  //     case SUSPENSION_ERP:
-  //       this->SetParam(dParamSuspensionERP, _value);
-  //       break;
-  //     case SUSPENSION_CFM:
-  //       this->SetParam(dParamSuspensionCFM, _value);
-  //       break;
-  //     case STOP_ERP:
-  //       this->SetParam(dParamStopERP, _value);
-  //       break;
-  //     case STOP_CFM:
-  //       this->SetParam(dParamStopCFM, _value);
-  //       break;
-  //     case ERP:
-  //       this->SetParam(dParamERP, _value);
-  //       break;
-  //     case CFM:
-  //       this->SetParam(dParamCFM, _value);
-  //       break;
-  //     case FMAX:
-  //       this->SetParam(dParamFMax, _value);
-  //       break;
-  //     case VEL:
-  //       this->SetParam(dParamVel, _value);
-  //       break;
-  //     case HI_STOP:
-  //       this->SetParam(dParamHiStop, _value);
-  //       break;
-  //     case LO_STOP:
-  //       this->SetParam(dParamLoStop, _value);
-  //       break;
-  //     default:
-  //       gzerr << "Unable to handle joint attribute[" << _attr << "]\n";
-  //       break;
-  //   };
   gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
-void RTQL8Joint::SetAttribute(const std::string &/*_key*/, int /*_index*/,
-                              const boost::any &/*_value*/)
+double RTQL8Joint::GetAttribute(const std::string& /*_key*/,
+                              unsigned int /*_index*/)
 {
-  //   if (_key == "fudge_factor")
-  //   {
-  //     try
-  //     {
-  //       this->SetParam(dParamFudgeFactor, boost::any_cast<double>(_value));
-  //     }
-  //     catch(boost::bad_any_cast &e)
-  //     {
-  //       gzerr << "boost any_cast error:" << e.what() << "\n";
-  //     }
-  //   }
-  //   else if (_key == "suspension_erp")
-  //   {
-  //     try
-  //     {
-  //       this->SetParam(dParamSuspensionERP, boost::any_cast<double>(_value));
-  //     }
-  //     catch(boost::bad_any_cast &e)
-  //     {
-  //       gzerr << "boost any_cast error:" << e.what() << "\n";
-  //     }
-  //   }
-  //   else if (_key == "suspension_cfm")
-  //   {
-  //     try
-  //     {
-  //       this->SetParam(dParamSuspensionCFM, boost::any_cast<double>(_value));
-  //     }
-  //     catch(boost::bad_any_cast &e)
-  //     {
-  //       gzerr << "boost any_cast error:" << e.what() << "\n";
-  //     }
-  //   }
-  //   else if (_key == "stop_erp")
-  //   {
-  //     try
-  //     {
-  //       this->SetParam(dParamStopERP, boost::any_cast<double>(_value));
-  //     }
-  //     catch(boost::bad_any_cast &e)
-  //     {
-  //       gzerr << "boost any_cast error:" << e.what() << "\n";
-  //     }
-  //   }
-  //   else if (_key == "stop_cfm")
-  //   {
-  //     try
-  //     {
-  //       this->SetParam(dParamStopCFM, boost::any_cast<double>(_value));
-  //     }
-  //     catch(boost::bad_any_cast &e)
-  //     {
-  //       gzerr << "boost any_cast error:" << e.what() << "\n";
-  //     }
-  //   }
-  //   else if (_key == "erp")
-  //   {
-  //     try
-  //     {
-  //       this->SetParam(dParamERP, boost::any_cast<double>(_value));
-  //     }
-  //     catch(boost::bad_any_cast &e)
-  //     {
-  //       gzerr << "boost any_cast error:" << e.what() << "\n";
-  //     }
-  //   }
-  //   else if (_key == "cfm")
-  //   {
-  //     try
-  //     {
-  //       this->SetParam(dParamCFM, boost::any_cast<double>(_value));
-  //     }
-  //     catch(boost::bad_any_cast &e)
-  //     {
-  //       gzerr << "boost any_cast error:" << e.what() << "\n";
-  //     }
-  //   }
-  //   else if (_key == "fmax")
-  //   {
-  //     try
-  //     {
-  //       this->SetParam(dParamFMax, boost::any_cast<double>(_value));
-  //     }
-  //     catch(boost::bad_any_cast &e)
-  //     {
-  //       gzerr << "boost any_cast error:" << e.what() << "\n";
-  //     }
-  //   }
-  //   else if (_key == "vel")
-  //   {
-  //     try
-  //     {
-  //       this->SetParam(dParamVel, boost::any_cast<double>(_value));
-  //     }
-  //     catch(boost::bad_any_cast &e)
-  //     {
-  //       gzerr << "boost any_cast error:" << e.what() << "\n";
-  //     }
-  //   }
-  //   else if (_key == "hi_stop")
-  //   {
-  //     try
-  //     {
-  //       this->SetParam(dParamHiStop, boost::any_cast<double>(_value));
-  //     }
-  //     catch(boost::bad_any_cast &e)
-  //     {
-  //       gzerr << "boost any_cast error:" << e.what() << "\n";
-  //     }
-  //   }
-  //   else if (_key == "lo_stop")
-  //   {
-  //     try
-  //     {
-  //       this->SetParam(dParamLoStop, boost::any_cast<double>(_value));
-  //     }
-  //     catch(boost::bad_any_cast &e)
-  //     {
-  //       gzerr << "boost any_cast error:" << e.what() << "\n";
-  //     }
-  //   }
-  //   else if (_key == "thread_pitch")
-  //   {
-  //     ScrewJoint<RTQL8Joint>* screwJoint =
-  //       dynamic_cast<ScrewJoint<RTQL8Joint>* >(this);
-  //     if (screwJoint != NULL)
-  //     {
-  //       try
-  //       {
-  //         screwJoint->SetThreadPitch(0, boost::any_cast<double>(_value));
-  //       }
-  //       catch(boost::bad_any_cast &e)
-  //       {
-  //         gzerr << "boost any_cast error:" << e.what() << "\n";
-  //       }
-  //     }
-  //   }
-  //   else
-  //   {
-  //     try
-  //     {
-  //       gzerr << "Unable to handle joint attribute["
-  //             << boost::any_cast<std::string>(_value) << "]\n";
-  //     }
-  //     catch(boost::bad_any_cast &e)
-  //     {
-  //       gzerr << "boost any_cast error:" << e.what() << "\n";
-  //     }
-  //   }
   gzerr << "Not implemented...\n";
+
+  return 0;
 }
 
+//////////////////////////////////////////////////
 JointWrench RTQL8Joint::GetForceTorque(int /*_index*/)
 {
   JointWrench wrench;
@@ -576,4 +392,22 @@ JointWrench RTQL8Joint::GetForceTorque(int /*_index*/)
   gzerr << "Not implemented...\n";
 
   return wrench;
+}
+
+JointWrench RTQL8Joint::GetForceTorque(unsigned int /*_index*/)
+{
+  JointWrench wrench;
+
+  gzerr << "Not implemented...\n";
+
+  return wrench;
+}
+
+unsigned int RTQL8Joint::GetAngleCount() const
+{
+  unsigned int angleCount = 0;
+
+  angleCount = this->rtql8Joint->getNumDofs();
+
+  return angleCount;
 }
