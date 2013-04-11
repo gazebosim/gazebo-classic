@@ -16,6 +16,7 @@
 */
 
 #include <gtest/gtest.h>
+#include <boost/filesystem.hpp>
 
 #include "test_config.h"
 #include "gazebo/math/Vector3.hh"
