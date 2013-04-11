@@ -245,7 +245,10 @@ if (VALID_DISPLAY)
       ${QT_LIBRARIES}
       )
 
-    add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} -xml)
+
+    # QTest need and extra -o parameter to write logging information to a file
+    add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
+      -xml -o ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
 
     set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
 

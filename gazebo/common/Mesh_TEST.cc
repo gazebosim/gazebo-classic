@@ -118,6 +118,9 @@ endsolid MYSOLID";
 /////////////////////////////////////////////////
 TEST(MeshTest, Mesh)
 {
+  // Cleanup test directory.
+  boost::filesystem::remove_all("/tmp/gazebo_test");
+
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.3ds"));
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.xml"));
@@ -219,18 +222,23 @@ TEST(MeshTest, Mesh)
   newMesh->GenSphericalTexCoord(math::Vector3(0, 0, 0));
   delete newMesh;
 
-  std::ofstream stlFile("/tmp/gazebo_stl_test.stl", std::ios::out);
+  std::ofstream stlFile("/tmp/gazebo_test/gazebo_stl_test.stl", std::ios::out);
   stlFile << asciiSTLBox;
   stlFile.close();
 
-  mesh = common::MeshManager::Instance()->Load("/tmp/gazebo_stl_test-bad.stl");
+  mesh = common::MeshManager::Instance()->Load(
+      "/tmp/gazebo_test/gazebo_stl_test-bad.stl");
   EXPECT_EQ(NULL, mesh);
 
-  mesh = common::MeshManager::Instance()->Load("/tmp/gazebo_stl_test.stl");
+  mesh = common::MeshManager::Instance()->Load(
+      "/tmp/gazebo_test/gazebo_stl_test.stl");
   mesh->GetAABB(center, min, max);
   EXPECT_TRUE(center == math::Vector3(0.5, 0.5, 0.5));
   EXPECT_TRUE(min == math::Vector3(0, 0, 0));
   EXPECT_TRUE(max == math::Vector3(1, 1, 1));
+
+  // Cleanup test directory.
+  boost::filesystem::remove_all("/tmp/gazebo_test");
 }
 
 /////////////////////////////////////////////////
