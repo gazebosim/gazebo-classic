@@ -230,10 +230,10 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
         EXPECT_EQ((expectedForce[vi] < 0), (actualForce[vi] < 0));
 
         // Verify torque with a large tolerance
-        double odeTorqueTol = 1;
-        EXPECT_TRUE(fabs(actualTorque.x) < odeTorqueTol);
-        EXPECT_TRUE(fabs(actualTorque.y) < odeTorqueTol);
-        EXPECT_TRUE(fabs(actualTorque.z) < odeTorqueTol);
+        double odeTorqueTol = 2;
+        EXPECT_LT(fabs(actualTorque.x), odeTorqueTol);
+        EXPECT_LT(fabs(actualTorque.y), odeTorqueTol);
+        EXPECT_LT(fabs(actualTorque.z), odeTorqueTol);
 
         // TODO: ODE and bullet produce slightly different results
         // In ODE the force and torque on an object seem to be affected by other
@@ -338,7 +338,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   physics::CollisionPtr col = contactModel->GetLink()->GetCollision(ColInd);
   ASSERT_TRUE(col);
 
-  double tol = 1e-2;
+  double tol = 1e-1;
   // loop through contact collision pairs
   for (int i = 0; i < contacts.contact_size(); ++i)
   {
@@ -374,10 +374,10 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
       // contact sensor should have positive x torque and relatively large
       // compared to y and z
       EXPECT_GT(actualTorque.x, 0);
-      EXPECT_TRUE(actualTorque.x > fabs(actualTorque.y));
-      EXPECT_TRUE(actualTorque.x > fabs(actualTorque.z));
-      EXPECT_TRUE(fabs(actualTorque.y) < tol);
-      EXPECT_TRUE(fabs(actualTorque.z) < tol);
+      EXPECT_GT(actualTorque.x, fabs(actualTorque.y));
+      EXPECT_GT(actualTorque.x, fabs(actualTorque.z));
+      EXPECT_LT(fabs(actualTorque.y), tol);
+      EXPECT_LT(fabs(actualTorque.z), tol);
     }
   }
 }
