@@ -1512,17 +1512,31 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
   }
 }
 
+/////////////////////////////////////////////////
 TEST_F(PhysicsTest, CollisionFilteringODE)
 {
   CollisionFiltering("ode");
 }
 
+/////////////////////////////////////////////////
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, CollisionFilteringBullet)
 {
   CollisionFiltering("bullet");
 }
 #endif  // HAVE_BULLET
+
+/////////////////////////////////////////////////
+TEST_F(PhysicsTest, ZeroMaxContacts)
+{
+  // Load an empty world
+  Load("worlds/zero_max_contacts.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr model = world->GetModel("ground_plane");
+  ASSERT_TRUE(model);
+}
 
 int main(int argc, char **argv)
 {
