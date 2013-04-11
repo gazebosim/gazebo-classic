@@ -11,6 +11,8 @@ fi
 # Create a logfile based on the current time
 timestamp=`eval date +%d_%m_%Y_%R:%S`
 logfile="/tmp/gazebo_test-$timestamp.txt"
+logfileVerbose="/tmp/gazebo_test-$timestamp-verbose.txt"
+logfileRaw=/tmp/gazebo_build/raw.log
 
 # Create working directory
 cd 
@@ -44,7 +46,20 @@ do
   for i in {1..100}
   do
     cd /tmp/gazebo_build/source/build
-    make test | grep "\*\*\*" >> $logfile 
+    # make test with verbose output
+    make test ARGS="-VV" &> $logfileRaw
+    grep '^ *[0-9]*/[0-9]* .*\*\*\*' $logfileRaw >> $logfile
+    # for each failed test
+    for f in `grep '^ *[0-9]*/[0-9]* .*\*\*\*' $logfileRaw | \
+              sed -e 's@^ *\([0-9]*\)/.*@\1@'`
+    do
+      # output some brief info
+      echo Try $i of 100, failed test $f >> $logfileVerbose
+      # then send the raw output of both the test and its companion test_ran
+      # to the logfile for perusal
+      grep '^ *'`echo "($f/2)*2+1" | bc`':' $logfileRaw >> $logfileVerbose
+      grep '^ *'`echo "($f/2)*2+2" | bc`':' $logfileRaw >> $logfileVerbose
+    done
   done
 
   echo "Code Check Results" >> $logfile
