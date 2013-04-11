@@ -32,7 +32,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/common/Encoder.hh"
+#include "gazebo/common/VideoEncoder.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Rand.hh"
 
@@ -126,7 +126,7 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   this->renderTarget = NULL;
   this->renderTexture = NULL;
-  this->encoder = NULL;
+  this->videoEncoder = NULL;
 
   this->captureData = false;
   this->captureDataOnce = false;
@@ -439,7 +439,7 @@ void Camera::PostRender()
     }
     else if (this->encodeVideo)
     {
-        this->encoder->AddFrame(this->saveFrameBuffer, width, height);
+        this->videoEncoder->AddFrame(this->saveFrameBuffer, width, height);
     }
 
     if (this->sdf->HasElement("save") &&
@@ -900,14 +900,14 @@ bool Camera::SaveFrame(const std::string &_filename)
 //////////////////////////////////////////////////
 bool Camera::SaveVideo(const std::string &_filename)
 {
-  if (!this->encoder || !this->encoder->IsInitialized())
+  if (!this->videoEncoder || !this->videoEncoder->IsInitialized())
   {
     gzwarn << "Video encoder not initialized\n";
     return false;
   }
 
-  this->encoder->SaveToFile(_filename);
-  this->encoder->Reset();
+  this->videoEncoder->SaveToFile(_filename);
+  this->videoEncoder->Reset();
   return true;
 }
 
@@ -1168,13 +1168,13 @@ void Camera::SetEncodeVideo(bool _encode)
 
   if (this->encodeVideo)
   {
-    if (!this->encoder)
+    if (!this->videoEncoder)
     {
-      this->encoder = new common::Encoder();
+      this->videoEncoder = new common::VideoEncoder();
     }
     if (!this->videoEncodeFormat.empty())
-      this->encoder->SetFormat(this->videoEncodeFormat);
-    this->encoder->Init();
+      this->videoEncoder->SetFormat(this->videoEncodeFormat);
+    this->videoEncoder->Init();
   }
 }
 

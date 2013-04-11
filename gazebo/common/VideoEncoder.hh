@@ -36,15 +36,15 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
-    /// \class Encoder Encoder.hh common/common.hh
+    /// \class VideoEncoder VideoEncoder.hh common/common.hh
     /// \brief Handle video encoding using libavcodec
-    class Encoder
+    class VideoEncoder
     {
       /// \brief Constructor
-      public: Encoder();
+      public: VideoEncoder();
 
       /// \brief Destructor
-      public: virtual ~Encoder();
+      public: virtual ~VideoEncoder();
 
       /// \brief Initialize the encoder
       public: void Init();

@@ -57,7 +57,7 @@ namespace gazebo
 {
   namespace common
   {
-    class Encoder;
+    class VideoEncoder;
   }
 
   /// \ingroup gazebo_rendering
@@ -623,8 +623,8 @@ namespace gazebo
       /// \brief Texture that receives results from rendering.
       protected: Ogre::Texture *renderTexture;
 
-      /// \brief Video frame encoder
-      protected: common::Encoder *encoder;
+      /// \brief Video frame video encoder
+      protected: common::VideoEncoder *videoEncoder;
 
       /// \brief True to capture frames into an image buffer.
       protected: bool captureData;

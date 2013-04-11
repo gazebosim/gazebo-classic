@@ -37,13 +37,13 @@ extern "C"
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/Encoder.hh"
+#include "gazebo/common/VideoEncoder.hh"
 
 using namespace gazebo;
 using namespace common;
 
 /////////////////////////////////////////////////
-Encoder::Encoder()
+VideoEncoder::VideoEncoder()
 {
   this->initialized = false;
 #ifdef HAVE_FFMPEG
@@ -59,13 +59,13 @@ Encoder::Encoder()
 }
 
 /////////////////////////////////////////////////
-Encoder::~Encoder()
+VideoEncoder::~VideoEncoder()
 {
   this->Cleanup();
 }
 
 /////////////////////////////////////////////////
-void Encoder::Cleanup()
+void VideoEncoder::Cleanup()
 {
   if (!this->initialized)
     return;
@@ -115,38 +115,38 @@ void Encoder::Cleanup()
 }
 
 /////////////////////////////////////////////////
-void Encoder::SetBitRate(unsigned int _bitRate)
+void VideoEncoder::SetBitRate(unsigned int _bitRate)
 {
   this->bitRate = _bitRate;
 }
 
 /////////////////////////////////////////////////
-void Encoder::SetFrameWidth(unsigned int _width)
+void VideoEncoder::SetFrameWidth(unsigned int _width)
 {
   this->frameWidth = _width;
 }
 
 /////////////////////////////////////////////////
-void Encoder::SetFrameHeight(unsigned int _height)
+void VideoEncoder::SetFrameHeight(unsigned int _height)
 {
   this->frameHeight = _height;
 }
 
 /////////////////////////////////////////////////
-void Encoder::SetFormat(const std::string &_format)
+void VideoEncoder::SetFormat(const std::string &_format)
 {
   this->format = _format;
 }
 
 /////////////////////////////////////////////////
-std::string Encoder::GetFormat() const
+std::string VideoEncoder::GetFormat() const
 {
   return this->format;
 }
 
 /////////////////////////////////////////////////
 #ifdef HAVE_FFMPEG
-void Encoder::Init()
+void VideoEncoder::Init()
 {
   if (this->initialized)
     return;
@@ -260,7 +260,7 @@ void Encoder::Init()
   this->initialized = true;
 }
 #else
-void Encoder::Init()
+void VideoEncoder::Init()
 {
   gzwarn << "Encoding capability not available! "
       << "Please install libavcodec, libavformat and libswscale dev packages."
@@ -269,13 +269,13 @@ void Encoder::Init()
 #endif
 
 ////////////////////////////////////////////////
-bool Encoder::IsInitialized()
+bool VideoEncoder::IsInitialized()
 {
   return this->initialized;
 }
 
 /////////////////////////////////////////////////
-void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
+void VideoEncoder::AddFrame(unsigned char *_frame, unsigned int _width,
     unsigned int _height)
 {
   this->AddFrame(_frame, _width, _height,
@@ -284,7 +284,7 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
 
 /////////////////////////////////////////////////
 #ifdef HAVE_FFMPEG
-void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
+void VideoEncoder::AddFrame(unsigned char *_frame, unsigned int _width,
     unsigned int _height, common::Time _timestamp)
 {
   if (!this->initialized)
@@ -374,14 +374,14 @@ void Encoder::AddFrame(unsigned char *_frame, unsigned int _width,
   }
 }
 #else
-void Encoder::AddFrame(unsigned char */*_frame*/, unsigned int /*_w*/,
+void VideoEncoder::AddFrame(unsigned char */*_frame*/, unsigned int /*_w*/,
     unsigned int /*_h*/)
 {
 }
 #endif
 
 /////////////////////////////////////////////////
-void Encoder::Fini()
+void VideoEncoder::Fini()
 {
 #ifdef HAVE_FFMPEG
   if (this->formatCtx)
@@ -390,7 +390,7 @@ void Encoder::Fini()
 }
 
 /////////////////////////////////////////////////
-void Encoder::SaveToFile(const std::string &_filename)
+void VideoEncoder::SaveToFile(const std::string &_filename)
 {
 #ifdef HAVE_FFMPEG
   this->Fini();
@@ -405,7 +405,7 @@ void Encoder::SaveToFile(const std::string &_filename)
 }
 
 /////////////////////////////////////////////////
-void Encoder::Reset()
+void VideoEncoder::Reset()
 {
   this->Cleanup();
   // set default values

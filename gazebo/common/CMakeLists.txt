@@ -14,7 +14,6 @@ set (sources
   Color.cc
   Common.cc
   Console.cc
-  Encoder.cc
   Event.cc
   Events.cc
   Exception.cc
@@ -35,6 +34,7 @@ set (sources
   Time.cc
   Timer.cc
   Video.cc
+  VideoEncoder.cc
 )
 
 set (headers
@@ -46,7 +46,6 @@ set (headers
   CommonTypes.hh
   Color.hh
   Console.hh
-  Encoder.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -70,6 +69,7 @@ set (headers
   Timer.hh
   UpdateInfo.hh
   Video.hh
+  VideoEncoder.hh
  )
 
 if (HAVE_GTS)
