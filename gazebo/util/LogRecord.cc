@@ -23,17 +23,19 @@
 
 #include "gazebo/math/Rand.hh"
 
+#include "gazebo/transport/transport.hh"
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/common/LogRecord.hh"
+#include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
-using namespace common;
+using namespace util;
 
 /// Convert binary values to base64 characters
 typedef boost::archive::iterators::base64_from_binary<
@@ -64,6 +66,7 @@ LogRecord::LogRecord()
   this->logBasePath /= "/.gazebo/log/";
 
   this->logsEnd = this->logs.end();
+
 }
 
 //////////////////////////////////////////////////
@@ -140,9 +143,10 @@ bool LogRecord::Start(const std::string &_encoding)
       iter->second->Start(logCompletePath);
   }
 
-  // Listen to the world update event
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&LogRecord::Update, this, _1));
+  // Start the update thread if it has not already been started
+  if (!this->updateThread)
+    this->updateThread = new boost::thread(
+        boost::bind(&LogRecord::RunUpdate, this));
 
   // Start the writing thread if it has not already been started
   if (!this->writeThread)
@@ -171,21 +175,28 @@ void LogRecord::Fini()
   this->Stop();
 
   // Wait for the write thread, if it exists
+  if (this->updateThread)
+    this->updateThread->join();
+
+  // Wait for the write thread, if it exists
   if (this->writeThread)
     this->writeThread->join();
+
+  delete this->updateThread;
+  this->updateThread = NULL;
+
   delete this->writeThread;
   this->writeThread = NULL;
+
+  this->logControlSub.reset();
+  this->logStatusPub.reset();
+  this->node.reset();
 }
 
 //////////////////////////////////////////////////
 void LogRecord::Stop()
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
-
-  // Disconnect from the world update signale
-  if (this->updateConnection)
-    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
-  this->updateConnection.reset();
 
   // Kick the write thread
   this->dataAvailableCondition.notify_one();
@@ -244,8 +255,7 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
   // Check to see if the log has already been added.
   if (this->logs.find(_name) != this->logs.end())
   {
-    /// \todo Good place to use GZ_ASSERT
-    /// GZ_ASSERT(this->logs.find(_name)->second != NULL);
+    GZ_ASSERT(this->logs.find(_name)->second != NULL, "Unable to find log");
 
     if (this->logs.find(_name)->second->GetRelativeFilename() != _filename)
     {
@@ -278,6 +288,16 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
 
   // Update the pointer to the end of the log objects list.
   this->logsEnd = this->logs.end();
+
+  if (!this->node)
+  {
+    this->node = transport::NodePtr(new transport::Node());
+    this->node->Init();
+
+    this->logControlSub = this->node->Subscribe("~/log/control",
+        &LogRecord::OnLogControl, this);
+    this->logStatusPub = this->node->Advertise<msgs::LogStatus>("~/log/status");
+  }
 }
 
 //////////////////////////////////////////////////
@@ -312,9 +332,11 @@ std::string LogRecord::GetFilename(const std::string &_name) const
   Log_M::const_iterator iter = this->logs.find(_name);
   if (iter != this->logs.end())
   {
-    /// \TODO GZ_ASSERT(iter->second);
+    GZ_ASSERT(iter->second, "Invalid log");
     result = iter->second->GetCompleteFilename();
   }
+  else
+    result = this->logs.begin()->second->GetCompleteFilename();
 
   return result;
 }
@@ -390,7 +412,30 @@ bool LogRecord::GetFirstUpdate() const
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Update(const common::UpdateInfo &_info)
+void LogRecord::Notify()
+{
+  this->updateCondition.notify_all();
+}
+
+//////////////////////////////////////////////////
+void LogRecord::RunUpdate()
+{
+  boost::mutex localMutex;
+  boost::mutex::scoped_lock localLock(localMutex);
+
+  // This loop will write data to disk.
+  while (!this->stopThread)
+  {
+    this->Update();
+
+    // Don't completely lock, just to be safe.
+    this->updateCondition.timed_wait(localLock,
+        boost::posix_time::milliseconds(5000));
+  }
+}
+
+//////////////////////////////////////////////////
+void LogRecord::Update()
 {
   if (!this->paused)
   {
@@ -401,7 +446,7 @@ void LogRecord::Update(const common::UpdateInfo &_info)
 
       // Collect all the new log data. This will not write data to disk.
       for (this->updateIter = this->logs.begin();
-          this->updateIter != this->logsEnd; ++this->updateIter)
+           this->updateIter != this->logsEnd; ++this->updateIter)
       {
         size += this->updateIter->second->Update();
       }
@@ -410,15 +455,17 @@ void LogRecord::Update(const common::UpdateInfo &_info)
     if (this->firstUpdate)
     {
       this->firstUpdate = false;
-      this->startTime = _info.simTime;
+      this->startTime = common::Time::GetWallTime();
     }
-
 
     // Signal that new data is available.
     if (size > 0)
       this->dataAvailableCondition.notify_one();
 
-    this->currTime = _info.simTime;
+    this->currTime = common::Time::GetWallTime();
+
+    // Output the new log status
+    this->PublishLogStatus();
   }
 }
 
@@ -604,4 +651,83 @@ void LogRecord::Log::Write()
 
   // Clear the buffer.
   this->buffer.clear();
+}
+
+//////////////////////////////////////////////////
+void LogRecord::OnLogControl(ConstLogControlPtr &_data)
+{
+  if (_data->has_base_path() && !_data->base_path().empty())
+    this->SetBasePath(_data->base_path());
+
+  if (_data->has_start() && _data->start())
+  {
+    if (this->GetPaused())
+    {
+      this->Start("bz2");
+    }
+    else
+    {
+      this->Start("bz2");
+      // this->Add(this->GetName(), "state.log",
+      //    boost::bind(&LogRecord::OnLog, this, _1));
+    }
+  }
+  else if (_data->has_stop() && _data->stop())
+  {
+    this->Stop();
+  }
+  else if (_data->has_paused())
+  {
+    this->SetPaused(_data->paused());
+  }
+
+  // Output the new log status
+  this->PublishLogStatus();
+}
+
+//////////////////////////////////////////////////
+void LogRecord::PublishLogStatus()
+{
+  if (this->logs.empty())
+    return;
+
+  /// \todo right now this function will only report on the first log.
+
+  msgs::LogStatus msg;
+  unsigned int size = 0;
+
+  // Set the time of the status message
+  msgs::Set(msg.mutable_sim_time(), this->GetRunTime());
+
+  // Set the log recording base path name
+  msg.mutable_log_file()->set_base_path(this->GetBasePath());
+
+  // Get the full name of the log file
+  msg.mutable_log_file()->set_full_path(this->GetFilename());
+
+  // Set the URI of th log file
+  msg.mutable_log_file()->set_uri(transport::Connection::GetLocalHostname());
+
+  // Get the size of the log file
+  size = this->GetFileSize();
+
+  if (size < 1000)
+    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::BYTES);
+  else if (size < 1e6)
+  {
+    msg.mutable_log_file()->set_size(size / 1.0e3);
+    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::K_BYTES);
+  }
+  else if (size < 1e9)
+  {
+    msg.mutable_log_file()->set_size(size / 1.0e6);
+    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::M_BYTES);
+  }
+  else
+  {
+    msg.mutable_log_file()->set_size(size / 1.0e9);
+    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::G_BYTES);
+  }
+
+  this->logStatusPub->Publish(msg);
 }

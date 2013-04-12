@@ -30,11 +30,11 @@
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/LogRecord.hh"
-#include "gazebo/common/LogPlay.hh"
+#include "gazebo/util/LogRecord.hh"
+#include "gazebo/util/LogPlay.hh"
 
 using namespace gazebo;
-using namespace common;
+using namespace util;
 
 /////////////////////////////////////////////////
 // Convert a Base64 string.

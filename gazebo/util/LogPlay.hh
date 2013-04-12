@@ -24,16 +24,16 @@
 #include <string>
 #include <fstream>
 
-#include "common/SingletonT.hh"
+#include "gazebo/common/SingletonT.hh"
 
 namespace gazebo
 {
-  namespace common
+  namespace util
   {
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class Logplay Logplay.hh common/common.hh
+    /// \class Logplay Logplay.hh util/util.hh
     /// \brief Open and playback log files that were recorded using LogRecord.
     ///
     /// Use Logplay to open a log file (Logplay::Open), and access the

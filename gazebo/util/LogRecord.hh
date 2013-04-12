@@ -32,6 +32,8 @@
 #include <boost/archive/iterators/ostream_iterator.hpp>
 #include <boost/filesystem.hpp>
 
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/SingletonT.hh"
@@ -40,12 +42,12 @@
 
 namespace gazebo
 {
-  namespace common
+  namespace util
   {
-    /// addtogroup gazebo_common
+    /// addtogroup gazebo_util
     /// \{
 
-    /// \class LogRecord LogRecord.hh common/common.hh
+    /// \class LogRecord LogRecord.hh util/util.hh
     /// \brief Handles logging of data to disk
     ///
     /// The LogRecord class is a Singleton that manages data logging of any
@@ -106,6 +108,9 @@ namespace gazebo
       /// \brief Stop the logger.
       public: void Stop();
 
+      /// \brief Tell the recorder that an update should occur.
+      public: void Notify();
+
       /// \brief Set whether logging should pause. A paused state means the
       /// log file is still open, but data is not written to it.
       /// \param[in] _paused True to pause data logging.
@@ -133,12 +138,12 @@ namespace gazebo
       /// \brief Get the filename for a log object.
       /// \param[in] _name Name of the log object.
       /// \return Filename, empty string if not found.
-      public: std::string GetFilename(const std::string &_name) const;
+      public: std::string GetFilename(const std::string &_name = "") const;
 
       /// \brief Get the file size for a log object.
       /// \param[in] _name Name of the log object.
       /// \return Size in bytes.
-      public: unsigned int GetFileSize(const std::string &_name) const;
+      public: unsigned int GetFileSize(const std::string &_name = "") const;
 
       /// \brief Set the base path.
       /// \param[in] _path Path to the new logging location.
@@ -163,7 +168,11 @@ namespace gazebo
       ///
       /// Captures the current state of all registered entities, and outputs
       /// the data to their respective log files.
-      private: void Update(const common::UpdateInfo &_info);
+      // private: void Update(const common::UpdateInfo &_info);
+      private: void Update();
+
+      /// \brief Function used by the update thread.
+      private: void RunUpdate();
 
       /// \brief Run the Write loop.
       private: void Run();
@@ -171,8 +180,12 @@ namespace gazebo
       /// \brief Clear and delete the log buffers.
       private: void ClearLogs();
 
-      /// \brief Write the header to file.
-      // private: void WriteHeader();
+      /// \brief Publish log status message.
+      private: void PublishLogStatus();
+
+      /// \brief Called when a log control message is received.
+      /// \param[in] _data The log control message.
+      private: void OnLogControl(ConstLogControlPtr &_data);
 
       /// \cond
       private: class Log
@@ -231,6 +244,7 @@ namespace gazebo
         /// \brief Relative log filename.
         public: std::string relativeFilename;
 
+        /// \brief Complete file path.
         private: boost::filesystem::path completePath;
       };
       /// \endcond
@@ -248,14 +262,17 @@ namespace gazebo
       /// \brief Convenience iterator to the end of the log objects map.
       private: Log_M::iterator logsEnd;
 
-      /// \brief Event connected to the World update.
-      private: event::ConnectionPtr updateConnection;
+      /// \brief Condition used to trigger an update
+      private: boost::condition_variable updateCondition;
 
       /// \brief True if logging is running.
       private: bool running;
 
       /// \brief Thread used to write data to disk.
       private: boost::thread *writeThread;
+
+      /// \brief Thread used to update data.
+      private: boost::thread *updateThread;
 
       /// \brief Mutext to protect writing.
       private: mutable boost::mutex writeMutex;
@@ -297,6 +314,15 @@ namespace gazebo
 
       /// \brief Current simulation time.
       private: common::Time currTime;
+
+      /// \brief Transportation node.
+      private: transport::NodePtr node;
+
+      /// \brief Subscriber to log control messages.
+      private: transport::SubscriberPtr logControlSub;
+
+      /// \brief Publisher of log status messages.
+      private: transport::PublisherPtr logStatusPub;
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogRecord>;
