@@ -509,8 +509,11 @@ void Server::ProcessControlMsgs()
 }
 
 /////////////////////////////////////////////////
-bool Server::OpenWorld(const std::string &_filename)
+bool Server::OpenWorld(const std::string & /*_filename*/)
 {
+  gzerr << "Open World is not implemented\n";
+  return false;
+/*
   sdf::SDFPtr sdf(new sdf::SDF);
   if (!sdf::init(sdf))
   {
@@ -552,4 +555,5 @@ bool Server::OpenWorld(const std::string &_filename)
   worldMsg.set_create(true);
   this->worldModPub->Publish(worldMsg);
   return true;
+  */
 }
