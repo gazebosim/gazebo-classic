@@ -26,7 +26,6 @@
 #include "ServerFixture.hh"
 #include "images_cmp.h"
 
-
 using namespace gazebo;
 class FactoryTest : public ServerFixture
 {

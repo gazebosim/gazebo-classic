@@ -181,7 +181,7 @@ TEST_F(TransportStressTest, ManyNodes)
 
   // Wait for all the messages
   int waitCount = 0;
-  while (g_localPublishCount < g_totalExpectedMsgCount && waitCount < 50)
+  while (g_localPublishCount < g_totalExpectedMsgCount && waitCount < 100)
   {
     common::Time::MSleep(1000);
     waitCount++;
@@ -193,7 +193,7 @@ TEST_F(TransportStressTest, ManyNodes)
   // Time it took to received the messages.
   common::Time receiveDiff = g_localPublishEndTime - startTime;
 
-  EXPECT_LT(waitCount, 50);
+  EXPECT_LT(waitCount, 100);
 
   // Make sure we received all the messages.
   EXPECT_EQ(g_totalExpectedMsgCount, g_localPublishCount);
@@ -201,11 +201,10 @@ TEST_F(TransportStressTest, ManyNodes)
   // The total publish duration should always be very short.
   // The calculation here is the number of messages published multiplied by
   // the expected time to publish a single image message.
-  EXPECT_LT(static_cast<unsigned int>(pubDiff.nsec),
-      (g_localPublishMessageCount * nodes.size()) * 1500);
+  EXPECT_EQ(pubDiff.sec, 0);
 
   // The total receive duration will be longer.
-  EXPECT_LT(receiveDiff.sec, g_localPublishCount * 1e-6);
+  EXPECT_LT(receiveDiff.sec, g_localPublishCount * 1e-5);
 
   // Out time time for human testing purposes
   gzmsg << "Time to publish " << g_localPublishMessageCount * nodes.size()
