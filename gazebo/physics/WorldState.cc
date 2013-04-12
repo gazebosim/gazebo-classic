@@ -43,8 +43,11 @@ WorldState::WorldState(const WorldPtr _world)
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
-    this->modelStates.insert(std::make_pair((*iter)->GetName(),
-          ModelState(*iter, this->realTime, this->simTime)));
+    if (!(*iter)->IsStatic())
+    {
+      this->modelStates.insert(std::make_pair((*iter)->GetName(),
+            ModelState(*iter, this->realTime, this->simTime)));
+    }
   }
 }
 
@@ -76,8 +79,11 @@ void WorldState::Load(const WorldPtr _world)
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
-    this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
-        this->simTime);
+    if (!(*iter)->IsStatic())
+    {
+      this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
+          this->simTime);
+    }
   }
 
   // Remove models that no longer exist. We determine this by check the time
@@ -250,7 +256,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
   {
     if (this->HasModelState(iter->second.GetName()))
     {
-      ModelState state = this->GetModelState(iter->second.GetName()) - 
+      ModelState state = this->GetModelState(iter->second.GetName()) -
         iter->second;
 
       if (!state.IsZero())

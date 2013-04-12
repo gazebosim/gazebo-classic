@@ -173,14 +173,38 @@ uint32_t LogPlay::GetRandSeed() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
-  if (this->logCurrXml == this->logStartXml)
-    this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
-  else if (this->logCurrXml)
-    this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
-  else
-    return false;
+  std::string startMarker = "<state>";
+  std::string endMarker = "</state>";
+  size_t start = this->currentChunk.find(startMarker);
+  size_t end = this->currentChunk.find(endMarker);
 
-  return this->GetChunkData(this->logCurrXml, _data);
+  std::cout << "Start[" << start << "] End[" << end << "]\n";
+  if (start == std::string::npos || end == std::string::npos)
+  {
+    if (this->logCurrXml == this->logStartXml)
+    {
+      printf("First\n");
+      this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+    }
+    else if (this->logCurrXml)
+    {
+      printf("Other\n");
+      this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
+    }
+    else
+      return false;
+
+    this->currentChunk = this->GetChunkData(this->logCurrXml, _data);
+    start = this->currentChunk.find(startMarker);
+    end = this->currentChunk.find(endMarker);
+
+    std::cout << "Chunk[" << this->currentChunk << "]\n";
+    std::cout << "Start[" << start << "] End[" << end << "]\n";
+  }
+
+  _data = this->currentChunk.substr(start, end+endMarker.size());
+
+  this->currentChunk.erase(start, end + endMarker.size());
 }
 
 /////////////////////////////////////////////////

@@ -131,6 +131,8 @@ namespace gazebo
       /// \brief The encoding for the current chunk in the log file.
       private: std::string encoding;
 
+      private: std::string currentChunk;
+
       /// \brief This is a singleton
       private: friend class SingletonT<LogPlay>;
     };
