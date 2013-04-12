@@ -39,6 +39,7 @@ set(tests
   transport_stress.cc
   server_fixture.cc
   speed.cc
+  surface_properties.cc
   )
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
