@@ -36,8 +36,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Subscriber.hh"
 
-#include "gazebo/common/LogPlay.hh"
-#include "gazebo/common/LogRecord.hh"
+#include "gazebo/util/LogPlay.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Events.hh"
@@ -46,6 +45,7 @@
 #include "gazebo/common/Plugin.hh"
 
 #include "gazebo/util/Diagnostics.hh"
+#include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/physics/Road.hh"
 #include "gazebo/physics/RayShape.hh"
@@ -182,10 +182,6 @@ void World::Load(sdf::ElementPtr _sdf)
   this->controlSub = this->node->Subscribe("~/world_control",
                                            &World::OnControl, this);
 
-  this->logControlSub = this->node->Subscribe("~/log/control",
-                                              &World::OnLogControl, this);
-  this->logStatusPub = this->node->Advertise<msgs::LogStatus>("~/log/status");
-
   this->requestSub = this->node->Subscribe("~/request",
                                            &World::OnRequest, this, true);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
@@ -289,7 +285,7 @@ void World::Init()
   this->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
-  common::LogRecord::Instance()->Add(this->GetName(), "state.log",
+  util::LogRecord::Instance()->Add(this->GetName(), "state.log",
       boost::bind(&World::OnLog, this, _1));
 
   this->prevStates[0].SetWorld(shared_from_this());
@@ -314,14 +310,23 @@ void World::Init()
 void World::Run()
 {
   this->stop = false;
-  this->thread = new boost::thread(
-      boost::bind(&World::RunLoop, this));
+
+  this->thread = new boost::thread(boost::bind(&World::RunLoop, this));
 }
 
 //////////////////////////////////////////////////
 void World::Stop()
 {
   this->stop = true;
+
+  if (this->logThread)
+  {
+    this->logCondition.notify_all();
+    this->logThread->join();
+    delete this->logThread;
+    this->logThread = NULL;
+  }
+
   if (this->thread)
   {
     this->thread->join();
@@ -343,11 +348,13 @@ void World::RunLoop()
 
   this->prevStepWallTime = common::Time::GetWallTime();
 
+  this->logThread = new boost::thread(boost::bind(&World::LogWorker, this));
+
   // Get the first state
   this->prevStates[0] = WorldState(shared_from_this());
   this->stateToggle = 0;
 
-  if (!common::LogPlay::Instance()->IsOpen())
+  if (!util::LogPlay::Instance()->IsOpen())
   {
     while (!this->stop)
       this->Step();
@@ -366,7 +373,7 @@ void World::LogStep()
   if (!this->IsPaused() || this->stepInc > 0)
   {
     std::string data;
-    if (!common::LogPlay::Instance()->Step(data))
+    if (!util::LogPlay::Instance()->Step(data))
     {
       this->SetPaused(true);
     }
@@ -542,8 +549,8 @@ void World::Update()
       this->ResetEntities(Base::MODEL);
     this->needsReset = false;
   }
-
   DIAG_TIMER_LAP("World::Update", "needsReset");
+
 
   event::Events::worldUpdateStart();
   this->updateInfo.simTime = this->GetSimTime();
@@ -561,6 +568,10 @@ void World::Update()
   this->physicsEngine->UpdateCollision();
 
   DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
+
+  // Wait for logging to finish, if it's running.
+  if (util::LogRecord::Instance()->GetRunning())
+    boost::mutex::scoped_lock lock(this->logMutex);
 
   // Update the physics engine
   if (this->enablePhysicsEngine && this->physicsEngine)
@@ -584,33 +595,15 @@ void World::Update()
     DIAG_TIMER_LAP("World::Update", "SetWorldPose(dirtyPoses)");
   }
 
+  // Only update state information if logging data.
+  if (util::LogRecord::Instance()->GetRunning())
+    this->logCondition.notify_one();
+  DIAG_TIMER_LAP("World::Update", "LogRecordNotify");
+
   // Output the contact information
   this->physicsEngine->GetContactManager()->PublishContacts();
 
   DIAG_TIMER_LAP("World::Update", "ContactManager::PublishContacts");
-
-  // Only update state informatin if logging data.
-  if (common::LogRecord::Instance()->GetRunning())
-  {
-    int currState = (this->stateToggle + 1) % 2;
-    this->prevStates[currState] = WorldState(shared_from_this());
-
-    WorldState diffState = this->prevStates[currState] -
-      this->prevStates[this->stateToggle];
-
-    if (!diffState.IsZero())
-    {
-      this->stateToggle = currState;
-      this->states.push_back(diffState);
-      if (this->states.size() > 1000)
-        this->states.pop_front();
-
-      /// Publish a log status message if the logger is running.
-      this->PublishLogStatus();
-    }
-  }
-
-  DIAG_TIMER_LAP("World::Update", "LogRecord");
 
   event::Events::worldUpdateEnd();
 
@@ -1006,38 +999,6 @@ void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   this->factoryMsgs.push_back(*_msg);
-}
-
-//////////////////////////////////////////////////
-void World::OnLogControl(ConstLogControlPtr &_data)
-{
-  if (_data->has_base_path() && !_data->base_path().empty())
-    common::LogRecord::Instance()->SetBasePath(_data->base_path());
-
-  if (_data->has_start() && _data->start())
-  {
-    if (common::LogRecord::Instance()->GetPaused())
-    {
-      common::LogRecord::Instance()->Start("bz2");
-    }
-    else
-    {
-      common::LogRecord::Instance()->Start("bz2");
-      common::LogRecord::Instance()->Add(this->GetName(), "state.log",
-          boost::bind(&World::OnLog, this, _1));
-    }
-  }
-  else if (_data->has_stop() && _data->stop())
-  {
-    common::LogRecord::Instance()->Stop();
-  }
-  else if (_data->has_paused())
-  {
-    common::LogRecord::Instance()->SetPaused(_data->paused());
-  }
-
-  // Output the new log status
-  this->PublishLogStatus();
 }
 
 //////////////////////////////////////////////////
@@ -1612,14 +1573,15 @@ void World::SetState(const WorldState &_state)
 {
   this->SetSimTime(_state.GetSimTime());
 
-  for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
+  const ModelState_M modelStates = _state.GetModelStates();
+  for (ModelState_M::const_iterator iter = modelStates.begin();
+       iter != modelStates.end(); ++iter)
   {
-    ModelState modelState = _state.GetModelState(i);
-    ModelPtr model = this->GetModel(modelState.GetName());
+    ModelPtr model = this->GetModel(iter->second.GetName());
     if (model)
-      model->SetState(modelState);
+      model->SetState(iter->second);
     else
-      gzerr << "Unable to find model[" << modelState.GetName() << "]\n";
+      gzerr << "Unable to find model[" << iter->second.GetName() << "]\n";
   }
 }
 
@@ -1687,7 +1649,7 @@ void World::UpdateStateSDF()
 bool World::OnLog(std::ostringstream &_stream)
 {
   // Save the entire state when its the first call to OnLog.
-  if (common::LogRecord::Instance()->GetFirstUpdate())
+  if (util::LogRecord::Instance()->GetFirstUpdate())
   {
     this->UpdateStateSDF();
     _stream << "<sdf version ='";
@@ -1698,11 +1660,17 @@ bool World::OnLog(std::ostringstream &_stream)
   }
   else if (this->states.size() >= 1)
   {
-    // Get the difference from the previous state.
+    size_t end = this->states.size();
     _stream << "<sdf version='" << SDF_VERSION << "'>";
-    _stream << this->states[0];
+
+    // Get the difference from the previous state.
+    for (size_t i = 0; i < end; ++i)
+    {
+      _stream << this->states[0];
+      this->states.pop_front();
+    }
+
     _stream << "</sdf>";
-    this->states.pop_front();
   }
 
   return true;
@@ -1783,46 +1751,25 @@ void World::PublishModelPose(physics::ModelPtr _model)
 }
 
 //////////////////////////////////////////////////
-void World::PublishLogStatus()
+void World::LogWorker()
 {
-  msgs::LogStatus msg;
-  unsigned int size = 0;
+  boost::mutex::scoped_lock lock(this->logMutex);
 
-  // Set the time of the status message
-  msgs::Set(msg.mutable_sim_time(),
-            common::LogRecord::Instance()->GetRunTime());
-
-  // Set the log recording base path name
-  msg.mutable_log_file()->set_base_path(
-      common::LogRecord::Instance()->GetBasePath());
-
-  // Get the full name of the log file
-  msg.mutable_log_file()->set_full_path(
-    common::LogRecord::Instance()->GetFilename(this->GetName()));
-
-  // Set the URI of th log file
-  msg.mutable_log_file()->set_uri(transport::Connection::GetLocalHostname());
-
-  // Get the size of the log file
-  size = common::LogRecord::Instance()->GetFileSize(this->GetName());
-
-  if (size < 1000)
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::BYTES);
-  else if (size < 1e6)
+  WorldPtr self = shared_from_this();
+  while (!this->stop)
   {
-    msg.mutable_log_file()->set_size(size / 1.0e3);
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::K_BYTES);
-  }
-  else if (size < 1e9)
-  {
-    msg.mutable_log_file()->set_size(size / 1.0e6);
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::M_BYTES);
-  }
-  else
-  {
-    msg.mutable_log_file()->set_size(size / 1.0e9);
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::G_BYTES);
-  }
+    int currState = (this->stateToggle + 1) % 2;
+    this->prevStates[currState].Load(self);
+    WorldState diffState = this->prevStates[currState] -
+      this->prevStates[this->stateToggle];
 
-  this->logStatusPub->Publish(msg);
+    if (!diffState.IsZero())
+    {
+      this->stateToggle = currState;
+      this->states.push_back(diffState);
+      if (this->states.size() > 1000)
+        util::LogRecord::Instance()->Notify();
+    }
+    this->logCondition.wait(lock);
+  }
 }

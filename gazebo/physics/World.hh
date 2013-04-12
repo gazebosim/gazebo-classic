@@ -27,6 +27,7 @@
 #include <set>
 #include <deque>
 #include <string>
+#include <boost/thread.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -42,13 +43,6 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
 #include "gazebo/sdf/sdf.hh"
-
-namespace boost
-{
-  class thread;
-  class mutex;
-  class recursive_mutex;
-}
 
 namespace gazebo
 {
@@ -374,10 +368,6 @@ namespace gazebo
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
 
-      /// \brief Called when a log control message is received.
-      /// \param[in] _data The log control message.
-      private: void OnLogControl(ConstLogControlPtr &_data);
-
       /// \brief Called when a request message is received.
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
@@ -444,8 +434,8 @@ namespace gazebo
       /// \brief Publish the world stats message.
       private: void PublishWorldStats();
 
-      /// \brief Publish log status message.
-      private: void PublishLogStatus();
+      /// \brief Thread function for logging state data.
+      private: void LogWorker();
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
@@ -518,12 +508,6 @@ namespace gazebo
 
       /// \brief Subscriber to world control messages.
       private: transport::SubscriberPtr controlSub;
-
-      /// \brief Subscriber to log control messages.
-      private: transport::SubscriberPtr logControlSub;
-
-      /// \brief Publisher of log status messages.
-      private: transport::PublisherPtr logStatusPub;
 
       /// \brief Subscriber to factory messages.
       private: transport::SubscriberPtr factorySub;
@@ -657,6 +641,15 @@ namespace gazebo
 
       /// \brief The number of simulation iterations.
       private: uint64_t iterations;
+
+      /// \brief Condition used for log worker
+      private: boost::condition_variable logCondition;
+
+      /// \brief Mutex to protect the log worker thread
+      private: boost::mutex logMutex;
+
+      /// \brief Worker thread for logging.
+      private: boost::thread *logThread;
     };
     /// \}
   }

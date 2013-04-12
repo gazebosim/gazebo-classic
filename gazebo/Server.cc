@@ -22,8 +22,8 @@
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
 
-#include "gazebo/common/LogRecord.hh"
-#include "gazebo/common/LogPlay.hh"
+#include "gazebo/util/LogRecord.hh"
+#include "gazebo/util/LogPlay.hh"
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
@@ -178,19 +178,19 @@ bool Server::ParseArgs(int argc, char **argv)
   if (this->vm.count("play"))
   {
     // Load the log file
-    common::LogPlay::Instance()->Open(this->vm["play"].as<std::string>());
+    util::LogPlay::Instance()->Open(this->vm["play"].as<std::string>());
 
     gzmsg << "\nLog playback:\n"
       << "  Log Version: "
-      << common::LogPlay::Instance()->GetLogVersion() << "\n"
+      << util::LogPlay::Instance()->GetLogVersion() << "\n"
       << "  Gazebo Version: "
-      << common::LogPlay::Instance()->GetGazeboVersion() << "\n"
+      << util::LogPlay::Instance()->GetGazeboVersion() << "\n"
       << "  Random Seed: "
-      << common::LogPlay::Instance()->GetRandSeed() << "\n";
+      << util::LogPlay::Instance()->GetRandSeed() << "\n";
 
     // Get the SDF world description from the log file
     std::string sdfString;
-    common::LogPlay::Instance()->Step(sdfString);
+    util::LogPlay::Instance()->Step(sdfString);
 
     // Load the server
     if (!this->LoadString(sdfString))
@@ -461,7 +461,7 @@ void Server::ProcessParams()
     }
     else if (iter->first == "record")
     {
-      common::LogRecord::Instance()->Start(iter->second);
+      util::LogRecord::Instance()->Start(iter->second);
     }
   }
 }
