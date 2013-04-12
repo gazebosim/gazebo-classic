@@ -50,6 +50,19 @@ namespace gazebo
                 return *this;
               }
 
+      /// \brief Operator +
+      /// \param[in] _wrench Joint wrench to add
+      /// \return *this
+      public: JointWrench &operator +(const JointWrench &_wrench)
+              {
+                this->body1Force += _wrench.body1Force;
+                this->body2Force += _wrench.body2Force;
+
+                this->body1Torque += _wrench.body1Torque;
+                this->body2Torque += _wrench.body2Torque;
+                return *this;
+              }
+
       /// \brief Force on the first link.
       public: math::Vector3 body1Force;
 

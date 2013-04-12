@@ -911,6 +911,31 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
     wrench.body1Force.Set(fb->f2[0], fb->f2[1], fb->f2[2]);
     wrench.body1Torque.Set(fb->t2[0], fb->t2[1], fb->t2[2]);
 
+    // get force applied through SetForce
+    physics::JointWrench wrenchAppliedWorld;
+    if (this->HasType(physics::Base::HINGE_JOINT))
+    {
+      // rotate force into child link frame
+      wrenchAppliedWorld.body2Torque =
+        this->GetForce(0u) * this->GetGlobalAxis(0u);
+      wrenchAppliedWorld.body1Torque = -wrenchAppliedWorld.body2Torque;
+    }
+    else if (this->HasType(physics::Base::SLIDER_JOINT))
+    {
+      // rotate force into child link frame
+      this->GetGlobalAxis(0u);
+      wrenchAppliedWorld.body2Force =
+        this->GetForce(0u) * this->GetGlobalAxis(0u);
+      wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
+    }
+    else
+    {
+      /// \TODO: fix for multi-axis joints
+      gzerr << "force torque for joint type [" << this->GetType()
+            << "] not implemented, returns false results!!\n";
+    }
+
+    // rotate force into parent link frame
     if (this->childLink)
     {
       math::Pose childPose = this->childLink->GetWorldPose();
@@ -1001,6 +1026,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
         wrench.body1Torque = -wrench.body2Torque;
       }
     }
+    wrench = wrench + wrenchAppliedWorld;
   }
   else
   {
