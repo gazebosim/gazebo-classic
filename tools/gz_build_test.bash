@@ -20,7 +20,10 @@ rm -rf /tmp/gazebo_build
 mkdir /tmp/gazebo_build
 
 # Clone
-hg clone https://bitbucket.org/osrf/gazebo /tmp/gazebo_build/source
+#hg clone https://bitbucket.org/osrf/gazebo /tmp/gazebo_build/source
+cd /home/scpeters/osrf/gazebo_pristine
+hg pull
+hg clone /home/scpeters/osrf/gazebo_pristine /tmp/gazebo_build/source
 
 start_time=`eval date +%s`
 
@@ -32,6 +35,7 @@ for branch in $branches
 do
   # Get the correct branch
   cd /tmp/gazebo_build/source
+  echo hg up $branch
   hg up $branch
 
   # Build
@@ -53,6 +57,9 @@ do
     # make test with verbose output
     make test ARGS="-VV" &> $logfileRaw
     grep '^ *[0-9]*/[0-9]* .*\*\*\*' $logfileRaw >> $logfile
+    echo make test try $i of 100, \
+      `grep '^ *[0-9]*/[0-9]* .*\*\*\*' $logfileRaw | wc -l` \
+      tests failed
 
     # for each failed test
     for f in `grep '^ *[0-9]*/[0-9]* .*\*\*\*' $logfileRaw | \
