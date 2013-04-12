@@ -74,7 +74,7 @@ void TopicManager::Fini()
 {
   // These two lines make sure that pending messages get sent out
   this->ProcessNodes(true);
-  ConnectionManager::Instance()->RunUpdate();
+  // ConnectionManager::Instance()->RunUpdate();
 
   PublicationPtr_M::iterator iter;
   for (iter = this->advertisedTopics.begin();
@@ -136,7 +136,6 @@ void TopicManager::RemoveNode(unsigned int _id)
 //////////////////////////////////////////////////
 void TopicManager::ProcessNodes(bool _onlyOut)
 {
-  std::vector<NodePtr>::iterator iter;
   int s;
 
   {

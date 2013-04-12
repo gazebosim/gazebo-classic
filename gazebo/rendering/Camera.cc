@@ -394,7 +394,9 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
+    // Render, but don't swap buffers.
     this->renderTarget->update(false);
+
     this->lastRenderWallTime = common::Time::GetWallTime();
   }
 }
@@ -1247,7 +1249,6 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
       this->dlMergeInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
             "DeferredLighting/ShowLit");
-
 
       // Screen space ambient occlusion
       // this->ssaoInstance =

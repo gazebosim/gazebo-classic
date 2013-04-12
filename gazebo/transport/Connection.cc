@@ -29,6 +29,7 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/IOManager.hh"
+#include "gazebo/transport/ConnectionManager.hh"
 #include "gazebo/transport/Connection.hh"
 
 using namespace gazebo;
@@ -268,6 +269,11 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
   if (_force)
   {
     this->ProcessWriteQueue();
+  }
+  else
+  {
+    // Tell the connection manager that it needs to update
+    ConnectionManager::Instance()->TriggerUpdate();
   }
 }
 

@@ -115,7 +115,7 @@ TEST_F(SensorManager_TEST, InitRemove)
       ++i;
     }
 
-    EXPECT_LT(i, 20);
+    EXPECT_LT(i, 100);
   }
 
   // Make sure the proper number of sensors have been removed

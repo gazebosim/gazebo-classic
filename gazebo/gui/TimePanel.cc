@@ -147,15 +147,15 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   if (this->realTimes.size() > 20)
     this->realTimes.pop_front();
 
-  if (_msg->paused() && (g_pauseAct && !g_pauseAct->isChecked()))
+  if (_msg->paused() && (g_playAct && !g_playAct->isVisible()))
   {
-    g_pauseAct->setChecked(true);
-    g_playAct->setChecked(false);
+    g_playAct->setVisible(true);
+    g_pauseAct->setVisible(false);
   }
-  else if (!_msg->paused() && (g_playAct && !g_playAct->isChecked()))
+  else if (!_msg->paused() && (g_pauseAct && !g_pauseAct->isVisible()))
   {
-    g_pauseAct->setChecked(false);
-    g_playAct->setChecked(true);
+    g_pauseAct->setVisible(true);
+    g_playAct->setVisible(false);
   }
 
   unsigned int day, hour, min, sec, msec;
