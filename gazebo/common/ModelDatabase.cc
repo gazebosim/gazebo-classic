@@ -390,7 +390,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       suffix = _uri.substr(endIndex, std::string::npos);
 
     // Store downloaded .tar.gz and intermediate .tar files in temp location
-    boost::filesystem::path tmppath = boost::filesystem::path("/tmp");
+    boost::filesystem::path tmppath = boost::filesystem::temp_directory_path();
     tmppath /= boost::filesystem::unique_path("gz_model-%%%%-%%%%-%%%%-%%%%");
     std::string tarfilename = tmppath.string() + ".tar";
     std::string tgzfilename = tarfilename + ".gz";
