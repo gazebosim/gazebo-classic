@@ -86,35 +86,79 @@ void PhysicsTest::CollideWithoutContact(const std::string &_physicsEngine)
   // Expect collideBox to still be falling
   EXPECT_LT(collideBox->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
 
-  // Step forward until we get a contacts message from the contact sensor
-  msgs::Contacts contacts;
-  while (contacts.contact_size() == 0 && --steps > 0)
   {
-    world->StepWorld(1);
-    contacts = contactSensor->GetContacts();
+    // Step forward until we get a contacts message from the contact sensor
+    msgs::Contacts contacts;
+    while (contacts.contact_size() == 0 && --steps > 0)
+    {
+      world->StepWorld(1);
+      contacts = contactSensor->GetContacts();
+    }
+
+    // Verify that both objects are recognized by contact sensor
+    int i;
+    msgs::Contact contact;
+    bool collideBoxHit = false;
+    bool contactBoxHit = false;
+    for (i = 0; i < contacts.contact_size(); ++i)
+    {
+      contact = contacts.contact(i);
+      if (contact.collision1() == "contact_box::link::collision" ||
+          contact.collision2() == "contact_box::link::collision")
+      {
+        contactBoxHit = true;
+      }
+      if (contact.collision1() == "collide_box::link::collision" ||
+          contact.collision2() == "collide_box::link::collision")
+      {
+        collideBoxHit = true;
+      }
+    }
+    EXPECT_TRUE(contactBoxHit);
+    EXPECT_TRUE(collideBoxHit);
   }
 
-  // Verify that both objects are recognized by contact sensor
-  int i;
-  msgs::Contact contact;
-  bool collideBoxHit = false;
-  bool contactBoxHit = false;
-  for (i = 0; i < contacts.contact_size(); ++i)
+  // Step forward another 0.4 s
+  // The collideBox should have fallen through the ground and not
+  // be in contact with the sensor
+  world->StepWorld(steps*2);
+  fallVelocity = g.z * 4*stepTime;
+  // Expect contactBox to still be resting on contact sensor box
+  EXPECT_NEAR(contactBox->GetWorldLinearVel().z, 0.0, g_physics_tol);
+  // Expect collideBox to still be falling
+  EXPECT_LT(collideBox->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+
   {
-    contact = contacts.contact(i);
-    if (contact.collision1() == "contact_box::link::collision" ||
-        contact.collision2() == "contact_box::link::collision")
+    // Step forward until we get a contacts message from the contact sensor
+    msgs::Contacts contacts;
+    while (contacts.contact_size() == 0 && --steps > 0)
     {
-      contactBoxHit = true;
+      world->StepWorld(1);
+      contacts = contactSensor->GetContacts();
     }
-    if (contact.collision1() == "collide_box::link::collision" ||
-        contact.collision2() == "collide_box::link::collision")
+
+    // Verify that only contactBox is recognized by contact sensor
+    int i;
+    msgs::Contact contact;
+    bool collideBoxHit = false;
+    bool contactBoxHit = false;
+    for (i = 0; i < contacts.contact_size(); ++i)
     {
-      collideBoxHit = true;
+      contact = contacts.contact(i);
+      if (contact.collision1() == "contact_box::link::collision" ||
+          contact.collision2() == "contact_box::link::collision")
+      {
+        contactBoxHit = true;
+      }
+      if (contact.collision1() == "collide_box::link::collision" ||
+          contact.collision2() == "collide_box::link::collision")
+      {
+        collideBoxHit = true;
+      }
     }
+    EXPECT_TRUE(contactBoxHit);
+    EXPECT_FALSE(collideBoxHit);
   }
-  EXPECT_TRUE(contactBoxHit);
-  EXPECT_TRUE(collideBoxHit);
 }
 
 TEST_F(PhysicsTest, CollideWithoutContactODE)

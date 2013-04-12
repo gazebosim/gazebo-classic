@@ -38,6 +38,7 @@
     </model>
     <model name='contact_box'>
       <pose>0.0 -1.0 1.5  0 0 0</pose>
+      <allow_auto_disable>false</allow_auto_disable>
       <link name='link'>
         <collision name='collision'>
           <geometry>
@@ -66,6 +67,7 @@
     </model>
     <model name='collide_box'>
       <pose>0.0 1.0 1.5  0 0 0</pose>
+      <allow_auto_disable>false</allow_auto_disable>
       <link name='link'>
         <collision name='collision'>
           <geometry>
@@ -94,7 +96,7 @@
     </model>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>6.5 -1.0 2.0  0.0 0.0 -3.14159</pose>
+        <pose>6.5 0.0 1.5  0.0 0.0 -3.14159</pose>
         <view_controller>orbit</view_controller>
       </camera>
     </gui>
