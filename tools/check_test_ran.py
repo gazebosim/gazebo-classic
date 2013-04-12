@@ -74,8 +74,7 @@ def check_main():
     <failure message="Unable to find test results for %(test)s, test did not run.\nExpected results in %(test_file)s" type=""/>
   </testcase>
 </testsuite>"""%d)
+        sys.exit(getattr(os, 'EX_USAGE', 1))
 
 if __name__ == '__main__':
     check_main()
-
-
