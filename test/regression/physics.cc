@@ -1527,7 +1527,10 @@ TEST_F(PhysicsTest, CollisionFilteringBullet)
 #endif  // HAVE_BULLET
 
 /////////////////////////////////////////////////
-TEST_F(PhysicsTest, ZeroMaxContacts)
+// This test verifies that gazebo doesn't crash when collisions occur
+// and the <world><physics><ode><max_contacts> value is zero.
+// The crash was reported in issue #593 on bitbucket
+TEST_F(PhysicsTest, ZeroMaxContactsODE)
 {
   // Load an empty world
   Load("worlds/zero_max_contacts.world");
