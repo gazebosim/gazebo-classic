@@ -25,6 +25,10 @@ class PR2Test : public ServerFixture
 
 TEST_F(PR2Test, Load)
 {
+  // Cleanup test directory.
+  boost::filesystem::remove_all("/tmp/gazebo_test");
+  boost::filesystem::create_directories("/tmp/gazebo_test");
+
   Load("worlds/empty.world");
   SpawnModel("model://pr2");
 
@@ -46,7 +50,7 @@ TEST_F(PR2Test, Load)
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor);
 
-  while (!camSensor->SaveFrame("/tmp/frame_10.jpg"))
+  while (!camSensor->SaveFrame("/tmp/gazebo_test/frame_10.jpg"))
     common::Time::MSleep(100);
 
   physics::get_world("default")->GetPhysicsEngine()->SetGravity(
@@ -54,10 +58,13 @@ TEST_F(PR2Test, Load)
   for (int i = 11; i < 200; i++)
   {
     std::ostringstream filename;
-    filename << "/tmp/frame_" << i << ".jpg";
+    filename << "/tmp/gazebo_test/frame_" << i << ".jpg";
     camSensor->SaveFrame(filename.str());
     common::Time::MSleep(100);
   }
+
+  // Cleanup test directory.
+  boost::filesystem::remove_all("/tmp/gazebo_test");
 }
 
 ////////////////////////////////////////////////////////////////////////

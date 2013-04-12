@@ -38,6 +38,7 @@ class TopicManagerProcessTask : public tbb::task
 
 //////////////////////////////////////////////////
 ConnectionManager::ConnectionManager()
+  // : updateSem(0)
 {
   this->tmpIndex = 0;
   this->initialized = false;
@@ -45,9 +46,6 @@ ConnectionManager::ConnectionManager()
   this->stopped = true;
 
   this->serverConn = NULL;
-  this->listMutex = new boost::recursive_mutex();
-  this->masterMessagesMutex = new boost::recursive_mutex();
-  this->connectionMutex = new boost::recursive_mutex();
 
   this->eventConnections.push_back(
       event::Events::ConnectStop(boost::bind(&ConnectionManager::Stop, this)));
@@ -57,15 +55,6 @@ ConnectionManager::ConnectionManager()
 ConnectionManager::~ConnectionManager()
 {
   this->eventConnections.clear();
-
-  delete this->listMutex;
-  this->listMutex = NULL;
-
-  delete this->masterMessagesMutex;
-  this->masterMessagesMutex = NULL;
-
-  delete this->connectionMutex;
-  this->connectionMutex = NULL;
 
   delete this->serverConn;
   this->serverConn = NULL;
@@ -150,7 +139,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     msgs::Publishers pubs;
     pubs.ParseFromString(packet.serialized_data());
 
-    boost::recursive_mutex::scoped_lock lock(*this->listMutex);
+    boost::recursive_mutex::scoped_lock lock(this->listMutex);
     for (int i = 0; i < pubs.publisher_size(); i++)
     {
       const msgs::Publish &p = pubs.publisher(i);
@@ -180,24 +169,35 @@ void ConnectionManager::Fini()
 
   this->Stop();
 
-  this->masterConn->ProcessWriteQueue();
-  this->masterConn->Shutdown();
-  this->masterConn.reset();
+  if (this->masterConn)
+  {
+    this->masterConn->ProcessWriteQueue();
+    this->masterConn->Shutdown();
+    this->masterConn.reset();
+  }
 
-  this->serverConn->ProcessWriteQueue();
-  this->serverConn->Shutdown();
-  delete this->serverConn;
-  this->serverConn = NULL;
+  if (this->serverConn)
+  {
+    this->serverConn->ProcessWriteQueue();
+    this->serverConn->Shutdown();
+    delete this->serverConn;
+    this->serverConn = NULL;
+  }
 
+  this->eventConnections.clear();
   this->connections.clear();
+  this->publishers.clear();
+  this->namespaces.clear();
+  this->masterMessages.clear();
+
   this->initialized = false;
 }
-
 
 //////////////////////////////////////////////////
 void ConnectionManager::Stop()
 {
   this->stop = true;
+  this->updateCondition.notify_all();
   if (this->initialized)
     while (this->stopped == false)
       common::Time::MSleep(100);
@@ -211,7 +211,7 @@ void ConnectionManager::RunUpdate()
   unsigned int msize = 0;
 
   {
-    boost::recursive_mutex::scoped_lock lock(*this->masterMessagesMutex);
+    boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
     msize = this->masterMessages.size();
   }
 
@@ -220,23 +220,24 @@ void ConnectionManager::RunUpdate()
     this->ProcessMessage(this->masterMessages.front());
 
     {
-      boost::recursive_mutex::scoped_lock lock(*this->masterMessagesMutex);
+      boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
       this->masterMessages.pop_front();
       msize = this->masterMessages.size();
     }
   }
 
-  this->masterConn->ProcessWriteQueue();
+  if (this->masterConn)
+    this->masterConn->ProcessWriteQueue();
 
-
-  // Use TBB to process nodes.
-  TopicManagerProcessTask *task = new(tbb::task::allocate_root())
-    TopicManagerProcessTask();
-  tbb::task::enqueue(*task);
-  // TopicManager::Instance()->ProcessNodes();
+  // Use TBB to process nodes. Need more testing to see if this makes
+  // a difference.
+  // TopicManagerProcessTask *task = new(tbb::task::allocate_root())
+  //   TopicManagerProcessTask();
+  // tbb::task::enqueue(*task);
+  TopicManager::Instance()->ProcessNodes();
 
   {
-    boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);
+    boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
     iter = this->connections.begin();
     endIter = this->connections.end();
   }
@@ -250,7 +251,7 @@ void ConnectionManager::RunUpdate()
     }
     else
     {
-      boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);
+      boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
       iter = this->connections.erase(iter);
     }
   }
@@ -259,11 +260,15 @@ void ConnectionManager::RunUpdate()
 //////////////////////////////////////////////////
 void ConnectionManager::Run()
 {
+  boost::mutex::scoped_lock lock(this->updateMutex);
+
   this->stopped = false;
+
   while (!this->stop)
   {
     this->RunUpdate();
-    common::Time::NSleep(10000);
+    this->updateCondition.timed_wait(lock,
+       boost::posix_time::milliseconds(100));
   }
   this->RunUpdate();
 
@@ -287,11 +292,14 @@ void ConnectionManager::OnMasterRead(const std::string &_data)
 
   if (!_data.empty())
   {
-    boost::recursive_mutex::scoped_lock lock(*this->masterMessagesMutex);
+    boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
     this->masterMessages.push_back(std::string(_data));
   }
   else
     gzerr << "ConnectionManager::OnMasterRead empty data\n";
+
+  // Tell the ourself that we need an update
+  this->TriggerUpdate();
 }
 
 /////////////////////////////////////////////////
@@ -379,7 +387,7 @@ void ConnectionManager::OnAccept(const ConnectionPtr &newConnection)
       boost::bind(&ConnectionManager::OnRead, this, newConnection, _1));
 
   // Add the connection to the list of connections
-  boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);
+  boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
   this->connections.push_back(newConnection);
 }
 
@@ -468,7 +476,7 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &_publishers)
   _publishers.clear();
   std::list<msgs::Publish>::iterator iter;
 
-  boost::recursive_mutex::scoped_lock lock(*this->listMutex);
+  boost::recursive_mutex::scoped_lock lock(this->listMutex);
   for (iter = this->publishers.begin(); iter != this->publishers.end(); ++iter)
     _publishers.push_back(*iter);
 }
@@ -570,7 +578,7 @@ ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &host,
     conn.reset(new Connection());
     if (conn->Connect(host, port))
     {
-      boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);
+      boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
       this->connections.push_back(conn);
     }
     else
@@ -590,7 +598,7 @@ void ConnectionManager::RemoveConnection(ConnectionPtr &_conn)
 {
   std::list<ConnectionPtr>::iterator iter;
 
-  boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);
+  boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
   iter = this->connections.begin();
   while (iter != this->connections.end())
   {
@@ -611,7 +619,7 @@ ConnectionPtr ConnectionManager::FindConnection(const std::string &_host,
 
   std::list<ConnectionPtr>::iterator iter;
 
-  boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);
+  boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
 
   // Check to see if we are already connected to the remote publisher
   for (iter = this->connections.begin();
@@ -623,4 +631,10 @@ ConnectionPtr ConnectionManager::FindConnection(const std::string &_host,
   }
 
   return conn;
+}
+
+//////////////////////////////////////////////////
+void ConnectionManager::TriggerUpdate()
+{
+  this->updateCondition.notify_all();
 }

@@ -28,7 +28,11 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 SurfaceParams::SurfaceParams()
-  : collideWithoutContact(false)
+  : bounce(0), bounceThreshold(100000),
+    kp(1000000000000), kd(1), cfm(0), erp(0.2),
+    maxVel(0.01), minDepth(0),
+    mu1(1), mu2(1), slip1(0), slip2(0),
+    collideWithoutContact(false)
 {
 }
 
