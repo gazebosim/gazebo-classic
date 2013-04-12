@@ -62,8 +62,8 @@ do
       echo Try $i of 100, failed test $f >> $logfileVerbose
       # then send the raw output of both the test and its companion test_ran
       # to the logfile for perusal
-      grep '^ *'`echo "($f/2)*2+1" | bc`':' $logfileRaw >> $logfileVerbose
-      grep '^ *'`echo "($f/2)*2+2" | bc`':' $logfileRaw >> $logfileVerbose
+      grep '^ *'`echo "(($f-1)/2)*2+1" | bc`':' $logfileRaw >> $logfileVerbose
+      grep '^ *'`echo "(($f-1)/2)*2+2" | bc`':' $logfileRaw >> $logfileVerbose
     done
   done
 
