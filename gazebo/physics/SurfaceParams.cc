@@ -20,6 +20,7 @@
  */
 
 #include <float.h>
+#include "gazebo/common/Assert.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;
@@ -27,6 +28,11 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 SurfaceParams::SurfaceParams()
+  : bounce(0), bounceThreshold(100000),
+    kp(1000000000000), kd(1), cfm(0), erp(0.2),
+    maxVel(0.01), minDepth(0),
+    mu1(1), mu2(1), slip1(0), slip2(0),
+    collideWithoutContact(false)
 {
 }
 
@@ -38,16 +44,20 @@ SurfaceParams::~SurfaceParams()
 //////////////////////////////////////////////////
 void SurfaceParams::Load(sdf::ElementPtr _sdf)
 {
+  GZ_ASSERT(_sdf, "Surface _sdf is NULL");
   {
     sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
+    GZ_ASSERT(bounceElem, "Surface sdf member is NULL");
     this->bounce = bounceElem->Get<double>("restitution_coefficient");
     this->bounceThreshold = bounceElem->Get<double>("threshold");
   }
 
   {
     sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
+    GZ_ASSERT(frictionElem, "Surface sdf member is NULL");
     {
       sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
+      GZ_ASSERT(frictionOdeElem, "Surface sdf member is NULL");
       this->mu1 = frictionOdeElem->Get<double>("mu");
       this->mu2 = frictionOdeElem->Get<double>("mu2");
 
@@ -64,8 +74,12 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
 
   {
     sdf::ElementPtr contactElem = _sdf->GetElement("contact");
+    GZ_ASSERT(contactElem, "Surface sdf member is NULL");
     {
+      this->collideWithoutContact =
+        contactElem->Get<bool>("collide_without_contact");
       sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
+      GZ_ASSERT(contactOdeElem, "Surface sdf member is NULL");
       this->kp = contactOdeElem->Get<double>("kp");
       this->kd = contactOdeElem->Get<double>("kd");
       this->cfm = contactOdeElem->Get<double>("soft_cfm");
@@ -94,6 +108,7 @@ void SurfaceParams::FillMsg(msgs::Surface &_msg)
   _msg.set_kd(this->kd);
   _msg.set_max_vel(this->maxVel);
   _msg.set_min_depth(this->minDepth);
+  _msg.set_collide_without_contact(this->collideWithoutContact);
 }
 
 
@@ -134,6 +149,8 @@ void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
     this->maxVel = _msg.max_vel();
   if (_msg.has_min_depth())
     this->minDepth = _msg.min_depth();
+  if (_msg.has_collide_without_contact())
+    this->collideWithoutContact = _msg.collide_without_contact();
 }
 
 

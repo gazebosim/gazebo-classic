@@ -956,8 +956,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       jointFeedback->count++;
     }
 
-    // Attach the contact joint.
-    dJointAttach(contactJoint, b1, b2);
+    // Attach the contact joint if collideWithoutContact flags aren't set.
+    if (!_collision1->GetSurface()->collideWithoutContact &&
+        !_collision2->GetSurface()->collideWithoutContact)
+      dJointAttach(contactJoint, b1, b2);
   }
 }
 
