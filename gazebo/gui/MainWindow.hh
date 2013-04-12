@@ -82,10 +82,7 @@ namespace gazebo
       private slots: void Save();
       private slots: void SaveAs();
       private slots: void About();
-      private slots: void Play();
-      private slots: void Pause();
       private slots: void Step();
-
       private slots: void NewModel();
       private slots: void Arrow();
       private slots: void Translate();

@@ -98,7 +98,7 @@ namespace gazebo
       public: float GetMinHeight() const;
 
       /// \brief Deprecated
-      public: int GetSubSampling() const GAZEBO_DEPRECATED;
+      public: int GetSubSampling() const GAZEBO_DEPRECATED(1.6);
 
       /// \brief Return an image representation of the heightmap.
       /// \return Image where white pixels represents the highest locations,
