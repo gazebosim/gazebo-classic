@@ -213,6 +213,12 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             t1[1] = contact.fdir1[1];
             t1[2] = contact.fdir1[2];
             dCalcVectorCross3( t2, normal, t1 );
+
+            // if fdir1 is parallel to normal, revert to dPlaneSpace
+            if (_dequal(t2[0], 0.0) &&
+                _dequal(t2[1], 0.0) &&
+                _dequal(t2[2], 0.0))
+              dPlaneSpace( normal, t1, t2 );
         }
         else
         {
