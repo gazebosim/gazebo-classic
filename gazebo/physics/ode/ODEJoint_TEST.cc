@@ -71,7 +71,6 @@ TEST_F(ODEJoint_TEST, GetForceTorqueWithAppliedForce)
   static const double kp2 = 10000.0;
   for (unsigned int i = 0; i < 3388; ++i)
   {
-
     // pd control
     double j1State = joint_01->GetAngle(0u).Radian();
     double j2State = joint_12->GetAngle(0u).Radian();
