@@ -173,6 +173,17 @@ uint32_t LogPlay::GetRandSeed() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
+  /*
+  if (this->logCurrXml == this->logStartXml)
+    this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+  else if (this->logCurrXml)
+    this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
+  else
+    return false;
+
+  return this->GetChunkData(this->logCurrXml, _data);
+  */
+
   std::string startMarker = "<state>";
   std::string endMarker = "</state>";
   size_t start = this->currentChunk.find(startMarker);
@@ -194,7 +205,12 @@ bool LogPlay::Step(std::string &_data)
     else
       return false;
 
-    this->currentChunk = this->GetChunkData(this->logCurrXml, _data);
+    if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+    {
+      gzerr << "Unable to decode log file\n";
+      return false;
+    }
+
     start = this->currentChunk.find(startMarker);
     end = this->currentChunk.find(endMarker);
 
@@ -205,6 +221,8 @@ bool LogPlay::Step(std::string &_data)
   _data = this->currentChunk.substr(start, end+endMarker.size());
 
   this->currentChunk.erase(start, end + endMarker.size());
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -258,6 +276,7 @@ bool LogPlay::GetChunkData(TiXmlElement *_xml, std::string &_data)
 
       // Get the data
       std::getline(in, _data, '\0');
+      _data += '\0';
     }
   }
   else
