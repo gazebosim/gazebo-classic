@@ -34,13 +34,27 @@ namespace gazebo
     private: void OnUpdate();
 
     private: transport::NodePtr node;
+
+    /// \brief Subscriber to contact sensor messages.
     private: transport::SubscriberPtr contactSub;
 
+    /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;
 
+    /// \brief Pointer to world.
     private: physics::WorldPtr world;
+
+    /// \brief Pointer to physics engine.
+    private: physics::PhysicsEnginePtr physics;
+
+    /// \brief Pointer to model containing plugin.
     private: physics::ModelPtr model;
+
+    /// \brief Name of model containing plugin.
     private: std::string modelName;
+
+    /// \brief Pointer to canonical link in mud model. It is assumed that
+    ///        the canonical link has the contact sensor.
     private: physics::LinkPtr link;
 
     /// \brief Name of contact sensor relative to model, scoped with '/',
@@ -48,10 +62,6 @@ namespace gazebo
 
     /// \brief Flag that indicates whether mud is enabled or disabled.
     private: bool mudEnabled;
-
-    /// \brief Hysteresis parameter used for switching mudEnabled,
-    ///        defaults to 0.2.
-    private: double hysteresis;
 
     /// \brief Mutex to protect reads and writes.
     private: mutable boost::mutex mutex;
@@ -61,6 +71,14 @@ namespace gazebo
 
     /// \brief Flag to indicate new contact message.
     private: bool newMsg;
+
+    /// \brief Stiffness parameter, used in conjunction with damping
+    ///        to compute joint erp, cfm
+    private: double stiffness;
+
+    /// \brief Damping parameter, used in conjunction with stiffness
+    ///        to compute joint erp, cfm
+    private: double damping;
 
     /// \brief Dynamically created joint for simulating mud forces.
     private: physics::JointPtr joint;

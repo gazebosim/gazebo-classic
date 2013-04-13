@@ -26,7 +26,7 @@ GZ_REGISTER_MODEL_PLUGIN(MudPlugin)
 
 /////////////////////////////////////////////////
 MudPlugin::MudPlugin()
-  : mudEnabled(false), hysteresis(0.2), newMsg(false)
+  : mudEnabled(false), newMsg(false), stiffness(0.0), damping(100.0)
 {
 }
 
@@ -41,37 +41,45 @@ void MudPlugin::Load(physics::ModelPtr _model,
   this->world = this->model->GetWorld();
   GZ_ASSERT(this->world, "MudPlugin world pointer is NULL");
 
-  this->link = _model->GetLink("link");
+  this->physics = this->world->GetPhysicsEngine();
+  GZ_ASSERT(this->physics, "MudPlugin physics pointer is NULL");
+
+  this->link = _model->GetLink();
   GZ_ASSERT(this->link, "MudPlugin link pointer is NULL");
 
   GZ_ASSERT(_sdf, "MudPlugin _sdf pointer is NULL");
   if (_sdf->HasElement("contact_sensor_name"))
   {
     this->contactSensorName = _sdf->GetValueString("contact_sensor_name");
-
-    this->node = transport::NodePtr(new transport::Node());
-    this->node->Init(this->model->GetWorld()->GetName());
-
-    std::string topic = std::string("~/") + this->model->GetName() + "/" +
-      this->contactSensorName;
-    this->contactSub =
-      this->node->Subscribe(topic, &MudPlugin::OnContact, this);
   }
   else
   {
     gzerr << "contactSensorName not supplied, ignoring contacts\n";
   }
 
-  if (_sdf->HasElement("hysteresis"))
-    this->hysteresis = _sdf->GetValueDouble("hysteresis");
+  if (_sdf->HasElement("stiffness"))
+    this->stiffness = _sdf->GetValueDouble("stiffness");
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&MudPlugin::OnUpdate, this));
+  if (_sdf->HasElement("damping"))
+    this->damping = _sdf->GetValueDouble("damping");
 }
 
 /////////////////////////////////////////////////
 void MudPlugin::Init()
 {
+  this->node.reset(new transport::Node());
+  this->node->Init(this->world->GetName());
+
+  if (!this->contactSensorName.empty())
+  {
+    std::string topic = std::string("~/") + this->modelName + "/" +
+      this->contactSensorName;
+    this->contactSub =
+      this->node->Subscribe(topic, &MudPlugin::OnContact, this);
+  }
+
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+          boost::bind(&MudPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
@@ -105,8 +113,8 @@ void MudPlugin::OnUpdate()
       // If collision1() starts with this->modelName, then use collision2()
       std::string targetCollName =
         this->newestContactsMsg.contact(nc-1).collision1();
-      if (0 == this->modelName.compare(0, this->modelName.length(),
-               targetCollName))
+      if (0 == targetCollName.compare(0, this->modelName.length(),
+               this->modelName))
       {
         targetCollName = this->newestContactsMsg.contact(nc-1).collision2();
       }
@@ -142,7 +150,7 @@ void MudPlugin::OnUpdate()
       if (!this->targetLink || (targetLinkNames.end() ==
           targetLinkNames.find(this->targetLink->GetScopedName())))
       {
-        gzerr << "Destroying mud joint\n";
+        gzdbg << "Destroying mud joint\n";
         bool paused = this->world->IsPaused();
         this->world->SetPaused(true);
 
@@ -160,6 +168,7 @@ void MudPlugin::OnUpdate()
         this->world->SetPaused(paused);
       }
       // Otherwise, update the anchor position
+      // TODO: consider checking MaxStepSize and updating erp, cfm
       else
       {
         math::Vector3 contactPositionAverage;
@@ -176,10 +185,6 @@ void MudPlugin::OnUpdate()
           }
           // Then divide by numer of contact points
           contactPositionAverage *= 1.0 / static_cast<double>(pc);
-          gzerr << this->targetLink->GetScopedName()
-                << " anchor position "
-                << contactPositionAverage
-                << '\n';
           this->joint->SetAnchor(0, contactPositionAverage);
         }
         else
@@ -204,98 +209,52 @@ void MudPlugin::OnUpdate()
       if (this->targetLink)
       {
         // Create the joint
-        gzerr << "Creating a mud joint with " << targetLinkName << '\n';
+        gzdbg << "Creating a mud joint with " << targetLinkName << '\n';
         this->targetLink->SetAutoDisable(false);
         this->joint = this->world->GetPhysicsEngine()->CreateJoint(
           "revolute", this->model);
 
         this->joint->Attach(this->link, this->targetLink);
-        // TODO set anchor position here, copy code for contactPositionAverage
-        // from above.
-        this->joint->Load(this->link, this->targetLink, math::Pose());
+        // Compute anchor position here, code for contactPositionAverage
+        // copied from above.
+        math::Vector3 contactPositionAverage;
+        // Find the index to the correct contact data structure
+        unsigned int i = linkNameIndices[this->targetLink->GetScopedName()];
+        if (i < nc)
+        {
+          unsigned int pc = this->newestContactsMsg.contact(i).position_size();
+          // Add up all the contact point positions
+          for (unsigned int j = 0; j < pc; ++j)
+          {
+            contactPositionAverage +=
+              msgs::Convert(this->newestContactsMsg.contact(i).position(j));
+          }
+          // Then divide by numer of contact points
+          contactPositionAverage *= 1.0 / static_cast<double>(pc);
+        }
+        else
+        {
+          gzerr << "Error in linkNameIndices\n";
+        }
+
+        this->joint->Load(this->link, this->targetLink,
+          math::Pose(contactPositionAverage, math::Quaternion()));
         this->joint->SetName("mud_joint");
 
-        this->joint->SetAttribute("erp", 0, 0.0);
-        this->joint->SetAttribute("cfm", 0, 0.1);
-        this->joint->SetAttribute("stop_erp", 0, 0.0);
-        this->joint->SetAttribute("stop_cfm", 0, 0.1);
+        double erp, cfm, dt;
+        dt = this->physics->GetMaxStepSize();
+        erp = this->stiffness*dt / (this->stiffness*dt + this->damping); 
+        cfm = 1.0 / (this->stiffness*dt + this->damping); 
+        this->joint->SetAttribute("erp", 0, erp);
+        this->joint->SetAttribute("cfm", 0, cfm);
+        this->joint->SetAttribute("stop_erp", 0, erp);
+        this->joint->SetAttribute("stop_cfm", 0, cfm);
         this->joint->SetHighStop(0, 0.0);
         this->joint->SetLowStop(0, 0.0);
 
         this->joint->Init();
       }
     }
-
-    // // Each contacts message, may have more than one contact
-    // // The first contact is usually the oldest, so take the last contact
-    // math::Vector3 contactPositionAverage;
-    // std::cout << "MudPlugin: " << currTime << ' ';
-    // if (this->newestContactsMsg.contact_size())
-    // {
-    //   int i = this->newestContactsMsg.contact_size() - 1;
-    //   std::cout << msgs::Convert(this->newestContactsMsg.contact(i).time()) << ' ';
-    //   for (int j = 0; j < this->newestContactsMsg.contact(i).position_size(); ++j)
-    //   {
-    //     std::cout << msgs::Convert(this->newestContactsMsg.contact(i).position(j)) << ',';
-    //     contactPositionAverage += msgs::Convert(this->newestContactsMsg.contact(i).position(j));
-    //   }
-    //   contactPositionAverage *= 1.0 / this->newestContactsMsg.contact(i).position_size();
-    //   std::cout << '\n' << contactPositionAverage;
-    // }
-    // std::cout << '\n';
-
-    // Use hysteresis based on contactStepRatio for enabling and disabling mud
-    // if (!this->joint && contactStepRatio > (0.5+hysteresis))
-    // {
-    //   physics::LinkPtr link2;
-    //   link2 = this->world->GetModel("unit_box_1")->GetLink("link");
-    //   // Create the joint
-    //   if (link2)
-    //   {
-    //     link2->SetAutoDisable(false);
-    //     this->joint = this->world->GetPhysicsEngine()->CreateJoint(
-    //       "revolute", this->model);
-
-    //     this->joint->Attach(this->link, link2);
-    //     this->joint->Load(this->link, link2, math::Pose());
-    //     this->joint->SetName("mud_joint");
-
-    //     this->joint->SetAttribute("erp", 0, 0.0);
-    //     this->joint->SetAttribute("cfm", 0, 0.1);
-    //     this->joint->SetAttribute("stop_erp", 0, 0.0);
-    //     this->joint->SetAttribute("stop_cfm", 0, 0.1);
-    //     this->joint->SetHighStop(0, 0.0);
-    //     this->joint->SetLowStop(0, 0.0);
-
-    //     this->joint->Init();
-    //   }
-    // }
-    // else if (this->joint && contactStepRatio < (0.5-hysteresis))
-    // {
-    //   bool paused = this->world->IsPaused();
-    //   this->world->SetPaused(true);
-
-    //   // reenable collision between the link pair
-    //   physics::LinkPtr parent = this->joint->GetParent();
-    //   physics::LinkPtr child = this->joint->GetChild();
-    //   if (parent)
-    //     parent->SetCollideMode("all");
-    //   if (child)
-    //     child->SetCollideMode("all");
-
-    //   this->joint->Detach();
-    //   this->joint.reset();
-
-    //   this->world->SetPaused(paused);
-    // }
-    
-    // // Debugging
-    // std::stringstream stream;
-    // stream << "mySteps " << mySteps << ' '
-    //        << "contactStepRatio " << contactStepRatio << ' '
-    //        << "this->joint " << this->joint << ' ';
-    // stream << ", now " << this->model->GetWorld()->GetSimTime() << '\n';;
-    // //gzerr << stream.str();
 
     this->newMsg = false;
   }
