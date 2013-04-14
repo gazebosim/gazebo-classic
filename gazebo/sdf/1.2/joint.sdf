@@ -27,7 +27,7 @@
   </element>
 
   <element name="axis" required="1">
-      <description>The joint axis specified in the joint frame. This is the axis of rotation for revolute joints, the axis of translation for prismatic joints. The axis is specified in the joint frame of reference.</description>
+    <description>The joint axis specified in the model frame. This is the axis of rotation for revolute joints, the axis of translation for prismatic joints. The axis is currently specified in the model frame of reference, but this will be changed to the joint frame in future version of sdf (see gazebo issue #494).</description>
     <element name="xyz" type="vector3" default="0 0 1" required="1">
       <description>Represents the x,y,z components of a vector. The vector should be normalized.</description>
     </element>
@@ -58,7 +58,7 @@
   </element> <!-- End Axis -->
 
   <element name="axis2" required="0">
-    <description>The second joint axis specified in the joint frame. This is the second axis of rotation for revolute2 joints and universal joints. The axis is specified in the joint frame of reference.</description>
+    <description>The second joint axis specified in the model frame. This is the second axis of rotation for revolute2 joints and universal joints. The axis is currently specified in the model frame of reference, but this will be changed to the joint frame in future version of sdf (see gazebo issue #494).</description>
     <element name="xyz" type="vector3" default="0 0 1" required="1">
       <description>Represents the x,y,z components of a vector. The vector should be normalized.</description>
     </element>

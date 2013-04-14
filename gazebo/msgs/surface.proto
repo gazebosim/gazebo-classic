@@ -18,5 +18,6 @@ message Surface
   optional double kd                        = 7;
   optional double max_vel                   = 8;
   optional double min_depth                 = 9;
+  optional bool collide_without_contact     = 10;
 }
 

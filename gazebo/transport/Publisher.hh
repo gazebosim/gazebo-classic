@@ -143,7 +143,7 @@ namespace gazebo
       private: std::list<MessagePtr> messages;
 
       /// \brief For mutual exclusion.
-      private: mutable boost::recursive_mutex mutex;
+      private: mutable boost::mutex mutex;
 
       /// \brief The publication pointers. One for normal publication, and
       /// one for debug.
