@@ -50,7 +50,7 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
   //----------------------------------------------------------------------------
   // Step 0.
   //----------------------------------------------------------------------------
-  math::Pose poseChildLinkToJoint;
+  //math::Pose poseChildLinkToJoint;
 
   if (this->sdf->HasElement("pose"))
   {
@@ -68,7 +68,7 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
   // Step 1. Transformation from parent link frame to joint link frame.
   //----------------------------------------------------------------------------
   // Set Pose: offset from child link origin in child link frame.
-  if (_sdf->GetValueString("parent") == std::string("world"))
+  if (_sdf->GetElement("parent")->GetValueString("link_name") == std::string("world"))
   {
     poseParentLinkToJoint = /*-(this->parentLink->GetWorldPose())*/
         /*+ */(this->childLink->GetWorldPose())
@@ -80,7 +80,6 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
         + (this->childLink->GetWorldPose())
         + poseChildLinkToJoint;
   }
-
 
   //----------------------------------------------------------------------------
   // Step 2. Transformation by the rotate axis.
@@ -104,9 +103,10 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
   //----------------------------------------------------------------------------
   poseJointToChildLink = -poseChildLinkToJoint;
 
-RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint, poseParentLinkToJoint);
-  //RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint, poseJointToChildLink);
+  RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint, poseParentLinkToJoint);
+
   this->rtql8Joint->addTransform(rotHinge, true);
+
   RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint, poseJointToChildLink);
 }
 
@@ -116,7 +116,7 @@ math::Vector3 RTQL8HingeJoint::GetAnchor(int /*index*/) const
   //TODO: need test
 
   math::Vector3 result;
-  math::Pose poseChildLinkToJoint = -(this->poseJointToChildLink);
+  //math::Pose poseChildLinkToJoint = -(this->poseJointToChildLink);
 
   // setting anchor relative to gazebo link frame pose
   if (this->childLink)
@@ -158,7 +158,16 @@ math::Vector3 RTQL8HingeJoint::GetGlobalAxis(int /*_index*/) const
 //////////////////////////////////////////////////
 void RTQL8HingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
 {
-  rotHinge->setAxis(Eigen::Vector3d(_axis.x, _axis.y, _axis.z));
+  // For now the _axis is represented in global frame.
+  math::Pose jointFrameInWorld = this->childLink->GetWorldPose()
+      + this->poseChildLinkToJoint;
+  math::Vector3 axisInGlobal = -jointFrameInWorld.rot * _axis;
+  rotHinge->setAxis(Eigen::Vector3d(axisInGlobal.x,
+                                    axisInGlobal.y,
+                                    axisInGlobal.z));
+
+  // At some point, we need to change blow code.
+  //rotHinge->setAxis(Eigen::Vector3d(_axis.x, _axis.y, _axis.z));
 }
 
 //////////////////////////////////////////////////

@@ -77,7 +77,13 @@ void RTQL8Joint::Load(sdf::ElementPtr _sdf)
   RTQL8ModelPtr rtql8Model
       = boost::shared_dynamic_cast<RTQL8Model>(this->model);
 
-  if (_sdf->GetValueString("parent") == std::string("world"))
+  std::string parentLinkName
+      = _sdf->GetElement("parent")->GetValueString("link_name");
+
+  if (parentLinkName == std::string(""))
+    gzerr << "No parent link name";
+
+  if (parentLinkName == std::string("world"))
   {
     // a) create a rtql8 joint whose parent link is null pointer.
     rtql8Joint = new rtql8::kinematics::Joint(NULL, childBodyNode);

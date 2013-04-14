@@ -25,8 +25,8 @@ set (files
   revolute_joint_test.world
   revolute_joints.world
   revolute_joints_ode.world
-  #sp_test.world
-  #sp_test_ode.world
+  sp_test.world
+  sp_test_ode.world
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/rtql8)

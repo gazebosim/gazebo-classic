@@ -96,6 +96,12 @@ namespace gazebo
       public: virtual unsigned int GetAngleCount() const;
 
       /// \brief
+      public: math::Pose GetPose_ChildLinkToJoint() const
+      {
+        return poseChildLinkToJoint;
+      }
+
+      /// \brief
       public: math::Pose GetPose_ParentLinkToJoint() const
       {
         return poseParentLinkToJoint;
@@ -106,6 +112,9 @@ namespace gazebo
       {
         return poseJointToChildLink;
       }
+
+      /// \brief
+      protected: math::Pose poseChildLinkToJoint;
 
       /// \brief
       protected: math::Pose poseParentLinkToJoint;
