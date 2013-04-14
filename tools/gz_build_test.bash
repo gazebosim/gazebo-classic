@@ -48,6 +48,12 @@ do
 
   echo "Branch: $branch" >> $logfile
   echo "==================================================" >> $logfile
+
+  echo "Code Check Results" >> $logfile
+  # Run code checker
+  cd /tmp/gazebo_build/source
+  sh tools/code_check.sh >> $logfile
+
   echo "Test Results" >> $logfile
   # Run make test many times, only capture failures
   for i in {1..100}
@@ -66,18 +72,13 @@ do
       sed -e 's@^ *\([0-9]*\)/.*@\1@'`
     do
       # output some brief info
-      echo Try $i of 100, failed test $f >> $logfileVerbose
+      echo Branch "$branch" try $i of 100, failed test $f >> $logfileVerbose
       # then send the raw output of both the test and its companion test_ran
       # to the logfile for perusal
       grep '^ *'`echo "(($f-1)/2)*2+1" | bc`':' $logfileRaw >> $logfileVerbose
       grep '^ *'`echo "(($f-1)/2)*2+2" | bc`':' $logfileRaw >> $logfileVerbose
     done
   done
-
-  echo "Code Check Results" >> $logfile
-  # Run code checker
-  cd /tmp/gazebo_build/source
-  sh tools/code_check.sh >> $logfile
 done
 
 end_time=`eval date +%s`
