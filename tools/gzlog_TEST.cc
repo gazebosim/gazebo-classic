@@ -1281,15 +1281,15 @@ TEST(gz_log, Step)
 
   // Call gzlog step and press q immediately
   std::string stepq0 = custom_exec(std::string("echo 'q' | ") + stepCmd);
-  EXPECT_EQ(stepq0.length(), 20532u);
+  EXPECT_EQ(stepq0.length(), 18334u);
 
   // Call gzlog step and press space once, then q
   std::string stepq1 = custom_exec(std::string("echo ' q' | ") + stepCmd);
-  EXPECT_EQ(stepq1.length(), 41348u);
+  EXPECT_EQ(stepq1.length(), 36303u);
 
   // Call gzlog step and press space twice, then q
   std::string stepq2 = custom_exec(std::string("echo '  q' | ") + stepCmd);
-  EXPECT_EQ(stepq2.length(), 41348u);
+  EXPECT_EQ(stepq2.length(), 36303u);
 }
 
 /////////////////////////////////////////////////
