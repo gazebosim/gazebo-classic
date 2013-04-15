@@ -1,130 +1,131 @@
+<?xml version='1.0'?>
 <sdf version="1.3">
-    <world name="default">
-        <include><uri>model://ground_plane</uri></include>
-        <include><uri>model://sun</uri></include>
-        <scene>
-            <ambient>0.500000 0.500000 0.500000 1.000000</ambient>
-            <background>0.500000 0.500000 0.500000 1.000000</background>
-            <shadows>0</shadows>
-        </scene>
-        <physics type="ode">
-            <gravity>0.000000 0.000000 -9.810000</gravity>
-            <ode>
-                <solver>
-                    <type>quick</type>
-                    <dt>0.001000</dt>
-                    <iters>1000</iters>
-                    <precon_iters>0</precon_iters>
-                    <sor>1.000000</sor>
-                </solver>
-                <constraints>
-                    <cfm>0.000000</cfm>
-                    <erp>0.200000</erp>
-                    <contact_max_correcting_vel>100.000000</contact_max_correcting_vel>
-                    <contact_surface_layer>0.01000</contact_surface_layer>
-                </constraints>
-            </ode>
-            <update_rate>0.000000</update_rate>
-        </physics>
+  <world name="default">
+    <include><uri>model://ground_plane</uri></include>
+    <include><uri>model://sun</uri></include>
+    <scene>
+      <ambient>0.500000 0.500000 0.500000 1.000000</ambient>
+      <background>0.500000 0.500000 0.500000 1.000000</background>
+      <shadows>0</shadows>
+    </scene>
+    <physics type="ode">
+      <gravity>0.000000 0.000000 -9.810000</gravity>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <dt>0.001000</dt>
+          <iters>1000</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.000000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <contact_max_correcting_vel>100.000000</contact_max_correcting_vel>
+          <contact_surface_layer>0.01000</contact_surface_layer>
+        </constraints>
+      </ode>
+      <update_rate>0.000000</update_rate>
+    </physics>
 
 
-        <!-- to demonstrate force torque, we'll construct a model with
+    <!-- to demonstrate force torque, we'll construct a model with
              two bodies stacked vertically, with a x-revolute joint connecting
              them.  The joint has 90 degree limit.  We'll test force
              torque readings and characterize them. -->
         <model name="model_1">
+          <pose>0 0 0 0 0 0</pose>
+          <link name="link_1">
             <pose>0 0 0 0 0 0</pose>
-            <link name="link_1">
-                <pose>0 0 0 0 0 0</pose>
-                <inertial>
-                    <pose>0 0 0.5 0 0 0</pose>
-                    <inertia>
-                        <ixx>0.100000</ixx>
-                        <ixy>0.000000</ixy>
-                        <ixz>0.000000</ixz>
-                        <iyy>0.100000</iyy>
-                        <iyz>0.000000</iyz>
-                        <izz>0.100000</izz>
-                    </inertia>
-                    <mass>10.000000</mass>
-                </inertial>
-                <visual name="visual_sphere">
-                    <pose>0 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <sphere>
-                            <radius>0.100000</radius>
-                        </sphere>
-                    </geometry>
-                </visual>
-                <collision name="collision_sphere">
-                    <pose>0 0 0.5 0 0 0</pose>
-                    <max_contacts>250</max_contacts>
-                    <geometry>
-                        <sphere>
-                            <radius>0.100000</radius>
-                        </sphere>
-                    </geometry>
-                </collision>
-            </link>
-            <link name="link_2">
-                <pose>0 0 1.5 0 0 0</pose>
-                <inertial>
-                    <pose>0 0 0.5 0 0 0</pose>
-                    <inertia>
-                        <ixx>0.100000</ixx>
-                        <ixy>0.000000</ixy>
-                        <ixz>0.000000</ixz>
-                        <iyy>0.100000</iyy>
-                        <iyz>0.000000</iyz>
-                        <izz>0.100000</izz>
-                    </inertia>
-                    <mass>10.000000</mass>
-                </inertial>
-                <visual name="visual_box">
-                    <pose>0 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>0.1 0.2 0.4</size>
-                        </box>
-                    </geometry>
-                </visual>
-                <collision name="collision_box">
-                    <pose>0 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>0.1 0.2 0.4</size>
-                        </box>
-                    </geometry>
-                </collision>
-            </link>
-            <joint name="joint_01" type="revolute">
-                <parent>world</parent>
-                <child>link_1</child>
-                <!-- joint at origin of link_1 inertial frame -->
-                <!-- moement arm from link_1 inertial frame to joint_01
+            <inertial>
+              <pose>0 0 0.5 0 0 0</pose>
+              <inertia>
+                <ixx>0.100000</ixx>
+                <ixy>0.000000</ixy>
+                <ixz>0.000000</ixz>
+                <iyy>0.100000</iyy>
+                <iyz>0.000000</iyz>
+                <izz>0.100000</izz>
+              </inertia>
+              <mass>10.000000</mass>
+            </inertial>
+            <visual name="visual_sphere">
+              <pose>0 0 0.5 0 0 0</pose>
+              <geometry>
+                <sphere>
+                  <radius>0.100000</radius>
+                </sphere>
+              </geometry>
+            </visual>
+            <collision name="collision_sphere">
+              <pose>0 0 0.5 0 0 0</pose>
+              <max_contacts>250</max_contacts>
+              <geometry>
+                <sphere>
+                  <radius>0.100000</radius>
+                </sphere>
+              </geometry>
+            </collision>
+          </link>
+          <link name="link_2">
+            <pose>0 0 1.5 0 0 0</pose>
+            <inertial>
+              <pose>0 0 0.5 0 0 0</pose>
+              <inertia>
+                <ixx>0.100000</ixx>
+                <ixy>0.000000</ixy>
+                <ixz>0.000000</ixz>
+                <iyy>0.100000</iyy>
+                <iyz>0.000000</iyz>
+                <izz>0.100000</izz>
+              </inertia>
+              <mass>10.000000</mass>
+            </inertial>
+            <visual name="visual_box">
+              <pose>0 0 0.5 0 0 0</pose>
+              <geometry>
+                <box>
+                  <size>0.1 0.2 0.4</size>
+                </box>
+              </geometry>
+            </visual>
+            <collision name="collision_box">
+              <pose>0 0 0.5 0 0 0</pose>
+              <geometry>
+                <box>
+                  <size>0.1 0.2 0.4</size>
+                </box>
+              </geometry>
+            </collision>
+          </link>
+          <joint name="joint_01" type="revolute">
+            <parent>world</parent>
+            <child>link_1</child>
+            <!-- joint at origin of link_1 inertial frame -->
+            <!-- moement arm from link_1 inertial frame to joint_01
                      is 0m -->
                 <pose>0 0 0.5 0 0 0</pose>
                 <axis>
-                    <limit>
-                        <lower>-1.57079</lower>
-                        <upper>1.57079</upper>
-                        <effort>1000.000000</effort>
-                        <velocity>1000.000000</velocity>
-                    </limit>
-                    <dynamics>
-                        <damping>0.000000</damping>
-                        <friction>0.000000</friction>
-                    </dynamics>
-                    <xyz>1.000000 0.000000 0.000000</xyz>
+                  <limit>
+                    <lower>-1.57079</lower>
+                    <upper>1.57079</upper>
+                    <effort>1000.000000</effort>
+                    <velocity>1000.000000</velocity>
+                  </limit>
+                  <dynamics>
+                    <damping>0.000000</damping>
+                    <friction>0.000000</friction>
+                  </dynamics>
+                  <xyz>1.000000 0.000000 0.000000</xyz>
                 </axis>
                 <physics>
-                    <ode>
-                        <provide_feedback>1</provide_feedback>
-                        <!--<cfm_damping>1</cfm_damping>-->
-                    </ode>
+                  <ode>
+                    <provide_feedback>1</provide_feedback>
+                    <!--<cfm_damping>1</cfm_damping>-->
+                  </ode>
                 </physics>
-            </joint>
-            <joint name="joint_12" type="revolute">
+              </joint>
+              <joint name="joint_12" type="revolute">
                 <parent>link_1</parent>
                 <child>link_2</child>
                 <!-- joint_1 at origin of link_2 link frame -->
@@ -134,291 +135,275 @@
                      is 0.5m -->
                 <pose>0 0 0 0 0 0</pose>
                 <axis>
-                    <limit>
-                        <lower>-0.0</lower>
-                        <upper>0.0</upper>
-                        <effort>1000.000000</effort>
-                        <velocity>1000.000000</velocity>
-                    </limit>
-                    <dynamics>
-                        <damping>0.000000</damping>
-                        <friction>0.000000</friction>
-                    </dynamics>
-                    <xyz>0.000000 0.000000 1.000000</xyz>
+                  <limit>
+                    <lower>-0.0</lower>
+                    <upper>0.0</upper>
+                    <effort>1000.000000</effort>
+                    <velocity>1000.000000</velocity>
+                  </limit>
+                  <dynamics>
+                    <damping>0.000000</damping>
+                    <friction>0.000000</friction>
+                  </dynamics>
+                  <xyz>0.000000 0.000000 1.000000</xyz>
                 </axis>
                 <physics>
-                    <ode>
-                        <provide_feedback>1</provide_feedback>
-                        <!--<cfm_damping>1</cfm_damping>-->
-                    </ode>
+                  <ode>
+                    <provide_feedback>1</provide_feedback>
+                    <!--<cfm_damping>1</cfm_damping>-->
+                  </ode>
                 </physics>
-            </joint>
-            <static>0</static>
-        </model>
-        <model name="box">
-            <pose>-3.5 0 0 0 0 0</pose>
-            <link name="link">
+              </joint>
+              <static>0</static>
+            </model>
+            <model name="box">
+              <pose>-3.5 0 0 0 0 0</pose>
+              <link name="link">
                 <collision name="collision">
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>1 1 1</size>
-                        </box>
-                    </geometry>
+                  <pose>0.5 0 0.5 0 0 0</pose>
+                  <geometry>
+                    <box>
+                      <size>1 1 1</size>
+                    </box>
+                  </geometry>
                 </collision>
                 <visual name="visual">
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>1 1 1</size>
-                        </box>
-                    </geometry>
+                  <pose>0.5 0 0.5 0 0 0</pose>
+                  <geometry>
+                    <box>
+                      <size>1 1 1</size>
+                    </box>
+                  </geometry>
                 </visual>
                 <inertial>
-                    <mass>100.0</mass>
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <inertia>
-                        <ixx>0.1</ixx>
-                        <iyy>0.1</iyy>
-                        <izz>0.1</izz>
-                        <ixy>0.1</ixy>
-                        <ixz>0.1</ixz>
-                        <iyz>0.1</iyz>
-                    </inertia>
+                  <mass>100.0</mass>
+                  <pose>0.5 0 0.5 0 0 0</pose>
+                  <inertia>
+                    <ixx>0.1</ixx>
+                    <iyy>0.1</iyy>
+                    <izz>0.1</izz>
+                    <ixy>0.1</ixy>
+                    <ixz>0.1</ixz>
+                    <iyz>0.1</iyz>
+                  </inertia>
                 </inertial>
-            </link>
-            <link name="link2">
+              </link>
+              <link name="link2">
                 <pose>1.0 0 1.0 0 0 0</pose>
                 <collision name="collision">
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>1 1 1</size>
-                        </box>
-                    </geometry>
+                  <pose>0.5 0 0.5 0 0 0</pose>
+                  <geometry>
+                    <box>
+                      <size>1 1 1</size>
+                    </box>
+                  </geometry>
                 </collision>
                 <visual name="visual">
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>1 1 1</size>
-                        </box>
-                    </geometry>
+                  <pose>0.5 0 0.5 0 0 0</pose>
+                  <geometry>
+                    <box>
+                      <size>1 1 1</size>
+                    </box>
+                  </geometry>
                 </visual>
                 <inertial>
-                    <mass>5.0</mass>
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <inertia>
-                        <ixx>0.1</ixx>
-                        <iyy>0.1</iyy>
-                        <izz>0.1</izz>
-                        <ixy>0.1</ixy>
-                        <ixz>0.1</ixz>
-                        <iyz>0.1</iyz>
-                    </inertia>
+                  <mass>5.0</mass>
+                  <pose>0.5 0 0.5 0 0 0</pose>
+                  <inertia>
+                    <ixx>0.1</ixx>
+                    <iyy>0.1</iyy>
+                    <izz>0.1</izz>
+                    <ixy>0.1</ixy>
+                    <ixz>0.1</ixz>
+                    <iyz>0.1</iyz>
+                  </inertia>
                 </inertial>
-            </link>
-            <link name="link3">
+              </link>
+              <link name="link3">
                 <pose>2.0 0 2.0 0 0 0</pose>
                 <collision name="collision">
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>1 1 1</size>
-                        </box>
-                    </geometry>
+                  <pose>0.5 0 0.5 0 0 0</pose>
+                  <geometry>
+                    <box>
+                      <size>1 1 1</size>
+                    </box>
+                  </geometry>
                 </collision>
                 <visual name="visual">
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>1 1 1</size>
-                        </box>
-                    </geometry>
+                  <pose>0.5 0 0.5 0 0 0</pose>
+                  <geometry>
+                    <box>
+                      <size>1 1 1</size>
+                    </box>
+                  </geometry>
                 </visual>
                 <inertial>
-                    <mass>1.0</mass>
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <inertia>
-                        <ixx>0.1</ixx>
-                        <iyy>0.1</iyy>
-                        <izz>0.1</izz>
-                        <ixy>0.1</ixy>
-                        <ixz>0.1</ixz>
-                        <iyz>0.1</iyz>
-                    </inertia>
+                  <mass>1.0</mass>
+                  <pose>0.5 0 0.5 0 0 0</pose>
+                  <inertia>
+                    <ixx>0.1</ixx>
+                    <iyy>0.1</iyy>
+                    <izz>0.1</izz>
+                    <ixy>0.1</ixy>
+                    <ixz>0.1</ixz>
+                    <iyz>0.1</iyz>
+                  </inertia>
                 </inertial>
-            </link>
-            <joint name="joint1" type="revolute">
+              </link>
+              <joint name="joint1" type="revolute">
                 <physics>
-                    <ode>
-                        <provide_feedback>true</provide_feedback>
-                    </ode>
+                  <ode>
+                    <provide_feedback>true</provide_feedback>
+                  </ode>
                 </physics>
                 <axis>
-                    <xyz>0 1 0</xyz>
+                  <xyz>0 1 0</xyz>
                 </axis>
-                <parent>
-                    <link_name>link</link_name>
-                </parent>
-                <child>
-                    <link_name>link2</link_name>
-                </child>
-            </joint>
-            <joint name="joint2" type="revolute">
+                <parent>link</parent>
+                <child>link2</child>
+              </joint>
+              <joint name="joint2" type="revolute">
                 <physics>
-                    <ode>
-                        <provide_feedback>true</provide_feedback>
-                    </ode>
+                  <ode>
+                    <provide_feedback>true</provide_feedback>
+                  </ode>
                 </physics>
                 <axis>
-                    <xyz>0 1 0</xyz>
+                  <xyz>0 1 0</xyz>
                 </axis>
-                <parent>
-                    <link_name>link2</link_name>
-                </parent>
-                <child>
-                    <link_name>link3</link_name>
-                </child>
-            </joint>
-            <!--<plugin name="GazeboJointControlTester" filename="libGazeboJointControlTester.so">
+                <parent>link2</parent>
+                <child>link3</child>
+              </joint>
+              <!--<plugin name="GazeboJointControlTester" filename="libGazeboJointControlTester.so">
       </plugin>-->
             <plugin name="GazeboStateCommunicator" filename="libGazeboStateCommunicator.so" imulink="imu_link" />
-        </model>
-        <model name="boxes">
+          </model>
+          <model name="boxes">
             <pose>-3.5 0 0 0 0 0</pose>
             <link name="link1">
-                <collision name="collision">
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>1 1 1</size>
-                        </box>
-                    </geometry>
-                </collision>
-                <visual name="visual">
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>1 1 1</size>
-                        </box>
-                    </geometry>
-                </visual>
-                <inertial>
-                    <mass>100.0</mass>
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <inertia>
-                        <ixx>0.1</ixx>
-                        <iyy>0.1</iyy>
-                        <izz>0.1</izz>
-                        <ixy>0.1</ixy>
-                        <ixz>0.1</ixz>
-                        <iyz>0.1</iyz>
-                    </inertia>
-                </inertial>
+              <collision name="collision">
+                <pose>0.5 0 0.5 0 0 0</pose>
+                <geometry>
+                  <box>
+                    <size>1 1 1</size>
+                  </box>
+                </geometry>
+              </collision>
+              <visual name="visual">
+                <pose>0.5 0 0.5 0 0 0</pose>
+                <geometry>
+                  <box>
+                    <size>1 1 1</size>
+                  </box>
+                </geometry>
+              </visual>
+              <inertial>
+                <mass>100.0</mass>
+                <pose>0.5 0 0.5 0 0 0</pose>
+                <inertia>
+                  <ixx>0.1</ixx>
+                  <iyy>0.1</iyy>
+                  <izz>0.1</izz>
+                  <ixy>0.1</ixy>
+                  <ixz>0.1</ixz>
+                  <iyz>0.1</iyz>
+                </inertia>
+              </inertial>
             </link>
             <link name="link2">
-                <pose>1.0 0 1.0 0 0 0</pose>
-                <collision name="collision">
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>1 1 1</size>
-                        </box>
-                    </geometry>
-                </collision>
-                <visual name="visual">
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>1 1 1</size>
-                        </box>
-                    </geometry>
-                </visual>
-                <inertial>
-                    <mass>5.0</mass>
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <inertia>
-                        <ixx>0.1</ixx>
-                        <iyy>0.1</iyy>
-                        <izz>0.1</izz>
-                        <ixy>0.1</ixy>
-                        <ixz>0.1</ixz>
-                        <iyz>0.1</iyz>
-                    </inertia>
-                </inertial>
+              <pose>1.0 0 1.0 0 0 0</pose>
+              <collision name="collision">
+                <pose>0.5 0 0.5 0 0 0</pose>
+                <geometry>
+                  <box>
+                    <size>1 1 1</size>
+                  </box>
+                </geometry>
+              </collision>
+              <visual name="visual">
+                <pose>0.5 0 0.5 0 0 0</pose>
+                <geometry>
+                  <box>
+                    <size>1 1 1</size>
+                  </box>
+                </geometry>
+              </visual>
+              <inertial>
+                <mass>5.0</mass>
+                <pose>0.5 0 0.5 0 0 0</pose>
+                <inertia>
+                  <ixx>0.1</ixx>
+                  <iyy>0.1</iyy>
+                  <izz>0.1</izz>
+                  <ixy>0.1</ixy>
+                  <ixz>0.1</ixz>
+                  <iyz>0.1</iyz>
+                </inertia>
+              </inertial>
             </link>
             <link name="link3">
-                <pose>2.0 0 2.0 0 0 0</pose>
-                <collision name="collision">
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>1 1 1</size>
-                        </box>
-                    </geometry>
-                </collision>
-                <visual name="visual">
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <geometry>
-                        <box>
-                            <size>1 1 1</size>
-                        </box>
-                    </geometry>
-                </visual>
-                <inertial>
-                    <mass>1.0</mass>
-                    <pose>0.5 0 0.5 0 0 0</pose>
-                    <inertia>
-                        <ixx>0.1</ixx>
-                        <iyy>0.1</iyy>
-                        <izz>0.1</izz>
-                        <ixy>0.1</ixy>
-                        <ixz>0.1</ixz>
-                        <iyz>0.1</iyz>
-                    </inertia>
-                </inertial>
+              <pose>2.0 0 2.0 0 0 0</pose>
+              <collision name="collision">
+                <pose>0.5 0 0.5 0 0 0</pose>
+                <geometry>
+                  <box>
+                    <size>1 1 1</size>
+                  </box>
+                </geometry>
+              </collision>
+              <visual name="visual">
+                <pose>0.5 0 0.5 0 0 0</pose>
+                <geometry>
+                  <box>
+                    <size>1 1 1</size>
+                  </box>
+                </geometry>
+              </visual>
+              <inertial>
+                <mass>1.0</mass>
+                <pose>0.5 0 0.5 0 0 0</pose>
+                <inertia>
+                  <ixx>0.1</ixx>
+                  <iyy>0.1</iyy>
+                  <izz>0.1</izz>
+                  <ixy>0.1</ixy>
+                  <ixz>0.1</ixz>
+                  <iyz>0.1</iyz>
+                </inertia>
+              </inertial>
             </link>
             <joint name="joint1" type="revolute">
-                <physics>
-                    <ode>
-                        <provide_feedback>true</provide_feedback>
-                        <cfm_damping>true</cfm_damping>
-                    </ode>
-                </physics>
-                <axis>
-                    <xyz>0 1 0</xyz>
-                    <dynamics>
-                        <damping>60.000000</damping>
-                    </dynamics>
-                </axis>
-                <parent>
-                    <link_name>link1</link_name>
-                </parent>
-                <child>
-                    <link_name>link2</link_name>
-                </child>
+              <physics>
+                <ode>
+                  <provide_feedback>true</provide_feedback>
+                  <cfm_damping>true</cfm_damping>
+                </ode>
+              </physics>
+              <axis>
+                <xyz>0 1 0</xyz>
+                <dynamics>
+                  <damping>60.000000</damping>
+                </dynamics>
+              </axis>
+              <parent>link1</parent>
+              <child>link2</child>
             </joint>
             <joint name="joint2" type="revolute">
-                <physics>
-                    <ode>
-                        <provide_feedback>true</provide_feedback>
-                        <cfm_damping>true</cfm_damping>
-                    </ode>
-                </physics>
-                <axis>
-                    <xyz>0 1 0</xyz>
-                    <dynamics>
-                        <damping>30.000000</damping>
-                    </dynamics>
-                </axis>
-                <parent>
-                    <link_name>link2</link_name>
-                </parent>
-                <child>
-                    <link_name>link3</link_name>
-                </child>
+              <physics>
+                <ode>
+                  <provide_feedback>true</provide_feedback>
+                  <cfm_damping>true</cfm_damping>
+                </ode>
+              </physics>
+              <axis>
+                <xyz>0 1 0</xyz>
+                <dynamics>
+                  <damping>30.000000</damping>
+                </dynamics>
+              </axis>
+              <parent>link2</parent>
+              <child>link3</child>
             </joint>
-        </model>
-    </world>
-</sdf>
+          </model>
+        </world>
+      </sdf>
