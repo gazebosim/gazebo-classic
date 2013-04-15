@@ -398,8 +398,11 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
     if (endIndex != std::string::npos)
       suffix = _uri.substr(endIndex, std::string::npos);
 
-    // store zip file in temp location
-    std::string filename = "/tmp/gz_model.tar.gz";
+    // Store downloaded .tar.gz and intermediate .tar files in temp location
+    boost::filesystem::path tmppath = boost::filesystem::temp_directory_path();
+    tmppath /= boost::filesystem::unique_path("gz_model-%%%%-%%%%-%%%%-%%%%");
+    std::string tarfilename = tmppath.string() + ".tar";
+    std::string tgzfilename = tarfilename + ".gz";
 
     CURL *curl = curl_easy_init();
     if (!curl)
@@ -420,11 +423,11 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       retry = false;
       iterations++;
 
-      FILE *fp = fopen(filename.c_str(), "wb");
+      FILE *fp = fopen(tgzfilename.c_str(), "wb");
       if (!fp)
       {
         gzerr << "Could not download model[" << _uri << "] because we were"
-          << "unable to write to file[" << filename << "]."
+          << "unable to write to file[" << tgzfilename << "]."
           << "Please fix file permissions.";
         return std::string();
       }
@@ -446,9 +449,9 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       try
       {
         // Unzip model tarball
-        std::ifstream file(filename.c_str(),
+        std::ifstream file(tgzfilename.c_str(),
             std::ios_base::in | std::ios_base::binary);
-        std::ofstream out("/tmp/gz_model.tar",
+        std::ofstream out(tarfilename.c_str(),
             std::ios_base::out | std::ios_base::binary);
         boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
         in.push(boost::iostreams::gzip_decompressor());
@@ -463,7 +466,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       }
 
       TAR *tar;
-      tar_open(&tar, const_cast<char*>("/tmp/gz_model.tar"),
+      tar_open(&tar, const_cast<char*>(tarfilename.c_str()),
           NULL, O_RDONLY, 0644, TAR_GNU);
 
       std::string outputPath = getenv("HOME");
@@ -481,6 +484,17 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       gzerr << "Could not download model[" << _uri << "]."
         << "The model may be corrupt.\n";
       path.clear();
+    }
+
+    // Clean up
+    try
+    {
+      boost::filesystem::remove(tarfilename);
+      boost::filesystem::remove(tgzfilename);
+    }
+    catch(...)
+    {
+      gzwarn << "Failed to remove temporary model files after download.";
     }
   }
 

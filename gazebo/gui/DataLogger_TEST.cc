@@ -107,6 +107,9 @@ void DataLogger_TEST::RecordButton()
 /////////////////////////////////////////////////
 void DataLogger_TEST::StressTest()
 {
+  // Cleanup test directory.
+  boost::filesystem::remove_all("/tmp/gazebo_test");
+
   this->Load("worlds/empty.world");
 
   // Cleanup test directory.

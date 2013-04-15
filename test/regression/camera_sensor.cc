@@ -144,6 +144,7 @@ TEST_F(CameraSensor, MultiSenseHigh)
   // This test is disabled because it does not work on machines with
   // limited rendering capabilities.
   return;
+  /*
 
   Load("worlds/empty_test.world");
 
@@ -190,6 +191,7 @@ TEST_F(CameraSensor, MultiSenseHigh)
   EXPECT_LT(rate, 25.0);
 
   delete img;
+  */
 }
 
 TEST_F(CameraSensor, MultiSenseLow)
@@ -197,7 +199,7 @@ TEST_F(CameraSensor, MultiSenseLow)
   // This test is disabled because it does not work on machines with
   // limited rendering capabilities.
   return;
-
+/*
   Load("worlds/empty_test.world");
 
   // Make sure the render engine is available.
@@ -244,6 +246,7 @@ TEST_F(CameraSensor, MultiSenseLow)
 
   delete img;
   Unload();
+  */
 }
 
 TEST_F(CameraSensor, CheckNoise)

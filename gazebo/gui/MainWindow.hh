@@ -96,6 +96,9 @@ namespace gazebo
       private slots: void OnEditBuilding();
       private slots: void SetWireframe();
 
+      /// \brief Qt call back when the play action state changes
+      private slots: void OnPlayActionChanged();
+
       /// \brief Qt callback when the building editor's save action is
       /// triggered.
       private slots: void BuildingEditorSave();
@@ -146,6 +149,10 @@ namespace gazebo
       /// has been completed.
       private: void OnFinishBuilding();
 
+      /// \brief Handle event for changing the manual step size.
+      /// \param[in] _value New input step size.
+      private: void OnInputStepSizeChanged(int _value);
+
       private: QToolBar *playToolbar;
 
       private: RenderWidget *renderWidget;
@@ -187,6 +194,9 @@ namespace gazebo
       /// \brief The filename set via "Save As". This filename is used by
       /// the "Save" feature.
       private: std::string saveFilename;
+
+      /// \brief User specified step size for manually stepping the world
+      private: int inputStepSize;
     };
   }
 }
