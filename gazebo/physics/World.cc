@@ -387,7 +387,9 @@ void World::LogStep()
         {
           ModelPtr model = this->LoadModel(modelElem, this->rootElement);
           model->Init();
-          model->LoadPlugins();
+
+          // Disabling plugins on playback
+          // model->LoadPlugins();
 
           modelElem = modelElem->GetNextElement("model");
         }

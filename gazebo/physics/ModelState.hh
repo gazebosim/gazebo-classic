@@ -211,12 +211,12 @@ namespace gazebo
         }
 
         // Output the joint information
-        for (std::vector<JointState>::const_iterator iter =
+        /*for (std::vector<JointState>::const_iterator iter =
             _state.jointStates.begin(); iter != _state.jointStates.end();
             ++iter)
         {
           _out << *iter;
-        }
+        }*/
 
         _out << "  </model>\n";
 

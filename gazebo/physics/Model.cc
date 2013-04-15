@@ -935,9 +935,7 @@ void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);
 
-  // For now we don't use the link state values to set the state of
-  // simulation.
-  /*for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
+  for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
   {
     LinkState linkState = _state.GetLinkState(i);
     LinkPtr link = this->GetLink(linkState.GetName());
@@ -945,14 +943,16 @@ void Model::SetState(const ModelState &_state)
       link->SetState(linkState);
     else
       gzerr << "Unable to find link[" << linkState.GetName() << "]\n";
-  }*/
+  }
 
-  for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
+  // For now we don't use the joint state values to set the state of
+  // simulation.
+  /*for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
   {
     JointState jointState = _state.GetJointState(i);
     this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
                            jointState.GetAngle(0).Radian());
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////

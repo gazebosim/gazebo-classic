@@ -166,12 +166,12 @@ namespace gazebo
              << "</acceleration>\n";
         _out << "      <wrench>" << _state.wrench << "</wrench>\n";
 
-        for (std::vector<CollisionState>::const_iterator iter =
+        /*for (std::vector<CollisionState>::const_iterator iter =
              _state.collisionStates.begin();
              iter != _state.collisionStates.end(); ++iter)
         {
           _out << *iter;
-        }
+        }*/
 
         _out << "    </link>\n";
 

@@ -45,12 +45,12 @@ ModelState::ModelState(const ModelPtr _model)
   }
 
   // Copy all the joints
-  const Joint_V joints = _model->GetJoints();
+  /*const Joint_V joints = _model->GetJoints();
   for (Joint_V::const_iterator iter = joints.begin();
        iter != joints.end(); ++iter)
   {
     this->jointStates.push_back(JointState(*iter));
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -91,7 +91,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
   }
 
   // Set all the joints
-  this->jointStates.clear();
+  /*this->jointStates.clear();
   if (_elem->HasElement("joint"))
   {
     sdf::ElementPtr childElem = _elem->GetElement("joint");
@@ -101,7 +101,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
       this->jointStates.push_back(JointState(childElem));
       childElem = childElem->GetNextElement("joint");
     }
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -121,11 +121,12 @@ bool ModelState::IsZero() const
     result = result && (*iter).IsZero();
   }
 
-  for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
+  /*for (std::vector<JointState>::const_iterator iter =
+    this->jointStates.begin();
        iter != this->jointStates.end() && result; ++iter)
   {
     result = result && (*iter).IsZero();
-  }
+  }*/
 
   return result && this->pose == math::Pose::Zero;
 }
@@ -155,17 +156,18 @@ std::vector<LinkState> ModelState::GetLinkStates(
 
 /////////////////////////////////////////////////
 std::vector<JointState> ModelState::GetJointStates(
-    const boost::regex &_regex) const
+    const boost::regex & /*_regex*/) const
 {
   std::vector<JointState> result;
 
   // Search for matching link names
-  for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
+  /*for (std::vector<JointState>::const_iterator iter =
+    this->jointStates.begin();
        iter != this->jointStates.end(); ++iter)
   {
     if (boost::regex_match((*iter).GetName(), _regex))
       result.push_back(*iter);
-  }
+  }*/
 
   return result;
 }
@@ -274,7 +276,7 @@ ModelState &ModelState::operator=(const ModelState &_state)
 
   // Clear the link and joint states.
   this->linkStates.clear();
-  this->jointStates.clear();
+  //this->jointStates.clear();
 
   // Copy the link states.
   for (std::vector<LinkState>::const_iterator iter =
@@ -284,11 +286,11 @@ ModelState &ModelState::operator=(const ModelState &_state)
   }
 
   // Copy the joint states.
-  for (std::vector<JointState>::const_iterator iter =
+  /*for (std::vector<JointState>::const_iterator iter =
        _state.jointStates.begin(); iter != _state.jointStates.end(); ++iter)
   {
     this->jointStates.push_back(JointState(*iter));
-  }
+  }*/
 
   return *this;
 }
@@ -323,7 +325,7 @@ ModelState ModelState::operator-(const ModelState &_state) const
   }
 
   // Insert the joint state diffs.
-  for (std::vector<JointState>::const_iterator iter =
+  /*for (std::vector<JointState>::const_iterator iter =
        this->jointStates.begin(); iter != this->jointStates.end(); ++iter)
   {
     try
@@ -340,7 +342,7 @@ ModelState ModelState::operator-(const ModelState &_state) const
       // Ignore exception, which is just the fact that a joint state may not
       // have been recorded.
     }
-  }
+  }*/
 
   return result;
 }
@@ -374,7 +376,7 @@ ModelState ModelState::operator+(const ModelState &_state) const
   }
 
   // Insert the joint state diffs.
-  for (std::vector<JointState>::const_iterator iter =
+  /*for (std::vector<JointState>::const_iterator iter =
        this->jointStates.begin(); iter != this->jointStates.end(); ++iter)
   {
     try
@@ -390,7 +392,7 @@ ModelState ModelState::operator+(const ModelState &_state) const
       // Ignore exception, which is just the fact that a joint state may not
       // have been recorded.
     }
-  }
+  }*/
 
   return result;
 }
@@ -410,12 +412,12 @@ void ModelState::FillSDF(sdf::ElementPtr _sdf)
     (*iter).FillSDF(elem);
   }
 
-  for (std::vector<JointState>::iterator iter = this->jointStates.begin();
+  /*for (std::vector<JointState>::iterator iter = this->jointStates.begin();
        iter != this->jointStates.end(); ++iter)
   {
     sdf::ElementPtr elem = _sdf->AddElement("joint");
     (*iter).FillSDF(elem);
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -429,11 +431,11 @@ void ModelState::SetWallTime(const common::Time &_time)
     (*iter).SetWallTime(_time);
   }
 
-  for (std::vector<JointState>::iterator iter = this->jointStates.begin();
+  /*for (std::vector<JointState>::iterator iter = this->jointStates.begin();
        iter != this->jointStates.end(); ++iter)
   {
     (*iter).SetWallTime(_time);
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -447,11 +449,11 @@ void ModelState::SetRealTime(const common::Time &_time)
     (*iter).SetRealTime(_time);
   }
 
-  for (std::vector<JointState>::iterator iter = this->jointStates.begin();
+  /*for (std::vector<JointState>::iterator iter = this->jointStates.begin();
        iter != this->jointStates.end(); ++iter)
   {
     (*iter).SetRealTime(_time);
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -465,9 +467,9 @@ void ModelState::SetSimTime(const common::Time &_time)
     (*iter).SetSimTime(_time);
   }
 
-  for (std::vector<JointState>::iterator iter = this->jointStates.begin();
+  /*for (std::vector<JointState>::iterator iter = this->jointStates.begin();
        iter != this->jointStates.end(); ++iter)
   {
     (*iter).SetSimTime(_time);
-  }
+  }*/
 }

@@ -34,7 +34,7 @@ WorldState::WorldState()
 
 /////////////////////////////////////////////////
 WorldState::WorldState(const WorldPtr _world)
-  : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
+  : State(_world->GetName(), _world->GetRealTime(), _world->GetSimTime())
 {
   this->world = _world;
 
@@ -254,10 +254,10 @@ WorldState WorldState::operator+(const WorldState &_state) const
 {
   WorldState result;
 
-  result.name = this->name;
-  result.simTime = this->simTime;
-  result.realTime = this->realTime;
-  result.wallTime = this->wallTime;
+  result.name = _state.name;
+  result.simTime = _state.simTime;
+  result.realTime = _state.realTime;
+  result.wallTime = _state.wallTime;
 
   // Add the states.
   for (std::vector<ModelState>::const_iterator iter =

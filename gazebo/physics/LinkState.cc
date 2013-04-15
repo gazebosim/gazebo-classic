@@ -35,20 +35,20 @@ LinkState::LinkState(const LinkPtr _link)
   : State(_link->GetName(), _link->GetWorld()->GetRealTime(),
           _link->GetWorld()->GetSimTime())
 {
-  this->pose = _link->GetRelativePose();
-  this->velocity = math::Pose(_link->GetRelativeLinearVel(),
-                   math::Quaternion(_link->GetRelativeAngularVel()));
-  this->acceleration = math::Pose(_link->GetRelativeLinearAccel(),
-                       math::Quaternion(_link->GetRelativeAngularAccel()));
-  this->wrench = math::Pose(_link->GetRelativeForce(), math::Quaternion());
+  this->pose = _link->GetWorldPose();
+  this->velocity = math::Pose(_link->GetWorldLinearVel(),
+                   math::Quaternion(_link->GetWorldAngularVel()));
+  this->acceleration = math::Pose(_link->GetWorldLinearAccel(),
+                       math::Quaternion(_link->GetWorldAngularAccel()));
+  this->wrench = math::Pose(_link->GetWorldForce(), math::Quaternion());
 
   // Create all the collision states.
-  Collision_V collisions = _link->GetCollisions();
+  /*Collision_V collisions = _link->GetCollisions();
   for (Collision_V::const_iterator iter = collisions.begin();
        iter != collisions.end(); ++iter)
   {
     this->collisionStates.push_back(CollisionState(*iter));
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -159,19 +159,19 @@ const std::vector<CollisionState> &LinkState::GetCollisionStates() const
 /////////////////////////////////////////////////
 bool LinkState::IsZero() const
 {
-  bool result = true;
+  /*bool result = true;
 
   for (std::vector<CollisionState>::const_iterator iter =
        this->collisionStates.begin();
        iter != this->collisionStates.end() && result; ++iter)
   {
     result = result && (*iter).IsZero();
-  }
+  }*/
 
-  return result && this->pose == math::Pose::Zero &&
+  return this->pose == math::Pose::Zero;/* &&
          this->velocity == math::Pose::Zero &&
          this->acceleration == math::Pose::Zero &&
-         this->wrench == math::Pose::Zero;
+         this->wrench == math::Pose::Zero;*/
 }
 
 /////////////////////////////////////////////////
@@ -195,12 +195,12 @@ LinkState &LinkState::operator=(const LinkState &_state)
   this->collisionStates.clear();
 
   // Copy the collision states
-  for (std::vector<CollisionState>::const_iterator iter =
+  /*for (std::vector<CollisionState>::const_iterator iter =
        _state.collisionStates.begin();
        iter != _state.collisionStates.end(); ++iter)
   {
     this->collisionStates.push_back(*iter);
-  }
+  }*/
 
   return *this;
 }
@@ -212,22 +212,22 @@ LinkState LinkState::operator-(const LinkState &_state) const
 
   result.name = this->name;
 
-  result.pose.pos = this->pose.pos - _state.pose.pos;
-  result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
+  result.pose =  this->pose;// - _state.pose.pos;
+  // result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
 
   result.velocity = this->velocity - _state.velocity;
   result.acceleration = this->acceleration - _state.acceleration;
   result.wrench = this->wrench - _state.wrench;
 
   // Insert the collision differences
-  for (std::vector<CollisionState>::const_iterator iter =
+  /*for (std::vector<CollisionState>::const_iterator iter =
        _state.collisionStates.begin();
        iter != _state.collisionStates.end(); ++iter)
   {
     CollisionState state = this->GetCollisionState((*iter).GetName()) - *iter;
     if (!state.IsZero())
       result.collisionStates.push_back(state);
-  }
+  }*/
 
   return result;
 }
@@ -239,21 +239,22 @@ LinkState LinkState::operator+(const LinkState &_state) const
 
   result.name = this->name;
 
-  result.pose.pos = this->pose.pos + _state.pose.pos;
-  result.pose.rot = _state.pose.rot * this->pose.rot;
+  result.pose = _state.pose;
+  //result.pose.pos = this->pose.pos + _state.pose.pos;
+  // result.pose.rot = _state.pose.rot * this->pose.rot;
 
   result.velocity = this->velocity + _state.velocity;
   result.acceleration = this->acceleration + _state.acceleration;
   result.wrench = this->wrench + _state.wrench;
 
   // Insert the collision differences
-  for (std::vector<CollisionState>::const_iterator iter =
+  /*for (std::vector<CollisionState>::const_iterator iter =
        _state.collisionStates.begin();
        iter != _state.collisionStates.end(); ++iter)
   {
     CollisionState state = this->GetCollisionState((*iter).GetName()) + *iter;
     result.collisionStates.push_back(state);
-  }
+  }*/
 
   return result;
 }
@@ -269,13 +270,13 @@ void LinkState::FillSDF(sdf::ElementPtr _sdf)
   _sdf->GetElement("acceleration")->Set(this->acceleration);
   _sdf->GetElement("wrench")->Set(this->wrench);
 
-  for (std::vector<CollisionState>::iterator iter =
+  /*for (std::vector<CollisionState>::iterator iter =
        this->collisionStates.begin();
        iter != this->collisionStates.end(); ++iter)
   {
     sdf::ElementPtr elem = _sdf->AddElement("collision");
     (*iter).FillSDF(elem);
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -283,12 +284,12 @@ void LinkState::SetWallTime(const common::Time &_time)
 {
   State::SetWallTime(_time);
 
-  for (std::vector<CollisionState>::iterator
+  /*for (std::vector<CollisionState>::iterator
        iter = this->collisionStates.begin();
        iter != this->collisionStates.end(); ++iter)
   {
     (*iter).SetWallTime(_time);
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -296,12 +297,12 @@ void LinkState::SetRealTime(const common::Time &_time)
 {
   State::SetRealTime(_time);
 
-  for (std::vector<CollisionState>::iterator
+  /*for (std::vector<CollisionState>::iterator
        iter = this->collisionStates.begin();
        iter != this->collisionStates.end(); ++iter)
   {
     (*iter).SetRealTime(_time);
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -309,10 +310,10 @@ void LinkState::SetSimTime(const common::Time &_time)
 {
   State::SetSimTime(_time);
 
-  for (std::vector<CollisionState>::iterator
+  /*for (std::vector<CollisionState>::iterator
        iter = this->collisionStates.begin();
        iter != this->collisionStates.end(); ++iter)
   {
     (*iter).SetSimTime(_time);
-  }
+  }*/
 }
