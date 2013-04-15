@@ -597,7 +597,7 @@ class StateFilter : public FilterBase
             this->filter.Init(_filter);
           }
 
-  /// \brief Peform filtering
+  /// \brief Perform filtering
   /// \param[in] _stateString The string to filter.
   public: std::string Filter(const std::string &_stateString)
           {
