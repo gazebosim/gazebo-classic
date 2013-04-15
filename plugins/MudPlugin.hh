@@ -79,6 +79,9 @@ namespace gazebo
     /// \brief Flag to indicate new contact message.
     private: bool newMsg;
 
+    /// \brief Number of updates without having a new contacts message.
+    private: unsigned int newMsgWait;
+
     /// \brief Stiffness parameter, used in conjunction with damping
     ///        to compute joint erp, cfm
     private: double stiffness;

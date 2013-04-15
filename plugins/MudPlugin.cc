@@ -26,7 +26,7 @@ GZ_REGISTER_MODEL_PLUGIN(MudPlugin)
 
 /////////////////////////////////////////////////
 MudPlugin::MudPlugin()
-  : newMsg(false), stiffness(0.0), damping(100.0)
+  : newMsg(false), newMsgWait(0), stiffness(0.0), damping(100.0)
 {
 }
 
@@ -151,8 +151,6 @@ void MudPlugin::OnUpdate()
           targetLinkNames.find(this->targetLink->GetScopedName())))
       {
         gzdbg << "Destroying mud joint\n";
-        bool paused = this->world->IsPaused();
-        this->world->SetPaused(true);
 
         // reenable collision between the link pair
         physics::LinkPtr parent = this->joint->GetParent();
@@ -164,8 +162,6 @@ void MudPlugin::OnUpdate()
 
         this->joint->Detach();
         this->joint.reset();
-
-        this->world->SetPaused(paused);
       }
       // Otherwise, update the anchor position
       // TODO: consider checking MaxStepSize and updating erp, cfm
@@ -184,7 +180,7 @@ void MudPlugin::OnUpdate()
               msgs::Convert(this->newestContactsMsg.contact(i).position(j));
           }
           // Then divide by numer of contact points
-          contactPositionAverage *= 1.0 / static_cast<double>(pc);
+          contactPositionAverage /= static_cast<double>(pc);
           this->joint->SetAnchor(0, contactPositionAverage);
         }
         else
@@ -230,7 +226,7 @@ void MudPlugin::OnUpdate()
               msgs::Convert(this->newestContactsMsg.contact(i).position(j));
           }
           // Then divide by numer of contact points
-          contactPositionAverage *= 1.0 / static_cast<double>(pc);
+          contactPositionAverage /= static_cast<double>(pc);
         }
         else
         {
@@ -257,5 +253,12 @@ void MudPlugin::OnUpdate()
     }
 
     this->newMsg = false;
+    this->newMsgWait = 0;
+  }
+  else if (++this->newMsgWait > floor(1.0 / this->physics->GetMaxStepSize()))
+  {
+    gzlog << "MudPlugin attached to " << this->modelName 
+          << " waited 1.0 s without contact messages\n";
+    this->newMsgWait = 0;
   }
 }
