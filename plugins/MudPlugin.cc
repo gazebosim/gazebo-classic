@@ -26,7 +26,7 @@ GZ_REGISTER_MODEL_PLUGIN(MudPlugin)
 
 /////////////////////////////////////////////////
 MudPlugin::MudPlugin()
-  : mudEnabled(false), newMsg(false), stiffness(0.0), damping(100.0)
+  : newMsg(false), stiffness(0.0), damping(100.0)
 {
 }
 

@@ -70,9 +70,6 @@ namespace gazebo
     /// \brief Name of contact sensor relative to model, scoped with '/',
     private: std::string contactSensorName;
 
-    /// \brief Flag that indicates whether mud is enabled or disabled.
-    private: bool mudEnabled;
-
     /// \brief Mutex to protect reads and writes.
     private: mutable boost::mutex mutex;
 
