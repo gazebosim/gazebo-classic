@@ -803,7 +803,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   // maxCollide must less than the size of this->indices. Check the header
   int maxCollide = MAX_CONTACT_JOINTS;
-  if (this->GetMaxContacts() < MAX_CONTACT_JOINTS)
+  if (this->GetMaxContacts() < MAX_CONTACT_JOINTS && this->GetMaxContacts() > 0)
     maxCollide = this->GetMaxContacts();
 
   // Generate the contacts
