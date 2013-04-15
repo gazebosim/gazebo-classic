@@ -38,6 +38,7 @@ class TopicManagerProcessTask : public tbb::task
 
 //////////////////////////////////////////////////
 ConnectionManager::ConnectionManager()
+  // : updateSem(0)
 {
   this->tmpIndex = 0;
   this->initialized = false;

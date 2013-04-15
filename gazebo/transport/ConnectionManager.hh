@@ -19,7 +19,7 @@
 
 
 #include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
+#include <boost/interprocess/sync/interprocess_semaphore.hpp>
 #include <string>
 #include <list>
 #include <vector>
