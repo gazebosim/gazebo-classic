@@ -40,7 +40,7 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
   if (elem && boost::lexical_cast<double>(_toVersion) >= 1.3)
   {
     elem->SetValue("sdf");
-    std::cout << "Set SDF value\n";
+    gzwarn << "Set SDF value\n";
   }
   else if (!elem)
     elem = _doc->FirstChildElement("sdf");
