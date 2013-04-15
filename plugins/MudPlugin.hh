@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MODEL_TRAJECTORY_TEST_PLUGIN_HH_
-#define _GAZEBO_MODEL_TRAJECTORY_TEST_PLUGIN_HH_
+#ifndef _MUD_PLUGIN_HH_
+#define _MUD_PLUGIN_HH_
 
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
@@ -26,13 +26,23 @@ namespace gazebo
 {
   class MudPlugin : public ModelPlugin
   {
+    /// \brief Constructor.
     public: MudPlugin();
+
+    // Documentation Inherited.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+
+    // Documentation Inherited.
     public: virtual void Init();
 
+    /// \brief Callback for receipt of contact sensor messages.
+    /// \param[in] _msg Contacts message from contact sensor.
     private: void OnContact(ConstContactsPtr &_msg);
+
+    /// \brief Callback for World Update events.
     private: void OnUpdate();
 
+    /// \brief Transport node used for subscribing to contact sensor messages.
     private: transport::NodePtr node;
 
     /// \brief Subscriber to contact sensor messages.
@@ -87,4 +97,4 @@ namespace gazebo
     private: physics::LinkPtr targetLink;
   };
 }
-#endif
+#endif  // ifndef _MUD_PLUGIN_HH_
