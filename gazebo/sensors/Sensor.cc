@@ -22,8 +22,8 @@
 #include "sdf/sdf.hh"
 #include "transport/transport.hh"
 
-#include "physics/Physics.hh"
-#include "physics/World.hh"
+#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/World.hh"
 
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Console.hh"

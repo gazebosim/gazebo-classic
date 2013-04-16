@@ -25,7 +25,7 @@
 #include <vector>
 
 #include "common/common.hh"
-#include "physics/physics.hh"
+#include "gazebo/physics/physics.hh"
 #include "transport/transport.hh"
 #include "gazebo.hh"
 

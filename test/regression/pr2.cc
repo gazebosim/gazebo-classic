@@ -15,7 +15,7 @@
  *
 */
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
+#include "gazebo/physics/physics.hh"
 
 using namespace gazebo;
 class PR2Test : public ServerFixture

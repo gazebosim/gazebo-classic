@@ -21,7 +21,7 @@
 
 #include <sstream>
 
-#include "physics/World.hh"
+#include "gazebo/physics/World.hh"
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"

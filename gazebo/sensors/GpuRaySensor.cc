@@ -19,7 +19,7 @@
  * Date: 29 March 2012
 */
 
-#include "physics/World.hh"
+#include "gazebo/physics/World.hh"
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
