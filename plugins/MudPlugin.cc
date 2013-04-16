@@ -74,7 +74,6 @@ void MudPlugin::Load(physics::ModelPtr _model,
       allowedLinks.push_back(elem->GetValueString());
       links.push_back(physics::LinkPtr());
       joints.push_back(physics::JointPtr());
-      gzerr << "link_name " << elem->GetValueString() << '\n';
       elem = elem->GetNextElement("link_name");
     }
   }
@@ -227,7 +226,7 @@ void MudPlugin::OnUpdate()
           if (*iterLink)
           {
             // Create the joint
-            gzdbg << "Creating a mud joint with " << *iterLinkName << '\n';
+            // gzdbg << "Creating a mud joint with " << *iterLinkName << '\n';
             (*iterLink)->SetAutoDisable(false);
             *iterJoint = this->physics->CreateJoint("revolute", this->model);
 
@@ -267,7 +266,7 @@ void MudPlugin::OnUpdate()
         // then delete the joint
         if (*iterJoint)
         {
-          gzdbg << "Destroying mud joint\n";
+          // gzdbg << "Destroying mud joint\n";
 
           // reenable collision between the link pair
           physics::LinkPtr parent = (*iterJoint)->GetParent();
