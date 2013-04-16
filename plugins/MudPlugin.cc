@@ -112,6 +112,9 @@ void MudPlugin::OnContact(ConstContactsPtr &_msg)
 /////////////////////////////////////////////////
 void MudPlugin::OnUpdate()
 {
+  double dt = this->physics->GetMaxStepSize();
+  if (dt < 1e-6)
+    dt = 1e-6;
   if (this->newMsg)
   {
     boost::mutex::scoped_lock lock(this->mutex);
@@ -227,8 +230,7 @@ void MudPlugin::OnUpdate()
             }
 
             {
-              double erp, cfm, dt;
-              dt = this->physics->GetMaxStepSize();
+              double erp, cfm;
               erp = this->stiffness*dt / (this->stiffness*dt + this->damping);
               cfm = 1.0 / (this->stiffness*dt + this->damping);
               (*iterJoint)->SetAttribute("erp", 0, erp);
@@ -275,7 +277,7 @@ void MudPlugin::OnUpdate()
     this->newMsg = false;
     this->newMsgWait = 0;
   }
-  else if (++this->newMsgWait > floor(1.0 / this->physics->GetMaxStepSize()))
+  else if (++this->newMsgWait > floor(1.0 / dt))
   {
     gzlog << "MudPlugin attached to " << this->modelName
           << " waited 1.0 s without contact messages\n";
