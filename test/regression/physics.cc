@@ -1548,6 +1548,21 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 //}
 //#endif  // HAVE_BULLET
 
+/////////////////////////////////////////////////
+// This test verifies that gazebo doesn't crash when collisions occur
+// and the <world><physics><ode><max_contacts> value is zero.
+// The crash was reported in issue #593 on bitbucket
+TEST_F(PhysicsTest, ZeroMaxContactsODE)
+{
+  // Load an empty world
+  Load("worlds/zero_max_contacts.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr model = world->GetModel("ground_plane");
+  ASSERT_TRUE(model);
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
