@@ -615,73 +615,6 @@ void MainWindow::CaptureScreenshot()
   this->renderWidget->DisplayOverlayMsg(
       "Screenshot saved in: " + cam->GetScreenshotPath(), 2000);
 }
-/*
-/////////////////////////////////////////////////
-void MainWindow::RecordVideo()
-{
-  rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->SetEncodeVideo(g_recordVideoAct->isChecked());
-  if (g_recordVideoAct->isChecked())
-  {
-    g_recordVideoAct->setIcon(QIcon(":/images/record_stop.png"));
-    if (!this->recordVideoTimer)
-    {
-      this->recordVideoTimer = new QTimer(this);
-      connect(this->recordVideoTimer, SIGNAL(timeout()), this,
-          SLOT(DisplayRecordingMsg()));
-    }
-    this->recordVideoTimer->start(1000);
-    QWidget *defaultWidget = g_recordVideoFormatAct->defaultWidget();
-    qobject_cast<QToolButton *>(defaultWidget)->setEnabled(false);
-  }
-  else
-  {
-    this->recordVideoTimer->stop();
-    g_recordVideoAct->setIcon(QIcon(":/images/record.png"));
-
-    std::string friendlyName = cam->GetName();
-    boost::replace_all(friendlyName, "::", "_");
-    std::string timestamp = common::Time::GetWallTimeAsISOString();
-    boost::replace_all(timestamp, ":", "_");
-
-    SaveDialog saveDialog;
-    saveDialog.SetSaveName(friendlyName + "_" + timestamp);
-    saveDialog.SetSaveLocation(QDir::homePath().toStdString());
-    if (saveDialog.exec() == QDialog::Accepted)
-    {
-      std::string name = saveDialog.GetSaveName();
-      std::string location = saveDialog.GetSaveLocation();
-      cam->SaveVideo(location + "/" + name);
-      this->renderWidget->DisplayOverlayMsg(
-        name + " saved in: " + location, 2000);
-    }
-    QWidget *defaultWidget = g_recordVideoFormatAct->defaultWidget();
-    qobject_cast<QToolButton *>(defaultWidget)->setEnabled(true);
-  }
-}
-
-/////////////////////////////////////////////////
-void MainWindow::SetRecordVideoFormat(QAction *_action)
-{
-  rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->SetEncodeVideoFormat(_action->text().toStdString());
-  this->renderWidget->DisplayOverlayMsg("Set video recording format to " +
-      _action->text().toStdString(), 2000);
-}
-
-/////////////////////////////////////////////////
-void MainWindow::ShowVideoFormatMenu()
-{
-  QWidget *defaultWidget = g_recordVideoFormatAct->defaultWidget();
-  qobject_cast<QToolButton *>(defaultWidget)->showMenu();
-}
-
-/////////////////////////////////////////////////
-void MainWindow::DisplayRecordingMsg()
-{
-  this->renderWidget->DisplayOverlayMsg("Recording...",
-      this->recordVideoTimer ? this->recordVideoTimer->interval()/2 : 500);
-}*/
 
 /////////////////////////////////////////////////
 void MainWindow::InsertModel()
@@ -1128,41 +1061,6 @@ void MainWindow::CreateActions()
       SLOT(CaptureScreenshot()));
 
   this->videoRecorder->CreateActions();
-
-/*  g_recordVideoAct = new QAction(QIcon(":/images/record.png"),
-      tr("Video"), this);
-  g_recordVideoAct->setStatusTip(tr("Record a video"));
-  g_recordVideoAct->setCheckable(true);
-  g_recordVideoAct->setChecked(false);
-  connect(g_recordVideoAct, SIGNAL(triggered()), this,
-      SLOT(RecordVideo()));
-
-  g_recordVideoFormatAct = new QWidgetAction(NULL);
-  g_recordVideoFormatAct->setStatusTip(tr("Select video format"));
-  g_recordVideoFormatAct->setCheckable(false);
-
-  QMenu *videoFormatSubmenu = new QMenu;
-  std::vector<QAction *> formats;
-  formats.push_back(videoFormatSubmenu->addAction("ogv"));
-  formats.push_back(videoFormatSubmenu->addAction("avi"));
-  formats.push_back(videoFormatSubmenu->addAction("mp4"));
-  QActionGroup *formatActGroup = new QActionGroup(this);
-  for (unsigned int i = 0; i < formats.size(); ++i)
-  {
-    formats[i]->setCheckable(true);
-    formatActGroup->addAction(formats[i]);
-  }
-  connect(videoFormatSubmenu, SIGNAL(triggered(QAction *)), this,
-      SLOT(SetRecordVideoFormat(QAction *)));
-  formats[0]->setChecked(true);
-
-  QToolButton *videoFormatButton = new QToolButton();
-  videoFormatButton->setMenu(videoFormatSubmenu);
-  g_recordVideoFormatAct->setDefaultWidget(videoFormatButton);
-  videoFormatButton->setMaximumSize(18, videoFormatButton->height()/2);
-
-  connect(videoFormatButton, SIGNAL(clicked()), this,
-    SLOT(ShowVideoFormatMenu()));*/
 }
 
 /////////////////////////////////////////////////

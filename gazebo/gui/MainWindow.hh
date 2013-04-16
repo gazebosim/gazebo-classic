@@ -53,7 +53,6 @@ namespace gazebo
 
       private: void OnGUI(ConstGUIPtr &_msg);
 
-
       private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
       private slots: void Open();
@@ -80,19 +79,6 @@ namespace gazebo
 
       /// \brief Qt callback when the screenshot action is triggered
       private slots: void CaptureScreenshot();
-
-      /*/// \brief Qt callback when the record video action is triggered
-      private slots: void RecordVideo();
-
-      /// \brief Qt callback when a video format menu action is triggered
-      private slots: void SetRecordVideoFormat(QAction *_action);
-
-      /// \brief Qt callback when the record video format button is clicked
-      private slots: void ShowVideoFormatMenu();
-
-      /// \brief Qt callback connected to a QTimer for displaying a blinking
-      /// recording text to the screen
-      private slots: void DisplayRecordingMsg();*/
 
       private slots: void InsertModel();
       private slots: void ShowGrid();
