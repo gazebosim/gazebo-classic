@@ -5,11 +5,8 @@
       <ambient>.1 .1 .1 1</ambient>
       <shadows>false</shadows>
     </scene>
-    <physics type="bullet">
+    <physics type="rtql8">
       <gravity>0 0 -9.8</gravity>
-      <bullet>
-        <dt>0.001</dt>
-      </bullet>
     </physics>
 
     <!-- A ground plane -->
