@@ -20,12 +20,12 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "common/Common.hh"
-#include "common/BVHLoader.hh"
-#include "common/SystemPaths.hh"
-#include "common/Skeleton.hh"
-#include "common/SkeletonAnimation.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Common.hh"
+#include "gazebo/common/BVHLoader.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/common/SkeletonAnimation.hh"
+#include "gazebo/common/Console.hh"
 #include "math/Matrix3.hh"
 #include "math/Angle.hh"
 

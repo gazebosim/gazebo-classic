@@ -18,9 +18,9 @@
 
 #include "math/Spline.hh"
 #include "math/RotationSpline.hh"
-#include "common/Console.hh"
-#include "common/KeyFrame.hh"
-#include "common/Animation.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/KeyFrame.hh"
+#include "gazebo/common/Animation.hh"
 
 using namespace gazebo;
 using namespace common;

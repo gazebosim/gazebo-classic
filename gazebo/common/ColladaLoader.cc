@@ -27,14 +27,14 @@
 #include "math/Vector3.hh"
 #include "math/Matrix4.hh"
 #include "math/Quaternion.hh"
-#include "common/Console.hh"
-#include "common/Material.hh"
-#include "common/Mesh.hh"
-#include "common/Skeleton.hh"
-#include "common/SkeletonAnimation.hh"
-#include "common/ColladaLoader.hh"
-#include "common/SystemPaths.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Material.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/common/SkeletonAnimation.hh"
+#include "gazebo/common/ColladaLoader.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Exception.hh"
 
 using namespace gazebo;
 using namespace common;
