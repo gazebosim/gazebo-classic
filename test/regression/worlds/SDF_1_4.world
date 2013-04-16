@@ -45,12 +45,8 @@
       </link>
       <joint type="revolute" name="joint14_revolute_joint">
         <pose>0 0 1 0 0 0</pose>
-        <parent>
-          <link_name>body2</link_name>
-        </parent>
-        <child>
-          <link_name>body1</link_name>
-        </child>
+        <parent>body2</parent>
+        <child>body1</child>
         <axis>
           <xyz>0 0 1</xyz>
         </axis>
