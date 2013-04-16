@@ -33,7 +33,7 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderEvents.hh"
 
-#include "gazebo/gui/SaveDialog.hh"
+#include "gazebo/gui/VideoRecorder.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
@@ -71,11 +71,11 @@ MainWindow::MainWindow()
   this->node->Init();
   gui::set_world(this->node->GetTopicNamespace());
 
+  this->videoRecorder = new VideoRecorder(this);
+
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
   this->CreateMenus();
-
-  this->recordVideoTimer = NULL;
 
   QWidget *mainWidget = new QWidget;
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -109,6 +109,9 @@ MainWindow::MainWindow()
   this->toolsWidget = new ToolsWidget();
 
   this->renderWidget = new RenderWidget(mainWidget);
+  QObject::connect(this->videoRecorder,
+      SIGNAL(MessageChanged(std::string, int)),
+      this->renderWidget, SLOT(DisplayOverlayMsg(std::string, int)));
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
@@ -612,7 +615,7 @@ void MainWindow::CaptureScreenshot()
   this->renderWidget->DisplayOverlayMsg(
       "Screenshot saved in: " + cam->GetScreenshotPath(), 2000);
 }
-
+/*
 /////////////////////////////////////////////////
 void MainWindow::RecordVideo()
 {
@@ -678,7 +681,8 @@ void MainWindow::DisplayRecordingMsg()
 {
   this->renderWidget->DisplayOverlayMsg("Recording...",
       this->recordVideoTimer ? this->recordVideoTimer->interval()/2 : 500);
-}
+}*/
+
 /////////////////////////////////////////////////
 void MainWindow::InsertModel()
 {
@@ -1123,7 +1127,9 @@ void MainWindow::CreateActions()
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
 
-  g_recordVideoAct = new QAction(QIcon(":/images/record.png"),
+  this->videoRecorder->CreateActions();
+
+/*  g_recordVideoAct = new QAction(QIcon(":/images/record.png"),
       tr("Video"), this);
   g_recordVideoAct->setStatusTip(tr("Record a video"));
   g_recordVideoAct->setCheckable(true);
@@ -1156,7 +1162,7 @@ void MainWindow::CreateActions()
   videoFormatButton->setMaximumSize(18, videoFormatButton->height()/2);
 
   connect(videoFormatButton, SIGNAL(clicked()), this,
-    SLOT(ShowVideoFormatMenu()));
+    SLOT(ShowVideoFormatMenu()));*/
 }
 
 /////////////////////////////////////////////////

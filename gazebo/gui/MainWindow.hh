@@ -34,6 +34,7 @@ namespace gazebo
     class ToolsWidget;
     class ModelListWidget;
     class BuildingEditorPalette;
+    class VideoRecorder;
 
     class MainWindow : public QMainWindow
     {
@@ -80,7 +81,7 @@ namespace gazebo
       /// \brief Qt callback when the screenshot action is triggered
       private slots: void CaptureScreenshot();
 
-      /// \brief Qt callback when the record video action is triggered
+      /*/// \brief Qt callback when the record video action is triggered
       private slots: void RecordVideo();
 
       /// \brief Qt callback when a video format menu action is triggered
@@ -91,7 +92,7 @@ namespace gazebo
 
       /// \brief Qt callback connected to a QTimer for displaying a blinking
       /// recording text to the screen
-      private slots: void DisplayRecordingMsg();
+      private slots: void DisplayRecordingMsg();*/
 
       private slots: void InsertModel();
       private slots: void ShowGrid();
@@ -210,8 +211,8 @@ namespace gazebo
       /// the "Save" feature.
       private: std::string saveFilename;
 
-      /// \brief Timer for displaying the video recording message
-      private: QTimer *recordVideoTimer;
+      /// \brief Video recording widget
+      private: VideoRecorder * videoRecorder;
 
       /// \brief User specified step size for manually stepping the world
       private: int inputStepSize;

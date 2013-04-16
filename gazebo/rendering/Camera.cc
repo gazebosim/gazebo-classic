@@ -432,7 +432,41 @@ void Camera::PostRender()
         static_cast<Ogre::PixelFormat>(this->imageFormat),
         this->saveFrameBuffer);
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 8
     this->viewport->getTarget()->copyContentsToMemory(box);
+#else
+    // Case for UserCamera where there is no RenderTexture but
+    // a RenderTarget (RenderWindow) exists. We can not call SetRenderTarget
+    // because that overrides the this->renderTarget variable
+    if (this->renderTarget && !this->renderTexture)
+    {
+      // Create the render texture
+      this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
+        this->renderTarget->getName() + "_tex",
+        "General",
+        Ogre::TEX_TYPE_2D,
+        this->GetImageWidth(),
+        this->GetImageHeight(),
+        0,
+        (Ogre::PixelFormat)this->imageFormat,
+        Ogre::TU_RENDERTARGET)).getPointer();
+        Ogre::RenderTexture *rtt
+            = this->renderTexture->getBuffer()->getRenderTarget();
+
+      // Setup the viewport to use the texture
+      Ogre::Viewport *vp = rtt->addViewport(this->camera);
+      vp->setClearEveryFrame(true);
+      vp->setShadowsEnabled(true);
+    }
+    this->renderTexture->getBuffer()->getRenderTarget()->update();
+
+    // The code below is equivalent to
+    // this->viewport->getTarget()->copyContentsToMemory(box);
+    // which causes problems on some machines if running ogre-1.7.4
+    Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
+    pixelBuffer = this->renderTexture->getBuffer();
+    pixelBuffer->blitToMemory(box);
+#endif
 
     if (this->captureDataOnce)
     {

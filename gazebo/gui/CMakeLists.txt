@@ -40,6 +40,7 @@ set (sources
   TimePanel.cc
   ToolsWidget.cc
   TopicSelector.cc
+  VideoRecorder.cc
 )
 
 set (qt_headers
@@ -57,6 +58,7 @@ set (qt_headers
   TimePanel.hh
   ToolsWidget.hh
   TopicSelector.hh
+  VideoRecorder.hh
 )
 
 set (headers

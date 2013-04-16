@@ -52,7 +52,7 @@ namespace gazebo
       /// \brief Display an overlay message
       /// \param[in] _msg Message to be displayed
       /// \param [in] _duration Duration in milliseconds
-      public: void DisplayOverlayMsg(const std::string &_msg,
+      public slots: void DisplayOverlayMsg(const std::string &_msg,
           int _duration = -1);
 
       /// \brief Get the overlay message being displayed
