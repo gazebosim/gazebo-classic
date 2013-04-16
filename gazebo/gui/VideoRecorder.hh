@@ -17,6 +17,7 @@
 #ifndef _VIDEORECORDER_HH_
 #define _VIDEORECORDER_HH_
 
+#include <string>
 #include "gui/qt.h"
 #include "common/Event.hh"
 
