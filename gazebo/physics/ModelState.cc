@@ -276,7 +276,7 @@ ModelState &ModelState::operator=(const ModelState &_state)
 
   // Clear the link and joint states.
   this->linkStates.clear();
-  //this->jointStates.clear();
+  // this->jointStates.clear();
 
   // Copy the link states.
   for (std::vector<LinkState>::const_iterator iter =
@@ -286,11 +286,11 @@ ModelState &ModelState::operator=(const ModelState &_state)
   }
 
   // Copy the joint states.
-  /*for (std::vector<JointState>::const_iterator iter =
-       _state.jointStates.begin(); iter != _state.jointStates.end(); ++iter)
-  {
-    this->jointStates.push_back(JointState(*iter));
-  }*/
+  // for (std::vector<JointState>::const_iterator iter =
+  //      _state.jointStates.begin(); iter != _state.jointStates.end(); ++iter)
+  // {
+  //   this->jointStates.push_back(JointState(*iter));
+  // }
 
   return *this;
 }
