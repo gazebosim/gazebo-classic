@@ -90,11 +90,14 @@ namespace gazebo
     ///        to compute joint erp, cfm
     private: double damping;
 
-    /// \brief Dynamically created joint for simulating mud forces.
-    private: physics::JointPtr joint;
+    /// \brief Names of allowed target links, specified in sdf parameters.
+    private: std::vector<std::string> allowedLinks;
 
     /// \brief Pointer to link currently targeted by mud joint.
-    private: physics::LinkPtr targetLink;
+    private: std::vector<physics::LinkPtr> links;
+
+    /// \brief Dynamically created joint for simulating mud forces.
+    private: std::vector<physics::JointPtr> joints;
   };
 }
 #endif  // ifndef _MUD_PLUGIN_HH_

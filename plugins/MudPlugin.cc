@@ -15,6 +15,9 @@
  *
 */
 
+#include <boost/unordered_map.hpp>
+#include <boost/unordered_set.hpp>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
@@ -62,6 +65,25 @@ void MudPlugin::Load(physics::ModelPtr _model,
 
   if (_sdf->HasElement("damping"))
     this->damping = _sdf->GetValueDouble("damping");
+
+  if (_sdf->HasElement("link_name"))
+  {
+    sdf::ElementPtr elem = _sdf->GetElement("link_name");
+    while (elem)
+    {
+      allowedLinks.push_back(elem->GetValueString());
+      links.push_back(physics::LinkPtr());
+      joints.push_back(physics::JointPtr());
+      gzerr << "link_name " << elem->GetValueString() << '\n';
+      elem = elem->GetNextElement("link_name");
+    }
+  }
+  unsigned int linkCount;
+  linkCount = allowedLinks.size();
+  GZ_ASSERT(linkCount == links.size(),
+    "Length of links data structure doesn't match allowedLinks");
+  GZ_ASSERT(linkCount == joints.size(),
+    "Length of joints data structure doesn't match allowedLinks");
 }
 
 /////////////////////////////////////////////////
@@ -98,8 +120,8 @@ void MudPlugin::OnUpdate()
     boost::mutex::scoped_lock lock(this->mutex);
 
     unsigned int nc = this->newestContactsMsg.contact_size();
-    std::set<std::string> targetLinkNames;
-    std::map<std::string, unsigned int> linkNameIndices;
+    boost::unordered_set<std::string> contactLinkNames;
+    boost::unordered_map<std::string, unsigned int> linkNameIndices;
 
     // If new contacts, then get the link names
     if (nc)
@@ -120,9 +142,12 @@ void MudPlugin::OnUpdate()
       }
       std::string tmpLinkName = targetCollName.substr(0,
                                 targetCollName.rfind("::"));
-      targetLinkNames.insert(tmpLinkName);
+      contactLinkNames.insert(tmpLinkName);
       linkNameIndices[tmpLinkName] = nc-1;
 
+      // Then starting with second to last contact message, iterate backwards
+      // checking each contact with a timestamp matching the last contact
+      // Add each link name to contactLinkNames
       for (int i = nc-2; i >= 0 &&
            msgs::Convert(this->newestContactsMsg.contact(i).time())
             == latestContactTime; --i)
@@ -136,120 +161,132 @@ void MudPlugin::OnUpdate()
         }
         tmpLinkName = targetCollName.substr(0,
                       targetCollName.rfind("::"));
-        targetLinkNames.insert(tmpLinkName);
+        contactLinkNames.insert(tmpLinkName);
         linkNameIndices[tmpLinkName] = i;
       }
     }
 
-    // If there's an existing joint
-    if (this->joint)
+    // Iterate through the list of allowed links
+    std::vector<std::string>::iterator iterLinkName =
+      this->allowedLinks.begin();
+    std::vector<physics::LinkPtr>::iterator iterLink = this->links.begin();
+    std::vector<physics::JointPtr>::iterator iterJoint = this->joints.begin();
+    unsigned int countIters = 0;
+    // Only check the length of the first iterator since we used a GZ_ASSERT
+    // in the Load function to confirm the vectors have the same length
+    while (iterLinkName != this->allowedLinks.end())
     {
-      // If the targetLink doesn't exist or
-      // if it doesn't have its name in the most recent set,
-      // then destroy the joint
-      if (!this->targetLink || (targetLinkNames.end() ==
-          targetLinkNames.find(this->targetLink->GetScopedName())))
+      // If *iterLinkName is in contactLinkNames
+      if (contactLinkNames.end() != contactLinkNames.find(*iterLinkName))
       {
-        gzdbg << "Destroying mud joint\n";
+        // Compute the average contact point position
+        math::Vector3 contactPositionAverage;
+        {
+          // Find the index to the correct contact data structure
+          unsigned int i = linkNameIndices[*iterLinkName];
+          if (i < nc)
+          {
+            unsigned int pc =
+              this->newestContactsMsg.contact(i).position_size();
+            // Add up all the contact point positions
+            for (unsigned int j = 0; j < pc; ++j)
+            {
+              contactPositionAverage +=
+                msgs::Convert(this->newestContactsMsg.contact(i).position(j));
+            }
+            // Then divide by numer of contact points
+            contactPositionAverage /= static_cast<double>(pc);
+          }
+          else
+          {
+            gzerr << "Error in linkNameIndices\n";
+          }
+        }
 
-        // reenable collision between the link pair
-        physics::LinkPtr parent = this->joint->GetParent();
-        physics::LinkPtr child = this->joint->GetChild();
-        if (parent)
-          parent->SetCollideMode("all");
-        if (child)
-          child->SetCollideMode("all");
+        // If joint exists
+        if (*iterJoint)
+        {
+          // Update the anchor position
+          // TODO: consider checking MaxStepSize and updating erp, cfm
+          (*iterJoint)->SetAnchor(0, contactPositionAverage);
+        }
+        // Otherwise, try to create a joint
+        else
+        {
+          // Try to get link pointer if we don't already have it
+          if (!(*iterLink))
+          {
+            std::string targetModelName = (*iterLinkName).substr(0,
+                                          (*iterLinkName).rfind("::"));
+            physics::ModelPtr targetModel =
+              this->world->GetModel(targetModelName);
+            if (targetModel)
+              *iterLink = targetModel->GetLink(*iterLinkName);
+          }
 
-        this->joint->Detach();
-        this->joint.reset();
+          if (*iterLink)
+          {
+            // Create the joint
+            gzdbg << "Creating a mud joint with " << *iterLinkName << '\n';
+            (*iterLink)->SetAutoDisable(false);
+            *iterJoint = this->physics->CreateJoint("revolute", this->model);
+
+            (*iterJoint)->Attach(this->link, *iterLink);
+
+            (*iterJoint)->Load(this->link, *iterLink,
+              math::Pose(contactPositionAverage, math::Quaternion()));
+            // Joint names must be unique
+            // name as mud_joint_0, mud_joint_1, etc.
+            {
+              std::stringstream jointNameStream;
+              jointNameStream << "mud_joint_" << countIters;
+              (*iterJoint)->SetName(jointNameStream.str());
+            }
+
+            {
+              double erp, cfm, dt;
+              dt = this->physics->GetMaxStepSize();
+              erp = this->stiffness*dt / (this->stiffness*dt + this->damping); 
+              cfm = 1.0 / (this->stiffness*dt + this->damping); 
+              (*iterJoint)->SetAttribute("erp", 0, erp);
+              (*iterJoint)->SetAttribute("cfm", 0, cfm);
+              (*iterJoint)->SetAttribute("stop_erp", 0, erp);
+              (*iterJoint)->SetAttribute("stop_cfm", 0, cfm);
+            }
+            (*iterJoint)->SetHighStop(0, 0.0);
+            (*iterJoint)->SetLowStop(0, 0.0);
+
+            (*iterJoint)->Init();
+          }
+        }
       }
-      // Otherwise, update the anchor position
-      // TODO: consider checking MaxStepSize and updating erp, cfm
+      // *iterLinkName is not in contactLinkNames
       else
       {
-        math::Vector3 contactPositionAverage;
-        // Find the index to the correct contact data structure
-        unsigned int i = linkNameIndices[this->targetLink->GetScopedName()];
-        if (i < nc)
+        // If there's an existing joint,
+        // then delete the joint
+        if (*iterJoint)
         {
-          unsigned int pc = this->newestContactsMsg.contact(i).position_size();
-          // Add up all the contact point positions
-          for (unsigned int j = 0; j < pc; ++j)
-          {
-            contactPositionAverage +=
-              msgs::Convert(this->newestContactsMsg.contact(i).position(j));
-          }
-          // Then divide by numer of contact points
-          contactPositionAverage /= static_cast<double>(pc);
-          this->joint->SetAnchor(0, contactPositionAverage);
-        }
-        else
-        {
-          gzerr << "Error in linkNameIndices\n";
+          gzdbg << "Destroying mud joint\n";
+
+          // reenable collision between the link pair
+          physics::LinkPtr parent = (*iterJoint)->GetParent();
+          physics::LinkPtr child = (*iterJoint)->GetChild();
+          if (parent)
+            parent->SetCollideMode("all");
+          if (child)
+            child->SetCollideMode("all");
+
+          (*iterJoint)->Detach();
+          (*iterJoint).reset();
         }
       }
-    }
 
-    // If there's no joint
-    // and there are targetLinkNames
-    // Then create a joint with the first one
-    if (!this->joint && !targetLinkNames.empty())
-    {
-      std::string targetLinkName = *(targetLinkNames.begin());
-      std::string targetModelName = targetLinkName.substr(0,
-                                    targetLinkName.rfind("::"));
-      physics::ModelPtr targetModel = this->world->GetModel(targetModelName);
-      if (targetModel)
-        this->targetLink = targetModel->GetLink(targetLinkName);
-
-      if (this->targetLink)
-      {
-        // Create the joint
-        gzdbg << "Creating a mud joint with " << targetLinkName << '\n';
-        this->targetLink->SetAutoDisable(false);
-        this->joint = this->world->GetPhysicsEngine()->CreateJoint(
-          "revolute", this->model);
-
-        this->joint->Attach(this->link, this->targetLink);
-        // Compute anchor position here, code for contactPositionAverage
-        // copied from above.
-        math::Vector3 contactPositionAverage;
-        // Find the index to the correct contact data structure
-        unsigned int i = linkNameIndices[this->targetLink->GetScopedName()];
-        if (i < nc)
-        {
-          unsigned int pc = this->newestContactsMsg.contact(i).position_size();
-          // Add up all the contact point positions
-          for (unsigned int j = 0; j < pc; ++j)
-          {
-            contactPositionAverage +=
-              msgs::Convert(this->newestContactsMsg.contact(i).position(j));
-          }
-          // Then divide by numer of contact points
-          contactPositionAverage /= static_cast<double>(pc);
-        }
-        else
-        {
-          gzerr << "Error in linkNameIndices\n";
-        }
-
-        this->joint->Load(this->link, this->targetLink,
-          math::Pose(contactPositionAverage, math::Quaternion()));
-        this->joint->SetName("mud_joint");
-
-        double erp, cfm, dt;
-        dt = this->physics->GetMaxStepSize();
-        erp = this->stiffness*dt / (this->stiffness*dt + this->damping); 
-        cfm = 1.0 / (this->stiffness*dt + this->damping); 
-        this->joint->SetAttribute("erp", 0, erp);
-        this->joint->SetAttribute("cfm", 0, cfm);
-        this->joint->SetAttribute("stop_erp", 0, erp);
-        this->joint->SetAttribute("stop_cfm", 0, cfm);
-        this->joint->SetHighStop(0, 0.0);
-        this->joint->SetLowStop(0, 0.0);
-
-        this->joint->Init();
-      }
+      // Increment
+      ++countIters;
+      ++iterJoint;
+      ++iterLink;
+      ++iterLinkName;
     }
 
     this->newMsg = false;
