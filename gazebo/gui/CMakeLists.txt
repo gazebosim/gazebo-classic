@@ -13,6 +13,7 @@ add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
 add_subdirectory(building)
+add_subdirectory(viewers)
 
 set (sources
   ../gazebo.cc
@@ -39,12 +40,6 @@ set (sources
   TimePanel.cc
   ToolsWidget.cc
   TopicSelector.cc
-  viewers/ImageView.cc
-  viewers/ImagesView.cc
-  viewers/LaserView.cc
-  viewers/TopicView.cc
-  viewers/TextView.cc
-  viewers/ViewFactory.cc
 )
 
 set (qt_headers
@@ -62,11 +57,6 @@ set (qt_headers
   TimePanel.hh
   ToolsWidget.hh
   TopicSelector.hh
-  viewers/ImageView.hh
-  viewers/ImagesView.hh
-  viewers/LaserView.hh
-  viewers/TextView.hh
-  viewers/TopicView.hh
 )
 
 set (headers
@@ -81,7 +71,6 @@ set (headers
   MeshMaker.hh
   ModelMaker.hh
   SphereMaker.hh
-  viewers/ViewFactory.hh
 )
 
 #if (HAVE_QWT)
@@ -98,7 +87,6 @@ set (headers
 set (qt_tests
   DataLogger_TEST.cc
   TimePanel_TEST.cc
-  viewers/ImagesView_TEST.cc
 )
 
 # Generate executables for each of the QT unit tests
@@ -122,6 +110,7 @@ target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_sensors
                                  gazebo_msgs
                                  gazebo_building
+                                 gazebo_gui_viewers
                                  gzqtpropertybrowser
                                  ${QT_LIBRARIES}
                                  ${ogre_libraries}
@@ -135,6 +124,7 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_sensors
                                 gazebo_msgs
                                 gazebo_building
+                                gazebo_gui_viewers
                                 gzqtpropertybrowser
                                 ${QT_LIBRARIES}
                                 ${ogre_libraries}

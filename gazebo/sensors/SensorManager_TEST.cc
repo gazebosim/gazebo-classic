@@ -103,7 +103,19 @@ TEST_F(SensorManager_TEST, InitRemove)
        iter != sensors.end() && sensorCount > 10; ++iter)
   {
     mgr->RemoveSensor((*iter)->GetName());
-    EXPECT_EQ(mgr->GetSensors().size(), --sensorCount);
+
+    --sensorCount;
+
+    int i = 0;
+
+    // Wait for a sensor manager update.
+    while (mgr->GetSensors().size() > sensorCount)
+    {
+      gazebo::common::Time::MSleep(100);
+      ++i;
+    }
+
+    EXPECT_LT(i, 100);
   }
 
   // Make sure the proper number of sensors have been removed
