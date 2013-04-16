@@ -14,6 +14,7 @@ add_definitions(${QT_DEFINITIONS})
 add_subdirectory(qtpropertybrowser)
 add_subdirectory(building)
 add_subdirectory(terrain)
+add_subdirectory(viewers)
 
 set (sources
   Actions.cc
@@ -40,12 +41,6 @@ set (sources
   TimePanel.cc
   ToolsWidget.cc
   TopicSelector.cc
-  viewers/ImageView.cc
-  viewers/ImagesView.cc
-  viewers/LaserView.cc
-  viewers/TopicView.cc
-  viewers/TextView.cc
-  viewers/ViewFactory.cc
 )
 
 set (qt_headers
@@ -63,11 +58,6 @@ set (qt_headers
   TimePanel.hh
   ToolsWidget.hh
   TopicSelector.hh
-  viewers/ImageView.hh
-  viewers/ImagesView.hh
-  viewers/LaserView.hh
-  viewers/TextView.hh
-  viewers/TopicView.hh
 )
 
 set (headers
@@ -83,7 +73,6 @@ set (headers
   ModelMaker.hh
   SphereMaker.hh
   MouseEventHandler.hh
-  viewers/ViewFactory.hh
 )
 
 #if (HAVE_QWT)
@@ -100,7 +89,6 @@ set (headers
 set (qt_tests
   DataLogger_TEST.cc
   TimePanel_TEST.cc
-  viewers/ImagesView_TEST.cc
 )
 
 # Generate executables for each of the QT unit tests
@@ -125,6 +113,7 @@ target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_msgs
                                  gazebo_gui_building
                                  gazebo_gui_terrain
+                                 gazebo_gui_viewers
                                  gzqtpropertybrowser
                                  libgazebo
                                  ${QT_LIBRARIES}
@@ -140,6 +129,7 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_msgs
                                 gazebo_gui_building
                                 gazebo_gui_terrain
+                                gazebo_gui_viewers
                                 gzqtpropertybrowser
                                 libgazebo
                                 ${QT_LIBRARIES}
@@ -149,7 +139,7 @@ target_link_libraries(gzclient  gazebo_common
 
 add_definitions(${QT_DEFINITIONS})
 
-set (gui_headers "" CACHE INTERNAL "common headers" FORCE)
+set (gui_headers "" CACHE INTERNAL "gui headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(gui_headers
     "GUI Headers" "#include \"gui/${hdr}\"\n")

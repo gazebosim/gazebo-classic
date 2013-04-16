@@ -145,6 +145,7 @@ void CameraSensor::Init()
 //////////////////////////////////////////////////
 void CameraSensor::Fini()
 {
+  this->imagePub.reset();
   Sensor::Fini();
   if (this->camera)
     this->camera->Fini();

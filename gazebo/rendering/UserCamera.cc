@@ -507,7 +507,10 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   Camera::SetRenderTarget(_target);
 
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
-  this->gui->Init(this->renderTarget);
+
+  if (this->gui)
+    this->gui->Init(this->renderTarget);
+
   this->initialized = true;
 
   this->selectionBuffer = new SelectionBuffer(this->name,

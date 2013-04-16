@@ -861,8 +861,40 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd =
-    (_collision1->GetSurface()->fdir1 + _collision2->GetSurface()->fdir1) * 0.5;
+  math::Vector3 fd = _collision1->GetSurface()->fdir1;
+  if (fd != math::Vector3::Zero)
+  {
+    // fdir1 is in body local frame, rotate it into world frame
+    /// \TODO: once issue #624 is fixed, switch to below:
+    /// fd = _collision1->GetWorldPose().rot.RotateVector(fd);
+    fd = (_collision1->GetRelativePose() +
+      _collision1->GetLink()->GetWorldPose()).rot.RotateVector(fd.Normalize());
+  }
+
+  /// \TODO: Better treatment when both surfaces have fdir1 specified.
+  /// Ideally, we want to use fdir1 specified by surface with
+  /// a smaller friction coefficient, but it's not clear how
+  /// that can be determined with friction pyramid approximations.
+  /// As a hack, we'll simply compare mu1 from
+  /// both surfaces for now, and use fdir1 specified by
+  /// surface with smaller mu1.
+  math::Vector3 fd2 = _collision2->GetSurface()->fdir1;
+  if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
+        _collision1->GetSurface()->mu1 > _collision2->GetSurface()->mu1))
+  {
+    // fdir1 is in body local frame, rotate it into world frame
+    /// \TODO: once issue #624 is fixed, switch to below:
+    /// fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
+    fd = (_collision2->GetRelativePose() +
+      _collision2->GetLink()->GetWorldPose()).rot.RotateVector(fd2.Normalize());
+    /// \TODO: uncomment gzlog below once we confirm it does not affect
+    /// performance
+    /// if (fd2 != math::Vector3::Zero && fd != math::Vector3::Zero &&
+    ///       _collision1->surface->mu1 > _collision2->surface->mu1)
+    ///   gzlog << "both contact surfaces have non-zero fdir1, comparing"
+    ///         << " comparing mu1 from both surfaces, and use fdir1"
+    ///         << " from surface with smaller mu1\n";
+  }
 
   if (fd != math::Vector3::Zero)
   {
@@ -955,8 +987,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       jointFeedback->count++;
     }
 
-    // Attach the contact joint.
-    dJointAttach(contactJoint, b1, b2);
+    // Attach the contact joint if collideWithoutContact flags aren't set.
+    if (!_collision1->GetSurface()->collideWithoutContact &&
+        !_collision2->GetSurface()->collideWithoutContact)
+      dJointAttach(contactJoint, b1, b2);
   }
 }
 

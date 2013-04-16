@@ -639,7 +639,7 @@ void MainWindow::ShowCollisions()
 void MainWindow::ShowGrid()
 {
   msgs::Scene msg;
-  msg.set_name("default");
+  msg.set_name(gui::get_world());
   msg.set_grid(g_showGridAct->isChecked());
   this->scenePub->Publish(msg);
 }
@@ -1286,7 +1286,6 @@ void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
   {
     g_pauseAct->setVisible(true);
     g_playAct->setVisible(false);
-
   }
 }
 
@@ -1302,7 +1301,6 @@ void MainWindow::OnPlayActionChanged()
   {
     g_stepAct->setToolTip("Pause the world before stepping");
     g_stepAct->setEnabled(false);
-
   }
 }
 
