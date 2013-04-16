@@ -74,6 +74,9 @@ namespace gazebo
       /// \brief Finalize the ray
       protected: virtual void Fini();
 
+      // Documentation inherited
+      public: virtual std::string GetTopic() const;
+
       /// \brief Returns a pointer to the internally kept rendering::GpuLaser
       /// \return Pointer to GpuLaser
       public: rendering::GpuLaserPtr GetLaserCamera() const
@@ -281,7 +284,34 @@ namespace gazebo
       private: boost::mutex mutex;
 
       /// \brief Laser message to publish data.
-      private: msgs::LaserScan laserMsg;
+      private: msgs::LaserScanStamped laserMsg;
+
+      /// \brief Parent entity of gpu ray sensor
+      private: physics::EntityPtr parentEntity;
+
+      /// \brief Publisher to publish ray sensor data
+      private: transport::PublisherPtr scanPub;
+
+      // Which noise type we support
+      private: enum NoiseModelType
+      {
+        NONE,
+        GAUSSIAN
+      };
+
+      // If true, apply the noise model specified by other noise parameters
+      private: bool noiseActive;
+
+      // Which type of noise we're applying
+      private: enum NoiseModelType noiseType;
+
+      // If noiseType==GAUSSIAN, noiseMean is the mean of the distibution
+      // from which we sample
+      private: double noiseMean;
+
+      // If noiseType==GAUSSIAN, noiseStdDev is the standard devation of
+      // the distibution from which we sample
+      private: double noiseStdDev;
     };
     /// \}
   }

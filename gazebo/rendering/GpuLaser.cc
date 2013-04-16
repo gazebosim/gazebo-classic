@@ -148,7 +148,8 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
       Ogre::PF_FLOAT32_RGB,
       Ogre::TU_RENDERTARGET).getPointer();
 
-  this->Set2ndPassTarget(this->secondPassTexture->getBuffer()->getRenderTarget());
+  this->Set2ndPassTarget(
+      this->secondPassTexture->getBuffer()->getRenderTarget());
   RTShaderSystem::AttachViewport(this->secondPassViewport, this->GetScene());
   this->secondPassTarget->setAutoUpdated(false);
 
@@ -157,18 +158,18 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 
   this->matSecondPass->load();
 
-  Ogre::TextureUnitState *tex_unit;
-  for (unsigned int i = 0; i < this->textureCount; i++)
+  Ogre::TextureUnitState *texUnit;
+  for (unsigned int i = 0; i < this->textureCount; ++i)
   {
     unsigned int texIndex = texCount++;
-    tex_unit =
+    texUnit =
       this->matSecondPass->getTechnique(0)->getPass(0)->createTextureUnitState(
         this->firstPassTextures[i]->getName(), texIndex);
 
     this->texIdx.push_back(texIndex);
 
-    tex_unit->setTextureFiltering(Ogre::TFO_NONE);
-    tex_unit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
+    texUnit->setTextureFiltering(Ogre::TFO_NONE);
+    texUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
   }
 
   this->CreateCanvas();
@@ -381,7 +382,7 @@ void GpuLaser::RenderImpl()
 
   sceneMgr->addRenderObjectListener(this);
 
-  for (unsigned int i = 0; i < this->textureCount; i++)
+  for (unsigned int i = 0; i < this->textureCount; ++i)
   {
     if (this->textureCount>1)
       this->RotateYaw(this->cameraYaws[i]);
@@ -506,7 +507,8 @@ void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *_target)
   if (this->secondPassTarget)
   {
     // Setup the viewport to use the texture
-    this->secondPassViewport = this->secondPassTarget->addViewport(this->orthoCam);
+    this->secondPassViewport =
+        this->secondPassTarget->addViewport(this->orthoCam);
     this->secondPassViewport->setClearEveryFrame(true);
     this->secondPassViewport->setBackgroundColour(
         Ogre::ColourValue(0.0, 1.0, 0.0));
