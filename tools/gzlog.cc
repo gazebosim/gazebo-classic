@@ -612,7 +612,7 @@ class StateFilter : public FilterBase
 
             if (this->hz > 0.0 && this->prevTime != gazebo::common::Time::Zero)
             {
-              if ((state.GetRealTime() - this->prevTime).Double() <
+              if ((state.GetSimTime() - this->prevTime).Double() <
                   1.0 / this->hz)
               {
                 return result.str();
@@ -621,7 +621,8 @@ class StateFilter : public FilterBase
 
             if (this->xmlOutput)
             {
-              result << "<state name='" << state.GetName() << "'>\n"
+              result << "<sdf version='" << SDF_VERSION << "'>\n"
+                << "<state world_name='" << state.GetName() << "'>\n"
                 << "<sim_time>" << state.GetSimTime() << "</sim_time>\n"
                 << "<real_time>" << state.GetRealTime() << "</real_time>\n"
                 << "<wall_time>" << state.GetWallTime() << "</wall_time>\n";
@@ -630,9 +631,9 @@ class StateFilter : public FilterBase
             result << this->filter.Filter(state);
 
             if (this->xmlOutput)
-              result << "</state>\n";
+              result << "</sdf></state>\n";
 
-            this->prevTime = state.GetRealTime();
+            this->prevTime = state.GetSimTime();
             return result.str();
           }
 
@@ -854,18 +855,16 @@ void echo(const std::string &_filter, bool _raw, const std::string &_stamp,
   std::string stateString;
 
   // Output the header
-  std::cout << play->GetHeader();
+  std::cout << play->GetHeader() << std::endl;
 
   StateFilter filter(!_raw, _stamp, _hz);
   filter.Init(_filter);
 
   unsigned int i = 0;
-  while (gazebo::util::LogPlay::Instance()->Step(stateString))
+  while (play->Step(stateString))
   {
-    if (!_filter.empty() && i > 0)
+    if (i > 0)
       stateString = filter.Filter(stateString);
-    else if (!_filter.empty())
-      stateString.clear();
 
     if (!stateString.empty())
     {
@@ -889,7 +888,7 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
   std::string stateString;
   gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
 
-  std::cout << play->GetHeader();
+  std::cout << play->GetHeader() << std::endl;
 
   char c = '\0';
 
@@ -897,13 +896,8 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
   filter.Init(_filter);
 
   unsigned int i = 0;
-  while (gazebo::util::LogPlay::Instance()->Step(stateString) && c != 'q')
+  while (play->Step(stateString) && c != 'q')
   {
-    stateString.clear();
-
-    // Get and output the state string
-    play->Step(stateString);
-
     if (i > 0)
       stateString = filter.Filter(stateString);
 

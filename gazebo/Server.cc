@@ -84,7 +84,6 @@ bool Server::ParseArgs(int argc, char **argv)
       this->systemPluginsArgv[i][j] = argv[i][j];
   }
 
-
   po::options_description v_desc("Allowed options");
   v_desc.add_options()
     ("help,h", "Produce this help message.")
@@ -97,6 +96,8 @@ bool Server::ParseArgs(int argc, char **argv)
      "Aboslute path in which to store state data")
     ("seed",  po::value<double>(),
      "Start with a given random number seed.")
+    ("iters",  po::value<unsigned int>(),
+     "Number of iterations to simulate.")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
@@ -167,6 +168,21 @@ bool Server::ParseArgs(int argc, char **argv)
       !this->vm["record_path"].as<std::string>().empty())
   {
     this->params["record"] = this->vm["record_path"].as<std::string>();
+  }
+
+  if (this->vm.count("iters"))
+  {
+    try
+    {
+      this->params["iterations"] = boost::lexical_cast<std::string>(
+          this->vm["iters"].as<unsigned int>());
+    }
+    catch(...)
+    {
+      this->params["iterations"] = "0";
+      gzerr << "Unable to set iterations of [" <<
+        this->vm["iters"].as<unsigned int>() << "]\n";
+    }
   }
 
   if (this->vm.count("pause"))
@@ -411,11 +427,27 @@ void Server::Run()
   // Run the sensor threads
   sensors::run_threads();
 
+  unsigned int iterations = 0;
+  common::StrStr_M::iterator piter = this->params.find("iterations");
+  if (piter != this->params.end())
+  {
+    try
+    {
+      iterations = boost::lexical_cast<unsigned int>(piter->second);
+    }
+    catch (...)
+    {
+      iterations = 0;
+      gzerr << "Unable to cast iterations[" << piter->second << "] "
+        << "to unsigned integer\n";
+    }
+  }
+
   // Run each world. Each world starts a new thread
-  physics::run_worlds();
+  physics::run_worlds(iterations);
 
   // Update the sensors.
-  while (!this->stop)
+  while (!this->stop && physics::worlds_running())
   {
     this->ProcessControlMsgs();
     sensors::run_once();

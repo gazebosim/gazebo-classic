@@ -55,7 +55,7 @@ LinkState::LinkState(const LinkPtr _link)
                        math::Quaternion(_link->GetWorldAngularAccel()));
   this->wrench = math::Pose(_link->GetWorldForce(), math::Quaternion());
 
-  // Disabling CollisionStates to improve performance. This information is 
+  // Disabling CollisionStates to improve performance. This information is
   // probably not required.
   //
   // // Create all the collision states.
@@ -201,7 +201,7 @@ bool LinkState::IsZero() const
   //   result = result && (*iter).IsZero();
   // }
 
-  //return result && this->pose == math::Pose::Zero;
+  // return result && this->pose == math::Pose::Zero;
   return this->pose == math::Pose::Zero;
 }
 

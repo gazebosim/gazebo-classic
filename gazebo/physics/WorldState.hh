@@ -93,7 +93,7 @@ namespace gazebo
       /// \return Number of models.
       public: unsigned int GetModelStateCount() const;
 
-      /// Deprecated 
+      /// Deprecated
       public: ModelState GetModelState(unsigned int _index) const
               GAZEBO_DEPRECATED(1.7);
 

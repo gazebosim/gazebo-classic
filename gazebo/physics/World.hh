@@ -90,7 +90,13 @@ namespace gazebo
       /// \brief Run the world in a thread.
       ///
       /// Run the update loop.
-      public: void Run();
+      /// \param[in] _iterations Run for this many iterations, then stop.
+      /// A value of zero disables run stop.
+      public: void Run(unsigned int _iterations = 0);
+
+      /// \brief Return the running state of the world.
+      /// \return True if the world is running.
+      public: bool GetRunning() const;
 
       /// \brief Stop the world.
       ///
@@ -641,6 +647,9 @@ namespace gazebo
 
       /// \brief The number of simulation iterations.
       private: uint64_t iterations;
+
+      /// \brief The number of simulation iterations to take before stopping.
+      private: uint64_t stopIterations;
 
       /// \brief Condition used for log worker.
       private: boost::condition_variable logCondition;

@@ -38,7 +38,6 @@ class TopicManagerProcessTask : public tbb::task
 
 //////////////////////////////////////////////////
 ConnectionManager::ConnectionManager()
-  // : updateSem(0)
 {
   this->tmpIndex = 0;
   this->initialized = false;
@@ -264,7 +263,7 @@ void ConnectionManager::Run()
 
   this->stopped = false;
 
-  while (!this->stop)
+  while (!this->stop && this->masterConn && this->masterConn->IsOpen())
   {
     this->RunUpdate();
     this->updateCondition.timed_wait(lock,

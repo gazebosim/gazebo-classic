@@ -308,25 +308,24 @@ void World::Init()
 }
 
 //////////////////////////////////////////////////
-void World::Run()
+void World::Run(unsigned int _iterations)
 {
   this->stop = false;
+  this->stopIterations = _iterations;
 
   this->thread = new boost::thread(boost::bind(&World::RunLoop, this));
+}
+
+//////////////////////////////////////////////////
+bool World::GetRunning() const
+{
+  return !this->stop;
 }
 
 //////////////////////////////////////////////////
 void World::Stop()
 {
   this->stop = true;
-
-  if (this->logThread)
-  {
-    this->logCondition.notify_all();
-    this->logThread->join();
-    delete this->logThread;
-    this->logThread = NULL;
-  }
 
   if (this->thread)
   {
@@ -357,14 +356,31 @@ void World::RunLoop()
 
   if (!util::LogPlay::Instance()->IsOpen())
   {
-    while (!this->stop)
+    for (this->iterations = 0; !this->stop &&
+        (!this->stopIterations || (this->iterations < this->stopIterations));)
+    {
       this->Step();
+    }
   }
   else
   {
     this->enablePhysicsEngine = false;
-    while (!this->stop)
+    for (this->iterations = 0; !this->stop &&
+        (!this->stopIterations || (this->iterations < this->stopIterations));)
+    {
       this->LogStep();
+    }
+  }
+
+  this->thread = NULL;
+  this->stop = true;
+
+  if (this->logThread)
+  {
+    this->logCondition.notify_all();
+    this->logThread->join();
+    delete this->logThread;
+    this->logThread = NULL;
   }
 }
 
@@ -1685,7 +1701,7 @@ bool World::OnLog(std::ostringstream &_stream)
     {
       _stream << "<sdf version='" << SDF_VERSION << "'>"
         << this->states[0] << "</sdf>";
-        
+
       this->states.pop_front();
     }
   }
