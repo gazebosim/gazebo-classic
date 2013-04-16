@@ -83,6 +83,13 @@ void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
+  float retro;
+  if (this->sdf->HasElement("laser_retro"))
+    {
+      retro = this->sdf->GetElement("laser_retro")->GetValueDouble();
+      this->SetLaserRetro(retro);
+    }
+
   this->SetRelativePose(this->sdf->GetValuePose("pose"));
 
   this->surface->Load(this->sdf->GetElement("surface"));
