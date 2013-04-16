@@ -104,7 +104,8 @@ def check_main():
     stdout, stderr = run_grep(test_file, "QtVersion")
     if (stdout):
         print("Detect QTest xml file. Converting to JUNIT ...")
-        run_xsltproc("qtest_to_junit.xslt", test_file)
+        stylesheet = os.path.dirname(os.path.abspath(__file__)) + "/qtest_to_junit.xslt"
+        run_xsltproc(stylesheet, test_file)
 
 if __name__ == '__main__':
     check_main()
