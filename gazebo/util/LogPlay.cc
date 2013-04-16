@@ -102,6 +102,21 @@ void LogPlay::Open(const std::string &_logFile)
 }
 
 /////////////////////////////////////////////////
+std::string LogPlay::GetHeader() const
+{
+  std::ostringstream stream;
+  stream << "<?xml version='1.0'?>\n"
+         << "<gazebo_log>\n"
+         << "<header>\n"
+         << "<log_version>" << this->logVersion << "</log_version>\n"
+         << "<gazebo_version>" << this->gazeboVersion << "</gazebo_version>\n"
+         << "<rand_seed>" << this->randSeed << "</rand_seed>\n"
+         << "</header>\n";
+
+  return stream.str();
+}
+
+/////////////////////////////////////////////////
 void LogPlay::ReadHeader()
 {
   this->randSeed = math::Rand::GetSeed();

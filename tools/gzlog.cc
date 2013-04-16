@@ -850,7 +850,11 @@ void info(const std::string &_filename)
 void echo(const std::string &_filter, bool _raw, const std::string &_stamp,
     double _hz)
 {
+  gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
   std::string stateString;
+
+  // Output the header
+  std::cout << play->GetHeader();
 
   StateFilter filter(!_raw, _stamp, _hz);
   filter.Init(_filter);
@@ -864,10 +868,16 @@ void echo(const std::string &_filter, bool _raw, const std::string &_stamp,
       stateString.clear();
 
     if (!stateString.empty())
+    {
+      std::cout << "<chunk encoding='txt'>\n";
       std::cout << stateString;
+      std::cout << "</chunk>\n";
+    }
 
     ++i;
   }
+
+  std::cout << "</gazebo_log>\n";
 }
 
 /////////////////////////////////////////////////
@@ -878,6 +888,8 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
 {
   std::string stateString;
   gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
+
+  std::cout << play->GetHeader();
 
   char c = '\0';
 
@@ -898,7 +910,9 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
     // Only wait for user input if there is some state to output.
     if (!stateString.empty())
     {
+      std::cout << "<chunk encoding='txt'>\n";
       std::cout << stateString;
+      std::cout << "</chunk>\n";
 
       std::cout << "\n--- Press space to continue, 'q' to quit ---\n";
 
@@ -910,6 +924,8 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
     }
     ++i;
   }
+
+  std::cout << "</gazebo_log>\n";
 }
 
 /////////////////////////////////////////////////
