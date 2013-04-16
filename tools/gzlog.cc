@@ -869,9 +869,9 @@ void echo(const std::string &_filter, bool _raw, const std::string &_stamp,
 
     if (!stateString.empty())
     {
-      std::cout << "<chunk encoding='txt'>\n";
+      std::cout << "<chunk encoding='txt'><![CDATA[\n";
       std::cout << stateString;
-      std::cout << "</chunk>\n";
+      std::cout << "]]></chunk>\n";
     }
 
     ++i;
@@ -910,9 +910,9 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
     // Only wait for user input if there is some state to output.
     if (!stateString.empty())
     {
-      std::cout << "<chunk encoding='txt'>\n";
+      std::cout << "<chunk encoding='txt'><![CDATA[\n";
       std::cout << stateString;
-      std::cout << "</chunk>\n";
+      std::cout << "]]></chunk>\n";
 
       std::cout << "\n--- Press space to continue, 'q' to quit ---\n";
 
