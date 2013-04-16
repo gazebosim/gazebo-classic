@@ -77,11 +77,9 @@ void MudPlugin::Load(physics::ModelPtr _model,
       elem = elem->GetNextElement("link_name");
     }
   }
-  unsigned int linkCount;
-  linkCount = allowedLinks.size();
-  GZ_ASSERT(linkCount == links.size(),
+  GZ_ASSERT(allowedLinks.size() == links.size(),
     "Length of links data structure doesn't match allowedLinks");
-  GZ_ASSERT(linkCount == joints.size(),
+  GZ_ASSERT(allowedLinks.size() == joints.size(),
     "Length of joints data structure doesn't match allowedLinks");
 }
 
@@ -125,35 +123,21 @@ void MudPlugin::OnUpdate()
     // If new contacts, then get the link names
     if (nc)
     {
-      // Latest contact data is at the end of msg.contact() vector
-      // So iterate from the end to the beginning
-      common::Time latestContactTime =
-        msgs::Convert(this->newestContactsMsg.contact(nc-1).time());
-
-      // Try to find name of the other collision
-      // If collision1() starts with this->modelName, then use collision2()
-      std::string targetCollName =
-        this->newestContactsMsg.contact(nc-1).collision1();
-      if (0 == targetCollName.compare(0, this->modelName.length(),
-               this->modelName))
-      {
-        targetCollName = this->newestContactsMsg.contact(nc-1).collision2();
-      }
-      std::string tmpLinkName = targetCollName.substr(0,
-                                targetCollName.rfind("::"));
-      contactLinkNames.insert(tmpLinkName);
-      linkNameIndices[tmpLinkName] = nc-1;
-
-      // Then starting with second to last contact message, iterate backwards
+      // Starting with last contact message, iterate backwards
       // checking each contact with a timestamp matching the last contact
       // Add each link name to contactLinkNames
-      for (int i = nc-2; i >= 0 &&
+      common::Time latestContactTime =
+        msgs::Convert(this->newestContactsMsg.contact(nc-1).time());
+      std::string targetCollName, tmpLinkName;
+
+      for (int i = nc-1; i >= 0 &&
            msgs::Convert(this->newestContactsMsg.contact(i).time())
             == latestContactTime; --i)
       {
-        targetCollName =
-          this->newestContactsMsg.contact(i).collision1();
-        if (0 == this->modelName.compare(0, this->modelName.length(),
+        // Try to find name of the other collision
+        // If collision1() starts with this->modelName, then use collision2()
+        targetCollName = this->newestContactsMsg.contact(i).collision1();
+        if (0 == targetCollName.compare(0, this->modelName.length(),
                targetCollName))
         {
           targetCollName = this->newestContactsMsg.contact(i).collision2();
