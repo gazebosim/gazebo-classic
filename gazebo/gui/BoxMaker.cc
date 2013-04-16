@@ -18,10 +18,10 @@
 
 #include "msgs/msgs.hh"
 
-#include "common/Console.hh"
+#include "gazebo/common/Console.hh"
 #include "gui/GuiEvents.hh"
 #include "math/Quaternion.hh"
-#include "common/MouseEvent.hh"
+#include "gazebo/common/MouseEvent.hh"
 
 #include "rendering/UserCamera.hh"
 

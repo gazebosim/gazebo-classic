@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "gui/qt.h"
-#include "common/Event.hh"
+#include "gazebo/common/Event.hh"
 
 class QLineEdit;
 class QLabel;

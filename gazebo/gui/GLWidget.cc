@@ -16,7 +16,7 @@
 */
 #include <math.h>
 
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
 #include "math/gzmath.hh"
 
 #include "transport/transport.hh"

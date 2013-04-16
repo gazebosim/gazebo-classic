@@ -18,9 +18,9 @@
 
 #include "msgs/msgs.hh"
 
-#include "common/Console.hh"
-#include "common/MouseEvent.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/Exception.hh"
 
 #include "rendering/UserCamera.hh"
 #include "rendering/Visual.hh"

@@ -27,8 +27,8 @@
 
 #include "transport/TransportTypes.hh"
 
-#include "common/MouseEvent.hh"
-#include "common/Event.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/Event.hh"
 
 #include "math/Pose.hh"
 
