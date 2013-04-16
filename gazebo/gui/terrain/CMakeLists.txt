@@ -21,4 +21,5 @@ QT4_ADD_RESOURCES(resources_RCC ${resources})
 add_library(gazebo_gui_terrain STATIC ${sources} ${headers_MOC}
   ${headers} ${resources_RCC})
 
+add_dependencies(gazebo_gui_terrain gazebo_msgs)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
