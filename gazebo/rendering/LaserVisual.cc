@@ -75,7 +75,7 @@ void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
   this->rayFan->SetPoint(0, offset.pos);
   for (size_t i = 0; static_cast<int>(i) < _msg->scan().ranges_size(); i++)
   {
-    r = _msg->scan().ranges(i) + _msg->scan().range_min();
+    r = _msg->scan().ranges(i);
     pt.x = 0 + r * cos(angle);
     pt.y = 0 + r * sin(angle);
     pt.z = 0;
