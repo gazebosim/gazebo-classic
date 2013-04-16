@@ -168,10 +168,10 @@ bool LinkState::IsZero() const
     result = result && (*iter).IsZero();
   }*/
 
-  return this->pose == math::Pose::Zero;/* &&
-         this->velocity == math::Pose::Zero &&
-         this->acceleration == math::Pose::Zero &&
-         this->wrench == math::Pose::Zero;*/
+  return this->pose == math::Pose::Zero;
+  // && this->velocity == math::Pose::Zero &&
+  //       this->acceleration == math::Pose::Zero &&
+  //       this->wrench == math::Pose::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -212,7 +212,7 @@ LinkState LinkState::operator-(const LinkState &_state) const
 
   result.name = this->name;
 
-  result.pose =  this->pose;// - _state.pose.pos;
+  result.pose =  this->pose;
   // result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
 
   result.velocity = this->velocity - _state.velocity;
@@ -240,7 +240,7 @@ LinkState LinkState::operator+(const LinkState &_state) const
   result.name = this->name;
 
   result.pose = _state.pose;
-  //result.pose.pos = this->pose.pos + _state.pose.pos;
+  // result.pose.pos = this->pose.pos + _state.pose.pos;
   // result.pose.rot = _state.pose.rot * this->pose.rot;
 
   result.velocity = this->velocity + _state.velocity;
@@ -270,13 +270,13 @@ void LinkState::FillSDF(sdf::ElementPtr _sdf)
   _sdf->GetElement("acceleration")->Set(this->acceleration);
   _sdf->GetElement("wrench")->Set(this->wrench);
 
-  /*for (std::vector<CollisionState>::iterator iter =
-       this->collisionStates.begin();
-       iter != this->collisionStates.end(); ++iter)
-  {
-    sdf::ElementPtr elem = _sdf->AddElement("collision");
-    (*iter).FillSDF(elem);
-  }*/
+  // for (std::vector<CollisionState>::iterator iter =
+  //      this->collisionStates.begin();
+  //      iter != this->collisionStates.end(); ++iter)
+  // {
+  //   sdf::ElementPtr elem = _sdf->AddElement("collision");
+  //   (*iter).FillSDF(elem);
+  // }
 }
 
 /////////////////////////////////////////////////
