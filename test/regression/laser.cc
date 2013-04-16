@@ -18,7 +18,7 @@
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "sensors/sensors.hh"
-#include "common/common.hh"
+#include "gazebo/common/common.hh"
 #include "scans_cmp.h"
 
 #define LASER_TOL 1e-5

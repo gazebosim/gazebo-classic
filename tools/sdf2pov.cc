@@ -16,10 +16,10 @@
 */
 #include "sdf/sdf.hh"
 #include "math/Pose.hh"
-#include "common/Console.hh"
-#include "common/MeshManager.hh"
-#include "common/Mesh.hh"
-#include "common/Material.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Material.hh"
 
 std::vector<std::string> params;
 

@@ -17,7 +17,7 @@
 
 #include "ServerFixture.hh"
 #include "sensors/sensors.hh"
-#include "common/common.hh"
+#include "gazebo/common/common.hh"
 
 // How tightly to compare for deterministic values
 #define IMU_TOL 1e-5

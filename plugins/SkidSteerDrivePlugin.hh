@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "common/common.hh"
+#include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
 #include "transport/TransportTypes.hh"
 #include "gazebo.hh"
