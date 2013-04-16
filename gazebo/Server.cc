@@ -92,7 +92,9 @@ bool Server::ParseArgs(int argc, char **argv)
     ("physics,e", po::value<std::string>(),
      "Specify a physics engine (ode|bullet).")
     ("play,p", po::value<std::string>(), "Play a log file.")
-    ("record,r", "Record state data to disk.")
+    ("record,r", "Record state data.")
+    ("record_path", po::value<std::string>()->default_value(""),
+     "Aboslute path in which to store state data")
     ("seed",  po::value<double>(),
      "Start with a given random number seed.")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
@@ -161,8 +163,11 @@ bool Server::ParseArgs(int argc, char **argv)
   }
 
   // Set the parameter to record a log file
-  if (this->vm.count("record"))
-    this->params["record"] = "bz2";
+  if (this->vm.count("record") ||
+      !this->vm["record_path"].as<std::string>().empty())
+  {
+    this->params["record"] = this->vm["record_path"].as<std::string>();
+  }
 
   if (this->vm.count("pause"))
     this->params["pause"] = "true";
@@ -461,7 +466,7 @@ void Server::ProcessParams()
     }
     else if (iter->first == "record")
     {
-      util::LogRecord::Instance()->Start(iter->second);
+      util::LogRecord::Instance()->Start("bz2", iter->second);
     }
   }
 }

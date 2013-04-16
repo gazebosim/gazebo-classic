@@ -97,6 +97,7 @@ World::World(const std::string &_name)
   this->stepInc = 0;
   this->pause = false;
   this->thread = NULL;
+  this->logThread = NULL;
   this->stop = false;
 
   this->stateToggle = 0;
@@ -413,9 +414,7 @@ void World::LogStep()
         }
       }
 
-      WorldState state = WorldState(shared_from_this()) + this->logPlayState;
-      this->SetState(state);
-
+      this->SetState(this->logPlayState);
       this->Update();
       this->iterations++;
     }
@@ -571,7 +570,18 @@ void World::Update()
 
   // Wait for logging to finish, if it's running.
   if (util::LogRecord::Instance()->GetRunning())
+  {
     boost::mutex::scoped_lock lock(this->logMutex);
+
+    // It's possible the logWorker thread never processed the previous
+    // state. This checks to make sure that we don't continute until the log
+    // worker catchs up.
+    if (this->iterations - this->logPrevIteration > 1)
+    {
+      this->logCondition.notify_one();
+      this->logContinueCondition.wait(lock);
+    }
+  }
 
   // Update the physics engine
   if (this->enablePhysicsEngine && this->physicsEngine)
@@ -962,11 +972,16 @@ gazebo::common::Time World::GetStartTime() const
 //////////////////////////////////////////////////
 common::Time World::GetRealTime() const
 {
-  if (this->pause)
-    return (this->pauseStartTime - this->startTime) - this->realTimeOffset;
+  if (!util::LogPlay::Instance()->IsOpen())
+  {
+    if (this->pause)
+      return (this->pauseStartTime - this->startTime) - this->realTimeOffset;
+    else
+      return (common::Time::GetWallTime() - this->startTime) -
+        this->realTimeOffset;
+  }
   else
-    return (common::Time::GetWallTime() - this->startTime) -
-             this->realTimeOffset;
+    return this->logRealTime;
 }
 
 //////////////////////////////////////////////////
@@ -1572,6 +1587,7 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
 void World::SetState(const WorldState &_state)
 {
   this->SetSimTime(_state.GetSimTime());
+  this->logRealTime = _state.GetRealTime();
 
   const ModelState_M modelStates = _state.GetModelStates();
   for (ModelState_M::const_iterator iter = modelStates.begin();
@@ -1661,16 +1677,35 @@ bool World::OnLog(std::ostringstream &_stream)
   else if (this->states.size() >= 1)
   {
     size_t end = this->states.size();
-    _stream << "<sdf version='" << SDF_VERSION << "'>";
 
     // Get the difference from the previous state.
     for (size_t i = 0; i < end; ++i)
     {
-      _stream << this->states[0];
+      _stream << "<sdf version='" << SDF_VERSION << "'>"
+        << this->states[0] << "</sdf>";
+        
       this->states.pop_front();
     }
+  }
 
-    _stream << "</sdf>";
+  // Logging has stopped. Wait for log worker to finish. Output last bit
+  // of data, and reset states.
+  if (!util::LogRecord::Instance()->GetRunning())
+  {
+    boost::mutex::scoped_lock lock(this->logMutex);
+
+    // Output any data that may have been pushed onto the queue
+    for (size_t i = 0; i < this->states.size(); ++i)
+    {
+      _stream << "<sdf version='" << SDF_VERSION << "'>"
+        << this->states[i] << "</sdf>";
+    }
+
+    // Clear everything.
+    this->states.clear();
+    this->stateToggle = 0;
+    this->prevStates[0] = WorldState();
+    this->prevStates[1] = WorldState();
   }
 
   return true;
@@ -1756,20 +1791,38 @@ void World::LogWorker()
   boost::mutex::scoped_lock lock(this->logMutex);
 
   WorldPtr self = shared_from_this();
+  this->logPrevIteration = this->iterations;
+
+  GZ_ASSERT(self, "Self pointer to World is invalid");
+
   while (!this->stop)
   {
     int currState = (this->stateToggle + 1) % 2;
+
     this->prevStates[currState].Load(self);
     WorldState diffState = this->prevStates[currState] -
       this->prevStates[this->stateToggle];
+    this->logPrevIteration = this->iterations;
 
     if (!diffState.IsZero())
     {
       this->stateToggle = currState;
-      this->states.push_back(diffState);
+
+      // Store the entire current state (instead of the diffState). A slow
+      // moving link may never be captured if only diff state is recorded.
+      this->states.push_back(this->prevStates[currState]);
+
+      // Tell the logger to update, once the number of states exceeds 1000
       if (this->states.size() > 1000)
         util::LogRecord::Instance()->Notify();
     }
+
+    this->logContinueCondition.notify_all();
+
+    // Wait until there is work to be done.
     this->logCondition.wait(lock);
   }
+
+  // Make sure nothing is blocked by this thread.
+  this->logContinueCondition.notify_all();
 }

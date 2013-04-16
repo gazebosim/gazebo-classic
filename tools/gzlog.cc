@@ -26,9 +26,8 @@
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
 #include <gazebo/gazebo.hh>
-
 #include <gazebo/sdf/sdf.hh>
-
+#include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/WorldState.hh>
 #include <gazebo/common/Time.hh>
 #include <gazebo/util/util.hh>
@@ -523,7 +522,8 @@ class ModelFilter : public FilterBase
             std::list<std::string>::iterator partIter = this->parts.begin();
 
             // The first element in the filter must be a model name or a star.
-            if (!(*partIter).empty() && (*partIter) != "*")
+            if (!this->parts.empty() &&
+                !(*partIter).empty() && (*partIter) != "*")
             {
               std::string regexStr = *partIter;
               boost::replace_all(regexStr, "*", ".*");
@@ -659,7 +659,11 @@ void help()
             << "  help\t Output this help message.\n"
             << "  info\t Display statistical information about a log file.\n"
             << "  echo\t Output the contents of a log file to screen.\n"
-            << "  step\t Step through the contents of a log file.\n";
+            << "  step\t Step through the contents of a log file.\n"
+            << "  start\t Start recording a log file on an active Gazebo "
+            << "server.\n"
+            << "  stop\t Stop recording a log file on an active Gazebo "
+            << "server.\n";
 
   std::cerr << "\n";
 }
@@ -851,12 +855,9 @@ void echo(const std::string &_filter, bool _raw, const std::string &_stamp,
   StateFilter filter(!_raw, _stamp, _hz);
   filter.Init(_filter);
 
-  for (unsigned int i = 0;
-       i < gazebo::util::LogPlay::Instance()->GetChunkCount(); ++i)
+  unsigned int i = 0;
+  while (gazebo::util::LogPlay::Instance()->Step(stateString))
   {
-    // Get and output the state string
-    gazebo::util::LogPlay::Instance()->Step(stateString);
-
     if (!_filter.empty() && i > 0)
       stateString = filter.Filter(stateString);
     else if (!_filter.empty())
@@ -864,6 +865,8 @@ void echo(const std::string &_filter, bool _raw, const std::string &_stamp,
 
     if (!stateString.empty())
       std::cout << stateString;
+
+    ++i;
   }
 }
 
@@ -881,13 +884,14 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
   StateFilter filter(!_raw, _stamp, _hz);
   filter.Init(_filter);
 
-  for (unsigned int i = 0; i < play->GetChunkCount() && c != 'q'; ++i)
+  unsigned int i = 0;
+  while (gazebo::util::LogPlay::Instance()->Step(stateString) && c != 'q')
   {
     // Get and output the state string
     play->Step(stateString);
 
-    //if (i > 0)
-    //  stateString = filter.Filter(stateString);
+    if (i > 0)
+      stateString = filter.Filter(stateString);
 
     // Only wait for user input if there is some state to output.
     if (!stateString.empty())
@@ -902,7 +906,30 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
       while (c != ' ' && c != 'q')
         c = get_ch();
     }
+    ++i;
   }
+}
+
+/////////////////////////////////////////////////
+/// \brief Start or stop logging
+/// \param[in] _start True to start logging
+void record(bool _start)
+{
+  gazebo::transport::init();
+  gazebo::transport::run();
+
+  gazebo::transport::NodePtr node(new gazebo::transport::Node());
+  node->Init();
+
+  gazebo::transport::PublisherPtr pub =
+    node->Advertise<gazebo::msgs::LogControl>("~/log/control");
+  pub->WaitForConnection();
+
+  gazebo::msgs::LogControl msg;
+  _start ? msg.set_start(true) : msg.set_stop(true);
+  pub->Publish<gazebo::msgs::LogControl>(msg, true);
+
+  gazebo::transport::fini();
 }
 
 /////////////////////////////////////////////////
@@ -971,18 +998,21 @@ int main(int argc, char **argv)
     return 0;
   }
 
-  // Load the log file
-  if (vm.count("file"))
-    filename = vm["file"].as<std::string>();
-  else
+  if (command != "start" && command != "stop")
   {
-    gzerr << "No log file specified\n";
-    return -1;
-  }
+    // Load the log file
+    if (vm.count("file"))
+      filename = vm["file"].as<std::string>();
+    else
+    {
+      gzerr << "No log file specified\n";
+      return -1;
+    }
 
-  // Load log file from string
-  if (!load_log_from_file(filename))
-    return -1;
+    // Load log file from string
+    if (!load_log_from_file(filename))
+      return -1;
+  }
 
   std::string stamp;
   if (vm.count("stamp"))
@@ -999,6 +1029,10 @@ int main(int argc, char **argv)
     echo(filter, vm.count("raw"), stamp, hz);
   else if (command == "step")
     step(filter, vm.count("raw"), stamp, hz);
+  else if (command == "start")
+    record(true);
+  else if (command == "stop")
+    record(false);
 
   return 0;
 }

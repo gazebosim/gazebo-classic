@@ -53,6 +53,7 @@ namespace gazebo
               {
                 this->pub->WaitForConnection();
                 this->pub->Publish(*this->msg, true);
+                this->pub->SendMessage();
                 delete this->msg;
                 this->pub.reset();
                 return NULL;

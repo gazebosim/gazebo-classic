@@ -35,12 +35,12 @@ LinkState::LinkState(const LinkPtr _link, const common::Time &_realTime,
                   const common::Time &_simTime)
   : State(_link->GetName(), _realTime, _simTime)
 {
-  this->pose = _link->GetRelativePose();
-  this->velocity = math::Pose(_link->GetRelativeLinearVel(),
-                   math::Quaternion(_link->GetRelativeAngularVel()));
-  this->acceleration = math::Pose(_link->GetRelativeLinearAccel(),
-                       math::Quaternion(_link->GetRelativeAngularAccel()));
-  this->wrench = math::Pose(_link->GetRelativeForce(), math::Quaternion());
+  this->pose = _link->GetWorldPose();
+  this->velocity = math::Pose(_link->GetWorldLinearVel(),
+                   math::Quaternion(_link->GetWorldAngularVel()));
+  this->acceleration = math::Pose(_link->GetWorldLinearAccel(),
+                       math::Quaternion(_link->GetWorldAngularAccel()));
+  this->wrench = math::Pose(_link->GetWorldForce(), math::Quaternion());
 }
 
 /////////////////////////////////////////////////
@@ -48,12 +48,12 @@ LinkState::LinkState(const LinkPtr _link)
   : State(_link->GetName(), _link->GetWorld()->GetRealTime(),
           _link->GetWorld()->GetSimTime())
 {
-  this->pose = _link->GetRelativePose();
-  this->velocity = math::Pose(_link->GetRelativeLinearVel(),
-                   math::Quaternion(_link->GetRelativeAngularVel()));
-  this->acceleration = math::Pose(_link->GetRelativeLinearAccel(),
-                       math::Quaternion(_link->GetRelativeAngularAccel()));
-  this->wrench = math::Pose(_link->GetRelativeForce(), math::Quaternion());
+  this->pose = _link->GetWorldPose();
+  this->velocity = math::Pose(_link->GetWorldLinearVel(),
+                   math::Quaternion(_link->GetWorldAngularVel()));
+  this->acceleration = math::Pose(_link->GetWorldLinearAccel(),
+                       math::Quaternion(_link->GetWorldAngularAccel()));
+  this->wrench = math::Pose(_link->GetWorldForce(), math::Quaternion());
 
   // Disabling CollisionStates to improve performance. This information is 
   // probably not required.
@@ -88,12 +88,12 @@ void LinkState::Load(const LinkPtr _link, const common::Time &_realTime,
   this->realTime = _realTime;
   this->simTime = _simTime;
 
-  this->pose = _link->GetRelativePose();
-  this->velocity.Set(_link->GetRelativeLinearVel(),
-                     _link->GetRelativeAngularVel());
-  this->acceleration.Set(_link->GetRelativeLinearAccel(),
-                         _link->GetRelativeAngularAccel());
-  this->wrench.Set(_link->GetRelativeForce(), math::Quaternion());
+  this->pose = _link->GetWorldPose();
+  this->velocity.Set(_link->GetWorldLinearVel(),
+                     _link->GetWorldAngularVel());
+  this->acceleration.Set(_link->GetWorldLinearAccel(),
+                         _link->GetWorldAngularAccel());
+  this->wrench.Set(_link->GetWorldForce(), math::Quaternion());
 }
 
 /////////////////////////////////////////////////

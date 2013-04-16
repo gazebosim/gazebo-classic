@@ -34,7 +34,7 @@ WorldState::WorldState()
 
 /////////////////////////////////////////////////
 WorldState::WorldState(const WorldPtr _world)
-  : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
+  : State(_world->GetName(), _world->GetRealTime(), _world->GetSimTime())
 {
   this->world = _world;
 

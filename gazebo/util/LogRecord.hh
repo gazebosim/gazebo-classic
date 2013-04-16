@@ -128,7 +128,9 @@ namespace gazebo
 
       /// \brief Start the logger.
       /// \param[in] _encoding The type of encoding (txt, or bz2).
-      public: bool Start(const std::string &_encoding="bz2");
+      /// \param[in] _path Path in which to store log files.
+      public: bool Start(const std::string &_encoding="bz2",
+                  const std::string &_path="");
 
       /// \brief Get the encoding used.
       /// \return Either [txt, or bz2], where txt is plain txt and bz2 is
@@ -175,7 +177,11 @@ namespace gazebo
       private: void RunUpdate();
 
       /// \brief Run the Write loop.
-      private: void Run();
+      private: void RunWrite();
+
+      /// \brief Write all logs.
+      /// \param[in] _force True to skip waiting on dataAvailableCondition.
+      private: void Write(bool _force = false);
 
       /// \brief Clear and delete the log buffers.
       private: void ClearLogs();
@@ -205,6 +211,9 @@ namespace gazebo
         /// \brief Start the log.
         /// \param[in] _path The complete path in which to put the log file.
         public: void Start(const boost::filesystem::path &_path);
+
+        /// \brief Stop logging.
+        public: void Stop();
 
         /// \brief Write data to disk.
         public: void Write();

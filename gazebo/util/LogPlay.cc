@@ -83,7 +83,7 @@ void LogPlay::Open(const std::string &_logFile)
 
   // Parse the log file
   if (!this->xmlDoc.LoadFile(_logFile))
-    gzthrow("Unable to parser log file[" << _logFile << "]");
+    gzthrow("Unable to parse log file[" << _logFile << "]");
 
   // Get the gazebo_log element
   this->logStartXml = this->xmlDoc.FirstChildElement("gazebo_log");
@@ -173,36 +173,24 @@ uint32_t LogPlay::GetRandSeed() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
-  /*
-  if (this->logCurrXml == this->logStartXml)
-    this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
-  else if (this->logCurrXml)
-    this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
-  else
-    return false;
-
-  return this->GetChunkData(this->logCurrXml, _data);
-  */
-
-  std::string startMarker = "<state>";
-  std::string endMarker = "</state>";
+  std::string startMarker = "<sdf ";
+  std::string endMarker = "</sdf>";
   size_t start = this->currentChunk.find(startMarker);
   size_t end = this->currentChunk.find(endMarker);
 
-  std::cout << "Start[" << start << "] End[" << end << "]\n";
   if (start == std::string::npos || end == std::string::npos)
   {
     if (this->logCurrXml == this->logStartXml)
-    {
-      printf("First\n");
       this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
-    }
     else if (this->logCurrXml)
     {
-      printf("Other\n");
       this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
     }
     else
+      return false;
+
+    // Stop if there are no more chunks
+    if (!this->logCurrXml)
       return false;
 
     if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
@@ -213,14 +201,11 @@ bool LogPlay::Step(std::string &_data)
 
     start = this->currentChunk.find(startMarker);
     end = this->currentChunk.find(endMarker);
-
-    std::cout << "Chunk[" << this->currentChunk << "]\n";
-    std::cout << "Start[" << start << "] End[" << end << "]\n";
   }
 
-  _data = this->currentChunk.substr(start, end+endMarker.size());
+  _data = this->currentChunk.substr(start, end+endMarker.size()-start);
 
-  this->currentChunk.erase(start, end + endMarker.size());
+  this->currentChunk.erase(0, end + endMarker.size());
 
   return true;
 }

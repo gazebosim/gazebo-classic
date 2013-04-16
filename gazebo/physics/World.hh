@@ -642,10 +642,20 @@ namespace gazebo
       /// \brief The number of simulation iterations.
       private: uint64_t iterations;
 
-      /// \brief Condition used for log worker
+      /// \brief Condition used for log worker.
       private: boost::condition_variable logCondition;
 
-      /// \brief Mutex to protect the log worker thread
+      /// \brief Condition used to guarantee the log worker thread doesn't
+      /// skip an interation.
+      private: boost::condition_variable logContinueCondition;
+
+      /// \brief Last iteration recorded by the log worker thread.
+      private: uint64_t logPrevIteration;
+
+      /// \brief Real time value set from a log file.
+      private: common::Time logRealTime;
+
+      /// \brief Mutex to protect the log worker thread.
       private: boost::mutex logMutex;
 
       /// \brief Worker thread for logging.

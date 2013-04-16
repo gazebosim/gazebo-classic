@@ -90,6 +90,7 @@ void QTestFixture::RunServer(const std::string &_worldFilename, bool _paused)
   this->SetPause(_paused);
 
   this->server->Run();
+  printf("Server not running\n");
 
   gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
