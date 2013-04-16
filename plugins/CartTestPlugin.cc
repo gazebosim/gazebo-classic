@@ -101,7 +101,7 @@ void CartTestPlugin::Load(physics::ModelPtr _model,
   this->jointMaxEfforts[2] =
     _sdf->GetElement("left_eff")->GetValueDouble();
 
-  this->updateConnection = event::Events::ConnectWorldUpdateStart(
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&CartTestPlugin::OnUpdate, this));
 }
 

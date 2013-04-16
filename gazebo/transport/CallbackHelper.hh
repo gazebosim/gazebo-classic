@@ -137,7 +137,7 @@ namespace gazebo
       // documentation inherited
       public: virtual bool HandleMessage(MessagePtr _newMsg)
               {
-                this->callback(boost::shared_dynamic_cast<M>(_newMsg));
+                this->callback(boost::dynamic_pointer_cast<M>(_newMsg));
                 return true;
               }
 

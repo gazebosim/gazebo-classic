@@ -1732,9 +1732,7 @@ TiXmlDocument URDF2Gazebo::InitModelString(const std::string &_urdfStr,
 
     // add robot to gazeboXmlOut
     TiXmlElement *gazeboSdf = new TiXmlElement("sdf");
-    // Until the URDF parser is updated to SDF 1.4, mark the SDF's as 1.3
-    // and rely on the sdf convert functions for compatibility.
-    gazeboSdf->SetAttribute("version", "1.3");  // SDF_VERSION);
+    gazeboSdf->SetAttribute("version", SDF_VERSION);
     gazeboSdf->LinkEndChild(robot);
     gazeboXmlOut.LinkEndChild(gazeboSdf);
 

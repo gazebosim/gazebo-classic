@@ -123,8 +123,8 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
       math::Vector3::Zero);
   SpawnEmptyLink("test_empty", modelPos["test_empty"], math::Vector3::Zero);
-  std::string trimeshPath =
-      "file://media/models/cube_20k/meshes/cube_20k.stl";
+  // std::string trimeshPath =
+  //    "file://media/models/cube_20k/meshes/cube_20k.stl";
   // SpawnTrimesh("test_trimesh", trimeshPath, math::Vector3(0.5, 0.5, 0.5),
   //    modelPos["test_trimesh"], math::Vector3::Zero);
 
@@ -681,11 +681,12 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    double jointVel1, jointVel2;
-    double angle1, angle2, angle3;
     model = world->GetModel(*modelIter);
     if (model)
     {
+      double jointVel1, jointVel2;
+      double angle1, angle2, angle3;
+
       gzdbg << "Check angle measurement for " << *modelIter << '\n';
       std::vector<std::string>::iterator jointIter;
       for (jointIter  = jointNames.begin();
@@ -1511,17 +1512,34 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
   }
 }
 
+/////////////////////////////////////////////////
 TEST_F(PhysicsTest, CollisionFilteringODE)
 {
   CollisionFiltering("ode");
 }
 
+/////////////////////////////////////////////////
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, CollisionFilteringBullet)
 {
   CollisionFiltering("bullet");
 }
 #endif  // HAVE_BULLET
+
+/////////////////////////////////////////////////
+// This test verifies that gazebo doesn't crash when collisions occur
+// and the <world><physics><ode><max_contacts> value is zero.
+// The crash was reported in issue #593 on bitbucket
+TEST_F(PhysicsTest, ZeroMaxContactsODE)
+{
+  // Load an empty world
+  Load("worlds/zero_max_contacts.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr model = world->GetModel("ground_plane");
+  ASSERT_TRUE(model);
+}
 
 int main(int argc, char **argv)
 {

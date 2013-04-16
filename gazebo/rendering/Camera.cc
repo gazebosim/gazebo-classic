@@ -28,10 +28,12 @@
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Pose.hh"
+#include "gazebo/math/Rand.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -46,6 +48,56 @@ using namespace rendering;
 
 
 unsigned int Camera::cameraCounter = 0;
+
+namespace gazebo
+{
+namespace rendering
+{
+// We'll create an instance of this class for each camera, to be used to inject
+// random values on each render call.
+class GaussianNoiseCompositorListener
+  : public Ogre::CompositorInstance::Listener
+{
+  /// \brief Constructor, setting mean and standard deviation.
+  public: GaussianNoiseCompositorListener(double _mean, double _stddev):
+      mean(_mean), stddev(_stddev) {}
+
+  /// \brief Callback that OGRE will invoke for us on each render call
+  public: virtual void notifyMaterialRender(unsigned int _pass_id,
+                                            Ogre::MaterialPtr & _mat)
+  {
+    // modify material here (wont alter the base material!), called for
+    // every drawn geometry instance (i.e. compositor render_quad)
+
+    // Sample three values within the range [0,1.0] and set them for use in
+    // the fragment shader, which will interpret them as offsets from (0,0)
+    // to use when computing pseudo-random values.
+    Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
+                          math::Rand::GetDblUniform(0.0, 1.0),
+                          math::Rand::GetDblUniform(0.0, 1.0));
+    // These calls are setting parameters that are declared in two places:
+    // 1. media/materials/scripts/gazebo.material, in
+    //    fragment_program Gazebo/GaussianCameraNoiseFS
+    // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
+    _mat->getTechnique(0)->getPass(_pass_id)->
+      getFragmentProgramParameters()->
+      setNamedConstant("offsets", offsets);
+    _mat->getTechnique(0)->getPass(_pass_id)->
+      getFragmentProgramParameters()->
+      setNamedConstant("mean", (Ogre::Real)this->mean);
+    _mat->getTechnique(0)->getPass(_pass_id)->
+      getFragmentProgramParameters()->
+      setNamedConstant("stddev", (Ogre::Real)this->stddev);
+  }
+
+  /// \brief Mean that we'll pass down to the GLSL fragment shader.
+  private: double mean;
+  /// \brief Standard deviation that we'll pass down to the GLSL fragment
+  /// shader.
+  private: double stddev;
+};
+}  // namespace rendering
+}  // namespace gazebo
 
 //////////////////////////////////////////////////
 Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
@@ -173,6 +225,28 @@ void Camera::Load()
     }
     this->SetHFOV(angle);
   }
+
+  // Handle noise model settings.
+  this->noiseActive = false;
+  if (this->sdf->HasElement("noise"))
+  {
+    sdf::ElementPtr noiseElem = this->sdf->GetElement("noise");
+    std::string type = noiseElem->GetValueString("type");
+    if (type == "gaussian")
+    {
+      this->noiseType = GAUSSIAN;
+      this->noiseMean = noiseElem->GetValueDouble("mean");
+      this->noiseStdDev = noiseElem->GetValueDouble("stddev");
+      this->noiseActive = true;
+      this->gaussianNoiseCompositorListener.reset(new
+        GaussianNoiseCompositorListener(this->noiseMean, this->noiseStdDev));
+      gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
+        " and stddev " << this->noiseStdDev << std::endl;
+    }
+    else
+      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
+        std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -203,6 +277,9 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  if (this->gaussianNoiseCompositorListener)
+    this->gaussianNoiseInstance->removeListener(
+      this->gaussianNoiseCompositorListener.get());
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
   this->renderTarget->removeAllViewports();
   this->connections.clear();
@@ -312,7 +389,9 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
+    // Render, but don't swap buffers.
     this->renderTarget->update(false);
+
     this->lastRenderWallTime = common::Time::GetWallTime();
   }
 }
@@ -820,7 +899,6 @@ std::string Camera::GetFrameFilename()
   boost::filesystem::path pathToFile;
 
   std::string friendlyName = this->GetName();
-  std::string filename;
 
   boost::replace_all(friendlyName, "::", "_");
 
@@ -1119,9 +1197,9 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
 }
 
 //////////////////////////////////////////////////
-void Camera::SetRenderTarget(Ogre::RenderTarget *target)
+void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
-  this->renderTarget = target;
+  this->renderTarget = _target;
 
   if (this->renderTarget)
   {
@@ -1167,7 +1245,6 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
         Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
             "DeferredLighting/ShowLit");
 
-
       // Screen space ambient occlusion
       // this->ssaoInstance =
       //  Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
@@ -1180,6 +1257,25 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
       this->dlMergeInstance->setEnabled(true);
 
       // this->ssaoInstance->setEnabled(false);
+    }
+
+    // Noise
+    if (this->noiseActive)
+    {
+      switch (this->noiseType)
+      {
+        case GAUSSIAN:
+          this->gaussianNoiseInstance =
+            Ogre::CompositorManager::getSingleton().addCompositor(
+              this->viewport, "CameraNoise/Gaussian");
+          this->gaussianNoiseInstance->setEnabled(true);
+          // gaussianNoiseCompositorListener was allocated in Load()
+          this->gaussianNoiseInstance->addListener(
+            this->gaussianNoiseCompositorListener.get());
+          break;
+        default:
+          GZ_ASSERT(false, "Invalid noise model type");
+      }
     }
 
     if (this->GetScene()->skyx != NULL)

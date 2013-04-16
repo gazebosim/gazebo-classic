@@ -803,7 +803,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   // maxCollide must less than the size of this->indices. Check the header
   int maxCollide = MAX_CONTACT_JOINTS;
-  if (this->GetMaxContacts() < MAX_CONTACT_JOINTS)
+  if (this->GetMaxContacts() < MAX_CONTACT_JOINTS && this->GetMaxContacts() > 0)
     maxCollide = this->GetMaxContacts();
 
   // Generate the contacts
@@ -861,8 +861,40 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd =
-    (_collision1->GetSurface()->fdir1 + _collision2->GetSurface()->fdir1) * 0.5;
+  math::Vector3 fd = _collision1->GetSurface()->fdir1;
+  if (fd != math::Vector3::Zero)
+  {
+    // fdir1 is in body local frame, rotate it into world frame
+    /// \TODO: once issue #624 is fixed, switch to below:
+    /// fd = _collision1->GetWorldPose().rot.RotateVector(fd);
+    fd = (_collision1->GetRelativePose() +
+      _collision1->GetLink()->GetWorldPose()).rot.RotateVector(fd.Normalize());
+  }
+
+  /// \TODO: Better treatment when both surfaces have fdir1 specified.
+  /// Ideally, we want to use fdir1 specified by surface with
+  /// a smaller friction coefficient, but it's not clear how
+  /// that can be determined with friction pyramid approximations.
+  /// As a hack, we'll simply compare mu1 from
+  /// both surfaces for now, and use fdir1 specified by
+  /// surface with smaller mu1.
+  math::Vector3 fd2 = _collision2->GetSurface()->fdir1;
+  if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
+        _collision1->GetSurface()->mu1 > _collision2->GetSurface()->mu1))
+  {
+    // fdir1 is in body local frame, rotate it into world frame
+    /// \TODO: once issue #624 is fixed, switch to below:
+    /// fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
+    fd = (_collision2->GetRelativePose() +
+      _collision2->GetLink()->GetWorldPose()).rot.RotateVector(fd2.Normalize());
+    /// \TODO: uncomment gzlog below once we confirm it does not affect
+    /// performance
+    /// if (fd2 != math::Vector3::Zero && fd != math::Vector3::Zero &&
+    ///       _collision1->surface->mu1 > _collision2->surface->mu1)
+    ///   gzlog << "both contact surfaces have non-zero fdir1, comparing"
+    ///         << " comparing mu1 from both surfaces, and use fdir1"
+    ///         << " from surface with smaller mu1\n";
+  }
 
   if (fd != math::Vector3::Zero)
   {
@@ -955,8 +987,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       jointFeedback->count++;
     }
 
-    // Attach the contact joint.
-    dJointAttach(contactJoint, b1, b2);
+    // Attach the contact joint if collideWithoutContact flags aren't set.
+    if (!_collision1->GetSurface()->collideWithoutContact &&
+        !_collision2->GetSurface()->collideWithoutContact)
+      dJointAttach(contactJoint, b1, b2);
   }
 }
 
@@ -1042,7 +1076,7 @@ void ODEPhysics::SetSeed(uint32_t _seed)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
+void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
@@ -1112,7 +1146,7 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
       dWorldSetQuickStepPreconIterations(this->worldId, value);
       break;
     }
-    case SOR_ITERS:
+    case PGS_ITERS:
     {
       int value;
       try
@@ -1198,7 +1232,7 @@ void ODEPhysics::SetParam(PhysicsParam _param, const boost::any &_value)
 //////////////////////////////////////////////////
 void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
-  PhysicsParam param;
+  ODEParam param;
 
   if (_key == "type")
     param = SOLVER_TYPE;
@@ -1209,7 +1243,7 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "precon_iters")
     param = SOR_PRECON_ITERS;
   else if (_key == "iters")
-    param = SOR_ITERS;
+    param = PGS_ITERS;
   else if (_key == "sor")
     param = SOR;
   else if (_key == "contact_max_correcting_vel")
@@ -1229,7 +1263,7 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 }
 
 //////////////////////////////////////////////////
-boost::any ODEPhysics::GetParam(PhysicsParam _param) const
+boost::any ODEPhysics::GetParam(ODEParam _param) const
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
@@ -1257,7 +1291,7 @@ boost::any ODEPhysics::GetParam(PhysicsParam _param) const
       value = odeElem->GetElement("solver")->GetValueInt("precon_iters");
       break;
     }
-    case SOR_ITERS:
+    case PGS_ITERS:
     {
       value = odeElem->GetElement("solver")->GetValueInt("iters");
       break;
@@ -1301,7 +1335,7 @@ boost::any ODEPhysics::GetParam(PhysicsParam _param) const
 //////////////////////////////////////////////////
 boost::any ODEPhysics::GetParam(const std::string &_key) const
 {
-  PhysicsParam param;
+  ODEParam param;
 
   if (_key == "type")
     param = SOLVER_TYPE;
@@ -1312,7 +1346,7 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
   else if (_key == "precon_iters")
     param = SOR_PRECON_ITERS;
   else if (_key == "iters")
-    param = SOR_ITERS;
+    param = PGS_ITERS;
   else if (_key == "sor")
     param = SOR;
   else if (_key == "contact_max_correcting_vel")
