@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  */
 
-#include "common/MeshManager.hh"
+#include "gazebo/common/MeshManager.hh"
 
 #include "rendering/ogre_gazebo.h"
 #include "rendering/Scene.hh"

@@ -26,7 +26,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "common/common.hh"
+#include "gazebo/common/common.hh"
 #include "math/gzmath.hh"
 #include "rendering/MovableText.hh"
 

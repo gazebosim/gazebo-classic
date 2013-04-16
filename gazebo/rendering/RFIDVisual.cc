@@ -22,7 +22,7 @@
 #include "transport/transport.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/Scene.hh"
-#include "common/MeshManager.hh"
+#include "gazebo/common/MeshManager.hh"
 
 #include "rendering/RFIDVisual.hh"
 

@@ -14,9 +14,9 @@
  * limitations under the License.
  *
 */
-#include "common/Color.hh"
+#include "gazebo/common/Color.hh"
 #include "rendering/ogre_gazebo.h"
-#include "common/Console.hh"
+#include "gazebo/common/Console.hh"
 #include "rendering/Material.hh"
 
 using namespace gazebo;

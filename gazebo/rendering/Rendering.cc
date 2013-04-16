@@ -15,8 +15,8 @@
  *
 */
 #include <boost/thread.hpp>
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
 #include "rendering/RenderEngine.hh"
 #include "Rendering.hh"

@@ -26,7 +26,7 @@
 // TODO: remove this line
 #include "rendering/ogre_gazebo.h"
 
-#include "common/Color.hh"
+#include "gazebo/common/Color.hh"
 
 namespace Ogre
 {

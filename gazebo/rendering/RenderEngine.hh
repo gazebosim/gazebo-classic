@@ -26,8 +26,8 @@
 #include <string>
 
 #include "msgs/msgs.hh"
-#include "common/SingletonT.hh"
-#include "common/Event.hh"
+#include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/Event.hh"
 #include "transport/TransportTypes.hh"
 #include "rendering/RenderTypes.hh"
 

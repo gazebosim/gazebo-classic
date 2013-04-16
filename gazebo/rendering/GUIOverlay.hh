@@ -23,8 +23,8 @@
 #include <vector>
 
 #include "rendering/cegui.h"
-#include "common/MouseEvent.hh"
-#include "common/Events.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/Events.hh"
 
 #include "math/MathTypes.hh"
 

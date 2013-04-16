@@ -27,12 +27,12 @@
 #include "rendering/ogre_gazebo.h"
 #include "rendering/RTShaderSystem.hh"
 
-#include "common/Events.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "common/Mesh.hh"
-#include "common/MeshManager.hh"
-#include "common/Timer.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/Timer.hh"
 #include "sensors/GpuRaySensor.hh"
 #include "math/Pose.hh"
 

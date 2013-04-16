@@ -18,7 +18,7 @@
 #define _VIEWCONTROLLER_HH_
 
 #include <string>
-#include "common/CommonTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "rendering/RenderTypes.hh"
 
 namespace gazebo
