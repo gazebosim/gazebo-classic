@@ -1624,7 +1624,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
   if (!this->enableVisualizations)
     return true;
 
-  if (_msg->type() == "ray" && _msg->visualize() && !_msg->topic().empty())
+  if ((_msg->type() == "ray" || _msg->type() == "gpu_ray") && _msg->visualize()
+      && !_msg->topic().empty())
   {
     std::string rayVisualName = _msg->parent() + "::" + _msg->name();
     if (!this->visuals[rayVisualName+"_laser_vis"])

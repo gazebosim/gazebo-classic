@@ -117,7 +117,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
     cameraYaws[3] = -this->hfov;
   }
 
-  for (unsigned int i = 0; i < this->textureCount; i++)
+  for (unsigned int i = 0; i < this->textureCount; ++i)
   {
     std::stringstream texName;
     texName << _textureName << "first_pass_" << i;
@@ -164,7 +164,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
     unsigned int texIndex = texCount++;
     texUnit =
       this->matSecondPass->getTechnique(0)->getPass(0)->createTextureUnitState(
-        this->firstPassTextures[i]->getName(), texIndex);
+          this->firstPassTextures[i]->getName(), texIndex);
 
     this->texIdx.push_back(texIndex);
 
@@ -279,13 +279,13 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
   {
     pass->getFragmentProgramParameters()->setNamedConstant("tex1",
       this->texIdx[0]);
-    if (this->texIdx.size() > 0)
+    if (this->texIdx.size() > 1)
     {
       pass->getFragmentProgramParameters()->setNamedConstant("tex2",
         this->texIdx[1]);
-      if (this->texIdx.size() > 1)
+      if (this->texIdx.size() > 2)
         pass->getFragmentProgramParameters()->setNamedConstant("tex3",
-          this->texIdx[1]);
+          this->texIdx[2]);
     }
   }
 
@@ -293,7 +293,7 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
   if (pass->hasVertexProgram())
   {
     renderSys->bindGpuProgram(
-    pass->getVertexProgram()->_getBindingDelegate());
+        pass->getVertexProgram()->_getBindingDelegate());
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
     renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
@@ -384,7 +384,7 @@ void GpuLaser::RenderImpl()
 
   for (unsigned int i = 0; i < this->textureCount; ++i)
   {
-    if (this->textureCount>1)
+    if (this->textureCount > 1)
       this->RotateYaw(this->cameraYaws[i]);
 
     this->currentMat = this->matFirstPass;
@@ -563,7 +563,6 @@ void GpuLaser::CreateMesh()
     phi = 0;
 
   unsigned int pts_on_line = 0;
-
   for (unsigned int j = 0; j < this->h2nd; j++)
   {
     double gamma = 0;
@@ -596,25 +595,30 @@ void GpuLaser::CreateMesh()
       }
       pts_on_line++;
       submesh->AddVertex(texture/1000.0, start_x, start_y);
+//      gzerr << "vet " <<  texture/1000.0 << " " <<  start_x << " " << start_y << std::endl;
 
       double u, v;
       if (this->isHorizontal)
       {
         u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
+        // FIXME v is nan
         v = -tan(gamma)/(2 * tan(phi)) + 0.5;
+//        v = 0.5;
       }
       else
       {
         v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
         u = -tan(delta)/(2 * tan(theta)) + 0.5;
       }
+//      gzerr << "uv " <<  u << " " <<  v << " " <<  std::endl;
+//      gzerr << "ang " <<  phi << " " << delta << " " <<  theta << " " << gamma << std::endl;
 
       submesh->AddTexCoord(u, v);
     }
   }
 
-  for (unsigned int j = 0; j < (this->h2nd ); j++)
-    for (unsigned int i = 0; i < (this->w2nd ); i++)
+  for (unsigned int j = 0; j < (this->h2nd ); ++j)
+    for (unsigned int i = 0; i < (this->w2nd ); ++i)
       submesh->AddIndex(this->w2nd * j + i);
 
   mesh->AddSubMesh(submesh);

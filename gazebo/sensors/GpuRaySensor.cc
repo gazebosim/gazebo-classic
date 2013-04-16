@@ -555,6 +555,8 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
     {
       double range = this->laserCam->GetLaserData()[
           (j * this->GetRayCount() + i) * 3];
+
+      //gzerr << "range " << i  << " " << range << std::endl;
       if (this->noiseActive)
       {
         switch (this->noiseType)
@@ -571,7 +573,7 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
             GZ_ASSERT(false, "Invalid noise model type");
         }
       }
-//      gzerr << "range " << i  << " " << range << std::endl;
+
       scan->add_ranges(range);
       scan->add_intensities(this->laserCam->GetLaserData()[
           (j * this->GetRayCount() + i) * 3 + 1]);
