@@ -16,6 +16,7 @@ set (files
   trimesh_test.world
   cart_test.world
   double_pendulums.world
+  mud.world
   plugin.world
   pr2.world
   presentation.world
