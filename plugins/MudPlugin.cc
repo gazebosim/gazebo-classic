@@ -229,8 +229,8 @@ void MudPlugin::OnUpdate()
             {
               double erp, cfm, dt;
               dt = this->physics->GetMaxStepSize();
-              erp = this->stiffness*dt / (this->stiffness*dt + this->damping); 
-              cfm = 1.0 / (this->stiffness*dt + this->damping); 
+              erp = this->stiffness*dt / (this->stiffness*dt + this->damping);
+              cfm = 1.0 / (this->stiffness*dt + this->damping);
               (*iterJoint)->SetAttribute("erp", 0, erp);
               (*iterJoint)->SetAttribute("cfm", 0, cfm);
               (*iterJoint)->SetAttribute("stop_erp", 0, erp);
@@ -277,7 +277,7 @@ void MudPlugin::OnUpdate()
   }
   else if (++this->newMsgWait > floor(1.0 / this->physics->GetMaxStepSize()))
   {
-    gzlog << "MudPlugin attached to " << this->modelName 
+    gzlog << "MudPlugin attached to " << this->modelName
           << " waited 1.0 s without contact messages\n";
     this->newMsgWait = 0;
   }

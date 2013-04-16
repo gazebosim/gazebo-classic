@@ -17,6 +17,9 @@
 #ifndef _MUD_PLUGIN_HH_
 #define _MUD_PLUGIN_HH_
 
+#include <string>
+#include <vector>
+
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
