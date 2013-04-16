@@ -446,7 +446,7 @@ class ModelFilter : public FilterBase
             boost::split(mainParts, _filter, boost::is_any_of("/"));
 
             // Create the model filter
-            if (mainParts.size())
+            if (!mainParts.empty())
             {
               boost::split(this->parts, mainParts.front(),
                   boost::is_any_of("."));
@@ -454,25 +454,25 @@ class ModelFilter : public FilterBase
                 this->parts.push_back(mainParts.front());
             }
 
-            if (!mainParts.size())
+            if (mainParts.empty())
               return;
 
             mainParts.pop_front();
 
             // Create the link filter
-            if (mainParts.size() && !mainParts.front().empty())
+            if (!mainParts.empty() && !mainParts.front().empty())
             {
               this->linkFilter = new LinkFilter(this->xmlOutput, this->stamp);
               this->linkFilter->Init(mainParts.front());
             }
 
-            if (!mainParts.size())
+            if (mainParts.empty())
               return;
 
             mainParts.pop_front();
 
             // Create the joint filter
-            if (mainParts.size())
+            if (!mainParts.empty())
             {
               this->jointFilter = new JointFilter(this->xmlOutput,
                   this->stamp);
@@ -493,7 +493,7 @@ class ModelFilter : public FilterBase
             {
               // Get the model state pose
               gazebo::math::Pose pose = _state.GetPose();
-              _partIter++;
+              ++_partIter;
 
               // Get the elements to filter pose by.
               std::string elemParts;
@@ -522,7 +522,7 @@ class ModelFilter : public FilterBase
             std::list<std::string>::iterator partIter = this->parts.begin();
 
             // The first element in the filter must be a model name or a star.
-            if (!this->parts.empty() &&
+            if (partIter != this->parts.end() && !this->parts.empty() &&
                 !(*partIter).empty() && (*partIter) != "*")
             {
               std::string regexStr = *partIter;
@@ -597,7 +597,7 @@ class StateFilter : public FilterBase
             this->filter.Init(_filter);
           }
 
-  /// \brief Peform filtering
+  /// \brief Perform filtering
   /// \param[in] _stateString The string to filter.
   public: std::string Filter(const std::string &_stateString)
           {
@@ -887,6 +887,8 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
   unsigned int i = 0;
   while (gazebo::util::LogPlay::Instance()->Step(stateString) && c != 'q')
   {
+    stateString.clear();
+
     // Get and output the state string
     play->Step(stateString);
 

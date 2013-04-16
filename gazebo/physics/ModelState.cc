@@ -356,11 +356,11 @@ ModelState &ModelState::operator=(const ModelState &_state)
   }
 
   // Copy the joint states.
-  /*for (JointState_M::const_iterator iter =
-       _state.jointStates.begin(); iter != _state.jointStates.end(); ++iter)
-  {
-    this->jointStates.insert(std::make_pair(iter->first, iter->second));
-  }*/
+  // for (JointState_M::const_iterator iter =
+  //     _state.jointStates.begin(); iter != _state.jointStates.end(); ++iter)
+  // {
+  //   this->jointStates.insert(std::make_pair(iter->first, iter->second));
+  // }
 
   return *this;
 }
