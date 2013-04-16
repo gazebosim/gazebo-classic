@@ -23,9 +23,9 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 
-#include "physics/ode/ODECollision.hh"
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODETrimeshShape.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODETrimeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;

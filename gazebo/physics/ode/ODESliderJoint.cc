@@ -23,8 +23,8 @@
 #include "gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
-#include "physics/Link.hh"
-#include "physics/ode/ODESliderJoint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODESliderJoint.hh"
 
 using namespace gazebo;
 using namespace physics;

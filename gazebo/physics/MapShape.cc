@@ -24,11 +24,11 @@
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/Exception.hh"
 
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/BoxShape.hh"
-#include "physics/Collision.hh"
-#include "physics/MapShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/BoxShape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/MapShape.hh"
 
 using namespace gazebo;
 using namespace physics;

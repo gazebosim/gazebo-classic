@@ -29,17 +29,17 @@
 
 #include "transport/Publisher.hh"
 
-#include "physics/Contact.hh"
-#include "physics/Shape.hh"
-#include "physics/BoxShape.hh"
-#include "physics/CylinderShape.hh"
-#include "physics/TrimeshShape.hh"
-#include "physics/SphereShape.hh"
-#include "physics/HeightmapShape.hh"
-#include "physics/SurfaceParams.hh"
-#include "physics/Model.hh"
-#include "physics/Link.hh"
-#include "physics/Collision.hh"
+#include "gazebo/physics/Contact.hh"
+#include "gazebo/physics/Shape.hh"
+#include "gazebo/physics/BoxShape.hh"
+#include "gazebo/physics/CylinderShape.hh"
+#include "gazebo/physics/TrimeshShape.hh"
+#include "gazebo/physics/SphereShape.hh"
+#include "gazebo/physics/HeightmapShape.hh"
+#include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Collision.hh"
 
 using namespace gazebo;
 using namespace physics;

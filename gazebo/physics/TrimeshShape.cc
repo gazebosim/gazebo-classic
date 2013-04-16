@@ -24,10 +24,10 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Exception.hh"
 
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Collision.hh"
-#include "physics/TrimeshShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/TrimeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;

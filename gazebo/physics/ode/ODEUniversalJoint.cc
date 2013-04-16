@@ -22,8 +22,8 @@
 #include "gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
-#include "physics/Link.hh"
-#include "physics/ode/ODEUniversalJoint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODEUniversalJoint.hh"
 
 using namespace gazebo;
 using namespace physics;

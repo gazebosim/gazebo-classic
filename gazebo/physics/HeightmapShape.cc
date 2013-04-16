@@ -26,7 +26,7 @@
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Exception.hh"
 
-#include "physics/HeightmapShape.hh"
+#include "gazebo/physics/HeightmapShape.hh"
 
 using namespace gazebo;
 using namespace physics;

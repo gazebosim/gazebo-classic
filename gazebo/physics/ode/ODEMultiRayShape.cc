@@ -16,13 +16,13 @@
  */
 #include "gazebo/common/Exception.hh"
 
-#include "physics/World.hh"
-#include "physics/ode/ODETypes.hh"
-#include "physics/ode/ODELink.hh"
-#include "physics/ode/ODECollision.hh"
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODERayShape.hh"
-#include "physics/ode/ODEMultiRayShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/ode/ODETypes.hh"
+#include "gazebo/physics/ode/ODELink.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODERayShape.hh"
+#include "gazebo/physics/ode/ODEMultiRayShape.hh"
 
 using namespace gazebo;
 using namespace physics;

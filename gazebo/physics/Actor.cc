@@ -34,13 +34,13 @@
 #include "gazebo/common/SkeletonAnimation.hh"
 #include "gazebo/common/BVHLoader.hh"
 
-#include "physics/World.hh"
-#include "physics/Joint.hh"
-#include "physics/Link.hh"
-#include "physics/Model.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Actor.hh"
-#include "physics/Physics.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Actor.hh"
+#include "gazebo/physics/Physics.hh"
 
 #include "transport/Node.hh"
 
