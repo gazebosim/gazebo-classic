@@ -22,9 +22,9 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
 
 using namespace gazebo;
 using namespace physics;

@@ -21,10 +21,10 @@
 
 #include "gazebo/common/Exception.hh"
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletCollision.hh"
-#include "physics/bullet/BulletHeightmapShape.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletHeightmapShape.hh"
 
 using namespace gazebo;
 using namespace physics;

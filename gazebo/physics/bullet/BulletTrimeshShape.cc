@@ -21,10 +21,10 @@
 
 #include "gazebo/common/Mesh.hh"
 
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletCollision.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletTrimeshShape.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletTrimeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
