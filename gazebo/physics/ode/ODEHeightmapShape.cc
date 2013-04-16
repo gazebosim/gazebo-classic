@@ -19,7 +19,7 @@
  * Date: 12 Nov 2009
  */
 
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
 #include "physics/ode/ODECollision.hh"
 #include "physics/ode/ODEHeightmapShape.hh"
 

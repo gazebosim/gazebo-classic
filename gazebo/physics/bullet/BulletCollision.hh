@@ -26,7 +26,7 @@
 
 /*
 
-#include "common/Param.hh"
+#include "gazebo/common/Param.hh"
 #include "Entity.hh"
 #include "math/Pose.hh"
 #include "math/Vector3.hh"

@@ -19,7 +19,7 @@
  * Date: 21 May 2009
  */
 
-#include "common/Mesh.hh"
+#include "gazebo/common/Mesh.hh"
 
 #include "physics/bullet/BulletTypes.hh"
 #include "physics/bullet/BulletCollision.hh"

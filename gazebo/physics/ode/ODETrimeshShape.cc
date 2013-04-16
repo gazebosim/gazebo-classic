@@ -19,9 +19,9 @@
  * Date: 16 Oct 2009
  */
 
-#include "common/Mesh.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
 #include "physics/ode/ODECollision.hh"
 #include "physics/ode/ODEPhysics.hh"

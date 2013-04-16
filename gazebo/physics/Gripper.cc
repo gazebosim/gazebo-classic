@@ -15,7 +15,7 @@
  *
 */
 
-#include "common/Events.hh"
+#include "gazebo/common/Events.hh"
 
 #include "physics/World.hh"
 #include "physics/Joint.hh"

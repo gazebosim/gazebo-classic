@@ -19,7 +19,7 @@
  * Date: 8 May 2003
  */
 
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
 
 #include "physics/bullet/bullet_inc.h"
 #include "physics/bullet/BulletTypes.hh"

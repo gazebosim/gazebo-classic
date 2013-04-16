@@ -23,7 +23,7 @@
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/PhysicsFactory.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo_config.h"
 
 void RegisterODEPhysics();

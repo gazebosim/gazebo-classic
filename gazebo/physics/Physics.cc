@@ -15,8 +15,8 @@
  *
 */
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 #include "physics/World.hh"
 #include "physics/PhysicsFactory.hh"
 #include "physics/Physics.hh"

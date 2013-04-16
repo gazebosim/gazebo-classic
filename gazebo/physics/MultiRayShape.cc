@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
 #include "msgs/msgs.hh"
 #include "physics/MultiRayShape.hh"
 

@@ -22,7 +22,7 @@
 #include <boost/bind.hpp>
 
 #include "gazebo_config.h"
-#include "common/Console.hh"
+#include "gazebo/common/Console.hh"
 
 #include "physics/Link.hh"
 #include "physics/ode/ODEHingeJoint.hh"

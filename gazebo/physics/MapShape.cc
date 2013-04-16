@@ -21,8 +21,8 @@
 #include <string.h>
 #include <math.h>
 
-#include "common/Image.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/common/Exception.hh"
 
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"

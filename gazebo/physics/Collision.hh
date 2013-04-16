@@ -25,8 +25,8 @@
 #include <string>
 #include <vector>
 
-#include "common/Event.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 #include "physics/PhysicsTypes.hh"
 #include "physics/CollisionState.hh"
