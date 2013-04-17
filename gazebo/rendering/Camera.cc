@@ -432,7 +432,7 @@ void Camera::PostRender()
         static_cast<Ogre::PixelFormat>(this->imageFormat),
         this->saveFrameBuffer);
 
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR <= 8
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
     // Case for UserCamera where there is no RenderTexture but
     // a RenderTarget (RenderWindow) exists. We can not call SetRenderTarget
     // because that overrides the this->renderTarget variable
