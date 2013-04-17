@@ -718,6 +718,9 @@ void LogRecord::OnLogControl(ConstLogControlPtr &_data)
   {
     this->SetPaused(_data->paused());
   }
+
+  // Output the new log status
+  this->PublishLogStatus();
 }
 
 //////////////////////////////////////////////////
