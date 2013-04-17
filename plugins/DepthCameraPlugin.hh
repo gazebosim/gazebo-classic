@@ -24,7 +24,7 @@
 #include "gazebo/sensors/DepthCameraSensor.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/rendering/DepthCamera.hh"
-#include "gazebo.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {

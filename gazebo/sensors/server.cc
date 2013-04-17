@@ -23,7 +23,7 @@
 #include "gazebo/rendering/Rendering.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 
-#include "gazebo.hh"
+#include "gazebo/gazebo.hh"
 
 bool quit = false;
 
