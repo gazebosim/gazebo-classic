@@ -855,7 +855,8 @@ void echo(const std::string &_filter, bool _raw, const std::string &_stamp,
   std::string stateString;
 
   // Output the header
-  std::cout << play->GetHeader() << std::endl;
+  if (!_raw)
+    std::cout << play->GetHeader() << std::endl;
 
   StateFilter filter(!_raw, _stamp, _hz);
   filter.Init(_filter);
@@ -865,18 +866,25 @@ void echo(const std::string &_filter, bool _raw, const std::string &_stamp,
   {
     if (i > 0)
       stateString = filter.Filter(stateString);
+    else if (i == 0 && _raw)
+      stateString.clear();
 
     if (!stateString.empty())
     {
-      std::cout << "<chunk encoding='txt'><![CDATA[\n";
+      if (!_raw)
+        std::cout << "<chunk encoding='txt'><![CDATA[\n";
+
       std::cout << stateString;
-      std::cout << "]]></chunk>\n";
+
+      if (!_raw)
+        std::cout << "]]></chunk>\n";
     }
 
     ++i;
   }
 
-  std::cout << "</gazebo_log>\n";
+  if (!_raw)
+    std::cout << "</gazebo_log>\n";
 }
 
 /////////////////////////////////////////////////
@@ -888,7 +896,8 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
   std::string stateString;
   gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
 
-  std::cout << play->GetHeader() << std::endl;
+  if (!_raw)
+    std::cout << play->GetHeader() << std::endl;
 
   char c = '\0';
 
@@ -900,13 +909,18 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
   {
     if (i > 0)
       stateString = filter.Filter(stateString);
+    else if (i == 0 && _raw)
+      stateString.clear();
 
     // Only wait for user input if there is some state to output.
     if (!stateString.empty())
     {
-      std::cout << "<chunk encoding='txt'><![CDATA[\n";
+      if (!_raw)
+        std::cout << "<chunk encoding='txt'><![CDATA[\n";
       std::cout << stateString;
-      std::cout << "]]></chunk>\n";
+
+      if (!_raw)
+        std::cout << "]]></chunk>\n";
 
       std::cout << "\n--- Press space to continue, 'q' to quit ---\n";
 
@@ -919,7 +933,8 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
     ++i;
   }
 
-  std::cout << "</gazebo_log>\n";
+  if (!_raw)
+    std::cout << "</gazebo_log>\n";
 }
 
 /////////////////////////////////////////////////
