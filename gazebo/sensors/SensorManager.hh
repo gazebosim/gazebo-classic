@@ -53,7 +53,7 @@ namespace gazebo
 
     /// \brief Monitors simulation time, and notifies conditions when
     /// a specified time has been reached.
-    class SimTimeEventHandler : public SingletonT<SimTimeEventHandler>
+    class SimTimeEventHandler
     {
       /// \brief Constructor
       public: SimTimeEventHandler();
@@ -78,9 +78,6 @@ namespace gazebo
 
       /// \brief The list of events to handle.
       private: std::list<SimTimeEvent*> events;
-
-      /// \brief This is a singleton class.
-      private: friend class SingletonT<SimTimeEventHandler>;
 
       /// \brief Connect to the World::UpdateBegin event.
       private: event::ConnectionPtr updateConnection;
@@ -277,18 +274,14 @@ namespace gazebo
       /// \brief The sensor manager's vector of sensor containers.
       private: SensorContainer_V sensorContainers;
 
-      /// \brief A mutex used by SensorContainer and SimTimeEventHandler
-      /// for timing coordination.
-      private: static boost::mutex sensorTimingMutex;
-
       /// \brief This is a singleton class.
       private: friend class SingletonT<SensorManager>;
 
       /// \brief Allow access to sensorTimeMutex member var.
       private: friend class SensorContainer;
 
-      /// \brief Allow access to sensorTimeMutex member var.
-      private: friend class SimTimeEventHandler;
+      /// \brief Pointer to the sim time event handler.
+      private: SimTimeEventHandler *simTimeEventHandler;
     };
     /// \}
   }
