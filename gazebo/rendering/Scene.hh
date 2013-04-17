@@ -29,7 +29,7 @@
 
 #include "rendering/RenderTypes.hh"
 
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/math/Vector2i.hh"

@@ -25,7 +25,7 @@
 #include "gazebo/gui/qt.h"
 #include "sdf/sdf.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "rendering/RenderTypes.hh"
 
 class QTreeWidget;

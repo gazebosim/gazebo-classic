@@ -20,8 +20,8 @@
 
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "transport/Transport.hh"
-#include "transport/Node.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
 #include "gazebo/math/Vector2d.hh"
 
 #include "rendering/ogre_gazebo.h"

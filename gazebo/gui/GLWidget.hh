@@ -25,7 +25,7 @@
 #include "gazebo/gui/qt.h"
 #include "rendering/RenderTypes.hh"
 
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/Event.hh"

@@ -19,7 +19,7 @@
  * Date: 14 Dec 2007
  */
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 #include "rendering/Scene.hh"
 #include "rendering/DynamicLines.hh"
 #include "rendering/LaserVisual.hh"

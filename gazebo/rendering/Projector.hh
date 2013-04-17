@@ -30,7 +30,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "sdf/sdf.hh"
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 #include "rendering/RenderTypes.hh"
 
 namespace gazebo

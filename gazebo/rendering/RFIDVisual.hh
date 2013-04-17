@@ -26,7 +26,7 @@
 
 #include "rendering/Visual.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {

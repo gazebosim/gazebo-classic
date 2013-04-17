@@ -28,7 +28,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/Event.hh"
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "rendering/RenderTypes.hh"
 
 namespace Ogre

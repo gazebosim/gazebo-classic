@@ -18,7 +18,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "transport/Node.hh"
+#include "gazebo/transport/Node.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/common/MouseEvent.hh"
 #include "rendering/UserCamera.hh"

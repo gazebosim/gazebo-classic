@@ -19,7 +19,7 @@
  * Date: 6th December 2011
  */
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/Scene.hh"
 #include "gazebo/common/MeshManager.hh"

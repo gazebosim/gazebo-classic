@@ -19,7 +19,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/gzmath.hh"
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
 #include "rendering/RenderEvents.hh"
 #include "rendering/Rendering.hh"
