@@ -16,9 +16,9 @@
  */
 #include "gazebo/common/Color.hh"
 #include "gazebo/common/Assert.hh"
-#include "math/Pose.hh"
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
 
 #include "sdf/interface/parser.hh"
 #include "sdf/interface/SDF.hh"

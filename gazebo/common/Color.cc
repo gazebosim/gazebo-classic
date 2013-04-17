@@ -22,7 +22,7 @@
 #include <math.h>
 #include <algorithm>
 
-#include "math/Helpers.hh"
+#include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Color.hh"
 

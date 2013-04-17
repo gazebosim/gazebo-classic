@@ -26,7 +26,7 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"

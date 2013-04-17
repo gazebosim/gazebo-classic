@@ -17,7 +17,7 @@
 #ifndef _ODEBOXSHAPE_HH_
 #define _ODEBOXSHAPE_HH_
 
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODETypes.hh"

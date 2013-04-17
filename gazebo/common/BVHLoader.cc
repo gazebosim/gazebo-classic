@@ -26,8 +26,8 @@
 #include "gazebo/common/Skeleton.hh"
 #include "gazebo/common/SkeletonAnimation.hh"
 #include "gazebo/common/Console.hh"
-#include "math/Matrix3.hh"
-#include "math/Angle.hh"
+#include "gazebo/math/Matrix3.hh"
+#include "gazebo/math/Angle.hh"
 
 using namespace gazebo;
 using namespace common;

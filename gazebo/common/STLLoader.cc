@@ -18,7 +18,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#include "math/Helpers.hh"
+#include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/STLLoader.hh"

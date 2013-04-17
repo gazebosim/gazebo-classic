@@ -28,8 +28,8 @@
 
 #include "gazebo/common/Param.hh"
 #include "Entity.hh"
-#include "math/Pose.hh"
-#include "math/Vector3.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Collision.hh"
 */
 

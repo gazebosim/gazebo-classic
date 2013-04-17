@@ -16,8 +16,8 @@
 */
 #include <algorithm>
 
-#include "math/Spline.hh"
-#include "math/RotationSpline.hh"
+#include "gazebo/math/Spline.hh"
+#include "gazebo/math/RotationSpline.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"

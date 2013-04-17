@@ -15,7 +15,7 @@
  *
 */
 #include "sdf/sdf.hh"
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Mesh.hh"
