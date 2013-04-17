@@ -658,7 +658,7 @@ void help()
 
   std::cerr << "Commands:\n"
             << "  help\t Output this help message.\n"
-            << "  info\t Display statistical information about a log file.\n"
+            // << "  info\t Display statistical information about a log file.\n"
             << "  echo\t Output the contents of a log file to screen.\n"
             << "  step\t Step through the contents of a log file.\n"
             << "  start\t Start recording a log file on an active Gazebo "
@@ -821,27 +821,30 @@ void info(const std::string &_filename)
 
   // Compute the duration
   gazebo::common::Time deltaTime = endTime - startTime;
-  int hours = deltaTime.sec / 3600;
-  int minutes = (deltaTime.sec - hours * 3600) / 60;
-  int seconds = (deltaTime.sec - hours * 3600 - minutes * 60);
+  // int hours = deltaTime.sec / 3600;
+  // int minutes = (deltaTime.sec - hours * 3600) / 60;
+  // int seconds = (deltaTime.sec - hours * 3600 - minutes * 60);
 
   // Output info
   std::cout
     << "Log Version:    " << play->GetLogVersion() << "\n"
     << "Gazebo Version: " << play->GetGazeboVersion() << "\n"
     << "Random Seed:    " << play->GetRandSeed() << "\n"
-    << "Start:          " << boost::posix_time::from_time_t(startTime.sec)
-    << "." << startTime.nsec << "\n"
-    << "End:            " << boost::posix_time::from_time_t(endTime.sec)
-    << "." << endTime.nsec << "\n"
-    << "Duration:       " << std::setfill('0') << std::setw(2) << hours << ":"
-                          << std::setfill('0') << std::setw(2) << minutes << ":"
-                          << std::setfill('0') << std::setw(2) << seconds << "."
-                          << deltaTime.nsec << "\n"
-    << "Steps:          " << play->GetChunkCount() << "\n"
+    // << "Start:          " << boost::posix_time::from_time_t(startTime.sec)
+    // << "." << startTime.nsec << "\n"
+    // << "End:            " << boost::posix_time::from_time_t(endTime.sec)
+    // << "." << endTime.nsec << "\n"
+    // << "Duration:       " << std::setfill('0') << std::setw(2)
+    // << hours << ":"
+    //                       << std::setfill('0')
+    //                       << std::setw(2) << minutes << ":"
+    //                       << std::setfill('0') << std::setw(2)
+    //                       << seconds << "."
+    //                       << deltaTime.nsec << "\n"
+    // << "Steps:          " << play->GetChunkCount() << "\n"
     << "Size:           " << get_file_size_str(_filename) << "\n"
     << "Encoding:       " << play->GetEncoding() << "\n"
-    << "Model Count:    " << modelCount << "\n"
+    // << "Model Count:    " << modelCount << "\n"
     << "\n";
 }
 
