@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/MeshManager.hh"

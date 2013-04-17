@@ -25,7 +25,7 @@
 #include "gazebo/physics/Physics.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/transport/Transport.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 #include "gazebo_config.h"
 
 // Command line options

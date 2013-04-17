@@ -20,8 +20,8 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 
-#include "sdf/interface/parser.hh"
-#include "sdf/interface/SDF.hh"
+#include "gazebo/sdf/interface/parser.hh"
+#include "gazebo/sdf/interface/SDF.hh"
 
 using namespace sdf;
 

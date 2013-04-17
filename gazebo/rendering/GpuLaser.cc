@@ -23,7 +23,7 @@
 #include <dirent.h>
 #include <sstream>
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
 

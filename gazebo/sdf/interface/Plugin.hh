@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "sdf/interface/SDFBase.hh"
+#include "gazebo/sdf/interface/SDFBase.hh"
 
 namespace sdf
 {

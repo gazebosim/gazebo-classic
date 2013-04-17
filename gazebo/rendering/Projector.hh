@@ -29,7 +29,7 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
