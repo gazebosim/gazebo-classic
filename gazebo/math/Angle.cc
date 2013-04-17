@@ -20,8 +20,8 @@
  */
 
 #include <math.h>
-#include "math/Helpers.hh"
-#include "math/Angle.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Angle.hh"
 
 using namespace gazebo;
 using namespace math;

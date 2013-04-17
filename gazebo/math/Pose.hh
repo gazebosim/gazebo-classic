@@ -24,8 +24,8 @@
 
 #include <iostream>
 
-#include "math/Vector3.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Quaternion.hh"
 
 namespace gazebo
 {
