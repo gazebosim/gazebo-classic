@@ -435,7 +435,7 @@ void Server::Run()
     {
       iterations = boost::lexical_cast<unsigned int>(piter->second);
     }
-    catch (...)
+    catch(...)
     {
       iterations = 0;
       gzerr << "Unable to cast iterations[" << piter->second << "] "

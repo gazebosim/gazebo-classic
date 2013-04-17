@@ -51,10 +51,6 @@ void onPoseInfo(ConstPose_VPtr &_msg)
 /// Record a log file
 TEST(StateLogTest, PR2Record)
 {
-  // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
-  boost::filesystem::create_directories("/tmp/gazebo_test");
-
   custom_exec("gzserver -r --record_path /tmp/gazebo_test "
     "--iters 1000 --seed 12345 worlds/pr2.world");
 
@@ -64,7 +60,7 @@ TEST(StateLogTest, PR2Record)
 
 /////////////////////////////////////////////////
 // Playback a log file
-TEST(StateLogTest, PR2Playback)
+TEST(StateLogTest, PR2PlaybackZipped)
 {
   // Run playback
   boost::thread *play = new boost::thread(boost::bind(&custom_exec,
@@ -105,9 +101,63 @@ TEST(StateLogTest, PR2Playback)
 
   gazebo::transport::fini();
 
-  // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
-  boost::filesystem::create_directories("/tmp/gazebo_test");
+  // Make sure the values are correct.
+  EXPECT_NEAR(g_pr2LGripperXStart, 0.83, 0.05);
+  EXPECT_NEAR(g_pr2LGripperXEnd, 0.76, 0.05);
+}
+
+/////////////////////////////////////////////////
+// Playback a log file
+TEST(StateLogTest, PR2PlaybackTxt)
+{
+  g_pr2LGripperXStart = -1;
+  g_pr2LGripperXEnd = -1;
+  g_msgCount = 0;
+
+  // Convert the zipped state to txt and set a Hz filter.
+  custom_exec("gzlog echo /tmp/gazebo_test/state.log -z 30 > "
+      "/tmp/gazebo_test/state_txt.log");
+
+  // Run playback
+  boost::thread *play = new boost::thread(boost::bind(&custom_exec,
+        "gzserver -u -p /tmp/gazebo_test/state.log"));
+
+  // Setup transportation
+  gazebo::transport::init();
+  gazebo::transport::run();
+
+  gazebo::transport::NodePtr node(new gazebo::transport::Node());
+  node->Init();
+
+  // Subscribe to pose info
+  gazebo::transport::SubscriberPtr sub = node->Subscribe(
+      "/gazebo/default/pose/info", &onPoseInfo);
+
+  // Create a publisher to unpause gzserver
+  gazebo::transport::PublisherPtr pub =
+    node->Advertise<gazebo::msgs::WorldControl>(
+        "/gazebo/default/world_control");
+  pub->WaitForConnection();
+
+  // Unpause gzserver
+  gazebo::msgs::WorldControl msg;
+  msg.set_pause(false);
+  pub->Publish(msg);
+
+  // Wait for messages to arrive
+  while (g_msgCount < 120)
+  {
+    gazebo::common::Time::MSleep(100);
+  }
+
+  // Kill gserver
+  play->interrupt();
+  delete play;
+
+  // Cleanup...not the best
+  custom_exec("killall -9 gzserver");
+
+  gazebo::transport::fini();
 
   // Make sure the values are correct.
   EXPECT_NEAR(g_pr2LGripperXStart, 0.83, 0.05);
@@ -117,6 +167,15 @@ TEST(StateLogTest, PR2Playback)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
+  // Cleanup test directory and create a new one.
+  boost::filesystem::remove_all("/tmp/gazebo_test");
+  boost::filesystem::create_directories("/tmp/gazebo_test");
+
   ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+  int result = RUN_ALL_TESTS();
+
+  // Cleanup test directory.
+  boost::filesystem::remove_all("/tmp/gazebo_test");
+
+  return result;
 }
