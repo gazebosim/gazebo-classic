@@ -216,7 +216,6 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
     // Set the IMU orientation
     msgs::Set(this->imuMsg.mutable_orientation(),
               (imuPose - this->referencePose).rot);
-              //imuPose.rot * this->referencePose.rot.GetInverse());
 
     // Set the IMU angular velocity
     msgs::Set(this->imuMsg.mutable_angular_velocity(),
