@@ -6,7 +6,6 @@ include_directories(SYSTEM
 )
 
 include_directories(
-  ${PROJECT_SOURCE_DIR}/gazebo
   ${PROJECT_BINARY_DIR}/gazebo
 )
 
