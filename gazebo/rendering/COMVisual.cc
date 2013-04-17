@@ -19,9 +19,9 @@
  */
 
 #include "gazebo/common/MeshManager.hh"
-#include "math/Vector3.hh"
-#include "math/Quaternion.hh"
-#include "math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/math/Pose.hh"
 
 #include "rendering/DynamicLines.hh"
 #include "rendering/ogre_gazebo.h"

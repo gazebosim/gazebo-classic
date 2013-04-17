@@ -26,7 +26,7 @@
 #include "rendering/Visual.hh"
 #include "rendering/Scene.hh"
 
-#include "math/Quaternion.hh"
+#include "gazebo/math/Quaternion.hh"
 
 #include "transport/Publisher.hh"
 #include "transport/Node.hh"

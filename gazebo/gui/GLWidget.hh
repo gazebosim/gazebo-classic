@@ -30,7 +30,7 @@
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/Event.hh"
 
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
 #include "msgs/msgs.hh"
 

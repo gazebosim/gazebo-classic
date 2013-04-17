@@ -19,7 +19,7 @@
 
 #include "rendering/RenderTypes.hh"
 #include "transport/TransportTypes.hh"
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {

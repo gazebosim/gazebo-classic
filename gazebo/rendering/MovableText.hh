@@ -29,7 +29,7 @@
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Color.hh"
-#include "math/MathTypes.hh"
+#include "gazebo/math/MathTypes.hh"
 
 namespace boost
 {

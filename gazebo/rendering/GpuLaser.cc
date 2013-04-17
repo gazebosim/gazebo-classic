@@ -34,7 +34,7 @@
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Timer.hh"
 #include "sensors/GpuRaySensor.hh"
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
 #include "rendering/Visual.hh"
 #include "rendering/Conversions.hh"

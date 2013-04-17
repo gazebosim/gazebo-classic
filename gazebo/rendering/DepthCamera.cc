@@ -30,7 +30,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
 #include "rendering/Visual.hh"
 #include "rendering/Conversions.hh"
