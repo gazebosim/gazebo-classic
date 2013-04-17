@@ -17,7 +17,7 @@
 #ifndef _EDIT_MODEL_WIDGET_HH_
 #define _EDIT_MODEL_WIDGET_HH_
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 #include "transport/TransportTypes.hh"
 #include "msgs/msgs.hh"
 

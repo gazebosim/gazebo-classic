@@ -30,11 +30,11 @@
 #include "rendering/OrbitViewController.hh"
 #include "rendering/FPSViewController.hh"
 
-#include "gui/Actions.hh"
-#include "gui/Gui.hh"
-#include "gui/ModelRightMenu.hh"
-#include "gui/GuiEvents.hh"
-#include "gui/GLWidget.hh"
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/ModelRightMenu.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GLWidget.hh"
 
 using namespace gazebo;
 using namespace gui;

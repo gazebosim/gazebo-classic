@@ -31,9 +31,9 @@
 #include "transport/Publisher.hh"
 #include "transport/Node.hh"
 
-#include "gui/Gui.hh"
-#include "gui/GuiEvents.hh"
-#include "gui/ModelMaker.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/ModelMaker.hh"
 
 using namespace gazebo;
 using namespace gui;

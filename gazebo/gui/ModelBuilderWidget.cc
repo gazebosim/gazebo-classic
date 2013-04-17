@@ -23,8 +23,8 @@
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
 
-#include "gui/GLWidget.hh"
-#include "gui/ModelBuilderWidget.hh"
+#include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/ModelBuilderWidget.hh"
 
 using namespace gazebo;
 using namespace gui;

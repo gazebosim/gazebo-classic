@@ -16,8 +16,8 @@
 */
 #include <boost/bind.hpp>
 
-#include "gui/Gui.hh"
-#include "gui/GuiEvents.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "rendering/Scene.hh"
 #include "rendering/Camera.hh"
 #include "rendering/DepthCamera.hh"

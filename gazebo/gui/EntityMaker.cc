@@ -16,7 +16,7 @@
 */
 #include "transport/Transport.hh"
 #include "transport/Node.hh"
-#include "gui/EntityMaker.hh"
+#include "gazebo/gui/EntityMaker.hh"
 
 using namespace gazebo;
 using namespace gui;

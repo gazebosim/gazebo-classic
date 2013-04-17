@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 
 class QLineEdit;

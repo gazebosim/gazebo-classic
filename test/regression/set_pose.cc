@@ -16,7 +16,7 @@
  */
 
 // #include <signal.h>
-// #include "gui/Gui.hh"
+// #include "gazebo/gui/Gui.hh"
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 

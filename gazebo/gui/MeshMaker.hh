@@ -18,7 +18,7 @@
 #define _MESHMAKER_HH_
 
 #include <string>
-#include "gui/EntityMaker.hh"
+#include "gazebo/gui/EntityMaker.hh"
 
 namespace gazebo
 {

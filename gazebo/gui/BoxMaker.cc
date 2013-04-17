@@ -19,7 +19,7 @@
 #include "msgs/msgs.hh"
 
 #include "gazebo/common/Console.hh"
-#include "gui/GuiEvents.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/common/MouseEvent.hh"
 
@@ -27,7 +27,7 @@
 
 #include "transport/Publisher.hh"
 
-#include "gui/BoxMaker.hh"
+#include "gazebo/gui/BoxMaker.hh"
 
 using namespace gazebo;
 using namespace gui;

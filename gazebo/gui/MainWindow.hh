@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 #include "msgs/MessageTypes.hh"
 #include "transport/TransportTypes.hh"

@@ -21,13 +21,13 @@
 #include "rendering/UserCamera.hh"
 #include "gazebo/common/Console.hh"
 
-#include "gui/GuiEvents.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/common/MouseEvent.hh"
 
 #include "transport/Publisher.hh"
 
-#include "gui/MeshMaker.hh"
+#include "gazebo/gui/MeshMaker.hh"
 
 using namespace gazebo;
 using namespace gui;

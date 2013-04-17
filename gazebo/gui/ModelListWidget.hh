@@ -22,7 +22,7 @@
 #include <vector>
 #include <deque>
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 #include "sdf/sdf.hh"
 #include "msgs/msgs.hh"
 #include "transport/TransportTypes.hh"
