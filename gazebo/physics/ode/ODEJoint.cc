@@ -99,7 +99,10 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
           elem->GetElement("fudge_factor")->GetValueDouble());
 
     if (elem->HasElement("cfm"))
-        this->SetParam(dParamCFM, elem->GetElement("cfm")->GetValueDouble());
+        this->SetAttribute("cfm", 0, elem->GetElement("cfm")->GetValueDouble());
+
+    if (elem->HasElement("erp"))
+        this->SetAttribute("erp", 0, elem->GetElement("erp")->GetValueDouble());
 
     if (elem->HasElement("bounce"))
         this->SetParam(dParamBounce,
