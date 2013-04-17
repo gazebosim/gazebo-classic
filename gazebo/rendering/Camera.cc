@@ -432,9 +432,7 @@ void Camera::PostRender()
         static_cast<Ogre::PixelFormat>(this->imageFormat),
         this->saveFrameBuffer);
 
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 8
-    this->viewport->getTarget()->copyContentsToMemory(box);
-#else
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR <= 8
     // Case for UserCamera where there is no RenderTexture but
     // a RenderTarget (RenderWindow) exists. We can not call SetRenderTarget
     // because that overrides the this->renderTarget variable
@@ -466,6 +464,11 @@ void Camera::PostRender()
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
     pixelBuffer = this->renderTexture->getBuffer();
     pixelBuffer->blitToMemory(box);
+#else
+    // There is a fix in ogre-1.8 for a buffer overrun problem in
+    // OgreGLXWindow.cpp's copyContentsToMemory(). It fixes reading
+    // pixels from buffer into memory.
+    this->viewport->getTarget()->copyContentsToMemory(box);
 #endif
 
     if (this->captureDataOnce)
