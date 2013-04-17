@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#include <msgs/msgs.hh>
-
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 #include <limits>
 #include <algorithm>
+
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
