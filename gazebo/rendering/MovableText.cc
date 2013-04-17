@@ -28,7 +28,7 @@
 
 #include "gazebo/common/common.hh"
 #include "gazebo/math/gzmath.hh"
-#include "rendering/MovableText.hh"
+#include "gazebo/rendering/MovableText.hh"
 
 #define POS_TEX_BINDING    0
 #define COLOUR_BINDING     1

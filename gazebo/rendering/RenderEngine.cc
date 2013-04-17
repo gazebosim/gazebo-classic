@@ -30,7 +30,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo_config.h"
 
@@ -45,15 +45,15 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/SystemPaths.hh"
 
-#include "rendering/Material.hh"
-#include "rendering/RenderEvents.hh"
-#include "rendering/RTShaderSystem.hh"
-#include "rendering/WindowManager.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Grid.hh"
-#include "rendering/Visual.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/RenderEngine.hh"
+#include "gazebo/rendering/Material.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/WindowManager.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Grid.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
 using namespace gazebo;
 using namespace rendering;

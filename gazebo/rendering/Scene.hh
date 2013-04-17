@@ -27,7 +27,7 @@
 #include "sdf/sdf.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/Events.hh"

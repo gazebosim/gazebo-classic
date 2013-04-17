@@ -32,7 +32,7 @@
 
 #include "sdf/sdf.hh"
 
-#include "rendering/Camera.hh"
+#include "gazebo/rendering/Camera.hh"
 
 namespace Ogre
 {

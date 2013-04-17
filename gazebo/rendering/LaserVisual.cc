@@ -20,9 +20,9 @@
  */
 
 #include "gazebo/transport/transport.hh"
-#include "rendering/Scene.hh"
-#include "rendering/DynamicLines.hh"
-#include "rendering/LaserVisual.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/LaserVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;

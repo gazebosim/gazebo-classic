@@ -20,7 +20,7 @@
 #include <string>
 
 #include "gazebo/math/Vector3.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

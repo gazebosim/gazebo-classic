@@ -17,7 +17,7 @@
 #ifndef _CONVERSIONS_HH_
 #define _CONVERSIONS_HH_
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Color.hh"
 #include "gazebo/math/Vector3.hh"

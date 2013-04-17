@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "gazebo/common/SingletonT.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace Ogre
 {

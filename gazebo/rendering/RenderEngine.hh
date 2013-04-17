@@ -29,7 +29,7 @@
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace Ogre
 {

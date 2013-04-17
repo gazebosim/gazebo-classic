@@ -26,12 +26,12 @@
 #include <map>
 #include <list>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
 #include "sdf/sdf.hh"
 #include "gazebo/transport/transport.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

@@ -17,8 +17,8 @@
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/common/MouseEvent.hh"
 
-#include "rendering/UserCamera.hh"
-#include "rendering/FPSViewController.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/FPSViewController.hh"
 
 #define TYPE_STRING "fps"
 

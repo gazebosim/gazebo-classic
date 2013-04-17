@@ -38,7 +38,7 @@
 #include "gazebo/math/Vector2i.hh"
 
 #include "gazebo/msgs/MessageTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "sdf/sdf.hh"
 
 // Forward Declarations
