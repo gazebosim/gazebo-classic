@@ -187,9 +187,6 @@ void ImuSensor::OnLinkData(ConstLinkDataPtr &_msg)
   // Store the contacts message for processing in UpdateImpl
   this->incomingLinkData[this->dataIndex] = _msg;
   this->dataDirty = true;
-
-  // if (this->incomingLinkData.size() > 3)
-  //    this->incomingLinkData.pop_front();
 }
 
 //////////////////////////////////////////////////
@@ -239,12 +236,6 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
 
   // toggle the index
   msg.CopyFrom(*this->incomingLinkData[readIndex].get());
-
-//    if (this->incomingLinkData.empty())
-//      return;
-
-//    msg.CopyFrom(*this->incomingLinkData.front().get());
-//    this->incomingLinkData.pop_front();
 
   common::Time timestamp = msgs::Convert(msg.time());
 
