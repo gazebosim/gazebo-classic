@@ -114,7 +114,7 @@ double MultiRayShape::GetRange(int _index)
   }
 
   // Add min range, because we measured from min range.
-  return this->GetMinRange() + this->rays[_index]->GetLength(); 
+  return this->GetMinRange() + this->rays[_index]->GetLength();
 }
 
 //////////////////////////////////////////////////
