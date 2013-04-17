@@ -1578,13 +1578,13 @@ void dxQuickStepper (dxWorldProcessContext *context,
         dxJoint::Info2 Jinfo;
         Jinfo.rowskip = 12;
         Jinfo.fps = stepsize1;
-        Jinfo.erp = world->global_erp;
 
         dReal *Jcopyrow = Jcopy;
         unsigned ofsi = 0;
         const dJointWithInfo1 *jicurr = jointiinfos;
         const dJointWithInfo1 *const jiend = jicurr + nj;
         for (; jicurr != jiend; jicurr++) {
+          Jinfo.erp = world->global_erp;
           dReal *const Jrow = J + ofsi * 12;
           Jinfo.J1l = Jrow;
           Jinfo.J1a = Jrow + 3;
