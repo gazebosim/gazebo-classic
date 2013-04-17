@@ -17,8 +17,8 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Events.hh"
-#include "transport/TopicManager.hh"
-#include "transport/ConnectionManager.hh"
+#include "gazebo/transport/TopicManager.hh"
+#include "gazebo/transport/ConnectionManager.hh"
 
 #include "gazebo_config.h"
 

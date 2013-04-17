@@ -20,7 +20,7 @@
  */
 
 #include "sdf/sdf.hh"
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
 #include "gazebo/physics/Physics.hh"
 #include "gazebo/physics/World.hh"

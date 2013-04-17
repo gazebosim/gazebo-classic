@@ -42,7 +42,7 @@
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/Physics.hh"
 
-#include "transport/Node.hh"
+#include "gazebo/transport/Node.hh"
 
 using namespace gazebo;
 using namespace physics;

@@ -26,7 +26,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
 #include "rendering/DepthCamera.hh"
 #include "rendering/Scene.hh"

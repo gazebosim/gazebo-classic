@@ -24,7 +24,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
 #include "rendering/Scene.hh"
 #include "rendering/Rendering.hh"

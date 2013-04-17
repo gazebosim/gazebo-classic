@@ -19,7 +19,7 @@
 
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo.hh"
 
 namespace gazebo

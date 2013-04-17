@@ -28,7 +28,7 @@
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Pose.hh"
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "rendering/RenderTypes.hh"
 

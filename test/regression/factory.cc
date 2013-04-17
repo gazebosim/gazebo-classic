@@ -16,8 +16,8 @@
 */
 #include <string.h>
 #include "gazebo/math/Helpers.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/Node.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/Node.hh"
 
 #include "rendering/RenderEngine.hh"
 #include "rendering/Camera.hh"

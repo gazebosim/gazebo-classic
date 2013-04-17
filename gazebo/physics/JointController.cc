@@ -15,8 +15,8 @@
  *
 */
 
-#include "transport/Node.hh"
-#include "transport/Subscriber.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Joint.hh"

@@ -21,7 +21,7 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 
-#include "transport/Connection.hh"
+#include "gazebo/transport/Connection.hh"
 #include "gazebo/common/Event.hh"
 
 namespace gazebo

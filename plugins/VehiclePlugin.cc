@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/physics/physics.hh"
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 #include "plugins/VehiclePlugin.hh"
 
 using namespace gazebo;

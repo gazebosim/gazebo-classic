@@ -21,7 +21,7 @@
 
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo.hh"
 
 #define NUMBER_OF_WHEELS 4
