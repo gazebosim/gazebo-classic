@@ -29,7 +29,7 @@
 #include "gazebo/math/MathTypes.hh"
 
 #include "rendering/RenderTypes.hh"
-#include "msgs/MessageTypes.hh"
+#include "gazebo/msgs/MessageTypes.hh"
 #include "transport/TransportTypes.hh"
 
 namespace Ogre

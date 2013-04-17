@@ -19,7 +19,7 @@
 
 #include <string>
 #include "gazebo/common/Event.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 namespace gazebo
 {

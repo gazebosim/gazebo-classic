@@ -32,7 +32,7 @@
 
 #include "gazebo/math/Pose.hh"
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/gui/BoxMaker.hh"
 #include "gazebo/gui/SphereMaker.hh"

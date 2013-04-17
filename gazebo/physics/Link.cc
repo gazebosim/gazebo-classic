@@ -21,7 +21,7 @@
 
 #include <sstream>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/math/Quaternion.hh"

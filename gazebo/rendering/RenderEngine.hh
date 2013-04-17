@@ -25,7 +25,7 @@
 #include <vector>
 #include <string>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/Event.hh"
 #include "transport/TransportTypes.hh"

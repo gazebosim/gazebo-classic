@@ -28,7 +28,7 @@
 
 #include "rendering/ogre_gazebo.h"
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "sdf/sdf.hh"
 #include "transport/transport.hh"
 #include "rendering/RenderTypes.hh"

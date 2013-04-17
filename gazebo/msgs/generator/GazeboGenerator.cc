@@ -26,7 +26,7 @@
 #include <utility>
 #include <iostream>
 
-#include "msgs/generator/GazeboGenerator.hh"
+#include "gazebo/msgs/generator/GazeboGenerator.hh"
 
 namespace google {
 namespace protobuf {

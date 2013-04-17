@@ -28,7 +28,7 @@
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 namespace gazebo
 {
