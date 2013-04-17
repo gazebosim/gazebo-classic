@@ -23,7 +23,7 @@
 #include <list>
 
 #include "gazebo/gui/qt.h"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
 

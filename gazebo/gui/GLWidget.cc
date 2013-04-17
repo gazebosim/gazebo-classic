@@ -21,14 +21,14 @@
 
 #include "gazebo/transport/transport.hh"
 
-#include "rendering/RenderEvents.hh"
-#include "rendering/Rendering.hh"
-#include "rendering/Visual.hh"
-#include "rendering/WindowManager.hh"
-#include "rendering/Scene.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/OrbitViewController.hh"
-#include "rendering/FPSViewController.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/WindowManager.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/OrbitViewController.hh"
+#include "gazebo/rendering/FPSViewController.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/Gui.hh"

@@ -26,12 +26,12 @@
 
 #include "gazebo/transport/transport.hh"
 
-#include "rendering/Scene.hh"
-#include "rendering/Rendering.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Rendering.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/GpuRaySensor.hh"
-#include "rendering/GpuLaser.hh"
+#include "gazebo/rendering/GpuLaser.hh"
 
 using namespace gazebo;
 using namespace sensors;

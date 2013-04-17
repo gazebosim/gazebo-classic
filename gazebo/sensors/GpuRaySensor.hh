@@ -30,7 +30,7 @@
 #include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

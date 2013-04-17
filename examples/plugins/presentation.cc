@@ -18,13 +18,13 @@
 
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Camera.hh"
-#include "rendering/DepthCamera.hh"
-#include "rendering/RenderEngine.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/GUIOverlay.hh"
-#include "rendering/Visual.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/DepthCamera.hh"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/GUIOverlay.hh"
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo.hh"
 
 namespace gazebo

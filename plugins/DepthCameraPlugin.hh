@@ -23,7 +23,7 @@
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/sensors/DepthCameraSensor.hh"
 #include "gazebo/sensors/CameraSensor.hh"
-#include "rendering/DepthCamera.hh"
+#include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo.hh"
 
 namespace gazebo

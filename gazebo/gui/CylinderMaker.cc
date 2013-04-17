@@ -21,7 +21,7 @@
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/math/Quaternion.hh"
 
-#include "rendering/UserCamera.hh"
+#include "gazebo/rendering/UserCamera.hh"
 
 #include "gazebo/transport/Publisher.hh"
 
