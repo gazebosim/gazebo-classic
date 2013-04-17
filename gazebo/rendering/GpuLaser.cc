@@ -33,7 +33,7 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Timer.hh"
-#include "sensors/GpuRaySensor.hh"
+#include "gazebo/sensors/GpuRaySensor.hh"
 #include "gazebo/math/Pose.hh"
 
 #include "rendering/Visual.hh"

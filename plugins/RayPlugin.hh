@@ -23,8 +23,8 @@
 #define GAZEBO_RAY_PLUGIN_HH
 
 #include "gazebo/common/Plugin.hh"
-#include "sensors/SensorTypes.hh"
-#include "sensors/RaySensor.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/sensors/RaySensor.hh"
 #include "gazebo.hh"
 
 namespace gazebo

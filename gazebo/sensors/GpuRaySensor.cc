@@ -29,8 +29,8 @@
 #include "rendering/Scene.hh"
 #include "rendering/Rendering.hh"
 
-#include "sensors/SensorFactory.hh"
-#include "sensors/GpuRaySensor.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/GpuRaySensor.hh"
 #include "rendering/GpuLaser.hh"
 
 using namespace gazebo;

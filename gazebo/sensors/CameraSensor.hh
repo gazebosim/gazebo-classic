@@ -24,7 +24,7 @@
 
 #include <string>
 
-#include "sensors/Sensor.hh"
+#include "gazebo/sensors/Sensor.hh"
 #include "msgs/MessageTypes.hh"
 #include "transport/TransportTypes.hh"
 #include "rendering/RenderTypes.hh"

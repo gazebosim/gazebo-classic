@@ -21,8 +21,8 @@
 
 #include "rendering/RenderEngine.hh"
 #include "rendering/Camera.hh"
-#include "sensors/Sensors.hh"
-#include "sensors/CameraSensor.hh"
+#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 #include "ServerFixture.hh"
 #include "images_cmp.h"
 
