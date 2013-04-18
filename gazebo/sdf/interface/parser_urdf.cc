@@ -557,11 +557,11 @@ void URDF2Gazebo::InsertGazeboExtensionJoint(TiXmlElement *_elem,
         // insert stopCfm, stopErp, fudgeFactor
         if ((*ge)->isStopCfm)
         {
-          this->AddKeyValue(limit, "erp", this->Values2str(1, &(*ge)->stopCfm));
+          this->AddKeyValue(limit, "cfm", this->Values2str(1, &(*ge)->stopCfm));
         }
         if ((*ge)->isStopErp)
         {
-          this->AddKeyValue(limit, "cfm", this->Values2str(1, &(*ge)->stopErp));
+          this->AddKeyValue(limit, "erp", this->Values2str(1, &(*ge)->stopErp));
         }
         /* gone
         if ((*ge)->isInitialJointPosition)

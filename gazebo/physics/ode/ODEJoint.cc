@@ -926,7 +926,6 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
     else if (this->HasType(physics::Base::SLIDER_JOINT))
     {
       // rotate force into child link frame
-      this->GetGlobalAxis(0u);
       wrenchAppliedWorld.body2Force =
         this->GetForce(0u) * this->GetGlobalAxis(0u);
       wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
