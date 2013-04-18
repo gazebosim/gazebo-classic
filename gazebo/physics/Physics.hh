@@ -58,7 +58,9 @@ namespace gazebo
 
     /// \brief Run world by calling World::Run() given a pointer to it.
     /// \param[in] _world World to run.
-    void run_world(WorldPtr _world);
+    /// \param[in] _iterations Number of iterations for each world to take.
+    /// Zero indicates that each world should continue forever.
+    void run_world(WorldPtr _world, unsigned int _iterations = 0);
 
     /// \brief Stop world by calling World::Stop() given a pointer to it.
     /// \param[in] _world World to stop.
@@ -77,9 +79,11 @@ namespace gazebo
     /// gazebo::g_worlds
     void init_worlds();
 
-    /// \brief run multiple worlds stored in static variable
+    /// \brief Run multiple worlds stored in static variable
     /// gazebo::g_worlds
-    void run_worlds();
+    /// \param[in] _iterations Number of iterations for each world to take.
+    /// Zero indicates that each world should continue forever.
+    void run_worlds(unsigned int _iterations = 0);
 
     /// \brief stop multiple worlds stored in static variable
     /// gazebo::g_worlds
@@ -93,6 +97,10 @@ namespace gazebo
     /// \brief remove multiple worlds stored in static variable
     /// gazebo::g_worlds
     void remove_worlds();
+
+    /// \brief Return true if any world is running.
+    /// \return True if any world is running.
+    bool worlds_running();
     /// \}
   }
 }

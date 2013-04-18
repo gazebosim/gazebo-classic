@@ -432,7 +432,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
   {
     // try to use the old deprecated parser
     if (!gazeboNode)
-      gzwarn << "x SDF has no <sdf> element\n";
+      gzwarn << "SDF has no <sdf> element\n";
     else if (!gazeboNode->Attribute("version"))
       gzwarn << "<sdf> element has no version\n";
     else if (strcmp(gazeboNode->Attribute("version"),

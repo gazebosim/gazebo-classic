@@ -283,6 +283,7 @@ else (build_errors)
  
 
   if (BUILD_GAZEBO)
+    set(TEST_TYPE "UNIT")
     add_subdirectory(gazebo)
     add_subdirectory(sdf)
     add_subdirectory(media)

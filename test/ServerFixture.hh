@@ -49,6 +49,8 @@
 
 using namespace gazebo;
 
+std::string custom_exec(std::string _cmd);
+
 class ServerFixture : public testing::Test
 {
   protected: ServerFixture()

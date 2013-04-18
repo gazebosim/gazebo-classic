@@ -33,8 +33,8 @@ namespace gazebo
 
     /// \class JointWrench JointWrench.hh physics/physics.hh
     /// \brief Wrench information from a joint.  These are
-    /// forces and torques on parent and child Links, relative to the Link's
-    /// center of mass.
+    /// forces and torques on parent and child Links, relative to
+    /// the Joint frame immediately after rotation.
     class JointWrench
     {
       /// \brief Operator =

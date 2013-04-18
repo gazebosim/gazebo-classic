@@ -15,15 +15,15 @@
         <solver>
           <type>quick</type>
           <dt>0.001000</dt>
-          <iters>1000</iters>
+          <iters>250</iters>
           <precon_iters>0</precon_iters>
-          <sor>1.000000</sor>
+          <sor>1.400000</sor>
         </solver>
         <constraints>
           <cfm>0.000000</cfm>
           <erp>0.200000</erp>
-          <contact_max_correcting_vel>100.000000</contact_max_correcting_vel>
-          <contact_surface_layer>0.01000</contact_surface_layer>
+          <contact_max_correcting_vel>0.000000</contact_max_correcting_vel>
+          <contact_surface_layer>0.00000</contact_surface_layer>
         </constraints>
       </ode>
     </physics>
