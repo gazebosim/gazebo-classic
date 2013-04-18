@@ -761,7 +761,7 @@ void info(const std::string &_filename)
 
   gazebo::physics::WorldState state;
 
-  unsigned int modelCount = 0;
+  // unsigned int modelCount = 0;
 
   gazebo::common::Time endTime(0, 0);
   gazebo::common::Time startTime(0, 0);
@@ -783,7 +783,7 @@ void info(const std::string &_filename)
         // Count all the model elements.
         while (modelElem)
         {
-          modelCount++;
+          // modelCount++;
           modelElem = modelElem->GetNextElement("model");
         }
       }
