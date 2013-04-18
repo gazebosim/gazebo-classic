@@ -41,6 +41,9 @@ Node::~Node()
 /////////////////////////////////////////////////
 void Node::Fini()
 {
+  if (!this->initialized)
+    return;
+
   this->initialized = false;
   TopicManager::Instance()->RemoveNode(this->id);
 

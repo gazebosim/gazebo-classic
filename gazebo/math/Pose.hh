@@ -71,6 +71,11 @@ namespace gazebo
       /// \param[in] _rot The rotation.
       public: void Set(const Vector3 &_pos, const Quaternion &_rot);
 
+      /// \brief Set the pose from  pos and rpy vectors
+      /// \param[in] _pos The position.
+      /// \param[in] _rpy The rotation expressed as Euler angles.
+      public: void Set(const Vector3 &_pos, const Vector3 &_rpy);
+
       /// \brief Set the pose from a six tuple.
       /// \param[in] _x x position in meters.
       /// \param[in] _y y position in meters.
