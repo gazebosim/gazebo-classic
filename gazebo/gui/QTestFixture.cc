@@ -136,7 +136,9 @@ void QTestFixture::cleanup()
   double resPercentChange = (residentEnd - residentStart) / residentStart;
   double sharePercentChange = (shareEnd - shareStart) / shareStart;
 
+  std::cout << "SharePercentChange[" << sharePercentChange << "]\n";
   std::cout << "ResPercentChange[" << resPercentChange << "]\n";
+
   // Make sure the percent change values are reasonable.
   QVERIFY(resPercentChange < this->resMaxPercentChange);
   QVERIFY(sharePercentChange < this->shareMaxPercentChange);

@@ -119,6 +119,9 @@ void MainWindow_TEST::Wireframe()
   // Make sure the request was set.
   QVERIFY(g_gotSetWireframe);
 
+  gzdbg << "AvgPrewireframe [" << avgPreWireframe
+        << "] AvgPostWireframe[" << avgPostWireframe << "]\n";
+
   // Removing the grey ground plane should change the image.
   QVERIFY(fabs(avgPreWireframe - avgPostWireframe) > 10);
 

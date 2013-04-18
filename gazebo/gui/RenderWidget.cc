@@ -227,7 +227,6 @@ void RenderWidget::update()
 
   if (!cam || !cam->GetInitialized())
   {
-    printf("Prerender\n");
     event::Events::preRender();
     return;
   }
