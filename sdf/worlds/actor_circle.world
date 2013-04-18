@@ -1,4 +1,4 @@
-<sdf version="1.3">
+<sdf version="1.4">
     <world name="default">
         <model name="plane1_model" static="1">
             <link name="body" gravity="1" self_collide="0" kinematic="0">
