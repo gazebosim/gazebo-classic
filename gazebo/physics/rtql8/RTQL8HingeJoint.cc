@@ -70,15 +70,16 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
   // Set Pose: offset from child link origin in child link frame.
   if (_sdf->GetElement("parent")->GetValueString("link_name") == std::string("world"))
   {
+    math::Pose tmpPose = (this->childLink->GetWorldPose());
     poseParentLinkToJoint = /*-(this->parentLink->GetWorldPose())*/
-        /*+ */(this->childLink->GetWorldPose())
-        + poseChildLinkToJoint;
+        /*+ */tmpPose
+        * poseChildLinkToJoint;
   }
   else
   {
-    poseParentLinkToJoint = -(this->parentLink->GetWorldPose())
-        + (this->childLink->GetWorldPose())
-        + poseChildLinkToJoint;
+    poseParentLinkToJoint = (this->parentLink->GetWorldPose().GetInverse())
+        * (this->childLink->GetWorldPose())
+        * poseChildLinkToJoint;
   }
 
   //----------------------------------------------------------------------------
@@ -101,7 +102,7 @@ void RTQL8HingeJoint::Load(sdf::ElementPtr _sdf)
   //----------------------------------------------------------------------------
   // Step 3. Transformation from rotated joint frame to child link frame.
   //----------------------------------------------------------------------------
-  poseJointToChildLink = -poseChildLinkToJoint;
+  poseJointToChildLink = poseChildLinkToJoint.GetInverse();
 
   RTQL8Utils::addTransformToRTQL8Joint(this->rtql8Joint, poseParentLinkToJoint);
 
@@ -159,12 +160,12 @@ math::Vector3 RTQL8HingeJoint::GetGlobalAxis(int /*_index*/) const
 void RTQL8HingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
 {
   // For now the _axis is represented in global frame.
-  math::Pose jointFrameInWorld = this->childLink->GetWorldPose()
-      + this->poseChildLinkToJoint;
-  math::Vector3 axisInGlobal = -jointFrameInWorld.rot * _axis;
-  rotHinge->setAxis(Eigen::Vector3d(axisInGlobal.x,
-                                    axisInGlobal.y,
-                                    axisInGlobal.z));
+  math::Pose childWorldPose = this->childLink->GetWorldPose();
+  math::Pose jointFrameInWorld = childWorldPose * this->poseChildLinkToJoint;
+  math::Vector3 axisInJointFrame = (jointFrameInWorld.rot.GetInverse()) * _axis;
+  rotHinge->setAxis(Eigen::Vector3d(axisInJointFrame.x,
+                                    axisInJointFrame.y,
+                                    axisInJointFrame.z));
 
   // At some point, we need to change blow code.
   //rotHinge->setAxis(Eigen::Vector3d(_axis.x, _axis.y, _axis.z));

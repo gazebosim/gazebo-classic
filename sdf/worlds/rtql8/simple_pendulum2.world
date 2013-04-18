@@ -37,7 +37,7 @@
             <joint name="joint01" type="revolute">
                 <pose>0 -0.5 0 0 0 0</pose>
                 <axis>
-                    <xyz>1 0 0</xyz>
+                    <xyz>0 0 1</xyz>
                 </axis>
                 <parent>
                     <link_name>world</link_name>

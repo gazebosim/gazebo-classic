@@ -31,7 +31,7 @@ void RTQL8Utils::ConvPoseToMat(Eigen::Matrix4d* _mat, const math::Pose& _pose)
 {
   assert(_mat);
 
-  _mat->setZero();
+  _mat->setIdentity();
 
   Eigen::Quaterniond quat(_pose.rot.w, _pose.rot.x,
                           _pose.rot.y, _pose.rot.z);
@@ -41,7 +41,7 @@ void RTQL8Utils::ConvPoseToMat(Eigen::Matrix4d* _mat, const math::Pose& _pose)
   (*_mat)(1, 3) = _pose.pos.y;
   (*_mat)(2, 3) = _pose.pos.z;
 
-  (*_mat)(3, 3) = 1.0;
+  //(*_mat)(3, 3) = 1.0;
 }
 
 //////////////////////////////////////////////////
