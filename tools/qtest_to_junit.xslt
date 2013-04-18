@@ -7,6 +7,7 @@
 <xsl:variable name="classname" select="/TestCase/@name" />
 <xsl:variable name="total-tests" select="count(/TestCase/TestFunction)" />
 <xsl:variable name="total-failures" select="count(/TestCase/TestFunction/Incident[@type='fail'])" />
+<xsl:variable name="total-time" select="sum(/TestCase/TestFunction/BenchmarkResult/@value)" />
 
 <!-- main template call -->
 <xsl:template match="/">
@@ -14,7 +15,7 @@
 </xsl:template>
 
 <xsl:template match="TestCase">
-	<testsuite name="{$classname}" tests="{$total-tests}" failures="{$total-failures}" errors="0" time="0.0">
+	<testsuite name="{$classname}" tests="{$total-tests}" failures="{$total-failures}" errors="0" time="{$total-time}">
         <xsl:apply-templates select="Environment"/>
         <xsl:apply-templates select="TestFunction" />
 		<xsl:call-template name="display-system-out" />
@@ -31,7 +32,18 @@
 </xsl:template>
 
 <xsl:template match="TestFunction">
-    <testcase classname="{$classname}" name="{@name}" time="0.0">
+    <!-- check if BenchMarkResult is defined. 0 by default -->
+    <xsl:variable name="time">
+      <xsl:choose>
+        <xsl:when test="BenchmarkResult/@value">
+          <xsl:value-of select='BenchmarkResult/@value'/>
+        </xsl:when>
+      <xsl:otherwise>
+         <xsl:text>0</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+    </xsl:variable>
+    <testcase classname="{$classname}" name="{@name}" time="{$time}">
         <!-- handle fail -->
         <xsl:if test="Incident/@type = 'fail'">
 			<!-- will be used to generate "nice" error message -->
