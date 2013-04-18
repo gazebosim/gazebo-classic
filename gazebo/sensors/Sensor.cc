@@ -56,10 +56,12 @@ Sensor::Sensor(SensorCategory _cat)
 //////////////////////////////////////////////////
 Sensor::~Sensor()
 {
-  this->node->Fini();
+  if (this->node)
+    this->node->Fini();
   this->node.reset();
 
-  this->sdf->Reset();
+  if (this->sdf)
+    this->sdf->Reset();
   this->sdf.reset();
   this->connections.clear();
 }

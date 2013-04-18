@@ -31,6 +31,16 @@ JointState::JointState()
 }
 
 /////////////////////////////////////////////////
+JointState::JointState(JointPtr _joint, const common::Time &_realTime,
+    const common::Time &_simTime)
+: State(_joint->GetName(), _realTime, _simTime)
+{
+  // Set the joint angles.
+  for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)
+    this->angles.push_back(_joint->GetAngle(i));
+}
+
+/////////////////////////////////////////////////
 JointState::JointState(JointPtr _joint)
 : State(_joint->GetName(), _joint->GetWorld()->GetRealTime(),
         _joint->GetWorld()->GetSimTime())
@@ -51,6 +61,20 @@ JointState::JointState(const sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 JointState::~JointState()
 {
+}
+
+/////////////////////////////////////////////////
+void JointState::Load(JointPtr _joint, const common::Time &_realTime,
+    const common::Time &_simTime)
+{
+  this->name = _joint->GetName();
+  this->realTime = _realTime;
+  this->simTime = _simTime;
+  this->wallTime = common::Time::GetWallTime();
+
+  // Set the joint angles.
+  for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)
+    this->angles.push_back(_joint->GetAngle(i));
 }
 
 /////////////////////////////////////////////////
@@ -105,7 +129,7 @@ bool JointState::IsZero() const
   for (std::vector<math::Angle>::const_iterator iter = this->angles.begin();
        iter != this->angles.end() && result; ++iter)
   {
-    result = result && (*iter) == math::Angle(0.0);
+    result = result && (*iter) == math::Angle::Zero;
   }
 
   return result;

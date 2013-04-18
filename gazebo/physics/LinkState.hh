@@ -54,6 +54,16 @@ namespace gazebo
       /// Build a LinkState from an existing Link.
       /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
+      /// \param[in] _realTime Real time stamp.
+      /// \param[in] _simTime Sim time stamp
+      public: LinkState(const LinkPtr _link, const common::Time &_realTime,
+                  const common::Time &_simTime);
+
+      /// \brief Constructor
+      ///
+      /// Build a LinkState from an existing Link.
+      /// \param[in] _model Pointer to the Link from which to gather state
+      /// info.
       public: explicit LinkState(const LinkPtr _link);
 
       /// \brief Constructor
@@ -64,6 +74,16 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~LinkState();
+
+      /// \brief Load a LinkState from a Link pointer.
+      ///
+      /// Build a LinkState from an existing Link.
+      /// \param[in] _model Pointer to the Link from which to gather state
+      /// info.
+      /// \param[in] _realTime Real time stamp.
+      /// \param[in] _simTime Sim time stamp
+      public: void Load(const LinkPtr _link, const common::Time &_realTime,
+                  const common::Time &_simTime);
 
       /// \brief Load state from SDF element.
       ///
@@ -124,6 +144,19 @@ namespace gazebo
       /// \param[out] _sdf SDF element to populate.
       public: void FillSDF(sdf::ElementPtr _sdf);
 
+      /// \brief Set the wall time when this state was generated
+      /// \param[in] _time The absolute clock time when the State
+      /// data was recorded.
+      public: virtual void SetWallTime(const common::Time &_time);
+
+      /// \brief Set the real time when this state was generated
+      /// \param[in] _time Clock time since simulation was stated.
+      public: virtual void SetRealTime(const common::Time &_time);
+
+      /// \brief Set the sim time when this state was generated
+      /// \param[in] _time Simulation time when the data was recorded.
+      public: virtual void SetSimTime(const common::Time &_time);
+
       /// \brief Assignment operator
       /// \param[in] _state State value
       /// \return this
@@ -143,24 +176,24 @@ namespace gazebo
       /// \param[in] _out output stream
       /// \param[in] _state Link state to output
       /// \return the stream
-      public: friend std::ostream &operator<<(std::ostream &_out,
-                                     const gazebo::physics::LinkState &_state)
+      public: inline friend std::ostream &operator<<(std::ostream &_out,
+                  const gazebo::physics::LinkState &_state)
       {
-        _out << "    <link name='" << _state.name << "'>\n";
-        _out << "      <pose>" << _state.pose << "</pose>\n";
-        _out << "      <velocity>" << _state.velocity << "</velocity>\n";
-        _out << "      <acceleration>" << _state.acceleration
-             << "</acceleration>\n";
-        _out << "      <wrench>" << _state.wrench << "</wrench>\n";
+        _out << "<link name='" << _state.name << "'>"
+             << "<pose>" << _state.pose << "</pose>"
+             << "<velocity>" << _state.velocity << "</velocity>"
+             << "<acceleration>" << _state.acceleration << "</acceleration>"
+             << "<wrench>" << _state.wrench << "</wrench>";
 
-        for (std::vector<CollisionState>::const_iterator iter =
-             _state.collisionStates.begin();
-             iter != _state.collisionStates.end(); ++iter)
-        {
-          _out << *iter;
-        }
+        /// Disabling this for efficiency.
+        // for (std::vector<CollisionState>::const_iterator iter =
+        //      _state.collisionStates.begin();
+        //      iter != _state.collisionStates.end(); ++iter)
+        // {
+        //   _out << *iter;
+        // }
 
-        _out << "    </link>\n";
+        _out << "</link>";
 
         return _out;
       }
