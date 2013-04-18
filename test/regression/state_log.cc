@@ -93,7 +93,7 @@ TEST(StateLogTest, PR2PlaybackZipped)
 
   int i = 0;
   // Wait for messages to arrive
-  while (g_msgCount < 150 && i < 100)
+  while (g_msgCount < 120 && i < 100)
   {
     gzdbg << "Pose Msg Count = " << g_msgCount  << std::endl;
     gazebo::common::Time::MSleep(100);
@@ -109,7 +109,7 @@ TEST(StateLogTest, PR2PlaybackZipped)
 
   gazebo::transport::fini();
 
-  if (g_msgCount > 140)
+  if (g_msgCount >= 120)
   {
     // Make sure the values are correct.
     EXPECT_NEAR(g_pr2LGripperXStart, 0.83, 0.05);
