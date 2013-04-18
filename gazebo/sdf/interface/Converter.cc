@@ -38,9 +38,7 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
 
   // Replace <gazebo> with <sdf>
   if (elem && boost::lexical_cast<double>(_toVersion) >= 1.3)
-  {
     elem->SetValue("sdf");
-  }
   else if (!elem)
     elem = _doc->FirstChildElement("sdf");
 
