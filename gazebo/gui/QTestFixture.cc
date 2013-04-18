@@ -63,7 +63,7 @@ void QTestFixture::initTestCase()
 /////////////////////////////////////////////////
 void QTestFixture::init()
 {
-  this->resMaxPercentChange = 4.0;
+  this->resMaxPercentChange = 3.0;
   this->shareMaxPercentChange = 1.0;
 
   this->serverThread = NULL;
