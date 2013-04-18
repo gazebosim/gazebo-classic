@@ -1506,7 +1506,7 @@ void World::ProcessFactoryMsgs()
       bool isModel = false;
       bool isLight = false;
 
-      sdf::ElementPtr elem = factorySDF->root;  //->Clone();
+      sdf::ElementPtr elem = factorySDF->root->Clone();
 
       if (elem->HasElement("world"))
         elem = elem->GetElement("world");
