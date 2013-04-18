@@ -1223,6 +1223,12 @@ void Element::RemoveChild(ElementPtr _child)
 /////////////////////////////////////////////////
 void Element::ClearElements()
 {
+  for (sdf::ElementPtr_V::iterator iter = this->elements.begin();
+      iter != this->elements.end(); ++iter)
+  {
+    (*iter)->ClearElements();
+  }
+
   this->elements.clear();
 }
 

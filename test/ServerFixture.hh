@@ -49,6 +49,8 @@
 
 using namespace gazebo;
 
+std::string custom_exec(std::string _cmd);
+
 class ServerFixture : public testing::Test
 {
   protected: ServerFixture()
@@ -137,8 +139,8 @@ class ServerFixture : public testing::Test
                int waitCount = 0, maxWaitCount = 6000;
                while ((!this->server || !this->server->GetInitialized()) &&
                       ++waitCount < maxWaitCount)
-                 common::Time::MSleep(10);
-               gzwarn << "ServerFixture load in "
+                 common::Time::MSleep(100);
+               gzdbg << "ServerFixture load in "
                       << static_cast<double>(waitCount)/100.0
                       << " seconds, timeout after "
                       << static_cast<double>(maxWaitCount)/100.0
@@ -156,6 +158,10 @@ class ServerFixture : public testing::Test
                  this->node->Advertise<msgs::Factory>("~/factory");
                this->factoryPub->WaitForConnection();
 
+               this->requestPub =
+                 this->node->Advertise<msgs::Request>("~/request");
+               this->requestPub->WaitForConnection();
+
                // Wait for the world to reach the correct pause state.
                // This might not work properly with multiple worlds.
                // Use a 30 second timeout.
@@ -164,7 +170,7 @@ class ServerFixture : public testing::Test
                while ((!physics::get_world() ||
                         physics::get_world()->IsPaused() != _paused) &&
                       ++waitCount < maxWaitCount)
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
                ASSERT_LT(waitCount, maxWaitCount);
 
              }
@@ -422,7 +428,7 @@ class ServerFixture : public testing::Test
                                  this, _1, _2, _3, _4, _5));
 
                while (this->gotImage < 20)
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
 
                camSensor->GetCamera()->DisconnectNewImageFrame(c);
              }
@@ -432,7 +438,7 @@ class ServerFixture : public testing::Test
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  unsigned int _width = 320, unsigned int _height = 240,
                  double _rate = 25,
-                 const std::string &_noiseType = "", 
+                 const std::string &_noiseType = "",
                  double _noiseMean = 0.0,
                  double _noiseStdDev = 0.0)
              {
@@ -481,7 +487,7 @@ class ServerFixture : public testing::Test
                // Wait for the entity to spawn
                while (!this->HasEntity(_modelName) && i < 50)
                {
-                 common::Time::MSleep(20);
+                 common::Time::MSleep(100);
                  ++i;
                }
                EXPECT_LT(i, 50);
@@ -547,12 +553,12 @@ class ServerFixture : public testing::Test
 
                int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 50)
+               while (!this->HasEntity(_modelName) && i < 100)
                {
-                 common::Time::MSleep(20);
+                 common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 50);
+               EXPECT_LT(i, 100);
              }
 
   protected: void SpawnImuSensor(const std::string &_modelName,
@@ -617,7 +623,7 @@ class ServerFixture : public testing::Test
                // Wait for the entity to spawn
                while (!this->HasEntity(_modelName) && i < 50)
                {
-                 common::Time::MSleep(20);
+                 common::Time::MSleep(50);
                  ++i;
                }
                EXPECT_LT(i, 50);
@@ -638,14 +644,18 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
                std::ostringstream shapeStr;
+
                if (_collisionType == "box")
+               {
                  shapeStr << " <box><size>1 1 1</size></box>";
+               }
                else if (_collisionType == "cylinder")
                {
                  shapeStr << "<cylinder>"
                           << "  <radius>.5</radius><length>1.0</length>"
                           << "</cylinder>";
                }
+
                newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
@@ -675,12 +685,12 @@ class ServerFixture : public testing::Test
 
                int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name) && i < 50)
+               while (!this->HasEntity(_name) && i < 100)
                {
-                 common::Time::MSleep(20);
+                 common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 50);
+               EXPECT_LT(i, 100);
              }
 
   protected: void SpawnCylinder(const std::string &_name,
@@ -718,7 +728,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
              }
 
   protected: void SpawnSphere(const std::string &_name,
@@ -752,7 +762,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (_wait && !this->HasEntity(_name))
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
              }
 
   protected: void SpawnSphere(const std::string &_name,
@@ -790,7 +800,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (_wait && !this->HasEntity(_name))
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
              }
 
   protected: void SpawnBox(const std::string &_name,
@@ -824,7 +834,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
              }
 
   protected: void SpawnTrimesh(const std::string &_name,
@@ -862,7 +872,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
              }
 
   protected: void SpawnEmptyLink(const std::string &_name,
@@ -886,7 +896,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 common::Time::MSleep(10);
+                 common::Time::MSleep(100);
              }
 
   protected: void SpawnModel(const std::string &_filename)
@@ -920,7 +930,7 @@ class ServerFixture : public testing::Test
                  sdf::ElementPtr model = sdfParsed.root->GetElement("model");
                  std::string name = model->GetValueString("name");
                  while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
-                   common::Time::MSleep(10);
+                   common::Time::MSleep(100);
                  ASSERT_LT(waitCount, maxWaitCount);
                }
              }
@@ -940,6 +950,12 @@ class ServerFixture : public testing::Test
                return world->GetModel(_name);
              }
 
+  protected: void RemoveModel(const std::string &_name)
+             {
+               msgs::Request *msg = msgs::CreateRequest("entity_delete", _name);
+               this->requestPub->Publish(*msg);
+               delete msg;
+             }
 
   protected: void RemovePlugin(const std::string &_name)
              {
@@ -991,6 +1007,7 @@ class ServerFixture : public testing::Test
   protected: transport::SubscriberPtr poseSub;
   protected: transport::SubscriberPtr statsSub;
   protected: transport::PublisherPtr factoryPub;
+  protected: transport::PublisherPtr requestPub;
 
   protected: std::map<std::string, math::Pose> poses;
   protected: boost::mutex receiveMutex;

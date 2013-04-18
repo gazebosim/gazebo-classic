@@ -389,7 +389,9 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
+    // Render, but don't swap buffers.
     this->renderTarget->update(false);
+
     this->lastRenderWallTime = common::Time::GetWallTime();
   }
 }
@@ -1195,9 +1197,9 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
 }
 
 //////////////////////////////////////////////////
-void Camera::SetRenderTarget(Ogre::RenderTarget *target)
+void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
-  this->renderTarget = target;
+  this->renderTarget = _target;
 
   if (this->renderTarget)
   {
@@ -1242,7 +1244,6 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
       this->dlMergeInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
             "DeferredLighting/ShowLit");
-
 
       // Screen space ambient occlusion
       // this->ssaoInstance =

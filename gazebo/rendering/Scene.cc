@@ -2267,14 +2267,13 @@ void Scene::SetSky()
     }
   }
 
-  /*vclouds->getLightningManager()->setEnabled(preset.vcLightnings);
-  vclouds->getLightningManager()->setAverageLightningApparitionTime(
-      preset.vcLightningsAT);
-  vclouds->getLightningManager()->setLightningColor(
-      preset.vcLightningsColor);
-  vclouds->getLightningManager()->setLightningTimeMultiplier(
-      preset.vcLightningsTM);
-      */
+  // vclouds->getLightningManager()->setEnabled(preset.vcLightnings);
+  // vclouds->getLightningManager()->setAverageLightningApparitionTime(
+  //     preset.vcLightningsAT);
+  // vclouds->getLightningManager()->setLightningColor(
+  //     preset.vcLightningsColor);
+  // vclouds->getLightningManager()->setLightningTimeMultiplier(
+  //    preset.vcLightningsTM);
 
   Ogre::Root::getSingletonPtr()->addFrameListener(this->skyx);
 

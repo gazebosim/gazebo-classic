@@ -19,13 +19,13 @@
 #include <boost/filesystem.hpp>
 
 #include "gazebo/common/Exception.hh"
-#include "gazebo/common/LogRecord.hh"
+#include "gazebo/util/LogRecord.hh"
 
 /////////////////////////////////////////////////
 /// \brief Test LogRecord constructor and a few accessors
 TEST(LogRecord_TEST, Constructor)
 {
-  gazebo::common::LogRecord *recorder = gazebo::common::LogRecord::Instance();
+  gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
   char *homePath = getenv("HOME");
   EXPECT_TRUE(homePath != NULL);
@@ -50,7 +50,7 @@ TEST(LogRecord_TEST, Constructor)
 /// \brief Test LogRecord Start errors
 TEST(LogRecord_TEST, StartErrors)
 {
-  gazebo::common::LogRecord *recorder = gazebo::common::LogRecord::Instance();
+  gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
   // Start without an init
   {
@@ -75,7 +75,7 @@ TEST(LogRecord_TEST, StartErrors)
 /// \brief Test LogRecord Init and Start
 TEST(LogRecord_TEST, Start)
 {
-  gazebo::common::LogRecord *recorder = gazebo::common::LogRecord::Instance();
+  gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
   recorder->Init("test");
   recorder->Start("bz2");
 
