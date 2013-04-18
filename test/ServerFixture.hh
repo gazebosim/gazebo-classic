@@ -621,12 +621,12 @@ class ServerFixture : public testing::Test
 
                int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 50)
+               while (!this->HasEntity(_modelName) && i < 100)
                {
-                 common::Time::MSleep(50);
+                 common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 50);
+               EXPECT_LT(i, 100);
              }
 
   /// \brief Spawn a contact sensor with the specified collision geometry
