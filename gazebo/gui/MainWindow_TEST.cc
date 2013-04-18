@@ -123,7 +123,7 @@ void MainWindow_TEST::Wireframe()
         << "] AvgPostWireframe[" << avgPostWireframe << "]\n";
 
   // Removing the grey ground plane should change the image.
-  QVERIFY(fabs(avgPreWireframe - avgPostWireframe) > 10);
+  QVERIFY(avgPreWireframe != avgPostWireframe);
 
   mainWindow->hide();
   delete mainWindow;
