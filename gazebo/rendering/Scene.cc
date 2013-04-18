@@ -42,7 +42,6 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/DepthCamera.hh"
-// #include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/Grid.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/RFIDVisual.hh"
