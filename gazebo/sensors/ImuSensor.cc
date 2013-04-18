@@ -267,8 +267,6 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
     // Set the IMU angular velocity
     math::Vector3 imuWorldAngularVel
         = msgs::Convert(msg.angular_velocity());
-    imuWorldLinearVel +=
-        imuWorldAngularVel.Cross(parentEntityPose.pos - imuPose.pos);
     msgs::Set(this->imuMsg.mutable_angular_velocity(),
               imuPose.rot.GetInverse().RotateVector(
               imuWorldAngularVel));
