@@ -63,7 +63,7 @@ void QTestFixture::initTestCase()
 /////////////////////////////////////////////////
 void QTestFixture::init()
 {
-  this->resMaxPercentChange = 2.5;
+  this->resMaxPercentChange = 4.0;
   this->shareMaxPercentChange = 1.0;
 
   this->serverThread = NULL;
@@ -136,8 +136,10 @@ void QTestFixture::cleanup()
   double resPercentChange = (residentEnd - residentStart) / residentStart;
   double sharePercentChange = (shareEnd - shareStart) / shareStart;
 
-  std::cout << "SharePercentChange[" << sharePercentChange << "]\n";
-  std::cout << "ResPercentChange[" << resPercentChange << "]\n";
+  std::cout << "SharePercentChange[" << sharePercentChange << "] "
+    << "ShareMaxPercentChange[" << this->shareMaxPercentChange << "]\n";
+  std::cout << "ResPercentChange[" << resPercentChange << "]"
+    << "ResMaxPercentChange[" << this->resMaxPercentChange << "]\n";
 
   // Make sure the percent change values are reasonable.
   QVERIFY(resPercentChange < this->resMaxPercentChange);
