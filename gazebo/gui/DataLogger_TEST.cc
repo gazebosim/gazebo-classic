@@ -44,7 +44,8 @@ void DataLogger_TEST::RecordButton()
     QLabel *timeLabel = dataLogger->findChild<QLabel*>("dataLoggerTimeLabel");
 
     // Get the status label
-    QLabel *statusLabel = dataLogger->findChild<QLabel*>("dataLoggerStatusLabel");
+    QLabel *statusLabel =
+      dataLogger->findChild<QLabel*>("dataLoggerStatusLabel");
 
     // Get the size label
     QLabel *sizeLabel = dataLogger->findChild<QLabel*>("dataLoggerSizeLabel");
