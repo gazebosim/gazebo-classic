@@ -254,26 +254,26 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
     math::Pose parentEntityPose = this->parentEntity->GetWorldPose();
     math::Pose imuPose = this->pose + parentEntityPose;
 
+    // Set the IMU angular velocity
+    math::Vector3 imuWorldAngularVel
+        = msgs::Convert(msg.angular_velocity());
+
+    msgs::Set(this->imuMsg.mutable_angular_velocity(),
+              imuPose.rot.GetInverse().RotateVector(
+              imuWorldAngularVel));
+
     // Compute and set the IMU linear acceleration
     math::Vector3 imuWorldLinearVel
         = msgs::Convert(msg.linear_velocity());
+    // Get the correct vel for imu's that are at an offset from parent link
+    imuWorldLinearVel +=
+        imuWorldAngularVel.Cross(parentEntityPose.pos - imuPose.pos);
     this->linearAcc = imuPose.rot.GetInverse().RotateVector(
       (imuWorldLinearVel - this->lastLinearVel) / dt);
 
     // Add contribution from gravity
     this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
     msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
-
-    // Set the IMU angular velocity
-    math::Vector3 imuWorldAngularVel
-        = msgs::Convert(msg.angular_velocity());
-
-    // Get the correct vel for imu's that are at an offset from parent link
-    imuWorldLinearVel +=
-        imuWorldAngularVel.Cross(parentEntityPose.pos - imuPose.pos);
-    msgs::Set(this->imuMsg.mutable_angular_velocity(),
-              imuPose.rot.GetInverse().RotateVector(
-              imuWorldAngularVel));
 
     // Set the IMU orientation
     msgs::Set(this->imuMsg.mutable_orientation(),
