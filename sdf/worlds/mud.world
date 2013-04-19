@@ -1,30 +1,29 @@
 <?xml version="1.0" ?>
-<sdf version="1.3">
+<sdf version="1.4">
   <world name="default">
-
-    <include><uri>model://sun</uri></include>
-    <include><uri>model://ground_plane</uri></include>
-  
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
     <include>
       <uri>model://double_pendulum_with_base</uri>
       <name>pendulum_thick_mud</name>
-      <pose>-2.0 0 0  0 0 0</pose>
+      <pose>-2.0 0 0 0 0 0</pose>
     </include>
-
     <include>
       <uri>model://double_pendulum_with_base</uri>
       <name>pendulum_thin_mud</name>
-      <pose>0 0 0  0 0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
     </include>
-
     <include>
       <uri>model://double_pendulum_with_base</uri>
       <name>pendulum_no_mud</name>
-      <pose>2.0 0 0  0 0 0</pose>
+      <pose>2.0 0 0 0 0 0</pose>
     </include>
-
     <model name="mud_pit_thin">
-      <pose>0 -1.0 0.7  0 0 0</pose>
+      <pose>0 -1.0 0.7 0 0 0</pose>
       <static>true</static>
       <link name="link">
         <collision name="collision">
@@ -66,9 +65,8 @@
         <link_name>pendulum_thick_mud::lower_link</link_name>
       </plugin>
     </model>
-
     <model name="mud_pit_thick">
-      <pose>0.0 -1.0 1.0  0 0 0</pose>
+      <pose>0.0 -1.0 1.0 0 0 0</pose>
       <static>true</static>
       <link name="link">
         <collision name="collision">

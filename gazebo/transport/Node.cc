@@ -162,7 +162,7 @@ void Node::ProcessIncoming()
   if (!this->initialized)
     return;
 
-  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+  boost::recursive_mutex::scoped_lock lock(this->processIncomingMutex);
 
   Callback_M::iterator cbIter;
   Callback_L::iterator liter;
@@ -172,8 +172,11 @@ void Node::ProcessIncoming()
     std::list<std::string>::iterator msgIter;
     std::map<std::string, std::list<std::string> >::iterator inIter;
     std::map<std::string, std::list<std::string> >::iterator endIter;
-    inIter = this->incomingMsgs.begin();
-    endIter = this->incomingMsgs.end();
+    {
+      boost::recursive_mutex::scoped_lock lock2(this->incomingMutex);
+      inIter = this->incomingMsgs.begin();
+      endIter = this->incomingMsgs.end();
+    }
 
     for (; inIter != endIter; ++inIter)
     {
@@ -181,9 +184,17 @@ void Node::ProcessIncoming()
       cbIter = this->callbacks.find(inIter->first);
       if (cbIter != this->callbacks.end())
       {
+        std::list<std::string>::iterator msgInIter;
+        std::list<std::string>::iterator msgEndIter;
+
+        {
+          boost::recursive_mutex::scoped_lock lock2(this->incomingMutex);
+          msgInIter = inIter->second.begin();
+          msgEndIter = inIter->second.end();
+        }
+
         // For each message in the buffer
-        for (msgIter = inIter->second.begin(); msgIter != inIter->second.end();
-            ++msgIter)
+        for (msgIter = msgInIter; msgIter != msgEndIter; ++msgIter)
         {
           // Send the message to all callbacks
           for (liter = cbIter->second.begin();
@@ -192,17 +203,24 @@ void Node::ProcessIncoming()
             (*liter)->HandleData(*msgIter);
           }
         }
+
+        {
+          boost::recursive_mutex::scoped_lock lock2(this->incomingMutex);
+          inIter->second.erase(msgInIter, msgEndIter);
+        }
       }
     }
-    this->incomingMsgs.clear();
   }
 
   {
     std::list<MessagePtr>::iterator msgIter;
     std::map<std::string, std::list<MessagePtr> >::iterator inIter;
     std::map<std::string, std::list<MessagePtr> >::iterator endIter;
-    inIter = this->incomingMsgsLocal.begin();
-    endIter = this->incomingMsgsLocal.end();
+    {
+      boost::recursive_mutex::scoped_lock lock2(this->incomingMutex);
+      inIter = this->incomingMsgsLocal.begin();
+      endIter = this->incomingMsgsLocal.end();
+    }
 
     for (; inIter != endIter; ++inIter)
     {
@@ -210,9 +228,17 @@ void Node::ProcessIncoming()
       cbIter = this->callbacks.find(inIter->first);
       if (cbIter != this->callbacks.end())
       {
+        std::list<MessagePtr>::iterator msgInIter;
+        std::list<MessagePtr>::iterator msgEndIter;
+
+        {
+          boost::recursive_mutex::scoped_lock lock2(this->incomingMutex);
+          msgInIter = inIter->second.begin();
+          msgEndIter = inIter->second.end();
+        }
+
         // For each message in the buffer
-        for (msgIter = inIter->second.begin(); msgIter != inIter->second.end();
-            ++msgIter)
+        for (msgIter = msgInIter; msgIter != msgEndIter; ++msgIter)
         {
           // Send the message to all callbacks
           for (liter = cbIter->second.begin();
@@ -221,9 +247,13 @@ void Node::ProcessIncoming()
             (*liter)->HandleMessage(*msgIter);
           }
         }
+
+        {
+          boost::recursive_mutex::scoped_lock lock2(this->incomingMutex);
+          inIter->second.erase(msgInIter, msgEndIter);
+        }
       }
     }
-    this->incomingMsgsLocal.clear();
   }
 }
 
