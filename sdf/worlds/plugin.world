@@ -1,9 +1,13 @@
 <?xml version="1.0" ?>
-<sdf version="1.3">
+<sdf version="1.4">
   <world name="default">
     <plugin name="world_edit" filename="libworld_edit.so" />
-    <include><uri>model://ground_plane</uri></include>
-    <include><uri>model://sun</uri></include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
     <model name="box_model">
       <pose>0 0 0.5 0 0 0</pose>
       <link name="body">
