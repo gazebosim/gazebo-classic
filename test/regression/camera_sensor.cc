@@ -145,7 +145,6 @@ TEST_F(CameraSensor, MultiSenseHigh)
   // limited rendering capabilities.
   return;
   /*
-
   Load("worlds/empty_test.world");
 
   // Make sure the render engine is available.
