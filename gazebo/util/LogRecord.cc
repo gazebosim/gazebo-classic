@@ -646,7 +646,8 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
 
   // Make sure the file does not exist
   if (boost::filesystem::exists(this->completePath))
-    gzthrow("Filename[" + this->completePath.string() + "], already exists\n");
+    gzwarn << "Filename[" + this->completePath.string() + "], already exists."
+      << " The log file will be overwritten.\n";
 
   std::ostringstream stream;
   stream << "<?xml version='1.0'?>\n"
