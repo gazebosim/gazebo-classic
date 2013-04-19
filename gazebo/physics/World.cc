@@ -325,6 +325,7 @@ bool World::GetRunning() const
 //////////////////////////////////////////////////
 void World::Stop()
 {
+  common::ModelDatabase::Instance()->Fini();
   this->stop = true;
 
   if (this->thread)
@@ -1506,7 +1507,7 @@ void World::ProcessFactoryMsgs()
       bool isModel = false;
       bool isLight = false;
 
-      sdf::ElementPtr elem = factorySDF->root;
+      sdf::ElementPtr elem = factorySDF->root->Clone();
 
       if (elem->HasElement("world"))
         elem = elem->GetElement("world");
