@@ -166,6 +166,9 @@ struct dxJoint : public dObject
     bool use_damping;
     dReal damping_coefficient;
 
+    // Moved from ball.h and fixed.h by OSRF
+    dReal erp;          // error reduction
+    dReal cfm;          // constraint force mix in
 };
 
 

@@ -134,7 +134,7 @@ namespace gazebo
     private: std::list<std::pair<unsigned int, std::string> > msgs;
 
     /// \brief Our server connection.
-    private: transport::Connection *connection;
+    private: transport::ConnectionPtr connection;
 
     /// \brief Thread to run the main loop.
     private: boost::thread *runThread;
@@ -143,10 +143,10 @@ namespace gazebo
     private: bool stop;
 
     /// \brief Mutex to protect connections.
-    private: boost::recursive_mutex *connectionMutex;
+    private: boost::recursive_mutex connectionMutex;
 
     /// \brief Mutex to protect msg bufferes.
-    private: boost::recursive_mutex *msgsMutex;
+    private: boost::recursive_mutex msgsMutex;
   };
 }
 #endif

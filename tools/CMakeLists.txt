@@ -11,7 +11,11 @@ include_directories(
   ${PROTOBUF_INCLUDE_DIR}
 )
 
-add_subdirectory(test)
+set (test_sources 
+  gzlog_TEST.cc 
+)
+
+gz_build_tests(${test_sources})
 
 add_executable(gzsdf gzsdf.cc)
 target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_sdf_interface)

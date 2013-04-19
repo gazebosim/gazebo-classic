@@ -64,6 +64,7 @@ MainWindow::MainWindow()
   this->menuBar = NULL;
   this->setObjectName("mainWindow");
 
+  this->inputStepSize = 1;
   this->requestMsg = NULL;
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -166,6 +167,10 @@ MainWindow::MainWindow()
   this->connections.push_back(
       gui::editor::Events::ConnectFinishBuildingModel(
       boost::bind(&MainWindow::OnFinishBuilding, this)));
+
+  this->connections.push_back(
+      gui::Events::ConnectInputStepSize(
+      boost::bind(&MainWindow::OnInputStepSizeChanged, this, _1)));
 
   gui::ViewFactory::RegisterAll();
 }
@@ -448,7 +453,8 @@ void MainWindow::Play()
   msgs::WorldControl msg;
   msg.set_pause(false);
 
-  g_pauseAct->setChecked(false);
+  g_pauseAct->setVisible(true);
+  g_playAct->setVisible(false);
   this->worldControlPub->Publish(msg);
 }
 
@@ -458,7 +464,8 @@ void MainWindow::Pause()
   msgs::WorldControl msg;
   msg.set_pause(true);
 
-  g_playAct->setChecked(false);
+  g_pauseAct->setVisible(false);
+  g_playAct->setVisible(true);
   this->worldControlPub->Publish(msg);
 }
 
@@ -466,9 +473,15 @@ void MainWindow::Pause()
 void MainWindow::Step()
 {
   msgs::WorldControl msg;
-  msg.set_step(true);
+  msg.set_multi_step(this->inputStepSize);
 
   this->worldControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnInputStepSizeChanged(int _value)
+{
+  this->inputStepSize = _value;
 }
 
 /////////////////////////////////////////////////
@@ -653,7 +666,7 @@ void MainWindow::ShowCollisions()
 void MainWindow::ShowGrid()
 {
   msgs::Scene msg;
-  msg.set_name("default");
+  msg.set_name(gui::get_world());
   msg.set_grid(g_showGridAct->isChecked());
   this->scenePub->Publish(msg);
 }
@@ -838,22 +851,32 @@ void MainWindow::CreateActions()
   g_editBuildingAct->setChecked(false);
   connect(g_editBuildingAct, SIGNAL(triggered()), this, SLOT(OnEditBuilding()));
 
-  g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
-  g_playAct->setStatusTip(tr("Run the world"));
-  g_playAct->setCheckable(true);
-  g_playAct->setChecked(true);
-  connect(g_playAct, SIGNAL(triggered()), this, SLOT(Play()));
-
-  g_pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
-  g_pauseAct->setStatusTip(tr("Pause the world"));
-  g_pauseAct->setCheckable(true);
-  g_pauseAct->setChecked(false);
-  connect(g_pauseAct, SIGNAL(triggered()), this, SLOT(Pause()));
-
   g_stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
   g_stepAct->setStatusTip(tr("Step the world"));
   connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
+  QIcon icon = g_stepAct->icon();
 
+  // step action's icon is already in gray scale so there is no change in
+  // appearance when it is disabled. So create a custom semi-transparent
+  // icon for the disabled state.
+  QPixmap pixmap(":/images/end.png");
+  QPainter p(&pixmap);
+  p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+  p.fillRect(pixmap.rect(), QColor(0, 0, 0, 100));
+  icon.addPixmap(pixmap, QIcon::Disabled);
+  g_stepAct->setIcon(icon);
+
+  g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
+  g_playAct->setStatusTip(tr("Run the world"));
+  g_playAct->setVisible(false);
+  connect(g_playAct, SIGNAL(triggered()), this, SLOT(Play()));
+  connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
+  this->OnPlayActionChanged();
+
+  g_pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
+  g_pauseAct->setStatusTip(tr("Pause the world"));
+  g_pauseAct->setVisible(true);
+  connect(g_pauseAct, SIGNAL(triggered()), this, SLOT(Pause()));
 
   g_arrowAct = new QAction(QIcon(":/images/arrow.png"),
       tr("Selection Mode"), this);
@@ -1331,15 +1354,30 @@ void MainWindow::OnSetSelectedEntity(const std::string &_name,
 /////////////////////////////////////////////////
 void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
 {
-  if (_msg->paused() && g_playAct->isChecked())
+  if (_msg->paused() && g_pauseAct->isVisible())
   {
-    g_playAct->setChecked(false);
-    g_pauseAct->setChecked(true);
+    g_pauseAct->setVisible(false);
+    g_playAct->setVisible(true);
   }
-  else if (!_msg->paused() && !g_playAct->isChecked())
+  else if (!_msg->paused() && !g_playAct->isVisible())
   {
-    g_playAct->setChecked(true);
-    g_pauseAct->setChecked(false);
+    g_pauseAct->setVisible(true);
+    g_playAct->setVisible(false);
+  }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnPlayActionChanged()
+{
+  if (g_playAct->isVisible())
+  {
+    g_stepAct->setToolTip("Step the world");
+    g_stepAct->setEnabled(true);
+  }
+  else
+  {
+    g_stepAct->setToolTip("Pause the world before stepping");
+    g_stepAct->setEnabled(false);
   }
 }
 
@@ -1354,86 +1392,4 @@ void MainWindow::OnFinishBuilding()
 void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 {
   _item->setExpanded(!_item->isExpanded());
-}
-
-/////////////////////////////////////////////////
-TreeViewDelegate::TreeViewDelegate(QTreeView *_view, QWidget *_parent)
-  : QItemDelegate(_parent), view(_view)
-{
-}
-
-/////////////////////////////////////////////////
-void TreeViewDelegate::paint(QPainter *painter,
-                          const QStyleOptionViewItem &option,
-                          const QModelIndex &index) const
-{
-  const QAbstractItemModel *model = index.model();
-  Q_ASSERT(model);
-
-  if (!model->parent(index).isValid())
-  {
-    QRect r = option.rect;
-
-    QColor orange(245, 129, 19);
-    QColor blue(71, 99, 183);
-    QColor grey(100, 100, 100);
-
-    if (option.state & QStyle::State_Open ||
-        option.state & QStyle::State_MouseOver)
-    {
-      painter->setPen(blue);
-      painter->setBrush(QBrush(blue));
-    }
-    else
-    {
-      painter->setPen(grey);
-      painter->setBrush(QBrush(grey));
-    }
-
-    if (option.state & QStyle::State_Open)
-      painter->drawLine(r.left()+8, r.top() + (r.height()*0.5 - 5),
-                        r.left()+8, r.top() + r.height()-1);
-
-    painter->save();
-    painter->setRenderHints(QPainter::Antialiasing |
-                            QPainter::TextAntialiasing);
-
-    painter->drawRoundedRect(r.left()+4, r.top() + (r.height()*0.5 - 5),
-                             10, 10, 20.0, 10.0, Qt::RelativeSize);
-
-
-    // draw text
-    QRect textrect = QRect(r.left() + 20, r.top(),
-                           r.width() - 40,
-                           r.height());
-
-    QString text = elidedText(
-        option.fontMetrics,
-        textrect.width(),
-        Qt::ElideMiddle,
-        model->data(index, Qt::DisplayRole).toString());
-
-    if (option.state & QStyle::State_MouseOver)
-      painter->setPen(QPen(orange, 1));
-    else
-      painter->setPen(QPen(grey, 1));
-
-    this->view->style()->drawItemText(painter, textrect, Qt::AlignLeft,
-        option.palette, this->view->isEnabled(), text);
-
-    painter->restore();
-  }
-  else
-  {
-      QItemDelegate::paint(painter, option, index);
-  }
-}
-
-/////////////////////////////////////////////////
-QSize TreeViewDelegate::sizeHint(const QStyleOptionViewItem &_opt,
-    const QModelIndex &_index) const
-{
-  QStyleOptionViewItem option = _opt;
-  QSize sz = QItemDelegate::sizeHint(_opt, _index) + QSize(2, 2);
-  return sz;
 }

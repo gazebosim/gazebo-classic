@@ -411,7 +411,6 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
           << " does not exist, GetWorldLinearVel returns default of "
           << vel << std::endl;
   }
-
   return vel;
 }
 
