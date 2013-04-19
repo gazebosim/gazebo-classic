@@ -522,7 +522,7 @@ void SensorManager::SensorContainer::Update(bool _force)
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   if (this->sensors.empty())
-    gzlog << "Updating a sensor containing without any sensors.\n";
+    gzlog << "Updating a sensor container without any sensors.\n";
 
   // Update all the sensors in this container.
   for (Sensor_V::iterator iter = this->sensors.begin();
@@ -650,9 +650,6 @@ void SensorManager::ImageSensorContainer::Update(bool _force)
 /////////////////////////////////////////////////
 SimTimeEventHandler::SimTimeEventHandler()
 {
-  this->world = physics::get_world();
-  GZ_ASSERT(this->world != NULL, "World pointer is NULL");
-
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&SimTimeEventHandler::OnUpdate, this, _1));
 }
@@ -676,9 +673,12 @@ void SimTimeEventHandler::AddRelativeEvent(const common::Time &_time,
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
+  physics::WorldPtr world = physics::get_world();
+  GZ_ASSERT(world != NULL, "World pointer is NULL");
+
   // Create the new event.
   SimTimeEvent *event = new SimTimeEvent;
-  event->time = this->world->GetSimTime() + _time;
+  event->time = world->GetSimTime() + _time;
   event->condition = _var;
 
   // Add the event to the list.
@@ -688,8 +688,6 @@ void SimTimeEventHandler::AddRelativeEvent(const common::Time &_time,
 /////////////////////////////////////////////////
 void SimTimeEventHandler::OnUpdate(const common::UpdateInfo &_info)
 {
-  GZ_ASSERT(this->world != NULL, "World pointer is NULL");
-
   boost::mutex::scoped_lock timingLock(g_sensorTimingMutex);
   boost::mutex::scoped_lock lock(this->mutex);
 
