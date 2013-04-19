@@ -56,7 +56,14 @@ Sensor::Sensor(SensorCategory _cat)
 //////////////////////////////////////////////////
 Sensor::~Sensor()
 {
-  this->Fini();
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
+
+  if (this->sdf)
+    this->sdf->Reset();
+  this->sdf.reset();
+  this->connections.clear();
 }
 
 //////////////////////////////////////////////////
@@ -77,10 +84,7 @@ void Sensor::Load(const std::string &_worldName)
   if (this->sdf->GetValueBool("always_on"))
     this->SetActive(true);
 
-  std::cout << "Sensor[" << this->GetName()
-    << "] Getting world[" << _worldName << "]\n";
   this->world = physics::get_world(_worldName);
-  std::cout << "Got World[" << this->world.get() << "]\n";
 
   GZ_ASSERT(this->world != NULL, "World pointer is NULL");
 
@@ -130,8 +134,6 @@ void Sensor::Update(bool _force)
 {
   if (this->IsActive() || _force)
   {
-    if (!this->world)
-      std::cout << "Sensor[" << this->GetName() << "] Update\n";
     if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod
         || _force)
     {

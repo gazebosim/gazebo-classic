@@ -99,7 +99,10 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
           elem->GetElement("fudge_factor")->GetValueDouble());
 
     if (elem->HasElement("cfm"))
-        this->SetParam(dParamCFM, elem->GetElement("cfm")->GetValueDouble());
+        this->SetAttribute("cfm", 0, elem->GetElement("cfm")->GetValueDouble());
+
+    if (elem->HasElement("erp"))
+        this->SetAttribute("erp", 0, elem->GetElement("erp")->GetValueDouble());
 
     if (elem->HasElement("bounce"))
         this->SetParam(dParamBounce,
@@ -923,7 +926,6 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
     else if (this->HasType(physics::Base::SLIDER_JOINT))
     {
       // rotate force into child link frame
-      this->GetGlobalAxis(0u);
       wrenchAppliedWorld.body2Force =
         this->GetForce(0u) * this->GetGlobalAxis(0u);
       wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;

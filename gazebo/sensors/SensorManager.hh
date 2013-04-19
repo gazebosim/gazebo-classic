@@ -79,9 +79,6 @@ namespace gazebo
       /// \brief The list of events to handle.
       private: std::list<SimTimeEvent*> events;
 
-      /// \brief Get sim time from the world.
-      private: physics::WorldPtr world;
-
       /// \brief Connect to the World::UpdateBegin event.
       private: event::ConnectionPtr updateConnection;
     };

@@ -79,7 +79,7 @@ namespace gazebo
     /// gazebo::g_worlds
     void init_worlds();
 
-    /// \brief Gun multiple worlds stored in static variable
+    /// \brief Run multiple worlds stored in static variable
     /// gazebo::g_worlds
     /// \param[in] _iterations Number of iterations for each world to take.
     /// Zero indicates that each world should continue forever.

@@ -234,6 +234,9 @@ void LogRecord::Stop()
 
   // Reset the times
   this->startTime = this->currTime = common::Time();
+
+  // Output the new log status
+  this->PublishLogStatus();
 }
 
 //////////////////////////////////////////////////
@@ -631,6 +634,8 @@ void LogRecord::Log::Stop()
 
     this->logFile.close();
   }
+
+  this->completePath.clear();
 }
 
 //////////////////////////////////////////////////
@@ -699,16 +704,7 @@ void LogRecord::OnLogControl(ConstLogControlPtr &_data)
 
   if (_data->has_start() && _data->start())
   {
-    if (this->GetPaused())
-    {
-      this->Start("bz2");
-    }
-    else
-    {
-      this->Start("bz2");
-      // this->Add(this->GetName(), "state.log",
-      //    boost::bind(&LogRecord::OnLog, this, _1));
-    }
+    this->Start("bz2");
   }
   else if (_data->has_stop() && _data->stop())
   {
@@ -718,6 +714,9 @@ void LogRecord::OnLogControl(ConstLogControlPtr &_data)
   {
     this->SetPaused(_data->paused());
   }
+
+  // Output the new log status
+  this->PublishLogStatus();
 }
 
 //////////////////////////////////////////////////
