@@ -35,7 +35,9 @@
 
 /////////////////////////////////////////////////
 QTestFixture::QTestFixture()
-  : server(NULL), serverThread(NULL), residentStart(0), shareStart(0)
+  : server(NULL), serverThread(NULL),
+    resMaxPercentChange(0), shareMaxPercentChange(0),
+    residentStart(0), shareStart(0)
 {
 }
 
