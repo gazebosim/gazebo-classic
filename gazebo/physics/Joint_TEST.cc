@@ -308,7 +308,6 @@ TEST_F(Joint_TEST, joint_SDF14)
 }
 
 
-
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
