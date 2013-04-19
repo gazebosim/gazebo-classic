@@ -39,7 +39,6 @@ set(tests
   transport_stress.cc
   server_fixture.cc
   speed.cc
-  state_log.cc
   surface_properties.cc
   )
 
