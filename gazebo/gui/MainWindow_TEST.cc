@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/math/Helpers.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/gui/Actions.hh"
@@ -123,7 +124,7 @@ void MainWindow_TEST::Wireframe()
         << "] AvgPostWireframe[" << avgPostWireframe << "]\n";
 
   // Removing the grey ground plane should change the image.
-  QVERIFY(avgPreWireframe != avgPostWireframe);
+  QVERIFY(!gazebo::math::equal(avgPreWireframe, avgPostWireframe));
 
   mainWindow->hide();
   delete mainWindow;
