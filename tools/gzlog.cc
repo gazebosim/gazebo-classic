@@ -657,14 +657,13 @@ void help()
   std::cerr << "Usage: gzlog [command] <options> [log file]\n\n";
 
   std::cerr << "Commands:\n"
-            << "  help\t Output this help message.\n"
-            << "  info\t Display statistical information about a log file.\n"
-            << "  echo\t Output the contents of a log file to screen.\n"
-            << "  step\t Step through the contents of a log file.\n"
-            << "  start\t Start recording a log file on an active Gazebo "
-            << "server.\n"
-            << "  stop\t Stop recording a log file on an active Gazebo "
-            << "server.\n";
+    << "  help\t Output this help message.\n"
+    << "  info\t Display statistical information about a log file.\n"
+    << "  echo\t Output the contents of a log file to screen.\n"
+    << "  step\t Step through the contents of a log file.\n"
+    << "  start\t Start recording a log file on an active Gazebo server.\n"
+    << "  stop\t Stop recording a log file on an active Gazebo server.\n"
+    << "  play\t Play a log file in an active Gazebo server";
 
   std::cerr << "\n";
 }
@@ -746,8 +745,14 @@ std::string get_file_size_str(const std::string &_filename)
 
 /////////////////////////////////////////////////
 /// \bried Output information about a log file.
-void info(const std::string &_filename)
+int info(const std::string &_filename)
 {
+  if (_filename.empty())
+  {
+    gzerr << "No log file specified\n";
+    return -1;
+  }
+
   gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
 
   // Get the SDF world description from the log file
@@ -843,14 +848,26 @@ void info(const std::string &_filename)
     << "Encoding:       " << play->GetEncoding() << "\n"
     << "Model Count:    " << modelCount << "\n"
     << "\n";
+
+  return 0;
 }
 
 /////////////////////////////////////////////////
 /// \brief Dump the contents of a log file to screen
 /// \param[in] _filter Filter string
-void echo(const std::string &_filter, bool _raw, const std::string &_stamp,
-    double _hz)
+int echo(const std::string &_filename, const std::string &_filter, bool _raw,
+    const std::string &_stamp, double _hz)
 {
+  if (_filename.empty())
+  {
+    gzerr << "No log file specified\n";
+    return -1;
+  }
+
+  // Load log file from string
+  if (!load_log_from_file(_filename))
+    return -1;
+
   gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
   std::string stateString;
 
@@ -885,14 +902,26 @@ void echo(const std::string &_filter, bool _raw, const std::string &_stamp,
 
   if (!_raw)
     std::cout << "</gazebo_log>\n";
+
+  return 0;
 }
 
 /////////////////////////////////////////////////
 /// \brief Step through a log file.
 /// \param[in] _filter Filter string
-void step(const std::string &_filter, bool _raw, const std::string &_stamp,
-    double _hz)
+int step(const std::string &_filename, const std::string &_filter,
+    bool _raw, const std::string &_stamp, double _hz)
 {
+  if (_filename.empty())
+  {
+    gzerr << "No log file specified\n";
+    return -1;
+  }
+
+  // Load log file from string
+  if (!load_log_from_file(_filename))
+    return -1;
+
   std::string stateString;
   gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
 
@@ -935,12 +964,14 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
 
   if (!_raw)
     std::cout << "</gazebo_log>\n";
+
+  return 0;
 }
 
 /////////////////////////////////////////////////
 /// \brief Start or stop logging
 /// \param[in] _start True to start logging
-void record(bool _start)
+int record(bool _start)
 {
   gazebo::transport::init();
   gazebo::transport::run();
@@ -954,9 +985,39 @@ void record(bool _start)
 
   gazebo::msgs::LogControl msg;
   _start ? msg.set_start(true) : msg.set_stop(true);
-  pub->Publish<gazebo::msgs::LogControl>(msg, true);
+  pub->Publish(msg, true);
 
   gazebo::transport::fini();
+
+  return 0;
+}
+
+/////////////////////////////////////////////////
+int play(const std::string &_filename)
+{
+  if (_filename.empty())
+  {
+    gzerr << "No log file specified\n";
+    return -1;
+  }
+
+  gazebo::transport::init();
+  gazebo::transport::run();
+
+  gazebo::transport::NodePtr node(new gazebo::transport::Node());
+  node->Init();
+
+  gazebo::transport::PublisherPtr pub =
+    node->Advertise<gazebo::msgs::ServerControl>("/gazebo/server/control");
+  pub->WaitForConnection();
+
+  gazebo::msgs::ServerControl msg;
+  msg.set_open_log_filename(_filename);
+  pub->Publish(msg, true);
+
+  gazebo::transport::fini();
+
+  return 0;
 }
 
 /////////////////////////////////////////////////
@@ -1025,21 +1086,9 @@ int main(int argc, char **argv)
     return 0;
   }
 
-  if (command != "start" && command != "stop")
-  {
-    // Load the log file
-    if (vm.count("file"))
-      filename = vm["file"].as<std::string>();
-    else
-    {
-      gzerr << "No log file specified\n";
-      return -1;
-    }
-
-    // Load log file from string
-    if (!load_log_from_file(filename))
-      return -1;
-  }
+  // Load the log file
+  if (vm.count("file"))
+    filename = vm["file"].as<std::string>();
 
   std::string stamp;
   if (vm.count("stamp"))
@@ -1049,17 +1098,21 @@ int main(int argc, char **argv)
   if (vm.count("hz"))
     hz = vm["hz"].as<double>();
 
+  int result = 0;
+
   // Process the command
   if (command == "info")
-    info(filename);
+    result = info(filename);
   else if (command == "echo")
-    echo(filter, vm.count("raw"), stamp, hz);
+    result = echo(filename, filter, vm.count("raw"), stamp, hz);
   else if (command == "step")
-    step(filter, vm.count("raw"), stamp, hz);
+    result = step(filename, filter, vm.count("raw"), stamp, hz);
   else if (command == "start")
-    record(true);
+    result = record(true);
   else if (command == "stop")
-    record(false);
+    result = record(false);
+  else if (command == "play")
+    result = play(filename);
 
-  return 0;
+  return result;
 }

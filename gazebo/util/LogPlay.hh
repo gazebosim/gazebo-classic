@@ -112,7 +112,7 @@ namespace gazebo
       private: void ReadHeader();
 
       /// \brief The XML document of the log file.
-      private: TiXmlDocument xmlDoc;
+      private: TiXmlDocument *xmlDoc;
 
       /// \brief Start of the log.
       private: TiXmlElement *logStartXml;
@@ -136,6 +136,7 @@ namespace gazebo
       /// \brief The encoding for the current chunk in the log file.
       private: std::string encoding;
 
+      /// \brief The current chunk of log info
       private: std::string currentChunk;
 
       /// \brief This is a singleton

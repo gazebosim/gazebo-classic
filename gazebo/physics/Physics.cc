@@ -150,6 +150,7 @@ void physics::remove_worlds()
       iter != g_worlds.end(); ++iter)
   {
     (*iter)->Fini();
+    std::cout << "World[" << (*iter)->GetName() << "] Usecount[" << (*iter).use_count() << "]\n";
     (*iter).reset();
   }
 

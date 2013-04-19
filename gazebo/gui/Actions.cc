@@ -22,6 +22,7 @@ QAction *gazebo::gui::g_translateAct = 0;
 QAction *gazebo::gui::g_rotateAct = 0;
 QAction *gazebo::gui::g_newAct = 0;
 QAction *gazebo::gui::g_openAct = 0;
+QAction *gazebo::gui::g_openLogAct = 0;
 QAction *gazebo::gui::g_importAct = 0;
 QAction *gazebo::gui::g_saveAct = 0;
 QAction *gazebo::gui::g_saveAsAct = 0;

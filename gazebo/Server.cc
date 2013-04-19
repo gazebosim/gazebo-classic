@@ -402,6 +402,12 @@ void Server::Fini()
 {
   this->Stop();
 
+  // Stop gazebo
+  gazebo::stop();
+
+  // Stop the master
+  this->master->Stop();
+
   gazebo::fini();
 
   physics::fini();
@@ -416,6 +422,27 @@ void Server::Fini()
 
 /////////////////////////////////////////////////
 void Server::Run()
+{
+  bool localStop = false;
+
+  while (!localStop)
+  {
+    localStop = true;
+    this->RunImpl();
+
+    // Open a log if one was specified
+    if (!this->openLogFilename.empty())
+    {
+      // Continue if the OpenLog function was successful.
+      localStop = !this->OpenLog(this->openLogFilename);
+      this->stop = false;
+      this->openLogFilename.clear();
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void Server::RunImpl()
 {
   if (this->stop)
     return;
@@ -458,12 +485,6 @@ void Server::Run()
   physics::stop_worlds();
 
   sensors::stop();
-
-  // Stop gazebo
-  gazebo::stop();
-
-  // Stop the master
-  this->master->Stop();
 }
 
 /////////////////////////////////////////////////
@@ -541,12 +562,79 @@ void Server::ProcessControlMsgs()
     {
       this->OpenWorld((*iter).open_filename());
     }
+    else if ((*iter).has_open_log_filename())
+    {
+      this->openLogFilename = (*iter).open_log_filename(); 
+      this->stop = true;
+    }
   }
   this->controlMsgs.clear();
 }
 
 /////////////////////////////////////////////////
-bool Server::OpenWorld(const std::string & /*_filename*/)
+bool Server::OpenLog(const std::string &_filename)
+{
+  sensors::fini();
+  physics::remove_worlds();
+
+  // Load the log file
+  util::LogPlay::Instance()->Open(_filename);
+
+  gzmsg << "\nLog playback:\n"
+    << "  Log Version: "
+    << util::LogPlay::Instance()->GetLogVersion() << "\n"
+    << "  Gazebo Version: "
+    << util::LogPlay::Instance()->GetGazeboVersion() << "\n"
+    << "  Random Seed: "
+    << util::LogPlay::Instance()->GetRandSeed() << "\n";
+
+  // Get the SDF world description from the log file
+  std::string sdfString;
+  util::LogPlay::Instance()->Step(sdfString);
+
+  // Load the world file
+  sdf::SDFPtr sdf(new sdf::SDF);
+  if (!sdf::init(sdf))
+  {
+    gzerr << "Unable to initialize sdf\n";
+    return false;
+  }
+
+  if (!sdf::readString(sdfString, sdf))
+  {
+    gzerr << "Unable to read SDF string[" << sdfString << "]\n";
+    return false;
+  }
+
+  sdf::ElementPtr worldElem = sdf->root->GetElement("world");
+  if (worldElem)
+  {
+    printf("Creating world\n");
+    physics::WorldPtr world = physics::create_world(
+        worldElem->GetValueString("name"));
+    std::cout << "Created World[" << world.get() << "]\n";
+
+    // Create the world
+    try
+    {
+      printf("Loading world\n");
+      world->Load(worldElem);
+      printf("Loading world done\n");
+    }
+    catch(common::Exception &e)
+    {
+      gzerr << "Failed to load the World\n"  << e;
+      return false;
+    }
+
+    world->Init();
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Server::OpenWorld(const std::string &/*_filename*/)
 {
   gzerr << "Open World is not implemented\n";
   return false;

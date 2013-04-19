@@ -428,7 +428,6 @@ void SensorManager::SensorContainer::Stop()
   this->runCondition.notify_all();
   if (this->runThread)
   {
-    this->runThread->interrupt();
     this->runThread->join();
     delete this->runThread;
     this->runThread = NULL;
@@ -439,14 +438,6 @@ void SensorManager::SensorContainer::Stop()
 void SensorManager::SensorContainer::RunLoop()
 {
   this->stop = false;
-
-  physics::WorldPtr world = physics::get_world();
-  GZ_ASSERT(world != NULL, "Pointer to World is NULL");
-
-  physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
-  GZ_ASSERT(engine != NULL, "Pointer to PhysicsEngine is NULL");
-
-  engine->InitForThread();
 
   common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = 0;
@@ -480,10 +471,23 @@ void SensorManager::SensorContainer::RunLoop()
   else
     sleepTime.Set(0, 1e6);
 
+  physics::WorldPtr world = physics::get_world();
+  GZ_ASSERT(world != NULL, "Pointer to World is NULL");
+
+  physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
+  GZ_ASSERT(engine != NULL, "Pointer to PhysicsEngine is NULL");
+
+  engine->InitForThread();
+
+
   while (!this->stop)
   {
     if (this->sensors.empty())
+    {
       this->runCondition.wait(lock2);
+      if (this->stop)
+        break;
+    }
 
     // Get the start time of the update.
     startTime = world->GetSimTime();

@@ -462,6 +462,20 @@ CameraPtr Scene::CreateCamera(const std::string &_name, bool _autoRender)
 }
 
 //////////////////////////////////////////////////
+void Scene::RemoveCamera(const std::string &_name)
+{
+  std::vector<CameraPtr>::iterator iter;
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
+  {
+    if ((*iter)->GetName() == _name)
+    {
+      this->cameras.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
                                         bool _autoRender)
 {

@@ -60,6 +60,8 @@ namespace gazebo
 
     public: bool LoadString(const std::string &_sdfString);
     public: void Init();
+
+    /// \brief Run the server.
     public: void Run();
     public: void Stop();
     public: void Fini();
@@ -67,6 +69,9 @@ namespace gazebo
     public: void SetParams(const common::StrStr_M &params);
 
     public: bool GetInitialized() const;
+
+    /// \brief Helper to the Server::Run function.
+    private: void RunImpl();
 
     /// \brief Load implementation.
     /// \param[in] _elem Description of the world to load.
@@ -80,9 +85,17 @@ namespace gazebo
 
     private: void OnControl(ConstServerControlPtr &_msg);
 
+    /// \brief Open a log file.
+    /// \param[in] _filename Name of the file to open.
+    private: bool OpenLog(const std::string &_filename);
+
     private: bool OpenWorld(const std::string &_filename);
 
     private: void ProcessControlMsgs();
+
+    // save argc and argv for access by system plugins
+    public: int systemPluginsArgc;
+    public: char** systemPluginsArgv;
 
     private: static bool stop;
 
@@ -98,9 +111,8 @@ namespace gazebo
     private: gazebo::common::StrStr_M params;
     private: po::variables_map vm;
 
-    // save argc and argv for access by system plugins
-    public: int systemPluginsArgc;
-    public: char** systemPluginsArgv;
+    /// \brief Filename of a log to open.
+    private: std::string openLogFilename;
   };
 }
 

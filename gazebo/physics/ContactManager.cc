@@ -40,6 +40,7 @@ ContactManager::~ContactManager()
   this->Clear();
   this->node.reset();
   this->contactPub.reset();
+  this->world.reset();
 }
 
 /////////////////////////////////////////////////

@@ -151,6 +151,10 @@ namespace gazebo
       public: CameraPtr CreateCamera(const std::string &_name,
                                      bool _autoRender = true);
 
+      /// \brief Remove a camera with a given name.
+      /// \param[in] _name Name of the camera to remove.
+      public: void RemoveCamera(const std::string &_name);
+
       /// \brief Create depth camera
       /// \param[in] _name Name of the new camera.
       /// \param[in] _autoRender True to allow Gazebo to automatically

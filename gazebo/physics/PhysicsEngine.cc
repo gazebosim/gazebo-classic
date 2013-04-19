@@ -83,6 +83,8 @@ void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void PhysicsEngine::Fini()
 {
+  delete this->contactManager;
+  this->contactManager = NULL;
   this->world.reset();
   this->node->Fini();
 }

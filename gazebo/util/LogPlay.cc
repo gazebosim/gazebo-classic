@@ -67,26 +67,34 @@ void base64_decode(std::string &_dest, const std::string &_src)
 LogPlay::LogPlay()
 {
   this->logStartXml = NULL;
+  this->xmlDoc = NULL;
 }
 
 /////////////////////////////////////////////////
 LogPlay::~LogPlay()
 {
+  delete this->xmlDoc;
+  this->xmlDoc = NULL;
 }
 
 /////////////////////////////////////////////////
 void LogPlay::Open(const std::string &_logFile)
 {
+  std::cout << "LogPlay::Open\n";
   boost::filesystem::path path(_logFile);
   if (!boost::filesystem::exists(path))
     gzthrow("Invalid logfile[" + _logFile + "]. Does not exist.");
 
+  if (this->xmlDoc)
+    delete this->xmlDoc;
+  this->xmlDoc = new TiXmlDocument();
+
   // Parse the log file
-  if (!this->xmlDoc.LoadFile(_logFile))
+  if (!this->xmlDoc->LoadFile(_logFile))
     gzthrow("Unable to parse log file[" << _logFile << "]");
 
   // Get the gazebo_log element
-  this->logStartXml = this->xmlDoc.FirstChildElement("gazebo_log");
+  this->logStartXml = this->xmlDoc->FirstChildElement("gazebo_log");
 
   if (!this->logStartXml)
     gzthrow("Log file is missing the <gazebo_log> element");
@@ -99,6 +107,8 @@ void LogPlay::Open(const std::string &_logFile)
 
   this->logCurrXml = this->logStartXml;
   this->encoding.clear();
+
+  this->currentChunk.clear();
 }
 
 /////////////////////////////////////////////////

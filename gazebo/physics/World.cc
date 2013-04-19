@@ -129,6 +129,8 @@ World::World(const std::string &_name)
 //////////////////////////////////////////////////
 World::~World()
 {
+  printf("Deleting world\n");
+
   delete this->receiveMutex;
   this->receiveMutex = NULL;
   delete this->loadModelMutex;
@@ -333,6 +335,7 @@ void World::Stop()
     delete this->thread;
     this->thread = NULL;
   }
+  std::cout << "World Stopped\n";
 }
 
 //////////////////////////////////////////////////
@@ -372,7 +375,6 @@ void World::RunLoop()
     }
   }
 
-  this->thread = NULL;
   this->stop = true;
 
   if (this->logThread)
@@ -641,12 +643,18 @@ void World::Update()
 //////////////////////////////////////////////////
 void World::Fini()
 {
+  WorldPtr self = shared_from_this();
+  std::cout << "World::Fini Start[" << self.use_count() << "]\n";
   this->Stop();
+  std::cout << "World::Fini Stop[" << self.use_count() << "]\n";
+
   this->plugins.clear();
+  std::cout << "World::Fini Plugins[" << self.use_count() << "]\n";
 
   this->publishModelPoses.clear();
 
   this->node->Fini();
+  std::cout << "World::Fini Node[" << self.use_count() << "]\n";
 
   if (this->rootElement)
   {
@@ -654,14 +662,17 @@ void World::Fini()
     this->rootElement.reset();
   }
 
+  std::cout << "World::Fini Root[" << self.use_count() << "]\n";
   if (this->physicsEngine)
   {
     this->physicsEngine->Fini();
     this->physicsEngine.reset();
   }
+  std::cout << "World::Fini Physics[" << self.use_count() << "]\n";
 
   this->prevStates[0].SetWorld(WorldPtr());
   this->prevStates[1].SetWorld(WorldPtr());
+  std::cout << "World::Fini End[" << self.use_count() << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -719,6 +730,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
 
+    std::cout << "Load Model[" << model->GetScopedName() << "]\n";
     event::Events::addEntity(model->GetScopedName());
 
     msgs::Model msg;
@@ -1843,4 +1855,5 @@ void World::LogWorker()
 
   // Make sure nothing is blocked by this thread.
   this->logContinueCondition.notify_all();
+  printf("LogWorker end\n");
 }
