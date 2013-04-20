@@ -6,6 +6,7 @@ set (files
   deferred_post.material
   deferred_post_minilight.material
   deferred_post.program
+  depth.compositor
   gazebo.material
   grid.material
   kitchen.material

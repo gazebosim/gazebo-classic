@@ -868,3 +868,37 @@ material Gazebo/GaussianCameraNoise
     }
   }
 }
+
+
+vertex_program Gazebo/GpuLaserDepthVS glsl
+{
+  source laser_1st_pass.vert
+}
+
+fragment_program Gazebo/GpuLaserDepthFS glsl
+{
+  source laser_1st_pass.frag
+  default_params
+  {
+    param_named RT int 0
+  }
+}
+
+material Gazebo/GpuLaserDepth
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/GpuLaserDepthVS { }
+      fragment_program_ref Gazebo/GpuLaserDepthFS { }
+
+      texture_unit RT
+      {
+        tex_coord_set 0
+        tex_address_mode clamp
+        filtering linear linear linear
+      }
+    }
+  }
+}
