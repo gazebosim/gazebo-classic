@@ -56,6 +56,7 @@ SET (headers
 
 gz_add_library(gazebo_physics_dart ${sources})
 
+# these flags should probably go into dart.pc
 target_link_libraries(gazebo_physics_dart ${DART_LIBRARIES} -lfcl -lassimp3.0)
 
 gz_install_library(gazebo_physics_dart)
