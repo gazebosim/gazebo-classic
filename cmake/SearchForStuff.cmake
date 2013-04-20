@@ -120,17 +120,28 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   #################################################
-  # Find rtql8
-  find_package(RTQL8)
-  if (RTQL8_FOUND)
-    message (STATUS "Looking for RTQL8, found")
-    set (HAVE_RTQL8 TRUE)
+  # Find DART
+  find_package(DART)
+  if (DART_FOUND)
+    message (STATUS "Looking for DART, found")
+    set (HAVE_DART TRUE)
   else()
-    message (STATUS "Looking for RTQL8, not found")
-    set (HAVE_RTQL8 FALSE)
+    message (STATUS "Looking for DART, not found")
+    set (HAVE_DART FALSE)
   endif()
 
   #################################################
+
+#-------------------------------------------------------------------------------
+# Eigen3
+#-------------------------------------------------------------------------------
+#include (${gazebo_cmake_dir}/FindEigen3.cmake)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
+find_package(Eigen3 REQUIRED)
+if(EIGEN3_FOUND)
+    include_directories(${EIGEN3_INCLUDE_DIR})
+    #target_link_libraries(foo ${EIGEN3_LIBRARY})
+endif()
 
   #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config

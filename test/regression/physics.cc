@@ -77,12 +77,12 @@ void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
 //}
 //#endif  // HAVE_BULLET
 
-//#ifdef HAVE_RTQL8
-//TEST_F(PhysicsTest, EmptyWorldRTQL8)
+//#ifdef HAVE_DART
+//TEST_F(PhysicsTest, EmptyWorldDART)
 //{
-//  EmptyWorld("rtql8");
+//  EmptyWorld("dart");
 //}
-//#endif  // HAVE_RTQL8
+//#endif  // HAVE_DART
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnDrop:
@@ -244,12 +244,12 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 //}
 //#endif  // HAVE_BULLET
 
-//#ifdef HAVE_RTQL8
-//TEST_F(PhysicsTest, SpawnDropRTQL8)
+//#ifdef HAVE_DART
+//TEST_F(PhysicsTest, SpawnDropDART)
 //{
-//  SpawnDrop("rtql8");
+//  SpawnDrop("dart");
 //}
-//#endif  // HAVE_RTQL8
+//#endif  // HAVE_DART
 
 //////////////////////////////////////////////////////////////////////////
 //// SpawnDropCoGOffset:

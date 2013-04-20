@@ -5,8 +5,8 @@ if (HAVE_BULLET)
   add_subdirectory(bullet)
 endif()
 
-if (HAVE_RTQL8)
-  add_subdirectory(rtql8)
+if (HAVE_DART)
+  add_subdirectory(dart)
 endif()
 
 set (sources
@@ -113,8 +113,8 @@ if (HAVE_BULLET)
   target_link_libraries(gazebo_physics gazebo_physics_bullet)
 endif()
 
-if (HAVE_RTQL8)
-  target_link_libraries(gazebo_physics gazebo_physics_rtql8)
+if (HAVE_DART)
+  target_link_libraries(gazebo_physics gazebo_physics_dart)
 endif()
 
 gz_add_executable(gzphysics server.cc)
