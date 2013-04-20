@@ -130,10 +130,8 @@ if (PKG_CONFIG_FOUND)
     set (HAVE_DART FALSE)
   endif()
 
-  #################################################
-
 #-------------------------------------------------------------------------------
-# Eigen3
+# DART dependency Eigen3
 #-------------------------------------------------------------------------------
 #include (${gazebo_cmake_dir}/FindEigen3.cmake)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
@@ -142,6 +140,10 @@ if(EIGEN3_FOUND)
     include_directories(${EIGEN3_INCLUDE_DIR})
     #target_link_libraries(foo ${EIGEN3_LIBRARY})
 endif()
+
+  pkg_check_modules(fcl FCL)
+  pkg_check_modules(assimp ASSIMP)
+  #################################################
 
   #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
