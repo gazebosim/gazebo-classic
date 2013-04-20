@@ -56,6 +56,6 @@ SET (headers
 
 gz_add_library(gazebo_physics_dart ${sources})
 
-target_link_libraries(gazebo_physics_dart ${DART_LIBRARIES})
+target_link_libraries(gazebo_physics_dart ${DART_LIBRARIES} -lfcl -lassimp3.0)
 
 gz_install_library(gazebo_physics_dart)
