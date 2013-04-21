@@ -271,8 +271,8 @@ void GpuRaySensor::Init()
     this->laserCam->Init();
     this->laserCam->SetRangeCount(this->horzRangeCount, this->vertRangeCount);
     this->laserCam->SetClipDist(this->GetRangeMin(), this->GetRangeMax());
-    this->laserCam->CreateLaserTexture(this->GetName() + "_RttTex_Laser");
-    this->laserCam->CreateRenderTexture(this->GetName() + "_RttTex_Image");
+    this->laserCam->CreateLaserTexture(this->GetScopedName() + "_RttTex_Laser");
+    this->laserCam->CreateRenderTexture(this->GetScopedName() + "_RttTex_Image");
     this->laserCam->SetWorldPose(this->pose);
     this->laserCam->AttachToVisual(this->parentName, true);
 
@@ -550,8 +550,8 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
     scan->clear_intensities();
 
     // todo: add loop for vertical range count
-    for (unsigned int j = 0; j < (unsigned int)this->GetVerticalRayCount(); ++j)
-    for (unsigned int i = 0; i < (unsigned int)this->GetRayCount(); ++i)
+    for (int j = 0; j < this->GetVerticalRayCount(); ++j)
+    for (int i = 0; i < this->GetRayCount(); ++i)
     {
       double range = this->laserCam->GetLaserData()[
           (j * this->GetRayCount() + i) * 3];

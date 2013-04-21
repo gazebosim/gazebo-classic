@@ -184,9 +184,6 @@ void GpuLaser::PostRender()
 //  double blitDur = 0.0;
 //  double postRenderDur = 0.0;
 
-  if (this->GetScene()->skyx != NULL)
-    this->GetScene()->skyx->setVisible(true);
-
   for (unsigned int i = 0; i < this->textureCount; i++)
   {
     this->firstPassTargets[i]->swapBuffers();
@@ -425,6 +422,9 @@ void GpuLaser::RenderImpl()
 
   sceneMgr->_suppressRenderStateChanges(false);
   sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+
+  if (this->GetScene()->skyx != NULL)
+    this->GetScene()->skyx->setVisible(true);
 
   double secondPassDur = secondPassTimer.GetElapsed().Double();
   this->lastRenderDuration = firstPassDur + secondPassDur;
