@@ -195,7 +195,7 @@ namespace gazebo
       public: void SetVertFOV(double _vfov);
 
       /// \brief Get the number of cameras required
-      /// \return Number of cameras needed to generate the rays 
+      /// \return Number of cameras needed to generate the rays
       public: double GetCameraCount() const;
 
       /// \brief Set the number of cameras required

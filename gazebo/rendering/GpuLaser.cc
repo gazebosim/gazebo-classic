@@ -213,11 +213,11 @@ void GpuLaser::PostRender()
 
     memset(this->laserBuffer, 255, size);
 
-    Ogre::PixelBox dst_box(width, height,
+    Ogre::PixelBox dstBox(width, height,
         1, Ogre::PF_FLOAT32_RGB, this->laserBuffer);
 
 //    blitT.Start();
-    pixelBuffer->blitToMemory(dst_box);
+    pixelBuffer->blitToMemory(dstBox);
 //    blitDur = blitT.GetElapsed().Double();
 
     if (!this->laserScan)
@@ -382,6 +382,8 @@ void GpuLaser::RenderImpl()
 
   firstPassTimer.Start();
 
+  // Disable skyx otherwise the range values get clipped at origin
+  // Seems like skyx's mMeshManager is causing this problem
   if (this->GetScene()->skyx != NULL)
     this->GetScene()->skyx->setVisible(false);
 
@@ -505,7 +507,6 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
   }
   if (_index == 0)
   {
-    //this->vfov = Ogre::Degree(1).valueDegrees();
     this->camera->setAspectRatio(this->rayCountRatio);
     this->camera->setFOVy(Ogre::Radian(this->vfov));
   }
@@ -555,7 +556,7 @@ void GpuLaser::CreateMesh()
   double dx, dy;
   submesh->SetPrimitiveType(common::SubMesh::POINTS);
 
-  double view_height = this->GetImageHeight()/10.0;
+  double viewHeight = this->GetImageHeight()/10.0;
 
   if (h2nd == 1)
     dy = 0;
@@ -564,22 +565,22 @@ void GpuLaser::CreateMesh()
 
   dx = 0.1;
 
-  double start_x = dx;
-  double start_y = view_height;
+  double startX = dx;
+  double startY = viewHeight;
 
   double phi = this->vfov / 2;
 
-  double v_ang_min = -phi;
+  double vAngMin = -phi;
 
   if (this->GetImageHeight() == 1)
     phi = 0;
 
-  unsigned int pts_on_line = 0;
+  unsigned int ptsOnLine = 0;
   for (unsigned int j = 0; j < this->h2nd; j++)
   {
     double gamma = 0;
     if (this->h2nd != 1)
-      gamma = ((2 * phi / (this->h2nd - 1)) * j) + v_ang_min;
+      gamma = ((2 * phi / (this->h2nd - 1)) * j) + vAngMin;
     for (unsigned int i = 0; i < this->w2nd; i++)
     {
       double thfov = this->textureCount * this->hfov;
@@ -598,32 +599,27 @@ void GpuLaser::CreateMesh()
 
       delta = delta - theta;
 
-      start_x -= dx;
-      if (pts_on_line == this->GetImageWidth())
+      startX -= dx;
+      if (ptsOnLine == this->GetImageWidth())
       {
-        pts_on_line = 0;
-        start_x = 0;
-        start_y -= dy;
+        ptsOnLine = 0;
+        startX = 0;
+        startY -= dy;
       }
-      pts_on_line++;
-      submesh->AddVertex(texture/1000.0, start_x, start_y);
+      ptsOnLine++;
+      submesh->AddVertex(texture/1000.0, startX, startY);
 
       double u, v;
       if (this->isHorizontal)
       {
         u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
-        // FIXME v is nan
-        v = -tan(gamma)/(2 * tan(phi)) + 0.5;
+        v = phi ? -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
       }
       else
       {
         v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
-        u = -tan(delta)/(2 * tan(theta)) + 0.5;
+        u = theta ? -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
       }
-      // gzerr << "uv " <<  u << " " <<  v << " " <<  std::endl;
-      // gzerr << "ang " <<  phi << " " << delta << " " <<  theta << " "
-          << gamma << std::endl;
-
       submesh->AddTexCoord(u, v);
     }
   }

@@ -79,7 +79,7 @@ TEST_F(GpuLaser_TEST, BasicGpuLaserAPITest)
     EXPECT_NEAR(laserCam->GetRayCountRatio(), 0.344, 1e-6);
 
     laserCam->SetCameraCount(4);
-    EXPECT_EQ((int)laserCam->GetCameraCount(), 4);
+    EXPECT_EQ(static_cast<int>(laserCam->GetCameraCount()), 4);
   }
 }
 

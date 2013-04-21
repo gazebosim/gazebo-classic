@@ -556,7 +556,6 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
       double range = this->laserCam->GetLaserData()[
           (j * this->GetRayCount() + i) * 3];
 
-      //gzerr << "range " << i  << " " << range << std::endl;
       if (this->noiseActive)
       {
         switch (this->noiseType)

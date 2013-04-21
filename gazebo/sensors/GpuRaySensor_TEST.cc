@@ -39,7 +39,7 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
 
   // Get a pointer to the Ray sensor
   sensors::GpuRaySensorPtr sensor =
-    boost::shared_dynamic_cast<sensors::GpuRaySensor>
+    boost::dynamic_pointer_cast<sensors::GpuRaySensor>
     (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
