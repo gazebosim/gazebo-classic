@@ -518,7 +518,7 @@ double GpuRaySensor::GetRetro(int /*_index*/) const
 //////////////////////////////////////////////////
 int GpuRaySensor::GetFiducial(int /*_index*/) const
 {
-  return 0;
+  return -1;
 }
 
 //////////////////////////////////////////////////

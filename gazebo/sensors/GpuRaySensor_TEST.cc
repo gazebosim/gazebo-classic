@@ -24,11 +24,21 @@ class GPURaySensor_TEST : public ServerFixture
 {
 };
 
+void OnNewLaserFrame(int *_scanCounter, float *_scanDest,
+                  const float *_scan,
+                  unsigned int _width, unsigned int _height,
+                  unsigned int _depth,
+                  const std::string &/*_format*/)
+{
+  memcpy(_scanDest, _scan, _width * _height * _depth);
+  *_scanCounter += 1;
+}
+
 /////////////////////////////////////////////////
 /// \brief Test Creation of a Ray sensor
 TEST_F(GPURaySensor_TEST, CreateLaser)
 {
-  Load("worlds/gpu_laser.world");
+  Load("worlds/gpu_laser2.world");
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   // Create the Ray sensor
@@ -39,8 +49,8 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
 
   // Get a pointer to the Ray sensor
   sensors::GpuRaySensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::GpuRaySensor>
-    (mgr->GetSensor(sensorName));
+     boost::dynamic_pointer_cast<sensors::GpuRaySensor>
+     (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
@@ -64,11 +74,23 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   EXPECT_TRUE(sensor->IsActive());
   EXPECT_TRUE(sensor->IsHorizontal());
 
-/// \TODO: this interface needs debugging, currently, only gazebo_ros_gpu_laser
-/// accessor works well for now.
-/*
-  // Update the sensor
-  sensor->Update(true);
+  // listen to new laser frames
+  float *scan = new float[sensor->GetRayCount()
+      * sensor->GetVerticalRayCount() * 3];
+  int scanCount = 0;
+  event::ConnectionPtr c =
+    sensor->ConnectNewLaserFrame(
+        boost::bind(&::OnNewLaserFrame, &scanCount, scan,
+          _1, _2, _3, _4, _5));
+
+  // wait for a few laser scans
+  int i = 0;
+  while (scanCount < 10)
+  {
+    common::Time::MSleep(10);
+    i++;
+  }
+  EXPECT_LT(i, 100);
 
   // Get all the range values
   std::vector<double> ranges;
@@ -83,7 +105,8 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
     EXPECT_NEAR(sensor->GetRetro(i), 0, 1e-6);
     EXPECT_EQ(sensor->GetFiducial(i), -1);
   }
-*/
+
+  delete [] scan;
 }
 
 /////////////////////////////////////////////////
@@ -92,63 +115,3 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-/*
-/////////////////////////////////////////////////
-//                                             //
-//  GPU Laser World has a few objects,         //
-//  spot check if GPULaser is return correct   //
-//  values.                                    //
-//                                             //
-/////////////////////////////////////////////////
-TEST_F(GpuLaser_TEST, GpuLaserWorldTest)
-{
-  Load("worlds/gpu_laser.world");
-
-  // Get sensors
-  GpuRaySensor gpuRaySensor =
-    boost::shared_dynamic_cast<sensors::GpuRaySensor>
-      (sensors::SensorManager::Instance()->GetSensor(
-        "default::laser_sensor"));
-
-  gazebo::rendering::GpuLaserPtr laserCam =
-    scene->CreateGpuLaser("test_laser", false);
-
-  EXPECT_TRUE(laserCam != NULL);
-
-  // The following tests all the getters and setters
-  {
-    laserCam->SetNearClip(0.1);
-    EXPECT_NEAR(laserCam->GetNearClip(), 0.1, 1e-6);
-
-    laserCam->SetFarClip(100.0);
-    EXPECT_NEAR(laserCam->GetFarClip(), 100, 1e-6);
-
-    laserCam->SetHorzHalfAngle(1.2);
-    EXPECT_NEAR(laserCam->GetHorzHalfAngle(), 1.2, 1e-6);
-
-    laserCam->SetVertHalfAngle(0.5);
-    EXPECT_NEAR(laserCam->GetVertHalfAngle(), 0.5, 1e-6);
-
-    laserCam->SetIsHorizontal(false);
-    EXPECT_FALSE(laserCam->IsHorizontal());
-
-    laserCam->SetHorzFOV(2.4);
-    EXPECT_NEAR(laserCam->GetHorzFOV(), 2.4, 1e-6);
-
-    laserCam->SetVertFOV(1.0);
-    EXPECT_NEAR(laserCam->GetVertFOV(), 1.0, 1e-6);
-
-    laserCam->SetCosHorzFOV(0.2);
-    EXPECT_NEAR(laserCam->GetCosHorzFOV(), 0.2, 1e-6);
-
-    laserCam->SetCosVertFOV(0.1);
-    EXPECT_NEAR(laserCam->GetCosVertFOV(), 0.1, 1e-6);
-
-    laserCam->SetRayCountRatio(0.344);
-    EXPECT_NEAR(laserCam->GetRayCountRatio(), 0.344, 1e-6);
-
-    laserCam->SetCameraCount(4);
-    EXPECT_EQ(laserCam->GetCameraCount(), 4);
-  }
-}
-*/
