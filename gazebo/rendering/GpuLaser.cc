@@ -35,6 +35,7 @@
 #include "gazebo/common/Timer.hh"
 #include "gazebo/math/Pose.hh"
 
+#include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -182,42 +183,13 @@ void GpuLaser::PostRender()
 //  postRenderT.Start();
 //  double blitDur = 0.0;
 //  double postRenderDur = 0.0;
+
+  if (this->GetScene()->skyx != NULL)
+    this->GetScene()->skyx->setVisible(true);
+
   for (unsigned int i = 0; i < this->textureCount; i++)
   {
-    // testing =============
-    unsigned int width = this->firstPassViewports[i]->getActualWidth();
-    unsigned int height = this->firstPassViewports[i]->getActualHeight();
-    Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
-    pixelBuffer = this->firstPassTextures[i]->getBuffer();
-    size_t size = Ogre::PixelUtil::getMemorySize(
-                    width, height, 1, Ogre::PF_FLOAT32_RGB);
-    // Blit the depth buffer if needed
-    float *bfer = new float[size];
-
-    memset(bfer, 255, size);
-
-    Ogre::PixelBox dst_box(width, height,
-        1, Ogre::PF_FLOAT32_RGB, bfer);
-
-//    blitT.Start();
-    pixelBuffer->blitToMemory(dst_box);
-//    blitDur = blitT.GetElapsed().Double();
-
-    float *lScan =  new float[this->w2nd * this->h2nd * 3];
-
-    memcpy(lScan, bfer,
-           this->w2nd * this->h2nd * 3 * sizeof(lScan[0]));
-
-    for ( int j = 0; j < this->w2nd * this->h2nd * 3; j =j + 3)
-    {
-      gzerr << "first pass value " << j << " " << lScan[j] << " " << lScan[j+1] << " " << lScan[j+2]  << std::endl;
-
-    }
-    // testing =============
-
-
     this->firstPassTargets[i]->swapBuffers();
-
   }
 
   this->secondPassTarget->swapBuffers();
@@ -282,22 +254,11 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
   // Get pointer to the material pass
   pass = _material->getBestTechnique()->getPass(0);
 
-
-
   // Render the depth texture
   // OgreSceneManager::_render function automatically sets farClip to 0.
   // Which normally equates to infinite distance. We don't want this. So
   // we have to set the distance every time.
   _cam->setFarClipDistance(this->GetFarClip());
-//  _cam->setFarClipDistance(5);
-//  _cam->setFarClipDistance(100);
-
-//  _cam->setPosition(0, 0, 2);
-
-  Ogre::Matrix4 mat = _cam->getViewMatrix(true);
-/*  gzerr << " mat " << mat[0][0] << " " << mat[0][1]  << " " << mat[0][2]
-    << " " << mat[1][0] << " " << mat[1][1] << " " << mat[1][2]
-    << " " << mat[2][0] << " " << mat[2][1] << " " << mat[2][2] <<std::endl;*/
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
@@ -305,16 +266,12 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
 
   // Need this line to render the ground plane. No idea why it's necessary.
   renderSys->_setViewport(vp);
-//  renderSys->_setViewMatrix(_cam->getViewMatrix(true));
-//  renderSys->_setProjectionMatrix(_cam->getProjectionMatrixRS());
   sceneMgr->_setPass(pass, true, false);
   autoParamDataSource.setCurrentPass(pass);
   autoParamDataSource.setCurrentViewport(vp);
   autoParamDataSource.setCurrentRenderTarget(_target);
   autoParamDataSource.setCurrentSceneManager(sceneMgr);
   autoParamDataSource.setCurrentCamera(_cam, true);
-
-  //gzerr << " _cam " << _cam->setPosition(0, 0, 2);
 
   renderSys->setLightingEnabled(false);
   renderSys->_setFog(Ogre::FOG_NONE);
@@ -393,8 +350,6 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
   Ogre::Viewport *vp = this->currentTarget->getViewport(0);
 
   renderSys->_setViewport(vp);
-//  renderSys->_setViewMatrix(this->camera->getViewMatrix(true));
-//  renderSys->_setProjectionMatrix(this->camera->getProjectionMatrixRS());
   autoParamDataSource.setCurrentRenderable(_rend);
   autoParamDataSource.setCurrentPass(my_pass);
   autoParamDataSource.setCurrentViewport(vp);
@@ -426,6 +381,9 @@ void GpuLaser::RenderImpl()
   common::Timer firstPassTimer, secondPassTimer;
 
   firstPassTimer.Start();
+
+  if (this->GetScene()->skyx != NULL)
+    this->GetScene()->skyx->setVisible(false);
 
   Ogre::SceneManager *sceneMgr = this->scene->GetManager();
 
@@ -649,7 +607,6 @@ void GpuLaser::CreateMesh()
       }
       pts_on_line++;
       submesh->AddVertex(texture/1000.0, start_x, start_y);
-//      gzerr << "vet " <<  texture/1000.0 << " " <<  start_x << " " << start_y << std::endl;
 
       double u, v;
       if (this->isHorizontal)
@@ -657,15 +614,15 @@ void GpuLaser::CreateMesh()
         u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
         // FIXME v is nan
         v = -tan(gamma)/(2 * tan(phi)) + 0.5;
-//        v = 0.5;
       }
       else
       {
         v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
         u = -tan(delta)/(2 * tan(theta)) + 0.5;
       }
-//      gzerr << "uv " <<  u << " " <<  v << " " <<  std::endl;
-//      gzerr << "ang " <<  phi << " " << delta << " " <<  theta << " " << gamma << std::endl;
+      // gzerr << "uv " <<  u << " " <<  v << " " <<  std::endl;
+      // gzerr << "ang " <<  phi << " " << delta << " " <<  theta << " "
+          << gamma << std::endl;
 
       submesh->AddTexCoord(u, v);
     }
@@ -714,7 +671,7 @@ void GpuLaser::CreateCanvas()
   this->visual->SetMaterial("Gazebo/Green");
   this->visual->SetAmbient(common::Color(0, 1, 0, 1));
   this->visual->SetVisible(true);
-//  this->scene->AddVisual(this->visual);
+  this->scene->AddVisual(this->visual);
 }
 
 //////////////////////////////////////////////////
@@ -823,12 +780,6 @@ void GpuLaser::SetNearClip(double _near)
 void GpuLaser::SetFarClip(double _far)
 {
   this->far = _far;
-  /*for (unsigned int i = 0; i < firstPassViewports.size(); ++i)
-  {
-    if (this->firstPassViewports[i])
-      this->firstPassViewports[i]->setBackgroundColour(
-         Ogre::ColourValue(_far, 0.0, 1.0));
-  }*/
 }
 
 //////////////////////////////////////////////////

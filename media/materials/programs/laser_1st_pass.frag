@@ -12,11 +12,6 @@ void main()
 
   if (l>far)
     l = far;
-    
-//  l = gl_FragCoord.z / gl_FragCoord.w;
-    
-//    float t = sqrt(point.x*point.x + point.y*point.y + point.z*point.z);
-//    gl_FragColor = vec4(l, t, far, 1.0);    
-//    gl_FragColor = vec4(point.x, point.y, point.z, 1.0);
+
   gl_FragColor = vec4(l, retro, 0, 1.0);
 }
