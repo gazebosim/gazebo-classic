@@ -37,7 +37,9 @@ TEST(Connection, IPWhiteList)
   // Set a new IP White List Value
   setenv("GAZEBO_IP_WHITE_LIST", "192.168.1.1", 1);
   connection = new transport::Connection();
-  EXPECT_EQ(connection->GetIPWhiteList(), "127.0.0.1:192.168.1.1");
+  std::string localAddress = connection->GetLocalAddress();
+  EXPECT_EQ(connection->GetIPWhiteList(),
+      localAddress + ":127.0.0.1:192.168.1.1");
   delete connection;
   connection = NULL;
 

@@ -57,10 +57,6 @@ static bool addressIsLoopback(const boost::asio::ip::address_v4 &_addr)
 //////////////////////////////////////////////////
 Connection::Connection()
 {
-  char *whiteListEnv = getenv("GAZEBO_IP_WHITE_LIST");
-  if (whiteListEnv && !std::string(whiteListEnv).empty())
-    this->ipWhiteList = std::string("127.0.0.1:") + whiteListEnv;
-
   if (iomanager == NULL)
     iomanager = new IOManager();
 
@@ -78,6 +74,16 @@ Connection::Connection()
                    boost::lexical_cast<std::string>(this->GetLocalPort());
 
   this->localAddress = this->GetLocalEndpoint().address().to_string();
+
+  // Get and set the IP white list from the GAZEBO_IP_WHITE_LIST environment
+  // variable.
+  char *whiteListEnv = getenv("GAZEBO_IP_WHITE_LIST");
+  if (whiteListEnv && !std::string(whiteListEnv).empty())
+  {
+    // Automatically add in the local addresses. This guarantees that
+    // Gazebo will run properly on the local machine.
+    this->ipWhiteList = this->localAddress + ":127.0.0.1:" + whiteListEnv;
+  }
 }
 
 //////////////////////////////////////////////////
