@@ -84,7 +84,16 @@ namespace gazebo
 
     /// \addtogroup gazebo_transport Transport
     /// \{
-
+    ///
+    /// \remarks
+    ///  Environment Variables:
+    ///   - GAZEBO_IP_WHITE_LIST: Colon separated list of valid IPs. Leave
+    /// this empty to accept connections from all addresses.
+    ///   - GAZEBO_IP: IP address to export. This will override the default
+    /// IP lookup.
+    ///   - GAZEBO_HOSTNAME: Hostame to export. Setting this will override
+    /// both GAZEBO_IP and the default IP lookup.
+    ///
     /// \class Connection Connection.hh transport/transport.hh
     /// \brief Single TCP/IP connection manager
     class Connection : public boost::enable_shared_from_this<Connection>

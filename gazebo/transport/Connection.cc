@@ -57,6 +57,10 @@ static bool addressIsLoopback(const boost::asio::ip::address_v4 &_addr)
 //////////////////////////////////////////////////
 Connection::Connection()
 {
+  char *whiteListEnv = getenv("GAZEBO_IP_WHITE_LIST");
+  if (whiteListEnv && !std::string(whiteListEnv).empty())
+    this->ipWhiteList = std::string("127.0.0.1:") + whiteListEnv;
+
   if (iomanager == NULL)
     iomanager = new IOManager();
 
@@ -190,13 +194,13 @@ void Connection::OnAccept(const boost::system::error_code &e)
   // Call the accept callback if there isn't an error
   if (!e)
   {
-    this->ipWhiteList = "127.0.0.1:192.168.1.68";
     if (!this->ipWhiteList.empty() &&
         this->ipWhiteList.find(this->acceptConn->GetRemoteHostname()) ==
         std::string::npos)
     {
-      gzwarn << "Remote IP[" << this->acceptConn->GetRemoteHostname() << "] "
-        "not in GAZEBO_IP_WHITELIST. Rejecting connection\n";
+      gzlog << "Rejected connection from["
+        << this->acceptConn->GetRemoteHostname() << "], not in white list["
+        << this->ipWhiteList << "]\n";
     }
     else
     {
