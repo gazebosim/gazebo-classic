@@ -77,18 +77,14 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   SpawnBox(box01, math::Vector3(1, 1, 1), box01Pose.pos,
       box01Pose.rot.GetAsEuler());
 
-  // FIXME: Later part of the test calls SetWorldPose, which doesn't seem to
-  // change a static model's visual pose and causes the test to fail!
   SpawnBox(box02, math::Vector3(1, 1, 1), box02Pose.pos,
-      box02Pose.rot.GetAsEuler()/*, true*/);
+      box02Pose.rot.GetAsEuler());
 
   SpawnBox(box03, math::Vector3(1, 1, 1), box03Pose.pos,
       box03Pose.rot.GetAsEuler());
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-
-  // EXPECT_TRUE(world->GetModel(box02)->IsStatic());
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::GpuRaySensorPtr raySensor =
