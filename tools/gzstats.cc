@@ -158,19 +158,20 @@ int main(int argc, char **argv)
     g_plot = true;
   }
 
-  transport::init();
+  if (transport::init())
+  {
+    transport::NodePtr node(new transport::Node());
 
-  transport::NodePtr node(new transport::Node());
+    node->Init(worldName);
 
-  node->Init(worldName);
+    std::string topic = "~/world_stats";
 
-  std::string topic = "~/world_stats";
+    transport::SubscriberPtr sub = node->Subscribe(topic, cb);
+    transport::run();
 
-  transport::SubscriberPtr sub = node->Subscribe(topic, cb);
-  transport::run();
-
-  boost::mutex::scoped_lock lock(mutex);
-  condition.wait(lock);
+    boost::mutex::scoped_lock lock(mutex);
+    condition.wait(lock);
+  }
 
   transport::fini();
 
