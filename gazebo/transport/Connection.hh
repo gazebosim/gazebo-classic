@@ -87,7 +87,7 @@ namespace gazebo
     ///
     /// \remarks
     ///  Environment Variables:
-    ///   - GAZEBO_IP_WHITE_LIST: Colon separated list of valid IPs. Leave
+    ///   - GAZEBO_IP_WHITE_LIST: Comma separated list of valid IPs. Leave
     /// this empty to accept connections from all addresses.
     ///   - GAZEBO_IP: IP address to export. This will override the default
     /// IP lookup.
