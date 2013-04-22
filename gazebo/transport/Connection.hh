@@ -428,6 +428,9 @@ namespace gazebo
 
       /// \brief True if the connection has an error
       private: bool connectError;
+
+      /// \brief Colon separated list of valid IP addresses.
+      private: std::string ipWhiteList;
     };
     /// \}
   }

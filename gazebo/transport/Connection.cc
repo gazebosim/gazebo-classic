@@ -165,9 +165,9 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
 }
 
 //////////////////////////////////////////////////
-void Connection::Listen(unsigned int port, const AcceptCallback &accept_cb)
+void Connection::Listen(unsigned int port, const AcceptCallback &_acceptCB)
 {
-  this->acceptCB = accept_cb;
+  this->acceptCB = _acceptCB;
 
   this->acceptor = new boost::asio::ip::tcp::acceptor(iomanager->GetIO());
   boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port);
@@ -190,9 +190,20 @@ void Connection::OnAccept(const boost::system::error_code &e)
   // Call the accept callback if there isn't an error
   if (!e)
   {
-    // First start a new acceptor
-    this->acceptCB(this->acceptConn);
+    this->ipWhiteList = "127.0.0.1:192.168.1.68";
+    if (!this->ipWhiteList.empty() &&
+        this->ipWhiteList.find(this->acceptConn->GetRemoteHostname()) ==
+        std::string::npos)
+    {
+      gzwarn << "Remote IP[" << this->acceptConn->GetRemoteHostname() << "] "
+        "not in GAZEBO_IP_WHITELIST. Rejecting connection\n";
+    }
+    else
+    {
+      this->acceptCB(this->acceptConn);
+    }
 
+    // First start a new acceptor
     this->acceptConn = ConnectionPtr(new Connection());
 
     this->acceptor->async_accept(*this->acceptConn->socket,

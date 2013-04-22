@@ -380,14 +380,14 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
 }
 
 //////////////////////////////////////////////////
-void ConnectionManager::OnAccept(const ConnectionPtr &newConnection)
+void ConnectionManager::OnAccept(const ConnectionPtr &_newConnection)
 {
-  newConnection->AsyncRead(
-      boost::bind(&ConnectionManager::OnRead, this, newConnection, _1));
+  _newConnection->AsyncRead(
+      boost::bind(&ConnectionManager::OnRead, this, _newConnection, _1));
 
   // Add the connection to the list of connections
   boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
-  this->connections.push_back(newConnection);
+  this->connections.push_back(_newConnection);
 }
 
 //////////////////////////////////////////////////
