@@ -844,3 +844,9 @@ unsigned int Connection::GetId() const
 {
   return this->id;
 }
+
+//////////////////////////////////////////////////
+std::string Connection::GetIPWhiteList() const
+{
+  return this->ipWhiteList;
+}

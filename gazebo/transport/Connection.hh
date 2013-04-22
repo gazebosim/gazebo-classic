@@ -333,6 +333,11 @@ namespace gazebo
       /// \return True if the _ip is a valid.
       public: static bool ValidateIP(const std::string &_ip);
 
+      /// \brief Get the IP white list, from GAZEBO_IP_WHITE_LIST
+      /// environment variable.
+      /// \return GAZEBO_IP_WHITE_LIST
+      public: std::string GetIPWhiteList() const;
+
       /// \brief Callback when a write has occurred.
       /// \param[in] _e Error code
       /// \param[in] _b Buffer of the data that was written.
