@@ -19,9 +19,6 @@
 #include "gazebo/math/Angle.hh"
 #include "test/ServerFixture.hh"
 
-#define LASER_TOL 1e-5
-#define DOUBLE_TOL 1e-6
-
 using namespace gazebo;
 class GPURaySensor_TEST : public ServerFixture
 {
