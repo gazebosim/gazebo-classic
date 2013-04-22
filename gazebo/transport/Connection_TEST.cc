@@ -39,7 +39,7 @@ TEST(Connection, IPWhiteList)
   connection = new transport::Connection();
   std::string localAddress = connection->GetLocalAddress();
   EXPECT_EQ(connection->GetIPWhiteList(),
-      localAddress + ":127.0.0.1:192.168.1.1");
+      localAddress + ",127.0.0.1,192.168.1.1");
   delete connection;
   connection = NULL;
 

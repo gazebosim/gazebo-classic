@@ -82,7 +82,7 @@ Connection::Connection()
   {
     // Automatically add in the local addresses. This guarantees that
     // Gazebo will run properly on the local machine.
-    this->ipWhiteList = this->localAddress + ":127.0.0.1:" + whiteListEnv;
+    this->ipWhiteList = this->localAddress + ",127.0.0.1," + whiteListEnv;
   }
 }
 
