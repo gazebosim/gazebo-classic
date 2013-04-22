@@ -379,8 +379,8 @@ void GpuLaser::RenderImpl()
 
   firstPassTimer.Start();
 
-  // Disable skyx otherwise the range values get clipped at origin
-  // Seems like skyx's mMeshManager is causing this problem
+  // Disable skyx otherwise the range values get clipped.
+  // Seems like skyx's mMeshManager is causing this problem.
   if (this->GetScene()->skyx != NULL)
     this->GetScene()->skyx->setVisible(false);
 
@@ -613,12 +613,12 @@ void GpuLaser::CreateMesh()
       if (this->isHorizontal)
       {
         u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
-        v = phi ? -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
+        v = math::equal(phi, 0.0) ? -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
       }
       else
       {
         v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
-        u = theta ? -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
+        u = math::equal(theta, 0.0) ? -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
       }
       submesh->AddTexCoord(u, v);
     }

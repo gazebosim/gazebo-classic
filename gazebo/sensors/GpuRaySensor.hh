@@ -244,6 +244,9 @@ namespace gazebo
       /// \param[in,out] _conn Connection pointer to disconnect.
       public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn);
 
+      // Documentation inherited
+      public: virtual bool IsActive();
+
       /// \brief Scan SDF elementz.
       protected: sdf::ElementPtr scanElem;
 

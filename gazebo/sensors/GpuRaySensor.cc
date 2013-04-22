@@ -499,13 +499,18 @@ void GpuRaySensor::GetRanges(std::vector<double> &_ranges)
 //////////////////////////////////////////////////
 double GpuRaySensor::GetRange(int _index)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+  if (this->laserMsg.scan().ranges_size() == 0)
+  {
+    gzwarn << "ranges not constructed yet (zero sized)\n";
+    return 0.0;
+  }
   if (_index < 0 || _index > this->laserMsg.scan().ranges_size())
   {
     gzerr << "Invalid range index[" << _index << "]\n";
     return 0.0;
   }
 
-  boost::mutex::scoped_lock lock(this->mutex);
   return this->laserMsg.scan().ranges(_index);
 }
 
@@ -581,4 +586,10 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
     if (this->scanPub)
       this->scanPub->Publish(this->laserMsg);
   }
+}
+
+//////////////////////////////////////////////////
+bool GpuRaySensor::IsActive()
+{
+  return Sensor::IsActive() || this->scanPub->HasConnections();
 }
