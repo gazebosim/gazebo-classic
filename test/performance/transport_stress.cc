@@ -131,22 +131,21 @@ TEST_F(TransportStressTest, ManyNodes)
   #ifdef USE_LOW_MEMORY_TESTS
     // 1k nodes publish 10 times needs about 400Mb of RAM
     unsigned int nodeCount = 1000;
+    unsigned int requiredMB = 400;
 
-    if (! gazebo::test:memory::IsMemoryAvailable(400))
-    {
-       gzdbg << "Skipped test since 400Mb of RAM were not available \n";
-       SUCCEED();
-    }
   #else
     // 2k nodes publish 10 times needs about 1.7Gb of RAM
     unsigned int nodeCount = 2000;
-
-    if (! gazebo::test::memory::IsMemoryAvailable(1700))
-    {
-      gzdbg << "Skipped test since 1.7Gb of RAM were not available \n";
-      SUCCEED();
-    }
+    unsigned int requiredMB = 1700;
   #endif
+
+  // Check if there is enough memory available
+  if (! gazebo::test::memory::IsMemoryAvailable(requiredMB))
+  {
+    gzdbg << "Skipped test since" << requiredMB << 
+              "Mb of RAM were not available \n";
+    SUCCEED();
+  }
 
   // The number of messages to send
   g_localPublishMessageCount = 10;
