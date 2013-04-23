@@ -34,22 +34,22 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   // Create the button to raise terrain
-  QPushButton *raiseButton = new QPushButton("Raise / Lower", this);
+  QPushButton *raiseButton = new QPushButton("Raise", this);
   raiseButton->setStatusTip(tr("Left-mouse press to raise terrain."));
   raiseButton->setCheckable(true);
   raiseButton->setChecked(false);
   connect(raiseButton, SIGNAL(toggled(bool)), this, SLOT(OnRaise(bool)));
 
   // Create the button to lower terrain
-  QPushButton *lowerButton = new QPushButton("Flatten", this);
-  lowerButton->setStatusTip(tr("Left-mouse press to flatten terrain."));
+  QPushButton *lowerButton = new QPushButton("Lower", this);
+  lowerButton->setStatusTip(tr("Left-mouse press to lower terrain."));
   lowerButton->setCheckable(true);
   lowerButton->setChecked(false);
   connect(lowerButton, SIGNAL(toggled(bool)), this, SLOT(OnLower(bool)));
 
   // Create the button to flatten terrain
-  QPushButton *flattenButton = new QPushButton("Smooth", this);
-  flattenButton->setStatusTip(tr("Left-mouse press to smooth terrain."));
+  QPushButton *flattenButton = new QPushButton("Flatten", this);
+  flattenButton->setStatusTip(tr("Left-mouse press to flatten terrain."));
   flattenButton->setCheckable(true);
   flattenButton->setChecked(false);
   connect(flattenButton, SIGNAL(toggled(bool)), this, SLOT(OnFlatten(bool)));

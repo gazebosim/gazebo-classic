@@ -1910,11 +1910,11 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsHelpers(
       // The following line used to be:
       // "      float depth = tex2d(shadowMap, newUV.xy, 1.0, 1.0).x;\n"
       "      float depth = textureGrad(shadowMap, newUV.xy, "
-      "vec2(1.0, 1.0), vec2(1.0, 1.0)).x;\n"
+      " vec2(1.0, 1.0), vec2(1.0, 1.0)).x;\n"
       "      if (depth >= 1.0 || depth >= uv.z)\n"
       "        shadow += 1.0;\n"
       "    }\n"
-      "  shadow /= (SHADOW_SAMPLES);\n"
+      "  shadow /= (SHADOW_SAMPLES); \n"
       "  return shadow;\n"
       "}\n";
   }
@@ -1961,7 +1961,7 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsHelpers(
     _outStream << "\n"
       "  vec4 pssmSplitPoints, float camDepth)\n"
       "{\n"
-      "  float shadow;\n"
+      "  float shadow = 1.0;\n"
       "  // calculate shadow\n";
 
     for (Ogre::uint i = 0; i < numTextures; ++i)
@@ -1969,12 +1969,12 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsHelpers(
       if (!i)
       {
         _outStream << "  if (camDepth <= pssmSplitPoints."
-                   << this->GetChannel(i) << ")\n";
+          << this->GetChannel(i) << ")\n";
       }
-      else if (i < numTextures - 1)
+      else if (i < numTextures-1)
       {
         _outStream << "  else if (camDepth <= pssmSplitPoints."
-                   << this->GetChannel(i) << ")\n";
+          << this->GetChannel(i) << ")\n";
       }
       else
         _outStream << "  else\n";
@@ -1984,12 +1984,12 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsHelpers(
       if (_prof->getReceiveDynamicShadowsDepth())
       {
         _outStream << "    shadow = calcDepthShadow(shadowMap" << i
-                   << ", lsPos" << i << ", invShadowmapSize" << i << ");\n";
+          << ", lsPos" << i << ", invShadowmapSize" << i << ");\n";
       }
       else
       {
         _outStream << "    shadow = calcSimpleShadow(shadowMap" << i
-                   << ", lsPos" << i << ");\n";
+          << ", lsPos" << i << ");\n";
       }
       _outStream << "  }\n";
     }
@@ -2053,7 +2053,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadows(
     }
   }
 
-  _outStream << "  shadow = min(shadow, rtshadow);\n";
+  _outStream << "  shadow = rtshadow;//min(shadow, rtshadow);\n";
 }
 
 /////////////////////////////////////////////////

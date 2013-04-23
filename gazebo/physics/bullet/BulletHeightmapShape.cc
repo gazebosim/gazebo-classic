@@ -79,8 +79,6 @@ void BulletHeightmapShape::Init()
 
   btVector3 min, max;
   this->heightFieldShape->getAabb(btTransform::getIdentity(), min, max);
-  std::cout << "Min[" << min[0] << " " << min[1] << " " << min[2] << "] Max["
-    << max[0] << " " << max[1] << " " << max[2] << "]\n";
 
   BulletLinkPtr bLink = boost::shared_dynamic_cast<BulletLink>(
       bParent->GetParent());
