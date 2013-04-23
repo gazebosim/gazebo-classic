@@ -41,11 +41,19 @@ void OnNewLaserFrame(int *_scanCounter, float *_scanDest,
 /// Adapted from LaserUnitBox test in laser.cc
 TEST_F(GPURaySensorTest, LaserUnitBox)
 {
-  // Test GPU ray sensor with 3 boxes in the world.
+  // Test GPU ray sensors with 3 boxes in the world.
+  // First GPU ray sensor at identity orientation, second at 90 degree roll
   // First place 2 of 3 boxes within range and verify range values.
   // then move all 3 boxes out of range and verify range values
+  Load("worlds/empty_test.world");
 
-  Load("worlds/empty.world");
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run gpu laser test\n";
+    return;
+  }
 
   std::string modelName = "gpu_ray_model";
   std::string raySensorName = "gpu_ray_sensor";
@@ -58,19 +66,33 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   math::Pose testPose(math::Vector3(0, 0, 0.1),
       math::Quaternion(0, 0, 0));
 
+  // Spawn another gpu ray sensor at 90 degree roll
+  std::string modelName2 = "gpu_ray_model_roll";
+  std::string raySensorName2 = "gpu_ray_sensor_roll";
+  math::Pose testPose2(math::Vector3(0, 0, 0.1),
+      math::Quaternion(M_PI/2.0, 0, 0));
+
   SpawnGpuRaySensor(modelName, raySensorName, testPose.pos,
       testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+      rangeResolution, samples);
+
+  SpawnGpuRaySensor(modelName2, raySensorName2, testPose2.pos,
+      testPose2.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
       rangeResolution, samples);
 
   std::string box01 = "box_01";
   std::string box02 = "box_02";
   std::string box03 = "box_03";
 
-  // box in front of ray sensor
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  world->GetPhysicsEngine()->SetGravity(math::Vector3(0, 0, 0));
+
+  // box in front of ray sensor 1 and 2
   math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
-  // box on the right of ray sensor
+  // box on the right of ray sensor 1
   math::Pose box02Pose(math::Vector3(0, -1, 0.5), math::Quaternion(0, 0, 0));
-  // box on the left of the ray sensor but out of range
+  // box on the left of the ray sensor 1 but out of range
   math::Pose box03Pose(math::Vector3(0, maxRange + 1, 0.5),
       math::Quaternion(0, 0, 0));
 
@@ -83,18 +105,22 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   SpawnBox(box03, math::Vector3(1, 1, 1), box03Pose.pos,
       box03Pose.rot.GetAsEuler());
 
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::GpuRaySensorPtr raySensor =
     boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
 
+  sensors::SensorPtr sensor2 = sensors::get_sensor(raySensorName2);
+  sensors::GpuRaySensorPtr raySensor2 =
+    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor2);
+
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(raySensor != NULL);
+  EXPECT_TRUE(raySensor2 != NULL);
 
   raySensor->SetActive(true);
+  raySensor2->SetActive(true);
 
+  // Verify ray sensor 1 range readings
   // listen to new laser frames
   float *scan = new float[raySensor->GetRayCount()
       * raySensor->GetVerticalRayCount() * 3];
@@ -117,11 +143,37 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   double unitBoxSize = 1.0;
   double expectedRangeAtMidPoint = box01Pose.pos.x - unitBoxSize/2;
 
+  // ray sensor 1 should see box01 and box02
   EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
   EXPECT_NEAR(raySensor->GetRange(0), expectedRangeAtMidPoint, LASER_TOL);
 
   // WARNING: for readings of no return, gazebo returns max range rather
   // than +inf. issue #124
+  EXPECT_NEAR(raySensor->GetRange(samples-1), maxRange, LASER_TOL);
+
+  // Verify ray sensor 2 range readings
+  // listen to new laser frames
+  float *scan2 = new float[raySensor2->GetRayCount()
+      * raySensor2->GetVerticalRayCount() * 3];
+  int scanCount2 = 0;
+  event::ConnectionPtr c2 =
+    raySensor->ConnectNewLaserFrame(
+        boost::bind(&::OnNewLaserFrame, &scanCount2, scan2,
+          _1, _2, _3, _4, _5));
+
+  // wait for a few laser scans
+  i = 0;
+  scanCount2 = 0;
+  while (scanCount2 < 10 && i < 300)
+  {
+    common::Time::MSleep(10);
+    i++;
+  }
+  EXPECT_LT(i, 300);
+
+  // Only box01 should be visible to ray sensor 2
+  EXPECT_NEAR(raySensor2->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
+  EXPECT_NEAR(raySensor2->GetRange(0), maxRange, LASER_TOL);
   EXPECT_NEAR(raySensor->GetRange(samples-1), maxRange, LASER_TOL);
 
   // Move all boxes out of range
@@ -134,7 +186,8 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   // wait for a few more laser scans
   i = 0;
   scanCount = 0;
-  while (scanCount < 10 && i < 300)
+  scanCount2 = 0;
+  while ((scanCount < 10 ||scanCount2 < 10) && i < 300)
   {
     common::Time::MSleep(10);
     i++;
@@ -142,12 +195,16 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   EXPECT_LT(i, 300);
 
   for (int i = 0; i < raySensor->GetRayCount(); ++i)
-  {
     EXPECT_NEAR(raySensor->GetRange(i), maxRange, LASER_TOL);
-    break;
-  }
+
+  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+    EXPECT_NEAR(raySensor2->GetRange(i), maxRange, LASER_TOL);
+
+  raySensor->DisconnectNewLaserFrame(c);
+  raySensor2->DisconnectNewLaserFrame(c2);
 
   delete [] scan;
+  delete [] scan2;
 }
 
 int main(int argc, char **argv)

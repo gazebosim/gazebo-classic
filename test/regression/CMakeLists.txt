@@ -30,7 +30,6 @@ set(tests
   factory.cc
   factory_stress.cc
   file_handling.cc
-  gpu_laser.cc
   imu.cc
   laser.cc
   nondefault_world.cc
@@ -58,6 +57,7 @@ gz_build_display_tests(${display_tests})
 
 set(dri_tests
   camera_sensor.cc
+  gpu_laser.cc
   heightmap.cc
   pr2.cc
   projector.cc

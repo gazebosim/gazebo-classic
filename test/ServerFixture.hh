@@ -587,7 +587,8 @@ class ServerFixture : public testing::Test
                  << "    </cylinder>"
                  << "  </geometry>"
                  << "</collision>"
-                 << "  <sensor name ='" << _raySensorName << "' type ='gpu_ray'>"
+                 << "  <sensor name ='" << _raySensorName
+                 << "' type ='gpu_ray'>"
                  << "    <ray>"
                  << "      <scan>"
                  << "        <horizontal>"
