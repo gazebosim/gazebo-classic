@@ -285,7 +285,7 @@ namespace gazebo
       /// \brief True if the sensor is horizontal only.
       protected: bool isHorizontal;
 
-      /// \brief Number of cameras.
+      /// \brief Number of cameras needed to generate the rays.
       protected: unsigned int cameraCount;
 
       /// \brief Event triggered when new laser range data are available.
@@ -324,7 +324,7 @@ namespace gazebo
 
       /// \brief First pass viewports.
       private: Ogre::Viewport *firstPassViewports[3];
-.
+
       /// \brief Second pass viewport
       private: Ogre::Viewport *secondPassViewport;
 
@@ -347,13 +347,14 @@ namespace gazebo
       /// \brief Ogre scenenode where the orthorgraphic camera is attached to.
       private: Ogre::SceneNode *pitchNodeOrtho;
 
-      /// \brief Ogre mesh used for undistortion in the second rendering pass.
+      /// \brief Ogre mesh used to create a canvas for undistorting range values
+      /// in the second rendering pass.
       private: common::Mesh *undistMesh;
 
-      /// \brief Ogre movable object created from the mesh.
+      /// \brief Ogre movable object created from the canvas mesh.
       private: Ogre::MovableObject *object;
 
-      /// \brief Pointer to visual that contains the ogre mesh.
+      /// \brief Pointer to visual that holds the canvas.
       private: VisualPtr visual;
 
       /// \brief Image width.
