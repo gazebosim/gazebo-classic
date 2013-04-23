@@ -584,12 +584,12 @@ void GpuLaser::CreateMesh()
     phi = 0;
 
   unsigned int ptsOnLine = 0;
-  for (unsigned int j = 0; j < this->h2nd; j++)
+  for (unsigned int j = 0; j < this->h2nd; ++j)
   {
     double gamma = 0;
     if (this->h2nd != 1)
       gamma = ((2 * phi / (this->h2nd - 1)) * j) + vAngMin;
-    for (unsigned int i = 0; i < this->w2nd; i++)
+    for (unsigned int i = 0; i < this->w2nd; ++i)
     {
       double thfov = this->textureCount * this->hfov;
       double theta = this->hfov / 2;
