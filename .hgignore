@@ -9,3 +9,4 @@ Ogre.log
 *.user
 *.autosave
 *.kdev4
+nbproject/
