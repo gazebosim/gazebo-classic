@@ -138,6 +138,15 @@ set (CMAKE_LINK_FLAGS_DEBUG " " CACHE INTERNAL "Link flags for debug" FORCE)
 set (CMAKE_LINK_FLAGS_PROFILE " -pg" CACHE INTERNAL "Link flags for profile" FORCE)
 set (CMAKE_LINK_FLAGS_CHECK " --coverage" CACHE INTERNAL "Link flags for static code checking" FORCE)
 
+#####################################
+# Check for low memory version to use in some tests
+if(NOT DEFINED USE_LOW_MEMORY_TESTS)
+  set (USE_LOW_MEMORY_TESTS FALSE)
+endif()
+if (USE_LOW_MEMORY_TESTS)
+  message (STATUS "Use low memory version of tests when available")
+endif()
+
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")
 include (${gazebo_cmake_dir}/SearchForStuff.cmake)
 message (STATUS "----------------------------------------\n")
