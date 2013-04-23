@@ -61,7 +61,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
   this->dartBodyNode = bodyNodeDyn;
 
   // Add dart's body node to dart's skeleton.
-  GetDARTModel()->GetSkeletonDynamics()->addNode(dartBodyNode);
+  GetDARTModel()->GetSkeletonDynamics()->addNode(dartBodyNode, false);
 }
 
 //////////////////////////////////////////////////
@@ -69,6 +69,19 @@ void DARTLink::Init()
 {
   //----------------------------------------------------------------------------
   Link::Init();
+
+  // Mass
+  double mass = this->inertial->GetMass();
+  this->dartBodyNode->setMass(mass);
+
+  // Inertia
+  double Ixx = this->inertial->GetIXX();
+  double Iyy = this->inertial->GetIYY();
+  double Izz = this->inertial->GetIZZ();
+  double Ixy = this->inertial->GetIXY();
+  double Ixz = this->inertial->GetIXZ();
+  double Iyz = this->inertial->GetIYZ();
+  this->dartBodyNode->setLocalInertia(Ixx, Iyy, Izz, Ixy, Ixz, Iyz);
 
   //////////////////////////////////////////////////////////////////////////////
   // TODO: At some point, DART should support collision shape and ...
@@ -138,8 +151,6 @@ void DARTLink::Init()
   }
   else
   {
-      // TODO: Since dart store mass in shape, we must create shape even though
-      //       no visual in sdf!
       Eigen::Vector3d eigenSize(0.1, 0.1, 0.1);
       kinematics::ShapeEllipsoid* shape
           = new kinematics::ShapeEllipsoid(eigenSize);
