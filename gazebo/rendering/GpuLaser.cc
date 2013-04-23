@@ -402,7 +402,11 @@ void GpuLaser::RenderImpl()
   for (unsigned int i = 0; i < this->textureCount; ++i)
   {
     if (this->textureCount > 1)
-      this->RotateYaw(this->cameraYaws[i]);
+    {
+      // Cannot call Camera::RotateYaw because it rotates in world frame,
+      // but we need rotation in camera local frame
+      this->sceneNode->roll(Ogre::Radian(this->cameraYaws[i]));
+    }
 
     this->currentMat = this->matFirstPass;
     this->currentTarget = this->firstPassTargets[i];
@@ -413,7 +417,7 @@ void GpuLaser::RenderImpl()
   }
 
   if (this->textureCount > 1)
-    this->RotateYaw(this->cameraYaws[3]);
+      this->sceneNode->roll(Ogre::Radian(this->cameraYaws[3]));
 
   sceneMgr->removeRenderObjectListener(this);
 
