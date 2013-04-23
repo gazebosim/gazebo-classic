@@ -131,16 +131,16 @@ namespace gazebo
       /// \return (vertical_max_angle + vertical_min_angle) * 0.5
       public: double GetVertHalfAngle() const;
 
-      /// \brief Sets the horizontal half angle
-      /// \param[in] horizontal half angle
+      /// \brief Set the horizontal half angle
+      /// \param[in] _angle horizontal half angle
       public: void SetHorzHalfAngle(double _angle);
 
-      /// \brief Sets the vertical half angle
-      /// \param[in] vertical half angle
+      /// \brief Set the vertical half angle
+      /// \param[in] _angle vertical half angle
       public: void SetVertHalfAngle(double _angle);
 
-      /// \brief Sets sensor horizontal or vertical
-      /// \return True if horizontal, false if not
+      /// \brief Set sensor horizontal or vertical
+      /// \param[in] _horizontal True if horizontal, false if not
       public: void SetIsHorizontal(bool _horizontal);
 
       /// \brief Gets if sensor is horizontal
@@ -155,19 +155,20 @@ namespace gazebo
       /// \return 2 * atan(tan(this->hfov/2) / cos(this->vfov/2))
       public: double GetCosHorzFOV() const;
 
-      /// \brief Sets the Cos Horz FOV
-      /// \param[in] Cos Horz FOV
+      /// \brief Set the Cos Horz FOV
+      /// \param[in] _chfov Cos Horz FOV
       public: void SetCosHorzFOV(double _chfov);
 
       /// \brief Get the vertical field-of-view.
+      /// \return The vertical field of view of the laser sensor.
       public: double GetVertFOV() const;
 
       /// \brief Get Cos Vert field-of-view
       /// \return 2 * atan(tan(this->vfov/2) / cos(this->hfov/2))
       public: double GetCosVertFOV() const;
 
-      /// \brief Sets the Cos Horz FOV
-      /// \param[in] Cos Horz FOV
+      /// \brief Set the Cos Horz FOV
+      /// \param[in] _cvfov Cos Horz FOV
       public: void SetCosVertFOV(double _cvfov);
 
       /// \brief Get near clip
@@ -178,20 +179,20 @@ namespace gazebo
       /// \return far clip distance
       public: double GetFarClip() const;
 
-      /// \brief Sets the near clip distance
-      /// \param[in] near clip distance
+      /// \brief Set the near clip distance
+      /// \param[in] _near near clip distance
       public: void SetNearClip(double _near);
 
-      /// \brief Sets the far clip distance
-      /// \param[in] far clip distance
+      /// \brief Set the far clip distance
+      /// \param[in] _far far clip distance
       public: void SetFarClip(double _far);
 
-      /// \brief Sets the horizontal fov
-      /// \param[in] horizontal fov
+      /// \brief Set the horizontal fov
+      /// \param[in] _hfov horizontal fov
       public: void SetHorzFOV(double _hfov);
 
-      /// \brief Sets the vertical fov
-      /// \param[in] vertical fov
+      /// \brief Set the vertical fov
+      /// \param[in] _vfov vertical fov
       public: void SetVertFOV(double _vfov);
 
       /// \brief Get the number of cameras required
@@ -287,43 +288,88 @@ namespace gazebo
       /// \brief Number of cameras.
       protected: unsigned int cameraCount;
 
-      private: event::EventT<void(const float *, unsigned int, unsigned int,
-                   unsigned int, const std::string &)> newLaserFrame;
+      /// \brief Event triggered when new laser range data are available.
+      /// \param[in] _frame New frame containing raw laser data.
+      /// \param[in] _width Width of frame.
+      /// \param[in] _height Height of frame.
+      /// \param[in] _depth Depth of frame.
+      /// \param[in] _format Format of frame.
+      private: event::EventT<void(const float *_frame, unsigned int _width,
+                   unsigned int _height, unsigned int _depth,
+                   const std::string &_format)> newLaserFrame;
 
+      /// \brief Raw buffer of laser data.
       private: float *laserBuffer;
+
+      /// \brief Outgoing laser data, used by newLaserFrame event.
       private: float *laserScan;
+
+      /// \brief Pointer to Ogre material for the first rendering pass.
       private: Ogre::Material *matFirstPass;
+
+      /// \brief Pointer to Ogre material for the sencod rendering pass.
       private: Ogre::Material *matSecondPass;
 
+      /// \brief An array of first pass textures.
       private: Ogre::Texture *firstPassTextures[3];
+
+      /// \brief Second pass texture.
       private: Ogre::Texture *secondPassTexture;
+
+      /// \brief First pass render targets.
       private: Ogre::RenderTarget *firstPassTargets[3];
+
+      /// \brief Second pass render target.
       private: Ogre::RenderTarget *secondPassTarget;
+
+      /// \brief First pass viewports.
       private: Ogre::Viewport *firstPassViewports[3];
+.
+      /// \brief Second pass viewport
       private: Ogre::Viewport *secondPassViewport;
 
+      /// \brief Number of first pass textures.
       private: unsigned int textureCount;
+
+      /// \brief A list of camera angles for first pass rendering.
       private: double cameraYaws[4];
 
+      /// \brief Temporary pointer to the current render target.
       private: Ogre::RenderTarget *currentTarget;
+
+      /// \brief Temporary pointer to the current material.
       private: Ogre::Material *currentMat;
 
+      /// \brief Ogre orthorgraphic camera used in the second pass for
+      /// undistortion.
       private: Ogre::Camera *orthoCam;
 
+      /// \brief Ogre scenenode where the orthorgraphic camera is attached to.
       private: Ogre::SceneNode *pitchNodeOrtho;
 
+      /// \brief Ogre mesh used for undistortion in the second rendering pass.
       private: common::Mesh *undistMesh;
 
+      /// \brief Ogre movable object created from the mesh.
       private: Ogre::MovableObject *object;
 
+      /// \brief Pointer to visual that contains the ogre mesh.
       private: VisualPtr visual;
 
+      /// \brief Image width.
       private: unsigned int w2nd;
+
+      /// \brief Image height.
       private: unsigned int h2nd;
 
+      /// \brief Time taken to complete the two rendering passes.
       private: double lastRenderDuration;
 
+      /// \brief List of texture unit indices used during the second
+      /// rendering pass.
       private: std::vector<int> texIdx;
+
+      /// Number of second pass texture units created.
       private: static int texCount;
     };
     /// \}

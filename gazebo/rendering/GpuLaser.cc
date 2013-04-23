@@ -63,6 +63,8 @@ GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
 //////////////////////////////////////////////////
 GpuLaser::~GpuLaser()
 {
+  delete this->laserBuffer;
+  delete this->laserScan;
 }
 
 //////////////////////////////////////////////////
@@ -163,8 +165,13 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
   for (unsigned int i = 0; i < this->textureCount; ++i)
   {
     unsigned int texIndex = texCount++;
-    texUnit =
-      this->matSecondPass->getTechnique(0)->getPass(0)->createTextureUnitState(
+    Ogre::Technique *technique = this->matSecondPass->getTechnique(0);
+    GZ_ASSERT(technique, "GpuLaser material script error: technique not found");
+
+    Ogre::Pass *pass = technique->getPass(0);
+    GZ_ASSERT(pass, "GpuLaser material script error: pass not found");
+
+    texUnit = pass->createTextureUnitState(
           this->firstPassTextures[i]->getName(), texIndex);
 
     this->texIdx.push_back(texIndex);
@@ -184,7 +191,7 @@ void GpuLaser::PostRender()
 //  double blitDur = 0.0;
 //  double postRenderDur = 0.0;
 
-  for (unsigned int i = 0; i < this->textureCount; i++)
+  for (unsigned int i = 0; i < this->textureCount; ++i)
   {
     this->firstPassTargets[i]->swapBuffers();
   }
@@ -338,7 +345,7 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
     _rend->setCustomParameter(1, Ogre::Vector4(0, 0, 0, 0));
   }
 
-  Ogre::Pass *my_pass = this->currentMat->getBestTechnique()->getPass(0);
+  Ogre::Pass *pass = this->currentMat->getBestTechnique()->getPass(0);
   Ogre::RenderSystem *renderSys =
                   this->scene->GetManager()->getDestinationRenderSystem();
 
@@ -348,28 +355,28 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
 
   renderSys->_setViewport(vp);
   autoParamDataSource.setCurrentRenderable(_rend);
-  autoParamDataSource.setCurrentPass(my_pass);
+  autoParamDataSource.setCurrentPass(pass);
   autoParamDataSource.setCurrentViewport(vp);
   autoParamDataSource.setCurrentRenderTarget(this->currentTarget);
   autoParamDataSource.setCurrentSceneManager(this->scene->GetManager());
   autoParamDataSource.setCurrentCamera(this->camera, true);
 
-  my_pass->_updateAutoParams(&autoParamDataSource,
-            Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
-  my_pass->getFragmentProgramParameters()->setNamedConstant("retro", retro[0]);
+  pass->_updateAutoParams(&autoParamDataSource,
+      Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
+  pass->getFragmentProgramParameters()->setNamedConstant("retro", retro[0]);
   renderSys->bindGpuProgram(
-    my_pass->getVertexProgram()->_getBindingDelegate());
+      pass->getVertexProgram()->_getBindingDelegate());
 
   renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
-    my_pass->getVertexProgramParameters(),
-    Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
+      pass->getVertexProgramParameters(),
+      Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
 
   renderSys->bindGpuProgram(
-  my_pass->getFragmentProgram()->_getBindingDelegate());
+      pass->getFragmentProgram()->_getBindingDelegate());
 
   renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM,
-  my_pass->getFragmentProgramParameters(),
-    Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
+      pass->getFragmentProgramParameters(),
+      Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
 }
 
 //////////////////////////////////////////////////
