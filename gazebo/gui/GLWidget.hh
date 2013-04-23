@@ -171,6 +171,10 @@ namespace gazebo
       private: std::string state;
 
       private: std::list<std::pair<std::string, math::Pose> > moveHistory;
+
+      /// \brief Flag that is set to true when GLWidget has responded to
+      ///  OnCreateScene
+      private: bool sceneCreated;
     };
   }
 }

@@ -27,6 +27,7 @@
 #include "gazebo/rendering/Rendering.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/WindowManager.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/OrbitViewController.hh"
@@ -51,6 +52,7 @@ GLWidget::GLWidget(QWidget *_parent)
 {
   this->setObjectName("GLWidget");
   this->state = "select";
+  this->sceneCreated = false;
 
   this->setFocusPolicy(Qt::StrongFocus);
 
@@ -162,14 +164,14 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 void GLWidget::showEvent(QShowEvent *_event)
 {
   QApplication::flush();
-  this->windowId = rendering::WindowManager::Instance()->CreateWindow(
-      this->GetOgreHandle(), this->width(), this->height());
+  this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
+    CreateWindow(this->GetOgreHandle(), this->width(), this->height());
 
   QWidget::showEvent(_event);
 
   if (this->userCamera)
-    rendering::WindowManager::Instance()->SetCamera(this->windowId,
-                                                    this->userCamera);
+    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+        this->windowId, this->userCamera);
   this->setFocus();
 }
 
@@ -185,13 +187,19 @@ void GLWidget::moveEvent(QMoveEvent *_e)
 
   if (_e->isAccepted() && this->windowId >= 0)
   {
-    rendering::WindowManager::Instance()->Moved(this->windowId);
+    rendering::RenderEngine::Instance()->GetWindowManager()->Moved(
+        this->windowId);
   }
 }
 
 /////////////////////////////////////////////////
 void GLWidget::paintEvent(QPaintEvent *_e)
 {
+  // Timing may cause GLWidget to miss the OnCreateScene event. So, we check
+  // here to make sure it's handled.
+  if (!this->sceneCreated && rendering::get_scene())
+    this->OnCreateScene(rendering::get_scene()->GetName());
+
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->GetInitialized())
   {
@@ -213,8 +221,8 @@ void GLWidget::resizeEvent(QResizeEvent *_e)
 
   if (this->windowId >= 0)
   {
-    rendering::WindowManager::Instance()->Resize(this->windowId,
-        _e->size().width(), _e->size().height());
+    rendering::RenderEngine::Instance()->GetWindowManager()->Resize(
+        this->windowId, _e->size().width(), _e->size().height());
     this->userCamera->Resize(_e->size().width(), _e->size().height());
   }
 }
@@ -717,8 +725,8 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
 
   if (this->windowId >= 0)
   {
-    rendering::WindowManager::Instance()->SetCamera(this->windowId,
-                                                    this->userCamera);
+    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+        this->windowId, this->userCamera);
   }
 }
 
@@ -788,6 +796,7 @@ void GLWidget::OnCreateScene(const std::string &_name)
   this->SetMouseMoveVisual(rendering::VisualPtr());
 
   this->ViewScene(rendering::get_scene(_name));
+  this->sceneCreated = true;
 }
 
 /////////////////////////////////////////////////

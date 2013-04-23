@@ -338,7 +338,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   physics::CollisionPtr col = contactModel->GetLink()->GetCollision(ColInd);
   ASSERT_TRUE(col);
 
-  double tol = 1e-1;
+  double tol = 2e-1;
   // loop through contact collision pairs
   for (int i = 0; i < contacts.contact_size(); ++i)
   {
