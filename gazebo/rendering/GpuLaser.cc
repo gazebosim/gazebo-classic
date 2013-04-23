@@ -64,8 +64,8 @@ GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
 //////////////////////////////////////////////////
 GpuLaser::~GpuLaser()
 {
-  delete this->laserBuffer;
-  delete this->laserScan;
+  delete [] this->laserBuffer;
+  delete [] this->laserScan;
 }
 
 //////////////////////////////////////////////////
