@@ -128,7 +128,16 @@ int main(int argc, char** argv)
       if (sdf::Converter::Convert(&xmlDoc, SDF::version, true))
       {
         success = true;
-        xmlDoc.SaveFile(params[1]);
+
+        // Create an XML printer to control formatting
+        TiXmlPrinter printer;
+        printer.SetIndent("  ");
+        xmlDoc.Accept(&printer);
+
+        // Output the XML
+        std::ofstream stream(params[1].c_str(), std::ios_base::out);
+        stream << printer.Str();
+        stream.close();
       }
     }
     else

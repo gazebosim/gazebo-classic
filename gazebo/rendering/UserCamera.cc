@@ -59,6 +59,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   this->viewController = NULL;
 
   this->selectionBuffer = NULL;
+
   // Set default UserCamera render rate to 30Hz
   this->SetRenderRate(30.0);
 }
@@ -363,13 +364,15 @@ void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
 //////////////////////////////////////////////////
 float UserCamera::GetAvgFPS() const
 {
-  return WindowManager::Instance()->GetAvgFPS(this->windowId);
+  return RenderEngine::Instance()->GetWindowManager()->GetAvgFPS(
+      this->windowId);
 }
 
 //////////////////////////////////////////////////
 float UserCamera::GetTriangleCount() const
 {
-  return WindowManager::Instance()->GetTriangleCount(this->windowId);
+  return RenderEngine::Instance()->GetWindowManager()->GetTriangleCount(
+      this->windowId);
 }
 
 //////////////////////////////////////////////////
@@ -506,7 +509,10 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   Camera::SetRenderTarget(_target);
 
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
-  this->gui->Init(this->renderTarget);
+
+  if (this->gui)
+    this->gui->Init(this->renderTarget);
+
   this->initialized = true;
 
   this->selectionBuffer = new SelectionBuffer(this->name,

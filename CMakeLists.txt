@@ -10,7 +10,7 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 set (GAZEBO_VERSION_NAME "lithium")
 set (GAZEBO_MAJOR_VERSION 1)
-set (GAZEBO_MINOR_VERSION 6)
+set (GAZEBO_MINOR_VERSION 8)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
@@ -206,7 +206,7 @@ set (CMAKE_CXX_FLAGS_CHECK "${CMAKE_C_FLAGS_CHECK} -fno-elide-constructors -fno-
 MESSAGE(STATUS "Checking gazebo build type")
 # Set the default build type
 if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING 
+    set (CMAKE_BUILD_TYPE "Release" CACHE STRING 
         "Choose the type of build, options are: Debug Release RelWithDebInfo Profile Check" FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 # TODO: still convert to uppercase to keep backwards compatibility with 
@@ -305,6 +305,7 @@ else (build_errors)
  
 
   if (BUILD_GAZEBO)
+    set(TEST_TYPE "UNIT")
     add_subdirectory(gazebo)
     add_subdirectory(sdf)
     add_subdirectory(media)

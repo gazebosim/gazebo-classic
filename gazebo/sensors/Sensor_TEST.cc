@@ -179,6 +179,8 @@ TEST_F(Sensor_TEST, ResetWorldStressTest)
     gzdbg << "counted " << g_hokuyoMsgCount << " hokuyo messages\n";
   }
 
+  EXPECT_GT(g_hokuyoMsgCount, 19u);
+
   // Send reset world message
   transport::PublisherPtr worldControlPub =
     node->Advertise<msgs::WorldControl>("~/world_control");

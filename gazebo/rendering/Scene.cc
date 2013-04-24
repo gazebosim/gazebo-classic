@@ -42,7 +42,6 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/DepthCamera.hh"
-// #include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/Grid.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/RFIDVisual.hh"
@@ -2266,14 +2265,13 @@ void Scene::SetSky()
     }
   }
 
-  /*vclouds->getLightningManager()->setEnabled(preset.vcLightnings);
-  vclouds->getLightningManager()->setAverageLightningApparitionTime(
-      preset.vcLightningsAT);
-  vclouds->getLightningManager()->setLightningColor(
-      preset.vcLightningsColor);
-  vclouds->getLightningManager()->setLightningTimeMultiplier(
-      preset.vcLightningsTM);
-      */
+  // vclouds->getLightningManager()->setEnabled(preset.vcLightnings);
+  // vclouds->getLightningManager()->setAverageLightningApparitionTime(
+  //     preset.vcLightningsAT);
+  // vclouds->getLightningManager()->setLightningColor(
+  //     preset.vcLightningsColor);
+  // vclouds->getLightningManager()->setLightningTimeMultiplier(
+  //    preset.vcLightningsTM);
 
   Ogre::Root::getSingletonPtr()->addFrameListener(this->skyx);
 

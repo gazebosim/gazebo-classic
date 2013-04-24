@@ -1,11 +1,10 @@
 <?xml version="1.0" ?>
-<sdf version="1.3">
+<sdf version="1.4">
   <world name="default">
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
     </include>
-
     <model name="heightmap">
       <static>true</static>
       <link name="link">
@@ -18,7 +17,6 @@
             </heightmap>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
             <heightmap>
@@ -51,7 +49,6 @@
             </heightmap>
           </geometry>
         </visual>
-
       </link>
     </model>
   </world>

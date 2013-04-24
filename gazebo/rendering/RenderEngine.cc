@@ -64,7 +64,6 @@
 using namespace gazebo;
 using namespace rendering;
 
-
 //////////////////////////////////////////////////
 RenderEngine::RenderEngine()
 {
@@ -76,8 +75,8 @@ RenderEngine::RenderEngine()
   this->initialized = false;
 
   this->renderPathType = NONE;
+  this->windowManager.reset(new WindowManager);
 }
-
 
 //////////////////////////////////////////////////
 RenderEngine::~RenderEngine()
@@ -94,53 +93,50 @@ void RenderEngine::Load()
     return;
   }
 
-  this->connections.push_back(event::Events::ConnectPreRender(
-        boost::bind(&RenderEngine::PreRender, this)));
-  this->connections.push_back(event::Events::ConnectRender(
-        boost::bind(&RenderEngine::Render, this)));
-  this->connections.push_back(event::Events::ConnectPostRender(
-        boost::bind(&RenderEngine::PostRender, this)));
-
-  // Create a new log manager and prevent output from going to stdout
-  this->logManager = new Ogre::LogManager();
-
-  std::string logPath = common::SystemPaths::Instance()->GetLogPath();
-  logPath += "/ogre.log";
-
-  this->logManager->createLog(logPath, true, false, false);
-
-  if (this->root)
+  if (!this->root)
   {
-    gzerr << "Attempting to load, but root already exist\n";
-    return;
+    this->connections.push_back(event::Events::ConnectPreRender(
+          boost::bind(&RenderEngine::PreRender, this)));
+    this->connections.push_back(event::Events::ConnectRender(
+          boost::bind(&RenderEngine::Render, this)));
+    this->connections.push_back(event::Events::ConnectPostRender(
+          boost::bind(&RenderEngine::PostRender, this)));
+
+    // Create a new log manager and prevent output from going to stdout
+    this->logManager = new Ogre::LogManager();
+
+    std::string logPath = common::SystemPaths::Instance()->GetLogPath();
+    logPath += "/ogre.log";
+
+    this->logManager->createLog(logPath, true, false, false);
+
+    // Make the root
+    try
+    {
+      this->root = new Ogre::Root();
+    }
+    catch(Ogre::Exception &e)
+    {
+      gzthrow("Unable to create an Ogre rendering environment, no Root ");
+    }
+
+    // Load all the plugins
+    this->LoadPlugins();
+
+    // Setup the rendering system, and create the context
+    this->SetupRenderSystem();
+
+    // Initialize the root node, and don't create a window
+    this->root->initialise(false);
+
+    // Setup the available resources
+    this->SetupResources();
   }
-
-  // Make the root
-  try
-  {
-    this->root = new Ogre::Root();
-  }
-  catch(Ogre::Exception &e)
-  {
-    gzthrow("Unable to create an Ogre rendering environment, no Root ");
-  }
-
-  // Load all the plugins
-  this->LoadPlugins();
-
-  // Setup the rendering system, and create the context
-  this->SetupRenderSystem();
-
-  // Initialize the root node, and don't create a window
-  this->root->initialise(false);
-
-  // Setup the available resources
-  this->SetupResources();
 
   std::stringstream stream;
   stream << (int32_t)this->dummyWindowId;
 
-  WindowManager::Instance()->CreateWindow(stream.str(), 1, 1);
+  this->windowManager->CreateWindow(stream.str(), 1, 1);
   this->CheckSystemCapabilities();
 }
 
@@ -197,7 +193,7 @@ ScenePtr RenderEngine::GetScene(const std::string &_name)
   std::vector<ScenePtr>::iterator iter;
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
-    if ((*iter)->GetName() == _name)
+    if (_name.empty() || (*iter)->GetName() == _name)
       return (*iter);
 
   return ScenePtr();
@@ -281,12 +277,15 @@ void RenderEngine::Fini()
   if (!this->initialized)
     return;
 
-  this->node->Fini();
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
+
   this->connections.clear();
 
   // TODO: this was causing a segfault on shutdown
   // Close all the windows first;
-  WindowManager::Instance()->Fini();
+  this->windowManager->Fini();
 
   RTShaderSystem::Instance()->Fini();
 
@@ -722,4 +721,10 @@ void RenderEngine::CheckSystemCapabilities()
   // Disable deferred rendering for now. Needs more work.
   // if (hasRenderToVertexBuffer && multiRenderTargetCount >= 8)
   //  this->renderPathType = RenderEngine::DEFERRED;
+}
+
+/////////////////////////////////////////////////
+WindowManagerPtr RenderEngine::GetWindowManager() const
+{
+  return this->windowManager;
 }

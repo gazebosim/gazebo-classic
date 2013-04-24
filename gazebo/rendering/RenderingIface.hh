@@ -38,7 +38,7 @@ namespace gazebo
 
     /// \brief get pointer to rendering::Scene by name.
     /// \param[in] _name Name of the scene to retreive.
-    rendering::ScenePtr get_scene(const std::string &_name);
+    rendering::ScenePtr get_scene(const std::string &_name = "");
 
     /// \brief create rendering::Scene by name.
     /// \param[in] _name Name of the scene to create.

@@ -440,14 +440,22 @@ void BuildingMaker::Stop()
 /////////////////////////////////////////////////
 void BuildingMaker::Reset()
 {
+  if (!gui::get_active_camera() ||
+      !gui::get_active_camera()->GetScene())
+    return;
+
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+
   if (this->modelVisual)
     scene->RemoveVisual(this->modelVisual);
+
   this->saved = false;
   this->saveLocation = QDir::homePath().toStdString();
   this->modelName = this->buildingDefaultName;
+
   this->modelVisual.reset(new rendering::Visual(this->modelName,
       scene->GetWorldVisual()));
+
   this->modelVisual->Load();
   this->modelPose = math::Pose::Zero;
   this->modelVisual->SetPose(this->modelPose);
