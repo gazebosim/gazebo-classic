@@ -31,7 +31,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 DARTHingeJoint::DARTHingeJoint(BasePtr _parent)
-    : HingeJoint<DARTJoint>(_parent)
+  : HingeJoint<DARTJoint>(_parent)
 {
 
 }
@@ -70,16 +70,35 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
   // Set Pose: offset from child link origin in child link frame.
   if (_sdf->GetElement("parent")->GetValueString("link_name") == std::string("world"))
   {
-    math::Pose tmpPose = (this->childLink->GetWorldPose());
-    poseParentLinkToJoint = /*-(this->parentLink->GetWorldPose())*/
-        /*+ */tmpPose
-        * poseChildLinkToJoint;
+    Eigen::Matrix4d matChildLink;
+    Eigen::Matrix4d matChildLinkToJoint;
+    Eigen::Matrix4d matParentLinkToJoint;
+
+    DARTUtils::ConvPoseToMat(&matChildLink, this->childLink->GetWorldPose());
+    DARTUtils::ConvPoseToMat(&matChildLinkToJoint, this->poseChildLinkToJoint);
+
+    matParentLinkToJoint = matChildLink * matChildLinkToJoint;
+
+    DARTUtils::ConvMatToPose(&poseParentLinkToJoint, matParentLinkToJoint);
   }
   else
   {
-    poseParentLinkToJoint = (this->parentLink->GetWorldPose().GetInverse())
-        * (this->childLink->GetWorldPose())
-        * poseChildLinkToJoint;
+    Eigen::Matrix4d matParentLink;
+    Eigen::Matrix4d matParentLinkInv;
+    Eigen::Matrix4d matChildLink;
+    Eigen::Matrix4d matChildLinkToJoint;
+    Eigen::Matrix4d matParentLinkToJoint;
+
+    DARTUtils::ConvPoseToMat(&matParentLink, this->parentLink->GetWorldPose());
+    matParentLinkInv = matParentLink.inverse();
+    DARTUtils::ConvPoseToMat(&matChildLink, this->childLink->GetWorldPose());
+    DARTUtils::ConvPoseToMat(&matChildLinkToJoint, this->poseChildLinkToJoint);
+
+    matParentLinkToJoint = matParentLinkInv
+                           * matChildLink
+                           * matChildLinkToJoint;
+
+    DARTUtils::ConvMatToPose(&poseParentLinkToJoint, matParentLinkToJoint);
   }
 
   //----------------------------------------------------------------------------
@@ -96,7 +115,7 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
   // Add the transform to the skeletone in the model.
   // add to model because it's variable
   DARTModelPtr dartModel
-          = boost::shared_dynamic_cast<DARTModel>(this->model);
+      = boost::shared_dynamic_cast<DARTModel>(this->model);
   dartModel->GetSkeletonDynamics()->addTransform(rotHinge);
 
   //----------------------------------------------------------------------------
@@ -160,9 +179,21 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
 void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
 {
   // For now the _axis is represented in global frame.
-  math::Pose childWorldPose = this->childLink->GetWorldPose();
-  math::Pose jointFrameInWorld = childWorldPose * this->poseChildLinkToJoint;
-  math::Vector3 axisInJointFrame = (jointFrameInWorld.rot.GetInverse()) * _axis;
+  //math::Pose childWorldPose = this->childLink->GetWorldPose();
+  //math::Pose jointFrameInWorld = childWorldPose * this->poseChildLinkToJoint;
+  //math::Vector3 axisInJointFrame = (jointFrameInWorld.rot.GetInverse()) * _axis;
+  math::Vector3 axisInJointFrame;
+  //  if (this->sdf->GetElement("parent")->GetValueString("link_name")
+  //      == std::string("world"))
+  //  {
+  //    axisInJointFrame = _axis;
+  //    gzwarn << "Parent link is world.\n";
+  //  }
+  //  else
+  //  {
+  axisInJointFrame = this->poseParentLinkToJoint.rot.GetInverse() * _axis;
+  //  }
+
   rotHinge->setAxis(Eigen::Vector3d(axisInJointFrame.x,
                                     axisInJointFrame.y,
                                     axisInJointFrame.z));
@@ -174,9 +205,9 @@ void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
 {
-//   this->damping_coefficient = _damping;
-//   dJointSetDamping(this->jointId, this->damping_coefficient);
-  gzerr << "DARTHingeJoint::SetDamping(...): Not implemented...\n";
+  //   this->damping_coefficient = _damping;
+  //   dJointSetDamping(this->jointId, this->damping_coefficient);
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -189,28 +220,28 @@ void DARTHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
 //////////////////////////////////////////////////
 math::Angle DARTHingeJoint::GetAngleImpl(int /*index*/) const
 {
-   math::Angle result;
+  math::Angle result;
 
-   // TODO: need test
-   assert(this->dartJoint);
-   assert(this->dartJoint->getNumDofs() == 1);
+  // TODO: need test
+  assert(this->dartJoint);
+  assert(this->dartJoint->getNumDofs() == 1);
 
-   // Hinge joint has only one dof.
-   kinematics::Dof* dof = this->dartJoint->getDof(0);
+  // Hinge joint has only one dof.
+  kinematics::Dof* dof = this->dartJoint->getDof(0);
 
-   assert(dof);
+  assert(dof);
 
-   result.SetFromRadian(dof->getValue());
+  result.SetFromRadian(dof->getValue());
 
-   return result;
+  return result;
 }
 
 //////////////////////////////////////////////////
 double DARTHingeJoint::GetVelocity(int /*index*/) const
 {
-//   double result = dJointGetHingeAngleRate(this->jointId);
-// 
-//   return result;
+  //   double result = dJointGetHingeAngleRate(this->jointId);
+  //
+  //   return result;
   gzerr << "DARTHingeJoint::GetVelocity(...): Not implemented...\n";
   return 0;
 }
@@ -218,21 +249,21 @@ double DARTHingeJoint::GetVelocity(int /*index*/) const
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetVelocity(int /*index*/, double /*_vel*/)
 {
-//   this->SetParam(dParamVel, _angle);
+  //   this->SetParam(dParamVel, _angle);
   gzerr << "DARTHingeJoint::SetVelocity(...): Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetMaxForce(int /*index*/, double /*_force*/)
 {
-//   return this->SetParam(dParamFMax, _t);
+  //   return this->SetParam(dParamFMax, _t);
   gzerr << "DARTHingeJoint::SetMaxForce(...): Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
 double DARTHingeJoint::GetMaxForce(int /*index*/)
 {
-//   return this->GetParam(dParamFMax);
+  //   return this->GetParam(dParamFMax);
   gzerr << "DARTHingeJoint::GetMaxForce(...): Not implemented...\n";
   return 0.0;
 }
@@ -240,11 +271,11 @@ double DARTHingeJoint::GetMaxForce(int /*index*/)
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetForce(int /*index*/, double /*_torque*/)
 {
-//   if (this->childLink)
-//     this->childLink->SetEnabled(true);
-//   if (this->parentLink)
-//     this->parentLink->SetEnabled(true);
-//   dJointAddHingeTorque(this->jointId, _torque);
+  //   if (this->childLink)
+  //     this->childLink->SetEnabled(true);
+  //   if (this->parentLink)
+  //     this->parentLink->SetEnabled(true);
+  //   dJointAddHingeTorque(this->jointId, _torque);
   gzerr << "DARTHingeJoint::SetForce(...): Not implemented...\n";
 }
 
