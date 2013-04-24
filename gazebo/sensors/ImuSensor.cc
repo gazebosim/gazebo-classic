@@ -43,6 +43,10 @@ GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor)
 ImuSensor::ImuSensor()
   : Sensor(sensors::OTHER)
 {
+  this->dataIndex = 0;
+  this->dataDirty = false;
+  this->incomingLinkData[0].reset();
+  this->incomingLinkData[1].reset();
 }
 
 //////////////////////////////////////////////////
@@ -131,6 +135,12 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
       gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
         std::endl;
   }
+
+  this->parentEntity->SetPublishData(true);
+
+  std::string topic = "~/" + this->parentEntity->GetScopedName();
+  this->linkDataSub = this->node->Subscribe(topic,
+    &ImuSensor::OnLinkData, this);
 }
 
 //////////////////////////////////////////////////
@@ -160,6 +170,7 @@ void ImuSensor::Init()
 //////////////////////////////////////////////////
 void ImuSensor::Fini()
 {
+  this->parentEntity->SetPublishData(false);
 }
 
 //////////////////////////////////////////////////
@@ -167,6 +178,15 @@ msgs::IMU ImuSensor::GetImuMessage() const
 {
   boost::mutex::scoped_lock lock(this->mutex);
   return this->imuMsg;
+}
+
+//////////////////////////////////////////////////
+void ImuSensor::OnLinkData(ConstLinkDataPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+  // Store the contacts message for processing in UpdateImpl
+  this->incomingLinkData[this->dataIndex] = _msg;
+  this->dataDirty = true;
 }
 
 //////////////////////////////////////////////////
@@ -199,46 +219,69 @@ void ImuSensor::SetReferencePose()
 //////////////////////////////////////////////////
 void ImuSensor::UpdateImpl(bool /*_force*/)
 {
-  double dt= (this->world->GetSimTime() - this->lastMeasurementTime).Double();
+  msgs::LinkData msg;
+  int readIndex = 0;
+
   {
     boost::mutex::scoped_lock lock(this->mutex);
 
-    this->lastMeasurementTime = this->world->GetSimTime();
+    // Don't do anything if there is no new data to process.
+    if (!this->dataDirty)
+      return;
+
+    readIndex = this->dataIndex;
+    this->dataIndex ^= 1;
+    this->dataDirty = false;
+  }
+
+  // toggle the index
+  msg.CopyFrom(*this->incomingLinkData[readIndex].get());
+
+  common::Time timestamp = msgs::Convert(msg.time());
+
+  double dt = (timestamp - this->lastMeasurementTime).Double();
+
+  if (dt > 0.0)
+  {
+    boost::mutex::scoped_lock lock(this->mutex);
 
     this->imuMsg.set_entity_name(this->parentName);
 
-    // Set the time stamp
-    msgs::Set(this->imuMsg.mutable_stamp(), this->world->GetSimTime());
+    this->gravity = this->world->GetPhysicsEngine()->GetGravity();
+
+    msgs::Set(this->imuMsg.mutable_stamp(), timestamp);
 
     math::Pose parentEntityPose = this->parentEntity->GetWorldPose();
     math::Pose imuPose = this->pose + parentEntityPose;
 
-    // Set the IMU orientation
-    msgs::Set(this->imuMsg.mutable_orientation(),
-              imuPose.rot * this->referencePose.rot.GetInverse());
-
     // Set the IMU angular velocity
+    math::Vector3 imuWorldAngularVel
+        = msgs::Convert(msg.angular_velocity());
+
     msgs::Set(this->imuMsg.mutable_angular_velocity(),
               imuPose.rot.GetInverse().RotateVector(
-              this->parentEntity->GetWorldAngularVel()));
-
-    // get linear velocity in world frame
-    math::Vector3 imuWorldLinearVel =
-      this->parentEntity->GetWorldLinearVel(this->pose.pos);
+              imuWorldAngularVel));
 
     // Compute and set the IMU linear acceleration
-    if (dt > 0.0)
-    {
-      this->linearAcc = imuPose.rot.GetInverse().RotateVector(
-        (imuWorldLinearVel - this->lastLinearVel) / dt);
-      this->lastLinearVel = imuWorldLinearVel;
-    }
+    math::Vector3 imuWorldLinearVel
+        = msgs::Convert(msg.linear_velocity());
+    // Get the correct vel for imu's that are at an offset from parent link
+    imuWorldLinearVel +=
+        imuWorldAngularVel.Cross(parentEntityPose.pos - imuPose.pos);
+    this->linearAcc = imuPose.rot.GetInverse().RotateVector(
+      (imuWorldLinearVel - this->lastLinearVel) / dt);
 
     // Add contribution from gravity
-    this->gravity = this->world->GetPhysicsEngine()->GetGravity();
     this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
-
     msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
+
+    // Set the IMU orientation
+    msgs::Set(this->imuMsg.mutable_orientation(),
+              (imuPose - this->referencePose).rot);
+
+    this->lastLinearVel = imuWorldLinearVel;
+
+    this->lastMeasurementTime = timestamp;
 
     if (this->noiseActive)
     {
@@ -248,13 +291,16 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
           // Add Gaussian noise + fixed bias to each rate
           this->imuMsg.mutable_angular_velocity()->set_x(
             this->imuMsg.angular_velocity().x() + this->rateBias +
-            math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
+            math::Rand::GetDblNormal(this->rateNoiseMean,
+              this->rateNoiseStdDev));
           this->imuMsg.mutable_angular_velocity()->set_y(
             this->imuMsg.angular_velocity().y() + this->rateBias +
-            math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
+            math::Rand::GetDblNormal(this->rateNoiseMean,
+              this->rateNoiseStdDev));
           this->imuMsg.mutable_angular_velocity()->set_z(
             this->imuMsg.angular_velocity().z() + this->rateBias +
-            math::Rand::GetDblNormal(this->rateNoiseMean, this->rateNoiseStdDev));
+            math::Rand::GetDblNormal(this->rateNoiseMean,
+              this->rateNoiseStdDev));
 
           // Add Gaussian noise + fixed bias to each acceleration
           this->imuMsg.mutable_linear_acceleration()->set_x(
@@ -276,8 +322,15 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
           GZ_ASSERT(false, "Invalid noise model type");
       }
     }
-  }
 
-  if (this->pub)
-    this->pub->Publish(this->imuMsg);
+    if (this->pub)
+      this->pub->Publish(this->imuMsg);
+  }
+}
+
+//////////////////////////////////////////////////
+bool ImuSensor::IsActive()
+{
+  return this->active ||
+         (this->pub && this->pub->HasConnections());
 }

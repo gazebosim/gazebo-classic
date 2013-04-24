@@ -116,7 +116,7 @@ TEST_F(HeightmapTest, Heights)
 
       // Test to see if the physics height is equal to the render engine
       // height.
-      EXPECT_TRUE(math::equal(physicsTest.back(), renderTest.back(), 0.13f));
+      EXPECT_NEAR(physicsTest.back(), renderTest.back(), 0.13f);
     }
   }
 

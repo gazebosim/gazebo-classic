@@ -2029,7 +2029,8 @@ void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
 {
   this->ResetTree();
   this->propTreeBrowser->clear();
-  this->node->Fini();
+  if (this->node)
+    this->node->Fini();
   this->node.reset();
 
   this->requestPub.reset();

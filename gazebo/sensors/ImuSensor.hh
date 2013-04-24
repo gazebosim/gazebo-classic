@@ -76,6 +76,13 @@ namespace gazebo
       /// \brief Sets the current pose as the IMU reference pose
       public: void SetReferencePose();
 
+      // Documentation inherited.
+      public: virtual bool IsActive();
+
+      /// \brief Callback when link data is received
+      /// \param[in] _msg Message containing link data
+      private: void OnLinkData(ConstLinkDataPtr &_msg);
+
       /// \brief Imu reference pose
       private: math::Pose referencePose;
 
@@ -88,9 +95,29 @@ namespace gazebo
       /// \brief store gravity vector to be added to the imu output.
       private: math::Vector3 gravity;
 
+      /// \brief Imu data publisher
       private: transport::PublisherPtr pub;
+
+      /// \brief Subscriber to link data published by parent entity
+      private: transport::SubscriberPtr linkDataSub;
+
+      /// \brief Parent entity which the IMU is attached to
       private: physics::LinkPtr parentEntity;
+
+      /// \brief Imu message
       private: msgs::IMU imuMsg;
+
+      /// \brief Mutex to protect reads and writes.
+      private: mutable boost::mutex mutex;
+
+      /// \brief Buffer for storing link data
+      private: boost::shared_ptr<msgs::LinkData const> incomingLinkData[2];
+
+      /// \brief Index for accessing element in the link data array
+      private: unsigned int dataIndex;
+
+      /// \brief True if new link data is received
+      private: bool dataDirty;
 
       /// \brief Which noise type we support
       private: enum NoiseModelType
@@ -127,9 +154,6 @@ namespace gazebo
 
       /// \brief If noiseType==GAUSSIAN, the bias we'll add to rates
       private: double rateBias;
-
-      /// \brief Prevent imuMsg update race condition when
-      private: mutable boost::mutex mutex;
     };
     /// \}
   }
