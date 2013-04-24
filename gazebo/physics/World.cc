@@ -124,6 +124,9 @@ World::World(const std::string &_name)
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&World::SetSelectedEntityCB, this, _1)));
+
+  // Make sure the model database has started.
+  common::ModelDatabase::Instance()->Start();
 }
 
 //////////////////////////////////////////////////

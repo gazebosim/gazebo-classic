@@ -60,19 +60,29 @@ size_t get_models_cb(void *_buffer, size_t _size, size_t _nmemb, void *_userp)
 
 /////////////////////////////////////////////////
 ModelDatabase::ModelDatabase()
+  : updateCacheThread(NULL)
 {
-  this->stop = false;
-
-  // Create the thread that is used to update the model cache. This
-  // retreives online data in the background to improve startup times.
-  this->updateCacheThread = new boost::thread(
-      boost::bind(&ModelDatabase::UpdateModelCache, this));
+  this->Start();
 }
 
 /////////////////////////////////////////////////
 ModelDatabase::~ModelDatabase()
 {
   this->Fini();
+}
+
+/////////////////////////////////////////////////
+void ModelDatabase::Start()
+{
+  if (!this->updateCacheThread)
+  {
+    this->stop = false;
+
+    // Create the thread that is used to update the model cache. This
+    // retreives online data in the background to improve startup times.
+    this->updateCacheThread = new boost::thread(
+        boost::bind(&ModelDatabase::UpdateModelCache, this));
+  }
 }
 
 /////////////////////////////////////////////////

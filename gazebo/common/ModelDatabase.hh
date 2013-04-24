@@ -48,6 +48,9 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~ModelDatabase();
 
+      /// \brief Start the model database.
+      public: void Start();
+
       /// \brief Finalize the model database.
       public: void Fini();
 
@@ -138,6 +141,9 @@ namespace gazebo
       /// no one else should use this function.
       private: bool UpdateModelCacheImpl();
 
+      /// \brief Thread to update the model cache.
+      private: boost::thread *updateCacheThread;
+
       /// \brief A dictionary of all model names indexed by their uri.
       private: std::map<std::string, std::string> modelCache;
 
@@ -146,9 +152,6 @@ namespace gazebo
 
       /// \brief Cache update mutex
       private: boost::mutex updateMutex;
-
-      /// \brief Thread to update the model cache.
-      private: boost::thread *updateCacheThread;
 
       /// \brief Condition variable for the updateCacheThread.
       private: boost::condition_variable updateCacheCondition;
