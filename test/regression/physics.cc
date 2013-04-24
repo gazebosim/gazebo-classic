@@ -921,8 +921,6 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   }
 }
 
-// As a workaround for issue #660, this test is placed first.
-// When issue #660 is resolved, this can be moved back.
 TEST_F(PhysicsTest, RevoluteJointODE)
 {
   RevoluteJoint("ode");
