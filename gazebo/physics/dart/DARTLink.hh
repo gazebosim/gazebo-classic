@@ -44,13 +44,13 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _ptr);
 
-      /// \brief Initialize the body
+      // Documentation inherited.
       public: virtual void Init();
 
-      /// \brief Finalize the body
+      // Documentation inherited.
       public: virtual void Fini();
 
-      /// \brief Update the body
+      // Documentation inherited.
       public: virtual void Update();
 
       // Documentation inherited
