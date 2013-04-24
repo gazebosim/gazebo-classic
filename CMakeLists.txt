@@ -142,9 +142,10 @@ set (CMAKE_LINK_FLAGS_CHECK " --coverage" CACHE INTERNAL "Link flags for static 
 # Check for low memory version to use in some tests
 if(NOT DEFINED USE_LOW_MEMORY_TESTS)
   set (USE_LOW_MEMORY_TESTS FALSE)
-endif()
-if (USE_LOW_MEMORY_TESTS)
-  message (STATUS "Use low memory version of tests when available")
+  message (STATUS "High memory tests: enabled")
+else()
+  set (USE_LOW_MEMORY_TEST TRUE)
+  message (STATUS "High memory tests: disabled, low memory versions will be used")
 endif()
 
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")
