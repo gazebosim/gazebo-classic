@@ -132,7 +132,6 @@ TEST_F(TransportStressTest, ManyNodes)
     // 1k nodes publish 10 times needs about 400Mb of RAM
     unsigned int nodeCount = 1000;
     unsigned int requiredMB = 400;
-
   #else
     // 2k nodes publish 10 times needs about 1.7Gb of RAM
     unsigned int nodeCount = 2000;
@@ -142,9 +141,10 @@ TEST_F(TransportStressTest, ManyNodes)
   // Check if there is enough memory available
   if (! gazebo::test::memory::IsMemoryAvailable(requiredMB))
   {
-    gzdbg << "Skipped test since" << requiredMB << 
+    gzdbg << "Skipped test since " << requiredMB << 
               "Mb of RAM were not available \n";
     SUCCEED();
+    return;
   }
 
   // The number of messages to send
