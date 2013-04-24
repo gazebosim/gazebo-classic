@@ -32,6 +32,10 @@ namespace gazebo
   {
     namespace memory
     {
+      /// \brief Parse the /proc/meminfo and return the vale corresponding to
+      ///        key given.
+      /// \param[in] _key string represent keys in meminfo ended with a colon
+      ///        example: "MemFree:"
       unsigned long ParseProcMeminfo(const std::string key)
       {
           std::string token;
