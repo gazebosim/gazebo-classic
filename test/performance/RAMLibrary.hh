@@ -32,7 +32,7 @@ namespace gazebo
   {
     namespace memory
     {
-      /// \brief Parse the /proc/meminfo and return the vale corresponding to
+      /// \brief Parse the /proc/meminfo and return the value corresponding to
       ///        key given.
       /// \param[in] _key string represent keys in meminfo ended with a colon
       ///        example: "MemFree:"
