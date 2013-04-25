@@ -51,6 +51,10 @@ void DARTModel::Load(sdf::ElementPtr _sdf)
 
   Model::Load(_sdf);
 
+  // Name
+  std::string name = this->GetName();
+  this->dartSkeletonDynamics->setName(name.c_str());
+
   //  if (this->IsStatic())
   //    dartSkeletonDynamics->setImmobileState(true);
   //  else

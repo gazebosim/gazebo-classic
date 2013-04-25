@@ -59,7 +59,7 @@ void DARTUtils::ConvMatToPose(math::Pose* _pose, const Eigen::Matrix4d& _mat)
 }
 
 //////////////////////////////////////////////////
-kinematics::TrfmTranslate* DARTUtils::createTrfmTranslate(
+kinematics::TrfmTranslate* DARTUtils::CreateTrfmTranslate(
     const math::Vector3& _vec)
 {
   kinematics::Dof* dofX = new kinematics::Dof(_vec.x);
@@ -73,7 +73,7 @@ kinematics::TrfmTranslate* DARTUtils::createTrfmTranslate(
 }
 
 //////////////////////////////////////////////////
-kinematics::TrfmRotateQuat* DARTUtils::createTrfmRotateQuat(
+kinematics::TrfmRotateQuat* DARTUtils::CreateTrfmRotateQuat(
     const math::Quaternion& _quat)
 {
   kinematics::Dof* dofW = new kinematics::Dof(_quat.w);
@@ -88,16 +88,16 @@ kinematics::TrfmRotateQuat* DARTUtils::createTrfmRotateQuat(
 }
 
 //////////////////////////////////////////////////
-void DARTUtils::addTransformToDARTJoint(kinematics::Joint* _rtl8Joint,
+void DARTUtils::AddTransformToDARTJoint(kinematics::Joint* _rtl8Joint,
                                           const math::Pose& _pose)
 {
   kinematics::TrfmTranslate* trfmTrans
-      = DARTUtils::createTrfmTranslate(_pose.pos);
+      = DARTUtils::CreateTrfmTranslate(_pose.pos);
 
   _rtl8Joint->addTransform(trfmTrans, false);
 
   kinematics::TrfmRotateQuat* trfmRot
-      = DARTUtils::createTrfmRotateQuat(_pose.rot);
+      = DARTUtils::CreateTrfmRotateQuat(_pose.rot);
 
   _rtl8Joint->addTransform(trfmRot, false);
 
@@ -105,7 +105,7 @@ void DARTUtils::addTransformToDARTJoint(kinematics::Joint* _rtl8Joint,
 }
 
 //////////////////////////////////////////////////
-void DARTUtils::add6DOFToDARTJoint(kinematics::Joint* /*_dartJoint*/,
+void DARTUtils::Add6DOFToDARTJoint(kinematics::Joint* /*_dartJoint*/,
                                      const math::Pose& /*_initialPose*/)
 {
 }

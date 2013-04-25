@@ -76,11 +76,11 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
 
-      /// \brief Set the simulation step time
-      public: virtual void SetStepTime(double _value);
+      //      /// \brief Set the simulation step time
+      //      public: virtual void SetStepTime(double _value);
 
-      /// \brief Get the simulation step time
-      public: virtual double GetStepTime();
+      //      /// \brief Get the simulation step time
+      //      public: virtual double GetStepTime();
 
       /// \brief Create a new model
       public: virtual ModelPtr CreateModel(BasePtr _parent);

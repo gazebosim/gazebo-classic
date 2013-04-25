@@ -42,20 +42,20 @@ namespace gazebo
                                         const Eigen::Matrix4d& _mat);
 
       /// \brief Create kinematics::TrfmTranslate from math::Vector3.
-      public: static kinematics::TrfmTranslate* createTrfmTranslate(
+      public: static kinematics::TrfmTranslate* CreateTrfmTranslate(
           const math::Vector3& _vec);
 
       /// \brief Create kinematics::TrfmRotateQuat from math::Vector3.
-      public: static kinematics::TrfmRotateQuat* createTrfmRotateQuat(
+      public: static kinematics::TrfmRotateQuat* CreateTrfmRotateQuat(
           const math::Quaternion& _quat);
 
       /// \brief addTransform from math::Pose.
-      public: static void addTransformToDARTJoint(
+      public: static void AddTransformToDARTJoint(
           kinematics::Joint* _rtl8Joint,
           const math::Pose& _pose);
 
       /// \brief Add 6dof joint for free floating body.
-      public: static void add6DOFToDARTJoint(
+      public: static void Add6DOFToDARTJoint(
           kinematics::Joint* _dartJoint,
           const math::Pose& _initialPose);
     };

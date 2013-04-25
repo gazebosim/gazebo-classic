@@ -47,6 +47,10 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
 {
   HingeJoint<DARTJoint>::Load(_sdf);
 
+  // Name
+  std::string name = this->GetName();
+  this->dartJoint->setName(name.c_str());
+
   //----------------------------------------------------------------------------
   // Step 0.
   //----------------------------------------------------------------------------
@@ -123,11 +127,11 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
   //----------------------------------------------------------------------------
   poseJointToChildLink = poseChildLinkToJoint.GetInverse();
 
-  DARTUtils::addTransformToDARTJoint(this->dartJoint, poseParentLinkToJoint);
+  DARTUtils::AddTransformToDARTJoint(this->dartJoint, poseParentLinkToJoint);
 
   this->dartJoint->addTransform(rotHinge, true);
 
-  DARTUtils::addTransformToDARTJoint(this->dartJoint, poseJointToChildLink);
+  DARTUtils::AddTransformToDARTJoint(this->dartJoint, poseJointToChildLink);
 }
 
 //////////////////////////////////////////////////
@@ -207,7 +211,7 @@ void DARTHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
 {
   //   this->damping_coefficient = _damping;
   //   dJointSetDamping(this->jointId, this->damping_coefficient);
-  gzerr << "Not implemented...\n";
+  gzwarn << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -222,7 +226,6 @@ math::Angle DARTHingeJoint::GetAngleImpl(int /*index*/) const
 {
   math::Angle result;
 
-  // TODO: need test
   assert(this->dartJoint);
   assert(this->dartJoint->getNumDofs() == 1);
 
@@ -242,29 +245,29 @@ double DARTHingeJoint::GetVelocity(int /*index*/) const
   //   double result = dJointGetHingeAngleRate(this->jointId);
   //
   //   return result;
-  gzerr << "DARTHingeJoint::GetVelocity(...): Not implemented...\n";
+  gzwarn << "DARTHingeJoint::GetVelocity(...): Not implemented...\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetVelocity(int /*index*/, double /*_vel*/)
 {
-  //   this->SetParam(dParamVel, _angle);
-  gzerr << "DARTHingeJoint::SetVelocity(...): Not implemented...\n";
+  // TODO: Do nothing because DART accept only torques (forces) of joint as
+  // input.
 }
 
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetMaxForce(int /*index*/, double /*_force*/)
 {
   //   return this->SetParam(dParamFMax, _t);
-  gzerr << "DARTHingeJoint::SetMaxForce(...): Not implemented...\n";
+  gzwarn << "DARTHingeJoint::SetMaxForce(...): Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
 double DARTHingeJoint::GetMaxForce(int /*index*/)
 {
   //   return this->GetParam(dParamFMax);
-  gzerr << "DARTHingeJoint::GetMaxForce(...): Not implemented...\n";
+  gzwarn << "DARTHingeJoint::GetMaxForce(...): Not implemented...\n";
   return 0.0;
 }
 
@@ -276,7 +279,7 @@ void DARTHingeJoint::SetForce(int /*index*/, double /*_torque*/)
   //   if (this->parentLink)
   //     this->parentLink->SetEnabled(true);
   //   dJointAddHingeTorque(this->jointId, _torque);
-  gzerr << "DARTHingeJoint::SetForce(...): Not implemented...\n";
+  gzwarn << "DARTHingeJoint::SetForce(...): Not implemented...\n";
 }
 
 //////////////////////////////////////////////////

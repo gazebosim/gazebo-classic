@@ -1,5 +1,8 @@
 <sdf version="1.4">
     <world name="default">
+        <physics type="dart">
+            <gravity>0 0 -10.0</gravity>
+        </physics>
         <include>
             <uri>model://sun</uri>
         </include>

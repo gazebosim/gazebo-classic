@@ -110,8 +110,9 @@ void DARTPhysics::Reset()
 {
   {
     this->physicsUpdateMutex->lock();
-    // Very important to clear out the contact group
-    //dJointGroupEmpty(this->contactGroup);
+
+    this->dartWorld->reset();
+
     this->physicsUpdateMutex->unlock();
   }
 }
@@ -139,7 +140,7 @@ void DARTPhysics::UpdatePhysics()
 //    double state = FirstDof[0];
 
     //common::Time currTime =  this->world->GetRealTime();
-    this->dartWorld->updatePhysics();
+    this->dartWorld->updatePhysics(this->maxStepSize);
 
 //    dofs = this->dartWorld->getDofs();
 //    FirstDof = dofs[0];
@@ -184,20 +185,17 @@ void DARTPhysics::SetSeed(uint32_t /*_seed*/)
   gzerr << "Not implemented yet...\n";
 }
 
-//////////////////////////////////////////////////
-void DARTPhysics::SetStepTime(double _value)
-{
-//   this->sdf->GetElement("dart")->GetElement(
-//       "solver")->GetAttribute("dt")->Set(_value);
+////////////////////////////////////////////////////
+//void DARTPhysics::SetStepTime(double _value)
+//{
+//   this->dartWorld->setTimeStep(_value);
+//}
 
-   this->dartWorld->setTimeStep(_value);
-}
-
-//////////////////////////////////////////////////
-double DARTPhysics::GetStepTime()
-{
-  return this->dartWorld->getTimeStep();
-}
+////////////////////////////////////////////////////
+//double DARTPhysics::GetStepTime()
+//{
+//  return this->dartWorld->getTimeStep();
+//}
 
 //////////////////////////////////////////////////
 ModelPtr DARTPhysics::CreateModel(BasePtr _parent)

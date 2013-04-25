@@ -83,6 +83,12 @@ void DARTLink::Init()
   double Iyz = this->inertial->GetIYZ();
   this->dartBodyNode->setLocalInertia(Ixx, Iyy, Izz, Ixy, Ixz, Iyz);
 
+  // Name
+  std::string name = this->GetName();
+  this->dartBodyNode->setName(name.c_str());
+
+  this->visuals;
+
   //////////////////////////////////////////////////////////////////////////////
   // TODO: At some point, DART should support collision shape and ...
   //
