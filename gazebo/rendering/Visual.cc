@@ -350,6 +350,9 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       elem->GetAttribute("name")->Set(_msg->plugin().name());
     if (_msg->plugin().has_filename())
       elem->GetAttribute("filename")->Set(_msg->plugin().filename());
+    TiXmlDocument innerXML;
+    innerXML.Parse(_msg->plugin().innerxml().c_str());
+    sdf::copyChildren(elem, innerXML.RootElement());
   }
 
   this->Load();
