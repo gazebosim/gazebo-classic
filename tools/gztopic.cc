@@ -48,19 +48,21 @@ std::vector<common::Time> bwTime;
 boost::mutex mutex;
 
 boost::shared_ptr<google::protobuf::Message> g_echoMsg;
+bool g_useShortDebugString = false;
 
 /////////////////////////////////////////////////
 void help()
 {
   std::cerr << "This tool lists information about published topics on a "
             << "Gazebo master.\n"
-            << "    list         : List all topics\n"
-            << "    info <topic> : Get information about a topic\n"
-            << "    echo <topic> : Output topic data to screen\n"
-            << "    view <topic> : View topic data using a QT widget\n"
-            << "    hz <topic>   : Get publish frequency\n"
-            << "    bw <topic>   : Get topic bandwidth\n"
-            << "    help         : This help text\n";
+            << "    list          : List all topics\n"
+            << "    info <topic>  : Get information about a topic\n"
+            << "    echo <topic>  : Output formatted topic data to screen \n"
+            << "    echo2 <topic> : Output unformatted topic data to screen \n"
+            << "    view <topic>  : View topic data using a QT widget\n"
+            << "    hz <topic>    : Get publish frequency\n"
+            << "    bw <topic>    : Get topic bandwidth\n"
+            << "    help          : This help text\n";
 }
 
 /////////////////////////////////////////////////
@@ -171,7 +173,10 @@ void list()
 void echoCB(const std::string &_data)
 {
   g_echoMsg->ParseFromString(_data);
-  std::cout << g_echoMsg->DebugString() << "\n";
+  if (g_useShortDebugString)
+    std::cout << g_echoMsg->ShortDebugString() << "\n";
+  else
+    std::cout << g_echoMsg->DebugString() << "\n";
 }
 
 /////////////////////////////////////////////////
@@ -480,6 +485,11 @@ int main(int argc, char **argv)
     print_topic_info(params[1]);
   else if (params[0] == "echo")
     echo();
+  else if (params[0] == "echo2")
+  {
+    g_useShortDebugString = true;
+    echo();
+  }
   else if (params[0] == "hz")
     hz();
   else if (params[0] == "bw")
