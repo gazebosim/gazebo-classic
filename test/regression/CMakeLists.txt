@@ -35,6 +35,7 @@ set(tests
   nondefault_world.cc
   physics.cc
   pioneer2dx.cc
+  ray_sensor_issue662.cc
   transport.cc
   transport_stress.cc
   server_fixture.cc
