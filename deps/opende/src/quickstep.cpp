@@ -89,7 +89,7 @@ typedef dReal *dRealMutablePtr;
 // during the solution. depending on the situation, this can help a lot
 // or hardly at all, but it doesn't seem to hurt.
 
-#define RANDOMLY_REORDER_CONSTRAINTS 1
+// #define RANDOMLY_REORDER_CONSTRAINTS 1
 #undef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
 
 
