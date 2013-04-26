@@ -49,7 +49,9 @@ namespace gazebo
       private: virtual ~ModelDatabase();
 
       /// \brief Start the model database.
-      public: void Start();
+      /// \param[in] _fetchImmediately True to fetch the models without
+      /// waiting.
+      public: void Start(bool _fetchImmediately = false);
 
       /// \brief Finalize the model database.
       public: void Fini();
@@ -135,7 +137,9 @@ namespace gazebo
       private: std::string GetManifestImpl(const std::string &_uri);
 
       /// \brief Used by a thread to update the model cache.
-      private: void UpdateModelCache();
+      /// \param[in] _fetchImmediately True to fetch the models without
+      /// waiting.
+      private: void UpdateModelCache(bool _fetchImmediately);
 
       /// \brief Used by ModelDatabase::UpdateModelCache,
       /// no one else should use this function.
@@ -152,6 +156,9 @@ namespace gazebo
 
       /// \brief Cache update mutex
       private: boost::mutex updateMutex;
+
+      /// \brief Mutex to protect cache thread status checks.
+      private: boost::recursive_mutex startCacheMutex;
 
       /// \brief Condition variable for the updateCacheThread.
       private: boost::condition_variable updateCacheCondition;

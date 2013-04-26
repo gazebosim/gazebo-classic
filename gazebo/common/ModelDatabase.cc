@@ -72,8 +72,10 @@ ModelDatabase::~ModelDatabase()
 }
 
 /////////////////////////////////////////////////
-void ModelDatabase::Start()
+void ModelDatabase::Start(bool _fetchImmediately)
 {
+  boost::recursive_mutex::scoped_lock lock(this->startCacheMutex);
+
   if (!this->updateCacheThread)
   {
     this->stop = false;
@@ -81,7 +83,7 @@ void ModelDatabase::Start()
     // Create the thread that is used to update the model cache. This
     // retreives online data in the background to improve startup times.
     this->updateCacheThread = new boost::thread(
-        boost::bind(&ModelDatabase::UpdateModelCache, this));
+        boost::bind(&ModelDatabase::UpdateModelCache, this, _fetchImmediately));
   }
 }
 
@@ -95,10 +97,13 @@ void ModelDatabase::Fini()
   this->updateCacheCompleteCondition.notify_all();
   this->updateCacheCondition.notify_all();
 
-  if (this->updateCacheThread)
-    this->updateCacheThread->join();
-  delete this->updateCacheThread;
-  this->updateCacheThread = NULL;
+  {
+    boost::recursive_mutex::scoped_lock lock(this->startCacheMutex);
+    if (this->updateCacheThread)
+      this->updateCacheThread->join();
+    delete this->updateCacheThread;
+    this->updateCacheThread = NULL;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -257,20 +262,18 @@ bool ModelDatabase::UpdateModelCacheImpl()
 }
 
 /////////////////////////////////////////////////
-void ModelDatabase::UpdateModelCache()
+void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
 {
-  bool first = true;
+  boost::mutex::scoped_lock lock(this->updateMutex);
 
   // Continually update the model cache when requested.
   while (!this->stop)
   {
-    boost::mutex::scoped_lock lock(this->updateMutex);
-
     // Wait for an update request.
-    if (!first)
+    if (!_fetchImmediately)
       this->updateCacheCondition.wait(lock);
     else
-      first = false;
+      _fetchImmediately = false;
 
     // Exit if notified and stopped.
     if (this->stop)
@@ -300,20 +303,23 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
 {
   size_t size = 0;
 
-  if (!this->updateCacheThread)
   {
-    // Transfer mutex ownership to lock.
-    boost::mutex::scoped_lock lock(this->updateMutex);
-    this->Start();
-  }
-  else
-  {
-    boost::mutex::scoped_try_lock lock(this->updateMutex);
-    if (!lock)
+    boost::recursive_mutex::scoped_lock startLock(this->startCacheMutex);
+    if (!this->updateCacheThread)
     {
-      gzmsg << "Waiting for model database update to complete...\n";
-      boost::mutex::scoped_lock lock2(this->updateMutex);
-      this->updateCacheCompleteCondition.wait(lock2);
+      // Transfer mutex ownership to lock.
+      boost::mutex::scoped_lock lock(this->updateMutex);
+      this->Start(true);
+      this->updateCacheCompleteCondition.wait(lock);
+    }
+    else
+    {
+      boost::mutex::scoped_try_lock lock(this->updateMutex);
+      if (!lock)
+      {
+        gzmsg << "Waiting for model database update to complete...\n";
+        boost::mutex::scoped_lock lock2(this->updateMutex);
+      }
     }
 
     size = this->modelCache.size();
@@ -326,14 +332,13 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
     gzwarn << "Getting models from[" << GetURI()
            << "]. This may take a few seconds.\n";
 
-    // Tell the background thread to grab the models from online.
-    this->updateCacheCondition.notify_one();
+    boost::mutex::scoped_lock lock(this->updateMutex);
 
-    // Let the other thread start downloading.
-    common::Time::MSleep(100);
+    // Tell the background thread to grab the models from online.
+    this->updateCacheCondition.notify_all();
 
     // Wait for the thread to finish.
-    boost::mutex::scoped_lock lock(this->updateMutex);
+    this->updateCacheCompleteCondition.wait(lock);
   }
 
   return this->modelCache;
