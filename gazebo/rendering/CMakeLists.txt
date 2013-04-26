@@ -129,4 +129,4 @@ gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering
 # unit tests
 set (gtest_sources
   GpuLaser_TEST.cc)
-gz_build_tests(${gtest_sources})
+gz_build_dri_tests(${gtest_sources})
