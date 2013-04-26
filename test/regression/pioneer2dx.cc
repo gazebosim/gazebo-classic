@@ -31,14 +31,13 @@ TEST_F(Pioneer2dx, StraightLine)
       "~/pioneer2dx/vel_cmd");
 
   int i = 0;
-  while (!this->HasEntity("pioneer2dx") && i < 20)
+  while (!this->HasEntity("pioneer2dx") && i < 500)
   {
     common::Time::MSleep(100);
     ++i;
   }
+  ASSERT_TRUE(i < 500);
 
-  if (i > 20)
-    gzthrow("Unable to get pioneer2dx");
 
   gazebo::msgs::Pose msg;
   gazebo::msgs::Set(msg.mutable_position(),
