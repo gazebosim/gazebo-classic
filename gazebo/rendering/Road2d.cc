@@ -27,7 +27,7 @@ using namespace rendering;
 Road2d::Road2d()
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("default");
+  this->node->Init();
   this->sub = this->node->Subscribe("~/roads", &Road2d::OnRoadMsg, this, true);
 
   this->connections.push_back(

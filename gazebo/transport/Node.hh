@@ -53,6 +53,7 @@ namespace gazebo
               {
                 this->pub->WaitForConnection();
                 this->pub->Publish(*this->msg, true);
+                this->pub->SendMessage();
                 delete this->msg;
                 this->pub.reset();
                 return NULL;
@@ -155,9 +156,8 @@ namespace gazebo
           transport::TopicManager::Instance()->Advertise<M>(
               decodedTopic, _queueLimit, _hzRate);
 
-        boost::recursive_mutex::scoped_lock lock(this->publisherMutex);
+        boost::mutex::scoped_lock lock(this->publisherMutex);
         this->publishers.push_back(publisher);
-        this->publishersEnd = this->publishers.end();
 
         return publisher;
       }
@@ -325,7 +325,6 @@ namespace gazebo
       private: std::string topicNamespace;
       private: std::vector<PublisherPtr> publishers;
       private: std::vector<PublisherPtr>::iterator publishersIter;
-      private: std::vector<PublisherPtr>::iterator publishersEnd;
       private: static unsigned int idCounter;
       private: unsigned int id;
 
@@ -337,8 +336,13 @@ namespace gazebo
       /// \brief List of newly arrive messages
       private: std::map<std::string, std::list<MessagePtr> > incomingMsgsLocal;
 
-      private: boost::recursive_mutex publisherMutex;
+      private: boost::mutex publisherMutex;
+      private: boost::mutex publisherDeleteMutex;
       private: boost::recursive_mutex incomingMutex;
+
+      /// \brief make sure we don't call ProcessingIncoming simultaneously
+      /// from separate threads.
+      private: boost::recursive_mutex processIncomingMutex;
 
       private: bool initialized;
     };

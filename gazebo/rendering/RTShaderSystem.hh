@@ -30,7 +30,7 @@
 #include "gazebo_config.h"
 
 #include "rendering/Camera.hh"
-#include "common/SingletonT.hh"
+#include "gazebo/common/SingletonT.hh"
 
 namespace gazebo
 {

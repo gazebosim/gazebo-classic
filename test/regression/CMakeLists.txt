@@ -31,16 +31,18 @@ set(tests
   file_handling.cc
   imu.cc
   laser.cc
+  nondefault_world.cc
   physics.cc
   pioneer2dx.cc
   transport.cc
-  transport_stress.cc
   server_fixture.cc
   speed.cc
+  #state_log.cc
+  surface_properties.cc
   )
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
-    "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc")
+  "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
 gz_build_tests(${tests})
 
 set(display_tests
@@ -48,11 +50,12 @@ set(display_tests
 
 # Build the display tests (need extra sources to compile)
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
-    "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc")
+    "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
 gz_build_display_tests(${display_tests})
 
 set(dri_tests
   camera_sensor.cc
+  gpu_laser.cc
   heightmap.cc
   pr2.cc
   projector.cc
@@ -60,5 +63,5 @@ set(dri_tests
 )
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
-    "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc")
+    "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
 gz_build_dri_tests(${dri_tests})

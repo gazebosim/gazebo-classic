@@ -8,7 +8,7 @@
                 <solver>
                     <type>quick</type>
                     <dt>0.001</dt>
-                    <iters>40</iters>
+                    <iters>1000</iters>
                     <sor>1.0</sor>
                 </solver>
                 <constraints>
@@ -30,14 +30,14 @@
                 <inertial>
                     <pose>0 0 0 0 0 0</pose>
                     <inertia>
-                        <ixx>1.000000</ixx>
+                        <ixx>200.000000</ixx>
                         <ixy>0.000000</ixy>
                         <ixz>0.000000</ixz>
-                        <iyy>1.000000</iyy>
+                        <iyy>300.000000</iyy>
                         <iyz>0.000000</iyz>
-                        <izz>1.000000</izz>
+                        <izz>400.000000</izz>
                     </inertia>
-                    <mass>10.000000</mass>
+                    <mass>1.000000</mass>
                 </inertial>
                 <visual name="visual_cylinder">
                     <pose>0 0 -0.5 0 0 0</pose>

@@ -33,6 +33,13 @@ class PhysicsTest : public ServerFixture
   public: void CollisionFiltering(const std::string &_physicsEngine);
 };
 
+// As a workaround for issue #660, this test is placed first.
+// When issue #660 is resolved, this can be moved back.
+TEST_F(PhysicsTest, RevoluteJointODE)
+{
+  RevoluteJoint("ode");
+}
+
 ////////////////////////////////////////////////////////////////////////
 // EmptyWorld:
 // Load a world, take a few steps, and verify that time is increasing.
@@ -921,11 +928,6 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, RevoluteJointODE)
-{
-  RevoluteJoint("ode");
-}
-
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, RevoluteJointBullet)
 {
@@ -1512,17 +1514,34 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
   }
 }
 
+/////////////////////////////////////////////////
 TEST_F(PhysicsTest, CollisionFilteringODE)
 {
   CollisionFiltering("ode");
 }
 
+/////////////////////////////////////////////////
 #ifdef HAVE_BULLET
 TEST_F(PhysicsTest, CollisionFilteringBullet)
 {
   CollisionFiltering("bullet");
 }
 #endif  // HAVE_BULLET
+
+/////////////////////////////////////////////////
+// This test verifies that gazebo doesn't crash when collisions occur
+// and the <world><physics><ode><max_contacts> value is zero.
+// The crash was reported in issue #593 on bitbucket
+TEST_F(PhysicsTest, ZeroMaxContactsODE)
+{
+  // Load an empty world
+  Load("worlds/zero_max_contacts.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr model = world->GetModel("ground_plane");
+  ASSERT_TRUE(model);
+}
 
 int main(int argc, char **argv)
 {

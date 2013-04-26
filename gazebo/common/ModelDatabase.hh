@@ -48,6 +48,9 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~ModelDatabase();
 
+      /// \brief Finalize the model database.
+      public: void Fini();
+
       /// \brief Returns the the global model database URI.
       /// \return the URI.
       public: std::string GetURI();
