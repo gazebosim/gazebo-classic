@@ -156,6 +156,9 @@ namespace gazebo
       /// \brief Condition variable for the updateCacheThread.
       private: boost::condition_variable updateCacheCondition;
 
+      /// \brief Condition variable for completion of one cache update.
+      private: boost::condition_variable updateCacheCompleteCondition;
+
       /// \def CallbackFunc
       /// \brief Boost function that is used to passback the model cache.
       private: typedef boost::function<
