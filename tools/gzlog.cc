@@ -100,7 +100,7 @@ class FilterBase
               // Get the list of pose elements from the filter
               std::list<std::string> elements;
               boost::split(elements, _filter, boost::is_any_of(","));
-              if (!elements.size() && !_filter.empty())
+              if (elements.empty() && !_filter.empty())
                 elements.push_back(_filter);
 
               // Iterate over the list of pose elements.
@@ -210,7 +210,7 @@ class JointFilter : public FilterBase
               // Get the list of axis elements from the filter
               std::list<std::string> elements;
               boost::split(elements, part, boost::is_any_of(","));
-              if (!elements.size() && !part.empty())
+              if (elements.empty() && !part.empty())
                 elements.push_back(part);
 
               // Iterate over the list of axis elements.
