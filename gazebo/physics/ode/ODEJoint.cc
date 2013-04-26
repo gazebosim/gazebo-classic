@@ -43,11 +43,13 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->cfmDampingState[0] = ODEJoint::NONE;
   this->cfmDampingState[1] = ODEJoint::NONE;
   this->dampingInitialized = false;
+  this->feedback = NULL;
 }
 
 //////////////////////////////////////////////////
 ODEJoint::~ODEJoint()
 {
+  delete this->feedback;
   this->Detach();
   dJointDestroy(this->jointId);
 }
@@ -207,6 +209,7 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 //////////////////////////////////////////////////
 void ODEJoint::Detach()
 {
+  Joint::Detach();
   this->childLink.reset();
   this->parentLink.reset();
   dJointAttach(this->jointId, 0, 0);
@@ -335,6 +338,17 @@ math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
                jointFeedback->t2[2]);
 
   return result;
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::SetAxis(int _index, const math::Vector3 &_axis)
+{
+  if (_index == 0)
+    this->sdf->GetElement("axis")->GetElement("xyz")->Set(_axis);
+  else if (_index == 1)
+    this->sdf->GetElement("axis2")->GetElement("xyz")->Set(_axis);
+  else
+    gzerr << "SetAxis index [" << _index << "] out of bounds\n";
 }
 
 //////////////////////////////////////////////////
