@@ -82,7 +82,7 @@ Connection::Connection()
   {
     // Automatically add in the local addresses. This guarantees that
     // Gazebo will run properly on the local machine.
-    this->ipWhiteList = this->localAddress + ",127.0.0.1," + whiteListEnv;
+    this->ipWhiteList = this->localAddress + ",127.0.0.1," + whiteListEnv + ",";
   }
 }
 
@@ -201,7 +201,7 @@ void Connection::OnAccept(const boost::system::error_code &e)
   if (!e)
   {
     if (!this->ipWhiteList.empty() &&
-        this->ipWhiteList.find(this->acceptConn->GetRemoteHostname()) ==
+        this->ipWhiteList.find(this->acceptConn->GetRemoteHostname()+",") ==
         std::string::npos)
     {
       gzlog << "Rejected connection from["
