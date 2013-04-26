@@ -307,7 +307,6 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
     boost::recursive_mutex::scoped_lock startLock(this->startCacheMutex);
     if (!this->updateCacheThread)
     {
-      // Transfer mutex ownership to lock.
       boost::mutex::scoped_lock lock(this->updateMutex);
       this->Start(true);
       this->updateCacheCompleteCondition.wait(lock);
