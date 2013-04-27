@@ -36,7 +36,7 @@ TEST_F(Pioneer2dx, StraightLine)
     common::Time::MSleep(100);
     ++i;
   }
-  ASSERT_TRUE(i < 500);
+  ASSERT_LT(i, 500);
 
 
   gazebo::msgs::Pose msg;
