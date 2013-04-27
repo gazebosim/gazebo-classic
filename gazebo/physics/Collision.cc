@@ -362,3 +362,15 @@ void Collision::SetState(const CollisionState &_state)
 {
   this->SetRelativePose(_state.GetPose());
 }
+
+/////////////////////////////////////////////////
+void Collision::SetMaxContacts(double _maxContacts)
+{
+  this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
+}
+
+/////////////////////////////////////////////////
+int Collision::GetMaxContacts()
+{
+  return this->sdf->GetElement("max_contacts")->GetValueInt();
+}

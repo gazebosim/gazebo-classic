@@ -348,6 +348,12 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
         else
           gazebo->selfCollide = false;
       }
+      else if (childElem->ValueStr() == "maxContacts")
+      {
+          gazebo->isMaxContacts = true;
+          gazebo->maxContacts = boost::lexical_cast<int>(
+            this->GetKeyValueAsString(childElem).c_str());
+      }
       else if (childElem->ValueStr() == "laserRetro")
       {
           gazebo->isLaserRetro = true;
@@ -456,6 +462,9 @@ void URDF2Gazebo::InsertGazeboExtensionCollision(TiXmlElement *_elem,
         if ((*ge)->isLaserRetro)
           this->AddKeyValue(_elem, "laser_retro",
                       this->Values2str(1, &(*ge)->laserRetro));
+        if ((*ge)->isMaxContacts)
+          this->AddKeyValue(_elem, "max_contacts",
+                      boost::lexical_cast<std::string>((*ge)->maxContacts));
 
         contact->LinkEndChild(contactOde);
         surface->LinkEndChild(contact);

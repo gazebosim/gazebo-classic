@@ -1068,11 +1068,12 @@ void ODEJoint::CFMDamping()
      return;
   }
 
+  double dt = this->GetWorld()->GetPhysicsEngine()->GetMaxStepSize();
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
-    if (this->GetAngle(i) >= this->upperLimit[i] ||
-        this->GetAngle(i) <= this->lowerLimit[i] ||
-        math::equal(this->dampingCoefficient, 0.0))
+    if (math::equal(this->dampingCoefficient, 0.0) ||
+        this->GetAngle(i) + this->GetVelocity(i) * dt >= this->upperLimit[i] ||
+        this->GetAngle(i) - this->GetVelocity(i) * dt <= this->lowerLimit[i])
     {
       if (this->cfmDampingState[i] != ODEJoint::JOINT_LIMIT)
       {
