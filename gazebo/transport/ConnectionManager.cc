@@ -90,9 +90,18 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   }
 
   std::string initData, namespacesData, publishersData;
-  this->masterConn->Read(initData);
-  this->masterConn->Read(namespacesData);
-  this->masterConn->Read(publishersData);
+
+  try
+  {
+    this->masterConn->Read(initData);
+    this->masterConn->Read(namespacesData);
+    this->masterConn->Read(publishersData);
+  }
+  catch(...)
+  {
+    gzerr << "Unable to read from master\n";
+    return false;
+  }
 
   msgs::Packet packet;
   packet.ParseFromString(initData);
@@ -380,14 +389,14 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
 }
 
 //////////////////////////////////////////////////
-void ConnectionManager::OnAccept(const ConnectionPtr &newConnection)
+void ConnectionManager::OnAccept(const ConnectionPtr &_newConnection)
 {
-  newConnection->AsyncRead(
-      boost::bind(&ConnectionManager::OnRead, this, newConnection, _1));
+  _newConnection->AsyncRead(
+      boost::bind(&ConnectionManager::OnRead, this, _newConnection, _1));
 
   // Add the connection to the list of connections
   boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
-  this->connections.push_back(newConnection);
+  this->connections.push_back(_newConnection);
 }
 
 //////////////////////////////////////////////////
@@ -483,6 +492,9 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &_publishers)
 //////////////////////////////////////////////////
 void ConnectionManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 {
+  if (!this->initialized)
+    return;
+
   _namespaces.clear();
 
   boost::mutex::scoped_lock lock(this->namespaceMutex);

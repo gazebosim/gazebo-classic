@@ -945,7 +945,9 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
 /// \param[in] _start True to start logging
 void record(bool _start)
 {
-  gazebo::transport::init();
+  if (!gazebo::transport::init())
+    return;
+
   gazebo::transport::run();
 
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
