@@ -27,6 +27,24 @@ set (files
   willowMap.png
   wood.jpg
   WoodPallet.png
+
+  aluminium_metal.jpg  
+  bark.jpg
+  cement_cracked.jpg
+  cinder_block.jpg
+  grass_dry.jpg  
+  metal_ripped.jpg   
+  mud_soft_leaves.jpg
+  red_brick.jpg
+  rock_craggy.jpg
+  rough_ground.jpg
+  steel_grating.jpg
+  tarmac.jpg         
+  wall_white_structured.jpg
+  wood_planks.jpg
+  
+  #TODO: REMOVE THIS FROM HERE AND FIND AN APPROPRIATE PLACE!
+  2x4x1_box.dae
 )
 
 
