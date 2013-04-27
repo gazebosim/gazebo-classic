@@ -33,6 +33,13 @@ class PhysicsTest : public ServerFixture
   public: void CollisionFiltering(const std::string &_physicsEngine);
 };
 
+// As a workaround for issue #660, this test is placed first.
+// When issue #660 is resolved, this can be moved back.
+TEST_F(PhysicsTest, RevoluteJointODE)
+{
+  RevoluteJoint("ode");
+}
+
 ////////////////////////////////////////////////////////////////////////
 // EmptyWorld:
 // Load a world, take a few steps, and verify that time is increasing.
@@ -919,11 +926,6 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       EXPECT_TRUE(model != NULL);
     }
   }
-}
-
-TEST_F(PhysicsTest, RevoluteJointODE)
-{
-  RevoluteJoint("ode");
 }
 
 #ifdef HAVE_BULLET
