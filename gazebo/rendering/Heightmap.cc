@@ -28,6 +28,7 @@
 
 #include "gazebo/math/Helpers.hh"
 
+#include "gazebo/transport/Transport.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Light.hh"
@@ -40,6 +41,7 @@ using namespace rendering;
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)
 {
+  std::cout << "New Heightmap\n";
   this->scene = _scene;
   this->terrainGlobals = NULL;
 }
@@ -47,13 +49,25 @@ Heightmap::Heightmap(ScenePtr _scene)
 //////////////////////////////////////////////////
 Heightmap::~Heightmap()
 {
+  std::cout << "Delete Heightmap\n";
+  delete this->terrainGroup;
+  this->terrainGroup = NULL;
+
+  // delete this->gzMatGen;
+  // this->gzMatGen = NULL;
+
+  // delete this->terrainGlobals->getDefaultMaterialGenerator().get();
+  // this->terrainGlobals->setDefaultMaterialGenerator(
+  //    Ogre::TerrainMaterialGeneratorPtr());
+  //delete this->terrainGlobals;
+  this->terrainGlobals = NULL;
+
   this->scene.reset();
 }
 
 //////////////////////////////////////////////////
 void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 {
-  msgs::Set(this->heightImage, _msg->geometry().heightmap().image());
   this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
   this->terrainOrigin = msgs::Convert(_msg->geometry().heightmap().origin());
 
@@ -87,6 +101,8 @@ Ogre::TerrainGroup *Heightmap::GetOgreTerrain() const
 //////////////////////////////////////////////////
 common::Image Heightmap::GetImage() const
 {
+  common::Image result;
+
   double height = 0.0;
   unsigned char *imageData = NULL;
 
@@ -121,7 +137,6 @@ common::Image Heightmap::GetImage() const
     }
   }
 
-  common::Image result;
   result.SetFromData(imageData, size, size, common::Image::L_INT8);
 
   delete [] imageData;
@@ -136,17 +151,25 @@ void Heightmap::Load()
 
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
 
-  if (this->heightImage.GetWidth() != this->heightImage.GetHeight() ||
-      !math::isPowerOfTwo(this->heightImage.GetWidth() - 1))
+  msgs::Geometry geomMsg;
+  boost::shared_ptr<msgs::Response> response = transport::request(
+      "default", "heightmap_data");
+
+  if (response->response() != "error" &&
+      response->type() == geomMsg.GetTypeName())
   {
-    gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
+    geomMsg.ParseFromString(response->serialized_data());
+
+    // Copy the height data.
+    this->heights.resize(geomMsg.heightmap().heights().size());
+    memcpy(&this->heights[0],geomMsg.heightmap().heights().data(),
+        sizeof(float)*geomMsg.heightmap().heights().size());
+
+    this->dataSize = geomMsg.heightmap().width();
   }
 
-  this->imageSize = this->heightImage.GetWidth();
-  this->maxPixel = this->heightImage.GetMaxColor().r;
-
-  if (math::equal(this->maxPixel, 0.0))
-    this->maxPixel = 1.0;
+  if (!math::isPowerOfTwo(this->dataSize - 1))
+    gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
 
   // Create terrain group, which holds all the individual terrain instances.
   // Param 1: Pointer to the scene manager
@@ -156,7 +179,7 @@ void Heightmap::Load()
   // Param 4: World size of each terrain instance, in meters.
   this->terrainGroup = new Ogre::TerrainGroup(
       this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
-      this->imageSize, this->terrainSize.x);
+      this->dataSize, this->terrainSize.x);
 
   this->terrainGroup->setFilenameConvention(
       Ogre::String("gazebo_terrain"), Ogre::String("dat"));
@@ -187,8 +210,6 @@ void Heightmap::Load()
   }
 
   this->terrainGroup->freeTemporaryResources();
-  common::Image img = this->GetImage();
-  img.SavePNG("/tmp/heights_rendering.png");
 }
 
 ///////////////////////////////////////////////////
@@ -203,7 +224,7 @@ void Heightmap::ConfigureTerrainDefaults()
 
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
-  this->terrainGlobals->setCompositeMapDistance(1000);
+  this->terrainGlobals->setCompositeMapDistance(2000);
 
   // Get the first directional light
   LightPtr directionalLight;
@@ -241,13 +262,13 @@ void Heightmap::ConfigureTerrainDefaults()
   Ogre::Terrain::ImportData &defaultimp =
     this->terrainGroup->getDefaultImportSettings();
 
-  defaultimp.terrainSize = this->imageSize;
+  defaultimp.terrainSize = this->dataSize;
   defaultimp.worldSize = this->terrainSize.x;
 
-  defaultimp.inputScale = this->terrainSize.z / this->maxPixel;
+  defaultimp.inputScale = 1.0;
 
-  defaultimp.minBatchSize = 33;
-  defaultimp.maxBatchSize = 65;
+  defaultimp.minBatchSize = 65;
+  defaultimp.maxBatchSize = 129;
 
   // textures. The default material generator takes two materials per layer.
   //    1. diffuse_specular - diffuse texture with a specular map in the
@@ -269,65 +290,47 @@ void Heightmap::ConfigureTerrainDefaults()
 }
 
 /////////////////////////////////////////////////
-void Heightmap::DefineTerrain(int x, int y)
+void Heightmap::SetWireframe(bool _show)
 {
-  Ogre::String filename = this->terrainGroup->generateFilename(x, y);
+  Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
+  GZ_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
+
+  Ogre::Material *material = terrain->getMaterial().get();
+
+  unsigned int techniqueCount, passCount;
+  Ogre::Technique *technique;
+  Ogre::Pass *pass;
+
+  for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
+      techniqueCount++)
+  {
+    technique = material->getTechnique(techniqueCount);
+
+    for (passCount = 0; passCount < technique->getNumPasses(); passCount++)
+    {
+      pass = technique->getPass(passCount);
+      if (_show)
+        pass->setPolygonMode(Ogre::PM_WIREFRAME);
+      else
+        pass->setPolygonMode(Ogre::PM_SOLID);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void Heightmap::DefineTerrain(int _x, int _y)
+{
+  Ogre::String filename = this->terrainGroup->generateFilename(_x, _y);
 
   if (Ogre::ResourceGroupManager::getSingleton().resourceExists(
         this->terrainGroup->getResourceGroup(), filename))
   {
-    this->terrainGroup->defineTerrain(x, y);
+    this->terrainGroup->defineTerrain(_x, _y);
   }
   else
   {
-    Ogre::Image img;
-    bool flipX = x % 2 != 0;
-    bool flipY = y % 2 != 0;
-
-    unsigned char *data = NULL;
-    unsigned int count = 0;
-    this->heightImage.GetData(&data, count);
-/*
-    for (int y = 0; y < 129; ++y)
-    {
-      for (int x = 0; x < 129; ++x)
-      {
-        double px1 = static_cast<int>(data[y * 387 + x * 3]) / 255.0;
-        std::cout << "XY[" << x << " " << y << "] H[" << px1 << "] \n";
-      }
-    }
-    */
-
-    if (this->heightImage.GetPixelFormat() == common::Image::L_INT8)
-    {
-      img.loadDynamicImage(data, this->heightImage.GetWidth(),
-          this->heightImage.GetHeight(), Ogre::PF_L8);
-    }
-    else if (this->heightImage.GetPixelFormat() == common::Image::RGBA_INT8)
-    {
-      img.loadDynamicImage(data, this->heightImage.GetWidth(),
-          this->heightImage.GetHeight(), Ogre::PF_R8G8B8A8);
-    }
-    else if (this->heightImage.GetPixelFormat() == common::Image::RGB_INT8)
-    {
-      img.loadDynamicImage(data, this->heightImage.GetWidth(),
-          this->heightImage.GetHeight(), Ogre::PF_R8G8B8);
-    }
-    else
-    {
-      gzerr << "Unable to handle image format["
-            << this->heightImage.GetPixelFormat() << "]\n";
-    }
-
-    if (flipX)
-      img.flipAroundY();
-    if (flipY)
-      img.flipAroundX();
-
-    this->terrainGroup->defineTerrain(x, y, &img);
+    this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);
     this->terrainsImported = true;
-
-    delete [] data;
   }
 }
 
@@ -394,7 +397,6 @@ double Heightmap::GetHeight(double _x, double _y, double _z)
     return result.position.z;
   else
   {
-    printf("Didn't hit\n");
     return 0;
   }
 }
@@ -599,12 +601,13 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
 /////////////////////////////////////////////////
 void Heightmap::SetupShadows(bool _enableShadows)
 {
+  this->gzMatGen = new GzTerrainMatGen();
+
   // Assume we get a shader model 2 material profile
   Ogre::TerrainMaterialGeneratorA::SM2Profile *matProfile;
 
   // RTSS PSSM shadows compatible terrain material
-  Ogre::TerrainMaterialGenerator *matGen =
-    new GzTerrainMatGen();
+  Ogre::TerrainMaterialGenerator *matGen = this->gzMatGen;
 
   Ogre::TerrainMaterialGeneratorPtr ptr = Ogre::TerrainMaterialGeneratorPtr();
   ptr.bind(matGen);
@@ -614,6 +617,8 @@ void Heightmap::SetupShadows(bool _enableShadows)
       matGen->getActiveProfile());
   if (!matProfile)
     gzerr << "Invalid mat profile\n";
+
+  matProfile->setLayerParallaxMappingEnabled(false);
 
   if (_enableShadows)
   {
@@ -667,6 +672,7 @@ GzTerrainMatGen::SM2Profile::SM2Profile(
     const Ogre::String &_desc)
 : TerrainMaterialGeneratorA::SM2Profile::SM2Profile(_parent, _name, _desc)
 {
+  this->mShaderGen = NULL;
 }
 
 /////////////////////////////////////////////////

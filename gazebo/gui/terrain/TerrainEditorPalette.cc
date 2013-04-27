@@ -82,7 +82,7 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
 
   // Create a slider to control the outer size of the brush
   this->outsideRadiusSlider = new QSlider(this);
-  this->outsideRadiusSlider->setRange(1, 1000);
+  this->outsideRadiusSlider->setRange(1, 100000);
   this->outsideRadiusSlider->setTickInterval(1);
   this->outsideRadiusSlider->setOrientation(Qt::Horizontal);
   this->outsideRadiusSlider->setValue(10);
@@ -90,6 +90,9 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
       this, SLOT(OnOutsideRadiusSlider(int)));
 
   this->outsideRadiusSpin = new QDoubleSpinBox(this);
+  this->outsideRadiusSpin->setRange(0, 1.0);
+  this->outsideRadiusSpin->setSingleStep(0.001);
+  this->outsideRadiusSpin->setDecimals(3);
   connect(this->outsideRadiusSpin, SIGNAL(valueChanged(double)),
       this, SLOT(OnOutsideRadiusSpin(double)));
 
@@ -106,19 +109,19 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
 
   // Create a slider to control the inner size of the brush
   this->insideRadiusSlider = new QSlider(this);
-  this->insideRadiusSlider->setRange(0, 1000);
+  this->insideRadiusSlider->setRange(0, 100000);
   this->insideRadiusSlider->setTickInterval(1);
   this->insideRadiusSlider->setOrientation(Qt::Horizontal);
-  this->insideRadiusSlider->setValue(20);
+  this->insideRadiusSlider->setValue(10);
   connect(this->insideRadiusSlider, SIGNAL(valueChanged(int)),
       this, SLOT(OnInsideRadiusSlider(int)));
 
   this->insideRadiusSpin = new QDoubleSpinBox(this);
   this->insideRadiusSpin->setRange(0, 1.0);
-  this->insideRadiusSpin->setSingleStep(0.1);
+  this->insideRadiusSpin->setSingleStep(0.001);
+  this->insideRadiusSpin->setDecimals(3);
   connect(this->insideRadiusSpin, SIGNAL(valueChanged(double)),
       this, SLOT(OnInsideRadiusSpin(double)));
-
 
   // Create a layout to hold the inner brush size slider and its label
   QHBoxLayout *insideRadiusSpinLayout = new QHBoxLayout;
@@ -132,7 +135,7 @@ TerrainEditorPalette::TerrainEditorPalette(QWidget *_parent)
 
   // Create a slider to control the weight of the brush
   this->weightSlider = new QSlider(this);
-  this->weightSlider->setRange(1, 1000);
+  this->weightSlider->setRange(1, 10000);
   this->weightSlider->setTickInterval(1);
   this->weightSlider->setOrientation(Qt::Horizontal);
   this->weightSlider->setValue(10);
@@ -336,8 +339,8 @@ bool TerrainEditorPalette::Apply(const common::MouseEvent &_event,
 
   // Get the brush weight and size from the sliders.
   double weight = this->weightSpin->value();
-  double outsideRadius = this->outsideRadiusSpin->value();
-  double insideRadius = this->insideRadiusSpin->value();
+  double outsideRadius = this->outsideRadiusSpin->value() / 10.0;
+  double insideRadius = this->insideRadiusSpin->value() / 10.0;
 
   if (this->state == "lower")
     handled = _heightmap->Lower(_camera, _event.pos, outsideRadius,
@@ -361,7 +364,8 @@ void TerrainEditorPalette::OnOutsideRadiusSpin(double _value)
   disconnect(this->outsideRadiusSlider, SIGNAL(valueChanged(int)),
       this, SLOT(OnOutsideRadiusSlider(int)));
 
-  this->outsideRadiusSlider->setValue(static_cast<int>(rint(_value * 10.0)));
+  this->outsideRadiusSlider->setValue(
+      static_cast<int>(rint(_value * this->outsideRadiusSlider->maximum())));
 
   connect(this->outsideRadiusSlider, SIGNAL(valueChanged(int)),
       this, SLOT(OnOutsideRadiusSlider(int)));
@@ -373,7 +377,8 @@ void TerrainEditorPalette::OnOutsideRadiusSlider(int _value)
   disconnect(this->outsideRadiusSpin, SIGNAL(valueChanged(double)),
       this, SLOT(OnOutsideRadiusSpin(double)));
 
-  this->outsideRadiusSpin->setValue(_value / 10.0);
+  this->outsideRadiusSpin->setValue(_value /
+      static_cast<double>(this->outsideRadiusSlider->maximum()));
 
   connect(this->outsideRadiusSpin, SIGNAL(valueChanged(double)),
       this, SLOT(OnOutsideRadiusSpin(double)));

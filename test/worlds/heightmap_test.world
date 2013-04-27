@@ -3,8 +3,6 @@
   <world name="default">
     <include><uri>model://camera</uri></include>
 
-    <physics type='bullet'/>
-
     <model name="heightmap">
       <static>true</static>
       <link name="link">

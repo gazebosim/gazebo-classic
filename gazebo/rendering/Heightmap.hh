@@ -43,6 +43,8 @@ namespace gazebo
 {
   namespace rendering
   {
+    class GzTerrainMatGen;
+
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -128,6 +130,10 @@ namespace gazebo
       /// \param[in] _brushSize Controls the radius of effect.
       public: double GetAvgHeight(Ogre::Vector3 _pos, double _brushSize);
 
+      /// \brief Set the heightmap to render in wireframe mode.
+      /// \param[in] _show True to render wireframe, false to render solid.
+      public: void SetWireframe(bool _show);
+
       /// \brief Get a pointer to the OGRE terrain group object.
       /// \return Pointer to the OGRE terrain.
       public: Ogre::TerrainGroup *GetOgreTerrain() const;
@@ -181,10 +187,7 @@ namespace gazebo
       private: math::Vector3 terrainSize;
 
       /// \brief Size of the image.
-      private: unsigned int imageSize;
-
-      /// \brief Max pixel value.
-      private: double maxPixel;
+      private: unsigned int dataSize;
 
       /// \brief Origin of the terrain.
       private: math::Vector3 terrainOrigin;
@@ -212,6 +215,11 @@ namespace gazebo
 
       /// \brief Material blend fade distances.
       private: std::vector<double> blendFade;
+
+      /// \brief The raw height values received from physics.
+      private: std::vector<float> heights;
+
+      private: GzTerrainMatGen *gzMatGen;
     };
     /// \}
 

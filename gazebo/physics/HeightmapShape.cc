@@ -22,6 +22,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "gazebo/transport/transport.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/Common.hh"
@@ -37,12 +38,35 @@ using namespace physics;
 HeightmapShape::HeightmapShape(CollisionPtr _parent)
     : Shape(_parent)
 {
+  this->vertSize = 0;
   this->AddType(Base::HEIGHTMAP_SHAPE);
 }
 
 //////////////////////////////////////////////////
 HeightmapShape::~HeightmapShape()
 {
+}
+
+//////////////////////////////////////////////////
+void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
+{
+  if (_msg->request() == "heightmap_data")
+  {
+    msgs::Geometry msg;
+
+    msgs::Response response;
+    response.set_id(_msg->id());
+    response.set_request(_msg->request());
+    response.set_response("success");
+
+    this->FillMsg(msg);
+
+    response.set_type(msg.GetTypeName());
+    std::string *serializedData = response.mutable_serialized_data();
+    msg.SerializeToString(serializedData);
+
+    this->responsePub->Publish(response);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -76,14 +100,21 @@ int HeightmapShape::GetSubSampling() const
 //////////////////////////////////////////////////
 void HeightmapShape::Init()
 {
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+
+  this->requestSub = this->node->Subscribe("~/request",
+      &HeightmapShape::OnRequest, this, true);
+  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
+
   this->subSampling = 2;
 
   math::Vector3 terrainSize = this->GetSize();
 
   // sampling size along image width and height
-  this->vertSize = this->img.GetWidth() * this->subSampling;
-  this->scale.x = terrainSize.x / (this->vertSize-1);
-  this->scale.y = terrainSize.y / (this->vertSize-1);
+  this->vertSize = (this->img.GetWidth() * this->subSampling)-1;
+  this->scale.x = terrainSize.x / this->vertSize;
+  this->scale.y = terrainSize.y / this->vertSize;
 
   if (math::equal(this->img.GetMaxColor().r, 0.0f))
     this->scale.z = fabs(terrainSize.z);
@@ -145,6 +176,8 @@ void HeightmapShape::FillHeightMap()
     }
   }*/
 
+  std::ofstream out("/tmp/physics_heights.txt", std::ios::out);
+
   // Iterate over all the vertices
   for (y = 0; y < this->vertSize; y++)
   {
@@ -182,14 +215,17 @@ void HeightmapShape::FillHeightMap()
       if (this->GetSize().z < 0)
         h = 1.0 - h;
 
+      out << h << " ";
       // Store the height for future use
       if (!this->flipY)
         this->heights[y * this->vertSize + x] = h;
       else
         this->heights[(this->vertSize - y - 1) * this->vertSize + x] = h;
     }
+    out << std::endl;
   }
 
+  out.close();
   delete [] data;
 }
 
@@ -215,8 +251,19 @@ math::Vector3 HeightmapShape::GetPos() const
 void HeightmapShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::HEIGHTMAP);
-  msgs::Set(_msg.mutable_heightmap()->mutable_image(),
-            common::Image(this->GetURI()));
+
+  _msg.mutable_heightmap()->set_width(this->vertSize);
+  _msg.mutable_heightmap()->set_height(this->vertSize);
+
+  for (unsigned int y = 0; y < this->vertSize; ++y)
+  {
+    for (unsigned int x = 0; x < this->vertSize; ++x)
+    {
+      int index = (this->vertSize - y - 1) * this->vertSize + x;
+      _msg.mutable_heightmap()->add_heights(this->heights[index]);
+    }
+  }
+
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
   msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos());
 }
@@ -281,7 +328,7 @@ common::Image HeightmapShape::GetImage() const
   double minHeight = this->GetMinHeight();
   double maxHeight = this->GetMaxHeight() - minHeight;
 
-  int size = this->vertSize / this->subSampling;
+  int size = (this->vertSize+1) / this->subSampling;
 
   // Create the image data buffer
   imageData = new unsigned char[size * size];

@@ -1232,6 +1232,7 @@ void World::LoadPlugin(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void World::ProcessEntityMsgs()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   std::list<std::string>::iterator iter;
   for (iter = this->deleteEntity.begin();
        iter != this->deleteEntity.end(); ++iter)
@@ -1271,6 +1272,7 @@ void World::ProcessEntityMsgs()
 //////////////////////////////////////////////////
 void World::ProcessRequestMsgs()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   msgs::Response response;
 
   std::list<msgs::Request>::iterator iter;
@@ -1398,6 +1400,7 @@ void World::ProcessRequestMsgs()
 //////////////////////////////////////////////////
 void World::ProcessModelMsgs()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   std::list<msgs::Model>::iterator iter;
   for (iter = this->modelMsgs.begin(); iter != this->modelMsgs.end(); ++iter)
   {
@@ -1430,146 +1433,155 @@ void World::ProcessModelMsgs()
 //////////////////////////////////////////////////
 void World::ProcessFactoryMsgs()
 {
+  std::list<sdf::ElementPtr> modelsToLoad;
   std::list<msgs::Factory>::iterator iter;
 
-  for (iter = this->factoryMsgs.begin();
-       iter != this->factoryMsgs.end(); ++iter)
   {
-    this->factorySDF->root->ClearElements();
-
-    if ((*iter).has_sdf() && !(*iter).sdf().empty())
+    boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+    for (iter = this->factoryMsgs.begin();
+        iter != this->factoryMsgs.end(); ++iter)
     {
-      // SDF Parsing happens here
-      if (!sdf::readString((*iter).sdf(), factorySDF))
+      this->factorySDF->root->ClearElements();
+
+      if ((*iter).has_sdf() && !(*iter).sdf().empty())
       {
-        gzerr << "Unable to read sdf string[" << (*iter).sdf() << "]\n";
-        continue;
+        // SDF Parsing happens here
+        if (!sdf::readString((*iter).sdf(), factorySDF))
+        {
+          gzerr << "Unable to read sdf string[" << (*iter).sdf() << "]\n";
+          continue;
+        }
       }
-    }
-    else if ((*iter).has_sdf_filename() && !(*iter).sdf_filename().empty())
-    {
-      std::string filename = common::ModelDatabase::Instance()->GetModelFile(
-          (*iter).sdf_filename());
-
-      if (!sdf::readFile(filename, factorySDF))
+      else if ((*iter).has_sdf_filename() && !(*iter).sdf_filename().empty())
       {
-        gzerr << "Unable to read sdf file.\n";
-        continue;
+        std::string filename = common::ModelDatabase::Instance()->GetModelFile(
+            (*iter).sdf_filename());
+
+        if (!sdf::readFile(filename, factorySDF))
+        {
+          gzerr << "Unable to read sdf file.\n";
+          continue;
+        }
       }
-    }
-    else if ((*iter).has_clone_model_name())
-    {
-      ModelPtr model = this->GetModel((*iter).clone_model_name());
-      if (!model)
+      else if ((*iter).has_clone_model_name())
       {
-        gzerr << "Unable to clone model[" << (*iter).clone_model_name()
-              << "]. Model not found.\n";
-        continue;
-      }
+        ModelPtr model = this->GetModel((*iter).clone_model_name());
+        if (!model)
+        {
+          gzerr << "Unable to clone model[" << (*iter).clone_model_name()
+            << "]. Model not found.\n";
+          continue;
+        }
 
-      factorySDF->root->InsertElement(model->GetSDF()->Clone());
+        factorySDF->root->InsertElement(model->GetSDF()->Clone());
 
-      std::string newName = model->GetName() + "_clone";
-      int i = 0;
-      while (this->GetModel(newName))
-      {
-        newName = model->GetName() + "_clone_" +
-                  boost::lexical_cast<std::string>(i);
-        i++;
-      }
+        std::string newName = model->GetName() + "_clone";
+        int i = 0;
+        while (this->GetModel(newName))
+        {
+          newName = model->GetName() + "_clone_" +
+            boost::lexical_cast<std::string>(i);
+          i++;
+        }
 
-      factorySDF->root->GetElement("model")->GetAttribute("name")->Set(newName);
-    }
-    else
-    {
-      gzerr << "Unable to load sdf from factory message."
-            << "No SDF or SDF filename specified.\n";
-      continue;
-    }
-
-    if ((*iter).has_edit_name())
-    {
-      BasePtr base = this->rootElement->GetByName((*iter).edit_name());
-      if (base)
-      {
-        sdf::ElementPtr elem;
-        if (factorySDF->root->GetName() == "sdf")
-          elem = factorySDF->root->GetFirstElement();
-        else
-          elem = factorySDF->root;
-
-        base->UpdateParameters(elem);
-      }
-    }
-    else
-    {
-      bool isActor = false;
-      bool isModel = false;
-      bool isLight = false;
-
-      sdf::ElementPtr elem = factorySDF->root->Clone();
-
-      if (elem->HasElement("world"))
-        elem = elem->GetElement("world");
-
-      if (elem->HasElement("model"))
-      {
-        elem = elem->GetElement("model");
-        isModel = true;
-      }
-      else if (elem->HasElement("light"))
-      {
-        elem = elem->GetElement("light");
-        isLight = true;
-      }
-      else if (elem->HasElement("actor"))
-      {
-        elem = elem->GetElement("actor");
-        isActor = true;
+        factorySDF->root->GetElement("model")->GetAttribute("name")->Set(newName);
       }
       else
       {
-        gzerr << "Unable to find a model, light, or actor in:\n";
-        factorySDF->root->PrintValues("");
+        gzerr << "Unable to load sdf from factory message."
+          << "No SDF or SDF filename specified.\n";
         continue;
       }
 
-      if (!elem)
+      if ((*iter).has_edit_name())
       {
-        gzerr << "Invalid SDF:";
-        factorySDF->root->PrintValues("");
-        continue;
+        BasePtr base = this->rootElement->GetByName((*iter).edit_name());
+        if (base)
+        {
+          sdf::ElementPtr elem;
+          if (factorySDF->root->GetName() == "sdf")
+            elem = factorySDF->root->GetFirstElement();
+          else
+            elem = factorySDF->root;
+
+          base->UpdateParameters(elem);
+        }
       }
-
-      elem->SetParent(this->sdf);
-      elem->GetParent()->InsertElement(elem);
-      if ((*iter).has_pose())
-        elem->GetElement("pose")->Set(msgs::Convert((*iter).pose()));
-
-      if (isActor)
+      else
       {
-        ActorPtr actor = this->LoadActor(elem, this->rootElement);
-        actor->Init();
-      }
-      else if (isModel)
-      {
-        ModelPtr model = this->LoadModel(elem, this->rootElement);
-        model->Init();
+        bool isActor = false;
+        bool isModel = false;
+        bool isLight = false;
 
-        model->LoadPlugins();
-      }
-      else if (isLight)
-      {
-        /// \TODO: Current broken. See Issue #67.
-        msgs::Light *lm = this->sceneMsg.add_light();
-        lm->CopyFrom(msgs::LightFromSDF(elem));
+        sdf::ElementPtr elem = factorySDF->root->Clone();
 
-        this->lightPub->Publish(*lm);
+        if (elem->HasElement("world"))
+          elem = elem->GetElement("world");
+
+        if (elem->HasElement("model"))
+        {
+          elem = elem->GetElement("model");
+          isModel = true;
+        }
+        else if (elem->HasElement("light"))
+        {
+          elem = elem->GetElement("light");
+          isLight = true;
+        }
+        else if (elem->HasElement("actor"))
+        {
+          elem = elem->GetElement("actor");
+          isActor = true;
+        }
+        else
+        {
+          gzerr << "Unable to find a model, light, or actor in:\n";
+          factorySDF->root->PrintValues("");
+          continue;
+        }
+
+        if (!elem)
+        {
+          gzerr << "Invalid SDF:";
+          factorySDF->root->PrintValues("");
+          continue;
+        }
+
+        elem->SetParent(this->sdf);
+        elem->GetParent()->InsertElement(elem);
+        if ((*iter).has_pose())
+          elem->GetElement("pose")->Set(msgs::Convert((*iter).pose()));
+
+        if (isActor)
+        {
+          ActorPtr actor = this->LoadActor(elem, this->rootElement);
+          actor->Init();
+        }
+        else if (isModel)
+        {
+          modelsToLoad.push_back(elem);
+        }
+        else if (isLight)
+        {
+          /// \TODO: Current broken. See Issue #67.
+          msgs::Light *lm = this->sceneMsg.add_light();
+          lm->CopyFrom(msgs::LightFromSDF(elem));
+
+          this->lightPub->Publish(*lm);
+        }
       }
     }
+
+    this->factoryMsgs.clear();
   }
 
-  this->factoryMsgs.clear();
+  for (std::list<sdf::ElementPtr>::iterator iter = modelsToLoad.begin();
+       iter != modelsToLoad.end(); ++iter)
+  {
+    ModelPtr model = this->LoadModel(*iter, this->rootElement);
+    model->Init();
+    model->LoadPlugins();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1733,37 +1745,38 @@ bool World::OnLog(std::ostringstream &_stream)
 //////////////////////////////////////////////////
 void World::ProcessMessages()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
-  msgs::Pose *poseMsg;
-
-  if (this->posePub && this->posePub->HasConnections() &&
-      this->publishModelPoses.size() > 0)
   {
-    msgs::Pose_V msg;
+    boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+    msgs::Pose *poseMsg;
 
-    for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
-        iter != this->publishModelPoses.end(); ++iter)
+    if (this->posePub && this->posePub->HasConnections() &&
+        this->publishModelPoses.size() > 0)
     {
-      poseMsg = msg.add_pose();
+      msgs::Pose_V msg;
 
-      // Publish the model's relative pose
-      poseMsg->set_name((*iter)->GetScopedName());
-      msgs::Set(poseMsg, (*iter)->GetRelativePose());
-
-      // Publish each of the model's children relative poses
-      Link_V links = (*iter)->GetLinks();
-      for (Link_V::iterator linkIter = links.begin();
-          linkIter != links.end(); ++linkIter)
+      for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
+          iter != this->publishModelPoses.end(); ++iter)
       {
         poseMsg = msg.add_pose();
-        poseMsg->set_name((*linkIter)->GetScopedName());
-        msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
-      }
-    }
-    this->posePub->Publish(msg);
-  }
-  this->publishModelPoses.clear();
 
+        // Publish the model's relative pose
+        poseMsg->set_name((*iter)->GetScopedName());
+        msgs::Set(poseMsg, (*iter)->GetRelativePose());
+
+        // Publish each of the model's children relative poses
+        Link_V links = (*iter)->GetLinks();
+        for (Link_V::iterator linkIter = links.begin();
+            linkIter != links.end(); ++linkIter)
+        {
+          poseMsg = msg.add_pose();
+          poseMsg->set_name((*linkIter)->GetScopedName());
+          msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
+        }
+      }
+      this->posePub->Publish(msg);
+    }
+    this->publishModelPoses.clear();
+  }
 
   if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
       this->processMsgsPeriod)

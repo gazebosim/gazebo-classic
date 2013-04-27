@@ -27,6 +27,7 @@
 
 #include "gazebo/common/Image.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
 
@@ -108,6 +109,8 @@ namespace gazebo
       /// \brief Create a lookup table of the terrain's height.
       private: void FillHeightMap();
 
+      private: void OnRequest(ConstRequestPtr &_msg);
+
       /// \brief Lookup table of heights.
       protected: std::vector<float> heights;
 
@@ -125,6 +128,15 @@ namespace gazebo
 
       /// \brief The amount of subsampling. Default is 2.
       protected: int subSampling;
+
+      /// \brief Transportation node.
+      private: transport::NodePtr node;
+
+      /// \brief Subscriber to request messages.
+      private: transport::SubscriberPtr requestSub;
+
+      /// \brief Publisher for request response messages.
+      private: transport::PublisherPtr responsePub;
     };
     /// \}
   }

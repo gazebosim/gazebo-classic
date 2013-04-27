@@ -73,7 +73,7 @@ void Publisher::WaitForConnection() const
 
 //////////////////////////////////////////////////
 void Publisher::PublishImpl(const google::protobuf::Message &_message,
-                            bool /*_block*/)
+                            bool _block)
 {
   if (_message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
@@ -133,8 +133,15 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
     }
   }
 
-  // Tell the connection manager that it needs to update
-  ConnectionManager::Instance()->TriggerUpdate();
+  if (_block)
+  {
+    this->SendMessage();
+  }
+  else
+  {
+    // Tell the connection manager that it needs to update
+    ConnectionManager::Instance()->TriggerUpdate();
+  }
 }
 
 //////////////////////////////////////////////////

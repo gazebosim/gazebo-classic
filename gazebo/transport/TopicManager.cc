@@ -146,8 +146,11 @@ void TopicManager::ProcessNodes(bool _onlyOut)
   }
 
   // Process nodes in parallel
-  tbb::parallel_for(tbb::blocked_range<size_t>(0, this->nodes.size(), 10),
-      NodeProcess_TBB(&this->nodes));
+  {
+    boost::mutex::scoped_lock lock(this->processNodesMutex);
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, this->nodes.size(), 10),
+        NodeProcess_TBB(&this->nodes));
+  }
 
   if (!this->pauseIncoming && !_onlyOut)
   {

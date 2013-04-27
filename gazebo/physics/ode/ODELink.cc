@@ -700,9 +700,9 @@ void ODELink::SetKinematic(const bool &_state)
   this->sdf->GetElement("kinematic")->Set(_state);
   if (this->linkId)
   {
-    if (_state)
+    if (_state && !dBodyIsKinematic(this->linkId))
       dBodySetKinematic(this->linkId);
-    else
+    else if(dBodyIsKinematic(this->linkId))
       dBodySetDynamic(this->linkId);
   }
   else
