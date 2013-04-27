@@ -25,6 +25,25 @@ GZ_REGISTER_WORLD_PLUGIN(RubblePlugin)
 /////////////////////////////////////////////////
 RubblePlugin::RubblePlugin()
 {
+    // set textures to be used for random distribution over rubble parts
+    rubbleMaterialScript = "file://media/materials/scripts/rubble.material";
+
+    // specify possible textures for each rubble type
+    std::vector<std::string> texturesType0;
+    texturesType0.push_back("Rubble/Brick");
+    texturesType0.push_back("Rubble/WoodPlank");
+
+    std::vector<std::string> texturesType1;
+    texturesType1.push_back("Rubble/Brick");
+    texturesType1.push_back("Rubble/RoughStone");
+
+    std::vector<std::string> texturesType2;
+    texturesType2.push_back("Rubble/Brick");
+    texturesType2.push_back("Rubble/RoughStone");
+
+    rubbleTextures.push_back(texturesType0);
+    rubbleTextures.push_back(texturesType1);
+    rubbleTextures.push_back(texturesType2);
 }
 
 /////////////////////////////////////////////////
@@ -61,6 +80,10 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
 
     obj.type = rubbleType;
+
+    // select texture
+    uint textureIdx = math::Rand::GetIntUniform(1, rubbleTextures[rubbleType].size()) - 1;
+    obj.texture = rubbleTextures[rubbleType][textureIdx];
 
     // Make a 2x4
     if (rubbleType == 0)
@@ -99,11 +122,11 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     name << "rubble_" << i;
 
     if (rubbleType == 0)
-      this->MakeBox(name.str(), obj.pose, obj.size, mass);
+      this->MakeBox(name.str(), obj.pose, obj.size, mass, obj.texture);
     else if (rubbleType == 1)
-      this->MakeCinderBlock(name.str(), obj.pose, obj.size, mass);
+      this->MakeCinderBlock(name.str(), obj.pose, obj.size, mass, obj.texture);
     /*else
-      this->MakeCylinder(name.str(), obj.pos, obj.size, mass);
+      this->MakeCylinder(name.str(), obj.pos, obj.size, mass, obj.texture);
       */
 
     // Disable compound objects for now.
@@ -179,7 +202,7 @@ void RubblePlugin::Init()
 
 /////////////////////////////////////////////////
 void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
-                              math::Vector3 &_size, double _mass)
+                              math::Vector3 &_size, double _mass, const std::string &_texture)
 {
   std::ostringstream newModelStr;
 
@@ -187,7 +210,7 @@ void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
   float sy = _size.y;
   float sz = _size.z;
 
-  newModelStr << "<sdf version='1.3'>"
+  newModelStr << "<sdf version='1.4'>"
     "<model name='" << _name << "'>"
     "<pose>" << _pose << "</pose>"
     "<link name='link'>"
@@ -214,6 +237,12 @@ void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
         "<geometry>"
           "<box><size>" << _size << "</size></box>"
         "</geometry>"
+        "<material>"
+          "<script>"
+            "<uri>" << rubbleMaterialScript << "</uri>"
+            "<name>" << _texture << "</name>"
+          "</script>"
+        "</material>"
       "</visual>"
     "</link>"
   "</model>"
@@ -224,15 +253,22 @@ void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
 
 /////////////////////////////////////////////////
 void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
-                           math::Vector3 &_size, double _mass)
+                           math::Vector3 &_size, double _mass, const std::string &_texture)
 {
   std::ostringstream newModelStr;
+
+  // load uv-mapped model with dimensions (1,
+  std::string visualMesh = "file://media/materials/textures/2x4x1_box.dae";
+  // allow to scale mesh in case dimensions get changed
+  float vsx = _size.x;
+  float vsy = 0.1016 / _size.y;
+  float vsz = 0.0508 / _size.z;
 
   float sx = _size.x;
   float sy = _size.y;
   float sz = _size.z;
 
-  newModelStr << "<sdf version='1.3'>"
+  newModelStr << "<sdf version='1.4'>"
     "<model name='" << _name << "'>"
     "<allow_auto_disable>true</allow_auto_disable>"
     "<pose>" << _pose << "</pose>"
@@ -258,8 +294,18 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
       "</collision>"
       "<visual name='visual'>"
         "<geometry>"
-          "<box><size>" << _size << "</size></box>"
+//           "<box><size>" << _size << "</size></box>"
+          "<mesh>"
+            "<uri>" << visualMesh << "</uri>"
+            "<scale>" << vsx << " " << vsy << " " << vsz << "</scale>"
+          "</mesh>"
         "</geometry>"
+        "<material>"
+          "<script>"
+            "<uri>" << rubbleMaterialScript << "</uri>"
+            "<name>" << _texture << "</name>"
+          "</script>"
+        "</material>"
       "</visual>"
     "</link>"
   "</model>"
@@ -270,14 +316,14 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
 
 /////////////////////////////////////////////////
 void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
-                                math::Vector3 &_size, double _mass)
+                                math::Vector3 &_size, double _mass, const std::string &_texture)
 {
   std::ostringstream newModelStr;
 
   float r = _size.x * 0.5;
   float h = _size.z;
 
-  newModelStr << "<sdf version='1.3'>"
+  newModelStr << "<sdf version='1.4'>"
     "<model name='" << _name << "'>"
     "<pose>" << _pos << " 0 0 0</pose>"
     "<link name='link'>"
@@ -306,6 +352,12 @@ void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
           "<cylinder><radius>" << r << "</radius>"
           "<length>" << h << "</length></cylinder>"
         "</geometry>"
+        "<material>"
+          "<script>"
+            "<uri>" << rubbleMaterialScript << "</uri>"
+            "<name>" << _texture << "</name>"
+          "</script>"
+        "</material>"
       "</visual>"
     "</link>"
   "</model>"
@@ -319,7 +371,7 @@ void RubblePlugin::MakeCompound(const std::string &_name, CompoundObj &_obj)
 {
   std::ostringstream newModelStr, geomStr, inertiaStr;
 
-  newModelStr << "<sdf version ='1.3'>"
+  newModelStr << "<sdf version ='1.4'>"
       << "<model name='" << _name << "'>"
       << "  <pose>" << _obj.pos << " 0 0 0</pose>"
       << "  <link name='link'>";
