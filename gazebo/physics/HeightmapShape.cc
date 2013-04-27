@@ -198,12 +198,12 @@ void HeightmapShape::FillHeightMap()
         x2 = imgWidth-1;
       dx = xf - x1;
 
-      px1 = static_cast<int>(data[y1 * pitch + x1 * bpp]) / 256.0;
-      px2 = static_cast<int>(data[y1 * pitch + x2 * bpp]) / 256.0;
+      px1 = static_cast<int>(data[y1 * pitch + x1 * bpp]) / 255.0;
+      px2 = static_cast<int>(data[y1 * pitch + x2 * bpp]) / 255.0;
       h1 = (px1 - ((px1 - px2) * dx));
 
-      px3 = static_cast<int>(data[y2 * pitch + x1 * bpp]) / 256.0;
-      px4 = static_cast<int>(data[y2 * pitch + x2 * bpp]) / 256.0;
+      px3 = static_cast<int>(data[y2 * pitch + x1 * bpp]) / 255.0;
+      px4 = static_cast<int>(data[y2 * pitch + x2 * bpp]) / 255.0;
       h2 = (px3 - ((px3 - px4) * dx));
 
 

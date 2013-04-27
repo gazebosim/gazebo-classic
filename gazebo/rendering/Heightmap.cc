@@ -41,7 +41,6 @@ using namespace rendering;
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)
 {
-  std::cout << "New Heightmap\n";
   this->scene = _scene;
   this->terrainGlobals = NULL;
 }
@@ -49,18 +48,13 @@ Heightmap::Heightmap(ScenePtr _scene)
 //////////////////////////////////////////////////
 Heightmap::~Heightmap()
 {
-  std::cout << "Delete Heightmap\n";
+  this->terrainGroup->removeAllTerrains();
+
+  delete this->terrainGlobals;
+  this->terrainGlobals = NULL;
+
   delete this->terrainGroup;
   this->terrainGroup = NULL;
-
-  // delete this->gzMatGen;
-  // this->gzMatGen = NULL;
-
-  // delete this->terrainGlobals->getDefaultMaterialGenerator().get();
-  // this->terrainGlobals->setDefaultMaterialGenerator(
-  //    Ogre::TerrainMaterialGeneratorPtr());
-  //delete this->terrainGlobals;
-  this->terrainGlobals = NULL;
 
   this->scene.reset();
 }
@@ -679,7 +673,8 @@ GzTerrainMatGen::SM2Profile::SM2Profile(
 GzTerrainMatGen::SM2Profile::~SM2Profile()
 {
   // Because the base SM2Profile has no virtual destructor:
-  OGRE_DELETE this->mShaderGen;
+  delete this->mShaderGen;
+  this->mShaderGen = NULL;
 }
 
 /////////////////////////////////////////////////

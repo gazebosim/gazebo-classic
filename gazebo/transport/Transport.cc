@@ -207,7 +207,6 @@ boost::shared_ptr<msgs::Response> transport::request(
 
   SubscriberPtr responseSub = node->Subscribe("~/response", &on_response);
 
-  std::cout << "request[" << request->DebugString() << "]\n";
   requestPub->Publish(*request, true);
 
   boost::shared_ptr<msgs::Response> response;

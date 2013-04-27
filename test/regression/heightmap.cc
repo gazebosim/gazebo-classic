@@ -208,7 +208,6 @@ TEST_F(HeightmapTest, Heights)
   // printf(" %f};\nstatic float *heights = __heights;\n",
   // shape->GetHeight(x,y));
 }
-/*
 
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, WhiteAlpha)
@@ -231,7 +230,7 @@ TEST_F(HeightmapTest, WhiteAlpha)
   {
     for (x = 0; x < shape->GetVertexCount().x; ++x)
     {
-      EXPECT_EQ(shape->GetHeight(x, y), 10.0);
+      EXPECT_NEAR(shape->GetHeight(x, y), 10.0, 1e-4);
     }
   }
 }
@@ -283,13 +282,12 @@ TEST_F(HeightmapTest, InvalidSizeImage)
       TEST_REGRESSION_PATH);
 
   this->server = new Server();
-  EXPECT_THROW(this->server->Load("worlds/invalid_size_heightmap.world"),
+  EXPECT_THROW(this->server->LoadFile("worlds/invalid_size_heightmap.world"),
                common::Exception);
 
   this->server->Fini();
   delete this->server;
 }
-*/
 
 
 int main(int argc, char **argv)
