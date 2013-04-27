@@ -66,7 +66,7 @@ void BulletLink::Init()
 {
   // Set the initial pose of the body
   this->motionState.reset(new BulletMotionState(
-    boost::shared_dynamic_cast<Link>(shared_from_this())));
+    boost::dynamic_pointer_cast<Link>(shared_from_this())));
 
   Link::Init();
 

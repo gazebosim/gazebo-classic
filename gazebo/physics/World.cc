@@ -1484,7 +1484,8 @@ void World::ProcessFactoryMsgs()
           i++;
         }
 
-        factorySDF->root->GetElement("model")->GetAttribute("name")->Set(newName);
+        factorySDF->root->GetElement("model")->GetAttribute("name")->Set(
+            newName);
       }
       else
       {

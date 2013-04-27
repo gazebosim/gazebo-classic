@@ -702,7 +702,7 @@ void ODELink::SetKinematic(const bool &_state)
   {
     if (_state && !dBodyIsKinematic(this->linkId))
       dBodySetKinematic(this->linkId);
-    else if(dBodyIsKinematic(this->linkId))
+    else if (dBodyIsKinematic(this->linkId))
       dBodySetDynamic(this->linkId);
   }
   else

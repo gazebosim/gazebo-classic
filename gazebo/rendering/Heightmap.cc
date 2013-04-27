@@ -156,8 +156,8 @@ void Heightmap::Load()
 
     // Copy the height data.
     this->heights.resize(geomMsg.heightmap().heights().size());
-    memcpy(&this->heights[0],geomMsg.heightmap().heights().data(),
-        sizeof(float)*geomMsg.heightmap().heights().size());
+    memcpy(&this->heights[0], geomMsg.heightmap().heights().data(),
+        sizeof(this->heights[0])*geomMsg.heightmap().heights().size());
 
     this->dataSize = geomMsg.heightmap().width();
   }

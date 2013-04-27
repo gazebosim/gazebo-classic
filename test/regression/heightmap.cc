@@ -47,7 +47,8 @@ TEST_F(HeightmapTest, PhysicsLoad)
     model->GetLink("link")->GetCollision("collision");
 
   physics::HeightmapShapePtr shape =
-    boost::shared_dynamic_cast<physics::HeightmapShape>(collision->GetShape());
+    boost::dynamic_pointer_cast<physics::HeightmapShape>(
+        collision->GetShape());
 
   EXPECT_TRUE(shape);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
@@ -98,7 +99,6 @@ TEST_F(HeightmapTest, Heights)
   rendering::ScenePtr scene = GetScene();
   ASSERT_TRUE(scene);
 
-  return;
   rendering::Heightmap *heightmap = NULL;
 
   // Wait for the heightmap to get loaded by the scene.

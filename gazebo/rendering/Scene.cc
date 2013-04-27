@@ -1658,7 +1658,8 @@ void Scene::PreRender()
         {
           // If an object is selected, don't let the physics engine move it.
           if (!this->selectedVis || this->selectionMode != "move" ||
-              iter->first.find(this->selectedVis->GetName()) == std::string::npos)
+              iter->first.find(this->selectedVis->GetName()) ==
+              std::string::npos)
           {
             math::Pose pose = msgs::Convert(pose_msg);
             iter2->second->SetPose(pose);
@@ -2278,7 +2279,6 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::SetSky()
 {
-  return;
   // Create SkyX
   this->skyxController = new SkyX::BasicController();
   this->skyx = new SkyX::SkyX(this->manager, this->skyxController);

@@ -80,7 +80,7 @@ void BulletHeightmapShape::Init()
   btVector3 min, max;
   this->heightFieldShape->getAabb(btTransform::getIdentity(), min, max);
 
-  BulletLinkPtr bLink = boost::shared_dynamic_cast<BulletLink>(
+  BulletLinkPtr bLink = boost::dynamic_pointer_cast<BulletLink>(
       bParent->GetParent());
 
   GZ_ASSERT(bLink != NULL, "Bullet heightmap does not have a link.");
