@@ -81,8 +81,7 @@ typedef dReal *dRealMutablePtr;
 // and the optimal order is somewhat problem dependent.
 // @@@ try the leaf->root ordering.
 
-//#define REORDER_CONSTRAINTS 1
-
+// #define REORDER_CONSTRAINTS 1
 
 // for the SOR method:
 // uncomment the following line to randomly reorder constraint rows
@@ -92,6 +91,9 @@ typedef dReal *dRealMutablePtr;
 // #define RANDOMLY_REORDER_CONSTRAINTS 1
 #undef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
 
+// scale SOR for contact to reduce overshoot in solution for contacts
+// make this a parameter
+#define CONTACT_SOR_SCALE 0.5
 
 // structure for passing variable pointers in SOR_LCP
 struct dxSORLCPParameters {
@@ -1122,7 +1124,10 @@ static void SOR_LCP (dxWorldProcessContext *context,
       if (jb[i*2+1] >= 0) {
         for (int k=6; k<12; k++) sum += iMJ_ptr[k] * J_ptr[k];
       }
-      Ad[i] = sor_w / (sum + cfm[i]);
+      if (findex[i] < 0)
+        Ad[i] = sor_w / (sum + cfm[i]);
+      else
+        Ad[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
     }
   }
 
@@ -1142,7 +1147,10 @@ static void SOR_LCP (dxWorldProcessContext *context,
       if (jb[i*2+1] >= 0) {
         for (int k=6; k<12; k++) sum += J_ptr[k] * J_ptr[k];
       }
-      Ad_precon[i] = sor_w / (sum + cfm[i]);
+      if (findex[i] < 0)
+        Ad_precon[i] = sor_w / (sum + cfm[i]);
+      else
+        Ad_precon[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
     }
   }
 
@@ -1208,19 +1216,22 @@ static void SOR_LCP (dxWorldProcessContext *context,
 #ifndef REORDER_CONSTRAINTS
   {
     // make sure constraints with findex < 0 come first.
-    IndexError *orderhead = order, *ordertail = order + (m - 1);
+    IndexError *orderhead = order; //, *ordertail = order + (m - 1);
 
+    int front = 0;
+    int back = m-1;
     // Fill the array from both ends
-    for (int i=0; i<m; i++) {
+    for (int i=0; i<m; ++i) {
       if (findex[i] < 0) {
-        orderhead->index = i; // Place them at the front
-        ++orderhead;
+        orderhead->index = front; // Place them at the front
+        ++front;
       } else {
-        ordertail->index = i; // Place them at the end
-        --ordertail;
+        orderhead->index = back; // Place them at the end
+        --back;
       }
+      ++orderhead;
     }
-    dIASSERT (orderhead-ordertail==1);
+    dIASSERT (back - front==1);
   }
 #endif
 
