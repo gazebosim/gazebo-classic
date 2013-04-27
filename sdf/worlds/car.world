@@ -1,12 +1,11 @@
 <?xml version="1.0" ?>
-<sdf version="1.3">
+<sdf version="1.4">
   <world name="default">
     <physics type="ode">
       <gravity>0 0 -9.8</gravity>
       <ode>
         <solver>
           <type>quick</type>
-          <dt>0.003</dt>
           <iters>80</iters>
           <sor>1.3</sor>
         </solver>
@@ -17,11 +16,16 @@
           <contact_surface_layer>0.001</contact_surface_layer>
         </constraints>
       </ode>
+      <max_step_size>0.003</max_step_size>
     </physics>
     <!-- A ground plane -->
-    <include><uri>model://ground_plane</uri></include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
     <!-- A global light source -->
-    <include><uri>model://sun</uri></include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
     <include filename="car.model" />
   </world>
 </sdf>

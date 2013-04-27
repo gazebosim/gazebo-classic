@@ -54,6 +54,18 @@ namespace gazebo
   /// \brief An angle and related functions.
   class Angle
   {
+    /// \brief math::Angle(0)
+    public: static const Angle Zero;
+
+    /// \brief math::Angle(M_PI)
+    public: static const Angle Pi;
+
+    /// \brief math::Angle(M_PI * 0.5)
+    public: static const Angle HalfPi;
+
+    /// \brief math::Angle(M_PI * 2)
+    public: static const Angle TwoPi;
+
     /// \brief Constructor
     public: Angle();
 

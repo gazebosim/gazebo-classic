@@ -40,6 +40,7 @@ set (msgs
   laserscan_stamped.proto
   light.proto
   link.proto
+  link_data.proto
   log_control.proto
   log_status.proto
   material.proto

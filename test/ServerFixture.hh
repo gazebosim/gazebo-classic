@@ -49,6 +49,8 @@
 
 using namespace gazebo;
 
+std::string custom_exec(std::string _cmd);
+
 class ServerFixture : public testing::Test
 {
   protected: ServerFixture()
@@ -619,12 +621,12 @@ class ServerFixture : public testing::Test
 
                int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 50)
+               while (!this->HasEntity(_modelName) && i < 100)
                {
-                 common::Time::MSleep(50);
+                 common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 50);
+               EXPECT_LT(i, 100);
              }
 
   /// \brief Spawn a contact sensor with the specified collision geometry
@@ -689,6 +691,68 @@ class ServerFixture : public testing::Test
                  ++i;
                }
                EXPECT_LT(i, 100);
+             }
+
+  /// \brief Spawn an IMU sensor on a link
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _collisionType Type of collision, box or cylinder
+  /// \param[in] _topic Topic to publish IMU data to
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _static True to make the model static
+  protected: void SpawnUnitImuSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const std::string &_collisionType,
+                 const std::string &_topic, const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy, bool _static = false)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+               std::ostringstream shapeStr;
+               if (_collisionType == "box")
+                 shapeStr << " <box><size>1 1 1</size></box>";
+               else if (_collisionType == "cylinder")
+               {
+                 shapeStr << "<cylinder>"
+                          << "  <radius>.5</radius><length>1.0</length>"
+                          << "</cylinder>";
+               }
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <collision name ='contact_collision'>"
+                 << "    <geometry>"
+                 << shapeStr.str()
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << shapeStr.str()
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "  <sensor name='" << _sensorName << "' type='imu'>"
+                 << "    <imu>"
+                 << "      <topic>" << _topic << "</topic>"
+                 << "    </imu>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
              }
 
   protected: void SpawnCylinder(const std::string &_name,

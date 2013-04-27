@@ -188,6 +188,8 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
 //////////////////////////////////////////////////
 void ContactSensor::Fini()
 {
+  this->contactSub.reset();
+  this->contactsPub.reset();
   Sensor::Fini();
 }
 
