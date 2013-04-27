@@ -39,13 +39,16 @@ namespace gazebo
     public: virtual void Init();
 
     private: void MakeBox(const std::string &_name, math::Pose &_pose,
-                          math::Vector3 &_size, double _mass, const std::string &_texture);
+                          math::Vector3 &_size, double _mass,
+                          const std::string &_texture);
 
     private: void MakeCinderBlock(const std::string &_name, math::Pose &_pose,
-                                  math::Vector3 &_size, double _mass, const std::string &_texture);
+                                  math::Vector3 &_size, double _mass,
+                                  const std::string &_texture);
 
     private: void MakeCylinder(const std::string &_name, math::Vector3 &_pos,
-                               math::Vector3 &_size, double _mass, const std::string &_texture);
+                               math::Vector3 &_size, double _mass,
+                               const std::string &_texture);
 
     private: class Obj
              {
@@ -68,9 +71,11 @@ namespace gazebo
     private: void MakeCompound(const std::string &_name, CompoundObj &_obj);
     private: physics::WorldPtr world;
 
-    /// stores absolute filename of rubble material script
+    /// \brief Stores absolute filename of rubble material script
     private: std::string rubbleMaterialScript;
-    /// stores possible rubble textures used from rubble material script for each rubble type
+
+    /// \brief Stores possible rubble textures used from rubble material script
+    ///        for each rubble type
     private: std::vector< std::vector<std::string> > rubbleTextures;
   };
 }

@@ -82,7 +82,8 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     obj.type = rubbleType;
 
     // select texture
-    uint textureIdx = math::Rand::GetIntUniform(1, rubbleTextures[rubbleType].size()) - 1;
+    uint textureIdx =
+      math::Rand::GetIntUniform(1, rubbleTextures[rubbleType].size()) - 1;
     obj.texture = rubbleTextures[rubbleType][textureIdx];
 
     // Make a 2x4
@@ -202,7 +203,8 @@ void RubblePlugin::Init()
 
 /////////////////////////////////////////////////
 void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
-                              math::Vector3 &_size, double _mass, const std::string &_texture)
+                              math::Vector3 &_size, double _mass,
+                              const std::string &_texture)
 {
   std::ostringstream newModelStr;
 
@@ -253,7 +255,8 @@ void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
 
 /////////////////////////////////////////////////
 void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
-                           math::Vector3 &_size, double _mass, const std::string &_texture)
+                           math::Vector3 &_size, double _mass,
+                           const std::string &_texture)
 {
   std::ostringstream newModelStr;
 
@@ -316,7 +319,8 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
 
 /////////////////////////////////////////////////
 void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
-                                math::Vector3 &_size, double _mass, const std::string &_texture)
+                                math::Vector3 &_size, double _mass,
+                                const std::string &_texture)
 {
   std::ostringstream newModelStr;
 
