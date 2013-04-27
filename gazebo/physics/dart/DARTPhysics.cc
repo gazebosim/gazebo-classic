@@ -82,7 +82,7 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   // Gravity
   math::Vector3 g = this->sdf->GetValueVector3("gravity");
   this->dartWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
-  
+
   // Time step
   //double timeStep = this->sdf->GetValueDouble("time_step");
   //this->dartWorld->setTimeStep(timeStep);
@@ -95,7 +95,7 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void DARTPhysics::Init()
 {
-  this->dartWorld->init();
+  //this->dartWorld->initialize();
   //this->dartWorld->setRuntimeMode();
 }
 
@@ -140,7 +140,7 @@ void DARTPhysics::UpdatePhysics()
 //    double state = FirstDof[0];
 
     //common::Time currTime =  this->world->GetRealTime();
-    this->dartWorld->updatePhysics(this->maxStepSize);
+    this->dartWorld->step(this->maxStepSize);
 
 //    dofs = this->dartWorld->getDofs();
 //    FirstDof = dofs[0];

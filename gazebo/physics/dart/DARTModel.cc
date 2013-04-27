@@ -141,7 +141,7 @@ void DARTModel::Init()
 
   // init the kinematics and dynamics
   dartSkeletonDynamics->initSkel();
-  dartSkeletonDynamics->initDynamics();
+  //dartSkeletonDynamics->initDynamics();
 
   // add skeleton to world
   this->GetDARTWorld()->addSkeleton(dartSkeletonDynamics);

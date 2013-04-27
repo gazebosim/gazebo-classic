@@ -65,24 +65,24 @@ void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 
-TEST_F(PhysicsTest, EmptyWorldODE)
-{
-  EmptyWorld("ode");
-}
+//TEST_F(PhysicsTest, EmptyWorldODE)
+//{
+//  EmptyWorld("ode");
+//}
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, EmptyWorldBullet)
-{
-  EmptyWorld("bullet");
-}
-#endif  // HAVE_BULLET
+//#ifdef HAVE_BULLET
+//TEST_F(PhysicsTest, EmptyWorldBullet)
+//{
+//  EmptyWorld("bullet");
+//}
+//#endif  // HAVE_BULLET
 
-#ifdef HAVE_DART
-TEST_F(PhysicsTest, EmptyWorldDART)
-{
-  EmptyWorld("dart");
-}
-#endif // HAVE_DART
+//#ifdef HAVE_DART
+//TEST_F(PhysicsTest, EmptyWorldDART)
+//{
+//  EmptyWorld("dart");
+//}
+//#endif // HAVE_DART
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnDrop:
@@ -232,24 +232,24 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, SpawnDropODE)
-{
-  SpawnDrop("ode");
-}
+//TEST_F(PhysicsTest, SpawnDropODE)
+//{
+//  SpawnDrop("ode");
+//}
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SpawnDropBullet)
-{
-  SpawnDrop("bullet");
-}
-#endif  // HAVE_BULLET
+//#ifdef HAVE_BULLET
+//TEST_F(PhysicsTest, SpawnDropBullet)
+//{
+//  SpawnDrop("bullet");
+//}
+//#endif  // HAVE_BULLET
 
-#ifdef HAVE_DART
-TEST_F(PhysicsTest, SpawnDropDART)
-{
-  SpawnDrop("dart");
-}
-#endif  // HAVE_DART
+//#ifdef HAVE_DART
+//TEST_F(PhysicsTest, SpawnDropDART)
+//{
+//  SpawnDrop("dart");
+//}
+//#endif // HAVE_DART
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnDropCoGOffset:
@@ -1280,17 +1280,17 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
 //}
 
 
-TEST_F(PhysicsTest, SimplePendulumODE)
-{
-  SimplePendulum("ode");
-}
+//TEST_F(PhysicsTest, SimplePendulumODE)
+//{
+//  SimplePendulum("ode");
+//}
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SimplePendulumBullet)
-{
-  SimplePendulum("bullet");
-}
-#endif  // HAVE_BULLET
+//#ifdef HAVE_BULLET
+//TEST_F(PhysicsTest, SimplePendulumBullet)
+//{
+//  SimplePendulum("bullet");
+//}
+//#endif  // HAVE_BULLET
 
 #ifdef HAVE_DART
 TEST_F(PhysicsTest, SimplePendulumDart)

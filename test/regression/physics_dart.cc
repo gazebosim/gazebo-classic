@@ -53,8 +53,9 @@ void PhysicsTest::EmptyWorld_JS(std::string _worldFile)
 TEST_F(PhysicsTest, DART_FIRST_TEST)
 {
   //EmptyWorld_JS("worlds/empty.world");
-  EmptyWorld_JS("worlds/dart/sp_test.world");
   //EmptyWorld_JS("worlds/dart/sp_test.world");
+  //EmptyWorld_JS("worlds/dart/sp_test.world");
+  EmptyWorld_JS("worlds/dart/falling_box.world");
 }
 #endif // HAVE_DART
 
