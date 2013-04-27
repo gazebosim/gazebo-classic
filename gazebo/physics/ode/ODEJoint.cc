@@ -1071,9 +1071,11 @@ void ODEJoint::CFMDamping()
   double dt = this->GetWorld()->GetPhysicsEngine()->GetMaxStepSize();
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
+    double angle = this->GetAngle(i).Radian();
+    double dAngle = 2.0 * this->GetVelocity(i) * dt;
     if (math::equal(this->dampingCoefficient, 0.0) ||
-        this->GetAngle(i) + this->GetVelocity(i) * dt >= this->upperLimit[i] ||
-        this->GetAngle(i) - this->GetVelocity(i) * dt <= this->lowerLimit[i])
+        angle + dAngle >= this->upperLimit[i].Radian() ||
+        angle - dAngle <= this->lowerLimit[i].Radian())
     {
       if (this->cfmDampingState[i] != ODEJoint::JOINT_LIMIT)
       {
