@@ -140,7 +140,7 @@ void DARTPhysics::UpdatePhysics()
 //    double state = FirstDof[0];
 
     //common::Time currTime =  this->world->GetRealTime();
-    this->dartWorld->step(this->maxStepSize);
+    this->dartWorld->step();
 
 //    dofs = this->dartWorld->getDofs();
 //    FirstDof = dofs[0];
@@ -435,5 +435,12 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
+}
+
+void DARTPhysics::SetMaxStepSize(double _stepSize)
+{
+  PhysicsEngine::SetMaxStepSize(_stepSize);
+
+  this->dartWorld->setTimeStep(_stepSize);
 }
 

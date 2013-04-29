@@ -82,40 +82,41 @@ namespace gazebo
       //      /// \brief Get the simulation step time
       //      public: virtual double GetStepTime();
 
-      /// \brief Create a new model
+      // Documentation inherited
       public: virtual ModelPtr CreateModel(BasePtr _parent);
       
-      /// \brief Create a new body
+      // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
-      /// \brief Create a new collision
+      // Documentation inherited
       public: virtual CollisionPtr CreateCollision(const std::string& _type,
                                                    LinkPtr _body);
 
-      /// \brief Create a new joint
+      // Documentation inherited
       public: virtual JointPtr CreateJoint(const std::string& _type,
                                            ModelPtr _parent);
       
-      /// \brief Create a new shape
+      // Documentation inherited
       public: virtual ShapePtr CreateShape(const std::string& _shapeType,
                                            CollisionPtr _collision);
 
-      /// \brief Set the gavity vector
+      // Documentation inherited
       public: virtual void SetGravity(const gazebo::math::Vector3& gravity);
 
-      /// \brief Debug print out of the physic engine state.
+      // Documentation inherited
       public: virtual void DebugPrint() const;
 
       /// \brief Store the value of the stepTime parameter to improve efficiency
       //private: double stepTimeDouble;
 
-      /// \brief virtual callback for gztopic "~/request".
-      /// \param[in] _msg Request message.
+      // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
 
-      /// \brief virtual callback for gztopic "~/physics".
-      /// \param[in] _msg Physics message.
+      // Documentation inherited
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
+
+      // Documentation inherited
+      void virtual SetMaxStepSize(double _stepSize);
 
       /// \brief
       public: simulation::World* GetDARTWorld() {return dartWorld;}
