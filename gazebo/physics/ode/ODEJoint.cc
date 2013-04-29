@@ -42,8 +42,12 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->jointId = NULL;
   this->cfmDampingState[0] = ODEJoint::NONE;
   this->cfmDampingState[1] = ODEJoint::NONE;
+  this->cfmDampingState[2] = ODEJoint::NONE;
   this->dampingInitialized = false;
   this->feedback = NULL;
+  this->dStable[0] = 0;
+  this->dStable[1] = 0;
+  this->dStable[2] = 0;
 }
 
 //////////////////////////////////////////////////
@@ -1092,12 +1096,43 @@ void ODEJoint::CFMDamping()
     }
     else if (!math::equal(this->dampingCoefficient, 0.0))
     {
-      if (this->cfmDampingState[i] != ODEJoint::DAMPING_ACTIVE)
+      /// \TODO: hardcoded thresholds for now, make them params.
+      static double vThreshold = 0.01;
+      static double fThreshold = 1.0;
+      double f = this->GetForce(i);
+      double v = this->GetVelocity(i);
+      double curDamp = fabs(this->dampingCoefficient);
+
+      /// \TODO: increase damping if resulting acceleration
+      /// is outside of stability region.  simple limiter based on (f, v).
+      // safeguard against unstable joint behavior
+      // at low speed and high force scenarios
+      if (this->dampingCoefficient < 0 &&
+          fabs(v) < vThreshold && fabs(f) > fThreshold)
       {
+        double tmpDStable = f / (v/fabs(v)*std::max(fabs(v), vThreshold));
+        // gzerr << "joint [" << this->GetName()
+        //       << "] curDamp[" << curDamp
+        //       << "] f [" << f
+        //       << "] v [" << v
+        //       << "] f*v [" << f*v
+        //       << "] f/v [" << tmpDStable
+        //       << "] cur dStable[" << i << "] = [" << dStable[i] << "]\n";
+
+        // limit v(n+1)/v(n) to 2.0 by multiplying tmpDStable by 0.5
+        curDamp = std::max(curDamp, 0.5*tmpDStable);
+      }
+
+      // update if going into DAMPING_ACTIVE mode, or
+      // if current applied damping value is not the same as predicted.
+      if (this->cfmDampingState[i] != ODEJoint::DAMPING_ACTIVE ||
+          !math::equal(curDamp, this->dStable[i]))
+      {
+        this->dStable[i] = curDamp;
         // add additional constraint row by fake hitting joint limit
         // then, set erp and cfm to simulate viscous joint damping
         this->SetAttribute("stop_erp", i, 0.0);
-        this->SetAttribute("stop_cfm", i, 1.0 / this->dampingCoefficient);
+        this->SetAttribute("stop_cfm", i, 1.0 / curDamp);
         this->SetAttribute("hi_stop", i, 0.0);
         this->SetAttribute("lo_stop", i, 0.0);
         this->SetAttribute("hi_stop", i, 0.0);

@@ -499,7 +499,9 @@ double Joint::GetForce(int _index)
 //////////////////////////////////////////////////
 void Joint::ApplyDamping()
 {
-  double dampingForce = -this->dampingCoefficient * this->GetVelocity(0);
+  // dampingCoefficient could be negative, used for adaptive damping
+  // to enforce stability.
+  double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
   this->SetForce(0, dampingForce);
 }
 
