@@ -1021,7 +1021,12 @@ void World::SetPaused(bool _p)
   }
 
   if (_p)
+  {
+    // This is also a good time to clear out the logging buffer.
+    util::LogRecord::Instance()->Notify();
+
     this->pauseStartTime = common::Time::GetWallTime();
+  }
   else
     this->realTimeOffset += common::Time::GetWallTime() - this->pauseStartTime;
 
@@ -1708,16 +1713,20 @@ bool World::OnLog(std::ostringstream &_stream)
   }
   else if (this->states.size() >= 1)
   {
-    size_t end = this->states.size();
-
-    // Get the difference from the previous state.
-    for (size_t i = 0; i < end; ++i)
+    do
     {
-      _stream << "<sdf version='" << SDF_VERSION << "'>"
-        << this->states[0] << "</sdf>";
+      size_t end = this->states.size();
 
-      this->states.pop_front();
-    }
+      // Get the difference from the previous state.
+      for (size_t i = 0; i < end; ++i)
+      {
+        _stream << "<sdf version='" << SDF_VERSION << "'>"
+          << this->states[0] << "</sdf>";
+
+        this->states.pop_front();
+      }
+    } while (this->states.size() > 1000);
+    std::cout << "States[" << this->states.size() << "]\n";
   }
 
   // Logging has stopped. Wait for log worker to finish. Output last bit
