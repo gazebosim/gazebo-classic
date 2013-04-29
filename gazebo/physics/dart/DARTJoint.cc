@@ -77,13 +77,6 @@ void DARTJoint::Load(sdf::ElementPtr _sdf)
   DARTModelPtr dartModel
       = boost::shared_dynamic_cast<DARTModel>(this->model);
 
-  this->parentLink;
-  std::string parentLinkName
-      = _sdf->GetElement("parent")->GetValueString("link_name");
-
-  if (parentLinkName == std::string(""))
-    gzerr << "No parent link name";
-
   if (this->parentLink && this->childLink)
   {
     // a) create a dart joint.
