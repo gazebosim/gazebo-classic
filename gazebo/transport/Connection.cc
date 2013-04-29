@@ -202,7 +202,7 @@ void Connection::OnAccept(const boost::system::error_code &e)
   if (!e)
   {
     if (!this->ipWhiteList.empty() &&
-        this->ipWhiteList.find( "," +
+        this->ipWhiteList.find("," +
           this->acceptConn->GetRemoteHostname() + ",") == std::string::npos)
     {
       gzlog << "Rejected connection from["
