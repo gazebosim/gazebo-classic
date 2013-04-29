@@ -81,8 +81,8 @@ void ImagesView_TEST::Switch()
     topicMap[6] = "~/multicamera_5/link/cam5/images";
     topicMap[7] = "~/multicamera_6/link/cam6/images";
 
-    // Switch the topic 50 times
-    for (unsigned int i = 0; i < 50; ++i)
+    // Switch the topic 25 times
+    for (unsigned int i = 0; i < 25; ++i)
     {
       // Get a random topic index.
       int index = gazebo::math::Rand::GetIntUniform(1, 7);
