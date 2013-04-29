@@ -1580,10 +1580,10 @@ void World::ProcessFactoryMsgs()
     this->factoryMsgs.clear();
   }
 
-  for (std::list<sdf::ElementPtr>::iterator iter = modelsToLoad.begin();
-       iter != modelsToLoad.end(); ++iter)
+  for (std::list<sdf::ElementPtr>::iterator iter2 = modelsToLoad.begin();
+       iter2 != modelsToLoad.end(); ++iter2)
   {
-    ModelPtr model = this->LoadModel(*iter, this->rootElement);
+    ModelPtr model = this->LoadModel(*iter2, this->rootElement);
     model->Init();
     model->LoadPlugins();
   }
