@@ -147,7 +147,7 @@ void Heightmap::Load()
 
   msgs::Geometry geomMsg;
   boost::shared_ptr<msgs::Response> response = transport::request(
-      "default", "heightmap_data");
+     this->scene->GetName(), "heightmap_data");
 
   if (response->response() != "error" &&
       response->type() == geomMsg.GetTypeName())
