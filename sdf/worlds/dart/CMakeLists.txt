@@ -27,6 +27,8 @@ set (files
   revolute_joints_ode.world
   sp_test.world
   sp_test_ode.world
+  falling.world
+  falling_ode.world
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/dart)
