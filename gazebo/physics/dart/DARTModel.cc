@@ -46,9 +46,6 @@ void DARTModel::Load(sdf::ElementPtr _sdf)
   // create skeletonDynamics of DART
   this->dartSkeletonDynamics = new dynamics::SkeletonDynamics();
 
-  // add skeleton to world
-  //this->GetDARTWorld()->addSkeleton(dartSkeletonDynamics);
-
   Model::Load(_sdf);
 
   // Name

@@ -398,6 +398,7 @@ math::Vector3 DARTLink::GetWorldLinearVel(
   math::Vector3 vel;
 
   //const Eigen::Vector3d& linVel = this->dartBodyNode->getWorldLinearVel();
+  // TODO:
   const Eigen::Vector3d& linVel =  this->dartBodyNode->mVel;
 
   vel.x = linVel[0];
@@ -439,16 +440,11 @@ math::Vector3 DARTLink::GetWorldAngularVel() const
 {
   math::Vector3 vel;
 
-  //   if (this->linkId)
-  //   {
-  //     const dReal *dvel;
-  //
-  //     dvel = dBodyGetAngularVel(this->linkId);
-  //
-  //     vel.Set(dvel[0], dvel[1], dvel[2]);
-  //   }
+  const Eigen::Vector3d& AngularVel =  this->dartBodyNode->mOmega;
 
-  gzwarn << "Not implemented!\n";
+  vel.x = AngularVel[0];
+  vel.y = AngularVel[1];
+  vel.z = AngularVel[2];
 
   return vel;
 }

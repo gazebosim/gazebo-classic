@@ -28,7 +28,9 @@ set (files
   sp_test.world
   sp_test_ode.world
   falling.world
+  falling2.world
   falling_ode.world
+  falling2_ode.world
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/dart)

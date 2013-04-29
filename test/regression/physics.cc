@@ -949,19 +949,19 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   }
 }
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, RevoluteJointBullet)
-{
-  RevoluteJoint("bullet");
-}
-#endif  // HAVE_BULLET
-
-//#ifdef HAVE_DART
-//TEST_F(PhysicsTest, RevoluteJointDART)
+//#ifdef HAVE_BULLET
+//TEST_F(PhysicsTest, RevoluteJointBullet)
 //{
-//  RevoluteJoint("dart");
+//  RevoluteJoint("bullet");
 //}
-//#endif  // HAVE_DART
+//#endif  // HAVE_BULLET
+
+#ifdef HAVE_DART
+TEST_F(PhysicsTest, RevoluteJointDART)
+{
+  RevoluteJoint("dart");
+}
+#endif  // HAVE_DART
 
 //TEST_F(PhysicsTest, State)
 //{
@@ -1562,6 +1562,14 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
 //  CollisionFiltering("bullet");
 //}
 //#endif  // HAVE_BULLET
+
+///////////////////////////////////////////////////
+//#ifdef HAVE_DART
+//TEST_F(PhysicsTest, CollisionFilteringDART)
+//{
+//  CollisionFiltering("dart");
+//}
+//#endif  // HAVE_DART
 
 ///////////////////////////////////////////////////
 //// This test verifies that gazebo doesn't crash when collisions occur
