@@ -112,20 +112,30 @@ transport::ConnectionPtr connect_to_master()
 
   // Connect to the master
   transport::ConnectionPtr connection(new transport::Connection());
-  connection->Connect(host, port);
 
-  // Read the verification message
-  connection->Read(data);
-  connection->Read(namespacesData);
-  connection->Read(publishersData);
-
-  packet.ParseFromString(data);
-  if (packet.type() == "init")
+  if (connection->Connect(host, port))
   {
-    msgs::GzString msg;
-    msg.ParseFromString(packet.serialized_data());
-    if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
-      std::cerr << "Conflicting gazebo versions\n";
+    try
+    {
+      // Read the verification message
+      connection->Read(data);
+      connection->Read(namespacesData);
+      connection->Read(publishersData);
+    }
+    catch(...)
+    {
+      gzerr << "Unable to read from master\n";
+      return transport::ConnectionPtr();
+    }
+
+    packet.ParseFromString(data);
+    if (packet.type() == "init")
+    {
+      msgs::GzString msg;
+      msg.ParseFromString(packet.serialized_data());
+      if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
+        std::cerr << "Conflicting gazebo versions\n";
+    }
   }
 
   return connection;
@@ -141,26 +151,29 @@ void list()
 
   transport::ConnectionPtr connection = connect_to_master();
 
-  request.set_id(0);
-  request.set_request("get_publishers");
-  connection->EnqueueMsg(msgs::Package("request", request), true);
-  connection->Read(data);
-
-  packet.ParseFromString(data);
-  pubs.ParseFromString(packet.serialized_data());
-
-  // This list is used to filter topic output.
-  std::list<std::string> listed;
-
-  for (int i = 0; i < pubs.publisher_size(); i++)
+  if (connection)
   {
-    const msgs::Publish &p = pubs.publisher(i);
-    if (std::find(listed.begin(), listed.end(), p.topic()) == listed.end())
-    {
-      std::cout << p.topic() << std::endl;
+    request.set_id(0);
+    request.set_request("get_publishers");
+    connection->EnqueueMsg(msgs::Package("request", request), true);
+    connection->Read(data);
 
-      // Record the topics that have been listed to prevent duplicates.
-      listed.push_back(p.topic());
+    packet.ParseFromString(data);
+    pubs.ParseFromString(packet.serialized_data());
+
+    // This list is used to filter topic output.
+    std::list<std::string> listed;
+
+    for (int i = 0; i < pubs.publisher_size(); i++)
+    {
+      const msgs::Publish &p = pubs.publisher(i);
+      if (std::find(listed.begin(), listed.end(), p.topic()) == listed.end())
+      {
+        std::cout << p.topic() << std::endl;
+
+        // Record the topics that have been listed to prevent duplicates.
+        listed.push_back(p.topic());
+      }
     }
   }
 
@@ -255,7 +268,8 @@ void echo()
 
   std::string topic = params[1];
 
-  transport::init();
+  if (!transport::init())
+    return;
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -300,7 +314,8 @@ void bw()
     return;
   }
 
-  transport::init();
+  if (!transport::init())
+    return;
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -392,7 +407,8 @@ void hz()
     return;
   }
 
-  transport::init();
+  if (!transport::init())
+    return;
 
   transport::NodePtr node(new transport::Node());
   node->Init();

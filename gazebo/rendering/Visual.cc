@@ -1363,7 +1363,7 @@ math::Pose Visual::GetWorldPose() const
   pose.pos.y = vpos.y;
   pose.pos.z = vpos.z;
 
-  vquatern = this->sceneNode->getOrientation();
+  vquatern = this->sceneNode->_getDerivedOrientation();
   pose.rot.w = vquatern.w;
   pose.rot.x = vquatern.x;
   pose.rot.y = vquatern.y;
