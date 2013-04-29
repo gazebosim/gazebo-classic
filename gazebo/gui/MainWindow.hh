@@ -49,7 +49,7 @@ namespace gazebo
       public: unsigned int GetEntityId(const std::string &_name);
       public: bool HasEntityName(const std::string &_name);
 
-      /// \brief Add a widget to the left column stack of widgetes.
+      /// \brief Add a widget to the left column stack of widgets.
       /// \param[in] _name Name of the widget
       /// \param[in] _widget Pointer to the widget to add.
       public: void AddToLeftColumn(const std::string &_name, QWidget *_widget);

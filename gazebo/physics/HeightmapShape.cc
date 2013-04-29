@@ -158,7 +158,7 @@ void HeightmapShape::FillHeightMap()
   double px1, px2, px3, px4;
 
   // Iterate over all the vertices
-  for (y = 0; y < this->vertSize; y++)
+  for (y = 0; y < this->vertSize; ++y)
   {
     // yf ranges between 0 and 4
     yf = y / static_cast<double>(this->subSampling);
@@ -168,7 +168,7 @@ void HeightmapShape::FillHeightMap()
       y2 = imgHeight-1;
     dy = yf - y1;
 
-    for (x = 0; x < this->vertSize; x++)
+    for (x = 0; x < this->vertSize; ++x)
     {
       xf = x / static_cast<double>(this->subSampling);
       x1 = floor(xf);
@@ -310,9 +310,9 @@ common::Image HeightmapShape::GetImage() const
   imageData = new unsigned char[size * size];
 
   // Get height data from all vertices
-  for (uint16_t y = 0; y < size; y++)
+  for (uint16_t y = 0; y < size; ++y)
   {
-    for (uint16_t x = 0; x < size; x++)
+    for (uint16_t x = 0; x < size; ++x)
     {
       int sx = static_cast<int>(x * this->subSampling);
       int sy;

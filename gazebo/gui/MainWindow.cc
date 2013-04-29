@@ -993,16 +993,20 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
   QLayoutItem *child = NULL;
   while ((child = this->menuLayout->takeAt(0)) != 0)
   {
+    delete child;
   }
 
   if (!_bar)
   {
-    if (!this->menuBar)
-      this->CreateMenuBar();
+    this->CreateMenuBar();
     this->menuLayout->addWidget(this->menuBar);
   }
   else
+  {
+    if (this->menuBar)
+      this->menuBar->hide();
     this->menuLayout->addWidget(_bar);
+  }
 
   this->menuLayout->addStretch(5);
   this->menuLayout->setContentsMargins(0, 0, 0, 0);
@@ -1012,9 +1016,7 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 void MainWindow::CreateMenuBar()
 {
   if (this->menuBar)
-  {
-    delete menuBar;
-  }
+    delete this->menuBar;
 
   this->menuBar = new QMenuBar;
   this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

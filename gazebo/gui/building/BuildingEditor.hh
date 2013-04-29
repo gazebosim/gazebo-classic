@@ -66,8 +66,16 @@ namespace gazebo
       /// \brief Contains all the building editor tools.
       private: BuildingEditorPalette *buildingPalette;
 
+      /// \brief Create menus
+      private: void CreateMenus();
+
       /// \brief Our custom menubar
       private: QMenuBar *menuBar;
+
+      private: QAction *saveAct;
+      private: QAction *discardAct;
+      private: QAction *doneAct;
+      private: QAction *exitAct;
     };
   }
 }

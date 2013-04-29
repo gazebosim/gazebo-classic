@@ -34,44 +34,37 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
   this->buildingPalette = new BuildingEditorPalette;
   this->Init("buildingEditorTab", "Building Editor", this->buildingPalette);
 
-  QAction *saveAct = new QAction(tr("&Save (As)"), this->mainWindow);
-  saveAct->setStatusTip(tr("Save (As)"));
-  saveAct->setShortcut(tr("Ctrl+S"));
-  saveAct->setCheckable(false);
-  connect(saveAct, SIGNAL(triggered()), this, SLOT(Save()));
+  this->saveAct = new QAction(tr("&Save (As)"), this->mainWindow);
+  this->saveAct->setStatusTip(tr("Save (As)"));
+  this->saveAct->setShortcut(tr("Ctrl+S"));
+  this->saveAct->setCheckable(false);
+  connect(this->saveAct, SIGNAL(triggered()), this, SLOT(Save()));
 
-  QAction *discardAct = new QAction(tr("&Discard"), this->mainWindow);
-  discardAct->setStatusTip(tr("Discard"));
-  discardAct->setShortcut(tr("Ctrl+D"));
-  discardAct->setCheckable(false);
-  connect(discardAct, SIGNAL(triggered()), this, SLOT(Discard()));
+  this->discardAct = new QAction(tr("&Discard"), this->mainWindow);
+  this->discardAct->setStatusTip(tr("Discard"));
+  this->discardAct->setShortcut(tr("Ctrl+D"));
+  this->discardAct->setCheckable(false);
+  connect(this->discardAct, SIGNAL(triggered()), this, SLOT(Discard()));
 
-  QAction *doneAct = new QAction(tr("Don&e"), this->mainWindow);
-  doneAct->setShortcut(tr("Ctrl+E"));
-  doneAct->setStatusTip(tr("Done"));
-  doneAct->setCheckable(false);
-  connect(doneAct, SIGNAL(triggered()), this, SLOT(Done()));
+  this->doneAct = new QAction(tr("Don&e"), this->mainWindow);
+  this->doneAct->setShortcut(tr("Ctrl+E"));
+  this->doneAct->setStatusTip(tr("Done"));
+  this->doneAct->setCheckable(false);
+  connect(this->doneAct, SIGNAL(triggered()), this, SLOT(Done()));
 
-  QAction *exitAct = new QAction(tr("E&xit Building Editor"), this->mainWindow);
-  exitAct->setStatusTip(tr("Exit Building Editor"));
-  exitAct->setShortcut(tr("Ctrl+X"));
-  exitAct->setCheckable(false);
-  connect(exitAct, SIGNAL(triggered()), this, SLOT(Exit()));
-
-  this->menuBar = new QMenuBar;
-  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
-  fileMenu->addAction(saveAct);
-  fileMenu->addAction(discardAct);
-  fileMenu->addAction(doneAct);
-  fileMenu->addAction(exitAct);
+  this->exitAct = new QAction(tr("E&xit Building Editor"), this->mainWindow);
+  this->exitAct->setStatusTip(tr("Exit Building Editor"));
+  this->exitAct->setShortcut(tr("Ctrl+X"));
+  this->exitAct->setCheckable(false);
+  connect(this->exitAct, SIGNAL(triggered()), this, SLOT(Exit()));
 
   connect(g_editBuildingAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
   this->connections.push_back(
       gui::editor::Events::ConnectFinishBuildingModel(
       boost::bind(&BuildingEditor::OnFinish, this)));
+
+  this->menuBar = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -111,10 +104,26 @@ void BuildingEditor::OnFinish()
 }
 
 /////////////////////////////////////////////////
+void BuildingEditor::CreateMenus()
+{
+  delete this->menuBar;
+
+  this->menuBar = new QMenuBar;
+  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  fileMenu->addAction(this->saveAct);
+  fileMenu->addAction(this->discardAct);
+  fileMenu->addAction(this->doneAct);
+  fileMenu->addAction(this->exitAct);
+}
+
+/////////////////////////////////////////////////
 void BuildingEditor::OnEdit(bool _checked)
 {
   if (_checked)
   {
+    this->CreateMenus();
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("buildingEditorTab");
     this->mainWindow->ShowMenuBar(this->menuBar);

@@ -48,12 +48,10 @@ void TerrainEditor::OnEdit(bool _checked)
   {
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("terrainEditorTab");
-    // this->mainWindow->ShowMenuBar(this->menuBar);
   }
   else
   {
     this->mainWindow->ShowLeftColumnWidget();
-    // this->mainWindow->ShowMenuBar();
     this->mainWindow->Play();
   }
 }
