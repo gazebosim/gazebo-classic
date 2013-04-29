@@ -103,7 +103,9 @@ void Spawn(po::variables_map &_vm)
     rpy.z = _vm["pose-Y"].as<double>();
   pose.rot.SetFromEuler(rpy);
 
-  transport::init();
+  if (!transport::init())
+    return;
+
   transport::run();
 
   transport::NodePtr node(new transport::Node());
@@ -142,7 +144,9 @@ void Delete(po::variables_map &vm)
 
   msgs::Request *msg = msgs::CreateRequest("entity_delete", modelName);
 
-  transport::init();
+  if (!transport::init())
+    return;
+
   transport::run();
 
   transport::NodePtr node(new transport::Node());
