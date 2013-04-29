@@ -1032,7 +1032,9 @@ void MainWindow::CreateMenuBar()
   editMenu->addAction(g_resetModelsAct);
   editMenu->addAction(g_resetWorldAct);
   editMenu->addAction(g_editBuildingAct);
-  editMenu->addAction(g_editTerrainAct);
+
+  // \TODO: Add this back in when implementing the full Terrain Editor spec.
+  // editMenu->addAction(g_editTerrainAct);
 
   QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
