@@ -62,6 +62,8 @@ namespace gazebo
 
       /// \brief Apply a brush
       /// \param[in] _event The mouse event.
+      /// \param[in] _camera Active camera.
+      /// \param[in] _heightmap Heightmap on which to apply the modification.
       /// \return True if the brush was applied
       private: bool Apply(const common::MouseEvent &_event,
                    rendering::CameraPtr _camera,

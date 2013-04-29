@@ -157,27 +157,6 @@ void HeightmapShape::FillHeightMap()
   int y1, y2, x1, x2;
   double px1, px2, px3, px4;
 
-  /*for (y = 0; y < this->vertSize; ++y)
-  {
-    for (x = 0; x < this->vertSize; ++x)
-    {
-      px1 = static_cast<int>(data[y * pitch + x * bpp]) / 255.0f;
-
-      h = px1 * this->scale.z;
-
-      // invert pixel definition so 1=ground, 0=full height,
-      //   if the terrain size has a negative z component
-      //   this is mainly for backward compatibility
-      if (this->GetSize().z < 0)
-        h = 1.0f - h;
-
-      // Store the height for future use
-      this->heights[y * this->vertSize + x] = h;
-    }
-  }*/
-
-  std::ofstream out("/tmp/physics_heights.txt", std::ios::out);
-
   // Iterate over all the vertices
   for (y = 0; y < this->vertSize; y++)
   {
@@ -215,17 +194,14 @@ void HeightmapShape::FillHeightMap()
       if (this->GetSize().z < 0)
         h = 1.0 - h;
 
-      out << h << " ";
       // Store the height for future use
       if (!this->flipY)
         this->heights[y * this->vertSize + x] = h;
       else
         this->heights[(this->vertSize - y - 1) * this->vertSize + x] = h;
     }
-    out << std::endl;
   }
 
-  out.close();
   delete [] data;
 }
 

@@ -70,9 +70,9 @@ set (headers
   GuiEvents.hh
   LightMaker.hh
   MeshMaker.hh
+  MouseEventHandler.hh
   ModelMaker.hh
   SphereMaker.hh
-  MouseEventHandler.hh
 )
 
 #if (HAVE_QWT)

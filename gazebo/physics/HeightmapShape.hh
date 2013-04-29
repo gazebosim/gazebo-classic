@@ -98,8 +98,9 @@ namespace gazebo
       /// \return The minimum height.
       public: float GetMinHeight() const;
 
-      /// \brief Deprecated
-      public: int GetSubSampling() const GAZEBO_DEPRECATED(1.6);
+      /// \brief Get the amount of subsampling.
+      /// \return Amount of subsampling.
+      public: int GetSubSampling() const;
 
       /// \brief Return an image representation of the heightmap.
       /// \return Image where white pixels represents the highest locations,
@@ -109,6 +110,8 @@ namespace gazebo
       /// \brief Create a lookup table of the terrain's height.
       private: void FillHeightMap();
 
+      /// \brief Handle request messages.
+      /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
 
       /// \brief Lookup table of heights.

@@ -57,19 +57,6 @@ void ODEHeightmapShape::Init()
   this->odeData = dGeomHeightfieldDataCreate();
 
   // Step 3: Setup a callback method for ODE
-  /*dGeomHeightfieldDataBuildCallback(
-      this->odeData,
-      this,
-      ODEHeightmapShape::GetHeightCallback,
-      this->GetSize().x,  // in meters
-      this->GetSize().y,  // in meters
-      this->vertSize,  // width sampling size
-      this->vertSize,  // depth sampling size (along height of image)
-      1.0,  // vertical (z-axis) scaling
-      this->GetPos().z,  // vertical (z-axis) offset
-      1.0,  // vertical thickness for closing the height map mesh
-      0);  // wrap mode
-      */
   dGeomHeightfieldDataBuildSingle(
       this->odeData,
       &this->heights[0],

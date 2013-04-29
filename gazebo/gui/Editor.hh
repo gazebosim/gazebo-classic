@@ -30,12 +30,13 @@ namespace gazebo
     class MainWindow;
 
     /// \brief Base class for editors, such as BuildingEditor and
-    /// TerrainEditor
+    /// TerrainEditor.
     class Editor : public QObject
     {
       Q_OBJECT
 
-      /// \brief Constuctor
+      /// \brief Constuctor.
+      /// \param[in] _mainWindow Pointer to the main window.
       public: Editor(MainWindow *_mainWindow);
 
       /// \brief Destuctor
@@ -45,12 +46,12 @@ namespace gazebo
       /// function on construction.
       /// \param[in] _objName Name of the object, which can be used in the
       /// style sheet.
-      /// \param[in] _lableName String used for the tab label.
+      /// \param[in] _tabLabel String used for the tab label.
       /// \param[in] _widget Widget that is put inside the tab.
       protected: void Init(const std::string &_objName,
                      const std::string &_tabLabel, QWidget *_widget);
 
-      /// \brief The tab widget that holds the editor's set of buttons
+      /// \brief The tab widget that holds the editor's set of buttons.
       protected: QTabWidget *tabWidget;
 
       /// \brief Pointer to the main window.

@@ -78,21 +78,47 @@ namespace gazebo
 
       private: std::string GetOgreHandle() const;
 
+      /// \brief Callback for a mouse move event.
+      /// \param[in] _event The mouse move event
+      /// \return True if handled by this function.
       private: bool OnMouseMove(const common::MouseEvent &_event);
+
+      /// \brief Process a normal mouse move event.
       private: void OnMouseMoveNormal();
+
+      /// \brief Process an object translate mouse move event.
       private: void OnMouseMoveTranslate();
+
+      /// \brief Process a make object mouse move event.
       private: void OnMouseMoveMakeEntity();
 
+      /// \brief Callback for a mouse release event.
+      /// \param[in] _event The mouse release event
+      /// \return True if handled by this function.
       private: bool OnMouseRelease(const common::MouseEvent &_event);
+
+      /// \brief Process a normal mouse release event.
       private: void OnMouseReleaseNormal();
+
+      /// \brief Process an object translate mouse release event.
       private: void OnMouseReleaseTranslate();
+
+      /// \brief Process a make object mouse release event.
       private: void OnMouseReleaseMakeEntity();
 
+      /// \brief Callback for a mouse press event.
+      /// \param[in] _event The mouse press event
+      /// \return True if handled by this function.
       private: bool OnMousePress(const common::MouseEvent &_event);
+
+      /// \brief Process a normal mouse press event.
       private: void OnMousePressNormal();
+
+      /// \brief Process an object translate mouse press event.
       private: void OnMousePressTranslate();
+
+      /// \brief Process a make object mouse presse event.
       private: void OnMousePressMakeEntity();
-      private: void OnMousePressRaiseTerrain();
 
       private: void OnRequest(ConstRequestPtr &_msg);
 

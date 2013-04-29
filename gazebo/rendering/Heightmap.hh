@@ -186,7 +186,7 @@ namespace gazebo
       /// \brief Size of the terrain.
       private: math::Vector3 terrainSize;
 
-      /// \brief Size of the image.
+      /// \brief Size of the heightmap data.
       private: unsigned int dataSize;
 
       /// \brief Origin of the terrain.
@@ -219,6 +219,7 @@ namespace gazebo
       /// \brief The raw height values received from physics.
       private: std::vector<float> heights;
 
+      /// \brief Pointer to the terrain material generator.
       private: GzTerrainMatGen *gzMatGen;
     };
     /// \}

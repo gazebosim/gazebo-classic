@@ -115,17 +115,5 @@
       </link>
     </model>
 
-    <!--
-    <include>
-      <uri>model://hokuyo</uri>
-      <pose>0 0 10 0 1.570796 0</pose>
-    </include>
-
-    <include>
-      <uri>model://camera</uri>
-      <pose>0 0 100 0 1.570796 0</pose>
-    </include>
--->
-
   </world>
 </sdf>
