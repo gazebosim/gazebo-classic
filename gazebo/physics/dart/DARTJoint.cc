@@ -77,13 +77,21 @@ void DARTJoint::Load(sdf::ElementPtr _sdf)
   DARTModelPtr dartModel
       = boost::shared_dynamic_cast<DARTModel>(this->model);
 
+  this->parentLink;
   std::string parentLinkName
       = _sdf->GetElement("parent")->GetValueString("link_name");
 
   if (parentLinkName == std::string(""))
     gzerr << "No parent link name";
 
-  if (parentLinkName == std::string("world"))
+  if (this->parentLink && this->childLink)
+  {
+    // a) create a dart joint.
+    kinematics::BodyNode* parentBodyNode
+        = boost::shared_dynamic_cast<DARTLink>(this->parentLink)->GetBodyNode();
+    dartJoint = new kinematics::Joint(parentBodyNode, childBodyNode);
+  }
+  else if (this->childLink)
   {
     // a) create a dart joint whose parent link is null pointer.
     dartJoint = new kinematics::Joint(NULL, childBodyNode);
@@ -93,10 +101,7 @@ void DARTJoint::Load(sdf::ElementPtr _sdf)
   }
   else
   {
-    // a) create a dart joint.
-    kinematics::BodyNode* parentBodyNode
-        = boost::shared_dynamic_cast<DARTLink>(this->parentLink)->GetBodyNode();
-    dartJoint = new kinematics::Joint(parentBodyNode, childBodyNode);
+    gzthrow("joint without links\n");
   }
 
   dartModel->GetSkeletonDynamics()->addJoint(dartJoint);
