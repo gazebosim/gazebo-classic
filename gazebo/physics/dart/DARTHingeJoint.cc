@@ -209,12 +209,18 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
     globalAxis = localAxis;
   }
 
-  return globalAxis;
+  // TODO: Issue #494
+  // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
+  //return globalAxis;
+  return this->poseParentLinkToJoint.rot * localAxis;
 }
 
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
 {
+  // TODO: Issue #494
+  // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
+
   // For now the _axis is represented in global frame.
   //math::Pose childWorldPose = this->childLink->GetWorldPose();
   //math::Pose jointFrameInWorld = childWorldPose * this->poseChildLinkToJoint;
