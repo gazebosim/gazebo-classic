@@ -91,8 +91,8 @@ typedef dReal *dRealMutablePtr;
 // #define RANDOMLY_REORDER_CONSTRAINTS 1
 #undef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
 
-// scale SOR for contact to reduce overshoot in solution for contacts
-// make this a parameter
+/// scale SOR for contact to reduce overshoot in solution for contacts
+/// \TODO: make this a parameter
 #define CONTACT_SOR_SCALE 0.5
 
 // structure for passing variable pointers in SOR_LCP
