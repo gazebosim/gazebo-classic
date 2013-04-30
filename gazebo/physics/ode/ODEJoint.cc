@@ -381,6 +381,7 @@ math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
 //////////////////////////////////////////////////
 void ODEJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
+  // record axis in sdf element
   if (_index == 0)
     this->sdf->GetElement("axis")->GetElement("xyz")->Set(_axis);
   else if (_index == 1)
@@ -930,15 +931,19 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
     if (this->HasType(physics::Base::HINGE_JOINT))
     {
       // rotate force into child link frame
+      // GetLocalAxis is the axis specified in parent link frame!!!
       wrenchAppliedWorld.body2Torque =
-        this->GetForce(0u) * this->GetGlobalAxis(0u);
+        this->GetForce(0u) * this->GetLocalAxis(0u);
+      gzerr << "body2Torque [" << wrenchAppliedWorld.body2Torque
+            << "axis [" << this->GetLocalAxis(0u)
+            << "]\n";
       wrenchAppliedWorld.body1Torque = -wrenchAppliedWorld.body2Torque;
     }
     else if (this->HasType(physics::Base::SLIDER_JOINT))
     {
       // rotate force into child link frame
       wrenchAppliedWorld.body2Force =
-        this->GetForce(0u) * this->GetGlobalAxis(0u);
+        this->GetForce(0u) * this->GetLocalAxis(0u);
       wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
     }
     else

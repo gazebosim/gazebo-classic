@@ -22,6 +22,7 @@
 #include "gazebo_config.h"
 #include "common/Console.hh"
 
+#include "physics/Model.hh"
 #include "physics/Link.hh"
 #include "physics/ode/ODEHinge2Joint.hh"
 
@@ -89,12 +90,21 @@ void ODEHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
+  /// ODE needs global axis
+  /// \TODO: currently we assume joint axis is specified in model frame,
+  /// this is incorrect, and should be corrected to be
+  /// joint frame which is specified in child link frame.
+  math::Vector3 globalAxis =
+    this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+
   if (this->jointId)
   {
     if (_index == 0)
-      dJointSetHinge2Axis1(this->jointId, _axis.x, _axis.y, _axis.z);
+      dJointSetHinge2Axis1(this->jointId,
+        globalAxis.x, globalAxis.y, globalAxis.z);
     else
-      dJointSetHinge2Axis2(this->jointId, _axis.x, _axis.y, _axis.z);
+      dJointSetHinge2Axis2(this->jointId,
+        globalAxis.x, globalAxis.y, globalAxis.z);
   }
   else
     gzerr << "ODE Joint ID is invalid\n";

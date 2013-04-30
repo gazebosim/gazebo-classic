@@ -160,9 +160,10 @@ namespace gazebo
       /// \brief Detach this joint from all links.
       public: virtual void Detach();
 
-      /// \brief Set the axis of rotation.
+      /// \brief Set the axis of rotation where axis is specified in local
+      /// joint frame.
       /// \param[in] _index Index of the axis to set.
-      /// \param[in] _axis Vector in world frame of axis direction
+      /// \param[in] _axis Vector in local joint frame of axis direction
       ///                  (must have length greater than zero).
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis) = 0;
 
