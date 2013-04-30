@@ -487,11 +487,19 @@ void URDF2Gazebo::InsertGazeboExtensionVisual(TiXmlElement *_elem,
     for (std::vector<GazeboExtension*>::iterator ge = gazeboIt->second.begin();
          ge != gazeboIt->second.end(); ++ge)
     {
-      if ((*ge)->oldLinkName == _linkName)
+      if (_linkName.find((*ge)->oldLinkName) != std::string::npos)
       {
         // insert material block
         if (!(*ge)->material.empty())
-            this->AddKeyValue(_elem, "material", (*ge)->material);
+        {
+          // new sdf needs <material><script>...</script></material>
+          TiXmlElement *materialElem = new TiXmlElement("material");
+          TiXmlElement *scriptElem = new TiXmlElement("script");
+          this->AddKeyValue(scriptElem, "name", (*ge)->material);
+          materialElem->LinkEndChild(scriptElem);
+          _elem->LinkEndChild(materialElem);
+          // this->AddKeyValue(_elem, "material", (*ge)->material);
+        }
       }
     }
   }
