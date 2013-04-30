@@ -325,7 +325,6 @@ bool World::GetRunning() const
 //////////////////////////////////////////////////
 void World::Stop()
 {
-  common::ModelDatabase::Instance()->Fini();
   this->stop = true;
 
   if (this->thread)
