@@ -143,7 +143,6 @@ TEST_F(ODEJoint_TEST, GetForceTorqueWithAppliedForce)
       //       << "]\n";
     }
   }
-  getchar();
 }
 
 ////////////////////////////////////////////////////////////////////////
