@@ -348,6 +348,12 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
         else
           gazebo->selfCollide = false;
       }
+      else if (childElem->ValueStr() == "maxContacts")
+      {
+          gazebo->isMaxContacts = true;
+          gazebo->maxContacts = boost::lexical_cast<int>(
+            this->GetKeyValueAsString(childElem).c_str());
+      }
       else if (childElem->ValueStr() == "laserRetro")
       {
           gazebo->isLaserRetro = true;
@@ -456,6 +462,9 @@ void URDF2Gazebo::InsertGazeboExtensionCollision(TiXmlElement *_elem,
         if ((*ge)->isLaserRetro)
           this->AddKeyValue(_elem, "laser_retro",
                       this->Values2str(1, &(*ge)->laserRetro));
+        if ((*ge)->isMaxContacts)
+          this->AddKeyValue(_elem, "max_contacts",
+                      boost::lexical_cast<std::string>((*ge)->maxContacts));
 
         contact->LinkEndChild(contactOde);
         surface->LinkEndChild(contact);
@@ -478,11 +487,19 @@ void URDF2Gazebo::InsertGazeboExtensionVisual(TiXmlElement *_elem,
     for (std::vector<GazeboExtension*>::iterator ge = gazeboIt->second.begin();
          ge != gazeboIt->second.end(); ++ge)
     {
-      if ((*ge)->oldLinkName == _linkName)
+      if (_linkName.find((*ge)->oldLinkName) != std::string::npos)
       {
         // insert material block
         if (!(*ge)->material.empty())
-            this->AddKeyValue(_elem, "material", (*ge)->material);
+        {
+          // new sdf needs <material><script>...</script></material>
+          TiXmlElement *materialElem = new TiXmlElement("material");
+          TiXmlElement *scriptElem = new TiXmlElement("script");
+          this->AddKeyValue(scriptElem, "name", (*ge)->material);
+          materialElem->LinkEndChild(scriptElem);
+          _elem->LinkEndChild(materialElem);
+          // this->AddKeyValue(_elem, "material", (*ge)->material);
+        }
       }
     }
   }

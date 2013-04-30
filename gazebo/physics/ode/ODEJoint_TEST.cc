@@ -92,8 +92,8 @@ TEST_F(ODEJoint_TEST, GetForceTorqueWithAppliedForce)
       EXPECT_NEAR(wrench_01.body1Force.x,     0.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Force.y,     0.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Force.z,   300.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Torque.x,  200.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Torque.y,    0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Torque.x,   25.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Torque.y, -175.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Torque.z,    0.0, TOL_CONT);
 
       EXPECT_NEAR(wrench_01.body2Force.x,  -wrench_01.body1Force.x,  TOL_CONT);
@@ -103,15 +103,15 @@ TEST_F(ODEJoint_TEST, GetForceTorqueWithAppliedForce)
       EXPECT_NEAR(wrench_01.body2Torque.y, -wrench_01.body1Torque.y, TOL_CONT);
       EXPECT_NEAR(wrench_01.body2Torque.z, -wrench_01.body1Torque.z, TOL_CONT);
 
-      gzdbg << "joint_01 force torque : "
-            << "step [" << i
-            << "] GetForce [" << joint_01->GetForce(0u)
-            << "] command [" << effort1
-            << "] force1 [" << wrench_01.body1Force
-            << "] torque1 [" << wrench_01.body1Torque
-            << "] force2 [" << wrench_01.body2Force
-            << "] torque2 [" << wrench_01.body2Torque
-            << "]\n";
+      // gzdbg << "joint_01 force torque : "
+      //       << "step [" << i
+      //       << "] GetForce [" << joint_01->GetForce(0u)
+      //       << "] command [" << effort1
+      //       << "] force1 [" << wrench_01.body1Force
+      //       << "] torque1 [" << wrench_01.body1Torque
+      //       << "] force2 [" << wrench_01.body2Force
+      //       << "] torque2 [" << wrench_01.body2Torque
+      //       << "]\n";
     }
 
     // test joint_12 wrench
@@ -122,7 +122,7 @@ TEST_F(ODEJoint_TEST, GetForceTorqueWithAppliedForce)
       EXPECT_NEAR(wrench_12.body1Force.y,     0.0, TOL_CONT);
       EXPECT_NEAR(wrench_12.body1Force.z,    50.0, TOL_CONT);
       EXPECT_NEAR(wrench_12.body1Torque.x,   25.0, TOL_CONT);
-      EXPECT_NEAR(wrench_12.body1Torque.y,  -25.0, TOL_CONT);
+      EXPECT_NEAR(wrench_12.body1Torque.y,    0.0, TOL_CONT);
       EXPECT_NEAR(wrench_12.body1Torque.z,    0.0, TOL_CONT);
 
       EXPECT_NEAR(wrench_12.body2Force.x,   -35.355, TOL_CONT);
@@ -132,15 +132,15 @@ TEST_F(ODEJoint_TEST, GetForceTorqueWithAppliedForce)
       EXPECT_NEAR(wrench_12.body2Torque.y,    0.000, TOL_CONT);
       EXPECT_NEAR(wrench_12.body2Torque.z,   17.678, TOL_CONT);
 
-      gzdbg << "joint_12 force torque : "
-            << "step [" << i
-            << "] GetForce [" << joint_12->GetForce(0u)
-            << "] command [" << effort2
-            << "] force1 [" << wrench_12.body1Force
-            << "] torque1 [" << wrench_12.body1Torque
-            << "] force2 [" << wrench_12.body2Force
-            << "] torque2 [" << wrench_12.body2Torque
-            << "]\n";
+      // gzdbg << "joint_12 force torque : "
+      //       << "step [" << i
+      //       << "] GetForce [" << joint_12->GetForce(0u)
+      //       << "] command [" << effort2
+      //       << "] force1 [" << wrench_12.body1Force
+      //       << "] torque1 [" << wrench_12.body1Torque
+      //       << "] force2 [" << wrench_12.body2Force
+      //       << "] torque2 [" << wrench_12.body2Torque
+      //       << "]\n";
     }
   }
   getchar();

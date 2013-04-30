@@ -217,6 +217,12 @@ namespace gazebo
       /// \brief The laser retro value.
       private: float laserRetro;
 
+      /// \brief Number of contacts allowed for this collision.
+      /// This overrides global value (in PhysicsEngine) if specified.
+      // private: int maxContacts;
+      public: virtual void SetMaxContacts(double _maxContacts);
+      public: virtual int GetMaxContacts();
+
       private: CollisionState state;
     };
     /// \}
