@@ -264,7 +264,8 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
           renderState->reset();
 
           /// This doesn't seem to work properly.
-          if (vis->GetShaderType() == "normal_map_object_space")
+          if (vis->GetShaderType() == "normal_map_object_space" &&
+              !vis->GetNormalMap().empty())
           {
             Ogre::RTShader::SubRenderState* subRenderState =
               this->shaderGenerator->createSubRenderState(
@@ -279,7 +280,8 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
             normalMapSubRS->setNormalMapTextureName(vis->GetNormalMap());
             renderState->addTemplateSubRenderState(normalMapSubRS);
           }
-          else if (vis->GetShaderType() == "normal_map_tangent_space")
+          else if (vis->GetShaderType() == "normal_map_tangent_space" &&
+              !vis->GetNormalMap().empty())
           {
             Ogre::RTShader::SubRenderState* subRenderState =
               this->shaderGenerator->createSubRenderState(
@@ -295,7 +297,9 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
             renderState->addTemplateSubRenderState(normalMapSubRS);
           }
-          else if (vis->GetShaderType() == "vertex")
+          else if (vis->GetShaderType() == "vertex" ||
+              (vis->GetShaderType().find("normal_map") != std::string::npos &&
+               vis->GetNormalMap().empty()))
           {
             Ogre::RTShader::SubRenderState *perPerVertexLightModel =
               this->shaderGenerator->createSubRenderState(
