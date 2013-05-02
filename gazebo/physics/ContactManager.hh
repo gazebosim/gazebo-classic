@@ -20,6 +20,8 @@
 
 #include <vector>
 
+#include <boost/unordered/unordered_set.hpp>
+
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -29,6 +31,18 @@ namespace gazebo
 {
   namespace physics
   {
+    class ContactPublisher
+    {
+      public: std::string topic;
+
+      public: transport::PublisherPtr publisher;
+
+      public: boost::unordered_set<std::string> collisions;
+
+      public: std::vector<Contact *> contacts;
+    };
+
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -80,7 +94,7 @@ namespace gazebo
       /// The return vector may have invalid contacts. Only use contents of
       /// the vector between 0 and ContactManager::GetContactCount
       /// \return Vector of contact pointers.
-      public: const std::vector<Contact*> &GetContacts() const;
+      public: const std::vector<Contact *> &GetContacts() const;
 
       /// \brief Clear all stored contacts.
       public: void Clear();
@@ -90,6 +104,9 @@ namespace gazebo
 
       /// \brief Set the contact count to zero.
       public: void ResetCount();
+
+      public: void CreateFilter(const std::string &_topic,
+                  std::vector<std::string> _collisions);
 
       private: std::vector<Contact*> contacts;
 
@@ -103,6 +120,8 @@ namespace gazebo
 
       /// \brief Pointer to the world.
       private: WorldPtr world;
+
+      private: std::vector<ContactPublisher *> contactPublishers;
     };
     /// \}
   }

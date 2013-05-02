@@ -29,6 +29,8 @@
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ContactManager.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/ContactSensor.hh"
@@ -82,30 +84,39 @@ void ContactSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  if (!this->contactSub)
-  {
-    this->contactSub = this->node->Subscribe("~/physics/contacts",
-        &ContactSensor::OnContacts, this);
-  }
-
   std::string collisionName;
   std::string collisionScopedName;
 
   sdf::ElementPtr collisionElem =
     this->sdf->GetElement("contact")->GetElement("collision");
 
+  std::string entityName =
+      this->world->GetEntity(this->parentName)->GetScopedName();
+
   // Get all the collision elements
   while (collisionElem)
   {
     // get collision name
     collisionName = collisionElem->GetValueString();
-    collisionScopedName =
-      this->world->GetEntity(this->parentName)->GetScopedName();
+    collisionScopedName = entityName;
     collisionScopedName += "::" + collisionName;
 
     this->collisions.push_back(collisionScopedName);
 
     collisionElem = collisionElem->GetNextElement("collision");
+  }
+
+  if (!this->collisions.empty())
+  {
+
+    physics::ContactManager *mgr =
+        this->world->GetPhysicsEngine()->GetContactManager();
+    mgr->CreateFilter(entityName, this->collisions);
+    if (!this->contactSub)
+    {
+      this->contactSub = this->node->Subscribe("~/" + entityName + "/contacts",
+          &ContactSensor::OnContacts, this);
+    }
   }
 }
 

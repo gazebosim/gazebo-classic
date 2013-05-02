@@ -66,6 +66,12 @@ void MudPlugin::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("damping"))
     this->damping = _sdf->GetValueDouble("damping");
 
+  if (_sdf->HasElement("contact_surface_bitmask"))
+  {
+    this->contactSurfaceBitmask =
+        _sdf->GetValueUInt("contact_surface_bitmask");
+  }
+
   if (_sdf->HasElement("link_name"))
   {
     sdf::ElementPtr elem = _sdf->GetElement("link_name");
@@ -95,6 +101,23 @@ void MudPlugin::Init()
       this->contactSensorName;
     this->contactSub =
       this->node->Subscribe(topic, &MudPlugin::OnContact, this);
+  }
+
+  for (unsigned int i = 0; i < this->allowedLinks.size(); ++i)
+  {
+    physics::LinkPtr allowedLink = boost::dynamic_pointer_cast<physics::Link>(
+        this->world->GetEntity(this->allowedLinks[i]));
+
+    if (!allowedLink)
+      continue;
+
+    std::vector<physics::CollisionPtr> collisions
+        = allowedLink->GetCollisions();
+    for (unsigned int j = 0; j < collisions.size(); ++j)
+    {
+      collisions[j]->GetSurface()->collideWithoutContactBitmask =
+          this->contactSurfaceBitmask;
+    }
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
