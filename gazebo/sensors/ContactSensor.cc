@@ -108,13 +108,14 @@ void ContactSensor::Load(const std::string &_worldName)
 
   if (!this->collisions.empty())
   {
-
+    // request the contact manager to publish messages to a custom topic for
+    // this sensor
     physics::ContactManager *mgr =
         this->world->GetPhysicsEngine()->GetContactManager();
-    mgr->CreateFilter(entityName, this->collisions);
+    std::string topic = mgr->CreateFilter(entityName, this->collisions);
     if (!this->contactSub)
     {
-      this->contactSub = this->node->Subscribe("~/" + entityName + "/contacts",
+      this->contactSub = this->node->Subscribe(topic,
           &ContactSensor::OnContacts, this);
     }
   }

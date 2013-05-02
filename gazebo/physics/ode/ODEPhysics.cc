@@ -798,13 +798,13 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactGeom *_contactCollisions)
 {
-
+  // Filter collisions based on contact bitmask if collide_without_contact is
+  // on.The bitmask is set mainly for speed improvements otherwise a collision
+  // with collide_without_contact may potentially generate a large number of
+  // contacts.
   if (_collision1->GetSurface()->collideWithoutContact ||
       _collision2->GetSurface()->collideWithoutContact)
   {
-/*    gzerr << _collision1->GetSurface()->mask << " " <<
-    _collision2->GetSurface()->mask <<
-     (_collision1->GetSurface()->mask & _collision2->GetSurface()->mask) << std::endl;*/
     if ((_collision1->GetSurface()->collideWithoutContactBitmask &
         _collision2->GetSurface()->collideWithoutContactBitmask) == 0)
       return;

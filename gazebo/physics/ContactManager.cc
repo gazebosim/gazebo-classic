@@ -41,10 +41,10 @@ ContactManager::~ContactManager()
   this->node.reset();
   this->contactPub.reset();
 
-  for (unsigned int i = 0 ; i < this->contactPublishers.size(); ++i)
+  for (unsigned int i = 0 ; i < this->customContactPublishers.size(); ++i)
   {
-    this->contactPublishers[i]->collisions.clear();
-    this->contactPublishers[i]->publisher.reset();
+    this->customContactPublishers[i]->collisions.clear();
+    this->customContactPublishers[i]->publisher.reset();
   }
 }
 
@@ -70,26 +70,21 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   if (!_collision1 || !_collision2)
     return result;
 
-  // If no one is listening, then don't create any contact information.
+  // If no one is listening to the default topic, or there are no
+  // custom contact publishers then don't create any contact information.
   // This is a signal to the Physics engine that it can skip the extra
   // processing necessary to get back contact information.
 
   ContactPublisher *contactPublisher = NULL;
-
-  //boost::unordered_map<std::string, boost::unordered_set<std::string>:: iter;
   std::vector<ContactPublisher *>::iterator iter;
-//  for (iter = this->contactPublishers.begin(); iter != this->contactPublishers.end(); ++iter)
-  for (unsigned int i = 0; i < this->contactPublishers.size(); ++i)
+  for (unsigned int i = 0; i < this->customContactPublishers.size(); ++i)
   {
-//      if (iter->second.count(collision1->GetScopedName() != 0 ||
-//          iter->second.count(collision2->GetScopedName() != 0)
-    if (this->contactPublishers[i]->collisions.count(
+    if (this->customContactPublishers[i]->collisions.count(
         _collision1->GetScopedName()) != 0 ||
-        this->contactPublishers[i]->collisions.count(
+        this->customContactPublishers[i]->collisions.count(
         _collision2->GetScopedName()) != 0)
     {
-//      gzerr << _collision1->GetScopedName() << " " << _collision2->GetScopedName() << std::endl;
-      contactPublisher = this->contactPublishers[i];
+      contactPublisher = this->customContactPublishers[i];
       break;
     }
   }
@@ -159,8 +154,8 @@ void ContactManager::Clear()
 
   this->contacts.clear();
 
-  for (unsigned int i = 0 ; i < this->contactPublishers.size(); ++i)
-    this->contactPublishers[i]->contacts.clear();
+  for (unsigned int i = 0 ; i < this->customContactPublishers.size(); ++i)
+    this->customContactPublishers[i]->contacts.clear();
 
   // Reset the contact count to zero.
   this->contactIndex = 0;
@@ -179,7 +174,7 @@ void ContactManager::PublishContacts()
     return;
   }
 
-  // publish to ~/physics/contacts
+  // publish to default topic, ~/physics/contacts
   msgs::Contacts msg;
   for (unsigned int i = 0; i < this->contactIndex; ++i)
   {
@@ -195,11 +190,11 @@ void ContactManager::PublishContacts()
 
   // publish to other custom topics
   msgs::Contacts msg2;
-  for (unsigned int i = 0; i < this->contactPublishers.size(); ++i)
+  for (unsigned int i = 0; i < this->customContactPublishers.size(); ++i)
   {
-    ContactPublisher *contactPublisher = this->contactPublishers[i];
-    for (unsigned int j = 0; j < this->contactPublishers[i]->contacts.size();
-        ++j)
+    ContactPublisher *contactPublisher = this->customContactPublishers[i];
+    for (unsigned int j = 0;
+        j < this->customContactPublishers[i]->contacts.size(); ++j)
     {
       if (contactPublisher->contacts[j]->count == 0)
         continue;
@@ -214,20 +209,24 @@ void ContactManager::PublishContacts()
 }
 
 /////////////////////////////////////////////////
-void ContactManager::CreateFilter(const std::string &_topic,
-    std::vector<std::string> _collisions)
+std::string ContactManager::CreateFilter(const std::string &_name,
+    const std::vector<std::string> &_collisions)
 {
   if (_collisions.empty())
-    return;
+    return "";
+
+  // Contact sensors make use of this filter
+  std::string topic = "~/" + _name + "/contacts";
 
   transport::PublisherPtr pub =
-    this->node->Advertise<msgs::Contacts>("~/" + _topic + "/contacts");
+    this->node->Advertise<msgs::Contacts>(topic);
 
   ContactPublisher *contactPublisher = new ContactPublisher;
-  contactPublisher->topic = _topic;
   contactPublisher->publisher = pub;
   for (unsigned int i = 0; i < _collisions.size(); ++i)
     contactPublisher->collisions.insert(_collisions[i]);
 
-  this->contactPublishers.push_back(contactPublisher);
+  this->customContactPublishers.push_back(contactPublisher);
+
+  return topic;
 }
