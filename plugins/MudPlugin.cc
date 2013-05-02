@@ -29,7 +29,8 @@ GZ_REGISTER_MODEL_PLUGIN(MudPlugin)
 
 /////////////////////////////////////////////////
 MudPlugin::MudPlugin()
-  : newMsg(false), newMsgWait(0), stiffness(0.0), damping(100.0)
+  : newMsg(false), newMsgWait(0), stiffness(0.0), damping(100.0),
+    contactSurfaceBitmask(1)
 {
 }
 

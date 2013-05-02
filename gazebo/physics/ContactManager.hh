@@ -22,6 +22,7 @@
 #include <string>
 
 #include <boost/unordered/unordered_set.hpp>
+#include <boost/unordered/unordered_map.hpp>
 
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -131,7 +132,9 @@ namespace gazebo
 
       /// \brief A list of custom publishers that publish filtered contact
       /// messages to the specified topic
-      private: std::vector<ContactPublisher *> customContactPublishers;
+      private: boost::unordered_map<std::string, ContactPublisher *>
+          customContactPublishers;
+//      private: std::vector<ContactPublisher *> customContactPublishers;
     };
     /// \}
   }
