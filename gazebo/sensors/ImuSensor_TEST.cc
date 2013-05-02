@@ -141,7 +141,9 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   EXPECT_GT(steps, 0);
   world->StepWorld(steps);
 
-  EXPECT_GT(imuSensor->GetLinearAcceleration().z, 0);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, -gravityZ, TOL);
 }
 
 TEST_F(ImuSensor_TEST, LinearAccelerationTestODE)
