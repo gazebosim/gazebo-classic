@@ -145,7 +145,7 @@ void MudPlugin::Init()
         = allowedLink->GetCollisions();
     for (unsigned int j = 0; j < collisions.size(); ++j)
     {
-      collisions[j]->GetSurface()->collideWithoutContactBitmask =
+      collisions[j]->GetSurface()->collideWithoutContactBitmask |=
           this->contactSurfaceBitmask;
     }
   }
