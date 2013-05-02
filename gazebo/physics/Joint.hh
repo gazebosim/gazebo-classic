@@ -168,9 +168,18 @@ namespace gazebo
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis) = 0;
 
       /// \brief Set the joint damping.
-      /// \param[in] _index Index of the axis to set.
+      /// \param[in] _index Index of the axis to set, currently ignored, to be
+      ///                   implemented.
       /// \param[in] _damping Damping value for the axis.
       public: virtual void SetDamping(int _index, double _damping) = 0;
+
+      /// \brief Returns the current joint damping coefficient.
+      /// \param[in] _index Index of the axis to get, currently ignored, to be
+      ///                   implemented.
+      public: double GetDamping(int /*_index*/)
+              {
+                return this->dampingCoefficient;
+              }
 
       /// \brief Callback to apply damping force to joint.
       public: virtual void ApplyDamping();
