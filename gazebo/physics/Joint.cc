@@ -558,3 +558,9 @@ double Joint::GetInertiaRatio(unsigned int _index) const
     return 0;
   }
 }
+
+//////////////////////////////////////////////////
+double Joint::GetDamping(int /*_index*/)
+{
+  return this->dampingCoefficient;
+}
