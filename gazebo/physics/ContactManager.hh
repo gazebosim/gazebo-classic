@@ -134,7 +134,6 @@ namespace gazebo
       /// messages to the specified topic
       private: boost::unordered_map<std::string, ContactPublisher *>
           customContactPublishers;
-//      private: std::vector<ContactPublisher *> customContactPublishers;
     };
     /// \}
   }
