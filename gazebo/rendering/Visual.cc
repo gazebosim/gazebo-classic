@@ -1402,8 +1402,14 @@ void Visual::DisableTrackVisual()
 //////////////////////////////////////////////////
 std::string Visual::GetNormalMap() const
 {
-  return this->sdf->GetElement("material")->GetElement(
+  std::string file = this->sdf->GetElement("material")->GetElement(
       "shader")->GetElement("normal_map")->GetValueString();
+
+  std::string uriFile = common::find_file(file);
+  if (!uriFile.empty())
+    file = uriFile;
+
+  return file;
 }
 
 //////////////////////////////////////////////////

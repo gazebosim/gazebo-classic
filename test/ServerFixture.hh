@@ -796,6 +796,13 @@ class ServerFixture : public testing::Test
                  << "    <geometry>"
                  << shapeStr.str()
                  << "    </geometry>"
+                 << "    <surface>"
+                 << "      <contact>"
+                 << "        <ode>"
+                 << "          <min_depth>0.01</min_depth>"
+                 << "        </ode>"
+                 << "      </contact>"
+                 << "    </surface>"
                  << "  </collision>"
                  << "  <visual name ='visual'>"
                  << "    <geometry>"
