@@ -7,6 +7,7 @@ endif(COMMAND CMAKE_POLICY)
 
 project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (GAZEBO_VERSION_NAME "lithium")
 set (GAZEBO_MAJOR_VERSION 1)
@@ -303,12 +304,12 @@ else (build_errors)
 
   ########################################
   # Make the cmake config files
-  set(PKG_NAME ${PROJECT_NAME_LOWER})
+  set(PKG_NAME ${PROJECT_NAME_UPPER})
   set(PKG_LIBRARIES gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_sdf_interface gazebo_msgs gazebo_transport)
   set(PKG_DEPENDS Boost)
-  set(cmake_conf_file "${CMAKE_CURRENT_SOURCE_DIR}/cmake/gazebo-config.cmake")
-  configure_file("${cmake_conf_file}.in" "${cmake_conf_file}" @ONLY)
-  install(FILES ${cmake_conf_file} DESTINATION share/${PROJECT_NAME_LOWER}/cmake/ COMPONENT cmake)
+  set(cmake_conf_file "cmake/gazebo-config.cmake")
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${cmake_conf_file}.in" "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}" @ONLY)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file} DESTINATION share/${PROJECT_NAME_LOWER}/cmake/ COMPONENT cmake)
 
 
   ########################################
