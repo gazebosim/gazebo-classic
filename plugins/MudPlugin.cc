@@ -20,6 +20,8 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/sensors/ContactSensor.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/MudPlugin.hh"
 
@@ -30,7 +32,7 @@ GZ_REGISTER_MODEL_PLUGIN(MudPlugin)
 /////////////////////////////////////////////////
 MudPlugin::MudPlugin()
   : newMsg(false), newMsgWait(0), stiffness(0.0), damping(100.0),
-    contactSurfaceBitmask(1)
+    contactSurfaceBitmask(0)
 {
 }
 
@@ -41,6 +43,7 @@ void MudPlugin::Load(physics::ModelPtr _model,
   GZ_ASSERT(_model, "MudPlugin _model pointer is NULL");
   this->model = _model;
   this->modelName = _model->GetName();
+  this->sdf = _sdf;
 
   this->world = this->model->GetWorld();
   GZ_ASSERT(this->world, "MudPlugin world pointer is NULL");
@@ -102,6 +105,32 @@ void MudPlugin::Init()
       this->contactSensorName;
     this->contactSub =
       this->node->Subscribe(topic, &MudPlugin::OnContact, this);
+
+    // create bitmask from contact sensor's collisions if it's not specified in
+    // the sdf
+    if (!this->sdf->HasElement("contact_surface_bitmask"))
+    {
+      std::string name = this->contactSensorName;
+      boost::replace_all(name, "/", "::");
+      name = this->world->GetName() + "::"+ this->modelName + "::" + name;
+      sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+      // Get a pointer to the contact sensor
+      sensors::ContactSensorPtr sensor =
+          boost::dynamic_pointer_cast<sensors::ContactSensor>
+          (mgr->GetSensor(name));
+      for (unsigned int i = 0; i < sensor->GetCollisionCount(); ++i)
+      {
+        std::string colName = sensor->GetCollisionName(i);
+        physics::CollisionPtr colPtr =
+            boost::dynamic_pointer_cast<physics::Collision>(
+            this->world->GetEntity(colName));
+        if (colPtr)
+        {
+          this->contactSurfaceBitmask |=
+              colPtr->GetSurface()->collideWithoutContactBitmask;
+        }
+      }
+    }
   }
 
   for (unsigned int i = 0; i < this->allowedLinks.size(); ++i)

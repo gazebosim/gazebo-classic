@@ -53,7 +53,6 @@
         <contact_sensor_name>link/mud_contact</contact_sensor_name>
         <stiffness>0.0</stiffness>
         <damping>1.0</damping>
-        <contact_surface_bitmask>2</contact_surface_bitmask>
         <link_name>pr2_mud::r_gripper_l_finger_link</link_name>
       </plugin>
     </model>
