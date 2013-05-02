@@ -1725,7 +1725,6 @@ bool World::OnLog(std::ostringstream &_stream)
         this->states.pop_front();
       }
     } while (this->states.size() > 1000);
-    std::cout << "States[" << this->states.size() << "]\n";
   }
 
   // Logging has stopped. Wait for log worker to finish. Output last bit
