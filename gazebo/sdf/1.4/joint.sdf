@@ -87,7 +87,7 @@
     <element name="dynamics" required="0">
       <description>An element specifying physical properties of the joint. These values are used to specify modeling properties of the joint, particularly useful for simulation.</description>
       <element name="damping" type="double" default="0" required="0">
-        <description>The physical velocity dependent viscous damping coefficient of the joint.  EXPERIMENTAL: if dammping coefficient is negative and cfm_damping is true, adaptive damping is used.</description>
+        <description>The physical velocity dependent viscous damping coefficient of the joint.  EXPERIMENTAL: if damping coefficient is negative and cfm_damping is true, adaptive damping is used.</description>
       </element>
       <element name="friction" type="double" default="0" required="0">
         <description>The physical static friction value of the joint.</description>

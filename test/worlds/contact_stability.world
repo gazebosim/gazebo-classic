@@ -26,6 +26,7 @@
           </surface>
         </collision>
         <visual name="vis">
+          <transparency>0.5</transparency>
           <geometry>
             <sphere><radius>0.5</radius></sphere>
           </geometry>
@@ -54,6 +55,7 @@
           </surface>
         </collision>
         <visual name="vis">
+          <transparency>0.5</transparency>
           <geometry>
             <sphere><radius>0.5</radius></sphere>
           </geometry>
@@ -84,6 +86,7 @@
           </surface>
         </collision>
         <visual name="vis">
+          <transparency>0.5</transparency>
           <geometry>
             <box><size>1 1 1</size></box>
           </geometry>
@@ -112,6 +115,7 @@
           </surface>
         </collision>
         <visual name="vis">
+          <transparency>0.5</transparency>
           <geometry>
             <box><size>1 1 1</size></box>
           </geometry>

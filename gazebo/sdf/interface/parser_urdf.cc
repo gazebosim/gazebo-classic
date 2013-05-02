@@ -495,10 +495,18 @@ void URDF2Gazebo::InsertGazeboExtensionVisual(TiXmlElement *_elem,
           // new sdf needs <material><script>...</script></material>
           TiXmlElement *materialElem = new TiXmlElement("material");
           TiXmlElement *scriptElem = new TiXmlElement("script");
-          this->AddKeyValue(scriptElem, "name", (*ge)->material);
-          materialElem->LinkEndChild(scriptElem);
-          _elem->LinkEndChild(materialElem);
-          // this->AddKeyValue(_elem, "material", (*ge)->material);
+          if (scriptElem && materialElem)
+          {
+            this->AddKeyValue(scriptElem, "name", (*ge)->material);
+            materialElem->LinkEndChild(scriptElem);
+            _elem->LinkEndChild(materialElem);
+            // this->AddKeyValue(_elem, "material", (*ge)->material);
+          }
+          else
+          {
+            // Memory allocation error
+            gzerr << "Memory allocation error while processing <material>.\n";
+          }
         }
       }
     }

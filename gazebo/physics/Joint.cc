@@ -499,8 +499,8 @@ double Joint::GetForce(int _index)
 //////////////////////////////////////////////////
 void Joint::ApplyDamping()
 {
-  // dampingCoefficient could be negative, used for adaptive damping
-  // to enforce stability.
+  // Take absolute value of dampingCoefficient, since negative values of
+  // dampingCoefficient are used for adaptive damping to enforce stability.
   double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
   this->SetForce(0, dampingForce);
 }
