@@ -45,6 +45,7 @@ ContactManager::~ContactManager()
   {
     this->customContactPublishers[i]->collisions.clear();
     this->customContactPublishers[i]->publisher.reset();
+    delete customContactPublishers[i];
   }
 }
 
