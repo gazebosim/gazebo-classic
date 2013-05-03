@@ -118,17 +118,24 @@ void MudPlugin::Init()
       sensors::ContactSensorPtr sensor =
           boost::dynamic_pointer_cast<sensors::ContactSensor>
           (mgr->GetSensor(name));
-      for (unsigned int i = 0; i < sensor->GetCollisionCount(); ++i)
+      if (sensor)
       {
-        std::string colName = sensor->GetCollisionName(i);
-        physics::CollisionPtr colPtr =
-            boost::dynamic_pointer_cast<physics::Collision>(
-            this->world->GetEntity(colName));
-        if (colPtr)
+        for (unsigned int i = 0; i < sensor->GetCollisionCount(); ++i)
         {
-          this->contactSurfaceBitmask |=
-              colPtr->GetSurface()->collideWithoutContactBitmask;
+          std::string colName = sensor->GetCollisionName(i);
+          physics::CollisionPtr colPtr =
+              boost::dynamic_pointer_cast<physics::Collision>(
+              this->world->GetEntity(colName));
+          if (colPtr)
+          {
+            this->contactSurfaceBitmask |=
+                colPtr->GetSurface()->collideWithoutContactBitmask;
+          }
         }
+      }
+      else
+      {
+        gzerr << "Unable to GetSensor, ignoring contact_surface_bitmask\n";
       }
     }
   }
