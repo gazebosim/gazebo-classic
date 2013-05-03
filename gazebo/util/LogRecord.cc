@@ -503,24 +503,22 @@ void LogRecord::RunWrite()
   while (!this->stopThread)
   {
     this->Write(false);
-
-    // Throttle the write loop.
-    if (!this->stopThread)
-      common::Time::MSleep(1000);
   }
 }
 
 //////////////////////////////////////////////////
 void LogRecord::Write(bool _force)
 {
+  boost::mutex::scoped_lock lock(this->writeMutex);
+
   if (!_force)
   {
     // Wait for new data.
-    boost::mutex::scoped_lock lock(this->writeMutex);
-    this->dataAvailableCondition.wait(lock);
+    this->dataAvailableCondition.timed_wait(lock,
+        boost::posix_time::milliseconds(1000));
   }
 
-  // Collect all the new log data.
+  // Write all the collected log data.
   for (this->updateIter = this->logs.begin();
       this->updateIter != this->logsEnd; ++this->updateIter)
   {

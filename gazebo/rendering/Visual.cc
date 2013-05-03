@@ -406,7 +406,8 @@ void Visual::Load()
     catch(Ogre::Exception &e)
     {
       gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-      gzthrow("Unable to create a mesh from " + meshName);
+      gzerr << "Unable to create a mesh from " <<  meshName << "\n";
+      return;
     }
   }
 
@@ -1599,7 +1600,16 @@ void Visual::InsertMesh(const std::string &_meshName,
   {
     mesh = common::MeshManager::Instance()->Load(_meshName);
     if (!mesh)
-      gzthrow("Unable to create a mesh from " + _meshName);
+    {
+      gzerr << "Unable to create a mesh from " << _meshName << "\n";
+      return;
+    }
+
+    if (_meshName == "/home/nkoenig/.gazebo/models/hokuyo/meshes/hokuyo.dae")
+    {
+      printf("\n\n RETURNING \n\n");
+      return;
+    }
   }
   else
   {

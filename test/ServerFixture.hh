@@ -156,11 +156,9 @@ class ServerFixture : public testing::Test
 
                this->factoryPub =
                  this->node->Advertise<msgs::Factory>("~/factory");
-               this->factoryPub->WaitForConnection();
 
                this->requestPub =
                  this->node->Advertise<msgs::Request>("~/request");
-               this->requestPub->WaitForConnection();
 
                // Wait for the world to reach the correct pause state.
                // This might not work properly with multiple worlds.
@@ -173,6 +171,8 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(100);
                ASSERT_LT(waitCount, maxWaitCount);
 
+               this->factoryPub->WaitForConnection();
+               this->requestPub->WaitForConnection();
              }
 
   protected: void RunServer(const std::string &_worldFilename)
