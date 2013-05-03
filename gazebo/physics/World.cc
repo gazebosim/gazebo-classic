@@ -1424,6 +1424,14 @@ void World::ProcessModelMsgs()
       // Let all other subscribers know about the change
       msgs::Model msg;
       model->FillMsg(msg);
+
+      // FillMsg fills the visual components from initial sdf
+      // but problem is that Visuals may have changed e.g. through ~/visual,
+      // so don't publish them to subscribes.
+      msg.clear_visual();
+      for (int i = 0; i < msg.link_size(); ++i)
+        msg.mutable_link(i)->clear_visual();
+
       this->modelPub->Publish(msg);
     }
   }
