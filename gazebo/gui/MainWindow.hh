@@ -34,6 +34,7 @@ namespace gazebo
     class ToolsWidget;
     class ModelListWidget;
     class BuildingEditorPalette;
+    class DataPlayback;
 
     class MainWindow : public QMainWindow
     {
@@ -166,6 +167,7 @@ namespace gazebo
       private: RenderWidget *renderWidget;
       private: ToolsWidget *toolsWidget;
       private: ModelListWidget *modelListWidget;
+      private: DataPlayback *dataPlayback;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr worldControlPub;

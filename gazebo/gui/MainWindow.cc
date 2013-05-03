@@ -34,6 +34,7 @@
 #include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/Scene.hh"
 
+#include "gazebo/gui/DataPlayback.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
@@ -107,6 +108,7 @@ MainWindow::MainWindow()
   this->toolsWidget = new ToolsWidget();
 
   this->renderWidget = new RenderWidget(mainWidget);
+  this->dataPlayback = new DataPlayback(mainWidget);
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
@@ -137,6 +139,7 @@ MainWindow::MainWindow()
 
   mainLayout->setSpacing(0);
   mainLayout->addLayout(centerLayout, 1);
+  mainLayout->addWidget(dataPlayback);
   mainLayout->addWidget(new QSizeGrip(mainWidget), 0,
                         Qt::AlignBottom | Qt::AlignRight);
 
