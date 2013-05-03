@@ -1363,7 +1363,7 @@ math::Pose Visual::GetWorldPose() const
   pose.pos.y = vpos.y;
   pose.pos.z = vpos.z;
 
-  vquatern = this->sceneNode->getOrientation();
+  vquatern = this->sceneNode->_getDerivedOrientation();
   pose.rot.w = vquatern.w;
   pose.rot.x = vquatern.x;
   pose.rot.y = vquatern.y;
@@ -1401,8 +1401,14 @@ void Visual::DisableTrackVisual()
 //////////////////////////////////////////////////
 std::string Visual::GetNormalMap() const
 {
-  return this->sdf->GetElement("material")->GetElement(
+  std::string file = this->sdf->GetElement("material")->GetElement(
       "shader")->GetElement("normal_map")->GetValueString();
+
+  std::string uriFile = common::find_file(file);
+  if (!uriFile.empty())
+    file = uriFile;
+
+  return file;
 }
 
 //////////////////////////////////////////////////

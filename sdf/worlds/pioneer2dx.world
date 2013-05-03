@@ -2,21 +2,16 @@
 <sdf version="1.4">
   <world name="default">
     <!-- Ground -->
-    <!--  <include>
+    <include>
       <uri>model://ground_plane</uri>
     </include>
--->
-
     <!-- Pioneer2dx model -->
     <include>
       <uri>model://pioneer2dx</uri>
     </include>
-
     <!-- A global light source -->
-    <!--    <include>
+    <include>
       <uri>model://sun</uri>
     </include>
--->
-
   </world>
 </sdf>

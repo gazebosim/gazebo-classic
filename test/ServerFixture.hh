@@ -561,6 +561,75 @@ class ServerFixture : public testing::Test
                EXPECT_LT(i, 100);
              }
 
+  protected: void SpawnGpuRaySensor(const std::string &_modelName,
+                 const std::string &_raySensorName,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
+                 double _minRange = 0.08, double _maxRange = 10,
+                 double _rangeResolution = 0.01, unsigned int _samples = 640,
+                 const std::string &_noiseType = "", double _noiseMean = 0.0,
+                 double _noiseStdDev = 0.0)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _modelName << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "<collision name='parent_collision'>"
+                 << "  <pose>0 0 0.0205 0 0 0</pose>"
+                 << "  <geometry>"
+                 << "    <cylinder>"
+                 << "      <radius>0.021</radius>"
+                 << "      <length>0.029</length>"
+                 << "    </cylinder>"
+                 << "  </geometry>"
+                 << "</collision>"
+                 << "  <sensor name ='" << _raySensorName
+                 << "' type ='gpu_ray'>"
+                 << "    <ray>"
+                 << "      <scan>"
+                 << "        <horizontal>"
+                 << "          <samples>" << _samples << "</samples>"
+                 << "          <resolution> 1 </resolution>"
+                 << "          <min_angle>" << _hMinAngle << "</min_angle>"
+                 << "          <max_angle>" << _hMaxAngle << "</max_angle>"
+                 << "        </horizontal>"
+                 << "      </scan>"
+                 << "      <range>"
+                 << "        <min>" << _minRange << "</min>"
+                 << "        <max>" << _maxRange << "</max>"
+                 << "        <resolution>" << _rangeResolution <<"</resolution>"
+                 << "      </range>";
+
+               if (_noiseType.size() > 0)
+                 newModelStr << "      <noise>"
+                 << "        <type>" << _noiseType << "</type>"
+                 << "        <mean>" << _noiseMean << "</mean>"
+                 << "        <stddev>" << _noiseStdDev << "</stddev>"
+                 << "      </noise>";
+
+               newModelStr << "    </ray>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_modelName) && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               EXPECT_LT(i, 100);
+             }
+
   protected: void SpawnImuSensor(const std::string &_modelName,
                  const std::string &_imuSensorName,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
@@ -727,6 +796,13 @@ class ServerFixture : public testing::Test
                  << "    <geometry>"
                  << shapeStr.str()
                  << "    </geometry>"
+                 << "    <surface>"
+                 << "      <contact>"
+                 << "        <ode>"
+                 << "          <min_depth>0.01</min_depth>"
+                 << "        </ode>"
+                 << "      </contact>"
+                 << "    </surface>"
                  << "  </collision>"
                  << "  <visual name ='visual'>"
                  << "    <geometry>"

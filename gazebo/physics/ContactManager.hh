@@ -19,6 +19,10 @@
 #define _CONTACTMANAGER_HH_
 
 #include <vector>
+#include <string>
+
+#include <boost/unordered/unordered_set.hpp>
+#include <boost/unordered/unordered_map.hpp>
 
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -29,6 +33,20 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \brief A custom contact publisher created for each contact filter
+    /// in the Contact Manager.
+    class ContactPublisher
+    {
+      /// \brief Contact message publisher
+      public: transport::PublisherPtr publisher;
+
+      /// \brief Names of collisions monitored by contact manager for contacts.
+      public: boost::unordered_set<std::string> collisions;
+
+      /// \brief A list of contacts associated to the collisions.
+      public: std::vector<Contact *> contacts;
+    };
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -80,7 +98,7 @@ namespace gazebo
       /// The return vector may have invalid contacts. Only use contents of
       /// the vector between 0 and ContactManager::GetContactCount
       /// \return Vector of contact pointers.
-      public: const std::vector<Contact*> &GetContacts() const;
+      public: const std::vector<Contact *> &GetContacts() const;
 
       /// \brief Clear all stored contacts.
       public: void Clear();
@@ -90,6 +108,14 @@ namespace gazebo
 
       /// \brief Set the contact count to zero.
       public: void ResetCount();
+
+      /// \brief Create a filter for contacts. A new publisher will be created
+      /// that publishes contacts associated to the input collisions.
+      /// param[in] _name Filter name.
+      /// param[in] _collisions A list of collision names used for filtering.
+      /// \return New topic where filtered messages will be published to.
+      public: std::string CreateFilter(const std::string &_topic,
+                  const std::vector<std::string> &_collisions);
 
       private: std::vector<Contact*> contacts;
 
@@ -103,6 +129,11 @@ namespace gazebo
 
       /// \brief Pointer to the world.
       private: WorldPtr world;
+
+      /// \brief A list of custom publishers that publish filtered contact
+      /// messages to the specified topic
+      private: boost::unordered_map<std::string, ContactPublisher *>
+          customContactPublishers;
     };
     /// \}
   }

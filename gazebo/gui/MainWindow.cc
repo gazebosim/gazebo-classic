@@ -83,7 +83,7 @@ MainWindow::MainWindow()
 
   this->setDockOptions(QMainWindow::AnimatedDocks);
 
-   this->modelListWidget = new ModelListWidget(this);
+  this->modelListWidget = new ModelListWidget(this);
   InsertModelWidget *insertModel = new InsertModelWidget(this);
 
   int minimumTabWidth = 250;

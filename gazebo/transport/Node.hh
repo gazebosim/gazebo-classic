@@ -343,6 +343,10 @@ namespace gazebo
       private: boost::mutex publisherDeleteMutex;
       private: boost::recursive_mutex incomingMutex;
 
+      /// \brief make sure we don't call ProcessingIncoming simultaneously
+      /// from separate threads.
+      private: boost::recursive_mutex processIncomingMutex;
+
       private: bool initialized;
     };
     /// \}

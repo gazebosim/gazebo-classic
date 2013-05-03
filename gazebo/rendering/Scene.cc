@@ -42,6 +42,7 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/DepthCamera.hh"
+#include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/Grid.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/RFIDVisual.hh"
@@ -484,15 +485,15 @@ DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
 }
 
 //////////////////////////////////////////////////
-/*GpuLaserPtr Scene::CreateGpuLaser(const std::string &_name,
+GpuLaserPtr Scene::CreateGpuLaser(const std::string &_name,
                                         bool _autoRender)
 {
   GpuLaserPtr camera(new GpuLaser(this->name + "::" + _name,
-        this, _autoRender));
+        shared_from_this(), _autoRender));
   this->cameras.push_back(camera);
 
   return camera;
-}*/
+}
 
 //////////////////////////////////////////////////
 uint32_t Scene::GetCameraCount() const
@@ -1640,7 +1641,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
   if (!this->enableVisualizations)
     return true;
 
-  if (_msg->type() == "ray" && _msg->visualize() && !_msg->topic().empty())
+  if ((_msg->type() == "ray" || _msg->type() == "gpu_ray") && _msg->visualize()
+      && !_msg->topic().empty())
   {
     std::string rayVisualName = _msg->parent() + "::" + _msg->name();
     if (!this->visuals[rayVisualName+"_laser_vis"])
@@ -2066,6 +2068,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       visual->ShowJoints(this->showJoints);
       visual->SetTransparency(this->transparent ? 0.5 : 0.0);
       visual->SetWireframe(this->wireframe);
+
+      visual->UpdateFromMsg(_msg);
     }
   }
 
@@ -2159,6 +2163,8 @@ void Scene::OnModelMsg(ConstModelPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 {
+  if (!this->skyx)
+    return;
   SkyX::VClouds::VClouds *vclouds =
     this->skyx->getVCloudsManager()->getVClouds();
 

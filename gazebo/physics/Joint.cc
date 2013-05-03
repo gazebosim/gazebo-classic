@@ -217,36 +217,20 @@ void Joint::Init()
     }
   }
 
-  if (this->parentLink)
-  {
-    math::Pose modelPose = this->parentLink->GetModel()->GetWorldPose();
-
-    // Set joint axis
-    if (this->sdf->HasElement("axis"))
-    {
-      this->SetAxis(0, modelPose.rot.RotateVector(
-            this->sdf->GetElement("axis")->GetValueVector3("xyz")));
-    }
-
-    if (this->sdf->HasElement("axis2"))
-    {
-      this->SetAxis(1, modelPose.rot.RotateVector(
-            this->sdf->GetElement("axis2")->GetValueVector3("xyz")));
-    }
-  }
-  else
-  {
-    // if parentLink is NULL, it's name be the world
+  // Set parent name: if parentLink is NULL, it's name be the world
+  if (!this->parentLink)
     this->sdf->GetElement("parent")->Set("world");
-    if (this->sdf->HasElement("axis"))
-    {
-      this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-    }
-    if (this->sdf->HasElement("axis2"))
-    {
-      this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
-    }
+
+  // Set axis in physics engines
+  if (this->sdf->HasElement("axis"))
+  {
+    this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
   }
+  if (this->sdf->HasElement("axis2"))
+  {
+    this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+  }
+
   this->ComputeInertiaRatio();
 }
 
@@ -503,7 +487,9 @@ double Joint::GetForce(int _index)
 //////////////////////////////////////////////////
 void Joint::ApplyDamping()
 {
-  double dampingForce = -this->dampingCoefficient * this->GetVelocity(0);
+  // Take absolute value of dampingCoefficient, since negative values of
+  // dampingCoefficient are used for adaptive damping to enforce stability.
+  double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
   this->SetForce(0, dampingForce);
 }
 
@@ -575,4 +561,10 @@ double Joint::GetInertiaRatio(unsigned int _index) const
           << "] when trying to get inertia ratio across joint.\n";
     return 0;
   }
+}
+
+//////////////////////////////////////////////////
+double Joint::GetDamping(int /*_index*/)
+{
+  return this->dampingCoefficient;
 }

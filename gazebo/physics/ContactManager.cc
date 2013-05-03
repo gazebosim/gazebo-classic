@@ -40,6 +40,20 @@ ContactManager::~ContactManager()
   this->Clear();
   this->node.reset();
   this->contactPub.reset();
+
+  boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
+  for (iter = this->customContactPublishers.begin();
+      iter != this->customContactPublishers.end(); ++iter)
+  {
+    if (iter->second)
+    {
+      iter->second->collisions.clear();
+      iter->second->publisher.reset();
+      delete iter->second;
+      iter->second = NULL;
+    }
+  }
+  this->customContactPublishers.clear();
   this->world.reset();
 }
 
@@ -65,21 +79,44 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   if (!_collision1 || !_collision2)
     return result;
 
-  // If no one is listening, then don't create any contact information.
+  // If no one is listening to the default topic, or there are no
+  // custom contact publishers then don't create any contact information.
   // This is a signal to the Physics engine that it can skip the extra
   // processing necessary to get back contact information.
-  if (!this->contactPub->HasConnections())
-    return result;
 
-  // Get or create a contact feedback object.
-  if (this->contactIndex < this->contacts.size())
-    result = this->contacts[this->contactIndex++];
-  else
+  std::vector<ContactPublisher *> publishers;
+  boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
+  for (iter = this->customContactPublishers.begin();
+      iter != this->customContactPublishers.end(); ++iter)
   {
-    result = new Contact();
-    this->contacts.push_back(result);
-    this->contactIndex = this->contacts.size();
+    if (iter->second->collisions.find(_collision1->GetScopedName()) !=
+        iter->second->collisions.end() ||
+        iter->second->collisions.find(_collision2->GetScopedName()) !=
+        iter->second->collisions.end())
+    {
+      publishers.push_back(iter->second);
+    }
   }
+
+  if (this->contactPub->HasConnections() || !publishers.empty())
+  {
+    // Get or create a contact feedback object.
+    if (this->contactIndex < this->contacts.size())
+      result = this->contacts[this->contactIndex++];
+    else
+    {
+      result = new Contact();
+      this->contacts.push_back(result);
+      this->contactIndex = this->contacts.size();
+    }
+    for (unsigned int i = 0; i < publishers.size(); ++i)
+    {
+      publishers[i]->contacts.push_back(result);
+    }
+  }
+
+  if (!result)
+    return result;
 
   result->count = 0;
   result->collision1 = _collision1->GetScopedName();
@@ -123,9 +160,15 @@ void ContactManager::ResetCount()
 void ContactManager::Clear()
 {
   // Delete all the contacts.
-  for (unsigned int i = 0; i < this->contacts.size(); i++)
+  for (unsigned int i = 0; i < this->contacts.size(); ++i)
     delete this->contacts[i];
+
   this->contacts.clear();
+
+  boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
+  for (iter = this->customContactPublishers.begin();
+      iter != this->customContactPublishers.end(); ++iter)
+    iter->second->contacts.clear();
 
   // Reset the contact count to zero.
   this->contactIndex = 0;
@@ -144,8 +187,8 @@ void ContactManager::PublishContacts()
     return;
   }
 
+  // publish to default topic, ~/physics/contacts
   msgs::Contacts msg;
-
   for (unsigned int i = 0; i < this->contactIndex; ++i)
   {
     if (this->contacts[i]->count == 0)
@@ -157,4 +200,58 @@ void ContactManager::PublishContacts()
 
   msgs::Set(msg.mutable_time(), this->world->GetSimTime());
   this->contactPub->Publish(msg);
+
+  // publish to other custom topics
+  msgs::Contacts msg2;
+  boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
+  for (iter = this->customContactPublishers.begin();
+      iter != this->customContactPublishers.end(); ++iter)
+  {
+    ContactPublisher *contactPublisher = iter->second;
+    for (unsigned int j = 0;
+        j < contactPublisher->contacts.size(); ++j)
+    {
+      if (contactPublisher->contacts[j]->count == 0)
+        continue;
+
+      msgs::Contact *contactMsg = msg2.add_contact();
+      contactPublisher->contacts[j]->FillMsg(*contactMsg);
+    }
+    msgs::Set(msg2.mutable_time(), this->world->GetSimTime());
+    contactPublisher->publisher->Publish(msg2);
+    contactPublisher->contacts.clear();
+  }
+}
+
+/////////////////////////////////////////////////
+std::string ContactManager::CreateFilter(const std::string &_name,
+    const std::vector<std::string> &_collisions)
+{
+  if (_collisions.empty())
+    return "";
+
+  std::string name = _name;
+  boost::replace_all(name, "::", "/");
+
+  if (this->customContactPublishers.find(name) !=
+    this->customContactPublishers.end())
+  {
+    gzerr << "Filter with the same name already exists! Aborting" << std::endl;
+    return "";
+  }
+
+  // Contact sensors make use of this filter
+  std::string topic = "~/" + name + "/contacts";
+
+  transport::PublisherPtr pub =
+    this->node->Advertise<msgs::Contacts>(topic);
+
+  ContactPublisher *contactPublisher = new ContactPublisher;
+  contactPublisher->publisher = pub;
+  for (unsigned int i = 0; i < _collisions.size(); ++i)
+    contactPublisher->collisions.insert(_collisions[i]);
+
+  this->customContactPublishers[name] = contactPublisher;
+
+  return topic;
 }
