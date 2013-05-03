@@ -42,6 +42,7 @@ Contact::Contact(const Contact &_c)
 //////////////////////////////////////////////////
 Contact::~Contact()
 {
+  this->world.reset();
 }
 
 //////////////////////////////////////////////////
@@ -120,6 +121,7 @@ Contact &Contact::operator =(const msgs::Contact &_contact)
 //////////////////////////////////////////////////
 void Contact::Reset()
 {
+  this->world.reset();
   this->count = 0;
 }
 

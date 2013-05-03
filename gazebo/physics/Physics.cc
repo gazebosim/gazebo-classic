@@ -90,11 +90,11 @@ void physics::init_worlds()
 }
 
 /////////////////////////////////////////////////
-void physics::run_worlds(unsigned int _steps)
+void physics::run_worlds(unsigned int _steps, unsigned int _stepDelayMS)
 {
   std::vector<WorldPtr>::iterator iter;
   for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
-    (*iter)->Run(_steps);
+    (*iter)->Run(_steps, _stepDelayMS);
 }
 
 /////////////////////////////////////////////////
@@ -150,7 +150,6 @@ void physics::remove_worlds()
       iter != g_worlds.end(); ++iter)
   {
     (*iter)->Fini();
-    std::cout << "World[" << (*iter)->GetName() << "] Usecount[" << (*iter).use_count() << "]\n";
     (*iter).reset();
   }
 

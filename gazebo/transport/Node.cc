@@ -43,8 +43,16 @@ void Node::Fini()
 {
   if (!this->initialized)
     return;
-
   this->initialized = false;
+
+  // Unadvertise all the publishers.
+  for (std::vector<PublisherPtr>::iterator iter = this->publishers.begin();
+       iter != this->publishers.end(); ++iter)
+  {
+    TopicManager::Instance()->Unadvertise(*iter);
+  }
+
+  // Remove ourself
   TopicManager::Instance()->RemoveNode(this->id);
 
   {
@@ -141,8 +149,10 @@ void Node::ProcessPublishers()
 /////////////////////////////////////////////////
 bool Node::HandleData(const std::string &_topic, const std::string &_msg)
 {
-  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-  this->incomingMsgs[_topic].push_back(_msg);
+  {
+    boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+    this->incomingMsgs[_topic].push_back(_msg);
+  }
   ConnectionManager::Instance()->TriggerUpdate();
   return true;
 }
@@ -150,8 +160,10 @@ bool Node::HandleData(const std::string &_topic, const std::string &_msg)
 /////////////////////////////////////////////////
 bool Node::HandleMessage(const std::string &_topic, MessagePtr _msg)
 {
-  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-  this->incomingMsgsLocal[_topic].push_back(_msg);
+  {
+    boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+    this->incomingMsgsLocal[_topic].push_back(_msg);
+  }
   ConnectionManager::Instance()->TriggerUpdate();
   return true;
 }
@@ -305,5 +317,20 @@ void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
         break;
       }
     }
+  }
+}
+
+/////////////////////////////////////////////////
+void Node::ClearBuffers()
+{
+  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+
+  this->incomingMsgs.clear();
+  this->incomingMsgsLocal.clear();
+
+  for (std::vector<PublisherPtr>::iterator iter = this->publishers.begin();
+       iter != this->publishers.end(); ++iter)
+  {
+    (*iter)->ClearBuffers();
   }
 }

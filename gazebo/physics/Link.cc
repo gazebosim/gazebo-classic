@@ -645,7 +645,7 @@ bool Link::SetSelected(bool _s)
 }
 
 //////////////////////////////////////////////////
-void Link::SetInertial(const InertialPtr &/*_inertial*/)
+void Link::SetInertial(InertialPtr /*_inertial*/)
 {
   gzwarn << "Link::SetMass is empty\n";
 }
@@ -857,7 +857,7 @@ std::string Link::GetSensorName(unsigned int _i) const
 }
 
 //////////////////////////////////////////////////
-void Link::AttachStaticModel(ModelPtr &_model, const math::Pose &_offset)
+void Link::AttachStaticModel(ModelPtr _model, const math::Pose &_offset)
 {
   if (!_model->IsStatic())
   {

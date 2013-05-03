@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class Publisher Publisher.hh transport/transport.hh
     /// \brief A publisher of messages on a topic
-    class Publisher
+    class Publisher: public boost::enable_shared_from_this<Publisher>
     {
       /// Deprecated
       public: Publisher(const std::string &_topic, const std::string &_msgType,
@@ -92,6 +92,13 @@ namespace gazebo
       /// \return The number of outgoing messages
       public: unsigned int GetOutgoingCount() const;
 
+      /// \brief Clear all buffers.
+      public: void ClearBuffers();
+
+      /// \brief Implementation of the Publish function.
+      /// \param[in] _message Message to be published
+      /// \param[in] _block Whether to block until the message is actually
+      /// written out
       private: void PublishImpl(const google::protobuf::Message &_message,
                                 bool _block);
 
@@ -151,8 +158,14 @@ namespace gazebo
       /// \brief The previous message published. Used for latching topics.
       private: MessagePtr prevMsg;
 
+      /// \brief Current time.
       private: common::Time currentTime;
+
+      /// \brief Time of the last publication.
       private: common::Time prevPublishTime;
+
+      public: unsigned int id;
+      private: static unsigned int idCounter;
     };
     /// \}
   }

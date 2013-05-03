@@ -4,7 +4,6 @@ package gazebo.msgs;
 /// \interface Request
 /// \brief A message containing a string request
 
-
 message Request
 {
   required int32 id         = 1;
@@ -12,5 +11,3 @@ message Request
   optional string data      = 3;
   optional double dbl_data  = 4;
 }
-
-

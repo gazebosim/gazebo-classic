@@ -315,6 +315,9 @@ namespace gazebo
       /// \return The message type
       public: std::string GetMsgType(const std::string &_topic) const;
 
+      /// \brief Clear message buffers
+      public: void ClearBuffers();
+
       /// \internal
       /// \brief Remove a callback. This should only be called by
       /// Subscriber.cc

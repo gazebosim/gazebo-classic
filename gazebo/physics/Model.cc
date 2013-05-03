@@ -70,13 +70,11 @@ Model::Model(BasePtr _parent)
   : Entity(_parent)
 {
   this->AddType(MODEL);
-  this->updateMutex = new boost::recursive_mutex();
 }
 
 //////////////////////////////////////////////////
 Model::~Model()
 {
-  delete this->updateMutex;
 }
 
 //////////////////////////////////////////////////
@@ -109,7 +107,9 @@ void Model::LoadLinks()
   // Load the bodies
   if (this->sdf->HasElement("link"))
   {
+   
     sdf::ElementPtr linkElem = this->sdf->GetElement("link");
+
     bool canonicalLinkInitialized = false;
     while (linkElem)
     {
@@ -209,7 +209,7 @@ void Model::Init()
 //////////////////////////////////////////////////
 void Model::Update()
 {
-  this->updateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
 
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
@@ -253,8 +253,6 @@ void Model::Update()
     }
     this->prevAnimationTime = this->world->GetSimTime();
   }
-
-  this->updateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -318,6 +316,7 @@ void Model::Fini()
 {
   Entity::Fini();
 
+  this->jointController.reset();
   this->attachedModels.clear();
   this->joints.clear();
   this->plugins.clear();
@@ -644,7 +643,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   std::string stype = _sdf->GetValueString("type");
 
   joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
-     boost::static_pointer_cast<Model>(shared_from_this()));
+      boost::static_pointer_cast<Model>(shared_from_this()));
   if (!joint)
     gzthrow("Unable to create joint of type[" + stype + "]\n");
 
@@ -870,7 +869,7 @@ void Model::SetJointAnimation(
     const std::map<std::string, common::NumericAnimationPtr> _anims,
     boost::function<void()> _onComplete)
 {
-  this->updateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
   std::map<std::string, common::NumericAnimationPtr>::const_iterator iter;
   for (iter = _anims.begin(); iter != _anims.end(); ++iter)
   {
@@ -878,21 +877,19 @@ void Model::SetJointAnimation(
   }
   this->onJointAnimationComplete = _onComplete;
   this->prevAnimationTime = this->world->GetSimTime();
-  this->updateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
 void Model::StopAnimation()
 {
-  this->updateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
   Entity::StopAnimation();
   this->onJointAnimationComplete.clear();
   this->jointAnimations.clear();
-  this->updateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
-void Model::AttachStaticModel(ModelPtr &_model, math::Pose _offset)
+void Model::AttachStaticModel(ModelPtr _model, math::Pose _offset)
 {
   if (!_model->IsStatic())
   {
@@ -978,7 +975,7 @@ void Model::SetLinkWorldPose(const math::Pose &_pose, std::string _linkName)
 }
 
 /////////////////////////////////////////////////
-void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
+void Model::SetLinkWorldPose(const math::Pose &_pose, LinkPtr _link)
 {
   math::Pose linkPose = _link->GetWorldPose();
   math::Pose currentModelPose = this->GetWorldPose();

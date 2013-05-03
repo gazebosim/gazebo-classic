@@ -42,6 +42,9 @@ namespace gazebo
       /// \param[in] _model Model that uses this joint controller.
       public: explicit JointController(ModelPtr _model);
 
+      /// \brief Destructor
+      public: virtual ~JointController();
+
       /// \brief Add a joint to control.
       /// \param[in] _joint Joint to control.
       public: void AddJoint(JointPtr _joint);
@@ -104,7 +107,7 @@ namespace gazebo
       /// \param[in] _link Link to get the connections from.
       /// \param[in] _checkParentTree True to recurse down parent link trees.
       private: void AddConnectedLinks(std::vector<LinkPtr> &_linksOut,
-                                      const LinkPtr &_link,
+                                      const LinkPtr _link,
                                       bool _checkParentTree = false);
 
       /// \brief Helper for SetJointPositions.

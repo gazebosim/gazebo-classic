@@ -364,6 +364,18 @@ void TopicManager::Unadvertise(const std::string &_topic)
 }
 
 //////////////////////////////////////////////////
+void TopicManager::Unadvertise(PublisherPtr _pub)
+{
+  GZ_ASSERT(_pub, "Unadvertising a NULL Publisher");
+
+  PublicationPtr publication = this->FindPublication(_pub->GetTopic());
+  if (publication)
+    publication->RemovePublisher(_pub);
+
+  this->Unadvertise(_pub->GetTopic());
+}
+
+//////////////////////////////////////////////////
 void TopicManager::RegisterTopicNamespace(const std::string &_name)
 {
   ConnectionManager::Instance()->RegisterTopicNamespace(_name);
@@ -396,10 +408,20 @@ TopicManager::GetAdvertisedTopics() const
 //////////////////////////////////////////////////
 void TopicManager::ClearBuffers()
 {
-  PublicationPtr_M::iterator iter;
-  for (iter = this->advertisedTopics.begin();
-       iter != this->advertisedTopics.end(); ++iter)
+  for (std::vector<NodePtr>::iterator iter = this->nodes.begin();
+       iter != this->nodes.end(); ++iter)
   {
+    (*iter)->ClearBuffers();
+  }
+
+  for (SubNodeMap::iterator iter = this->subscribedNodes.begin();
+       iter != this->subscribedNodes.end(); ++iter)
+  {
+    for (std::list<NodePtr>::iterator iter2 = iter->second.begin();
+        iter2 != iter->second.end(); ++iter2)
+    {
+      (*iter2)->ClearBuffers();
+    }
   }
 }
 

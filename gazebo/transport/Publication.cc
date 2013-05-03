@@ -223,7 +223,7 @@ void Publication::RemoveSubscription(const std::string &_host,
 }
 
 //////////////////////////////////////////////////
-void Publication::LocalPublish(const std::string &data)
+void Publication::LocalPublish(const std::string &_data)
 {
   std::list<NodePtr>::iterator iter, endIter;
 
@@ -234,7 +234,7 @@ void Publication::LocalPublish(const std::string &data)
     endIter = this->nodes.end();
     while (iter != endIter)
     {
-      if ((*iter)->HandleData(this->topic, data))
+      if ((*iter)->HandleData(this->topic, _data))
         ++iter;
       else
         this->nodes.erase(iter++);
@@ -254,7 +254,7 @@ void Publication::LocalPublish(const std::string &data)
     {
       if ((*cbIter)->IsLocal())
       {
-        if ((*cbIter)->HandleData(data))
+        if ((*cbIter)->HandleData(_data))
           ++cbIter;
         else
           cbIter = this->callbacks.erase(cbIter);
@@ -372,6 +372,21 @@ void Publication::AddPublisher(PublisherPtr _pub)
 {
   boost::mutex::scoped_lock lock(this->callbackMutex);
   this->publishers.push_back(_pub);
+}
+
+//////////////////////////////////////////////////
+void Publication::RemovePublisher(PublisherPtr _pub)
+{
+  boost::mutex::scoped_lock lock(this->callbackMutex);
+
+  GZ_ASSERT(_pub, "Received a NULL PublisherPtr");
+
+  // Find the publiser
+  std::vector<PublisherPtr>::iterator iter = std::find(
+      this->publishers.begin(), this->publishers.end(), _pub);
+
+  if (iter != this->publishers.end())
+    this->publishers.erase(iter);
 }
 
 //////////////////////////////////////////////////

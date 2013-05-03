@@ -337,7 +337,7 @@ namespace gazebo
 
       /// \brief Remove a visual from the scene.
       /// \param[in] _vis Visual to remove.
-      public: void RemoveVisual(VisualPtr _vis);
+      public: bool RemoveVisual(VisualPtr _vis);
 
       /// \brief Set the grid on or off
       /// \param[in] _enabled Set to true to turn on the grid
@@ -530,6 +530,9 @@ namespace gazebo
       /// \param[in] _linkVisual Pointer to the link's visual.
       private: void CreateCOMVisual(sdf::ElementPtr _elem,
                                     VisualPtr _linkVisual);
+
+      /// \brief Init communications.
+      private: void InitComms();
 
       /// \brief Name of the scene.
       private: std::string name;

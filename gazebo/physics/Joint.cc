@@ -59,6 +59,10 @@ Joint::Joint(BasePtr _parent)
 //////////////////////////////////////////////////
 Joint::~Joint()
 {
+  this->anchorLink.reset();
+  this->childLink.reset();
+  this->parentLink.reset();
+  this->model.reset();
 }
 
 //////////////////////////////////////////////////

@@ -324,6 +324,9 @@ namespace gazebo
       /// \return True if the _ip is a valid.
       public: static bool ValidateIP(const std::string &_ip);
 
+      /// \brief Clear all message buffers.
+      public: void ClearBuffers();
+
       /// \brief Callback when a write has occurred.
       /// \param[in] _e Error code
       /// \param[in] _b Buffer of the data that was written.

@@ -40,6 +40,20 @@ JointController::JointController(ModelPtr _model)
 }
 
 /////////////////////////////////////////////////
+JointController::~JointController()
+{
+  this->jointCmdSub.reset();
+
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
+
+  this->joints.clear();
+  this->updatedLinks.clear();
+  this->model.reset();
+}
+
+/////////////////////////////////////////////////
 void JointController::AddJoint(JointPtr _joint)
 {
   this->joints[_joint->GetScopedName()] = _joint;
@@ -364,7 +378,7 @@ void JointController::ComputeAndSetLinkTwist(LinkPtr _link,
 
 //////////////////////////////////////////////////
 void JointController::AddConnectedLinks(Link_V &_linksOut,
-                                        const LinkPtr &_link,
+                                        const LinkPtr _link,
                                         bool _checkParentTree)
 {
   // strategy, for each child, recursively look for children

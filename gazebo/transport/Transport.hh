@@ -68,6 +68,10 @@ namespace gazebo
     /// \brief Stop the transport component from running.
     void stop();
 
+    /// \brief Pause or unpause the transport system.
+    /// \param[in] _pause True to pause, false to unpause.
+    void pause(bool _pause);
+
     /// \brief Cleanup the transport component
     void fini();
 
@@ -87,8 +91,9 @@ namespace gazebo
     /// \param[in] _data Optional data string.
     /// \return The response to the request.  Can be empty.
     boost::shared_ptr<msgs::Response> request(const std::string &_worldName,
-                                              const std::string &_request,
-                                              const std::string &_data = "");
+        const std::string &_request,
+        const std::string &_data = "",
+        const common::Time &_wait = common::Time::Zero);
 
     /// \brief Send a request and don't wait for a response. This is
     /// non-blocking.

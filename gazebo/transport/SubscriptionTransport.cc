@@ -47,12 +47,12 @@ bool SubscriptionTransport::HandleMessage(MessagePtr _newMsg)
 }
 
 //////////////////////////////////////////////////
-bool SubscriptionTransport::HandleData(const std::string &newdata)
+bool SubscriptionTransport::HandleData(const std::string &_newdata)
 {
   bool result = false;
   if (this->connection->IsOpen())
   {
-    this->connection->EnqueueMsg(newdata);
+    this->connection->EnqueueMsg(_newdata);
     result = true;
   }
   else

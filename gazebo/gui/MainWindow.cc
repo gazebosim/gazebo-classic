@@ -204,6 +204,8 @@ void MainWindow::Init()
     this->node->Advertise<msgs::WorldControl>("~/world_control");
   this->serverControlPub =
     this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
+  this->serverControlSub = this->node->Subscribe("/gazebo/server/status",
+        &MainWindow::OnServerStatus, this);
   this->selectionPub =
     this->node->Advertise<msgs::Selection>("~/selection");
   this->scenePub =
@@ -299,12 +301,12 @@ void MainWindow::OpenLog()
 
   if (!filename.empty())
   {
+
     msgs::ServerControl msg;
     msg.set_open_log_filename(filename);
     this->serverControlPub->Publish(msg);
   }
 
-  rendering::get_scene(gui::get_world())->Clear();
 }
 
 /////////////////////////////////////////////////
@@ -1416,4 +1418,17 @@ void MainWindow::OnFinishBuilding()
 void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 {
   _item->setExpanded(!_item->isExpanded());
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnServerStatus(ConstGzStringPtr &_msg)
+{
+  std::cout << "OnSErver Status[" << _msg->DebugString() << "}\n";
+  if (_msg->data() == "logfile_opened")
+  {
+    rendering::get_scene(gui::get_world())->Clear();
+    rendering::get_scene(gui::get_world())->Init();
+    printf("Log file opened bitches\n");
+  }
+
 }

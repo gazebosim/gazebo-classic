@@ -63,7 +63,7 @@ namespace gazebo
 
     /// \brief Run the server.
     public: void Run();
-    public: void Stop();
+    public: void Stop(bool _stop = true);
     public: void Fini();
 
     public: void SetParams(const common::StrStr_M &params);
@@ -93,6 +93,8 @@ namespace gazebo
 
     private: void ProcessControlMsgs();
 
+    private: bool IsStopped() const;
+
     // save argc and argv for access by system plugins
     public: int systemPluginsArgc;
     public: char** systemPluginsArgv;
@@ -104,8 +106,11 @@ namespace gazebo
     private: transport::NodePtr node;
     private: transport::SubscriberPtr serverSub;
     private: transport::PublisherPtr worldModPub;
+    private: transport::PublisherPtr serverPub;
 
     private: boost::mutex *receiveMutex;
+    private: boost::mutex openLogMutex;
+    private: mutable boost::mutex stopMutex;
     private: std::list<msgs::ServerControl> controlMsgs;
 
     private: gazebo::common::StrStr_M params;

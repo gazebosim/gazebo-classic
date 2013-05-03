@@ -36,7 +36,6 @@ CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
 /////////////////////////////////////////////////
 CameraVisual::~CameraVisual()
 {
-  printf("CameraVisual destructor\n");
   this->scene->RemoveCamera(this->GetName());
   this->camera.reset();
 }
@@ -102,4 +101,7 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
   this->camera->AttachToVisual(this->GetName(), true);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  if (this->parent)
+    this->parent->AttachVisual(shared_from_this());
 }

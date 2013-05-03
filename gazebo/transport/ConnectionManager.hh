@@ -68,6 +68,10 @@ namespace gazebo
       /// \brief Stop the conneciton manager
       public: void Stop();
 
+      /// \brief Pause or unpause the conneciton manager.
+      /// \param[in] _pause True to pause, false to unpause.
+      public: void Pause(bool _pause);
+
       /// \brief Subscribe to a topic
       /// \param[in] _topic The topic to subscribe to
       /// \param[in] _msgType The type of the topic
@@ -130,6 +134,9 @@ namespace gazebo
       /// \brief Inform the connection manager that it needs an update.
       public: void TriggerUpdate();
 
+      /// \brief Clear all message buffers.
+      public: void ClearBuffers();
+
       /// \brief Callback function called when we have read data from the
       /// master
       /// \param[in] _data String of incoming data
@@ -166,6 +173,9 @@ namespace gazebo
 
       private: bool initialized;
       private: bool stop, stopped;
+
+      /// \brief Control the paused state of the run loop.
+      private: bool pause;
 
       private: unsigned int tmpIndex;
       private: boost::recursive_mutex listMutex;

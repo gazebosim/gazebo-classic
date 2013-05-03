@@ -42,6 +42,7 @@ ConnectionManager::ConnectionManager()
   this->tmpIndex = 0;
   this->initialized = false;
   this->stop = false;
+  this->pause = false;
   this->stopped = true;
 
   this->serverConn = NULL;
@@ -89,6 +90,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     return false;
   }
 
+  printf("Read from master\n");
   std::string initData, namespacesData, publishersData;
   this->masterConn->Read(initData);
   this->masterConn->Read(namespacesData);
@@ -193,6 +195,19 @@ void ConnectionManager::Fini()
 }
 
 //////////////////////////////////////////////////
+void ConnectionManager::Pause(bool _pause)
+{
+  if (this->pause && !_pause)
+  {
+    this->pause = _pause;
+    boost::mutex::scoped_lock lock(this->updateMutex);
+    this->updateCondition.notify_all();
+  }
+  else
+    this->pause = _pause;
+}
+
+//////////////////////////////////////////////////
 void ConnectionManager::Stop()
 {
   this->stop = true;
@@ -265,9 +280,14 @@ void ConnectionManager::Run()
 
   while (!this->stop && this->masterConn && this->masterConn->IsOpen())
   {
-    this->RunUpdate();
-    this->updateCondition.timed_wait(lock,
-       boost::posix_time::milliseconds(100));
+    if (!this->pause)
+    {
+      this->RunUpdate();
+      this->updateCondition.timed_wait(lock,
+          boost::posix_time::milliseconds(100));
+    }
+    else
+      this->updateCondition.wait(lock);
   }
   this->RunUpdate();
 
@@ -636,4 +656,18 @@ ConnectionPtr ConnectionManager::FindConnection(const std::string &_host,
 void ConnectionManager::TriggerUpdate()
 {
   this->updateCondition.notify_all();
+}
+
+//////////////////////////////////////////////////
+void ConnectionManager::ClearBuffers()
+{
+  // this->namespaces.clear();
+  // this->masterMessages.clear();
+
+  this->publishers.clear();
+  for (std::list<ConnectionPtr>::iterator iter = this->connections.begin();
+       iter != this->connections.end(); ++iter)
+  {
+    (*iter)->ClearBuffers();
+  }
 }

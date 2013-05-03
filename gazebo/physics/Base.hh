@@ -277,11 +277,11 @@ namespace gazebo
       /// \brief Set the world this object belongs to. This will also
       /// set the world for all children.
       /// \param[in] _newWorld The new World this object is part of.
-      public: void SetWorld(const WorldPtr &_newWorld);
+      public: void SetWorld(WorldPtr _newWorld);
 
       /// \brief Get the World this object is in.
       /// \return The World this object is part of.
-      public: const WorldPtr &GetWorld() const;
+      public: WorldPtr GetWorld() const;
 
       /// \brief Get the SDF values for the object.
       /// \return The SDF values for the object.

@@ -268,7 +268,7 @@ namespace gazebo
 
       /// \brief Set the mass of the link.
       /// \parma[in] _inertial Inertial value for the link.
-      public: void SetInertial(const InertialPtr &_inertial);
+      public: void SetInertial(InertialPtr _inertial);
 
       /// \cond
       /// This is an internal function
@@ -391,7 +391,7 @@ namespace gazebo
       /// \brief Attach a static model to this link
       /// \param[in] _model Pointer to a static model.
       /// \param[in] _offset Pose relative to this link to place the model.
-      public: void AttachStaticModel(ModelPtr &_model,
+      public: void AttachStaticModel(ModelPtr _model,
                                      const math::Pose &_offset);
 
       /// \brief Detach a static model from this link.

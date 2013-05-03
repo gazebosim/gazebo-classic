@@ -36,7 +36,7 @@ using namespace gazebo;
 using namespace transport;
 
 unsigned int Connection::idCounter = 0;
-IOManager *Connection::iomanager = NULL;
+extern IOManager *g_iomanager;
 
 // Version 1.52 of boost has an address::is_unspecfied function, but
 // Version 1.46.1 (installed on ubuntu) does not. So this helper function
@@ -57,12 +57,12 @@ static bool addressIsLoopback(const boost::asio::ip::address_v4 &_addr)
 //////////////////////////////////////////////////
 Connection::Connection()
 {
-  if (iomanager == NULL)
-    iomanager = new IOManager();
+  // if (iomanager == NULL)
+  //  iomanager = new IOManager();
 
-  this->socket = new boost::asio::ip::tcp::socket(iomanager->GetIO());
+  this->socket = new boost::asio::ip::tcp::socket(g_iomanager->GetIO());
 
-  iomanager->IncCount();
+  g_iomanager->IncCount();
   this->id = idCounter++;
 
   this->acceptor = NULL;
@@ -81,14 +81,14 @@ Connection::~Connection()
 {
   this->Shutdown();
 
-  if (iomanager)
+  if (g_iomanager)
   {
-    iomanager->DecCount();
-    if (iomanager->GetCount() == 0)
+    g_iomanager->DecCount();
+    if (g_iomanager->GetCount() == 0)
     {
       this->idCounter = 0;
-      delete iomanager;
-      iomanager = NULL;
+      //delete iomanager;
+      //iomanager = NULL;
     }
   }
 }
@@ -107,7 +107,7 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
 
   // Resolve the host name into an IP address
   boost::asio::ip::tcp::resolver::iterator end;
-  boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
+  boost::asio::ip::tcp::resolver resolver(g_iomanager->GetIO());
   boost::asio::ip::tcp::resolver::query query(host, service,
       boost::asio::ip::resolver_query_base::numeric_service);
   boost::asio::ip::tcp::resolver::iterator endpointIter;
@@ -169,11 +169,15 @@ void Connection::Listen(unsigned int port, const AcceptCallback &accept_cb)
 {
   this->acceptCB = accept_cb;
 
-  this->acceptor = new boost::asio::ip::tcp::acceptor(iomanager->GetIO());
+  this->acceptor = new boost::asio::ip::tcp::acceptor(g_iomanager->GetIO());
   boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port);
   this->acceptor->open(endpoint.protocol());
   this->acceptor->set_option(
       boost::asio::ip::tcp::acceptor::reuse_address(true));
+
+  // Enable TCP_NO_DELAY
+  this->acceptor->set_option(boost::asio::ip::tcp::no_delay(true));
+
   this->acceptor->bind(endpoint);
   this->acceptor->listen();
 
@@ -225,16 +229,14 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 {
   // Don't enqueue empty messages
   if (_buffer.empty())
-  {
     return;
-  }
 
-  std::ostringstream header_stream;
+  std::ostringstream headerStream;
 
-  header_stream << std::setw(HEADER_LENGTH) << std::hex << _buffer.size();
+  headerStream << std::setw(HEADER_LENGTH) << std::hex << _buffer.size();
 
-  if (header_stream.str().empty() ||
-      header_stream.str().size() != HEADER_LENGTH)
+  if (headerStream.str().empty() ||
+      headerStream.str().size() != HEADER_LENGTH)
   {
     // Something went wrong, inform the caller
     boost::system::error_code error(boost::asio::error::invalid_argument);
@@ -247,7 +249,7 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
     boost::asio::streambuf *buffer = new boost::asio::streambuf;
     std::ostream os(buffer);
-    os << header_stream.str() << _buffer;
+    os << headerStream.str() << _buffer;
 
     std::size_t written = 0;
     written = boost::asio::write(*this->socket, buffer->data());
@@ -261,7 +263,7 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     */
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    this->writeQueue.push_back(header_stream.str());
+    this->writeQueue.push_back(headerStream.str());
     this->writeQueue.push_back(_buffer);
   }
   // }
@@ -281,18 +283,14 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 void Connection::ProcessWriteQueue(bool _blocking)
 {
   if (!this->IsOpen())
-  {
     return;
-  }
 
   boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
   // async_write should only be called when the last async_write has
   // completed. Therefore we have to check the writeCount attribute
   if (this->writeQueue.size() == 0 || this->writeCount > 0)
-  {
     return;
-  }
 
   boost::asio::streambuf *buffer(new boost::asio::streambuf);
   std::ostream os(buffer);
@@ -345,10 +343,11 @@ std::string Connection::GetRemoteURI() const
 void Connection::OnWrite(const boost::system::error_code &_e,
                          boost::asio::streambuf *_buffer)
 {
+  delete _buffer;
+
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
     this->writeCount--;
-    delete _buffer;
   }
 
   if (_e)
@@ -625,7 +624,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
   // First try GAZEBO_HOSTNAME if it is set.
   if (hostname && !std::string(hostname).empty())
   {
-    boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
+    boost::asio::ip::tcp::resolver resolver(g_iomanager->GetIO());
     boost::asio::ip::tcp::resolver::query query(hostname, "");
     boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
     boost::asio::ip::tcp::resolver::iterator end;
@@ -744,8 +743,16 @@ bool Connection::ValidateIP(const std::string &_ip)
 boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
 {
   boost::asio::ip::tcp::endpoint ep;
-  if (this->socket)
-    ep = this->socket->remote_endpoint();
+  try
+  {
+    if (this->socket)
+      ep = this->socket->remote_endpoint();
+  }
+  catch(boost::system::system_error &e)
+  {
+    gzerr << "Unable to get remote endpoint: "
+      << e.what() << "\n";
+  }
   return ep;
 }
 
@@ -764,7 +771,7 @@ std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint _ep)
   // Otherwise perform a lookup
   else
   {
-    boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
+    boost::asio::ip::tcp::resolver resolver(g_iomanager->GetIO());
     boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(_ep);
     boost::asio::ip::tcp::resolver::iterator end;
 
@@ -828,4 +835,11 @@ void Connection::OnConnect(const boost::system::error_code &_error,
 unsigned int Connection::GetId() const
 {
   return this->id;
+}
+
+//////////////////////////////////////////////////
+void Connection::ClearBuffers()
+{
+  boost::recursive_mutex::scoped_lock lock(this->writeMutex);
+  this->writeQueue.clear();
 }

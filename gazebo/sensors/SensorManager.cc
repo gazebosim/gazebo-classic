@@ -415,6 +415,7 @@ void SensorManager::SensorContainer::Fini()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Run()
 {
+  this->stop = false;
   this->runThread = new boost::thread(
       boost::bind(&SensorManager::SensorContainer::RunLoop, this));
 
@@ -437,49 +438,51 @@ void SensorManager::SensorContainer::Stop()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::RunLoop()
 {
-  this->stop = false;
-
   common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = 0;
+  physics::WorldPtr world;
+  physics::PhysicsEnginePtr engine; 
 
   boost::mutex tmpMutex;
   boost::mutex::scoped_lock lock2(tmpMutex);
 
   // Wait for a sensor to be added.
-  if (this->sensors.empty())
+  if (!this->stop && this->sensors.empty())
   {
     this->runCondition.wait(lock2);
     if (this->stop)
       return;
   }
 
+  if (!this->stop)
   {
-    boost::recursive_mutex::scoped_lock lock(this->mutex);
-
-    // Get the minimum update rate from the sensors.
-    for (Sensor_V::iterator iter = this->sensors.begin();
-        iter != this->sensors.end() && !this->stop; ++iter)
     {
-      GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
-      maxUpdateRate = std::max((*iter)->GetUpdateRate(), maxUpdateRate);
+      boost::recursive_mutex::scoped_lock lock(this->mutex);
+
+      // Get the minimum update rate from the sensors.
+      for (Sensor_V::iterator iter = this->sensors.begin();
+          iter != this->sensors.end() && !this->stop; ++iter)
+      {
+        GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
+        maxUpdateRate = std::max((*iter)->GetUpdateRate(), maxUpdateRate);
+      }
     }
+
+    // Calculate an appropriate sleep time.
+    if (maxUpdateRate > 0)
+      sleepTime.Set(1.0 / (maxUpdateRate));
+    else
+      sleepTime.Set(0, 1e6);
+
+    world = physics::get_world();
+    GZ_ASSERT(world != NULL, "Pointer to World is NULL");
+
+    engine = world->GetPhysicsEngine();
+    GZ_ASSERT(engine != NULL, "Pointer to PhysicsEngine is NULL");
+
+    engine->InitForThread();
   }
-
-  // Calculate an appropriate sleep time.
-  if (maxUpdateRate > 0)
-    sleepTime.Set(1.0 / (maxUpdateRate));
-  else
-    sleepTime.Set(0, 1e6);
-
-  physics::WorldPtr world = physics::get_world();
-  GZ_ASSERT(world != NULL, "Pointer to World is NULL");
-
-  physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
-  GZ_ASSERT(engine != NULL, "Pointer to PhysicsEngine is NULL");
-
-  engine->InitForThread();
-
-
+  
   while (!this->stop)
   {
     if (this->sensors.empty())

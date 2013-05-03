@@ -80,6 +80,8 @@ class ModelUpdate_TBB
 //////////////////////////////////////////////////
 World::World(const std::string &_name)
 {
+  this->stepDelayMS = 0;
+
   this->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->sdf);
 
@@ -124,13 +126,14 @@ World::World(const std::string &_name)
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&World::SetSelectedEntityCB, this, _1)));
+
+  this->prevStates[0] = new WorldState();
+  this->prevStates[1] = new WorldState();
 }
 
 //////////////////////////////////////////////////
 World::~World()
 {
-  printf("Deleting world\n");
-
   delete this->receiveMutex;
   this->receiveMutex = NULL;
   delete this->loadModelMutex;
@@ -193,7 +196,7 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->statPub =
-    this->node->Advertise<msgs::WorldStatistics>("~/world_stats");
+    this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 10, 40.0);
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
@@ -291,11 +294,11 @@ void World::Init()
   util::LogRecord::Instance()->Add(this->GetName(), "state.log",
       boost::bind(&World::OnLog, this, _1));
 
-  this->prevStates[0].SetWorld(shared_from_this());
-  this->prevStates[1].SetWorld(shared_from_this());
+  this->prevStates[0]->SetWorld(shared_from_this());
+  this->prevStates[1]->SetWorld(shared_from_this());
 
-  this->prevStates[0].SetName(this->GetName());
-  this->prevStates[1].SetName(this->GetName());
+  this->prevStates[0]->SetName(this->GetName());
+  this->prevStates[1]->SetName(this->GetName());
 
   this->initialized = true;
 
@@ -310,10 +313,11 @@ void World::Init()
 }
 
 //////////////////////////////////////////////////
-void World::Run(unsigned int _iterations)
+void World::Run(unsigned int _steps, unsigned int _stepDelay)
 {
   this->stop = false;
-  this->stopIterations = _iterations;
+  this->stopIterations = _steps;
+  this->stepDelayMS = _stepDelay;
 
   this->thread = new boost::thread(boost::bind(&World::RunLoop, this));
 }
@@ -336,7 +340,6 @@ void World::Stop()
     delete this->thread;
     this->thread = NULL;
   }
-  std::cout << "World Stopped\n";
 }
 
 //////////////////////////////////////////////////
@@ -355,7 +358,7 @@ void World::RunLoop()
   this->logThread = new boost::thread(boost::bind(&World::LogWorker, this));
 
   // Get the first state
-  this->prevStates[0] = WorldState(shared_from_this());
+  this->prevStates[0]->Load(shared_from_this());
   this->stateToggle = 0;
 
   if (!util::LogPlay::Instance()->IsOpen())
@@ -364,6 +367,8 @@ void World::RunLoop()
         (!this->stopIterations || (this->iterations < this->stopIterations));)
     {
       this->Step();
+      if (this->stepDelayMS > 0)
+        gazebo::common::Time::MSleep(this->stepDelayMS);
     }
   }
   else
@@ -373,6 +378,8 @@ void World::RunLoop()
         (!this->stopIterations || (this->iterations < this->stopIterations));)
     {
       this->LogStep();
+      if (this->stepDelayMS > 0)
+        gazebo::common::Time::MSleep(this->stepDelayMS);
     }
   }
 
@@ -380,6 +387,7 @@ void World::RunLoop()
 
   if (this->logThread)
   {
+    // Notify the condition to continue.
     this->logCondition.notify_all();
     this->logThread->join();
     delete this->logThread;
@@ -429,6 +437,7 @@ void World::LogStep()
           this->logPlayStateSDF->GetElement("deletions")->GetElement("name");
         while (nameElem)
         {
+          gzdbg << "Sending entity delete message\n";
           transport::requestNoReply(this->GetName(), "entity_delete",
                                     nameElem->GetValueString());
           nameElem = nameElem->GetNextElement("name");
@@ -599,7 +608,7 @@ void World::Update()
     // worker catchs up.
     if (this->iterations - this->logPrevIteration > 1)
     {
-      this->logCondition.notify_one();
+      this->logCondition.notify_all();
       this->logContinueCondition.wait(lock);
     }
   }
@@ -628,7 +637,7 @@ void World::Update()
 
   // Only update state information if logging data.
   if (util::LogRecord::Instance()->GetRunning())
-    this->logCondition.notify_one();
+    this->logCondition.notify_all();
   DIAG_TIMER_LAP("World::Update", "LogRecordNotify");
 
   // Output the contact information
@@ -644,36 +653,41 @@ void World::Update()
 //////////////////////////////////////////////////
 void World::Fini()
 {
-  WorldPtr self = shared_from_this();
-  std::cout << "World::Fini Start[" << self.use_count() << "]\n";
   this->Stop();
-  std::cout << "World::Fini Stop[" << self.use_count() << "]\n";
 
   this->plugins.clear();
-  std::cout << "World::Fini Plugins[" << self.use_count() << "]\n";
 
   this->publishModelPoses.clear();
 
-  this->node->Fini();
-  std::cout << "World::Fini Node[" << self.use_count() << "]\n";
+  if (this->node)
+    this->node->Fini();
 
   if (this->rootElement)
   {
+    WorldPtr self = shared_from_this();
     this->rootElement->Fini();
     this->rootElement.reset();
   }
 
-  std::cout << "World::Fini Root[" << self.use_count() << "]\n";
   if (this->physicsEngine)
   {
     this->physicsEngine->Fini();
     this->physicsEngine.reset();
   }
-  std::cout << "World::Fini Physics[" << self.use_count() << "]\n";
 
-  this->prevStates[0].SetWorld(WorldPtr());
-  this->prevStates[1].SetWorld(WorldPtr());
-  std::cout << "World::Fini End[" << self.use_count() << "]\n";
+  delete this->prevStates[0];
+  this->prevStates[0] = NULL;
+
+  delete this->prevStates[1];
+  this->prevStates[1] = NULL;
+
+  this->modelMsgs.clear();
+  this->factoryMsgs.clear();
+  this->requestMsgs.clear();
+  this->dirtyPoses.clear();
+  this->deleteEntity.clear();
+  this->connections.clear();
+  this->node.reset();
 }
 
 //////////////////////////////////////////////////
@@ -731,7 +745,6 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
 
-    std::cout << "Load Model[" << model->GetScopedName() << "]\n";
     event::Events::addEntity(model->GetScopedName());
 
     msgs::Model msg;
@@ -1689,7 +1702,7 @@ void World::UpdateStateSDF()
   sdf::ElementPtr stateElem = this->sdf->GetElement("state");
   stateElem->ClearElements();
 
-  this->prevStates[(this->stateToggle + 1) % 2].FillSDF(stateElem);
+  this->prevStates[(this->stateToggle + 1) % 2]->FillSDF(stateElem);
 }
 
 //////////////////////////////////////////////////
@@ -1735,8 +1748,8 @@ bool World::OnLog(std::ostringstream &_stream)
     // Clear everything.
     this->states.clear();
     this->stateToggle = 0;
-    this->prevStates[0] = WorldState();
-    this->prevStates[1] = WorldState();
+    delete this->prevStates[0];
+    delete this->prevStates[1];
   }
 
   return true;
@@ -1830,9 +1843,9 @@ void World::LogWorker()
   {
     int currState = (this->stateToggle + 1) % 2;
 
-    this->prevStates[currState].Load(self);
-    WorldState diffState = this->prevStates[currState] -
-      this->prevStates[this->stateToggle];
+    this->prevStates[currState]->Load(self);
+    WorldState diffState = (*this->prevStates[currState]) -
+      (*this->prevStates[this->stateToggle]);
     this->logPrevIteration = this->iterations;
 
     if (!diffState.IsZero())
@@ -1841,7 +1854,7 @@ void World::LogWorker()
 
       // Store the entire current state (instead of the diffState). A slow
       // moving link may never be captured if only diff state is recorded.
-      this->states.push_back(this->prevStates[currState]);
+      this->states.push_back(*this->prevStates[currState]);
 
       // Tell the logger to update, once the number of states exceeds 1000
       if (this->states.size() > 1000)
@@ -1850,11 +1863,11 @@ void World::LogWorker()
 
     this->logContinueCondition.notify_all();
 
-    // Wait until there is work to be done.
-    this->logCondition.wait(lock);
+    // Wait until there is work to be done, but only if we are not stopped.
+    if (!this->stop)
+      this->logCondition.wait(lock);
   }
 
   // Make sure nothing is blocked by this thread.
   this->logContinueCondition.notify_all();
-  printf("LogWorker end\n");
 }

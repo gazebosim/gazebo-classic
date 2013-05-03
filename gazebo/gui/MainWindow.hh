@@ -128,6 +128,10 @@ namespace gazebo
       /// \brief Callback for diagnostics action.
       private slots: void Diagnostics();
 
+      /// \brief Receives status messages from the server.
+      /// \param[in] _msg Message pointer.
+      private: void OnServerStatus(ConstGzStringPtr &_msg);
+
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);
 
@@ -169,6 +173,9 @@ namespace gazebo
       private: transport::PublisherPtr selectionPub;
       private: transport::PublisherPtr requestPub;
       private: transport::PublisherPtr scenePub;
+
+      /// \brief Receives status messages from the server
+      private: transport::SubscriberPtr serverControlSub;
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr guiSub;
       private: transport::SubscriberPtr newEntitySub, statsSub;

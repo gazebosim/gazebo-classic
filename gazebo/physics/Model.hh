@@ -25,16 +25,12 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/thread.hpp>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
-
-namespace boost
-{
-  class recursive_mutex;
-}
 
 namespace gazebo
 {
@@ -231,7 +227,7 @@ namespace gazebo
       ///
       /// \param[in] _model Pointer to the static model.
       /// \param[in] _offset Offset, relative to this Model, to place _model.
-      public: void AttachStaticModel(ModelPtr &_model, math::Pose _offset);
+      public: void AttachStaticModel(ModelPtr _model, math::Pose _offset);
 
       /// \brief Detach a static model from this model.
       /// \param[in] _model Name of an attached static model to remove.
@@ -262,8 +258,7 @@ namespace gazebo
       /// are unchanged.
       /// \param[in] _pose Pose to set the link to.
       /// \param[in] _link Pointer to the link to set.
-      public: void SetLinkWorldPose(const math::Pose &_pose,
-                                    const LinkPtr &_link);
+      public: void SetLinkWorldPose(const math::Pose &_pose, LinkPtr _link);
 
       /// \brief Allow the model the auto disable. This is ignored if the
       /// model has joints.
@@ -342,7 +337,7 @@ namespace gazebo
       private: common::Time prevAnimationTime;
 
       /// \brief Mutex used during the update cycle.
-      private: boost::recursive_mutex *updateMutex;
+      private: boost::recursive_mutex updateMutex;
 
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;

@@ -89,8 +89,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->requestMsg = NULL;
   this->enableVisualizations = _enableVisualizations;
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_name);
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
 
@@ -98,54 +96,25 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->manager = NULL;
   this->raySceneQuery = NULL;
   this->skyx = NULL;
+  this->skyxController = NULL;
 
   this->receiveMutex = new boost::mutex();
-
-  this->connections.push_back(
-      event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
-
-  this->sensorSub = this->node->Subscribe("~/sensor",
-                                          &Scene::OnSensorMsg, this, true);
-  this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
-
-  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
-
-  this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
-
-  this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
-  this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
-  this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
-          &Scene::OnSkeletonPoseMsg, this);
-  this->selectionSub = this->node->Subscribe("~/selection",
-      &Scene::OnSelectionMsg, this);
-  this->skySub = this->node->Subscribe("~/sky", &Scene::OnSkyMsg, this);
-  this->modelInfoSub = this->node->Subscribe("~/model/info",
-                                             &Scene::OnModelMsg, this);
-
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
-
-  this->requestSub = this->node->Subscribe("~/request",
-      &Scene::OnRequest, this);
-
-  // \TODO: This causes the Scene to occasionally miss the response to
-  // scene_info
-  // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
-  this->responseSub = this->node->Subscribe("~/response",
-      &Scene::OnResponse, this);
-  this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
-
 
   this->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->sdf);
 
   this->terrain = NULL;
   this->selectedVis.reset();
+
+  this->connections.push_back(
+      event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 }
 
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  this->node->Fini();
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+
   this->visualMsgs.clear();
   this->lightMsgs.clear();
   this->poseMsgs.clear();
@@ -156,9 +125,13 @@ void Scene::Clear()
   this->userCameras.clear();
   this->lights.clear();
 
-
   while (this->visuals.size() > 0)
-    this->RemoveVisual(this->visuals.begin()->second);
+  {
+    if (!this->RemoveVisual(this->visuals.begin()->second))
+    {
+      this->visuals.erase(this->visuals.begin());
+    }
+  }
   this->visuals.clear();
 
   for (uint32_t i = 0; i < this->grids.size(); i++)
@@ -248,6 +221,7 @@ VisualPtr Scene::GetWorldVisual() const
 //////////////////////////////////////////////////
 void Scene::Init()
 {
+  this->InitComms();
   this->worldVisual.reset(new Visual("__world_node__", shared_from_this()));
 
   // RTShader system self-enables if the render path type is FORWARD,
@@ -281,8 +255,32 @@ void Scene::Init()
   // Force shadows on.
   this->SetShadowsEnabled(true);
 
-  this->requestMsg = msgs::CreateRequest("scene_info");
-  this->requestPub->Publish(*this->requestMsg);
+  /*boost::shared_ptr<msgs::Response> response;
+  msgs::Scene sceneMsg;
+
+  while (!response)
+    response = transport::request("default", "scene_info", "",
+        common::Time(5,0));
+
+  if (response->response() != "error" &&
+      response->type() == sceneMsg.GetTypeName())
+  {
+    sceneMsg.ParseFromString(response->serialized_data());
+    boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
+    this->sceneMsgs.push_back(sm);
+  }
+  else
+  {*/
+    // \TODO: This causes the Scene to occasionally miss the response to
+    // scene_info
+    // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
+    this->responseSub = this->node->Subscribe("~/response",
+        &Scene::OnResponse, this);
+    this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
+
+    this->requestMsg = msgs::CreateRequest("scene_info");
+    this->requestPub->Publish(*this->requestMsg);
+  //}
 
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);
@@ -1475,6 +1473,11 @@ void Scene::PreRender()
     first = false;
   */
   boost::mutex::scoped_lock lock(*this->receiveMutex);
+  if (this->requestMsg != NULL)
+  {
+    this->requestPub->Publish(*this->requestMsg);
+    return;
+  }
 
   static RequestMsgs_L::iterator rIter;
   static SceneMsgs_L::iterator sIter;
@@ -1670,7 +1673,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       cameraVis->Load(_msg->camera().image_size().x(),
                       _msg->camera().image_size().y());
 
-      this->visuals[cameraVis->GetName()] = cameraVis;
+      // this->visuals[cameraVis->GetName()] = cameraVis;
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&
@@ -1716,7 +1719,8 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 
   if (!linkVis)
   {
-    gzerr << "No link visual\n";
+    // gzerr << "No link visual for message:\n";
+    // gzerr << _msg->DebugString() << std::endl;
     return false;
   }
 
@@ -1779,6 +1783,7 @@ void Scene::OnScene(ConstScenePtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnResponse(ConstResponsePtr &_msg)
 {
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
@@ -2214,9 +2219,15 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 void Scene::SetSky()
 {
   // Create SkyX
-  this->skyxController = new SkyX::BasicController();
-  this->skyx = new SkyX::SkyX(this->manager, this->skyxController);
-  this->skyx->create();
+  if (!this->skyxController)
+    this->skyxController = new SkyX::BasicController();
+
+  if (!this->skyx)
+  {
+    this->skyx = new SkyX::SkyX(this->manager, this->skyxController);
+    this->skyx->create();
+    Ogre::Root::getSingletonPtr()->addFrameListener(this->skyx);
+  }
 
   this->skyx->setTimeMultiplier(0);
 
@@ -2287,8 +2298,6 @@ void Scene::SetSky()
   // vclouds->getLightningManager()->setLightningTimeMultiplier(
   //    preset.vcLightningsTM);
 
-  Ogre::Root::getSingletonPtr()->addFrameListener(this->skyx);
-
   this->skyx->update(0);
 }
 
@@ -2354,8 +2363,10 @@ void Scene::AddVisual(VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
-void Scene::RemoveVisual(VisualPtr _vis)
+bool Scene::RemoveVisual(VisualPtr _vis)
 {
+  bool result = false;
+
   if (_vis)
   {
     // Remove all projectors attached to the visual
@@ -2381,11 +2392,16 @@ void Scene::RemoveVisual(VisualPtr _vis)
     {
       iter->second->Fini();
       this->visuals.erase(iter);
+      result = true;
     }
+    else
+      gzerr << "Unable to find visual[" << _vis->GetName() << "]\n";
 
     if (this->selectedVis && this->selectedVis->GetName() == _vis->GetName())
       this->selectedVis.reset();
   }
+
+  return result;
 }
 
 /////////////////////////////////////////////////
@@ -2533,4 +2549,34 @@ void Scene::ShowContacts(bool _show)
     vis->SetEnabled(_show);
   else
     gzerr << "Unable to get contact visualization. This should never happen.\n";
+}
+
+/////////////////////////////////////////////////
+void Scene::InitComms()
+{
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(this->GetName());
+
+  this->sensorSub = this->node->Subscribe("~/sensor",
+                                          &Scene::OnSensorMsg, this, true);
+  this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
+
+  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+
+  this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
+
+  this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
+  this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
+  this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
+          &Scene::OnSkeletonPoseMsg, this);
+  this->selectionSub = this->node->Subscribe("~/selection",
+      &Scene::OnSelectionMsg, this);
+  this->skySub = this->node->Subscribe("~/sky", &Scene::OnSkyMsg, this);
+  this->modelInfoSub = this->node->Subscribe("~/model/info",
+                                             &Scene::OnModelMsg, this);
+
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+
+  this->requestSub = this->node->Subscribe("~/request",
+      &Scene::OnRequest, this);
 }
