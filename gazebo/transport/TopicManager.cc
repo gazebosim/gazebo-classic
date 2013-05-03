@@ -154,7 +154,7 @@ void TopicManager::ProcessNodes(bool _onlyOut)
   }
   catch(...)
   {
-    /// Failed to process the connections this time around. But not to
+    /// Failed to process the nodes this time around. But not to
     /// worry. This function is called again.
   }
 
