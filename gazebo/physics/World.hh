@@ -667,6 +667,9 @@ namespace gazebo
       /// \brief Mutex to protect the log worker thread.
       private: boost::mutex logMutex;
 
+      /// \brief Mutex to protect the deleteEntity list.
+      private: boost::mutex entityDeleteMutex;
+
       /// \brief Worker thread for logging.
       private: boost::thread *logThread;
     };
