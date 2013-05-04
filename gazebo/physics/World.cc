@@ -1229,7 +1229,8 @@ void World::LoadPlugin(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void World::ProcessEntityMsgs()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->entityDeleteMutex);
+
   std::list<std::string>::iterator iter;
   for (iter = this->deleteEntity.begin();
        iter != this->deleteEntity.end(); ++iter)
@@ -1302,6 +1303,7 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "entity_delete")
     {
+      boost::mutex::scoped_lock lock2(this->entityDeleteMutex);
       this->deleteEntity.push_back((*iter).data());
     }
     else if ((*iter).request() == "entity_info")

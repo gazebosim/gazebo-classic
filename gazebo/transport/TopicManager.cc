@@ -146,10 +146,16 @@ void TopicManager::ProcessNodes(bool _onlyOut)
   }
 
   // Process nodes in parallel
+  try
   {
     boost::mutex::scoped_lock lock(this->processNodesMutex);
     tbb::parallel_for(tbb::blocked_range<size_t>(0, this->nodes.size(), 10),
         NodeProcess_TBB(&this->nodes));
+  }
+  catch(...)
+  {
+    /// Failed to process the nodes this time around. But not to
+    /// worry. This function is called again.
   }
 
   if (!this->pauseIncoming && !_onlyOut)
