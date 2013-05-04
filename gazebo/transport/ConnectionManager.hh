@@ -95,7 +95,7 @@ namespace gazebo
       /// \param[in] _topic The topic to advertise
       /// \param[in] _msgType The type of the topic
       public: void Advertise(const std::string &_topic,
-                              const std::string &_msgType);
+                             const std::string &_msgType);
 
       /// \brief Unadvertise a topic
       /// \param[in] _topic The topic to unadvertise
@@ -191,6 +191,50 @@ namespace gazebo
 
       /// \brief Condition used for synchronization
       private: boost::condition_variable namespaceCondition;
+
+      /// \brief A class to hold a pending subscription.
+      private: class PendingSubscription
+               {
+                 /// \brief Constructor.
+                 /// \param[in] _topic Name of the topic.
+                 /// \param[in] _msgType Type of message.
+                 /// \param[in] _latching True for latching topics.
+                 public:PendingSubscription(const std::string &_topic,
+                            const std::string &_msgType, bool _latching) :
+                   topic(_topic), msgType(_msgType), latching(_latching) {}
+
+                 /// \brief Name of the topic.
+                 public: std::string topic;
+
+                 /// \brief Name of the message type.
+                 public: std::string msgType;
+
+                 /// \brief True for latching topics.
+                 public: bool latching;
+               };
+
+      /// \brief A class to hold a pending advertisement.
+      private: class PendingAdvertisement
+               {
+                 /// \brief Constructor.
+                 /// \param[in] _topic Name of the topic.
+                 /// \param[in] _msgType Type of message.
+                 public:PendingAdvertisement(const std::string &_topic,
+                            const std::string &_msgType) :
+                   topic(_topic), msgType(_msgType) {}
+
+                 /// \brief Name of the topic.
+                 public: std::string topic;
+
+                 /// \brief Name of the message type.
+                 public: std::string msgType;
+               };
+
+      /// \brief List of all pending subscriptions.
+      private: std::list<PendingSubscription> pendingSubscriptions;
+
+      /// \brief List of all pending advertisements.
+      private: std::list<PendingAdvertisement> pendingAdvertisements;
 
       // Singleton implementation
       private: friend class SingletonT<ConnectionManager>;

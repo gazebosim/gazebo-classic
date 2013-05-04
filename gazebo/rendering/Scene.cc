@@ -1654,7 +1654,6 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       LaserVisualPtr laserVis(new LaserVisual(
             rayVisualName+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
       laserVis->Load();
-      this->visuals[rayVisualName+"_laser_vis"] = laserVis;
     }
   }
   else if (_msg->type() == "camera" && _msg->visualize())
@@ -1674,8 +1673,6 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 
       cameraVis->Load(_msg->camera().image_size().x(),
                       _msg->camera().image_size().y());
-
-      // this->visuals[cameraVis->GetName()] = cameraVis;
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&

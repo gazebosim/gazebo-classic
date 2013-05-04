@@ -17,11 +17,13 @@
 
 #include <sstream>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/common/Assert.hh"
 
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Grid.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Grid.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -111,8 +113,14 @@ void Grid::SetHeight(uint32_t _height)
 //////////////////////////////////////////////////
 void Grid::Init()
 {
+  if (!this->scene || !this->scene->GetManager())
+    return;
+
   this->manualObject =
     this->scene->GetManager()->createManualObject(this->name);
+
+  GZ_ASSERT(this->manualObject, "Unable to create OGRE manual object");
+
   this->manualObject->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->manualObject->setDynamic(false);

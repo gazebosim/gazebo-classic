@@ -90,7 +90,6 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     return false;
   }
 
-  printf("Read from master\n");
   std::string initData, namespacesData, publishersData;
 
   try
@@ -167,6 +166,22 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   // Tell the user what address will be publicized to other nodes.
   gzmsg << "Publicized address: "
         << this->masterConn->GetLocalHostname() << "\n";
+
+  // Process all pending subscriptions.
+  for (std::list<PendingSubscription>::iterator iter =
+      this->pendingSubscriptions.begin();
+      iter != this->pendingSubscriptions.end(); ++iter)
+  {
+    this->Subscribe((*iter).topic, (*iter).msgType, (*iter).latching);
+  }
+
+  // Process all pending advertisements.
+  for (std::list<PendingAdvertisement>::iterator iter =
+      this->pendingAdvertisements.begin();
+      iter != this->pendingAdvertisements.end(); ++iter)
+  {
+    this->Advertise((*iter).topic, (*iter).msgType);
+  }
 
   return true;
 }
@@ -446,22 +461,27 @@ void ConnectionManager::OnRead(const ConnectionPtr &_connection,
     subLink->Init(_connection, sub.latching());
 
     // Connect the publisher to this transport mechanism
-    TopicManager::Instance()->ConnectPubToSub(sub.topic(), subLink);
+    TopicManager::Instance()->ConnectPubToSub(sub, subLink);
   }
   else
     gzerr << "Error est here\n";
 }
 
 //////////////////////////////////////////////////
-void ConnectionManager::Advertise(const std::string &topic,
-                                  const std::string &msgType)
+void ConnectionManager::Advertise(const std::string &_topic,
+                                  const std::string &_msgType)
 {
+  // We are not initialized, so add the advertisement to our pending list.
   if (!this->initialized)
+  {
+    this->pendingAdvertisements.push_back(
+        PendingAdvertisement(_topic, _msgType));
     return;
+  }
 
   msgs::Publish msg;
-  msg.set_topic(topic);
-  msg.set_msg_type(msgType);
+  msg.set_topic(_topic);
+  msg.set_msg_type(_msgType);
   msg.set_host(this->serverConn->GetLocalAddress());
   msg.set_port(this->serverConn->GetLocalPort());
 
@@ -564,9 +584,11 @@ void ConnectionManager::Subscribe(const std::string &_topic,
                                   const std::string &_msgType,
                                   bool _latching)
 {
+  // We are not initialized, so add the subscription to our pending list.
   if (!this->initialized)
   {
-    gzerr << "ConnectionManager is not initialized\n";
+    this->pendingSubscriptions.push_back(
+        PendingSubscription(_topic, _msgType, _latching));
     return;
   }
 

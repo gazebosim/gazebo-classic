@@ -40,6 +40,8 @@ boost::mutex g_sensorTimingMutex;
 SensorManager::SensorManager()
   : initialized(false)
 {
+  this->simTimeEventHandler = NULL;
+
   // sensors::IMAGE container
   this->sensorContainers.push_back(new ImageSensorContainer());
 
@@ -180,6 +182,12 @@ void SensorManager::ResetLastUpdateTimes()
 void SensorManager::Init()
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
+
+  if (this->simTimeEventHandler)
+  {
+    delete this->simTimeEventHandler;
+    this->simTimeEventHandler = NULL;
+  }
 
   this->simTimeEventHandler = new SimTimeEventHandler();
 
@@ -441,7 +449,7 @@ void SensorManager::SensorContainer::RunLoop()
   common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = 0;
   physics::WorldPtr world;
-  physics::PhysicsEnginePtr engine; 
+  physics::PhysicsEnginePtr engine;
 
   boost::mutex tmpMutex;
   boost::mutex::scoped_lock lock2(tmpMutex);
@@ -482,7 +490,7 @@ void SensorManager::SensorContainer::RunLoop()
 
     engine->InitForThread();
   }
-  
+
   while (!this->stop)
   {
     if (this->sensors.empty())
@@ -516,8 +524,9 @@ void SensorManager::SensorContainer::RunLoop()
 
     // Add an event to trigger when the appropriate simulation time has been
     // reached.
-    SensorManager::Instance()->simTimeEventHandler->AddRelativeEvent(
-        eventTime, &this->runCondition);
+    if (SensorManager::Instance()->simTimeEventHandler)
+      SensorManager::Instance()->simTimeEventHandler->AddRelativeEvent(
+          eventTime, &this->runCondition);
 
     this->runCondition.wait(timingLock);
   }

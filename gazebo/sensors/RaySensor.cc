@@ -319,7 +319,7 @@ void RaySensor::UpdateImpl(bool /*_force*/)
         this->laserShape->GetRetro(j * this->GetRayCount() + i));
   }
 
-  if (this->scanPub)
+  if (this->scanPub && this->laserMsg.IsInitialized())
     this->scanPub->Publish(this->laserMsg);
 }
 
