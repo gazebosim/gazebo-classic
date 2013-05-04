@@ -34,7 +34,7 @@
 #include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/Scene.hh"
 
-#include "gazebo/gui/DataPlayback.hh"
+#include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
@@ -108,7 +108,7 @@ MainWindow::MainWindow()
   this->toolsWidget = new ToolsWidget();
 
   this->renderWidget = new RenderWidget(mainWidget);
-  this->dataPlayback = new DataPlayback(mainWidget);
+  this->logPlay = new LogPlayWidget(mainWidget);
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
@@ -139,9 +139,11 @@ MainWindow::MainWindow()
 
   mainLayout->setSpacing(0);
   mainLayout->addLayout(centerLayout, 1);
-  mainLayout->addWidget(dataPlayback);
+  mainLayout->addWidget(this->logPlay);
   mainLayout->addWidget(new QSizeGrip(mainWidget), 0,
                         Qt::AlignBottom | Qt::AlignRight);
+
+  this->logPlay->hide();
 
   mainWidget->setLayout(mainLayout);
 
@@ -304,12 +306,12 @@ void MainWindow::OpenLog()
 
   if (!filename.empty())
   {
-
     msgs::ServerControl msg;
     msg.set_open_log_filename(filename);
     this->serverControlPub->Publish(msg);
-  }
 
+    this->logPlay->show();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1426,12 +1428,9 @@ void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 /////////////////////////////////////////////////
 void MainWindow::OnServerStatus(ConstGzStringPtr &_msg)
 {
-  std::cout << "OnSErver Status[" << _msg->DebugString() << "}\n";
   if (_msg->data() == "logfile_opened")
   {
     rendering::get_scene(gui::get_world())->Clear();
     rendering::get_scene(gui::get_world())->Init();
-    printf("Log file opened bitches\n");
   }
-
 }

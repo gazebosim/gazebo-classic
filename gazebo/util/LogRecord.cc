@@ -275,7 +275,8 @@ bool LogRecord::GetRunning() const
 
 //////////////////////////////////////////////////
 void LogRecord::Add(const std::string &_name, const std::string &_filename,
-                    boost::function<bool (std::ostringstream &)> _logCallback)
+                    boost::function<bool (std::ostringstream &,
+                      uint64_t &)> _logCallback)
 {
   boost::mutex::scoped_lock logLock(this->writeMutex);
 
@@ -321,9 +322,10 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
     this->node = transport::NodePtr(new transport::Node());
     this->node->Init();
 
-    this->logControlSub = this->node->Subscribe("~/log/control",
+    this->logControlSub = this->node->Subscribe("~/log/record/control",
         &LogRecord::OnLogControl, this);
-    this->logStatusPub = this->node->Advertise<msgs::LogStatus>("~/log/status");
+    this->logStatusPub = this->node->Advertise<msgs::LogRecordStatus>(
+        "~/log/record/status");
   }
 }
 
@@ -536,7 +538,7 @@ common::Time LogRecord::GetRunTime() const
 
 //////////////////////////////////////////////////
 LogRecord::Log::Log(LogRecord *_parent, const std::string &_relativeFilename,
-                 boost::function<bool (std::ostringstream &)> _logCB)
+    boost::function<bool (std::ostringstream &, uint64_t &)> _logCB)
 {
   this->parent = _parent;
   this->logCB = _logCB;
@@ -554,14 +556,17 @@ LogRecord::Log::~Log()
 unsigned int LogRecord::Log::Update()
 {
   std::ostringstream stream;
+  uint64_t segments;
 
   // Get log data via the callback.
-  if (this->logCB(stream) && !stream.str().empty())
+  if (this->logCB(stream, segments) && !stream.str().empty())
   {
     const std::string encoding = this->parent->GetEncoding();
 
     this->buffer.append("<chunk encoding='");
     this->buffer.append(encoding);
+    this->buffer.append("' segments='");
+    this->buffer.append(boost::lexical_cast<std::string>(segments));
     this->buffer.append("'>\n");
 
     this->buffer.append("<![CDATA[");
@@ -698,7 +703,7 @@ void LogRecord::Log::Write()
 }
 
 //////////////////////////////////////////////////
-void LogRecord::OnLogControl(ConstLogControlPtr &_data)
+void LogRecord::OnLogControl(ConstLogRecordControlPtr &_data)
 {
   if (_data->has_base_path() && !_data->base_path().empty())
     this->SetBasePath(_data->base_path());
@@ -728,7 +733,7 @@ void LogRecord::PublishLogStatus()
 
   /// \todo right now this function will only report on the first log.
 
-  msgs::LogStatus msg;
+  msgs::LogRecordStatus msg;
   unsigned int size = 0;
 
   // Set the time of the status message
@@ -747,21 +752,25 @@ void LogRecord::PublishLogStatus()
   size = this->GetFileSize();
 
   if (size < 1000)
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::BYTES);
+    msg.mutable_log_file()->set_size_units(
+        msgs::LogRecordStatus::LogFile::BYTES);
   else if (size < 1e6)
   {
     msg.mutable_log_file()->set_size(size / 1.0e3);
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::K_BYTES);
+    msg.mutable_log_file()->set_size_units(
+        msgs::LogRecordStatus::LogFile::K_BYTES);
   }
   else if (size < 1e9)
   {
     msg.mutable_log_file()->set_size(size / 1.0e6);
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::M_BYTES);
+    msg.mutable_log_file()->set_size_units(
+        msgs::LogRecordStatus::LogFile::M_BYTES);
   }
   else
   {
     msg.mutable_log_file()->set_size(size / 1.0e9);
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::G_BYTES);
+    msg.mutable_log_file()->set_size_units(
+        msgs::LogRecordStatus::LogFile::G_BYTES);
   }
 
   this->logStatusPub->Publish(msg);

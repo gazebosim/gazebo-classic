@@ -977,7 +977,7 @@ int step(const std::string &_filename, const std::string &_filter,
 int record(bool _start)
 {
   if (!gazebo::transport::init())
-    return;
+    return 0;
 
   gazebo::transport::run();
 
@@ -985,10 +985,10 @@ int record(bool _start)
   node->Init();
 
   gazebo::transport::PublisherPtr pub =
-    node->Advertise<gazebo::msgs::LogControl>("~/log/control");
+    node->Advertise<gazebo::msgs::LogRecordControl>("~/log/record/control");
   pub->WaitForConnection();
 
-  gazebo::msgs::LogControl msg;
+  gazebo::msgs::LogRecordControl msg;
   _start ? msg.set_start(true) : msg.set_stop(true);
   pub->Publish(msg, true);
 

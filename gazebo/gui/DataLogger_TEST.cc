@@ -126,9 +126,10 @@ void DataLogger_TEST::StressTest()
     // Create a node from communication.
     node = gazebo::transport::NodePtr(new gazebo::transport::Node());
     node->Init();
-    pub = node->Advertise<gazebo::msgs::LogControl>("~/log/control");
+    pub = node->Advertise<gazebo::msgs::LogRecordControl>(
+        "~/log/record/control");
 
-    gazebo::msgs::LogControl msg;
+    gazebo::msgs::LogRecordControl msg;
     msg.set_base_path("/tmp/gazebo_test");
     pub->Publish(msg);
 

@@ -434,7 +434,10 @@ namespace gazebo
       private: void ProcessModelMsgs();
 
       /// \brief Log callback. This is where we write out state info.
-      private: bool OnLog(std::ostringstream &_stream);
+      /// \param[out] _stream OnLog will populated _stream with data to log.
+      /// \param[out] _segments OnLog will set this to the number of steps
+      /// that _stream contains.
+      private: bool OnLog(std::ostringstream &_stream, uint64_t &_segments);
 
       /// \brief Process all incoming messages.
       private: void ProcessMessages();

@@ -1,12 +1,12 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface LogStatus
-/// \brief A message that contains information about data logging
+/// \interface LogRecordStatus
+/// \brief A message that contains information about data log recording
 
 import "time.proto";
 
-message LogStatus
+message LogRecordStatus
 {
   message LogFile
   {

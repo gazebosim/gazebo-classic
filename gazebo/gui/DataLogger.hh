@@ -83,7 +83,7 @@ namespace gazebo
 
       /// \brief Callback for log status messages.
       /// \param[in] _msg Log status message.
-      private: void OnStatus(ConstLogStatusPtr &_msg);
+      private: void OnStatus(ConstLogRecordStatusPtr &_msg);
 
       /// \brief Node to handle communication.
       private: transport::NodePtr node;

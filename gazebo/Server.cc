@@ -85,6 +85,18 @@ bool Server::ParseArgs(int argc, char **argv)
       this->systemPluginsArgv[i][j] = argv[i][j];
   }
 
+  std::string host = "";
+  unsigned int port = 0;
+
+  gazebo::transport::get_master_uri(host, port);
+
+  this->master = new gazebo::Master();
+  this->master->Init(port);
+  this->master->RunThread();
+
+  // Load gazebo
+  gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
+
   po::options_description v_desc("Allowed options");
   v_desc.add_options()
     ("help,h", "Produce this help message.")
@@ -320,19 +332,6 @@ bool Server::LoadString(const std::string &_sdfString)
 bool Server::LoadImpl(sdf::ElementPtr _elem,
                       const std::string &_physics)
 {
-  std::string host = "";
-  unsigned int port = 0;
-
-  gazebo::transport::get_master_uri(host, port);
-
-  this->master = new gazebo::Master();
-  this->master->Init(port);
-  this->master->RunThread();
-
-
-  // Load gazebo
-  gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
-
   /// Load the sensors library
   sensors::load();
 

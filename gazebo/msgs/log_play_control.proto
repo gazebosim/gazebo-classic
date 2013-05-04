@@ -1,0 +1,12 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface LogPlayControl
+/// \brief A message that allows for control of log play functions
+
+message LogPlayControl
+{
+  optional bool start           = 1;
+  optional bool stop            = 2;
+  optional int32 steps          = 3;
+}

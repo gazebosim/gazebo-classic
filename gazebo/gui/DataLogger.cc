@@ -226,12 +226,13 @@ DataLogger::DataLogger(QWidget *_parent)
 
   // Advertise on the log control topic. The server listens to log control
   // messages.
-  this->pub = this->node->Advertise<msgs::LogControl>("~/log/control");
+  this->pub = this->node->Advertise<msgs::LogRecordControl>(
+      "~/log/record/control");
 
   // Subscribe to the log status topic. The server publishes log status
   // messages.
-  this->sub = this->node->Subscribe<msgs::LogStatus>("~/log/status",
-      &DataLogger::OnStatus, this);
+  this->sub = this->node->Subscribe<msgs::LogRecordStatus>(
+      "~/log/record/status", &DataLogger::OnStatus, this);
 }
 
 /////////////////////////////////////////////////
@@ -251,7 +252,7 @@ void DataLogger::OnRecord(bool _toggle)
     this->statusLabel->setText("Recording");
 
     // Tell the server to start data logging
-    msgs::LogControl msg;
+    msgs::LogRecordControl msg;
     msg.set_start(true);
     this->pub->Publish(msg);
   }
@@ -264,7 +265,7 @@ void DataLogger::OnRecord(bool _toggle)
     this->statusLabel->setText("Ready");
 
     // Tell the server to stop data logging
-    msgs::LogControl msg;
+    msgs::LogRecordControl msg;
     msg.set_stop(true);
     this->pub->Publish(msg);
 
@@ -273,7 +274,7 @@ void DataLogger::OnRecord(bool _toggle)
 }
 
 /////////////////////////////////////////////////
-void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
+void DataLogger::OnStatus(ConstLogRecordStatusPtr &_msg)
 {
   // A new log status message has arrived, let's display the contents.
   common::Time time = msgs::Convert(_msg->sim_time());
@@ -331,13 +332,13 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
       // Get the size units.
       switch (_msg->log_file().size_units())
       {
-        case msgs::LogStatus::LogFile::BYTES:
+        case msgs::LogRecordStatus::LogFile::BYTES:
           stream << "B";
           break;
-        case msgs::LogStatus::LogFile::K_BYTES:
+        case msgs::LogRecordStatus::LogFile::K_BYTES:
           stream << "KB";
           break;
-        case msgs::LogStatus::LogFile::M_BYTES:
+        case msgs::LogRecordStatus::LogFile::M_BYTES:
           stream << "MB";
           break;
         default:
@@ -423,7 +424,7 @@ void DataLogger::OnBrowse()
   }
 
   // Set the new base path
-  msgs::LogControl msg;
+  msgs::LogRecordControl msg;
   msg.set_base_path(path.string());
   this->pub->Publish(msg);
 

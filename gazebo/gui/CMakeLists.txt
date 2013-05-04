@@ -21,7 +21,6 @@ set (sources
   BoxMaker.cc
   CylinderMaker.cc
   DataLogger.cc
-  DataPlayback.cc
   EntityMaker.cc
   RenderWidget.cc
   GLWidget.cc
@@ -30,6 +29,7 @@ set (sources
   InsertModelWidget.cc
   JointControlWidget.cc
   LightMaker.cc
+  LogPlayWidget.cc
   MainWindow.cc
   MeshMaker.cc
   ModelEditWidget.cc
@@ -45,10 +45,10 @@ set (sources
 set (qt_headers
   Actions.hh
   DataLogger.hh
-  DataPlayback.hh
   GLWidget.hh
   InsertModelWidget.hh
   JointControlWidget.hh
+  LogPlayWidget.hh
   MainWindow.hh
   ModelListWidget.hh
   ModelEditWidget.hh

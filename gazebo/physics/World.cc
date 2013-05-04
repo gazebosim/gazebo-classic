@@ -292,7 +292,7 @@ void World::Init()
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
   util::LogRecord::Instance()->Add(this->GetName(), "state.log",
-      boost::bind(&World::OnLog, this, _1));
+      boost::bind(&World::OnLog, this, _1, _2));
 
   this->prevStates[0]->SetWorld(shared_from_this());
   this->prevStates[1]->SetWorld(shared_from_this());
@@ -1705,8 +1705,10 @@ void World::UpdateStateSDF()
 }
 
 //////////////////////////////////////////////////
-bool World::OnLog(std::ostringstream &_stream)
+bool World::OnLog(std::ostringstream &_stream, uint64_t &_segments)
 {
+  _segments = 0;
+
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->GetFirstUpdate())
   {
@@ -1716,6 +1718,7 @@ bool World::OnLog(std::ostringstream &_stream)
     _stream << "'>\n";
     _stream << this->sdf->ToString("");
     _stream << "</sdf>\n";
+    _segments++;
   }
   else if (this->states.size() >= 1)
   {
@@ -1728,8 +1731,9 @@ bool World::OnLog(std::ostringstream &_stream)
         << this->states[0] << "</sdf>";
 
       this->states.pop_front();
+      _segments++;
     }
-  }
+  } 
 
   // Logging has stopped. Wait for log worker to finish. Output last bit
   // of data, and reset states.
@@ -1742,6 +1746,8 @@ bool World::OnLog(std::ostringstream &_stream)
     {
       _stream << "<sdf version='" << SDF_VERSION << "'>"
         << this->states[i] << "</sdf>";
+
+      _segments++;
     }
 
     // Clear everything.
