@@ -79,8 +79,12 @@ void TrimeshShape::Init()
       gzthrow("Unable to get submesh with name[" +
           submeshElem->GetValueString("name") + "]");
 
-    if (submeshElem->HasElement("center"))
+    // Center the submesh if specified in SDF.
+    if (submeshElem->HasElement("center") &&
+        submeshElem->GetValueBool("center"))
+    {
       this->submesh->Center();
+    }
   }
 }
 

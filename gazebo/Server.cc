@@ -24,6 +24,7 @@
 
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
+#include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
@@ -377,6 +378,9 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
 /////////////////////////////////////////////////
 void Server::Init()
 {
+  // Make sure the model database has started.
+  common::ModelDatabase::Instance()->Start();
+
   gazebo::init();
 
   sensors::init();
@@ -412,6 +416,9 @@ void Server::Fini()
     this->master->Fini();
   delete this->master;
   this->master = NULL;
+
+  // Cleanup model database.
+  common::ModelDatabase::Instance()->Fini();
 }
 
 /////////////////////////////////////////////////

@@ -406,7 +406,8 @@ void Visual::Load()
     catch(Ogre::Exception &e)
     {
       gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-      gzthrow("Unable to create a mesh from " + meshName);
+      gzerr << "Unable to create a mesh from " <<  meshName << "\n";
+      return;
     }
   }
 
@@ -1363,7 +1364,7 @@ math::Pose Visual::GetWorldPose() const
   pose.pos.y = vpos.y;
   pose.pos.z = vpos.z;
 
-  vquatern = this->sceneNode->getOrientation();
+  vquatern = this->sceneNode->_getDerivedOrientation();
   pose.rot.w = vquatern.w;
   pose.rot.x = vquatern.x;
   pose.rot.y = vquatern.y;
@@ -1401,8 +1402,14 @@ void Visual::DisableTrackVisual()
 //////////////////////////////////////////////////
 std::string Visual::GetNormalMap() const
 {
-  return this->sdf->GetElement("material")->GetElement(
+  std::string file = this->sdf->GetElement("material")->GetElement(
       "shader")->GetElement("normal_map")->GetValueString();
+
+  std::string uriFile = common::find_file(file);
+  if (!uriFile.empty())
+    file = uriFile;
+
+  return file;
 }
 
 //////////////////////////////////////////////////
@@ -1593,7 +1600,16 @@ void Visual::InsertMesh(const std::string &_meshName,
   {
     mesh = common::MeshManager::Instance()->Load(_meshName);
     if (!mesh)
-      gzthrow("Unable to create a mesh from " + _meshName);
+    {
+      gzerr << "Unable to create a mesh from " << _meshName << "\n";
+      return;
+    }
+
+    if (_meshName == "/home/nkoenig/.gazebo/models/hokuyo/meshes/hokuyo.dae")
+    {
+      printf("\n\n RETURNING \n\n");
+      return;
+    }
   }
   else
   {

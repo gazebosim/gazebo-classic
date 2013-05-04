@@ -36,24 +36,6 @@ namespace gazebo
                   event::ConnectionPtr _subscriber)
               { createEntity.Disconnect(_subscriber); }
 
-      /////////////////////////////////////////////////
-      public: template<typename T>
-              static event::ConnectionPtr ConnectMousePress(T _subscriber)
-              { return mousePress.Connect(_subscriber); }
-      public: static void DisconnectMousePress(
-                  event::ConnectionPtr _subscriber)
-              { mousePress.Disconnect(_subscriber); }
-
-      /////////////////////////////////////////////////
-      public: template<typename T>
-              static event::ConnectionPtr ConnectMouseRelease(T _subscriber)
-              { return mouseRelease.Connect(_subscriber); }
-      public: static void DisconnectMouseRelease(
-                  event::ConnectionPtr _subscriber)
-              { mouseRelease.Disconnect(_subscriber); }
-
-
-
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot to the move mode signal
       public: template<typename T>
@@ -131,10 +113,6 @@ namespace gazebo
       public: static event::EventT<void ()> orbit;
 
       public: static event::EventT<void (std::string)> keyPress;
-      public: static event::EventT<void (const common::MouseEvent &)>
-              mousePress;
-      public: static event::EventT<void (const common::MouseEvent &)>
-              mouseRelease;
 
       /// \brief Step size changed event
       public: static event::EventT<void (int)> inputStepSize;

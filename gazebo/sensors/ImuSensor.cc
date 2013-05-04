@@ -171,6 +171,8 @@ void ImuSensor::Init()
 void ImuSensor::Fini()
 {
   this->parentEntity->SetPublishData(false);
+  this->pub.reset();
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////

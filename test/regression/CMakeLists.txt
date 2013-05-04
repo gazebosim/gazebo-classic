@@ -28,7 +28,6 @@ set(tests
   bandwidth.cc
   contact_sensor.cc
   factory.cc
-  factory_stress.cc
   file_handling.cc
   imu.cc
   laser.cc
@@ -36,7 +35,6 @@ set(tests
   physics.cc
   pioneer2dx.cc
   transport.cc
-  transport_stress.cc
   server_fixture.cc
   speed.cc
   #state_log.cc
@@ -57,6 +55,7 @@ gz_build_display_tests(${display_tests})
 
 set(dri_tests
   camera_sensor.cc
+  gpu_laser.cc
   heightmap.cc
   pr2.cc
   projector.cc

@@ -166,6 +166,10 @@ namespace gazebo
       /// \return True if an Update has not yet been completed.
       public: bool GetFirstUpdate() const;
 
+      /// \brief Write all logs.
+      /// \param[in] _force True to skip waiting on dataAvailableCondition.
+      public: void Write(bool _force = false);
+
       /// \brief Update the log files
       ///
       /// Captures the current state of all registered entities, and outputs
@@ -178,10 +182,6 @@ namespace gazebo
 
       /// \brief Run the Write loop.
       private: void RunWrite();
-
-      /// \brief Write all logs.
-      /// \param[in] _force True to skip waiting on dataAvailableCondition.
-      private: void Write(bool _force = false);
 
       /// \brief Clear and delete the log buffers.
       private: void ClearLogs();
