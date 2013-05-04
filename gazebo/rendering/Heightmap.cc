@@ -28,7 +28,7 @@
 
 #include "gazebo/math/Helpers.hh"
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Light.hh"
