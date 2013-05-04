@@ -56,6 +56,7 @@ namespace urdf2gazebo
       setStaticFlag = false;
       gravity = true;
       isDampingFactor = false;
+      isMaxContacts = false;
       isMaxVel = false;
       isMinDepth = false;
       fdir1.clear();
@@ -74,6 +75,7 @@ namespace urdf2gazebo
       blobs.clear();
 
       dampingFactor = 0;
+      maxContacts = 0;
       maxVel = 0;
       minDepth = 0;
       mu1 = 0;
@@ -96,6 +98,7 @@ namespace urdf2gazebo
       setStaticFlag = ge.setStaticFlag;
       gravity = ge.gravity;
       isDampingFactor = ge.isDampingFactor;
+      isMaxContacts = ge.isMaxContacts;
       isMaxVel = ge.isMaxVel;
       isMinDepth = ge.isMinDepth;
       isMu1 = ge.isMu1;
@@ -111,6 +114,7 @@ namespace urdf2gazebo
       provideFeedback = ge.provideFeedback;
       cfmDamping = ge.cfmDamping;
       dampingFactor = ge.dampingFactor;
+      maxContacts = ge.maxContacts;
       maxVel = ge.maxVel;
       minDepth = ge.minDepth;
       mu1 = ge.mu1;
@@ -141,7 +145,9 @@ namespace urdf2gazebo
     private: bool gravity;
     private: bool isDampingFactor;
     private: double dampingFactor;
+    private: bool isMaxContacts;
     private: bool isMaxVel;
+    private: int maxContacts;
     private: double maxVel;
     private: bool isMinDepth;
     private: double minDepth;

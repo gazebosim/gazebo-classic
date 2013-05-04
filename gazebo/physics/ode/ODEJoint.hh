@@ -130,6 +130,9 @@ namespace gazebo
       /// \brief internal variable to keep track of cfm damping internals
       private: int cfmDampingState[3];
 
+      /// \brief current cfm damping for stability reasons
+      private: double dStable[3];
+
       /// \brief internal variable to keep track if ConnectJointUpdate
       /// has been called on a damping method
       private: bool dampingInitialized;

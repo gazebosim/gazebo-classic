@@ -156,7 +156,7 @@ namespace gazebo
       /// \param[in] _autoRender True to allow Gazebo to automatically
       /// render the camera. This should almost always be true.
       /// \return Pointer to the new camera.
-     public: DepthCameraPtr CreateDepthCamera(const std::string &_name,
+      public: DepthCameraPtr CreateDepthCamera(const std::string &_name,
                                                bool _autoRender = true);
 
       /// \brief Create laser that generates data from rendering.
@@ -164,8 +164,8 @@ namespace gazebo
       /// \param[in] _autoRender True to allow Gazebo to automatically
       /// render the camera. This should almost always be true.
       /// \return Pointer to the new laser.
-      // public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
-      //                                   bool _autoRender = true);
+      public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
+                                         bool _autoRender = true);
 
       /// \brief Get the number of cameras in this scene
       /// \return Number of lasers.
@@ -466,7 +466,7 @@ namespace gazebo
 
       /// \brief Proces a scene message.
       /// \param[in] _msg The message data.
-      private: void ProcessSceneMsg(ConstScenePtr &_msg);
+      private: bool ProcessSceneMsg(ConstScenePtr &_msg);
 
       /// \brief Process a model message.
       /// \param[in] _msg The message data.
@@ -490,7 +490,7 @@ namespace gazebo
 
       /// \brief Process a light message.
       /// \param[in] _msg The message data.
-      private: void ProcessLightMsg(ConstLightPtr &_msg);
+      private: bool ProcessLightMsg(ConstLightPtr &_msg);
 
       /// \brief Process a request message.
       /// \param[in] _msg The message data.

@@ -149,6 +149,9 @@ macro (gz_build_tests)
   # Build all the tests
   foreach(GTEST_SOURCE_file ${ARGN})
     string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
+    if(USE_LOW_MEMORY_TESTS)
+      add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
+    endif(USE_LOW_MEMORY_TESTS)
     add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
     add_dependencies(${BINARY_NAME}

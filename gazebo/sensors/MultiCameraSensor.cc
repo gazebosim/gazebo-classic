@@ -148,6 +148,7 @@ void MultiCameraSensor::Init()
 //////////////////////////////////////////////////
 void MultiCameraSensor::Fini()
 {
+  this->imagePub.reset();
   Sensor::Fini();
 
   boost::mutex::scoped_lock lock(this->cameraMutex);
