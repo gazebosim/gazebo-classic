@@ -250,6 +250,9 @@ namespace gazebo
       /// \brief Used to protect subscription connection creation.
       private: boost::mutex subscriberMutex;
 
+      /// \brief Mutex to protect node processing
+      private: boost::mutex processNodesMutex;
+
       private: bool pauseIncoming;
 
       // Singleton implementation

@@ -142,6 +142,7 @@ void RaySensor::Init()
 //////////////////////////////////////////////////
 void RaySensor::Fini()
 {
+  this->scanPub.reset();
   Sensor::Fini();
 }
 

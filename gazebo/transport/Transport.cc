@@ -141,6 +141,7 @@ void transport::pause(bool _pause)
 void transport::stop()
 {
   g_stopped = true;
+  g_responseCondition.notify_all();
   transport::ConnectionManager::Instance()->Stop();
   // g_iomanager->Stop();
   if (g_runThread)
@@ -154,9 +155,8 @@ void transport::stop()
 /////////////////////////////////////////////////
 void transport::fini()
 {
-  g_stopped = true;
+  transport::stop();
   transport::TopicManager::Instance()->Fini();
-  transport::ConnectionManager::Instance()->Stop();
 
   if (g_runThread)
   {
@@ -225,9 +225,11 @@ boost::shared_ptr<msgs::Response> transport::request(
   node->Init(_worldName);
 
   PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
+  requestPub->WaitForConnection();
+
   SubscriberPtr responseSub = node->Subscribe("~/response", &on_response);
 
-  requestPub->Publish(*request);
+  requestPub->Publish(*request, true);
 
   boost::shared_ptr<msgs::Response> response;
   std::list<boost::shared_ptr<msgs::Response> >::iterator iter;

@@ -143,13 +143,15 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
     }
   }
 
-  if (!_block)
+  if (_block)
+  {
+    this->SendMessage();
+  }
+  else
   {
     // Tell the connection manager that it needs to update
     ConnectionManager::Instance()->TriggerUpdate();
   }
-  else
-    this->SendMessage();
 }
 
 //////////////////////////////////////////////////

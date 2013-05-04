@@ -126,6 +126,9 @@ void Scene::Clear()
   this->userCameras.clear();
   this->lights.clear();
 
+  delete this->terrain;
+  this->terrain = NULL;
+
   while (this->visuals.size() > 0)
   {
     if (!this->RemoveVisual(this->visuals.begin()->second))
@@ -256,32 +259,15 @@ void Scene::Init()
   // Force shadows on.
   this->SetShadowsEnabled(true);
 
-  /*boost::shared_ptr<msgs::Response> response;
-  msgs::Scene sceneMsg;
+   // \TODO: This causes the Scene to occasionally miss the response to
+  // scene_info
+  // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
+  this->responseSub = this->node->Subscribe("~/response",
+      &Scene::OnResponse, this);
+  this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
 
-  while (!response)
-    response = transport::request("default", "scene_info", "",
-        common::Time(5,0));
-
-  if (response->response() != "error" &&
-      response->type() == sceneMsg.GetTypeName())
-  {
-    sceneMsg.ParseFromString(response->serialized_data());
-    boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
-    this->sceneMsgs.push_back(sm);
-  }
-  else
-  {*/
-    // \TODO: This causes the Scene to occasionally miss the response to
-    // scene_info
-    // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
-    this->responseSub = this->node->Subscribe("~/response",
-        &Scene::OnResponse, this);
-    this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
-
-    this->requestMsg = msgs::CreateRequest("scene_info");
-    this->requestPub->Publish(*this->requestMsg);
-  //}
+  this->requestMsg = msgs::CreateRequest("scene_info");
+  this->requestPub->Publish(*this->requestMsg);
 
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);
@@ -1280,7 +1266,7 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
 }
 
 /////////////////////////////////////////////////
-void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
+bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
   for (int i = 0; i < _msg->model_size(); i++)
   {
@@ -1352,6 +1338,8 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
                  elem->GetValueDouble("start"),
                  elem->GetValueDouble("end"));
   }
+
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -1473,158 +1461,228 @@ void Scene::PreRender()
   else
     first = false;
   */
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  if (this->requestMsg != NULL)
-  {
-    this->requestPub->Publish(*this->requestMsg);
-    return;
-  }
 
   static RequestMsgs_L::iterator rIter;
   static SceneMsgs_L::iterator sIter;
   static ModelMsgs_L::iterator modelIter;
-  static VisualMsgs_L::iterator vIter;
-  static LightMsgs_L::iterator lIter;
+  static VisualMsgs_L::iterator visualIter;
+  static LightMsgs_L::iterator lightIter;
   static PoseMsgs_L::iterator pIter;
   static SkeletonPoseMsgs_L::iterator spIter;
-  static JointMsgs_L::iterator jIter;
+  static JointMsgs_L::iterator jointIter;
   static SensorMsgs_L::iterator sensorIter;
   static LinkMsgs_L::iterator linkIter;
 
-  // Process the scene messages. DO THIS FIRST
-  for (sIter = this->sceneMsgs.begin();
-       sIter != this->sceneMsgs.end(); ++sIter)
-  {
-    this->ProcessSceneMsg(*sIter);
-  }
-  this->sceneMsgs.clear();
+  SceneMsgs_L sceneMsgsCopy;
+  ModelMsgs_L modelMsgsCopy;
+  SensorMsgs_L sensorMsgsCopy;
+  LightMsgs_L lightMsgsCopy;
+  VisualMsgs_L visualMsgsCopy;
+  JointMsgs_L jointMsgsCopy;
+  LinkMsgs_L linkMsgsCopy;
+  RequestMsgs_L requestMsgsCopy;
 
-  modelIter = this->modelMsgs.begin();
-  while (modelIter != this->modelMsgs.end())
+  {
+    boost::mutex::scoped_lock lock(*this->receiveMutex);
+    if (this->requestMsg != NULL)
+    {
+      this->requestPub->Publish(*this->requestMsg);
+      return;
+    }
+
+    std::copy(this->sceneMsgs.begin(), this->sceneMsgs.end(),
+              std::back_inserter(sceneMsgsCopy));
+    this->sceneMsgs.clear();
+
+    std::copy(this->modelMsgs.begin(), this->modelMsgs.end(),
+              std::back_inserter(modelMsgsCopy));
+    this->modelMsgs.clear();
+
+    std::copy(this->sensorMsgs.begin(), this->sensorMsgs.end(),
+              std::back_inserter(sensorMsgsCopy));
+    this->sensorMsgs.clear();
+
+    std::copy(this->lightMsgs.begin(), this->lightMsgs.end(),
+              std::back_inserter(lightMsgsCopy));
+    this->lightMsgs.clear();
+
+    this->visualMsgs.sort(VisualMessageLessOp);
+    std::copy(this->visualMsgs.begin(), this->visualMsgs.end(),
+              std::back_inserter(visualMsgsCopy));
+    this->visualMsgs.clear();
+
+    std::copy(this->jointMsgs.begin(), this->jointMsgs.end(),
+              std::back_inserter(jointMsgsCopy));
+    this->jointMsgs.clear();
+
+    std::copy(this->linkMsgs.begin(), this->linkMsgs.end(),
+              std::back_inserter(linkMsgsCopy));
+    this->linkMsgs.clear();
+  }
+
+  // Process the scene messages. DO THIS FIRST
+  for (sIter = sceneMsgsCopy.begin(); sIter != sceneMsgsCopy.end();)
+  {
+    if (this->ProcessSceneMsg(*sIter))
+      sceneMsgsCopy.erase(sIter++);
+    else
+      ++sIter;
+  }
+
+  // Process the model messages.
+  for (modelIter = modelMsgsCopy.begin(); modelIter != modelMsgsCopy.end();)
   {
     if (this->ProcessModelMsg(**modelIter))
-      this->modelMsgs.erase(modelIter++);
+      modelMsgsCopy.erase(modelIter++);
     else
       ++modelIter;
   }
 
-  sensorIter = this->sensorMsgs.begin();
-  while (sensorIter != this->sensorMsgs.end())
+  // Process the sensor messages.
+  for (sensorIter = sensorMsgsCopy.begin(); sensorIter != sensorMsgsCopy.end();)
   {
     if (this->ProcessSensorMsg(*sensorIter))
-      this->sensorMsgs.erase(sensorIter++);
+      sensorMsgsCopy.erase(sensorIter++);
     else
       ++sensorIter;
   }
 
-  // Process the light messages
-  for (lIter =  this->lightMsgs.begin();
-       lIter != this->lightMsgs.end(); ++lIter)
+  // Process the light messages.
+  for (lightIter = lightMsgsCopy.begin(); lightIter != lightMsgsCopy.end();)
   {
-    this->ProcessLightMsg(*lIter);
-  }
-  this->lightMsgs.clear();
-
-  // Process the visual messages
-  this->visualMsgs.sort(VisualMessageLessOp);
-  vIter = this->visualMsgs.begin();
-  while (vIter != this->visualMsgs.end())
-  {
-    if (this->ProcessVisualMsg(*vIter))
-      this->visualMsgs.erase(vIter++);
+    if (this->ProcessLightMsg(*lightIter))
+      lightMsgsCopy.erase(lightIter++);
     else
-      ++vIter;
+      ++lightIter;
   }
 
-  // Process all the model messages last. Remove pose message from the list
-  // only when a corresponding visual exits. We may receive pose updates
-  // over the wire before  we recieve the visual
-  pIter = this->poseMsgs.begin();
-  while (pIter != this->poseMsgs.end())
+  // Process the visual messages.
+  for (visualIter = visualMsgsCopy.begin(); visualIter != visualMsgsCopy.end();)
   {
-    Visual_M::iterator iter = this->visuals.find((*pIter).name());
-    if (iter != this->visuals.end() && iter->second)
-    {
-      // If an object is selected, don't let the physics engine move it.
-      if (!this->selectedVis || this->selectionMode != "move" ||
-          iter->first.find(this->selectedVis->GetName()) == std::string::npos)
-      {
-        math::Pose pose = msgs::Convert(*pIter);
-        GZ_ASSERT(iter->second, "Visual pointer is NULL");
-        iter->second->SetPose(pose);
-        PoseMsgs_L::iterator prev = pIter++;
-        this->poseMsgs.erase(prev);
-      }
-      else
-        ++pIter;
-    }
+    if (this->ProcessVisualMsg(*visualIter))
+      visualMsgsCopy.erase(visualIter++);
     else
-      ++pIter;
+      ++visualIter;
   }
 
-  // process skeleton pose msgs
-  spIter = this->skeletonPoseMsgs.begin();
-  while (spIter != this->skeletonPoseMsgs.end())
+  // Process the joint messages.
+  for (jointIter = jointMsgsCopy.begin(); jointIter != jointMsgsCopy.end();)
   {
-    Visual_M::iterator iter = this->visuals.find((*spIter)->model_name());
-    for (int i = 0; i < (*spIter)->pose_size(); i++)
-    {
-      const msgs::Pose& pose_msg = (*spIter)->pose(i);
-      Visual_M::iterator iter2 = this->visuals.find(pose_msg.name());
-      if (iter2 != this->visuals.end())
-      {
-        // If an object is selected, don't let the physics engine move it.
-        if (!this->selectedVis || this->selectionMode != "move" ||
-          iter->first.find(this->selectedVis->GetName()) == std::string::npos)
-        {
-          math::Pose pose = msgs::Convert(pose_msg);
-          iter2->second->SetPose(pose);
-        }
-      }
-    }
-
-    if (iter != this->visuals.end())
-    {
-      iter->second->SetSkeletonPose(*(*spIter).get());
-      SkeletonPoseMsgs_L::iterator prev = spIter++;
-      this->skeletonPoseMsgs.erase(prev);
-    }
+    if (this->ProcessJointMsg(*jointIter))
+      jointMsgsCopy.erase(jointIter++);
     else
-      ++spIter;
+      ++jointIter;
   }
 
-  // Process the request messages
-  for (rIter =  this->requestMsgs.begin();
-       rIter != this->requestMsgs.end(); ++rIter)
-  {
-    this->ProcessRequestMsg(*rIter);
-  }
-  this->requestMsgs.clear();
-
-  // Process the joint messages
-  jIter = this->jointMsgs.begin();
-  while (jIter != this->jointMsgs.end())
-  {
-    if (this->ProcessJointMsg(*jIter))
-      this->jointMsgs.erase(jIter++);
-    else
-      ++jIter;
-  }
-
-  // Process the link messages
-  linkIter = this->linkMsgs.begin();
-  while (linkIter != this->linkMsgs.end())
+  // Process the link messages.
+  for (linkIter = linkMsgsCopy.begin(); linkIter != linkMsgsCopy.end();)
   {
     if (this->ProcessLinkMsg(*linkIter))
-      this->linkMsgs.erase(linkIter++);
+      linkMsgsCopy.erase(linkIter++);
     else
       ++linkIter;
   }
 
-  if (this->selectionMsg)
+    // Process the request messages
+    for (rIter =  this->requestMsgs.begin();
+         rIter != this->requestMsgs.end(); ++rIter)
+    {
+      this->ProcessRequestMsg(*rIter);
+    }
+    this->requestMsgs.clear();
+
+
   {
-    this->SelectVisual(this->selectionMsg->name(), "normal");
-    this->selectionMsg.reset();
+    boost::mutex::scoped_lock lock(*this->receiveMutex);
+
+    std::copy(sceneMsgsCopy.begin(), sceneMsgsCopy.end(),
+        std::front_inserter(this->sceneMsgs));
+
+    std::copy(modelMsgsCopy.begin(), modelMsgsCopy.end(),
+        std::front_inserter(this->modelMsgs));
+
+    std::copy(sensorMsgsCopy.begin(), sensorMsgsCopy.end(),
+        std::front_inserter(this->sensorMsgs));
+
+    std::copy(lightMsgsCopy.begin(), lightMsgsCopy.end(),
+        std::front_inserter(this->lightMsgs));
+
+    std::copy(visualMsgsCopy.begin(), visualMsgsCopy.end(),
+        std::front_inserter(this->visualMsgs));
+
+    std::copy(jointMsgsCopy.begin(), jointMsgsCopy.end(),
+        std::front_inserter(this->jointMsgs));
+
+    std::copy(linkMsgsCopy.begin(), linkMsgsCopy.end(),
+        std::front_inserter(this->linkMsgs));
+  }
+
+  {
+    boost::mutex::scoped_lock lock(*this->receiveMutex);
+
+    // Process all the model messages last. Remove pose message from the list
+    // only when a corresponding visual exits. We may receive pose updates
+    // over the wire before  we recieve the visual
+    pIter = this->poseMsgs.begin();
+    while (pIter != this->poseMsgs.end())
+    {
+      Visual_M::iterator iter = this->visuals.find((*pIter).name());
+      if (iter != this->visuals.end() && iter->second)
+      {
+        // If an object is selected, don't let the physics engine move it.
+        if (!this->selectedVis || this->selectionMode != "move" ||
+            iter->first.find(this->selectedVis->GetName()) == std::string::npos)
+        {
+          math::Pose pose = msgs::Convert(*pIter);
+          GZ_ASSERT(iter->second, "Visual pointer is NULL");
+          iter->second->SetPose(pose);
+          PoseMsgs_L::iterator prev = pIter++;
+          this->poseMsgs.erase(prev);
+        }
+        else
+          ++pIter;
+      }
+      else
+        ++pIter;
+    }
+
+    // process skeleton pose msgs
+    spIter = this->skeletonPoseMsgs.begin();
+    while (spIter != this->skeletonPoseMsgs.end())
+    {
+      Visual_M::iterator iter = this->visuals.find((*spIter)->model_name());
+      for (int i = 0; i < (*spIter)->pose_size(); i++)
+      {
+        const msgs::Pose& pose_msg = (*spIter)->pose(i);
+        Visual_M::iterator iter2 = this->visuals.find(pose_msg.name());
+        if (iter2 != this->visuals.end())
+        {
+          // If an object is selected, don't let the physics engine move it.
+          if (!this->selectedVis || this->selectionMode != "move" ||
+              iter->first.find(this->selectedVis->GetName()) ==
+              std::string::npos)
+          {
+            math::Pose pose = msgs::Convert(pose_msg);
+            iter2->second->SetPose(pose);
+          }
+        }
+      }
+
+      if (iter != this->visuals.end())
+      {
+        iter->second->SetSkeletonPose(*(*spIter).get());
+        SkeletonPoseMsgs_L::iterator prev = spIter++;
+        this->skeletonPoseMsgs.erase(prev);
+      }
+      else
+        ++spIter;
+    }
+
+    if (this->selectionMsg)
+    {
+      this->SelectVisual(this->selectionMsg->name(), "normal");
+      this->selectionMsg.reset();
+    }
   }
 }
 
@@ -1718,8 +1776,6 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 
   if (!linkVis)
   {
-    // gzerr << "No link visual for message:\n";
-    // gzerr << _msg->DebugString() << std::endl;
     return false;
   }
 
@@ -2124,7 +2180,7 @@ void Scene::OnLightMsg(ConstLightPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::ProcessLightMsg(ConstLightPtr &_msg)
+bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
 {
   Light_M::iterator iter;
   iter = this->lights.find(_msg->name());
@@ -2142,6 +2198,8 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
     iter->second->UpdateFromMsg(_msg);
     RTShaderSystem::Instance()->UpdateShaders();
   }
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -2488,6 +2546,9 @@ void Scene::SetWireframe(bool _show)
   {
     iter->second->SetWireframe(_show);
   }
+
+  if (this->terrain)
+    this->terrain->SetWireframe(_show);
 }
 
 /////////////////////////////////////////////////

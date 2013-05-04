@@ -470,7 +470,7 @@ namespace gazebo
 
       /// \brief Proces a scene message.
       /// \param[in] _msg The message data.
-      private: void ProcessSceneMsg(ConstScenePtr &_msg);
+      private: bool ProcessSceneMsg(ConstScenePtr &_msg);
 
       /// \brief Process a model message.
       /// \param[in] _msg The message data.
@@ -494,7 +494,7 @@ namespace gazebo
 
       /// \brief Process a light message.
       /// \param[in] _msg The message data.
-      private: void ProcessLightMsg(ConstLightPtr &_msg);
+      private: bool ProcessLightMsg(ConstLightPtr &_msg);
 
       /// \brief Process a request message.
       /// \param[in] _msg The message data.
