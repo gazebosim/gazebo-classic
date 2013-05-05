@@ -113,6 +113,13 @@ void RTShaderSystem::AddScene(ScenePtr _scene)
   if (!this->initialized)
     return;
 
+  for (std::vector<ScenePtr>::iterator iter = this->scenes.begin();
+      iter != this->scenes.end(); ++iter)
+  {
+    if ((*iter) == _scene)
+      return;
+  }
+
   // Set the scene manager
   this->shaderGenerator->addSceneManager(_scene->GetManager());
   this->shaderGenerator->createScheme(_scene->GetName() +

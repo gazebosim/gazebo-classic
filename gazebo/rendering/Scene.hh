@@ -96,8 +96,11 @@ namespace gazebo
       /// \brief Load the scene with default parameters.
       public: void Load();
 
-      /// \brief Init rendering::Scene.
+      /// \brief Init the scene.
       public: void Init();
+
+      /// \brief Finalize the scene.
+      public: void Fini();
 
       /// \brief Process all received messages.
       public: void PreRender();
@@ -154,6 +157,9 @@ namespace gazebo
       /// \brief Remove a camera with a given name.
       /// \param[in] _name Name of the camera to remove.
       public: void RemoveCamera(const std::string &_name);
+
+      /// \brief Remove all cameras.
+      public: void RemoveCameras();
 
       /// \brief Create depth camera
       /// \param[in] _name Name of the new camera.
@@ -534,6 +540,9 @@ namespace gazebo
       /// \brief Init communications.
       private: void InitComms();
 
+      /// \brief Clear implementation.
+      private: void ClearImpl();
+
       /// \brief Name of the scene.
       private: std::string name;
 
@@ -651,6 +660,7 @@ namespace gazebo
 
       /// \brief Mutex to lock the various message buffers.
       private: boost::mutex *receiveMutex;
+      private: boost::mutex preRenderMutex;
 
       /// \brief Communication Node
       private: transport::NodePtr node;
@@ -751,6 +761,8 @@ namespace gazebo
 
       /// \brief Initialized.
       private: bool initialized;
+
+      private: bool setClear;
     };
     /// \}
   }

@@ -64,8 +64,6 @@ void RFIDSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  // std::cout << "load rfid sensor" << std::endl;
-
   if (this->sdf->GetElement("topic"))
   {
     this->scanPub = this->node->Advertise<msgs::Pose>(
@@ -73,41 +71,6 @@ void RFIDSensor::Load(const std::string &_worldName)
   }
 
   this->entity = this->world->GetEntity(this->parentName);
-
-  // this->sdf->PrintDescription("something");
-  /*std::cout << " setup ray" << std::endl;
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-
-  //trying to use just "ray" gives a seg fault
-  this->laserCollision = physicsEngine->CreateCollision("multiray",
-      this->parentName);
-
-  this->laserCollision->SetName("rfid_sensor_collision");
-  this->laserCollision->SetRelativePose(this->pose);
-
-  this->laserShape = boost::dynamic_pointer_cast<physics::RayShape>(
-      this->laserCollision->GetShape());
-
-  this->laserShape->Load(this->sdf);
-
-  this->laserShape->Init();
-  */
-
-  /*** Tried to use rendering, but says rendering engine isnt initialized
-       which is understandable */
-
-  /**
-    rendering::ScenePtr scene = rendering::get_scene(this->world->GetName());
-    if (!scene)
-    {
-    scene = rendering::create_scene(this->world->GetName(), false);
-    }
-
-    manager = rendering::get_scene(this->world->GetName())->GetManager();
-
-    query = manager->createRayQuery(Ogre::Ray());
-
-*/
 }
 
 /////////////////////////////////////////////////
@@ -145,10 +108,6 @@ void RFIDSensor::EvaluateTags()
   for (ci = this->tags.begin(); ci != this->tags.end(); ++ci)
   {
     math::Pose pos = (*ci)->GetTagPose();
-    // std::cout << "link: " << tagModelPtr->GetName() << std::endl;
-    // std::cout << "link pos: x" << pos.pos.x
-    //     << " y:" << pos.pos.y
-    //     << " z:" << pos.pos.z << std::endl;
     this->CheckTagRange(pos);
   }
 }
@@ -160,11 +119,8 @@ bool RFIDSensor::CheckTagRange(const math::Pose &_pose)
   math::Vector3 v;
   v = _pose.pos - this->entity->GetWorldPose().pos;
 
-  // std::cout << v.GetLength() << std::endl;
-
   if (v.GetLength() <= 5.0)
   {
-    // std::cout << "detected " <<  v.GetLength() << std::endl;
     return true;
   }
 

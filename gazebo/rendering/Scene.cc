@@ -81,6 +81,7 @@ struct VisualMessageLess {
 //////////////////////////////////////////////////
 Scene::Scene(const std::string &_name, bool _enableVisualizations)
 {
+  this->setClear = false;
   this->initialized = false;
   this->showCOMs = false;
   this->showCollisions = false;
@@ -112,88 +113,9 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 }
 
 //////////////////////////////////////////////////
-void Scene::Clear()
-{
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-
-  this->visualMsgs.clear();
-  this->lightMsgs.clear();
-  this->poseMsgs.clear();
-  this->sceneMsgs.clear();
-  this->jointMsgs.clear();
-  this->linkMsgs.clear();
-  this->cameras.clear();
-  this->userCameras.clear();
-  this->lights.clear();
-
-  delete this->terrain;
-  this->terrain = NULL;
-
-  while (this->visuals.size() > 0)
-  {
-    if (!this->RemoveVisual(this->visuals.begin()->second))
-    {
-      this->visuals.erase(this->visuals.begin());
-    }
-  }
-  this->visuals.clear();
-
-  for (uint32_t i = 0; i < this->grids.size(); i++)
-    delete this->grids[i];
-  this->grids.clear();
-
-  this->sensorMsgs.clear();
-  RTShaderSystem::Instance()->Clear();
-}
-
-//////////////////////////////////////////////////
 Scene::~Scene()
 {
-  delete this->requestMsg;
-  delete this->receiveMutex;
-  delete this->raySceneQuery;
-
-  this->node->Fini();
-  this->node.reset();
-  this->visSub.reset();
-  this->lightSub.reset();
-  this->poseSub.reset();
-  this->jointSub.reset();
-  this->skeletonPoseSub.reset();
-  this->selectionSub.reset();
-
-  Visual_M::iterator iter;
-  this->visuals.clear();
-  this->jointMsgs.clear();
-  this->linkMsgs.clear();
-  this->sceneMsgs.clear();
-  this->poseMsgs.clear();
-  this->lightMsgs.clear();
-  this->visualMsgs.clear();
-
-  this->worldVisual.reset();
-  this->selectionMsg.reset();
-  this->lights.clear();
-
-  // Remove a scene
-  RTShaderSystem::Instance()->RemoveScene(shared_from_this());
-
-  for (uint32_t i = 0; i < this->grids.size(); i++)
-    delete this->grids[i];
-  this->grids.clear();
-
-  this->cameras.clear();
-  this->userCameras.clear();
-
-  if (this->manager)
-  {
-    RenderEngine::Instance()->root->destroySceneManager(this->manager);
-    this->manager = NULL;
-  }
-  this->connections.clear();
-
-  this->sdf->Reset();
-  this->sdf.reset();
+  printf("Delete Scene\n");
 }
 
 //////////////////////////////////////////////////
@@ -223,8 +145,56 @@ VisualPtr Scene::GetWorldVisual() const
 }
 
 //////////////////////////////////////////////////
+void Scene::Fini()
+{
+  this->Clear();
+
+  this->selectionMsg.reset();
+
+  if (this->worldVisual)
+    this->worldVisual->Fini();
+  this->worldVisual.reset();
+
+  if (this->node)
+    this->node->Fini();
+
+  this->node.reset();
+  this->visSub.reset();
+  this->lightSub.reset();
+  this->poseSub.reset();
+  this->jointSub.reset();
+  this->skeletonPoseSub.reset();
+  this->selectionSub.reset();
+
+  // Remove a scene
+  RTShaderSystem::Instance()->RemoveScene(shared_from_this());
+
+  for (uint32_t i = 0; i < this->grids.size(); i++)
+    delete this->grids[i];
+  this->grids.clear();
+
+  this->cameras.clear();
+  this->userCameras.clear();
+
+  if (this->manager)
+  {
+    RenderEngine::Instance()->root->destroySceneManager(this->manager);
+    this->manager = NULL;
+  }
+  this->connections.clear();
+
+  this->sdf->Reset();
+  this->sdf.reset();
+
+  delete this->requestMsg;
+  delete this->receiveMutex;
+  delete this->raySceneQuery;
+}
+
+//////////////////////////////////////////////////
 void Scene::Init()
 {
+  printf("Scene::Init\n");
   this->InitComms();
   this->worldVisual.reset(new Visual("__world_node__", shared_from_this()));
 
@@ -453,10 +423,20 @@ void Scene::RemoveCamera(const std::string &_name)
   {
     if ((*iter)->GetName() == _name)
     {
+      (*iter)->Fini();
       this->cameras.erase(iter);
       break;
     }
   }
+}
+
+//////////////////////////////////////////////////
+void Scene::RemoveCameras()
+{
+  std::vector<CameraPtr>::iterator iter;
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
+    (*iter)->Fini();
+  this->cameras.clear();
 }
 
 //////////////////////////////////////////////////
@@ -1420,6 +1400,14 @@ void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 //////////////////////////////////////////////////
 void Scene::PreRender()
 {
+  if (this->setClear)
+  {
+    this->Clear();
+    return;
+  }
+
+  boost::mutex::scoped_lock lock1(this->preRenderMutex);
+
   /* Deferred shading debug code. Delete me soon (July 17, 2012)
   static bool first = true;
 
@@ -1443,7 +1431,6 @@ void Scene::PreRender()
         Ogre::MultiRenderTarget *mtarget = dynamic_cast<Ogre::MultiRenderTarget*>(renderIter.current()->second);
         if (mtarget)
         {
-          // std::cout << renderIter.current()->first << "\n";
           mtarget->getBoundSurface(0)->writeContentsToFile(filename.str());
 
           mtarget->getBoundSurface(1)->writeContentsToFile(filename2.str());
@@ -2049,7 +2036,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       result = true;
     }
   }
-  else if (iter != this->visuals.end())
+  else if (iter != this->visuals.end() && iter->second)
   {
     iter->second->UpdateFromMsg(_msg);
     result = true;
@@ -2643,4 +2630,62 @@ void Scene::InitComms()
 
   this->requestSub = this->node->Subscribe("~/request",
       &Scene::OnRequest, this);
+}
+
+//////////////////////////////////////////////////
+void Scene::Clear()
+{
+  this->setClear = true;
+}
+
+//////////////////////////////////////////////////
+void Scene::ClearImpl()
+{
+  boost::mutex::scoped_lock lock1(this->preRenderMutex);
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->setClear = false;
+  printf("Scene::Clear\n");
+  this->RemoveCameras();
+
+  this->visualMsgs.clear();
+  this->lightMsgs.clear();
+  this->poseMsgs.clear();
+  this->sceneMsgs.clear();
+  this->jointMsgs.clear();
+  this->linkMsgs.clear();
+
+  delete this->terrain;
+  this->terrain = NULL;
+
+  while (this->visuals.size() > 0)
+  {
+    if (!this->RemoveVisual(this->visuals.begin()->second))
+    {
+      if (this->visuals.begin()->second)
+        this->visuals.begin()->second->Fini();
+      this->visuals.erase(this->visuals.begin());
+    }
+  }
+  this->visuals.clear();
+
+  this->lights.clear();
+
+  for (uint32_t i = 0; i < this->grids.size(); i++)
+    delete this->grids[i];
+  this->grids.clear();
+
+  this->sensorMsgs.clear();
+  RTShaderSystem::Instance()->Clear();
+
+  this->manager->destroyAllLights();
+  this->manager->destroyAllEntities();
+  this->manager->destroyAllManualObjects();
+  this->manager->destroyAllBillboardChains();
+  this->manager->destroyAllRibbonTrails();
+  this->manager->destroyAllParticleSystems();
+  this->manager->destroyAllAnimations();
+  this->manager->destroyAllAnimationStates();
+  this->manager->destroyAllStaticGeometry();
+  this->manager->destroyAllInstancedGeometry();
+  this->manager->destroyAllMovableObjects();
 }

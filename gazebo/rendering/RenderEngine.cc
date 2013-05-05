@@ -172,8 +172,9 @@ void RenderEngine::RemoveScene(const std::string &_name)
     RTShaderSystem::Instance()->Clear();
     rendering::Events::removeScene(_name);
 
-    (*iter)->Clear();
+    (*iter)->Fini();
     (*iter).reset();
+
     this->scenes.erase(iter);
   }
 }
@@ -188,7 +189,11 @@ ScenePtr RenderEngine::GetScene(const std::string &_name)
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
     if (_name.empty() || (*iter)->GetName() == _name)
+    {
+      if ((*iter) && !(*iter)->GetInitialized())
+        (*iter)->Init();
       return (*iter);
+    }
 
   return ScenePtr();
 }

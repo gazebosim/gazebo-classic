@@ -35,7 +35,6 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
                          const std::string &_topicName)
 : Visual(_name, _vis)
 {
-  printf("Create laser visual\n");
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
@@ -52,8 +51,7 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
 /////////////////////////////////////////////////
 LaserVisual::~LaserVisual()
 {
-  printf("Delete laser visual\n");
-  delete this->rayFan;
+  this->DeleteDynamicLine(this->rayFan);
   this->rayFan = NULL;
 }
 

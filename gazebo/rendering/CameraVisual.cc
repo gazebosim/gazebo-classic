@@ -36,7 +36,9 @@ CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
 /////////////////////////////////////////////////
 CameraVisual::~CameraVisual()
 {
-  this->scene->RemoveCamera(this->GetName());
+  printf("Delete camera visual\n");
+  if (this->scene)
+    this->scene->RemoveCamera(this->GetName());
   this->camera.reset();
 }
 

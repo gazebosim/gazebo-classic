@@ -22,6 +22,9 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
 
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/Scene.hh"
+
 #include "gazebo/physics/Physics.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/World.hh"
@@ -220,7 +223,7 @@ void SensorManager::Fini()
 
   delete this->simTimeEventHandler;
   this->simTimeEventHandler = NULL;
-
+  rendering::remove_scene(physics::get_world()->GetName());
   this->initialized = false;
 }
 
@@ -343,12 +346,7 @@ void SensorManager::RemoveSensor(const std::string &_name)
   boost::recursive_mutex::scoped_lock lock(this->mutex);
   SensorPtr sensor = this->GetSensor(_name);
 
-  if (!sensor)
-  {
-    gzerr << "Unable to remove sensor[" << _name << "] because it "
-          << "does not exist.\n";
-  }
-  else
+  if (sensor)
   {
     // Push it on the list, to be removed by the main sensor thread,
     // to ensure correct access to rendering resources.
