@@ -536,9 +536,6 @@ namespace gazebo
       /// \brief Function pointer to the model update function.
       private: void (World::*modelUpdateFunc)();
 
-      /// \brief Period used to send out world statistics.
-      private: common::Time statPeriod;
-
       /// \brief Last time a world statistics message was sent.
       private: common::Time prevStatTime;
 

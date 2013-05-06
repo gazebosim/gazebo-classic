@@ -193,6 +193,11 @@ namespace gazebo
       /// \param[in] _data The log control message.
       private: void OnLogControl(ConstLogControlPtr &_data);
 
+      /// \brief Cleanup log recording. A thread uses this function, you
+      /// should never call this function directly. Use the cleanupCondition
+      /// to trigger a cleanup.
+      private: void Cleanup();
+
       /// \cond
       private: class Log
       {
@@ -274,6 +279,9 @@ namespace gazebo
       /// \brief Condition used to trigger an update
       private: boost::condition_variable updateCondition;
 
+      /// \brief Used by the cleanupThread to wait for a cleanup signal.
+      private: boost::condition_variable cleanupCondition;
+
       /// \brief True if logging is running.
       private: bool running;
 
@@ -282,6 +290,9 @@ namespace gazebo
 
       /// \brief Thread used to update data.
       private: boost::thread *updateThread;
+
+      /// \brief Thread to cleanup log recording.
+      private: boost::thread cleanupThread;
 
       /// \brief Mutext to protect writing.
       private: mutable boost::mutex writeMutex;

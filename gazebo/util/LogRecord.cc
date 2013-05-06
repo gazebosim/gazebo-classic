@@ -156,6 +156,9 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
 
   this->startTime = this->currTime = common::Time();
 
+  // Create a thread to cleanup recording.
+  this->cleanupThread = boost::thread(boost::bind(&LogRecord::Cleanup, this));
+
   // Start the update thread if it has not already been started
   if (!this->updateThread)
     this->updateThread = new boost::thread(
@@ -191,52 +194,10 @@ void LogRecord::Fini()
 //////////////////////////////////////////////////
 void LogRecord::Stop()
 {
-  boost::mutex::scoped_lock lock(this->controlMutex);
-
   if (!this->running)
     return;
 
-  // Reset the flags
-  this->paused = false;
-  this->running = false;
-  this->stopThread = true;
-
-  // Kick the update thread
-  this->updateCondition.notify_one();
-
-  // Kick the write thread
-  this->dataAvailableCondition.notify_one();
-
-  // Wait for the write thread, if it exists
-  if (this->updateThread)
-    this->updateThread->join();
-
-  // Wait for the write thread, if it exists
-  if (this->writeThread)
-    this->writeThread->join();
-
-  delete this->updateThread;
-  this->updateThread = NULL;
-
-  delete this->writeThread;
-  this->writeThread = NULL;
-
-  // Update and write one last time to make sure we log all data.
-  this->Update();
-  this->Write(true);
-
-  // Stop all the logs
-  for (Log_M::iterator iter = this->logs.begin();
-      iter != this->logsEnd; ++iter)
-  {
-    iter->second->Stop();
-  }
-
-  // Reset the times
-  this->startTime = this->currTime = common::Time();
-
-  // Output the new log status
-  this->PublishLogStatus();
+  this->cleanupCondition.notify_all();
 }
 
 //////////////////////////////////////////////////
@@ -765,4 +726,62 @@ void LogRecord::PublishLogStatus()
   }
 
   this->logStatusPub->Publish(msg);
+}
+
+//////////////////////////////////////////////////
+void LogRecord::Cleanup()
+{
+  boost::mutex::scoped_lock lock(this->controlMutex);
+
+  // Wait for the cleanup signal
+  this->cleanupCondition.wait(lock);
+
+  event::Events::pause(true);
+
+  this->stopThread = true;
+
+  // Reset the flags
+  this->paused = false;
+  this->running = false;
+  this->stopThread = true;
+
+  // Kick the update thread
+  this->updateCondition.notify_all();
+
+  // Kick the write thread
+  this->dataAvailableCondition.notify_all();
+
+  // Wait for the write thread, if it exists
+  if (this->updateThread)
+    this->updateThread->join();
+
+  // Wait for the write thread, if it exists
+  if (this->writeThread)
+    this->writeThread->join();
+
+  delete this->updateThread;
+  this->updateThread = NULL;
+
+  delete this->writeThread;
+  this->writeThread = NULL;
+
+  // Update and write one last time to make sure we log all data.
+  this->Update();
+
+  this->Write(true);
+
+  // Stop all the logs
+  for (Log_M::iterator iter = this->logs.begin();
+      iter != this->logsEnd; ++iter)
+  {
+    iter->second->Stop();
+  }
+
+  // Reset the times
+  this->startTime = this->currTime = common::Time();
+
+  // Output the new log status
+  this->PublishLogStatus();
+
+  event::Events::pause(false);
 }
