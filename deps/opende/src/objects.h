@@ -96,7 +96,6 @@ struct dxDampingParameters {
 
 // quick-step parameters
 struct dxQuickStepParameters {
-  int precon_iterations;	// number of preconditioned SOR iterations to perform (without error correction)
   int num_iterations;		// number of SOR iterations to perform
   dReal w;			// the SOR over-relaxation parameter
   int num_chunks;		// divide rows to these many chunks

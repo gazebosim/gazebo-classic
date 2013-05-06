@@ -1653,7 +1653,6 @@ dxWorld * dWorldCreate()
   w->adis.linear_average_threshold = REAL(0.01)*REAL(0.01);		// (magnitude squared)
 
   w->qs.num_iterations = 20;
-  w->qs.precon_iterations = 0;
   w->qs.w = REAL(1.3);
   w->qs.num_chunks = 1;
   w->qs.num_overlap = 0;
@@ -2195,14 +2194,14 @@ void dWorldSetQuickStepNumIterations (dWorldID w, int num)
 void dWorldSetQuickStepPreconIterations (dWorldID w, int num)
 {
 	dAASSERT(w);
-	w->qs.precon_iterations = num;
+	// not impelemneted
 }
 
 
 int dWorldGetQuickStepPreconIterations (dWorldID w)
 {
 	dAASSERT(w);
-	return w->qs.precon_iterations;
+	return 0;
 }
 
 int dWorldGetQuickStepNumIterations (dWorldID w)
