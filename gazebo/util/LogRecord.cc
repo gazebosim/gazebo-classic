@@ -46,6 +46,7 @@ typedef boost::archive::iterators::base64_from_binary<
 //////////////////////////////////////////////////
 LogRecord::LogRecord()
 {
+  this->pauseState = false;
   this->running = false;
   this->paused = false;
   this->initialized = false;
@@ -66,6 +67,16 @@ LogRecord::LogRecord()
   this->logBasePath /= "/.gazebo/log/";
 
   this->logsEnd = this->logs.end();
+
+  this->connections.push_back(
+     event::Events::ConnectPause(
+       boost::bind(&LogRecord::OnPause, this, _1)));
+}
+
+//////////////////////////////////////////////////
+void LogRecord::OnPause(bool _pause)
+{
+  this->pauseState = _pause;
 }
 
 //////////////////////////////////////////////////
@@ -181,6 +192,8 @@ const std::string &LogRecord::GetEncoding() const
 //////////////////////////////////////////////////
 void LogRecord::Fini()
 {
+  this->connections.clear();
+
   this->Stop();
 
   // Remove all the logs.
@@ -736,6 +749,7 @@ void LogRecord::Cleanup()
   // Wait for the cleanup signal
   this->cleanupCondition.wait(lock);
 
+  bool currentPauseState = this->pauseState;
   event::Events::pause(true);
 
   this->stopThread = true;
@@ -783,5 +797,5 @@ void LogRecord::Cleanup()
   // Output the new log status
   this->PublishLogStatus();
 
-  event::Events::pause(false);
+  event::Events::pause(currentPauseState);
 }
