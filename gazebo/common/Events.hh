@@ -175,6 +175,19 @@ namespace gazebo
               { worldUpdateEnd.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Render pause signal
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      public: template<typename T>
+              static ConnectionPtr ConnectPauseRender(T _subscriber)
+              { return pauseRender.Connect(_subscriber); }
+
+      /// \brief Disconnect a render pause signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectPauseRender(ConnectionPtr _subscriber)
+              { pauseRender.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Render start signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
@@ -185,6 +198,7 @@ namespace gazebo
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectPreRender(ConnectionPtr _subscriber)
               { preRender.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the render update signal
       /// \param[in] _subscriber the subscriber to this event
@@ -262,6 +276,9 @@ namespace gazebo
 
       /// \brief World update has ended
       public: static EventT<void ()> worldUpdateEnd;
+
+      /// \brief Pause render
+      public: static EventT<void (bool)> pauseRender;
 
       /// \brief Pre-render
       public: static EventT<void ()> preRender;

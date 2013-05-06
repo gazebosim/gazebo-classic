@@ -141,9 +141,6 @@ namespace gazebo
       /// \brief Execute prerender on all scenes
       private: void PreRender();
 
-      /// \brief Execute render on all scenes
-      private: void Render();
-
       /// \brief Execute post-render on all scenes
       private: void PostRender();
 

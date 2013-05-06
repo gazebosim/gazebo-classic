@@ -105,6 +105,9 @@ namespace gazebo
       /// \brief Process all received messages.
       public: void PreRender();
 
+      /// \brief Handl the post render event.
+      public: void PostRender();
+
       /// \brief Get the OGRE scene manager.
       /// \return Pointer to the Ogre SceneManager.
       public: Ogre::SceneManager *GetManager() const;
@@ -158,8 +161,11 @@ namespace gazebo
       /// \param[in] _name Name of the camera to remove.
       public: void RemoveCamera(const std::string &_name);
 
-      /// \brief Remove all cameras.
+      /// \brief Remove all non-user cameras.
       public: void RemoveCameras();
+
+      /// \brief Remove all user cameras.
+      public: void RemoveUserCameras();
 
       /// \brief Create depth camera
       /// \param[in] _name Name of the new camera.
@@ -661,6 +667,7 @@ namespace gazebo
       /// \brief Mutex to lock the various message buffers.
       private: boost::mutex *receiveMutex;
       private: boost::mutex preRenderMutex;
+      private: boost::mutex renderMutex;
 
       /// \brief Communication Node
       private: transport::NodePtr node;

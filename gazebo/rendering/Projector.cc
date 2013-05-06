@@ -218,7 +218,10 @@ Projector::ProjectorFrameListener::~ProjectorFrameListener()
   }
 
   delete this->frustum;
+  this->frustum = NULL;
+
   delete this->filterFrustum;
+  this->filterFrustum = NULL;
 
   if (this->projectorQuery)
     this->sceneMgr->destroyQuery(this->projectorQuery);

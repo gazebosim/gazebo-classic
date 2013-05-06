@@ -34,6 +34,7 @@ EventT<void (const common::UpdateInfo &)> Events::worldUpdateBegin;
 
 EventT<void ()> Events::worldUpdateEnd;
 
+EventT<void (bool)> Events::pauseRender;
 EventT<void ()> Events::preRender;
 EventT<void ()> Events::render;
 EventT<void ()> Events::postRender;

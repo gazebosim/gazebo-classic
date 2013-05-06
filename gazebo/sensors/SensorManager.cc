@@ -526,7 +526,8 @@ void SensorManager::SensorContainer::RunLoop()
       SensorManager::Instance()->simTimeEventHandler->AddRelativeEvent(
           eventTime, &this->runCondition);
 
-    this->runCondition.wait(timingLock);
+    if (!this->stop)
+      this->runCondition.wait(timingLock);
   }
 }
 

@@ -155,7 +155,6 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   // Set default render rate to unlimited
   this->SetRenderRate(0.0);
-  std::cout << "Create Camera[" << this->GetName() << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -282,8 +281,6 @@ void Camera::Fini()
   this->connections.clear();
 
   boost::mutex::scoped_lock lock(this->renderMutex);
-
-  std::cout << "Fini Camera[" << this->GetName() << "]\n";
 
   if (this->gaussianNoiseCompositorListener)
     this->gaussianNoiseInstance->removeListener(

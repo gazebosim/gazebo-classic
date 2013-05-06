@@ -198,9 +198,16 @@ namespace gazebo
 
       private: std::list<std::pair<std::string, math::Pose> > moveHistory;
 
+      /// \brief Callback to pause or enable rendering.
+      /// \param[in] _pause True to pause rendering.
+      private: void OnPauseRender(bool _pause);
+
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene
       private: bool sceneCreated;
+
+      private: boost::mutex renderMutex;
+      private: bool pauseRendering;
     };
   }
 }

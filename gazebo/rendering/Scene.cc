@@ -110,12 +110,14 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->connections.push_back(
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
+
+  this->connections.push_back(
+      event::Events::ConnectPostRender(boost::bind(&Scene::PostRender, this)));
 }
 
 //////////////////////////////////////////////////
 Scene::~Scene()
 {
-  printf("Delete Scene\n");
 }
 
 //////////////////////////////////////////////////
@@ -147,7 +149,7 @@ VisualPtr Scene::GetWorldVisual() const
 //////////////////////////////////////////////////
 void Scene::Fini()
 {
-  this->Clear();
+  this->ClearImpl();
 
   this->selectionMsg.reset();
 
@@ -173,9 +175,6 @@ void Scene::Fini()
     delete this->grids[i];
   this->grids.clear();
 
-  this->cameras.clear();
-  this->userCameras.clear();
-
   if (this->manager)
   {
     RenderEngine::Instance()->root->destroySceneManager(this->manager);
@@ -194,7 +193,6 @@ void Scene::Fini()
 //////////////////////////////////////////////////
 void Scene::Init()
 {
-  printf("Scene::Init\n");
   this->InitComms();
   this->worldVisual.reset(new Visual("__world_node__", shared_from_this()));
 
@@ -437,6 +435,18 @@ void Scene::RemoveCameras()
   for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
     (*iter)->Fini();
   this->cameras.clear();
+}
+
+//////////////////////////////////////////////////
+void Scene::RemoveUserCameras()
+{
+  std::vector<UserCameraPtr>::iterator iter;
+  for (iter = this->userCameras.begin(); iter != this->userCameras.end();
+       ++iter)
+  {
+    (*iter)->Fini();
+  }
+  this->userCameras.clear();
 }
 
 //////////////////////////////////////////////////
@@ -1400,12 +1410,6 @@ void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 //////////////////////////////////////////////////
 void Scene::PreRender()
 {
-  if (this->setClear)
-  {
-    this->Clear();
-    return;
-  }
-
   boost::mutex::scoped_lock lock1(this->preRenderMutex);
 
   /* Deferred shading debug code. Delete me soon (July 17, 2012)
@@ -1671,6 +1675,16 @@ void Scene::PreRender()
       this->selectionMsg.reset();
     }
   }
+
+  // Lock the render event.
+  this->renderMutex.lock();
+}
+
+//////////////////////////////////////////////////
+void Scene::PostRender()
+{
+  // Unlock the render event.
+  this->renderMutex.unlock();
 }
 
 /////////////////////////////////////////////////
@@ -2207,6 +2221,7 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 {
   if (!this->skyx)
     return;
+
   SkyX::VClouds::VClouds *vclouds =
     this->skyx->getVCloudsManager()->getVClouds();
 
@@ -2635,17 +2650,19 @@ void Scene::InitComms()
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  this->setClear = true;
+  //this->setClear = true;
+  this->ClearImpl();
 }
 
 //////////////////////////////////////////////////
 void Scene::ClearImpl()
 {
-  boost::mutex::scoped_lock lock1(this->preRenderMutex);
+  boost::mutex::scoped_lock lock1(this->renderMutex);
+  boost::mutex::scoped_lock lock2(this->preRenderMutex);
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->setClear = false;
-  printf("Scene::Clear\n");
   this->RemoveCameras();
+  this->RemoveUserCameras();
 
   this->visualMsgs.clear();
   this->lightMsgs.clear();
@@ -2668,6 +2685,16 @@ void Scene::ClearImpl()
   }
   this->visuals.clear();
 
+  // Delete all projectors
+  for (std::map<std::string, Projector *>::iterator iter =
+      this->projectors.begin(); iter != this->projectors.end(); ++iter)
+  {
+    GZ_ASSERT(iter->second, "NULL Projector pointer");
+    delete iter->second;
+  }
+  this->projectors.clear();
+
+  // Delete all lights
   this->lights.clear();
 
   for (uint32_t i = 0; i < this->grids.size(); i++)
@@ -2676,6 +2703,13 @@ void Scene::ClearImpl()
 
   this->sensorMsgs.clear();
   RTShaderSystem::Instance()->Clear();
+
+  delete this->skyx;
+  this->skyx = NULL;
+
+  // SkyX does major no-no. It take a pointer, and then delets it.
+  // delete this->skyxController;
+  // this->skyxController = NULL;
 
   this->manager->destroyAllLights();
   this->manager->destroyAllEntities();

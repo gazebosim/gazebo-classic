@@ -51,6 +51,7 @@ GLWidget::GLWidget(QWidget *_parent)
   : QWidget(_parent)
 {
   this->setObjectName("GLWidget");
+  this->pauseRendering = false;
   this->state = "select";
   this->sceneCreated = false;
 
@@ -71,6 +72,10 @@ GLWidget::GLWidget(QWidget *_parent)
   mainLayout->addWidget(this->renderFrame);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
+
+  this->connections.push_back(
+      event::Events::ConnectPauseRender(
+        boost::bind(&GLWidget::OnPauseRender, this, _1)));
 
   this->connections.push_back(
       rendering::Events::ConnectCreateScene(
@@ -203,12 +208,17 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->GetInitialized())
   {
-    event::Events::preRender();
+    boost::mutex::scoped_try_lock lock(this->renderMutex);
 
-    // Tell all the cameras to render
-    event::Events::render();
+    if (lock && !this->pauseRendering)
+    {
+      event::Events::preRender();
 
-    event::Events::postRender();
+      // Tell all the cameras to render
+      event::Events::render();
+
+      event::Events::postRender();
+    }
   }
   _e->accept();
 }
@@ -795,6 +805,12 @@ void GLWidget::OnRemoveScene(const std::string &_name)
   {
     this->Clear();
   }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnPauseRender(bool _pause)
+{
+  this->pauseRendering = _pause;
 }
 
 /////////////////////////////////////////////////

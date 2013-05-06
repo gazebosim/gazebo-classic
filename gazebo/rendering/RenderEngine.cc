@@ -91,8 +91,6 @@ void RenderEngine::Load()
   {
     this->connections.push_back(event::Events::ConnectPreRender(
           boost::bind(&RenderEngine::PreRender, this)));
-    this->connections.push_back(event::Events::ConnectRender(
-          boost::bind(&RenderEngine::Render, this)));
     this->connections.push_back(event::Events::ConnectPostRender(
           boost::bind(&RenderEngine::PostRender, this)));
 
@@ -223,13 +221,12 @@ void RenderEngine::PreRender()
 }
 
 //////////////////////////////////////////////////
-void RenderEngine::Render()
-{
-}
-
-//////////////////////////////////////////////////
 void RenderEngine::PostRender()
 {
+  printf("RenderEngine::PostRender\n");
+  if (!this->root)
+    printf("ROOT IS NULL\n");
+
   // _fireFrameRenderingQueued needs to be here for CEGUI to work
   this->root->_fireFrameRenderingQueued();
   this->root->_fireFrameEnded();

@@ -1385,7 +1385,9 @@ void MainWindow::OnServerStatus(ConstGzStringPtr &_msg)
 {
   if (_msg->data() == "logfile_opened")
   {
+    event::Events::pauseRender(true);
     rendering::get_scene(gui::get_world())->Clear();
     rendering::get_scene(gui::get_world())->Init();
+    event::Events::pauseRender(false);
   }
 }
