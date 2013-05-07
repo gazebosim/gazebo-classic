@@ -283,12 +283,6 @@ void Camera::Fini()
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
   this->renderTarget->removeAllViewports();
 
-  if (this->connections.size() > 1)
-  {
-    gzerr << " disconnect " << std::endl;
-    event::Events::DisconnectRender(this->connections[1]);
-    event::Events::DisconnectPostRender(this->connections[2]);
-  }
   this->connections.clear();
 }
 
@@ -387,17 +381,7 @@ void Camera::Render()
       this->renderPeriod)
   {
     this->newData = true;
-
-    // FIXME: Disable clouds in offscreen rendering for now until they can
-    // be rendered properly
-    bool displayClouds = this->GetScene()->GetShowClouds();
-    if (this->renderTexture)
-      this->GetScene()->ShowClouds(false);
-
     this->RenderImpl();
-
-    if (this->renderTexture)
-      this->GetScene()->ShowClouds(displayClouds);
   }
 }
 
@@ -425,6 +409,12 @@ void Camera::PostRender()
 
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
+    // FIXME: Disable clouds in offscreen rendering for now until they can
+    // be rendered properly
+    bool displayClouds = this->GetScene()->GetShowClouds();
+    if (this->renderTexture)
+      this->GetScene()->ShowClouds(false);
+
     size_t size;
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
@@ -514,6 +504,9 @@ void Camera::PostRender()
 
     this->newImageFrame(buffer, width, height, this->GetImageDepth(),
                     this->GetImageFormat());
+
+    if (this->renderTexture)
+      this->GetScene()->ShowClouds(displayClouds);
   }
 
   this->newData = false;
@@ -1205,7 +1198,6 @@ void Camera::CreateRenderTexture(const std::string &textureName)
       Ogre::TU_RENDERTARGET)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
-
   this->initialized = true;
 }
 

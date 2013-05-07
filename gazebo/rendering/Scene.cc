@@ -1742,6 +1742,9 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     {
       CameraVisualPtr cameraVis(new CameraVisual(
             _msg->name()+"_GUIONLY_camera_vis", parentVis));
+
+      // need to call AttachVisual in order for cameraVis to be added to
+      // parentVis' children list so that it can be properly deleted.
       parentVis->AttachVisual(cameraVis);
 
       cameraVis->SetPose(msgs::Convert(_msg->pose()));
