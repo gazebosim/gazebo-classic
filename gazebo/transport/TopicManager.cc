@@ -52,6 +52,7 @@ class NodeProcess_TBB
 TopicManager::TopicManager()
 {
   this->pauseIncoming = false;
+  this->initialized = false;
   this->advertisedTopicsEnd = this->advertisedTopics.end();
 }
 
@@ -63,10 +64,14 @@ TopicManager::~TopicManager()
 //////////////////////////////////////////////////
 void TopicManager::Init()
 {
-  this->advertisedTopics.clear();
-  this->advertisedTopicsEnd = this->advertisedTopics.end();
-  this->subscribedNodes.clear();
-  this->nodes.clear();
+  if (!this->initialized)
+  {
+    this->advertisedTopics.clear();
+    this->advertisedTopicsEnd = this->advertisedTopics.end();
+    this->subscribedNodes.clear();
+    this->nodes.clear();
+  }
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////

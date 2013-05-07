@@ -38,8 +38,9 @@ void OnNewLaserFrame(int *_scanCounter, float *_scanDest,
 /// \brief Test Creation of a Ray sensor
 TEST_F(GPURaySensor_TEST, CreateLaser)
 {
+  printf("GPURaySensor_TEST Load\n");
   Load("worlds/gpu_laser2.world");
-  sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+  printf("GPURaySensor_TEST Load COMPLETE\n");
 
   // Create the Ray sensor
   std::string sensorName = "default::model_1::link_1::laser_sensor";

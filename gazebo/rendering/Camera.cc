@@ -170,7 +170,7 @@ Camera::~Camera()
   if (this->renderTexture)
     Ogre::TextureManager::getSingleton().remove(this->renderTexture->getName());
 
-  if (this->camera)
+  if (this->scene && this->scene->GetManager())
   {
     this->scene->GetManager()->destroyCamera(this->name);
     this->camera = NULL;

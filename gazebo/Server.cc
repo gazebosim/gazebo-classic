@@ -54,6 +54,18 @@ Server::Server()
 
   if (signal(SIGINT, Server::SigInt) == SIG_ERR)
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
+
+  std::string host = "";
+  unsigned int port = 0;
+
+  gazebo::transport::get_master_uri(host, port);
+
+  this->master = new gazebo::Master();
+  this->master->Init(port);
+  this->master->RunThread();
+
+  // Start transport.
+  gazebo::transport::init();
 }
 
 /////////////////////////////////////////////////
@@ -77,6 +89,7 @@ bool Server::ParseArgs(int argc, char **argv)
   // save a copy of argc and argv for consumption by system plugins
   this->systemPluginsArgc = argc;
   this->systemPluginsArgv = new char*[argc];
+
   for (int i = 0; i < argc; ++i)
   {
     int argv_len = strlen(argv[i]);
@@ -84,19 +97,6 @@ bool Server::ParseArgs(int argc, char **argv)
     for (int j = 0; j < argv_len; ++j)
       this->systemPluginsArgv[i][j] = argv[i][j];
   }
-
-  std::string host = "";
-  unsigned int port = 0;
-
-  gazebo::transport::get_master_uri(host, port);
-
-  this->master = new gazebo::Master();
-  this->master->Init(port);
-  this->master->RunThread();
-
-  // Load gazebo
-  gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
-
 
   po::options_description v_desc("Allowed options");
   v_desc.add_options()
@@ -333,6 +333,9 @@ bool Server::LoadString(const std::string &_sdfString)
 bool Server::LoadImpl(sdf::ElementPtr _elem,
                       const std::string &_physics)
 {
+  // Load gazebo
+  gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
+
   /// Load the sensors library
   sensors::load();
 

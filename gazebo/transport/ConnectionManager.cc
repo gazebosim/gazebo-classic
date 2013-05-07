@@ -65,6 +65,9 @@ ConnectionManager::~ConnectionManager()
 bool ConnectionManager::Init(const std::string &_masterHost,
                              unsigned int master_port)
 {
+  if (this->initialized)
+    return true;
+
   this->stop = false;
   this->masterConn.reset(new Connection());
   delete this->serverConn;
