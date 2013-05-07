@@ -147,8 +147,10 @@ void CameraSensor::Fini()
 {
   this->imagePub.reset();
   Sensor::Fini();
+
   if (this->camera)
-    this->camera->Fini();
+    this->scene->RemoveCamera(this->camera->GetName());
+
   this->camera.reset();
   this->scene.reset();
 }

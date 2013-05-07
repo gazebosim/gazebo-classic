@@ -35,6 +35,7 @@ CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
 
 CameraVisual::~CameraVisual()
 {
+gzerr << " camera visual destructor " << std::endl;
   this->camera.reset();
 }
 

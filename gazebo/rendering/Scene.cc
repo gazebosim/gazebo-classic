@@ -546,6 +546,22 @@ UserCameraPtr Scene::GetUserCamera(uint32_t index) const
 }
 
 //////////////////////////////////////////////////
+void Scene::RemoveCamera(const std::string &_name)
+{
+  std::vector<CameraPtr>::iterator iter;
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
+  {
+    if ((*iter)->GetName() == _name)
+    {
+      (*iter)->Fini();
+      (*iter).reset();
+      this->cameras.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 LightPtr Scene::GetLight(const std::string &_name) const
 {
   LightPtr result;
@@ -1726,6 +1742,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     {
       CameraVisualPtr cameraVis(new CameraVisual(
             _msg->name()+"_GUIONLY_camera_vis", parentVis));
+      parentVis->AttachVisual(cameraVis);
 
       cameraVis->SetPose(msgs::Convert(_msg->pose()));
 
@@ -2620,4 +2637,22 @@ void Scene::ShowClouds(bool _show)
     if (vclouds)
       vclouds->setVisible(_show);
   }
+}
+
+/////////////////////////////////////////////////
+bool Scene::GetShowClouds() const
+{
+  if (!this->skyx)
+    return false;
+
+  SkyX::VCloudsManager *mgr = this->skyx->getVCloudsManager();
+  if (mgr)
+  {
+    SkyX::VClouds::VClouds *vclouds =
+        this->skyx->getVCloudsManager()->getVClouds();
+    if (vclouds)
+      return vclouds->isVisible();
+  }
+
+  return false;
 }

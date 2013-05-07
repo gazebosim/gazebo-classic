@@ -156,7 +156,7 @@ void MultiCameraSensor::Fini()
   for (std::vector<rendering::CameraPtr>::iterator iter =
       this->cameras.begin(); iter != this->cameras.end(); ++iter)
   {
-    (*iter)->Fini();
+    (*iter)->GetScene()->RemoveCamera((*iter)->GetName());
   }
   this->cameras.clear();
 }

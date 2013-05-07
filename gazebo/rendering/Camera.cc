@@ -282,6 +282,13 @@ void Camera::Fini()
       this->gaussianNoiseCompositorListener.get());
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
   this->renderTarget->removeAllViewports();
+
+  if (this->connections.size() > 1)
+  {
+    gzerr << " disconnect " << std::endl;
+    event::Events::DisconnectRender(this->connections[1]);
+    event::Events::DisconnectPostRender(this->connections[2]);
+  }
   this->connections.clear();
 }
 
@@ -380,7 +387,17 @@ void Camera::Render()
       this->renderPeriod)
   {
     this->newData = true;
+
+    // FIXME: Disable clouds in offscreen rendering for now until they can
+    // be rendered properly
+    bool displayClouds = this->GetScene()->GetShowClouds();
+    if (this->renderTexture)
+      this->GetScene()->ShowClouds(false);
+
     this->RenderImpl();
+
+    if (this->renderTexture)
+      this->GetScene()->ShowClouds(displayClouds);
   }
 }
 
@@ -1188,11 +1205,6 @@ void Camera::CreateRenderTexture(const std::string &textureName)
       Ogre::TU_RENDERTARGET)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
-
-  // FIXME: Disable clouds in offscreen rendering for now until they can
-  // be rendered properly
-  if (this->renderTexture)
-    this->GetScene()->ShowClouds(false);
 
   this->initialized = true;
 }

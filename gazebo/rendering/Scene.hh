@@ -200,6 +200,10 @@ namespace gazebo
       /// invalid.
       public: UserCameraPtr GetUserCamera(uint32_t _index) const;
 
+      /// \brief Remove a camera from the scene
+      /// \param[in] _name Name of the camera.
+      public: void RemoveCamera(const std::string &_name);
+
       /// \brief Get a light by name.
       /// \param[in] _name Name of the light to get.
       /// \return Pointer to the light, or NULL if the light was not found.
@@ -391,9 +395,13 @@ namespace gazebo
       /// \param[in] _show True to enable contact visualization.
       public: void ShowContacts(bool _show);
 
-      /// \brief Display clouds in the sky
+      /// \brief Display clouds in the sky.
       /// \param[in] _show True to display clouds.
       public: void ShowClouds(bool _show);
+
+      /// \brief Get whether or not clouds are displayed.
+      /// \return True if clouds are displayed.
+      public: bool GetShowClouds() const;
 
       /// \brief Return true if the Scene has been initialized.
       public: bool GetInitialized() const;
