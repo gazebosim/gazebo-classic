@@ -124,6 +124,9 @@ World::World(const std::string &_name)
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&World::SetSelectedEntityCB, this, _1)));
+  this->connections.push_back(
+     event::Events::ConnectPause(
+       boost::bind(&World::SetPaused, this, _1)));
 }
 
 //////////////////////////////////////////////////
@@ -163,9 +166,6 @@ void World::Load(sdf::ElementPtr _sdf)
   this->sceneMsg.CopyFrom(msgs::SceneFromSDF(this->sdf->GetElement("scene")));
   this->sceneMsg.set_name(this->GetName());
 
-  // The period at which statistics about the world are published
-  this->statPeriod = common::Time(0, 200000000);
-
   // The period at which messages are processed
   this->processMsgsPeriod = common::Time(0, 200000000);
 
@@ -191,7 +191,7 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->statPub =
-    this->node->Advertise<msgs::WorldStatistics>("~/world_stats");
+    this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 100, 5);
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
@@ -465,11 +465,7 @@ void World::Step()
 
   DIAG_TIMER_LAP("World::Step", "loadPlugins");
 
-  // Send statistics about the world simulation
-  if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
-  {
-    this->PublishWorldStats();
-  }
+  this->PublishWorldStats();
 
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
 
