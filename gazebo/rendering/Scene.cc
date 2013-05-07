@@ -150,7 +150,6 @@ void Scene::Fini()
 
   boost::mutex::scoped_lock lock3(this->renderMutex);
   boost::mutex::scoped_lock lock2(this->preRenderMutex);
-  boost::mutex::scoped_lock lock1(this->receiveMutex);
 
   this->selectionMsg.reset();
 

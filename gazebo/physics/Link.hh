@@ -24,6 +24,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -491,7 +492,7 @@ namespace gazebo
       private: bool publishData;
 
       /// \brief Mutex to protect the publishData variable
-      private: boost::recursive_mutex *publishDataMutex;
+      private: boost::recursive_mutex publishDataMutex;
     };
     /// \}
   }

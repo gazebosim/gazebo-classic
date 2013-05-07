@@ -62,8 +62,17 @@ void Node::Fini()
   }
 
   {
+    // Run through a try lock loop to prevent deadlock
+    /*bool locked = this->incomingMutex.try_lock();
+    while (!locked)
+    {
+      common::Time::MSleep(100);
+      locked = this->incomingMutex.try_lock();
+    }*/
+
     boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
     this->callbacks.clear();
+    // this->incomingMutex.unlock();
   }
 }
 
@@ -89,13 +98,6 @@ void Node::Init(const std::string &_space)
     if (namespaces.empty())
       gzerr << "No namespace found\n";
 
-    /*while (namespaces.front() != "gazebo")
-      namespaces.pop_front();
-
-    if (namespaces.empty())
-      this->topicNamespace = "default";
-    else
-    */
     this->topicNamespace = namespaces.front();
   }
   else if (_space[0] != '/')
