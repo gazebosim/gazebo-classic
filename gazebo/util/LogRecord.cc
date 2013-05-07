@@ -210,6 +210,7 @@ void LogRecord::Stop()
   if (!this->running)
     return;
 
+  this->running = false;
   this->cleanupCondition.notify_all();
 }
 
