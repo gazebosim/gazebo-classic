@@ -117,13 +117,6 @@ void GpuRaySensor::Load(const std::string &_worldName)
         std::endl;
   }
 
-  std::cout << "World[" << this->world->GetName() << "] Parent[" << this->parentName << "] My Name[" << this->GetScopedName() << "]\n";
-
-  physics::Model_V models = this->world->GetModels();
-  for (physics::Model_V::iterator iter = models.begin(); iter != models.end(); ++iter)
-  {
-    std::cout << "Model[" << (*iter)->GetScopedName() << "}\n";
-  }
   this->parentEntity = this->world->GetEntity(this->parentName);
 
   GZ_ASSERT(this->parentEntity != NULL, "Unable to get the parent entity.");
