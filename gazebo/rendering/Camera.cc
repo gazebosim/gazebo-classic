@@ -286,7 +286,8 @@ void Camera::Fini()
     this->gaussianNoiseInstance->removeListener(
       this->gaussianNoiseCompositorListener.get());
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
-  this->renderTarget->removeAllViewports();
+  if (this->renderTarget)
+    this->renderTarget->removeAllViewports();
 }
 
 //////////////////////////////////////////////////

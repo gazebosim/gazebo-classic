@@ -39,12 +39,12 @@ TEST_F(GpuLaser_TEST, BasicGpuLaserAPITest)
   if (!scene)
       scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  ASSERT_TRUE(scene != NULL);
 
   gazebo::rendering::GpuLaserPtr laserCam =
     scene->CreateGpuLaser("test_laser", false);
 
-  EXPECT_TRUE(laserCam != NULL);
+  ASSERT_TRUE(laserCam != NULL);
 
   // The following tests all the getters and setters
   {
