@@ -77,9 +77,20 @@ void MainWindow_TEST::Wireframe()
 
   // Get the image data
   const unsigned char *image = cam->GetImageData();
+
+  while (!image)
+  {
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    image = cam->GetImageData();
+  }
+
   unsigned int height = cam->GetImageHeight();
   unsigned int width = cam->GetImageWidth();
   unsigned int depth = 3;
+
+  gzdbg << "Image Width[" << width << "] Height[" << height << "]\n";
 
   // Calculate the average color.
   unsigned int sum = 0;

@@ -212,12 +212,12 @@ void GLWidget::paintEvent(QPaintEvent *_e)
 
     if (lock && !this->pauseRendering)
     {
-      // event::Events::preRender();
+      event::Events::preRender();
 
       // Tell all the cameras to render
-      // event::Events::render();
+      event::Events::render();
 
-      // event::Events::postRender();
+      event::Events::postRender();
     }
   }
   _e->accept();
