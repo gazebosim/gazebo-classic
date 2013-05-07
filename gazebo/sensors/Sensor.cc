@@ -41,6 +41,7 @@ using namespace sensors;
 //////////////////////////////////////////////////
 Sensor::Sensor(SensorCategory _cat)
 {
+  this->initialized = false;
   this->category = _cat;
 
   this->sdf.reset(new sdf::Element);
@@ -115,6 +116,8 @@ void Sensor::Init()
   this->FillMsg(msg);
   if (this->sensorPub)
     this->sensorPub->Publish(msg);
+
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -145,6 +148,12 @@ void Sensor::Update(bool _force)
 }
 
 //////////////////////////////////////////////////
+bool Sensor::IsInitialized() const
+{
+  return this->initialized;
+}
+
+//////////////////////////////////////////////////
 void Sensor::Fini()
 {
   this->node->Fini();
@@ -156,6 +165,8 @@ void Sensor::Fini()
 
   this->world.reset();
   this->plugins.clear();
+
+  this->initialized = false;
 }
 
 //////////////////////////////////////////////////

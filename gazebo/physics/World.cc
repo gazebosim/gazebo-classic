@@ -121,6 +121,9 @@ World::World(const std::string &_name)
   this->prevStatTime = common::Time::GetWallTime();
   this->prevProcessMsgsTime = common::Time::GetWallTime();
 
+  this->prevStates[0] = new WorldState();
+  this->prevStates[1] = new WorldState();
+
   this->connections.push_back(
      event::Events::ConnectStep(boost::bind(&World::OnStep, this)));
   this->connections.push_back(
@@ -129,9 +132,6 @@ World::World(const std::string &_name)
   this->connections.push_back(
      event::Events::ConnectPause(
        boost::bind(&World::SetPaused, this, _1)));
-
-  this->prevStates[0] = new WorldState();
-  this->prevStates[1] = new WorldState();
 }
 
 //////////////////////////////////////////////////
@@ -354,11 +354,11 @@ void World::RunLoop()
 
   this->prevStepWallTime = common::Time::GetWallTime();
 
-  this->logThread = new boost::thread(boost::bind(&World::LogWorker, this));
-
   // Get the first state
   this->prevStates[0]->Load(shared_from_this());
   this->stateToggle = 0;
+
+  this->logThread = new boost::thread(boost::bind(&World::LogWorker, this));
 
   if (!util::LogPlay::Instance()->IsOpen())
   {
@@ -1779,8 +1779,6 @@ bool World::OnLog(std::ostringstream &_stream, uint64_t &_segments)
     // Clear everything.
     this->states.clear();
     this->stateToggle = 0;
-    delete this->prevStates[0];
-    delete this->prevStates[1];
   }
 
   return true;

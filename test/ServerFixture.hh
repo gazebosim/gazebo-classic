@@ -1083,6 +1083,23 @@ class ServerFixture : public testing::Test
                world->LoadPlugin(_filename, _name, sdf::ElementPtr());
              }
 
+  protected: sensors::SensorPtr GetSensor(const std::string &_name)
+             {
+               sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+               sensors::SensorPtr sensor;
+
+               int i = 0;
+               while (!sensor && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 sensor = mgr->GetSensor(_name);
+                 ++i;
+               } 
+
+               EXPECT_LT(i, 100);
+               return sensor;
+             }
+
   protected: physics::ModelPtr GetModel(const std::string &_name)
              {
                // Get the first world...we assume it the only one running
