@@ -80,7 +80,10 @@ void Base::Load(sdf::ElementPtr _sdf)
   this->sdf = _sdf;
 
   if (this->parent)
+  {
+    this->world = this->parent->GetWorld();
     this->parent->AddChild(shared_from_this());
+  }
 }
 
 //////////////////////////////////////////////////

@@ -203,7 +203,6 @@ class ServerFixture : public testing::Test
                             const std::string &_physics)
              {
                ASSERT_NO_THROW(this->server = new Server());
-               this->server->ParseArgs(0, NULL);
 
                if (_physics.length())
                  ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
@@ -1094,7 +1093,7 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(100);
                  sensor = mgr->GetSensor(_name);
                  ++i;
-               } 
+               }
 
                EXPECT_LT(i, 100);
                return sensor;

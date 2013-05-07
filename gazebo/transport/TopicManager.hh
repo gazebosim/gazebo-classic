@@ -255,6 +255,9 @@ namespace gazebo
 
       private: bool pauseIncoming;
 
+      /// \brief True if initialized
+      private: bool initialized;
+
       // Singleton implementation
       private: friend class SingletonT<TopicManager>;
     };
