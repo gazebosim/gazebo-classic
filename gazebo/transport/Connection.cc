@@ -98,8 +98,6 @@ Connection::~Connection()
     if (g_iomanager->GetCount() == 0)
     {
       this->idCounter = 0;
-      //delete iomanager;
-      //iomanager = NULL;
     }
   }
 }

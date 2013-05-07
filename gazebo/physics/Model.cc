@@ -107,7 +107,6 @@ void Model::LoadLinks()
   // Load the bodies
   if (this->sdf->HasElement("link"))
   {
-   
     sdf::ElementPtr linkElem = this->sdf->GetElement("link");
 
     bool canonicalLinkInitialized = false;

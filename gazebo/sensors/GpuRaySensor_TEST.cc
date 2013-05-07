@@ -50,7 +50,7 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
      (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  ASSERT_TRUE(sensor != NULL);
 
   double angleRes = (sensor->GetAngleMax() - sensor->GetAngleMin()).Radian() /
                     sensor->GetRayCount();

@@ -81,7 +81,6 @@ struct VisualMessageLess {
 //////////////////////////////////////////////////
 Scene::Scene(const std::string &_name, bool _enableVisualizations)
 {
-  this->setClear = false;
   this->initialized = false;
   this->showCOMs = false;
   this->showCollisions = false;
@@ -147,8 +146,7 @@ VisualPtr Scene::GetWorldVisual() const
 //////////////////////////////////////////////////
 void Scene::Fini()
 {
-  std::cout << "FIni Scene[" << this->GetName() << "]\n";
-  this->ClearImpl();
+  this->Clear();
 
   boost::mutex::scoped_lock lock3(this->renderMutex);
   boost::mutex::scoped_lock lock2(this->preRenderMutex);
@@ -229,7 +227,7 @@ void Scene::Init()
   // Force shadows on.
   this->SetShadowsEnabled(true);
 
-   // \TODO: This causes the Scene to occasionally miss the response to
+  // \TODO: This causes the Scene to occasionally miss the response to
   // scene_info
   // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->responseSub = this->node->Subscribe("~/response",
@@ -2654,17 +2652,9 @@ void Scene::InitComms()
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  //this->setClear = true;
-  this->ClearImpl();
-}
-
-//////////////////////////////////////////////////
-void Scene::ClearImpl()
-{
   boost::mutex::scoped_lock lock1(this->renderMutex);
   boost::mutex::scoped_lock lock2(this->preRenderMutex);
   boost::mutex::scoped_lock lock(this->receiveMutex);
-  this->setClear = false;
   this->RemoveCameras();
   this->RemoveUserCameras();
 

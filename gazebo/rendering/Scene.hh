@@ -541,9 +541,6 @@ namespace gazebo
       /// \brief Init communications.
       private: void InitComms();
 
-      /// \brief Clear implementation.
-      private: void ClearImpl();
-
       /// \brief Name of the scene.
       private: std::string name;
 
@@ -763,8 +760,6 @@ namespace gazebo
 
       /// \brief Initialized.
       private: bool initialized;
-
-      private: bool setClear;
     };
     /// \}
   }

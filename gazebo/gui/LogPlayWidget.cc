@@ -32,8 +32,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 {
   this->sliderPressed = false;
 
-  //this->setObjectName("dataPlayBack");
-
   QHBoxLayout *mainLayout = new QHBoxLayout;
 
   QFrame *frame = new QFrame;

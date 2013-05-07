@@ -203,6 +203,8 @@ class ServerFixture : public testing::Test
                             const std::string &_physics)
              {
                ASSERT_NO_THROW(this->server = new Server());
+               this->server->ParseArgs(0, NULL);
+
                if (_physics.length())
                  ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
                                                         _physics));

@@ -291,7 +291,6 @@ void ConnectionManager::Run()
       this->pendingSubscriptions.begin();
       iter != this->pendingSubscriptions.end(); ++iter)
   {
-    std::cout << "Subscribe[" << (*iter).topic << "]\n";
     this->Subscribe((*iter).topic, (*iter).msgType, (*iter).latching);
   }
 
@@ -464,8 +463,6 @@ void ConnectionManager::OnRead(const ConnectionPtr &_connection,
     // Connect the publisher to this transport mechanism
     TopicManager::Instance()->ConnectPubToSub(sub, subLink);
   }
-  else
-    gzerr << "Error est here\n";
 }
 
 //////////////////////////////////////////////////

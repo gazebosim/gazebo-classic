@@ -19,6 +19,7 @@
 #define _LOGPLAY_HH_
 
 #include <tinyxml.h>
+#include <deque>
 
 #include <list>
 #include <string>
