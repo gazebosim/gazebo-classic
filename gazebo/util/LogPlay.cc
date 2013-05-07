@@ -67,6 +67,7 @@ void base64_decode(std::string &_dest, const std::string &_src)
 /////////////////////////////////////////////////
 LogPlay::LogPlay()
 {
+  this->pause = false;
   this->chunkCount = 0;
   this->segmentCount = 0;
   this->chunkCount = 0;
@@ -211,6 +212,14 @@ uint32_t LogPlay::GetRandSeed() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
+  if (this->pause)
+  {
+    printf("Paused. CUrrentStep[%d] Buffer[%d]\n",this->currentStep, this->stepBuffer.size());
+    if (this->currentStep < this->stepBuffer.size())
+      _data = this->stepBuffer[this->currentStep];
+    return true;
+  }
+
   std::string startMarker = "<sdf ";
   std::string endMarker = "</sdf>";
   size_t start = this->currentChunk.find(startMarker);
@@ -245,7 +254,10 @@ bool LogPlay::Step(std::string &_data)
 
   _data = this->currentChunk.substr(start, end+endMarker.size()-start);
 
+  this->stepBuffer.push_back(_data);
+
   this->currentChunk.erase(0, end + endMarker.size());
+  ++this->currentStep;
 
   this->PublishStatus();
 
@@ -372,7 +384,7 @@ void LogPlay::CalculateStepCount()
       }
       catch(...)
       {
-        gzerr << "Invalid segment count in log file. Unable to evalute[" 
+        gzerr << "Invalid segment count in log file. Unable to evalute["
           << data << "]\n";
       }
     }
@@ -385,8 +397,16 @@ void LogPlay::CalculateStepCount()
 }
 
 /////////////////////////////////////////////////
-void LogPlay::OnLogControl(ConstLogPlayControlPtr &/*_data*/)
+void LogPlay::OnLogControl(ConstLogPlayControlPtr &_data)
 {
+  if (_data->has_target_step())
+  {
+    std::cout << "Targe step[" << _data->target_step() << "]\n";
+    this->currentStep = _data->target_step();
+  }
+
+  if (_data->has_pause())
+    this->pause = _data->pause();
 }
 
 /////////////////////////////////////////////////
@@ -395,7 +415,7 @@ void LogPlay::PublishStatus()
   msgs::LogPlayStatus msg;
   msg.set_chunks(this->chunkCount);
   msg.set_segments(this->segmentCount);
-  msgs::Set(msg.mutable_step(), common::Time::Zero);
+  msg.set_step(this->currentStep);
 
   this->logStatusPub->Publish(msg);
 }

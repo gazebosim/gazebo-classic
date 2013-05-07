@@ -6,7 +6,7 @@ package gazebo.msgs;
 
 message LogPlayControl
 {
-  optional bool start           = 1;
-  optional bool stop            = 2;
-  optional int32 to_step        = 3;
+  optional bool start            = 1;
+  optional bool pause            = 2;
+  optional uint64 target_step    = 3;
 }

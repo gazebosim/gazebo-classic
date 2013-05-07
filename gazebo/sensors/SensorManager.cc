@@ -223,7 +223,10 @@ void SensorManager::Fini()
 
   delete this->simTimeEventHandler;
   this->simTimeEventHandler = NULL;
-  rendering::remove_scene(physics::get_world()->GetName());
+  if (physics::get_world())
+    rendering::remove_scene(physics::get_world()->GetName());
+  else
+    rendering::remove_scenes();
   this->initialized = false;
 }
 

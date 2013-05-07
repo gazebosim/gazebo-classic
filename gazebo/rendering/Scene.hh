@@ -51,11 +51,6 @@ namespace Ogre
   class Quaternion;
 }
 
-namespace boost
-{
-  class mutex;
-}
-
 namespace gazebo
 {
   namespace rendering
@@ -665,7 +660,7 @@ namespace gazebo
       private: boost::shared_ptr<msgs::Selection const> selectionMsg;
 
       /// \brief Mutex to lock the various message buffers.
-      private: boost::mutex *receiveMutex;
+      private: mutable boost::mutex receiveMutex;
       private: boost::mutex preRenderMutex;
       private: boost::mutex renderMutex;
 

@@ -30,6 +30,8 @@ using namespace gui;
 LogPlayWidget::LogPlayWidget(QWidget *_parent)
   : QWidget(_parent)
 {
+  this->sliderPressed = false;
+
   //this->setObjectName("dataPlayBack");
 
   QHBoxLayout *mainLayout = new QHBoxLayout;
@@ -43,18 +45,22 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   this->scrubber->setValue(0);
   connect(this->scrubber, SIGNAL(valueChanged(int)),
       this, SLOT(OnScrubber(int)));
+  connect(this->scrubber, SIGNAL(sliderPressed()),
+      this, SLOT(OnScrubberPressed()));
+  connect(this->scrubber, SIGNAL(sliderReleased()),
+      this, SLOT(OnScrubberReleased()));
+
   frameLayout->addWidget(this->scrubber);
 
   frame->setLayout(frameLayout);
-  frame->layout()->setContentsMargins(10, 10, 10, 10);
+  frame->layout()->setContentsMargins(0, 0, 0, 0);
 
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
 
-  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  printf("Log Play Creation\n");
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init("/gazebo");
 
@@ -85,9 +91,8 @@ void LogPlayWidget::OnSetRange(unsigned int _max)
 /////////////////////////////////////////////////
 void LogPlayWidget::OnScrubber(int _value)
 {
-  printf("On Scrubber[%d]\n", _value);
-  msg::LogPlayControl msg;
-  msg.set_to_step(_value);
+  msgs::LogPlayControl msg;
+  msg.set_target_step(_value);
 
   this->controlPub->Publish(msg);
 }
@@ -95,5 +100,30 @@ void LogPlayWidget::OnScrubber(int _value)
 /////////////////////////////////////////////////
 void LogPlayWidget::OnStatusMsg(ConstLogPlayStatusPtr &_msg)
 {
-  this->SetRange(_msg->segments());
+  if (!this->sliderPressed)
+  {
+    if (static_cast<uint64_t>(this->scrubber->maximum()) != _msg->segments())
+      this->SetRange(_msg->segments());
+
+    if (static_cast<uint64_t>(this->scrubber->value()) != _msg->step())
+      this->scrubber->setValue(_msg->step());
+  }
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnScrubberPressed()
+{
+  this->sliderPressed = true;
+  msgs::LogPlayControl msg;
+  msg.set_pause(true);
+  this->controlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnScrubberReleased()
+{
+  this->sliderPressed = false;
+  msgs::LogPlayControl msg;
+  msg.set_pause(false);
+  this->controlPub->Publish(msg);
 }

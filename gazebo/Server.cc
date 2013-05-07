@@ -612,10 +612,13 @@ void Server::ProcessControlMsgs()
     if ((*iter).has_save_world_name())
     {
       physics::WorldPtr world = physics::get_world((*iter).save_world_name());
-      if ((*iter).has_save_filename())
-        world->Save((*iter).save_filename());
-      else
-        gzerr << "No filename specified.\n";
+      if (world)
+      {
+        if ((*iter).has_save_filename())
+          world->Save((*iter).save_filename());
+        else
+          gzerr << "No filename specified.\n";
+      }
     }
     else if ((*iter).has_new_world() && (*iter).new_world())
     {

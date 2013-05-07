@@ -152,9 +152,12 @@ namespace gazebo
       /// \brief The current chunk of log info.
       private: std::string currentChunk;
 
+      /// \brief The current step count.
+      private: uint64_t currentStep;
+
       /// \brief Total number of segments.
       private: uint64_t segmentCount;
-               
+
       /// \brief Total number of chunks.
       private: uint64_t chunkCount;
 
@@ -166,6 +169,12 @@ namespace gazebo
 
       /// \brief Publisher of log status messages.
       private: transport::PublisherPtr logStatusPub;
+
+      /// \brief True if paused.
+      private: bool pause;
+
+      /// \brief Buffer of step data.
+      private: std::deque<std::string> stepBuffer;
 
       /// \brief This is a singleton.
       private: friend class SingletonT<LogPlay>;

@@ -10,5 +10,5 @@ message LogPlayStatus
 {
   required uint64 chunks     = 1;
   required uint64 segments   = 2;
-  required Time step         = 3;
+  required uint64 step       = 4;
 }

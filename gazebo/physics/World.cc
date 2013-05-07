@@ -401,7 +401,7 @@ void World::LogStep()
     {
       this->SetPaused(true);
     }
-    else
+    else if (!data.empty())
     {
       this->logPlayStateSDF->ClearElements();
       sdf::readString(data, this->logPlayStateSDF);

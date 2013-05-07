@@ -53,6 +53,12 @@ namespace gazebo
       /// \param[in] _max Maximum value for the scrubber.
       private slots: void OnSetRange(unsigned int _max);
 
+      /// \brief QT callback when slider is pressed.
+      private slots: void OnScrubberPressed();
+
+      /// \brief QT callback when slider is released.
+      private slots: void OnScrubberReleased();
+
       /// \brief Callback for status messages.
       private: void OnStatusMsg(ConstLogPlayStatusPtr &_msg);
 
@@ -64,6 +70,12 @@ namespace gazebo
 
       /// \brief Subscribs to status messages.
       private: transport::SubscriberPtr statusSub;
+
+      /// \brief Publish log play control messages.
+      private: transport::PublisherPtr controlPub;
+
+      /// \brief True when the slider is pressed.
+      private: bool sliderPressed;
     };
   }
 }

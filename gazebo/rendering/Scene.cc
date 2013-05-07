@@ -100,8 +100,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->skyx = NULL;
   this->skyxController = NULL;
 
-  this->receiveMutex = new boost::mutex();
-
   this->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->sdf);
 
@@ -149,7 +147,12 @@ VisualPtr Scene::GetWorldVisual() const
 //////////////////////////////////////////////////
 void Scene::Fini()
 {
+  std::cout << "FIni Scene[" << this->GetName() << "]\n";
   this->ClearImpl();
+
+  boost::mutex::scoped_lock lock3(this->renderMutex);
+  boost::mutex::scoped_lock lock2(this->preRenderMutex);
+  boost::mutex::scoped_lock lock1(this->receiveMutex);
 
   this->selectionMsg.reset();
 
@@ -186,7 +189,6 @@ void Scene::Fini()
   this->sdf.reset();
 
   delete this->requestMsg;
-  delete this->receiveMutex;
   delete this->raySceneQuery;
 }
 
@@ -1396,14 +1398,14 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
 //////////////////////////////////////////////////
 void Scene::OnSensorMsg(ConstSensorPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   this->sensorMsgs.push_back(_msg);
 }
 
 //////////////////////////////////////////////////
 void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   this->visualMsgs.push_back(_msg);
 }
 
@@ -1474,7 +1476,7 @@ void Scene::PreRender()
   RequestMsgs_L requestMsgsCopy;
 
   {
-    boost::mutex::scoped_lock lock(*this->receiveMutex);
+    boost::mutex::scoped_lock lock(this->receiveMutex);
     if (this->requestMsg != NULL)
     {
       this->requestPub->Publish(*this->requestMsg);
@@ -1584,7 +1586,7 @@ void Scene::PreRender()
 
 
   {
-    boost::mutex::scoped_lock lock(*this->receiveMutex);
+    boost::mutex::scoped_lock lock(this->receiveMutex);
 
     std::copy(sceneMsgsCopy.begin(), sceneMsgsCopy.end(),
         std::front_inserter(this->sceneMsgs));
@@ -1609,7 +1611,7 @@ void Scene::PreRender()
   }
 
   {
-    boost::mutex::scoped_lock lock(*this->receiveMutex);
+    boost::mutex::scoped_lock lock(this->receiveMutex);
 
     // Process all the model messages last. Remove pose message from the list
     // only when a corresponding visual exits. We may receive pose updates
@@ -1683,6 +1685,10 @@ void Scene::PreRender()
 //////////////////////////////////////////////////
 void Scene::PostRender()
 {
+  // Try to lock the mutex. This guarantees that we have a lock, incase we
+  // somehow missed ::PreRender.
+  this->renderMutex.try_lock();
+
   // Unlock the render event.
   this->renderMutex.unlock();
 }
@@ -1690,7 +1696,7 @@ void Scene::PostRender()
 /////////////////////////////////////////////////
 void Scene::OnJointMsg(ConstJointPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   this->jointMsgs.push_back(_msg);
 }
 
@@ -1832,14 +1838,14 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnScene(ConstScenePtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   this->sceneMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
 void Scene::OnResponse(ConstResponsePtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
@@ -1853,7 +1859,7 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnRequest(ConstRequestPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   this->requestMsgs.push_back(_msg);
 }
 
@@ -2133,7 +2139,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnPoseMsg(ConstPose_VPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   PoseMsgs_L::iterator iter;
 
   for (int i = 0; i < _msg->pose_size(); ++i)
@@ -2155,7 +2161,7 @@ void Scene::OnPoseMsg(ConstPose_VPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   SkeletonPoseMsgs_L::iterator iter;
 
   // Find an old model message, and remove them
@@ -2176,7 +2182,7 @@ void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnLightMsg(ConstLightPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   this->lightMsgs.push_back(_msg);
 }
 
@@ -2212,7 +2218,7 @@ void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnModelMsg(ConstModelPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   this->modelMsgs.push_back(_msg);
 }
 
@@ -2457,8 +2463,6 @@ bool Scene::RemoveVisual(VisualPtr _vis)
       this->visuals.erase(iter);
       result = true;
     }
-    else
-      gzerr << "Unable to find visual[" << _vis->GetName() << "]\n";
 
     if (this->selectedVis && this->selectedVis->GetName() == _vis->GetName())
       this->selectedVis.reset();
@@ -2501,7 +2505,7 @@ std::string Scene::StripSceneName(const std::string &_name) const
 //////////////////////////////////////////////////
 Heightmap *Scene::GetHeightmap() const
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   return this->terrain;
 }
 
@@ -2659,7 +2663,7 @@ void Scene::ClearImpl()
 {
   boost::mutex::scoped_lock lock1(this->renderMutex);
   boost::mutex::scoped_lock lock2(this->preRenderMutex);
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   this->setClear = false;
   this->RemoveCameras();
   this->RemoveUserCameras();

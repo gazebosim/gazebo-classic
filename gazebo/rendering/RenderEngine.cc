@@ -138,15 +138,19 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
 {
   if (this->renderPathType == NONE)
     return ScenePtr();
+  ScenePtr scene;
 
-  ScenePtr scene(new Scene(_name, _enableVisualizations));
-  this->scenes.push_back(scene);
+  {
+    boost::mutex::scoped_lock lock(this->sceneMutex);
+    scene.reset(new Scene(_name, _enableVisualizations));
+    this->scenes.push_back(scene);
 
-  scene->Load();
-  if (this->initialized)
-    scene->Init();
-  else
-    gzerr << "RenderEngine is not initialized\n";
+    scene->Load();
+    if (this->initialized)
+      scene->Init();
+    else
+      gzerr << "RenderEngine is not initialized\n";
+  }
 
   rendering::Events::createScene(_name);
 
@@ -159,6 +163,7 @@ void RenderEngine::RemoveScene(const std::string &_name)
   if (this->renderPathType == NONE)
     return;
 
+  boost::mutex::scoped_lock lock(this->sceneMutex);
   std::vector<ScenePtr>::iterator iter;
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
@@ -178,11 +183,31 @@ void RenderEngine::RemoveScene(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+void RenderEngine::RemoveScenes()
+{
+  boost::mutex::scoped_lock lock(this->sceneMutex);
+  for (std::vector<ScenePtr>::iterator iter = this->scenes.begin();
+       iter != this->scenes.end(); ++iter)
+  {
+    if (*iter)
+    {
+      RTShaderSystem::Instance()->Clear();
+      rendering::Events::removeScene((*iter)->GetName());
+
+      (*iter)->Fini();
+      (*iter).reset();
+    }
+  }
+  this->scenes.clear();
+}
+
+//////////////////////////////////////////////////
 ScenePtr RenderEngine::GetScene(const std::string &_name)
 {
   if (this->renderPathType == NONE)
     return ScenePtr();
 
+  boost::mutex::scoped_lock lock(this->sceneMutex);
   std::vector<ScenePtr>::iterator iter;
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
@@ -199,6 +224,8 @@ ScenePtr RenderEngine::GetScene(const std::string &_name)
 //////////////////////////////////////////////////
 ScenePtr RenderEngine::GetScene(unsigned int index)
 {
+  boost::mutex::scoped_lock lock(this->sceneMutex);
+
   if (index < this->scenes.size())
     return this->scenes[index];
   else
@@ -211,6 +238,7 @@ ScenePtr RenderEngine::GetScene(unsigned int index)
 //////////////////////////////////////////////////
 unsigned int RenderEngine::GetSceneCount() const
 {
+  boost::mutex::scoped_lock lock(this->sceneMutex);
   return this->scenes.size();
 }
 
@@ -256,8 +284,11 @@ void RenderEngine::Init()
   RTShaderSystem::Instance()->Init();
   rendering::Material::CreateMaterials();
 
-  for (unsigned int i = 0; i < this->scenes.size(); i++)
-    this->scenes[i]->Init();
+  {
+    boost::mutex::scoped_lock lock(this->sceneMutex);
+    for (unsigned int i = 0; i < this->scenes.size(); i++)
+      this->scenes[i]->Init();
+  }
 
   this->initialized = true;
 }
@@ -281,7 +312,10 @@ void RenderEngine::Fini()
 
   RTShaderSystem::Instance()->Fini();
 
-  this->scenes.clear();
+  {
+    boost::mutex::scoped_lock lock(this->sceneMutex);
+    this->scenes.clear();
+  }
 
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->root)

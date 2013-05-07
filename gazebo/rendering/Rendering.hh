@@ -51,6 +51,9 @@ namespace gazebo
     /// \param[in] _name The name of the scene to remove.
     void remove_scene(const std::string &_name);
 
+    /// \brief Remove all scenes
+    void remove_scenes();
+
     /// \}
   }
 }

@@ -44,7 +44,7 @@ namespace gazebo
 
     /// \brief Returns a pointer to a world by name.
     /// \param[in] _name Name of the world to get.
-    /// \return Pointer to the world.
+    /// \return Pointer to the world, NULL if the world doesn't exist.
     WorldPtr get_world(const std::string &_name = "");
 
     /// \brief Load world from sdf::Element pointer.

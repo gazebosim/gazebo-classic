@@ -95,6 +95,9 @@ namespace gazebo
       /// \param[in] _name The name of the scene to remove.
       public: void RemoveScene(const std::string &_name);
 
+      /// \brief Remove all scenes
+      public: void RemoveScenes();
+
       /// \brief Get a scene by name
       /// \param[in] _name Name of the scene to retreive.
       /// \return A pointer to the Scene, or NULL if the scene doesn't
@@ -183,6 +186,9 @@ namespace gazebo
 
       /// \brief Pointer to the window manager.
       private: WindowManagerPtr windowManager;
+
+      /// \brief To protect the scene list.
+      private: mutable boost::mutex sceneMutex;
 
       /// \brief Makes this class a singleton.
       private: friend class SingletonT<RenderEngine>;
