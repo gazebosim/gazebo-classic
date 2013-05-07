@@ -82,7 +82,7 @@ TEST_F(Joint_TEST, JointTorqueTest)
     }
 
     double lastV = 0;
-    double dt = world->GetPhysicsEngine()->GetStepTime();
+    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
     for (unsigned int i = 0; i < 10; ++i)
     {
       double torque = 1.3;
@@ -140,7 +140,7 @@ TEST_F(Joint_TEST, JointTorqueTest)
     }
 
     double lastV = 0;
-    double dt = world->GetPhysicsEngine()->GetStepTime();
+    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
     for (unsigned int i = 0; i < 10; ++i)
     {
       double torque = 1.3;
