@@ -223,10 +223,6 @@ void RenderEngine::PreRender()
 //////////////////////////////////////////////////
 void RenderEngine::PostRender()
 {
-  printf("RenderEngine::PostRender\n");
-  if (!this->root)
-    printf("ROOT IS NULL\n");
-
   // _fireFrameRenderingQueued needs to be here for CEGUI to work
   this->root->_fireFrameRenderingQueued();
   this->root->_fireFrameEnded();

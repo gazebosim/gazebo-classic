@@ -167,22 +167,6 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   gzmsg << "Publicized address: "
         << this->masterConn->GetLocalHostname() << "\n";
 
-  // Process all pending subscriptions.
-  for (std::list<PendingSubscription>::iterator iter =
-      this->pendingSubscriptions.begin();
-      iter != this->pendingSubscriptions.end(); ++iter)
-  {
-    this->Subscribe((*iter).topic, (*iter).msgType, (*iter).latching);
-  }
-
-  // Process all pending advertisements.
-  for (std::list<PendingAdvertisement>::iterator iter =
-      this->pendingAdvertisements.begin();
-      iter != this->pendingAdvertisements.end(); ++iter)
-  {
-    this->Advertise((*iter).topic, (*iter).msgType);
-  }
-
   return true;
 }
 
@@ -301,6 +285,23 @@ void ConnectionManager::Run()
   boost::mutex::scoped_lock lock(this->updateMutex);
 
   this->stopped = false;
+
+  // Process all pending subscriptions.
+  for (std::list<PendingSubscription>::iterator iter =
+      this->pendingSubscriptions.begin();
+      iter != this->pendingSubscriptions.end(); ++iter)
+  {
+    std::cout << "Subscribe[" << (*iter).topic << "]\n";
+    this->Subscribe((*iter).topic, (*iter).msgType, (*iter).latching);
+  }
+
+  // Process all pending advertisements.
+  for (std::list<PendingAdvertisement>::iterator iter =
+      this->pendingAdvertisements.begin();
+      iter != this->pendingAdvertisements.end(); ++iter)
+  {
+    this->Advertise((*iter).topic, (*iter).msgType);
+  }
 
   while (!this->stop && this->masterConn && this->masterConn->IsOpen())
   {
@@ -539,7 +540,7 @@ void ConnectionManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 
   boost::mutex::scoped_lock lock(this->namespaceMutex);
 
-  if (!this->namespaces.size())
+  if (this->namespaces.empty())
   {
     if (!this->namespaceCondition.timed_wait(lock,
           boost::posix_time::milliseconds(60000)))

@@ -72,6 +72,14 @@ LogPlay::LogPlay()
   this->chunkCount = 0;
   this->logStartXml = NULL;
   this->xmlDoc = NULL;
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init("/gazebo");
+
+  this->logControlSub = this->node->Subscribe("/gazebo/log/play/control",
+      &LogPlay::OnLogControl, this);
+  this->logStatusPub = this->node->Advertise<msgs::LogPlayStatus>(
+      "/gazebo/log/play/status", 10000);
 }
 
 /////////////////////////////////////////////////
@@ -84,17 +92,6 @@ LogPlay::~LogPlay()
 /////////////////////////////////////////////////
 void LogPlay::Open(const std::string &_logFile)
 {
-  if (!this->node)
-  {
-    this->node = transport::NodePtr(new transport::Node());
-    this->node->Init("/gazebo");
-
-    this->logControlSub = this->node->Subscribe("/gazebo/log/play/control",
-        &LogPlay::OnLogControl, this);
-    this->logStatusPub = this->node->Advertise<msgs::LogPlayStatus>(
-        "/gazebo/log/play/status");
-  }
-
   boost::filesystem::path path(_logFile);
   if (!boost::filesystem::exists(path))
     gzthrow("Invalid logfile[" + _logFile + "]. Does not exist.");

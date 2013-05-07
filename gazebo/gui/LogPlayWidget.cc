@@ -54,8 +54,12 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
+  printf("Log Play Creation\n");
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init("/gazebo");
+
+  this->controlPub = this->node->Advertise<msgs::LogPlayControl>(
+      "/gazebo/log/play/control");
 
   this->statusSub = this->node->Subscribe("/gazebo/log/play/status",
       &LogPlayWidget::OnStatusMsg, this);
@@ -68,6 +72,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 LogPlayWidget::~LogPlayWidget()
 {
+  printf("Detel log player\n");
 }
 
 /////////////////////////////////////////////////
@@ -81,6 +86,10 @@ void LogPlayWidget::OnSetRange(unsigned int _max)
 void LogPlayWidget::OnScrubber(int _value)
 {
   printf("On Scrubber[%d]\n", _value);
+  msg::LogPlayControl msg;
+  msg.set_to_step(_value);
+
+  this->controlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////

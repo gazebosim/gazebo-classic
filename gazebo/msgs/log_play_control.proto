@@ -8,5 +8,5 @@ message LogPlayControl
 {
   optional bool start           = 1;
   optional bool stop            = 2;
-  optional int32 steps          = 3;
+  optional int32 to_step        = 3;
 }

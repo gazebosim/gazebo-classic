@@ -89,9 +89,16 @@ void Node::Init(const std::string &_space)
     if (namespaces.empty())
       gzerr << "No namespace found\n";
 
+    /*while (namespaces.front() != "gazebo")
+      namespaces.pop_front();
+
+    if (namespaces.empty())
+      this->topicNamespace = "default";
+    else
+    */
     this->topicNamespace = namespaces.front();
   }
-  else
+  else if (_space[0] != '/')
     TopicManager::Instance()->RegisterTopicNamespace(_space);
 
   TopicManager::Instance()->AddNode(shared_from_this());
