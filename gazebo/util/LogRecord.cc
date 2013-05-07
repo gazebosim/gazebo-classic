@@ -74,12 +74,6 @@ LogRecord::LogRecord()
 }
 
 //////////////////////////////////////////////////
-void LogRecord::OnPause(bool _pause)
-{
-  this->pauseState = _pause;
-}
-
-//////////////////////////////////////////////////
 LogRecord::~LogRecord()
 {
   // Stop the write thread.
@@ -812,4 +806,10 @@ void LogRecord::Cleanup()
   this->PublishLogStatus();
 
   event::Events::pause(currentPauseState);
+}
+
+//////////////////////////////////////////////////
+void LogRecord::OnPause(bool _pause)
+{
+  this->pauseState = _pause;
 }

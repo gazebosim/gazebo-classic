@@ -397,7 +397,8 @@ void World::RunLoop()
 //////////////////////////////////////////////////
 void World::LogStep()
 {
-  if (!this->IsPaused() || this->stepInc > 0)
+  if (!this->IsPaused() || this->stepInc > 0 ||
+      (this->IsPaused() && util::LogPlay::Instance()->NeedsStep()))
   {
     std::string data;
     if (!util::LogPlay::Instance()->Step(data))

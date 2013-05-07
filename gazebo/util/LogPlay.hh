@@ -105,6 +105,11 @@ namespace gazebo
       /// \return Header of the open log file.
       public: std::string GetHeader() const;
 
+      /// \brief Returns true if LogPlay::Step should be called. This can be
+      /// used to override the world's paused state.
+      /// \return True if LogPlay::Step should be called.
+      public: bool NeedsStep();
+
       /// \brief Helper function to get chunk data from XML.
       /// \param[in] _xml Pointer to an xml block that has state data.
       /// \param[out] _data Storage for the chunk's data.
@@ -175,6 +180,9 @@ namespace gazebo
 
       /// \brief Buffer of step data.
       private: std::deque<std::string> stepBuffer;
+
+      /// \brief True if LogPlay::Step should be called.
+      private: bool needsStep;
 
       /// \brief This is a singleton.
       private: friend class SingletonT<LogPlay>;

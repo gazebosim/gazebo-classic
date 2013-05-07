@@ -91,10 +91,13 @@ void LogPlayWidget::OnSetRange(unsigned int _max)
 /////////////////////////////////////////////////
 void LogPlayWidget::OnScrubber(int _value)
 {
-  msgs::LogPlayControl msg;
-  msg.set_target_step(_value);
+  if (this->sliderPressed)
+  {
+    msgs::LogPlayControl msg;
+    msg.set_target_step(_value);
 
-  this->controlPub->Publish(msg);
+    this->controlPub->Publish(msg);
+  }
 }
 
 /////////////////////////////////////////////////

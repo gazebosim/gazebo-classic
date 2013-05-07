@@ -29,6 +29,7 @@
 #include "gazebo/math/Rand.hh"
 #include "gazebo/transport/transport.hh"
 
+#include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/util/LogRecord.hh"
@@ -67,6 +68,7 @@ void base64_decode(std::string &_dest, const std::string &_src)
 /////////////////////////////////////////////////
 LogPlay::LogPlay()
 {
+  this->needsStep = false;
   this->pause = false;
   this->chunkCount = 0;
   this->segmentCount = 0;
@@ -212,51 +214,55 @@ uint32_t LogPlay::GetRandSeed() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
+  this->needsStep = false;
+
+  if (this->currentStep < this->stepBuffer.size())
+    _data = this->stepBuffer[this->currentStep];
+
   if (this->pause)
-  {
-    printf("Paused. CUrrentStep[%d] Buffer[%d]\n",this->currentStep, this->stepBuffer.size());
-    if (this->currentStep < this->stepBuffer.size())
-      _data = this->stepBuffer[this->currentStep];
     return true;
-  }
 
-  std::string startMarker = "<sdf ";
-  std::string endMarker = "</sdf>";
-  size_t start = this->currentChunk.find(startMarker);
-  size_t end = this->currentChunk.find(endMarker);
-
-  if (start == std::string::npos || end == std::string::npos)
+  if (this->currentStep >= this->stepBuffer.size())
   {
-    this->currentChunk.clear();
+    std::string startMarker = "<sdf ";
+    std::string endMarker = "</sdf>";
+    size_t start = this->currentChunk.find(startMarker);
+    size_t end = this->currentChunk.find(endMarker);
 
-    if (this->logCurrXml == this->logStartXml)
-      this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
-    else if (this->logCurrXml)
+    if (start == std::string::npos || end == std::string::npos)
     {
-      this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
+      this->currentChunk.clear();
+
+      if (this->logCurrXml == this->logStartXml)
+        this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+      else if (this->logCurrXml)
+      {
+        this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
+      }
+      else
+        return false;
+
+      // Stop if there are no more chunks
+      if (!this->logCurrXml)
+        return false;
+
+      if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+      {
+        gzerr << "Unable to decode log file\n";
+        return false;
+      }
+
+      start = this->currentChunk.find(startMarker);
+      end = this->currentChunk.find(endMarker);
     }
-    else
-      return false;
 
-    // Stop if there are no more chunks
-    if (!this->logCurrXml)
-      return false;
+    _data = this->currentChunk.substr(start, end+endMarker.size()-start);
 
-    if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
-    {
-      gzerr << "Unable to decode log file\n";
-      return false;
-    }
+    this->stepBuffer.push_back(_data);
 
-    start = this->currentChunk.find(startMarker);
-    end = this->currentChunk.find(endMarker);
+    this->currentChunk.erase(0, end + endMarker.size());
   }
 
-  _data = this->currentChunk.substr(start, end+endMarker.size()-start);
-
-  this->stepBuffer.push_back(_data);
-
-  this->currentChunk.erase(0, end + endMarker.size());
   ++this->currentStep;
 
   this->PublishStatus();
@@ -397,16 +403,25 @@ void LogPlay::CalculateStepCount()
 }
 
 /////////////////////////////////////////////////
+bool LogPlay::NeedsStep()
+{
+  return this->needsStep;
+}
+
+/////////////////////////////////////////////////
 void LogPlay::OnLogControl(ConstLogPlayControlPtr &_data)
 {
   if (_data->has_target_step())
   {
     std::cout << "Targe step[" << _data->target_step() << "]\n";
     this->currentStep = _data->target_step();
+    this->needsStep = true;
   }
 
   if (_data->has_pause())
+  {
     this->pause = _data->pause();
+  }
 }
 
 /////////////////////////////////////////////////
