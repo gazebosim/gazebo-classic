@@ -141,6 +141,9 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->terrain = NULL;
   this->selectedVis.reset();
+
+  this->sceneSimTimePosesApplied  = common::Time();
+  this->sceneSimTimePosesReceived = common::Time();
 }
 
 //////////////////////////////////////////////////
@@ -1676,6 +1679,8 @@ void Scene::PreRender()
       else
         ++spIter;
     }
+    // official time stamp of approval
+    this->sceneSimTimePosesApplied = this->sceneSimTimePosesReceived;
 
     if (this->selectionMsg)
     {
@@ -2134,7 +2139,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 /////////////////////////////////////////////////
 common::Time Scene::GetSimTime() const
 {
-  return this->sceneSimTime;
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  return this->sceneSimTimePosesApplied;
 }
 
 /////////////////////////////////////////////////
@@ -2143,7 +2149,8 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   PoseMsgs_L::iterator iter;
 
-  this->sceneSimTime = common::Time(_msg->time().sec(), _msg->time().nsec());
+  this->sceneSimTimePosesReceived =
+    common::Time(_msg->time().sec(), _msg->time().nsec());
 
   for (int i = 0; i < _msg->pose_size(); ++i)
   {

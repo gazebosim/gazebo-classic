@@ -745,9 +745,13 @@ namespace gazebo
       /// \brief Initialized.
       private: bool initialized;
 
-      /// \brief SimTime of this Scene, as we apply PosesStamped from
+      /// \brief SimTime of this Scene, as we receive PosesStamped from
       /// the world, we update this time accordingly.
-      private: common::Time sceneSimTime;
+      private: common::Time sceneSimTimePosesReceived;
+
+      /// \brief SimTime of this Scene, after applying PosesStamped to
+      /// scene, we update this time accordingly.
+      private: common::Time sceneSimTimePosesApplied;
 
       /// \brief Get the scene simulation time.
       /// Note this is different from World::GetSimTime() because
