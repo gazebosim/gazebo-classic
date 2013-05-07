@@ -62,17 +62,8 @@ void Node::Fini()
   }
 
   {
-    // Run through a try lock loop to prevent deadlock
-    /*bool locked = this->incomingMutex.try_lock();
-    while (!locked)
-    {
-      common::Time::MSleep(100);
-      locked = this->incomingMutex.try_lock();
-    }*/
-
     boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
     this->callbacks.clear();
-    // this->incomingMutex.unlock();
   }
 }
 

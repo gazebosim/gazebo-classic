@@ -88,6 +88,11 @@ LogPlay::LogPlay()
 /////////////////////////////////////////////////
 LogPlay::~LogPlay()
 {
+  this->logControlSub.reset();
+  this->logStatusPub.reset();
+  this->node->Fini();
+  this->node.reset();
+
   delete this->xmlDoc;
   this->xmlDoc = NULL;
 }
