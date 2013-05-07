@@ -110,7 +110,7 @@ namespace gazebo
 
     private: boost::mutex *receiveMutex;
     private: boost::mutex openLogMutex;
-    private: mutable boost::mutex stopMutex;
+    private: mutable boost::recursive_mutex stopMutex;
     private: std::list<msgs::ServerControl> controlMsgs;
 
     private: gazebo::common::StrStr_M params;

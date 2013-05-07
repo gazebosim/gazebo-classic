@@ -111,6 +111,9 @@ namespace gazebo
       /// \return True if LogPlay::Step should be called.
       public: bool NeedsStep();
 
+      /// \brief Finialize, and shutdown.
+      public: void Fini();
+
       /// \brief Helper function to get chunk data from XML.
       /// \param[in] _xml Pointer to an xml block that has state data.
       /// \param[out] _data Storage for the chunk's data.

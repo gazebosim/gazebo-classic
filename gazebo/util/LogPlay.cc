@@ -88,11 +88,6 @@ LogPlay::LogPlay()
 /////////////////////////////////////////////////
 LogPlay::~LogPlay()
 {
-  this->logControlSub.reset();
-  this->logStatusPub.reset();
-  this->node->Fini();
-  this->node.reset();
-
   delete this->xmlDoc;
   this->xmlDoc = NULL;
 }
@@ -438,4 +433,12 @@ void LogPlay::PublishStatus()
   msg.set_step(this->currentStep);
 
   this->logStatusPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void LogPlay::Fini()
+{
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
 }

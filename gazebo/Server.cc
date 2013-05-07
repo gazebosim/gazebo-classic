@@ -421,14 +421,14 @@ void Server::SigInt(int)
 /////////////////////////////////////////////////
 void Server::Stop(bool _stop)
 {
-  boost::mutex::scoped_lock lock(this->stopMutex);
+  boost::recursive_mutex::scoped_lock lock(this->stopMutex);
   this->stop = _stop;
 }
 
 /////////////////////////////////////////////////
 bool Server::IsStopped() const
 {
-  boost::mutex::scoped_lock lock(this->stopMutex);
+  boost::recursive_mutex::scoped_lock lock(this->stopMutex);
   return this->stop;
 }
 
@@ -489,15 +489,15 @@ void Server::RunImpl()
   if (this->IsStopped())
     return;
 
+  // Make sure the sensors are updated once before running the world.
+  // This makes sure plugins get loaded properly.
+  sensors::run_once(true);
+
+  // Run the sensor threads
+  sensors::run_threads();
+
   {
-    boost::mutex::scoped_lock lock(this->stopMutex);
-
-    // Make sure the sensors are updated once before running the world.
-    // This makes sure plugins get loaded properly.
-    sensors::run_once(true);
-
-    // Run the sensor threads
-    sensors::run_threads();
+    boost::recursive_mutex::scoped_lock lock(this->stopMutex);
 
     unsigned int steps = 0;
     common::StrStr_M::iterator piter = this->params.find("steps");
@@ -544,7 +544,7 @@ void Server::RunImpl()
   } while (!this->IsStopped() && physics::worlds_running());
 
   {
-    boost::mutex::scoped_lock lock(this->stopMutex);
+    boost::recursive_mutex::scoped_lock lock(this->stopMutex);
 
     // Stop all the worlds
     physics::stop_worlds();
