@@ -192,9 +192,15 @@ const std::string &LogRecord::GetEncoding() const
 //////////////////////////////////////////////////
 void LogRecord::Fini()
 {
-  this->connections.clear();
+  do
+  {
+    boost::mutex::scoped_lock lock(this->controlMutex);
+    this->cleanupCondition.notify_all();
+  } while (!this->cleanupThread.timed_join(
+        boost::posix_time::milliseconds(1000)));
 
-  this->Stop();
+  boost::mutex::scoped_lock lock(this->controlMutex);
+  this->connections.clear();
 
   // Remove all the logs.
   this->ClearLogs();
