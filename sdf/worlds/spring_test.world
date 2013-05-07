@@ -84,30 +84,6 @@
               <radius>0.1</radius>
             </sphere>
           </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>0.5</mu>
-                <mu2>0.2</mu2>
-                <fdir1>1.0 0 0</fdir1>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-            </friction>
-            <bounce>
-              <restitution_coefficient>0</restitution_coefficient>
-              <threshold>1000000.0</threshold>
-            </bounce>
-            <contact>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <kp>1e15</kp>
-                <kd>1e13</kd>
-                <max_vel>100.0</max_vel>
-                <min_depth>0.0001</min_depth>
-              </ode>
-            </contact>
-          </surface>
           <laser_retro>100.0</laser_retro>
         </collision>
         <gravity>true</gravity>
@@ -119,17 +95,18 @@
         <child>link_1</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
-          <limit lower="0" upper="0" effort="1000" velocity="1000" />
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
         <physics>
           <ode>
-            <cfm>0.0</cfm>
-            <bounce>0.0</bounce>
-            <max_force>1000.0</max_force>
-            <velocity>0.0</velocity>
-            <fudge_factor>0.0</fudge_factor>
-            <limit cfm="0.0" erp="0.2" />
+            <limit>
+              <cfm>0.0</cfm>
+              <erp>0.2</erp>
+            </limit>
             <!--<suspension cfm="0.0" erp="0.2"/>-->
           </ode>
         </physics>
@@ -176,31 +153,6 @@
               <radius>0.1</radius>
             </sphere>
           </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>0.5</mu>
-                <mu2>0.2</mu2>
-                <fdir1>1.0 0 0</fdir1>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-            </friction>
-            <bounce>
-              <restitution_coefficient>0</restitution_coefficient>
-              <threshold>1000000.0</threshold>
-            </bounce>
-            <contact>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <kp>1e15</kp>
-                <kd>1e13</kd>
-                <max_vel>100.0</max_vel>
-                <min_depth>0.0001</min_depth>
-              </ode>
-            </contact>
-          </surface>
-          <laser_retro>100.0</laser_retro>
         </collision>
         <gravity>true</gravity>
         <self_collide>true</self_collide>
@@ -211,18 +163,18 @@
         <child>link_1</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
-          <limit lower="0" upper="0" effort="1000" velocity="1000" />
+          <limit>
+            <lower>0.0</lower>
+            <upper>0.0</upper>
+          </limit>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
         <physics>
           <ode>
-            <cfm>0.0</cfm>
-            <bounce>0.0</bounce>
-            <max_force>1000.0</max_force>
-            <velocity>0.0</velocity>
-            <fudge_factor>0.0</fudge_factor>
-            <limit cfm="3.0" erp="1.0" />
-            <!--<suspension cfm="0.0" erp="0.2"/>-->
+            <limit>
+              <cfm>3.0</cfm>
+              <erp>1.0</erp>
+            </limit>
           </ode>
         </physics>
       </joint>
@@ -264,30 +216,6 @@
               <radius>0.1</radius>
             </sphere>
           </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>0.5</mu>
-                <mu2>0.2</mu2>
-                <fdir1>1.0 0 0</fdir1>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-            </friction>
-            <bounce>
-              <restitution_coefficient>0</restitution_coefficient>
-              <threshold>1000000.0</threshold>
-            </bounce>
-            <contact>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <kp>1e15</kp>
-                <kd>1e13</kd>
-                <max_vel>100.0</max_vel>
-                <min_depth>0.0001</min_depth>
-              </ode>
-            </contact>
-          </surface>
           <laser_retro>100.0</laser_retro>
         </collision>
         <gravity>true</gravity>
@@ -299,17 +227,18 @@
         <child>link_1</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
-          <limit lower="0" upper="0" effort="1000" velocity="1000" />
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
         <physics>
           <ode>
-            <cfm>0.0</cfm>
-            <bounce>0.0</bounce>
-            <max_force>1000.0</max_force>
-            <velocity>0.0</velocity>
-            <fudge_factor>0.0</fudge_factor>
-            <limit cfm="6.0" erp="1.0" />
+            <limit>
+              <cfm>6.0</cfm>
+              <erp>1.0</erp>
+            </limit>
             <!--<suspension cfm="0.0" erp="0.2"/>-->
           </ode>
         </physics>
@@ -352,31 +281,6 @@
               <radius>0.1</radius>
             </sphere>
           </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>0.5</mu>
-                <mu2>0.2</mu2>
-                <fdir1>1.0 0 0</fdir1>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-            </friction>
-            <bounce>
-              <restitution_coefficient>0</restitution_coefficient>
-              <threshold>1000000.0</threshold>
-            </bounce>
-            <contact>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <kp>1e15</kp>
-                <kd>1e13</kd>
-                <max_vel>100.0</max_vel>
-                <min_depth>0.0001</min_depth>
-              </ode>
-            </contact>
-          </surface>
-          <laser_retro>100.0</laser_retro>
         </collision>
         <gravity>true</gravity>
         <self_collide>true</self_collide>
@@ -387,18 +291,18 @@
         <child>link_1</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
-          <limit lower="0" upper="0" effort="1000" velocity="1000" />
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
         <physics>
           <ode>
-            <cfm>0.0</cfm>
-            <bounce>0.0</bounce>
-            <max_force>1000.0</max_force>
-            <velocity>0.0</velocity>
-            <fudge_factor>0.0</fudge_factor>
-            <limit cfm="9.0" erp="1.0" />
-            <!--<suspension cfm="0.0" erp="0.2"/>-->
+            <limit>
+              <cfm>9.0</cfm>
+              <erp>1.0</erp>
+            </limit>
           </ode>
         </physics>
       </joint>
