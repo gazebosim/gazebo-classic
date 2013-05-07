@@ -2132,10 +2132,18 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::OnPoseMsg(ConstPose_VPtr &_msg)
+common::Time Scene::GetSimTime() const
+{
+  return this->sceneSimTime;
+}
+
+/////////////////////////////////////////////////
+void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   PoseMsgs_L::iterator iter;
+
+  this->sceneSimTime = common::Time(_msg->time().sec(), _msg->time().nsec());
 
   for (int i = 0; i < _msg->pose_size(); ++i)
   {

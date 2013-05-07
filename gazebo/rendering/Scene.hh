@@ -510,7 +510,7 @@ namespace gazebo
 
       /// \brief Pose message callback.
       /// \param[in] _msg The message data.
-      private: void OnPoseMsg(ConstPose_VPtr &_msg);
+      private: void OnPoseMsg(ConstPosesStampedPtr &_msg);
 
       /// \brief Skeleton animation callback.
       /// \param[in] _msg The message data.
@@ -744,6 +744,17 @@ namespace gazebo
 
       /// \brief Initialized.
       private: bool initialized;
+
+      /// \brief SimTime of this Scene, as we apply PosesStamped from
+      /// the world, we update this time accordingly.
+      private: common::Time sceneSimTime;
+
+      /// \brief Get the scene simulation time.
+      /// Note this is different from World::GetSimTime() because
+      /// there is a lag between the time new poses are sent out by World
+      /// and when they are received and applied by the Scene.
+      /// \return The current simulation time in Scene
+      public: common::Time GetSimTime() const;
     };
     /// \}
   }
