@@ -113,6 +113,10 @@ namespace SkyX
     mLastCameraPosition = Ogre::Vector3(0, 0, 0);
     mLastCameraFarClipDistance = -1;
 
+    // FIXME: Disable mMoonManager otherwise gpu range values get clipped.
+    // issue #678
+    mMoonManager->getMoonSceneNode()->setVisible(false);
+
     mCreated = true;
   }
 
@@ -210,7 +214,9 @@ namespace SkyX
     }
 
     mMeshManager->getSceneNode()->setVisible(mVisible);
-    mMoonManager->getMoonSceneNode()->setVisible(mVisible);
+
+    // Disable moon manager as it clips gpu laser range values
+    // mMoonManager->getMoonSceneNode()->setVisible(mVisible);
 
     if (mVCloudsManager->isCreated())
     {

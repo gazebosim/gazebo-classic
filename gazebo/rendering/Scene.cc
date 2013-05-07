@@ -2605,3 +2605,19 @@ void Scene::ShowContacts(bool _show)
   else
     gzerr << "Unable to get contact visualization. This should never happen.\n";
 }
+
+/////////////////////////////////////////////////
+void Scene::ShowClouds(bool _show)
+{
+  if (!this->skyx)
+    return;
+
+  SkyX::VCloudsManager *mgr = this->skyx->getVCloudsManager();
+  if (mgr)
+  {
+    SkyX::VClouds::VClouds *vclouds =
+        this->skyx->getVCloudsManager()->getVClouds();
+    if (vclouds)
+      vclouds->setVisible(_show);
+  }
+}

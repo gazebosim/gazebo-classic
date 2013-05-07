@@ -391,7 +391,6 @@ void Camera::RenderImpl()
   {
     // Render, but don't swap buffers.
     this->renderTarget->update(false);
-
     this->lastRenderWallTime = common::Time::GetWallTime();
   }
 }
@@ -1189,6 +1188,12 @@ void Camera::CreateRenderTexture(const std::string &textureName)
       Ogre::TU_RENDERTARGET)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
+
+  // FIXME: Disable clouds in offscreen rendering for now until they can
+  // be rendered properly
+  if (this->renderTexture)
+    this->GetScene()->ShowClouds(false);
+
   this->initialized = true;
 }
 

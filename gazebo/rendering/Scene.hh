@@ -391,6 +391,10 @@ namespace gazebo
       /// \param[in] _show True to enable contact visualization.
       public: void ShowContacts(bool _show);
 
+      /// \brief Display clouds in the sky
+      /// \param[in] _show True to display clouds.
+      public: void ShowClouds(bool _show);
+
       /// \brief Return true if the Scene has been initialized.
       public: bool GetInitialized() const;
 
