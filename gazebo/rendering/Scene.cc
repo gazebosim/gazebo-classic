@@ -146,9 +146,12 @@ VisualPtr Scene::GetWorldVisual() const
 //////////////////////////////////////////////////
 void Scene::Fini()
 {
+  this->initialized = false;
+  this->connections.clear();
+
   this->Clear();
 
-  boost::mutex::scoped_lock lock3(this->renderMutex);
+  // boost::mutex::scoped_lock lock3(this->renderMutex);
   boost::mutex::scoped_lock lock2(this->preRenderMutex);
 
   this->selectionMsg.reset();
@@ -180,7 +183,6 @@ void Scene::Fini()
     RenderEngine::Instance()->root->destroySceneManager(this->manager);
     this->manager = NULL;
   }
-  this->connections.clear();
 
   this->sdf->Reset();
   this->sdf.reset();
@@ -192,6 +194,7 @@ void Scene::Fini()
 //////////////////////////////////////////////////
 void Scene::Init()
 {
+  this->initialized = false;
   this->InitComms();
   this->worldVisual.reset(new Visual("__world_node__", shared_from_this()));
 
@@ -1409,6 +1412,9 @@ void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 //////////////////////////////////////////////////
 void Scene::PreRender()
 {
+  if (!this->initialized)
+    return;
+
   boost::mutex::scoped_lock lock1(this->preRenderMutex);
 
   /* Deferred shading debug code. Delete me soon (July 17, 2012)
@@ -1676,7 +1682,7 @@ void Scene::PreRender()
   }
 
   // Lock the render event.
-  this->renderMutex.lock();
+  // this->renderMutex.lock();
 }
 
 //////////////////////////////////////////////////
@@ -1684,10 +1690,10 @@ void Scene::PostRender()
 {
   // Try to lock the mutex. This guarantees that we have a lock, incase we
   // somehow missed ::PreRender.
-  this->renderMutex.try_lock();
+  // this->renderMutex.try_lock();
 
   // Unlock the render event.
-  this->renderMutex.unlock();
+  // this->renderMutex.unlock();
 }
 
 /////////////////////////////////////////////////
@@ -2651,7 +2657,7 @@ void Scene::InitComms()
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  boost::mutex::scoped_lock lock1(this->renderMutex);
+  //boost::mutex::scoped_lock lock1(this->renderMutex);
   boost::mutex::scoped_lock lock2(this->preRenderMutex);
   boost::mutex::scoped_lock lock(this->receiveMutex);
   this->RemoveCameras();
