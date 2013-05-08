@@ -481,26 +481,27 @@ void LogRecord::Update()
 //////////////////////////////////////////////////
 void LogRecord::RunWrite()
 {
+  // Wait for new data.
+  boost::mutex::scoped_lock lock(this->runWriteMutex);
+
   // This loop will write data to disk.
   while (!this->stopThread)
   {
+    this->dataAvailableCondition.wait(lock);
+
     this->Write(false);
 
     // Throttle the write loop.
-    if (!this->stopThread)
-      common::Time::MSleep(1000);
+    //if (!this->stopThread)
+      //common::Time::MSleep(1000);
   }
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Write(bool _force)
+void LogRecord::Write(bool /*_force*/)
 {
-  if (!_force)
-  {
-    // Wait for new data.
-    boost::mutex::scoped_lock lock(this->writeMutex);
-    this->dataAvailableCondition.wait(lock);
-  }
+  boost::mutex::scoped_lock lock(this->writeMutex);
+  gzdbg << "Write()" << std::endl;
 
   // Collect all the new log data.
   for (this->updateIter = this->logs.begin();
@@ -779,7 +780,7 @@ void LogRecord::Cleanup()
 
   // Kick the write thread
   {
-    boost::mutex::scoped_lock lock(this->writeMutex);
+    boost::mutex::scoped_lock lock2(this->runWriteMutex);
     this->dataAvailableCondition.notify_all();
   }
 

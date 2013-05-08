@@ -297,8 +297,11 @@ namespace gazebo
       /// \brief Thread to cleanup log recording.
       private: boost::thread cleanupThread;
 
-      /// \brief Mutext to protect writing.
+      /// \brief Mutex to protect against parallel calls to Write()
       private: mutable boost::mutex writeMutex;
+
+      /// \brief Mutex to synchronize with RunWrite()
+      private: mutable boost::mutex runWriteMutex;
 
       private: mutable boost::mutex updateMutex;
 
