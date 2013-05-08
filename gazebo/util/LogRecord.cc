@@ -213,9 +213,6 @@ void LogRecord::Fini()
 //////////////////////////////////////////////////
 void LogRecord::Stop()
 {
-  // if (!this->running)
-  //   return;
-
   boost::mutex::scoped_lock lock(this->controlMutex);
 
   this->running = false;
@@ -490,10 +487,6 @@ void LogRecord::RunWrite()
     this->dataAvailableCondition.wait(lock);
 
     this->Write(false);
-
-    // Throttle the write loop.
-    //if (!this->stopThread)
-      //common::Time::MSleep(1000);
   }
 }
 
