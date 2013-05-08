@@ -133,6 +133,11 @@ namespace gazebo
       /// \brief Publish log status message.
       private: void PublishStatus();
 
+      /// \brief Helper function to get step data.
+      /// \param[out] _data Populated with the step data.
+      /// \return True on success.
+      private: bool GetStep(std::string &_data);
+
       /// \brief The XML document of the log file.
       private: TiXmlDocument *xmlDoc;
 

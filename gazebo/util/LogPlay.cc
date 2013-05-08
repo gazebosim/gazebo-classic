@@ -125,6 +125,8 @@ void LogPlay::Open(const std::string &_logFile)
   this->currentChunk.clear();
 
   this->CalculateStepCount();
+
+  this->PublishStatus();
 }
 
 /////////////////////////////////////////////////
@@ -219,53 +221,59 @@ bool LogPlay::Step(std::string &_data)
   if (this->currentStep < this->stepBuffer.size())
     _data = this->stepBuffer[this->currentStep];
 
-  if (this->pause)
-    return true;
-
-  if (this->currentStep >= this->stepBuffer.size())
+  while (this->currentStep >= this->stepBuffer.size() &&
+         this->GetStep(_data))
   {
-    std::string startMarker = "<sdf ";
-    std::string endMarker = "</sdf>";
-    size_t start = this->currentChunk.find(startMarker);
-    size_t end = this->currentChunk.find(endMarker);
-
-    if (start == std::string::npos || end == std::string::npos)
-    {
-      this->currentChunk.clear();
-
-      if (this->logCurrXml == this->logStartXml)
-        this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
-      else if (this->logCurrXml)
-      {
-        this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
-      }
-      else
-        return false;
-
-      // Stop if there are no more chunks
-      if (!this->logCurrXml)
-        return false;
-
-      if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
-      {
-        gzerr << "Unable to decode log file\n";
-        return false;
-      }
-
-      start = this->currentChunk.find(startMarker);
-      end = this->currentChunk.find(endMarker);
-    }
-
-    _data = this->currentChunk.substr(start, end+endMarker.size()-start);
-
     this->stepBuffer.push_back(_data);
-
-    this->currentChunk.erase(0, end + endMarker.size());
   }
 
-  ++this->currentStep;
+  if (!this->pause && this->currentStep < this->segmentCount)
+  {
+    ++this->currentStep;
+    this->PublishStatus();
+  }
 
-  this->PublishStatus();
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::GetStep(std::string &_data)
+{
+  std::string startMarker = "<sdf ";
+  std::string endMarker = "</sdf>";
+  size_t start = this->currentChunk.find(startMarker);
+  size_t end = this->currentChunk.find(endMarker);
+
+  if (start == std::string::npos || end == std::string::npos)
+  {
+    this->currentChunk.clear();
+
+    if (this->logCurrXml == this->logStartXml)
+      this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+    else if (this->logCurrXml)
+    {
+      this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
+    }
+    else
+      return false;
+
+    // Stop if there are no more chunks
+    if (!this->logCurrXml)
+      return false;
+
+    if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+    {
+      gzerr << "Unable to decode log file\n";
+      return false;
+    }
+
+    start = this->currentChunk.find(startMarker);
+    end = this->currentChunk.find(endMarker);
+  }
+
+  _data = this->currentChunk.substr(start, end+endMarker.size()-start);
+
+  this->currentChunk.erase(0, end + endMarker.size());
 
   return true;
 }
@@ -413,7 +421,6 @@ void LogPlay::OnLogControl(ConstLogPlayControlPtr &_data)
 {
   if (_data->has_target_step())
   {
-    std::cout << "Targe step[" << _data->target_step() << "]\n";
     this->currentStep = _data->target_step();
     this->needsStep = true;
   }

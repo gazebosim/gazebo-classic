@@ -41,6 +41,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   this->scrubber->setTickInterval(1);
   this->scrubber->setOrientation(Qt::Horizontal);
   this->scrubber->setValue(0);
+  this->scrubber->setPageStep(50);
   connect(this->scrubber, SIGNAL(valueChanged(int)),
       this, SLOT(OnScrubber(int)));
   connect(this->scrubber, SIGNAL(sliderPressed()),
@@ -66,7 +67,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
       "/gazebo/log/play/control");
 
   this->statusSub = this->node->Subscribe("/gazebo/log/play/status",
-      &LogPlayWidget::OnStatusMsg, this);
+      &LogPlayWidget::OnStatusMsg, this, true);
 
   // Create a QueuedConnection. This is used for thread safety.
   connect(this, SIGNAL(SetRange(unsigned int)),
@@ -89,13 +90,10 @@ void LogPlayWidget::OnSetRange(unsigned int _max)
 /////////////////////////////////////////////////
 void LogPlayWidget::OnScrubber(int _value)
 {
-  if (this->sliderPressed)
-  {
-    msgs::LogPlayControl msg;
-    msg.set_target_step(_value);
+  msgs::LogPlayControl msg;
+  msg.set_target_step(_value);
 
-    this->controlPub->Publish(msg);
-  }
+  this->controlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
@@ -107,7 +105,11 @@ void LogPlayWidget::OnStatusMsg(ConstLogPlayStatusPtr &_msg)
       this->SetRange(_msg->segments());
 
     if (static_cast<uint64_t>(this->scrubber->value()) != _msg->step())
+    {
+      this->scrubber->blockSignals(true);
       this->scrubber->setValue(_msg->step());
+      this->scrubber->blockSignals(false);
+    }
   }
 }
 
