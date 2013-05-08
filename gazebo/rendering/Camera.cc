@@ -281,13 +281,15 @@ void Camera::Fini()
   this->connections.clear();
 
   boost::mutex::scoped_lock lock(this->renderMutex);
+  RTShaderSystem::DetachViewport(this->viewport, this->scene);
 
   if (this->gaussianNoiseCompositorListener)
     this->gaussianNoiseInstance->removeListener(
       this->gaussianNoiseCompositorListener.get());
-  RTShaderSystem::DetachViewport(this->viewport, this->scene);
+
   if (this->renderTarget)
     this->renderTarget->removeAllViewports();
+  this->viewport = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -1251,7 +1253,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport->setClearEveryFrame(true);
     this->viewport->setShadowsEnabled(true);
 
-    RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
+    RTShaderSystem::AttachViewport(this->viewport,
+        this->GetScene());
 
     this->viewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
