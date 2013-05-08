@@ -300,6 +300,8 @@ namespace gazebo
       /// \brief Mutext to protect writing.
       private: mutable boost::mutex writeMutex;
 
+      private: mutable boost::mutex updateMutex;
+
       /// \brief Mutex to protect logging control.
       private: boost::mutex controlMutex;
 

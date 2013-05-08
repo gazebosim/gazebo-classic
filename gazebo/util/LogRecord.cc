@@ -216,6 +216,8 @@ void LogRecord::Stop()
   // if (!this->running)
   //   return;
 
+  boost::mutex::scoped_lock lock(this->controlMutex);
+
   this->running = false;
   this->cleanupCondition.notify_all();
 }
@@ -428,14 +430,13 @@ void LogRecord::Notify()
 //////////////////////////////////////////////////
 void LogRecord::RunUpdate()
 {
-  boost::mutex localMutex;
-  boost::mutex::scoped_lock localLock(localMutex);
+  boost::mutex::scoped_lock updateLock(this->updateMutex);
 
   // This loop will write data to disk.
   while (!this->stopThread)
   {
     // Don't completely lock, just to be safe.
-    this->updateCondition.wait(localLock);
+    this->updateCondition.wait(updateLock);
 
     if (!this->stopThread)
       this->Update();
@@ -767,14 +768,20 @@ void LogRecord::Cleanup()
   this->stopThread = true;
 
   // Kick the update thread
-  this->updateCondition.notify_all();
-
-  // Kick the write thread
-  this->dataAvailableCondition.notify_all();
+  {
+    boost::mutex::scoped_lock updateLock(this->updateMutex);
+    this->updateCondition.notify_all();
+  }
 
   // Wait for the write thread, if it exists
   if (this->updateThread)
     this->updateThread->join();
+
+  // Kick the write thread
+  {
+    boost::mutex::scoped_lock lock(this->writeMutex);
+    this->dataAvailableCondition.notify_all();
+  }
 
   // Wait for the write thread, if it exists
   if (this->writeThread)
