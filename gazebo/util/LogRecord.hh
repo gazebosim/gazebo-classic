@@ -303,6 +303,7 @@ namespace gazebo
       /// \brief Mutex to synchronize with RunWrite()
       private: mutable boost::mutex runWriteMutex;
 
+      /// \brief Mutex to synchronize with RunUpdate()
       private: mutable boost::mutex updateMutex;
 
       /// \brief Mutex to protect logging control.
