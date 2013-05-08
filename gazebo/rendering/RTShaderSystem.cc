@@ -188,8 +188,9 @@ void RTShaderSystem::Clear()
 void RTShaderSystem::AttachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-  _viewport->setMaterialScheme(_scene->GetName() +
-      Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+  if (_viewport && _scene)
+    _viewport->setMaterialScheme(_scene->GetName() +
+        Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 #endif
 }
 

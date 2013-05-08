@@ -135,7 +135,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
         this->firstPassTextures[i]->getBuffer()->getRenderTarget(), i);
 
     RTShaderSystem::AttachViewport(this->firstPassViewports[i],
-                                   this->GetScene());
+        this->GetScene());
     this->firstPassTargets[i]->setAutoUpdated(false);
   }
 
@@ -154,7 +154,8 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 
   this->Set2ndPassTarget(
       this->secondPassTexture->getBuffer()->getRenderTarget());
-  RTShaderSystem::AttachViewport(this->secondPassViewport, this->GetScene());
+  RTShaderSystem::AttachViewport(this->secondPassViewport,
+      this->GetScene());
   this->secondPassTarget->setAutoUpdated(false);
 
   this->matSecondPass = (Ogre::Material*)(

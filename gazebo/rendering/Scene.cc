@@ -2660,6 +2660,9 @@ void Scene::Clear()
   //boost::mutex::scoped_lock lock1(this->renderMutex);
   boost::mutex::scoped_lock lock2(this->preRenderMutex);
   boost::mutex::scoped_lock lock(this->receiveMutex);
+
+  RTShaderSystem::Instance()->Clear();
+
   this->RemoveCameras();
   this->RemoveUserCameras();
 
@@ -2701,7 +2704,6 @@ void Scene::Clear()
   this->grids.clear();
 
   this->sensorMsgs.clear();
-  RTShaderSystem::Instance()->Clear();
 
   delete this->skyx;
   this->skyx = NULL;
