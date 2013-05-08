@@ -52,6 +52,7 @@ LogRecord::LogRecord()
   this->initialized = false;
   this->stopThread = false;
   this->firstUpdate = true;
+  this->cleanupActive = true;
 
   // Get the user's home directory
   // \todo getenv is not portable, and there is no generic cross-platform
@@ -192,6 +193,11 @@ const std::string &LogRecord::GetEncoding() const
 //////////////////////////////////////////////////
 void LogRecord::Fini()
 {
+  {
+    boost::mutex::scoped_lock lock(this->controlMutex);
+    this->cleanupActive = false;
+  }
+
   do
   {
     boost::mutex::scoped_lock lock(this->controlMutex);
@@ -753,63 +759,67 @@ void LogRecord::PublishLogStatus()
 void LogRecord::Cleanup()
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
+  this->cleanupActive = true;
 
   // Wait for the cleanup signal
-  this->cleanupCondition.wait(lock);
-
-  bool currentPauseState = this->pauseState;
-  event::Events::pause(true);
-
-  this->stopThread = true;
-
-  // Reset the flags
-  this->paused = false;
-  this->running = false;
-  this->stopThread = true;
-
-  // Kick the update thread
+  while (this->cleanupActive)
   {
-    boost::mutex::scoped_lock updateLock(this->updateMutex);
-    this->updateCondition.notify_all();
+    this->cleanupCondition.wait(lock);
+
+    bool currentPauseState = this->pauseState;
+    event::Events::pause(true);
+
+    this->stopThread = true;
+
+    // Reset the flags
+    this->paused = false;
+    this->running = false;
+    this->stopThread = true;
+
+    // Kick the update thread
+    {
+      boost::mutex::scoped_lock updateLock(this->updateMutex);
+      this->updateCondition.notify_all();
+    }
+
+    // Wait for the write thread, if it exists
+    if (this->updateThread)
+      this->updateThread->join();
+
+    // Kick the write thread
+    {
+      boost::mutex::scoped_lock lock(this->writeMutex);
+      this->dataAvailableCondition.notify_all();
+    }
+
+    // Wait for the write thread, if it exists
+    if (this->writeThread)
+      this->writeThread->join();
+
+    delete this->updateThread;
+    this->updateThread = NULL;
+
+    delete this->writeThread;
+    this->writeThread = NULL;
+
+    // Update and write one last time to make sure we log all data.
+    this->Update();
+
+    this->Write(true);
+
+    // Stop all the logs
+    for (Log_M::iterator iter = this->logs.begin();
+        iter != this->logsEnd; ++iter)
+    {
+      iter->second->Stop();
+    }
+
+    // Reset the times
+    this->startTime = this->currTime = common::Time();
+
+    // Output the new log status
+    this->PublishLogStatus();
+
+    event::Events::pause(currentPauseState);
   }
-
-  // Wait for the write thread, if it exists
-  if (this->updateThread)
-    this->updateThread->join();
-
-  // Kick the write thread
-  {
-    boost::mutex::scoped_lock lock(this->writeMutex);
-    this->dataAvailableCondition.notify_all();
-  }
-
-  // Wait for the write thread, if it exists
-  if (this->writeThread)
-    this->writeThread->join();
-
-  delete this->updateThread;
-  this->updateThread = NULL;
-
-  delete this->writeThread;
-  this->writeThread = NULL;
-
-  // Update and write one last time to make sure we log all data.
-  this->Update();
-
-  this->Write(true);
-
-  // Stop all the logs
-  for (Log_M::iterator iter = this->logs.begin();
-      iter != this->logsEnd; ++iter)
-  {
-    iter->second->Stop();
-  }
-
-  // Reset the times
-  this->startTime = this->currTime = common::Time();
-
-  // Output the new log status
-  this->PublishLogStatus();
-
-  event::Events::pause(currentPauseState);
 }

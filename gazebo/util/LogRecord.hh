@@ -355,6 +355,9 @@ namespace gazebo
       /// \brief Simulation pause state.
       private: bool pauseState;
 
+      /// \brief True when cleanup thread is running.
+      private: bool cleanupActive;
+
       /// \brief This is a singleton
       private: friend class SingletonT<LogRecord>;
     };
