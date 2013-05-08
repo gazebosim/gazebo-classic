@@ -501,7 +501,6 @@ void LogRecord::RunWrite()
 void LogRecord::Write(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->writeMutex);
-  gzdbg << "Write()" << std::endl;
 
   // Collect all the new log data.
   for (this->updateIter = this->logs.begin();
