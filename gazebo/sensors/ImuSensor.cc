@@ -175,7 +175,6 @@ void ImuSensor::Fini()
   this->linkDataSub.reset();
   this->pub.reset();
   Sensor::Fini();
-  printf("IMuSEnsorFini\n");
 }
 
 //////////////////////////////////////////////////

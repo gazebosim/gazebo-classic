@@ -362,12 +362,12 @@ void LogPlay::CalculateStepCount()
 
   TiXmlElement *xml = this->logStartXml->FirstChildElement("chunk");
 
-  printf("Processing Log Chunk     ");
+  fprintf(stderr, "Processing Log Chunk     ");
   fflush(stdout);
 
   while (xml)
   {
-     printf("\b\b\b\b%04lu", this->chunkCount);
+     fprintf(stderr, "\b\b\b\b%04lu", this->chunkCount);
      fflush(stdout);
 
     if (this->logVersion == "1.0")
@@ -399,7 +399,7 @@ void LogPlay::CalculateStepCount()
     ++this->chunkCount;
   }
 
-  printf("\n");
+  fprintf(stderr, "\n");
 }
 
 /////////////////////////////////////////////////
