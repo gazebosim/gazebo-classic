@@ -66,24 +66,16 @@
                 <axis>
                     <xyz>1.0 0.0 0.0</xyz>
                 </axis>
-                <parent>
-                    <link_name>world</link_name>
-                </parent>
-                <child>
-                    <link_name>link1</link_name>
-                </child>
+                <parent>world</parent>
+                <child>link1</child>
             </joint>
             <joint name="joint12" type="revolute">
                 <pose>0 -0.5 0 0 0 0</pose>
                 <axis>
                     <xyz>1.0 0.0 0.0</xyz>
                 </axis>
-                <parent>
-                    <link_name>link1</link_name>
-                </parent>
-                <child>
-                    <link_name>link2</link_name>
-                </child>
+                <parent>link1</parent>
+                <child>link2</child>
             </joint>
         </model>
     </world>

@@ -165,6 +165,17 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
   this->dartJoint->addTransform(rotHinge, true);
 
   DARTUtils::AddTransformToDARTJoint(this->dartJoint, poseJointToChildLink);
+
+
+//  kinematics::TrfmTranslate* trfmTrans
+//      = DARTUtils::CreateTrfmTranslate(_pose.pos);
+
+//  _rtl8Joint->addTransform(trfmTrans, false);
+
+//  kinematics::TrfmRotateQuat* trfmRot
+//      = DARTUtils::CreateTrfmRotateQuat(poseJointToChildLink.rot);
+
+//  this->dartJoint->addTransform(trfmRot, false);
 }
 
 //////////////////////////////////////////////////

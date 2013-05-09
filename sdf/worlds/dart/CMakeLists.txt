@@ -31,6 +31,7 @@ set (files
   falling2.world
   falling_ode.world
   falling2_ode.world
+  coll_filtering.world
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/dart)

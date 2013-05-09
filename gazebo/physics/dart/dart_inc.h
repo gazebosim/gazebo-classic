@@ -1,6 +1,8 @@
 #ifndef _DART_INC_H_
 #define _DART_INC_H_
 
+#include <dart/math/UtilsRotation.h>
+
 #include <dart/integration/Integrator.h>
 #include <dart/integration/EulerIntegrator.h>
 #include <dart/integration/RK4Integrator.h>
@@ -31,6 +33,5 @@
 
 #include <dart/simulation/World.h>
 
-#include <dart/utils/UtilsRotation.h>
 
 #endif

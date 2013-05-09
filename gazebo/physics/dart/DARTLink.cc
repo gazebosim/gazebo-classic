@@ -181,6 +181,8 @@ void DARTLink::Init()
                                 poseJointToChildLink.pos.y + cog.y,
                                 poseJointToChildLink.pos.z + cog.z);
 
+//  Eigen::Vector3d dartCOMLocal(cog.x, cog.y, cog.z);
+
   this->dartBodyNode->setLocalCOM(dartCOMLocal);
 
   //----------------------------------------------------------------------------
@@ -189,6 +191,78 @@ void DARTLink::Init()
   Eigen::Matrix4d newTrfm;
   DARTUtils::ConvPoseToMat(&newTrfm, this->GetWorldPose());
   this->dartBodyNode->setWorldTransform(newTrfm);
+
+
+
+
+
+
+
+
+
+
+  if (dartParentJoint == 0)
+  {
+    // TODO: need to access to Model::canonicalLink
+    //       the member is private for now. this should be protected.
+    //LinkPtr this = this;
+
+    kinematics::BodyNode* parentBodyNode = NULL;
+    kinematics::BodyNode* childBodyNode
+        = /*boost::shared_dynamic_cast<DARTLink>*/(this)->GetBodyNode();
+
+    kinematics::Joint* newJoint
+        = new kinematics::Joint(parentBodyNode, childBodyNode);
+    GetDARTModel()->GetSkeletonDynamics()->addJoint(newJoint);
+
+    //---- Step 1. Transformation from rotated joint frame to child link frame.
+    math::Pose canonicalLinkPose = this->GetWorldPose();
+//    DARTUtils::addTransformToDARTJoint(this->dartCanonicalJoint,
+//                                         canonicalLinkPose);
+
+    //---- Step 2. Transformation by the rotate axis.
+    kinematics::Dof* tranX = new kinematics::Dof(0, -10000, 10000);
+    kinematics::Dof* tranY = new kinematics::Dof(0, -10000, 10000);
+    kinematics::Dof* tranZ = new kinematics::Dof(0, -10000, 10000);
+//    kinematics::Dof* rotX = new kinematics::Dof(0, -6.1416, 6.1416);
+//    kinematics::Dof* rotY = new kinematics::Dof(0, -6.1416, 6.1416);
+//    kinematics::Dof* rotZ = new kinematics::Dof(0, -6.1416, 6.1416);
+    kinematics::Dof* rotX = new kinematics::Dof(0, -60.1416, 60.1416);
+    kinematics::Dof* rotY = new kinematics::Dof(0, -60.1416, 60.1416);
+    kinematics::Dof* rotZ = new kinematics::Dof(0, -60.1416, 60.1416);
+
+    kinematics::TrfmTranslate* trfmTranslateCanonical
+        = new kinematics::TrfmTranslate(tranX, tranY, tranZ);
+    kinematics::TrfmRotateExpMap* trfmRotateCanonical
+        = new kinematics::TrfmRotateExpMap(rotX, rotY, rotZ);
+
+    // Set the initial pose (transformation) of bodies.
+    tranX->setValue(canonicalLinkPose.pos.x);
+    tranY->setValue(canonicalLinkPose.pos.y);
+    tranZ->setValue(canonicalLinkPose.pos.z);
+
+    Eigen::Quaterniond eigenQuat(canonicalLinkPose.rot.w,
+                                canonicalLinkPose.rot.x,
+                                canonicalLinkPose.rot.y,
+                                canonicalLinkPose.rot.z);
+
+    //Eigen::Quaterniond expToQuat(Eigen::Vector3d& v);
+    Eigen::Vector3d eigenVec3 = dart_math::quatToExp(eigenQuat);
+
+    rotX->setValue(eigenVec3(0));
+    rotY->setValue(eigenVec3(1));
+    rotZ->setValue(eigenVec3(2));
+
+    // Get the model associated with
+    // Add the transform to the skeletone in the model.
+    // add to model because it's variable
+    newJoint->addTransform(trfmTranslateCanonical, true);
+    newJoint->addTransform(trfmRotateCanonical, true);
+
+    GetDARTModel()->GetSkeletonDynamics()->addTransform(trfmTranslateCanonical);
+    GetDARTModel()->GetSkeletonDynamics()->addTransform(trfmRotateCanonical);
+  }
+
 }
 
 //////////////////////////////////////////////////
