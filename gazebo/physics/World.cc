@@ -124,6 +124,9 @@ World::World(const std::string &_name)
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&World::SetSelectedEntityCB, this, _1)));
+  this->connections.push_back(
+     event::Events::ConnectPause(
+       boost::bind(&World::SetPaused, this, _1)));
 }
 
 //////////////////////////////////////////////////
@@ -188,7 +191,7 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->statPub =
-    this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 10, 5);
+    this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 100, 5);
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
