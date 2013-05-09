@@ -70,8 +70,8 @@ namespace urdf2gazebo
       isStopErp = false;
       isInitialJointPosition = false;
       isFudgeFactor = false;
-      provideFeedback = false;
-      cfmDamping = false;
+      isProvideFeedback = false;
+      isCFMDamping = false;
       blobs.clear();
 
       dampingFactor = 0;
@@ -87,6 +87,8 @@ namespace urdf2gazebo
       stopErp = 0.1;
       initialJointPosition = 0;
       fudgeFactor = 1;
+      provideFeedback = false;
+      cfmDamping = false;
     };
 
     private: GazeboExtension(const GazeboExtension &ge)
@@ -111,8 +113,8 @@ namespace urdf2gazebo
       isStopErp = ge.isStopErp;
       isInitialJointPosition = ge.isInitialJointPosition;
       isFudgeFactor = ge.isFudgeFactor;
-      provideFeedback = ge.provideFeedback;
-      cfmDamping = ge.cfmDamping;
+      isProvideFeedback = ge.isProvideFeedback;
+      isCFMDamping = ge.isCFMDamping;
       dampingFactor = ge.dampingFactor;
       maxContacts = ge.maxContacts;
       maxVel = ge.maxVel;
@@ -126,6 +128,8 @@ namespace urdf2gazebo
       stopErp = ge.stopErp;
       initialJointPosition = ge.initialJointPosition;
       fudgeFactor = ge.fudgeFactor;
+      provideFeedback = ge.provideFeedback;
+      cfmDamping = ge.cfmDamping;
     };
 
     // visual
@@ -162,7 +166,9 @@ namespace urdf2gazebo
     // joint, joint limit dynamics
     private: bool isStopCfm, isStopErp, isInitialJointPosition, isFudgeFactor;
     private: double stopCfm, stopErp, initialJointPosition, fudgeFactor;
+    private: bool isProvideFeedback;
     private: bool provideFeedback;
+    private: bool isCFMDamping;
     private: bool cfmDamping;
 
     friend class URDF2Gazebo;
