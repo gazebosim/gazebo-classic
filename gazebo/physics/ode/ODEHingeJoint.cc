@@ -175,10 +175,19 @@ void ODEHingeJoint::SetForce(int _index, double _effort)
   // truncating SetForce effort if velocity limit reached.
   if (this->velocityLimit[_index] >= 0)
   {
-    if (this->GetVelocity(_index) > this->velocityLimit[_index])
-      _effort = _effort > 0 ? 0 : _effort;
-    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
-      _effort = _effort < 0 ? 0 : _effort;
+    static double kV = 1.0;
+    double velocity = this->GetVelocity(_index);
+    double maxVelocity = this->velocityLimit[_index];
+    double damping;
+    if (velocity > maxVelocity)
+    {
+      damping =  -kV * (velocity - maxVelocity);
+    }
+    else if (velocity < -maxVelocity)
+    {
+      damping =  -kV * (velocity + maxVelocity);
+    }
+    _effort += damping;
   }
 
   // truncate effort if effortLimit is not negative
