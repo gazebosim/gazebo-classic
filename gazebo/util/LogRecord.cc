@@ -17,6 +17,7 @@
 #include <iomanip>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/date_time.hpp>
@@ -144,9 +145,9 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
   if (!boost::filesystem::exists(this->logCompletePath))
     boost::filesystem::create_directories(logCompletePath);
 
-  if (_encoding != "bz2" && _encoding != "txt")
+  if (_encoding != "bz2" && _encoding != "txt" && _encoding != "zlib")
     gzthrow("Invalid log encoding[" + _encoding +
-            "]. Must be one of [bz2, txt]");
+            "]. Must be one of [bz2, zlib, txt]");
 
   this->encoding = _encoding;
 
@@ -560,6 +561,24 @@ unsigned int LogRecord::Log::Update()
                   Base64Text(str.c_str() + str.size()),
                   std::back_inserter(this->buffer));
       }
+      else if (encoding == "zlib")
+      {
+        std::string str;
+
+        // Compress to zlib
+        {
+          boost::iostreams::filtering_ostream out;
+          out.push(boost::iostreams::zlib_compressor());
+          out.push(std::back_inserter(str));
+          out << stream.str();
+          out.flush();
+        }
+
+        // Encode in base64.
+        std::copy(Base64Text(str.c_str()),
+                  Base64Text(str.c_str() + str.size()),
+                  std::back_inserter(this->buffer));
+      }
       else if (encoding == "txt")
         this->buffer.append(stream.str());
       else
@@ -678,9 +697,13 @@ void LogRecord::OnLogControl(ConstLogControlPtr &_data)
   if (_data->has_base_path() && !_data->base_path().empty())
     this->SetBasePath(_data->base_path());
 
+  std::string msgEncoding = "bz2";
+  if (_data->has_encoding())
+    msgEncoding = _data->encoding();
+
   if (_data->has_start() && _data->start())
   {
-    this->Start("bz2");
+    this->Start(msgEncoding);
   }
   else if (_data->has_stop() && _data->stop())
   {
