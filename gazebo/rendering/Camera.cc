@@ -402,6 +402,9 @@ void Camera::RenderImpl()
     // Render, but don't swap buffers.
     this->renderTarget->update(false);
     this->lastRenderWallTime = common::Time::GetWallTime();
+
+    if (this->renderTexture)
+      this->GetScene()->ShowClouds(this->displayClouds);
   }
 }
 
@@ -418,6 +421,9 @@ void Camera::PostRender()
 
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
+    if (this->renderTexture)
+      this->GetScene()->ShowClouds(false);
+
     size_t size;
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
