@@ -19,6 +19,9 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include <tbb/parallel_for.h>
+#include <tbb/blocked_range.h>
+
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
@@ -37,6 +40,8 @@ namespace po = boost::program_options;
 
 sdf::ElementPtr g_stateSdf;
 
+
+
 /// \brief Base class for all filters.
 class FilterBase
 {
@@ -52,7 +57,7 @@ class FilterBase
   /// \param[in] _stream The output stream.
   /// \param[in] _state Current state.
   public: std::ostringstream &Out(std::ostringstream &_stream,
-              const gazebo::physics::State &_state)
+              const gazebo::physics::State &_state) const
           {
             if (!this->xmlOutput && !this->stamp.empty())
             {
@@ -75,7 +80,7 @@ class FilterBase
   public: std::string FilterPose(const gazebo::math::Pose &_pose,
               const std::string &_xmlName,
               std::string _filter,
-              const gazebo::physics::State &_state)
+              const gazebo::physics::State &_state) const
           {
             std::ostringstream result;
             std::string xmlPrefix, xmlSuffix;
@@ -195,7 +200,7 @@ class JointFilter : public FilterBase
   /// \param[in] _state Link state to filter.
   /// \param[in] _partIter Iterator to the filtered string parts.
   public: std::string FilterParts(gazebo::physics::JointState &_state,
-              std::list<std::string>::iterator _partIter)
+              std::list<std::string>::const_iterator _partIter) const
           {
             std::ostringstream result;
             std::string part = *_partIter;
@@ -250,12 +255,12 @@ class JointFilter : public FilterBase
   /// as a string.
   /// \param[in] _state The model state to filter.
   /// \return Filtered string.
-  public: std::string Filter(gazebo::physics::ModelState &_state)
+  public: std::string Filter(gazebo::physics::ModelState &_state) const
           {
             std::ostringstream result;
 
             gazebo::physics::JointState_M states;
-            std::list<std::string>::iterator partIter;
+            std::list<std::string>::const_iterator partIter;
 
             /// Get an iterator to the list of the command line parts.
             partIter = this->parts.begin();
@@ -330,7 +335,7 @@ class LinkFilter : public FilterBase
   /// \param[in] _state Link state to filter.
   /// \param[in] _partIter Iterator to the filtered string parts.
   public: std::string FilterParts(gazebo::physics::LinkState &_state,
-              std::list<std::string>::iterator _partIter)
+              std::list<std::string>::const_iterator _partIter) const
           {
             std::ostringstream result;
 
@@ -361,12 +366,12 @@ class LinkFilter : public FilterBase
   /// as a string.
   /// \param[in] _state The model state to filter.
   /// \return Filtered string.
-  public: std::string Filter(gazebo::physics::ModelState &_state)
+  public: std::string Filter(gazebo::physics::ModelState &_state) const
           {
             std::ostringstream result;
 
             gazebo::physics::LinkState_M states;
-            std::list<std::string>::iterator partIter;
+            std::list<std::string>::const_iterator partIter;
 
             /// Get an iterator to the list of the command line parts.
             partIter = this->parts.begin();
@@ -484,7 +489,7 @@ class ModelFilter : public FilterBase
   /// \param[in] _state Model state to filter.
   /// \param[in] _partIter Iterator to the filtered string parts.
   public: std::string FilterParts(gazebo::physics::ModelState &_state,
-              std::list<std::string>::iterator _partIter)
+              std::list<std::string>::const_iterator _partIter) const
           {
             std::ostringstream result;
 
@@ -514,12 +519,13 @@ class ModelFilter : public FilterBase
   /// as a string.
   /// \param[in] _state The World state to filter.
   /// \return Filtered string.
-  public: std::string Filter(gazebo::physics::WorldState &_state)
+  public: std::string Filter(gazebo::physics::WorldState &_state) const
           {
             std::ostringstream result;
 
             gazebo::physics::ModelState_M states;
-            std::list<std::string>::iterator partIter = this->parts.begin();
+            std::list<std::string>::const_iterator partIter =
+              this->parts.begin();
 
             // The first element in the filter must be a model name or a star.
             if (partIter != this->parts.end() && !this->parts.empty() &&
@@ -588,7 +594,10 @@ class StateFilter : public FilterBase
               double _hz = 0)
           : FilterBase(_xmlOutput, _stamp), filter(_xmlOutput, _stamp),
           hz(_hz)
-          {}
+          {
+            this->stateSdf.reset(new sdf::Element);
+            sdf::initFile("state.sdf", this->stateSdf);
+          }
 
   /// \brief Initialize the filter with a set of parameters.
   /// \param[_in] _filter The filter parameters
@@ -599,14 +608,14 @@ class StateFilter : public FilterBase
 
   /// \brief Perform filtering
   /// \param[in] _stateString The string to filter.
-  public: std::string Filter(const std::string &_stateString)
+  public: std::string Filter(const std::string &_stateString) const
           {
             gazebo::physics::WorldState state;
 
             // Read and parse the state information
-            g_stateSdf->ClearElements();
-            sdf::readString(_stateString, g_stateSdf);
-            state.Load(g_stateSdf);
+            this->stateSdf->ClearElements();
+            sdf::readString(_stateString, this->stateSdf);
+            state.Load(this->stateSdf);
 
             std::ostringstream result;
 
@@ -644,9 +653,63 @@ class StateFilter : public FilterBase
   private: double hz;
 
   /// \brief Previous time a state was output.
-  private: gazebo::common::Time prevTime;
+  private: mutable gazebo::common::Time prevTime;
+
+  /// \brief State sdf element
+  private: mutable sdf::ElementPtr stateSdf;
 };
 
+/////////////////////////////////////////////////
+// \brief Class to process chunks in parallel
+class ProcessChunk_TBB
+{
+  public: ProcessChunk_TBB(gazebo::util::LogPlay *_play,
+              const std::string &_filter, bool _raw,
+              const std::string &_stamp, double _hz, 
+              std::vector<std::list<std::string> > *_result) : play(_play),
+  filterStr(_filter), raw(_raw), stamp(_stamp), hz(_hz), result(_result)
+  {
+  }
+
+  public: void operator() (const tbb::blocked_range<size_t> &_r) const
+  {
+    std::string chunkData, stepData;
+    std::string startMarker = "<sdf ";
+    std::string endMarker = "</sdf>";
+    size_t start = std::string::npos;
+    size_t end = std::string::npos;
+
+    StateFilter filter(!this->raw, this->stamp, this->hz);
+    filter.Init(this->filterStr);
+
+    for (size_t i = _r.begin(); i != _r.end(); i++)
+    {
+      play->GetChunk(i, chunkData);
+
+      do
+      {
+        start = chunkData.find(startMarker);
+        end = chunkData.find(endMarker);
+        if (start == std::string::npos || end == std::string::npos)
+          break;
+
+        stepData = chunkData.substr(start, end+endMarker.size() - start);
+        chunkData.erase(0, end + endMarker.size());
+
+        if (!stepData.empty())
+          (*this->result)[i].push_back(filter.Filter(stepData));
+      } while (chunkData.size() > 0);
+    }
+  }
+
+  /// \brief Pointer to the log recorder
+  private: gazebo::util::LogPlay *play;
+  private: std::string filterStr;
+  private: bool raw;
+  private: std::string stamp;
+  private: double hz;
+  private: std::vector<std::list<std::string> > *result;
+};
 
 /////////////////////////////////////////////////
 /// \brief Print general help
@@ -878,9 +941,26 @@ int echo(const std::string &_filename, const std::string &_filter, bool _raw,
   if (!_raw)
     std::cout << play->GetHeader() << std::endl;
 
+  std::vector<std::list<std::string> > result;
+  result.resize(play->GetChunkCount());
+
+  tbb::parallel_for(tbb::blocked_range<size_t>(1, play->GetChunkCount()-1, 4),
+      ProcessChunk_TBB(play, _filter, _raw, _stamp, _hz, &result));
+
+  // Output the result
+  for (std::vector<std::list<std::string> >::iterator iter = result.begin();
+      iter != result.end(); ++iter)
+  {
+    for (std::list<std::string>::iterator iter2 = (*iter).begin();
+        iter2 != (*iter).end(); ++iter2)
+    {
+      std::cout << *iter2 << std::endl;
+    }
+  }
+
+  /* // Old code. Here for comparison
   StateFilter filter(!_raw, _stamp, _hz);
   filter.Init(_filter);
-
   unsigned int i = 0;
   while (play->Step(stateString))
   {
@@ -902,6 +982,7 @@ int echo(const std::string &_filename, const std::string &_filter, bool _raw,
 
     ++i;
   }
+  */
 
   if (!_raw)
     std::cout << "</gazebo_log>\n";

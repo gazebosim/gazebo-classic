@@ -207,8 +207,7 @@ void LogRecord::Fini()
 //////////////////////////////////////////////////
 void LogRecord::Stop()
 {
-  if (!this->running)
-    return;
+  boost::mutex::scoped_lock lock(this->controlMutex);
 
   this->running = false;
   this->cleanupCondition.notify_all();
@@ -424,14 +423,13 @@ void LogRecord::Notify()
 //////////////////////////////////////////////////
 void LogRecord::RunUpdate()
 {
-  boost::mutex localMutex;
-  boost::mutex::scoped_lock localLock(localMutex);
+  boost::mutex::scoped_lock updateLock(this->updateMutex);
 
   // This loop will write data to disk.
   while (!this->stopThread)
   {
     // Don't completely lock, just to be safe.
-    this->updateCondition.wait(localLock);
+    this->updateCondition.wait(updateLock);
 
     if (!this->stopThread)
       this->Update();
@@ -476,26 +474,24 @@ void LogRecord::Update()
 //////////////////////////////////////////////////
 void LogRecord::RunWrite()
 {
+  // Wait for new data.
+  boost::mutex::scoped_lock lock(this->runWriteMutex);
+
   // This loop will write data to disk.
   while (!this->stopThread)
   {
+    this->dataAvailableCondition.wait(lock);
+
     this->Write(false);
   }
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Write(bool _force)
+void LogRecord::Write(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->writeMutex);
 
-  if (!_force)
-  {
-    // Wait for new data.
-    this->dataAvailableCondition.timed_wait(lock,
-        boost::posix_time::milliseconds(1000));
-  }
-
-  // Write all the collected log data.
+  // Collect all the new log data.
   for (this->updateIter = this->logs.begin();
       this->updateIter != this->logsEnd; ++this->updateIter)
   {
@@ -768,14 +764,20 @@ void LogRecord::Cleanup()
   this->stopThread = true;
 
   // Kick the update thread
-  this->updateCondition.notify_all();
-
-  // Kick the write thread
-  this->dataAvailableCondition.notify_all();
+  {
+    boost::mutex::scoped_lock updateLock(this->updateMutex);
+    this->updateCondition.notify_all();
+  }
 
   // Wait for the write thread, if it exists
   if (this->updateThread)
     this->updateThread->join();
+
+  // Kick the write thread
+  {
+    boost::mutex::scoped_lock lock2(this->runWriteMutex);
+    this->dataAvailableCondition.notify_all();
+  }
 
   // Wait for the write thread, if it exists
   if (this->writeThread)

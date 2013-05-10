@@ -1226,7 +1226,8 @@ void Element::ClearElements()
   for (sdf::ElementPtr_V::iterator iter = this->elements.begin();
       iter != this->elements.end(); ++iter)
   {
-    (*iter)->ClearElements();
+    if (*iter)
+      (*iter)->ClearElements();
   }
 
   this->elements.clear();

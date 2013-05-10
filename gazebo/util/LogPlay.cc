@@ -126,7 +126,7 @@ void LogPlay::Open(const std::string &_logFile)
 
   this->CalculateStepCount();
 
-  this->PublishStatus();
+  // this->PublishStatus();
 }
 
 /////////////////////////////////////////////////
