@@ -958,12 +958,15 @@ int echo(const std::string &_filename, const std::string &_filter, bool _raw,
     for (std::list<std::string>::iterator iter2 = (*iter).begin();
         iter2 != (*iter).end(); ++iter2)
     {
-      if (!_raw)
-        std::cout << "<chunk encoding='txt'><![CDATA[\n";
-      std::cout << *iter2 << std::endl;
+      if (!(*iter2).empty())
+      {
+        if (!_raw)
+          std::cout << "<chunk encoding='txt'><![CDATA[\n";
+        std::cout << *iter2 << std::endl;
 
-      if (!_raw)
-        std::cout << "]]></chunk>\n";
+        if (!_raw)
+          std::cout << "]]></chunk>\n";
+      }
     }
   }
 
