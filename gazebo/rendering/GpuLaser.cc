@@ -387,11 +387,6 @@ void GpuLaser::RenderImpl()
 
   firstPassTimer.Start();
 
-  // Disable skyx otherwise the range values get clipped.
-  // Seems like skyx's mMeshManager is causing this problem.
-  if (this->GetScene()->skyx != NULL)
-    this->GetScene()->skyx->setVisible(false);
-
   Ogre::SceneManager *sceneMgr = this->scene->GetManager();
 
   sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
@@ -434,9 +429,6 @@ void GpuLaser::RenderImpl()
 
   sceneMgr->_suppressRenderStateChanges(false);
   sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
-
-  if (this->GetScene()->skyx != NULL)
-    this->GetScene()->skyx->setVisible(true);
 
   double secondPassDur = secondPassTimer.GetElapsed().Double();
   this->lastRenderDuration = firstPassDur + secondPassDur;

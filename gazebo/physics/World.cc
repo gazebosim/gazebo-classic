@@ -172,7 +172,8 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
-  this->posePub = this->node->Advertise<msgs::Pose_V>("~/pose/info", 10, 60.0);
+  this->posePub = this->node->Advertise<msgs::PosesStamped>(
+    "~/pose/info", 10, 60.0);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
   if (this->sdf->HasElement("gui"))
@@ -1766,7 +1767,10 @@ void World::ProcessMessages()
     if (this->posePub && this->posePub->HasConnections() &&
         this->publishModelPoses.size() > 0)
     {
-      msgs::Pose_V msg;
+      msgs::PosesStamped msg;
+
+      // Time stamp this PosesStamped message
+      msgs::Set(msg.mutable_time(), this->GetSimTime());
 
       for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
           iter != this->publishModelPoses.end(); ++iter)

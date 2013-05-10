@@ -168,7 +168,9 @@ void Visual::Fini()
   {
     this->sceneNode->removeChild((*iter)->GetSceneNode());
     (*iter)->parent.reset();
+    (*iter).reset();
   }
+
   this->children.clear();
 
   if (this->sceneNode != NULL)
@@ -243,6 +245,7 @@ void Visual::Init()
 
   if (this->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
+
   this->initialized = true;
 }
 
