@@ -162,12 +162,12 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
   {
     this->camera->Render();
     this->camera->PostRender();
-    this->lastMeasurementTime = this->world->GetSimTime();
+    this->lastMeasurementTime = this->scene->GetSimTime();
 
     if (this->imagePub->HasConnections())
     {
       msgs::ImageStamped msg;
-      msgs::Set(msg.mutable_time(), this->world->GetSimTime());
+      msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
       msg.mutable_image()->set_width(this->camera->GetImageWidth());
       msg.mutable_image()->set_height(this->camera->GetImageHeight());
       msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
