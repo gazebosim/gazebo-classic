@@ -701,6 +701,9 @@ namespace gazebo
       /// \brief If noiseType==GAUSSIAN, noiseStdDev is the standard
       /// devation of the distibution from which we sample
       private: double noiseStdDev;
+
+      /// \brief store option to turn off cloud
+      private: bool displayClouds;
     };
     /// \}
   }
