@@ -126,7 +126,7 @@ void LogPlay::Open(const std::string &_logFile)
 
   this->CalculateStepCount();
 
-  // this->PublishStatus();
+  this->PublishStatus();
 }
 
 /////////////////////////////////////////////////
@@ -370,13 +370,13 @@ void LogPlay::CalculateStepCount()
 
   TiXmlElement *xml = this->logStartXml->FirstChildElement("chunk");
 
-  fprintf(stderr, "Processing Log Chunk     ");
-  fflush(stdout);
+  // fprintf(stderr, "Processing Log Chunk     ");
+  // fflush(stdout);
 
   while (xml)
   {
-     fprintf(stderr, "\b\b\b\b%04lu", this->chunkCount);
-     fflush(stdout);
+     // fprintf(stderr, "\b\b\b\b%04lu", this->chunkCount);
+     // fflush(stdout);
 
     if (this->logVersion == "1.0")
     {
@@ -407,7 +407,7 @@ void LogPlay::CalculateStepCount()
     ++this->chunkCount;
   }
 
-  fprintf(stderr, "\n");
+  // fprintf(stderr, "\n");
 }
 
 /////////////////////////////////////////////////

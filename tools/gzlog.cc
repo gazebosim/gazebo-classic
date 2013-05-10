@@ -947,6 +947,10 @@ int echo(const std::string &_filename, const std::string &_filter, bool _raw,
   tbb::parallel_for(tbb::blocked_range<size_t>(1, play->GetChunkCount()-1, 4),
       ProcessChunk_TBB(play, _filter, _raw, _stamp, _hz, &result));
 
+  // Get the first step, which is the world definition
+  play->Step(stateString);
+  result[0].push_back(stateString);
+
   // Output the result
   for (std::vector<std::list<std::string> >::iterator iter = result.begin();
       iter != result.end(); ++iter)
@@ -954,7 +958,12 @@ int echo(const std::string &_filename, const std::string &_filter, bool _raw,
     for (std::list<std::string>::iterator iter2 = (*iter).begin();
         iter2 != (*iter).end(); ++iter2)
     {
+      if (!_raw)
+        std::cout << "<chunk encoding='txt'><![CDATA[\n";
       std::cout << *iter2 << std::endl;
+
+      if (!_raw)
+        std::cout << "]]></chunk>\n";
     }
   }
 
