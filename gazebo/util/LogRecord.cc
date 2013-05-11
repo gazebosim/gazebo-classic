@@ -779,10 +779,9 @@ void LogRecord::Cleanup()
   bool currentPauseState = this->pauseState;
   event::Events::pause(true);
 
-  this->stopThread = true;
-
   // Reset the flags
   this->paused = false;
+  this->running = false;
   this->stopThread = true;
 
   // Kick the update thread
