@@ -106,7 +106,7 @@ TEST(LogRecord_TEST, Start_bzip2)
 
   // Logger may still be writing so make sure we exit cleanly
   int i = 0;
-  while (!recorder->GetReady() && i < 50)
+  while (!recorder->IsReadyToStart() && i < 50)
   {
     gazebo::common::Time::MSleep(100);
     i++;
@@ -148,7 +148,7 @@ TEST(LogRecord_TEST, Start_zlib)
 
   // Logger may still be writing so make sure we exit cleanly
   int i = 0;
-  while (!recorder->GetReady() && i < 50)
+  while (!recorder->IsReadyToStart() && i < 50)
   {
     gazebo::common::Time::MSleep(100);
     i++;

@@ -122,10 +122,10 @@ namespace gazebo
       /// \sa LogRecord::SetPaused
       public: bool GetPaused() const;
 
-      /// \brief Get whether the logger is ready and the previous run has
-      /// finished.
-      // \return True if logger is ready
-      public: bool GetReady() const;
+      /// \brief Get whether the logger is ready to start, which implies
+      /// that any previous runs have finished.
+      // \return True if logger is ready to start.
+      public: bool IsReadyToStart() const;
 
       /// \brief Get whether logging is running.
       /// \return True if logging has been started.
