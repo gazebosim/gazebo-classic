@@ -419,7 +419,7 @@ namespace gazebo
       /// \brief Seconds
       public: int32_t sec;
 
-      /// \brief Microseconds
+      /// \brief Nanoseconds
       public: int32_t nsec;
 
       /// \brief a singleton value of the last GetWallTime() value

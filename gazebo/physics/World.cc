@@ -124,6 +124,9 @@ World::World(const std::string &_name)
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&World::SetSelectedEntityCB, this, _1)));
+  this->connections.push_back(
+     event::Events::ConnectPause(
+       boost::bind(&World::SetPaused, this, _1)));
 }
 
 //////////////////////////////////////////////////
@@ -169,7 +172,8 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
-  this->posePub = this->node->Advertise<msgs::Pose_V>("~/pose/info", 10, 60.0);
+  this->posePub = this->node->Advertise<msgs::PosesStamped>(
+    "~/pose/info", 10, 60.0);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
   if (this->sdf->HasElement("gui"))
@@ -188,7 +192,7 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->statPub =
-    this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 10, 5);
+    this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 100, 5);
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
@@ -1763,7 +1767,10 @@ void World::ProcessMessages()
     if (this->posePub && this->posePub->HasConnections() &&
         this->publishModelPoses.size() > 0)
     {
-      msgs::Pose_V msg;
+      msgs::PosesStamped msg;
+
+      // Time stamp this PosesStamped message
+      msgs::Set(msg.mutable_time(), this->GetSimTime());
 
       for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
           iter != this->publishModelPoses.end(); ++iter)

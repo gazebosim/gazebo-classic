@@ -193,6 +193,14 @@ namespace gazebo
       /// \param[in] _data The log control message.
       private: void OnLogControl(ConstLogControlPtr &_data);
 
+      /// \brief Cleanup log recording. A thread uses this function, you
+      /// should never call this function directly. Use the Stop() function
+      /// to trigger a cleanup.
+      private: void Cleanup();
+
+      /// \brief Used to get the simulation pause state.
+      private: void OnPause(bool _pause);
+
       /// \cond
       private: class Log
       {
@@ -274,6 +282,9 @@ namespace gazebo
       /// \brief Condition used to trigger an update
       private: boost::condition_variable updateCondition;
 
+      /// \brief Used by the cleanupThread to wait for a cleanup signal.
+      private: boost::condition_variable cleanupCondition;
+
       /// \brief True if logging is running.
       private: bool running;
 
@@ -283,8 +294,17 @@ namespace gazebo
       /// \brief Thread used to update data.
       private: boost::thread *updateThread;
 
-      /// \brief Mutext to protect writing.
+      /// \brief Thread to cleanup log recording.
+      private: boost::thread cleanupThread;
+
+      /// \brief Mutex to protect against parallel calls to Write()
       private: mutable boost::mutex writeMutex;
+
+      /// \brief Mutex to synchronize with RunWrite()
+      private: mutable boost::mutex runWriteMutex;
+
+      /// \brief Mutex to synchronize with RunUpdate()
+      private: mutable boost::mutex updateMutex;
 
       /// \brief Mutex to protect logging control.
       private: boost::mutex controlMutex;
@@ -332,6 +352,12 @@ namespace gazebo
 
       /// \brief Publisher of log status messages.
       private: transport::PublisherPtr logStatusPub;
+
+      /// \brief All the event connections.
+      private: event::Connection_V connections;
+
+      /// \brief Simulation pause state.
+      private: bool pauseState;
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogRecord>;
