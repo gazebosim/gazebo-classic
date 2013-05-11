@@ -367,8 +367,9 @@ namespace gazebo
       /// \brief This is a singleton
       private: friend class SingletonT<LogRecord>;
 
-      /// \brief True if the logger is ready, and the previous run has finished.
-      private: bool ready;
+      /// \brief True if the logger is ready to start, and the previous run
+      /// has finished.
+      private: bool readyToStart;
     };
     /// \}
   }

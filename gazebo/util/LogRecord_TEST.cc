@@ -70,6 +70,26 @@ TEST(LogRecord_TEST, StartErrors)
     EXPECT_TRUE(recorder->GetRunning());
     EXPECT_FALSE(recorder->Start("bz2"));
   }
+
+  // Sleep to allow RunUpdate, RunWrite, and Cleanup threads to start
+  gazebo::common::Time::MSleep(50);
+
+  // Stop recording.
+  recorder->Stop();
+
+  // Make sure everything has reset.
+  EXPECT_FALSE(recorder->GetRunning());
+  EXPECT_FALSE(recorder->GetPaused());
+  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+
+  // Logger may still be writing so make sure we exit cleanly
+  int i = 0, iMax = 50;
+  while (!recorder->IsReadyToStart() && i < iMax)
+  {
+    gazebo::common::Time::MSleep(100);
+    i++;
+  }
+  EXPECT_LT(i, iMax);
 }
 
 /////////////////////////////////////////////////
@@ -78,8 +98,8 @@ TEST(LogRecord_TEST, Start_bzip2)
 {
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
-  recorder->Init("test");
-  recorder->Start("bz2");
+  EXPECT_TRUE(recorder->Init("test"));
+  EXPECT_TRUE(recorder->Start("bz2"));
 
   // Make sure the right flags have been set
   EXPECT_FALSE(recorder->GetPaused());
@@ -96,6 +116,9 @@ TEST(LogRecord_TEST, Start_bzip2)
   // Run time should be zero since no update has been triggered.
   EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
 
+  // Sleep to allow RunUpdate, RunWrite, and Cleanup threads to start
+  gazebo::common::Time::MSleep(50);
+
   // Stop recording.
   recorder->Stop();
 
@@ -105,13 +128,13 @@ TEST(LogRecord_TEST, Start_bzip2)
   EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
 
   // Logger may still be writing so make sure we exit cleanly
-  int i = 0;
-  while (!recorder->IsReadyToStart() && i < 50)
+  int i = 0, iMax = 50;
+  while (!recorder->IsReadyToStart() && i < iMax)
   {
     gazebo::common::Time::MSleep(100);
     i++;
   }
-  EXPECT_LT(i, 50);
+  EXPECT_LT(i, iMax);
 }
 
 /////////////////////////////////////////////////
@@ -120,8 +143,8 @@ TEST(LogRecord_TEST, Start_zlib)
 {
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
-  recorder->Init("test");
-  recorder->Start("zlib");
+  EXPECT_TRUE(recorder->Init("test"));
+  EXPECT_TRUE(recorder->Start("zlib"));
 
   // Make sure the right flags have been set
   EXPECT_FALSE(recorder->GetPaused());
@@ -138,6 +161,9 @@ TEST(LogRecord_TEST, Start_zlib)
   // Run time should be zero since no update has been triggered.
   EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
 
+  // Sleep to allow RunUpdate, RunWrite, and Cleanup threads to start
+  gazebo::common::Time::MSleep(50);
+
   // Stop recording.
   recorder->Stop();
 
@@ -147,13 +173,13 @@ TEST(LogRecord_TEST, Start_zlib)
   EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
 
   // Logger may still be writing so make sure we exit cleanly
-  int i = 0;
-  while (!recorder->IsReadyToStart() && i < 50)
+  int i = 0, iMax = 50;
+  while (!recorder->IsReadyToStart() && i < iMax)
   {
     gazebo::common::Time::MSleep(100);
     i++;
   }
-  EXPECT_LT(i, 50);
+  EXPECT_LT(i, iMax);
 }
 
 /////////////////////////////////////////////////
