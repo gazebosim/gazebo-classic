@@ -53,6 +53,7 @@ LogRecord::LogRecord()
   this->initialized = false;
   this->stopThread = false;
   this->firstUpdate = true;
+  this->ready = true;
 
   // Get the user's home directory
   // \todo getenv is not portable, and there is no generic cross-platform
@@ -105,6 +106,7 @@ bool LogRecord::Init(const std::string &_subdir)
   this->paused = false;
   this->stopThread = false;
   this->firstUpdate = true;
+  this->ready = true;
 
   return true;
 }
@@ -165,6 +167,7 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
   this->paused = false;
   this->firstUpdate = true;
   this->stopThread = false;
+  this->ready = false;
 
   this->startTime = this->currTime = common::Time();
 
@@ -780,7 +783,6 @@ void LogRecord::Cleanup()
 
   // Reset the flags
   this->paused = false;
-  this->running = false;
   this->stopThread = true;
 
   // Kick the update thread
@@ -828,4 +830,11 @@ void LogRecord::Cleanup()
   this->PublishLogStatus();
 
   event::Events::pause(currentPauseState);
+  this->ready = true;
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::GetReady() const
+{
+  return this->ready;
 }

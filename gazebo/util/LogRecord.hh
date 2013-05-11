@@ -122,6 +122,11 @@ namespace gazebo
       /// \sa LogRecord::SetPaused
       public: bool GetPaused() const;
 
+      /// \brief Get whether the logger is ready and the previous run has
+      /// finished.
+      // \return True if logger is ready
+      public: bool GetReady() const;
+
       /// \brief Get whether logging is running.
       /// \return True if logging has been started.
       public: bool GetRunning() const;
@@ -361,6 +366,9 @@ namespace gazebo
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogRecord>;
+
+      /// \brief True if the logger is ready, and the previous run has finished.
+      private: bool ready;
     };
     /// \}
   }

@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/util/LogRecord.hh"
 
@@ -73,9 +74,10 @@ TEST(LogRecord_TEST, StartErrors)
 
 /////////////////////////////////////////////////
 /// \brief Test LogRecord Init and Start
-TEST(LogRecord_TEST, Start)
+TEST(LogRecord_TEST, Start_bzip2)
 {
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
+
   recorder->Init("test");
   recorder->Start("bz2");
 
@@ -101,6 +103,57 @@ TEST(LogRecord_TEST, Start)
   EXPECT_FALSE(recorder->GetRunning());
   EXPECT_FALSE(recorder->GetPaused());
   EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+
+  // Logger may still be writing so make sure we exit cleanly
+  int i = 0;
+  while (!recorder->GetReady() && i < 50)
+  {
+    gazebo::common::Time::MSleep(100);
+    i++;
+  }
+  EXPECT_LT(i, 50);
+}
+
+/////////////////////////////////////////////////
+/// \brief Test LogRecord Init and Start
+TEST(LogRecord_TEST, Start_zlib)
+{
+  gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
+
+  recorder->Init("test");
+  recorder->Start("zlib");
+
+  // Make sure the right flags have been set
+  EXPECT_FALSE(recorder->GetPaused());
+  EXPECT_TRUE(recorder->GetRunning());
+  EXPECT_TRUE(recorder->GetFirstUpdate());
+
+  // Make sure the right encoding is set
+  EXPECT_EQ(recorder->GetEncoding(), std::string("zlib"));
+
+  // Make sure the log directories exist
+  EXPECT_TRUE(boost::filesystem::exists(recorder->GetBasePath()));
+  EXPECT_TRUE(boost::filesystem::is_directory(recorder->GetBasePath()));
+
+  // Run time should be zero since no update has been triggered.
+  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+
+  // Stop recording.
+  recorder->Stop();
+
+  // Make sure everything has reset.
+  EXPECT_FALSE(recorder->GetRunning());
+  EXPECT_FALSE(recorder->GetPaused());
+  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+
+  // Logger may still be writing so make sure we exit cleanly
+  int i = 0;
+  while (!recorder->GetReady() && i < 50)
+  {
+    gazebo::common::Time::MSleep(100);
+    i++;
+  }
+  EXPECT_LT(i, 50);
 }
 
 /////////////////////////////////////////////////
