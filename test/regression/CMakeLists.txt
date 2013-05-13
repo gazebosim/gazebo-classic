@@ -31,6 +31,7 @@ set(tests
   file_handling.cc
   imu.cc
   laser.cc
+  logrecord_stress.cc
   nondefault_world.cc
   physics.cc
   pioneer2dx.cc
