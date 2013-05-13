@@ -83,13 +83,13 @@ TEST(LogRecord_TEST, StartErrors)
   EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
 
   // Logger may still be writing so make sure we exit cleanly
-  int i = 0, iMax = 50;
-  while (!recorder->IsReadyToStart() && i < iMax)
+  int i = 0;
+  while (!recorder->IsReadyToStart())
   {
     gazebo::common::Time::MSleep(100);
-    i++;
+    if ((++i % 50) == 0)
+      gzdbg << "Waiting for recorder->IsReadyToStart()" << std::endl;
   }
-  EXPECT_LT(i, iMax);
 }
 
 /////////////////////////////////////////////////
@@ -128,13 +128,13 @@ TEST(LogRecord_TEST, Start_bzip2)
   EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
 
   // Logger may still be writing so make sure we exit cleanly
-  int i = 0, iMax = 50;
-  while (!recorder->IsReadyToStart() && i < iMax)
+  int i = 0;
+  while (!recorder->IsReadyToStart())
   {
     gazebo::common::Time::MSleep(100);
-    i++;
+    if ((++i % 50) == 0)
+      gzdbg << "Waiting for recorder->IsReadyToStart()" << std::endl;
   }
-  EXPECT_LT(i, iMax);
 }
 
 /////////////////////////////////////////////////
@@ -173,13 +173,13 @@ TEST(LogRecord_TEST, Start_zlib)
   EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
 
   // Logger may still be writing so make sure we exit cleanly
-  int i = 0, iMax = 50;
-  while (!recorder->IsReadyToStart() && i < iMax)
+  int i = 0;
+  while (!recorder->IsReadyToStart())
   {
     gazebo::common::Time::MSleep(100);
-    i++;
+    if ((++i % 50) == 0)
+      gzdbg << "Waiting for recorder->IsReadyToStart()" << std::endl;
   }
-  EXPECT_LT(i, iMax);
 }
 
 /////////////////////////////////////////////////
