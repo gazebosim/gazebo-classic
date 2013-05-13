@@ -689,7 +689,7 @@ void Actor::AddActorVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
   visualPoseSdf->Set(_pose);
   sdf::ElementPtr geomVisSdf = visualSdf->GetElement("geometry");
   sdf::ElementPtr meshSdf = geomVisSdf->GetElement("mesh");
-  meshSdf->GetElement("filename")->Set(this->skinFile);
+  meshSdf->GetElement("uri")->Set(this->skinFile);
   meshSdf->GetElement("scale")->Set(math::Vector3(this->skinScale,
       this->skinScale, this->skinScale));
 }
