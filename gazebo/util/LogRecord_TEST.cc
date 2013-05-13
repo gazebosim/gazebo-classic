@@ -71,9 +71,6 @@ TEST(LogRecord_TEST, StartErrors)
     EXPECT_FALSE(recorder->Start("bz2"));
   }
 
-  // Sleep to allow RunUpdate, RunWrite, and Cleanup threads to start
-  gazebo::common::Time::MSleep(50);
-
   // Stop recording.
   recorder->Stop();
 
@@ -116,9 +113,6 @@ TEST(LogRecord_TEST, Start_bzip2)
   // Run time should be zero since no update has been triggered.
   EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
 
-  // Sleep to allow RunUpdate, RunWrite, and Cleanup threads to start
-  gazebo::common::Time::MSleep(50);
-
   // Stop recording.
   recorder->Stop();
 
@@ -160,9 +154,6 @@ TEST(LogRecord_TEST, Start_zlib)
 
   // Run time should be zero since no update has been triggered.
   EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
-
-  // Sleep to allow RunUpdate, RunWrite, and Cleanup threads to start
-  gazebo::common::Time::MSleep(50);
 
   // Stop recording.
   recorder->Stop();

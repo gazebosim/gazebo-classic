@@ -284,6 +284,9 @@ namespace gazebo
       /// \brief Convenience iterator to the end of the log objects map.
       private: Log_M::iterator logsEnd;
 
+      /// \brief Condition used to start threads
+      private: boost::condition_variable startThreadCondition;
+
       /// \brief Condition used to trigger an update
       private: boost::condition_variable updateCondition;
 

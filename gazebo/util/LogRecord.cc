@@ -173,16 +173,26 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
 
   // Create a thread to cleanup recording.
   this->cleanupThread = boost::thread(boost::bind(&LogRecord::Cleanup, this));
+  // Wait for thread to start
+  this->startThreadCondition.wait(lock);
 
   // Start the update thread if it has not already been started
   if (!this->updateThread)
+  {
+    boost::mutex::scoped_lock updateLock(this->updateMutex);
     this->updateThread = new boost::thread(
         boost::bind(&LogRecord::RunUpdate, this));
+    this->startThreadCondition.wait(updateLock);
+  }
 
   // Start the writing thread if it has not already been started
   if (!this->writeThread)
+  {
+    boost::mutex::scoped_lock writeLock(this->runWriteMutex);
     this->writeThread = new boost::thread(
         boost::bind(&LogRecord::RunWrite, this));
+    this->startThreadCondition.wait(writeLock);
+  }
 
   return true;
 }
@@ -432,6 +442,7 @@ void LogRecord::Notify()
 void LogRecord::RunUpdate()
 {
   boost::mutex::scoped_lock updateLock(this->updateMutex);
+  this->startThreadCondition.notify_all();
 
   // This loop will write data to disk.
   while (!this->stopThread)
@@ -484,6 +495,7 @@ void LogRecord::RunWrite()
 {
   // Wait for new data.
   boost::mutex::scoped_lock lock(this->runWriteMutex);
+  this->startThreadCondition.notify_all();
 
   // This loop will write data to disk.
   while (!this->stopThread)
@@ -772,6 +784,7 @@ void LogRecord::PublishLogStatus()
 void LogRecord::Cleanup()
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
+  this->startThreadCondition.notify_all();
 
   // Wait for the cleanup signal
   this->cleanupCondition.wait(lock);
