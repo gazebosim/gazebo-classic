@@ -93,6 +93,8 @@ bool Server::ParseArgs(int argc, char **argv)
      "Specify a physics engine (ode|bullet).")
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data.")
+    ("record_encoding", po::value<std::string>()->default_value("bz2"),
+     "Compression encoding format for log data.")
     ("record_path", po::value<std::string>()->default_value(""),
      "Aboslute path in which to store state data")
     ("seed",  po::value<double>(),
@@ -166,9 +168,12 @@ bool Server::ParseArgs(int argc, char **argv)
 
   // Set the parameter to record a log file
   if (this->vm.count("record") ||
-      !this->vm["record_path"].as<std::string>().empty())
+      !this->vm["record_path"].as<std::string>().empty() ||
+      !this->vm["record_encoding"].as<std::string>().empty())
   {
     this->params["record"] = this->vm["record_path"].as<std::string>();
+    this->params["record_encoding"] =
+        this->vm["record_encoding"].as<std::string>();
   }
 
   if (this->vm.count("iters"))
@@ -505,7 +510,8 @@ void Server::ProcessParams()
     }
     else if (iter->first == "record")
     {
-      util::LogRecord::Instance()->Start("bz2", iter->second);
+      util::LogRecord::Instance()->Start(this->params["record_encoding"],
+                                         iter->second);
     }
   }
 }
