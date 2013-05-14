@@ -322,6 +322,7 @@ bool LogPlay::GetChunkData(TiXmlElement *_xml, std::string &_data)
   else if (this->encoding == "bz2")
   {
     std::string data = _xml->GetText();
+
     std::string buffer;
 
     // Decode the base64 string
@@ -375,9 +376,10 @@ void LogPlay::CalculateStepCount()
 
   while (xml)
   {
-     // fprintf(stderr, "\b\b\b\b%04lu", this->chunkCount);
-     // fflush(stdout);
+//      fprintf(stderr, "\b\b\b\b%04lu", this->chunkCount);
+//      fflush(stdout);
 
+    data.clear();
     if (this->logVersion == "1.0")
     {
       this->GetChunkData(xml, data);
