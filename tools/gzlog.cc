@@ -726,8 +726,8 @@ class ProcessChunk_TBB
 
     for (size_t i = _r.begin(); i != _r.end(); i++)
     {
-      gazebo::common::Time t1;
-      t1 = gazebo::common::Time::GetWallTime();
+//      gazebo::common::Time t1;
+//      t1 = gazebo::common::Time::GetWallTime();
 
       chunkData.clear();
       play->GetChunk(i, chunkData);
@@ -751,8 +751,8 @@ class ProcessChunk_TBB
 
       } while (startIndex < chunkSize);
 
-      gzerr << " chunk " << i << " time " <<
-          (gazebo::common::Time::GetWallTime() - t1) << std::endl;
+//      gzerr << " chunk " << i << " time " <<
+//          (gazebo::common::Time::GetWallTime() - t1) << std::endl;
     }
   }
 
