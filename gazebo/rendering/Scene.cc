@@ -2657,7 +2657,7 @@ void Scene::InitComms()
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  //boost::mutex::scoped_lock lock1(this->renderMutex);
+  // boost::mutex::scoped_lock lock1(this->renderMutex);
   boost::mutex::scoped_lock lock2(this->preRenderMutex);
   boost::mutex::scoped_lock lock(this->receiveMutex);
 

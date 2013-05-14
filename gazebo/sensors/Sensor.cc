@@ -180,7 +180,7 @@ std::string Sensor::GetScopedName() const
 {
   std::string worldName;
   if (this->world)
-    worldName = this->world->GetName(); 
+    worldName = this->world->GetName();
 
   return worldName + "::" + this->parentName + "::" + this->GetName();
 }

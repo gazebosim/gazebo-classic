@@ -646,7 +646,6 @@ void URDF2Gazebo::InsertGazeboExtensionJoint(TiXmlElement *_elem,
           physics->LinkEndChild(physicsOde);
         if (newPhysics)
           _elem->LinkEndChild(physics);
-
       }
     }
   }

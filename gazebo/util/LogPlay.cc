@@ -374,9 +374,10 @@ void LogPlay::CalculateStepCount()
 
   while (xml)
   {
-     // fprintf(stderr, "\b\b\b\b%04lu", this->chunkCount);
-     // fflush(stdout);
+      // fprintf(stderr, "\b\b\b\b%04lu", this->chunkCount);
+      // fflush(stdout);
 
+    data.clear();
     if (this->logVersion == "1.0")
     {
       this->GetChunkData(xml, data);

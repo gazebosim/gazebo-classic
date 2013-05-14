@@ -615,21 +615,25 @@ class StateFilter : public FilterBase
             // Read and parse the state information
             this->stateSdf->ClearElements();
             sdf::readString(_stateString, this->stateSdf);
-            state.Load(this->stateSdf);
 
             std::ostringstream result;
 
-            if (this->start > 0 && state.GetSimTime().Double() < this->start)
+            if (this->start > 0 &&
+                this->stateSdf->GetValueTime("sim_time").Double() < this->start)
+            {
               return std::string();
+            }
 
             if (this->hz > 0.0 && this->prevTime != gazebo::common::Time::Zero)
             {
-              if ((state.GetSimTime() - this->prevTime).Double() <
-                  1.0 / this->hz)
+              if ((this->stateSdf->GetValueTime("sim_time")
+                  - this->prevTime).Double() < 1.0 / this->hz)
               {
                 return result.str();
               }
             }
+
+            state.Load(this->stateSdf);
 
             if (this->xmlOutput)
             {
@@ -671,7 +675,7 @@ class ProcessChunk_TBB
 {
   public: ProcessChunk_TBB(gazebo::util::LogPlay *_play,
               const std::string &_filter, bool _raw,
-              const std::string &_stamp, double _hz, 
+              const std::string &_stamp, double _hz,
               double _start,
               std::vector<std::list<std::string> > *_result) : play(_play),
   filterStr(_filter), raw(_raw), stamp(_stamp), hz(_hz), start(_start),
@@ -692,26 +696,27 @@ class ProcessChunk_TBB
 
     for (size_t i = _r.begin(); i != _r.end(); i++)
     {
-      std::cerr << "Chunk[" << i << "]\n";
-      if (i < 6)
-        continue;
-
+      chunkData.clear();
       play->GetChunk(i, chunkData);
 
+      unsigned int startIndex = 0;
+      unsigned int chunkSize = chunkData.size();
       do
       {
-        startPos = chunkData.find(startMarker);
-        endPos = chunkData.find(endMarker);
+        startPos = chunkData.find(startMarker, startIndex);
+        endPos = chunkData.find(endMarker, start + startMarker.size());
+
         if (startPos == std::string::npos || endPos == std::string::npos)
           break;
 
         stepData = chunkData.substr(startPos,
             endPos + endMarker.size() - startPos);
-        chunkData.erase(0, endPos + endMarker.size());
+
+        startIndex = endPos + endMarker.size();
 
         if (!stepData.empty())
           (*this->result)[i].push_back(filter.Filter(stepData));
-      } while (chunkData.size() > 0);
+      } while (startIndex < chunkSize);
     }
   }
 
