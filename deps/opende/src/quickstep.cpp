@@ -1703,7 +1703,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
 
       // compute rhs_precon
-      computeRHSPrecon(context,m,nb,I,body,stepsize1,c,J,jb,rhs_precon);
+      if (world->qs.precon_iterations > 0)
+        computeRHSPrecon(context,m,nb,I,body,stepsize1,c,J,jb,rhs_precon);
 
 
 
