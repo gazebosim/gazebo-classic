@@ -721,7 +721,7 @@ class ProcessChunk_TBB
     size_t start = std::string::npos;
     size_t end = std::string::npos;
 
-    StateFilter filter(!this->raw, this->stamp, this ->hz);
+    StateFilter filter(!this->raw, this->stamp, this->hz);
     filter.Init(this->filterStr);
 
     for (size_t i = _r.begin(); i != _r.end(); i++)
