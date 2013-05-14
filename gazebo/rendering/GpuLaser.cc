@@ -257,6 +257,13 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
   Ogre::Pass *pass;
 
   renderSys = this->scene->GetManager()->getDestinationRenderSystem();
+
+  // Need this check. Got an error during log playback on a laptop.
+  // The laptop might not have been able to createa the material for 
+  // GPU rendering. Should look into this more.
+  if (!_material || !_material->getBestTechnique())
+    return;
+
   // Get pointer to the material pass
   pass = _material->getBestTechnique()->getPass(0);
 

@@ -70,7 +70,6 @@ LogPlay::LogPlay()
 {
   this->needsStep = false;
   this->pause = false;
-  this->chunkCount = 0;
   this->segmentCount = 0;
   this->chunkCount = 0;
   this->logStartXml = NULL;

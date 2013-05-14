@@ -591,9 +591,9 @@ class StateFilter : public FilterBase
   /// \brief Constructor
   /// \param[in] _xmlOutput True to format output as XML
   public: StateFilter(bool _xmlOutput, const std::string &_stamp,
-              double _hz = 0)
+              double _hz = 0, double _start = -1)
           : FilterBase(_xmlOutput, _stamp), filter(_xmlOutput, _stamp),
-          hz(_hz)
+          hz(_hz), start(_start)
           {
             this->stateSdf.reset(new sdf::Element);
             sdf::initFile("state.sdf", this->stateSdf);
@@ -618,6 +618,9 @@ class StateFilter : public FilterBase
             state.Load(this->stateSdf);
 
             std::ostringstream result;
+
+            if (this->start > 0 && state.GetSimTime().Double() < this->start)
+              return std::string();
 
             if (this->hz > 0.0 && this->prevTime != gazebo::common::Time::Zero)
             {
@@ -657,6 +660,9 @@ class StateFilter : public FilterBase
 
   /// \brief State sdf element
   private: mutable sdf::ElementPtr stateSdf;
+
+  /// \brief Start time
+  private: double start;
 };
 
 /////////////////////////////////////////////////
@@ -666,8 +672,10 @@ class ProcessChunk_TBB
   public: ProcessChunk_TBB(gazebo::util::LogPlay *_play,
               const std::string &_filter, bool _raw,
               const std::string &_stamp, double _hz, 
+              double _start,
               std::vector<std::list<std::string> > *_result) : play(_play),
-  filterStr(_filter), raw(_raw), stamp(_stamp), hz(_hz), result(_result)
+  filterStr(_filter), raw(_raw), stamp(_stamp), hz(_hz), start(_start),
+  result(_result)
   {
   }
 
@@ -676,25 +684,30 @@ class ProcessChunk_TBB
     std::string chunkData, stepData;
     std::string startMarker = "<sdf ";
     std::string endMarker = "</sdf>";
-    size_t start = std::string::npos;
-    size_t end = std::string::npos;
+    size_t startPos = std::string::npos;
+    size_t endPos = std::string::npos;
 
-    StateFilter filter(!this->raw, this->stamp, this->hz);
+    StateFilter filter(!this->raw, this->stamp, this->hz, this->start);
     filter.Init(this->filterStr);
 
     for (size_t i = _r.begin(); i != _r.end(); i++)
     {
+      std::cerr << "Chunk[" << i << "]\n";
+      if (i < 6)
+        continue;
+
       play->GetChunk(i, chunkData);
 
       do
       {
-        start = chunkData.find(startMarker);
-        end = chunkData.find(endMarker);
-        if (start == std::string::npos || end == std::string::npos)
+        startPos = chunkData.find(startMarker);
+        endPos = chunkData.find(endMarker);
+        if (startPos == std::string::npos || endPos == std::string::npos)
           break;
 
-        stepData = chunkData.substr(start, end+endMarker.size() - start);
-        chunkData.erase(0, end + endMarker.size());
+        stepData = chunkData.substr(startPos,
+            endPos + endMarker.size() - startPos);
+        chunkData.erase(0, endPos + endMarker.size());
 
         if (!stepData.empty())
           (*this->result)[i].push_back(filter.Filter(stepData));
@@ -708,6 +721,7 @@ class ProcessChunk_TBB
   private: bool raw;
   private: std::string stamp;
   private: double hz;
+  private: double start;
   private: std::vector<std::list<std::string> > *result;
 };
 
@@ -922,7 +936,7 @@ int info(const std::string &_filename)
 /// \brief Dump the contents of a log file to screen
 /// \param[in] _filter Filter string
 int echo(const std::string &_filename, const std::string &_filter, bool _raw,
-    const std::string &_stamp, double _hz)
+    const std::string &_stamp, double _hz, double _start)
 {
   if (_filename.empty())
   {
@@ -942,10 +956,14 @@ int echo(const std::string &_filename, const std::string &_filter, bool _raw,
     std::cout << play->GetHeader() << std::endl;
 
   std::vector<std::list<std::string> > result;
-  result.resize(play->GetChunkCount());
+  uint64_t chunkCount = play->GetChunkCount();
+  int numThreads = 4;
+  result.resize(chunkCount);
 
-  tbb::parallel_for(tbb::blocked_range<size_t>(1, play->GetChunkCount()-1, 4),
-      ProcessChunk_TBB(play, _filter, _raw, _stamp, _hz, &result));
+  // Run on multiple threads.
+  tbb::parallel_for(tbb::blocked_range<size_t>(
+        1, chunkCount, chunkCount/numThreads),
+      ProcessChunk_TBB(play, _filter, _raw, _stamp, _hz, _start, &result));
 
   // Get the first step, which is the world definition
   play->Step(stateString);
@@ -1131,6 +1149,7 @@ int main(int argc, char **argv)
   visibleOptions.add_options()
     ("help,h", "Output this help message.")
     ("raw,r", "Output the data from echo and step without XML formatting.")
+    ("start", po::value<double>(), "Start time.")
     ("stamp,s", po::value<std::string>(), "Add a timestamp to each line of "
      "output. Valid values are (sim,real,wall)")
     ("hz,z", po::value<double>(), "Filter output to the specified Hz rate.\
@@ -1196,13 +1215,17 @@ int main(int argc, char **argv)
   if (vm.count("hz"))
     hz = vm["hz"].as<double>();
 
+  double start = -1;
+  if (vm.count("start"))
+    start = vm["start"].as<double>();
+
   int result = 0;
 
   // Process the command
   if (command == "info")
     result = info(filename);
   else if (command == "echo")
-    result = echo(filename, filter, vm.count("raw"), stamp, hz);
+    result = echo(filename, filter, vm.count("raw"), stamp, hz, start);
   else if (command == "step")
     result = step(filename, filter, vm.count("raw"), stamp, hz);
   else if (command == "start")
