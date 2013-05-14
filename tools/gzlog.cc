@@ -257,7 +257,6 @@ class JointFilter : public FilterBase
   /// \return Filtered string.
   public: std::string Filter(gazebo::physics::ModelState &_state) const
           {
-            gzerr << " joint state filter " << std::endl;
             std::ostringstream result;
 
             gazebo::physics::JointState_M states;
@@ -369,7 +368,6 @@ class LinkFilter : public FilterBase
   /// \return Filtered string.
   public: std::string Filter(gazebo::physics::ModelState &_state) const
           {
-//            gzerr << " link state filter " << std::endl;
             std::ostringstream result;
 
             gazebo::physics::LinkState_M states;
@@ -523,7 +521,6 @@ class ModelFilter : public FilterBase
   /// \return Filtered string.
   public: std::string Filter(gazebo::physics::WorldState &_state) const
           {
-//            gzerr << " model state filter " << std::endl;
             std::ostringstream result;
 
             gazebo::physics::ModelState_M states;
@@ -613,7 +610,6 @@ class StateFilter : public FilterBase
   /// \param[in] _stateString The string to filter.
   public: std::string Filter(const std::string &_stateString) const
           {
-//            gzerr << " world state filter " << std::endl;
             gazebo::physics::WorldState state;
 
             // Read and parse the state information
@@ -632,15 +628,7 @@ class StateFilter : public FilterBase
               }
             }
 
-
-//            gazebo::common::Time t1;
-
-//            t1 = gazebo::common::Time::GetWallTime();
             state.Load(this->stateSdf);
-//            gzerr << " load time  " << (gazebo::common::Time::GetWallTime() - t1)
-//                << " for size " << _stateString.size() << std::endl;
-
-            gzerr << " sim time " << state.GetSimTime() << std::endl;
 
             if (this->xmlOutput)
             {
@@ -651,10 +639,7 @@ class StateFilter : public FilterBase
                 << "<wall_time>" << state.GetWallTime() << "</wall_time>\n";
             }
 
-//            t1 = gazebo::common::Time::GetWallTime();
             result << this->filter.Filter(state);
-//            gzerr << " filter time " << (gazebo::common::Time::GetWallTime() - t1)
-//                 << std::endl;
 
             if (this->xmlOutput)
               result << "</sdf></state>\n";
@@ -688,6 +673,8 @@ class ProcessChunk_TBB
   {
   }
 
+  // old code
+  /*
   public: void operator() (const tbb::blocked_range<size_t> &_r) const
   {
     std::string chunkData, stepData;
@@ -695,54 +682,36 @@ class ProcessChunk_TBB
     std::string endMarker = "</sdf>";
     size_t start = std::string::npos;
     size_t end = std::string::npos;
-
-
     StateFilter filter(!this->raw, this->stamp, this ->hz);
-
     filter.Init(this->filterStr);
-
-
-
     for (size_t i = _r.begin(); i != _r.end(); i++)
     {
-
-      gazebo::common::Time t1;
-      t1 = gazebo::common::Time::GetWallTime();
+      // gazebo::common::Time t1;
+      // t1 = gazebo::common::Time::GetWallTime();
 
       play->GetChunk(i, chunkData);
 
       do
       {
-//        gazebo::common::Time t1;
-//       t1 = gazebo::common::Time::GetWallTime();
-
         start = chunkData.find(startMarker);
         end = chunkData.find(endMarker, start + startMarker.size());
         if (start == std::string::npos || end == std::string::npos)
           break;
 
-//       t1 = gazebo::common::Time::GetWallTime();
         stepData = chunkData.substr(start, end+endMarker.size() - start);
-
-//        gzerr << stepData << std::endl;
-
-//       t1 = gazebo::common::Time::GetWallTime();
         chunkData.erase(0, end + endMarker.size());
 
         if (!stepData.empty())
         {
-
-//       t1 = gazebo::common::Time::GetWallTime();
           (*this->result)[i].push_back(filter.Filter(stepData));
         }
-
-//        gzerr << " while loop time  " << (gazebo::common::Time::GetWallTime() - t1) << std::endl;;
-
       } while (chunkData.size() > 0);
 
-      gzerr << " chunk " << i << " time " << (gazebo::common::Time::GetWallTime() - t1) << std::endl;
+      // gzerr << " chunk " << i << " time " <<
+      //    (gazebo::common::Time::GetWallTime() - t1) << std::endl;
     }
-  }
+  }*/
+
 
   public: void operator() (const tbb::blocked_range<size_t> &_r) const
   {
@@ -759,7 +728,6 @@ class ProcessChunk_TBB
     {
       gazebo::common::Time t1;
       t1 = gazebo::common::Time::GetWallTime();
-
 
       chunkData.clear();
       play->GetChunk(i, chunkData);
@@ -768,40 +736,23 @@ class ProcessChunk_TBB
       unsigned int chunkSize = chunkData.size();
       do
       {
-//  gazebo::common::Time t1;
-//  t1 = gazebo::common::Time::GetWallTime();
-
         start = chunkData.find(startMarker, startIndex);
         end = chunkData.find(endMarker, start + startMarker.size());
-
-//  gzerr << " find time  " << (gazebo::common::Time::GetWallTime() - t1) << std::endl;;
 
         if (start == std::string::npos || end == std::string::npos)
           break;
 
-//  t1 = gazebo::common::Time::GetWallTime();
-
         stepData = chunkData.substr(start, end+endMarker.size() - start);
 
-//  gzerr << " substr time  " << (gazebo::common::Time::GetWallTime() - t1) << std::endl;;
-
-  //t1 = gazebo::common::Time::GetWallTime();
-  //      chunkData.erase(0, end + endMarker.size());
-  //gzerr << " erase time  " << (gazebo::common::Time::GetWallTime() - t1) << std::endl;;
         startIndex = end + endMarker.size();
 
         if (!stepData.empty())
-        {
-
-// t1 = gazebo::common::Time::GetWallTime();
           (*this->result)[i].push_back(filter.Filter(stepData));
-//  gzerr << " filter time  " << (gazebo::common::Time::GetWallTime() - t1) << std::endl;;
-        }
 
-//      } while (chunkData.size() > 0);
       } while (startIndex < chunkSize);
 
-      gzerr << " chunk " << i << " time " << (gazebo::common::Time::GetWallTime() - t1) << std::endl;
+      gzerr << " chunk " << i << " time " <<
+          (gazebo::common::Time::GetWallTime() - t1) << std::endl;
     }
   }
 
