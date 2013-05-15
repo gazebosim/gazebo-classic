@@ -257,7 +257,7 @@ class ServerFixture : public testing::Test
                return this->percentRealTime;
              }
 
-  protected: void OnPose(ConstPose_VPtr &_msg)
+  protected: void OnPose(ConstPosesStampedPtr &_msg)
              {
                boost::mutex::scoped_lock lock(this->receiveMutex);
                for (int i = 0; i < _msg->pose_size(); ++i)
