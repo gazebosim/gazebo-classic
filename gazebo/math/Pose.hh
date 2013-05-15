@@ -101,6 +101,9 @@ namespace gazebo
       public: Pose GetInverse() const;
 
       /// \brief Addition operator
+      /// A is the transform from O to P specified in frame O
+      /// B is the transform from P to Q specified in frame P
+      /// then, B + A is the transform from O to Q specified in frame O
       /// \param[in] _pose Pose to add to this pose
       /// \return The resulting pose
       public: Pose operator+(const Pose &_pose) const;
@@ -111,6 +114,8 @@ namespace gazebo
       public: const Pose &operator+=(const Pose &_pose);
 
       /// \brief Negation operator
+      /// A is the transform from O to P in frame O
+      /// then -A is transform from P to O specified in frame P
       /// \return The resulting pose
       public: inline Pose operator-() const
               {
@@ -118,6 +123,9 @@ namespace gazebo
               }
 
       /// \brief Subtraction operator
+      /// A is the transform from O to P in frame O
+      /// B is the transform from O to Q in frame O
+      /// B - A is the transform from P to Q in frame P
       /// \param[in] _pose Pose to subtract from this one
       /// \return The resulting pose
       public: inline Pose operator-(const Pose &_pose) const

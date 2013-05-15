@@ -386,6 +386,7 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
       }
       else if (childElem->ValueStr() == "provideFeedback")
       {
+          gazebo->isProvideFeedback = true;
           std::string valueStr = this->GetKeyValueAsString(childElem);
 
           if (lowerStr(valueStr) == "true" || lowerStr(valueStr) == "yes" ||
@@ -396,6 +397,7 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
       }
       else if (childElem->ValueStr() == "cfmDamping")
       {
+          gazebo->isCFMDamping = true;
           std::string valueStr = this->GetKeyValueAsString(childElem);
 
           if (lowerStr(valueStr) == "true" || lowerStr(valueStr) == "yes" ||
@@ -576,9 +578,30 @@ void URDF2Gazebo::InsertGazeboExtensionJoint(TiXmlElement *_elem,
            ge = gazeboIt->second.begin();
            ge != gazeboIt->second.end(); ++ge)
       {
-        TiXmlElement *physics     = new TiXmlElement("physics");
-        TiXmlElement *physicsOde = new TiXmlElement("ode");
-        TiXmlElement *limit       = new TiXmlElement("limit");
+        TiXmlElement *physics = _elem->FirstChildElement("physics");
+        bool newPhysics = false;
+        if (physics == NULL)
+        {
+          physics = new TiXmlElement("physics");
+          newPhysics = true;
+        }
+
+        TiXmlElement *physicsOde = physics->FirstChildElement("ode");
+        bool newPhysicsOde = false;
+        if (physicsOde == NULL)
+        {
+          physicsOde = new TiXmlElement("ode");
+          newPhysicsOde = true;
+        }
+
+        TiXmlElement *limit = physicsOde->FirstChildElement("limit");
+        bool newLimit = false;
+        if (limit == NULL)
+        {
+          limit = new TiXmlElement("limit");
+          newLimit = true;
+        }
+
         // insert stopCfm, stopErp, fudgeFactor
         if ((*ge)->isStopCfm)
         {
@@ -595,25 +618,34 @@ void URDF2Gazebo::InsertGazeboExtensionJoint(TiXmlElement *_elem,
         */
 
         // insert provideFeedback
-        if ((*ge)->provideFeedback)
-            this->AddKeyValue(physicsOde, "provide_feedback", "true");
-        else
-            this->AddKeyValue(physicsOde, "provide_feedback", "false");
+        if ((*ge)->isProvideFeedback)
+        {
+          if ((*ge)->provideFeedback)
+              this->AddKeyValue(physicsOde, "provide_feedback", "true");
+          else
+              this->AddKeyValue(physicsOde, "provide_feedback", "false");
+        }
 
         // insert cfmDamping
-        if ((*ge)->cfmDamping)
-            this->AddKeyValue(physicsOde, "cfm_damping", "true");
-        else
-            this->AddKeyValue(physicsOde, "cfm_damping", "false");
+        if ((*ge)->isCFMDamping)
+        {
+          if ((*ge)->cfmDamping)
+              this->AddKeyValue(physicsOde, "cfm_damping", "true");
+          else
+              this->AddKeyValue(physicsOde, "cfm_damping", "false");
+        }
 
         // insert fudgeFactor
         if ((*ge)->isFudgeFactor)
           this->AddKeyValue(physicsOde, "fudge_factor",
                       this->Values2str(1, &(*ge)->fudgeFactor));
 
-        physics->LinkEndChild(physicsOde);
-        physicsOde->LinkEndChild(limit);
-        _elem->LinkEndChild(physics);
+        if (newLimit)
+          physicsOde->LinkEndChild(limit);
+        if (newPhysicsOde)
+          physics->LinkEndChild(physicsOde);
+        if (newPhysics)
+          _elem->LinkEndChild(physics);
       }
     }
   }
