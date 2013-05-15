@@ -1134,56 +1134,65 @@ static void SOR_LCP (dxWorldProcessContext *context,
   // recompute Ad for preconditioned case, Ad_precon is similar to Ad but
   //   whereas Ad is 1 over diagonals of J inv(M) J'
   //    Ad_precon is 1 over diagonals of J J'
-  dReal *Ad_precon = context->AllocateArray<dReal> (m);
-
+  dReal *Adcfm_precon = NULL;
+  if (qs->precon_iterations > 0)
   {
-    const dReal sor_w = qs->w;    // SOR over-relaxation parameter
-    // precompute 1 / diagonals of A
-    // preconditioned version uses J instead of iMJ
-    dRealPtr J_ptr = J;
-    for (int i=0; i<m; J_ptr += 12, i++) {
-      dReal sum = 0;
-      for (int j=0; j<6; j++) sum += J_ptr[j] * J_ptr[j];
-      if (jb[i*2+1] >= 0) {
-        for (int k=6; k<12; k++) sum += J_ptr[k] * J_ptr[k];
+    dReal *Ad_precon = context->AllocateArray<dReal> (m);
+
+    {
+      const dReal sor_w = qs->w;    // SOR over-relaxation parameter
+      // precompute 1 / diagonals of A
+      // preconditioned version uses J instead of iMJ
+      dRealPtr J_ptr = J;
+      for (int i=0; i<m; J_ptr += 12, i++) {
+        dReal sum = 0;
+        for (int j=0; j<6; j++) sum += J_ptr[j] * J_ptr[j];
+        if (jb[i*2+1] >= 0) {
+          for (int k=6; k<12; k++) sum += J_ptr[k] * J_ptr[k];
+        }
+        if (findex[i] < 0)
+          Ad_precon[i] = sor_w / (sum + cfm[i]);
+        else
+          Ad_precon[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
       }
-      if (findex[i] < 0)
-        Ad_precon[i] = sor_w / (sum + cfm[i]);
-      else
-        Ad_precon[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
+    }
+
+    /********************************/
+    /* allocate for Adcfm           */
+    /* which is a mX1 column vector */
+    /********************************/
+    // compute Adcfm_precon for the preconditioned case
+    //   do this first before J gets altered (J's diagonals gets premultiplied by Ad)
+    //   and save a copy of J into J_orig
+    //   as J becomes J * Ad, J_precon becomes J * Ad_precon
+    Adcfm_precon = context->AllocateArray<dReal> (m);
+    {
+
+      // NOTE: This may seem unnecessary but it's indeed an optimization
+      // to move multiplication by Ad[i] and cfm[i] out of iteration loop.
+
+      // scale J_precon and rhs_precon by Ad
+      dRealMutablePtr J_ptr = J;
+      dRealMutablePtr J_precon_ptr = J_precon;
+      for (int i=0; i<m; J_ptr += 12, J_precon_ptr += 12, i++) {
+        dReal Ad_precon_i = Ad_precon[i];
+        for (int j=0; j<12; j++) {
+          J_precon_ptr[j] = J_ptr[j] * Ad_precon_i;
+        }
+        rhs_precon[i] *= Ad_precon_i;
+        // scale Ad by CFM. N.B. this should be done last since it is used above
+        Adcfm_precon[i] = Ad_precon_i * cfm[i];
+      }
     }
   }
 
-  /********************************/
-  /* allocate for Adcfm           */
-  /* which is a mX1 column vector */
-  /********************************/
-  // compute Adcfm_precon for the preconditioned case
-  //   do this first before J gets altered (J's diagonals gets premultiplied by Ad)
-  //   and save a copy of J into J_orig
-  //   as J becomes J * Ad, J_precon becomes J * Ad_precon
-  dReal *Adcfm_precon = context->AllocateArray<dReal> (m);
-
-
   {
-    // NOTE: This may seem unnecessary but it's indeed an optimization
-    // to move multiplication by Ad[i] and cfm[i] out of iteration loop.
-
-    // scale J_precon and rhs_precon by Ad
     // copy J_orig
     dRealMutablePtr J_ptr = J;
-    dRealMutablePtr J_precon_ptr = J_precon;
     dRealMutablePtr J_orig_ptr = J_orig;
-    for (int i=0; i<m; J_ptr += 12, J_precon_ptr += 12, J_orig_ptr += 12, i++) {
-      dReal Ad_precon_i = Ad_precon[i];
-      for (int j=0; j<12; j++) {
-        J_precon_ptr[j] = J_ptr[j] * Ad_precon_i;
+    for (int i=0; i<m; J_ptr += 12,  J_orig_ptr += 12, i++)
+      for (int j=0; j<12; j++)
         J_orig_ptr[j] = J_ptr[j]; //copy J
-      }
-      rhs_precon[i] *= Ad_precon_i;
-      // scale Ad by CFM. N.B. this should be done last since it is used above
-      Adcfm_precon[i] = Ad_precon_i * cfm[i];
-    }
   }
 
   dReal *Adcfm = context->AllocateArray<dReal> (m);
