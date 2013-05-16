@@ -76,14 +76,15 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
   {
     Eigen::Matrix4d matChildLink;
     Eigen::Matrix4d matChildLinkToJoint;
-    Eigen::Matrix4d matParentLinkToJoint;
 
     DARTUtils::ConvPoseToMat(&matChildLink, this->childLink->GetWorldPose());
     DARTUtils::ConvPoseToMat(&matChildLinkToJoint, this->poseChildLinkToJoint);
+    matJointToChildLink = matChildLinkToJoint.inverse();
 
     matParentLinkToJoint = matChildLink * matChildLinkToJoint;
 
     DARTUtils::ConvMatToPose(&poseParentLinkToJoint, matParentLinkToJoint);
+    DARTUtils::ConvMatToPose(&poseJointToChildLink, matJointToChildLink);
   }
   else
   {
@@ -91,18 +92,19 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
     Eigen::Matrix4d matParentLinkInv;
     Eigen::Matrix4d matChildLink;
     Eigen::Matrix4d matChildLinkToJoint;
-    Eigen::Matrix4d matParentLinkToJoint;
 
     DARTUtils::ConvPoseToMat(&matParentLink, this->parentLink->GetWorldPose());
     matParentLinkInv = matParentLink.inverse();
     DARTUtils::ConvPoseToMat(&matChildLink, this->childLink->GetWorldPose());
     DARTUtils::ConvPoseToMat(&matChildLinkToJoint, this->poseChildLinkToJoint);
+    matJointToChildLink = matChildLinkToJoint.inverse();
 
     matParentLinkToJoint = matParentLinkInv
                            * matChildLink
                            * matChildLinkToJoint;
 
     DARTUtils::ConvMatToPose(&poseParentLinkToJoint, matParentLinkToJoint);
+    DARTUtils::ConvMatToPose(&poseJointToChildLink, matJointToChildLink);
   }
 
 //  if (_sdf->GetElement("parent")->GetValueString("link_name") == std::string("world"))
@@ -158,7 +160,7 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
   //----------------------------------------------------------------------------
   // Step 3. Transformation from rotated joint frame to child link frame.
   //----------------------------------------------------------------------------
-  poseJointToChildLink = poseChildLinkToJoint.GetInverse();
+  //poseJointToChildLink = poseChildLinkToJoint.GetInverse();
 
   DARTUtils::AddTransformToDARTJoint(this->dartJoint, poseParentLinkToJoint);
 
@@ -207,23 +209,24 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
 {
   // Axis in local frame of this joint
   Eigen::Vector3d localAxis_Eigen = rotHinge->getAxis();
+  Eigen::Vector3d globalAxis_Eigen;
+
   math::Vector3 localAxis(localAxis_Eigen.x(), localAxis_Eigen.y(), localAxis_Eigen.z());
   math::Vector3 globalAxis;
+  Eigen::Matrix4d worldToJointTransform = Eigen::Matrix4d::Identity();
 
   if (this->parentLink)
   {
-    math::Pose worldPoseOfParentLink = this->parentLink->GetWorldPose();
-    globalAxis = worldPoseOfParentLink.rot * localAxis;
+    worldToJointTransform = dartJoint->getParentNode()->getWorldTransform();
   }
-  else
-  {
-    globalAxis = localAxis;
-  }
+  worldToJointTransform = worldToJointTransform * matParentLinkToJoint;
+  globalAxis_Eigen = worldToJointTransform.topLeftCorner<3,3>() * localAxis_Eigen;
+  globalAxis.Set(globalAxis_Eigen(0), globalAxis_Eigen(1), globalAxis_Eigen(2));
 
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
-  //return globalAxis;
-  return this->poseParentLinkToJoint.rot * localAxis;
+  return globalAxis;
+  //return this->poseParentLinkToJoint.rot * localAxis;
 }
 
 //////////////////////////////////////////////////
@@ -236,7 +239,7 @@ void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
   //math::Pose childWorldPose = this->childLink->GetWorldPose();
   //math::Pose jointFrameInWorld = childWorldPose * this->poseChildLinkToJoint;
   //math::Vector3 axisInJointFrame = (jointFrameInWorld.rot.GetInverse()) * _axis;
-  math::Vector3 axisInJointFrame;
+  Eigen::Vector3d axisInJointFrame;
   //  if (this->sdf->GetElement("parent")->GetValueString("link_name")
   //      == std::string("world"))
   //  {
@@ -245,12 +248,40 @@ void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
   //  }
   //  else
   //  {
-  axisInJointFrame = this->poseParentLinkToJoint.rot.GetInverse() * _axis;
+  //axisInJointFrame = this->poseParentLinkToJoint.rot.GetInverse() * _axis;
   //  }
 
-  rotHinge->setAxis(Eigen::Vector3d(axisInJointFrame.x,
-                                    axisInJointFrame.y,
-                                    axisInJointFrame.z));
+
+  Eigen::Matrix4d matParentLink = Eigen::Matrix4d::Identity();
+  Eigen::Matrix3d rot;
+
+  if (parentLink)
+  {
+    DARTUtils::ConvPoseToMat(&matParentLink, this->parentLink->GetWorldPose());
+  }
+  else
+  {
+
+  }
+
+
+
+  rot = matParentLink.topLeftCorner<3,3>().transpose();
+
+  Eigen::Vector3d axis;
+  axis(0) = _axis[0];
+  axis(1) = _axis[1];
+  axis(2) = _axis[2];
+
+
+  axisInJointFrame = rot * axis;
+
+//  axis(0) = 1;
+//  axis(1) = 0;
+//  axis(2) = 0;
+//  axisInJointFrame = axis;
+
+  rotHinge->setAxis(axisInJointFrame);
 
   // At some point, we need to change blow code.
   //rotHinge->setAxis(Eigen::Vector3d(_axis.x, _axis.y, _axis.z));
@@ -292,11 +323,11 @@ math::Angle DARTHingeJoint::GetAngleImpl(int /*index*/) const
 //////////////////////////////////////////////////
 double DARTHingeJoint::GetVelocity(int /*index*/) const
 {
-  //   double result = dJointGetHingeAngleRate(this->jointId);
-  //
-  //   return result;
-  gzwarn << "DARTHingeJoint::GetVelocity(...): Not implemented...\n";
-  return 0;
+  double result;
+
+  result = this->dartJoint->getDof(0)->dq;
+
+  return result;
 }
 
 //////////////////////////////////////////////////

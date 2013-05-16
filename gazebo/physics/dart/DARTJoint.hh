@@ -20,6 +20,7 @@
 
 #include <boost/any.hpp>
 #include <string>
+#include <Eigen/Dense>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Joint.hh"
@@ -32,6 +33,9 @@ namespace gazebo
     /// \brief DART joint interface
     class DARTJoint : public Joint
     {
+      /// \brief
+      public: EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
       /// \brief Constructor.
       /// \param[in] _parent Parent of the Joint.
       public: DARTJoint(BasePtr _parent);
@@ -121,6 +125,12 @@ namespace gazebo
 
       /// \brief
       protected: math::Pose poseJointToChildLink;
+
+      /// \brief
+      Eigen::Matrix4d matParentLinkToJoint;
+
+      /// \brief
+      Eigen::Matrix4d matJointToChildLink;
     };
   }
 }

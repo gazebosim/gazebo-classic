@@ -10,7 +10,7 @@
         <!--include><uri>model://ground_plane</uri></include-->
         <!-- 25.3kg total mass -->
         <model name="double_pendulum_1">
-            <pose>0 0 1 0 0 0</pose>
+            <pose>0 0 1 0 0 -0.7854</pose>
             <link name="link1">
                 <pose>0 1 0 0 0 0</pose>
                 <inertial>
