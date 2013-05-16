@@ -507,7 +507,7 @@ bool Connection::Read(std::string &data)
   }
 
   // Parse the header to get the size of the incoming data packet
-  incoming_size = this->ParseHeader(header);
+  incoming_size = this->ParseHeader(std::string(header, HEADER_LENGTH));
   if (incoming_size > 0)
   {
     incoming.resize(incoming_size);
