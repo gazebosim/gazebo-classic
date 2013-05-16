@@ -153,6 +153,8 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   this->lastRenderWallTime = common::Time::GetWallTime();
 
+  this->displayClouds = true;
+
   // Set default render rate to unlimited
   this->SetRenderRate(0.0);
 }
@@ -282,6 +284,7 @@ void Camera::Fini()
       this->gaussianNoiseCompositorListener.get());
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
   this->renderTarget->removeAllViewports();
+
   this->connections.clear();
 }
 
@@ -389,10 +392,19 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
+    // FIXME: Disable clouds in offscreen rendering for now until they can
+    // be rendered properly
+    this->displayClouds = this->GetScene()->GetShowClouds();
+
+    if (this->renderTexture)
+      this->GetScene()->ShowClouds(false);
+
     // Render, but don't swap buffers.
     this->renderTarget->update(false);
-
     this->lastRenderWallTime = common::Time::GetWallTime();
+
+    if (this->renderTexture)
+      this->GetScene()->ShowClouds(this->displayClouds);
   }
 }
 
@@ -409,6 +421,9 @@ void Camera::PostRender()
 
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
+    if (this->renderTexture)
+      this->GetScene()->ShowClouds(false);
+
     size_t size;
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
@@ -498,6 +513,9 @@ void Camera::PostRender()
 
     this->newImageFrame(buffer, width, height, this->GetImageDepth(),
                     this->GetImageFormat());
+
+    if (this->renderTexture)
+      this->GetScene()->ShowClouds(this->displayClouds);
   }
 
   this->newData = false;

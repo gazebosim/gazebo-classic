@@ -13,14 +13,15 @@ add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
 add_subdirectory(building)
+add_subdirectory(terrain)
 add_subdirectory(viewers)
 
 set (sources
-  ../gazebo.cc
   Actions.cc
   BoxMaker.cc
   CylinderMaker.cc
   DataLogger.cc
+  Editor.cc
   EntityMaker.cc
   RenderWidget.cc
   GLWidget.cc
@@ -35,6 +36,7 @@ set (sources
   ModelListWidget.cc
   ModelMaker.cc
   ModelRightMenu.cc
+  MouseEventHandler.cc
   SphereMaker.cc
   TimePanel.cc
   ToolsWidget.cc
@@ -44,6 +46,7 @@ set (sources
 set (qt_headers
   Actions.hh
   DataLogger.hh
+  Editor.hh
   GLWidget.hh
   InsertModelWidget.hh
   JointControlWidget.hh
@@ -67,6 +70,7 @@ set (headers
   GuiEvents.hh
   LightMaker.hh
   MeshMaker.hh
+  MouseEventHandler.hh
   ModelMaker.hh
   SphereMaker.hh
 )
@@ -108,9 +112,11 @@ target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_rendering
                                  gazebo_sensors
                                  gazebo_msgs
-                                 gazebo_building
+                                 gazebo_gui_building
+                                 gazebo_gui_terrain
                                  gazebo_gui_viewers
                                  gzqtpropertybrowser
+                                 libgazebo
                                  ${QT_LIBRARIES}
                                  ${ogre_libraries}
                                  ${Boost_LIBRARIES}
@@ -122,9 +128,11 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_rendering
                                 gazebo_sensors
                                 gazebo_msgs
-                                gazebo_building
+                                gazebo_gui_building
+                                gazebo_gui_terrain
                                 gazebo_gui_viewers
                                 gzqtpropertybrowser
+                                libgazebo
                                 ${QT_LIBRARIES}
                                 ${ogre_libraries}
                                 ${Boost_LIBRARIES}
@@ -132,6 +140,13 @@ target_link_libraries(gzclient  gazebo_common
 
 add_definitions(${QT_DEFINITIONS})
 
+set (gui_headers "" CACHE INTERNAL "gui headers" FORCE)
+foreach (hdr ${headers})
+  APPEND_TO_CACHED_STRING(gui_headers
+    "GUI Headers" "#include \"gui/${hdr}\"\n")
+endforeach()
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR}/gui.hh )
+
 gz_install_library(gazebo_gui)
-gz_install_includes("gui" ${headers})
+gz_install_includes("gui" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)

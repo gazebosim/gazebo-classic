@@ -118,6 +118,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   modelPos["test_sphere"] = math::Vector3(4, 0, z0);
   modelPos["test_cylinder"] = math::Vector3(8, 0, z0);
   modelPos["test_empty"] = math::Vector3(12, 0, z0);
+  modelPos["link_offset_box"] = math::Vector3(0, 0, z0);
 
   // FIXME Trimesh drop test passes in bullet but fails in ode because
   // the mesh bounces to the side when it hits the ground.
@@ -130,6 +131,40 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
       math::Vector3::Zero);
   SpawnEmptyLink("test_empty", modelPos["test_empty"], math::Vector3::Zero);
+
+  std::ostringstream linkOffsetStream;
+  math::Pose linkOffsetPose1(0, 0, z0, 0, 0, 0);
+  math::Pose linkOffsetPose2(1000, 1000, 0, 0, 0, 0);
+  math::Vector3 linkOffsetSize(1, 1, 1);
+  linkOffsetStream << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='link_offset_box'>"
+    << "<pose>" << linkOffsetPose1 << "</pose>"
+    << "<allow_auto_disable>false</allow_auto_disable>"
+    << "<link name ='body'>"
+    << "  <pose>" << linkOffsetPose2 << "</pose>"
+    << "  <inertial>"
+    << "    <mass>4.0</mass>"
+    << "    <inertia>"
+    << "      <ixx>0.1667</ixx> <ixy>0.0</ixy> <ixz>0.0</ixz>"
+    << "      <iyy>0.1667</iyy> <iyz>0.0</iyz>"
+    << "      <izz>0.1667</izz>"
+    << "    </inertia>"
+    << "  </inertial>"
+    << "  <collision name ='geom'>"
+    << "    <geometry>"
+    << "      <box><size>" << linkOffsetSize << "</size></box>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << "      <box><size>" << linkOffsetSize << "</size></box>"
+    << "    </geometry>"
+    << "  </visual>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+  SpawnSDF(linkOffsetStream.str());
+
   // std::string trimeshPath =
   //    "file://media/models/cube_20k/meshes/cube_20k.stl";
   // SpawnTrimesh("test_trimesh", trimeshPath, math::Vector3(0.5, 0.5, 0.5),
@@ -229,6 +264,23 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       gzerr << "Error loading model " << name << '\n';
       EXPECT_TRUE(model != NULL);
     }
+  }
+
+  // Compute and check link pose of link_offset_box
+  gzdbg << "Check link pose of link_offset_box\n";
+  model = world->GetModel("link_offset_box");
+  ASSERT_TRUE(model);
+  physics::LinkPtr link = model->GetLink();
+  ASSERT_TRUE(link);
+  // relative pose of link in linkOffsetPose2
+  for (int i = 0; i < 20; ++i)
+  {
+    pose1 = model->GetWorldPose();
+    pose2 = linkOffsetPose2 + pose1;
+    EXPECT_NEAR(pose2.pos.x, linkOffsetPose2.pos.x, PHYSICS_TOL);
+    EXPECT_NEAR(pose2.pos.y, linkOffsetPose2.pos.y, PHYSICS_TOL);
+    EXPECT_NEAR(pose2.pos.z, 0.5, PHYSICS_TOL);
+    world->StepWorld(1);
   }
 }
 
