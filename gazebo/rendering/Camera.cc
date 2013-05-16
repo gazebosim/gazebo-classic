@@ -396,11 +396,14 @@ void Camera::RenderImpl()
     // be rendered properly
     this->displayClouds = this->GetScene()->GetShowClouds();
 
-    if (this->renderTexture)
-      this->GetScene()->ShowClouds(false);
+     if (this->renderTexture)
+       this->GetScene()->ShowClouds(false);
 
     // Render, but don't swap buffers.
     this->renderTarget->update(false);
+
+//    if (this->renderTexture)
+//      this->renderTexture->getBuffer()->getRenderTarget()->update();
     this->lastRenderWallTime = common::Time::GetWallTime();
 
     if (this->renderTexture)
@@ -443,6 +446,7 @@ void Camera::PostRender()
         this->saveFrameBuffer);
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
+
     // Case for UserCamera where there is no RenderTexture but
     // a RenderTarget (RenderWindow) exists. We can not call SetRenderTarget
     // because that overrides the this->renderTarget variable
@@ -465,14 +469,17 @@ void Camera::PostRender()
       Ogre::Viewport *vp = rtt->addViewport(this->camera);
       vp->setClearEveryFrame(true);
       vp->setShadowsEnabled(true);
+
+      this->renderTexture->getBuffer()->getRenderTarget()->update();
     }
-    this->renderTexture->getBuffer()->getRenderTarget()->update();
 
     // The code below is equivalent to
     // this->viewport->getTarget()->copyContentsToMemory(box);
     // which causes problems on some machines if running ogre-1.7.4
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
     pixelBuffer = this->renderTexture->getBuffer();
+    // expensive call which stalls pipeline,
+    // to improve performance: blit to texture and read from it in the next frame
     pixelBuffer->blitToMemory(box);
 #else
     // There is a fix in ogre-1.8 for a buffer overrun problem in
@@ -495,7 +502,7 @@ void Camera::PostRender()
 
     const unsigned char *buffer = this->saveFrameBuffer;
 
-    // do last minute conversion if Bayer pattern is requested, go from R8G8B8
+/*    // do last minute conversion if Bayer pattern is requested, go from R8G8B8
     if ((this->GetImageFormat() == "BAYER_RGGB8") ||
          (this->GetImageFormat() == "BAYER_BGGR8") ||
          (this->GetImageFormat() == "BAYER_GBRG8") ||
@@ -509,7 +516,7 @@ void Camera::PostRender()
           width, height);
 
       buffer = this->bayerFrameBuffer;
-    }
+    }*/
 
     this->newImageFrame(buffer, width, height, this->GetImageDepth(),
                     this->GetImageFormat());
@@ -1207,6 +1214,7 @@ void Camera::CreateRenderTexture(const std::string &textureName)
       Ogre::TU_RENDERTARGET)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
+
   this->initialized = true;
 }
 
