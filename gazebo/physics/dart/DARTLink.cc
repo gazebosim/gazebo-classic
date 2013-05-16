@@ -247,7 +247,7 @@ void DARTLink::Init()
                                 canonicalLinkPose.rot.z);
 
     //Eigen::Quaterniond expToQuat(Eigen::Vector3d& v);
-    Eigen::Vector3d eigenVec3 = dart_math::quatToExp(eigenQuat);
+    Eigen::Vector3d eigenVec3 = ::math::quatToExp(eigenQuat);
 
     rotX->setValue(eigenVec3(0));
     rotY->setValue(eigenVec3(1));
@@ -466,7 +466,7 @@ void DARTLink::AddRelativeTorque(const math::Vector3& /*_torque*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTLink::GetWorldLinearVel(
+gazebo::math::Vector3 DARTLink::GetWorldLinearVel(
     const math::Vector3& /*_offset*/) const
 {
   math::Vector3 vel;

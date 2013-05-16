@@ -178,9 +178,9 @@ void DARTCollision::SetCollideBits(unsigned int /*_bits*/)
 }
 
 //////////////////////////////////////////////////
-math::Box DARTCollision::GetBoundingBox() const
+gazebo::math::Box DARTCollision::GetBoundingBox() const
 {
-  math::Box box;
+  gazebo::math::Box box;
   //   dReal aabb[6];
   //
   //   memset(aabb, 0, 6 * sizeof(dReal));
