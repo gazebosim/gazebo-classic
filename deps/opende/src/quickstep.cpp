@@ -1172,27 +1172,21 @@ static void SOR_LCP (dxWorldProcessContext *context,
       // to move multiplication by Ad[i] and cfm[i] out of iteration loop.
 
       // scale J_precon and rhs_precon by Ad
+      // copy J_orig
       dRealMutablePtr J_ptr = J;
+      dRealMutablePtr J_orig_ptr = J_orig;
       dRealMutablePtr J_precon_ptr = J_precon;
-      for (int i=0; i<m; J_ptr += 12, J_precon_ptr += 12, i++) {
+      for (int i=0; i<m; J_ptr += 12, J_precon_ptr += 12, J_orig_ptr += 12, i++) {
         dReal Ad_precon_i = Ad_precon[i];
         for (int j=0; j<12; j++) {
           J_precon_ptr[j] = J_ptr[j] * Ad_precon_i;
+          J_orig_ptr[j] = J_ptr[j]; //copy J
         }
         rhs_precon[i] *= Ad_precon_i;
         // scale Ad by CFM. N.B. this should be done last since it is used above
         Adcfm_precon[i] = Ad_precon_i * cfm[i];
       }
     }
-  }
-
-  {
-    // copy J_orig
-    dRealMutablePtr J_ptr = J;
-    dRealMutablePtr J_orig_ptr = J_orig;
-    for (int i=0; i<m; J_ptr += 12,  J_orig_ptr += 12, i++)
-      for (int j=0; j<12; j++)
-        J_orig_ptr[j] = J_ptr[j]; //copy J
   }
 
   dReal *Adcfm = context->AllocateArray<dReal> (m);
