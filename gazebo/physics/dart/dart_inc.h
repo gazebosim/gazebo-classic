@@ -1,37 +1,37 @@
 #ifndef _DART_INC_H_
 #define _DART_INC_H_
 
-#include <dart/math/UtilsRotation.h>
+#include <math/UtilsRotation.h>
 
-#include <dart/integration/Integrator.h>
-#include <dart/integration/EulerIntegrator.h>
-#include <dart/integration/RK4Integrator.h>
+#include <integration/Integrator.h>
+#include <integration/EulerIntegrator.h>
+#include <integration/RK4Integrator.h>
 
-#include <dart/kinematics/BodyNode.h>
-#include <dart/kinematics/Dof.h>
-#include <dart/kinematics/Joint.h>
-#include <dart/kinematics/Shape.h>
-#include <dart/kinematics/ShapeBox.h>
-#include <dart/kinematics/ShapeCylinder.h>
-#include <dart/kinematics/ShapeEllipsoid.h>
-#include <dart/kinematics/ShapeMesh.h>
-#include <dart/kinematics/Transformation.h>
-#include <dart/kinematics/TrfmRotateEuler.h>
-#include <dart/kinematics/TrfmRotateExpmap.h>
-#include <dart/kinematics/TrfmRotateAxis.h>
-#include <dart/kinematics/TrfmRotateQuat.h>
-#include <dart/kinematics/TrfmTranslate.h>
+#include <kinematics/BodyNode.h>
+#include <kinematics/Dof.h>
+#include <kinematics/Joint.h>
+#include <kinematics/Shape.h>
+#include <kinematics/ShapeBox.h>
+#include <kinematics/ShapeCylinder.h>
+#include <kinematics/ShapeEllipsoid.h>
+#include <kinematics/ShapeMesh.h>
+#include <kinematics/Transformation.h>
+#include <kinematics/TrfmRotateEuler.h>
+#include <kinematics/TrfmRotateExpmap.h>
+#include <kinematics/TrfmRotateAxis.h>
+#include <kinematics/TrfmRotateQuat.h>
+#include <kinematics/TrfmTranslate.h>
 
-#include <dart/dynamics/BodyNodeDynamics.h>
-#include <dart/dynamics/ClosedLoopConstraint.h>
-#include <dart/dynamics/Constraint.h>
-#include <dart/dynamics/ConstraintDynamics.h>
-#include <dart/dynamics/ContactDynamics.h>
-#include <dart/dynamics/JointLimitDynamics.h>
-#include <dart/dynamics/PointConstraint.h>
-#include <dart/dynamics/SkeletonDynamics.h>
+#include <dynamics/BodyNodeDynamics.h>
+#include <dynamics/ClosedLoopConstraint.h>
+#include <dynamics/Constraint.h>
+#include <dynamics/ConstraintDynamics.h>
+#include <dynamics/ContactDynamics.h>
+#include <dynamics/JointLimitDynamics.h>
+#include <dynamics/PointConstraint.h>
+#include <dynamics/SkeletonDynamics.h>
 
-#include <dart/simulation/World.h>
+#include <simulation/World.h>
 
 
 #endif
