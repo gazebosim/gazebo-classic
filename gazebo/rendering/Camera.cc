@@ -399,14 +399,11 @@ void Camera::RenderImpl()
      if (this->renderTexture)
        this->GetScene()->ShowClouds(false);
 
-
-    this->ReadPixelBuffer();
-
     // Render, but don't swap buffers.
     this->renderTarget->update(false);
 
-//    if (this->renderTexture)
-//      this->renderTexture->getBuffer()->getRenderTarget()->update();
+    this->ReadPixelBuffer();
+
     this->lastRenderWallTime = common::Time::GetWallTime();
 
     if (this->renderTexture)
@@ -469,6 +466,11 @@ void Camera::ReadPixelBuffer()
       vp->setShadowsEnabled(true);
       vp->setOverlaysEnabled(false);
     }
+
+    // This update is only needed for client side data captures
+    if (this->renderTexture->getBuffer()->getRenderTarget()
+        != this->renderTarget)
+      this->renderTexture->getBuffer()->getRenderTarget()->update();
 
     // The code below is equivalent to
     // this->viewport->getTarget()->copyContentsToMemory(box);
