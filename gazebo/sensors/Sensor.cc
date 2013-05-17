@@ -135,14 +135,7 @@ void Sensor::Update(bool _force)
         || _force)
     {
       this->lastUpdateTime = this->world->GetSimTime();
-
-//      common::Time t1 = common::Time::GetWallTime();
-
       this->UpdateImpl(_force);
-
-//      if (this->GetCategory() == 0)
-//      gzerr << this->GetName() << " " <<
-//          (common::Time::GetWallTime() - t1).Double() << std::endl;
       this->updated();
     }
   }
