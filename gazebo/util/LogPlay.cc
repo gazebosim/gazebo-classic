@@ -18,6 +18,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/archive/iterators/base64_from_binary.hpp>
@@ -330,6 +331,25 @@ bool LogPlay::GetChunkData(TiXmlElement *_xml, std::string &_data)
     {
       boost::iostreams::filtering_istream in;
       in.push(boost::iostreams::bzip2_decompressor());
+      in.push(boost::make_iterator_range(buffer));
+
+      // Get the data
+      std::getline(in, _data, '\0');
+      _data += '\0';
+    }
+  }
+  else if (this->encoding == "zlib")
+  {
+    std::string data = _xml->GetText();
+    std::string buffer;
+
+    // Decode the base64 string
+    base64_decode(buffer, data);
+
+    // Decompress the zlib data
+    {
+      boost::iostreams::filtering_istream in;
+      in.push(boost::iostreams::zlib_decompressor());
       in.push(boost::make_iterator_range(buffer));
 
       // Get the data

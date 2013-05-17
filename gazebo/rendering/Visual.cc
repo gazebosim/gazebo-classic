@@ -248,6 +248,7 @@ void Visual::Init()
 
   if (this->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
+
   this->initialized = true;
 }
 

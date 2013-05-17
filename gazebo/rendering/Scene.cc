@@ -110,6 +110,9 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->connections.push_back(
       event::Events::ConnectPostRender(boost::bind(&Scene::PostRender, this)));
+
+  this->sceneSimTimePosesApplied  = common::Time();
+  this->sceneSimTimePosesReceived = common::Time();
 }
 
 //////////////////////////////////////////////////
@@ -1617,7 +1620,7 @@ void Scene::PreRender()
     boost::mutex::scoped_lock lock(this->receiveMutex);
 
     // Process all the model messages last. Remove pose message from the list
-    // only when a corresponding visual exits. We may receive pose updates
+    // only when a corresponding visuals. We may receive pose updates
     // over the wire before  we recieve the visual
     pIter = this->poseMsgs.begin();
     while (pIter != this->poseMsgs.end())
@@ -1673,6 +1676,8 @@ void Scene::PreRender()
       else
         ++spIter;
     }
+    // official time stamp of approval
+    this->sceneSimTimePosesApplied = this->sceneSimTimePosesReceived;
 
     if (this->selectionMsg)
     {
@@ -1736,6 +1741,10 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     {
       CameraVisualPtr cameraVis(new CameraVisual(
             _msg->name()+"_GUIONLY_camera_vis", parentVis));
+
+      // need to call AttachVisual in order for cameraVis to be added to
+      // parentVis' children list so that it can be properly deleted.
+      parentVis->AttachVisual(cameraVis);
 
       cameraVis->SetPose(msgs::Convert(_msg->pose()));
 
@@ -2140,10 +2149,20 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::OnPoseMsg(ConstPose_VPtr &_msg)
+common::Time Scene::GetSimTime() const
+{
+  boost::mutex::scoped_lock lock(this->receiveMutex);
+  return this->sceneSimTimePosesApplied;
+}
+
+/////////////////////////////////////////////////
+void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->receiveMutex);
   PoseMsgs_L::iterator iter;
+
+  this->sceneSimTimePosesReceived =
+    common::Time(_msg->time().sec(), _msg->time().nsec());
 
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
@@ -2622,6 +2641,40 @@ void Scene::ShowContacts(bool _show)
     vis->SetEnabled(_show);
   else
     gzerr << "Unable to get contact visualization. This should never happen.\n";
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowClouds(bool _show)
+{
+  if (!this->skyx)
+    return;
+
+  SkyX::VCloudsManager *mgr = this->skyx->getVCloudsManager();
+  if (mgr)
+  {
+    SkyX::VClouds::VClouds *vclouds =
+        this->skyx->getVCloudsManager()->getVClouds();
+    if (vclouds)
+      vclouds->setVisible(_show);
+  }
+}
+
+/////////////////////////////////////////////////
+bool Scene::GetShowClouds() const
+{
+  if (!this->skyx)
+    return false;
+
+  SkyX::VCloudsManager *mgr = this->skyx->getVCloudsManager();
+  if (mgr)
+  {
+    SkyX::VClouds::VClouds *vclouds =
+        this->skyx->getVCloudsManager()->getVClouds();
+    if (vclouds)
+      return vclouds->isVisible();
+  }
+
+  return false;
 }
 
 /////////////////////////////////////////////////

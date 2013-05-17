@@ -17,6 +17,7 @@
 #include <iomanip>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/date_time.hpp>
@@ -52,6 +53,7 @@ LogRecord::LogRecord()
   this->initialized = false;
   this->stopThread = false;
   this->firstUpdate = true;
+  this->readyToStart = false;
 
   // Get the user's home directory
   // \todo getenv is not portable, and there is no generic cross-platform
@@ -71,6 +73,12 @@ LogRecord::LogRecord()
   this->connections.push_back(
      event::Events::ConnectPause(
        boost::bind(&LogRecord::OnPause, this, _1)));
+}
+
+//////////////////////////////////////////////////
+void LogRecord::OnPause(bool _pause)
+{
+  this->pauseState = _pause;
 }
 
 //////////////////////////////////////////////////
@@ -98,6 +106,7 @@ bool LogRecord::Init(const std::string &_subdir)
   this->paused = false;
   this->stopThread = false;
   this->firstUpdate = true;
+  this->readyToStart = true;
 
   return true;
 }
@@ -138,9 +147,9 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
   if (!boost::filesystem::exists(this->logCompletePath))
     boost::filesystem::create_directories(logCompletePath);
 
-  if (_encoding != "bz2" && _encoding != "txt")
+  if (_encoding != "bz2" && _encoding != "txt" && _encoding != "zlib")
     gzthrow("Invalid log encoding[" + _encoding +
-            "]. Must be one of [bz2, txt]");
+            "]. Must be one of [bz2, zlib, txt]");
 
   this->encoding = _encoding;
 
@@ -158,21 +167,32 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
   this->paused = false;
   this->firstUpdate = true;
   this->stopThread = false;
+  this->readyToStart = false;
 
   this->startTime = this->currTime = common::Time();
 
   // Create a thread to cleanup recording.
   this->cleanupThread = boost::thread(boost::bind(&LogRecord::Cleanup, this));
+  // Wait for thread to start
+  this->startThreadCondition.wait(lock);
 
   // Start the update thread if it has not already been started
   if (!this->updateThread)
+  {
+    boost::mutex::scoped_lock updateLock(this->updateMutex);
     this->updateThread = new boost::thread(
         boost::bind(&LogRecord::RunUpdate, this));
+    this->startThreadCondition.wait(updateLock);
+  }
 
   // Start the writing thread if it has not already been started
   if (!this->writeThread)
+  {
+    boost::mutex::scoped_lock writeLock(this->runWriteMutex);
     this->writeThread = new boost::thread(
         boost::bind(&LogRecord::RunWrite, this));
+    this->startThreadCondition.wait(writeLock);
+  }
 
   return true;
 }
@@ -424,6 +444,7 @@ void LogRecord::Notify()
 void LogRecord::RunUpdate()
 {
   boost::mutex::scoped_lock updateLock(this->updateMutex);
+  this->startThreadCondition.notify_all();
 
   // This loop will write data to disk.
   while (!this->stopThread)
@@ -476,6 +497,7 @@ void LogRecord::RunWrite()
 {
   // Wait for new data.
   boost::mutex::scoped_lock lock(this->runWriteMutex);
+  this->startThreadCondition.notify_all();
 
   // This loop will write data to disk.
   while (!this->stopThread)
@@ -549,6 +571,24 @@ unsigned int LogRecord::Log::Update()
         {
           boost::iostreams::filtering_ostream out;
           out.push(boost::iostreams::bzip2_compressor());
+          out.push(std::back_inserter(str));
+          out << stream.str();
+          out.flush();
+        }
+
+        // Encode in base64.
+        std::copy(Base64Text(str.c_str()),
+                  Base64Text(str.c_str() + str.size()),
+                  std::back_inserter(this->buffer));
+      }
+      else if (encoding == "zlib")
+      {
+        std::string str;
+
+        // Compress to zlib
+        {
+          boost::iostreams::filtering_ostream out;
+          out.push(boost::iostreams::zlib_compressor());
           out.push(std::back_inserter(str));
           out << stream.str();
           out.flush();
@@ -677,9 +717,13 @@ void LogRecord::OnLogControl(ConstLogRecordControlPtr &_data)
   if (_data->has_base_path() && !_data->base_path().empty())
     this->SetBasePath(_data->base_path());
 
+  std::string msgEncoding = "bz2";
+  if (_data->has_encoding())
+    msgEncoding = _data->encoding();
+
   if (_data->has_start() && _data->start())
   {
-    this->Start("bz2");
+    this->Start(msgEncoding);
   }
   else if (_data->has_stop() && _data->stop())
   {
@@ -749,14 +793,13 @@ void LogRecord::PublishLogStatus()
 void LogRecord::Cleanup()
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
+  this->startThreadCondition.notify_all();
 
   // Wait for the cleanup signal
   this->cleanupCondition.wait(lock);
 
   bool currentPauseState = this->pauseState;
   event::Events::pause(true);
-
-  this->stopThread = true;
 
   // Reset the flags
   this->paused = false;
@@ -808,6 +851,13 @@ void LogRecord::Cleanup()
   this->PublishLogStatus();
 
   event::Events::pause(currentPauseState);
+  this->readyToStart = true;
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::IsReadyToStart() const
+{
+  return this->readyToStart;
 }
 
 //////////////////////////////////////////////////

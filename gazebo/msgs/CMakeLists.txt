@@ -60,6 +60,7 @@ set (msgs
   pose_stamped.proto
   pose_trajectory.proto
   pose_v.proto
+  poses_stamped.proto
   projector.proto
   publishers.proto
   publish.proto

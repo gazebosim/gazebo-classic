@@ -704,6 +704,9 @@ namespace gazebo
 
       /// \bried Protects the render call.
       private: boost::mutex renderMutex;
+
+      /// \brief store option to turn off cloud
+      private: bool displayClouds;
     };
     /// \}
   }

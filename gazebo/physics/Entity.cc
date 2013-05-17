@@ -339,11 +339,9 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
   // also update parent model's pose
   if (this->parentEntity->HasType(MODEL))
   {
-    this->parentEntity->worldPose.pos = _pose.pos -
-      this->parentEntity->worldPose.rot.RotateVector(
-          this->initialRelativePose.pos);
-    this->parentEntity->worldPose.rot = _pose.rot *
-      this->initialRelativePose.rot.GetInverse();
+    // setting parent Model world pose from canonical link world pose
+    // where _pose is the canonical link's world pose
+    this->parentEntity->worldPose = (-this->initialRelativePose) + _pose;
 
     this->parentEntity->worldPose.Correct();
 
@@ -621,6 +619,7 @@ void Entity::PlaceOnEntity(const std::string &_entityName)
 void Entity::GetNearestEntityBelow(double &_distBelow,
                                    std::string &_entityName)
 {
+  this->GetWorld()->GetPhysicsEngine()->InitForThread();
   RayShapePtr rayShape = boost::dynamic_pointer_cast<RayShape>(
     this->GetWorld()->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
