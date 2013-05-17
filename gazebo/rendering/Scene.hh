@@ -156,7 +156,7 @@ namespace gazebo
       /// \param[in] _autoRender True to allow Gazebo to automatically
       /// render the camera. This should almost always be true.
       /// \return Pointer to the new camera.
-     public: DepthCameraPtr CreateDepthCamera(const std::string &_name,
+      public: DepthCameraPtr CreateDepthCamera(const std::string &_name,
                                                bool _autoRender = true);
 
       /// \brief Create laser that generates data from rendering.
@@ -164,8 +164,8 @@ namespace gazebo
       /// \param[in] _autoRender True to allow Gazebo to automatically
       /// render the camera. This should almost always be true.
       /// \return Pointer to the new laser.
-      // public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
-      //                                   bool _autoRender = true);
+      public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
+                                         bool _autoRender = true);
 
       /// \brief Get the number of cameras in this scene
       /// \return Number of lasers.
@@ -466,7 +466,7 @@ namespace gazebo
 
       /// \brief Proces a scene message.
       /// \param[in] _msg The message data.
-      private: void ProcessSceneMsg(ConstScenePtr &_msg);
+      private: bool ProcessSceneMsg(ConstScenePtr &_msg);
 
       /// \brief Process a model message.
       /// \param[in] _msg The message data.
@@ -490,7 +490,7 @@ namespace gazebo
 
       /// \brief Process a light message.
       /// \param[in] _msg The message data.
-      private: void ProcessLightMsg(ConstLightPtr &_msg);
+      private: bool ProcessLightMsg(ConstLightPtr &_msg);
 
       /// \brief Process a request message.
       /// \param[in] _msg The message data.
@@ -510,7 +510,7 @@ namespace gazebo
 
       /// \brief Pose message callback.
       /// \param[in] _msg The message data.
-      private: void OnPoseMsg(ConstPose_VPtr &_msg);
+      private: void OnPoseMsg(ConstPosesStampedPtr &_msg);
 
       /// \brief Skeleton animation callback.
       /// \param[in] _msg The message data.
@@ -744,6 +744,21 @@ namespace gazebo
 
       /// \brief Initialized.
       private: bool initialized;
+
+      /// \brief SimTime of this Scene, as we receive PosesStamped from
+      /// the world, we update this time accordingly.
+      private: common::Time sceneSimTimePosesReceived;
+
+      /// \brief SimTime of this Scene, after applying PosesStamped to
+      /// scene, we update this time accordingly.
+      private: common::Time sceneSimTimePosesApplied;
+
+      /// \brief Get the scene simulation time.
+      /// Note this is different from World::GetSimTime() because
+      /// there is a lag between the time new poses are sent out by World
+      /// and when they are received and applied by the Scene.
+      /// \return The current simulation time in Scene
+      public: common::Time GetSimTime() const;
     };
     /// \}
   }

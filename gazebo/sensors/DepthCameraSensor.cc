@@ -137,7 +137,7 @@ void DepthCameraSensor::UpdateImpl(bool /*_force*/)
   {
     this->camera->Render();
     this->camera->PostRender();
-    this->lastMeasurementTime = this->world->GetSimTime();
+    this->lastMeasurementTime = this->scene->GetSimTime();
   }
 }
 

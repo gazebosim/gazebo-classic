@@ -46,6 +46,7 @@ typedef boost::archive::iterators::base64_from_binary<
 //////////////////////////////////////////////////
 LogRecord::LogRecord()
 {
+  this->pauseState = false;
   this->running = false;
   this->paused = false;
   this->initialized = false;
@@ -66,6 +67,16 @@ LogRecord::LogRecord()
   this->logBasePath /= "/.gazebo/log/";
 
   this->logsEnd = this->logs.end();
+
+  this->connections.push_back(
+     event::Events::ConnectPause(
+       boost::bind(&LogRecord::OnPause, this, _1)));
+}
+
+//////////////////////////////////////////////////
+void LogRecord::OnPause(bool _pause)
+{
+  this->pauseState = _pause;
 }
 
 //////////////////////////////////////////////////
@@ -156,6 +167,9 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
 
   this->startTime = this->currTime = common::Time();
 
+  // Create a thread to cleanup recording.
+  this->cleanupThread = boost::thread(boost::bind(&LogRecord::Cleanup, this));
+
   // Start the update thread if it has not already been started
   if (!this->updateThread)
     this->updateThread = new boost::thread(
@@ -178,7 +192,15 @@ const std::string &LogRecord::GetEncoding() const
 //////////////////////////////////////////////////
 void LogRecord::Fini()
 {
-  this->Stop();
+  do
+  {
+    boost::mutex::scoped_lock lock(this->controlMutex);
+    this->cleanupCondition.notify_all();
+  } while (!this->cleanupThread.timed_join(
+        boost::posix_time::milliseconds(1000)));
+
+  boost::mutex::scoped_lock lock(this->controlMutex);
+  this->connections.clear();
 
   // Remove all the logs.
   this->ClearLogs();
@@ -193,50 +215,8 @@ void LogRecord::Stop()
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
 
-  if (!this->running)
-    return;
-
-  // Reset the flags
-  this->paused = false;
   this->running = false;
-  this->stopThread = true;
-
-  // Kick the update thread
-  this->updateCondition.notify_one();
-
-  // Kick the write thread
-  this->dataAvailableCondition.notify_one();
-
-  // Wait for the write thread, if it exists
-  if (this->updateThread)
-    this->updateThread->join();
-
-  // Wait for the write thread, if it exists
-  if (this->writeThread)
-    this->writeThread->join();
-
-  delete this->updateThread;
-  this->updateThread = NULL;
-
-  delete this->writeThread;
-  this->writeThread = NULL;
-
-  // Update and write one last time to make sure we log all data.
-  this->Update();
-  this->Write(true);
-
-  // Stop all the logs
-  for (Log_M::iterator iter = this->logs.begin();
-      iter != this->logsEnd; ++iter)
-  {
-    iter->second->Stop();
-  }
-
-  // Reset the times
-  this->startTime = this->currTime = common::Time();
-
-  // Output the new log status
-  this->PublishLogStatus();
+  this->cleanupCondition.notify_all();
 }
 
 //////////////////////////////////////////////////
@@ -447,14 +427,13 @@ void LogRecord::Notify()
 //////////////////////////////////////////////////
 void LogRecord::RunUpdate()
 {
-  boost::mutex localMutex;
-  boost::mutex::scoped_lock localLock(localMutex);
+  boost::mutex::scoped_lock updateLock(this->updateMutex);
 
   // This loop will write data to disk.
   while (!this->stopThread)
   {
     // Don't completely lock, just to be safe.
-    this->updateCondition.wait(localLock);
+    this->updateCondition.wait(updateLock);
 
     if (!this->stopThread)
       this->Update();
@@ -499,26 +478,22 @@ void LogRecord::Update()
 //////////////////////////////////////////////////
 void LogRecord::RunWrite()
 {
+  // Wait for new data.
+  boost::mutex::scoped_lock lock(this->runWriteMutex);
+
   // This loop will write data to disk.
   while (!this->stopThread)
   {
-    this->Write(false);
+    this->dataAvailableCondition.wait(lock);
 
-    // Throttle the write loop.
-    if (!this->stopThread)
-      common::Time::MSleep(1000);
+    this->Write(false);
   }
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Write(bool _force)
+void LogRecord::Write(bool /*_force*/)
 {
-  if (!_force)
-  {
-    // Wait for new data.
-    boost::mutex::scoped_lock lock(this->writeMutex);
-    this->dataAvailableCondition.wait(lock);
-  }
+  boost::mutex::scoped_lock lock(this->writeMutex);
 
   // Collect all the new log data.
   for (this->updateIter = this->logs.begin();
@@ -646,7 +621,8 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
 
   // Make sure the file does not exist
   if (boost::filesystem::exists(this->completePath))
-    gzthrow("Filename[" + this->completePath.string() + "], already exists\n");
+    gzwarn << "Filename[" + this->completePath.string() + "], already exists."
+      << " The log file will be overwritten.\n";
 
   std::ostringstream stream;
   stream << "<?xml version='1.0'?>\n"
@@ -764,4 +740,69 @@ void LogRecord::PublishLogStatus()
   }
 
   this->logStatusPub->Publish(msg);
+}
+
+//////////////////////////////////////////////////
+void LogRecord::Cleanup()
+{
+  boost::mutex::scoped_lock lock(this->controlMutex);
+
+  // Wait for the cleanup signal
+  this->cleanupCondition.wait(lock);
+
+  bool currentPauseState = this->pauseState;
+  event::Events::pause(true);
+
+  this->stopThread = true;
+
+  // Reset the flags
+  this->paused = false;
+  this->running = false;
+  this->stopThread = true;
+
+  // Kick the update thread
+  {
+    boost::mutex::scoped_lock updateLock(this->updateMutex);
+    this->updateCondition.notify_all();
+  }
+
+  // Wait for the write thread, if it exists
+  if (this->updateThread)
+    this->updateThread->join();
+
+  // Kick the write thread
+  {
+    boost::mutex::scoped_lock lock2(this->runWriteMutex);
+    this->dataAvailableCondition.notify_all();
+  }
+
+  // Wait for the write thread, if it exists
+  if (this->writeThread)
+    this->writeThread->join();
+
+  delete this->updateThread;
+  this->updateThread = NULL;
+
+  delete this->writeThread;
+  this->writeThread = NULL;
+
+  // Update and write one last time to make sure we log all data.
+  this->Update();
+
+  this->Write(true);
+
+  // Stop all the logs
+  for (Log_M::iterator iter = this->logs.begin();
+      iter != this->logsEnd; ++iter)
+  {
+    iter->second->Stop();
+  }
+
+  // Reset the times
+  this->startTime = this->currTime = common::Time();
+
+  // Output the new log status
+  this->PublishLogStatus();
+
+  event::Events::pause(currentPauseState);
 }

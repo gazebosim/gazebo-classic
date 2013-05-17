@@ -1,0 +1,14 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PosesStamped
+/// \brief Message for a vector of poses with a time stamp
+
+import "time.proto";
+import "pose.proto";
+
+message PosesStamped
+{
+  required Time time = 1;
+  repeated Pose pose = 2;
+}

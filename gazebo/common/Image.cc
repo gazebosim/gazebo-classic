@@ -374,7 +374,7 @@ Color Image::GetMaxColor()
 void Image::Rescale(int _width, int _height)
 {
   this->bitmap = FreeImage_Rescale(this->bitmap, _width, _height,
-      FILTER_BICUBIC);
+      FILTER_LANCZOS3);
 }
 
 //////////////////////////////////////////////////

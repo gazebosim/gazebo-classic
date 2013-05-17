@@ -160,16 +160,24 @@ namespace gazebo
       /// \brief Detach this joint from all links.
       public: virtual void Detach();
 
-      /// \brief Set the axis of rotation.
+      /// \brief Set the axis of rotation where axis is specified in local
+      /// joint frame.
       /// \param[in] _index Index of the axis to set.
-      /// \param[in] _axis Vector in world frame of axis direction
+      /// \param[in] _axis Vector in local joint frame of axis direction
       ///                  (must have length greater than zero).
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis) = 0;
 
       /// \brief Set the joint damping.
-      /// \param[in] _index Index of the axis to set.
+      /// \param[in] _index Index of the axis to set, currently ignored, to be
+      ///                   implemented.
       /// \param[in] _damping Damping value for the axis.
       public: virtual void SetDamping(int _index, double _damping) = 0;
+
+      /// \brief Returns the current joint damping coefficient.
+      /// \param[in] _index Index of the axis to get, currently ignored, to be
+      ///                   implemented.
+      /// \return Joint viscous damping coefficient for this joint.
+      public: double GetDamping(int _index);
 
       /// \brief Callback to apply damping force to joint.
       public: virtual void ApplyDamping();

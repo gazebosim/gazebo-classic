@@ -51,6 +51,9 @@
     <element name="collide_without_contact" type="bool" default="0" required="0">
       <description>Flag to disable contact force generation, while still allowing collision checks and contact visualization to occur.</description>
     </element>
+    <element name="collide_without_contact_bitmask" type="unsigned int" default="1" required="0">
+      <description>Bitmask for collision filtering when collide_without_contact is on </description>
+    </element>    
     <element name="ode" required="0">
       <description>ODE contact parameters</description>
       <element name="soft_cfm" type="double" default="0" required="0">

@@ -502,7 +502,9 @@ double Joint::GetForce(int _index)
 //////////////////////////////////////////////////
 void Joint::ApplyDamping()
 {
-  double dampingForce = -this->dampingCoefficient * this->GetVelocity(0);
+  // Take absolute value of dampingCoefficient, since negative values of
+  // dampingCoefficient are used for adaptive damping to enforce stability.
+  double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
   this->SetForce(0, dampingForce);
 }
 
@@ -574,4 +576,10 @@ double Joint::GetInertiaRatio(unsigned int _index) const
           << "] when trying to get inertia ratio across joint.\n";
     return 0;
   }
+}
+
+//////////////////////////////////////////////////
+double Joint::GetDamping(int /*_index*/)
+{
+  return this->dampingCoefficient;
 }

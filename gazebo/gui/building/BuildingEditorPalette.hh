@@ -20,6 +20,8 @@
 
 #include <string>
 #include <vector>
+#include <list>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Events.hh"
 
@@ -55,7 +57,7 @@ namespace gazebo
       private slots: void OnAddDoor();
 
       /// \brief Qt callback when the draw stairs button is pressed.
-      private slots: void OnAddStairs();
+      private slots: void OnAddStair();
 
       /// \brief Qt callback when the discard button is pressed.
       private slots: void OnDiscard();
@@ -73,6 +75,10 @@ namespace gazebo
       private: void OnSaveModel(const std::string &_saveName,
           const std::string &_saveLocation);
 
+      /// \brief Event received when an editor item is selected.
+      /// \param[in] _type Type of item to add.
+      private: void OnCreateEditorItem(const std::string &_type);
+
       /// \brief Event received when a building model has been discarded.
       private: void OnDiscardModel();
 
@@ -81,6 +87,9 @@ namespace gazebo
 
       /// \brief Save button.
       private: QPushButton *saveButton;
+
+      /// \brief All the brushes (wall, door, window, stair, etc).
+      private: std::list<QPushButton *> brushes;
 
       /// \brief Name of model.
       private: std::string modelName;
