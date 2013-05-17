@@ -485,6 +485,9 @@ namespace gazebo
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 
+      /// \brief Read image data from pixel buffer
+      protected: void ReadPixelBuffer();
+
       /// \brief Implementation of the Camera::TrackVisual call
       /// \param[in] _visualName Name of the visual to track
       /// \return True if able to track the visual
@@ -602,27 +605,8 @@ namespace gazebo
       /// \brief Target that renders frames.
       protected: Ogre::RenderTarget *renderTarget;
 
-      /// \brief Target that renders frames.
-      protected: Ogre::RenderTarget *renderTarget2;
-
       /// \brief Texture that receives results from rendering.
       protected: Ogre::Texture *renderTexture;
-
-      /// \brief Texture that receives results from rendering.
-      protected: Ogre::Texture *renderTexture2;
-
-      /// \brief Texture that receives results from rendering.
-      protected: Ogre::Texture *camTexture;
-
-      /// \brief Texture that receives results from rendering.
-      protected: Ogre::Texture *camTexture2;
-
-      /// \brief Texture that receives results from rendering.
-      protected: int textureQueueIndex;
-
-      protected: std::vector<Ogre::Texture *> textureQueue;
-
-      protected: std::vector<Ogre::RenderTarget *> targetQueue;
 
       /// \brief True to capture frames into an image buffer.
       protected: bool captureData;

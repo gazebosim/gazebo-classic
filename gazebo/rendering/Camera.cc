@@ -154,7 +154,6 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
   this->lastRenderWallTime = common::Time::GetWallTime();
 
   this->displayClouds = true;
-  this->textureQueueIndex = 0;
 
   // Set default render rate to unlimited
   this->SetRenderRate(0.0);
@@ -391,7 +390,33 @@ void Camera::Render()
 //////////////////////////////////////////////////
 void Camera::RenderImpl()
 {
+  if (this->renderTarget)
+  {
+    // FIXME: Disable clouds in offscreen rendering for now until they can
+    // be rendered properly
+    this->displayClouds = this->GetScene()->GetShowClouds();
 
+     if (this->renderTexture)
+       this->GetScene()->ShowClouds(false);
+
+
+    this->ReadPixelBuffer();
+
+    // Render, but don't swap buffers.
+    this->renderTarget->update(false);
+
+//    if (this->renderTexture)
+//      this->renderTexture->getBuffer()->getRenderTarget()->update();
+    this->lastRenderWallTime = common::Time::GetWallTime();
+
+    if (this->renderTexture)
+      this->GetScene()->ShowClouds(this->displayClouds);
+  }
+}
+
+//////////////////////////////////////////////////
+void Camera::ReadPixelBuffer()
+{
   this->renderTarget->swapBuffers();
 
   if (this->newData && (this->captureData || this->captureDataOnce))
@@ -441,8 +466,8 @@ void Camera::RenderImpl()
       Ogre::Viewport *vp = rtt->addViewport(this->camera);
       vp->setClearEveryFrame(true);
       vp->setShadowsEnabled(true);
-
-      this->renderTexture->getBuffer()->getRenderTarget()->update();
+      vp->setShadowsEnabled(true);
+      vp->setOverlaysEnabled(false);
     }
 
     // The code below is equivalent to
@@ -450,105 +475,13 @@ void Camera::RenderImpl()
     // which causes problems on some machines if running ogre-1.7.4
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
     pixelBuffer = this->renderTexture->getBuffer();
-    // expensive call which stalls pipeline,
-    // to improve performance: blit to texture and read from it in the next frame
-//     common::Time t2 = common::Time::GetWallTime();
-     pixelBuffer->blitToMemory(box);
-//     gzerr << "blit " << (common::Time::GetWallTime() - t2).Double() << std::endl;
-
-/*    if (this->textureQueue.size() > 1)
-    {
-      Ogre::HardwarePixelBufferSharedPtr pBuffer;
-      Ogre::Texture *tex = this->textureQueue[this->textureQueueIndex];
-      pBuffer = tex->getBuffer();
-
-      common::Time t2 = common::Time::GetWallTime();
-      pBuffer->blit(pixelBuffer);
-      gzerr << "blit " << (common::Time::GetWallTime() - t2).Double() << std::endl;
-      this->textureQueueIndex ^= 1;
-
-      Ogre::Image::Box imageBox(0,0,width,height);
-      pBuffer = this->textureQueue[this->textureQueueIndex]->getBuffer();
-
-      common::Time t1 = common::Time::GetWallTime();
-      const Ogre::PixelBox &pBox =
-          pBuffer->lock(imageBox, Ogre::HardwareBuffer::HBL_NORMAL);
-      unsigned char *data = static_cast<unsigned char *>(pBox.data);
-      memcpy(this->saveFrameBuffer, data, size);
-      pBuffer->unlock();
-
-      gzerr << "memcpy " << (common::Time::GetWallTime() - t1).Double() << std::endl;
-    }*/
-
+    pixelBuffer->blitToMemory(box);
 #else
     // There is a fix in ogre-1.8 for a buffer overrun problem in
     // OgreGLXWindow.cpp's copyContentsToMemory(). It fixes reading
     // pixels from buffer into memory.
     this->viewport->getTarget()->copyContentsToMemory(box);
 #endif
-
-    if (this->captureDataOnce)
-    {
-      this->SaveFrame(this->GetFrameFilename());
-      this->captureDataOnce = false;
-    }
-
-    if (this->sdf->HasElement("save") &&
-        this->sdf->GetElement("save")->GetValueBool("enabled"))
-    {
-      this->SaveFrame(this->GetFrameFilename());
-    }
-
-    const unsigned char *buffer = this->saveFrameBuffer;
-
-/*    // do last minute conversion if Bayer pattern is requested, go from R8G8B8
-    if ((this->GetImageFormat() == "BAYER_RGGB8") ||
-         (this->GetImageFormat() == "BAYER_BGGR8") ||
-         (this->GetImageFormat() == "BAYER_GBRG8") ||
-         (this->GetImageFormat() == "BAYER_GRBG8"))
-    {
-      if (!this->bayerFrameBuffer)
-        this->bayerFrameBuffer = new unsigned char[width * height];
-
-      this->ConvertRGBToBAYER(this->bayerFrameBuffer,
-          this->saveFrameBuffer, this->GetImageFormat(),
-          width, height);
-
-      buffer = this->bayerFrameBuffer;
-    }*/
-
-    this->newImageFrame(buffer, width, height, this->GetImageDepth(),
-                    this->GetImageFormat());
-
-    if (this->renderTexture)
-      this->GetScene()->ShowClouds(this->displayClouds);
-  }
-
-
-
-
-
-
-
-
-
-
-  if (this->renderTarget)
-  {
-    // FIXME: Disable clouds in offscreen rendering for now until they can
-    // be rendered properly
-    this->displayClouds = this->GetScene()->GetShowClouds();
-
-     if (this->renderTexture)
-       this->GetScene()->ShowClouds(false);
-
-    // Render, but don't swap buffers.
-    this->renderTarget->update(false);
-
-//    if (this->renderTexture)
-//      this->renderTexture->getBuffer()->getRenderTarget()->update();
-    this->lastRenderWallTime = common::Time::GetWallTime();
-
     if (this->renderTexture)
       this->GetScene()->ShowClouds(this->displayClouds);
   }
@@ -563,7 +496,43 @@ common::Time Camera::GetLastRenderWallTime()
 //////////////////////////////////////////////////
 void Camera::PostRender()
 {
+  if (this->newData && (this->captureData || this->captureDataOnce))
+  {
+    if (this->captureDataOnce)
+    {
+      this->SaveFrame(this->GetFrameFilename());
+      this->captureDataOnce = false;
+    }
 
+    if (this->sdf->HasElement("save") &&
+        this->sdf->GetElement("save")->GetValueBool("enabled"))
+    {
+      this->SaveFrame(this->GetFrameFilename());
+    }
+
+    unsigned int width = this->GetImageWidth();
+    unsigned int height = this->GetImageHeight();
+    const unsigned char *buffer = this->saveFrameBuffer;
+
+    // do last minute conversion if Bayer pattern is requested, go from R8G8B8
+    if ((this->GetImageFormat() == "BAYER_RGGB8") ||
+         (this->GetImageFormat() == "BAYER_BGGR8") ||
+         (this->GetImageFormat() == "BAYER_GBRG8") ||
+         (this->GetImageFormat() == "BAYER_GRBG8"))
+    {
+      if (!this->bayerFrameBuffer)
+        this->bayerFrameBuffer = new unsigned char[width * height];
+
+      this->ConvertRGBToBAYER(this->bayerFrameBuffer,
+          this->saveFrameBuffer, this->GetImageFormat(),
+          width, height);
+
+      buffer = this->bayerFrameBuffer;
+    }
+
+    this->newImageFrame(buffer, width, height, this->GetImageDepth(),
+        this->GetImageFormat());
+  }
 
   this->newData = false;
 }
@@ -1253,27 +1222,6 @@ void Camera::CreateRenderTexture(const std::string &textureName)
       (Ogre::PixelFormat)this->imageFormat,
       Ogre::TU_RENDERTARGET)).getPointer();
 
-/*  this->camTexture = (Ogre::TextureManager::getSingleton().createManual(
-      textureName + "_1",
-      "General",
-      Ogre::TEX_TYPE_2D,
-      this->GetImageWidth(),
-      this->GetImageHeight(),
-      0,
-      (Ogre::PixelFormat)this->imageFormat)).getPointer();
-
-  this->camTexture2 = (Ogre::TextureManager::getSingleton().createManual(
-      textureName + "_2",
-      "General",
-      Ogre::TEX_TYPE_2D,
-      this->GetImageWidth(),
-      this->GetImageHeight(),
-      0,
-      (Ogre::PixelFormat)this->imageFormat)).getPointer();*/
-
-  this->textureQueue.push_back(this->camTexture);
-  this->textureQueue.push_back(this->camTexture2);
-
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
 
   this->initialized = true;
@@ -1331,6 +1279,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport = this->renderTarget->addViewport(this->camera);
     this->viewport->setClearEveryFrame(true);
     this->viewport->setShadowsEnabled(true);
+    this->viewport->setOverlaysEnabled(false);
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
