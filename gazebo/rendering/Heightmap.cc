@@ -1912,7 +1912,7 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsHelpers(
       // "      float depth = tex2d(shadowMap, newUV.xy, 1.0, 1.0).x;\n"
       "      float depth = textureGrad(shadowMap, newUV.xy, "
       " vec2(1.0, 1.0), vec2(1.0, 1.0)).x;\n"
-      //"      if (depth >= 1.0 || depth >= uv.z)\n"
+      // "      if (depth >= 1.0 || depth >= uv.z)\n"
       "      if (depth >= 1.0 || depth >= newUV.z)\n"
       "        shadow += 1.0;\n"
       "    }\n"
