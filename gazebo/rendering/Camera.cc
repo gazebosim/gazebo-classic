@@ -396,8 +396,8 @@ void Camera::RenderImpl()
     // be rendered properly
     this->displayClouds = this->GetScene()->GetShowClouds();
 
-     if (this->renderTexture)
-       this->GetScene()->ShowClouds(false);
+    if (this->renderTexture)
+      this->GetScene()->ShowClouds(false);
 
     // Render, but don't swap buffers.
     this->renderTarget->update(false);
@@ -440,7 +440,6 @@ void Camera::ReadPixelBuffer()
         this->saveFrameBuffer);
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
-
     // Case for UserCamera where there is no RenderTexture but
     // a RenderTarget (RenderWindow) exists. We can not call SetRenderTarget
     // because that overrides the this->renderTarget variable
@@ -1223,7 +1222,6 @@ void Camera::CreateRenderTexture(const std::string &textureName)
       0,
       (Ogre::PixelFormat)this->imageFormat,
       Ogre::TU_RENDERTARGET)).getPointer();
-
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
 
   this->initialized = true;
