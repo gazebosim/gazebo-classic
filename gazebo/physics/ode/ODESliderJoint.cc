@@ -110,7 +110,10 @@ void ODESliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
       this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
 
   if (this->jointId)
-    dJointSetSliderAxis(this->jointId, _axis.x, _axis.y, _axis.z);
+  {
+    dJointSetSliderAxis(this->jointId,
+                        globalAxis.x, globalAxis.y, globalAxis.z);
+  }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }

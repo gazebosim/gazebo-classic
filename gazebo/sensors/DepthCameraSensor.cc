@@ -118,7 +118,7 @@ void DepthCameraSensor::Init()
 void DepthCameraSensor::Fini()
 {
   Sensor::Fini();
-  this->camera->Fini();
+  this->scene->RemoveCamera(this->camera->GetName());
   this->camera.reset();
   this->scene.reset();
 }
@@ -147,4 +147,3 @@ bool DepthCameraSensor::SaveFrame(const std::string &_filename)
   this->SetActive(true);
   return this->camera->SaveFrame(_filename);
 }
-
