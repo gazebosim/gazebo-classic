@@ -857,7 +857,11 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       if (joint)
       {
         // Detach upper_joint.
-        joint->Detach();
+        //joint->Detach();
+        // freeze joint limit instead
+        math::Angle curAngle = joint->GetAngle(0u);
+        joint->SetLowStop(0, curAngle - 0.1);
+        joint->SetHighStop(0, curAngle + 0.1);
       }
       else
       {
@@ -875,7 +879,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         double oldVel, newVel, force;
         oldVel = joint->GetVelocity(0);
         // Apply positive torque to the lower_joint and step forward.
-        force = 1;
+        force = 10;
         for (int i = 0; i < 10; ++i)
         {
           joint->SetForce(0, force);
@@ -902,7 +906,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           EXPECT_NEAR(jointVel, axis.Dot(angVel), PHYSICS_TOL);
         }
         // Apply negative torque to lower_joint
-        force = -3;
+        force = -30;
         for (int i = 0; i < 10; ++i)
         {
           joint->SetForce(0, force);

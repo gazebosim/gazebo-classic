@@ -353,14 +353,11 @@ double DARTHingeJoint::GetMaxForce(int /*index*/)
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetForce(int /*index*/, double /*_torque*/)
+void DARTHingeJoint::SetForce(int _index, double _torque)
 {
-  //   if (this->childLink)
-  //     this->childLink->SetEnabled(true);
-  //   if (this->parentLink)
-  //     this->parentLink->SetEnabled(true);
-  //   dJointAddHingeTorque(this->jointId, _torque);
-  gzwarn << "DARTHingeJoint::SetForce(...): Not implemented...\n";
+  DARTJoint::SetForce(_index, _torque);
+
+  dartJoint->getDof(0)->tau = _torque;
 }
 
 //////////////////////////////////////////////////

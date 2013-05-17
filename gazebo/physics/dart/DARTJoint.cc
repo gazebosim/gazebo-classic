@@ -185,17 +185,15 @@ void DARTJoint::Detach()
 
   // TODO: DART's joint can't change their links connected.
   // For now, recreating the joint is the only way.
-  //  if (this->dartJoint)
-  //    delete this->dartJoint;
+  if (this->dartJoint)
+    delete this->dartJoint;
 
-  //  kinematics::BodyNode* parentBodyNode = boost::shared_dynamic_cast<DARTLink>(
-  //        this->parentLink)->GetBodyNode();
-  //  kinematics::BodyNode* childBodyNode = boost::shared_dynamic_cast<DARTLink>(
-  //        this->childLink)->GetBodyNode();
+  kinematics::BodyNode* parentBodyNode = boost::shared_dynamic_cast<DARTLink>(
+        this->parentLink)->GetBodyNode();
+  kinematics::BodyNode* childBodyNode = boost::shared_dynamic_cast<DARTLink>(
+        this->childLink)->GetBodyNode();
 
-  //  this->dartJoint = new kinematics::Joint(NULL, NULL);
-
-  gzerr << "Not implemented...\n";
+  this->dartJoint = new kinematics::Joint(NULL, NULL);
 }
 
 //////////////////////////////////////////////////
