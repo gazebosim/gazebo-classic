@@ -602,8 +602,27 @@ namespace gazebo
       /// \brief Target that renders frames.
       protected: Ogre::RenderTarget *renderTarget;
 
+      /// \brief Target that renders frames.
+      protected: Ogre::RenderTarget *renderTarget2;
+
       /// \brief Texture that receives results from rendering.
       protected: Ogre::Texture *renderTexture;
+
+      /// \brief Texture that receives results from rendering.
+      protected: Ogre::Texture *renderTexture2;
+
+      /// \brief Texture that receives results from rendering.
+      protected: Ogre::Texture *camTexture;
+
+      /// \brief Texture that receives results from rendering.
+      protected: Ogre::Texture *camTexture2;
+
+      /// \brief Texture that receives results from rendering.
+      protected: int textureQueueIndex;
+
+      protected: std::vector<Ogre::Texture *> textureQueue;
+
+      protected: std::vector<Ogre::RenderTarget *> targetQueue;
 
       /// \brief True to capture frames into an image buffer.
       protected: bool captureData;
