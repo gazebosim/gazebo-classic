@@ -462,7 +462,6 @@ void Camera::ReadPixelBuffer()
       Ogre::Viewport *vp = rtt->addViewport(this->camera);
       vp->setClearEveryFrame(true);
       vp->setShadowsEnabled(true);
-      vp->setShadowsEnabled(true);
       vp->setOverlaysEnabled(false);
     }
 
