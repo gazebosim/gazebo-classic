@@ -30,6 +30,7 @@ void RegisterDepthCameraSensor();
 void RegisterMultiCameraSensor();
 void RegisterGpuRaySensor();
 void RegisterImuSensor();
+void RegisterForceTorqueSensor();
 void RegisterRaySensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
@@ -48,6 +49,7 @@ void SensorFactory::RegisterAll()
   RegisterMultiCameraSensor();
   RegisterGpuRaySensor();
   RegisterImuSensor();
+  RegisterForceTorqueSensor();
   RegisterRaySensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();

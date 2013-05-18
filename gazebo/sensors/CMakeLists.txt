@@ -6,6 +6,7 @@ set (sources
   DepthCameraSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
+  ForceTorqueSensor.cc
   MultiCameraSensor.cc
   RaySensor.cc
   RFIDSensor.cc
@@ -22,6 +23,7 @@ set (headers
   DepthCameraSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
+  ForceTorqueSensor.hh
   MultiCameraSensor.hh
   RaySensor.hh
   RFIDSensor.hh
@@ -36,6 +38,7 @@ set (headers
 set (gtest_sources
   RaySensor_TEST.cc
   ImuSensor_TEST.cc
+  # ForceTorqueSensor_TEST.cc
   Sensor_TEST.cc
 )
 

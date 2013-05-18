@@ -10,7 +10,7 @@ import "time.proto";
 
 message ForceTorque
 {
-  repeated JointWrench wrench = 1;
+  required JointWrench wrench = 1;
   required Time time          = 2;
 }
 
