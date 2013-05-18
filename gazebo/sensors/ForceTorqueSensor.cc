@@ -201,15 +201,15 @@ void ForceTorqueSensor::UpdateImpl(bool /*_force*/)
         case GAUSSIAN:
           // Add Gaussian noise + fixed bias to each data stream
           this->forceTorqueMsg.mutable_wrench()->mutable_body_2_force()->set_x(
-            this->forceTorqueMsg.wrench()->body_2_force().x() + this->bias +
+            this->forceTorqueMsg.wrench().body_2_force().x() + this->bias +
             math::Rand::GetDblNormal(this->noiseMean,
                                      this->noiseStdDev));
           this->forceTorqueMsg.mutable_wrench()->mutable_body_2_force()->set_y(
-            this->forceTorqueMsg.wrench()->body_2_force().y() + this->bias +
+            this->forceTorqueMsg.wrench().body_2_force().y() + this->bias +
             math::Rand::GetDblNormal(this->noiseMean,
                                      this->noiseStdDev));
           this->forceTorqueMsg.mutable_wrench()->mutable_body_2_force()->set_z(
-            this->forceTorqueMsg.wrench()->body_2_force().z() + this->bias +
+            this->forceTorqueMsg.wrench().body_2_force().z() + this->bias +
             math::Rand::GetDblNormal(this->noiseMean,
                                      this->noiseStdDev));
           break;
