@@ -210,8 +210,9 @@ void LogRecord::Fini()
   {
     boost::mutex::scoped_lock lock(this->controlMutex);
     this->cleanupCondition.notify_all();
-  } while (!this->cleanupThread.timed_join(
-        boost::posix_time::milliseconds(1000)));
+  } while (this->cleanupThread.joinable() &&
+          !this->cleanupThread.timed_join(
+            boost::posix_time::milliseconds(1000)));
 
   boost::mutex::scoped_lock lock(this->controlMutex);
   this->connections.clear();
