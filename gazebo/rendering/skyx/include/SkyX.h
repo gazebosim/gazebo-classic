@@ -352,6 +352,52 @@ namespace SkyX
       return mTimeOffset;
     }
 
+/*    enum SkyXMode {
+      SKYX_ALL = 0x0FFFFFFF,
+      SKYX_CLOUD = 0x0000001,
+      SKYX_MOON = 0x0000002
+    };
+
+    void setSkyXMode(SkyXMode _mode)
+    {
+      this->mode = _mode;
+    }
+
+    inline SkyXMode getSkyXMode()
+    {
+      return this->mode;
+    }*/
+
+    void setEnabled(bool _enabled)
+    {
+      this->mEnabled = _enabled;
+    }
+    inline bool getEnabled()
+    {
+      return this->mEnabled;
+    }
+
+    void setMoonEnabled(bool _enabled)
+    {
+      this->mMoonEnabled = _enabled;
+    }
+
+    inline bool getMoonEnabled()
+    {
+      return this->mMoonEnabled;
+    }
+
+    void setCloudsEnabled(bool _enabled)
+    {
+      this->mCloudsEnabled = _enabled;
+    }
+
+    inline bool getCloudsEnabled()
+    {
+      return this->mCloudsEnabled;
+    }
+
+
   private:
     /// Scene manager
     Ogre::SceneManager *mSceneManager;
@@ -402,6 +448,15 @@ namespace SkyX
 
     /// Volumetric clouds manager
     VCloudsManager* mVCloudsManager;
+
+    /// True if moon is enabled
+    bool mMoonEnabled;
+
+    /// True if clouds are enabled
+    bool mCloudsEnabled;
+
+    /// True if skyx is enabled
+    bool mEnabled;
   };
 }
 

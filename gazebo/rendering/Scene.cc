@@ -2674,3 +2674,16 @@ bool Scene::GetShowClouds() const
 
   return false;
 }
+
+/////////////////////////////////////////////////
+void Scene::SetSkyXMode(unsigned int _mode)
+{
+  bool enabled = _mode != GZ_SKYX_NONE;
+  this->skyx->setEnabled(enabled);
+
+  if (!enabled)
+    return;
+
+  this->skyx->setCloudsEnabled(_mode & GZ_SKYX_CLOUDS);
+  this->skyx->setMoonEnabled(_mode & GZ_SKYX_MOON);
+}
