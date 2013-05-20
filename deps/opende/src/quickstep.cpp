@@ -252,6 +252,7 @@ static void multiply_J (int m, dRealPtr J, int *jb,
 
 // compute out = (J*inv(M)*J' + cfm)*in.
 // use z as an nb*6 temporary.
+/* not used
 #ifdef WARM_STARTING
 static void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePtr iMJ, int *jb,
   dRealPtr cfm, dRealMutablePtr z, dRealMutablePtr in, dRealMutablePtr out)
@@ -263,6 +264,7 @@ static void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePt
   for (int i=0; i<m; i++) out[i] += cfm[i] * in[i];
 }
 #endif
+*/
 
 //***************************************************************************
 // conjugate gradient method with jacobi preconditioner
