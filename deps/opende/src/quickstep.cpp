@@ -487,7 +487,11 @@ static inline void sum6(dRealMutablePtr a, dReal delta, dRealPtr b)
 }
 
 static void ComputeRows(
+#ifdef SHOW_CONVERGENCE
                 int thread_id,
+#else
+                int /*thread_id*/,
+#endif
                 IndexError* order,
                 dxBody* const * /*body*/,
                 dxSORLCPParameters params,
