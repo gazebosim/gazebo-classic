@@ -45,7 +45,7 @@
 #define USE_TPROW
 #undef TIMING
 #undef REPORT_MONITOR
-#undef SHOW_CONVERGENCE
+#define SHOW_CONVERGENCE
 #undef RECOMPUTE_RMS
 #undef USE_1NORM
 //#define LOCAL_STEPPING  // not yet implemented
@@ -72,7 +72,7 @@ typedef dReal *dRealMutablePtr;
 // help for motor-driven joints. unfortunately it appears to hurt
 // with high-friction contacts using the SOR method. use with care
 
-//#define WARM_STARTING 1
+#define WARM_STARTING 1
 
 
 // for the SOR method:
@@ -205,8 +205,8 @@ static void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
 }
 
 // compute out = inv(M)*J'*in.
-//#ifdef WARM_STARTING
-/*static void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
+#ifdef WARM_STARTING
+static void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
   dRealPtr in, dRealMutablePtr out)
 {
   dSetZero (out,6*nb);
@@ -224,8 +224,8 @@ static void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
     }
     iMJ_ptr += 6;
   }
-}*/
-//#endif
+}
+#endif
 
 // compute out = J*in.
 
@@ -485,7 +485,7 @@ static inline void sum6(dRealMutablePtr a, dReal delta, dRealPtr b)
 }
 
 static void ComputeRows(
-                int /*thread_id*/,
+                int thread_id,
                 IndexError* order,
                 dxBody* const * /*body*/,
                 dxSORLCPParameters params,
@@ -1021,7 +1021,20 @@ static void ComputeRows(
     //}
 
 #ifdef SHOW_CONVERGENCE
-    printf("MONITOR: id: %d iteration: %d error: %20.16f\n",thread_id,iteration,rms_error);
+    if (1)
+    {
+      if (0)
+      printf("MONITOR: id: %d iteration: %d error: %20.16f\n",thread_id,iteration,rms_error);
+    }
+    else
+    {
+      for (int i=startRow; i<startRow+nRows; i++)
+      {
+        printf("%f, ", lambda[i]);
+      }
+      printf("\n");
+    }
+
 #endif
 
     if (rms_error < sor_lcp_tolerance)
@@ -1083,6 +1096,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
   const dReal stepsize)
 {
 #ifdef WARM_STARTING
+  if (0)
   {
     // for warm starting, this seems to be necessary to prevent
     // jerkiness in motor-driven joints. i have no idea why this works.
@@ -1100,15 +1114,18 @@ static void SOR_LCP (dxWorldProcessContext *context,
   dReal *iMJ = context->AllocateArray<dReal> (m*12);
   compute_invM_JT (m,J,iMJ,jb,body,invI);
 
-  // compute cforce=(inv(M)*J')*lambda. we will incrementally maintain cforce
-  // as we change lambda.
 #ifdef WARM_STARTING
-  multiply_invM_JT (m,nb,J,jb,lambda,cforce);
+  // compute cforce=(inv(M)*J')*lambda
+  if (qs->precon_iterations > 0)
+    multiply_invM_JT (m,nb,J,jb,lambda,cforce);
+  // compute caccel=(inv(M)*J')*lambda
   multiply_invM_JT (m,nb,iMJ,jb,lambda,caccel);
+  multiply_invM_JT (m,nb,iMJ,jb,lambda,caccel_erp);
 #else
+  if (qs->precon_iterations > 0)
+    dSetZero (cforce,nb*6);
   dSetZero (caccel,nb*6);
   dSetZero (caccel_erp,nb*6);
-  dSetZero (cforce,nb*6);
 #endif
 
   dReal *Ad = context->AllocateArray<dReal> (m);
@@ -1729,18 +1746,33 @@ void dxQuickStepper (dxWorldProcessContext *context,
     dReal *lambda = context->AllocateArray<dReal> (m);
     dReal *lambda_erp = context->AllocateArray<dReal> (m);
 
-#ifdef WARM_STARTING //FIXME: add for lambda_erp
+#ifdef WARM_STARTING
     {
-      dReal *lambdscurr = lambda;
+      dReal *lambdacurr = lambda;
+      dReal *lambda_erpcurr = lambda_erp;
       const dJointWithInfo1 *jicurr = jointiinfos;
       const dJointWithInfo1 *const jiend = jicurr + nj;
       for (; jicurr != jiend; jicurr++) {
         int infom = jicurr->info.m;
-        memcpy (lambdscurr, jicurr->joint->lambda, infom * sizeof(dReal));
-        lambdscurr += infom;
+        memcpy (lambdacurr, jicurr->joint->lambda, infom * sizeof(dReal));
+        lambdacurr += infom;
+        memcpy (lambda_erpcurr, jicurr->joint->lambda_erp, infom * sizeof(dReal));
+        lambda_erpcurr += infom;
       }
     }
+    
 #endif
+
+    if (0)
+    {
+      printf("-------------- saved labmdas -------------\n");
+      // print current lambdas
+      for (int i = 0; i < m; ++i)
+      {
+        printf("%f, ", lambda[i]);
+      }
+      printf("\n-------------- end of saved labmdas -------------\n");
+    }
 
     BEGIN_STATE_SAVE(context, lcpstate) {
       IFTIMING (dTimerNow ("solving LCP problem"));
@@ -1758,18 +1790,21 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
     } END_STATE_SAVE(context, lcpstate);
 
-#ifdef WARM_STARTING //FIXME: add for lambda_erp
+#ifdef WARM_STARTING
     {
       // save lambda for the next iteration
       //@@@ note that this doesn't work for contact joints yet, as they are
       // recreated every iteration
       const dReal *lambdacurr = lambda;
+      const dReal *lambda_erpcurr = lambda_erp;
       const dJointWithInfo1 *jicurr = jointiinfos;
       const dJointWithInfo1 *const jiend = jicurr + nj;
       for (; jicurr != jiend; jicurr++) {
         int infom = jicurr->info.m;
         memcpy (jicurr->joint->lambda, lambdacurr, infom * sizeof(dReal));
         lambdacurr += infom;
+        memcpy (jicurr->joint->lambda_erp, lambda_erpcurr, infom * sizeof(dReal));
+        lambda_erpcurr += infom;
       }
     }
 #endif
