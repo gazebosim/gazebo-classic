@@ -45,7 +45,7 @@
 #define USE_TPROW
 #undef TIMING
 #undef REPORT_MONITOR
-#define SHOW_CONVERGENCE
+#undef SHOW_CONVERGENCE
 #undef RECOMPUTE_RMS
 #undef USE_1NORM
 //#define LOCAL_STEPPING  // not yet implemented
@@ -1023,7 +1023,6 @@ static void ComputeRows(
 #ifdef SHOW_CONVERGENCE
     if (1)
     {
-      if (0)
       printf("MONITOR: id: %d iteration: %d error: %20.16f\n",thread_id,iteration,rms_error);
     }
     else
@@ -1763,7 +1762,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
     
 #endif
 
-    if (0)
+#ifdef SHOW_CONVERGENCE
     {
       printf("-------------- saved labmdas -------------\n");
       // print current lambdas
@@ -1773,6 +1772,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       }
       printf("\n-------------- end of saved labmdas -------------\n");
     }
+#endif
 
     BEGIN_STATE_SAVE(context, lcpstate) {
       IFTIMING (dTimerNow ("solving LCP problem"));
