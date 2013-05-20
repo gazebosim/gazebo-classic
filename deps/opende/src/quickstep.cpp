@@ -1095,6 +1095,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
   const dReal stepsize)
 {
 #ifdef WARM_STARTING
+  // not activating these works well for quickstep
   if (0)
   {
     // for warm starting, this seems to be necessary to prevent
@@ -1235,23 +1236,63 @@ static void SOR_LCP (dxWorldProcessContext *context,
 #ifndef REORDER_CONSTRAINTS
   {
     // make sure constraints with findex < 0 come first.
-    IndexError *orderhead = order; //, *ordertail = order + (m - 1);
-
     int front = 0;
     int back = m-1;
     // Fill the array from both ends
+    // where -1 is bilateral, and -2 is friction normal,
+    // might be followed by 2 positive tangential indices
+    // if friction is not zero.
+    // first pass puts positive numbers in the back
     for (int i=0; i<m; ++i) {
-      if (findex[i] < 0) {
-        orderhead->index = front; // Place them at the front
+      if (findex[i] == -1) {
+        order[front].index = i; // Place them at the front
         ++front;
-      } else {
-        orderhead->index = back; // Place them at the end
-        --back;
+      } else if (findex[i] == -2) {
+        // check if followed by two positive values
+        // i.e. friction
+        if (i + 2 < m && findex[i+1] >= 0 && findex[i+2] >= 0)
+        {
+          // put it at the back
+          order[back].index = i+2; // Place them at the end
+          --back;
+          order[back].index = i+1; // Place them at the end
+          --back;
+          order[back].index = i; // Place them at the end
+          --back;
+          i+=2;
+        }
+        else
+        {
+          // normal direction
+          order[back].index = i; // Place them at the end
+          --back;
+        }
       }
-      ++orderhead;
     }
     dIASSERT (back - front==1);
   }
+#endif
+
+#ifdef SHOW_CONVERGENCE
+    {
+      printf("-------------- saved labmdas -------------\n");
+      // print current lambdas
+      for (int i = 0; i < m; ++i)
+      {
+        printf("%f, ", lambda[order[i].index]);
+      }
+      printf("\n");
+      for (int i = 0; i < m; ++i)
+      {
+        printf("%d, ", findex[order[i].index]);
+      }
+      printf("\n");
+      for (int i = 0; i < m; ++i)
+      {
+        printf("%d, ", order[i].index);
+      }
+      printf("\n-------------- end of saved labmdas -------------\n");
+    }
 #endif
 
 #ifdef REORDER_CONSTRAINTS
@@ -1760,18 +1801,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
       }
     }
     
-#endif
-
-#ifdef SHOW_CONVERGENCE
-    {
-      printf("-------------- saved labmdas -------------\n");
-      // print current lambdas
-      for (int i = 0; i < m; ++i)
-      {
-        printf("%f, ", lambda[i]);
-      }
-      printf("\n-------------- end of saved labmdas -------------\n");
-    }
 #endif
 
     BEGIN_STATE_SAVE(context, lcpstate) {
