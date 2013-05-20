@@ -1230,6 +1230,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
 
   // order to solve constraint rows in
   IndexError *order = context->AllocateArray<IndexError> (m);
+  int *tmpOrder = context->AllocateArray<int> (m);
 
   dReal *delta_error = context->AllocateArray<dReal> (m);
 
@@ -1244,29 +1245,12 @@ static void SOR_LCP (dxWorldProcessContext *context,
     // if friction is not zero.
     // first pass puts positive numbers in the back
     for (int i=0; i<m; ++i) {
-      if (findex[i] == -1) {
+      if (findex[i] != -1) {
         order[front].index = i; // Place them at the front
         ++front;
-      } else if (findex[i] == -2) {
-        // check if followed by two positive values
-        // i.e. friction
-        if (i + 2 < m && findex[i+1] >= 0 && findex[i+2] >= 0)
-        {
-          // put it at the back
-          order[back].index = i+2; // Place them at the end
-          --back;
-          order[back].index = i+1; // Place them at the end
-          --back;
-          order[back].index = i; // Place them at the end
-          --back;
-          i+=2;
-        }
-        else
-        {
-          // normal direction
-          order[back].index = i; // Place them at the end
-          --back;
-        }
+      } else {
+        order[back].index = i; // Place them at the back
+        --back;
       }
     }
     dIASSERT (back - front==1);
@@ -2103,6 +2087,7 @@ static size_t EstimateSOR_LCPMemoryRequirements(int m,int /*nb*/)
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Adcfm_precon
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for delta_error
   res += dEFFICIENT_SIZE(sizeof(IndexError) * m); // for order
+  res += dEFFICIENT_SIZE(sizeof(int) * m); // for tmpOrder
 #ifdef REORDER_CONSTRAINTS
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for last_lambda
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for last_lambda_erp
