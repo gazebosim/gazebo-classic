@@ -1259,6 +1259,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
         --back;
       }
     }
+    dIASSERT (back - front==1);
     // second pass, put all negatives in the front,
     // should preserver -1 goes before -2,
     // and group all >0 at the end
