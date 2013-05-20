@@ -352,22 +352,6 @@ namespace SkyX
       return mTimeOffset;
     }
 
-/*    enum SkyXMode {
-      SKYX_ALL = 0x0FFFFFFF,
-      SKYX_CLOUD = 0x0000001,
-      SKYX_MOON = 0x0000002
-    };
-
-    void setSkyXMode(SkyXMode _mode)
-    {
-      this->mode = _mode;
-    }
-
-    inline SkyXMode getSkyXMode()
-    {
-      return this->mode;
-    }*/
-
     void setEnabled(bool _enabled)
     {
       this->mEnabled = _enabled;
@@ -396,7 +380,6 @@ namespace SkyX
     {
       return this->mCloudsEnabled;
     }
-
 
   private:
     /// Scene manager
