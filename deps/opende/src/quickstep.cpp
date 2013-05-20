@@ -93,7 +93,7 @@ typedef dReal *dRealMutablePtr;
 
 /// scale SOR for contact to reduce overshoot in solution for contacts
 /// \TODO: make this a parameter
-#define CONTACT_SOR_SCALE 0.5
+#define CONTACT_SOR_SCALE 0.25
 
 // structure for passing variable pointers in SOR_LCP
 struct dxSORLCPParameters {
@@ -1236,20 +1236,34 @@ static void SOR_LCP (dxWorldProcessContext *context,
 
 #ifndef REORDER_CONSTRAINTS
   {
-    // make sure constraints with findex < 0 come first.
-    int front = 0;
-    int back = m-1;
+    // -1 in front, followed by -2, lastly all the >0
     // Fill the array from both ends
     // where -1 is bilateral, and -2 is friction normal,
     // might be followed by 2 positive tangential indices
     // if friction is not zero.
-    // first pass puts positive numbers in the back
+    // first pass puts -1 in the back
+    int front = 0;
+    int back = m-1;
     for (int i=0; i<m; ++i) {
-      if (findex[i] != -1) {
-        order[front].index = i; // Place them at the front
+      if (findex[i] == -1) {
+        tmpOrder[front] = i; // Place them at the front
         ++front;
       } else {
-        order[back].index = i; // Place them at the back
+        tmpOrder[back] = i; // Place them at the end
+        --back;
+      }
+    }
+    // second pass, put all negatives in the front,
+    // should preserver -1 goes before -2,
+    // and group all >0 at the end
+    front = 0;
+    back = m-1;
+    for (int i=0; i<m; ++i) {
+      if (findex[tmpOrder[i]] < 0) {
+        order[front].index = tmpOrder[i]; // Place them at the front
+        ++front;
+      } else {
+        order[back].index = tmpOrder[i]; // Place them at the end
         --back;
       }
     }
