@@ -134,7 +134,7 @@ namespace gazebo
       /// \brief Start the logger.
       /// \param[in] _encoding The type of encoding (txt, zlib, or bz2).
       /// \param[in] _path Path in which to store log files.
-      public: bool Start(const std::string &_encoding="bz2",
+      public: bool Start(const std::string &_encoding="zlib",
                   const std::string &_path="");
 
       /// \brief Get the encoding used.
