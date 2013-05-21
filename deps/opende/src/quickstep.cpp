@@ -826,17 +826,18 @@ static void ComputeRows(
             delta -= dot6(caccel_ptr2, J_ptr + 6);
 
           // for the unthrottled _erp version
-          // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
-          bool erp_update = _dequal(rhs[index], rhs_erp[index]);
-          if (erp_update)
-            delta_erp = delta;
-          else
+          // if rhs equals rhs_erp, two solutions are the same.
+          bool custom_erp = !_dequal(rhs[index], rhs_erp[index]);
+          if (custom_erp)
           {
+            // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
             delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
             delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
             if (caccel_erp_ptr2)
               delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
           }
+          else
+            delta_erp = delta;
 
           // set the limits for this constraint.
           // this is the place where the QuickStep method differs from the
@@ -852,15 +853,21 @@ static void ComputeRows(
             hi_act = dFabs (hi[index] * lambda[findex[index]]);
             lo_act = -hi_act;
             // for the unthrottled _erp version
-            hi_act_erp = dFabs (hi[index] * lambda_erp[findex[index]]);
-            lo_act_erp = -hi_act_erp;
+            if (custom_erp)
+            {
+              hi_act_erp = dFabs (hi[index] * lambda_erp[findex[index]]);
+              lo_act_erp = -hi_act_erp;
+            }
           } else {
             // FOR erp throttled by info.c_v_max or info.c
             hi_act = hi[index];
             lo_act = lo[index];
             // for the unthrottled _erp version
-            hi_act_erp = hi[index];
-            lo_act_erp = lo[index];
+            if (custom_erp)
+            {
+              hi_act_erp = hi[index];
+              lo_act_erp = lo[index];
+            }
           }
 
           // compute lambda and clamp it to [lo,hi].
@@ -881,9 +888,7 @@ static void ComputeRows(
           }
 
           // for the unthrottled _erp version
-          if (erp_update)
-            lambda_erp[index] = lambda[index];
-          else
+          if (custom_erp)
           {
             dReal new_lambda_erp = old_lambda_erp + delta_erp;
             if (new_lambda_erp < lo_act_erp) {
@@ -898,6 +903,8 @@ static void ComputeRows(
               lambda_erp[index] = new_lambda_erp;
             }
           }
+          else
+            lambda_erp[index] = lambda[index];
   #else
           // FOR erp throttled by info.c_v_max or info.c
           dReal nl = old_lambda + delta;
@@ -923,17 +930,17 @@ static void ComputeRows(
               sum6(caccel_ptr2, delta, iMJ_ptr + 6);
 
             // update caccel_erp.
-            if (erp_update)
-            {
-              memcpy(caccel_erp_ptr1, caccel_ptr1, 6*sizeof(dReal));
-              if (caccel_erp_ptr2)
-                memcpy(caccel_erp_ptr2, caccel_ptr2, 6*sizeof(dReal));
-            }
-            else
+            if (custom_erp)
             {
               sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
               if (caccel_erp_ptr2)
                 sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
+            }
+            else
+            {
+              memcpy(caccel_erp_ptr1, caccel_ptr1, 6*sizeof(dReal));
+              if (caccel_erp_ptr2)
+                memcpy(caccel_erp_ptr2, caccel_ptr2, 6*sizeof(dReal));
             }
 
 #ifdef PENETRATION_JVERROR_CORRECTION
