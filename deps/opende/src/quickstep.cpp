@@ -72,7 +72,7 @@ typedef dReal *dRealMutablePtr;
 // help for motor-driven joints. unfortunately it appears to hurt
 // with high-friction contacts using the SOR method. use with care
 
-#define WARM_STARTING 1
+// #define WARM_STARTING 1
 
 
 // for the SOR method:
