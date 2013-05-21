@@ -72,7 +72,7 @@
           </geometry>
         </collision>
         <gravity>true</gravity>
-        <!-- <self_collide>true</self_collide> -->
+        <self_collide>true</self_collide>
         <kinematic>false</kinematic>
       </link>
       <joint name="joint_0" type="revolute">
@@ -122,7 +122,7 @@
           </geometry>
         </collision>
         <gravity>true</gravity>
-        <!-- <self_collide>true</self_collide> -->
+        <self_collide>true</self_collide>
         <kinematic>false</kinematic>
       </link>
       <joint name="joint_1" type="revolute">
@@ -184,7 +184,7 @@
           </geometry>
         </collision>
         <gravity>true</gravity>
-        <!-- <self_collide>true</self_collide> -->
+        <self_collide>true</self_collide>
         <kinematic>false</kinematic>
       </link>
       <joint name="joint_0" type="revolute">
@@ -240,7 +240,7 @@
           </geometry>
         </collision>
         <gravity>true</gravity>
-        <!-- <self_collide>true</self_collide> -->
+        <self_collide>true</self_collide>
         <kinematic>false</kinematic>
       </link>
       <joint name="joint_0" type="revolute">
