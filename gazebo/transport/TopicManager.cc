@@ -74,7 +74,7 @@ void TopicManager::Fini()
 {
   // These two lines make sure that pending messages get sent out
   this->ProcessNodes(true);
-  ConnectionManager::Instance()->RunUpdate();
+  // ConnectionManager::Instance()->RunUpdate();
 
   PublicationPtr_M::iterator iter;
   for (iter = this->advertisedTopics.begin();
@@ -136,7 +136,6 @@ void TopicManager::RemoveNode(unsigned int _id)
 //////////////////////////////////////////////////
 void TopicManager::ProcessNodes(bool _onlyOut)
 {
-  std::vector<NodePtr>::iterator iter;
   int s;
 
   {
@@ -147,8 +146,17 @@ void TopicManager::ProcessNodes(bool _onlyOut)
   }
 
   // Process nodes in parallel
-  tbb::parallel_for(tbb::blocked_range<size_t>(0, this->nodes.size(), 10),
-      NodeProcess_TBB(&this->nodes));
+  try
+  {
+    boost::mutex::scoped_lock lock(this->processNodesMutex);
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, this->nodes.size(), 10),
+        NodeProcess_TBB(&this->nodes));
+  }
+  catch(...)
+  {
+    /// Failed to process the nodes this time around. But not to
+    /// worry. This function is called again.
+  }
 
   if (!this->pauseIncoming && !_onlyOut)
   {

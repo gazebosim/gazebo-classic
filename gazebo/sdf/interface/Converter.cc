@@ -38,10 +38,7 @@ bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
 
   // Replace <gazebo> with <sdf>
   if (elem && boost::lexical_cast<double>(_toVersion) >= 1.3)
-  {
     elem->SetValue("sdf");
-    std::cout << "Set SDF value\n";
-  }
   else if (!elem)
     elem = _doc->FirstChildElement("sdf");
 
@@ -255,12 +252,13 @@ void Converter::Move(TiXmlElement *_elem, TiXmlElement *_moveElem)
   boost::algorithm::split_regex(fromTokens, fromStr, boost::regex("::"));
   boost::algorithm::split_regex(toTokens, toStr, boost::regex("::"));
 
-  if (fromTokens.size() == 0)
+  if (fromTokens.empty())
   {
     gzerr << "Incorrect 'from' string format\n";
     return;
   }
-  if (toTokens.size() == 0)
+
+  if (toTokens.empty())
   {
     gzerr << "Incorrect 'to' string format\n";
     return;

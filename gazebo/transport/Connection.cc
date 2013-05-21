@@ -25,11 +25,12 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "common/Console.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "transport/IOManager.hh"
-#include "transport/Connection.hh"
+#include "gazebo/transport/IOManager.hh"
+#include "gazebo/transport/ConnectionManager.hh"
+#include "gazebo/transport/Connection.hh"
 
 using namespace gazebo;
 using namespace transport;
@@ -73,6 +74,17 @@ Connection::Connection()
                    boost::lexical_cast<std::string>(this->GetLocalPort());
 
   this->localAddress = this->GetLocalEndpoint().address().to_string();
+
+  // Get and set the IP white list from the GAZEBO_IP_WHITE_LIST environment
+  // variable.
+  char *whiteListEnv = getenv("GAZEBO_IP_WHITE_LIST");
+  if (whiteListEnv && !std::string(whiteListEnv).empty())
+  {
+    // Automatically add in the local addresses. This guarantees that
+    // Gazebo will run properly on the local machine.
+    this->ipWhiteList = "," + this->localAddress + ",127.0.0.1,"
+      + whiteListEnv + ",";
+  }
 }
 
 //////////////////////////////////////////////////
@@ -164,9 +176,9 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
 }
 
 //////////////////////////////////////////////////
-void Connection::Listen(unsigned int port, const AcceptCallback &accept_cb)
+void Connection::Listen(unsigned int port, const AcceptCallback &_acceptCB)
 {
-  this->acceptCB = accept_cb;
+  this->acceptCB = _acceptCB;
 
   this->acceptor = new boost::asio::ip::tcp::acceptor(iomanager->GetIO());
   boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port);
@@ -189,9 +201,20 @@ void Connection::OnAccept(const boost::system::error_code &e)
   // Call the accept callback if there isn't an error
   if (!e)
   {
-    // First start a new acceptor
-    this->acceptCB(this->acceptConn);
+    if (!this->ipWhiteList.empty() &&
+        this->ipWhiteList.find("," +
+          this->acceptConn->GetRemoteHostname() + ",") == std::string::npos)
+    {
+      gzlog << "Rejected connection from["
+        << this->acceptConn->GetRemoteHostname() << "], not in white list["
+        << this->ipWhiteList << "]\n";
+    }
+    else
+    {
+      this->acceptCB(this->acceptConn);
+    }
 
+    // First start a new acceptor
     this->acceptConn = ConnectionPtr(new Connection());
 
     this->acceptor->async_accept(*this->acceptConn->socket,
@@ -268,6 +291,11 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
   if (_force)
   {
     this->ProcessWriteQueue();
+  }
+  else
+  {
+    // Tell the connection manager that it needs to update
+    ConnectionManager::Instance()->TriggerUpdate();
   }
 }
 
@@ -479,7 +507,7 @@ bool Connection::Read(std::string &data)
   }
 
   // Parse the header to get the size of the incoming data packet
-  incoming_size = this->ParseHeader(header);
+  incoming_size = this->ParseHeader(std::string(header, HEADER_LENGTH));
   if (incoming_size > 0)
   {
     incoming.resize(incoming_size);
@@ -822,4 +850,10 @@ void Connection::OnConnect(const boost::system::error_code &_error,
 unsigned int Connection::GetId() const
 {
   return this->id;
+}
+
+//////////////////////////////////////////////////
+std::string Connection::GetIPWhiteList() const
+{
+  return this->ipWhiteList;
 }

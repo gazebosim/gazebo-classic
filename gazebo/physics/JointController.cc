@@ -240,6 +240,8 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
       if (this->model->IsStatic())
       {
         math::Pose linkWorldPose = childLink->GetWorldPose();
+        /// \TODO: we want to get axis in global frame, but GetGlobalAxis
+        /// not implemented for static models yet.
         axis = linkWorldPose.rot.RotateVector(_joint->GetLocalAxis(0));
         anchor = linkWorldPose.pos;
       }

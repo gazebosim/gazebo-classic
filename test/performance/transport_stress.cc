@@ -17,6 +17,7 @@
 
 #include <boost/thread.hpp>
 #include "ServerFixture.hh"
+#include "RAMLibrary.hh"
 
 using namespace gazebo;
 
@@ -126,8 +127,25 @@ TEST_F(TransportStressTest, ManyNodes)
   std::list<transport::SubscriberPtr> subs;
   std::list<transport::PublisherPtr> pubs;
 
-  // The number of nodes to create
-  unsigned int nodeCount = 2000;
+  // The number of nodes to create.  
+  #ifdef USE_LOW_MEMORY_TESTS
+    // 1k nodes publish 10 times needs about 400Mb of RAM
+    unsigned int nodeCount = 1000;
+    unsigned int requiredMB = 400;
+  #else
+    // 2k nodes publish 10 times needs about 1.7Gb of RAM
+    unsigned int nodeCount = 2000;
+    unsigned int requiredMB = 1700;
+  #endif
+
+  // Check if there is enough memory available
+  if (! gazebo::test::memory::IsMemoryAvailable(requiredMB))
+  {
+    gzdbg << "Skipped test since " << requiredMB << 
+              "Mb of RAM were not available \n";
+    SUCCEED();
+    return;
+  }
 
   // The number of messages to send
   g_localPublishMessageCount = 10;
@@ -181,7 +199,7 @@ TEST_F(TransportStressTest, ManyNodes)
 
   // Wait for all the messages
   int waitCount = 0;
-  while (g_localPublishCount < g_totalExpectedMsgCount && waitCount < 50)
+  while (g_localPublishCount < g_totalExpectedMsgCount && waitCount < 100)
   {
     common::Time::MSleep(1000);
     waitCount++;
@@ -193,7 +211,7 @@ TEST_F(TransportStressTest, ManyNodes)
   // Time it took to received the messages.
   common::Time receiveDiff = g_localPublishEndTime - startTime;
 
-  EXPECT_LT(waitCount, 50);
+  EXPECT_LT(waitCount, 100);
 
   // Make sure we received all the messages.
   EXPECT_EQ(g_totalExpectedMsgCount, g_localPublishCount);
@@ -201,11 +219,10 @@ TEST_F(TransportStressTest, ManyNodes)
   // The total publish duration should always be very short.
   // The calculation here is the number of messages published multiplied by
   // the expected time to publish a single image message.
-  EXPECT_LT(static_cast<unsigned int>(pubDiff.nsec),
-      (g_localPublishMessageCount * nodes.size()) * 1500);
+  EXPECT_EQ(pubDiff.sec, 0);
 
   // The total receive duration will be longer.
-  EXPECT_LT(receiveDiff.sec, g_localPublishCount * 1e-6);
+  EXPECT_LT(receiveDiff.sec, g_localPublishCount * 1e-5);
 
   // Out time time for human testing purposes
   gzmsg << "Time to publish " << g_localPublishMessageCount * nodes.size()

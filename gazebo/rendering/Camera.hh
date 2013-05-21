@@ -62,6 +62,7 @@ namespace gazebo
     class MouseEvent;
     class ViewController;
     class Scene;
+    class GaussianNoiseCompositorListener;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \brief A set of rendering related class, functions, and definitions
@@ -484,6 +485,9 @@ namespace gazebo
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 
+      /// \brief Read image data from pixel buffer
+      protected: void ReadPixelBuffer();
+
       /// \brief Implementation of the Camera::TrackVisual call
       /// \param[in] _visualName Name of the visual to track
       /// \return True if able to track the visual
@@ -666,11 +670,43 @@ namespace gazebo
       /// \brief Screen space ambient occlusion compositor.
       private: Ogre::CompositorInstance *ssaoInstance;
 
+      /// \brief Gaussian noise compositor
+      private: Ogre::CompositorInstance *gaussianNoiseInstance;
+
+      /// \brief Gaussian noise compositor listener
+      private: boost::shared_ptr<GaussianNoiseCompositorListener>
+        gaussianNoiseCompositorListener;
+
       /// \brief Queue of move positions.
       private: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
 
       /// \brief Render period.
       private: common::Time renderPeriod;
+
+      /// \brief Which noise type we support
+      private: enum NoiseModelType
+      {
+        NONE,
+        GAUSSIAN
+      };
+
+      /// \brief If true, apply the noise model specified by other
+      /// noise parameters
+      private: bool noiseActive;
+
+      /// \brief Which type of noise we're applying
+      private: enum NoiseModelType noiseType;
+
+      /// \brief If noiseType==GAUSSIAN, noiseMean is the mean of the
+      /// distibution from which we sample
+      private: double noiseMean;
+
+      /// \brief If noiseType==GAUSSIAN, noiseStdDev is the standard
+      /// devation of the distibution from which we sample
+      private: double noiseStdDev;
+
+      /// \brief store option to turn off cloud
+      private: bool displayClouds;
     };
     /// \}
   }

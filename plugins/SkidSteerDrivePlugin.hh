@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_SkidSteerDrive_PLUGIN_HH__
-#define __GAZEBO_SkidSteerDrive_PLUGIN_HH__
+#ifndef _GAZEBO_SkidSteerDrive_PLUGIN_HH_
+#define _GAZEBO_SkidSteerDrive_PLUGIN_HH_
 
 #include <string>
 
-#include "common/common.hh"
-#include "physics/physics.hh"
-#include "transport/TransportTypes.hh"
-#include "gazebo.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/gazebo.hh"
 
 #define NUMBER_OF_WHEELS 4
 
@@ -49,7 +49,7 @@ namespace gazebo
     /// \param[in] _index Internal wheel index (Zero based)
     /// \param[in] _name Name wheel joint
     /// \return {0: Success, else: Error}
-    private: int RegisterJoint(int _index, const std::string _name);
+    private: int RegisterJoint(int _index, const std::string &_name);
 
     /// \brief Callback for gazebo topic
     /// \param[in] _msg Pose message from external publisher

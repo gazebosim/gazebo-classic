@@ -29,6 +29,8 @@
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ContactManager.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/ContactSensor.hh"
@@ -82,30 +84,40 @@ void ContactSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  if (!this->contactSub)
-  {
-    this->contactSub = this->node->Subscribe("~/physics/contacts",
-        &ContactSensor::OnContacts, this);
-  }
-
   std::string collisionName;
   std::string collisionScopedName;
 
   sdf::ElementPtr collisionElem =
     this->sdf->GetElement("contact")->GetElement("collision");
 
+  std::string entityName =
+      this->world->GetEntity(this->parentName)->GetScopedName();
+
   // Get all the collision elements
   while (collisionElem)
   {
     // get collision name
     collisionName = collisionElem->GetValueString();
-    collisionScopedName =
-      this->world->GetEntity(this->parentName)->GetScopedName();
+    collisionScopedName = entityName;
     collisionScopedName += "::" + collisionName;
 
     this->collisions.push_back(collisionScopedName);
 
     collisionElem = collisionElem->GetNextElement("collision");
+  }
+
+  if (!this->collisions.empty())
+  {
+    // request the contact manager to publish messages to a custom topic for
+    // this sensor
+    physics::ContactManager *mgr =
+        this->world->GetPhysicsEngine()->GetContactManager();
+    std::string topic = mgr->CreateFilter(entityName, this->collisions);
+    if (!this->contactSub)
+    {
+      this->contactSub = this->node->Subscribe(topic,
+          &ContactSensor::OnContacts, this);
+    }
   }
 }
 
@@ -120,7 +132,7 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
   std::vector<std::string>::iterator collIter;
-  std::string collision1, collision2;
+  std::string collision1;
 
   // Don't do anything if there is no new data to process.
   if (this->incomingContacts.size() == 0)
@@ -145,13 +157,10 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
       // If unable to find the first collision's name, try the second
       if (collIter == this->collisions.end())
       {
-        collision2 = collision1;
         collision1 = (*iter)->contact(i).collision2();
         collIter = std::find(this->collisions.begin(),
             this->collisions.end(), collision1);
       }
-      else
-        collision2 = (*iter)->contact(i).collision2();
 
       // If this sensor is monitoring one of the collision's in the
       // contact, then add the contact to our outgoing message.
@@ -191,6 +200,8 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
 //////////////////////////////////////////////////
 void ContactSensor::Fini()
 {
+  this->contactSub.reset();
+  this->contactsPub.reset();
   Sensor::Fini();
 }
 

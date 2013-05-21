@@ -81,13 +81,13 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 
     laser->Update(true);
 
-    double diffMax, diffSum, diffAvg;
     std::vector<double> scan;
     laser->GetRanges(scan);
 
     // run test against pre-recorded range data only in ode
     if (_physicsEngine == "ode")
     {
+      double diffMax, diffSum, diffAvg;
       DoubleCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
       EXPECT_LT(diffMax, 2e-6);
       EXPECT_LT(diffSum, 1e-4);
@@ -169,7 +169,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   std::string raySensorName = "ray_sensor";
   double hMinAngle = -M_PI/2.0;
   double hMaxAngle = M_PI/2.0;
-  double minRange = 0.0;
+  double minRange = 0.1;
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 320;
@@ -217,10 +217,6 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   int mid = samples / 2;
   double unitBoxSize = 1.0;
   double expectedRangeAtMidPoint = box01Pose.pos.x - unitBoxSize/2;
-
-  // WARNING: gazebo returns distance to object from min range
-  // issue #503
-  expectedRangeAtMidPoint -= minRange;
 
   EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
   EXPECT_NEAR(raySensor->GetRange(0), expectedRangeAtMidPoint, LASER_TOL);
@@ -285,7 +281,7 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
-    boost::shared_dynamic_cast<sensors::RaySensor>(sensor);
+    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
   raySensor->Init();
   raySensor->Update(true);

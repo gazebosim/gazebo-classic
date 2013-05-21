@@ -362,8 +362,11 @@ void ODELink::UpdateMass()
   math::Vector3 cog(0, 0, 0);
 
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
-  math::Vector3 principals = this->inertial->GetPrincipalMoments();
-  math::Vector3 products = this->inertial->GetProductsofInertia();
+  // give ODE un-rotated inertia
+  math::Matrix3 moi = this->inertial->GetMOI(
+    math::Pose(this->inertial->GetCoG(), math::Quaternion()));
+  math::Vector3 principals(moi[0][0], moi[1][1], moi[2][2]);
+  math::Vector3 products(moi[0][1], moi[0][2], moi[1][2]);
 
   dMassSetParameters(&odeMass, this->inertial->GetMass(),
       cog.x, cog.y, cog.z,
@@ -408,7 +411,6 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
           << " does not exist, GetWorldLinearVel returns default of "
           << vel << std::endl;
   }
-
   return vel;
 }
 
@@ -698,9 +700,9 @@ void ODELink::SetKinematic(const bool &_state)
   this->sdf->GetElement("kinematic")->Set(_state);
   if (this->linkId)
   {
-    if (_state)
+    if (_state && !dBodyIsKinematic(this->linkId))
       dBodySetKinematic(this->linkId);
-    else
+    else if (dBodyIsKinematic(this->linkId))
       dBodySetDynamic(this->linkId);
   }
   else

@@ -18,14 +18,15 @@
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/common/LogRecord.hh"
+#include "gazebo/util/LogRecord.hh"
 
 /////////////////////////////////////////////////
 /// \brief Test LogRecord constructor and a few accessors
 TEST(LogRecord_TEST, Constructor)
 {
-  gazebo::common::LogRecord *recorder = gazebo::common::LogRecord::Instance();
+  gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
   char *homePath = getenv("HOME");
   EXPECT_TRUE(homePath != NULL);
@@ -50,7 +51,7 @@ TEST(LogRecord_TEST, Constructor)
 /// \brief Test LogRecord Start errors
 TEST(LogRecord_TEST, StartErrors)
 {
-  gazebo::common::LogRecord *recorder = gazebo::common::LogRecord::Instance();
+  gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
   // Start without an init
   {
@@ -69,15 +70,33 @@ TEST(LogRecord_TEST, StartErrors)
     EXPECT_TRUE(recorder->GetRunning());
     EXPECT_FALSE(recorder->Start("bz2"));
   }
+
+  // Stop recording.
+  recorder->Stop();
+
+  // Make sure everything has reset.
+  EXPECT_FALSE(recorder->GetRunning());
+  EXPECT_FALSE(recorder->GetPaused());
+  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+
+  // Logger may still be writing so make sure we exit cleanly
+  int i = 0;
+  while (!recorder->IsReadyToStart())
+  {
+    gazebo::common::Time::MSleep(100);
+    if ((++i % 50) == 0)
+      gzdbg << "Waiting for recorder->IsReadyToStart()" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
 /// \brief Test LogRecord Init and Start
-TEST(LogRecord_TEST, Start)
+TEST(LogRecord_TEST, Start_bzip2)
 {
-  gazebo::common::LogRecord *recorder = gazebo::common::LogRecord::Instance();
-  recorder->Init("test");
-  recorder->Start("bz2");
+  gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
+
+  EXPECT_TRUE(recorder->Init("test"));
+  EXPECT_TRUE(recorder->Start("bz2"));
 
   // Make sure the right flags have been set
   EXPECT_FALSE(recorder->GetPaused());
@@ -101,6 +120,57 @@ TEST(LogRecord_TEST, Start)
   EXPECT_FALSE(recorder->GetRunning());
   EXPECT_FALSE(recorder->GetPaused());
   EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+
+  // Logger may still be writing so make sure we exit cleanly
+  int i = 0;
+  while (!recorder->IsReadyToStart())
+  {
+    gazebo::common::Time::MSleep(100);
+    if ((++i % 50) == 0)
+      gzdbg << "Waiting for recorder->IsReadyToStart()" << std::endl;
+  }
+}
+
+/////////////////////////////////////////////////
+/// \brief Test LogRecord Init and Start
+TEST(LogRecord_TEST, Start_zlib)
+{
+  gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
+
+  EXPECT_TRUE(recorder->Init("test"));
+  EXPECT_TRUE(recorder->Start("zlib"));
+
+  // Make sure the right flags have been set
+  EXPECT_FALSE(recorder->GetPaused());
+  EXPECT_TRUE(recorder->GetRunning());
+  EXPECT_TRUE(recorder->GetFirstUpdate());
+
+  // Make sure the right encoding is set
+  EXPECT_EQ(recorder->GetEncoding(), std::string("zlib"));
+
+  // Make sure the log directories exist
+  EXPECT_TRUE(boost::filesystem::exists(recorder->GetBasePath()));
+  EXPECT_TRUE(boost::filesystem::is_directory(recorder->GetBasePath()));
+
+  // Run time should be zero since no update has been triggered.
+  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+
+  // Stop recording.
+  recorder->Stop();
+
+  // Make sure everything has reset.
+  EXPECT_FALSE(recorder->GetRunning());
+  EXPECT_FALSE(recorder->GetPaused());
+  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+
+  // Logger may still be writing so make sure we exit cleanly
+  int i = 0;
+  while (!recorder->IsReadyToStart())
+  {
+    gazebo::common::Time::MSleep(100);
+    if ((++i % 50) == 0)
+      gzdbg << "Waiting for recorder->IsReadyToStart()" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////

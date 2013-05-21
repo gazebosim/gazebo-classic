@@ -156,7 +156,7 @@ namespace gazebo
       /// \param[in] _autoRender True to allow Gazebo to automatically
       /// render the camera. This should almost always be true.
       /// \return Pointer to the new camera.
-     public: DepthCameraPtr CreateDepthCamera(const std::string &_name,
+      public: DepthCameraPtr CreateDepthCamera(const std::string &_name,
                                                bool _autoRender = true);
 
       /// \brief Create laser that generates data from rendering.
@@ -164,8 +164,8 @@ namespace gazebo
       /// \param[in] _autoRender True to allow Gazebo to automatically
       /// render the camera. This should almost always be true.
       /// \return Pointer to the new laser.
-      // public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
-      //                                   bool _autoRender = true);
+      public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
+                                         bool _autoRender = true);
 
       /// \brief Get the number of cameras in this scene
       /// \return Number of lasers.
@@ -199,6 +199,10 @@ namespace gazebo
       /// \return Pointer to the UserCamera, or NULL if the index was
       /// invalid.
       public: UserCameraPtr GetUserCamera(uint32_t _index) const;
+
+      /// \brief Remove a camera from the scene
+      /// \param[in] _name Name of the camera.
+      public: void RemoveCamera(const std::string &_name);
 
       /// \brief Get a light by name.
       /// \param[in] _name Name of the light to get.
@@ -391,6 +395,14 @@ namespace gazebo
       /// \param[in] _show True to enable contact visualization.
       public: void ShowContacts(bool _show);
 
+      /// \brief Display clouds in the sky.
+      /// \param[in] _show True to display clouds.
+      public: void ShowClouds(bool _show);
+
+      /// \brief Get whether or not clouds are displayed.
+      /// \return True if clouds are displayed.
+      public: bool GetShowClouds() const;
+
       /// \brief Return true if the Scene has been initialized.
       public: bool GetInitialized() const;
 
@@ -466,7 +478,7 @@ namespace gazebo
 
       /// \brief Proces a scene message.
       /// \param[in] _msg The message data.
-      private: void ProcessSceneMsg(ConstScenePtr &_msg);
+      private: bool ProcessSceneMsg(ConstScenePtr &_msg);
 
       /// \brief Process a model message.
       /// \param[in] _msg The message data.
@@ -490,7 +502,7 @@ namespace gazebo
 
       /// \brief Process a light message.
       /// \param[in] _msg The message data.
-      private: void ProcessLightMsg(ConstLightPtr &_msg);
+      private: bool ProcessLightMsg(ConstLightPtr &_msg);
 
       /// \brief Process a request message.
       /// \param[in] _msg The message data.
@@ -510,7 +522,7 @@ namespace gazebo
 
       /// \brief Pose message callback.
       /// \param[in] _msg The message data.
-      private: void OnPoseMsg(ConstPose_VPtr &_msg);
+      private: void OnPoseMsg(ConstPosesStampedPtr &_msg);
 
       /// \brief Skeleton animation callback.
       /// \param[in] _msg The message data.
@@ -744,6 +756,21 @@ namespace gazebo
 
       /// \brief Initialized.
       private: bool initialized;
+
+      /// \brief SimTime of this Scene, as we receive PosesStamped from
+      /// the world, we update this time accordingly.
+      private: common::Time sceneSimTimePosesReceived;
+
+      /// \brief SimTime of this Scene, after applying PosesStamped to
+      /// scene, we update this time accordingly.
+      private: common::Time sceneSimTimePosesApplied;
+
+      /// \brief Get the scene simulation time.
+      /// Note this is different from World::GetSimTime() because
+      /// there is a lag between the time new poses are sent out by World
+      /// and when they are received and applied by the Scene.
+      /// \return The current simulation time in Scene
+      public: common::Time GetSimTime() const;
     };
     /// \}
   }

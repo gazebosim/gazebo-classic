@@ -49,7 +49,7 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 //////////////////////////////////////////////////
 Publisher::~Publisher()
 {
-  if (this->messages.size() > 0)
+  if (!this->messages.empty())
     this->SendMessage();
 
   if (!this->topic.empty())
@@ -73,7 +73,7 @@ void Publisher::WaitForConnection() const
 
 //////////////////////////////////////////////////
 void Publisher::PublishImpl(const google::protobuf::Message &_message,
-                            bool /*_block*/)
+                            bool _block)
 {
   if (_message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
@@ -112,7 +112,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   msgPtr->CopyFrom(_message);
 
   {
-    boost::recursive_mutex::scoped_lock lock(this->mutex);
+    boost::mutex::scoped_lock lock(this->mutex);
     if (this->prevMsg == NULL)
       this->prevMsg = msgPtr;
 
@@ -120,6 +120,8 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
 
     if (this->messages.size() > this->queueLimit)
     {
+      this->messages.pop_front();
+
       if (!queueLimitWarned)
       {
         gzwarn << "Queue limit reached for topic "
@@ -128,37 +130,55 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
                << "This warning is printed only once." << std::endl;
         queueLimitWarned = true;
       }
-
-      this->messages.pop_front();
     }
+  }
+
+  if (_block)
+  {
+    this->SendMessage();
+  }
+  else
+  {
+    // Tell the connection manager that it needs to update
+    ConnectionManager::Instance()->TriggerUpdate();
   }
 }
 
 //////////////////////////////////////////////////
 void Publisher::SendMessage()
 {
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
+  std::list<MessagePtr> localBuffer;
 
-  if (this->messages.size() > 0)
   {
-    std::list<MessagePtr>::iterator iter;
-    for (iter = this->messages.begin(); iter != this->messages.end(); ++iter)
+    boost::mutex::scoped_lock lock(this->mutex);
+
+    std::copy(this->messages.begin(), this->messages.end(),
+        std::back_inserter(localBuffer));
+    this->messages.clear();
+  }
+
+  // Only send messages if there is something to send
+  if (!localBuffer.empty())
+  {
+    // Send all the current messages
+    for (std::list<MessagePtr>::iterator iter = localBuffer.begin();
+        iter != localBuffer.end(); ++iter)
     {
       // Send the latest message.
       TopicManager::Instance()->Publish(this->topic, *iter,
           boost::bind(&Publisher::OnPublishComplete, this));
     }
 
-    this->messages.clear();
+    // Clear the local buffer.
+    localBuffer.clear();
   }
 }
 
 //////////////////////////////////////////////////
 unsigned int Publisher::GetOutgoingCount() const
 {
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
-  unsigned int c = this->messages.size();
-  return c;
+  boost::mutex::scoped_lock lock(this->mutex);
+  return this->messages.size();
 }
 
 //////////////////////////////////////////////////
@@ -201,7 +221,7 @@ bool Publisher::GetLatching() const
 std::string Publisher::GetPrevMsg() const
 {
   std::string result;
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
+  boost::mutex::scoped_lock lock(this->mutex);
   if (this->prevMsg)
     this->prevMsg->SerializeToString(&result);
   return result;
@@ -210,7 +230,7 @@ std::string Publisher::GetPrevMsg() const
 //////////////////////////////////////////////////
 MessagePtr Publisher::GetPrevMsgPtr() const
 {
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
+  boost::mutex::scoped_lock lock(this->mutex);
   if (this->prevMsg)
     return this->prevMsg;
   return MessagePtr();

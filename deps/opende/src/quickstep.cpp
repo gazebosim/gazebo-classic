@@ -81,17 +81,19 @@ typedef dReal *dRealMutablePtr;
 // and the optimal order is somewhat problem dependent.
 // @@@ try the leaf->root ordering.
 
-//#define REORDER_CONSTRAINTS 1
-
+// #define REORDER_CONSTRAINTS 1
 
 // for the SOR method:
 // uncomment the following line to randomly reorder constraint rows
 // during the solution. depending on the situation, this can help a lot
 // or hardly at all, but it doesn't seem to hurt.
 
-#define RANDOMLY_REORDER_CONSTRAINTS 1
+// #define RANDOMLY_REORDER_CONSTRAINTS 1
 #undef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
 
+/// scale SOR for contact to reduce overshoot in solution for contacts
+/// \TODO: make this a parameter
+#define CONTACT_SOR_SCALE 0.5
 
 // structure for passing variable pointers in SOR_LCP
 struct dxSORLCPParameters {
@@ -1122,59 +1124,68 @@ static void SOR_LCP (dxWorldProcessContext *context,
       if (jb[i*2+1] >= 0) {
         for (int k=6; k<12; k++) sum += iMJ_ptr[k] * J_ptr[k];
       }
-      Ad[i] = sor_w / (sum + cfm[i]);
+      if (findex[i] < 0)
+        Ad[i] = sor_w / (sum + cfm[i]);
+      else
+        Ad[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
     }
   }
 
   // recompute Ad for preconditioned case, Ad_precon is similar to Ad but
   //   whereas Ad is 1 over diagonals of J inv(M) J'
   //    Ad_precon is 1 over diagonals of J J'
-  dReal *Ad_precon = context->AllocateArray<dReal> (m);
-
+  dReal *Adcfm_precon = NULL;
+  if (qs->precon_iterations > 0)
   {
-    const dReal sor_w = qs->w;    // SOR over-relaxation parameter
-    // precompute 1 / diagonals of A
-    // preconditioned version uses J instead of iMJ
-    dRealPtr J_ptr = J;
-    for (int i=0; i<m; J_ptr += 12, i++) {
-      dReal sum = 0;
-      for (int j=0; j<6; j++) sum += J_ptr[j] * J_ptr[j];
-      if (jb[i*2+1] >= 0) {
-        for (int k=6; k<12; k++) sum += J_ptr[k] * J_ptr[k];
+    dReal *Ad_precon = context->AllocateArray<dReal> (m);
+
+    {
+      const dReal sor_w = qs->w;    // SOR over-relaxation parameter
+      // precompute 1 / diagonals of A
+      // preconditioned version uses J instead of iMJ
+      dRealPtr J_ptr = J;
+      for (int i=0; i<m; J_ptr += 12, i++) {
+        dReal sum = 0;
+        for (int j=0; j<6; j++) sum += J_ptr[j] * J_ptr[j];
+        if (jb[i*2+1] >= 0) {
+          for (int k=6; k<12; k++) sum += J_ptr[k] * J_ptr[k];
+        }
+        if (findex[i] < 0)
+          Ad_precon[i] = sor_w / (sum + cfm[i]);
+        else
+          Ad_precon[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
       }
-      Ad_precon[i] = sor_w / (sum + cfm[i]);
     }
-  }
 
-  /********************************/
-  /* allocate for Adcfm           */
-  /* which is a mX1 column vector */
-  /********************************/
-  // compute Adcfm_precon for the preconditioned case
-  //   do this first before J gets altered (J's diagonals gets premultiplied by Ad)
-  //   and save a copy of J into J_orig
-  //   as J becomes J * Ad, J_precon becomes J * Ad_precon
-  dReal *Adcfm_precon = context->AllocateArray<dReal> (m);
+    /********************************/
+    /* allocate for Adcfm           */
+    /* which is a mX1 column vector */
+    /********************************/
+    // compute Adcfm_precon for the preconditioned case
+    //   do this first before J gets altered (J's diagonals gets premultiplied by Ad)
+    //   and save a copy of J into J_orig
+    //   as J becomes J * Ad, J_precon becomes J * Ad_precon
+    Adcfm_precon = context->AllocateArray<dReal> (m);
+    {
 
+      // NOTE: This may seem unnecessary but it's indeed an optimization
+      // to move multiplication by Ad[i] and cfm[i] out of iteration loop.
 
-  {
-    // NOTE: This may seem unnecessary but it's indeed an optimization
-    // to move multiplication by Ad[i] and cfm[i] out of iteration loop.
-
-    // scale J_precon and rhs_precon by Ad
-    // copy J_orig
-    dRealMutablePtr J_ptr = J;
-    dRealMutablePtr J_precon_ptr = J_precon;
-    dRealMutablePtr J_orig_ptr = J_orig;
-    for (int i=0; i<m; J_ptr += 12, J_precon_ptr += 12, J_orig_ptr += 12, i++) {
-      dReal Ad_precon_i = Ad_precon[i];
-      for (int j=0; j<12; j++) {
-        J_precon_ptr[j] = J_ptr[j] * Ad_precon_i;
-        J_orig_ptr[j] = J_ptr[j]; //copy J
+      // scale J_precon and rhs_precon by Ad
+      // copy J_orig
+      dRealMutablePtr J_ptr = J;
+      dRealMutablePtr J_orig_ptr = J_orig;
+      dRealMutablePtr J_precon_ptr = J_precon;
+      for (int i=0; i<m; J_ptr += 12, J_precon_ptr += 12, J_orig_ptr += 12, i++) {
+        dReal Ad_precon_i = Ad_precon[i];
+        for (int j=0; j<12; j++) {
+          J_precon_ptr[j] = J_ptr[j] * Ad_precon_i;
+          J_orig_ptr[j] = J_ptr[j]; //copy J
+        }
+        rhs_precon[i] *= Ad_precon_i;
+        // scale Ad by CFM. N.B. this should be done last since it is used above
+        Adcfm_precon[i] = Ad_precon_i * cfm[i];
       }
-      rhs_precon[i] *= Ad_precon_i;
-      // scale Ad by CFM. N.B. this should be done last since it is used above
-      Adcfm_precon[i] = Ad_precon_i * cfm[i];
     }
   }
 
@@ -1208,19 +1219,22 @@ static void SOR_LCP (dxWorldProcessContext *context,
 #ifndef REORDER_CONSTRAINTS
   {
     // make sure constraints with findex < 0 come first.
-    IndexError *orderhead = order, *ordertail = order + (m - 1);
+    IndexError *orderhead = order; //, *ordertail = order + (m - 1);
 
+    int front = 0;
+    int back = m-1;
     // Fill the array from both ends
-    for (int i=0; i<m; i++) {
+    for (int i=0; i<m; ++i) {
       if (findex[i] < 0) {
-        orderhead->index = i; // Place them at the front
-        ++orderhead;
+        orderhead->index = front; // Place them at the front
+        ++front;
       } else {
-        ordertail->index = i; // Place them at the end
-        --ordertail;
+        orderhead->index = back; // Place them at the end
+        --back;
       }
+      ++orderhead;
     }
-    dIASSERT (orderhead-ordertail==1);
+    dIASSERT (back - front==1);
   }
 #endif
 
@@ -1578,13 +1592,13 @@ void dxQuickStepper (dxWorldProcessContext *context,
         dxJoint::Info2 Jinfo;
         Jinfo.rowskip = 12;
         Jinfo.fps = stepsize1;
-        Jinfo.erp = world->global_erp;
 
         dReal *Jcopyrow = Jcopy;
         unsigned ofsi = 0;
         const dJointWithInfo1 *jicurr = jointiinfos;
         const dJointWithInfo1 *const jiend = jicurr + nj;
         for (; jicurr != jiend; jicurr++) {
+          Jinfo.erp = world->global_erp;
           dReal *const Jrow = J + ofsi * 12;
           Jinfo.J1l = Jrow;
           Jinfo.J1a = Jrow + 3;
@@ -1692,7 +1706,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
 
       // compute rhs_precon
-      computeRHSPrecon(context,m,nb,I,body,stepsize1,c,J,jb,rhs_precon);
+      if (world->qs.precon_iterations > 0)
+        computeRHSPrecon(context,m,nb,I,body,stepsize1,c,J,jb,rhs_precon);
 
 
 

@@ -41,7 +41,6 @@ bool g_plot;
 /////////////////////////////////////////////////
 void cb(ConstWorldStatisticsPtr &_msg)
 {
-  static bool first = true;
   double percent = 0;
   char paused;
   common::Time simTime  = msgs::Convert(_msg->sim_time());
@@ -86,6 +85,7 @@ void cb(ConstWorldStatisticsPtr &_msg)
 
   if (g_plot)
   {
+    static bool first = true;
     if (first)
     {
       printf("# real-time factor (percent), simtime (sec), realtime (sec), "
@@ -112,8 +112,6 @@ void SignalHandler(int /*dummy*/)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  std::string worldName = "default";
-
   if (signal(SIGINT, SignalHandler) == SIG_ERR)
   {
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
@@ -149,6 +147,7 @@ int main(int argc, char **argv)
     return 1;
   }
 
+  std::string worldName;
   if (vm.count("world-name"))
   {
     worldName = vm["world-name"].as<std::string>();
@@ -159,19 +158,20 @@ int main(int argc, char **argv)
     g_plot = true;
   }
 
-  transport::init();
+  if (transport::init())
+  {
+    transport::NodePtr node(new transport::Node());
 
-  transport::NodePtr node(new transport::Node());
+    node->Init(worldName);
 
-  node->Init(worldName);
+    std::string topic = "~/world_stats";
 
-  std::string topic = "~/world_stats";
+    transport::SubscriberPtr sub = node->Subscribe(topic, cb);
+    transport::run();
 
-  transport::SubscriberPtr sub = node->Subscribe(topic, cb);
-  transport::run();
-
-  boost::mutex::scoped_lock lock(mutex);
-  condition.wait(lock);
+    boost::mutex::scoped_lock lock(mutex);
+    condition.wait(lock);
+  }
 
   transport::fini();
 

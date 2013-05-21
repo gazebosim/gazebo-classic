@@ -21,9 +21,13 @@
 #include "test/ServerFixture.hh"
 #include "gazebo/sensors/ImuSensor.hh"
 
+#define TOL 1e-4
+
 using namespace gazebo;
 class ImuSensor_TEST : public ServerFixture
 {
+  public: void BasicImuSensorCheck(const std::string &_physicsEngine);
+  public: void LinearAccelerationTest(const std::string &_physicsEngine);
 };
 
 static std::string imuSensorString =
@@ -37,9 +41,9 @@ static std::string imuSensorString =
 "  </sensor>"
 "</sdf>";
 
-TEST_F(ImuSensor_TEST, BasicImuSensorCheck)
+void ImuSensor_TEST::BasicImuSensorCheck(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world");
+  Load("worlds/empty.world", false, _physicsEngine);
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   sdf::ElementPtr sdf(new sdf::Element);
@@ -68,6 +72,91 @@ TEST_F(ImuSensor_TEST, BasicImuSensorCheck)
   EXPECT_EQ(sensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
 }
 
+TEST_F(ImuSensor_TEST, BasicImuSensorCheckODE)
+{
+  BasicImuSensorCheck("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(ImuSensor_TEST, BasicImuSensorCheckBullet)
+{
+  BasicImuSensorCheck("bullet");
+}
+#endif
+
+// Drop a model with imu sensor and measure its linear acceleration
+void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
+{
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  double z = 3;
+  double gravityZ = physics->GetGravity().z;
+  double stepSize = physics->GetMaxStepSize();
+
+  std::string modelName = "imuModel";
+  std::string imuSensorName = "imuSensor";
+  math::Pose modelPose(0, 0, z, 0, 0, 0);
+
+  std::string topic = "~/" + imuSensorName + "_" + _physicsEngine;
+  // spawn imu sensor
+  SpawnUnitImuSensor(modelName, imuSensorName,
+      "box", topic, modelPose.pos, modelPose.rot.GetAsEuler());
+
+  sensors::SensorPtr sensor = sensors::get_sensor(imuSensorName);
+  sensors::ImuSensorPtr imuSensor =
+      boost::dynamic_pointer_cast<sensors::ImuSensor>(sensor);
+
+  ASSERT_TRUE(imuSensor);
+
+  sensors::SensorManager::Instance()->Init();
+  imuSensor->SetActive(true);
+
+  EXPECT_EQ(imuSensor->GetAngularVelocity(), math::Vector3::Zero);
+  EXPECT_EQ(imuSensor->GetLinearAcceleration(), math::Vector3::Zero);
+  EXPECT_EQ(imuSensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
+
+  // step world and verify imu's linear acceleration is zero on free fall
+  world->StepWorld(200);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, 0, TOL);
+  world->StepWorld(1);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, 0, TOL);
+
+  // Predict time of contact with ground plane.
+  double tHit = sqrt((z-0.5) / (-gravityZ));
+  // Time to advance, allow 0.5 s settling time.
+  // This assumes inelastic collisions with the ground.
+  double dtHit = tHit+0.5 - world->GetSimTime().Double();
+  double steps = ceil(dtHit / stepSize);
+  EXPECT_GT(steps, 0);
+  world->StepWorld(steps);
+
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, -gravityZ, TOL);
+}
+
+TEST_F(ImuSensor_TEST, LinearAccelerationTestODE)
+{
+  LinearAccelerationTest("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(ImuSensor_TEST, LinearAccelerationTestBullet)
+{
+  LinearAccelerationTest("bullet");
+}
+#endif
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
