@@ -33,11 +33,6 @@ class PhysicsTest : public ServerFixture
   public: void CollisionFiltering(const std::string &_physicsEngine);
 };
 
-TEST_F(PhysicsTest, SimplePendulumODE1)
-{
-  SimplePendulum("ode");
-}
-
 ////////////////////////////////////////////////////////////////////////
 // EmptyWorld:
 // Load a world, take a few steps, and verify that time is increasing.
