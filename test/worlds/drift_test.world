@@ -1,0 +1,321 @@
+<sdf version="1.4">
+  <world name="default">
+    <scene>
+      <ambient>1.000000 1.000000 1.000000 1.000000</ambient>
+      <background>0.700000 0.700000 0.700000 1.000000</background>
+      <shadows>1</shadows>
+    </scene>
+    <physics type="ode">
+      <gravity>0.000000 0.000000 -1.000000</gravity>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>300</iters>
+          <sor>1.300000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <contact_max_correcting_vel>100.000000</contact_max_correcting_vel>
+          <contact_surface_layer>0.001000</contact_surface_layer>
+        </constraints>
+      </ode>
+      <real_time_update_rate>0.000000</real_time_update_rate>
+      <max_step_size>0.001000</max_step_size>
+    </physics>
+    <model name="gplane">
+      <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+      <link name="plane">
+        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <collision name="plane">
+          <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <plane>
+              <normal>0.000000 0.000000 1.000000</normal>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>50.000000</mu>
+                <mu2>50.000000</mu2>
+                <fdir1>0.000000 0.000000 0.000000</fdir1>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <bounce>
+              <restitution_coefficient>0.000000</restitution_coefficient>
+              <threshold>100000.000000</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <soft_cfm>0.000000</soft_cfm>
+                <soft_erp>0.200000</soft_erp>
+                <kp>1000000000.000000</kp>
+                <kd>1.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.001000</min_depth>
+              </ode>
+            </contact>
+          </surface>
+          <laser_retro>0.000000</laser_retro>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+      </link>
+      <static>1</static>
+    </model>
+    <model name="drift_boxes">
+      <static>false</static>
+      <link name="link_friction">
+        <pose>0 0 0.5 0 0 0</pose>
+        <inertial>
+          <pose>.4 0 0 0 0 0</pose>
+          <mass>300.0</mass>
+          <inertia>
+            <ixx>0.041667</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>0.041667</iyy>
+            <iyz>0.0</iyz>
+            <izz>0.041667</izz>
+          </inertia>
+        </inertial>
+        <!--
+            <collision name="collision_1">
+              <geometry>
+                <cylinder>
+                  <radius>0.05</radius>
+                  <length>0.05</length>
+                </cylinder>
+              </geometry>
+              <max_contacts>60</max_contacts>
+            </collision>
+            <visual name="visual_1">
+              <geometry>
+                <cylinder>
+                  <radius>0.05</radius>
+                  <length>0.05</length>
+                </cylinder>
+              </geometry>
+              <material>
+                <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/WoodPallet</name></script>
+              </material>
+            </visual>
+            -->
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.0 1.0 1.0</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>1000000.000000</kp>
+                <kd>100.000000</kd>
+                <max_vel>1.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+            <friction>
+              <ode>
+                <mu>1.000000</mu>
+                <mu2>1.000000</mu2>
+                <fdir1>1.000000 0.000000 0.000000</fdir1>
+              </ode>
+            </friction>
+          </surface>
+          <surface>
+            <contact>
+              <ode />
+            </contact>
+            <friction>
+              <ode />
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1.0 1.0 1.0</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/WoodPallet</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <link name="link_no_friction">
+        <pose>0 1.5 0.5 0 0 0</pose>
+        <inertial>
+          <pose>.4 0 0 0 0 0</pose>
+          <mass>300.0</mass>
+          <inertia>
+            <ixx>0.041667</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>0.041667</iyy>
+            <iyz>0.0</iyz>
+            <izz>0.041667</izz>
+          </inertia>
+        </inertial>
+        <!--
+            <collision name="collision_1">
+              <geometry>
+                <cylinder>
+                  <radius>0.05</radius>
+                  <length>0.05</length>
+                </cylinder>
+              </geometry>
+              <max_contacts>60</max_contacts>
+            </collision>
+            <visual name="visual_1">
+              <geometry>
+                <cylinder>
+                  <radius>0.05</radius>
+                  <length>0.05</length>
+                </cylinder>
+              </geometry>
+              <material>
+                <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/WoodPallet</name></script>
+              </material>
+            </visual>
+      -->
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.0 1.0 1.0</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>1000000.000000</kp>
+                <kd>100.000000</kd>
+                <max_vel>1.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.000000</mu>
+                <mu2>0.000000</mu2>
+                <fdir1>1.000000 0.000000 0.000000</fdir1>
+              </ode>
+            </friction>
+          </surface>
+          <surface>
+            <contact>
+              <ode />
+            </contact>
+            <friction>
+              <ode />
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1.0 1.0 1.0</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/WoodPallet</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <link name="link_no_offset">
+        <pose>0 -1.5 0.5 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>300.0</mass>
+          <inertia>
+            <ixx>0.041667</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>0.041667</iyy>
+            <iyz>0.0</iyz>
+            <izz>0.041667</izz>
+          </inertia>
+        </inertial>
+        <!--
+            <collision name="collision_1">
+              <geometry>
+                <cylinder>
+                  <radius>0.05</radius>
+                  <length>0.05</length>
+                </cylinder>
+              </geometry>
+              <max_contacts>60</max_contacts>
+            </collision>
+            <visual name="visual_1">
+              <geometry>
+                <cylinder>
+                  <radius>0.05</radius>
+                  <length>0.05</length>
+                </cylinder>
+              </geometry>
+              <material>
+                <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/WoodPallet</name></script>
+              </material>
+            </visual>
+      -->
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.0 1.0 1.0</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>1000000.000000</kp>
+                <kd>100.000000</kd>
+                <max_vel>1.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.000000</mu>
+                <mu2>0.000000</mu2>
+                <fdir1>1.000000 0.000000 0.000000</fdir1>
+              </ode>
+            </friction>
+          </surface>
+          <surface>
+            <contact>
+              <ode />
+            </contact>
+            <friction>
+              <ode />
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1.0 1.0 1.0</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/WoodPallet</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <allow_auto_disable>false</allow_auto_disable>
+    </model>
+  </world>
+</sdf>

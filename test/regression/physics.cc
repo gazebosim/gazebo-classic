@@ -31,6 +31,7 @@ class PhysicsTest : public ServerFixture
   public: void RevoluteJoint(const std::string &_physicsEngine);
   public: void SimplePendulum(const std::string &_physicsEngine);
   public: void CollisionFiltering(const std::string &_physicsEngine);
+  public: void CoGOffsetDriftTest(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -1586,6 +1587,134 @@ TEST_F(PhysicsTest, ZeroMaxContactsODE)
 
   physics::ModelPtr model = world->GetModel("ground_plane");
   ASSERT_TRUE(model);
+}
+
+TEST_F(PhysicsTest, CoGOffsetDriftTestODE)
+{
+  CoGOffsetDriftTest("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, CoGOffsetDriftTestBullet)
+{
+  CoGOffsetDriftTest("bullet");
+}
+#endif  // HAVE_BULLET
+
+/////////////////////////////////////////////////
+// This test verifies that resting contact with CoG offset does not
+// drift too much.
+void PhysicsTest::CoGOffsetDriftTest(const std::string &_physicsEngine)
+{
+  Load("worlds/drift_test.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  int i = 0;
+  while (!this->HasEntity("drift_boxes") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get model drift_boxes");
+
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  EXPECT_TRUE(physicsEngine);
+  physics::ModelPtr model = world->GetModel("drift_boxes");
+  EXPECT_TRUE(model);
+  physics::LinkPtr link_friction = model->GetLink("link_friction");
+  EXPECT_TRUE(link_friction);
+  physics::LinkPtr link_no_friction = model->GetLink("link_no_friction");
+  EXPECT_TRUE(link_no_friction);
+  physics::LinkPtr link_no_offset = model->GetLink("link_no_offset");
+  EXPECT_TRUE(link_no_offset);
+
+  {
+    // test with global contact_max_correcting_vel at 0 as set by world file
+    //   here we expect significant energy loss as the velocity correction
+    //   is set to 0
+    int steps = 10;  // @todo: make this more general
+
+    // random sample 500 and 200 iterations for reference
+    for (int i = 0; i < steps; i ++)
+    {
+      math::Pose pose_friction_last = link_friction->GetWorldPose();
+      math::Pose pose_no_friction_last = link_no_friction->GetWorldPose();
+      math::Pose pose_no_offset_last = link_no_offset->GetWorldPose();
+
+      world->StepWorld(2000);
+      {
+        // check velocity / energy
+        math::Vector3 vel_friction = link_friction->GetWorldLinearVel();
+        math::Vector3 ang_friction = link_friction->GetWorldAngularVel();
+        math::Vector3 vel_no_friction = link_no_friction->GetWorldLinearVel();
+        math::Vector3 ang_no_friction = link_no_friction->GetWorldAngularVel();
+        math::Vector3 vel_no_offset = link_no_offset->GetWorldLinearVel();
+        math::Vector3 ang_no_offset = link_no_offset->GetWorldAngularVel();
+
+        math::Pose pose_friction = link_friction->GetWorldPose();
+        math::Pose pose_no_friction = link_no_friction->GetWorldPose();
+        math::Pose pose_no_offset = link_no_offset->GetWorldPose();
+
+        math::Pose d_pose_friction = pose_friction - pose_friction_last;
+        math::Pose d_pose_no_friction =
+          pose_no_friction - pose_no_friction_last;
+        math::Pose d_pose_no_offset =
+          pose_no_offset - pose_no_offset_last;
+
+        gzdbg << "friction [" << pose_friction
+              << "] no_friction [" << pose_no_friction
+              << "] no_offset [" << pose_no_offset
+              << "] d_friction [" << d_pose_friction
+              << "] d_no_friction [" << d_pose_no_friction
+              << "] d_no_offset [" << d_pose_no_offset
+              << "]\n";
+
+        math::Pose pose_friction_last = pose_friction;
+        math::Pose pose_no_friction_last = pose_no_friction;
+        math::Pose pose_no_offset_last = pose_no_offset;
+
+        EXPECT_NEAR(vel_friction.x, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel_friction.y, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel_friction.z, 0, PHYSICS_TOL);
+        EXPECT_NEAR(ang_friction.x, 0, PHYSICS_TOL);
+        EXPECT_NEAR(ang_friction.y, 0, PHYSICS_TOL);
+        EXPECT_NEAR(ang_friction.z, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel_no_friction.x, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel_no_friction.y, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel_no_friction.z, 0, PHYSICS_TOL);
+        EXPECT_NEAR(ang_no_friction.x, 0, PHYSICS_TOL);
+        EXPECT_NEAR(ang_no_friction.y, 0, PHYSICS_TOL);
+        EXPECT_NEAR(ang_no_friction.z, 0, PHYSICS_TOL);
+
+        EXPECT_NEAR(vel_no_offset.x, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel_no_offset.y, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel_no_offset.z, 0, PHYSICS_TOL);
+        EXPECT_NEAR(ang_no_offset.x, 0, PHYSICS_TOL);
+        EXPECT_NEAR(ang_no_offset.y, 0, PHYSICS_TOL);
+        EXPECT_NEAR(ang_no_offset.z, 0, PHYSICS_TOL);
+        EXPECT_NEAR(pose_friction.pos.x, 0, PHYSICS_TOL);
+        EXPECT_NEAR(pose_no_friction.pos.x, 0, PHYSICS_TOL);
+        EXPECT_NEAR(pose_no_offset.pos.x, 0, PHYSICS_TOL);
+        EXPECT_NEAR(pose_friction.pos.y, 0, PHYSICS_TOL);
+        EXPECT_NEAR(pose_no_friction.pos.y, 1.5, PHYSICS_TOL);
+        EXPECT_NEAR(pose_no_offset.pos.y, -1.5, PHYSICS_TOL);
+        EXPECT_NEAR(pose_friction.pos.z, 0.5, PHYSICS_TOL);
+        EXPECT_NEAR(pose_no_friction.pos.z, 0.5, PHYSICS_TOL);
+        EXPECT_NEAR(pose_no_offset.pos.z, 0.5, PHYSICS_TOL);
+        // bounds for drift
+        EXPECT_LT(d_pose_friction.pos.x, 0.0001);
+        EXPECT_NEAR(d_pose_no_friction.pos.x, 0.0, PHYSICS_TOL);
+        EXPECT_NEAR(d_pose_no_offset.pos.x, 0.0, PHYSICS_TOL);
+      }
+    }
+  }
 }
 
 int main(int argc, char **argv)
