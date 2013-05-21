@@ -75,8 +75,10 @@ void GpuRaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
+//  this->scanPub = this->node->Advertise<msgs::LaserScanStamped>(
+//      this->GetTopic());
   this->scanPub = this->node->Advertise<msgs::LaserScanStamped>(
-      this->GetTopic());
+    this->GetTopic(), 5, this->sdf->GetValueDouble("update_rate"));
 
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   this->scanElem = rayElem->GetElement("scan");

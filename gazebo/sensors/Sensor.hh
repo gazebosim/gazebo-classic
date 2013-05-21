@@ -22,6 +22,7 @@
 #ifndef _SENSOR_HH_
 #define _SENSOR_HH_
 
+//#include <google/protobuf/message.h>
 #include <boost/enable_shared_from_this.hpp>
 #include <vector>
 #include <string>
@@ -58,6 +59,12 @@ namespace gazebo
 
       /// \brief Number of Sensor Categories
       CATEGORY_COUNT = 3
+    };
+
+    enum SensorPublishMode
+    {
+      SENSOR_PULL,
+      SENSOR_PUSH
     };
 
     /// \addtogroup gazebo_sensors
@@ -231,6 +238,15 @@ namespace gazebo
       /// \brief Stores last time that a sensor measurement was generated;
       ///        this value must be updated within each sensor's UpdateImpl
       protected: common::Time lastMeasurementTime;
+
+      /// \brief Message queue size limit;
+      protected: unsigned int maxMsgQueueSize;
+
+      /// \brief Sensor publish mode;
+      protected: int publishMode;
+
+      /// \brief Message queue for SENSOR_PUSH mode
+//      protected: std::list<google::protobuf::Message &> msgQueue;
 
       /// \brief Event triggered when a sensor is updated.
       private: event::EventT<void()> updated;

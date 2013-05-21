@@ -89,6 +89,8 @@ void Sensor::Load(const std::string &_worldName)
   // loaded, but not updated
   this->lastUpdateTime = common::Time(0.0);
 
+  this->publishMode = SENSOR_PULL;
+
   this->node->Init(this->world->GetName());
   this->sensorPub = this->node->Advertise<msgs::Sensor>("~/sensor");
 }
@@ -134,6 +136,8 @@ void Sensor::Update(bool _force)
     if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod
         || _force)
     {
+//      if (this->GetCategory() == 0)
+//        gzerr << " first update " << this->world->GetSimTime() << std::endl;
       this->lastUpdateTime = this->world->GetSimTime();
       this->UpdateImpl(_force);
       this->updated();

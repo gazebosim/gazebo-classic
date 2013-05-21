@@ -91,6 +91,9 @@ namespace gazebo
       // Documentation inherited.
       public: virtual bool IsActive();
 
+//      /// \brief Publish message
+//      public: void Publish(const msgs::ImagesStamped &_message);
+
       // Documentation inherited.
       protected: virtual void UpdateImpl(bool _force);
 
@@ -105,6 +108,8 @@ namespace gazebo
 
       /// \brief Publishes messages of type msgs::ImagesStamped.
       private: transport::PublisherPtr imagePub;
+
+//      protected: std::list<msgs::ImagesStamped> msgQueue;
 
       private: rendering::ScenePtr scene;
     };

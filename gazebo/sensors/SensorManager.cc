@@ -153,6 +153,7 @@ void SensorManager::Update(bool _force)
 
   // Only update if there are sensors
   if (this->sensorContainers[sensors::IMAGE]->sensors.size() > 0)
+//    this->sensorContainers[sensors::IMAGE]->Update(true);
     this->sensorContainers[sensors::IMAGE]->Update(_force);
 }
 

@@ -78,7 +78,9 @@ std::string CameraSensor::GetTopic() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->GetTopic());
+//  this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->GetTopic());
+  this->imagePub = this->node->Advertise<msgs::ImagesStamped>(this->GetTopic(),
+    5, this->sdf->GetValueDouble("update_rate"));
 }
 
 //////////////////////////////////////////////////
