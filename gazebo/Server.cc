@@ -94,7 +94,7 @@ bool Server::ParseArgs(int argc, char **argv)
      "Specify a physics engine (ode|bullet).")
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data.")
-    ("record_encoding", po::value<std::string>()->default_value("bz2"),
+    ("record_encoding", po::value<std::string>()->default_value("zlib"),
      "Compression encoding format for log data.")
     ("record_path", po::value<std::string>()->default_value(""),
      "Aboslute path in which to store state data")
