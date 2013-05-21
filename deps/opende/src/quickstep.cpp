@@ -1126,7 +1126,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
     multiply_invM_JT (m,nb,J,jb,lambda,cforce);
   // compute caccel=(inv(M)*J')*lambda
   multiply_invM_JT (m,nb,iMJ,jb,lambda,caccel);
-  multiply_invM_JT (m,nb,iMJ,jb,lambda,caccel_erp);
+  multiply_invM_JT (m,nb,iMJ,jb,lambda_erp,caccel_erp);
 #else
   if (qs->precon_iterations > 0)
     dSetZero (cforce,nb*6);
