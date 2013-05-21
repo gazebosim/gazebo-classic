@@ -800,7 +800,6 @@ static void ComputeRows(
       }
       else {
         {
-          // FOR erp = 0
 
           // NOTE:
           // for this update, we need not throw away J*v(n+1)/h term from rhs
@@ -809,16 +808,23 @@ static void ComputeRows(
           //      but given that J is already scaled by Ad_i, we don't have
           //      to do it explicitly here
 
+          // FOR erp throttled by info.c_v_max or info.c
           delta =
 #ifdef PENETRATION_JVERROR_CORRECTION
                  Jvnew_final +
 #endif
                 rhs[index] - old_lambda*Adcfm[index];
-
           dRealPtr J_ptr = J + index*12;
           delta -= dot6(caccel_ptr1, J_ptr);
           if (caccel_ptr2)
             delta -= dot6(caccel_ptr2, J_ptr + 6);
+
+          // for the unthrottled _erp version
+          // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
+          delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
+          delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
+          if (caccel_erp_ptr2)
+            delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
 
           // set the limits for this constraint.
           // this is the place where the QuickStep method differs from the
@@ -828,17 +834,27 @@ static void ComputeRows(
           // the constraints are ordered so that all lambda[] values needed have
           // already been computed.
           dReal hi_act, lo_act;
+          dReal hi_act_erp, lo_act_erp;
           if (findex[index] >= 0) {
+            // FOR erp throttled by info.c_v_max or info.c
             hi_act = dFabs (hi[index] * lambda[findex[index]]);
             lo_act = -hi_act;
+            // for the unthrottled _erp version
+            hi_act_erp = dFabs (hi[index] * lambda_erp[findex[index]]);
+            lo_act_erp = -hi_act_erp;
           } else {
+            // FOR erp throttled by info.c_v_max or info.c
             hi_act = hi[index];
             lo_act = lo[index];
+            // for the unthrottled _erp version
+            hi_act_erp = hi[index];
+            lo_act_erp = lo[index];
           }
 
           // compute lambda and clamp it to [lo,hi].
           // @@@ SSE not a win here
   #if 1
+          // FOR erp throttled by info.c_v_max or info.c
           dReal new_lambda = old_lambda + delta;
           if (new_lambda < lo_act) {
             delta = lo_act-old_lambda;
@@ -851,16 +867,37 @@ static void ComputeRows(
           else {
             lambda[index] = new_lambda;
           }
+
+          // for the unthrottled _erp version
+          dReal new_lambda_erp = old_lambda_erp + delta_erp;
+          if (new_lambda_erp < lo_act_erp) {
+            delta_erp = lo_act_erp-old_lambda_erp;
+            lambda_erp[index] = lo_act_erp;
+          }
+          else if (new_lambda_erp > hi_act_erp) {
+            delta_erp = hi_act_erp-old_lambda_erp;
+            lambda_erp[index] = hi_act_erp;
+          }
+          else {
+            lambda_erp[index] = new_lambda_erp;
+          }
   #else
+          // FOR erp throttled by info.c_v_max or info.c
           dReal nl = old_lambda + delta;
           _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
           lambda[index] = nl;
           delta = nl - old_lambda;
+
+          // for the unthrottled _erp version
+          dReal nl = old_lambda_erp + delta_erp;
+          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+          lambda_erp[index] = nl;
+          delta_erp = nl - old_lambda_erp;
   #endif
 
-          // update caccel
+          // for non-precon case, update caccel
           {
-            // for non-precon case, update caccel
+            // FOR erp throttled by info.c_v_max or info.c
             dRealPtr iMJ_ptr = iMJ + index*12;
 
             // update caccel.
@@ -868,6 +905,10 @@ static void ComputeRows(
             if (caccel_ptr2)
               sum6(caccel_ptr2, delta, iMJ_ptr + 6);
 
+            // update caccel_erp.
+            sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
+            if (caccel_erp_ptr2)
+              sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
 
 #ifdef PENETRATION_JVERROR_CORRECTION
             // update vnew incrementally
@@ -905,66 +946,6 @@ static void ComputeRows(
 #ifdef RECOMPUTE_RMS
         delta_error[index] = dFabs(delta);
 #endif
-        {
-          // FOR erp != 0
-          // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
-          delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
-          dRealPtr J_ptr = J + index*12;
-          delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
-          if (caccel_erp_ptr2)
-            delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
-
-          // for the _erp version
-          // set the limits for this constraint.
-          // this is the place where the QuickStep method differs from the
-          // direct LCP solving method, since that method only performs this
-          // limit adjustment once per time step, whereas this method performs
-          // once per iteration per constraint row.
-          // the constraints are ordered so that all lambda_erp[] values needed have
-          // already been computed.
-          dReal hi_act, lo_act;
-          if (findex[index] >= 0) {
-            hi_act = dFabs (hi[index] * lambda_erp[findex[index]]);
-            lo_act = -hi_act;
-          } else {
-            hi_act = hi[index];
-            lo_act = lo[index];
-          }
-
-          // compute lambda and clamp it to [lo,hi].
-          // @@@ SSE not a win here
-  #if 1
-          dReal new_lambda_erp = old_lambda_erp + delta_erp;
-          if (new_lambda_erp < lo_act) {
-            delta_erp = lo_act-old_lambda_erp;
-            lambda_erp[index] = lo_act;
-          }
-          else if (new_lambda_erp > hi_act) {
-            delta_erp = hi_act-old_lambda_erp;
-            lambda_erp[index] = hi_act;
-          }
-          else {
-            lambda_erp[index] = new_lambda_erp;
-          }
-  #else
-          dReal nl = old_lambda_erp + delta_erp;
-          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
-          lambda_erp[index] = nl;
-          delta_erp = nl - old_lambda_erp;
-  #endif
-          // update caccel_erp
-          if (!preconditioning)
-          {
-            // for non-precon case, update caccel_erp
-            dRealPtr iMJ_ptr = iMJ + index*12;
-
-            // update caccel_erp.
-            sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
-            if (caccel_erp_ptr2)
-              sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
-
-          }
-        }
       }
 
 
