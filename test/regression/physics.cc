@@ -1413,7 +1413,7 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
     // test with global contact_max_correcting_vel at 100
     // here we expect much lower energy loss
     world->Reset();
-    // physicsEngine->SetContactMaxCorrectingVel(100);
+    physicsEngine->SetContactMaxCorrectingVel(100);
 
     int steps = 10;  // @todo: make this more general
     for (int i = 0; i < steps; i ++)
