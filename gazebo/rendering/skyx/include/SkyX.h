@@ -356,6 +356,7 @@ namespace SkyX
     {
       this->mEnabled = _enabled;
     }
+
     inline bool getEnabled()
     {
       return this->mEnabled;
@@ -364,6 +365,7 @@ namespace SkyX
     void setMoonEnabled(bool _enabled)
     {
       this->mMoonEnabled = _enabled;
+      this->mMoonManager->setEnabled(_enabled);
     }
 
     inline bool getMoonEnabled()
@@ -374,6 +376,7 @@ namespace SkyX
     void setCloudsEnabled(bool _enabled)
     {
       this->mCloudsEnabled = _enabled;
+      this->mVCloudsManager->getVClouds()->setEnabled(_enabled);
     }
 
     inline bool getCloudsEnabled()
