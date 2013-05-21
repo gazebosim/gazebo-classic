@@ -1356,12 +1356,12 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
     double pe = 9.81 * m * pos.pos.z;
     double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
     e_start = pe + ke;
-    gzdbg << "total energy [" << e_start
-          << "] pe[" << pe
-          << "] ke[" << ke
-          << "] p[" << pos.pos.z
-          << "] v[" << vel
-          << "]\n";
+    // gzdbg << "total energy [" << e_start
+    //       << "] pe[" << pe
+    //       << "] ke[" << ke
+    //       << "] p[" << pos.pos.z
+    //       << "] v[" << vel
+    //       << "]\n";
   }
   physicsEngine->SetMaxStepSize(0.0001);
   physicsEngine->SetSORPGSIters(1000);
@@ -1383,14 +1383,14 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);
-        gzdbg << "total energy [" << e
-              << "] pe[" << pe
-              << "] ke[" << ke
-              << "] p[" << pos.pos.z
-              << "] v[" << vel
-              << "] error[" << e - e_start
-              << "] tol[" << e_tol
-              << "]\n";
+        // gzdbg << "total energy [" << e
+        //       << "] pe[" << pe
+        //       << "] ke[" << ke
+        //       << "] p[" << pos.pos.z
+        //       << "] v[" << vel
+        //       << "] error[" << e - e_start
+        //       << "] tol[" << e_tol
+        //       << "]\n";
 
         EXPECT_LT(fabs(e - e_start), e_tol);
       }
@@ -1402,11 +1402,11 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
           PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(),
           0.000001) - 1.5707963);
         double actual_theta = joint->GetAngle(0).Radian();
-        gzdbg << "time [" << world->GetSimTime().Double()
-              << "] exact [" << integ_theta
-              << "] actual [" << actual_theta
-              << "] pose [" << model->GetWorldPose()
-              << "]\n";
+        // gzdbg << "time [" << world->GetSimTime().Double()
+        //       << "] exact [" << integ_theta
+        //       << "] actual [" << actual_theta
+        //       << "] pose [" << model->GetWorldPose()
+        //       << "]\n";
          EXPECT_LT(fabs(integ_theta - actual_theta) , 0.01);
       }
     }
@@ -1433,14 +1433,14 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);
-        gzdbg << "total energy [" << e
-              << "] pe[" << pe
-              << "] ke[" << ke
-              << "] p[" << pos.pos.z
-              << "] v[" << vel
-              << "] error[" << e - e_start
-              << "] tol[" << e_tol
-              << "]\n";
+        // gzdbg << "total energy [" << e
+        //       << "] pe[" << pe
+        //       << "] ke[" << ke
+        //       << "] p[" << pos.pos.z
+        //       << "] v[" << vel
+        //       << "] error[" << e - e_start
+        //       << "] tol[" << e_tol
+        //       << "]\n";
 
         EXPECT_LT(fabs(e - e_start), e_tol);
       }
@@ -1452,11 +1452,11 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
           PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(),
           0.000001) - 1.5707963);
         double actual_theta = joint->GetAngle(0).Radian();
-        gzdbg << "time [" << world->GetSimTime().Double()
-              << "] exact [" << integ_theta
-              << "] actual [" << actual_theta
-              << "] pose [" << model->GetWorldPose()
-              << "]\n";
+        // gzdbg << "time [" << world->GetSimTime().Double()
+        //       << "] exact [" << integ_theta
+        //       << "] actual [" << actual_theta
+        //       << "] pose [" << model->GetWorldPose()
+        //       << "]\n";
          EXPECT_LT(fabs(integ_theta - actual_theta) , 0.01);
       }
     }

@@ -24,7 +24,7 @@
         <constraints>
           <cfm>0</cfm>
           <erp>1.0</erp>
-          <contact_max_correcting_vel>100.0</contact_max_correcting_vel>
+          <contact_max_correcting_vel>0.0</contact_max_correcting_vel>
           <contact_surface_layer>0.0</contact_surface_layer>
         </constraints>
       </ode>
