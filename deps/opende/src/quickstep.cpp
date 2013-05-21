@@ -72,7 +72,7 @@ typedef dReal *dRealMutablePtr;
 // help for motor-driven joints. unfortunately it appears to hurt
 // with high-friction contacts using the SOR method. use with care
 
-// #define WARM_STARTING 1
+#define WARM_STARTING 1
 
 
 // for the SOR method:
@@ -1102,13 +1102,13 @@ static void SOR_LCP (dxWorldProcessContext *context,
 {
 #ifdef WARM_STARTING
   // not activating these works well for quickstep
-  if (0)
+  if (1)
   {
     // for warm starting, this seems to be necessary to prevent
     // jerkiness in motor-driven joints. i have no idea why this works.
     for (int i=0; i<m; i++) {
-      lambda[i] *= 0.9;
-      lambda_erp[i] *= 0.9;
+      lambda[i] *= 0.5;
+      lambda_erp[i] *= 0.5;
     }
   }
 #else
