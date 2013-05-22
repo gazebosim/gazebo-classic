@@ -130,7 +130,10 @@ void CameraSensor::Init()
 
     this->camera->Init();
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
-    this->camera->SetWorldPose(this->pose);
+    math::Pose cameraPose = this->pose;
+    if (cameraSdf->HasElement("pose"))
+      cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
+    this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentName, true);
   }
   else
@@ -142,9 +145,12 @@ void CameraSensor::Init()
 //////////////////////////////////////////////////
 void CameraSensor::Fini()
 {
+  this->imagePub.reset();
   Sensor::Fini();
+
   if (this->camera)
-    this->camera->Fini();
+    this->scene->RemoveCamera(this->camera->GetName());
+
   this->camera.reset();
   this->scene.reset();
 }
@@ -156,12 +162,12 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
   {
     this->camera->Render();
     this->camera->PostRender();
-    this->lastMeasurementTime = this->world->GetSimTime();
+    this->lastMeasurementTime = this->scene->GetSimTime();
 
     if (this->imagePub->HasConnections())
     {
       msgs::ImageStamped msg;
-      msgs::Set(msg.mutable_time(), this->world->GetSimTime());
+      msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
       msg.mutable_image()->set_width(this->camera->GetImageWidth());
       msg.mutable_image()->set_height(this->camera->GetImageHeight());
       msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(

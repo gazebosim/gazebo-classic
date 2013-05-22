@@ -24,6 +24,7 @@
 
 #include "transport/TransportTypes.hh"
 #include "transport/SubscribeOptions.hh"
+#include "transport/Node.hh"
 #include "transport/TopicManager.hh"
 
 namespace gazebo
@@ -106,6 +107,20 @@ namespace gazebo
     /// \param[in] _data Optional data string.
     void requestNoReply(NodePtr _node, const std::string &_request,
                         const std::string &_data = "");
+
+    /// \brief A convenience function for a one-time publication of
+    /// a message. This is inefficient, compared to
+    /// Node::Advertise followed by Publisher::Publish. This function
+    /// should only be used when sending a message very infrequently.
+    /// \param[in] _topic The topic to advertise
+    /// \param[in] _message Message to be published
+    template<typename M> void publish(const std::string &_topic,
+                 const google::protobuf::Message &_message)
+    {
+      transport::NodePtr node = transport::NodePtr(new transport::Node());
+      node->Init();
+      node->Publish<M>(_topic, _message);
+    }
 
     /// \brief Get a list of all the topics and their message types.
     /// \return A map where keys are message types, and values are a list

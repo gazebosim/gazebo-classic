@@ -84,7 +84,16 @@ namespace gazebo
 
     /// \addtogroup gazebo_transport Transport
     /// \{
-
+    ///
+    /// \remarks
+    ///  Environment Variables:
+    ///   - GAZEBO_IP_WHITE_LIST: Comma separated list of valid IPs. Leave
+    /// this empty to accept connections from all addresses.
+    ///   - GAZEBO_IP: IP address to export. This will override the default
+    /// IP lookup.
+    ///   - GAZEBO_HOSTNAME: Hostame to export. Setting this will override
+    /// both GAZEBO_IP and the default IP lookup.
+    ///
     /// \class Connection Connection.hh transport/transport.hh
     /// \brief Single TCP/IP connection manager
     class Connection : public boost::enable_shared_from_this<Connection>
@@ -214,16 +223,11 @@ namespace gazebo
                 {
                   if (_e.message() != "End of File")
                   {
-                    try
-                    {
-                      this->Shutdown();
-                    }
-                    catch(...)
-                    {
-                    }
                     // This will occur when the other side closes the
                     // connection. We don't want spew error messages in this
                     // case.
+                    //
+                    // It's okay to do nothing here.
                   }
                 }
                 else
@@ -318,7 +322,7 @@ namespace gazebo
               {this->shutdown.Disconnect(_subscriber);}
 
       /// \brief Handle on-write callbacks
-      public: void ProcessWriteQueue();
+      public: void ProcessWriteQueue(bool _blocking = false);
 
       /// \brief Get the ID of the connection.
       /// \return The connection's unique ID.
@@ -328,6 +332,11 @@ namespace gazebo
       /// \param[in] _ip Dotted quad to validate.
       /// \return True if the _ip is a valid.
       public: static bool ValidateIP(const std::string &_ip);
+
+      /// \brief Get the IP white list, from GAZEBO_IP_WHITE_LIST
+      /// environment variable.
+      /// \return GAZEBO_IP_WHITE_LIST
+      public: std::string GetIPWhiteList() const;
 
       /// \brief Callback when a write has occurred.
       /// \param[in] _e Error code
@@ -375,13 +384,13 @@ namespace gazebo
       private: std::deque<std::string> writeQueue;
 
       /// \brief Mutex to protect new connections.
-      private: boost::mutex *connectMutex;
+      private: boost::mutex connectMutex;
 
       /// \brief Mutex to protect write.
       private: boost::recursive_mutex writeMutex;
 
       /// \brief Mutex to protect reads.
-      private: boost::recursive_mutex *readMutex;
+      private: boost::recursive_mutex readMutex;
 
       /// \brief Mutex to protect socket close.
       private: mutable boost::mutex socketMutex;
@@ -433,6 +442,9 @@ namespace gazebo
 
       /// \brief True if the connection has an error
       private: bool connectError;
+
+      /// \brief Comma separated list of valid IP addresses.
+      private: std::string ipWhiteList;
     };
     /// \}
   }

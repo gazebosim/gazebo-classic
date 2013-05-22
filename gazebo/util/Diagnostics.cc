@@ -33,8 +33,6 @@ DiagnosticManager::DiagnosticManager()
 {
   this->enabled = false;
 
-  this->node = transport::NodePtr(new transport::Node());
-
   // Get the base of the time logging path
   if (!getenv("HOME"))
   {
@@ -61,6 +59,8 @@ DiagnosticManager::~DiagnosticManager()
 //////////////////////////////////////////////////
 void DiagnosticManager::Init(const std::string &_worldName)
 {
+  this->node.reset(new transport::Node());
+
   this->node->Init(_worldName);
   this->pub = this->node->Advertise<msgs::Diagnostics>("~/diagnostics");
 
@@ -92,7 +92,7 @@ boost::filesystem::path DiagnosticManager::GetLogPath() const
 //////////////////////////////////////////////////
 void DiagnosticManager::Update(const common::UpdateInfo &_info)
 {
-  if (_info.realTime > 0)
+  if (_info.realTime > common::Time::Zero)
     this->msg.set_real_time_factor((_info.simTime / _info.realTime).Double());
   else
     this->msg.set_real_time_factor(0.0);
@@ -178,6 +178,13 @@ int DiagnosticManager::GetTimerCount() const
 //////////////////////////////////////////////////
 common::Time DiagnosticManager::GetTime(int _index) const
 {
+  if (_index < 0 || static_cast<size_t>(_index) > this->timers.size())
+  {
+    gzerr << "Invalid index of[" << _index << "]. Must be between 0 and "
+      << this->timers.size()-1 << ", inclusive.\n";
+    return common::Time();
+  }
+
   TimerMap::const_iterator iter;
 
   iter = this->timers.begin();
@@ -197,6 +204,12 @@ common::Time DiagnosticManager::GetTime(int _index) const
 //////////////////////////////////////////////////
 std::string DiagnosticManager::GetLabel(int _index) const
 {
+  if (_index < 0 || static_cast<size_t>(_index) > this->timers.size())
+  {
+    gzerr << "Invalid index of[" << _index << "]. Must be between 0 and "
+      << this->timers.size()-1 << ", inclusive.\n";
+    return std::string();
+  }
   TimerMap::const_iterator iter;
 
   iter = this->timers.begin();

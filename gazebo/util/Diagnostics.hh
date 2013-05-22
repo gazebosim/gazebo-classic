@@ -22,7 +22,7 @@
 #ifndef _DIAGNOSTICMANAGER_HH_
 #define _DIAGNOSTICMANAGER_HH_
 
-#include <map>
+#include <boost/unordered_map.hpp>
 #include <string>
 #include <boost/filesystem.hpp>
 
@@ -163,7 +163,8 @@ namespace gazebo
       private: void OnControl(ConstDiagnosticControlPtr &_msg);
 
       /// \brief Map of all the active timers.
-      private: typedef std::map<std::string, DiagnosticTimerPtr> TimerMap;
+      private: typedef boost::unordered_map<std::string, DiagnosticTimerPtr>
+               TimerMap;
 
       /// \brief dictionary of timers index by name
       private: TimerMap timers;

@@ -25,7 +25,7 @@ namespace gazebo
   void print_version();
   void add_plugin(const std::string &_filename);
 
-  bool load(int argc = 0, char** argv = 0);
+  bool load(int _argc = 0, char **_argv = 0);
   bool init();
   void run();
   void stop();

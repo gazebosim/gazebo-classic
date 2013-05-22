@@ -19,9 +19,9 @@
  * Date: k13 Oct 2009
  */
 
-#include "gazebo_config.h"
-#include "common/Console.hh"
-#include "physics/ode/ODEBallJoint.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/ode/ODEBallJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -44,7 +44,11 @@ ODEBallJoint::~ODEBallJoint()
 math::Vector3 ODEBallJoint::GetAnchor(int /*_index*/) const
 {
   dVector3 result;
-  dJointGetBallAnchor(jointId, result);
+  if (this->jointId)
+    dJointGetBallAnchor(jointId, result);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
   return math::Vector3(result[0], result[1], result[2]);
 }
 
@@ -52,15 +56,8 @@ math::Vector3 ODEBallJoint::GetAnchor(int /*_index*/) const
 //////////////////////////////////////////////////
 void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
 {
-  dJointSetBallAnchor(jointId, _anchor.x, _anchor.y, _anchor.z);
-}
-
-//////////////////////////////////////////////////
-void ODEBallJoint::SetDamping(int /*_index*/, double _damping)
-{
-  this->dampingCoefficient = _damping;
-  // use below when ode version is fixed
-  // dJointSetDamping(this->jointId, _damping);
-  this->applyDamping = physics::Joint::ConnectJointUpdate(
-    boost::bind(&Joint::ApplyDamping, this));
+  if (this->jointId)
+    dJointSetBallAnchor(jointId, _anchor.x, _anchor.y, _anchor.z);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }

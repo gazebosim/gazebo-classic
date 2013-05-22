@@ -139,7 +139,7 @@ void Diagnostics::Update()
   boost::mutex::scoped_lock lock(this->mutex);
 
   // Update all the plots
-  for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
+  for (std::vector<IncrementalPlot *>::iterator iter = this->plots.begin();
       iter != this->plots.end(); ++iter)
   {
     (*iter)->Update();

@@ -73,7 +73,7 @@ namespace gazebo
 
                 BoxShape::SetSize(size);
                 BulletCollisionPtr bParent;
-                bParent = boost::shared_dynamic_cast<BulletCollision>(
+                bParent = boost::dynamic_pointer_cast<BulletCollision>(
                     this->collisionParent);
 
                 /// Bullet requires the half-extents of the box

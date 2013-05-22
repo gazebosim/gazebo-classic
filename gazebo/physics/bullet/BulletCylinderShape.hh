@@ -76,7 +76,7 @@ namespace gazebo
 
                 CylinderShape::SetSize(_radius, _length);
                 BulletCollisionPtr bParent;
-                bParent = boost::shared_dynamic_cast<BulletCollision>(
+                bParent = boost::dynamic_pointer_cast<BulletCollision>(
                     this->collisionParent);
 
                 btCollisionShape *shape = bParent->GetCollisionShape();

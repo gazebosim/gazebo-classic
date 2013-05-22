@@ -24,6 +24,7 @@
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/Model.hh"
 
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletCollision.hh"
@@ -51,7 +52,7 @@ BulletLink::~BulletLink()
 //////////////////////////////////////////////////
 void BulletLink::Load(sdf::ElementPtr _sdf)
 {
-  this->bulletPhysics = boost::shared_dynamic_cast<BulletPhysics>(
+  this->bulletPhysics = boost::dynamic_pointer_cast<BulletPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (this->bulletPhysics == NULL)
@@ -63,6 +64,10 @@ void BulletLink::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletLink::Init()
 {
+  // Set the initial pose of the body
+  this->motionState.reset(new BulletMotionState(
+    boost::dynamic_pointer_cast<Link>(shared_from_this())));
+
   Link::Init();
 
   GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
@@ -80,17 +85,13 @@ void BulletLink::Init()
   btVector3 fallInertia(0, 0, 0);
   math::Vector3 cogVec = this->inertial->GetCoG();
 
-  // Set the initial pose of the body
-  this->motionState.reset(new BulletMotionState(
-    boost::shared_dynamic_cast<Link>(shared_from_this())));
-
   for (Base_V::iterator iter = this->children.begin();
        iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
     {
       BulletCollisionPtr collision;
-      collision = boost::shared_static_cast<BulletCollision>(*iter);
+      collision = boost::static_pointer_cast<BulletCollision>(*iter);
       btCollisionShape *shape = collision->GetCollisionShape();
 
       math::Pose relativePose = collision->GetRelativePose();
@@ -127,7 +128,6 @@ void BulletLink::Init()
   this->rigidLink->setCollisionFlags(this->rigidLink->getCollisionFlags() |
       btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 
-
   // Setup motion clamping to prevent objects from moving too fast.
   // this->rigidLink->setCcdMotionThreshold(1);
   // math::Vector3 size = this->GetBoundingBox().GetSize();
@@ -150,14 +150,22 @@ void BulletLink::Init()
   {
     if ((*iter)->HasType(Base::COLLISION))
     {
-      collision = boost::shared_static_cast<BulletCollision>(*iter);
+      collision = boost::static_pointer_cast<BulletCollision>(*iter);
       categortyBits = collision->GetCategoryBits();
       collideBits = collision->GetCollideBits();
       break;
     }
   }
   bulletWorld->addRigidBody(this->rigidLink, categortyBits, collideBits);
-  // this->rigidLink->setSleepingThresholds(0,0);
+
+  // Only use auto disable if no joints and no sensors are present
+  if (this->GetModel()->GetAutoDisable() &&
+      this->GetModel()->GetJointCount() == 0 &&
+      this->GetSensorCount() == 0)
+  {
+    this->rigidLink->setSleepingThresholds(0.1, 0.1);
+    this->rigidLink->setDeactivationTime(1.0);
+  }
 
   this->SetGravityMode(this->sdf->GetValueBool("gravity"));
 

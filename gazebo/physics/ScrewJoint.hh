@@ -39,7 +39,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the joint.
-      public: explicit ScrewJoint(BasePtr _parent) : T(_parent)
+      public: explicit ScrewJoint(BasePtr _parent) : T(_parent), threadPitch(0)
               {this->AddType(Base::SCREW_JOINT);}
 
       /// \brief Destructor.
@@ -103,6 +103,13 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \param[in] _threadPitch Thread pitch value.
       public: virtual void SetThreadPitch(int _index, double _threadPitch) = 0;
+
+      /// \brief Get screw joint thread pitch.
+      ///
+      /// This must be implemented in a child class
+      /// \param[in] _index Index of the axis.
+      /// \return _threadPitch Thread pitch value.
+      public: virtual double GetThreadPitch(unsigned int _index) = 0;
 
       /// \brief The anchor value is not used internally.
       protected: math::Vector3 fakeAnchor;

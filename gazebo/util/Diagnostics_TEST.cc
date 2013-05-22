@@ -31,6 +31,7 @@ TEST(DiagnosticsTest, Diagnostics)
   common::Time prev = common::Time::GetWallTime();
   {
     mgr->StartTimer("test");
+    mgr->StopTimer("test");
     EXPECT_STREQ("test", mgr->GetLabel(0).c_str());
     EXPECT_EQ(1, mgr->GetTimerCount());
   }

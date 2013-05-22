@@ -25,11 +25,12 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "common/Console.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "transport/IOManager.hh"
-#include "transport/Connection.hh"
+#include "gazebo/transport/IOManager.hh"
+#include "gazebo/transport/ConnectionManager.hh"
+#include "gazebo/transport/Connection.hh"
 
 using namespace gazebo;
 using namespace transport;
@@ -64,8 +65,6 @@ Connection::Connection()
   iomanager->IncCount();
   this->id = idCounter++;
 
-  this->connectMutex = new boost::mutex();
-  this->readMutex = new boost::recursive_mutex();
   this->acceptor = NULL;
   this->readQuit = false;
   this->writeQueue.clear();
@@ -75,17 +74,23 @@ Connection::Connection()
                    boost::lexical_cast<std::string>(this->GetLocalPort());
 
   this->localAddress = this->GetLocalEndpoint().address().to_string();
+
+  // Get and set the IP white list from the GAZEBO_IP_WHITE_LIST environment
+  // variable.
+  char *whiteListEnv = getenv("GAZEBO_IP_WHITE_LIST");
+  if (whiteListEnv && !std::string(whiteListEnv).empty())
+  {
+    // Automatically add in the local addresses. This guarantees that
+    // Gazebo will run properly on the local machine.
+    this->ipWhiteList = "," + this->localAddress + ",127.0.0.1,"
+      + whiteListEnv + ",";
+  }
 }
 
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
-  this->ProcessWriteQueue();
-  this->writeQueue.clear();
   this->Shutdown();
-
-  delete this->readMutex;
-  this->readMutex = NULL;
 
   if (iomanager)
   {
@@ -102,7 +107,7 @@ Connection::~Connection()
 //////////////////////////////////////////////////
 bool Connection::Connect(const std::string &_host, unsigned int _port)
 {
-  boost::mutex::scoped_lock lock(*this->connectMutex);
+  boost::mutex::scoped_lock lock(this->connectMutex);
 
   std::string service = boost::lexical_cast<std::string>(_port);
 
@@ -171,9 +176,9 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
 }
 
 //////////////////////////////////////////////////
-void Connection::Listen(unsigned int port, const AcceptCallback &accept_cb)
+void Connection::Listen(unsigned int port, const AcceptCallback &_acceptCB)
 {
-  this->acceptCB = accept_cb;
+  this->acceptCB = _acceptCB;
 
   this->acceptor = new boost::asio::ip::tcp::acceptor(iomanager->GetIO());
   boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port);
@@ -196,9 +201,20 @@ void Connection::OnAccept(const boost::system::error_code &e)
   // Call the accept callback if there isn't an error
   if (!e)
   {
-    // First start a new acceptor
-    this->acceptCB(this->acceptConn);
+    if (!this->ipWhiteList.empty() &&
+        this->ipWhiteList.find("," +
+          this->acceptConn->GetRemoteHostname() + ",") == std::string::npos)
+    {
+      gzlog << "Rejected connection from["
+        << this->acceptConn->GetRemoteHostname() << "], not in white list["
+        << this->ipWhiteList << "]\n";
+    }
+    else
+    {
+      this->acceptCB(this->acceptConn);
+    }
 
+    // First start a new acceptor
     this->acceptConn = ConnectionPtr(new Connection());
 
     this->acceptor->async_accept(*this->acceptConn->socket,
@@ -276,10 +292,15 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
   {
     this->ProcessWriteQueue();
   }
+  else
+  {
+    // Tell the connection manager that it needs to update
+    ConnectionManager::Instance()->TriggerUpdate();
+  }
 }
 
 /////////////////////////////////////////////////
-void Connection::ProcessWriteQueue()
+void Connection::ProcessWriteQueue(bool _blocking)
 {
   if (!this->IsOpen())
   {
@@ -308,23 +329,26 @@ void Connection::ProcessWriteQueue()
   // Write the serialized data to the socket. We use
   // "gather-write" to send both the head and the data in
   // a single write operation
-  boost::asio::async_write(*this->socket, buffer->data(),
-    boost::bind(&Connection::OnWrite, shared_from_this(),
-    boost::asio::placeholders::error, buffer));
-
-  /*
-  try
+  if (!_blocking)
   {
-    boost::asio::write(*this->socket, buffer->data());
+    boost::asio::async_write(*this->socket, buffer->data(),
+        boost::bind(&Connection::OnWrite, shared_from_this(),
+          boost::asio::placeholders::error, buffer));
   }
-  catch(...)
+  else
   {
-    this->Shutdown();
-  }
+    try
+    {
+      boost::asio::write(*this->socket, buffer->data());
+    }
+    catch(...)
+    {
+      this->Shutdown();
+    }
 
-  this->writeCount--;
-  delete buffer;
-  */
+    this->writeCount--;
+    delete buffer;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -359,33 +383,15 @@ void Connection::OnWrite(const boost::system::error_code &_e,
 //////////////////////////////////////////////////
 void Connection::Shutdown()
 {
-  this->ProcessWriteQueue();
-
-  int iters = 0;
-  while (this->writeCount > 0 && iters < 50)
-  {
-    common::Time::MSleep(10);
-    iters++;
-  }
-
-  this->shutdown();
-  // this->StopRead();
+  if (!this->socket)
+    return;
 
   this->Cancel();
 
+  // Shutdown the TBB task
+  this->shutdown();
+
   this->Close();
-
-  {
-    boost::mutex::scoped_lock lock(this->socketMutex);
-    boost::system::error_code ec;
-    if (this->socket)
-    {
-      this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-    }
-
-    delete this->socket;
-    this->socket = NULL;
-  }
 }
 
 //////////////////////////////////////////////////
@@ -412,10 +418,11 @@ void Connection::Close()
 
   if (this->socket && this->socket->is_open())
   {
-    this->ProcessWriteQueue();
     try
     {
       this->socket->close();
+      boost::system::error_code ec;
+      this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     }
     catch(boost::system::system_error &e)
     {
@@ -423,6 +430,9 @@ void Connection::Close()
       // gzwarn << "Error closing socket[" << this->id << "] ["
              // << e.what() << "]\n";
     }
+
+    delete this->socket;
+    this->socket = NULL;
   }
 
   if (this->acceptor && this->acceptor->is_open())
@@ -485,7 +495,7 @@ bool Connection::Read(std::string &data)
   std::size_t incoming_size;
   boost::system::error_code error;
 
-  this->readMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->readMutex);
 
   // First read the header
   this->socket->read_some(boost::asio::buffer(header), error);
@@ -497,7 +507,7 @@ bool Connection::Read(std::string &data)
   }
 
   // Parse the header to get the size of the incoming data packet
-  incoming_size = this->ParseHeader(header);
+  incoming_size = this->ParseHeader(std::string(header, HEADER_LENGTH));
   if (incoming_size > 0)
   {
     incoming.resize(incoming_size);
@@ -523,7 +533,6 @@ bool Connection::Read(std::string &data)
     result = true;
   }
 
-  this->readMutex->unlock();
   return result;
 }
 
@@ -810,7 +819,7 @@ void Connection::OnConnect(const boost::system::error_code &_error,
   // This function is called when a connection is successfully (or
   // unsuccessfully) established.
 
-  boost::mutex::scoped_lock lock(*this->connectMutex);
+  boost::mutex::scoped_lock lock(this->connectMutex);
   if (_error == 0)
   {
     this->remoteURI = std::string("http://") + this->GetRemoteHostname()
@@ -841,4 +850,10 @@ void Connection::OnConnect(const boost::system::error_code &_error,
 unsigned int Connection::GetId() const
 {
   return this->id;
+}
+
+//////////////////////////////////////////////////
+std::string Connection::GetIPWhiteList() const
+{
+  return this->ipWhiteList;
 }

@@ -67,6 +67,7 @@ Base::~Base()
   }
   this->children.clear();
   this->childrenEnd = this->children.end();
+  this->sdf->Reset();
   this->sdf.reset();
 }
 
@@ -97,7 +98,8 @@ void Base::Fini()
   Base_V::iterator iter;
 
   for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
-    (*iter)->Fini();
+    if (*iter)
+      (*iter)->Fini();
 
   this->children.clear();
   this->childrenEnd = this->children.end();

@@ -16,7 +16,6 @@
 */
 
 #include <unistd.h>
-
 #include "ServerFixture.hh"
 
 using namespace gazebo;
@@ -64,7 +63,6 @@ TEST_F(TransportTest, Load)
   }
 }
 
-
 TEST_F(TransportTest, PubSub)
 {
   Load("worlds/empty.world");
@@ -106,9 +104,6 @@ TEST_F(TransportTest, Errors)
     testNode->Subscribe("~/world_stats", &ReceiveWorldStatsMsg);
   EXPECT_STREQ("/gazebo/default/world_stats", statsSub->GetTopic().c_str());
 
-  transport::SubscriberPtr statsSubDebug =
-    testNode->Subscribe("~/world_stats/__dbg", &ReceiveWorldStatsDebugMsg);
-
   // This generates a warning message
   // EXPECT_THROW(testNode->Advertise<math::Vector3>("~/scene"),
   //             common::Exception);
@@ -130,12 +125,6 @@ TEST_F(TransportTest, Errors)
                testNode->DecodeTopicName("~/factory").c_str());
   EXPECT_STREQ("~/factory",
                testNode->EncodeTopicName("/gazebo/default/factory").c_str());
-
-  msgs::Scene sceneMsg;
-  EXPECT_THROW(scenePub->Publish(sceneMsg), common::Exception);
-
-  msgs::Factory factoryMsg;
-  EXPECT_THROW(scenePub->Publish(factoryMsg), common::Exception);
 
   // Get the original URI
   char *uri = getenv("GAZEBO_MASTER_URI");
@@ -173,7 +162,6 @@ TEST_F(TransportTest, Errors)
   statsSub.reset();
   testNode.reset();
 }
-
 
 // This test creates a child process to test interprocess communication
 // TODO: This test needs to be fixed

@@ -56,10 +56,12 @@ Sensor::Sensor(SensorCategory _cat)
 //////////////////////////////////////////////////
 Sensor::~Sensor()
 {
-  this->node->Fini();
+  if (this->node)
+    this->node->Fini();
   this->node.reset();
 
-  this->sdf->Reset();
+  if (this->sdf)
+    this->sdf->Reset();
   this->sdf.reset();
   this->connections.clear();
 }
@@ -89,8 +91,6 @@ void Sensor::Load(const std::string &_worldName)
 
   this->node->Init(this->world->GetName());
   this->sensorPub = this->node->Advertise<msgs::Sensor>("~/sensor");
-  this->controlSub = this->node->Subscribe("~/world_control",
-                                           &Sensor::OnControl, this);
 }
 
 //////////////////////////////////////////////////
@@ -286,14 +286,7 @@ SensorCategory Sensor::GetCategory() const
 }
 
 //////////////////////////////////////////////////
-void Sensor::OnControl(ConstWorldControlPtr &_data)
+void Sensor::ResetLastUpdateTime()
 {
-  if (_data->has_reset())
-  {
-    if ((_data->reset().has_all() && _data->reset().all()) ||
-        (_data->reset().has_time_only() && _data->reset().time_only()))
-    {
-      this->lastUpdateTime = 0.0;
-    }
-  }
+  this->lastUpdateTime = 0.0;
 }

@@ -29,6 +29,7 @@ class LaserTest : public ServerFixture
 {
   public: void Stationary_EmptyWorld(const std::string &_physicsEngine);
   public: void LaserUnitBox(const std::string &_physicsEngine);
+  public: void LaserUnitNoise(const std::string &_physicsEngine);
 };
 
 void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
@@ -51,7 +52,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
       rangeResolution, samples);
 
   sensors::RaySensorPtr laser =
-    boost::shared_static_cast<sensors::RaySensor>(
+    boost::static_pointer_cast<sensors::RaySensor>(
         sensors::SensorManager::Instance()->GetSensor(raySensorName));
 
   ASSERT_TRUE(laser);
@@ -80,13 +81,13 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 
     laser->Update(true);
 
-    double diffMax, diffSum, diffAvg;
     std::vector<double> scan;
     laser->GetRanges(scan);
 
     // run test against pre-recorded range data only in ode
     if (_physicsEngine == "ode")
     {
+      double diffMax, diffSum, diffAvg;
       DoubleCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
       EXPECT_LT(diffMax, 2e-6);
       EXPECT_LT(diffSum, 1e-4);
@@ -168,7 +169,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   std::string raySensorName = "ray_sensor";
   double hMinAngle = -M_PI/2.0;
   double hMaxAngle = M_PI/2.0;
-  double minRange = 0.0;
+  double minRange = 0.1;
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 320;
@@ -203,7 +204,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
-    boost::shared_dynamic_cast<sensors::RaySensor>(sensor);
+    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
   raySensor->Init();
   raySensor->Update(true);
@@ -216,10 +217,6 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   int mid = samples / 2;
   double unitBoxSize = 1.0;
   double expectedRangeAtMidPoint = box01Pose.pos.x - unitBoxSize/2;
-
-  // WARNING: gazebo returns distance to object from min range
-  // issue #503
-  expectedRangeAtMidPoint -= minRange;
 
   EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
   EXPECT_NEAR(raySensor->GetRange(0), expectedRangeAtMidPoint, LASER_TOL);
@@ -252,6 +249,71 @@ TEST_F(LaserTest, LaserBoxODE)
 TEST_F(LaserTest, LaserBoxBullet)
 {
   LaserUnitBox("bullet");
+}
+#endif  // HAVE_BULLET
+
+void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
+{
+  // Test ray sensor with noise applied
+
+  Load("worlds/empty.world", true, _physicsEngine);
+
+  std::string modelName = "ray_model";
+  std::string raySensorName = "ray_sensor";
+  double hMinAngle = -M_PI/2.0;
+  double hMaxAngle = M_PI/2.0;
+  double minRange = 0.0;
+  double maxRange = 5.0;
+  double rangeResolution = 0.02;
+  unsigned int samples = 320;
+  std::string noiseType = "gaussian";
+  // Give negative bias so that we can see the effect (positive bias
+  // would be removed by clamp(minRange,maxRange).
+  double noiseMean = -1.0;
+  double noiseStdDev = 0.01;
+  math::Pose testPose(math::Vector3(0, 0, 0),
+      math::Quaternion(0, 0, 0));
+
+  SpawnRaySensor(modelName, raySensorName, testPose.pos,
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+      rangeResolution, samples,
+      noiseType, noiseMean, noiseStdDev);
+
+  sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
+  sensors::RaySensorPtr raySensor =
+    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
+
+  raySensor->Init();
+  raySensor->Update(true);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Expect at least one value to be non-max (empty world), and expect the
+  // mean to be close to the max+noiseMean
+  double total = 0.0;
+  bool foundNoise = false;
+  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+  {
+    if (fabs(raySensor->GetRange(i) - maxRange) > LASER_TOL)
+      foundNoise = true;
+    total += raySensor->GetRange(i);
+  }
+  EXPECT_TRUE(foundNoise);
+  double mean = total / raySensor->GetRayCount();
+  // The mean should be well within 3-sigma
+  EXPECT_NEAR(mean, maxRange + noiseMean, 3*noiseStdDev);
+}
+
+TEST_F(LaserTest, LaserNoiseODE)
+{
+  LaserUnitNoise("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(LaserTest, LaserNoiseBullet)
+{
+  LaserUnitNoise("bullet");
 }
 #endif  // HAVE_BULLET
 

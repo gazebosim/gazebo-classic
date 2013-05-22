@@ -23,18 +23,19 @@
 #include <string>
 #include <vector>
 
-#include "common/Exception.hh"
-#include "msgs/msgs.hh"
-#include "common/SingletonT.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/SingletonT.hh"
 
-#include "transport/TransportTypes.hh"
-#include "transport/SubscribeOptions.hh"
-#include "transport/SubscriptionTransport.hh"
-#include "transport/PublicationTransport.hh"
-#include "transport/ConnectionManager.hh"
-#include "transport/Publisher.hh"
-#include "transport/Publication.hh"
-#include "transport/Subscriber.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/SubscribeOptions.hh"
+#include "gazebo/transport/SubscriptionTransport.hh"
+#include "gazebo/transport/PublicationTransport.hh"
+#include "gazebo/transport/ConnectionManager.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Publication.hh"
+#include "gazebo/transport/Subscriber.hh"
 
 namespace gazebo
 {
@@ -117,45 +118,34 @@ namespace gazebo
                 PublicationPtr publication;
 
                 // Connect all local subscription to the publisher
-                for (int i = 0; i < 2; i ++)
+                msgTypename = msg->GetTypeName();
+
+                publication = this->FindPublication(_topic);
+                GZ_ASSERT(publication != NULL, "FindPublication returned NULL");
+
+                publication->AddPublisher(pub);
+                if (!publication->GetLocallyAdvertised())
                 {
-                  std::string t;
-                  if (i == 0)
-                  {
-                    t = _topic;
-                    msgTypename = msg->GetTypeName();
-                  }
-                  else
-                  {
-                    t = _topic + "/__dbg";
-                    msgs::GzString tmp;
-                    msgTypename = tmp.GetTypeName();
-                  }
+                  ConnectionManager::Instance()->Advertise(_topic, msgTypename);
+                }
 
-                  publication = this->FindPublication(t);
-                  publication->AddPublisher(pub);
-                  if (!publication->GetLocallyAdvertised())
-                  {
-                    ConnectionManager::Instance()->Advertise(t, msgTypename);
-                  }
+                publication->SetLocallyAdvertised(true);
+                pub->SetPublication(publication);
 
-                  publication->SetLocallyAdvertised(true);
-                  pub->SetPublication(publication, i);
 
-                  SubNodeMap::iterator iter2;
-                  SubNodeMap::iterator st_end2 = this->subscribedNodes.end();
-                  for (iter2 = this->subscribedNodes.begin();
-                       iter2 != st_end2; iter2++)
+                SubNodeMap::iterator iter2;
+                SubNodeMap::iterator stEnd2 = this->subscribedNodes.end();
+                for (iter2 = this->subscribedNodes.begin();
+                     iter2 != stEnd2; ++iter2)
+                {
+                  if (iter2->first == _topic)
                   {
-                    if (iter2->first == t)
+                    std::list<NodePtr>::iterator liter;
+                    std::list<NodePtr>::iterator lEnd = iter2->second.end();
+                    for (liter = iter2->second.begin();
+                        liter != lEnd; ++liter)
                     {
-                      std::list<NodePtr>::iterator liter;
-                      std::list<NodePtr>::iterator l_end = iter2->second.end();
-                      for (liter = iter2->second.begin();
-                           liter != l_end; liter++)
-                      {
-                        publication->AddSubscription(*liter);
-                      }
+                      publication->AddSubscription(*liter);
                     }
                   }
                 }
@@ -172,9 +162,8 @@ namespace gazebo
       /// \param _topic Name of the topic
       /// \param _message The message to send.
       /// \param _cb Callback, used when the publish is completed.
-      public: void Publish(const std::string &_topic,
-                            const google::protobuf::Message &_message,
-                            const boost::function<void()> &_cb = NULL);
+      public: void Publish(const std::string &_topic, MessagePtr _message,
+                  const boost::function<void()> &_cb = NULL);
 
       /// \brief Connection a local Publisher to a remote Subscriber
       /// \param[in] _topic The topic to use
@@ -227,7 +216,7 @@ namespace gazebo
       /// of topic names.
       /// \sa transport::GetAdvertisedTopics
       public: std::map<std::string, std::list<std::string> >
-              GetAdvertisedTopics() const GAZEBO_DEPRECATED;
+              GetAdvertisedTopics() const GAZEBO_DEPRECATED(1.5);
 
       /// \brief Clear all buffers
       public: void ClearBuffers();
@@ -250,12 +239,14 @@ namespace gazebo
       /// \brief Used to protect subscription connection creation.
       private: boost::mutex subscriberMutex;
 
+      /// \brief Mutex to protect node processing
+      private: boost::mutex processNodesMutex;
+
       private: bool pauseIncoming;
 
       // Singleton implementation
       private: friend class SingletonT<TopicManager>;
     };
-
     /// \}
   }
 }

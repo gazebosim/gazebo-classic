@@ -58,12 +58,12 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   // Create the Hz and bandwidth labels
   // {
   QHBoxLayout *infoLayout = new QHBoxLayout;
-  QLabel *hzLabel = new QLabel("Hz: ");
+  QLabel *hzLabel = new QLabel(tr("Hz: "));
   this->hzEdit = new QLineEdit;
   this->hzEdit->setReadOnly(true);
   this->hzEdit->setFixedWidth(80);
 
-  QLabel *bandwidthLabel = new QLabel("Bandwidth: ");
+  QLabel *bandwidthLabel = new QLabel(tr("Bandwidth: "));
   this->bandwidthEdit = new QLineEdit;
   this->bandwidthEdit->setReadOnly(true);
   this->bandwidthEdit->setFixedWidth(110);
@@ -315,8 +315,7 @@ void TopicCombo::UpdateList()
       for (std::list<std::string>::iterator topicIter = iter->second.begin();
            topicIter != iter->second.end(); ++topicIter)
       {
-        if ((*topicIter).find("__dbg") == std::string::npos &&
-            std::find(topics.begin(), topics.end(), *topicIter) == topics.end())
+        if (std::find(topics.begin(), topics.end(), *topicIter) == topics.end())
         {
           topics.push_back(*topicIter);
         }
@@ -328,9 +327,6 @@ void TopicCombo::UpdateList()
   for (std::list<std::string>::iterator iter = topics.begin();
       iter != topics.end(); ++iter)
   {
-    if ((*iter).find("__dbg") != std::string::npos)
-      continue;
-
     // Get the shorthand notation for the topic.
     std::string topicName = this->node->EncodeTopicName(*iter);
 

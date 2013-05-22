@@ -63,7 +63,7 @@ namespace gazebo
 
                 SphereShape::SetRadius(_radius);
                 BulletCollisionPtr bParent;
-                bParent = boost::shared_dynamic_cast<BulletCollision>(
+                bParent = boost::dynamic_pointer_cast<BulletCollision>(
                     this->collisionParent);
 
                 btCollisionShape *shape = bParent->GetCollisionShape();

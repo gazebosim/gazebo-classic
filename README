@@ -9,13 +9,9 @@ This is the Gazebo simulator.  Gazebo simulates multiple robots in a
 
 Installation
 ------------
-Read the installation instructions (http://gazebosim.org/documentation.html) in the online manual for generic instructions.  For most people, the following sequence will suffice:
+Instructions are located at
 
-  $ mkdir build (inside the gazebo-trunk directory)
-  $ cd build
-  $ cmake ..
-  $ make
-
+  http://gazebosim.org/documentation.html
 
 Uninstallation
 --------------
@@ -25,4 +21,3 @@ Read the installation instructions (http://gazebosim.org/documentation.html) in 
 
 
 - Nate Koenig
-

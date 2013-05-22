@@ -61,6 +61,13 @@ dxJoint::dxJoint( dxWorld *w ) :
     // joint damping
     use_damping = false;
     damping_coefficient = 0.0;
+
+    // Moved here by OSRF
+    // Default to negative value, which means the current global value
+    // will be used. If set non-negative, then this joint-specific 
+    // value will be used.
+    erp = -1;  // world->global_erp;
+    cfm = -1;  // world->global_cfm;
 }
 
 dxJoint::~dxJoint()
