@@ -2674,3 +2674,21 @@ bool Scene::GetShowClouds() const
 
   return false;
 }
+
+/////////////////////////////////////////////////
+void Scene::SetSkyXMode(unsigned int _mode)
+{
+  /// \todo This function is currently called on initialization of rendering
+  /// based sensors to disable clouds and moon. More testing is required to
+  /// make sure it functions correctly when called during a render update,
+  /// issue #693.
+
+  bool enabled = _mode != GZ_SKYX_NONE;
+  this->skyx->setEnabled(enabled);
+
+  if (!enabled)
+    return;
+
+  this->skyx->setCloudsEnabled(_mode & GZ_SKYX_CLOUDS);
+  this->skyx->setMoonEnabled(_mode & GZ_SKYX_MOON);
+}
