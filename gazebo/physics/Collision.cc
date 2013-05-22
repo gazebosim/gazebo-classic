@@ -46,7 +46,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
-    : Entity(_link)
+    : Entity(_link), maxContacts(0)
 {
   this->AddType(Base::COLLISION);
 
@@ -82,6 +82,9 @@ void Collision::Fini()
 void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
+
+  this->maxContacts = _sdf->GetElement("max_contacts")->GetValueInt();
+  this->SetMaxContacts(this->maxContacts);
 
   if (this->sdf->HasElement("laser_retro"))
     this->SetLaserRetro(this->sdf->GetElement("laser_retro")->GetValueDouble());
@@ -369,11 +372,12 @@ void Collision::SetState(const CollisionState &_state)
 /////////////////////////////////////////////////
 void Collision::SetMaxContacts(double _maxContacts)
 {
+  this->maxContacts = static_cast<int>(_maxContacts);
   this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
 }
 
 /////////////////////////////////////////////////
 int Collision::GetMaxContacts()
 {
-  return this->sdf->GetElement("max_contacts")->GetValueInt();
+  return this->maxContacts;
 }
