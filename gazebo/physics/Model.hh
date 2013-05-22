@@ -347,6 +347,9 @@ namespace gazebo
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;
 
+      /// \brief Cached list of links. This is here for performance.
+      private: Link_V links;
+
       private: bool pluginsLoaded;
     };
     /// \}

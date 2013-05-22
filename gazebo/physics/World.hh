@@ -669,6 +669,9 @@ namespace gazebo
 
       /// \brief Worker thread for logging.
       private: boost::thread *logThread;
+
+      /// \brief A cached list of models. This is here for performance.
+      private: Model_V models;
     };
     /// \}
   }
