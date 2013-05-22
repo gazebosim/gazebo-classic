@@ -68,7 +68,6 @@ set (resources ../resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-add_dependencies(gazebo_model_editor gazebo_msgs)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 gz_add_library(gazebo_gui_building ${sources} ${headers_MOC} ${headers} ${resources_RCC})

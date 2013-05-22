@@ -30,13 +30,13 @@ int main(int _argc, char **_argv)
   po::options_description vDesc("Allowed options");
   vDesc.add_options()
     ("help,h", "print help message")
-    ("period,p", po::value<unsigned int>(), 
+    ("period,p", po::value<unsigned int>(),
      "Period length in seconds. Default[10]");
 
   po::options_description hDesc("Hidden options");
   hDesc.add_options()
     ("topic", po::value<std::string>(), "Topic to plot")
-    ("field", po::value<std::string>(), "Topic to plot");
+    ("field", po::value<std::string>(), "Field to plot");
 
   po::options_description desc("Allowed options");
   desc.add(vDesc).add(hDesc);
