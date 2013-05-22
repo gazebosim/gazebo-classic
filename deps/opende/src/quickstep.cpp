@@ -42,7 +42,7 @@
 
 
 #undef REPORT_THREAD_TIMING
-#define USE_TPROW
+#undef USE_TPROW
 #undef TIMING
 #undef REPORT_MONITOR
 #undef SHOW_CONVERGENCE
