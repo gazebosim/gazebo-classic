@@ -828,17 +828,11 @@ static void ComputeRows(
           // for the unthrottled _erp version
           // if rhs equals rhs_erp, two solutions are the same.
           // otherwise, compute second set of solutions for rhs with custom erp
-          bool compute_custom_erp = !_dequal(rhs[index], rhs_erp[index]);
-          if (compute_custom_erp)
-          {
-            // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
-            delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
-            delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
-            if (caccel_erp_ptr2)
-              delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
-          }
-          else
-            delta_erp = delta;
+          // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
+          delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
+          delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
+          if (caccel_erp_ptr2)
+            delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
 
           // set the limits for this constraint.
           // this is the place where the QuickStep method differs from the
@@ -854,21 +848,15 @@ static void ComputeRows(
             hi_act = dFabs (hi[index] * lambda[findex[index]]);
             lo_act = -hi_act;
             // for the unthrottled _erp version
-            if (compute_custom_erp)
-            {
-              hi_act_erp = dFabs (hi[index] * lambda_erp[findex[index]]);
-              lo_act_erp = -hi_act_erp;
-            }
+            hi_act_erp = dFabs (hi[index] * lambda_erp[findex[index]]);
+            lo_act_erp = -hi_act_erp;
           } else {
             // FOR erp throttled by info.c_v_max or info.c
             hi_act = hi[index];
             lo_act = lo[index];
             // for the unthrottled _erp version
-            if (compute_custom_erp)
-            {
-              hi_act_erp = hi[index];
-              lo_act_erp = lo[index];
-            }
+            hi_act_erp = hi[index];
+            lo_act_erp = lo[index];
           }
 
           // compute lambda and clamp it to [lo,hi].
@@ -889,23 +877,18 @@ static void ComputeRows(
           }
 
           // for the unthrottled _erp version
-          if (compute_custom_erp)
-          {
-            dReal new_lambda_erp = old_lambda_erp + delta_erp;
-            if (new_lambda_erp < lo_act_erp) {
-              delta_erp = lo_act_erp-old_lambda_erp;
-              lambda_erp[index] = lo_act_erp;
-            }
-            else if (new_lambda_erp > hi_act_erp) {
-              delta_erp = hi_act_erp-old_lambda_erp;
-              lambda_erp[index] = hi_act_erp;
-            }
-            else {
-              lambda_erp[index] = new_lambda_erp;
-            }
+          dReal new_lambda_erp = old_lambda_erp + delta_erp;
+          if (new_lambda_erp < lo_act_erp) {
+            delta_erp = lo_act_erp-old_lambda_erp;
+            lambda_erp[index] = lo_act_erp;
           }
-          else
-            lambda_erp[index] = lambda[index];
+          else if (new_lambda_erp > hi_act_erp) {
+            delta_erp = hi_act_erp-old_lambda_erp;
+            lambda_erp[index] = hi_act_erp;
+          }
+          else {
+            lambda_erp[index] = new_lambda_erp;
+          }
   #else
           // FOR erp throttled by info.c_v_max or info.c
           dReal nl = old_lambda + delta;
@@ -931,18 +914,9 @@ static void ComputeRows(
               sum6(caccel_ptr2, delta, iMJ_ptr + 6);
 
             // update caccel_erp.
-            if (compute_custom_erp)
-            {
-              sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
-              if (caccel_erp_ptr2)
-                sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
-            }
-            else
-            {
-              memcpy(caccel_erp_ptr1, caccel_ptr1, 6*sizeof(dReal));
-              if (caccel_erp_ptr2)
-                memcpy(caccel_erp_ptr2, caccel_ptr2, 6*sizeof(dReal));
-            }
+            sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
+            if (caccel_erp_ptr2)
+              sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
 
 #ifdef PENETRATION_JVERROR_CORRECTION
             // update vnew incrementally
