@@ -719,8 +719,10 @@ static void ComputeRows(
         vnew_ptr1 = vnew + 6*b1;
         vnew_ptr2 = (b2 >= 0) ? vnew + 6*b2 : NULL;
 #endif
-        cforce_ptr1 = cforce + 6*b1;
-        cforce_ptr2 = (b2 >= 0) ? cforce + 6*b2 : NULL;
+        if (preconditioning) {
+          cforce_ptr1 = cforce + 6*b1;
+          cforce_ptr2 = (b2 >= 0) ? cforce + 6*b2 : NULL;
+        }
       }
 
       dReal old_lambda        = lambda[index];
