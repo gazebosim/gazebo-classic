@@ -827,8 +827,9 @@ static void ComputeRows(
 
           // for the unthrottled _erp version
           // if rhs equals rhs_erp, two solutions are the same.
-          bool custom_erp = !_dequal(rhs[index], rhs_erp[index]);
-          if (custom_erp)
+          // otherwise, compute second set of solutions for rhs with custom erp
+          bool compute_custom_erp = !_dequal(rhs[index], rhs_erp[index]);
+          if (compute_custom_erp)
           {
             // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
             delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
@@ -853,7 +854,7 @@ static void ComputeRows(
             hi_act = dFabs (hi[index] * lambda[findex[index]]);
             lo_act = -hi_act;
             // for the unthrottled _erp version
-            if (custom_erp)
+            if (compute_custom_erp)
             {
               hi_act_erp = dFabs (hi[index] * lambda_erp[findex[index]]);
               lo_act_erp = -hi_act_erp;
@@ -863,7 +864,7 @@ static void ComputeRows(
             hi_act = hi[index];
             lo_act = lo[index];
             // for the unthrottled _erp version
-            if (custom_erp)
+            if (compute_custom_erp)
             {
               hi_act_erp = hi[index];
               lo_act_erp = lo[index];
@@ -888,7 +889,7 @@ static void ComputeRows(
           }
 
           // for the unthrottled _erp version
-          if (custom_erp)
+          if (compute_custom_erp)
           {
             dReal new_lambda_erp = old_lambda_erp + delta_erp;
             if (new_lambda_erp < lo_act_erp) {
@@ -930,7 +931,7 @@ static void ComputeRows(
               sum6(caccel_ptr2, delta, iMJ_ptr + 6);
 
             // update caccel_erp.
-            if (custom_erp)
+            if (compute_custom_erp)
             {
               sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
               if (caccel_erp_ptr2)
