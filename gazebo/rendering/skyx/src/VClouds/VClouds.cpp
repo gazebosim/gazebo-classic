@@ -252,6 +252,18 @@ void VClouds::setVisible(const bool& visible)
   mLightningManager->_setVisible(mVisible);
 }
 
+void VClouds::setEnabled(bool _enabled)
+{
+  if (!mCreated)
+  {
+    return;
+  }
+
+  bool visible = _enabled ? mVisible : false;
+  mGeometryManager->getSceneNode()->setVisible(visible);
+  mLightningManager->_setVisible(visible);
+}
+
 void VClouds::setRenderQueueGroups(const RenderQueueGroups& rqg)
 {
   mRenderQueueGroups = rqg;
