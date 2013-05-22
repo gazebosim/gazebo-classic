@@ -67,14 +67,14 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
   this->node->Init(this->model->GetWorld()->GetName());
 
   int err = 0;
+
   err += RegisterJoint(RIGHT_FRONT, "right_front");
   err += RegisterJoint(RIGHT_REAR,  "right_rear");
   err += RegisterJoint(LEFT_FRONT,  "left_front");
   err += RegisterJoint(LEFT_REAR,   "left_rear");
+
   if (err > 0)
-  {
     return;
-  }
 
   if (_sdf->HasElement("max_force"))
     this->maxForce = _sdf->GetElement("max_force")->GetValueDouble();
