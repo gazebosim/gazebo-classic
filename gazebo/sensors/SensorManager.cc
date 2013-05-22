@@ -488,9 +488,6 @@ void SensorManager::SensorContainer::RunLoop()
     // Get the start time of the update.
     startTime = world->GetSimTime();
 
-    if (this->sensors.size() == 0)
-      this->runCondition.wait(lock2);
-
     this->Update(false);
 
     // Compute the time it took to update the sensors.

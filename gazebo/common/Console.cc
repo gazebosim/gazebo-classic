@@ -30,7 +30,7 @@ Console::Console()
 {
   this->msgStream = &std::cerr;
   this->errStream = &std::cerr;
-  this->logStream = new std::ofstream("/dev/null", std::ios::out);
+  this->logStream = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -86,6 +86,7 @@ std::ofstream &Console::Log()
 {
   if (!this->logStream)
     this->logStream = new std::ofstream("/dev/null", std::ios::out);
+
   *this->logStream << "[" << common::Time::GetWallTime() << "] ";
   this->logStream->flush();
   return *this->logStream;

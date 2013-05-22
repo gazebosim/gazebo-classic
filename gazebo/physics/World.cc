@@ -166,9 +166,6 @@ void World::Load(sdf::ElementPtr _sdf)
   this->sceneMsg.CopyFrom(msgs::SceneFromSDF(this->sdf->GetElement("scene")));
   this->sceneMsg.set_name(this->GetName());
 
-  // The period at which statistics about the world are published
-  this->statPeriod = common::Time(0, 200000000);
-
   // The period at which messages are processed
   this->processMsgsPeriod = common::Time(0, 200000000);
 
@@ -187,10 +184,6 @@ void World::Load(sdf::ElementPtr _sdf)
                                            &World::OnFactoryMsg, this);
   this->controlSub = this->node->Subscribe("~/world_control",
                                            &World::OnControl, this);
-
-  this->logControlSub = this->node->Subscribe("~/log/control",
-                                              &World::OnLogControl, this);
-  this->logStatusPub = this->node->Advertise<msgs::LogStatus>("~/log/status");
 
   this->requestSub = this->node->Subscribe("~/request",
                                            &World::OnRequest, this, true);
@@ -1904,4 +1897,3 @@ void World::LogWorker()
   // Make sure nothing is blocked by this thread.
   this->logContinueCondition.notify_all();
 }
-
