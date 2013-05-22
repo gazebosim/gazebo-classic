@@ -30,6 +30,7 @@ Node::Node()
   this->id = idCounter++;
   this->topicNamespace = "";
   this->initialized = false;
+  this->processPublishers = false;
 }
 
 /////////////////////////////////////////////////
@@ -136,6 +137,20 @@ void Node::ProcessPublishers()
 
   for (int i = start; i < end; ++i)
     this->publishers[i]->SendMessage();
+
+  this->processPublishers = false;
+}
+
+/////////////////////////////////////////////////
+void Node::SetProcessPublishers(bool _enabled)
+{
+  this->processPublishers = _enabled;
+}
+
+/////////////////////////////////////////////////
+bool Node::GetProcessPublishers() const
+{
+  return this->processPublishers;
 }
 
 /////////////////////////////////////////////////

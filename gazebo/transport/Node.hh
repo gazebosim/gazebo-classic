@@ -112,6 +112,15 @@ namespace gazebo
       /// most recent message over the wire. This is for internal use only
       public: void ProcessPublishers();
 
+      /// \brief Tell the node that it should process it's publishers.
+      /// This should only be called from Publisher::PublishImpl
+      /// \param[in] _enabled True to enable publisher processing.
+      public: void SetProcessPublishers(bool _enabled = true);
+
+      /// \brief Get whether the node should process it's publishers.
+      /// \return True to process it's publishers.
+      public: bool GetProcessPublishers() const;
+
       /// \brief Process incoming messages.
       public: void ProcessIncoming();
 
@@ -157,6 +166,7 @@ namespace gazebo
               decodedTopic, _queueLimit, _hzRate);
 
         boost::mutex::scoped_lock lock(this->publisherMutex);
+        publisher->SetNode(shared_from_this());
         this->publishers.push_back(publisher);
 
         return publisher;
@@ -345,6 +355,9 @@ namespace gazebo
       private: boost::recursive_mutex processIncomingMutex;
 
       private: bool initialized;
+
+      /// \brief True tells the node that it should process publishers.
+      private: bool processPublishers;
     };
     /// \}
   }
