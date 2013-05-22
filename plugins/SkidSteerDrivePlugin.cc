@@ -79,7 +79,11 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("max_force"))
     this->maxForce = _sdf->GetElement("max_force")->GetValueDouble();
   else if (_sdf->HasElement("MaxForce"))
+  {
+    gzerr << "The <MaxForce> element in the skid steer plugin is deprecated."
+          << "Use <max_force>\n";
     this->maxForce = _sdf->GetElement("MaxForce")->GetValueDouble();
+  }
   else
     gzwarn << "No MaxForce value set in the model sdf, default value is 5.0.\n";
 
