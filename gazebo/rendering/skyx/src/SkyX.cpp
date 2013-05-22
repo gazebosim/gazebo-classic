@@ -52,6 +52,9 @@ namespace SkyX
       , mStarfield(true)
       , mTimeMultiplier(0.1f)
       , mTimeOffset(0.0f)
+      , mMoonEnabled(true)
+      , mCloudsEnabled(true)
+      , mEnabled(true)
   {
     // Need to be instanced here, when SkyX::mSceneManager is valid
     mVCloudsManager = new VCloudsManager(this);
@@ -139,7 +142,7 @@ namespace SkyX
 
   void SkyX::update(const Ogre::Real& timeSinceLastFrame)
   {
-    if (!mCreated)
+    if (!mCreated || !this->mEnabled)
     {
       return;
     }
@@ -171,14 +174,18 @@ namespace SkyX
     mGPUManager->setGpuProgramParameter(
         GPUManager::GPUP_FRAGMENT, "uLightDir", sunDir);
 
-    mMoonManager->updateMoonPhase(mController->getMoonPhase());
-    mCloudsManager->update();
-    mVCloudsManager->update(timeSinceLastFrame);
+    if (this->mMoonEnabled)
+      mMoonManager->updateMoonPhase(mController->getMoonPhase());
+    if (this->mCloudsEnabled)
+    {
+      mCloudsManager->update();
+      mVCloudsManager->update(timeSinceLastFrame);
+    }
   }
 
   void SkyX::notifyCameraRender(Ogre::Camera* c)
   {
-    if (!mCreated)
+    if (!mCreated || !this->mEnabled)
     {
       return;
     }
@@ -199,9 +206,12 @@ namespace SkyX
       mLastCameraFarClipDistance = mCamera->getFarClipDistance();
     }
 
-    mMoonManager->updateGeometry(c);
-
-    mVCloudsManager->notifyCameraRender(c);
+    if (this->mMoonEnabled)
+      mMoonManager->updateGeometry(c);
+    if (this->mCloudsEnabled)
+    {
+      mVCloudsManager->notifyCameraRender(c);
+    }
   }
 
   void SkyX::setVisible(const bool& visible)

@@ -29,6 +29,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Common.hh"
+#include "gazebo/common/Console.hh"
 
 #include "gazebo/sdf/sdf.hh"
 
@@ -50,7 +51,6 @@ bool Server::stop = true;
 Server::Server()
 {
   this->receiveMutex = new boost::mutex();
-  gazebo::print_version();
 
   if (signal(SIGINT, Server::SigInt) == SIG_ERR)
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
@@ -87,6 +87,7 @@ bool Server::ParseArgs(int argc, char **argv)
 
   po::options_description v_desc("Allowed options");
   v_desc.add_options()
+    ("quiet,q", "Reduce output to stdout.")
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
     ("physics,e", po::value<std::string>(),
@@ -132,6 +133,12 @@ bool Server::ParseArgs(int argc, char **argv)
     // std::cerr << boost::diagnostic_information(_e) << "\n";
     return false;
   }
+
+  if (this->vm.count("quiet"))
+    gazebo::common::Console::Instance()->SetQuiet(true);
+  else
+    gazebo::print_version();
+
 
   // Set the random number seed if present on the command line.
   if (this->vm.count("seed"))
