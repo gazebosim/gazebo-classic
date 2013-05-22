@@ -317,6 +317,9 @@ namespace gazebo
       /// \brief True if selected.
       private: bool selected;
 
+      /// \brief Local copy of the sdf name.
+      private: std::string name;
+
       protected: friend class Entity;
     };
     /// \}
