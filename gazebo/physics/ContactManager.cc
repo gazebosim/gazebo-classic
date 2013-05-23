@@ -88,12 +88,15 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   for (iter = this->customContactPublishers.begin();
       iter != this->customContactPublishers.end(); ++iter)
   {
-    if (iter->second->collisions.find(_collision1->GetScopedName()) !=
+    if (iter->second->collisions.find(_collision1) !=
         iter->second->collisions.end() ||
-        iter->second->collisions.find(_collision2->GetScopedName()) !=
+        iter->second->collisions.find(_collision2) !=
         iter->second->collisions.end())
     {
       publishers.push_back(iter->second);
+      /*gzerr << iter->first << " col  " <<
+        _collision1->GetScopedName() << " " <<
+        _collision2->GetScopedName() << std::endl;*/
     }
   }
 
@@ -219,6 +222,7 @@ void ContactManager::PublishContacts()
     msgs::Set(msg2.mutable_time(), this->world->GetSimTime());
     contactPublisher->publisher->Publish(msg2);
     contactPublisher->contacts.clear();
+    msg2.Clear();
   }
 }
 
@@ -248,7 +252,12 @@ std::string ContactManager::CreateFilter(const std::string &_name,
   ContactPublisher *contactPublisher = new ContactPublisher;
   contactPublisher->publisher = pub;
   for (unsigned int i = 0; i < _collisions.size(); ++i)
-    contactPublisher->collisions.insert(_collisions[i]);
+  {
+    Collision *col = boost::dynamic_pointer_cast<Collision>(
+        this->world->GetByName(_collisions[i])).get();
+    contactPublisher->collisions.insert(col);
+//    gzerr << topic << " " << col->GetScopedName() << std::endl;
+  }
 
   this->customContactPublishers[name] = contactPublisher;
 
