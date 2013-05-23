@@ -252,6 +252,12 @@ std::string ContactManager::CreateFilter(const std::string &_name,
   {
     Collision *col = boost::dynamic_pointer_cast<Collision>(
         this->world->GetByName(_collisions[i])).get();
+    if (!col)
+    {
+      gzerr << "Unable to find: '" << _collisions[i]
+          << "', ignoring collision in contact filter " << std::endl;
+      continue;
+    }
     contactPublisher->collisions.insert(col);
   }
 
