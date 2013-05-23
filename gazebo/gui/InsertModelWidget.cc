@@ -227,7 +227,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
         }
         else if (dIter->filename() != "database.config")
         {
-          gzwarn << "Invalid filename or directory[" << fullPath
+          gzlog << "Invalid filename or directory[" << fullPath
             << "] in GAZEBO_MODEL_PATH. It's not a good idea to put extra "
             << "files in a GAZEBO_MODEL_PATH because the file structure may"
             << " be modified by Gazebo.\n";
@@ -251,7 +251,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
 
       if (!boost::filesystem::exists(manifest) || manifest == fullPath)
       {
-        gzerr << "model.config file is missing in directory["
+        gzlog << "model.config file is missing in directory["
               << fullPath << "]\n";
         continue;
       }

@@ -1200,24 +1200,24 @@ void URDF2Gazebo::CreateSDF(TiXmlElement *_root,
       ((!_link->inertial) || gazebo::math::equal(_link->inertial->mass, 0.0)))
     {
       if (!_link->child_links.empty())
-        gzwarn << "urdf2gazebo: link[" << _link->name
+        gzlog << "urdf2gazebo: link[" << _link->name
                << "] has no inertial/mass, ["
                << static_cast<int>(_link->child_links.size())
                << "] children links ignored\n.";
 
       if (!_link->child_joints.empty())
-        gzwarn << "urdf2gazebo: link[" << _link->name
+        gzlog << "urdf2gazebo: link[" << _link->name
                << "] has no inertia/mass, ["
                << static_cast<int>(_link->child_links.size())
                << "] children joints ignored\n.";
 
       if (_link->parent_joint)
-        gzwarn << "urdf2gazebo: link[" << _link->name
+        gzlog << "urdf2gazebo: link[" << _link->name
                << "] has no inertia/mass, "
                << "parent joint [" << _link->parent_joint->name
                << "] ignored\n.";
 
-        gzwarn << "urdf2gazebo: link[" << _link->name
+        gzlog << "urdf2gazebo: link[" << _link->name
                << "] has no inertia/mass, not modeled in gazebo\n";
       return;
     }

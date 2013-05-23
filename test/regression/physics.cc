@@ -1091,18 +1091,13 @@ TEST_F(PhysicsTest, JointDampingTest)
 
     EXPECT_EQ(vel.x, 0.0);
 
-    EXPECT_LT(vel.y, -10.2006);
-    EXPECT_GT(vel.y, -10.2008);
-    EXPECT_LT(vel.z, -6.51766);
-    EXPECT_GT(vel.z, -6.51768);
+    EXPECT_NEAR(vel.y, -10.2009, PHYSICS_TOL);
+    EXPECT_NEAR(vel.z, -6.51755, PHYSICS_TOL);
 
     EXPECT_EQ(pose.pos.x, 3.0);
-    EXPECT_LT(pose.pos.y, 5.0e-6);
-    EXPECT_GT(pose.pos.y, 0.0);
-    EXPECT_GT(pose.pos.z, 10.099);
-    EXPECT_LT(pose.pos.z, 10.101);
-    EXPECT_GT(pose.rot.GetAsEuler().x, 0.567336);
-    EXPECT_LT(pose.rot.GetAsEuler().x, 0.567338);
+    EXPECT_NEAR(pose.pos.y, 0.0, PHYSICS_TOL);
+    EXPECT_NEAR(pose.pos.z, 10.099, PHYSICS_TOL);
+    EXPECT_NEAR(pose.rot.GetAsEuler().x, 0.567334, PHYSICS_TOL);
     EXPECT_EQ(pose.rot.GetAsEuler().y, 0.0);
     EXPECT_EQ(pose.rot.GetAsEuler().z, 0.0);
   }
