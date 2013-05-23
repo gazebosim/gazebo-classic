@@ -1320,10 +1320,6 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
   for (int i = 0; i < _msg->model_size(); i++)
   {
-    /*this->poseMsgs.push_front(_msg->model(i).pose());
-    this->poseMsgs.front().set_name(_msg->model(i).name());
-    this->poseMsgs.front().set_id(_msg->model(i).id());
-    */
     this->poseMsgs[_msg->model(i).id()] = _msg->model(i).pose();
     this->poseMsgs[_msg->model(i).id()].set_name(_msg->model(i).name());
     this->poseMsgs[_msg->model(i).id()].set_id(_msg->model(i).id());
@@ -1424,11 +1420,6 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     this->poseMsgs[_msg.link(j).id()] = _msg.link(j).pose();
     this->poseMsgs[_msg.link(j).id()].set_name(linkName);
     this->poseMsgs[_msg.link(j).id()].set_id(_msg.link(j).id());
-
-    /*this->poseMsgs.push_front(_msg.link(j).pose());
-    this->poseMsgs.front().set_name(linkName);
-    this->poseMsgs.front().set_id(_msg.link(j).id());
-    */
 
     if (_msg.link(j).has_inertial())
     {
@@ -2216,7 +2207,6 @@ common::Time Scene::GetSimTime() const
 void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  // PoseMsgs_M::iterator iter;
 
   this->sceneSimTimePosesReceived =
     common::Time(_msg->time().sec(), _msg->time().nsec());
@@ -2224,19 +2214,6 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
     this->poseMsgs[_msg->pose(i).id()] = _msg->pose(i);
-
-    // Find an old model message, and remove them
-    /*for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); ++iter)
-    {
-      if ((*iter).id() == _msg->pose(i).id())
-      {
-        this->poseMsgs.erase(iter);
-        break;
-      }
-    }
-
-    this->poseMsgs.push_back(_msg->pose(i));
-    */
   }
 }
 

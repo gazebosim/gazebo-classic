@@ -214,8 +214,6 @@ void World::Load(sdf::ElementPtr _sdf)
   GZ_ASSERT(this->rootElement->GetId() == 0,
       "World root element ID must be zero");
 
-  std::cout << "Root ELement ID[" << this->rootElement->GetId() << "]\n";
-
   // A special order is necessary when loading a world that contains state
   // information. The joints must be created last, otherwise they get
   // initialized improperly.
