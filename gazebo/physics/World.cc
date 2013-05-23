@@ -211,9 +211,6 @@ void World::Load(sdf::ElementPtr _sdf)
   this->rootElement->SetName(this->GetName());
   this->rootElement->SetWorld(shared_from_this());
 
-  GZ_ASSERT(this->rootElement->GetId() == 0,
-      "World root element ID must be zero");
-
   // A special order is necessary when loading a world that contains state
   // information. The joints must be created last, otherwise they get
   // initialized improperly.
