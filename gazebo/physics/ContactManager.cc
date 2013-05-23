@@ -94,9 +94,6 @@ Contact *ContactManager::NewContact(Collision *_collision1,
         iter->second->collisions.end())
     {
       publishers.push_back(iter->second);
-      /*gzerr << iter->first << " col  " <<
-        _collision1->GetScopedName() << " " <<
-        _collision2->GetScopedName() << std::endl;*/
     }
   }
 
@@ -256,7 +253,6 @@ std::string ContactManager::CreateFilter(const std::string &_name,
     Collision *col = boost::dynamic_pointer_cast<Collision>(
         this->world->GetByName(_collisions[i])).get();
     contactPublisher->collisions.insert(col);
-//    gzerr << topic << " " << col->GetScopedName() << std::endl;
   }
 
   this->customContactPublishers[name] = contactPublisher;
