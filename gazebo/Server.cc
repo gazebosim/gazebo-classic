@@ -102,7 +102,7 @@ bool Server::ParseArgs(int argc, char **argv)
      "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(),
      "Number of iterations to simulate.")
-    ("minimal_comms","Reduce the messages output by gzserver")
+    ("minimal_comms", "Reduce the messages output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 

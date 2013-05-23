@@ -168,8 +168,12 @@ void Scene::Clear()
   delete this->terrain;
   this->terrain = NULL;
 
+  // Erase the world visual
+  this->visuals.erase(this->visuals.begin());
+
   while (this->visuals.size() > 0)
-    this->RemoveVisual(this->visuals.begin()->second);
+    if (this->visuals.begin()->second)
+      this->RemoveVisual(this->visuals.begin()->second);
   this->visuals.clear();
 
   for (uint32_t i = 0; i < this->grids.size(); i++)

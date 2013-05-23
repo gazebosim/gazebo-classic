@@ -208,7 +208,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
 }
 
 /////////////////////////////////////////////////
-void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* _sceneNode)
+void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
 {
   if (!_sceneNode)
     return;
