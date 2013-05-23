@@ -331,6 +331,7 @@ LinkPtr Joint::GetParent() const
 void Joint::FillMsg(msgs::Joint &_msg)
 {
   _msg.set_name(this->GetScopedName());
+  _msg.set_id(this->GetId());
 
   msgs::Set(_msg.mutable_pose(), this->anchorPose);
 
@@ -375,14 +376,26 @@ void Joint::FillMsg(msgs::Joint &_msg)
   _msg.mutable_axis1()->set_friction(0);
 
   if (this->GetParent())
+  {
     _msg.set_parent(this->GetParent()->GetScopedName());
+    _msg.set_parent_id(this->GetParent()->GetId());
+  }
   else
+  {
     _msg.set_parent("world");
+    _msg.set_parent_id(0);
+  }
 
   if (this->GetChild())
+  {
     _msg.set_child(this->GetChild()->GetScopedName());
+    _msg.set_child_id(this->GetChild()->GetId());
+  }
   else
+  {
     _msg.set_child("world");
+    _msg.set_parent_id(0);
+  }
 }
 
 //////////////////////////////////////////////////

@@ -261,6 +261,10 @@ namespace gazebo
 
       /// \brief The sensor's parent ID.
       private: uint32_t parentId;
+
+      /// \brief An SDF pointer that allows us to only read the sensor.sdf
+      /// file once, which in turns limits disk reads.
+      private: static sdf::ElementPtr sdfSensor;
     };
     /// \}
   }

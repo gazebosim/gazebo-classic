@@ -45,10 +45,12 @@
 using namespace gazebo;
 using namespace rendering;
 
+uint32_t Visual::visualIdCount = GZ_UINT32_MAX;
 
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 {
+  this->id = this->visualIdCount--;
   this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
 
@@ -93,6 +95,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
 {
+  this->id = this->visualIdCount--;
   this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
 

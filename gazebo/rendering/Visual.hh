@@ -560,6 +560,7 @@ namespace gazebo
       private: WireBox *boundingBox;
 
       private: uint32_t id;
+      private: static uint32_t visualIdCount;
     };
     /// \}
   }

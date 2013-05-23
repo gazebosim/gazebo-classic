@@ -53,7 +53,7 @@ ModelMaker::~ModelMaker()
 }
 
 /////////////////////////////////////////////////
-bool ModelMaker::InitFromModel(const std::string &_modelName)
+bool ModelMaker::InitFromModel(const std::string & /*_modelName*/)
 {
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
   if (this->modelVisual)
@@ -63,7 +63,10 @@ bool ModelMaker::InitFromModel(const std::string &_modelName)
     this->visuals.clear();
   }
 
-  this->modelVisual = scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
+  // This function is currently not executed. Commenting out the following
+  // line to prevent a compile warning.
+  // this->modelVisual =
+  // scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
 
   if (!this->modelVisual)
   {

@@ -442,6 +442,9 @@ namespace gazebo
       /// entities.
       private: void SetInertialFromCollisions();
 
+      /// \brief Parse visuals from SDF
+      private: void ParseVisuals();
+
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
 

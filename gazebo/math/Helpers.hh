@@ -32,6 +32,10 @@
 #define GZ_FLT_MAX std::numeric_limits<float>::max()
 #define GZ_FLT_MIN std::numeric_limits<float>::min()
 
+#define GZ_UINT32_MAX std::numeric_limits<uint32_t>::max()
+#define GZ_UINT32_MIN std::numeric_limits<uint32_t>::min()
+
+
 namespace gazebo
 {
   namespace math

@@ -38,13 +38,20 @@
 using namespace gazebo;
 using namespace sensors;
 
+sdf::ElementPtr Sensor::sdfSensor;
+
 //////////////////////////////////////////////////
 Sensor::Sensor(SensorCategory _cat)
 {
+  if (!this->sdfSensor)
+  {
+    this->sdfSensor.reset(new sdf::Element);
+    sdf::initFile("sensor.sdf", this->sdfSensor);
+  }
+
   this->category = _cat;
 
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("sensor.sdf", this->sdf);
+  this->sdf = this->sdfSensor->Clone();
 
   this->active = false;
 
