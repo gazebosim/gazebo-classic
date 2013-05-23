@@ -620,7 +620,6 @@ VisualPtr Scene::GetVisual(uint32_t _id) const
 VisualPtr Scene::GetVisual(const std::string &_name) const
 {
   VisualPtr result;
-  //Visual_M::const_iterator iter = this->visuals.find(_name);
 
   Visual_M::const_iterator iter;
   for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
@@ -631,7 +630,6 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
     result = iter->second;
   else
   {
-    //iter = this->visuals.find(this->GetName() + "::" + _name);
     std::string otherName = this->GetName() + "::" + _name;
     for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
       if (iter->second->GetName() == otherName)
@@ -2173,7 +2171,6 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     if (visual)
     {
       result = true;
-      //std::cout << "NewVisual[" << _msg->id() << "][" << _msg->name() << "] Parent[" << _msg->parent_id() << "] PName[" << _msg->parent_name() << "]\n";
       visual->LoadFromMsg(_msg);
       this->visuals[_msg->id()] = visual;
       if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||

@@ -62,7 +62,6 @@ Link::Link(EntityPtr _parent)
 //////////////////////////////////////////////////
 Link::~Link()
 {
-
   this->attachedModels.clear();
 
   for (Visuals_M::iterator iter = this->visuals.begin();
