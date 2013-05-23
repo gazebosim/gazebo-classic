@@ -25,6 +25,7 @@
 using namespace gazebo;
 
 std::vector<physics::WorldPtr> g_worlds;
+uint32_t g_uniqueId = 0;
 
 /////////////////////////////////////////////////
 bool physics::load()
@@ -167,4 +168,10 @@ bool physics::worlds_running()
   }
 
   return false;
+}
+
+/////////////////////////////////////////////////
+uint32_t physics::getUniqueId()
+{
+  return g_uniqueId++;
 }

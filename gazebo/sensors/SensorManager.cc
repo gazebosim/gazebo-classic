@@ -225,7 +225,8 @@ void SensorManager::GetSensorTypes(std::vector<std::string> &_types) const
 //////////////////////////////////////////////////
 std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
                                         const std::string &_worldName,
-                                        const std::string &_parentName)
+                                        const std::string &_parentName,
+                                        uint32_t _parentId)
 {
   std::string type = _elem->GetValueString("type");
   SensorPtr sensor = sensors::SensorFactory::NewSensor(type);
@@ -238,6 +239,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
 
   // Must come before sensor->Load
   sensor->SetParent(_parentName);
+  sensor->SetParentId(_parentId);
 
   // Load the sensor
   sensor->Load(_worldName, _elem);

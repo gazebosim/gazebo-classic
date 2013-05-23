@@ -513,6 +513,10 @@ namespace gazebo
 
       /// \brief option to use CFM damping
       protected: bool useCFMDamping;
+
+      /// \brief An SDF pointer that allows us to only read the joint.sdf
+      /// file once, which in turns limits disk reads.
+      private: static sdf::ElementPtr sdfJoint;
     };
     /// \}
   }

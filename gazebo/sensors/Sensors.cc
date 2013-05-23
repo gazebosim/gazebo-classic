@@ -64,10 +64,11 @@ bool sensors::fini()
 /////////////////////////////////////////////////
 std::string sensors::create_sensor(sdf::ElementPtr _elem,
                                    const std::string &_worldName,
-                                   const std::string &_parentName)
+                                   const std::string &_parentName,
+                                   uint32_t _parentId)
 {
   return sensors::SensorManager::Instance()->CreateSensor(_elem, _worldName,
-                                                          _parentName);
+      _parentName, _parentId);
 }
 
 /////////////////////////////////////////////////

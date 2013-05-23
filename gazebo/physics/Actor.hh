@@ -229,6 +229,9 @@ namespace gazebo
       /// \brief Name of the visual
       protected: std::string visualName;
 
+      /// \brief ID for this visual
+      protected: uint32_t visualId;
+
       /// \brief Where to send bone info.
       protected: transport::PublisherPtr bonePosePub;
 

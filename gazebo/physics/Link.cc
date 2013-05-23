@@ -36,6 +36,7 @@
 #include "gazebo/sensors/Sensors.hh"
 #include "gazebo/sensors/Sensor.hh"
 
+#include "gazebo/physics/Physics.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -44,8 +45,6 @@
 
 using namespace gazebo;
 using namespace physics;
-
-uint32_t Link::visualCounter = 10000;
 
 //////////////////////////////////////////////////
 Link::Link(EntityPtr _parent)
@@ -63,15 +62,15 @@ Link::Link(EntityPtr _parent)
 //////////////////////////////////////////////////
 Link::~Link()
 {
-  std::vector<Entity*>::iterator iter;
 
   this->attachedModels.clear();
 
-  for (unsigned int i = 0; i < this->visuals.size(); i++)
+  for (Visuals_M::iterator iter = this->visuals.begin();
+      iter != this->visuals.end(); ++iter)
   {
     msgs::Visual msg;
-    msg.set_name("");
-    msg.set_id(this->visuals[i]);
+    msg.set_name(iter->second.name());
+    msg.set_id(iter->second.id());
     msg.set_delete_me(true);
     this->visPub->Publish(msg);
   }
@@ -121,19 +120,18 @@ void Link::Load(sdf::ElementPtr _sdf)
 
       std::string visName = this->GetScopedName() + "::" + msg.name();
       msg.set_name(visName);
-      msg.set_id(this->visualCounter++);
+      msg.set_id(physics::getUniqueId());
       msg.set_parent_name(this->GetScopedName());
       msg.set_parent_id(this->GetId());
       msg.set_is_static(this->IsStatic());
 
       this->visPub->Publish(msg);
 
-      std::vector<uint32_t>::iterator iter;
-      iter = std::find(this->visuals.begin(), this->visuals.end(), msg.id());
+      Visuals_M::iterator iter = this->visuals.find(msg.id());
       if (iter != this->visuals.end())
         gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
 
-      this->visuals.push_back(msg.id());
+      this->visuals[msg.id()] = msg;
 
       visualElem = visualElem->GetNextElement("visual");
     }
@@ -158,7 +156,7 @@ void Link::Load(sdf::ElementPtr _sdf)
     {
       std::string sensorName =
         sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-                               this->GetScopedName());
+            this->GetScopedName(), this->GetId());
       this->sensors.push_back(sensorName);
       sensorElem = sensorElem->GetNextElement("sensor");
     }
@@ -259,11 +257,11 @@ void Link::Fini()
   }
   this->sensors.clear();
 
-  for (std::vector<uint32_t>::iterator iter = this->visuals.begin();
+  for (Visuals_M::iterator iter = this->visuals.begin();
        iter != this->visuals.end(); ++iter)
   {
     msgs::Request *msg = msgs::CreateRequest("entity_delete",
-        boost::lexical_cast<std::string>(*iter));
+        boost::lexical_cast<std::string>(iter->second.id()));
     this->requestPub->Publish(*msg, true);
   }
 
@@ -776,20 +774,11 @@ void Link::FillMsg(msgs::Link &_msg)
       sensor->FillMsg(*_msg.add_sensor());
   }
 
-  if (this->sdf->HasElement("visual"))
+  for (Visuals_M::iterator iter = this->visuals.begin();
+       iter != this->visuals.end(); ++iter)
   {
-    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
-    while (visualElem)
-    {
-      msgs::Visual *vis = _msg.add_visual();
-      vis->CopyFrom(msgs::VisualFromSDF(visualElem));
-      vis->set_name(this->GetScopedName() + "::" + vis->name());
-      vis->set_id(this->visualCounter++);
-      vis->set_parent_name(this->GetScopedName());
-      vis->set_parent_id(this->GetId());
-
-      visualElem = visualElem->GetNextElement("visual");
-    }
+    msgs::Visual *vis = _msg.add_visual();
+    vis->CopyFrom(iter->second);
   }
 
   if (this->sdf->HasElement("projector"))

@@ -223,6 +223,9 @@ void Model::Init()
 //////////////////////////////////////////////////
 void Model::Update()
 {
+  if (this->IsStatic())
+    return;
+
   this->updateMutex->lock();
 
   for (Joint_V::iterator jiter = this->joints.begin();

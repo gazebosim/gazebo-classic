@@ -1660,7 +1660,6 @@ void Scene::PreRender()
       {
         // If an object is selected, don't let the physics engine move it.
         if (!this->selectedVis || this->selectionMode != "move" ||
-            //iter->first.find(this->selectedVis->GetName()) == std::string::npos)
             iter->first != this->selectedVis->GetId())
         {
           math::Pose pose = msgs::Convert(*pIter);
@@ -1677,20 +1676,19 @@ void Scene::PreRender()
     }
 
     // process skeleton pose msgs
-    /*spIter = this->skeletonPoseMsgs.begin();
+    spIter = this->skeletonPoseMsgs.begin();
     while (spIter != this->skeletonPoseMsgs.end())
     {
-      Visual_M::iterator iter = this->visuals.find((*spIter)->model_name());
+      Visual_M::iterator iter = this->visuals.find((*spIter)->model_id());
       for (int i = 0; i < (*spIter)->pose_size(); i++)
       {
         const msgs::Pose& pose_msg = (*spIter)->pose(i);
-        Visual_M::iterator iter2 = this->visuals.find(pose_msg.name());
+        Visual_M::iterator iter2 = this->visuals.find(pose_msg.id());
         if (iter2 != this->visuals.end())
         {
           // If an object is selected, don't let the physics engine move it.
           if (!this->selectedVis || this->selectionMode != "move" ||
-              iter->first.find(this->selectedVis->GetName()) ==
-              std::string::npos)
+              iter->first != this->selectedVis->GetId())
           {
             math::Pose pose = msgs::Convert(pose_msg);
             iter2->second->SetPose(pose);
@@ -1707,7 +1705,7 @@ void Scene::PreRender()
       else
         ++spIter;
     }
-    */
+
     // official time stamp of approval
     this->sceneSimTimePosesApplied = this->sceneSimTimePosesReceived;
 
@@ -1727,17 +1725,16 @@ void Scene::OnJointMsg(ConstJointPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessSensorMsg(ConstSensorPtr & /*_msg*/)
+bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 {
   if (!this->enableVisualizations)
     return true;
 
-  /*
   if ((_msg->type() == "ray" || _msg->type() == "gpu_ray") && _msg->visualize()
       && !_msg->topic().empty())
   {
     std::string rayVisualName = _msg->parent() + "::" + _msg->name();
-    if (!this->visuals[rayVisualName+"_laser_vis"])
+    if (!this->visuals[_msg->id()])
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
       if (!parentVis)
@@ -1746,7 +1743,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr & /*_msg*/)
       LaserVisualPtr laserVis(new LaserVisual(
             rayVisualName+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
       laserVis->Load();
-      this->visuals[rayVisualName+"_laser_vis"] = laserVis;
+      laserVis->SetId(_msg->id());
+      this->visuals[_msg->id()] = laserVis;
     }
   }
   else if (_msg->type() == "camera" && _msg->visualize())
@@ -1768,10 +1766,11 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr & /*_msg*/)
 
       cameraVis->SetPose(msgs::Convert(_msg->pose()));
 
+      cameraVis->SetId(_msg->id());
       cameraVis->Load(_msg->camera().image_size().x(),
                       _msg->camera().image_size().y());
 
-      this->visuals[cameraVis->GetName()] = cameraVis;
+      this->visuals[_msg->id()] = cameraVis;
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&
@@ -1780,8 +1779,9 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr & /*_msg*/)
     ContactVisualPtr contactVis(new ContactVisual(
           _msg->name()+"_GUIONLY_contact_vis",
           this->worldVisual, _msg->topic()));
+    contactVis->SetId(_msg->id());
 
-    this->visuals[contactVis->GetName()] = contactVis;
+    this->visuals[_msg->id()] = contactVis;
   }
   else if (_msg->type() == "rfidtag" && _msg->visualize() &&
            !_msg->topic().empty())
@@ -1792,8 +1792,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr & /*_msg*/)
 
     RFIDTagVisualPtr rfidVis(new RFIDTagVisual(
           _msg->name() + "_GUIONLY_rfidtag_vis", parentVis, _msg->topic()));
-
-    this->visuals[rfidVis->GetName()] = rfidVis;
+    rfidVis->SetId(_msg->id());
+    this->visuals[_msg->id()] = rfidVis;
   }
   else if (_msg->type() == "rfid" && _msg->visualize() &&
            !_msg->topic().empty())
@@ -1804,9 +1804,9 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr & /*_msg*/)
 
     RFIDVisualPtr rfidVis(new RFIDVisual(
           _msg->name() + "_GUIONLY_rfid_vis", parentVis, _msg->topic()));
-    this->visuals[rfidVis->GetName()] = rfidVis;
+    rfidVis->SetId(_msg->id());
+    this->visuals[_msg->id()] = rfidVis;
   }
-*/
 
   return true;
 }

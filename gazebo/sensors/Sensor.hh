@@ -190,6 +190,18 @@ namespace gazebo
       /// \brief Reset the lastUpdateTime to zero.
       public: void ResetLastUpdateTime();
 
+      /// \brief Get the sensor's ID.
+      /// \return The sensor's ID.
+      public: uint32_t GetId() const;
+
+      /// \brief Get the sensor's parent's ID.
+      /// \return The sensor's parent's ID.
+      public: uint32_t GetParentId() const;
+
+      /// \brief Set the sensor's parent's ID.
+      /// \param[in] _id The sensor's parent's ID.
+      public: void SetParentId(uint32_t _id);
+
       /// \brief Load a plugin for this sensor.
       /// \param[in] _sdf SDF parameters.
       private: void LoadPlugin(sdf::ElementPtr _sdf);
@@ -243,6 +255,12 @@ namespace gazebo
 
       /// \brief The category of the sensor.
       private: SensorCategory category;
+
+      /// \brief The sensors unique ID.
+      private: uint32_t id;
+
+      /// \brief The sensor's parent ID.
+      private: uint32_t parentId;
     };
     /// \}
   }

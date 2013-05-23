@@ -24,6 +24,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/physics/Physics.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 
@@ -37,7 +38,7 @@ Base::Base(BasePtr _parent)
 : parent(_parent)
 {
   this->type = BASE;
-  this->id = ++idCounter;
+  this->id = physics::getUniqueId();
   this->saveable = true;
   this->selected = false;
 
@@ -89,6 +90,8 @@ void Base::Load(sdf::ElementPtr _sdf)
     this->world = this->parent->GetWorld();
     this->parent->AddChild(shared_from_this());
   }
+
+  this->ComputeScopedName();
 }
 
 //////////////////////////////////////////////////
@@ -304,19 +307,22 @@ BasePtr Base::GetByName(const std::string &_name)
 //////////////////////////////////////////////////
 std::string Base::GetScopedName() const
 {
+  return this->scopedName;
+}
+
+//////////////////////////////////////////////////
+void Base::ComputeScopedName()
+{
   BasePtr p = this->parent;
-  std::string scopedName = this->GetName();
+  this->scopedName = this->GetName();
 
   while (p)
   {
     if (p->GetParent())
-      scopedName.insert(0, p->GetName()+"::");
+      this->scopedName.insert(0, p->GetName()+"::");
     p = p->GetParent();
   }
-
-  return scopedName;
 }
-
 
 //////////////////////////////////////////////////
 bool Base::HasType(const Base::EntityType &_t) const

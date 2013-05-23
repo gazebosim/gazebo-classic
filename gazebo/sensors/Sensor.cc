@@ -51,6 +51,8 @@ Sensor::Sensor(SensorCategory _cat)
   this->node = transport::NodePtr(new transport::Node());
 
   this->updatePeriod = common::Time(0.0);
+
+  this->id = physics::getUniqueId();
 }
 
 //////////////////////////////////////////////////
@@ -124,6 +126,24 @@ void Sensor::SetParent(const std::string &_name)
 std::string Sensor::GetParentName() const
 {
   return this->parentName;
+}
+
+//////////////////////////////////////////////////
+uint32_t Sensor::GetId() const
+{
+  return this->id;
+}
+
+//////////////////////////////////////////////////
+uint32_t Sensor::GetParentId() const
+{
+  return this->parentId;
+}
+
+//////////////////////////////////////////////////
+void Sensor::SetParentId(uint32_t _id)
+{
+  this->parentId = _id;
 }
 
 //////////////////////////////////////////////////
@@ -257,8 +277,10 @@ std::string Sensor::GetTopic() const
 void Sensor::FillMsg(msgs::Sensor &_msg)
 {
   _msg.set_name(this->GetName());
+  _msg.set_id(this->GetId());
   _msg.set_type(this->GetType());
   _msg.set_parent(this->GetParentName());
+  _msg.set_parent_id(this->GetParentId());
   msgs::Set(_msg.mutable_pose(), this->GetPose());
 
   _msg.set_visualize(this->GetVisualize());

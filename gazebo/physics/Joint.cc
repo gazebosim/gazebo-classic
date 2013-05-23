@@ -36,6 +36,8 @@
 using namespace gazebo;
 using namespace physics;
 
+sdf::ElementPtr Joint::sdfJoint;
+
 //////////////////////////////////////////////////
 Joint::Joint(BasePtr _parent)
   : Base(_parent)
@@ -54,6 +56,12 @@ Joint::Joint(BasePtr _parent)
   this->upperLimit[1] =  1e16;
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
+
+  if (!this->sdfJoint)
+  {
+    this->sdfJoint.reset(new sdf::Element);
+    sdf::initFile("joint.sdf", this->sdfJoint);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -88,7 +96,7 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 
   // Joint is loaded without sdf from a model
   // Initialize this->sdf so it can be used for data storage
-  sdf::initFile("joint.sdf", this->sdf);
+  this->sdf = this->sdfJoint->Clone();
 
   this->LoadImpl(_pose);
 }

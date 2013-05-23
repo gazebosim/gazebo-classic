@@ -39,7 +39,8 @@ namespace gazebo
     /// \return The name of the new sensor.
     std::string create_sensor(sdf::ElementPtr _elem,
                               const std::string &_worldName,
-                              const std::string &_parentName);
+                              const std::string &_parentName,
+                              uint32_t _parentId);
 
     /// \brief Remove a sensor by name
     /// \param[in] _sensorName Name of sensor to remove
