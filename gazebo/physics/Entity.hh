@@ -317,9 +317,6 @@ namespace gazebo
       /// \brief Visual message container.
       protected: msgs::Visual *visualMsg;
 
-      /// \brief Pose message container.
-      protected: msgs::Pose *poseMsg;
-
       /// \brief Current pose animation
       protected: common::PoseAnimationPtr animation;
 

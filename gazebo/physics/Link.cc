@@ -45,6 +45,8 @@
 using namespace gazebo;
 using namespace physics;
 
+uint32_t Link::visualCounter = 10000;
+
 //////////////////////////////////////////////////
 Link::Link(EntityPtr _parent)
     : Entity(_parent)
@@ -68,7 +70,8 @@ Link::~Link()
   for (unsigned int i = 0; i < this->visuals.size(); i++)
   {
     msgs::Visual msg;
-    msg.set_name(this->visuals[i]);
+    msg.set_name("");
+    msg.set_id(this->visuals[i]);
     msg.set_delete_me(true);
     this->visPub->Publish(msg);
   }
@@ -118,17 +121,19 @@ void Link::Load(sdf::ElementPtr _sdf)
 
       std::string visName = this->GetScopedName() + "::" + msg.name();
       msg.set_name(visName);
+      msg.set_id(this->visualCounter++);
       msg.set_parent_name(this->GetScopedName());
+      msg.set_parent_id(this->GetId());
       msg.set_is_static(this->IsStatic());
 
       this->visPub->Publish(msg);
 
-      std::vector<std::string>::iterator iter;
-      iter = std::find(this->visuals.begin(), this->visuals.end(), msg.name());
+      std::vector<uint32_t>::iterator iter;
+      iter = std::find(this->visuals.begin(), this->visuals.end(), msg.id());
       if (iter != this->visuals.end())
         gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
 
-      this->visuals.push_back(msg.name());
+      this->visuals.push_back(msg.id());
 
       visualElem = visualElem->GetNextElement("visual");
     }
@@ -243,23 +248,27 @@ void Link::Init()
 //////////////////////////////////////////////////
 void Link::Fini()
 {
-  std::vector<std::string>::iterator iter;
-
   this->parentJoints.clear();
   this->childJoints.clear();
   this->inertial.reset();
 
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+  for (std::vector<std::string>::iterator iter = this->sensors.begin();
+       iter != this->sensors.end(); ++iter)
+  {
     sensors::remove_sensor(*iter);
+  }
   this->sensors.clear();
 
-  for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
+  for (std::vector<uint32_t>::iterator iter = this->visuals.begin();
+       iter != this->visuals.end(); ++iter)
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
+    msgs::Request *msg = msgs::CreateRequest("entity_delete",
+        boost::lexical_cast<std::string>(*iter));
     this->requestPub->Publish(*msg, true);
   }
 
-  for (iter = this->cgVisuals.begin(); iter != this->cgVisuals.end(); ++iter)
+  for (std::vector<std::string>::iterator iter = this->cgVisuals.begin();
+       iter != this->cgVisuals.end(); ++iter)
   {
     msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
     this->requestPub->Publish(*msg, true);
@@ -775,7 +784,9 @@ void Link::FillMsg(msgs::Link &_msg)
       msgs::Visual *vis = _msg.add_visual();
       vis->CopyFrom(msgs::VisualFromSDF(visualElem));
       vis->set_name(this->GetScopedName() + "::" + vis->name());
+      vis->set_id(this->visualCounter++);
       vis->set_parent_name(this->GetScopedName());
+      vis->set_parent_id(this->GetId());
 
       visualElem = visualElem->GetNextElement("visual");
     }

@@ -343,7 +343,9 @@ msgs::Visual Collision::CreateCollisionVisual()
 {
   msgs::Visual msg;
   msg.set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
+  msg.set_id(this->GetId());
   msg.set_parent_name(this->parent->GetScopedName());
+  msg.set_parent_id(this->parent->GetId());
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
   msgs::Set(msg.mutable_pose(), this->GetRelativePose());

@@ -604,12 +604,23 @@ LightPtr Scene::GetLight(uint32_t _index) const
 VisualPtr Scene::GetVisual(const std::string &_name) const
 {
   VisualPtr result;
-  Visual_M::const_iterator iter = this->visuals.find(_name);
+  //Visual_M::const_iterator iter = this->visuals.find(_name);
+
+  Visual_M::const_iterator iter;
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
+    if (iter->second->GetName() == _name)
+      break;
+
   if (iter != this->visuals.end())
     result = iter->second;
   else
   {
-    iter = this->visuals.find(this->GetName() + "::" + _name);
+    //iter = this->visuals.find(this->GetName() + "::" + _name);
+    std::string otherName = this->GetName() + "::" + _name;
+    for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
+      if (iter->second->GetName() == otherName)
+        break;
+
     if (iter != this->visuals.end())
       result = iter->second;
   }
@@ -1644,12 +1655,13 @@ void Scene::PreRender()
     pIter = this->poseMsgs.begin();
     while (pIter != this->poseMsgs.end())
     {
-      Visual_M::iterator iter = this->visuals.find((*pIter).name());
+      Visual_M::iterator iter = this->visuals.find((*pIter).id());
       if (iter != this->visuals.end() && iter->second)
       {
         // If an object is selected, don't let the physics engine move it.
         if (!this->selectedVis || this->selectionMode != "move" ||
-            iter->first.find(this->selectedVis->GetName()) == std::string::npos)
+            //iter->first.find(this->selectedVis->GetName()) == std::string::npos)
+            iter->first != this->selectedVis->GetId())
         {
           math::Pose pose = msgs::Convert(*pIter);
           GZ_ASSERT(iter->second, "Visual pointer is NULL");
@@ -1665,7 +1677,7 @@ void Scene::PreRender()
     }
 
     // process skeleton pose msgs
-    spIter = this->skeletonPoseMsgs.begin();
+    /*spIter = this->skeletonPoseMsgs.begin();
     while (spIter != this->skeletonPoseMsgs.end())
     {
       Visual_M::iterator iter = this->visuals.find((*spIter)->model_name());
@@ -1695,6 +1707,7 @@ void Scene::PreRender()
       else
         ++spIter;
     }
+    */
     // official time stamp of approval
     this->sceneSimTimePosesApplied = this->sceneSimTimePosesReceived;
 
@@ -1714,11 +1727,12 @@ void Scene::OnJointMsg(ConstJointPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
+bool Scene::ProcessSensorMsg(ConstSensorPtr & /*_msg*/)
 {
   if (!this->enableVisualizations)
     return true;
 
+  /*
   if ((_msg->type() == "ray" || _msg->type() == "gpu_ray") && _msg->visualize()
       && !_msg->topic().empty())
   {
@@ -1792,13 +1806,15 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
           _msg->name() + "_GUIONLY_rfid_vis", parentVis, _msg->topic()));
     this->visuals[rfidVis->GetName()] = rfidVis;
   }
+*/
 
   return true;
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
+bool Scene::ProcessLinkMsg(ConstLinkPtr & /*_msg*/)
 {
+  /*
   VisualPtr linkVis = this->GetVisual(_msg->name());
 
   if (!linkVis)
@@ -1824,13 +1840,15 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
       this->projectors[pname] = projector;
     }
   }
+  */
 
   return true;
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
+bool Scene::ProcessJointMsg(ConstJointPtr & /*_msg*/)
 {
+  /*
   Visual_M::iterator iter;
   iter = this->visuals.find(_msg->name() + "_JOINT_VISUAL__");
 
@@ -1853,6 +1871,7 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 
     this->visuals[jointVis->GetName()] = jointVis;
   }
+  */
   return true;
 }
 
@@ -1923,7 +1942,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     else
     {
       Visual_M::iterator iter;
-      iter = this->visuals.find(_msg->data());
+      iter = this->visuals.find(boost::lexical_cast<uint32_t>(_msg->data()));
       if (iter != this->visuals.end())
         this->RemoveVisual(iter->second);
     }
@@ -2066,7 +2085,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 {
   bool result = false;
   Visual_M::iterator iter;
-  iter = this->visuals.find(_msg->name());
+  iter = this->visuals.find(_msg->id());
 
   if (_msg->has_delete_me() && _msg->delete_me())
   {
@@ -2113,29 +2132,31 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     // If the visual has a parent which is not the name of the scene...
     if (_msg->has_parent_name() && _msg->parent_name() != this->GetName())
     {
-      iter = this->visuals.find(_msg->name());
+      iter = this->visuals.find(_msg->id());
       if (iter != this->visuals.end())
         gzerr << "Visual already exists. This shouldn't happen.\n";
 
       // Make sure the parent visual exists before trying to add a child
       // visual
-      iter = this->visuals.find(_msg->parent_name());
+      iter = this->visuals.find(_msg->parent_id());
       if (iter != this->visuals.end())
       {
         visual.reset(new Visual(_msg->name(), iter->second));
+        visual->SetId(_msg->id());
       }
     }
     else
     {
       // Add a visual that is attached to the scene root
       visual.reset(new Visual(_msg->name(), this->worldVisual));
+      visual->SetId(_msg->id());
     }
 
     if (visual)
     {
       result = true;
       visual->LoadFromMsg(_msg);
-      this->visuals[_msg->name()] = visual;
+      this->visuals[_msg->id()] = visual;
       if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
           visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
       {
@@ -2450,10 +2471,10 @@ bool Scene::GetShadowsEnabled() const
 /////////////////////////////////////////////////
 void Scene::AddVisual(VisualPtr _vis)
 {
-  if (this->visuals.find(_vis->GetName()) != this->visuals.end())
+  if (this->visuals.find(_vis->GetId()) != this->visuals.end())
     gzerr << "Duplicate visuals detected[" << _vis->GetName() << "]\n";
 
-  this->visuals[_vis->GetName()] = _vis;
+  this->visuals[_vis->GetId()] = _vis;
 }
 
 /////////////////////////////////////////////////
@@ -2479,14 +2500,14 @@ void Scene::RemoveVisual(VisualPtr _vis)
     }
 
     // Delete the visual
-    Visual_M::iterator iter = this->visuals.find(_vis->GetName());
+    Visual_M::iterator iter = this->visuals.find(_vis->GetId());
     if (iter != this->visuals.end())
     {
       iter->second->Fini();
       this->visuals.erase(iter);
     }
 
-    if (this->selectedVis && this->selectedVis->GetName() == _vis->GetName())
+    if (this->selectedVis && this->selectedVis->GetId() == _vis->GetId())
       this->selectedVis.reset();
   }
 }
@@ -2536,7 +2557,7 @@ void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
                                     _linkVisual));
   comVis->Load(_msg);
   comVis->SetVisible(false);
-  this->visuals[comVis->GetName()] = comVis;
+  this->visuals[comVis->GetId()] = comVis;
 }
 
 /////////////////////////////////////////////////
@@ -2546,13 +2567,16 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
                                     _linkVisual));
   comVis->Load(_elem);
   comVis->SetVisible(false);
-  this->visuals[comVis->GetName()] = comVis;
+  this->visuals[comVis->GetId()] = comVis;
 }
 
 /////////////////////////////////////////////////
-VisualPtr Scene::CloneVisual(const std::string &_visualName,
-                             const std::string &_newName)
+VisualPtr Scene::CloneVisual(const std::string & /*_visualName*/,
+                             const std::string & /*_newName*/)
 {
+  gzerr << "This function is deprecated\n";
+  return VisualPtr();
+  /*
   VisualPtr result;
   VisualPtr vis = this->GetVisual(_visualName);
   if (vis)
@@ -2561,6 +2585,7 @@ VisualPtr Scene::CloneVisual(const std::string &_visualName,
     this->visuals[_newName] = result;
   }
   return result;
+  */
 }
 
 /////////////////////////////////////////////////
@@ -2622,8 +2647,9 @@ void Scene::ShowJoints(bool _show)
 }
 
 /////////////////////////////////////////////////
-void Scene::ShowContacts(bool _show)
+void Scene::ShowContacts(bool /*_show*/)
 {
+  /*
   ContactVisualPtr vis = boost::dynamic_pointer_cast<ContactVisual>(
       this->visuals["__GUIONLY_CONTACT_VISUAL__"]);
 
@@ -2639,6 +2665,7 @@ void Scene::ShowContacts(bool _show)
     vis->SetEnabled(_show);
   else
     gzerr << "Unable to get contact visualization. This should never happen.\n";
+    */
 }
 
 /////////////////////////////////////////////////

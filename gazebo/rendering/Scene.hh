@@ -646,7 +646,7 @@ namespace gazebo
 
       /// \def Visual_M
       /// \brief Map of visuals and their names.
-      typedef std::map<std::string, VisualPtr> Visual_M;
+      typedef std::map<uint32_t, VisualPtr> Visual_M;
 
       /// \brief Map of all the visuals in this scene.
       private: Visual_M visuals;

@@ -174,7 +174,8 @@ bool Node::HandleMessage(const std::string &_topic, MessagePtr _msg)
 /////////////////////////////////////////////////
 void Node::ProcessIncoming()
 {
-  if (!this->initialized)
+  if (!this->initialized ||
+      (this->incomingMsgs.empty() && this->incomingMsgsLocal.empty()))
     return;
 
   boost::recursive_mutex::scoped_lock lock(this->processIncomingMutex);

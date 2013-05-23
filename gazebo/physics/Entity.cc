@@ -53,7 +53,7 @@ Entity::Entity(BasePtr _parent)
   this->AddType(ENTITY);
 
   this->visualMsg = new msgs::Visual;
-  this->poseMsg = new msgs::Pose;
+  this->visualMsg->set_id(this->id);
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
@@ -74,9 +74,6 @@ Entity::~Entity()
 
   delete this->visualMsg;
   this->visualMsg = NULL;
-
-  delete this->poseMsg;
-  this->poseMsg = NULL;
 
   this->visPub.reset();
   this->requestPub.reset();
@@ -109,12 +106,13 @@ void Entity::Load(sdf::ElementPtr _sdf)
   }
 
   if (this->parent)
+  {
     this->visualMsg->set_parent_name(this->parent->GetScopedName());
+    this->visualMsg->set_parent_id(this->parent->GetId());
+  }
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
 
   this->visPub->Publish(*this->visualMsg);
-
-  this->poseMsg->set_name(this->GetScopedName());
 
   if (this->HasType(Base::MODEL))
     this->setWorldPoseFunc = &Entity::SetWorldPoseModel;

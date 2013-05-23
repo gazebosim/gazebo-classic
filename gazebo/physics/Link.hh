@@ -449,7 +449,7 @@ namespace gazebo
       protected: std::vector<std::string> cgVisuals;
 
       /// \brief Link visual elements.
-      protected: std::vector<std::string> visuals;
+      protected: std::vector<uint32_t> visuals;
 
       /// \brief Linear acceleration.
       protected: math::Vector3 linearAccel;
@@ -492,6 +492,8 @@ namespace gazebo
 
       /// \brief Mutex to protect the publishData variable
       private: boost::recursive_mutex *publishDataMutex;
+
+      private: static uint32_t visualCounter;
     };
     /// \}
   }

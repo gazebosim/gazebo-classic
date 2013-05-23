@@ -30,7 +30,7 @@
 using namespace gazebo;
 using namespace physics;
 
-unsigned int Base::idCounter = 0;
+uint32_t Base::idCounter = 0;
 
 //////////////////////////////////////////////////
 Base::Base(BasePtr _parent)
@@ -149,7 +149,7 @@ std::string Base::GetName() const
 }
 
 //////////////////////////////////////////////////
-unsigned int Base::GetId() const
+uint32_t Base::GetId() const
 {
   return this->id;
 }

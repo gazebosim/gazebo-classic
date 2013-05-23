@@ -2394,3 +2394,15 @@ void Visual::LoadPlugin(sdf::ElementPtr _sdf)
   std::string filename = _sdf->GetValueString("filename");
   this->LoadPlugin(filename, pluginName, _sdf);
 }
+
+//////////////////////////////////////////////////
+uint32_t Visual::GetId() const
+{
+  return this->id;
+}
+
+//////////////////////////////////////////////////
+void Visual::SetId(uint32_t _id)
+{
+  this->id = _id;
+}

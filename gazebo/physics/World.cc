@@ -1749,6 +1749,7 @@ void World::ProcessMessages()
 
         // Publish the model's relative pose
         poseMsg->set_name((*iter)->GetScopedName());
+        poseMsg->set_id((*iter)->GetId());
         msgs::Set(poseMsg, (*iter)->GetRelativePose());
 
         // Publish each of the model's children relative poses
@@ -1758,6 +1759,7 @@ void World::ProcessMessages()
         {
           poseMsg = msg.add_pose();
           poseMsg->set_name((*linkIter)->GetScopedName());
+          poseMsg->set_id((*linkIter)->GetId());
           msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
         }
       }
