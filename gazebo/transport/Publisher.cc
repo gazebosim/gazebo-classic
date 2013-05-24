@@ -134,8 +134,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
     }
   }
 
-  if (this->node)
-    this->node->SetProcessPublishers(true);
+  TopicManager::Instance()->AddNodeToProcess(this->node);
 
   if (_block)
   {

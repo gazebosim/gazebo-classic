@@ -22,6 +22,7 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <boost/unordered/unordered_set.hpp>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
@@ -225,6 +226,10 @@ namespace gazebo
       /// \param[in] _pause If true pause processing; otherwse unpause
       public: void PauseIncoming(bool _pause);
 
+      /// \brief Add a node to the list of nodes that requires processing.
+      /// \param[in] _ptr Node to process.
+      public: void AddNodeToProcess(NodePtr _ptr);
+
       /// \brief A map of string->list of Node pointers
       typedef std::map<std::string, std::list<NodePtr> > SubNodeMap;
 
@@ -233,6 +238,7 @@ namespace gazebo
       private: PublicationPtr_M::iterator advertisedTopicsEnd;
       private: SubNodeMap subscribedNodes;
       private: std::vector<NodePtr> nodes;
+      private: boost::unordered_set<NodePtr> nodesToProcess;
 
       private: boost::recursive_mutex nodeMutex;
 
