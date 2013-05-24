@@ -53,8 +53,10 @@ Collision::Collision(LinkPtr _link)
   this->link = _link;
 
   this->contactsEnabled = false;
+  this->placeable = false;
 
   this->surface.reset(new SurfaceParams());
+  sdf::initFile("collision.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////

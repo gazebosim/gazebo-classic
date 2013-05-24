@@ -407,8 +407,8 @@ void ODEPhysics::UpdatePhysics()
     for (unsigned int i = 0; i < this->jointFeedbackIndex; ++i)
     {
       Contact *contactFeedback = this->jointFeedbacks[i]->contact;
-      Collision *col1 = contactFeedback->collisionPtr1;
-      Collision *col2 = contactFeedback->collisionPtr2;
+      Collision *col1 = contactFeedback->collision1;
+      Collision *col2 = contactFeedback->collision2;
 
       GZ_ASSERT(col1 != NULL, "Collision 1 is NULL");
       GZ_ASSERT(col2 != NULL, "Collision 2 is NULL");
@@ -758,9 +758,11 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
     ODECollision *collision2 = NULL;
 
     // Exit if both bodies are not enabled
-    if ((b1 && b2 && !dBodyIsEnabled(b1) && !dBodyIsEnabled(b2)) ||
-         (!b2 && b1 && !dBodyIsEnabled(b1)) ||
-         (!b1 && b2 && !dBodyIsEnabled(b2)))
+    if (dGeomGetCategoryBits(_o1) != GZ_SENSOR_COLLIDE &&
+        dGeomGetCategoryBits(_o2) != GZ_SENSOR_COLLIDE &&
+        ((b1 && b2 && !dBodyIsEnabled(b1) && !dBodyIsEnabled(b2)) ||
+        (!b2 && b1 && !dBodyIsEnabled(b1)) ||
+        (!b1 && b2 && !dBodyIsEnabled(b2))))
     {
       return;
     }
@@ -806,9 +808,20 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       _collision2->GetSurface()->collideWithoutContact)
   {
     if ((_collision1->GetSurface()->collideWithoutContactBitmask &
-        _collision2->GetSurface()->collideWithoutContactBitmask) == 0)
+         _collision2->GetSurface()->collideWithoutContactBitmask) == 0)
+    {
       return;
+    }
   }
+
+  /*
+  if (_collision1->GetCollisionId() && _collision2->GetCollisionId())
+  {
+    const dVector3 *pos1 = (const dVector3*)dGeomGetPosition(_collision1->GetCollisionId());
+    const dVector3 *pos2 = (const dVector3*)dGeomGetPosition(_collision2->GetCollisionId());
+    std::cout << "1[" << (*pos1)[0]<< " " << (*pos1)[1] << " " << (*pos1)[2] << "] "
+      << "2[" << (*pos2)[0]<< " " << (*pos2)[1] << " " << (*pos2)[2] << "]\n";
+  }*/
 
   int numc = 0;
   dContact contact;

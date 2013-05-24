@@ -513,6 +513,9 @@ namespace gazebo
 
       /// \brief option to use CFM damping
       protected: bool useCFMDamping;
+
+      /// \brief Names of all the sensors attached to the link.
+      private: std::vector<std::string> sensors;
     };
     /// \}
   }

@@ -22,6 +22,9 @@
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/Sensors.hh"
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
@@ -59,6 +62,12 @@ Joint::Joint(BasePtr _parent)
 //////////////////////////////////////////////////
 Joint::~Joint()
 {
+  for (std::vector<std::string>::iterator iter = this->sensors.begin();
+      iter != this->sensors.end(); ++iter)
+  {
+    sensors::remove_sensor(*iter);
+  }
+  this->sensors.clear();
 }
 
 //////////////////////////////////////////////////
@@ -155,6 +164,28 @@ void Joint::LoadImpl(const math::Pose &_pose)
   // otherwise set anchor relative to world frame
   else
     this->anchorPos = _pose.pos;
+
+  if (this->sdf->HasElement("sensor"))
+  {
+    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
+    while (sensorElem)
+    {
+      /// \todo This if statement is a hack to prevent Joints from creating
+      /// other sensors. We should make this more generic.
+      if (sensorElem->GetValueString("type") == "force_torque")
+      {
+        std::string sensorName =
+          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
+              this->GetScopedName());
+        this->sensors.push_back(sensorName);
+      }
+      else
+        gzerr << "A joint cannot load a [" << 
+          sensorElem->GetValueString("type") << "] sensor.\n";
+      sensorElem = sensorElem->GetNextElement("sensor");
+    }
+  }
+
 }
 
 //////////////////////////////////////////////////
@@ -375,6 +406,20 @@ void Joint::FillMsg(msgs::Joint &_msg)
     _msg.set_child(this->GetChild()->GetScopedName());
   else
     _msg.set_child("world");
+
+  for (std::vector<std::string>::iterator iter = this->sensors.begin();
+       iter != this->sensors.end(); ++iter)
+  {
+    sensors::SensorPtr sensor = sensors::get_sensor(*iter);
+    if (sensor)
+    {
+      msgs::Sensor *sensorMsg =_msg.add_sensor(); 
+      sensor->FillMsg(*sensorMsg);
+
+      // A little hack to make the visualization of the sensor appear.
+      sensorMsg->set_parent(this->parentLink->GetScopedName());
+    }
+  }
 }
 
 //////////////////////////////////////////////////

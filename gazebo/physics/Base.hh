@@ -124,7 +124,10 @@ namespace gazebo
                 /// \brief SphereShape type
                 SPHERE_SHAPE    = 0x00200000,
                 /// \brief TrimeshShape type
-                TRIMESH_SHAPE   = 0x00400000
+                TRIMESH_SHAPE   = 0x00400000,
+
+                /// \brief Indicates a collision shape used for sensing
+                SENSOR_COLLISION   = 0x00800000
               };
 
       /// \brief Constructor
