@@ -288,6 +288,11 @@ namespace gazebo
       /// \return Number of sensors.
       public: unsigned int GetSensorCount() const;
 
+      /// \brief Get a handle to the Controller for the joints in this model.
+      /// \return A handle to the Controller for the joints in this model.
+      public: JointControllerPtr GetJointController()
+        { return this->jointController; }
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
@@ -306,10 +311,10 @@ namespace gazebo
       /// \param[in] _sdf SDF parameter.
       private: void LoadGripper(sdf::ElementPtr _sdf);
 
-      /// \brief Get a handle to the Controller for the joints in this model.
-      /// \return A handle to the Controller for the joints in this model.
-      public: JointControllerPtr GetJointController()
-        { return this->jointController; }
+      /// \brief Remove a link based on a name. This does not delete the
+      /// link.
+      /// \param[in] _name Name of the link to remove.
+      private: void RemoveLink(const std::string &_name);
 
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
@@ -350,6 +355,7 @@ namespace gazebo
       /// \brief Cached list of links. This is here for performance.
       private: Link_V links;
 
+      /// \brief True if plugins have been loaded.
       private: bool pluginsLoaded;
     };
     /// \}

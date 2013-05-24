@@ -1232,6 +1232,7 @@ void World::ProcessEntityMsgs()
     }
 
     this->rootElement->RemoveChild((*iter));
+    this->RemoveModel(*iter);
   }
 
   if (this->deleteEntity.size() > 0)
@@ -1847,4 +1848,18 @@ void World::LogWorker()
 
   // Make sure nothing is blocked by this thread.
   this->logContinueCondition.notify_all();
+}
+
+//////////////////////////////////////////////////
+void World::RemoveModel(const std::string &_name)
+{
+  for (Model_V::iterator iter = this->models.begin();
+       iter != this->models.end(); ++iter)
+  {
+    if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
+    {
+      this->models.erase(iter);
+      break;
+    }
+  }
 }

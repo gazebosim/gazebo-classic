@@ -320,6 +320,8 @@ void Model::RemoveChild(EntityPtr _child)
         }
       }
     }
+
+    this->RemoveLink(_child->GetScopedName());
   }
 
   Entity::RemoveChild(_child->GetId());
@@ -1009,4 +1011,18 @@ void Model::SetAutoDisable(bool _auto)
 bool Model::GetAutoDisable() const
 {
   return this->sdf->GetValueBool("allow_auto_disable");
+}
+
+/////////////////////////////////////////////////
+void Model::RemoveLink(const std::string &_name)
+{
+  for (Link_V::iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
+  {
+    if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
+    {
+      this->links.erase(iter);
+      break;
+    }
+  }
 }

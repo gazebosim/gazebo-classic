@@ -1765,12 +1765,11 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
             rayVisualName+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
       laserVis->Load();
       laserVis->SetId(_msg->id());
-      this->visuals[_msg->id()] = laserVis;
     }
   }
   else if (_msg->type() == "camera" && _msg->visualize())
   {
-    VisualPtr parentVis = this->GetVisual(_msg->parent());
+    VisualPtr parentVis = this->GetVisual(_msg->parent_id());
     if (!parentVis)
       return false;
 
@@ -1790,8 +1789,6 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       cameraVis->SetId(_msg->id());
       cameraVis->Load(_msg->camera().image_size().x(),
                       _msg->camera().image_size().y());
-
-      this->visuals[_msg->id()] = cameraVis;
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&
@@ -1803,7 +1800,6 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     contactVis->SetId(_msg->id());
 
     this->contactVisId = _msg->id();
-    this->visuals[_msg->id()] = contactVis;
   }
   else if (_msg->type() == "rfidtag" && _msg->visualize() &&
            !_msg->topic().empty())
@@ -1815,7 +1811,6 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     RFIDTagVisualPtr rfidVis(new RFIDTagVisual(
           _msg->name() + "_GUIONLY_rfidtag_vis", parentVis, _msg->topic()));
     rfidVis->SetId(_msg->id());
-    this->visuals[_msg->id()] = rfidVis;
   }
   else if (_msg->type() == "rfid" && _msg->visualize() &&
            !_msg->topic().empty())
@@ -1827,7 +1822,6 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     RFIDVisualPtr rfidVis(new RFIDVisual(
           _msg->name() + "_GUIONLY_rfid_vis", parentVis, _msg->topic()));
     rfidVis->SetId(_msg->id());
-    this->visuals[_msg->id()] = rfidVis;
   }
 
   return true;
@@ -1961,10 +1955,19 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     // Otherwise delete a visual
     else
     {
-      Visual_M::iterator iter;
-      iter = this->visuals.find(boost::lexical_cast<uint32_t>(_msg->data()));
-      if (iter != this->visuals.end())
-        this->RemoveVisual(iter->second);
+      VisualPtr visPtr;
+      try
+      {
+        Visual_M::iterator iter;
+        iter = this->visuals.find(boost::lexical_cast<uint32_t>(_msg->data()));
+        visPtr = iter->second;
+      } catch(...)
+      {
+        visPtr = this->GetVisual(_msg->data());
+      }
+
+      if (visPtr)
+        this->RemoveVisual(visPtr);
     }
   }
   else if (_msg->request() == "show_contact")
@@ -2117,6 +2120,9 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
   }
   else if (iter != this->visuals.end())
   {
+    if (_msg->name().find("COLLISION") != std::string::npos)
+      gzerr << "Update collision visual[" << _msg->name() << "][" << _msg->id() << "]\n";
+
     iter->second->UpdateFromMsg(_msg);
     result = true;
   }

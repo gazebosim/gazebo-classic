@@ -105,7 +105,6 @@ namespace gazebo
     /// \brief Get a unique ID
     /// \return A unique integer
     uint32_t getUniqueId();
-
     /// \}
   }
 }

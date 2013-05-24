@@ -29,6 +29,7 @@
 
 #include "transport/Publisher.hh"
 
+#include "physics/Physics.hh"
 #include "physics/Contact.hh"
 #include "physics/Shape.hh"
 #include "physics/BoxShape.hh"
@@ -343,7 +344,8 @@ msgs::Visual Collision::CreateCollisionVisual()
 {
   msgs::Visual msg;
   msg.set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
-  msg.set_id(this->GetId());
+  // Put in a unique ID because this is a special visual.
+  msg.set_id(physics::getUniqueId());
   msg.set_parent_name(this->parent->GetScopedName());
   msg.set_parent_id(this->parent->GetId());
   msg.set_is_static(this->IsStatic());

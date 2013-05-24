@@ -27,17 +27,19 @@
 using namespace gazebo;
 using namespace rendering;
 
-/// \brief Constructor
+/////////////////////////////////////////////////
 CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
 : Visual(_name, _vis)
 {
 }
 
+/////////////////////////////////////////////////
 CameraVisual::~CameraVisual()
 {
   this->camera.reset();
 }
 
+/////////////////////////////////////////////////
 void CameraVisual::Load(unsigned int _width, unsigned int _height)
 {
   double dist = 2.0;
