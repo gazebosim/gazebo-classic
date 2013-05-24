@@ -89,24 +89,27 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   for (iter = this->customContactPublishers.begin();
       iter != this->customContactPublishers.end(); ++iter)
   {
-    // convert collision names to pointers
+    // A model can simply be loaded later, so convert ones that are not yet
+    // found
     if (!iter->second->collisionNames.empty())
     {
-      for (unsigned int i = 0; i < iter->second->collisionNames.size(); ++i)
+      gzerr << " not empty " << std::endl;
+      std::vector<std::string>::iterator it;
+      for (it = iter->second->collisionNames.begin();
+          it != iter->second->collisionNames.end();)
       {
         Collision *col = boost::dynamic_pointer_cast<Collision>(
-            this->world->GetByName(iter->second->collisionNames[i])).get();
+            this->world->GetByName(*it)).get();
         if (!col)
         {
-          gzerr << "Unable to find: '" << iter->second->collisionNames[i]
-              << "', ignoring collision in contact filter " << std::endl;
+          ++it;
           continue;
         }
+        else
+          iter->second->collisionNames.erase(it++);
         iter->second->collisions.insert(col);
       }
-      iter->second->collisionNames.clear();
     }
-
 
     if (iter->second->collisions.find(_collision1) !=
         iter->second->collisions.end() ||
@@ -268,6 +271,22 @@ std::string ContactManager::CreateFilter(const std::string &_name,
   ContactPublisher *contactPublisher = new ContactPublisher;
   contactPublisher->publisher = pub;
   contactPublisher->collisionNames = _collisions;
+  std::vector<std::string>::iterator iter;
+  for (iter = contactPublisher->collisionNames.begin();
+      iter != contactPublisher->collisionNames.end();)
+  {
+    // convert collision names to pointers
+    Collision *col = boost::dynamic_pointer_cast<Collision>(
+       this->world->GetByName(*iter)).get();
+    if (!col)
+    {
+      ++iter;
+      continue;
+    }
+    else
+      contactPublisher->collisionNames.erase(iter++);
+    contactPublisher->collisions.insert(col);
+  }
 
   this->customContactPublishers[name] = contactPublisher;
 
