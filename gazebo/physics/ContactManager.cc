@@ -48,6 +48,7 @@ ContactManager::~ContactManager()
     if (iter->second)
     {
       iter->second->collisions.clear();
+      iter->second->collisionNames.clear();
       iter->second->publisher.reset();
       delete iter->second;
       iter->second = NULL;
