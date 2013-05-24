@@ -30,7 +30,6 @@ Node::Node()
   this->id = idCounter++;
   this->topicNamespace = "";
   this->initialized = false;
-  this->processPublishers = true;
 }
 
 /////////////////////////////////////////////////
@@ -126,13 +125,6 @@ unsigned int Node::GetId() const
 /////////////////////////////////////////////////
 void Node::ProcessPublishers()
 {
-  {
-    boost::mutex::scoped_lock lock3(this->processPublishersMutex);
-    if (!this->processPublishers)
-      return;
-    this->processPublishers = false;
-  }
-
   int start, end;
   boost::mutex::scoped_lock lock(this->publisherDeleteMutex);
 
@@ -144,13 +136,6 @@ void Node::ProcessPublishers()
 
   for (int i = start; i < end; ++i)
     this->publishers[i]->SendMessage();
-}
-
-/////////////////////////////////////////////////
-void Node::SetProcessPublishers(bool _enabled)
-{
-  boost::mutex::scoped_lock lock(this->processPublishersMutex);
-  this->processPublishers = _enabled;
 }
 
 /////////////////////////////////////////////////
@@ -174,11 +159,10 @@ bool Node::HandleMessage(const std::string &_topic, MessagePtr _msg)
 /////////////////////////////////////////////////
 void Node::ProcessIncoming()
 {
-  boost::recursive_mutex::scoped_lock lock(this->processIncomingMutex);
-
-  if (!this->initialized ||
-      (this->incomingMsgs.empty() && this->incomingMsgsLocal.empty()))
+  if (!this->initialized)
     return;
+
+  boost::recursive_mutex::scoped_lock lock(this->processIncomingMutex);
 
   Callback_M::iterator cbIter;
   Callback_L::iterator liter;
