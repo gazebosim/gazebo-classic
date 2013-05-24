@@ -238,8 +238,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
   }
 
   // Must come before sensor->Load
-  sensor->SetParent(_parentName);
-  sensor->SetParentId(_parentId);
+  sensor->SetParent(_parentName, _parentId);
 
   // Load the sensor
   sensor->Load(_worldName, _elem);

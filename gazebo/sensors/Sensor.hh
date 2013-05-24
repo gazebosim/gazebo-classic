@@ -89,7 +89,13 @@ namespace gazebo
 
       /// \brief Set the parent of the sensor.
       /// \param[in] _name Name of the parent.
-      public: virtual void SetParent(const std::string &_name);
+      public: virtual void SetParent(const std::string &_name)
+              GAZEBO_DEPRECATED(1.8);
+
+      /// \brief Set the sensor's parent.
+      /// \param[in] _name The sensor's parent's name.
+      /// \param[in] _id The sensor's parent's ID.
+      public: void SetParent(const std::string &_name, uint32_t _id);
 
       /// \brief Returns the name of the sensor parent.  The parent name is
       ///        set by Sensor::SetParent.
@@ -197,10 +203,6 @@ namespace gazebo
       /// \brief Get the sensor's parent's ID.
       /// \return The sensor's parent's ID.
       public: uint32_t GetParentId() const;
-
-      /// \brief Set the sensor's parent's ID.
-      /// \param[in] _id The sensor's parent's ID.
-      public: void SetParentId(uint32_t _id);
 
       /// \brief Load a plugin for this sensor.
       /// \param[in] _sdf SDF parameters.

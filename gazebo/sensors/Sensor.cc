@@ -130,6 +130,13 @@ void Sensor::SetParent(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+void Sensor::SetParent(const std::string &_name, uint32_t _id)
+{
+  this->parentName = _name;
+  this->parentId = _id;
+}
+
+//////////////////////////////////////////////////
 std::string Sensor::GetParentName() const
 {
   return this->parentName;
@@ -145,12 +152,6 @@ uint32_t Sensor::GetId() const
 uint32_t Sensor::GetParentId() const
 {
   return this->parentId;
-}
-
-//////////////////////////////////////////////////
-void Sensor::SetParentId(uint32_t _id)
-{
-  this->parentId = _id;
 }
 
 //////////////////////////////////////////////////

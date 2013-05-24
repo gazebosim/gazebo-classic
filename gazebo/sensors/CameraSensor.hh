@@ -48,10 +48,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~CameraSensor();
 
-      /// \brief Set the parent of the sensor
-      /// \param _name The name of the parent
-      public: virtual void SetParent(const std::string &_name);
-
       /// \brief Load the sensor with SDF parameters
       /// \param[in] _sdf SDF Sensor parameters
       /// \param[in] _worldName Name of world to load from
