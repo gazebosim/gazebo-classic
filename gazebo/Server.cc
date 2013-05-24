@@ -174,8 +174,7 @@ bool Server::ParseArgs(int argc, char **argv)
   }
 
   // Set the parameter to record a log file
-  if (this->vm.count("record") ||
-      !this->vm["record_path"].as<std::string>().empty())
+  if (this->vm.count("record"))
   {
     this->params["record"] = this->vm["record_path"].as<std::string>();
     this->params["record_encoding"] =
