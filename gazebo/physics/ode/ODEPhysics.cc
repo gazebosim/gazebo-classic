@@ -179,6 +179,8 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   dWorldSetDamping(this->worldId, 0.0001, 0.0001);
 
+  dWorldSetIslandThreads(this->worldId, 2);
+
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId,
       odeElem->GetElement("constraints")->GetValueDouble(
