@@ -88,6 +88,24 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   for (iter = this->customContactPublishers.begin();
       iter != this->customContactPublishers.end(); ++iter)
   {
+    if (!iter->second->collisionNames.empty())
+    {
+      for (unsigned int i = 0; i < iter->second->collisionNames.size(); ++i)
+      {
+        Collision *col = boost::dynamic_pointer_cast<Collision>(
+            this->world->GetByName(iter->second->collisionNames[i])).get();
+        if (!col)
+        {
+          gzerr << "Unable to find: '" << iter->second->collisionNames[i]
+              << "', ignoring collision in contact filter " << std::endl;
+          continue;
+        }
+        iter->second->collisions.insert(col);
+      }
+      iter->second->collisionNames.clear();
+    }
+
+
     if (iter->second->collisions.find(_collision1) !=
         iter->second->collisions.end() ||
         iter->second->collisions.find(_collision2) !=
@@ -247,18 +265,7 @@ std::string ContactManager::CreateFilter(const std::string &_name,
 
   ContactPublisher *contactPublisher = new ContactPublisher;
   contactPublisher->publisher = pub;
-  for (unsigned int i = 0; i < _collisions.size(); ++i)
-  {
-    Collision *col = boost::dynamic_pointer_cast<Collision>(
-        this->world->GetByName(_collisions[i])).get();
-    if (!col)
-    {
-      gzerr << "Unable to find: '" << _collisions[i]
-          << "', ignoring collision in contact filter " << std::endl;
-      continue;
-    }
-    contactPublisher->collisions.insert(col);
-  }
+  contactPublisher->collisionNames = _collisions;
 
   this->customContactPublishers[name] = contactPublisher;
 
