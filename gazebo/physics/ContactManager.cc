@@ -88,6 +88,7 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   for (iter = this->customContactPublishers.begin();
       iter != this->customContactPublishers.end(); ++iter)
   {
+    // convert collision names to pointers
     if (!iter->second->collisionNames.empty())
     {
       for (unsigned int i = 0; i < iter->second->collisionNames.size(); ++i)
