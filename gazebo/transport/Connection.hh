@@ -301,11 +301,12 @@ namespace gazebo
 
                 if (!_e && !transport::is_stopped())
                 {
-                  /*ConnectionReadTask *task = new(tbb::task::allocate_root())
+                  ConnectionReadTask *task = new(tbb::task::allocate_root())
                         ConnectionReadTask(boost::get<0>(_handler), data);
                   tbb::task::enqueue(*task);
-                  */
-                  boost::get<0>(_handler)(data);
+
+                  // Non-tbb version:
+                  // boost::get<0>(_handler)(data);
                 }
               }
 
