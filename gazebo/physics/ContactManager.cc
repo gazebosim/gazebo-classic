@@ -201,12 +201,12 @@ void ContactManager::PublishContacts()
   this->contactPub->Publish(msg);
 
   // publish to other custom topics
-  msgs::Contacts msg2;
   boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
   for (iter = this->customContactPublishers.begin();
       iter != this->customContactPublishers.end(); ++iter)
   {
     ContactPublisher *contactPublisher = iter->second;
+    msgs::Contacts msg2;
     for (unsigned int j = 0;
         j < contactPublisher->contacts.size(); ++j)
     {
@@ -219,7 +219,6 @@ void ContactManager::PublishContacts()
     msgs::Set(msg2.mutable_time(), this->world->GetSimTime());
     contactPublisher->publisher->Publish(msg2);
     contactPublisher->contacts.clear();
-    msg2.Clear();
   }
 }
 
