@@ -39,8 +39,7 @@ class NodeProcess_TBB
   {
     for (size_t i = _r.begin(); i != _r.end(); i++)
     {
-      if ((*this->nodes)[i]->GetProcessPublishers())
-        (*this->nodes)[i]->ProcessPublishers();
+      (*this->nodes)[i]->ProcessPublishers();
     }
   }
 

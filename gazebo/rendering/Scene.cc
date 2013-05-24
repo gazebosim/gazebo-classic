@@ -2120,9 +2120,6 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
   }
   else if (iter != this->visuals.end())
   {
-    if (_msg->name().find("COLLISION") != std::string::npos)
-      gzerr << "Update collision visual[" << _msg->name() << "][" << _msg->id() << "]\n";
-
     iter->second->UpdateFromMsg(_msg);
     result = true;
   }

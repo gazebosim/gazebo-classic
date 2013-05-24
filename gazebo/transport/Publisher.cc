@@ -134,15 +134,15 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
     }
   }
 
+  if (this->node)
+    this->node->SetProcessPublishers(true);
+
   if (_block)
   {
     this->SendMessage();
   }
   else
   {
-    if (this->node)
-      this->node->SetProcessPublishers(true);
-
     // Tell the connection manager that it needs to update
     ConnectionManager::Instance()->TriggerUpdate();
   }

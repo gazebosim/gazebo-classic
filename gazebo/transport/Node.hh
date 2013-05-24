@@ -117,10 +117,6 @@ namespace gazebo
       /// \param[in] _enabled True to enable publisher processing.
       public: void SetProcessPublishers(bool _enabled = true);
 
-      /// \brief Get whether the node should process it's publishers.
-      /// \return True to process it's publishers.
-      public: bool GetProcessPublishers() const;
-
       /// \brief Process incoming messages.
       public: void ProcessIncoming();
 
@@ -358,6 +354,9 @@ namespace gazebo
 
       /// \brief True tells the node that it should process publishers.
       private: bool processPublishers;
+
+      /// \brief Protected the process Publishers boolean.
+      private: mutable boost::mutex processPublishersMutex;
     };
     /// \}
   }
