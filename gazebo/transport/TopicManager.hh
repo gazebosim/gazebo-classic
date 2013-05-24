@@ -238,6 +238,8 @@ namespace gazebo
       private: PublicationPtr_M::iterator advertisedTopicsEnd;
       private: SubNodeMap subscribedNodes;
       private: std::vector<NodePtr> nodes;
+
+      /// \brief Nodes that require processing.
       private: boost::unordered_set<NodePtr> nodesToProcess;
 
       private: boost::recursive_mutex nodeMutex;
