@@ -17,6 +17,7 @@
 
 #include <sys/stat.h>
 #include "sdf/sdf.hh"
+#include <gazebo/common/Console.hh>
 
 std::vector<std::string> params;
 
@@ -49,6 +50,17 @@ bool file_exists(const std::string &_filename)
 int main(int argc, char** argv)
 {
   bool success = false;
+
+  try
+  {
+    // Initialize the informational logger. This will log warnings and errors.
+    gazebo::common::Console::Instance()->Init("gzsdf.log");
+  }
+  catch(gazebo::common::Exception &_e)
+  {
+    _e.Print();
+    std::cerr << "Error initializing log file" << std::endl;
+  }
 
   // Get parameters from command line
   for (int i = 1; i < argc; i++)
