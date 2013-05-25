@@ -91,6 +91,7 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   {
     // A model can simply be loaded later, so convert ones that are not yet
     // found
+      gzerr << iter->second->collisionNames.size() << std::endl;
     if (!iter->second->collisionNames.empty())
     {
       std::vector<std::string>::iterator it;
@@ -270,11 +271,11 @@ std::string ContactManager::CreateFilter(const std::string &_name,
   ContactPublisher *contactPublisher = new ContactPublisher;
   contactPublisher->publisher = pub;
   contactPublisher->collisionNames = _collisions;
+  // convert collision names to pointers
   std::vector<std::string>::iterator iter;
   for (iter = contactPublisher->collisionNames.begin();
       iter != contactPublisher->collisionNames.end();)
   {
-    // convert collision names to pointers
     Collision *col = boost::dynamic_pointer_cast<Collision>(
        this->world->GetByName(*iter)).get();
     if (!col)
@@ -284,7 +285,6 @@ std::string ContactManager::CreateFilter(const std::string &_name,
     }
     else
       iter = contactPublisher->collisionNames.erase(iter);
-
     contactPublisher->collisions.insert(col);
   }
 
