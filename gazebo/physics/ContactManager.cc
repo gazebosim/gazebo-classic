@@ -91,7 +91,6 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   {
     // A model can simply be loaded later, so convert ones that are not yet
     // found
-      gzerr << iter->second->collisionNames.size() << std::endl;
     if (!iter->second->collisionNames.empty())
     {
       std::vector<std::string>::iterator it;
