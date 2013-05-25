@@ -106,7 +106,7 @@ Contact *ContactManager::NewContact(Collision *_collision1,
           continue;
         }
         else
-          iter->second->collisionNames.erase(it++);
+          it = iter->second->collisionNames.erase(it);
         iter->second->collisions.insert(col);
       }
     }
@@ -284,7 +284,8 @@ std::string ContactManager::CreateFilter(const std::string &_name,
       continue;
     }
     else
-      contactPublisher->collisionNames.erase(iter++);
+      iter = contactPublisher->collisionNames.erase(iter);
+
     contactPublisher->collisions.insert(col);
   }
 
