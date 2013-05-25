@@ -46,6 +46,7 @@
 #undef TIMING
 #undef REPORT_MONITOR
 #undef SHOW_CONVERGENCE
+#define SMOOTH_LAMBDA
 #undef RECOMPUTE_RMS
 #undef USE_1NORM
 //#define LOCAL_STEPPING  // not yet implemented
@@ -617,7 +618,8 @@ static void ComputeRows(
 #ifdef PENETRATION_JVERROR_CORRECTION
   dReal Jvnew_final = 0;
 #endif
-  for (int iteration=0; iteration < num_iterations + precon_iterations; iteration++) {
+  int friction_iterations = 10;
+  for (int iteration=0; iteration < num_iterations + precon_iterations + friction_iterations; iteration++) {
 
     rms_error = 0;
 
@@ -718,7 +720,8 @@ static void ComputeRows(
 
       int index = order[i].index;
 
-      if (iteration > num_iterations/2 && findex[index] < 0)
+      // if (iteration > num_iterations && findex[index] < 0)
+      if (iteration >= num_iterations + precon_iterations && findex[index] < 0)
         continue;
 
       dReal delta,delta_erp;
@@ -920,7 +923,7 @@ static void ComputeRows(
   #endif
 
           // option to smooth lambda
-          if (1)
+#ifdef SMOOTH_LAMBDA
           {
             // smooth delta lambda
             // equivalent to first order artificial dissipation on lambda update.
@@ -936,14 +939,16 @@ static void ComputeRows(
                 printf("\n");
             }
 #endif
+            if (findex[index] != -1)
             {
-              // extra residual smoothing for friction directions
-              dReal mu = 0.1;
+              // extra residual smoothing for contact constraints
+              dReal mu = 0.01;
               lambda[index] = (1.0 - mu)*lambda[index] + mu*old_lambda;
               // is filtering lambda_erp necessary?
               // lambda_erp[index] = (1.0 - mu)*lambda_erp[index] + mu*old_lambda_erp;
             }
           }
+#endif
 
           // update caccel
           {
