@@ -320,6 +320,9 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   msgs::Contacts contacts;
 
+  physics->SetContactMaxCorrectingVel(0);
+  physics->SetSORPGSIters(100);
+
   world->StepWorld(1);
 
   // run simulation until contacts occur
