@@ -93,7 +93,6 @@ Contact *ContactManager::NewContact(Collision *_collision1,
     // found
     if (!iter->second->collisionNames.empty())
     {
-      gzerr << " not empty " << std::endl;
       std::vector<std::string>::iterator it;
       for (it = iter->second->collisionNames.begin();
           it != iter->second->collisionNames.end();)
