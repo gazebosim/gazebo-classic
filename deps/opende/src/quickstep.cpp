@@ -937,10 +937,8 @@ static void ComputeRows(
             }
 #endif
             {
-              dReal mu = 0.1;
               // extra residual smoothing for friction directions
-              if (findex[index] >= 0)
-                mu = 0.5;
+              dReal mu = 0.1;
               lambda[index] = (1.0 - mu)*lambda[index] + mu*old_lambda;
               // is filtering lambda_erp necessary?
               // lambda_erp[index] = (1.0 - mu)*lambda_erp[index] + mu*old_lambda_erp;
