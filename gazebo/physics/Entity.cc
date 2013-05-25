@@ -54,10 +54,12 @@ Entity::Entity(BasePtr _parent)
 
   this->visualMsg = new msgs::Visual;
   this->visualMsg->set_id(this->id);
+  this->visualMsg->set_parent_name(this->world->GetName());
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
     this->parentEntity = boost::dynamic_pointer_cast<Entity>(this->parent);
+    this->visualMsg->set_parent_name(this->parentEntity->GetScopedName());
     this->SetStatic(this->parentEntity->IsStatic());
   }
 
@@ -109,6 +111,11 @@ void Entity::Load(sdf::ElementPtr _sdf)
   {
     this->visualMsg->set_parent_name(this->parent->GetScopedName());
     this->visualMsg->set_parent_id(this->parent->GetId());
+  }
+  else
+  {
+    this->visualMsg->set_parent_name(this->world->GetName());
+    this->visualMsg->set_parent_id(0);
   }
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
 

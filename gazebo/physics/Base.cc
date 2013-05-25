@@ -143,6 +143,7 @@ void Base::SetName(const std::string &_name)
   GZ_ASSERT(this->sdf->GetAttribute("name"), "Base sdf missing name attribute");
   this->sdf->GetAttribute("name")->Set(_name);
   this->name = _name;
+  this->ComputeScopedName();
 }
 
 //////////////////////////////////////////////////
