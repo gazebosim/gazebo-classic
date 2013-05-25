@@ -106,9 +106,6 @@ TEST_F(HeightmapTest, Heights)
     int i = 0;
     while (i < 20 && (heightmap = scene->GetHeightmap()) == NULL)
     {
-      // Make sure to PreRender so that the Scene can process its messages
-      scene->PreRender();
-
       common::Time::MSleep(100);
       i++;
     }
