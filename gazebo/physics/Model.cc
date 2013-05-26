@@ -749,16 +749,18 @@ unsigned int Model::GetSensorCount() const
 //////////////////////////////////////////////////
 void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string pname = _sdf->GetValueString("name");
+  std::string pluginName = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  gazebo::ModelPluginPtr plugin = gazebo::ModelPlugin::Create(filename, pname);
+  gazebo::ModelPluginPtr plugin =
+    gazebo::ModelPlugin::Create(filename, pluginName);
   if (plugin)
   {
     if (plugin->GetType() != MODEL_PLUGIN)
     {
       gzerr << "Model[" << this->GetName() << "] is attempting to load "
             << "a plugin, but detected an incorrect plugin type. "
-            << "Plugin filename[" << filename << "] name[" << pname << "]\n";
+            << "Plugin filename[" << filename << "] name["
+            << pluginName << "]\n";
       return;
     }
 
