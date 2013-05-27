@@ -31,6 +31,7 @@ boost::thread *g_runThread = NULL;
 boost::condition_variable g_responseCondition;
 boost::mutex requestMutex;
 bool g_stopped = true;
+bool g_minimalComms = false;
 
 std::list<msgs::Request *> g_requests;
 std::list<boost::shared_ptr<msgs::Response> > g_responses;
@@ -334,4 +335,15 @@ std::string transport::getTopicMsgType(const std::string &_topicName)
   return result;
 }
 
+/////////////////////////////////////////////////
+void transport::setMinimalComms(bool _enabled)
+{
+  g_minimalComms = _enabled;
+}
+
+/////////////////////////////////////////////////
+bool transport::getMinimalComms()
+{
+  return g_minimalComms;
+}
 
