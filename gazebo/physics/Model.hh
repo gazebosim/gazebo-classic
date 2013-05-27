@@ -311,8 +311,8 @@ namespace gazebo
       /// \param[in] _sdf SDF parameter.
       private: void LoadGripper(sdf::ElementPtr _sdf);
 
-      /// \brief Remove a link based on a name. This does not delete the
-      /// link.
+      /// \brief Remove a link from the model's cached list of links.
+      /// This does not delete the link.
       /// \param[in] _name Name of the link to remove.
       private: void RemoveLink(const std::string &_name);
 

@@ -45,7 +45,8 @@
 using namespace gazebo;
 using namespace rendering;
 
-uint32_t Visual::visualIdCount = GZ_UINT32_MAX;
+// Note: The value of GZ_UINT32_MAX is reserved as a flag.
+uint32_t Visual::visualIdCount = GZ_UINT32_MAX - 1;
 
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)

@@ -313,9 +313,6 @@ namespace gazebo
       /// \brief This entities ID.
       private: uint32_t id;
 
-      /// \brief Used to automaticaly chose a unique ID on creation.
-      private: static uint32_t idCounter;
-
       /// \brief The type of this object.
       private: unsigned int type;
 

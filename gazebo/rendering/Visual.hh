@@ -559,7 +559,10 @@ namespace gazebo
       /// \brief A wire frame bounding box.
       private: WireBox *boundingBox;
 
+      /// \brief Unique id of this visual
       private: uint32_t id;
+
+      /// \brief Counter used to create unique ids.
       private: static uint32_t visualIdCount;
     };
     /// \}

@@ -31,8 +31,6 @@
 using namespace gazebo;
 using namespace physics;
 
-uint32_t Base::idCounter = 0;
-
 //////////////////////////////////////////////////
 Base::Base(BasePtr _parent)
 : parent(_parent)

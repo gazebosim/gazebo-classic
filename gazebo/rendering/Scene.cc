@@ -84,7 +84,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   // \todo: This is a hack. There is no guarantee (other than the
   // improbability of creating an extreme number of visuals), that
   // this contactVisId is unique.
-  this->contactVisId = GZ_UINT32_MAX - 1;
+  this->contactVisId = GZ_UINT32_MAX;
 
   this->initialized = false;
   this->showCOMs = false;
@@ -2650,17 +2650,19 @@ void Scene::ShowJoints(bool _show)
 /////////////////////////////////////////////////
 void Scene::ShowContacts(bool _show)
 {
-  ContactVisualPtr vis = boost::dynamic_pointer_cast<ContactVisual>(
-      this->visuals[this->contactVisId]);
+  ContactVisualPtr vis;
 
-  if (!vis && _show)
+  if (this->contactVisId == GZ_UINT32_MAX && _show)
   {
     vis.reset(new ContactVisual("__GUIONLY_CONTACT_VISUAL__",
               this->worldVisual, "~/physics/contacts"));
     vis->SetEnabled(_show);
-    vis->SetId(this->contactVisId);
+    this->contactVisId = vis->GetId();
     this->visuals[this->contactVisId] = vis;
   }
+  else
+   vis = boost::dynamic_pointer_cast<ContactVisual>(
+       this->visuals[this->contactVisId]);
 
   if (vis)
     vis->SetEnabled(_show);
