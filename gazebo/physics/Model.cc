@@ -42,8 +42,6 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Contact.hh"
-#include "gazebo/physics/simbody/SimbodyPhysics.hh"
-#include "gazebo/physics/simbody/SimbodyTypes.hh"
 
 #include "gazebo/sensors/SensorManager.hh"
 
@@ -199,13 +197,6 @@ void Model::Init()
   {
     (*iter)->Init();
   }
-
-  // rebuild simbody state
-  physics::SimbodyPhysicsPtr simbodyPhysics =
-    boost::shared_dynamic_cast<physics::SimbodyPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
-  if (simbodyPhysics)
-    simbodyPhysics->InitModel(this);
 
   // Initialize the joints messages for visualizer
   for (Joint_V::iterator iter = this->joints.begin();

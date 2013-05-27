@@ -320,16 +320,16 @@ namespace gazebo
       private: LinkPtr canonicalLink;
 
       /// \brief All the joints in the model.
-      private: Joint_V joints;
+      protected: Joint_V joints;
 
       /// \brief All the grippers in the model.
-      private: std::vector<Gripper*> grippers;
+      protected: std::vector<Gripper*> grippers;
 
       /// \brief All the model plugins.
       private: std::vector<ModelPluginPtr> plugins;
 
       /// \brief Publisher for joint info.
-      private: transport::PublisherPtr jointPub;
+      protected: transport::PublisherPtr jointPub;
 
       /// \brief The joint animations.
       private: std::map<std::string, common::NumericAnimationPtr>

@@ -1,5 +1,8 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+# HACK!  why do we need this?  can't find -lSimTK*
+link_directories(${Simbody_LIB_DIR})
+
 set (sources 
   CameraSensor.cc
   ContactSensor.cc
