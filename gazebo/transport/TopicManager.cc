@@ -146,8 +146,6 @@ void TopicManager::AddNodeToProcess(NodePtr _ptr)
 //////////////////////////////////////////////////
 void TopicManager::ProcessNodes(bool _onlyOut)
 {
-
-
   {
     boost::mutex::scoped_lock lock(this->processNodesMutex);
     for (boost::unordered_set<NodePtr>::iterator iter =

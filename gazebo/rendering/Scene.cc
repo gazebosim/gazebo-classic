@@ -2661,8 +2661,8 @@ void Scene::ShowContacts(bool _show)
     this->visuals[this->contactVisId] = vis;
   }
   else
-   vis = boost::dynamic_pointer_cast<ContactVisual>(
-       this->visuals[this->contactVisId]);
+    vis = boost::dynamic_pointer_cast<ContactVisual>(
+        this->visuals[this->contactVisId]);
 
   if (vis)
     vis->SetEnabled(_show);
