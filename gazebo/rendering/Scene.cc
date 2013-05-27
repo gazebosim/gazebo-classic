@@ -1732,7 +1732,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       && !_msg->topic().empty())
   {
     std::string rayVisualName = _msg->parent() + "::" + _msg->name();
-    if (!this->visuals[rayVisualName+"_laser_vis"])
+    if (this->visuals.find(rayVisualName+"_laser_vis") == this->visuals.end())
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
       if (!parentVis)
@@ -1741,14 +1741,14 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       LaserVisualPtr laserVis(new LaserVisual(
             rayVisualName+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
       laserVis->Load();
-      this->visuals[rayVisualName+"_laser_vis"] = laserVis;
+      // this->visuals[rayVisualName+"_laser_vis"] = laserVis;
     }
   }
   else if ((_msg->type() == "sonar") && _msg->visualize()
       && !_msg->topic().empty())
   {
     std::string sonarVisualName = _msg->parent() + "::" + _msg->name();
-    if (!this->visuals[sonarVisualName+"_sonar_vis"])
+    if (this->visuals.find(sonarVisualName+"_sonar_vis") == this->visuals.end())
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
       if (!parentVis)
@@ -1757,14 +1757,15 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       SonarVisualPtr sonarVis(new SonarVisual(
             sonarVisualName+"_GUIONLY_sonar_vis", parentVis, _msg->topic()));
       sonarVis->Load();
-      this->visuals[sonarVisualName+"_sonar_vis"] = sonarVis;
+      // this->visuals[sonarVisualName+"_sonar_vis"] = sonarVis;
     }
   }
   else if ((_msg->type() == "force_torque") && _msg->visualize()
       && !_msg->topic().empty())
   {
     std::string wrenchVisualName = _msg->parent() + "::" + _msg->name();
-    if (!this->visuals[wrenchVisualName + "_wrench_vis"])
+    if (this->visuals.find(wrenchVisualName + "_wrench_vis") ==
+        this->visuals.end())
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
       if (!parentVis)
@@ -1773,7 +1774,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       WrenchVisualPtr wrenchVis(new WrenchVisual(
             wrenchVisualName+"_GUIONLY_wrench_vis", parentVis, _msg->topic()));
       wrenchVis->Load();
-      this->visuals[wrenchVisualName+"_wrench_vis"] = wrenchVis;
+      // this->visuals[wrenchVisualName+"_wrench_vis"] = wrenchVis;
     }
   }
   else if (_msg->type() == "camera" && _msg->visualize())
@@ -1798,7 +1799,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       cameraVis->Load(_msg->camera().image_size().x(),
                       _msg->camera().image_size().y());
 
-      this->visuals[cameraVis->GetName()] = cameraVis;
+      // this->visuals[cameraVis->GetName()] = cameraVis;
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&
@@ -1873,7 +1874,7 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
   Visual_M::iterator iter;
-  iter = this->visuals.find(_msg->name() + "_JOINT_VISUAL__");
+  iter = this->visuals.find(_msg->name());// + "_JOINT_VISUAL__");
 
   if (iter == this->visuals.end())
   {
@@ -1888,9 +1889,11 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
       return false;
 
     JointVisualPtr jointVis(new JointVisual(
-            _msg->name() + "_JOINT_VISUAL__", childVis));
+            _msg->name()/* + "_JOINT_VISUAL__"*/, childVis));
     jointVis->Load(_msg);
     jointVis->SetVisible(this->showJoints);
+    jointVis->GetSceneNode()->_setDerivedOrientation(
+        Ogre::Quaternion(1, 0, 0, 0));
 
     this->visuals[jointVis->GetName()] = jointVis;
   }

@@ -79,7 +79,7 @@ namespace gazebo
       private: void OnContacts(ConstContactsPtr &_msg);
 
       private: physics::CollisionPtr sonarCollision;
-      private: physics::CylinderShapePtr sonarShape;
+      private: physics::MeshShapePtr sonarShape;
       private: physics::EntityPtr parentEntity;
 
       /// \brief Subscription to contact messages from the physics engine

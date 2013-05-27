@@ -415,9 +415,6 @@ void Joint::FillMsg(msgs::Joint &_msg)
     {
       msgs::Sensor *sensorMsg =_msg.add_sensor(); 
       sensor->FillMsg(*sensorMsg);
-
-      // A little hack to make the visualization of the sensor appear.
-      sensorMsg->set_parent(this->parentLink->GetScopedName());
     }
   }
 }
@@ -608,4 +605,30 @@ double Joint::GetInertiaRatio(unsigned int _index) const
 double Joint::GetDamping(int /*_index*/)
 {
   return this->dampingCoefficient;
+}
+
+//////////////////////////////////////////////////
+math::Angle Joint::GetLowerLimit(unsigned int _index) const
+{
+  if (_index < this->GetAngleCount())
+    return this->lowerLimit[_index];
+
+  gzwarn << "requesting lower limit of joint index out of bound\n";
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+math::Angle Joint::GetUpperLimit(unsigned int _index) const
+{
+  if (_index < this->GetAngleCount())
+    return this->upperLimit[_index];
+
+  gzwarn << "requesting upper limit of joint index out of bound\n";
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+void Joint::SetProvideFeedback(bool _enable)
+{
+  this->provideFeedback = _enable;
 }

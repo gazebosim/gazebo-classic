@@ -19,15 +19,15 @@
  * Date: 16 Oct 2009
  */
 
-#include "common/Common.hh"
-#include "common/MeshManager.hh"
-#include "common/Mesh.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Common.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Collision.hh"
-#include "physics/TrimeshShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/TrimeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -38,8 +38,8 @@ TrimeshShape::TrimeshShape(CollisionPtr _parent)
 {
   this->submesh = NULL;
   this->AddType(Base::TRIMESH_SHAPE);
+  sdf::initFile("mesh_shape.sdf", this->sdf);
 }
-
 
 //////////////////////////////////////////////////
 TrimeshShape::~TrimeshShape()
@@ -49,21 +49,24 @@ TrimeshShape::~TrimeshShape()
 //////////////////////////////////////////////////
 void TrimeshShape::Init()
 {
-  std::string filename;
+  std::string meshStr = this->sdf->GetValueString("uri");
 
-  this->mesh = NULL;
   common::MeshManager *meshManager = common::MeshManager::Instance();
+  this->mesh = meshManager->GetMesh(meshStr);
 
-  filename = common::find_file(this->sdf->GetValueString("uri"));
-
-  if (filename == "__default__" || filename.empty())
+  if (!this->mesh)
   {
-    gzerr << "No mesh specified\n";
-    return;
-  }
+    meshStr = common::find_file(this->sdf->GetValueString("uri"));
 
-  if ((this->mesh = meshManager->Load(filename)) == NULL)
-    gzerr << "Unable to load mesh from file[" << filename << "]\n";
+    if (meshStr == "__default__" || meshStr.empty())
+    {
+      gzerr << "No mesh specified\n";
+      return;
+    }
+
+    if ((this->mesh = meshManager->Load(meshStr)) == NULL)
+      gzerr << "Unable to load mesh from file[" << meshStr << "]\n";
+  }
 
   if (this->submesh)
     delete this->submesh;

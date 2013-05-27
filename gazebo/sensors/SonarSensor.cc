@@ -17,11 +17,9 @@
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/SurfaceParams.hh"
-#include "gazebo/physics/CylinderShape.hh"
+#include "gazebo/physics/MeshShape.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/ContactManager.hh"
-// #include "gazebo/physics/Physics.hh"
-// #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Collision.hh"
 
 #include "gazebo/common/Assert.hh"
@@ -121,7 +119,9 @@ void SonarSensor::Load(const std::string &_worldName)
   GZ_ASSERT(physicsEngine != NULL,
       "Unable to get a pointer to the physics engine");
 
-  this->sonarCollision = physicsEngine->CreateCollision("cylinder",
+  /// \todo: Change the collision shape to a cone. Needs a collision shape
+  /// within ODE. Or, switch out the collision engine.
+  this->sonarCollision = physicsEngine->CreateCollision("mesh",
       this->parentName);
 
   GZ_ASSERT(this->sonarCollision != NULL,
@@ -131,7 +131,7 @@ void SonarSensor::Load(const std::string &_worldName)
   this->sonarCollision->AddType(physics::Base::SENSOR_COLLISION);
   this->parentEntity->AddChild(this->sonarCollision);
 
-  this->sonarShape = boost::dynamic_pointer_cast<physics::CylinderShape>(
+  this->sonarShape = boost::dynamic_pointer_cast<physics::MeshShape>(
       this->sonarCollision->GetShape());
 
   GZ_ASSERT(this->sonarShape != NULL,
@@ -141,8 +141,11 @@ void SonarSensor::Load(const std::string &_worldName)
   this->sonarMsg.mutable_sonar()->set_range_max(max);
   this->sonarMsg.mutable_sonar()->set_radius(radius);
 
-  this->sonarShape->SetRadius(radius);
-  this->sonarShape->SetLength(max - min);
+  this->sonarShape->SetMesh("unit_cone");
+  this->sonarShape->SetScale(math::Vector3(max-min, max-min, radius*2.0));
+
+  // this->sonarShape->SetRadius(radius);
+  // this->sonarShape->SetLength(max - min);
 
   math::Vector3 offset(0, 0, (max - min) * 0.5);
   offset = this->pose.rot.RotateVector(offset);

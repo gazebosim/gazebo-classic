@@ -79,6 +79,7 @@ void ForceTorqueSensor::Load(const std::string &_worldName)
 void ForceTorqueSensor::Init()
 {
   Sensor::Init();
+  this->parentJoint->SetProvideFeedback(true);
 }
 
 //////////////////////////////////////////////////
