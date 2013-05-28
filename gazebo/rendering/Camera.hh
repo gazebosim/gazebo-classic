@@ -704,6 +704,9 @@ namespace gazebo
       /// \brief If noiseType==GAUSSIAN, noiseStdDev is the standard
       /// devation of the distibution from which we sample
       private: double noiseStdDev;
+
+      /// \brief Mutex to protect the render function.
+      private: boost::mutex renderMutex;
     };
     /// \}
   }

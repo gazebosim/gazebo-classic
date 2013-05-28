@@ -1654,15 +1654,21 @@ std::string World::StripWorldName(const std::string &_name) const
 //////////////////////////////////////////////////
 void World::EnableAllModels()
 {
-  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-    this->GetModel(i)->SetEnabled(true);
+  for (Model_V::iterator iter = this->models.begin();
+       iter != this->models.end(); ++iter)
+  {
+    (*iter)->SetEnabled(true);
+  }
 }
 
 //////////////////////////////////////////////////
 void World::DisableAllModels()
 {
-  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-    this->GetModel(i)->SetEnabled(false);
+  for (Model_V::iterator iter = this->models.begin();
+       iter != this->models.end(); ++iter)
+  {
+    (*iter)->SetEnabled(false);
+  }
 }
 
 //////////////////////////////////////////////////

@@ -1765,6 +1765,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
             rayVisualName+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
       laserVis->Load();
       laserVis->SetId(_msg->id());
+      this->visuals[_msg->id()] = laserVis;
     }
   }
   else if (_msg->type() == "camera" && _msg->visualize())

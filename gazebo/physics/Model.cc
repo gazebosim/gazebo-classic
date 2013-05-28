@@ -180,7 +180,17 @@ void Model::Init()
        iter!= this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::LINK))
-      boost::static_pointer_cast<Link>(*iter)->Init();
+    {
+      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
+      if (link)
+      {
+        link->Init();
+        this->links.push_back(link);
+      }
+      else
+        gzerr << "Child [" << (*iter)->GetName()
+              << "] has type Base::LINK, but cannot be dynamically casted\n";
+    }
     else if ((*iter)->HasType(Base::MODEL))
       boost::static_pointer_cast<Model>(*iter)->Init();
   }
@@ -203,22 +213,7 @@ void Model::Init()
   {
     (*iter)->Init();
   }
-
-  /// Create a cached set of links.
-  for (unsigned int i = 0; i < this->GetChildCount(); ++i)
-  {
-    if (this->GetChild(i)->HasType(Base::LINK))
-    {
-      LinkPtr link = boost::static_pointer_cast<Link>(this->GetChild(i));
-      if (link)
-        this->links.push_back(link);
-      else
-        gzerr << "Child [" << this->GetChild(i)->GetName()
-              << "] has type Base::LINK, but cannot be dynamically casted\n";
-    }
-  }
 }
-
 
 //////////////////////////////////////////////////
 void Model::Update()
@@ -326,10 +321,11 @@ void Model::RemoveChild(EntityPtr _child)
 
   Entity::RemoveChild(_child->GetId());
 
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-    if (*iter && (*iter)->HasType(LINK))
-      boost::static_pointer_cast<Link>(*iter)->SetEnabled(true);
+  for (Link_V::iterator liter = this->links.begin();
+       liter!= this->links.end(); ++liter)
+  {
+    (*liter)->SetEnabled(true);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -409,14 +405,13 @@ void Model::Reset()
 //////////////////////////////////////////////////
 void Model::SetLinearVel(const math::Vector3 &_vel)
 {
-  for (Base_V::iterator iter = this->children.begin();
-      iter != this->children.end(); ++iter)
+  for (Link_V::iterator liter = this->links.begin();
+      liter!= this->links.end(); ++liter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*liter)
     {
-      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetLinearVel(_vel);
+      (*liter)->SetEnabled(true);
+      (*liter)->SetLinearVel(_vel);
     }
   }
 }
@@ -424,15 +419,13 @@ void Model::SetLinearVel(const math::Vector3 &_vel)
 //////////////////////////////////////////////////
 void Model::SetAngularVel(const math::Vector3 &_vel)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (Link_V::iterator liter = this->links.begin();
+      liter!= this->links.end(); ++liter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*liter)
     {
-      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetAngularVel(_vel);
+      (*liter)->SetEnabled(true);
+      (*liter)->SetAngularVel(_vel);
     }
   }
 }
@@ -440,15 +433,13 @@ void Model::SetAngularVel(const math::Vector3 &_vel)
 //////////////////////////////////////////////////
 void Model::SetLinearAccel(const math::Vector3 &_accel)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (Link_V::iterator liter = this->links.begin();
+      liter!= this->links.end(); ++liter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*liter)
     {
-      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetLinearAccel(_accel);
+      (*liter)->SetEnabled(true);
+      (*liter)->SetLinearAccel(_accel);
     }
   }
 }
@@ -456,15 +447,13 @@ void Model::SetLinearAccel(const math::Vector3 &_accel)
 //////////////////////////////////////////////////
 void Model::SetAngularAccel(const math::Vector3 &_accel)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (Link_V::iterator liter = this->links.begin();
+      liter!= this->links.end(); ++liter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*liter)
     {
-      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetAngularAccel(_accel);
+      (*liter)->SetEnabled(true);
+      (*liter)->SetAngularAccel(_accel);
     }
   }
 }
@@ -546,18 +535,17 @@ math::Vector3 Model::GetWorldAngularAccel() const
 math::Box Model::GetBoundingBox() const
 {
   math::Box box;
-  Base_V::const_iterator iter;
 
   box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
   box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (Link_V::const_iterator liter = this->links.begin();
+      liter!= this->links.end(); ++liter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*liter)
     {
       math::Box linkBox;
-      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
-      linkBox = link->GetBoundingBox();
+      linkBox = (*liter)->GetBoundingBox();
       box += linkBox;
     }
   }
@@ -780,13 +768,12 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Model::SetGravityMode(const bool &_v)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (Link_V::iterator liter = this->links.begin();
+      liter!= this->links.end(); ++liter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*liter)
     {
-      boost::static_pointer_cast<Link>(*iter)->SetGravityMode(_v);
+      (*liter)->SetGravityMode(_v);
     }
   }
 }
@@ -794,13 +781,12 @@ void Model::SetGravityMode(const bool &_v)
 //////////////////////////////////////////////////
 void Model::SetCollideMode(const std::string &_m)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (Link_V::iterator liter = this->links.begin();
+      liter!= this->links.end(); ++liter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*liter)
     {
-      boost::static_pointer_cast<Link>(*iter)->SetCollideMode(_m);
+      (*liter)->SetCollideMode(_m);
     }
   }
 }
@@ -808,13 +794,12 @@ void Model::SetCollideMode(const std::string &_m)
 //////////////////////////////////////////////////
 void Model::SetLaserRetro(const float _retro)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (Link_V::iterator liter = this->links.begin();
+      liter!= this->links.end(); ++liter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*liter)
     {
-       boost::static_pointer_cast<Link>(*iter)->SetLaserRetro(_retro);
+      (*liter)->SetLaserRetro(_retro);
     }
   }
 }
@@ -830,13 +815,10 @@ void Model::FillMsg(msgs::Model &_msg)
   msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
-  for (unsigned int j = 0; j < this->GetChildCount(); ++j)
+  for (Link_V::iterator iter = this->links.begin(); iter != this->links.end();
+      ++iter)
   {
-    if (this->GetChild(j)->HasType(Base::LINK))
-    {
-      LinkPtr link = boost::dynamic_pointer_cast<Link>(this->GetChild(j));
-      link->FillMsg(*_msg.add_link());
-    }
+    (*iter)->FillMsg(*_msg.add_link());
   }
 
   for (unsigned int j = 0; j < this->joints.size(); ++j)
@@ -967,10 +949,12 @@ void Model::SetState(const ModelState &_state)
 /////////////////////////////////////////////////
 void Model::SetEnabled(bool _enabled)
 {
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-    if (*iter && (*iter)->HasType(LINK))
-      boost::static_pointer_cast<Link>(*iter)->SetEnabled(_enabled);
+  for (Link_V::iterator liter = this->links.begin();
+      liter!= this->links.end(); ++liter)
+  {
+    if (*liter)
+      (*liter)->SetEnabled(_enabled);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1001,10 +985,14 @@ void Model::SetAutoDisable(bool _auto)
   if (this->joints.size() > 0)
     return;
 
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-    if (*iter && (*iter)->HasType(LINK))
-      boost::static_pointer_cast<Link>(*iter)->SetAutoDisable(_auto);
+  for (Link_V::iterator liter = this->links.begin();
+      liter!= this->links.end(); ++liter)
+  {
+    if (*liter)
+    {
+      (*liter)->SetAutoDisable(_auto);
+    }
+  }
 }
 
 /////////////////////////////////////////////////

@@ -110,6 +110,8 @@ Link::~Link()
 
   delete this->publishDataMutex;
   this->publishDataMutex = NULL;
+
+  this->collisions.clear();
 }
 
 //////////////////////////////////////////////////
@@ -163,60 +165,6 @@ void Link::Init()
   this->linearAccel.Set(0, 0, 0);
   this->angularAccel.Set(0, 0, 0);
 
-  /// Attach mesh for CG visualization
-  /// Add a renderable visual for CG, make visible in Update()
-  /// TODO: this shouldn't be in the physics sim
-  /*if (this->mass.GetAsDouble() > 0.0)
-  {
-    std::ostringstream visname;
-    visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
-
-    msgs::Visual msg;
-    msg.set_name(visname.str());
-    msg.set_parent_id(this->comEntity->GetCompleteScopedName());
-    msg.set_render_type(msgs::Visual::MESH_RESOURCE);
-    msg.set_mesh("unit_box");
-    msg.set_material("Gazebo/RedGlow");
-    msg.set_cast_shadows(false);
-    msg.set_attach_axes(true);
-    msg.set_visible(false);
-    msgs::Set(msg.mutable_scale(), math::Vector3(0.1, 0.1, 0.1));
-    this->vis_pub->Publish(msg);
-    this->cgVisuals.push_back(msg.header().str_id());
-
-    if (this->children.size() > 1)
-    {
-      msgs::Visual g_msg;
-      g_msg.set_name(visname.str() + "_connectors");
-
-      g_msg.set_parent_id(this->comEntity->GetCompleteScopedName());
-      g_msg.set_render_type(msgs::Visual::LINE_LIST);
-      g_msg.set_attach_axes(false);
-      g_msg.set_material("Gazebo/GreenGlow");
-      g_msg.set_visible(false);
-
-      // Create a line to each collision
-      for (Base_V::iterator giter = this->children.begin();
-           giter != this->children.end(); giter++)
-      {
-        EntityPtr e = boost::dynamic_pointer_cast<Entity>(*giter);
-
-        msgs::Point *pt;
-        pt = g_msg.add_points();
-        pt->set_x(0);
-        pt->set_y(0);
-        pt->set_z(0);
-
-        pt = g_msg.add_points();
-        pt->set_x(e->GetRelativePose().pos.x);
-        pt->set_y(e->GetRelativePose().pos.y);
-        pt->set_z(e->GetRelativePose().pos.z);
-      }
-      this->vis_pub->Publish(msg);
-      this->cgVisuals.push_back(g_msg.header().str_id());
-    }
-  }*/
-
   this->enabled = true;
 
   // Set Link pose before setting pose of child collisions
@@ -228,7 +176,11 @@ void Link::Init()
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-      boost::static_pointer_cast<Collision>(*iter)->Init();
+    {
+      CollisionPtr collision = boost::static_pointer_cast<Collision>(*iter);
+      this->collisions.push_back(collision);
+      collision->Init();
+    }
   }
 }
 
@@ -237,6 +189,7 @@ void Link::Fini()
 {
   this->parentJoints.clear();
   this->childJoints.clear();
+  this->collisions.clear();
   this->inertial.reset();
 
   for (std::vector<std::string>::iterator iter = this->sensors.begin();
@@ -380,18 +333,13 @@ void Link::SetCollideMode(const std::string &_mode)
     return;
   }
 
-  for (Base_V::iterator iter = this->children.begin();
-       iter != this->children.end(); ++iter)
+  for (Collision_V::iterator iter = this->collisions.begin();
+       iter != this->collisions.end(); ++iter)
   {
-    if ((*iter)->HasType(Base::COLLISION))
+    if ((*iter))
     {
-      physics::CollisionPtr pc =
-        boost::dynamic_pointer_cast<physics::Collision>(*iter);
-      if (pc)
-      {
-        pc->SetCategoryBits(categoryBits);
-        pc->SetCollideBits(collideBits);
-      }
+      (*iter)->SetCategoryBits(categoryBits);
+      (*iter)->SetCollideBits(collideBits);
     }
   }
 }
@@ -409,12 +357,10 @@ bool Link::GetSelfCollide()
 //////////////////////////////////////////////////
 void Link::SetLaserRetro(float _retro)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (Collision_V::iterator iter = this->collisions.begin();
+       iter != this->collisions.end(); ++iter)
   {
-    if ((*iter)->HasType(Base::COLLISION))
-      boost::static_pointer_cast<Collision>(*iter)->SetLaserRetro(_retro);
+    (*iter)->SetLaserRetro(_retro);
   }
 }
 
@@ -508,17 +454,7 @@ CollisionPtr Link::GetCollision(const std::string &_name)
 //////////////////////////////////////////////////
 Collision_V Link::GetCollisions() const
 {
-  Collision_V result;
-  Base_V::const_iterator biter;
-  for (biter = this->children.begin(); biter != this->children.end(); ++biter)
-  {
-    if ((*biter)->HasType(Base::COLLISION))
-    {
-      result.push_back(boost::static_pointer_cast<Collision>(*biter));
-    }
-  }
-
-  return result;
+  return this->collisions;
 }
 
 //////////////////////////////////////////////////
@@ -615,15 +551,14 @@ ModelPtr Link::GetModel() const
 math::Box Link::GetBoundingBox() const
 {
   math::Box box;
-  Base_V::const_iterator iter;
 
   box.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
   box.max.Set(0, 0, 0);
 
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (Collision_V::const_iterator iter = this->collisions.begin();
+       iter != this->collisions.end(); ++iter)
   {
-    if ((*iter)->HasType(Base::COLLISION))
-      box += boost::static_pointer_cast<Collision>(*iter)->GetBoundingBox();
+    box += (*iter)->GetBoundingBox();
   }
 
   return box;
@@ -745,14 +680,10 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.mutable_inertial()->set_izz(this->inertial->GetIZZ());
   msgs::Set(_msg.mutable_inertial()->mutable_pose(), this->inertial->GetPose());
 
-  for (unsigned int j = 0; j < this->GetChildCount(); j++)
+  for (Collision_V::iterator iter = this->collisions.begin();
+       iter != this->collisions.end(); ++iter)
   {
-    if (this->GetChild(j)->HasType(Base::COLLISION))
-    {
-      CollisionPtr coll = boost::dynamic_pointer_cast<Collision>(
-          this->GetChild(j));
-      coll->FillMsg(*_msg.add_collision());
-    }
+    (*iter)->FillMsg(*_msg.add_collision());
   }
 
   for (std::vector<std::string>::iterator iter = this->sensors.begin();
@@ -1004,6 +935,33 @@ void Link::ParseVisuals()
       this->visuals[msg.id()] = msg;
 
       visualElem = visualElem->GetNextElement("visual");
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void Link::RemoveChild(EntityPtr _child)
+{
+  if (_child->HasType(COLLISION))
+  {
+    this->RemoveCollision(_child->GetScopedName());
+  }
+
+  Entity::RemoveChild(_child->GetId());
+
+  this->SetEnabled(true);
+}
+
+/////////////////////////////////////////////////
+void Link::RemoveCollision(const std::string &_name)
+{
+  for (Collision_V::iterator iter = this->collisions.begin();
+       iter != this->collisions.end(); ++iter)
+  {
+    if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
+    {
+      this->collisions.erase(iter);
+      break;
     }
   }
 }

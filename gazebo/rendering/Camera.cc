@@ -160,6 +160,7 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 //////////////////////////////////////////////////
 Camera::~Camera()
 {
+  boost::mutex::scoped_lock lock(this->renderMutex);
   delete [] this->saveFrameBuffer;
   delete [] this->bayerFrameBuffer;
 
@@ -277,13 +278,18 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  boost::mutex::scoped_lock lock(this->renderMutex);
+  this->initialized = false;
+  this->connections.clear();
+
   if (this->gaussianNoiseCompositorListener)
     this->gaussianNoiseInstance->removeListener(
       this->gaussianNoiseCompositorListener.get());
-  RTShaderSystem::DetachViewport(this->viewport, this->scene);
-  this->renderTarget->removeAllViewports();
 
-  this->connections.clear();
+  RTShaderSystem::DetachViewport(this->viewport, this->scene);
+  if (this->renderTarget)
+    this->renderTarget->removeAllViewports();
+  this->viewport = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -377,7 +383,8 @@ void Camera::Update()
 //////////////////////////////////////////////////
 void Camera::Render()
 {
-  if (common::Time::GetWallTime() - this->lastRenderWallTime >=
+  if (this->initialized &&
+      common::Time::GetWallTime() - this->lastRenderWallTime >=
       this->renderPeriod)
   {
     this->newData = true;
@@ -388,8 +395,10 @@ void Camera::Render()
 //////////////////////////////////////////////////
 void Camera::RenderImpl()
 {
+  boost::mutex::scoped_lock lock(this->renderMutex);
   if (this->renderTarget)
   {
+    std::cout << "RenderImpl[" << this->GetName() << "][" << this << "]\n";
     // Render, but don't swap buffers.
     this->renderTarget->update(false);
 

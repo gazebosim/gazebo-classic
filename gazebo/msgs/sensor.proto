@@ -13,17 +13,16 @@ import "contactsensor.proto";
 message Sensor
 {
   required string name             = 1;
-  required uint32 id               = 3;
-  required string parent           = 4;
-  required uint32 parent_id        = 5;
-  required string type             = 6;
-  optional bool always_on          = 7;
-  optional double update_rate      = 8;
-  optional Pose pose               = 9;
-  optional CameraSensor camera     = 10;
-  optional RaySensor ray           = 11;
-  optional ContactSensor contact   = 12;
-  optional bool visualize          = 13;
-  optional string topic            = 14;
+  required uint32 id               = 2;
+  required string parent           = 3;
+  required uint32 parent_id        = 4;
+  required string type             = 5;
+  optional bool always_on          = 6;
+  optional double update_rate      = 7;
+  optional Pose pose               = 8;
+  optional CameraSensor camera     = 9;
+  optional RaySensor ray           = 10;
+  optional ContactSensor contact   = 11;
+  optional bool visualize          = 12;
+  optional string topic            = 13;
 }
-
