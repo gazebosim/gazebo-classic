@@ -106,6 +106,11 @@ namespace gazebo
       /// \brief Send latest message over the wire. For internal use only
       public: void SendMessage();
 
+      /// \brief Set our containing node.
+      /// \param[in] _node Pointer to a node. Should be the node that create
+      /// this publisher.
+      public: void SetNode(NodePtr _node);
+
       /// Deprecated
       public: bool GetLatching() const GAZEBO_DEPRECATED(1.5);
 
@@ -150,6 +155,9 @@ namespace gazebo
 
       /// \brief The previous message published. Used for latching topics.
       private: MessagePtr prevMsg;
+
+      /// \brief Pointer to our containing node.
+      private: NodePtr node;
 
       private: common::Time currentTime;
       private: common::Time prevPublishTime;

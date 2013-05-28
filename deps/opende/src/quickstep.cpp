@@ -46,6 +46,7 @@
 #undef TIMING
 #undef REPORT_MONITOR
 #undef SHOW_CONVERGENCE
+#define SMOOTH_LAMBDA
 #undef RECOMPUTE_RMS
 #undef USE_1NORM
 //#define LOCAL_STEPPING  // not yet implemented
@@ -601,10 +602,24 @@ static void ComputeRows(
   //       velocity update
   bool preconditioning;
 
+#ifdef SHOW_CONVERGENCE
+    if (1)
+    {
+      // show starting lambda
+      printf("lambda start: [");
+      for (int i=startRow; i<startRow+nRows; i++)
+      {
+        printf("%f, ", lambda[i]);
+      }
+      printf("]\n");
+    }
+#endif
+
 #ifdef PENETRATION_JVERROR_CORRECTION
   dReal Jvnew_final = 0;
 #endif
-  for (int iteration=0; iteration < num_iterations + precon_iterations; iteration++) {
+  int friction_iterations = 10;
+  for (int iteration=0; iteration < num_iterations + precon_iterations + friction_iterations; iteration++) {
 
     rms_error = 0;
 
@@ -704,6 +719,10 @@ static void ComputeRows(
       //     access pattern.
 
       int index = order[i].index;
+
+      // if (iteration > num_iterations && findex[index] < 0)
+      if (iteration >= num_iterations + precon_iterations && findex[index] < 0)
+        continue;
 
       dReal delta,delta_erp;
       dReal delta_precon;
@@ -903,7 +922,35 @@ static void ComputeRows(
           delta_erp = nl - old_lambda_erp;
   #endif
 
-          // for non-precon case, update caccel
+          // option to smooth lambda
+#ifdef SMOOTH_LAMBDA
+          {
+            // smooth delta lambda
+            // equivalent to first order artificial dissipation on lambda update.
+#ifdef SHOW_CONVERGENCE
+            if (0)
+            {
+              if (i == 0)
+                printf("rhs[%f] adcfm[%f]: ",rhs[index], Adcfm[index]);
+              if (i == 0)
+                printf("dlambda iter[%d]: ",iteration);
+              printf(" %f ", lambda[index]-old_lambda);
+              if (i == startRow + nRows - 1)
+                printf("\n");
+            }
+#endif
+            if (findex[index] != -1)
+            {
+              // extra residual smoothing for contact constraints
+              dReal mu = 0.01;
+              lambda[index] = (1.0 - mu)*lambda[index] + mu*old_lambda;
+              // is filtering lambda_erp necessary?
+              // lambda_erp[index] = (1.0 - mu)*lambda_erp[index] + mu*old_lambda_erp;
+            }
+          }
+#endif
+
+          // update caccel
           {
             // FOR erp throttled by info.c_v_max or info.c
             dRealPtr iMJ_ptr = iMJ + index*12;
@@ -963,6 +1010,7 @@ static void ComputeRows(
       //delta *= ramp;
 
     } // end of for loop on m
+
 #ifdef PENETRATION_JVERROR_CORRECTION
     Jvnew_final = Jvnew*stepsize1;
     Jvnew_final = Jvnew_final > 1.0 ? 1.0 : ( Jvnew_final < -1.0 ? -1.0 : Jvnew_final );
@@ -981,7 +1029,7 @@ static void ComputeRows(
         }
     #else // use 2 norm
         //for (int i=startRow; i<startRow+nRows; i++)
-        for (int i=0; i<m; i++)  // use entire solution vector errors
+        for (int i=startRow; i<startRow+nRows; i++)  // use entire solution vector errors
           rms_error += delta_error[order[i].index]*delta_error[order[i].index]; ///(dReal)nRows;
         rms_error = sqrt(rms_error/(dReal)nRows);
     #endif
@@ -1010,11 +1058,12 @@ static void ComputeRows(
     //}
 
 #ifdef SHOW_CONVERGENCE
-    if (1)
+    // show per iteration history
+    if (0)
     {
       printf("MONITOR: id: %d iteration: %d error: %20.16f\n",thread_id,iteration,rms_error);
     }
-    else
+    if (0)
     {
       for (int i=startRow; i<startRow+nRows; i++)
       {
@@ -1022,7 +1071,6 @@ static void ComputeRows(
       }
       printf("\n");
     }
-
 #endif
 
     if (rms_error < sor_lcp_tolerance)
@@ -1042,6 +1090,19 @@ static void ComputeRows(
 
   } // end of for loop on iterations
 
+#ifdef SHOW_CONVERGENCE
+  if (1)
+  {
+    // show starting lambda
+    printf("lambda end: [");
+    for (int i=startRow; i<startRow+nRows; i++)
+    {
+      printf("%f, ", lambda[i]);
+    }
+    printf("]\n");
+    printf("MONITOR: id: %d iteration: %d error: %20.16f\n",thread_id,num_iterations,rms_error);
+  }
+#endif
   //printf("vnew: ");
   //for (int i=0; i<6*nb; i++) printf(" %f ",vnew[i]);
   //printf("\n");
@@ -1083,21 +1144,6 @@ static void SOR_LCP (dxWorldProcessContext *context,
 #endif
   const dReal stepsize)
 {
-#ifdef WARM_STARTING
-  // not activating these works well for quickstep
-  if (1)
-  {
-    // for warm starting, this seems to be necessary to prevent
-    // jerkiness in motor-driven joints. i have no idea why this works.
-    for (int i=0; i<m; i++) {
-      lambda[i] *= 0.5;
-      lambda_erp[i] *= 0.5;
-    }
-  }
-#else
-  dSetZero (lambda,m);
-  dSetZero (lambda_erp,m);
-#endif
 
   // precompute iMJ = inv(M)*J'
   dReal *iMJ = context->AllocateArray<dReal> (m*12);
@@ -1107,10 +1153,16 @@ static void SOR_LCP (dxWorldProcessContext *context,
   // compute cforce=(inv(M)*J')*lambda
   if (qs->precon_iterations > 0)
     multiply_invM_JT (m,nb,J,jb,lambda,cforce);
-  // compute caccel=(inv(M)*J')*lambda
-  multiply_invM_JT (m,nb,iMJ,jb,lambda,caccel);
-  multiply_invM_JT (m,nb,iMJ,jb,lambda_erp,caccel_erp);
+
+  if (1)
+  {
+    // re-compute caccel=(inv(M)*J')*lambda with new iMJ
+    // seems much better than using stored caccel's
+    multiply_invM_JT (m,nb,iMJ,jb,lambda,caccel);
+    multiply_invM_JT (m,nb,iMJ,jb,lambda_erp,caccel_erp);
+  }
 #else
+  // no warm starting
   if (qs->precon_iterations > 0)
     dSetZero (cforce,nb*6);
   dSetZero (caccel,nb*6);
@@ -1262,6 +1314,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
 #endif
 
 #ifdef SHOW_CONVERGENCE
+    if (0)
     {
       printf("-------------- saved labmdas -------------\n");
       // print current lambdas
@@ -1788,7 +1841,22 @@ void dxQuickStepper (dxWorldProcessContext *context,
         lambda_erpcurr += infom;
       }
     }
-    
+
+    if (1)
+    {
+      // for warm starting, this seems to be necessary to prevent
+      // jerkiness in motor-driven joints. i have no idea why this works.
+      // also necessary if J condition numbers are high (maybe the same thing).
+      for (int i=0; i<m; i++) {
+        lambda[i] *= 0.5;
+        lambda_erp[i] *= 0.5;
+      }
+
+    }
+#else
+    // no warm starting
+    dSetZero (lambda,m);
+    dSetZero (lambda_erp,m);
 #endif
 
     BEGIN_STATE_SAVE(context, lcpstate) {
