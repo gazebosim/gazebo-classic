@@ -36,6 +36,10 @@ CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
 /////////////////////////////////////////////////
 CameraVisual::~CameraVisual()
 {
+  if (this->scene)
+    this->scene->RemoveCamera(this->camera->GetName());
+
+  std::cout << "UseCount[" << this->camera.use_count() << "]\n";
   this->camera.reset();
 }
 
@@ -100,4 +104,7 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
   this->camera->AttachToVisual(this->GetName(), true);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  if (this->parent)
+    this->parent->AttachVisual(shared_from_this());
 }

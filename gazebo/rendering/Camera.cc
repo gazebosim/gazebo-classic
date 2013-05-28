@@ -161,6 +161,8 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 Camera::~Camera()
 {
   boost::mutex::scoped_lock lock(this->renderMutex);
+
+  std::cout << "Delete Camera[" << this->GetName() << "]\n";
   delete [] this->saveFrameBuffer;
   delete [] this->bayerFrameBuffer;
 

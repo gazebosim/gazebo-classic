@@ -567,6 +567,7 @@ void Scene::RemoveCamera(const std::string &_name)
   {
     if ((*iter)->GetName() == _name)
     {
+      std::cout << "Scene::RemoveCamera[" << _name << "]\n";
       (*iter)->Fini();
       (*iter).reset();
       this->cameras.erase(iter);
