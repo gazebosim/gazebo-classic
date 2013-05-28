@@ -103,13 +103,11 @@ void SensorManager::Stop()
 //////////////////////////////////////////////////
 void SensorManager::Update(bool _force)
 {
-  Sensor_V::iterator iter;
-
   {
     boost::recursive_mutex::scoped_lock lock(this->mutex);
 
     // in case things are spawn, sensors length changes
-    for (iter = this->initSensors.begin();
+    for (Sensor_V::iterator iter = this->initSensors.begin();
          iter != this->initSensors.end(); ++iter)
     {
       GZ_ASSERT((*iter) != NULL, "Sensor pointer is NULL");
@@ -123,22 +121,18 @@ void SensorManager::Update(bool _force)
     }
     this->initSensors.clear();
 
-    for (iter = this->removeSensors.begin();
+    for (std::vector<std::string>::iterator iter = this->removeSensors.begin();
          iter != this->removeSensors.end(); ++iter)
     {
-      GZ_ASSERT((*iter) != NULL, "Sensor pointer is NULL");
-      GZ_ASSERT((*iter)->GetCategory() < 0 ||
-          (*iter)->GetCategory() < CATEGORY_COUNT, "Sensor category is empty");
-      GZ_ASSERT(this->sensorContainers[(*iter)->GetCategory()] != NULL,
-                "Sensor container is NULL");
+      GZ_ASSERT(!(*iter).empty(), "Remove sensor name is empty.");
+
       bool removed = false;
-      std::string scopedName = (*iter)->GetScopedName();
       for (SensorContainer_V::iterator iter2 = this->sensorContainers.begin();
            iter2 != this->sensorContainers.end() && !removed; ++iter2)
       {
         GZ_ASSERT((*iter2) != NULL, "SensorContainer is NULL");
 
-        removed = (*iter2)->RemoveSensor(scopedName);
+        removed = (*iter2)->RemoveSensor(*iter);
       }
 
       if (!removed)
@@ -345,7 +339,7 @@ void SensorManager::RemoveSensor(const std::string &_name)
   {
     // Push it on the list, to be removed by the main sensor thread,
     // to ensure correct access to rendering resources.
-    this->removeSensors.push_back(sensor);
+    this->removeSensors.push_back(sensor->GetScopedName());
   }
 }
 

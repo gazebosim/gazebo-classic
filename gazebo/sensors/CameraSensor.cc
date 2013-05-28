@@ -153,7 +153,6 @@ void CameraSensor::Fini()
     this->scene->RemoveCamera(this->camera->GetName());
   }
 
-  std::cout << "CameraSensor::Fini(" << this->GetName() << ")[" << this << "]\n";
   this->camera.reset();
   this->scene.reset();
 }
@@ -163,8 +162,6 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
 {
   if (this->camera)
   {
-    std::cout << "CameraSensor::UpdateImpl(" << this->GetName() << ")["
-      << this << "]\n";
     this->camera->Render();
     this->camera->PostRender();
     this->lastMeasurementTime = this->scene->GetSimTime();

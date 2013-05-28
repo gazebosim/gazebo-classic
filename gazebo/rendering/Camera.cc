@@ -160,9 +160,6 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 //////////////////////////////////////////////////
 Camera::~Camera()
 {
-  boost::mutex::scoped_lock lock(this->renderMutex);
-
-  std::cout << "Delete Camera[" << this->GetName() << "]\n";
   delete [] this->saveFrameBuffer;
   delete [] this->bayerFrameBuffer;
 
@@ -280,7 +277,6 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
-  boost::mutex::scoped_lock lock(this->renderMutex);
   this->initialized = false;
   this->connections.clear();
 
@@ -292,6 +288,7 @@ void Camera::Fini()
   if (this->renderTarget)
     this->renderTarget->removeAllViewports();
   this->viewport = NULL;
+  this->renderTarget = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -397,10 +394,8 @@ void Camera::Render()
 //////////////////////////////////////////////////
 void Camera::RenderImpl()
 {
-  boost::mutex::scoped_lock lock(this->renderMutex);
   if (this->renderTarget)
   {
-    std::cout << "RenderImpl[" << this->GetName() << "][" << this << "]\n";
     // Render, but don't swap buffers.
     this->renderTarget->update(false);
 
@@ -1204,11 +1199,11 @@ void Camera::SetCaptureDataOnce()
 }
 
 //////////////////////////////////////////////////
-void Camera::CreateRenderTexture(const std::string &textureName)
+void Camera::CreateRenderTexture(const std::string &_textureName)
 {
   // Create the render texture
   this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
-      textureName,
+      _textureName,
       "General",
       Ogre::TEX_TYPE_2D,
       this->GetImageWidth(),
