@@ -15,41 +15,43 @@
  *
 */
 
-#include "ForceTorquePlugin.hh"
+#include "gazebo/physics/physics.hh"
+#include "SonarPlugin.hh"
 
 using namespace gazebo;
 
 // Register this plugin with the simulator
-GZ_REGISTER_SENSOR_PLUGIN(ForceTorquePlugin)
+GZ_REGISTER_SENSOR_PLUGIN(SonarPlugin)
 
 /////////////////////////////////////////////////
-ForceTorquePlugin::ForceTorquePlugin()
+SonarPlugin::SonarPlugin()
 {
 }
 
 /////////////////////////////////////////////////
-ForceTorquePlugin::~ForceTorquePlugin()
+SonarPlugin::~SonarPlugin()
 {
   this->parentSensor->DisconnectUpdate(this->connection);
   this->parentSensor.reset();
 }
 
 /////////////////////////////////////////////////
-void ForceTorquePlugin::Load(sensors::SensorPtr _parent,
-    sdf::ElementPtr /*_sdf*/)
+void SonarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
 {
+  // Get then name of the parent sensor
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(_parent);
+    boost::dynamic_pointer_cast<sensors::SonarSensor>(_parent);
 
   if (!this->parentSensor)
-    gzthrow("ForceTorquePlugin requires a force_torque sensor as its parent.");
+    gzthrow("SonarPlugin requires a sonar sensor as its parent.");
 
-  this->connection = this->parentSensor->ConnectUpdate(
-        boost::bind(&ForceTorquePlugin::OnUpdate, this, _1));
+  this->connection =
+    this->parentSensor->ConnectUpdate(
+      boost::bind(&SonarPlugin::OnUpdate, this, _1));
 }
 
 /////////////////////////////////////////////////
-void ForceTorquePlugin::OnUpdate(msgs::WrenchStamped /*_msg*/)
+void SonarPlugin::OnUpdate(msgs::SonarStamped /*_msg*/)
 {
   // overload with useful callback here
 }

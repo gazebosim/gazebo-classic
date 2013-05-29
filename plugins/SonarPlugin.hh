@@ -14,45 +14,40 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Contact Plugin
- * Author: Nate Koenig mod by John Hsu
- */
 
-#ifndef GAZEBO_RAY_PLUGIN_HH
-#define GAZEBO_RAY_PLUGIN_HH
+#ifndef _GAZEBO_SONAR_PLUGIN_HH_
+#define _GAZEBO_SONAR_PLUGIN_HH_
 
-#include "common/Plugin.hh"
-#include "sensors/SensorTypes.hh"
-#include "sensors/RaySensor.hh"
-#include "gazebo.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/sensors/SonarSensor.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {
   /// \brief A Bumper controller
-  class RayPlugin : public SensorPlugin
+  class SonarPlugin : public SensorPlugin
   {
     /// \brief Constructor
-    public: RayPlugin();
+    public: SonarPlugin();
 
     /// \brief Destructor
-    public: virtual ~RayPlugin();
-
-    /// \brief Update callback
-    public: virtual void OnNewLaserScans();
+    public: virtual ~SonarPlugin();
 
     /// \brief Load the plugin
-    /// \param take in SDF root element
+    /// \param[in] _parent Pointer to the parent sensor.
+    /// \param[in] _sdf SDF element for the plugin.
     public: void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
 
-    /// \brief Pointer to parent
-    protected: physics::WorldPtr world;
+    /// \brief Update callback. Overload this function in a child class.
+    /// \param[in] _msg The sonar ping message.
+    protected: virtual void OnUpdate(msgs::SonarStamped _msg);
 
     /// \brief The parent sensor
-    private: sensors::RaySensorPtr parentSensor;
+    protected: sensors::SonarSensorPtr parentSensor;
 
-    /// \brief The connection tied to RayPlugin::OnNewLaserScans()
-    private: event::ConnectionPtr newLaserScansConnection;
+    /// \brief The connection tied to SonarSensor::OnNewPing()
+    private: event::ConnectionPtr connection;
   };
 }
 #endif

@@ -36,35 +36,64 @@ namespace gazebo
     /// \brief Sensor for measure force and torque on a joint.
     class ForceTorqueSensor: public Sensor
     {
-      /// \brief Constructor
+      /// \brief Constructor.
       public: ForceTorqueSensor();
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ForceTorqueSensor();
 
-      // Documentation inherited
+      // Documentation inherited.
       public: virtual void Load(const std::string &_worldName);
 
-      // Documentation inherited
+      // Documentation inherited.
       public: virtual void Init();
 
-      // Documentation inherited
-      protected: virtual void UpdateImpl(bool _force);
-
-      // Documentation inherited
-      protected: virtual void Fini();
-
-      // Documentation inherited
+      // Documentation inherited.
       public: virtual std::string GetTopic() const;
 
-      // Documentation inherited
+      /// \brief Get the current joint torque.
+      /// \return The latested measured torque.
+      public: math::Vector3 GetTorque() const;
+
+      /// \brief Get the current joint force.
+      /// \return The latested measured force.
+      public: math::Vector3 GetForce() const;
+
+      // Documentation inherited.
       public: virtual bool IsActive();
 
+      /// \brief Connect a to the  update signal.
+      /// \param[in] _subscriber Callback function.
+      /// \return The connection, which must be kept in scope.
+      public: template<typename T>
+              event::ConnectionPtr ConnectUpdate(T _subscriber)
+              {return update.Connect(_subscriber);}
+
+      /// \brief Disconnect from the update signal.
+      /// \param[in] _conn Connection to remove.
+      public: void DisconnectUpdate(event::ConnectionPtr &_conn)
+              {update.Disconnect(_conn);}
+
+      // Documentation inherited.
+      protected: virtual void UpdateImpl(bool _force);
+
+      // Documentation inherited.
+      protected: virtual void Fini();
+
+      /// \brief Parent joint, from which we get force torque info.
       private: physics::JointPtr parentJoint;
 
+      /// \brief Publishes the wrenchMsg.
       private: transport::PublisherPtr wrenchPub;
 
+      /// \brief Message the store the current force torque info.
+      private: msgs::WrenchStamped wrenchMsg;
+
+      /// \brief Mutex to protect the wrench message
       private: boost::mutex mutex;
+
+      /// \brief Update event.
+      protected: event::EventT<void(msgs::WrenchStamped)> update;
     };
     /// \}
   }

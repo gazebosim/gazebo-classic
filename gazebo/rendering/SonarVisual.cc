@@ -91,7 +91,6 @@ void SonarVisual::OnMsg(ConstSonarStampedPtr &_msg)
   if (_msg->sonar().has_contact())
   {
     math::Vector3 pos = msgs::Convert(_msg->sonar().contact());
-    //pos = pose.rot.RotateVectorReverse(pos);
     this->sonarRay->SetPoint(1, pos);
   }
   else

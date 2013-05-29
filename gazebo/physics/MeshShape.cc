@@ -27,27 +27,27 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
-#include "gazebo/physics/TrimeshShape.hh"
+#include "gazebo/physics/MeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-TrimeshShape::TrimeshShape(CollisionPtr _parent)
+MeshShape::MeshShape(CollisionPtr _parent)
   : Shape(_parent)
 {
   this->submesh = NULL;
-  this->AddType(Base::TRIMESH_SHAPE);
+  this->AddType(Base::MESH_SHAPE);
   sdf::initFile("mesh_shape.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////
-TrimeshShape::~TrimeshShape()
+MeshShape::~MeshShape()
 {
 }
 
 //////////////////////////////////////////////////
-void TrimeshShape::Init()
+void MeshShape::Init()
 {
   std::string meshStr = this->sdf->GetValueString("uri");
 
@@ -92,63 +92,60 @@ void TrimeshShape::Init()
 }
 
 //////////////////////////////////////////////////
-void TrimeshShape::SetScale(const math::Vector3 &_scale)
+void MeshShape::SetScale(const math::Vector3 &_scale)
 {
   this->sdf->GetElement("scale")->Set(_scale);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 TrimeshShape::GetSize() const
+math::Vector3 MeshShape::GetSize() const
 {
   return this->sdf->GetValueVector3("scale");
 }
 
 //////////////////////////////////////////////////
-std::string TrimeshShape::GetFilename() const
+std::string MeshShape::GetFilename() const
 {
   return this->GetMeshURI();
 }
 
 //////////////////////////////////////////////////
-std::string TrimeshShape::GetMeshURI() const
+std::string MeshShape::GetMeshURI() const
 {
   return this->sdf->GetValueString("uri");
 }
 
 //////////////////////////////////////////////////
-void TrimeshShape::SetFilename(const std::string &_filename)
+void MeshShape::SetFilename(const std::string &_filename)
 {
   this->SetMesh(_filename);
 }
 
 //////////////////////////////////////////////////
-void TrimeshShape::SetMesh(const std::string &_uri,
+void MeshShape::SetMesh(const std::string &_uri,
                            const std::string &_submesh,
                            bool _center)
 {
-  if (_uri.find("://") == std::string::npos)
-  {
-    gzerr << "Invalid URI[" << _uri
-          << "]. Must use a URI, like file://" << _uri << "\n";
-    return;
-  }
-
   this->sdf->GetElement("uri")->Set(_uri);
-  this->sdf->GetElement("submesh")->GetElement("name")->Set(_submesh);
-  this->sdf->GetElement("submesh")->GetElement("center")->Set(_center);
+
+  if (!_submesh.empty())
+  {
+    this->sdf->GetElement("submesh")->GetElement("name")->Set(_submesh);
+    this->sdf->GetElement("submesh")->GetElement("center")->Set(_center);
+  }
 
   this->Init();
 }
 
 //////////////////////////////////////////////////
-void TrimeshShape::FillMsg(msgs::Geometry &_msg)
+void MeshShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::MESH);
   _msg.mutable_mesh()->CopyFrom(msgs::MeshFromSDF(this->sdf));
 }
 
 //////////////////////////////////////////////////
-void TrimeshShape::ProcessMsg(const msgs::Geometry &_msg)
+void MeshShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetScale(msgs::Convert(_msg.mesh().scale()));
   this->SetMesh(_msg.mesh().filename(),

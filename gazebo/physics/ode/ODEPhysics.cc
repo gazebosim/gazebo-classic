@@ -57,7 +57,7 @@
 #include "gazebo/physics/ode/ODESphereShape.hh"
 #include "gazebo/physics/ode/ODECylinderShape.hh"
 #include "gazebo/physics/ode/ODEPlaneShape.hh"
-#include "gazebo/physics/ode/ODETrimeshShape.hh"
+#include "gazebo/physics/ode/ODEMeshShape.hh"
 #include "gazebo/physics/ode/ODEMultiRayShape.hh"
 #include "gazebo/physics/ode/ODEHeightmapShape.hh"
 
@@ -501,7 +501,7 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
   else if (_type == "multiray")
     shape.reset(new ODEMultiRayShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
-    shape.reset(new ODETrimeshShape(collision));
+    shape.reset(new ODEMeshShape(collision));
   else if (_type == "heightmap")
     shape.reset(new ODEHeightmapShape(collision));
   else if (_type == "map" || _type == "image")
@@ -784,8 +784,8 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
     if (collision1 && collision2)
     {
       // Add either a tri-mesh collider or a regular collider.
-      if (collision1->HasType(Base::TRIMESH_SHAPE) ||
-          collision2->HasType(Base::TRIMESH_SHAPE))
+      if (collision1->HasType(Base::MESH_SHAPE) ||
+          collision2->HasType(Base::MESH_SHAPE))
         self->AddTrimeshCollider(collision1, collision2);
       else
       {

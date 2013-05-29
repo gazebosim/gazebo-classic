@@ -222,6 +222,15 @@ void ContactManager::PublishContacts()
 
 /////////////////////////////////////////////////
 std::string ContactManager::CreateFilter(const std::string &_name,
+    const std::string &_collision)
+{
+  std::vector<std::string> collisions;
+  collisions.push_back(_collision);
+  return this->CreateFilter(_name, collisions);
+}
+
+/////////////////////////////////////////////////
+std::string ContactManager::CreateFilter(const std::string &_name,
     const std::vector<std::string> &_collisions)
 {
   if (_collisions.empty())

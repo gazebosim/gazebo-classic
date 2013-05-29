@@ -23,6 +23,7 @@
 #define _JOINT_HH_
 
 #include <string>
+#include <vector>
 
 #include <boost/any.hpp>
 

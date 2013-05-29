@@ -12,7 +12,7 @@
       <pose>0 0 -0.8 0 0 0</pose>
       <static>false</static>
       <link name="link">
-        <pose>0 0 1.0 0 0 0</pose>
+        <pose>0 0 1.5 0 0 0</pose>
         <gravity>false</gravity>
 
         <sensor name="sonar" type="sonar">

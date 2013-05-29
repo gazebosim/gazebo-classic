@@ -180,12 +180,11 @@ void Joint::LoadImpl(const math::Pose &_pose)
         this->sensors.push_back(sensorName);
       }
       else
-        gzerr << "A joint cannot load a [" << 
+        gzerr << "A joint cannot load a [" <<
           sensorElem->GetValueString("type") << "] sensor.\n";
       sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -413,7 +412,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
     sensors::SensorPtr sensor = sensors::get_sensor(*iter);
     if (sensor)
     {
-      msgs::Sensor *sensorMsg =_msg.add_sensor(); 
+      msgs::Sensor *sensorMsg =_msg.add_sensor();
       sensor->FillMsg(*sensorMsg);
     }
   }

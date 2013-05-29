@@ -155,7 +155,7 @@ void Link::Load(sdf::ElementPtr _sdf)
       /// a force torque sensor. We should make this more generic.
       if (sensorElem->GetValueString("type") == "force_torque")
       {
-        gzerr << "A link cannot load a [" << 
+        gzerr << "A link cannot load a [" <<
           sensorElem->GetValueString("type") << "] sensor.\n";
       }
       else

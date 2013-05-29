@@ -90,22 +90,37 @@ void ForceTorqueSensor::Fini()
 }
 
 //////////////////////////////////////////////////
+math::Vector3 ForceTorqueSensor::GetForce() const
+{
+  return msgs::Convert(this->wrenchMsg.wrench().force());
+}
+
+//////////////////////////////////////////////////
+math::Vector3 ForceTorqueSensor::GetTorque() const
+{
+  return msgs::Convert(this->wrenchMsg.wrench().torque());
+}
+
+//////////////////////////////////////////////////
 void ForceTorqueSensor::UpdateImpl(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  msgs::WrenchStamped msg;
 
   this->lastMeasurementTime = this->world->GetSimTime();
-  msgs::Set(msg.mutable_time(), this->lastMeasurementTime);
+  msgs::Set(this->wrenchMsg.mutable_time(), this->lastMeasurementTime);
 
   physics::JointWrench wrench = this->parentJoint->GetForceTorque(0u);
 
   // Get the force and torque in the parent frame.
-  msgs::Set(msg.mutable_wrench()->mutable_force(), wrench.body2Force);
-  msgs::Set(msg.mutable_wrench()->mutable_torque(), wrench.body2Torque);
+  msgs::Set(this->wrenchMsg.mutable_wrench()->mutable_force(),
+      wrench.body2Force);
+  msgs::Set(this->wrenchMsg.mutable_wrench()->mutable_torque(),
+      wrench.body2Torque);
+
+  this->update(this->wrenchMsg);
 
   if (this->wrenchPub)
-    this->wrenchPub->Publish(msg);
+    this->wrenchPub->Publish(this->wrenchMsg);
 }
 
 //////////////////////////////////////////////////

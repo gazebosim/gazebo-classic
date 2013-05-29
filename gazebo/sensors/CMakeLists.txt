@@ -41,6 +41,8 @@ set (gtest_sources
   RaySensor_TEST.cc
   ImuSensor_TEST.cc
   Sensor_TEST.cc
+  SonarSensor_TEST.cc
+  ForceTorqueSensor_TEST.cc
 )
 
 gz_build_tests(${gtest_sources})

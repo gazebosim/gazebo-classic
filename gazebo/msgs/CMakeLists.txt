@@ -53,6 +53,7 @@ set (msgs
   planegeom.proto
   pid.proto
   plugin.proto
+  pointcloud.proto
   pose.proto
   pose_animation.proto
   pose_stamped.proto

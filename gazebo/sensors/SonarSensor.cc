@@ -75,33 +75,37 @@ void SonarSensor::Load(const std::string &_worldName)
     return;
   }
 
-  double min = sonarElem->GetValueDouble("min");
-  double max = sonarElem->GetValueDouble("max");
-  double radius = sonarElem->GetValueDouble("radius");
+  this->rangeMin = sonarElem->GetValueDouble("min");
+  this->rangeMax = sonarElem->GetValueDouble("max");
+  this->radius = sonarElem->GetValueDouble("radius");
+  double range = this->rangeMax - this->rangeMin;
 
-  if (radius < 0)
+  if (this->radius < 0)
   {
-    gzerr << "Sonar radius must be > 0. Current value is[" << radius << "]\n";
+    gzerr << "Sonar radius must be > 0. Current value is["
+      << this->radius << "]\n";
     return;
   }
 
-  if (min < 0)
+  if (this->rangeMin < 0)
   {
-    gzerr << "Min sonar range must be >= 0. Current value is[" << min << "]\n";
+    gzerr << "Min sonar range must be >= 0. Current value is["
+      << this->rangeMin << "]\n";
     return;
   }
 
-  if (min > max)
+  if (this->rangeMin > this->rangeMax)
   {
-    gzerr << "Min sonar range of [" << min << "] must be less than"
-      << "the max sonar range of[" << max << "]\n";
+    gzerr << "Min sonar range of [" << this->rangeMin << "] must be less than"
+      << "the max sonar range of[" << this->rangeMax << "]\n";
     return;
   }
 
-  if (max < min)
+  if (this->rangeMax < this->rangeMin)
   {
-    gzerr << "Max sonar range of [" << max << "] must be greater than"
-      << "the min sonar range of[" << min << "]\n";
+    gzerr << "Max sonar range of [" << this->rangeMax
+      << "] must be greater than"
+      << "the min sonar range of[" << this->rangeMin << "]\n";
     return;
   }
 
@@ -137,49 +141,54 @@ void SonarSensor::Load(const std::string &_worldName)
   GZ_ASSERT(this->sonarShape != NULL,
       "Unable to get the sonar shape from the sonar collision.");
 
-  this->sonarMsg.mutable_sonar()->set_range_min(min);
-  this->sonarMsg.mutable_sonar()->set_range_max(max);
-  this->sonarMsg.mutable_sonar()->set_radius(radius);
-
+  // Use a scaled cone mesh for the sonar collision shape.
   this->sonarShape->SetMesh("unit_cone");
-  this->sonarShape->SetScale(math::Vector3(max-min, max-min, radius*2.0));
+  this->sonarShape->SetScale(math::Vector3(this->radius*2.0,
+        this->radius*2.0, range));
 
-  // this->sonarShape->SetRadius(radius);
-  // this->sonarShape->SetLength(max - min);
-
-  math::Vector3 offset(0, 0, (max - min) * 0.5);
+  // Position the collision shape properly. Without this, the shape will be
+  // centered at the start of the sonar.
+  math::Vector3 offset(0, 0, range * 0.5);
   offset = this->pose.rot.RotateVector(offset);
-
   this->sonarMidPose.Set(this->pose.pos - offset, this->pose.rot);
-
-  std::vector<std::string> collisions;
-  collisions.push_back(this->sonarCollision->GetScopedName());
-
-  physics::ContactManager *contactMgr =
-    this->world->GetPhysicsEngine()->GetContactManager();
-
-  std::string topic = contactMgr->CreateFilter(
-      this->sonarCollision->GetScopedName(), collisions);
-
-  if (!this->contactSub)
-  {
-    this->contactSub = this->node->Subscribe(topic,
-        &SonarSensor::OnContacts, this);
-  }
 
   this->sonarCollision->SetRelativePose(this->sonarMidPose);
   this->sonarCollision->SetInitialRelativePose(this->sonarMidPose);
 
+  // Don't create contacts when objects collide with the sonar shape
   this->sonarCollision->GetSurface()->collideWithoutContact = true;
   this->sonarCollision->GetSurface()->collideWithoutContactBitmask = 1;
   this->sonarCollision->SetCollideBits(~GZ_SENSOR_COLLIDE);
   this->sonarCollision->SetCategoryBits(GZ_SENSOR_COLLIDE);
 
+  /*std::vector<std::string> collisions;
+  collisions.push_back(this->sonarCollision->GetScopedName());
+
+  physics::ContactManager *contactMgr =
+    this->world->GetPhysicsEngine()->GetContactManager();
+    */
+
+  // Create a contact topic for the collision shape
+  std::string topic =
+    this->world->GetPhysicsEngine()->GetContactManager()->CreateFilter(
+        this->sonarCollision->GetScopedName(),
+        this->sonarCollision->GetScopedName());
+
+  // Subscribe to the contact topic
+  this->contactSub = this->node->Subscribe(topic,
+      &SonarSensor::OnContacts, this);
+
+  // Advertise the sensor's topic on which we will output range data.
+  this->sonarPub = this->node->Advertise<msgs::SonarStamped>(this->GetTopic());
+
+  // Initialize the message that will be published on this->sonarPub.
+  this->sonarMsg.mutable_sonar()->set_range_min(this->rangeMin);
+  this->sonarMsg.mutable_sonar()->set_range_max(this->rangeMax);
+  this->sonarMsg.mutable_sonar()->set_radius(this->radius);
+
   msgs::Set(this->sonarMsg.mutable_sonar()->mutable_world_pose(),
       this->sonarMidPose);
   this->sonarMsg.mutable_sonar()->set_range(0);
-
-  this->sonarPub = this->node->Advertise<msgs::SonarStamped>(this->GetTopic());
 }
 
 //////////////////////////////////////////////////
@@ -197,7 +206,26 @@ void SonarSensor::Init()
 void SonarSensor::Fini()
 {
   this->sonarPub.reset();
+  this->contactSub.reset();
   Sensor::Fini();
+}
+
+//////////////////////////////////////////////////
+double SonarSensor::GetRangeMin() const
+{
+  return this->rangeMin;
+}
+
+//////////////////////////////////////////////////
+double SonarSensor::GetRangeMax() const
+{
+  return this->rangeMax;
+}
+
+//////////////////////////////////////////////////
+double SonarSensor::GetRadius() const
+{
+  return this->radius;
 }
 
 //////////////////////////////////////////////////
@@ -229,7 +257,7 @@ void SonarSensor::UpdateImpl(bool /*_force*/)
       // Debug output:
       // std::cout << "Collision1[" << (*iter)->contact(i).collision1() << "]"
       //  << "C2[" << (*iter)->contact(i).collision2() << "]\n";
-      
+
       this->sonarMsg.mutable_sonar()->set_range(-1);
 
       for (int j = 0; j < (*iter)->contact(i).position_size(); ++j)
@@ -255,6 +283,8 @@ void SonarSensor::UpdateImpl(bool /*_force*/)
 
   // Clear the incoming contact list.
   this->incomingContacts.clear();
+
+  this->update(this->sonarMsg);
 
   if (this->sonarPub)
     this->sonarPub->Publish(this->sonarMsg);

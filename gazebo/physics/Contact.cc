@@ -165,7 +165,7 @@ void Contact::FillMsg(msgs::Contact &_msg) const
     jntWrench->set_body_1_id(this->collision1->GetId());
     jntWrench->set_body_2_name(this->collision2->GetScopedName());
     jntWrench->set_body_2_id(this->collision2->GetId());
-   
+
     msgs::Wrench *wrenchMsg =  jntWrench->mutable_body_1_wrench();
     msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body1Force);
     msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body1Torque);
