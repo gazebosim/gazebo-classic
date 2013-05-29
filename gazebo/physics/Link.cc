@@ -660,15 +660,17 @@ void Link::RemoveChildJoint(const std::string &_jointName)
 //////////////////////////////////////////////////
 void Link::FillMsg(msgs::Link &_msg)
 {
+  math::Pose relPose = this->GetRelativePose();
+
   _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
   _msg.set_self_collide(this->GetSelfCollide());
   _msg.set_gravity(this->GetGravityMode());
   _msg.set_kinematic(this->GetKinematic());
   _msg.set_enabled(this->GetEnabled());
-  msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
+  msgs::Set(_msg.mutable_pose(), relPose);
 
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
+  msgs::Set(this->visualMsg->mutable_pose(), relPose);
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   _msg.mutable_inertial()->set_mass(this->inertial->GetMass());
@@ -681,13 +683,13 @@ void Link::FillMsg(msgs::Link &_msg)
   msgs::Set(_msg.mutable_inertial()->mutable_pose(), this->inertial->GetPose());
 
   for (Collision_V::iterator iter = this->collisions.begin();
-       iter != this->collisions.end(); ++iter)
+      iter != this->collisions.end(); ++iter)
   {
     (*iter)->FillMsg(*_msg.add_collision());
   }
 
   for (std::vector<std::string>::iterator iter = this->sensors.begin();
-       iter != this->sensors.end(); ++iter)
+      iter != this->sensors.end(); ++iter)
   {
     sensors::SensorPtr sensor = sensors::get_sensor(*iter);
     if (sensor)
@@ -699,7 +701,7 @@ void Link::FillMsg(msgs::Link &_msg)
     this->ParseVisuals();
 
   for (Visuals_M::iterator iter = this->visuals.begin();
-       iter != this->visuals.end(); ++iter)
+      iter != this->visuals.end(); ++iter)
   {
     msgs::Visual *vis = _msg.add_visual();
     vis->CopyFrom(iter->second);

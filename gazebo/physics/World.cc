@@ -1391,18 +1391,23 @@ void World::ProcessModelMsgs()
     {
       model->ProcessMsg(*iter);
 
+      // May 30, 2013: The following code was removed because it has a
+      // major performance impact when dragging complex object via the GUI.
+      // This code also does not seem to be necessary, since can just
+      // publish the incoming changes instead of a full model message. We
+      // are leaving it temporarily in case we find a need for it.
+      //
       // Let all other subscribers know about the change
-      msgs::Model msg;
-      model->FillMsg(msg);
+      // msgs::Model msg;
+      // model->FillMsg(msg);
+      // // FillMsg fills the visual components from initial sdf
+      // // but problem is that Visuals may have changed e.g. through ~/visual,
+      // // so don't publish them to subscribers.
+      // msg.clear_visual();
+      // for (int i = 0; i < msg.link_size(); ++i)
+      //   msg.mutable_link(i)->clear_visual();
 
-      // FillMsg fills the visual components from initial sdf
-      // but problem is that Visuals may have changed e.g. through ~/visual,
-      // so don't publish them to subscribers.
-      msg.clear_visual();
-      for (int i = 0; i < msg.link_size(); ++i)
-        msg.mutable_link(i)->clear_visual();
-
-      this->modelPub->Publish(msg);
+      this->modelPub->Publish(*iter);
     }
   }
   if (this->modelMsgs.size())
