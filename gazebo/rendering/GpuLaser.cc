@@ -39,7 +39,6 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/GpuLaser.hh"
 
 using namespace gazebo;
@@ -413,7 +412,6 @@ void GpuLaser::RenderImpl()
       this->sceneNode->roll(Ogre::Radian(this->cameraYaws[3]));
 
   sceneMgr->removeRenderObjectListener(this);
-
 
   double firstPassDur = firstPassTimer.GetElapsed().Double();
   secondPassTimer.Start();
