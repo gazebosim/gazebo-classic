@@ -83,7 +83,7 @@ TEST_F(HeightmapTest, PhysicsLoad)
 }
 
 /////////////////////////////////////////////////
-// 
+//
 // Disabled: segfaults ocassionally
 // See https://bitbucket.org/osrf/gazebo/issue/521 for details
 
