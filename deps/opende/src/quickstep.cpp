@@ -785,17 +785,14 @@ static void ComputeRows(
         // compute lambda and clamp it to [lo,hi].
         // @@@ SSE not a win here
 #if 1
-        dReal new_lambda = old_lambda+ delta_precon;
-        if (new_lambda < lo_act) {
+        lambda[index] = old_lambda+ delta_precon;
+        if (lambda[index] < lo_act) {
           delta_precon = lo_act-old_lambda;
           lambda[index] = lo_act;
         }
-        else if (new_lambda > hi_act) {
+        else if (lambda[index] > hi_act) {
           delta_precon = hi_act-old_lambda;
           lambda[index] = hi_act;
-        }
-        else {
-          lambda[index] = new_lambda;
         }
 #else
         dReal nl = old_lambda+ delta_precon;
@@ -833,7 +830,7 @@ static void ComputeRows(
           //      but given that J is already scaled by Ad_i, we don't have
           //      to do it explicitly here
 
-          // FOR erp throttled by info.c_v_max or info.c
+          // delta: erp throttled by info.c_v_max or info.c
           delta =
 #ifdef PENETRATION_JVERROR_CORRECTION
                  Jvnew_final +
@@ -844,9 +841,7 @@ static void ComputeRows(
           if (caccel_ptr2)
             delta -= dot6(caccel_ptr2, J_ptr + 6);
 
-          // for the unthrottled _erp version
-          // if rhs equals rhs_erp, two solutions are the same.
-          // otherwise, compute second set of solutions for rhs with custom erp
+          // delta_erp: unthrottled version compute for rhs with custom erp
           // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
           delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
           delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
@@ -862,12 +857,13 @@ static void ComputeRows(
           // already been computed.
           dReal hi_act, lo_act;
           dReal hi_act_erp, lo_act_erp;
-          if (findex[index] >= 0) {
+          int normal_index = findex[index];
+          if (normal_index >= 0) {
             // FOR erp throttled by info.c_v_max or info.c
-            hi_act = dFabs (hi[index] * lambda[findex[index]]);
+            hi_act = dFabs (hi[index] * lambda[normal_index]);
             lo_act = -hi_act;
             // for the unthrottled _erp version
-            hi_act_erp = dFabs (hi[index] * lambda_erp[findex[index]]);
+            hi_act_erp = dFabs (hi[index] * lambda_erp[normal_index]);
             lo_act_erp = -hi_act_erp;
           } else {
             // FOR erp throttled by info.c_v_max or info.c
@@ -882,31 +878,25 @@ static void ComputeRows(
           // @@@ SSE not a win here
   #if 1
           // FOR erp throttled by info.c_v_max or info.c
-          dReal new_lambda = old_lambda + delta;
-          if (new_lambda < lo_act) {
+          lambda[index] = old_lambda + delta;
+          if (lambda[index] < lo_act) {
             delta = lo_act-old_lambda;
             lambda[index] = lo_act;
           }
-          else if (new_lambda > hi_act) {
+          else if (lambda[index] > hi_act) {
             delta = hi_act-old_lambda;
             lambda[index] = hi_act;
           }
-          else {
-            lambda[index] = new_lambda;
-          }
 
           // for the unthrottled _erp version
-          dReal new_lambda_erp = old_lambda_erp + delta_erp;
-          if (new_lambda_erp < lo_act_erp) {
+          lambda_erp[index] = old_lambda_erp + delta_erp;
+          if (lambda_erp[index] < lo_act_erp) {
             delta_erp = lo_act_erp-old_lambda_erp;
             lambda_erp[index] = lo_act_erp;
           }
-          else if (new_lambda_erp > hi_act_erp) {
+          else if (lambda_erp[index] > hi_act_erp) {
             delta_erp = hi_act_erp-old_lambda_erp;
             lambda_erp[index] = hi_act_erp;
-          }
-          else {
-            lambda_erp[index] = new_lambda_erp;
           }
   #else
           // FOR erp throttled by info.c_v_max or info.c
@@ -1178,9 +1168,9 @@ static void SOR_LCP (dxWorldProcessContext *context,
     dRealPtr J_ptr = J;
     for (int i=0; i<m; J_ptr += 12, iMJ_ptr += 12, i++) {
       dReal sum = 0;
-      for (int j=0; j<6; j++) sum += iMJ_ptr[j] * J_ptr[j];
+      sum += dot6(iMJ_ptr, J_ptr);
       if (jb[i*2+1] >= 0) {
-        for (int k=6; k<12; k++) sum += iMJ_ptr[k] * J_ptr[k];
+        sum += dot6(iMJ_ptr+6, J_ptr+6);
       }
       if (findex[i] < 0)
         Ad[i] = sor_w / (sum + cfm[i]);
@@ -1204,9 +1194,9 @@ static void SOR_LCP (dxWorldProcessContext *context,
       dRealPtr J_ptr = J;
       for (int i=0; i<m; J_ptr += 12, i++) {
         dReal sum = 0;
-        for (int j=0; j<6; j++) sum += J_ptr[j] * J_ptr[j];
+        sum += dot6(J_ptr, J_ptr);
         if (jb[i*2+1] >= 0) {
-          for (int k=6; k<12; k++) sum += J_ptr[k] * J_ptr[k];
+          sum += dot6(J_ptr+6, J_ptr+6);
         }
         if (findex[i] < 0)
           Ad_precon[i] = sor_w / (sum + cfm[i]);
