@@ -872,7 +872,7 @@ static void ComputeRows(
             hi_act = dFabs (hi[index] * lambda[normal_index]);
             lo_act = -hi_act;
             // for the unthrottled _erp version
-            hi_act_erp = dFabs (hi[index] * lambda_erp[findex[index]]);
+            hi_act_erp = dFabs (hi[index] * lambda_erp[normal_index]);
             lo_act_erp = -hi_act_erp;
           } else {
             // FOR erp throttled by info.c_v_max or info.c
