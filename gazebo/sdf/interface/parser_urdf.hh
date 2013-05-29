@@ -151,17 +151,9 @@ namespace urdf2gazebo
     // visual
     private: std::string material;
 
-    private: std::string fdir1;
-
     // for reducing fixed joints and removing links
     private: std::string oldLinkName;
     private: gazebo::math::Pose reductionTransform;
-
-    // blobs into body or robot
-    private: std::vector<TiXmlElement*> blobs;
-
-    // visual
-    private: std::string material;
 
     // body, default off
     private: bool setStaticFlag;
