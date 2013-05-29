@@ -24,6 +24,7 @@ set (plugins
   ForceTorquePlugin
   ModelTrajectoryTestPlugin
   MudPlugin
+  PressurePlugin
   RayPlugin
   RubblePlugin
   SpringTestPlugin
