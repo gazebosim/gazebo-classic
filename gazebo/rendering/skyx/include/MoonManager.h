@@ -132,6 +132,18 @@ namespace SkyX
       return mCreated;
     }
 
+    void setVisible(bool _visible)
+    {
+      this->mVisible = _visible;
+      this->mMoonSceneNode->setVisible(_visible);
+    }
+
+    void setEnabled(bool _enabled)
+    {
+      bool visible = _enabled ? mVisible : false;
+      this->mMoonSceneNode->setVisible(visible);
+    }
+
   private:
     /** Update moon bounds
         @param c Camera
@@ -158,6 +170,9 @@ namespace SkyX
 
     /// Moon material
     Ogre::MaterialPtr mMoonMaterial;
+
+    /// True if visible
+    bool mVisible;
   };
 }
 

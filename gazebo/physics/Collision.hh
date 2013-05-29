@@ -229,6 +229,9 @@ namespace gazebo
 
       /// \brief Stores collision state information.
       private: CollisionState state;
+
+      /// \brief Number of contact points allowed for this collision.
+      private: int maxContacts;
     };
     /// \}
   }

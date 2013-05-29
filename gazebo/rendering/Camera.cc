@@ -153,8 +153,6 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   this->lastRenderWallTime = common::Time::GetWallTime();
 
-  this->displayClouds = true;
-
   // Set default render rate to unlimited
   this->SetRenderRate(0.0);
 }
@@ -392,38 +390,22 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
-    // FIXME: Disable clouds in offscreen rendering for now until they can
-    // be rendered properly
-    this->displayClouds = this->GetScene()->GetShowClouds();
-
-    if (this->renderTexture)
-      this->GetScene()->ShowClouds(false);
-
     // Render, but don't swap buffers.
     this->renderTarget->update(false);
-    this->lastRenderWallTime = common::Time::GetWallTime();
 
-    if (this->renderTexture)
-      this->GetScene()->ShowClouds(this->displayClouds);
+    this->ReadPixelBuffer();
+
+    this->lastRenderWallTime = common::Time::GetWallTime();
   }
 }
 
 //////////////////////////////////////////////////
-common::Time Camera::GetLastRenderWallTime()
-{
-  return this->lastRenderWallTime;
-}
-
-//////////////////////////////////////////////////
-void Camera::PostRender()
+void Camera::ReadPixelBuffer()
 {
   this->renderTarget->swapBuffers();
 
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
-    if (this->renderTexture)
-      this->GetScene()->ShowClouds(false);
-
     size_t size;
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
@@ -465,8 +447,14 @@ void Camera::PostRender()
       Ogre::Viewport *vp = rtt->addViewport(this->camera);
       vp->setClearEveryFrame(true);
       vp->setShadowsEnabled(true);
+      vp->setShadowsEnabled(true);
+      vp->setOverlaysEnabled(false);
     }
-    this->renderTexture->getBuffer()->getRenderTarget()->update();
+
+    // This update is only needed for client side data captures
+    if (this->renderTexture->getBuffer()->getRenderTarget()
+        != this->renderTarget)
+      this->renderTexture->getBuffer()->getRenderTarget()->update();
 
     // The code below is equivalent to
     // this->viewport->getTarget()->copyContentsToMemory(box);
@@ -480,7 +468,20 @@ void Camera::PostRender()
     // pixels from buffer into memory.
     this->viewport->getTarget()->copyContentsToMemory(box);
 #endif
+  }
+}
 
+//////////////////////////////////////////////////
+common::Time Camera::GetLastRenderWallTime()
+{
+  return this->lastRenderWallTime;
+}
+
+//////////////////////////////////////////////////
+void Camera::PostRender()
+{
+  if (this->newData && (this->captureData || this->captureDataOnce))
+  {
     if (this->captureDataOnce)
     {
       this->SaveFrame(this->GetFrameFilename());
@@ -493,6 +494,8 @@ void Camera::PostRender()
       this->SaveFrame(this->GetFrameFilename());
     }
 
+    unsigned int width = this->GetImageWidth();
+    unsigned int height = this->GetImageHeight();
     const unsigned char *buffer = this->saveFrameBuffer;
 
     // do last minute conversion if Bayer pattern is requested, go from R8G8B8
@@ -512,10 +515,7 @@ void Camera::PostRender()
     }
 
     this->newImageFrame(buffer, width, height, this->GetImageDepth(),
-                    this->GetImageFormat());
-
-    if (this->renderTexture)
-      this->GetScene()->ShowClouds(this->displayClouds);
+        this->GetImageFormat());
   }
 
   this->newData = false;
@@ -1205,8 +1205,8 @@ void Camera::CreateRenderTexture(const std::string &textureName)
       0,
       (Ogre::PixelFormat)this->imageFormat,
       Ogre::TU_RENDERTARGET)).getPointer();
-
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
+
   this->initialized = true;
 }
 
@@ -1262,6 +1262,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport = this->renderTarget->addViewport(this->camera);
     this->viewport->setClearEveryFrame(true);
     this->viewport->setShadowsEnabled(true);
+    this->viewport->setOverlaysEnabled(false);
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 

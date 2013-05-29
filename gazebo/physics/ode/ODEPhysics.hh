@@ -322,6 +322,9 @@ namespace gazebo
 
       /// \brief Indices used during creation of contact joints.
       private: int indices[MAX_CONTACT_JOINTS];
+
+      /// \brief Maximum number of contact points per collision pair.
+      private: int maxContacts;
     };
   }
 }

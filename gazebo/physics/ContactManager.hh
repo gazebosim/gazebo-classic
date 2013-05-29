@@ -40,8 +40,14 @@ namespace gazebo
       /// \brief Contact message publisher
       public: transport::PublisherPtr publisher;
 
-      /// \brief Names of collisions monitored by contact manager for contacts.
-      public: boost::unordered_set<std::string> collisions;
+      /// \brief Pointers of collisions monitored by contact manager for
+      /// contacts.
+      public: boost::unordered_set<Collision *> collisions;
+
+      /// \internal
+      /// \brief Names of collisions passed in by CreateFilter. Cleared
+      /// once converted to pointers.
+      public: std::vector<std::string> collisionNames;
 
       /// \brief A list of contacts associated to the collisions.
       public: std::vector<Contact *> contacts;

@@ -435,7 +435,8 @@ bool LogRecord::GetFirstUpdate() const
 //////////////////////////////////////////////////
 void LogRecord::Notify()
 {
-  this->updateCondition.notify_all();
+  if (this->running)
+    this->updateCondition.notify_all();
 }
 
 //////////////////////////////////////////////////
@@ -655,7 +656,7 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
 
   // Make sure the file does not exist
   if (boost::filesystem::exists(this->completePath))
-    gzwarn << "Filename[" + this->completePath.string() + "], already exists."
+    gzlog << "Filename[" + this->completePath.string() + "], already exists."
       << " The log file will be overwritten.\n";
 
   std::ostringstream stream;
@@ -712,7 +713,7 @@ void LogRecord::OnLogControl(ConstLogControlPtr &_data)
   if (_data->has_base_path() && !_data->base_path().empty())
     this->SetBasePath(_data->base_path());
 
-  std::string msgEncoding = "bz2";
+  std::string msgEncoding = "zlib";
   if (_data->has_encoding())
     msgEncoding = _data->encoding();
 
