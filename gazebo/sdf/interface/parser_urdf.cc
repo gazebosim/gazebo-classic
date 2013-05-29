@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <string>
 
+#include "gazebo/common/Common.hh"
 #include "gazebo/common/SystemPaths.hh"
 
 namespace urdf2gazebo
@@ -33,6 +34,40 @@ std::string lowerStr(std::string str)
   std::string out = str;
   std::transform(out.begin(), out.end(), out.begin(), ::tolower);
   return out;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string find_file(const std::string &_filename)
+{
+  std::string result = _filename;
+
+  if (_filename[0] == '/')
+    result = gazebo::common::find_file(_filename, false);
+  else
+  {
+    std::string tmp = std::string("sdf/") + sdf::SDF::version + "/" + _filename;
+    result = gazebo::common::find_file(tmp, false);
+  }
+
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool init_sdf(sdf::SDFPtr _sdf)
+{
+  bool result = false;
+
+  std::string filename;
+  filename = find_file("root.sdf");
+
+  FILE *ftest = fopen(filename.c_str(), "r");
+  if (ftest && initFile(filename, _sdf))
+  {
+    result = true;
+    fclose(ftest);
+  }
+
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

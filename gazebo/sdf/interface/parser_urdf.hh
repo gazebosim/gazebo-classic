@@ -96,10 +96,10 @@ namespace urdf2gazebo
     };
 
     private: GazeboExtension(const GazeboExtension &ge)
-             : material(ge.material), fdir1(ge.fdir1),
+             : material(ge.material),
              oldLinkName(ge.oldLinkName),
              reductionTransform(ge.reductionTransform),
-             blobs(ge.blobs)
+             fdir1(ge.fdir1), blobs(ge.blobs)
     {
       material = ge.material;
       setStaticFlag = ge.setStaticFlag;
@@ -108,7 +108,6 @@ namespace urdf2gazebo
       isMaxContacts = ge.isMaxContacts;
       isMaxVel = ge.isMaxVel;
       isMinDepth = ge.isMinDepth;
-      fdir1 = ge.fdir1;
       isMu1 = ge.isMu1;
       isMu2 = ge.isMu2;
       isKp = ge.isKp;
@@ -125,7 +124,6 @@ namespace urdf2gazebo
       isCFMDamping = ge.isCFMDamping;
       provideFeedback = ge.provideFeedback;
       cfmDamping = ge.cfmDamping;
-      oldLinkName = ge.oldLinkName;
       reductionTransform = ge.reductionTransform;
       blobs = ge.blobs;
 
