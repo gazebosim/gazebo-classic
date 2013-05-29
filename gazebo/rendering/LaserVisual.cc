@@ -35,7 +35,6 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
                          const std::string &_topicName)
 : Visual(_name, _vis)
 {
-  std::cout << "NewLaserVisual[" << _name << "]\n";
   this->receivedMsg = false;
 
   this->node = transport::NodePtr(new transport::Node());

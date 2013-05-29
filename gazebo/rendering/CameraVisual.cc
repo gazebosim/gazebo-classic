@@ -39,7 +39,6 @@ CameraVisual::~CameraVisual()
   if (this->scene)
     this->scene->RemoveCamera(this->camera->GetName());
 
-  std::cout << "UseCount[" << this->camera.use_count() << "]\n";
   this->camera.reset();
 }
 
