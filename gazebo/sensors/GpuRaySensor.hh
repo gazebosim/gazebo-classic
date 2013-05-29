@@ -197,7 +197,7 @@ namespace gazebo
 
       /// Deprecated
       /// \sa GetRayCountRatio
-      public: double Get1stRatio() const GAZEBO_DEPRECATED;
+      public: double Get1stRatio() const GAZEBO_DEPRECATED(1.3);
 
       /// \brief Return the ratio of horizontal ray count to vertical ray
       /// count.
@@ -209,7 +209,7 @@ namespace gazebo
 
       /// Deprecated
       /// \sa GetRangeCountRatio
-      public: double Get2ndRatio() const GAZEBO_DEPRECATED;
+      public: double Get2ndRatio() const GAZEBO_DEPRECATED(1.3);
 
       /// \brief Return the ratio of horizontal range count to vertical
       /// range count.
@@ -221,14 +221,14 @@ namespace gazebo
 
       /// Deprecated.
       /// \sa GetHorzFOV
-      public: double GetHFOV() const GAZEBO_DEPRECATED;
+      public: double GetHFOV() const GAZEBO_DEPRECATED(1.3);
 
       /// \brief Get the horizontal field of view of the laser sensor.
       /// \return The horizontal field of view of the laser sensor.
       public: double GetHorzFOV() const;
 
       /// Deprecated
-      public: double GetCHFOV() const GAZEBO_DEPRECATED;
+      public: double GetCHFOV() const GAZEBO_DEPRECATED(1.3);
 
       /// \brief Get Cos Horz field-of-view
       /// \return 2 * atan(tan(this->hfov/2) / cos(this->vfov/2))
@@ -236,14 +236,14 @@ namespace gazebo
 
       /// Deprecated
       /// \sa GetVertFOV
-      public: double GetVFOV() const GAZEBO_DEPRECATED;
+      public: double GetVFOV() const GAZEBO_DEPRECATED(1.3);
 
       /// \brief Get the vertical field-of-view.
       public: double GetVertFOV() const;
 
       /// Deprecated
       /// \sa GetCosVertFOV
-      public: double GetCVFOV() const GAZEBO_DEPRECATED;
+      public: double GetCVFOV() const GAZEBO_DEPRECATED(1.3);
 
       /// \brief Get Cos Vert field-of-view
       /// \return 2 * atan(tan(this->vfov/2) / cos(this->hfov/2))
@@ -251,7 +251,7 @@ namespace gazebo
 
       /// Deprecated.
       /// \sa GetHorzHalfAngle
-      public: double GetHAngle() const GAZEBO_DEPRECATED;
+      public: double GetHAngle() const GAZEBO_DEPRECATED(1.3);
 
       /// \brief Get (horizontal_max_angle + horizontal_min_angle) * 0.5
       /// \return (horizontal_max_angle + horizontal_min_angle) * 0.5
@@ -259,7 +259,7 @@ namespace gazebo
 
       /// Deprecated.
       /// \sa GetVertHalfAngle
-      public: double GetVAngle() const GAZEBO_DEPRECATED;
+      public: double GetVAngle() const GAZEBO_DEPRECATED(1.3);
 
       /// \brief Get (vertical_max_angle + vertical_min_angle) * 0.5
       /// \return (vertical_max_angle + vertical_min_angle) * 0.5

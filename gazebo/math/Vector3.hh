@@ -129,13 +129,13 @@ namespace gazebo
       public: double Dot(const Vector3 &_pt) const;
 
       /// \brief Deprecated
-      public: Vector3 GetCrossProd(const Vector3 &_pt) const GAZEBO_DEPRECATED
+      public: Vector3 GetCrossProd(const Vector3 &_pt) const GAZEBO_DEPRECATED(1.2)
       {
         return this->Cross(_pt);
       }
 
       /// \brief Deprecated
-      public: double GetDotProd(const Vector3 &_pt) const GAZEBO_DEPRECATED
+      public: double GetDotProd(const Vector3 &_pt) const GAZEBO_DEPRECATED(1.2)
       {
         return this->Dot(_pt);
       }
