@@ -40,6 +40,7 @@ set (msgs
   laserscan_stamped.proto
   light.proto
   link.proto
+  link_data.proto
   log_control.proto
   log_status.proto
   material.proto
@@ -57,6 +58,7 @@ set (msgs
   pose_stamped.proto
   pose_trajectory.proto
   pose_v.proto
+  poses_stamped.proto
   projector.proto
   publishers.proto
   publish.proto
@@ -82,10 +84,15 @@ set (msgs
   vector3d.proto
   visual.proto
   world_control.proto
-  world_reset.proto 
-  world_stats.proto 
-  world_modify.proto 
+  world_reset.proto
+  world_stats.proto
+  world_modify.proto
 )
+
+set (msgs_tests_sources
+  msgs_TEST.cc
+)
+gz_build_tests(${msgs_tests_sources})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

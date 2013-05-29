@@ -43,6 +43,7 @@ gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
   SensorManager_TEST.cc
+  GpuRaySensor_TEST.cc
 )
 
 gz_build_dri_tests(${gtest_sources_dri})

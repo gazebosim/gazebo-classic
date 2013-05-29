@@ -56,6 +56,7 @@ namespace urdf2gazebo
       setStaticFlag = false;
       gravity = true;
       isDampingFactor = false;
+      isMaxContacts = false;
       isMaxVel = false;
       isMinDepth = false;
       fdir1.clear();
@@ -71,11 +72,12 @@ namespace urdf2gazebo
       isStopKd = false;
       isInitialJointPosition = false;
       isFudgeFactor = false;
-      provideFeedback = false;
-      cfmDamping = false;
+      isProvideFeedback = false;
+      isCFMDamping = false;
       blobs.clear();
 
       dampingFactor = 0;
+      maxContacts = 0;
       maxVel = 0;
       minDepth = 0;
       mu1 = 0;
@@ -89,14 +91,21 @@ namespace urdf2gazebo
       stopKd = 1;
       initialJointPosition = 0;
       fudgeFactor = 1;
+      provideFeedback = false;
+      cfmDamping = false;
     };
 
     private: GazeboExtension(const GazeboExtension &ge)
+             : material(ge.material), fdir1(ge.fdir1),
+             oldLinkName(ge.oldLinkName),
+             reductionTransform(ge.reductionTransform),
+             blobs(ge.blobs)
     {
       material = ge.material;
       setStaticFlag = ge.setStaticFlag;
       gravity = ge.gravity;
       isDampingFactor = ge.isDampingFactor;
+      isMaxContacts = ge.isMaxContacts;
       isMaxVel = ge.isMaxVel;
       isMinDepth = ge.isMinDepth;
       fdir1 = ge.fdir1;
@@ -112,6 +121,8 @@ namespace urdf2gazebo
       isStopErp = ge.isStopErp;
       isInitialJointPosition = ge.isInitialJointPosition;
       isFudgeFactor = ge.isFudgeFactor;
+      isProvideFeedback = ge.isProvideFeedback;
+      isCFMDamping = ge.isCFMDamping;
       provideFeedback = ge.provideFeedback;
       cfmDamping = ge.cfmDamping;
       oldLinkName = ge.oldLinkName;
@@ -119,6 +130,7 @@ namespace urdf2gazebo
       blobs = ge.blobs;
 
       dampingFactor = ge.dampingFactor;
+      maxContacts = ge.maxContacts;
       maxVel = ge.maxVel;
       minDepth = ge.minDepth;
       mu1 = ge.mu1;
@@ -132,11 +144,21 @@ namespace urdf2gazebo
       stopErp = ge.stopErp;
       initialJointPosition = ge.initialJointPosition;
       fudgeFactor = ge.fudgeFactor;
+      provideFeedback = ge.provideFeedback;
+      cfmDamping = ge.cfmDamping;
     };
+
+    // visual
+    private: std::string material;
+
+    private: std::string fdir1;
 
     // for reducing fixed joints and removing links
     private: std::string oldLinkName;
     private: gazebo::math::Pose reductionTransform;
+
+    // blobs into body or robot
+    private: std::vector<TiXmlElement*> blobs;
 
     // visual
     private: std::string material;
@@ -146,7 +168,9 @@ namespace urdf2gazebo
     private: bool gravity;
     private: bool isDampingFactor;
     private: double dampingFactor;
+    private: bool isMaxContacts;
     private: bool isMaxVel;
+    private: int maxContacts;
     private: double maxVel;
     private: bool isMinDepth;
     private: double minDepth;
@@ -162,7 +186,9 @@ namespace urdf2gazebo
     // joint, joint limit dynamics
     private: bool isStopCfm, isStopErp, isStopKp, isStopKd, isInitialJointPosition, isFudgeFactor;
     private: double stopCfm, stopErp, stopKp, stopKd, initialJointPosition, fudgeFactor;
+    private: bool isProvideFeedback;
     private: bool provideFeedback;
+    private: bool isCFMDamping;
     private: bool cfmDamping;
 
     // blobs into body or robot

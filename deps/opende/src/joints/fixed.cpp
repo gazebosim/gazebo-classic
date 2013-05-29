@@ -35,8 +35,9 @@ dxJointFixed::dxJointFixed ( dxWorld *w ) :
 {
     dSetZero ( offset, 4 );
     dSetZero ( qrel, 4 );
-    erp = world->global_erp;
-    cfm = world->global_cfm;
+    // These are now set in dxJoint constructor
+    // erp = world->global_erp;
+    // cfm = world->global_cfm;
 }
 
 
@@ -58,6 +59,20 @@ dxJointFixed::getInfo1 ( dxJoint::Info1 *info )
 void
 dxJointFixed::getInfo2 ( dxJoint::Info2 *info )
 {
+    // If joint values of erp and cfm are negative, then ignore them.
+    // info->erp, info->cfm already have the global values from quickstep
+    if (this->erp >= 0)
+      info->erp = erp;
+    if (this->cfm >= 0)
+    {
+      info->cfm[0] = cfm;
+      info->cfm[1] = cfm;
+      info->cfm[2] = cfm;
+      info->cfm[3] = cfm;
+      info->cfm[4] = cfm;
+      info->cfm[5] = cfm;
+    }
+
     int s = info->rowskip;
 
     // Three rows for orientation
@@ -68,11 +83,6 @@ dxJointFixed::getInfo2 ( dxJoint::Info2 *info )
     info->J1l[0] = 1;
     info->J1l[s+1] = 1;
     info->J1l[2*s+2] = 1;
-
-    info->erp = erp;
-    info->cfm[0] = cfm;
-    info->cfm[1] = cfm;
-    info->cfm[2] = cfm;
 
     dVector3 ofs;
     dMultiply0_331 ( ofs, node[0].body->posr.R, offset );

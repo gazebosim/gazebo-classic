@@ -74,6 +74,9 @@ namespace gazebo
       /// \brief Finalize the ray
       protected: virtual void Fini();
 
+      // Documentation inherited
+      public: virtual std::string GetTopic() const;
+
       /// \brief Returns a pointer to the internally kept rendering::GpuLaser
       /// \return Pointer to GpuLaser
       public: rendering::GpuLaserPtr GetLaserCamera() const
@@ -160,7 +163,7 @@ namespace gazebo
 
       /// \brief Get all the ranges
       /// \param[out] _range A vector that will contain all the range data
-      public: void GetRanges(std::vector<double> &_ranges) const;
+      public: void GetRanges(std::vector<double> &_ranges);
 
       /// \brief Get detected retro (intensity) value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -272,6 +275,9 @@ namespace gazebo
       /// \param[in,out] _conn Connection pointer to disconnect.
       public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn);
 
+      // Documentation inherited
+      public: virtual bool IsActive();
+
       /// \brief Scan SDF elementz.
       protected: sdf::ElementPtr scanElem;
 
@@ -312,7 +318,34 @@ namespace gazebo
       private: boost::mutex mutex;
 
       /// \brief Laser message to publish data.
-      private: msgs::LaserScan laserMsg;
+      private: msgs::LaserScanStamped laserMsg;
+
+      /// \brief Parent entity of gpu ray sensor
+      private: physics::EntityPtr parentEntity;
+
+      /// \brief Publisher to publish ray sensor data
+      private: transport::PublisherPtr scanPub;
+
+      // Which noise type we support
+      private: enum NoiseModelType
+      {
+        NONE,
+        GAUSSIAN
+      };
+
+      // If true, apply the noise model specified by other noise parameters
+      private: bool noiseActive;
+
+      // Which type of noise we're applying
+      private: enum NoiseModelType noiseType;
+
+      // If noiseType==GAUSSIAN, noiseMean is the mean of the distibution
+      // from which we sample
+      private: double noiseMean;
+
+      // If noiseType==GAUSSIAN, noiseStdDev is the standard devation of
+      // the distibution from which we sample
+      private: double noiseStdDev;
     };
     /// \}
   }

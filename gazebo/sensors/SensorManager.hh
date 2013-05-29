@@ -53,7 +53,7 @@ namespace gazebo
 
     /// \brief Monitors simulation time, and notifies conditions when
     /// a specified time has been reached.
-    class SimTimeEventHandler : public SingletonT<SimTimeEventHandler>
+    class SimTimeEventHandler
     {
       /// \brief Constructor
       public: SimTimeEventHandler();
@@ -78,12 +78,6 @@ namespace gazebo
 
       /// \brief The list of events to handle.
       private: std::list<SimTimeEvent*> events;
-
-      /// \brief Get sim time from the world.
-      private: physics::WorldPtr world;
-
-      /// \brief This is a singleton class.
-      private: friend class SingletonT<SimTimeEventHandler>;
 
       /// \brief Connect to the World::UpdateBegin event.
       private: event::ConnectionPtr updateConnection;
@@ -115,7 +109,7 @@ namespace gazebo
 
       /// \brief Deprecated
       /// \sa RunThreads
-      public: void Run() GAZEBO_DEPRECATED;
+      public: void Run() GAZEBO_DEPRECATED(1.5);
 
       /// \brief Run sensor updates in separate threads.
       /// This will only run non-image based sensor updates.
@@ -271,15 +265,14 @@ namespace gazebo
       /// \brief List of sensors that require initialization.
       private: Sensor_V initSensors;
 
+      /// \brief List of sensors that require initialization.
+      private: Sensor_V removeSensors;
+
       /// \brief A vector of SensorContainer pointers.
       private: typedef std::vector<SensorContainer*> SensorContainer_V;
 
       /// \brief The sensor manager's vector of sensor containers.
       private: SensorContainer_V sensorContainers;
-
-      /// \brief A mutex used by SensorContainer and SimTimeEventHandler
-      /// for timing coordination.
-      private: static boost::mutex sensorTimingMutex;
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<SensorManager>;
@@ -287,8 +280,8 @@ namespace gazebo
       /// \brief Allow access to sensorTimeMutex member var.
       private: friend class SensorContainer;
 
-      /// \brief Allow access to sensorTimeMutex member var.
-      private: friend class SimTimeEventHandler;
+      /// \brief Pointer to the sim time event handler.
+      private: SimTimeEventHandler *simTimeEventHandler;
     };
     /// \}
   }

@@ -19,8 +19,6 @@ set (sources
   Exception.cc
   Image.cc
   KeyFrame.cc
-  LogPlay.cc
-  LogRecord.cc
   Material.cc
   Mesh.cc
   MeshLoader.cc
@@ -50,8 +48,6 @@ set (headers
   Exception.hh
   Image.hh
   KeyFrame.hh
-  LogPlay.hh
-  LogRecord.hh
   Material.hh
   Mesh.hh
   MeshLoader.hh
@@ -83,10 +79,10 @@ endif()
 
 set (gtest_sources
   Animation_TEST.cc
+  ColladaLoader_TEST.cc
   Color_TEST.cc
   Console_TEST.cc
   Exception_TEST.cc
-  LogRecord_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
   Image_TEST.cc

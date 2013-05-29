@@ -233,6 +233,9 @@ namespace gazebo
       private: std::deque<std::string> fillTypes;
 
       private: msgs::Light::LightType lightType;
+
+      /// \brief Type of physics engine.
+      private: msgs::Physics_Type physicsType;
     };
 
     class ModelListSheetDelegate: public QItemDelegate

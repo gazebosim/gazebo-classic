@@ -25,6 +25,9 @@
 #include <vector>
 #include <string>
 
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
+
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -371,11 +374,11 @@ namespace gazebo
 
       /// \brief Remove Joints that have this Link as a parent Link.
       /// \param[in] _joint Joint that is a child of this link.
-      public: void RemoveChildJoint(JointPtr _joint) GAZEBO_DEPRECATED;
+      public: void RemoveChildJoint(JointPtr _joint) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Remove Joints that have this Link as a child Link
       /// \param[in] _joint Joint that is a parent of this link.
-      public: void RemoveParentJoint(JointPtr _joint) GAZEBO_DEPRECATED;
+      public: void RemoveParentJoint(JointPtr _joint) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Remove Joints that have this Link as a child Link.
       /// \param[in] _jointName Parent Joint name.
@@ -424,6 +427,13 @@ namespace gazebo
       /// \return Vector of parent Links connected by joints.
       public: Link_V GetParentJointsLinks() const;
 
+      /// \brief Enable/Disable link data publishing
+      /// \param[in] _enable True to enable publishing, false to stop publishing
+      public: void SetPublishData(bool _enable);
+
+      /// \brief Publish timestamped link data such as velocity.
+      private: void PublishData();
+
       /// \brief Load a new collision helper function.
       /// \param[in] _sdf SDF element used to load the collision.
       private: void LoadCollision(sdf::ElementPtr _sdf);
@@ -467,6 +477,21 @@ namespace gazebo
 
       /// \brief All the attached models.
       private: std::vector<ModelPtr> attachedModels;
+
+      /// \brief Link data publisher
+      private: transport::PublisherPtr dataPub;
+
+      /// \brief Link data message
+      private: msgs::LinkData linkDataMsg;
+
+      /// \brief Event connections
+      private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief True to publish data, false otherwise
+      private: bool publishData;
+
+      /// \brief Mutex to protect the publishData variable
+      private: boost::recursive_mutex *publishDataMutex;
     };
     /// \}
   }

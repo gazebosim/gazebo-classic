@@ -125,3 +125,8 @@ endif()
 
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
+
+# unit tests
+set (gtest_sources
+  GpuLaser_TEST.cc)
+gz_build_dri_tests(${gtest_sources})

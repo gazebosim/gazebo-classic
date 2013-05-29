@@ -186,7 +186,7 @@ std::string CylinderMaker::GetSDFString()
   std::ostringstream newModelStr;
 
   newModelStr
-    << "<sdf version ='1.3'>"
+    << "<sdf version ='" << SDF_VERSION << "'>"
     << "  <model name ='unit_cylinder_" << counter << "'>"
     << "    <pose>0 0 0.5 0 0 0</pose>"
     << "    <link name='link'>"
@@ -235,6 +235,3 @@ void CylinderMaker::CreateTheEntity()
   this->makerPub->Publish(msg);
   this->camera.reset();
 }
-
-
-

@@ -98,8 +98,14 @@ void Joint::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string parentName = _sdf->GetValueString("parent");
-  std::string childName = _sdf->GetValueString("child");
+  sdf::ElementPtr parentElem = _sdf->GetElement("parent");
+  sdf::ElementPtr childElem = _sdf->GetElement("child");
+
+  GZ_ASSERT(parentElem, "Parent element is NULL");
+  GZ_ASSERT(childElem, "Child element is NULL");
+
+  std::string parentName = parentElem->GetValueString();
+  std::string childName = childElem->GetValueString();
 
   if (this->model)
   {
@@ -108,10 +114,10 @@ void Joint::Load(sdf::ElementPtr _sdf)
   }
   else
   {
-    this->childLink = boost::shared_dynamic_cast<Link>(
+    this->childLink = boost::dynamic_pointer_cast<Link>(
         this->GetWorld()->GetByName(childName));
 
-    this->parentLink = boost::shared_dynamic_cast<Link>(
+    this->parentLink = boost::dynamic_pointer_cast<Link>(
         this->GetWorld()->GetByName(parentName));
   }
 
@@ -137,9 +143,9 @@ void Joint::LoadImpl(const math::Pose &_pose)
   BasePtr myBase = shared_from_this();
 
   if (this->parentLink)
-    this->parentLink->AddChildJoint(boost::shared_static_cast<Joint>(myBase));
+    this->parentLink->AddChildJoint(boost::static_pointer_cast<Joint>(myBase));
   else if (this->childLink)
-    this->childLink->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
+    this->childLink->AddParentJoint(boost::static_pointer_cast<Joint>(myBase));
   else
     gzthrow("both parent and child link do no exist");
 
@@ -207,36 +213,20 @@ void Joint::Init()
     }
   }
 
-  if (this->parentLink)
-  {
-    math::Pose modelPose = this->parentLink->GetModel()->GetWorldPose();
-
-    // Set joint axis
-    if (this->sdf->HasElement("axis"))
-    {
-      this->SetAxis(0, modelPose.rot.RotateVector(
-            this->sdf->GetElement("axis")->GetValueVector3("xyz")));
-    }
-
-    if (this->sdf->HasElement("axis2"))
-    {
-      this->SetAxis(1, modelPose.rot.RotateVector(
-            this->sdf->GetElement("axis2")->GetValueVector3("xyz")));
-    }
-  }
-  else
-  {
-    // if parentLink is NULL, it's name be the world
+  // Set parent name: if parentLink is NULL, it's name be the world
+  if (!this->parentLink)
     this->sdf->GetElement("parent")->Set("world");
-    if (this->sdf->HasElement("axis"))
-    {
-      this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-    }
-    if (this->sdf->HasElement("axis2"))
-    {
-      this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
-    }
+
+  // Set axis in physics engines
+  if (this->sdf->HasElement("axis"))
+  {
+    this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
   }
+  if (this->sdf->HasElement("axis2"))
+  {
+    this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+  }
+
   this->ComputeInertiaRatio();
 }
 
@@ -493,7 +483,9 @@ double Joint::GetForce(int _index)
 //////////////////////////////////////////////////
 void Joint::ApplyDamping()
 {
-  double dampingForce = -this->dampingCoefficient * this->GetVelocity(0);
+  // Take absolute value of dampingCoefficient, since negative values of
+  // dampingCoefficient are used for adaptive damping to enforce stability.
+  double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
   this->SetForce(0, dampingForce);
 }
 
@@ -565,4 +557,10 @@ double Joint::GetInertiaRatio(unsigned int _index) const
           << "] when trying to get inertia ratio across joint.\n";
     return 0;
   }
+}
+
+//////////////////////////////////////////////////
+double Joint::GetDamping(int /*_index*/)
+{
+  return this->dampingCoefficient;
 }

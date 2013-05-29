@@ -27,6 +27,7 @@
 #include <set>
 #include <deque>
 #include <string>
+#include <boost/thread.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -42,13 +43,6 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
 #include "gazebo/sdf/sdf.hh"
-
-namespace boost
-{
-  class thread;
-  class mutex;
-  class recursive_mutex;
-}
 
 namespace gazebo
 {
@@ -96,7 +90,13 @@ namespace gazebo
       /// \brief Run the world in a thread.
       ///
       /// Run the update loop.
-      public: void Run();
+      /// \param[in] _iterations Run for this many iterations, then stop.
+      /// A value of zero disables run stop.
+      public: void Run(unsigned int _iterations = 0);
+
+      /// \brief Return the running state of the world.
+      /// \return True if the world is running.
+      public: bool GetRunning() const;
 
       /// \brief Stop the world.
       ///
@@ -309,8 +309,8 @@ namespace gazebo
       /// \brief Publish pose updates for a model.
       /// This list of models to publish is processed and cleared once every
       /// iteration.
-      /// \param[in] _modelName Name of the model to publish.
-      public: void PublishModelPose(const std::string &_modelName);
+      /// \param[in] _model Pointer to the model to publish.
+      public: void PublishModelPose(physics::ModelPtr _model);
 
       /// \cond
       /// This is an internal function.
@@ -374,10 +374,6 @@ namespace gazebo
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
 
-      /// \brief Called when a log control message is received.
-      /// \param[in] _data The log control message.
-      private: void OnLogControl(ConstLogControlPtr &_data);
-
       /// \brief Called when a request message is received.
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
@@ -419,19 +415,19 @@ namespace gazebo
       /// \param[in] _model Pointer to the model to get the data from.
       private: void FillModelMsg(msgs::Model &_msg, ModelPtr _model);
 
-      /// \brief Process all recieved entity messages.
+      /// \brief Process all received entity messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessEntityMsgs();
 
-      /// \brief Process all recieved request messages.
+      /// \brief Process all received request messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessRequestMsgs();
 
-      /// \brief Process all recieved factory messages.
+      /// \brief Process all received factory messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
 
-      /// \brief Process all recieved model messages.
+      /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
 
@@ -444,8 +440,8 @@ namespace gazebo
       /// \brief Publish the world stats message.
       private: void PublishWorldStats();
 
-      /// \brief Publish log status message.
-      private: void PublishLogStatus();
+      /// \brief Thread function for logging state data.
+      private: void LogWorker();
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
@@ -519,12 +515,6 @@ namespace gazebo
       /// \brief Subscriber to world control messages.
       private: transport::SubscriberPtr controlSub;
 
-      /// \brief Subscriber to log control messages.
-      private: transport::SubscriberPtr logControlSub;
-
-      /// \brief Publisher of log status messages.
-      private: transport::PublisherPtr logStatusPub;
-
       /// \brief Subscriber to factory messages.
       private: transport::SubscriberPtr factorySub;
 
@@ -546,9 +536,6 @@ namespace gazebo
       /// \brief Function pointer to the model update function.
       private: void (World::*modelUpdateFunc)();
 
-      /// \brief Period used to send out world statistics.
-      private: common::Time statPeriod;
-
       /// \brief Last time a world statistics message was sent.
       private: common::Time prevStatTime;
 
@@ -558,7 +545,7 @@ namespace gazebo
       /// \brief Used to compute a more accurate real time value.
       private: common::Time realTimeOffset;
 
-      /// \brief Mutext to protect incoming message buffers.
+      /// \brief Mutex to protect incoming message buffers.
       private: boost::recursive_mutex *receiveMutex;
 
       /// \brief Mutex to protext loading of models.
@@ -649,14 +636,39 @@ namespace gazebo
       /// objects are inserted via the factory.
       private: sdf::SDFPtr factorySDF;
 
-      /// \brief The list of pose messages to output.
-      private: std::set<std::string> publishModelPoses;
+      /// \brief The list of models that need to publish their pose.
+      private: std::set<ModelPtr> publishModelPoses;
 
       /// \brief Info passed through the WorldUpdateBegin event.
       private: common::UpdateInfo updateInfo;
 
       /// \brief The number of simulation iterations.
       private: uint64_t iterations;
+
+      /// \brief The number of simulation iterations to take before stopping.
+      private: uint64_t stopIterations;
+
+      /// \brief Condition used for log worker.
+      private: boost::condition_variable logCondition;
+
+      /// \brief Condition used to guarantee the log worker thread doesn't
+      /// skip an interation.
+      private: boost::condition_variable logContinueCondition;
+
+      /// \brief Last iteration recorded by the log worker thread.
+      private: uint64_t logPrevIteration;
+
+      /// \brief Real time value set from a log file.
+      private: common::Time logRealTime;
+
+      /// \brief Mutex to protect the log worker thread.
+      private: boost::mutex logMutex;
+
+      /// \brief Mutex to protect the deleteEntity list.
+      private: boost::mutex entityDeleteMutex;
+
+      /// \brief Worker thread for logging.
+      private: boost::thread *logThread;
     };
     /// \}
   }

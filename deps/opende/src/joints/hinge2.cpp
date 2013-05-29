@@ -127,6 +127,21 @@ dxJointHinge2::getAxisInfo(dVector3 ax1, dVector3 ax2, dVector3 axCross,
 void
 dxJointHinge2::getInfo2( dxJoint::Info2 *info )
 {
+    // Added by OSRF
+    // If joint values of erp and cfm are negative, then ignore them.
+    // info->erp, info->cfm already have the global values from quickstep
+    if (this->erp >= 0)
+      info->erp = erp;
+    if (this->cfm >= 0)
+    {
+      info->cfm[0] = cfm;
+      info->cfm[1] = cfm;
+      info->cfm[2] = cfm;
+      info->cfm[3] = cfm;
+      info->cfm[4] = cfm;
+      info->cfm[5] = cfm;
+    }
+
     // get information we need to set the hinge row
     dReal s, c;
     dVector3 q;
@@ -268,9 +283,26 @@ void dJointSetHinge2Param( dJointID j, int parameter, dReal value )
     }
     else
     {
-        if ( parameter == dParamSuspensionERP ) joint->susp_erp = value;
-        else if ( parameter == dParamSuspensionCFM ) joint->susp_cfm = value;
-        else joint->limot1.set( parameter, value );
+        switch (parameter)
+        {
+          case dParamERP:
+            joint->erp = value;
+            break;
+          case dParamCFM:
+            joint->cfm = value;
+            // dParamCFM label is also used for normal_cfm
+            joint->limot1.set( parameter, value );
+            break;
+          case dParamSuspensionERP:
+            joint->susp_erp = value;
+            break;
+          case dParamSuspensionCFM:
+            joint->susp_cfm = value;
+            break;
+          default:
+            joint->limot1.set( parameter, value );
+            break;
+        }
     }
 }
 
@@ -338,9 +370,19 @@ dReal dJointGetHinge2Param( dJointID j, int parameter )
     }
     else
     {
-        if ( parameter == dParamSuspensionERP ) return joint->susp_erp;
-        else if ( parameter == dParamSuspensionCFM ) return joint->susp_cfm;
-        else return joint->limot1.get( parameter );
+        switch (parameter)
+        {
+          case dParamERP:
+            return joint->erp;
+          case dParamCFM:
+            return joint->cfm;
+          case dParamSuspensionERP:
+            return joint->susp_erp;
+          case dParamSuspensionCFM:
+            return joint->susp_cfm;
+          default:
+            return joint->limot1.get( parameter );
+        }
     }
 }
 
