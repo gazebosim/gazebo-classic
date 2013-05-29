@@ -1,15 +1,59 @@
-<?xml version="1.0" ?>
-<sdf version="1.4">
-  <world name="default">
-    <!-- A ground plane -->
-    <include>
-      <uri>model://ground_plane</uri>
-    </include>
-    <!-- A global light source -->
-    <include>
-      <uri>model://sun</uri>
-    </include>
-    <plugin filename="libRubblePlugin.so" name="rubble">
+<sdf version='1.4'>
+  <world name='default'>
+    <model name='ground_plane'>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0.000000 0.000000 1.000000</normal>
+              <size>100.000000 100.000000</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100.000000</mu>
+                <mu2>50.000000</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <cast_shadows>0</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0.000000 0.000000 1.000000</normal>
+              <size>100.000000 100.000000</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+        <velocity_decay>
+          <linear>0.000000</linear>
+          <angular>0.000000</angular>
+        </velocity_decay>
+      </link>
+    </model>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0.000000 0.000000 10.000000 0.000000 0.000000 0.000000</pose>
+      <diffuse>0.800000 0.800000 0.800000 1.000000</diffuse>
+      <specular>0.200000 0.200000 0.200000 1.000000</specular>
+      <attenuation>
+        <range>1000.000000</range>
+        <constant>0.900000</constant>
+        <linear>0.010000</linear>
+        <quadratic>0.001000</quadratic>
+      </attenuation>
+      <direction>0.500000 0.100000 -0.900000</direction>
+    </light>
+    <plugin name='rubble' filename='libRubblePlugin.so'>
       <bottom_right>-.5 -1 0.0</bottom_right>
       <top_left>0.5 1.0 0.4</top_left>
       <min_size>0.05 0.05 0.05</min_size>
@@ -18,21 +62,21 @@
       <max_mass>1.0</max_mass>
       <count>100</count>
     </plugin>
-    <model name="right_wall">
-      <static>true</static>
-      <pose>0 -1.1 0.5 0 0 0</pose>
-      <link name="link">
-        <collision name="collision">
+    <model name='right_wall'>
+      <static>1</static>
+      <pose>0.000000 -1.100000 0.500000 0.000000 0.000000 0.000000</pose>
+      <link name='link'>
+        <collision name='collision'>
           <geometry>
             <box>
-              <size>5 0.2 1.0</size>
+              <size>5.000000 0.200000 1.000000</size>
             </box>
           </geometry>
         </collision>
-        <visual name="visual">
+        <visual name='visual'>
           <geometry>
             <box>
-              <size>5 0.2 1.0</size>
+              <size>5.000000 0.200000 1.000000</size>
             </box>
           </geometry>
           <material>
@@ -42,23 +86,27 @@
             </script>
           </material>
         </visual>
+        <velocity_decay>
+          <linear>0.000000</linear>
+          <angular>0.000000</angular>
+        </velocity_decay>
       </link>
     </model>
-    <model name="left_wall">
-      <static>true</static>
-      <pose>0 1.1 0.5 0 0 0</pose>
-      <link name="link">
-        <collision name="collision">
+    <model name='left_wall'>
+      <static>1</static>
+      <pose>0.000000 1.100000 0.500000 0.000000 0.000000 0.000000</pose>
+      <link name='link'>
+        <collision name='collision'>
           <geometry>
             <box>
-              <size>5 0.2 1.0</size>
+              <size>5.000000 0.200000 1.000000</size>
             </box>
           </geometry>
         </collision>
-        <visual name="visual">
+        <visual name='visual'>
           <geometry>
             <box>
-              <size>5 0.2 1.0</size>
+              <size>5.000000 0.200000 1.000000</size>
             </box>
           </geometry>
           <material>
@@ -68,7 +116,22 @@
             </script>
           </material>
         </visual>
+        <velocity_decay>
+          <linear>0.000000</linear>
+          <angular>0.000000</angular>
+        </velocity_decay>
       </link>
     </model>
+    <physics type='ode'>
+      <max_step_size>0.001000</max_step_size>
+      <real_time_factor>1.000000</real_time_factor>
+      <real_time_update_rate>1000.000000</real_time_update_rate>
+      <gravity>0.000000 0.000000 -9.800000</gravity>
+    </physics>
+    <scene>
+      <ambient>0.200000 0.200000 0.200000 1.000000</ambient>
+      <background>0.700000 0.700000 0.700000 1.000000</background>
+      <shadows>1</shadows>
+    </scene>
   </world>
 </sdf>
