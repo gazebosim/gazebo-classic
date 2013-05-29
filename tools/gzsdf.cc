@@ -16,7 +16,7 @@
 */
 
 #include <sys/stat.h>
-#include "sdf/sdf.hh"
+#include <gazebo/sdf/sdf.hh>
 #include <gazebo/common/Console.hh>
 #include <gazebo/common/Exception.hh>
 
