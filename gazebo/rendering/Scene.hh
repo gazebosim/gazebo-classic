@@ -33,7 +33,6 @@
 #include "common/Events.hh"
 #include "common/Color.hh"
 #include "math/Vector2i.hh"
-#include "rendering/GpuLaser.hh"
 
 namespace SkyX
 {
