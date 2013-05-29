@@ -719,9 +719,9 @@ static void ComputeRows(
       //     access pattern.
 
       int index = order[i].index;
+      int normal_index = findex[index];  // cache for efficiency
 
-      // if (iteration > num_iterations && findex[index] < 0)
-      if (iteration >= num_iterations + precon_iterations && findex[index] < 0)
+      if (iteration >= num_iterations + precon_iterations && normal_index < 0)
         continue;
 
       dReal delta,delta_erp;
@@ -783,8 +783,8 @@ static void ComputeRows(
         // the constraints are ordered so that all lambda[] values needed have
         // already been computed.
         dReal hi_act, lo_act;
-        if (findex[index] >= 0) {
-          hi_act = dFabs (hi[index] * lambda[findex[index]]);
+        if (normal_index >= 0) {
+          hi_act = dFabs (hi[index] * lambda[normal_index]);
           lo_act = -hi_act;
         } else {
           hi_act = hi[index];
@@ -866,7 +866,6 @@ static void ComputeRows(
           // already been computed.
           dReal hi_act, lo_act;
           dReal hi_act_erp, lo_act_erp;
-          int normal_index = findex[index];
           if (normal_index >= 0) {
             // FOR erp throttled by info.c_v_max or info.c
             hi_act = dFabs (hi[index] * lambda[normal_index]);
@@ -938,7 +937,7 @@ static void ComputeRows(
                 printf("\n");
             }
 #endif
-            if (findex[index] != -1)
+            if (normal_index != -1)
             {
               // extra residual smoothing for contact constraints
               lambda[index] = (1.0 - SMOOTH)*lambda[index] + SMOOTH*old_lambda;
@@ -977,7 +976,7 @@ static void ComputeRows(
             if (iteration >= num_iterations-7) {
               // check for non-contact bilateral constraints only
               // I've set findex to -2 for contact normal constraint
-              if (findex[index] == -1) {
+              if (normal_index == -1) {
                 dRealPtr J_ptr = J + index*12;
                 Jvnew = dot6(vnew_ptr1,J_ptr);
                 if (caccel_ptr2)
