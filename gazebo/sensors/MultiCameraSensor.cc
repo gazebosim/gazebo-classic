@@ -132,7 +132,7 @@ void MultiCameraSensor::Init()
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
-    camera->AttachToVisual(this->parentName, true);
+    camera->AttachToVisual(this->parentId, true);
 
     {
       boost::mutex::scoped_lock lock(this->cameraMutex);

@@ -128,7 +128,7 @@ void CameraSensor::Init()
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
     this->camera->SetWorldPose(cameraPose);
-    this->camera->AttachToVisual(this->parentName, true);
+    this->camera->AttachToVisual(this->parentId, true);
   }
   else
     gzerr << "No world name\n";

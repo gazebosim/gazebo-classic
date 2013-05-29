@@ -229,6 +229,9 @@ namespace gazebo
       /// \brief Name of the parent.
       protected: std::string parentName;
 
+      /// \brief The sensor's parent ID.
+      protected: uint32_t parentId;
+
       /// \brief All the plugins for the sensor.
       protected: std::vector<SensorPluginPtr> plugins;
 
@@ -263,9 +266,6 @@ namespace gazebo
 
       /// \brief The sensors unique ID.
       private: uint32_t id;
-
-      /// \brief The sensor's parent ID.
-      private: uint32_t parentId;
 
       /// \brief An SDF pointer that allows us to only read the sensor.sdf
       /// file once, which in turns limits disk reads.
