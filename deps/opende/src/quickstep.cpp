@@ -95,6 +95,7 @@ typedef dReal *dRealMutablePtr;
 /// scale SOR for contact to reduce overshoot in solution for contacts
 /// \TODO: make this a parameter
 #define CONTACT_SOR_SCALE 0.25
+#define SMOOTH 0.01
 
 // structure for passing variable pointers in SOR_LCP
 struct dxSORLCPParameters {
@@ -619,6 +620,12 @@ static void ComputeRows(
   dReal Jvnew_final = 0;
 #endif
   int friction_iterations = 10;
+  dRealMutablePtr caccel_ptr1;
+  dRealMutablePtr caccel_ptr2;
+  dRealMutablePtr caccel_erp_ptr1;
+  dRealMutablePtr caccel_erp_ptr2;
+  dRealMutablePtr cforce_ptr1;
+  dRealMutablePtr cforce_ptr2;
   for (int iteration=0; iteration < num_iterations + precon_iterations + friction_iterations; iteration++) {
 
     rms_error = 0;
@@ -697,19 +704,12 @@ static void ComputeRows(
     }
 #endif
 
-    dRealMutablePtr caccel_ptr1;
-    dRealMutablePtr caccel_ptr2;
-    dRealMutablePtr caccel_erp_ptr1;
-    dRealMutablePtr caccel_erp_ptr2;
-
 #ifdef PENETRATION_JVERROR_CORRECTION
     dRealMutablePtr vnew_ptr1;
     dRealMutablePtr vnew_ptr2;
     const dReal stepsize1 = dRecip(stepsize);
     dReal Jvnew = 0;
 #endif
-    dRealMutablePtr cforce_ptr1;
-    dRealMutablePtr cforce_ptr2;
     for (int i=startRow; i<startRow+nRows; i++) {
       //boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every row
 
@@ -731,15 +731,24 @@ static void ComputeRows(
         int b1 = jb[index*2];
         int b2 = jb[index*2+1];
         caccel_ptr1 = caccel + 6*b1;
-        caccel_ptr2 = (b2 >= 0) ? caccel + 6*b2 : NULL;
         caccel_erp_ptr1 = caccel_erp + 6*b1;
-        caccel_erp_ptr2 = (b2 >= 0) ? caccel_erp + 6*b2 : NULL;
+        cforce_ptr1 = cforce + 6*b1;
+        if (b2 >= 0)
+        {
+          caccel_ptr2     = caccel + 6*b2;
+          caccel_erp_ptr2 = caccel_erp + 6*b2;
+          cforce_ptr2     = cforce + 6*b2;
+        }
+        else
+        {
+          caccel_ptr2     = NULL;
+          caccel_erp_ptr2 = NULL;
+          cforce_ptr2     = NULL;
+        }
 #ifdef PENETRATION_JVERROR_CORRECTION
         vnew_ptr1 = vnew + 6*b1;
         vnew_ptr2 = (b2 >= 0) ? vnew + 6*b2 : NULL;
 #endif
-        cforce_ptr1 = cforce + 6*b1;
-        cforce_ptr2 = (b2 >= 0) ? cforce + 6*b2 : NULL;
       }
 
       dReal old_lambda        = lambda[index];
@@ -863,7 +872,7 @@ static void ComputeRows(
             hi_act = dFabs (hi[index] * lambda[normal_index]);
             lo_act = -hi_act;
             // for the unthrottled _erp version
-            hi_act_erp = dFabs (hi[index] * lambda_erp[normal_index]);
+            hi_act_erp = dFabs (hi[index] * lambda_erp[findex[index]]);
             lo_act_erp = -hi_act_erp;
           } else {
             // FOR erp throttled by info.c_v_max or info.c
@@ -932,10 +941,9 @@ static void ComputeRows(
             if (findex[index] != -1)
             {
               // extra residual smoothing for contact constraints
-              dReal mu = 0.01;
-              lambda[index] = (1.0 - mu)*lambda[index] + mu*old_lambda;
+              lambda[index] = (1.0 - SMOOTH)*lambda[index] + SMOOTH*old_lambda;
               // is filtering lambda_erp necessary?
-              // lambda_erp[index] = (1.0 - mu)*lambda_erp[index] + mu*old_lambda_erp;
+              // lambda_erp[index] = (1.0 - SMOOTH)*lambda_erp[index] + SMOOTH*old_lambda_erp;
             }
           }
 #endif
