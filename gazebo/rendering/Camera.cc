@@ -1406,7 +1406,6 @@ void Camera::AttachToVisual(const std::string &_visualName,
 //////////////////////////////////////////////////
 void Camera::TrackVisual(const std::string &_name)
 {
-
   msgs::Request request;
   request.set_request("track_visual");
   request.set_data(_name);
