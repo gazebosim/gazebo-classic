@@ -38,7 +38,6 @@ set(tests
   laser.cc
   nondefault_world.cc
   physics.cc
-  physics_dart.cc
   pioneer2dx.cc
   transport.cc
   server_fixture.cc
