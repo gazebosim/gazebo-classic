@@ -27,8 +27,4 @@ set (files
   weshare2012.world
   willowgarage.world)
 
-if (HAVE_DART)
-  add_subdirectory(dart)
-endif()
-
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/)
