@@ -571,11 +571,6 @@ unsigned int LogRecord::Log::Update()
           out.push(boost::iostreams::bzip2_compressor());
           out.push(std::back_inserter(str));
           boost::iostreams::copy(boost::make_iterator_range(data), out);
-
-          /*out.push(std::back_inserter(str));
-            out << stream.str();
-            out.flush();
-            */
         }
 
         // Encode in base64.
@@ -593,8 +588,6 @@ unsigned int LogRecord::Log::Update()
           out.push(boost::iostreams::zlib_compressor());
           out.push(std::back_inserter(str));
           boost::iostreams::copy(boost::make_iterator_range(data), out);
-          //out << stream.str();
-          //out.flush();
         }
 
         // Encode in base64.

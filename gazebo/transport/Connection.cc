@@ -283,7 +283,10 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     */
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    this->writeQueue.push_back(header_stream.str() + _buffer);
+    if (this->writeQueue.size() > 1)
+      this->writeQueue.back() += header_stream.str() + _buffer;
+    else
+      this->writeQueue.push_back(header_stream.str() + _buffer);
   }
   // }
 
