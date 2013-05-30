@@ -101,7 +101,6 @@ namespace urdf2gazebo
              reductionTransform(ge.reductionTransform),
              fdir1(ge.fdir1), blobs(ge.blobs)
     {
-      material = ge.material;
       setStaticFlag = ge.setStaticFlag;
       gravity = ge.gravity;
       isDampingFactor = ge.isDampingFactor;
@@ -124,8 +123,6 @@ namespace urdf2gazebo
       isCFMDamping = ge.isCFMDamping;
       provideFeedback = ge.provideFeedback;
       cfmDamping = ge.cfmDamping;
-      reductionTransform = ge.reductionTransform;
-      blobs = ge.blobs;
 
       dampingFactor = ge.dampingFactor;
       maxContacts = ge.maxContacts;
