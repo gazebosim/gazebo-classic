@@ -46,6 +46,7 @@
 #undef TIMING
 #undef REPORT_MONITOR
 #undef SHOW_CONVERGENCE
+#define SMOOTH_LAMBDA
 #undef RECOMPUTE_RMS
 #undef USE_1NORM
 //#define LOCAL_STEPPING  // not yet implemented
@@ -72,7 +73,7 @@ typedef dReal *dRealMutablePtr;
 // help for motor-driven joints. unfortunately it appears to hurt
 // with high-friction contacts using the SOR method. use with care
 
-//#define WARM_STARTING 1
+#define WARM_STARTING 1
 
 
 // for the SOR method:
@@ -93,7 +94,7 @@ typedef dReal *dRealMutablePtr;
 
 /// scale SOR for contact to reduce overshoot in solution for contacts
 /// \TODO: make this a parameter
-#define CONTACT_SOR_SCALE 0.5
+#define CONTACT_SOR_SCALE 0.25
 
 // structure for passing variable pointers in SOR_LCP
 struct dxSORLCPParameters {
@@ -205,8 +206,8 @@ static void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
 }
 
 // compute out = inv(M)*J'*in.
-//#ifdef WARM_STARTING
-/*static void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
+#ifdef WARM_STARTING
+static void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
   dRealPtr in, dRealMutablePtr out)
 {
   dSetZero (out,6*nb);
@@ -224,8 +225,8 @@ static void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
     }
     iMJ_ptr += 6;
   }
-}*/
-//#endif
+}
+#endif
 
 // compute out = J*in.
 
@@ -252,6 +253,7 @@ static void multiply_J (int m, dRealPtr J, int *jb,
 
 // compute out = (J*inv(M)*J' + cfm)*in.
 // use z as an nb*6 temporary.
+/* not used
 #ifdef WARM_STARTING
 static void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePtr iMJ, int *jb,
   dRealPtr cfm, dRealMutablePtr z, dRealMutablePtr in, dRealMutablePtr out)
@@ -263,6 +265,7 @@ static void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePt
   for (int i=0; i<m; i++) out[i] += cfm[i] * in[i];
 }
 #endif
+*/
 
 //***************************************************************************
 // conjugate gradient method with jacobi preconditioner
@@ -485,7 +488,11 @@ static inline void sum6(dRealMutablePtr a, dReal delta, dRealPtr b)
 }
 
 static void ComputeRows(
+#ifdef SHOW_CONVERGENCE
+                int thread_id,
+#else
                 int /*thread_id*/,
+#endif
                 IndexError* order,
                 dxBody* const * /*body*/,
                 dxSORLCPParameters params,
@@ -595,10 +602,24 @@ static void ComputeRows(
   //       velocity update
   bool preconditioning;
 
+#ifdef SHOW_CONVERGENCE
+    if (1)
+    {
+      // show starting lambda
+      printf("lambda start: [");
+      for (int i=startRow; i<startRow+nRows; i++)
+      {
+        printf("%f, ", lambda[i]);
+      }
+      printf("]\n");
+    }
+#endif
+
 #ifdef PENETRATION_JVERROR_CORRECTION
   dReal Jvnew_final = 0;
 #endif
-  for (int iteration=0; iteration < num_iterations + precon_iterations; iteration++) {
+  int friction_iterations = 10;
+  for (int iteration=0; iteration < num_iterations + precon_iterations + friction_iterations; iteration++) {
 
     rms_error = 0;
 
@@ -698,6 +719,10 @@ static void ComputeRows(
       //     access pattern.
 
       int index = order[i].index;
+
+      // if (iteration > num_iterations && findex[index] < 0)
+      if (iteration >= num_iterations + precon_iterations && findex[index] < 0)
+        continue;
 
       dReal delta,delta_erp;
       dReal delta_precon;
@@ -800,7 +825,6 @@ static void ComputeRows(
       }
       else {
         {
-          // FOR erp = 0
 
           // NOTE:
           // for this update, we need not throw away J*v(n+1)/h term from rhs
@@ -809,16 +833,25 @@ static void ComputeRows(
           //      but given that J is already scaled by Ad_i, we don't have
           //      to do it explicitly here
 
+          // FOR erp throttled by info.c_v_max or info.c
           delta =
 #ifdef PENETRATION_JVERROR_CORRECTION
                  Jvnew_final +
 #endif
                 rhs[index] - old_lambda*Adcfm[index];
-
           dRealPtr J_ptr = J + index*12;
           delta -= dot6(caccel_ptr1, J_ptr);
           if (caccel_ptr2)
             delta -= dot6(caccel_ptr2, J_ptr + 6);
+
+          // for the unthrottled _erp version
+          // if rhs equals rhs_erp, two solutions are the same.
+          // otherwise, compute second set of solutions for rhs with custom erp
+          // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
+          delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
+          delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
+          if (caccel_erp_ptr2)
+            delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
 
           // set the limits for this constraint.
           // this is the place where the QuickStep method differs from the
@@ -828,17 +861,27 @@ static void ComputeRows(
           // the constraints are ordered so that all lambda[] values needed have
           // already been computed.
           dReal hi_act, lo_act;
+          dReal hi_act_erp, lo_act_erp;
           if (findex[index] >= 0) {
+            // FOR erp throttled by info.c_v_max or info.c
             hi_act = dFabs (hi[index] * lambda[findex[index]]);
             lo_act = -hi_act;
+            // for the unthrottled _erp version
+            hi_act_erp = dFabs (hi[index] * lambda_erp[findex[index]]);
+            lo_act_erp = -hi_act_erp;
           } else {
+            // FOR erp throttled by info.c_v_max or info.c
             hi_act = hi[index];
             lo_act = lo[index];
+            // for the unthrottled _erp version
+            hi_act_erp = hi[index];
+            lo_act_erp = lo[index];
           }
 
           // compute lambda and clamp it to [lo,hi].
           // @@@ SSE not a win here
   #if 1
+          // FOR erp throttled by info.c_v_max or info.c
           dReal new_lambda = old_lambda + delta;
           if (new_lambda < lo_act) {
             delta = lo_act-old_lambda;
@@ -851,16 +894,65 @@ static void ComputeRows(
           else {
             lambda[index] = new_lambda;
           }
+
+          // for the unthrottled _erp version
+          dReal new_lambda_erp = old_lambda_erp + delta_erp;
+          if (new_lambda_erp < lo_act_erp) {
+            delta_erp = lo_act_erp-old_lambda_erp;
+            lambda_erp[index] = lo_act_erp;
+          }
+          else if (new_lambda_erp > hi_act_erp) {
+            delta_erp = hi_act_erp-old_lambda_erp;
+            lambda_erp[index] = hi_act_erp;
+          }
+          else {
+            lambda_erp[index] = new_lambda_erp;
+          }
   #else
+          // FOR erp throttled by info.c_v_max or info.c
           dReal nl = old_lambda + delta;
           _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
           lambda[index] = nl;
           delta = nl - old_lambda;
+
+          // for the unthrottled _erp version
+          dReal nl = old_lambda_erp + delta_erp;
+          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+          lambda_erp[index] = nl;
+          delta_erp = nl - old_lambda_erp;
   #endif
+
+          // option to smooth lambda
+#ifdef SMOOTH_LAMBDA
+          {
+            // smooth delta lambda
+            // equivalent to first order artificial dissipation on lambda update.
+#ifdef SHOW_CONVERGENCE
+            if (0)
+            {
+              if (i == 0)
+                printf("rhs[%f] adcfm[%f]: ",rhs[index], Adcfm[index]);
+              if (i == 0)
+                printf("dlambda iter[%d]: ",iteration);
+              printf(" %f ", lambda[index]-old_lambda);
+              if (i == startRow + nRows - 1)
+                printf("\n");
+            }
+#endif
+            if (findex[index] != -1)
+            {
+              // extra residual smoothing for contact constraints
+              dReal mu = 0.01;
+              lambda[index] = (1.0 - mu)*lambda[index] + mu*old_lambda;
+              // is filtering lambda_erp necessary?
+              // lambda_erp[index] = (1.0 - mu)*lambda_erp[index] + mu*old_lambda_erp;
+            }
+          }
+#endif
 
           // update caccel
           {
-            // for non-precon case, update caccel
+            // FOR erp throttled by info.c_v_max or info.c
             dRealPtr iMJ_ptr = iMJ + index*12;
 
             // update caccel.
@@ -868,6 +960,10 @@ static void ComputeRows(
             if (caccel_ptr2)
               sum6(caccel_ptr2, delta, iMJ_ptr + 6);
 
+            // update caccel_erp.
+            sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
+            if (caccel_erp_ptr2)
+              sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
 
 #ifdef PENETRATION_JVERROR_CORRECTION
             // update vnew incrementally
@@ -905,66 +1001,6 @@ static void ComputeRows(
 #ifdef RECOMPUTE_RMS
         delta_error[index] = dFabs(delta);
 #endif
-        {
-          // FOR erp != 0
-          // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
-          delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
-          dRealPtr J_ptr = J + index*12;
-          delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
-          if (caccel_erp_ptr2)
-            delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
-
-          // for the _erp version
-          // set the limits for this constraint.
-          // this is the place where the QuickStep method differs from the
-          // direct LCP solving method, since that method only performs this
-          // limit adjustment once per time step, whereas this method performs
-          // once per iteration per constraint row.
-          // the constraints are ordered so that all lambda_erp[] values needed have
-          // already been computed.
-          dReal hi_act, lo_act;
-          if (findex[index] >= 0) {
-            hi_act = dFabs (hi[index] * lambda_erp[findex[index]]);
-            lo_act = -hi_act;
-          } else {
-            hi_act = hi[index];
-            lo_act = lo[index];
-          }
-
-          // compute lambda and clamp it to [lo,hi].
-          // @@@ SSE not a win here
-  #if 1
-          dReal new_lambda_erp = old_lambda_erp + delta_erp;
-          if (new_lambda_erp < lo_act) {
-            delta_erp = lo_act-old_lambda_erp;
-            lambda_erp[index] = lo_act;
-          }
-          else if (new_lambda_erp > hi_act) {
-            delta_erp = hi_act-old_lambda_erp;
-            lambda_erp[index] = hi_act;
-          }
-          else {
-            lambda_erp[index] = new_lambda_erp;
-          }
-  #else
-          dReal nl = old_lambda_erp + delta_erp;
-          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
-          lambda_erp[index] = nl;
-          delta_erp = nl - old_lambda_erp;
-  #endif
-          // update caccel_erp
-          if (!preconditioning)
-          {
-            // for non-precon case, update caccel_erp
-            dRealPtr iMJ_ptr = iMJ + index*12;
-
-            // update caccel_erp.
-            sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
-            if (caccel_erp_ptr2)
-              sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
-
-          }
-        }
       }
 
 
@@ -974,6 +1010,7 @@ static void ComputeRows(
       //delta *= ramp;
 
     } // end of for loop on m
+
 #ifdef PENETRATION_JVERROR_CORRECTION
     Jvnew_final = Jvnew*stepsize1;
     Jvnew_final = Jvnew_final > 1.0 ? 1.0 : ( Jvnew_final < -1.0 ? -1.0 : Jvnew_final );
@@ -992,7 +1029,7 @@ static void ComputeRows(
         }
     #else // use 2 norm
         //for (int i=startRow; i<startRow+nRows; i++)
-        for (int i=0; i<m; i++)  // use entire solution vector errors
+        for (int i=startRow; i<startRow+nRows; i++)  // use entire solution vector errors
           rms_error += delta_error[order[i].index]*delta_error[order[i].index]; ///(dReal)nRows;
         rms_error = sqrt(rms_error/(dReal)nRows);
     #endif
@@ -1021,7 +1058,19 @@ static void ComputeRows(
     //}
 
 #ifdef SHOW_CONVERGENCE
-    printf("MONITOR: id: %d iteration: %d error: %20.16f\n",thread_id,iteration,rms_error);
+    // show per iteration history
+    if (0)
+    {
+      printf("MONITOR: id: %d iteration: %d error: %20.16f\n",thread_id,iteration,rms_error);
+    }
+    if (0)
+    {
+      for (int i=startRow; i<startRow+nRows; i++)
+      {
+        printf("%f, ", lambda[i]);
+      }
+      printf("\n");
+    }
 #endif
 
     if (rms_error < sor_lcp_tolerance)
@@ -1041,6 +1090,19 @@ static void ComputeRows(
 
   } // end of for loop on iterations
 
+#ifdef SHOW_CONVERGENCE
+  if (1)
+  {
+    // show starting lambda
+    printf("lambda end: [");
+    for (int i=startRow; i<startRow+nRows; i++)
+    {
+      printf("%f, ", lambda[i]);
+    }
+    printf("]\n");
+    printf("MONITOR: id: %d iteration: %d error: %20.16f\n",thread_id,num_iterations,rms_error);
+  }
+#endif
   //printf("vnew: ");
   //for (int i=0; i<6*nb; i++) printf(" %f ",vnew[i]);
   //printf("\n");
@@ -1082,33 +1144,29 @@ static void SOR_LCP (dxWorldProcessContext *context,
 #endif
   const dReal stepsize)
 {
-#ifdef WARM_STARTING
-  {
-    // for warm starting, this seems to be necessary to prevent
-    // jerkiness in motor-driven joints. i have no idea why this works.
-    for (int i=0; i<m; i++) {
-      lambda[i] *= 0.9;
-      lambda_erp[i] *= 0.9;
-    }
-  }
-#else
-  dSetZero (lambda,m);
-  dSetZero (lambda_erp,m);
-#endif
 
   // precompute iMJ = inv(M)*J'
   dReal *iMJ = context->AllocateArray<dReal> (m*12);
   compute_invM_JT (m,J,iMJ,jb,body,invI);
 
-  // compute cforce=(inv(M)*J')*lambda. we will incrementally maintain cforce
-  // as we change lambda.
 #ifdef WARM_STARTING
-  multiply_invM_JT (m,nb,J,jb,lambda,cforce);
-  multiply_invM_JT (m,nb,iMJ,jb,lambda,caccel);
+  // compute cforce=(inv(M)*J')*lambda
+  if (qs->precon_iterations > 0)
+    multiply_invM_JT (m,nb,J,jb,lambda,cforce);
+
+  if (1)
+  {
+    // re-compute caccel=(inv(M)*J')*lambda with new iMJ
+    // seems much better than using stored caccel's
+    multiply_invM_JT (m,nb,iMJ,jb,lambda,caccel);
+    multiply_invM_JT (m,nb,iMJ,jb,lambda_erp,caccel_erp);
+  }
 #else
+  // no warm starting
+  if (qs->precon_iterations > 0)
+    dSetZero (cforce,nb*6);
   dSetZero (caccel,nb*6);
   dSetZero (caccel_erp,nb*6);
-  dSetZero (cforce,nb*6);
 #endif
 
   dReal *Ad = context->AllocateArray<dReal> (m);
@@ -1213,29 +1271,69 @@ static void SOR_LCP (dxWorldProcessContext *context,
 
   // order to solve constraint rows in
   IndexError *order = context->AllocateArray<IndexError> (m);
+  int *tmpOrder = context->AllocateArray<int> (m);
 
   dReal *delta_error = context->AllocateArray<dReal> (m);
 
 #ifndef REORDER_CONSTRAINTS
   {
-    // make sure constraints with findex < 0 come first.
-    IndexError *orderhead = order; //, *ordertail = order + (m - 1);
-
+    // -1 in front, followed by -2, lastly all the >0
+    // Fill the array from both ends
+    // where -1 is bilateral, and -2 is friction normal,
+    // might be followed by 2 positive tangential indices
+    // if friction is not zero.
+    // first pass puts -1 in the back
     int front = 0;
     int back = m-1;
-    // Fill the array from both ends
     for (int i=0; i<m; ++i) {
-      if (findex[i] < 0) {
-        orderhead->index = front; // Place them at the front
+      if (findex[i] == -1) {
+        tmpOrder[front] = i; // Place them at the front
         ++front;
       } else {
-        orderhead->index = back; // Place them at the end
+        tmpOrder[back] = i; // Place them at the end
         --back;
       }
-      ++orderhead;
+    }
+    dIASSERT (back - front==1);
+    // second pass, put all negatives in the front,
+    // should preserver -1 goes before -2,
+    // and group all >0 at the end
+    front = 0;
+    back = m-1;
+    for (int i=0; i<m; ++i) {
+      if (findex[tmpOrder[i]] < 0) {
+        order[front].index = tmpOrder[i]; // Place them at the front
+        ++front;
+      } else {
+        order[back].index = tmpOrder[i]; // Place them at the end
+        --back;
+      }
     }
     dIASSERT (back - front==1);
   }
+#endif
+
+#ifdef SHOW_CONVERGENCE
+    if (0)
+    {
+      printf("-------------- saved labmdas -------------\n");
+      // print current lambdas
+      for (int i = 0; i < m; ++i)
+      {
+        printf("%f, ", lambda[order[i].index]);
+      }
+      printf("\n");
+      for (int i = 0; i < m; ++i)
+      {
+        printf("%d, ", findex[order[i].index]);
+      }
+      printf("\n");
+      for (int i = 0; i < m; ++i)
+      {
+        printf("%d, ", order[i].index);
+      }
+      printf("\n-------------- end of saved labmdas -------------\n");
+    }
 #endif
 
 #ifdef REORDER_CONSTRAINTS
@@ -1729,17 +1827,36 @@ void dxQuickStepper (dxWorldProcessContext *context,
     dReal *lambda = context->AllocateArray<dReal> (m);
     dReal *lambda_erp = context->AllocateArray<dReal> (m);
 
-#ifdef WARM_STARTING //FIXME: add for lambda_erp
+#ifdef WARM_STARTING
     {
-      dReal *lambdscurr = lambda;
+      dReal *lambdacurr = lambda;
+      dReal *lambda_erpcurr = lambda_erp;
       const dJointWithInfo1 *jicurr = jointiinfos;
       const dJointWithInfo1 *const jiend = jicurr + nj;
       for (; jicurr != jiend; jicurr++) {
         int infom = jicurr->info.m;
-        memcpy (lambdscurr, jicurr->joint->lambda, infom * sizeof(dReal));
-        lambdscurr += infom;
+        memcpy (lambdacurr, jicurr->joint->lambda, infom * sizeof(dReal));
+        lambdacurr += infom;
+        memcpy (lambda_erpcurr, jicurr->joint->lambda_erp, infom * sizeof(dReal));
+        lambda_erpcurr += infom;
       }
     }
+
+    if (1)
+    {
+      // for warm starting, this seems to be necessary to prevent
+      // jerkiness in motor-driven joints. i have no idea why this works.
+      // also necessary if J condition numbers are high (maybe the same thing).
+      for (int i=0; i<m; i++) {
+        lambda[i] *= 0.5;
+        lambda_erp[i] *= 0.5;
+      }
+
+    }
+#else
+    // no warm starting
+    dSetZero (lambda,m);
+    dSetZero (lambda_erp,m);
 #endif
 
     BEGIN_STATE_SAVE(context, lcpstate) {
@@ -1758,18 +1875,21 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
     } END_STATE_SAVE(context, lcpstate);
 
-#ifdef WARM_STARTING //FIXME: add for lambda_erp
+#ifdef WARM_STARTING
     {
       // save lambda for the next iteration
       //@@@ note that this doesn't work for contact joints yet, as they are
       // recreated every iteration
       const dReal *lambdacurr = lambda;
+      const dReal *lambda_erpcurr = lambda_erp;
       const dJointWithInfo1 *jicurr = jointiinfos;
       const dJointWithInfo1 *const jiend = jicurr + nj;
       for (; jicurr != jiend; jicurr++) {
         int infom = jicurr->info.m;
         memcpy (jicurr->joint->lambda, lambdacurr, infom * sizeof(dReal));
         lambdacurr += infom;
+        memcpy (jicurr->joint->lambda_erp, lambda_erpcurr, infom * sizeof(dReal));
+        lambda_erpcurr += infom;
       }
     }
 #endif
@@ -2039,6 +2159,7 @@ static size_t EstimateSOR_LCPMemoryRequirements(int m,int /*nb*/)
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Adcfm_precon
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for delta_error
   res += dEFFICIENT_SIZE(sizeof(IndexError) * m); // for order
+  res += dEFFICIENT_SIZE(sizeof(int) * m); // for tmpOrder
 #ifdef REORDER_CONSTRAINTS
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for last_lambda
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for last_lambda_erp

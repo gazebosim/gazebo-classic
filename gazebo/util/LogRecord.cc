@@ -656,7 +656,7 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
 
   // Make sure the file does not exist
   if (boost::filesystem::exists(this->completePath))
-    gzwarn << "Filename[" + this->completePath.string() + "], already exists."
+    gzlog << "Filename[" + this->completePath.string() + "], already exists."
       << " The log file will be overwritten.\n";
 
   std::ostringstream stream;

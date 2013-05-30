@@ -156,6 +156,7 @@ namespace gazebo
               decodedTopic, _queueLimit, _hzRate);
 
         boost::mutex::scoped_lock lock(this->publisherMutex);
+        publisher->SetNode(shared_from_this());
         this->publishers.push_back(publisher);
 
         return publisher;
