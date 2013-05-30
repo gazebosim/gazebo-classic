@@ -152,7 +152,7 @@ void DARTHingeJoint::SetAnchor(int /*index*/, const math::Vector3& /*_anchor*/)
 math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
 {
   // Axis in local frame of this joint
-  Eigen::Vector3d localAxis_Eigen = rotHinge->getAxis();
+  const Eigen::Vector3d& localAxis_Eigen = rotHinge->getAxis();
   Eigen::Vector3d globalAxis_Eigen;
 
   math::Vector3 localAxis(localAxis_Eigen.x(), localAxis_Eigen.y(), localAxis_Eigen.z());
@@ -168,6 +168,17 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
   worldToJointTransform = worldToJointTransform * matParentLinkToJoint;
   globalAxis_Eigen = worldToJointTransform.topLeftCorner<3,3>() * localAxis_Eigen;
   globalAxis.Set(globalAxis_Eigen(0), globalAxis_Eigen(1), globalAxis_Eigen(2));
+
+
+  //////////////////////////////////////////////////////////////////////////////
+//  Eigen::Matrix4d matParentLink = Eigen::Matrix4d::Identity();
+//  if (parentLink)
+//  {
+//    DARTUtils::ConvPoseToMat(&matParentLink, parentLink->GetWorldPose());
+//  }
+//  Eigen::Matrix3d rotParentLink = matParentLink.topLeftCorner<3,3>();
+//  globalAxis_Eigen = rotParentLink * localAxis_Eigen;
+//  globalAxis.Set(globalAxis_Eigen(0), globalAxis_Eigen(1), globalAxis_Eigen(2));
 
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
@@ -194,33 +205,35 @@ void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
   //  }
   //  else
   //  {
-  //axisInJointFrame = this->poseParentLinkToJoint.rot.GetInverse() * _axis;
+  Eigen::Matrix4d matJointToParent = Eigen::Matrix4d::Identity();
+  Eigen::Matrix4d matParentToJoint = Eigen::Matrix4d::Identity();
+  DARTUtils::ConvPoseToMat(&matParentToJoint, poseParentLinkToJoint);
+  matJointToParent = matParentToJoint.inverse();
   //  }
 
 
-  Eigen::Matrix4d matParentLink = Eigen::Matrix4d::Identity();
-  Eigen::Matrix3d rot;
+//  Eigen::Matrix4d matParentLink = Eigen::Matrix4d::Identity();
+//  Eigen::Matrix3d rot;
 
-  if (parentLink)
-  {
-    DARTUtils::ConvPoseToMat(&matParentLink, this->parentLink->GetWorldPose());
-  }
-  else
-  {
+//  if (parentLink)
+//  {
+//    DARTUtils::ConvPoseToMat(&matParentLink, this->parentLink->GetWorldPose());
+//  }
+//  else
+//  {
 
-  }
+//  }
 
-
-
-  rot = matParentLink.topLeftCorner<3,3>().transpose();
+//  rot = matParentLink.topLeftCorner<3,3>().transpose();
 
   Eigen::Vector3d axis;
   axis(0) = _axis[0];
   axis(1) = _axis[1];
   axis(2) = _axis[2];
 
+  axisInJointFrame = matJointToParent.topLeftCorner<3,3>() * axis;
 
-  axisInJointFrame = rot * axis;
+  //axisInJointFrame = rot * axis;
 
 //  axis(0) = 1;
 //  axis(1) = 0;

@@ -74,7 +74,7 @@ void DARTCollision::Init()
     math::Vector2d size
         = geometryElem->GetFirstElement()->GetValueVector2d("size");
 //    Eigen::Vector3d eigenSize(size.x, size.y, 0.001);
-    Eigen::Vector3d eigenSize(100, 100, 0.001);
+    Eigen::Vector3d eigenSize(2100, 2100, 0.001);
     kinematics::ShapeBox* dartShape
         = new kinematics::ShapeBox(eigenSize);
     dartBodyNode->setCollisionShape(dartShape);
