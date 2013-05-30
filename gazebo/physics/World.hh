@@ -537,9 +537,6 @@ namespace gazebo
       /// \brief Function pointer to the model update function.
       private: void (World::*modelUpdateFunc)();
 
-      /// \brief Period used to send out world statistics.
-      private: common::Time statPeriod;
-
       /// \brief Last time a world statistics message was sent.
       private: common::Time prevStatTime;
 
@@ -667,6 +664,9 @@ namespace gazebo
 
       /// \brief Mutex to protect the log worker thread.
       private: boost::mutex logMutex;
+
+      /// \brief Mutex to protect the deleteEntity list.
+      private: boost::mutex entityDeleteMutex;
 
       /// \brief Worker thread for logging.
       private: boost::thread *logThread;

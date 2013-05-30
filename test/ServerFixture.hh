@@ -156,11 +156,9 @@ class ServerFixture : public testing::Test
 
                this->factoryPub =
                  this->node->Advertise<msgs::Factory>("~/factory");
-               this->factoryPub->WaitForConnection();
 
                this->requestPub =
                  this->node->Advertise<msgs::Request>("~/request");
-               this->requestPub->WaitForConnection();
 
                // Wait for the world to reach the correct pause state.
                // This might not work properly with multiple worlds.
@@ -173,6 +171,8 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(100);
                ASSERT_LT(waitCount, maxWaitCount);
 
+               this->factoryPub->WaitForConnection();
+               this->requestPub->WaitForConnection();
              }
 
   protected: void RunServer(const std::string &_worldFilename)
@@ -257,7 +257,7 @@ class ServerFixture : public testing::Test
                return this->percentRealTime;
              }
 
-  protected: void OnPose(ConstPose_VPtr &_msg)
+  protected: void OnPose(ConstPosesStampedPtr &_msg)
              {
                boost::mutex::scoped_lock lock(this->receiveMutex);
                for (int i = 0; i < _msg->pose_size(); ++i)
@@ -796,6 +796,13 @@ class ServerFixture : public testing::Test
                  << "    <geometry>"
                  << shapeStr.str()
                  << "    </geometry>"
+                 << "    <surface>"
+                 << "      <contact>"
+                 << "        <ode>"
+                 << "          <min_depth>0.01</min_depth>"
+                 << "        </ode>"
+                 << "      </contact>"
+                 << "    </surface>"
                  << "  </collision>"
                  << "  <visual name ='visual'>"
                  << "    <geometry>"

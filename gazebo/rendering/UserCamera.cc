@@ -536,6 +536,7 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
                                 std::string &_mod)
 {
   VisualPtr result;
+
   if (!this->selectionBuffer)
     return result;
 

@@ -290,7 +290,7 @@ void GpuRaySensor::Init()
 void GpuRaySensor::Fini()
 {
   Sensor::Fini();
-  this->laserCam->Fini();
+  this->scene->RemoveCamera(this->laserCam->GetName());
   this->laserCam.reset();
   this->scene.reset();
 }
@@ -535,7 +535,7 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
   {
     this->laserCam->Render();
     this->laserCam->PostRender();
-    this->lastMeasurementTime = this->world->GetSimTime();
+    this->lastMeasurementTime = this->scene->GetSimTime();
 
     boost::mutex::scoped_lock lock(this->mutex);
 
