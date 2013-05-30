@@ -126,6 +126,9 @@ namespace gazebo
       /// \brief Stream for a log file.
       private: std::ofstream *logStream;
 
+      /// \brief True to silence msg output.
+      private: bool quiet;
+
       /// \brief This is a singleton
       private: friend class SingletonT<Console>;
     };

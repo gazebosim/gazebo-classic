@@ -303,8 +303,10 @@ namespace gazebo
                 {
                   ConnectionReadTask *task = new(tbb::task::allocate_root())
                         ConnectionReadTask(boost::get<0>(_handler), data);
-
                   tbb::task::enqueue(*task);
+
+                  // Non-tbb version:
+                  // boost::get<0>(_handler)(data);
                 }
               }
 

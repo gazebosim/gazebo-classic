@@ -19,6 +19,7 @@
  */
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TopicManager.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -133,6 +134,8 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
     }
   }
 
+  TopicManager::Instance()->AddNodeToProcess(this->node);
+
   if (_block)
   {
     this->SendMessage();
@@ -172,6 +175,12 @@ void Publisher::SendMessage()
     // Clear the local buffer.
     localBuffer.clear();
   }
+}
+
+//////////////////////////////////////////////////
+void Publisher::SetNode(NodePtr _node)
+{
+  this->node = _node;
 }
 
 //////////////////////////////////////////////////

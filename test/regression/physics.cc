@@ -1127,16 +1127,15 @@ void PhysicsTest::JointDamping(const std::string &_physicsEngine)
 
     EXPECT_EQ(vel.x, 0.0);
 
-    //EXPECT_NEAR(vel.y, -10.2007, PHYSICS_TOL);
-    //EXPECT_NEAR(vel.z, -6.51766, PHYSICS_TOL);
-    EXPECT_NEAR(vel.y, -10.2007, PHYSICS_TOL * 2.0);
-    EXPECT_NEAR(vel.z, -6.51766, PHYSICS_TOL * 2.0);
+    EXPECT_NEAR(vel.y, -10.2009, PHYSICS_TOL);
+    EXPECT_NEAR(vel.z, -6.51755, PHYSICS_TOL);
 
-    EXPECT_NEAR(pose.pos.x, 3.0, PHYSICS_TOL);
-    EXPECT_NEAR(pose.pos.y, 5.0e-6, PHYSICS_TOL);
-    EXPECT_NEAR(pose.pos.z, 10.101, PHYSICS_TOL);
-    EXPECT_NEAR(pose.rot.GetAsEuler().x, 0.567336, PHYSICS_TOL);
-    EXPECT_NEAR(pose.rot.GetAsEuler().y, 0.0, PHYSICS_TOL);
+    EXPECT_EQ(pose.pos.x, 3.0);
+    EXPECT_NEAR(pose.pos.y, 0.0, PHYSICS_TOL);
+    EXPECT_NEAR(pose.pos.z, 10.099, PHYSICS_TOL);
+    EXPECT_NEAR(pose.rot.GetAsEuler().x, 0.567334, PHYSICS_TOL);
+    EXPECT_EQ(pose.rot.GetAsEuler().y, 0.0);
+    EXPECT_EQ(pose.rot.GetAsEuler().z, 0.0);
   }
 }
 

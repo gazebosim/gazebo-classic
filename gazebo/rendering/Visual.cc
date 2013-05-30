@@ -1607,12 +1607,6 @@ void Visual::InsertMesh(const std::string &_meshName,
       gzerr << "Unable to create a mesh from " << _meshName << "\n";
       return;
     }
-
-    if (_meshName == "/home/nkoenig/.gazebo/models/hokuyo/meshes/hokuyo.dae")
-    {
-      printf("\n\n RETURNING \n\n");
-      return;
-    }
   }
   else
   {

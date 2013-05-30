@@ -134,32 +134,53 @@ void TopicManager::RemoveNode(unsigned int _id)
 }
 
 //////////////////////////////////////////////////
-void TopicManager::ProcessNodes(bool _onlyOut)
+void TopicManager::AddNodeToProcess(NodePtr _ptr)
 {
-  int s;
-
-  {
-    boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
-
-    // store as size might change (spawning)
-    s = this->nodes.size();
-  }
-
-  // Process nodes in parallel
-  try
+  if (_ptr)
   {
     boost::mutex::scoped_lock lock(this->processNodesMutex);
-    tbb::parallel_for(tbb::blocked_range<size_t>(0, this->nodes.size(), 10),
-        NodeProcess_TBB(&this->nodes));
+    this->nodesToProcess.insert(_ptr);
   }
-  catch(...)
+}
+
+//////////////////////////////////////////////////
+void TopicManager::ProcessNodes(bool _onlyOut)
+{
   {
-    /// Failed to process the nodes this time around. But not to
-    /// worry. This function is called again.
+    boost::mutex::scoped_lock lock(this->processNodesMutex);
+    for (boost::unordered_set<NodePtr>::iterator iter =
+        this->nodesToProcess.begin();
+        iter != this->nodesToProcess.end(); ++iter)
+    {
+      (*iter)->ProcessPublishers();
+    }
+    this->nodesToProcess.clear();
   }
+
+  // Note: In general there are very few nodes. So, parallelization is not
+  // needed. Keeping this code for posterity.
+  // int s;
+  // {
+  //   boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
+  //   // store as size might change (spawning)
+  //   s = this->nodes.size();
+  // }
+  // Process nodes in parallel
+  // try
+  // {
+  //   boost::mutex::scoped_lock lock(this->processNodesMutex);
+  //   tbb::parallel_for(tbb::blocked_range<size_t>(0, this->nodes.size(), 10),
+  //       NodeProcess_TBB(&this->nodes));
+  // }
+  // catch(...)
+  // {
+  //   /// Failed to process the nodes this time around. But not to
+  //   /// worry. This function is called again.
+  // }
 
   if (!this->pauseIncoming && !_onlyOut)
   {
+    int s = 0;
     {
       boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
       s = this->nodes.size();
