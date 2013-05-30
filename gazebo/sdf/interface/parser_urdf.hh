@@ -174,12 +174,14 @@ namespace urdf2gazebo
     private: double laserRetro;
 
     // joint, joint limit dynamics
-    private: bool isStopCfm, isStopErp, isStopKp, isStopKd, isInitialJointPosition, isFudgeFactor;
-    private: double stopCfm, stopErp, stopKp, stopKd, initialJointPosition, fudgeFactor;
+    private: bool isStopCfm, isStopErp, isInitialJointPosition, isFudgeFactor;
+    private: double stopCfm, stopErp, initialJointPosition, fudgeFactor;
     private: bool isProvideFeedback;
     private: bool provideFeedback;
     private: bool isCFMDamping;
     private: bool cfmDamping;
+    private: bool isStopKp, isStopKd;
+    private: double stopKp, stopKd;
 
     // blobs into body or robot
     private: std::vector<TiXmlElement*> blobs;
@@ -223,7 +225,8 @@ namespace urdf2gazebo
     /// \param[in] _str string where vector3 value might be
     /// \param[in] _scale scalar scale for the vector3
     /// \return a urdf::Vector3
-    private: urdf::Vector3 ParseVector3(const std::string &_str, double _scale = 1.0);
+    private: urdf::Vector3 ParseVector3(const std::string &_str,
+                                        double _scale = 1.0);
 
     /// \brief convert values to string
     /// \param[in] _count number of values in _values array

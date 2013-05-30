@@ -632,7 +632,8 @@ namespace gazebo
         std::stringstream ss;
         for (sdf::ElementPtr innerElem = elem->GetFirstElement();
             innerElem;
-            innerElem = innerElem->GetNextElement("")) {
+            innerElem = innerElem->GetNextElement(""))
+        {
           ss << innerElem->ToString("");
         }
         plgnMsg->set_innerxml("<root>" + ss.str() + "</root>");

@@ -279,7 +279,7 @@ void URDF2Gazebo::ParseRobotOrigin(TiXmlDocument &_urdfXml)
     this->initialRobotPose.position = this->ParseVector3(
       originXml->Attribute("xyz"));
     urdf::Vector3 rpy = this->ParseVector3(originXml->Attribute("rpy"));
-    this->initialRobotPose.rotation.setFromRPY( rpy.x, rpy.y, rpy.z);
+    this->initialRobotPose.rotation.setFromRPY(rpy.x, rpy.y, rpy.z);
   }
 }
 
