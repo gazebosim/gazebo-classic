@@ -80,35 +80,38 @@ void PressurePlugin::OnUpdate()
   // Get all the contacts.
   msgs::Contacts contacts;
   contacts = this->parentSensor->GetContacts();
-  msgs::Tactile tactileMsg;
-
-  common::Time currentContactTime;
-  int i = contacts.contact_size() - 1;
-  msgs::Set(currentContactTime, contacts.contact(i).time());
-  if (currentContactTime != this->lastContactTime)
+  if (contacts.contact_size() > 0)
   {
-    tactileMsg.add_collision_name(contacts.contact(i).collision1());
-    tactileMsg.add_collision_id(0);
+    msgs::Tactile tactileMsg;
 
-    double normalForceSum = 0, normalForce;
-    for (int j = 0; j < contacts.contact(i).position_size(); ++j)
+    common::Time currentContactTime;
+    int i = contacts.contact_size() - 1;
+    currentContactTime = msgs::Convert(contacts.contact(i).time());
+    if (currentContactTime != this->lastContactTime)
     {
-      normalForce = contacts.contact(i).normal(j).x() *
-                    contacts.contact(i).wrench(j).body_1_force().x() +
-                    contacts.contact(i).normal(j).y() *
-                    contacts.contact(i).wrench(j).body_1_force().y() +
-                    contacts.contact(i).normal(j).z() *
-                    contacts.contact(i).wrench(j).body_1_force().z();
-      normalForceSum += normalForce;
+      tactileMsg.add_collision_name(contacts.contact(i).collision1());
+      tactileMsg.add_collision_id(0);
+
+      double normalForceSum = 0, normalForce;
+      for (int j = 0; j < contacts.contact(i).position_size(); ++j)
+      {
+        normalForce = contacts.contact(i).normal(j).x() *
+                      contacts.contact(i).wrench(j).body_1_force().x() +
+                      contacts.contact(i).normal(j).y() *
+                      contacts.contact(i).wrench(j).body_1_force().y() +
+                      contacts.contact(i).normal(j).z() *
+                      contacts.contact(i).wrench(j).body_1_force().z();
+        normalForceSum += normalForce;
+      }
+      double area = 1.0;
+      tactileMsg.add_pressure(normalForceSum / area);
+
+      msgs::Set(tactileMsg.mutable_time(), currentContactTime);
+      this->lastContactTime = currentContactTime;
+
+      if (this->tactilePub)
+        this->tactilePub->Publish(tactileMsg);
     }
-    double area = 1.0;
-    tactileMsg.add_pressure(normalForceSum / area);
-
-    msgs::Set(tactileMsg.mutable_time(), currentContactTime);
-    this->lastContactTime = currentContactTime;
-
-    if (this->tactilePub)
-      this->tactilePub->Publish(tactileMsg);
   }
   // for (int i = 0; i < contacts.contact_size(); ++i)
   // {
