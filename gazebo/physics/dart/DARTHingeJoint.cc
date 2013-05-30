@@ -46,25 +46,13 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
   HingeJoint<DARTJoint>::Load(_sdf);
 
   // Name
-  std::string name = this->GetName();
-  this->dartJoint->setName(name.c_str());
+  std::string jointName = this->GetName();
+  this->dartJoint->setName(jointName.c_str());
 
   //----------------------------------------------------------------------------
   // Step 0.
   //----------------------------------------------------------------------------
   poseChildLinkToJoint = this->anchorPose;
-
-//  if (this->sdf->HasElement("pose"))
-//  {
-//    sdf::ElementPtr poseElem = this->sdf->GetElement("pose");
-
-//    // The pose of this joint represented in the child link.
-//    poseChildLinkToJoint = poseElem->GetValuePose();
-//  }
-//  else
-//  {
-//    poseChildLinkToJoint;
-//  }
 
   //----------------------------------------------------------------------------
   // Step 1. Transformation from parent link frame to joint link frame.
@@ -77,9 +65,9 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
 
     DARTUtils::ConvPoseToMat(&matChildLink, this->childLink->GetWorldPose());
     DARTUtils::ConvPoseToMat(&matChildLinkToJoint, this->poseChildLinkToJoint);
-    matJointToChildLink = matChildLinkToJoint.inverse();
+    Eigen::Matrix4d matJointToChildLink = matChildLinkToJoint.inverse();
 
-    matParentLinkToJoint = matChildLink * matChildLinkToJoint;
+    Eigen::Matrix4d matParentLinkToJoint = matChildLink * matChildLinkToJoint;
 
     DARTUtils::ConvMatToPose(&poseParentLinkToJoint, matParentLinkToJoint);
     DARTUtils::ConvMatToPose(&poseJointToChildLink, matJointToChildLink);
@@ -95,48 +83,15 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
     matParentLinkInv = matParentLink.inverse();
     DARTUtils::ConvPoseToMat(&matChildLink, this->childLink->GetWorldPose());
     DARTUtils::ConvPoseToMat(&matChildLinkToJoint, this->poseChildLinkToJoint);
-    matJointToChildLink = matChildLinkToJoint.inverse();
+    Eigen::Matrix4d matJointToChildLink = matChildLinkToJoint.inverse();
 
-    matParentLinkToJoint = matParentLinkInv
+    Eigen::Matrix4d matParentLinkToJoint = matParentLinkInv
                            * matChildLink
                            * matChildLinkToJoint;
 
     DARTUtils::ConvMatToPose(&poseParentLinkToJoint, matParentLinkToJoint);
     DARTUtils::ConvMatToPose(&poseJointToChildLink, matJointToChildLink);
   }
-
-//  if (_sdf->GetElement("parent")->GetValueString("link_name") == std::string("world"))
-//  {
-//    Eigen::Matrix4d matChildLink;
-//    Eigen::Matrix4d matChildLinkToJoint;
-//    Eigen::Matrix4d matParentLinkToJoint;
-
-//    DARTUtils::ConvPoseToMat(&matChildLink, this->childLink->GetWorldPose());
-//    DARTUtils::ConvPoseToMat(&matChildLinkToJoint, this->poseChildLinkToJoint);
-
-//    matParentLinkToJoint = matChildLink * matChildLinkToJoint;
-
-//    DARTUtils::ConvMatToPose(&poseParentLinkToJoint, matParentLinkToJoint);
-//  }
-//  else
-//  {
-//    Eigen::Matrix4d matParentLink;
-//    Eigen::Matrix4d matParentLinkInv;
-//    Eigen::Matrix4d matChildLink;
-//    Eigen::Matrix4d matChildLinkToJoint;
-//    Eigen::Matrix4d matParentLinkToJoint;
-
-//    DARTUtils::ConvPoseToMat(&matParentLink, this->parentLink->GetWorldPose());
-//    matParentLinkInv = matParentLink.inverse();
-//    DARTUtils::ConvPoseToMat(&matChildLink, this->childLink->GetWorldPose());
-//    DARTUtils::ConvPoseToMat(&matChildLinkToJoint, this->poseChildLinkToJoint);
-
-//    matParentLinkToJoint = matParentLinkInv
-//                           * matChildLink
-//                           * matChildLinkToJoint;
-
-//    DARTUtils::ConvMatToPose(&poseParentLinkToJoint, matParentLinkToJoint);
-//  }
 
   //----------------------------------------------------------------------------
   // Step 2. Transformation by the rotate axis.
@@ -165,17 +120,6 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
   this->dartJoint->addTransform(rotHinge, true);
 
   DARTUtils::AddTransformToDARTJoint(this->dartJoint, poseJointToChildLink);
-
-
-//  kinematics::TrfmTranslate* trfmTrans
-//      = DARTUtils::CreateTrfmTranslate(_pose.pos);
-
-//  _rtl8Joint->addTransform(trfmTrans, false);
-
-//  kinematics::TrfmRotateQuat* trfmRot
-//      = DARTUtils::CreateTrfmRotateQuat(poseJointToChildLink.rot);
-
-//  this->dartJoint->addTransform(trfmRot, false);
 
   dartJoint->setDampingCoefficient(0, dampingCoefficient);
 }
@@ -219,6 +163,8 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
   {
     worldToJointTransform = dartJoint->getParentNode()->getWorldTransform();
   }
+  Eigen::Matrix4d matParentLinkToJoint;
+  DARTUtils::ConvPoseToMat(&matParentLinkToJoint, poseParentLinkToJoint);
   worldToJointTransform = worldToJointTransform * matParentLinkToJoint;
   globalAxis_Eigen = worldToJointTransform.topLeftCorner<3,3>() * localAxis_Eigen;
   globalAxis.Set(globalAxis_Eigen(0), globalAxis_Eigen(1), globalAxis_Eigen(2));

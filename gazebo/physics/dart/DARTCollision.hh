@@ -18,8 +18,6 @@
 #ifndef _DARTCOLLISION_HH_
 #define _DARTCOLLISION_HH_
 
-//#include "ode/ode.h"
-
 #include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"

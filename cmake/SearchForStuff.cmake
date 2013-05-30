@@ -130,16 +130,18 @@ if (PKG_CONFIG_FOUND)
     set (HAVE_DART FALSE)
   endif()
 
-#-------------------------------------------------------------------------------
-# DART dependency Eigen3
-#-------------------------------------------------------------------------------
-#include (${gazebo_cmake_dir}/FindEigen3.cmake)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
-find_package(Eigen3 REQUIRED)
-if(EIGEN3_FOUND)
+  #-------------------------------------------------------------------------------
+  # TODO: 
+  #-------------------------------------------------------------------------------
+  # DART dependency Eigen3
+  #-------------------------------------------------------------------------------
+  #include (${gazebo_cmake_dir}/FindEigen3.cmake)
+  set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
+  find_package(Eigen3 REQUIRED)
+  if(EIGEN3_FOUND)
     include_directories(${EIGEN3_INCLUDE_DIR})
     #target_link_libraries(foo ${EIGEN3_LIBRARY})
-endif()
+  endif()
 
   pkg_check_modules(fcl FCL)
   pkg_check_modules(assimp ASSIMP)

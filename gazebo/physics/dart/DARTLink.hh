@@ -18,8 +18,6 @@
 #ifndef _DARTLINK_HH_
 #define _DARTLINK_HH_
 
-#include <Eigen/Dense>
-
 #include "gazebo/physics/Link.hh"
 
 #include "gazebo/physics/dart/dart_inc.h"
@@ -37,8 +35,6 @@ namespace gazebo
     /// \brief DART Link class
     class DARTLink : public Link
     {
-
-
       /// \brief Constructor
       public: explicit DARTLink(EntityPtr _parent);
 
