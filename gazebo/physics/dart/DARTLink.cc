@@ -247,7 +247,7 @@ void DARTLink::Init()
                                 canonicalLinkPose.rot.z);
 
     //Eigen::Quaterniond expToQuat(Eigen::Vector3d& v);
-    Eigen::Vector3d eigenVec3 = ::math::quatToExp(eigenQuat);
+    Eigen::Vector3d eigenVec3 = dart_math::quatToExp(eigenQuat);
 
     rotX->setValue(eigenVec3(0));
     rotY->setValue(eigenVec3(1));

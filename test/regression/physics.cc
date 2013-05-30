@@ -354,46 +354,46 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   std::vector<double> radii;
   std::vector<math::Vector3> cogs;
 
-//  // sphere1 and sphere2 have c.g. at center of sphere, different sizes
-//  modelNames.push_back("small_centered_sphere");
-//  x0s.push_back(0);
-//  y0s.push_back(0);
-//  radii.push_back(r1);
-//  cogs.push_back(v30);
+  // sphere1 and sphere2 have c.g. at center of sphere, different sizes
+  modelNames.push_back("small_centered_sphere");
+  x0s.push_back(0);
+  y0s.push_back(0);
+  radii.push_back(r1);
+  cogs.push_back(v30);
 
-//  modelNames.push_back("large_centered_sphere");
-//  x0s.push_back(4);
-//  y0s.push_back(0);
-//  radii.push_back(r2);
-//  cogs.push_back(v30);
+  modelNames.push_back("large_centered_sphere");
+  x0s.push_back(4);
+  y0s.push_back(0);
+  radii.push_back(r2);
+  cogs.push_back(v30);
 
-//  // sphere3 has c.g. below the center
-//  modelNames.push_back("lowered_cog_sphere");
-//  x0s.push_back(8);
-//  y0s.push_back(0);
-//  radii.push_back(r2);
-//  cogs.push_back(math::Vector3(0, 0, -r1));
+  // sphere3 has c.g. below the center
+  modelNames.push_back("lowered_cog_sphere");
+  x0s.push_back(8);
+  y0s.push_back(0);
+  radii.push_back(r2);
+  cogs.push_back(math::Vector3(0, 0, -r1));
 
-//  // sphere4 has c.g. above the center
-//  modelNames.push_back("raised_cog_sphere");
-//  x0s.push_back(-4);
-//  y0s.push_back(0);
-//  radii.push_back(r2);
-//  cogs.push_back(math::Vector3(0, 0, r1));
+  // sphere4 has c.g. above the center
+  modelNames.push_back("raised_cog_sphere");
+  x0s.push_back(-4);
+  y0s.push_back(0);
+  radii.push_back(r2);
+  cogs.push_back(math::Vector3(0, 0, r1));
 
-//  // sphere5 has c.g. to the side along y axis; it will roll
-//  modelNames.push_back("cog_y_offset_sphere");
-//  x0s.push_back(-8);
-//  y0s.push_back(0);
-//  radii.push_back(r2);
-//  cogs.push_back(math::Vector3(0, r1, 0));
+  // sphere5 has c.g. to the side along y axis; it will roll
+  modelNames.push_back("cog_y_offset_sphere");
+  x0s.push_back(-8);
+  y0s.push_back(0);
+  radii.push_back(r2);
+  cogs.push_back(math::Vector3(0, r1, 0));
 
-//  // sphere6 has c.g. to the side along x axis; it will roll
-//  modelNames.push_back("cog_x_offset_sphere");
-//  x0s.push_back(15);
-//  y0s.push_back(0);
-//  radii.push_back(r2);
-//  cogs.push_back(math::Vector3(r1, 0, 0));
+  // sphere6 has c.g. to the side along x axis; it will roll
+  modelNames.push_back("cog_x_offset_sphere");
+  x0s.push_back(15);
+  y0s.push_back(0);
+  radii.push_back(r2);
+  cogs.push_back(math::Vector3(r1, 0, 0));
 
   // sphere7 has c.g. to the side diagonally; it will roll
   modelNames.push_back("cog_xy_45deg_offset_sphere");
@@ -405,14 +405,14 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   cogs.push_back(math::Vector3(r1*cos(angle.Radian()),
                                r1*sin(angle.Radian()), 0));
 
-//  // sphere8 has c.g. to the side diagonally; it will roll
-//  modelNames.push_back("cog_xy_-30deg_offset_sphere");
-//  x0s.push_back(0);
-//  y0s.push_back(-8);
-//  radii.push_back(r2);
-//  angle.SetFromDegree(-30);
-//  cogs.push_back(math::Vector3(r1*cos(angle.Radian()),
-//                               r1*sin(angle.Radian()), 0));
+  // sphere8 has c.g. to the side diagonally; it will roll
+  modelNames.push_back("cog_xy_-30deg_offset_sphere");
+  x0s.push_back(0);
+  y0s.push_back(-8);
+  radii.push_back(r2);
+  angle.SetFromDegree(-30);
+  cogs.push_back(math::Vector3(r1*cos(angle.Radian()),
+                               r1*sin(angle.Radian()), 0));
 
   unsigned int i;
   for (i = 0; i < modelNames.size(); ++i)
