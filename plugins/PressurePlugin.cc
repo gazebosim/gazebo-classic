@@ -81,43 +81,52 @@ void PressurePlugin::OnUpdate()
   msgs::Contacts contacts;
   contacts = this->parentSensor->GetContacts();
   msgs::Tactile tactileMsg;
-  for (int i = 0; i < contacts.contact_size(); ++i)
+
+  common::Time currentContactTime;
+  int i = contacts.contact_size() - 1;
+  msgs::Set(currentContactTime, contacts.contact(i).time());
+  if (currentContactTime != this->lastContactTime)
   {
-    //std::cout << "Collision between[" << contacts.contact(i).collision1()
-    //          << "] and [" << contacts.contact(i).collision2() << "]\n";
     tactileMsg.add_collision_name(contacts.contact(i).collision1());
     tactileMsg.add_collision_id(0);
-    double normalForceSum = 0, normalForce;
 
+    double normalForceSum = 0, normalForce;
     for (int j = 0; j < contacts.contact(i).position_size(); ++j)
     {
-      //std::cout << j << "  Position:"
-      //          << contacts.contact(i).position(j).x() << " "
-      //          << contacts.contact(i).position(j).y() << " "
-      //          << contacts.contact(i).position(j).z() << "\n";
-      //std::cout << "   Normal:"
-      //          << contacts.contact(i).normal(j).x() << " "
-      //          << contacts.contact(i).normal(j).y() << " "
-      //          << contacts.contact(i).normal(j).z() << "\n";
-      //std::cout << "   Depth:" << contacts.contact(i).depth(j) << "\n";
       normalForce = contacts.contact(i).normal(j).x() *
-                   contacts.contact(i).wrench(j).body_1_force().x() +
-                   contacts.contact(i).normal(j).y() *
-                   contacts.contact(i).wrench(j).body_1_force().y() +
-                   contacts.contact(i).normal(j).z() *
-                   contacts.contact(i).wrench(j).body_1_force().z();
-      //std::cout << "   Normal force 1: "
-      //          << normalForce
-      //          << "\n";
+                    contacts.contact(i).wrench(j).body_1_force().x() +
+                    contacts.contact(i).normal(j).y() *
+                    contacts.contact(i).wrench(j).body_1_force().y() +
+                    contacts.contact(i).normal(j).z() *
+                    contacts.contact(i).wrench(j).body_1_force().z();
       normalForceSum += normalForce;
     }
     double area = 1.0;
     tactileMsg.add_pressure(normalForceSum / area);
+
+    msgs::Set(tactileMsg.mutable_time(), currentContactTime);
+    this->lastContactTime = currentContactTime;
+
+    if (this->tactilePub)
+      this->tactilePub->Publish(tactileMsg);
   }
+  // for (int i = 0; i < contacts.contact_size(); ++i)
+  // {
+  //   tactileMsg.add_collision_name(contacts.contact(i).collision1());
+  //   tactileMsg.add_collision_id(0);
+  //   double normalForceSum = 0, normalForce;
 
-  tactileMsg.mutable_time()->set_sec(contacts.time().sec());
-  tactileMsg.mutable_time()->set_nsec(contacts.time().nsec());
-
-  if (this->tactilePub)
-    this->tactilePub->Publish(tactileMsg);
+  //   for (int j = 0; j < contacts.contact(i).position_size(); ++j)
+  //   {
+  //     normalForce = contacts.contact(i).normal(j).x() *
+  //                   contacts.contact(i).wrench(j).body_1_force().x() +
+  //                   contacts.contact(i).normal(j).y() *
+  //                   contacts.contact(i).wrench(j).body_1_force().y() +
+  //                   contacts.contact(i).normal(j).z() *
+  //                   contacts.contact(i).wrench(j).body_1_force().z();
+  //     normalForceSum += normalForce;
+  //   }
+  //   double area = 1.0;
+  //   tactileMsg.add_pressure(normalForceSum / area);
+  // }
 }

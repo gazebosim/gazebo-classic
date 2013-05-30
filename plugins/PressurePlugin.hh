@@ -65,6 +65,9 @@ namespace gazebo
 
     /// \brief Parent sensor name.
     private: std::string parentSensorName;
+
+    /// \brief Last contact time.
+    private: common::Time lastContactTime;
   };
 }
 #endif
