@@ -178,6 +178,8 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
 //      = DARTUtils::CreateTrfmRotateQuat(poseJointToChildLink.rot);
 
 //  this->dartJoint->addTransform(trfmRot, false);
+
+  dartJoint->setDampingCoefficient(0, dampingCoefficient);
 }
 
 //////////////////////////////////////////////////
@@ -288,11 +290,14 @@ void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
+void DARTHingeJoint::SetDamping(int _index, double _damping)
 {
-  //   this->damping_coefficient = _damping;
-  //   dJointSetDamping(this->jointId, this->damping_coefficient);
-  gzwarn << "Not implemented...\n";
+  assert(_index == 0);
+  assert(_damping >= 0.0);
+
+  this->dampingCoefficient = _damping;
+
+  dartJoint->setDampingCoefficient(_index, _damping);
 }
 
 //////////////////////////////////////////////////

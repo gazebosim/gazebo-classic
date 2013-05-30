@@ -97,6 +97,26 @@ void DARTJoint::Load(sdf::ElementPtr _sdf)
     gzthrow("joint without links\n");
   }
 
+  if (this->sdf->HasElement("axis"))
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    if (axisElem->HasElement("dynamics"))
+    {
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+
+      if (dynamicsElem->HasElement("damping"))
+      {
+        //this->SetDamping(0, dynamicsElem->GetValueDouble("damping"));
+        dampingCoefficient = dynamicsElem->GetValueDouble("damping");
+      }
+      if (dynamicsElem->HasElement("friction"))
+      {
+        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+        gzlog << "joint friction not implemented\n";
+      }
+    }
+  }
+
   dartModel->GetSkeletonDynamics()->addJoint(dartJoint);
 }
 
@@ -180,20 +200,21 @@ void DARTJoint::Attach(LinkPtr _parent, LinkPtr _child)
 //////////////////////////////////////////////////
 void DARTJoint::Detach()
 {
-  this->childLink.reset();
-  this->parentLink.reset();
+//  this->childLink.reset();
+//  this->parentLink.reset();
 
-  // TODO: DART's joint can't change their links connected.
-  // For now, recreating the joint is the only way.
-  if (this->dartJoint)
-    delete this->dartJoint;
+//  // TODO: DART's joint can't change their links connected.
+//  // For now, recreating the joint is the only way.
+//  if (this->dartJoint)
+//    delete this->dartJoint;
 
-  kinematics::BodyNode* parentBodyNode = boost::shared_dynamic_cast<DARTLink>(
-        this->parentLink)->GetBodyNode();
-  kinematics::BodyNode* childBodyNode = boost::shared_dynamic_cast<DARTLink>(
-        this->childLink)->GetBodyNode();
+//  kinematics::BodyNode* parentBodyNode = boost::shared_dynamic_cast<DARTLink>(
+//        this->parentLink)->GetBodyNode();
+//  kinematics::BodyNode* childBodyNode = boost::shared_dynamic_cast<DARTLink>(
+//        this->childLink)->GetBodyNode();
 
-  this->dartJoint = new kinematics::Joint(NULL, NULL);
+//  this->dartJoint = new kinematics::Joint(NULL, NULL);
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////

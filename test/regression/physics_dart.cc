@@ -56,10 +56,11 @@ TEST_F(PhysicsTest, DART_FIRST_TEST)
   //EmptyWorld_JS("worlds/dart/sp_test.world");
   //EmptyWorld_JS("worlds/dart/sp_test.world");
   //EmptyWorld_JS("worlds/dart/falling_box.world");
-  EmptyWorld_JS("worlds/dart/falling2.world");
+  //EmptyWorld_JS("worlds/dart/falling2.world");
   //EmptyWorld_JS("worlds/dart/coll_filtering.world");
   //EmptyWorld_JS("worlds/dart/double_pendulum.world");
   //EmptyWorld_JS("worlds/dart/revolute_joints.world");
+  EmptyWorld_JS("worlds/dart/damp_test.world");
 }
 #endif // HAVE_DART
 

@@ -504,6 +504,14 @@ math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 {
   math::Vector3 vel;
 
+  const Eigen::Vector3d& linVel =  this->dartBodyNode->mVel;
+
+  vel.x = linVel[0];
+  vel.y = linVel[1];
+  vel.z = linVel[2];
+
+  return vel;
+
   gzwarn << "Not implemented!\n";
 
   return vel;
