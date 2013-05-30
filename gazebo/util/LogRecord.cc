@@ -859,9 +859,3 @@ bool LogRecord::IsReadyToStart() const
 {
   return this->readyToStart;
 }
-
-//////////////////////////////////////////////////
-void LogRecord::OnPause(bool _pause)
-{
-  this->pauseState = _pause;
-}
