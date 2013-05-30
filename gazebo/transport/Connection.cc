@@ -68,7 +68,7 @@ Connection::Connection()
   this->acceptor = NULL;
   this->readQuit = false;
   this->writeQueue.clear();
-  //this->writeCount = 0;
+  this->writeCount = 0;
 
   this->localURI = std::string("http://") + this->GetLocalHostname() + ":" +
                    boost::lexical_cast<std::string>(this->GetLocalPort());
@@ -309,45 +309,29 @@ void Connection::ProcessWriteQueue(bool _blocking)
   boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
   // async_write should only be called when the last async_write has
-  // completed. Therefore we have to check the writeCount attribute
-  if (this->writeQueue.size() == 0)// || this->writeCount > 0)
+  // completed. therefore we have to check the writeCount attribute
+  if (this->writeQueue.size() == 0 || this->writeCount > 0)
   {
     return;
   }
 
-  /*boost::asio::streambuf *buffer(new boost::asio::streambuf);
-  std::ostream os(buffer);
-
-  for (unsigned int i = 0; i < this->writeQueue.size(); i++)
-  {
-    os << this->writeQueue[i];
-  }
-  this->writeQueue.clear();
-  */
-  //this->writeCount++;
+  this->writeCount++;
 
   // Write the serialized data to the socket. We use
   // "gather-write" to send both the head and the data in
   // a single write operation
   if (!_blocking)
   {
-    for (std::deque<std::string>::iterator iter = this->writeQueue.begin();
-        iter != this->writeQueue.end(); ++iter)
-    {
-      this->outBox.push_back(*iter);
-      boost::asio::async_write(*this->socket,
-          boost::asio::buffer(this->outBox.back(), this->outBox.back().size()),
+    boost::asio::async_write(*this->socket,
+        boost::asio::buffer(this->writeQueue.front(),
+          this->writeQueue.front().size()),
           boost::bind(&Connection::OnWrite, shared_from_this(),
-            boost::asio::placeholders::error));//, buffer));
-    }
-    this->writeQueue.clear();
+            boost::asio::placeholders::error));
   }
   else
   {
     try
     {
-      //boost::asio::write(*this->socket, buffer->data());
-
       boost::asio::write(*this->socket,
           boost::asio::buffer(this->writeQueue.front(),
             this->writeQueue.front().size()));
@@ -358,8 +342,7 @@ void Connection::ProcessWriteQueue(bool _blocking)
     }
 
     this->writeQueue.pop_front();
-    //this->writeCount--;
-    //delete buffer;
+    this->writeCount--;
   }
 }
 
@@ -377,14 +360,11 @@ std::string Connection::GetRemoteURI() const
 
 //////////////////////////////////////////////////
 void Connection::OnWrite(const boost::system::error_code &_e)
-                         //boost::asio::streambuf *_buffer)
 {
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    //this->writeCount--;
-    this->outBox.pop_front();
-    //delete _buffer;
-    //_buffer = NULL;
+    this->writeQueue.pop_front();
+    this->writeCount--;
   }
 
   if (_e)
