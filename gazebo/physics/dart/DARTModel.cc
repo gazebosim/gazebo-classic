@@ -30,7 +30,6 @@ DARTModel::DARTModel(BasePtr _parent)
   : Model(_parent), dartSkeletonDynamics(NULL),
     dartCanonicalJoint(NULL)
 {
-  
 }
 
 //////////////////////////////////////////////////
@@ -49,8 +48,8 @@ void DARTModel::Load(sdf::ElementPtr _sdf)
   Model::Load(_sdf);
 
   // Name
-  std::string name = this->GetName();
-  this->dartSkeletonDynamics->setName(name.c_str());
+  std::string modelName = this->GetName();
+  this->dartSkeletonDynamics->setName(modelName.c_str());
 
   //  if (this->IsStatic())
   //    dartSkeletonDynamics->setImmobileState(true);

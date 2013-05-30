@@ -35,7 +35,6 @@ using namespace physics;
 DARTSliderJoint::DARTSliderJoint(BasePtr _parent)
     : SliderJoint<DARTJoint>(_parent)
 {
-//   this->jointId = dJointCreateSlider(_worldId, NULL);
 }
 
 //////////////////////////////////////////////////
@@ -49,25 +48,14 @@ void DARTSliderJoint::Load(sdf::ElementPtr _sdf)
   //
   SliderJoint<DARTJoint>::Load(_sdf);
 
-  // Slider joint has only one degree of freedom.
-  //kinematics::Dof* dofs = new kinematics::Dof;
-
-  // TODO: Could I know the sliding axis?; x, y, z
-
-  //
-//  kinematics::TrfmTranslate* trans
-//      = new kinematics::TrfmTranslate(dofs[0], dofs[1], dofs[2]);
-
-  //
-  //this->dartJoint->addTransform(trans);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 math::Vector3 DARTSliderJoint::GetGlobalAxis(int /*_index*/) const
 {
-//   dVector3 result;
-//   dJointGetSliderAxis(this->jointId, result);
-//   return math::Vector3(result[0], result[1], result[2]);
+  gzwarn << "Not implemented!\n";
+
   return math::Vector3(0, 0, 0);
 }
 
@@ -75,23 +63,24 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(int /*_index*/) const
 math::Angle DARTSliderJoint::GetAngleImpl(int /*_index*/) const
 {
    math::Angle result;
-//   if (this->jointId)
-//     result = dJointGetSliderPosition(this->jointId);
+
+   gzwarn << "Not implemented!\n";
+
    return result;
 }
 
 //////////////////////////////////////////////////
 double DARTSliderJoint::GetVelocity(int /*index*/) const
 {
-//   double result = dJointGetSliderPositionRate(this->jointId);
-//   return result;
+  gzwarn << "Not implemented!\n";
+
   return 0;
 }
 
 //////////////////////////////////////////////////
 void DARTSliderJoint::SetVelocity(int /*index*/, double /*_angle*/)
 {
-   //this->SetParam(dParamVel, _angle);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
@@ -140,38 +129,31 @@ void DARTSliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 //////////////////////////////////////////////////
 void DARTSliderJoint::SetDamping(int /*index*/, double /*_damping*/)
 {
-//   this->damping_coefficient = _damping;
-//   dJointSetDamping(this->jointId, this->damping_coefficient);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTSliderJoint::ApplyDamping()
 {
-//   double damping_force = this->damping_coefficient * this->GetVelocity(0);
-//   this->SetForce(0, damping_force);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTSliderJoint::SetForce(int /*index*/, double /*_force*/)
 {
-//   if (this->childLink)
-//     this->childLink->SetEnabled(true);
-//   if (this->parentLink)
-//     this->parentLink->SetEnabled(true);
-// 
-//   dJointAddSliderForce(this->jointId, _force);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTSliderJoint::SetMaxForce(int /*_index*/, double /*_t*/)
 {
-//   this->SetParam(dParamFMax, _t);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 double DARTSliderJoint::GetMaxForce(int /*_index*/)
 {
-//   return this->GetParam(dParamFMax);
+  gzwarn << "Not implemented!\n";
 
   return 0;
 }

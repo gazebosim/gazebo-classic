@@ -308,112 +308,48 @@ bool DARTLink::GetEnabled() const
 //////////////////////////////////////////////////
 void DARTLink::UpdateMass()
 {
-  //   if (!this->linkId)
-  //     return;
-  //
-  //   dMass odeMass;
-  //   dMassSetZero(&odeMass);
-  //
-  //   // The CoG must always be (0, 0, 0)
-  //   math::Vector3 cog(0, 0, 0);
-  //
-  //   math::Vector3 principals = this->inertial->GetPrincipalMoments();
-  //   math::Vector3 products = this->inertial->GetProductsofInertia();
-  //
-  //   dMassSetParameters(&odeMass, this->inertial->GetMass(),
-  //       cog.x, cog.y, cog.z,
-  //       principals.x, principals.y, principals.z,
-  //       products.x, products.y, products.z);
-  //
-  //   if (this->inertial->GetMass() > 0)
-  //     dBodySetMass(this->linkId, &odeMass);
-  //   else
-  //     gzthrow("Setting custom link " + this->GetName() + "mass to zero!");
   gzwarn << "Not implemented!\n";
 }
 
 /////////////////////////////////////////////////////////////////////
 void DARTLink::UpdateSurface()
 {
-  //   Base_V::iterator iter;
-  //   Base_V::iterator iter_end = this->children.end();
-  //   for (iter = this->children.begin(); iter != iter_end; ++iter)
-  //   {
-  //     if ((*iter)->HasType(Base::COLLISION))
-  //     {
-  //       ODECollisionPtr g = boost::shared_static_cast<ODECollision>(*iter);
-  //       if (g->IsPlaceable() && g->GetCollisionId())
-  //       {
-  //         // Set surface properties max_vel and min_depth
-  //         dBodySetMaxVel(this->linkId, g->GetSurface()->maxVel);
-  //         dBodySetMinDepth(this->linkId, g->GetSurface()->minDepth);
-  //       }
-  //     }
-  //   }
   gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTLink::SetLinearVel(const math::Vector3& /*_vel*/)
 {
-  //   if (this->linkId)
-  //   {
-  //     dBodySetLinearVel(this->linkId, _vel.x, _vel.y, _vel.z);
-  //   }
   gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTLink::SetAngularVel(const math::Vector3& /*_vel*/)
 {
-  //   if (this->linkId)
-  //   {
-  //     dBodySetAngularVel(this->linkId, _vel.x, _vel.y, _vel.z);
-  //   }
   gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTLink::SetForce(const math::Vector3& /*_force*/)
 {
-  //   if (this->linkId)
-  //   {
-  //     this->SetEnabled(true);
-  //     dBodySetForce(this->linkId, _force.x, _force.y, _force.z);
-  //   }
   gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTLink::SetTorque(const math::Vector3& /*_torque*/)
 {
-  //   if (this->linkId)
-  //   {
-  //     this->SetEnabled(true);
-  //     dBodySetTorque(this->linkId, _torque.x, _torque.y, _torque.z);
-  //   }
   gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTLink::AddForce(const math::Vector3& /*_force*/)
 {
-  //   if (this->linkId)
-  //   {
-  //     this->SetEnabled(true);
-  //     dBodyAddForce(this->linkId, _force.x, _force.y, _force.z);
-  //   }
   gzwarn << "Not implemented!\n";
 }
 
 /////////////////////////////////////////////////
 void DARTLink::AddRelativeForce(const math::Vector3& /*_force*/)
 {
-  //   if (this->linkId)
-  //   {
-  //     this->SetEnabled(true);
-  //     dBodyAddRelForce(this->linkId, _force.x, _force.y, _force.z);
-  //   }
   gzwarn << "Not implemented!\n";
 }
 
@@ -421,12 +357,6 @@ void DARTLink::AddRelativeForce(const math::Vector3& /*_force*/)
 void DARTLink::AddForceAtWorldPosition(const math::Vector3& /*_force*/,
                                         const math::Vector3& /*_pos*/)
 {
-  //   if (this->linkId)
-  //   {
-  //     this->SetEnabled(true);
-  //     dBodyAddForceAtPos(this->linkId, _force.x, _force.y, _force.z,
-  //                           _pos.x, _pos.y, _pos.z);
-  //   }
   gzwarn << "Not implemented!\n";
 }
 
@@ -434,34 +364,18 @@ void DARTLink::AddForceAtWorldPosition(const math::Vector3& /*_force*/,
 void DARTLink::AddForceAtRelativePosition(const math::Vector3& /*_force*/,
                                            const math::Vector3& /*_relpos*/)
 {
-  //   if (this->linkId)
-  //   {
-  //     this->SetEnabled(true);
-  //     dBodyAddForceAtRelPos(this->linkId, _force.x, _force.y, _force.z,
-  //                           _relpos.x, _relpos.y, _relpos.z);
-  //   }
   gzwarn << "Not implemented!\n";
 }
 
 /////////////////////////////////////////////////
 void DARTLink::AddTorque(const math::Vector3& /*_torque*/)
 {
-  //   if (this->linkId)
-  //   {
-  //     this->SetEnabled(true);
-  //     dBodyAddTorque(this->linkId, _torque.x, _torque.y, _torque.z);
-  //   }
   gzwarn << "Not implemented!\n";
 }
 
 /////////////////////////////////////////////////
 void DARTLink::AddRelativeTorque(const math::Vector3& /*_torque*/)
 {
-  //   if (this->linkId)
-  //   {
-  //     this->SetEnabled(true);
-  //     dBodyAddRelTorque(this->linkId, _torque.x, _torque.y, _torque.z);
-  //   }
   gzwarn << "Not implemented!\n";
 }
 
@@ -471,8 +385,8 @@ gazebo::math::Vector3 DARTLink::GetWorldLinearVel(
 {
   math::Vector3 vel;
 
-  //const Eigen::Vector3d& linVel = this->dartBodyNode->getWorldLinearVel();
   // TODO:
+  //const Eigen::Vector3d& linVel = this->dartBodyNode->getWorldLinearVel();
   const Eigen::Vector3d& linVel =  this->dartBodyNode->mVel;
 
   vel.x = linVel[0];
@@ -489,12 +403,6 @@ math::Vector3 DARTLink::GetWorldLinearVel(
 {
   math::Vector3 vel;
 
-  //   if (this->linkId)
-  //   {
-  //     const dReal *dvel;
-  //     dvel = dBodyGetLinearVel(this->linkId);
-  //     vel.Set(dvel[0], dvel[1], dvel[2]);
-  //   }
   gzwarn << "Not implemented!\n";
 
   return vel;
@@ -536,17 +444,6 @@ math::Vector3 DARTLink::GetWorldForce() const
 {
   math::Vector3 force;
 
-  //   if (this->linkId)
-  //   {
-  //     const dReal *dforce;
-  //
-  //     dforce = dBodyGetForce(this->linkId);
-  //
-  //     force.x = dforce[0];
-  //     force.y = dforce[1];
-  //     force.z = dforce[2];
-  //   }
-
   gzwarn << "Not implemented!\n";
 
   return force;
@@ -556,17 +453,6 @@ math::Vector3 DARTLink::GetWorldForce() const
 math::Vector3 DARTLink::GetWorldTorque() const
 {
   math::Vector3 torque;
-
-  //   if (this->linkId)
-  //   {
-  //     const dReal *dtorque;
-  //
-  //     dtorque = dBodyGetTorque(this->linkId);
-  //
-  //     torque.x = dtorque[0];
-  //     torque.y = dtorque[1];
-  //     torque.z = dtorque[2];
-  //   }
 
   gzwarn << "Not implemented!\n";
 
@@ -594,25 +480,18 @@ bool DARTLink::GetGravityMode() const
 //////////////////////////////////////////////////
 void DARTLink::SetSelfCollide(bool /*_collide*/)
 {
-  //   this->sdf->GetElement("self_collide")->Set(_collide);
-  //   if (_collide)
-  //     this->spaceId = dSimpleSpaceCreate(this->odePhysics->GetSpaceId());
   gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTLink::SetLinearDamping(double /*_damping*/)
 {
-  //   if (this->GetODEId())
-  //     dBodySetLinearDamping(this->GetODEId(), _damping);
   gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTLink::SetAngularDamping(double /*_damping*/)
 {
-  //   if (this->GetODEId())
-  //     dBodySetAngularDamping(this->GetODEId(), _damping);
   gzwarn << "Not implemented!\n";
 }
 
@@ -620,13 +499,7 @@ void DARTLink::SetAngularDamping(double /*_damping*/)
 void DARTLink::SetKinematic(const bool& _state)
 {
   this->sdf->GetElement("kinematic")->Set(_state);
-  //   if (this->linkId)
-  //   {
-  //     if (_state)
-  //       dBodySetKinematic(this->linkId);
-  //     else
-  //       dBodySetDynamic(this->linkId);
-  //   }
+
   gzwarn << "Not implemented!\n";
 }
 
@@ -635,8 +508,6 @@ bool DARTLink::GetKinematic() const
 {
   bool result = false;
 
-  //   if (this->linkId)
-  //     result = dBodyIsKinematic(this->linkId);
   gzwarn << "Not implemented!\n";
 
   return result;
@@ -645,10 +516,6 @@ bool DARTLink::GetKinematic() const
 //////////////////////////////////////////////////
 void DARTLink::SetAutoDisable(bool /*_disable*/)
 {
-  //   if (this->GetModel()->GetJointCount() == 0 && this->linkId)
-  //   {
-  //     dBodySetAutoDisableFlag(this->linkId, _disable);
-  //   }
   gzwarn << "Not implemented!\n";
 }
 

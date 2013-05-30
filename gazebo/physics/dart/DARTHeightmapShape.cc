@@ -34,59 +34,7 @@ DARTHeightmapShape::~DARTHeightmapShape()
 }
 
 //////////////////////////////////////////////////
-// dReal DARTHeightmapShape::GetHeightCallback(void *_data, int _x, int _y)
-// {
-//   // Return the height at a specific vertex
-//   return static_cast<ODEHeightmapShape*>(_data)->GetHeight(_x, _y);
-// }
-
-//////////////////////////////////////////////////
 void DARTHeightmapShape::Init()
 {
-//   HeightmapShape::Init();
-// 
-//   ODECollisionPtr oParent =
-//     boost::shared_static_cast<ODECollision>(this->collisionParent);
-// 
-//   // Step 2: Create the ODE heightfield collision
-//   this->odeData = dGeomHeightfieldDataCreate();
-// 
-//   // Step 3: Setup a callback method for ODE
-//   dGeomHeightfieldDataBuildCallback(
-//       this->odeData,
-//       this,
-//       ODEHeightmapShape::GetHeightCallback,
-//       this->GetSize().x,  // in meters
-//       this->GetSize().y,  // in meters
-//       this->vertSize,  // width sampling size
-//       this->vertSize,  // depth sampling size (along height of image)
-//       1.0,  // vertical (z-axis) scaling
-//       this->GetPos().z,  // vertical (z-axis) offset
-//       1.0,  // vertical thickness for closing the height map mesh
-//       0);  // wrap mode
-// 
-//   // Step 4: Restrict the bounds of the AABB to improve efficiency
-//   dGeomHeightfieldDataSetBounds(this->odeData, 0, this->GetSize().z);
-// 
-//   oParent->SetCollision(dCreateHeightfield(0, this->odeData, 1), false);
-//   oParent->SetStatic(true);
-// 
-//   // Rotate so Z is up, not Y (which is the default orientation)
-//   math::Quaternion quat;
-//   math::Pose pose = oParent->GetWorldPose();
-// 
-//   // TODO: FIXME:  double check this, if Y is up,
-//   // rotating by roll of 90 deg will put Z-down.
-//   quat.SetFromEuler(math::Vector3(GZ_DTOR(90), 0, 0));
-// 
-//   pose.rot = pose.rot * quat;
-//   // this->body->SetPose(pose);
-// 
-//   dQuaternion q;
-//   q[0] = pose.rot.w;
-//   q[1] = pose.rot.x;
-//   q[2] = pose.rot.y;
-//   q[3] = pose.rot.z;
-// 
-//   dGeomSetQuaternion(oParent->GetCollisionId(), q);
+  gzwarn << "Not implemented!\n";
 }

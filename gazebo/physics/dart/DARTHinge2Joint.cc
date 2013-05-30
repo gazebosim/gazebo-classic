@@ -31,7 +31,6 @@ using namespace physics;
 DARTHinge2Joint::DARTHinge2Joint(BasePtr _parent)
     : Hinge2Joint<DARTJoint>(_parent)
 {
-  //this->jointId = dJointCreateHinge2(_worldId, NULL);
 }
 
 //////////////////////////////////////////////////
@@ -48,54 +47,34 @@ void DARTHinge2Joint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 math::Vector3 DARTHinge2Joint::GetAnchor(int /*_index*/) const
 {
-//   dVector3 result;
-// 
-//   if (_index == 0)
-//     dJointGetHinge2Anchor(this->jointId, result);
-//   else
-//     dJointGetHinge2Anchor2(this->jointId, result);
-// 
-//   return math::Vector3(result[0], result[1], result[2]);
+  gzwarn << "Not implemented!\n";
+
   return math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
 void DARTHinge2Joint::SetAnchor(int /*index*/, const math::Vector3 &/*_anchor*/)
 {
-//   if (this->childLink) this->childLink->SetEnabled(true);
-//   if (this->parentLink) this->parentLink->SetEnabled(true);
-//   dJointSetHinge2Anchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTHinge2Joint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 {
-//   if (this->childLink) this->childLink->SetEnabled(true);
-//   if (this->parentLink) this->parentLink->SetEnabled(true);
-// 
-//   if (_index == 0)
-//     dJointSetHinge2Axis1(this->jointId, _axis.x, _axis.y, _axis.z);
-//   else
-//     dJointSetHinge2Axis2(this->jointId, _axis.x, _axis.y, _axis.z);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTHinge2Joint::SetDamping(int /*_index*/, double /*_damping*/)
 {
-//   dJointSetDamping(this->jointId, _damping);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 math::Vector3 DARTHinge2Joint::GetGlobalAxis(int /*_index*/) const
 {
-//   dVector3 result;
-// 
-//   if (_index == 0)
-//     dJointGetHinge2Axis1(this->jointId, result);
-//   else
-//     dJointGetHinge2Axis2(this->jointId, result);
-// 
-//   return math::Vector3(result[0], result[1], result[2]);
+  gzwarn << "Not implemented!\n";
+
   return math::Vector3(0, 0, 0);
 }
 
@@ -117,10 +96,7 @@ double DARTHinge2Joint::GetVelocity(int /*_index*/) const
 {
   double result = 0;
 
-//   if (_index == 0)
-//     result = dJointGetHinge2Angle1Rate(this->jointId);
-//   else
-//     result = dJointGetHinge2Angle2Rate(this->jointId);
+  gzwarn << "Not implemented!\n";
 
   return result;
 }
@@ -128,19 +104,14 @@ double DARTHinge2Joint::GetVelocity(int /*_index*/) const
 //////////////////////////////////////////////////
 void DARTHinge2Joint::SetVelocity(int /*_index*/, double /*_angle*/)
 {
-//   if (_index == 0)
-//     this->SetParam(dParamVel, _angle);
-//   else
-//     this->SetParam(dParamVel2, _angle);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 double DARTHinge2Joint::GetMaxForce(int /*_index*/)
 {
-//   if (_index == 0)
-//     return this->GetParam(dParamFMax);
-//   else
-//     return this->GetParam(dParamFMax2);
+  gzwarn << "Not implemented!\n";
+
   return 0;
 }
 
@@ -148,37 +119,25 @@ double DARTHinge2Joint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void DARTHinge2Joint::SetMaxForce(int /*_index*/, double /*_t*/)
 {
-//   if (_index == 0)
-//     this->SetParam(dParamFMax, _t);
-//   else
-//     this->SetParam(dParamFMax2, _t);
+  gzwarn << "Not implemented!\n";
 }
 
 
 //////////////////////////////////////////////////
 void DARTHinge2Joint::SetForce(int /*_index*/, double /*_torque*/)
 {
-//   if (this->childLink) this->childLink->SetEnabled(true);
-//   if (this->parentLink) this->parentLink->SetEnabled(true);
-// 
-//   if (_index == 0)
-//     dJointAddHinge2Torques(this->jointId, _torque, 0);
-//   else
-//     dJointAddHinge2Torques(this->jointId, 0, _torque);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 double DARTHinge2Joint::GetParam(int /*_parameter*/) const
 {
-//   double result = dJointGetHinge2Param(this->jointId, _parameter);
-// 
-//   return result;
+  gzwarn << "Not implemented!\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
 void DARTHinge2Joint::SetParam(int /*_parameter*/, double /*_value*/)
 {
-//   ODEJoint::SetParam(_parameter, _value);
-//   dJointSetHinge2Param(this->jointId, _parameter, _value);
+  gzwarn << "Not implemented!\n";
 }

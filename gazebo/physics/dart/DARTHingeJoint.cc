@@ -33,13 +33,11 @@ using namespace physics;
 DARTHingeJoint::DARTHingeJoint(BasePtr _parent)
   : HingeJoint<DARTJoint>(_parent)
 {
-
 }
 
 //////////////////////////////////////////////////
 DARTHingeJoint::~DARTHingeJoint()
 {
-
 }
 
 //////////////////////////////////////////////////
@@ -301,13 +299,6 @@ void DARTHingeJoint::SetDamping(int _index, double _damping)
 }
 
 //////////////////////////////////////////////////
-//void DARTHingeJoint::ApplyDamping()
-//{
-//   double damping_force = this->damping_coefficient * this->GetVelocity(0);
-//   this->SetForce(0, damping_force);
-//}
-
-//////////////////////////////////////////////////
 math::Angle DARTHingeJoint::GetAngleImpl(int /*index*/) const
 {
   math::Angle result;
@@ -340,20 +331,19 @@ void DARTHingeJoint::SetVelocity(int /*index*/, double /*_vel*/)
 {
   // TODO: Do nothing because DART accept only torques (forces) of joint as
   // input.
+    gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetMaxForce(int /*index*/, double /*_force*/)
 {
-  //   return this->SetParam(dParamFMax, _t);
-  gzwarn << "DARTHingeJoint::SetMaxForce(...): Not implemented...\n";
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 double DARTHingeJoint::GetMaxForce(int /*index*/)
 {
-  //   return this->GetParam(dParamFMax);
-  gzwarn << "DARTHingeJoint::GetMaxForce(...): Not implemented...\n";
+  gzwarn << "Not implemented!\n";
   return 0.0;
 }
 
@@ -364,20 +354,3 @@ void DARTHingeJoint::SetForce(int _index, double _torque)
 
   dartJoint->getDof(0)->tau = _torque;
 }
-
-//////////////////////////////////////////////////
-//double DARTHingeJoint::GetParam(int _parameter) const
-//{
-//   double result = dJointGetHingeParam(this->jointId, _parameter);
-// 
-//   return result;
-//  return 0;
-//}
-
-//////////////////////////////////////////////////
-//void DARTHingeJoint::SetParam(int _parameter, double _value)
-//{
-//   ODEJoint::SetParam(_parameter, _value);
-// 
-//   dJointSetHingeParam(this->jointId, _parameter, _value);
-//}

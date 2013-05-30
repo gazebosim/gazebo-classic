@@ -26,7 +26,6 @@ using namespace physics;
 DARTBallJoint::DARTBallJoint(BasePtr _parent)
 : BallJoint<DARTJoint>(_parent)
 {
-  //this->jointId = dJointCreateBall(_worldId, NULL);
 }
 
 //////////////////////////////////////////////////
@@ -37,9 +36,8 @@ DARTBallJoint::~DARTBallJoint()
 //////////////////////////////////////////////////
 math::Vector3 DARTBallJoint::GetAnchor(int /*_index*/) const
 {
-  //dVector3 result;
-  //dJointGetBallAnchor(jointId, result);
-  //return math::Vector3(result[0], result[1], result[2]);
+  gzwarn << "Not implemented!\n";
+
   return math::Vector3(0, 0, 0);
 }
 
@@ -47,11 +45,11 @@ math::Vector3 DARTBallJoint::GetAnchor(int /*_index*/) const
 //////////////////////////////////////////////////
 void DARTBallJoint::SetAnchor(int /*_index*/, const math::Vector3& /*_anchor*/)
 {
-  //dJointSetBallAnchor(jointId, _anchor.x, _anchor.y, _anchor.z);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
 {
-  //dJointSetDamping(this->jointId, _damping);
+  gzwarn << "Not implemented!\n";
 }

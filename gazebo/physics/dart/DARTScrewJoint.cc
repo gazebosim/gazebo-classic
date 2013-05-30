@@ -30,7 +30,6 @@ using namespace physics;
 DARTScrewJoint::DARTScrewJoint(BasePtr _parent)
     : ScrewJoint<DARTJoint>(_parent)
 {
-//   this->jointId = dJointCreateScrew(_worldId, NULL);
 }
 
 //////////////////////////////////////////////////
@@ -41,38 +40,31 @@ DARTScrewJoint::~DARTScrewJoint()
 //////////////////////////////////////////////////
 void DARTScrewJoint::Load(sdf::ElementPtr /*_sdf*/)
 {
-//   ScrewJoint<ODEJoint>::Load(_sdf);
-//   this->SetThreadPitch(0, this->threadPitch);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 math::Vector3 DARTScrewJoint::GetGlobalAxis(int /*index*/) const
 {
-//   dVector3 result;
-//   dJointGetScrewAxis(this->jointId, result);
-// 
-//   return math::Vector3(result[0], result[1], result[2]);
+  gzwarn << "Not implemented!\n";
+
   return math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
 math::Angle DARTScrewJoint::GetAngleImpl(int /*_index*/) const
 {
-//   math::Angle result;
-//   if (this->jointId)
-//     result = dJointGetScrewPosition(this->jointId);
-// 
-//   return result;
+  math::Angle result;
 
-  return 0;
+  gzwarn << "Not implemented!\n";
+
+  return result;
 }
 
 //////////////////////////////////////////////////
 double DARTScrewJoint::GetVelocity(int /*index*/) const
 {
-//   double result = dJointGetScrewPositionRate(this->jointId);
-// 
-//   return result;
+  gzwarn << "Not implemented!\n";
 
   return 0;
 }
@@ -80,60 +72,49 @@ double DARTScrewJoint::GetVelocity(int /*index*/) const
 //////////////////////////////////////////////////
 void DARTScrewJoint::SetVelocity(int /*index*/, double /*_angle*/)
 {
-//   this->SetParam(dParamVel, _angle);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTScrewJoint::SetAxis(int /*index*/, const math::Vector3& /*_axis*/)
 {
-//   if (this->childLink) this->childLink->SetEnabled(true);
-//   if (this->parentLink) this->parentLink->SetEnabled(true);
-// 
-//   dJointSetScrewAxis(this->jointId, _axis.x, _axis.y, _axis.z);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTScrewJoint::SetDamping(int /*index*/, double /*_damping*/)
 {
-//   this->damping_coefficient = _damping;
-//   dJointSetDamping(this->jointId, this->damping_coefficient);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
 {
-//   dJointSetScrewThreadPitch(this->jointId, _threadPitch);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTScrewJoint::ApplyDamping()
 {
-//   double damping_force = this->damping_coefficient * this->GetVelocity(0);
-//   this->SetForce(0, damping_force);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTScrewJoint::SetForce(int /*index*/, double /*_force*/)
 {
-//   if (this->childLink) this->childLink->SetEnabled(true);
-//   if (this->parentLink) this->parentLink->SetEnabled(true);
-//   // dJointAddScrewForce(this->jointId, _force);
-//   dJointAddScrewTorque(this->jointId, _force);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTScrewJoint::SetParam(int /*_parameter*/, double /*_value*/)
 {
-//   ODEJoint::SetParam(_parameter, _value);
-//   dJointSetScrewParam(this->jointId, _parameter, _value);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 double DARTScrewJoint::GetParam(int /*_parameter*/) const
 {
-//   double result = dJointGetScrewParam(this->jointId, _parameter);
-// 
-//   return result;
+  gzwarn << "Not implemented!\n";
 
   return 0;
 }
@@ -141,13 +122,13 @@ double DARTScrewJoint::GetParam(int /*_parameter*/) const
 //////////////////////////////////////////////////
 void DARTScrewJoint::SetMaxForce(int /*_index*/, double /*_t*/)
 {
-//   this->SetParam(dParamFMax, _t);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 double DARTScrewJoint::GetMaxForce(int /*_index*/)
 {
-//   return this->GetParam(dParamFMax);
+  gzwarn << "Not implemented!\n";
 
   return 0;
 }

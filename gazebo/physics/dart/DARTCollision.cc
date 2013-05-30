@@ -117,83 +117,41 @@ void DARTCollision::Init()
 //////////////////////////////////////////////////
 void DARTCollision::Fini()
 {
-
   Collision::Fini();
 }
 
 //////////////////////////////////////////////////
 void DARTCollision::SetCollision(bool _placeable)
 {
-  //   // Must go first in this function
-  //   this->collisionId = _collisionId;
-  //
   Collision::SetCollision(_placeable);
-  //
-  //   if (dGeomGetSpace(this->collisionId) == 0)
-  //   {
-  //     dSpaceAdd(this->spaceId, this->collisionId);
-  //     assert(dGeomGetSpace(this->collisionId) != 0);
-  //   }
-  //
-  //   if (this->collisionId && this->placeable)
-  //   {
-  //     if (this->IsStatic())
-  //       this->onPoseChangeFunc = &DARTCollision::OnPoseChangeGlobal;
-  //     else
-  //       this->onPoseChangeFunc = &DARTCollision::OnPoseChangeRelative;
-  //   }
-  //   else
-  //   {
-  //     this->onPoseChangeFunc = &DARTCollision::OnPoseChangeNull;
-  //   }
-  //
-  //   dGeomSetData(this->collisionId, this);
-  gzerr << "Not yet implemented." << std::endl;
+
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTCollision::OnPoseChange()
 {
+    gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTCollision::SetCategoryBits(unsigned int /*_bits*/)
 {
-  //   if (this->collisionId)
-  //     dGeomSetCategoryBits(this->collisionId, _bits);
-  //   if (this->spaceId)
-  //     dGeomSetCategoryBits((dGeomID)this->spaceId, _bits);
-  gzerr << "Not yet implemented." << std::endl;
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTCollision::SetCollideBits(unsigned int /*_bits*/)
 {
-  //   if (this->collisionId)
-  //     dGeomSetCollideBits(this->collisionId, _bits);
-  //   if (this->spaceId)
-  //     dGeomSetCollideBits((dGeomID)this->spaceId, _bits);
-
-  gzerr << "Not yet implemented." << std::endl;
+    gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 gazebo::math::Box DARTCollision::GetBoundingBox() const
 {
   gazebo::math::Box box;
-  //   dReal aabb[6];
-  //
-  //   memset(aabb, 0, 6 * sizeof(dReal));
-  //
-  //   if (this->collisionId == NULL)
-  //     printf("HOW IS THIS NULL\n");
-  //
-  //   // if (this->collisionId && this->type != Shape::PLANE)
-  //   dGeomGetAABB(this->collisionId, aabb);
-  //
-  //   box.min.Set(aabb[0], aabb[2], aabb[4]);
-  //   box.max.Set(aabb[1], aabb[3], aabb[5]);
-  gzerr << "Not yet implemented." << std::endl;
+
+  gzwarn << "Not implemented!\n";
 
   return box;
 }

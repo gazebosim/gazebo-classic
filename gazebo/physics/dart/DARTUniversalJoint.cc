@@ -29,7 +29,6 @@ using namespace physics;
 DARTUniversalJoint::DARTUniversalJoint(BasePtr _parent)
     : UniversalJoint<DARTJoint>(_parent)
 {
-//   this->jointId = dJointCreateUniversal(_worldId, NULL);
 }
 
 //////////////////////////////////////////////////
@@ -40,52 +39,35 @@ DARTUniversalJoint::~DARTUniversalJoint()
 //////////////////////////////////////////////////
 math::Vector3 DARTUniversalJoint::GetAnchor(int /*index*/) const
 {
-//   dVector3 result;
-//   dJointGetUniversalAnchor(this->jointId, result);
-// 
-//   return math::Vector3(result[0], result[1], result[2]);
+  gzwarn << "Not implemented!\n";
+
   return math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
 void DARTUniversalJoint::SetAnchor(int /*index*/, const math::Vector3& /*_anchor*/)
 {
-//   if (this->childLink) this->childLink->SetEnabled(true);
-//   if (this->parentLink) this->parentLink->SetEnabled(true);
-// 
-//   dJointSetUniversalAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 math::Vector3 DARTUniversalJoint::GetGlobalAxis(int /*_index*/) const
 {
-//   dVector3 result;
-// 
-//   if (_index == 0)
-//     dJointGetUniversalAxis1(this->jointId, result);
-//   else
-//     dJointGetUniversalAxis2(this->jointId, result);
-// 
-//   return math::Vector3(result[0], result[1], result[2]);
+  gzwarn << "Not implemented!\n";
+
   return math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
 void DARTUniversalJoint::SetAxis(int /*_index*/, const math::Vector3& /*_axis*/)
 {
-//   if (this->childLink) this->childLink->SetEnabled(true);
-//   if (this->parentLink) this->parentLink->SetEnabled(true);
-// 
-//   if (_index == 0)
-//     dJointSetUniversalAxis1(this->jointId, _axis.x, _axis.y, _axis.z);
-//   else
-//     dJointSetUniversalAxis2(this->jointId, _axis.x, _axis.y, _axis.z);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTUniversalJoint::SetDamping(int /*_index*/, double /*_damping*/)
 {
-//   dJointSetDamping(this->jointId, _damping);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
@@ -93,14 +75,7 @@ math::Angle DARTUniversalJoint::GetAngleImpl(int /*_index*/) const
 {
   math::Angle result;
 
-//   if (this->jointId)
-//   {
-//     if (_index == 0)
-//       result = dJointGetUniversalAngle1(this->jointId);
-//     else
-//       result = dJointGetUniversalAngle2(this->jointId);
-//   }
-
+  gzwarn << "Not implemented!\n";
   return result;
 }
 
@@ -109,10 +84,7 @@ double DARTUniversalJoint::GetVelocity(int /*_index*/) const
 {
   double result = 0;
 
-//   if (_index == 0)
-//     result = dJointGetUniversalAngle1Rate(this->jointId);
-//   else
-//     result = dJointGetUniversalAngle2Rate(this->jointId);
+  gzwarn << "Not implemented!\n";
 
   return result;
 }
@@ -120,47 +92,33 @@ double DARTUniversalJoint::GetVelocity(int /*_index*/) const
 //////////////////////////////////////////////////
 void DARTUniversalJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 {
-//   if (_index == 0)
-//     this->SetParam(dParamVel, _angle);
-//   else
-//     this->SetParam(dParamVel2, _angle);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTUniversalJoint::SetForce(int /*_index*/, double /*_torque*/)
 {
-//   if (this->childLink) this->childLink->SetEnabled(true);
-//   if (this->parentLink) this->parentLink->SetEnabled(true);
-//   if (_index == 0)
-//     dJointAddUniversalTorques(this->jointId, _torque, 0);
-//   else
-//     dJointAddUniversalTorques(this->jointId, 0, _torque);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 void DARTUniversalJoint::SetMaxForce(int /*_index*/, double /*_t*/)
 {
-//   if (_index == 0)
-//     this->SetParam(dParamFMax, _t);
-//   else
-//     this->SetParam(dParamFMax2, _t);
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 double DARTUniversalJoint::GetMaxForce(int /*_index*/)
 {
-//   if (_index == 0)
-//     return this->GetParam(dParamFMax);
-//   else
-//     return this->GetParam(dParamFMax2);
+  gzwarn << "Not implemented!\n";
+
   return 0;
 }
 
 //////////////////////////////////////////////////
 void DARTUniversalJoint::SetParam(int /*_parameter*/, double /*_value*/)
 {
-//   ODEJoint::SetParam(_parameter, _value);
-//   dJointSetUniversalParam(this->jointId, _parameter, _value);
+  gzwarn << "Not implemented!\n";
 }
 
 

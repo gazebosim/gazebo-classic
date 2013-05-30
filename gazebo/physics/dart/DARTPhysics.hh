@@ -76,12 +76,6 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
 
-      //      /// \brief Set the simulation step time
-      //      public: virtual void SetStepTime(double _value);
-
-      //      /// \brief Get the simulation step time
-      //      public: virtual double GetStepTime();
-
       // Documentation inherited
       public: virtual ModelPtr CreateModel(BasePtr _parent);
       
@@ -105,9 +99,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
-
-      /// \brief Store the value of the stepTime parameter to improve efficiency
-      //private: double stepTimeDouble;
 
       // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);

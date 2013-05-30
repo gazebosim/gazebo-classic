@@ -296,16 +296,8 @@ math::Angle DARTJoint::GetLowStop(int _index)
 math::Vector3 DARTJoint::GetLinkForce(unsigned int /*_index*/) const
 {
   math::Vector3 result;
-  //   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
-  //
-  //   if (_index == 0)
-  //     result.Set(jointFeedback->f1[0], jointFeedback->f1[1],
-  //                jointFeedback->f1[2]);
-  //   else
-  //     result.Set(jointFeedback->f2[0], jointFeedback->f2[1],
-  //                jointFeedback->f2[2]);
 
-  gzerr << "DARTJoint::GetLinkForce(...): Not implemented...\n";
+  gzwarn << "Not implemented!\n";
 
   return result;
 }
@@ -314,16 +306,8 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int /*_index*/) const
 math::Vector3 DARTJoint::GetLinkTorque(unsigned int /*_index*/) const
 {
   math::Vector3 result;
-  //   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
-  //
-  //   if (_index == 0)
-  //     result.Set(jointFeedback->t1[0], jointFeedback->t1[1],
-  //                jointFeedback->t1[2]);
-  //   else
-  //     result.Set(jointFeedback->t2[0], jointFeedback->t2[1],
-  //                jointFeedback->t2[2]);
 
-  gzerr << "DARTJoint::GetLinkTorque(...): Not implemented...\n";
+  gzwarn << "Not implemented!\n";
 
   return result;
 }
@@ -332,14 +316,14 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int /*_index*/) const
 void DARTJoint::SetAttribute(const std::string& /*_key*/, int /*_index*/,
                               const boost::any& /*_value*/)
 {
-  gzerr << "Not implemented...\n";
+  gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
 double DARTJoint::GetAttribute(const std::string& /*_key*/,
                               unsigned int /*_index*/)
 {
-  gzerr << "Not implemented...\n";
+  gzwarn << "Not implemented!\n";
 
   return 0;
 }
@@ -348,71 +332,8 @@ double DARTJoint::GetAttribute(const std::string& /*_key*/,
 JointWrench DARTJoint::GetForceTorque(int /*_index*/)
 {
   JointWrench wrench;
-  //  // Note that:
-  //  // f2, t2 are the force torque measured on parent body's cg
-  //  // f1, t1 are the force torque measured on child body's cg
-  //  dJointFeedback* fb = this->GetFeedback();
-  //  if (fb)
-  //  {
-  //    wrench.body1Force.Set(fb->f1[0], fb->f1[1], fb->f1[2]);
-  //    wrench.body1Torque.Set(fb->t1[0], fb->t1[1], fb->t1[2]);
-  //    wrench.body2Force.Set(fb->f2[0], fb->f2[1], fb->f2[2]);
-  //    wrench.body2Torque.Set(fb->t2[0], fb->t2[1], fb->t2[2]);
 
-  //    if (this->childLink)
-  //    {
-  //      // convert torque from about child CG to joint anchor location
-  //      // cg position specified in child link frame
-  //      math::Vector3 cgPos = this->childLink->GetInertial()->GetPose().pos;
-  //      // moment arm rotated into world frame (given feedback is in world frame)
-  //      math::Vector3 childMomentArm =
-  //        this->childLink->GetWorldPose().rot.RotateVector(
-  //        this->anchorPos - cgPos);
-
-  //      // gzerr << "anchor [" << anchorPos
-  //      //       << "] iarm[" << this->childLink->GetInertial()->GetPose().pos
-  //      //       << "] childMomentArm[" << childMomentArm
-  //      //       << "] f1[" << wrench.body1Force
-  //      //       << "] t1[" << wrench.body1Torque
-  //      //       << "] fxp[" << wrench.body1Force.Cross(childMomentArm)
-  //      //       << "]\n";
-
-  //      wrench.body1Torque += wrench.body1Force.Cross(childMomentArm);
-  //    }
-
-  //    // convert torque from about parent CG to joint anchor location
-  //    if (this->parentLink)
-  //    {
-  //      // parent cg specified in child link frame
-  //      math::Vector3 cgPos = ((this->parentLink->GetInertial()->GetPose() +
-  //                            this->parentLink->GetWorldPose()) -
-  //                            this->childLink->GetWorldPose()).pos;
-
-  //      // rotate moement arms into world frame
-  //      math::Vector3 parentMomentArm =
-  //        this->childLink->GetWorldPose().rot.RotateVector(
-  //        this->anchorPos - cgPos);
-
-  //      wrench.body2Torque -= wrench.body2Force.Cross(parentMomentArm);
-
-  //      // A good check is that
-  //      // the computed body2Torque shoud in fact be opposite of body1Torque
-  //    }
-  //    else
-  //    {
-  //      // convert torque from about child CG to joint anchor location
-  //      // or simply use equal opposite force as body1 wrench
-  //      wrench.body2Force = -wrench.body1Force;
-  //      wrench.body2Torque = -wrench.body1Torque;
-  //    }
-  //  }
-  //  else
-  //  {
-  //    // forgot to set provide_feedback?
-  //    gzwarn << "GetForceTorque: forget to set <provide_feedback>?\n";
-  //  }
-
-  gzerr << "Not implemented...\n";
+  gzwarn << "Not implemented!\n";
 
   return wrench;
 }

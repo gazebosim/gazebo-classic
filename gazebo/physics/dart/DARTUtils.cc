@@ -105,10 +105,10 @@ void DARTUtils::AddTransformToDARTJoint(kinematics::Joint* _rtl8Joint,
 }
 
 //////////////////////////////////////////////////
-void DARTUtils::Add6DOFToDARTJoint(kinematics::Joint* /*_dartJoint*/,
-                                     const math::Pose& /*_initialPose*/)
-{
-}
+//void DARTUtils::Add6DOFToDARTJoint(kinematics::Joint* /*_dartJoint*/,
+//                                     const math::Pose& /*_initialPose*/)
+//{
+//}
 
 
 

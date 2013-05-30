@@ -56,9 +56,6 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetDamping(int _index, double _damping);
 
-      /// \brief callback to apply damping force to joint.
-      //public: void ApplyDamping();
-
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
@@ -76,12 +73,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetForce(int _index, double _torque);
-
-      // Documentation inherited
-      //public: virtual double GetParam(int _parameter) const;
-
-      // Documentation inherited
-      //public: virtual void SetParam(int _parameter, double _value);
 
       /// \brief
       private: kinematics::TrfmRotateAxis* rotHinge;

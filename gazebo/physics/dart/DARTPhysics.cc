@@ -65,7 +65,7 @@ DARTPhysics::DARTPhysics(WorldPtr _world)
   // TODO: Gazebo does not support design-time and runtime concept now.
   // Therefore, we basically set dart world as runtime and never change it.
   // When gazebo support the concept, we should apply it to dart also.
-  //this->dartWorld->changeDesignTime(false);
+  // this->dartWorld->changeDesignTime(false);
 }
 
 //////////////////////////////////////////////////
@@ -96,7 +96,6 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
 void DARTPhysics::Init()
 {
   //this->dartWorld->initialize();
-  //this->dartWorld->setRuntimeMode();
 }
 
 //////////////////////////////////////////////////
@@ -184,18 +183,6 @@ void DARTPhysics::SetSeed(uint32_t /*_seed*/)
 {
   gzerr << "Not implemented yet...\n";
 }
-
-////////////////////////////////////////////////////
-//void DARTPhysics::SetStepTime(double _value)
-//{
-//   this->dartWorld->setTimeStep(_value);
-//}
-
-////////////////////////////////////////////////////
-//double DARTPhysics::GetStepTime()
-//{
-//  return this->dartWorld->getTimeStep();
-//}
 
 //////////////////////////////////////////////////
 ModelPtr DARTPhysics::CreateModel(BasePtr _parent)
@@ -304,52 +291,7 @@ void DARTPhysics::SetGravity(const gazebo::math::Vector3& _gravity)
 //////////////////////////////////////////////////
 void DARTPhysics::DebugPrint() const
 {
-//   dBodyID b;
-//   std::cout << "Debug Print[" << dWorldGetBodyCount(this->worldId) << "]\n";
-//   for (int i = 0; i < dWorldGetBodyCount(this->worldId); ++i)
-//   {
-//     b = dWorldGetBody(this->worldId, i);
-//     ODELink *link = static_cast<ODELink*>(dBodyGetData(b));
-//     math::Pose pose = link->GetWorldPose();
-//     const dReal *pos = dBodyGetPosition(b);
-//     const dReal *rot = dBodyGetRotation(b);
-//     math::Vector3 dpos(pos[0], pos[1], pos[2]);
-//     math::Quaternion drot(rot[0], rot[1], rot[2], rot[3]);
-// 
-//     std::cout << "Body[" << link->GetScopedName() << "]\n";
-//     std::cout << "  World: Pos[" << dpos << "] Rot[" << drot << "]\n";
-//     if (pose.pos != dpos)
-//       std::cout << "    Incorrect world pos[" << pose.pos << "]\n";
-//     if (pose.rot != drot)
-//       std::cout << "    Incorrect world rot[" << pose.rot << "]\n";
-// 
-//     dMass mass;
-//     dBodyGetMass(b, &mass);
-//     std::cout << "  Mass[" << mass.mass << "] COG[" << mass.c[0]
-//               << " " << mass.c[1] << " " << mass.c[2] << "]\n";
-// 
-//     dGeomID g = dBodyGetFirstGeom(b);
-//     while (g)
-//     {
-//       ODECollision *coll = static_cast<ODECollision*>(dGeomGetData(g));
-// 
-//       pose = coll->GetWorldPose();
-//       const dReal *gpos = dGeomGetPosition(g);
-//       const dReal *grot = dGeomGetRotation(g);
-//       dpos.Set(gpos[0], gpos[1], gpos[2]);
-//       drot.Set(grot[0], grot[1], grot[2], grot[3]);
-// 
-//       std::cout << "    Geom[" << coll->GetScopedName() << "]\n";
-//       std::cout << "      World: Pos[" << dpos << "] Rot[" << drot << "]\n";
-// 
-//       if (pose.pos != dpos)
-//         std::cout << "      Incorrect world pos[" << pose.pos << "]\n";
-//       if (pose.rot != drot)
-//         std::cout << "      Incorrect world rot[" << pose.rot << "]\n";
-// 
-//       g = dBodyGetNextGeom(g);
-//     }
-//   }
+  gzwarn << "Not implemented!\n";
 }
 
 void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
@@ -385,54 +327,6 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
 
 void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
 {
-//  if (_msg->has_dt())
-//  {
-//    this->SetStepTime(_msg->dt());
-//  }
-
-//  if (_msg->has_update_rate())
-//    this->SetUpdateRate(_msg->update_rate());
-
-//  if (_msg->has_solver_type())
-//  {
-//    sdf::ElementPtr solverElem =
-//      this->sdf->GetElement("ode")->GetElement("solver");
-//    if (_msg->solver_type() == "quick")
-//    {
-//      solverElem->GetAttribute("type")->Set("quick");
-//      this->physicsStepFunc = &dWorldQuickStep;
-//    }
-//    else if (_msg->solver_type() == "world")
-//    {
-//      solverElem->GetAttribute("type")->Set("world");
-//      this->physicsStepFunc = &dWorldStep;
-//    }
-//  }
-
-//  if (_msg->has_iters())
-//    this->SetSORPGSIters(_msg->iters());
-
-//  if (_msg->has_sor())
-//    this->SetSORPGSW(_msg->sor());
-
-//  if (_msg->has_cfm())
-//    this->SetWorldCFM(_msg->cfm());
-
-//  if (_msg->has_erp())
-//    this->SetWorldERP(_msg->erp());
-
-//  if (_msg->has_enable_physics())
-//    this->world->EnablePhysicsEngine(_msg->enable_physics());
-
-//  if (_msg->has_contact_max_correcting_vel())
-//    this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
-
-//  if (_msg->has_contact_surface_layer())
-//    this->SetContactSurfaceLayer(_msg->contact_surface_layer());
-
-//  if (_msg->has_gravity())
-//    this->SetGravity(msgs::Convert(_msg->gravity()));
-
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
 }
