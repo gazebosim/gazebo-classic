@@ -25,6 +25,7 @@
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/sensors/sensors.hh>
+#include <gazebo/transport/transport.hh>
 
 namespace gazebo
 {
@@ -37,10 +38,11 @@ namespace gazebo
     /// \brief Destructor.
     public: virtual ~PressurePlugin();
 
-    /// \brief Load the sensor plugin.
-    /// \param[in] _sensor Pointer to the sensor that loaded this plugin.
-    /// \param[in] _sdf SDF element that describes the plugin.
+    // Documentation inherited.
     public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
+
+    // Documentation inherited.
+    public: virtual void Init();
 
     /// \brief Callback that recieves the contact sensor's update signal.
     private: virtual void OnUpdate();
@@ -51,6 +53,18 @@ namespace gazebo
     /// \brief Connection that maintains a link between the contact sensor's
     /// updated signal and the OnUpdate callback.
     private: event::ConnectionPtr updateConnection;
+
+    /// \brief Transport node used for publishing tactile messages.
+    private: transport::NodePtr node;
+
+    /// \brief Publisher of tactile messages.
+    private: transport::PublisherPtr tactilePub;
+
+    /// \brief World name.
+    private: std::string worldName;
+
+    /// \brief Parent sensor name.
+    private: std::string parentSensorName;
   };
 }
 #endif
