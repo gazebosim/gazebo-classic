@@ -1276,6 +1276,13 @@ void Element::Reset()
 }
 
 /////////////////////////////////////////////////
+ElementPtr Element::CreateElementDescription()
+{
+  this->elementDescriptions.push_back(ElementPtr(new Element));
+  return this->elementDescriptions.back();
+}
+
+/////////////////////////////////////////////////
 void Element::AddElementDescription(ElementPtr _elem)
 {
   this->elementDescriptions.push_back(_elem);

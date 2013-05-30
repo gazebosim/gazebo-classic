@@ -101,7 +101,9 @@ void Collision::Load(sdf::ElementPtr _sdf)
   if (!this->shape->HasType(Base::MULTIRAY_SHAPE) &&
       !this->shape->HasType(Base::RAY_SHAPE))
   {
-    this->visPub->Publish(this->CreateCollisionVisual());
+    msgs::Visual msg;
+    this->FillCollisionMsg(&msg);
+    this->visPub->Publish(msg);
   }
 
   // Force max correcting velocity to zero for certain collision entities
@@ -303,7 +305,8 @@ void Collision::FillMsg(msgs::Collision &_msg)
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
-  _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
+
+  this->FillCollisionMsg(_msg.add_visual());
 }
 
 //////////////////////////////////////////////////
@@ -355,6 +358,22 @@ msgs::Visual Collision::CreateCollisionVisual()
   geom->CopyFrom(msgs::GeometryFromSDF(this->sdf->GetElement("geometry")));
 
   return msg;
+}
+
+/////////////////////////////////////////////////
+void Collision::FillCollisionMsg(msgs::Visual *_msg)
+{
+  _msg->set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
+  _msg->set_parent_name(this->parent->GetScopedName());
+  _msg->set_is_static(this->IsStatic());
+  _msg->set_cast_shadows(false);
+  msgs::Set(_msg->mutable_pose(), this->GetRelativePose());
+  _msg->mutable_material()->mutable_script()->add_uri(
+      "file://media/materials/scripts/gazebo.material");
+  _msg->mutable_material()->mutable_script()->set_name(
+      "Gazebo/OrangeTransparent");
+  msgs::Geometry *geom = _msg->mutable_geometry();
+  geom->CopyFrom(msgs::GeometryFromSDF(this->sdf->GetElement("geometry")));
 }
 
 /////////////////////////////////////////////////

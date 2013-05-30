@@ -548,16 +548,18 @@ unsigned int LogRecord::Log::Update()
   std::ostringstream stream;
 
   // Get log data via the callback.
-  if (this->logCB(stream) && !stream.str().empty())
+  if (this->logCB(stream))
   {
-    const std::string encoding = this->parent->GetEncoding();
-
-    this->buffer.append("<chunk encoding='");
-    this->buffer.append(encoding);
-    this->buffer.append("'>\n");
-
-    this->buffer.append("<![CDATA[");
+    std::string data = stream.str();
+    if (!data.empty())
     {
+      const std::string encoding = this->parent->GetEncoding();
+
+      this->buffer.append("<chunk encoding='");
+      this->buffer.append(encoding);
+      this->buffer.append("'>\n");
+
+      this->buffer.append("<![CDATA[");
       // Compress the data.
       if (encoding == "bz2")
       {
@@ -568,14 +570,18 @@ unsigned int LogRecord::Log::Update()
           boost::iostreams::filtering_ostream out;
           out.push(boost::iostreams::bzip2_compressor());
           out.push(std::back_inserter(str));
-          out << stream.str();
-          out.flush();
+          boost::iostreams::copy(boost::make_iterator_range(data), out);
+
+          /*out.push(std::back_inserter(str));
+            out << stream.str();
+            out.flush();
+            */
         }
 
         // Encode in base64.
         std::copy(Base64Text(str.c_str()),
-                  Base64Text(str.c_str() + str.size()),
-                  std::back_inserter(this->buffer));
+            Base64Text(str.c_str() + str.size()),
+            std::back_inserter(this->buffer));
       }
       else if (encoding == "zlib")
       {
@@ -586,23 +592,24 @@ unsigned int LogRecord::Log::Update()
           boost::iostreams::filtering_ostream out;
           out.push(boost::iostreams::zlib_compressor());
           out.push(std::back_inserter(str));
-          out << stream.str();
-          out.flush();
+          boost::iostreams::copy(boost::make_iterator_range(data), out);
+          //out << stream.str();
+          //out.flush();
         }
 
         // Encode in base64.
         std::copy(Base64Text(str.c_str()),
-                  Base64Text(str.c_str() + str.size()),
-                  std::back_inserter(this->buffer));
+            Base64Text(str.c_str() + str.size()),
+            std::back_inserter(this->buffer));
       }
       else if (encoding == "txt")
-        this->buffer.append(stream.str());
+        this->buffer.append(data);
       else
         gzerr << "Unknown log file encoding[" << encoding << "]\n";
-    }
-    this->buffer.append("]]>\n");
+      this->buffer.append("]]>\n");
 
-    this->buffer.append("</chunk>\n");
+      this->buffer.append("</chunk>\n");
+    }
   }
 
   return this->buffer.size();
@@ -737,7 +744,7 @@ void LogRecord::OnLogControl(ConstLogControlPtr &_data)
 //////////////////////////////////////////////////
 void LogRecord::PublishLogStatus()
 {
-  if (this->logs.empty())
+  if (this->logs.empty() && !this->logStatusPub->HasConnections())
     return;
 
   /// \todo right now this function will only report on the first log.

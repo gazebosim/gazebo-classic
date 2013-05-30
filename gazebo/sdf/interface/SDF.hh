@@ -192,6 +192,10 @@ namespace sdf
     /// \brief Set a text description for the element
     public: void SetDescription(const std::string &_desc);
 
+    /// \brief Create a new element description.
+    /// \return Pointer to the new element description.
+    public: ElementPtr CreateElementDescription();
+
     /// \brief Add a new element description
     public: void AddElementDescription(ElementPtr _elem);
 

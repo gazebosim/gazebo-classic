@@ -343,8 +343,8 @@ namespace gazebo
       /// \brief Callback when a write has occurred.
       /// \param[in] _e Error code
       /// \param[in] _b Buffer of the data that was written.
-      private: void OnWrite(const boost::system::error_code &_e,
-                            boost::asio::streambuf *_b);
+      private: void OnWrite(const boost::system::error_code &_e);
+                    //        boost::asio::streambuf *_b);
 
       /// \brief Handle new connections, if this is a server
       /// \param[in] _e Error code for accept method
@@ -384,6 +384,7 @@ namespace gazebo
 
       /// \brief Outgoing data queue
       private: std::deque<std::string> writeQueue;
+      private: std::list<std::string> outBox;
 
       /// \brief Mutex to protect new connections.
       private: boost::mutex connectMutex;

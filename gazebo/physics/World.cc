@@ -301,6 +301,7 @@ void World::Init()
   this->updateInfo.worldName = this->GetName();
 
   this->iterations = 0;
+  this->logPrevIteration = 0;
 
   // Mark the world initialization
   gzlog << "World::Init" << std::endl;

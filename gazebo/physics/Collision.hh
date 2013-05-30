@@ -205,6 +205,8 @@ namespace gazebo
       /// \return Visual message for a collision.
       private: msgs::Visual CreateCollisionVisual();
 
+      private: void FillCollisionMsg(msgs::Visual *_msg);
+
       /// \brief The link this collision belongs to
       protected: LinkPtr link;
 

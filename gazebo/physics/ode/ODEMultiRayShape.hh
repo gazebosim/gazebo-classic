@@ -54,6 +54,8 @@ namespace gazebo
 
       /// \brief Ray space for collision detector.
       private: dSpaceID raySpaceId;
+
+      private: std::vector<ODECollisionPtr> rayCollisions;
     };
   }
 }
