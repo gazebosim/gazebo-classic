@@ -498,7 +498,7 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
     this->firstPassViewports[_index]->setClearEveryFrame(true);
     this->firstPassViewports[_index]->setOverlaysEnabled(false);
     this->firstPassViewports[_index]->setShadowsEnabled(false);
-    this->firstPassViewports[_index]->setSkiessEnabled(false);
+    this->firstPassViewports[_index]->setSkiesEnabled(false);
     this->firstPassViewports[_index]->setBackgroundColour(
         Ogre::ColourValue(this->far, 0.0, 1.0));
     this->firstPassViewports[_index]->setVisibilityMask(
@@ -524,7 +524,7 @@ void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *_target)
     this->secondPassViewport->setClearEveryFrame(true);
     this->secondPassViewport->setOverlaysEnabled(false);
     this->secondPassViewport->setShadowsEnabled(false);
-    this->secondPassViewport->setSkiessEnabled(false);
+    this->secondPassViewport->setSkiesEnabled(false);
     this->secondPassViewport->setBackgroundColour(
         Ogre::ColourValue(0.0, 1.0, 0.0));
     this->secondPassViewport->setVisibilityMask(
