@@ -311,7 +311,7 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
     TiXmlDocument doc = u2g.InitModelString(_xmlString);
     if (sdf::readDoc(&doc, _sdf, "urdf string"))
     {
-      gzwarn << "parse from urdf.\n";
+      gzmsg << "Parsing from urdf.\n";
       return true;
     }
     else
