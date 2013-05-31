@@ -40,7 +40,7 @@
    René Nyffenegger rene.nyffenegger@adp-gmbh.ch
 */
 
-#include "gazebo/util/Base64.hh"
+#include "gazebo/common/Base64.hh"
 #include <iostream>
 
 static const std::string base64Chars =
