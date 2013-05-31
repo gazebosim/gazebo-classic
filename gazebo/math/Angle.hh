@@ -94,11 +94,6 @@ namespace gazebo
     /// \return double containing the angle's radian value
     public: double Radian() const;
 
-    /// \brief Get the angle in radians, deprecated by Radian
-    /// \return double containing the angle's radian value
-    public: double GetAsRadian() const GAZEBO_DEPRECATED(1.3)
-      { return this->Radian(); }
-
     /// \brief Get the angle in degrees
     /// \return double containing the angle's degree value
     public: double Degree() const;
