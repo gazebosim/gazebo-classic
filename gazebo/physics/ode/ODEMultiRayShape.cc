@@ -60,8 +60,6 @@ ODEMultiRayShape::~ODEMultiRayShape()
 
   dSpaceSetCleanup(this->superSpaceId, 0);
   dSpaceDestroy(this->superSpaceId);
-
-  this->rayCollisions.clear();
 }
 
 //////////////////////////////////////////////////
@@ -194,8 +192,6 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
         this->collisionParent->GetLink()));
   odeCollision->SetName("ode_ray_collision");
   odeCollision->SetSpaceId(this->raySpaceId);
-
-  this->rayCollisions.push_back(odeCollision);
 
   ODERayShapePtr ray(new ODERayShape(odeCollision));
   odeCollision->SetShape(ray);

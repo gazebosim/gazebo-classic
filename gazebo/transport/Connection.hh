@@ -383,7 +383,6 @@ namespace gazebo
 
       /// \brief Outgoing data queue
       private: std::deque<std::string> writeQueue;
-      private: std::list<std::string> outBox;
 
       /// \brief Mutex to protect new connections.
       private: boost::mutex connectMutex;

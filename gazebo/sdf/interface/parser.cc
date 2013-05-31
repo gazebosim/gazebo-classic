@@ -242,7 +242,9 @@ bool initXml(TiXmlElement *_xml, ElementPtr _sdf)
     }
     else
     {
-      initXml(child, _sdf->CreateElementDescription());
+      ElementPtr element(new Element);
+      initXml(child, element);
+      _sdf->AddElementDescription(element);
     }
   }
 
@@ -252,7 +254,10 @@ bool initXml(TiXmlElement *_xml, ElementPtr _sdf)
   {
     std::string filename = child->Attribute("filename");
 
-    initFile(filename, _sdf->CreateElementDescription());
+    ElementPtr element(new Element);
+
+    initFile(filename, element);
+    _sdf->AddElementDescription(element);
   }
 
   return true;
