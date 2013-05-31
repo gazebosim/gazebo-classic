@@ -39,9 +39,7 @@
 
    René Nyffenegger rene.nyffenegger@adp-gmbh.ch
 */
-
 #include "gazebo/common/Base64.hh"
-#include <iostream>
 
 static const std::string base64Chars =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -75,7 +73,7 @@ void Base64Encode(const char *_bytesToEncode, unsigned int _inLen,
         ((charArray3[2] & 0xc0) >> 6);
       charArray4[3] = charArray3[2] & 0x3f;
 
-      for(i = 0; (i < 4); ++i)
+      for (i = 0; i < 4; ++i)
         _result += base64Chars[charArray4[i]];
       i = 0;
     }
@@ -83,7 +81,7 @@ void Base64Encode(const char *_bytesToEncode, unsigned int _inLen,
 
   if (i)
   {
-    for(j = i; j < 3; ++j)
+    for (j = i; j < 3; ++j)
       charArray3[j] = '\0';
 
     charArray4[0] = (charArray3[0] & 0xfc) >> 2;
