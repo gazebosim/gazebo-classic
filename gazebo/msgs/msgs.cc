@@ -636,7 +636,7 @@ namespace gazebo
         {
           ss << innerElem->ToString("");
         }
-        plgnMsg->set_innerxml("<root>" + ss.str() + "</root>");
+        plgnMsg->set_innerxml("<sdf>" + ss.str() + "</sdf>");
       }
 
       return result;
