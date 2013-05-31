@@ -36,6 +36,27 @@ class TopicManagerProcessTask : public tbb::task
           }
 };
 
+
+/// TBB task to establish subscriber to publisher connection.
+class TopicManagerConnectionTask : public tbb::task
+{
+
+  /// \brief Constructor.
+  /// \param[in] _pub Publish message
+  public: TopicManagerConnectionTask(msgs::Publish _pub) : pub(_pub) {}
+
+  /// Implements the necessary execute function
+  public: tbb::task *execute()
+          {
+            TopicManager::Instance()->ConnectSubToPub(pub);
+            return NULL;
+          }
+
+  /// \brief Publish message
+  private: msgs::Publish pub;
+
+};
+
 //////////////////////////////////////////////////
 ConnectionManager::ConnectionManager()
 {
@@ -224,8 +245,8 @@ void ConnectionManager::RunUpdate()
   std::list<ConnectionPtr>::iterator iter;
   std::list<ConnectionPtr>::iterator endIter;
 
-  this->subToPubCondition.notify_all();
-/*  unsigned int msize = 0;
+//  this->subToPubCondition.notify_all();
+  unsigned int msize = 0;
   {
     boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
     msize = this->masterMessages.size();
@@ -242,7 +263,7 @@ void ConnectionManager::RunUpdate()
   }
 
   if (this->masterConn)
-    this->masterConn->ProcessWriteQueue();*/
+    this->masterConn->ProcessWriteQueue();
 
   // Use TBB to process nodes. Need more testing to see if this makes
   // a difference.
@@ -281,9 +302,9 @@ void ConnectionManager::Run()
 
   // Separate out sub to pub connection function as it can block the message
   // update thread.
-  this->connectSubToPubThread =
-      new boost::thread(boost::bind(&ConnectionManager::RunConnectSubToPub,
-      this));
+//  this->connectSubToPubThread =
+//      new boost::thread(boost::bind(&ConnectionManager::RunConnectSubToPub,
+//      this));
 
   while (!this->stop && this->masterConn && this->masterConn->IsOpen())
   {
@@ -324,7 +345,7 @@ void ConnectionManager::UpdateConnectSubToPub()
       msize = this->subToPubQueue.size();
     }
   }*/
-
+/*
   unsigned int msize = 0;
   {
     boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
@@ -342,7 +363,7 @@ void ConnectionManager::UpdateConnectSubToPub()
   }
 
   if (this->masterConn)
-    this->masterConn->ProcessWriteQueue();
+    this->masterConn->ProcessWriteQueue();*/
 
 }
 
@@ -420,7 +441,12 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
         pub.port() != this->serverConn->GetLocalPort())
     {
       {
-        TopicManager::Instance()->ConnectSubToPub(pub);
+
+         TopicManagerConnectionTask *task = new(tbb::task::allocate_root())
+         TopicManagerConnectionTask(pub);
+         tbb::task::enqueue(*task);
+
+//        TopicManager::Instance()->ConnectSubToPub(pub);
         //boost::recursive_mutex::scoped_lock lock(this->subToPubQueueMutex);
 //        this->subToPubQueue.push_back(pub);
 //        this->subToPubCondition.notify_all();
