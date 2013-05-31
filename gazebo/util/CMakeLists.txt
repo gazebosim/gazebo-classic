@@ -4,7 +4,6 @@ set (sources
   Diagnostics.cc
   LogPlay.cc
   LogRecord.cc
-  Base64.cc
 )
 
 set (headers 
@@ -12,8 +11,7 @@ set (headers
   LogPlay.hh
   LogRecord.hh
   UtilTypes.hh
-  Base64.hh
- )
+)
 
 set (gtest_sources
   Diagnostics_TEST.cc

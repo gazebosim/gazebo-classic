@@ -31,19 +31,13 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/util/Base64.hh"
+#include "gazebo/common/Base64.hh"
 #include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 using namespace util;
-
-/// Convert binary values to base64 characters
-typedef boost::archive::iterators::base64_from_binary<
-        // retrieve 6 bit integers from a sequence of 8 bit bytes
-        boost::archive::iterators::transform_width<const char *, 6, 8> >
-        Base64Text;
 
 //////////////////////////////////////////////////
 LogRecord::LogRecord()
