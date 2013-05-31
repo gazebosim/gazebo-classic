@@ -19,6 +19,7 @@
 #include "common/Events.hh"
 #include "transport/TopicManager.hh"
 #include "transport/ConnectionManager.hh"
+#include "common/Timer.hh"
 
 #include "gazebo_config.h"
 
@@ -198,6 +199,13 @@ void ConnectionManager::Fini()
   this->namespaces.clear();
   this->masterMessages.clear();
 
+  if (this->connectSubToPubThread)
+  {
+    this->connectSubToPubThread->join();
+    delete this->connectSubToPubThread;
+    this->connectSubToPubThread = NULL;
+  }
+
   this->initialized = false;
 }
 
@@ -217,7 +225,6 @@ void ConnectionManager::RunUpdate()
   std::list<ConnectionPtr>::iterator iter;
   std::list<ConnectionPtr>::iterator endIter;
   unsigned int msize = 0;
-
   {
     boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
     msize = this->masterMessages.size();
@@ -226,7 +233,6 @@ void ConnectionManager::RunUpdate()
   while (msize > 0)
   {
     this->ProcessMessage(this->masterMessages.front());
-
     {
       boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
       this->masterMessages.pop_front();
@@ -272,6 +278,12 @@ void ConnectionManager::Run()
 
   this->stopped = false;
 
+  // Separate out sub to pub connection function as it can block the message
+  // update thread.
+  this->connectSubToPubThread =
+      new boost::thread(boost::bind(&ConnectionManager::RunConnectSubToPub,
+      this));
+
   while (!this->stop && this->masterConn && this->masterConn->IsOpen())
   {
     this->RunUpdate();
@@ -283,6 +295,34 @@ void ConnectionManager::Run()
   this->stopped = true;
 
   this->masterConn->Shutdown();
+}
+
+//////////////////////////////////////////////////
+void ConnectionManager::RunConnectSubToPub()
+{
+  boost::mutex::scoped_lock lock(this->subToPubUpdateMutex);
+
+  while (!this->stop && this->masterConn && this->masterConn->IsOpen())
+  {
+    this->UpdateConnectSubToPub();
+    this->subToPubCondition.timed_wait(lock,
+       boost::posix_time::milliseconds(100));
+  }
+}
+
+//////////////////////////////////////////////////
+void ConnectionManager::UpdateConnectSubToPub()
+{
+  unsigned int msize = this->subToPubQueue.size();
+  while (msize > 0)
+  {
+    TopicManager::Instance()->ConnectSubToPub(this->subToPubQueue.front());
+    {
+      boost::recursive_mutex::scoped_lock lock(this->subToPubQueueMutex);
+      this->subToPubQueue.pop_front();
+      msize = this->subToPubQueue.size();
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -355,11 +395,14 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   {
     msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
-
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
-      TopicManager::Instance()->ConnectSubToPub(pub);
+      {
+        boost::recursive_mutex::scoped_lock lock(this->subToPubQueueMutex);
+        this->subToPubQueue.push_back(pub);
+        this->subToPubCondition.notify_all();
+      }
     }
   }
   else if (packet.type() == "unsubscribe")

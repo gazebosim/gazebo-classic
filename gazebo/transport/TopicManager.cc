@@ -22,7 +22,7 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publication.hh"
 #include "gazebo/transport/TopicManager.hh"
-
+#include "common/Timer.hh"
 using namespace gazebo;
 using namespace transport;
 
@@ -312,6 +312,7 @@ void TopicManager::ConnectSubscribers(const std::string &_topic)
 void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
 {
   boost::mutex::scoped_lock lock(this->subscriberMutex);
+
   this->UpdatePublications(_pub.topic(), _pub.msg_type());
 
   PublicationPtr publication = this->FindPublication(_pub.topic());
@@ -321,7 +322,6 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
     // Connect to the remote publisher
     ConnectionPtr conn = ConnectionManager::Instance()->ConnectToRemoteHost(
         _pub.host(), _pub.port());
-
     if (conn)
     {
       // Create a transport link that will read from the connection, and
@@ -349,10 +349,8 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
       publication->AddTransport(publink);
     }
   }
-
   this->ConnectSubscribers(_pub.topic());
 }
-
 
 //////////////////////////////////////////////////
 PublicationPtr TopicManager::UpdatePublications(const std::string &topic,

@@ -1334,8 +1334,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
       }
     }
 
-    if (this->GetScene()->skyx != NULL)
-      this->renderTarget->addListener(this->GetScene()->skyx);
+//    if (this->GetScene()->skyx != NULL)
+//      this->renderTarget->addListener(this->GetScene()->skyx);
   }
 }
 

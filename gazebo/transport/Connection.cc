@@ -155,7 +155,7 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
       boost::bind(&Connection::OnConnect, this,
         boost::asio::placeholders::error, endpointIter));
 
-  // Wait for at most 2 seconds for a connection to be established.
+  // Wait for at most 10 seconds for a connection to be established.
   // The connectionCondition notification occurs in ::OnConnect.
   if (!this->connectCondition.timed_wait(lock,
         boost::posix_time::milliseconds(60000)) || this->connectError)
@@ -697,7 +697,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     // Get interface addresses
     if (getifaddrs(&ifaddr) == -1)
     {
-      perror("getifaddres");
+      perror("getifaddrs");
       gzthrow("Unable to get local interface addresses");
     }
 
@@ -744,6 +744,8 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
 
       address = address.loopback();
     }
+
+    freeifaddrs(ifaddr);
   }
 
   // Complain if we were unable to find a valid address

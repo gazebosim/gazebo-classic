@@ -142,6 +142,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   }
   else
   {
+//    gzerr << " trigger update " << std::endl;
     // Tell the connection manager that it needs to update
     ConnectionManager::Instance()->TriggerUpdate();
   }
@@ -159,6 +160,7 @@ void Publisher::SendMessage()
         std::back_inserter(localBuffer));
     this->messages.clear();
   }
+//    gzerr << " sending message " << std::endl;
 
   // Only send messages if there is something to send
   if (!localBuffer.empty())

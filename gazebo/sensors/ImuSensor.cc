@@ -188,6 +188,7 @@ void ImuSensor::OnLinkData(ConstLinkDataPtr &_msg)
   boost::mutex::scoped_lock lock(this->mutex);
   // Store the contacts message for processing in UpdateImpl
   this->incomingLinkData[this->dataIndex] = _msg;
+//  gzerr << " got link data " << std::endl;
   this->dataDirty = true;
 }
 
@@ -223,7 +224,6 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
 {
   msgs::LinkData msg;
   int readIndex = 0;
-
   {
     boost::mutex::scoped_lock lock(this->mutex);
 

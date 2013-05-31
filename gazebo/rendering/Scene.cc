@@ -2316,6 +2316,9 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::SetSky()
 {
+
+  return;
+
   // Create SkyX
   this->skyxController = new SkyX::BasicController();
   this->skyx = new SkyX::SkyX(this->manager, this->skyxController);
@@ -2682,6 +2685,9 @@ void Scene::SetSkyXMode(unsigned int _mode)
   /// based sensors to disable clouds and moon. More testing is required to
   /// make sure it functions correctly when called during a render update,
   /// issue #693.
+
+  if (!this->skyx)
+    return;
 
   bool enabled = _mode != GZ_SKYX_NONE;
   this->skyx->setEnabled(enabled);

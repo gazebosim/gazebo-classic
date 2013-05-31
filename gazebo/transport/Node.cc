@@ -126,6 +126,7 @@ unsigned int Node::GetId() const
 void Node::ProcessPublishers()
 {
   int start, end;
+//  gzerr << " process publishers " << std::endl;
   boost::mutex::scoped_lock lock(this->publisherDeleteMutex);
 
   {
@@ -136,6 +137,8 @@ void Node::ProcessPublishers()
 
   for (int i = start; i < end; ++i)
     this->publishers[i]->SendMessage();
+
+//  gzerr << " process publishers ===== done " << std::endl;
 }
 
 /////////////////////////////////////////////////
