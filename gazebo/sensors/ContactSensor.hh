@@ -27,8 +27,6 @@
 #include <list>
 #include <string>
 
-#include "gazebo/common/CommonTypes.hh"
-
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/math/Angle.hh"
