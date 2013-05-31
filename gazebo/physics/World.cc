@@ -1723,11 +1723,11 @@ bool World::OnLog(std::ostringstream &_stream)
     _stream << this->sdf->ToString("");
     _stream << "</sdf>\n";
   }
-  else if (this->states.size() >= 1)
+  else if (this->states.size() >= 2)
   {
     do
     {
-      size_t end = this->states.size();
+      size_t end = this->states.size() - 1;
 
       // Get the difference from the previous state.
       for (size_t i = 0; i < end; ++i)
