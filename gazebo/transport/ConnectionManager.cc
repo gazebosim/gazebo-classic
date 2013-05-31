@@ -223,7 +223,9 @@ void ConnectionManager::RunUpdate()
 {
   std::list<ConnectionPtr>::iterator iter;
   std::list<ConnectionPtr>::iterator endIter;
-  unsigned int msize = 0;
+
+  this->subToPubCondition.notify_all();
+/*  unsigned int msize = 0;
   {
     boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
     msize = this->masterMessages.size();
@@ -240,7 +242,7 @@ void ConnectionManager::RunUpdate()
   }
 
   if (this->masterConn)
-    this->masterConn->ProcessWriteQueue();
+    this->masterConn->ProcessWriteQueue();*/
 
   // Use TBB to process nodes. Need more testing to see if this makes
   // a difference.
@@ -312,7 +314,7 @@ void ConnectionManager::RunConnectSubToPub()
 //////////////////////////////////////////////////
 void ConnectionManager::UpdateConnectSubToPub()
 {
-  unsigned int msize = this->subToPubQueue.size();
+/*  unsigned int msize = this->subToPubQueue.size();
   while (msize > 0)
   {
     TopicManager::Instance()->ConnectSubToPub(this->subToPubQueue.front());
@@ -321,7 +323,27 @@ void ConnectionManager::UpdateConnectSubToPub()
       this->subToPubQueue.pop_front();
       msize = this->subToPubQueue.size();
     }
+  }*/
+
+  unsigned int msize = 0;
+  {
+    boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
+    msize = this->masterMessages.size();
   }
+
+  while (msize > 0)
+  {
+    this->ProcessMessage(this->masterMessages.front());
+    {
+      boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
+      this->masterMessages.pop_front();
+      msize = this->masterMessages.size();
+    }
+  }
+
+  if (this->masterConn)
+    this->masterConn->ProcessWriteQueue();
+
 }
 
 //////////////////////////////////////////////////
@@ -398,9 +420,10 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
         pub.port() != this->serverConn->GetLocalPort())
     {
       {
-        boost::recursive_mutex::scoped_lock lock(this->subToPubQueueMutex);
-        this->subToPubQueue.push_back(pub);
-        this->subToPubCondition.notify_all();
+        TopicManager::Instance()->ConnectSubToPub(pub);
+        //boost::recursive_mutex::scoped_lock lock(this->subToPubQueueMutex);
+//        this->subToPubQueue.push_back(pub);
+//        this->subToPubCondition.notify_all();
       }
     }
   }
