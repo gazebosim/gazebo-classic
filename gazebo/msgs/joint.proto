@@ -22,7 +22,7 @@ message Joint
   }
 
   required string name           = 1;
-  required uint32 id             = 2;
+  optional uint32 id             = 2;
   repeated double angle          = 3;
   optional Type type             = 4;
   optional string parent         = 5;

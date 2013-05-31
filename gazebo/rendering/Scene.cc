@@ -1831,7 +1831,12 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 {
-  VisualPtr linkVis = this->GetVisual(_msg->id());
+  VisualPtr linkVis;
+
+ if (_msg->has_id()) 
+   linkVis = this->GetVisual(_msg->id());
+ else
+   linkVis = this->GetVisual(_msg->name());
 
   if (!linkVis)
   {
@@ -1864,10 +1869,14 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
-  Visual_M::iterator iter;
-  iter = this->visuals.find(_msg->id());
+  bool good = false;
 
-  if (iter == this->visuals.end())
+  if (_msg->has_id())
+    good = this->visuals.find(_msg->id()) != this->visuals.end();
+  else
+    good = this->GetVisual(_msg->name()) != NULL;
+
+  if (good)
   {
     VisualPtr childVis;
 
@@ -1883,9 +1892,10 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
             _msg->name() + "_JOINT_VISUAL__", childVis));
     jointVis->Load(_msg);
     jointVis->SetVisible(this->showJoints);
-    jointVis->SetId(_msg->id());
+    if (_msg->has_id())
+      jointVis->SetId(_msg->id());
 
-    this->visuals[_msg->id()] = jointVis;
+    this->visuals[jointVis->GetId()] = jointVis;
   }
   return true;
 }
@@ -2108,8 +2118,15 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 {
   bool result = false;
-  Visual_M::iterator iter;
-  iter = this->visuals.find(_msg->id());
+  Visual_M::iterator iter = this->visuals.end();
+
+  if (_msg->has_id())
+    iter = this->visuals.find(_msg->id());
+  else
+  {
+    VisualPtr vis = this->GetVisual(_msg->name());
+    iter = vis ? this->visuals.find(vis->GetId()) : this->visuals.end();
+  }
 
   if (_msg->has_delete_me() && _msg->delete_me())
   {
@@ -2156,7 +2173,14 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     // If the visual has a parent which is not the name of the scene...
     if (_msg->has_parent_name() && _msg->parent_name() != this->GetName())
     {
-      iter = this->visuals.find(_msg->id());
+      if (_msg->has_id())
+        iter = this->visuals.find(_msg->id());
+      else
+      {
+        VisualPtr vis = this->GetVisual(_msg->name());
+        iter = vis ? this->visuals.find(vis->GetId()) : this->visuals.end();
+      }
+
       if (iter != this->visuals.end())
         gzerr << "Visual already exists. This shouldn't happen.\n";
 
@@ -2166,21 +2190,23 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       if (iter != this->visuals.end())
       {
         visual.reset(new Visual(_msg->name(), iter->second));
-        visual->SetId(_msg->id());
+        if (_msg->has_id())
+          visual->SetId(_msg->id());
       }
     }
     else
     {
       // Add a visual that is attached to the scene root
       visual.reset(new Visual(_msg->name(), this->worldVisual));
-      visual->SetId(_msg->id());
+      if (_msg->has_id())
+        visual->SetId(_msg->id());
     }
 
     if (visual)
     {
       result = true;
       visual->LoadFromMsg(_msg);
-      this->visuals[_msg->id()] = visual;
+      this->visuals[visual->GetId()] = visual;
       if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
           visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
       {

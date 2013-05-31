@@ -13,7 +13,7 @@ import "plugin.proto";
 message Visual
 {
   required string name         = 1;
-  required uint32 id           = 2; 
+  optional uint32 id           = 2; 
   required string parent_name  = 3;
   optional uint32 parent_id    = 4;
   optional bool cast_shadows   = 5;
