@@ -251,12 +251,13 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     return;
   }
 
-  std::ostringstream header_stream;
+  std::ostringstream headerStream;
 
-  header_stream << std::setw(HEADER_LENGTH) << std::hex << _buffer.size();
+  headerStream << std::setfill('0') << std::setw(HEADER_LENGTH)
+    << std::hex << _buffer.size();
 
-  if (header_stream.str().empty() ||
-      header_stream.str().size() != HEADER_LENGTH)
+  if (headerStream.str().empty() ||
+      headerStream.str().size() != HEADER_LENGTH)
   {
     // Something went wrong, inform the caller
     boost::system::error_code error(boost::asio::error::invalid_argument);
@@ -269,7 +270,7 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
     boost::asio::streambuf *buffer = new boost::asio::streambuf;
     std::ostream os(buffer);
-    os << header_stream.str() << _buffer;
+    os << headerStream.str() << _buffer;
 
     std::size_t written = 0;
     written = boost::asio::write(*this->socket, buffer->data());
@@ -283,10 +284,13 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     */
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
+
+    headerStream << _buffer;
+
     if (this->writeQueue.size() > 1)
-      this->writeQueue.back() += header_stream.str() + _buffer;
+      this->writeQueue.back() += headerStream.str();
     else
-      this->writeQueue.push_back(header_stream.str() + _buffer);
+      this->writeQueue.push_back(headerStream.str());
   }
   // }
 
