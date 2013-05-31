@@ -15,10 +15,11 @@
  *
 */
 
-#include "msgs/msgs.hh"
-#include "common/Events.hh"
-#include "transport/TopicManager.hh"
-#include "transport/ConnectionManager.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/transport/TopicManager.hh"
+#include "gazebo/transport/ConnectionManager.hh"
 
 #include "gazebo_config.h"
 
@@ -77,11 +78,15 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   while (!this->masterConn->Connect(_masterHost, master_port) &&
          this->IsRunning())
   {
-    printf(".");
-    fflush(stdout);
+    if (!common::Console::Instance()->GetQuiet())
+    {
+      printf(".");
+      fflush(stdout);
+    }
     common::Time::MSleep(1000);
   }
-  printf("\n");
+  if (!common::Console::Instance()->GetQuiet())
+    printf("\n");
 
   if (!this->IsRunning())
   {
