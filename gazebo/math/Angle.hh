@@ -25,8 +25,6 @@
 #include <math.h>
 #include <iostream>
 
-#include "gazebo/common/CommonTypes.hh"
-
 /// \brief Macro that converts radians to degrees
 /// \param[in] radians
 /// \return degrees
