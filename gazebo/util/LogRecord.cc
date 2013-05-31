@@ -31,6 +31,7 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/util/Base64.hh"
 #include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/gazebo_config.h"
@@ -586,14 +587,18 @@ unsigned int LogRecord::Log::Update()
         {
           boost::iostreams::filtering_ostream out;
           out.push(boost::iostreams::zlib_compressor());
-          out.push(std::back_inserter(str));
+          out.push(std::back_inserter(this->buffer));
           boost::iostreams::copy(boost::make_iterator_range(data), out);
         }
 
+        this->buffer += Base64Encode(str.c_str(), str.size());
+        gzerr << "Size[" << this->buffer.size() << "]\n";
+
         // Encode in base64.
-        std::copy(Base64Text(str.c_str()),
+        /*std::copy(Base64Text(str.c_str()),
             Base64Text(str.c_str() + str.size()),
             std::back_inserter(this->buffer));
+            */
       }
       else if (encoding == "txt")
         this->buffer.append(data);
@@ -611,6 +616,7 @@ unsigned int LogRecord::Log::Update()
 //////////////////////////////////////////////////
 void LogRecord::Log::ClearBuffer()
 {
+  gzerr << "Clear Buffer 3\n";
   this->buffer.clear();
 }
 
@@ -694,6 +700,7 @@ void LogRecord::Log::Write()
     gzerr << "Log file[" << this->completePath << "] no longer exists. "
           << "Unable to write log data.\n";
 
+    gzerr << "Clear Buffer 1\n";
     // We have to clear the buffer, or else it may grow indefinitely.
     this->buffer.clear();
     return;
@@ -703,6 +710,7 @@ void LogRecord::Log::Write()
   this->logFile.write(this->buffer.c_str(), this->buffer.size());
   this->logFile.flush();
 
+  gzerr << "Clear Buffer\n";
   // Clear the buffer.
   this->buffer.clear();
 }
