@@ -1,4 +1,20 @@
 /*
+ * Copyright 2012 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+/*
    base64.cpp and base64.h
 
    Copyright (C) 2004-2008 René Nyffenegger
@@ -22,7 +38,6 @@
    3. This notice may not be removed or altered from any source distribution.
 
    René Nyffenegger rene.nyffenegger@adp-gmbh.ch
-
 */
 
 #include "gazebo/util/Base64.hh"
@@ -33,14 +48,16 @@ static const std::string base64Chars =
 "abcdefghijklmnopqrstuvwxyz"
 "0123456789+/";
 
-static inline bool IsBase64(unsigned char c)
+/////////////////////////////////////////////////
+static inline bool IsBase64(unsigned char _c)
 {
-  return (isalnum(c) || (c == '+') || (c == '/'));
+  return (isalnum(_c) || (_c == '+') || (_c == '/'));
 }
 
-std::string Base64Encode(char const* _bytesToEncode, unsigned int _inLen)
+/////////////////////////////////////////////////
+void Base64Encode(const char *_bytesToEncode, unsigned int _inLen,
+    std::string &_result)
 {
-  std::string ret;
   int i = 0;
   int j = 0;
   unsigned char charArray3[3];
@@ -58,15 +75,15 @@ std::string Base64Encode(char const* _bytesToEncode, unsigned int _inLen)
         ((charArray3[2] & 0xc0) >> 6);
       charArray4[3] = charArray3[2] & 0x3f;
 
-      for(i = 0; (i <4) ; i++)
-        ret += base64Chars[charArray4[i]];
+      for(i = 0; (i < 4); ++i)
+        _result += base64Chars[charArray4[i]];
       i = 0;
     }
   }
 
   if (i)
   {
-    for(j = i; j < 3; j++)
+    for(j = i; j < 3; ++j)
       charArray3[j] = '\0';
 
     charArray4[0] = (charArray3[0] & 0xfc) >> 2;
@@ -76,34 +93,33 @@ std::string Base64Encode(char const* _bytesToEncode, unsigned int _inLen)
       ((charArray3[2] & 0xc0) >> 6);
     charArray4[3] = charArray3[2] & 0x3f;
 
-    for (j = 0; (j < i + 1); j++)
-      ret += base64Chars[charArray4[j]];
+    for (j = 0; (j < i + 1); ++j)
+      _result += base64Chars[charArray4[j]];
 
-    while((i++ < 3))
-      ret += '=';
+    while ((i++ < 3))
+      _result += '=';
   }
-
-  return ret;
 }
 
-std::string Base64Decode(std::string const& encoded_string)
+/////////////////////////////////////////////////
+std::string Base64Decode(const std::string &_encodedString)
 {
-  int _inLen = encoded_string.size();
+  int inLen = _encodedString.size();
   int i = 0;
   int j = 0;
-  int in_ = 0;
+  int in = 0;
   unsigned char charArray4[4], charArray3[3];
   std::string ret;
 
-  while (_inLen-- && (encoded_string[in_] != '=') &&
-      IsBase64(encoded_string[in_]))
+  while (inLen-- && (_encodedString[in] != '=') &&
+      IsBase64(_encodedString[in]))
   {
-    charArray4[i++] = encoded_string[in_];
-    in_++;
+    charArray4[i++] = _encodedString[in];
+    in++;
 
-    if (i ==4)
+    if (i == 4)
     {
-      for (i = 0; i <4; i++)
+      for (i = 0; i < 4; ++i)
         charArray4[i] = base64Chars.find(charArray4[i]);
 
       charArray3[0] = (charArray4[0] << 2) +
@@ -112,7 +128,7 @@ std::string Base64Decode(std::string const& encoded_string)
         ((charArray4[2] & 0x3c) >> 2);
       charArray3[2] = ((charArray4[2] & 0x3) << 6) + charArray4[3];
 
-      for (i = 0; (i < 3); i++)
+      for (i = 0; (i < 3); ++i)
         ret += charArray3[i];
       i = 0;
     }
@@ -120,10 +136,10 @@ std::string Base64Decode(std::string const& encoded_string)
 
   if (i)
   {
-    for (j = i; j <4; j++)
+    for (j = i; j <4; ++j)
       charArray4[j] = 0;
 
-    for (j = 0; j <4; j++)
+    for (j = 0; j <4; ++j)
       charArray4[j] = base64Chars.find(charArray4[j]);
 
     charArray3[0] = (charArray4[0] << 2) + ((charArray4[1] & 0x30) >> 4);
@@ -131,7 +147,8 @@ std::string Base64Decode(std::string const& encoded_string)
       ((charArray4[2] & 0x3c) >> 2);
     charArray3[2] = ((charArray4[2] & 0x3) << 6) + charArray4[3];
 
-    for (j = 0; (j < i - 1); j++) ret += charArray3[j];
+    for (j = 0; (j < i - 1); ++j)
+      ret += charArray3[j];
   }
 
   return ret;

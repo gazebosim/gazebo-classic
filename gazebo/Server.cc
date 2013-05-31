@@ -79,10 +79,9 @@ bool Server::ParseArgs(int argc, char **argv)
   this->systemPluginsArgv = new char*[argc];
   for (int i = 0; i < argc; ++i)
   {
-    int argv_len = strlen(argv[i]);
+    int argv_len = strlen(argv[i]) + 1;
     this->systemPluginsArgv[i] = new char[argv_len];
-    for (int j = 0; j < argv_len; ++j)
-      this->systemPluginsArgv[i][j] = argv[i][j];
+    strcpy(this->systemPluginsArgv[i], argv[i]);
   }
 
   po::options_description v_desc("Allowed options");

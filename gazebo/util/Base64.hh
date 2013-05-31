@@ -19,7 +19,16 @@
 
 #include <string>
 
-std::string Base64Encode(char const* , unsigned int len);
-std::string Base64Decode(std::string const& s);
+/// \brief Encode a binary string into base 64.
+/// \param[in] _bytesToEncode String of bytes to encode.
+/// \param[in] _len Length of _bytesToEncode.
+/// \param[out] _result Based64 string is appended to this string.
+void Base64Encode(const char *_bytesToEncode, unsigned int _len,
+    std::string &_result);
 
+
+/// \brief Decode a base64 string.
+/// \param[in] _encodedString A base 64 encoded string.
+/// \return The decoded string.
+std::string Base64Decode(const std::string &_encodedString);
 #endif

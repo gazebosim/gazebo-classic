@@ -575,9 +575,7 @@ unsigned int LogRecord::Log::Update()
         }
 
         // Encode in base64.
-        std::copy(Base64Text(str.c_str()),
-            Base64Text(str.c_str() + str.size()),
-            std::back_inserter(this->buffer));
+        Base64Encode(str.c_str(), str.size(), this->buffer);
       }
       else if (encoding == "zlib")
       {
@@ -591,13 +589,8 @@ unsigned int LogRecord::Log::Update()
           boost::iostreams::copy(boost::make_iterator_range(data), out);
         }
 
-        this->buffer += Base64Encode(str.c_str(), str.size());
-
         // Encode in base64.
-        /*std::copy(Base64Text(str.c_str()),
-            Base64Text(str.c_str() + str.size()),
-            std::back_inserter(this->buffer));
-            */
+        Base64Encode(str.c_str(), str.size(), this->buffer);
       }
       else if (encoding == "txt")
         this->buffer.append(data);
