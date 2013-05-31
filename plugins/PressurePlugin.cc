@@ -18,6 +18,7 @@
  * Desc: Pressure sensor plugin
  * Author: Steve Peters
  */
+#include <gazebo/physics/Base.hh>
 #include "PressurePlugin.hh"
 
 using namespace gazebo;
@@ -59,6 +60,52 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 
   // Get name of parent sensor.
   this->parentSensorName = this->parentSensor->GetName();
+
+  // Get collision names of parent sensor and physics pointers.
+  physics::WorldPtr world = physics::get_world(this->worldName);
+  unsigned int collisionCount = this->parentSensor->GetCollisionCount();
+  for (unsigned int i = 0; i < collisionCount; ++i)
+  {
+    std::string collisionScopedName = this->parentSensor->GetCollisionName(i);
+    // Strip off ::collision_name to get link name
+    std::string linkName = collisionScopedName.substr(0,
+                           collisionScopedName.rfind("::"));
+    // Get unscoped name of collision
+    std::string collisionName =
+      collisionScopedName.substr(collisionScopedName.rfind("::") + 2);
+    // Get physics pointers
+    physics::EntityPtr entity = world->GetEntity(linkName);
+    if (entity && entity->HasType(physics::Base::LINK))
+    {
+      physics::LinkPtr link =
+        boost::dynamic_pointer_cast<physics::Link>(entity);
+      if (link)
+      {
+        physics::CollisionPtr collision = link->GetCollision(collisionName);
+        if (collision)
+        {
+          physics::ShapePtr shape = collision->GetShape();
+          if (shape->HasType(physics::Base::BOX_SHAPE))
+          {
+            physics::BoxShapePtr box =
+              boost::dynamic_pointer_cast<physics::BoxShape>(shape);
+            if (box)
+            {
+              math::Vector3 size = box->GetSize();
+              std::vector<double> sizeVector;
+              sizeVector.push_back(size.x);
+              sizeVector.push_back(size.y);
+              sizeVector.push_back(size.z);
+              std::sort(sizeVector.begin(), sizeVector.end());
+              double area = sizeVector[1] * sizeVector[2];
+              if (area > 0.0)
+                this->collisionNamesToArea[collisionScopedName] = area;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -70,66 +117,58 @@ void PressurePlugin::Init()
   if (!this->parentSensorName.empty())
   {
     // Create publisher for tactile messages
-    this->tactilePub = this->node->Advertise<msgs::Tactile>("~/asdf");
+    std::string topicName = "~/" + this->parentSensorName + "/tactile";
+    boost::replace_all(topicName, "::", "/");
+    this->tactilePub = this->node->Advertise<msgs::Tactile>(topicName);
   }
 }
 
 /////////////////////////////////////////////////
 void PressurePlugin::OnUpdate()
 {
-  // Get all the contacts.
-  msgs::Contacts contacts;
-  contacts = this->parentSensor->GetContacts();
-  if (contacts.contact_size() > 0)
+  msgs::Tactile tactileMsg;
+  common::Time currentContactTime;
+
+  // For each collision attached to this sensor
+  boost::unordered_map<std::string, double>::iterator iter;
+  for (iter = this->collisionNamesToArea.begin();
+       iter != this->collisionNamesToArea.end(); ++iter)
   {
-    msgs::Tactile tactileMsg;
-
-    common::Time currentContactTime;
-    int i = contacts.contact_size() - 1;
-    currentContactTime = msgs::Convert(contacts.contact(i).time());
-    if (currentContactTime != this->lastContactTime)
+    double normalForceSum = 0, normalForce;
+    // Get the contacts sorted by collision element.
+    std::map<std::string, gazebo::physics::Contact> contacts;
+    std::map<std::string, gazebo::physics::Contact>::iterator iter2;
+    contacts = this->parentSensor->GetContacts(iter->first);
+    for (iter2 = contacts.begin(); iter2 != contacts.end(); ++iter2)
     {
-      tactileMsg.add_collision_name(contacts.contact(i).collision1());
-      tactileMsg.add_collision_id(0);
-
-      double normalForceSum = 0, normalForce;
-      for (int j = 0; j < contacts.contact(i).position_size(); ++j)
+      for (int i = 0; i < iter2->second.count; ++i)
       {
-        normalForce = contacts.contact(i).normal(j).x() *
-                      contacts.contact(i).wrench(j).body_1_force().x() +
-                      contacts.contact(i).normal(j).y() *
-                      contacts.contact(i).wrench(j).body_1_force().y() +
-                      contacts.contact(i).normal(j).z() *
-                      contacts.contact(i).wrench(j).body_1_force().z();
+        normalForce = iter2->second.normals[i].x *
+                      iter2->second.wrench[i].body1Force.x +
+                      iter2->second.normals[i].y *
+                      iter2->second.wrench[i].body1Force.y +
+                      iter2->second.normals[i].z *
+                      iter2->second.wrench[i].body1Force.z;
         normalForceSum += normalForce;
       }
-      double area = 1.0;
-      tactileMsg.add_pressure(normalForceSum / area);
-
-      msgs::Set(tactileMsg.mutable_time(), currentContactTime);
-      this->lastContactTime = currentContactTime;
-
-      if (this->tactilePub)
-        this->tactilePub->Publish(tactileMsg);
+    }
+    if (normalForceSum > 0)
+    {
+      tactileMsg.add_collision_name(iter->first);
+      tactileMsg.add_collision_id(0);
+      tactileMsg.add_pressure(normalForceSum / iter->second);
     }
   }
-  // for (int i = 0; i < contacts.contact_size(); ++i)
-  // {
-  //   tactileMsg.add_collision_name(contacts.contact(i).collision1());
-  //   tactileMsg.add_collision_id(0);
-  //   double normalForceSum = 0, normalForce;
 
-  //   for (int j = 0; j < contacts.contact(i).position_size(); ++j)
-  //   {
-  //     normalForce = contacts.contact(i).normal(j).x() *
-  //                   contacts.contact(i).wrench(j).body_1_force().x() +
-  //                   contacts.contact(i).normal(j).y() *
-  //                   contacts.contact(i).wrench(j).body_1_force().y() +
-  //                   contacts.contact(i).normal(j).z() *
-  //                   contacts.contact(i).wrench(j).body_1_force().z();
-  //     normalForceSum += normalForce;
-  //   }
-  //   double area = 1.0;
-  //   tactileMsg.add_pressure(normalForceSum / area);
-  // }
+  msgs::Contacts contacts = this->parentSensor->GetContacts();
+  int nc = contacts.contact_size();
+  if (nc > 0)
+  {
+    currentContactTime = msgs::Convert(contacts.contact(nc-1).time());
+    msgs::Set(tactileMsg.mutable_time(), currentContactTime);
+    this->lastContactTime = currentContactTime;
+
+    if (this->tactilePub && tactileMsg.pressure_size() > 0)
+      this->tactilePub->Publish(tactileMsg);
+  }
 }

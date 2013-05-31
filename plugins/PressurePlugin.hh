@@ -22,6 +22,7 @@
 #define _GAZEBO_PRESSURE_PLUGIN_HH_
 
 #include <string>
+#include <boost/unordered_map.hpp>
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/sensors/sensors.hh>
@@ -65,6 +66,9 @@ namespace gazebo
 
     /// \brief Parent sensor name.
     private: std::string parentSensorName;
+
+    /// \brief Parent sensor collision names.
+    private: boost::unordered_map<std::string, double> collisionNamesToArea;
 
     /// \brief Last contact time.
     private: common::Time lastContactTime;
