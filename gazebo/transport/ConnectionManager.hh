@@ -185,10 +185,19 @@ namespace gazebo
       // Singleton implementation
       private: friend class SingletonT<ConnectionManager>;
 
+      // \brief List of publisher_update messages
       private: std::list<msgs::Publish> subToPubQueue;
+
+      // \brief Mutex for protecting subToPubQueue
       private: boost::recursive_mutex subToPubQueueMutex;
+
+      // \brief Mutex for protecting subToPub  updates
       private: boost::mutex subToPubUpdateMutex;
+
+      /// \brief Condition used to trigger an update of the sub to pub thread.
       private: boost::condition_variable subToPubCondition;
+
+      /// \brief Thread for connecting subscribers to publishers
       private: boost::thread *connectSubToPubThread;
 
       public: void RunConnectSubToPub();
