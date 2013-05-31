@@ -860,3 +860,18 @@ bool LogRecord::IsReadyToStart() const
 {
   return this->readyToStart;
 }
+
+//////////////////////////////////////////////////
+unsigned int LogRecord::GetBufferSize() const
+{
+  boost::mutex::scoped_lock lock(this->writeMutex);
+  unsigned int size = 0;
+
+  for (Log_M::const_iterator iter = this->logs.begin();
+      iter != this->logs.end(); ++iter)
+  {
+    size += iter->second->GetBufferSize();
+  }
+
+  return size;
+}

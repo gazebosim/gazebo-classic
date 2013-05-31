@@ -517,7 +517,9 @@ void World::Step()
     }
     else
     {
-      util::LogRecord::Instance()->Write();
+      // Flush the log record buffer, if there is data in it.
+      if (util::LogRecord::Instance()->GetBufferSize() > 0)
+        util::LogRecord::Instance()->Notify();
       this->pauseTime += stepTime;
     }
   }
