@@ -516,7 +516,10 @@ void World::Step()
         this->stepInc--;
     }
     else
+    {
+      util::LogRecord::Instance()->Write();
       this->pauseTime += stepTime;
+    }
   }
 
   this->ProcessMessages();

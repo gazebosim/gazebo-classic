@@ -643,6 +643,7 @@ void LogRecord::Log::Stop()
 {
   if (this->logFile.is_open())
   {
+    this->Update();
     this->Write();
 
     std::string xmlEnd = "</gazebo_log>";
