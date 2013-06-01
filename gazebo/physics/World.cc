@@ -1719,19 +1719,13 @@ bool World::OnLog(std::ostringstream &_stream)
   }
   else if (this->states.size() >= 1)
   {
-    do
+    boost::mutex::scoped_lock lock(this->logMutex);
+    for (std::deque<WorldState>::iterator iter = this->states.begin();
+        iter != this->states.end(); ++iter)
     {
-      size_t end = this->states.size();
-
-      // Get the difference from the previous state.
-      for (size_t i = 0; i < end; ++i)
-      {
-        _stream << "<sdf version='" << SDF_VERSION << "'>"
-          << this->states[0] << "</sdf>";
-
-        this->states.pop_front();
-      }
-    } while (this->states.size() > 1000);
+      _stream << "<sdf version='" << SDF_VERSION << "'>" << *iter << "</sdf>";
+    }
+    this->states.clear();
   }
 
   // Logging has stopped. Wait for log worker to finish. Output last bit
