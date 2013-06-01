@@ -36,7 +36,6 @@ class TopicManagerProcessTask : public tbb::task
           }
 };
 
-
 /// TBB task to establish subscriber to publisher connection.
 class TopicManagerConnectionTask : public tbb::task
 {
@@ -219,13 +218,6 @@ void ConnectionManager::Fini()
   this->namespaces.clear();
   this->masterMessages.clear();
 
-  if (this->connectSubToPubThread)
-  {
-    this->connectSubToPubThread->join();
-    delete this->connectSubToPubThread;
-    this->connectSubToPubThread = NULL;
-  }
-
   this->initialized = false;
 }
 
@@ -245,7 +237,6 @@ void ConnectionManager::RunUpdate()
   std::list<ConnectionPtr>::iterator iter;
   std::list<ConnectionPtr>::iterator endIter;
 
-//  this->subToPubCondition.notify_all();
   unsigned int msize = 0;
   {
     boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
@@ -271,7 +262,6 @@ void ConnectionManager::RunUpdate()
   //   TopicManagerProcessTask();
   // tbb::task::enqueue(*task);
   TopicManager::Instance()->ProcessNodes();
-
   {
     boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
     iter = this->connections.begin();
@@ -300,12 +290,6 @@ void ConnectionManager::Run()
 
   this->stopped = false;
 
-  // Separate out sub to pub connection function as it can block the message
-  // update thread.
-//  this->connectSubToPubThread =
-//      new boost::thread(boost::bind(&ConnectionManager::RunConnectSubToPub,
-//      this));
-
   while (!this->stop && this->masterConn && this->masterConn->IsOpen())
   {
     this->RunUpdate();
@@ -317,54 +301,6 @@ void ConnectionManager::Run()
   this->stopped = true;
 
   this->masterConn->Shutdown();
-}
-
-//////////////////////////////////////////////////
-void ConnectionManager::RunConnectSubToPub()
-{
-  boost::mutex::scoped_lock lock(this->subToPubUpdateMutex);
-
-  while (!this->stop && this->masterConn && this->masterConn->IsOpen())
-  {
-    this->UpdateConnectSubToPub();
-    this->subToPubCondition.timed_wait(lock,
-       boost::posix_time::milliseconds(100));
-  }
-}
-
-//////////////////////////////////////////////////
-void ConnectionManager::UpdateConnectSubToPub()
-{
-/*  unsigned int msize = this->subToPubQueue.size();
-  while (msize > 0)
-  {
-    TopicManager::Instance()->ConnectSubToPub(this->subToPubQueue.front());
-    {
-      boost::recursive_mutex::scoped_lock lock(this->subToPubQueueMutex);
-      this->subToPubQueue.pop_front();
-      msize = this->subToPubQueue.size();
-    }
-  }*/
-/*
-  unsigned int msize = 0;
-  {
-    boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
-    msize = this->masterMessages.size();
-  }
-
-  while (msize > 0)
-  {
-    this->ProcessMessage(this->masterMessages.front());
-    {
-      boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
-      this->masterMessages.pop_front();
-      msize = this->masterMessages.size();
-    }
-  }
-
-  if (this->masterConn)
-    this->masterConn->ProcessWriteQueue();*/
-
 }
 
 //////////////////////////////////////////////////
@@ -429,10 +365,11 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     this->namespaces.push_back(std::string(result.data()));
     this->namespaceCondition.notify_all();
   }
-
-  // Publisher_update. This occurs when we try to subscribe to a topic, and
-  // the master informs us of a remote host that is publishing on our
-  // requested topic
+  // FIXME "publisher_update" is currently not used and have been separated out
+  // into "publisher_subscribe" and "publisher_advertise". This is implemented
+  // as a workaround to address transport blocking issue when gzclient connects
+  // to gzserver, see issue #714. "publisher_advertise", typically intended
+  // for gzserver, is parallelized and made non-blocking.
   else if (packet.type() == "publisher_update")
   {
     msgs::Publish pub;
@@ -440,22 +377,32 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
-      {
-        gzerr << this->masterConn->GetLocalAddress() << " " <<
-          this->serverConn->GetLocalAddress() << std::endl;
-
-        if (this->masterConn->GetLocalAddress() ==
-            this->serverConn->GetLocalAddress())
-        {
-          TopicManager::Instance()->ConnectSubToPub(pub);
-        }
-        else
-        {
-          TopicManagerConnectionTask *task = new(tbb::task::allocate_root())
-          TopicManagerConnectionTask(pub);
-          tbb::task::enqueue(*task);
-        }
-      }
+      TopicManager::Instance()->ConnectSubToPub(pub);
+    }
+  }
+  else if (packet.type() == "publisher_advertise")
+  {
+    msgs::Publish pub;
+    pub.ParseFromString(packet.serialized_data());
+    if (pub.host() != this->serverConn->GetLocalAddress() ||
+        pub.port() != this->serverConn->GetLocalPort())
+    {
+      TopicManagerConnectionTask *task = new(tbb::task::allocate_root())
+      TopicManagerConnectionTask(pub);
+      tbb::task::enqueue(*task);
+    }
+  }
+  // Publisher_update. This occurs when we try to subscribe to a topic, and
+  // the master informs us of a remote host that is publishing on our
+  // requested topic
+  else if (packet.type() == "publisher_subscribe")
+  {
+    msgs::Publish pub;
+    pub.ParseFromString(packet.serialized_data());
+    if (pub.host() != this->serverConn->GetLocalAddress() ||
+        pub.port() != this->serverConn->GetLocalPort())
+    {
+      TopicManager::Instance()->ConnectSubToPub(pub);
     }
   }
   else if (packet.type() == "unsubscribe")
