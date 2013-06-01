@@ -441,15 +441,20 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
         pub.port() != this->serverConn->GetLocalPort())
     {
       {
+        gzerr << this->masterConn->GetLocalAddress() << " " <<
+          this->serverConn->GetLocalAddress() << std::endl;
 
-         TopicManagerConnectionTask *task = new(tbb::task::allocate_root())
-         TopicManagerConnectionTask(pub);
-         tbb::task::enqueue(*task);
-
-//        TopicManager::Instance()->ConnectSubToPub(pub);
-        //boost::recursive_mutex::scoped_lock lock(this->subToPubQueueMutex);
-//        this->subToPubQueue.push_back(pub);
-//        this->subToPubCondition.notify_all();
+        if (this->masterConn->GetLocalAddress() ==
+            this->serverConn->GetLocalAddress())
+        {
+          TopicManager::Instance()->ConnectSubToPub(pub);
+        }
+        else
+        {
+          TopicManagerConnectionTask *task = new(tbb::task::allocate_root())
+          TopicManagerConnectionTask(pub);
+          tbb::task::enqueue(*task);
+        }
       }
     }
   }

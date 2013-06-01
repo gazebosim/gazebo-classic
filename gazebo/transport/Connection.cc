@@ -151,9 +151,6 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
 
   // Use async connect so that we can use a custom timeout. This is useful
   // when trying to detect network errors.
-  boost::asio::ip::tcp::endpoint endpoint = *endpointIter;
-  gzerr << " endpoint " << endpoint << std::endl;
-
   this->socket->async_connect(*endpointIter++,
       boost::bind(&Connection::OnConnect, this,
         boost::asio::placeholders::error, endpointIter));
@@ -776,11 +773,7 @@ boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
     boost::system::error_code ec;
     ep = this->socket->remote_endpoint(ec);
     if (ec)
-    {
-      ep = this->socket->remote_endpoint(ec);
-      if (ec)
         gzerr << "Getting remote endpoint failed" << std::endl;
-    }
   }
   return ep;
 }
@@ -834,7 +827,6 @@ void Connection::OnConnect(const boost::system::error_code &_error,
   // unsuccessfully) established.
 
   boost::mutex::scoped_lock lock(this->connectMutex);
-  gzerr << " err " << _error  << std::endl;
   if (_error == 0)
   {
     this->remoteURI = std::string("http://") + this->GetRemoteHostname()
