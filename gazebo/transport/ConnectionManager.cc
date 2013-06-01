@@ -39,7 +39,6 @@ class TopicManagerProcessTask : public tbb::task
 /// TBB task to establish subscriber to publisher connection.
 class TopicManagerConnectionTask : public tbb::task
 {
-
   /// \brief Constructor.
   /// \param[in] _pub Publish message
   public: TopicManagerConnectionTask(msgs::Publish _pub) : pub(_pub) {}
@@ -53,7 +52,6 @@ class TopicManagerConnectionTask : public tbb::task
 
   /// \brief Publish message
   private: msgs::Publish pub;
-
 };
 
 //////////////////////////////////////////////////
@@ -368,8 +366,8 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   // FIXME "publisher_update" is currently not used and have been separated out
   // into "publisher_subscribe" and "publisher_advertise". This is implemented
   // as a workaround to address transport blocking issue when gzclient connects
-  // to gzserver, see issue #714. "publisher_advertise", typically intended
-  // for gzserver, is parallelized and made non-blocking.
+  // to gzserver, see issue #714. "publisher_advertise", intended
+  // for gzserver when gzclient connects, is parallelized and made non-blocking.
   else if (packet.type() == "publisher_update")
   {
     msgs::Publish pub;
