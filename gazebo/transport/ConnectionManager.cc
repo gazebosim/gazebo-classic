@@ -390,7 +390,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
       tbb::task::enqueue(*task);
     }
   }
-  // Publisher_update. This occurs when we try to subscribe to a topic, and
+  // publisher_subscribe. This occurs when we try to subscribe to a topic, and
   // the master informs us of a remote host that is publishing on our
   // requested topic
   else if (packet.type() == "publisher_subscribe")
