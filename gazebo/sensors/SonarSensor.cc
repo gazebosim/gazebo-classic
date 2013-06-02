@@ -132,6 +132,9 @@ void SonarSensor::Load(const std::string &_worldName)
       "Unable to create a cylinder collision using the physics engine.");
 
   this->sonarCollision->SetName(this->GetScopedName() + "sensor_collision");
+
+  // We need a few contacts in order to get the closest collision.
+  this->sonarCollision->SetMaxContacts(2);
   this->sonarCollision->AddType(physics::Base::SENSOR_COLLISION);
   this->parentEntity->AddChild(this->sonarCollision);
 

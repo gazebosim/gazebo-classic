@@ -42,7 +42,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
-    : Entity(_link), maxContacts(0)
+    : Entity(_link), maxContacts(1)
 {
   this->AddType(Base::COLLISION);
 
