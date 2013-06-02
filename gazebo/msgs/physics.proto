@@ -15,7 +15,7 @@ message Physics
     ODE = 1;
     BULLET = 2;
   }
-  required Type type = 2[default=ODE];
+  optional Type type = 2[default=ODE];
 
   optional string solver_type = 3;
   /// dt is deprecated by max_step_size

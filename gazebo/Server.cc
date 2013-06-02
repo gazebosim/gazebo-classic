@@ -107,9 +107,7 @@ bool Server::ParseArgs(int argc, char **argv)
 
   po::options_description h_desc("Hidden options");
   h_desc.add_options()
-    ("world_file", po::value<std::string>(), "SDF world to load.");
-
-  h_desc.add_options()
+    ("world_file", po::value<std::string>(), "SDF world to load.")
     ("pass_through", po::value<std::vector<std::string> >(),
      "not used, passed through to system plugins.");
 

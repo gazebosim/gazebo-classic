@@ -41,4 +41,8 @@ add_executable(gzfactory gzfactory.cc)
 target_link_libraries(gzfactory gazebo_common gazebo_transport ${Boost_LIBRARIES} pthread)
 gz_install_executable(gzfactory)
 
+add_executable(gzmodify gzmodify.cc)
+target_link_libraries(gzmodify gazebo_common gazebo_transport ${Boost_LIBRARIES} pthread)
+gz_install_executable(gzmodify)
+
 install (FILES gzmodel_create.sh DESTINATION ${BIN_INSTALL_DIR})
