@@ -31,6 +31,7 @@
 #include "rendering/DepthCamera.hh"
 #include "rendering/Scene.hh"
 #include "rendering/Rendering.hh"
+#include "rendering/RenderEngine.hh"
 
 #include "sensors/SensorFactory.hh"
 #include "sensors/DepthCameraSensor.hh"
@@ -73,6 +74,13 @@ void DepthCameraSensor::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void DepthCameraSensor::Init()
 {
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "Unable to create DepthCameraSensor. Rendering is disabled.\n";
+    return;
+  }
+
   std::string worldName = this->world->GetName();
 
   if (!worldName.empty())
