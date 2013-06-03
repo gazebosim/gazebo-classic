@@ -79,7 +79,7 @@ bool Publisher::WaitForConnection(const common::Time &_timeout) const
   common::Time curr = common::Time::GetWallTime();
 
   while (!this->HasConnections() &&
-      (_timeout <= 0.0 || start - curr < _timeout))
+      (_timeout <= 0.0 || curr - start < _timeout))
   {
     common::Time::MSleep(100);
     curr = common::Time::GetWallTime();
