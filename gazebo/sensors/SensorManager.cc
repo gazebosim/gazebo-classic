@@ -621,6 +621,8 @@ void SensorManager::SensorContainer::ResetLastUpdateTimes()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::RemoveSensors()
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   Sensor_V::iterator iter;
 
   // Remove all the sensors
