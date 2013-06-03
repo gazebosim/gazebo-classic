@@ -15,10 +15,11 @@
  *
 */
 
-#include "msgs/msgs.hh"
-#include "common/Events.hh"
-#include "transport/TopicManager.hh"
-#include "transport/ConnectionManager.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/transport/TopicManager.hh"
+#include "gazebo/transport/ConnectionManager.hh"
 
 #include "gazebo_config.h"
 
@@ -74,14 +75,26 @@ bool ConnectionManager::Init(const std::string &_masterHost,
       boost::bind(&ConnectionManager::OnAccept, this, _1));
 
   gzmsg << "Waiting for master";
+  uint32_t timeoutCount = 0;
+  uint32_t waitDurationMS = 1000;
+  uint32_t timeoutCountMax = 30;
+
   while (!this->masterConn->Connect(_masterHost, master_port) &&
-         this->IsRunning())
+      this->IsRunning() && timeoutCount < timeoutCountMax)
   {
     printf(".");
     fflush(stdout);
-    common::Time::MSleep(1000);
+    common::Time::MSleep(waitDurationMS);
+    ++timeoutCount;
   }
   printf("\n");
+
+  if (timeoutCount >= timeoutCountMax)
+  {
+    gzerr << "Failed to connect to master in "
+          << (timeoutCount * waitDurationMS) / 1000.0 << " seconds.\n";
+    return false;
+  }
 
   if (!this->IsRunning())
   {
