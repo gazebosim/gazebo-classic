@@ -37,6 +37,24 @@ class TopicManagerProcessTask : public tbb::task
           }
 };
 
+/// TBB task to establish subscriber to publisher connection.
+class TopicManagerConnectionTask : public tbb::task
+{
+  /// \brief Constructor.
+  /// \param[in] _pub Publish message
+  public: TopicManagerConnectionTask(msgs::Publish _pub) : pub(_pub) {}
+
+  /// Implements the necessary execute function
+  public: tbb::task *execute()
+          {
+            TopicManager::Instance()->ConnectSubToPub(pub);
+            return NULL;
+          }
+
+  /// \brief Publish message
+  private: msgs::Publish pub;
+};
+
 //////////////////////////////////////////////////
 ConnectionManager::ConnectionManager()
 {
@@ -229,8 +247,8 @@ void ConnectionManager::RunUpdate()
 {
   std::list<ConnectionPtr>::iterator iter;
   std::list<ConnectionPtr>::iterator endIter;
-  unsigned int msize = 0;
 
+  unsigned int msize = 0;
   {
     boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
     msize = this->masterMessages.size();
@@ -239,7 +257,6 @@ void ConnectionManager::RunUpdate()
   while (msize > 0)
   {
     this->ProcessMessage(this->masterMessages.front());
-
     {
       boost::recursive_mutex::scoped_lock lock(this->masterMessagesMutex);
       this->masterMessages.pop_front();
@@ -256,7 +273,6 @@ void ConnectionManager::RunUpdate()
   //   TopicManagerProcessTask();
   // tbb::task::enqueue(*task);
   TopicManager::Instance()->ProcessNodes();
-
   {
     boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
     iter = this->connections.begin();
@@ -360,15 +376,40 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     this->namespaces.push_back(std::string(result.data()));
     this->namespaceCondition.notify_all();
   }
-
-  // Publisher_update. This occurs when we try to subscribe to a topic, and
-  // the master informs us of a remote host that is publishing on our
-  // requested topic
+  // FIXME "publisher_update" is currently not used and have been separated out
+  // into "publisher_subscribe" and "publisher_advertise". This is implemented
+  // as a workaround to address transport blocking issue when gzclient connects
+  // to gzserver, see issue #714. "publisher_advertise", intended
+  // for gzserver when gzclient connects, is parallelized and made non-blocking.
   else if (packet.type() == "publisher_update")
   {
     msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
-
+    if (pub.host() != this->serverConn->GetLocalAddress() ||
+        pub.port() != this->serverConn->GetLocalPort())
+    {
+      TopicManager::Instance()->ConnectSubToPub(pub);
+    }
+  }
+  else if (packet.type() == "publisher_advertise")
+  {
+    msgs::Publish pub;
+    pub.ParseFromString(packet.serialized_data());
+    if (pub.host() != this->serverConn->GetLocalAddress() ||
+        pub.port() != this->serverConn->GetLocalPort())
+    {
+      TopicManagerConnectionTask *task = new(tbb::task::allocate_root())
+      TopicManagerConnectionTask(pub);
+      tbb::task::enqueue(*task);
+    }
+  }
+  // publisher_subscribe. This occurs when we try to subscribe to a topic, and
+  // the master informs us of a remote host that is publishing on our
+  // requested topic
+  else if (packet.type() == "publisher_subscribe")
+  {
+    msgs::Publish pub;
+    pub.ParseFromString(packet.serialized_data());
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
