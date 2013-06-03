@@ -11,7 +11,7 @@ set (headers
   LogPlay.hh
   LogRecord.hh
   UtilTypes.hh
- )
+)
 
 set (gtest_sources
   Diagnostics_TEST.cc
