@@ -144,8 +144,19 @@ TEST_F(SensorManager_TEST, InitRemove)
   // Remove the rest of the sensors
   mgr->RemoveSensors();
 
+  int i = 0;
+  // Wait for a sensor manager update.
+  while (mgr->GetSensors().size() > 0 && i < 100)
+  {
+    gazebo::common::Time::MSleep(100);
+    ++i;
+  }
+  EXPECT_LT(i, 100);
+
   // Make sure all the sensors have been removed
   EXPECT_EQ(mgr->GetSensors().size(), size_t(0));
+
+  printf("Done done\n");
 }
 
 /////////////////////////////////////////////////

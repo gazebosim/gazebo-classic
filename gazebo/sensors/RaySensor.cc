@@ -297,7 +297,11 @@ double RaySensor::GetRange(int _index)
 double RaySensor::GetRetro(int index)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  return this->laserShape->GetRetro(index);
+
+  if (this->laserShape)
+    return this->laserShape->GetRetro(index);
+  else
+    return -1;
 }
 
 //////////////////////////////////////////////////

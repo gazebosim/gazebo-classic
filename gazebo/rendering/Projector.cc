@@ -44,6 +44,7 @@ Projector::Projector(rendering::VisualPtr _parent)
 /////////////////////////////////////////////////
 Projector::~Projector()
 {
+  gzerr << "Delete projector\n";
   this->SetEnabled(false);
   // Ogre cleanup
   Ogre::Root::getSingletonPtr()->removeFrameListener(&this->projector);
@@ -76,9 +77,6 @@ void Projector::Load(const std::string &_name,
     // set the projector pose relative to body
     this->projector.SetPose(_pose);
 
-    // Add the projector as an Ogre frame listener
-    Ogre::Root::getSingletonPtr()->addFrameListener(&this->projector);
-
     if (!this->projector.initialized)
     {
       gzwarn << "starting projector failed, retrying in 1 sec.\n";
@@ -86,6 +84,9 @@ void Projector::Load(const std::string &_name,
       ++retryCount;
     }
   }
+
+  // Add the projector as an Ogre frame listener
+  Ogre::Root::getSingletonPtr()->addFrameListener(&this->projector);
 
   this->projector.SetEnabled(true);
 
@@ -219,6 +220,8 @@ Projector::ProjectorFrameListener::~ProjectorFrameListener()
 
   delete this->frustum;
   delete this->filterFrustum;
+  this->frustum = NULL;
+  this->filterFrustum = NULL;
 
   if (this->projectorQuery)
     this->sceneMgr->destroyQuery(this->projectorQuery);
