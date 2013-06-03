@@ -224,6 +224,12 @@ TEST(gz_log, Step)
 }
 
 /////////////////////////////////////////////////
+TEST(gz_log, HangCheck)
+{
+  std::string echo = custom_exec("gzlog stop");
+}
+
+/////////////////////////////////////////////////
 /// Main
 int main(int argc, char **argv)
 {
