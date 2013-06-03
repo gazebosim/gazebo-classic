@@ -729,7 +729,8 @@ void LogRecord::OnLogControl(ConstLogControlPtr &_data)
 //////////////////////////////////////////////////
 void LogRecord::PublishLogStatus()
 {
-  if (this->logs.empty() && !this->logStatusPub->HasConnections())
+  if (this->logs.empty() || !this->logStatusPub ||
+      !this->logStatusPub->HasConnections())
     return;
 
   /// \todo right now this function will only report on the first log.
