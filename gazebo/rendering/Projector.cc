@@ -44,7 +44,6 @@ Projector::Projector(rendering::VisualPtr _parent)
 /////////////////////////////////////////////////
 Projector::~Projector()
 {
-  gzerr << "Delete projector\n";
   this->SetEnabled(false);
   // Ogre cleanup
   Ogre::Root::getSingletonPtr()->removeFrameListener(&this->projector);
