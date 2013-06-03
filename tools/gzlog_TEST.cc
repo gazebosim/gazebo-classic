@@ -228,7 +228,7 @@ TEST(gz_log, Step)
 TEST(gz_log, HangCheck)
 {
   gazebo::common::Time start = gazebo::common::Time::GetWallTime();
-  std::string echo = custom_exec("gzlog stop");
+  custom_exec("gzlog stop");
   gazebo::common::Time end = gazebo::common::Time::GetWallTime();
 
   EXPECT_LT(end - start, gazebo::common::Time(60,0));
