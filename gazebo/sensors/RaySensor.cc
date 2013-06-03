@@ -327,5 +327,6 @@ void RaySensor::UpdateImpl(bool /*_force*/)
 //////////////////////////////////////////////////
 bool RaySensor::IsActive()
 {
-  return Sensor::IsActive() || this->scanPub->HasConnections();
+  return Sensor::IsActive() ||
+    (this->scanPub && this->scanPub->HasConnections());
 }

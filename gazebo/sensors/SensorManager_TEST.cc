@@ -111,11 +111,18 @@ TEST_F(SensorManager_TEST, InitRemove)
   sensors::Sensor_V sensors = mgr->GetSensors();
   EXPECT_EQ(sensors.size(), sensorCount);
 
-  // Try removing a few senors.
+  std::vector<std::string> sensorNames;
   for (sensors::Sensor_V::iterator iter = sensors.begin();
-       iter != sensors.end() && sensorCount > 10; ++iter)
+       iter != sensors.end(); ++iter)
   {
-    mgr->RemoveSensor((*iter)->GetName());
+    sensorNames.push_back((*iter)->GetName());
+  }
+
+  // Try removing a few senors.
+  for (std::vector<std::string>::iterator iter = sensorNames.begin();
+       iter != sensorNames.end() && sensorCount > 10; ++iter)
+  {
+    mgr->RemoveSensor(*iter);
 
     --sensorCount;
 

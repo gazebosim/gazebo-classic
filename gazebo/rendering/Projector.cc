@@ -400,7 +400,7 @@ void Projector::ProjectorFrameListener::AddPassToVisibleMaterials()
   Ogre::SceneQueryResultMovableList::iterator it;
   for (it = result.movables.begin(); it != result.movables.end(); ++it)
   {
-    Ogre::Entity* entity = dynamic_cast<Ogre::Entity*>(*it);
+    Ogre::Entity *entity = dynamic_cast<Ogre::Entity*>(*it);
     if (entity && entity->getName().find("visual") != std::string::npos)
     {
       for (unsigned int i = 0; i < entity->getNumSubEntities(); i++)
