@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <gazebo/common/Time.hh>
 
 #include <stdio.h>
 #include <string>
@@ -226,7 +227,11 @@ TEST(gz_log, Step)
 /////////////////////////////////////////////////
 TEST(gz_log, HangCheck)
 {
+  gazebo::common::Time start = gazebo::common::Time::GetWallTime();
   std::string echo = custom_exec("gzlog stop");
+  gazebo::common::Time end = gazebo::common::Time::GetWallTime();
+
+  EXPECT_LT(end - start, gazebo::common::Time(60,0));
 }
 
 /////////////////////////////////////////////////
