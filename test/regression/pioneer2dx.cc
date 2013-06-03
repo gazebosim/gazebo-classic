@@ -31,9 +31,9 @@ TEST_F(Pioneer2dx, StraightLine)
       "~/pioneer2dx/vel_cmd");
 
   int i = 0;
-  for (i = 0; i < 500 && !this->HasEntity("pioneer2dx"); ++i)
+  for (i = 0; i < 1000 && !this->HasEntity("pioneer2dx"); ++i)
     common::Time::MSleep(500);
-  ASSERT_LT(i, 500);
+  ASSERT_LT(i, 1000);
 
   gazebo::msgs::Pose msg;
   gazebo::msgs::Set(msg.mutable_position(),
