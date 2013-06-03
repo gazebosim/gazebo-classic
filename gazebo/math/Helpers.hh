@@ -143,7 +143,7 @@ namespace gazebo
     template<typename T>
     inline T precision(const T &_a, const unsigned int &_precision)
     {
-      T result(0);
+      T result;
       try
       {
         result = boost::math::round(_a * pow(10, _precision)) /
@@ -151,6 +151,7 @@ namespace gazebo
       }
       catch(...)
       {
+        result = 0;
         std::cerr << "Gazebo error: math::precision rounding error for input "
           << "value[" << _a << "] and precision[" << _precision << "]\n";
       }
