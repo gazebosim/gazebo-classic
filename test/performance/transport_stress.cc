@@ -130,11 +130,11 @@ TEST_F(TransportStressTest, ManyNodes)
   // The number of nodes to create.
   #ifdef USE_LOW_MEMORY_TESTS
     // 1k nodes publish 10 times needs about 400Mb of RAM
-    unsigned int nodeCount = 1000;
+    unsigned int nodeCount = 500;
     unsigned int requiredMB = 400;
   #else
     // 2k nodes publish 10 times needs about 1.7Gb of RAM
-    unsigned int nodeCount = 2000;
+    unsigned int nodeCount = 1000;
     unsigned int requiredMB = 1700;
   #endif
 
