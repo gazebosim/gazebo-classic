@@ -54,11 +54,6 @@ RaySensor::RaySensor()
 //////////////////////////////////////////////////
 RaySensor::~RaySensor()
 {
-  this->laserCollision->Fini();
-  this->laserCollision.reset();
-
-  this->laserShape->Fini();
-  this->laserShape.reset();
 }
 
 //////////////////////////////////////////////////
@@ -143,6 +138,19 @@ void RaySensor::Init()
 void RaySensor::Fini()
 {
   this->scanPub.reset();
+
+  if (this->laserCollision)
+  {
+    this->laserCollision->Fini();
+    this->laserCollision.reset();
+  }
+
+  if (this->laserShape)
+  {
+    this->laserShape->Fini();
+    this->laserShape.reset();
+  }
+
   Sensor::Fini();
 }
 
