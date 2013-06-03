@@ -956,7 +956,7 @@ void record(bool _start)
   gazebo::transport::PublisherPtr pub =
     node->Advertise<gazebo::msgs::LogControl>("~/log/control");
 
-  if (!pub->WaitForConnection(gazebo::common::Time(10,0)))
+  if (!pub->WaitForConnection(gazebo::common::Time(10, 0)))
   {
     gzerr << "Unable to create a connection to topic ~/log/control.\n";
     return;
