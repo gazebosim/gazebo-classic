@@ -4,6 +4,7 @@ set (sources
   CameraSensor.cc
   ContactSensor.cc
   DepthCameraSensor.cc
+  GpuRaySensor.cc
   ImuSensor.cc
   MultiCameraSensor.cc
   RaySensor.cc
@@ -19,6 +20,7 @@ set (headers
   CameraSensor.hh
   ContactSensor.hh
   DepthCameraSensor.hh
+  GpuRaySensor.hh
   ImuSensor.hh
   MultiCameraSensor.hh
   RaySensor.hh
@@ -30,6 +32,21 @@ set (headers
   SensorFactory.hh
   SensorManager.hh
 )
+
+set (gtest_sources
+  RaySensor_TEST.cc
+  ImuSensor_TEST.cc
+  Sensor_TEST.cc
+)
+
+gz_build_tests(${gtest_sources})
+
+set (gtest_sources_dri
+  SensorManager_TEST.cc
+  GpuRaySensor_TEST.cc
+)
+
+gz_build_dri_tests(${gtest_sources_dri})
 
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
 foreach (hdr ${headers})

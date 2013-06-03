@@ -23,6 +23,10 @@
 
 #include "msgs/msgs.hh"
 
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+
 #include "gazebo/common/Events.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/common/Console.hh"
@@ -38,8 +42,6 @@
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Link.hh"
 
-#include "gazebo/transport/Publisher.hh"
-
 using namespace gazebo;
 using namespace physics;
 
@@ -51,6 +53,8 @@ Link::Link(EntityPtr _parent)
   this->inertial.reset(new Inertial);
   this->parentJoints.clear();
   this->childJoints.clear();
+  this->publishData = false;
+  this->publishDataMutex = new boost::recursive_mutex();
 }
 
 
@@ -65,6 +69,10 @@ Link::~Link()
   {
     msgs::Visual msg;
     msg.set_name(this->visuals[i]);
+    if (this->parent)
+      msg.set_parent_name(this->parent->GetScopedName());
+    else
+      msg.set_parent_name("");
     msg.set_delete_me(true);
     this->visPub->Publish(msg);
   }
@@ -76,6 +84,10 @@ Link::~Link()
     {
       msgs::Visual msg;
       msg.set_name(this->cgVisuals[i]);
+      if (this->parent)
+        msg.set_parent_name(this->parent->GetScopedName());
+      else
+        msg.set_parent_name("");
       msg.set_delete_me(true);
       this->visPub->Publish(msg);
     }
@@ -84,6 +96,13 @@ Link::~Link()
 
   this->visPub.reset();
   this->sensors.clear();
+
+  this->requestPub.reset();
+  this->dataPub.reset();
+  this->connections.clear();
+
+  delete this->publishDataMutex;
+  this->publishDataMutex = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -157,12 +176,6 @@ void Link::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Link::Init()
 {
-  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
-  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
-
-  this->SetLinearDamping(this->GetLinearDamping());
-  this->SetAngularDamping(this->GetAngularDamping());
-
   this->linearAccel.Set(0, 0, 0);
   this->angularAccel.Set(0, 0, 0);
 
@@ -202,7 +215,7 @@ void Link::Init()
       for (Base_V::iterator giter = this->children.begin();
            giter != this->children.end(); giter++)
       {
-        EntityPtr e = boost::shared_dynamic_cast<Entity>(*giter);
+        EntityPtr e = boost::dynamic_pointer_cast<Entity>(*giter);
 
         msgs::Point *pt;
         pt = g_msg.add_points();
@@ -231,7 +244,7 @@ void Link::Init()
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-      boost::shared_static_cast<Collision>(*iter)->Init();
+      boost::static_pointer_cast<Collision>(*iter)->Init();
   }
 }
 
@@ -266,7 +279,16 @@ void Link::Fini()
 //////////////////////////////////////////////////
 void Link::Reset()
 {
+  // resets pose
   Entity::Reset();
+
+  // resets velocity, acceleration, wrench
+  this->ResetPhysicsStates();
+}
+
+//////////////////////////////////////////////////
+void Link::ResetPhysicsStates()
+{
   this->SetAngularVel(math::Vector3(0, 0, 0));
   this->SetLinearVel(math::Vector3(0, 0, 0));
   this->SetAngularAccel(math::Vector3(0, 0, 0));
@@ -323,7 +345,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
     while (collisionElem)
     {
-      CollisionPtr collision = boost::shared_dynamic_cast<Collision>(
+      CollisionPtr collision = boost::dynamic_pointer_cast<Collision>(
           this->GetChild(collisionElem->GetValueString("name")));
 
       if (collision)
@@ -404,7 +426,7 @@ void Link::SetLaserRetro(float _retro)
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-      boost::shared_static_cast<Collision>(*iter)->SetLaserRetro(_retro);
+      boost::static_pointer_cast<Collision>(*iter)->SetLaserRetro(_retro);
   }
 }
 
@@ -464,7 +486,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
     this->SetStatic(true);
 
   collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(geomType,
-      boost::shared_static_cast<Link>(shared_from_this()));
+      boost::static_pointer_cast<Link>(shared_from_this()));
 
   if (!collision)
     gzthrow("Unknown Collisionetry Type[" + geomType + "]");
@@ -475,7 +497,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 CollisionPtr Link::GetCollisionById(unsigned int _id) const
 {
-  return boost::shared_dynamic_cast<Collision>(this->GetById(_id));
+  return boost::dynamic_pointer_cast<Collision>(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -487,7 +509,7 @@ CollisionPtr Link::GetCollision(const std::string &_name)
   {
     if ((*biter)->GetName() == _name)
     {
-      result = boost::shared_dynamic_cast<Collision>(*biter);
+      result = boost::dynamic_pointer_cast<Collision>(*biter);
       break;
     }
   }
@@ -504,7 +526,7 @@ Collision_V Link::GetCollisions() const
   {
     if ((*biter)->HasType(Base::COLLISION))
     {
-      result.push_back(boost::shared_static_cast<Collision>(*biter));
+      result.push_back(boost::static_pointer_cast<Collision>(*biter));
     }
   }
 
@@ -516,7 +538,7 @@ CollisionPtr Link::GetCollision(unsigned int _index) const
 {
   CollisionPtr collision;
   if (_index <= this->GetChildCount())
-    collision = boost::shared_static_cast<Collision>(this->GetChild(_index));
+    collision = boost::static_pointer_cast<Collision>(this->GetChild(_index));
   else
     gzerr << "Index is out of range\n";
 
@@ -598,7 +620,7 @@ math::Vector3 Link::GetRelativeTorque() const
 //////////////////////////////////////////////////
 ModelPtr Link::GetModel() const
 {
-  return boost::shared_dynamic_cast<Model>(this->GetParent());
+  return boost::dynamic_pointer_cast<Model>(this->GetParent());
 }
 
 //////////////////////////////////////////////////
@@ -613,7 +635,7 @@ math::Box Link::GetBoundingBox() const
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-      box += boost::shared_static_cast<Collision>(*iter)->GetBoundingBox();
+      box += boost::static_pointer_cast<Collision>(*iter)->GetBoundingBox();
   }
 
   return box;
@@ -681,6 +703,38 @@ void Link::RemoveChildJoint(JointPtr _joint)
 }
 
 //////////////////////////////////////////////////
+void Link::RemoveParentJoint(const std::string &_jointName)
+{
+  for (std::vector<JointPtr>::iterator iter = this->parentJoints.begin();
+                                       iter != this->parentJoints.end();
+                                       ++iter)
+  {
+    /// @todo: can we assume there are no repeats?
+    if ((*iter)->GetName() == _jointName)
+    {
+      this->parentJoints.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Link::RemoveChildJoint(const std::string &_jointName)
+{
+  for (std::vector<JointPtr>::iterator iter = this->childJoints.begin();
+                                       iter != this->childJoints.end();
+                                       ++iter)
+  {
+    /// @todo: can we assume there are no repeats?
+    if ((*iter)->GetName() == _jointName)
+    {
+      this->childJoints.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 void Link::FillMsg(msgs::Link &_msg)
 {
   _msg.set_id(this->GetId());
@@ -707,7 +761,7 @@ void Link::FillMsg(msgs::Link &_msg)
   {
     if (this->GetChild(j)->HasType(Base::COLLISION))
     {
-      CollisionPtr coll = boost::shared_dynamic_cast<Collision>(
+      CollisionPtr coll = boost::dynamic_pointer_cast<Collision>(
           this->GetChild(j));
       coll->FillMsg(*_msg.add_collision());
     }
@@ -859,9 +913,9 @@ void Link::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-void Link::SetState(const LinkState & /*_state*/)
+void Link::SetState(const LinkState &_state)
 {
-  // this->SetRelativePose(_state.GetPose());
+  this->SetWorldPose(_state.GetPose());
 
   /*
   for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)
@@ -896,4 +950,44 @@ double Link::GetAngularDamping() const
 /////////////////////////////////////////////////
 void Link::SetKinematic(const bool &/*_kinematic*/)
 {
+}
+
+/////////////////////////////////////////////////
+void Link::SetPublishData(bool _enable)
+{
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->publishDataMutex);
+    if (this->publishData == _enable)
+      return;
+
+    this->publishData = _enable;
+  }
+  if (_enable)
+  {
+    std::string topic = "~/" + this->GetScopedName();
+    this->dataPub = this->node->Advertise<msgs::LinkData>(topic);
+    this->connections.push_back(
+      event::Events::ConnectWorldUpdateEnd(
+        boost::bind(&Link::PublishData, this)));
+  }
+  else
+  {
+    this->dataPub.reset();
+    this->connections.clear();
+  }
+}
+
+/////////////////////////////////////////////////
+void Link::PublishData()
+{
+  if (this->publishData && this->dataPub->HasConnections())
+  {
+    msgs::Set(this->linkDataMsg.mutable_time(), this->world->GetSimTime());
+    linkDataMsg.set_name(this->GetScopedName());
+    msgs::Set(this->linkDataMsg.mutable_linear_velocity(),
+        this->GetWorldLinearVel());
+    msgs::Set(this->linkDataMsg.mutable_angular_velocity(),
+        this->GetWorldAngularVel());
+    this->dataPub->Publish(this->linkDataMsg);
+  }
 }

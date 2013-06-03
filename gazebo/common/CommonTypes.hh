@@ -34,13 +34,13 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #if defined(__GNUC__)
-#define GAZEBO_DEPRECATED __attribute__((deprecated))
+#define GAZEBO_DEPRECATED(version) __attribute__((deprecated))
 #define GAZEBO_FORCEINLINE __attribute__((always_inline))
 #elif defined(MSVC)
-#define GAZEBO_DEPRECATED
+#define GAZEBO_DEPRECATED(version) ()
 #define GAZEBO_FORCEINLINE __forceinline
 #else
-#define GAZEBO_DEPRECATED
+#define GAZEBO_DEPRECATED(version) ()
 #define GAZEBO_FORCEINLINE
 #endif
 
@@ -85,17 +85,18 @@ namespace gazebo
 
   namespace common
   {
-    class Param;
-    class Time;
-    class Image;
-    class Mesh;
-    class MouseEvent;
-    class PoseAnimation;
-    class NumericAnimation;
-    class DiagnosticTimer;
     class Animation;
     class Color;
+    class DiagnosticTimer;
+    class Image;
+    class Mesh;
+    class SubMesh;
+    class MouseEvent;
+    class NumericAnimation;
+    class Param;
+    class PoseAnimation;
     class SkeletonAnimation;
+    class Time;
 
     template <typename T>
     class ParamT;

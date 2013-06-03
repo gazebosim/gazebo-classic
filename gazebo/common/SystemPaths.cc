@@ -30,6 +30,7 @@
 #include <sstream>
 
 #include "gazebo/sdf/sdf.hh"
+#include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -266,9 +267,15 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
     {
       path = boost::filesystem::path(*iter) / suffix;
       if (boost::filesystem::exists(path))
+      {
+        filename = path.string();
         break;
+      }
     }
-    filename = path.string();
+
+    // Try to download the model if it wasn't found.
+    if (filename.empty())
+      filename = ModelDatabase::Instance()->GetModelPath(_uri, true);
   }
   else if (prefix.empty() || prefix == "file")
   {
@@ -302,8 +309,16 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     bool found = false;
 
-    path = boost::filesystem::operator/(boost::filesystem::current_path(),
-                                        _filename);
+    try
+    {
+      path = boost::filesystem::operator/(boost::filesystem::current_path(),
+          _filename);
+    }
+    catch(boost::filesystem::filesystem_error &_e)
+    {
+      gzerr << "Filesystem error[" << _e.what() << "]\n";
+      return std::string();
+    }
 
     if (_searchLocalPath && boost::filesystem::exists(path))
     {

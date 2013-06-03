@@ -23,10 +23,12 @@ set (plugins
   CartTestPlugin
   ForceTorquePlugin
   ModelTrajectoryTestPlugin
+  MudPlugin
   RayPlugin
   RubblePlugin
   SpringTestPlugin
   DiffDrivePlugin
+  SkidSteerDrivePlugin
   JointTrajectoryPlugin
   VehiclePlugin)
 

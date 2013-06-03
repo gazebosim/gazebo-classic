@@ -21,7 +21,6 @@
 #include "gazebo/gazebo.hh"
 
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/LogRecord.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/MainWindow.hh"
@@ -71,10 +70,9 @@ bool parse_args(int _argc, char **_argv)
     return false;
   }
 
-  gazebo::print_version();
-
   po::options_description v_desc("Allowed options");
   v_desc.add_options()
+    ("quiet,q", "Reduce output to stdout.")
     ("help,h", "Produce this help message.")
     ("gui-plugin,g", po::value<std::vector<std::string> >(), "Load a plugin.");
 
@@ -91,6 +89,11 @@ bool parse_args(int _argc, char **_argv)
     std::cerr << "Error. Gui Invalid arguments\n";
     return false;
   }
+
+  if (!vm.count("quiet"))
+    gazebo::print_version();
+  else
+    gazebo::common::Console::Instance()->SetQuiet(true);
 
   if (vm.count("help"))
   {
@@ -128,37 +131,6 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    void load()
-    {
-      g_modelRightMenu = new gui::ModelRightMenu();
-
-      rendering::load();
-      rendering::init();
-
-      g_argv = new char*[g_argc];
-      for (int i = 0; i < g_argc; i++)
-      {
-        g_argv[i] = new char[strlen("gazebo")];
-        snprintf(g_argv[i], strlen("gazebo"), "gazebo");
-      }
-
-      g_app = new QApplication(g_argc, g_argv);
-      set_style();
-
-      g_main_win = new gui::MainWindow();
-
-      g_main_win->Load();
-      g_main_win->resize(1024, 768);
-    }
-
-    /////////////////////////////////////////////////
-    void init()
-    {
-      g_main_win->show();
-      g_main_win->Init();
-    }
-
-    /////////////////////////////////////////////////
     void fini()
     {
       gui::clear_active_camera();
@@ -166,6 +138,37 @@ namespace gazebo
       fflush(stdout);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void gui::init()
+{
+  g_main_win->show();
+  g_main_win->Init();
+}
+
+/////////////////////////////////////////////////
+void gui::load()
+{
+  g_modelRightMenu = new gui::ModelRightMenu();
+
+  rendering::load();
+  rendering::init();
+
+  g_argv = new char*[g_argc];
+  for (int i = 0; i < g_argc; i++)
+  {
+    g_argv[i] = new char[strlen("gazebo")];
+    snprintf(g_argv[i], strlen("gazebo"), "gazebo");
+  }
+
+  g_app = new QApplication(g_argc, g_argv);
+  set_style();
+
+  g_main_win = new gui::MainWindow();
+
+  g_main_win->Load();
+  g_main_win->resize(1024, 768);
 }
 
 /////////////////////////////////////////////////
@@ -179,9 +182,6 @@ bool gui::run(int _argc, char **_argv)
 {
   // Initialize the informational logger. This will log warnings, and errors.
   gazebo::common::Console::Instance()->Init("gzclient.log");
-
-  // Initialize the data logger. This will log state information.
-  gazebo::common::LogRecord::Instance()->Init("gzclient");
 
   if (!parse_args(_argc, _argv))
     return false;

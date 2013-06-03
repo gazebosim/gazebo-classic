@@ -320,9 +320,12 @@ void GUIOverlay::Resize(unsigned int _width, unsigned int _height)
     CEGUI::WindowManager *windowManager =
       CEGUI::WindowManager::getSingletonPtr();
 
-    CEGUI::Window *rootWindow = windowManager->getWindow("root");
-    rootWindow->setArea(CEGUI::UDim(0, 0), CEGUI::UDim(0, 0),
-                        CEGUI::UDim(1, 0), CEGUI::UDim(1, 0));
+    if (windowManager && windowManager->isWindowPresent("root"))
+    {
+      CEGUI::Window *rootWindow = windowManager->getWindow("root");
+      rootWindow->setArea(CEGUI::UDim(0, 0), CEGUI::UDim(0, 0),
+          CEGUI::UDim(1, 0), CEGUI::UDim(1, 0));
+    }
   }
 }
 #else
@@ -335,7 +338,7 @@ void GUIOverlay::Resize(unsigned int /*_width*/, unsigned int /*_height*/)
 bool GUIOverlay::AttachCameraToImage(DepthCameraPtr &_camera,
                                      const std::string &_windowName)
 {
-  CameraPtr cam = boost::shared_dynamic_cast<Camera>(_camera);
+  CameraPtr cam = boost::dynamic_pointer_cast<Camera>(_camera);
   return this->AttachCameraToImage(cam , _windowName);
 }
 

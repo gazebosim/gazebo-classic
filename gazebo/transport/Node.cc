@@ -16,7 +16,8 @@
 */
 
 #include <boost/algorithm/string.hpp>
-#include "Node.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
 
 using namespace gazebo;
 using namespace transport;
@@ -40,10 +41,15 @@ Node::~Node()
 /////////////////////////////////////////////////
 void Node::Fini()
 {
+  if (!this->initialized)
+    return;
+
+  this->initialized = false;
   TopicManager::Instance()->RemoveNode(this->id);
 
   {
-    boost::recursive_mutex::scoped_lock lock(this->publisherMutex);
+    boost::mutex::scoped_lock lock(this->publisherDeleteMutex);
+    boost::mutex::scoped_lock lock2(this->publisherMutex);
     this->publishers.clear();
   }
 
@@ -119,12 +125,17 @@ unsigned int Node::GetId() const
 /////////////////////////////////////////////////
 void Node::ProcessPublishers()
 {
-  boost::recursive_mutex::scoped_lock lock(this->publisherMutex);
-  for (this->publishersIter = this->publishers.begin();
-       this->publishersIter != this->publishersEnd; this->publishersIter++)
+  int start, end;
+  boost::mutex::scoped_lock lock(this->publisherDeleteMutex);
+
   {
-    (*this->publishersIter)->SendMessage();
+    boost::mutex::scoped_lock lock2(this->publisherMutex);
+    start = 0;
+    end = this->publishers.size();
   }
+
+  for (int i = start; i < end; ++i)
+    this->publishers[i]->SendMessage();
 }
 
 /////////////////////////////////////////////////
@@ -132,44 +143,105 @@ bool Node::HandleData(const std::string &_topic, const std::string &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
   this->incomingMsgs[_topic].push_back(_msg);
+  ConnectionManager::Instance()->TriggerUpdate();
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Node::HandleMessage(const std::string &_topic, MessagePtr _msg)
+{
+  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+  this->incomingMsgsLocal[_topic].push_back(_msg);
+  ConnectionManager::Instance()->TriggerUpdate();
   return true;
 }
 
 /////////////////////////////////////////////////
 void Node::ProcessIncoming()
 {
-  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+  boost::recursive_mutex::scoped_lock lock(this->processIncomingMutex);
+
+  if (!this->initialized ||
+      (this->incomingMsgs.empty() && this->incomingMsgsLocal.empty()))
+    return;
 
   Callback_M::iterator cbIter;
   Callback_L::iterator liter;
-  std::list<std::string>::iterator msgIter;
 
   // For each topic
-  std::map<std::string, std::list<std::string> >::iterator inIter;
-  std::map<std::string, std::list<std::string> >::iterator endIter;
-  inIter = this->incomingMsgs.begin();
-  endIter = this->incomingMsgs.end();
-
-  for (; inIter != endIter; ++inIter)
   {
-    // Find the callbacks for the topic
-    cbIter = this->callbacks.find(inIter->first);
-    if (cbIter != this->callbacks.end())
+    std::list<std::string>::iterator msgIter;
+    std::map<std::string, std::list<std::string> >::iterator inIter;
+    std::map<std::string, std::list<std::string> >::iterator endIter;
+
+    boost::recursive_mutex::scoped_lock lock2(this->incomingMutex);
+    inIter = this->incomingMsgs.begin();
+    endIter = this->incomingMsgs.end();
+
+    for (; inIter != endIter; ++inIter)
     {
-      // For each message in the buffer
-      for (msgIter = inIter->second.begin(); msgIter != inIter->second.end();
-           ++msgIter)
+      // Find the callbacks for the topic
+      cbIter = this->callbacks.find(inIter->first);
+      if (cbIter != this->callbacks.end())
       {
-        // Send the message to all callbacks
-        for (liter = cbIter->second.begin();
-             liter != cbIter->second.end(); ++liter)
+        std::list<std::string>::iterator msgInIter;
+        std::list<std::string>::iterator msgEndIter;
+
+        msgInIter = inIter->second.begin();
+        msgEndIter = inIter->second.end();
+
+        // For each message in the buffer
+        for (msgIter = msgInIter; msgIter != msgEndIter; ++msgIter)
         {
-          (*liter)->HandleData(*msgIter);
+          // Send the message to all callbacks
+          for (liter = cbIter->second.begin();
+              liter != cbIter->second.end(); ++liter)
+          {
+            (*liter)->HandleData(*msgIter);
+          }
         }
       }
     }
+
+    this->incomingMsgs.clear();
   }
-  this->incomingMsgs.clear();
+
+  {
+    std::list<MessagePtr>::iterator msgIter;
+    std::map<std::string, std::list<MessagePtr> >::iterator inIter;
+    std::map<std::string, std::list<MessagePtr> >::iterator endIter;
+
+    boost::recursive_mutex::scoped_lock lock2(this->incomingMutex);
+    inIter = this->incomingMsgsLocal.begin();
+    endIter = this->incomingMsgsLocal.end();
+
+    for (; inIter != endIter; ++inIter)
+    {
+      // Find the callbacks for the topic
+      cbIter = this->callbacks.find(inIter->first);
+      if (cbIter != this->callbacks.end())
+      {
+        std::list<MessagePtr>::iterator msgInIter;
+        std::list<MessagePtr>::iterator msgEndIter;
+
+        msgInIter = inIter->second.begin();
+        msgEndIter = inIter->second.end();
+
+        // For each message in the buffer
+        for (msgIter = msgInIter; msgIter != msgEndIter; ++msgIter)
+        {
+          // Send the message to all callbacks
+          for (liter = cbIter->second.begin();
+              liter != cbIter->second.end(); ++liter)
+          {
+            (*liter)->HandleMessage(*msgIter);
+          }
+        }
+      }
+    }
+
+    this->incomingMsgsLocal.clear();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -186,6 +258,24 @@ void Node::InsertLatchedMsg(const std::string &_topic, const std::string &_msg)
     {
       if ((*liter)->GetLatching())
         (*liter)->HandleData(_msg);
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Node::InsertLatchedMsg(const std::string &_topic, MessagePtr _msg)
+{
+  // Find the callbacks for the topic
+  Callback_M::iterator cbIter = this->callbacks.find(_topic);
+
+  if (cbIter != this->callbacks.end())
+  {
+    // Send the message to all callbacks
+    for (Callback_L::iterator liter = cbIter->second.begin();
+         liter != cbIter->second.end(); ++liter)
+    {
+      if ((*liter)->GetLatching())
+        (*liter)->HandleMessage(_msg);
     }
   }
 }
@@ -220,14 +310,15 @@ void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
 
   if (iter != this->callbacks.end())
   {
+    Callback_L::iterator liter;
+
     // Find the callback with the correct ID and remove it.
-    for (Callback_L::iterator liter = iter->second.begin();
-         liter != iter->second.end(); ++liter)
+    for (liter = iter->second.begin(); liter != iter->second.end(); ++liter)
     {
       if ((*liter)->GetId() == _id)
       {
-        iter->second.erase(liter);
         (*liter).reset();
+        iter->second.erase(liter);
         break;
       }
     }

@@ -31,7 +31,7 @@ GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.LaserScanStamped", LaserView)
 
 /////////////////////////////////////////////////
 LaserView::LaserView(QWidget *_parent)
-: TopicView(_parent, "gazebo.msgs.LaserScanStamped", "laser")
+: TopicView(_parent, "gazebo.msgs.LaserScanStamped", "laser", 33)
 {
   this->setWindowTitle(tr("Gazebo: Laser View"));
 
@@ -140,8 +140,6 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
 
   this->laserItem->Clear();
 
-  double angle = _msg->scan().angle_min();
-
   double r;
   for (unsigned int i = 0;
        i < static_cast<unsigned int>(_msg->scan().ranges_size()); i++)
@@ -152,8 +150,6 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
       this->laserItem->AddRange(r);
     else
       this->laserItem->SetRange(i+1, r);
-
-    angle += _msg->scan().angle_step();
   }
 
   // Recalculate the points to draw.
@@ -232,7 +228,6 @@ void LaserView::LaserItem::paint(QPainter *_painter,
   if (index >= 0 && index < static_cast<int>(this->ranges.size()))
   {
     double x1, y1;
-    double x2, y2;
 
     double rangeScaled = this->ranges[index] * this->scale;
     double rangeMaxScaled = this->rangeMax * this->scale;
@@ -286,6 +281,7 @@ void LaserView::LaserItem::paint(QPainter *_painter,
 
     // This section draws the arc and the angle of the ray
     {
+      double x2, y2;
       // Give the arc some padding.
       textWidth *= 1.4;
 
@@ -353,6 +349,8 @@ QRectF LaserView::LaserItem::GetBoundingRect() const
 /////////////////////////////////////////////////
 double LaserView::LaserItem::GetHoverRange() const
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+
   // Compute the index of the ray that the mouse is hovering over.
   int index = static_cast<int>(
       rint((this->indexAngle - this->angleMin) / this->angleStep));
@@ -366,6 +364,7 @@ double LaserView::LaserItem::GetHoverRange() const
 /////////////////////////////////////////////////
 double LaserView::LaserItem::GetHoverAngle() const
 {
+  boost::mutex::scoped_lock lock(this->mutex);
   return this->radians ? this->indexAngle : GZ_RTOD(this->indexAngle);
 }
 

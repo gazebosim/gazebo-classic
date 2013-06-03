@@ -50,8 +50,12 @@ namespace gazebo
     ///        a sensor will update based on it's Hz rate.
     void run_once(bool _force = false);
 
-    /// \brief Run sensor generation continuously. This is a blocking call
-    void run();
+    /// \brief Deprecated
+    /// \sa run_threads
+    void run() GAZEBO_DEPRECATED(1.5);
+
+    /// \brief Run sensors in a threads. This is a non-blocking call.
+    void run_threads();
 
     /// \brief Stop the sensor generation loop.
     void stop();

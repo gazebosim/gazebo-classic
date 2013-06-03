@@ -348,6 +348,12 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
         else
           gazebo->selfCollide = false;
       }
+      else if (childElem->ValueStr() == "maxContacts")
+      {
+          gazebo->isMaxContacts = true;
+          gazebo->maxContacts = boost::lexical_cast<int>(
+            this->GetKeyValueAsString(childElem).c_str());
+      }
       else if (childElem->ValueStr() == "laserRetro")
       {
           gazebo->isLaserRetro = true;
@@ -380,6 +386,7 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
       }
       else if (childElem->ValueStr() == "provideFeedback")
       {
+          gazebo->isProvideFeedback = true;
           std::string valueStr = this->GetKeyValueAsString(childElem);
 
           if (lowerStr(valueStr) == "true" || lowerStr(valueStr) == "yes" ||
@@ -387,6 +394,17 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
             gazebo->provideFeedback = true;
           else
             gazebo->provideFeedback = false;
+      }
+      else if (childElem->ValueStr() == "cfmDamping")
+      {
+          gazebo->isCFMDamping = true;
+          std::string valueStr = this->GetKeyValueAsString(childElem);
+
+          if (lowerStr(valueStr) == "true" || lowerStr(valueStr) == "yes" ||
+              valueStr == "1")
+            gazebo->cfmDamping = true;
+          else
+            gazebo->cfmDamping = false;
       }
       else
       {
@@ -446,6 +464,9 @@ void URDF2Gazebo::InsertGazeboExtensionCollision(TiXmlElement *_elem,
         if ((*ge)->isLaserRetro)
           this->AddKeyValue(_elem, "laser_retro",
                       this->Values2str(1, &(*ge)->laserRetro));
+        if ((*ge)->isMaxContacts)
+          this->AddKeyValue(_elem, "max_contacts",
+                      boost::lexical_cast<std::string>((*ge)->maxContacts));
 
         contact->LinkEndChild(contactOde);
         surface->LinkEndChild(contact);
@@ -468,11 +489,27 @@ void URDF2Gazebo::InsertGazeboExtensionVisual(TiXmlElement *_elem,
     for (std::vector<GazeboExtension*>::iterator ge = gazeboIt->second.begin();
          ge != gazeboIt->second.end(); ++ge)
     {
-      if ((*ge)->oldLinkName == _linkName)
+      if (_linkName.find((*ge)->oldLinkName) != std::string::npos)
       {
         // insert material block
         if (!(*ge)->material.empty())
-            this->AddKeyValue(_elem, "material", (*ge)->material);
+        {
+          // new sdf needs <material><script>...</script></material>
+          TiXmlElement *materialElem = new TiXmlElement("material");
+          TiXmlElement *scriptElem = new TiXmlElement("script");
+          if (scriptElem && materialElem)
+          {
+            this->AddKeyValue(scriptElem, "name", (*ge)->material);
+            materialElem->LinkEndChild(scriptElem);
+            _elem->LinkEndChild(materialElem);
+            // this->AddKeyValue(_elem, "material", (*ge)->material);
+          }
+          else
+          {
+            // Memory allocation error
+            gzerr << "Memory allocation error while processing <material>.\n";
+          }
+        }
       }
     }
   }
@@ -504,9 +541,9 @@ void URDF2Gazebo::InsertGazeboExtensionLink(TiXmlElement *_elem,
           if ((*ge)->isDampingFactor)
           {
             /// @todo separate linear and angular velocity decay
-            this->AddKeyValue(_elem, "linear",
+            this->AddKeyValue(velocityDecay, "linear",
                         this->Values2str(1, &(*ge)->dampingFactor));
-            this->AddKeyValue(_elem, "angular",
+            this->AddKeyValue(velocityDecay, "angular",
                         this->Values2str(1, &(*ge)->dampingFactor));
           }
           _elem->LinkEndChild(velocityDecay);
@@ -541,17 +578,38 @@ void URDF2Gazebo::InsertGazeboExtensionJoint(TiXmlElement *_elem,
            ge = gazeboIt->second.begin();
            ge != gazeboIt->second.end(); ++ge)
       {
-        TiXmlElement *physics     = new TiXmlElement("physics");
-        TiXmlElement *physicsOde = new TiXmlElement("ode");
-        TiXmlElement *limit       = new TiXmlElement("limit");
+        TiXmlElement *physics = _elem->FirstChildElement("physics");
+        bool newPhysics = false;
+        if (physics == NULL)
+        {
+          physics = new TiXmlElement("physics");
+          newPhysics = true;
+        }
+
+        TiXmlElement *physicsOde = physics->FirstChildElement("ode");
+        bool newPhysicsOde = false;
+        if (physicsOde == NULL)
+        {
+          physicsOde = new TiXmlElement("ode");
+          newPhysicsOde = true;
+        }
+
+        TiXmlElement *limit = physicsOde->FirstChildElement("limit");
+        bool newLimit = false;
+        if (limit == NULL)
+        {
+          limit = new TiXmlElement("limit");
+          newLimit = true;
+        }
+
         // insert stopCfm, stopErp, fudgeFactor
         if ((*ge)->isStopCfm)
         {
-          this->AddKeyValue(limit, "erp", this->Values2str(1, &(*ge)->stopCfm));
+          this->AddKeyValue(limit, "cfm", this->Values2str(1, &(*ge)->stopCfm));
         }
         if ((*ge)->isStopErp)
         {
-          this->AddKeyValue(limit, "cfm", this->Values2str(1, &(*ge)->stopErp));
+          this->AddKeyValue(limit, "erp", this->Values2str(1, &(*ge)->stopErp));
         }
         /* gone
         if ((*ge)->isInitialJointPosition)
@@ -560,19 +618,34 @@ void URDF2Gazebo::InsertGazeboExtensionJoint(TiXmlElement *_elem,
         */
 
         // insert provideFeedback
-        if ((*ge)->provideFeedback)
-            this->AddKeyValue(physicsOde, "provide_feedback", "true");
-        else
-            this->AddKeyValue(physicsOde, "provide_feedback", "false");
+        if ((*ge)->isProvideFeedback)
+        {
+          if ((*ge)->provideFeedback)
+              this->AddKeyValue(physicsOde, "provide_feedback", "true");
+          else
+              this->AddKeyValue(physicsOde, "provide_feedback", "false");
+        }
+
+        // insert cfmDamping
+        if ((*ge)->isCFMDamping)
+        {
+          if ((*ge)->cfmDamping)
+              this->AddKeyValue(physicsOde, "cfm_damping", "true");
+          else
+              this->AddKeyValue(physicsOde, "cfm_damping", "false");
+        }
 
         // insert fudgeFactor
         if ((*ge)->isFudgeFactor)
           this->AddKeyValue(physicsOde, "fudge_factor",
                       this->Values2str(1, &(*ge)->fudgeFactor));
 
-        physics->LinkEndChild(physicsOde);
-        physicsOde->LinkEndChild(limit);
-        _elem->LinkEndChild(physics);
+        if (newLimit)
+          physicsOde->LinkEndChild(limit);
+        if (newPhysicsOde)
+          physics->LinkEndChild(physicsOde);
+        if (newPhysics)
+          _elem->LinkEndChild(physics);
       }
     }
   }
@@ -879,7 +952,7 @@ urdf::Pose  URDF2Gazebo::TransformToParentFrame(
   // transform to gazebo::math::Pose then call TransformToParentFrame
   gazebo::math::Pose p1 = URDF2Gazebo::CopyPose(_transformInLinkFrame);
   gazebo::math::Pose p2 = URDF2Gazebo::CopyPose(_parentToLinkTransform);
-  return URDF2Gazebo::CopyPose(TransformToParentFrame(p1, p2));
+  return URDF2Gazebo::CopyPose(this->TransformToParentFrame(p1, p2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -889,7 +962,7 @@ gazebo::math::Pose  URDF2Gazebo::TransformToParentFrame(
 {
   // transform to gazebo::math::Pose then call TransformToParentFrame
   gazebo::math::Pose p2 = URDF2Gazebo::CopyPose(_parentToLinkTransform);
-  return TransformToParentFrame(_transformInLinkFrame, p2);
+  return this->TransformToParentFrame(_transformInLinkFrame, p2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -956,7 +1029,7 @@ void URDF2Gazebo::ReduceGazeboExtensionToParent(UrdfLinkPtr _link)
     for (std::vector<GazeboExtension*>::iterator ge = ext->second.begin();
          ge != ext->second.end(); ++ge)
     {
-      (*ge)->reductionTransform = TransformToParentFrame(
+      (*ge)->reductionTransform = this->TransformToParentFrame(
         (*ge)->reductionTransform,
         _link->parent_joint->parent_to_joint_origin_transform);
       // for sensor and projector blocks only
@@ -1127,25 +1200,25 @@ void URDF2Gazebo::CreateSDF(TiXmlElement *_root,
       ((!_link->inertial) || gazebo::math::equal(_link->inertial->mass, 0.0)))
     {
       if (!_link->child_links.empty())
-        gzwarn << "urdf2gazebo: link[" << _link->name
-               << "] has no inertia, ["
+        gzlog << "urdf2gazebo: link[" << _link->name
+               << "] has no inertial/mass, ["
                << static_cast<int>(_link->child_links.size())
                << "] children links ignored\n.";
 
       if (!_link->child_joints.empty())
-        gzwarn << "urdf2gazebo: link[" << _link->name
-               << "] has no inertia, ["
+        gzlog << "urdf2gazebo: link[" << _link->name
+               << "] has no inertia/mass, ["
                << static_cast<int>(_link->child_links.size())
                << "] children joints ignored\n.";
 
       if (_link->parent_joint)
-        gzwarn << "urdf2gazebo: link[" << _link->name
-               << "] has no inertia, "
+        gzlog << "urdf2gazebo: link[" << _link->name
+               << "] has no inertia/mass, "
                << "parent joint [" << _link->parent_joint->name
                << "] ignored\n.";
 
-        gzwarn << "urdf2gazebo: link[" << _link->name
-               << "] has no inertia, not modeled in gazebo\n";
+        gzlog << "urdf2gazebo: link[" << _link->name
+               << "] has no inertia/mass, not modeled in gazebo\n";
       return;
     }
 
@@ -1526,6 +1599,10 @@ void URDF2Gazebo::CreateJoint(TiXmlElement *_root,
                 this->Values2str(1, &_link->parent_joint->limits->lower));
               this->AddKeyValue(jointAxisLimit, "upper",
                 this->Values2str(1, &_link->parent_joint->limits->upper));
+              this->AddKeyValue(jointAxisLimit, "effort",
+                this->Values2str(1, &_link->parent_joint->limits->effort));
+              this->AddKeyValue(jointAxisLimit, "velocity",
+                this->Values2str(1, &_link->parent_joint->limits->velocity));
             }
             else if (_link->parent_joint->type != urdf::Joint::CONTINUOUS)
             {
@@ -1547,6 +1624,10 @@ void URDF2Gazebo::CreateJoint(TiXmlElement *_root,
                 this->Values2str(1, &_link->parent_joint->limits->lower));
               this->AddKeyValue(jointAxisLimit, "upper",
                 this->Values2str(1, &_link->parent_joint->limits->upper));
+              this->AddKeyValue(jointAxisLimit, "effort",
+                this->Values2str(1, &_link->parent_joint->limits->effort));
+              this->AddKeyValue(jointAxisLimit, "velocity",
+                this->Values2str(1, &_link->parent_joint->limits->velocity));
             }
           }
         }
@@ -1817,27 +1898,7 @@ void URDF2Gazebo::ReduceVisualsToParent(UrdfLinkPtr _link)
     visualsIt = _link->visual_groups.begin();
     visualsIt != _link->visual_groups.end(); ++visualsIt)
   {
-    /// @todo: extend to different groups,
-    /// only work with default meshes right now.
-    if (visualsIt->first == "default")
-    {
-      std::string lumpGroupName = std::string("lump::")+_link->name;
-      // gzdbg << "adding modified lump group name [" << lumpGroupName
-      //       << "] to link [" << _link->getParent()->name << "]\n.";
-      for (std::vector<UrdfVisualPtr>::iterator
-        visualIt = visualsIt->second->begin();
-        visualIt != visualsIt->second->end(); ++visualIt)
-      {
-        // transform visual origin from _link frame to
-        // parent link frame before adding to parent
-        (*visualIt)->origin = TransformToParentFrame((*visualIt)->origin,
-          _link->parent_joint->parent_to_joint_origin_transform);
-        // add the modified visual to parent
-        this->ReduceVisualToParent(_link->getParent(), lumpGroupName,
-          *visualIt);
-      }
-    }
-    else if (visualsIt->first.find(std::string("lump::")) == 0)
+    if (visualsIt->first.find(std::string("lump::")) == 0)
     {
       // it's a previously lumped mesh, re-lump under same _groupName
       std::string lumpGroupName = visualsIt->first;
@@ -1849,7 +1910,26 @@ void URDF2Gazebo::ReduceVisualsToParent(UrdfLinkPtr _link)
       {
         // transform visual origin from _link frame to parent link
         // frame before adding to parent
-        (*visualIt)->origin = TransformToParentFrame((*visualIt)->origin,
+        (*visualIt)->origin = this->TransformToParentFrame((*visualIt)->origin,
+          _link->parent_joint->parent_to_joint_origin_transform);
+        // add the modified visual to parent
+        this->ReduceVisualToParent(_link->getParent(), lumpGroupName,
+          *visualIt);
+      }
+    }
+    else
+    {
+      // default and any other groups meshes
+      std::string lumpGroupName = std::string("lump::")+_link->name;
+      // gzdbg << "adding modified lump group name [" << lumpGroupName
+      //       << "] to link [" << _link->getParent()->name << "]\n.";
+      for (std::vector<UrdfVisualPtr>::iterator
+        visualIt = visualsIt->second->begin();
+        visualIt != visualsIt->second->end(); ++visualIt)
+      {
+        // transform visual origin from _link frame to
+        // parent link frame before adding to parent
+        (*visualIt)->origin = this->TransformToParentFrame((*visualIt)->origin,
           _link->parent_joint->parent_to_joint_origin_transform);
         // add the modified visual to parent
         this->ReduceVisualToParent(_link->getParent(), lumpGroupName,
@@ -1872,30 +1952,7 @@ void URDF2Gazebo::ReduceCollisionsToParent(UrdfLinkPtr _link)
       collisionsIt = _link->collision_groups.begin();
       collisionsIt != _link->collision_groups.end(); ++collisionsIt)
     {
-      if (collisionsIt->first == "default")
-      {
-        // if it's a "default" mesh, it will be added under "lump::"+_link name
-        std::string lumpGroupName = std::string("lump::")+_link->name;
-        // gzdbg << "lumping collision [" << collisionsIt->first
-        //       << "] for link [" << _link->name
-        //       << "] to parent [" << _link->getParent()->name
-        //       << "] with group name [" << lumpGroupName << "]\n";
-        for (std::vector<UrdfCollisionPtr>::iterator
-          collisionIt = collisionsIt->second->begin();
-          collisionIt != collisionsIt->second->end(); ++collisionIt)
-        {
-          // transform collision origin from _link frame to
-          // parent link frame before adding to parent
-          (*collisionIt)->origin = TransformToParentFrame(
-            (*collisionIt)->origin,
-            _link->parent_joint->parent_to_joint_origin_transform);
-
-          // add the modified collision to parent
-          this->ReduceCollisionToParent(_link->getParent(), lumpGroupName,
-            *collisionIt);
-        }
-      }
-      else if (collisionsIt->first.find(std::string("lump::")) == 0)
+      if (collisionsIt->first.find(std::string("lump::")) == 0)
       {
         // if it's a previously lumped mesh, relump under same _groupName
         std::string lumpGroupName = collisionsIt->first;
@@ -1909,9 +1966,32 @@ void URDF2Gazebo::ReduceCollisionsToParent(UrdfLinkPtr _link)
         {
           // transform collision origin from _link frame to
           // parent link frame before adding to parent
-          (*collisionIt)->origin = TransformToParentFrame(
+          (*collisionIt)->origin = this->TransformToParentFrame(
             (*collisionIt)->origin,
             _link->parent_joint->parent_to_joint_origin_transform);
+          // add the modified collision to parent
+          this->ReduceCollisionToParent(_link->getParent(), lumpGroupName,
+            *collisionIt);
+        }
+      }
+      else
+      {
+        // default and any other group meshes
+        std::string lumpGroupName = std::string("lump::")+_link->name;
+        // gzdbg << "lumping collision [" << collisionsIt->first
+        //       << "] for link [" << _link->name
+        //       << "] to parent [" << _link->getParent()->name
+        //       << "] with group name [" << lumpGroupName << "]\n";
+        for (std::vector<UrdfCollisionPtr>::iterator
+          collisionIt = collisionsIt->second->begin();
+          collisionIt != collisionsIt->second->end(); ++collisionIt)
+        {
+          // transform collision origin from _link frame to
+          // parent link frame before adding to parent
+          (*collisionIt)->origin = this->TransformToParentFrame(
+            (*collisionIt)->origin,
+            _link->parent_joint->parent_to_joint_origin_transform);
+
           // add the modified collision to parent
           this->ReduceCollisionToParent(_link->getParent(), lumpGroupName,
             *collisionIt);
@@ -1941,7 +2021,7 @@ void URDF2Gazebo::ReduceJointsToParent(UrdfLinkPtr _link)
         {
           jointAnchorTransform = jointAnchorTransform * jointAnchorTransform;
           parentJoint->parent_to_joint_origin_transform =
-            TransformToParentFrame(
+            this->TransformToParentFrame(
             parentJoint->parent_to_joint_origin_transform,
             newParentLink->parent_joint->parent_to_joint_origin_transform);
           newParentLink = newParentLink->getParent();

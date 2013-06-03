@@ -21,11 +21,12 @@
 
 #include <boost/bind.hpp>
 
-#include "gazebo_config.h"
-#include "common/Console.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Console.hh"
 
-#include "physics/Link.hh"
-#include "physics/ode/ODEHingeJoint.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODEHingeJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -58,7 +59,10 @@ math::Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
 
-  dJointGetHingeAnchor(this->jointId, result);
+  if (this->jointId)
+    dJointGetHingeAnchor(this->jointId, result);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -71,37 +75,48 @@ void ODEHingeJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  dJointSetHingeAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  if (this->jointId)
+    dJointSetHingeAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 
 //////////////////////////////////////////////////
 math::Vector3 ODEHingeJoint::GetGlobalAxis(int /*_index*/) const
 {
-    dVector3 result;
+  dVector3 result;
+  if (this->jointId)
     dJointGetHingeAxis(this->jointId, result);
-    return math::Vector3(result[0], result[1], result[2]);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
+  return math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
+void ODEHingeJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
+  ODEJoint::SetAxis(_index, _axis);
+
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  dJointSetHingeAxis(this->jointId, _axis.x, _axis.y, _axis.z);
-}
+  /// ODE needs global axis
+  /// \TODO: currently we assume joint axis is specified in model frame,
+  /// this is incorrect, and should be corrected to be
+  /// joint frame which is specified in child link frame.
+  math::Vector3 globalAxis = _axis;
+  if (this->parentLink)
+    globalAxis =
+      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
 
-//////////////////////////////////////////////////
-void ODEHingeJoint::SetDamping(int /*index*/, double _damping)
-{
-  this->dampingCoefficient = _damping;
-  // use below when ode version is fixed
-  // dJointSetDamping(this->jointId, this->dampingCoefficient);
-  this->applyDamping = physics::Joint::ConnectJointUpdate(
-    boost::bind(&Joint::ApplyDamping, this));
+  if (this->jointId)
+    dJointSetHingeAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -110,13 +125,21 @@ math::Angle ODEHingeJoint::GetAngleImpl(int /*index*/) const
   math::Angle result;
   if (this->jointId)
     result = dJointGetHingeAngle(this->jointId);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
   return result;
 }
 
 //////////////////////////////////////////////////
 double ODEHingeJoint::GetVelocity(int /*index*/) const
 {
-  double result = dJointGetHingeAngleRate(this->jointId);
+  double result = 0;
+
+  if (this->jointId)
+    result = dJointGetHingeAngleRate(this->jointId);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -140,20 +163,50 @@ double ODEHingeJoint::GetMaxForce(int /*index*/)
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetForce(int _index, double _torque)
+void ODEHingeJoint::SetForce(int _index, double _effort)
 {
-  ODEJoint::SetForce(_index, _torque);
+  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
+  {
+    gzerr << "Calling ODEHingeJoint::SetForce with an index ["
+          << _index << "] out of range\n";
+    return;
+  }
+
+  // truncating SetForce effort if velocity limit reached.
+  if (this->velocityLimit[_index] >= 0)
+  {
+    if (this->GetVelocity(_index) > this->velocityLimit[_index])
+      _effort = _effort > 0 ? 0 : _effort;
+    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
+      _effort = _effort < 0 ? 0 : _effort;
+  }
+
+  // truncate effort if effortLimit is not negative
+  if (this->effortLimit[_index] >= 0)
+    _effort = math::clamp(_effort,
+      -this->effortLimit[_index], this->effortLimit[_index]);
+
+  ODEJoint::SetForce(_index, _effort);
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
-  dJointAddHingeTorque(this->jointId, _torque);
+
+  if (this->jointId)
+    dJointAddHingeTorque(this->jointId, _effort);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
 double ODEHingeJoint::GetParam(int _parameter) const
 {
-  double result = dJointGetHingeParam(this->jointId, _parameter);
+  double result = 0;
+
+  if (this->jointId)
+    result = dJointGetHingeParam(this->jointId, _parameter);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -163,5 +216,8 @@ void ODEHingeJoint::SetParam(int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
 
-  dJointSetHingeParam(this->jointId, _parameter, _value);
+  if (this->jointId)
+    dJointSetHingeParam(this->jointId, _parameter, _value);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }

@@ -18,15 +18,19 @@
 #include "ServerFixture.hh"
 #include "physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
+
 class PhysicsTest : public ServerFixture
 {
   public: void EmptyWorld(const std::string &_physicsEngine);
   public: void SpawnDrop(const std::string &_physicsEngine);
   public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
+  public: void RevoluteJoint(const std::string &_physicsEngine);
   public: void SimplePendulum(const std::string &_physicsEngine);
+  public: void CollisionFiltering(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -55,7 +59,7 @@ void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
   // simulate a few steps
   int steps = 20;
   world->StepWorld(steps);
-  double dt = world->GetPhysicsEngine()->GetStepTime();
+  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   t = world->GetSimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
@@ -97,7 +101,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   EXPECT_LE(g.z, -9.8);
 
   // get physics time step
-  double dt = physics->GetStepTime();
+  double dt = physics->GetMaxStepSize();
   EXPECT_GT(dt, 0);
 
   // spawn some simple shapes and check to see that they start falling
@@ -107,6 +111,12 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   modelPos["test_sphere"] = math::Vector3(4, 0, z0);
   modelPos["test_cylinder"] = math::Vector3(8, 0, z0);
   modelPos["test_empty"] = math::Vector3(12, 0, z0);
+  modelPos["link_offset_box"] = math::Vector3(0, 0, z0);
+
+  // FIXME Trimesh drop test passes in bullet but fails in ode because
+  // the mesh bounces to the side when it hits the ground.
+  // See issue #513. Uncomment test when issue is resolved.
+  // modelPos["test_trimesh"] = math::Vector3(16, 0, z0);
 
   SpawnBox("test_box", math::Vector3(1, 1, 1), modelPos["test_box"],
       math::Vector3::Zero);
@@ -114,6 +124,44 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
       math::Vector3::Zero);
   SpawnEmptyLink("test_empty", modelPos["test_empty"], math::Vector3::Zero);
+
+  std::ostringstream linkOffsetStream;
+  math::Pose linkOffsetPose1(0, 0, z0, 0, 0, 0);
+  math::Pose linkOffsetPose2(1000, 1000, 0, 0, 0, 0);
+  math::Vector3 linkOffsetSize(1, 1, 1);
+  linkOffsetStream << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='link_offset_box'>"
+    << "<pose>" << linkOffsetPose1 << "</pose>"
+    << "<allow_auto_disable>false</allow_auto_disable>"
+    << "<link name ='body'>"
+    << "  <pose>" << linkOffsetPose2 << "</pose>"
+    << "  <inertial>"
+    << "    <mass>4.0</mass>"
+    << "    <inertia>"
+    << "      <ixx>0.1667</ixx> <ixy>0.0</ixy> <ixz>0.0</ixz>"
+    << "      <iyy>0.1667</iyy> <iyz>0.0</iyz>"
+    << "      <izz>0.1667</izz>"
+    << "    </inertia>"
+    << "  </inertial>"
+    << "  <collision name ='geom'>"
+    << "    <geometry>"
+    << "      <box><size>" << linkOffsetSize << "</size></box>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << "      <box><size>" << linkOffsetSize << "</size></box>"
+    << "    </geometry>"
+    << "  </visual>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+  SpawnSDF(linkOffsetStream.str());
+
+  // std::string trimeshPath =
+  //    "file://media/models/cube_20k/meshes/cube_20k.stl";
+  // SpawnTrimesh("test_trimesh", trimeshPath, math::Vector3(0.5, 0.5, 0.5),
+  //    modelPos["test_trimesh"], math::Vector3::Zero);
 
   int steps = 2;
   physics::ModelPtr model;
@@ -210,6 +258,23 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       EXPECT_TRUE(model != NULL);
     }
   }
+
+  // Compute and check link pose of link_offset_box
+  gzdbg << "Check link pose of link_offset_box\n";
+  model = world->GetModel("link_offset_box");
+  ASSERT_TRUE(model);
+  physics::LinkPtr link = model->GetLink();
+  ASSERT_TRUE(link);
+  // relative pose of link in linkOffsetPose2
+  for (int i = 0; i < 20; ++i)
+  {
+    pose1 = model->GetWorldPose();
+    pose2 = linkOffsetPose2 + pose1;
+    EXPECT_NEAR(pose2.pos.x, linkOffsetPose2.pos.x, PHYSICS_TOL);
+    EXPECT_NEAR(pose2.pos.y, linkOffsetPose2.pos.y, PHYSICS_TOL);
+    EXPECT_NEAR(pose2.pos.z, 0.5, PHYSICS_TOL);
+    world->StepWorld(1);
+  }
 }
 
 TEST_F(PhysicsTest, SpawnDropODE)
@@ -258,7 +323,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   EXPECT_LT(g.z, 0);
 
   // get physics time step
-  double dt = physics->GetStepTime();
+  double dt = physics->GetMaxStepSize();
   EXPECT_GT(dt, 0);
 
   // spawn some spheres and check to see that they start falling
@@ -509,6 +574,417 @@ TEST_F(PhysicsTest, SpawnDropCoGOffsetBullet)
 }
 #endif  // HAVE_BULLET
 
+////////////////////////////////////////////////////////////////////////
+// RevoluteJoint:
+// Load 8 double pendulums arranged in a circle.
+// Measure angular velocity of links, and verify proper axis orientation.
+// Then set joint limits and verify that links remain within limits.
+////////////////////////////////////////////////////////////////////////
+void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
+{
+  math::Rand::SetSeed(0);
+  // Load world
+  Load("worlds/revolute_joint_test.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // Model names
+  std::vector<std::string> modelNames;
+  modelNames.push_back("pendulum_0deg");
+  modelNames.push_back("pendulum_45deg");
+  modelNames.push_back("pendulum_90deg");
+  modelNames.push_back("pendulum_135deg");
+  modelNames.push_back("pendulum_180deg");
+  modelNames.push_back("pendulum_225deg");
+  modelNames.push_back("pendulum_270deg");
+  modelNames.push_back("pendulum_315deg");
+
+  // Global axis
+  double sqrt1_2 = sqrt(2.0) / 2.0;
+  std::vector<math::Vector3> globalAxes;
+  globalAxes.push_back(math::Vector3(1, 0, 0));
+  globalAxes.push_back(math::Vector3(sqrt1_2, sqrt1_2, 0));
+  globalAxes.push_back(math::Vector3(0, 1, 0));
+  globalAxes.push_back(math::Vector3(-sqrt1_2, sqrt1_2, 0));
+  globalAxes.push_back(math::Vector3(-1, 0, 0));
+  globalAxes.push_back(math::Vector3(-sqrt1_2, -sqrt1_2, 0));
+  globalAxes.push_back(math::Vector3(0, -1, 0));
+  globalAxes.push_back(math::Vector3(sqrt1_2, -sqrt1_2, 0));
+
+  // Link names
+  std::vector<std::string> linkNames;
+  linkNames.push_back("lower_link");
+  linkNames.push_back("upper_link");
+
+  // Link names
+  std::vector<std::string> jointNames;
+  jointNames.push_back("lower_joint");
+  jointNames.push_back("upper_joint");
+
+  physics::ModelPtr model;
+  physics::LinkPtr link;
+  std::vector<std::string>::iterator modelIter;
+  physics::JointPtr joint;
+
+  // Check global axes before simulation starts
+  std::vector<math::Vector3>::iterator axisIter;
+  axisIter = globalAxes.begin();
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check global axes of model " << *modelIter << '\n';
+      std::vector<std::string>::iterator jointIter;
+      for (jointIter  = jointNames.begin();
+           jointIter != jointNames.end(); ++jointIter)
+      {
+        joint = model->GetJoint(*jointIter);
+        if (joint)
+        {
+          math::Vector3 axis = joint->GetGlobalAxis(0);
+          EXPECT_NEAR(axis.x, (*axisIter).x, PHYSICS_TOL);
+          EXPECT_NEAR(axis.y, (*axisIter).y, PHYSICS_TOL);
+          EXPECT_NEAR(axis.z, (*axisIter).z, PHYSICS_TOL);
+        }
+        else
+        {
+          gzerr << "Error loading joint " << *jointIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(joint != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+    ++axisIter;
+  }
+
+  // Step forward 0.75 seconds
+  double dt = physics->GetMaxStepSize();
+  EXPECT_GT(dt, 0);
+  int steps = ceil(0.75 / dt);
+  world->StepWorld(steps);
+
+  // Get global angular velocity of each link
+  math::Vector3 angVel;
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check angular velocity of model " << *modelIter << '\n';
+      link = model->GetLink("base");
+      if (link)
+      {
+        // Expect stationary base
+        angVel = link->GetWorldAngularVel();
+        EXPECT_NEAR(angVel.x, 0, PHYSICS_TOL*10);
+        EXPECT_NEAR(angVel.y, 0, PHYSICS_TOL*10);
+        EXPECT_NEAR(angVel.z, 0, PHYSICS_TOL*10);
+      }
+      else
+      {
+        gzerr << "Error loading base link of model " << *modelIter << '\n';
+        EXPECT_TRUE(link != NULL);
+      }
+
+      std::vector<std::string>::iterator linkIter;
+      for (linkIter  = linkNames.begin();
+           linkIter != linkNames.end(); ++linkIter)
+      {
+        link = model->GetLink(*linkIter);
+        if (link)
+        {
+          // Expect relative angular velocity of pendulum links to be negative
+          // and along x axis.
+          angVel = link->GetRelativeAngularVel().Normalize();
+          EXPECT_NEAR(angVel.x, -1, PHYSICS_TOL);
+          EXPECT_NEAR(angVel.y,  0, 2*PHYSICS_TOL);
+          EXPECT_NEAR(angVel.z,  0, 2*PHYSICS_TOL);
+        }
+        else
+        {
+          gzerr << "Error loading link " << *linkIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(link != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+
+  // Keep stepping forward, verifying that joint angles move in the direction
+  // implied by the joint velocity
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      double jointVel1, jointVel2;
+      double angle1, angle2, angle3;
+
+      gzdbg << "Check angle measurement for " << *modelIter << '\n';
+      std::vector<std::string>::iterator jointIter;
+      for (jointIter  = jointNames.begin();
+           jointIter != jointNames.end(); ++jointIter)
+      {
+        joint = model->GetJoint(*jointIter);
+        if (joint)
+        {
+          // Get first joint angle
+          angle1 = joint->GetAngle(0).Radian();
+
+          // Get joint velocity and assume it is not too small
+          jointVel1 = joint->GetVelocity(0);
+          EXPECT_GT(fabs(jointVel1), 1e-1);
+
+          // Take 1 step and measure again
+          world->StepWorld(1);
+
+          // Expect angle change in direction of joint velocity
+          angle2 = joint->GetAngle(0).Radian();
+          EXPECT_GT((angle2 - angle1) * math::clamp(jointVel1*1e4, -1.0, 1.0)
+                    , 0);
+
+          jointVel2 = joint->GetVelocity(0);
+          EXPECT_GT(fabs(jointVel2), 1e-1);
+
+          // Take 1 step and measure the last angle, expect decrease
+          world->StepWorld(1);
+          angle3 = joint->GetAngle(0).Radian();
+          EXPECT_GT((angle3 - angle2) * math::clamp(jointVel2*1e4, -1.0, 1.0)
+                    , 0);
+        }
+        else
+        {
+          gzerr << "Error loading joint " << *jointIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(joint != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+
+
+  // Reset the world, and impose joint limits
+  world->Reset();
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      std::vector<std::string>::iterator jointIter;
+      for (jointIter  = jointNames.begin();
+           jointIter != jointNames.end(); ++jointIter)
+      {
+        joint = model->GetJoint(*jointIter);
+        if (joint)
+        {
+          joint->SetLowStop(0, math::Angle(-0.1));
+          joint->SetHighStop(0, math::Angle(0.1));
+        }
+        else
+        {
+          gzerr << "Error loading joint " << *jointIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(joint != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+
+  // Step forward again for 0.75 seconds and check that joint angles
+  // are within limits
+  world->StepWorld(steps);
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check angle limits and velocity of joints of model "
+            << *modelIter << '\n';
+      std::vector<std::string>::iterator jointIter;
+      for (jointIter  = jointNames.begin();
+           jointIter != jointNames.end(); ++jointIter)
+      {
+        joint = model->GetJoint(*jointIter);
+        if (joint)
+        {
+          EXPECT_NEAR(joint->GetAngle(0).Radian(), 0, 0.11);
+        }
+        else
+        {
+          gzerr << "Error loading joint " << *jointIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(joint != NULL);
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+
+  // Reset world again, disable gravity, detach upper_joint
+  // Then apply torque at lower_joint and verify motion
+  world->Reset();
+  for (modelIter  = modelNames.begin();
+       modelIter != modelNames.end(); ++modelIter)
+  {
+    model = world->GetModel(*modelIter);
+    if (model)
+    {
+      gzdbg << "Check SetForce for model " << *modelIter << '\n';
+      std::vector<std::string>::iterator linkIter;
+      for (linkIter  = linkNames.begin();
+           linkIter != linkNames.end(); ++linkIter)
+      {
+        link = model->GetLink(*linkIter);
+        if (link)
+        {
+          // Disable gravity for links.
+          link->SetGravityMode(false);
+        }
+        else
+        {
+          gzerr << "Error loading link " << *linkIter
+                << " of model " << *modelIter << '\n';
+          EXPECT_TRUE(link != NULL);
+        }
+      }
+
+      joint = model->GetJoint("upper_joint");
+      if (joint)
+      {
+        // Detach upper_joint.
+        joint->Detach();
+      }
+      else
+      {
+        gzerr << "Error loading upper_joint "
+              << " of model " << *modelIter << '\n';
+        EXPECT_TRUE(joint != NULL);
+      }
+
+      // Step forward and let things settle a bit.
+      world->StepWorld(100);
+
+      joint = model->GetJoint("lower_joint");
+      if (joint)
+      {
+        double oldVel, newVel, force;
+        oldVel = joint->GetVelocity(0);
+        // Apply positive torque to the lower_joint and step forward.
+        force = 1;
+        for (int i = 0; i < 10; ++i)
+        {
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          newVel = joint->GetVelocity(0);
+          // Expect increasing velocities
+          EXPECT_GT(newVel, oldVel);
+          oldVel = newVel;
+
+          // Check that GetForce returns what we set
+          EXPECT_NEAR(joint->GetForce(0u), force, PHYSICS_TOL);
+
+          // Expect joint velocity to be near angular velocity difference
+          // of child and parent, along global axis
+          // jointVel == DOT(angVelChild - angVelParent, axis)
+          double jointVel = joint->GetVelocity(0);
+          math::Vector3 axis = joint->GetGlobalAxis(0);
+          angVel  = joint->GetChild()->GetWorldAngularVel();
+          angVel -= joint->GetParent()->GetWorldAngularVel();
+          EXPECT_NEAR(jointVel, axis.Dot(angVel), PHYSICS_TOL);
+        }
+        // Apply negative torque to lower_joint
+        force = -3;
+        for (int i = 0; i < 10; ++i)
+        {
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          joint->SetForce(0, force);
+          world->StepWorld(1);
+          newVel = joint->GetVelocity(0);
+          // Expect decreasing velocities
+          EXPECT_LT(newVel, oldVel);
+
+          // Check that GetForce returns what we set
+          EXPECT_NEAR(joint->GetForce(0u), force, PHYSICS_TOL);
+
+          // Expect joint velocity to be near angular velocity difference
+          // of child and parent, along global axis
+          // jointVel == DOT(angVelChild - angVelParent, axis)
+          double jointVel = joint->GetVelocity(0);
+          math::Vector3 axis = joint->GetGlobalAxis(0);
+          angVel  = joint->GetChild()->GetWorldAngularVel();
+          angVel -= joint->GetParent()->GetWorldAngularVel();
+          EXPECT_NEAR(jointVel, axis.Dot(angVel), PHYSICS_TOL);
+        }
+      }
+      else
+      {
+        gzerr << "Error loading lower_joint "
+              << " of model " << *modelIter << '\n';
+        EXPECT_TRUE(joint != NULL);
+      }
+    }
+    else
+    {
+      gzerr << "Error loading model " << *modelIter << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+}
+
+TEST_F(PhysicsTest, RevoluteJointODE)
+{
+  RevoluteJoint("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, RevoluteJointBullet)
+{
+  RevoluteJoint("bullet");
+}
+#endif  // HAVE_BULLET
+
 TEST_F(PhysicsTest, State)
 {
   /// \TODO: Redo state test
@@ -523,9 +999,9 @@ TEST_F(PhysicsTest, State)
   physics::CollisionState collisionState = linkState.GetCollisionState(0);
 
   math::Pose pose;
-  EXPECT_EQ(static_cast<unsigned int>(1), worldState.GetModelStateCount());
-  EXPECT_EQ(static_cast<unsigned int>(1), modelState.GetLinkStateCount());
-  EXPECT_EQ(static_cast<unsigned int>(1), linkState.GetCollisionStateCount());
+  EXPECT_EQ(1u, worldState.GetModelStateCount());
+  EXPECT_EQ(1u, modelState.GetLinkStateCount());
+  EXPECT_EQ(1u, linkState.GetCollisionStateCount());
   EXPECT_EQ(pose, modelState.GetPose());
   EXPECT_EQ(pose, linkState.GetPose());
   EXPECT_EQ(pose, collisionState.GetPose());
@@ -595,7 +1071,7 @@ TEST_F(PhysicsTest, JointDampingTest)
   {
     // compare against recorded data only
     double test_duration = 1.5;
-    double dt = world->GetPhysicsEngine()->GetStepTime();
+    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
     int steps = test_duration/dt;
 
     for (int i = 0; i < steps; ++i)
@@ -615,18 +1091,13 @@ TEST_F(PhysicsTest, JointDampingTest)
 
     EXPECT_EQ(vel.x, 0.0);
 
-    EXPECT_LT(vel.y, -10.2006);
-    EXPECT_GT(vel.y, -10.2008);
-    EXPECT_LT(vel.z, -6.51766);
-    EXPECT_GT(vel.z, -6.51768);
+    EXPECT_NEAR(vel.y, -10.2009, PHYSICS_TOL);
+    EXPECT_NEAR(vel.z, -6.51755, PHYSICS_TOL);
 
     EXPECT_EQ(pose.pos.x, 3.0);
-    EXPECT_LT(pose.pos.y, 5.0e-6);
-    EXPECT_GT(pose.pos.y, 0.0);
-    EXPECT_GT(pose.pos.z, 10.099);
-    EXPECT_LT(pose.pos.z, 10.101);
-    EXPECT_GT(pose.rot.GetAsEuler().x, 0.567336);
-    EXPECT_LT(pose.rot.GetAsEuler().x, 0.567338);
+    EXPECT_NEAR(pose.pos.y, 0.0, PHYSICS_TOL);
+    EXPECT_NEAR(pose.pos.z, 10.099, PHYSICS_TOL);
+    EXPECT_NEAR(pose.rot.GetAsEuler().x, 0.567334, PHYSICS_TOL);
     EXPECT_EQ(pose.rot.GetAsEuler().y, 0.0);
     EXPECT_EQ(pose.rot.GetAsEuler().z, 0.0);
   }
@@ -654,7 +1125,7 @@ TEST_F(PhysicsTest, DropStuff)
     double z = 10.5;
     double v = 0.0;
     double g = -10.0;
-    double dt = world->GetPhysicsEngine()->GetStepTime();
+    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
 
     // world->StepWorld(1428);  // theoretical contact, but
     // world->StepWorld(100);  // integration error requires few more steps
@@ -763,7 +1234,7 @@ TEST_F(PhysicsTest, CollisionTest)
   {
     // todo: get parameters from drop_test.world
     double test_duration = 1.1;
-    double dt = world->GetPhysicsEngine()->GetStepTime();
+    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
 
     double f = 1000.0;
     double v = 0;
@@ -888,7 +1359,7 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
     //       << "] v[" << vel
     //       << "]\n";
   }
-  physicsEngine->SetStepTime(0.0001);
+  physicsEngine->SetMaxStepSize(0.0001);
   physicsEngine->SetSORPGSIters(1000);
 
   {
@@ -987,6 +1458,136 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
     }
   }
   Unload();
+}
+
+////////////////////////////////////////////////////////////////////////
+// CollisionFiltering:
+// Load a world, spawn a model with two overlapping links. By default,
+// the links should not collide with each other as they have the same
+// parent model. Check the x and y velocities to see if they are 0
+////////////////////////////////////////////////////////////////////////
+void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
+{
+  // load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  std::stringstream newModelStr;
+
+  std::string modelName = "multiLinkModel";
+  math::Pose modelPose(0, 0, 2, 0, 0, 0);
+  math::Pose link01Pose(0, 0.1, 0, 0, 0, 0);
+  math::Pose link02Pose(0, -0.1, 0, 0, 0, 0);
+
+  // A model composed of two overlapping links at fixed y offset from origin
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+              << "<model name ='" << modelName << "'>"
+              << "<pose>" << modelPose.pos.x << " "
+                         << modelPose.pos.y << " "
+                         << modelPose.pos.z << " "
+                         << modelPose.rot.GetAsEuler().x << " "
+                         << modelPose.rot.GetAsEuler().y << " "
+                         << modelPose.rot.GetAsEuler().z << "</pose>"
+              << "<link name ='link01'>"
+              << "  <pose>" << link01Pose.pos.x << " "
+                         << link01Pose.pos.y << " "
+                         << link01Pose.pos.z << " "
+                         << link01Pose.rot.GetAsEuler().x << " "
+                         << link01Pose.rot.GetAsEuler().y << " "
+                         << link01Pose.rot.GetAsEuler().z << "</pose>"
+              << "  <collision name ='geom'>"
+              << "    <geometry>"
+              << "      <box><size>1 1 1</size></box>"
+              << "    </geometry>"
+              << "  </collision>"
+              << "  <visual name ='visual'>"
+              << "    <geometry>"
+              << "      <box><size>1 1 1</size></box>"
+              << "    </geometry>"
+              << "  </visual>"
+              << "</link>"
+              << "<link name ='link02'>"
+              << "  <pose>" << link02Pose.pos.x << " "
+                         << link02Pose.pos.y << " "
+                         << link02Pose.pos.z << " "
+                         << link02Pose.rot.GetAsEuler().x << " "
+                         << link02Pose.rot.GetAsEuler().y << " "
+                         << link02Pose.rot.GetAsEuler().z << "</pose>"
+              << "  <collision name ='geom'>"
+              << "    <geometry>"
+              << "      <box><size>1 1 1</size></box>"
+              << "    </geometry>"
+              << "  </collision>"
+              << "  <visual name ='visual'>"
+              << "    <geometry>"
+              << "      <box><size>1 1 1</size></box>"
+              << "    </geometry>"
+              << "  </visual>"
+              << "</link>"
+              << "</model>"
+              << "</sdf>";
+
+  SpawnSDF(newModelStr.str());
+
+  // Wait for the entity to spawn
+  int i = 0;
+  while (!this->HasEntity(modelName) && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+  if (i > 20)
+    gzthrow("Unable to spawn model");
+
+  world->StepWorld(5);
+  physics::ModelPtr model = world->GetModel(modelName);
+
+  math::Vector3 vel;
+
+  physics::Link_V links = model->GetLinks();
+  unsigned int linkCount = 2;
+  EXPECT_EQ(links.size(), linkCount);
+  for (physics::Link_V::const_iterator iter = links.begin();
+      iter != links.end(); ++iter)
+  {
+    // Links should not repel each other hence expecting zero x, y vel
+    vel = (*iter)->GetWorldLinearVel();
+    EXPECT_EQ(vel.x, 0);
+    EXPECT_EQ(vel.y, 0);
+
+    // Model should be falling
+    EXPECT_LT(vel.z, 0);
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(PhysicsTest, CollisionFilteringODE)
+{
+  CollisionFiltering("ode");
+}
+
+/////////////////////////////////////////////////
+#ifdef HAVE_BULLET
+TEST_F(PhysicsTest, CollisionFilteringBullet)
+{
+  CollisionFiltering("bullet");
+}
+#endif  // HAVE_BULLET
+
+/////////////////////////////////////////////////
+// This test verifies that gazebo doesn't crash when collisions occur
+// and the <world><physics><ode><max_contacts> value is zero.
+// The crash was reported in issue #593 on bitbucket
+TEST_F(PhysicsTest, ZeroMaxContactsODE)
+{
+  // Load an empty world
+  Load("worlds/zero_max_contacts.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr model = world->GetModel("ground_plane");
+  ASSERT_TRUE(model);
 }
 
 int main(int argc, char **argv)

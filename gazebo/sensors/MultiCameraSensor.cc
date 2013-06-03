@@ -38,7 +38,7 @@ GZ_REGISTER_STATIC_SENSOR("multicamera", MultiCameraSensor)
 
 //////////////////////////////////////////////////
 MultiCameraSensor::MultiCameraSensor()
-    : Sensor()
+    : Sensor(sensors::IMAGE)
 {
 }
 
@@ -90,14 +90,14 @@ void MultiCameraSensor::Init()
     return;
   }
 
-  rendering::ScenePtr scene = rendering::get_scene(worldName);
+  this->scene = rendering::get_scene(worldName);
 
-  if (!scene)
+  if (!this->scene)
   {
-    scene = rendering::create_scene(worldName, false);
+    this->scene = rendering::create_scene(worldName, false);
 
     // This usually means rendering is not available
-    if (!scene)
+    if (!this->scene)
     {
       gzerr << "Unable to create MultiCameraSensor.\n";
       return;
@@ -108,7 +108,7 @@ void MultiCameraSensor::Init()
   sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
   while (cameraSdf)
   {
-    rendering::CameraPtr camera = scene->CreateCamera(
+    rendering::CameraPtr camera = this->scene->CreateCamera(
           cameraSdf->GetValueString("name"), false);
 
     if (!camera)
@@ -130,14 +130,23 @@ void MultiCameraSensor::Init()
 
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose += cameraSdf->GetValuePose("pose");
+      cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
     camera->AttachToVisual(this->parentName, true);
 
-    this->cameras.push_back(camera);
+    {
+      boost::mutex::scoped_lock lock(this->cameraMutex);
+      this->cameras.push_back(camera);
+    }
 
     cameraSdf = cameraSdf->GetNextElement("camera");
   }
+
+  // Disable clouds and moon on server side until fixed and also to improve
+  // performance
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+      ~rendering::Scene::GZ_SKYX_CLOUDS &
+      ~rendering::Scene::GZ_SKYX_MOON);
 
   Sensor::Init();
 }
@@ -145,19 +154,25 @@ void MultiCameraSensor::Init()
 //////////////////////////////////////////////////
 void MultiCameraSensor::Fini()
 {
+  this->imagePub.reset();
   Sensor::Fini();
+
+  boost::mutex::scoped_lock lock(this->cameraMutex);
 
   for (std::vector<rendering::CameraPtr>::iterator iter =
       this->cameras.begin(); iter != this->cameras.end(); ++iter)
   {
-    (*iter)->Fini();
+    (*iter)->GetScene()->RemoveCamera((*iter)->GetName());
   }
   this->cameras.clear();
+  this->scene.reset();
 }
 
 //////////////////////////////////////////////////
 rendering::CameraPtr MultiCameraSensor::GetCamera(unsigned int _index) const
 {
+  boost::mutex::scoped_lock lock(this->cameraMutex);
+
   if (_index < this->cameras.size())
     return this->cameras[_index];
   else
@@ -168,12 +183,14 @@ rendering::CameraPtr MultiCameraSensor::GetCamera(unsigned int _index) const
 //////////////////////////////////////////////////
 void MultiCameraSensor::UpdateImpl(bool /*_force*/)
 {
+  boost::mutex::scoped_lock lock(this->cameraMutex);
+
   if (this->cameras.size() == 0)
     return;
 
   bool publish = this->imagePub->HasConnections();
 
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->scene->GetSimTime();
 
   msgs::ImagesStamped msg;
   msgs::Set(msg.mutable_time(), this->lastMeasurementTime);
@@ -205,6 +222,7 @@ void MultiCameraSensor::UpdateImpl(bool /*_force*/)
 //////////////////////////////////////////////////
 unsigned int MultiCameraSensor::GetCameraCount() const
 {
+  boost::mutex::scoped_lock lock(this->cameraMutex);
   return this->cameras.size();
 }
 
@@ -231,6 +249,7 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
 {
   this->SetActive(true);
 
+  boost::mutex::scoped_lock lock(this->cameraMutex);
   if (_filenames.size() != this->cameras.size())
   {
     gzerr << "Filename count[" << _filenames.size() << "] does not match "
@@ -248,4 +267,10 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+bool MultiCameraSensor::IsActive()
+{
+  return Sensor::IsActive() || this->imagePub->HasConnections();
 }

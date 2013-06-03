@@ -39,8 +39,10 @@ using namespace gazebo;
 using namespace sensors;
 
 //////////////////////////////////////////////////
-Sensor::Sensor()
+Sensor::Sensor(SensorCategory _cat)
 {
+  this->category = _cat;
+
   this->sdf.reset(new sdf::Element);
   sdf::initFile("sensor.sdf", this->sdf);
 
@@ -48,16 +50,19 @@ Sensor::Sensor()
 
   this->node = transport::NodePtr(new transport::Node());
 
+  this->updateDelay = common::Time(0.0);
   this->updatePeriod = common::Time(0.0);
 }
 
 //////////////////////////////////////////////////
 Sensor::~Sensor()
 {
-  this->node->Fini();
+  if (this->node)
+    this->node->Fini();
   this->node.reset();
 
-  this->sdf->Reset();
+  if (this->sdf)
+    this->sdf->Reset();
   this->sdf.reset();
   this->connections.clear();
 }
@@ -81,12 +86,12 @@ void Sensor::Load(const std::string &_worldName)
     this->SetActive(true);
 
   this->world = physics::get_world(_worldName);
-  this->lastUpdateTime = common::Time(0.0);  // loaded, but not updated
+
+  // loaded, but not updated
+  this->lastUpdateTime = common::Time(0.0);
 
   this->node->Init(this->world->GetName());
   this->sensorPub = this->node->Advertise<msgs::Sensor>("~/sensor");
-  this->controlSub = this->node->Subscribe("~/world_control",
-                                           &Sensor::OnControl, this);
 }
 
 //////////////////////////////////////////////////
@@ -127,9 +132,23 @@ void Sensor::Update(bool _force)
 {
   if (this->IsActive() || _force)
   {
-    if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod
-        || _force)
+    // Adjust time-to-update period to compensate for delays caused by another
+    // sensor's update in the same thread.
+    common::Time adjustedElapsed = this->world->GetSimTime() -
+        this->lastUpdateTime + this->updateDelay;
+
+    if (adjustedElapsed >= this->updatePeriod || _force)
     {
+      this->updateDelay = std::max(common::Time::Zero,
+          adjustedElapsed - this->updatePeriod);
+
+      // if delay is more than a full update period, then give up trying
+      // to catch up. This happens normally when the sensor just changed from
+      // an inactive to an active state, or the sensor just cannot hit its
+      // target update rate (worst case).
+      if (this->updateDelay >= this->updatePeriod)
+        this->updateDelay = common::Time::Zero;
+
       this->lastUpdateTime = this->world->GetSimTime();
       this->UpdateImpl(_force);
       this->updated();
@@ -276,14 +295,13 @@ std::string Sensor::GetWorldName() const
 }
 
 //////////////////////////////////////////////////
-void Sensor::OnControl(ConstWorldControlPtr &_data)
+SensorCategory Sensor::GetCategory() const
 {
-  if (_data->has_reset())
-  {
-    if ((_data->reset().has_all() && _data->reset().all()) ||
-        (_data->reset().has_time_only() && _data->reset().time_only()))
-    {
-      this->lastUpdateTime = 0.0;
-    }
-  }
+  return this->category;
+}
+
+//////////////////////////////////////////////////
+void Sensor::ResetLastUpdateTime()
+{
+  this->lastUpdateTime = 0.0;
 }

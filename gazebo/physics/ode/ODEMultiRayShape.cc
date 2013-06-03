@@ -46,9 +46,9 @@ ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
 
   // These three lines may be unessecary
   ODELinkPtr pLink =
-    boost::shared_static_cast<ODELink>(this->collisionParent->GetLink());
+    boost::static_pointer_cast<ODELink>(this->collisionParent->GetLink());
   pLink->SetSpaceId(this->raySpaceId);
-  boost::shared_static_cast<ODECollision>(_parent)->SetSpaceId(
+  boost::static_pointer_cast<ODECollision>(this->collisionParent)->SetSpaceId(
       this->raySpaceId);
 }
 
@@ -65,21 +65,22 @@ ODEMultiRayShape::~ODEMultiRayShape()
 //////////////////////////////////////////////////
 void ODEMultiRayShape::UpdateRays()
 {
-  ODEPhysicsPtr ode = boost::shared_dynamic_cast<ODEPhysics>(
+  ODEPhysicsPtr ode = boost::dynamic_pointer_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (ode == NULL)
     gzthrow("Invalid physics engine. Must use ODE.");
 
-  // FIXME: Do we need to lock the physics engine here? YES!
-  //        especially when spawning models with sensors
+  // Do we need to lock the physics engine here? YES!
+  // especially when spawning models with sensors
+  {
+    boost::recursive_mutex::scoped_lock lock(*ode->GetPhysicsUpdateMutex());
 
-  ode->GetPhysicsUpdateMutex()->lock();
-  // Do collision detection
-  dSpaceCollide2((dGeomID) (this->superSpaceId),
-      (dGeomID) (ode->GetSpaceId()),
-      this, &UpdateCallback);
-  ode->GetPhysicsUpdateMutex()->unlock();
+    // Do collision detection
+    dSpaceCollide2((dGeomID) (this->superSpaceId),
+        (dGeomID) (ode->GetSpaceId()),
+        this, &UpdateCallback);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -158,7 +159,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
       if (n > 0)
       {
-        RayShapePtr shape = boost::shared_static_cast<RayShape>(
+        RayShapePtr shape = boost::static_pointer_cast<RayShape>(
             rayCollision->GetShape());
         if (contact.depth < shape->GetLength())
         {

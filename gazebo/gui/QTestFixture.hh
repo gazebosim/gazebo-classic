@@ -18,6 +18,7 @@
 #ifndef _QTESTFIXTURE_HH_
 #define _QTESTFIXTURE_HH_
 
+#include <string>
 #include <boost/thread.hpp>
 
 #include "gazebo/physics/physics.hh"
@@ -34,20 +35,61 @@ class QTestFixture : public QObject
 {
   Q_OBJECT
 
-  /// \brief QT slot that is called automatically when a test begins
+  public: QTestFixture();
+
+  /// \brief Load a world.
+  /// \param[in] _worldFilename Name of the world to load.
+  /// \param[in] _paused True to start the world paused.
+  /// \param[in] _serverScene True to create a scene on the server
+  /// \param[in] _clientScene True to create a scene on the client
+  protected: void Load(const std::string &_worldFilename, bool _paused = false,
+                 bool _serverScene = true, bool _clientScene = false);
+
+  /// \brief Pause or unpause the world.
+  /// \param[in] _pause True to pause the world
+  protected: void SetPause(bool _pause);
+
+  /// \brief Get memory information about the current process.
+  /// \param[out] _resident Resident size, in Kb.
+  /// \param[out] _share Shared memory, in Kb.
+  protected: void GetMemInfo(double &_resident, double &_share);
+
+  /// \brief QT slot that is called automatically when the whole test case
+  /// begins
   private slots: void initTestCase();
 
-  /// \brief QT slot that is called automatically when a test ends
+  /// \brief QT slot that is called automatically when each test begins
+  private slots: void init();
+
+  /// \brief QT slot that is called automatically when each test ends
+  private slots: void cleanup();
+
+  /// \brief QT slot that is called automatically when the whole test case ends
   private slots: void cleanupTestCase();
 
   /// \brief Run the Gazebo server in a thread.
-  private: void RunServer();
+  /// \param[in] _worldFilename World file to load.
+  /// \param[in] _paused True to start the world paused.
+  /// \param[in] _createScene True to create a scene.
+  private: void RunServer(const std::string &_worldFilename, bool _paused,
+                bool _createScene);
 
   /// \brief The Gazebo server, which is run in a thread.
   protected: gazebo::Server *server;
 
   /// \brief Thread to run the Gazebo server.
   protected: boost::thread *serverThread;
-};
 
+  /// \brief Maximum allowed percent change in resident memory usage.
+  protected: double resMaxPercentChange;
+
+  /// \brief Maximum allowed percent change in shared memory usage.
+  protected: double shareMaxPercentChange;
+
+  /// \brief Amount of resident memory at start.
+  private: double residentStart;
+
+  /// \brief Amount of shared memory at start.
+  private: double shareStart;
+};
 #endif

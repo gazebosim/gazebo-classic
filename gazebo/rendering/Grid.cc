@@ -113,8 +113,7 @@ void Grid::Init()
 {
   this->manualObject =
     this->scene->GetManager()->createManualObject(this->name);
-  this->manualObject->setVisibilityFlags(GZ_VISIBILITY_GUI |
-                                         GZ_VISIBILITY_NOT_SELECTABLE);
+  this->manualObject->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->manualObject->setDynamic(false);
   // this->manualObject->setRenderQueueGroup(

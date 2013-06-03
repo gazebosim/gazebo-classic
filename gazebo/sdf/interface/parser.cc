@@ -283,7 +283,7 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
     TiXmlDocument doc = u2g.InitModelFile(filename);
     if (sdf::readDoc(&doc, _sdf, "urdf file"))
     {
-      gzwarn << "parse from urdf file [" << filename << "].\n";
+      gzlog << "parse from urdf file [" << filename << "].\n";
       return true;
     }
     else
@@ -311,7 +311,7 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
     TiXmlDocument doc = u2g.InitModelString(_xmlString);
     if (sdf::readDoc(&doc, _sdf, "urdf string"))
     {
-      gzwarn << "parse from urdf.\n";
+      gzlog << "Parsing from urdf.\n";
       return true;
     }
     else
@@ -374,14 +374,14 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
   {
     // try to use the old deprecated parser
     if (!gazeboNode)
-      gzwarn << "SDF has no <sdf> element in file["
+      gzlog << "SDF has no <sdf> element in file["
              << _source << "]\n";
     else if (!gazeboNode->Attribute("version"))
-      gzwarn << "SDF element has no version in file["
+      gzlog << "SDF element has no version in file["
              << _source << "]\n";
     else if (strcmp(gazeboNode->Attribute("version"),
                     SDF::version.c_str()) != 0)
-      gzwarn << "SDF version ["
+      gzlog << "SDF version ["
             << gazeboNode->Attribute("version")
             << "] is not " << SDF::version << "\n";
     return false;
@@ -432,7 +432,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
   {
     // try to use the old deprecated parser
     if (!gazeboNode)
-      gzwarn << "x SDF has no <sdf> element\n";
+      gzwarn << "SDF has no <sdf> element\n";
     else if (!gazeboNode->Attribute("version"))
       gzwarn << "<sdf> element has no version\n";
     else if (strcmp(gazeboNode->Attribute("version"),
@@ -649,6 +649,13 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
           includeSDF->root->GetElement("model")->GetElement(
               "pose")->GetValue()->SetFromString(
                 elemXml->FirstChildElement("pose")->GetText());
+        }
+
+        if (elemXml->FirstChildElement("static"))
+        {
+          includeSDF->root->GetElement("model")->GetElement(
+              "static")->GetValue()->SetFromString(
+                elemXml->FirstChildElement("static")->GetText());
         }
 
         for (TiXmlElement *childElemXml = elemXml->FirstChildElement();

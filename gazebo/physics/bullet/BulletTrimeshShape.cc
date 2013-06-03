@@ -53,7 +53,7 @@ void BulletTrimeshShape::Init()
   TrimeshShape::Init();
 
   BulletCollisionPtr bParent =
-    boost::shared_static_cast<BulletCollision>(this->collisionParent);
+    boost::static_pointer_cast<BulletCollision>(this->collisionParent);
 
   float *vertices = NULL;
   int *indices = NULL;
@@ -92,7 +92,9 @@ void BulletTrimeshShape::Init()
     mTriMesh->addTriangle(bv0, bv1, bv2);
   }
 
-  bParent->SetCollisionShape(new btConvexTriangleMeshShape(mTriMesh, true));
+  btConvexShape* convexShape = new btConvexTriangleMeshShape(mTriMesh, true);
+  convexShape->setMargin(0.001f);
+  bParent->SetCollisionShape(convexShape);
 
   delete [] vertices;
   delete [] indices;

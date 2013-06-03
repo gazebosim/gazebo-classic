@@ -48,6 +48,14 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~ModelDatabase();
 
+      /// \brief Start the model database.
+      /// \param[in] _fetchImmediately True to fetch the models without
+      /// waiting.
+      public: void Start(bool _fetchImmediately = false);
+
+      /// \brief Finalize the model database.
+      public: void Fini();
+
       /// \brief Returns the the global model database URI.
       /// \return the URI.
       public: std::string GetURI();
@@ -71,7 +79,7 @@ namespace gazebo
       ///
       /// The URI must be fully qualified:
       /// http://gazebosim.org/gazebo_models/ground_plane or
-      /// models://gazebo_models
+      /// model://gazebo_models
       /// \param[in] _uri the model uri
       /// \return the model's name.
       public: std::string GetModelName(const std::string &_uri);
@@ -88,15 +96,17 @@ namespace gazebo
       /// \sa ModelDatabase::GetModelConfig
       /// \sa ModelDatabase::GetDBConfig
       public: std::string GetManifest(const std::string &_uri)
-              GAZEBO_DEPRECATED;
+              GAZEBO_DEPRECATED(1.5);
 
       /// \brief Get the local path to a model.
       ///
       /// Get the path to a model based on a URI. If the model is on
       /// a remote server, then the model fetched and installed locally.
-      /// param[in] _uri the model uri
+      /// \param[in] _uri the model uri
+      /// \param[in] _forceDownload True to skip searching local paths.
       /// \return path to a model directory
-      public: std::string GetModelPath(const std::string &_uri);
+      public: std::string GetModelPath(const std::string &_uri,
+                  bool _forceDownload = false);
 
       /// \brief Get a model's SDF file based on a URI.
       ///
@@ -127,11 +137,16 @@ namespace gazebo
       private: std::string GetManifestImpl(const std::string &_uri);
 
       /// \brief Used by a thread to update the model cache.
-      private: void UpdateModelCache();
+      /// \param[in] _fetchImmediately True to fetch the models without
+      /// waiting.
+      private: void UpdateModelCache(bool _fetchImmediately);
 
       /// \brief Used by ModelDatabase::UpdateModelCache,
       /// no one else should use this function.
       private: bool UpdateModelCacheImpl();
+
+      /// \brief Thread to update the model cache.
+      private: boost::thread *updateCacheThread;
 
       /// \brief A dictionary of all model names indexed by their uri.
       private: std::map<std::string, std::string> modelCache;
@@ -142,11 +157,14 @@ namespace gazebo
       /// \brief Cache update mutex
       private: boost::mutex updateMutex;
 
-      /// \brief Thread to update the model cache.
-      private: boost::thread *updateCacheThread;
+      /// \brief Mutex to protect cache thread status checks.
+      private: boost::recursive_mutex startCacheMutex;
 
       /// \brief Condition variable for the updateCacheThread.
       private: boost::condition_variable updateCacheCondition;
+
+      /// \brief Condition variable for completion of one cache update.
+      private: boost::condition_variable updateCacheCompleteCondition;
 
       /// \def CallbackFunc
       /// \brief Boost function that is used to passback the model cache.
