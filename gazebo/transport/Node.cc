@@ -88,8 +88,8 @@ void Node::Init(const std::string &_space)
 
     if (namespaces.empty())
       gzerr << "No namespace found\n";
-
-    this->topicNamespace = namespaces.front();
+    else
+      this->topicNamespace = namespaces.front();
   }
   else if (_space[0] != '/')
     TopicManager::Instance()->RegisterTopicNamespace(_space);

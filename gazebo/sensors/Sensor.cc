@@ -171,6 +171,7 @@ bool Sensor::IsInitialized() const
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
+  this->active = false;
   this->node->Fini();
   this->node.reset();
 

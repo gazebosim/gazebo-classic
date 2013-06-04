@@ -153,7 +153,7 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
       boost::bind(&Connection::OnConnect, this,
         boost::asio::placeholders::error, endpointIter));
 
-  // Wait for at most 2 seconds for a connection to be established.
+  // Wait for at most 60 seconds for a connection to be established.
   // The connectionCondition notification occurs in ::OnConnect.
   if (!this->connectCondition.timed_wait(lock,
         boost::posix_time::milliseconds(60000)) || this->connectError)
@@ -253,7 +253,8 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 
   std::ostringstream headerStream;
 
-  headerStream << std::setw(HEADER_LENGTH) << std::hex << _buffer.size();
+  headerStream << std::setfill('0') << std::setw(HEADER_LENGTH)
+    << std::hex << _buffer.size();
 
   if (headerStream.str().empty() ||
       headerStream.str().size() != HEADER_LENGTH)
@@ -283,8 +284,13 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     */
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    this->writeQueue.push_back(headerStream.str());
-    this->writeQueue.push_back(_buffer);
+
+    headerStream << _buffer;
+
+    if (this->writeQueue.size() > 1)
+      this->writeQueue.back() += headerStream.str();
+    else
+      this->writeQueue.push_back(headerStream.str());
   }
   // }
 
@@ -312,14 +318,6 @@ void Connection::ProcessWriteQueue(bool _blocking)
   if (this->writeQueue.size() == 0 || this->writeCount > 0)
     return;
 
-  boost::asio::streambuf *buffer(new boost::asio::streambuf);
-  std::ostream os(buffer);
-
-  for (unsigned int i = 0; i < this->writeQueue.size(); i++)
-  {
-    os << this->writeQueue[i];
-  }
-  this->writeQueue.clear();
   this->writeCount++;
 
   // Write the serialized data to the socket. We use
@@ -327,23 +325,27 @@ void Connection::ProcessWriteQueue(bool _blocking)
   // a single write operation
   if (!_blocking)
   {
-    boost::asio::async_write(*this->socket, buffer->data(),
-        boost::bind(&Connection::OnWrite, shared_from_this(),
-          boost::asio::placeholders::error, buffer));
+    boost::asio::async_write(*this->socket,
+        boost::asio::buffer(this->writeQueue.front(),
+          this->writeQueue.front().size()),
+          boost::bind(&Connection::OnWrite, shared_from_this(),
+            boost::asio::placeholders::error));
   }
   else
   {
     try
     {
-      boost::asio::write(*this->socket, buffer->data());
+      boost::asio::write(*this->socket,
+          boost::asio::buffer(this->writeQueue.front(),
+            this->writeQueue.front().size()));
     }
     catch(...)
     {
       this->Shutdown();
     }
 
+    this->writeQueue.pop_front();
     this->writeCount--;
-    delete buffer;
   }
 }
 
@@ -360,13 +362,11 @@ std::string Connection::GetRemoteURI() const
 }
 
 //////////////////////////////////////////////////
-void Connection::OnWrite(const boost::system::error_code &_e,
-                         boost::asio::streambuf *_buffer)
+void Connection::OnWrite(const boost::system::error_code &_e)
 {
-  delete _buffer;
-
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
+    this->writeQueue.pop_front();
     this->writeCount--;
   }
 
@@ -741,6 +741,8 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
 
       address = address.loopback();
     }
+
+    freeifaddrs(ifaddr);
   }
 
   // Complain if we were unable to find a valid address
@@ -766,7 +768,7 @@ boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
   try
   {
     if (this->socket)
-      ep = this->socket->remote_endpoint();
+      ep = this->socket->remote_endpoint(ec);
   }
   catch(boost::system::system_error &e)
   {

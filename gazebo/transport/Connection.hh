@@ -346,8 +346,7 @@ namespace gazebo
       /// \brief Callback when a write has occurred.
       /// \param[in] _e Error code
       /// \param[in] _b Buffer of the data that was written.
-      private: void OnWrite(const boost::system::error_code &_e,
-                            boost::asio::streambuf *_b);
+      private: void OnWrite(const boost::system::error_code &_e);
 
       /// \brief Handle new connections, if this is a server
       /// \param[in] _e Error code for accept method
