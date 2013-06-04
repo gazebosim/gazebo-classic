@@ -30,7 +30,9 @@ set (plugins
   DiffDrivePlugin
   SkidSteerDrivePlugin
   JointTrajectoryPlugin
-  VehiclePlugin)
+  VehiclePlugin
+  TestPlugin
+  )
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
