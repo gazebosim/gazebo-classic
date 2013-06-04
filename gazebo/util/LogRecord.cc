@@ -31,18 +31,13 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/Base64.hh"
 #include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 using namespace util;
-
-/// Convert binary values to base64 characters
-typedef boost::archive::iterators::base64_from_binary<
-        // retrieve 6 bit integers from a sequence of 8 bit bytes
-        boost::archive::iterators::transform_width<const char *, 6, 8> >
-        Base64Text;
 
 //////////////////////////////////////////////////
 LogRecord::LogRecord()
@@ -548,16 +543,18 @@ unsigned int LogRecord::Log::Update()
   std::ostringstream stream;
 
   // Get log data via the callback.
-  if (this->logCB(stream) && !stream.str().empty())
+  if (this->logCB(stream))
   {
-    const std::string encoding = this->parent->GetEncoding();
-
-    this->buffer.append("<chunk encoding='");
-    this->buffer.append(encoding);
-    this->buffer.append("'>\n");
-
-    this->buffer.append("<![CDATA[");
+    std::string data = stream.str();
+    if (!data.empty())
     {
+      const std::string encoding = this->parent->GetEncoding();
+
+      this->buffer.append("<chunk encoding='");
+      this->buffer.append(encoding);
+      this->buffer.append("'>\n");
+
+      this->buffer.append("<![CDATA[");
       // Compress the data.
       if (encoding == "bz2")
       {
@@ -568,14 +565,11 @@ unsigned int LogRecord::Log::Update()
           boost::iostreams::filtering_ostream out;
           out.push(boost::iostreams::bzip2_compressor());
           out.push(std::back_inserter(str));
-          out << stream.str();
-          out.flush();
+          boost::iostreams::copy(boost::make_iterator_range(data), out);
         }
 
         // Encode in base64.
-        std::copy(Base64Text(str.c_str()),
-                  Base64Text(str.c_str() + str.size()),
-                  std::back_inserter(this->buffer));
+        Base64Encode(str.c_str(), str.size(), this->buffer);
       }
       else if (encoding == "zlib")
       {
@@ -586,23 +580,20 @@ unsigned int LogRecord::Log::Update()
           boost::iostreams::filtering_ostream out;
           out.push(boost::iostreams::zlib_compressor());
           out.push(std::back_inserter(str));
-          out << stream.str();
-          out.flush();
+          boost::iostreams::copy(boost::make_iterator_range(data), out);
         }
 
         // Encode in base64.
-        std::copy(Base64Text(str.c_str()),
-                  Base64Text(str.c_str() + str.size()),
-                  std::back_inserter(this->buffer));
+        Base64Encode(str.c_str(), str.size(), this->buffer);
       }
       else if (encoding == "txt")
-        this->buffer.append(stream.str());
+        this->buffer.append(data);
       else
         gzerr << "Unknown log file encoding[" << encoding << "]\n";
-    }
-    this->buffer.append("]]>\n");
+      this->buffer.append("]]>\n");
 
-    this->buffer.append("</chunk>\n");
+      this->buffer.append("</chunk>\n");
+    }
   }
 
   return this->buffer.size();
@@ -637,6 +628,7 @@ void LogRecord::Log::Stop()
 {
   if (this->logFile.is_open())
   {
+    this->Update();
     this->Write();
 
     std::string xmlEnd = "</gazebo_log>";
@@ -737,7 +729,8 @@ void LogRecord::OnLogControl(ConstLogControlPtr &_data)
 //////////////////////////////////////////////////
 void LogRecord::PublishLogStatus()
 {
-  if (this->logs.empty())
+  if (this->logs.empty() || !this->logStatusPub ||
+      !this->logStatusPub->HasConnections())
     return;
 
   /// \todo right now this function will only report on the first log.
@@ -850,4 +843,19 @@ void LogRecord::Cleanup()
 bool LogRecord::IsReadyToStart() const
 {
   return this->readyToStart;
+}
+
+//////////////////////////////////////////////////
+unsigned int LogRecord::GetBufferSize() const
+{
+  boost::mutex::scoped_lock lock(this->writeMutex);
+  unsigned int size = 0;
+
+  for (Log_M::const_iterator iter = this->logs.begin();
+      iter != this->logs.end(); ++iter)
+  {
+    size += iter->second->GetBufferSize();
+  }
+
+  return size;
 }

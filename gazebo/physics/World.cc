@@ -302,6 +302,7 @@ void World::Init()
   this->updateInfo.worldName = this->GetName();
 
   this->iterations = 0;
+  this->logPrevIteration = 0;
 
   // Mark the world initialization
   gzlog << "World::Init" << std::endl;
@@ -516,7 +517,12 @@ void World::Step()
         this->stepInc--;
     }
     else
+    {
+      // Flush the log record buffer, if there is data in it.
+      if (util::LogRecord::Instance()->GetBufferSize() > 0)
+        util::LogRecord::Instance()->Notify();
       this->pauseTime += stepTime;
+    }
   }
 
   this->ProcessMessages();

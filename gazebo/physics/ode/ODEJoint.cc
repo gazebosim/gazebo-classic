@@ -48,6 +48,8 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->dStable[0] = 0;
   this->dStable[1] = 0;
   this->dStable[2] = 0;
+
+  this->provideFeedback = false;
 }
 
 //////////////////////////////////////////////////
@@ -139,7 +141,6 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       }
     }
   }
-
 
   if (this->provideFeedback)
   {

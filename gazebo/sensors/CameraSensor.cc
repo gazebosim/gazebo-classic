@@ -217,5 +217,6 @@ bool CameraSensor::SaveFrame(const std::string &_filename)
 //////////////////////////////////////////////////
 bool CameraSensor::IsActive()
 {
-  return Sensor::IsActive() || this->imagePub->HasConnections();
+  return Sensor::IsActive() ||
+    (this->imagePub && this->imagePub->HasConnections());
 }

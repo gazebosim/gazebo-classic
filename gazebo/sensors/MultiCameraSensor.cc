@@ -272,5 +272,6 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
 //////////////////////////////////////////////////
 bool MultiCameraSensor::IsActive()
 {
-  return Sensor::IsActive() || this->imagePub->HasConnections();
+  return Sensor::IsActive() ||
+    (this->imagePub && this->imagePub->HasConnections());
 }

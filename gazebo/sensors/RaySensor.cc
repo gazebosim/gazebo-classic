@@ -54,11 +54,6 @@ RaySensor::RaySensor()
 //////////////////////////////////////////////////
 RaySensor::~RaySensor()
 {
-  this->laserCollision->Fini();
-  this->laserCollision.reset();
-
-  this->laserShape->Fini();
-  this->laserShape.reset();
 }
 
 //////////////////////////////////////////////////
@@ -142,32 +137,57 @@ void RaySensor::Init()
 //////////////////////////////////////////////////
 void RaySensor::Fini()
 {
-  this->scanPub.reset();
   Sensor::Fini();
+
+  this->scanPub.reset();
+
+  if (this->laserCollision)
+  {
+    this->laserCollision->Fini();
+    this->laserCollision.reset();
+  }
+
+  if (this->laserShape)
+  {
+    this->laserShape->Fini();
+    this->laserShape.reset();
+  }
 }
 
 //////////////////////////////////////////////////
 math::Angle RaySensor::GetAngleMin() const
 {
-  return this->laserShape->GetMinAngle();
+  if (this->laserShape)
+    return this->laserShape->GetMinAngle();
+  else
+    return -1;
 }
 
 //////////////////////////////////////////////////
 math::Angle RaySensor::GetAngleMax() const
 {
-  return this->laserShape->GetMaxAngle();
+  if (this->laserShape)
+    return this->laserShape->GetMaxAngle();
+  else
+    return -1;
 }
 
 //////////////////////////////////////////////////
 double RaySensor::GetRangeMin() const
 {
-  return this->laserShape->GetMinRange();
+  if (this->laserShape)
+    return this->laserShape->GetMinRange();
+  else
+    return -1;
 }
 
 //////////////////////////////////////////////////
 double RaySensor::GetRangeMax() const
 {
-  return this->laserShape->GetMaxRange();
+  if (this->laserShape)
+    return this->laserShape->GetMaxRange();
+  else
+    return -1;
 }
 
 //////////////////////////////////////////////////
@@ -180,13 +200,19 @@ double RaySensor::GetAngleResolution() const
 //////////////////////////////////////////////////
 double RaySensor::GetRangeResolution() const
 {
-  return this->laserShape->GetResRange();
+  if (this->laserShape)
+    return this->laserShape->GetResRange();
+  else
+    return -1;
 }
 
 //////////////////////////////////////////////////
 int RaySensor::GetRayCount() const
 {
-  return this->laserShape->GetSampleCount();
+  if (this->laserShape)
+    return this->laserShape->GetSampleCount();
+  else
+    return -1;
 }
 
 //////////////////////////////////////////////////
@@ -194,33 +220,48 @@ int RaySensor::GetRangeCount() const
 {
   // TODO: maybe should check against this->laserMsg.ranges_size()
   //       as users use this to loop through GetRange() calls
-  return this->laserShape->GetSampleCount() *
-    this->laserShape->GetScanResolution();
+  if (this->laserShape)
+    return this->laserShape->GetSampleCount() *
+      this->laserShape->GetScanResolution();
+  else
+    return -1;
 }
 
 //////////////////////////////////////////////////
 int RaySensor::GetVerticalRayCount() const
 {
-  return this->laserShape->GetVerticalSampleCount();
+  if (this->laserShape)
+    return this->laserShape->GetVerticalSampleCount();
+  else
+    return -1;
 }
 
 //////////////////////////////////////////////////
 int RaySensor::GetVerticalRangeCount() const
 {
-  return this->laserShape->GetVerticalSampleCount() *
-         this->laserShape->GetVerticalScanResolution();
+  if (this->laserShape)
+    return this->laserShape->GetVerticalSampleCount() *
+      this->laserShape->GetVerticalScanResolution();
+  else
+    return -1;
 }
 
 //////////////////////////////////////////////////
 math::Angle RaySensor::GetVerticalAngleMin() const
 {
-  return this->laserShape->GetVerticalMinAngle();
+  if (this->laserShape)
+    return this->laserShape->GetVerticalMinAngle();
+  else
+    return -1;
 }
 
 //////////////////////////////////////////////////
 math::Angle RaySensor::GetVerticalAngleMax() const
 {
-  return this->laserShape->GetVerticalMaxAngle();
+  if (this->laserShape)
+    return this->laserShape->GetVerticalMaxAngle();
+  else
+    return -1;
 }
 
 //////////////////////////////////////////////////
@@ -256,7 +297,11 @@ double RaySensor::GetRange(int _index)
 double RaySensor::GetRetro(int index)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  return this->laserShape->GetRetro(index);
+
+  if (this->laserShape)
+    return this->laserShape->GetRetro(index);
+  else
+    return -1;
 }
 
 //////////////////////////////////////////////////
@@ -327,5 +372,6 @@ void RaySensor::UpdateImpl(bool /*_force*/)
 //////////////////////////////////////////////////
 bool RaySensor::IsActive()
 {
-  return Sensor::IsActive() || this->scanPub->HasConnections();
+  return Sensor::IsActive() ||
+    (this->scanPub && this->scanPub->HasConnections());
 }
