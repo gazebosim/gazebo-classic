@@ -127,13 +127,12 @@ void SensorManager::Update(bool _force)
       GZ_ASSERT(!(*iter).empty(), "Remove sensor name is empty.");
 
       bool removed = false;
-      std::string scopedName = (*iter)->GetScopedName();
       for (SensorContainer_V::iterator iter2 = this->sensorContainers.begin();
            iter2 != this->sensorContainers.end() && !removed; ++iter2)
       {
         GZ_ASSERT((*iter2) != NULL, "SensorContainer is NULL");
 
-        removed = (*iter2)->RemoveSensor(scopedName);
+        removed = (*iter2)->RemoveSensor(*iter);
       }
 
       if (!removed)
