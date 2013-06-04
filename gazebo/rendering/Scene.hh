@@ -70,6 +70,13 @@ namespace gazebo
     /// Maintains all the Visuals, Lights, and Cameras for a World.
     class Scene : public boost::enable_shared_from_this<Scene>
     {
+      public: enum SkyXMode {
+        GZ_SKYX_ALL = 0x0FFFFFFF,
+        GZ_SKYX_CLOUDS = 0x0000001,
+        GZ_SKYX_MOON = 0x0000002,
+        GZ_SKYX_NONE = 0
+      };
+
       /// \brief Constructor.
       private: Scene() {}
 
@@ -413,6 +420,13 @@ namespace gazebo
       /// \brief Get whether or not clouds are displayed.
       /// \return True if clouds are displayed.
       public: bool GetShowClouds() const;
+
+
+      /// \brief Set SkyX mode to enable/disable skyx components such as
+      /// clouds and moon.
+      /// \param[in] _mode SkyX mode bitmask.
+      /// \sa Scene::SkyXMode
+      public: void SetSkyXMode(unsigned int _mode);
 
       /// \brief Return true if the Scene has been initialized.
       public: bool GetInitialized() const;

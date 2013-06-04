@@ -192,6 +192,8 @@ void Scene::Fini()
 
   delete this->requestMsg;
   delete this->raySceneQuery;
+  this->requestMsg = NULL;
+  this->raySceneQuery = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -1483,11 +1485,6 @@ void Scene::PreRender()
 
   {
     boost::mutex::scoped_lock lock(this->receiveMutex);
-    if (this->requestMsg != NULL)
-    {
-      this->requestPub->Publish(*this->requestMsg);
-      return;
-    }
 
     std::copy(this->sceneMsgs.begin(), this->sceneMsgs.end(),
               std::back_inserter(sceneMsgsCopy));
@@ -1620,7 +1617,7 @@ void Scene::PreRender()
     boost::mutex::scoped_lock lock(this->receiveMutex);
 
     // Process all the model messages last. Remove pose message from the list
-    // only when a corresponding visuals. We may receive pose updates
+    // only when a corresponding visual exits. We may receive pose updates
     // over the wire before  we recieve the visual
     pIter = this->poseMsgs.begin();
     while (pIter != this->poseMsgs.end())
@@ -1795,6 +1792,7 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 
   if (!linkVis)
   {
+    gzerr << "No link visual\n";
     return false;
   }
 
@@ -2675,6 +2673,24 @@ bool Scene::GetShowClouds() const
   }
 
   return false;
+}
+
+/////////////////////////////////////////////////
+void Scene::SetSkyXMode(unsigned int _mode)
+{
+  /// \todo This function is currently called on initialization of rendering
+  /// based sensors to disable clouds and moon. More testing is required to
+  /// make sure it functions correctly when called during a render update,
+  /// issue #693.
+
+  bool enabled = _mode != GZ_SKYX_NONE;
+  this->skyx->setEnabled(enabled);
+
+  if (!enabled)
+    return;
+
+  this->skyx->setCloudsEnabled(_mode & GZ_SKYX_CLOUDS);
+  this->skyx->setMoonEnabled(_mode & GZ_SKYX_MOON);
 }
 
 /////////////////////////////////////////////////

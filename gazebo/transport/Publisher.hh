@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class Publisher Publisher.hh transport/transport.hh
     /// \brief A publisher of messages on a topic
-    class Publisher: public boost::enable_shared_from_this<Publisher>
+    class Publisher
     {
       /// Deprecated
       public: Publisher(const std::string &_topic, const std::string &_msgType,
@@ -113,6 +113,11 @@ namespace gazebo
       /// \brief Send latest message over the wire. For internal use only
       public: void SendMessage();
 
+      /// \brief Set our containing node.
+      /// \param[in] _node Pointer to a node. Should be the node that create
+      /// this publisher.
+      public: void SetNode(NodePtr _node);
+
       /// Deprecated
       public: bool GetLatching() const GAZEBO_DEPRECATED(1.5);
 
@@ -158,14 +163,14 @@ namespace gazebo
       /// \brief The previous message published. Used for latching topics.
       private: MessagePtr prevMsg;
 
+      /// \brief Pointer to our containing node.
+      private: NodePtr node;
+
       /// \brief Current time.
       private: common::Time currentTime;
 
       /// \brief Time of the last publication.
       private: common::Time prevPublishTime;
-
-      public: unsigned int id;
-      private: static unsigned int idCounter;
     };
     /// \}
   }

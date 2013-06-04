@@ -68,6 +68,10 @@ Link::~Link()
   {
     msgs::Visual msg;
     msg.set_name(this->visuals[i]);
+    if (this->parent)
+      msg.set_parent_name(this->parent->GetScopedName());
+    else
+      msg.set_parent_name("");
     msg.set_delete_me(true);
     this->visPub->Publish(msg);
   }
@@ -79,6 +83,10 @@ Link::~Link()
     {
       msgs::Visual msg;
       msg.set_name(this->cgVisuals[i]);
+      if (this->parent)
+        msg.set_parent_name(this->parent->GetScopedName());
+      else
+        msg.set_parent_name("");
       msg.set_delete_me(true);
       this->visPub->Publish(msg);
     }

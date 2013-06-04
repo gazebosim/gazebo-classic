@@ -250,6 +250,9 @@ namespace gazebo
 
       /// \brief True if initialized
       private: bool initialized;
+
+      /// \brief Keep track how much the update has been delayed.
+      private: common::Time updateDelay;
     };
     /// \}
   }

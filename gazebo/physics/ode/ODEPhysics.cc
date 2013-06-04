@@ -115,7 +115,7 @@ class Colliders_TBB
 
 //////////////////////////////////////////////////
 ODEPhysics::ODEPhysics(WorldPtr _world)
-    : PhysicsEngine(_world)
+    : PhysicsEngine(_world), maxContacts(0)
 {
   // Collision detection init
   dInitODE2(0);
@@ -168,6 +168,9 @@ ODEPhysics::~ODEPhysics()
 void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
+
+  this->maxContacts = _sdf->GetElement("max_contacts")->GetValueInt();
+  this->SetMaxContacts(this->maxContacts);
 
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   sdf::ElementPtr solverElem = odeElem->GetElement("solver");
@@ -599,8 +602,8 @@ void ODEPhysics::SetContactSurfaceLayer(double _depth)
 //////////////////////////////////////////////////
 void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 {
-  this->sdf->GetElement("ode")->GetElement(
-      "max_contacts")->GetValue()->Set(_maxContacts);
+  this->maxContacts = _maxContacts;
+  this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
 }
 
 //////////////////////////////////////////////////
@@ -656,7 +659,7 @@ double ODEPhysics::GetContactSurfaceLayer()
 //////////////////////////////////////////////////
 int ODEPhysics::GetMaxContacts()
 {
-  return this->sdf->GetElement("max_contacts")->GetValueInt();
+  return this->maxContacts;
 }
 
 //////////////////////////////////////////////////
