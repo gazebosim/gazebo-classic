@@ -57,6 +57,8 @@ static bool addressIsLoopback(const boost::asio::ip::address_v4 &_addr)
 //////////////////////////////////////////////////
 Connection::Connection()
 {
+  this->headerBuffer = new char[HEADER_LENGTH];
+
   if (iomanager == NULL)
     iomanager = new IOManager();
 
@@ -90,6 +92,9 @@ Connection::Connection()
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
+  delete this->headerBuffer;
+  this->headerBuffer = NULL;
+
   this->Shutdown();
 
   if (iomanager)
@@ -251,52 +256,13 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     return;
   }
 
-  std::ostringstream headerStream;
+  sprintf(this->headerBuffer, "%08x",
+      static_cast<unsigned int>(_buffer.size()));
 
-  headerStream << std::setfill('0') << std::setw(HEADER_LENGTH)
-    << std::hex << _buffer.size();
-
-  if (headerStream.str().empty() ||
-      headerStream.str().size() != HEADER_LENGTH)
-  {
-    // Something went wrong, inform the caller
-    boost::system::error_code error(boost::asio::error::invalid_argument);
-    gzerr << "Connection::Write error[" << error.message() << "]\n";
-    return;
-  }
-
-  /*if (_force)
-    {
-    boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    boost::asio::streambuf *buffer = new boost::asio::streambuf;
-    std::ostream os(buffer);
-    os << headerStream.str() << _buffer;
-
-    std::size_t written = 0;
-    written = boost::asio::write(*this->socket, buffer->data());
-    if (written != buffer->size())
-      gzerr << "Didn't write all the data\n";
-
-    delete buffer;
-    }
-    else
-    {
-    */
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-
-    headerStream << _buffer;
-    headerStream.flush()
-
-    this->writeQueue.push_back(headerStream.str());
-    /*
-    if (this->writeQueue.size() > 1)
-      this->writeQueue.back() += headerStream.str();
-    else
-      this->writeQueue.push_back(headerStream.str());
-      */
+    this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
   }
-  // }
 
   if (_force)
   {

@@ -446,6 +446,9 @@ namespace gazebo
 
       /// \brief Comma separated list of valid IP addresses.
       private: std::string ipWhiteList;
+
+      /// \brief Buffer for header information.
+      private: char *headerBuffer;
     };
     /// \}
   }
