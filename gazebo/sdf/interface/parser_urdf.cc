@@ -1788,7 +1788,7 @@ void URDF2Gazebo::CreateCollision(TiXmlElement* _elem, ConstUrdfLinkPtr _link,
     }
 
     /* set additional data from extensions */
-    this->InsertGazeboExtensionCollision(gazeboCollision, _oldLinkName);
+    this->InsertGazeboExtensionCollision(gazeboCollision, _link->name);
 
     /* add geometry to body */
     _elem->LinkEndChild(gazeboCollision);
