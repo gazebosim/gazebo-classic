@@ -26,14 +26,11 @@
 using namespace gazebo;
 using namespace transport;
 
-unsigned int Publisher::idCounter = 0;
-
 //////////////////////////////////////////////////
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
                      unsigned int _limit, bool /*_latch*/)
   : topic(_topic), msgType(_msgType), queueLimit(_limit)
 {
-  this->id = idCounter++;
   this->queueLimitWarned = false;
   this->updatePeriod = 0;
 }
@@ -44,7 +41,6 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
   : topic(_topic), msgType(_msgType), queueLimit(_limit),
     updatePeriod(0)
 {
-  this->id = idCounter++;
   if (!math::equal(_hzRate, 0.0))
     this->updatePeriod = 1.0 / _hzRate;
 
