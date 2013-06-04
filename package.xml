@@ -1,6 +1,8 @@
 <package>
+
   <!-- NOTE: This is a catkin package.xml file to support optional building in
-       a catkin workspace, but is not required to build gazebo. -->
+       a catkin workspace, but is not required to build gazebo. For more
+       information, see: http://ros.org/reps/rep-0134.html -->
 
   <name>gazebo</name>
   <version>1.8.2</version>
@@ -11,14 +13,12 @@
   <license>Apache2</license>
   <author>Open Source Robotics Foundation</author>
 
-  <maintainer email="nkoenig@osrfoundation.org">Nate Koenig</maintainer>
+  <maintainer email="nate@osrfoundation.org">Nate Koenig</maintainer>
   <maintainer email="hsu@osrfoundation.org">John Hsu</maintainer>
 
   <url>http://gazebosim.org/</url>
   
   <buildtool_depend>cmake</buildtool_depend>
-
-  <!-- TODO: add other dependencies -->
 
   <export>
     <build_type>cmake</build_type>
