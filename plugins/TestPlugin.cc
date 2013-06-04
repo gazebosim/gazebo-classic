@@ -20,28 +20,57 @@
 #include "plugins/TestPlugin.hh"
 
 using namespace gazebo;
-GZ_REGISTER_MODEL_PLUGIN(TestPlugin)
+GZ_REGISTER_WORLD_PLUGIN(TestPlugin)
 
 /////////////////////////////////////////////////
 TestPlugin::TestPlugin()
 {
+	this->joints_created = false;
 }
 
 /////////////////////////////////////////////////
-void TestPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr /*_sdf*/)
+void TestPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
 {
-  this->model = _model;
+	std::cout << "loading dynamic joint plugin" << std::endl;
 
-  physics::LinkPtr link1 = this->model->GetLink("link1");
-  physics::LinkPtr link2 = this->model->GetLink("link2");
-  physics::LinkPtr link3 = this->model->GetLink("link3");
-  physics::LinkPtr link4 = this->model->GetLink("link4");
-  physics::LinkPtr link5 = this->model->GetLink("link5");
+    // Store the pointer to the world
+	  this->world = _world;
 
-  this->CreateJoint(link1, link2);
-  this->CreateJoint(link2, link3);
-  this->CreateJoint(link3, link4);
-  this->CreateJoint(link4, link5);
+	  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+			  boost::bind(&TestPlugin::OnUpdate, this));
+
+}
+
+void TestPlugin::OnUpdate()
+{
+	// get models / links after a few seconds, in order to avoid:
+	// 'Error [ConnectionManager.cc:123] Connection Manager is not running'
+	// when loading the plugin
+
+	if (this->world->GetSimTime().sec > 2 && !this->joints_created)
+	{
+		this->liquid_model = this->world->GetModel("liquid_spheres");
+
+		std::cout <<  this->liquid_model->GetName().c_str() << std::endl;
+
+		this->center_link = this->liquid_model->GetLink("sphere_link_0");
+
+		// loading the links of the model
+		this->myLinks = this->liquid_model->GetLinks();
+
+		std::cout << this->myLinks.size() << std::endl;
+
+		//start from link 1, because 0 is the center
+		for (unsigned int i = 1; i < this->myLinks.size(); i++)
+		{
+			std::cout << this->myLinks[i]->GetName().c_str() << std::endl;
+
+			this->CreateJoint(this->center_link,
+					this->myLinks[i]);
+		}
+
+		this->joints_created = true;
+	}
 }
 
 void TestPlugin::CreateJoint(physics::LinkPtr _centerLink,
@@ -55,8 +84,8 @@ void TestPlugin::CreateJoint(physics::LinkPtr _centerLink,
   axis = direction.Cross(math::Vector3(0.0, 0.0, 1.0));
 
   this->myJoints.push_back(
-      this->model->GetWorld()->GetPhysicsEngine()->CreateJoint(
-        "revolute", this->model));
+		  this->world->GetPhysicsEngine()->CreateJoint(
+        "revolute", this->liquid_model));
 
   this->myJoints.back()->Attach(_extLink, _centerLink );
 

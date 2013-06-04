@@ -32,6 +32,7 @@ set (plugins
   JointTrajectoryPlugin
   VehiclePlugin
   TestPlugin
+  TestFactoryLiquid
   )
 
 foreach (src ${plugins})

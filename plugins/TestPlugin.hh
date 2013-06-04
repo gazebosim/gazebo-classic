@@ -28,17 +28,25 @@
 
 namespace gazebo
 {
-  class TestPlugin : public ModelPlugin
+  class TestPlugin : public WorldPlugin
   {
     /// \brief Constructor
     public: TestPlugin();
 
-    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    protected: virtual void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
+
+    protected: virtual void OnUpdate();
+
     private: void CreateJoint(physics::LinkPtr _centerLink,
                  physics::LinkPtr _extLink);
 
+    private: event::ConnectionPtr updateConnection;
     private: std::list<physics::JointPtr> myJoints;
-    private: physics::ModelPtr model;
+    private: physics::WorldPtr world;
+    private: physics::ModelPtr liquid_model;
+    private: physics::LinkPtr center_link;
+    private: std::vector<physics::LinkPtr> myLinks;
+    private: bool joints_created;
   };
 }
 #endif

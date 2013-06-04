@@ -10,114 +10,25 @@
       <uri>model://ground_plane</uri>
     </include>
 
-    <model name="spheres">
-      <link name="link1">
-        <pose>0 1.5 0.5 0 0 0</pose>
-        <collision name="collision">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
-        </visual>
-      </link>
+	<!-- world plugin for creating the sphere models -->
+     	<plugin name="liquid" filename="libTestFactoryLiquid.so">
+		<init_pos>0.3 0.1 1.0</init_pos>
+		<nr_spheres>80</nr_spheres>
+		<mass>0.001</mass>
+		<mu>0.85</mu>			
+		<mu2>0.85</mu2>
+		<slip1>1</slip1>			
+		<slip2>1</slip2>
+		<cfm>0.98</cfm>			
+		<erp>0.98</erp>
+		<kp>1.0</kp>			
+		<kd>1.0</kd>
+		<bounce>0.0</bounce>
+		<inertia>0.000072</inertia>
+	</plugin>
 
-      <link name="link2">
-        <pose>1 1.5 0.5 0 0 0</pose>
-        <collision name="collision">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
-        </visual>
-      </link>
-
-      <link name="link3">
-        <pose>2 1.5 0.5 0 0 0</pose>
-        <collision name="collision">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
-        </visual>
-      </link>
-
-      <link name="link4">
-        <pose>3 1.5 0.5 0 0 0</pose>
-        <collision name="collision">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
-        </visual>
-      </link>
-
-      <link name="link5">
-        <pose>0 1.5 0.5 0 0 0</pose>
-        <collision name="collision">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
-        </visual>
-      </link>
-
-      <plugin name="spheres" filename="libTestPlugin.so"/>
-    </model>
+	<!-- plugin which dynamically creates the joints -->
+        <plugin name="joints" filename="libTestPlugin.so"/>
 
   </world>
 </sdf>
