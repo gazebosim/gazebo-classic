@@ -190,6 +190,10 @@ void Connection::Listen(unsigned int port, const AcceptCallback &_acceptCB)
   this->acceptor->open(endpoint.protocol());
   this->acceptor->set_option(
       boost::asio::ip::tcp::acceptor::reuse_address(true));
+
+  // Enable TCP_NO_DELAY
+  this->acceptor->set_option(boost::asio::ip::tcp::no_delay(true));
+
   this->acceptor->bind(endpoint);
   this->acceptor->listen();
 
