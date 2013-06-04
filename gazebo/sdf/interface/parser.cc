@@ -288,7 +288,7 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
     }
     else
     {
-      gzerr << "parse as old deprecated model file failed.\n";
+      gzerr << "parse as old urdf model file failed.\n";
       return false;
     }
 #endif
@@ -311,12 +311,12 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
     TiXmlDocument doc = u2g.InitModelString(_xmlString);
     if (sdf::readDoc(&doc, _sdf, "urdf string"))
     {
-      gzwarn << "parse from urdf.\n";
+      gzlog << "Parsing from urdf.\n";
       return true;
     }
     else
     {
-      gzerr << "parse as old deprecated model file failed.\n";
+      gzerr << "parse as old urdf model file failed.\n";
       return false;
     }
 #endif
