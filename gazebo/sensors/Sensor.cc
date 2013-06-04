@@ -132,10 +132,14 @@ void Sensor::Update(bool _force)
 {
   if (this->IsActive() || _force)
   {
+    common::Time simTime = this->world->GetSimTime();
+    if (simTime == this->lastUpdateTime)
+      return;
+
     // Adjust time-to-update period to compensate for delays caused by another
     // sensor's update in the same thread.
-    common::Time adjustedElapsed = this->world->GetSimTime() -
-        this->lastUpdateTime + this->updateDelay;
+    common::Time adjustedElapsed = simTime - this->lastUpdateTime +
+        this->updateDelay;
 
     if (adjustedElapsed >= this->updatePeriod || _force)
     {
