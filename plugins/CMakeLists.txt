@@ -31,7 +31,6 @@ set (plugins
   SkidSteerDrivePlugin
   JointTrajectoryPlugin
   VehiclePlugin
-  TestPlugin
   )
 
 foreach (src ${plugins})
