@@ -75,18 +75,30 @@ bool ConnectionManager::Init(const std::string &_masterHost,
       boost::bind(&ConnectionManager::OnAccept, this, _1));
 
   gzmsg << "Waiting for master";
+  uint32_t timeoutCount = 0;
+  uint32_t waitDurationMS = 1000;
+  uint32_t timeoutCountMax = 30;
+
   while (!this->masterConn->Connect(_masterHost, master_port) &&
-         this->IsRunning())
+      this->IsRunning() && timeoutCount < timeoutCountMax)
   {
     if (!common::Console::Instance()->GetQuiet())
     {
       printf(".");
       fflush(stdout);
     }
-    common::Time::MSleep(1000);
+    common::Time::MSleep(waitDurationMS);
+    ++timeoutCount;
   }
   if (!common::Console::Instance()->GetQuiet())
     printf("\n");
+
+  if (timeoutCount >= timeoutCountMax)
+  {
+    gzerr << "Failed to connect to master in "
+          << (timeoutCount * waitDurationMS) / 1000.0 << " seconds.\n";
+    return false;
+  }
 
   if (!this->IsRunning())
   {
