@@ -102,8 +102,8 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   if (!_message.IsInitialized())
   {
     gzerr << "Publishing an uninitialized message on topic[" <<
-        this->topic << "]. Required field [" <<
-        _message.InitializationErrorString() << "] missing.\n";
+      this->topic << "]. Required field [" <<
+      _message.InitializationErrorString() << "] missing.\n";
     return;
   }
 
@@ -116,7 +116,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
     // Skip publication if the time difference is less than the update period.
     if (this->prevPublishTime != common::Time(0, 0) &&
         (this->currentTime - this->prevPublishTime).Double() <
-         this->updatePeriod)
+        this->updatePeriod)
     {
       return;
     }
@@ -143,62 +143,30 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
       if (!queueLimitWarned)
       {
         gzwarn << "Queue limit reached for topic "
-               << this->topic
-               << ", deleting message. "
-               << "This warning is printed only once." << std::endl;
+          << this->topic
+          << ", deleting message. "
+          << "This warning is printed only once." << std::endl;
         queueLimitWarned = true;
       }
     }
   }
 
-  //if (this->HasConnections())
-  {
-    TopicManager::Instance()->AddNodeToProcess(this->node);
+  TopicManager::Instance()->AddNodeToProcess(this->node);
 
-    if (_block)
-    {
-      this->SendMessage();
-    }
-    else
-    {
-      // Tell the connection manager that it needs to update
-      ConnectionManager::Instance()->TriggerUpdate();
-    }
+  if (_block)
+  {
+    this->SendMessage();
+  }
+  else
+  {
+    // Tell the connection manager that it needs to update
+    ConnectionManager::Instance()->TriggerUpdate();
   }
 }
 
 //////////////////////////////////////////////////
 void Publisher::SendMessage()
 {
-/*  std::list<MessagePtr> localBuffer;
-
-  {
-    boost::mutex::scoped_lock lock(this->mutex);
-    if (this->waiting)
-      return;
-
-    std::copy(this->messages.begin(), this->messages.end(),
-        std::back_inserter(localBuffer));
-    this->messages.clear();
-  }
-
-  // Only send messages if there is something to send
-  if (!localBuffer.empty())
-  {
-    // Send all the current messages
-    for (std::list<MessagePtr>::iterator iter = localBuffer.begin();
-        iter != localBuffer.end(); ++iter)
-    {
-      // Send the latest message.
-      this->publication->Publish(*iter,
-          boost::bind(&Publisher::OnPublishComplete, this);
-    }
-
-    // Clear the local buffer.
-    localBuffer.clear();
-  }
-  */
-
   MessagePtr msg;
   {
     boost::mutex::scoped_lock lock(this->mutex);
