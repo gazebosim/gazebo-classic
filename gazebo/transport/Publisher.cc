@@ -151,7 +151,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
     }
   }
 
-  if (this->HasConnections())
+  //if (this->HasConnections())
   {
     TopicManager::Instance()->AddNodeToProcess(this->node);
 
@@ -206,16 +206,16 @@ void Publisher::SendMessage()
     {
       msg = this->messages.front();
       this->waiting = true;
+      this->pubId = (this->nextPubId + 2) % 10000;
+      this->nextPubId = this->pubId;
     }
   }
 
   // Send the latest message.
   if (msg && this->publication)
   {
-    this->pubId = (this->nextPubId + 5 % 1000);
-    this->nextPubId = this->pubId;
     this->publication->Publish(msg,
-        boost::bind(&Publisher::OnPublishComplete, this));
+        boost::bind(&Publisher::OnPublishComplete, this, _1), this->pubId);
   }
 }
 
@@ -245,15 +245,13 @@ std::string Publisher::GetMsgType() const
 }
 
 //////////////////////////////////////////////////
-void Publisher::OnPublishComplete()
+void Publisher::OnPublishComplete(uint32_t _id)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  if (!this->messages.empty() && this->waiting &&
-      this->pubId == this->nextPubId)
+  if (!this->messages.empty() && this->waiting && this->pubId == _id)
   {
     this->messages.pop_front();
     this->waiting = false;
-    this->pubId++;
   }
 }
 

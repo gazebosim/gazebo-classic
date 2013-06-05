@@ -197,14 +197,14 @@ void TopicManager::ProcessNodes(bool _onlyOut)
 
 //////////////////////////////////////////////////
 void TopicManager::Publish(const std::string &_topic, MessagePtr _message,
-    const boost::function<void()> &_cb)
+    boost::function<void(uint32_t)> _cb, uint32_t _id)
 {
   PublicationPtr pub = this->FindPublication(_topic);
 
   if (pub)
-    pub->Publish(_message, _cb);
-  else if (_cb)
-    _cb();
+    pub->Publish(_message, _cb, _id);
+  else if (!_cb.empty())
+    _cb(_id);
 }
 
 //////////////////////////////////////////////////

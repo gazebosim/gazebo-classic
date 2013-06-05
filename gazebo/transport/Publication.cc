@@ -22,7 +22,7 @@
 using namespace gazebo;
 using namespace transport;
 
-void dummy3(){}
+extern void dummy_callback_fn(uint32_t);
 unsigned int Publication::idCounter = 0;
 
 //////////////////////////////////////////////////
@@ -255,7 +255,8 @@ void Publication::LocalPublish(const std::string &_data)
     {
       if ((*cbIter)->IsLocal())
       {
-        if ((*cbIter)->HandleData(_data, boost::bind(&dummy3)))
+        if ((*cbIter)->HandleData(_data,
+              boost::bind(&dummy_callback_fn, _1), 0))
           ++cbIter;
         else
           cbIter = this->callbacks.erase(cbIter);
@@ -267,7 +268,8 @@ void Publication::LocalPublish(const std::string &_data)
 }
 
 //////////////////////////////////////////////////
-void Publication::Publish(MessagePtr _msg, const boost::function<void()> &_cb)
+void Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
+    uint32_t _id)
 {
   std::list<NodePtr>::iterator iter, endIter;
 
@@ -302,15 +304,15 @@ void Publication::Publish(MessagePtr _msg, const boost::function<void()> &_cb)
 
       while (cbIter != this->callbacks.end())
       {
-        if ((*cbIter)->HandleData(data, _cb))
+        if ((*cbIter)->HandleData(data, _cb, _id))
           ++cbIter;
         else
           this->callbacks.erase(cbIter++);
       }
     }
-    else if (_cb)
+    else if (!_cb.empty())
     {
-      _cb();
+      _cb(_id);
     }
   }
 }

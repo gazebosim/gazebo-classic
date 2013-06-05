@@ -220,7 +220,7 @@ void ContactManager::PublishContacts()
   }
 
   msgs::Set(msg.mutable_time(), this->world->GetSimTime());
-  // this->contactPub->Publish(msg);
+  this->contactPub->Publish(msg);
 
   // publish to other custom topics
   boost::unordered_map<std::string, ContactPublisher *>::iterator iter;

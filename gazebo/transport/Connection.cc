@@ -35,6 +35,8 @@
 using namespace gazebo;
 using namespace transport;
 
+extern void dummy_callback_fn(uint32_t);
+
 unsigned int Connection::idCounter = 0;
 IOManager *Connection::iomanager = NULL;
 
@@ -88,7 +90,6 @@ Connection::Connection()
     this->ipWhiteList = "," + this->localAddress + ",127.0.0.1,"
       + whiteListEnv + ",";
   }
-  printf("New connection[%d]\n", this->id);
 }
 
 //////////////////////////////////////////////////
@@ -253,19 +254,14 @@ void Connection::StopRead()
   this->readQuit = true;
 }
 
-void tmp()
-{
-}
-
-void dummy(){}
 void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 {
-  this->EnqueueMsg(_buffer,boost::bind(&dummy), _force);
+  this->EnqueueMsg(_buffer, boost::bind(&dummy_callback_fn, _1), 0, _force);
 }
 
 //////////////////////////////////////////////////
 void Connection::EnqueueMsg(const std::string &_buffer,
-    boost::function<void()> _cb, bool _force)
+    boost::function<void(uint32_t)> _cb, uint32_t _id, bool _force)
 {
   // Don't enqueue empty messages
   if (_buffer.empty())
@@ -285,7 +281,7 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     if (this->writeQueue.size() < limit)
     {
       this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
-      this->callbacks.push_back(_cb);
+      this->callbacks.push_back(std::make_pair(_cb, _id));
       this->dropMsgLogged = false;
     }
     else if (!this->dropMsgLogged)
@@ -294,9 +290,6 @@ void Connection::EnqueueMsg(const std::string &_buffer,
       gzlog << "Connection[" << this->id << "] dropping messages. "
         << "Queue is over " << limit << " in size.\n";
     }
-
-    std::cerr << "ID[" << this->id << "] Size["
-      << this->writeQueue.size() << "]\n";
   }
 
   if (_force)
@@ -354,8 +347,8 @@ void Connection::ProcessWriteQueue(bool _blocking)
     }
 
     // Call the callback, in not NULL
-    if (!this->callbacks.front().empty())
-      this->callbacks.front()();
+    if (!this->callbacks.front().first.empty())
+      this->callbacks.front().first(this->callbacks.front().second);
 
     this->writeQueue.pop_front();
     this->writeCount--;
@@ -379,8 +372,8 @@ void Connection::OnWrite(const boost::system::error_code &_e)
 {
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    if (!this->callbacks.front().empty())
-      this->callbacks.front()();
+    if (!this->callbacks.front().first.empty())
+      this->callbacks.front().first(this->callbacks.front().second);
 
     this->callbacks.pop_front();
     this->writeQueue.pop_front();

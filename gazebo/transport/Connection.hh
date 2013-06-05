@@ -154,8 +154,10 @@ namespace gazebo
       /// to the socket, otherwise just enqueue the data for asynchronous write
       /// \param[in] _cb If non-null, callback to be invoked after
       /// transmission is complete.
+      /// \param[in] _id ID associated with the message data.
       public: void EnqueueMsg(const std::string &_buffer,
-                  boost::function<void()> _cb, bool _force = false);
+                  boost::function<void(uint32_t)> _cb, uint32_t _id,
+                  bool _force = false);
 
       public: void EnqueueMsg(const std::string &_buffer, bool _force = false);
 
@@ -293,8 +295,9 @@ namespace gazebo
               {
                 if (_e)
                 {
-                  gzerr << "Error Reading data["
-                    << _e.message() << "]\n";
+                  // This can occur when the connection is shut down.
+                  // gzerr << "Error Reading data["
+                  //  << _e.message() << "]\n";
                 }
 
                 // Inform caller that data has been received
@@ -390,7 +393,8 @@ namespace gazebo
       /// \brief Outgoing data queue
       private: std::deque<std::string> writeQueue;
 
-      private: std::deque<boost::function<void()> > callbacks;
+      private: std::deque<
+               std::pair<boost::function<void(uint32_t)>, uint32_t> > callbacks;
 
       /// \brief Mutex to protect new connections.
       private: boost::mutex connectMutex;

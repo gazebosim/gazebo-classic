@@ -420,6 +420,13 @@ namespace gazebo
       /// \brief Return true if the Scene has been initialized.
       public: bool GetInitialized() const;
 
+      /// \brief Get the scene simulation time.
+      /// Note this is different from World::GetSimTime() because
+      /// there is a lag between the time new poses are sent out by World
+      /// and when they are received and applied by the Scene.
+      /// \return The current simulation time in Scene
+      public: common::Time GetSimTime() const;
+
       /// \brief Helper function to setup the sky.
       private: void SetSky();
 
@@ -779,12 +786,8 @@ namespace gazebo
       /// scene, we update this time accordingly.
       private: common::Time sceneSimTimePosesApplied;
 
-      /// \brief Get the scene simulation time.
-      /// Note this is different from World::GetSimTime() because
-      /// there is a lag between the time new poses are sent out by World
-      /// and when they are received and applied by the Scene.
-      /// \return The current simulation time in Scene
-      public: common::Time GetSimTime() const;
+      /// \brief True if a scene_info response has been received.
+      private: bool receivedScene;
     };
     /// \}
   }

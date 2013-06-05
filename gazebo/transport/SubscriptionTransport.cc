@@ -20,6 +20,8 @@
 using namespace gazebo;
 using namespace transport;
 
+extern void dummy_callback_fn(uint32_t);
+
 //////////////////////////////////////////////////
 SubscriptionTransport::SubscriptionTransport()
 {
@@ -39,24 +41,22 @@ void SubscriptionTransport::Init(ConnectionPtr _conn, bool _latching)
   this->latching = _latching;
 }
 
-void dummy2(){}
-
 //////////////////////////////////////////////////
 bool SubscriptionTransport::HandleMessage(MessagePtr _newMsg)
 {
   std::string data;
   _newMsg->SerializeToString(&data);
-  return this->HandleData(data, boost::bind(&dummy2));
+  return this->HandleData(data, boost::bind(&dummy_callback_fn, _1), 0);
 }
 
 //////////////////////////////////////////////////
 bool SubscriptionTransport::HandleData(const std::string &_newdata,
-    boost::function<void()> _cb)
+    boost::function<void(uint32_t)> _cb, uint32_t _id)
 {
   bool result = false;
   if (this->connection->IsOpen())
   {
-    this->connection->EnqueueMsg(_newdata, _cb);
+    this->connection->EnqueueMsg(_newdata, _cb, _id);
     result = true;
   }
   else

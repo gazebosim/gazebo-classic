@@ -191,7 +191,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
 
-  this->responsePub = this->node->Advertise<msgs::Response>("~/response", 100);
+  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->statPub =
     this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 100, 5);
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
@@ -1388,6 +1388,7 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "scene_info")
     {
+      printf("World Scene Info\n");
       this->sceneMsg.clear_model();
       this->BuildSceneMsg(this->sceneMsg, this->rootElement);
 

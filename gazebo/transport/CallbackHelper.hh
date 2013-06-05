@@ -58,8 +58,9 @@ namespace gazebo
       /// \return true if successfully processed; false otherwise
       /// \param[in] _cb If non-null, callback to be invoked which signals
       /// that transmission is complete.
+      /// \param[in] _id ID associated with the message data.
       public: virtual bool HandleData(const std::string &_newdata,
-                  boost::function<void()> _cb) = 0;
+                  boost::function<void(uint32_t)> _cb, uint32_t _id) = 0;
 
       /// \brief Process new incoming message
       /// \param[in] _newMsg Incoming message to be processed
@@ -130,13 +131,13 @@ namespace gazebo
 
       // documentation inherited
       public: virtual bool HandleData(const std::string &_newdata,
-                  boost::function<void()> _cb)
+                  boost::function<void(uint32_t)> _cb, uint32_t _id)
               {
                 boost::shared_ptr<M> m(new M);
                 m->ParseFromString(_newdata);
                 this->callback(m);
                 if (!_cb.empty())
-                  _cb();
+                  _cb(_id);
                 return true;
               }
 
@@ -182,11 +183,11 @@ namespace gazebo
 
       // documentation inherited
       public: virtual bool HandleData(const std::string &_newdata,
-                  boost::function<void()> _cb)
+                  boost::function<void(uint32_t)> _cb, uint32_t _id)
               {
                 this->callback(_newdata);
                 if (!_cb.empty())
-                  _cb();
+                  _cb(_id);
                 return true;
               }
 

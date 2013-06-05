@@ -53,8 +53,9 @@ namespace gazebo
       /// \return true if the message was handled successfully, false otherwise
       /// \param[in] _cb If non-null, callback to be invoked after
       /// transmission is complete.
+      /// \param[in] _id ID associated with the message data.
       public: virtual bool HandleData(const std::string &_newdata,
-                  boost::function<void()> _cb);
+                  boost::function<void(uint32_t)> _cb, uint32_t _id);
 
       // Documentation inherited
       public: virtual bool HandleMessage(MessagePtr _newMsg);
