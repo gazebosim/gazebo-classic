@@ -385,22 +385,17 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   // as a workaround to address transport blocking issue when gzclient connects
   // to gzserver, see issue #714. "publisher_advertise", intended
   // for gzserver when gzclient connects, is parallelized and made non-blocking.
-  else if (packet.type() == "publisher_update" ||
-           packet.type() == "publisher_advertise" ||
-           packet.type() == "publisher_subscribe")
+  else if (packet.type() == "publisher_update")
   {
     msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
-      TopicManagerConnectionTask *task = new(tbb::task::allocate_root())
-      TopicManagerConnectionTask(pub);
-      tbb::task::enqueue(*task);
-      //TopicManager::Instance()->ConnectSubToPub(pub);
+      TopicManager::Instance()->ConnectSubToPub(pub);
     }
   }
-  /*else if (packet.type() == "publisher_advertise")
+  else if (packet.type() == "publisher_advertise")
   {
     msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
@@ -424,7 +419,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     {
       TopicManager::Instance()->ConnectSubToPub(pub);
     }
-  }*/
+  }
   else if (packet.type() == "unsubscribe")
   {
     msgs::Subscribe sub;
