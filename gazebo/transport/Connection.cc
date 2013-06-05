@@ -270,7 +270,7 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     return;
   }
 
-  sprintf(this->headerBuffer, "%08x",
+  snprintf(this->headerBuffer, HEADER_LENGTH, "%08x",
       static_cast<unsigned int>(_buffer.size()));
 
   {
