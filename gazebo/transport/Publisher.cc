@@ -242,8 +242,11 @@ std::string Publisher::GetMsgType() const
 void Publisher::OnPublishComplete()
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  this->messages.pop_front();
-  this->waiting = false;
+  if (!this->messages.empty() && this->waiting)
+  {
+    this->messages.pop_front();
+    this->waiting = false;
+  }
 }
 
 //////////////////////////////////////////////////

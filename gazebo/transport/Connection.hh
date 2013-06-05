@@ -457,6 +457,9 @@ namespace gazebo
 
       /// \brief Buffer for header information.
       private: char *headerBuffer;
+
+      /// \brief Used to prevent too many log messages.
+      private: bool dropMsgLogged;
     };
     /// \}
   }

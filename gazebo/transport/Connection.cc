@@ -57,6 +57,7 @@ static bool addressIsLoopback(const boost::asio::ip::address_v4 &_addr)
 //////////////////////////////////////////////////
 Connection::Connection()
 {
+  this->dropMsgLogged = false;
   this->headerBuffer = new char[HEADER_LENGTH];
 
   if (iomanager == NULL)
@@ -279,16 +280,20 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
     // \todo limit could be a configurable parameter.
-    uint32_t limit = 100;
+    uint32_t limit = 1000;
 
     if (this->writeQueue.size() < limit)
     {
       this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
       this->callbacks.push_back(_cb);
+      this->dropMsgLogged = false;
     }
-    else
+    else if (!this->dropMsgLogged)
+    {
+      this->dropMsgLogged = true;
       gzlog << "Connection[" << this->id << "] dropping messages. "
         << "Queue is over " << limit << " in size.\n";
+    }
 
     std::cout << "ID[" << this->id << "] Size["
       << this->writeQueue.size() << "]\n";
