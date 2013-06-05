@@ -1388,7 +1388,6 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "scene_info")
     {
-      printf("World Scene Info\n");
       this->sceneMsg.clear_model();
       this->BuildSceneMsg(this->sceneMsg, this->rootElement);
 
