@@ -280,7 +280,7 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
     // \todo limit could be a configurable parameter.
-    uint32_t limit = 1000;
+    uint32_t limit = 5000;
 
     if (this->writeQueue.size() < limit)
     {
@@ -295,7 +295,7 @@ void Connection::EnqueueMsg(const std::string &_buffer,
         << "Queue is over " << limit << " in size.\n";
     }
 
-    std::cout << "ID[" << this->id << "] Size["
+    std::cerr << "ID[" << this->id << "] Size["
       << this->writeQueue.size() << "]\n";
   }
 

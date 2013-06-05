@@ -47,6 +47,8 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 
   this->queueLimitWarned = false;
   this->waiting = false;
+  this->pubId = 0;
+  this->nextPubId = 0;
 }
 
 //////////////////////////////////////////////////
@@ -209,8 +211,12 @@ void Publisher::SendMessage()
 
   // Send the latest message.
   if (msg && this->publication)
+  {
+    this->pubId = (this->nextPubId + 5 % 1000);
+    this->nextPubId = this->pubId;
     this->publication->Publish(msg,
         boost::bind(&Publisher::OnPublishComplete, this));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -242,10 +248,12 @@ std::string Publisher::GetMsgType() const
 void Publisher::OnPublishComplete()
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  if (!this->messages.empty() && this->waiting)
+  if (!this->messages.empty() && this->waiting &&
+      this->pubId == this->nextPubId)
   {
     this->messages.pop_front();
     this->waiting = false;
+    this->pubId++;
   }
 }
 

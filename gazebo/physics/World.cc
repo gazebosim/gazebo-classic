@@ -1804,7 +1804,7 @@ void World::ProcessMessages()
           msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
         }
       }
-      // this->posePub->Publish(msg);
+      this->posePub->Publish(msg);
     }
     this->publishModelPoses.clear();
   }

@@ -170,6 +170,9 @@ namespace gazebo
       private: common::Time prevPublishTime;
 
       private: bool waiting;
+
+      private: uint32_t pubId;
+      private: uint32_t nextPubId;
     };
     /// \}
   }
