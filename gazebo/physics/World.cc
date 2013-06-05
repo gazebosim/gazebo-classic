@@ -176,7 +176,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->posePub = this->node->Advertise<msgs::PosesStamped>(
     "~/pose/info", 10, 60.0);
 
-  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
+  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
   if (this->sdf->HasElement("gui"))
     this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
 
@@ -191,7 +191,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
 
-  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
+  this->responsePub = this->node->Advertise<msgs::Response>("~/response", 100);
   this->statPub =
     this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 100, 5);
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);

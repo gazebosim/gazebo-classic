@@ -105,9 +105,6 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
     return;
   }
 
-  // if (!this->HasConnections())
-  // return;
-
   // Check if a throttling rate has been set
   if (this->updatePeriod > 0)
   {
@@ -152,26 +149,31 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
     }
   }
 
-  TopicManager::Instance()->AddNodeToProcess(this->node);
+  if (this->HasConnections())
+  {
+    TopicManager::Instance()->AddNodeToProcess(this->node);
 
-  if (_block)
-  {
-    this->SendMessage();
-  }
-  else
-  {
-    // Tell the connection manager that it needs to update
-    ConnectionManager::Instance()->TriggerUpdate();
+    if (_block)
+    {
+      this->SendMessage();
+    }
+    else
+    {
+      // Tell the connection manager that it needs to update
+      ConnectionManager::Instance()->TriggerUpdate();
+    }
   }
 }
 
 //////////////////////////////////////////////////
 void Publisher::SendMessage()
 {
-  /*std::list<MessagePtr> localBuffer;
+/*  std::list<MessagePtr> localBuffer;
 
   {
     boost::mutex::scoped_lock lock(this->mutex);
+    if (this->waiting)
+      return;
 
     std::copy(this->messages.begin(), this->messages.end(),
         std::back_inserter(localBuffer));
@@ -186,8 +188,8 @@ void Publisher::SendMessage()
         iter != localBuffer.end(); ++iter)
     {
       // Send the latest message.
-      TopicManager::Instance()->Publish(this->topic, *iter,
-          boost::bind(&Publisher::OnPublishComplete, this));
+      this->publication->Publish(*iter,
+          boost::bind(&Publisher::OnPublishComplete, this);
     }
 
     // Clear the local buffer.
@@ -240,8 +242,6 @@ std::string Publisher::GetMsgType() const
 void Publisher::OnPublishComplete()
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  printf("On Publish Complete\n");
-  std::cout << "Topic[" << this->topic << "]\n";
   this->messages.pop_front();
   this->waiting = false;
 }

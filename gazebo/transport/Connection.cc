@@ -87,6 +87,7 @@ Connection::Connection()
     this->ipWhiteList = "," + this->localAddress + ",127.0.0.1,"
       + whiteListEnv + ",";
   }
+  printf("New connection[%d]\n", this->id);
 }
 
 //////////////////////////////////////////////////
@@ -277,8 +278,20 @@ void Connection::EnqueueMsg(const std::string &_buffer,
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
-    this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
-    this->callbacks.push_back(_cb);
+    // \todo limit could be a configurable parameter.
+    uint32_t limit = 100;
+
+    if (this->writeQueue.size() < limit)
+    {
+      this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
+      this->callbacks.push_back(_cb);
+    }
+    else
+      gzlog << "Connection[" << this->id << "] dropping messages. "
+        << "Queue is over " << limit << " in size.\n";
+
+    std::cout << "ID[" << this->id << "] Size["
+      << this->writeQueue.size() << "]\n";
   }
 
   if (_force)

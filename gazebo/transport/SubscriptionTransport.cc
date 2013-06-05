@@ -56,9 +56,6 @@ bool SubscriptionTransport::HandleData(const std::string &_newdata,
   bool result = false;
   if (this->connection->IsOpen())
   {
-    if (!_cb.empty())
-      printf("CALLBACK\n");
-
     this->connection->EnqueueMsg(_newdata, _cb);
     result = true;
   }
