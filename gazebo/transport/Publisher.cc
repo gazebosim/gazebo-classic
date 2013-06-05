@@ -73,6 +73,22 @@ void Publisher::WaitForConnection() const
 }
 
 //////////////////////////////////////////////////
+bool Publisher::WaitForConnection(const common::Time &_timeout) const
+{
+  common::Time start = common::Time::GetWallTime();
+  common::Time curr = common::Time::GetWallTime();
+
+  while (!this->HasConnections() &&
+      (_timeout <= 0.0 || curr - start < _timeout))
+  {
+    common::Time::MSleep(100);
+    curr = common::Time::GetWallTime();
+  }
+
+  return this->HasConnections();
+}
+
+//////////////////////////////////////////////////
 void Publisher::PublishImpl(const google::protobuf::Message &_message,
                             bool _block)
 {
