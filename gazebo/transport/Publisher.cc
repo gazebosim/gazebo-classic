@@ -48,7 +48,6 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
   this->queueLimitWarned = false;
   this->waiting = false;
   this->pubId = 0;
-  this->nextPubId = 0;
 }
 
 //////////////////////////////////////////////////
@@ -174,8 +173,7 @@ void Publisher::SendMessage()
     {
       msg = this->messages.front();
       this->waiting = true;
-      this->pubId = (this->nextPubId + 2) % 10000;
-      this->nextPubId = this->pubId;
+      this->pubId = (this->pubId + 1) % 10000;
     }
   }
 

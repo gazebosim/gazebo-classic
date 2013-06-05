@@ -159,8 +159,11 @@ namespace gazebo
                   boost::function<void(uint32_t)> _cb, uint32_t _id,
                   bool _force = false);
 
+      /// \brief Write data to the socket
+      /// \param[in] _buffer Data to write
+      /// \param[in] _force If true, block until the data has been written
+      /// to the socket, otherwise just enqueue the data for asynchronous write
       public: void EnqueueMsg(const std::string &_buffer, bool _force = false);
-
 
       /// \brief Get the local URI
       /// \return The local URI
@@ -393,6 +396,8 @@ namespace gazebo
       /// \brief Outgoing data queue
       private: std::deque<std::string> writeQueue;
 
+      /// \brief List of callbacks, paired with writeQueue. The callbacks
+      /// are used to notify a publisher when a message is successfully sent.
       private: std::deque<
                std::pair<boost::function<void(uint32_t)>, uint32_t> > callbacks;
 

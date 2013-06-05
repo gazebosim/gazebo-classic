@@ -170,10 +170,11 @@ namespace gazebo
       private: common::Time currentTime;
       private: common::Time prevPublishTime;
 
+      /// \brief True if waiting to here back about a sent message.
       private: bool waiting;
 
+      /// \brief Current id of the sent message.
       private: uint32_t pubId;
-      private: uint32_t nextPubId;
     };
     /// \}
   }
