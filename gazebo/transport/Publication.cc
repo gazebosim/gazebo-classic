@@ -22,6 +22,7 @@
 using namespace gazebo;
 using namespace transport;
 
+void dummy3(){}
 unsigned int Publication::idCounter = 0;
 
 //////////////////////////////////////////////////
@@ -223,7 +224,7 @@ void Publication::RemoveSubscription(const std::string &_host,
 }
 
 //////////////////////////////////////////////////
-void Publication::LocalPublish(const std::string &data)
+void Publication::LocalPublish(const std::string &_data)
 {
   std::list<NodePtr>::iterator iter, endIter;
 
@@ -234,7 +235,7 @@ void Publication::LocalPublish(const std::string &data)
     endIter = this->nodes.end();
     while (iter != endIter)
     {
-      if ((*iter)->HandleData(this->topic, data))
+      if ((*iter)->HandleData(this->topic, _data))
         ++iter;
       else
         this->nodes.erase(iter++);
@@ -254,7 +255,7 @@ void Publication::LocalPublish(const std::string &data)
     {
       if ((*cbIter)->IsLocal())
       {
-        if ((*cbIter)->HandleData(data))
+        if ((*cbIter)->HandleData(_data, boost::bind(&dummy3)))
           ++cbIter;
         else
           cbIter = this->callbacks.erase(cbIter);
@@ -298,13 +299,13 @@ void Publication::Publish(MessagePtr _msg, const boost::function<void()> &_cb)
       _msg->SerializeToString(&data);
       std::list<CallbackHelperPtr>::iterator cbIter;
       cbIter = this->callbacks.begin();
-      if (cbIter != this->callbacks.end())
-        (*cbIter)->HandleData(data, _cb);
-      cbIter++;
+      //if (cbIter != this->callbacks.end())
+      //  (*cbIter)->HandleData(data, _cb);
+      //cbIter++;
 
       while (cbIter != this->callbacks.end())
       {
-        if ((*cbIter)->HandleData(data))
+        if ((*cbIter)->HandleData(data, _cb))
           ++cbIter;
         else
           this->callbacks.erase(cbIter++);

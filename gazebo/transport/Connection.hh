@@ -154,8 +154,11 @@ namespace gazebo
       /// to the socket, otherwise just enqueue the data for asynchronous write
       /// \param[in] _cb If non-null, callback to be invoked after
       /// transmission is complete.
-      public: void EnqueueMsg(const std::string &_buffer, bool _force = false,
-                  const boost::function<void()> &_cb = NULL);
+      public: void EnqueueMsg(const std::string &_buffer,
+                  boost::function<void()> _cb, bool _force = false);
+
+      public: void EnqueueMsg(const std::string &_buffer, bool _force = false);
+
 
       /// \brief Get the local URI
       /// \return The local URI
@@ -385,8 +388,9 @@ namespace gazebo
       private: boost::asio::ip::tcp::acceptor *acceptor;
 
       /// \brief Outgoing data queue
-      private: std::deque<std::pair<std::string,
-               const boost::function<void()> &> > writeQueue;
+      private: std::deque<std::string> writeQueue;
+
+      private: std::deque<boost::function<void()> > callbacks;
 
       /// \brief Mutex to protect new connections.
       private: boost::mutex connectMutex;

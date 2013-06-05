@@ -54,7 +54,7 @@ namespace gazebo
       /// \param[in] _cb If non-null, callback to be invoked after
       /// transmission is complete.
       public: virtual bool HandleData(const std::string &_newdata,
-                  const boost::function<void()> &_cb = NULL);
+                  boost::function<void()> _cb);
 
       // Documentation inherited
       public: virtual bool HandleMessage(MessagePtr _newMsg);

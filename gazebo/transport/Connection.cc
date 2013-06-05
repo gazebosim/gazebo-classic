@@ -255,9 +255,15 @@ void tmp()
 {
 }
 
+void dummy(){}
+void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
+{
+  this->EnqueueMsg(_buffer,boost::bind(&dummy), _force);
+}
+
 //////////////////////////////////////////////////
-void Connection::EnqueueMsg(const std::string &_buffer, bool _force,
-    const boost::function<void()> &_cb)
+void Connection::EnqueueMsg(const std::string &_buffer,
+    boost::function<void()> _cb, bool _force)
 {
   // Don't enqueue empty messages
   if (_buffer.empty())
@@ -271,8 +277,8 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force,
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
-    this->writeQueue.push_back(
-        std::make_pair(std::string(headerBuffer) + _buffer, _cb));
+    this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
+    this->callbacks.push_back(_cb);
   }
 
   if (_force)
@@ -310,10 +316,9 @@ void Connection::ProcessWriteQueue(bool _blocking)
   // a single write operation
   if (!_blocking)
   {
-    printf("Sending\n");
     boost::asio::async_write(*this->socket,
-        boost::asio::buffer(this->writeQueue.front().first.c_str(),
-          this->writeQueue.front().first.size()),
+        boost::asio::buffer(this->writeQueue.front().c_str(),
+          this->writeQueue.front().size()),
           boost::bind(&Connection::OnWrite, shared_from_this(),
             boost::asio::placeholders::error));
   }
@@ -322,8 +327,8 @@ void Connection::ProcessWriteQueue(bool _blocking)
     try
     {
       boost::asio::write(*this->socket,
-          boost::asio::buffer(this->writeQueue.front().first.c_str(),
-            this->writeQueue.front().first.size()));
+          boost::asio::buffer(this->writeQueue.front().c_str(),
+            this->writeQueue.front().size()));
     }
     catch(...)
     {
@@ -331,8 +336,9 @@ void Connection::ProcessWriteQueue(bool _blocking)
     }
 
     // Call the callback, in not NULL
-    if (this->writeQueue.front().second)
-      this->writeQueue.front().second();
+    if (!this->callbacks.front().empty())
+      this->callbacks.front()();
+
     this->writeQueue.pop_front();
     this->writeCount--;
   }
@@ -355,12 +361,10 @@ void Connection::OnWrite(const boost::system::error_code &_e)
 {
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    if (this->writeQueue.front().second)
-    {
-      printf("HERE\n");
-      this->writeQueue.front().second();
-    }
+    if (!this->callbacks.front().empty())
+      this->callbacks.front()();
 
+    this->callbacks.pop_front();
     this->writeQueue.pop_front();
     this->writeCount--;
   }

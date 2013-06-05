@@ -39,21 +39,26 @@ void SubscriptionTransport::Init(ConnectionPtr _conn, bool _latching)
   this->latching = _latching;
 }
 
+void dummy2(){}
+
 //////////////////////////////////////////////////
 bool SubscriptionTransport::HandleMessage(MessagePtr _newMsg)
 {
   std::string data;
   _newMsg->SerializeToString(&data);
-  return this->HandleData(data);
+  return this->HandleData(data, boost::bind(&dummy2));
 }
 
 //////////////////////////////////////////////////
 bool SubscriptionTransport::HandleData(const std::string &_newdata,
-    const boost::function<void()> &_cb )
+    boost::function<void()> _cb)
 {
   bool result = false;
   if (this->connection->IsOpen())
   {
+    if (!_cb.empty())
+      printf("CALLBACK\n");
+
     this->connection->EnqueueMsg(_newdata, _cb);
     result = true;
   }

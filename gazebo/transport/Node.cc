@@ -24,6 +24,8 @@ using namespace transport;
 
 unsigned int Node::idCounter = 0;
 
+void dummy1(){}
+
 /////////////////////////////////////////////////
 Node::Node()
 {
@@ -197,7 +199,7 @@ void Node::ProcessIncoming()
           for (liter = cbIter->second.begin();
               liter != cbIter->second.end(); ++liter)
           {
-            (*liter)->HandleData(*msgIter);
+            (*liter)->HandleData(*msgIter, boost::bind(&dummy1));
           }
         }
       }
@@ -257,7 +259,7 @@ void Node::InsertLatchedMsg(const std::string &_topic, const std::string &_msg)
          liter != cbIter->second.end(); ++liter)
     {
       if ((*liter)->GetLatching())
-        (*liter)->HandleData(_msg);
+        (*liter)->HandleData(_msg, boost::bind(&dummy1));
     }
   }
 }
