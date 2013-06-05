@@ -33,6 +33,7 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 {
   this->queueLimitWarned = false;
   this->updatePeriod = 0;
+  this->waiting = false;
 }
 
 //////////////////////////////////////////////////
@@ -45,6 +46,7 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
     this->updatePeriod = 1.0 / _hzRate;
 
   this->queueLimitWarned = false;
+  this->waiting = false;
 }
 
 //////////////////////////////////////////////////
@@ -166,7 +168,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
 //////////////////////////////////////////////////
 void Publisher::SendMessage()
 {
-  std::list<MessagePtr> localBuffer;
+  /*std::list<MessagePtr> localBuffer;
 
   {
     boost::mutex::scoped_lock lock(this->mutex);
@@ -191,6 +193,22 @@ void Publisher::SendMessage()
     // Clear the local buffer.
     localBuffer.clear();
   }
+  */
+
+  MessagePtr msg;
+  {
+    boost::mutex::scoped_lock lock(this->mutex);
+    if (!this->messages.empty() && !this->waiting)
+    {
+      msg = this->messages.front();
+      this->waiting = true;
+    }
+  }
+
+  // Send the latest message.
+  if (msg && this->publication)
+    this->publication->Publish(msg,
+        boost::bind(&Publisher::OnPublishComplete, this));
 }
 
 //////////////////////////////////////////////////
@@ -221,6 +239,11 @@ std::string Publisher::GetMsgType() const
 //////////////////////////////////////////////////
 void Publisher::OnPublishComplete()
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+  printf("On Publish Complete\n");
+  std::cout << "Topic[" << this->topic << "]\n";
+  this->messages.pop_front();
+  this->waiting = false;
 }
 
 //////////////////////////////////////////////////

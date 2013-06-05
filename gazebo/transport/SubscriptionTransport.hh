@@ -46,12 +46,15 @@ namespace gazebo
       /// \param[in] _conn The connection to use
       /// \param[in] _latching If true, latch the latest message; if false,
       /// don't latch
-      public: void Init(const ConnectionPtr &_conn, bool _latching);
+      public: void Init(ConnectionPtr _conn, bool _latching);
 
       /// \brief Output a message to a connection
       /// \param[in] _newdata The message to be handled
       /// \return true if the message was handled successfully, false otherwise
-      public: virtual bool HandleData(const std::string &_newdata);
+      /// \param[in] _cb If non-null, callback to be invoked after
+      /// transmission is complete.
+      public: virtual bool HandleData(const std::string &_newdata,
+                  const boost::function<void()> &_cb = NULL);
 
       // Documentation inherited
       public: virtual bool HandleMessage(MessagePtr _newMsg);

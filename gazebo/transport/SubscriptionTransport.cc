@@ -29,10 +29,11 @@ SubscriptionTransport::SubscriptionTransport()
 SubscriptionTransport::~SubscriptionTransport()
 {
   ConnectionManager::Instance()->RemoveConnection(this->connection);
+  this->connection.reset();
 }
 
 //////////////////////////////////////////////////
-void SubscriptionTransport::Init(const ConnectionPtr &_conn, bool _latching)
+void SubscriptionTransport::Init(ConnectionPtr _conn, bool _latching)
 {
   this->connection = _conn;
   this->latching = _latching;
@@ -47,12 +48,13 @@ bool SubscriptionTransport::HandleMessage(MessagePtr _newMsg)
 }
 
 //////////////////////////////////////////////////
-bool SubscriptionTransport::HandleData(const std::string &_newdata)
+bool SubscriptionTransport::HandleData(const std::string &_newdata,
+    const boost::function<void()> &_cb )
 {
   bool result = false;
   if (this->connection->IsOpen())
   {
-    this->connection->EnqueueMsg(_newdata);
+    this->connection->EnqueueMsg(_newdata, _cb);
     result = true;
   }
   else

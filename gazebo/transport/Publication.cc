@@ -298,6 +298,9 @@ void Publication::Publish(MessagePtr _msg, const boost::function<void()> &_cb)
       _msg->SerializeToString(&data);
       std::list<CallbackHelperPtr>::iterator cbIter;
       cbIter = this->callbacks.begin();
+      if (cbIter != this->callbacks.end())
+        (*cbIter)->HandleData(data, _cb);
+      cbIter++;
 
       while (cbIter != this->callbacks.end())
       {
@@ -307,10 +310,11 @@ void Publication::Publish(MessagePtr _msg, const boost::function<void()> &_cb)
           this->callbacks.erase(cbIter++);
       }
     }
+    else if (_cb)
+    {
+      _cb();
+    }
   }
-
-  if (_cb)
-    (_cb)();
 }
 
 //////////////////////////////////////////////////

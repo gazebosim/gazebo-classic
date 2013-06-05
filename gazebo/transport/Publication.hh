@@ -145,7 +145,7 @@ namespace gazebo
       /// \brief Type of message produced through the publication
       private: std::string msgType;
 
-      /// \brief Remove nodes that receieve messages.
+      /// \brief Remote nodes that receieve messages.
       private: std::list<CallbackHelperPtr> callbacks;
 
       /// \brief Local nodes that recieve messages.

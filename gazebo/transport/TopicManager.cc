@@ -203,6 +203,8 @@ void TopicManager::Publish(const std::string &_topic, MessagePtr _message,
 
   if (pub)
     pub->Publish(_message, _cb);
+  else if (_cb)
+    _cb();
 }
 
 //////////////////////////////////////////////////

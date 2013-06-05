@@ -251,8 +251,13 @@ void Connection::StopRead()
   this->readQuit = true;
 }
 
+void tmp()
+{
+}
+
 //////////////////////////////////////////////////
-void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
+void Connection::EnqueueMsg(const std::string &_buffer, bool _force,
+    const boost::function<void()> &_cb)
 {
   // Don't enqueue empty messages
   if (_buffer.empty())
@@ -265,7 +270,9 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
+
+    this->writeQueue.push_back(
+        std::make_pair(std::string(headerBuffer) + _buffer, _cb));
   }
 
   if (_force)
@@ -303,9 +310,10 @@ void Connection::ProcessWriteQueue(bool _blocking)
   // a single write operation
   if (!_blocking)
   {
+    printf("Sending\n");
     boost::asio::async_write(*this->socket,
-        boost::asio::buffer(this->writeQueue.front(),
-          this->writeQueue.front().size()),
+        boost::asio::buffer(this->writeQueue.front().first.c_str(),
+          this->writeQueue.front().first.size()),
           boost::bind(&Connection::OnWrite, shared_from_this(),
             boost::asio::placeholders::error));
   }
@@ -314,14 +322,17 @@ void Connection::ProcessWriteQueue(bool _blocking)
     try
     {
       boost::asio::write(*this->socket,
-          boost::asio::buffer(this->writeQueue.front(),
-            this->writeQueue.front().size()));
+          boost::asio::buffer(this->writeQueue.front().first.c_str(),
+            this->writeQueue.front().first.size()));
     }
     catch(...)
     {
       this->Shutdown();
     }
 
+    // Call the callback, in not NULL
+    if (this->writeQueue.front().second)
+      this->writeQueue.front().second();
     this->writeQueue.pop_front();
     this->writeCount--;
   }
@@ -344,6 +355,12 @@ void Connection::OnWrite(const boost::system::error_code &_e)
 {
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
+    if (this->writeQueue.front().second)
+    {
+      printf("HERE\n");
+      this->writeQueue.front().second();
+    }
+
     this->writeQueue.pop_front();
     this->writeCount--;
   }

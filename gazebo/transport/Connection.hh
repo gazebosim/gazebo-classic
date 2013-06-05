@@ -152,7 +152,10 @@ namespace gazebo
       /// \param[in] _buffer Data to write
       /// \param[in] _force If true, block until the data has been written
       /// to the socket, otherwise just enqueue the data for asynchronous write
-      public: void EnqueueMsg(const std::string &_buffer, bool _force = false);
+      /// \param[in] _cb If non-null, callback to be invoked after
+      /// transmission is complete.
+      public: void EnqueueMsg(const std::string &_buffer, bool _force = false,
+                  const boost::function<void()> &_cb = NULL);
 
       /// \brief Get the local URI
       /// \return The local URI
@@ -382,7 +385,8 @@ namespace gazebo
       private: boost::asio::ip::tcp::acceptor *acceptor;
 
       /// \brief Outgoing data queue
-      private: std::deque<std::string> writeQueue;
+      private: std::deque<std::pair<std::string,
+               const boost::function<void()> &> > writeQueue;
 
       /// \brief Mutex to protect new connections.
       private: boost::mutex connectMutex;

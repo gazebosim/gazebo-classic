@@ -1804,7 +1804,7 @@ void World::ProcessMessages()
           msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
         }
       }
-      this->posePub->Publish(msg);
+      // this->posePub->Publish(msg);
     }
     this->publishModelPoses.clear();
   }
@@ -1829,7 +1829,8 @@ void World::PublishWorldStats()
   this->worldStatsMsg.set_iterations(this->iterations);
   this->worldStatsMsg.set_paused(this->IsPaused());
 
-  this->statPub->Publish(this->worldStatsMsg);
+  if (this->statPub && this->statPub->HasConnections())
+    this->statPub->Publish(this->worldStatsMsg);
   this->prevStatTime = common::Time::GetWallTime();
 }
 

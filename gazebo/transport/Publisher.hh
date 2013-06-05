@@ -168,6 +168,8 @@ namespace gazebo
 
       private: common::Time currentTime;
       private: common::Time prevPublishTime;
+
+      private: bool waiting;
     };
     /// \}
   }
