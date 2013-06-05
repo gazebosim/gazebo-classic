@@ -81,7 +81,6 @@ struct VisualMessageLess {
 //////////////////////////////////////////////////
 Scene::Scene(const std::string &_name, bool _enableVisualizations)
 {
-  this->receivedScene = false;
   this->initialized = false;
   this->showCOMs = false;
   this->showCollisions = false;
@@ -1444,9 +1443,6 @@ void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 //////////////////////////////////////////////////
 void Scene::PreRender()
 {
-  // if (!this->receivedScene)
-  //  return;
-
   /* Deferred shading debug code. Delete me soon (July 17, 2012)
   static bool first = true;
 
@@ -1873,14 +1869,11 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
-  printf("OnResponse\n");
-
   msgs::Scene sceneMsg;
   sceneMsg.ParseFromString(_msg->serialized_data());
   boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
   this->sceneMsgs.push_back(sm);
   this->requestMsg = NULL;
-  this->receivedScene = true;
 }
 
 /////////////////////////////////////////////////

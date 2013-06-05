@@ -785,9 +785,6 @@ namespace gazebo
       /// \brief SimTime of this Scene, after applying PosesStamped to
       /// scene, we update this time accordingly.
       private: common::Time sceneSimTimePosesApplied;
-
-      /// \brief True if a scene_info response has been received.
-      private: bool receivedScene;
     };
     /// \}
   }
