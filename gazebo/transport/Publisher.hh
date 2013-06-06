@@ -64,6 +64,13 @@ namespace gazebo
       ///        publisher
       public: void WaitForConnection() const;
 
+      /// \brief Block until a connection has been established with this
+      ///        publisher
+      /// \param[in] _timeout Maxiumum time to wait. Use a negative time
+      /// value to wait forever.
+      /// \return True if a connection was established.
+      public: bool WaitForConnection(const common::Time &_timeout) const;
+
       /// \brief DEPRECATED in version 1.6
       /// \sa SetPublication
       public: void SetPublication(PublicationPtr &_publication, int _i)

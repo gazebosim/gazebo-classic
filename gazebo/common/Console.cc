@@ -72,6 +72,12 @@ void Console::SetQuiet(bool _quiet)
 }
 
 //////////////////////////////////////////////////
+bool Console::GetQuiet() const
+{
+  return this->quiet;
+}
+
+//////////////////////////////////////////////////
 std::ostream &Console::ColorMsg(const std::string &_lbl, int _color)
 {
   if (this->quiet)

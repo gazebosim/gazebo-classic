@@ -76,9 +76,6 @@ void Projector::Load(const std::string &_name,
     // set the projector pose relative to body
     this->projector.SetPose(_pose);
 
-    // Add the projector as an Ogre frame listener
-    Ogre::Root::getSingletonPtr()->addFrameListener(&this->projector);
-
     if (!this->projector.initialized)
     {
       gzwarn << "starting projector failed, retrying in 1 sec.\n";
@@ -86,6 +83,9 @@ void Projector::Load(const std::string &_name,
       ++retryCount;
     }
   }
+
+  // Add the projector as an Ogre frame listener
+  Ogre::Root::getSingletonPtr()->addFrameListener(&this->projector);
 
   this->projector.SetEnabled(true);
 
@@ -219,6 +219,8 @@ Projector::ProjectorFrameListener::~ProjectorFrameListener()
 
   delete this->frustum;
   delete this->filterFrustum;
+  this->frustum = NULL;
+  this->filterFrustum = NULL;
 
   if (this->projectorQuery)
     this->sceneMgr->destroyQuery(this->projectorQuery);
@@ -400,7 +402,7 @@ void Projector::ProjectorFrameListener::AddPassToVisibleMaterials()
   Ogre::SceneQueryResultMovableList::iterator it;
   for (it = result.movables.begin(); it != result.movables.end(); ++it)
   {
-    Ogre::Entity* entity = dynamic_cast<Ogre::Entity*>(*it);
+    Ogre::Entity *entity = dynamic_cast<Ogre::Entity*>(*it);
     if (entity && entity->getName().find("visual") != std::string::npos)
     {
       for (unsigned int i = 0; i < entity->getNumSubEntities(); i++)

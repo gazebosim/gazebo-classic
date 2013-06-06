@@ -31,38 +31,12 @@
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Base64.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
 
 using namespace gazebo;
 using namespace util;
-
-/////////////////////////////////////////////////
-// Convert a Base64 string.
-// We have to use our own function, instead of just using the
-// boost::archive iterators, because the boost::archive iterators throw an
-// error when the end of the Base64 string is reached. The expection then
-// causes nothing to happen.
-// TLDR; Boost is broken.
-void base64_decode(std::string &_dest, const std::string &_src)
-{
-  typedef boost::archive::iterators::transform_width<
-    boost::archive::iterators::binary_from_base64<const char*>, 8, 6>
-    base64_dec;
-
-  try
-  {
-    base64_dec srcIter(_src.c_str());
-    for (unsigned int i = 0; i < _src.size(); ++i)
-    {
-      _dest += *srcIter;
-      ++srcIter;
-    }
-  }
-  catch(boost::archive::iterators::dataflow_exception &)
-  {
-  }
-}
 
 /////////////////////////////////////////////////
 LogPlay::LogPlay()
@@ -269,7 +243,7 @@ bool LogPlay::GetChunkData(TiXmlElement *_xml, std::string &_data)
     std::string buffer;
 
     // Decode the base64 string
-    base64_decode(buffer, data);
+    buffer = Base64Decode(data);
 
     // Decompress the bz2 data
     {
@@ -288,7 +262,7 @@ bool LogPlay::GetChunkData(TiXmlElement *_xml, std::string &_data)
     std::string buffer;
 
     // Decode the base64 string
-    base64_decode(buffer, data);
+    buffer = Base64Decode(data);
 
     // Decompress the zlib data
     {
