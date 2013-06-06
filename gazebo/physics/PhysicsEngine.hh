@@ -122,10 +122,14 @@ namespace gazebo
 
       /// \brief Set max step size.
       /// \param[in] _stepSize Max step size.
-      public: void SetMaxStepSize(double _stepSize);
+      public: virtual void SetMaxStepSize(double _stepSize);
 
       /// \brief Update the physics engine.
       public: virtual void UpdatePhysics() {}
+
+      /// \brief Create a new model.
+      /// \param[in]
+      public: virtual ModelPtr CreateModel(BasePtr _base);
 
       /// \brief Create a new body.
       /// \param[in] _parent Parent model for the link.

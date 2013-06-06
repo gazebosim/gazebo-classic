@@ -25,6 +25,7 @@
 #include <boost/thread.hpp>
 #include <string>
 #include <list>
+#include <gazebo/common/Time.hh>
 
 #include "transport/TransportTypes.hh"
 

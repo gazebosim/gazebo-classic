@@ -32,6 +32,10 @@ void RegisterODEPhysics();
   void RegisterBulletPhysics();
 #endif
 
+#ifdef HAVE_DART
+  void RegisterDARTPhysics();
+#endif
+
 using namespace gazebo;
 using namespace physics;
 
@@ -45,6 +49,10 @@ void PhysicsFactory::RegisterAll()
 
 #ifdef HAVE_BULLET
   RegisterBulletPhysics();
+#endif
+
+#ifdef HAVE_DART
+  RegisterDARTPhysics();
 #endif
 }
 
