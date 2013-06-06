@@ -471,6 +471,9 @@ void Connection::Close()
     delete this->acceptor;
     this->acceptor = NULL;
   }
+
+  this->writeQueue.clear();
+  this->callbacks.clear();
 }
 
 //////////////////////////////////////////////////

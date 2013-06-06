@@ -309,6 +309,9 @@ void Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
         else
           this->callbacks.erase(cbIter++);
       }
+
+      if (this->callbacks.empty() && !_cb.empty())
+        _cb(_id);
     }
     else if (!_cb.empty())
     {
