@@ -53,6 +53,15 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
   if (this->dartPhysics == NULL)
     gzthrow("Not using the dart physics engine");
 
+  if (this->dartBodyNode != NULL)
+  {
+    delete this->dartBodyNode;
+    this->dartBodyNode = NULL;
+  }
+
+  // Create dart's body node associated with gazebo's link.
+  this->dartBodyNode = new dart::dynamics::BodyNode;
+
   Link::Load(_sdf);
 }
 
@@ -61,9 +70,6 @@ void DARTLink::Init()
 {
   //----------------------------------------------------------------------------
   Link::Init();
-
-  // Create dart's body node associated with gazebo's link.
-  this->dartBodyNode = new dart::dynamics::BodyNode;
 
   // Name
   std::string bodyName = this->GetName();
@@ -286,7 +292,7 @@ bool DARTLink::GetGravityMode() const
 {
   int mode = 0;
 
-  this->dartBodyNode->getGravityMode();
+  mode = this->dartBodyNode->getGravityMode();
 
   return mode;
 }

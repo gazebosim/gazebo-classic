@@ -125,25 +125,25 @@ void DARTCollision::SetCollision(bool _placeable)
 {
   Collision::SetCollision(_placeable);
 
-  gzwarn << "Not implemented!\n";
+  // Nothing to do in dart.
 }
 
 //////////////////////////////////////////////////
 void DARTCollision::OnPoseChange()
 {
-    gzwarn << "Not implemented!\n";
+  // Nothing to do in dart.
 }
 
 //////////////////////////////////////////////////
 void DARTCollision::SetCategoryBits(unsigned int /*_bits*/)
 {
-  gzwarn << "Not implemented!\n";
+  // Nothing to do in dart.
 }
 
 //////////////////////////////////////////////////
 void DARTCollision::SetCollideBits(unsigned int /*_bits*/)
 {
-    gzwarn << "Not implemented!\n";
+  // Nothing to do in dart.
 }
 
 //////////////////////////////////////////////////
