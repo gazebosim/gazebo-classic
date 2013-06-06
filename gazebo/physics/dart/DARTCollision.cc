@@ -62,8 +62,8 @@ void DARTCollision::Init()
   {
     double radius = geometryElem->GetFirstElement()->GetValueDouble("radius");
     Eigen::Vector3d eigenSize(radius*2, radius*2, radius*2);
-    kinematics::ShapeEllipsoid* dartShape
-        = new kinematics::ShapeEllipsoid(eigenSize);
+    dart::dynamics::ShapeEllipsoid* dartShape
+        = new dart::dynamics::ShapeEllipsoid(eigenSize);
     dartBodyNode->setCollisionShape(dartShape);
   }
   else if (geomType == "plane")
@@ -75,8 +75,8 @@ void DARTCollision::Init()
         = geometryElem->GetFirstElement()->GetValueVector2d("size");
 //    Eigen::Vector3d eigenSize(size.x, size.y, 0.001);
     Eigen::Vector3d eigenSize(2100, 2100, 0.001);
-    kinematics::ShapeBox* dartShape
-        = new kinematics::ShapeBox(eigenSize);
+    dart::dynamics::ShapeBox* dartShape
+        = new dart::dynamics::ShapeBox(eigenSize);
     dartBodyNode->setCollisionShape(dartShape);
   }
 
@@ -85,8 +85,8 @@ void DARTCollision::Init()
     math::Vector3 mathSize
         = geometryElem->GetFirstElement()->GetValueVector3("size");
     Eigen::Vector3d eigenSize(mathSize.x, mathSize.y, mathSize.z);
-    kinematics::ShapeBox* dartShape
-        = new kinematics::ShapeBox(eigenSize);
+    dart::dynamics::ShapeBox* dartShape
+        = new dart::dynamics::ShapeBox(eigenSize);
     dartBodyNode->setCollisionShape(dartShape);
   }
   else if (geomType == "cylinder")
@@ -94,8 +94,8 @@ void DARTCollision::Init()
     double radius = geometryElem->GetFirstElement()->GetValueDouble("radius");
     double length = geometryElem->GetFirstElement()->GetValueDouble("length");
     Eigen::Vector3d eigenSize(radius, length, 0.0);
-    kinematics::ShapeCylinder* dartShape
-            = new kinematics::ShapeCylinder(radius, length);
+    dart::dynamics::ShapeCylinder* dartShape
+            = new dart::dynamics::ShapeCylinder(radius, length);
 //    kinematics::ShapeCylinder* dartShape
 //        = new kinematics::ShapeCylinder(eigenSize);
     dartBodyNode->setCollisionShape(dartShape);

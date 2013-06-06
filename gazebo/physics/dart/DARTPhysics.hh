@@ -110,10 +110,10 @@ namespace gazebo
       void virtual SetMaxStepSize(double _stepSize);
 
       /// \brief
-      public: simulation::World* GetDARTWorld() {return dartWorld;}
+      public: dart::simulation::World* GetDARTWorld() {return dartWorld;}
 
       /// \brief 
-      private: simulation::World* dartWorld;
+      private: dart::simulation::World* dartWorld;
       
     };
 

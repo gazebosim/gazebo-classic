@@ -24,9 +24,6 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/dart/DARTSliderJoint.hh"
 
-#include "dart/kinematics/Dof.h"
-#include "dart/kinematics/Joint.h"
-
 using namespace gazebo;
 using namespace physics;
 
@@ -92,38 +89,39 @@ void DARTSliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
    if (this->parentLink)
      this->parentLink->SetEnabled(true);
 
-  // Slider joint has only one degree of freedom.
-  // _axis must have a value of (1, 0, 0), (0, 1, 0), and (0, 0, 1)
-  if (_axis == math::Vector3(1, 0, 0))
-  {
-    // When dart's 'Joint' is destroied, it deletes all 'Transform's.
-    // When 'Transform' is destroied, it deletes all 'Dof's.
-    kinematics::Dof* dofs = new kinematics::Dof;
-    kinematics::TrfmTranslateX* trans = new kinematics::TrfmTranslateX(dofs);
-    this->dartJoint->addTransform(trans);
-  }
-  else if (_axis == math::Vector3(1, 0, 0))
-  {
-    // When dart's 'Joint' is destroied, it deletes all 'Transform's.
-    // When 'Transform' is destroied, it deletes all 'Dof's.
-    kinematics::Dof* dofs = new kinematics::Dof;
-    kinematics::TrfmTranslateY* trans = new kinematics::TrfmTranslateY(dofs);
-    this->dartJoint->addTransform(trans);
-  }
-  else if (_axis == math::Vector3(1, 0, 0))
-  {
-    // When dart's 'Joint' is destroied, it deletes all 'Transform's.
-    // When 'Transform' is destroied, it deletes all 'Dof's.
-    kinematics::Dof* dofs = new kinematics::Dof;
-    kinematics::TrfmTranslateZ* trans = new kinematics::TrfmTranslateZ(dofs);
-    this->dartJoint->addTransform(trans);
-  }
-  else
-  {
-    // We assume that the axis has the value among these:
-    // (1, 0, 0), (0, 1, 0), (0, 0, 1)
-    gzthrow("Axis must be one of these: (1, 0, 0), (0, 1, 0), (0, 0, 1)\n");
-  }
+//  // Slider joint has only one degree of freedom.
+//  // _axis must have a value of (1, 0, 0), (0, 1, 0), and (0, 0, 1)
+//  if (_axis == math::Vector3(1, 0, 0))
+//  {
+//    // When dart's 'Joint' is destroied, it deletes all 'Transform's.
+//    // When 'Transform' is destroied, it deletes all 'Dof's.
+//    dart::dynamics::Dof* dofs = new dart::dynamicskinematics::Dof;
+//    dart::dynamics::TrfmTranslateX* trans = new kinematics::TrfmTranslateX(dofs);
+//    this->dartJoint->addTransform(trans);
+//  }
+//  else if (_axis == math::Vector3(1, 0, 0))
+//  {
+//    // When dart's 'Joint' is destroied, it deletes all 'Transform's.
+//    // When 'Transform' is destroied, it deletes all 'Dof's.
+//    kinematics::Dof* dofs = new kinematics::Dof;
+//    kinematics::TrfmTranslateY* trans = new kinematics::TrfmTranslateY(dofs);
+//    this->dartJoint->addTransform(trans);
+//  }
+//  else if (_axis == math::Vector3(1, 0, 0))
+//  {
+//    // When dart's 'Joint' is destroied, it deletes all 'Transform's.
+//    // When 'Transform' is destroied, it deletes all 'Dof's.
+//    kinematics::Dof* dofs = new kinematics::Dof;
+//    kinematics::TrfmTranslateZ* trans = new kinematics::TrfmTranslateZ(dofs);
+//    this->dartJoint->addTransform(trans);
+//  }
+//  else
+//  {
+//    // We assume that the axis has the value among these:
+//    // (1, 0, 0), (0, 1, 0), (0, 0, 1)
+//    gzthrow("Axis must be one of these: (1, 0, 0), (0, 1, 0), (0, 0, 1)\n");
+//  }
+   gzwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////

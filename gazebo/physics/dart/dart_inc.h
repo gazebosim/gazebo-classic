@@ -7,31 +7,23 @@
 #include <integration/EulerIntegrator.h>
 #include <integration/RK4Integrator.h>
 
-#include <kinematics/BodyNode.h>
-#include <kinematics/Dof.h>
-#include <kinematics/Joint.h>
-#include <kinematics/Shape.h>
-#include <kinematics/ShapeBox.h>
-#include <kinematics/ShapeCylinder.h>
-#include <kinematics/ShapeEllipsoid.h>
-#include <kinematics/ShapeMesh.h>
-#include <kinematics/Transformation.h>
-#include <kinematics/TrfmRotateEuler.h>
-#include <kinematics/TrfmRotateExpmap.h>
-#include <kinematics/TrfmRotateAxis.h>
-#include <kinematics/TrfmRotateQuat.h>
-#include <kinematics/TrfmTranslate.h>
+#include <dynamics/Dof.h>
+#include <dynamics/Joint.h>
+#include <dynamics/Shape.h>
+#include <dynamics/ShapeBox.h>
+#include <dynamics/ShapeCylinder.h>
+#include <dynamics/ShapeEllipsoid.h>
+#include <dynamics/ShapeMesh.h>
+#include <dynamics/BodyNode.h>
+#include <dynamics/Skeleton.h>
+#include <dynamics/BallJoint.h>
+#include <dynamics/RevoluteJoint.h>
+#include <dynamics/FreeJoint.h>
+#include <dynamics/WeldJoint.h>
 
-#include <dynamics/BodyNodeDynamics.h>
-#include <dynamics/ClosedLoopConstraint.h>
-#include <dynamics/Constraint.h>
-#include <dynamics/ConstraintDynamics.h>
-#include <dynamics/ContactDynamics.h>
-#include <dynamics/JointLimitDynamics.h>
-#include <dynamics/PointConstraint.h>
-#include <dynamics/SkeletonDynamics.h>
+#include <constraint/Constraint.h>
+#include <constraint/ConstraintDynamics.h>
 
 #include <simulation/World.h>
-
 
 #endif

@@ -21,8 +21,6 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/dart/DARTHinge2Joint.hh"
 
-#include "dart/kinematics/Dof.h"
-
 using namespace gazebo;
 using namespace physics;
 

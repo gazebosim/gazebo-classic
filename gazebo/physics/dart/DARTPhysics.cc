@@ -60,7 +60,7 @@ GZ_REGISTER_PHYSICS_ENGINE("dart", DARTPhysics)
 DARTPhysics::DARTPhysics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
-  this->dartWorld = new simulation::World;
+  this->dartWorld = new dart::simulation::World;
 
   // TODO: Gazebo does not support design-time and runtime concept now.
   // Therefore, we basically set dart world as runtime and never change it.

@@ -41,6 +41,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
 
+      // Documentation inherited.
+      public: virtual void Init();
+
       // Documentation inherited
       public: virtual math::Vector3 GetAnchor(int _index) const;
 
@@ -75,7 +78,7 @@ namespace gazebo
       public: virtual void SetForce(int _index, double _torque);
 
       /// \brief
-      private: kinematics::TrfmRotateAxis* rotHinge;
+      private: dart::dynamics::RevoluteJoint* rotHinge;
     };
   }
 }

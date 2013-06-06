@@ -25,17 +25,16 @@
 #include "gazebo/physics/dart/DARTLink.hh"
 #include "gazebo/physics/dart/DARTModel.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
+#include "gazebo/physics/dart/DARTUtils.hh"
 //#include "physics/ScrewJoint.hh"
-
-#include "dart/kinematics/Dof.h"
-#include "dart/kinematics/Joint.h"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 DARTJoint::DARTJoint(BasePtr _parent)
-  : Joint(_parent), dartJoint(NULL)
+  : Joint(_parent),
+    dartJoint(NULL)
 {
 }
 
@@ -57,46 +56,71 @@ void DARTJoint::Load(sdf::ElementPtr _sdf)
 
   // In case this joint is already loaded, we delete dart joint if it is
   // created.
-  if (dartJoint)
+  if (dartJoint != NULL)
   {
     delete dartJoint;
     dartJoint = NULL;
   }
+}
 
-  // TODO: need test
-  BasePtr myBase = shared_from_this();
-  if (this->parentLink)
-    boost::shared_dynamic_cast<DARTLink>(this->parentLink)->AddDARTChildJoint(boost::shared_static_cast<DARTJoint>(myBase));
-  boost::shared_dynamic_cast<DARTLink>(this->childLink)->SetDARTParentJoint(boost::shared_static_cast<DARTJoint>(myBase));
+void DARTJoint::Init()
+{
+  Joint::Init();
 
-  // In order to create dart joint, we need to know this joint's parent
-  // and child link so we create dart joint after the joint is loaded with sdf
-  // .
-  kinematics::BodyNode* childBodyNode
-      = boost::shared_dynamic_cast<DARTLink>(this->childLink)->GetBodyNode();
-  DARTModelPtr dartModel
-      = boost::shared_dynamic_cast<DARTModel>(this->model);
+  //----------------------------------------------------------------------------
+  // Name
+  //----------------------------------------------------------------------------
+  std::string jointName = this->GetName();
+  this->dartJoint->setName(jointName.c_str());
 
-  if (this->parentLink && this->childLink)
+  //----------------------------------------------------------------------------
+  // Parent and child link information
+  //----------------------------------------------------------------------------
+  DARTLinkPtr theParentLink =
+    boost::static_pointer_cast<DARTLink>(this->parentLink);
+  DARTLinkPtr theChildLink =
+    boost::static_pointer_cast<DARTLink>(this->childLink);
+
+  dart::dynamics::BodyNode* dartParentBody = NULL;
+  dart::dynamics::BodyNode* dartChildBody = NULL;
+  dart::math::SE3 dartTransfParentLinkToJointLeft;
+  dart::math::SE3 dartTransfChildLinkToJointRight;
+  dart::math::SE3 dartTransfParentLink;
+  dart::math::SE3 dartTransfChildLink;
+
+  if (theChildLink != NULL)
   {
-    // a) create a dart joint.
-    kinematics::BodyNode* parentBodyNode
-        = boost::shared_dynamic_cast<DARTLink>(this->parentLink)->GetBodyNode();
-    dartJoint = new kinematics::Joint(parentBodyNode, childBodyNode);
-  }
-  else if (this->childLink)
-  {
-    // a) create a dart joint whose parent link is null pointer.
-    dartJoint = new kinematics::Joint(NULL, childBodyNode);
+    dartChildBody = theChildLink->getDARTBodyNode();
+    assert(dartChildBody);
 
-    // b) set the canonical joint of the model as this joint
-    dartModel->SetCanonicalJoint(dartJoint);
-  }
-  else
-  {
-    gzthrow("joint without links\n");
+    dartTransfChildLink = dartChildBody->getTransformationWorld();
+    dartTransfChildLinkToJointRight = DARTUtils::ConvertPose(this->anchorPose);
   }
 
+  if (theParentLink != NULL)
+  {
+    dartParentBody = theParentLink->getDARTBodyNode();
+    assert(dartParentBody);
+
+    dartTransfParentLink = dartParentBody->getTransformationWorld();
+    // TODO: If the joint is not home position, then we need to care about it
+    //       by multiply jointLocalTransformation.inverse() to the end of below
+    //       line.
+    dartTransfParentLinkToJointLeft = dart::math::Inv(dartTransfParentLink)
+                                      * dartTransfChildLink
+                                      * dartTransfChildLinkToJointRight;
+                                      //* Inv(this->dartJoint->getLocalTransformation());
+  }
+
+  this->dartJoint->setParentBody(dartParentBody);
+  this->dartJoint->setChildBody(dartChildBody);
+  this->dartJoint->setLocalTransformFromParentBody(dartTransfParentLinkToJointLeft);
+  this->dartJoint->setLocalTransformFromChildBody(dartTransfChildLinkToJointRight);
+
+  //----------------------------------------------------------------------------
+  // TODO: Currently, dampingCoefficient seems not to be initialized when
+  //       this joint is loaded. Therefore, we need below code...
+  //----------------------------------------------------------------------------
   if (this->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
@@ -107,7 +131,7 @@ void DARTJoint::Load(sdf::ElementPtr _sdf)
       if (dynamicsElem->HasElement("damping"))
       {
         //this->SetDamping(0, dynamicsElem->GetValueDouble("damping"));
-        dampingCoefficient = dynamicsElem->GetValueDouble("damping");
+        this->dampingCoefficient = dynamicsElem->GetValueDouble("damping");
       }
       if (dynamicsElem->HasElement("friction"))
       {
@@ -117,7 +141,7 @@ void DARTJoint::Load(sdf::ElementPtr _sdf)
     }
   }
 
-  dartModel->GetSkeletonDynamics()->addJoint(dartJoint);
+  this->GetDARTModel()->GetSkeleton()->addJoint(dartJoint);
 }
 
 //////////////////////////////////////////////////
@@ -223,13 +247,13 @@ void DARTJoint::SetHighStop(int _index, const math::Angle& _angle)
   switch (_index)
   {
     case 0:
-      this->dartJoint->getDof(_index)->setMax(_angle.Radian());
+      this->dartJoint->getDof(_index)->set_qMax(_angle.Radian());
       break;
     case 1:
-      this->dartJoint->getDof(_index)->setMax(_angle.Radian());
+      this->dartJoint->getDof(_index)->set_qMax(_angle.Radian());
       break;
     case 2:
-      this->dartJoint->getDof(_index)->setMax(_angle.Radian());
+      this->dartJoint->getDof(_index)->set_qMax(_angle.Radian());
       break;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
@@ -243,13 +267,13 @@ void DARTJoint::SetLowStop(int _index, const math::Angle& _angle)
   switch (_index)
   {
   case 0:
-    this->dartJoint->getDof(_index)->setMin(_angle.Radian());
+    this->dartJoint->getDof(_index)->set_qMin(_angle.Radian());
     break;
   case 1:
-    this->dartJoint->getDof(_index)->setMin(_angle.Radian());
+    this->dartJoint->getDof(_index)->set_qMin(_angle.Radian());
     break;
   case 2:
-    this->dartJoint->getDof(_index)->setMin(_angle.Radian());
+    this->dartJoint->getDof(_index)->set_qMin(_angle.Radian());
     break;
   default:
     gzerr << "Invalid index[" << _index << "]\n";
@@ -354,4 +378,9 @@ unsigned int DARTJoint::GetAngleCount() const
   angleCount = this->dartJoint->getNumDofs();
 
   return angleCount;
+}
+
+DARTModelPtr DARTJoint::GetDARTModel() const
+{
+  return boost::shared_dynamic_cast<DARTModel>(this->model);
 }
