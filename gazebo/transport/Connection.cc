@@ -283,21 +283,6 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     else
       this->writeQueue.back() += std::string(headerBuffer) + _buffer;
     this->callbacks.push_back(std::make_pair(_cb, _id));
-
-    // \todo limit could be a configurable parameter.
-    /*uint32_t limit = 5000;
-    if (this->writeQueue.size() < limit)
-    {
-      this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
-      this->callbacks.push_back(std::make_pair(_cb, _id));
-      this->dropMsgLogged = false;
-    }
-    else if (!this->dropMsgLogged)
-    {
-      this->dropMsgLogged = true;
-      gzlog << "Connection[" << this->id << "] dropping messages. "
-        << "Queue is over " << limit << " in size.\n";
-    }*/
   }
 
   if (_force)
@@ -318,9 +303,6 @@ void Connection::ProcessWriteQueue(bool _blocking)
 
   if (!this->IsOpen())
   {
-    this->writeQueue.clear();
-    this->callbacks.clear();
-    this->writeCount = 0;
     return;
   }
 
@@ -387,9 +369,12 @@ void Connection::OnWrite(const boost::system::error_code &_e)
 
     for (unsigned int i = 0; i < this->callbackIndex; ++i)
     {
-      if (!this->callbacks.front().first.empty())
-        this->callbacks.front().first(this->callbacks.front().second);
-      this->callbacks.pop_front();
+      if(!this->callbacks.empty())
+      {
+        if (!this->callbacks.front().first.empty())
+          this->callbacks.front().first(this->callbacks.front().second);
+        this->callbacks.pop_front();
+      }
     }
 
     if (!this->writeQueue.empty())
