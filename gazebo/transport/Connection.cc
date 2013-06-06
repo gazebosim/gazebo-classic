@@ -276,16 +276,17 @@ void Connection::EnqueueMsg(const std::string &_buffer,
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
-    // \todo limit could be a configurable parameter.
-    // uint32_t limit = 5000;
     if (this->writeQueue.empty() ||
-        (this->writeCount > 0 && this->writeQueue.size() == 1))
+        (this->writeCount > 0 && this->writeQueue.size() == 1) ||
+        (this->writeQueue.back().size()+_buffer.size() > 4096))
       this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
     else
       this->writeQueue.back() += std::string(headerBuffer) + _buffer;
     this->callbacks.push_back(std::make_pair(_cb, _id));
 
-    /*if (this->writeQueue.size() < limit)
+    // \todo limit could be a configurable parameter.
+    /*uint32_t limit = 5000;
+    if (this->writeQueue.size() < limit)
     {
       this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
       this->callbacks.push_back(std::make_pair(_cb, _id));
