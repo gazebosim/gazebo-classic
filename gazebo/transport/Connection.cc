@@ -392,7 +392,8 @@ void Connection::OnWrite(const boost::system::error_code &_e)
       this->callbacks.pop_front();
     }
 
-    this->writeQueue.pop_front();
+    if (!this->writeQueue.empty())
+      this->writeQueue.pop_front();
     this->writeCount--;
   }
 
@@ -473,6 +474,7 @@ void Connection::Close()
     this->acceptor = NULL;
   }
 
+  boost::recursive_mutex::scoped_lock lock2(this->writeMutex);
   this->writeQueue.clear();
   this->callbacks.clear();
 }
