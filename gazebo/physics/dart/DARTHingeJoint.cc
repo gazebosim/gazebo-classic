@@ -121,7 +121,7 @@ void DARTHingeJoint::SetDamping(int _index, double _damping)
       = dynamic_cast<dart::dynamics::RevoluteJoint*>(this->dartJoint);
 
   this->dampingCoefficient = _damping;
-  dartRevJoint->setDampingCoefficient(_damping);
+  dartRevJoint->setDampingCoefficient(0, _damping);
 }
 
 //////////////////////////////////////////////////
