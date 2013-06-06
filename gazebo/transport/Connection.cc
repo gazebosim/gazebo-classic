@@ -265,7 +265,7 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     boost::function<void(uint32_t)> _cb, uint32_t _id, bool _force)
 {
   // Don't enqueue empty messages
-  if (_buffer.empty())
+  if (_buffer.empty() || !this->IsOpen())
   {
     return;
   }
@@ -277,9 +277,15 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
     // \todo limit could be a configurable parameter.
-    uint32_t limit = 5000;
+    // uint32_t limit = 5000;
+    if (this->writeQueue.empty() ||
+        (this->writeCount > 0 && this->writeQueue.size() == 1))
+      this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
+    else
+      this->writeQueue.back() += std::string(headerBuffer) + _buffer;
+    this->callbacks.push_back(std::make_pair(_cb, _id));
 
-    if (this->writeQueue.size() < limit)
+    /*if (this->writeQueue.size() < limit)
     {
       this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
       this->callbacks.push_back(std::make_pair(_cb, _id));
@@ -290,7 +296,7 @@ void Connection::EnqueueMsg(const std::string &_buffer,
       this->dropMsgLogged = true;
       gzlog << "Connection[" << this->id << "] dropping messages. "
         << "Queue is over " << limit << " in size.\n";
-    }
+    }*/
   }
 
   if (_force)
@@ -307,12 +313,15 @@ void Connection::EnqueueMsg(const std::string &_buffer,
 /////////////////////////////////////////////////
 void Connection::ProcessWriteQueue(bool _blocking)
 {
+  boost::recursive_mutex::scoped_lock lock(this->writeMutex);
+
   if (!this->IsOpen())
   {
+    this->writeQueue.clear();
+    this->callbacks.clear();
+    this->writeCount = 0;
     return;
   }
-
-  boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
   // async_write should only be called when the last async_write has
   // completed. therefore we have to check the writeCount attribute
@@ -328,6 +337,7 @@ void Connection::ProcessWriteQueue(bool _blocking)
   // a single write operation
   if (!_blocking)
   {
+    this->callbackIndex = this->callbacks.size();
     boost::asio::async_write(*this->socket,
         boost::asio::buffer(this->writeQueue.front().c_str(),
           this->writeQueue.front().size()),
@@ -373,10 +383,14 @@ void Connection::OnWrite(const boost::system::error_code &_e)
 {
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    if (!this->callbacks.front().first.empty())
-      this->callbacks.front().first(this->callbacks.front().second);
 
-    this->callbacks.pop_front();
+    for (unsigned int i = 0; i < this->callbackIndex; ++i)
+    {
+      if (!this->callbacks.front().first.empty())
+        this->callbacks.front().first(this->callbacks.front().second);
+      this->callbacks.pop_front();
+    }
+
     this->writeQueue.pop_front();
     this->writeCount--;
   }

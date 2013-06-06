@@ -469,6 +469,8 @@ namespace gazebo
 
       /// \brief Used to prevent too many log messages.
       private: bool dropMsgLogged;
+
+      private: unsigned int callbackIndex;
     };
     /// \}
   }

@@ -175,6 +175,7 @@ namespace gazebo
 
       /// \brief Current id of the sent message.
       private: uint32_t pubId;
+      private: std::list<uint32_t> pubIds;
     };
     /// \}
   }

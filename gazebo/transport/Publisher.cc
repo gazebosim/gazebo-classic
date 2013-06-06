@@ -166,7 +166,47 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
 //////////////////////////////////////////////////
 void Publisher::SendMessage()
 {
-  MessagePtr msg;
+  std::list<MessagePtr> localBuffer;
+  std::list<uint32_t> localIds;
+
+  {
+    boost::mutex::scoped_lock lock(this->mutex);
+    if (!this->pubIds.empty() || this->messages.empty())
+      return;
+
+    for (unsigned int i = 0; i < this->messages.size(); ++i)
+    {
+      this->pubId = (this->pubId + 1) % 10000;
+      this->pubIds.push_back(this->pubId);
+      localIds.push_back(this->pubId);
+    }
+
+    std::copy(this->messages.begin(), this->messages.end(),
+        std::back_inserter(localBuffer));
+    this->messages.clear();
+  }
+
+  // Only send messages if there is something to send
+  if (!localBuffer.empty())
+  {
+    std::list<uint32_t>::iterator pubIter = localIds.begin();
+
+    // Send all the current messages
+    for (std::list<MessagePtr>::iterator iter = localBuffer.begin();
+        iter != localBuffer.end(); ++iter, ++pubIter)
+    {
+      // Send the latest message.
+      this->publication->Publish(*iter,
+          boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
+    }
+
+    // Clear the local buffer.
+    localBuffer.clear();
+    localIds.clear();
+  }
+
+
+  /*MessagePtr msg;
   {
     boost::mutex::scoped_lock lock(this->mutex);
     if (!this->messages.empty() && !this->waiting)
@@ -174,6 +214,7 @@ void Publisher::SendMessage()
       msg = this->messages.front();
       this->waiting = true;
       this->pubId = (this->pubId + 1) % 10000;
+      this->pubIds.insert(this->pubId);
     }
   }
 
@@ -183,6 +224,7 @@ void Publisher::SendMessage()
     this->publication->Publish(msg,
         boost::bind(&Publisher::OnPublishComplete, this, _1), this->pubId);
   }
+  */
 }
 
 //////////////////////////////////////////////////
@@ -214,9 +256,12 @@ std::string Publisher::GetMsgType() const
 void Publisher::OnPublishComplete(uint32_t _id)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  if (!this->messages.empty() && this->waiting && this->pubId == _id)
+
+  std::list<uint32_t>::iterator iter =
+    std::find(this->pubIds.begin(), this->pubIds.end(), _id);
+  if (iter != this->pubIds.end())
   {
-    this->messages.pop_front();
+    this->pubIds.erase(iter);
     this->waiting = false;
   }
 }
