@@ -1021,67 +1021,67 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
 //}
 //#endif // HAVE_DART
 
-TEST_F(PhysicsTest, State)
-{
-  /// \TODO: Redo state test
-  /*
-  Load("worlds/empty.world");
-  physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+//TEST_F(PhysicsTest, State)
+//{
+//  /// \TODO: Redo state test
+//  /*
+//  Load("worlds/empty.world");
+//  physics::WorldPtr world = physics::get_world("default");
+//  EXPECT_TRUE(world != NULL);
 
-  physics::WorldState worldState = world->GetState();
-  physics::ModelState modelState = worldState.GetModelState(0);
-  physics::LinkState linkState = modelState.GetLinkState(0);
-  physics::CollisionState collisionState = linkState.GetCollisionState(0);
+//  physics::WorldState worldState = world->GetState();
+//  physics::ModelState modelState = worldState.GetModelState(0);
+//  physics::LinkState linkState = modelState.GetLinkState(0);
+//  physics::CollisionState collisionState = linkState.GetCollisionState(0);
 
-  math::Pose pose;
-  EXPECT_EQ(1u, worldState.GetModelStateCount());
-  EXPECT_EQ(1u, modelState.GetLinkStateCount());
-  EXPECT_EQ(1u, linkState.GetCollisionStateCount());
-  EXPECT_EQ(pose, modelState.GetPose());
-  EXPECT_EQ(pose, linkState.GetPose());
-  EXPECT_EQ(pose, collisionState.GetPose());
+//  math::Pose pose;
+//  EXPECT_EQ(1u, worldState.GetModelStateCount());
+//  EXPECT_EQ(1u, modelState.GetLinkStateCount());
+//  EXPECT_EQ(1u, linkState.GetCollisionStateCount());
+//  EXPECT_EQ(pose, modelState.GetPose());
+//  EXPECT_EQ(pose, linkState.GetPose());
+//  EXPECT_EQ(pose, collisionState.GetPose());
 
-  Unload();
-  Load("worlds/shapes.world");
-  world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
-  worldState = world->GetState();
+//  Unload();
+//  Load("worlds/shapes.world");
+//  world = physics::get_world("default");
+//  EXPECT_TRUE(world != NULL);
+//  worldState = world->GetState();
 
-  for (unsigned int i = 0; i < worldState.GetModelStateCount(); ++i)
-  {
-    modelState = worldState.GetModelState(i);
-    if (modelState.GetName() == "plane")
-      pose.Set(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0));
-    else if (modelState.GetName() == "box")
-      pose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
-    else if (modelState.GetName() == "sphere")
-      pose.Set(math::Vector3(0, 1.5, 0.5), math::Quaternion(0, 0, 0));
-    else if (modelState.GetName() == "cylinder")
-      pose.Set(math::Vector3(0, -1.5, 0.5), math::Quaternion(0, 0, 0));
+//  for (unsigned int i = 0; i < worldState.GetModelStateCount(); ++i)
+//  {
+//    modelState = worldState.GetModelState(i);
+//    if (modelState.GetName() == "plane")
+//      pose.Set(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0));
+//    else if (modelState.GetName() == "box")
+//      pose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
+//    else if (modelState.GetName() == "sphere")
+//      pose.Set(math::Vector3(0, 1.5, 0.5), math::Quaternion(0, 0, 0));
+//    else if (modelState.GetName() == "cylinder")
+//      pose.Set(math::Vector3(0, -1.5, 0.5), math::Quaternion(0, 0, 0));
 
-    EXPECT_TRUE(pose == modelState.GetPose());
-  }
+//    EXPECT_TRUE(pose == modelState.GetPose());
+//  }
 
-  // Move the box
-  world->GetModel("box")->SetWorldPose(
-      math::Pose(math::Vector3(1, 2, 0.5), math::Quaternion(0, 0, 0)));
+//  // Move the box
+//  world->GetModel("box")->SetWorldPose(
+//      math::Pose(math::Vector3(1, 2, 0.5), math::Quaternion(0, 0, 0)));
 
-  gazebo::common::Time::MSleep(10);
+//  gazebo::common::Time::MSleep(10);
 
-  // Make sure the box has been moved
-  physics::ModelState modelState2 = world->GetState().GetModelState("box");
-  pose.Set(math::Vector3(1, 2, 0.5), math::Quaternion(0, 0, 0));
-  EXPECT_TRUE(pose == modelState2.GetPose());
+//  // Make sure the box has been moved
+//  physics::ModelState modelState2 = world->GetState().GetModelState("box");
+//  pose.Set(math::Vector3(1, 2, 0.5), math::Quaternion(0, 0, 0));
+//  EXPECT_TRUE(pose == modelState2.GetPose());
 
-  // Reset world state, and check for correctness
-  world->SetState(worldState);
-  modelState2 = world->GetState().GetModelState("box");
-  pose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
-  EXPECT_TRUE(pose == modelState2.GetPose());
-  Unload();
-  */
-}
+//  // Reset world state, and check for correctness
+//  world->SetState(worldState);
+//  modelState2 = world->GetState().GetModelState("box");
+//  pose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
+//  EXPECT_TRUE(pose == modelState2.GetPose());
+//  Unload();
+//  */
+//}
 
 void PhysicsTest::JointDamping(const std::string &_physicsEngine)
 {
@@ -1369,12 +1369,12 @@ void PhysicsTest::JointDamping(const std::string &_physicsEngine)
 //}
 //#endif  // HAVE_BULLET
 
-//#ifdef HAVE_DART
-//TEST_F(PhysicsTest, SimplePendulumDART)
-//{
-//  SimplePendulum("dart");
-//}
-//#endif  // HAVE_DART
+#ifdef HAVE_DART
+TEST_F(PhysicsTest, SimplePendulumDART)
+{
+  SimplePendulum("dart");
+}
+#endif  // HAVE_DART
 
 void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
