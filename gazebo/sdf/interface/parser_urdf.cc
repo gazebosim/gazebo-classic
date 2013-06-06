@@ -509,7 +509,7 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
 
           std::ostringstream origStream;
           origStream << *childElem;
-          gzdbg << "extension [" << origStream.str() << "] not converted.\n";
+          gzdbg << "extension [" << origStream.str() << "] not converted, probably already in SDF format.\n";
           xmlNewDoc.Parse(origStream.str().c_str());
 
           // save all unknown stuff in a vector of blobs
