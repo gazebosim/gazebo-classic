@@ -78,12 +78,12 @@ void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
 //}
 //#endif  // HAVE_BULLET
 
-#ifdef HAVE_DART
-TEST_F(PhysicsTest, EmptyWorldDART)
-{
-  EmptyWorld("dart");
-}
-#endif  // HAVE_DART
+//#ifdef HAVE_DART
+//TEST_F(PhysicsTest, EmptyWorldDART)
+//{
+//  EmptyWorld("dart");
+//}
+//#endif  // HAVE_DART
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnDrop:

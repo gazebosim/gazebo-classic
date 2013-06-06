@@ -1,0 +1,334 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+    <world name="default">
+        <include>
+            <uri>model://sun</uri>
+        </include>
+        <physics type="dart">
+            <gravity>0 0 -10.0</gravity>
+            <max_step_size>0.001</max_step_size>
+        </physics>
+        <!--include><uri>model://ground_plane</uri></include-->
+        <!-- 25.3kg total mass -->
+        <model name="pendulum1">
+            <pose>0 0 2 0 0 0</pose>
+            <link name="link1">
+                <pose>0 0 0 0 0 0</pose>
+                <inertial>
+                    <inertia>
+                        <ixx>1</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>1</iyy>
+                        <iyz>0</iyz>
+                        <izz>1</izz>
+                    </inertia>
+                    <mass>1.0</mass>
+                </inertial>
+                <visual name="visual1">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.4 0.6</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <script>Gazebo/WoodPallet</script>
+                    </material>
+                </visual>
+            </link>
+            <joint name="joint01" type="revolute">
+                <pose>0 -0.5 0 0 0 0</pose>
+                <axis>
+                    <xyz>1 0 0</xyz>
+                </axis>
+                <parent>
+                    <link_name>world</link_name>
+                </parent>
+                <child>
+                    <link_name>link1</link_name>
+                </child>
+            </joint>
+        </model>
+        <model name="pendulum2">
+            <pose>2 0 2 0 0 0</pose>
+            <link name="link1">
+                <pose>0 0 0 0 0 0</pose>
+                <inertial>
+                    <inertia>
+                        <ixx>1</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>1</iyy>
+                        <iyz>0</iyz>
+                        <izz>1</izz>
+                    </inertia>
+                    <mass>1.0</mass>
+                </inertial>
+                <visual name="visual1">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.4 0.6</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <script>Gazebo/WoodPallet</script>
+                    </material>
+                </visual>
+            </link>
+            <joint name="joint01" type="revolute">
+                <pose>0 -0.5 0 0 0 0</pose>
+                <axis>
+                    <xyz>1 0 0</xyz>
+                </axis>
+                <parent>
+                    <link_name>world</link_name>
+                </parent>
+                <child>
+                    <link_name>link1</link_name>
+                </child>
+            </joint>
+        </model>
+        <model name="pendulum3">
+            <pose>4 0 2 0 0 0</pose>
+            <link name="link1">
+                <pose>0 0 0 0 0 0</pose>
+                <inertial>
+                    <inertia>
+                        <ixx>1</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>1</iyy>
+                        <iyz>0</iyz>
+                        <izz>1</izz>
+                    </inertia>
+                    <mass>1.0</mass>
+                </inertial>
+                <visual name="visual1">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.4 0.6</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <script>Gazebo/WoodPallet</script>
+                    </material>
+                </visual>
+            </link>
+            <joint name="joint01" type="revolute">
+                <pose>0 -0.5 0 0 0 0</pose>
+                <axis>
+                    <xyz>1 0 0</xyz>
+                </axis>
+                <parent>
+                    <link_name>world</link_name>
+                </parent>
+                <child>
+                    <link_name>link1</link_name>
+                </child>
+            </joint>
+        </model>
+        <model name="pendulum4">
+            <pose>6 0 2 0 0 0</pose>
+            <link name="link1">
+                <pose>0 0 0 0 0 0</pose>
+                <inertial>
+                    <inertia>
+                        <ixx>1</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>1</iyy>
+                        <iyz>0</iyz>
+                        <izz>1</izz>
+                    </inertia>
+                    <mass>1.0</mass>
+                </inertial>
+                <visual name="visual1">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.4 0.6</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <script>Gazebo/WoodPallet</script>
+                    </material>
+                </visual>
+            </link>
+            <joint name="joint01" type="revolute">
+                <pose>0 -0.5 0 0 0 0</pose>
+                <axis>
+                    <xyz>1 0 0</xyz>
+                </axis>
+                <parent>
+                    <link_name>world</link_name>
+                </parent>
+                <child>
+                    <link_name>link1</link_name>
+                </child>
+            </joint>
+        </model>
+        <model name="pendulum5">
+            <pose>8 0 2 0 0 0</pose>
+            <link name="link1">
+                <pose>0 0 0 0 0 0</pose>
+                <inertial>
+                    <inertia>
+                        <ixx>1</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>1</iyy>
+                        <iyz>0</iyz>
+                        <izz>1</izz>
+                    </inertia>
+                    <mass>1.0</mass>
+                </inertial>
+                <visual name="visual1">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.4 0.6</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <script>Gazebo/WoodPallet</script>
+                    </material>
+                </visual>
+            </link>
+            <joint name="joint01" type="revolute">
+                <pose>0 -0.5 0 0 0 0</pose>
+                <axis>
+                    <xyz>1 0 0</xyz>
+                </axis>
+                <parent>
+                    <link_name>world</link_name>
+                </parent>
+                <child>
+                    <link_name>link1</link_name>
+                </child>
+            </joint>
+        </model>
+        <model name="pendulum6">
+            <pose>10 0 2 0 0 0</pose>
+            <link name="link1">
+                <pose>0 0 0 0 0 0</pose>
+                <inertial>
+                    <inertia>
+                        <ixx>1</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>1</iyy>
+                        <iyz>0</iyz>
+                        <izz>1</izz>
+                    </inertia>
+                    <mass>1.0</mass>
+                </inertial>
+                <visual name="visual1">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.4 0.6</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <script>Gazebo/WoodPallet</script>
+                    </material>
+                </visual>
+            </link>
+            <joint name="joint01" type="revolute">
+                <pose>0 -0.5 0 0 0 0</pose>
+                <axis>
+                    <xyz>1 0 0</xyz>
+                </axis>
+                <parent>
+                    <link_name>world</link_name>
+                </parent>
+                <child>
+                    <link_name>link1</link_name>
+                </child>
+            </joint>
+        </model>
+        <model name="pendulum7">
+            <pose>12 0 2 0 0 0</pose>
+            <link name="link1">
+                <pose>0 0 0 0 0 0</pose>
+                <inertial>
+                    <inertia>
+                        <ixx>1</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>1</iyy>
+                        <iyz>0</iyz>
+                        <izz>1</izz>
+                    </inertia>
+                    <mass>1.0</mass>
+                </inertial>
+                <visual name="visual1">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.4 0.6</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <script>Gazebo/WoodPallet</script>
+                    </material>
+                </visual>
+            </link>
+            <joint name="joint01" type="revolute">
+                <pose>0 -0.5 0 0 0 0</pose>
+                <axis>
+                    <xyz>1 0 0</xyz>
+                </axis>
+                <parent>
+                    <link_name>world</link_name>
+                </parent>
+                <child>
+                    <link_name>link1</link_name>
+                </child>
+            </joint>
+        </model>
+        <model name="pendulum8">
+            <pose>14 0 2 0 0 0</pose>
+            <link name="link1">
+                <pose>0 0 0 0 0 0</pose>
+                <inertial>
+                    <inertia>
+                        <ixx>1</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>1</iyy>
+                        <iyz>0</iyz>
+                        <izz>1</izz>
+                    </inertia>
+                    <mass>1.0</mass>
+                </inertial>
+                <visual name="visual1">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.4 0.6</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <script>Gazebo/WoodPallet</script>
+                    </material>
+                </visual>
+            </link>
+            <joint name="joint01" type="revolute">
+                <pose>0 -0.5 0 0 0 0</pose>
+                <axis>
+                    <xyz>1 0 0</xyz>
+                </axis>
+                <parent>
+                    <link_name>world</link_name>
+                </parent>
+                <child>
+                    <link_name>link1</link_name>
+                </child>
+            </joint>
+        </model>
+    </world>
+</sdf>
