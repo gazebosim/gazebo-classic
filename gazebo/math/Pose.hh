@@ -41,12 +41,6 @@ namespace gazebo
       /// \brief math::Pose(0, 0, 0, 0, 0, 0)
       public: static const Pose Zero;
 
-      /// \brief math::Pose(0.01, 0.01, 0.01, 0.01, 0.01, 0.01)
-      public: static const Pose Near_P01;
-
-      /// \brief math::Pose(0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
-      public: static const Pose Near_P1;
-
       /// \brief Default constructors
       public: Pose();
 
