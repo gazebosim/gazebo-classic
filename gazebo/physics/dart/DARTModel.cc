@@ -47,21 +47,39 @@ void DARTModel::Load(sdf::ElementPtr _sdf)
 
   Model::Load(_sdf);
 
-  // Name
-  std::string modelName = this->GetName();
-  this->dartSkeleton->setName(modelName.c_str());
-
-  //  if (this->IsStatic())
-  //    dartSkeletonDynamics->setImmobileState(true);
-  //  else
-  //    dartSkeletonDynamics->setImmobileState(false);
-  dartSkeleton->setImmobileState(this->IsStatic());
 }
 
 //////////////////////////////////////////////////
 void DARTModel::Init()
 {
   Model::Init();
+
+  // Name
+  std::string modelName = this->GetName();
+  this->dartSkeleton->setName(modelName.c_str());
+
+  // Static
+  this->dartSkeleton->setImmobileState(this->IsStatic());
+
+  // Check if this link is free floating body
+  for (int i = 0; i < this->dartSkeleton->getNumBodies(); ++i)
+  {
+    dart::dynamics::BodyNode* itrBody = this->dartSkeleton->getBody(i);
+
+    if (itrBody->getParentJoint() == NULL)
+    {
+    // If this link has no parent joint, then we add 6-dof free joint.
+    dart::dynamics::FreeJoint* newFreeJoint = new dart::dynamics::FreeJoint;
+
+    newFreeJoint->setParentBody(NULL);
+    newFreeJoint->setLocalTransformFromParentBody(itrBody->getTransformationWorld());
+
+    newFreeJoint->setChildBody(itrBody);
+    newFreeJoint->setLocalTransformFromChildBody(dart::math::SE3());
+
+    this->GetSkeleton()->addJoint(newFreeJoint);
+    }
+  }
 
   // add skeleton to world
   this->GetDARTWorld()->addSkeleton(dartSkeleton);

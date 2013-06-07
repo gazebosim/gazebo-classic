@@ -22,7 +22,6 @@ set (files
   poses_ode.world
   shapes.world
   shapes_ode.world
-  revolute_joint_test.world
   revolute_joints.world
   revolute_joints_ode.world
   SimplePendulum.world
@@ -30,10 +29,13 @@ set (files
   falling2.world
   falling_ode.world
   falling2_ode.world
-  CollisionFiltering.world
   damp_test.world
-  SpawnDrop.world
   ball_joint.world
+  drop.world
+  
+  SpawnDrop.world
+  RevoluteJoint.world
+  CollisionFiltering.world
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/dart)

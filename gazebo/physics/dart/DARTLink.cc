@@ -100,19 +100,19 @@ void DARTLink::Init()
   this->dartBodyNode->setWorldTransformation(DARTUtils::ConvertPose(bodyWorldPose));
 
   // Check if this link is free floating body
-  if (dartParentJoint == 0)
-  {
-    // If this link has no parent joint, then we add 6-dof free joint.
-    dart::dynamics::FreeJoint* newFreeJoint = new dart::dynamics::FreeJoint;
+//  if (this->dartBodyNode->getParentJoint() == 0)
+//  {
+//    // If this link has no parent joint, then we add 6-dof free joint.
+//    dart::dynamics::FreeJoint* newFreeJoint = new dart::dynamics::FreeJoint;
 
-    newFreeJoint->setParentBody(NULL);
-    newFreeJoint->setLocalTransformFromParentBody(DARTUtils::ConvertPose(bodyWorldPose));
+//    newFreeJoint->setParentBody(NULL);
+//    newFreeJoint->setLocalTransformFromParentBody(DARTUtils::ConvertPose(bodyWorldPose));
 
-    newFreeJoint->setChildBody(this->dartBodyNode);
-    newFreeJoint->setLocalTransformFromChildBody(dart::math::SE3());
+//    newFreeJoint->setChildBody(this->dartBodyNode);
+//    newFreeJoint->setLocalTransformFromChildBody(dart::math::SE3());
 
-    this->GetDARTModel()->GetSkeleton()->addJoint(newFreeJoint);
-  }
+//    this->GetDARTModel()->GetSkeleton()->addJoint(newFreeJoint);
+//  }
 
   // Add dart body to dart skeleton.
   this->GetDARTModel()->GetSkeleton()->addBody(this->dartBodyNode, false);
