@@ -202,8 +202,8 @@ namespace gazebo
         //   << q.y << " "
         //   << q.z << " "
         //   << "</velocity>";
-        //<< "<acceleration>" << _state.acceleration << "</acceleration>"
-        //<< "<wrench>" << _state.wrench << "</wrench>";
+        // << "<acceleration>" << _state.acceleration << "</acceleration>"
+        // << "<wrench>" << _state.wrench << "</wrench>";
 
         /// Disabling this for efficiency.
         // for (std::vector<CollisionState>::const_iterator iter =
