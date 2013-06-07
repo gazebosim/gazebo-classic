@@ -180,7 +180,7 @@ namespace gazebo
                   const gazebo::physics::LinkState &_state)
       {
         math::Vector3 q(_state.pose.rot.GetAsEuler());
-        _out << std::fixed <<std::setprecision(3)
+        _out << std::fixed <<std::setprecision(4)
           << "<link name='" << _state.name << "'>"
           << "<pose>"
           << _state.pose.pos.x << " "
@@ -192,16 +192,16 @@ namespace gazebo
           << "</pose>";
 
         /// Disabling this for efficiency.
-        // q = _state.velocity.rot.GetAsEuler();
-        // _out << std::fixed <<std::setprecision(3)
-        //   << "<velocity>"
-        //   << _state.velocity.pos.x << " "
-        //   << _state.velocity.pos.y << " "
-        //   << _state.velocity.pos.z << " "
-        //   << q.x << " "
-        //   << q.y << " "
-        //   << q.z << " "
-        //   << "</velocity>";
+        q = _state.velocity.rot.GetAsEuler();
+         _out << std::fixed <<std::setprecision(4)
+           << "<velocity>"
+           << _state.velocity.pos.x << " "
+           << _state.velocity.pos.y << " "
+           << _state.velocity.pos.z << " "
+           << q.x << " "
+           << q.y << " "
+           << q.z << " "
+           << "</velocity>";
         // << "<acceleration>" << _state.acceleration << "</acceleration>"
         // << "<wrench>" << _state.wrench << "</wrench>";
 
