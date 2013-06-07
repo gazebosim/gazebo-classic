@@ -180,7 +180,7 @@ namespace gazebo
                   const gazebo::physics::LinkState &_state)
       {
         math::Vector3 q(_state.pose.rot.GetAsEuler());
-        _out << std::fixed <<std::setprecision(4)
+        _out << std::fixed <<std::setprecision(5)
           << "<link name='" << _state.name << "'>"
           << "<pose>"
           << _state.pose.pos.x << " "
