@@ -226,9 +226,9 @@ namespace gazebo
           << _state.pose.pos.x << " "
           << _state.pose.pos.y << " "
           << _state.pose.pos.z << " "
-          << q.x << " " 
-          << q.y << " " 
-          << q.z << " " 
+          << q.x << " "
+          << q.y << " "
+          << q.z << " "
           << "</pose>";
 
         for (LinkState_M::const_iterator iter =
@@ -239,12 +239,12 @@ namespace gazebo
         }
 
         // Output the joint information
-        /*for (JointState_M::const_iterator iter =
-            _state.jointStates.begin(); iter != _state.jointStates.end();
-            ++iter)
-        {
-          _out << iter->second;
-        }*/
+        // for (JointState_M::const_iterator iter =
+        //     _state.jointStates.begin(); iter != _state.jointStates.end();
+        //     ++iter)
+        // {
+        //   _out << iter->second;
+        // }
 
         _out << "</model>";
 

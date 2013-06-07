@@ -201,9 +201,8 @@ bool LinkState::IsZero() const
   //   result = result && (*iter).IsZero();
   // }
 
-  //return result && this->pose == math::Pose::Zero;
+  // return result && this->pose == math::Pose::Zero;
 
-  // return this->pose == math::Pose::Near_P01;
   return this->pose == math::Pose::Zero;
 }
 
