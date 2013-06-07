@@ -5,7 +5,7 @@
        information, see: http://ros.org/reps/rep-0134.html -->
 
   <name>gazebo</name>
-  <version>1.8.2</version>
+  <version>0.0.0</version>
   <description>
     This is the Gazebo simulator.  Gazebo simulates multiple robots in a
     3D environment, with extensive dynamic interaction between objects. 
