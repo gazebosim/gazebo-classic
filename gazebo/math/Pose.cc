@@ -25,6 +25,8 @@ using namespace gazebo;
 using namespace math;
 
 const Pose Pose::Zero = math::Pose(0, 0, 0, 0, 0, 0);
+const Pose Pose::Near_P01 = math::Pose(0.01, 0.01, 0.01, 0.01, 0.01, 0.01);
+const Pose Pose::Near_P1 = math::Pose(0.1, 0.1, 0.1, 0.1, 0.1, 0.1);
 
 //////////////////////////////////////////////////
 Pose::Pose()

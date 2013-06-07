@@ -204,7 +204,7 @@ bool ModelState::IsZero() const
     result = result && iter->second.IsZero();
   }*/
 
-  return result && this->pose == math::Pose::Zero;
+  return result && this->pose == math::Pose::Near_P01;
 }
 
 /////////////////////////////////////////////////
