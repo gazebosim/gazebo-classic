@@ -369,7 +369,7 @@ void Connection::OnWrite(const boost::system::error_code &_e)
 
     for (unsigned int i = 0; i < this->callbackIndex; ++i)
     {
-      if(!this->callbacks.empty())
+      if (!this->callbacks.empty())
       {
         if (!this->callbacks.front().first.empty())
           this->callbacks.front().first(this->callbacks.front().second);
