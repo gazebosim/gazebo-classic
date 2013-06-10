@@ -1106,7 +1106,7 @@ int record(bool _start)
   if (!pub->WaitForConnection(gazebo::common::Time(10, 0)))
   {
     gzerr << "Unable to create a connection to topic ~/log/record/control.\n";
-    return;
+    return 0;
   }
 
   gazebo::msgs::LogRecordControl msg;

@@ -1780,13 +1780,13 @@ bool World::OnLog(std::ostringstream &_stream, uint64_t &_segments)
     {
       _stream << "<sdf version='" << SDF_VERSION << "'>"
         << this->states[this->currentStateBuffer^1][i] << "</sdf>";
-      _segments++
+      _segments++;
     }
     for (size_t i = 0; i < this->states[this->currentStateBuffer].size(); ++i)
     {
       _stream << "<sdf version='" << SDF_VERSION << "'>"
         << this->states[this->currentStateBuffer][i] << "</sdf>";
-      _segments++
+      _segments++;
     }
 
     // Clear everything.

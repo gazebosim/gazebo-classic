@@ -546,7 +546,7 @@ unsigned int LogRecord::Log::Update()
   uint64_t segments;
 
   // Get log data via the callback.
-  if (this->logCB(stream))
+  if (this->logCB(stream, segments))
   {
     std::string data = stream.str();
     if (!data.empty())
