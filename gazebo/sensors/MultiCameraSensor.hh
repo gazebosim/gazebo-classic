@@ -92,10 +92,12 @@ namespace gazebo
       public: virtual bool IsActive();
 
       // Documentation inherited.
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited.
       protected: virtual void Fini();
+
+      private: void Render();
 
       /// \brief All the cameras.
       private: std::vector<rendering::CameraPtr> cameras;
@@ -106,7 +108,14 @@ namespace gazebo
       /// \brief Publishes messages of type msgs::ImagesStamped.
       private: transport::PublisherPtr imagePub;
 
+      /// \brief Pointer to the scene.
       private: rendering::ScenePtr scene;
+
+      /// \brief The images msg.
+      private: msgs::ImagesStamped msg;
+
+      /// \brief True if the sensor was rendered.
+      private: bool rendered;
     };
     /// \}
   }

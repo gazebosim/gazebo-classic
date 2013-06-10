@@ -46,7 +46,11 @@ GZ_REGISTER_STATIC_SENSOR("gpu_ray", GpuRaySensor)
 GpuRaySensor::GpuRaySensor()
     : Sensor(sensors::IMAGE)
 {
+  this->rendered = false;
   this->active = false;
+  this->connections.push_back(
+      event::Events::ConnectRender(
+        boost::bind(&GpuRaySensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -535,39 +539,51 @@ int GpuRaySensor::GetFiducial(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::UpdateImpl(bool /*_force*/)
+void GpuRaySensor::Render()
 {
-  if (this->laserCam)
+  if (!this->laserCam || !this->IsActive() || !this->NeedsUpdate())
+    return;
+
+  this->lastMeasurementTime = this->scene->GetSimTime();
+
+  this->laserCam->Render();
+  this->rendered = true;
+}
+
+//////////////////////////////////////////////////
+bool GpuRaySensor::UpdateImpl(bool /*_force*/)
+{
+  if (!this->rendered)
+    return false;
+
+  this->lastUpdateTime = this->lastMeasurementTime;
+  this->laserCam->PostRender();
+
+  boost::mutex::scoped_lock lock(this->mutex);
+
+  msgs::Set(this->laserMsg.mutable_time(), this->lastMeasurementTime);
+
+  msgs::LaserScan *scan = this->laserMsg.mutable_scan();
+
+  // Store the latest laser scans into laserMsg
+  msgs::Set(scan->mutable_world_pose(),
+      this->pose + this->parentEntity->GetWorldPose());
+  scan->set_angle_min(this->GetAngleMin().Radian());
+  scan->set_angle_max(this->GetAngleMax().Radian());
+  scan->set_angle_step(this->GetAngleResolution());
+
+  scan->set_range_min(this->GetRangeMin());
+  scan->set_range_max(this->GetRangeMax());
+
+  bool add = scan->ranges_size() == 0;
+
+  // todo: add loop for vertical range count
+  for (int j = 0; j < this->GetVerticalRayCount(); ++j)
   {
-    this->laserCam->Render();
-    this->laserCam->PostRender();
-    this->lastMeasurementTime = this->scene->GetSimTime();
-
-    boost::mutex::scoped_lock lock(this->mutex);
-
-    msgs::Set(this->laserMsg.mutable_time(), this->lastMeasurementTime);
-
-    msgs::LaserScan *scan = this->laserMsg.mutable_scan();
-
-    // Store the latest laser scans into laserMsg
-    msgs::Set(scan->mutable_world_pose(),
-              this->pose + this->parentEntity->GetWorldPose());
-    scan->set_angle_min(this->GetAngleMin().Radian());
-    scan->set_angle_max(this->GetAngleMax().Radian());
-    scan->set_angle_step(this->GetAngleResolution());
-
-    scan->set_range_min(this->GetRangeMin());
-    scan->set_range_max(this->GetRangeMax());
-
-    scan->clear_ranges();
-    scan->clear_intensities();
-
-    // todo: add loop for vertical range count
-    for (int j = 0; j < this->GetVerticalRayCount(); ++j)
     for (int i = 0; i < this->GetRayCount(); ++i)
     {
-      double range = this->laserCam->GetLaserData()[
-          (j * this->GetRayCount() + i) * 3];
+      int index = j * this->GetRayCount() + i;
+      double range = this->laserCam->GetLaserData()[index * 3];
 
       if (this->noiseActive)
       {
@@ -586,14 +602,26 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
         }
       }
 
-      scan->add_ranges(range);
-      scan->add_intensities(this->laserCam->GetLaserData()[
-          (j * this->GetRayCount() + i) * 3 + 1]);
+      if (add)
+      {
+        scan->add_ranges(range);
+        scan->add_intensities(this->laserCam->GetLaserData()[index * 3 + 1]);
+      }
+      else
+      {
+        scan->set_ranges(index, range);
+        scan->set_intensities(index,
+            this->laserCam->GetLaserData()[index * 3 + 1]);
+      }
     }
-
-    if (this->scanPub && this->scanPub->HasConnections())
-      this->scanPub->Publish(this->laserMsg);
   }
+
+  if (this->scanPub && this->scanPub->HasConnections())
+    this->scanPub->Publish(this->laserMsg);
+
+  this->rendered = false;
+
+  return true;
 }
 
 //////////////////////////////////////////////////

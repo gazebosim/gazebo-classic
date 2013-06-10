@@ -67,9 +67,8 @@ namespace gazebo
       /// \brief Initialize the ray
       public: virtual void Init();
 
-      /// \brief Update the sensor information
-      /// \param[in] _force True if update is forced, false if not
-      protected: virtual void UpdateImpl(bool _force);
+      // Documentation inherited
+      protected: virtual bool UpdateImpl(bool _force);
 
       /// \brief Finalize the ray
       protected: virtual void Fini();
@@ -247,6 +246,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual bool IsActive();
 
+      /// brief Render the camera.
+      private: void Render();
+
       /// \brief Scan SDF elementz.
       protected: sdf::ElementPtr scanElem;
 
@@ -315,6 +317,9 @@ namespace gazebo
       // If noiseType==GAUSSIAN, noiseStdDev is the standard devation of
       // the distibution from which we sample
       private: double noiseStdDev;
+
+      /// \brief True if the sensor was rendered.
+      private: bool rendered;
     };
     /// \}
   }

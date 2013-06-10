@@ -65,9 +65,8 @@ namespace gazebo
       /// \brief Initialize the camera
       protected: virtual void Init();
 
-      /// \brief Update the sensor information
-      /// \param[in] _force True if update is forced, false if not
-      protected: virtual void UpdateImpl(bool _force);
+      // Documentation inherited
+      protected: virtual bool UpdateImpl(bool _force);
 
       /// Finalize the camera
       protected: virtual void Fini();

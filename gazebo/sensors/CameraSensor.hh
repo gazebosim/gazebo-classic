@@ -70,9 +70,8 @@ namespace gazebo
       /// @todo to be implemented
       public: virtual std::string GetTopic() const;
 
-      /// \brief Update the sensor information
-      /// \param[in] _force True if update is forced, false if not
-      protected: virtual void UpdateImpl(bool _force);
+      // Documentation inherited
+      protected: virtual bool UpdateImpl(bool _force);
 
       /// \brief Finalize the camera
       protected: virtual void Fini();

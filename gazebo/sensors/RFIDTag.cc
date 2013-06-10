@@ -91,7 +91,7 @@ void RFIDTag::Init()
 }
 
 //////////////////////////////////////////////////
-void RFIDTag::UpdateImpl(bool /*_force*/)
+bool RFIDTag::UpdateImpl(bool /*_force*/)
 {
   if (this->scanPub)
   {
@@ -120,4 +120,6 @@ void RFIDTag::UpdateImpl(bool /*_force*/)
     this->scanPub->Publish(msg);
     // std::cout << "update impl for rfidtag called" << std::endl;
   }
+
+  return true;
 }

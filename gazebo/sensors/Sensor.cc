@@ -128,12 +128,23 @@ std::string Sensor::GetParentName() const
 }
 
 //////////////////////////////////////////////////
+bool Sensor::NeedsUpdate()
+{
+  // Adjust time-to-update period to compensate for delays caused by another
+  // sensor's update in the same thread.
+  return (this->world->GetSimTime() - this->lastUpdateTime +
+      this->updateDelay) >= this->updatePeriod;
+}
+
+//////////////////////////////////////////////////
 void Sensor::Update(bool _force)
 {
   if (this->IsActive() || _force)
   {
     // Adjust time-to-update period to compensate for delays caused by another
     // sensor's update in the same thread.
+    // NOTE: If you can this equation, also change the matching equation in
+    // Sensor::NeedsUpdate
     common::Time adjustedElapsed = this->world->GetSimTime() -
         this->lastUpdateTime + this->updateDelay;
 
@@ -149,9 +160,8 @@ void Sensor::Update(bool _force)
       if (this->updateDelay >= this->updatePeriod)
         this->updateDelay = common::Time::Zero;
 
-      this->lastUpdateTime = this->world->GetSimTime();
-      this->UpdateImpl(_force);
-      this->updated();
+      if (this->UpdateImpl(_force))
+        this->updated();
     }
   }
 }

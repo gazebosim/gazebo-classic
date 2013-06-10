@@ -136,15 +136,17 @@ void DepthCameraSensor::SetActive(bool value)
 }
 
 //////////////////////////////////////////////////
-void DepthCameraSensor::UpdateImpl(bool /*_force*/)
+bool DepthCameraSensor::UpdateImpl(bool /*_force*/)
 {
   // Sensor::Update(force);
-  if (this->camera)
-  {
-    this->camera->Render();
-    this->camera->PostRender();
-    this->lastMeasurementTime = this->scene->GetSimTime();
-  }
+  if (!this->camera)
+    return false;
+
+  this->camera->Render();
+  this->camera->PostRender();
+  this->lastMeasurementTime = this->scene->GetSimTime();
+
+  return true;
 }
 
 //////////////////////////////////////////////////

@@ -219,7 +219,7 @@ void ImuSensor::SetReferencePose()
 }
 
 //////////////////////////////////////////////////
-void ImuSensor::UpdateImpl(bool /*_force*/)
+bool ImuSensor::UpdateImpl(bool /*_force*/)
 {
   msgs::LinkData msg;
   int readIndex = 0;
@@ -229,12 +229,14 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
 
     // Don't do anything if there is no new data to process.
     if (!this->dataDirty)
-      return;
+      return false;
 
     readIndex = this->dataIndex;
     this->dataIndex ^= 1;
     this->dataDirty = false;
   }
+
+  this->lastUpdateTime = this->world->GetSimTime();
 
   // toggle the index
   msg.CopyFrom(*this->incomingLinkData[readIndex].get());
@@ -328,6 +330,8 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
     if (this->pub)
       this->pub->Publish(this->imuMsg);
   }
+
+  return true;
 }
 
 //////////////////////////////////////////////////

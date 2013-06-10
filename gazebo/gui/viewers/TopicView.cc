@@ -175,7 +175,7 @@ void TopicView::OnMsg(const common::Time &_dataTime, int _size)
   if (_dataTime != this->prevTime)
   {
     this->dataTimes.push_back(_dataTime - this->prevTime);
-    if (this->dataTimes.size() > 10)
+    if (this->dataTimes.size() > 20)
       this->dataTimes.pop_front();
   }
 

@@ -392,10 +392,6 @@ void Camera::RenderImpl()
   {
     // Render, but don't swap buffers.
     this->renderTarget->update(false);
-
-    this->ReadPixelBuffer();
-
-    this->lastRenderWallTime = common::Time::GetWallTime();
   }
 }
 
@@ -480,6 +476,10 @@ common::Time Camera::GetLastRenderWallTime()
 //////////////////////////////////////////////////
 void Camera::PostRender()
 {
+  this->ReadPixelBuffer();
+
+  this->lastRenderWallTime = common::Time::GetWallTime();
+
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
     if (this->captureDataOnce)

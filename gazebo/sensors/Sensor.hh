@@ -105,7 +105,8 @@ namespace gazebo
       ///        And in turn, Sensor::Update is called by
       ///        SensorManager::Update
       /// \param[in] _force True if update is forced, false if not
-      protected: virtual void UpdateImpl(bool /*_force*/) {}
+      /// \return True if the sensor was updated.
+      protected: virtual bool UpdateImpl(bool /*_force*/) {return false;}
 
       /// \brief Get the update rate of the sensor.
       /// \return _hz update rate of sensor.  Returns 0 if unthrottled.
@@ -190,6 +191,10 @@ namespace gazebo
       /// \brief Reset the lastUpdateTime to zero.
       public: void ResetLastUpdateTime();
 
+      /// \brief Return true if the sensor needs to be updated.
+      /// \return True when sensor should be updated.
+      protected: bool NeedsUpdate();
+
       /// \brief Load a plugin for this sensor.
       /// \param[in] _sdf SDF parameters.
       private: void LoadPlugin(sdf::ElementPtr _sdf);
@@ -232,6 +237,9 @@ namespace gazebo
       ///        this value must be updated within each sensor's UpdateImpl
       protected: common::Time lastMeasurementTime;
 
+      /// \brief Keep track how much the update has been delayed.
+      protected: common::Time updateDelay;
+
       /// \brief Event triggered when a sensor is updated.
       private: event::EventT<void()> updated;
 
@@ -243,9 +251,6 @@ namespace gazebo
 
       /// \brief The category of the sensor.
       private: SensorCategory category;
-
-      /// \brief Keep track how much the update has been delayed.
-      private: common::Time updateDelay;
     };
     /// \}
   }

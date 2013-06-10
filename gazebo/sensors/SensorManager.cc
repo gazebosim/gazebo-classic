@@ -641,7 +641,7 @@ void SensorManager::ImageSensorContainer::Update(bool _force)
   event::Events::preRender();
 
   // Tell all the cameras to render
-  // event::Events::render();
+  event::Events::render();
 
   event::Events::postRender();
 

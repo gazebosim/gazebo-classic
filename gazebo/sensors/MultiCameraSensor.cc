@@ -40,6 +40,10 @@ GZ_REGISTER_STATIC_SENSOR("multicamera", MultiCameraSensor)
 MultiCameraSensor::MultiCameraSensor()
     : Sensor(sensors::IMAGE)
 {
+  this->rendered = false;
+  this->connections.push_back(
+      event::Events::ConnectRender(
+        boost::bind(&MultiCameraSensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -140,6 +144,13 @@ void MultiCameraSensor::Init()
       this->cameras.push_back(camera);
     }
 
+    msgs::Image *image = this->msg.add_image();
+    image->set_width(camera->GetImageWidth());
+    image->set_height(camera->GetImageHeight());
+    image->set_pixel_format(common::Image::ConvertPixelFormat(
+          camera->GetImageFormat()));
+    image->set_step(camera->GetImageWidth() * camera->GetImageDepth());
+
     cameraSdf = cameraSdf->GetNextElement("camera");
   }
 
@@ -182,42 +193,54 @@ rendering::CameraPtr MultiCameraSensor::GetCamera(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void MultiCameraSensor::UpdateImpl(bool /*_force*/)
+void MultiCameraSensor::Render()
 {
-  boost::mutex::scoped_lock lock(this->cameraMutex);
-
-  if (this->cameras.size() == 0)
+  if (this->cameras.empty() || !this->IsActive() || !this->NeedsUpdate())
     return;
-
-  bool publish = this->imagePub->HasConnections();
 
   this->lastMeasurementTime = this->scene->GetSimTime();
 
-  msgs::ImagesStamped msg;
-  msgs::Set(msg.mutable_time(), this->lastMeasurementTime);
-
   // Update all the cameras
   for (std::vector<rendering::CameraPtr>::iterator iter = this->cameras.begin();
-       iter != this->cameras.end(); ++iter)
+      iter != this->cameras.end(); ++iter)
   {
     (*iter)->Render();
+  }
+  this->rendered = true;
+}
+
+//////////////////////////////////////////////////
+bool MultiCameraSensor::UpdateImpl(bool /*_force*/)
+{
+  boost::mutex::scoped_lock lock(this->cameraMutex);
+
+  if (!this->rendered)
+    return false;
+
+  this->lastUpdateTime = this->lastMeasurementTime;
+  bool publish = this->imagePub->HasConnections();
+
+  msgs::Set(this->msg.mutable_time(), this->lastMeasurementTime);
+
+  int index = 0;
+  for (std::vector<rendering::CameraPtr>::iterator iter = this->cameras.begin();
+       iter != this->cameras.end(); ++iter, ++index)
+  {
     (*iter)->PostRender();
 
     if (publish)
     {
-      msgs::Image *image = msg.add_image();
-      image->set_width((*iter)->GetImageWidth());
-      image->set_height((*iter)->GetImageHeight());
-      image->set_pixel_format(common::Image::ConvertPixelFormat(
-            (*iter)->GetImageFormat()));
-      image->set_step((*iter)->GetImageWidth() * (*iter)->GetImageDepth());
+      msgs::Image *image = this->msg.mutable_image(index);
       image->set_data((*iter)->GetImageData(0),
           image->width() * (*iter)->GetImageDepth() * image->height());
     }
   }
 
   if (publish)
-    this->imagePub->Publish(msg);
+    this->imagePub->Publish(this->msg);
+
+  this->rendered = false;
+  return true;
 }
 
 //////////////////////////////////////////////////
