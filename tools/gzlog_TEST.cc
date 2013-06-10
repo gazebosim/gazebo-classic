@@ -217,11 +217,11 @@ TEST(gz_log, Step)
 
   // Call gzlog step and press space once, then q
   std::string stepq1 = custom_exec(std::string("echo ' q' | ") + stepCmd);
-  EXPECT_EQ(stepq1.length(), 132144u);
+  EXPECT_EQ(stepq1.length(), 124125u);
 
   // Call gzlog step and press space twice, then q
   std::string stepq2 = custom_exec(std::string("echo '  q' | ") + stepCmd);
-  EXPECT_EQ(stepq2.length(), 148392u);
+  EXPECT_EQ(stepq2.length(), 132510u);
 }
 
 /////////////////////////////////////////////////
