@@ -234,6 +234,7 @@ void Scene::Init()
   // Force shadows on.
   this->SetShadowsEnabled(true);
 
+  this->requestPub->WaitForConnection();
   // \TODO: This causes the Scene to occasionally miss the response to
   // scene_info
   // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
