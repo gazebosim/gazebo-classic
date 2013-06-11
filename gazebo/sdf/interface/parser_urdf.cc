@@ -1200,24 +1200,24 @@ void URDF2Gazebo::CreateSDF(TiXmlElement *_root,
       ((!_link->inertial) || gazebo::math::equal(_link->inertial->mass, 0.0)))
     {
       if (!_link->child_links.empty())
-        gzwarn << "urdf2gazebo: link[" << _link->name
+        gzlog << "urdf2gazebo: link[" << _link->name
                << "] has no inertia, ["
                << static_cast<int>(_link->child_links.size())
                << "] children links ignored\n.";
 
       if (!_link->child_joints.empty())
-        gzwarn << "urdf2gazebo: link[" << _link->name
+        gzlog << "urdf2gazebo: link[" << _link->name
                << "] has no inertia, ["
                << static_cast<int>(_link->child_links.size())
                << "] children joints ignored\n.";
 
       if (_link->parent_joint)
-        gzwarn << "urdf2gazebo: link[" << _link->name
+        gzlog << "urdf2gazebo: link[" << _link->name
                << "] has no inertia, "
                << "parent joint [" << _link->parent_joint->name
                << "] ignored\n.";
 
-        gzwarn << "urdf2gazebo: link[" << _link->name
+        gzlog << "urdf2gazebo: link[" << _link->name
                << "] has no inertia, not modeled in gazebo\n";
       return;
     }
@@ -1284,7 +1284,7 @@ void URDF2Gazebo::CreateLink(TiXmlElement *_root,
     _currentTransform = localTransform * _currentTransform;
   }
   else
-    gzdbg << "[" << _link->name << "] has no parent joint\n";
+    gzlog << "[" << _link->name << "] has no parent joint\n";
 
   // create origin tag for this element
   this->AddTransform(elem, _currentTransform);
@@ -1679,7 +1679,7 @@ void URDF2Gazebo::CreateCollision(TiXmlElement* _elem, ConstUrdfLinkPtr _link,
     }
 
     /* set additional data from extensions */
-    this->InsertGazeboExtensionCollision(gazeboCollision, _oldLinkName);
+    this->InsertGazeboExtensionCollision(gazeboCollision, _link->name);
 
     /* add geometry to body */
     _elem->LinkEndChild(gazeboCollision);
@@ -1830,32 +1830,39 @@ void URDF2Gazebo::ReduceInertialToParent(UrdfLinkPtr _link)
     /* now lump all contents of this _link to parent */
     if (_link->inertial)
     {
-      // get parent mass (in parent link frame)
+      dMatrix3 R;
+      double phi, theta, psi;
+      // get parent mass (in parent link cg frame)
       dMass parentMass;
       if (!_link->getParent()->inertial)
         _link->getParent()->inertial.reset(new urdf::Inertial);
       dMassSetParameters(&parentMass, _link->getParent()->inertial->mass,
-        _link->getParent()->inertial->origin.position.x,
-        _link->getParent()->inertial->origin.position.y,
-        _link->getParent()->inertial->origin.position.z,
+        0, 0, 0,
         _link->getParent()->inertial->ixx, _link->getParent()->inertial->iyy,
         _link->getParent()->inertial->izz, _link->getParent()->inertial->ixy,
-         _link->getParent()->inertial->ixz, _link->getParent()->inertial->iyz);
+        _link->getParent()->inertial->ixz, _link->getParent()->inertial->iyz);
+
+      // transform parent inertia to parent link origin
+      _link->getParent()->inertial->origin.rotation.getRPY(phi, theta, psi);
+      dRFromEulerAngles(R, phi, theta, psi);
+      dMassRotate(&parentMass, R);
+      dMassTranslate(&parentMass,
+        _link->getParent()->inertial->origin.position.x,
+        _link->getParent()->inertial->origin.position.y,
+        _link->getParent()->inertial->origin.position.z);
+
       // PrintMass(_link->getParent()->name, parentMass);
       // PrintMass(_link->getParent());
-      // set _link mass (in _link frame)
+      // set _link mass (in _link's cg frame)
       dMass linkMass;
       dMassSetParameters(&linkMass, _link->inertial->mass,
-        _link->inertial->origin.position.x,
-        _link->inertial->origin.position.y,
-        _link->inertial->origin.position.z,
+        0, 0, 0,
         _link->inertial->ixx, _link->inertial->iyy, _link->inertial->izz,
         _link->inertial->ixy, _link->inertial->ixz, _link->inertial->iyz);
       // PrintMass(_link->name, linkMass);
       // PrintMass(_link);
+
       // un-rotate _link mass into parent link frame
-      dMatrix3 R;
-      double phi, theta, psi;
       _link->parent_joint->parent_to_joint_origin_transform.rotation.getRPY(
         phi, theta, psi);
       dRFromEulerAngles(R, phi, theta, psi);
@@ -1863,24 +1870,39 @@ void URDF2Gazebo::ReduceInertialToParent(UrdfLinkPtr _link)
       // PrintMass(_link->name, linkMass);
       // un-translate _link mass into parent link frame
       dMassTranslate(&linkMass,
+        _link->inertial->origin.position.x +
         _link->parent_joint->parent_to_joint_origin_transform.position.x,
+        _link->inertial->origin.position.y +
         _link->parent_joint->parent_to_joint_origin_transform.position.y,
+        _link->inertial->origin.position.z +
         _link->parent_joint->parent_to_joint_origin_transform.position.z);
+
       // PrintMass(_link->name, linkMass);
       // now linkMass is in the parent frame, add linkMass to parentMass
+      // dMassSetZero(&parentMass);
       dMassAdd(&parentMass, &linkMass);
-      // PrintMass(_link->getParent()->name, parentMass);
-      // update parent mass
+
+      // save new total mass
       _link->getParent()->inertial->mass = parentMass.mass;
+      // save CoG location
+      _link->getParent()->inertial->origin.position.x  = parentMass.c[0];
+      _link->getParent()->inertial->origin.position.y  = parentMass.c[1];
+      _link->getParent()->inertial->origin.position.z  = parentMass.c[2];
+
+      // transform MOI to the new CG
+      dMassTranslate(&parentMass,
+        -parentMass.c[0],
+        -parentMass.c[1],
+        -parentMass.c[2]);
+
+      // PrintMass(_link->getParent()->name, parentMass);
+      // update parent MOI
       _link->getParent()->inertial->ixx  = parentMass.I[0+4*0];
       _link->getParent()->inertial->iyy  = parentMass.I[1+4*1];
       _link->getParent()->inertial->izz  = parentMass.I[2+4*2];
       _link->getParent()->inertial->ixy  = parentMass.I[0+4*1];
       _link->getParent()->inertial->ixz  = parentMass.I[0+4*2];
       _link->getParent()->inertial->iyz  = parentMass.I[1+4*2];
-      _link->getParent()->inertial->origin.position.x  = parentMass.c[0];
-      _link->getParent()->inertial->origin.position.y  = parentMass.c[1];
-      _link->getParent()->inertial->origin.position.z  = parentMass.c[2];
       // PrintMass(_link->getParent());
     }
 }

@@ -134,32 +134,53 @@ void TopicManager::RemoveNode(unsigned int _id)
 }
 
 //////////////////////////////////////////////////
-void TopicManager::ProcessNodes(bool _onlyOut)
+void TopicManager::AddNodeToProcess(NodePtr _ptr)
 {
-  int s;
-
-  {
-    boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
-
-    // store as size might change (spawning)
-    s = this->nodes.size();
-  }
-
-  // Process nodes in parallel
-  try
+  if (_ptr)
   {
     boost::mutex::scoped_lock lock(this->processNodesMutex);
-    tbb::parallel_for(tbb::blocked_range<size_t>(0, this->nodes.size(), 10),
-        NodeProcess_TBB(&this->nodes));
+    this->nodesToProcess.insert(_ptr);
   }
-  catch(...)
+}
+
+//////////////////////////////////////////////////
+void TopicManager::ProcessNodes(bool _onlyOut)
+{
   {
-    /// Failed to process the nodes this time around. But not to
-    /// worry. This function is called again.
+    boost::mutex::scoped_lock lock(this->processNodesMutex);
+    for (boost::unordered_set<NodePtr>::iterator iter =
+        this->nodesToProcess.begin();
+        iter != this->nodesToProcess.end(); ++iter)
+    {
+      (*iter)->ProcessPublishers();
+    }
+    this->nodesToProcess.clear();
   }
+
+  // Note: In general there are very few nodes. So, parallelization is not
+  // needed. Keeping this code for posterity.
+  // int s;
+  // {
+  //   boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
+  //   // store as size might change (spawning)
+  //   s = this->nodes.size();
+  // }
+  // Process nodes in parallel
+  // try
+  // {
+  //   boost::mutex::scoped_lock lock(this->processNodesMutex);
+  //   tbb::parallel_for(tbb::blocked_range<size_t>(0, this->nodes.size(), 10),
+  //       NodeProcess_TBB(&this->nodes));
+  // }
+  // catch(...)
+  // {
+  //   /// Failed to process the nodes this time around. But not to
+  //   /// worry. This function is called again.
+  // }
 
   if (!this->pauseIncoming && !_onlyOut)
   {
+    int s = 0;
     {
       boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
       s = this->nodes.size();
@@ -176,12 +197,14 @@ void TopicManager::ProcessNodes(bool _onlyOut)
 
 //////////////////////////////////////////////////
 void TopicManager::Publish(const std::string &_topic, MessagePtr _message,
-    const boost::function<void()> &_cb)
+    boost::function<void(uint32_t)> _cb, uint32_t _id)
 {
   PublicationPtr pub = this->FindPublication(_topic);
 
   if (pub)
-    pub->Publish(_message, _cb);
+    pub->Publish(_message, _cb, _id);
+  else if (!_cb.empty())
+    _cb(_id);
 }
 
 //////////////////////////////////////////////////
@@ -334,22 +357,22 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
 
 
 //////////////////////////////////////////////////
-PublicationPtr TopicManager::UpdatePublications(const std::string &topic,
-                                                const std::string &msgType)
+PublicationPtr TopicManager::UpdatePublications(const std::string &_topic,
+                                                const std::string &_msgType)
 {
   // Find a current publication on this topic
-  PublicationPtr pub = this->FindPublication(topic);
+  PublicationPtr pub = this->FindPublication(_topic);
 
   if (pub)
   {
-    if (msgType != pub->GetMsgType())
+    if (_msgType != pub->GetMsgType())
       gzthrow("Attempting to advertise on an existing topic with"
               " a conflicting message type\n");
   }
   else
   {
-    pub = PublicationPtr(new Publication(topic, msgType));
-    this->advertisedTopics[topic] =  pub;
+    pub = PublicationPtr(new Publication(_topic, _msgType));
+    this->advertisedTopics[_topic] =  pub;
     this->advertisedTopicsEnd = this->advertisedTopics.end();
   }
 

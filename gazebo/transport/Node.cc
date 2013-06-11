@@ -24,6 +24,8 @@ using namespace transport;
 
 unsigned int Node::idCounter = 0;
 
+extern void dummy_callback_fn(uint32_t);
+
 /////////////////////////////////////////////////
 Node::Node()
 {
@@ -80,8 +82,8 @@ void Node::Init(const std::string &_space)
 
     if (namespaces.empty())
       gzerr << "No namespace found\n";
-
-    this->topicNamespace = namespaces.front();
+    else
+      this->topicNamespace = namespaces.front();
   }
   else
     TopicManager::Instance()->RegisterTopicNamespace(_space);
@@ -159,10 +161,11 @@ bool Node::HandleMessage(const std::string &_topic, MessagePtr _msg)
 /////////////////////////////////////////////////
 void Node::ProcessIncoming()
 {
-  if (!this->initialized)
-    return;
-
   boost::recursive_mutex::scoped_lock lock(this->processIncomingMutex);
+
+  if (!this->initialized ||
+      (this->incomingMsgs.empty() && this->incomingMsgsLocal.empty()))
+    return;
 
   Callback_M::iterator cbIter;
   Callback_L::iterator liter;
@@ -196,7 +199,8 @@ void Node::ProcessIncoming()
           for (liter = cbIter->second.begin();
               liter != cbIter->second.end(); ++liter)
           {
-            (*liter)->HandleData(*msgIter);
+            (*liter)->HandleData(*msgIter,
+                boost::bind(&dummy_callback_fn, _1), 0);
           }
         }
       }
@@ -256,7 +260,7 @@ void Node::InsertLatchedMsg(const std::string &_topic, const std::string &_msg)
          liter != cbIter->second.end(); ++liter)
     {
       if ((*liter)->GetLatching())
-        (*liter)->HandleData(_msg);
+        (*liter)->HandleData(_msg, boost::bind(&dummy_callback_fn, _1), 0);
     }
   }
 }

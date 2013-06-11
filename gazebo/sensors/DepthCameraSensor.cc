@@ -111,6 +111,12 @@ void DepthCameraSensor::Init()
   else
     gzerr << "No world name\n";
 
+  // Disable clouds and moon on server side until fixed and also to improve
+  // performance
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+      ~rendering::Scene::GZ_SKYX_CLOUDS &
+      ~rendering::Scene::GZ_SKYX_MOON);
+
   Sensor::Init();
 }
 

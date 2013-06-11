@@ -65,7 +65,7 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   {
     // This will create a topic based on the name specified in SDF.
     this->contactsPub = this->node->Advertise<msgs::Contacts>(
-      this->sdf->GetElement("contact")->GetValueString("topic"));
+      this->sdf->GetElement("contact")->GetValueString("topic"), 100);
   }
   else
   {
@@ -75,7 +75,7 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     topicName += this->parentName + "/" + this->GetName();
     boost::replace_all(topicName, "::", "/");
 
-    this->contactsPub = this->node->Advertise<msgs::Contacts>(topicName);
+    this->contactsPub = this->node->Advertise<msgs::Contacts>(topicName, 100);
   }
 }
 

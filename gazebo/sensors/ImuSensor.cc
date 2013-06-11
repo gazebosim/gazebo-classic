@@ -65,7 +65,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
       != "__default_topic__")
   {
     this->pub = this->node->Advertise<msgs::IMU>(
-        this->sdf->GetElement("imu")->GetValueString("topic"));
+        this->sdf->GetElement("imu")->GetValueString("topic"), 500);
   }
   else
   {
@@ -73,7 +73,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     topicName += this->parentName + "/" + this->GetName() + "/imu";
     boost::replace_all(topicName, "::", "/");
 
-    this->pub = this->node->Advertise<msgs::IMU>(topicName);
+    this->pub = this->node->Advertise<msgs::IMU>(topicName, 500);
   }
 
   // Handle noise model settings.
