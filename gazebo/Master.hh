@@ -80,7 +80,7 @@ namespace gazebo
 
     /// \brief Accept a new connection
     /// \param[in] _newConnection The new connection
-    private: void OnAccept(const transport::ConnectionPtr &_newConnection);
+    private: void OnAccept(transport::ConnectionPtr _newConnection);
 
     /// \brief Get a publisher for the given topic
     /// \param[in] _topic Name of the topic

@@ -52,7 +52,7 @@ void Master::Init(uint16_t _port)
 }
 
 //////////////////////////////////////////////////
-void Master::OnAccept(const transport::ConnectionPtr &_newConnection)
+void Master::OnAccept(transport::ConnectionPtr _newConnection)
 {
   // Send the gazebo version string
   msgs::GzString versionMsg;
@@ -81,7 +81,6 @@ void Master::OnAccept(const transport::ConnectionPtr &_newConnection)
   }
   _newConnection->EnqueueMsg(
       msgs::Package("publishers_init", publishersMsg), true);
-
 
   // Add the connection to our list
   {
