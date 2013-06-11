@@ -139,6 +139,14 @@ namespace gazebo
     /// \return The message type, or empty string if the topic is not valid.
     std::string getTopicMsgType(const std::string &_topicName);
 
+    /// \brief Set whether minimal comms should be used. This will be used
+    /// to reduce network traffic.
+    void setMinimalComms(bool _enabled);
+
+    /// \brief Get whether minimal comms has been enabled.
+    /// \return True if minimal comms is enabled.
+    bool getMinimalComms();
+
     /// \}
   }
 }

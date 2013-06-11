@@ -38,7 +38,7 @@ boost::mutex g_sensorTimingMutex;
 
 //////////////////////////////////////////////////
 SensorManager::SensorManager()
-  : initialized(false)
+  : initialized(false), removeAllSensors(false)
 {
   // sensors::IMAGE container
   this->sensorContainers.push_back(new ImageSensorContainer());
@@ -103,10 +103,9 @@ void SensorManager::Stop()
 //////////////////////////////////////////////////
 void SensorManager::Update(bool _force)
 {
-  Sensor_V::iterator iter;
-
   {
     boost::recursive_mutex::scoped_lock lock(this->mutex);
+    Sensor_V::iterator iter;
 
     // in case things are spawn, sensors length changes
     for (iter = this->initSensors.begin();
@@ -149,6 +148,18 @@ void SensorManager::Update(bool _force)
       }
     }
     this->removeSensors.clear();
+
+    if (this->removeAllSensors)
+    {
+      for (SensorContainer_V::iterator iter2 = this->sensorContainers.begin();
+          iter2 != this->sensorContainers.end(); ++iter2)
+      {
+        GZ_ASSERT((*iter2) != NULL, "SensorContainer is NULL");
+        (*iter2)->RemoveSensors();
+      }
+      this->initSensors.clear();
+      this->removeAllSensors = false;
+    }
   }
 
   // Only update if there are sensors
@@ -352,16 +363,8 @@ void SensorManager::RemoveSensor(const std::string &_name)
 void SensorManager::RemoveSensors()
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
-
-  for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
-      iter != this->sensorContainers.end(); ++iter)
-  {
-    GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
-    (*iter)->RemoveSensors();
-  }
-  this->initSensors.clear();
+  this->removeAllSensors = true;
 }
-
 
 //////////////////////////////////////////////////
 SensorManager::SensorContainer::SensorContainer()
@@ -618,6 +621,8 @@ void SensorManager::SensorContainer::ResetLastUpdateTimes()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::RemoveSensors()
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   Sensor_V::iterator iter;
 
   // Remove all the sensors
@@ -636,7 +641,7 @@ void SensorManager::ImageSensorContainer::Update(bool _force)
   event::Events::preRender();
 
   // Tell all the cameras to render
-  event::Events::render();
+  // event::Events::render();
 
   event::Events::postRender();
 

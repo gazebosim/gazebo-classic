@@ -179,11 +179,31 @@ namespace gazebo
       public: inline friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::physics::LinkState &_state)
       {
-        _out << "<link name='" << _state.name << "'>"
-             << "<pose>" << _state.pose << "</pose>"
-             << "<velocity>" << _state.velocity << "</velocity>"
-             << "<acceleration>" << _state.acceleration << "</acceleration>"
-             << "<wrench>" << _state.wrench << "</wrench>";
+        math::Vector3 q(_state.pose.rot.GetAsEuler());
+        _out << std::fixed <<std::setprecision(5)
+          << "<link name='" << _state.name << "'>"
+          << "<pose>"
+          << _state.pose.pos.x << " "
+          << _state.pose.pos.y << " "
+          << _state.pose.pos.z << " "
+          << q.x << " "
+          << q.y << " "
+          << q.z << " "
+          << "</pose>";
+
+        /// Disabling this for efficiency.
+        q = _state.velocity.rot.GetAsEuler();
+         _out << std::fixed <<std::setprecision(4)
+           << "<velocity>"
+           << _state.velocity.pos.x << " "
+           << _state.velocity.pos.y << " "
+           << _state.velocity.pos.z << " "
+           << q.x << " "
+           << q.y << " "
+           << q.z << " "
+           << "</velocity>";
+        // << "<acceleration>" << _state.acceleration << "</acceleration>"
+        // << "<wrench>" << _state.wrench << "</wrench>";
 
         /// Disabling this for efficiency.
         // for (std::vector<CollisionState>::const_iterator iter =
