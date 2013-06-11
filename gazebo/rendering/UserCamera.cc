@@ -364,13 +364,15 @@ void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
 //////////////////////////////////////////////////
 float UserCamera::GetAvgFPS() const
 {
-  return WindowManager::Instance()->GetAvgFPS(this->windowId);
+  return RenderEngine::Instance()->GetWindowManager()->GetAvgFPS(
+      this->windowId);
 }
 
 //////////////////////////////////////////////////
 float UserCamera::GetTriangleCount() const
 {
-  return WindowManager::Instance()->GetTriangleCount(this->windowId);
+  return RenderEngine::Instance()->GetWindowManager()->GetTriangleCount(
+      this->windowId);
 }
 
 //////////////////////////////////////////////////
@@ -534,6 +536,7 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
                                 std::string &_mod)
 {
   VisualPtr result;
+
   if (!this->selectionBuffer)
     return result;
 

@@ -18,6 +18,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/archive/iterators/base64_from_binary.hpp>
@@ -30,38 +31,12 @@
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/LogRecord.hh"
-#include "gazebo/common/LogPlay.hh"
+#include "gazebo/common/Base64.hh"
+#include "gazebo/util/LogRecord.hh"
+#include "gazebo/util/LogPlay.hh"
 
 using namespace gazebo;
-using namespace common;
-
-/////////////////////////////////////////////////
-// Convert a Base64 string.
-// We have to use our own function, instead of just using the
-// boost::archive iterators, because the boost::archive iterators throw an
-// error when the end of the Base64 string is reached. The expection then
-// causes nothing to happen.
-// TLDR; Boost is broken.
-void base64_decode(std::string &_dest, const std::string &_src)
-{
-  typedef boost::archive::iterators::transform_width<
-    boost::archive::iterators::binary_from_base64<const char*>, 8, 6>
-    base64_dec;
-
-  try
-  {
-    base64_dec srcIter(_src.c_str());
-    for (unsigned int i = 0; i < _src.size(); ++i)
-    {
-      _dest += *srcIter;
-      ++srcIter;
-    }
-  }
-  catch(boost::archive::iterators::dataflow_exception &)
-  {
-  }
-}
+using namespace util;
 
 /////////////////////////////////////////////////
 LogPlay::LogPlay()
@@ -83,7 +58,7 @@ void LogPlay::Open(const std::string &_logFile)
 
   // Parse the log file
   if (!this->xmlDoc.LoadFile(_logFile))
-    gzthrow("Unable to parser log file[" << _logFile << "]");
+    gzthrow("Unable to parse log file[" << _logFile << "]");
 
   // Get the gazebo_log element
   this->logStartXml = this->xmlDoc.FirstChildElement("gazebo_log");
@@ -99,6 +74,21 @@ void LogPlay::Open(const std::string &_logFile)
 
   this->logCurrXml = this->logStartXml;
   this->encoding.clear();
+}
+
+/////////////////////////////////////////////////
+std::string LogPlay::GetHeader() const
+{
+  std::ostringstream stream;
+  stream << "<?xml version='1.0'?>\n"
+         << "<gazebo_log>\n"
+         << "<header>\n"
+         << "<log_version>" << this->logVersion << "</log_version>\n"
+         << "<gazebo_version>" << this->gazeboVersion << "</gazebo_version>\n"
+         << "<rand_seed>" << this->randSeed << "</rand_seed>\n"
+         << "</header>\n";
+
+  return stream.str();
 }
 
 /////////////////////////////////////////////////
@@ -173,14 +163,43 @@ uint32_t LogPlay::GetRandSeed() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
-  if (this->logCurrXml == this->logStartXml)
-    this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
-  else if (this->logCurrXml)
-    this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
-  else
-    return false;
+  std::string startMarker = "<sdf ";
+  std::string endMarker = "</sdf>";
+  size_t start = this->currentChunk.find(startMarker);
+  size_t end = this->currentChunk.find(endMarker);
 
-  return this->GetChunkData(this->logCurrXml, _data);
+  if (start == std::string::npos || end == std::string::npos)
+  {
+    this->currentChunk.clear();
+
+    if (this->logCurrXml == this->logStartXml)
+      this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+    else if (this->logCurrXml)
+    {
+      this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
+    }
+    else
+      return false;
+
+    // Stop if there are no more chunks
+    if (!this->logCurrXml)
+      return false;
+
+    if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+    {
+      gzerr << "Unable to decode log file\n";
+      return false;
+    }
+
+    start = this->currentChunk.find(startMarker);
+    end = this->currentChunk.find(endMarker);
+  }
+
+  _data = this->currentChunk.substr(start, end+endMarker.size()-start);
+
+  this->currentChunk.erase(0, end + endMarker.size());
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -224,7 +243,7 @@ bool LogPlay::GetChunkData(TiXmlElement *_xml, std::string &_data)
     std::string buffer;
 
     // Decode the base64 string
-    base64_decode(buffer, data);
+    buffer = Base64Decode(data);
 
     // Decompress the bz2 data
     {
@@ -234,6 +253,26 @@ bool LogPlay::GetChunkData(TiXmlElement *_xml, std::string &_data)
 
       // Get the data
       std::getline(in, _data, '\0');
+      _data += '\0';
+    }
+  }
+  else if (this->encoding == "zlib")
+  {
+    std::string data = _xml->GetText();
+    std::string buffer;
+
+    // Decode the base64 string
+    buffer = Base64Decode(data);
+
+    // Decompress the zlib data
+    {
+      boost::iostreams::filtering_istream in;
+      in.push(boost::iostreams::zlib_decompressor());
+      in.push(boost::make_iterator_range(buffer));
+
+      // Get the data
+      std::getline(in, _data, '\0');
+      _data += '\0';
     }
   }
   else

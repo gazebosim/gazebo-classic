@@ -168,7 +168,9 @@ void Visual::Fini()
   {
     this->sceneNode->removeChild((*iter)->GetSceneNode());
     (*iter)->parent.reset();
+    (*iter).reset();
   }
+
   this->children.clear();
 
   if (this->sceneNode != NULL)
@@ -243,6 +245,7 @@ void Visual::Init()
 
   if (this->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
+
   this->initialized = true;
 }
 
@@ -362,6 +365,12 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       elem->GetAttribute("name")->Set(_msg->plugin().name());
     if (_msg->plugin().has_filename())
       elem->GetAttribute("filename")->Set(_msg->plugin().filename());
+    if (_msg->plugin().has_innerxml())
+    {
+      TiXmlDocument innerXML;
+      innerXML.Parse(_msg->plugin().innerxml().c_str());
+      sdf::copyChildren(elem, innerXML.RootElement());
+    }
   }
 
   this->Load();
@@ -406,7 +415,8 @@ void Visual::Load()
     catch(Ogre::Exception &e)
     {
       gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-      gzthrow("Unable to create a mesh from " + meshName);
+      gzerr << "Unable to create a mesh from " <<  meshName << "\n";
+      return;
     }
   }
 
@@ -1363,7 +1373,7 @@ math::Pose Visual::GetWorldPose() const
   pose.pos.y = vpos.y;
   pose.pos.z = vpos.z;
 
-  vquatern = this->sceneNode->getOrientation();
+  vquatern = this->sceneNode->_getDerivedOrientation();
   pose.rot.w = vquatern.w;
   pose.rot.x = vquatern.x;
   pose.rot.y = vquatern.y;
@@ -1401,8 +1411,14 @@ void Visual::DisableTrackVisual()
 //////////////////////////////////////////////////
 std::string Visual::GetNormalMap() const
 {
-  return this->sdf->GetElement("material")->GetElement(
+  std::string file = this->sdf->GetElement("material")->GetElement(
       "shader")->GetElement("normal_map")->GetValueString();
+
+  std::string uriFile = common::find_file(file);
+  if (!uriFile.empty())
+    file = uriFile;
+
+  return file;
 }
 
 //////////////////////////////////////////////////
@@ -1593,7 +1609,10 @@ void Visual::InsertMesh(const std::string &_meshName,
   {
     mesh = common::MeshManager::Instance()->Load(_meshName);
     if (!mesh)
-      gzthrow("Unable to create a mesh from " + _meshName);
+    {
+      gzerr << "Unable to create a mesh from " << _meshName << "\n";
+      return;
+    }
   }
   else
   {

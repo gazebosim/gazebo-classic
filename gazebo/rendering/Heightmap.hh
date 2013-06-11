@@ -43,6 +43,8 @@ namespace gazebo
 {
   namespace rendering
   {
+    class GzTerrainMatGen;
+
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -71,9 +73,93 @@ namespace gazebo
       /// \return The height at the specified location
       public: double GetHeight(double _x, double _y, double _z = 1000);
 
+      /// \brief Flatten the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Flatten(CameraPtr _camera, math::Vector2i _mousePos,
+                         double _outsideRadius, double _insideRadius,
+                         double _weight = 0.1);
+
+      /// \brief Smooth the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Smooth(CameraPtr _camera, math::Vector2i _mousePos,
+                         double _outsideRadius, double _insideRadius,
+                         double _weight = 0.1);
+
+      /// \brief Raise the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Raise(CameraPtr _camera, math::Vector2i _mousePos,
+                         double _outsideRadius, double _insideRadius,
+                         double _weight = 0.1);
+
+      /// \brief Lower the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Lower(CameraPtr _camera, math::Vector2i _mousePos,
+                         double _outsideRadius, double _insideRadius,
+                         double _weight = 0.1);
+
+      /// \brief Get the average height around a point.
+      /// \param[in] _pos Position in world coordinates.
+      /// \param[in] _brushSize Controls the radius of effect.
+      public: double GetAvgHeight(Ogre::Vector3 _pos, double _brushSize);
+
+      /// \brief Set the heightmap to render in wireframe mode.
+      /// \param[in] _show True to render wireframe, false to render solid.
+      public: void SetWireframe(bool _show);
+
       /// \brief Get a pointer to the OGRE terrain group object.
       /// \return Pointer to the OGRE terrain.
       public: Ogre::TerrainGroup *GetOgreTerrain() const;
+
+      /// \brief Get the heightmap as an image
+      /// \return An image that contains the terrain data.
+      public: common::Image GetImage() const;
+
+      /// \brief Calculate a mouse ray hit on the terrain.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \return The result of the mouse ray hit.
+      public: Ogre::TerrainGroup::RayResult GetMouseHit(CameraPtr _camera,
+                  math::Vector2i _mousePos);
+
+      /// \brief Modify the height at a specific point.
+      /// \param[in] _pos Position in world coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \param[in] _op Type of operation to perform.
+      private: void ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
+                   double _insideRadius, double _weight,
+                   const std::string &_op);
 
       /// \brief Initialize all the blend material maps.
       /// \param[in] _terrain The terrain to initialize the blend maps.
@@ -100,11 +186,8 @@ namespace gazebo
       /// \brief Size of the terrain.
       private: math::Vector3 terrainSize;
 
-      /// \brief Size of the image.
-      private: unsigned int imageSize;
-
-      /// \brief Max pixel value.
-      private: double maxPixel;
+      /// \brief Size of the heightmap data.
+      private: unsigned int dataSize;
 
       /// \brief Origin of the terrain.
       private: math::Vector3 terrainOrigin;
@@ -132,6 +215,12 @@ namespace gazebo
 
       /// \brief Material blend fade distances.
       private: std::vector<double> blendFade;
+
+      /// \brief The raw height values received from physics.
+      private: std::vector<float> heights;
+
+      /// \brief Pointer to the terrain material generator.
+      private: GzTerrainMatGen *gzMatGen;
     };
     /// \}
 

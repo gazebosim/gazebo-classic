@@ -130,6 +130,9 @@ namespace gazebo
       /// \brief internal variable to keep track of cfm damping internals
       private: int cfmDampingState[3];
 
+      /// \brief current cfm damping for stability reasons
+      private: double dStable[3];
+
       /// \brief internal variable to keep track if ConnectJointUpdate
       /// has been called on a damping method
       private: bool dampingInitialized;
@@ -155,6 +158,9 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetAttribute(Attribute _attr, int _index,
                                         double _value);
+
+      // Documentation inherited.
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
       // Documentation inherited.
       public: virtual void SetAttribute(const std::string &_key, int _index,

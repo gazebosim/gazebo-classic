@@ -23,6 +23,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
@@ -199,7 +200,15 @@ void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
   if (!this->bulletSlider)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-    this->initialWorldAxis = _axis;
+
+    /// \TODO: currently we assume joint axis is specified in model frame,
+    /// this is incorrect, and should be corrected to be
+    /// joint frame which is specified in child link frame.
+    if (this->parentLink)
+      this->initialWorldAxis =
+        this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+    else
+      this->initialWorldAxis = _axis;
   }
   else
   {

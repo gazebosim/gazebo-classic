@@ -31,11 +31,17 @@ boost::thread *g_runThread = NULL;
 boost::condition_variable g_responseCondition;
 boost::mutex requestMutex;
 bool g_stopped = true;
+bool g_minimalComms = false;
 
 std::list<msgs::Request *> g_requests;
 std::list<boost::shared_ptr<msgs::Response> > g_responses;
 
 #define DEFAULT_MASTER_PORT 11345
+
+/////////////////////////////////////////////////
+void dummy_callback_fn(uint32_t)
+{
+}
 
 /////////////////////////////////////////////////
 bool transport::get_master_uri(std::string &_masterHost,
@@ -127,15 +133,15 @@ bool transport::is_stopped()
 void transport::stop()
 {
   g_stopped = true;
+  g_responseCondition.notify_all();
   transport::ConnectionManager::Instance()->Stop();
 }
 
 /////////////////////////////////////////////////
 void transport::fini()
 {
-  g_stopped = true;
+  transport::stop();
   transport::TopicManager::Instance()->Fini();
-  transport::ConnectionManager::Instance()->Stop();
 
   if (g_runThread)
   {
@@ -203,9 +209,11 @@ boost::shared_ptr<msgs::Response> transport::request(
   node->Init(_worldName);
 
   PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
+  requestPub->WaitForConnection();
+
   SubscriberPtr responseSub = node->Subscribe("~/response", &on_response);
 
-  requestPub->Publish(*request);
+  requestPub->Publish(*request, true);
 
   boost::shared_ptr<msgs::Response> response;
   std::list<boost::shared_ptr<msgs::Response> >::iterator iter;
@@ -331,3 +339,16 @@ std::string transport::getTopicMsgType(const std::string &_topicName)
 
   return result;
 }
+
+/////////////////////////////////////////////////
+void transport::setMinimalComms(bool _enabled)
+{
+  g_minimalComms = _enabled;
+}
+
+/////////////////////////////////////////////////
+bool transport::getMinimalComms()
+{
+  return g_minimalComms;
+}
+

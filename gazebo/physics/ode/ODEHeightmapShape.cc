@@ -30,6 +30,7 @@ using namespace physics;
 ODEHeightmapShape::ODEHeightmapShape(CollisionPtr _parent)
     : HeightmapShape(_parent)
 {
+  this->flipY = false;
 }
 
 //////////////////////////////////////////////////
@@ -56,10 +57,10 @@ void ODEHeightmapShape::Init()
   this->odeData = dGeomHeightfieldDataCreate();
 
   // Step 3: Setup a callback method for ODE
-  dGeomHeightfieldDataBuildCallback(
+  dGeomHeightfieldDataBuildSingle(
       this->odeData,
-      this,
-      ODEHeightmapShape::GetHeightCallback,
+      &this->heights[0],
+      0,
       this->GetSize().x,  // in meters
       this->GetSize().y,  // in meters
       this->vertSize,  // width sampling size
