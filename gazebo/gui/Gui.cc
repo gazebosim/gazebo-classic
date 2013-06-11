@@ -70,10 +70,9 @@ bool parse_args(int _argc, char **_argv)
     return false;
   }
 
-  gazebo::print_version();
-
   po::options_description v_desc("Allowed options");
   v_desc.add_options()
+    ("quiet,q", "Reduce output to stdout.")
     ("help,h", "Produce this help message.")
     ("gui-plugin,g", po::value<std::vector<std::string> >(), "Load a plugin.");
 
@@ -90,6 +89,11 @@ bool parse_args(int _argc, char **_argv)
     std::cerr << "Error. Gui Invalid arguments\n";
     return false;
   }
+
+  if (!vm.count("quiet"))
+    gazebo::print_version();
+  else
+    gazebo::common::Console::Instance()->SetQuiet(true);
 
   if (vm.count("help"))
   {

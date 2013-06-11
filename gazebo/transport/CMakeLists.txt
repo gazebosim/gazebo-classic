@@ -51,3 +51,9 @@ target_link_libraries(gazebo_transport
 
 gz_install_library(gazebo_transport)
 gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport.hh)
+
+# unit tests
+set (gtest_sources
+  Connection_TEST.cc
+)
+gz_build_tests(${gtest_sources})

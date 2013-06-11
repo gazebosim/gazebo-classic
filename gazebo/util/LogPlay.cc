@@ -18,6 +18,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/archive/iterators/base64_from_binary.hpp>
@@ -30,38 +31,12 @@
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Base64.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
 
 using namespace gazebo;
 using namespace util;
-
-/////////////////////////////////////////////////
-// Convert a Base64 string.
-// We have to use our own function, instead of just using the
-// boost::archive iterators, because the boost::archive iterators throw an
-// error when the end of the Base64 string is reached. The expection then
-// causes nothing to happen.
-// TLDR; Boost is broken.
-void base64_decode(std::string &_dest, const std::string &_src)
-{
-  typedef boost::archive::iterators::transform_width<
-    boost::archive::iterators::binary_from_base64<const char*>, 8, 6>
-    base64_dec;
-
-  try
-  {
-    base64_dec srcIter(_src.c_str());
-    for (unsigned int i = 0; i < _src.size(); ++i)
-    {
-      _dest += *srcIter;
-      ++srcIter;
-    }
-  }
-  catch(boost::archive::iterators::dataflow_exception &)
-  {
-  }
-}
 
 /////////////////////////////////////////////////
 LogPlay::LogPlay()
@@ -268,12 +243,31 @@ bool LogPlay::GetChunkData(TiXmlElement *_xml, std::string &_data)
     std::string buffer;
 
     // Decode the base64 string
-    base64_decode(buffer, data);
+    buffer = Base64Decode(data);
 
     // Decompress the bz2 data
     {
       boost::iostreams::filtering_istream in;
       in.push(boost::iostreams::bzip2_decompressor());
+      in.push(boost::make_iterator_range(buffer));
+
+      // Get the data
+      std::getline(in, _data, '\0');
+      _data += '\0';
+    }
+  }
+  else if (this->encoding == "zlib")
+  {
+    std::string data = _xml->GetText();
+    std::string buffer;
+
+    // Decode the base64 string
+    buffer = Base64Decode(data);
+
+    // Decompress the zlib data
+    {
+      boost::iostreams::filtering_istream in;
+      in.push(boost::iostreams::zlib_decompressor());
       in.push(boost::make_iterator_range(buffer));
 
       // Get the data

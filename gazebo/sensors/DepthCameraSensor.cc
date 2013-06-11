@@ -111,6 +111,12 @@ void DepthCameraSensor::Init()
   else
     gzerr << "No world name\n";
 
+  // Disable clouds and moon on server side until fixed and also to improve
+  // performance
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+      ~rendering::Scene::GZ_SKYX_CLOUDS &
+      ~rendering::Scene::GZ_SKYX_MOON);
+
   Sensor::Init();
 }
 
@@ -118,7 +124,7 @@ void DepthCameraSensor::Init()
 void DepthCameraSensor::Fini()
 {
   Sensor::Fini();
-  this->camera->Fini();
+  this->scene->RemoveCamera(this->camera->GetName());
   this->camera.reset();
   this->scene.reset();
 }
@@ -137,7 +143,7 @@ void DepthCameraSensor::UpdateImpl(bool /*_force*/)
   {
     this->camera->Render();
     this->camera->PostRender();
-    this->lastMeasurementTime = this->world->GetSimTime();
+    this->lastMeasurementTime = this->scene->GetSimTime();
   }
 }
 
@@ -147,4 +153,3 @@ bool DepthCameraSensor::SaveFrame(const std::string &_filename)
   this->SetActive(true);
   return this->camera->SaveFrame(_filename);
 }
-

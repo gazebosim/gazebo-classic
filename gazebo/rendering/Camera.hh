@@ -485,6 +485,9 @@ namespace gazebo
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 
+      /// \brief Read image data from pixel buffer
+      protected: void ReadPixelBuffer();
+
       /// \brief Implementation of the Camera::TrackVisual call
       /// \param[in] _visualName Name of the visual to track
       /// \return True if able to track the visual

@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <gazebo/common/Time.hh>
 
 #include <stdio.h>
 #include <string>
@@ -216,11 +217,21 @@ TEST(gz_log, Step)
 
   // Call gzlog step and press space once, then q
   std::string stepq1 = custom_exec(std::string("echo ' q' | ") + stepCmd);
-  EXPECT_EQ(stepq1.length(), 132144u);
+  EXPECT_EQ(stepq1.length(), 124125u);
 
   // Call gzlog step and press space twice, then q
   std::string stepq2 = custom_exec(std::string("echo '  q' | ") + stepCmd);
-  EXPECT_EQ(stepq2.length(), 148392u);
+  EXPECT_EQ(stepq2.length(), 132510u);
+}
+
+/////////////////////////////////////////////////
+TEST(gz_log, HangCheck)
+{
+  gazebo::common::Time start = gazebo::common::Time::GetWallTime();
+  custom_exec("gzlog stop");
+  gazebo::common::Time end = gazebo::common::Time::GetWallTime();
+
+  EXPECT_LT(end - start, gazebo::common::Time(60, 0));
 }
 
 /////////////////////////////////////////////////

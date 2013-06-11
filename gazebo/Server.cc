@@ -24,10 +24,12 @@
 
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
+#include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Common.hh"
+#include "gazebo/common/Console.hh"
 
 #include "gazebo/sdf/sdf.hh"
 
@@ -49,7 +51,6 @@ bool Server::stop = true;
 Server::Server()
 {
   this->receiveMutex = new boost::mutex();
-  gazebo::print_version();
 
   if (signal(SIGINT, Server::SigInt) == SIG_ERR)
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
@@ -78,20 +79,22 @@ bool Server::ParseArgs(int argc, char **argv)
   this->systemPluginsArgv = new char*[argc];
   for (int i = 0; i < argc; ++i)
   {
-    int argv_len = strlen(argv[i]);
-    this->systemPluginsArgv[i] = new char[argv_len];
-    for (int j = 0; j < argv_len; ++j)
-      this->systemPluginsArgv[i][j] = argv[i][j];
+    int argvLen = strlen(argv[i]) + 1;
+    this->systemPluginsArgv[i] = new char[argvLen];
+    snprintf(this->systemPluginsArgv[i], argvLen, "%s", argv[i]);
   }
 
   po::options_description v_desc("Allowed options");
   v_desc.add_options()
+    ("quiet,q", "Reduce output to stdout.")
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
     ("physics,e", po::value<std::string>(),
      "Specify a physics engine (ode|bullet).")
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data.")
+    ("record_encoding", po::value<std::string>()->default_value("zlib"),
+     "Compression encoding format for log data.")
     ("record_path", po::value<std::string>()->default_value(""),
      "Aboslute path in which to store state data")
     ("seed",  po::value<double>(),
@@ -130,6 +133,12 @@ bool Server::ParseArgs(int argc, char **argv)
     return false;
   }
 
+  if (this->vm.count("quiet"))
+    gazebo::common::Console::Instance()->SetQuiet(true);
+  else
+    gazebo::print_version();
+
+
   // Set the random number seed if present on the command line.
   if (this->vm.count("seed"))
   {
@@ -164,10 +173,11 @@ bool Server::ParseArgs(int argc, char **argv)
   }
 
   // Set the parameter to record a log file
-  if (this->vm.count("record") ||
-      !this->vm["record_path"].as<std::string>().empty())
+  if (this->vm.count("record"))
   {
     this->params["record"] = this->vm["record_path"].as<std::string>();
+    this->params["record_encoding"] =
+        this->vm["record_encoding"].as<std::string>();
   }
 
   if (this->vm.count("iters"))
@@ -377,6 +387,9 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
 /////////////////////////////////////////////////
 void Server::Init()
 {
+  // Make sure the model database has started.
+  common::ModelDatabase::Instance()->Start();
+
   gazebo::init();
 
   sensors::init();
@@ -412,6 +425,9 @@ void Server::Fini()
     this->master->Fini();
   delete this->master;
   this->master = NULL;
+
+  // Cleanup model database.
+  common::ModelDatabase::Instance()->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -498,7 +514,8 @@ void Server::ProcessParams()
     }
     else if (iter->first == "record")
     {
-      util::LogRecord::Instance()->Start("bz2", iter->second);
+      util::LogRecord::Instance()->Start(this->params["record_encoding"],
+                                         iter->second);
     }
   }
 }

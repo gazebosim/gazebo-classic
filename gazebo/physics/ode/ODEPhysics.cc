@@ -115,7 +115,7 @@ class Colliders_TBB
 
 //////////////////////////////////////////////////
 ODEPhysics::ODEPhysics(WorldPtr _world)
-    : PhysicsEngine(_world)
+    : PhysicsEngine(_world), maxContacts(0)
 {
   // Collision detection init
   dInitODE2(0);
@@ -168,6 +168,9 @@ ODEPhysics::~ODEPhysics()
 void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
+
+  this->maxContacts = _sdf->GetElement("max_contacts")->GetValueInt();
+  this->SetMaxContacts(this->maxContacts);
 
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   sdf::ElementPtr solverElem = odeElem->GetElement("solver");
@@ -599,8 +602,8 @@ void ODEPhysics::SetContactSurfaceLayer(double _depth)
 //////////////////////////////////////////////////
 void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 {
-  this->sdf->GetElement("ode")->GetElement(
-      "max_contacts")->GetValue()->Set(_maxContacts);
+  this->maxContacts = _maxContacts;
+  this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
 }
 
 //////////////////////////////////////////////////
@@ -656,7 +659,7 @@ double ODEPhysics::GetContactSurfaceLayer()
 //////////////////////////////////////////////////
 int ODEPhysics::GetMaxContacts()
 {
-  return this->sdf->GetElement("max_contacts")->GetValueInt();
+  return this->maxContacts;
 }
 
 //////////////////////////////////////////////////
@@ -798,13 +801,36 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactGeom *_contactCollisions)
 {
+  // Filter collisions based on contact bitmask if collide_without_contact is
+  // on.The bitmask is set mainly for speed improvements otherwise a collision
+  // with collide_without_contact may potentially generate a large number of
+  // contacts.
+  if (_collision1->GetSurface()->collideWithoutContact ||
+      _collision2->GetSurface()->collideWithoutContact)
+  {
+    if ((_collision1->GetSurface()->collideWithoutContactBitmask &
+        _collision2->GetSurface()->collideWithoutContactBitmask) == 0)
+      return;
+  }
+
   int numc = 0;
   dContact contact;
 
   // maxCollide must less than the size of this->indices. Check the header
   int maxCollide = MAX_CONTACT_JOINTS;
-  if (this->GetMaxContacts() < MAX_CONTACT_JOINTS && this->GetMaxContacts() > 0)
+
+  // max_contacts specified globally
+  if (this->GetMaxContacts() > 0 && this->GetMaxContacts() < MAX_CONTACT_JOINTS)
     maxCollide = this->GetMaxContacts();
+
+  // over-ride with minimum of max_contacts from both collisions
+  if (_collision1->GetMaxContacts() >= 0 &&
+      _collision1->GetMaxContacts() < maxCollide)
+    maxCollide = _collision1->GetMaxContacts();
+
+  if (_collision2->GetMaxContacts() >= 0 &&
+      _collision2->GetMaxContacts() < maxCollide)
+    maxCollide = _collision2->GetMaxContacts();
 
   // Generate the contacts
   numc = dCollide(_collision1->GetCollisionId(), _collision2->GetCollisionId(),

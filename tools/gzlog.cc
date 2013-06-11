@@ -945,7 +945,9 @@ void step(const std::string &_filter, bool _raw, const std::string &_stamp,
 /// \param[in] _start True to start logging
 void record(bool _start)
 {
-  gazebo::transport::init();
+  if (!gazebo::transport::init())
+    return;
+
   gazebo::transport::run();
 
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
@@ -953,7 +955,12 @@ void record(bool _start)
 
   gazebo::transport::PublisherPtr pub =
     node->Advertise<gazebo::msgs::LogControl>("~/log/control");
-  pub->WaitForConnection();
+
+  if (!pub->WaitForConnection(gazebo::common::Time(10, 0)))
+  {
+    gzerr << "Unable to create a connection to topic ~/log/control.\n";
+    return;
+  }
 
   gazebo::msgs::LogControl msg;
   _start ? msg.set_start(true) : msg.set_stop(true);
