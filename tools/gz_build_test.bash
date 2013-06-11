@@ -21,14 +21,15 @@ mkdir /tmp/gazebo_build
 
 # Clone
 #hg clone https://bitbucket.org/osrf/gazebo /tmp/gazebo_build/source
-cd /home/scpeters/osrf/gazebo_pristine
+cd /home/scpeters/osrf/gazebo_readonly
 hg pull
-hg clone /home/scpeters/osrf/gazebo_pristine /tmp/gazebo_build/source
+hg clone /home/scpeters/osrf/gazebo_readonly /tmp/gazebo_build/source
 
 start_time=`eval date +%s`
 
 PATH=/tmp/gazebo_build/install/bin:$PATH
 LD_LIBRARY_PATH=/tmp/gazebo_build/install/lib:$LD_LIBRARY_PATH
+ulimit -c unlimited
 
 # Process each branch from the command line
 for branch in $branches
