@@ -75,7 +75,7 @@ int main(int _argc, char **_argv)
 
   pid1 = fork();
 
-  char** myargv = new char*[_argc+1];
+  char **myargv = new char*[_argc+1];
   for (int i = 0; i < _argc; ++i)
     myargv[i] = _argv[i];
   myargv[_argc] = static_cast<char*>(NULL);

@@ -39,4 +39,3 @@ message Joint
   optional double suspension_cfm = 15;
   optional double suspension_erp = 16;
 }
-

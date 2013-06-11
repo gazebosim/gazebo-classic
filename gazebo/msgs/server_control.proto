@@ -14,5 +14,3 @@ message ServerControl
   optional string open_filename   = 3;
   optional bool new_world         = 4;
 }
-
-

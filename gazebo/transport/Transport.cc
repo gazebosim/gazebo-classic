@@ -135,15 +135,18 @@ void transport::stop()
 /////////////////////////////////////////////////
 void transport::fini()
 {
-  transport::stop();
+  printf("transport::fini\n");
   transport::TopicManager::Instance()->Fini();
 
+  transport::stop();
   if (g_runThread)
   {
+    printf("transport::fini join\n");
     g_runThread->join();
     delete g_runThread;
     g_runThread = NULL;
   }
+  printf("transport::fini stop\n");
   transport::ConnectionManager::Instance()->Fini();
 }
 

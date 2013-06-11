@@ -490,6 +490,8 @@ int main(int argc, char **argv)
   if (!parse(argc, argv))
     return 0;
 
+  gazebo::common::Console::Instance()->SetQuiet(true);
+
   if (params[0] == "list")
     list();
   else if (params[0] == "info")

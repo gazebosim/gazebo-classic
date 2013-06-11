@@ -24,6 +24,7 @@ set (files
   projector.world
   rubble.world
   shapes.world
+  simple_arm.world
   weshare2012.world
   willowgarage.world)
 
