@@ -192,6 +192,30 @@ bool LogPlay::Step(std::string &_data)
 {
   this->needsStep = false;
 
+  /*if (this->currentStep < this->minStep + this->stepBuffer.size() &&
+      this->currentStep >= this->minStep)
+  {
+    _data = this->stepBuffer[this->currentStep - this->minStep];
+  }
+  else if (this->currentStep >= this->minStep + this->stepBuffer.size())
+  {
+    while (this->currentStep >= this->minStep + this->stepBuffer.size() &&
+        this->GetStep(_data))
+    {
+      this->stepBuffer.push_back(_data);
+
+      if (this->stepBuffer.size() > 1000)
+      {
+        this->stepBuffer.pop_front();
+        this->minStep++;
+      }
+    }
+  }
+  else if (this->currentStep < this->minStep)
+  {
+  }
+  */
+
   if (this->currentStep < this->stepBuffer.size())
     _data = this->stepBuffer[this->currentStep];
 

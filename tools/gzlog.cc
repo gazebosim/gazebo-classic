@@ -27,6 +27,7 @@
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/sdf/sdf.hh>
@@ -40,7 +41,21 @@ namespace po = boost::program_options;
 
 sdf::ElementPtr g_stateSdf;
 
+int g_echoCompleteCount = 0;
 
+boost::mutex g_mutex;
+void PrintEchoStatus(int _total, int _completed)
+{
+  boost::mutex::scoped_lock lock(g_mutex);
+  g_echoCompleteCount += _completed;
+
+  fprintf(stderr, "%d %d %6.2f %%\n", g_echoCompleteCount , _total,
+      g_echoCompleteCount / double(_total));
+
+  //fprintf(stderr, "%6.2f %%\b\b\b\b\b\b\b\b\b\b\b",
+  //    g_echoCompleteCount / double(_total));
+  fflush(stderr);
+}
 
 /// \brief Base class for all filters.
 class FilterBase
@@ -676,10 +691,10 @@ class ProcessChunk_TBB
   public: ProcessChunk_TBB(gazebo::util::LogPlay *_play,
               const std::string &_filter, bool _raw,
               const std::string &_stamp, double _hz,
-              double _start,
-              std::vector<std::list<std::string> > *_result) : play(_play),
-  filterStr(_filter), raw(_raw), stamp(_stamp), hz(_hz), start(_start),
-  result(_result)
+              double _start, int _chunkCount,
+              std::vector<std::list<std::string> > *_result)
+          : play(_play), filterStr(_filter), raw(_raw), stamp(_stamp),
+          hz(_hz), start(_start), chunkCount(_chunkCount), result(_result)
   {
   }
 
@@ -715,7 +730,10 @@ class ProcessChunk_TBB
         startIndex = endPos + endMarker.size();
 
         if (!stepData.empty())
+        {
           (*this->result)[i].push_back(filter.Filter(stepData));
+          PrintEchoStatus(this->chunkCount, 1);
+        }
       } while (startIndex < chunkSize);
     }
   }
@@ -727,6 +745,7 @@ class ProcessChunk_TBB
   private: std::string stamp;
   private: double hz;
   private: double start;
+  private: int chunkCount;
   private: std::vector<std::list<std::string> > *result;
 };
 
@@ -960,15 +979,19 @@ int echo(const std::string &_filename, const std::string &_filter, bool _raw,
   if (!_raw)
     std::cout << play->GetHeader() << std::endl;
 
+  std::cerr << "Preprocessing.\n";
   std::vector<std::list<std::string> > result;
   uint64_t chunkCount = play->GetChunkCount();
+  uint64_t segmentCount = play->GetSegmentCount();
   int numThreads = 4;
   result.resize(chunkCount);
 
+  std::cerr << "Starting echo.\n";
   // Run on multiple threads.
   tbb::parallel_for(tbb::blocked_range<size_t>(
         1, chunkCount, chunkCount/numThreads),
-      ProcessChunk_TBB(play, _filter, _raw, _stamp, _hz, _start, &result));
+      ProcessChunk_TBB(play, _filter, _raw, _stamp, _hz, _start, segmentCount,
+        &result));
 
   // Get the first step, which is the world definition
   play->Step(stateString);
@@ -992,32 +1015,6 @@ int echo(const std::string &_filename, const std::string &_filter, bool _raw,
       }
     }
   }
-
-  /* // Old code. Here for comparison
-  StateFilter filter(!_raw, _stamp, _hz);
-  filter.Init(_filter);
-  unsigned int i = 0;
-  while (play->Step(stateString))
-  {
-    if (i > 0)
-      stateString = filter.Filter(stateString);
-    else if (i == 0 && _raw)
-      stateString.clear();
-
-    if (!stateString.empty())
-    {
-      if (!_raw)
-        std::cout << "<chunk encoding='txt'><![CDATA[\n";
-
-      std::cout << stateString;
-
-      if (!_raw)
-        std::cout << "]]></chunk>\n";
-    }
-
-    ++i;
-  }
-  */
 
   if (!_raw)
     std::cout << "</gazebo_log>\n";
