@@ -185,7 +185,7 @@ bool WorldCommand::RunImpl()
   if (this->vm.count("reset-models"))
     msg.mutable_reset()->set_model_only(true);
 
-  pub->Publish(msg);
+  pub->Publish(msg, true);
 
   return true;
 }
@@ -327,7 +327,7 @@ bool ModelCommand::RunImpl()
     msgs::Request *msg = msgs::CreateRequest("entity_delete", modelName);
     transport::PublisherPtr pub = node->Advertise<msgs::Request>("~/request");
     pub->WaitForConnection();
-    pub->Publish(*msg);
+    pub->Publish(*msg, true);
     delete msg;
   }
   else if (this->vm.count("spawn-sdf"))
