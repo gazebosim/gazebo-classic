@@ -704,7 +704,7 @@ class ProcessChunk_TBB
       do
       {
         startPos = chunkData.find(startMarker, startIndex);
-        endPos = chunkData.find(endMarker, start + startMarker.size());
+        endPos = chunkData.find(endMarker, startPos + startMarker.size());
 
         if (startPos == std::string::npos || endPos == std::string::npos)
           break;
@@ -967,7 +967,7 @@ int echo(const std::string &_filename, const std::string &_filter, bool _raw,
 
   // Run on multiple threads.
   tbb::parallel_for(tbb::blocked_range<size_t>(
-        1, chunkCount, chunkCount/numThreads),
+        1, chunkCount, chunkCount/numThreads + 1),
       ProcessChunk_TBB(play, _filter, _raw, _stamp, _hz, _start, &result));
 
   // Get the first step, which is the world definition
