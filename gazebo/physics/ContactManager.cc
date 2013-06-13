@@ -67,7 +67,7 @@ void ContactManager::Init(WorldPtr _world)
   this->node->Init(this->world->GetName());
 
   this->contactPub =
-    this->node->Advertise<msgs::Contacts>("~/physics/contacts");
+    this->node->Advertise<msgs::Contacts>("~/physics/contacts", 50);
 }
 
 /////////////////////////////////////////////////

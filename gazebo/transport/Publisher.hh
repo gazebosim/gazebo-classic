@@ -137,7 +137,8 @@ namespace gazebo
       public: MessagePtr GetPrevMsgPtr() const;
 
       /// \brief Callback when a publish is completed
-      private: void OnPublishComplete();
+      /// \param[in] _id ID associated with the publication.
+      private: void OnPublishComplete(uint32_t _id);
 
       /// \brief Topic on which messages are published.
       private: std::string topic;
@@ -178,6 +179,13 @@ namespace gazebo
 
       /// \brief Time of the last publication.
       private: common::Time prevPublishTime;
+
+      /// \brief True if waiting to here back about a sent message.
+      private: bool waiting;
+
+      /// \brief Current id of the sent message.
+      private: uint32_t pubId;
+      private: std::list<uint32_t> pubIds;
     };
     /// \}
   }

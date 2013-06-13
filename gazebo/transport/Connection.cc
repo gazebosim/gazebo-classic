@@ -35,6 +35,8 @@
 using namespace gazebo;
 using namespace transport;
 
+extern void dummy_callback_fn(uint32_t);
+
 unsigned int Connection::idCounter = 0;
 extern IOManager *g_iomanager;
 
@@ -57,8 +59,8 @@ static bool addressIsLoopback(const boost::asio::ip::address_v4 &_addr)
 //////////////////////////////////////////////////
 Connection::Connection()
 {
-  // if (iomanager == NULL)
-  //  iomanager = new IOManager();
+  this->dropMsgLogged = false;
+  this->headerBuffer = new char[HEADER_LENGTH];
 
   this->socket = new boost::asio::ip::tcp::socket(g_iomanager->GetIO());
 
@@ -90,6 +92,9 @@ Connection::Connection()
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
+  delete this->headerBuffer;
+  this->headerBuffer = NULL;
+
   this->Shutdown();
 
   if (g_iomanager)
@@ -247,52 +252,33 @@ void Connection::StopRead()
 //////////////////////////////////////////////////
 void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 {
+  this->EnqueueMsg(_buffer, boost::bind(&dummy_callback_fn, _1), 0, _force);
+}
+
+//////////////////////////////////////////////////
+void Connection::EnqueueMsg(const std::string &_buffer,
+    boost::function<void(uint32_t)> _cb, uint32_t _id, bool _force)
+{
   // Don't enqueue empty messages
-  if (_buffer.empty())
-    return;
-
-  std::ostringstream headerStream;
-
-  headerStream << std::setfill('0') << std::setw(HEADER_LENGTH)
-    << std::hex << _buffer.size();
-
-  if (headerStream.str().empty() ||
-      headerStream.str().size() != HEADER_LENGTH)
+  if (_buffer.empty() || !this->IsOpen())
   {
-    // Something went wrong, inform the caller
-    boost::system::error_code error(boost::asio::error::invalid_argument);
-    gzerr << "Connection::Write error[" << error.message() << "]\n";
     return;
   }
 
-  /*if (_force)
-    {
-    boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    boost::asio::streambuf *buffer = new boost::asio::streambuf;
-    std::ostream os(buffer);
-    os << headerStream.str() << _buffer;
+  snprintf(this->headerBuffer, HEADER_LENGTH + 1, "%08x",
+      static_cast<unsigned int>(_buffer.size()));
 
-    std::size_t written = 0;
-    written = boost::asio::write(*this->socket, buffer->data());
-    if (written != buffer->size())
-      gzerr << "Didn't write all the data\n";
-
-    delete buffer;
-    }
-    else
-    {
-    */
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
-    headerStream << _buffer;
-
-    if (this->writeQueue.size() > 1)
-      this->writeQueue.back() += headerStream.str();
+    if (this->writeQueue.empty() ||
+        (this->writeCount > 0 && this->writeQueue.size() == 1) ||
+        (this->writeQueue.back().size()+_buffer.size() > 4096))
+      this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
     else
-      this->writeQueue.push_back(headerStream.str());
+      this->writeQueue.back() += std::string(headerBuffer) + _buffer;
+    this->callbacks.push_back(std::make_pair(_cb, _id));
   }
-  // }
 
   if (_force)
   {
@@ -308,10 +294,10 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 /////////////////////////////////////////////////
 void Connection::ProcessWriteQueue(bool _blocking)
 {
+  boost::recursive_mutex::scoped_lock lock(this->writeMutex);
+
   if (!this->IsOpen())
     return;
-
-  boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
   // async_write should only be called when the last async_write has
   // completed. Therefore we have to check the writeCount attribute
@@ -325,8 +311,9 @@ void Connection::ProcessWriteQueue(bool _blocking)
   // a single write operation
   if (!_blocking)
   {
+    this->callbackIndex = this->callbacks.size();
     boost::asio::async_write(*this->socket,
-        boost::asio::buffer(this->writeQueue.front(),
+        boost::asio::buffer(this->writeQueue.front().c_str(),
           this->writeQueue.front().size()),
           boost::bind(&Connection::OnWrite, shared_from_this(),
             boost::asio::placeholders::error));
@@ -336,13 +323,17 @@ void Connection::ProcessWriteQueue(bool _blocking)
     try
     {
       boost::asio::write(*this->socket,
-          boost::asio::buffer(this->writeQueue.front(),
+          boost::asio::buffer(this->writeQueue.front().c_str(),
             this->writeQueue.front().size()));
     }
     catch(...)
     {
       this->Shutdown();
     }
+
+    // Call the callback, in not NULL
+    if (!this->callbacks.front().first.empty())
+      this->callbacks.front().first(this->callbacks.front().second);
 
     this->writeQueue.pop_front();
     this->writeCount--;
@@ -366,7 +357,19 @@ void Connection::OnWrite(const boost::system::error_code &_e)
 {
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    this->writeQueue.pop_front();
+
+    for (unsigned int i = 0; i < this->callbackIndex; ++i)
+    {
+      if (!this->callbacks.empty())
+      {
+        if (!this->callbacks.front().first.empty())
+          this->callbacks.front().first(this->callbacks.front().second);
+        this->callbacks.pop_front();
+      }
+    }
+
+    if (!this->writeQueue.empty())
+      this->writeQueue.pop_front();
     this->writeCount--;
   }
 
@@ -446,6 +449,10 @@ void Connection::Close()
     delete this->acceptor;
     this->acceptor = NULL;
   }
+
+  boost::recursive_mutex::scoped_lock lock2(this->writeMutex);
+  this->writeQueue.clear();
+  this->callbacks.clear();
 }
 
 //////////////////////////////////////////////////
@@ -765,15 +772,12 @@ bool Connection::ValidateIP(const std::string &_ip)
 boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
 {
   boost::asio::ip::tcp::endpoint ep;
-  try
+  if (this->socket)
   {
-    if (this->socket)
-      ep = this->socket->remote_endpoint();
-  }
-  catch(boost::system::system_error &e)
-  {
-    gzerr << "Unable to get remote endpoint: "
-      << e.what() << "\n";
+    boost::system::error_code ec;
+    ep = this->socket->remote_endpoint(ec);
+    if (ec)
+        gzerr << "Getting remote endpoint failed" << std::endl;
   }
   return ep;
 }
