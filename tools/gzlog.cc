@@ -48,12 +48,8 @@ void PrintEchoStatus(int _total, int _completed)
 {
   boost::mutex::scoped_lock lock(g_mutex);
   g_echoCompleteCount += _completed;
-
-  fprintf(stderr, "%d %d %6.2f %%\n", g_echoCompleteCount , _total,
-      g_echoCompleteCount / double(_total));
-
-  //fprintf(stderr, "%6.2f %%\b\b\b\b\b\b\b\b\b\b\b",
-  //    g_echoCompleteCount / double(_total));
+  fprintf(stderr, "\b\b\b\b\b\b\b\b\b\b\b%6.2f %%",
+      g_echoCompleteCount / double(_total) * 100);
   fflush(stderr);
 }
 
@@ -691,10 +687,11 @@ class ProcessChunk_TBB
   public: ProcessChunk_TBB(gazebo::util::LogPlay *_play,
               const std::string &_filter, bool _raw,
               const std::string &_stamp, double _hz,
-              double _start, int _chunkCount,
+              double _start, int _segmentCount, bool _verbose,
               std::vector<std::list<std::string> > *_result)
           : play(_play), filterStr(_filter), raw(_raw), stamp(_stamp),
-          hz(_hz), start(_start), chunkCount(_chunkCount), result(_result)
+          hz(_hz), start(_start), segmentCount(_segmentCount),
+          verbose(_verbose), result(_result)
   {
   }
 
@@ -719,7 +716,7 @@ class ProcessChunk_TBB
       do
       {
         startPos = chunkData.find(startMarker, startIndex);
-        endPos = chunkData.find(endMarker, start + startMarker.size());
+        endPos = chunkData.find(endMarker, startPos + startMarker.size());
 
         if (startPos == std::string::npos || endPos == std::string::npos)
           break;
@@ -732,7 +729,8 @@ class ProcessChunk_TBB
         if (!stepData.empty())
         {
           (*this->result)[i].push_back(filter.Filter(stepData));
-          PrintEchoStatus(this->chunkCount, 1);
+          if (this->verbose)
+            PrintEchoStatus(this->segmentCount, 1);
         }
       } while (startIndex < chunkSize);
     }
@@ -745,7 +743,8 @@ class ProcessChunk_TBB
   private: std::string stamp;
   private: double hz;
   private: double start;
-  private: int chunkCount;
+  private: int segmentCount;
+  private: bool verbose;
   private: std::vector<std::list<std::string> > *result;
 };
 
@@ -960,7 +959,8 @@ int info(const std::string &_filename)
 /// \brief Dump the contents of a log file to screen
 /// \param[in] _filter Filter string
 int echo(const std::string &_filename, const std::string &_filter, bool _raw,
-    const std::string &_stamp, double _hz, double _start)
+    const std::string &_stamp, double _hz, double _start, bool _verbose,
+    int _threads)
 {
   if (_filename.empty())
   {
@@ -979,19 +979,22 @@ int echo(const std::string &_filename, const std::string &_filter, bool _raw,
   if (!_raw)
     std::cout << play->GetHeader() << std::endl;
 
-  std::cerr << "Preprocessing.\n";
+  if (_verbose)
+    std::cerr << "Preprocessing.\n";
   std::vector<std::list<std::string> > result;
   uint64_t chunkCount = play->GetChunkCount();
   uint64_t segmentCount = play->GetSegmentCount();
-  int numThreads = 4;
   result.resize(chunkCount);
 
-  std::cerr << "Starting echo.\n";
+  if (_verbose)
+    std::cerr << "Starting echo.\n";
   // Run on multiple threads.
   tbb::parallel_for(tbb::blocked_range<size_t>(
-        1, chunkCount, chunkCount/numThreads),
-      ProcessChunk_TBB(play, _filter, _raw, _stamp, _hz, _start, segmentCount,
-        &result));
+        1, chunkCount, chunkCount/_threads + 1),
+      ProcessChunk_TBB(play, _filter, _raw, _stamp, _hz, _start,
+        segmentCount, _verbose, &result));
+  if (_verbose)
+    std::cerr << "\nEcho complete.\n";
 
   // Get the first step, which is the world definition
   play->Step(stateString);
@@ -1163,7 +1166,9 @@ int main(int argc, char **argv)
      Only valid for echo and step commands.")
     ("file,f", po::value<std::string>(), "Path to a log file.")
     ("filter", po::value<std::string>(),
-     "Filter output. Valid only for the echo and step commands");
+     "Filter output. Valid only for the echo and step commands")
+    ("verbose,v", "Output verbose messages to stderr")
+    ("threads,j", po::value<int>(), "Number of threads to use");
 
   // Both the hidden and visible options
   po::options_description allOptions("all options");
@@ -1227,12 +1232,18 @@ int main(int argc, char **argv)
     start = vm["start"].as<double>();
 
   int result = 0;
+  bool verbose = vm.count("verbose") > 0;
+  int threads = 4;
+  if (vm.count("threads"))
+    threads = vm["threads"].as<int>();
+
 
   // Process the command
   if (command == "info")
     result = info(filename);
   else if (command == "echo")
-    result = echo(filename, filter, vm.count("raw"), stamp, hz, start);
+    result = echo(filename, filter, vm.count("raw"), stamp, hz, start, verbose,
+        threads);
   else if (command == "step")
     result = step(filename, filter, vm.count("raw"), stamp, hz);
   else if (command == "start")
