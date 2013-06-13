@@ -95,6 +95,7 @@ typedef dReal *dRealMutablePtr;
 /// scale SOR for contact to reduce overshoot in solution for contacts
 /// \TODO: make this a parameter
 #define CONTACT_SOR_SCALE 0.25
+#define SMOOTH 0.01
 
 // structure for passing variable pointers in SOR_LCP
 struct dxSORLCPParameters {
@@ -619,6 +620,12 @@ static void ComputeRows(
   dReal Jvnew_final = 0;
 #endif
   int friction_iterations = 10;
+  dRealMutablePtr caccel_ptr1;
+  dRealMutablePtr caccel_ptr2;
+  dRealMutablePtr caccel_erp_ptr1;
+  dRealMutablePtr caccel_erp_ptr2;
+  dRealMutablePtr cforce_ptr1;
+  dRealMutablePtr cforce_ptr2;
   for (int iteration=0; iteration < num_iterations + precon_iterations + friction_iterations; iteration++) {
 
     rms_error = 0;
@@ -697,19 +704,12 @@ static void ComputeRows(
     }
 #endif
 
-    dRealMutablePtr caccel_ptr1;
-    dRealMutablePtr caccel_ptr2;
-    dRealMutablePtr caccel_erp_ptr1;
-    dRealMutablePtr caccel_erp_ptr2;
-
 #ifdef PENETRATION_JVERROR_CORRECTION
     dRealMutablePtr vnew_ptr1;
     dRealMutablePtr vnew_ptr2;
     const dReal stepsize1 = dRecip(stepsize);
     dReal Jvnew = 0;
 #endif
-    dRealMutablePtr cforce_ptr1;
-    dRealMutablePtr cforce_ptr2;
     for (int i=startRow; i<startRow+nRows; i++) {
       //boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every row
 
@@ -719,9 +719,9 @@ static void ComputeRows(
       //     access pattern.
 
       int index = order[i].index;
+      int normal_index = findex[index];  // cache for efficiency
 
-      // if (iteration > num_iterations && findex[index] < 0)
-      if (iteration >= num_iterations + precon_iterations && findex[index] < 0)
+      if (iteration >= num_iterations + precon_iterations && normal_index < 0)
         continue;
 
       dReal delta,delta_erp;
@@ -731,15 +731,24 @@ static void ComputeRows(
         int b1 = jb[index*2];
         int b2 = jb[index*2+1];
         caccel_ptr1 = caccel + 6*b1;
-        caccel_ptr2 = (b2 >= 0) ? caccel + 6*b2 : NULL;
         caccel_erp_ptr1 = caccel_erp + 6*b1;
-        caccel_erp_ptr2 = (b2 >= 0) ? caccel_erp + 6*b2 : NULL;
+        cforce_ptr1 = cforce + 6*b1;
+        if (b2 >= 0)
+        {
+          caccel_ptr2     = caccel + 6*b2;
+          caccel_erp_ptr2 = caccel_erp + 6*b2;
+          cforce_ptr2     = cforce + 6*b2;
+        }
+        else
+        {
+          caccel_ptr2     = NULL;
+          caccel_erp_ptr2 = NULL;
+          cforce_ptr2     = NULL;
+        }
 #ifdef PENETRATION_JVERROR_CORRECTION
         vnew_ptr1 = vnew + 6*b1;
         vnew_ptr2 = (b2 >= 0) ? vnew + 6*b2 : NULL;
 #endif
-        cforce_ptr1 = cforce + 6*b1;
-        cforce_ptr2 = (b2 >= 0) ? cforce + 6*b2 : NULL;
       }
 
       dReal old_lambda        = lambda[index];
@@ -774,8 +783,8 @@ static void ComputeRows(
         // the constraints are ordered so that all lambda[] values needed have
         // already been computed.
         dReal hi_act, lo_act;
-        if (findex[index] >= 0) {
-          hi_act = dFabs (hi[index] * lambda[findex[index]]);
+        if (normal_index >= 0) {
+          hi_act = dFabs (hi[index] * lambda[normal_index]);
           lo_act = -hi_act;
         } else {
           hi_act = hi[index];
@@ -785,17 +794,14 @@ static void ComputeRows(
         // compute lambda and clamp it to [lo,hi].
         // @@@ SSE not a win here
 #if 1
-        dReal new_lambda = old_lambda+ delta_precon;
-        if (new_lambda < lo_act) {
+        lambda[index] = old_lambda+ delta_precon;
+        if (lambda[index] < lo_act) {
           delta_precon = lo_act-old_lambda;
           lambda[index] = lo_act;
         }
-        else if (new_lambda > hi_act) {
+        else if (lambda[index] > hi_act) {
           delta_precon = hi_act-old_lambda;
           lambda[index] = hi_act;
-        }
-        else {
-          lambda[index] = new_lambda;
         }
 #else
         dReal nl = old_lambda+ delta_precon;
@@ -833,7 +839,7 @@ static void ComputeRows(
           //      but given that J is already scaled by Ad_i, we don't have
           //      to do it explicitly here
 
-          // FOR erp throttled by info.c_v_max or info.c
+          // delta: erp throttled by info.c_v_max or info.c
           delta =
 #ifdef PENETRATION_JVERROR_CORRECTION
                  Jvnew_final +
@@ -844,9 +850,7 @@ static void ComputeRows(
           if (caccel_ptr2)
             delta -= dot6(caccel_ptr2, J_ptr + 6);
 
-          // for the unthrottled _erp version
-          // if rhs equals rhs_erp, two solutions are the same.
-          // otherwise, compute second set of solutions for rhs with custom erp
+          // delta_erp: unthrottled version compute for rhs with custom erp
           // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
           delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
           delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
@@ -862,12 +866,12 @@ static void ComputeRows(
           // already been computed.
           dReal hi_act, lo_act;
           dReal hi_act_erp, lo_act_erp;
-          if (findex[index] >= 0) {
+          if (normal_index >= 0) {
             // FOR erp throttled by info.c_v_max or info.c
-            hi_act = dFabs (hi[index] * lambda[findex[index]]);
+            hi_act = dFabs (hi[index] * lambda[normal_index]);
             lo_act = -hi_act;
             // for the unthrottled _erp version
-            hi_act_erp = dFabs (hi[index] * lambda_erp[findex[index]]);
+            hi_act_erp = dFabs (hi[index] * lambda_erp[normal_index]);
             lo_act_erp = -hi_act_erp;
           } else {
             // FOR erp throttled by info.c_v_max or info.c
@@ -882,31 +886,25 @@ static void ComputeRows(
           // @@@ SSE not a win here
   #if 1
           // FOR erp throttled by info.c_v_max or info.c
-          dReal new_lambda = old_lambda + delta;
-          if (new_lambda < lo_act) {
+          lambda[index] = old_lambda + delta;
+          if (lambda[index] < lo_act) {
             delta = lo_act-old_lambda;
             lambda[index] = lo_act;
           }
-          else if (new_lambda > hi_act) {
+          else if (lambda[index] > hi_act) {
             delta = hi_act-old_lambda;
             lambda[index] = hi_act;
           }
-          else {
-            lambda[index] = new_lambda;
-          }
 
           // for the unthrottled _erp version
-          dReal new_lambda_erp = old_lambda_erp + delta_erp;
-          if (new_lambda_erp < lo_act_erp) {
+          lambda_erp[index] = old_lambda_erp + delta_erp;
+          if (lambda_erp[index] < lo_act_erp) {
             delta_erp = lo_act_erp-old_lambda_erp;
             lambda_erp[index] = lo_act_erp;
           }
-          else if (new_lambda_erp > hi_act_erp) {
+          else if (lambda_erp[index] > hi_act_erp) {
             delta_erp = hi_act_erp-old_lambda_erp;
             lambda_erp[index] = hi_act_erp;
-          }
-          else {
-            lambda_erp[index] = new_lambda_erp;
           }
   #else
           // FOR erp throttled by info.c_v_max or info.c
@@ -939,13 +937,12 @@ static void ComputeRows(
                 printf("\n");
             }
 #endif
-            if (findex[index] != -1)
+            if (normal_index != -1)
             {
               // extra residual smoothing for contact constraints
-              dReal mu = 0.01;
-              lambda[index] = (1.0 - mu)*lambda[index] + mu*old_lambda;
+              lambda[index] = (1.0 - SMOOTH)*lambda[index] + SMOOTH*old_lambda;
               // is filtering lambda_erp necessary?
-              // lambda_erp[index] = (1.0 - mu)*lambda_erp[index] + mu*old_lambda_erp;
+              // lambda_erp[index] = (1.0 - SMOOTH)*lambda_erp[index] + SMOOTH*old_lambda_erp;
             }
           }
 #endif
@@ -979,7 +976,7 @@ static void ComputeRows(
             if (iteration >= num_iterations-7) {
               // check for non-contact bilateral constraints only
               // I've set findex to -2 for contact normal constraint
-              if (findex[index] == -1) {
+              if (normal_index == -1) {
                 dRealPtr J_ptr = J + index*12;
                 Jvnew = dot6(vnew_ptr1,J_ptr);
                 if (caccel_ptr2)
@@ -1178,9 +1175,9 @@ static void SOR_LCP (dxWorldProcessContext *context,
     dRealPtr J_ptr = J;
     for (int i=0; i<m; J_ptr += 12, iMJ_ptr += 12, i++) {
       dReal sum = 0;
-      for (int j=0; j<6; j++) sum += iMJ_ptr[j] * J_ptr[j];
+      sum += dot6(iMJ_ptr, J_ptr);
       if (jb[i*2+1] >= 0) {
-        for (int k=6; k<12; k++) sum += iMJ_ptr[k] * J_ptr[k];
+        sum += dot6(iMJ_ptr+6, J_ptr+6);
       }
       if (findex[i] < 0)
         Ad[i] = sor_w / (sum + cfm[i]);
@@ -1204,9 +1201,9 @@ static void SOR_LCP (dxWorldProcessContext *context,
       dRealPtr J_ptr = J;
       for (int i=0; i<m; J_ptr += 12, i++) {
         dReal sum = 0;
-        for (int j=0; j<6; j++) sum += J_ptr[j] * J_ptr[j];
+        sum += dot6(J_ptr, J_ptr);
         if (jb[i*2+1] >= 0) {
-          for (int k=6; k<12; k++) sum += J_ptr[k] * J_ptr[k];
+          sum += dot6(J_ptr+6, J_ptr+6);
         }
         if (findex[i] < 0)
           Ad_precon[i] = sor_w / (sum + cfm[i]);

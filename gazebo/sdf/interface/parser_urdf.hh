@@ -68,6 +68,8 @@ namespace urdf2gazebo
       isLaserRetro = false;
       isStopCfm = false;
       isStopErp = false;
+      isStopKp = false;
+      isStopKd = false;
       isInitialJointPosition = false;
       isFudgeFactor = false;
       isProvideFeedback = false;
@@ -85,6 +87,8 @@ namespace urdf2gazebo
       laserRetro = 101;
       stopCfm = 0;
       stopErp = 0.1;
+      stopKp = 100000000;
+      stopKd = 1;
       initialJointPosition = 0;
       fudgeFactor = 1;
       provideFeedback = false;
@@ -92,10 +96,10 @@ namespace urdf2gazebo
     };
 
     private: GazeboExtension(const GazeboExtension &ge)
-             : material(ge.material), fdir1(ge.fdir1),
+             : material(ge.material),
              oldLinkName(ge.oldLinkName),
              reductionTransform(ge.reductionTransform),
-             blobs(ge.blobs)
+             fdir1(ge.fdir1), blobs(ge.blobs)
     {
       setStaticFlag = ge.setStaticFlag;
       gravity = ge.gravity;
@@ -109,12 +113,17 @@ namespace urdf2gazebo
       isKd = ge.isKd;
       selfCollide = ge.selfCollide;
       isLaserRetro = ge.isLaserRetro;
+      isStopKp = ge.isStopKp;
+      isStopKd = ge.isStopKd;
       isStopCfm = ge.isStopCfm;
       isStopErp = ge.isStopErp;
       isInitialJointPosition = ge.isInitialJointPosition;
       isFudgeFactor = ge.isFudgeFactor;
       isProvideFeedback = ge.isProvideFeedback;
       isCFMDamping = ge.isCFMDamping;
+      provideFeedback = ge.provideFeedback;
+      cfmDamping = ge.cfmDamping;
+
       dampingFactor = ge.dampingFactor;
       maxContacts = ge.maxContacts;
       maxVel = ge.maxVel;
@@ -124,6 +133,8 @@ namespace urdf2gazebo
       kp = ge.kp;
       kd = ge.kd;
       laserRetro = ge.laserRetro;
+      stopKp = ge.stopKp;
+      stopKd = ge.stopKd;
       stopCfm = ge.stopCfm;
       stopErp = ge.stopErp;
       initialJointPosition = ge.initialJointPosition;
@@ -135,14 +146,9 @@ namespace urdf2gazebo
     // visual
     private: std::string material;
 
-    private: std::string fdir1;
-
     // for reducing fixed joints and removing links
     private: std::string oldLinkName;
     private: gazebo::math::Pose reductionTransform;
-
-    // blobs into body or robot
-    private: std::vector<TiXmlElement*> blobs;
 
     // body, default off
     private: bool setStaticFlag;
@@ -160,6 +166,7 @@ namespace urdf2gazebo
     // geom, contact dynamics
     private: bool isMu1, isMu2, isKp, isKd;
     private: double mu1, mu2, kp, kd;
+    private: std::string fdir1;
     private: bool isLaserRetro;
     private: double laserRetro;
 
@@ -170,6 +177,11 @@ namespace urdf2gazebo
     private: bool provideFeedback;
     private: bool isCFMDamping;
     private: bool cfmDamping;
+    private: bool isStopKp, isStopKd;
+    private: double stopKp, stopKd;
+
+    // blobs into body or robot
+    private: std::vector<TiXmlElement*> blobs;
 
     friend class URDF2Gazebo;
   };
@@ -206,6 +218,13 @@ namespace urdf2gazebo
     /// \return a urdf::Vector3
     private: urdf::Vector3 ParseVector3(TiXmlNode* _key, double _scale = 1.0);
 
+    /// \brief parser xml string into urdf::Vector3
+    /// \param[in] _str string where vector3 value might be
+    /// \param[in] _scale scalar scale for the vector3
+    /// \return a urdf::Vector3
+    private: urdf::Vector3 ParseVector3(const std::string &_str,
+                                        double _scale = 1.0);
+
     /// \brief convert values to string
     /// \param[in] _count number of values in _values array
     /// \param[in] _values array of double values
@@ -240,6 +259,12 @@ namespace urdf2gazebo
     /// things that do not belong in urdf but should be mapped into sdf
     /// @todo: do this using sdf definitions, not hard coded stuff
     private: void ParseGazeboExtension(TiXmlDocument &_urdfXml);
+
+    /// parse if <robot> contains an <origin> tag
+    private: void ParseRobotOrigin(TiXmlDocument &_urdfXml);
+
+    /// insert <robot>'s <origin> tag
+    private: void InsertRobotOrigin(TiXmlElement *_elem);
 
     /// insert extensions into collision geoms
     private: void InsertGazeboExtensionCollision(TiXmlElement *_elem,
@@ -430,6 +455,10 @@ namespace urdf2gazebo
       boost::shared_ptr<urdf::Geometry> _geometry);
 
     private: std::map<std::string, std::vector<GazeboExtension*> > extensions;
+
+    private: urdf::Pose initialRobotPose;
+    private: std::string collisionExt;
+    private: std::string visualExt;
 
     private: bool enforceLimits;
     private: bool reduceFixedJoints;

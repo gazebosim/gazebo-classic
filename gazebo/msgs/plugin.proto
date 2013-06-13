@@ -9,6 +9,7 @@ message Plugin
 {
   required string name         = 1;
   required string filename     = 2;
+  optional string innerxml     = 3 [default = ""];
 }
 
 
