@@ -768,7 +768,7 @@ boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
   try
   {
     if (this->socket)
-      ep = this->socket->remote_endpoint(ec);
+      ep = this->socket->remote_endpoint();
   }
   catch(boost::system::system_error &e)
   {
