@@ -39,7 +39,7 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 // Forward Declarations
 namespace Ogre

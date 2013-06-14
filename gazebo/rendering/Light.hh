@@ -31,7 +31,7 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Color.hh"
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace Ogre
 {

@@ -24,7 +24,7 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Events.hh"

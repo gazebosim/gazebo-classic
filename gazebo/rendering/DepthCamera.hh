@@ -30,7 +30,7 @@
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector2i.hh"
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/rendering/Camera.hh"
 

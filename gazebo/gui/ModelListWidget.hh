@@ -23,7 +23,7 @@
 #include <deque>
 
 #include "gazebo/gui/qt.h"
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
