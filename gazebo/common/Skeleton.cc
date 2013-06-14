@@ -16,8 +16,8 @@
  */
 #include <list>
 
-#include "common/Skeleton.hh"
-#include "common/SkeletonAnimation.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/common/SkeletonAnimation.hh"
 #include "math/Angle.hh"
 
 using namespace gazebo;

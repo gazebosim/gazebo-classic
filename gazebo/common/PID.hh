@@ -18,7 +18,7 @@
 #ifndef _GAZEBO_PID_HH_
 #define _GAZEBO_PID_HH_
 
-#include "common/Time.hh"
+#include "gazebo/common/Time.hh"
 
 namespace gazebo
 {

@@ -19,9 +19,9 @@
 #include <stdio.h>
 
 #include "math/Helpers.hh"
-#include "common/Console.hh"
-#include "common/Mesh.hh"
-#include "common/STLLoader.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/STLLoader.hh"
 
 using namespace gazebo;
 using namespace common;
