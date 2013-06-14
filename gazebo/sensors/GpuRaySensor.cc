@@ -76,7 +76,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   this->scanPub = this->node->Advertise<msgs::LaserScanStamped>(
-      this->GetTopic());
+      this->GetTopic(), 50);
 
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   this->scanElem = rayElem->GetElement("scan");
@@ -591,7 +591,7 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
           (j * this->GetRayCount() + i) * 3 + 1]);
     }
 
-    if (this->scanPub)
+    if (this->scanPub && this->scanPub->HasConnections())
       this->scanPub->Publish(this->laserMsg);
   }
 }
@@ -599,5 +599,6 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
 //////////////////////////////////////////////////
 bool GpuRaySensor::IsActive()
 {
-  return Sensor::IsActive() || this->scanPub->HasConnections();
+  return Sensor::IsActive() ||
+    (this->scanPub && this->scanPub->HasConnections());
 }

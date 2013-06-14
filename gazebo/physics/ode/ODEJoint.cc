@@ -48,6 +48,8 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->dStable[0] = 0;
   this->dStable[1] = 0;
   this->dStable[2] = 0;
+
+  this->provideFeedback = false;
 }
 
 //////////////////////////////////////////////////
@@ -139,7 +141,6 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       }
     }
   }
-
 
   if (this->provideFeedback)
   {
@@ -1095,7 +1096,7 @@ void ODEJoint::CFMDamping()
     double dAngle = 2.0 * this->GetVelocity(i) * dt;
     if (math::equal(this->dampingCoefficient, 0.0) ||
         angle + dAngle >= this->upperLimit[i].Radian() ||
-        angle - dAngle <= this->lowerLimit[i].Radian())
+        angle + dAngle <= this->lowerLimit[i].Radian())
     {
       if (this->cfmDampingState[i] != ODEJoint::JOINT_LIMIT)
       {

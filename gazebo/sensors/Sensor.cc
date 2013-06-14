@@ -159,6 +159,7 @@ void Sensor::Update(bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
+  this->active = false;
   this->plugins.clear();
 }
 
