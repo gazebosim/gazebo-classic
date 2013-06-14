@@ -22,7 +22,7 @@
 #include "gazebo/common/Console.hh"
 
 #include "gui/GuiEvents.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Quaternion.hh"
 #include "gazebo/common/MouseEvent.hh"
 
 #include "transport/Publisher.hh"

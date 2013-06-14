@@ -19,7 +19,7 @@
 #include "msgs/msgs.hh"
 #include "gui/GuiEvents.hh"
 #include "gazebo/common/MouseEvent.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Quaternion.hh"
 
 #include "rendering/UserCamera.hh"
 
