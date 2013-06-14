@@ -23,9 +23,9 @@
 #define _BULLETSLIDERJOINT_HH_
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/SliderJoint.hh"
-#include "physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/SliderJoint.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
 
 class btSliderConstraint;
 

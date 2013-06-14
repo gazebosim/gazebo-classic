@@ -24,9 +24,9 @@
 
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
-#include "physics/Hinge2Joint.hh"
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/Hinge2Joint.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
 
 class btHinge2Constraint;
 

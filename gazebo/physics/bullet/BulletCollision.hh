@@ -30,11 +30,11 @@
 #include "Entity.hh"
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
-#include "physics/Collision.hh"
+#include "gazebo/physics/Collision.hh"
 */
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/Collision.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/Collision.hh"
 
 class btCollisionShape;
 
