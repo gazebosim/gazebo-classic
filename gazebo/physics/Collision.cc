@@ -27,7 +27,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/Shape.hh"

@@ -18,7 +18,7 @@
 #include <iostream>
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Time.hh"
-#include "transport/Transport.hh"
+#include "gazebo/transport/Transport.hh"
 #include "gazebo/sensors/Sensors.hh"
 #include "rendering/Rendering.hh"
 #include "rendering/RenderEngine.hh"

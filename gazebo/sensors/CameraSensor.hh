@@ -26,7 +26,7 @@
 
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "rendering/RenderTypes.hh"
 
 namespace gazebo
