@@ -18,7 +18,7 @@
 #define _MODEL_BUILDER_WIDGET_HH_
 
 #include "gui/qt.h"
-#include "physics/PhysicsTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "transport/TransportTypes.hh"
 #include "math/Vector3.hh"
 

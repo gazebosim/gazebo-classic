@@ -36,7 +36,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
-#include "physics/PhysicsTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "sensors/SensorTypes.hh"
 #include "sdf/sdf.hh"
 #include "rendering/RenderTypes.hh"

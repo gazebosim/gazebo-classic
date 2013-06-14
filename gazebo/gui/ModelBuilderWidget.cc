@@ -17,8 +17,8 @@
 #include "rendering/Rendering.hh"
 #include "rendering/UserCamera.hh"
 
-#include "physics/World.hh"
-#include "physics/Physics.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Physics.hh"
 
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
