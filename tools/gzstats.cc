@@ -23,8 +23,8 @@
 #include "transport/TransportTypes.hh"
 #include "transport/Node.hh"
 
-#include "common/Animation.hh"
-#include "common/KeyFrame.hh"
+#include "gazebo/common/Animation.hh"
+#include "gazebo/common/KeyFrame.hh"
 
 #include "gazebo_config.h"
 

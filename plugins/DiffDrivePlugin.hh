@@ -17,7 +17,7 @@
 #ifndef __GAZEBO_DIFFDRIVE_PLUGIN_HH__
 #define __GAZEBO_DIFFDRIVE_PLUGIN_HH__
 
-#include "common/common.hh"
+#include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
 #include "transport/TransportTypes.hh"
 #include "gazebo.hh"
