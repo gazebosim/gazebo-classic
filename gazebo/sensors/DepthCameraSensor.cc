@@ -28,9 +28,9 @@
 
 #include "gazebo/transport/transport.hh"
 
-#include "rendering/DepthCamera.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Rendering.hh"
+#include "gazebo/rendering/DepthCamera.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Rendering.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/DepthCameraSensor.hh"

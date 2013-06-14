@@ -22,9 +22,9 @@
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/Exception.hh"
 
-#include "rendering/UserCamera.hh"
-#include "rendering/Visual.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/math/Quaternion.hh"
 

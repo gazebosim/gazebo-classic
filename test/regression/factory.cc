@@ -19,8 +19,8 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"
 
-#include "rendering/RenderEngine.hh"
-#include "rendering/Camera.hh"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/Sensors.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 #include "ServerFixture.hh"

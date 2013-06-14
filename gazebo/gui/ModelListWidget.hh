@@ -26,7 +26,7 @@
 #include "sdf/sdf.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 class QTreeWidget;
 class QTreeWidgetItem;

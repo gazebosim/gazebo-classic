@@ -23,10 +23,10 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabase.hh"
 
-#include "rendering/Rendering.hh"
-#include "rendering/Scene.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Visual.hh"
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/GuiEvents.hh"
 

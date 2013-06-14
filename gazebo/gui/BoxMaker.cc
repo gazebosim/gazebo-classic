@@ -23,7 +23,7 @@
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/common/MouseEvent.hh"
 
-#include "rendering/UserCamera.hh"
+#include "gazebo/rendering/UserCamera.hh"
 
 #include "gazebo/transport/Publisher.hh"
 

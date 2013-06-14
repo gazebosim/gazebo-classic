@@ -18,7 +18,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "rendering/UserCamera.hh"
+#include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/GuiEvents.hh"

@@ -20,8 +20,8 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/sensors/Sensors.hh"
-#include "rendering/Rendering.hh"
-#include "rendering/RenderEngine.hh"
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
 #include "gazebo.hh"
 

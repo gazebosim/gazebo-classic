@@ -19,7 +19,7 @@
 
 #include "gazebo/transport/Transport.hh"
 
-#include "rendering/Rendering.hh"
+#include "gazebo/rendering/Rendering.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"

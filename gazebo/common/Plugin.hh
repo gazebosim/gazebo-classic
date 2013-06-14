@@ -39,7 +39,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "sdf/sdf.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

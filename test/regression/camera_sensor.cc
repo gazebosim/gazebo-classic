@@ -21,7 +21,7 @@
 #include "gazebo/common/common.hh"
 #include "gazebo/common/Timer.hh"
 #include "scans_cmp.h"
-#include "rendering/Camera.hh"
+#include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 
 using namespace gazebo;
