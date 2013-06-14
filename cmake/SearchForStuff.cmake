@@ -57,6 +57,21 @@ else ()
 endif ()
 
 ########################################
+include (FindOpenAL)
+if (NOT OPENGL_FOUND)
+  BUILD_WARNING ("Missing: OpenAL")
+  set (HAVE_OPENAL OFF CACHE BOOL "HAVE OpenAL" FORCE)
+else ()
+  set (HAVE_OPENAL ON CACHE BOOL "HAVE OpenAL" FORCE)
+  # APPEND_TO_CACHED_LIST(gazeboserver_include_dirs
+  #   ${gazeboserver_include_dirs_desc}
+  #   ${OPENAL_INCLUDE_DIR})
+  # APPEND_TO_CACHED_LIST(gazeboserver_link_libs
+  #   ${gazeboserver_link_libs_desc}
+  #   ${OPENAL_LIBRARIES})
+endif ()
+
+########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
 
@@ -251,8 +266,10 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libavcodec not found. Audio-video capabilities will be disabled.")
   endif ()
 
-  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale)
+  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
+  else ()
+    set (HAVE_FFMPEG FALSE)
   endif ()
 
   ########################################
