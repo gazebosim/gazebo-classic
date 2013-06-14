@@ -57,11 +57,11 @@
 #include "gazebo/rendering/deferred_shading/DeferredLightCP.hh"
 #endif
 
-#include "rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Node.hh"
 
-#include "rendering/Scene.hh"
+#include "gazebo/rendering/Scene.hh"
 
 using namespace gazebo;
 using namespace rendering;

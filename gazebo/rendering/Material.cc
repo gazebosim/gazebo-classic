@@ -15,9 +15,9 @@
  *
 */
 #include "gazebo/common/Color.hh"
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/Console.hh"
-#include "rendering/Material.hh"
+#include "gazebo/rendering/Material.hh"
 
 using namespace gazebo;
 using namespace rendering;

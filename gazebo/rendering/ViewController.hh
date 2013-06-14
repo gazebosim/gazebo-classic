@@ -19,7 +19,7 @@
 
 #include <string>
 #include "gazebo/common/CommonTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

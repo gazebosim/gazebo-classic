@@ -24,7 +24,7 @@
 
 #include <string>
 
-#include "rendering/Visual.hh"
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 

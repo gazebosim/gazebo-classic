@@ -20,10 +20,10 @@
  */
 
 #include "gazebo/transport/transport.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
 #include "gazebo/common/MeshManager.hh"
-#include "rendering/RFIDTagVisual.hh"
+#include "gazebo/rendering/RFIDTagVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;

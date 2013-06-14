@@ -22,7 +22,7 @@
 
 #include <boost/bind.hpp>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
 #include "sdf/sdf.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -31,10 +31,10 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 
-#include "rendering/Scene.hh"
-#include "rendering/DynamicLines.hh"
-#include "rendering/Visual.hh"
-#include "rendering/Light.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Light.hh"
 
 using namespace gazebo;
 using namespace rendering;

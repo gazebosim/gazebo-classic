@@ -18,7 +18,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 
-#include "rendering/RenderEngine.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 #include "Rendering.hh"
 
 using namespace gazebo;

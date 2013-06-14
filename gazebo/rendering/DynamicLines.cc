@@ -23,10 +23,10 @@
 
 #include <cmath>
 #include <sstream>
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Exception.hh"
-#include "rendering/DynamicLines.hh"
+#include "gazebo/rendering/DynamicLines.hh"
 
 using namespace gazebo;
 using namespace rendering;

@@ -15,7 +15,7 @@
  *
 */
 
-#include "rendering/GUIOverlay.hh"
+#include "gazebo/rendering/GUIOverlay.hh"
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/common/SystemPaths.hh"
@@ -24,10 +24,10 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/math/Vector2d.hh"
 
-#include "rendering/ogre_gazebo.h"
-#include "rendering/RenderTypes.hh"
-#include "rendering/Camera.hh"
-#include "rendering/DepthCamera.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/DepthCamera.hh"
 
 using namespace gazebo;
 using namespace rendering;

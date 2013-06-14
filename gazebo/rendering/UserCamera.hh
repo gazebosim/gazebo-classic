@@ -25,8 +25,8 @@
 #include <string>
 #include <vector>
 
-#include "rendering/Camera.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
