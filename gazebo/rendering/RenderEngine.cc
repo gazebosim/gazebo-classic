@@ -34,9 +34,9 @@
 
 #include "gazebo_config.h"
 
-#include "transport/Transport.hh"
-#include "transport/Node.hh"
-#include "transport/Subscriber.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
 
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Color.hh"
