@@ -17,7 +17,7 @@
 #include <sstream>
 
 #include "msgs/msgs.hh"
-#include "gui/GuiEvents.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/math/Quaternion.hh"
 
@@ -25,7 +25,7 @@
 
 #include "transport/Publisher.hh"
 
-#include "gui/CylinderMaker.hh"
+#include "gazebo/gui/CylinderMaker.hh"
 
 using namespace gazebo;
 using namespace gui;

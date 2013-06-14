@@ -27,13 +27,13 @@
 #include "rendering/Scene.hh"
 #include "rendering/UserCamera.hh"
 #include "rendering/Visual.hh"
-#include "gui/Gui.hh"
-#include "gui/GuiEvents.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiEvents.hh"
 
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
 
-#include "gui/InsertModelWidget.hh"
+#include "gazebo/gui/InsertModelWidget.hh"
 
 using namespace gazebo;
 using namespace gui;

@@ -22,7 +22,7 @@
 #include <utility>
 #include <list>
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 #include "rendering/RenderTypes.hh"
 
 #include "transport/TransportTypes.hh"
@@ -34,12 +34,12 @@
 
 #include "msgs/msgs.hh"
 
-#include "gui/BoxMaker.hh"
-#include "gui/SphereMaker.hh"
-#include "gui/CylinderMaker.hh"
-#include "gui/MeshMaker.hh"
-#include "gui/ModelMaker.hh"
-#include "gui/LightMaker.hh"
+#include "gazebo/gui/BoxMaker.hh"
+#include "gazebo/gui/SphereMaker.hh"
+#include "gazebo/gui/CylinderMaker.hh"
+#include "gazebo/gui/MeshMaker.hh"
+#include "gazebo/gui/ModelMaker.hh"
+#include "gazebo/gui/LightMaker.hh"
 
 namespace gazebo
 {

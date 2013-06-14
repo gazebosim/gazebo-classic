@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "gui/Gui.hh"
+#include "gazebo/gui/Gui.hh"
 #include "rendering/rendering.hh"
 #include "gazebo.hh"
 

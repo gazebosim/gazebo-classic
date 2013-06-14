@@ -20,7 +20,7 @@
 #include <string>
 
 #include "msgs/msgs.hh"
-#include "gui/EntityMaker.hh"
+#include "gazebo/gui/EntityMaker.hh"
 
 namespace gazebo
 {
