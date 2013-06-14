@@ -22,8 +22,8 @@
 #ifndef _BULLETHINGEJOINT_HH_
 #define _BULLETHINGEJOINT_HH_
 
-#include "math/Angle.hh"
-#include "math/Vector3.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/HingeJoint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"

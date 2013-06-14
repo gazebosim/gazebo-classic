@@ -18,11 +18,11 @@
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
 
-#include "math/Vector3.hh"
-#include "math/Pose.hh"
-#include "math/Quaternion.hh"
-#include "math/Plane.hh"
-#include "math/Rand.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/math/Plane.hh"
+#include "gazebo/math/Rand.hh"
 
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Image.hh"
