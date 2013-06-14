@@ -18,7 +18,7 @@
 #include "gazebo/common/Animation.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/physics/Model.hh"
-#include "gazebo.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {

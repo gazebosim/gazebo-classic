@@ -16,7 +16,7 @@
 */
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/rendering/rendering.hh"
-#include "gazebo.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {
