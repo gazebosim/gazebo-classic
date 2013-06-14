@@ -20,7 +20,7 @@
 #include "rendering/Visual.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/Scene.hh"
-#include "common/MeshManager.hh"
+#include "gazebo/common/MeshManager.hh"
 #include "rendering/SelectionObj.hh"
 
 using namespace gazebo;

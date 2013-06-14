@@ -38,12 +38,12 @@
 #include "transport/Node.hh"
 #include "transport/Subscriber.hh"
 
-#include "common/Common.hh"
-#include "common/Color.hh"
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/SystemPaths.hh"
+#include "gazebo/common/Common.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/SystemPaths.hh"
 
 #include "rendering/Material.hh"
 #include "rendering/RenderEvents.hh"

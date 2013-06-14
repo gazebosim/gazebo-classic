@@ -27,8 +27,8 @@
 // TODO: remove this line
 #include "rendering/ogre_gazebo.h"
 
-#include "common/CommonTypes.hh"
-#include "common/Color.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/Color.hh"
 #include "math/MathTypes.hh"
 
 namespace boost

@@ -25,7 +25,7 @@
 #include <sstream>
 #include "rendering/ogre_gazebo.h"
 
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
 #include "rendering/DynamicLines.hh"
 
 using namespace gazebo;

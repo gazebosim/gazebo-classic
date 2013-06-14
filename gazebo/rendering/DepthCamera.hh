@@ -23,8 +23,8 @@
 #define _RENDERING_DEPTHCAMERA_HH_
 #include <string>
 
-#include "common/Event.hh"
-#include "common/Time.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/Time.hh"
 
 #include "math/Angle.hh"
 #include "math/Pose.hh"

@@ -30,8 +30,8 @@
 #include "rendering/RenderTypes.hh"
 
 #include "transport/TransportTypes.hh"
-#include "common/Events.hh"
-#include "common/Color.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Color.hh"
 #include "math/Vector2i.hh"
 
 namespace SkyX

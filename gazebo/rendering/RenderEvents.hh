@@ -18,7 +18,7 @@
 #define _RENDER_EVENTS_HH_
 
 #include <string>
-#include "common/Event.hh"
+#include "gazebo/common/Event.hh"
 #include "msgs/msgs.hh"
 
 namespace gazebo

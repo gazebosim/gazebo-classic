@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  */
 
-#include "common/MeshManager.hh"
+#include "gazebo/common/MeshManager.hh"
 #include "math/Vector3.hh"
 #include "math/Quaternion.hh"
 #include "math/Pose.hh"

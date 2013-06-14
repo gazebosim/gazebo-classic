@@ -16,9 +16,9 @@
 */
 
 #include "rendering/GUIOverlay.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Console.hh"
 
-#include "common/SystemPaths.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "msgs/msgs.hh"
 #include "transport/Transport.hh"
 #include "transport/Node.hh"

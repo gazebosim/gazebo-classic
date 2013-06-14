@@ -27,9 +27,9 @@
 #include "rendering/ogre_gazebo.h"
 #include "rendering/RTShaderSystem.hh"
 
-#include "common/Events.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 #include "math/Pose.hh"
 
 #include "rendering/Visual.hh"

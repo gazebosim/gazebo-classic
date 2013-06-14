@@ -15,7 +15,7 @@
  *
 */
 
-#include "common/Console.hh"
+#include "gazebo/common/Console.hh"
 #include "rendering/DynamicRenderable.hh"
 
 using namespace gazebo;

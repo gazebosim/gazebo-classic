@@ -19,7 +19,7 @@
 
 #include "rendering/ogre_gazebo.h"
 
-#include "common/Color.hh"
+#include "gazebo/common/Color.hh"
 #include "math/Vector3.hh"
 #include "math/Quaternion.hh"
 

@@ -28,8 +28,8 @@
 
 #include "msgs/msgs.hh"
 #include "rendering/RenderTypes.hh"
-#include "common/Event.hh"
-#include "common/Color.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/Color.hh"
 
 #include "sdf/sdf.hh"
 
