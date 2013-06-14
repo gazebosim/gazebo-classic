@@ -23,7 +23,7 @@
 #include <list>
 
 #include "gui/qt.h"
-#include "common/Event.hh"
+#include "gazebo/common/Event.hh"
 #include "msgs/MessageTypes.hh"
 #include "transport/TransportTypes.hh"
 

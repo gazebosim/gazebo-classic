@@ -23,8 +23,8 @@
 
 #include "physics/World.hh"
 
-#include "common/Events.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
 
 #include "transport/transport.hh"
 

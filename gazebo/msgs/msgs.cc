@@ -24,10 +24,10 @@
 #include "math/Plane.hh"
 #include "math/Rand.hh"
 
-#include "common/Common.hh"
-#include "common/Image.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Common.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 #include "msgs/msgs.hh"
 
 namespace gazebo

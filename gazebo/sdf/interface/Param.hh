@@ -31,9 +31,9 @@
 #include <string>
 #include <vector>
 
-#include "common/Console.hh"
-#include "common/Color.hh"
-#include "common/Time.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Time.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2i.hh"
 #include "math/Vector2d.hh"

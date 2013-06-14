@@ -19,9 +19,9 @@
 #include <boost/lexical_cast.hpp>
 
 #include "sdf/sdf.hh"
-#include "common/SystemPaths.hh"
-#include "common/Console.hh"
-#include "common/ModelDatabase.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/ModelDatabase.hh"
 
 #include "rendering/Rendering.hh"
 #include "rendering/Scene.hh"

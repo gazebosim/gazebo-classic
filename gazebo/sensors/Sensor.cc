@@ -25,10 +25,10 @@
 #include "physics/Physics.hh"
 #include "physics/World.hh"
 
-#include "common/Timer.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "common/Plugin.hh"
+#include "gazebo/common/Timer.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Plugin.hh"
 
 #include "sensors/CameraSensor.hh"
 

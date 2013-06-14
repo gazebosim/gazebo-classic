@@ -15,7 +15,7 @@
  *
 */
 
-#include "common/Console.hh"
+#include "gazebo/common/Console.hh"
 
 #include "transport/Transport.hh"
 

@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "msgs/msgs.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
 
 using namespace gazebo;
 

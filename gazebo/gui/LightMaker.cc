@@ -20,7 +20,7 @@
 
 #include "transport/Node.hh"
 #include "gui/GuiEvents.hh"
-#include "common/MouseEvent.hh"
+#include "gazebo/common/MouseEvent.hh"
 #include "rendering/UserCamera.hh"
 #include "rendering/Light.hh"
 #include "rendering/Scene.hh"

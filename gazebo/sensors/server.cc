@@ -16,8 +16,8 @@
 */
 #include <signal.h>
 #include <iostream>
-#include "common/SystemPaths.hh"
-#include "common/Time.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Time.hh"
 #include "transport/Transport.hh"
 #include "sensors/Sensors.hh"
 #include "rendering/Rendering.hh"
