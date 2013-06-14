@@ -24,8 +24,8 @@
 #include "msgs/msgs.hh"
 #include "msgs/MessageTypes.hh"
 
-#include "common/Events.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
 
 #include "transport/Publisher.hh"
 

@@ -19,10 +19,10 @@
  * Date: 16 Oct 2009
  */
 
-#include "common/Common.hh"
-#include "common/MeshManager.hh"
-#include "common/Mesh.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Common.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Exception.hh"
 
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"

@@ -19,8 +19,8 @@
  * Date: 15 May 2009
  */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
 #include "physics/bullet/bullet_inc.h"
 #include "physics/bullet/BulletLink.hh"

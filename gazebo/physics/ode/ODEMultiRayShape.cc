@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
 
 #include "physics/World.hh"
 #include "physics/ode/ODETypes.hh"

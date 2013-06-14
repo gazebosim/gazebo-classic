@@ -22,9 +22,9 @@
 #include <vector>
 
 #include "physics/Model.hh"
-#include "common/Time.hh"
-#include "common/Skeleton.hh"
-#include "common/Animation.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/common/Animation.hh"
 
 namespace gazebo
 {
