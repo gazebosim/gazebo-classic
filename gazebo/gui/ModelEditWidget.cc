@@ -15,8 +15,8 @@
  *
  */
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/gui/ModelEditWidget.hh"
 

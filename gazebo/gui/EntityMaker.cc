@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#include "transport/Transport.hh"
-#include "transport/Node.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
 using namespace gazebo;

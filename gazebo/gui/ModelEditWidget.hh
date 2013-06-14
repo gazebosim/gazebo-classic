@@ -18,7 +18,7 @@
 #define _EDIT_MODEL_WIDGET_HH_
 
 #include "gazebo/gui/qt.h"
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
 
 class QTreeWidget;

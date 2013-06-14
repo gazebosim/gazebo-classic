@@ -25,7 +25,7 @@
 
 #include "rendering/UserCamera.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/gui/BoxMaker.hh"
 

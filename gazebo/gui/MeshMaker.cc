@@ -25,7 +25,7 @@
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/common/MouseEvent.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/gui/MeshMaker.hh"
 

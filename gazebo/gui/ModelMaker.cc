@@ -28,8 +28,8 @@
 
 #include "gazebo/math/Quaternion.hh"
 
-#include "transport/Publisher.hh"
-#include "transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Node.hh"
 
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/GuiEvents.hh"

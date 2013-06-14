@@ -19,7 +19,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/math/Vector3.hh"
 
 namespace gazebo
