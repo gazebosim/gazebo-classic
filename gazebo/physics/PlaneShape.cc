@@ -15,8 +15,8 @@
  *
 */
 
-#include "physics/Collision.hh"
-#include "physics/PlaneShape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/PlaneShape.hh"
 
 using namespace gazebo;
 using namespace physics;

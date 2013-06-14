@@ -21,7 +21,7 @@
 #include <map>
 #include <vector>
 
-#include "physics/Model.hh"
+#include "gazebo/physics/Model.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Skeleton.hh"
 #include "gazebo/common/Animation.hh"

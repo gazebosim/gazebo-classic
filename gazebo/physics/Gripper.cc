@@ -17,14 +17,14 @@
 
 #include "gazebo/common/Events.hh"
 
-#include "physics/World.hh"
-#include "physics/Joint.hh"
-#include "physics/Link.hh"
-#include "physics/Collision.hh"
-#include "physics/Contact.hh"
-#include "physics/Model.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Gripper.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Contact.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Gripper.hh"
 
 using namespace gazebo;
 using namespace physics;

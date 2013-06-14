@@ -22,7 +22,7 @@
 #include <iostream>
 #include <vector>
 
-#include "physics/Physics.hh"
+#include "gazebo/physics/Physics.hh"
 #include "gazebo/common/Time.hh"
 #include "transport/Transport.hh"
 #include "sdf/sdf.hh"

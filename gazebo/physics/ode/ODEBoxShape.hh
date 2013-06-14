@@ -19,12 +19,12 @@
 
 #include "math/Vector3.hh"
 
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODETypes.hh"
-#include "physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODETypes.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/BoxShape.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/BoxShape.hh"
 
 namespace gazebo
 {

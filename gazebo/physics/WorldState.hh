@@ -25,8 +25,8 @@
 #include <vector>
 
 #include "sdf/sdf.hh"
-#include "physics/State.hh"
-#include "physics/ModelState.hh"
+#include "gazebo/physics/State.hh"
+#include "gazebo/physics/ModelState.hh"
 
 namespace gazebo
 {

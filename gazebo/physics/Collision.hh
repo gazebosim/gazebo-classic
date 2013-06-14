@@ -28,9 +28,9 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/CommonTypes.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/CollisionState.hh"
-#include "physics/Entity.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/CollisionState.hh"
+#include "gazebo/physics/Entity.hh"
 
 namespace gazebo
 {
