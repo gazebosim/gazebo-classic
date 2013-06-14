@@ -72,7 +72,8 @@ std::string CameraSensor::GetTopic() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->GetTopic());
+  this->imagePub = this->node->Advertise<msgs::ImageStamped>(
+      this->GetTopic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -180,7 +181,9 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
       msg.mutable_image()->set_data(this->camera->GetImageData(),
           msg.image().width() * this->camera->GetImageDepth() *
           msg.image().height());
-      this->imagePub->Publish(msg);
+
+      if (this->imagePub && this->imagePub->HasConnections())
+        this->imagePub->Publish(msg);
     }
   }
 }

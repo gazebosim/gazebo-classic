@@ -71,7 +71,7 @@ void RaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
   this->scanPub = this->node->Advertise<msgs::LaserScanStamped>(
-      this->GetTopic());
+      this->GetTopic(), 50);
 
   GZ_ASSERT(this->world != NULL,
       "RaySensor did not get a valid World pointer");
@@ -365,7 +365,7 @@ void RaySensor::UpdateImpl(bool /*_force*/)
         this->laserShape->GetRetro(j * this->GetRayCount() + i));
   }
 
-  if (this->scanPub)
+  if (this->scanPub && this->scanPub->HasConnections())
     this->scanPub->Publish(this->laserMsg);
 }
 

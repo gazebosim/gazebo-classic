@@ -67,8 +67,10 @@ set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 gz_build_dri_tests(${dri_tests})
 
 
-# Increase timeout, to account for model download time.
-set_tests_properties(pr2 PROPERTIES TIMEOUT 500)
+if (VALID_DRI_DISPLAY)
+  # Increase timeout, to account for model download time.
+  set_tests_properties(pr2 PROPERTIES TIMEOUT 500)
 
-# Increase timeout, to account for model download time.
-set_tests_properties(pioneer2dx PROPERTIES TIMEOUT 500)
+  # Increase timeout, to account for model download time.
+  set_tests_properties(pioneer2dx PROPERTIES TIMEOUT 500)
+endif()

@@ -176,7 +176,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->posePub = this->node->Advertise<msgs::PosesStamped>(
     "~/pose/info", 10, 60.0);
 
-  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
+  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
   if (this->sdf->HasElement("gui"))
     this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
 
@@ -1813,7 +1813,8 @@ void World::PublishWorldStats()
   this->worldStatsMsg.set_iterations(this->iterations);
   this->worldStatsMsg.set_paused(this->IsPaused());
 
-  this->statPub->Publish(this->worldStatsMsg);
+  if (this->statPub && this->statPub->HasConnections())
+    this->statPub->Publish(this->worldStatsMsg);
   this->prevStatTime = common::Time::GetWallTime();
 }
 

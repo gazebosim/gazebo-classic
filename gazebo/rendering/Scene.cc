@@ -140,7 +140,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
       &Scene::OnResponse, this);
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
 
-
   this->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->sdf);
 
@@ -298,6 +297,7 @@ void Scene::Init()
   // Force shadows on.
   this->SetShadowsEnabled(true);
 
+  this->requestPub->WaitForConnection();
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
 

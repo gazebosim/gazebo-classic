@@ -461,8 +461,8 @@ void Camera::ReadPixelBuffer()
       Ogre::Viewport *vp = rtt->addViewport(this->camera);
       vp->setClearEveryFrame(true);
       vp->setShadowsEnabled(true);
-      vp->setShadowsEnabled(true);
       vp->setOverlaysEnabled(false);
+      RTShaderSystem::AttachViewport(vp, this->GetScene());
     }
 
     // This update is only needed for client side data captures
