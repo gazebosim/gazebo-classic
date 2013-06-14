@@ -21,8 +21,8 @@
 
 #include <sstream>
 
-#include "msgs/msgs.hh"
-#include "msgs/MessageTypes.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/msgs/MessageTypes.hh"
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"

@@ -15,7 +15,7 @@
  *
 */
 #include "gazebo/common/Exception.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/MultiRayShape.hh"
 
 using namespace gazebo;

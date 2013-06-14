@@ -25,7 +25,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "rendering/RenderTypes.hh"
 

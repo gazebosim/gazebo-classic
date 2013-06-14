@@ -24,7 +24,7 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "transport/Connection.hh"
 
 namespace gazebo

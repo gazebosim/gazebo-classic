@@ -24,7 +24,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
-#include "msgs/MessageTypes.hh"
+#include "gazebo/msgs/MessageTypes.hh"
 #include "transport/TransportTypes.hh"
 
 namespace gazebo

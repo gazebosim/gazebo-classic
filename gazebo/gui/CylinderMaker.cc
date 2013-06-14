@@ -16,7 +16,7 @@
 */
 #include <sstream>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/math/Quaternion.hh"

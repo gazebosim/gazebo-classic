@@ -16,7 +16,7 @@
 */
 #include <sstream>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/gui/GuiEvents.hh"

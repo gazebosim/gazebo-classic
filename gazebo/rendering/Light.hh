@@ -26,7 +26,7 @@
 #include <string>
 #include <iostream>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "rendering/RenderTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Color.hh"

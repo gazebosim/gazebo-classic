@@ -37,7 +37,7 @@
 #include "gazebo/math/Plane.hh"
 #include "gazebo/math/Vector2i.hh"
 
-#include "msgs/MessageTypes.hh"
+#include "gazebo/msgs/MessageTypes.hh"
 #include "rendering/RenderTypes.hh"
 #include "sdf/sdf.hh"
 
