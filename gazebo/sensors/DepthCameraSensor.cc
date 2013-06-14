@@ -32,8 +32,8 @@
 #include "rendering/Scene.hh"
 #include "rendering/Rendering.hh"
 
-#include "sensors/SensorFactory.hh"
-#include "sensors/DepthCameraSensor.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/DepthCameraSensor.hh"
 
 using namespace gazebo;
 using namespace sensors;

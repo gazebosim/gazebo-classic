@@ -20,7 +20,7 @@
 #include <string>
 
 #include "gazebo/common/Plugin.hh"
-#include "sensors/CameraSensor.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 #include "rendering/Camera.hh"
 #include "gazebo.hh"
 

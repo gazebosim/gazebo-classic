@@ -17,7 +17,7 @@
 
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
-#include "sensors/sensors.hh"
+#include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
 #include "scans_cmp.h"
 

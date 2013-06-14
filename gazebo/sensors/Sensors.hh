@@ -19,7 +19,7 @@
 
 #include <string>
 #include "sdf/sdf.hh"
-#include "sensors/SensorTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
 
 namespace gazebo
 {

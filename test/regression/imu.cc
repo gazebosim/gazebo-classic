@@ -16,7 +16,7 @@
 */
 
 #include "ServerFixture.hh"
-#include "sensors/sensors.hh"
+#include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
 
 // How tightly to compare for deterministic values

@@ -17,12 +17,12 @@
 
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
-#include "sensors/sensors.hh"
+#include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/common/Timer.hh"
 #include "scans_cmp.h"
 #include "rendering/Camera.hh"
-#include "sensors/CameraSensor.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 
 using namespace gazebo;
 class CameraSensor : public ServerFixture

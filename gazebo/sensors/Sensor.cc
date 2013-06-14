@@ -30,10 +30,10 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 
-#include "sensors/CameraSensor.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 
-#include "sensors/Sensor.hh"
-#include "sensors/SensorManager.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/SensorManager.hh"
 
 using namespace gazebo;
 using namespace sensors;

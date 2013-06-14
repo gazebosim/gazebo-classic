@@ -21,10 +21,10 @@
 
 #include "rendering/Rendering.hh"
 
-#include "sensors/SensorFactory.hh"
-#include "sensors/SensorManager.hh"
-#include "sensors/Sensor.hh"
-#include "sensors/Sensors.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/Sensors.hh"
 
 using namespace gazebo;
 
