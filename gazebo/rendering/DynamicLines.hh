@@ -25,7 +25,7 @@
 #include <vector>
 #include <string>
 
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
 #include "rendering/DynamicRenderable.hh"
 
 namespace gazebo

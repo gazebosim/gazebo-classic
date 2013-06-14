@@ -20,8 +20,8 @@
 #include "rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Color.hh"
-#include "math/Vector3.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Quaternion.hh"
 
 namespace gazebo
 {

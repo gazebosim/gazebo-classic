@@ -26,7 +26,7 @@
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/Events.hh"
 
-#include "math/MathTypes.hh"
+#include "gazebo/math/MathTypes.hh"
 
 #include "rendering/RenderTypes.hh"
 #include "msgs/MessageTypes.hh"

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "math/Vector2i.hh"
+#include "gazebo/math/Vector2i.hh"
 #include "gazebo/common/MouseEvent.hh"
 
 #include "rendering/UserCamera.hh"
