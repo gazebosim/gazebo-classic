@@ -22,8 +22,8 @@
 #ifndef _AUDIO_DECODER_HH_
 #define _AUDIO_DECODER_HH_
 
-#include <string>
 #include <stdint.h>
+#include <string>
 
 struct AVFormatContext;
 struct AVCodecContext;
@@ -52,10 +52,13 @@ namespace gazebo
       /// \sa AudioDecoder::SetFile
       /// \param[out] _outBuffer Buffer that holds the decoded audio data.
       /// \param[out] _outBufferSize Size of the _outBuffer
-      public: int Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize);
+      public: bool Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize);
 
       /// \brief Get the sample rate from the latest decoded file
       public: int GetSampleRate();
+
+      /// \brief Free audio object, close files, streams
+      private: void Cleanup();
 
       /// \brief libav Format I/O context
       private: AVFormatContext *formatCtx;
@@ -74,5 +77,4 @@ namespace gazebo
     };
   }
 }
-
 #endif

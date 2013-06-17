@@ -30,7 +30,6 @@
 #endif
 
 extern "C" {
-
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 }
@@ -39,8 +38,6 @@ extern "C" {
 using namespace gazebo;
 using namespace common;
 
-bool AudioDecoder::initialized = false;
-
 /////////////////////////////////////////////////
 AudioDecoder::AudioDecoder()
 {
@@ -48,25 +45,28 @@ AudioDecoder::AudioDecoder()
   this->codecCtx = NULL;
   this->codec = NULL;
   this->audioStream = 0;
-
-  // Initialize the ffmpeg library only once
-  if (!this->initialized)
-  {
-    this->initialized = true;
-    avcodec_init();
-    avcodec_register_all();
-
-    // Register all formats and codecs
-    av_register_all();
-  }
 }
 
 /////////////////////////////////////////////////
 AudioDecoder::~AudioDecoder()
 {
+  this->Cleanup();
 }
 
 /////////////////////////////////////////////////
+void AudioDecoder::Cleanup()
+{
+#ifdef HAVE_FFMPEG
+  // Close the audio file
+  avformat_close_input(&this->formatCtx);
+
+  // Close the codec
+  avcodec_close(this->codecCtx);
+#endif
+}
+
+/////////////////////////////////////////////////
+#ifdef HAVE_FFMPEG
 bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 {
   AVPacket packet;
@@ -101,10 +101,14 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
     if (packet.stream_index == this->audioStream)
     {
       tmpBufsize = sizeof(tmpBuf);
+      int gotFrame = 0;
+      AVFrame *decodedFrame = NULL;
+
+      // av_get_frame_defaults(decodedFrame);
 
       // Decode the frame
-      bytesDecoded = avcodec_decode_audio2( this->codecCtx, (int16_t*)tmpBuf,
-          &tmpBufsize, packet.data, packet.size );
+      bytesDecoded = avcodec_decode_audio4( this->codecCtx, decodedFrame,
+          &gotFrame, &packet);
 
       if (bytesDecoded < 0)
       {
@@ -135,28 +139,39 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 
   return true;
 }
+#else
+bool AudioDecoder::Decode(uint8_t ** /*_outBuffer*/,
+    unsigned int * /*_outBufferSize*/)
+{
+  return true;
+}
+#endif
 
 /////////////////////////////////////////////////
 int AudioDecoder::GetSampleRate()
 {
+#ifdef HAVE_FFMPEG
   return this->codecCtx->sample_rate;
+#else
+  return 0;
+#endif
 }
 
 /////////////////////////////////////////////////
+#ifdef HAVE_FFMPEG
 bool AudioDecoder::SetFile(const std::string &_filename)
 {
   unsigned int i;
 
   // Open file
-  if (av_open_input_file(&this->formatCtx,
-        _filename.c_str(), NULL, 0, NULL) != 0)
+  if (avformat_open_input(&this->formatCtx, _filename.c_str(), NULL, NULL) < 0)
   {
     gzerr << "Unable to open audio file[" << _filename << "]\n";
     return false;
   }
 
   // Retrieve some information
-  if (av_find_stream_info(this->formatCtx) < 0)
+  if (avformat_find_stream_info(this->formatCtx, NULL) < 0)
   {
     gzerr << "Unable to find stream info\n";
     return false;
@@ -169,7 +184,7 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   this->audioStream = -1;
   for (i = 0; i < this->formatCtx->nb_streams; ++i)
   {
-    if (this->formatCtx->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO)
+    if (this->formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO)
     {
       this->audioStream = i;
       break;
@@ -198,8 +213,14 @@ bool AudioDecoder::SetFile(const std::string &_filename)
     this->codecCtx->flags |= CODEC_FLAG_TRUNCATED;
 
   // Open codec
-  if (avcodec_open(this->codecCtx, this->codec) < 0)
+  if (avcodec_open2(this->codecCtx, this->codec, NULL) < 0)
     perror("couldn't open codec");
 
   return true;
 }
+#else
+bool AudioDecoder::SetFile(const std::string & /*_filename*/)
+{
+  return false;
+}
+#endif

@@ -57,6 +57,8 @@ void gazebo::add_plugin(const std::string &_filename)
 /////////////////////////////////////////////////
 bool gazebo::load(int _argc, char **_argv)
 {
+  gazebo::common::load();
+
   // Initialize the informational logger. This will log warnings, and
   // errors.
   if (!gazebo::common::Console::Instance()->IsInitialized())
