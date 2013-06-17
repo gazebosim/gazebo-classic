@@ -14,8 +14,6 @@
  * limitations under the License.
  *
 */
-#include <msgs/msgs.hh>
-
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 #include <limits>
@@ -33,6 +31,8 @@
 #include "gazebo/common/Skeleton.hh"
 #include "gazebo/common/SkeletonAnimation.hh"
 #include "gazebo/common/BVHLoader.hh"
+
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Joint.hh"
