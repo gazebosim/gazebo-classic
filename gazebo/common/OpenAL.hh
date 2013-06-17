@@ -24,6 +24,7 @@
 #include <string>
 
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/common/SingletonT.hh"
 
 #ifdef HAVE_OPENAL
 
@@ -35,10 +36,9 @@ namespace gazebo
   namespace common
   {
     class OpenALIface;
-    class XMLConfigNode;
     class OpenALSource;
 
-    class OpenAL
+    class OpenAL :public SingletonT<OpenAL>
     {
       /// \brief Constructor
       private: OpenAL();
@@ -48,9 +48,6 @@ namespace gazebo
 
       /// \brief Load the OpenAL server
       public: void Load();
-
-      // \brief Get an instance of this class
-      public: static OpenAL *Instance();
 
       /// \brief Initialize
       public: void Init();
