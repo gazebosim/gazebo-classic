@@ -34,19 +34,19 @@ extern "C" {
 ODE_API void dRSetIdentity (dMatrix3 R);
 
 ODE_API void dRFromAxisAndAngle (dMatrix3 R, dReal ax, dReal ay, dReal az,
-			 dReal angle);
+       dReal angle);
 
 ODE_API void dRFromEulerAngles (dMatrix3 R, dReal phi, dReal theta, dReal psi);
 
 ODE_API void dRFrom2Axes (dMatrix3 R, dReal ax, dReal ay, dReal az,
-		  dReal bx, dReal by, dReal bz);
+      dReal bx, dReal by, dReal bz);
 
 ODE_API void dRFromZAxis (dMatrix3 R, dReal ax, dReal ay, dReal az);
 
 ODE_API void dQSetIdentity (dQuaternion q);
 
 ODE_API void dQFromAxisAndAngle (dQuaternion q, dReal ax, dReal ay, dReal az,
-			 dReal angle);
+       dReal angle);
 
 /* Quaternion multiplication, analogous to the matrix multiplication routines. */
 /* qa = rotate by qc, then qb */

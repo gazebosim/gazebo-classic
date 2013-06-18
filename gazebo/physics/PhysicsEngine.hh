@@ -157,7 +157,7 @@ namespace gazebo
       /// \param[in] _type Type of joint to create.
       /// \param[in] _parent Model parent.
       public: virtual JointPtr CreateJoint(const std::string &_type,
-                                           ModelPtr _parent) = 0;
+                                           ModelPtr _parent = ModelPtr()) = 0;
 
       /// \brief Return the gavity vector.
       /// \return The gavity vector.

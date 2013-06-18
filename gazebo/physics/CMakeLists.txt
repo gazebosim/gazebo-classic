@@ -57,6 +57,7 @@ set (headers
   Collision.hh
   CollisionState.hh
   Contact.hh
+  ContactManager.hh
   CylinderShape.hh
   Entity.hh
   HeightmapShape.hh

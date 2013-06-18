@@ -230,7 +230,6 @@ if (PKG_CONFIG_FOUND)
     set (OGRE_PLUGINDIR ${_pkgconfig_invoke_result})
   endif()
 
-
   ########################################
   # Find OpenAL
   # pkg_check_modules(OAL openal)

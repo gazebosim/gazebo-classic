@@ -153,8 +153,6 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   this->lastRenderWallTime = common::Time::GetWallTime();
 
-  this->displayClouds = true;
-
   // Set default render rate to unlimited
   this->SetRenderRate(0.0);
 }
@@ -392,22 +390,12 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
-    // FIXME: Disable clouds in offscreen rendering for now until they can
-    // be rendered properly
-    this->displayClouds = this->GetScene()->GetShowClouds();
-
-    if (this->renderTexture)
-      this->GetScene()->ShowClouds(false);
-
     // Render, but don't swap buffers.
     this->renderTarget->update(false);
 
     this->ReadPixelBuffer();
 
     this->lastRenderWallTime = common::Time::GetWallTime();
-
-    if (this->renderTexture)
-      this->GetScene()->ShowClouds(this->displayClouds);
   }
 }
 
@@ -418,9 +406,6 @@ void Camera::ReadPixelBuffer()
 
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
-    if (this->renderTexture)
-      this->GetScene()->ShowClouds(false);
-
     size_t size;
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
@@ -462,8 +447,8 @@ void Camera::ReadPixelBuffer()
       Ogre::Viewport *vp = rtt->addViewport(this->camera);
       vp->setClearEveryFrame(true);
       vp->setShadowsEnabled(true);
-      vp->setShadowsEnabled(true);
       vp->setOverlaysEnabled(false);
+      RTShaderSystem::AttachViewport(vp, this->GetScene());
     }
 
     // This update is only needed for client side data captures
@@ -483,8 +468,6 @@ void Camera::ReadPixelBuffer()
     // pixels from buffer into memory.
     this->viewport->getTarget()->copyContentsToMemory(box);
 #endif
-    if (this->renderTexture)
-      this->GetScene()->ShowClouds(this->displayClouds);
   }
 }
 

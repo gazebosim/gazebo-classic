@@ -1039,9 +1039,6 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         }
       }
 
-      // gzerr << "stopping before freezing joint\n";
-      // getchar();
-
       joint = model->GetJoint("upper_joint");
       if (joint)
       {
@@ -1070,9 +1067,6 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         // Apply positive torque to the lower_joint and step forward.
         force = 10;
 
-      // gzerr << "stopping before setting positive joint force\n";
-      // getchar();
-
         for (int i = 0; i < 10; ++i)
         {
           joint->SetForce(0, force);
@@ -1083,7 +1077,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           world->StepWorld(1);
           newVel = joint->GetVelocity(0);
 
-          gzerr << "model " << *modelIter
+          gzdbg << "model " << *modelIter
                 << "  i " << i
                 << "  oldVel " << oldVel
                 << "  newVel " << newVel
@@ -1107,10 +1101,6 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           angVel -= joint->GetParent()->GetWorldAngularVel();
           EXPECT_NEAR(jointVel, axis.Dot(angVel), PHYSICS_TOL);
         }
-
-      // gzerr << "stopping before setting negative joint forces\n";
-      // getchar();
-
         // Apply negative torque to lower_joint
         force = -30;
         for (int i = 0; i < 10; ++i)
@@ -1123,7 +1113,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           world->StepWorld(1);
           newVel = joint->GetVelocity(0);
 
-          gzerr << "model " << *modelIter
+          gzdbg << "model " << *modelIter
                 << "  i " << i
                 << "  oldVel " << oldVel
                 << "  newVel " << newVel
@@ -1161,6 +1151,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     }
   }
 }
+
 TEST_F(PhysicsTest, RevoluteJointODE)
 {
   RevoluteJoint("ode");
@@ -1290,10 +1281,11 @@ void PhysicsTest::JointDamping(const std::string &_physicsEngine)
     EXPECT_NEAR(vel.z, -6.51766, PHYSICS_TOL);
 
     EXPECT_NEAR(pose.pos.x, 3.0, PHYSICS_TOL);
-    EXPECT_NEAR(pose.pos.y, 5.0e-6, PHYSICS_TOL);
+    EXPECT_NEAR(pose.pos.y, 0.0, PHYSICS_TOL);
     EXPECT_NEAR(pose.pos.z, 10.101, PHYSICS_TOL);
     EXPECT_NEAR(pose.rot.GetAsEuler().x, 0.567336, PHYSICS_TOL);
     EXPECT_NEAR(pose.rot.GetAsEuler().y, 0.0, PHYSICS_TOL);
+    EXPECT_NEAR(pose.rot.GetAsEuler().z, 0.0, PHYSICS_TOL);
   }
 }
 
