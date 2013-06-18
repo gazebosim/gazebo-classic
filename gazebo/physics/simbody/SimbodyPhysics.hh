@@ -126,6 +126,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
 
+      // Documentation inherited
+      public: virtual ModelPtr CreateModel(BasePtr _parent);
+      
       private: SimTK::MultibodySystem *dynamicsWorld;
 
       private: common::Time lastUpdateTime;
@@ -202,6 +205,9 @@ namespace gazebo
       }
 
       public: static std::string GetTypeString(physics::Base::EntityType _type);
+
+      /// \brief true if initialized
+      public: bool simbodyPhysicsInitialized;
 
       /// \brief Helper functions
       private: void CreateMultibodyGraph(

@@ -20,6 +20,7 @@
  */
 
 #include "physics/simbody/SimbodyTypes.hh"
+#include "physics/simbody/SimbodyModel.hh"
 #include "physics/simbody/SimbodyLink.hh"
 #include "physics/simbody/SimbodyJoint.hh"
 #include "physics/simbody/SimbodyCollision.hh"
@@ -91,16 +92,25 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
 
   // Create an integrator
   // this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
-  this->integ = new SimTK::RungeKutta3Integrator(system);
+  // this->integ = new SimTK::RungeKutta3Integrator(system);
   // this->integ = new SimTK::RungeKutta2Integrator(system);
-  // this->integ = new SimTK::ExplicitEulerIntegrator(system);
+  this->integ = new SimTK::ExplicitEulerIntegrator(system);
   /// \TODO:  make sdf parameter
   this->integ->setAccuracy(0.001);
+  this->simbodyPhysicsInitialized = false;
 }
 
 //////////////////////////////////////////////////
 SimbodyPhysics::~SimbodyPhysics()
 {
+}
+
+//////////////////////////////////////////////////
+ModelPtr SimbodyPhysics::CreateModel(BasePtr _parent)
+{
+  SimbodyModelPtr model(new SimbodyModel(_parent));
+
+  return model;
 }
 
 //////////////////////////////////////////////////
@@ -122,13 +132,7 @@ void SimbodyPhysics::Reset()
 //////////////////////////////////////////////////
 void SimbodyPhysics::Init()
 {
-  try {
-    //------------------------ CREATE SIMBODY SYSTEM ---------------------------
-    // Create a Simbody System and populate it with Subsystems we'll need.
-    SimbodyPhysics::InitSimbodySystem();
-  } catch (const std::exception& e) {
-      gzthrow(std::string("Simbody init EXCEPTION: ") + e.what());
-  }
+  gzerr << "SimbodyPhysics::Init\n";
 }
 
 //////////////////////////////////////////////////
@@ -156,10 +160,18 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
       gzthrow(std::string("Simbody build EXCEPTION: ") + e.what());
   }
 
+  try {
+    //------------------------ CREATE SIMBODY SYSTEM ---------------------------
+    // Create a Simbody System and populate it with Subsystems we'll need.
+    SimbodyPhysics::InitSimbodySystem();
+  } catch (const std::exception& e) {
+      gzthrow(std::string("Simbody init EXCEPTION: ") + e.what());
+  }
+
   SimTK::State state = this->system.realizeTopology();
+  gzerr << "realizeTopology\n";
 
   this->integ->initialize(state);
-
   Link_V links = _model->GetLinks();
   for(Link_V::iterator li = links.begin(); li != links.end(); ++li)
   {
@@ -173,6 +185,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   }
 
   this->system.realize(this->integ->getAdvancedState(), Stage::Velocity);
+  gzerr << "realize system\n";
 
   // mark links as initialized
   for(Link_V::iterator li = links.begin(); li != links.end(); ++li)
@@ -199,6 +212,8 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
       gzerr << "simbodyJoint [" << (*ji)->GetName()
             << "]is not a SimbodyJointPtr\n";
   }
+
+  this->simbodyPhysicsInitialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -221,8 +236,10 @@ void SimbodyPhysics::UpdatePhysics()
 
 
   while (integ->getTime() < this->world->GetSimTime().Double())
+  {
     this->integ->stepTo(this->world->GetSimTime().Double(),
                        this->world->GetSimTime().Double());
+  }
 
   const SimTK::State &s = this->integ->getState();
 
@@ -377,7 +394,7 @@ void SimbodyPhysics::ConvertMass(void * /*_engineMass*/,
 //////////////////////////////////////////////////
 void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->GetAttribute("xyz")->Set(_gravity);
+  this->sdf->GetElement("gravity")->Set(_gravity);
 }
 
 //////////////////////////////////////////////////

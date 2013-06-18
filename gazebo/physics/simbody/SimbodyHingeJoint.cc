@@ -218,8 +218,14 @@ math::Angle SimbodyHingeJoint::GetAngleImpl(int _index) const
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
   {
-    return math::Angle(this->mobod.getOneQ(
-      this->simbodyPhysics->integ->getState(), _index));
+    if (this->simbodyPhysics->simbodyPhysicsInitialized)
+      return math::Angle(this->mobod.getOneQ(
+        this->simbodyPhysics->integ->getState(), _index));
+    else
+    {
+      gzwarn << "simbody not yet initialized\n";
+      return math::Angle();
+    }
   }
   else
   {

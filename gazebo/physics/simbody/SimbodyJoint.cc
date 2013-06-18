@@ -185,5 +185,55 @@ JointWrench SimbodyJoint::GetForceTorque(int _index)
 JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
 {
   JointWrench wrench;
+  const SimTK::State &state = this->simbodyPhysics->integ->getState();
+
+  // force calculation of reaction forces
+  this->simbodyPhysics->system.realize(state);
+
+  SimTK::SpatialVec reactionForceOnParentBodyInGround =
+    this->mobod.findMobilizerReactionOnParentAtFInGround(state);
+
+  SimTK::SpatialVec reactionForceOnChildBodyInGround =
+    this->mobod.findMobilizerReactionOnBodyAtMInGround(state);
+
+  // re-express in link frame
+  SimTK::Vec3 reactionTorqueOnChildBody =
+    this->mobod.expressGroundVectorInBodyFrame(
+    state, reactionForceOnParentBodyInGround[0]);   // [0] torque element
+  SimTK::Vec3 reactionForceOnChildBody =
+    this->mobod.expressGroundVectorInBodyFrame(
+    state, reactionForceOnParentBodyInGround[1]);   // [1] force element
+
+  SimTK::Vec3 reactionTorqueOnParentBody =
+    this->mobod.getParentMobilizedBody().expressGroundVectorInBodyFrame(
+    state, reactionForceOnParentBodyInGround[0]);   // [0] torque element
+  SimTK::Vec3 reactionForceOnParentBody =
+    this->mobod.getParentMobilizedBody().expressGroundVectorInBodyFrame(
+    state, reactionForceOnParentBodyInGround[1]);   // [1] force element
+
+  if (!this->isReversed)
+  {
+    wrench.body1Force =
+      SimbodyPhysics::Vec3ToVector3(reactionForceOnChildBody);
+    wrench.body1Torque =
+      SimbodyPhysics::Vec3ToVector3(reactionTorqueOnChildBody);
+
+    wrench.body2Force =
+      SimbodyPhysics::Vec3ToVector3(reactionForceOnParentBody);
+    wrench.body2Torque =
+      SimbodyPhysics::Vec3ToVector3(reactionTorqueOnParentBody);
+  }
+  else
+  {
+    wrench.body1Force =
+      SimbodyPhysics::Vec3ToVector3(reactionForceOnParentBody);
+    wrench.body1Torque =
+      SimbodyPhysics::Vec3ToVector3(reactionTorqueOnParentBody);
+
+    wrench.body2Force =
+      SimbodyPhysics::Vec3ToVector3(reactionForceOnChildBody);
+    wrench.body2Torque =
+      SimbodyPhysics::Vec3ToVector3(reactionTorqueOnChildBody);
+  }
   return wrench;
 }

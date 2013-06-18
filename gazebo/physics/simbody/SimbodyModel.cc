@@ -45,6 +45,7 @@ SimbodyModel::~SimbodyModel()
 void SimbodyModel::Load(sdf::ElementPtr _sdf)
 {
   Model::Load(_sdf);
+  this->Init();
 }
 
 //////////////////////////////////////////////////
