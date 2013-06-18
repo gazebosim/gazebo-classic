@@ -127,7 +127,6 @@ void GpuRaySensor::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void GpuRaySensor::Init()
 {
-
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
