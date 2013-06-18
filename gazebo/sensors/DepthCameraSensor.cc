@@ -31,6 +31,7 @@
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/DepthCameraSensor.hh"
@@ -73,6 +74,13 @@ void DepthCameraSensor::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void DepthCameraSensor::Init()
 {
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "Unable to create DepthCameraSensor. Rendering is disabled.\n";
+    return;
+  }
+
   std::string worldName = this->world->GetName();
 
   if (!worldName.empty())

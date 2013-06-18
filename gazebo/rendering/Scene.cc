@@ -2683,6 +2683,9 @@ void Scene::SetSkyXMode(unsigned int _mode)
   /// make sure it functions correctly when called during a render update,
   /// issue #693.
 
+  if (!this->skyx)
+    return;
+
   bool enabled = _mode != GZ_SKYX_NONE;
   this->skyx->setEnabled(enabled);
 
