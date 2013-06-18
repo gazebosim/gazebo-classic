@@ -7,4 +7,7 @@ Description: Gazebo Exported ODE Libraries
 Version: @GAZEBO_VERSION_FULL@
 Requires:
 Libs: -Wl,-rpath,${libdir},-rpath,${prefix}/lib -L${prefix}/lib -lgazebo_ode
-CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@
+CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@/gazebo
+# The CFlags statement here is deprecated for gazebo-1.9 and will be replaced
+# in gazebo-2.0 with the following:
+# CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@
