@@ -58,22 +58,23 @@ namespace gazebo
       /// \brief Create an OpenALSource object from XML node
       /// \param node The XML config node containing the auiod information
       /// \return A pointer to an OpenALSource object
-      public: OpenALSource *CreateSource( XMLConfigNode *node );
+      public: OpenALSource *CreateSource();
 
       /// \brief Set the listener position
-      public: void SetListenerPos( const Vector3 pos );
+      public: void SetListenerPos(const math::Vector3 &_pos);
 
       /// \brief Set the listener velocity
-      public: void SetListenerVel( const Vector3 vel );
+      public: void SetListenerVel(const math::Vector3 &_vel);
 
       /// \brief Set the listener orientation
-      public: void SetListenerOrient(float cx, float cy, float cz,
-                                          float ux, float uy, float uz);
+      public: void SetListenerOrient(float _cx, float _cy, float _cz,
+                  float _ux, float _uy, float _uz);
 
       private: ALCcontext_struct *context;
       private: ALCdevice_struct *audioDevice;
 
-      private: static OpenAL *myself;
+      /// \brief This is a singleton
+      private: friend class SingletonT<OpenAL>;
     };
 
     /// \brief OpenAL Source. This can be thought of as a speaker.
@@ -86,22 +87,22 @@ namespace gazebo
       public: virtual ~OpenALSource();
 
       /// \brief Load the source from xml
-      public: void Load(XMLConfigNode *node);
+      public: void Load();
 
       /// \brief Set the position of the source
-      public: int SetPos(const Vector3 &pos);
+      public: int SetPos(const math::Vector3 &_pos);
 
       /// \brief Set the velocity of the source
-      public: int SetVel(const Vector3 &vel);
+      public: int SetVel(const math::Vector3 &_vel);
 
       /// \brief Set the pitch of the source
-      public: int SetPitch(float p);
+      public: int SetPitch(float _p);
 
       /// \brief Set the pitch of the source
-      public: int SetGain(float g);
+      public: int SetGain(float _g);
 
       /// \brief Set whether the source loops the audio
-      public: int SetLoop(bool state);
+      public: int SetLoop(bool _state);
 
       /// \brief Play a sound
       public: void Play();
@@ -119,11 +120,11 @@ namespace gazebo
       public: bool IsPlaying();
 
       /// \brief Fill the OpenAL audio buffer from PCM data
-      public: void FillBufferFromPCM(uint8_t *pcmData, unsigned int dataCount,
-                                     int sampleRate );
+      public: void FillBufferFromPCM(uint8_t *_pcmData, unsigned int _dataCount,
+                                     int _sampleRate);
 
       /// \brief Fill the OpenAL audio buffer with data from a sound file
-      public: void FillBufferFromFile( const std::string &audioFile );
+      public: void FillBufferFromFile(const std::string &_audioFile);
 
       // OpenAL source index
       private: unsigned int alSource;

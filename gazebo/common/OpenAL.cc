@@ -18,13 +18,10 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: OpenAL Server
- * Author: Nathan Koenig
- * Date: 20 Jan 2008
- * SVN: $Id:$
- */
 
-#include "config.h"
+#include <gazebo/gazebo_config.h>
+#include <gazebo/common/Console.hh>
+#include <gazebo/common/Exception.hh>
 
 #ifdef HAVE_OPENAL
 
@@ -32,25 +29,17 @@
 #include <unistd.h>
 #include <iostream>
 
-
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/alext.h>
 
-#include "XMLConfig.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
-#include "AudioDecoder.hh"
-#include "GazeboConfig.hh"
-#include "Simulator.hh"
-#include "OpenAL.hh"
+#include "gazebo/common/AudioDecoder.hh"
+#include "gazebo/common/OpenAL.hh"
 
 using namespace gazebo;
-
-OpenAL *OpenAL::myself = NULL;
+using namespace common;
 
 ////////////////////////////////////////////////////////////////////////////////
-///// Constructor
 OpenAL::OpenAL()
 {
   this->context = NULL;
@@ -58,33 +47,21 @@ OpenAL::OpenAL()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Destructor
 OpenAL::~OpenAL()
 {
   this->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Instance
-OpenAL *OpenAL::Instance()
-{
-  if (!myself)
-    myself = new OpenAL();
-
-  return myself;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
-void OpenAL::Load(XMLConfigNode *node)
+void OpenAL::Load()
 {
   std::string deviceName = "default";
 
   // Get the audio device name
-  if (node)
+  /*if (node)
   {
     deviceName = node->GetString("device", "default", 0);
-  }
+  }*/
 
   // Open the default audio device
   if (deviceName == "default")
@@ -95,7 +72,8 @@ void OpenAL::Load(XMLConfigNode *node)
   // Make sure that we could open the audio device
   if (this->audioDevice == NULL)
   {
-    gzerr(0) << "Unable to open audio device[" << deviceName << "]\n Audio will be disabled.\n";
+    gzerr << "Unable to open audio device["
+      << deviceName << "]\n Audio will be disabled.\n";
     return;
   }
 
@@ -104,7 +82,7 @@ void OpenAL::Load(XMLConfigNode *node)
 
   if (this->context == NULL)
   {
-    gzerr(0) << "Unable to create OpenAL Context.\nAudio will be disabled.\n";
+    gzerr << "Unable to create OpenAL Context.\nAudio will be disabled.\n";
     return;
   }
 
@@ -119,13 +97,11 @@ void OpenAL::Load(XMLConfigNode *node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Initialize
 void OpenAL::Init()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Finalize
 void OpenAL::Fini()
 {
   if (this->audioDevice)
@@ -142,20 +118,12 @@ void OpenAL::Fini()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Create an openal source from XML config node
-OpenALSource *OpenAL::CreateSource( XMLConfigNode *node )
+OpenALSource *OpenAL::CreateSource()
 {
-  // Make sure the xml node is valid
-  if (!node)
-  {
-    gzerr(0) << "Invalid xmlconfig node\n";
-    return NULL;
-  }
-
   // Make sure the audio device has been opened
   if (!this->audioDevice)
   {
-    gzerr(0) << "Audio device not open\n";
+    gzerr << "Audio device not open\n";
     return NULL;
   }
 
@@ -163,86 +131,80 @@ OpenALSource *OpenAL::CreateSource( XMLConfigNode *node )
   OpenALSource *source = new OpenALSource();
 
   // Load the source
-  source->Load(node);
+  source->Load();
 
   // Return a pointer to the source
   return source;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the listener position
-void OpenAL::SetListenerPos( const Vector3 pos )
+void OpenAL::SetListenerPos(const math::Vector3 &_pos)
 {
   ALenum error;
 
   // Make sure we have an audio device
   if (!this->audioDevice)
   {
-    gzerr(0) << "Audio disabled\n";
+    gzerr << "Audio disabled\n";
     return;
   }
 
   // Clear error state
   alGetError();
 
-  alListener3f(AL_POSITION, pos.x, pos.y, pos.z);
+  alListener3f(AL_POSITION, _pos.x, _pos.y, _pos.z);
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << " Error: [" << error << "]\n";
+    gzerr << " Error: [" << error << "]\n";
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the listener velocity
-void OpenAL::SetListenerVel( const Vector3 vel )
+void OpenAL::SetListenerVel(const math::Vector3 &_vel)
 {
   ALenum error;
 
   // Make sure we have an audio device
   if (!this->audioDevice)
   {
-    gzerr(0) << "Audio disabled\n";
+    gzerr << "Audio disabled\n";
   }
 
   // Clear error state
   alGetError();
 
-  alListener3f(AL_VELOCITY, vel.x, vel.y, vel.z);
+  alListener3f(AL_VELOCITY, _vel.x, _vel.y, _vel.z);
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << " Error: [" <<  error << "]\n";
+    gzerr << " Error: [" <<  error << "]\n";
   }
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the listener orientation
-void OpenAL::SetListenerOrient( float cx, float cy, float cz,
-                               float ux, float uy, float uz )
+void OpenAL::SetListenerOrient(float _cx, float _cy, float _cz,
+                               float _ux, float _uy, float _uz)
 {
   ALenum error;
-  ALfloat orient[]={cx, cy, cz, ux, uy, uz};
+  ALfloat orient[] = {_cx, _cy, _cz, _ux, _uy, _uz};
 
   // Make sure we have an audio device
   if (!this->audioDevice)
   {
-    gzerr(0) << "Audio disabled\n";
+    gzerr << "Audio disabled\n";
   }
 
   // Clear error state
   alGetError();
 
-  alListenerfv( AL_ORIENTATION, orient );
+  alListenerfv(AL_ORIENTATION, orient);
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << " Error: [" << error << "]\n";
+    gzerr << " Error: [" << error << "]\n";
   }
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -252,7 +214,6 @@ void OpenAL::SetListenerOrient( float cx, float cy, float cz,
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Constructor
 OpenALSource::OpenALSource()
 {
   //Create 1 source
@@ -263,7 +224,6 @@ OpenALSource::OpenALSource()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Destructor
 OpenALSource::~OpenALSource()
 {
   alDeleteSources(1, &this->alSource);
@@ -271,11 +231,10 @@ OpenALSource::~OpenALSource()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Load from xml node
-void OpenALSource::Load(XMLConfigNode *node)
+void OpenALSource::Load()
 {
   // Set the pitch of the source
-  this->SetPitch( node->GetDouble("pitch",1.0,0) );
+  /*this->SetPitch( node->GetDouble("pitch",1.0,0) );
 
   // Set the gain of the source
   this->SetGain( node->GetDouble("gain",1.0,0) );
@@ -285,13 +244,19 @@ void OpenALSource::Load(XMLConfigNode *node)
 
   if (node->GetChild("mp3") != NULL)
     this->FillBufferFromFile(node->GetString("mp3","",1));
+    */
+
+  this->SetPitch(0.5);
+  this->SetGain(0.5);
+  this->SetLoop(true);
+  this->FillBufferFromFile("/home/nkoenig/Music/track.mp3");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the position of the source
-int OpenALSource::SetPos(const Vector3 &pos)
+int OpenALSource::SetPos(const math::Vector3 &_pos)
 {
-  ALfloat p[3] = {pos.x, pos.y, pos.z};
+  ALfloat p[3] = {static_cast<float>(_pos.x),
+    static_cast<float>(_pos.y), static_cast<float>(_pos.z)};
   ALenum error;
 
   // Clear error state
@@ -301,7 +266,7 @@ int OpenALSource::SetPos(const Vector3 &pos)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << "Error: [" << error << "]\n";
+    gzerr << "Error: [" << error << "]\n";
     return -1;
   }
 
@@ -309,20 +274,20 @@ int OpenALSource::SetPos(const Vector3 &pos)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the position of the source
-int OpenALSource::SetVel(const Vector3 &vel)
+int OpenALSource::SetVel(const math::Vector3 &_vel)
 {
   ALenum error;
-  ALfloat v[3] = {vel.x, vel.y, vel.z};
+  ALfloat v[3] = {static_cast<float>(_vel.x), 
+    static_cast<float>(_vel.y), static_cast<float>(_vel.z)};
 
   // Clear error state
   alGetError();
 
-  alSourcefv( this->alSource, AL_VELOCITY, v);
+  alSourcefv(this->alSource, AL_VELOCITY, v);
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << "Error: [" << error << "]\n";
+    gzerr << "Error: [" << error << "]\n";
     return -1;
   }
 
@@ -330,19 +295,18 @@ int OpenALSource::SetVel(const Vector3 &vel)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the pitch of the source
-int OpenALSource::SetPitch(float p)
+int OpenALSource::SetPitch(float _pitch)
 {
   ALenum error;
 
   // clear error state
   alGetError();
 
-  alSourcef(this->alSource, AL_PITCH, p);
+  alSourcef(this->alSource, AL_PITCH, _pitch);
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << " Error: [" << error << "]\n";
+    gzerr << " Error: [" << error << "]\n";
     return -1;
   }
 
@@ -350,8 +314,7 @@ int OpenALSource::SetPitch(float p)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the pitch of the source
-int OpenALSource::SetGain(float g)
+int OpenALSource::SetGain(float _gain)
 {
 
   ALenum error;
@@ -359,11 +322,11 @@ int OpenALSource::SetGain(float g)
   // clear error state
   alGetError();
 
-  alSourcef(this->alSource, AL_GAIN, g);
+  alSourcef(this->alSource, AL_GAIN, _gain);
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << "Error: [" << error << "]\n";
+    gzerr << "Error: [" << error << "]\n";
     return -1;
   }
 
@@ -371,8 +334,7 @@ int OpenALSource::SetGain(float g)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set whether the source loops the audio 
-int OpenALSource::SetLoop(bool state)
+int OpenALSource::SetLoop(bool _state)
 {
   ALenum error;
 
@@ -380,11 +342,11 @@ int OpenALSource::SetLoop(bool state)
   alGetError();
 
   // Set looping state 
-  alSourcei(this->alSource, AL_LOOPING, state);
+  alSourcei(this->alSource, AL_LOOPING, _state);
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << " Error: [" << error << "]\n";
+    gzerr << " Error: [" << error << "]\n";
     return -1;
   }
 
@@ -392,7 +354,6 @@ int OpenALSource::SetLoop(bool state)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Play the source
 void OpenALSource::Play()
 {
   int sourceState;
@@ -406,7 +367,6 @@ void OpenALSource::Play()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Pause the source
 void OpenALSource::Pause()
 {
   int sourceState;
@@ -414,11 +374,10 @@ void OpenALSource::Pause()
 
   // Pause the source if it playing
   if (sourceState == AL_PLAYING)
-    alSourcePause( this->alSource );
+    alSourcePause(this->alSource);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Stop the source
 void OpenALSource::Stop()
 {
   int sourceState;
@@ -426,18 +385,16 @@ void OpenALSource::Stop()
 
   // Stop the source if it is not already stopped
   if (sourceState != AL_STOPPED)
-    alSourcePause( this->alSource);
+    alSourcePause(this->alSource);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Rewind the sound to the beginning
 void OpenALSource::Rewind()
 {
   alSourceRewind(this->alSource);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Is the audio playing
 bool OpenALSource::IsPlaying()
 {
   int sourceState;
@@ -446,36 +403,32 @@ bool OpenALSource::IsPlaying()
   return sourceState == AL_PLAYING;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
-// Fill the audio buffer from PCM data
-void OpenALSource::FillBufferFromPCM(uint8_t *pcmData, unsigned int dataCount, 
-                                     int sampleRate )
+void OpenALSource::FillBufferFromPCM(uint8_t *_pcmData,
+    unsigned int _dataCount, int _sampleRate)
 {
   // First detach the buffer
-  alSourcei(this->alSource, AL_BUFFER, 0 );
+  alSourcei(this->alSource, AL_BUFFER, 0);
 
   // Copy raw buffer into AL buffer
   // AL_FORMAT_MONO8, AL_FORMAT_MONO16, AL_FORMAT_STEREO8,
   // AL_FORMAT_STEREO16
-  alBufferData( this->alBuffer, AL_FORMAT_MONO16, pcmData, dataCount, 
-                sampleRate);
+  alBufferData(this->alBuffer, AL_FORMAT_MONO16, _pcmData, _dataCount, 
+      _sampleRate);
 
   // Attach buffer to source
-  alSourcei(this->alSource, AL_BUFFER, this->alBuffer );
+  alSourcei(this->alSource, AL_BUFFER, this->alBuffer);
 
-  if ( alGetError() != AL_NO_ERROR)
+  if (alGetError() != AL_NO_ERROR)
   {
     gzthrow("Unable to copy data into openAL buffer\n");
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Fill the OpenAL audio buffer with data from a sound file
-void OpenALSource::FillBufferFromFile( const std::string &audioFile )
+void OpenALSource::FillBufferFromFile(const std::string &_audioFile)
 {
-
-  std::string fullPathAudioFile = audioFile;
+  std::string fullPathAudioFile = _audioFile;
 
   // Try to open the audio file in the current directory
   FILE *testFile = fopen(fullPathAudioFile.c_str(), "r");
@@ -483,7 +436,9 @@ void OpenALSource::FillBufferFromFile( const std::string &audioFile )
   // If the audio file couldn't be opened, try the gazebo paths
   if (testFile == NULL)
   {
-    std::list<std::string>::iterator iter;
+    gzerr << "Unable to open audio file[" << _audioFile << "]\n";
+
+    /*std::list<std::string>::iterator iter;
     GazeboConfig *gzconfig = Simulator::Instance()->GetGazeboConfig();
 
     for (iter = gzconfig->GetGazeboPaths().begin();
@@ -497,7 +452,7 @@ void OpenALSource::FillBufferFromFile( const std::string &audioFile )
       {
         break;
       }
-    }
+    }*/
   }
 
   uint8_t *dataBuffer = NULL;

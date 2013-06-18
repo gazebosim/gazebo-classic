@@ -1,5 +1,10 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+if (HAVE_OPENAL)
+  include_directories(${OPENAL_INCLUDE_DIR})
+endif()
+
+
 if (HAVE_GTS)
   include_directories(${gts_INCLUDE_DIRS})
   link_directories(${gts_LIBRARY_DIRS})
@@ -121,6 +126,10 @@ target_link_libraries(gazebo_common gazebo_math
 
 if (HAVE_GTS)
   target_link_libraries(gazebo_common ${gts_LIBRARIES})
+endif()
+
+if (HAVE_OPENAL)
+  target_link_libraries(gazebo_common ${OPENAL_LIBRARY})
 endif()
 
 gz_install_library(gazebo_common)
