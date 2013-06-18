@@ -197,12 +197,14 @@ void TopicManager::ProcessNodes(bool _onlyOut)
 
 //////////////////////////////////////////////////
 void TopicManager::Publish(const std::string &_topic, MessagePtr _message,
-    const boost::function<void()> &_cb)
+    boost::function<void(uint32_t)> _cb, uint32_t _id)
 {
   PublicationPtr pub = this->FindPublication(_topic);
 
   if (pub)
-    pub->Publish(_message, _cb);
+    pub->Publish(_message, _cb, _id);
+  else if (!_cb.empty())
+    _cb(_id);
 }
 
 //////////////////////////////////////////////////
@@ -355,22 +357,22 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
 
 
 //////////////////////////////////////////////////
-PublicationPtr TopicManager::UpdatePublications(const std::string &topic,
-                                                const std::string &msgType)
+PublicationPtr TopicManager::UpdatePublications(const std::string &_topic,
+                                                const std::string &_msgType)
 {
   // Find a current publication on this topic
-  PublicationPtr pub = this->FindPublication(topic);
+  PublicationPtr pub = this->FindPublication(_topic);
 
   if (pub)
   {
-    if (msgType != pub->GetMsgType())
+    if (_msgType != pub->GetMsgType())
       gzthrow("Attempting to advertise on an existing topic with"
               " a conflicting message type\n");
   }
   else
   {
-    pub = PublicationPtr(new Publication(topic, msgType));
-    this->advertisedTopics[topic] =  pub;
+    pub = PublicationPtr(new Publication(_topic, _msgType));
+    this->advertisedTopics[_topic] =  pub;
     this->advertisedTopicsEnd = this->advertisedTopics.end();
   }
 

@@ -2,7 +2,7 @@
 <element name="scene" required="1">
   <description>Specifies the look of the environment.</description>
 
-  <element name="ambient" type="color" default="0.2 0.2 0.2 1.0" required="1">
+  <element name="ambient" type="color" default="0.4 0.4 0.4 1.0" required="1">
     <description>Color of the ambient light.</description>
   </element>
 

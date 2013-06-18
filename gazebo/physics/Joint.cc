@@ -470,12 +470,13 @@ void Joint::SetLowStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetAngle(int /*index*/, math::Angle _angle)
+void Joint::SetAngle(int _index, math::Angle _angle)
 {
   if (this->model->IsStatic())
     this->staticAngle = _angle;
   else
-    this->model->SetJointPosition(this->GetScopedName(), _angle.Radian());
+    this->model->SetJointPosition(
+      this->GetScopedName(), _angle.Radian(), _index);
 }
 
 //////////////////////////////////////////////////
