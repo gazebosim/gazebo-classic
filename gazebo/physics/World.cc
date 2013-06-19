@@ -1421,8 +1421,24 @@ void World::ProcessModelMsgs()
       model = this->GetModel((*iter).name());
 
     if (!model)
-      gzerr << "Unable to find model["
+    {
+      gzdbg << "Unable to find model["
             << (*iter).name() << "] Id[" << (*iter).id() << "]\n";
+
+      // look for link in all models
+      Model_V models = this->GetModels();
+      for (Model_V::iterator miter = models.begin();
+                             miter != models.end(); ++miter)
+      {
+        LinkPtr link = (*miter)->GetLink((*iter).name());
+        if (link && (*iter).has_pose())
+        {
+          // gzdbg << "set link " << link->GetName()
+          //       << " pose " << msgs::Convert((*iter).pose()) << "\n";
+          link->SetWorldPose(msgs::Convert((*iter).pose()));
+        }
+      }
+    }
     else
     {
       model->ProcessMsg(*iter);

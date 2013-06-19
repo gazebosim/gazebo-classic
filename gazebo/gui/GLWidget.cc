@@ -414,8 +414,16 @@ void GLWidget::OnMousePressTranslate()
   if (vis && !vis->IsPlane() &&
       this->mouseEvent.button == common::MouseEvent::LEFT)
   {
-    vis = vis->GetRootVisual();
-    this->mouseMoveVisStartPose = vis->GetWorldPose();
+    if (!this->mouseEvent.control)
+      vis = vis->GetRootVisual();
+    else
+      vis = vis->GetParent();
+
+    // gzerr << "selecting vis name [" << vis->GetName()
+    //       << "] pose [" << vis->GetWorldPose()
+    //       << "]\n";
+
+    this->mouseMoveVisStartPose = vis->GetPose();
 
     this->SetMouseMoveVisual(vis);
 
@@ -919,6 +927,10 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
 {
   math::Pose pose = _vis->GetPose();
 
+  // gzdbg << "get pose " << pose
+  //       << " root node " << _vis->GetRootVisual()->GetPose()
+  //       << " : " << this->mouseMoveVisStartPose << "\n";
+
   math::Vector3 origin1, dir1, p1;
   math::Vector3 origin2, dir2, p2;
 
@@ -934,7 +946,7 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
   if (this->keyText == "z")
   {
     math::Vector2i diff = this->mouseEvent.pos - this->mouseEvent.pressPos;
-    pose.pos.z = this->mouseMoveVisStartPose.pos.z + diff.y * -0.01;
+    pose.pos.z = this->mouseMoveVisStartPose.pos.z + diff.y * -0.001;
     _vis->SetPose(pose);
     return;
   }
@@ -960,7 +972,15 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
   p1 = origin1 + dir1 * dist1;
   p2 = origin2 + dir2 * dist2;
 
-  moveVector *= p1 - p2;
+  // rotate moveVector into local frame
+  if (_vis == _vis->GetRootVisual())
+    moveVector *= p1 - p2;
+  else
+  {
+    math::Quaternion q = _vis->GetWorldPose().rot.GetInverse();
+    moveVector = q.RotateVector(moveVector * (p1 - p2));
+  }
+
   pose.pos = this->mouseMoveVisStartPose.pos + moveVector;
 
   if (this->mouseEvent.shift)
