@@ -880,3 +880,41 @@ material Gazebo/GaussianCameraNoise
     }
   }
 }
+
+vertex_program Gazebo/CameraDistortionVS glsl
+{
+  source camera_distortion_vs.glsl
+}
+
+fragment_program Gazebo/CameraDistortionFS glsl
+{
+  source camera_distortion_fs.glsl
+  default_params
+  {
+    param_named RT int 0
+    param_named k1 float 0.0
+    param_named k2 float 0.0
+    param_named k3 float 0.0
+    param_named p1 float 0.0
+    param_named p2 float 0.0
+  }
+}
+
+material Gazebo/CameraDistortion
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/CameraDistortionVS { }
+      fragment_program_ref Gazebo/CameraDistortionFS { }
+
+      texture_unit RT
+      {
+        tex_coord_set 0
+        tex_address_mode clamp
+        filtering linear linear linear
+      }
+    }
+  }
+}

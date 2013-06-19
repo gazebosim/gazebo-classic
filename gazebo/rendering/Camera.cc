@@ -80,14 +80,14 @@ class GaussianNoiseCompositorListener
     //    fragment_program Gazebo/GaussianCameraNoiseFS
     // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
     _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("offsets", offsets);
+        getFragmentProgramParameters()->
+        setNamedConstant("offsets", offsets);
     _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("mean", (Ogre::Real)this->mean);
+        getFragmentProgramParameters()->
+        setNamedConstant("mean", static_cast<Ogre::Real>(this->mean));
     _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("stddev", (Ogre::Real)this->stddev);
+        getFragmentProgramParameters()->
+        setNamedConstant("stddev", static_cast<Ogre::Real>(this->stddev));
   }
 
   /// \brief Mean that we'll pass down to the GLSL fragment shader.
@@ -96,6 +96,58 @@ class GaussianNoiseCompositorListener
   /// shader.
   private: double stddev;
 };
+
+// We'll create an instance of this class for each camera, to be used to inject
+// random values on each render call.
+class LensDistortionCompositorListener
+  : public Ogre::CompositorInstance::Listener
+{
+  /// \brief Constructor, setting mean and standard deviation.
+  public: LensDistortionCompositorListener()
+  {
+  }
+
+  /// \brief Callback that OGRE will invoke for us on each render call
+  public: virtual void notifyMaterialRender(unsigned int _pass_id,
+                                            Ogre::MaterialPtr & _mat)
+  {
+    // These calls are setting parameters that are declared in two places:
+    // 1. media/materials/scripts/gazebo.material, in
+    //    fragment_program Gazebo/CameraDistortionFS
+    // 2. media/materials/scripts/camera_distortion_fs.glsl
+    _mat->getTechnique(0)->getPass(_pass_id)->
+        getFragmentProgramParameters()->setNamedConstant("k1",
+        static_cast<Ogre::Real>(this->k1));
+    _mat->getTechnique(0)->getPass(_pass_id)->
+        getFragmentProgramParameters()->setNamedConstant("k2",
+        static_cast<Ogre::Real>(this->k2));
+    _mat->getTechnique(0)->getPass(_pass_id)->
+        getFragmentProgramParameters()->setNamedConstant("k3",
+        static_cast<Ogre::Real>(this->k3));
+    _mat->getTechnique(0)->getPass(_pass_id)->
+        getFragmentProgramParameters()->setNamedConstant("p1",
+        static_cast<Ogre::Real>(this->p1));
+    _mat->getTechnique(0)->getPass(_pass_id)->
+        getFragmentProgramParameters()->setNamedConstant("p2",
+        static_cast<Ogre::Real>(this->p2));
+  }
+
+  /// \brief Distortion coefficient k1.
+  private: double k1;
+
+  /// \brief Distortion coefficient k2.
+  private: double k2;
+
+  /// \brief Distortion coefficient k3.
+  private: double k3;
+
+  /// \brief Distortion coefficient p1.
+  private: double p1;
+
+  /// \brief Distortion coefficient p2.
+  private: double p2;
+};
+
 }  // namespace rendering
 }  // namespace gazebo
 
@@ -155,6 +207,8 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   // Set default render rate to unlimited
   this->SetRenderRate(0.0);
+
+  this->distortionActive = false;
 }
 
 //////////////////////////////////////////////////
@@ -246,6 +300,28 @@ void Camera::Load()
     else
       gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
         std::endl;
+  }
+
+  if (this->sdf->HasElement("distortion"))
+  {
+    sdf::ElementPtr distortionElem = this->sdf->GetElement("distortion");
+
+    this->distortionActive = true;
+/*    std::string type = noiseElem->GetValueString("type");
+    if (type == "gaussian")
+    {
+      this->noiseType = GAUSSIAN;
+      this->noiseMean = noiseElem->GetValueDouble("mean");
+      this->noiseStdDev = noiseElem->GetValueDouble("stddev");
+      this->noiseActive = true;
+      this->gaussianNoiseCompositorListener.reset(new
+        GaussianNoiseCompositorListener(this->noiseMean, this->noiseStdDev));
+      gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
+        " and stddev " << this->noiseStdDev << std::endl;
+    }
+    else
+      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
+        std::endl;*/
   }
 }
 
@@ -1322,16 +1398,27 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
       {
         case GAUSSIAN:
           this->gaussianNoiseInstance =
-            Ogre::CompositorManager::getSingleton().addCompositor(
+              Ogre::CompositorManager::getSingleton().addCompositor(
               this->viewport, "CameraNoise/Gaussian");
           this->gaussianNoiseInstance->setEnabled(true);
           // gaussianNoiseCompositorListener was allocated in Load()
           this->gaussianNoiseInstance->addListener(
-            this->gaussianNoiseCompositorListener.get());
+              this->gaussianNoiseCompositorListener.get());
           break;
         default:
           GZ_ASSERT(false, "Invalid noise model type");
       }
+    }
+
+    // Distortion
+    if (this->distortionActive)
+    {
+      this->lensDistortionInstance =
+          Ogre::CompositorManager::getSingleton().addCompositor(
+          this->viewport, "CameraDistortion/Default");
+      this->lensDistortionInstance->setEnabled(true);
+      this->lensDistortionInstance->addListener(
+          this->lensDistortionCompositorListener.get());
     }
 
     if (this->GetScene()->skyx != NULL)

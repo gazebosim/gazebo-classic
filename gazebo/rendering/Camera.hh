@@ -63,6 +63,7 @@ namespace gazebo
     class ViewController;
     class Scene;
     class GaussianNoiseCompositorListener;
+    class LensDistortionCompositorListener;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \brief A set of rendering related class, functions, and definitions
@@ -673,9 +674,16 @@ namespace gazebo
       /// \brief Gaussian noise compositor
       private: Ogre::CompositorInstance *gaussianNoiseInstance;
 
+      /// \brief Lens distortion compositor
+      private: Ogre::CompositorInstance *lensDistortionInstance;
+
       /// \brief Gaussian noise compositor listener
       private: boost::shared_ptr<GaussianNoiseCompositorListener>
         gaussianNoiseCompositorListener;
+
+      /// \brief Lens distortion compositor listener
+      private: boost::shared_ptr<LensDistortionCompositorListener>
+        lensDistortionCompositorListener;
 
       /// \brief Queue of move positions.
       private: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
@@ -693,6 +701,9 @@ namespace gazebo
       /// \brief If true, apply the noise model specified by other
       /// noise parameters
       private: bool noiseActive;
+
+      /// \brief If true, apply the lens distortion model
+      private: bool distortionActive;
 
       /// \brief Which type of noise we're applying
       private: enum NoiseModelType noiseType;
