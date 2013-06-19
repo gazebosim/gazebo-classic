@@ -1007,6 +1007,9 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
   pose.pos.z = _vis->GetPose().pos.z;
 
   _vis->SetPose(pose);
+
+  if (this->mouseMoveVis && this->mouseEvent.control)
+    this->PublishVisualPose(this->mouseMoveVis);
 }
 
 /////////////////////////////////////////////////
