@@ -162,6 +162,10 @@ MainWindow::MainWindow()
       gui::Events::ConnectInputStepSize(
       boost::bind(&MainWindow::OnInputStepSizeChanged, this, _1)));
 
+  this->connections.push_back(
+      gui::Events::ConnectFollow(
+        boost::bind(&MainWindow::OnFollow, this, _1)));
+
   gui::ViewFactory::RegisterAll();
 
   // Do these things last
@@ -478,6 +482,13 @@ void MainWindow::Step()
 void MainWindow::OnInputStepSizeChanged(int _value)
 {
   this->inputStepSize = _value;
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnFollow(const std::string & /*_modelName*/)
+{
+  this->renderWidget->DisplayOverlayMsg(
+      "Press Escape to exit Follow mode", 20000);
 }
 
 /////////////////////////////////////////////////

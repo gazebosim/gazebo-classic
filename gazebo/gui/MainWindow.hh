@@ -162,6 +162,10 @@ namespace gazebo
       /// \param[in] _value New input step size.
       private: void OnInputStepSizeChanged(int _value);
 
+      /// \brief Handle follow model user event.
+      /// \param[in] _modelName Name of the model that is being followed.
+      private: void OnFollow(const std::string &_modelName);
+
       private: QToolBar *playToolbar;
 
       private: RenderWidget *renderWidget;
