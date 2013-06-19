@@ -20,6 +20,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
 
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
@@ -154,6 +155,7 @@ void ModelRightMenu::OnFollow()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->TrackVisual(this->modelName);
+  gui::Events::follow(this->modelName);
 }
 
 /////////////////////////////////////////////////

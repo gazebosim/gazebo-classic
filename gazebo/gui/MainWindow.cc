@@ -487,6 +487,7 @@ void MainWindow::OnInputStepSizeChanged(int _value)
 /////////////////////////////////////////////////
 void MainWindow::OnFollow(const std::string & /*_modelName*/)
 {
+  printf("On Follow\n");
   this->renderWidget->DisplayOverlayMsg(
       "Press Escape to exit Follow mode", 20000);
 }

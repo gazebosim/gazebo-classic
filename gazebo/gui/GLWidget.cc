@@ -34,6 +34,7 @@
 #include "gazebo/rendering/FPSViewController.hh"
 
 #include "gazebo/gui/MouseEventHandler.hh"
+#include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
@@ -262,6 +263,9 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     this->keyModifiers & Qt::AltModifier ? true : false;
 
   this->userCamera->HandleKeyPressEvent(this->keyText);
+
+  // Process Key Events
+  KeyEventHandler::Instance()->HandlePress(this->keyEvent);
 }
 
 /////////////////////////////////////////////////
@@ -302,6 +306,9 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   }
 
   this->userCamera->HandleKeyReleaseEvent(_event->text().toStdString());
+
+  // Process Key Events
+  KeyEventHandler::Instance()->HandleRelease(this->keyEvent);
 }
 
 /////////////////////////////////////////////////
