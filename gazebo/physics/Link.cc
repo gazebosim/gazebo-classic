@@ -805,10 +805,11 @@ void Link::FillMsg(msgs::Link &_msg)
 //////////////////////////////////////////////////
 void Link::ProcessMsg(const msgs::Link &_msg)
 {
-  if (_msg.id() != this->GetId())
+ /* if (_msg.id() != this->GetId())
   {
     return;
   }
+  */
 
   this->SetName(_msg.name());
 
