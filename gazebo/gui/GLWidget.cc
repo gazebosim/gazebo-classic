@@ -122,6 +122,8 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->installEventFilter(this);
   this->keyModifiers = 0;
+  this->keyText = "";
+  this->keyInt = -1;
 
   this->selectedVis.reset();
   this->mouseMoveVis.reset();
@@ -237,6 +239,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     return;
 
   this->keyText = _event->text().toStdString();
+  this->keyInt = _event->key();  // case insensitive
   this->keyModifiers = _event->modifiers();
 
   // Toggle full screen
@@ -274,6 +277,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
     return;
 
   this->keyText = "";
+  this->keyInt = -1;
 
   this->keyModifiers = _event->modifiers();
 
@@ -293,11 +297,14 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   // Reset the mouse move info when the user hits keys.
   if (this->state == "translate" || this->state == "rotate")
   {
-    if (this->keyText == "x" || this->keyText == "y" || this->keyText == "z")
+    if (this->keyText == "x" || this->keyText == "y" || this->keyText == "z" ||
+        char(this->keyInt) == 'X' || char(this->keyInt) == 'Y' ||
+        char(this->keyInt) == 'Z')
     {
       this->mouseEvent.pressPos = this->mouseEvent.pos;
       if (this->mouseMoveVis)
-        this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
+        // this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
+        this->mouseMoveVisStartPose = this->mouseMoveVis->GetPose();
     }
   }
 
@@ -424,6 +431,7 @@ void GLWidget::OnMousePressTranslate()
     //       << "]\n";
 
     this->mouseMoveVisStartPose = vis->GetPose();
+    // this->mouseMoveVisStartPose = vis->GetWorldPose();
 
     this->SetMouseMoveVisual(vis);
 
@@ -905,9 +913,11 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
 
   math::Vector3 rpyAmt;
 
-  if (this->keyText == "x" || this->keyText == "X")
+  if (this->keyText == "x" || this->keyText == "X" ||
+      char(this->keyInt) == 'X')
     rpyAmt.x = 1.0;
-  else if (this->keyText == "y" || this->keyText == "Y")
+  else if (this->keyText == "y" || this->keyText == "Y" ||
+      char(this->keyInt) == 'Y')
     rpyAmt.y = 1.0;
   else
     rpyAmt.z = 1.0;
@@ -943,18 +953,25 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
   math::Vector3 moveVector(0, 0, 0);
   math::Vector3 planeNorm(0, 0, 1);
 
-  if (this->keyText == "z")
+  if (this->keyText == "z" || char(this->keyInt) == 'Z')
   {
-    math::Vector2i diff = this->mouseEvent.pos - this->mouseEvent.pressPos;
-    pose.pos.z = this->mouseMoveVisStartPose.pos.z + diff.y * -0.001;
-    _vis->SetPose(pose);
-    return;
+    if (_vis == _vis->GetRootVisual())
+    {
+      math::Vector2i diff = this->mouseEvent.pos - this->mouseEvent.pressPos;
+      pose.pos.z = this->mouseMoveVisStartPose.pos.z + diff.y * -0.001;
+      _vis->SetPose(pose);
+      return;
+    }
+    else
+    {
+      moveVector.z = 1;
+    }
   }
-  else if (this->keyText == "x")
+  else if (this->keyText == "x" || char(this->keyInt) == 'X')
   {
     moveVector.x = 1;
   }
-  else if (this->keyText == "y")
+  else if (this->keyText == "y" || char(this->keyInt) == 'Y')
   {
     moveVector.y = 1;
   }
@@ -972,16 +989,28 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
   p1 = origin1 + dir1 * dist1;
   p2 = origin2 + dir2 * dist2;
 
+  // Motion in the inertial plane
+  math::Vector3 dist = p1 - p2;
+
   // rotate moveVector into local frame
   if (_vis == _vis->GetRootVisual())
-    moveVector *= p1 - p2;
+  {
+    moveVector *= dist;
+    pose.pos = moveVector + this->mouseMoveVisStartPose.pos;
+  }
   else
   {
-    math::Quaternion q = _vis->GetWorldPose().rot.GetInverse();
-    moveVector = q.RotateVector(moveVector * (p1 - p2));
+    math::Vector3 moveVectorLocal(moveVector);
+    math::Quaternion q2 = _vis->GetWorldPose().rot.GetInverse();
+    // use max of x or y dist
+    if (fabs(dist.x) > fabs(dist.y))
+      dist.z = dist.x;
+    else
+      dist.z = dist.y;
+    moveVector = q2.RotateVector(moveVectorLocal * dist);
+    pose = math::Pose(moveVector, math::Quaternion()) +
+           this->mouseMoveVisStartPose;
   }
-
-  pose.pos = this->mouseMoveVisStartPose.pos + moveVector;
 
   if (this->mouseEvent.shift)
   {
@@ -1004,12 +1033,18 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
     }
   }
 
-  pose.pos.z = _vis->GetPose().pos.z;
+  if (_vis == _vis->GetRootVisual())
+  {
+    pose.pos.z = _vis->GetPose().pos.z;
+  }
+  else
+  {
+    math::Quaternion q2 = _vis->GetWorldPose().rot;
+    math::Vector3 moveZLocal(0, 0, _vis->GetPose().pos.z);
+    // pose.pos += q2.RotateVector(moveZLocal);
+  }
 
   _vis->SetPose(pose);
-
-  if (this->mouseMoveVis && this->mouseEvent.control)
-    this->PublishVisualPose(this->mouseMoveVis);
 }
 
 /////////////////////////////////////////////////
@@ -1085,7 +1120,27 @@ void GLWidget::PublishVisualPose(rendering::VisualPtr _vis)
       msg.set_id(gui::get_entity_id(_vis->GetName()));
       msg.set_name(_vis->GetName());
 
-      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+      if (this->mouseEvent.control)
+      {
+        msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+
+        if (0)
+        {
+          math::Vector3 disp = 100.0 *
+            (_vis->GetWorldPose() - this->mouseMoveVisStartPose).pos;
+          gzerr << "diff " << disp
+                << " new " << _vis->GetWorldPose()
+                << " old " << this->mouseMoveVisStartPose
+                << "\n";
+          // also set force and torque
+          if (this->state == "translate")
+            msgs::Set(msg.mutable_force(), disp);
+          else if (this->state == "rotate")
+            msgs::Set(msg.mutable_torque(), disp);
+        }
+      }
+      else
+        msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
       this->modelPub->Publish(msg);
     }
     // Otherwise, check to see if the visual is a light

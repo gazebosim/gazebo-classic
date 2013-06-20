@@ -1431,6 +1431,19 @@ void World::ProcessModelMsgs()
                              miter != models.end(); ++miter)
       {
         LinkPtr link = (*miter)->GetLink((*iter).name());
+
+        if (link && (*iter).has_force())
+        {
+          math::Vector3 force(msgs::Convert((*iter).force()));
+          link->AddForce(force);
+        }
+
+        if (link && (*iter).has_torque())
+        {
+          math::Vector3 torque(msgs::Convert((*iter).torque()));
+          link->AddTorque(torque);
+        }
+
         if (link && (*iter).has_pose())
         {
           // gzdbg << "set link " << link->GetName()

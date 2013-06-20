@@ -188,6 +188,7 @@ namespace gazebo
       private: transport::SubscriberPtr selectionSub, requestSub;
 
       private: std::string keyText;
+      private: int keyInt;
       private: Qt::KeyboardModifiers keyModifiers;
       private: QPoint onShiftMousePos;
       private: math::Pose mouseMoveVisStartPose;
