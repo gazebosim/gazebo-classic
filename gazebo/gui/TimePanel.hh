@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <list>
+#include <string>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/transport/TransportTypes.hh"
