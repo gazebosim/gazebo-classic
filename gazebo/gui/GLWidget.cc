@@ -1122,11 +1122,11 @@ void GLWidget::PublishVisualPose(rendering::VisualPtr _vis)
 
       if (this->mouseEvent.control)
       {
-        msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
-
-        if (0)
+        bool useWrench = false;
+        if (useWrench)
         {
-          math::Vector3 disp = 100.0 *
+          double scale = 100.0;
+          math::Vector3 disp = scale *
             (_vis->GetWorldPose() - this->mouseMoveVisStartPose).pos;
           gzerr << "diff " << disp
                 << " new " << _vis->GetWorldPose()
@@ -1138,6 +1138,8 @@ void GLWidget::PublishVisualPose(rendering::VisualPtr _vis)
           else if (this->state == "rotate")
             msgs::Set(msg.mutable_torque(), disp);
         }
+        else
+          msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
       }
       else
         msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
