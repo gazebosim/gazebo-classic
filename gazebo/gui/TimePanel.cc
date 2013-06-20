@@ -158,12 +158,10 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   }
 
   // Set simulation time
-  this->SetSimTime(QString::fromStdString(
-        TimePanel::FormatTime(_msg->sim_time())));
+  this->SetSimTime(QString::fromStdString(FormatTime(_msg->sim_time())));
 
   // Set real time
-  this->SetRealTime(QString::fromStdString(
-        TimePanel::FormatTime(_msg->real_time())));
+  this->SetRealTime(QString::fromStdString(FormatTime(_msg->real_time())));
 
   // Set the iterations
   this->SetIterations(QString::fromStdString(
