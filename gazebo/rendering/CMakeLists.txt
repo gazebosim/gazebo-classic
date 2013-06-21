@@ -101,7 +101,7 @@ set (headers
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(rendering_headers
-                          "Rendering Headers" "#include \"rendering/${hdr}\"\n")
+                          "Rendering Headers" "#include \"gazebo/rendering/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)

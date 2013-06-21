@@ -19,12 +19,12 @@
  * Date: 21 May 2009
  */
 
-#include "common/Mesh.hh"
+#include "gazebo/common/Mesh.hh"
 
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletCollision.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletMeshShape.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletMeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;

@@ -15,7 +15,7 @@
  *
 */
 
-#include "physics/CylinderShape.hh"
+#include "gazebo/physics/CylinderShape.hh"
 
 using namespace gazebo;
 using namespace physics;

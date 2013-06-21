@@ -23,7 +23,7 @@
 #define LASERINTERFACE_HH
 
 #include <string>
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "GazeboInterface.hh"
 
 /// \addtogroup player_iface Interfaces

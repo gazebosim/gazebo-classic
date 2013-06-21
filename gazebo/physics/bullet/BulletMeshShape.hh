@@ -22,7 +22,7 @@
 #ifndef _BULLETMESHSHAPE_HH_
 #define _BULLETMESHSHAPE_HH_
 
-#include "physics/MeshShape.hh"
+#include "gazebo/physics/MeshShape.hh"
 
 namespace gazebo
 {
