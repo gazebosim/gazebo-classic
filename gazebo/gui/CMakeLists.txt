@@ -13,6 +13,7 @@ add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
 add_subdirectory(building)
+add_subdirectory(model)
 add_subdirectory(terrain)
 add_subdirectory(viewers)
 

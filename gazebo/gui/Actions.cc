@@ -35,6 +35,7 @@ QAction *gazebo::gui::g_resetModelsAct = 0;
 QAction *gazebo::gui::g_resetWorldAct = 0;
 QAction *gazebo::gui::g_editBuildingAct = 0;
 QAction *gazebo::gui::g_editTerrainAct = 0;
+QAction *gazebo::gui::g_editModelAct = 0;
 
 QAction *gazebo::gui::g_playAct = 0;
 QAction *gazebo::gui::g_pauseAct = 0;
