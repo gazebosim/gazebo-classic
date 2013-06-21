@@ -232,14 +232,8 @@ namespace gazebo
               {
                 if (_e)
                 {
-                  if (_e.message() != "End of File")
-                  {
-                    // This will occur when the other side closes the
-                    // connection. We don't want spew error messages in this
-                    // case.
-                    //
-                    // It's okay to do nothing here.
-                  }
+                  if (_e.message() == "End of file")
+                    this->isOpen = false;
                 }
                 else
                 {
@@ -298,9 +292,8 @@ namespace gazebo
               {
                 if (_e)
                 {
-                  // This can occur when the connection is shut down.
-                  // gzerr << "Error Reading data["
-                  //  << _e.message() << "]\n";
+                  if (_e.message() == "End of file")
+                    this->isOpen = false;
                 }
 
                 // Inform caller that data has been received
@@ -470,7 +463,12 @@ namespace gazebo
       /// \brief Used to prevent too many log messages.
       private: bool dropMsgLogged;
 
+      /// \brief Index into the callbacks buffer that marks the last
+      /// async_write.
       private: unsigned int callbackIndex;
+
+      /// \brief True if the connection is open.
+      private: bool isOpen;
     };
     /// \}
   }
