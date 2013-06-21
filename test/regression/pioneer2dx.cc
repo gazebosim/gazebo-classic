@@ -15,8 +15,8 @@
  *
 */
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
-#include "common/Time.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/common/Time.hh"
 
 using namespace gazebo;
 class Pioneer2dx : public ServerFixture

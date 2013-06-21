@@ -17,8 +17,8 @@
 
 #include <string>
 
-#include "physics/physics.hh"
-#include "transport/transport.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 #include "plugins/SkidSteerDrivePlugin.hh"
 
 using namespace gazebo;

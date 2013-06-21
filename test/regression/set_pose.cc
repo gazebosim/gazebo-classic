@@ -16,9 +16,9 @@
  */
 
 // #include <signal.h>
-// #include "gui/Gui.hh"
+// #include "gazebo/gui/Gui.hh"
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
+#include "gazebo/physics/physics.hh"
 
 using namespace gazebo;
 class PhysicsTest : public ServerFixture

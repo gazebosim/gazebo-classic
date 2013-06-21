@@ -23,9 +23,9 @@
 #define _BULLETHEIGHTMAPGEOM_HH_
 #include <string>
 
-#include "physics/HeightmapShape.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/Collision.hh"
+#include "gazebo/physics/HeightmapShape.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/Collision.hh"
 
 class btHeightfieldTerrainShape;
 

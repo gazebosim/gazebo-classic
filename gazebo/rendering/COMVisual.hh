@@ -23,8 +23,8 @@
 
 #include <string>
 
-#include "rendering/Visual.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/msgs/msgs.hh"
 
 namespace ogre
 {

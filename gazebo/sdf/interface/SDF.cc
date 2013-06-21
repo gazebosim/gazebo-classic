@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  */
-#include "common/Color.hh"
-#include "common/Assert.hh"
-#include "math/Pose.hh"
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
 
-#include "sdf/interface/parser.hh"
-#include "sdf/interface/SDF.hh"
+#include "gazebo/sdf/interface/parser.hh"
+#include "gazebo/sdf/interface/SDF.hh"
 
 using namespace sdf;
 

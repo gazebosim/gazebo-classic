@@ -16,24 +16,24 @@
  */
 #include <sstream>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "common/Console.hh"
-#include "common/MouseEvent.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "rendering/UserCamera.hh"
-#include "rendering/Visual.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Scene.hh"
 
-#include "math/Quaternion.hh"
+#include "gazebo/math/Quaternion.hh"
 
-#include "transport/Publisher.hh"
-#include "transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "gui/Gui.hh"
-#include "gui/GuiEvents.hh"
-#include "gui/ModelMaker.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/ModelMaker.hh"
 
 using namespace gazebo;
 using namespace gui;

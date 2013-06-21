@@ -24,10 +24,10 @@
 
 #include <string>
 
-#include "sensors/Sensor.hh"
-#include "msgs/MessageTypes.hh"
-#include "transport/TransportTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

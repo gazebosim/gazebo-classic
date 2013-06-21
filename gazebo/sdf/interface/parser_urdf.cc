@@ -15,8 +15,6 @@
  *
 */
 #include <urdf_parser/urdf_parser.h>
-#include <sdf/interface/parser_urdf.hh>
-#include <sdf/sdf.hh>
 
 #include <fstream>
 #include <sstream>
@@ -25,6 +23,8 @@
 
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/SystemPaths.hh"
+#include "gazebo/sdf/interface/parser_urdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace urdf2gazebo
 {

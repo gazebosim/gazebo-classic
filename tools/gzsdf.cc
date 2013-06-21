@@ -16,9 +16,9 @@
 */
 
 #include <sys/stat.h>
-#include <gazebo/sdf/sdf.hh>
 #include <gazebo/common/Console.hh>
 #include <gazebo/common/Exception.hh>
+#include "gazebo/sdf/sdf.hh"
 
 std::vector<std::string> params;
 

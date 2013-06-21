@@ -19,8 +19,8 @@
  * Date: 03 Apr 2007
  */
 #include <math.h>
-#include "math/Helpers.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Quaternion.hh"
 
 using namespace gazebo;
 using namespace math;
