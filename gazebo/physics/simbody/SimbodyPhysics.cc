@@ -108,6 +108,9 @@ SimbodyPhysics::~SimbodyPhysics()
 //////////////////////////////////////////////////
 ModelPtr SimbodyPhysics::CreateModel(BasePtr _parent)
 {
+  // set physics as uninitialized
+  this->simbodyPhysicsInitialized = false;
+
   SimbodyModelPtr model(new SimbodyModel(_parent));
 
   return model;
@@ -438,6 +441,9 @@ void SimbodyPhysics::CreateMultibodyGraph(
        li != links.end(); ++li)
   {
     SimbodyLinkPtr simbodyLink = boost::shared_dynamic_cast<SimbodyLink>(*li);
+
+    gzerr << "debug : " << (*li)->GetName() << "\n";
+
     if (simbodyLink)
       _mbgraph.addBody((*li)->GetName(), (*li)->GetInertial()->GetMass(),
                       simbodyLink->mustBeBaseLink, (*li).get());
@@ -550,6 +556,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     // original pointer get scrambled
     SimbodyLink* gzInb = static_cast<SimbodyLink*>(mob.getInboardBodyRef());
     SimbodyLink* gzOutb = static_cast<SimbodyLink*>(mob.getOutboardMasterBodyRef());
+
+    if (gzInb)
+      gzerr << "debug: Inb: " << gzInb->GetName() << "\n";
+    if (gzOutb)
+      gzerr << "debug: Outb: " << gzOutb->GetName() << "\n";
 
     const MassProperties massProps = 
         gzOutb->GetEffectiveMassProps(mob.getNumFragments());

@@ -187,7 +187,7 @@ namespace gazebo
 
       /// \brief Fill a model message.
       /// \param[in] _msg Message to fill using this model's data.
-      public: void FillMsg(msgs::Model &_msg);
+      public: virtual void FillMsg(msgs::Model &_msg);
 
       /// \brief Update parameters from a model message.
       /// \param[in] _msg Message to process.

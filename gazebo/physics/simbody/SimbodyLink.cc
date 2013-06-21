@@ -176,10 +176,16 @@ void SimbodyLink::SetLinearVel(const math::Vector3 & /*_vel*/)
 math::Vector3 SimbodyLink::GetWorldLinearVel(
   const math::Vector3& _offset) const
 {
+
   SimTK::Vec3 station = SimbodyPhysics::Vector3ToVec3(_offset);
-  SimTK::Vec3 v = 
-    this->masterMobod.findStationVelocityInGround(
+  SimTK::Vec3 v;
+
+  if (this->simbodyPhysics->simbodyPhysicsInitialized)
+    v = this->masterMobod.findStationVelocityInGround(
     this->simbodyPhysics->integ->getState(), station);
+  else
+    gzerr << "debug: simbody physics not yet initialized\n";
+
   return SimbodyPhysics::Vec3ToVector3(v);
 }
 
