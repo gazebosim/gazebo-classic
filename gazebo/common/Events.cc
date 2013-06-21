@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "common/Events.hh"
+#include "gazebo/common/Events.hh"
 
 using namespace gazebo;
 using namespace event;

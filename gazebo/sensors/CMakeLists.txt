@@ -51,7 +51,7 @@ gz_build_dri_tests(${gtest_sources_dri})
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(sensors_headers "sensors headers"
-    "#include \"sensors/${hdr}\"\n")
+    "#include \"gazebo/sensors/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
 

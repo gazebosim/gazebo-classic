@@ -22,7 +22,7 @@
 #define _JOINTVISUAL_HH_
 
 #include <string>
-#include "rendering/Visual.hh"
+#include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {

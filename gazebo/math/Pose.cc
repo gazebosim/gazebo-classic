@@ -19,7 +19,7 @@
  * Date: 03 Apr 2007
  */
 
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
 using namespace gazebo;
 using namespace math;

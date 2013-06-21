@@ -33,9 +33,9 @@
 #include <deque>
 #include <utility>
 
-#include "common/Event.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
 #define HEADER_LENGTH 8
 

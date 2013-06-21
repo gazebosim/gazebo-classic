@@ -16,11 +16,11 @@
  */
 #include <sstream>
 
-#include "transport/Node.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "gui/Actions.hh"
-#include "gui/GuiEvents.hh"
-#include "gui/TimePanel.hh"
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/TimePanel.hh"
 
 using namespace gazebo;
 using namespace gui;
