@@ -32,6 +32,44 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
+  this->modelTreeWidget = new QTreeWidget();
+  this->modelTreeWidget->setColumnCount(1);
+  this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  this->modelTreeWidget->header()->hide();
+  connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+      this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
+
+/*  QFrame *frame = new QFrame;
+  QVBoxLayout *frameLayout = new QVBoxLayout;
+  frameLayout->addWidget(this->modelTreeWidget, 0);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
+  frame->setLayout(frameLayout);*/
+  mainLayout->addWidget(this->modelTreeWidget);
+
+  // Create a top-level tree item for the path
+  this->modelSettingsItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("Model Settings")));
+    this->modelTreeWidget->addTopLevelItem(this->modelSettingsItem);
+
+  this->modelItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("Shappes and Joints")));
+    this->modelTreeWidget->addTopLevelItem(this->modelItem);
+
+  QTreeWidgetItem *modelChildItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+    this->modelItem->addChild(modelChildItem);
+
+
+  QLabel *test = new QLabel(tr("TEST"));
+  this->modelTreeWidget->setItemWidget(modelChildItem, 0, test);
+
+  this->pluginItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("Plugin")));
+    this->modelTreeWidget->addTopLevelItem(this->pluginItem);
+
   /*// Create the button to raise terrain
   QPushButton *raiseButton = new QPushButton("Raise", this);
   raiseButton->setStatusTip(tr("Left-mouse press to raise terrain."));
@@ -193,16 +231,45 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   mainLayout->addStretch(1);
   mainLayout->addWidget(saveButton);*/
 
+//  mainLayout->addWidget(frame);
   mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
   this->setObjectName("modelEditorPalette");
   this->setLayout(mainLayout);
+  this->layout()->setContentsMargins(0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
 }
+
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnModelSelection(QTreeWidgetItem *_item,
+                                         int /*_column*/)
+{
+  if (_item)
+  {
+   /* std::string path, filename;
+
+    if (_item->parent())
+      path = _item->parent()->text(0).toStdString() + "/";
+
+    path = _item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (!path.empty())
+    {
+      //QApplication::setOverrideCursor(Qt::BusyCursor);
+      //filename = common::ModelDatabase::Instance()->GetModelFile(path);
+      //gui::Events::createEntity("model", filename);
+
+      //this->fileTreeWidget->clearSelection();
+      //QApplication::setOverrideCursor(Qt::ArrowCursor);
+    }*/
+  }
+}
+
 
 
 /*

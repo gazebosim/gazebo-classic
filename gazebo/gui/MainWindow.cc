@@ -44,6 +44,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
+#include "gazebo/gui/model/ModelEditor.hh"
 
 #include "sdf/sdf.hh"
 
@@ -807,6 +808,12 @@ void MainWindow::CreateActions()
   g_editTerrainAct->setCheckable(true);
   g_editTerrainAct->setChecked(false);
 
+  g_editModelAct = new QAction(tr("&Model Editor"), editorGroup);
+  g_editModelAct->setShortcut(tr("Ctrl+M"));
+  g_editModelAct->setStatusTip(tr("Enter Model Editor Mode"));
+  g_editModelAct->setCheckable(true);
+  g_editModelAct->setChecked(false);
+
   g_stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
   g_stepAct->setStatusTip(tr("Step the world"));
   connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
@@ -1037,6 +1044,9 @@ void MainWindow::CreateMenuBar()
 
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
+
+  // \TODO: Add this back in when implementing the full Model Editor spec.
+  editMenu->addAction(g_editModelAct);
 
   QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
@@ -1347,4 +1357,7 @@ void MainWindow::CreateEditors()
 
   // Create a Building Editor
   this->editors.push_back(new BuildingEditor(this));
+
+  // Create a Building Editor
+  this->editors.push_back(new ModelEditor(this));
 }

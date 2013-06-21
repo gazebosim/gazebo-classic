@@ -50,6 +50,22 @@ namespace gazebo
       /// \brief Destructor
       public: ~ModelEditorPalette();
 
+      /// \brief Received model selection user input
+      private slots: void OnModelSelection(QTreeWidgetItem *_item, int _column);
+
+      /// \brief Widget that display model properties.
+      private: QTreeWidget *modelTreeWidget;
+
+      /// \brief Model settings item
+      private: QTreeWidgetItem *modelSettingsItem;
+
+      /// \brief Model settings item
+      private: QTreeWidgetItem *modelItem;
+
+      /// \brief Plugin item
+      private: QTreeWidgetItem *pluginItem;
+
+
       /*/// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the brush was applied
