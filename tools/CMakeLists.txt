@@ -12,7 +12,7 @@ link_directories(
   ${SDF_LIBRARY_DIRS}
 )
 
-# Remove this whole if block in Gazebo 1.8
+# Remove this whole if block in Gazebo 2.0
 if (NOT HAVE_SDF)
   link_directories(
     ${urdfdom_LIBRARY_DIRS}
@@ -21,8 +21,11 @@ if (NOT HAVE_SDF)
     )
 endif()
 
+set (test_sources 
+  gzlog_TEST.cc 
+)
 
-add_subdirectory(test)
+gz_build_tests(${test_sources})
 
 add_executable(gzsdf gzsdf.cc)
 target_link_libraries(gzsdf ${tinyxml_libraries} ${SDF_LIBRARIES})

@@ -17,38 +17,38 @@
 #include <iomanip>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/date_time.hpp>
 
 #include "gazebo/math/Rand.hh"
 
+#include "gazebo/transport/transport.hh"
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/common/LogRecord.hh"
+#include "gazebo/common/Base64.hh"
+#include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
-using namespace common;
-
-/// Convert binary values to base64 characters
-typedef boost::archive::iterators::base64_from_binary<
-        // retrieve 6 bit integers from a sequence of 8 bit bytes
-        boost::archive::iterators::transform_width<const char *, 6, 8> >
-        Base64Text;
+using namespace util;
 
 //////////////////////////////////////////////////
 LogRecord::LogRecord()
 {
+  this->pauseState = false;
   this->running = false;
   this->paused = false;
   this->initialized = false;
   this->stopThread = false;
   this->firstUpdate = true;
+  this->readyToStart = false;
 
   // Get the user's home directory
   // \todo getenv is not portable, and there is no generic cross-platform
@@ -64,6 +64,16 @@ LogRecord::LogRecord()
   this->logBasePath /= "/.gazebo/log/";
 
   this->logsEnd = this->logs.end();
+
+  this->connections.push_back(
+     event::Events::ConnectPause(
+       boost::bind(&LogRecord::OnPause, this, _1)));
+}
+
+//////////////////////////////////////////////////
+void LogRecord::OnPause(bool _pause)
+{
+  this->pauseState = _pause;
 }
 
 //////////////////////////////////////////////////
@@ -91,12 +101,13 @@ bool LogRecord::Init(const std::string &_subdir)
   this->paused = false;
   this->stopThread = false;
   this->firstUpdate = true;
+  this->readyToStart = true;
 
   return true;
 }
 
 //////////////////////////////////////////////////
-bool LogRecord::Start(const std::string &_encoding)
+bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
 
@@ -118,15 +129,22 @@ bool LogRecord::Start(const std::string &_encoding)
   // Get the current time as an ISO string.
   std::string logTimeDir = common::Time::GetWallTimeAsISOString();
 
-  this->logCompletePath = this->logBasePath / logTimeDir / this->logSubDir;
+  // Override the default path settings if the _path parameter is set.
+  if (!_path.empty())
+  {
+    this->logBasePath = boost::filesystem::path(_path);
+    this->logCompletePath = this->logBasePath;
+  }
+  else
+    this->logCompletePath = this->logBasePath / logTimeDir / this->logSubDir;
 
   // Create the log directory if necessary
   if (!boost::filesystem::exists(this->logCompletePath))
     boost::filesystem::create_directories(logCompletePath);
 
-  if (_encoding != "bz2" && _encoding != "txt")
+  if (_encoding != "bz2" && _encoding != "txt" && _encoding != "zlib")
     gzthrow("Invalid log encoding[" + _encoding +
-            "]. Must be one of [bz2, txt]");
+            "]. Must be one of [bz2, zlib, txt]");
 
   this->encoding = _encoding;
 
@@ -140,19 +158,36 @@ bool LogRecord::Start(const std::string &_encoding)
       iter->second->Start(logCompletePath);
   }
 
-  // Listen to the world update event
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&LogRecord::Update, this, _1));
-
-  // Start the writing thread if it has not already been started
-  if (!this->writeThread)
-    this->writeThread = new boost::thread(boost::bind(&LogRecord::Run, this));
-
   this->running = true;
   this->paused = false;
   this->firstUpdate = true;
+  this->stopThread = false;
+  this->readyToStart = false;
 
   this->startTime = this->currTime = common::Time();
+
+  // Create a thread to cleanup recording.
+  this->cleanupThread = boost::thread(boost::bind(&LogRecord::Cleanup, this));
+  // Wait for thread to start
+  this->startThreadCondition.wait(lock);
+
+  // Start the update thread if it has not already been started
+  if (!this->updateThread)
+  {
+    boost::mutex::scoped_lock updateLock(this->updateMutex);
+    this->updateThread = new boost::thread(
+        boost::bind(&LogRecord::RunUpdate, this));
+    this->startThreadCondition.wait(updateLock);
+  }
+
+  // Start the writing thread if it has not already been started
+  if (!this->writeThread)
+  {
+    boost::mutex::scoped_lock writeLock(this->runWriteMutex);
+    this->writeThread = new boost::thread(
+        boost::bind(&LogRecord::RunWrite, this));
+    this->startThreadCondition.wait(writeLock);
+  }
 
   return true;
 }
@@ -166,15 +201,22 @@ const std::string &LogRecord::GetEncoding() const
 //////////////////////////////////////////////////
 void LogRecord::Fini()
 {
-  this->stopThread = true;
+  do
+  {
+    boost::mutex::scoped_lock lock(this->controlMutex);
+    this->cleanupCondition.notify_all();
+  } while (!this->cleanupThread.timed_join(
+        boost::posix_time::milliseconds(1000)));
 
-  this->Stop();
+  boost::mutex::scoped_lock lock(this->controlMutex);
+  this->connections.clear();
 
-  // Wait for the write thread, if it exists
-  if (this->writeThread)
-    this->writeThread->join();
-  delete this->writeThread;
-  this->writeThread = NULL;
+  // Remove all the logs.
+  this->ClearLogs();
+
+  this->logControlSub.reset();
+  this->logStatusPub.reset();
+  this->node.reset();
 }
 
 //////////////////////////////////////////////////
@@ -182,23 +224,8 @@ void LogRecord::Stop()
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
 
-  // Disconnect from the world update signale
-  if (this->updateConnection)
-    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
-  this->updateConnection.reset();
-
-  // Kick the write thread
-  this->dataAvailableCondition.notify_one();
-
-  // Remove all the logs.
-  this->ClearLogs();
-
-  // Reset the times
-  this->startTime = this->currTime = common::Time();
-
-  // Reset the flags
   this->running = false;
-  this->paused = false;
+  this->cleanupCondition.notify_all();
 }
 
 //////////////////////////////////////////////////
@@ -244,8 +271,7 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
   // Check to see if the log has already been added.
   if (this->logs.find(_name) != this->logs.end())
   {
-    /// \todo Good place to use GZ_ASSERT
-    /// GZ_ASSERT(this->logs.find(_name)->second != NULL);
+    GZ_ASSERT(this->logs.find(_name)->second != NULL, "Unable to find log");
 
     if (this->logs.find(_name)->second->GetRelativeFilename() != _filename)
     {
@@ -278,6 +304,16 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
 
   // Update the pointer to the end of the log objects list.
   this->logsEnd = this->logs.end();
+
+  if (!this->node)
+  {
+    this->node = transport::NodePtr(new transport::Node());
+    this->node->Init();
+
+    this->logControlSub = this->node->Subscribe("~/log/control",
+        &LogRecord::OnLogControl, this);
+    this->logStatusPub = this->node->Advertise<msgs::LogStatus>("~/log/status");
+  }
 }
 
 //////////////////////////////////////////////////
@@ -312,9 +348,11 @@ std::string LogRecord::GetFilename(const std::string &_name) const
   Log_M::const_iterator iter = this->logs.find(_name);
   if (iter != this->logs.end())
   {
-    /// \TODO GZ_ASSERT(iter->second);
+    GZ_ASSERT(iter->second, "Invalid log");
     result = iter->second->GetCompleteFilename();
   }
+  else
+    result = this->logs.begin()->second->GetCompleteFilename();
 
   return result;
 }
@@ -390,7 +428,31 @@ bool LogRecord::GetFirstUpdate() const
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Update(const common::UpdateInfo &_info)
+void LogRecord::Notify()
+{
+  if (this->running)
+    this->updateCondition.notify_all();
+}
+
+//////////////////////////////////////////////////
+void LogRecord::RunUpdate()
+{
+  boost::mutex::scoped_lock updateLock(this->updateMutex);
+  this->startThreadCondition.notify_all();
+
+  // This loop will write data to disk.
+  while (!this->stopThread)
+  {
+    // Don't completely lock, just to be safe.
+    this->updateCondition.wait(updateLock);
+
+    if (!this->stopThread)
+      this->Update();
+  }
+}
+
+//////////////////////////////////////////////////
+void LogRecord::Update()
 {
   if (!this->paused)
   {
@@ -401,7 +463,7 @@ void LogRecord::Update(const common::UpdateInfo &_info)
 
       // Collect all the new log data. This will not write data to disk.
       for (this->updateIter = this->logs.begin();
-          this->updateIter != this->logsEnd; ++this->updateIter)
+           this->updateIter != this->logsEnd; ++this->updateIter)
       {
         size += this->updateIter->second->Update();
       }
@@ -410,44 +472,46 @@ void LogRecord::Update(const common::UpdateInfo &_info)
     if (this->firstUpdate)
     {
       this->firstUpdate = false;
-      this->startTime = _info.simTime;
+      this->startTime = common::Time::GetWallTime();
     }
-
 
     // Signal that new data is available.
     if (size > 0)
       this->dataAvailableCondition.notify_one();
 
-    this->currTime = _info.simTime;
+    this->currTime = common::Time::GetWallTime();
+
+    // Output the new log status
+    this->PublishLogStatus();
   }
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Run()
+void LogRecord::RunWrite()
 {
-  if (!this->running)
-    gzerr << "Running LogRecord before it has been started." << std::endl;
-
-  this->stopThread = false;
+  // Wait for new data.
+  boost::mutex::scoped_lock lock(this->runWriteMutex);
+  this->startThreadCondition.notify_all();
 
   // This loop will write data to disk.
   while (!this->stopThread)
   {
-    {
-      // Wait for new data.
-      boost::mutex::scoped_lock lock(this->writeMutex);
-      this->dataAvailableCondition.wait(lock);
+    this->dataAvailableCondition.wait(lock);
 
-      // Collect all the new log data.
-      for (this->updateIter = this->logs.begin();
-           this->updateIter != this->logsEnd; ++this->updateIter)
-      {
-        this->updateIter->second->Write();
-      }
-    }
+    this->Write(false);
+  }
+}
 
-    // Throttle the write loop.
-    common::Time::MSleep(1000);
+//////////////////////////////////////////////////
+void LogRecord::Write(bool /*_force*/)
+{
+  boost::mutex::scoped_lock lock(this->writeMutex);
+
+  // Collect all the new log data.
+  for (this->updateIter = this->logs.begin();
+      this->updateIter != this->logsEnd; ++this->updateIter)
+  {
+    this->updateIter->second->Write();
   }
 }
 
@@ -465,25 +529,12 @@ LogRecord::Log::Log(LogRecord *_parent, const std::string &_relativeFilename,
   this->logCB = _logCB;
 
   this->relativeFilename = _relativeFilename;
-  std::ostringstream stream;
-  stream << "<?xml version='1.0'?>\n"
-         << "<gazebo_log>\n"
-         << "<header>\n"
-         << "<log_version>" << GZ_LOG_VERSION << "</log_version>\n"
-         << "<gazebo_version>" << GAZEBO_VERSION_FULL << "</gazebo_version>\n"
-         << "<rand_seed>" << math::Rand::GetSeed() << "</rand_seed>\n"
-         << "</header>\n";
-
-  this->buffer.append(stream.str());
 }
 
 //////////////////////////////////////////////////
 LogRecord::Log::~Log()
 {
-  std::string xmlEnd = "</gazebo_log>";
-  this->logFile.write(xmlEnd.c_str(), xmlEnd.size());
-
-  this->logFile.close();
+  this->Stop();
 }
 
 //////////////////////////////////////////////////
@@ -492,16 +543,18 @@ unsigned int LogRecord::Log::Update()
   std::ostringstream stream;
 
   // Get log data via the callback.
-  if (this->logCB(stream) && !stream.str().empty())
+  if (this->logCB(stream))
   {
-    const std::string encoding = this->parent->GetEncoding();
-
-    this->buffer.append("<chunk encoding='");
-    this->buffer.append(encoding);
-    this->buffer.append("'>\n");
-
-    this->buffer.append("<![CDATA[");
+    std::string data = stream.str();
+    if (!data.empty())
     {
+      const std::string encoding = this->parent->GetEncoding();
+
+      this->buffer.append("<chunk encoding='");
+      this->buffer.append(encoding);
+      this->buffer.append("'>\n");
+
+      this->buffer.append("<![CDATA[");
       // Compress the data.
       if (encoding == "bz2")
       {
@@ -512,23 +565,35 @@ unsigned int LogRecord::Log::Update()
           boost::iostreams::filtering_ostream out;
           out.push(boost::iostreams::bzip2_compressor());
           out.push(std::back_inserter(str));
-          out << stream.str();
-          out.flush();
+          boost::iostreams::copy(boost::make_iterator_range(data), out);
         }
 
         // Encode in base64.
-        std::copy(Base64Text(str.c_str()),
-                  Base64Text(str.c_str() + str.size()),
-                  std::back_inserter(this->buffer));
+        Base64Encode(str.c_str(), str.size(), this->buffer);
+      }
+      else if (encoding == "zlib")
+      {
+        std::string str;
+
+        // Compress to zlib
+        {
+          boost::iostreams::filtering_ostream out;
+          out.push(boost::iostreams::zlib_compressor());
+          out.push(std::back_inserter(str));
+          boost::iostreams::copy(boost::make_iterator_range(data), out);
+        }
+
+        // Encode in base64.
+        Base64Encode(str.c_str(), str.size(), this->buffer);
       }
       else if (encoding == "txt")
-        this->buffer.append(stream.str());
+        this->buffer.append(data);
       else
         gzerr << "Unknown log file encoding[" << encoding << "]\n";
-    }
-    this->buffer.append("]]>\n");
+      this->buffer.append("]]>\n");
 
-    this->buffer.append("</chunk>\n");
+      this->buffer.append("</chunk>\n");
+    }
   }
 
   return this->buffer.size();
@@ -559,6 +624,23 @@ std::string LogRecord::Log::GetCompleteFilename() const
 }
 
 //////////////////////////////////////////////////
+void LogRecord::Log::Stop()
+{
+  if (this->logFile.is_open())
+  {
+    this->Update();
+    this->Write();
+
+    std::string xmlEnd = "</gazebo_log>";
+    this->logFile.write(xmlEnd.c_str(), xmlEnd.size());
+
+    this->logFile.close();
+  }
+
+  this->completePath.clear();
+}
+
+//////////////////////////////////////////////////
 void LogRecord::Log::Start(const boost::filesystem::path &_path)
 {
   // Make the full path for the log file
@@ -566,7 +648,19 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
 
   // Make sure the file does not exist
   if (boost::filesystem::exists(this->completePath))
-    gzthrow("Filename[" + this->completePath.string() + "], already exists\n");
+    gzlog << "Filename[" + this->completePath.string() + "], already exists."
+      << " The log file will be overwritten.\n";
+
+  std::ostringstream stream;
+  stream << "<?xml version='1.0'?>\n"
+         << "<gazebo_log>\n"
+         << "<header>\n"
+         << "<log_version>" << GZ_LOG_VERSION << "</log_version>\n"
+         << "<gazebo_version>" << GAZEBO_VERSION_FULL << "</gazebo_version>\n"
+         << "<rand_seed>" << math::Rand::GetSeed() << "</rand_seed>\n"
+         << "</header>\n";
+
+  this->buffer.append(stream.str());
 }
 
 //////////////////////////////////////////////////
@@ -597,11 +691,171 @@ void LogRecord::Log::Write()
     return;
   }
 
-
   // Write out the contents of the buffer.
   this->logFile.write(this->buffer.c_str(), this->buffer.size());
   this->logFile.flush();
 
   // Clear the buffer.
   this->buffer.clear();
+}
+
+//////////////////////////////////////////////////
+void LogRecord::OnLogControl(ConstLogControlPtr &_data)
+{
+  if (_data->has_base_path() && !_data->base_path().empty())
+    this->SetBasePath(_data->base_path());
+
+  std::string msgEncoding = "zlib";
+  if (_data->has_encoding())
+    msgEncoding = _data->encoding();
+
+  if (_data->has_start() && _data->start())
+  {
+    this->Start(msgEncoding);
+  }
+  else if (_data->has_stop() && _data->stop())
+  {
+    this->Stop();
+  }
+  else if (_data->has_paused())
+  {
+    this->SetPaused(_data->paused());
+  }
+
+  // Output the new log status
+  this->PublishLogStatus();
+}
+
+//////////////////////////////////////////////////
+void LogRecord::PublishLogStatus()
+{
+  if (this->logs.empty() || !this->logStatusPub ||
+      !this->logStatusPub->HasConnections())
+    return;
+
+  /// \todo right now this function will only report on the first log.
+
+  msgs::LogStatus msg;
+  unsigned int size = 0;
+
+  // Set the time of the status message
+  msgs::Set(msg.mutable_sim_time(), this->GetRunTime());
+
+  // Set the log recording base path name
+  msg.mutable_log_file()->set_base_path(this->GetBasePath());
+
+  // Get the full name of the log file
+  msg.mutable_log_file()->set_full_path(this->GetFilename());
+
+  // Set the URI of th log file
+  msg.mutable_log_file()->set_uri(transport::Connection::GetLocalHostname());
+
+  // Get the size of the log file
+  size = this->GetFileSize();
+
+  if (size < 1000)
+    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::BYTES);
+  else if (size < 1e6)
+  {
+    msg.mutable_log_file()->set_size(size / 1.0e3);
+    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::K_BYTES);
+  }
+  else if (size < 1e9)
+  {
+    msg.mutable_log_file()->set_size(size / 1.0e6);
+    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::M_BYTES);
+  }
+  else
+  {
+    msg.mutable_log_file()->set_size(size / 1.0e9);
+    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::G_BYTES);
+  }
+
+  this->logStatusPub->Publish(msg);
+}
+
+//////////////////////////////////////////////////
+void LogRecord::Cleanup()
+{
+  boost::mutex::scoped_lock lock(this->controlMutex);
+  this->startThreadCondition.notify_all();
+
+  // Wait for the cleanup signal
+  this->cleanupCondition.wait(lock);
+
+  bool currentPauseState = this->pauseState;
+  event::Events::pause(true);
+
+  // Reset the flags
+  this->paused = false;
+  this->running = false;
+  this->stopThread = true;
+
+  // Kick the update thread
+  {
+    boost::mutex::scoped_lock updateLock(this->updateMutex);
+    this->updateCondition.notify_all();
+  }
+
+  // Wait for the write thread, if it exists
+  if (this->updateThread)
+    this->updateThread->join();
+
+  // Kick the write thread
+  {
+    boost::mutex::scoped_lock lock2(this->runWriteMutex);
+    this->dataAvailableCondition.notify_all();
+  }
+
+  // Wait for the write thread, if it exists
+  if (this->writeThread)
+    this->writeThread->join();
+
+  delete this->updateThread;
+  this->updateThread = NULL;
+
+  delete this->writeThread;
+  this->writeThread = NULL;
+
+  // Update and write one last time to make sure we log all data.
+  this->Update();
+
+  this->Write(true);
+
+  // Stop all the logs
+  for (Log_M::iterator iter = this->logs.begin();
+      iter != this->logsEnd; ++iter)
+  {
+    iter->second->Stop();
+  }
+
+  // Reset the times
+  this->startTime = this->currTime = common::Time();
+
+  // Output the new log status
+  this->PublishLogStatus();
+
+  event::Events::pause(currentPauseState);
+  this->readyToStart = true;
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::IsReadyToStart() const
+{
+  return this->readyToStart;
+}
+
+//////////////////////////////////////////////////
+unsigned int LogRecord::GetBufferSize() const
+{
+  boost::mutex::scoped_lock lock(this->writeMutex);
+  unsigned int size = 0;
+
+  for (Log_M::const_iterator iter = this->logs.begin();
+      iter != this->logs.end(); ++iter)
+  {
+    size += iter->second->GetBufferSize();
+  }
+
+  return size;
 }

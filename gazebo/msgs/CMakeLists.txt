@@ -38,6 +38,7 @@ set (msgs
   laserscan_stamped.proto
   light.proto
   link.proto
+  link_data.proto
   log_control.proto
   log_status.proto
   material.proto
@@ -55,6 +56,7 @@ set (msgs
   pose_stamped.proto
   pose_trajectory.proto
   pose_v.proto
+  poses_stamped.proto
   projector.proto
   publishers.proto
   publish.proto

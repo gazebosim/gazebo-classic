@@ -59,5 +59,3 @@ T &SingletonT<T>::myself = SingletonT<T>::GetInstance();
 /// \}
 
 #endif
-
-

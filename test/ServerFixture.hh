@@ -49,6 +49,8 @@
 
 using namespace gazebo;
 
+std::string custom_exec(std::string _cmd);
+
 class ServerFixture : public testing::Test
 {
   protected: ServerFixture()
@@ -154,11 +156,9 @@ class ServerFixture : public testing::Test
 
                this->factoryPub =
                  this->node->Advertise<msgs::Factory>("~/factory");
-               this->factoryPub->WaitForConnection();
 
                this->requestPub =
                  this->node->Advertise<msgs::Request>("~/request");
-               this->requestPub->WaitForConnection();
 
                // Wait for the world to reach the correct pause state.
                // This might not work properly with multiple worlds.
@@ -171,6 +171,8 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(100);
                ASSERT_LT(waitCount, maxWaitCount);
 
+               this->factoryPub->WaitForConnection();
+               this->requestPub->WaitForConnection();
              }
 
   protected: void RunServer(const std::string &_worldFilename)
@@ -256,7 +258,7 @@ class ServerFixture : public testing::Test
                return this->percentRealTime;
              }
 
-  protected: void OnPose(ConstPose_VPtr &_msg)
+  protected: void OnPose(ConstPosesStampedPtr &_msg)
              {
                boost::mutex::scoped_lock lock(this->receiveMutex);
                for (int i = 0; i < _msg->pose_size(); ++i)
@@ -560,6 +562,75 @@ class ServerFixture : public testing::Test
                EXPECT_LT(i, 100);
              }
 
+  protected: void SpawnGpuRaySensor(const std::string &_modelName,
+                 const std::string &_raySensorName,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
+                 double _minRange = 0.08, double _maxRange = 10,
+                 double _rangeResolution = 0.01, unsigned int _samples = 640,
+                 const std::string &_noiseType = "", double _noiseMean = 0.0,
+                 double _noiseStdDev = 0.0)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _modelName << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "<collision name='parent_collision'>"
+                 << "  <pose>0 0 0.0205 0 0 0</pose>"
+                 << "  <geometry>"
+                 << "    <cylinder>"
+                 << "      <radius>0.021</radius>"
+                 << "      <length>0.029</length>"
+                 << "    </cylinder>"
+                 << "  </geometry>"
+                 << "</collision>"
+                 << "  <sensor name ='" << _raySensorName
+                 << "' type ='gpu_ray'>"
+                 << "    <ray>"
+                 << "      <scan>"
+                 << "        <horizontal>"
+                 << "          <samples>" << _samples << "</samples>"
+                 << "          <resolution> 1 </resolution>"
+                 << "          <min_angle>" << _hMinAngle << "</min_angle>"
+                 << "          <max_angle>" << _hMaxAngle << "</max_angle>"
+                 << "        </horizontal>"
+                 << "      </scan>"
+                 << "      <range>"
+                 << "        <min>" << _minRange << "</min>"
+                 << "        <max>" << _maxRange << "</max>"
+                 << "        <resolution>" << _rangeResolution <<"</resolution>"
+                 << "      </range>";
+
+               if (_noiseType.size() > 0)
+                 newModelStr << "      <noise>"
+                 << "        <type>" << _noiseType << "</type>"
+                 << "        <mean>" << _noiseMean << "</mean>"
+                 << "        <stddev>" << _noiseStdDev << "</stddev>"
+                 << "      </noise>";
+
+               newModelStr << "    </ray>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_modelName) && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               EXPECT_LT(i, 100);
+             }
+
   protected: void SpawnImuSensor(const std::string &_modelName,
                  const std::string &_imuSensorName,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
@@ -620,12 +691,12 @@ class ServerFixture : public testing::Test
 
                int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 50)
+               while (!this->HasEntity(_modelName) && i < 100)
                {
-                 common::Time::MSleep(50);
+                 common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 50);
+               EXPECT_LT(i, 100);
              }
 
   /// \brief Spawn a contact sensor with the specified collision geometry
@@ -690,6 +761,75 @@ class ServerFixture : public testing::Test
                  ++i;
                }
                EXPECT_LT(i, 100);
+             }
+
+  /// \brief Spawn an IMU sensor on a link
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _collisionType Type of collision, box or cylinder
+  /// \param[in] _topic Topic to publish IMU data to
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _static True to make the model static
+  protected: void SpawnUnitImuSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const std::string &_collisionType,
+                 const std::string &_topic, const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy, bool _static = false)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+               std::ostringstream shapeStr;
+               if (_collisionType == "box")
+                 shapeStr << " <box><size>1 1 1</size></box>";
+               else if (_collisionType == "cylinder")
+               {
+                 shapeStr << "<cylinder>"
+                          << "  <radius>.5</radius><length>1.0</length>"
+                          << "</cylinder>";
+               }
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <collision name ='contact_collision'>"
+                 << "    <geometry>"
+                 << shapeStr.str()
+                 << "    </geometry>"
+                 << "    <surface>"
+                 << "      <contact>"
+                 << "        <ode>"
+                 << "          <min_depth>0.01</min_depth>"
+                 << "        </ode>"
+                 << "      </contact>"
+                 << "    </surface>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << shapeStr.str()
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "  <sensor name='" << _sensorName << "' type='imu'>"
+                 << "    <imu>"
+                 << "      <topic>" << _topic << "</topic>"
+                 << "    </imu>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
              }
 
   protected: void SpawnCylinder(const std::string &_name,

@@ -156,7 +156,7 @@ namespace gazebo
 
       /// \brief Pointer to bullet motion state, which manages updates to the
       ///        world pose from bullet.
-      private: BulletMotionStatePtr motionState;
+      public: BulletMotionStatePtr motionState;
 
       /// \brief Pointer to the bullet rigid body object.
       private: btRigidBody *rigidLink;

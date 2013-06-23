@@ -258,10 +258,11 @@ void Model::Update()
 }
 
 //////////////////////////////////////////////////
-void Model::SetJointPosition(const std::string &_jointName, double _position)
+void Model::SetJointPosition(
+  const std::string &_jointName, double _position, int _index)
 {
   if (this->jointController)
-    this->jointController->SetJointPosition(_jointName, _position);
+    this->jointController->SetJointPosition(_jointName, _position, _index);
 }
 
 //////////////////////////////////////////////////
@@ -749,16 +750,18 @@ unsigned int Model::GetSensorCount() const
 //////////////////////////////////////////////////
 void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string name = _sdf->Get<std::string>("name");
+  std::string pluginName = _sdf->Get<std::string>("name");
   std::string filename = _sdf->Get<std::string>("filename");
-  gazebo::ModelPluginPtr plugin = gazebo::ModelPlugin::Create(filename, name);
+  gazebo::ModelPluginPtr plugin =
+    gazebo::ModelPlugin::Create(filename, pluginName);
   if (plugin)
   {
     if (plugin->GetType() != MODEL_PLUGIN)
     {
       gzerr << "Model[" << this->GetName() << "] is attempting to load "
             << "a plugin, but detected an incorrect plugin type. "
-            << "Plugin filename[" << filename << "] name[" << name << "]\n";
+            << "Plugin filename[" << filename << "] name["
+            << pluginName << "]\n";
       return;
     }
 
@@ -935,24 +938,25 @@ void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);
 
-  // For now we don't use the link state values to set the state of
-  // simulation.
-  /*for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
+  LinkState_M linkStates = _state.GetLinkStates();
+  for (LinkState_M::iterator iter = linkStates.begin();
+       iter != linkStates.end(); ++iter)
   {
-    LinkState linkState = _state.GetLinkState(i);
-    LinkPtr link = this->GetLink(linkState.GetName());
+    LinkPtr link = this->GetLink(iter->first);
     if (link)
-      link->SetState(linkState);
+      link->SetState(iter->second);
     else
-      gzerr << "Unable to find link[" << linkState.GetName() << "]\n";
-  }*/
-
-  for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
-  {
-    JointState jointState = _state.GetJointState(i);
-    this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
-                           jointState.GetAngle(0).Radian());
+      gzerr << "Unable to find link[" << iter->first << "]\n";
   }
+
+  // For now we don't use the joint state values to set the state of
+  // simulation.
+  // for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
+  // {
+  //   JointState jointState = _state.GetJointState(i);
+  //   this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
+  //                          jointState.GetAngle(0).Radian());
+  // }
 }
 
 /////////////////////////////////////////////////

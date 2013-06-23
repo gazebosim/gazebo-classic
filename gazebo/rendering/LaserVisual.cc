@@ -19,7 +19,10 @@
  * Date: 14 Dec 2007
  */
 
+#include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
+
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/LaserVisual.hh"
@@ -70,15 +73,15 @@ void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
                       this->GetWorldPose();
 
   this->rayFan->SetPoint(0, offset.pos);
-  for (int i = 0; i < _msg->scan().ranges_size(); i++)
+  for (size_t i = 0; static_cast<int>(i) < _msg->scan().ranges_size(); i++)
   {
-    r = _msg->scan().ranges(i) + _msg->scan().range_min();
+    r = _msg->scan().ranges(i);
     pt.x = 0 + r * cos(angle);
     pt.y = 0 + r * sin(angle);
     pt.z = 0;
     pt += offset.pos;
 
-    if (i+1 >= static_cast<int>(this->rayFan->GetPointCount()))
+    if (i+1 >= this->rayFan->GetPointCount())
       this->rayFan->AddPoint(pt);
     else
       this->rayFan->SetPoint(i+1, pt);

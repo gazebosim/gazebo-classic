@@ -95,6 +95,19 @@ namespace gazebo
       /// \return Simulation time when the data was recorded.
       public: common::Time GetSimTime() const;
 
+      /// \brief Set the wall time when this state was generated
+      /// \param[in] _time The absolute clock time when the State
+      /// data was recorded.
+      public: virtual void SetWallTime(const common::Time &_time);
+
+      /// \brief Set the real time when this state was generated
+      /// \param[in] _time Clock time since simulation was stated.
+      public: virtual void SetRealTime(const common::Time &_time);
+
+      /// \brief Set the sim time when this state was generated
+      /// \param[in] _time Simulation time when the data was recorded.
+      public: virtual void SetSimTime(const common::Time &_time);
+
       /// Name associated with this State
       protected: std::string name;
 

@@ -16,9 +16,9 @@
 */
 
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
-#include "sensors/sensors.hh"
-#include "common/common.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/common/common.hh"
 #include "scans_cmp.h"
 
 #define LASER_TOL 1e-5
@@ -169,7 +169,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   std::string raySensorName = "ray_sensor";
   double hMinAngle = -M_PI/2.0;
   double hMaxAngle = M_PI/2.0;
-  double minRange = 0.0;
+  double minRange = 0.1;
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 320;
@@ -217,10 +217,6 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   int mid = samples / 2;
   double unitBoxSize = 1.0;
   double expectedRangeAtMidPoint = box01Pose.pos.x - unitBoxSize/2;
-
-  // WARNING: gazebo returns distance to object from min range
-  // issue #503
-  expectedRangeAtMidPoint -= minRange;
 
   EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
   EXPECT_NEAR(raySensor->GetRange(0), expectedRangeAtMidPoint, LASER_TOL);

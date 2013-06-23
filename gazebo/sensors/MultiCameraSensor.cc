@@ -69,7 +69,8 @@ void MultiCameraSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   // Create the publisher of image data.
-  this->imagePub = this->node->Advertise<msgs::ImagesStamped>(this->GetTopic());
+  this->imagePub = this->node->Advertise<msgs::ImagesStamped>(
+      this->GetTopic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -90,14 +91,14 @@ void MultiCameraSensor::Init()
     return;
   }
 
-  rendering::ScenePtr scene = rendering::get_scene(worldName);
+  this->scene = rendering::get_scene(worldName);
 
-  if (!scene)
+  if (!this->scene)
   {
-    scene = rendering::create_scene(worldName, false);
+    this->scene = rendering::create_scene(worldName, false);
 
     // This usually means rendering is not available
-    if (!scene)
+    if (!this->scene)
     {
       gzerr << "Unable to create MultiCameraSensor.\n";
       return;
@@ -142,12 +143,19 @@ void MultiCameraSensor::Init()
     cameraSdf = cameraSdf->GetNextElement("camera");
   }
 
+  // Disable clouds and moon on server side until fixed and also to improve
+  // performance
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+      ~rendering::Scene::GZ_SKYX_CLOUDS &
+      ~rendering::Scene::GZ_SKYX_MOON);
+
   Sensor::Init();
 }
 
 //////////////////////////////////////////////////
 void MultiCameraSensor::Fini()
 {
+  this->imagePub.reset();
   Sensor::Fini();
 
   boost::mutex::scoped_lock lock(this->cameraMutex);
@@ -155,9 +163,10 @@ void MultiCameraSensor::Fini()
   for (std::vector<rendering::CameraPtr>::iterator iter =
       this->cameras.begin(); iter != this->cameras.end(); ++iter)
   {
-    (*iter)->Fini();
+    (*iter)->GetScene()->RemoveCamera((*iter)->GetName());
   }
   this->cameras.clear();
+  this->scene.reset();
 }
 
 //////////////////////////////////////////////////
@@ -182,7 +191,7 @@ void MultiCameraSensor::UpdateImpl(bool /*_force*/)
 
   bool publish = this->imagePub->HasConnections();
 
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->scene->GetSimTime();
 
   msgs::ImagesStamped msg;
   msgs::Set(msg.mutable_time(), this->lastMeasurementTime);
@@ -264,5 +273,6 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
 //////////////////////////////////////////////////
 bool MultiCameraSensor::IsActive()
 {
-  return Sensor::IsActive() || this->imagePub->HasConnections();
+  return Sensor::IsActive() ||
+    (this->imagePub && this->imagePub->HasConnections());
 }

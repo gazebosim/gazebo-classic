@@ -392,19 +392,19 @@ namespace gazebo
       /// \param[in] _sec duration in seconds
       /// \return nanoseconds
       public: static inline double SecToNano(double _sec)
-              { return _sec * 1e-9;}
+              { return _sec * 1e9;}
 
       /// \brief Convert milliseconds to nanoseconds
       /// \param[in] _ms milliseconds
       /// \return nanoseconds
       public: static inline double MilToNano(double _ms)
-              { return _ms * 1e-6;}
+              { return _ms * 1e6;}
 
       /// \brief Convert microseconds to nanoseconds
       /// \param _ms microseconds
       /// \return nanoseconds
       public: static inline double MicToNano(double _ms)
-              { return _ms * 1e-3;}
+              { return _ms * 1e3;}
 
       /// \brief Stream insertion operator
       /// \param[in] _out the output stream
@@ -433,7 +433,7 @@ namespace gazebo
       /// \brief Seconds
       public: int32_t sec;
 
-      /// \brief Microseconds
+      /// \brief Nanoseconds
       public: int32_t nsec;
 
       /// \brief a singleton value of the last GetWallTime() value

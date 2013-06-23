@@ -32,6 +32,8 @@
 #include <boost/archive/iterators/ostream_iterator.hpp>
 #include <boost/filesystem.hpp>
 
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/SingletonT.hh"
@@ -40,12 +42,12 @@
 
 namespace gazebo
 {
-  namespace common
+  namespace util
   {
-    /// addtogroup gazebo_common
+    /// addtogroup gazebo_util
     /// \{
 
-    /// \class LogRecord LogRecord.hh common/common.hh
+    /// \class LogRecord LogRecord.hh util/util.hh
     /// \brief Handles logging of data to disk
     ///
     /// The LogRecord class is a Singleton that manages data logging of any
@@ -106,6 +108,9 @@ namespace gazebo
       /// \brief Stop the logger.
       public: void Stop();
 
+      /// \brief Tell the recorder that an update should occur.
+      public: void Notify();
+
       /// \brief Set whether logging should pause. A paused state means the
       /// log file is still open, but data is not written to it.
       /// \param[in] _paused True to pause data logging.
@@ -117,28 +122,35 @@ namespace gazebo
       /// \sa LogRecord::SetPaused
       public: bool GetPaused() const;
 
+      /// \brief Get whether the logger is ready to start, which implies
+      /// that any previous runs have finished.
+      // \return True if logger is ready to start.
+      public: bool IsReadyToStart() const;
+
       /// \brief Get whether logging is running.
       /// \return True if logging has been started.
       public: bool GetRunning() const;
 
       /// \brief Start the logger.
-      /// \param[in] _encoding The type of encoding (txt, or bz2).
-      public: bool Start(const std::string &_encoding="bz2");
+      /// \param[in] _encoding The type of encoding (txt, zlib, or bz2).
+      /// \param[in] _path Path in which to store log files.
+      public: bool Start(const std::string &_encoding="zlib",
+                  const std::string &_path="");
 
       /// \brief Get the encoding used.
-      /// \return Either [txt, or bz2], where txt is plain txt and bz2 is
-      /// bzip2 compressed data with Base64 encoding.
+      /// \return Either [txt, zlib, or bz2], where txt is plain txt and bz2
+      /// and zlib are compressed data with Base64 encoding.
       public: const std::string &GetEncoding() const;
 
       /// \brief Get the filename for a log object.
       /// \param[in] _name Name of the log object.
       /// \return Filename, empty string if not found.
-      public: std::string GetFilename(const std::string &_name) const;
+      public: std::string GetFilename(const std::string &_name = "") const;
 
       /// \brief Get the file size for a log object.
       /// \param[in] _name Name of the log object.
       /// \return Size in bytes.
-      public: unsigned int GetFileSize(const std::string &_name) const;
+      public: unsigned int GetFileSize(const std::string &_name = "") const;
 
       /// \brief Set the base path.
       /// \param[in] _path Path to the new logging location.
@@ -159,20 +171,44 @@ namespace gazebo
       /// \return True if an Update has not yet been completed.
       public: bool GetFirstUpdate() const;
 
+      /// \brief Write all logs.
+      /// \param[in] _force True to skip waiting on dataAvailableCondition.
+      public: void Write(bool _force = false);
+
+      /// \brief Get the size of the buffer.
+      /// \return Size of the buffer, in bytes.
+      public: unsigned int GetBufferSize() const;
+
       /// \brief Update the log files
       ///
       /// Captures the current state of all registered entities, and outputs
       /// the data to their respective log files.
-      private: void Update(const common::UpdateInfo &_info);
+      // private: void Update(const common::UpdateInfo &_info);
+      private: void Update();
+
+      /// \brief Function used by the update thread.
+      private: void RunUpdate();
 
       /// \brief Run the Write loop.
-      private: void Run();
+      private: void RunWrite();
 
       /// \brief Clear and delete the log buffers.
       private: void ClearLogs();
 
-      /// \brief Write the header to file.
-      // private: void WriteHeader();
+      /// \brief Publish log status message.
+      private: void PublishLogStatus();
+
+      /// \brief Called when a log control message is received.
+      /// \param[in] _data The log control message.
+      private: void OnLogControl(ConstLogControlPtr &_data);
+
+      /// \brief Cleanup log recording. A thread uses this function, you
+      /// should never call this function directly. Use the Stop() function
+      /// to trigger a cleanup.
+      private: void Cleanup();
+
+      /// \brief Used to get the simulation pause state.
+      private: void OnPause(bool _pause);
 
       /// \cond
       private: class Log
@@ -192,6 +228,9 @@ namespace gazebo
         /// \brief Start the log.
         /// \param[in] _path The complete path in which to put the log file.
         public: void Start(const boost::filesystem::path &_path);
+
+        /// \brief Stop logging.
+        public: void Stop();
 
         /// \brief Write data to disk.
         public: void Write();
@@ -231,6 +270,7 @@ namespace gazebo
         /// \brief Relative log filename.
         public: std::string relativeFilename;
 
+        /// \brief Complete file path.
         private: boost::filesystem::path completePath;
       };
       /// \endcond
@@ -248,8 +288,14 @@ namespace gazebo
       /// \brief Convenience iterator to the end of the log objects map.
       private: Log_M::iterator logsEnd;
 
-      /// \brief Event connected to the World update.
-      private: event::ConnectionPtr updateConnection;
+      /// \brief Condition used to start threads
+      private: boost::condition_variable startThreadCondition;
+
+      /// \brief Condition used to trigger an update
+      private: boost::condition_variable updateCondition;
+
+      /// \brief Used by the cleanupThread to wait for a cleanup signal.
+      private: boost::condition_variable cleanupCondition;
 
       /// \brief True if logging is running.
       private: bool running;
@@ -257,8 +303,20 @@ namespace gazebo
       /// \brief Thread used to write data to disk.
       private: boost::thread *writeThread;
 
-      /// \brief Mutext to protect writing.
+      /// \brief Thread used to update data.
+      private: boost::thread *updateThread;
+
+      /// \brief Thread to cleanup log recording.
+      private: boost::thread cleanupThread;
+
+      /// \brief Mutex to protect against parallel calls to Write()
       private: mutable boost::mutex writeMutex;
+
+      /// \brief Mutex to synchronize with RunWrite()
+      private: mutable boost::mutex runWriteMutex;
+
+      /// \brief Mutex to synchronize with RunUpdate()
+      private: mutable boost::mutex updateMutex;
 
       /// \brief Mutex to protect logging control.
       private: boost::mutex controlMutex;
@@ -298,8 +356,27 @@ namespace gazebo
       /// \brief Current simulation time.
       private: common::Time currTime;
 
+      /// \brief Transportation node.
+      private: transport::NodePtr node;
+
+      /// \brief Subscriber to log control messages.
+      private: transport::SubscriberPtr logControlSub;
+
+      /// \brief Publisher of log status messages.
+      private: transport::PublisherPtr logStatusPub;
+
+      /// \brief All the event connections.
+      private: event::Connection_V connections;
+
+      /// \brief Simulation pause state.
+      private: bool pauseState;
+
       /// \brief This is a singleton
       private: friend class SingletonT<LogRecord>;
+
+      /// \brief True if the logger is ready to start, and the previous run
+      /// has finished.
+      private: bool readyToStart;
     };
     /// \}
   }

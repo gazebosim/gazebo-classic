@@ -27,8 +27,8 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "physics/PhysicsTypes.hh"
-#include "physics/World.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/World.hh"
 
 namespace po = boost::program_options;
 

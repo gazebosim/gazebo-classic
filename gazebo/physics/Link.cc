@@ -23,6 +23,10 @@
 
 #include "gazebo/msgs/msgs.hh"
 
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+
 #include "gazebo/common/Events.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/common/Console.hh"
@@ -38,8 +42,6 @@
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Link.hh"
 
-#include "gazebo/transport/Publisher.hh"
-
 using namespace gazebo;
 using namespace physics;
 
@@ -51,6 +53,8 @@ Link::Link(EntityPtr _parent)
   this->inertial.reset(new Inertial);
   this->parentJoints.clear();
   this->childJoints.clear();
+  this->publishData = false;
+  this->publishDataMutex = new boost::recursive_mutex();
 }
 
 
@@ -65,6 +69,10 @@ Link::~Link()
   {
     msgs::Visual msg;
     msg.set_name(this->visuals[i]);
+    if (this->parent)
+      msg.set_parent_name(this->parent->GetScopedName());
+    else
+      msg.set_parent_name("");
     msg.set_delete_me(true);
     this->visPub->Publish(msg);
   }
@@ -76,6 +84,10 @@ Link::~Link()
     {
       msgs::Visual msg;
       msg.set_name(this->cgVisuals[i]);
+      if (this->parent)
+        msg.set_parent_name(this->parent->GetScopedName());
+      else
+        msg.set_parent_name("");
       msg.set_delete_me(true);
       this->visPub->Publish(msg);
     }
@@ -84,6 +96,13 @@ Link::~Link()
 
   this->visPub.reset();
   this->sensors.clear();
+
+  this->requestPub.reset();
+  this->dataPub.reset();
+  this->connections.clear();
+
+  delete this->publishDataMutex;
+  this->publishDataMutex = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -105,8 +124,7 @@ void Link::Load(sdf::ElementPtr _sdf)
     {
       msgs::Visual msg = msgs::VisualFromSDF(visualElem);
 
-      std::string visName = this->GetScopedName() + "::" + msg.name();
-      msg.set_name(visName);
+      msg.set_name(this->GetScopedName() + "::" + msg.name());
       msg.set_parent_name(this->GetScopedName());
       msg.set_is_static(this->IsStatic());
 
@@ -895,9 +913,9 @@ void Link::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-void Link::SetState(const LinkState & /*_state*/)
+void Link::SetState(const LinkState &_state)
 {
-  // this->SetRelativePose(_state.GetPose());
+  this->SetWorldPose(_state.GetPose());
 
   /*
   for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)
@@ -932,4 +950,44 @@ double Link::GetAngularDamping() const
 /////////////////////////////////////////////////
 void Link::SetKinematic(const bool &/*_kinematic*/)
 {
+}
+
+/////////////////////////////////////////////////
+void Link::SetPublishData(bool _enable)
+{
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->publishDataMutex);
+    if (this->publishData == _enable)
+      return;
+
+    this->publishData = _enable;
+  }
+  if (_enable)
+  {
+    std::string topic = "~/" + this->GetScopedName();
+    this->dataPub = this->node->Advertise<msgs::LinkData>(topic);
+    this->connections.push_back(
+      event::Events::ConnectWorldUpdateEnd(
+        boost::bind(&Link::PublishData, this)));
+  }
+  else
+  {
+    this->dataPub.reset();
+    this->connections.clear();
+  }
+}
+
+/////////////////////////////////////////////////
+void Link::PublishData()
+{
+  if (this->publishData && this->dataPub->HasConnections())
+  {
+    msgs::Set(this->linkDataMsg.mutable_time(), this->world->GetSimTime());
+    linkDataMsg.set_name(this->GetScopedName());
+    msgs::Set(this->linkDataMsg.mutable_linear_velocity(),
+        this->GetWorldLinearVel());
+    msgs::Set(this->linkDataMsg.mutable_angular_velocity(),
+        this->GetWorldAngularVel());
+    this->dataPub->Publish(this->linkDataMsg);
+  }
 }

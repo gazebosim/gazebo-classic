@@ -24,6 +24,7 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/SubscribeOptions.hh"
+#include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TopicManager.hh"
 
 namespace gazebo
@@ -107,6 +108,20 @@ namespace gazebo
     void requestNoReply(NodePtr _node, const std::string &_request,
                         const std::string &_data = "");
 
+    /// \brief A convenience function for a one-time publication of
+    /// a message. This is inefficient, compared to
+    /// Node::Advertise followed by Publisher::Publish. This function
+    /// should only be used when sending a message very infrequently.
+    /// \param[in] _topic The topic to advertise
+    /// \param[in] _message Message to be published
+    template<typename M> void publish(const std::string &_topic,
+                 const google::protobuf::Message &_message)
+    {
+      transport::NodePtr node = transport::NodePtr(new transport::Node());
+      node->Init();
+      node->Publish<M>(_topic, _message);
+    }
+
     /// \brief Get a list of all the topics and their message types.
     /// \return A map where keys are message types, and values are a list
     /// of topic names.
@@ -123,6 +138,14 @@ namespace gazebo
     /// \param[in] _topicName Name of the topic to query.
     /// \return The message type, or empty string if the topic is not valid.
     std::string getTopicMsgType(const std::string &_topicName);
+
+    /// \brief Set whether minimal comms should be used. This will be used
+    /// to reduce network traffic.
+    void setMinimalComms(bool _enabled);
+
+    /// \brief Get whether minimal comms has been enabled.
+    /// \return True if minimal comms is enabled.
+    bool getMinimalComms();
 
     /// \}
   }

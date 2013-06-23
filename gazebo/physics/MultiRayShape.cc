@@ -113,7 +113,8 @@ double MultiRayShape::GetRange(int _index)
     gzthrow(stream.str());
   }
 
-  return this->rays[_index]->GetLength();
+  // Add min range, because we measured from min range.
+  return this->GetMinRange() + this->rays[_index]->GetLength();
 }
 
 //////////////////////////////////////////////////
@@ -147,14 +148,15 @@ int MultiRayShape::GetFiducial(int _index)
 //////////////////////////////////////////////////
 void MultiRayShape::Update()
 {
-  double maxRange = this->rangeElem->Get<double>("max");
+  // The measurable range is (max-min)
+  double fullRange = this->GetMaxRange() - this->GetMinRange();
 
   // Reset the ray lengths and mark the collisions as dirty (so they get
   // redrawn)
   unsigned int ray_size = this->rays.size();
   for (unsigned int i = 0; i < ray_size; i++)
   {
-    this->rays[i]->SetLength(maxRange);
+    this->rays[i]->SetLength(fullRange);
     this->rays[i]->SetRetro(0.0);
 
     // Get the global points of the line

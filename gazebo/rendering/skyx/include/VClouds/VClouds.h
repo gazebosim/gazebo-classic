@@ -465,6 +465,11 @@ namespace SkyX { namespace VClouds {
      */
     void setVisible(const bool& visible);
 
+    /** Set enable
+        @param _enabled true to set VClouds to be enabled, false to hide it
+     */
+    void setEnabled(bool _enabled);
+
     /** Is VClouds visible?
         @return true if VClouds is visible, false otherwise
      */

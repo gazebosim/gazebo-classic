@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/common/SingletonT.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
 namespace Ogre
@@ -37,13 +36,13 @@ namespace gazebo
 
     /// \class WindowManager WindowManager.hh rendering/rendering.hh
     /// \brief Class to mangage render windows.
-    class WindowManager : public SingletonT<WindowManager>
+    class WindowManager
     {
       /// \brief Constructor
-      private: WindowManager();
+      public: WindowManager();
 
       /// \brief Destructor
-      private: virtual ~WindowManager();
+      public: virtual ~WindowManager();
 
       /// \brief Shutdown all the windows
       public: void Fini();
@@ -91,9 +90,6 @@ namespace gazebo
 
       /// \brief Used to create unique names for the windows.
       private: static uint32_t windowCounter;
-
-      /// \brief This is a singleton class.
-      private: friend class SingletonT<WindowManager>;
     };
     /// \}
   }

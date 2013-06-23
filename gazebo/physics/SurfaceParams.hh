@@ -136,6 +136,10 @@ namespace gazebo
 
       /// \brief Allow collision checking without generating a contact joint.
       public: bool collideWithoutContact;
+
+      /// \brief Custom collision filtering used when collideWithoutContact is
+      /// true.
+      public: unsigned int collideWithoutContactBitmask;
     };
     /// \}
   }

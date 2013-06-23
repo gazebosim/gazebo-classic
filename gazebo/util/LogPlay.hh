@@ -28,12 +28,12 @@
 
 namespace gazebo
 {
-  namespace common
+  namespace util
   {
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class Logplay Logplay.hh common/common.hh
+    /// \class Logplay Logplay.hh util/util.hh
     /// \brief Open and playback log files that were recorded using LogRecord.
     ///
     /// Use Logplay to open a log file (Logplay::Open), and access the
@@ -97,6 +97,11 @@ namespace gazebo
       /// LogPlay::Step has not been called at least once.
       public: std::string GetEncoding() const;
 
+      /// \brief Get the header that was read from a log file. Should call
+      /// LogPlay::Open first.
+      /// \return Header of the open log file.
+      public: std::string GetHeader() const;
+
       /// \brief Helper function to get chunk data from XML.
       /// \param[in] _xml Pointer to an xml block that has state data.
       /// \param[out] _data Storage for the chunk's data.
@@ -130,6 +135,8 @@ namespace gazebo
 
       /// \brief The encoding for the current chunk in the log file.
       private: std::string encoding;
+
+      private: std::string currentChunk;
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogPlay>;

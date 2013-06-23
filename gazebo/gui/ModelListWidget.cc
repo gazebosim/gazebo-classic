@@ -1963,7 +1963,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(GZ_RTOD(rpy.x));
+  item->setValue(rpy.x);
 
   // Add Pitch value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "pitch"));
@@ -1975,7 +1975,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(GZ_RTOD(rpy.y));
+  item->setValue(rpy.y);
 
   // Add Yaw value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "yaw"));
@@ -1987,7 +1987,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(GZ_RTOD(rpy.z));
+  item->setValue(rpy.z);
 }
 
 /////////////////////////////////////////////////
@@ -2024,7 +2024,8 @@ void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
 {
   this->ResetTree();
   this->propTreeBrowser->clear();
-  this->node->Fini();
+  if (this->node)
+    this->node->Fini();
   this->node.reset();
 
   this->requestPub.reset();

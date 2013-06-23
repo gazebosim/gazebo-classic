@@ -2,21 +2,26 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources 
   Diagnostics.cc
+  LogPlay.cc
+  LogRecord.cc
 )
 
 set (headers 
   Diagnostics.hh
+  LogPlay.hh
+  LogRecord.hh
   UtilTypes.hh
- )
+)
 
 set (gtest_sources
   Diagnostics_TEST.cc
+  LogRecord_TEST.cc
 )
 gz_build_tests(${gtest_sources})
 
 set (util_headers "" CACHE INTERNAL "util headers" FORCE)
 foreach (hdr ${headers})
-  APPEND_TO_CACHED_STRING(common_headers
+  APPEND_TO_CACHED_STRING(util_headers
     "Utility Headers" "#include \"gazebo/util/${hdr}\"\n")
 endforeach()
 

@@ -18,6 +18,8 @@
 #define _PHYSICSTYPES_HH_
 
 #include <vector>
+#include <map>
+#include <string>
 #include <boost/shared_ptr.hpp>
 
 /// \file
@@ -51,6 +53,9 @@ namespace gazebo
     class SphereShape;
     class MeshShape;
     class HeightmapShape;
+    class ModelState;
+    class LinkState;
+    class JointState;
 
     /// \def BasePtr
     /// \brief Boost shared pointer to a Base object
@@ -167,6 +172,18 @@ namespace gazebo
     /// \def Collision_V
     /// \brief Vector of CollisionPtr
     typedef std::vector<CollisionPtr>  Collision_V;
+
+    /// \def ModelState_M
+    /// \brief Map of model state
+    typedef std::map<std::string, ModelState> ModelState_M;
+
+    /// \def LinkState_M
+    /// \brief Map of link state
+    typedef std::map<std::string, LinkState> LinkState_M;
+
+    /// \def JointState_M
+    /// \brief Map of joint state
+    typedef std::map<std::string, JointState> JointState_M;
 
     #ifndef GZ_COLLIDE_BITS
 

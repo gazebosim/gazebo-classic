@@ -149,6 +149,9 @@ macro (gz_build_tests)
   # Build all the tests
   foreach(GTEST_SOURCE_file ${ARGN})
     string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
+    if(USE_LOW_MEMORY_TESTS)
+      add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
+    endif(USE_LOW_MEMORY_TESTS)
     add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
     add_dependencies(${BINARY_NAME}
@@ -162,7 +165,7 @@ macro (gz_build_tests)
       gazebo_transport
       )
 
-    # Remove in Gazebo 1.8
+    # Remove in Gazebo 2.0
     if (HAVE_SDF)
       target_link_libraries(${BINARY_NAME}
         libgtest.a
@@ -196,14 +199,14 @@ macro (gz_build_tests)
     endif()
  
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
-      --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
   
     set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
   
     # Check that the test produced a result and create a failure if it didn't.
     # Guards against crashed and timed out tests.
     add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-             ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+	${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
   endforeach()
 
   set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
@@ -247,7 +250,7 @@ if (VALID_DISPLAY)
       gazebo_transport
       )
 
-    # Remove in Gazebo 1.8
+    # Remove in Gazebo 2.0
     if (HAVE_SDF)
       target_link_libraries(${BINARY_NAME}
         gazebo_gui
@@ -284,14 +287,14 @@ if (VALID_DISPLAY)
 
     # QTest need and extra -o parameter to write logging information to a file
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
-      -xml -o ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+	-xml -o ${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
 
     set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
 
     # Check that the test produced a result and create a failure if it didn't.
     # Guards against crashed and timed out tests.
     add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-             ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+	${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
     endforeach()
   endmacro()
 endif()
