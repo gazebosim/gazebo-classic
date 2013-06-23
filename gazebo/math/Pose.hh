@@ -170,9 +170,8 @@ namespace gazebo
       public: Pose operator*(const Pose &_pose);
 
       /// \brief Equal operator
-      /// \param[in] _qt Quaternion to copy
+      /// \param[in] _pose Pose to copy
       public: Pose &operator=(const Pose &_pose);
-
 
       /// \brief Add one point to a vector: result = this + pos
       /// \param[in] _pos Position to add to this pose
