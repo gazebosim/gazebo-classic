@@ -114,7 +114,7 @@ void WorldState::Load(const sdf::ElementPtr _elem)
     while (childElem)
     {
       this->modelStates.insert(std::make_pair(
-            childElem->GetValueString("name"), ModelState(childElem)));
+            childElem->Get<std::string>("name"), ModelState(childElem)));
       childElem = childElem->GetNextElement("model");
     }
   }
