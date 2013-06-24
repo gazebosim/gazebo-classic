@@ -37,6 +37,8 @@
 #include "gazebo/transport/Subscriber.hh"
 
 #include "gazebo/util/LogPlay.hh"
+
+#include "gazebo/common/OpenAL.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Events.hh"
@@ -253,6 +255,12 @@ void World::Load(sdf::ElementPtr _sdf)
   event::Events::worldCreated(this->GetName());
 
   this->loaded = true;
+
+  common::OpenAL::Instance()->Load();
+  common::OpenAL::Instance()->SetListenerPos(math::Vector3(0, 0 ,0));
+
+  common::OpenALSource *source = common::OpenAL::Instance()->CreateSource();
+  source->SetPos(math::Vector3(0, 0, 1));
 }
 
 //////////////////////////////////////////////////
@@ -666,6 +674,8 @@ void World::Fini()
 
   this->prevStates[0].SetWorld(WorldPtr());
   this->prevStates[1].SetWorld(WorldPtr());
+
+  common::OpenAL::Instance()->Fini();
 }
 
 //////////////////////////////////////////////////

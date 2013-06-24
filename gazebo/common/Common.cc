@@ -18,6 +18,7 @@
 #include <boost/filesystem/path.hpp>
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Common.hh"
+#include "gazebo/gazebo_config.h"
 
 #ifdef HAVE_FFMPEG
 extern "C" {

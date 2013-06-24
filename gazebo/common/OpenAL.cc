@@ -239,7 +239,7 @@ void OpenALSource::Load()
   // Set the gain of the source
   this->SetGain( node->GetDouble("gain",1.0,0) );
 
-  // Set whether the source should loop when played 
+  // Set whether the source should loop when played
   this->SetLoop( node->GetBool("loop",false,0) );
 
   if (node->GetChild("mp3") != NULL)
@@ -277,7 +277,7 @@ int OpenALSource::SetPos(const math::Vector3 &_pos)
 int OpenALSource::SetVel(const math::Vector3 &_vel)
 {
   ALenum error;
-  ALfloat v[3] = {static_cast<float>(_vel.x), 
+  ALfloat v[3] = {static_cast<float>(_vel.x),
     static_cast<float>(_vel.y), static_cast<float>(_vel.z)};
 
   // Clear error state
@@ -341,7 +341,7 @@ int OpenALSource::SetLoop(bool _state)
   // clear error state
   alGetError();
 
-  // Set looping state 
+  // Set looping state
   alSourcei(this->alSource, AL_LOOPING, _state);
 
   if ((error = alGetError()) != AL_NO_ERROR)
@@ -413,7 +413,7 @@ void OpenALSource::FillBufferFromPCM(uint8_t *_pcmData,
   // Copy raw buffer into AL buffer
   // AL_FORMAT_MONO8, AL_FORMAT_MONO16, AL_FORMAT_STEREO8,
   // AL_FORMAT_STEREO16
-  alBufferData(this->alBuffer, AL_FORMAT_MONO16, _pcmData, _dataCount, 
+  alBufferData(this->alBuffer, AL_FORMAT_MONO16, _pcmData, _dataCount,
       _sampleRate);
 
   // Attach buffer to source
@@ -469,14 +469,14 @@ void OpenALSource::FillBufferFromFile(const std::string &_audioFile)
   // Copy raw buffer into AL buffer
   // AL_FORMAT_MONO8, AL_FORMAT_MONO16, AL_FORMAT_STEREO8,
   // AL_FORMAT_STEREO16
-  this->FillBufferFromPCM( dataBuffer, dataBufferSize, 
+  this->FillBufferFromPCM( dataBuffer, dataBufferSize,
                            audioDecoder.GetSampleRate());
 #else
   std::cerr << "No FFMPEG audio decoder. Missing FFMPEG libraries.\n";
 #endif
 
   if (dataBuffer)
-    delete [] dataBuffer; 
+    delete [] dataBuffer;
 }
 
 #endif
