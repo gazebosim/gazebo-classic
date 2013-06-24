@@ -53,6 +53,33 @@ namespace gazebo
       /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *_item, int _column);
 
+      /// \brief Qt callback when cylinder button is clicked.
+      private slots: void OnCylinder();
+
+      /// \brief Qt callback when sphere button is clicked.
+      private slots: void OnSphere();
+
+      /// \brief Qt callback when cube button is clicked.
+      private slots: void OnCube();
+
+      /// \brief Qt callback when fixed joint button is clicked.
+      private slots: void OnFixedJoint();
+
+      /// \brief Qt callback when revolute joint button is clicked.
+      private slots: void OnRevoluteJoint();
+
+      /// \brief Qt callback when slider joint button is clicked.
+      private slots: void OnSliderJoint();
+
+      /// \brief Qt callback when hinge joint button is clicked.
+      private slots: void OnHingeJoint();
+
+      /// \brief Qt callback when screw joint button is clicked.
+      private slots: void OnScrewJoint();
+
+      /// \brief Qt callback when universal joint button is clicked.
+      private slots: void OnUniversalJoint();
+
       /// \brief Widget that display model properties.
       private: QTreeWidget *modelTreeWidget;
 
@@ -64,7 +91,6 @@ namespace gazebo
 
       /// \brief Plugin item
       private: QTreeWidgetItem *pluginItem;
-
 
       /*/// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
