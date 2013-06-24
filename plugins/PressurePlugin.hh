@@ -31,6 +31,11 @@
 namespace gazebo
 {
   /// \brief A plugin for a tactile pressure sensor.
+  /// The plugin extends the contact sensor and is currently limited to
+  /// collision elements with BoxShape geometry. It is assumed that pressure
+  /// measurement occurs on the largest face of the box. All normal forces on
+  /// each box shape are summed and divided by the area of the largest face
+  /// to compute pressure.
   class PressurePlugin : public SensorPlugin
   {
     /// \brief Constructor.
