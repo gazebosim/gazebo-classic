@@ -142,6 +142,7 @@ void PressurePlugin::OnUpdate()
     {
       for (int i = 0; i < iter2->second.count; ++i)
       {
+        // TODO: determine whether body1Force or body2Force should be used.
         normalForce = iter2->second.normals[i].x *
                       iter2->second.wrench[i].body1Force.x +
                       iter2->second.normals[i].y *
