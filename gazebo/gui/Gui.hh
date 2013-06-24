@@ -18,7 +18,7 @@
 #define _GAZEBO_GUI_HH_
 
 #include <string>
-#include "rendering/Rendering.hh"
+#include "gazebo/rendering/Rendering.hh"
 
 namespace gazebo
 {

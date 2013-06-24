@@ -96,7 +96,7 @@ gz_build_tests(${gtest_sources})
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(common_headers
-    "Common Headers" "#include \"common/${hdr}\"\n")
+    "Common Headers" "#include \"gazebo/common/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_DIR}/common.hh )
 

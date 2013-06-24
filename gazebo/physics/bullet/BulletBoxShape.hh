@@ -22,8 +22,8 @@
 #ifndef _BULLETBOXSHAPE_HH_
 #define _BULLETBOXSHAPE_HH_
 
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/BoxShape.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/BoxShape.hh"
 
 namespace gazebo
 {

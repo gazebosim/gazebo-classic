@@ -15,7 +15,7 @@
  *
 */
 #include "plugins/GpuRayPlugin.hh"
-#include "sensors/GpuRaySensor.hh"
+#include "gazebo/sensors/GpuRaySensor.hh"
 
 using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(GpuRayPlugin)

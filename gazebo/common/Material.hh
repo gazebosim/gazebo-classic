@@ -19,7 +19,7 @@
 
 #include <string>
 #include <iostream>
-#include "common/Color.hh"
+#include "gazebo/common/Color.hh"
 
 namespace gazebo
 {

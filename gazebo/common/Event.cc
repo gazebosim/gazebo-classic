@@ -15,8 +15,8 @@
  *
  */
 
-#include "common/Console.hh"
-#include "common/Event.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Event.hh"
 
 using namespace gazebo;
 using namespace event;
