@@ -46,7 +46,7 @@ namespace gazebo
     /// \brief The parent sensor
     protected: sensors::SonarSensorPtr parentSensor;
 
-    /// \brief The connection tied to SonarSensor::OnNewPing()
+    /// \brief The connection tied to SonarSensor's update event
     private: event::ConnectionPtr connection;
   };
 }

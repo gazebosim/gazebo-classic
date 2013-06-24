@@ -508,7 +508,7 @@ namespace gazebo
       /// \brief Joint update event.
       private: event::EventT<void ()> jointUpdate;
 
-      /// \brief Angle used when the joint is paret of a static model.
+      /// \brief Angle used when the joint is parent of a static model.
       private: math::Angle staticAngle;
     };
     /// \}

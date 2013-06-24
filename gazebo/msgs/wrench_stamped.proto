@@ -2,7 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface WrenchStamped
-/// \brief Message for an time stamped wrench value
+/// \brief Message for a time stamped wrench value
 
 import "time.proto";
 import "wrench.proto";

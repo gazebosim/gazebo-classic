@@ -59,7 +59,7 @@ TEST_F(SonarSensor_TEST, CreateSonar)
   // Update the sensor manager so that it can process new sensors.
   mgr->Update();
 
-  // Get a pointer to the Ray sensor
+  // Get a pointer to the sonar sensor
   sensors::SonarSensorPtr sensor =
     boost::dynamic_pointer_cast<sensors::SonarSensor>(
         mgr->GetSensor(sensorName));

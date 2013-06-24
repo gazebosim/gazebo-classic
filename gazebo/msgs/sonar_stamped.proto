@@ -2,7 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface SonarStamped
-/// \brief Message for an time stamped sonar value
+/// \brief Message for a time stamped sonar value
 
 import "time.proto";
 import "sonar.proto";
