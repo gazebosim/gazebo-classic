@@ -372,13 +372,22 @@ void Camera::Update()
     double pitch = atan2(-direction.z,
                          sqrt(pow(direction.x, 2) + pow(direction.y, 2)));
     pitch = math::clamp(pitch, 0.0, 0.25*M_PI);
-    this->SetWorldRotation(math::Quaternion(0, pitch, yaw));
+    double currPitch = this->GetWorldRotation().GetAsEuler().y;
+    double currYaw = this->GetWorldRotation().GetAsEuler().z;
+    double error = currPitch - pitch;
+    double scaling = this->trackVisualOPID.Update(error, 0.01);
+
+    std::cout << "Pitch[" << pitch << "] C[" << currPitch << "] E["
+      << error << "] Scaling[" << scaling << "]\n";
+
+    // this->SetWorldRotation(math::Quaternion(0, currPitch + scaling, currYaw));
+    //this->SetWorldRotation(math::Quaternion(0, pitch, yaw));
 
     double origDistance = 8.0;
     double distance = direction.GetLength();
-    double error = origDistance - distance;
+    error = origDistance - distance;
 
-    double scaling = this->trackVisualPID.Update(error, 0.3);
+    scaling = this->trackVisualPID.Update(error, 0.3);
 
     math::Vector3 displacement = direction;
     displacement.Normalize();
@@ -1440,7 +1449,8 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
 
   if (_visual)
   {
-    this->trackVisualPID.Init(0.025, 0, 0, 0, 0, 1.0, 0.0);
+    this->trackVisualPID.Init(0.25, 0, 0, 0, 0, 1.0, 0.0);
+    this->trackVisualOPID.Init(0.01, 0, 0, 0, 0, 1.0, 0.0);
     this->trackedVisual = _visual;
   }
   else

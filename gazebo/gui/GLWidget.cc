@@ -240,6 +240,9 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   this->keyText = _event->text().toStdString();
   this->keyModifiers = _event->modifiers();
 
+  this->keyEvent.key = _event->key();
+  std::cout << "Key[" << this->keyEvent.key << "]\n";
+
   // Toggle full screen
   if (_event->key() == Qt::Key_F11)
   {
