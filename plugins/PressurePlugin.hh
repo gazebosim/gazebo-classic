@@ -69,9 +69,6 @@ namespace gazebo
 
     /// \brief Parent sensor collision names.
     private: boost::unordered_map<std::string, double> collisionNamesToArea;
-
-    /// \brief Last contact time.
-    private: common::Time lastContactTime;
   };
 }
 #endif

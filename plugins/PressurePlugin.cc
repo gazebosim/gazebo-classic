@@ -127,7 +127,6 @@ void PressurePlugin::Init()
 void PressurePlugin::OnUpdate()
 {
   msgs::Tactile tactileMsg;
-  common::Time currentContactTime;
 
   // For each collision attached to this sensor
   boost::unordered_map<std::string, double>::iterator iter;
@@ -164,9 +163,9 @@ void PressurePlugin::OnUpdate()
   int nc = contacts.contact_size();
   if (nc > 0)
   {
+    common::Time currentContactTime;
     currentContactTime = msgs::Convert(contacts.contact(nc-1).time());
     msgs::Set(tactileMsg.mutable_time(), currentContactTime);
-    this->lastContactTime = currentContactTime;
 
     if (this->tactilePub && tactileMsg.pressure_size() > 0)
       this->tactilePub->Publish(tactileMsg);
