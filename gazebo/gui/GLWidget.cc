@@ -89,6 +89,10 @@ GLWidget::GLWidget(QWidget *_parent)
         boost::bind(&GLWidget::OnCreateEntity, this, _1, _2)));
 
   this->connections.push_back(
+      gui::Events::ConnectCreateJoint(
+        boost::bind(&GLWidget::OnCreateJoint, this, _1)));
+
+  this->connections.push_back(
       gui::Events::ConnectFPS(
         boost::bind(&GLWidget::OnFPS, this)));
 
@@ -865,6 +869,29 @@ void GLWidget::OnCreateEntity(const std::string &_type,
   {
     this->state = "select";
     // TODO: make sure cursor state stays at the default
+  }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnCreateJoint(const std::string &_type)
+{
+  if (_type == "fixed")
+  {
+  }
+  else if (_type == "revolute")
+  {
+  }
+  else if (_type == "slider")
+  {
+  }
+  else if (_type == "hinge")
+  {
+  }
+  else if (_type == "screw")
+  {
+  }
+  else if (_type == "universal")
+  {
   }
 }
 

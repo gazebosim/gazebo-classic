@@ -20,7 +20,7 @@
 
 #include "gazebo/gui/Gui.hh"
 //#include "gazebo/gui/MouseEventHandler.hh"
-//#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 
 using namespace gazebo;
@@ -79,21 +79,21 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   sphereButton->setChecked(false);
   connect(sphereButton, SIGNAL(clicked()), this, SLOT(OnSphere()));
 
-  // Cube button
-  QPushButton *cubeButton = new QPushButton(tr("Cube"), this);
-  cubeButton->setCheckable(true);
-  cubeButton->setChecked(false);
-  connect(cubeButton, SIGNAL(clicked()), this, SLOT(OnCube()));
+  // Box button
+  QPushButton *boxButton = new QPushButton(tr("Box"), this);
+  boxButton->setCheckable(true);
+  boxButton->setChecked(false);
+  connect(boxButton, SIGNAL(clicked()), this, SLOT(OnBox()));
 
   QButtonGroup *partsButtonGroup = new QButtonGroup;
   partsButtonGroup->addButton(cylinderButton);
   partsButtonGroup->addButton(sphereButton);
-  partsButtonGroup->addButton(cubeButton);
+  partsButtonGroup->addButton(boxButton);
 
   partsLayout->addWidget(partsLabel, 0, 0);
   partsLayout->addWidget(cylinderButton, 1, 0);
   partsLayout->addWidget(sphereButton, 1, 1);
-  partsLayout->addWidget(cubeButton, 1, 2);
+  partsLayout->addWidget(boxButton, 1, 2);
 
   QGridLayout *jointsLayout = new QGridLayout;
   QLabel *jointsLabel = new QLabel(tr("Joints"));
@@ -366,16 +366,19 @@ void ModelEditorPalette::OnModelSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnCylinder()
 {
+  gui::Events::createEntity("cylinder", "");
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSphere()
 {
+  gui::Events::createEntity("sphere", "");
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnCube()
+void ModelEditorPalette::OnBox()
 {
+  gui::Events::createEntity("box", "");
 }
 
 /////////////////////////////////////////////////
