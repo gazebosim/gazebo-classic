@@ -79,7 +79,7 @@ void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
     pt.x = 0 + r * cos(angle);
     pt.y = 0 + r * sin(angle);
     pt.z = 0;
-    pt = offset.rot * (offset.pos + pt);
+    pt = offset.rot * pt + offset.pos;
 
     if (i+1 >= this->rayFan->GetPointCount())
       this->rayFan->AddPoint(pt);
