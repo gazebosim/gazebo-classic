@@ -174,7 +174,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node->Init(this->GetName());
 
   this->posePub = this->node->Advertise<msgs::PosesStamped>(
-    "~/pose/info", 10, 60.0);
+    "~/pose/info", 10, 80.0);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
   if (this->sdf->HasElement("gui"))
@@ -1777,31 +1777,35 @@ void World::ProcessMessages()
     boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
     msgs::Pose *poseMsg;
 
-    if (this->posePub && this->posePub->HasConnections() &&
-        this->publishModelPoses.size() > 0)
+    if (this->posePub && this->posePub->HasConnections())
     {
       msgs::PosesStamped msg;
 
       // Time stamp this PosesStamped message
+      // Rendering sensors time stamp their data with the sim time in this msg,
+      // which is more accurate than calling GetSimTime() directly.
       msgs::Set(msg.mutable_time(), this->GetSimTime());
 
-      for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
-          iter != this->publishModelPoses.end(); ++iter)
+      if (this->publishModelPoses.size() > 0)
       {
-        poseMsg = msg.add_pose();
-
-        // Publish the model's relative pose
-        poseMsg->set_name((*iter)->GetScopedName());
-        msgs::Set(poseMsg, (*iter)->GetRelativePose());
-
-        // Publish each of the model's children relative poses
-        Link_V links = (*iter)->GetLinks();
-        for (Link_V::iterator linkIter = links.begin();
-            linkIter != links.end(); ++linkIter)
+        for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
+            iter != this->publishModelPoses.end(); ++iter)
         {
           poseMsg = msg.add_pose();
-          poseMsg->set_name((*linkIter)->GetScopedName());
-          msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
+
+          // Publish the model's relative pose
+          poseMsg->set_name((*iter)->GetScopedName());
+          msgs::Set(poseMsg, (*iter)->GetRelativePose());
+
+          // Publish each of the model's children relative poses
+          Link_V links = (*iter)->GetLinks();
+          for (Link_V::iterator linkIter = links.begin();
+              linkIter != links.end(); ++linkIter)
+          {
+            poseMsg = msg.add_pose();
+            poseMsg->set_name((*linkIter)->GetScopedName());
+            msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
+          }
         }
       }
       this->posePub->Publish(msg);

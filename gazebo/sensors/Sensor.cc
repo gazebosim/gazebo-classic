@@ -30,6 +30,10 @@
 #include "common/Exception.hh"
 #include "common/Plugin.hh"
 
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/Scene.hh"
+
 #include "sensors/CameraSensor.hh"
 
 #include "sensors/Sensor.hh"
@@ -87,6 +91,9 @@ void Sensor::Load(const std::string &_worldName)
 
   this->world = physics::get_world(_worldName);
 
+  if (this->category == IMAGE)
+    this->scene = rendering::get_scene(_worldName);
+
   // loaded, but not updated
   this->lastUpdateTime = common::Time(0.0);
 
@@ -132,10 +139,19 @@ void Sensor::Update(bool _force)
 {
   if (this->IsActive() || _force)
   {
+    common::Time simTime;
+    if (this->category == IMAGE && this->scene)
+      simTime = this->scene->GetSimTime();
+    else
+      simTime = this->world->GetSimTime();
+
+    if (simTime == this->lastUpdateTime)
+        return;
+
     // Adjust time-to-update period to compensate for delays caused by another
     // sensor's update in the same thread.
-    common::Time adjustedElapsed = this->world->GetSimTime() -
-        this->lastUpdateTime + this->updateDelay;
+    common::Time adjustedElapsed = simTime - this->lastUpdateTime +
+        this->updateDelay;
 
     if (adjustedElapsed >= this->updatePeriod || _force)
     {
@@ -149,7 +165,7 @@ void Sensor::Update(bool _force)
       if (this->updateDelay >= this->updatePeriod)
         this->updateDelay = common::Time::Zero;
 
-      this->lastUpdateTime = this->world->GetSimTime();
+      this->lastUpdateTime = simTime;
       this->UpdateImpl(_force);
       this->updated();
     }
