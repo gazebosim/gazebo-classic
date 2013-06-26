@@ -25,6 +25,7 @@ set (plugins
   JointTrajectoryPlugin
   ModelTrajectoryTestPlugin
   MudPlugin
+  PressurePlugin
   RayPlugin
   RubblePlugin
   SkidSteerDrivePlugin
