@@ -490,7 +490,7 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 500);
+               EXPECT_LT(i, 50);
              }
 
   protected: void SpawnRaySensor(const std::string &_modelName,

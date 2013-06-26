@@ -69,7 +69,8 @@ TEST_F(RenderingSensorTest, Timestamp)
   // framerate. The long update time needed for these camera sensors cause
   // delays to other rendering sensors updates, resulting in the sensors trying
   // to catch up in order to achieve their target update rate. The test verifies
-  // that this update strategy does not produce duplicate timestamped data.
+  // that this update strategy does not produce duplicate timestamped data and
+  // are in the right order.
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
   unsigned int width  = 800;
@@ -152,9 +153,9 @@ TEST_F(RenderingSensorTest, Timestamp)
   // Verify that there are no duplicate timestamps
   for (unsigned int j = 0; j < numTimestamps - 1; ++j)
   {
-    EXPECT_TRUE (gpuRayTimeStamps[j] != gpuRayTimeStamps[j+1]);
-    EXPECT_TRUE (cam1TimeStamps[j] != cam1TimeStamps[j+1]);
-    EXPECT_TRUE (cam2TimeStamps[j] != cam2TimeStamps[j+1]);
+    EXPECT_TRUE (gpuRayTimeStamps[j] < gpuRayTimeStamps[j+1]);
+    EXPECT_TRUE (cam1TimeStamps[j] < cam1TimeStamps[j+1]);
+    EXPECT_TRUE (cam2TimeStamps[j] < cam2TimeStamps[j+1]);
   }
 
   gpuRayTimeStamps.clear();
