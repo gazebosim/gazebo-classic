@@ -74,6 +74,7 @@ set (msgs
   spheregeom.proto
   subscribe.proto
   surface.proto
+  tactile.proto
   test.proto
   time.proto
   topic_info.proto

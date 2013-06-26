@@ -196,6 +196,7 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 
     SensorPtr myself = shared_from_this();
     plugin->Load(myself, _sdf);
+    plugin->Init();
     this->plugins.push_back(plugin);
   }
 }
