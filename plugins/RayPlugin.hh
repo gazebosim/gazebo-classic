@@ -38,9 +38,8 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~RayPlugin();
 
-    // update callback
+    /// \brief Update callback
     public: virtual void OnNewLaserScans();
-    private: event::ConnectionPtr newLaserScansConnection;
 
     /// \brief Load the plugin
     /// \param take in SDF root element
@@ -51,8 +50,9 @@ namespace gazebo
 
     /// \brief The parent sensor
     private: sensors::RaySensorPtr parentSensor;
+
+    /// \brief The connection tied to RayPlugin::OnNewLaserScans()
+    private: event::ConnectionPtr newLaserScansConnection;
   };
 }
-
 #endif
-

@@ -16,7 +16,7 @@ set (sources ODEPhysics.cc
              ODEHinge2Joint.cc
              ODEUniversalJoint.cc
              ODEBallJoint.cc
-             ODETrimeshShape.cc
+             ODEMeshShape.cc
              ODERayShape.cc
              ODEMultiRayShape.cc
              ODEHeightmapShape.cc
@@ -34,7 +34,7 @@ SET (headers
   ODEHinge2Joint.hh
   ODEUniversalJoint.hh
   ODEBallJoint.hh
-  ODETrimeshShape.hh
+  ODEMeshShape.hh
   ODERayShape.hh
   ODEMultiRayShape.hh
   ODEHeightmapShape.hh

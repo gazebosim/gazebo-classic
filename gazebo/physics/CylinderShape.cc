@@ -25,6 +25,7 @@ using namespace physics;
 CylinderShape::CylinderShape(CollisionPtr _parent) : Shape(_parent)
 {
   this->AddType(Base::CYLINDER_SHAPE);
+  sdf::initFile("cylinder_shape.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////
@@ -39,21 +40,26 @@ void CylinderShape::Init()
                  this->sdf->Get<double>("length"));
 }
 
-
 //////////////////////////////////////////////////
 void CylinderShape::SetRadius(double _radius)
 {
   this->sdf->GetElement("radius")->Set(_radius);
-  this->SetSize(this->sdf->Get<double>("radius"),
-                this->sdf->Get<double>("length"));
+  if (this->sdf->HasElement("length"))
+  {
+    this->SetSize(this->sdf->Get<double>("radius"),
+                  this->sdf->Get<double>("length"));
+  }
 }
 
 //////////////////////////////////////////////////
 void CylinderShape::SetLength(double _length)
 {
   this->sdf->GetElement("length")->Set(_length);
-  this->SetSize(this->sdf->Get<double>("radius"),
-                 this->sdf->Get<double>("length"));
+  if (this->sdf->HasElement("radius"))
+  {
+    this->SetSize(this->sdf->Get<double>("radius"),
+                  this->sdf->Get<double>("length"));
+  }
 }
 
 //////////////////////////////////////////////////

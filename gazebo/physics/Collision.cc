@@ -33,7 +33,7 @@
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/physics/BoxShape.hh"
 #include "gazebo/physics/CylinderShape.hh"
-#include "gazebo/physics/TrimeshShape.hh"
+#include "gazebo/physics/MeshShape.hh"
 #include "gazebo/physics/SphereShape.hh"
 #include "gazebo/physics/HeightmapShape.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -46,15 +46,17 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
-    : Entity(_link), maxContacts(0)
+    : Entity(_link), maxContacts(1)
 {
   this->AddType(Base::COLLISION);
 
   this->link = _link;
 
   this->contactsEnabled = false;
+  this->placeable = false;
 
   this->surface.reset(new SurfaceParams());
+  sdf::initFile("collision.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////
