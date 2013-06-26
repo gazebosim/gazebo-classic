@@ -857,7 +857,7 @@ void ColladaLoader::LoadPositions(const std::string &_id,
 
 /////////////////////////////////////////////////
 void ColladaLoader::LoadNormals(const std::string &_id,
-    const math::Matrix4 &_transform,
+    const math::Matrix4 &/*_transform*/,
     std::vector<math::Vector3> &_values)
 {
   TiXmlElement *normalsXml = this->GetElementId("source", _id);
@@ -881,11 +881,7 @@ void ColladaLoader::LoadNormals(const std::string &_id,
     math::Vector3 vec;
     iss >> vec.x >> vec.y >> vec.z;
     if (iss)
-    {
-      vec = _transform * vec;
-      vec.Normalize();
       _values.push_back(vec);
-    }
   } while (iss);
 }
 

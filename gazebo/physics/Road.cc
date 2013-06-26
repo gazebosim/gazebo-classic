@@ -36,21 +36,25 @@ Road::~Road()
 /////////////////////////////////////////////////
 void Road::Load(sdf::ElementPtr _elem)
 {
+  Base::Load(_elem);
+  this->SetName(_elem->Get<std::string>("name"));
+}
+
+/////////////////////////////////////////////////
+void Road::Init()
+{
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
   this->roadPub = this->node->Advertise<msgs::Road>("~/roads", 10);
 
   msgs::Road msg;
-  Base::Load(_elem);
-
-  this->SetName(_elem->Get<std::string>("name"));
   msg.set_name(this->GetName());
 
   this->width = _elem->Get<double>("width");
   msg.set_width(this->width);
 
-  sdf::ElementPtr pointElem = _elem->GetElement("point");
+  sdf::ElementPtr pointElem = this->sdf->GetElement("point");
   while (pointElem)
   {
     math::Vector3 point = pointElem->Get<math::Vector3>();
@@ -61,9 +65,4 @@ void Road::Load(sdf::ElementPtr _elem)
   }
 
   this->roadPub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
-void Road::Init()
-{
 }

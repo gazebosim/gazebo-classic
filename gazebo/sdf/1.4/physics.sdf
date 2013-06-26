@@ -92,7 +92,7 @@
         <description>Number of iterations for each step. A higher number produces greater accuracy at a performance cost.</description>
       </element>
       <element name="precon_iters" type="int" default="0" required="0">
-        <description></description>
+        <description>Experimental parameter.</description>
       </element>
       <element name="sor" type="double" default="1.3" required="1">
         <description>Set the successive over-relaxation parameter.</description>

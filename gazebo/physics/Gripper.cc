@@ -72,7 +72,6 @@ void Gripper::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr gripperLinkElem = _sdf->GetElement("gripper_link");
 
-
   while (gripperLinkElem)
   {
     physics::LinkPtr gripperLink

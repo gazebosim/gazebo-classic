@@ -23,6 +23,8 @@ set (plugins
   CartTestPlugin
   ForceTorquePlugin
   ModelTrajectoryTestPlugin
+  MudPlugin
+  PressurePlugin
   RayPlugin
   RubblePlugin
   SpringTestPlugin

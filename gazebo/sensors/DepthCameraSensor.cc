@@ -31,6 +31,7 @@
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/DepthCameraSensor.hh"
@@ -73,6 +74,13 @@ void DepthCameraSensor::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void DepthCameraSensor::Init()
 {
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "Unable to create DepthCameraSensor. Rendering is disabled.\n";
+    return;
+  }
+
   std::string worldName = this->world->GetName();
 
   if (!worldName.empty())
@@ -111,6 +119,12 @@ void DepthCameraSensor::Init()
   else
     gzerr << "No world name\n";
 
+  // Disable clouds and moon on server side until fixed and also to improve
+  // performance
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+      ~rendering::Scene::GZ_SKYX_CLOUDS &
+      ~rendering::Scene::GZ_SKYX_MOON);
+
   Sensor::Init();
 }
 
@@ -118,7 +132,7 @@ void DepthCameraSensor::Init()
 void DepthCameraSensor::Fini()
 {
   Sensor::Fini();
-  this->camera->Fini();
+  this->scene->RemoveCamera(this->camera->GetName());
   this->camera.reset();
   this->scene.reset();
 }
@@ -137,7 +151,7 @@ void DepthCameraSensor::UpdateImpl(bool /*_force*/)
   {
     this->camera->Render();
     this->camera->PostRender();
-    this->lastMeasurementTime = this->world->GetSimTime();
+    this->lastMeasurementTime = this->scene->GetSimTime();
   }
 }
 
@@ -147,4 +161,3 @@ bool DepthCameraSensor::SaveFrame(const std::string &_filename)
   this->SetActive(true);
   return this->camera->SaveFrame(_filename);
 }
-

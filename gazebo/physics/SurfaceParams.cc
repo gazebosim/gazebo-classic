@@ -32,7 +32,8 @@ SurfaceParams::SurfaceParams()
     kp(1000000000000), kd(1), cfm(0), erp(0.2),
     maxVel(0.01), minDepth(0),
     mu1(1), mu2(1), slip1(0), slip2(0),
-    collideWithoutContact(false)
+    collideWithoutContact(false),
+    collideWithoutContactBitmask(1)
 {
 }
 
@@ -78,6 +79,8 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
     {
       this->collideWithoutContact =
         contactElem->Get<bool>("collide_without_contact");
+      this->collideWithoutContactBitmask =
+          contactElem->Get<unsigned int>("collide_without_contact_bitmask");
       sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
       GZ_ASSERT(contactOdeElem, "Surface sdf member is NULL");
       this->kp = contactOdeElem->Get<double>("kp");
@@ -109,6 +112,7 @@ void SurfaceParams::FillMsg(msgs::Surface &_msg)
   _msg.set_max_vel(this->maxVel);
   _msg.set_min_depth(this->minDepth);
   _msg.set_collide_without_contact(this->collideWithoutContact);
+  _msg.set_collide_without_contact_bitmask(this->collideWithoutContactBitmask);
 }
 
 
@@ -151,6 +155,6 @@ void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
     this->minDepth = _msg.min_depth();
   if (_msg.has_collide_without_contact())
     this->collideWithoutContact = _msg.collide_without_contact();
+  if (_msg.has_collide_without_contact_bitmask())
+    this->collideWithoutContactBitmask = _msg.collide_without_contact_bitmask();
 }
-
-

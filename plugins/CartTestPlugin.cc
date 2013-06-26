@@ -24,8 +24,8 @@
  *  should refine the test to be more specific in the future.
 */
 
-#include "physics/physics.hh"
-#include "transport/transport.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 #include "plugins/CartTestPlugin.hh"
 
 using namespace gazebo;

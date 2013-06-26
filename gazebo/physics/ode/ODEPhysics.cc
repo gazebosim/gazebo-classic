@@ -23,7 +23,6 @@
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/util/Diagnostics.hh"
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -46,12 +45,12 @@
 
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODELink.hh"
-#include "gazebo/physics/ode/ODEUniversalJoint.hh"
 #include "gazebo/physics/ode/ODEScrewJoint.hh"
 #include "gazebo/physics/ode/ODEHingeJoint.hh"
 #include "gazebo/physics/ode/ODEHinge2Joint.hh"
 #include "gazebo/physics/ode/ODESliderJoint.hh"
 #include "gazebo/physics/ode/ODEBallJoint.hh"
+#include "gazebo/physics/ode/ODEUniversalJoint.hh"
 
 #include "gazebo/physics/ode/ODERayShape.hh"
 #include "gazebo/physics/ode/ODEBoxShape.hh"
@@ -116,7 +115,7 @@ class Colliders_TBB
 
 //////////////////////////////////////////////////
 ODEPhysics::ODEPhysics(WorldPtr _world)
-    : PhysicsEngine(_world)
+    : PhysicsEngine(_world), maxContacts(0)
 {
   // Collision detection init
   dInitODE2(0);
@@ -169,6 +168,9 @@ ODEPhysics::~ODEPhysics()
 void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
+
+  this->maxContacts = _sdf->Get<int>("max_contacts");
+  this->SetMaxContacts(this->maxContacts);
 
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   sdf::ElementPtr solverElem = odeElem->GetElement("solver");
@@ -600,8 +602,8 @@ void ODEPhysics::SetContactSurfaceLayer(double _depth)
 //////////////////////////////////////////////////
 void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 {
-  this->sdf->GetElement("ode")->GetElement(
-      "max_contacts")->GetValue()->Set(_maxContacts);
+  this->maxContacts = _maxContacts;
+  this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
 }
 
 //////////////////////////////////////////////////
@@ -657,7 +659,7 @@ double ODEPhysics::GetContactSurfaceLayer()
 //////////////////////////////////////////////////
 int ODEPhysics::GetMaxContacts()
 {
-  return this->sdf->GetElement("max_contacts")->Get<int>();
+  return this->maxContacts;
 }
 
 //////////////////////////////////////////////////
@@ -799,13 +801,36 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactGeom *_contactCollisions)
 {
+  // Filter collisions based on contact bitmask if collide_without_contact is
+  // on.The bitmask is set mainly for speed improvements otherwise a collision
+  // with collide_without_contact may potentially generate a large number of
+  // contacts.
+  if (_collision1->GetSurface()->collideWithoutContact ||
+      _collision2->GetSurface()->collideWithoutContact)
+  {
+    if ((_collision1->GetSurface()->collideWithoutContactBitmask &
+        _collision2->GetSurface()->collideWithoutContactBitmask) == 0)
+      return;
+  }
+
   int numc = 0;
   dContact contact;
 
   // maxCollide must less than the size of this->indices. Check the header
   int maxCollide = MAX_CONTACT_JOINTS;
-  if (this->GetMaxContacts() < MAX_CONTACT_JOINTS)
+
+  // max_contacts specified globally
+  if (this->GetMaxContacts() > 0 && this->GetMaxContacts() < MAX_CONTACT_JOINTS)
     maxCollide = this->GetMaxContacts();
+
+  // over-ride with minimum of max_contacts from both collisions
+  if (_collision1->GetMaxContacts() >= 0 &&
+      _collision1->GetMaxContacts() < maxCollide)
+    maxCollide = _collision1->GetMaxContacts();
+
+  if (_collision2->GetMaxContacts() >= 0 &&
+      _collision2->GetMaxContacts() < maxCollide)
+    maxCollide = _collision2->GetMaxContacts();
 
   // Generate the contacts
   numc = dCollide(_collision1->GetCollisionId(), _collision2->GetCollisionId(),
@@ -862,8 +887,40 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd =
-    (_collision1->GetSurface()->fdir1 + _collision2->GetSurface()->fdir1) * 0.5;
+  math::Vector3 fd = _collision1->GetSurface()->fdir1;
+  if (fd != math::Vector3::Zero)
+  {
+    // fdir1 is in body local frame, rotate it into world frame
+    /// \TODO: once issue #624 is fixed, switch to below:
+    /// fd = _collision1->GetWorldPose().rot.RotateVector(fd);
+    fd = (_collision1->GetRelativePose() +
+      _collision1->GetLink()->GetWorldPose()).rot.RotateVector(fd.Normalize());
+  }
+
+  /// \TODO: Better treatment when both surfaces have fdir1 specified.
+  /// Ideally, we want to use fdir1 specified by surface with
+  /// a smaller friction coefficient, but it's not clear how
+  /// that can be determined with friction pyramid approximations.
+  /// As a hack, we'll simply compare mu1 from
+  /// both surfaces for now, and use fdir1 specified by
+  /// surface with smaller mu1.
+  math::Vector3 fd2 = _collision2->GetSurface()->fdir1;
+  if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
+        _collision1->GetSurface()->mu1 > _collision2->GetSurface()->mu1))
+  {
+    // fdir1 is in body local frame, rotate it into world frame
+    /// \TODO: once issue #624 is fixed, switch to below:
+    /// fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
+    fd = (_collision2->GetRelativePose() +
+      _collision2->GetLink()->GetWorldPose()).rot.RotateVector(fd2.Normalize());
+    /// \TODO: uncomment gzlog below once we confirm it does not affect
+    /// performance
+    /// if (fd2 != math::Vector3::Zero && fd != math::Vector3::Zero &&
+    ///       _collision1->surface->mu1 > _collision2->surface->mu1)
+    ///   gzlog << "both contact surfaces have non-zero fdir1, comparing"
+    ///         << " comparing mu1 from both surfaces, and use fdir1"
+    ///         << " from surface with smaller mu1\n";
+  }
 
   if (fd != math::Vector3::Zero)
   {

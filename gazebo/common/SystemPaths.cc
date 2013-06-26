@@ -317,7 +317,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
       path = boost::filesystem::operator/(boost::filesystem::current_path(),
           _filename);
     }
-    catch(boost::filesystem3::filesystem_error &_e)
+    catch(boost::filesystem::filesystem_error &_e)
     {
       gzerr << "Filesystem error[" << _e.what() << "]\n";
       return std::string();

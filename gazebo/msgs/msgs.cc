@@ -628,6 +628,15 @@ namespace gazebo
           plgnMsg->set_name(elem->Get<std::string>("name"));
         // if (elem->HasElement("filename"))
           plgnMsg->set_filename(elem->Get<std::string>("filename"));
+
+        std::stringstream ss;
+        for (sdf::ElementPtr innerElem = elem->GetFirstElement();
+            innerElem;
+            innerElem = innerElem->GetNextElement(""))
+        {
+          ss << innerElem->ToString("");
+        }
+        plgnMsg->set_innerxml("<sdf>" + ss.str() + "</sdf>");
       }
 
       return result;

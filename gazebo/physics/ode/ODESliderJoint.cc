@@ -20,9 +20,10 @@
  */
 #include <boost/bind.hpp>
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/ode/ODESliderJoint.hh"
 
@@ -99,8 +100,20 @@ void ODESliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
     this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
 
+  /// ODE needs global axis
+  /// \TODO: currently we assume joint axis is specified in model frame,
+  /// this is incorrect, and should be corrected to be
+  /// joint frame which is specified in child link frame.
+  math::Vector3 globalAxis = _axis;
+  if (this->parentLink)
+    globalAxis =
+      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+
   if (this->jointId)
-    dJointSetSliderAxis(this->jointId, _axis.x, _axis.y, _axis.z);
+  {
+    dJointSetSliderAxis(this->jointId,
+                        globalAxis.x, globalAxis.y, globalAxis.z);
+  }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }

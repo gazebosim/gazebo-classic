@@ -22,6 +22,7 @@ using namespace event;
 EventT<void (bool)> Events::pause;
 EventT<void ()> Events::step;
 EventT<void ()> Events::stop;
+EventT<void ()> Events::sigInt;
 
 EventT<void (std::string)> Events::worldCreated;
 EventT<void (std::string)> Events::entityCreated;

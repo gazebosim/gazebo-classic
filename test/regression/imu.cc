@@ -16,8 +16,8 @@
 */
 
 #include "ServerFixture.hh"
-#include "sensors/sensors.hh"
-#include "common/common.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/common/common.hh"
 
 // How tightly to compare for deterministic values
 #define IMU_TOL 1e-5
@@ -58,7 +58,18 @@ void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
   for (unsigned int i = 0; i < _cnt; ++i)
   {
     world->StepWorld(1);
-    _imu->Update(true);
+
+    int j = 0;
+    while (_imu->GetLastMeasurementTime() == gazebo::common::Time::Zero &&
+        j < 100)
+    {
+      _imu->Update(true);
+      gazebo::common::Time::MSleep(100);
+      ++j;
+    }
+
+    EXPECT_LT(j, 100);
+
     rateSum += _imu->GetAngularVelocity();
     accelSum += _imu->GetLinearAcceleration();
   }

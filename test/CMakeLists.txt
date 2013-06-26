@@ -38,4 +38,12 @@ execute_process(COMMAND cmake -E remove_directory ${CMAKE_BINARY_DIR}/test_resul
 execute_process(COMMAND cmake -E make_directory ${CMAKE_BINARY_DIR}/test_results)
 include_directories(${GTEST_INCLUDE_DIRS})
 
+set(TEST_TYPE "PERFORMANCE")
+add_subdirectory(performance)
+set(TEST_TYPE "INTEGRATION")
 add_subdirectory(regression)
+add_subdirectory(cmake)
+add_subdirectory(pkgconfig)
+
+set(headers ServerFixture.hh)
+gz_install_includes("test" ${headers} ${PROJECT_BINARY_DIR}/test_config.h)

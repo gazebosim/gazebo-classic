@@ -64,6 +64,13 @@ void Pose::Set(const Vector3 &_pos, const Quaternion &_rot)
 }
 
 //////////////////////////////////////////////////
+void Pose::Set(const Vector3 &_pos, const Vector3 &_rpy)
+{
+  this->pos = _pos;
+  this->rot.SetFromEuler(_rpy);
+}
+
+//////////////////////////////////////////////////
 void Pose::Set(double _x, double _y, double _z,
                double _roll, double _pitch, double _yaw)
 {

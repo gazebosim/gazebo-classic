@@ -79,9 +79,6 @@ namespace gazebo
       /// \brief The list of events to handle.
       private: std::list<SimTimeEvent*> events;
 
-      /// \brief Get sim time from the world.
-      private: physics::WorldPtr world;
-
       /// \brief Connect to the World::UpdateBegin event.
       private: event::ConnectionPtr updateConnection;
     };
@@ -261,6 +258,9 @@ namespace gazebo
       /// \brief True if SensorManager::Init has been called
       ///        i.e. SensorManager::sensors are initialized.
       private: bool initialized;
+
+      /// \brief True removes all sensors from all sensor containers.
+      private: bool removeAllSensors;
 
       /// \brief Mutex used when adding and removing sensors.
       private: mutable boost::recursive_mutex mutex;

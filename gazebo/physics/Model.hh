@@ -28,7 +28,6 @@
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
-
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
 
@@ -199,7 +198,7 @@ namespace gazebo
       /// \param[in] _jointName Name of the joint to set.
       /// \param[in] _position Position to set the joint to.
       public: void SetJointPosition(const std::string &_jointName,
-                                    double _position);
+                                    double _position, int _index = 0);
 
       /// \brief Set the positions of a set of joints.
       /// \sa JointController::SetJointPositions.

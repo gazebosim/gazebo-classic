@@ -105,6 +105,8 @@ namespace gazebo
 
       /// \brief Publishes messages of type msgs::ImagesStamped.
       private: transport::PublisherPtr imagePub;
+
+      private: rendering::ScenePtr scene;
     };
     /// \}
   }

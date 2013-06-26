@@ -39,6 +39,7 @@ RTShaderSystem::RTShaderSystem()
   this->entityMutex = new boost::mutex();
   this->initialized = false;
   this->shadowsApplied = false;
+  this->pssmSetup = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -474,7 +475,8 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   // pssmCasterPass->setFog(true);
 
   // shadow camera setup
-  this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
+  if (!this->pssmSetup)
+    this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
 
   double shadowFarDistance = 200;
   double cameraNearClip = 0.1;

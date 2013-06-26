@@ -25,6 +25,7 @@ set (sources
   DynamicLines.cc
   DynamicRenderable.cc
   FPSViewController.cc
+  GpuLaser.cc
   Grid.cc
   GUIOverlay.cc
   Heightmap.cc
@@ -63,6 +64,7 @@ set (headers
   DynamicLines.hh
   DynamicRenderable.hh
   FPSViewController.hh
+  GpuLaser.hh
   Grid.hh
   GUIOverlay.hh
   Heightmap.hh
@@ -122,3 +124,8 @@ endif()
 
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
+
+# unit tests
+set (gtest_sources
+  GpuLaser_TEST.cc)
+gz_build_dri_tests(${gtest_sources})

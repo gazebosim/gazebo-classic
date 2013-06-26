@@ -17,6 +17,8 @@
 
 #include <sys/stat.h>
 #include <sdf/sdf.hh>
+#include <gazebo/common/Console.hh>
+#include <gazebo/common/Exception.hh>
 
 std::vector<std::string> params;
 
@@ -49,6 +51,17 @@ bool file_exists(const std::string &_filename)
 int main(int argc, char** argv)
 {
   bool success = false;
+
+  try
+  {
+    // Initialize the informational logger. This will log warnings and errors.
+    gazebo::common::Console::Instance()->Init("gzsdf.log");
+  }
+  catch(gazebo::common::Exception &_e)
+  {
+    _e.Print();
+    std::cerr << "Error initializing log file" << std::endl;
+  }
 
   // Get parameters from command line
   for (int i = 1; i < argc; i++)
@@ -128,7 +141,16 @@ int main(int argc, char** argv)
       if (sdf::Converter::Convert(&xmlDoc, SDF::version, true))
       {
         success = true;
-        xmlDoc.SaveFile(params[1]);
+
+        // Create an XML printer to control formatting
+        TiXmlPrinter printer;
+        printer.SetIndent("  ");
+        xmlDoc.Accept(&printer);
+
+        // Output the XML
+        std::ofstream stream(params[1].c_str(), std::ios_base::out);
+        stream << printer.Str();
+        stream.close();
       }
     }
     else

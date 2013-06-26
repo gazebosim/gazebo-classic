@@ -137,7 +137,6 @@ TimePanel::~TimePanel()
 void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  std::ostringstream stream;
 
   this->simTimes.push_back(msgs::Convert(_msg->sim_time()));
   if (this->simTimes.size() > 20)
@@ -158,64 +157,47 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
     g_playAct->setVisible(false);
   }
 
-  unsigned int day, hour, min, sec, msec;
-
   // Set simulation time
-  {
-    stream.str("");
-
-    sec = _msg->sim_time().sec();
-
-    day = sec / 86400;
-    sec -= day * 86400;
-
-    hour = sec / 3600;
-    sec -= hour * 3600;
-
-    min = sec / 60;
-    sec -= min * 60;
-
-    msec = rint(_msg->sim_time().nsec() * 1e-6);
-
-    stream << std::setw(2) << std::setfill('0') << day << " ";
-    stream << std::setw(2) << std::setfill('0') << hour << ":";
-    stream << std::setw(2) << std::setfill('0') << min << ":";
-    stream << std::setw(2) << std::setfill('0') << sec << ".";
-    stream << std::setw(3) << std::setfill('0') << msec;
-
-    this->SetSimTime(QString::fromStdString(stream.str()));
-  }
+  this->SetSimTime(QString::fromStdString(FormatTime(_msg->sim_time())));
 
   // Set real time
-  {
-    stream.str("");
-
-    sec = _msg->real_time().sec();
-
-    day = sec / 86400;
-    sec -= day * 86400;
-
-    hour = sec / 3600;
-    sec -= hour * 3600;
-
-    min = sec / 60;
-    sec -= min * 60;
-
-    msec = rint(_msg->sim_time().nsec() * 1e-6);
-
-    stream << std::setw(2) << std::setfill('0') << day << " ";
-    stream << std::setw(2) << std::setfill('0') << hour << ":";
-    stream << std::setw(2) << std::setfill('0') << min << ":";
-    stream << std::setw(2) << std::setfill('0') << sec << ".";
-    stream << std::setw(3) << std::setfill('0') << msec;
-
-    this->SetRealTime(QString::fromStdString(stream.str()));
-  }
+  this->SetRealTime(QString::fromStdString(FormatTime(_msg->real_time())));
 
   // Set the iterations
   this->SetIterations(QString::fromStdString(
         boost::lexical_cast<std::string>(_msg->iterations())));
 }
+
+/////////////////////////////////////////////////
+std::string TimePanel::FormatTime(const msgs::Time &_msg)
+{
+  std::ostringstream stream;
+  unsigned int day, hour, min, sec, msec;
+
+  stream.str("");
+
+  sec = _msg.sec();
+
+  day = sec / 86400;
+  sec -= day * 86400;
+
+  hour = sec / 3600;
+  sec -= hour * 3600;
+
+  min = sec / 60;
+  sec -= min * 60;
+
+  msec = rint(_msg.nsec() * 1e-6);
+
+  stream << std::setw(2) << std::setfill('0') << day << " ";
+  stream << std::setw(2) << std::setfill('0') << hour << ":";
+  stream << std::setw(2) << std::setfill('0') << min << ":";
+  stream << std::setw(2) << std::setfill('0') << sec << ".";
+  stream << std::setw(3) << std::setfill('0') << msec;
+
+  return stream.str();
+}
+
 
 /////////////////////////////////////////////////
 void TimePanel::Update()
