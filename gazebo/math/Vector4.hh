@@ -24,7 +24,7 @@
 
 #include <iostream>
 #include <fstream>
-#include "math/Matrix4.hh"
+#include "gazebo/math/Matrix4.hh"
 
 namespace gazebo
 {

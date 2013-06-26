@@ -104,7 +104,7 @@ if (PKG_CONFIG_FOUND)
       BUILD_WARNING ("CEGUI-OGRE not found, opengl GUI will be disabled.")
       set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
     else()
-      set (HAVE_CEGUI ON CACHE BOOL "HAVE CEGUI" FORCE)
+      set (HAVE_CEGUI ON CACHE BOOL "HAVE CEGUI")
       set (CEGUI_LIBRARIES "CEGUIBase;CEGUIOgreRenderer")
       message (STATUS "Looking for CEGUI-OGRE, found")
     endif()
@@ -219,7 +219,6 @@ if (PKG_CONFIG_FOUND)
     # This variable will be substituted into cmake/setup.sh.in
     set (OGRE_PLUGINDIR ${_pkgconfig_invoke_result})
   endif()
-
 
   ########################################
   # Find OpenAL

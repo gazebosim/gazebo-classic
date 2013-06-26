@@ -22,7 +22,7 @@
 #ifndef _JOINT_WRENCH_HH_
 #define _JOINT_WRENCH_HH_
 
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {

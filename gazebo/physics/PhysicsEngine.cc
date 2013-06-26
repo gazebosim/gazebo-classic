@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  */
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Exception.hh"

@@ -56,8 +56,8 @@
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/World.hh"
 
-#include "physics/Collision.hh"
-#include "physics/ContactManager.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ContactManager.hh"
 
 using namespace gazebo;
 using namespace physics;

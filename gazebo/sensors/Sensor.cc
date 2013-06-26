@@ -19,25 +19,23 @@
  * Date: 25 May 2007
  */
 
-#include "sdf/sdf.hh"
-#include "transport/transport.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "physics/Physics.hh"
-#include "physics/World.hh"
+#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/World.hh"
 
-#include "common/Timer.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "common/Plugin.hh"
+#include "gazebo/common/Timer.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Plugin.hh"
 
-#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Rendering.hh"
 #include "gazebo/rendering/Scene.hh"
 
-#include "sensors/CameraSensor.hh"
-
-#include "sensors/Sensor.hh"
-#include "sensors/SensorManager.hh"
+#include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/SensorManager.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -211,6 +209,7 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 
     SensorPtr myself = shared_from_this();
     plugin->Load(myself, _sdf);
+    plugin->Init();
     this->plugins.push_back(plugin);
   }
 }

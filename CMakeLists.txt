@@ -7,6 +7,7 @@ endif(COMMAND CMAKE_POLICY)
 
 project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (GAZEBO_VERSION_NAME "lithium")
 set (GAZEBO_MAJOR_VERSION 1)
@@ -311,6 +312,16 @@ else (build_errors)
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
   endforeach()
+
+  ########################################
+  # Make the cmake config files
+  set(PKG_NAME ${PROJECT_NAME_UPPER})
+  set(PKG_LIBRARIES gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_sdf_interface gazebo_msgs gazebo_transport)
+  set(PKG_DEPENDS Boost Protobuf)
+  set(cmake_conf_file "cmake/gazebo-config.cmake")
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${cmake_conf_file}.in" "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}" @ONLY)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file} DESTINATION share/${PROJECT_NAME_LOWER}/cmake/ COMPONENT cmake)
+
 
   ########################################
   # If present, load platform-specific build hooks.  This system is used,
