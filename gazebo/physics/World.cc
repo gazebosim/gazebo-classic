@@ -174,7 +174,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node->Init(this->GetName());
 
   this->posePub = this->node->Advertise<msgs::PosesStamped>(
-    "~/pose/info", 10, 60.0);
+    "~/pose/info", 10);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
   if (this->sdf->HasElement("gui"))
@@ -1782,8 +1782,8 @@ void World::ProcessMessages()
       msgs::PosesStamped msg;
 
       // Time stamp this PosesStamped message
-      // Rendering sensors time stamp their data with the sim time in this msg,
-      // which is more accurate than calling GetSimTime() directly.
+      // rendering::Scene depends on this timestamp, which is used by
+      // rendering sensors to time stamp their data
       msgs::Set(msg.mutable_time(), this->GetSimTime());
 
       if (this->publishModelPoses.size() > 0)

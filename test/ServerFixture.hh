@@ -485,12 +485,12 @@ class ServerFixture : public testing::Test
 
                int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 80)
+               while (!this->HasEntity(_modelName) && i < 50)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 80);
+               EXPECT_LT(i, 500);
              }
 
   protected: void SpawnRaySensor(const std::string &_modelName,
