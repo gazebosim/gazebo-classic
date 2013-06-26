@@ -174,7 +174,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node->Init(this->GetName());
 
   this->posePub = this->node->Advertise<msgs::PosesStamped>(
-    "~/pose/info", 10, 80.0);
+    "~/pose/info", 10, 60.0);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
   if (this->sdf->HasElement("gui"))
