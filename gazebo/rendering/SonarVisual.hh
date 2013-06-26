@@ -47,6 +47,9 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~SonarVisual();
 
+      // Documentation inherited
+      public: virtual void Load();
+
       /// \brief Callback when sonar data is received.
       private: void OnMsg(ConstSonarStampedPtr &_msg);
 

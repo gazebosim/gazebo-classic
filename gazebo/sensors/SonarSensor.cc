@@ -101,14 +101,6 @@ void SonarSensor::Load(const std::string &_worldName)
     return;
   }
 
-  if (this->rangeMax < this->rangeMin)
-  {
-    gzerr << "Max sonar range of [" << this->rangeMax
-      << "] must be greater than"
-      << "the min sonar range of[" << this->rangeMin << "]\n";
-    return;
-  }
-
   Sensor::Load(_worldName);
   GZ_ASSERT(this->world != NULL,
       "SonarSensor did not get a valid World pointer");

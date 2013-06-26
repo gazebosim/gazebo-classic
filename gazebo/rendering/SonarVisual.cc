@@ -53,8 +53,6 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
     this->sceneNode->createChildSceneNode(this->GetName() + "_SONAR_CONE");
   this->coneNode->attachObject(coneObj);
   this->coneNode->setPosition(0, 0, 0);
-
-  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
 
 /////////////////////////////////////////////////
@@ -62,6 +60,14 @@ SonarVisual::~SonarVisual()
 {
   delete this->sonarRay;
   this->sonarRay = NULL;
+}
+
+/////////////////////////////////////////////////
+void SonarVisual::Load()
+{
+  Visual::Load();
+  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->SetCastShadows(false);
 }
 
 /////////////////////////////////////////////////

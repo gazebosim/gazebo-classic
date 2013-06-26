@@ -25,7 +25,7 @@
 
 namespace gazebo
 {
-  /// \brief A Bumper controller
+  /// \brief A sonar sensor plugin
   class SonarPlugin : public SensorPlugin
   {
     /// \brief Constructor
