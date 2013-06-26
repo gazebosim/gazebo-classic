@@ -52,16 +52,23 @@ WirelessReceiver::~WirelessReceiver()
   // this->link.reset();
 }
 
-/////////////////////////////////////////////////
-void WirelessReceiver::Load(const std::string &_worldName, sdf::ElementPtr _sdf )
-{
-  Sensor::Load(_worldName, _sdf);
+//////////////////////////////////////////////////                              
+std::string WirelessReceiver::GetTopic() const                               
+{                                                                               
+  std::string topicName = "~/";                                                 
+  topicName += this->parentName + "/" + this->GetName() + "/receiver";          
+  boost::replace_all(topicName, "::", "/");                                     
+                                                                                
+  return topicName;                                                             
 }
 
 /////////////////////////////////////////////////
 void WirelessReceiver::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
+
+  this->recPub = this->node->Advertise<msgs::Int>(this->GetTopic(), 30);      
+  this->entity = this->world->GetEntity(this->parentName);
 }
 
 /////////////////////////////////////////////////
@@ -79,6 +86,12 @@ void WirelessReceiver::Init()
 //////////////////////////////////////////////////
 void WirelessReceiver::UpdateImpl(bool /*_force*/)
 {
-
+  if (this->recPub)                                                           
+  {                                                                             
+    msgs::Int msg;                                                              
+    msg.set_data(3);                                                            
+                                                                                
+    this->recPub->Publish(msg);                                               
+  }
 }
 

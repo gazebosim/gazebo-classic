@@ -33,6 +33,8 @@ void RegisterImuSensor();
 void RegisterRaySensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
+void RegisterWirelessTransmitter();
+void RegisterWirelessReceiver();
 
 using namespace gazebo;
 using namespace sensors;
@@ -51,6 +53,8 @@ void SensorFactory::RegisterAll()
   RegisterRaySensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();
+  RegisterWirelessTransmitter();
+  RegisterWirelessReceiver();
 }
 
 /////////////////////////////////////////////////

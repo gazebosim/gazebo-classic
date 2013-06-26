@@ -47,9 +47,8 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~WirelessTransmitter();
 
-      // Documentation inherited
-      public: virtual void Load(const std::string & _worldName,
-                                sdf::ElementPtr &_sdf);
+      // Documentation inherited                                                
+      public: virtual std::string GetTopic() const;
 
       // Documentation inherited
       public: virtual void Load(const std::string & _worldName);
@@ -70,6 +69,8 @@ namespace gazebo
 
       /// \brief Pointer the entity that has the transmitter.
       private: physics::EntityPtr entity;
+
+      private: transport::PublisherPtr transPub;
     };
     /// \}
   }

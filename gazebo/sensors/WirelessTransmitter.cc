@@ -46,10 +46,14 @@ WirelessTransmitter::~WirelessTransmitter()
 {
 }
 
-/////////////////////////////////////////////////
-void WirelessTransmitter::Load(const std::string &_worldName, sdf::ElementPtr &_sdf)
-{
-  Sensor::Load(_worldName, _sdf);
+//////////////////////////////////////////////////                              
+std::string WirelessTransmitter::GetTopic() const                                         
+{                                                                               
+  std::string topicName = "~/";                                                 
+  topicName += this->parentName + "/" + this->GetName() + "/transmitter";              
+  boost::replace_all(topicName, "::", "/");                                     
+                                                                                
+  return topicName;                                                             
 }
 
 /////////////////////////////////////////////////
@@ -57,6 +61,7 @@ void WirelessTransmitter::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
+  this->transPub = this->node->Advertise<msgs::Int>(this->GetTopic(), 30);
   this->entity = this->world->GetEntity(this->parentName);
 }
 
@@ -76,5 +81,12 @@ void WirelessTransmitter::Init()
 //////////////////////////////////////////////////
 void WirelessTransmitter::UpdateImpl(bool /*_force*/)
 {
+  if (this->transPub)                                                            
+  {
+    msgs::Int msg;
+    msg.set_data(3);
 
+    this->transPub->Publish(msg);
+  }
 }
+
