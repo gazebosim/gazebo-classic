@@ -1788,7 +1788,8 @@ void World::ProcessMessages()
 
       if (this->publishModelPoses.size() > 0)
       {
-        for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
+        for (std::set<ModelPtr>::iterator iter =
+            this->publishModelPoses.begin();
             iter != this->publishModelPoses.end(); ++iter)
         {
           poseMsg = msg.add_pose();
