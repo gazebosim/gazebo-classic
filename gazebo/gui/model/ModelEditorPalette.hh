@@ -34,6 +34,8 @@ namespace gazebo
 
   namespace gui
   {
+    class JointMaker;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -43,12 +45,46 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \enum Joint types
+      /// \brief Unique identifiers for joint types that can be created.
+      public: enum JointType
+      {
+        /// \brief none
+        JOINT_NONE,
+        /// \brief Fixed joint
+        JOINT_FIXED,
+        /// \brief Revolute joint
+        JOINT_REVOLUTE,
+        /// \brief Slider joint
+        JOINT_SLIDER,
+        /// \brief Hinge joint
+        JOINT_HINGE,
+        /// \brief Screw joint
+        JOINT_SCREW,
+        /// \brief Universal joint
+        JOINT_UNIVERSAL
+      };
+
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
       public: ModelEditorPalette(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~ModelEditorPalette();
+
+      /// \brief Create a joint
+      /// \param[_type] Type of joint to be created
+      public: void CreateJoint(JointType _type);
+
+      /// \brief Mouse event filter callback when mouse button is pressed.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMousePress(const common::MouseEvent &_event);
+
+      /// \brief Mouse event filter callback when mouse is moved.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMouseMove(const common::MouseEvent &_event);
 
       /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *_item, int _column);
@@ -92,17 +128,30 @@ namespace gazebo
       /// \brief Plugin item
       private: QTreeWidgetItem *pluginItem;
 
-      /*/// \brief Mouse event filter callback when mouse button is pressed.
-      /// \param[in] _event The mouse event.
-      /// \return True if the brush was applied
-      private: bool OnMousePress(const common::MouseEvent &_event);
+      /// \brief Keep track of joint type that
+      private: JointType createJointType;
 
-      /// \brief Mouse event filter callback when mouse is moved.
-      /// \param[in] _event The mouse event.
-      /// \return True if the brush was applied
-      private: bool OnMouseMove(const common::MouseEvent &_event);
+//      private: rendering::UserCameraPtr userCamera;
 
-      /// \brief Apply a brush
+      /// \brief Visual that is currently hovered over by the mouse
+      private: rendering::VisualPtr hoverVis;
+
+      /// \brief Currently selected visual
+      private: rendering::VisualPtr selectedVis;
+
+      /// \brief Visual line used to represent joint connecting parent and child
+      // private: rendering::DynamicLines *jointLine;
+//      private: rendering::VisualPtr jointLine;
+      private: JointMaker *jointLine;
+
+      /// \brief A list of joint visuals.
+      private: std::vector<JointMaker *> jointLines;
+//      private: std::vector<rendering::VisualPtr> jointLines;
+//      private: std::vector<rendering::DynamicLines *> jointLines;
+
+
+
+      /*/// \brief Apply a brush
       /// \param[in] _event The mouse event.
       /// \param[in] _camera Active camera.
       /// \param[in] _heightmap Heightmap on which to apply the modification.
