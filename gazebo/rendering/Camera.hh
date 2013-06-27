@@ -687,6 +687,7 @@ namespace gazebo
       /// \brief PID used to track a visual smoothly.
       private: common::PID trackVisualPID;
       private: common::PID trackVisualOPID;
+      private: common::PID trackVisualYawPID;
 
       /// \brief Which noise type we support
       private: enum NoiseModelType

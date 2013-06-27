@@ -197,6 +197,10 @@ void MainWindow::Init()
   winSize.setWidth(std::max(1024, winSize.width()));
   winSize.setHeight(std::max(768, winSize.height()));
 
+  winSize.setWidth(1920);
+  winSize.setHeight(1080);
+
+
   this->resize(winSize);
 
   this->worldControlPub =
@@ -485,11 +489,13 @@ void MainWindow::OnInputStepSizeChanged(int _value)
 }
 
 /////////////////////////////////////////////////
-void MainWindow::OnFollow(const std::string & /*_modelName*/)
+void MainWindow::OnFollow(const std::string &_modelName)
 {
-  printf("On Follow\n");
-  this->renderWidget->DisplayOverlayMsg(
-      "Press Escape to exit Follow mode", 20000);
+  if (_modelName.empty())
+    this->renderWidget->DisplayOverlayMsg("", 0);
+  else
+    this->renderWidget->DisplayOverlayMsg(
+        "Press Escape to exit Follow mode", 0);
 }
 
 /////////////////////////////////////////////////

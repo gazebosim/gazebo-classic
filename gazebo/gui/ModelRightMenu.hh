@@ -21,6 +21,7 @@
 #include <vector>
 #include <string>
 
+#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -64,6 +65,11 @@ namespace gazebo
       // private slots: void OnSnapBelow();
 
       // private slots: void OnSkeleton();
+
+      /// \brief Key release callback.
+      /// \param[in] _event The key event.
+      /// \return True if the key press was handled.
+      private: bool OnKeyRelease(const common::KeyEvent &_event);
 
       /// \brief Request callback.
       /// \param[in] _msg Request message to process.

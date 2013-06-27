@@ -372,22 +372,29 @@ void Camera::Update()
     double pitch = atan2(-direction.z,
                          sqrt(pow(direction.x, 2) + pow(direction.y, 2)));
     pitch = math::clamp(pitch, 0.0, 0.25*M_PI);
+
     double currPitch = this->GetWorldRotation().GetAsEuler().y;
     double currYaw = this->GetWorldRotation().GetAsEuler().z;
-    double error = currPitch - pitch;
-    double scaling = this->trackVisualOPID.Update(error, 0.01);
 
-    std::cout << "Pitch[" << pitch << "] C[" << currPitch << "] E["
-      << error << "] Scaling[" << scaling << "]\n";
+    double pitchError = currPitch - pitch;
 
-    // this->SetWorldRotation(math::Quaternion(0, currPitch + scaling, currYaw));
-    //this->SetWorldRotation(math::Quaternion(0, pitch, yaw));
+    double yawError = currYaw - yaw;
+    if (yawError > M_PI)
+      yawError -= M_PI*2;
+    if (yawError < -M_PI)
+      yawError += M_PI*2;
+
+    double pitchAdj = this->trackVisualOPID.Update(pitchError, 0.01);
+    double yawAdj = this->trackVisualYawPID.Update(yawError, 0.01);
+
+    this->SetWorldRotation(math::Quaternion(0, currPitch + pitchAdj,
+          currYaw + yawAdj));
 
     double origDistance = 8.0;
     double distance = direction.GetLength();
-    error = origDistance - distance;
+    double error = origDistance - distance;
 
-    scaling = this->trackVisualPID.Update(error, 0.3);
+    double scaling = this->trackVisualPID.Update(error, 0.3);
 
     math::Vector3 displacement = direction;
     displacement.Normalize();
@@ -586,6 +593,9 @@ void Camera::SetWorldPosition(const math::Vector3 &_pos)
     return;
 
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
+
+  // The pitch nodes needs to be told to update its transform
+  this->pitchNode->needUpdate();
 }
 
 //////////////////////////////////////////////////
@@ -1445,12 +1455,15 @@ bool Camera::TrackVisualImpl(const std::string &_name)
 //////////////////////////////////////////////////
 bool Camera::TrackVisualImpl(VisualPtr _visual)
 {
-  this->sceneNode->getParent()->removeChild(this->sceneNode);
+  //if (this->sceneNode->getParent())
+  //  this->sceneNode->getParent()->removeChild(this->sceneNode);
 
   if (_visual)
   {
     this->trackVisualPID.Init(0.25, 0, 0, 0, 0, 1.0, 0.0);
-    this->trackVisualOPID.Init(0.01, 0, 0, 0, 0, 1.0, 0.0);
+    this->trackVisualOPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
+    this->trackVisualYawPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
+
     this->trackedVisual = _visual;
   }
   else
@@ -1466,11 +1479,13 @@ Ogre::Texture *Camera::GetRenderTexture() const
   return this->renderTexture;
 }
 
+/////////////////////////////////////////////////
 math::Vector3 Camera::GetDirection() const
 {
   return Conversions::Convert(this->camera->getDerivedDirection());
 }
 
+/////////////////////////////////////////////////
 bool Camera::IsVisible(VisualPtr _visual)
 {
   if (this->camera && _visual)

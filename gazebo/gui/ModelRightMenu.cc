@@ -20,6 +20,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
 
+#include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/Gui.hh"
@@ -31,6 +32,9 @@ using namespace gui;
 /////////////////////////////////////////////////
 ModelRightMenu::ModelRightMenu()
 {
+  KeyEventHandler::Instance()->AddReleaseFilter("ModelRightMenu",
+        boost::bind(&ModelRightMenu::OnKeyRelease, this, _1));
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->requestSub = this->node->Subscribe("~/request",
@@ -100,6 +104,19 @@ ModelRightMenu::ModelRightMenu()
   // this->skeletonAction->setCheckable(true);
   // connect(this->skeletonAction, SIGNAL(triggered()), this,
   //         SLOT(OnSkeleton()));
+}
+
+/////////////////////////////////////////////////
+bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
+{
+  if (_event.key == 16777216)
+  {
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+    cam->TrackVisual("");
+    gui::Events::follow("");
+  }
+
+  return false;
 }
 
 /////////////////////////////////////////////////
