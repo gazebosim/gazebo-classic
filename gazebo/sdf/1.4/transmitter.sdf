@@ -1,0 +1,12 @@
+<element name="transmitter" required="0">
+  <description>These elements are specific to a wireless transmitter.</description>
+
+  <element name="essid" type="string" default="transmitter" required="1">
+    <description>Service set identifier (network name)</description>
+  </element> <!-- End Essid -->
+
+  <element name="frequency" type="double" default="2.40" required="1">
+    <description>Specifies the frequency of transmission</description>
+  </element> <!-- End Frequency -->
+
+</element> <!-- End Transmitter -->

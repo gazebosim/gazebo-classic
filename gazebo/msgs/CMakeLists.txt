@@ -83,6 +83,8 @@ set (msgs
   vector2d.proto
   vector3d.proto
   visual.proto
+  wireless_node.proto
+  wireless_nodes.proto
   world_control.proto
   world_reset.proto
   world_stats.proto

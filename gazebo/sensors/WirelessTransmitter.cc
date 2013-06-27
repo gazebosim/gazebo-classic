@@ -29,6 +29,9 @@
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/sensors/WirelessTransmitter.hh"
 
+#include <iostream>
+using namespace std;
+
 using namespace gazebo;
 using namespace sensors;
 
@@ -46,23 +49,41 @@ WirelessTransmitter::~WirelessTransmitter()
 {
 }
 
-//////////////////////////////////////////////////                              
-std::string WirelessTransmitter::GetTopic() const                                         
-{                                                                               
-  std::string topicName = "~/";                                                 
-  topicName += this->parentName + "/" + this->GetName() + "/transmitter";              
-  boost::replace_all(topicName, "::", "/");                                     
-                                                                                
-  return topicName;                                                             
-}
-
 /////////////////////////////////////////////////
 void WirelessTransmitter::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  this->transPub = this->node->Advertise<msgs::Int>(this->GetTopic(), 30);
   this->entity = this->world->GetEntity(this->parentName);
+
+  if (this->sdf->HasElement("transmitter"))
+  {
+    sdf::ElementPtr transElem = this->sdf->GetElement("transmitter");
+
+    if (transElem->HasElement("essid"))
+    {
+      this->essid = transElem->GetValueString("essid");
+      //cout << "ESSID: " << this->essid << endl;
+    }
+
+    if (transElem->HasElement("frequency"))
+    {
+      this->freq = transElem->GetValueDouble("frequency");
+      //cout << "Freq: " << this->freq << endl;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+double WirelessTransmitter::GetFreq()
+{
+  return this->freq;
+}
+
+/////////////////////////////////////////////////
+std::string WirelessTransmitter::GetESSID()
+{
+  return this->essid;
 }
 
 /////////////////////////////////////////////////
@@ -81,12 +102,6 @@ void WirelessTransmitter::Init()
 //////////////////////////////////////////////////
 void WirelessTransmitter::UpdateImpl(bool /*_force*/)
 {
-  if (this->transPub)                                                            
-  {
-    msgs::Int msg;
-    msg.set_data(3);
 
-    this->transPub->Publish(msg);
-  }
 }
 

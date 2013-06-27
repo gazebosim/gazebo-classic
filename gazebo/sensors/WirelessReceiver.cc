@@ -32,7 +32,12 @@
 #include "gazebo/math/Vector3.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/sensors/WirelessReceiver.hh"
+#include "gazebo/sensors/WirelessTransmitter.hh"
+
+#include <iostream>
+using namespace std;
 
 using namespace gazebo;
 using namespace sensors;
@@ -67,7 +72,7 @@ void WirelessReceiver::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  this->recPub = this->node->Advertise<msgs::Int>(this->GetTopic(), 30);      
+  this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);      
   this->entity = this->world->GetEntity(this->parentName);
 }
 
@@ -86,12 +91,42 @@ void WirelessReceiver::Init()
 //////////////////////////////////////////////////
 void WirelessReceiver::UpdateImpl(bool /*_force*/)
 {
-  if (this->recPub)                                                           
+  if (this->pub)                                                           
   {                                                                             
-    msgs::Int msg;                                                              
-    msg.set_data(3);                                                            
+    msgs::WirelessNodes msg;
+
+    Sensor_V sensors = SensorManager::Instance()->GetSensors();
+    for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
+    {
+      if ((*it)->GetType() == "wirelessTransmitter")
+      {
+        std::string id;
+        double freq;
+        math::Pose pos;
+
+        id = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetESSID();
+        freq = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetFreq();
+        pos = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetPose();
+
+        msgs::WirelessNode *wireless_node = msg.add_node();
+        wireless_node->set_essid(id);
+        wireless_node->set_frequency(freq);
+
+        math::Pose my_pos = entity->GetWorldPose();
+        double distance = my_pos.pos.Distance(pos.pos);
+        
+        if (distance > 0.0)
+        {
+          wireless_node->set_signal_level(1.0 / (distance));
+        }
+        else
+        {
+          wireless_node->set_signal_level(0.0);
+        }
+      }
+    }
                                                                                 
-    this->recPub->Publish(msg);                                               
+    this->pub->Publish(msg);                                               
   }
 }
 

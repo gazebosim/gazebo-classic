@@ -71,7 +71,7 @@ namespace gazebo
       /// \brief Parent entity
       private: physics::EntityPtr entity;
 
-      private: transport::PublisherPtr recPub;
+      private: transport::PublisherPtr pub;
     };
     /// \}
   }

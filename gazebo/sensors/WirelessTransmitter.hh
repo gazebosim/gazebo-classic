@@ -47,9 +47,6 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~WirelessTransmitter();
 
-      // Documentation inherited                                                
-      public: virtual std::string GetTopic() const;
-
       // Documentation inherited
       public: virtual void Load(const std::string & _worldName);
 
@@ -64,13 +61,21 @@ namespace gazebo
 
       /// \brief Returns pose of transmitter in world coordinate.
       /// \return Pose of object.
-      public: math::Pose GetTransmitterPose() const
+      public: math::Pose GetPose() const
               {return entity->GetWorldPose();}
+
+      public: double GetFreq();
+
+      public: std::string GetESSID();
 
       /// \brief Pointer the entity that has the transmitter.
       private: physics::EntityPtr entity;
 
-      private: transport::PublisherPtr transPub;
+      private: double freq;
+
+      private: double signalLevel;
+
+      private: std::string essid;
     };
     /// \}
   }

@@ -1,0 +1,14 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Contacts
+/// \brief Contacts from collision detection
+
+
+import "wireless_node.proto";
+
+message WirelessNodes
+{
+  repeated WirelessNode node = 1;
+}
+

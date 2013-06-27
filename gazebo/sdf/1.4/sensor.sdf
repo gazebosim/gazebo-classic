@@ -37,5 +37,6 @@
   <include filename="rfid.sdf" required="0"/>
   <include filename="rfidtag.sdf" required="0"/>
   <include filename="imu.sdf" required="0"/>
+  <include filename="transmitter.sdf" required="0"/>
 
 </element> <!-- End Sensor -->
