@@ -1818,7 +1818,6 @@ void World::ProcessMessages()
         }
         if (this->posePub && this->posePub->HasConnections())
           this->posePub->Publish(msg);
-        this->publishModelPoses.clear();
       }
 
       if (this->poseLocalPub && this->poseLocalPub->HasConnections())
@@ -1828,6 +1827,7 @@ void World::ProcessMessages()
         this->poseLocalPub->Publish(msg);
       }
     }
+    this->publishModelPoses.clear();
   }
 
   if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
