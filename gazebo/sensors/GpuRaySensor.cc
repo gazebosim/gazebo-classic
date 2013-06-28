@@ -103,7 +103,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
   if (rayElem->HasElement("noise"))
   {
     sdf::ElementPtr noiseElem = rayElem->GetElement("noise");
-    std::string type = noiseElem->Get<string>("type");
+    std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {
       this->noiseType = GAUSSIAN;
@@ -144,7 +144,7 @@ void GpuRaySensor::Init()
       this->scene = rendering::create_scene(worldName, false);
 
     this->laserCam = this->scene->CreateGpuLaser(
-        this->sdf->Get<string>("name"), false);
+        this->sdf->Get<std::string>("name"), false);
 
     if (!this->laserCam)
     {

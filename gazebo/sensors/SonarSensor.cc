@@ -75,9 +75,9 @@ void SonarSensor::Load(const std::string &_worldName)
     return;
   }
 
-  this->rangeMin = sonarElem->GetValueDouble("min");
-  this->rangeMax = sonarElem->GetValueDouble("max");
-  this->radius = sonarElem->GetValueDouble("radius");
+  this->rangeMin = sonarElem->Get<double>("min");
+  this->rangeMax = sonarElem->Get<double>("max");
+  this->radius = sonarElem->Get<double>("radius");
   double range = this->rangeMax - this->rangeMin;
 
   if (this->radius < 0)

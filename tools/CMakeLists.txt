@@ -28,7 +28,7 @@ set (test_sources
 gz_build_tests(${test_sources})
 
 add_executable(gzsdf gzsdf.cc)
-target_link_libraries(gzsdf ${tinyxml_libraries} ${SDF_LIBRARIES})
+target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_common)
 gz_install_executable(gzsdf)
 
 add_executable(gztopic gztopic.cc)

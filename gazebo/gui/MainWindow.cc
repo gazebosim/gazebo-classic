@@ -1310,13 +1310,6 @@ void MainWindow::OnPlayActionChanged()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::OnFinishBuilding()
-{
-  g_editBuildingAct->setChecked(!g_editBuildingAct->isChecked());
-  this->OnEditBuilding();
-}
-
-/////////////////////////////////////////////////
 void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 {
   _item->setExpanded(!_item->isExpanded());

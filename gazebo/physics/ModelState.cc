@@ -160,8 +160,8 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 
     while (childElem)
     {
-      this->linkStates.insert(std::make_pair(childElem->Get<std:string>("name"),
-            LinkState(childElem)));
+      this->linkStates.insert(std::make_pair(
+            childElem->Get<std::string>("name"), LinkState(childElem)));
       childElem = childElem->GetNextElement("link");
     }
   }

@@ -26,11 +26,12 @@
 #include <iostream>
 #include <fstream>
 
-// Remove the gazebo_confif and ifdefs in Gazebo 1.8
+// Remove the gazebo_config and ifdefs in Gazebo 1.8
 #include "gazebo/gazebo_config.h"
 #ifdef HAVE_SDF
 #include "sdf/sdf.hh"
 #endif
+
 
 #include "gazebo/math/Helpers.hh"
 

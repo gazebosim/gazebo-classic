@@ -51,7 +51,7 @@ void Road::Init()
   msgs::Road msg;
   msg.set_name(this->GetName());
 
-  this->width = _elem->Get<double>("width");
+  this->width = this->sdf->Get<double>("width");
   msg.set_width(this->width);
 
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");

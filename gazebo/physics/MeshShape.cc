@@ -20,6 +20,7 @@
  */
 
 #include "gazebo/common/Common.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Exception.hh"
@@ -49,7 +50,7 @@ MeshShape::~MeshShape()
 //////////////////////////////////////////////////
 void MeshShape::Init()
 {
-  std::string meshStr = this->sdf->GetValueString("uri");
+  std::string meshStr = this->sdf->Get<std::string>("uri");
 
   common::MeshManager *meshManager = common::MeshManager::Instance();
   this->mesh = meshManager->GetMesh(meshStr);

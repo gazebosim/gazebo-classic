@@ -243,6 +243,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
 
   if (!sensor)
   {
+    _elem->PrintValues("  ");
     gzerr << "Unable to create sensor of type[" << type << "]\n";
     return std::string();
   }

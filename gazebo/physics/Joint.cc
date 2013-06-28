@@ -172,7 +172,7 @@ void Joint::LoadImpl(const math::Pose &_pose)
     {
       /// \todo This if statement is a hack to prevent Joints from creating
       /// other sensors. We should make this more generic.
-      if (sensorElem->GetValueString("type") == "force_torque")
+      if (sensorElem->Get<std::string>("type") == "force_torque")
       {
         std::string sensorName =
           sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
@@ -181,7 +181,7 @@ void Joint::LoadImpl(const math::Pose &_pose)
       }
       else
         gzerr << "A joint cannot load a [" <<
-          sensorElem->GetValueString("type") << "] sensor.\n";
+          sensorElem->Get<std::string>("type") << "] sensor.\n";
       sensorElem = sensorElem->GetNextElement("sensor");
     }
   }

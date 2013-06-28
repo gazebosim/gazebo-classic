@@ -103,7 +103,7 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
           elem->GetElement("fudge_factor")->Get<double>());
 
     if (elem->HasElement("cfm"))
-        this->SetAttribute("cfm", 0, elem->Get<double>("cfm");
+        this->SetAttribute("cfm", 0, elem->Get<double>("cfm"));
 
     if (elem->HasElement("erp"))
         this->SetAttribute("erp", 0, elem->Get<double>("erp"));

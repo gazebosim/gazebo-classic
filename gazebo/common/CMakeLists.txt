@@ -119,7 +119,7 @@ target_link_libraries(gazebo_common
   pthread
 )
 
-# Remove this conditional in Gazebo 1.8. Only leave ${SDF_LIBRARIES} in tact.
+# Remove this conditional in Gazebo 1.10. Only leave ${SDF_LIBRARIES} in tact.
 if (HAVE_SDF)
   target_link_libraries(gazebo_common ${SDF_LIBRARIES})
 endif()

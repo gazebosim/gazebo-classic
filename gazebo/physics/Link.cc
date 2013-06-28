@@ -160,12 +160,12 @@ void Link::Load(sdf::ElementPtr _sdf)
     {
       /// \todo This if statement is a hack to prevent Links from creating
       /// a force torque sensor. We should make this more generic.
-      if (sensorElem->GetValueString("type") == "force_torque")
+      if (sensorElem->Get<std::string>("type") == "force_torque")
       {
         gzerr << "A link cannot load a [" <<
-          sensorElem->GetValueString("type") << "] sensor.\n";
+          sensorElem->Get<std::string>("type") << "] sensor.\n";
       }
-      else
+      else if (sensorElem->Get<std::string>("type") != "__default__")
       {
         std::string sensorName =
           sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
