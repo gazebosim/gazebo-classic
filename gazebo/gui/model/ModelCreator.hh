@@ -43,6 +43,23 @@ namespace gazebo
     /// \brief Create and manage 3D visuals of a building.
     class ModelCreator : public EntityMaker
     {
+
+      /// \enum Joint types
+      /// \brief Unique identifiers for joint types that can be created.
+      public: enum PartType
+      {
+        /// \brief none
+        PART_NONE,
+        /// \brief Box
+        PART_BOX,
+        /// \brief Sphere
+        PART_SPHERE,
+        /// \brief Cylinder
+        PART_CYLINDER,
+        /// \brief Cylinder
+        PART_CUSTOM
+      };
+
       /// \brief Constructor
       public: ModelCreator();
 
@@ -57,12 +74,26 @@ namespace gazebo
        public: void FinishModel();
 
       /// \brief Add a box to the model.
-      /// \param[in] _size Size of the building part.
+      /// \param[in] _size Size of the box.
       /// \param[in] _pose Pose of the box.
       /// \return Name of the box that has been added.
       public: std::string AddBox(
           const math::Vector3 &_size = math::Vector3::One,
           const math::Pose &_pose = math::Pose::Zero);
+
+      /// \brief Add a sphere to the model.
+      /// \param[in] _size Size of the sphere.
+      /// \param[in] _pose Pose of the sphere.
+      /// \return Name of the sphere that has been added.
+      public: std::string AddSphere(double _radius = 0.5,
+          const math::Pose &_pose = math::Pose::Zero);
+
+      /// \brief Add a cylinder to the model.
+      /// \param[in] _size Size of the cylinder.
+      /// \param[in] _pose Pose of the cylinder.
+      /// \return Name of the cylinder that has been added.
+      public: std::string AddCylinder(double _radius = 0.5,
+          double _length = 1.0, const math::Pose &_pose = math::Pose::Zero);
 
       /// \brief Remove a part from the model.
       /// \param[in] _partName Name of the part to remove
@@ -74,6 +105,20 @@ namespace gazebo
 
       /// \brief Reset the building maker and the SDF.
       public: void Reset();
+
+      /// \brief Create a part
+      /// \param[_type] Type of part to be created
+      public: void CreatePart(PartType _type);
+
+      /// \brief Mouse event filter callback when mouse button is pressed
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMousePressPart(const common::MouseEvent &_event);
+
+      /// \brief Mouse event filter callback when mouse is moved.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMouseMovePart(const common::MouseEvent &_event);
 
       // Documentation inherited
       public: virtual void Start(const rendering::UserCameraPtr _camera);
@@ -125,6 +170,9 @@ namespace gazebo
       /// \brief The root visual of the model.
       private: rendering::VisualPtr modelVisual;
 
+      /// \brief The root visual of the model.
+      private: rendering::VisualPtr mouseVisual;
+
       /// \brief The pose of the building model.
       private: math::Pose modelPose;
 
@@ -145,6 +193,9 @@ namespace gazebo
 
       /// \brief Counter for the number of spheres in the model.
       private: int sphereCounter;
+
+      /// \brief
+      private: PartType createPartType;
 
       /// \brief A map of model part names to and their visuals.
       private: std::map<std::string, rendering::VisualPtr> allParts;

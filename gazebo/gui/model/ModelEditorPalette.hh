@@ -55,19 +55,17 @@ namespace gazebo
       /// \brief Destructor
       public: ~ModelEditorPalette();
 
-      /// \brief Create a joint
-      /// \param[_type] Type of joint to be created
-      public: void CreateJoint(JointMaker::JointType _type);
-
-      /// \brief Mouse event filter callback when mouse button is pressed.
+      /// \brief Mouse event filter callback when mouse button is pressed in
+      /// create part mode.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMousePress(const common::MouseEvent &_event);
+      private: bool OnMousePressPart(const common::MouseEvent &_event);
 
-      /// \brief Mouse event filter callback when mouse is moved.
+      /// \brief Mouse event filter callback when mouse is moved in create
+      /// part mode.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMouseMove(const common::MouseEvent &_event);
+      private: bool OnMouseMovePart(const common::MouseEvent &_event);
 
       /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *_item, int _column);
@@ -111,17 +109,6 @@ namespace gazebo
       /// \brief Plugin item
       private: QTreeWidgetItem *pluginItem;
 
-      /// \brief Keep track of joint type that
-      private: JointMaker::JointType createJointType;
-
-//      private: rendering::UserCameraPtr userCamera;
-
-      /// \brief Visual that is currently hovered over by the mouse
-      private: rendering::VisualPtr hoverVis;
-
-      /// \brief Currently selected visual
-      private: rendering::VisualPtr selectedVis;
-
       /// \brief Visual line used to represent joint connecting parent and child
       // private: rendering::DynamicLines *jointLine;
 //      private: rendering::VisualPtr jointLine;
@@ -133,6 +120,8 @@ namespace gazebo
       /// \brief Model creator.
       private: ModelCreator *modelCreator;
 
+      /// \brief Joint maker.
+      private: JointMaker *jointMaker;
 //      private: std::vector<rendering::VisualPtr> jointLines;
 //      private: std::vector<rendering::DynamicLines *> jointLines;
 

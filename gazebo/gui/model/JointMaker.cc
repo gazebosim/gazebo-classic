@@ -15,30 +15,33 @@
  *
 */
 
+#include "gazebo/common/MouseEvent.hh"
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/UserCamera.hh"
+
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/MouseEventHandler.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-JointMaker::JointMaker(const std::string &_name,
-    rendering::VisualPtr _vis)
-: rendering::Visual(_name, _vis)
+JointMaker::JointMaker()
 {
-  this->jointLine =
-      this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  this->jointLine->AddPoint(math::Vector3(0, 0, 0));
-  this->jointLine->AddPoint(math::Vector3(0, 0, 0.01));
 }
 
 /////////////////////////////////////////////////
 JointMaker::~JointMaker()
 {
   delete this->jointLine;
+  this->hoverVis.reset();
 }
-
+/*
 /////////////////////////////////////////////////
 void JointMaker::SetParent(rendering::VisualPtr _parent,
     math::Vector3 _offset)
@@ -73,4 +76,149 @@ void JointMaker::SetChild(rendering::VisualPtr _child,
     parentPos = this->parent->GetWorldPose().pos;
   this->jointLine->SetPoint(0,
       _child->GetWorldPose().pos - parentPos + _offset);
+}*/
+
+/////////////////////////////////////////////////
+bool JointMaker::OnMousePress(const common::MouseEvent &_event)
+{
+  if (_event.button != common::MouseEvent::LEFT)
+    return false;
+
+  // Get the active camera and scene.
+  rendering::UserCameraPtr camera = gui::get_active_camera();
+  rendering::ScenePtr scene = camera->GetScene();
+
+  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  if (vis)
+    vis = vis->GetRootVisual();
+
+  if (this->hoverVis)
+  {
+    if (!this->selectedVis)
+    {
+      this->selectedVis = this->hoverVis;
+      this->hoverVis.reset();
+
+//      JointMaker *jointVis = new JointMaker(
+//          this->selectedVis->GetName() + " _JointMaker::JOINTCREATOR_VISUAL_",
+//          this->selectedVis);
+      rendering::VisualPtr joint(
+          new rendering::Visual(this->selectedVis->GetName() +
+          "_JointMaker::JOINTCREATOR_VISUAL_", this->selectedVis));
+      this->jointVis = joint;
+      this->jointVis->Load();
+      this->parent = this->selectedVis;
+      this->jointLine =
+          jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+      this->jointLine->AddPoint(math::Vector3(0, 0, 0));
+      this->jointLine->AddPoint(math::Vector3(0, 0, 1.01));
+
+//      this->jointLine = jointVis;
+//      this->jointLines.push_back(jointLine);
+    }
+    else if (this->selectedVis != vis)
+    {
+      this->jointLine = NULL;
+      if (this->hoverVis)
+        this->hoverVis->SetHighlighted(false);
+      if (this->selectedVis)
+        this->selectedVis->SetHighlighted(false);
+      // create the joint by publishing to server!?
+
+      this->selectedVis.reset();
+      this->hoverVis.reset();
+      this->jointVis.reset();
+      this->parent.reset();
+      this->CreateJoint(JointMaker::JOINT_NONE);
+    }
+  }
+
+  return true;
+}
+
+
+/////////////////////////////////////////////////
+void JointMaker::CreateJoint(JointMaker::JointType _type)
+{
+  this->createJointType = _type;
+  if (_type != JointMaker::JOINT_NONE)
+  {
+    // Add an event filter, which allows the TerrainEditor to capture
+    // mouse events.
+    MouseEventHandler::Instance()->AddPressFilter("model_joint",
+        boost::bind(&JointMaker::OnMousePress, this, _1));
+
+    MouseEventHandler::Instance()->AddMoveFilter("model_joint",
+        boost::bind(&JointMaker::OnMouseMove, this, _1));
+  }
+  else
+  {
+    // Remove the event filters.
+    MouseEventHandler::Instance()->RemovePressFilter("model_joint");
+    MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
+  }
+}
+
+
+/////////////////////////////////////////////////
+bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
+{
+  if (_event.button != common::MouseEvent::LEFT)
+    return false;
+
+  // Get the active camera and scene.
+  rendering::UserCameraPtr camera = gui::get_active_camera();
+  rendering::ScenePtr scene = camera->GetScene();
+
+  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+//  if (!this->hoverVis || this->hoverVis != this->selectedVis)
+  {
+//    if (vis)
+//      vis = vis->GetRootVisual();
+
+    // Highlight visual on hover
+    if (vis)
+    {
+      if (this->hoverVis && this->hoverVis != this->selectedVis)
+        this->hoverVis->SetHighlighted(false);
+
+      this->hoverVis = vis;
+      if (!this->hoverVis->IsPlane())
+      {
+        this->hoverVis->SetHighlighted(true);
+  //      event::Events::setSelectedEntity(vis->GetName(), "normal");
+      }
+    }
+
+    // Case when a parent part is already selected and currently
+    // extending the joint line to a child part
+    if (this->selectedVis && this->hoverVis && this->jointLine)
+    {
+      math::Vector3 parentPos;
+      if (!this->hoverVis->IsPlane())
+      {
+//        this->jointLine->SetChild(this->hoverVis->GetWorldPose().pos -
+//            this->selectedVis->GetWorldPose().pos);
+//        this->jointLine->SetChild(this->hoverVis);
+        if (this->parent)
+          parentPos = this->parent->GetWorldPose().pos;
+        this->jointLine->SetPoint(1,
+            this->hoverVis->GetWorldPose().pos - parentPos);
+      }
+      else
+      {
+        math::Vector3 pt;
+        camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
+            math::Plane(math::Vector3(0, 0, 1)), pt);
+
+//        this->jointLine->SetChild(this->hoverVis, pt);
+        if (this->parent)
+          parentPos = this->parent->GetWorldPose().pos;
+        this->jointLine->SetPoint(1,
+            this->hoverVis->GetWorldPose().pos - parentPos + pt);
+      }
+    }
+  }
+
+  return true;
 }

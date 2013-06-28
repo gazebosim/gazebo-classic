@@ -164,13 +164,14 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->modelTreeWidget->setItemWidget(modelChildItem, 0, modelWidget);
   modelChildItem->setExpanded(true);
 
-  //
+  // plugin
   this->pluginItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("Plugin")));
     this->modelTreeWidget->addTopLevelItem(this->pluginItem);
 
-//  this->modelCreator = new ModelCreator();
+  this->modelCreator = new ModelCreator();
+  this->jointMaker = new JointMaker();
 
   mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
@@ -182,7 +183,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
-  this->hoverVis.reset();
 }
 
 /////////////////////////////////////////////////
@@ -214,175 +214,61 @@ void ModelEditorPalette::OnModelSelection(QTreeWidgetItem *_item,
 void ModelEditorPalette::OnCylinder()
 {
 //  gui::Events::createEntity("cylinder", "");
+  this->modelCreator->CreatePart(ModelCreator::PART_CYLINDER);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSphere()
 {
 //  gui::Events::createEntity("sphere", "");
+  this->modelCreator->CreatePart(ModelCreator::PART_SPHERE);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnBox()
 {
 //  gui::Events::createEntity("box", "");
-//  this->modelCreator->AddBox();
+  this->modelCreator->CreatePart(ModelCreator::PART_BOX);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnFixedJoint()
 {
-  this->CreateJoint(JointMaker::JOINT_FIXED);
+//  this->CreateJoint(JointMaker::JOINT_FIXED);
+  this->jointMaker->CreateJoint(JointMaker::JOINT_FIXED);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnRevoluteJoint()
 {
-  this->CreateJoint(JointMaker::JOINT_REVOLUTE);
+//  this->CreateJoint(JointMaker::JOINT_REVOLUTE);
+  this->jointMaker->CreateJoint(JointMaker::JOINT_REVOLUTE);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSliderJoint()
 {
-  this->CreateJoint(JointMaker::JOINT_SLIDER);
+//  this->CreateJoint(JointMaker::JOINT_SLIDER);
+  this->jointMaker->CreateJoint(JointMaker::JOINT_SLIDER);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnHingeJoint()
 {
-  this->CreateJoint(JointMaker::JOINT_HINGE);
+//  this->CreateJoint(JointMaker::JOINT_HINGE);
+  this->jointMaker->CreateJoint(JointMaker::JOINT_HINGE);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnScrewJoint()
 {
-  this->CreateJoint(JointMaker::JOINT_SCREW);
+//  this->CreateJoint(JointMaker::JOINT_SCREW);
+  this->jointMaker->CreateJoint(JointMaker::JOINT_SCREW);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnUniversalJoint()
 {
-  this->CreateJoint(JointMaker::JOINT_UNIVERSAL);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::CreateJoint(JointMaker::JointType _type)
-{
-  this->createJointType = _type;
-  if (_type != JointMaker::JOINT_NONE)
-  {
-    // Add an event filter, which allows the TerrainEditor to capture
-    // mouse events.
-    MouseEventHandler::Instance()->AddPressFilter("model_joint",
-        boost::bind(&ModelEditorPalette::OnMousePress, this, _1));
-
-    MouseEventHandler::Instance()->AddMoveFilter("model_joint",
-        boost::bind(&ModelEditorPalette::OnMouseMove, this, _1));
-  }
-  else
-  {
-    // Remove the event filters.
-    MouseEventHandler::Instance()->RemovePressFilter("model_joint");
-    MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
-  }
-}
-
-/////////////////////////////////////////////////
-bool ModelEditorPalette::OnMousePress(const common::MouseEvent &_event)
-{
-  if (_event.button != common::MouseEvent::LEFT)
-    return false;
-
-  // Get the active camera and scene.
-  rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::ScenePtr scene = camera->GetScene();
-
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
-  if (vis)
-    vis = vis->GetRootVisual();
-
-  gzerr << " mouse press" << std::endl;
-
-  if (this->hoverVis)
-  {
-    if (!this->selectedVis)
-    {
-      this->selectedVis = this->hoverVis;
-      this->hoverVis.reset();
-
-      JointMaker *jointVis = new JointMaker(
-          this->selectedVis->GetName() + " _JointMaker::JOINTCREATOR_VISUAL_",
-          this->selectedVis);
-      this->jointLine = jointVis;
-      this->jointLines.push_back(jointLine);
-    }
-    else if (this->selectedVis != vis)
-    {
-      this->jointLine = NULL;
-      if (this->hoverVis)
-        this->hoverVis->SetHighlighted(false);
-      if (this->selectedVis)
-        this->selectedVis->SetHighlighted(false);
-      // create the joint by publishing to server!?
-
-      this->CreateJoint(JointMaker::JOINT_NONE);
-    }
-  }
-
-  return true;
-}
-
-
-/////////////////////////////////////////////////
-bool ModelEditorPalette::OnMouseMove(const common::MouseEvent &_event)
-{
-  if (_event.button != common::MouseEvent::LEFT)
-    return false;
-
-  // Get the active camera and scene.
-  rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::ScenePtr scene = camera->GetScene();
-
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
-//  if (!this->hoverVis || this->hoverVis != this->selectedVis)
-  {
-    if (vis)
-      vis = vis->GetRootVisual();
-
-    // Highlight visual on hover
-    if (vis)
-    {
-      if (this->hoverVis && this->hoverVis != this->selectedVis)
-        this->hoverVis->SetHighlighted(false);
-
-      this->hoverVis = vis;
-      if (!this->hoverVis->IsPlane())
-      {
-        this->hoverVis->SetHighlighted(true);
-  //      event::Events::setSelectedEntity(vis->GetName(), "normal");
-      }
-    }
-
-    // Case when a parent part is already selected and currently
-    // extending the joint line to a child part
-    if (this->selectedVis && this->hoverVis && this->jointLine)
-    {
-      if (!this->hoverVis->IsPlane())
-      {
-//        this->jointLine->SetChild(this->hoverVis->GetWorldPose().pos -
-//            this->selectedVis->GetWorldPose().pos);
-        this->jointLine->SetChild(this->hoverVis);
-      }
-      else
-      {
-        math::Vector3 pt;
-        camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
-            math::Plane(math::Vector3(0, 0, 1)), pt);
-
-        this->jointLine->SetChild(this->hoverVis, pt);
-      }
-    }
-  }
-
-  return true;
+//  this->CreateJoint(JointMaker::JOINT_UNIVERSAL);
+  this->jointMaker->CreateJoint(JointMaker::JOINT_UNIVERSAL);
 }

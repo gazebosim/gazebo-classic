@@ -29,6 +29,8 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
+#include "gazebo/gui/MouseEventHandler.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
@@ -92,6 +94,9 @@ std::string ModelCreator::CreateModel()
 std::string ModelCreator::AddBox(const math::Vector3 &_size,
     const math::Pose &_pose)
 {
+  if (!this->modelVisual)
+    this->Reset();
+
   std::ostringstream linkNameStream;
   linkNameStream << "Box_" << this->boxCounter++;
   std::string linkName = linkNameStream.str();
@@ -108,15 +113,110 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
       ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+
+  sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
+  geomElem->ClearElements();
+  ((geomElem->AddElement("box"))->AddElement("size"))->Set(_size);
+
   visVisual->Load(visualElem);
-//  math::Vector3 scaledSize = ModelCreator::ConvertSize(_size);
-  visVisual->SetScale(_size);
-  visVisual->SetPose(_pose);
-//  visVisual->SetPosition(math::Vector3(0, 0, _size.z/2.0));
+
+  linkVisual->SetPose(_pose);
+  if (_pose == math::Pose::Zero)
+  {
+    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
+    _pose.pos.z + _size.z/2));
+  }
 
   this->allParts[linkName] = linkVisual;
+  this->mouseVisual = linkVisual;
+  return linkName;
+}
 
-//  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+/////////////////////////////////////////////////
+std::string ModelCreator::AddSphere(double _radius,
+    const math::Pose &_pose)
+{
+  if (!this->modelVisual)
+    this->Reset();
+
+  std::ostringstream linkNameStream;
+  linkNameStream << "Sphere_" << this->sphereCounter++;
+  std::string linkName = linkNameStream.str();
+
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
+        linkName, this->modelVisual));
+  linkVisual->Load();
+
+  std::ostringstream visualName;
+  visualName << this->modelName << "::" << linkName << "::Visual";
+  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+        linkVisual));
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+
+  sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
+  geomElem->ClearElements();
+  ((geomElem->AddElement("sphere"))->GetElement("radius"))->Set(_radius);
+
+  visVisual->Load(visualElem);
+
+  linkVisual->SetPose(_pose);
+  if (_pose == math::Pose::Zero)
+  {
+    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
+    _pose.pos.z + _radius));
+  }
+
+  this->allParts[linkName] = linkVisual;
+  this->mouseVisual = linkVisual;
+
+  return linkName;
+}
+
+/////////////////////////////////////////////////
+std::string ModelCreator::AddCylinder(double _radius, double _length,
+    const math::Pose &_pose)
+{
+  if (!this->modelVisual)
+    this->Reset();
+
+  std::ostringstream linkNameStream;
+  linkNameStream << "Cylinder_" << this->cylinderCounter++;
+  std::string linkName = linkNameStream.str();
+
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
+        linkName, this->modelVisual));
+  linkVisual->Load();
+
+  std::ostringstream visualName;
+  visualName << this->modelName << "::" << linkName << "::Visual";
+  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+        linkVisual));
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+
+  sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
+  geomElem->ClearElements();
+  sdf::ElementPtr cylinderElem = geomElem->AddElement("cylinder");
+  (cylinderElem->GetElement("radius"))->Set(_radius);
+  (cylinderElem->GetElement("length"))->Set(_length);
+
+  visVisual->Load(visualElem);
+
+  linkVisual->SetPose(_pose);
+  if (_pose == math::Pose::Zero)
+  {
+    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
+    _pose.pos.z + _length/2));
+  }
+
+  this->allParts[linkName] = linkVisual;
+  this->mouseVisual = linkVisual;
+
   return linkName;
 }
 
@@ -124,6 +224,9 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
 /////////////////////////////////////////////////
 void ModelCreator::RemovePart(const std::string &_partName)
 {
+  if (!this->modelVisual)
+    this->Reset();
+
   rendering::VisualPtr vis = this->allParts[_partName];
   if (!vis)
   {
@@ -152,7 +255,10 @@ void ModelCreator::Stop()
 /////////////////////////////////////////////////
 void ModelCreator::Reset()
 {
-  gzerr << " reset model visual " << std::endl;
+  this->saved = false;
+  this->saveLocation = QDir::homePath().toStdString();
+  this->modelName = "default_model";
+
   if (!gui::get_active_camera() ||
       !gui::get_active_camera()->GetScene())
     return;
@@ -162,20 +268,13 @@ void ModelCreator::Reset()
   if (this->modelVisual)
     scene->RemoveVisual(this->modelVisual);
 
-  this->saved = false;
-  this->saveLocation = QDir::homePath().toStdString();
-  this->modelName = "default_model";
-
   this->modelVisual.reset(new rendering::Visual(this->modelName,
       scene->GetWorldVisual()));
 
   this->modelVisual->Load();
   this->modelPose = math::Pose::Zero;
   this->modelVisual->SetPose(this->modelPose);
-//  this->modelVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
   scene->AddVisual(this->modelVisual);
-
-  gzerr << " create model visual " << std::endl;
 
   while (this->allParts.size() > 0)
   {
@@ -239,13 +338,6 @@ std::string ModelCreator::GetTemplateSDFString()
     << "<model name='template_model'>"
     << "<pose>0 0 0.0 0 0 0</pose>"
     << "<link name ='link'>"
-    <<   "<collision name ='collision'>"
-    <<     "<geometry>"
-    <<       "<box>"
-    <<         "<size>1.0 1.0 1.0</size>"
-    <<       "</box>"
-    <<     "</geometry>"
-    <<   "</collision>"
     <<   "<visual name ='visual'>"
     <<     "<pose>0 0 0.0 0 0 0</pose>"
     <<     "<geometry>"
@@ -266,6 +358,112 @@ std::string ModelCreator::GetTemplateSDFString()
     << "</sdf>";
 
   return newModelStr.str();
+}
+
+
+/////////////////////////////////////////////////
+void ModelCreator::CreatePart(PartType _type)
+{
+  this->createPartType = _type;
+  if (_type != PART_NONE)
+  {
+    // Add an event filter, which allows the TerrainEditor to capture
+    // mouse events.
+    MouseEventHandler::Instance()->AddPressFilter("model_part",
+        boost::bind(&ModelCreator::OnMousePressPart, this, _1));
+
+    MouseEventHandler::Instance()->AddMoveFilter("model_part",
+        boost::bind(&ModelCreator::OnMouseMovePart, this, _1));
+
+    switch (_type)
+    {
+      case PART_BOX:
+      {
+        this->AddBox();
+        break;
+      }
+      case PART_SPHERE:
+      {
+        this->AddSphere();
+        break;
+      }
+      case PART_CYLINDER:
+      {
+        this->AddCylinder();
+        break;
+      }
+      default:
+        break;
+    }
+  }
+  else
+  {
+    // Remove the event filters.
+    MouseEventHandler::Instance()->RemovePressFilter("model_part");
+    MouseEventHandler::Instance()->RemoveMoveFilter("model_part");
+  }
+}
+
+
+/////////////////////////////////////////////////
+bool ModelCreator::OnMousePressPart(const common::MouseEvent &_event)
+{
+  if (_event.button != common::MouseEvent::LEFT)
+    return false;
+
+  this->mouseVisual.reset();
+  this->CreatePart(PART_NONE);
+  return true;
+
+}
+
+/////////////////////////////////////////////////
+bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
+{
+  if (!this->mouseVisual)
+    return false;
+
+  if (!gui::get_active_camera())
+    return false;
+
+  math::Pose pose = this->mouseVisual->GetWorldPose();
+
+  math::Vector3 origin1, dir1, p1;
+  math::Vector3 origin2, dir2, p2;
+
+
+  // Cast two rays from the camera into the world
+  gui::get_active_camera()->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
+      origin1, dir1);
+
+  // Compute the distance from the camera to plane of translation
+  math::Plane plane(math::Vector3(0, 0, 1), 0);
+
+  double dist1 = plane.Distance(origin1, dir1);
+
+  // Compute two points on the plane. The first point is the current
+  // mouse position, the second is the previous mouse position
+  p1 = origin1 + dir1 * dist1;
+  pose.pos = p1;
+
+  if (!_event.shift)
+  {
+    if (ceil(pose.pos.x) - pose.pos.x <= .4)
+      pose.pos.x = ceil(pose.pos.x);
+    else if (pose.pos.x - floor(pose.pos.x) <= .4)
+      pose.pos.x = floor(pose.pos.x);
+
+    if (ceil(pose.pos.y) - pose.pos.y <= .4)
+      pose.pos.y = ceil(pose.pos.y);
+    else if (pose.pos.y - floor(pose.pos.y) <= .4)
+      pose.pos.y = floor(pose.pos.y);
+
+  }
+  pose.pos.z = this->mouseVisual->GetWorldPose().pos.z;
+
+  this->mouseVisual->SetWorldPose(pose);
+
+  return true;
 }
 
 /*

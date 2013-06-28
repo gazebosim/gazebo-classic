@@ -128,7 +128,6 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 
   this->setLayout(mainLayout);
 
-
   this->connections.push_back(
       gui::editor::Events::ConnectSaveBuildingModel(
       boost::bind(&BuildingEditorPalette::OnSaveModel, this, _1, _2)));

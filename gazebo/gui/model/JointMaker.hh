@@ -19,13 +19,8 @@
 #define _JOINTMAKER_HH_
 
 #include <string>
-#include "gazebo/rendering/Visual.hh"
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-
-namespace ogre
-{
-  class SceneNode;
-}
 
 namespace gazebo
 {
@@ -36,7 +31,7 @@ namespace gazebo
 
     /// \class JointMaker JointMaker.hh
     /// \brief Joint visualization
-    class JointMaker : public rendering::Visual
+    class JointMaker
     {
       /// \enum Joint types
       /// \brief Unique identifiers for joint types that can be created.
@@ -61,13 +56,28 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _name Name of the joint visual
       /// \param[in] _vis Pointer to the parent visual
-      public: JointMaker(const std::string &_name,
-          rendering::VisualPtr _vis);
+      public: JointMaker();
 
       /// \brief Destructor
       public: virtual ~JointMaker();
 
-      /// \brief Set parent of joint.
+      /// \brief Create a joint
+      /// \param[_type] Type of joint to be created
+      public: void CreateJoint(JointType _type);
+
+      /// \brief Mouse event filter callback when mouse button is pressed in
+      /// create joint mode.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMousePress(const common::MouseEvent &_event);
+
+      /// \brief Mouse event filter callback when mouse is moved in create
+      /// joint mode.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMouseMove(const common::MouseEvent &_event);
+
+/*      /// \brief Set parent of joint.
       /// \param[in] _parent Pointer to parent visual.
       /// \param[in] _offset Offset relative to parent origin where the joint
       /// is to be attached to.
@@ -79,10 +89,27 @@ namespace gazebo
       /// \param[in] _offset Offset relative to child origin where the joint
       /// is to be attached to.
       public: void SetChild(rendering::VisualPtr _child,
-          math::Vector3 _offset = math::Vector3::Zero);
+          math::Vector3 _offset = math::Vector3::Zero);*/
 
       /// \brief Visual line used to represent joint connecting parent and child
       private: rendering::DynamicLines *jointLine;
+
+      /// \brief Keep track of joint type that
+      private: JointMaker::JointType createJointType;
+
+//      private: rendering::UserCameraPtr userCamera;
+
+      /// \brief Visual that is currently hovered over by the mouse
+      private: rendering::VisualPtr hoverVis;
+
+      /// \brief Currently selected visual
+      private: rendering::VisualPtr selectedVis;
+
+      /// \brief Visual that is currently being drawn
+      private: rendering::VisualPtr jointVis;
+
+      /// \brief Currently selected visual
+      private: rendering::VisualPtr parent;
     };
     /// \}
   }
