@@ -23,18 +23,21 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/MouseEvent.hh"
+
+#include "gazebo/gui/model/JointMaker.hh"
+#include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
   namespace rendering
   {
-    // class Heightmap;
   }
 
   namespace gui
   {
     class JointMaker;
+    class ModelCreator;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -45,26 +48,6 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \enum Joint types
-      /// \brief Unique identifiers for joint types that can be created.
-      public: enum JointType
-      {
-        /// \brief none
-        JOINT_NONE,
-        /// \brief Fixed joint
-        JOINT_FIXED,
-        /// \brief Revolute joint
-        JOINT_REVOLUTE,
-        /// \brief Slider joint
-        JOINT_SLIDER,
-        /// \brief Hinge joint
-        JOINT_HINGE,
-        /// \brief Screw joint
-        JOINT_SCREW,
-        /// \brief Universal joint
-        JOINT_UNIVERSAL
-      };
-
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
       public: ModelEditorPalette(QWidget *_parent = 0);
@@ -74,7 +57,7 @@ namespace gazebo
 
       /// \brief Create a joint
       /// \param[_type] Type of joint to be created
-      public: void CreateJoint(JointType _type);
+      public: void CreateJoint(JointMaker::JointType _type);
 
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
@@ -129,7 +112,7 @@ namespace gazebo
       private: QTreeWidgetItem *pluginItem;
 
       /// \brief Keep track of joint type that
-      private: JointType createJointType;
+      private: JointMaker::JointType createJointType;
 
 //      private: rendering::UserCameraPtr userCamera;
 
@@ -146,6 +129,10 @@ namespace gazebo
 
       /// \brief A list of joint visuals.
       private: std::vector<JointMaker *> jointLines;
+
+      /// \brief Model creator.
+      private: ModelCreator *modelCreator;
+
 //      private: std::vector<rendering::VisualPtr> jointLines;
 //      private: std::vector<rendering::DynamicLines *> jointLines;
 

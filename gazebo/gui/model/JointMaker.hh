@@ -38,6 +38,26 @@ namespace gazebo
     /// \brief Joint visualization
     class JointMaker : public rendering::Visual
     {
+      /// \enum Joint types
+      /// \brief Unique identifiers for joint types that can be created.
+      public: enum JointType
+      {
+        /// \brief none
+        JOINT_NONE,
+        /// \brief Fixed joint
+        JOINT_FIXED,
+        /// \brief Revolute joint
+        JOINT_REVOLUTE,
+        /// \brief Slider joint
+        JOINT_SLIDER,
+        /// \brief Hinge joint
+        JOINT_HINGE,
+        /// \brief Screw joint
+        JOINT_SCREW,
+        /// \brief Universal joint
+        JOINT_UNIVERSAL
+      };
+
       /// \brief Constructor
       /// \param[in] _name Name of the joint visual
       /// \param[in] _vis Pointer to the parent visual

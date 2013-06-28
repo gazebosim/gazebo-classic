@@ -1,0 +1,373 @@
+/*
+ * Copyright 2012 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+#include <sstream>
+#include <boost/filesystem.hpp>
+
+#include "gazebo/common/Exception.hh"
+
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Scene.hh"
+
+#include "gazebo/math/Quaternion.hh"
+
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Node.hh"
+
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/EntityMaker.hh"
+
+#include "gazebo/gui/model/ModelCreator.hh"
+
+
+using namespace gazebo;
+using namespace gui;
+
+/////////////////////////////////////////////////
+  ModelCreator::ModelCreator() : EntityMaker()
+{
+  this->modelName = "";
+
+  this->modelTemplateSDF.reset(new sdf::SDF);
+  this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
+
+/*  this->connections.push_back(
+  gui::editor::Events::ConnectSaveBuildingEditor(
+    boost::bind(&ModelCreator::OnSave, this)));
+  this->connections.push_back(
+  gui::editor::Events::ConnectDiscardBuildingEditor(
+    boost::bind(&ModelCreator::OnDiscard, this)));
+  this->connections.push_back(
+  gui::editor::Events::ConnectDoneBuildingEditor(
+    boost::bind(&ModelCreator::OnDone, this)));
+  this->connections.push_back(
+  gui::editor::Events::ConnectExitBuildingEditor(
+    boost::bind(&ModelCreator::OnExit, this)));
+
+  this->saveDialog =
+      new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
+  this->finishDialog =
+      new FinishBuildingDialog(FinishBuildingDialog::MODEL_FINISH, 0);*/
+
+  this->boxCounter = 0;
+  this->cylinderCounter = 0;
+  this->sphereCounter = 0;
+
+  this->Reset();
+}
+
+/////////////////////////////////////////////////
+ModelCreator::~ModelCreator()
+{
+  this->camera.reset();
+/*  if (this->saveDialog)
+    delete this->saveDialog;
+  if (this->finishDialog)
+    delete this->finishDialog;*/
+}
+
+/////////////////////////////////////////////////
+std::string ModelCreator::CreateModel()
+{
+  this->Reset();
+  return this->modelName;
+}
+
+/////////////////////////////////////////////////
+std::string ModelCreator::AddBox(const math::Vector3 &_size,
+    const math::Pose &_pose)
+{
+  std::ostringstream linkNameStream;
+  linkNameStream << "Box_" << this->boxCounter++;
+  std::string linkName = linkNameStream.str();
+
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
+        linkName, this->modelVisual));
+  linkVisual->Load();
+
+  std::ostringstream visualName;
+  visualName << this->modelName << "::" << linkName << "::Visual";
+  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+        linkVisual));
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+  visVisual->Load(visualElem);
+//  math::Vector3 scaledSize = ModelCreator::ConvertSize(_size);
+  visVisual->SetScale(_size);
+  visVisual->SetPose(_pose);
+//  visVisual->SetPosition(math::Vector3(0, 0, _size.z/2.0));
+
+  this->allParts[linkName] = linkVisual;
+
+//  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  return linkName;
+}
+
+
+/////////////////////////////////////////////////
+void ModelCreator::RemovePart(const std::string &_partName)
+{
+  rendering::VisualPtr vis = this->allParts[_partName];
+  if (!vis)
+  {
+    gzerr << _partName << " does not exist\n";
+    return;
+  }
+  rendering::VisualPtr visParent = vis->GetParent();
+  rendering::ScenePtr scene = vis->GetScene();
+  scene->RemoveVisual(vis);
+  if (visParent)
+    scene->RemoveVisual(visParent);
+  this->allParts.erase(_partName);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::Start(const rendering::UserCameraPtr _camera)
+{
+  this->camera = _camera;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::Stop()
+{
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::Reset()
+{
+  gzerr << " reset model visual " << std::endl;
+  if (!gui::get_active_camera() ||
+      !gui::get_active_camera()->GetScene())
+    return;
+
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+
+  if (this->modelVisual)
+    scene->RemoveVisual(this->modelVisual);
+
+  this->saved = false;
+  this->saveLocation = QDir::homePath().toStdString();
+  this->modelName = "default_model";
+
+  this->modelVisual.reset(new rendering::Visual(this->modelName,
+      scene->GetWorldVisual()));
+
+  this->modelVisual->Load();
+  this->modelPose = math::Pose::Zero;
+  this->modelVisual->SetPose(this->modelPose);
+//  this->modelVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  scene->AddVisual(this->modelVisual);
+
+  gzerr << " create model visual " << std::endl;
+
+  while (this->allParts.size() > 0)
+  {
+    this->RemovePart(this->allParts.begin()->first);
+  }
+  this->allParts.clear();
+}
+
+/////////////////////////////////////////////////
+bool ModelCreator::IsActive() const
+{
+  return true;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::SetModelName(const std::string &_modelName)
+{
+  this->modelName = _modelName;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::SaveToSDF(const std::string &_savePath)
+{
+  this->saveLocation = _savePath;
+  std::ofstream savefile;
+  boost::filesystem::path path;
+  path = boost::filesystem::operator/(this->saveLocation,
+      this->modelName + ".sdf");
+  savefile.open(path.string().c_str());
+  savefile << this->modelSDF->ToString();
+  savefile.close();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::FinishModel()
+{
+  this->CreateTheEntity();
+  this->Stop();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::GenerateSDF()
+{
+
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::CreateTheEntity()
+{
+  this->GenerateSDF();
+  msgs::Factory msg;
+  msg.set_sdf(this->modelSDF->ToString());
+  this->makerPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+std::string ModelCreator::GetTemplateSDFString()
+{
+  std::ostringstream newModelStr;
+  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
+    << "<model name='template_model'>"
+    << "<pose>0 0 0.0 0 0 0</pose>"
+    << "<link name ='link'>"
+    <<   "<collision name ='collision'>"
+    <<     "<geometry>"
+    <<       "<box>"
+    <<         "<size>1.0 1.0 1.0</size>"
+    <<       "</box>"
+    <<     "</geometry>"
+    <<   "</collision>"
+    <<   "<visual name ='visual'>"
+    <<     "<pose>0 0 0.0 0 0 0</pose>"
+    <<     "<geometry>"
+    <<       "<box>"
+    <<         "<size>1.0 1.0 1.0</size>"
+    <<       "</box>"
+    <<     "</geometry>"
+    <<     "<material>"
+    <<       "<script>"
+    <<         "<uri>file://media/materials/scripts/gazebo.material</uri>"
+    <<         "<name>Gazebo/Grey</name>"
+    <<       "</script>"
+    <<     "</material>"
+    <<   "</visual>"
+    << "</link>"
+    << "<static>true</static>"
+    << "</model>"
+    << "</sdf>";
+
+  return newModelStr.str();
+}
+
+/*
+/////////////////////////////////////////////////
+void ModelCreator::OnDiscard()
+{
+  int ret = QMessageBox::warning(0, QString("Discard"),
+      QString("Are you sure you want to discard\n"
+      "your model? All of your work will\n"
+      "be lost."),
+      QMessageBox::Discard | QMessageBox::Cancel,
+      QMessageBox::Cancel);
+
+  switch (ret)
+  {
+    case QMessageBox::Discard:
+      gui::editor::Events::discardBuildingModel();
+      this->modelName = this->buildingDefaultName;
+      this->saveLocation = QDir::homePath().toStdString();
+      this->saved = false;
+      break;
+    case QMessageBox::Cancel:
+    // Do nothing
+    break;
+    default:
+    break;
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnSave()
+{
+  if (this->saved)
+  {
+    this->SetModelName(this->modelName);
+    this->GenerateSDF();
+    this->SaveToSDF(this->saveLocation);
+  }
+  else
+  {
+    this->saveDialog->SetModelName(this->modelName);
+    this->saveDialog->SetSaveLocation(this->saveLocation);
+    if (this->saveDialog->exec() == QDialog::Accepted)
+    {
+      this->modelName = this->saveDialog->GetModelName();
+      this->saveLocation = this->saveDialog->GetSaveLocation();
+      this->SetModelName(this->modelName);
+      this->GenerateSDF();
+      this->SaveToSDF(this->saveLocation);
+      this->saved = true;
+    }
+  }
+  gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnDone()
+{
+  this->finishDialog->SetModelName(this->modelName);
+  this->finishDialog->SetSaveLocation(this->saveLocation);
+  if (this->finishDialog->exec() == QDialog::Accepted)
+  {
+    this->modelName = this->finishDialog->GetModelName();
+    this->saveLocation = this->finishDialog->GetSaveLocation();
+    this->SetModelName(this->modelName);
+    this->GenerateSDF();
+    this->SaveToSDF(this->saveLocation);
+    this->FinishModel();
+    gui::editor::Events::discardBuildingModel();
+    gui::editor::Events::finishBuildingModel();
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnExit()
+{
+  int ret = QMessageBox::warning(0, QString("Exit"),
+      QString("Save Changes before exiting? If you do not\n"
+      "save, all of your work will be lost!\n\n"
+      "Note: Building Editor state is not maintained\n"
+      "between Gazebo sessions. Once you quit\n"
+      "Gazebo, your building will no longer be editable.\n\n"),
+//      "If you are done editing your model, select Done\n"),
+      QMessageBox::Discard | QMessageBox::Cancel | QMessageBox::Save,
+      QMessageBox::Save);
+
+  switch (ret)
+  {
+    case QMessageBox::Discard:
+      gui::editor::Events::discardBuildingModel();
+      this->modelName = this->buildingDefaultName;
+      this->saveLocation = QDir::homePath().toStdString();
+      this->saved = false;
+      gui::editor::Events::finishBuildingModel();
+      break;
+    case QMessageBox::Cancel:
+      break;
+    case QMessageBox::Save:
+      this->OnSave();
+      gui::editor::Events::finishBuildingModel();
+      break;
+    default:
+      break;
+  }
+}*/
