@@ -4,6 +4,7 @@ include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
+  ${SDF_INCLUDE_DIRS}
 )
 
 include_directories(

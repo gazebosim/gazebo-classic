@@ -1,5 +1,14 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+# Remove this whole if conditional in Gazebo 1.8
+if (NOT HAVE_SDF)
+  link_directories(
+    ${urdfdom_LIBRARY_DIRS}
+    ${urdfdom_headers_LIBRARY_DIRS}
+    ${console_bridge_LIBRARY_DIRS}
+    )
+endif()
+
 set (msgs
   axis.proto
   boxgeom.proto
@@ -131,17 +140,9 @@ target_link_libraries(gazebo_msgs
   gazebo_common
   gazebo_math
   ${PROTOBUF_LIBRARY}
+  ${SDF_LIBRARIES}
 )
 
-# Remove this whole if conditional in Gazebo 1.8
-if (NOT HAVE_SDF)
-  link_directories(
-    ${urdfdom_LIBRARY_DIRS}
-    ${urdfdom_headers_LIBRARY_DIRS}
-    ${console_bridge_LIBRARY_DIRS}
-    )
-  target_link_libraries(gazebo_msgs gazebo_sdf_interface)
-endif()
 
 add_dependencies(gazebo_msgs gazebomsgs_out)
 

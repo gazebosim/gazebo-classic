@@ -181,18 +181,17 @@ macro (gz_build_tests)
         pthread
         )
     else()
-      add_dependencies(${BINARY_NAME} gazebo_sdf_interface)
       target_link_libraries(${BINARY_NAME}
         libgtest.a
         libgtest_main.a
         gazebo_common
-        gazebo_sdf_interface
         gazebo_math
         gazebo_physics
         gazebo_sensors
         gazebo_rendering
         gazebo_msgs
         gazebo_transport
+        ${SDF_LIBRARIES}
         libgazebo
         pthread
         )
@@ -267,11 +266,9 @@ if (VALID_DISPLAY)
         ${QT_LIBRARIES}
         )
     else()
-      add_dependencies(${BINARY_NAME} gazebo_sdf_interface)
       target_link_libraries(${BINARY_NAME}
         gazebo_gui
         gazebo_common
-        gazebo_sdf_interface
         gazebo_math
         gazebo_physics
         gazebo_sensors
@@ -280,6 +277,7 @@ if (VALID_DISPLAY)
         gazebo_transport
         libgazebo
         pthread
+        ${SDF_LIBRARIES}
         ${QT_QTTEST_LIBRARY}
         ${QT_LIBRARIES}
         )
