@@ -72,7 +72,7 @@ void WirelessReceiver::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);      
+  this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
   this->entity = this->world->GetEntity(this->parentName);
 }
 

@@ -42,11 +42,22 @@ WirelessTransmitter::WirelessTransmitter()
 : Sensor(sensors::OTHER)
 {
   this->active = false;
+  srand((unsigned)time(NULL));
 }
 
 /////////////////////////////////////////////////
 WirelessTransmitter::~WirelessTransmitter()
 {
+}
+
+//////////////////////////////////////////////////                              
+std::string WirelessTransmitter::GetTopic() const                               
+{                                                                               
+  std::string topicName = "~/";                                                 
+  topicName += this->parentName + "/" + this->GetName() + "/receiver";          
+  boost::replace_all(topicName, "::", "/");                                     
+                                                                                
+  return topicName;                                                             
 }
 
 /////////////////////////////////////////////////
@@ -55,6 +66,7 @@ void WirelessTransmitter::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   this->entity = this->world->GetEntity(this->parentName);
+  this->pub = this->node->Advertise<msgs::Pose>(this->GetTopic(), 30);
 
   if (this->sdf->HasElement("transmitter"))
   {
@@ -102,6 +114,26 @@ void WirelessTransmitter::Init()
 //////////////////////////////////////////////////
 void WirelessTransmitter::UpdateImpl(bool /*_force*/)
 {
-
+  if (this->pub)                                                           
+  {                                                                             
+    msgs::Pose msg;
+    msgs::Set(&msg, entity->GetWorldPose());
+                                                                              
+    this->pub->Publish(msg);
+  }
 }
 
+double WirelessTransmitter::GetSignalStrength(const math::Pose _transmitter,
+                                              const math::Pose _receiver)
+{
+  double distance = _transmitter.pos.Distance(_receiver.pos);
+  
+  if (distance > 0.0)
+  {
+    return min(1.0, 1.0 / distance);
+  }
+  else
+  {
+    return 0.0;
+  }
+}
