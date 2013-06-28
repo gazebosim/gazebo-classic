@@ -79,7 +79,8 @@ struct VisualMessageLess {
 
 
 //////////////////////////////////////////////////
-Scene::Scene(const std::string &_name, bool _enableVisualizations)
+Scene::Scene(const std::string &_name, bool _enableVisualizations,
+    bool _isServer)
 {
   this->initialized = false;
   this->showCOMs = false;
@@ -113,7 +114,15 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
 
-  this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
+  if (_isServer)
+    this->poseSub = this->node->Subscribe("~/pose/local/info",
+    &Scene::OnPoseMsg, this);
+  else
+  {
+    this->poseSub = this->node->Subscribe("~/pose/info",
+        &Scene::OnPoseMsg, this);
+  }
+
   this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
   this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
           &Scene::OnSkeletonPoseMsg, this);

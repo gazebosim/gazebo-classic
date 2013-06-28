@@ -214,7 +214,7 @@ class ServerFixture : public testing::Test
                      gazebo::physics::get_world()->GetName()))
                {
                  rendering::create_scene(
-                     gazebo::physics::get_world()->GetName(), false);
+                     gazebo::physics::get_world()->GetName(), false, true);
                }
 
                this->SetPause(_paused);

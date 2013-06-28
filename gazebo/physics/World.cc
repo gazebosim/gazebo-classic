@@ -173,8 +173,16 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
+  // pose pub for server size, mainly used for updating and timestamping
+  // Scene, which in turn will be used by rendering sensors.
+  // TODO: replace local communication with shared memory efficiency
+  this->poseLocalPub = this->node->Advertise<msgs::PosesStamped>(
+    "~/pose/local/info", 10);
+
+  // pose pub for client with a cap on publishing rate to reduce traffic
+  // overhead
   this->posePub = this->node->Advertise<msgs::PosesStamped>(
-    "~/pose/info", 10);
+    "~/pose/info", 10, 60);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
   if (this->sdf->HasElement("gui"))
@@ -1777,13 +1785,13 @@ void World::ProcessMessages()
     boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
     msgs::Pose *poseMsg;
 
-    if (this->posePub && this->posePub->HasConnections())
+
+    if ((this->posePub && this->posePub->HasConnections()) ||
+        (this->poseLocalPub && this->poseLocalPub->HasConnections()))
     {
       msgs::PosesStamped msg;
 
       // Time stamp this PosesStamped message
-      // rendering::Scene depends on this timestamp, which is used by
-      // rendering sensors to time stamp their data
       msgs::Set(msg.mutable_time(), this->GetSimTime());
 
       if (this->publishModelPoses.size() > 0)
@@ -1808,10 +1816,18 @@ void World::ProcessMessages()
             msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
           }
         }
+        if (this->posePub && this->posePub->HasConnections())
+          this->posePub->Publish(msg);
+        this->publishModelPoses.clear();
       }
-      this->posePub->Publish(msg);
+
+      if (this->poseLocalPub && this->poseLocalPub->HasConnections())
+      {
+        // rendering::Scene depends on this timestamp, which is used by
+        // rendering sensors to time stamp their data
+        this->poseLocalPub->Publish(msg);
+      }
     }
-    this->publishModelPoses.clear();
   }
 
   if (common::Time::GetWallTime() - this->prevProcessMsgsTime >

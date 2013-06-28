@@ -99,7 +99,7 @@ void CameraSensor::Init()
     this->scene = rendering::get_scene(worldName);
     if (!this->scene)
     {
-      this->scene = rendering::create_scene(worldName, false);
+      this->scene = rendering::create_scene(worldName, false, true);
 
       // This usually means rendering is not available
       if (!this->scene)

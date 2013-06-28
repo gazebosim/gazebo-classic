@@ -91,7 +91,8 @@ namespace gazebo
       /// this should be set to true for user interfaces, and false for
       /// sensor generation.
       public: Scene(const std::string &_name,
-                    bool _enableVisualizations = false);
+                    bool _enableVisualizations = false,
+                    bool _isServer = false);
 
       /// \brief Destructor
       public: virtual ~Scene();
