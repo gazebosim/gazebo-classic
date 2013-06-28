@@ -46,8 +46,7 @@ void CylinderShape::SetRadius(double _radius)
   this->sdf->GetElement("radius")->Set(_radius);
   if (this->sdf->HasElement("length"))
   {
-    this->SetSize(this->sdf->Get<double>("radius"),
-                  this->sdf->Get<double>("length"));
+    this->SetSize(_radius, this->sdf->Get<double>("length"));
   }
 }
 
@@ -57,8 +56,7 @@ void CylinderShape::SetLength(double _length)
   this->sdf->GetElement("length")->Set(_length);
   if (this->sdf->HasElement("radius"))
   {
-    this->SetSize(this->sdf->Get<double>("radius"),
-                  this->sdf->Get<double>("length"));
+    this->SetSize(this->sdf->Get<double>("radius"), _length);
   }
 }
 
