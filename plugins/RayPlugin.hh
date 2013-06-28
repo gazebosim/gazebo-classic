@@ -42,8 +42,8 @@ namespace gazebo
     public: virtual void OnNewLaserScans();
 
     /// \brief Load the plugin
-    /// \param take in SDF root element
-    public: void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
+    /// \param take in RML root element
+    public: void Load(sensors::SensorPtr _parent, rml::ElementPtr _sdf);
 
     /// \brief Pointer to parent
     protected: physics::WorldPtr world;

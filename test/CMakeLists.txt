@@ -3,7 +3,7 @@ include_directories (
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
-  ${SDF_INCLUDE_DIRS}
+  ${RML_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/test/gtest/include
   ${PROJECT_SOURCE_DIR}/test/gtest
@@ -16,8 +16,8 @@ link_directories(
   ${ODE_LIBRARY_DIRS}
 )
 
-# Remove this whole if block in Gazebo 1.8
-if (NOT HAVE_SDF)
+# Remove this whole if block in Gazebo 2.0
+if (NOT HAVE_RML)
   link_directories(
     ${urdfdom_LIBRARY_DIRS}
     ${urdfdom_headers_LIBRARY_DIRS}

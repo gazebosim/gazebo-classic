@@ -44,9 +44,9 @@ BulletCollision::~BulletCollision()
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::Load(sdf::ElementPtr _sdf)
+void BulletCollision::Load(rml::ElementPtr _rml)
 {
-  Collision::Load(_sdf);
+  Collision::Load(_rml);
 
   if (this->IsStatic())
   {

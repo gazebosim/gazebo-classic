@@ -28,7 +28,7 @@ namespace gazebo
   class CartTestPlugin : public ModelPlugin
   {
     public: CartTestPlugin();
-    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    public: virtual void Load(physics::ModelPtr _model, rml::ElementPtr _sdf);
     public: virtual void Init();
 
     private: void OnUpdate();

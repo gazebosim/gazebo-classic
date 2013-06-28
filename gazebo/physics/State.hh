@@ -22,7 +22,7 @@
 #define _STATE_HH_
 
 #include <string>
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/Time.hh"
@@ -57,11 +57,11 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~State();
 
-      /// \brief Load state from SDF element
+      /// \brief Load state from RML element
       ///
-      /// Populates the State information from data stored in an SDF::Element
-      /// \param _elem Pointer to the SDF::Element
-      public: virtual void Load(const sdf::ElementPtr _elem);
+      /// Populates the State information from data stored in an RML::Element
+      /// \param _elem Pointer to the RML::Element
+      public: virtual void Load(const rml::ElementPtr _elem);
 
       /// \brief Assignment operator
       /// \param[in] _state State value

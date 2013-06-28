@@ -26,7 +26,7 @@ namespace gazebo
 {
   class RayTest : public SensorPlugin
   {
-    public: void Load(sensors::SensorPtr &/*_parent*/, sdf::ElementPtr &_sdf)
+    public: void Load(sensors::SensorPtr &/*_parent*/, rml::ElementPtr &_sdf)
     {
       // Get then name of the parent model
       std::string modelName = _sdf->GetParent()->Get<std::string>("name");

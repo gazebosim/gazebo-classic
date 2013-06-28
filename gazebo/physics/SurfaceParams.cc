@@ -43,22 +43,22 @@ SurfaceParams::~SurfaceParams()
 }
 
 //////////////////////////////////////////////////
-void SurfaceParams::Load(sdf::ElementPtr _sdf)
+void SurfaceParams::Load(rml::ElementPtr _rml)
 {
-  GZ_ASSERT(_sdf, "Surface _sdf is NULL");
+  GZ_ASSERT(_rml, "Surface _rml is NULL");
   {
-    sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
-    GZ_ASSERT(bounceElem, "Surface sdf member is NULL");
+    rml::ElementPtr bounceElem = _rml->GetElement("bounce");
+    GZ_ASSERT(bounceElem, "Surface rml member is NULL");
     this->bounce = bounceElem->Get<double>("restitution_coefficient");
     this->bounceThreshold = bounceElem->Get<double>("threshold");
   }
 
   {
-    sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
-    GZ_ASSERT(frictionElem, "Surface sdf member is NULL");
+    rml::ElementPtr frictionElem = _rml->GetElement("friction");
+    GZ_ASSERT(frictionElem, "Surface rml member is NULL");
     {
-      sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
-      GZ_ASSERT(frictionOdeElem, "Surface sdf member is NULL");
+      rml::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
+      GZ_ASSERT(frictionOdeElem, "Surface rml member is NULL");
       this->mu1 = frictionOdeElem->Get<double>("mu");
       this->mu2 = frictionOdeElem->Get<double>("mu2");
 
@@ -74,15 +74,15 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
   }
 
   {
-    sdf::ElementPtr contactElem = _sdf->GetElement("contact");
-    GZ_ASSERT(contactElem, "Surface sdf member is NULL");
+    rml::ElementPtr contactElem = _rml->GetElement("contact");
+    GZ_ASSERT(contactElem, "Surface rml member is NULL");
     {
       this->collideWithoutContact =
         contactElem->Get<bool>("collide_without_contact");
       this->collideWithoutContactBitmask =
           contactElem->Get<unsigned int>("collide_without_contact_bitmask");
-      sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
-      GZ_ASSERT(contactOdeElem, "Surface sdf member is NULL");
+      rml::ElementPtr contactOdeElem = contactElem->GetElement("ode");
+      GZ_ASSERT(contactOdeElem, "Surface rml member is NULL");
       this->kp = contactOdeElem->Get<double>("kp");
       this->kd = contactOdeElem->Get<double>("kd");
       this->cfm = contactOdeElem->Get<double>("soft_cfm");

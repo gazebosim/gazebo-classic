@@ -115,9 +115,9 @@ namespace gazebo
       public: void Load(LinkPtr _parent, LinkPtr _child,
                         const math::Vector3 &_pos) GAZEBO_DEPRECATED(1.5);
 
-      /// \brief Load physics::Joint from a SDF sdf::Element.
-      /// \param[in] _sdf SDF values to load from.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      /// \brief Load physics::Joint from a RML rml::Element.
+      /// \param[in] _rml RML values to load from.
+      public: virtual void Load(rml::ElementPtr _rml);
 
       /// \brief Initialize a joint.
       public: virtual void Init();
@@ -125,9 +125,9 @@ namespace gazebo
       /// \brief Update the joint.
       public: void Update();
 
-      /// \brief Update the parameters using new sdf values.
-      /// \param[in] _sdf SDF values to update from.
-      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+      /// \brief Update the parameters using new rml values.
+      /// \param[in] _rml RML values to update from.
+      public: virtual void UpdateParameters(rml::ElementPtr _rml);
 
       /// \brief Reset the joint.
       public: virtual void Reset();
@@ -246,12 +246,12 @@ namespace gazebo
 
       /// \brief Get the effort limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
-      /// \return Effort limit specified in SDF
+      /// \return Effort limit specified in RML
       public: virtual double GetEffortLimit(int _index);
 
       /// \brief Get the velocity limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
-      /// \return Velocity limit specified in SDF
+      /// \return Velocity limit specified in RML
       public: virtual double GetVelocityLimit(int _index);
 
       /// \brief Set the velocity of an axis(index).
@@ -299,7 +299,7 @@ namespace gazebo
       /// \brief get internal force and torque values at a joint
       /// Note that you must set
       ///   <provide_feedback>true<provide_feedback>
-      /// in the joint sdf to use this.
+      /// in the joint rml to use this.
       /// \param[in] _index Force and torque on child link if _index = 0
       /// and on parent link of _index = 1
       /// \return The force and torque at the joint
@@ -309,7 +309,7 @@ namespace gazebo
       /// \brief get internal force and torque values at a joint
       /// Note that you must set
       ///   <provide_feedback>true<provide_feedback>
-      /// in the joint sdf to use this.
+      /// in the joint rml to use this.
       /// \param[in] _index Force and torque on child link if _index = 0
       /// and on parent link of _index = 1
       /// \return The force and torque at the joint
@@ -458,7 +458,7 @@ namespace gazebo
       /// child frame specified in the parent link frame
       protected: math::Vector3 anchorPos;
 
-      /// \brief Anchor pose specified in SDF <joint><pose> tag.
+      /// \brief Anchor pose specified in RML <joint><pose> tag.
       /// AnchorPose is the transform from child link frame to joint frame
       /// specified in the child link frame.
       /// AnchorPos is more relevant in normal usage, but sometimes,
@@ -480,20 +480,20 @@ namespace gazebo
       /// Allocate a 2 vector in case hinge2 joint is used.
       protected: double forceApplied[MAX_JOINT_AXIS];
 
-      /// \brief Store Joint effort limit as specified in SDF
+      /// \brief Store Joint effort limit as specified in RML
       protected: double effortLimit[MAX_JOINT_AXIS];
 
-      /// \brief Store Joint velocity limit as specified in SDF
+      /// \brief Store Joint velocity limit as specified in RML
       protected: double velocityLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint inertia ratio.  This is a measure of how well
       /// this model behaves using interative LCP solvers.
       protected: double inertiaRatio[MAX_JOINT_AXIS];
 
-      /// \brief Store Joint position lower limit as specified in SDF
+      /// \brief Store Joint position lower limit as specified in RML
       protected: math::Angle lowerLimit[MAX_JOINT_AXIS];
 
-      /// \brief Store Joint position upper limit as specified in SDF
+      /// \brief Store Joint position upper limit as specified in RML
       protected: math::Angle upperLimit[MAX_JOINT_AXIS];
 
       /// \brief option to use CFM damping

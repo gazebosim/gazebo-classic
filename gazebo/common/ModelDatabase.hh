@@ -110,12 +110,12 @@ namespace gazebo
       public: std::string GetModelPath(const std::string &_uri,
                   bool _forceDownload = false);
 
-      /// \brief Get a model's SDF file based on a URI.
+      /// \brief Get a model's RML file based on a URI.
       ///
       /// Get a model file based on a URI. If the model is on
       /// a remote server, then the model fetched and installed locally.
       /// \param[in] _uri The URI of the model
-      /// \return The full path and filename to the SDF file
+      /// \return The full path and filename to the RML file
       public: std::string GetModelFile(const std::string &_uri);
 
       /// \brief Download all dependencies for a give model path

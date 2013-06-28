@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
@@ -77,7 +77,7 @@ namespace gazebo
       public: virtual ~GpuLaser();
 
       // Documentation inherited
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(rml::ElementPtr &_rml);
 
       // Documentation inherited
       public: virtual void Load();

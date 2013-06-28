@@ -24,7 +24,7 @@ namespace gazebo
   {
     public: CameraMove() : ModelPlugin() {}
 
-    public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+    public: void Load(physics::ModelPtr _model, rml::ElementPtr _sdf)
     {
       // Get a pointer to the model
       this->model = _model;

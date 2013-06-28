@@ -46,9 +46,9 @@ namespace gazebo
               {}
 
       /// \brief Load a SliderJoint.
-      /// \param[in] _sdf SDF values to load from
-      public: virtual void Load(sdf::ElementPtr _sdf)
-              {T::Load(_sdf);}
+      /// \param[in] _rml RML values to load from
+      public: virtual void Load(rml::ElementPtr _rml)
+              {T::Load(_rml);}
 
       /// \interal
       public: virtual unsigned int GetAngleCount() const

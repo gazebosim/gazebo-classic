@@ -46,9 +46,9 @@ BulletHinge2Joint::~BulletHinge2Joint()
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::Load(sdf::ElementPtr _sdf)
+void BulletHinge2Joint::Load(rml::ElementPtr _rml)
 {
-  Hinge2Joint<BulletJoint>::Load(_sdf);
+  Hinge2Joint<BulletJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////
@@ -64,10 +64,10 @@ void BulletHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
   if (!bulletChildLink || !bulletParentLink)
     gzthrow("Requires bullet bodies");
 
-  sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
+  rml::ElementPtr axis1Elem = this->rml->GetElement("axis");
   math::Vector3 axis1 = axis1Elem->Get<math::Vector3>("xyz");
 
-  sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis");
+  rml::ElementPtr axis2Elem = this->rml->GetElement("axis");
   math::Vector3 axis2 = axis2Elem->Get<math::Vector3>("xyz");
 
   btVector3 banchor(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);

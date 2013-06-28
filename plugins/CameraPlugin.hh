@@ -33,7 +33,7 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~CameraPlugin();
 
-    public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
+    public: virtual void Load(sensors::SensorPtr _sensor, rml::ElementPtr _sdf);
 
     public: virtual void OnNewFrame(const unsigned char *_image,
                               unsigned int _width, unsigned int _height,

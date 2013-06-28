@@ -87,9 +87,9 @@ Entity::~Entity()
 }
 
 //////////////////////////////////////////////////
-void Entity::Load(sdf::ElementPtr _sdf)
+void Entity::Load(rml::ElementPtr _rml)
 {
-  Base::Load(_sdf);
+  Base::Load(_rml);
   this->node->Init(this->GetWorld()->GetName());
 
   this->poseSub = this->node->Subscribe("~/pose/modify",
@@ -99,15 +99,15 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   this->visualMsg->set_name(this->GetScopedName());
 
-  if (this->sdf->HasElement("pose"))
+  if (this->rml->HasElement("pose"))
   {
     if (this->parent && this->parentEntity)
-      this->worldPose = this->sdf->Get<math::Pose>("pose") +
+      this->worldPose = this->rml->Get<math::Pose>("pose") +
                         this->parentEntity->worldPose;
     else
-      this->worldPose = this->sdf->Get<math::Pose>("pose");
+      this->worldPose = this->rml->Get<math::Pose>("pose");
 
-    this->initialRelativePose = this->sdf->Get<math::Pose>("pose");
+    this->initialRelativePose = this->rml->Get<math::Pose>("pose");
   }
 
   if (this->parent)
@@ -532,15 +532,15 @@ void Entity::Reset()
 }
 
 //////////////////////////////////////////////////
-void Entity::UpdateParameters(sdf::ElementPtr _sdf)
+void Entity::UpdateParameters(rml::ElementPtr _rml)
 {
-  Base::UpdateParameters(_sdf);
+  Base::UpdateParameters(_rml);
 
   math::Pose parentPose;
   if (this->parent && this->parentEntity)
     parentPose = this->parentEntity->worldPose;
 
-  math::Pose newPose = _sdf->Get<math::Pose>("pose");
+  math::Pose newPose = _rml->Get<math::Pose>("pose");
   if (newPose != this->GetRelativePose())
   {
     this->SetRelativePose(newPose);

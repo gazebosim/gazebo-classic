@@ -18,7 +18,7 @@
 #define _PHYSICS_HH_
 
 #include <string>
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 
@@ -47,10 +47,10 @@ namespace gazebo
     /// \return Pointer to the world.
     WorldPtr get_world(const std::string &_name = "");
 
-    /// \brief Load world from sdf::Element pointer.
+    /// \brief Load world from rml::Element pointer.
     /// \param[in] _world Pointer to a world.
-    /// \param[in] _sdf SDF values to load from.
-    void load_world(WorldPtr _world, sdf::ElementPtr _sdf);
+    /// \param[in] _rml RML values to load from.
+    void load_world(WorldPtr _world, rml::ElementPtr _rml);
 
     /// \brief Init world given a pointer to it.
     /// \param[in] _world World to initialize.
@@ -71,9 +71,9 @@ namespace gazebo
     /// \param[in] _pause True to pause, False to unpause.
     void pause_world(WorldPtr _world, bool _pause);
 
-    /// \brief load multiple worlds from single sdf::Element pointer
-    /// \param[in] _sdf SDF values used to create worlds.
-    void load_worlds(sdf::ElementPtr _sdf);
+    /// \brief load multiple worlds from single rml::Element pointer
+    /// \param[in] _rml RML values used to create worlds.
+    void load_worlds(rml::ElementPtr _rml);
 
     /// \brief initialize multiple worlds stored in static variable
     /// gazebo::g_worlds

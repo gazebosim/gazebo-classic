@@ -77,7 +77,7 @@ bool ModelMaker::InitFromModel(const std::string &_modelName)
 }
 
 /////////////////////////////////////////////////
-bool ModelMaker::InitFromSDFString(const std::string &_data)
+bool ModelMaker::InitFromRMLString(const std::string &_data)
 {
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
@@ -88,13 +88,13 @@ bool ModelMaker::InitFromSDFString(const std::string &_data)
     this->visuals.clear();
   }
 
-  this->modelSDF.reset(new sdf::SDF);
-  sdf::initFile("root.sdf", this->modelSDF);
-  sdf::readString(_data, this->modelSDF);
+  this->modelRML.reset(new rml::RML);
+  rml::initFile("root.rml", this->modelRML);
+  rml::readString(_data, this->modelRML);
 
-  if (!sdf::readString(_data, this->modelSDF))
+  if (!rml::readString(_data, this->modelRML))
   {
-    gzerr << "Unable to load SDF from data\n";
+    gzerr << "Unable to load RML from data\n";
     return false;
   }
 
@@ -115,10 +115,10 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
     this->visuals.clear();
   }
 
-  this->modelSDF.reset(new sdf::SDF);
-  sdf::initFile("root.sdf", this->modelSDF);
+  this->modelRML.reset(new rml::RML);
+  rml::initFile("root.rml", this->modelRML);
 
-  if (!sdf::readFile(_filename, this->modelSDF))
+  if (!rml::readFile(_filename, this->modelRML))
   {
     gzerr << "Unable to load file[" << _filename << "]\n";
     return false;
@@ -135,15 +135,15 @@ bool ModelMaker::Init()
   // Load the world file
   std::string modelName;
   math::Pose modelPose, linkPose, visualPose;
-  sdf::ElementPtr modelElem;
+  rml::ElementPtr modelElem;
 
-  if (this->modelSDF->root->HasElement("model"))
-    modelElem = this->modelSDF->root->GetElement("model");
-  else if (this->modelSDF->root->HasElement("light"))
-    modelElem = this->modelSDF->root->GetElement("light");
+  if (this->modelRML->root->HasElement("model"))
+    modelElem = this->modelRML->root->GetElement("model");
+  else if (this->modelRML->root->HasElement("light"))
+    modelElem = this->modelRML->root->GetElement("light");
   else
   {
-    gzerr << "No model or light in SDF\n";
+    gzerr << "No model or light in RML\n";
     return false;
   }
 
@@ -165,7 +165,7 @@ bool ModelMaker::Init()
 
   if (modelElem->GetName() == "model")
   {
-    sdf::ElementPtr linkElem = modelElem->GetElement("link");
+    rml::ElementPtr linkElem = modelElem->GetElement("link");
 
     try
     {
@@ -184,7 +184,7 @@ bool ModelMaker::Init()
         this->visuals.push_back(linkVisual);
 
         int visualIndex = 0;
-        sdf::ElementPtr visualElem;
+        rml::ElementPtr visualElem;
 
         if (linkElem->HasElement("visual"))
           visualElem = linkElem->GetElement("visual");
@@ -245,7 +245,7 @@ void ModelMaker::Stop()
   scene->RemoveVisual(this->modelVisual);
   this->modelVisual.reset();
   this->visuals.clear();
-  this->modelSDF.reset();
+  this->modelRML.reset();
 
   this->state = 0;
   gui::Events::moveMode(true);
@@ -329,17 +329,17 @@ void ModelMaker::CreateTheEntity()
   if (!this->clone)
   {
     rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-    sdf::ElementPtr modelElem;
+    rml::ElementPtr modelElem;
     bool isModel = false;
     bool isLight = false;
-    if (this->modelSDF->root->HasElement("model"))
+    if (this->modelRML->root->HasElement("model"))
     {
-      modelElem = this->modelSDF->root->GetElement("model");
+      modelElem = this->modelRML->root->GetElement("model");
       isModel = true;
     }
-    else if (this->modelSDF->root->HasElement("light"))
+    else if (this->modelRML->root->HasElement("light"))
     {
-      modelElem = this->modelSDF->root->GetElement("light");
+      modelElem = this->modelRML->root->GetElement("light");
       isLight = true;
     }
 
@@ -358,13 +358,13 @@ void ModelMaker::CreateTheEntity()
     // by the World automatically
     modelName.erase(0, this->node->GetTopicNamespace().size()+2);
 
-    // The the SDF model's name
+    // The the RML model's name
     modelElem->GetAttribute("name")->Set(modelName);
     modelElem->GetElement("pose")->Set(
         this->modelVisual->GetWorldPose());
 
     // Spawn the model in the physics server
-    msg.set_sdf(this->modelSDF->ToString());
+    msg.set_rml(this->modelRML->ToString());
   }
   else
   {

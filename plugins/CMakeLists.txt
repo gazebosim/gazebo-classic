@@ -2,11 +2,11 @@ include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROJECT_BINARY_DIR}/gazebo
   ${PROTOBUF_INCLUDE_DIR}
-  ${SDF_INCLUDE_DIRS}
+  ${RML_INCLUDE_DIRS}
 )
 
-# Remove this whole if block in Gazebo 1.8
-if (NOT HAVE_SDF)
+# Remove this whole if block in Gazebo 2.0
+if (NOT HAVE_RML)
   link_directories(
     ${urdfdom_LIBRARY_DIRS}
     ${urdfdom_headers_LIBRARY_DIRS}

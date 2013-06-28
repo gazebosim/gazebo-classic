@@ -36,7 +36,7 @@
 
 namespace po = boost::program_options;
 
-sdf::ElementPtr g_stateSdf;
+rml::ElementPtr g_stateSdf;
 
 /// \brief Base class for all filters.
 class FilterBase
@@ -606,7 +606,7 @@ class StateFilter : public FilterBase
 
             // Read and parse the state information
             g_stateSdf->ClearElements();
-            sdf::readString(_stateString, g_stateSdf);
+            rml::readString(_stateString, g_stateSdf);
             state.Load(g_stateSdf);
 
             std::ostringstream result;
@@ -622,7 +622,7 @@ class StateFilter : public FilterBase
 
             if (this->xmlOutput)
             {
-              result << "<sdf version='" << SDF_VERSION << "'>\n"
+              result << "<sdf version='" << RML_VERSION << "'>\n"
                 << "<state world_name='" << state.GetName() << "'>\n"
                 << "<sim_time>" << state.GetSimTime() << "</sim_time>\n"
                 << "<real_time>" << state.GetRealTime() << "</real_time>\n"
@@ -751,14 +751,14 @@ void info(const std::string &_filename)
 {
   gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
 
-  // Get the SDF world description from the log file
+  // Get the RML world description from the log file
   std::string sdfString;
   gazebo::util::LogPlay::Instance()->Step(sdfString);
 
-  // Parse the first SDF world description
-  sdf::ElementPtr sdf(new sdf::Element);
-  sdf::initFile("root.sdf", sdf);
-  sdf::readString(sdfString, sdf);
+  // Parse the first RML world description
+  rml::ElementPtr sdf(new rml::Element);
+  rml::initFile("root.sdf", sdf);
+  rml::readString(sdfString, sdf);
 
   gazebo::physics::WorldState state;
 
@@ -773,13 +773,13 @@ void info(const std::string &_filename)
     if (sdf->HasElement("world"))
     {
       // Get a pointer to the world element
-      sdf::ElementPtr worldElem = sdf->GetElement("world");
+      rml::ElementPtr worldElem = sdf->GetElement("world");
 
       // Check for a model
       if (worldElem->HasElement("model"))
       {
         // Get a pointer to the first model element.
-        sdf::ElementPtr modelElem = worldElem->GetElement("model");
+        rml::ElementPtr modelElem = worldElem->GetElement("model");
 
         // Count all the model elements.
         while (modelElem)
@@ -806,7 +806,7 @@ void info(const std::string &_filename)
       play->GetChunk(play->GetChunkCount()-1, stateString);
 
       g_stateSdf->ClearElements();
-      sdf::readString(stateString, g_stateSdf);
+      rml::readString(stateString, g_stateSdf);
 
       state.Load(g_stateSdf);
       endTime = state.GetWallTime();
@@ -1018,8 +1018,8 @@ int main(int argc, char **argv)
   std::string command, filename, filter;
 
   // Create a state sdf element.
-  g_stateSdf.reset(new sdf::Element);
-  sdf::initFile("state.sdf", g_stateSdf);
+  g_stateSdf.reset(new rml::Element);
+  rml::initFile("state.sdf", g_stateSdf);
 
   // Get the command name
   command = vm.count("command") ? vm["command"].as<std::string>() : "";

@@ -42,7 +42,7 @@ namespace gazebo
       public: virtual ~ImuSensor();
 
       // Documentation inherited.
-      protected: void Load(const std::string &_worldName, sdf::ElementPtr _sdf);
+      protected: void Load(const std::string &_worldName, rml::ElementPtr _rml);
 
       // Documentation inherited.
       protected: virtual void Load(const std::string &_worldName);

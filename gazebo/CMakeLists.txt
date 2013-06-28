@@ -1,10 +1,9 @@
 include_directories(SYSTEM
-  ${SDF_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
-  ${SDF_INCLUDE_DIRS}
+  ${RML_INCLUDE_DIRS}
 )
 
 include_directories(
@@ -14,12 +13,12 @@ include_directories(
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
-  ${SDF_LIBRARY_DIRS}
+  ${RML_LIBRARY_DIRS}
   ${PROJECT_BINARY_DIR}/test
 )
 
 # Remove this whole if block in Gazebo 1.8
-if (NOT HAVE_SDF)
+if (NOT HAVE_RML)
   link_directories(
     ${urdfdom_LIBRARY_DIRS}
     ${urdfdom_headers_LIBRARY_DIRS}
@@ -36,10 +35,7 @@ add_subdirectory(gui)
 add_subdirectory(physics)
 add_subdirectory(sensors)
 add_subdirectory(util)
-
-if (NOT HAVE_SDF)
-  add_subdirectory(sdf)
-endif()
+add_subdirectory(sdf)
 
 add_dependencies(gazebo_physics gazebo_msgs)
 add_dependencies(gazebo_physics_ode gazebo_msgs)
@@ -88,12 +84,6 @@ target_link_libraries(gazebo
   gazebo_gui
   pthread
 )
-
-# Remove this in Gazebo 2.0
-if (HAVE_SDF)
-  target_link_libraries(gazebo ${SDF_LIBRARIES})
-endif()
-
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
   target_link_libraries(gzserver gcov)

@@ -537,16 +537,16 @@ void Color::Clamp()
   this->b = this->b > 1 ? this->b/255.0: this->b;
 }
 
-#ifdef HAVE_SDF
+#ifdef HAVE_RML
 //////////////////////////////////////////////////
-Color::Color(const sdf::Color &_pt)
+Color::Color(const rml::Color &_pt)
 : r(_pt.r), g(_pt.g), b(_pt.b), a(_pt.a)
 {
   this->Clamp();
 }
 
 //////////////////////////////////////////////////
-Color &Color::operator =(const sdf::Color &_pt)
+Color &Color::operator =(const rml::Color &_pt)
 {
   this->r = _pt.r;
   this->g = _pt.g;
@@ -557,7 +557,7 @@ Color &Color::operator =(const sdf::Color &_pt)
 }
 
 //////////////////////////////////////////////////
-bool Color::operator!=(const sdf::Color &_pt) const
+bool Color::operator!=(const rml::Color &_pt) const
 {
   return !math::equal(this->r, _pt.r) ||
          !math::equal(this->g, _pt.g) ||

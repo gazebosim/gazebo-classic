@@ -25,7 +25,7 @@ namespace gazebo
     public: ~ProjectorPlugin() {}
 
     //////////////////////////////////////////////////
-    public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
+    public: void Load(physics::ModelPtr _parent, rml::ElementPtr _sdf)
     {
       // Create a new transport node
       this->node.reset(new transport::Node());

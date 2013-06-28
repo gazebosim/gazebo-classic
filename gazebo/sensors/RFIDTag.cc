@@ -48,9 +48,9 @@ RFIDTag::~RFIDTag()
 }
 
 /////////////////////////////////////////////////
-void RFIDTag::Load(const std::string &_worldName, sdf::ElementPtr &_sdf)
+void RFIDTag::Load(const std::string &_worldName, rml::ElementPtr &_rml)
 {
-  Sensor::Load(_worldName, _sdf);
+  Sensor::Load(_worldName, _rml);
 }
 
 /////////////////////////////////////////////////
@@ -58,10 +58,10 @@ void RFIDTag::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  if (this->sdf->GetElement("topic"))
+  if (this->rml->GetElement("topic"))
   {
     this->scanPub = this->node->Advertise<msgs::Pose>(
-        this->sdf->GetElement("topic")->Get<std::string>());
+        this->rml->GetElement("topic")->Get<std::string>());
   }
 
   this->entity = this->world->GetEntity(this->parentName);

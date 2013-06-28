@@ -33,7 +33,7 @@ namespace gazebo
     public: MudPlugin();
 
     // Documentation Inherited.
-    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    public: virtual void Load(physics::ModelPtr _model, rml::ElementPtr _sdf);
 
     // Documentation Inherited.
     public: virtual void Init();
@@ -105,8 +105,8 @@ namespace gazebo
     /// \brief Custom bitmask associated to collision surface of allowed links
     private: unsigned int contactSurfaceBitmask;
 
-    /// \brief SDF for this plugin;
-    private: sdf::ElementPtr sdf;
+    /// \brief RML for this plugin;
+    private: rml::ElementPtr sdf;
   };
 }
 #endif  // ifndef _MUD_PLUGIN_HH_

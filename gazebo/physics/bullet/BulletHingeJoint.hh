@@ -48,7 +48,7 @@ namespace gazebo
       public: virtual ~BulletHingeJoint();
 
       // Documentation inherited.
-      protected: virtual void Load(sdf::ElementPtr _sdf);
+      protected: virtual void Load(rml::ElementPtr _rml);
 
       // Documentation inherited.
       public: virtual void Init();

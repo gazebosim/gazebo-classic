@@ -54,9 +54,9 @@ namespace gazebo
 
       /// \brief Constructor
       ///
-      /// Build a JointState from SDF data
-      /// \param[in] _sdf SDF data to load a joint state from.
-      public: explicit JointState(const sdf::ElementPtr _sdf);
+      /// Build a JointState from RML data
+      /// \param[in] _rml RML data to load a joint state from.
+      public: explicit JointState(const rml::ElementPtr _rml);
 
       /// \brief Destructor.
       public: virtual ~JointState();
@@ -68,9 +68,9 @@ namespace gazebo
       public: void Load(JointPtr _joint, const common::Time &_realTime,
                   const common::Time &_simTime);
 
-      /// \brief Load state from SDF element.
+      /// \brief Load state from RML element.
       /// \param[in] _elem SDf values to load from.
-      public: virtual void Load(const sdf::ElementPtr _elem);
+      public: virtual void Load(const rml::ElementPtr _elem);
 
       /// \brief Get the number of angles.
       /// \return The number of angles.
@@ -90,9 +90,9 @@ namespace gazebo
       /// \return True if the values in the state are zero.
       public: bool IsZero() const;
 
-      /// \brief Populate a state SDF element with data from the object.
-      /// \param[out] _sdf SDF element to populate.
-      public: void FillSDF(sdf::ElementPtr _sdf);
+      /// \brief Populate a state RML element with data from the object.
+      /// \param[out] _rml RML element to populate.
+      public: void FillRML(rml::ElementPtr _rml);
 
       /// \brief Assignment operator
       /// \param[in] _state State value

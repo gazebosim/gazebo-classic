@@ -239,9 +239,9 @@ void Pose::Round(int _precision)
   this->pos.Round(_precision);
 }
 
-#ifdef HAVE_SDF
+#ifdef HAVE_RML
 //////////////////////////////////////////////////
-Pose::Pose(const sdf::Pose &_pose)
+Pose::Pose(const rml::Pose &_pose)
 {
   this->pos.x = _pose.pos.x;
   this->pos.y = _pose.pos.y;
@@ -254,7 +254,7 @@ Pose::Pose(const sdf::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
-Pose &Pose::operator=(const sdf::Pose &_pose)
+Pose &Pose::operator=(const rml::Pose &_pose)
 {
   this->pos.x = _pose.pos.x;
   this->pos.y = _pose.pos.y;

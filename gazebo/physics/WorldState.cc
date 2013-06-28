@@ -53,10 +53,10 @@ WorldState::WorldState(const WorldPtr _world)
 }
 
 /////////////////////////////////////////////////
-WorldState::WorldState(const sdf::ElementPtr _sdf)
+WorldState::WorldState(const rml::ElementPtr _rml)
   : State()
 {
-  this->Load(_sdf);
+  this->Load(_rml);
 }
 
 /////////////////////////////////////////////////
@@ -100,7 +100,7 @@ void WorldState::Load(const WorldPtr _world)
 }
 
 /////////////////////////////////////////////////
-void WorldState::Load(const sdf::ElementPtr _elem)
+void WorldState::Load(const rml::ElementPtr _elem)
 {
   // Copy the name
   this->name = _elem->Get<std::string>("world_name");
@@ -109,7 +109,7 @@ void WorldState::Load(const sdf::ElementPtr _elem)
   this->modelStates.clear();
   if (_elem->HasElement("model"))
   {
-    sdf::ElementPtr childElem = _elem->GetElement("model");
+    rml::ElementPtr childElem = _elem->GetElement("model");
 
     while (childElem)
     {
@@ -278,7 +278,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
     if (!_state.HasModelState(iter->second.GetName()) && this->world)
     {
       ModelPtr model = this->world->GetModel(iter->second.GetName());
-      result.insertions.push_back(model->GetSDF()->ToString(""));
+      result.insertions.push_back(model->GetRML()->ToString(""));
     }
   }
 
@@ -308,20 +308,20 @@ WorldState WorldState::operator+(const WorldState &_state) const
 }
 
 /////////////////////////////////////////////////
-void WorldState::FillSDF(sdf::ElementPtr _sdf)
+void WorldState::FillRML(rml::ElementPtr _rml)
 {
-  _sdf->ClearElements();
+  _rml->ClearElements();
 
-  _sdf->GetAttribute("world_name")->Set(this->name);
-  _sdf->GetElement("sim_time")->Set(this->simTime);
-  _sdf->GetElement("real_time")->Set(this->realTime);
-  _sdf->GetElement("wall_time")->Set(this->wallTime);
+  _rml->GetAttribute("world_name")->Set(this->name);
+  _rml->GetElement("sim_time")->Set(this->simTime);
+  _rml->GetElement("real_time")->Set(this->realTime);
+  _rml->GetElement("wall_time")->Set(this->wallTime);
 
   for (ModelState_M::iterator iter =
        this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
   {
-    sdf::ElementPtr elem = _sdf->AddElement("model");
-    iter->second.FillSDF(elem);
+    rml::ElementPtr elem = _rml->AddElement("model");
+    iter->second.FillRML(elem);
   }
 }
 

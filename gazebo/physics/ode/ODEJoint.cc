@@ -61,14 +61,14 @@ ODEJoint::~ODEJoint()
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::Load(sdf::ElementPtr _sdf)
+void ODEJoint::Load(rml::ElementPtr _rml)
 {
-  Joint::Load(_sdf);
+  Joint::Load(_rml);
 
-  if (this->sdf->HasElement("physics") &&
-      this->sdf->GetElement("physics")->HasElement("ode"))
+  if (this->rml->HasElement("physics") &&
+      this->rml->GetElement("physics")->HasElement("ode"))
   {
-    sdf::ElementPtr elem = this->sdf->GetElement("physics")->GetElement("ode");
+    rml::ElementPtr elem = this->rml->GetElement("physics")->GetElement("ode");
 
     if (elem->HasElement("provide_feedback"))
     {
@@ -121,12 +121,12 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
           elem->GetElement("velocity")->Get<double>());
   }
 
-  if (this->sdf->HasElement("axis"))
+  if (this->rml->HasElement("axis"))
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    rml::ElementPtr axisElem = this->rml->GetElement("axis");
     if (axisElem->HasElement("dynamics"))
     {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+      rml::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
       if (dynamicsElem->HasElement("damping"))
       {
@@ -134,7 +134,7 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       }
       if (dynamicsElem->HasElement("friction"))
       {
-        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+        rml::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
         gzlog << "joint friction not implemented\n";
       }
     }
@@ -374,11 +374,11 @@ math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
 //////////////////////////////////////////////////
 void ODEJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
-  // record axis in sdf element
+  // record axis in rml element
   if (_index == 0)
-    this->sdf->GetElement("axis")->GetElement("xyz")->Set(_axis);
+    this->rml->GetElement("axis")->GetElement("xyz")->Set(_axis);
   else if (_index == 1)
-    this->sdf->GetElement("axis2")->GetElement("xyz")->Set(_axis);
+    this->rml->GetElement("axis2")->GetElement("xyz")->Set(_axis);
   else
     gzerr << "SetAxis index [" << _index << "] out of bounds\n";
 }
@@ -1152,7 +1152,7 @@ void ODEJoint::SetDamping(int /*_index*/, double _damping)
 {
   this->dampingCoefficient = _damping;
 
-  // \TODO: implement on a per axis basis (requires additional sdf parameters)
+  // \TODO: implement on a per axis basis (requires additional rml parameters)
   // trigger an update in CFMDAmping if this is called
   if (this->useCFMDamping)
   {

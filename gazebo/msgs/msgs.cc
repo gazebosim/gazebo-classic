@@ -283,35 +283,35 @@ namespace gazebo
           _p.d());
     }
 
-    msgs::GUI GUIFromSDF(sdf::ElementPtr _sdf)
+    msgs::GUI GUIFromRML(rml::ElementPtr _rml)
     {
       msgs::GUI result;
 
-      result.set_fullscreen(_sdf->Get<bool>("fullscreen"));
+      result.set_fullscreen(_rml->Get<bool>("fullscreen"));
 
 
-      if (_sdf->HasElement("camera"))
+      if (_rml->HasElement("camera"))
       {
-        sdf::ElementPtr camSDF = _sdf->GetElement("camera");
+        rml::ElementPtr camRML = _rml->GetElement("camera");
         msgs::GUICamera *guiCam = result.mutable_camera();
 
-        guiCam->set_name(camSDF->Get<std::string>("name"));
+        guiCam->set_name(camRML->Get<std::string>("name"));
 
-        if (camSDF->HasElement("pose"))
+        if (camRML->HasElement("pose"))
         {
-          msgs::Set(guiCam->mutable_pose(), camSDF->Get<math::Pose>("pose"));
+          msgs::Set(guiCam->mutable_pose(), camRML->Get<math::Pose>("pose"));
         }
 
-        if (camSDF->HasElement("view_controller"))
+        if (camRML->HasElement("view_controller"))
         {
           guiCam->set_view_controller(
-              camSDF->Get<std::string>("view_controller"));
+              camRML->Get<std::string>("view_controller"));
         }
 
-        if (camSDF->HasElement("track_visual"))
+        if (camRML->HasElement("track_visual"))
         {
           guiCam->mutable_track()->CopyFrom(
-              TrackVisualFromSDF(camSDF->GetElement("track_visual")));
+              TrackVisualFromRML(camRML->GetElement("track_visual")));
         }
       }
 
@@ -319,33 +319,33 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::TrackVisual TrackVisualFromSDF(sdf::ElementPtr _sdf)
+    msgs::TrackVisual TrackVisualFromRML(rml::ElementPtr _rml)
     {
       msgs::TrackVisual result;
 
-      result.set_name(_sdf->Get<std::string>("name"));
+      result.set_name(_rml->Get<std::string>("name"));
 
-      if (_sdf->HasElement("min_dist"))
-        result.set_min_dist(_sdf->GetElement("min_dist")->Get<double>());
+      if (_rml->HasElement("min_dist"))
+        result.set_min_dist(_rml->GetElement("min_dist")->Get<double>());
 
-      if (_sdf->HasElement("max_dist"))
-        result.set_max_dist(_sdf->GetElement("max_dist")->Get<double>());
+      if (_rml->HasElement("max_dist"))
+        result.set_max_dist(_rml->GetElement("max_dist")->Get<double>());
 
       return result;
     }
 
 
     /////////////////////////////////////////////////
-    msgs::Light LightFromSDF(sdf::ElementPtr _sdf)
+    msgs::Light LightFromRML(rml::ElementPtr _rml)
     {
       msgs::Light result;
 
-      std::string type = _sdf->Get<std::string>("type");
+      std::string type = _rml->Get<std::string>("type");
       std::transform(type.begin(), type.end(), type.begin(), ::tolower);
 
-      result.set_name(_sdf->Get<std::string>("name"));
+      result.set_name(_rml->Get<std::string>("name"));
 
-      result.set_cast_shadows(_sdf->Get<bool>("cast_shadows"));
+      result.set_cast_shadows(_rml->Get<bool>("cast_shadows"));
 
       if (type == "point")
         result.set_type(msgs::Light::POINT);
@@ -354,41 +354,41 @@ namespace gazebo
       else if (type == "directional")
         result.set_type(msgs::Light::DIRECTIONAL);
 
-      if (_sdf->HasElement("pose"))
+      if (_rml->HasElement("pose"))
       {
-        result.mutable_pose()->CopyFrom(Convert(_sdf->Get<math::Pose>("pose")));
+        result.mutable_pose()->CopyFrom(Convert(_rml->Get<math::Pose>("pose")));
       }
 
-      if (_sdf->HasElement("diffuse"))
+      if (_rml->HasElement("diffuse"))
       {
         result.mutable_diffuse()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("diffuse")));
+            Convert(_rml->Get<common::Color>("diffuse")));
       }
 
-      if (_sdf->HasElement("specular"))
+      if (_rml->HasElement("specular"))
       {
         result.mutable_specular()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("specular")));
+            Convert(_rml->Get<common::Color>("specular")));
       }
 
-      if (_sdf->HasElement("attenuation"))
+      if (_rml->HasElement("attenuation"))
       {
-        sdf::ElementPtr elem = _sdf->GetElement("attenuation");
+        rml::ElementPtr elem = _rml->GetElement("attenuation");
         result.set_attenuation_constant(elem->Get<double>("constant"));
         result.set_attenuation_linear(elem->Get<double>("linear"));
         result.set_attenuation_quadratic(elem->Get<double>("quadratic"));
         result.set_range(elem->Get<double>("range"));
       }
 
-      if (_sdf->HasElement("direction"))
+      if (_rml->HasElement("direction"))
       {
         result.mutable_direction()->CopyFrom(
-            Convert(_sdf->Get<math::Vector3>("direction")));
+            Convert(_rml->Get<math::Vector3>("direction")));
       }
 
-      if (_sdf->HasElement("spot"))
+      if (_rml->HasElement("spot"))
       {
-        sdf::ElementPtr elem = _sdf->GetElement("spot");
+        rml::ElementPtr elem = _rml->GetElement("spot");
         result.set_spot_inner_angle(elem->Get<double>("inner_angle"));
         result.set_spot_outer_angle(elem->Get<double>("outer_angle"));
         result.set_spot_falloff(elem->Get<double>("falloff"));
@@ -398,24 +398,24 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::MeshGeom MeshFromSDF(sdf::ElementPtr _sdf)
+    msgs::MeshGeom MeshFromRML(rml::ElementPtr _rml)
     {
       msgs::MeshGeom result;
 
-      if (_sdf->GetName() != "mesh")
+      if (_rml->GetName() != "mesh")
       {
         gzerr << "Cannot create a mesh message from an "
-          << _sdf->GetName() << " SDF element.\n";
+          << _rml->GetName() << " RML element.\n";
         return result;
       }
 
-        msgs::Set(result.mutable_scale(), _sdf->Get<math::Vector3>("scale"));
+        msgs::Set(result.mutable_scale(), _rml->Get<math::Vector3>("scale"));
 
-        result.set_filename(_sdf->Get<std::string>("uri"));
+        result.set_filename(_rml->Get<std::string>("uri"));
 
-        if (_sdf->HasElement("submesh"))
+        if (_rml->HasElement("submesh"))
         {
-          sdf::ElementPtr submeshElem = _sdf->GetElement("submesh");
+          rml::ElementPtr submeshElem = _rml->GetElement("submesh");
           if (submeshElem->HasElement("name") &&
               submeshElem->Get<std::string>("name") != "__default__")
           {
@@ -431,19 +431,19 @@ namespace gazebo
 
 
     /////////////////////////////////////////////////
-    msgs::Geometry GeometryFromSDF(sdf::ElementPtr _sdf)
+    msgs::Geometry GeometryFromRML(rml::ElementPtr _rml)
     {
       msgs::Geometry result;
 
-      if (_sdf->GetName() != "geometry")
+      if (_rml->GetName() != "geometry")
       {
         gzerr << "Cannot create a geometry message from an "
-          << _sdf->GetName() << " SDF element.\n";
+          << _rml->GetName() << " RML element.\n";
         return result;
       }
 
       // Load the geometry
-      sdf::ElementPtr geomElem = _sdf->GetFirstElement();
+      rml::ElementPtr geomElem = _rml->GetFirstElement();
       if (!geomElem)
         gzthrow("Invalid geometry element");
 
@@ -496,7 +496,7 @@ namespace gazebo
         common::Image img(geomElem->Get<std::string>("uri"));
         msgs::Set(result.mutable_heightmap()->mutable_image(), img);
 
-        sdf::ElementPtr textureElem = geomElem->GetElement("texture");
+        rml::ElementPtr textureElem = geomElem->GetElement("texture");
         msgs::HeightmapGeom::Texture *tex;
         while (textureElem)
         {
@@ -507,7 +507,7 @@ namespace gazebo
           textureElem = textureElem->GetNextElement("texture");
         }
 
-        sdf::ElementPtr blendElem = geomElem->GetElement("blend");
+        rml::ElementPtr blendElem = geomElem->GetElement("blend");
         msgs::HeightmapGeom::Blend *blend;
         while (blendElem)
         {
@@ -521,7 +521,7 @@ namespace gazebo
       else if (geomElem->GetName() == "mesh")
       {
         result.set_type(msgs::Geometry::MESH);
-        result.mutable_mesh()->CopyFrom(MeshFromSDF(geomElem));
+        result.mutable_mesh()->CopyFrom(MeshFromRML(geomElem));
       }
       else if (geomElem->GetName() == "empty")
       {
@@ -534,41 +534,41 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
+    msgs::Visual VisualFromRML(rml::ElementPtr _rml)
     {
       msgs::Visual result;
 
-      result.set_name(_sdf->Get<std::string>("name"));
+      result.set_name(_rml->Get<std::string>("name"));
 
-      if (_sdf->HasElement("cast_shadows"))
-        result.set_cast_shadows(_sdf->Get<bool>("cast_shadows"));
+      if (_rml->HasElement("cast_shadows"))
+        result.set_cast_shadows(_rml->Get<bool>("cast_shadows"));
 
-      if (_sdf->HasElement("transparency"))
-        result.set_transparency(_sdf->Get<double>("transparency"));
+      if (_rml->HasElement("transparency"))
+        result.set_transparency(_rml->Get<double>("transparency"));
 
-      if (_sdf->HasElement("laser_retro"))
-        result.set_laser_retro(_sdf->Get<double>("laser_retro"));
+      if (_rml->HasElement("laser_retro"))
+        result.set_laser_retro(_rml->Get<double>("laser_retro"));
 
       // Load the geometry
-      if (_sdf->HasElement("geometry"))
+      if (_rml->HasElement("geometry"))
       {
         msgs::Geometry *geomMsg = result.mutable_geometry();
-        geomMsg->CopyFrom(GeometryFromSDF(_sdf->GetElement("geometry")));
+        geomMsg->CopyFrom(GeometryFromRML(_rml->GetElement("geometry")));
       }
 
       /// Load the material
-      if (_sdf->HasElement("material"))
+      if (_rml->HasElement("material"))
       {
-        sdf::ElementPtr elem = _sdf->GetElement("material");
+        rml::ElementPtr elem = _rml->GetElement("material");
         msgs::Material *matMsg = result.mutable_material();
 
         if (elem->HasElement("script"))
         {
-          sdf::ElementPtr scriptElem = elem->GetElement("script");
+          rml::ElementPtr scriptElem = elem->GetElement("script");
           matMsg->mutable_script()->set_name(
               scriptElem->Get<std::string>("name"));
 
-          sdf::ElementPtr uriElem = scriptElem->GetElement("uri");
+          rml::ElementPtr uriElem = scriptElem->GetElement("uri");
           while (uriElem)
           {
             matMsg->mutable_script()->add_uri(uriElem->Get<std::string>());
@@ -578,7 +578,7 @@ namespace gazebo
 
         if (elem->HasElement("shader"))
         {
-          sdf::ElementPtr shaderElem = elem->GetElement("shader");
+          rml::ElementPtr shaderElem = elem->GetElement("shader");
 
           if (shaderElem->Get<std::string>("type") == "pixel")
             matMsg->set_shader_type(msgs::Material::PIXEL);
@@ -614,15 +614,15 @@ namespace gazebo
       }
 
       // Set the origin of the visual
-      if (_sdf->HasElement("pose"))
+      if (_rml->HasElement("pose"))
       {
-        msgs::Set(result.mutable_pose(), _sdf->Get<math::Pose>("pose"));
+        msgs::Set(result.mutable_pose(), _rml->Get<math::Pose>("pose"));
       }
 
       // Set plugins of the visual
-      if (_sdf->HasElement("plugin"))
+      if (_rml->HasElement("plugin"))
       {
-        sdf::ElementPtr elem = _sdf->GetElement("plugin");
+        rml::ElementPtr elem = _rml->GetElement("plugin");
         msgs::Plugin *plgnMsg = result.mutable_plugin();
         // if (elem->HasElement("name"))
           plgnMsg->set_name(elem->Get<std::string>("name"));
@@ -630,23 +630,23 @@ namespace gazebo
           plgnMsg->set_filename(elem->Get<std::string>("filename"));
 
         std::stringstream ss;
-        for (sdf::ElementPtr innerElem = elem->GetFirstElement();
+        for (rml::ElementPtr innerElem = elem->GetFirstElement();
             innerElem;
             innerElem = innerElem->GetNextElement(""))
         {
           ss << innerElem->ToString("");
         }
-        plgnMsg->set_innerxml("<sdf>" + ss.str() + "</sdf>");
+        plgnMsg->set_innerxml("<rml>" + ss.str() + "</rml>");
       }
 
       return result;
     }
 
-    msgs::Fog FogFromSDF(sdf::ElementPtr _sdf)
+    msgs::Fog FogFromRML(rml::ElementPtr _rml)
     {
       msgs::Fog result;
 
-      std::string type = _sdf->Get<std::string>("type");
+      std::string type = _rml->Get<std::string>("type");
       if (type == "linear")
         result.set_type(msgs::Fog::LINEAR);
       else if (type == "exp")
@@ -659,47 +659,47 @@ namespace gazebo
         gzthrow(std::string("Unknown fog type[") + type + "]");
 
       result.mutable_color()->CopyFrom(
-          Convert(_sdf->Get<common::Color>("color")));
+          Convert(_rml->Get<common::Color>("color")));
 
-      result.set_density(_sdf->Get<double>("density"));
-      result.set_start(_sdf->Get<double>("start"));
-      result.set_end(_sdf->Get<double>("end"));
+      result.set_density(_rml->Get<double>("density"));
+      result.set_start(_rml->Get<double>("start"));
+      result.set_end(_rml->Get<double>("end"));
       return result;
     }
 
-    msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
+    msgs::Scene SceneFromRML(rml::ElementPtr _rml)
     {
       msgs::Scene result;
 
       Init(result, "scene");
 
-      if (_sdf->HasElement("grid"))
-        result.set_grid(_sdf->Get<bool>("grid"));
+      if (_rml->HasElement("grid"))
+        result.set_grid(_rml->Get<bool>("grid"));
       else
         result.set_grid(true);
 
-      if (_sdf->HasElement("ambient"))
+      if (_rml->HasElement("ambient"))
         result.mutable_ambient()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("ambient")));
+            Convert(_rml->Get<common::Color>("ambient")));
 
-      if (_sdf->HasElement("background"))
+      if (_rml->HasElement("background"))
       {
         result.mutable_background()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("background")));
+            Convert(_rml->Get<common::Color>("background")));
       }
 
-      if (_sdf->HasElement("sky"))
+      if (_rml->HasElement("sky"))
       {
         msgs::Sky *skyMsg = result.mutable_sky();
-        skyMsg->set_time(_sdf->GetElement("sky")->Get<double>("time"));
-        skyMsg->set_sunrise(_sdf->GetElement("sky")->Get<double>("sunrise"));
-        skyMsg->set_sunset(_sdf->GetElement("sky")->Get<double>("sunset"));
-        skyMsg->set_sunset(_sdf->GetElement("sky")->Get<double>("sunset"));
+        skyMsg->set_time(_rml->GetElement("sky")->Get<double>("time"));
+        skyMsg->set_sunrise(_rml->GetElement("sky")->Get<double>("sunrise"));
+        skyMsg->set_sunset(_rml->GetElement("sky")->Get<double>("sunset"));
+        skyMsg->set_sunset(_rml->GetElement("sky")->Get<double>("sunset"));
 
-        if (_sdf->GetElement("sky")->HasElement("clouds"))
+        if (_rml->GetElement("sky")->HasElement("clouds"))
         {
-          sdf::ElementPtr cloudsElem =
-            _sdf->GetElement("sky")->GetElement("clouds");
+          rml::ElementPtr cloudsElem =
+            _rml->GetElement("sky")->GetElement("clouds");
           skyMsg->set_wind_speed(cloudsElem->Get<double>("speed"));
           skyMsg->set_wind_direction(cloudsElem->Get<double>("direction"));
           skyMsg->set_humidity(cloudsElem->Get<double>("humidity"));
@@ -709,11 +709,11 @@ namespace gazebo
         }
       }
 
-      if (_sdf->HasElement("fog"))
-        result.mutable_fog()->CopyFrom(FogFromSDF(_sdf->GetElement("fog")));
+      if (_rml->HasElement("fog"))
+        result.mutable_fog()->CopyFrom(FogFromRML(_rml->GetElement("fog")));
 
-      if (_sdf->HasElement("shadows"))
-        result.set_shadows(_sdf->Get<bool>("shadows"));
+      if (_rml->HasElement("shadows"))
+        result.set_shadows(_rml->Get<bool>("shadows"));
 
       return result;
     }

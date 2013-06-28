@@ -73,15 +73,15 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::Load(sdf::ElementPtr _sdf)
+void HeightmapShape::Load(rml::ElementPtr _rml)
 {
-  Base::Load(_sdf);
+  Base::Load(_rml);
 
-  std::string filename = common::find_file(this->sdf->Get<std::string>("uri"));
+  std::string filename = common::find_file(this->rml->Get<std::string>("uri"));
   if (filename.empty())
   {
     gzthrow("Unable to find heightmap[" +
-            this->sdf->Get<std::string>("uri") + "]\n");
+            this->rml->Get<std::string>("uri") + "]\n");
   }
 
   // Use the image to get the size of the heightmap
@@ -210,19 +210,19 @@ void HeightmapShape::FillHeightMap()
 //////////////////////////////////////////////////
 std::string HeightmapShape::GetURI() const
 {
-  return this->sdf->Get<std::string>("uri");
+  return this->rml->Get<std::string>("uri");
 }
 
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetSize() const
 {
-  return this->sdf->Get<math::Vector3>("size");
+  return this->rml->Get<math::Vector3>("size");
 }
 
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetPos() const
 {
-  return this->sdf->Get<math::Vector3>("pos");
+  return this->rml->Get<math::Vector3>("pos");
 }
 
 //////////////////////////////////////////////////

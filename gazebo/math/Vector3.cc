@@ -368,9 +368,9 @@ bool Vector3::Equal(const Vector3 &_v) const
          math::equal(this->z, _v.z);
 }
 
-#ifdef HAVE_SDF
+#ifdef HAVE_RML
 //////////////////////////////////////////////////
-Vector3 &Vector3::operator =(const sdf::Vector3 &_pt)
+Vector3 &Vector3::operator =(const rml::Vector3 &_pt)
 {
   this->x = _pt.x;
   this->y = _pt.y;
@@ -381,14 +381,14 @@ Vector3 &Vector3::operator =(const sdf::Vector3 &_pt)
 
 
 //////////////////////////////////////////////////
-Vector3::Vector3(const sdf::Vector3 &_pt)
+Vector3::Vector3(const rml::Vector3 &_pt)
     : x(_pt.x), y(_pt.y), z(_pt.z)
 {
 }
 
 
 //////////////////////////////////////////////////
-bool Vector3::operator!=(const sdf::Vector3 &_pt) const
+bool Vector3::operator!=(const rml::Vector3 &_pt) const
 {
   return !equal(this->x, _pt.x, 0.001) ||
          !equal(this->y, _pt.y, 0.001) ||

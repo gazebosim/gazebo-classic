@@ -23,11 +23,11 @@ namespace gazebo
 {
   class AnimateJoints : public ModelPlugin
   {
-    public: void Load(physics::ModelPtr _model, sdf::ElementPtr /*_sdf*/)
+    public: void Load(physics::ModelPtr _model, rml::ElementPtr /*_sdf*/)
     {
       std::map<std::string, common::NumericAnimationPtr> anim;
 
-      // Create a new animation for the "my_joint" define in the SDF file.
+      // Create a new animation for the "my_joint" define in the RML file.
       // The animation will last for 5.0 seconds, and it will repeat
       anim["my_joint"].reset(new common::NumericAnimation(
             "my_animation", 5.0, true));

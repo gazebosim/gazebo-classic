@@ -96,7 +96,7 @@ void Projector::Load(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void Projector::Load(sdf::ElementPtr _sdf)
+void Projector::Load(rml::ElementPtr _rml)
 {
   math::Pose pose;
   std::string textureName;
@@ -104,22 +104,22 @@ void Projector::Load(sdf::ElementPtr _sdf)
   double farClip = 10.0;
   double fov = M_PI * 0.25;
 
-  if (_sdf->HasElement("pose"))
-    pose = _sdf->Get<math::Pose>("pose");
+  if (_rml->HasElement("pose"))
+    pose = _rml->Get<math::Pose>("pose");
 
-  if (_sdf->HasElement("texture_name"))
-    textureName = _sdf->Get<std::string>("texture_name");
+  if (_rml->HasElement("texture_name"))
+    textureName = _rml->Get<std::string>("texture_name");
 
-  if (_sdf->HasElement("near_clip"))
-    nearClip = _sdf->Get<double>("near_clip");
+  if (_rml->HasElement("near_clip"))
+    nearClip = _rml->Get<double>("near_clip");
 
-  if (_sdf->HasElement("far_clip"))
-    farClip = _sdf->Get<double>("far_clip");
+  if (_rml->HasElement("far_clip"))
+    farClip = _rml->Get<double>("far_clip");
 
-  if (_sdf->HasElement("fov"))
-    fov = _sdf->Get<double>("fov");
+  if (_rml->HasElement("fov"))
+    fov = _rml->Get<double>("fov");
 
-  this->Load(_sdf->Get<std::string>("name"), pose, textureName,
+  this->Load(_rml->Get<std::string>("name"), pose, textureName,
              nearClip, farClip, fov);
 }
 

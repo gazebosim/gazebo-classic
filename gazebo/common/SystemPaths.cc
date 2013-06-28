@@ -29,7 +29,7 @@
 #include <fstream>
 #include <sstream>
 
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
@@ -55,7 +55,7 @@ SystemPaths::SystemPaths()
   else
     home = homePath;
 
-  sdf::addURIPath("model://", home + "/.gazebo/models");
+  rml::addURIPath("model://", home + "/.gazebo/models");
   this->modelPaths.push_back(home + "/.gazebo/models");
 
   char *path = getenv("GAZEBO_LOG_PATH");
@@ -86,7 +86,7 @@ SystemPaths::SystemPaths()
   this->UpdateOgrePaths();
 
   // Add some search paths
-  // this->suffixPaths.push_back(std::string("/sdf/") + SDF_VERSION + "/");
+  // this->suffixPaths.push_back(std::string("/rml/") + RML_VERSION + "/");
   this->suffixPaths.push_back("/models/");
   this->suffixPaths.push_back("/media/models/");
   this->suffixPaths.push_back("/Media/models/");
@@ -156,7 +156,7 @@ void SystemPaths::UpdateModelPaths()
   size_t pos2 = path.find(delim);
   while (pos2 != std::string::npos)
   {
-    sdf::addURIPath("model://", path.substr(pos1, pos2-pos1));
+    rml::addURIPath("model://", path.substr(pos1, pos2-pos1));
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->modelPaths);
     pos1 = pos2+1;
     pos2 = path.find(delim, pos2+1);

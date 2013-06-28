@@ -55,7 +55,7 @@ void QTestFixture::initTestCase()
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(PROJECT_SOURCE_PATH);
 
   std::string path = PROJECT_SOURCE_PATH;
-  path += "/sdf/worlds";
+  path += "/rml/worlds";
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
   path = TEST_PATH;

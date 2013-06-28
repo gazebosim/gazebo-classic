@@ -115,14 +115,10 @@ target_link_libraries(gazebo_common
   ${libswscale_LIBRARIES}
   ${libtar_libraries}
   ${TBB_LIBRARIES}
+  ${RML_LIBRARIES}
   rt
   pthread
 )
-
-# Remove this conditional in Gazebo 1.10. Only leave ${SDF_LIBRARIES} in tact.
-if (HAVE_SDF)
-  target_link_libraries(gazebo_common ${SDF_LIBRARIES})
-endif()
 
 if (HAVE_GTS)
   target_link_libraries(gazebo_common ${gts_LIBRARIES})

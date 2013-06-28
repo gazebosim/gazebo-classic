@@ -35,19 +35,19 @@ BoxShape::~BoxShape()
 //////////////////////////////////////////////////
 void BoxShape::Init()
 {
-  this->SetSize(this->sdf->Get<math::Vector3>("size"));
+  this->SetSize(this->rml->Get<math::Vector3>("size"));
 }
 
 //////////////////////////////////////////////////
 void BoxShape::SetSize(const math::Vector3 &_size)
 {
-  this->sdf->GetElement("size")->Set(_size);
+  this->rml->GetElement("size")->Set(_size);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 BoxShape::GetSize() const
 {
-  return this->sdf->Get<math::Vector3>("size");
+  return this->rml->Get<math::Vector3>("size");
 }
 
 //////////////////////////////////////////////////

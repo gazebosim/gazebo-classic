@@ -5,15 +5,15 @@ include_directories(
   ${PROJECT_BINARY_DIR}/gazebo 
   ${tinyxml_include_dirs}
   ${PROTOBUF_INCLUDE_DIR}
-  ${SDF_INCLUDE_DIRS}
+  ${RML_INCLUDE_DIRS}
 )
 
 link_directories( 
-  ${SDF_LIBRARY_DIRS}
+  ${RML_LIBRARY_DIRS}
 )
 
 # Remove this whole if block in Gazebo 2.0
-if (NOT HAVE_SDF)
+if (NOT HAVE_RML)
   link_directories(
     ${urdfdom_LIBRARY_DIRS}
     ${urdfdom_headers_LIBRARY_DIRS}
@@ -42,10 +42,6 @@ gz_install_executable(gzlog)
 add_executable(gzstats gzstats.cc)
 target_link_libraries(gzstats gazebo_msgs gazebo_common gazebo_transport pthread)
 gz_install_executable(gzstats)
-
-#add_executable(sdf2pov sdf2pov.cc)
-#target_link_libraries(sdf2pov gazebo_common ${SDF_LIBRARIES})
-#gz_install_executable(sdf2pov)
 
 add_executable(gzfactory gzfactory.cc)
 target_link_libraries(gzfactory gazebo_common gazebo_transport pthread)

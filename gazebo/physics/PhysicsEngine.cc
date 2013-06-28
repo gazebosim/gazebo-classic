@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  */
 
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Exception.hh"
@@ -42,8 +42,8 @@ using namespace physics;
 PhysicsEngine::PhysicsEngine(WorldPtr _world)
   : world(_world)
 {
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("physics.sdf", this->sdf);
+  this->rml.reset(new rml::Element);
+  rml::initFile("physics.rml", this->rml);
 
   this->targetRealTimeFactor = 0;
   this->realTimeUpdateRate = 0;
@@ -68,16 +68,16 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::Load(sdf::ElementPtr _sdf)
+void PhysicsEngine::Load(rml::ElementPtr _rml)
 {
-  this->sdf->Copy(_sdf);
+  this->rml->Copy(_rml);
 
   this->realTimeUpdateRate =
-      this->sdf->GetElement("real_time_update_rate")->Get<double>();
+      this->rml->GetElement("real_time_update_rate")->Get<double>();
   this->targetRealTimeFactor =
-      this->sdf->GetElement("real_time_factor")->Get<double>();
+      this->rml->GetElement("real_time_factor")->Get<double>();
   this->maxStepSize =
-      this->sdf->GetElement("max_step_size")->Get<double>();
+      this->rml->GetElement("max_step_size")->Get<double>();
 }
 
 //////////////////////////////////////////////////
@@ -90,8 +90,8 @@ void PhysicsEngine::Fini()
 //////////////////////////////////////////////////
 PhysicsEngine::~PhysicsEngine()
 {
-  this->sdf->Reset();
-  this->sdf.reset();
+  this->rml->Reset();
+  this->rml.reset();
   delete this->physicsUpdateMutex;
   this->physicsUpdateMutex = NULL;
   this->responsePub.reset();
@@ -104,7 +104,7 @@ PhysicsEngine::~PhysicsEngine()
 //////////////////////////////////////////////////
 math::Vector3 PhysicsEngine::GetGravity() const
 {
-  return this->sdf->Get<math::Vector3>("gravity");
+  return this->rml->Get<math::Vector3>("gravity");
 }
 
 //////////////////////////////////////////////////
@@ -178,21 +178,21 @@ double PhysicsEngine::GetMaxStepSize() const
 //////////////////////////////////////////////////
 void PhysicsEngine::SetTargetRealTimeFactor(double _factor)
 {
-  this->sdf->GetElement("real_time_factor")->Set(_factor);
+  this->rml->GetElement("real_time_factor")->Set(_factor);
   this->targetRealTimeFactor = _factor;
 }
 
 //////////////////////////////////////////////////
 void PhysicsEngine::SetRealTimeUpdateRate(double _rate)
 {
-  this->sdf->GetElement("real_time_update_rate")->Set(_rate);
+  this->rml->GetElement("real_time_update_rate")->Set(_rate);
   this->realTimeUpdateRate = _rate;
 }
 
 //////////////////////////////////////////////////
 void PhysicsEngine::SetMaxStepSize(double _stepSize)
 {
-  this->sdf->GetElement("max_step_size")->Set(_stepSize);
+  this->rml->GetElement("max_step_size")->Set(_stepSize);
   this->maxStepSize = _stepSize;
 }
 

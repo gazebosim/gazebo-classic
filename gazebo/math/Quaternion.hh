@@ -29,8 +29,8 @@
 
 // Remove the gazebo_confif and ifdefs in Gazebo 1.8
 #include "gazebo/gazebo_config.h"
-#ifdef HAVE_SDF
-#include "sdf/sdf.hh"
+#ifdef HAVE_RML
+#include "rml/rml.hh"
 #endif
 
 #include "gazebo/math/Helpers.hh"
@@ -81,12 +81,12 @@ namespace gazebo
     /// \param qt Quaternion to copy
     public: Quaternion(const Quaternion &_qt);
 
-#ifdef HAVE_SDF
+#ifdef HAVE_RML
     /// Deprecated
-    public: Quaternion(const sdf::Quaternion &_qt) __attribute__((deprecated));
+    public: Quaternion(const rml::Quaternion &_qt) __attribute__((deprecated));
 
     /// Deprecated
-    public: Quaternion &operator =(const sdf::Quaternion &_qt);
+    public: Quaternion &operator =(const rml::Quaternion &_qt);
 #endif
 
     /// \brief Destructor

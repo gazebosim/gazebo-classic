@@ -36,7 +36,7 @@ SonarPlugin::~SonarPlugin()
 }
 
 /////////////////////////////////////////////////
-void SonarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
+void SonarPlugin::Load(sensors::SensorPtr _parent, rml::ElementPtr /*_sdf*/)
 {
   // Get then name of the parent sensor
   this->parentSensor =

@@ -41,8 +41,8 @@ Base::Base(BasePtr _parent)
   this->saveable = true;
   this->selected = false;
 
-  this->sdf.reset(new sdf::Element);
-  this->sdf->AddAttribute("name", "string", "__default__", true);
+  this->rml.reset(new rml::Element);
+  this->rml->AddAttribute("name", "string", "__default__", true);
   this->name = "__default__";
 
   if (this->parent)
@@ -68,20 +68,20 @@ Base::~Base()
   }
   this->children.clear();
   this->childrenEnd = this->children.end();
-  this->sdf->Reset();
-  this->sdf.reset();
+  this->rml->Reset();
+  this->rml.reset();
 }
 
 //////////////////////////////////////////////////
-void Base::Load(sdf::ElementPtr _sdf)
+void Base::Load(rml::ElementPtr _rml)
 {
-  if (_sdf)
-    this->sdf = _sdf;
+  if (_rml)
+    this->rml = _rml;
 
-  GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
+  GZ_ASSERT(this->rml != NULL, "this->rml is NULL");
 
-  if (this->sdf->HasAttribute("name"))
-    this->name = this->sdf->Get<std::string>("name");
+  if (this->rml->HasAttribute("name"))
+    this->name = this->rml->Get<std::string>("name");
   else
     this->name.clear();
 
@@ -95,11 +95,11 @@ void Base::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Base::UpdateParameters(sdf::ElementPtr _sdf)
+void Base::UpdateParameters(rml::ElementPtr _rml)
 {
-  GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
-  this->sdf->Copy(_sdf);
+  GZ_ASSERT(_rml != NULL, "_rml parameter is NULL");
+  GZ_ASSERT(this->rml != NULL, "Base rml member is NULL");
+  this->rml->Copy(_rml);
 }
 
 //////////////////////////////////////////////////
@@ -139,9 +139,9 @@ void Base::Reset(Base::EntityType _resetType)
 //////////////////////////////////////////////////
 void Base::SetName(const std::string &_name)
 {
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
-  GZ_ASSERT(this->sdf->GetAttribute("name"), "Base sdf missing name attribute");
-  this->sdf->GetAttribute("name")->Set(_name);
+  GZ_ASSERT(this->rml != NULL, "Base rml member is NULL");
+  GZ_ASSERT(this->rml->GetAttribute("name"), "Base rml missing name attribute");
+  this->rml->GetAttribute("name")->Set(_name);
   this->name = _name;
   this->ComputeScopedName();
 }
@@ -390,11 +390,11 @@ const WorldPtr &Base::GetWorld() const
 }
 
 //////////////////////////////////////////////////
-const sdf::ElementPtr Base::GetSDF()
+const rml::ElementPtr Base::GetRML()
 {
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
-  this->sdf->Update();
-  return this->sdf;
+  GZ_ASSERT(this->rml != NULL, "Base rml member is NULL");
+  this->rml->Update();
+  return this->rml;
 }
 
 

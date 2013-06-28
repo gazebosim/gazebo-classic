@@ -57,7 +57,7 @@ void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
   if (!bulletChildLink || !bulletParentLink)
     gzthrow("Requires bullet bodies");
 
-  sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+  rml::ElementPtr axisElem = this->rml->GetElement("axis");
   math::Vector3 axis1 = axisElem->Get<math::Vector3>("xyz");
   math::Vector3 axis2 = axisElem->Get<math::Vector3>("xyz");
 

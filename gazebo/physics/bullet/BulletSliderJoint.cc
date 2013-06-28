@@ -47,9 +47,9 @@ BulletSliderJoint::~BulletSliderJoint()
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::Load(sdf::ElementPtr _sdf)
+void BulletSliderJoint::Load(rml::ElementPtr _rml)
 {
-  SliderJoint<BulletJoint>::Load(_sdf);
+  SliderJoint<BulletJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////
@@ -159,9 +159,9 @@ void BulletSliderJoint::Init()
 
   // Apply joint translation limits here.
   // TODO: velocity and effort limits.
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
-  sdf::ElementPtr limitElem;
-  limitElem = this->sdf->GetElement("axis")->GetElement("limit");
+  GZ_ASSERT(this->rml != NULL, "Joint rml member is NULL");
+  rml::ElementPtr limitElem;
+  limitElem = this->rml->GetElement("axis")->GetElement("limit");
   this->bulletSlider->setLowerLinLimit(limitElem->Get<double>("lower"));
   this->bulletSlider->setUpperLinLimit(limitElem->Get<double>("upper"));
 

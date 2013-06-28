@@ -38,7 +38,7 @@ MudPlugin::MudPlugin()
 
 /////////////////////////////////////////////////
 void MudPlugin::Load(physics::ModelPtr _model,
-                     sdf::ElementPtr _sdf)
+                     rml::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "MudPlugin _model pointer is NULL");
   this->model = _model;
@@ -78,7 +78,7 @@ void MudPlugin::Load(physics::ModelPtr _model,
 
   if (_sdf->HasElement("link_name"))
   {
-    sdf::ElementPtr elem = _sdf->GetElement("link_name");
+    rml::ElementPtr elem = _sdf->GetElement("link_name");
     while (elem)
     {
       allowedLinks.push_back(elem->Get<std::string>());

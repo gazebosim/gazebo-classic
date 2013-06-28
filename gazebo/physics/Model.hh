@@ -57,8 +57,8 @@ namespace gazebo
       public: virtual ~Model();
 
       /// \brief Load the model.
-      /// \param[in] _sdf SDF parameters to load from.
-      public: void Load(sdf::ElementPtr _sdf);
+      /// \param[in] _rml RML parameters to load from.
+      public: void Load(rml::ElementPtr _rml);
 
       /// \brief Load all the joints.
       public: void LoadJoints();
@@ -72,13 +72,13 @@ namespace gazebo
       /// \brief Finalize the model.
       public: virtual void Fini();
 
-      /// \brief Update the parameters using new sdf values.
-      /// \param[in] _sdf SDF values to update from.
-      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+      /// \brief Update the parameters using new rml values.
+      /// \param[in] _rml RML values to update from.
+      public: virtual void UpdateParameters(rml::ElementPtr _rml);
 
-      /// \brief Get the SDF values for the model.
-      /// \return The SDF value for this model.
-      public: virtual const sdf::ElementPtr GetSDF();
+      /// \brief Get the RML values for the model.
+      /// \return The RML value for this model.
+      public: virtual const rml::ElementPtr GetRML();
 
       /// \brief Remove a child.
       /// \param[in] _child Remove a child entity.
@@ -270,13 +270,13 @@ namespace gazebo
       /// \param[in] _disable If true, the model is allowed to auto disable.
       public: void SetAutoDisable(bool _disable);
 
-      /// \brief Return the value of the SDF <allow_auto_disable> element.
+      /// \brief Return the value of the RML <allow_auto_disable> element.
       /// \return True if auto disable is allowed for this model.
       public: bool GetAutoDisable() const;
 
       /// \brief Load all plugins
       ///
-      /// Load all plugins specified in the SDF for the model.
+      /// Load all plugins specified in the RML for the model.
       public: void LoadPlugins();
 
       /// \brief Get the number of plugins this model has.
@@ -295,16 +295,16 @@ namespace gazebo
       private: void LoadLinks();
 
       /// \brief Load a joint helper function.
-      /// \param[in] _sdf SDF parameter.
-      private: void LoadJoint(sdf::ElementPtr _sdf);
+      /// \param[in] _rml RML parameter.
+      private: void LoadJoint(rml::ElementPtr _rml);
 
       /// \brief Load a plugin helper function.
-      /// \param[in] _sdf SDF parameter.
-      private: void LoadPlugin(sdf::ElementPtr _sdf);
+      /// \param[in] _rml RML parameter.
+      private: void LoadPlugin(rml::ElementPtr _rml);
 
       /// \brief Load a gripper helper function.
-      /// \param[in] _sdf SDF parameter.
-      private: void LoadGripper(sdf::ElementPtr _sdf);
+      /// \param[in] _rml RML parameter.
+      private: void LoadGripper(rml::ElementPtr _rml);
 
       /// \brief Get a handle to the Controller for the joints in this model.
       /// \return A handle to the Controller for the joints in this model.

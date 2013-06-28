@@ -304,12 +304,12 @@ TEST(MsgsTest, SetPlane)
   EXPECT_TRUE(math::equal(1.0, msg.d()));
 }
 
-TEST(MsgsTest, GUIFromSDF)
+TEST(MsgsTest, GUIFromRML)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("gui.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("gui.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <gui fullscreen='true'>\
          <camera name='camera'>\
            <view_controller>fps</view_controller>\
@@ -321,16 +321,16 @@ TEST(MsgsTest, GUIFromSDF)
            </track_visual>\
          </camera>\
          </gui>\
-       </gazebo>", sdf);
-  msgs::GUI msg = msgs::GUIFromSDF(sdf);
+       </gazebo>", rml);
+  msgs::GUI msg = msgs::GUIFromRML(rml);
 }
 
-TEST(MsgsTest, GUIFromSDF_EmptyTrackVisual)
+TEST(MsgsTest, GUIFromRML_EmptyTrackVisual)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("gui.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("gui.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <gui fullscreen='true'>\
          <camera name='camera'>\
            <view_controller>fps</view_controller>\
@@ -342,42 +342,42 @@ TEST(MsgsTest, GUIFromSDF_EmptyTrackVisual)
            </track_visual>\
          </camera>\
          </gui>\
-       </gazebo>", sdf);
-  msgs::GUI msg = msgs::GUIFromSDF(sdf);
+       </gazebo>", rml);
+  msgs::GUI msg = msgs::GUIFromRML(rml);
 }
 
-TEST(MsgsTest, GUIFromSDF_WithEmptyCamera)
+TEST(MsgsTest, GUIFromRML_WithEmptyCamera)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("gui.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("gui.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <gui fullscreen='true'>\
          <camera name='camera'>\
          </camera>\
          </gui>\
-       </gazebo>", sdf);
-  msgs::GUI msg = msgs::GUIFromSDF(sdf);
+       </gazebo>", rml);
+  msgs::GUI msg = msgs::GUIFromRML(rml);
 }
 
-TEST(MsgsTest, GUIFromSDF_WithoutCamera)
+TEST(MsgsTest, GUIFromRML_WithoutCamera)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("gui.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("gui.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <gui fullscreen='true'>\
          </gui>\
-       </gazebo>", sdf);
-  msgs::GUI msg = msgs::GUIFromSDF(sdf);
+       </gazebo>", rml);
+  msgs::GUI msg = msgs::GUIFromRML(rml);
 }
 
-TEST(MsgsTest, LightFromSDF_ListDirectional)
+TEST(MsgsTest, LightFromRML_ListDirectional)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("light.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("light.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <light type='directional' name='sun'>\
            <cast_shadows>true</cast_shadows>\
            <pose>0 0 10 0 0 0</pose>\
@@ -391,16 +391,16 @@ TEST(MsgsTest, LightFromSDF_ListDirectional)
            </attenuation>\
            <direction>1.0 1.0 -1.0</direction>\
          </light>\
-       </gazebo>", sdf);
-  msgs::Light msg = msgs::LightFromSDF(sdf);
+       </gazebo>", rml);
+  msgs::Light msg = msgs::LightFromRML(rml);
 }
 
-TEST(MsgsTest, LightFromSDF_LightSpot)
+TEST(MsgsTest, LightFromRML_LightSpot)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("light.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("light.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <light type='spot' name='lamp'>\
            <pose>0 0 10 0 0 0</pose>\
            <diffuse>0.8 0.8 0.8 1</diffuse>\
@@ -418,16 +418,16 @@ TEST(MsgsTest, LightFromSDF_LightSpot)
            </attenuation>\
            <direction>1.0 1.0 -1.0</direction>\
          </light>\
-       </gazebo>", sdf);
-  msgs::Light msg = msgs::LightFromSDF(sdf);
+       </gazebo>", rml);
+  msgs::Light msg = msgs::LightFromRML(rml);
 }
 
-TEST(MsgsTest, LightFromSDF_LightPoint)
+TEST(MsgsTest, LightFromRML_LightPoint)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("light.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("light.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <light type='point' name='lamp'>\
            <pose>0 0 10 0 0 0</pose>\
            <diffuse>0.8 0.8 0.8 1</diffuse>\
@@ -439,29 +439,29 @@ TEST(MsgsTest, LightFromSDF_LightPoint)
              <quadratic>0.0</quadratic>\
            </attenuation>\
          </light>\
-       </gazebo>", sdf);
-  msgs::Light msg = msgs::LightFromSDF(sdf);
+       </gazebo>", rml);
+  msgs::Light msg = msgs::LightFromRML(rml);
 }
 
-TEST(MsgsTest, LightFromSDF_LighBadType)
+TEST(MsgsTest, LightFromRML_LighBadType)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("light.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("light.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <light type='_bad_' name='lamp'>\
          </light>\
-       </gazebo>", sdf);
-  msgs::Light msg = msgs::LightFromSDF(sdf);
+       </gazebo>", rml);
+  msgs::Light msg = msgs::LightFromRML(rml);
 }
 
 // Plane visual
-TEST(MsgsTest, VisualFromSDF_PlaneVisual)
+TEST(MsgsTest, VisualFromRML_PlaneVisual)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("visual.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
            <geometry>\
@@ -469,16 +469,16 @@ TEST(MsgsTest, VisualFromSDF_PlaneVisual)
            </geometry>\
            <material><script>Gazebo/Grey</script></material>\
          </visual>\
-      </gazebo>", sdf);
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+      </gazebo>", rml);
+  msgs::Visual msg = msgs::VisualFromRML(rml);
 }
 
-TEST(MsgsTest, VisualFromSDF_BoxVisual)
+TEST(MsgsTest, VisualFromRML_BoxVisual)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("visual.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
            <geometry>\
@@ -486,16 +486,16 @@ TEST(MsgsTest, VisualFromSDF_BoxVisual)
            </geometry>\
            <material><script>Gazebo/Grey'</script></material>\
          </visual>\
-      </gazebo>", sdf);
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+      </gazebo>", rml);
+  msgs::Visual msg = msgs::VisualFromRML(rml);
 }
 
-TEST(MsgsTest, VisualFromSDF_SphereVisual)
+TEST(MsgsTest, VisualFromRML_SphereVisual)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("visual.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
            <geometry>\
@@ -507,16 +507,16 @@ TEST(MsgsTest, VisualFromSDF_SphereVisual)
            </shader>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+      </gazebo>", rml);
+  msgs::Visual msg = msgs::VisualFromRML(rml);
 }
 
-TEST(MsgsTest, VisualFromSDF_CylinderVisual)
+TEST(MsgsTest, VisualFromRML_CylinderVisual)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("visual.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
            <geometry>\
@@ -526,16 +526,16 @@ TEST(MsgsTest, VisualFromSDF_CylinderVisual)
            <shader type='normal_map_object_space'/>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+      </gazebo>", rml);
+  msgs::Visual msg = msgs::VisualFromRML(rml);
 }
 
-TEST(MsgsTest, VisualFromSDF_MeshVisual)
+TEST(MsgsTest, VisualFromRML_MeshVisual)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("visual.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
            <geometry>\
@@ -545,16 +545,16 @@ TEST(MsgsTest, VisualFromSDF_MeshVisual)
            <shader type='vertex'/>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+      </gazebo>", rml);
+  msgs::Visual msg = msgs::VisualFromRML(rml);
 }
 
-TEST(MsgsTest, VisualFromSDF_ImageVisual)
+TEST(MsgsTest, VisualFromRML_ImageVisual)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("visual.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
            <pose>1 1 1 1 2 3</pose>\
@@ -576,16 +576,16 @@ TEST(MsgsTest, VisualFromSDF_ImageVisual)
              <emissive>.1 .2 .3 1</emissive>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+      </gazebo>", rml);
+  msgs::Visual msg = msgs::VisualFromRML(rml);
 }
 
-TEST(MsgsTest, VisualFromSDF_HeigthmapVisual)
+TEST(MsgsTest, VisualFromRML_HeigthmapVisual)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("visual.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
            <pose>1 1 1 1 2 3</pose>\
@@ -600,29 +600,29 @@ TEST(MsgsTest, VisualFromSDF_HeigthmapVisual)
            <shader type='pixel'/>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+      </gazebo>", rml);
+  msgs::Visual msg = msgs::VisualFromRML(rml);
 }
 
-TEST(MsgsTest, VisualFromSDF_NoGeometry)
+TEST(MsgsTest, VisualFromRML_NoGeometry)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("visual.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <visual name='visual'>\
          </visual>\
-      </gazebo>", sdf);
-  EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
+      </gazebo>", rml);
+  EXPECT_THROW(msgs::Visual msg = msgs::VisualFromRML(rml),
       common::Exception);
 }
 
-TEST(MsgsTest, VisualFromSDF_ShaderTypeThrow)
+TEST(MsgsTest, VisualFromRML_ShaderTypeThrow)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("visual.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <visual name='visual'>\
            <pose>1 1 1 1 2 3</pose>\
            <geometry>\
@@ -635,16 +635,16 @@ TEST(MsgsTest, VisualFromSDF_ShaderTypeThrow)
            <shader type='throw'/>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+      </gazebo>", rml);
+  msgs::Visual msg = msgs::VisualFromRML(rml);
 }
 
-TEST(MsgsTest, VisualFromSDF_BadGeometryVisual)
+TEST(MsgsTest, VisualFromRML_BadGeometryVisual)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("visual.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <visual name='visual'>\
            <pose>1 1 1 1 2 3</pose>\
            <geometry>\
@@ -653,17 +653,17 @@ TEST(MsgsTest, VisualFromSDF_BadGeometryVisual)
            <shader type='pixel'/>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
-  EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
+      </gazebo>", rml);
+  EXPECT_THROW(msgs::Visual msg = msgs::VisualFromRML(rml),
                common::Exception);
 }
 
-TEST(MsgsTest, VisualFromSDF_BadGeometryType)
+TEST(MsgsTest, VisualFromRML_BadGeometryType)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("visual.sdf", sdf);
-  EXPECT_FALSE(sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("visual.rml", rml);
+  EXPECT_FALSE(rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <visual name='visual'>\
            <pose>1 1 1 1 2 3</pose>\
            <geometry>\
@@ -673,27 +673,27 @@ TEST(MsgsTest, VisualFromSDF_BadGeometryType)
            <shader type='pixel'/>\
            </material>\
          </visual>\
-      </gazebo>", sdf));
+      </gazebo>", rml));
 
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <visual name='visual'>\
          </visual>\
-      </gazebo>", sdf);
+      </gazebo>", rml);
 
-  sdf::ElementPtr badElement(new sdf::Element());
+  rml::ElementPtr badElement(new rml::Element());
   badElement->SetName("bad_type");
-  sdf->GetElement("geometry")->InsertElement(badElement);
-  EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
+  rml->GetElement("geometry")->InsertElement(badElement);
+  EXPECT_THROW(msgs::Visual msg = msgs::VisualFromRML(rml),
       common::Exception);
 }
 
-TEST(MsgsTest, VisualFromSDF_BadFogType)
+TEST(MsgsTest, VisualFromRML_BadFogType)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("scene.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("scene.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <scene>\
            <ambient>0.1 0.1 0.1 1</ambient>\
            <background>0 0 0 1</background>\
@@ -702,16 +702,16 @@ TEST(MsgsTest, VisualFromSDF_BadFogType)
            <start>0</start> <end>10</end> <density>1</density> </fog>\
            <grid>false</grid>\
          </scene>\
-      </gazebo>", sdf);
-  EXPECT_THROW(msgs::Scene msg = msgs::SceneFromSDF(sdf), common::Exception);
+      </gazebo>", rml);
+  EXPECT_THROW(msgs::Scene msg = msgs::SceneFromRML(rml), common::Exception);
 }
 
-TEST(MsgsTest, VisualSceneFromSDF_A)
+TEST(MsgsTest, VisualSceneFromRML_A)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("scene.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("scene.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <scene>\
            <ambient>0.1 0.1 0.1 1</ambient>\
            <background>0 0 0 1</background>\
@@ -719,16 +719,16 @@ TEST(MsgsTest, VisualSceneFromSDF_A)
            <fog>1 1 1 1' type='linear' start='0' end='10' density='1'/>\
            <grid>false</grid>\
          </scene>\
-      </gazebo>", sdf);
-  msgs::Scene msg = msgs::SceneFromSDF(sdf);
+      </gazebo>", rml);
+  msgs::Scene msg = msgs::SceneFromRML(rml);
 }
 
-TEST(MsgsTest, VisualSceneFromSDF_B)
+TEST(MsgsTest, VisualSceneFromRML_B)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("scene.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("scene.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <scene>\
            <ambient>0.1 0.1 0.1 1</ambient>\
            <background>0 0 0 1</background>\
@@ -736,16 +736,16 @@ TEST(MsgsTest, VisualSceneFromSDF_B)
            <fog><color>1 1 1 1</color><type>exp</type><start>0</start>\
            <end>10</end><density>1<density/>\
          </scene>\
-      </gazebo>", sdf);
-  msgs::Scene msg = msgs::SceneFromSDF(sdf);
+      </gazebo>", rml);
+  msgs::Scene msg = msgs::SceneFromRML(rml);
 }
 
-TEST(MsgsTest, VisualSceneFromSDF_C)
+TEST(MsgsTest, VisualSceneFromRML_C)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("scene.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("scene.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <scene>\
            <ambient>0.1 0.1 0.1 1</ambient>\
            <background>0 0 0 1</background>\
@@ -755,42 +755,42 @@ TEST(MsgsTest, VisualSceneFromSDF_C)
            <density>1</density>\
            <grid>true</grid>\
          </scene>\
-      </gazebo>", sdf);
-  msgs::Scene msg = msgs::SceneFromSDF(sdf);
+      </gazebo>", rml);
+  msgs::Scene msg = msgs::SceneFromRML(rml);
 }
 
-TEST(MsgsTest, VisualSceneFromSDF_CEmpty)
+TEST(MsgsTest, VisualSceneFromRML_CEmpty)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("scene.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("scene.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <scene>\
          </scene>\
-      </gazebo>", sdf);
-  msgs::Scene msg = msgs::SceneFromSDF(sdf);
+      </gazebo>", rml);
+  msgs::Scene msg = msgs::SceneFromRML(rml);
 }
 
-TEST(MsgsTest, VisualSceneFromSDF_CEmptyNoSky)
+TEST(MsgsTest, VisualSceneFromRML_CEmptyNoSky)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("scene.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("scene.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
          <scene>\
            <background>0 0 0 1</background>\
          </scene>\
-      </gazebo>", sdf);
-  msgs::Scene msg = msgs::SceneFromSDF(sdf);
+      </gazebo>", rml);
+  msgs::Scene msg = msgs::SceneFromRML(rml);
 }
 
 /////////////////////////////////////////////////
-TEST(MsgsTest, MeshFromSDF)
+TEST(MsgsTest, MeshFromRML)
 {
-  sdf::ElementPtr sdf(new sdf::Element());
-  sdf::initFile("geometry.sdf", sdf);
-  sdf::readString(
-      "<sdf version='" SDF_VERSION "'>\
+  rml::ElementPtr rml(new rml::Element());
+  rml::initFile("geometry.rml", rml);
+  rml::readString(
+      "<rml version='" RML_VERSION "'>\
            <geometry>\
              <mesh>\
                <uri>test/mesh.dae</uri>\
@@ -802,9 +802,9 @@ TEST(MsgsTest, MeshFromSDF)
              </mesh>\
            </geometry>\
          </visual>\
-      </sdf>", sdf);
+      </rml>", rml);
 
-  msgs::MeshGeom msg = msgs::MeshFromSDF(sdf->GetElement("mesh"));
+  msgs::MeshGeom msg = msgs::MeshFromRML(rml->GetElement("mesh"));
   EXPECT_TRUE(msg.has_filename());
   EXPECT_STREQ("test/mesh.dae", msg.filename().c_str());
 

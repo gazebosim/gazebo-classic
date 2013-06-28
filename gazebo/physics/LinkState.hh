@@ -24,7 +24,7 @@
 #include <vector>
 #include <string>
 
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/CollisionState.hh"
 #include "gazebo/math/Pose.hh"
@@ -68,9 +68,9 @@ namespace gazebo
 
       /// \brief Constructor
       ///
-      /// Build a LinkState from SDF data
-      /// \param[in] _sdf SDF data to load a link state from.
-      public: explicit LinkState(const sdf::ElementPtr _sdf);
+      /// Build a LinkState from RML data
+      /// \param[in] _rml RML data to load a link state from.
+      public: explicit LinkState(const rml::ElementPtr _rml);
 
       /// \brief Destructor.
       public: virtual ~LinkState();
@@ -85,11 +85,11 @@ namespace gazebo
       public: void Load(const LinkPtr _link, const common::Time &_realTime,
                   const common::Time &_simTime);
 
-      /// \brief Load state from SDF element.
+      /// \brief Load state from RML element.
       ///
-      /// Load LinkState information from stored data in and SDF::Element.
-      /// \param[in] _elem Pointer to the SDF::Element containing state info.
-      public: virtual void Load(const sdf::ElementPtr _elem);
+      /// Load LinkState information from stored data in and RML::Element.
+      /// \param[in] _elem Pointer to the RML::Element containing state info.
+      public: virtual void Load(const rml::ElementPtr _elem);
 
       /// \brief Get the link pose.
       /// \return The math::Pose of the Link.
@@ -140,9 +140,9 @@ namespace gazebo
       /// \return True if the values in the state are zero.
       public: bool IsZero() const;
 
-      /// \brief Populate a state SDF element with data from the object.
-      /// \param[out] _sdf SDF element to populate.
-      public: void FillSDF(sdf::ElementPtr _sdf);
+      /// \brief Populate a state RML element with data from the object.
+      /// \param[out] _rml RML element to populate.
+      public: void FillRML(rml::ElementPtr _rml);
 
       /// \brief Set the wall time when this state was generated
       /// \param[in] _time The absolute clock time when the State

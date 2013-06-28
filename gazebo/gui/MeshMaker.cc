@@ -162,7 +162,7 @@ void MeshMaker::CreateTheEntity()
 
   std::ostringstream newModelStr;
 
-  newModelStr << "<sdf version ='1.3'>\
+  newModelStr << "<rml version ='1.3'>\
     <model name='custom_user_mesh" << counter << "_model'>\
     <pose>" << this->visualMsg->pose().position().x() << " "
               << this->visualMsg->pose().position().y() << " "
@@ -186,9 +186,9 @@ void MeshMaker::CreateTheEntity()
       </visual>\
     </link>\
   </model>\
-  </sdf>";
+  </rml>";
 
-  msg.set_sdf(newModelStr.str());
+  msg.set_rml(newModelStr.str());
 
   msgs::Request *requestMsg = msgs::CreateRequest("entity_delete",
       this->visualMsg->name());

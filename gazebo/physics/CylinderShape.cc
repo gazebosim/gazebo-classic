@@ -25,7 +25,7 @@ using namespace physics;
 CylinderShape::CylinderShape(CollisionPtr _parent) : Shape(_parent)
 {
   this->AddType(Base::CYLINDER_SHAPE);
-  sdf::initFile("cylinder_shape.sdf", this->sdf);
+  rml::initFile("cylinder_shape.rml", this->rml);
 }
 
 //////////////////////////////////////////////////
@@ -36,47 +36,47 @@ CylinderShape::~CylinderShape()
 //////////////////////////////////////////////////
 void CylinderShape::Init()
 {
-  this->SetSize(this->sdf->Get<double>("radius"),
-                 this->sdf->Get<double>("length"));
+  this->SetSize(this->rml->Get<double>("radius"),
+                 this->rml->Get<double>("length"));
 }
 
 //////////////////////////////////////////////////
 void CylinderShape::SetRadius(double _radius)
 {
-  this->sdf->GetElement("radius")->Set(_radius);
-  if (this->sdf->HasElement("length"))
+  this->rml->GetElement("radius")->Set(_radius);
+  if (this->rml->HasElement("length"))
   {
-    this->SetSize(_radius, this->sdf->Get<double>("length"));
+    this->SetSize(_radius, this->rml->Get<double>("length"));
   }
 }
 
 //////////////////////////////////////////////////
 void CylinderShape::SetLength(double _length)
 {
-  this->sdf->GetElement("length")->Set(_length);
-  if (this->sdf->HasElement("radius"))
+  this->rml->GetElement("length")->Set(_length);
+  if (this->rml->HasElement("radius"))
   {
-    this->SetSize(this->sdf->Get<double>("radius"), _length);
+    this->SetSize(this->rml->Get<double>("radius"), _length);
   }
 }
 
 //////////////////////////////////////////////////
 void CylinderShape::SetSize(double _radius, double _length)
 {
-  this->sdf->GetElement("radius")->Set(_radius);
-  this->sdf->GetElement("length")->Set(_length);
+  this->rml->GetElement("radius")->Set(_radius);
+  this->rml->GetElement("length")->Set(_length);
 }
 
 /////////////////////////////////////////////////
 double CylinderShape::GetRadius() const
 {
-  return this->sdf->Get<double>("radius");
+  return this->rml->Get<double>("radius");
 }
 
 /////////////////////////////////////////////////
 double CylinderShape::GetLength() const
 {
-  return this->sdf->Get<double>("length");
+  return this->rml->Get<double>("length");
 }
 
 /////////////////////////////////////////////////

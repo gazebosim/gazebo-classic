@@ -28,7 +28,7 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/SystemPaths.hh"
@@ -614,30 +614,30 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
     TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
     if (modelXML)
     {
-      TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");
-      TiXmlElement *sdfSearch = sdfXML;
+      TiXmlElement *rmlXML = modelXML->FirstChildElement("rml");
+      TiXmlElement *rmlSearch = rmlXML;
 
-      // Find the SDF element that matches our current SDF version.
-      while (sdfSearch)
+      // Find the RML element that matches our current RML version.
+      while (rmlSearch)
       {
-        if (sdfSearch->Attribute("version") &&
-            std::string(sdfSearch->Attribute("version")) == SDF_VERSION)
+        if (rmlSearch->Attribute("version") &&
+            std::string(rmlSearch->Attribute("version")) == RML_VERSION)
         {
-          sdfXML = sdfSearch;
+          rmlXML = rmlSearch;
           break;
         }
 
-        sdfSearch = sdfSearch->NextSiblingElement("sdf");
+        rmlSearch = rmlSearch->NextSiblingElement("rml");
       }
 
-      if (sdfXML)
+      if (rmlXML)
       {
-        result = path + "/" + sdfXML->GetText();
+        result = path + "/" + rmlXML->GetText();
       }
       else
       {
         gzerr << "Manifest[" << manifestPath << "] doesn't have "
-              << "<model><sdf>...</sdf></model> element.\n";
+              << "<model><rml>...</rml></model> element.\n";
       }
     }
     else

@@ -28,7 +28,7 @@
 #include <list>
 #include <vector>
 
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Event.hh"
@@ -100,8 +100,8 @@ namespace gazebo
       public: void LoadFromMsg(ConstVisualPtr &_msg);
 
       /// \brief Load the visual with a set of parameters.
-      /// \param[in] _sdf Load from an SDF element.
-      public: void Load(sdf::ElementPtr _sdf);
+      /// \param[in] _rml Load from an RML element.
+      public: void Load(rml::ElementPtr _rml);
 
       /// \brief Load the visual with default parameters.
       public: virtual void Load();
@@ -438,10 +438,10 @@ namespace gazebo
       /// \brief Load a plugin
       /// \param _filename The filename of the plugin
       /// \param _name A unique name for the plugin
-      /// \param _sdf The SDF to pass into the plugin.
+      /// \param _rml The RML to pass into the plugin.
       public: void LoadPlugin(const std::string &_filename,
                                const std::string &_name,
-                               sdf::ElementPtr _sdf);
+                               rml::ElementPtr _rml);
 
       /// \brief Remove a running plugin
       /// \param _name The unique name of the plugin to remove
@@ -449,10 +449,10 @@ namespace gazebo
 
       /// \brief Load all plugins
       ///
-      /// Load all plugins specified in the SDF for the model.
+      /// Load all plugins specified in the RML for the model.
       private: void LoadPlugins();
 
-      private: void LoadPlugin(sdf::ElementPtr _sdf);
+      private: void LoadPlugin(rml::ElementPtr _rml);
 
       private: std::vector<VisualPluginPtr> plugins;
 
@@ -462,11 +462,11 @@ namespace gazebo
       private: void GetBoundsHelper(Ogre::SceneNode *_node,
                                     math::Box &_box) const;
 
-      /// \brief The name of the mesh set in the visual's SDF.
+      /// \brief The name of the mesh set in the visual's RML.
       /// \return Name of the mesh.
       public: std::string GetMeshName() const;
 
-      /// \brief Get the name of the sub mesh set in the visual's SDF.
+      /// \brief Get the name of the sub mesh set in the visual's RML.
       /// \return Name of the submesh. Empty string if no submesh is
       /// specified.
       public: std::string GetSubMeshName() const;
@@ -493,8 +493,8 @@ namespace gazebo
       private: void DestroyAllAttachedMovableObjects(
                    Ogre::SceneNode *_sceneNode);
 
-      /// \brief The SDF element for the visual.
-      private: sdf::ElementPtr sdf;
+      /// \brief The RML element for the visual.
+      private: rml::ElementPtr rml;
 
       /// \brief The unique name for the visual's material.
       private: std::string myMaterialName;

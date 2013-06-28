@@ -22,7 +22,7 @@
 #ifndef _ODESURFACEPARAMS_HH_
 #define _ODESURFACEPARAMS_HH_
 
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 namespace gazebo
 {
@@ -38,7 +38,7 @@ namespace gazebo
       public: virtual ~ODESurfaceParams();
 
       // Documentation inherited
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(rml::ElementPtr _rml);
     };
   }
 }

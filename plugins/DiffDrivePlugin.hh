@@ -27,7 +27,7 @@ namespace gazebo
   class DiffDrivePlugin : public ModelPlugin
   {
     public: DiffDrivePlugin();
-    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    public: virtual void Load(physics::ModelPtr _model, rml::ElementPtr _sdf);
     public: virtual void Init();
 
     private: void OnUpdate();

@@ -96,15 +96,15 @@ void RaySensor::Load(const std::string &_worldName)
   GZ_ASSERT(this->laserShape != NULL,
       "Unable to get the laser shape from the multi-ray collision.");
 
-  this->laserShape->Load(this->sdf);
+  this->laserShape->Load(this->rml);
   this->laserShape->Init();
 
   // Handle noise model settings.
   this->noiseActive = false;
-  sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
+  rml::ElementPtr rayElem = this->rml->GetElement("ray");
   if (rayElem->HasElement("noise"))
   {
-    sdf::ElementPtr noiseElem = rayElem->GetElement("noise");
+    rml::ElementPtr noiseElem = rayElem->GetElement("noise");
     std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {

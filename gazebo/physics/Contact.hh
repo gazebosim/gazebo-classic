@@ -35,7 +35,7 @@
 // For the sake of efficiency, use fixed size arrays for collision
 // MAX_COLLIDE_RETURNS limits contact detection, needs to be large
 //                      for proper contact dynamics.
-// MAX_CONTACT_JOINTS truncates <max_contacts> specified in SDF
+// MAX_CONTACT_JOINTS truncates <max_contacts> specified in RML
 #define MAX_COLLIDE_RETURNS 250
 #define MAX_CONTACT_JOINTS 32
 

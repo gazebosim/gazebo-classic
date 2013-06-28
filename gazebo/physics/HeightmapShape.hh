@@ -52,8 +52,8 @@ namespace gazebo
       public: virtual ~HeightmapShape();
 
       /// \brief Load the heightmap.
-      /// \param[in] _sdf SDF value to load from.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      /// \param[in] _rml RML value to load from.
+      public: virtual void Load(rml::ElementPtr _rml);
 
       /// \brief Initialize the heightmap.
       public: virtual void Init();

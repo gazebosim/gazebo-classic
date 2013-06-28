@@ -31,7 +31,7 @@ class ImuSensor_TEST : public ServerFixture
 };
 
 static std::string imuSensorString =
-"<sdf version='1.3'>"
+"<rml version='1.3'>"
 "  <sensor name='imu' type='imu'>"
 "    <always_on>1</always_on>"
 "    <update_rate>20.000000</update_rate>"
@@ -39,19 +39,19 @@ static std::string imuSensorString =
 "      <topic>/test_imu</topic>"
 "    </imu>"
 "  </sensor>"
-"</sdf>";
+"</rml>";
 
 void ImuSensor_TEST::BasicImuSensorCheck(const std::string &_physicsEngine)
 {
   Load("worlds/empty.world", false, _physicsEngine);
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
-  sdf::ElementPtr sdf(new sdf::Element);
-  sdf::initFile("sensor.sdf", sdf);
-  sdf::readString(imuSensorString, sdf);
+  rml::ElementPtr rml(new rml::Element);
+  rml::initFile("sensor.rml", rml);
+  rml::readString(imuSensorString, rml);
 
   // Create the IMU sensor
-  std::string sensorName = mgr->CreateSensor(sdf, "default",
+  std::string sensorName = mgr->CreateSensor(rml, "default",
       "ground_plane::link");
 
   // Make sure the returned sensor name is correct

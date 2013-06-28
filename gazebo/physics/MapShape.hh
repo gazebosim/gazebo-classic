@@ -55,8 +55,8 @@ namespace gazebo
       public: void Update();
 
       /// \brief Load the map.
-      /// \param[in] _sdf Load the map from SDF values.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      /// \param[in] _rml Load the map from RML values.
+      public: virtual void Load(rml::ElementPtr _rml);
 
       /// \brief Init the map.
       public: virtual void Init();

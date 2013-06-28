@@ -823,19 +823,19 @@ void GLWidget::OnCreateEntity(const std::string &_type,
   if (_type == "box")
   {
     this->boxMaker.Start(this->userCamera);
-    if (this->modelMaker.InitFromSDFString(this->boxMaker.GetSDFString()))
+    if (this->modelMaker.InitFromRMLString(this->boxMaker.GetRMLString()))
       this->entityMaker = &this->modelMaker;
   }
   else if (_type == "sphere")
   {
     this->sphereMaker.Start(this->userCamera);
-    if (this->modelMaker.InitFromSDFString(this->sphereMaker.GetSDFString()))
+    if (this->modelMaker.InitFromRMLString(this->sphereMaker.GetRMLString()))
       this->entityMaker = &this->modelMaker;
   }
   else if (_type == "cylinder")
   {
     this->cylinderMaker.Start(this->userCamera);
-    if (this->modelMaker.InitFromSDFString(this->cylinderMaker.GetSDFString()))
+    if (this->modelMaker.InitFromRMLString(this->cylinderMaker.GetRMLString()))
       this->entityMaker = &this->modelMaker;
   }
   else if (_type == "mesh" && !_data.empty())

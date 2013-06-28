@@ -183,12 +183,12 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-std::string CylinderMaker::GetSDFString()
+std::string CylinderMaker::GetRMLString()
 {
   std::ostringstream newModelStr;
 
   newModelStr
-    << "<sdf version ='" << SDF_VERSION << "'>"
+    << "<rml version ='" << RML_VERSION << "'>"
     << "  <model name ='unit_cylinder_" << counter << "'>"
     << "    <pose>0 0 0.5 0 0 0</pose>"
     << "    <link name='link'>"
@@ -217,7 +217,7 @@ std::string CylinderMaker::GetSDFString()
     << "      </visual>"
     << "    </link>"
     << "  </model>"
-    << "</sdf>";
+    << "</rml>";
 
   return newModelStr.str();
 }
@@ -227,7 +227,7 @@ void CylinderMaker::CreateTheEntity()
 {
   msgs::Factory msg;
 
-  msg.set_sdf(this->GetSDFString());
+  msg.set_rml(this->GetRMLString());
 
   msgs::Request *requestMsg = msgs::CreateRequest("entity_delete",
       this->visualMsg->name());

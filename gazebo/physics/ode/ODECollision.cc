@@ -54,9 +54,9 @@ ODECollision::~ODECollision()
 }
 
 //////////////////////////////////////////////////
-void ODECollision::Load(sdf::ElementPtr _sdf)
+void ODECollision::Load(rml::ElementPtr _rml)
 {
-  Collision::Load(_sdf);
+  Collision::Load(_rml);
 
   if (this->IsStatic())
   {

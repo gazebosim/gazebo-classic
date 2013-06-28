@@ -18,7 +18,7 @@
 #define _INERTIAL_HH_
 
 #include <string>
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/math/Quaternion.hh"
@@ -50,13 +50,13 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~Inertial();
 
-      /// \brief Load from SDF values.
-      /// \param[in] _sdf SDF value to load from.
-      public: void Load(sdf::ElementPtr _sdf);
+      /// \brief Load from RML values.
+      /// \param[in] _rml RML value to load from.
+      public: void Load(rml::ElementPtr _rml);
 
-      /// \brief update the parameters using new sdf values.
-      /// \param[in] _sdf Update values from.
-      public: void UpdateParameters(sdf::ElementPtr _sdf);
+      /// \brief update the parameters using new rml values.
+      /// \param[in] _rml Update values from.
+      public: void UpdateParameters(rml::ElementPtr _rml);
 
       /// \brief Reset all the mass properties.
       public: void Reset();
@@ -202,7 +202,7 @@ namespace gazebo
 
       /// \brief Get the equivalent inertia from a point in local Link frame
       /// If you specify GetMOI(this->GetPose()), you should get
-      /// back the Moment of Inertia (MOI) exactly as specified in the SDF.
+      /// back the Moment of Inertia (MOI) exactly as specified in the RML.
       /// If _pose is different from pose of the Inertial block, then
       /// the MOI is rotated accordingly, and contributions from changes
       /// in MOI location location due to point mass is added to the final MOI.
@@ -259,12 +259,12 @@ namespace gazebo
       /// Where products.x is Ixy, products.y is Ixz and products.z is Iyz.
       private: math::Vector3 products;
 
-      /// \brief Our SDF values.
-      private: sdf::ElementPtr sdf;
+      /// \brief Our RML values.
+      private: rml::ElementPtr rml;
 
-      /// \brief An SDF pointer that allows us to only read the inertial.sdf
+      /// \brief An RML pointer that allows us to only read the inertial.rml
       /// file once, which in turns limits disk reads.
-      private: static sdf::ElementPtr sdfInertial;
+      private: static rml::ElementPtr rmlInertial;
     };
     /// \}
   }

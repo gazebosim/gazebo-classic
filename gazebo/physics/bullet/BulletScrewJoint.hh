@@ -45,7 +45,7 @@ namespace gazebo
       public: virtual ~BulletScrewJoint();
 
       /// \brief Load the BulletScrewJoint
-      protected: virtual void Load(sdf::ElementPtr _sdf);
+      protected: virtual void Load(rml::ElementPtr _rml);
 
       /// \brief Attach the two bodies with this joint
       public: void Attach(LinkPtr _one, LinkPtr _two);

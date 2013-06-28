@@ -46,9 +46,9 @@ ODEScrewJoint::~ODEScrewJoint()
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
+void ODEScrewJoint::Load(rml::ElementPtr _rml)
 {
-  ScrewJoint<ODEJoint>::Load(_sdf);
+  ScrewJoint<ODEJoint>::Load(_rml);
   this->SetThreadPitch(0, this->threadPitch);
 }
 

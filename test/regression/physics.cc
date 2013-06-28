@@ -129,7 +129,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   math::Pose linkOffsetPose1(0, 0, z0, 0, 0, 0);
   math::Pose linkOffsetPose2(1000, 1000, 0, 0, 0, 0);
   math::Vector3 linkOffsetSize(1, 1, 1);
-  linkOffsetStream << "<sdf version='" << SDF_VERSION << "'>"
+  linkOffsetStream << "<sdf version='" << RML_VERSION << "'>"
     << "<model name ='link_offset_box'>"
     << "<pose>" << linkOffsetPose1 << "</pose>"
     << "<allow_auto_disable>false</allow_auto_disable>"
@@ -156,7 +156,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
     << "</link>"
     << "</model>"
     << "</sdf>";
-  SpawnSDF(linkOffsetStream.str());
+  SpawnRML(linkOffsetStream.str());
 
   // std::string trimeshPath =
   //    "file://media/models/cube_20k/meshes/cube_20k.stl";
@@ -1479,7 +1479,7 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
   math::Pose link02Pose(0, -0.1, 0, 0, 0, 0);
 
   // A model composed of two overlapping links at fixed y offset from origin
-  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+  newModelStr << "<sdf version='" << RML_VERSION << "'>"
               << "<model name ='" << modelName << "'>"
               << "<pose>" << modelPose.pos.x << " "
                          << modelPose.pos.y << " "
@@ -1526,7 +1526,7 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
               << "</model>"
               << "</sdf>";
 
-  SpawnSDF(newModelStr.str());
+  SpawnRML(newModelStr.str());
 
   // Wait for the entity to spawn
   int i = 0;

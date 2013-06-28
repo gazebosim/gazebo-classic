@@ -18,7 +18,7 @@
 #define MESSAGES_UTILITY_H
 
 #include <string>
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/msgs/MessageTypes.hh"
 
@@ -171,45 +171,45 @@ namespace gazebo
     /// \param[in] _v A math::Plane reference
     void Set(msgs::PlaneGeom *_p, const math::Plane &_v);
 
-    /// \brief Create a msgs::TrackVisual from a track visual SDF element
-    /// \param[in] _sdf The sdf element
+    /// \brief Create a msgs::TrackVisual from a track visual RML element
+    /// \param[in] _rml The rml element
     /// \return The new msgs::TrackVisual object
-    msgs::TrackVisual TrackVisualFromSDF(sdf::ElementPtr _sdf);
+    msgs::TrackVisual TrackVisualFromRML(rml::ElementPtr _rml);
 
-    /// \brief Create a msgs::GUI from a GUI SDF element
-    /// \param[in] _sdf The sdf element
+    /// \brief Create a msgs::GUI from a GUI RML element
+    /// \param[in] _rml The rml element
     /// \return The new msgs::GUI object
-    msgs::GUI GUIFromSDF(sdf::ElementPtr _sdf);
+    msgs::GUI GUIFromRML(rml::ElementPtr _rml);
 
-    /// \brief Create a msgs::Light from a light SDF element
-    /// \param[in] _sdf The sdf element
+    /// \brief Create a msgs::Light from a light RML element
+    /// \param[in] _rml The rml element
     /// \return The new msgs::Light object
-    msgs::Light LightFromSDF(sdf::ElementPtr _sdf);
+    msgs::Light LightFromRML(rml::ElementPtr _rml);
 
-    /// \brief Create a msgs::MeshGeom from a mesh SDF element
-    /// \param[in] _sdf The sdf element
+    /// \brief Create a msgs::MeshGeom from a mesh RML element
+    /// \param[in] _rml The rml element
     /// \return The new msgs::MeshGeom object
-    msgs::MeshGeom MeshFromSDF(sdf::ElementPtr _sdf);
+    msgs::MeshGeom MeshFromRML(rml::ElementPtr _rml);
 
-    /// \brief Create a msgs::Geometry from a geometry SDF element
-    /// \param[in] _sdf The sdf element
+    /// \brief Create a msgs::Geometry from a geometry RML element
+    /// \param[in] _rml The rml element
     /// \return The new msgs::Geometry object
-    msgs::Geometry GeometryFromSDF(sdf::ElementPtr _sdf);
+    msgs::Geometry GeometryFromRML(rml::ElementPtr _rml);
 
-    /// \brief Create a msgs::Visual from a visual SDF element
-    /// \param[in] _sdf The sdf element
+    /// \brief Create a msgs::Visual from a visual RML element
+    /// \param[in] _rml The rml element
     /// \return The new msgs::Visual object
-    msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf);
+    msgs::Visual VisualFromRML(rml::ElementPtr _rml);
 
-    /// \brief Create a msgs::Fog from a fog SDF element
-    /// \param[in] _sdf The sdf element
+    /// \brief Create a msgs::Fog from a fog RML element
+    /// \param[in] _rml The rml element
     /// \return The new msgs::Fog object
-    msgs::Fog FogFromSDF(sdf::ElementPtr _sdf);
+    msgs::Fog FogFromRML(rml::ElementPtr _rml);
 
-    /// \brief Create a msgs::Scene from a scene SDF element
-    /// \param[in] _sdf The sdf element
+    /// \brief Create a msgs::Scene from a scene RML element
+    /// \param[in] _rml The rml element
     /// \return The new msgs::Scene object
-    msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
+    msgs::Scene SceneFromRML(rml::ElementPtr _rml);
 
     /// \cond
     const google::protobuf::FieldDescriptor *GetFD(

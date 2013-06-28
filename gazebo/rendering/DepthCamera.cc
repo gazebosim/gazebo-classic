@@ -60,11 +60,11 @@ DepthCamera::~DepthCamera()
 }
 
 //////////////////////////////////////////////////
-void DepthCamera::Load(sdf::ElementPtr &_sdf)
+void DepthCamera::Load(rml::ElementPtr &_rml)
 {
-  Camera::Load(_sdf);
+  Camera::Load(_rml);
   this->outputPoints =
-    (_sdf->GetElement("depth_camera")->Get<std::string>("output")
+    (_rml->GetElement("depth_camera")->Get<std::string>("output")
     == "points");
 }
 

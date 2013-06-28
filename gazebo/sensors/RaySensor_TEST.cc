@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 #include "gazebo/math/Angle.hh"
 #include "test/ServerFixture.hh"
 
@@ -26,7 +26,7 @@ class RaySensor_TEST : public ServerFixture
 };
 
 static std::string raySensorString =
-"<sdf version='1.3'>"
+"<rml version='1.3'>"
 "  <sensor name='laser' type='ray'>"
 "    <always_on>1</always_on>"
 "    <visualize>1</visualize>"
@@ -47,7 +47,7 @@ static std::string raySensorString =
 "      </range>"
 "    </ray>"
 "  </sensor>"
-"</sdf>";
+"</rml>";
 
 /////////////////////////////////////////////////
 /// \brief Test Creation of a Ray sensor
@@ -56,12 +56,12 @@ TEST_F(RaySensor_TEST, CreateLaser)
   Load("worlds/empty.world");
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
-  sdf::ElementPtr sdf(new sdf::Element);
-  sdf::initFile("sensor.sdf", sdf);
-  sdf::readString(raySensorString, sdf);
+  rml::ElementPtr rml(new rml::Element);
+  rml::initFile("sensor.rml", rml);
+  rml::readString(raySensorString, rml);
 
   // Create the Ray sensor
-  std::string sensorName = mgr->CreateSensor(sdf, "default",
+  std::string sensorName = mgr->CreateSensor(rml, "default",
       "ground_plane::link");
 
   // Make sure the returned sensor name is correct

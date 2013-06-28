@@ -102,8 +102,8 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
                bool _autoRender)
 {
   this->initialized = false;
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("camera.sdf", this->sdf);
+  this->rml.reset(new rml::Element);
+  rml::initFile("camera.rml", this->rml);
 
   this->animState = NULL;
   this->windowId = 0;
@@ -178,20 +178,20 @@ Camera::~Camera()
   this->connections.clear();
 
   this->imageElem.reset();
-  this->sdf.reset();
+  this->rml.reset();
 }
 
 //////////////////////////////////////////////////
-void Camera::Load(sdf::ElementPtr _sdf)
+void Camera::Load(rml::ElementPtr _rml)
 {
-  this->sdf->Copy(_sdf);
+  this->rml->Copy(_rml);
   this->Load();
 }
 
 //////////////////////////////////////////////////
 void Camera::Load()
 {
-  sdf::ElementPtr imgElem = this->sdf->GetElement("image");
+  rml::ElementPtr imgElem = this->rml->GetElement("image");
   if (imgElem)
   {
     this->imageWidth = imgElem->Get<int>("width");
@@ -203,10 +203,10 @@ void Camera::Load()
     gzthrow("Camera has no <image> tag.");
 
   // Create the directory to store frames
-  if (this->sdf->HasElement("save") &&
-      this->sdf->GetElement("save")->Get<bool>("enabled"))
+  if (this->rml->HasElement("save") &&
+      this->rml->GetElement("save")->Get<bool>("enabled"))
   {
-    sdf::ElementPtr elem = this->sdf->GetElement("save");
+    rml::ElementPtr elem = this->rml->GetElement("save");
     std::string command;
 
     command = "mkdir " + elem->Get<std::string>("path")+ " 2>>/dev/null";
@@ -214,9 +214,9 @@ void Camera::Load()
       gzerr << "Error making directory\n";
   }
 
-  if (this->sdf->HasElement("horizontal_fov"))
+  if (this->rml->HasElement("horizontal_fov"))
   {
-    sdf::ElementPtr elem = this->sdf->GetElement("horizontal_fov");
+    rml::ElementPtr elem = this->rml->GetElement("horizontal_fov");
     double angle = elem->Get<double>();
     if (angle < 0.01 || angle > M_PI)
     {
@@ -227,9 +227,9 @@ void Camera::Load()
 
   // Handle noise model settings.
   this->noiseActive = false;
-  if (this->sdf->HasElement("noise"))
+  if (this->rml->HasElement("noise"))
   {
-    sdf::ElementPtr noiseElem = this->sdf->GetElement("noise");
+    rml::ElementPtr noiseElem = this->rml->GetElement("noise");
     std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {
@@ -440,8 +440,8 @@ void Camera::PostRender()
       this->captureDataOnce = false;
     }
 
-    if (this->sdf->HasElement("save") &&
-        this->sdf->GetElement("save")->Get<bool>("enabled"))
+    if (this->rml->HasElement("save") &&
+        this->rml->GetElement("save")->Get<bool>("enabled"))
     {
       this->SaveFrame(this->GetFrameFilename());
     }
@@ -552,7 +552,7 @@ void Camera::RotatePitch(math::Angle _angle)
 //////////////////////////////////////////////////
 void Camera::SetClipDist()
 {
-  sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
+  rml::ElementPtr clipElem = this->rml->GetElement("clip");
   if (!clipElem)
     gzthrow("Camera has no <clip> tag.");
 
@@ -569,7 +569,7 @@ void Camera::SetClipDist()
 //////////////////////////////////////////////////
 void Camera::SetClipDist(float _near, float _far)
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("clip");
+  rml::ElementPtr elem = this->rml->GetElement("clip");
 
   elem->GetElement("near")->Set(_near);
   elem->GetElement("far")->Set(_far);
@@ -580,13 +580,13 @@ void Camera::SetClipDist(float _near, float _far)
 //////////////////////////////////////////////////
 void Camera::SetHFOV(math::Angle _angle)
 {
-  this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
+  this->rml->GetElement("horizontal_fov")->Set(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 math::Angle Camera::GetHFOV() const
 {
-  return math::Angle(this->sdf->Get<double>("horizontal_fov"));
+  return math::Angle(this->rml->Get<double>("horizontal_fov"));
 }
 
 //////////////////////////////////////////////////
@@ -605,14 +605,14 @@ void Camera::SetImageSize(unsigned int _w, unsigned int _h)
 //////////////////////////////////////////////////
 void Camera::SetImageWidth(unsigned int _w)
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("image");
+  rml::ElementPtr elem = this->rml->GetElement("image");
   elem->GetElement("width")->Set(_w);
 }
 
 //////////////////////////////////////////////////
 void Camera::SetImageHeight(unsigned int _h)
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("image");
+  rml::ElementPtr elem = this->rml->GetElement("image");
   elem->GetElement("height")->Set(_h);
 }
 
@@ -626,7 +626,7 @@ unsigned int Camera::GetImageWidth() const
   }
   else
   {
-    sdf::ElementPtr elem = this->sdf->GetElement("image");
+    rml::ElementPtr elem = this->rml->GetElement("image");
     width = elem->Get<int>("width");
   }
   return width;
@@ -642,7 +642,7 @@ unsigned int Camera::GetImageHeight() const
   }
   else
   {
-    sdf::ElementPtr elem = this->sdf->GetElement("image");
+    rml::ElementPtr elem = this->rml->GetElement("image");
     height = elem->Get<int>("height");
   }
   return height;
@@ -651,7 +651,7 @@ unsigned int Camera::GetImageHeight() const
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageDepth() const
 {
-  sdf::ElementPtr imgElem = this->sdf->GetElement("image");
+  rml::ElementPtr imgElem = this->rml->GetElement("image");
   std::string imgFmt = imgElem->Get<std::string>("format");
 
   if (imgFmt == "L8" || imgFmt == "L_INT8")
@@ -674,7 +674,7 @@ unsigned int Camera::GetImageDepth() const
 //////////////////////////////////////////////////
 std::string Camera::GetImageFormat() const
 {
-  sdf::ElementPtr imgElem = this->sdf->GetElement("image");
+  rml::ElementPtr imgElem = this->rml->GetElement("image");
   return imgElem->Get<std::string>("format");
 }
 
@@ -694,7 +694,7 @@ unsigned int Camera::GetTextureHeight() const
 //////////////////////////////////////////////////
 size_t Camera::GetImageByteSize() const
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("image");
+  rml::ElementPtr elem = this->rml->GetElement("image");
   return this->GetImageByteSize(elem->Get<int>("width"),
                                 elem->Get<int>("height"),
                                 this->GetImageFormat());
@@ -746,7 +746,7 @@ int Camera::GetOgrePixelFormat(const std::string &_format)
 //////////////////////////////////////////////////
 void Camera::EnableSaveFrame(bool enable)
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("save");
+  rml::ElementPtr elem = this->rml->GetElement("save");
   elem->GetAttribute("enabled")->Set(enable);
   this->captureData = true;
 }
@@ -754,7 +754,7 @@ void Camera::EnableSaveFrame(bool enable)
 //////////////////////////////////////////////////
 void Camera::SetSaveFramePathname(const std::string &_pathname)
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("save");
+  rml::ElementPtr elem = this->rml->GetElement("save");
   elem->GetElement("path")->Set(_pathname);
 
   // Create the directory to store frames
@@ -898,7 +898,7 @@ bool Camera::SaveFrame(const std::string &_filename)
 //////////////////////////////////////////////////
 std::string Camera::GetFrameFilename()
 {
-  sdf::ElementPtr saveElem = this->sdf->GetElement("save");
+  rml::ElementPtr saveElem = this->rml->GetElement("save");
 
   std::string path = saveElem->Get<std::string>("path");
   boost::filesystem::path pathToFile;

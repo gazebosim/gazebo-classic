@@ -36,9 +36,9 @@ ODESurfaceParams::~ODESurfaceParams()
 }
 
 //////////////////////////////////////////////////
-void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
+void ODESurfaceParams::Load(rml::ElementPtr _rml)
 {
-  SurfaceParams::Load(_sdf);
+  SurfaceParams::Load(_rml);
 }
 
 

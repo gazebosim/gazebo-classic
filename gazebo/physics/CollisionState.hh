@@ -52,18 +52,18 @@ namespace gazebo
 
       /// \brief Constructor
       ///
-      /// Build a CollisionState from SDF data
-      /// \param[in] _sdf SDF data to load a collision state from.
-      public: explicit CollisionState(const sdf::ElementPtr _sdf);
+      /// Build a CollisionState from RML data
+      /// \param[in] _rml RML data to load a collision state from.
+      public: explicit CollisionState(const rml::ElementPtr _rml);
 
       /// \brief Destructor
       public: virtual ~CollisionState();
 
-      /// \brief Load state from SDF element
+      /// \brief Load state from RML element
       ///
-      /// Load CollisionState information from stored data in and SDF::Element
-      /// \param[in] _elem Pointer to the SDF::Element containing state info.
-      public: virtual void Load(const sdf::ElementPtr _elem);
+      /// Load CollisionState information from stored data in and RML::Element
+      /// \param[in] _elem Pointer to the RML::Element containing state info.
+      public: virtual void Load(const rml::ElementPtr _elem);
 
       /// \brief Get the Collision pose
       /// \return The pose of the CollisionState
@@ -73,9 +73,9 @@ namespace gazebo
       /// \return True if the values in the state are zero.
       public: bool IsZero() const;
 
-      /// \brief Populate a state SDF element with data from the object.
-      /// \param[out] _sdf SDF element to populate.
-      public: void FillSDF(sdf::ElementPtr _sdf);
+      /// \brief Populate a state RML element with data from the object.
+      /// \param[out] _rml RML element to populate.
+      public: void FillRML(rml::ElementPtr _rml);
 
       /// \brief Assignment operator
       /// \param[in] _state State value

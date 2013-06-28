@@ -36,7 +36,7 @@ ForceTorquePlugin::~ForceTorquePlugin()
 
 /////////////////////////////////////////////////
 void ForceTorquePlugin::Load(sensors::SensorPtr _parent,
-    sdf::ElementPtr /*_sdf*/)
+    rml::ElementPtr /*_sdf*/)
 {
   this->parentSensor =
     boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(_parent);

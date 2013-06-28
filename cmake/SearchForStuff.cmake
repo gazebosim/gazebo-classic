@@ -60,15 +60,15 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
-  pkg_check_modules(SDF sdf)
-  if (NOT SDF_FOUND)
-    BUILD_WARNING ("Missing: SDF. Required for reading and writing SDF files. A deprecated version will be used. Pay attention to this warning, because it will become an error in Gazebo 1.7.")
-    set (HAVE_SDF FALSE)
-    set(SDF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/gazebo")
-    set(SDF_LIBRARY_DIRS "${PROJECT_BINARY_DIR}/gazebo/sdf/interface")
-    set(SDF_LIBRARIES gazebo_sdf_interface)
+  pkg_check_modules(RML rml)
+  if (NOT RML_FOUND)
+    BUILD_WARNING ("Missing: RML. Required for reading and writing RML files. The deprecated SDF version will be used. Pay attention to this warning, because it will become an error in Gazebo 2.0.")
+    set (HAVE_RML FALSE)
+    set(RML_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/gazebo")
+    set(RML_LIBRARY_DIRS "${PROJECT_BINARY_DIR}/gazebo/sdf/interface")
+    set(RML_LIBRARIES gazebo_sdf_interface)
   else()
-    set (HAVE_SDF TRUE)
+    set (HAVE_RML TRUE)
   endif()
 
   pkg_check_modules(CURL libcurl)
@@ -441,7 +441,7 @@ endif ()
 #endif ()
 
 # Remove this whole if code block in Gazebo 1.8
-if (NOT HAVE_SDF)
+if (NOT HAVE_RML)
   ########################################
   # Find urdfdom and urdfdom_headers
   # look for the cmake modules first, and .pc pkg_config second

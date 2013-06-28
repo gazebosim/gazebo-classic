@@ -28,7 +28,7 @@ RubblePlugin::RubblePlugin()
 }
 
 /////////////////////////////////////////////////
-void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
+void RubblePlugin::Load(physics::WorldPtr _world, rml::ElementPtr _sdf)
 {
   this->world = _world;
 
@@ -187,7 +187,7 @@ void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
   float sy = _size.y;
   float sz = _size.z;
 
-  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+  newModelStr << "<sdf version='" << RML_VERSION << "'>"
     "<model name='" << _name << "'>"
     "<pose>" << _pose << "</pose>"
     "<link name='link'>"
@@ -232,7 +232,7 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
   float sy = _size.y;
   float sz = _size.z;
 
-  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+  newModelStr << "<sdf version='" << RML_VERSION << "'>"
     "<model name='" << _name << "'>"
     "<allow_auto_disable>true</allow_auto_disable>"
     "<pose>" << _pose << "</pose>"
@@ -277,7 +277,7 @@ void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
   float r = _size.x * 0.5;
   float h = _size.z;
 
-  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+  newModelStr << "<sdf version='" << RML_VERSION << "'>"
     "<model name='" << _name << "'>"
     "<pose>" << _pos << " 0 0 0</pose>"
     "<link name='link'>"

@@ -19,7 +19,7 @@
 
 // Remove the gazebo_config and ifdefs in Gazebo 2.0
 #include "gazebo/gazebo_config.h"
-#ifdef HAVE_SDF
+#ifdef HAVE_RML
 #include "sdf/sdf.hh"
 #else
 #include "gazebo/sdf/sdf.hh"
@@ -35,16 +35,16 @@ using namespace sdf;
 /////////////////////////////////////////////////
 void help()
 {
-  std::cout << "This tool provides information about SDF files.\n\n";
+  std::cout << "This tool provides information about RML files.\n\n";
   std::cout << "gzsdf <command>\n\n";
   std::cout << "Commands:\n";
-  std::cout << "    describe [SDF version]     Print the SDF format.\n";
+  std::cout << "    describe [RML version]     Print the RML format.\n";
   std::cout << "    convert [file]             "
             << "In place conversion to the latest format.\n";
-  std::cout << "    doc [SDF version]          Print HTML SDF.\n";
-  std::cout << "    check [file] [SDF version] Check the SDF format for the";
+  std::cout << "    doc [RML version]          Print HTML RML.\n";
+  std::cout << "    check [file] [RML version] Check the RML format for the";
   std::cout << " given file.\n";
-  std::cout << "    print [SDF verison]         Prints SDF, useful for ";
+  std::cout << "    print [RML verison]         Prints RML, useful for ";
   std::cout << " debugging and as a conversion tool.\n\n";
 }
 
@@ -88,15 +88,15 @@ int main(int argc, char** argv)
   if ((params[0] == "check" || params[0] == "print" || params[0] == "convert"))
   {
     if (params.size() == 3)
-      SDF::version = params[2];
+      RML::version = params[2];
   }
   else if (params.size() == 2)
-    SDF::version = params[1];
+    RML::version = params[1];
 
-  boost::shared_ptr<SDF> sdf(new SDF());
+  boost::shared_ptr<RML> sdf(new RML());
   if (!init(sdf))
   {
-    std::cerr << "ERROR: SDF parsing the xml failed" << std::endl;
+    std::cerr << "ERROR: RML parsing the xml failed" << std::endl;
     return -1;
   }
 
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
 
     if (!readFile(params[1], sdf))
     {
-      std::cerr << "Error: SDF parsing the xml failed\n";
+      std::cerr << "Error: RML parsing the xml failed\n";
       return -1;
     }
 
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
     if (params.size() < 2)
     {
       help();
-      std::cerr << "Error: Missing SDF file to convert\n\n";
+      std::cerr << "Error: Missing RML file to convert\n\n";
       return -1;
     }
 
@@ -146,7 +146,7 @@ int main(int argc, char** argv)
     TiXmlDocument xmlDoc;
     if (xmlDoc.LoadFile(params[1]))
     {
-      if (sdf::Converter::Convert(&xmlDoc, SDF::version, true))
+      if (rml::Converter::Convert(&xmlDoc, RML::version, true))
       {
         success = true;
 
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
 
     if (!readFile(params[1], sdf))
     {
-      std::cerr << "Error: SDF parsing the xml failed\n";
+      std::cerr << "Error: RML parsing the xml failed\n";
       return -1;
     }
     success = true;

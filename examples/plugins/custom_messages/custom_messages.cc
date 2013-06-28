@@ -25,7 +25,7 @@ namespace gazebo
 {
   class CustomMessages : public ModelPlugin
   {
-    public: void Load(physics::ModelPtr /*_parent*/, sdf::ElementPtr /*_sdf*/)
+    public: void Load(physics::ModelPtr /*_parent*/, rml::ElementPtr /*_sdf*/)
     {
       this->node.reset(new transport::Node());
       this->pub = node->Advertise<my_msgs::Custom>("~/my_msgs");

@@ -66,9 +66,9 @@ std::string GpuRaySensor::GetTopic() const
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr &_sdf)
+void GpuRaySensor::Load(const std::string &_worldName, rml::ElementPtr &_rml)
 {
-  Sensor::Load(_worldName, _sdf);
+  Sensor::Load(_worldName, _rml);
 }
 
 //////////////////////////////////////////////////
@@ -79,7 +79,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
   this->scanPub = this->node->Advertise<msgs::LaserScanStamped>(
       this->GetTopic(), 50);
 
-  sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
+  rml::ElementPtr rayElem = this->rml->GetElement("ray");
   this->scanElem = rayElem->GetElement("scan");
   this->horzElem = this->scanElem->GetElement("horizontal");
   this->rangeElem = rayElem->GetElement("range");
@@ -102,7 +102,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
   this->noiseActive = false;
   if (rayElem->HasElement("noise"))
   {
-    sdf::ElementPtr noiseElem = rayElem->GetElement("noise");
+    rml::ElementPtr noiseElem = rayElem->GetElement("noise");
     std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {
@@ -144,7 +144,7 @@ void GpuRaySensor::Init()
       this->scene = rendering::create_scene(worldName, false);
 
     this->laserCam = this->scene->CreateGpuLaser(
-        this->sdf->Get<std::string>("name"), false);
+        this->rml->Get<std::string>("name"), false);
 
     if (!this->laserCam)
     {
@@ -153,7 +153,7 @@ void GpuRaySensor::Init()
     }
     this->laserCam->SetCaptureData(true);
 
-    // initialize GpuLaser from sdf
+    // initialize GpuLaser from rml
     if (this->vertRayCount == 1)
     {
       this->vertRangeCount = 1;
@@ -256,13 +256,13 @@ void GpuRaySensor::Init()
       }
     }
 
-    // Initialize camera sdf for GpuLaser
-    this->cameraElem.reset(new sdf::Element);
-    sdf::initFile("camera.sdf", this->cameraElem);
+    // Initialize camera rml for GpuLaser
+    this->cameraElem.reset(new rml::Element);
+    rml::initFile("camera.rml", this->cameraElem);
 
     this->cameraElem->GetElement("horizontal_fov")->Set(this->GetCosHorzFOV());
 
-    sdf::ElementPtr ptr = this->cameraElem->GetElement("image");
+    rml::ElementPtr ptr = this->cameraElem->GetElement("image");
     ptr->GetElement("width")->Set(this->horzRayCount);
     ptr->GetElement("height")->Set(this->vertRayCount);
     ptr->GetElement("format")->Set("R8G8B8");
@@ -271,7 +271,7 @@ void GpuRaySensor::Init()
     ptr->GetElement("near")->Set(this->laserCam->GetNearClip());
     ptr->GetElement("far")->Set(this->laserCam->GetFarClip());
 
-    // Load camera sdf for GpuLaser
+    // Load camera rml for GpuLaser
     this->laserCam->Load(this->cameraElem);
 
 

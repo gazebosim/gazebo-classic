@@ -205,15 +205,15 @@ int Vector2i::operator[](unsigned int index) const
   }
 }
 
-#ifdef HAVE_SDF
+#ifdef HAVE_RML
 //////////////////////////////////////////////////
-Vector2i::Vector2i(const sdf::Vector2i &_pt)
+Vector2i::Vector2i(const rml::Vector2i &_pt)
   : x(_pt.x), y(_pt.y)
 {
 }
 
 //////////////////////////////////////////////////
-Vector2i &Vector2i::operator =(const sdf::Vector2i &_pt)
+Vector2i &Vector2i::operator =(const rml::Vector2i &_pt)
 {
   this->x = _pt.x;
   this->y = _pt.y;

@@ -51,16 +51,16 @@ namespace gazebo
               {return 2;}
 
       /// \brief Load a UniversalJoint.
-      /// \param[in] _sdf SDF values to load from.
-      public: virtual void Load(sdf::ElementPtr _sdf)
+      /// \param[in] _rml RML values to load from.
+      public: virtual void Load(rml::ElementPtr _rml)
               {
-                T::Load(_sdf);
+                T::Load(_rml);
 
                 /*
                 this->SetAxis(0,
-                    this->sdf->GetElement("axis")->Get<math::Vector3("xyz"));
+                    this->rml->GetElement("axis")->Get<math::Vector3("xyz"));
                 this->SetAxis(1,
-                    this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
+                    this->rml->GetElement("axis2")->Get<math::Vector3>("xyz"));
                     */
               }
     };

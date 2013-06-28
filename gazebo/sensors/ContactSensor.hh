@@ -53,11 +53,11 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~ContactSensor();
 
-      /// \brief Load the sensor with SDF parameters
-      /// \param[in] _sdf SDF Sensor parameters
+      /// \brief Load the sensor with RML parameters
+      /// \param[in] _rml RML Sensor parameters
       /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName,
-                                sdf::ElementPtr _sdf);
+                                rml::ElementPtr _rml);
 
       /// \brief Load the sensor with default parameters.
       /// \param[in] _worldName Name of world to load from.
@@ -101,7 +101,7 @@ namespace gazebo
       /// Each ContactSensor subscribes to the Gazebo ~/physics/contacts topic,
       /// retrieves all contact pairs in a time step and filters them wthin
       /// ContactSensor::OnContacts against <collision> body name
-      /// specified by the ContactSensor SDF.
+      /// specified by the ContactSensor RML.
       /// All collision pairs between ContactSensor <collision> body and
       /// other bodies in the world are stored in an array inside
       /// contacts.proto.

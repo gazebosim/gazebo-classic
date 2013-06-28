@@ -47,7 +47,7 @@ namespace gazebo
       public: virtual ~BulletSliderJoint();
 
       /// \brief Load the BulletSliderJoint
-      protected: virtual void Load(sdf::ElementPtr _sdf);
+      protected: virtual void Load(rml::ElementPtr _rml);
 
       // Documentation inherited.
       protected: virtual void Init();

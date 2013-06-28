@@ -55,17 +55,17 @@ ImuSensor::~ImuSensor()
 }
 
 //////////////////////////////////////////////////
-void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
+void ImuSensor::Load(const std::string &_worldName, rml::ElementPtr _rml)
 {
-  Sensor::Load(_worldName, _sdf);
+  Sensor::Load(_worldName, _rml);
 
-  if (this->sdf->HasElement("imu") &&
-      this->sdf->GetElement("imu")->HasElement("topic") &&
-      this->sdf->GetElement("imu")->Get<std::string>("topic")
+  if (this->rml->HasElement("imu") &&
+      this->rml->GetElement("imu")->HasElement("topic") &&
+      this->rml->GetElement("imu")->Get<std::string>("topic")
       != "__default_topic__")
   {
     this->pub = this->node->Advertise<msgs::IMU>(
-        this->sdf->GetElement("imu")->Get<std::string>("topic"), 500);
+        this->rml->GetElement("imu")->Get<std::string>("topic"), 500);
   }
   else
   {
@@ -78,10 +78,10 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 
   // Handle noise model settings.
   this->noiseActive = false;
-  sdf::ElementPtr imuElem = this->sdf->GetElement("imu");
+  rml::ElementPtr imuElem = this->rml->GetElement("imu");
   if (imuElem->HasElement("noise"))
   {
-    sdf::ElementPtr noiseElem = imuElem->GetElement("noise");
+    rml::ElementPtr noiseElem = imuElem->GetElement("noise");
     std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {
@@ -95,7 +95,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
       this->accelBias = 0.0;
       if (noiseElem->HasElement("rate"))
       {
-        sdf::ElementPtr rateElem = noiseElem->GetElement("rate");
+        rml::ElementPtr rateElem = noiseElem->GetElement("rate");
         this->rateNoiseMean = rateElem->Get<double>("mean");
         this->rateNoiseStdDev = rateElem->Get<double>("stddev");
         double rateBiasMean = rateElem->Get<double>("bias_mean");
@@ -113,7 +113,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
       }
       if (noiseElem->HasElement("accel"))
       {
-        sdf::ElementPtr accelElem = noiseElem->GetElement("accel");
+        rml::ElementPtr accelElem = noiseElem->GetElement("accel");
         this->accelNoiseMean = accelElem->Get<double>("mean");
         this->accelNoiseStdDev = accelElem->Get<double>("stddev");
         double accelBiasMean = accelElem->Get<double>("bias_mean");

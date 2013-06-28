@@ -35,8 +35,8 @@ namespace gazebo
 
     /// \brief Load the plugin.
     /// \param[in] _parent Pointer to the parent sensor.
-    /// \param[in] _sdf SDF element for the plugin.
-    public: virtual void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
+    /// \param[in] _sdf RML element for the plugin.
+    public: virtual void Load(sensors::SensorPtr _parent, rml::ElementPtr _sdf);
 
     /// \brief Update callback. Overload this function in a child class.
     /// \param[in] _msg The force torque message.

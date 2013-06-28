@@ -49,7 +49,7 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Load(const std::string & _worldName,
-                                sdf::ElementPtr &_sdf);
+                                rml::ElementPtr &_rml);
 
       // Documentation inherited
       public: virtual void Load(const std::string & _worldName);

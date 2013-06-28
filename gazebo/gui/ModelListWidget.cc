@@ -22,7 +22,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
@@ -418,7 +418,7 @@ void ModelListWidget::RemoveEntity(const std::string &_name)
       items[i]->takeChild(items[i]->indexOfChild(listItem));
       this->propTreeBrowser->clear();
       this->selectedEntityName.clear();
-      this->sdfElement.reset();
+      this->rmlElement.reset();
       this->fillTypes.clear();
       return;
     }

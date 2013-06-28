@@ -28,8 +28,8 @@
 
 // Remove the gazebo_config and ifdefs in Gazebo 1.8
 #include "gazebo/gazebo_config.h"
-#ifdef HAVE_SDF
-#include "sdf/sdf.hh"
+#ifdef HAVE_RML
+#include "rml/rml.hh"
 #endif
 
 
@@ -76,16 +76,16 @@ namespace gazebo
       /// \param[in] _v a vector
       public: Vector3(const Vector3 &_v);
 
-#ifdef HAVE_SDF
+#ifdef HAVE_RML
       /// Deprecated
-      public: Vector3(const sdf::Vector3 &_v) __attribute__((deprecated));
+      public: Vector3(const rml::Vector3 &_v) __attribute__((deprecated));
 
       /// Deprecated
-      public: Vector3 &operator =(const sdf::Vector3 &_v)
+      public: Vector3 &operator =(const rml::Vector3 &_v)
               __attribute__((deprecated));
 
       /// Deprecated
-      public: bool operator!=(const sdf::Vector3 &_v) const
+      public: bool operator!=(const rml::Vector3 &_v) const
               __attribute__((deprecated));
 #endif
 

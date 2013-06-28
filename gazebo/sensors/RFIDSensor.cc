@@ -54,9 +54,9 @@ RFIDSensor::~RFIDSensor()
 }
 
 /////////////////////////////////////////////////
-void RFIDSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf )
+void RFIDSensor::Load(const std::string &_worldName, rml::ElementPtr _rml )
 {
-  Sensor::Load(_worldName, _sdf);
+  Sensor::Load(_worldName, _rml);
 }
 
 /////////////////////////////////////////////////
@@ -66,15 +66,15 @@ void RFIDSensor::Load(const std::string &_worldName)
 
   // std::cout << "load rfid sensor" << std::endl;
 
-  if (this->sdf->GetElement("topic"))
+  if (this->rml->GetElement("topic"))
   {
     this->scanPub = this->node->Advertise<msgs::Pose>(
-        this->sdf->GetElement("topic")->Get<std::string>());
+        this->rml->GetElement("topic")->Get<std::string>());
   }
 
   this->entity = this->world->GetEntity(this->parentName);
 
-  // this->sdf->PrintDescription("something");
+  // this->rml->PrintDescription("something");
   /*std::cout << " setup ray" << std::endl;
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
@@ -88,7 +88,7 @@ void RFIDSensor::Load(const std::string &_worldName)
   this->laserShape = boost::dynamic_pointer_cast<physics::RayShape>(
       this->laserCollision->GetShape());
 
-  this->laserShape->Load(this->sdf);
+  this->laserShape->Load(this->rml);
 
   this->laserShape->Init();
   */

@@ -41,7 +41,7 @@ State::~State()
 }
 
 /////////////////////////////////////////////////
-void State::Load(const sdf::ElementPtr /*_elem*/)
+void State::Load(const rml::ElementPtr /*_elem*/)
 {
 }
 

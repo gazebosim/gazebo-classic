@@ -21,7 +21,7 @@ namespace gazebo
 {
   class ModelVisuals : public ModelPlugin
   {
-    public: void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
+    public: void Load(physics::ModelPtr _parent, rml::ElementPtr /*_sdf*/)
     {
       transport::PublisherPtr visPub;
       msgs::Visual visualMsg;

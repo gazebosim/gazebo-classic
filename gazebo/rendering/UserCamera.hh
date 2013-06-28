@@ -55,8 +55,8 @@ namespace gazebo
       public: virtual ~UserCamera();
 
       /// \brief Load the user camera.
-      /// \param[in] _sdf Parameters for the camera.
-      public: void Load(sdf::ElementPtr _sdf);
+      /// \param[in] _rml Parameters for the camera.
+      public: void Load(rml::ElementPtr _rml);
 
       /// \brief Generic load function
       public: void Load();

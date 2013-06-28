@@ -24,7 +24,7 @@ class SonarSensor_TEST : public ServerFixture
 };
 
 static std::string sonarSensorString =
-"<sdf version='1.4'>"
+"<rml version='1.4'>"
 "  <sensor name='sonar' type='sonar'>"
 "    <always_on>1</always_on>"
 "    <visualize>1</visualize>"
@@ -35,7 +35,7 @@ static std::string sonarSensorString =
 "      <radius>0.3</radius>"
 "    </sonar>"
 "  </sensor>"
-"</sdf>";
+"</rml>";
 
 /////////////////////////////////////////////////
 /// \brief Test Creation of a Sonar sensor
@@ -44,12 +44,12 @@ TEST_F(SonarSensor_TEST, CreateSonar)
   Load("worlds/empty.world");
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
-  sdf::ElementPtr sdf(new sdf::Element);
-  sdf::initFile("sensor.sdf", sdf);
-  sdf::readString(sonarSensorString, sdf);
+  rml::ElementPtr rml(new rml::Element);
+  rml::initFile("sensor.rml", rml);
+  rml::readString(sonarSensorString, rml);
 
   // Create the Ray sensor
-  std::string sensorName = mgr->CreateSensor(sdf, "default",
+  std::string sensorName = mgr->CreateSensor(rml, "default",
       "ground_plane::link");
 
   // Make sure the returned sensor name is correct

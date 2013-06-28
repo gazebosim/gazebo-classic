@@ -26,7 +26,7 @@ namespace gazebo
 {
   class PR2PoseTest : public ModelPlugin
   {
-    public: void Load(physics::ModelPtr &/*_parent*/, sdf::ElementPtr &_sdf)
+    public: void Load(physics::ModelPtr &/*_parent*/, rml::ElementPtr &_sdf)
     {
       // Get then name of the parent model
       std::string modelName = _sdf->GetParent()->Get<std::string>("name");

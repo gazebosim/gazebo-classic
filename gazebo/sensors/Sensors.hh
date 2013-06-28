@@ -18,7 +18,7 @@
 #define _GAZEBO_SENSORS_HH_
 
 #include <string>
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 #include "gazebo/sensors/SensorTypes.hh"
 
 namespace gazebo
@@ -32,12 +32,12 @@ namespace gazebo
     /// \return True if successfully loaded, false if not.
     bool load();
 
-    /// \brief Create a sensor using SDF.
-    /// \param[in] _elem The SDF element that describes the sensor.
+    /// \brief Create a sensor using RML.
+    /// \param[in] _elem The RML element that describes the sensor.
     /// \param[in] _worldName Name of the world in which to create the sensor.
     /// \param[in] _parentName The fully scoped parent name (model::link).
     /// \return The name of the new sensor.
-    std::string create_sensor(sdf::ElementPtr _elem,
+    std::string create_sensor(rml::ElementPtr _elem,
                               const std::string &_worldName,
                               const std::string &_parentName);
 

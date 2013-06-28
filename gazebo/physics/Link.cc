@@ -106,23 +106,23 @@ Link::~Link()
 }
 
 //////////////////////////////////////////////////
-void Link::Load(sdf::ElementPtr _sdf)
+void Link::Load(rml::ElementPtr _rml)
 {
-  Entity::Load(_sdf);
+  Entity::Load(_rml);
 
   // before loading child collsion, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
-  this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
-  this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
+  this->SetSelfCollide(this->rml->Get<bool>("self_collide"));
+  this->rml->GetElement("self_collide")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetSelfCollide, this));
 
   // TODO: this shouldn't be in the physics sim
-  if (this->sdf->HasElement("visual"))
+  if (this->rml->HasElement("visual"))
   {
-    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    rml::ElementPtr visualElem = this->rml->GetElement("visual");
     while (visualElem)
     {
-      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+      msgs::Visual msg = msgs::VisualFromRML(visualElem);
 
       msg.set_name(this->GetScopedName() + "::" + msg.name());
       msg.set_parent_name(this->GetScopedName());
@@ -142,9 +142,9 @@ void Link::Load(sdf::ElementPtr _sdf)
   }
 
   // Load the geometries
-  if (this->sdf->HasElement("collision"))
+  if (this->rml->HasElement("collision"))
   {
-    sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
+    rml::ElementPtr collisionElem = this->rml->GetElement("collision");
     while (collisionElem)
     {
       // Create and Load a collision, which will belong to this body.
@@ -153,9 +153,9 @@ void Link::Load(sdf::ElementPtr _sdf)
     }
   }
 
-  if (this->sdf->HasElement("sensor"))
+  if (this->rml->HasElement("sensor"))
   {
-    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
+    rml::ElementPtr sensorElem = this->rml->GetElement("sensor");
     while (sensorElem)
     {
       /// \todo This if statement is a hack to prevent Links from creating
@@ -178,7 +178,7 @@ void Link::Load(sdf::ElementPtr _sdf)
 
   if (!this->IsStatic())
   {
-    this->inertial->Load(this->sdf->GetElement("inertial"));
+    this->inertial->Load(this->rml->GetElement("inertial"));
   }
 }
 
@@ -245,8 +245,8 @@ void Link::Init()
   this->enabled = true;
 
   // Set Link pose before setting pose of child collisions
-  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
-  this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetRelativePose(this->rml->Get<math::Pose>("pose"));
+  this->SetInitialRelativePose(this->rml->Get<math::Pose>("pose"));
 
   // Call Init for child collisions, which whill set their pose
   Base_V::iterator iter;
@@ -307,37 +307,37 @@ void Link::ResetPhysicsStates()
 }
 
 //////////////////////////////////////////////////
-void Link::UpdateParameters(sdf::ElementPtr _sdf)
+void Link::UpdateParameters(rml::ElementPtr _rml)
 {
-  Entity::UpdateParameters(_sdf);
+  Entity::UpdateParameters(_rml);
 
-  if (this->sdf->HasElement("inertial"))
+  if (this->rml->HasElement("inertial"))
   {
-    sdf::ElementPtr inertialElem = this->sdf->GetElement("inertial");
+    rml::ElementPtr inertialElem = this->rml->GetElement("inertial");
     this->inertial->UpdateParameters(inertialElem);
   }
 
-  this->sdf->GetElement("gravity")->GetValue()->SetUpdateFunc(
+  this->rml->GetElement("gravity")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetGravityMode, this));
-  this->sdf->GetElement("kinematic")->GetValue()->SetUpdateFunc(
+  this->rml->GetElement("kinematic")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetKinematic, this));
 
-  if (this->sdf->Get<bool>("gravity") != this->GetGravityMode())
-    this->SetGravityMode(this->sdf->Get<bool>("gravity"));
+  if (this->rml->Get<bool>("gravity") != this->GetGravityMode())
+    this->SetGravityMode(this->rml->Get<bool>("gravity"));
 
   // before loading child collsiion, we have to figure out if
   // selfCollide is true and modify parent class Entity so this
   // body has its own spaceId
-  this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
+  this->SetSelfCollide(this->rml->Get<bool>("self_collide"));
 
   // TODO: this shouldn't be in the physics sim
-  if (this->sdf->HasElement("visual"))
+  if (this->rml->HasElement("visual"))
   {
-    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    rml::ElementPtr visualElem = this->rml->GetElement("visual");
     while (visualElem)
     {
       // TODO: Update visuals properly
-      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+      msgs::Visual msg = msgs::VisualFromRML(visualElem);
 
       msg.set_name(this->GetScopedName() + "::" + msg.name());
       msg.set_parent_name(this->GetScopedName());
@@ -349,9 +349,9 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     }
   }
 
-  if (this->sdf->HasElement("collision"))
+  if (this->rml->HasElement("collision"))
   {
-    sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
+    rml::ElementPtr collisionElem = this->rml->GetElement("collision");
     while (collisionElem)
     {
       CollisionPtr collision = boost::dynamic_pointer_cast<Collision>(
@@ -420,9 +420,9 @@ void Link::SetCollideMode(const std::string &_mode)
 //////////////////////////////////////////////////
 bool Link::GetSelfCollide()
 {
-  GZ_ASSERT(this->sdf != NULL, "Link sdf member is NULL");
-  if (this->sdf->HasElement("self_collide"))
-    return this->sdf->Get<bool>("self_collide");
+  GZ_ASSERT(this->rml != NULL, "Link rml member is NULL");
+  if (this->rml->HasElement("self_collide"))
+    return this->rml->Get<bool>("self_collide");
   else
     return false;
 }
@@ -485,11 +485,11 @@ Link_V Link::GetParentJointsLinks() const
 }
 
 //////////////////////////////////////////////////
-void Link::LoadCollision(sdf::ElementPtr _sdf)
+void Link::LoadCollision(rml::ElementPtr _rml)
 {
   CollisionPtr collision;
   std::string geomType =
-    _sdf->GetElement("geometry")->GetFirstElement()->GetName();
+    _rml->GetElement("geometry")->GetFirstElement()->GetName();
 
   if (geomType == "heightmap" || geomType == "map")
     this->SetStatic(true);
@@ -500,7 +500,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
   if (!collision)
     gzthrow("Unknown Collisionetry Type[" + geomType + "]");
 
-  collision->Load(_sdf);
+  collision->Load(_rml);
 }
 
 //////////////////////////////////////////////////
@@ -785,13 +785,13 @@ void Link::FillMsg(msgs::Link &_msg)
       sensor->FillMsg(*_msg.add_sensor());
   }
 
-  if (this->sdf->HasElement("visual"))
+  if (this->rml->HasElement("visual"))
   {
-    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    rml::ElementPtr visualElem = this->rml->GetElement("visual");
     while (visualElem)
     {
       msgs::Visual *vis = _msg.add_visual();
-      vis->CopyFrom(msgs::VisualFromSDF(visualElem));
+      vis->CopyFrom(msgs::VisualFromRML(visualElem));
       vis->set_name(this->GetScopedName() + "::" + vis->name());
       vis->set_parent_name(this->GetScopedName());
 
@@ -799,9 +799,9 @@ void Link::FillMsg(msgs::Link &_msg)
     }
   }
 
-  if (this->sdf->HasElement("projector"))
+  if (this->rml->HasElement("projector"))
   {
-    sdf::ElementPtr elem = this->sdf->GetElement("projector");
+    rml::ElementPtr elem = this->rml->GetElement("projector");
 
     msgs::Projector *proj = _msg.add_projector();
     proj->set_name(
@@ -943,8 +943,8 @@ void Link::SetState(const LinkState &_state)
 /////////////////////////////////////////////////
 double Link::GetLinearDamping() const
 {
-  if (this->sdf->HasElement("velocity_decay"))
-    return this->sdf->GetElement("velocity_decay")->Get<double>("linear");
+  if (this->rml->HasElement("velocity_decay"))
+    return this->rml->GetElement("velocity_decay")->Get<double>("linear");
   else
     return 0.0;
 }
@@ -952,8 +952,8 @@ double Link::GetLinearDamping() const
 /////////////////////////////////////////////////
 double Link::GetAngularDamping() const
 {
-  if (this->sdf->HasElement("velocity_decay"))
-    return this->sdf->GetElement("velocity_decay")->Get<double>("angular");
+  if (this->rml->HasElement("velocity_decay"))
+    return this->rml->GetElement("velocity_decay")->Get<double>("angular");
   else
     return 0.0;
 }

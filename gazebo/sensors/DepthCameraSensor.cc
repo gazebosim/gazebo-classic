@@ -60,9 +60,9 @@ void DepthCameraSensor::SetParent(const std::string &_name)
 
 //////////////////////////////////////////////////
 void DepthCameraSensor::Load(const std::string &_worldName,
-                                   sdf::ElementPtr &_sdf)
+                                   rml::ElementPtr &_rml)
 {
-  Sensor::Load(_worldName, _sdf);
+  Sensor::Load(_worldName, _rml);
 }
 
 //////////////////////////////////////////////////
@@ -91,7 +91,7 @@ void DepthCameraSensor::Init()
       this->scene = rendering::create_scene(worldName, false);
 
     this->camera = this->scene->CreateDepthCamera(
-        this->sdf->Get<std::string>("name"), false);
+        this->rml->Get<std::string>("name"), false);
 
     if (!this->camera)
     {
@@ -100,7 +100,7 @@ void DepthCameraSensor::Init()
     }
     this->camera->SetCaptureData(true);
 
-    sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
+    rml::ElementPtr cameraSdf = this->rml->GetElement("camera");
     this->camera->Load(cameraSdf);
 
     // Do some sanity checks

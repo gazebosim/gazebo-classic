@@ -62,8 +62,8 @@ namespace gazebo
       public: virtual ~Actor();
 
       /// \brief Load the actor
-      /// \param[in] _sdf SDF parameters
-      public: void Load(sdf::ElementPtr _sdf);
+      /// \param[in] _rml RML parameters
+      public: void Load(rml::ElementPtr _rml);
 
       /// \brief Initialize the actor
       public: virtual void Init();
@@ -83,20 +83,20 @@ namespace gazebo
       /// \brief Finalize the actor
       public: virtual void Fini();
 
-      /// \brief update the parameters using new sdf values.
-      /// \param[in] _sdf SDF values to update from.
-      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+      /// \brief update the parameters using new rml values.
+      /// \param[in] _rml RML values to update from.
+      public: virtual void UpdateParameters(rml::ElementPtr _rml);
 
-      /// \brief Get the SDF values for the actor.
-      /// \return Pointer to the SDF values.
-      public: virtual const sdf::ElementPtr GetSDF();
+      /// \brief Get the RML values for the actor.
+      /// \return Pointer to the RML values.
+      public: virtual const rml::ElementPtr GetRML();
 
       /// \brief Add inertia for a sphere.
       /// \param[in] _linkSdf The link to add the inertia to.
       /// \param[in] _pose Pose of the inertia.
       /// \param[in] _mass Mass of the inertia.
       /// \param[in] _radiau Radius of the sphere.
-      private: void AddSphereInertia(sdf::ElementPtr _linkSdf,
+      private: void AddSphereInertia(rml::ElementPtr _linkSdf,
                                      const math::Pose &_pose,
                                      double _mass, double _radius);
 
@@ -105,7 +105,7 @@ namespace gazebo
       /// \param[in] _name Name of the collision object.
       /// \param[in] _pose Pose of the collision object.
       /// \param[in] _radius Radius of the collision object.
-      private: void AddSphereCollision(sdf::ElementPtr _linkSdf,
+      private: void AddSphereCollision(rml::ElementPtr _linkSdf,
                                        const std::string &_name,
                                        const math::Pose &_pose,
                                        double _radius);
@@ -117,7 +117,7 @@ namespace gazebo
       /// \param[in] _radius Radius of the visual object.
       /// \param[in] _material Name of the visual material.
       /// \param[in] _ambient Ambient color.
-      private: void AddSphereVisual(sdf::ElementPtr _linkSdf,
+      private: void AddSphereVisual(rml::ElementPtr _linkSdf,
                                     const std::string &_name,
                                     const math::Pose &_pose,
                                     double _radius,
@@ -131,7 +131,7 @@ namespace gazebo
       /// \param[in] _size Dimensions of the visual object.
       /// \param[in] _material Name of the visual material.
       /// \param[in] _ambient Ambient color.
-      private: void AddBoxVisual(sdf::ElementPtr _linkSdf,
+      private: void AddBoxVisual(rml::ElementPtr _linkSdf,
                                  const std::string &_name,
                                  const math::Pose &_pose,
                                  const math::Vector3 &_size,
@@ -142,17 +142,17 @@ namespace gazebo
       /// \param[in] _linkSdf Link to add the visual to.
       /// \param[in] _name Name of the visual.
       /// \param[in] _pose Pose of the visual.
-      private: void AddActorVisual(sdf::ElementPtr _linkSdf,
+      private: void AddActorVisual(rml::ElementPtr _linkSdf,
                                    const std::string &_name,
                                    const math::Pose &_pose);
 
-      /// \brief Load an animation from SDF.
-      /// \param[in] _sdf SDF element containing the animation.
-      private: void LoadAnimation(sdf::ElementPtr _sdf);
+      /// \brief Load an animation from RML.
+      /// \param[in] _rml RML element containing the animation.
+      private: void LoadAnimation(rml::ElementPtr _rml);
 
-      /// \brief Load an animation script from SDF.
-      /// \param[in] _sdf SDF element containing the animation script.
-      private: void LoadScript(sdf::ElementPtr _sdf);
+      /// \brief Load an animation script from RML.
+      /// \param[in] _rml RML element containing the animation script.
+      private: void LoadScript(rml::ElementPtr _rml);
 
       /// \brief Set the actor's pose.
       /// \param[in] _frame Each frame name and transform.

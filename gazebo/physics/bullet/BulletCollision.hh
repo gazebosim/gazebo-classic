@@ -56,7 +56,7 @@ namespace gazebo
       public: virtual ~BulletCollision();
 
       /// \brief Load the collision
-      public: virtual void Load(sdf::ElementPtr _ptr);
+      public: virtual void Load(rml::ElementPtr _ptr);
 
       /// \brief On pose change
       public: virtual void OnPoseChange();

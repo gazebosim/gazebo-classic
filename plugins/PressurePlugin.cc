@@ -35,7 +35,7 @@ PressurePlugin::~PressurePlugin()
 }
 
 /////////////////////////////////////////////////
-void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
+void PressurePlugin::Load(sensors::SensorPtr _sensor, rml::ElementPtr /*_sdf*/)
 {
   // Get the parent sensor.
   this->parentSensor =

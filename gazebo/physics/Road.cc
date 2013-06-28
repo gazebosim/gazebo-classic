@@ -34,7 +34,7 @@ Road::~Road()
 }
 
 /////////////////////////////////////////////////
-void Road::Load(sdf::ElementPtr _elem)
+void Road::Load(rml::ElementPtr _elem)
 {
   Base::Load(_elem);
   this->SetName(_elem->Get<std::string>("name"));
@@ -51,10 +51,10 @@ void Road::Init()
   msgs::Road msg;
   msg.set_name(this->GetName());
 
-  this->width = this->sdf->Get<double>("width");
+  this->width = this->rml->Get<double>("width");
   msg.set_width(this->width);
 
-  sdf::ElementPtr pointElem = this->sdf->GetElement("point");
+  rml::ElementPtr pointElem = this->rml->GetElement("point");
   while (pointElem)
   {
     math::Vector3 point = pointElem->Get<math::Vector3>();

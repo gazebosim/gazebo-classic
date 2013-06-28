@@ -36,7 +36,7 @@ JointTrajectoryPlugin::~JointTrajectoryPlugin()
 
 /////////////////////////////////////////////////
 void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
-                                 sdf::ElementPtr /*_sdf*/)
+                                 rml::ElementPtr /*_sdf*/)
 {
   // Get the world name.
   this->model = _parent;

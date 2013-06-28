@@ -50,10 +50,10 @@ namespace gazebo
               {return 1;}
 
       /// \brief Load joint
-      /// \param[in] _sdf Pointer to SDF element
-      public: virtual void Load(sdf::ElementPtr _sdf)
+      /// \param[in] _rml Pointer to RML element
+      public: virtual void Load(rml::ElementPtr _rml)
               {
-                T::Load(_sdf);
+                T::Load(_rml);
               }
 
       /// \brief Initialize joint

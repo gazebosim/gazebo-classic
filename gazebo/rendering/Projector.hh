@@ -25,7 +25,7 @@
 #include <string>
 #include <map>
 #include <list>
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -51,9 +51,9 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~Projector();
 
-      /// \brief Load from an sdf pointer.
-      /// \param[in] _sdf Pointer to the SDF element.
-      public: void Load(sdf::ElementPtr _sdf);
+      /// \brief Load from an rml pointer.
+      /// \param[in] _rml Pointer to the RML element.
+      public: void Load(rml::ElementPtr _rml);
 
       /// \brief Load from a message.
       /// \param[in] _msg Load from a message.

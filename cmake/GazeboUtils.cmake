@@ -165,38 +165,20 @@ macro (gz_build_tests)
       gazebo_transport
       )
 
-    # Remove in Gazebo 2.0
-    if (HAVE_SDF)
-      target_link_libraries(${BINARY_NAME}
-        libgtest.a
-        libgtest_main.a
-        gazebo_common
-        gazebo_math
-        gazebo_physics
-        gazebo_sensors
-        gazebo_rendering
-        gazebo_msgs
-        gazebo_transport
-        libgazebo
-        pthread
-        )
-    else()
-      target_link_libraries(${BINARY_NAME}
-        libgtest.a
-        libgtest_main.a
-        gazebo_common
-        gazebo_math
-        gazebo_physics
-        gazebo_sensors
-        gazebo_rendering
-        gazebo_msgs
-        gazebo_transport
-        ${SDF_LIBRARIES}
-        libgazebo
-        pthread
-        )
-    endif()
- 
+    target_link_libraries(${BINARY_NAME}
+      libgtest.a
+      libgtest_main.a
+      gazebo_common
+      gazebo_math
+      gazebo_physics
+      gazebo_sensors
+      gazebo_rendering
+      gazebo_msgs
+      gazebo_transport
+      libgazebo
+      pthread
+      )
+
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
 	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
   
@@ -249,39 +231,20 @@ if (VALID_DISPLAY)
       gazebo_transport
       )
 
-    # Remove in Gazebo 2.0
-    if (HAVE_SDF)
-      target_link_libraries(${BINARY_NAME}
-        gazebo_gui
-        gazebo_common
-        gazebo_math
-        gazebo_physics
-        gazebo_sensors
-        gazebo_rendering
-        gazebo_msgs
-        gazebo_transport
-        libgazebo
-        pthread
-        ${QT_QTTEST_LIBRARY}
-        ${QT_LIBRARIES}
-        )
-    else()
-      target_link_libraries(${BINARY_NAME}
-        gazebo_gui
-        gazebo_common
-        gazebo_math
-        gazebo_physics
-        gazebo_sensors
-        gazebo_rendering
-        gazebo_msgs
-        gazebo_transport
-        libgazebo
-        pthread
-        ${SDF_LIBRARIES}
-        ${QT_QTTEST_LIBRARY}
-        ${QT_LIBRARIES}
-        )
-    endif()
+    target_link_libraries(${BINARY_NAME}
+      gazebo_gui
+      gazebo_common
+      gazebo_math
+      gazebo_physics
+      gazebo_sensors
+      gazebo_rendering
+      gazebo_msgs
+      gazebo_transport
+      libgazebo
+      pthread
+      ${QT_QTTEST_LIBRARY}
+      ${QT_LIBRARIES}
+      )
 
     # QTest need and extra -o parameter to write logging information to a file
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}

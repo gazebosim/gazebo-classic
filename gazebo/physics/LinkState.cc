@@ -68,10 +68,10 @@ LinkState::LinkState(const LinkPtr _link)
 }
 
 /////////////////////////////////////////////////
-LinkState::LinkState(const sdf::ElementPtr _sdf)
+LinkState::LinkState(const rml::ElementPtr _rml)
   : State()
 {
-  this->Load(_sdf);
+  this->Load(_rml);
 }
 
 /////////////////////////////////////////////////
@@ -97,7 +97,7 @@ void LinkState::Load(const LinkPtr _link, const common::Time &_realTime,
 }
 
 /////////////////////////////////////////////////
-void LinkState::Load(const sdf::ElementPtr _elem)
+void LinkState::Load(const rml::ElementPtr _elem)
 {
   // Set the name
   this->name = _elem->Get<std::string>("name");
@@ -295,23 +295,23 @@ LinkState LinkState::operator+(const LinkState &_state) const
 }
 
 /////////////////////////////////////////////////
-void LinkState::FillSDF(sdf::ElementPtr _sdf)
+void LinkState::FillRML(rml::ElementPtr _rml)
 {
-  _sdf->ClearElements();
+  _rml->ClearElements();
 
-  _sdf->GetAttribute("name")->Set(this->name);
-  _sdf->GetElement("pose")->Set(this->pose);
-  _sdf->GetElement("velocity")->Set(this->velocity);
-  _sdf->GetElement("acceleration")->Set(this->acceleration);
-  _sdf->GetElement("wrench")->Set(this->wrench);
+  _rml->GetAttribute("name")->Set(this->name);
+  _rml->GetElement("pose")->Set(this->pose);
+  _rml->GetElement("velocity")->Set(this->velocity);
+  _rml->GetElement("acceleration")->Set(this->acceleration);
+  _rml->GetElement("wrench")->Set(this->wrench);
 
   // Disabled for efficiency
   // for (std::vector<CollisionState>::iterator iter =
   //      this->collisionStates.begin();
   //      iter != this->collisionStates.end(); ++iter)
   // {
-  //   sdf::ElementPtr elem = _sdf->AddElement("collision");
-  //   (*iter).FillSDF(elem);
+  //   rml::ElementPtr elem = _rml->AddElement("collision");
+  //   (*iter).FillRML(elem);
   // }
 }
 

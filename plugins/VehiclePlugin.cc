@@ -37,7 +37,7 @@ VehiclePlugin::VehiclePlugin()
 }
 
 /////////////////////////////////////////////////
-void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+void VehiclePlugin::Load(physics::ModelPtr _model, rml::ElementPtr _sdf)
 {
   this->model = _model;
   // this->physics = this->model->GetWorld()->GetPhysicsEngine();

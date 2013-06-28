@@ -60,19 +60,19 @@ void MapShape::Update()
 }
 
 //////////////////////////////////////////////////
-void MapShape::Load(sdf::ElementPtr _sdf)
+void MapShape::Load(rml::ElementPtr _rml)
 {
-  Base::Load(_sdf);
+  Base::Load(_rml);
 
-  std::string imageFilename = _sdf->Get<std::string>("uri");
+  std::string imageFilename = _rml->Get<std::string>("uri");
 
   // Make sure they are ok
-  if (_sdf->Get<double>("scale") <= 0)
-    _sdf->GetElement("scale")->Set(0.1);
-  if (this->sdf->Get<int>("threshold") <= 0)
-    _sdf->GetElement("threshold")->Set(200);
-  if (this->sdf->Get<double>("height") <= 0)
-    _sdf->GetElement("height")->Set(1.0);
+  if (_rml->Get<double>("scale") <= 0)
+    _rml->GetElement("scale")->Set(0.1);
+  if (this->rml->Get<int>("threshold") <= 0)
+    _rml->GetElement("threshold")->Set(200);
+  if (this->rml->Get<double>("height") <= 0)
+    _rml->GetElement("height")->Set(1.0);
 
   // Load the image
   this->mapImage = new common::Image();
@@ -118,37 +118,37 @@ void MapShape::FillMsg(msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 std::string MapShape::GetURI() const
 {
-  return this->sdf->Get<std::string>("uri");
+  return this->rml->Get<std::string>("uri");
 }
 
 //////////////////////////////////////////////////
 double MapShape::GetScale() const
 {
-  return this->sdf->Get<double>("scale");
+  return this->rml->Get<double>("scale");
 }
 
 //////////////////////////////////////////////////
 int MapShape::GetThreshold() const
 {
-  return this->sdf->Get<int>("threshold");
+  return this->rml->Get<int>("threshold");
 }
 
 //////////////////////////////////////////////////
 double MapShape::GetHeight() const
 {
-  return this->sdf->Get<double>("height");
+  return this->rml->Get<double>("height");
 }
 
 //////////////////////////////////////////////////
 int MapShape::GetGranularity() const
 {
-  return this->sdf->Get<int>("granularity");
+  return this->rml->Get<int>("granularity");
 }
 
 //////////////////////////////////////////////////
 void MapShape::CreateBoxes(QuadNode * /*_node*/)
 {
-  /*TODO: fix this to use SDF
+  /*TODO: fix this to use RML
   if (node->leaf)
   {
     if (!node->valid || !node->occupied)
@@ -162,12 +162,12 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
 
     stream << "<gazebo:world xmlns:gazebo =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:collision =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#collision\">";
 
-    float x = (node->x + node->width / 2.0) * this->sdf->Get<double>("scale");
-    float y = (node->y + node->height / 2.0) * this->sdf->Get<double>("scale");
-    float z = this->sdf->Get<double>("height") / 2.0;
-    float xSize = (node->width) * this->sdf->Get<double>("scale");
-    float ySize = (node->height) * this->sdf->Get<double>("scale");
-    float zSize = this->sdf->Get<double>("height");
+    float x = (node->x + node->width / 2.0) * this->rml->Get<double>("scale");
+    float y = (node->y + node->height / 2.0) * this->rml->Get<double>("scale");
+    float z = this->rml->Get<double>("height") / 2.0;
+    float xSize = (node->width) * this->rml->Get<double>("scale");
+    float ySize = (node->height) * this->rml->Get<double>("scale");
+    float zSize = this->rml->Get<double>("height");
 
     char collisionName[256];
     sprintf(collisionName, "map_collision_%d", collisionCounter++);
@@ -322,7 +322,7 @@ void MapShape::BuildTree(QuadNode *_node)
   // int diff = labs(freePixels - occPixels);
 
   if (static_cast<int>(_node->width*_node->height) >
-      this->sdf->Get<int>("granularity"))
+      this->rml->Get<int>("granularity"))
   {
     float newX, newY;
     float newW, newH;
@@ -404,10 +404,10 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
 
       v = (unsigned char)(255 *
           ((pixColor.r + pixColor.g + pixColor.b) / 3.0));
-      // if (this->sdf->Get<bool>("negative"))
+      // if (this->rml->Get<bool>("negative"))
         // v = 255 - v;
 
-      if (v > this->sdf->Get<int>("threshold"))
+      if (v > this->rml->Get<int>("threshold"))
         freePixels++;
       else
         occPixels++;

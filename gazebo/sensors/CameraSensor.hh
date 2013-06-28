@@ -52,11 +52,11 @@ namespace gazebo
       /// \param _name The name of the parent
       public: virtual void SetParent(const std::string &_name);
 
-      /// \brief Load the sensor with SDF parameters
-      /// \param[in] _sdf SDF Sensor parameters
+      /// \brief Load the sensor with RML parameters
+      /// \param[in] _rml RML Sensor parameters
       /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName,
-                                sdf::ElementPtr _sdf);
+                                rml::ElementPtr _rml);
 
       /// \brief Load the sensor with default parameters
       /// \param[in] _worldName Name of world to load from

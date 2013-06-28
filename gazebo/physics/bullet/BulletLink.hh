@@ -49,7 +49,7 @@ namespace gazebo
       public: virtual ~BulletLink();
 
       // Documentation inherited.
-      public: virtual void Load(sdf::ElementPtr _ptr);
+      public: virtual void Load(rml::ElementPtr _ptr);
 
       // Documentation inherited.
       public: virtual void Init();

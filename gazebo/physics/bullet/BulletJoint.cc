@@ -45,9 +45,9 @@ BulletJoint::~BulletJoint()
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::Load(sdf::ElementPtr _sdf)
+void BulletJoint::Load(rml::ElementPtr _rml)
 {
-  Joint::Load(_sdf);
+  Joint::Load(_rml);
 }
 
 //////////////////////////////////////////////////

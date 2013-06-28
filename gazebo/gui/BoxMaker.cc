@@ -174,10 +174,10 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-std::string BoxMaker::GetSDFString()
+std::string BoxMaker::GetRMLString()
 {
   std::ostringstream newModelStr;
-  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
+  newModelStr << "<rml version ='" << RML_VERSION << "'>"
     << "<model name='unit_box_" << counter << "'>"
     << "<pose>0 0 0.5 0 0 0</pose>"
     << "<link name ='link'>"
@@ -204,7 +204,7 @@ std::string BoxMaker::GetSDFString()
     <<   "</visual>"
     << "</link>"
     << "</model>"
-    << "</sdf>";
+    << "</rml>";
 
   return newModelStr.str();
 }
@@ -216,7 +216,7 @@ void BoxMaker::CreateTheEntity()
   math::Vector3 p = msgs::Convert(this->visualMsg->pose().position());
   math::Vector3 size = msgs::Convert(this->visualMsg->geometry().box().size());
 
-  msg.set_sdf(this->GetSDFString());
+  msg.set_rml(this->GetRMLString());
 
   msgs::Request *requestMsg = msgs::CreateRequest("entity_delete",
       this->visualMsg->name());

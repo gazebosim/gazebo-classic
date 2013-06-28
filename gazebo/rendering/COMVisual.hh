@@ -52,9 +52,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~COMVisual();
 
-      /// \brief Load the Visual from an SDF pointer
-      /// \param[in] _elem SDF Element pointer
-      public: virtual void Load(sdf::ElementPtr _elem);
+      /// \brief Load the Visual from an RML pointer
+      /// \param[in] _elem RML Element pointer
+      public: virtual void Load(rml::ElementPtr _elem);
 
       /// \brief Load from a message
       /// \param[in] _msg Pointer to the message

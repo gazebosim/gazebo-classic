@@ -84,7 +84,7 @@ gazebo::math::Vector3 Convert(const gazebo::math::Vector3 &_vec)
   return result;
 }
 
-void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
+void ProcessMesh(rml::ElementPtr _elem, const gazebo::math::Pose _pose)
 {
   const gazebo::common::Mesh *mesh;
 
@@ -199,7 +199,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
   }
 }
 
-void ProcessLight(sdf::ElementPtr _elem)
+void ProcessLight(rml::ElementPtr _elem)
 {
   gazebo::math::Pose pose;
   gazebo::common::Color diffuse, specular;
@@ -259,7 +259,7 @@ void ProcessLight(sdf::ElementPtr _elem)
   printf("}\n");
 }
 
-void ProcessScene(sdf::ElementPtr _elem)
+void ProcessScene(rml::ElementPtr _elem)
 {
   gazebo::common::Color color;
   if (_elem->HasElement("background"))
@@ -293,11 +293,11 @@ void ProcessScene(sdf::ElementPtr _elem)
   printf("} }\n");
 }
 
-void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
+void ProcessGeometry(rml::ElementPtr _elem, const gazebo::math::Pose &_pose)
 {
   if (_elem->HasElement("plane"))
   {
-    sdf::ElementPtr planeElem = _elem->GetElement("plane");
+    rml::ElementPtr planeElem = _elem->GetElement("plane");
     gazebo::math::Vector3 normal = planeElem->GetValueVector3("normal");
     printf("plane {\n");
     printf("  <%f, %f, %f>, 0\n", normal.x, normal.y, normal.z);
@@ -306,7 +306,7 @@ void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
   }
   else if (_elem->HasElement("box"))
   {
-    sdf::ElementPtr boxElem = _elem->GetElement("box");
+    rml::ElementPtr boxElem = _elem->GetElement("box");
     gazebo::math::Vector3 size = boxElem->GetValueVector3("size");
     printf("box {\n");
     gazebo::math::Vector3 corner1 = _pose.pos - (size/2.0);
@@ -319,7 +319,7 @@ void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
   }
   else if (_elem->HasElement("cylinder"))
   {
-    sdf::ElementPtr cylinderElem = _elem->GetElement("cylinder");
+    rml::ElementPtr cylinderElem = _elem->GetElement("cylinder");
     double radius = cylinderElem->GetValueDouble("radius");
     double length = cylinderElem->GetValueDouble("length");
     gazebo::math::Vector3 capPoint = _pose.pos;
@@ -333,7 +333,7 @@ void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
   }
   else if (_elem->HasElement("sphere"))
   {
-    sdf::ElementPtr sphereElem = _elem->GetElement("sphere");
+    rml::ElementPtr sphereElem = _elem->GetElement("sphere");
     double radius = sphereElem->GetValueDouble("radius");
 
     printf("sphere {\n");
@@ -354,14 +354,14 @@ int main(int argc, char **argv)
     return 0;
 
   // Load the world file
-  sdf::SDFPtr sdf(new sdf::SDF);
-  if (!sdf::init(sdf))
+  rml::RMLPtr sdf(new rml::RML);
+  if (!rml::init(sdf))
   {
     gzerr << "Unable to initialize sdf\n";
     return false;
   }
 
-  if (!sdf::readFile(params[0], sdf))
+  if (!rml::readFile(params[0], sdf))
   {
     gzerr << "Unable to read sdf file[" << params[0] << "]\n";
     return false;
@@ -378,11 +378,11 @@ int main(int argc, char **argv)
   printf("  right <0, 1, 0>\n");
   printf("}\n");
 
-  sdf::ElementPtr root = sdf->root;
+  rml::ElementPtr root = sdf->root;
 
   gazebo::math::Pose modelPose, linkPose, visualPose;
 
-  sdf::ElementPtr worldElem = root->GetElement("world");
+  rml::ElementPtr worldElem = root->GetElement("world");
   while (worldElem)
   {
     if (worldElem->HasElement("scene"))
@@ -390,7 +390,7 @@ int main(int argc, char **argv)
 
     if (worldElem->HasElement("light"))
     {
-      sdf::ElementPtr lightElem = worldElem->GetElement("light");
+      rml::ElementPtr lightElem = worldElem->GetElement("light");
       while (lightElem)
       {
         ProcessLight(lightElem);
@@ -398,19 +398,19 @@ int main(int argc, char **argv)
       }
     }
 
-    sdf::ElementPtr modelElem = worldElem->GetElement("model");
+    rml::ElementPtr modelElem = worldElem->GetElement("model");
     while (modelElem)
     {
       modelPose = modelElem->GetOrCreateElement("origin")->GetValuePose("pose");
 
-      sdf::ElementPtr linkElem = modelElem->GetElement("link");
+      rml::ElementPtr linkElem = modelElem->GetElement("link");
       while (linkElem)
       {
         linkPose = linkElem->GetOrCreateElement("origin")->GetValuePose("pose");
 
         if (linkElem->HasElement("visual"))
         {
-          sdf::ElementPtr visualElem = linkElem->GetElement("visual");
+          rml::ElementPtr visualElem = linkElem->GetElement("visual");
           while (visualElem)
           {
             visualPose =
@@ -419,7 +419,7 @@ int main(int argc, char **argv)
             visualPose = modelPose + (linkPose + visualPose);
             // visualPose.pos = modelPose.pos + linkPose.pos + visualPose.pos;
             // visualPose.rot = visualPose.rot * linkPose.rot * modelPose.rot;
-            sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
+            rml::ElementPtr geomElem = visualElem->GetElement("geometry");
             ProcessGeometry(geomElem, visualPose);
 
             visualElem = visualElem->GetNextElement("visual");

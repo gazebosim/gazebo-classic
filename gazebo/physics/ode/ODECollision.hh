@@ -44,7 +44,7 @@ namespace gazebo
       public: virtual ~ODECollision();
 
       // Documentation inherited.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(rml::ElementPtr _rml);
 
       // Documentation inherited.
       public: virtual void Fini();

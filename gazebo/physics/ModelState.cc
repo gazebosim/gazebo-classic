@@ -81,10 +81,10 @@ ModelState::ModelState(const ModelPtr _model)
 }
 
 /////////////////////////////////////////////////
-ModelState::ModelState(const sdf::ElementPtr _sdf)
+ModelState::ModelState(const rml::ElementPtr _rml)
   : State()
 {
-  this->Load(_sdf);
+  this->Load(_rml);
 }
 
 /////////////////////////////////////////////////
@@ -141,7 +141,7 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
 }
 
 /////////////////////////////////////////////////
-void ModelState::Load(const sdf::ElementPtr _elem)
+void ModelState::Load(const rml::ElementPtr _elem)
 {
   // Set the name
   this->name = _elem->Get<std::string>("name");
@@ -156,7 +156,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
   this->linkStates.clear();
   if (_elem->HasElement("link"))
   {
-    sdf::ElementPtr childElem = _elem->GetElement("link");
+    rml::ElementPtr childElem = _elem->GetElement("link");
 
     while (childElem)
     {
@@ -170,7 +170,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
   /*this->jointStates.clear();
   if (_elem->HasElement("joint"))
   {
-    sdf::ElementPtr childElem = _elem->GetElement("joint");
+    rml::ElementPtr childElem = _elem->GetElement("joint");
 
     while (childElem)
     {
@@ -472,25 +472,25 @@ ModelState ModelState::operator+(const ModelState &_state) const
 }
 
 /////////////////////////////////////////////////
-void ModelState::FillSDF(sdf::ElementPtr _sdf)
+void ModelState::FillRML(rml::ElementPtr _rml)
 {
-  _sdf->ClearElements();
+  _rml->ClearElements();
 
-  _sdf->GetAttribute("name")->Set(this->name);
-  _sdf->GetElement("pose")->Set(this->pose);
+  _rml->GetAttribute("name")->Set(this->name);
+  _rml->GetElement("pose")->Set(this->pose);
 
   for (LinkState_M::iterator iter = this->linkStates.begin();
        iter != this->linkStates.end(); ++iter)
   {
-    sdf::ElementPtr elem = _sdf->AddElement("link");
-    iter->second.FillSDF(elem);
+    rml::ElementPtr elem = _rml->AddElement("link");
+    iter->second.FillRML(elem);
   }
 
   for (JointState_M::iterator iter = this->jointStates.begin();
        iter != this->jointStates.end(); ++iter)
   {
-    sdf::ElementPtr elem = _sdf->AddElement("joint");
-    iter->second.FillSDF(elem);
+    rml::ElementPtr elem = _rml->AddElement("joint");
+    iter->second.FillRML(elem);
   }
 }
 
