@@ -56,16 +56,16 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->modelSettingsItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("Model Settings")));
-    this->modelTreeWidget->addTopLevelItem(this->modelSettingsItem);
+  this->modelTreeWidget->addTopLevelItem(this->modelSettingsItem);
 
   this->modelItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Shapes and Joints")));
-    this->modelTreeWidget->addTopLevelItem(this->modelItem);
+        QStringList(QString("Parts and Joints")));
+  this->modelTreeWidget->addTopLevelItem(this->modelItem);
 
   QTreeWidgetItem *modelChildItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-    this->modelItem->addChild(modelChildItem);
+  this->modelItem->addChild(modelChildItem);
 
   // Parts and joints buttons
   QWidget *modelWidget = new QWidget;
@@ -110,24 +110,23 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   fixedJointButton->setChecked(false);
   connect(fixedJointButton, SIGNAL(clicked()), this, SLOT(OnFixedJoint()));
 
-  // revolute joint button
-  QPushButton *revoluteJointButton = new QPushButton(tr("Revolute"), this);
-  revoluteJointButton->setCheckable(true);
-  revoluteJointButton->setChecked(false);
-  connect(revoluteJointButton, SIGNAL(clicked()), this,
-      SLOT(OnRevoluteJoint()));
+  // Hinge joint button
+  QPushButton *hingeJointButton = new QPushButton(tr("Hinge"), this);
+  hingeJointButton->setCheckable(true);
+  hingeJointButton->setChecked(false);
+  connect(hingeJointButton, SIGNAL(clicked()), this, SLOT(OnHingeJoint()));
+
+  // Hinge2 joint button
+  QPushButton *hinge2JointButton = new QPushButton(tr("Hinge2"), this);
+  hinge2JointButton->setCheckable(true);
+  hinge2JointButton->setChecked(false);
+  connect(hinge2JointButton, SIGNAL(clicked()), this, SLOT(OnHinge2Joint()));
 
   // slider joint button
   QPushButton *sliderJointButton = new QPushButton(tr("Slider"), this);
   sliderJointButton->setCheckable(true);
   sliderJointButton->setChecked(false);
   connect(sliderJointButton, SIGNAL(clicked()), this, SLOT(OnSliderJoint()));
-
-  // Hinge joint button
-  QPushButton *hingeJointButton = new QPushButton(tr("Hinge"), this);
-  hingeJointButton->setCheckable(true);
-  hingeJointButton->setChecked(false);
-  connect(hingeJointButton, SIGNAL(clicked()), this, SLOT(OnHingeJoint()));
 
   // Screw joint button
   QPushButton *screwJointButton = new QPushButton(tr("Screw"), this);
@@ -142,26 +141,36 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   connect(universalJointButton, SIGNAL(clicked()), this,
       SLOT(OnUniversalJoint()));
 
+  // Ball joint button
+  QPushButton *ballJointButton = new QPushButton(tr("Ball"), this);
+  ballJointButton->setCheckable(true);
+  ballJointButton->setChecked(false);
+  connect(ballJointButton, SIGNAL(clicked()), this, SLOT(OnBallJoint()));
+
+
   QButtonGroup *jointsButtonGroup = new QButtonGroup;
   jointsButtonGroup->addButton(fixedJointButton);
-  jointsButtonGroup->addButton(revoluteJointButton);
   jointsButtonGroup->addButton(sliderJointButton);
   jointsButtonGroup->addButton(hingeJointButton);
+  jointsButtonGroup->addButton(hinge2JointButton);
   jointsButtonGroup->addButton(screwJointButton);
   jointsButtonGroup->addButton(universalJointButton);
+  jointsButtonGroup->addButton(ballJointButton);
 
   jointsLayout->addWidget(jointsLabel, 0, 0);
   jointsLayout->addWidget(fixedJointButton, 1, 0);
-  jointsLayout->addWidget(revoluteJointButton, 1, 1);
-  jointsLayout->addWidget(sliderJointButton, 1, 2);
-  jointsLayout->addWidget(hingeJointButton, 2, 0);
+  jointsLayout->addWidget(sliderJointButton, 1, 1);
+  jointsLayout->addWidget(hingeJointButton, 1, 2);
+  jointsLayout->addWidget(hinge2JointButton, 2, 0);
   jointsLayout->addWidget(screwJointButton, 2, 1);
   jointsLayout->addWidget(universalJointButton, 2, 2);
+  jointsLayout->addWidget(ballJointButton, 3, 0);
 
   modelLayout->addLayout(partsLayout);
   modelLayout->addLayout(jointsLayout);
   modelWidget->setLayout(modelLayout);
   this->modelTreeWidget->setItemWidget(modelChildItem, 0, modelWidget);
+  this->modelItem->setExpanded(true);
   modelChildItem->setExpanded(true);
 
   // plugin
@@ -213,62 +222,59 @@ void ModelEditorPalette::OnModelSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnCylinder()
 {
-//  gui::Events::createEntity("cylinder", "");
   this->modelCreator->CreatePart(ModelCreator::PART_CYLINDER);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSphere()
 {
-//  gui::Events::createEntity("sphere", "");
   this->modelCreator->CreatePart(ModelCreator::PART_SPHERE);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnBox()
 {
-//  gui::Events::createEntity("box", "");
   this->modelCreator->CreatePart(ModelCreator::PART_BOX);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnFixedJoint()
 {
-//  this->CreateJoint(JointMaker::JOINT_FIXED);
   this->jointMaker->CreateJoint(JointMaker::JOINT_FIXED);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnRevoluteJoint()
-{
-//  this->CreateJoint(JointMaker::JOINT_REVOLUTE);
-  this->jointMaker->CreateJoint(JointMaker::JOINT_REVOLUTE);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnSliderJoint()
-{
-//  this->CreateJoint(JointMaker::JOINT_SLIDER);
-  this->jointMaker->CreateJoint(JointMaker::JOINT_SLIDER);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnHingeJoint()
 {
-//  this->CreateJoint(JointMaker::JOINT_HINGE);
   this->jointMaker->CreateJoint(JointMaker::JOINT_HINGE);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnHinge2Joint()
+{
+  this->jointMaker->CreateJoint(JointMaker::JOINT_HINGE2);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSliderJoint()
+{
+  this->jointMaker->CreateJoint(JointMaker::JOINT_SLIDER);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnScrewJoint()
 {
-//  this->CreateJoint(JointMaker::JOINT_SCREW);
   this->jointMaker->CreateJoint(JointMaker::JOINT_SCREW);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnUniversalJoint()
 {
-//  this->CreateJoint(JointMaker::JOINT_UNIVERSAL);
   this->jointMaker->CreateJoint(JointMaker::JOINT_UNIVERSAL);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnBallJoint()
+{
+  this->jointMaker->CreateJoint(JointMaker::JOINT_BALL);
 }

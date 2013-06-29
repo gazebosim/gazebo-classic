@@ -82,20 +82,23 @@ namespace gazebo
       /// \brief Qt callback when fixed joint button is clicked.
       private slots: void OnFixedJoint();
 
-      /// \brief Qt callback when revolute joint button is clicked.
-      private slots: void OnRevoluteJoint();
+      /// \brief Qt callback when hinge joint button is clicked.
+      private slots: void OnHingeJoint();
+
+      /// \brief Qt callback when hinge2 joint button is clicked.
+      private slots: void OnHinge2Joint();
 
       /// \brief Qt callback when slider joint button is clicked.
       private slots: void OnSliderJoint();
-
-      /// \brief Qt callback when hinge joint button is clicked.
-      private slots: void OnHingeJoint();
 
       /// \brief Qt callback when screw joint button is clicked.
       private slots: void OnScrewJoint();
 
       /// \brief Qt callback when universal joint button is clicked.
       private slots: void OnUniversalJoint();
+
+      /// \brief Qt callback when universal joint button is clicked.
+      private slots: void OnBallJoint();
 
       /// \brief Widget that display model properties.
       private: QTreeWidget *modelTreeWidget;

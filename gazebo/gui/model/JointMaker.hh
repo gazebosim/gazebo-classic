@@ -41,16 +41,18 @@ namespace gazebo
         JOINT_NONE,
         /// \brief Fixed joint
         JOINT_FIXED,
-        /// \brief Revolute joint
-        JOINT_REVOLUTE,
         /// \brief Slider joint
         JOINT_SLIDER,
         /// \brief Hinge joint
         JOINT_HINGE,
+        /// \brief Hinge2 joint
+        JOINT_HINGE2,
         /// \brief Screw joint
         JOINT_SCREW,
         /// \brief Universal joint
-        JOINT_UNIVERSAL
+        JOINT_UNIVERSAL,
+        /// \brief Revolute joint
+        JOINT_BALL
       };
 
       /// \brief Constructor

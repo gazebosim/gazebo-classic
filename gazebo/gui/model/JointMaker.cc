@@ -41,42 +41,6 @@ JointMaker::~JointMaker()
   delete this->jointLine;
   this->hoverVis.reset();
 }
-/*
-/////////////////////////////////////////////////
-void JointMaker::SetParent(rendering::VisualPtr _parent,
-    math::Vector3 _offset)
-{
-  if (!_parent)
-  {
-    gzerr << "Parent is NULL" << std::endl;
-    return;
-  }
-
-  if (_parent != this->parent)
-  {
-    this->parent->DetachVisual(this->GetName());
-    this->parent = _parent;
-    this->parent->AttachVisual(shared_from_this());
-  }
-
-  this->jointLine->SetPoint(0, _offset);
-}
-
-/////////////////////////////////////////////////
-void JointMaker::SetChild(rendering::VisualPtr _child,
-    math::Vector3 _offset)
-{
-  if (!_child)
-  {
-    gzerr << "Child is NULL" << std::endl;
-    return;
-  }
-  math::Vector3 parentPos = math::Vector3::Zero;
-  if (this->parent)
-    parentPos = this->parent->GetWorldPose().pos;
-  this->jointLine->SetPoint(0,
-      _child->GetWorldPose().pos - parentPos + _offset);
-}*/
 
 /////////////////////////////////////////////////
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
@@ -89,8 +53,8 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
   rendering::ScenePtr scene = camera->GetScene();
 
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
-  if (vis)
-    vis = vis->GetRootVisual();
+//  if (vis)
+//    vis = vis->GetRootVisual();
 
   if (this->hoverVis)
   {
@@ -99,21 +63,59 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
       this->selectedVis = this->hoverVis;
       this->hoverVis.reset();
 
-//      JointMaker *jointVis = new JointMaker(
-//          this->selectedVis->GetName() + " _JointMaker::JOINTCREATOR_VISUAL_",
-//          this->selectedVis);
       rendering::VisualPtr joint(
           new rendering::Visual(this->selectedVis->GetName() +
-          "_JointMaker::JOINTCREATOR_VISUAL_", this->selectedVis));
+          "_JOINTCREATOR_VISUAL_", this->selectedVis));
       this->jointVis = joint;
       this->jointVis->Load();
       this->parent = this->selectedVis;
       this->jointLine =
           jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
       this->jointLine->AddPoint(math::Vector3(0, 0, 0));
-      this->jointLine->AddPoint(math::Vector3(0, 0, 1.01));
+      this->jointLine->AddPoint(math::Vector3(0, 0, 0.01));
 
-//      this->jointLine = jointVis;
+      switch (this->createJointType)
+      {
+        case JOINT_FIXED:
+        {
+          this->jointLine->setMaterial("Gazebo/Red");
+          break;
+        }
+        case JOINT_HINGE:
+        {
+          this->jointLine->setMaterial("Gazebo/Orange");
+          break;
+        }
+        case JOINT_HINGE2:
+        {
+          this->jointLine->setMaterial("Gazebo/Yellow");
+          break;
+        }
+        case JOINT_SLIDER:
+        {
+          this->jointLine->setMaterial("Gazebo/Green");
+          break;
+        }
+        case JOINT_SCREW:
+        {
+          this->jointLine->setMaterial("Gazebo/Black");
+          break;
+        }
+        case JOINT_UNIVERSAL:
+        {
+          this->jointLine->setMaterial("Gazebo/Blue");
+          break;
+        }
+        case JOINT_BALL:
+        {
+          this->jointLine->setMaterial("Gazebo/Purple");
+          break;
+        }
+        default:
+          break;
+
+      }
+
 //      this->jointLines.push_back(jointLine);
     }
     else if (this->selectedVis != vis)
@@ -171,54 +173,50 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   rendering::ScenePtr scene = camera->GetScene();
 
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
-//  if (!this->hoverVis || this->hoverVis != this->selectedVis)
+
+//  if (vis)
+//    vis = vis->GetRootVisual();
+
+  // Highlight visual on hover
+  if (vis)
   {
-//    if (vis)
-//      vis = vis->GetRootVisual();
+    if (this->hoverVis && this->hoverVis != this->selectedVis)
+      this->hoverVis->SetHighlighted(false);
 
-    // Highlight visual on hover
-    if (vis)
+    this->hoverVis = vis;
+    if (!this->hoverVis->IsPlane())
     {
-      if (this->hoverVis && this->hoverVis != this->selectedVis)
-        this->hoverVis->SetHighlighted(false);
-
-      this->hoverVis = vis;
-      if (!this->hoverVis->IsPlane())
-      {
-        this->hoverVis->SetHighlighted(true);
-  //      event::Events::setSelectedEntity(vis->GetName(), "normal");
-      }
-    }
-
-    // Case when a parent part is already selected and currently
-    // extending the joint line to a child part
-    if (this->selectedVis && this->hoverVis && this->jointLine)
-    {
-      math::Vector3 parentPos;
-      if (!this->hoverVis->IsPlane())
-      {
-//        this->jointLine->SetChild(this->hoverVis->GetWorldPose().pos -
-//            this->selectedVis->GetWorldPose().pos);
-//        this->jointLine->SetChild(this->hoverVis);
-        if (this->parent)
-          parentPos = this->parent->GetWorldPose().pos;
-        this->jointLine->SetPoint(1,
-            this->hoverVis->GetWorldPose().pos - parentPos);
-      }
-      else
-      {
-        math::Vector3 pt;
-        camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
-            math::Plane(math::Vector3(0, 0, 1)), pt);
-
-//        this->jointLine->SetChild(this->hoverVis, pt);
-        if (this->parent)
-          parentPos = this->parent->GetWorldPose().pos;
-        this->jointLine->SetPoint(1,
-            this->hoverVis->GetWorldPose().pos - parentPos + pt);
-      }
+      this->hoverVis->SetHighlighted(true);
+//    event::Events::setSelectedEntity(vis->GetName(), "normal");
     }
   }
+
+  // Case when a parent part is already selected and currently
+  // extending the joint line to a child part
+  if (this->selectedVis && this->hoverVis && this->jointLine)
+  {
+    math::Vector3 parentPos;
+    if (!this->hoverVis->IsPlane())
+    {
+      if (this->parent)
+        parentPos = this->parent->GetWorldPose().pos;
+      this->jointLine->SetPoint(1,
+          this->hoverVis->GetWorldPose().pos - parentPos);
+    }
+    else
+    {
+      math::Vector3 pt;
+      camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
+          math::Plane(math::Vector3(0, 0, 1)), pt);
+
+//      this->jointLine->SetChild(this->hoverVis, pt);
+      if (this->parent)
+        parentPos = this->parent->GetWorldPose().pos;
+      this->jointLine->SetPoint(1,
+          this->hoverVis->GetWorldPose().pos - parentPos + pt);
+    }
+  }
+
 
   return true;
 }
