@@ -19,8 +19,8 @@
  * Date: 4 Apr 2007
  */
 
-#include "math/Helpers.hh"
-#include "math/Vector3.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
 using namespace math;

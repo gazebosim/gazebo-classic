@@ -19,7 +19,7 @@
 #include <signal.h>
 #include <sys/types.h>
 #include "Server.hh"
-#include "gui/Gui.hh"
+#include "gazebo/gui/Gui.hh"
 
 bool sig_killed = false;
 int status1, status2;
