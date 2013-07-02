@@ -29,18 +29,18 @@
 #include <vector>
 #include <deque>
 
-#include "common/Event.hh"
-#include "common/PID.hh"
-#include "common/Time.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/PID.hh"
+#include "gazebo/common/Time.hh"
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "math/Plane.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Plane.hh"
+#include "gazebo/math/Vector2i.hh"
 
-#include "msgs/MessageTypes.hh"
-#include "rendering/RenderTypes.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sdf/sdf.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -684,9 +684,13 @@ namespace gazebo
       /// \brief Render period.
       private: common::Time renderPeriod;
 
-      /// \brief PID used to track a visual smoothly.
+      /// \brief Position PID used to track a visual smoothly.
       private: common::PID trackVisualPID;
-      private: common::PID trackVisualOPID;
+
+      /// \brief Pitch PID used to track a visual smoothly.
+      private: common::PID trackVisualPitchPID;
+
+      /// \brief Yaw PID used to track a visual smoothly.
       private: common::PID trackVisualYawPID;
 
       /// \brief Which noise type we support

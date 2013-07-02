@@ -384,7 +384,7 @@ void Camera::Update()
     if (yawError < -M_PI)
       yawError += M_PI*2;
 
-    double pitchAdj = this->trackVisualOPID.Update(pitchError, 0.01);
+    double pitchAdj = this->trackVisualPitchPID.Update(pitchError, 0.01);
     double yawAdj = this->trackVisualYawPID.Update(yawError, 0.01);
 
     this->SetWorldRotation(math::Quaternion(0, currPitch + pitchAdj,
@@ -1461,7 +1461,7 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   if (_visual)
   {
     this->trackVisualPID.Init(0.25, 0, 0, 0, 0, 1.0, 0.0);
-    this->trackVisualOPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
+    this->trackVisualPitchPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
     this->trackVisualYawPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
 
     this->trackedVisual = _visual;

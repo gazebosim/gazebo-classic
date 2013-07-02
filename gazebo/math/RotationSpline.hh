@@ -18,7 +18,7 @@
 #define _ROTATIONSPLINE_HH_
 
 #include <vector>
-#include "math/Quaternion.hh"
+#include "gazebo/math/Quaternion.hh"
 
 namespace gazebo
 {

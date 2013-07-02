@@ -22,7 +22,7 @@
 #ifndef _ODESURFACEPARAMS_HH_
 #define _ODESURFACEPARAMS_HH_
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {

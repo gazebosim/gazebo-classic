@@ -17,7 +17,7 @@
 #ifndef _MOUSEEVENT_HH_
 #define _MOUSEEVENT_HH_
 
-#include "math/Vector2i.hh"
+#include "gazebo/math/Vector2i.hh"
 
 namespace gazebo
 {
