@@ -24,7 +24,13 @@
 #include <vector>
 #include <string>
 
-#include <rml/rml.hh>
+#include "gazebo/gazebo_config.h"
+#ifdef HAVE_RML
+#include "rml/rml.hh"
+#else
+#include "gazebo/sdf/sdf.hh"
+#endif
+
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/CollisionState.hh"
 #include "gazebo/math/Pose.hh"

@@ -25,11 +25,19 @@
 #include "gazebo/sdf/interface/Param.hh"
 
 #define SDF_VERSION "1.4"
+#define RML_VERSION "1.4"
 
 /// \ingroup gazebo_parser
 /// \brief namespace for Simulation Description Format parser
 namespace sdf
 {
+  class SDF;
+  class Element;
+  typedef boost::shared_ptr<SDF> SDFPtr;
+  typedef boost::shared_ptr<SDF> RMLPtr;
+  typedef boost::shared_ptr<Element> ElementPtr;
+  typedef std::vector< ElementPtr > ElementPtr_V;
+
   /// A function that is used in the external SDF library. This is here to
   /// make the build work if the external SDF library is not present.
   void addURIPath(const std::string &_uri, const std::string &_path);
@@ -305,10 +313,12 @@ namespace sdf
 
     public: static std::string version;
   };
-  /// \}
 
-  typedef boost::shared_ptr<SDF> SDFPtr;
-  typedef boost::shared_ptr<Element> ElementPtr;
-  typedef std::vector< ElementPtr > ElementPtr_V;
+  class RML : public SDF
+  {
+  };
+  /// \}
 }
+
+namespace rml = sdf;
 #endif

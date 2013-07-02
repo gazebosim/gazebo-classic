@@ -27,7 +27,7 @@
 // Remove the gazebo_config and ifdefs in Gazebo 2.0
 #include "gazebo/gazebo_config.h"
 #ifdef HAVE_RML
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 #endif
 
 #include <gtest/gtest.h>
@@ -79,7 +79,7 @@ class ServerFixture : public testing::Test
                gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
                path = TEST_REGRESSION_PATH;
-               path += "/../../sdf";
+               path += "/../../rml";
                gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
                path = TEST_REGRESSION_PATH;
@@ -269,6 +269,9 @@ class ServerFixture : public testing::Test
                boost::mutex::scoped_lock lock(this->receiveMutex);
                for (int i = 0; i < _msg->pose_size(); ++i)
                {
+                 if (_msg->pose(i).name() == "pioneer2dx")
+                   std::cout << "Model[" << _msg->pose(i).name() << "] P[" <<
+                     msgs::Convert(_msg->pose(i)) << "]\n";
                  this->poses[_msg->pose(i).name()] =
                    msgs::Convert(_msg->pose(i));
                }
@@ -452,7 +455,7 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<sdf version='" << RML_VERSION << "'>"
+               newModelStr << "<rml version='" << RML_VERSION << "'>"
                  << "<model name ='" << _modelName << "'>"
                  << "<static>true</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
@@ -485,9 +488,9 @@ class ServerFixture : public testing::Test
                  << "  </sensor>"
                  << "</link>"
                  << "</model>"
-                 << "</sdf>";
+                 << "</rml>";
 
-               msg.set_sdf(newModelStr.str());
+               msg.set_rml(newModelStr.str());
                this->factoryPub->Publish(msg);
 
                int i = 0;
@@ -512,7 +515,7 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<sdf version='" << RML_VERSION << "'>"
+               newModelStr << "<rml version='" << RML_VERSION << "'>"
                  << "<model name ='" << _modelName << "'>"
                  << "<static>true</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
@@ -553,9 +556,9 @@ class ServerFixture : public testing::Test
                  << "  </sensor>"
                  << "</link>"
                  << "</model>"
-                 << "</sdf>";
+                 << "</rml>";
 
-               msg.set_sdf(newModelStr.str());
+               msg.set_rml(newModelStr.str());
                this->factoryPub->Publish(msg);
 
                int i = 0;
@@ -580,7 +583,7 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<sdf version='" << RML_VERSION << "'>"
+               newModelStr << "<rml version='" << RML_VERSION << "'>"
                  << "<model name ='" << _modelName << "'>"
                  << "<static>true</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
@@ -622,9 +625,9 @@ class ServerFixture : public testing::Test
                  << "  </sensor>"
                  << "</link>"
                  << "</model>"
-                 << "</sdf>";
+                 << "</rml>";
 
-               msg.set_sdf(newModelStr.str());
+               msg.set_rml(newModelStr.str());
                this->factoryPub->Publish(msg);
 
                int i = 0;
@@ -649,7 +652,7 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<sdf version='" << RML_VERSION << "'>"
+               newModelStr << "<rml version='" << RML_VERSION << "'>"
                  << "<model name ='" << _modelName << "'>" << std::endl
                  << "<static>true</static>" << std::endl
                  << "<pose>" << _pos << " " << _rpy << "</pose>" << std::endl
@@ -690,9 +693,9 @@ class ServerFixture : public testing::Test
                  << "  </sensor>" << std::endl
                  << "</link>" << std::endl
                  << "</model>" << std::endl
-                 << "</sdf>" << std::endl;
+                 << "</rml>" << std::endl;
 
-               msg.set_sdf(newModelStr.str());
+               msg.set_rml(newModelStr.str());
                this->factoryPub->Publish(msg);
 
                int i = 0;
@@ -732,7 +735,7 @@ class ServerFixture : public testing::Test
                           << "</cylinder>";
                }
 
-               newModelStr << "<sdf version='" << RML_VERSION << "'>"
+               newModelStr << "<rml version='" << RML_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
@@ -754,9 +757,9 @@ class ServerFixture : public testing::Test
                  << "  </sensor>"
                  << "</link>"
                  << "</model>"
-                 << "</sdf>";
+                 << "</rml>";
 
-               msg.set_sdf(newModelStr.str());
+               msg.set_rml(newModelStr.str());
                this->factoryPub->Publish(msg);
 
                int i = 0;
@@ -794,7 +797,7 @@ class ServerFixture : public testing::Test
                           << "  <radius>.5</radius><length>1.0</length>"
                           << "</cylinder>";
                }
-               newModelStr << "<sdf version='" << RML_VERSION << "'>"
+               newModelStr << "<rml version='" << RML_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
@@ -823,9 +826,9 @@ class ServerFixture : public testing::Test
                  << "  </sensor>"
                  << "</link>"
                  << "</model>"
-                 << "</sdf>";
+                 << "</rml>";
 
-               msg.set_sdf(newModelStr.str());
+               msg.set_rml(newModelStr.str());
                this->factoryPub->Publish(msg);
 
                int i = 0;
@@ -845,7 +848,7 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<sdf version='" << RML_VERSION << "'>"
+               newModelStr << "<rml version='" << RML_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
@@ -866,9 +869,9 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</sdf>";
+                 << "</rml>";
 
-               msg.set_sdf(newModelStr.str());
+               msg.set_rml(newModelStr.str());
                this->factoryPub->Publish(msg);
 
                // Wait for the entity to spawn
@@ -883,7 +886,7 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<sdf version='" << RML_VERSION << "'>"
+               newModelStr << "<rml version='" << RML_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
@@ -900,9 +903,9 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</sdf>";
+                 << "</rml>";
 
-               msg.set_sdf(newModelStr.str());
+               msg.set_rml(newModelStr.str());
                this->factoryPub->Publish(msg);
 
                // Wait for the entity to spawn
@@ -918,7 +921,7 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<sdf version='" << RML_VERSION << "'>"
+               newModelStr << "<rml version='" << RML_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
@@ -938,9 +941,9 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</sdf>";
+                 << "</rml>";
 
-               msg.set_sdf(newModelStr.str());
+               msg.set_rml(newModelStr.str());
                this->factoryPub->Publish(msg);
 
                // Wait for the entity to spawn
@@ -955,7 +958,7 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<sdf version='" << RML_VERSION << "'>"
+               newModelStr << "<rml version='" << RML_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
@@ -972,9 +975,9 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</sdf>";
+                 << "</rml>";
 
-               msg.set_sdf(newModelStr.str());
+               msg.set_rml(newModelStr.str());
                this->factoryPub->Publish(msg);
 
                // Wait for the entity to spawn
@@ -990,7 +993,7 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<sdf version='" << RML_VERSION << "'>"
+               newModelStr << "<rml version='" << RML_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
@@ -1010,9 +1013,9 @@ class ServerFixture : public testing::Test
                  << "  </visual>"
                  << "</link>"
                  << "</model>"
-                 << "</sdf>";
+                 << "</rml>";
 
-               msg.set_sdf(newModelStr.str());
+               msg.set_rml(newModelStr.str());
                this->factoryPub->Publish(msg);
 
                // Wait for the entity to spawn
@@ -1027,16 +1030,16 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<sdf version='" << RML_VERSION << "'>"
+               newModelStr << "<rml version='" << RML_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<static>" << _static << "</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='body'>"
                  << "</link>"
                  << "</model>"
-                 << "</sdf>";
+                 << "</rml>";
 
-               msg.set_sdf(newModelStr.str());
+               msg.set_rml(newModelStr.str());
                this->factoryPub->Publish(msg);
 
                // Wait for the entity to spawn
@@ -1047,32 +1050,32 @@ class ServerFixture : public testing::Test
   protected: void SpawnModel(const std::string &_filename)
              {
                msgs::Factory msg;
-               msg.set_sdf_filename(_filename);
+               msg.set_rml_filename(_filename);
                this->factoryPub->Publish(msg);
              }
 
              /// \brief Send a factory message based on an RML string.
-             /// \param[in] _sdf RML string to publish.
-  protected: void SpawnRML(const std::string &_sdf)
+             /// \param[in] _rml RML string to publish.
+  protected: void SpawnRML(const std::string &_rml)
              {
                msgs::Factory msg;
-               msg.set_sdf(_sdf);
+               msg.set_rml(_rml);
                this->factoryPub->Publish(msg);
 
                // The code above sends a message, but it will take some time
                // before the message is processed.
                //
-               // The code below parses the sdf string to find a model name,
+               // The code below parses the rml string to find a model name,
                // then this function will block until that model
                // has been processed and recognized by the Server Fixture.
-               rml::RML sdfParsed;
-               sdfParsed.SetFromString(_sdf);
-               // Check that sdf contains a model
-               if (sdfParsed.root->HasElement("model"))
+               rml::RML rmlParsed;
+               rmlParsed.SetFromString(_rml);
+               // Check that rml contains a model
+               if (rmlParsed.root->HasElement("model"))
                {
                  // Timeout of 30 seconds (3000 * 10 ms)
                  int waitCount = 0, maxWaitCount = 3000;
-                 rml::ElementPtr model = sdfParsed.root->GetElement("model");
+                 rml::ElementPtr model = rmlParsed.root->GetElement("model");
                  std::string name = model->Get<std::string>("name");
                  while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
                    common::Time::MSleep(100);

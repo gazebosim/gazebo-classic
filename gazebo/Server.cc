@@ -280,6 +280,8 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
+  rml->root->PrintValues("  ");
+
   if (!rml::readFile(common::find_file(_filename), rml))
   {
     gzerr << "Unable to read rml file[" << _filename << "]\n";

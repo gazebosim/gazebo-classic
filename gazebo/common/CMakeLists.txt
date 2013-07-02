@@ -115,10 +115,13 @@ target_link_libraries(gazebo_common
   ${libswscale_LIBRARIES}
   ${libtar_libraries}
   ${TBB_LIBRARIES}
-  ${RML_LIBRARIES}
   rt
   pthread
 )
+
+if (HAVE_RML)
+  target_link_libraries(gazebo_common ${RML_LIBRARIES})
+endif()
 
 if (HAVE_GTS)
   target_link_libraries(gazebo_common ${gts_LIBRARIES})

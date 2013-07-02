@@ -146,7 +146,7 @@ TEST(gz_log, EchoFilter)
 
   echo = custom_exec(
       std::string("gzlog echo --filter pr2.pose.x ") +
-      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log 2>/dev/null");
   boost::trim_right(echo);
   EXPECT_EQ(pr2PoseXStateLog, echo);
 

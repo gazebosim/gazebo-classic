@@ -22,7 +22,12 @@
 #ifndef _SURFACEPARAMS_HH_
 #define _SURFACEPARAMS_HH_
 
-#include <rml/rml.hh>
+#include "gazebo/gazebo_config.h"
+#ifdef HAVE_RML
+#include "rml/rml.hh"
+#else
+#include "gazebo/sdf/sdf.hh"
+#endif
 
 #include "gazebo/msgs/msgs.hh"
 

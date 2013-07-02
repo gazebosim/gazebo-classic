@@ -25,7 +25,12 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <gazebo/gazebo_config.h>
+#ifdef HAVE_RML
 #include <rml/rml.hh>
+#else
+#include "gazebo/sdf/sdf.hh"
+#endif
 
 #include "gazebo/transport/TransportTypes.hh"
 

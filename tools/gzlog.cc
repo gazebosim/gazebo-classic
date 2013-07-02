@@ -25,7 +25,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
-#include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/msgs/msgs.hh>
@@ -622,7 +622,7 @@ class StateFilter : public FilterBase
 
             if (this->xmlOutput)
             {
-              result << "<sdf version='" << RML_VERSION << "'>\n"
+              result << "<rml version='" << RML_VERSION << "'>\n"
                 << "<state world_name='" << state.GetName() << "'>\n"
                 << "<sim_time>" << state.GetSimTime() << "</sim_time>\n"
                 << "<real_time>" << state.GetRealTime() << "</real_time>\n"
@@ -632,7 +632,7 @@ class StateFilter : public FilterBase
             result << this->filter.Filter(state);
 
             if (this->xmlOutput)
-              result << "</sdf></state>\n";
+              result << "</rml></state>\n";
 
             this->prevTime = state.GetSimTime();
             return result.str();
@@ -752,13 +752,13 @@ void info(const std::string &_filename)
   gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
 
   // Get the RML world description from the log file
-  std::string sdfString;
-  gazebo::util::LogPlay::Instance()->Step(sdfString);
+  std::string rmlString;
+  gazebo::util::LogPlay::Instance()->Step(rmlString);
 
   // Parse the first RML world description
-  rml::ElementPtr sdf(new rml::Element);
-  rml::initFile("root.sdf", sdf);
-  rml::readString(sdfString, sdf);
+  rml::ElementPtr rml(new rml::Element);
+  rml::initFile("root.rml", rml);
+  rml::readString(rmlString, rml);
 
   gazebo::physics::WorldState state;
 
@@ -767,13 +767,13 @@ void info(const std::string &_filename)
   gazebo::common::Time endTime(0, 0);
   gazebo::common::Time startTime(0, 0);
 
-  if (sdf)
+  if (rml)
   {
     // Check for a world element
-    if (sdf->HasElement("world"))
+    if (rml->HasElement("world"))
     {
       // Get a pointer to the world element
-      rml::ElementPtr worldElem = sdf->GetElement("world");
+      rml::ElementPtr worldElem = rml->GetElement("world");
 
       // Check for a model
       if (worldElem->HasElement("model"))
@@ -1017,9 +1017,9 @@ int main(int argc, char **argv)
 
   std::string command, filename, filter;
 
-  // Create a state sdf element.
+  // Create a state rml element.
   g_stateSdf.reset(new rml::Element);
-  rml::initFile("state.sdf", g_stateSdf);
+  rml::initFile("state.rml", g_stateSdf);
 
   // Get the command name
   command = vm.count("command") ? vm["command"].as<std::string>() : "";

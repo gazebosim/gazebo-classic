@@ -17,13 +17,16 @@ link_directories(
   ${PROJECT_BINARY_DIR}/test
 )
 
-# Remove this whole if block in Gazebo 1.8
+# Remove this whole if block in Gazebo 2.0
 if (NOT HAVE_RML)
   link_directories(
     ${urdfdom_LIBRARY_DIRS}
     ${urdfdom_headers_LIBRARY_DIRS}
     ${console_bridge_LIBRARY_DIRS}
     )
+  add_subdirectory(sdf)
+  add_subdirectory(rml)
+  include_directories(${PROJECT_SOURCE_DIR}/gazebo)
 endif()
 
 add_subdirectory(msgs)
@@ -35,7 +38,6 @@ add_subdirectory(gui)
 add_subdirectory(physics)
 add_subdirectory(sensors)
 add_subdirectory(util)
-add_subdirectory(sdf)
 
 add_dependencies(gazebo_physics gazebo_msgs)
 add_dependencies(gazebo_physics_ode gazebo_msgs)

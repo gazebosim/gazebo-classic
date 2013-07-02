@@ -27,10 +27,10 @@
 #include <time.h>
 #include <iostream>
 
-// Remove the gazebo_confif and ifdefs in Gazebo 1.8
-#include "gazebo/gazebo_config.h"
-#ifdef HAVE_RML
-#include "rml/rml.hh"
+// Remove in gazebo 2.0
+#include <gazebo/gazebo_config.h>
+#if HAVE_RML
+#include <rml/rml.hh>
 #endif
 
 #include "gazebo/common/CommonTypes.hh"

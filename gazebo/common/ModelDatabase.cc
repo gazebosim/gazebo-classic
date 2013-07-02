@@ -615,6 +615,13 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
     if (modelXML)
     {
       TiXmlElement *rmlXML = modelXML->FirstChildElement("rml");
+      bool sdf = false;
+      if (!rmlXML)
+      {
+        rmlXML = modelXML->FirstChildElement("sdf");
+        sdf = true;
+      }
+
       TiXmlElement *rmlSearch = rmlXML;
 
       // Find the RML element that matches our current RML version.
@@ -627,7 +634,10 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
           break;
         }
 
-        rmlSearch = rmlSearch->NextSiblingElement("rml");
+        if (sdf)
+          rmlSearch = rmlSearch->NextSiblingElement("sdf");
+        else
+          rmlSearch = rmlSearch->NextSiblingElement("rml");
       }
 
       if (rmlXML)

@@ -26,12 +26,10 @@
 #include <iostream>
 #include <fstream>
 
-// Remove the gazebo_config and ifdefs in Gazebo 1.8
-#include "gazebo/gazebo_config.h"
-#ifdef HAVE_RML
-#include "rml/rml.hh"
+#include <gazebo/gazebo_config.h>
+#if HAVE_RML
+#include <rml/rml.hh>
 #endif
-
 
 #include "gazebo/math/Helpers.hh"
 

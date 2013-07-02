@@ -20,7 +20,7 @@
 // Remove the gazebo_config and ifdefs in Gazebo 2.0
 #include "gazebo/gazebo_config.h"
 #ifdef HAVE_RML
-#include "sdf/sdf.hh"
+#include "rml/rml.hh"
 #else
 #include "gazebo/sdf/sdf.hh"
 #endif
@@ -30,13 +30,13 @@
 
 std::vector<std::string> params;
 
-using namespace sdf;
+using namespace rml;
 
 /////////////////////////////////////////////////
 void help()
 {
   std::cout << "This tool provides information about RML files.\n\n";
-  std::cout << "gzsdf <command>\n\n";
+  std::cout << "gzrml <command>\n\n";
   std::cout << "Commands:\n";
   std::cout << "    describe [RML version]     Print the RML format.\n";
   std::cout << "    convert [file]             "
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
   try
   {
     // Initialize the informational logger. This will log warnings and errors.
-    gazebo::common::Console::Instance()->Init("gzsdf.log");
+    gazebo::common::Console::Instance()->Init("gzrml.log");
   }
   catch(gazebo::common::Exception &_e)
   {
@@ -93,8 +93,8 @@ int main(int argc, char** argv)
   else if (params.size() == 2)
     RML::version = params[1];
 
-  boost::shared_ptr<RML> sdf(new RML());
-  if (!init(sdf))
+  boost::shared_ptr<RML> rml(new RML());
+  if (!init(rml))
   {
     std::cerr << "ERROR: RML parsing the xml failed" << std::endl;
     return -1;
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
     if (!file_exists(params[1]))
       std::cerr << "Error: File doesn't exist[" << params[1] << "]\n";
 
-    if (!readFile(params[1], sdf))
+    if (!readFile(params[1], rml))
     {
       std::cerr << "Error: RML parsing the xml failed\n";
       return -1;
@@ -123,12 +123,12 @@ int main(int argc, char** argv)
   }
   else if (params[0] == "describe")
   {
-    sdf->PrintDescription();
+    rml->PrintDescription();
     success = true;
   }
   else if (params[0] == "doc")
   {
-    sdf->PrintDoc();
+    rml->PrintDoc();
     success = true;
   }
   else if (params[0] == "convert")
@@ -176,13 +176,13 @@ int main(int argc, char** argv)
     if (!file_exists(params[1]))
       std::cerr << "Error: File doesn't exist[" << params[1] << "]\n";
 
-    if (!readFile(params[1], sdf))
+    if (!readFile(params[1], rml))
     {
       std::cerr << "Error: RML parsing the xml failed\n";
       return -1;
     }
     success = true;
-    sdf->PrintValues();
+    rml->PrintValues();
   }
   else
   {

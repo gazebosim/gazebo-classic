@@ -6,6 +6,4 @@ add_subdirectory(1.4)
 
 set (headers sdf.hh)
 
-if (HAVE_RML)
-  gz_install_includes("sdf" ${headers})
-endif()
+gz_install_includes("sdf" ${headers})

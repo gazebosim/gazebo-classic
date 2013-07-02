@@ -56,6 +56,7 @@ SystemPaths::SystemPaths()
     home = homePath;
 
   rml::addURIPath("model://", home + "/.gazebo/models");
+
   this->modelPaths.push_back(home + "/.gazebo/models");
 
   char *path = getenv("GAZEBO_LOG_PATH");

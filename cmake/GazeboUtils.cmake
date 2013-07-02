@@ -179,6 +179,10 @@ macro (gz_build_tests)
       pthread
       )
 
+    if (NOT HAVE_RML)
+      target_link_libraries(${BINARY_NAME} gazebo_sdf_interface)
+    endif()
+
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
 	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
   
@@ -245,6 +249,10 @@ if (VALID_DISPLAY)
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
       )
+
+    if (NOT HAVE_RML)
+      target_link_libraries(${BINARY_NAME} gazebo_sdf_interface)
+    endif()
 
     # QTest need and extra -o parameter to write logging information to a file
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}

@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include <rml/rml.hh>
 #include "Inertial.hh"
 
 using namespace gazebo;
@@ -32,7 +31,7 @@ Inertial::Inertial()
   if (!this->rmlInertial)
   {
     this->rmlInertial.reset(new rml::Element);
-    rml::initFile("inertial.rml", this->rmlInertial);
+    initFile("inertial.rml", this->rmlInertial);
   }
 
   // This is the only time this->rmlInertial should be used.
@@ -43,7 +42,7 @@ Inertial::Inertial()
 Inertial::Inertial(double _m)
 {
   this->rml.reset(new rml::Element);
-  rml::initFile("inertial.rml", this->rml);
+  initFile("inertial.rml", this->rml);
 
   this->mass = _m;
   this->cog.Set(0, 0, 0, 0, 0, 0);
@@ -55,7 +54,7 @@ Inertial::Inertial(double _m)
 Inertial::Inertial(const Inertial &_inertial)
 {
   this->rml.reset(new rml::Element);
-  rml::initFile("inertial.rml", this->rml);
+  initFile("inertial.rml", this->rml);
 
   (*this) = _inertial;
 }
