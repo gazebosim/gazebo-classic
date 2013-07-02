@@ -434,6 +434,7 @@ void GLWidget::OnMouseMoveUniversal()
     if (this->mouseEvent.button == common::MouseEvent::LEFT)
     {
       /// TODO add logic for rotate/scale/translate vis
+      //if (mode
 
       this->userCamera->HandleMouseEvent(this->mouseEvent);
     }
@@ -1000,25 +1001,32 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
       this->mouseEvent.pressPos.y, origin2, dir2);
 
   math::Vector3 moveVector(0, 0, 0);
-  math::Vector3 planeNorm(0, 0, 1);
+  math::Vector3 planeNorm(0, 0, 0);
 
   if (this->keyText == "z")
   {
-    math::Vector2i diff = this->mouseEvent.pos - this->mouseEvent.pressPos;
+/*    math::Vector2i diff = this->mouseEvent.pos - this->mouseEvent.pressPos;
     pose.pos.z = this->mouseMoveVisStartPose.pos.z + diff.y * -0.01;
     _vis->SetPose(pose);
-    return;
+    return;*/
+    moveVector.z = 1;
+    planeNorm.y = 1;
   }
   else if (this->keyText == "x")
   {
     moveVector.x = 1;
+    planeNorm.y = 1;
   }
   else if (this->keyText == "y")
   {
     moveVector.y = 1;
+    planeNorm.x = 1;
   }
   else
+  {
     moveVector.Set(1, 1, 0);
+    planeNorm.z = 1;
+  }
 
   // Compute the distance from the camera to plane of translation
   double d = pose.pos.Dot(planeNorm);
@@ -1055,7 +1063,8 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
     }
   }
 
-  pose.pos.z = _vis->GetPose().pos.z;
+  if (this->keyText != "z")
+    pose.pos.z = _vis->GetPose().pos.z;
 
   _vis->SetPose(pose);
 }
